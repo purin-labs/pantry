@@ -140,11 +140,11 @@ No voice file names the GitHub organisation, so step 1 changes nothing for voice
 
 Git ignores these files. A moved folder keeps them, but a new clone does not have them:
 
-| Item                                         | Size   | What to do                                                                                                         |
-| -------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
-| `.cache/human/2026-11-16-1912/`              | 9.6 MB | The owner's voice. The D5 run needs it. Never commit it. Copied to `~/Dev/lowerarchy/seams-atelier` on 2026-11-18. |
-| `output/shop-voice/`                         | 25 MB  | Journey and bench results that the plans cite. Copied to `~/Dev/lowerarchy/seams-atelier` on 2026-11-18.           |
-| `.claude/launch.json`, `voice-recorder-p82c` | —      | The new clone has no `.claude/launch.json`. Add the entry with the new path if you use the recorder.               |
+| Item                                         | Size   | What to do                                                                                                            |
+| -------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------- |
+| `.cache/human/2026-11-16-1912/`              | 9.6 MB | The owner's voice. The D5 run needs it. Never commit it. Copied to the clone `~/Dev/lowerarchy/pantry` on 2026-11-18. |
+| `output/shop-voice/`                         | 25 MB  | Journey and bench results that the plans cite. Copied to the clone `~/Dev/lowerarchy/pantry` on 2026-11-18.           |
+| `.claude/launch.json`, `voice-recorder-p82c` | —      | The new clone has no `.claude/launch.json`. Add the entry with the new path if you use the recorder.                  |
 
 ### What stays where it is
 
@@ -169,10 +169,10 @@ These are outside the repositories, so the move does not change them:
 - The account Worker in `~/Dev/rust/seams-monorepo/.artifacts/shared-account-platform/account-worker/index.mjs`,
   for `SATYR_ACCOUNT_WORKER_ARTIFACT`. After the move, use the new seams-monorepo path.
 - Claude Code keeps its project notes in a folder named after the checkout's path. A checkout at a
-  new path starts with no notes. Today two folders hold separate copies:
-  `~/.claude/projects/-Users-pta-Dev-lowerarchy-satyr/memory` and
-  `~/.claude/projects/-Users-pta-Dev-lowerarchy-seams-atelier/memory`. Merge them into the new
-  project's `memory/` folder.
+  new path starts with no notes. Today three folders hold separate copies, named after the clones
+  `satyr`, `seams-atelier` and `pantry`, for example
+  `~/.claude/projects/-Users-pta-Dev-lowerarchy-pantry/memory`. The `pantry` folder has the voice
+  notes of 2026-11-18. Merge the three into the new project's `memory/` folder.
 
 ### What the Purin rename changes for voice
 
