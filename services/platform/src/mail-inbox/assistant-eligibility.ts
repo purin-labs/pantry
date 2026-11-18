@@ -9,12 +9,13 @@ import type { MailAssistantStatus } from "@seams/control-api";
 import type { MailOrganizationActorInput } from "./commands";
 import { authorizeMailSource } from "./authorization";
 import type { Result } from "../result";
+import type { Variant } from "@seams/type-utils";
 
 export type MailAssistantAuthority = Readonly<{
   modelRoute: OrganisationModelRoute;
   modelRouteDigest: string;
   sourcePin: string;
-  status: Extract<MailAssistantStatus, { kind: "ready" }>;
+  status: Variant<MailAssistantStatus, "ready">;
 }>;
 export async function authorizeMailAssistant(
   env: Env,
@@ -81,7 +82,7 @@ export async function authorizeMailAssistant(
 }
 function mailAssistantRecipient(
   route: OrganisationModelRoute,
-): Extract<MailAssistantStatus, { kind: "ready" }>["recipient"] {
+): Variant<MailAssistantStatus, "ready">["recipient"] {
   switch (route.provider) {
     case "openai-compatible":
       return "openrouter";

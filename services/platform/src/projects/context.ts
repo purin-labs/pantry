@@ -32,6 +32,7 @@ import type { Env } from "../env";
 import type { ProjectAccessScope } from "./access";
 import { readProject } from "./records";
 import { observeProjectReference } from "./references";
+import type { Variant } from "@seams/type-utils";
 
 export type ProjectSnapshotPlacement = Readonly<{
   projectId: ProjectId;
@@ -195,7 +196,7 @@ type ProjectObservationError = Readonly<{
 async function projectObservationItem(
   db: OrganisationDatabase,
   accountAccess: AccountPlatformAccess,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   caseId: string,
   snapshotDigest: string,
   text: string,
@@ -264,7 +265,7 @@ async function projectObservationItem(
 export async function authorizeProjectContextDisclosure(
   db: OrganisationDatabase,
   accountAccess: AccountPlatformAccess,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   caseId: string,
   snapshot: ProjectSnapshot | null,
 ): Promise<Result<true, ProjectObservationError>> {

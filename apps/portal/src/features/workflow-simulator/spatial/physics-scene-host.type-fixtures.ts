@@ -1,10 +1,8 @@
 import type { PhysicsSceneLife } from "./physics-scene-host";
+import type { Variant } from "@seams/type-utils";
 
-declare const factory: Extract<PhysicsSceneLife, { kind: "factory" }>;
-declare const recording: Extract<
-  PhysicsSceneLife,
-  { kind: "ready" | "loading-assets" }
->;
+declare const factory: Variant<PhysicsSceneLife, "factory">;
+declare const recording: Variant<PhysicsSceneLife, "ready" | "loading-assets">;
 
 // @ts-expect-error A disposed host cannot retain a factory renderer through a spread.
 const disposedFactory: PhysicsSceneLife = { ...factory, kind: "disposed" };

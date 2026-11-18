@@ -14,6 +14,7 @@ import {
 } from "../data/email-operational";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * A sender of one mailbox that a person links to a supplier from the Inbox.
@@ -69,7 +70,7 @@ async function senderLinkVerificationId(
 async function senderContactTarget(
   supplierId: string,
   address: string,
-): Promise<Extract<OperationalEmailTarget, { kind: "supplier_contact" }>> {
+): Promise<Variant<OperationalEmailTarget, "supplier_contact">> {
   return {
     kind: "supplier_contact",
     supplierId,
@@ -242,7 +243,7 @@ export async function linkSenderToSupplier(
 
 function sameTarget(
   left: OperationalEmailTarget,
-  right: Extract<OperationalEmailTarget, { kind: "supplier_contact" }>,
+  right: Variant<OperationalEmailTarget, "supplier_contact">,
 ): boolean {
   return (
     left.kind === "supplier_contact" &&

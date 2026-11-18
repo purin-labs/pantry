@@ -9,13 +9,14 @@ import type { OperationalEmailTarget } from "../data/email-operational";
 import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
 import { digestCanonical } from "../policy/information-flow/digest";
 import type { FlowRecipient } from "../policy/information-flow/types";
+import type { Variant } from "@seams/type-utils";
 
 type VerifiedSupplierEndpoint = Omit<
   VerifiedContactEndpoint,
   "target" | "endpoint"
 > &
   Readonly<{
-    target: Extract<OperationalEmailTarget, { kind: "supplier_contact" }>;
+    target: Variant<OperationalEmailTarget, "supplier_contact">;
     endpoint: Extract<ContactEndpoint, { channel: "gmail" }>;
   }>;
 

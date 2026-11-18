@@ -171,11 +171,11 @@ void invalidScenarioSaving;
 void invalidEmptyScenarioProposal;
 
 // Persistent saves cannot reuse a finite plan or an agent proposal.
-declare const finiteRunPanel: Extract<
+declare const finiteRunPanel: Variant<
   ConstructorParameters<
     typeof import("./workspace-runs-panel").WorkspaceRunsPanel
   >[0],
-  { kind: "production" | "rehearsal-run" }
+  "production" | "rehearsal-run"
 >;
 // @ts-expect-error Changing the discriminant cannot turn a finite plan into a resumable save source.
 export const mixedPersistentRunPanel: ConstructorParameters<

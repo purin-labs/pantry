@@ -16,8 +16,9 @@ import {
 } from "./conversation-access";
 import { authorizeProject } from "../projects/access";
 import { readDefaultProjectId } from "../projects/case-project";
+import type { Variant } from "@seams/type-utils";
 
-type MoveCommand = Extract<ChatDirectoryCommand, { kind: "move_chat" }>;
+type MoveCommand = Variant<ChatDirectoryCommand, "move_chat">;
 
 export async function moveChatDirectoryEntry(
   execution: OrganisationExecutionScope,

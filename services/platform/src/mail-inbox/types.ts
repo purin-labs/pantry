@@ -14,6 +14,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import type { Variant } from "@seams/type-utils";
 
 export type MailObservation =
   | Readonly<{
@@ -32,7 +33,7 @@ export type MailOrganizationHead = Readonly<{
   organisationId: OrganisationId;
   integrationAccountId: IntegrationAccountId;
   view: Exclude<MailRuleSet, { kind: "empty" }>;
-  authority: Extract<RequestAuthority, { kind: "control" }>;
+  authority: Variant<RequestAuthority, "control">;
   sourcePin: string;
   classificationRevision: number;
   observation: MailObservation;

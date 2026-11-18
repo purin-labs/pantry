@@ -31,6 +31,7 @@ import {
   type TypeSafeUsageMeasurement,
 } from "../integrations/typesafe/evaluation-ledger";
 import { assertNever } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 export type CaseContextDiscoveryEvaluationDispatch =
   Readonly<{ kind: "unissued" }> | Readonly<{ kind: "issued" }>;
@@ -60,10 +61,7 @@ export function releaseUnissuedCaseContextDiscoveryEvaluation(
     scope: OrganisationExecutionScope;
     evaluationId: string;
     requestDigest: string;
-    dispatch: Extract<
-      CaseContextDiscoveryEvaluationDispatch,
-      { kind: "unissued" }
-    >;
+    dispatch: Variant<CaseContextDiscoveryEvaluationDispatch, "unissued">;
   }>,
 ): void {
   // The caller owns this reservation and its guarded transport never issued it.

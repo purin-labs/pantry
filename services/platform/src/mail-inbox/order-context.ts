@@ -15,8 +15,9 @@ import {
   validateEmailCommerceEvidence,
   type EmailCommerceEvidence,
 } from "./supplier-context";
+import type { Variant } from "@seams/type-utils";
 
-type MailboxAuthority = Extract<RequestAuthority, { kind: "agent_mailbox" }>;
+type MailboxAuthority = Variant<RequestAuthority, "agent_mailbox">;
 type CommerceEntity = CommerceGraphQueryResult["entities"][number];
 
 type EmailOrderContextError = Readonly<{

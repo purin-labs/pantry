@@ -17,7 +17,7 @@ import { isRecord, parseJsonOrNull } from "@seams/std";
 import { RunArtifactFile } from "./run-artifact-file";
 import { compileBlackSesameRecipe } from "../recipes/bakery/black-sesame.ts";
 import { compileGingerBlackTeaRecipe } from "../recipes/bakery/ginger-black-tea.ts";
-import type { StrictUnion, VariantBy } from "@seams/type-utils";
+import type { StrictUnion, Variant, VariantBy } from "@seams/type-utils";
 import {
   parsePersistentCell,
   type PersistentCell,
@@ -167,7 +167,7 @@ export async function readOvenSave(
 
 export async function prepareFinancierRecipe(
   raw: unknown,
-): Promise<Result<Extract<OvenRunSource, { kind: "recipe" }>, string>> {
+): Promise<Result<Variant<OvenRunSource, "recipe">, string>> {
   const compiled = await compileFinancierRecipe(raw);
   if (!compiled.ok)
     return err(`Cannot prepare this recipe: ${compiled.error.code}.`);
@@ -200,7 +200,7 @@ export async function savedCellDefinitions(
 
 export async function prepareBlackSesameRecipe(
   raw: unknown,
-): Promise<Result<Extract<OvenRunSource, { kind: "recipe" }>, string>> {
+): Promise<Result<Variant<OvenRunSource, "recipe">, string>> {
   const compiled = await compileBlackSesameRecipe(raw);
   if (!compiled.ok)
     return err(`Cannot prepare black sesame milk: ${compiled.error.code}.`);
@@ -213,7 +213,7 @@ export async function prepareBlackSesameRecipe(
 
 export async function prepareGingerBlackTeaRecipe(
   raw: unknown,
-): Promise<Result<Extract<OvenRunSource, { kind: "recipe" }>, string>> {
+): Promise<Result<Variant<OvenRunSource, "recipe">, string>> {
   const compiled = await compileGingerBlackTeaRecipe(raw);
   if (!compiled.ok)
     return err(`Cannot prepare ginger black tea: ${compiled.error.code}.`);

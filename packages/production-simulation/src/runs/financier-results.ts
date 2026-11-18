@@ -6,6 +6,7 @@ import type {
 } from "../index.ts";
 import type { RecurringFinancierInput } from "../recipes/bakery/recurring-financier.ts";
 import { canonicalJson, isRecord } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 /** Read-only results of one completed recurring financier shift. */
 export type FinancierResult = Readonly<{
@@ -116,7 +117,7 @@ export function financierResult(
  * Waits for a baker, material or an earlier step are not physical queues.
  */
 function longestQueue(
-  waits: Extract<HostView["schedulingHistory"], { kind: "available" }>["waits"],
+  waits: Variant<HostView["schedulingHistory"], "available">["waits"],
 ): FinancierResult["longestQueue"] {
   const edges = new Map<string, [number, number][]>();
   for (const wait of waits) {

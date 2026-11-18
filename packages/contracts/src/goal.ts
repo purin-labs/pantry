@@ -1,5 +1,5 @@
 import { hasExactKeys, isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import type { CaseGoalValue as Goal } from "./record-schemas.ts";
 import type { CaseGoalStateValue as State } from "./record-schemas.ts";
 import type { CaseGoalSnapshotValue as Snapshot } from "./record-schemas.ts";
@@ -9,7 +9,7 @@ import type { CaseGoalOperationOutcomeValue as Outcome } from "./record-schemas.
 export type CaseGoalState = StrictUnion<State>;
 export type CaseGoal = Omit<Goal, "state"> & { readonly state: CaseGoalState };
 export type CaseGoalSnapshot = StrictUnion<
-  | Extract<Snapshot, { kind: "none" }>
+  | Variant<Snapshot, "none">
   | {
       readonly kind: "present";
       readonly revision: number;

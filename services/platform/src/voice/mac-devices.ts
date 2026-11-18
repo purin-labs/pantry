@@ -9,8 +9,9 @@ import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import { voiceMacHostname } from "./dns";
 import { listVoiceMacs, MAC_HEARTBEAT_FRESH_MS, type VoiceMac } from "./store";
+import type { Variant } from "@seams/type-utils";
 
-type ShopMacDeviceView = Extract<DeviceView, { kind: "shop_mac" }>;
+type ShopMacDeviceView = Variant<DeviceView, "shop_mac">;
 
 /** A shop Mac as the Devices page and the agent's `device_read` see it. */
 type ShopMacDevice = Readonly<{

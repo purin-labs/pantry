@@ -35,7 +35,7 @@ import {
 } from "./agent-session-budget";
 import { readPiUsage } from "./pi-durable-usage";
 import type { Env } from "../env";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import { traceWarn } from "../observability";
 import { deriveCodeModeLeaseBinding } from "./code-mode-execution-record";
 import {
@@ -535,7 +535,7 @@ function interruptedCall(
 }
 function blockRecovery(
   storage: DurableObjectStorage,
-  current: Extract<AgentSessionLifecycle, { kind: "recovering" }>,
+  current: Variant<AgentSessionLifecycle, "recovering">,
   reason: "authorization" | "budget",
   now: number,
 ): void {

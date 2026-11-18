@@ -10,6 +10,7 @@ import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { AgentMailboxConnectorHandle } from "./agent-mailbox-connector";
 import { emailApprovalChallenge } from "./email-approval-challenge";
 import { recordEmailReplyRevision } from "./email-reply-lifecycle";
+import type { Variant } from "@seams/type-utils";
 
 /** Plan 40D: the Organisation Actor that holds a reply's shared draft. */
 export async function mailReplyDraftActor(
@@ -59,7 +60,7 @@ export async function saveMailReplyDraft(
     scope: OrganisationExecutionScope;
     organisationId: OrganisationId;
     userId: UserId;
-    authority: Extract<RequestAuthority, { kind: "control" }>;
+    authority: Variant<RequestAuthority, "control">;
     projection: EmailReplyProposalProjection;
     connector: AgentMailboxConnectorHandle;
     secret: string;

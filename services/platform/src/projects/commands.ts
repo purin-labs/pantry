@@ -25,6 +25,7 @@ import {
 import { prepareReturnPrivateChatsToDefault } from "./case-project";
 import { VISIBLE_PROJECTS, parseProjectRecord, readProject } from "./records";
 import { observeProjectReference } from "./references";
+import type { Variant } from "@seams/type-utils";
 
 const ACTIVE_PLACEMENT = `EXISTS (SELECT 1 FROM organisation_placement
   WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ?
@@ -49,7 +50,7 @@ type CommandActor = Readonly<{
   organisationRole: OnboardingControlRole;
 }>;
 
-type Rejection = Extract<ProjectCommandResult, { kind: "rejected" }>["code"];
+type Rejection = Variant<ProjectCommandResult, "rejected">["code"];
 
 export async function readProjectCatalogue(
   env: Env,
@@ -188,7 +189,7 @@ type Guard = Readonly<{
 }>;
 
 type PreparedCommand =
-  | Extract<ProjectCommandResult, { kind: "rejected" }>
+  | Variant<ProjectCommandResult, "rejected">
   | Readonly<{
       kind: "prepared";
       // The conditions under which the command is accepted, checked in the
@@ -470,8 +471,6 @@ async function readReceipt(
   };
 }
 
-function rejected(
-  code: Rejection,
-): Extract<ProjectCommandResult, { kind: "rejected" }> {
+function rejected(code: Rejection): Variant<ProjectCommandResult, "rejected"> {
   return { kind: "rejected", code };
 }

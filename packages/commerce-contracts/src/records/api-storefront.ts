@@ -18,6 +18,7 @@ import {
   ReadonlyStrictObject,
   wireRecordParser,
 } from "./wire-objects.ts";
+import type { Variant } from "@seams/type-utils";
 
 const text = normalizedTextSchema;
 
@@ -507,17 +508,14 @@ export type WireCreateBuyerShippingCheckout = Readonly<{
 }> &
   (
     | Readonly<{
-        buyer: Extract<BuyerCheckoutIdentity, { readonly kind: "guest" }>;
-        shippingDestination: Extract<
+        buyer: Variant<BuyerCheckoutIdentity, "guest">;
+        shippingDestination: Variant<
           BuyerShippingDestination,
-          { readonly kind: "provided_address" }
+          "provided_address"
         >;
       }>
     | Readonly<{
-        buyer: Extract<
-          BuyerCheckoutIdentity,
-          { readonly kind: "identified_customer" }
-        >;
+        buyer: Variant<BuyerCheckoutIdentity, "identified_customer">;
         shippingDestination: BuyerShippingDestination;
       }>
   );

@@ -225,10 +225,7 @@ export async function uploadHarnessCheckpoint(input: {
   readonly storage: HarnessAuthorityStorage;
   readonly bucket: R2Bucket;
   readonly root: SecretsStoreSecret;
-  readonly publication: Extract<
-    HarnessCheckpointPublication,
-    { kind: "upload_pending" }
-  >;
+  readonly publication: Variant<HarnessCheckpointPublication, "upload_pending">;
   /**
    * "first" when the caller accepted this checkpoint in the same call, so no
    * earlier attempt can have stored it. "resumed" when an earlier attempt may

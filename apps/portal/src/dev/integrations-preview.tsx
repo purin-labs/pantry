@@ -60,6 +60,7 @@ import type {
   MailboxSetupPlan,
 } from "@seams/control-api";
 import type { WhatsAppAccountView } from "@seams/control-api/portal/whatsapp";
+import type { Variant } from "@seams/type-utils";
 
 type Scenario =
   | "empty"
@@ -359,7 +360,7 @@ const MAILBOX_AGENT: NonNullable<AgentMailboxView["binding"]> = {
   installationId: "inst_urk",
 };
 
-const MAILBOX_LIMITS: Extract<AgentMailboxView["policy"], { kind: "enabled" }> =
+const MAILBOX_LIMITS: Variant<AgentMailboxView["policy"], "enabled"> =
   {
     kind: "enabled",
     policyVersion: 2,

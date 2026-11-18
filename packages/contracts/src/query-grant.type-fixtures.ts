@@ -3,11 +3,9 @@ import type {
   CommerceGraphQuery,
   PublishedCommerceSelector,
 } from "@seams/commerce-contracts";
+import type { Variant } from "@seams/type-utils";
 declare const selector: PublishedCommerceSelector;
-declare const context: Extract<
-  CommerceGraphQuery,
-  { kind: "underclerk_context" }
->;
+declare const context: Variant<CommerceGraphQuery, "underclerk_context">;
 const invalidScope: CommerceReadGrantScope = {
   kind: "saved_selector",
   selector: {
@@ -16,7 +14,7 @@ const invalidScope: CommerceReadGrantScope = {
     query: context,
   },
 };
-declare const target: Extract<AccessGrantTarget, { kind: "commerce_read" }>;
+declare const target: Variant<AccessGrantTarget, "commerce_read">;
 const invalidTarget: AccessGrantTarget = {
   ...target,
   scope: {

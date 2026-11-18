@@ -55,8 +55,9 @@ import type {
   MailRelationshipLookup,
   MailSupplierCandidate,
 } from "@seams/control-api";
+import type { Variant } from "@seams/type-utils";
 
-type MailboxAuthority = Extract<RequestAuthority, { kind: "agent_mailbox" }>;
+type MailboxAuthority = Variant<RequestAuthority, "agent_mailbox">;
 export type EmailCommerceEvidence = Readonly<{
   integrationAccountId: string;
   merchantId: string;
@@ -288,7 +289,7 @@ export type EmailRelationshipRead =
 export async function readEmailRelationship(
   env: Env,
   mailboxAuthority: MailboxAuthority,
-  operatorAuthority: Extract<RequestAuthority, { kind: "control" }>,
+  operatorAuthority: Variant<RequestAuthority, "control">,
   caseId: string,
   message: GmailMessageContent,
   lookup: MailRelationshipLookup,
@@ -497,7 +498,7 @@ export async function readMailboxCommerceQuery(
  */
 export async function readReviewerCommerceQuery(
   env: Env,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   caseId: string,
   query: CommerceGraphQuery,
 ): Promise<Result<CommerceGraphQueryResult, ContextError>> {
@@ -669,7 +670,7 @@ async function readGrantedCommerceQuery(
 
 /** Whether a source's label may reach a person as a delivery to them. */
 async function reviewerMayReceive(
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   label: FlowLabel,
 ): Promise<boolean> {
   return (
@@ -795,7 +796,7 @@ export async function validateEmailCommerceEvidence(
  */
 export async function authorizeEmailCommerceDelivery(
   env: Env,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   evidence: readonly EmailCommerceEvidence[],
 ): Promise<Result<null, ContextError>> {
   const organisationId = parseOrganisationId(authority.organisationId);
@@ -933,7 +934,7 @@ export function recordEmailRelationshipCorrection(
   proposalId: string,
   version: number,
   userId: string,
-  relationship: Extract<EmailRelationshipRead, { kind: "purchase_request" }>,
+  relationship: Variant<EmailRelationshipRead, "purchase_request">,
 ): void {
   // The correction replaces the purchasing evidence. Evidence of another
   // source the turn read, such as an order, still covers the reply.

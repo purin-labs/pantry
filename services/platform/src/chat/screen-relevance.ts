@@ -139,7 +139,7 @@ function newCheckId(): string {
 }
 
 function refused(
-  reason: Extract<ScreenRelevanceView, { kind: "refused" }>["reason"],
+  reason: Variant<ScreenRelevanceView, "refused">["reason"],
 ): Result<ScreenRelevanceView, never> {
   return { ok: true, value: { kind: "refused", reason } };
 }

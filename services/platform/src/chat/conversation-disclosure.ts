@@ -48,6 +48,7 @@ import {
   authorizeSideCaseAccess,
   readSideCaseOriginForCase,
 } from "./side-cases";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * Whether every current reader of a conversation may be shown content under
@@ -158,7 +159,7 @@ export async function checkConversationDisclosure(
     const requests = new Set(
       conversation.historyBindings.map(historyRequestId),
     );
-    const terminalInputs: Extract<ChatTimelineEvent, { kind: "user" }>[] = [];
+    const terminalInputs: Variant<ChatTimelineEvent, "user">[] = [];
     for (const event of conversation.timeline) {
       if (
         event.kind === "user" &&

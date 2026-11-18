@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import {
   instanceLotId,
   taskId,
@@ -65,7 +65,7 @@ type MaterialStore = {
   occupied: number;
   held: number;
 };
-type LotOutput = Extract<MaterialOutput, { kind: "lot" | "measured-lot" }>;
+type LotOutput = Variant<MaterialOutput, "lot" | "measured-lot">;
 type MaterialLedger = Readonly<{
   lots: Map<LotId, LotBalance>;
   definitions: ReadonlyMap<LotId, LotOutput>;

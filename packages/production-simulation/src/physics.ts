@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import type {
   AttemptId,
   BoundaryId,
@@ -352,7 +352,7 @@ export type RestResult = Readonly<{
   cellId: CellId;
   predecessor: Sha256Hex;
   checkpoint: CheckpointRef;
-  recording: Extract<CellRecording, { kind: "idle" }>;
+  recording: Variant<CellRecording, "idle">;
   /** Present when the cell may now hold instead of stepping. */
   settled: HoldOffer | null;
 }>;
@@ -405,7 +405,7 @@ export type BoundaryCandidate = Readonly<{
   predecessor: Sha256Hex;
   checkpoint: CheckpointRef;
   slot: CarrierSlot;
-  recording: Extract<CellRecording, { kind: "admission" | "removal" }>;
+  recording: Variant<CellRecording, "admission" | "removal">;
   digest: Sha256Hex;
 }>;
 

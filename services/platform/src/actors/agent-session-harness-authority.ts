@@ -1216,7 +1216,7 @@ export function dropArchivedHarnessCheckpointPayloads(sql: SqlStorage): void {
 export function readUnpublishedHarnessCheckpoint(
   sql: SqlStorage,
 ): Result<
-  Extract<HarnessCheckpointPublication, { kind: "upload_pending" }> | null,
+  Variant<HarnessCheckpointPublication, "upload_pending"> | null,
   HarnessAuthorityError
 > {
   const row = sql
@@ -1302,10 +1302,7 @@ export function retainHarnessCheckpointUploadInTransaction(
 
 export function markHarnessCheckpointPublishedInTransaction(
   sql: SqlStorage,
-  publication: Extract<
-    HarnessCheckpointPublication,
-    { kind: "upload_pending" }
-  >,
+  publication: Variant<HarnessCheckpointPublication, "upload_pending">,
 ): Result<HarnessCheckpointRecord, HarnessAuthorityError> {
   const saved = readHarnessCheckpointPublication(sql, publication.checkpoint);
   if (!saved.ok) return saved;

@@ -7,6 +7,7 @@ import {
   type MerchantReportRecord,
   type MerchantReportResult,
 } from "./merchant-reports";
+import type { Variant } from "@seams/type-utils";
 
 /** The record type whose read grant covers the stock shortage report. */
 export const STOCK_SHORTAGE_SOURCE_TYPE = "inventory_position";
@@ -26,7 +27,7 @@ export async function readBoundStockShortages(
     merchantId: string;
     now: string;
   }>,
-): Promise<Extract<MerchantReportResult, { kind: "reported" }>> {
+): Promise<Variant<MerchantReportResult, "reported">> {
   const snapshot = await input.client.readStockSnapshot(input.merchantId);
   if (!snapshot.ok)
     throw new Error(`stock snapshot unavailable: ${snapshot.error.kind}`);

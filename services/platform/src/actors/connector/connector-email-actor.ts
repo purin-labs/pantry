@@ -153,6 +153,7 @@ import {
 } from "./whatsapp-parsers";
 import type { ConnectorDO } from "../connector";
 import { ConnectorEvals } from "./connector-evals";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * Email processing for the Connector: the mailbox, reply turns, operational proposals, correction learning and Case context discovery.
@@ -1254,9 +1255,9 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        authority: Extract<
+        authority: Variant<
           import("@seams/contracts").RequestAuthority,
-          { kind: "control" }
+          "control"
         >;
         edit: import("@seams/control-api").MailReplyEdit;
         /** Plan 40D: `shared` for a body that several authors wrote. */
@@ -1368,9 +1369,9 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        authority: Extract<
+        authority: Variant<
           import("@seams/contracts").RequestAuthority,
-          { kind: "control" }
+          "control"
         >;
         lookup: import("@seams/control-api").MailRelationshipLookup;
       }>,
@@ -1414,9 +1415,9 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        authority: Extract<
+        authority: Variant<
           import("@seams/contracts").RequestAuthority,
-          { kind: "control" }
+          "control"
         >;
         correction: import("@seams/control-api").MailReplyCorrection;
       }>,

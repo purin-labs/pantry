@@ -14,6 +14,7 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import { validateNativeRequestAuthority } from "../request-authority";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * Whether one person may read the customer text of one WhatsApp number in the
@@ -22,7 +23,7 @@ import { validateNativeRequestAuthority } from "../request-authority";
  */
 export async function authorizeWhatsAppSupportRead(
   scope: OrganisationExecutionScope,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   integrationAccountId: IntegrationAccountId,
 ): Promise<boolean> {
   const context = await resolveActiveProviderAccountContext({

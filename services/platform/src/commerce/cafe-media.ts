@@ -14,6 +14,7 @@ import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { Result } from "../result";
 import type { MenuBoardCommand, MenuBoardCommandReply } from "../actors/menu-board-commands";
 import { CAFE_STOREFRONT_ID } from "./cafe-menu-publication";
+import type { Variant } from "@seams/type-utils";
 
 /** The café storefront's media address for a merchant, ending in "/". */
 export function cafeMediaBaseFor(
@@ -135,7 +136,7 @@ export async function deleteCafeImage(
     const shown = (await organisation.menuBoardCommand({
       organisationId: input.organisationId,
       command,
-    })) as MenuBoardCommandReply<Extract<MenuBoardCommand, { kind: "media_on_boards" }>>;
+    })) as MenuBoardCommandReply<Variant<MenuBoardCommand, "media_on_boards">>;
     if (!shown.ok) return { ok: false, error: { code: "organisation_placement_conflict" } };
     boards = shown.value.boards;
   } catch {

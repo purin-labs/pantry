@@ -166,6 +166,7 @@ import type {
   EmailSizeBreach,
   EmailResponsePolicy,
 } from "./email-harness-tools";
+import type { Variant } from "@seams/type-utils";
 
 const DEFAULT_TURN_TOKEN_ALLOWANCE = 100_000;
 const TURN_MAX_WALL_MS = 5 * 60 * 1_000;
@@ -284,7 +285,7 @@ type EmailCorrectionLearningOutcome =
       kind: "learned";
       proposal: Readonly<{ memoryId: string; revision: number }> | null;
     }>
-  | Extract<EmailThreadTurnOutcome, { kind: "skipped" | "deferred" }>;
+  | Variant<EmailThreadTurnOutcome, "skipped" | "deferred">;
 
 export type EmailThreadTurnOutcome =
   | {
@@ -393,8 +394,7 @@ async function runEmailTurn(
   input: EmailThreadTurnInput | EmailCorrectionLearningRun,
 ): Promise<
   Result<
-    | EmailThreadTurnOutcome
-    | Extract<EmailCorrectionLearningOutcome, { kind: "learned" }>,
+    EmailThreadTurnOutcome | Variant<EmailCorrectionLearningOutcome, "learned">,
     EmailThreadTurnError
   >
 > {
@@ -1392,10 +1392,10 @@ async function settleEarlierEmailAttempts(
   env: Env,
   input: EmailThreadTurnInput | EmailCorrectionLearningRun,
   turn: EarlierEmailAttempts,
-): Promise<Extract<EmailReplyRecovery, { kind: "stop" }> | null> {
+): Promise<Variant<EmailReplyRecovery, "stop"> | null> {
   const stop = (
     result: Result<EmailThreadTurnOutcome, EmailThreadTurnError>,
-  ): Extract<EmailReplyRecovery, { kind: "stop" }> => ({
+  ): Variant<EmailReplyRecovery, "stop"> => ({
     kind: "stop",
     result,
   });
@@ -1735,7 +1735,7 @@ async function settleCorrectionLearning(
   }>,
 ): Promise<
   Result<
-    Extract<EmailCorrectionLearningOutcome, { kind: "learned" }>,
+    Variant<EmailCorrectionLearningOutcome, "learned">,
     EmailThreadTurnError
   >
 > {
@@ -1903,7 +1903,7 @@ async function settleCorrectionLearning(
 }
 
 function deferredEmailTurn(): Result<
-  Extract<EmailThreadTurnOutcome, { kind: "deferred" }>,
+  Variant<EmailThreadTurnOutcome, "deferred">,
   never
 > {
   return { ok: true, value: { kind: "deferred", reason: "placement_changed" } };

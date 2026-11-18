@@ -16,9 +16,10 @@ import {
   type CustomConnectorFetchNamespace,
 } from "./egress";
 import type { JsonObject } from "./definition";
+import type { Variant } from "@seams/type-utils";
 
 export type ReviewedConnectorOperationRequest =
-  | (Extract<CustomConnectorOperationRequest, { kind: "get" | "post_json" }> & {
+  | (Variant<CustomConnectorOperationRequest, "get" | "post_json"> & {
       readonly toolName?: never;
       readonly arguments?: never;
       readonly protocolVersion?: never;
@@ -59,10 +60,7 @@ export type ReviewedConnectorFailure =
 
 type McpInvocation = {
   readonly input: OperationInput;
-  readonly operation: Extract<
-    ReviewedConnectorOperationRequest,
-    { kind: "mcp" }
-  >;
+  readonly operation: Variant<ReviewedConnectorOperationRequest, "mcp">;
   failure: CustomConnectorTransportError | null;
   dispatch: DispatchState;
   remainingBytes: number;

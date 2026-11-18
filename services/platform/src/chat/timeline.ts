@@ -39,6 +39,7 @@ import {
   type ChatTurnUsage,
   parseChatQuestion,
 } from "@seams/control-api";
+import type { Variant } from "@seams/type-utils";
 export type ConnectorCardTarget = ConversationCardTarget;
 
 /** The provider-neutral content that can be accepted into a conversation. */
@@ -69,10 +70,7 @@ export type ChatInputPart =
       readonly preparation: "ready";
     };
 
-export type ChatAttachmentPart = Extract<
-  ChatInputPart,
-  { readonly kind: "attachment" }
->;
+export type ChatAttachmentPart = Variant<ChatInputPart, "attachment">;
 
 export function attachmentParts(
   parts: readonly ChatInputPart[],

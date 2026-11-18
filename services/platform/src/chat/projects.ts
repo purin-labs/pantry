@@ -17,6 +17,7 @@ import {
 } from "@seams/control-api";
 import { assertNever, canonicalJson, sha256Hex } from "@seams/std";
 import type { ConversationScope } from "./store";
+import type { Variant } from "@seams/type-utils";
 
 export type ConversationPlacementRow = Readonly<{
   project_id: unknown;
@@ -215,7 +216,7 @@ async function readDirectoryOperation(
 function prepareProjectPlacement(
   execution: OrganisationExecutionScope,
   userId: UserId,
-  command: Extract<ChatDirectoryCommand, { kind: "set_project_placement" }>,
+  command: Variant<ChatDirectoryCommand, "set_project_placement">,
   digest: string,
   now: number,
 ): D1PreparedStatement[] {

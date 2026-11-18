@@ -27,6 +27,7 @@ import type { UserId } from "../ids";
 import type { ConversationScope } from "../chat/store";
 import type { ActiveControlSession } from "../data/control-plane";
 import type { Result } from "../result";
+import type { Variant } from "@seams/type-utils";
 
 export type { AccountAdmissionAction, AccountUserAuthority };
 
@@ -67,9 +68,9 @@ export interface AccountPlatformAccess {
   ): Promise<Result<CurrentAccountEligibility, AccountEligibilityFailure>>;
   checkAutomation(
     input: Readonly<{
-      authority: Extract<
+      authority: Variant<
         RequestAuthority,
-        { kind: "workflow" | "agent_mailbox" | "whatsapp_support" }
+        "workflow" | "agent_mailbox" | "whatsapp_support"
       >;
       action: AccountAdmissionAction;
     }>,

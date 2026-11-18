@@ -6,9 +6,9 @@ import type { ResourceDefinition, TravelRoute } from "./scenario.ts";
 import type { RunState } from "./state.ts";
 import { tickDuration, ZERO_DURATION, type TickDuration } from "./time.ts";
 
-type UpdateWorkerTravelCommand = Extract<
+type UpdateWorkerTravelCommand = Variant<
   ControlCommand,
-  { kind: "update-worker-travel" }
+  "update-worker-travel"
 >;
 
 export function routePairKey(from: LocationId, to: LocationId): string {

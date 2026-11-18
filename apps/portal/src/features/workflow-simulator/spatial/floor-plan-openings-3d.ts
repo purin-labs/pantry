@@ -11,17 +11,18 @@ import {
 } from "@seams/production-simulation/floor/openings";
 import type { FloorPlanWorkspace } from "../floor-plan-workspace";
 import { enableShadowMeshes } from "./scene-lighting";
+import type { Variant } from "@seams/type-utils";
 
 type OpeningVisual =
   | Readonly<{
       kind: "door";
-      opening: Extract<FloorPlanOpening, { kind: "door" }>;
+      opening: Variant<FloorPlanOpening, "door">;
       pivot: THREE.Group;
       panel?: never;
     }>
   | Readonly<{
       kind: "window";
-      opening: Extract<FloorPlanOpening, { kind: "window" }>;
+      opening: Variant<FloorPlanOpening, "window">;
       pivot: THREE.Group;
       panel: number;
     }>;

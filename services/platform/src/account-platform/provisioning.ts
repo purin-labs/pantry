@@ -30,6 +30,7 @@ import {
   type PantryProvisionOwnerMapping,
   type PantryServiceTenantBinding,
 } from "./provisioning-boundary";
+import type { Variant } from "@seams/type-utils";
 
 type PantryProvisionResult =
   | Readonly<{ kind: "accepted"; value: PantryProvisionApplied }>
@@ -199,7 +200,7 @@ type NativeTenantResult =
       kind: "accepted";
       value: Readonly<{ binding: PantryServiceTenantBinding; user: User }>;
     }>
-  | Extract<PantryProvisionResult, { kind: "rejected" }>;
+  | Variant<PantryProvisionResult, "rejected">;
 async function resolveProvisionNativeTenant(
   env: Env,
   envelope: PantryProvisionEnvelope,
@@ -556,7 +557,7 @@ function commandState(
   }
 }
 function rejected(
-  code: Extract<PantryProvisionResult, { kind: "rejected" }>["error"]["code"],
-): Extract<PantryProvisionResult, { kind: "rejected" }> {
+  code: Variant<PantryProvisionResult, "rejected">["error"]["code"],
+): Variant<PantryProvisionResult, "rejected"> {
   return { kind: "rejected", error: { code } };
 }

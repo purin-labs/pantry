@@ -238,6 +238,7 @@ import type {
   ProposalRow,
   QuarantinedCaseDiscardResult,
 } from "./case/types";
+import type { Variant } from "@seams/type-utils";
 
 /** What a Case did with the ledger entry of the action that it waits on. */
 type CommerceApprovalSync = Readonly<{
@@ -1618,7 +1619,7 @@ export class CaseDO
       caseId: CaseId;
       threadId: string;
     }>,
-  ): Promise<CaseResult<Extract<MailInboxWork, { kind: "linked" }>>> {
+  ): Promise<CaseResult<Variant<MailInboxWork, "linked">>> {
     // Inbox projection excludes Case journals, objectives and assignment context.
     const sql = this.ctx.storage.sql;
     const meta = readMeta(sql);

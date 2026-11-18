@@ -1,6 +1,6 @@
 import type { SessionRecoveryAction, TurnLifecycle } from "@seams/contracts";
 import { parseJsonOrNull } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import type { CodeModeLeaseBinding } from "./code-mode-budget";
 import { readCodeModeExecution } from "./code-mode-execution-record";
 import {
@@ -120,9 +120,9 @@ export function classifyCodeModeRecovery(
   }
 }
 
-type OpenReceipt = Extract<
+type OpenReceipt = Variant<
   CodeModeReceiptPhase,
-  { kind: "started" | "pending_settlement" }
+  "started" | "pending_settlement"
 >;
 
 function needsRecovery(

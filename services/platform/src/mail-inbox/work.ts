@@ -17,6 +17,7 @@ import type { Env } from "../env";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type { RequestAuthority } from "@seams/contracts";
+import type { Variant } from "@seams/type-utils";
 
 type ThreadWorkInput = Readonly<{
   organisationId: OrganisationId;
@@ -105,9 +106,9 @@ export async function readMailThreadReply(
   input: ThreadWorkInput &
     Readonly<{
       proposalId: string;
-      authority: Extract<RequestAuthority, { kind: "control" }>;
+      authority: Variant<RequestAuthority, "control">;
     }>,
-): Promise<Result<Extract<MailInboxResult, { kind: "reply" }>, WorkError>> {
+): Promise<Result<Variant<MailInboxResult, "reply">, WorkError>> {
   const execution = await OrganisationExecutionScope.resolve(
     env,
     input.organisationId,

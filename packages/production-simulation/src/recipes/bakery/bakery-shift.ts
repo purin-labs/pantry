@@ -309,10 +309,7 @@ export const SHIFT_LOCATIONS = [
   "coffee-station",
 ] as const;
 
-type WorkerResource = Extract<
-  CompiledScenario["resources"][number],
-  { kind: "worker" }
->;
+type WorkerResource = Variant<CompiledScenario["resources"][number], "worker">;
 
 export function shiftTravel(
   walkSpeedPreset: "standard" | "brisk" | "congested-aisle" = "standard",
@@ -1552,6 +1549,7 @@ import { blackSesameApplianceTask } from "./black-sesame-milk.ts";
 import { financierApplianceTask } from "./financier.ts";
 import { pieApplianceTask } from "./pie.ts";
 import { teaApplianceTask } from "./tea.ts";
+import type { Variant } from "@seams/type-utils";
 
 export {
   defaultMorningShiftFaultInjections,

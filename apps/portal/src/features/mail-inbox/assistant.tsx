@@ -10,6 +10,7 @@ import {
 } from "@seams/control-api";
 import { mailAssistantRequest } from "./api";
 import { mailRuleLabel } from "./rule-label";
+import type { Variant } from "@seams/type-utils";
 
 type Props = Readonly<{
   organisationId: string;
@@ -288,7 +289,7 @@ export class MailAssistantPanel extends React.Component<Props, State> {
   }
 }
 function recipientName(
-  recipient: Extract<MailAssistantStatus, { kind: "ready" }>["recipient"],
+  recipient: Variant<MailAssistantStatus, "ready">["recipient"],
 ): string {
   switch (recipient) {
     case "openrouter":

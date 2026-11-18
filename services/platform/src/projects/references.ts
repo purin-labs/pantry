@@ -46,6 +46,7 @@ import {
   VISIBLE_CONVERSATIONS_SQL,
 } from "../chat/conversation-access";
 import { parseConversationActorIdentity } from "../chat/conversation-actor-identity";
+import type { Variant } from "@seams/type-utils";
 
 export async function searchProjectReferences(
   env: Env,
@@ -199,7 +200,7 @@ function referenceFromResource(row: ResourceRow): ProjectReference | null {
 }
 function isCommerceRecordType(
   raw: string,
-): raw is Extract<ProjectReference, { kind: "commerce_record" }>["type"] {
+): raw is Variant<ProjectReference, "commerce_record">["type"] {
   return (
     raw === "product" ||
     raw === "order" ||

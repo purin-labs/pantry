@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import type {
   ArrivalSourceId,
   AvailabilityId,
@@ -261,7 +261,7 @@ export type TaskExecutor = StrictUnion<
       kind: "after-inspection";
       inspection: TaskKey;
       outcome: "accept" | "reject";
-      work: Extract<UnconditionalExecutor, { kind: "declared" | "attended" }>;
+      work: Variant<UnconditionalExecutor, "declared" | "attended">;
     }>
 >;
 

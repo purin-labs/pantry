@@ -24,7 +24,7 @@ import {
   type EmailCommerceEvidence,
 } from "./supplier-context";
 
-type ControlAuthority = Extract<RequestAuthority, { kind: "control" }>;
+type ControlAuthority = Variant<RequestAuthority, "control">;
 type Shown = Readonly<{ title: string; detail: string }>;
 
 /**

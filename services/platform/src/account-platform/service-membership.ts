@@ -22,6 +22,7 @@ import { resolvePantryAccountBinding } from "./binding";
 import { resolveLinkedPantryAccountUser } from "./identity";
 import type { OrganizationMembership as AccountMembership } from "@seams-internal/console-shared/accountPlatform";
 import type { AccountPlatformError, PantryAccountBinding } from "./types";
+import type { Variant } from "@seams/type-utils";
 
 type AccountMembershipContext = Readonly<{
   client: AccountPlatformClient;
@@ -67,7 +68,7 @@ export class AccountServiceGrantAcceptance {
     readonly binding: PantryAccountBinding,
     readonly nativeUserId: UserId,
     readonly invitationId: string,
-    readonly membership: Extract<AccountMembership, { kind: "active" }>,
+    readonly membership: Variant<AccountMembership, "active">,
     readonly authorityRevision: number,
     readonly accessRevision: number,
     readonly receiptId: string,

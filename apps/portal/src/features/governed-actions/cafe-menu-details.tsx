@@ -1,13 +1,11 @@
 import React from "react";
 
 import type { CommerceActionDetails } from "@seams/control-api/portal/commerce-actions";
+import type { Variant } from "@seams/type-utils";
 
 /** The exact menu that goes live, by section, with what changes. */
 export function CafeMenuPublicationDetails(input: {
-  readonly details: Extract<
-    CommerceActionDetails,
-    { readonly kind: "publish_cafe_menu" }
-  >;
+  readonly details: Variant<CommerceActionDetails, "publish_cafe_menu">;
 }): React.JSX.Element {
   const { details } = input;
   const names = new Map(

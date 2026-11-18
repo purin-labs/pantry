@@ -9,6 +9,7 @@ import type {
   BakerySurfaceCommandV1,
   BakerySurfaceContextV1,
 } from "./bakery-surface.ts";
+import type { Variant } from "@seams/type-utils";
 
 declare function acceptWorkspaceView(action: BakeryWorkspaceViewAction): void;
 acceptWorkspaceView({ kind: "setCamera", camera: "overhead" });
@@ -70,7 +71,7 @@ const loadingProduction: BakerySurfaceContextV1 = {
 void loadingProduction;
 
 declare function discardCandidate(
-  command: Extract<BakerySurfaceCommandV1, { kind: "discard_candidate" }>,
+  command: Variant<BakerySurfaceCommandV1, "discard_candidate">,
 ): void;
 // @ts-expect-error Discard requires the exact candidate reference, including its epoch.
 discardCandidate({

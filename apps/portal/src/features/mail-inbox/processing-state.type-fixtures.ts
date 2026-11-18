@@ -1,8 +1,9 @@
 import type { MailOrganizationView } from "@seams/control-api";
 import type { MailProcessingState } from "./processing-state";
+import type { Variant } from "@seams/type-utils";
 
 declare const view: MailOrganizationView;
-declare const ready: Extract<MailProcessingState, { kind: "ready" }>;
+declare const ready: Variant<MailProcessingState, "ready">;
 
 // @ts-expect-error A known processing state requires its saved view.
 export const missingView: MailProcessingState = { kind: "ready", notice: "" };

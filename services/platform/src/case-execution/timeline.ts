@@ -29,6 +29,7 @@ import {
   readCaseExecutionPage,
   type CaseExecutionReadError,
 } from "./access";
+import type { Variant } from "@seams/type-utils";
 
 /** The Cases one timeline read summarises. Each costs a projection read. */
 const MAX_TIMELINE_CASES = 30;
@@ -39,9 +40,9 @@ const MAX_TIMELINE_PAGES = 6;
 /** The newest schedule runs one read summarises. Each costs a projection read. */
 const MAX_SCHEDULE_RUNS = 40;
 
-type OpenNode<Kind extends OpenCaseExecutionNode["kind"]> = Extract<
+type OpenNode<Kind extends OpenCaseExecutionNode["kind"]> = Variant<
   OpenCaseExecutionNode,
-  { kind: Kind }
+  Kind
 >;
 
 /** What a Case is called for one reader, and the Case that proposed it. */

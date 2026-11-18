@@ -640,9 +640,9 @@ export async function validateLiveRequestAuthority(
 export async function validateLiveAutomationAuthority(
   input: Readonly<{
     db: OrganisationDatabase;
-    authority: Extract<
+    authority: Variant<
       RequestAuthority,
-      { kind: "workflow" | "agent_mailbox" | "whatsapp_support" }
+      "workflow" | "agent_mailbox" | "whatsapp_support"
     >;
     accountAccess: AccountPlatformAccess;
     action: AccountAdmissionAction;

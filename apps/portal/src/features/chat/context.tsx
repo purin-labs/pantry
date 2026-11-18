@@ -16,6 +16,7 @@ import type { Chat } from "@seams/control-api/portal/chat";
 import { bakerySurfaceForOrganisation } from "../bakery-surface-registry";
 import { useScreenChipDecision } from "./screen-chip";
 import { KITCHEN_SURFACE } from "@seams/control-api";
+import type { Variant } from "@seams/type-utils";
 
 export type ChatWorkspaceContext = Readonly<{
   organisation: string;
@@ -219,12 +220,12 @@ function confirmedContextLabel(
 
 function isSourceObservation(
   context: ChatContextDetails,
-): context is Extract<ChatContextDetails, { kind: "observed" }> {
+): context is Variant<ChatContextDetails, "observed"> {
   return context.kind === "observed";
 }
 
 function renderSourceObservation(
-  context: Extract<ChatContextDetails, { kind: "observed" }>,
+  context: Variant<ChatContextDetails, "observed">,
 ): React.ReactNode {
   const source = context.source;
   const stale =
@@ -349,9 +350,9 @@ function renderProjectContext(
   );
 }
 function isUnavailableReference(
-  observation: Extract<
+  observation: Variant<
     NonNullable<ProjectSnapshot["layer"]>,
-    { kind: "project" }
+    "project"
   >["references"][number],
 ): boolean {
   return observation.kind !== "available";

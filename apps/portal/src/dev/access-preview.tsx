@@ -45,6 +45,7 @@ import type {
   DropboxResourcePage,
 } from "@seams/control-api/portal/access-models";
 import type { CapabilityDefinition } from "@seams/contracts";
+import type { Variant } from "@seams/type-utils";
 
 type Scenario = "fresh" | "populated" | "viewer" | "empty";
 
@@ -865,7 +866,7 @@ function applyPreviewMutation(
 
 function previewGrant(
   state: PreviewAccessState,
-  command: Extract<AccessMutationCommand, { kind: "create_grant" }>,
+  command: Variant<AccessMutationCommand, "create_grant">,
 ): AccessControlGrantView {
   const definition = definitionById(command.target.capabilityRef.capabilityId);
   const subject = Object.values(SUBJECTS).find(
@@ -885,7 +886,7 @@ function previewGrant(
 
 function previewResource(
   definition: CapabilityDefinition,
-  target: Extract<AccessMutationCommand, { kind: "create_grant" }>["target"],
+  target: Variant<AccessMutationCommand, "create_grant">["target"],
 ): AccessControlGrantView["resource"] {
   switch (target.kind) {
     case "platform":

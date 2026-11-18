@@ -9,6 +9,7 @@ import {
   deviceHealthSchema,
   deviceKindSchema,
 } from "./device-gateway";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The Devices page (Plan 85): one list of the devices in the shop. Each kind
@@ -222,8 +223,8 @@ export const deviceViewSchema = Type.Union([
 ]);
 export type DeviceView = Static<typeof deviceViewSchema>;
 export type DeviceKind = DeviceView["kind"];
-export type KitchenDeviceView = Extract<DeviceView, { kind: "kitchen_device" }>;
-export type GatewayDeviceView = Extract<DeviceView, { kind: "gateway" }>;
+export type KitchenDeviceView = Variant<DeviceView, "kitchen_device">;
+export type GatewayDeviceView = Variant<DeviceView, "gateway">;
 
 export const deviceListSchema = Type.Object(
   {

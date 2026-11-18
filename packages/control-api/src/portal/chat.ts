@@ -994,7 +994,7 @@ function parseSentFrom(raw: unknown): Readonly<{ sentFrom?: ChatSentFrom }> {
 
 function parseSpokenPath(
   raw: unknown,
-): Pick<Extract<ChatTimelineView, { kind: "user" }>, "spoken"> {
+): Pick<Variant<ChatTimelineView, "user">, "spoken"> {
   if (!Array.isArray(raw)) return {};
   for (const part of raw)
     if (

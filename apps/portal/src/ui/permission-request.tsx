@@ -37,6 +37,7 @@ import {
   type PromptToastView,
 } from "./prompt-toast";
 import "./permission-request.css";
+import type { Variant } from "@seams/type-utils";
 
 export type PermissionRequestParty = {
   readonly name: string;
@@ -113,7 +114,7 @@ export type PermissionRequestDecision =
       readonly secondary: PermissionRequestAction | null;
     };
 
-type ResultDecision = Extract<PermissionRequestDecision, { kind: "result" }>;
+type ResultDecision = Variant<PermissionRequestDecision, "result">;
 
 export type PermissionRequestCardProps = {
   readonly requester: PermissionRequestParty;

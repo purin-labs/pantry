@@ -85,6 +85,7 @@ import { assertNever } from "@seams/std";
 import { ConsoleToolsProvider } from "./console-tools";
 import type { ToolbarItem } from "./ui/overflow-toolbar";
 import { HoverLabel } from "./ui/hover-label";
+import type { Variant } from "@seams/type-utils";
 
 const DOCS_ORIGIN = (
   import.meta.env.VITE_DOCS_ORIGIN || "http://docs.localhost:3005"
@@ -840,13 +841,13 @@ function PortalIdentity(props: {
 }
 
 function waitingRequests(
-  identity: Extract<PortalFrameIdentity, { kind: "ready" }>,
+  identity: Variant<PortalFrameIdentity, "ready">,
 ): number | null {
   return identity.permissionRequests?.count ?? null;
 }
 
 function waitingRequestsLabel(
-  identity: Extract<PortalFrameIdentity, { kind: "ready" }>,
+  identity: Variant<PortalFrameIdentity, "ready">,
 ): string {
   const count = waitingRequests(identity);
   return count === null

@@ -330,7 +330,7 @@ export async function createEmailHarnessToolHost(
     organisationId: string;
     manifest: EmailCaseManifest;
     responsePolicy: EmailResponsePolicy;
-    authority: Extract<RequestAuthority, { kind: "agent_mailbox" }>;
+    authority: Variant<RequestAuthority, "agent_mailbox">;
     caseId: string;
     now: () => number;
     fetcher: typeof fetch;

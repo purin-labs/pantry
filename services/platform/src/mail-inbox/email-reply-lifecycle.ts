@@ -12,6 +12,7 @@ import {
   parseIntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import type { Variant } from "@seams/type-utils";
 
 export async function syncEmailProposalLifecycle(
   input: Readonly<{
@@ -120,9 +121,9 @@ export async function recordEmailReplyRevision(
         | Readonly<{
             kind: "dispatch";
             draftMessageId?: never;
-            lifecycle: Extract<
+            lifecycle: Variant<
               EmailReplyProposalLifecycle,
-              { kind: "sent" | "send_indeterminate" }
+              "sent" | "send_indeterminate"
             >;
           }>
       );

@@ -15,6 +15,7 @@ import { authorizeProject } from "../projects/access";
 import { validateLiveRequestAuthority } from "../request-authority";
 import type { Result } from "../result";
 import type { EmailChatContext, EmailChatSource } from "./reply-sources";
+import type { Variant } from "@seams/type-utils";
 
 /** The resource scope of every commerce grant (`integrationResourceScopeForGrant`). */
 const COMMERCE_READ_SCOPE_PREFIX = "commerce_read:";
@@ -37,7 +38,7 @@ type EmailChatSourceError = Readonly<{
  */
 export async function authorizeEmailChatSourceDelivery(
   env: Env,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   sources: readonly EmailChatSource[],
   context: EmailChatContext = NO_CHAT_CONTEXT,
 ): Promise<Result<null, EmailChatSourceError>> {

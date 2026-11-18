@@ -28,6 +28,7 @@ import { readStorageHistory } from "./storage-history-view.ts";
 import type { StorageHistoryView } from "./storage-history.ts";
 import { readSchedulingHistory } from "./scheduling-history-document.ts";
 import type { SchedulingHistoryView } from "./scheduling-history.ts";
+import type { Variant } from "@seams/type-utils";
 
 /** Inspection has no execution identity, status or command authority. */
 export type ObservationView = Readonly<{
@@ -302,8 +303,7 @@ function resourcesAt(
       definition.kind === "batch" ? "idle" : null;
     let position =
       definition.kind === "worker" ? definition.initialLocation : "Fixed";
-    let assignment: Extract<AcceptedEvent, { kind: "worker-assigned" }> | null =
-      null;
+    let assignment: Variant<AcceptedEvent, "worker-assigned"> | null = null;
     for (const event of events) {
       if (event.kind === "worker-assigned" && event.worker === definition.id) {
         assignment = event;

@@ -16,6 +16,7 @@ import {
   type CaseContextCollectionSelection,
   type CaseContextCollection,
 } from "./relationships";
+import type { Variant } from "@seams/type-utils";
 
 export type CaseContextCollectionEvidenceSelection = Readonly<{
   relationshipId: string | null;
@@ -40,9 +41,9 @@ export type CaseContextCollectionEvidenceDependency =
       recipient: FlowRecipient;
       selections: readonly CaseContextCollectionEvidenceSelection[];
     }>;
-export type CaseContextCollectionEvidence = Extract<
+export type CaseContextCollectionEvidence = Variant<
   CaseContextCollectionEvidenceDependency,
-  { kind: "case_context_collection_evidence" }
+  "case_context_collection_evidence"
 >;
 export type CaseContextCollectionProposalEvidence =
   | Readonly<{
@@ -52,9 +53,9 @@ export type CaseContextCollectionProposalEvidence =
     }>
   | Readonly<{
       kind: "case_context_collection_evidence";
-      dependency: Extract<
+      dependency: Variant<
         import("@seams/contracts").CaseEvidenceDependency,
-        { kind: "case_context_collection_evidence" }
+        "case_context_collection_evidence"
       >;
       flowBindingDigest: string;
     }>;

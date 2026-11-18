@@ -5,6 +5,7 @@ import {
   type DeviceHealth,
   type DeviceReadiness,
 } from "@seams/control-api";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The one answer to "can this device take the next task?" (Plan 85). The
@@ -88,7 +89,7 @@ export function deviceReadiness(facts: DeviceReadinessFacts): DeviceReadiness {
 }
 
 function blocked(
-  reason: Extract<DeviceReadiness, { kind: "blocked" }>["reason"],
+  reason: Variant<DeviceReadiness, "blocked">["reason"],
 ): DeviceReadiness {
   return { kind: "blocked", reason };
 }

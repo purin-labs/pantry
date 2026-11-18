@@ -1,7 +1,7 @@
 import type { FloorPlanOpening } from "@seams/production-simulation/floor/openings";
 import { pickFloorPlanOpening } from "./floor-plan-openings-3d";
 import { floorPlanWorkspace } from "../floor-plan-workspace";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import type { LogisticsView } from "@seams/production-simulation";
 import type { PersistentPhysicsMotion } from "@seams/bakery-model/bakery-physics";
 import * as THREE from "three";
@@ -133,7 +133,7 @@ export type FactorySceneSource = Readonly<{
     id: string;
     motion: PersistentPhysicsMotion | null;
   }>[];
-  stores: Extract<LogisticsView, { kind: "available" }>["carrierStores"] | null;
+  stores: Variant<LogisticsView, "available">["carrierStores"] | null;
   /** Equipment of a factory without robot cells, or alongside cobot cells. Labels select by station id. */
   stations: readonly FactoryStationSource[] | null;
   workers: readonly FactoryWorker[];

@@ -6,6 +6,7 @@ import {
 import { assertNever, isRecord } from "@seams/std";
 import { compareGmailHistoryIds } from "../mail/gmail-adapter";
 import type { MailOrganizationHead } from "./types";
+import type { Variant } from "@seams/type-utils";
 
 type InboxResponseState =
   | Readonly<{
@@ -51,7 +52,7 @@ export type MailResponseOwner = Readonly<{
         state: InboxResponseState;
       }>
   );
-export type InboxResponseOwner = Extract<MailResponseOwner, { kind: "inbox" }>;
+export type InboxResponseOwner = Variant<MailResponseOwner, "inbox">;
 type ReadyInboxResponseOwner = InboxResponseOwner &
   Readonly<{ state: Readonly<{ kind: "ready" }> }>;
 
@@ -185,7 +186,7 @@ export type InboxResponseSettlement =
   | Readonly<{ kind: "retry"; outcome?: never }>
   | Readonly<{
       kind: "complete";
-      outcome: Extract<InboxResponseState, { kind: "complete" }>["outcome"];
+      outcome: Variant<InboxResponseState, "complete">["outcome"];
     }>;
 
 export function settleInboxResponse(

@@ -6,6 +6,7 @@ import { apiKeyErrorMessage, GRANTABLE_SCOPE_LABELS, GRANTABLE_SCOPES, issueComm
 import type { CommerceApiKey } from "@seams/control-api/portal/api-keys";
 import "../vault/styles.css";
 import "./styles.css";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * Commerce API keys (Plan 80 step 3): an owner or admin gives the shop's own
@@ -64,7 +65,7 @@ export function CommerceApiKeysRoute(props: {
   };
 
   const create = async (
-    draft: Extract<Drawer, { kind: "create" }>,
+    draft: Variant<Drawer, "create">,
   ): Promise<void> => {
     if (draft.label.trim() === "" || draft.scopes.length === 0) {
       setFailure("Give the key a name and at least one scope.");

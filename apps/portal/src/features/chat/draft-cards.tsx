@@ -32,6 +32,7 @@ import {
 import type { ChatTimelineInsert } from "./activity";
 import type { SlackChannelView, SlackDraftView } from "@seams/control-api/portal/slack-drafts";
 import type { SlackDraftActions } from "./slack-drafts";
+import type { Variant } from "@seams/type-utils";
 
 type EmailDraft =
   | { readonly kind: "reply"; readonly item: EmailReplyQueueItem }
@@ -339,7 +340,7 @@ function replyView(
  * edits, the claims follow the text in the editor.
  */
 function replyReview(
-  result: Extract<EmailReplyPreviewResult, { kind: "current" }>,
+  result: Variant<EmailReplyPreviewResult, "current">,
   trace: TraceState,
   links: MailSourceLinks | null,
 ): DraftMessageReview {
@@ -468,10 +469,7 @@ function operationalView(
 }
 
 function operationalFields(
-  proposal: Extract<
-    EmailOperationalPreviewResult,
-    { kind: "current" }
-  >["proposal"],
+  proposal: Variant<EmailOperationalPreviewResult, "current">["proposal"],
 ): readonly DraftMessageField[] {
   return [
     { label: "From", value: proposal.from },

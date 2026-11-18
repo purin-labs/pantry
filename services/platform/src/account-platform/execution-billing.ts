@@ -3,7 +3,7 @@ import type {
   HarnessTurnLease,
   ModelRoute,
 } from "@seams/contracts";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import {
   assertNever,
   canonicalJson,
@@ -68,7 +68,7 @@ type PaidPhase = StrictUnion<
         | { kind: "open" }
         | {
             kind: "cancelled";
-            terminal: Extract<Terminal, { kind: "cancelled" }>;
+            terminal: Variant<Terminal, "cancelled">;
           };
     }>
   | Readonly<{ kind: "held"; hold: Hold }>
@@ -78,13 +78,13 @@ type PaidPhase = StrictUnion<
   | Readonly<{
       kind: "delivered";
       hold: Hold;
-      terminal: Extract<Terminal, { kind: "completed" }>;
-      receipt: Extract<AccountUsageReceipt, { kind: "charged" }>;
+      terminal: Variant<Terminal, "completed">;
+      receipt: Variant<AccountUsageReceipt, "charged">;
     }>
   | Readonly<{
       kind: "delivered";
       hold: Hold;
-      terminal: Extract<Terminal, { kind: "cancelled" }>;
+      terminal: Variant<Terminal, "cancelled">;
       receipt: {
         kind: "recorded_without_charge";
         reason: "nonbillable_outcome";
@@ -555,10 +555,7 @@ export async function reconcilePantryExecutionBilling(
 
 async function deliverBilling(
   context: Context,
-  operation: Extract<
-    PantryExecutionBilling,
-    { kind: "isolated_e2e_completed_turn" }
-  >,
+  operation: Variant<PantryExecutionBilling, "isolated_e2e_completed_turn">,
 ): Promise<void> {
   const client = createAccountPlatformClient(context.env);
   if (!client.ok) return;
@@ -758,7 +755,7 @@ function deliveredPhase(
   hold: Hold,
   terminal: Terminal,
   receipt: AccountUsageReceipt,
-): Extract<PaidPhase, { kind: "delivered" }> | null {
+): Variant<PaidPhase, "delivered"> | null {
   switch (terminal.kind) {
     case "completed":
       if (
@@ -850,12 +847,9 @@ function sameTerminal(left: Terminal, right: Terminal): boolean {
   return canonicalJson(left) === canonicalJson(right);
 }
 function paidOperation(
-  operation: Extract<
-    PantryExecutionBilling,
-    { kind: "isolated_e2e_completed_turn" }
-  >,
+  operation: Variant<PantryExecutionBilling, "isolated_e2e_completed_turn">,
   phase: PaidPhase,
-): Extract<PantryExecutionBilling, { kind: "isolated_e2e_completed_turn" }> {
+): Variant<PantryExecutionBilling, "isolated_e2e_completed_turn"> {
   return {
     kind: operation.kind,
     identity: operation.identity,

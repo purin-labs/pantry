@@ -147,7 +147,7 @@ import type { CommerceMutationReceiptSigningEnvelopeV1 as GeneratedCommerceMutat
 import type { CommerceMutationReceiptV1 as GeneratedCommerceMutationReceiptV1 } from "./entity-plane-receipts.ts";
 import type { CommerceEntityPlaneError as GeneratedCommerceEntityPlaneError } from "./entity-plane-results.ts";
 import type { VisibleRelationshipColumn as GeneratedVisibleRelationshipColumn } from "./view-records.ts";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 
 export type { CommerceEntityRef } from "./entity-reference.ts";
 export type { SystemCommerceEntityRef } from "./entity-reference.ts";
@@ -244,9 +244,9 @@ export type SavedCommerceViewCreateTarget =
   GeneratedSavedCommerceViewCreateTarget;
 export type SavedCommerceViewSource =
   StrictUnion<GeneratedSavedCommerceViewSource>;
-export type PublishedCommerceSelector = Extract<
+export type PublishedCommerceSelector = Variant<
   SchemaCommerceContextSelection,
-  { kind: "selector" }
+  "selector"
 >["selector"];
 
 export type { CommerceFilter } from "./query-filter.ts";
@@ -364,7 +364,7 @@ export type CommerceViewPresentation =
 export type VisibleRelationshipColumn =
   StrictUnion<GeneratedVisibleRelationshipColumn>;
 export type CommerceContextRequest = Omit<
-  Extract<CommerceGraphQuery, { kind: "underclerk_context" }>,
+  Variant<CommerceGraphQuery, "underclerk_context">,
   "kind"
 >;
 

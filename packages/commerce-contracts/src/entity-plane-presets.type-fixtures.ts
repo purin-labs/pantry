@@ -1,4 +1,4 @@
-import type { VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@seams/type-utils";
 import type {
   CommerceEntityType,
   CommerceList,
@@ -138,10 +138,7 @@ const systemEvidence: CommerceEntityPlaneExportPresetEvidence = {
   // @ts-expect-error Export evidence contains only custom entity types.
   customEntityTypes: [systemType],
 };
-declare const inactive: Extract<
-  CommercePurchasingReconcileResponse,
-  { kind: "inactive" }
->;
+declare const inactive: Variant<CommercePurchasingReconcileResponse, "inactive">;
 // @ts-expect-error An inactive reconciliation cannot contain counters through a spread.
 const mixedReconciliation: CommercePurchasingReconcileResponse = {
   ...inactive,
@@ -149,10 +146,7 @@ const mixedReconciliation: CommercePurchasingReconcileResponse = {
   updated: 0,
   received: 0,
 };
-declare const reconciled: Extract<
-  CommercePurchasingReconcileResponse,
-  { kind: "reconciled" }
->;
+declare const reconciled: Variant<CommercePurchasingReconcileResponse, "reconciled">;
 // @ts-expect-error A reconciled response requires all three counters.
 const missingCount: CommercePurchasingReconcileResponse = {
   kind: "reconciled",

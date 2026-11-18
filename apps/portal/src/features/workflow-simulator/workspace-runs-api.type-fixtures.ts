@@ -1,7 +1,8 @@
 import type { PreparedWorkspaceRun } from "./workspace-runs-api";
+import type { Variant } from "@seams/type-utils";
 
-declare const inline: Extract<PreparedWorkspaceRun, { kind: "inline" }>;
-declare const artifacts: Extract<PreparedWorkspaceRun, { kind: "artifacts" }>;
+declare const inline: Variant<PreparedWorkspaceRun, "inline">;
+declare const artifacts: Variant<PreparedWorkspaceRun, "artifacts">;
 
 // @ts-expect-error A staged publication requires its verified files.
 export const missingFiles: PreparedWorkspaceRun = {

@@ -443,10 +443,7 @@ async function decideQuarantinedSettlement(
 function commitQuarantinedSettlement(
   sql: SqlStorage,
   row: SettlementRow,
-  outcome: Extract<
-    QuarantinedSettlementDecision,
-    { kind: "decided" }
-  >["outcome"],
+  outcome: Variant<QuarantinedSettlementDecision, "decided">["outcome"],
   now: number,
 ): boolean {
   const updated = sql.exec(

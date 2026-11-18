@@ -4,6 +4,7 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * A read-only projection of what the runtime recorded while it worked on one
@@ -875,8 +876,8 @@ function parseTurnMemory(raw: unknown): CaseExecutionTurnMemory | null {
   }
 }
 
-type EffectNode = Extract<OpenCaseExecutionNode, { kind: "effect" }>;
-type DeliveryNode = Extract<OpenCaseExecutionNode, { kind: "delivery" }>;
+type EffectNode = Variant<OpenCaseExecutionNode, "effect">;
+type DeliveryNode = Variant<OpenCaseExecutionNode, "delivery">;
 
 /** Undefined means that the stored value is not a receipt and not null. */
 function parseEffectReceipt(raw: unknown): EffectNode["receipt"] | undefined {

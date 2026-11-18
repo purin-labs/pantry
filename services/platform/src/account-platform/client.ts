@@ -27,7 +27,7 @@ import {
   type AccountOnboardingRequest,
 } from "@seams/control-api";
 import type { ActiveControlSession, User } from "../data/control-plane";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import {
   readOrganizationInvitationV1 as readAccountInvitation,
   readAccountMembershipListV1 as readAccountMembershipList,
@@ -97,7 +97,7 @@ type AccountAutomationCheck = Readonly<{
 export type AccountMembershipActor = Readonly<{
   binding: PantryAccountBinding;
   user: LinkedPantryAccountUser;
-  authority: Extract<AccountUserAuthority, { kind: "authenticated_session" }>;
+  authority: Variant<AccountUserAuthority, "authenticated_session">;
 }>;
 type AccountAutomationGrantRequest = Omit<
   AccountAutomationGrantChangeV1,
@@ -224,17 +224,17 @@ export class AccountPlatformClient {
     return this.post("usage", input, readAccountUsageReceipt);
   }
   settleFunds(
-    input: Extract<AccountTerminalDelivery, { kind: "settle" }>,
+    input: Variant<AccountTerminalDelivery, "settle">,
   ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
     return this.post("funds/settle", input, readAccountFundsReservation);
   }
   releaseFunds(
-    input: Extract<AccountTerminalDelivery, { kind: "release" }>,
+    input: Variant<AccountTerminalDelivery, "release">,
   ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
     return this.post("funds/release", input, readAccountFundsReservation);
   }
   reconcileFunds(
-    input: Extract<AccountTerminalDelivery, { kind: "reconcile" }>,
+    input: Variant<AccountTerminalDelivery, "reconcile">,
   ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
     return this.post("funds/reconcile", input, readAccountFundsReservation);
   }
@@ -324,7 +324,7 @@ export class AccountPlatformClient {
     input: AccountMembershipActor &
       Readonly<{ invitationId: string; token: string }>,
   ): Promise<
-    Result<Extract<AccountMembership, { kind: "active" }>, AccountPlatformError>
+    Result<Variant<AccountMembership, "active">, AccountPlatformError>
   > {
     return this.signedPostUser(
       "invitations/accept",

@@ -37,6 +37,7 @@ import type {
   GoalModelStop,
 } from "./goal-model-calls";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
+import type { Variant } from "@seams/type-utils";
 
 export type GoalUsageContext = {
   readonly env: Env;
@@ -223,7 +224,7 @@ export async function createTransientGoalExecution(
   if (!Number.isSafeInteger(tokenAllowance) || tokenAllowance <= 0)
     throw new Error("goal_session_budget_invalid");
   await reconcileSessionGoalUsage(context);
-  const authority: Extract<GoalUsageAuthority, { kind: "transient" }> = {
+  const authority: Variant<GoalUsageAuthority, "transient"> = {
     kind: "transient",
     lease,
     runId: crypto.randomUUID(),
@@ -261,7 +262,7 @@ export async function createTransientGoalExecution(
 
 async function beginTransient(
   context: GoalUsageContext,
-  authority: Extract<GoalUsageAuthority, { kind: "transient" }>,
+  authority: Variant<GoalUsageAuthority, "transient">,
   caseId: string,
   goalId: string,
   state: TransientGoalExecution["state"],

@@ -583,7 +583,7 @@ function parseCommerceActionDetails(raw: unknown): CommerceActionDetails {
 
 function parseOrderRefundDetails(
   raw: Record<string, unknown>,
-): Extract<CommerceActionDetails, { kind: "refund_order" }> {
+): Variant<CommerceActionDetails, "refund_order"> {
   if (
     !nonEmptyText(raw.orderId) ||
     !nonEmptyText(raw.reason) ||
@@ -631,7 +631,7 @@ function parseOrderRefundDetails(
 
 function parseCafeMenuDetails(
   raw: Record<string, unknown>,
-): Extract<CommerceActionDetails, { kind: "publish_cafe_menu" }> {
+): Variant<CommerceActionDetails, "publish_cafe_menu"> {
   const menu = raw.menu;
   if (
     !hasExactKeys(raw, [

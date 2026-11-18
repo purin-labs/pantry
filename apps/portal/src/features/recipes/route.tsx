@@ -21,6 +21,7 @@ import {
 import { PageSkeleton, RecoverableError } from "../../page-components";
 import { RecipeEditor } from "./editor";
 import "./styles.css";
+import type { Variant } from "@seams/type-utils";
 
 type Props = Readonly<{
   organisationId: string;
@@ -357,7 +358,7 @@ function matchesQuery(query: string, recipe: RecipeRevision): boolean {
 }
 
 function readyState(
-  previous: Extract<State, { kind: "ready" }>,
+  previous: Variant<State, "ready">,
   collection: RecipeCollection,
   query: string,
   selected: RecipeRevision | null,

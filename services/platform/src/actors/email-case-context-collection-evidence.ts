@@ -44,8 +44,9 @@ import {
   type GmailMessageContent,
 } from "../mail/gmail-adapter";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
+import type { Variant } from "@seams/type-utils";
 
-type MailboxAuthority = Extract<RequestAuthority, { kind: "agent_mailbox" }>;
+type MailboxAuthority = Variant<RequestAuthority, "agent_mailbox">;
 type EvidenceError = Readonly<{ code: string }>;
 
 export class EmailTurnInformationFlow {
@@ -160,9 +161,9 @@ async function prepareCaseContextCollectionFlowLabel(
   env: Env,
   authority: MailboxAuthority,
   caseId: string,
-  dependency: Extract<
+  dependency: Variant<
     CaseContextCollectionEvidenceDependency,
-    { kind: "case_context_collection_evidence" }
+    "case_context_collection_evidence"
   >,
 ): Promise<Result<FlowLabel, EvidenceError>> {
   const valid = await validateEmailCaseContextCollectionDependency(
@@ -223,9 +224,9 @@ async function prepareCaseContextCollectionFlowLabel(
 
 async function selectedCaseContextCollectionSourceLabels(
   env: Env,
-  dependency: Extract<
+  dependency: Variant<
     CaseContextCollectionEvidenceDependency,
-    { kind: "case_context_collection_evidence" }
+    "case_context_collection_evidence"
   >,
 ): Promise<Result<readonly FlowLabel[], EvidenceError>> {
   const organisationId = parseOrganisationId(
@@ -316,9 +317,9 @@ export async function validateEmailCaseContextCollectionDependency(
 
 export async function validateCaseContextCollectionEmailMessage(
   env: Env,
-  dependency: Extract<
+  dependency: Variant<
     CaseContextCollectionEvidenceDependency,
-    { kind: "case_context_collection_evidence" }
+    "case_context_collection_evidence"
   >,
   messageId: string,
   content: GmailMessageContent,
@@ -374,9 +375,9 @@ export async function validateCaseContextCollectionEmailMessage(
 
 async function validateCaseContextCollectionProviderSources(
   env: Env,
-  dependency: Extract<
+  dependency: Variant<
     CaseContextCollectionEvidenceDependency,
-    { kind: "case_context_collection_evidence" }
+    "case_context_collection_evidence"
   >,
 ): Promise<Result<null, EvidenceError>> {
   const access = await resolveConnectorGmailAccess({

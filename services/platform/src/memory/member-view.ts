@@ -9,6 +9,7 @@ import type {
   FlowPolicyOwner,
 } from "../policy/information-flow/types";
 import type { MemoryViewer } from "./access";
+import type { Variant } from "@seams/type-utils";
 
 /** The member that a view is for, with what is needed to judge a reader. */
 export type MemberViewer = Pick<
@@ -95,7 +96,7 @@ async function readerIsOpen(
  */
 async function slackConversationIsOpen(
   viewer: MemberViewer,
-  reader: Extract<FlowAudience, { kind: "conversation" }>,
+  reader: Variant<FlowAudience, "conversation">,
 ): Promise<boolean> {
   const database = viewer.execution.database;
   if (await slackChannelIsPublic(database, viewer.organisationId, reader))

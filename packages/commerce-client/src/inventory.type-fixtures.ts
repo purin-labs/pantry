@@ -1,10 +1,8 @@
 import type { ReconcileCommerceInventoryV1 } from "./admin-client.ts";
 import type { CommerceInventoryReceiptPurchase } from "./commerce-resources.ts";
+import type { Variant } from "@seams/type-utils";
 
-declare const count: Extract<
-  ReconcileCommerceInventoryV1["change"],
-  { kind: "count" }
->;
+declare const count: Variant<ReconcileCommerceInventoryV1["change"], "count">;
 
 // @ts-expect-error A count cannot carry an adjustment direction through a spread.
 const countWithDirection: ReconcileCommerceInventoryV1["change"] = {

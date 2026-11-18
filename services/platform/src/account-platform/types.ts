@@ -32,6 +32,7 @@ import {
   type PlatformUsageReceiptV1 as AccountUsageReceipt,
 } from "@seams-internal/console-shared/accountPlatform";
 import type { Result } from "../result";
+import type { Variant } from "@seams/type-utils";
 
 export {
   accountObject,
@@ -73,15 +74,12 @@ type StoredAccountScope<T> = T extends { readonly scope: PlatformScopeV1 }
   ? Omit<T, "scope"> & { readonly scope: AccountScope }
   : never;
 export type AccountPrincipal =
-  | Extract<PlatformPrincipalV1, { readonly kind: "automation" }>
+  | Variant<PlatformPrincipalV1, "automation">
   | (Omit<
-      Extract<PlatformPrincipalV1, { readonly kind: "user" }>,
+      Variant<PlatformPrincipalV1, "user">,
       "identity"
     > & {
-      readonly identity: Extract<
-        PlatformIdentityLinkV1,
-        { readonly kind: "verified_provider_subject" }
-      > & { readonly issuer: "https://accounts.google.com" };
+      readonly identity: Variant<PlatformIdentityLinkV1, "verified_provider_subject"> & { readonly issuer: "https://accounts.google.com" };
     });
 export type AccountIdentityResolution = Omit<
   Pick<ServiceIdentityResolutionV1, keyof ServiceIdentityResolutionV1>,

@@ -192,9 +192,9 @@ const skippedSuccessorBinding: PreparedRecordingAcceptance = {
 };
 void skippedSuccessorBinding;
 
-declare const preparedTask: Extract<
+declare const preparedTask: Variant<
   BrowserPhysicsTask,
-  { kind: "request" | "prepared-request" }
+  "request" | "prepared-request"
 >;
 // @ts-expect-error Preparing a request cannot also resume another model's state through a spread.
 const mixedPhysicsStart: BrowserPhysicsTask = {

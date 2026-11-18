@@ -362,12 +362,9 @@ type RehearsalAuthoring = Readonly<{
   financierPack: FinancierPackRecipeConfig | null;
   pastryBench: PastryBenchRecipeConfig | null;
   cafeShift: CafeShiftRecipeConfig | null;
-  calibratedBatter: Extract<
-    FinancierBatterOutcome,
-    { kind: "completed" }
-  > | null;
-  calibratedBake: Extract<FinancierBakeOutcome, { kind: "completed" }> | null;
-  calibratedPack: Extract<FinancierPackOutcome, { kind: "completed" }> | null;
+  calibratedBatter: Variant<FinancierBatterOutcome, "completed"> | null;
+  calibratedBake: Variant<FinancierBakeOutcome, "completed"> | null;
+  calibratedPack: Variant<FinancierPackOutcome, "completed"> | null;
   handoffRecoveryPreset: FinancierHandoffRecoveryPreset;
   authorRoute: "cold-racking" | "oven-rack";
   timelineOpen: boolean;
@@ -1135,7 +1132,7 @@ export class ProductionWorkspace extends React.Component<
     this.setState({ cafeShift: null });
   }
   private applyCafeShiftToSchedule(
-    outcome: Extract<CafeShiftOutcome, { kind: "completed" }>,
+    outcome: Variant<CafeShiftOutcome, "completed">,
   ): void {
     const currentSettings =
       this.props.session.data.kind === "ready"
@@ -1177,7 +1174,7 @@ export class ProductionWorkspace extends React.Component<
     }
   }
   private applyFinancierBatterToSchedule(
-    outcome: Extract<FinancierBatterOutcome, { kind: "completed" }>,
+    outcome: Variant<FinancierBatterOutcome, "completed">,
   ): void {
     const currentSettings =
       this.props.session.data.kind === "ready"
@@ -1221,7 +1218,7 @@ export class ProductionWorkspace extends React.Component<
     }
   }
   private applyFinancierBakeToSchedule(
-    outcome: Extract<FinancierBakeOutcome, { kind: "completed" }>,
+    outcome: Variant<FinancierBakeOutcome, "completed">,
   ): void {
     const currentSettings =
       this.props.session.data.kind === "ready"
@@ -1297,7 +1294,7 @@ export class ProductionWorkspace extends React.Component<
     }
   }
   private applyFinancierPackToSchedule(
-    outcome: Extract<FinancierPackOutcome, { kind: "completed" }>,
+    outcome: Variant<FinancierPackOutcome, "completed">,
   ): void {
     const currentSettings =
       this.props.session.data.kind === "ready"

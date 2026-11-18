@@ -10,6 +10,7 @@ import {
 } from "@seams/control-api";
 import { controlMutation } from "../../control-client";
 import { captureSurfaceObservation } from "../surface-observation";
+import type { Variant } from "@seams/type-utils";
 
 // The chat routes, without an import of `./api`, which imports this module.
 function chatPath(organisationId: string): string {
@@ -28,7 +29,7 @@ type ScreenSuggestion = Readonly<{
   surfaceSessionId: string;
   /** The trimmed draft that Jev checked. */
   draft: string;
-  view: Extract<ScreenRelevanceView, { kind: "quiet" | "hint" | "ask" }>;
+  view: Variant<ScreenRelevanceView, "quiet" | "hint" | "ask">;
   /** The question showed for this draft; Enter again sends without. */
   asked: boolean;
 }>;

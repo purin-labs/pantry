@@ -5,6 +5,7 @@ import {
   type FloorPlanWindow,
 } from "./bakery-room";
 import type { Box2D } from "./collisions";
+import type { Variant } from "@seams/type-utils";
 
 export type FloorPlanOpening =
   | Readonly<{
@@ -23,14 +24,14 @@ export type FloorPlanOpening =
 export function doorOpening(
   planId: BakeryFloorPlanId,
   door: FloorPlanDoor,
-): Extract<FloorPlanOpening, { kind: "door" }> {
+): Variant<FloorPlanOpening, "door"> {
   return { kind: "door", planId, door };
 }
 
 export function windowOpening(
   planId: BakeryFloorPlanId,
   window: FloorPlanWindow,
-): Extract<FloorPlanOpening, { kind: "window" }> {
+): Variant<FloorPlanOpening, "window"> {
   return { kind: "window", planId, window };
 }
 

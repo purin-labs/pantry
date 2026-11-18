@@ -2108,7 +2108,7 @@ function rehearsalEditVisible(
     }
   >,
   trays: readonly BakerySurfaceRehearsalTray[],
-  faults: Extract<BakeryRehearsalEdit, { kind: "set_faults" }>["faults"],
+  faults: Variant<BakeryRehearsalEdit, "set_faults">["faults"],
 ): boolean {
   switch (edit.kind) {
     case "set_faults":

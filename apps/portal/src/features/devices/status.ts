@@ -5,6 +5,7 @@ import {
   type KitchenDeviceView,
 } from "@seams/control-api";
 import { assertNever } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 /** How a device's facts read on the Devices page. */
 
@@ -84,9 +85,7 @@ export function deviceStatus(device: DeviceView): DeviceStatus {
   }
 }
 
-function gatewayStatus(
-  device: Extract<DeviceView, { kind: "gateway" }>,
-): DeviceStatus {
+function gatewayStatus(device: Variant<DeviceView, "gateway">): DeviceStatus {
   if (device.enrollment === "revoked")
     return { label: "Revoked", reason: "Its access is removed", tone: "muted" };
   if (device.enrollment === "pending")
@@ -245,7 +244,7 @@ export function currentWork(device: DeviceView): string {
 }
 
 export function credentialLabel(
-  health: Extract<DeviceView, { kind: "payment_terminal" }>["credentialHealth"],
+  health: Variant<DeviceView, "payment_terminal">["credentialHealth"],
 ): string {
   switch (health) {
     case "active":
@@ -266,7 +265,7 @@ export function credentialLabel(
 }
 
 export function modelLabel(
-  state: Extract<DeviceView, { kind: "shop_mac" }>["modelState"],
+  state: Variant<DeviceView, "shop_mac">["modelState"],
 ): string {
   switch (state) {
     case "loaded":

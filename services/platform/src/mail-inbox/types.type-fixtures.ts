@@ -6,6 +6,7 @@ import type {
 } from "./types";
 import type { MailResponseOwner } from "./response-store";
 import { startInboxResponse } from "./response-store";
+import type { Variant } from "@seams/type-utils";
 
 const expired = { kind: "history_expired" } as const;
 // @ts-expect-error Expired history cannot retain a usable cursor through a spread.
@@ -32,7 +33,7 @@ const unknownOrigin: MailWork = {
   threadId: "t",
   revision: 1,
 };
-declare const action: Extract<MailAction, { kind: "supplier_delay" }>;
+declare const action: Variant<MailAction, "supplier_delay">;
 // @ts-expect-error An organization-only publication cannot retain action authority.
 const mixedAction: MailAction = { ...action, kind: "none" };
 const incompleteOwner: MailResponseOwner = {

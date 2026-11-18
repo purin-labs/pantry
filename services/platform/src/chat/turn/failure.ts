@@ -16,6 +16,7 @@ import {
 } from "../store";
 import { assertNever } from "@seams/std";
 import { nextTimelineSequence } from "./timeline";
+import type { Variant } from "@seams/type-utils";
 
 export async function reconcileFailedConversationTurn(
   env: Env,
@@ -113,7 +114,7 @@ export function failedConversation(
 function interruptedConversationRecovery(
   work: Conversation["work"],
   requestId: string,
-): Extract<Conversation["work"], { kind: "failed" }>["recovery"] {
+): Variant<Conversation["work"], "failed">["recovery"] {
   if (work.kind === "ready" || work.requestId !== requestId) return null;
   switch (work.kind) {
     case "running":

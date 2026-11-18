@@ -21,9 +21,10 @@ import type { OrganisationDatabase } from "../database-handles";
 import { validateNativeRequestAuthority } from "../request-authority";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";
+import type { Variant } from "@seams/type-utils";
 export async function authorizeMailSource(
   env: OrganisationPlacementBindings,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   integrationAccountId: IntegrationAccountId,
 ): Promise<Readonly<{
   label: FlowLabel;
@@ -86,7 +87,7 @@ export async function authorizeMailSource(
  */
 export async function mailboxAwaitsReconnect(
   env: OrganisationPlacementBindings,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   integrationAccountId: IntegrationAccountId,
 ): Promise<boolean> {
   const organisationId = parseOrganisationId(authority.organisationId);
@@ -135,7 +136,7 @@ export async function mailboxAwaitsReconnect(
  */
 async function mailboxReadGrantIds(
   db: OrganisationDatabase,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   integrationAccountId: IntegrationAccountId,
 ): Promise<readonly string[] | null> {
   const organisationId = parseOrganisationId(authority.organisationId);

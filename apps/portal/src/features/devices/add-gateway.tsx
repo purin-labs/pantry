@@ -12,6 +12,7 @@ import {
   startGateway,
   type GatewayStartResult,
 } from "./requests";
+import type { Variant } from "@seams/type-utils";
 
 const STATION_ITEMS = DEVICE_STATIONS.map((station) => ({
   value: station.stationId,
@@ -206,7 +207,7 @@ function doneText(active: number, waiting: number): string {
   return `${confirmed}${left}. ${rule}`;
 }
 
-type GatewayStart = Extract<GatewayStartResult, { kind: "started" }>["start"];
+type GatewayStart = Variant<GatewayStartResult, "started">["start"];
 
 type StartFailure = Exclude<GatewayStartResult, { kind: "started" }>;
 

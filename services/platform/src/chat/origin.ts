@@ -4,6 +4,7 @@ import {
   type ChatOrigin,
 } from "@seams/control-api";
 import type { ChatTimelineEvent } from "./timeline";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * Where a chat started (Plan 87): the page that its first message carried.
@@ -34,7 +35,7 @@ function timelineOrigin(
 
 function isUserEvent(
   event: ChatTimelineEvent,
-): event is Extract<ChatTimelineEvent, { readonly kind: "user" }> {
+): event is Variant<ChatTimelineEvent, "user"> {
   return event.kind === "user";
 }
 

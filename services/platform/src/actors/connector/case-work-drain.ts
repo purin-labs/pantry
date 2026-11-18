@@ -50,6 +50,7 @@ import {
   type SessionStub,
   replyMaySteer,
 } from "./support";
+import type { Variant } from "@seams/type-utils";
 
 export class ConnectorCaseWorkDrain {
   /** The Cases that have a message in flight. */
@@ -456,7 +457,7 @@ export class ConnectorCaseWorkDrain {
    */
   private async tellAttemptsExhausted(
     claimed: ConnectorCaseWorkClaim,
-    work: Extract<ConnectorCaseWorkClaim["work"], { kind: "exhausted_notice" }>,
+    work: Variant<ConnectorCaseWorkClaim["work"], "exhausted_notice">,
     scope: OrganisationExecutionScope,
   ): Promise<SlackCaseProcessingResult> {
     const { storage } = this.input;

@@ -8,6 +8,7 @@ import {
   isNonNegativeInteger,
   isRecord,
 } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 // A chat's Project is its Case's Project. The revision is that association's.
 export type ChatPlacement = Readonly<{
@@ -314,7 +315,7 @@ export function parseProjectReference(raw: unknown): ProjectReference | null {
 
 function isProjectCommerceType(
   raw: unknown,
-): raw is Extract<ProjectReference, { kind: "commerce_record" }>["type"] {
+): raw is Variant<ProjectReference, "commerce_record">["type"] {
   return (
     raw === "product" ||
     raw === "order" ||

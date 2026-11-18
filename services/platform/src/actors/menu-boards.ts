@@ -108,6 +108,7 @@ import {
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
 } from "./collaboration-room";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The menu boards of an Organisation (Plan 40B phase 1). Each board is a
@@ -2236,7 +2237,7 @@ function canvasRectsOf(snapshot: MenuBoardSnapshot): Map<string, MenuBoardRect> 
 function stackEditUpdate(
   document: MenuBoardDoc,
   snapshot: MenuBoardSnapshot,
-  edit: Extract<MenuBoardStackEdit, { kind: "stack_elements" }>,
+  edit: Variant<MenuBoardStackEdit, "stack_elements">,
   operationId: string,
 ): BoardEditOutcome {
   const id = `element_${operationId.slice(0, 16)}`;

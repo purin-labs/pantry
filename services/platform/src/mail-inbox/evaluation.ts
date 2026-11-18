@@ -23,6 +23,7 @@ import { JevMailRequest } from "./jev";
 import { mailClassificationEvidence } from "./evidence";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import type { Result } from "../result";
+import type { Variant } from "@seams/type-utils";
 
 export type MailEvaluationInput = Readonly<{
   organisationId: OrganisationId;
@@ -31,7 +32,7 @@ export type MailEvaluationInput = Readonly<{
   revision: number;
   messageId: string;
   rules: readonly MailRule[];
-  authority: Extract<RequestAuthority, { kind: "control" }>;
+  authority: Variant<RequestAuthority, "control">;
   sourcePin: string;
 }>;
 type MailEvaluationResult = Readonly<{

@@ -29,6 +29,7 @@ import {
 import { decideChatPermission } from "./api";
 import { AGENT_NAME } from "../../agent-name";
 import type { Chat } from "@seams/control-api/portal/chat";
+import type { Variant } from "@seams/type-utils";
 
 type Props = Readonly<{
   organisationId: string;
@@ -291,9 +292,9 @@ function WaitingBanner(
   );
 }
 
-type CapabilityItem = Extract<
+type CapabilityItem = Variant<
   ChatPermissionRequest["items"][number],
-  { kind: "capability" }
+  "capability"
 >;
 
 function isCapabilityItem(

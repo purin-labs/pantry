@@ -2,10 +2,7 @@ import type { Variant } from "@seams/type-utils";
 import { withoutBatchMember } from "./engine-batches.ts";
 import type { DomainEvent } from "./events.ts";
 
-type RejectedBatchMember = Extract<
-  DomainEvent,
-  { kind: "batch-member-rejected" }
->;
+type RejectedBatchMember = Variant<DomainEvent, "batch-member-rejected">;
 declare const rejectedMemberWithoutRecovery: Omit<
   RejectedBatchMember,
   "recovery"
@@ -14,9 +11,9 @@ declare const rejectedMemberWithoutRecovery: Omit<
 export const unprovenBatchRejection: RejectedBatchMember = {
   ...rejectedMemberWithoutRecovery,
 };
-declare const completedBatch: Extract<
+declare const completedBatch: Variant<
   DomainEvent,
-  { kind: "batch-completed" | "batch-cleared" }
+  "batch-completed" | "batch-cleared"
 >;
 // @ts-expect-error A completed cycle cannot become a member rejection without member identities.
 export const incompleteBatchRejection: RejectedBatchMember = {
@@ -479,11 +476,8 @@ export const evidenceWithBundle: RunDocument = {
 
 declare const address: AttemptAddress;
 declare const boundaryRequest: BoundaryRequest;
-declare const idleRecording: Extract<CellRecording, { kind: "idle" }>;
-declare const handoffRecording: Extract<
-  CellRecording,
-  { kind: "admission" | "removal" }
->;
+declare const idleRecording: Variant<CellRecording, "idle">;
+declare const handoffRecording: Variant<CellRecording, "admission" | "removal">;
 declare const restWithoutRecording: Omit<RestResult, "recording">;
 declare const boundaryWithoutRecording: Omit<BoundaryCandidate, "recording">;
 
@@ -705,9 +699,9 @@ export const unparsedOperationPurpose: OperationDispatch["purpose"] =
 
 import type { RecoveryView } from "./execution-view.ts";
 
-declare const recoveringView: Extract<
+declare const recoveringView: Variant<
   RecoveryView,
-  { kind: "recovering" | "recovery-failed" }
+  "recovering" | "recovery-failed"
 >;
 
 // @ts-expect-error Pending recovery has no handling or return phase, even through a spread.
@@ -725,7 +719,7 @@ export const incompleteRecoveryView: RecoveryView = {
 
 import type { LogisticsView, TaskView } from "./logistics-view.ts";
 
-declare const waitingTaskView: Extract<TaskView, { kind: "waiting" }>;
+declare const waitingTaskView: Variant<TaskView, "waiting">;
 declare const untrustedTaskView: unknown;
 
 // @ts-expect-error Completed tasks cannot retain waiting blockers through a spread.
@@ -753,7 +747,7 @@ export const unavailableWithQueues: LogisticsView = {
   queues: [],
 };
 
-declare const availableLogistics: Extract<LogisticsView, { kind: "available" }>;
+declare const availableLogistics: Variant<LogisticsView, "available">;
 // @ts-expect-error A spread cannot remove the required dependency observation.
 export const missingDependencyObservation: LogisticsView = {
   ...availableLogistics,
@@ -761,7 +755,7 @@ export const missingDependencyObservation: LogisticsView = {
 };
 
 import type { PhysicsView } from "./physics-view.ts";
-declare const recordedPhysics: Extract<PhysicsView, { kind: "recorded" }>;
+declare const recordedPhysics: Variant<PhysicsView, "recorded">;
 // @ts-expect-error An absent observation cannot retain sample identity through a spread.
 export const absentWithRecording: PhysicsView = {
   ...recordedPhysics,
@@ -773,7 +767,7 @@ export const incompletePhysics: PhysicsView = {
   version: 1,
   content: "{}",
 };
-declare const cellPhysics: Extract<PhysicsView, { kind: "cell-recorded" }>;
+declare const cellPhysics: Variant<PhysicsView, "cell-recorded">;
 // @ts-expect-error Cell observations cannot acquire a task through a spread.
 export const cellWithTask: PhysicsView = { ...cellPhysics, task: "invented" };
 // @ts-expect-error An operation observation requires its task and attempt.
@@ -784,10 +778,7 @@ export const cellAsOperation: PhysicsView = {
 
 import type { ResourceHistoryView } from "./resource-history-view.ts";
 import type { ResourceInterval } from "./results.ts";
-declare const availableHistory: Extract<
-  ResourceHistoryView,
-  { kind: "available" }
->;
+declare const availableHistory: Variant<ResourceHistoryView, "available">;
 declare const untrustedHistory: unknown;
 // @ts-expect-error Unavailable history cannot retain totals through a spread.
 export const absentWithResourceTotals: ResourceHistoryView = {
@@ -806,10 +797,7 @@ export const claimWithoutLifecycle: ResourceInterval = {
 };
 
 import type { StorageHistoryView, StorageInterval } from "./storage-history.ts";
-declare const availableStorage: Extract<
-  StorageHistoryView,
-  { kind: "available" }
->;
+declare const availableStorage: Variant<StorageHistoryView, "available">;
 declare const untrustedStorage: unknown;
 // @ts-expect-error Unavailable history cannot retain intervals through a spread.
 export const absentWithStorageTotals: StorageHistoryView = {
@@ -836,10 +824,7 @@ import type {
   CapacityCategories,
   TaskWait,
 } from "./scheduling-history.ts";
-declare const availableScheduling: Extract<
-  SchedulingHistoryView,
-  { kind: "available" }
->;
+declare const availableScheduling: Variant<SchedulingHistoryView, "available">;
 declare const rawScheduling: unknown;
 // @ts-expect-error Unavailable observations cannot retain categories through a spread.
 export const absentSchedulingWithTotals: SchedulingHistoryView = {
@@ -879,9 +864,9 @@ export const unboundInspection: import("./commands.ts").ControlCommand = {
   kind: "inspect",
   task: inspectionTask,
 };
-declare const inspectionWait: Extract<
+declare const inspectionWait: Variant<
   import("./state.ts").RunStatus,
-  { kind: "awaiting-inspection" }
+  "awaiting-inspection"
 >;
 export const mixedInspectionWait: import("./state.ts").RunStatus = {
   ...inspectionWait,
@@ -896,22 +881,19 @@ export const untargetedArrivalClosure: import("./execution-host.ts").HostRequest
     commandId: "close-source",
   };
 
-declare const declaredWork: Extract<
+declare const declaredWork: Variant<
   import("./scenario.ts").TaskExecutor,
-  { kind: "declared" }
+  "declared"
 >;
-declare const guardedWork: Extract<
+declare const guardedWork: Variant<
   import("./scenario.ts").TaskExecutor,
-  { kind: "after-inspection" }
+  "after-inspection"
 >;
-declare const nativeWork: Extract<
+declare const nativeWork: Variant<
   import("./scenario.ts").TaskExecutor,
-  { kind: "native" }
+  "native"
 >;
-declare const skippedTask: Extract<
-  import("./state.ts").TaskState,
-  { kind: "skipped" }
->;
+declare const skippedTask: Variant<import("./state.ts").TaskState, "skipped">;
 // @ts-expect-error Guarded work needs an inspection and its required outcome.
 export const unboundConditionalWork: import("./scenario.ts").TaskExecutor = {
   kind: "after-inspection",

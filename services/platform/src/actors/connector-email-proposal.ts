@@ -87,10 +87,11 @@ import {
   settleEmailRelationshipVerification,
   type EmailRelationshipRead,
 } from "../mail-inbox/supplier-context";
+import type { Variant } from "@seams/type-utils";
 
 export type EmailRelationshipPreview =
-  | Extract<EmailRelationshipRead, { kind: "suppliers" }>
-  | (Extract<EmailRelationshipRead, { kind: "purchase_request" }> &
+  | Variant<EmailRelationshipRead, "suppliers">
+  | (Variant<EmailRelationshipRead, "purchase_request"> &
       Readonly<{ version: number; snapshotDigest: string }>);
 
 type RelationshipInput = Readonly<{
@@ -98,7 +99,7 @@ type RelationshipInput = Readonly<{
   env: Env;
   scope: OrganisationExecutionScope;
   proposalId: string;
-  authority: Extract<RequestAuthority, { kind: "control" }>;
+  authority: Variant<RequestAuthority, "control">;
   lookup: MailRelationshipLookup;
   now: number;
   fetcher: typeof fetch;
@@ -502,7 +503,7 @@ export async function editEmailReplyBody(
     env: Env;
     scope: OrganisationExecutionScope;
     proposalId: string;
-    authority: Extract<RequestAuthority, { kind: "control" }>;
+    authority: Variant<RequestAuthority, "control">;
     edit: MailReplyEdit;
     /**
      * `shared` when the new body came from a shared draft that more than one
@@ -708,7 +709,7 @@ function persistRelationshipCorrection(
   sql: SqlStorage,
   operation: EmailDraftOperation,
   userId: string,
-  relationship: Extract<EmailRelationshipRead, { kind: "purchase_request" }>,
+  relationship: Variant<EmailRelationshipRead, "purchase_request">,
   version: number,
   bodyDigest: string,
   snapshotDigest: string,
@@ -770,7 +771,7 @@ export async function authorizeEmailReplyReview(
   sql: SqlStorage,
   env: Env,
   scope: OrganisationExecutionScope,
-  authority: Extract<RequestAuthority, { kind: "control" }>,
+  authority: Variant<RequestAuthority, "control">,
   proposalId: string,
 ): Promise<Result<null, EmailProposalError>> {
   if (!(await isActorExecutionActive(sql, scope)))

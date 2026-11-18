@@ -27,6 +27,7 @@ import {
 import type { Env } from "../env";
 import type { ControlSessionId, OrganisationId, UserId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { Variant } from "@seams/type-utils";
 
 type CapturedActionPlacement = Readonly<{
   organisationId: OrganisationId;
@@ -119,7 +120,7 @@ export async function resolveSlackApprover(
 export function sessionActionMutationExecution(
   scope: OrganisationExecutionScope,
   lease: HarnessTurnLease,
-): Extract<ActionMutationExecution, { kind: "session_turn" }> {
+): Variant<ActionMutationExecution, "session_turn"> {
   return {
     kind: "session_turn",
     execution: sessionTurnExecution(lease),

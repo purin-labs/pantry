@@ -6,6 +6,7 @@ import {
 import type { StatusChipStatus } from "../status-chip";
 import { assertNever } from "@seams/std";
 import type { AgentMailboxView, MailboxPauseReasonView, MailboxProcessingView } from "@seams/control-api/portal/agent-mailbox";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * An agent in a mailbox's list. A mailbox can be assigned to an agent that is
@@ -38,10 +39,7 @@ export type MailboxPolicyDraft =
     };
 
 /** The limits a mailbox turns on with until a person changes them. */
-export const DEFAULT_MAILBOX_POLICY: Extract<
-  MailboxPolicyDraft,
-  { readonly kind: "enabled" }
-> = {
+export const DEFAULT_MAILBOX_POLICY: Variant<MailboxPolicyDraft, "enabled"> = {
   kind: "enabled",
   maxActiveCases: 3,
   maxMessagesPerHour: 20,

@@ -9,6 +9,7 @@ import type {
 import { assertNever } from "@seams/std";
 
 import type { VaultTransport } from "./api";
+import type { Variant } from "@seams/type-utils";
 
 /** The vaults that a token reaches, when the person must choose one. */
 export type OnePasswordVaultChoice = Readonly<{
@@ -172,7 +173,7 @@ export function ConnectForm(props: {
 
 /** The connected store: move items, disconnect, and the store's history. */
 export function StoreDetails(props: {
-  readonly store: Extract<VaultStoreView, { kind: "onepassword" }>;
+  readonly store: Variant<VaultStoreView, "onepassword">;
   readonly items: readonly VaultItemView[];
   readonly busy: boolean;
   readonly failure: string | null;

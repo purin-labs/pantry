@@ -30,11 +30,9 @@ const historicalHost: HostView = { ...observation };
 void incompleteRecovery;
 void historicalHost;
 import type { MaterialStorageHistoryView } from "./material-history.ts";
+import type { Variant } from "@seams/type-utils";
 
-declare const materialHistory: Extract<
-  MaterialStorageHistoryView,
-  { kind: "available" }
->;
+declare const materialHistory: Variant<MaterialStorageHistoryView, "available">;
 // @ts-expect-error A retained build with no history cannot claim measured intervals.
 export const unavailableMaterialHistory: MaterialStorageHistoryView = {
   ...materialHistory,

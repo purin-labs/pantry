@@ -10,13 +10,14 @@ import {
   parsePersistentSnapshot,
   readSharedRunArtifact,
 } from "./workspace-runs-api";
+import type { Variant } from "@seams/type-utils";
 
 /** Opening a shared run retains verified files in browser storage for a fresh worker. */
 export async function openPersistentWorkspaceRun(
   organisationId: string,
   id: string,
   read: (path: string) => Promise<unknown>,
-): Promise<Extract<OvenRunSource, { kind: "snapshot" }>> {
+): Promise<Variant<OvenRunSource, "snapshot">> {
   const snapshot = await readExactWorkspaceRun(organisationId, id, read);
   if (snapshot.kind !== "persistent-production")
     throw new Error("Choose a persistent production run.");

@@ -2,12 +2,13 @@ import type { ProductionNavigation } from "./production-navigation.ts";
 import type { ProductionReady } from "./production-session.ts";
 import type { ProductionWorkcell } from "@seams/production-simulation/recipes/bakery/production-workcells";
 import type { BakeryWorkspaceAction } from "./simulator-state.ts";
+import type { Variant } from "@seams/type-utils";
 
 declare const from: ProductionReady;
 declare const operation: ProductionWorkcell;
 declare function navigate(value: ProductionNavigation): void;
 declare function showPanel(
-  value: Extract<BakeryWorkspaceAction, { kind: "productionPanelShown" }>,
+  value: Variant<BakeryWorkspaceAction, "productionPanelShown">,
 ): void;
 
 showPanel({ kind: "productionPanelShown", from, panel: "timeline" });

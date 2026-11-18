@@ -10,7 +10,7 @@ import { readStorageHistory } from "./storage-history-view.ts";
 import { type SchedulingHistoryView } from "./scheduling-history.ts";
 import { readSchedulingHistory } from "./scheduling-history-document.ts";
 import { isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import * as d from "./document-values.ts";
 import { err, ok } from "./result.ts";
 import {
@@ -55,7 +55,7 @@ type RecoveryContents = StrictUnion<
 
 function recoveryContents(
   run: RunState,
-  task: Extract<TaskState, { kind: "recovery-required" }>,
+  task: Variant<TaskState, "recovery-required">,
 ): RecoveryContents {
   for (const cell of run.cells) {
     if (cell.attempt?.id !== task.attempt || cell.slot.kind !== "active")

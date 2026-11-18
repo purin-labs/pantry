@@ -34,6 +34,7 @@ import {
   writeMailHead,
 } from "./store";
 import type { MailOrganizationHead } from "./types";
+import type { Variant } from "@seams/type-utils";
 
 export type MailOrganizationActorInput = Readonly<{
   identity: Readonly<{
@@ -41,7 +42,7 @@ export type MailOrganizationActorInput = Readonly<{
     connectorId: ConnectorId;
   }>;
   integrationAccountId: IntegrationAccountId;
-  authority: Extract<RequestAuthority, { kind: "control" }>;
+  authority: Variant<RequestAuthority, "control">;
 }>;
 export type MailOrganizationReadInput = MailOrganizationActorInput &
   Readonly<{ messageIds: readonly string[] }>;

@@ -60,6 +60,7 @@ import {
 import { readDecision } from "./reads";
 import { mailClassificationEvidence } from "./evidence";
 import { bindOperatorTurnAccess } from "../chat/turn-access";
+import type { Variant } from "@seams/type-utils";
 
 export type MailAssistantActorInput = MailOrganizationActorInput &
   Readonly<{
@@ -493,7 +494,7 @@ async function prepareAssistantPrompt(
 async function decisionStillCurrent(
   context: MailConnectorContext,
   input: AssistantInput,
-  prompt: Extract<PreparedPrompt, { kind: "decision" }>,
+  prompt: Variant<PreparedPrompt, "decision">,
 ): Promise<boolean> {
   if (input.command.kind !== "explainDecision") return false;
   const current = await readDecision(context, {

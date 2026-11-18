@@ -1,8 +1,9 @@
 import type { FrameSamplingOutcome } from "./media-inspect.ts";
 import type { WorkspaceExecutorInspectionOperation } from "./workspace-executor.ts";
 import type { ContractDecodeResult } from "@seams/commerce-contracts/schema";
+import type { Variant } from "@seams/type-utils";
 
-declare const decodedFrames: Extract<FrameSamplingOutcome, { kind: "sampled" }>;
+declare const decodedFrames: Variant<FrameSamplingOutcome, "sampled">;
 declare const sourceSha256: string;
 
 // @ts-expect-error A decoder request cannot contain sampled frames.

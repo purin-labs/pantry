@@ -19,16 +19,13 @@ import type { ResourceDefinition } from "./scenario.ts";
 import type { BatchState, RunState } from "./state.ts";
 import { advance } from "./time.ts";
 
-type BatchEvent = Extract<
+type BatchEvent = Variant<
   AcceptedEvent,
-  {
-    kind:
-      | "batch-admitted"
-      | "batch-started"
-      | "batch-completed"
-      | "batch-cleared"
-      | "batch-member-rejected";
-  }
+  | "batch-admitted"
+  | "batch-started"
+  | "batch-completed"
+  | "batch-cleared"
+  | "batch-member-rejected"
 >;
 
 function isBatchEvent(event: AcceptedEvent): event is BatchEvent {

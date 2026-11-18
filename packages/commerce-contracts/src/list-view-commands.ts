@@ -8,7 +8,7 @@ import {
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import {
   authorityTargetSchemas,
   authorityTargetWireSchemas,
@@ -93,29 +93,29 @@ export const listViewCommandSchema = Type.Union([
 export type ListViewCommand = StrictUnion<
   StaticDecode<typeof listViewCommandSchema>
 >;
-export type CreateCommerceListCommand = Extract<
+export type CreateCommerceListCommand = Variant<
   ListViewCommand,
-  { kind: "create_commerce_list" }
+  "create_commerce_list"
 >["command"];
-export type AddCommerceListEntryCommand = Extract<
+export type AddCommerceListEntryCommand = Variant<
   ListViewCommand,
-  { kind: "add_commerce_list_entry" }
+  "add_commerce_list_entry"
 >["command"];
-export type PatchCommerceListEntryCommand = Extract<
+export type PatchCommerceListEntryCommand = Variant<
   ListViewCommand,
-  { kind: "patch_commerce_list_entry" }
+  "patch_commerce_list_entry"
 >["command"];
-export type RemoveCommerceListEntryCommand = Extract<
+export type RemoveCommerceListEntryCommand = Variant<
   ListViewCommand,
-  { kind: "remove_commerce_list_entry" }
+  "remove_commerce_list_entry"
 >["command"];
-export type PublishSavedCommerceViewCommand = Extract<
+export type PublishSavedCommerceViewCommand = Variant<
   ListViewCommand,
-  { kind: "publish_saved_commerce_view" }
+  "publish_saved_commerce_view"
 >["command"];
-export type ArchiveSavedCommerceViewCommand = Extract<
+export type ArchiveSavedCommerceViewCommand = Variant<
   ListViewCommand,
-  { kind: "archive_saved_commerce_view" }
+  "archive_saved_commerce_view"
 >["command"];
 
 const commandWire = Type.Union([

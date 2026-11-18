@@ -27,6 +27,7 @@ import {
   type TurnLifecycle,
   type WorkspaceRevisionReceipt,
 } from "./session-schemas.ts";
+import type { Variant } from "@seams/type-utils";
 
 // The Plan 78 port of the Rust session reducer (actor.rs) and its JSON
 // boundary (actor/serialized.rs). Each function takes the decoded request and
@@ -750,9 +751,9 @@ function decideSessionCommand(
   return transition;
 }
 
-type LifecycleState<Kind extends AgentSessionLifecycle["kind"]> = Extract<
+type LifecycleState<Kind extends AgentSessionLifecycle["kind"]> = Variant<
   AgentSessionLifecycle,
-  { kind: Kind }
+  Kind
 >["state"];
 
 /** A missing session is not initialized; any other state is the wrong one. */
@@ -817,7 +818,7 @@ function resumeExecution(
   };
 }
 
-type CancellationTarget = Extract<SessionCommand, { kind: "cancel" }>["target"];
+type CancellationTarget = Variant<SessionCommand, "cancel">["target"];
 type CancellationPlan = CancellingSession["plan"];
 type CancellationLease = CancellationPlan["lease"];
 
@@ -895,13 +896,13 @@ function decideCancellationStart(
   };
 }
 
-type CancellationResolutionInput = Extract<
+type CancellationResolutionInput = Variant<
   SessionCommand,
-  { kind: "resolve_cancellation" }
+  "resolve_cancellation"
 >["resolution"];
-type CancellationResolution = Extract<
+type CancellationResolution = Variant<
   SessionTransition,
-  { kind: "cancellation_resolved" }
+  "cancellation_resolved"
 >["resolution"];
 
 function decideCancellationResolution(

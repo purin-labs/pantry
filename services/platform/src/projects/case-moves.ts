@@ -20,6 +20,7 @@ import type { CaseId, UserId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { authorizeProject, type ProjectAccessScope } from "./access";
 import { readDefaultProjectId } from "./case-project";
+import type { Variant } from "@seams/type-utils";
 
 const ACTIVE_PLACEMENT = `EXISTS (SELECT 1 FROM organisation_placement
   WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ?
@@ -29,7 +30,7 @@ const RECEIPT_OPEN = `EXISTS (SELECT 1 FROM project_operation o
   WHERE o.organisation_id = ? AND o.actor_user_id = ? AND o.operation_id = ?
     AND o.command_digest = ? AND o.applied = 0) AND ${ACTIVE_PLACEMENT}`;
 
-type Rejection = Extract<CaseProjectResult, { kind: "rejected" }>["code"];
+type Rejection = Variant<CaseProjectResult, "rejected">["code"];
 
 type StoredCasePlacement = CaseProjectView &
   Readonly<{ filedAt: number; conversationId: ConversationId | null }>;
@@ -353,8 +354,6 @@ async function readReceipt(
   };
 }
 
-function rejected(
-  code: Rejection,
-): Extract<CaseProjectResult, { kind: "rejected" }> {
+function rejected(code: Rejection): Variant<CaseProjectResult, "rejected"> {
   return { kind: "rejected", code };
 }

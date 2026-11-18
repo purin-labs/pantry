@@ -3,13 +3,11 @@ import React from "react";
 import { formatMoneyMinorEnglish as money } from "../../formatting";
 
 import type { CommerceActionDetails } from "@seams/control-api/portal/commerce-actions";
+import type { Variant } from "@seams/type-utils";
 
 /** The exact money that goes back, and where it comes from on the order. */
 export function OrderRefundDetails(input: {
-  readonly details: Extract<
-    CommerceActionDetails,
-    { readonly kind: "refund_order" }
-  >;
+  readonly details: Variant<CommerceActionDetails, "refund_order">;
 }): React.JSX.Element {
   const { details } = input;
   const taxes = new Map(

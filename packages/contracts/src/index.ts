@@ -335,19 +335,18 @@ export type { AccessDecisionQuestion } from "./types/AccessDecisionQuestion";
 export type { AccessDecisionStage } from "./types/AccessDecisionStage";
 export type { AccessGrantLifecycle } from "./access-control.ts";
 import type { AccessGrantTarget as GeneratedAccessGrantTarget } from "./types/AccessGrantTarget";
+import type { Variant } from "@seams/type-utils";
 export type AccessGrantTarget =
   | Exclude<
       GeneratedAccessGrantTarget,
       { kind: "commerce_read" | "commerce_command" }
     >
-  | (Omit<
-      Extract<GeneratedAccessGrantTarget, { kind: "commerce_read" }>,
-      "scope"
-    > & { scope: CommerceReadGrantScope })
-  | (Omit<
-      Extract<GeneratedAccessGrantTarget, { kind: "commerce_command" }>,
-      "scope"
-    > & { scope: import("@seams/commerce-contracts").CommerceAuthorityScope });
+  | (Omit<Variant<GeneratedAccessGrantTarget, "commerce_read">, "scope"> & {
+      scope: CommerceReadGrantScope;
+    })
+  | (Omit<Variant<GeneratedAccessGrantTarget, "commerce_command">, "scope"> & {
+      scope: import("@seams/commerce-contracts").CommerceAuthorityScope;
+    });
 export type { AccessSubjectRef } from "./types/AccessSubjectRef";
 export type { AccessTargetRef } from "./types/AccessTargetRef";
 export type { CapabilityCategory } from "./types/CapabilityCategory";
@@ -362,9 +361,9 @@ export type { CapabilityRef } from "./types/CapabilityRef";
 export type { CapabilityRisk } from "./types/CapabilityRisk";
 export type { CapabilityTargetKind } from "./types/CapabilityTargetKind";
 export type { CaseRef } from "./types/CaseRef";
-export type CommerceReadGrantScope = Extract<
+export type CommerceReadGrantScope = Variant<
   import("@seams/commerce-contracts").CommerceAuthorityScope,
-  { kind: "entity_type" | "commerce_list" | "saved_selector" }
+  "entity_type" | "commerce_list" | "saved_selector"
 >;
 export type { EffectiveGrantRef } from "./types/EffectiveGrantRef";
 export type { FlowDestinationRef } from "./types/FlowDestinationRef";

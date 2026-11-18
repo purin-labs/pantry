@@ -79,6 +79,7 @@ import type {
 } from "./settings-types";
 import { providerAttemptDiagnostics } from "./setup";
 import { WorkspaceSettingsPage } from "./workspace";
+import type { Variant } from "@seams/type-utils";
 
 // The platform tests import these through this JSX module.
 export { autoSyncCommerce } from "./commerce-system";
@@ -392,10 +393,7 @@ type IntegrationsRouteState = ReturnType<typeof useIntegrationsRouteState>;
 function mailboxSettingsBody(
   props: MailboxSettingsRouteProps,
   route: IntegrationsRouteState,
-  content: Extract<
-    SettingsRouteContent<IntegrationsRouteData>,
-    { kind: "ready" }
-  >,
+  content: Variant<SettingsRouteContent<IntegrationsRouteData>, "ready">,
 ): React.ReactNode {
   const detail = route.detailContent;
   if (detail.kind === "idle" || detail.kind === "loading")

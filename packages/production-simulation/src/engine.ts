@@ -1693,7 +1693,7 @@ function measuredOutput(
     { kind: "inspection-exit" }
   >,
   measurements: readonly Measurement[],
-): Extract<import("./scenario.ts").MaterialOutput, { kind: "lot" | "exit" }> {
+): Variant<import("./scenario.ts").MaterialOutput, "lot" | "exit"> {
   if (output.kind === "lot" || output.kind === "exit") return output;
   const found = measurements.find(
     (measurement) => measurement.measurement === output.measurement,

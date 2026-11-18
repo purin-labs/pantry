@@ -2,8 +2,9 @@ import React from "react";
 import type { ChatTimelineView } from "@seams/control-api/portal/chat";
 import { VoiceMessageMark } from "../voice/control";
 import "./screen-chip.css";
+import type { Variant } from "@seams/type-utils";
 
-type UserEvent = Extract<ChatTimelineView, { readonly kind: "user" }>;
+type UserEvent = Variant<ChatTimelineView, "user">;
 
 /** The marks on a sent message: spoken, and the page that went with it. */
 export function UserMessageMarks({

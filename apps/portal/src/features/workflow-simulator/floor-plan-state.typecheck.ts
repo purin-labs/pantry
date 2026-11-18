@@ -2,13 +2,14 @@ import type { ApplianceId, AppliancePose } from "@seams/production-simulation/fl
 import type { ResolvedApplianceMove } from "@seams/production-simulation/floor/collisions";
 import type { FloorPlanOpening } from "@seams/production-simulation/floor/openings";
 import type { SceneGesture } from "./scene";
+import type { Variant } from "@seams/type-utils";
 
 /** Compile-only checks for invalid identities and mixed domain branches. */
 export function floorPlanTypeChecks(
   pose: AppliancePose,
-  door: Extract<FloorPlanOpening, { kind: "door" }>,
-  window: Extract<FloorPlanOpening, { kind: "window" }>,
-  move: Extract<SceneGesture, { kind: "move" }>,
+  door: Variant<FloorPlanOpening, "door">,
+  window: Variant<FloorPlanOpening, "window">,
+  move: Variant<SceneGesture, "move">,
   raw: string,
 ): void {
   // @ts-expect-error Raw UI identities must pass the catalogue guard.

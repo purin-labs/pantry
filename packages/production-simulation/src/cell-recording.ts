@@ -1,5 +1,5 @@
 import { sha256Hex } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import * as d from "./document-values.ts";
 import type {
   BoundaryId,
@@ -65,7 +65,7 @@ async function storeCellRecording(
 
 export function storeIdleRecording(
   identity: CellRecordingExecution,
-  recording: Extract<CellRecording, { kind: "idle" }>,
+  recording: Variant<CellRecording, "idle">,
   after: LogicalTime,
 ): Promise<StoredCellRecording> {
   const steps = d.steps(recording.steps.end - recording.steps.start);
@@ -78,7 +78,7 @@ export function storeIdleRecording(
 
 export function storeHandoffRecording(
   identity: CellRecordingExecution,
-  recording: Extract<CellRecording, { kind: "admission" | "removal" }>,
+  recording: Variant<CellRecording, "admission" | "removal">,
   at: LogicalTime,
   boundary: BoundaryId,
 ): Promise<StoredCellRecording> {

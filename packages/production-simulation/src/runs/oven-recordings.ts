@@ -20,6 +20,7 @@ import {
 } from "./oven-live-physics";
 import { readOvenPlayback, type OvenPlayback } from "./oven-playback";
 import type { OvenSave } from "./oven-run-file";
+import type { Variant } from "@seams/type-utils";
 
 /** Bounds resident record metadata, independently of the total archive size. */
 export const MAX_OVEN_RECORDING_INDEX_ENTRIES = 65_536;
@@ -48,8 +49,8 @@ async function readSavedArtifact(
 }
 
 type Observation =
-  | Omit<Extract<PhysicsView, { kind: "cell-recorded" }>, "content">
-  | Omit<Extract<PhysicsView, { kind: "recorded" }>, "content">;
+  | Omit<Variant<PhysicsView, "cell-recorded">, "content">
+  | Omit<Variant<PhysicsView, "recorded">, "content">;
 type Reference = Readonly<{
   offset: number;
   byteLength: number;

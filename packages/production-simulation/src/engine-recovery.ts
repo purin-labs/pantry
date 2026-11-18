@@ -27,7 +27,7 @@ import {
   travelDurationFromRoutes,
 } from "./engine-workers.ts";
 
-type Recover = Extract<ControlCommand, { kind: "recover" }>;
+type Recover = Variant<ControlCommand, "recover">;
 type Recovering = Variant<TaskState, "recovering">;
 
 /** Recovery starts only from a complete boundary with all capacity available. */

@@ -284,9 +284,7 @@ export function VaultRoute(props: {
     );
   };
 
-  const connect = async (
-    form: Extract<Drawer, { kind: "connect" }>,
-  ): Promise<void> => {
+  const connect = async (form: Variant<Drawer, "connect">): Promise<void> => {
     if (busy) return;
     setBusy(true);
     setFailure(null);

@@ -14,6 +14,7 @@ import {
   type EvalTaskResult,
 } from "@seams/control-api";
 import { isRecord, parseJsonOrNull } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The eval runs of one mailbox agent while they are in progress.
@@ -136,7 +137,7 @@ export function createConnectorEvalSchema(sql: SqlStorage): void {
 export function findEvalRunCommand(
   sql: SqlStorage,
   input: Readonly<{ commandId: string; requestDigest: string }>,
-): Extract<EvalRunAdmission, { kind: "replayed" | "command_conflict" }> | null {
+): Variant<EvalRunAdmission, "replayed" | "command_conflict"> | null {
   const earlier = sql
     .exec<{ run_id: string; request_digest: string }>(
       "SELECT run_id, request_digest FROM connector_eval_run WHERE command_id = ?",
