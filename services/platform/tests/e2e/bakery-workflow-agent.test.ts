@@ -42,6 +42,7 @@ import {
   requireLastToolOutput,
 } from "./slack-journey-support";
 import { WorkflowDraftPeer } from "./workflow-draft-peer";
+import { draftAction, messageWord, startChat } from "./chat-journey-support";
 
 const WORKFLOW = "latte-j7";
 const FIELDS = {
@@ -410,11 +411,12 @@ it(
     const other = await onlyProposal(author, base);
     const card = await draftCard(fixture, author, otherChat);
     expect(card.summary).toContain("Rest the milk");
-    const confirmed = await confirmCard(
+    const confirmed = await draftAction(
       fixture,
       author,
       otherChat,
-      card.draftId,
+      card,
+      "confirm",
     );
     expect(confirmed.status, await confirmed.clone().text()).toBe(200);
     const otherApproved = await send(base, author, "GET");
@@ -704,54 +706,6 @@ async function draftCard(
   )
     throw new Error("No draft card");
   return { draftId: first.draftId, summary: first.summary };
-}
-
-function confirmCard(
-  fixture: MemoryFixture,
-  person: Member,
-  conversationId: ConversationId,
-  draftId: string,
-): Promise<Response> {
-  const headers = commerceHeaders(person.session);
-  headers.set("idempotency-key", crypto.randomUUID());
-  headers.set("x-satyr-configuration-version", "1");
-  return exports.default.fetch(
-    `${PUBLIC_ORIGIN}${fixture.paths.organisation}/chat/conversations/${conversationId}/configuration-drafts/${draftId}/confirm`,
-    { method: "POST", headers, body: "{}" },
-  );
-}
-
-async function startChat(
-  fixture: MemoryFixture,
-  person: Member,
-  word: string,
-): Promise<ConversationId> {
-  const conversationId = newConversationId();
-  await createConversation(person, conversationId, fixture.route);
-  await ask(
-    person,
-    fixture.paths.chat,
-    conversationId,
-    fixture.route.model,
-    `${word} now.`,
-    word,
-  );
-  return conversationId;
-}
-
-function messageWord(
-  body: Record<string, unknown>,
-  words: readonly string[],
-): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (!isRecord(message) || message.role !== "user") continue;
-    const text = JSON.stringify(message.content);
-    const word = words.find((candidate) => text.includes(candidate));
-    if (word !== undefined) return word;
-  }
-  throw new Error("The model request has no scripted message");
 }
 
 let replies = 0;

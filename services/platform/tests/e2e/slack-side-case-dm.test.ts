@@ -30,6 +30,7 @@ import {
   slackIngressWorker,
   slackPermalink,
   startButtonValue,
+  summary,
   type SlackCall,
 } from "./slack-side-case-support";
 
@@ -55,7 +56,8 @@ const BRIEF =
 const REPLY = "Use the terms of last year as a start.";
 // The first thread and the brief share no word.
 const ANSWERS = {
-  parent: "Your bake list for Tuesday holds sourdough and baguettes. I added one more task.",
+  parent:
+    "Your bake list for Tuesday holds sourdough and baguettes. I added one more task.",
   sideCase: "I will look for the renewal terms of the flour contract.",
   reply: "I will compare them with last year's terms.",
 } as const;
@@ -170,9 +172,7 @@ async function slackSideCaseDmJourney(test: TestContext): Promise<void> {
   ]);
   expect(lastUserText(replyTurn)).toContain(REPLY);
   expect(JSON.stringify(replyTurn)).toContain(BRIEF);
-  expect(assistantTexts(replyTurn)).toEqual([
-    JSON.stringify(ANSWERS.sideCase),
-  ]);
+  expect(assistantTexts(replyTurn)).toEqual([JSON.stringify(ANSWERS.sideCase)]);
   expect(answersIn(slack.posts(), ROOT_TS)).toEqual([ANSWERS.parent]);
   expect(recorded.requests).toHaveLength(4);
 
@@ -181,9 +181,10 @@ async function slackSideCaseDmJourney(test: TestContext): Promise<void> {
       modelRequests: recorded.requests.length,
       posts: slack.posts().map(summary),
       ephemeral: slack.ephemeral,
-      proposal: await fixtureDatabase().prepare(
-        "SELECT source_kind AS sourceKind, status, source_channel_id AS channelId, destination_thread_ts AS destinationThreadTs FROM side_case_proposal WHERE organisation_id = ?",
-      )
+      proposal: await fixtureDatabase()
+        .prepare(
+          "SELECT source_kind AS sourceKind, status, source_channel_id AS channelId, destination_thread_ts AS destinationThreadTs FROM side_case_proposal WHERE organisation_id = ?",
+        )
         .bind(ORGANISATION_ID)
         .all(),
     },
@@ -246,15 +247,4 @@ function answersIn(posts: readonly SlackCall[], threadTs: string): string[] {
   return posts
     .filter((post) => post.threadTs === threadTs && post.blocks.length === 0)
     .map((post) => post.text);
-}
-
-function summary(call: SlackCall) {
-  return {
-    method: call.method,
-    channel: call.channel,
-    threadTs: call.threadTs,
-    ts: call.ts,
-    text: call.text,
-    button: startButtonValue(call),
-  };
 }

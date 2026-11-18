@@ -31,6 +31,7 @@ import {
   slackIngressWorker,
   slackPermalink,
   startButtonValue,
+  summary,
   type SlackCall,
 } from "./slack-side-case-support";
 import { runInDurableObject } from "cloudflare:test";
@@ -78,7 +79,8 @@ const REPLY = "The bakers changed the probe battery at noon.";
 // The first thread and the brief share no word, so the organisational
 // context of the new turn does not tie the side Case to the first thread.
 const ANSWERS = {
-  parent: "Tomorrow's order holds 120 croissants. I also suggested a separate task.",
+  parent:
+    "Tomorrow's order holds 120 croissants. I also suggested a separate task.",
   sideCase: "I will compare the oven 2 probe with the bake log.",
   reply: "Then compare only the bakes after noon.",
 } as const;
@@ -227,9 +229,7 @@ async function slackSideCaseJourney(test: TestContext): Promise<void> {
   ]);
   expect(lastUserText(replyTurn)).toContain(REPLY);
   expect(JSON.stringify(replyTurn)).toContain(BRIEF);
-  expect(assistantTexts(replyTurn)).toEqual([
-    JSON.stringify(ANSWERS.sideCase),
-  ]);
+  expect(assistantTexts(replyTurn)).toEqual([JSON.stringify(ANSWERS.sideCase)]);
   expect(answersIn(slack.posts(), ROOT_TS)).toEqual([ANSWERS.parent]);
 
   // The first person clicks after the start: only that person is told.
@@ -259,9 +259,10 @@ async function slackSideCaseJourney(test: TestContext): Promise<void> {
       changes: changed.map(summary),
       ephemeral: slack.ephemeral,
       sideCaseWork,
-      proposal: await fixtureDatabase().prepare(
-        "SELECT source_kind AS sourceKind, status, source_channel_id AS channelId, source_thread_ts AS sourceThreadTs, destination_thread_ts AS destinationThreadTs, destination_case_id AS destinationCaseId FROM side_case_proposal WHERE organisation_id = ?",
-      )
+      proposal: await fixtureDatabase()
+        .prepare(
+          "SELECT source_kind AS sourceKind, status, source_channel_id AS channelId, source_thread_ts AS sourceThreadTs, destination_thread_ts AS destinationThreadTs, destination_case_id AS destinationCaseId FROM side_case_proposal WHERE organisation_id = ?",
+        )
         .bind(ORGANISATION_ID)
         .all(),
     },
@@ -312,17 +313,6 @@ function answerIn(
   answer: string,
 ): boolean {
   return answersIn(posts, threadTs).includes(answer);
-}
-
-function summary(call: SlackCall) {
-  return {
-    method: call.method,
-    channel: call.channel,
-    threadTs: call.threadTs,
-    ts: call.ts,
-    text: call.text,
-    button: startButtonValue(call),
-  };
 }
 
 /** How the side Case's first work settled, and for whom it ran. */
@@ -399,9 +389,7 @@ async function lapsedStartJourney(test: TestContext): Promise<void> {
   };
 
   // The member's start stops: Slack refused the new thread.
-  expect((await ingress.fetch(await signedStartClick(click))).status).toBe(
-    200,
-  );
+  expect((await ingress.fetch(await signedStartClick(click))).status).toBe(200);
   await expect
     .poll(() => slack.ephemeral, { timeout: 15_000 })
     .toEqual([
@@ -411,12 +399,8 @@ async function lapsedStartJourney(test: TestContext): Promise<void> {
 
   // While the start's lease holds, the first person cannot take it over.
   const first = { ...click, user: USER_ID };
-  expect((await ingress.fetch(await signedStartClick(first))).status).toBe(
-    200,
-  );
-  await expect
-    .poll(() => slack.ephemeral.length, { timeout: 15_000 })
-    .toBe(2);
+  expect((await ingress.fetch(await signedStartClick(first))).status).toBe(200);
+  await expect.poll(() => slack.ephemeral.length, { timeout: 15_000 }).toBe(2);
   expect(slack.ephemeral[1]).toBe(
     "Another person already started this side Case.",
   );
@@ -431,9 +415,7 @@ async function lapsedStartJourney(test: TestContext): Promise<void> {
   expect(moved.meta.changes).toBe(1);
 
   // The first person starts the side Case now, in one new thread.
-  expect((await ingress.fetch(await signedStartClick(first))).status).toBe(
-    200,
-  );
+  expect((await ingress.fetch(await signedStartClick(first))).status).toBe(200);
   await expect
     .poll(() => newThreadRoots(slack.posts()).length, { timeout: 30_000 })
     .toBe(1);

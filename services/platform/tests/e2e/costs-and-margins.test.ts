@@ -36,7 +36,6 @@ import {
   parseCostsSheetWriteResult,
   presetDemandCurveValues,
   type CostForecastPlan,
-  type ConversationId,
   type CostsOverview,
   type CostsSheetWrite,
   type ProductCostPlanEntry,
@@ -56,7 +55,6 @@ import {
 import { accessControlPath } from "./access-route-support";
 import { publishCafeMenu } from "./cafe-order-support";
 import {
-  ask,
   lastCalledTool,
   pausedRequest,
   resumeChat,
@@ -86,6 +84,13 @@ import {
   openRouterToolCall,
   requireLastToolOutput,
 } from "./slack-journey-support";
+import {
+  agentReceipts,
+  chatDirect,
+  finished,
+  messageWord,
+  startChat,
+} from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -2684,8 +2689,9 @@ async function allowHeldStep(fixture: MemoryFixture): Promise<void> {
   });
   expect(list.status).toBe(200);
   const body: unknown = await list.json();
-  if (!isRecord(body) || !Array.isArray(body.heldOutputs))
-    {throw new Error("Pending list invalid");}
+  if (!isRecord(body) || !Array.isArray(body.heldOutputs)) {
+    throw new Error("Pending list invalid");
+  }
   const held: unknown = body.heldOutputs.at(-1);
   if (!isRecord(held) || typeof held.requestId !== "string")
     {throw new Error("No held step");}
@@ -2736,73 +2742,6 @@ async function chatThrough(
   return { action: pause.permission.action };
 }
 
-async function chatDirect(
-  fixture: MemoryFixture,
-  person: Member,
-  word: string,
-): Promise<void> {
-  await finished(person, await startChat(fixture, person, word));
-}
-
-async function startChat(
-  fixture: MemoryFixture,
-  person: Member,
-  word: string,
-): Promise<ConversationId> {
-  const conversationId = newConversationId();
-  await createConversation(person, conversationId, fixture.route);
-  await ask(
-    person,
-    fixture.paths.chat,
-    conversationId,
-    fixture.route.model,
-    `${word} now.`,
-    word,
-  );
-  return conversationId;
-}
-
-function finished(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  return expect
-    .poll(workKind.bind(null, person, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
-async function agentReceipts(
-  fixture: MemoryFixture,
-  route: string,
-): Promise<unknown> {
-  const scope = await requireOrganisationExecutionScope(
-    env,
-    fixture.organisationId,
-  );
-  const rows = await scope.database
-    .prepare(
-      "SELECT operation, COUNT(*) AS n FROM control_mutation_receipt WHERE organisation_scope = ? AND route = ? AND substr(idempotency_key, 1, 6) = 'agent_' GROUP BY operation ORDER BY operation",
-    )
-    .bind(fixture.organisationId, route)
-    .all();
-  return rows.results;
-}
-
-function messageWord(
-  body: Record<string, unknown>,
-  words: readonly string[],
-): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (!isRecord(message) || message.role !== "user") {continue;}
-    const text = JSON.stringify(message.content);
-    const word = words.find((candidate) => text.includes(candidate));
-    if (word !== undefined) {return word;}
-  }
-  throw new Error("Model request has no scripted word");
-}
-
 async function replyToModel(
   journey: Journey,
   { request }: Parameters<HttpResponseResolver>[0],
@@ -2828,7 +2767,9 @@ async function replyToModel(
         )
       : reply("Ready.");}
   const script = all[word];
-  if (script === undefined) {throw new Error(`No script for ${word}`);}
+  if (script === undefined) {
+    throw new Error(`No script for ${word}`);
+  }
   const callTool = async (): Promise<Response> => {
     if (
       word === "VIEWERSUPPLYCOST" &&

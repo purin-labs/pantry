@@ -2,14 +2,6 @@ import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse } from "msw";
-import { isRecord } from "@seams/std";
-import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
-import {
-  readEmailRuntime,
-  type EmailProcessingState,
-} from "../../src/actors/connector-email";
-import { runConnectorEmailEvaluation } from "../../src/actors/connector-email-evaluation";
-import { gmailConnectorId } from "../../src/data/email-mailbox";
 import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { installMemoryFixture } from "./memory-support";
@@ -18,6 +10,12 @@ import {
   connectGmailMailbox,
   sendAs,
   setUpMailbox,
+  evaluateAt,
+  mailboxConnector,
+  mailRuntime,
+  readReplyTurns,
+  scheduledAt,
+  mailProcessing,
 } from "./gmail-mailbox-support";
 
 const ADDRESS = "orders@example.test";
@@ -60,10 +58,6 @@ type GmailMailbox = {
   readonly historyQueries: string[];
   readonly metadataReads: string[];
 };
-
-type Connector = DurableObjectStub<
-  import("../../src/actors/connector").ConnectorDO
->;
 
 async function spamRescueJourney({ task }: TestContext): Promise<void> {
   const { organisationId, author: owner } = await installMemoryFixture();
@@ -125,9 +119,9 @@ async function spamRescueJourney({ task }: TestContext): Promise<void> {
   const connector = await mailboxConnector(organisationId, account);
   await runDurableObjectAlarm(connector);
   await expect
-    .poll(processing.bind(null, connector), { timeout: 10_000 })
+    .poll(mailProcessing.bind(null, connector), { timeout: 10_000 })
     .toEqual({ kind: "waiting" });
-  expect(await runtime(connector)).toMatchObject({
+  expect(await mailRuntime(connector)).toMatchObject({
     activationFloor: "1000",
     acceptedHistoryId: "1000",
   });
@@ -153,7 +147,7 @@ async function spamRescueJourney({ task }: TestContext): Promise<void> {
     deduplicated: 0,
     threads: [],
   });
-  expect(await runtime(connector)).toMatchObject({
+  expect(await mailRuntime(connector)).toMatchObject({
     acceptedHistoryId: String(gmail.historyId),
   });
   expect(gmail.historyQueries.at(-1)).toBe(
@@ -194,7 +188,7 @@ async function spamRescueJourney({ task }: TestContext): Promise<void> {
       },
     ],
   });
-  const afterRescue = await runtime(connector);
+  const afterRescue = await mailRuntime(connector);
   expect(afterRescue).toMatchObject({
     acceptedHistoryId: String(gmail.historyId),
     processing: { kind: "waiting" },
@@ -255,7 +249,7 @@ async function spamRescueJourney({ task }: TestContext): Promise<void> {
   });
   const lastRecordRead =
     cursorBeforeNoise + HISTORY_PAGE_RECORDS * HISTORY_PAGES_PER_READ;
-  const afterStop = await runtime(connector);
+  const afterStop = await mailRuntime(connector);
   expect(afterStop).toMatchObject({
     acceptedHistoryId: String(lastRecordRead),
     processing: { kind: "scheduled", at: stopped.at + COALESCE_MS },
@@ -277,7 +271,7 @@ async function spamRescueJourney({ task }: TestContext): Promise<void> {
       },
     ],
   });
-  expect(await runtime(connector)).toMatchObject({
+  expect(await mailRuntime(connector)).toMatchObject({
     acceptedHistoryId: String(gmail.historyId),
     processing: { kind: "waiting" },
   });
@@ -479,61 +473,6 @@ function historyRecord(
   };
 }
 
-/** The time of the evaluation that a check scheduled. */
-function scheduledAt(
-  checked: Readonly<{ status: number; body: unknown }>,
-): number {
-  const body = checked.body;
-  if (
-    checked.status !== 200 ||
-    !isRecord(body) ||
-    body.kind !== "scheduled" ||
-    typeof body.at !== "number"
-  )
-    throw new Error(`Not a scheduled check: ${JSON.stringify(checked)}`);
-  return body.at;
-}
-
-async function mailboxConnector(
-  organisationId: OrganisationId,
-  account: IntegrationAccountId,
-): Promise<Connector> {
-  const connectorId = gmailConnectorId(account);
-  if (!connectorId.ok) throw new Error("Invalid connector");
-  const connector = await resolveActiveConnectorActor({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    connectorId: connectorId.value,
-    now: Date.now(),
-  });
-  if (!connector.ok) throw new Error(connector.error.code);
-  return connector.value;
-}
-
-async function runtime(connector: Connector) {
-  const stored = await runInDurableObject(connector, readRuntime);
-  if (stored === null) throw new Error("The mailbox has no mail runtime");
-  return stored;
-}
-
-async function processing(connector: Connector): Promise<EmailProcessingState> {
-  return (await runtime(connector)).processing;
-}
-
-function readRuntime(_actor: unknown, state: DurableObjectState) {
-  return readEmailRuntime(state.storage.sql);
-}
-
-function readReplyTurns(_actor: unknown, state: DurableObjectState) {
-  return state.storage.sql
-    .exec<{ messageId: string; caseId: string }>(
-      `SELECT provider_message_id AS messageId, case_id AS caseId
-       FROM connector_email_reply_turn ORDER BY provider_message_id`,
-    )
-    .toArray();
-}
-
 async function threadCases(
   organisationId: OrganisationId,
   account: IntegrationAccountId,
@@ -566,20 +505,4 @@ async function receipts(
     .bind(organisationId, account)
     .all<{ messageId: string; caseId: string }>();
   return rows.results;
-}
-
-/** The Connector's own evaluation, on a clock at the given time. */
-async function evaluateAt(
-  organisationId: OrganisationId,
-  now: number,
-  _actor: unknown,
-  state: DurableObjectState,
-) {
-  return runConnectorEmailEvaluation({
-    scope: await requireOrganisationExecutionScope(env, organisationId),
-    env,
-    storage: state.storage,
-    now,
-    fetcher: fetch,
-  });
 }

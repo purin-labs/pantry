@@ -1,4 +1,4 @@
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
@@ -34,9 +34,8 @@ import {
   slackPostFields,
   openRouterText,
   requiredSessionId,
-  signedSlackRequest,
-  slackEnvelope,
   shownSlackPost,
+  acceptSlack,
 } from "./slack-journey-support";
 
 /**
@@ -897,17 +896,6 @@ function acceptReply(
     threadTs: ROOT_TS,
     text,
   });
-}
-
-async function acceptSlack(
-  envelope: Parameters<typeof slackEnvelope>[0],
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(slackEnvelope(envelope)),
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  expect(isRecord(body) ? body.durableMode : null).toBe("case_accepted");
 }
 
 async function registryEntries(

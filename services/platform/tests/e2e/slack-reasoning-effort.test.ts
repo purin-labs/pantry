@@ -1,26 +1,22 @@
-import { env, exports } from "cloudflare:workers";
+import { exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import {
-  parseAnthropicApiKey,
-  storeOrganisationAnthropicModelCredential,
-} from "../../src/credential-vault";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { preparePortalChatJourney } from "./chat-journey-support";
-import { selectInference } from "./chatgpt-subscription-support";
+import { connectAnthropicApiKey } from "./chatgpt-subscription-support";
+import { commerceHeaders } from "./commerce-support";
 import { MODEL_EXIT_EGRESS_HEADER } from "./model-exit-network";
 import { network } from "./network";
 import {
-  CHANNEL_ID,
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,
-  readSlackMessageText,
   signedSlackRequest,
   slackEnvelope,
   slackSimulator,
+  threadAnswers,
 } from "./slack-journey-support";
 
 /**
@@ -131,7 +127,7 @@ async function readEffort(
   session: IssuedControlSession,
 ): Promise<{ readonly status: number; readonly effort: unknown }> {
   const response = await exports.default.fetch(effortUrl(), {
-    headers: headers(session),
+    headers: commerceHeaders(session),
   });
   const body: unknown = await response.json();
   return {
@@ -144,7 +140,7 @@ async function writeEffort(
   session: IssuedControlSession,
   effort: "low" | "medium" | "high" | null,
 ): Promise<{ readonly status: number; readonly body: unknown }> {
-  const request = headers(session);
+  const request = commerceHeaders(session);
   request.set("idempotency-key", `e2e-slack-effort-${crypto.randomUUID()}`);
   const response = await exports.default.fetch(effortUrl(), {
     method: "PUT",
@@ -158,15 +154,6 @@ function effortUrl(): string {
   return `https://localhost/v1/control/organisations/${ORGANISATION_ID}/inference/slack-reasoning-effort`;
 }
 
-function headers(session: IssuedControlSession): Headers {
-  return new Headers({
-    origin: "https://localhost",
-    "content-type": "application/json",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
-  });
-}
-
 /** The role of the person behind both the control session and Slack. */
 async function setRole(role: "admin" | "operator"): Promise<void> {
   await fixtureDatabase()
@@ -175,36 +162,6 @@ async function setRole(role: "admin" | "operator"): Promise<void> {
     )
     .bind(role, ORGANISATION_ID, SLACK_ACTOR_USER_ID)
     .run();
-}
-
-/**
- * Store the organisation's own Anthropic API key, as an owner does in
- * Portal, and make it the inference route.
- */
-async function connectAnthropicApiKey(apiKey: string): Promise<void> {
-  const key = parseAnthropicApiKey(apiKey);
-  if (!key.ok) throw new Error(key.error.code);
-  const stored = await storeOrganisationAnthropicModelCredential({
-    db: fixtureDatabase(),
-    keys: env,
-    organisationId: ORGANISATION_ID,
-    apiKey: key.value,
-    now: Date.now(),
-  });
-  if (!stored.ok) throw new Error(stored.error.code);
-  await selectInference({ kind: "organisation_anthropic_api_key" });
-}
-
-function threadAnswers(
-  messages: readonly Record<string, string>[],
-  threadTs: string,
-): string[] {
-  return messages
-    .filter(
-      (message) =>
-        message.channel === CHANNEL_ID && message.thread_ts === threadTs,
-    )
-    .map(readSlackMessageText);
 }
 
 async function sendSlack(

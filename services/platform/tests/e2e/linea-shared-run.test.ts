@@ -1,17 +1,15 @@
-import { exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect, it } from "vitest";
 import { isRecord, sha256Hex } from "@seams/std";
 import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
 import { readEspressoRun } from "@seams/bakery-model/espresso-rehearsal-file";
-import type { IssuedControlSession } from "../../src/data/control-plane";
-import { commerceHeaders } from "./commerce-support";
 import {
   accountFixtureJson,
   applyAccountFixtureProvision,
   bootstrapSharedAccountNativeTenants,
   linkAccountFixtureMember,
   readSharedAccountFixture,
+  nativeAccountRequest,
 } from "./shared-account-platform-fixture";
 import scheduled from "../fixtures/linea-scheduled-paused.json";
 import activeDose from "../fixtures/linea-active-dose.json";
@@ -67,14 +65,14 @@ async function sharedEspressoJourney(
     name: snapshot.name,
     document: JSON.parse(snapshot.file),
   };
-  expect((await write(path, foreign.session, body)).status).toBe(404);
-  const refused = await write(path, viewer.session, body);
+  expect((await nativeAccountRequest(foreign, path, body)).status).toBe(404);
+  const refused = await nativeAccountRequest(viewer, path, body);
   // The control boundary conceals resources when the required role is absent.
   expect(refused.status).toBe(404);
-  const saved = await write(path, owner.session, body);
+  const saved = await nativeAccountRequest(owner, path, body);
   expect(saved.status, await saved.clone().text()).toBe(201);
-  expect((await write(path, owner.session, body)).status).toBe(200);
-  const reopened = await read(`${path}/${id}`, viewer.session);
+  expect((await nativeAccountRequest(owner, path, body)).status).toBe(200);
+  const reopened = await nativeAccountRequest(viewer, `${path}/${id}`, null);
   expect(reopened.status).toBe(200);
   const text = await reopened.text();
   expect(text).toBe(snapshot.content);
@@ -85,9 +83,11 @@ async function sharedEspressoJourney(
   const run = readEspressoRun(validated.file);
   expect(run.telemetry.at(-1)?.hotWaterDose).toBe(8);
   expect(run.telemetry.at(-1)?.cups[2]?.mass_g).toBeCloseTo(30, 6);
-  expect((await read(`${path}/${id}`, foreign.session)).status).toBe(404);
+  expect(
+    (await nativeAccountRequest(foreign, `${path}/${id}`, null)).status,
+  ).toBe(404);
   const listed: unknown = await (
-    await read(`${path}?kind=${kind}`, viewer.session)
+    await nativeAccountRequest(viewer, `${path}?kind=${kind}`, null)
   ).json();
   if (!isRecord(listed) || !Array.isArray(listed.snapshots))
     throw new Error("Missing archive list");
@@ -97,7 +97,7 @@ async function sharedEspressoJourney(
     kind: "eagle-rehearsal",
   };
   expect(
-    (await write(path, owner.session, { ...body, document: mislabeled }))
+    (await nativeAccountRequest(owner, path, { ...body, document: mislabeled }))
       .status,
   ).toBe(422);
   const production = parseRunSnapshot({
@@ -116,30 +116,40 @@ async function sharedEspressoJourney(
     name: production.name,
     document: JSON.parse(production.file),
   };
-  expect((await write(path, owner.session, productionBody)).status).toBe(409);
+  expect((await nativeAccountRequest(owner, path, productionBody)).status).toBe(
+    409,
+  );
   const preparedPath = `${path}/prepared/${productionId}`;
-  const prepared = await write(preparedPath, owner.session, productionBody);
+  const prepared = await nativeAccountRequest(
+    owner,
+    preparedPath,
+    productionBody,
+  );
   expect(prepared.status, await prepared.clone().text()).toBe(200);
-  expect((await read(preparedPath, viewer.session)).status).toBe(404);
+  expect((await nativeAccountRequest(viewer, preparedPath, null)).status).toBe(
+    404,
+  );
   for (const artifact of productionSave.artifacts) {
-    const uploaded = await write(
+    const uploaded = await nativeAccountRequest(
+      owner,
       `${preparedPath}/artifacts/${artifact.digest}`,
-      owner.session,
       { content: artifact.content },
     );
     expect(uploaded.status, await uploaded.clone().text()).toBe(200);
   }
-  const published = await write(path, owner.session, productionBody);
+  const published = await nativeAccountRequest(owner, path, productionBody);
   expect(published.status, await published.clone().text()).toBe(201);
   expect(
-    await (await read(`${path}/${productionId}`, viewer.session)).text(),
+    await (
+      await nativeAccountRequest(viewer, `${path}/${productionId}`, null)
+    ).text(),
   ).toBe(production.content);
   const checkpointArtifact =
     productionSave.artifacts.find(isCheckpointArtifact);
   if (checkpointArtifact === undefined)
     throw new Error("Missing checkpoint artifact");
   const artifactPath = `${path}/${productionId}/artifacts/${checkpointArtifact.digest}`;
-  const sharedArtifact = await read(artifactPath, viewer.session);
+  const sharedArtifact = await nativeAccountRequest(viewer, artifactPath, null);
   expect(sharedArtifact.status).toBe(200);
   const artifactReply: unknown = await sharedArtifact.json();
   if (!isRecord(artifactReply) || typeof artifactReply.content !== "string")
@@ -147,20 +157,30 @@ async function sharedEspressoJourney(
   expect(await sha256Hex(artifactReply.content)).toBe(
     checkpointArtifact.digest,
   );
-  expect((await read(artifactPath, foreign.session)).status).toBe(404);
+  expect((await nativeAccountRequest(foreign, artifactPath, null)).status).toBe(
+    404,
+  );
   await fixtureDatabase()
     .prepare(
       "UPDATE service_role_grant SET status = 'revoked', revoked_at = ? WHERE organisation_id = ? AND user_id = ?",
     )
     .bind(Date.now(), organisation, viewer.identity.userId)
     .run();
-  expect((await read(`${path}/${id}`, viewer.session)).status).toBe(404);
-  expect((await read(artifactPath, viewer.session)).status).toBe(404);
-  const catalogue: unknown = await (await read(path, owner.session)).json();
+  expect(
+    (await nativeAccountRequest(viewer, `${path}/${id}`, null)).status,
+  ).toBe(404);
+  expect((await nativeAccountRequest(viewer, artifactPath, null)).status).toBe(
+    404,
+  );
+  const catalogue: unknown = await (
+    await nativeAccountRequest(owner, path, null)
+  ).json();
   if (!isRecord(catalogue) || !Array.isArray(catalogue.snapshots))
     throw new Error("Missing shared run catalogue");
   expect(catalogue.snapshots).toHaveLength(2);
-  expect((await read(artifactPath, viewer.session)).status).toBe(404);
+  expect((await nativeAccountRequest(viewer, artifactPath, null)).status).toBe(
+    404,
+  );
   console.log(
     JSON.stringify({
       artifact: `${kind}-shared-run`,
@@ -176,23 +196,6 @@ async function sharedEspressoJourney(
     }),
   );
 }
-function read(path: string, session: IssuedControlSession): Promise<Response> {
-  return exports.default.fetch(`https://localhost${path}`, {
-    headers: commerceHeaders(session),
-  });
-}
-function write(
-  path: string,
-  session: IssuedControlSession,
-  body: unknown,
-): Promise<Response> {
-  return exports.default.fetch(`https://localhost${path}`, {
-    method: "POST",
-    headers: commerceHeaders(session),
-    body: JSON.stringify(body),
-  });
-}
-
 function isCheckpointArtifact(artifact: { role: string }): boolean {
   return artifact.role === "cell-checkpoint";
 }

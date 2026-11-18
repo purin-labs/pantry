@@ -4,11 +4,9 @@ import { expect, it, type TestContext } from "vitest";
 import {
   newConversationId,
   newProjectId,
-  type ConversationId,
   type ProjectId,
   type UserId,
 } from "@seams/control-api";
-import type { Conversation } from "../../src/chat/conversation";
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
 import { parseSessionId } from "../../src/ids";
 import { readConversation, saveConversation } from "../../src/chat/store";
@@ -17,6 +15,7 @@ import { ensureCaseProject } from "../../src/projects/case-project";
 import { requireDefaultProjectId } from "../fixtures/default-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { requireCaseId } from "../test-ids";
+import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import {
   installSlackActorFixture,
@@ -186,7 +185,7 @@ async function projectCasesJourney(context: TestContext): Promise<void> {
     await saveConversation(
       scope,
       owner.userId,
-      emptyConversation(privateChat, "Private launch notes"),
+      platformConversation(privateChat, "Private launch notes"),
       0,
       { projectId: launch },
     ),
@@ -221,7 +220,7 @@ async function projectCasesJourney(context: TestContext): Promise<void> {
     await saveConversation(
       scope,
       owner.userId,
-      emptyConversation(moving, "Chat that moves"),
+      platformConversation(moving, "Chat that moves"),
       0,
       { projectId: launch },
     ),
@@ -600,29 +599,4 @@ function call(
 
 async function json(response: Response): Promise<Record<string, unknown>> {
   return response.json<Record<string, unknown>>();
-}
-
-function emptyConversation(id: ConversationId, title: string): Conversation {
-  return {
-    id,
-    title,
-    lineage: { kind: "original" },
-    historyBindings: [],
-    modelRoute: {
-      keySource: "platform",
-      provider: "openai-compatible",
-      model: "fixture",
-    },
-    documents: [],
-    work: { kind: "ready" },
-    completedRequests: [],
-    timeline: [],
-    pendingInputs: [],
-    latestSequence: 0,
-    lastReadSequence: 0,
-    surfaceEventCursor: 0,
-    draftText: "",
-    draftUpdatedAt: null,
-    effort: null,
-  };
 }

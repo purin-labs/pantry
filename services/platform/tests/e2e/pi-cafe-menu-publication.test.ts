@@ -16,7 +16,7 @@ import { parseCommerceActionRecordResponse } from "@seams/control-api/portal/com
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { enableCapability } from "./access-route-support";
+import { enableCapability, mutationHeaders } from "./access-route-support";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { network } from "./network";
 import { givePortalHandles } from "./permission-request-support";
@@ -158,7 +158,7 @@ it("publishes an agent's menu only after an owner approves that exact menu", asy
   const card = parseCommerceActionRecordResponse(
     await (
       await exports.default.fetch(`${BASE}/commerce/actions/${firstNonce}`, {
-        headers: controlHeaders(session),
+        headers: mutationHeaders(session),
       })
     ).json(),
   );
@@ -232,14 +232,17 @@ it("publishes an agent's menu only after an owner approves that exact menu", asy
     .toContain("PI_MENU_SECOND_WAITING");
   const secondNonce = listingNonce(requests);
   expect(secondNonce).not.toBe(firstNonce);
-  const person = await exports.default.fetch(`${BASE}/commerce/menu-publication`, {
-    method: "POST",
-    headers: controlHeaders(session),
-    body: JSON.stringify({
-      documentRevision: (await readDraft(session)).revision,
-      hours: SERVING_HOURS,
-    }),
-  });
+  const person = await exports.default.fetch(
+    `${BASE}/commerce/menu-publication`,
+    {
+      method: "POST",
+      headers: mutationHeaders(session),
+      body: JSON.stringify({
+        documentRevision: (await readDraft(session)).revision,
+        hours: SERVING_HOURS,
+      }),
+    },
+  );
   expect(person.status, await person.clone().text()).toBe(200);
   const afterPerson = await liveMenu();
   expect(afterPerson?.revision).toBe(live.revision + 1);
@@ -310,7 +313,7 @@ it("asks a person before content of a private channel enters the shared menu", a
   expect(outputs.join("\n")).toContain("Seams Pantry stopped this step");
   const response = await exports.default.fetch(
     `${BASE}/collaboration/menu-draft`,
-    { headers: controlHeaders(session) },
+    { headers: mutationHeaders(session) },
   );
   // No edit ran, so the Organisation still has no draft to read.
   expect(await response.text()).not.toContain("Secret menu");
@@ -361,20 +364,10 @@ function delivered(slack: ReturnType<typeof slackSimulator>): string {
   return slack.messages.map((message) => message.text).join("\n");
 }
 
-function controlHeaders(session: IssuedControlSession): Record<string, string> {
-  return {
-    "content-type": "application/json",
-    origin: "https://localhost",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
-    "idempotency-key": crypto.randomUUID(),
-  };
-}
-
 async function readDraft(session: IssuedControlSession) {
   const response = await exports.default.fetch(
     `${BASE}/collaboration/menu-draft`,
-    { headers: controlHeaders(session) },
+    { headers: mutationHeaders(session) },
   );
   expect(response.status).toBe(200);
   const body = (await response.json()) as {

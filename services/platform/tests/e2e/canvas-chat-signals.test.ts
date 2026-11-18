@@ -1,6 +1,6 @@
 import interrupted from "../../../../assets/bakery-mujoco/combined-bakery/rust-evidence/shared-run-interrupted.json";
 import { fixtureDatabase } from "./organisation-database";
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { evictDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
@@ -23,16 +23,15 @@ import { requireOrganisationBootstrap } from "../organisation-execution-fixture"
 import {
   PUBLIC_ORIGIN,
   closeSocket,
-  controlReadHeaders,
   createControlClient,
   expectPong,
   openSocket,
-  requireTestPlacement,
   type ControlClient,
 } from "./hibernatable-socket-support";
+import { control } from "./chat-journey-support";
 import { network } from "./network";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
-import { openRouterText } from "./slack-journey-support";
+import { openRouterText, requiredPlacement } from "./slack-journey-support";
 
 // A frame that has not come within this time does not come.
 const QUIET_MS = 750;
@@ -215,7 +214,7 @@ async function installCanvasScenario(): Promise<CanvasScenario> {
     owner: owner.identity,
     organisationName: "Canvas chat signals",
     environment: "development",
-    placement: requireTestPlacement(),
+    placement: requiredPlacement(),
     mutation: organisationBootstrapMutation(owner.identity, now),
     now,
   });
@@ -420,28 +419,6 @@ async function readCanvasChat(
     work: body.conversation.work.kind,
     text: JSON.stringify(body.conversation),
   };
-}
-
-function control(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-  path: string,
-  method: string,
-  body: unknown,
-): Promise<Response> {
-  return exports.default.fetch(
-    `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/${path}`,
-    {
-      method,
-      headers: {
-        origin: PUBLIC_ORIGIN,
-        ...controlReadHeaders(session),
-        "x-satyr-csrf": session.csrfToken,
-        "content-type": "application/json",
-      },
-      ...(body === null ? {} : { body: JSON.stringify(body) }),
-    },
-  );
 }
 
 /**

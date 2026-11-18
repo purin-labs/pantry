@@ -1,5 +1,5 @@
 import { fixtureDatabase } from "./organisation-database";
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
@@ -7,17 +7,12 @@ import { newConversationId, type ConversationId } from "@seams/control-api";
 import { isRecord } from "@seams/std";
 import {
   requireActiveOrganisationActor,
-  resolveActiveCaseActor,
   resolveActiveSessionActor,
 } from "../../src/actors/actor-router";
 import {
   deriveDirectCaseIdentities,
   processDirectCaseCommand,
 } from "../../src/actors/case-direct-processing";
-import {
-  conversationCaseId,
-  initialConversationCaseIdentity,
-} from "../../src/chat/conversation-actor-identity";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
 import {
@@ -43,14 +38,18 @@ import {
   openRouterText,
   openRouterToolCall,
 } from "./slack-journey-support";
+import {
+  bindLinkFetch,
+  erase,
+  resolvePublicAddress,
+} from "./link-fetch-support";
+import { conversationCase } from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
     messageLinkFetchPlacement?: Record<string, unknown>;
   }
 }
-
-const REGISTRY_ROUTE = "https://localhost/v1/admin/state-object-registry";
 const DOCUMENTATION = "https://docs.carrier.example.net/reference";
 const DOCUMENTATION_PAGE = "https://docs.carrier.example.net/reference/v2";
 const PAGE_TEXT = "Carrier API: send the key as a bearer token.";
@@ -446,70 +445,4 @@ function addressedName(address: Addressed): string {
 
 function addressedHint(address: Addressed): string | null {
   return address.locationHint;
-}
-
-function resolvePublicAddress({
-  request,
-}: Parameters<HttpResponseResolver>[0]): Response {
-  return HttpResponse.json({
-    Status: 0,
-    Answer:
-      new URL(request.url).searchParams.get("type") === "A"
-        ? [{ type: 1, data: "93.184.216.34" }]
-        : [],
-  });
-}
-
-async function conversationCase(
-  person: Member,
-  conversationId: ConversationId,
-) {
-  const caseId = await conversationCaseId(
-    initialConversationCaseIdentity(
-      { organisationId: person.organisationId, userId: person.userId },
-      conversationId,
-    ),
-  );
-  const actor = await resolveActiveCaseActor({
-    env,
-    namespace: env.CASE,
-    organisationId: person.organisationId,
-    caseId,
-    now: Date.now(),
-  });
-  if (!actor.ok) throw new Error(actor.error.code);
-  return actor.value;
-}
-
-function bindLinkFetch(linkFetch: object, actor: object): void {
-  const bindings = Reflect.get(actor, "env");
-  if (!isRecord(bindings)) throw new Error("The Actor has no environment");
-  Object.defineProperty(bindings, "MESSAGE_LINK_FETCH", {
-    configurable: true,
-    value: linkFetch,
-  });
-}
-
-/** The status of an erase, and the code of its refusal. */
-async function erase(
-  objectKind: string,
-  objectId: string,
-): Promise<{ status: number; code: unknown }> {
-  const answered = await exports.default.fetch(
-    new Request(REGISTRY_ROUTE, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${env.ORGANISATION_ADMIN_TOKEN}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        command: "erase_unregistered_actor",
-        objectKind,
-        objectId,
-      }),
-    }),
-  );
-  const body: unknown = await answered.json().catch(() => null);
-  const error = isRecord(body) && isRecord(body.error) ? body.error : null;
-  return { status: answered.status, code: error?.code ?? null };
 }

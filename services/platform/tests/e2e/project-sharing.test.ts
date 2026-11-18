@@ -7,7 +7,7 @@ import {
 } from "./organisation-database";
 import { ensureInitialOrganisationPlacement } from "../../src/data/shared-rows/placement-row";
 import { parseOrganisationPlacementProfile } from "../../src/placement";
-import { newConversationId, type ConversationId } from "@seams/control-api";
+import { newConversationId } from "@seams/control-api";
 import { parseSessionId } from "../../src/ids";
 import type { Conversation } from "../../src/chat/conversation";
 import { readConversation, saveConversation } from "../../src/chat/store";
@@ -27,6 +27,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { newProjectId, type UserId } from "@seams/control-api";
 import type { IssuedControlSession } from "../../src/data/control-plane";
+import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import {
   attachSharedAccountNativeOrganisation,
@@ -328,7 +329,7 @@ async function projectDeletionJourney(context: TestContext): Promise<void> {
         await saveConversation(
           await requireOrganisationExecutionScope(env, scope.organisationId),
           scope.userId,
-          emptyConversation(id, "Confidential private chat"),
+          platformConversation(id, "Confidential private chat"),
           0,
           { projectId },
         )
@@ -539,7 +540,7 @@ async function projectTransitionJourney(context: TestContext): Promise<void> {
       await saveConversation(
         await requireOrganisationExecutionScope(env, organisationId),
         owner.userId,
-        emptyConversation(conversationId, "Moving launch review"),
+        platformConversation(conversationId, "Moving launch review"),
         0,
         { projectId: sourceId },
       )
@@ -731,7 +732,7 @@ async function sharedConversationJourney(context: TestContext): Promise<void> {
       await saveConversation(
         await requireOrganisationExecutionScope(env, scope.organisationId),
         scope.userId,
-        emptyConversation(conversationId, "Private capacity review"),
+        platformConversation(conversationId, "Private capacity review"),
         0,
         { projectId },
       )
@@ -1003,31 +1004,6 @@ async function sharedConversationJourney(context: TestContext): Promise<void> {
       liveTurnRevocation: true,
     },
   });
-}
-
-function emptyConversation(id: ConversationId, title: string): Conversation {
-  return {
-    id,
-    title,
-    lineage: { kind: "original" },
-    historyBindings: [],
-    modelRoute: {
-      keySource: "platform",
-      provider: "openai-compatible",
-      model: "fixture",
-    },
-    documents: [],
-    work: { kind: "ready" },
-    completedRequests: [],
-    timeline: [],
-    pendingInputs: [],
-    latestSequence: 0,
-    lastReadSequence: 0,
-    surfaceEventCursor: 0,
-    draftText: "",
-    draftUpdatedAt: null,
-    effort: null,
-  };
 }
 
 async function requestChatApi(

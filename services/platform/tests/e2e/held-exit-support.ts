@@ -1,7 +1,9 @@
 // The members and the turn reads of the journeys of a held exit (Plan 27C).
 import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject } from "cloudflare:test";
-import { env } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
+import { expect } from "vitest";
+import { isRecord } from "@seams/std";
 
 import { admitSessionInformationFlowObservation } from "../../src/actors/agent-session-information-flow";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
@@ -12,7 +14,8 @@ import type {
   FlowPolicyInput,
   FlowWriter,
 } from "../../src/policy/information-flow";
-import { commerceClient } from "./commerce-support";
+import { accessControlPath } from "./access-route-support";
+import { commerceClient, commerceHeaders } from "./commerce-support";
 import { ORGANISATION_ID } from "./slack-journey-support";
 
 export type Person = Readonly<{
@@ -148,4 +151,54 @@ export async function admin(
   });
   if (!granted.ok) throw new Error(granted.error.code);
   return { personId: joining.personId, session: joining.client.session };
+}
+
+function heldPath(requestId: string): string {
+  return `${accessControlPath(ORGANISATION_ID)}/held-outputs/${requestId}`;
+}
+
+/** The person reads one held output in the Portal. */
+export function readHeld(person: Person, requestId: string): Promise<Response> {
+  return exports.default.fetch(heldPath(requestId), {
+    headers: commerceHeaders(person.session),
+  });
+}
+
+/** The person allows or denies one held output in the Portal. */
+export function decide(
+  person: Person,
+  requestId: string,
+  decision: "allow" | "deny",
+): Promise<Response> {
+  return exports.default.fetch(`${heldPath(requestId)}/decision`, {
+    method: "POST",
+    headers: commerceHeaders(person.session),
+    body: JSON.stringify({ decision }),
+  });
+}
+
+/** The held outputs that wait for this person, as the Portal lists them. */
+export async function pendingOf(
+  person: Person,
+): Promise<readonly Record<string, unknown>[]> {
+  const response = await exports.default.fetch(
+    `${accessControlPath(ORGANISATION_ID)}/permission-requests`,
+    { headers: commerceHeaders(person.session) },
+  );
+  expect(response.status).toBe(200);
+  const body: unknown = await response.json();
+  if (!isRecord(body) || !Array.isArray(body.heldOutputs))
+    throw new Error("Pending list invalid");
+  return body.heldOutputs.filter(isRecord);
+}
+
+/** The stored status of one held output. */
+export async function heldStatus(requestId: string): Promise<unknown> {
+  const row = await fixtureDatabase()
+    .prepare(
+      "SELECT status FROM held_output_request WHERE organisation_id = ? AND request_id = ?",
+    )
+    .bind(ORGANISATION_ID, requestId)
+    .first<{ status: unknown }>();
+  return row?.status;
 }

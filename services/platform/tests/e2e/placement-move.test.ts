@@ -23,17 +23,16 @@ import {
 } from "../../src/actors/actor-relocation";
 import { startActorRestore } from "../../src/actors/actor-restore";
 import { prepareActorRestoreManifest } from "../../src/actors/actor-restore-manifest";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { requireActiveSessionActor } from "../../src/actors/actor-router";
 import {
-  listPlacementActorRegistryEntries,
   quarantineActorRegistryEntry,
   reserveActor,
 } from "../../src/actors/actor-registry";
 import { resolveActorExecutionAdmission } from "../../src/actors/actor-placement-admission";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../src/actors/agent-session-schema";
 import { parseSessionId, type SessionId } from "../../src/ids";
+import { moveTarget, placementEntries } from "./placement-move-support";
 
 it(
   "gives an Organisation an active placement again when an operator abandons a restore that stopped after the freeze",
@@ -411,16 +410,6 @@ async function staleReservationJourney({ task }: TestContext): Promise<void> {
   });
 }
 
-function moveTarget() {
-  const target = parseOrganisationPlacementMoveTarget({
-    kind: "affinity",
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!target.ok) throw new Error(target.error.code);
-  return target.value;
-}
-
 function sessionIdentity(value: string): SessionId {
   const parsed = parseSessionId(value);
   if (!parsed.ok) throw new Error("Invalid Session identity");
@@ -435,16 +424,6 @@ async function executionAdmission(scope: OrganisationExecutionScope) {
   );
   if (!admission.ok) throw new Error(admission.error.code);
   return admission.value;
-}
-
-async function placementEntries(epoch: number) {
-  const result = await listPlacementActorRegistryEntries({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    placementEpoch: epoch,
-  });
-  if (!result.ok) throw new Error(result.error.code);
-  return result.value;
 }
 
 function entryIdentity(entry: {

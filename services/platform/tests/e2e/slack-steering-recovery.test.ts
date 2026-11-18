@@ -18,7 +18,14 @@ import {
   sendThreadMessage,
   startScriptTurn,
 } from "./durable-codemode-journey-support";
-import { ORGANISATION_ID, ROOT_TS } from "./slack-journey-support";
+import { readReceipt, readSteeredReplies } from "./slack-follow-up-support";
+import {
+  ORGANISATION_ID,
+  ROOT_TS,
+  threadAndText,
+  userMessageContaining,
+  userMessageIs,
+} from "./slack-journey-support";
 
 /**
  * A steering reply survives the loss of the Session Actor (Plan 71,
@@ -248,20 +255,6 @@ function losePiSubmission(_actor: unknown, ctx: DurableObjectState): void {
   ctx.storage.sql.exec("DELETE FROM submissions");
 }
 
-function readSteeredReplies(
-  _actor: unknown,
-  ctx: DurableObjectState,
-): string[] {
-  return ctx.storage.sql
-    .exec<{ event_id: string }>(
-      "SELECT event_id FROM connector_case_steering ORDER BY event_id",
-    )
-    .toArray()
-    .map(function eventId(row) {
-      return row.event_id;
-    });
-}
-
 function readSteeringStates(
   _actor: unknown,
   ctx: DurableObjectState,
@@ -295,21 +288,6 @@ function countHistoryEntries(
     }).length;
 }
 
-function readReceipt(
-  eventId: string,
-  _actor: unknown,
-  ctx: DurableObjectState,
-): string | null {
-  return (
-    ctx.storage.sql
-      .exec<{ outcome: string }>(
-        "SELECT outcome FROM connector_case_work_receipt WHERE event_id = ?",
-        eventId,
-      )
-      .toArray()[0]?.outcome ?? null
-  );
-}
-
 function messageList(body: Record<string, unknown> | undefined): unknown[] {
   return Array.isArray(body?.messages) ? body.messages : [];
 }
@@ -320,34 +298,6 @@ function isToolMessage(message: unknown): boolean {
 
 function isUserMessage(message: unknown): boolean {
   return isRecord(message) && message.role === "user";
-}
-
-/** A user message that is this text alone, as history holds a message. */
-function userMessageIs(text: string, message: unknown): boolean {
-  if (!isRecord(message) || message.role !== "user") return false;
-  const content = message.content;
-  return (
-    content === text ||
-    (Array.isArray(content) &&
-      content.length === 1 &&
-      isRecord(content[0]) &&
-      content[0].text === text)
-  );
-}
-
-function userMessageContaining(text: string, message: unknown): boolean {
-  return (
-    isRecord(message) &&
-    message.role === "user" &&
-    JSON.stringify(message.content).includes(text)
-  );
-}
-
-function threadAndText(post: Record<string, string>): {
-  readonly thread: string | undefined;
-  readonly text: string | undefined;
-} {
-  return { thread: post.thread_ts, text: post.text };
 }
 
 async function connectorOf() {

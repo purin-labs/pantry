@@ -32,6 +32,7 @@ import {
   installSlackActorFixture,
   slackSimulator,
 } from "./slack-journey-support";
+import { trustShopDeliveries } from "./commerce-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -119,7 +120,7 @@ async function openShop(): Promise<IssuedControlSession> {
     createdAt: new Date().toISOString(),
   });
   if (!provisioned.ok) throw new Error(JSON.stringify(provisioned.error));
-  await trustShopDeliveries();
+  await trustShopDeliveries(MERCHANT);
   await publishCafeMenu(MERCHANT);
   return session;
 }
@@ -298,22 +299,6 @@ async function orderProvenance(
       };
   }
   throw new Error("The order is not in the graph");
-}
-
-/** The shared fixture binds a placeholder key; this journey reads deliveries. */
-async function trustShopDeliveries(): Promise<void> {
-  const signing = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${MERCHANT}/test-signing-key`,
-    { headers: { authorization: "Bearer underclerk-e2e-token" } },
-  );
-  const key: unknown = await signing.json();
-  if (!isRecord(key) || typeof key.publicKeyB64 !== "string")
-    throw new Error("Fixture signing key missing");
-  await fixtureDatabase().prepare(
-    "UPDATE underclerk_merchant_binding SET delivery_signing_key_id = 'key_bakery_e2e', delivery_signing_public_key_b64 = ? WHERE merchant_id = ?",
-  )
-    .bind(key.publicKeyB64, MERCHANT)
-    .run();
 }
 
 async function drainFeed(): Promise<void> {

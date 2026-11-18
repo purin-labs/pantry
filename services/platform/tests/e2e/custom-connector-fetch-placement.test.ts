@@ -1,19 +1,18 @@
 import { env, exports } from "cloudflare:workers";
-import { http, HttpResponse, type HttpResponseResolver } from "msw";
+import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";
+import { erase, resolvePublicAddress } from "./link-fetch-support";
 
 declare module "vitest" {
   interface TaskMeta {
     customConnectorFetchPlacement?: Record<string, unknown>;
   }
 }
-
-const REGISTRY_ROUTE = "https://localhost/v1/admin/state-object-registry";
 const ORIGIN = "https://api.carrier.example.net";
 const CREDENTIAL = "synthetic-carrier-api-key";
 const ACCOUNT = { id: "carrier_account_7", name: "Carrier account" };
@@ -295,40 +294,4 @@ const DOCUMENT = {
 /** The record names no Organisation: its identifier changes with each run. */
 function withoutOrganisation(address: Addressed) {
   return { locationHint: address.locationHint };
-}
-
-function resolvePublicAddress({
-  request,
-}: Parameters<HttpResponseResolver>[0]): Response {
-  return HttpResponse.json({
-    Status: 0,
-    Answer:
-      new URL(request.url).searchParams.get("type") === "A"
-        ? [{ type: 1, data: "93.184.216.34" }]
-        : [],
-  });
-}
-
-/** The status of an erase, and the code of its refusal. */
-async function erase(
-  objectKind: string,
-  objectId: string,
-): Promise<{ status: number; code: unknown }> {
-  const answered = await exports.default.fetch(
-    new Request(REGISTRY_ROUTE, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${env.ORGANISATION_ADMIN_TOKEN}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        command: "erase_unregistered_actor",
-        objectKind,
-        objectId,
-      }),
-    }),
-  );
-  const body: unknown = await answered.json().catch(() => null);
-  const error = isRecord(body) && isRecord(body.error) ? body.error : null;
-  return { status: answered.status, code: error?.code ?? null };
 }

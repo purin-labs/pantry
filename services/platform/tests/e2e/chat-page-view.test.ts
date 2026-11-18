@@ -19,11 +19,11 @@ import {
   installMemoryFixture,
   post,
   storedConversation,
-  workKind,
   type Member,
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText } from "./slack-journey-support";
+import { finished, latestUserInput } from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -130,7 +130,7 @@ it(
       page: { pageView: COSTS_PAGE },
     });
     expect(oldTab.status, await oldTab.clone().text()).toBe(200);
-    await finish(author, conversationId);
+    await finished(author, conversationId);
     const privateInput = latestUserInput(requests);
     expect(privateInput).toContain("Portal page on the operator's screen");
     expect(privateInput).toContain("Shelf waste (spoil)");
@@ -162,7 +162,7 @@ it(
       page: { surfaceObservation: COSTS_OBSERVATION },
     });
     expect(sharedCosts.status, await sharedCosts.clone().text()).toBe(200);
-    await finish(author, shared);
+    await finished(author, shared);
     const sharedCostsInput = latestUserInput(requests);
     expect(sharedCostsInput).toContain("spoil rate is on my screen now?");
     expect(sharedCostsInput).toContain("Shelf waste (spoil)");
@@ -173,7 +173,7 @@ it(
       page: { surfaceObservation: ORDER_OBSERVATION },
     });
     expect(sharedOrder.status, await sharedOrder.clone().text()).toBe(200);
-    await finish(author, shared);
+    await finished(author, shared);
     const sharedOrderInput = latestUserInput(requests);
     expect(sharedOrderInput).toContain("Why is this order held?");
     expect(sharedOrderInput).toContain(
@@ -243,15 +243,6 @@ async function sharedConversation(
   return conversationId;
 }
 
-async function finish(
-  author: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  await expect
-    .poll(workKind.bind(null, author, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
 function send(
   author: Member,
   chatPath: string,
@@ -286,19 +277,4 @@ async function recordAndReply(
     "Your screen shows the plan.",
     `page_view_${String(requests.length)}`,
   );
-}
-
-/** The newest user message of the newest model request. */
-function latestUserInput(requests: readonly string[]): string {
-  const latest = requests.at(-1);
-  if (latest === undefined) throw new Error("The model received no request");
-  const body: unknown = JSON.parse(latest);
-  const messages =
-    isRecord(body) && Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (isRecord(message) && message.role === "user")
-      return JSON.stringify(message.content);
-  }
-  throw new Error("The model request has no user message");
 }

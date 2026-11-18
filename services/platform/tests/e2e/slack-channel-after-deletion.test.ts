@@ -22,6 +22,7 @@ import { runScheduledOnboardingReconciliation } from "../../src/onboarding-recon
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
+import { configurationVersion, readHeaders } from "./purge-support";
 import {
   attachSharedAccountNativeOrganisation,
   type SharedAccountNativeClient,
@@ -354,23 +355,29 @@ async function seedWorkspace(installer: Owner, other: Owner): Promise<void> {
     [installer, RELEASED_CHANNEL],
     [other, HELD_CHANNEL],
   ] as const) {
-    const connected = await createActiveConnectedIntegration(fixtureDatabase(), {
-      organisationId: owner.organisationId,
-      provider: "slack",
-      providerSubjectId: TEAM_ID,
-      environment: "development",
-      authMode: "shared_satyr_app",
-      authority: { kind: "connection_credential", credentialRef: requiredHandle(tokenRef) },
-      grantedScopes: [...SLACK_SCOPES],
-      createdByUserId: owner.client.identity.userId,
-      providerAccountId: TEAM_ID,
-      accountKind: "workspace",
-      displayName: "Cafe Workspace",
-      capabilities: ["conversation.ingress", "conversation.egress"],
-      audiencePolicy: { kind: "operator" },
-      retentionPolicy: { kind: "organisation_default" },
-      now,
-    });
+    const connected = await createActiveConnectedIntegration(
+      fixtureDatabase(),
+      {
+        organisationId: owner.organisationId,
+        provider: "slack",
+        providerSubjectId: TEAM_ID,
+        environment: "development",
+        authMode: "shared_satyr_app",
+        authority: {
+          kind: "connection_credential",
+          credentialRef: requiredHandle(tokenRef),
+        },
+        grantedScopes: [...SLACK_SCOPES],
+        createdByUserId: owner.client.identity.userId,
+        providerAccountId: TEAM_ID,
+        accountKind: "workspace",
+        displayName: "Cafe Workspace",
+        capabilities: ["conversation.ingress", "conversation.egress"],
+        audiencePolicy: { kind: "operator" },
+        retentionPolicy: { kind: "organisation_default" },
+        now,
+      },
+    );
     const connectionId = `connection_e2e_${channel.toLowerCase()}`;
     await env.DB.batch([
       env.DB.prepare(
@@ -536,22 +543,6 @@ async function lifecycleMutation(
   };
 }
 
-/** The version that the Portal reads with the Organisation's projection. */
-async function configurationVersion(
-  organisationId: OrganisationId,
-): Promise<number> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const version = await scope.database
-    .prepare(
-      "SELECT configuration_version FROM organisation_onboarding WHERE organisation_id = ?",
-    )
-    .bind(organisationId)
-    .first("configuration_version");
-  if (typeof version !== "number")
-    throw new Error("The Organisation has no configuration version");
-  return version;
-}
-
 function mutationHeaders(
   owner: Owner,
   idempotencyKey: string,
@@ -566,12 +557,5 @@ function mutationHeaders(
       ? {}
       : { "x-satyr-configuration-version": String(version) }),
     "x-satyr-csrf": owner.client.session.csrfToken,
-  };
-}
-
-function readHeaders(owner: Owner): Record<string, string> {
-  const { token, csrfToken } = owner.client.session;
-  return {
-    cookie: `satyr_control_session=${token}; satyr_control_csrf=${csrfToken}`,
   };
 }

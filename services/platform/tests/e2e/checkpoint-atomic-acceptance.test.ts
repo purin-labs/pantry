@@ -11,12 +11,9 @@ import {
   chat,
   preparePortalChatJourney,
   readWork,
+  answerTurn,
 } from "./chat-journey-support";
-import {
-  FakeChatGpt,
-  textAnswer,
-  type ChatGptAnswer,
-} from "./chatgpt-subscription-support";
+import { FakeChatGpt } from "./chatgpt-subscription-support";
 
 it.for(["unobserved", "observed"] as const)(
   "rolls back rejected checkpoint acceptance and finalizes from saved records despite a stale response (%s)",
@@ -64,17 +61,6 @@ async function checkpointAcceptance(
       modelTurns: chatgpt.modelRequestCount(),
     },
   });
-}
-
-async function answerTurn(
-  turns: (() => Promise<void>)[],
-  _request: unknown,
-  index: number,
-): Promise<ChatGptAnswer> {
-  await turns.shift()?.();
-  return textAnswer(
-    JSON.stringify({ kind: "reply", text: `TURN_${String(index + 1)}_OK` }),
-  );
 }
 
 type Evidence = {

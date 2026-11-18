@@ -7,7 +7,6 @@ import {
   resumeActorRelocation,
   startActorRelocation,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import { parseOrganisationId, parseSessionId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
@@ -32,6 +31,7 @@ import {
   startScriptTurn,
 } from "./durable-codemode-journey-support";
 import { ORGANISATION_ID } from "./slack-journey-support";
+import { moveTarget } from "./placement-move-support";
 
 // Plan 50A, Phase D. These journeys run through the Slack Actor path with
 // the real Session, Organisation, and governor Actors, the Pi harness, and
@@ -142,7 +142,7 @@ it("releases a script that the freeze of a relocation ended, and completes the r
   const started = await startActorRelocation({
     env,
     organisationId: ORGANISATION_ID,
-    target: relocationTarget(),
+    target: moveTarget(),
     now: Date.now(),
   });
   if (!started.ok) throw new Error(started.error.code);
@@ -282,22 +282,12 @@ it("erases the reads and the stored values of scripts with their Session", async
   });
 }, 60_000);
 
-function relocationTarget() {
-  const target = parseOrganisationPlacementMoveTarget({
-    kind: "affinity",
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!target.ok) throw new Error(target.error.code);
-  return target.value;
-}
-
 /** Moves the Organisation and its Actors to another placement. */
 async function relocateOrganisation() {
   const started = await startActorRelocation({
     env,
     organisationId: ORGANISATION_ID,
-    target: relocationTarget(),
+    target: moveTarget(),
     now: Date.now(),
   });
   if (!started.ok) return started;

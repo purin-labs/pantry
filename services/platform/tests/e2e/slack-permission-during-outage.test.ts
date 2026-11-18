@@ -1,4 +1,4 @@
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { HttpResponse, http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
@@ -23,9 +23,8 @@ import {
   openRouterText,
   openRouterToolCall,
   requireLastToolOutput,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  postMention,
 } from "./slack-journey-support";
 
 declare module "vitest" {
@@ -180,25 +179,6 @@ async function replyToModel(
     default:
       throw new Error("Unexpected model request");
   }
-}
-
-async function postMention(
-  eventId: string,
-  ts: string,
-  question: string,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: "app_mention",
-        eventId,
-        messageTs: ts,
-        threadTs: ts,
-        text: `<@U0SATYR> ${question}`,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
 }
 
 function textsOf(messages: readonly Record<string, string>[]): string[] {

@@ -9,6 +9,7 @@ import {
   parseMenuScreenFeed,
   parseMenuScreenPairing,
   parseMenuScreenPairingState,
+  parseMenuScreenSignal,
   type MenuScreenFeed,
 } from "@seams/control-api";
 import {
@@ -621,6 +622,23 @@ export async function installBoardJourney(
       ]),
     ),
   };
+}
+
+/** Resolves with the time of the next screen signal on a TV's socket. */
+export function nextSignal(socket: WebSocket): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      socket.removeEventListener("message", onMessage);
+      reject(new Error("The screen got no signal"));
+    }, 30_000);
+    const onMessage = (event: MessageEvent): void => {
+      if (!parseMenuScreenSignal(event.data)) return;
+      clearTimeout(timer);
+      socket.removeEventListener("message", onMessage);
+      resolve(Date.now());
+    };
+    socket.addEventListener("message", onMessage);
+  });
 }
 
 /** The raw feed JSON, to check which keys a TV player from before receives. */

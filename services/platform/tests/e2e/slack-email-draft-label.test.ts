@@ -8,6 +8,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-case-work";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import type { FlowPolicyInput } from "../../src/policy/information-flow";
+import { lastCalledTool } from "./chat-permission-support";
 import { commerceHeaders } from "./commerce-support";
 import { raiseLabel } from "./held-exit-support";
 import { network } from "./network";
@@ -296,29 +297,6 @@ function toolSucceeded(output: string | undefined): boolean {
   let value: unknown = output;
   while (typeof value === "string") value = JSON.parse(value);
   return isRecord(value) && value.success === true;
-}
-
-/** The tool of the latest call, when the latest message is its output. */
-function lastCalledTool(body: Record<string, unknown>): string | null {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last: unknown = messages.at(-1);
-  if (!isRecord(last) || last.role !== "tool") return null;
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (
-      isRecord(message) &&
-      message.role === "assistant" &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const call: unknown = message.tool_calls.at(-1);
-      return isRecord(call) &&
-        isRecord(call.function) &&
-        typeof call.function.name === "string"
-        ? call.function.name
-        : null;
-    }
-  }
-  return null;
 }
 
 async function postMention(

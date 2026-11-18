@@ -26,6 +26,7 @@ import {
   openSocket,
 } from "./hibernatable-socket-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+import { applied } from "./menu-board-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -396,13 +397,6 @@ function nextMenuMessage(
     socket.addEventListener("message", onMessage);
     send();
   });
-}
-
-function applied(
-  result:
-    Readonly<{ ok: true }> | Readonly<{ ok: false; error: { code: string } }>,
-): void {
-  if (!result.ok) throw new Error(result.error.code);
 }
 
 async function required<T>(

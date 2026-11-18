@@ -24,6 +24,10 @@ import {
 import { network } from "./network";
 import { PlanJourney } from "./production-plan-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+import {
+  commerceEngine,
+  configurationHeaders,
+} from "./commerce-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -270,7 +274,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       {
         method: "POST",
         headers: {
-          ...mutationHeaders(owner.session, "square-disable"),
+          ...configurationHeaders(owner.session, "square-disable"),
           "x-satyr-configuration-version": await configurationVersion(),
         },
         body: JSON.stringify({}),
@@ -282,7 +286,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       {
         method: "DELETE",
         headers: {
-          ...mutationHeaders(owner.session, "square-remove"),
+          ...configurationHeaders(owner.session, "square-remove"),
           "x-satyr-configuration-version": await configurationVersion(),
         },
         body: JSON.stringify({}),
@@ -585,7 +589,7 @@ async function connectSquare(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/providers/square/start`,
     {
       method: "POST",
-      headers: mutationHeaders(session, "square-cafe-connect"),
+      headers: configurationHeaders(session, "square-cafe-connect"),
       body: JSON.stringify({ returnPath: `/portal/${organisationId}` }),
     },
   );
@@ -694,7 +698,7 @@ async function refreshResources(
     {
       method: "POST",
       headers: {
-        ...mutationHeaders(session, "square-cafe-resources"),
+        ...configurationHeaders(session, "square-cafe-resources"),
         "x-satyr-configuration-version": String(version?.version ?? 1),
       },
       body: JSON.stringify({}),
@@ -754,21 +758,10 @@ async function post(
 ): Promise<Readonly<{ status: number; body: unknown }>> {
   const response = await exports.default.fetch(`${PUBLIC_ORIGIN}${path}`, {
     method: "POST",
-    headers: mutationHeaders(session, crypto.randomUUID()),
+    headers: configurationHeaders(session, crypto.randomUUID()),
     body: JSON.stringify(body),
   });
   return { status: response.status, body: await response.json() };
-}
-
-async function commerceEngine(
-  merchantId: string,
-  path: string,
-): Promise<Record<string, unknown>> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/${path}`,
-    { headers: { authorization: OPERATOR } },
-  );
-  return record(await response.json());
 }
 
 function requireOrganisation(raw: string): OrganisationId {
@@ -786,18 +779,4 @@ async function executionScope(organisationId: OrganisationId) {
 function record(value: unknown): Record<string, unknown> {
   if (!isRecord(value)) throw new Error(`Not a record: ${String(value)}`);
   return value;
-}
-
-function mutationHeaders(
-  session: IssuedControlSession,
-  idempotencyKey: string,
-): HeadersInit {
-  return {
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    origin: PUBLIC_ORIGIN,
-    "content-type": "application/json",
-    "idempotency-key": idempotencyKey,
-    "x-satyr-configuration-version": "1",
-    "x-satyr-csrf": session.csrfToken,
-  };
 }

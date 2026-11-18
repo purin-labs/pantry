@@ -33,6 +33,7 @@ import {
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
+import { lastToolCallName } from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -442,21 +443,6 @@ async function scriptedPastryModel(
         {},
         `pastry_call_${script.requests.length}`,
       );
-}
-
-function lastToolCallName(messages: readonly unknown[]): string | null {
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message = messages[index];
-    if (!isRecord(message) || message.role !== "assistant") continue;
-    const calls = Array.isArray(message.tool_calls) ? message.tool_calls : [];
-    const call: unknown = calls.at(-1);
-    return isRecord(call) &&
-      isRecord(call.function) &&
-      typeof call.function.name === "string"
-      ? call.function.name
-      : null;
-  }
-  return null;
 }
 
 function send(

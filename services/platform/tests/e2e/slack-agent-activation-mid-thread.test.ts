@@ -5,16 +5,13 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import {
-  connectorActorStub,
-  sessionActorStub,
-} from "../../src/actors/actor-router";
+import { sessionActorStub } from "../../src/actors/actor-router";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
 } from "../../src/data/agent-operations";
 import { network } from "./network";
+import { connectorOf, registryEntries } from "./slack-follow-up-support";
 import {
   ORGANISATION_ID,
   ROOT_TS,
@@ -317,31 +314,6 @@ async function pins(): Promise<
     .bind(ORGANISATION_ID)
     .all<{ readonly assignmentId: string; readonly installationId: string }>();
   return rows.results;
-}
-
-async function registryEntries() {
-  const entries = await listPlacementActorRegistryEntries({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    placementEpoch: 1,
-  });
-  if (!entries.ok) throw new Error(entries.error.code);
-  return entries.value;
-}
-
-async function connectorOf(connectorId: string) {
-  const entry = (await registryEntries()).find(function isConnector(candidate) {
-    return (
-      candidate.identity.objectKind === "connector" &&
-      candidate.identity.logicalObjectId === connectorId
-    );
-  });
-  if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
-    env.CONNECTOR,
-    entry.physicalObjectName,
-    entry.placement,
-  );
 }
 
 /** The instruction digest of the Session's latest checkpoint. */

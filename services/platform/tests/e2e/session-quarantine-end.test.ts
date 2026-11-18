@@ -4,20 +4,22 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import {
-  resolveActiveCaseActor,
-  resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
 import { recoverInterruptedSessionInTransaction } from "../../src/actors/actor-journal/transactions";
 import { discardHarnessTurnContinuation } from "../../src/actors/agent-session-continuation";
 import { failSessionTurnStream } from "../../src/actors/agent-session-turn-stream";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import type { SessionDO } from "../../src/actors/agent-session";
 import { deriveCodeModeLeaseBinding } from "../../src/actors/code-mode-execution-record";
 import { OrganisationDO } from "../../src/actors/organisation";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { newRequestId, type CaseId, type SessionId } from "../../src/ids";
-import { preparePortalChatJourney } from "./chat-journey-support";
+import {
+  preparePortalChatJourney,
+  assignmentStates,
+  caseOf,
+  dispatchCommand,
+  leaveOldAssignment,
+  sessionOf,
+} from "./chat-journey-support";
 import {
   organisationActor,
   readLifecycleKind,
@@ -80,8 +82,6 @@ it(
 const ENDED_KEY = "session_quarantine_end_clean";
 const KEPT_KEY = "session_quarantine_end_effect";
 const INSTRUCTION = "Count the open supplier orders.";
-/** Older than the 30-minute abandon time. */
-const OLD_START_AGE_MS = 31 * 60_000;
 
 /** Each model request waits while the phase is `held`. */
 type Model = {
@@ -498,98 +498,6 @@ function quarantineWithUnknownEffect(
     Date.now(),
   );
   quarantineAsOlderRelease(_actor, state);
-}
-
-/**
- * What a Case of the older release holds: no wakeup, no assignment time, and
- * a start older than the abandon time.
- */
-async function leaveOldAssignment(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  await state.storage.deleteAlarm();
-  const rows = state.storage.sql
-    .exec<{ assignment_id: string; lifecycle_json: string }>(
-      "SELECT assignment_id, lifecycle_json FROM case_assignment",
-    )
-    .toArray();
-  for (const row of rows) {
-    const lifecycle: unknown = JSON.parse(row.lifecycle_json);
-    if (!isRecord(lifecycle) || !isRecord(lifecycle.start))
-      throw new Error("case_assignment_start_missing");
-    const acceptedAt = Number(lifecycle.start.acceptedAt) - OLD_START_AGE_MS;
-    lifecycle.start.acceptedAt =
-      typeof lifecycle.start.acceptedAt === "string"
-        ? String(acceptedAt)
-        : acceptedAt;
-    state.storage.sql.exec(
-      "UPDATE case_assignment SET lifecycle_json = ?, assigned_at = NULL WHERE assignment_id = ?",
-      JSON.stringify(lifecycle),
-      row.assignment_id,
-    );
-  }
-}
-
-function dispatchCommand(
-  session: IssuedControlSession,
-  key: string,
-  instruction: string,
-): Promise<Response> {
-  return exports.default.fetch(
-    `https://localhost/v1/control/organisations/${ORGANISATION_ID}/cases/commands`,
-    {
-      method: "POST",
-      headers: {
-        origin: "https://localhost",
-        "content-type": "application/json",
-        "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
-      },
-      body: JSON.stringify({ instruction }),
-    },
-  );
-}
-
-async function sessionOf(
-  sessionId: Parameters<typeof resolveActiveSessionActor>[0]["sessionId"],
-): Promise<DurableObjectStub<SessionDO>> {
-  const resolved = await resolveActiveSessionActor({
-    env,
-    namespace: env.SESSION,
-    organisationId: ORGANISATION_ID,
-    sessionId,
-    now: Date.now(),
-  });
-  if (!resolved.ok) throw new Error(resolved.error.code);
-  return resolved.value;
-}
-
-async function caseOf(
-  caseId: Parameters<typeof resolveActiveCaseActor>[0]["caseId"],
-) {
-  const resolved = await resolveActiveCaseActor({
-    env,
-    namespace: env.CASE,
-    organisationId: ORGANISATION_ID,
-    caseId,
-    now: Date.now(),
-  });
-  if (!resolved.ok) throw new Error(resolved.error.code);
-  return resolved.value;
-}
-
-async function assignmentStates(
-  caseActor: Awaited<ReturnType<typeof caseOf>>,
-): Promise<string[]> {
-  const snapshot = await caseActor.inspect();
-  if (!snapshot.ok) throw new Error(snapshot.error.code);
-  return snapshot.value.assignmentLifecycles.map((lifecycle) =>
-    lifecycle.kind === "settled"
-      ? `settled:${lifecycle.disposition.kind}`
-      : lifecycle.kind,
-  );
 }
 
 /** The old active assignments that the admin census route counts. */

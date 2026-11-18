@@ -1,15 +1,13 @@
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect, it } from "vitest";
 import { isRecord, sha256Hex } from "@seams/std";
 import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import { commerceClient, commerceWorkspace } from "./commerce-support";
 import {
-  commerceClient,
-  commerceWorkspace,
-  commerceHeaders,
-} from "./commerce-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+  attachSharedAccountNativeOrganisation,
+  nativeAccountRequest,
+} from "./shared-account-platform-fixture";
 import failed from "../fixtures/bakery-persistent-failure.json";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 
@@ -58,8 +56,8 @@ async function artifactJourney(): Promise<void> {
     name: snapshot.name,
     document: JSON.parse(snapshot.file),
   };
-  expect((await write(path, owner.session, body)).status).toBe(409);
-  const prepared = await write(stage, owner.session, body);
+  expect((await nativeAccountRequest(owner, path, body)).status).toBe(409);
+  const prepared = await nativeAccountRequest(owner, stage, body);
   expect(prepared.status, await prepared.clone().text()).toBe(200);
   const missing = await prepared.json();
   if (!isRecord(missing) || !Array.isArray(missing.missing))
@@ -68,33 +66,46 @@ async function artifactJourney(): Promise<void> {
   const first = failed.artifacts[0];
   if (first === undefined) throw new Error("Fixture contains no physics");
   const firstStage = `${stage}/artifacts/${first.digest}`;
-  expect((await read(stage, reviewer.session)).status).toBe(404);
-  expect((await read(stage, foreign.session)).status).toBe(404);
+  expect((await nativeAccountRequest(reviewer, stage, null)).status).toBe(404);
+  expect((await nativeAccountRequest(foreign, stage, null)).status).toBe(404);
   expect(
-    (await write(firstStage, owner.session, { content: first.content + " " }))
-      .status,
+    (
+      await nativeAccountRequest(owner, firstStage, {
+        content: first.content + " ",
+      })
+    ).status,
   ).toBe(409);
   expect(
-    (await write(firstStage, owner.session, { content: first.content })).status,
+    (await nativeAccountRequest(owner, firstStage, { content: first.content }))
+      .status,
   ).toBe(200);
   expect(
-    (await read(`${path}/${id}/artifacts/${first.digest}`, reviewer.session))
-      .status,
+    (
+      await nativeAccountRequest(
+        reviewer,
+        `${path}/${id}/artifacts/${first.digest}`,
+        null,
+      )
+    ).status,
   ).toBe(404);
-  expect((await read(firstStage, reviewer.session)).status).toBe(404);
-  expect((await write(path, owner.session, body)).status).toBe(409);
-  expect((await read(`${path}/${id}`, owner.session)).status).toBe(404);
+  expect((await nativeAccountRequest(reviewer, firstStage, null)).status).toBe(
+    404,
+  );
+  expect((await nativeAccountRequest(owner, path, body)).status).toBe(409);
+  expect(
+    (await nativeAccountRequest(owner, `${path}/${id}`, null)).status,
+  ).toBe(404);
   // A replacement uploader recovers the exact preparation after losing its reply.
-  const resumed = await write(stage, owner.session, body);
+  const resumed = await nativeAccountRequest(owner, stage, body);
   const remaining = await resumed.json();
   if (!isRecord(remaining) || !Array.isArray(remaining.missing))
     throw new Error("Missing resumed index");
   expect(remaining.missing).not.toContain(first.digest);
   for (const artifact of failed.artifacts) {
     if (!remaining.missing.includes(artifact.digest)) continue;
-    const uploaded = await write(
+    const uploaded = await nativeAccountRequest(
+      owner,
       `${stage}/artifacts/${artifact.digest}`,
-      owner.session,
       { content: artifact.content },
     );
     expect(uploaded.status, await uploaded.clone().text()).toBe(200);
@@ -105,24 +116,27 @@ async function artifactJourney(): Promise<void> {
     )
     .bind(Date.now(), organisation, owner.identity.userId)
     .run();
-  expect((await write(path, owner.session, body)).status).toBe(404);
-  expect((await read(firstStage, owner.session)).status).toBe(404);
+  expect((await nativeAccountRequest(owner, path, body)).status).toBe(404);
+  expect((await nativeAccountRequest(owner, firstStage, null)).status).toBe(
+    404,
+  );
   await fixtureDatabase()
     .prepare(
       "UPDATE service_role_grant SET status = 'active', revoked_at = NULL WHERE organisation_id = ? AND user_id = ?",
     )
     .bind(organisation, owner.identity.userId)
     .run();
-  const published = await write(path, owner.session, body);
+  const published = await nativeAccountRequest(owner, path, body);
   expect(published.status, await published.clone().text()).toBe(201);
   // Exact retry finds the immutable publication after its response is lost.
-  expect((await write(path, owner.session, body)).status).toBe(200);
-  const saved = await read(`${path}/${id}`, reviewer.session);
+  expect((await nativeAccountRequest(owner, path, body)).status).toBe(200);
+  const saved = await nativeAccountRequest(reviewer, `${path}/${id}`, null);
   expect(await saved.text()).toBe(snapshot.content);
   for (const artifact of failed.artifacts) {
-    const response = await read(
+    const response = await nativeAccountRequest(
+      reviewer,
       `${path}/${id}/artifacts/${artifact.digest}`,
-      reviewer.session,
+      null,
     );
     expect(response.status).toBe(200);
     const received = await response.json();
@@ -140,19 +154,34 @@ async function artifactJourney(): Promise<void> {
     customMetadata: publishedObject.customMetadata,
   });
   expect(
-    (await read(`${path}/${id}/artifacts/${first.digest}`, reviewer.session))
-      .status,
+    (
+      await nativeAccountRequest(
+        reviewer,
+        `${path}/${id}/artifacts/${first.digest}`,
+        null,
+      )
+    ).status,
   ).toBe(422);
   await env.ARCHIVE.put(publishedKey, snapshot.content, {
     customMetadata: publishedObject.customMetadata,
   });
   expect(
-    (await read(`${path}/${id}/artifacts/${first.digest}`, reviewer.session))
-      .status,
+    (
+      await nativeAccountRequest(
+        reviewer,
+        `${path}/${id}/artifacts/${first.digest}`,
+        null,
+      )
+    ).status,
   ).toBe(200);
   expect(
-    (await read(`${path}/${id}/artifacts/${first.digest}`, foreign.session))
-      .status,
+    (
+      await nativeAccountRequest(
+        foreign,
+        `${path}/${id}/artifacts/${first.digest}`,
+        null,
+      )
+    ).status,
   ).toBe(404);
   await fixtureDatabase()
     .prepare(
@@ -161,28 +190,21 @@ async function artifactJourney(): Promise<void> {
     .bind(Date.now(), organisation, reviewer.identity.userId)
     .run();
   expect(
-    (await read(`${path}/${id}/artifacts/${first.digest}`, reviewer.session))
-      .status,
+    (
+      await nativeAccountRequest(
+        reviewer,
+        `${path}/${id}/artifacts/${first.digest}`,
+        null,
+      )
+    ).status,
   ).toBe(404);
-  expect((await read(`${path}/${id}`, reviewer.session)).status).toBe(404);
-  const catalogue = await (await read(path, owner.session)).json();
+  expect(
+    (await nativeAccountRequest(reviewer, `${path}/${id}`, null)).status,
+  ).toBe(404);
+  const catalogue = await (
+    await nativeAccountRequest(owner, path, null)
+  ).json();
   if (!isRecord(catalogue) || !Array.isArray(catalogue.snapshots))
     throw new Error("Missing catalogue");
   expect(catalogue.snapshots.length).toBe(1);
-}
-function read(path: string, session: IssuedControlSession): Promise<Response> {
-  return exports.default.fetch(`https://localhost${path}`, {
-    headers: commerceHeaders(session),
-  });
-}
-function write(
-  path: string,
-  session: IssuedControlSession,
-  body: unknown,
-): Promise<Response> {
-  return exports.default.fetch(`https://localhost${path}`, {
-    method: "POST",
-    headers: commerceHeaders(session),
-    body: JSON.stringify(body),
-  });
 }

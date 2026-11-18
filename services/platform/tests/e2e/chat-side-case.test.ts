@@ -12,6 +12,14 @@ import { isRecord } from "@seams/std";
 
 import { saveConversation } from "../../src/chat/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import {
+  answers,
+  ask,
+  cardId,
+  currentRequest,
+  lastCalledTool,
+} from "./chat-permission-support";
+import { finished } from "./chat-journey-support";
 import { commerceHeaders } from "./commerce-support";
 import {
   emptyConversation,
@@ -19,7 +27,6 @@ import {
   post,
   postJson,
   storedConversation,
-  workKind,
   type Member,
 } from "./memory-support";
 import { network } from "./network";
@@ -133,7 +140,7 @@ async function sideCaseJourney({ task }: TestContext): Promise<void> {
 
   // 1. The agent proposes a side Case while it answers; nothing starts.
   await ask(owner, paths.chat, parentId, route.model, QUESTION, "first");
-  await waitReady(owner, parentId);
+  await finished(owner, parentId);
   expect(await answers(owner, parentId)).toEqual([PARENT_ANSWER]);
   expect(recorded.proposalOutputs).toHaveLength(1);
   expect(recorded.proposalOutputs[0]).toContain("card");
@@ -158,7 +165,7 @@ async function sideCaseJourney({ task }: TestContext): Promise<void> {
   expect(again.status, JSON.stringify(again.body)).toBe(200);
   const childId = conversationIdOf(started.body);
   expect(conversationIdOf(again.body)).toBe(childId);
-  await waitReady(owner, childId);
+  await finished(owner, childId);
   expect(await answers(owner, childId)).toEqual([CHILD_ANSWER]);
   expect(recorded.childRequests).toHaveLength(1);
   // The side Case holds no turn of its source chat: one system message and
@@ -205,7 +212,7 @@ async function sideCaseJourney({ task }: TestContext): Promise<void> {
 
   // 4. A chat keeps three proposals that wait; the agent learns of the fourth.
   await ask(owner, paths.chat, parentId, route.model, QUESTION_TWO, "second");
-  await waitReady(owner, parentId);
+  await finished(owner, parentId);
   expect(await answers(owner, parentId)).toEqual([PARENT_ANSWER, LATER_ANSWER]);
   expect(recorded.proposalOutputs).toHaveLength(5);
   expect(recorded.proposalOutputs.slice(1, 4)).toEqual([
@@ -237,7 +244,7 @@ async function sideCaseJourney({ task }: TestContext): Promise<void> {
   await post(owner, paths.chat, hereCommand);
   const retried = await postJson(owner, paths.chat, hereCommand);
   expect(retried.status, JSON.stringify(retried.body)).toBe(200);
-  await waitReady(owner, parentId);
+  await finished(owner, parentId);
   const recovered = await readChat(owner, paths.chat, parentId);
   expect(recovered.conversation.timeline).toEqual(
     expect.arrayContaining([
@@ -419,92 +426,10 @@ function proposalCallsAfter(
   return calls;
 }
 
-/**
- * The person's request of this turn, as Pantry quotes it in the latest user
- * message, without the organisational context that follows it.
- */
-function currentRequest(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (isRecord(message) && message.role === "user") {
-      const text = JSON.stringify(message.content);
-      const at = text.indexOf("Current user request");
-      if (at < 0) return "";
-      const end = text.indexOf("Accepted organizational context", at);
-      return text.slice(at, end < 0 ? undefined : end);
-    }
-  }
-  return "";
-}
-
 function messageRoles(body: Record<string, unknown>): unknown[] {
   const messages = Array.isArray(body.messages) ? body.messages : [];
   return messages.map((message: unknown) =>
     isRecord(message) ? message.role : null,
-  );
-}
-
-/** The tool of the latest call, when the latest message is its output. */
-function lastCalledTool(body: Record<string, unknown>): string | null {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last: unknown = messages.at(-1);
-  if (!isRecord(last) || last.role !== "tool") return null;
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (
-      isRecord(message) &&
-      message.role === "assistant" &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const call: unknown = message.tool_calls.at(-1);
-      return isRecord(call) &&
-        isRecord(call.function) &&
-        typeof call.function.name === "string"
-        ? call.function.name
-        : null;
-    }
-  }
-  return null;
-}
-
-async function ask(
-  person: Member,
-  chatPath: string,
-  conversationId: ConversationId,
-  model: string,
-  text: string,
-  label: string,
-): Promise<void> {
-  const started = await post(person, chatPath, {
-    kind: "message",
-    conversationId,
-    requestId: `request_${conversationId}_${label}`,
-    model,
-    text,
-    surfaceContext: null,
-    browserContext: { kind: "unavailable" },
-  });
-  expect(started.status, await started.clone().text()).toBe(200);
-}
-
-async function waitReady(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  await expect
-    .poll(workKind.bind(null, person, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
-/** The assistant answers that the chat shows, in order. */
-async function answers(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<string[]> {
-  const stored = await storedConversation(person, conversationId);
-  return (stored?.conversation.timeline ?? []).flatMap((event) =>
-    event.kind === "assistant" && "text" in event ? [event.text] : [],
   );
 }
 
@@ -560,16 +485,6 @@ function hasId(id: string, row: Record<string, unknown>): boolean {
 
 function cardTitle(card: Record<string, unknown>): unknown {
   return card.title;
-}
-
-function cardId(
-  cards: readonly Record<string, unknown>[],
-  title: string,
-): string {
-  const card = cards.find((candidate) => candidate.title === title);
-  if (typeof card?.proposalId !== "string")
-    throw new Error(`Card missing: ${title}`);
-  return card.proposalId;
 }
 
 function stateOf(

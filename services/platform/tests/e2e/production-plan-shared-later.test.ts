@@ -4,6 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { newConversationId, type ConversationId } from "@seams/control-api";
 import { isRecord } from "@seams/std";
 
+import { lastCalledTool } from "./chat-permission-support";
 import { connectCommerceFixture } from "./commerce-support";
 import { openSocket } from "./hibernatable-socket-support";
 import {
@@ -272,29 +273,6 @@ function readPlan(id: string): Response | Promise<Response> {
     { locationId: LOCATION },
     `call_${id}`,
   );
-}
-
-/** The tool of the latest call, when the latest message is its output. */
-function lastCalledTool(body: Record<string, unknown>): string | null {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last: unknown = messages.at(-1);
-  if (!isRecord(last) || last.role !== "tool") return null;
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (
-      isRecord(message) &&
-      message.role === "assistant" &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const call: unknown = message.tool_calls.at(-1);
-      return isRecord(call) &&
-        isRecord(call.function) &&
-        typeof call.function.name === "string"
-        ? call.function.name
-        : null;
-    }
-  }
-  return null;
 }
 
 async function pausedRequest(

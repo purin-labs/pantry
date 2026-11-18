@@ -2,7 +2,10 @@ import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { isRecord } from "@seams/std";
 
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
+import {
+  listPlacementActorRegistryEntries,
+  type ActorRegistryEntry,
+} from "../../src/actors/actor-registry";
 import { connectorActorStub } from "../../src/actors/actor-router";
 import { ORGANISATION_ID } from "./slack-journey-support";
 
@@ -38,7 +41,10 @@ export function readFollowUps(
  * The clock of the journey: the follow-up's time is now. A follow-up is due
  * at the time of its message, so both move. The payload keeps its JSON form.
  */
-export function makeFollowUpsDue(_actor: unknown, ctx: DurableObjectState): void {
+export function makeFollowUpsDue(
+  _actor: unknown,
+  ctx: DurableObjectState,
+): void {
   const now = Date.now();
   const rows = ctx.storage.sql
     .exec<{ event_id: string; payload: string }>(
@@ -57,14 +63,53 @@ export function makeFollowUpsDue(_actor: unknown, ctx: DurableObjectState): void
   }
 }
 
-export async function connectorOf(connectorId: string) {
+/** The steering replies that the Connector holds for a running turn. */
+export function readSteeredReplies(
+  _actor: unknown,
+  ctx: DurableObjectState,
+): string[] {
+  return ctx.storage.sql
+    .exec<{ event_id: string }>(
+      "SELECT event_id FROM connector_case_steering ORDER BY event_id",
+    )
+    .toArray()
+    .map(function eventId(row) {
+      return row.event_id;
+    });
+}
+
+/** How the Connector settled the work of one Slack event, if it did. */
+export function readReceipt(
+  eventId: string,
+  _actor: unknown,
+  ctx: DurableObjectState,
+): string | null {
+  return (
+    ctx.storage.sql
+      .exec<{ outcome: string }>(
+        "SELECT outcome FROM connector_case_work_receipt WHERE event_id = ?",
+        eventId,
+      )
+      .toArray()[0]?.outcome ?? null
+  );
+}
+
+/** The Actor registry entries of the journey's Organisation. */
+export async function registryEntries(): Promise<
+  readonly ActorRegistryEntry[]
+> {
   const entries = await listPlacementActorRegistryEntries({
     db: fixtureDatabase(),
     organisationId: ORGANISATION_ID,
     placementEpoch: 1,
   });
   if (!entries.ok) throw new Error(entries.error.code);
-  const entry = entries.value.find(function isConnector(candidate) {
+  return entries.value;
+}
+
+/** The Connector Actor with this logical id. */
+export async function connectorOf(connectorId: string) {
+  const entry = (await registryEntries()).find(function isConnector(candidate) {
     return (
       candidate.identity.objectKind === "connector" &&
       candidate.identity.logicalObjectId === connectorId

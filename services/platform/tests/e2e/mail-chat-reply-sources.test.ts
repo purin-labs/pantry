@@ -9,16 +9,8 @@ import {
   parseMailReplySources,
   type MemoryCommand,
 } from "@seams/control-api";
-import {
-  assertNever,
-  decodeBase64,
-  encodeBase64Url,
-  isRecord,
-} from "@seams/std";
-import {
-  requireActiveOrganisationActor,
-  resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+import { assertNever, encodeBase64Url, isRecord } from "@seams/std";
+import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   readEmailProposalChatContext,
   readEmailProposalChatSources,
@@ -37,7 +29,6 @@ import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
 } from "../../src/data/capability-policy";
-import { gmailConnectorId } from "../../src/data/email-mailbox";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {
   parseIntegrationAccountId,
@@ -70,6 +61,9 @@ import {
   connectGmailMailbox,
   sendAs,
   setUpMailbox,
+  draftBody,
+  header,
+  mailboxConnector,
 } from "./gmail-mailbox-support";
 import {
   offeredToolNames,
@@ -128,10 +122,6 @@ it(
   { timeout: 240_000 },
   chatReplySourcesJourney,
 );
-
-type Connector = DurableObjectStub<
-  import("../../src/actors/connector").ConnectorDO
->;
 
 /**
  * The owner asks a Portal chat on the Pi test route to check an order and
@@ -1008,31 +998,6 @@ class CustomerMailbox {
   }
 }
 
-function decodeRaw(encoded: string): string {
-  return new TextDecoder().decode(
-    decodeBase64(encoded.replaceAll("-", "+").replaceAll("_", "/")) ??
-      new Uint8Array(),
-  );
-}
-
-function header(encoded: string, name: string): string | null {
-  const head = decodeRaw(encoded).split("\r\n\r\n")[0] ?? "";
-  return (
-    head
-      .split("\r\n")
-      .find((line) => line.startsWith(`${name}: `))
-      ?.slice(name.length + 2) ?? null
-  );
-}
-
-function draftBody(encoded: string): string {
-  return new TextDecoder().decode(
-    decodeBase64(
-      (decodeRaw(encoded).split("\r\n\r\n")[1] ?? "").replaceAll(/\s+/gu, ""),
-    ) ?? new Uint8Array(),
-  );
-}
-
 /** Every reply that a chat drafted, as the Inbox projection names it. */
 async function chatProposalIds(
   organisationId: OrganisationId,
@@ -1377,21 +1342,4 @@ async function approveMailboxModel(
       now,
     )
     .run();
-}
-
-async function mailboxConnector(
-  organisationId: OrganisationId,
-  account: IntegrationAccountId,
-): Promise<Connector> {
-  const connectorId = gmailConnectorId(account);
-  if (!connectorId.ok) throw new Error("Invalid connector");
-  const connector = await resolveActiveConnectorActor({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    connectorId: connectorId.value,
-    now: Date.now(),
-  });
-  if (!connector.ok) throw new Error(connector.error.code);
-  return connector.value;
 }

@@ -4,7 +4,7 @@ import {
   organisationDatabase,
   publishGlobalOrganisation,
 } from "./organisation-database";
-import { env } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect } from "vitest";
 
@@ -43,6 +43,7 @@ import {
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { isRecord } from "@seams/std";
+import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 export const SLACK_SIGNING_SECRET = "slack-signing-e2e-secret";
 export const ORGANISATION_ID = requiredOrganisationId(
   "organisation_e2e_slack_actor",
@@ -880,6 +881,37 @@ async function respondToModel(
   }
 }
 
+/** A model that answers each request, and records its Session header. */
+export function replyingModel(): {
+  readonly handler: ReturnType<typeof http.post>;
+  readonly sessionIds: (string | null)[];
+  readonly requests: number;
+} {
+  const sessionIds: (string | null)[] = [];
+  return {
+    sessionIds,
+    get requests() {
+      return sessionIds.length;
+    },
+    handler: http.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      replyToModel.bind(null, sessionIds),
+    ),
+  };
+}
+
+async function replyToModel(
+  sessionIds: (string | null)[],
+  { request }: Parameters<HttpResponseResolver>[0],
+): Promise<Response> {
+  await request.json();
+  sessionIds.push(request.headers.get("x-session-id"));
+  return openRouterText(
+    `Reply ${String(sessionIds.length)}.`,
+    `chatcmpl_55e_${String(sessionIds.length)}`,
+  );
+}
+
 export function discoveryModelSimulator(): {
   readonly handler: ReturnType<typeof http.post>;
   readonly requests: Record<string, unknown>[];
@@ -990,6 +1022,28 @@ export function requireLastToolOutput(body: Record<string, unknown>): string {
   throw new Error("OpenRouter tool output missing");
 }
 
+/** A user message of a model request that holds this text. */
+export function userMessageContaining(text: string, message: unknown): boolean {
+  return (
+    isRecord(message) &&
+    message.role === "user" &&
+    JSON.stringify(message.content).includes(text)
+  );
+}
+
+/** A user message that is this text alone, as history holds a message. */
+export function userMessageIs(text: string, message: unknown): boolean {
+  if (!isRecord(message) || message.role !== "user") return false;
+  const content = message.content;
+  return (
+    content === text ||
+    (Array.isArray(content) &&
+      content.length === 1 &&
+      isRecord(content[0]) &&
+      content[0].text === text)
+  );
+}
+
 /**
  * A streamed answer is one message in the thread: the start creates it, and
  * each append and the stop add their text to it.
@@ -1015,11 +1069,6 @@ function streamToSlack(
   return { ok: true, ts: message.ts };
 }
 
-/**
- * A post as the thread shows it. Pantry posts a model answer as Markdown
- * (`markdown_text`) and a notice as plain text (`text`); the record holds the
- * shown text as `text` either way.
- */
 /** Whether a Slack message is a commerce card that waits for its decision. */
 export function isApprovalCard(message: Record<string, string>): boolean {
   return (
@@ -1046,6 +1095,11 @@ export function cardButtons(
   );
 }
 
+/**
+ * A post as the thread shows it. Pantry posts a model answer as Markdown
+ * (`markdown_text`) and a notice as plain text (`text`); the record holds the
+ * shown text as `text` either way.
+ */
 export function shownSlackPost(
   body: Record<string, string>,
 ): Record<string, string> {
@@ -1138,6 +1192,29 @@ export function slackSimulator(
 
 export function countMessages(messages: readonly unknown[]): number {
   return messages.length;
+}
+
+/**
+ * A Slack API that accepts the bot token and records the time of each
+ * `chat.postMessage`.
+ */
+export async function respondToSlack(
+  posts: number[],
+  { params, request }: Parameters<HttpResponseResolver>[0],
+): Promise<Response> {
+  if (request.headers.get("authorization") !== `Bearer ${SLACK_BOT_TOKEN}`)
+    return HttpResponse.json({ ok: false, error: "invalid_auth" });
+  const body: unknown = slackPostFields(await request.json());
+  if (!isStringRecord(body)) throw new Error("Slack request body is invalid");
+  if (params.method === "chat.postMessage") {
+    posts.push(Date.now());
+    return HttpResponse.json({
+      ok: true,
+      channel: body.channel,
+      ts: "1787500001.000001",
+    });
+  }
+  return HttpResponse.json({ ok: true });
 }
 
 /** The deliveries that settled on one Slack message. */
@@ -1403,6 +1480,82 @@ export function readSlackMessageText(message: Record<string, string>): string {
   return message.text ?? "";
 }
 
+/** The texts of the posts in this thread of the journey's channel. */
+export function threadAnswers(
+  messages: readonly Record<string, string>[],
+  threadTs: string,
+): string[] {
+  return messages
+    .filter(
+      (message) =>
+        message.channel === CHANNEL_ID && message.thread_ts === threadTs,
+    )
+    .map(readSlackMessageText);
+}
+
+/** The thread and the text of a Slack post. */
+export function threadAndText(post: Record<string, string>): {
+  readonly thread: string | undefined;
+  readonly text: string | undefined;
+} {
+  return { thread: post.thread_ts, text: post.text };
+}
+
+/** Slack sends a mention that starts the thread at `ts`. */
+export async function postMention(
+  eventId: string,
+  ts: string,
+  question: string,
+): Promise<void> {
+  const response = await exports.default.fetch(
+    await signedSlackRequest(
+      slackEnvelope({
+        eventType: "app_mention",
+        eventId,
+        messageTs: ts,
+        threadTs: ts,
+        text: `<@U0SATYR> ${question}`,
+      }),
+    ),
+  );
+  expect(response.status).toBe(200);
+}
+
+/**
+ * Slack sends a message in the thread of `ROOT_TS`: a mention when it starts
+ * the thread, a reply after that.
+ */
+export async function sendSlack(
+  eventId: string,
+  messageTs: string,
+  text: string,
+): Promise<void> {
+  const response = await exports.default.fetch(
+    await signedSlackRequest(
+      slackEnvelope({
+        eventType: messageTs === ROOT_TS ? "app_mention" : "message",
+        eventId,
+        messageTs,
+        threadTs: ROOT_TS,
+        text,
+      }),
+    ),
+  );
+  expect(response.status).toBe(200);
+}
+
+/** Slack sends the event, and the ingress gives it to a Case. */
+export async function acceptSlack(
+  envelope: Parameters<typeof slackEnvelope>[0],
+): Promise<void> {
+  const response = await exports.default.fetch(
+    await signedSlackRequest(slackEnvelope(envelope)),
+  );
+  expect(response.status).toBe(200);
+  const body: unknown = await response.json();
+  expect(isRecord(body) ? body.durableMode : null).toBe("case_accepted");
+}
+
 export async function signedSlackRequest(
   envelope: Record<string, unknown>,
 ): Promise<Request> {
@@ -1517,4 +1670,3 @@ export function receiptIdentity(receipt: ConnectorDeliveryReceipt) {
     deliveredAt: receipt.deliveredAt,
   };
 }
-import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

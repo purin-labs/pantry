@@ -62,6 +62,7 @@ import {
   readCaseExecution,
   readCaseExecutionDetail,
   readCaseTimeline,
+  storedContent,
 } from "./case-execution-support";
 import {
   attachSharedAccountNativeOrganisation,
@@ -273,6 +274,8 @@ import {
 } from "../../src/mail/reply-target";
 import type { CaseAssignment } from "@seams/contracts";
 import type { CaseGmailReplyProposal } from "../../src/actors/case/types";
+import { decodeRaw } from "./gmail-mailbox-support";
+import { controlFetch, modelToolResults } from "./chat-journey-support";
 
 async function prepareMailBudgetJourney() {
   const owner = await client("mail-budget-pi-owner");
@@ -802,7 +805,7 @@ async function transientPiGoalJourney(context: TestContext): Promise<void> {
       .first<{ name: string }>();
     if (row === null) throw new Error("Missing transient Session");
     const session = env.SESSION.getByName(row.name);
-    const stored = await runInDurableObject(session, dumpAssistantStorage);
+    const stored = await runInDurableObject(session, storedContent);
     expect(stored).not.toContain("TRANSIENT_GOAL_PRIVATE_CONTENT");
     if (phase === "limit") {
       expect(await runInDurableObject(session, loseTransientGoalReceipt)).toBe(
@@ -1335,10 +1338,7 @@ async function verifyMailboxPlacement(
       sends: 0,
       edits: 0,
     });
-    const retained = await runInDurableObject(
-      recovered.value,
-      dumpAssistantStorage,
-    );
+    const retained = await runInDurableObject(recovered.value, storedContent);
     expect(retained).not.toContain("DRAFT_PRIVATE_REPLY");
     Object.assign(input.context.task.meta, {
       mailboxPlacement: {
@@ -2073,10 +2073,7 @@ async function verifyProposalPlacement(
       drafts: 1,
       calls: 4,
     });
-    const retained = await runInDurableObject(
-      recovered.value,
-      dumpAssistantStorage,
-    );
+    const retained = await runInDurableObject(recovered.value, storedContent);
     expect(retained).not.toContain("Edited supplier reply after exact review.");
     expect(retained).not.toContain("DRAFT_PRIVATE_REPLY");
     expect(retained).not.toContain("CORRECTED_PRIVATE_REPLY");
@@ -4157,7 +4154,7 @@ async function runDraftOnlyJourney(
     .all<{ kind: string; name: string }>();
   for (const row of placements.results) {
     const actor = draftFixtureActor(row);
-    const stored = await runInDurableObject(actor, dumpAssistantStorage);
+    const stored = await runInDurableObject(actor, storedContent);
     expect(stored).not.toContain("DRAFT_PRIVATE_REPLY");
     expect(stored).not.toContain("Private body");
   }
@@ -4389,7 +4386,7 @@ async function acceptPurchasingCorrection(
   console.log("MAIL_CORRECTION_STEP: delivery reconciled");
   expect(delivery.sends).toBe(1);
   expect(delivery.deletes).toBe(1);
-  const stored = await runInDurableObject(connector, dumpAssistantStorage);
+  const stored = await runInDurableObject(connector, storedContent);
   expect(stored).toContain("directory_supplier_packaging");
   expect(stored).not.toContain("CORRECTED_PRIVATE_REPLY");
   expect(stored).not.toContain("Packaging supplier");
@@ -8379,27 +8376,6 @@ async function organizationView(
   if (view === null) throw new Error("Invalid organization view");
   return view;
 }
-function controlFetch(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-  path: string,
-  body: unknown,
-): Promise<Response> {
-  return exports.default.fetch(
-    `https://localhost/v1/control/organisations/${organisationId}/${path}`,
-    {
-      method: body === null ? "GET" : "POST",
-      headers: {
-        "content-type": "application/json",
-        origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
-      },
-      body: body === null ? null : JSON.stringify(body),
-    },
-  );
-}
-
 it(
   "proposes a rule through transient Inbox assistance, fences processing revocation and leaves no content or effects in durable state",
   assistantJourney,
@@ -8618,7 +8594,7 @@ async function assistantJourney(context: TestContext): Promise<void> {
       row.kind === "case"
         ? env.CASE.getByName(row.name)
         : env.SESSION.getByName(row.name);
-    const stored = await runInDurableObject(actor, dumpAssistantStorage);
+    const stored = await runInDurableObject(actor, storedContent);
     expect(stored).not.toContain("ASSISTANT_PRIVATE_REQUEST");
     expect(stored).not.toContain("ASSISTANT_GENERATED_CRITERIA");
     expect(stored).not.toContain("ASSISTANT_GENERATED_EXPLANATION");
@@ -8748,25 +8724,6 @@ function assistantSend(
     },
   );
 }
-async function dumpAssistantStorage(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<string> {
-  const tables = state.storage.sql
-    .exec<{ name: string }>(
-      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT GLOB '_cf_*'",
-    )
-    .toArray();
-  const rows: unknown[] = [];
-  for (const table of tables)
-    rows.push({
-      table: table.name,
-      rows: state.storage.sql.exec(`SELECT * FROM "${table.name}"`).toArray(),
-    });
-  const values = await state.storage.list();
-  return JSON.stringify({ tables: rows, values: [...values.entries()] });
-}
-
 function seedAssistantDecision(
   input: Readonly<{
     organisationId: OrganisationId;
@@ -10338,13 +10295,6 @@ async function readCaseContextCollectionSendAttempt(
 function isMessageIdHeader(line: string): boolean {
   return line.startsWith("Message-ID: ");
 }
-function decodeCaseContextCollectionRaw(encoded: string): string {
-  return new TextDecoder().decode(
-    decodeBase64(encoded.replaceAll("-", "+").replaceAll("_", "/")) ??
-      new Uint8Array(),
-  );
-}
-
 async function caseContextCollectionConnectionProbe({
   request,
 }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
@@ -10941,7 +10891,7 @@ async function verifySupplierReplyCorrection(
   // reviewed edit that follows is saved as the next version. Neither is
   // recorded as a correction, because the words under it cannot be attributed.
   const [draftId, encoded] = [...state.drafts][0] ?? ["", ""];
-  const [headers] = decodeCaseContextCollectionRaw(encoded).split("\r\n\r\n");
+  const [headers] = decodeRaw(encoded).split("\r\n\r\n");
   state.drafts.set(
     draftId,
     encodeBase64Url(
@@ -13024,9 +12974,7 @@ async function verifyDraftsAcrossMailboxSettings(
     provider_message_id: delivered.id,
     version: 2,
   });
-  expect(decodeCaseContextCollectionRaw(delivered.raw)).toContain(
-    "To: supplier@example.test\r\n",
-  );
+  expect(decodeRaw(delivered.raw)).toContain("To: supplier@example.test\r\n");
   expect(caseContextCollectionDraftBody(delivered.raw)).toBe(
     SETTINGS_EDITED_REPLY,
   );
@@ -15741,7 +15689,7 @@ class CaseContextCollectionReplyProvider {
       const query = new URL(request.url).searchParams.get("q");
       const drafts: { id: string }[] = [];
       for (const [id, encoded] of this.drafts) {
-        const messageId = decodeCaseContextCollectionRaw(encoded)
+        const messageId = decodeRaw(encoded)
           .split("\r\n")
           .find(isMessageIdHeader)
           ?.slice("Message-ID: ".length);
@@ -15874,7 +15822,7 @@ class CaseContextCollectionReplyProvider {
       ) {
         // Gmail accepts the message, and its answer never arrives.
         this.acceptedRfcMessageId =
-          decodeCaseContextCollectionRaw(raw.raw)
+          decodeRaw(raw.raw)
             .split("\r\n")
             .find(isMessageIdHeader)
             ?.slice("Message-ID: ".length) ?? null;
@@ -15885,7 +15833,7 @@ class CaseContextCollectionReplyProvider {
         if (typeof raw.raw !== "string")
           throw new Error("Missing accepted send body");
         this.acceptedRfcMessageId =
-          decodeCaseContextCollectionRaw(raw.raw)
+          decodeRaw(raw.raw)
             .split("\r\n")
             .find(isMessageIdHeader)
             ?.slice("Message-ID: ".length) ?? null;
@@ -15956,20 +15904,9 @@ class CaseContextCollectionReplyProvider {
 function caseContextCollectionDraftBody(encoded: string): string {
   return new TextDecoder().decode(
     decodeBase64(
-      (
-        decodeCaseContextCollectionRaw(encoded).split("\r\n\r\n")[1] ?? ""
-      ).replaceAll(/\s+/gu, ""),
+      (decodeRaw(encoded).split("\r\n\r\n")[1] ?? "").replaceAll(/\s+/gu, ""),
     ) ?? new Uint8Array(),
   );
-}
-
-/** How many tool results one model request already carries. */
-function modelToolResults(raw: unknown): number {
-  return isRecord(raw) && Array.isArray(raw.messages)
-    ? raw.messages.filter(
-        (message: unknown) => isRecord(message) && message.role === "tool",
-      ).length
-    : 0;
 }
 
 /** The request text of one model request: what the turn's prompt was. */
@@ -15994,9 +15931,7 @@ function caseContextCollectionProviderDraft(
   encoded: string,
   threadId: string,
 ): Response {
-  const headers = decodeCaseContextCollectionRaw(encoded)
-    .split("\r\n\r\n")[0]
-    ?.split("\r\n");
+  const headers = decodeRaw(encoded).split("\r\n\r\n")[0]?.split("\r\n");
   const header = (name: string, fallback: string) =>
     headers
       ?.find((line) => line.startsWith(`${name}: `))

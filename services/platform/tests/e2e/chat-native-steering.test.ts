@@ -3,6 +3,11 @@ import { expect, it, type TestContext } from "vitest";
 import { newConversationId } from "@seams/control-api";
 import { isRecord } from "@seams/std";
 
+import {
+  portalBrowser,
+  textsOf,
+  type TimelineEvent,
+} from "./chat-queued-steer-support";
 import { network } from "./network";
 import {
   controlPaths,
@@ -17,6 +22,7 @@ import {
   offeredToolNames,
   openRouterText,
   openRouterToolCall,
+  userMessageContaining,
 } from "./slack-journey-support";
 
 /**
@@ -84,7 +90,7 @@ async function steeringJourney(test: TestContext): Promise<void> {
   expect(steered.status, await steered.clone().text()).toBe(200);
   const during = await storedConversation(owner, conversationId);
   expect(during?.conversation.work.kind).toBe("running");
-  expect(userTexts(during?.conversation.timeline ?? [])).toEqual([
+  expect(textsOf("user", during?.conversation.timeline ?? [])).toEqual([
     "Check the next deliveries of our suppliers.",
     STEERING_TEXT,
   ]);
@@ -94,7 +100,7 @@ async function steeringJourney(test: TestContext): Promise<void> {
   const repeated = await steer(owner, conversationId, fixture.route.model);
   expect(repeated.status, await repeated.clone().text()).toBe(200);
   const retried = await storedConversation(owner, conversationId);
-  expect(userTexts(retried?.conversation.timeline ?? [])).toHaveLength(2);
+  expect(textsOf("user", retried?.conversation.timeline ?? [])).toHaveLength(2);
   expect(retried?.conversation.pendingInputs).toEqual([]);
 
   model.releaseFirst.resolve();
@@ -115,8 +121,8 @@ async function steeringJourney(test: TestContext): Promise<void> {
   const after = await storedConversation(owner, conversationId);
   const timeline = after?.conversation.timeline ?? [];
   expect(timeline.map(eventKind)).not.toContain("run_cancelled");
-  expect(assistantTexts(timeline)).toEqual([ANSWER]);
-  expect(userTexts(timeline)).toEqual([
+  expect(textsOf("assistant", timeline)).toEqual([ANSWER]);
+  expect(textsOf("user", timeline)).toEqual([
     "Check the next deliveries of our suppliers.",
     STEERING_TEXT,
   ]);
@@ -139,7 +145,7 @@ async function steeringJourney(test: TestContext): Promise<void> {
   expect(model.requests).toHaveLength(3);
   expect(JSON.stringify(model.requests[2])).toContain(STEERING_TEXT);
   const last = await storedConversation(owner, conversationId);
-  expect(assistantTexts(last?.conversation.timeline ?? [])).toEqual([
+  expect(textsOf("assistant", last?.conversation.timeline ?? [])).toEqual([
     ANSWER,
     NOTED,
   ]);
@@ -213,49 +219,6 @@ function isToolMessage(message: unknown): boolean {
   return isRecord(message) && message.role === "tool";
 }
 
-function userMessageContaining(text: string, message: unknown): boolean {
-  return (
-    isRecord(message) &&
-    message.role === "user" &&
-    JSON.stringify(message.content).includes(text)
-  );
-}
-
-type TimelineEvent = Readonly<{ kind: string; text?: unknown }>;
-
 function eventKind(event: TimelineEvent): string {
   return event.kind;
 }
-
-function userTexts(timeline: readonly TimelineEvent[]): unknown[] {
-  return timeline
-    .filter(function isUser(event) {
-      return event.kind === "user";
-    })
-    .map(eventText);
-}
-
-function assistantTexts(timeline: readonly TimelineEvent[]): unknown[] {
-  return timeline
-    .filter(function isAssistant(event) {
-      return event.kind === "assistant";
-    })
-    .map(eventText);
-}
-
-function eventText(event: TimelineEvent): unknown {
-  return event.text;
-}
-
-/**
- * The Portal sends its browser binding with every message of the chat, also
- * with a steer.
- */
-function portalBrowser(conversationId: string) {
-  return {
-    kind: "available",
-    binding: { browserInstanceId: PORTAL_BROWSER, conversationId },
-  } as const;
-}
-
-const PORTAL_BROWSER = "4a615a93-cfbb-4160-aaf4-327d2a55e39c";

@@ -30,6 +30,7 @@ import {
   signedSlackRequest,
   slackEnvelope,
   slackSimulator,
+  isApprovalCard,
 } from "./slack-journey-support";
 
 // The journeys of Plan 50A that run a Code Mode script through the Slack
@@ -216,7 +217,7 @@ export async function deliverAfterConnectorLease(
     .toBe("sleeping");
   // A proposal's approval notice posts on its own; the turn's answer waits
   // for the connector.
-  const notices = journey.slack.messages.filter(isApprovalNotice).length;
+  const notices = journey.slack.messages.filter(isApprovalCard).length;
   expect(journey.slack.messages).toHaveLength(notices);
   const connector = await connectorActor();
   await runInDurableObject(connector, endCaseWorkLease);
@@ -224,14 +225,6 @@ export async function deliverAfterConnectorLease(
   await expect
     .poll(journey.slack.visibleMessageCount, { timeout: 20_000 })
     .toBe(notices + 1);
-}
-
-function isApprovalNotice(message: Record<string, string>): boolean {
-  return (
-    message.text?.includes(
-      "Nothing changes until an owner or admin approves it",
-    ) === true
-  );
 }
 
 export function endCaseWorkLease(

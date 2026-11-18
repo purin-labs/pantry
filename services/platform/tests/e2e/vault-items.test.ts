@@ -1,16 +1,11 @@
 import { env } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import {
-  parseVaultItemList,
-  parseVaultItemResult,
-  type VaultItemView,
-} from "@seams/control-api";
+import { parseVaultItemList } from "@seams/control-api";
 
-import { resolveVaultHandle } from "../../src/credential-vault/service";
-import { parseVaultHandle } from "../../src/credential-vault/domain";
 import type { OrganisationId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { installMemoryFixture, post, type Member } from "./memory-support";
+import { item, loginHandle, resolvedSecret } from "./vault-support";
 
 const FIRST_PASSWORD = "first-supplier-pass-7Q";
 const SECOND_PASSWORD = "second-supplier-pass-9Z";
@@ -98,7 +93,7 @@ async function vaultItemJourney({ task }: TestContext): Promise<void> {
   expect(await storedCiphertextContains(organisationId, FIRST_PASSWORD)).toBe(
     false,
   );
-  expect(await resolvedSignIn(organisationId, firstHandle)).toEqual({
+  expect(await resolvedSecret(organisationId, firstHandle)).toEqual({
     kind: "website_login",
     username: "buyer@nini.example",
     password: FIRST_PASSWORD,
@@ -178,12 +173,12 @@ async function vaultItemJourney({ task }: TestContext): Promise<void> {
   });
   const secondHandle = await loginHandle(organisationId, login.itemId);
   expect(secondHandle).not.toBe(firstHandle);
-  expect(await resolvedSignIn(organisationId, secondHandle)).toEqual({
+  expect(await resolvedSecret(organisationId, secondHandle)).toEqual({
     kind: "website_login",
     username: "orders@nini.example",
     password: SECOND_PASSWORD,
   });
-  expect(await resolvedSignIn(organisationId, firstHandle)).toEqual({
+  expect(await resolvedSecret(organisationId, firstHandle)).toEqual({
     error: "vault_secret_revoked",
   });
 
@@ -196,7 +191,7 @@ async function vaultItemJourney({ task }: TestContext): Promise<void> {
   expect(
     await send(owner, commands, { kind: "remove", expectedRevision: 3 }),
   ).toMatchObject({ status: 200, body: { ok: true, removed: login.itemId } });
-  expect(await resolvedSignIn(organisationId, secondHandle)).toEqual({
+  expect(await resolvedSecret(organisationId, secondHandle)).toEqual({
     error: "vault_secret_revoked",
   });
   const after = parseVaultItemList((await send(owner, items, null)).body);
@@ -228,28 +223,6 @@ async function vaultItemJourney({ task }: TestContext): Promise<void> {
   });
 }
 
-function item(body: unknown): VaultItemView {
-  const result = parseVaultItemResult(body);
-  if (result === null || !("item" in result))
-    throw new Error(`not a Vault item: ${JSON.stringify(body)}`);
-  return result.item;
-}
-
-async function loginHandle(
-  organisationId: OrganisationId,
-  itemId: string,
-): Promise<string> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const row = await scope.database
-    .prepare(
-      "SELECT vault_handle FROM vault_item WHERE organisation_id = ? AND vault_item_id = ?",
-    )
-    .bind(organisationId, itemId)
-    .first<{ vault_handle: string }>();
-  if (row === null) throw new Error("login missing");
-  return row.vault_handle;
-}
-
 async function storedCiphertextContains(
   organisationId: OrganisationId,
   text: string,
@@ -267,20 +240,4 @@ async function storedCiphertextContains(
       row.ciphertext_b64.includes(encoded) ||
       atob(row.ciphertext_b64).includes(text),
   );
-}
-
-async function resolvedSignIn(
-  organisationId: OrganisationId,
-  rawHandle: string,
-): Promise<unknown> {
-  const handle = parseVaultHandle(rawHandle);
-  if (!handle.ok) throw new Error("handle invalid");
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const resolved = await resolveVaultHandle({
-    db: scope.database,
-    keys: env,
-    organisationId,
-    handle: handle.value,
-  });
-  return resolved.ok ? resolved.value : { error: resolved.error.code };
 }

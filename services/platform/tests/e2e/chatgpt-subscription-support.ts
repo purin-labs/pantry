@@ -1,6 +1,6 @@
 import { fixtureDatabase } from "./organisation-database";
 import { zstdDecompressSync } from "node:zlib";
-import { env } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect } from "vitest";
 import { encodeBase64Url, isRecord } from "@seams/std";
@@ -11,7 +11,9 @@ import {
   startOrganisationCodexAuthorization,
 } from "../../src/models/codex-connection";
 import {
+  parseAnthropicApiKey,
   parseOpenAiApiKey,
+  storeOrganisationAnthropicModelCredential,
   storeOrganisationOpenAiModelCredential,
 } from "../../src/credential-vault";
 import {
@@ -20,7 +22,12 @@ import {
   type OrganisationInferenceSelection,
 } from "../../src/data/organisation-inference-selection";
 import { parseUserId, type OrganisationId, type UserId } from "../../src/ids";
-import { ORGANISATION_ID, SLACK_ACTOR_USER_ID } from "./slack-journey-support";
+import {
+  ORGANISATION_ID,
+  SLACK_ACTOR_USER_ID,
+  signedSlackRequest,
+  slackEnvelope,
+} from "./slack-journey-support";
 import {
   CHATGPT_EXIT_EGRESS_HEADER,
   MODEL_EXIT_EGRESS_HEADER,
@@ -1063,4 +1070,67 @@ export async function connectOpenAiApiKey(apiKey: string): Promise<void> {
   });
   if (!stored.ok) throw new Error(stored.error.code);
   await selectInference({ kind: "organisation_openai_api_key" });
+}
+
+/**
+ * Store the organisation's own Anthropic API key, as an owner does in
+ * Portal, and make it the inference route.
+ */
+export async function connectAnthropicApiKey(apiKey: string): Promise<void> {
+  const key = parseAnthropicApiKey(apiKey);
+  if (!key.ok) throw new Error(key.error.code);
+  const stored = await storeOrganisationAnthropicModelCredential({
+    db: fixtureDatabase(),
+    keys: env,
+    organisationId: ORGANISATION_ID,
+    apiKey: key.value,
+    now: Date.now(),
+  });
+  if (!stored.ok) throw new Error(stored.error.code);
+  await selectInference({ kind: "organisation_anthropic_api_key" });
+}
+
+/**
+ * Slack sends a mention that asks which integrations are connected, and
+ * starts the thread. Returns the durable mode of the ingress.
+ */
+export function sendMention(
+  eventId: string,
+  threadTs: string,
+): Promise<unknown> {
+  return sendIntegrationQuestion(eventId, threadTs, threadTs, "app_mention");
+}
+
+/** Slack sends a reply that asks again in the thread. */
+export function sendReply(
+  eventId: string,
+  messageTs: string,
+  threadTs: string,
+): Promise<unknown> {
+  return sendIntegrationQuestion(eventId, messageTs, threadTs, "message");
+}
+
+async function sendIntegrationQuestion(
+  eventId: string,
+  messageTs: string,
+  threadTs: string,
+  eventType: "app_mention" | "message",
+): Promise<unknown> {
+  const response = await exports.default.fetch(
+    await signedSlackRequest(
+      slackEnvelope({
+        eventType,
+        eventId,
+        messageTs,
+        threadTs,
+        text:
+          eventType === "app_mention"
+            ? "<@U0SATYR> Which integrations are connected?"
+            : "Try again, please.",
+      }),
+    ),
+  );
+  expect(response.status).toBe(200);
+  const body: unknown = await response.json();
+  return isRecord(body) ? body.durableMode : null;
 }

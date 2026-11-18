@@ -1,5 +1,5 @@
 import { runInDurableObject } from "cloudflare:test";
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
@@ -12,15 +12,17 @@ import {
 import { STEER_ANSWER_LOST_FAULT_KEY } from "../../src/actors/connector/steer-fault";
 import { fixtureDatabase } from "./organisation-database";
 import { network } from "./network";
+import { readSteeredReplies } from "./slack-follow-up-support";
 import {
   ORGANISATION_ID,
   ROOT_TS,
   installSlackActorFixture,
   openRouterText,
   openRouterToolCall,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  sendSlack,
+  threadAndText,
+  userMessageContaining,
 } from "./slack-journey-support";
 
 /**
@@ -161,25 +163,6 @@ async function replyToModel(
   }
 }
 
-async function sendSlack(
-  eventId: string,
-  messageTs: string,
-  text: string,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: messageTs === ROOT_TS ? "app_mention" : "message",
-        eventId,
-        messageTs,
-        threadTs: ROOT_TS,
-        text,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
-}
-
 function readReceipts(
   _actor: unknown,
   state: DurableObjectState,
@@ -192,18 +175,6 @@ function readReceipts(
       .toArray()
       .map((row) => [row.event_id, row.outcome]),
   );
-}
-
-function readSteeredReplies(
-  _actor: unknown,
-  state: DurableObjectState,
-): string[] {
-  return state.storage.sql
-    .exec<{ event_id: string }>(
-      "SELECT event_id FROM connector_case_steering ORDER BY event_id",
-    )
-    .toArray()
-    .map((row) => row.event_id);
 }
 
 function readSteeringStates(
@@ -220,21 +191,6 @@ function readSteeringStates(
 
 function messageList(body: Record<string, unknown> | undefined): unknown[] {
   return Array.isArray(body?.messages) ? body.messages : [];
-}
-
-function userMessageContaining(text: string, message: unknown): boolean {
-  return (
-    isRecord(message) &&
-    message.role === "user" &&
-    JSON.stringify(message.content).includes(text)
-  );
-}
-
-function threadAndText(post: Record<string, string>): {
-  readonly thread: string | undefined;
-  readonly text: string | undefined;
-} {
-  return { thread: post.thread_ts, text: post.text };
 }
 
 async function actorOf(

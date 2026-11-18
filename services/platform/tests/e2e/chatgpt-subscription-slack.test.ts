@@ -2,7 +2,6 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
 
 import {
   readOrganisationCodexConnection,
@@ -20,19 +19,18 @@ import {
   fixtureUser,
   lastToolOutput,
   offeredTools,
+  sendMention,
+  sendReply,
   textAnswer,
   type ChatGptAnswer,
   type ChatGptModelRequest,
 } from "./chatgpt-subscription-support";
 import { network } from "./network";
 import {
-  CHANNEL_ID,
   ORGANISATION_ID,
   installDiscoveryActorFixture,
-  readSlackMessageText,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  threadAnswers,
 } from "./slack-journey-support";
 
 /**
@@ -719,18 +717,6 @@ function isText(value: string | null): value is string {
   return value !== null;
 }
 
-function threadAnswers(
-  messages: readonly Record<string, string>[],
-  threadTs: string,
-): string[] {
-  return messages
-    .filter(
-      (message) =>
-        message.channel === CHANNEL_ID && message.thread_ts === threadTs,
-    )
-    .map(readSlackMessageText);
-}
-
 async function readConnection(): Promise<unknown> {
   const read = await readOrganisationCodexConnection({
     env,
@@ -758,41 +744,4 @@ async function readPortalConnection(): Promise<unknown> {
     },
   );
   return response.json();
-}
-
-function sendMention(eventId: string, threadTs: string): Promise<unknown> {
-  return sendSlack(eventId, threadTs, threadTs, "app_mention");
-}
-
-function sendReply(
-  eventId: string,
-  messageTs: string,
-  threadTs: string,
-): Promise<unknown> {
-  return sendSlack(eventId, messageTs, threadTs, "message");
-}
-
-async function sendSlack(
-  eventId: string,
-  messageTs: string,
-  threadTs: string,
-  eventType: "app_mention" | "message",
-): Promise<unknown> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType,
-        eventId,
-        messageTs,
-        threadTs,
-        text:
-          eventType === "app_mention"
-            ? "<@U0SATYR> Which integrations are connected?"
-            : "Try again, please.",
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  return isRecord(body) ? body.durableMode : null;
 }

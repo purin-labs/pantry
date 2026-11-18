@@ -12,13 +12,13 @@ import type { CaseTimelineCase } from "@seams/control-api";
 
 import { saveConversation } from "../../src/chat/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { answers, cardId, currentRequest } from "./chat-permission-support";
+import { finished } from "./chat-journey-support";
 import {
   emptyConversation,
   installMemoryFixture,
   post,
   postJson,
-  storedConversation,
-  workKind,
   type Member,
 } from "./memory-support";
 import { readCaseTimeline } from "./case-execution-support";
@@ -153,7 +153,7 @@ async function sideCaseFlowJourney({ task }: TestContext): Promise<void> {
     browserContext: { kind: "unavailable" },
   });
   expect(asked.status, await asked.clone().text()).toBe(200);
-  await waitReady(owner, parentId);
+  await finished(owner, parentId);
   expect(await answers(owner, parentId)).toEqual([ANSWER]);
 
   // 1. Allowed: the admin edits the shared chat and starts a side Case.
@@ -169,7 +169,7 @@ async function sideCaseFlowJourney({ task }: TestContext): Promise<void> {
   );
   expect(started.status, JSON.stringify(started.body)).toBe(200);
   const adminSide = conversationIdOf(started.body);
-  await waitReady(admin, adminSide);
+  await finished(admin, adminSide);
   expect(await answers(admin, adminSide)).toEqual([
     SIDE_ANSWERS[PROPOSALS[0].brief],
   ]);
@@ -259,7 +259,7 @@ async function sideCaseFlowJourney({ task }: TestContext): Promise<void> {
   );
   expect(ownerStart.status, JSON.stringify(ownerStart.body)).toBe(200);
   const ownerSide = conversationIdOf(ownerStart.body);
-  await waitReady(owner, ownerSide);
+  await finished(owner, ownerSide);
   expect(await answers(owner, ownerSide)).toEqual([
     SIDE_ANSWERS[PROPOSALS[1].brief],
   ]);
@@ -363,44 +363,6 @@ function toolCalls(body: Record<string, unknown>): string[] {
   return names;
 }
 
-/**
- * The person's request of this turn, as Pantry quotes it in the latest user
- * message, without the organisational context that follows it.
- */
-function currentRequest(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (isRecord(message) && message.role === "user") {
-      const text = JSON.stringify(message.content);
-      const at = text.indexOf("Current user request");
-      if (at < 0) return "";
-      const end = text.indexOf("Accepted organizational context", at);
-      return text.slice(at, end < 0 ? undefined : end);
-    }
-  }
-  return "";
-}
-
-async function waitReady(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  await expect
-    .poll(workKind.bind(null, person, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
-async function answers(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<string[]> {
-  const stored = await storedConversation(person, conversationId);
-  return (stored?.conversation.timeline ?? []).flatMap((event) =>
-    event.kind === "assistant" && "text" in event ? [event.text] : [],
-  );
-}
-
 async function readCards(
   person: Member,
   chatPath: string,
@@ -420,16 +382,6 @@ async function readCards(
 function cardSummary(card: Record<string, unknown>): Record<string, unknown> {
   const state = isRecord(card.state) ? card.state : {};
   return { title: card.title, state: state.kind, mayDecide: state.mayDecide };
-}
-
-function cardId(
-  cards: readonly Record<string, unknown>[],
-  title: string,
-): string {
-  const card = cards.find((candidate) => candidate.title === title);
-  if (typeof card?.proposalId !== "string")
-    throw new Error(`Card missing: ${title}`);
-  return card.proposalId;
 }
 
 function startPath(

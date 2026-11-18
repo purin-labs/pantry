@@ -36,6 +36,8 @@ import {
   signedSlackRequest,
   openRouterStream,
 } from "./slack-journey-support";
+import { storedContent } from "./case-execution-support";
+import { exportedItemCount } from "./placement-move-support";
 
 it(
   "fences transient WhatsApp proposals at goal stops and timeout, preserves usage after restart, and retains no transcript",
@@ -227,25 +229,6 @@ function readTransientRequest(
     },
   };
 }
-async function storedContent(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<string> {
-  const tables = state.storage.sql
-    .exec<{ name: string }>(
-      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT GLOB '_cf_*'",
-    )
-    .toArray();
-  const rows: unknown[] = [];
-  for (const table of tables)
-    rows.push({
-      table: table.name,
-      rows: state.storage.sql.exec(`SELECT * FROM "${table.name}"`).toArray(),
-    });
-  const values = await state.storage.list();
-  return JSON.stringify({ tables: rows, values: [...values.entries()] });
-}
-
 class WhatsAppGoalProvider {
   phase: "bootstrap" | "complete" | "limited" | "timeout" = "bootstrap";
   phaseCalls = 0;
@@ -493,7 +476,7 @@ async function whatsappPlacementJourney({ task }: TestContext): Promise<void> {
       .poll(readTransientBarrier.bind(null, session), { timeout: 10000 })
       .toBe(1);
     expect(marker.completed).toBe(false);
-    expect(await exportedTransientItems(move.relocationId)).toBe(0);
+    expect(await exportedItemCount(move.relocationId)).toBe(0);
     expect(provider.calls).toBe(0);
     pause.phase = "released";
     expect(await preparation).toMatchObject({
@@ -734,13 +717,4 @@ function readTransientBarrier(
   session: DurableObjectStub<SessionDO>,
 ): Promise<number> {
   return runInDurableObject(session, transientBarrier);
-}
-async function exportedTransientItems(relocationId: string): Promise<number> {
-  const row = await env.DB.prepare(
-    "SELECT COUNT(*) AS count FROM state_object_relocation_item WHERE relocation_id = ? AND status <> 'pending'",
-  )
-    .bind(relocationId)
-    .first<{ count: number }>();
-  if (row === null) throw new Error("Missing relocation inventory");
-  return row.count;
 }

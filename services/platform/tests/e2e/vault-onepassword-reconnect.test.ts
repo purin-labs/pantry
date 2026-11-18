@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { parseVaultItemList } from "@seams/control-api";
 
@@ -7,6 +6,7 @@ import {
   E2E_ONEPASSWORD_TOKEN,
   E2E_ONEPASSWORD_VAULTS,
 } from "./onepassword-network";
+import { onePassword } from "./vault-support";
 
 const [SATYR_VAULT, PRIVATE_VAULT] = E2E_ONEPASSWORD_VAULTS;
 
@@ -83,14 +83,6 @@ async function addLogin(vaultId: string, title: string): Promise<void> {
     websites: [],
     tags: [],
   });
-}
-
-async function onePassword(path: string, body?: unknown): Promise<unknown> {
-  const response = await env.VAULT_ONEPASSWORD.fetch(
-    `https://vault-onepassword.internal${path}`,
-    { method: "POST", body: JSON.stringify(body ?? {}) },
-  );
-  return response.json();
 }
 
 async function onePasswordState(): Promise<{ listHeld: boolean }> {

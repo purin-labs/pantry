@@ -72,6 +72,7 @@ import {
   EMAIL_SELF_TEST_BODY,
   resolveEmailProposalRecipient,
 } from "../../src/data/email-self-test";
+import { selfTestCount } from "./gmail-mailbox-support";
 
 const TOKEN = "mail-session-origin-fixture-token";
 const PROVIDER_TEXT = "P55 private supplier mail";
@@ -226,7 +227,7 @@ async function mailOriginJourney(
     expect(retained.history).not.toContain(PROVIDER_TEXT);
     expect(retained.providerObservations).toBe(0);
     expect(await proposalProjectionCount()).toBe(0);
-    expect(await selfTestCount()).toBe(0);
+    expect(await selfTestCount(ORGANISATION_ID)).toBe(0);
     const receipts = await runInDurableObject(connector, readConnectorState);
     expect(receipts.drafts).toBe(boundary === "reply_response" ? 1 : 0);
     expect(receipts.operational).toBe(0);
@@ -265,7 +266,7 @@ async function mailOriginJourney(
       ).toBe(1);
       expect(await proposalProjectionCount()).toBe(1);
       expect(journey.providerReads + journey.providerDrafts).toBe(0);
-      expect(await selfTestCount()).toBe(
+      expect(await selfTestCount(ORGANISATION_ID)).toBe(
         boundary.startsWith("self_test") ? 1 : 0,
       );
       if (boundary.startsWith("self_test")) {
@@ -623,15 +624,6 @@ async function proposalProjectionCount(): Promise<number> {
       "SELECT (SELECT COUNT(*) FROM email_reply_proposal WHERE organisation_id = ?) + (SELECT COUNT(*) FROM email_operational_proposal_projection WHERE organisation_id = ?) AS total",
     )
     .bind(ORGANISATION_ID, ORGANISATION_ID)
-    .first<{ total: number }>();
-  return row?.total ?? 0;
-}
-async function selfTestCount(): Promise<number> {
-  const row = await fixtureDatabase()
-    .prepare(
-      "SELECT COUNT(*) AS total FROM email_self_test WHERE organisation_id = ?",
-    )
-    .bind(ORGANISATION_ID)
     .first<{ total: number }>();
   return row?.total ?? 0;
 }

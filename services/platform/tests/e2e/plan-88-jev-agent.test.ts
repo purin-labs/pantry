@@ -38,6 +38,7 @@ import {
   openRouterToolCall,
   requireLastToolOutput,
 } from "./slack-journey-support";
+import { draftAction, onlyDraft } from "./chat-journey-support";
 
 type Script = Readonly<{
   tool: string;
@@ -235,48 +236,6 @@ async function chat(
       .toBe("ready");
   }
   return conversationId;
-}
-
-type DraftView = Readonly<{
-  draftId: string;
-  summary: string;
-  actionLabel: string;
-  state: string;
-}>;
-
-async function onlyDraft(
-  fixture: MemoryFixture,
-  person: Member,
-  conversationId: ConversationId,
-): Promise<DraftView> {
-  const query = new URLSearchParams({ conversation: conversationId });
-  const read = await postJson(person, `${fixture.paths.chat}?${query}`, null);
-  const body = read.body;
-  if (!isRecord(body) || !Array.isArray(body.configurationDrafts))
-    throw new Error(`No drafts: ${JSON.stringify(body).slice(0, 400)}`);
-  const drafts = body.configurationDrafts.filter((draft): draft is DraftView =>
-    isRecord(draft),
-  );
-  expect(drafts).toHaveLength(1);
-  const draft = drafts[0];
-  if (draft === undefined) throw new Error("No draft");
-  return draft;
-}
-
-function draftAction(
-  fixture: MemoryFixture,
-  person: Member,
-  conversationId: ConversationId,
-  draft: DraftView,
-  action: "confirm" | "cancel",
-): Promise<Response> {
-  const headers = commerceHeaders(person.session);
-  headers.set("idempotency-key", crypto.randomUUID());
-  headers.set("x-satyr-configuration-version", "1");
-  return exports.default.fetch(
-    `${PUBLIC_ORIGIN}${fixture.paths.organisation}/chat/conversations/${conversationId}/configuration-drafts/${draft.draftId}/${action}`,
-    { method: "POST", headers, body: "{}" },
-  );
 }
 
 async function features(

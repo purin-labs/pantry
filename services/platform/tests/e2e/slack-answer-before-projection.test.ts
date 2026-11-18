@@ -1,6 +1,6 @@
 import { runInDurableObject } from "cloudflare:test";
 import { env, exports } from "cloudflare:workers";
-import { http, HttpResponse, type HttpResponseResolver } from "msw";
+import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
@@ -11,14 +11,12 @@ import { network } from "./network";
 import {
   ORGANISATION_ID,
   ROOT_TS,
-  SLACK_BOT_TOKEN,
   installSlackActorFixture,
-  isStringRecord,
-  slackPostFields,
   openRouterText,
   requiredPlacement,
   signedSlackRequest,
   slackEnvelope,
+  respondToSlack,
 } from "./slack-journey-support";
 
 /**
@@ -181,23 +179,4 @@ async function replyToModel({
 }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
   await request.json();
   return openRouterText("Reply.", "chatcmpl_55e_projection");
-}
-
-async function respondToSlack(
-  posts: number[],
-  { params, request }: Parameters<HttpResponseResolver>[0],
-): Promise<Response> {
-  if (request.headers.get("authorization") !== `Bearer ${SLACK_BOT_TOKEN}`)
-    return HttpResponse.json({ ok: false, error: "invalid_auth" });
-  const body: unknown = slackPostFields(await request.json());
-  if (!isStringRecord(body)) throw new Error("Slack request body is invalid");
-  if (params.method === "chat.postMessage") {
-    posts.push(Date.now());
-    return HttpResponse.json({
-      ok: true,
-      channel: body.channel,
-      ts: "1787500001.000001",
-    });
-  }
-  return HttpResponse.json({ ok: true });
 }

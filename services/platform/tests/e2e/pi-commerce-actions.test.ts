@@ -18,6 +18,7 @@ import {
   chat,
   preparePortalChatJourney,
   readWork,
+  toolOutput,
 } from "./chat-journey-support";
 import {
   FakeChatGpt,
@@ -46,6 +47,7 @@ import {
   openRouterToolCall,
   slackSimulator,
 } from "./slack-journey-support";
+import { mutationHeaders } from "./access-route-support";
 
 const BASE = `https://localhost/v1/control/organisations/${ORGANISATION_ID}`;
 const LATER_THREAD = "1710000200.000100";
@@ -113,7 +115,7 @@ it("refunds an order only after an owner approves the exact money", async () => 
     const card = parseCommerceActionRecordResponse(
       await (
         await exports.default.fetch(`${BASE}/commerce/actions/${nonce}`, {
-          headers: controlHeaders(session),
+          headers: mutationHeaders(session),
         })
       ).json(),
     );
@@ -306,7 +308,7 @@ async function decide(
   const conversationId = "conv_719795b9-7490-4476-b8f5-40463dafd29a";
   return exports.default.fetch(
     `${BASE}/chat/conversations/${conversationId}/configuration-drafts/${draftId}/${action}`,
-    { method: "POST", headers: controlHeaders(session), body: "{}" },
+    { method: "POST", headers: mutationHeaders(session), body: "{}" },
   );
 }
 
@@ -316,7 +318,7 @@ async function allowance(
 ): Promise<Record<string, unknown>> {
   const response = await exports.default.fetch(
     `${BASE}/commerce/offers/${encodeURIComponent(offerId)}/price-policy`,
-    { headers: controlHeaders(session) },
+    { headers: mutationHeaders(session) },
   );
   expect(response.status, await response.clone().text()).toBe(200);
   const raw: unknown = await response.json();
@@ -386,16 +388,6 @@ function delivered(slack: ReturnType<typeof slackSimulator>): string {
   return slack.messages.map((message) => message.text).join("\n");
 }
 
-function controlHeaders(session: IssuedControlSession): Record<string, string> {
-  return {
-    "content-type": "application/json",
-    origin: "https://localhost",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
-    "idempotency-key": crypto.randomUUID(),
-  };
-}
-
 async function approveAndExecute(
   session: IssuedControlSession,
   nonce: string,
@@ -462,15 +454,6 @@ function readEntities(
     },
     callId,
   );
-}
-
-function toolOutput(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last = messages.filter(
-    (message) => isRecord(message) && message.role === "tool",
-  );
-  const message = last.at(-1);
-  return isRecord(message) ? JSON.stringify(message.content) : "";
 }
 
 async function respond(

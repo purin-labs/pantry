@@ -5,17 +5,14 @@ import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { newConversationId, newProjectId } from "@seams/control-api";
 import type { CollaborationAgentActivity } from "@seams/collaboration";
-import { decodeBase64, encodeBase64Url, isRecord } from "@seams/std";
+import { encodeBase64Url, isRecord } from "@seams/std";
 import { MailReplyDoc, type MailReplyUpdate } from "@seams/mail-reply-crdt";
 import {
   encodeDraftClientMessage,
   parseDraftServerMessage,
   type DraftServerMessage,
 } from "@seams/mail-reply-crdt/protocol";
-import {
-  requireActiveOrganisationActor,
-  resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
@@ -26,7 +23,6 @@ import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
 } from "../../src/data/capability-policy";
-import { gmailConnectorId } from "../../src/data/email-mailbox";
 import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
 import { resolveOrganisationModelRoute } from "../../src/models/route";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
@@ -55,6 +51,9 @@ import {
   connectGmailMailbox,
   sendAs,
   setUpMailbox,
+  draftBody,
+  header,
+  mailboxConnector,
 } from "./gmail-mailbox-support";
 import {
   offeredToolNames,
@@ -309,10 +308,6 @@ function countRoomEdits() {
   } as typeof original;
   return edits;
 }
-
-type Connector = DurableObjectStub<
-  import("../../src/actors/connector").ConnectorDO
->;
 
 /**
  * A private Portal chat of the owner drafts a reply to a customer's mail; its
@@ -1136,31 +1131,6 @@ async function requestRaw(
   };
 }
 
-function decodeRaw(encoded: string): string {
-  return new TextDecoder().decode(
-    decodeBase64(encoded.replaceAll("-", "+").replaceAll("_", "/")) ??
-      new Uint8Array(),
-  );
-}
-
-function header(encoded: string, name: string): string | null {
-  const head = decodeRaw(encoded).split("\r\n\r\n")[0] ?? "";
-  return (
-    head
-      .split("\r\n")
-      .find((line) => line.startsWith(`${name}: `))
-      ?.slice(name.length + 2) ?? null
-  );
-}
-
-function draftBody(encoded: string): string {
-  return new TextDecoder().decode(
-    decodeBase64(
-      (decodeRaw(encoded).split("\r\n\r\n")[1] ?? "").replaceAll(/\s+/gu, ""),
-    ) ?? new Uint8Array(),
-  );
-}
-
 /** The one reply that the first chat drafted. */
 async function replyProposalId(
   organisationId: OrganisationId,
@@ -1314,21 +1284,4 @@ async function approveMailboxModel(
       now,
     )
     .run();
-}
-
-async function mailboxConnector(
-  organisationId: OrganisationId,
-  account: IntegrationAccountId,
-): Promise<Connector> {
-  const connectorId = gmailConnectorId(account);
-  if (!connectorId.ok) throw new Error("Invalid connector");
-  const connector = await resolveActiveConnectorActor({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    connectorId: connectorId.value,
-    now: Date.now(),
-  });
-  if (!connector.ok) throw new Error(connector.error.code);
-  return connector.value;
 }

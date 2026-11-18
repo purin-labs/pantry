@@ -9,6 +9,7 @@ import {
   type Member,
 } from "./memory-support";
 
+/** Sends a message in the Portal chat, and expects the chat to take it. */
 export async function ask(
   person: Member,
   chatPath: string,
@@ -61,6 +62,36 @@ export function lastCalledTool(body: Record<string, unknown>): string | null {
     }
   }
   return null;
+}
+
+/**
+ * The person's request of this turn, as Pantry quotes it in the latest user
+ * message, without the organisational context that follows it.
+ */
+export function currentRequest(body: Record<string, unknown>): string {
+  const messages = Array.isArray(body.messages) ? body.messages : [];
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message: unknown = messages[index];
+    if (isRecord(message) && message.role === "user") {
+      const text = JSON.stringify(message.content);
+      const at = text.indexOf("Current user request");
+      if (at < 0) return "";
+      const end = text.indexOf("Accepted organizational context", at);
+      return text.slice(at, end < 0 ? undefined : end);
+    }
+  }
+  return "";
+}
+
+/** The proposal id of the side Case card with this title. */
+export function cardId(
+  cards: readonly Record<string, unknown>[],
+  title: string,
+): string {
+  const card = cards.find((candidate) => candidate.title === title);
+  if (typeof card?.proposalId !== "string")
+    throw new Error(`Card missing: ${title}`);
+  return card.proposalId;
 }
 
 /**
@@ -120,6 +151,7 @@ async function stateWork(
   return isRecord(state.body) ? state.body.work : null;
 }
 
+/** Resumes the paused chat on the permission request. */
 export function resumeChat(
   person: Member,
   chatPath: string,

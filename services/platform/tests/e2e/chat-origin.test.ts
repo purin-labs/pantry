@@ -19,6 +19,7 @@ import {
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText } from "./slack-journey-support";
+import { latestUserInput, userScreenParts } from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -191,19 +192,6 @@ function listedOrigin(read: ChatRead, conversationId: ConversationId): unknown {
   return isRecord(row) ? row.origin : undefined;
 }
 
-function userScreenParts(read: ChatRead): readonly unknown[] {
-  const timeline = Array.isArray(read.conversation.timeline)
-    ? read.conversation.timeline
-    : [];
-  return timeline.flatMap((event: unknown) =>
-    isRecord(event) && event.kind === "user" && Array.isArray(event.parts)
-      ? event.parts.filter(
-          (part: unknown) => isRecord(part) && part.kind === "screen",
-        )
-      : [],
-  );
-}
-
 async function sendAndFinish(
   author: Member,
   chatPath: string,
@@ -241,19 +229,4 @@ async function recordAndReply(
   if (!isRecord(body)) throw new Error("Invalid model request");
   requests.push(JSON.stringify(body));
   return openRouterText("Noted.", `chat_origin_${String(requests.length)}`);
-}
-
-/** The newest user message of the newest model request. */
-function latestUserInput(requests: readonly string[]): string {
-  const latest = requests.at(-1);
-  if (latest === undefined) throw new Error("The model received no request");
-  const body: unknown = JSON.parse(latest);
-  const messages =
-    isRecord(body) && Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (isRecord(message) && message.role === "user")
-      return JSON.stringify(message.content);
-  }
-  throw new Error("The model request has no user message");
 }

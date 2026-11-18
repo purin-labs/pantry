@@ -97,6 +97,15 @@ export async function cleanupStatus(
     .first("status");
 }
 
+/** The owner's Portal session cookies, for a read. */
+export function readHeaders(owner: PurgeOwner): Record<string, string> {
+  const { token, csrfToken } = owner.client.session;
+  return {
+    cookie: `satyr_control_session=${token}; satyr_control_csrf=${csrfToken}`,
+  };
+}
+
+/** The configuration version of the Organisation's onboarding. */
 export async function configurationVersion(
   organisationId: OrganisationId,
 ): Promise<number> {

@@ -1,16 +1,13 @@
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
-import { fixtureDatabase } from "./organisation-database";
-import { env, exports } from "cloudflare:workers";
+import { exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import { connectorActorStub } from "../../src/actors/actor-router";
 import { CaseDO } from "../../src/actors/case";
 import { network } from "./network";
+import { connectorOf } from "./slack-follow-up-support";
 import {
-  ORGANISATION_ID,
   ROOT_TS,
   SLACK_BOT_TOKEN,
   installSlackActorFixture,
@@ -294,27 +291,6 @@ function readMessageRecord(
         attempt: work.attempt,
         reason: work.retry_reason,
       };
-}
-
-async function connectorOf(connectorId: string) {
-  const entries = await listPlacementActorRegistryEntries({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    placementEpoch: 1,
-  });
-  if (!entries.ok) throw new Error(entries.error.code);
-  const entry = entries.value.find(function isConnector(candidate) {
-    return (
-      candidate.identity.objectKind === "connector" &&
-      candidate.identity.logicalObjectId === connectorId
-    );
-  });
-  if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
-    env.CONNECTOR,
-    entry.physicalObjectName,
-    entry.placement,
-  );
 }
 
 function textOf(post: Record<string, string>): string | undefined {

@@ -22,10 +22,8 @@ import {
   readOperationalEmailDispatchId,
 } from "../../src/actors/connector-email-operational";
 import {
-  startActorRelocation,
   resumeActorRelocation,
   reconcileActorRelocationMailReceipt,
-  type ActorRelocationId,
 } from "../../src/actors/actor-relocation";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
@@ -40,7 +38,6 @@ import {
   EMAIL_SELF_TEST_BODY,
   registerEmailSelfTest,
 } from "../../src/data/email-self-test";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import { GMAIL_SEND_ONLY_SCOPES } from "../../src/mail/gmail-authorization";
 import {
   CAPABILITY_KEYS,
@@ -67,6 +64,12 @@ import {
 } from "../../src/data/control-plane";
 import { buildControlAuthority } from "../../src/request-authority";
 import type { SessionTurnExecution } from "../../src/chat/turn-access";
+import { selfTestCount } from "./gmail-mailbox-support";
+import {
+  exportedItemCount,
+  readBarrier,
+  startMove,
+} from "./placement-move-support";
 
 const PROPOSAL_ID = "proposal_p55_operational";
 const BODY = "Please prepare the bakery delivery for Friday.";
@@ -250,7 +253,7 @@ async function operationalJourney(
     await expect
       .poll(readBarrier.bind(null, fixture.connector), { timeout: 10_000 })
       .toBe(1);
-    expect(await exportedItems(relocationId)).toBe(0);
+    expect(await exportedItemCount(relocationId)).toBe(0);
     expect(pause.providerAttempts).toBe(isIssuedBoundary(boundary) ? 1 : 0);
     if (isIssuedBoundary(boundary)) {
       const issued = await runInDurableObject(fixture.connector, readProposal);
@@ -272,7 +275,7 @@ async function operationalJourney(
         ok: false,
         error: { code: "relocation_provider_work_unresolved" },
       });
-      expect(await exportedItems(relocationId)).toBe(0);
+      expect(await exportedItemCount(relocationId)).toBe(0);
       const issued = await runInDurableObject(fixture.connector, readProposal);
       if (issued.rfcMessageId === null)
         throw new Error("Missing issued message identity");
@@ -342,7 +345,8 @@ async function operationalJourney(
         ? null
         : "awaiting_approval",
     );
-    if (boundary === "expiry") expect(await selfTestCount()).toBe(1);
+    if (boundary === "expiry")
+      expect(await selfTestCount(ORGANISATION_ID)).toBe(1);
     await evictDurableObject(fixture.connector);
     expect(
       await fixture.connector.previewEmailOperationalProposal(
@@ -385,14 +389,15 @@ async function operationalJourney(
         .run();
       await runDurableObjectAlarm(target);
       expect((await projection())?.lifecycleKind).toBe("awaiting_approval");
-      expect(await selfTestCount()).toBe(1);
+      expect(await selfTestCount(ORGANISATION_ID)).toBe(1);
       await fixtureDatabase()
         .prepare("DROP TRIGGER p55_operational_cleanup_failure")
         .run();
       await evictDurableObject(target);
     }
     await runDurableObjectAlarm(target);
-    if (boundary === "expiry") expect(await selfTestCount()).toBe(0);
+    if (boundary === "expiry")
+      expect(await selfTestCount(ORGANISATION_ID)).toBe(0);
     const restored = await runInDurableObject(target, readProposal);
     const terminal =
       boundary === "expiry"
@@ -731,50 +736,6 @@ function readProposal(_actor: unknown, state: DurableObjectState) {
     contentAvailable: record.ciphertextB64 !== null || record.nonceB64 !== null,
     rfcMessageId: readOperationalEmailDispatchId(state.storage.sql, record),
   };
-}
-function readLocalBarrier(_actor: unknown, state: DurableObjectState): number {
-  return state.storage.sql
-    .exec("SELECT 1 FROM state_object_cleanup_export_barrier")
-    .toArray().length;
-}
-function readBarrier(
-  connector: DurableObjectStub<ConnectorDO>,
-): Promise<number> {
-  return runInDurableObject(connector, readLocalBarrier);
-}
-async function exportedItems(relocationId: ActorRelocationId): Promise<number> {
-  const row = await env.DB.prepare(
-    "SELECT COUNT(*) AS total FROM state_object_relocation_item WHERE relocation_id = ? AND status <> 'pending'",
-  )
-    .bind(relocationId)
-    .first<{ total: number }>();
-  return row?.total ?? 0;
-}
-async function startMove(): Promise<ActorRelocationId> {
-  const target = required(
-    parseOrganisationPlacementMoveTarget({
-      kind: "affinity",
-      placementCellId: "e2e",
-      locationHint: "wnam",
-    }),
-  );
-  return required(
-    await startActorRelocation({
-      env,
-      organisationId: ORGANISATION_ID,
-      target,
-      now: Date.now(),
-    }),
-  ).relocationId;
-}
-async function selfTestCount(): Promise<number> {
-  const row = await fixtureDatabase()
-    .prepare(
-      "SELECT COUNT(*) AS total FROM email_self_test WHERE organisation_id = ?",
-    )
-    .bind(ORGANISATION_ID)
-    .first<{ total: number }>();
-  return row?.total ?? 0;
 }
 function projection() {
   return readEmailOperationalProposalProjection({

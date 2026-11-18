@@ -23,12 +23,7 @@ import {
   deferWhatsAppNotice,
   latestWhatsAppProposal,
 } from "../../src/actors/connector-whatsapp";
-import {
-  startActorRelocation,
-  resumeActorRelocation,
-  type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { resumeActorRelocation } from "../../src/actors/actor-relocation";
 import {
   parseUserId,
   parseSessionId,
@@ -60,6 +55,11 @@ import {
   TOKEN,
   type Fixture,
 } from "./whatsapp-connector-support";
+import {
+  exportedItemCount,
+  readBarrier,
+  startMove,
+} from "./placement-move-support";
 
 type ReplyBoundary = "panel" | "preview" | "credential" | "response";
 type NoticeBoundary = "notice_credential" | "notice_response";
@@ -828,7 +828,7 @@ async function noticeJourney(
     await expect
       .poll(readBarrier.bind(null, fixture.connector), { timeout: 10_000 })
       .toBe(1);
-    expect(await exportedItems(relocationId)).toBe(0);
+    expect(await exportedItemCount(relocationId)).toBe(0);
     expect(pause.providerAttempts).toBe(boundary === "notice_response" ? 1 : 0);
     pause.phase = "released";
     expect(await work).toMatchObject({
@@ -995,7 +995,7 @@ async function whatsappPlacementJourney(
       .poll(readBarrier.bind(null, fixture.connector), { timeout: 10_000 })
       .toBe(1);
     expect(marker.complete).toBe(false);
-    expect(await exportedItems(relocationId)).toBe(0);
+    expect(await exportedItemCount(relocationId)).toBe(0);
     expect(pause.providerAttempts).toBe(boundary === "response" ? 1 : 0);
     pause.phase = "released";
     const result = await work;
@@ -1193,43 +1193,8 @@ function pausePhase(pause: Pause): Pause["phase"] {
 function markComplete(marker: { complete: boolean }): void {
   marker.complete = true;
 }
-function readLocalBarrier(_actor: unknown, state: DurableObjectState): number {
-  return state.storage.sql
-    .exec("SELECT 1 FROM state_object_cleanup_export_barrier")
-    .toArray().length;
-}
 function readProposalState(_actor: unknown, state: DurableObjectState): string {
   const proposal = latestWhatsAppProposal(state.storage.sql, PROPOSAL_ID);
   if (proposal === null) throw new Error("Missing imported WhatsApp proposal");
   return proposal.state;
-}
-function readBarrier(
-  connector: DurableObjectStub<ConnectorDO>,
-): Promise<number> {
-  return runInDurableObject(connector, readLocalBarrier);
-}
-async function exportedItems(relocationId: ActorRelocationId): Promise<number> {
-  const row = await env.DB.prepare(
-    "SELECT COUNT(*) AS total FROM state_object_relocation_item WHERE relocation_id = ? AND status <> 'pending'",
-  )
-    .bind(relocationId)
-    .first<{ total: number }>();
-  return row?.total ?? 0;
-}
-async function startMove(): Promise<ActorRelocationId> {
-  const target = required(
-    parseOrganisationPlacementMoveTarget({
-      kind: "affinity",
-      placementCellId: "e2e",
-      locationHint: "wnam",
-    }),
-  );
-  return required(
-    await startActorRelocation({
-      env,
-      organisationId: ORGANISATION_ID,
-      target,
-      now: Date.now(),
-    }),
-  ).relocationId;
 }

@@ -1,4 +1,4 @@
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import {
   evictDurableObject,
@@ -18,7 +18,6 @@ import {
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import type { Conversation } from "../../src/chat/conversation";
 import { saveConversation } from "../../src/chat/store";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { parseActorFenceToken } from "../../src/actors/actor-registry";
@@ -35,15 +34,15 @@ import {
   PUBLIC_ORIGIN,
   SOCKET_MOVED_CODE,
   closeSocket,
-  controlReadHeaders,
   createControlClient,
   dueSocketSweepNow,
   expectPong,
   nextCloseCode,
   openSocket,
-  requireTestPlacement,
   type ControlClient,
 } from "./hibernatable-socket-support";
+import { control, platformConversation } from "./chat-journey-support";
+import { requiredPlacement } from "./slack-journey-support";
 
 // A signal that has not come within this time does not come.
 const QUIET_MS = 750;
@@ -105,7 +104,7 @@ async function chatSignalJourney(): Promise<void> {
         await saveConversation(
           await requireOrganisationExecutionScope(env, organisationId),
           owner.identity.userId,
-          emptyConversation(conversationId, "Proof schedule"),
+          platformConversation(conversationId, "Proof schedule"),
           0,
           { projectId },
         )
@@ -266,7 +265,7 @@ async function installChatScenario(): Promise<
     owner: owner.identity,
     organisationName: "Chat signals",
     environment: "development",
-    placement: requireTestPlacement(),
+    placement: requiredPlacement(),
     mutation: organisationBootstrapMutation(owner.identity, now),
     now,
   });
@@ -323,28 +322,6 @@ function openSignalSocket(
   return openSocket(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/chat/signals`,
     session,
-  );
-}
-
-function control(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-  path: string,
-  method: string,
-  body: unknown,
-): Promise<Response> {
-  return exports.default.fetch(
-    `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/${path}`,
-    {
-      method,
-      headers: {
-        origin: PUBLIC_ORIGIN,
-        ...controlReadHeaders(session),
-        "x-satyr-csrf": session.csrfToken,
-        "content-type": "application/json",
-      },
-      ...(body === null ? {} : { body: JSON.stringify(body) }),
-    },
   );
 }
 
@@ -424,29 +401,4 @@ function noSignal(socket: WebSocket): Promise<void> {
     }, QUIET_MS);
     socket.addEventListener("message", onMessage);
   });
-}
-
-function emptyConversation(id: ConversationId, title: string): Conversation {
-  return {
-    id,
-    title,
-    lineage: { kind: "original" },
-    historyBindings: [],
-    modelRoute: {
-      keySource: "platform",
-      provider: "openai-compatible",
-      model: "fixture",
-    },
-    documents: [],
-    work: { kind: "ready" },
-    completedRequests: [],
-    timeline: [],
-    pendingInputs: [],
-    latestSequence: 0,
-    lastReadSequence: 0,
-    surfaceEventCursor: 0,
-    draftText: "",
-    draftUpdatedAt: null,
-    effort: null,
-  };
 }

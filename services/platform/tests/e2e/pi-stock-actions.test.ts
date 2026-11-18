@@ -2,7 +2,6 @@
 // request changes, through the person's commands, approvals and receipts. Each
 // change happens only after an owner approves the exact card, happens one time,
 // and is refused when the shelf moved after a count.
-import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
@@ -45,6 +44,8 @@ import {
   openRouterToolCall,
   slackSimulator,
 } from "./slack-journey-support";
+import { trustShopDeliveries } from "./commerce-journey-support";
+import { toolOutput } from "./chat-journey-support";
 
 const BASE = `https://localhost/v1/control/organisations/${ORGANISATION_ID}`;
 const FLOUR_RECIPE = "recipe_sesame_cookie_stocked";
@@ -541,22 +542,6 @@ async function grantStockReads(
   }
 }
 
-/** The shared fixture binds a placeholder key; this journey reads deliveries. */
-async function trustShopDeliveries(): Promise<void> {
-  const signing = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${MERCHANT}/test-signing-key`,
-    { headers: { authorization: "Bearer underclerk-e2e-token" } },
-  );
-  const key: unknown = await signing.json();
-  if (!isRecord(key) || typeof key.publicKeyB64 !== "string")
-    throw new Error("Fixture signing key missing");
-  await fixtureDatabase().prepare(
-    "UPDATE underclerk_merchant_binding SET delivery_signing_key_id = 'key_bakery_e2e', delivery_signing_public_key_b64 = ? WHERE merchant_id = ?",
-  )
-    .bind(key.publicKeyB64, MERCHANT)
-    .run();
-}
-
 async function provisionShop(session: IssuedControlSession) {
   const client = providerClient();
   const provisioned = await client.provisionDemo({
@@ -567,7 +552,7 @@ async function provisionShop(session: IssuedControlSession) {
     createdAt: new Date().toISOString(),
   });
   if (!provisioned.ok) throw new Error(JSON.stringify(provisioned.error));
-  await trustShopDeliveries();
+  await trustShopDeliveries(MERCHANT);
   const stock = await readStock();
   const recipe = stock.foodService.resources.recipeRevisions.find(
     (candidate) => candidate.recipeId === FLOUR_RECIPE,
@@ -964,15 +949,6 @@ function answer(marker: string): Step {
   };
 }
 
-function toolOutput(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last = messages.filter(
-    (message) => isRecord(message) && message.role === "tool",
-  );
-  const message = last.at(-1);
-  return isRecord(message) ? JSON.stringify(message.content) : "";
-}
-
 async function respond(
   requests: Record<string, unknown>[],
   steps: Step[],
@@ -986,5 +962,3 @@ async function respond(
     throw new Error(`Unexpected model request ${requests.length}`);
   return step(toolOutput(body));
 }
-
-

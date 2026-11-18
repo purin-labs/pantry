@@ -11,7 +11,6 @@ import {
   type IssuedControlSession,
   type User,
 } from "../../src/data/control-plane";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
 
 export const PUBLIC_ORIGIN = "https://localhost";
 /** The close code of a socket whose Actor no longer serves the Organisation. */
@@ -47,6 +46,7 @@ export async function createControlClient(
   return { identity, session };
 }
 
+/** The Portal's session cookies, for a read. */
 export function controlReadHeaders(
   session: IssuedControlSession,
 ): Record<string, string> {
@@ -121,15 +121,4 @@ export async function dueSocketSweepNow(
   // runs it with runDurableObjectAlarm and not the runtime on its own.
   state.storage.sql.exec("UPDATE hibernatable_socket_sweep SET due_at = 0");
   await state.storage.setAlarm(Date.now() + 60_000);
-}
-
-export function requireTestPlacement() {
-  const parsed = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!parsed.ok) throw new Error(parsed.error.path);
-  return parsed.value;
 }

@@ -7,9 +7,7 @@ import { env, exports } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import {
-  newConversationId,
   parseRecipeCollection,
-  type ConversationId,
   type RecipeCollection,
 } from "@seams/control-api";
 import { isRecord } from "@seams/std";
@@ -27,17 +25,13 @@ import {
 } from "./chat-permission-support";
 import { commerceHeaders, connectCommerceFixture } from "./commerce-support";
 import {
-  createConversation,
   installMemoryFixture,
   postJson,
-  workKind,
-  type Member,
   type MemoryFixture,
 } from "./memory-support";
 import { raiseLabel } from "./held-exit-support";
 import { network } from "./network";
 import { allowAsPortal } from "./permission-request-support";
-import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { providerClient } from "./pi-sdk-effect-support";
 import {
   offeredToolNames,
@@ -45,6 +39,13 @@ import {
   openRouterToolCall,
   requireLastToolOutput,
 } from "./slack-journey-support";
+import {
+  agentReceipts,
+  chatDirect,
+  finished,
+  messageWord,
+  startChat,
+} from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -267,7 +268,7 @@ it(
       )?.revision,
     ).toBe(source.revision);
     await allowHeldStep(fixture);
-    await chatDirect(fixture, "SAVERECIPE");
+    await chatDirect(fixture, fixture.author, "SAVERECIPE");
     expect(lastOutput("SAVERECIPE")).toContain("receiptId");
     const edited = (await library()).recipes.find(
       (recipe) => recipe.recipeId === source.recipeId,
@@ -352,7 +353,7 @@ it(
     evidence.supplierAskAction = supplierAsk.action;
     expect(lastOutput("NOPURCHASING")).toContain(STOPPED);
     await allowHeldStep(fixture);
-    await chatDirect(fixture, "NOPURCHASING");
+    await chatDirect(fixture, fixture.author, "NOPURCHASING");
     expect(lastOutput("NOPURCHASING")).toContain("Activate purchasing");
 
     // 7. A person turns purchasing on and adds a supplier on the page. The agent
@@ -372,7 +373,7 @@ it(
       purchasingNotes: null,
       inventoryItemIds: [item.id],
     });
-    await chatDirect(fixture, "READSUPPLIERS");
+    await chatDirect(fixture, fixture.author, "READSUPPLIERS");
     const suppliers = lastOutput("READSUPPLIERS");
     expect(suppliers).toContain("acceptance-mill");
     expect(suppliers).toContain("Acceptance Mill");
@@ -409,7 +410,7 @@ it(
     //     recipe exists only after both. A chat with no such text needed one
     //     Allow in step 5.
     journey.afterOutsideText = { ...journey.added, name: "After outside text" };
-    const marked = await startChat(fixture, "OUTSIDETEXT");
+    const marked = await startChat(fixture, fixture.author, "OUTSIDETEXT");
     await finished(author, marked);
     const later = async (attempt: string): Promise<string> => {
       const before = journey.outputs.LATERRECIPE?.length ?? 0;
@@ -533,9 +534,9 @@ async function chatApproved(
   fixture: MemoryFixture,
   word: string,
 ): Promise<void> {
-  await chatDirect(fixture, word);
+  await chatDirect(fixture, fixture.author, word);
   await allowHeldStep(fixture);
-  await chatDirect(fixture, word);
+  await chatDirect(fixture, fixture.author, word);
 }
 
 /** One chat message that pauses on a request, which the owner allows in place. */
@@ -545,7 +546,7 @@ async function chatThrough(
   options: Readonly<{ action?: string }>,
 ): Promise<Readonly<{ action: unknown }>> {
   const person = fixture.author;
-  const conversationId = await startChat(fixture, word);
+  const conversationId = await startChat(fixture, fixture.author, word);
   const pause = await pausedRequest(person, fixture.paths.chat, conversationId);
   if (options.action !== undefined)
     expect(pause.permission).toMatchObject({ action: options.action });
@@ -564,70 +565,6 @@ async function chatThrough(
   expect(resumed.status, JSON.stringify(resumed.body)).toBe(200);
   await finished(person, conversationId);
   return { action: pause.permission.action };
-}
-
-/** One chat message that needs no prompt. A pause fails the poll. */
-async function chatDirect(fixture: MemoryFixture, word: string): Promise<void> {
-  await finished(fixture.author, await startChat(fixture, word));
-}
-
-async function startChat(
-  fixture: MemoryFixture,
-  word: string,
-): Promise<ConversationId> {
-  const conversationId = newConversationId();
-  await createConversation(fixture.author, conversationId, fixture.route);
-  await ask(
-    fixture.author,
-    fixture.paths.chat,
-    conversationId,
-    fixture.route.model,
-    `${word} now.`,
-    word,
-  );
-  return conversationId;
-}
-
-function finished(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  return expect
-    .poll(workKind.bind(null, person, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
-async function agentReceipts(
-  fixture: MemoryFixture,
-  route: string,
-): Promise<unknown> {
-  const scope = await requireOrganisationExecutionScope(
-    env,
-    fixture.organisationId,
-  );
-  const rows = await scope.database
-    .prepare(
-      "SELECT operation, COUNT(*) AS n FROM control_mutation_receipt WHERE organisation_scope = ? AND route = ? AND substr(idempotency_key, 1, 6) = 'agent_' GROUP BY operation ORDER BY operation",
-    )
-    .bind(fixture.organisationId, route)
-    .all();
-  return rows.results;
-}
-
-/** The word of the chat message: each chat holds one. */
-function messageWord(
-  body: Record<string, unknown>,
-  words: readonly string[],
-): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (!isRecord(message) || message.role !== "user") continue;
-    const text = JSON.stringify(message.content);
-    const word = words.find((candidate) => text.includes(candidate));
-    if (word !== undefined) return word;
-  }
-  throw new Error("The model request has no scripted message");
 }
 
 async function replyToModel(

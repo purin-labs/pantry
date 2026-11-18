@@ -9,6 +9,7 @@ import { network } from "./network";
 import {
   connectorOf,
   makeFollowUpsDue,
+  readReceipt,
   readFollowUps,
 } from "./slack-follow-up-support";
 import {
@@ -21,6 +22,7 @@ import {
   signedSlackRequest,
   slackEnvelope,
   slackSimulator,
+  threadAndText,
 } from "./slack-journey-support";
 
 /**
@@ -75,8 +77,9 @@ async function followUpJourney(test: TestContext): Promise<void> {
   );
   expect(response.status).toBe(200);
   const connector = await connectorOf(fixture.connectorId);
+  const rootReceipt = readReceipt.bind(null, "Ev_FOLLOW_UP_ROOT");
   await expect
-    .poll(() => runInDurableObject(connector, readRootReceipt), {
+    .poll(() => runInDurableObject(connector, rootReceipt), {
       timeout: 30_000,
     })
     .toBe("completed");
@@ -153,24 +156,4 @@ async function replyToModel(
     default:
       throw new Error("Unexpected model request");
   }
-}
-
-function readRootReceipt(
-  _actor: unknown,
-  ctx: DurableObjectState,
-): string | null {
-  const receipt = ctx.storage.sql
-    .exec<{ outcome: string }>(
-      "SELECT outcome FROM connector_case_work_receipt WHERE event_id = ?",
-      "Ev_FOLLOW_UP_ROOT",
-    )
-    .toArray()[0];
-  return receipt?.outcome ?? null;
-}
-
-function threadAndText(post: Record<string, string>): {
-  readonly thread: string | undefined;
-  readonly text: string | undefined;
-} {
-  return { thread: post.thread_ts, text: post.text };
 }

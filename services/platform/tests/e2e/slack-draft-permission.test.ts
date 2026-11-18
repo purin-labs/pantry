@@ -8,6 +8,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-case-work";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { revokeProductRead } from "./access-route-support";
+import { lastCalledTool } from "./chat-permission-support";
 import { commerceHeaders } from "./commerce-support";
 import { network } from "./network";
 import { installProductSource } from "./product-source-support";
@@ -27,9 +28,8 @@ import {
   openRouterText,
   openRouterToolCall,
   requireLastToolOutput,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  postMention,
 } from "./slack-journey-support";
 
 /**
@@ -241,7 +241,7 @@ async function draftPermissionJourney(test: TestContext): Promise<void> {
     SECOND_ROOT_TS,
     SECOND_ROOT_TS,
     SECOND_ROOT_TS,
-]);
+  ]);
 
   Object.assign(test.task.meta, {
     slackDraftPermission: {
@@ -270,7 +270,7 @@ async function replyToModel(
   if (
     (step === 3 || step === 7 || step === 9) &&
     !offered.includes("product_description_draft_read") &&
-    lastToolName(body) !== "tool_search"
+    lastCalledTool(body) !== "tool_search"
   ) {
     recorded.searches += 1;
     return openRouterToolCall(
@@ -367,30 +367,12 @@ async function replyToModel(
   }
 }
 
-async function postMention(
-  eventId: string,
-  ts: string,
-  question: string,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: "app_mention",
-        eventId,
-        messageTs: ts,
-        threadTs: ts,
-        text: `<@U0SATYR> ${question}`,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
-}
-
 /** An active Organisation. The Slack fixture leaves its onboarding open. */
 async function activateOrganisation(): Promise<void> {
-  await fixtureDatabase().prepare(
-    "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_draft_permission', activated_at = ? WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_draft_permission', activated_at = ? WHERE organisation_id = ?",
+    )
     .bind(Date.now(), ORGANISATION_ID)
     .run();
 }
@@ -444,27 +426,4 @@ function threadOf(message: Record<string, string>): string {
 
 function threadAndText(post: Record<string, string>) {
   return { thread: post.thread_ts, text: post.text };
-}
-
-/** The tool of the latest call, when the latest message is its output. */
-function lastToolName(body: Record<string, unknown>): string | null {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last: unknown = messages.at(-1);
-  if (!isRecord(last) || last.role !== "tool") return null;
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (
-      isRecord(message) &&
-      message.role === "assistant" &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const call: unknown = message.tool_calls.at(-1);
-      return isRecord(call) &&
-        isRecord(call.function) &&
-        typeof call.function.name === "string"
-        ? call.function.name
-        : null;
-    }
-  }
-  return null;
 }

@@ -22,11 +22,11 @@ import {
   createConversation,
   installMemoryFixture,
   post,
-  workKind,
   type Member,
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
+import { finished, lastToolCallName } from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -132,7 +132,7 @@ it(
       { receipt },
     );
     expect(settled.status, await settled.clone().text()).toBe(200);
-    await finish(author, conversationId);
+    await finished(author, conversationId);
     const shownResult = model.toolResults.at(-1) ?? "";
     expect(shownResult).toContain("page_completed");
     expect(shownResult).toContain("Selected product");
@@ -153,7 +153,7 @@ it(
       text: "Show me the Matcha financier again.",
     });
     expect(noPage.status, await noPage.clone().text()).toBe(200);
-    await finish(author, conversationId);
+    await finished(author, conversationId);
     const refusal = model.toolResults.at(-1) ?? "";
     expect(refusal).toContain("does not carry Costs & margins");
     expect(await pageCommandCount(author)).toBe(1);
@@ -207,22 +207,6 @@ async function selectProduct(
         { query: "costs_view_select_product", limit: 1 },
         `j5_discover_${model.requests.length}`,
       );
-}
-
-/** The name of the tool that the newest assistant message called. */
-function lastToolCallName(messages: readonly unknown[]): string | null {
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message = messages[index];
-    if (!isRecord(message) || message.role !== "assistant") continue;
-    const calls = Array.isArray(message.tool_calls) ? message.tool_calls : [];
-    const call: unknown = calls.at(-1);
-    return isRecord(call) &&
-      isRecord(call.function) &&
-      typeof call.function.name === "string"
-      ? call.function.name
-      : null;
-  }
-  return null;
 }
 
 function send(
@@ -304,13 +288,4 @@ async function pageCommandCount(author: Member): Promise<number> {
     .bind(author.organisationId)
     .first<{ count: number }>();
   return row?.count ?? 0;
-}
-
-async function finish(
-  author: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  await expect
-    .poll(workKind.bind(null, author, conversationId), { timeout: 60_000 })
-    .toBe("ready");
 }

@@ -1,27 +1,19 @@
-import { env, exports } from "cloudflare:workers";
-import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
 
-import {
-  listPlacementActorRegistryEntries,
-  type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
-import { connectorActorStub } from "../../src/actors/actor-router";
+import type { ActorRegistryEntry } from "../../src/actors/actor-registry";
 import { network } from "./network";
+import { connectorOf, registryEntries } from "./slack-follow-up-support";
 import {
-  ORGANISATION_ID,
   ROOT_TS,
   SLACK_BOT_TOKEN,
   installSlackActorFixture,
   isStringRecord,
   slackPostFields,
   openRouterText,
-  signedSlackRequest,
-  slackEnvelope,
   shownSlackPost,
+  acceptSlack,
 } from "./slack-journey-support";
 
 /**
@@ -95,27 +87,6 @@ function observeProviders(): Recorded {
   return recorded;
 }
 
-async function acceptSlack(
-  envelope: Parameters<typeof slackEnvelope>[0],
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(slackEnvelope(envelope)),
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  expect(isRecord(body) ? body.durableMode : null).toBe("case_accepted");
-}
-
-async function registryEntries(): Promise<readonly ActorRegistryEntry[]> {
-  const entries = await listPlacementActorRegistryEntries({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    placementEpoch: 1,
-  });
-  if (!entries.ok) throw new Error(entries.error.code);
-  return entries.value;
-}
-
 /** The Case and Session entries of the organisation, in registry order. */
 async function threadActors(): Promise<readonly ActorSummary[]> {
   return (await registryEntries())
@@ -138,21 +109,6 @@ function isThreadActor(entry: ActorRegistryEntry): boolean {
 
 function kindAndLifecycle(actor: ActorSummary): string {
   return `${actor.kind} ${actor.lifecycle}`;
-}
-
-async function connectorOf(connectorId: string) {
-  const entry = (await registryEntries()).find(function isConnector(candidate) {
-    return (
-      candidate.identity.objectKind === "connector" &&
-      candidate.identity.logicalObjectId === connectorId
-    );
-  });
-  if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
-    env.CONNECTOR,
-    entry.physicalObjectName,
-    entry.placement,
-  );
 }
 
 /** The Connector's unsettled Slack work, as its state and attempt. */

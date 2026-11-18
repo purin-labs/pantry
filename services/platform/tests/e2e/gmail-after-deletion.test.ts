@@ -18,6 +18,7 @@ import { runScheduledOnboardingReconciliation } from "../../src/onboarding-recon
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
+import { configurationVersion, readHeaders } from "./purge-support";
 import { googleIdToken } from "./gmail-mailbox-support";
 import {
   attachSharedAccountNativeOrganisation,
@@ -333,21 +334,6 @@ async function lifecycleMutation(
   };
 }
 
-async function configurationVersion(
-  organisationId: OrganisationId,
-): Promise<number> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const version = await scope.database
-    .prepare(
-      "SELECT configuration_version FROM organisation_onboarding WHERE organisation_id = ?",
-    )
-    .bind(organisationId)
-    .first("configuration_version");
-  if (typeof version !== "number")
-    throw new Error("The Organisation has no configuration version");
-  return version;
-}
-
 function mutationHeaders(
   owner: Owner,
   idempotencyKey: string,
@@ -360,12 +346,5 @@ function mutationHeaders(
     "idempotency-key": `gmail-after-deletion-${owner.organisationId}-${idempotencyKey}`,
     "x-satyr-configuration-version": String(version),
     "x-satyr-csrf": owner.client.session.csrfToken,
-  };
-}
-
-function readHeaders(owner: Owner): Record<string, string> {
-  const { token, csrfToken } = owner.client.session;
-  return {
-    cookie: `satyr_control_session=${token}; satyr_control_csrf=${csrfToken}`,
   };
 }

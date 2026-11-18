@@ -4,6 +4,11 @@ import { expect, it, type TestContext } from "vitest";
 import { isConversationId, newConversationId } from "@seams/control-api";
 import { isRecord } from "@seams/std";
 
+import {
+  portalBrowser,
+  textsOf,
+  type TimelineEvent,
+} from "./chat-queued-steer-support";
 import { commerceHeaders } from "./commerce-support";
 import { network } from "./network";
 import {
@@ -15,7 +20,12 @@ import {
   workKind,
   type Member,
 } from "./memory-support";
-import { openRouterText, openRouterToolCall } from "./slack-journey-support";
+import {
+  openRouterText,
+  openRouterToolCall,
+  userMessageContaining,
+  userMessageIs,
+} from "./slack-journey-support";
 
 /**
  * A fork of a steered Portal turn inherits the steering message once (Plan
@@ -93,8 +103,10 @@ async function steeringForkJourney(test: TestContext): Promise<void> {
     .toBe("ready");
   expect(model.requests).toHaveLength(2);
   const source = await storedConversation(owner, conversationId);
-  expect(assistantTexts(source?.conversation.timeline ?? [])).toEqual([ANSWER]);
-  expect(userTexts(source?.conversation.timeline ?? [])).toEqual([
+  expect(textsOf("assistant", source?.conversation.timeline ?? [])).toEqual([
+    ANSWER,
+  ]);
+  expect(textsOf("user", source?.conversation.timeline ?? [])).toEqual([
     QUESTION,
     STEERING_TEXT,
   ]);
@@ -156,7 +168,7 @@ async function steeringForkJourney(test: TestContext): Promise<void> {
     .toBe("ready");
   expect(model.requests).toHaveLength(4);
   const fork = await storedConversation(owner, forkId);
-  const forkAnswers = assistantTexts(fork?.conversation.timeline ?? []);
+  const forkAnswers = textsOf("assistant", fork?.conversation.timeline ?? []);
   expect(forkAnswers).toContain(FORKED);
   expect(forkAnswers).toContain(FORK_SECOND);
 
@@ -260,56 +272,3 @@ function isToolMessage(message: unknown): boolean {
 function isUserMessage(message: unknown): boolean {
   return isRecord(message) && message.role === "user";
 }
-
-/** A user message that is this text alone, as history holds a message. */
-function userMessageIs(text: string, message: unknown): boolean {
-  if (!isRecord(message) || message.role !== "user") return false;
-  const content = message.content;
-  return (
-    content === text ||
-    (Array.isArray(content) &&
-      content.length === 1 &&
-      isRecord(content[0]) &&
-      content[0].text === text)
-  );
-}
-
-function userMessageContaining(text: string, message: unknown): boolean {
-  return (
-    isRecord(message) &&
-    message.role === "user" &&
-    JSON.stringify(message.content).includes(text)
-  );
-}
-
-type TimelineEvent = Readonly<{ kind: string; text?: unknown }>;
-
-function userTexts(timeline: readonly TimelineEvent[]): unknown[] {
-  return timeline
-    .filter(function isUser(event) {
-      return event.kind === "user";
-    })
-    .map(eventText);
-}
-
-function assistantTexts(timeline: readonly TimelineEvent[]): unknown[] {
-  return timeline
-    .filter(function isAssistant(event) {
-      return event.kind === "assistant";
-    })
-    .map(eventText);
-}
-
-function eventText(event: TimelineEvent): unknown {
-  return event.text;
-}
-
-/** The Portal sends its browser binding with every message of a chat. */
-function portalBrowser(conversationId: string) {
-  return {
-    kind: "available",
-    binding: { browserInstanceId: PORTAL_BROWSER, conversationId },
-  } as const;
-}
-
-const PORTAL_BROWSER = "5b726c04-dfcb-4e24-9a0e-1f8e5c6d2a31";

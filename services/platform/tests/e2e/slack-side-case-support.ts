@@ -187,6 +187,18 @@ export function startButtonValue(call: SlackCall): string | null {
   return null;
 }
 
+/** A Slack call as the journeys record it: where it went, its text, its Start. */
+export function summary(call: SlackCall) {
+  return {
+    method: call.method,
+    channel: call.channel,
+    threadTs: call.threadTs,
+    ts: call.ts,
+    text: call.text,
+    button: startButtonValue(call),
+  };
+}
+
 /**
  * A click on Start as Slack sends it: a signed form body that holds the
  * interaction payload. The proposal is a message in the thread `threadTs`.

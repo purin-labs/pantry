@@ -3,13 +3,9 @@ import { expect, it, type TestContext } from "vitest";
 import {
   parseVaultEventList,
   parseVaultItemList,
-  parseVaultItemResult,
   parseVaultStoreResult,
-  type VaultItemView,
 } from "@seams/control-api";
 
-import { parseVaultHandle } from "../../src/credential-vault/domain";
-import { resolveVaultHandle } from "../../src/credential-vault/service";
 import type { OrganisationId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { installMemoryFixture, post, type Member } from "./memory-support";
@@ -17,6 +13,12 @@ import {
   E2E_ONEPASSWORD_TOKEN,
   E2E_ONEPASSWORD_VAULTS,
 } from "./onepassword-network";
+import {
+  item,
+  loginHandle,
+  onePassword,
+  resolvedSecret,
+} from "./vault-support";
 
 const SATYR_PASSWORD = "satyr-held-pass-4K";
 const APP_PASSWORD = "added-in-1password-8M";
@@ -162,7 +164,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
     },
   });
   expect((await onePasswordState()).tokens.length).toBe(callsBefore);
-  expect(await resolved(organisationId, tokenHandle)).toEqual({
+  expect(await resolvedSecret(organisationId, tokenHandle)).toEqual({
     kind: "bearer",
     value: E2E_ONEPASSWORD_TOKEN,
   });
@@ -241,7 +243,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
     ).body,
   );
   expect(moved).toMatchObject({ kind: "moved", moved: 2, remaining: 0 });
-  expect(await resolved(organisationId, pantryHandle)).toEqual({
+  expect(await resolvedSecret(organisationId, pantryHandle)).toEqual({
     error: "vault_secret_revoked",
   });
   const afterMove = await list();
@@ -317,7 +319,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   ]);
   const flourBack = back.items.find((entry) => entry.label === "Flour mill");
   expect(
-    await resolved(
+    await resolvedSecret(
       organisationId,
       await loginHandle(organisationId, flourBack?.itemId ?? ""),
     ),
@@ -337,7 +339,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   expect(
     await send(owner, `${base}/store`, { kind: "disconnect_onepassword" }),
   ).toMatchObject({ status: 200, body: { store: { kind: "satyr" } } });
-  expect(await resolved(organisationId, tokenHandle)).toEqual({
+  expect(await resolvedSecret(organisationId, tokenHandle)).toEqual({
     error: "vault_secret_revoked",
   });
   expect((await onePasswordState()).items).toHaveLength(4);
@@ -395,21 +397,6 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   });
 }
 
-function item(body: unknown): VaultItemView {
-  const result = parseVaultItemResult(body);
-  if (result === null || !("item" in result))
-    throw new Error(`not a Vault item: ${JSON.stringify(body)}`);
-  return result.item;
-}
-
-async function onePassword(path: string, body?: unknown): Promise<unknown> {
-  const response = await env.VAULT_ONEPASSWORD.fetch(
-    `https://vault-onepassword.internal${path}`,
-    { method: "POST", body: JSON.stringify(body ?? {}) },
-  );
-  return response.json();
-}
-
 type FakeState = {
   items: {
     item: {
@@ -458,35 +445,4 @@ async function pantryItemCount(organisationId: OrganisationId): Promise<number> 
     .bind(organisationId)
     .first<{ count: number }>();
   return row?.count ?? 0;
-}
-
-async function loginHandle(
-  organisationId: OrganisationId,
-  itemId: string,
-): Promise<string> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const row = await scope.database
-    .prepare(
-      "SELECT vault_handle FROM vault_item WHERE organisation_id = ? AND vault_item_id = ?",
-    )
-    .bind(organisationId, itemId)
-    .first<{ vault_handle: string }>();
-  if (row === null) throw new Error("Satyr login missing");
-  return row.vault_handle;
-}
-
-async function resolved(
-  organisationId: OrganisationId,
-  rawHandle: string,
-): Promise<unknown> {
-  const handle = parseVaultHandle(rawHandle);
-  if (!handle.ok) throw new Error("handle invalid");
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const secret = await resolveVaultHandle({
-    db: scope.database,
-    keys: env,
-    organisationId,
-    handle: handle.value,
-  });
-  return secret.ok ? secret.value : { error: secret.error.code };
 }

@@ -13,6 +13,10 @@ import {
 } from "./commerce-support";
 import { network } from "./network";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+import {
+  commerceEngine,
+  configurationHeaders,
+} from "./commerce-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -21,7 +25,6 @@ declare module "vitest" {
 }
 
 const PUBLIC_ORIGIN = "https://localhost";
-const OPERATOR = "Bearer underclerk-e2e-token";
 // Pantry's Connect application and Commerce's platform key are one
 // Stripe platform; the fake tells their requests apart by key.
 const SATYR_PLATFORM_KEY = "Bearer sk_test_satyr_platform_e2e";
@@ -320,7 +323,7 @@ async function connectStripe(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/providers/stripe/start`,
     {
       method: "POST",
-      headers: mutationHeaders(session, idempotencyKey),
+      headers: configurationHeaders(session, idempotencyKey),
       body: JSON.stringify({ returnPath: `/portal/${organisationId}` }),
     },
   );
@@ -365,7 +368,7 @@ async function onboarding(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/commerce/payment-accounts/stripe/onboarding`,
     {
       method: "POST",
-      headers: mutationHeaders(session, crypto.randomUUID()),
+      headers: configurationHeaders(session, crypto.randomUUID()),
       body: JSON.stringify(body),
     },
   );
@@ -395,32 +398,7 @@ async function paymentAccounts(
   }));
 }
 
-async function commerceEngine(
-  merchantId: string,
-  path: string,
-): Promise<Record<string, unknown>> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/${path}`,
-    { headers: { authorization: OPERATOR } },
-  );
-  return record(await response.json());
-}
-
 function record(value: unknown): Record<string, unknown> {
   if (!isRecord(value)) throw new Error(`Not a record: ${String(value)}`);
   return value;
-}
-
-function mutationHeaders(
-  session: IssuedControlSession,
-  idempotencyKey: string,
-): HeadersInit {
-  return {
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    origin: PUBLIC_ORIGIN,
-    "content-type": "application/json",
-    "idempotency-key": idempotencyKey,
-    "x-satyr-configuration-version": "1",
-    "x-satyr-csrf": session.csrfToken,
-  };
 }

@@ -70,7 +70,6 @@ import {
   resolveActiveSessionActor,
 } from "../../src/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import type { Conversation } from "../../src/chat/conversation";
 import { readConversation, saveConversation } from "../../src/chat/store";
 import { readProjectDirectory } from "../../src/chat/projects";
 import { requireDefaultProjectId } from "../fixtures/default-project";
@@ -81,6 +80,7 @@ import {
 } from "../../src/chat/turn-access";
 import { readChatControlAuthority } from "../../src/chat/information-flow";
 import { observeProjectReference } from "../../src/projects/references";
+import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import {
   installSlackActorFixture,
@@ -177,7 +177,11 @@ async function sharedRuntimeJourney(context: TestContext): Promise<void> {
   await saveConversation(
     await requireOrganisationExecutionScope(env, scope.organisationId),
     scope.userId,
-    emptyConversation(privateConversationId, "Private biscuit"),
+    platformConversation(
+      privateConversationId,
+      "Private biscuit",
+      "moonshotai/kimi-k3",
+    ),
     0,
   );
   // Retained canonical roots keep their original Actor address after an ID cutover.
@@ -304,7 +308,7 @@ async function sharedRuntimeJourney(context: TestContext): Promise<void> {
   await saveConversation(
     await requireOrganisationExecutionScope(env, ORGANISATION_ID),
     owner.userId,
-    emptyConversation(conversationId, "Shared launch"),
+    platformConversation(conversationId, "Shared launch", "moonshotai/kimi-k3"),
     0,
   );
   await fixtureDatabase().prepare(
@@ -1570,31 +1574,6 @@ async function verifyArchiveMovePaused(
       .first<number>("count"),
   ).toBe(0);
   expect(await env.ARCHIVE.head(objectKey)).not.toBeNull();
-}
-
-function emptyConversation(id: ConversationId, title: string): Conversation {
-  return {
-    id,
-    title,
-    lineage: { kind: "original" },
-    historyBindings: [],
-    modelRoute: {
-      keySource: "platform",
-      provider: "openai-compatible",
-      model: "moonshotai/kimi-k3",
-    },
-    documents: [],
-    work: { kind: "ready" },
-    completedRequests: [],
-    timeline: [],
-    pendingInputs: [],
-    latestSequence: 0,
-    lastReadSequence: 0,
-    surfaceEventCursor: 0,
-    draftText: "",
-    draftUpdatedAt: null,
-    effort: null,
-  };
 }
 
 async function reply(

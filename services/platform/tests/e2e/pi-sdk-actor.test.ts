@@ -35,6 +35,7 @@ import {
   slackEnvelope,
   slackSimulator,
 } from "./slack-journey-support";
+import { readCaseWorkOutcome } from "./durable-codemode-journey-support";
 
 it("restores native discovery and Code Mode store across Actor eviction after delayed discovery through the durable Slack Actor path", async ({
   task,
@@ -134,7 +135,7 @@ it("withholds a native composition summary after its read grant is revoked", asy
   if (connectorRow === null) throw new Error("Connector Actor missing");
   const connector = env.CONNECTOR.getByName(connectorRow.name);
   await expect
-    .poll(readSdkCaseWorkOutcome.bind(null, connector), { timeout: 15_000 })
+    .poll(readCaseWorkOutcome.bind(null, connector), { timeout: 15_000 })
     .toMatchObject({ reason: "case_delivery_authority_partition_changed" });
   expect(requests).toHaveLength(3);
   expect(slack.messages).toEqual([]);
@@ -145,7 +146,7 @@ it("withholds a native composition summary after its read grant is revoked", asy
     piSdkEvidence: {
       scenario: "native-composition-revoked-delivery",
       requests,
-      caseWork: await readSdkCaseWorkOutcome(connector),
+      caseWork: await readCaseWorkOutcome(connector),
       session: accepted.session,
       case: accepted.case,
       delivered: slack.messages,
@@ -194,27 +195,6 @@ async function respondToRevokedDeliveryModel(
     default:
       throw new Error("Unexpected delivery model request");
   }
-}
-
-async function readSdkCaseWorkOutcome(connector: DurableObjectStub) {
-  return runInDurableObject(connector, inspectSdkCaseWorkOutcome);
-}
-
-function inspectSdkCaseWorkOutcome(_actor: unknown, state: DurableObjectState) {
-  const receipt = state.storage.sql
-    .exec<{ outcome: string; reason: string | null }>(
-      "SELECT outcome, reason FROM connector_case_work_receipt",
-    )
-    .toArray()[0];
-  if (receipt !== undefined) return receipt;
-  const pending = state.storage.sql
-    .exec<{ state_kind: string; retry_reason: string | null }>(
-      "SELECT state_kind, retry_reason FROM connector_case_work",
-    )
-    .toArray()[0];
-  return pending === undefined
-    ? null
-    : { outcome: pending.state_kind, reason: pending.retry_reason };
 }
 
 it("settles an exhausted native composition through the Actor budget boundary", async ({

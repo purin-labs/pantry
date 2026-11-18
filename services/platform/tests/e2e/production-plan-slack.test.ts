@@ -7,6 +7,7 @@ import { isRecord } from "@seams/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-case-work";
 import type { IssuedControlSession } from "../../src/data/control-plane";
+import { lastCalledTool } from "./chat-permission-support";
 import { commerceHeaders, connectCommerceFixture } from "./commerce-support";
 import { network } from "./network";
 import {
@@ -15,7 +16,12 @@ import {
   readRequest,
   requestIdIn,
 } from "./permission-request-support";
-import { LOCATION, PRODUCTION, PlanJourney } from "./production-plan-support";
+import {
+  LOCATION,
+  PRODUCTION,
+  PlanJourney,
+  readPlan,
+} from "./production-plan-support";
 import {
   CHANNEL_ID,
   ORGANISATION_ID,
@@ -25,9 +31,8 @@ import {
   openRouterText,
   openRouterToolCall,
   requireLastToolOutput,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  postMention,
 } from "./slack-journey-support";
 
 declare module "vitest" {
@@ -183,7 +188,7 @@ async function replyToModel(
   recorded.requests.push(body);
   const offered = offeredToolNames(body);
   const id = `plan_slack_${String(recorded.requests.length)}`;
-  const called = lastToolName(body);
+  const called = lastCalledTool(body);
   if (called === null) {
     recorded.turns += 1;
     if (recorded.turns === 1) {
@@ -234,33 +239,6 @@ async function replyToModel(
     default:
       throw new Error(`Unexpected tool ${called}`);
   }
-}
-
-function readPlan(id: string): Promise<Response> | Response {
-  return openRouterToolCall(
-    "production_plan_read",
-    { locationId: LOCATION },
-    `call_${id}`,
-  );
-}
-
-async function postMention(
-  eventId: string,
-  ts: string,
-  question: string,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: "app_mention",
-        eventId,
-        messageTs: ts,
-        threadTs: ts,
-        text: `<@U0SATYR> ${question}`,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
 }
 
 /** An active Organisation. The Slack fixture leaves its onboarding open. */
@@ -322,27 +300,4 @@ function threadsOf(messages: readonly Record<string, string>[]): string[] {
 
 function threadAndText(post: Record<string, string>) {
   return { thread: post.thread_ts, text: post.text };
-}
-
-/** The tool of the latest call, when the latest message is its output. */
-function lastToolName(body: Record<string, unknown>): string | null {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last: unknown = messages.at(-1);
-  if (!isRecord(last) || last.role !== "tool") return null;
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (
-      isRecord(message) &&
-      message.role === "assistant" &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const call: unknown = message.tool_calls.at(-1);
-      return isRecord(call) &&
-        isRecord(call.function) &&
-        typeof call.function.name === "string"
-        ? call.function.name
-        : null;
-    }
-  }
-  return null;
 }

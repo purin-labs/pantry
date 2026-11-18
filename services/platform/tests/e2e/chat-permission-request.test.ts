@@ -1,14 +1,9 @@
-import { env, exports } from "cloudflare:workers";
+import { exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { newConversationId, type ConversationId } from "@seams/control-api";
 import { isRecord } from "@seams/std";
-import { resolveActiveCaseActor } from "../../src/actors/actor-router";
-import {
-  conversationCaseId,
-  initialConversationCaseIdentity,
-} from "../../src/chat/conversation-actor-identity";
 import { commerceHeaders } from "./commerce-support";
 import {
   createConversation,
@@ -21,6 +16,8 @@ import {
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText } from "./slack-journey-support";
+import { bindLinkFetch, resolvePublicAddress } from "./link-fetch-support";
+import { conversationCase } from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -349,46 +346,4 @@ async function setCapabilityMode(
     },
   );
   expect(changed.status, await changed.clone().text()).toBe(200);
-}
-
-function resolvePublicAddress({
-  request,
-}: Parameters<HttpResponseResolver>[0]): Response {
-  return HttpResponse.json({
-    Status: 0,
-    Answer:
-      new URL(request.url).searchParams.get("type") === "A"
-        ? [{ type: 1, data: "93.184.216.34" }]
-        : [],
-  });
-}
-
-async function conversationCase(
-  person: Member,
-  conversationId: ConversationId,
-) {
-  const caseId = await conversationCaseId(
-    initialConversationCaseIdentity(
-      { organisationId: person.organisationId, userId: person.userId },
-      conversationId,
-    ),
-  );
-  const actor = await resolveActiveCaseActor({
-    env,
-    namespace: env.CASE,
-    organisationId: person.organisationId,
-    caseId,
-    now: Date.now(),
-  });
-  if (!actor.ok) throw new Error(actor.error.code);
-  return actor.value;
-}
-
-function bindLinkFetch(linkFetch: object, actor: object): void {
-  const bindings = Reflect.get(actor, "env");
-  if (!isRecord(bindings)) throw new Error("The Actor has no environment");
-  Object.defineProperty(bindings, "MESSAGE_LINK_FETCH", {
-    configurable: true,
-    value: linkFetch,
-  });
 }

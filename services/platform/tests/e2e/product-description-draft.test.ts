@@ -27,12 +27,11 @@ import {
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { commerceCanonicalResourceId } from "../../src/commerce/provider";
 import type { OrganisationId } from "../../src/ids";
 import type { Variant } from "@seams/type-utils";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
-
+import { requiredPlacement } from "./slack-journey-support";
 
 const PUBLIC_ORIGIN = "https://localhost";
 const PRODUCT_ID = "product_description_e2e";
@@ -41,7 +40,7 @@ const PROVIDER_CONNECTION_ID = "provider_description_e2e";
 const COMMERCE_BINDING_ID = "underclerk_binding_description_e2e";
 const COMMERCE_MERCHANT_ID = "merchant_description_e2e";
 const INITIAL_DESCRIPTION = "Freshly baked croissant.";
-const TEST_PLACEMENT = requireTestPlacement();
+const TEST_PLACEMENT = requiredPlacement();
 type ControlClient = Readonly<{
   identity: User;
   session: IssuedControlSession;
@@ -409,44 +408,53 @@ async function installDraftScenario(
   if (!bootstrapped.ok) throw new Error(bootstrapped.error.code);
   const organisation = bootstrapped.value;
   await fixtureDatabase().batch([
-    fixtureDatabase().prepare(
-      `INSERT INTO person (organisation_id, person_id, display_name)
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO person (organisation_id, person_id, display_name)
        VALUES (?, ?, ?)`,
-    ).bind(
-      organisation.organisationId,
-      `person_description_${label}`,
-      editor.identity.displayName,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO service_role_grant (
+      )
+      .bind(
+        organisation.organisationId,
+        `person_description_${label}`,
+        editor.identity.displayName,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO service_role_grant (
          organisation_id, user_id, person_id, role, status, created_at, revoked_at
        ) VALUES (?, ?, ?, 'operator', 'active', ?, NULL)`,
-    ).bind(
-      organisation.organisationId,
-      editor.identity.userId,
-      `person_description_${label}`,
-      now,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO person (organisation_id, person_id, display_name)
+      )
+      .bind(
+        organisation.organisationId,
+        editor.identity.userId,
+        `person_description_${label}`,
+        now,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO person (organisation_id, person_id, display_name)
        VALUES (?, ?, ?)`,
-    ).bind(
-      organisation.organisationId,
-      `person_description_${label}_viewer`,
-      viewer.identity.displayName,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO service_role_grant (
+      )
+      .bind(
+        organisation.organisationId,
+        `person_description_${label}_viewer`,
+        viewer.identity.displayName,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO service_role_grant (
          organisation_id, user_id, person_id, role, status, created_at, revoked_at
        ) VALUES (?, ?, ?, 'viewer', 'active', ?, NULL)`,
-    ).bind(
-      organisation.organisationId,
-      viewer.identity.userId,
-      `person_description_${label}_viewer`,
-      now,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO provider_connection (
+      )
+      .bind(
+        organisation.organisationId,
+        viewer.identity.userId,
+        `person_description_${label}_viewer`,
+        now,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO provider_connection (
          provider_connection_id, organisation_id, provider, auth_mode, authority_kind,
          credential_generation, credential_ref, provider_application,
          application_credential_generation, asset_grant_revision, lifecycle,
@@ -454,16 +462,18 @@ async function installDraftScenario(
          disabled_at, revoked_at, environment, provider_subject_id
        ) VALUES (?, ?, 'underclerk', 'api_key', 'connection_credential',
          1, ?, NULL, NULL, NULL, 'active', '[]', ?, ?, ?, NULL, NULL, 'development', '')`,
-    ).bind(
-      PROVIDER_CONNECTION_ID + label,
-      organisation.organisationId,
-      `vault:description:${label}`,
-      owner.identity.userId,
-      now,
-      now,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO integration_account (
+      )
+      .bind(
+        PROVIDER_CONNECTION_ID + label,
+        organisation.organisationId,
+        `vault:description:${label}`,
+        owner.identity.userId,
+        now,
+        now,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO integration_account (
          integration_account_id, organisation_id, provider_connection_id, provider,
          provider_account_id, account_kind, display_name, lifecycle,
          lifecycle_reason_code, capability_set, audience_policy, retention_policy,
@@ -471,43 +481,48 @@ async function installDraftScenario(
          revoked_at, environment, is_default_for_provider
        ) VALUES (?, ?, ?, 'underclerk', ?, 'merchant', ?, 'active', NULL,
          '[]', '{}', '{}', ?, ?, NULL, NULL, NULL, 'development', 0)`,
-    ).bind(
-      INTEGRATION_ACCOUNT_ID + label,
-      organisation.organisationId,
-      PROVIDER_CONNECTION_ID + label,
-      COMMERCE_MERCHANT_ID + label,
-      `Underclerk ${label}`,
-      now,
-      now,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO underclerk_merchant_binding (
+      )
+      .bind(
+        INTEGRATION_ACCOUNT_ID + label,
+        organisation.organisationId,
+        PROVIDER_CONNECTION_ID + label,
+        COMMERCE_MERCHANT_ID + label,
+        `Underclerk ${label}`,
+        now,
+        now,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO underclerk_merchant_binding (
          binding_id, organisation_id, integration_account_id, merchant_id,
          environment, delivery_signing_key_id, delivery_signing_public_key_b64,
          revision, created_at, updated_at
        ) VALUES (?, ?, ?, ?, 'development', ?, ?, 1, ?, ?)`,
-    ).bind(
-      COMMERCE_BINDING_ID + label,
-      organisation.organisationId,
-      INTEGRATION_ACCOUNT_ID + label,
-      COMMERCE_MERCHANT_ID + label,
-      `underclerk-key-${label}`,
-      "AA==",
-      now,
-      now,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO organisation_commerce_system (
+      )
+      .bind(
+        COMMERCE_BINDING_ID + label,
+        organisation.organisationId,
+        INTEGRATION_ACCOUNT_ID + label,
+        COMMERCE_MERCHANT_ID + label,
+        `underclerk-key-${label}`,
+        "AA==",
+        now,
+        now,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO organisation_commerce_system (
          organisation_id, system_kind, underclerk_binding_id,
          shopify_integration_account_id, revision, selected_at,
          selected_by_user_id
        ) VALUES (?, 'satyr_commerce', ?, NULL, 1, ?, ?)`,
-    ).bind(
-      organisation.organisationId,
-      COMMERCE_BINDING_ID + label,
-      now,
-      owner.identity.userId,
-    ),
+      )
+      .bind(
+        organisation.organisationId,
+        COMMERCE_BINDING_ID + label,
+        now,
+        owner.identity.userId,
+      ),
   ]);
   await ensureCreatedOrganisationActor({
     env,
@@ -572,11 +587,12 @@ async function revokeMembership(
   organisationId: OrganisationId,
   userId: string,
 ): Promise<void> {
-  await fixtureDatabase().prepare(
-    `UPDATE service_role_grant
+  await fixtureDatabase()
+    .prepare(
+      `UPDATE service_role_grant
         SET status = 'revoked', revoked_at = ?
       WHERE organisation_id = ? AND user_id = ?`,
-  )
+    )
     .bind(Date.now(), organisationId, userId)
     .run();
 }
@@ -865,17 +881,6 @@ function organisationBootstrapMutation(
       now,
     }),
   };
-}
-
-function requireTestPlacement() {
-  const parsed = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!parsed.ok) throw new Error(parsed.error.path);
-  return parsed.value;
 }
 
 function delay(milliseconds: number): Promise<void> {

@@ -1,5 +1,9 @@
 import { env, exports } from "cloudflare:workers";
-import { organisationDatabase, fixtureDatabase, publishGlobalOrganisation } from "./organisation-database";
+import {
+  organisationDatabase,
+  fixtureDatabase,
+  publishGlobalOrganisation,
+} from "./organisation-database";
 import {
   evictDurableObject,
   runDurableObjectAlarm,
@@ -25,11 +29,13 @@ import { storeVaultSecret } from "../../src/credential-vault";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { createOrganisationInstall } from "../../src/data/organisation";
 import { type SessionId } from "../../src/ids";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { network } from "./network";
 import {
   attachSlackActorToAccountAuthority,
+  isStringRecord,
+  requiredPlacement,
+  signedSlackRequest,
   slackPostFields,
 } from "./slack-journey-support";
 import { isRecord, parseJsonOrNull } from "@seams/std";
@@ -40,7 +46,6 @@ import {
   requireWorkspaceId,
 } from "../test-ids";
 
-const SLACK_SIGNING_SECRET = "slack-signing-e2e-secret";
 const ORGANISATION_ID = requireOrganisationId(
   "organisation_e2e_actor_recovery",
 );
@@ -487,9 +492,10 @@ async function recoversActorDelivery(
       fixture.connectorId,
     );
     const targetStubs = recoveryActorStubs(targetReferences);
-    const targetOrganisationRow = await fixtureDatabase().prepare(
-      "SELECT physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind = 'organisation' AND lifecycle_status = 'active'",
-    )
+    const targetOrganisationRow = await fixtureDatabase()
+      .prepare(
+        "SELECT physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind = 'organisation' AND lifecycle_status = 'active'",
+      )
       .bind(ORGANISATION_ID)
       .first<{ name: string }>();
     if (targetOrganisationRow === null)
@@ -666,29 +672,34 @@ async function installRecoveryFixture(): Promise<{
 }> {
   const now = Date.now();
   const tokenHandle = requireVaultHandle("vault:slack:bot:e2e-actor-recovery");
-  const install = await createOrganisationInstall(organisationDatabase(ORGANISATION_ID), env.DB, {
-    organisationId: ORGANISATION_ID,
-    name: "E2E actor recovery",
-    surfaceKind: "slack",
-    workspaceId: WORKSPACE_ID,
-    installModel: "unlisted",
-    botTokenRef: tokenHandle,
-    scopes: [
-      "app_mentions:read",
-      "assistant:write",
-      "channels:history",
-      "channels:read",
-      "chat:write",
-    ],
-    placement: requiredPlacement(),
-    createdAt: now - 2_000,
-    installedAt: now - 1_000,
-  });
-  const connection = await fixtureDatabase().prepare(
-    `SELECT provider_connection_id AS providerConnectionId
+  const install = await createOrganisationInstall(
+    organisationDatabase(ORGANISATION_ID),
+    env.DB,
+    {
+      organisationId: ORGANISATION_ID,
+      name: "E2E actor recovery",
+      surfaceKind: "slack",
+      workspaceId: WORKSPACE_ID,
+      installModel: "unlisted",
+      botTokenRef: tokenHandle,
+      scopes: [
+        "app_mentions:read",
+        "assistant:write",
+        "channels:history",
+        "channels:read",
+        "chat:write",
+      ],
+      placement: requiredPlacement(),
+      createdAt: now - 2_000,
+      installedAt: now - 1_000,
+    },
+  );
+  const connection = await fixtureDatabase()
+    .prepare(
+      `SELECT provider_connection_id AS providerConnectionId
      FROM integration_account
      WHERE integration_account_id = ?`,
-  )
+    )
     .bind(install.integrationAccountId)
     .first<{ readonly providerConnectionId: string }>();
   if (connection === null)
@@ -718,61 +729,73 @@ async function installRecoveryFixture(): Promise<{
     ).bind(now - 1_000, now - 1_000),
   ]);
   await fixtureDatabase().batch([
-    fixtureDatabase().prepare(
-      `INSERT INTO person (organisation_id, person_id, display_name)
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO person (organisation_id, person_id, display_name)
        VALUES (?, 'person_e2e-actor-recovery', 'E2E Actor Recovery')`,
-    ).bind(ORGANISATION_ID),
-    fixtureDatabase().prepare(
-      `INSERT INTO service_role_grant (
+      )
+      .bind(ORGANISATION_ID),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO service_role_grant (
          organisation_id, user_id, person_id, role, status, created_at, revoked_at
        ) VALUES (
          ?, 'user_78d52121-40d5-53ad-83cd-ef528ba5f3f2', 'person_e2e-actor-recovery',
          'operator', 'active', ?, NULL
        )`,
-    ).bind(ORGANISATION_ID, now - 1_000),
-    fixtureDatabase().prepare(
-      `INSERT INTO external_identity_link (
+      )
+      .bind(ORGANISATION_ID, now - 1_000),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO external_identity_link (
          organisation_id, workspace_connection_id, workspace_id, external_user_id,
          user_id, verified_at, verified_by
        ) VALUES (
          ?, ?, ?, ?, 'user_78d52121-40d5-53ad-83cd-ef528ba5f3f2', ?, 'google'
        )`,
-    ).bind(
-      ORGANISATION_ID,
-      connection.providerConnectionId,
-      WORKSPACE_ID,
-      USER_ID,
-      now - 900,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO organisation_communication_destination (
+      )
+      .bind(
+        ORGANISATION_ID,
+        connection.providerConnectionId,
+        WORKSPACE_ID,
+        USER_ID,
+        now - 900,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO organisation_communication_destination (
          organisation_id, integration_account_id, workspace_id, channel_id,
          provider_revision, selected_at
        ) VALUES (?, ?, ?, ?, 'channel-e2e-recovery-1', ?)`,
-    ).bind(
-      ORGANISATION_ID,
-      install.integrationAccountId,
-      WORKSPACE_ID,
-      CHANNEL_ID,
-      now - 800,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO organisation_slack_channel (
+      )
+      .bind(
+        ORGANISATION_ID,
+        install.integrationAccountId,
+        WORKSPACE_ID,
+        CHANNEL_ID,
+        now - 800,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO organisation_slack_channel (
          organisation_id, integration_account_id, workspace_id, channel_id,
          provider_revision, connected_at
        ) VALUES (?, ?, ?, ?, 'channel-e2e-recovery-1', ?)`,
-    ).bind(
-      ORGANISATION_ID,
-      install.integrationAccountId,
-      WORKSPACE_ID,
-      CHANNEL_ID,
-      now - 800,
-    ),
-    fixtureDatabase().prepare(
-      `INSERT INTO organisation_inference_selection (
+      )
+      .bind(
+        ORGANISATION_ID,
+        install.integrationAccountId,
+        WORKSPACE_ID,
+        CHANNEL_ID,
+        now - 800,
+      ),
+    fixtureDatabase()
+      .prepare(
+        `INSERT INTO organisation_inference_selection (
          organisation_id, selection_kind, selected_by_user_id, selected_at
        ) VALUES (?, 'satyr_platform', 'user_78d52121-40d5-53ad-83cd-ef528ba5f3f2', ?)`,
-    ).bind(ORGANISATION_ID, now - 700),
+      )
+      .bind(ORGANISATION_ID, now - 700),
   ]);
 
   await env.DB.batch([
@@ -942,8 +965,9 @@ async function activeRecoveryActorCount(connectorId: string): Promise<number> {
 async function readRecoveryActorRegistryRows(): Promise<
   readonly ActorRegistryRow[]
 > {
-  const result = await fixtureDatabase().prepare(
-    `SELECT object_kind AS objectKind,
+  const result = await fixtureDatabase()
+    .prepare(
+      `SELECT object_kind AS objectKind,
             logical_object_id AS logicalObjectId,
             physical_object_name AS physicalObjectName
      FROM durable_object_registry
@@ -951,7 +975,7 @@ async function readRecoveryActorRegistryRows(): Promise<
        AND lifecycle_status = 'active'
        AND object_kind IN ('connector', 'case', 'session')
      ORDER BY object_kind`,
-  )
+    )
     .bind(ORGANISATION_ID)
     .all<ActorRegistryRow>();
   return result.results;
@@ -1235,59 +1259,6 @@ function slackEnvelope(): Record<string, unknown> {
       event_ts: ROOT_TS,
     },
   };
-}
-
-async function signedSlackRequest(
-  envelope: Record<string, unknown>,
-): Promise<Request> {
-  const rawBody = JSON.stringify(envelope);
-  const timestamp = Math.floor(Date.now() / 1_000).toString();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(SLACK_SIGNING_SECRET),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const digest = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(`v0:${timestamp}:${rawBody}`),
-  );
-  return new Request("http://satyr.test/slack/events", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-slack-request-timestamp": timestamp,
-      "x-slack-signature": `v0=${hex(new Uint8Array(digest))}`,
-    },
-    body: rawBody,
-  });
-}
-
-function hex(bytes: Uint8Array): string {
-  let result = "";
-  for (const byte of bytes) result += byte.toString(16).padStart(2, "0");
-  return result;
-}
-
-function requiredPlacement() {
-  const parsed = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!parsed.ok) throw new Error(parsed.error.path);
-  return parsed.value;
-}
-
-function isStringRecord(value: unknown): value is Record<string, string> {
-  if (!isRecord(value)) return false;
-  for (const item of Object.values(value)) {
-    if (typeof item !== "string") return false;
-  }
-  return true;
 }
 
 function deliveryReceiptIdentity(receipt: {

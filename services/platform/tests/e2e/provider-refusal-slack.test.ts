@@ -1,26 +1,21 @@
-import { fixtureDatabase } from "./organisation-database";
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
 import {
-  parseAnthropicApiKey,
-  storeOrganisationAnthropicModelCredential,
-} from "../../src/credential-vault";
-import { selectInference } from "./chatgpt-subscription-support";
+  connectAnthropicApiKey,
+  sendMention,
+  sendReply,
+} from "./chatgpt-subscription-support";
 import { MODEL_EXIT_EGRESS_HEADER } from "./model-exit-network";
 import { network } from "./network";
 import {
-  CHANNEL_ID,
-  ORGANISATION_ID,
   installDiscoveryActorFixture,
   openRouterText,
   openRouterToolCall,
-  readSlackMessageText,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  threadAnswers,
 } from "./slack-journey-support";
 
 /**
@@ -304,71 +299,4 @@ class FakeOpenRouter implements FakeModelApi {
       ? openRouterToolCall("integration_list", {}, `tool_${id}`)
       : openRouterText(ANSWER, id);
   }
-}
-
-/**
- * Store the organisation's own Anthropic API key, as an owner does in
- * Portal, and make it the inference route.
- */
-async function connectAnthropicApiKey(apiKey: string): Promise<void> {
-  const key = parseAnthropicApiKey(apiKey);
-  if (!key.ok) throw new Error(key.error.code);
-  const stored = await storeOrganisationAnthropicModelCredential({
-    db: fixtureDatabase(),
-    keys: env,
-    organisationId: ORGANISATION_ID,
-    apiKey: key.value,
-    now: Date.now(),
-  });
-  if (!stored.ok) throw new Error(stored.error.code);
-  await selectInference({ kind: "organisation_anthropic_api_key" });
-}
-
-function threadAnswers(
-  messages: readonly Record<string, string>[],
-  threadTs: string,
-): string[] {
-  return messages
-    .filter(
-      (message) =>
-        message.channel === CHANNEL_ID && message.thread_ts === threadTs,
-    )
-    .map(readSlackMessageText);
-}
-
-function sendMention(eventId: string, threadTs: string): Promise<unknown> {
-  return sendSlack(eventId, threadTs, threadTs, "app_mention");
-}
-
-function sendReply(
-  eventId: string,
-  messageTs: string,
-  threadTs: string,
-): Promise<unknown> {
-  return sendSlack(eventId, messageTs, threadTs, "message");
-}
-
-async function sendSlack(
-  eventId: string,
-  messageTs: string,
-  threadTs: string,
-  eventType: "app_mention" | "message",
-): Promise<unknown> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType,
-        eventId,
-        messageTs,
-        threadTs,
-        text:
-          eventType === "app_mention"
-            ? "<@U0SATYR> Which integrations are connected?"
-            : "Try again, please.",
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  return isRecord(body) ? body.durableMode : null;
 }

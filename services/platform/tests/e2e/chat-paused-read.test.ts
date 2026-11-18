@@ -7,6 +7,7 @@ import { revokeProductRead } from "./access-route-support";
 import {
   answers,
   ask,
+  currentRequest,
   lastCalledTool,
   pausedRequest,
   resumeChat,
@@ -260,20 +261,4 @@ async function replyToModel(
 
 function reply(text: string, id: string): Response {
   return openRouterText(JSON.stringify({ kind: "reply", text }), id);
-}
-
-/** The person's request of this turn, without the context that follows it. */
-function currentRequest(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (isRecord(message) && message.role === "user") {
-      const text = JSON.stringify(message.content);
-      const at = text.indexOf("Current user request");
-      if (at < 0) return "";
-      const end = text.indexOf("Accepted organizational context", at);
-      return text.slice(at, end < 0 ? undefined : end);
-    }
-  }
-  return "";
 }

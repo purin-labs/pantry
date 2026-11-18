@@ -2,7 +2,7 @@
 // docs/plan-88-satyr-funded-jev.md. The fake TypeSafe only records the key and
 // the purpose of each request and answers; product code chooses the key, writes
 // the switch records and refuses the requests that the journeys assert.
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
@@ -42,6 +42,7 @@ import {
   attachSharedAccountNativeOrganisation,
   fixtureRows,
 } from "./shared-account-platform-fixture";
+import { controlFetch } from "./chat-journey-support";
 
 const SATYR_KEY = "typesafe-satyr-e2e-key-0000000000";
 const OWN_KEY = "typesafe-own-e2e-key-00000000000";
@@ -1018,25 +1019,4 @@ async function typeSafeVaultSecrets(
     .bind(organisationId)
     .first<{ count: number }>();
   return row?.count ?? 0;
-}
-
-function controlFetch(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-  path: string,
-  body: unknown,
-): Promise<Response> {
-  return exports.default.fetch(
-    `https://localhost/v1/control/organisations/${organisationId}/${path}`,
-    {
-      method: body === null ? "GET" : "POST",
-      headers: {
-        "content-type": "application/json",
-        origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
-      },
-      body: body === null ? null : JSON.stringify(body),
-    },
-  );
 }

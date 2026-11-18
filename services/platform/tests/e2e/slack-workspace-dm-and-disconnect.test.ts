@@ -17,6 +17,7 @@ import { requireOrganisationExecutionScope } from "../organisation-execution-fix
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
 import { organisationDatabase } from "./organisation-database";
+import { readHeaders } from "./purge-support";
 import {
   attachSharedAccountNativeOrganisation,
   type SharedAccountNativeClient,
@@ -326,11 +327,4 @@ async function routingConnections(
       lifecycle: String(raw.lifecycle),
     };
   });
-}
-
-function readHeaders(owner: Owner): Record<string, string> {
-  const { token, csrfToken } = owner.client.session;
-  return {
-    cookie: `satyr_control_session=${token}; satyr_control_csrf=${csrfToken}`,
-  };
 }

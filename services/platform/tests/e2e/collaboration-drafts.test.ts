@@ -53,12 +53,12 @@ import {
   expectPong,
   nextCloseCode,
   openSocket,
-  requireTestPlacement,
   type ControlClient,
 } from "./hibernatable-socket-support";
+import { requiredPlacement } from "./slack-journey-support";
 import type { Variant } from "@seams/type-utils";
 
-const TEST_PLACEMENT = requireTestPlacement();
+const TEST_PLACEMENT = requiredPlacement();
 
 type CollaborationScenario = Readonly<{
   organisationId: OrganisationId;

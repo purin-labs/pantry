@@ -16,10 +16,10 @@ import {
 } from "../../src/data/control-mutation";
 import { storeVaultSecret, type VaultHandle } from "../../src/credential-vault";
 import type { OrganisationId } from "../../src/ids";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
 import type { VariantBy } from "@seams/type-utils";
 import { assertNever, bytesToHex, encodeBase64 } from "@seams/std";
 import { requireVaultHandle } from "../test-ids";
+import { requiredPlacement } from "./slack-journey-support";
 
 const PUBLIC_ORIGIN = "https://localhost";
 
@@ -69,7 +69,7 @@ const WEBHOOK_CASES: readonly WebhookCase[] = [
   },
 ];
 
-const TEST_PLACEMENT = requireTestPlacement();
+const TEST_PLACEMENT = requiredPlacement();
 
 it.each(WEBHOOK_CASES)(
   "$provider verifies and admits its signed public webhook",
@@ -417,15 +417,4 @@ async function assertWebhookAuthorityUnchanged(
   expect(authority).toMatchObject({ accounts: 1, connections: 1, webhooks: 1 });
   expect(authority?.signingCiphertext).not.toContain(row.signingSecret);
   expect(scenario.account.providerAccountId).toBe(row.providerAccountId);
-}
-
-function requireTestPlacement() {
-  const parsed = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!parsed.ok) throw new Error(parsed.error.path);
-  return parsed.value;
 }

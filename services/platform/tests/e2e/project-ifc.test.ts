@@ -51,8 +51,8 @@ import {
 } from "../../src/context/files/tools";
 import { parseSessionId, type OrganisationId } from "../../src/ids";
 import { readConversation, saveConversation } from "../../src/chat/store";
-import type { Conversation } from "../../src/chat/conversation";
 import { observeProjectReference } from "../../src/projects/references";
+import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import {
   createRequiredGrant,
@@ -301,7 +301,11 @@ async function projectInformationFlowJourney(
       await saveConversation(
         await requireOrganisationExecutionScope(env, ORGANISATION_ID),
         owner.userId,
-        emptyConversation(conversationId, conversationTitle),
+        platformConversation(
+          conversationId,
+          conversationTitle,
+          "moonshotai/kimi-k3",
+        ),
         0,
         { projectId },
       )
@@ -895,30 +899,6 @@ async function workKind(
       )
     )?.conversation.work.kind ?? null
   );
-}
-function emptyConversation(id: ConversationId, title: string): Conversation {
-  return {
-    id,
-    title,
-    lineage: { kind: "original" },
-    historyBindings: [],
-    modelRoute: {
-      keySource: "platform",
-      provider: "openai-compatible",
-      model: "moonshotai/kimi-k3",
-    },
-    documents: [],
-    work: { kind: "ready" },
-    completedRequests: [],
-    timeline: [],
-    pendingInputs: [],
-    latestSequence: 0,
-    lastReadSequence: 0,
-    surfaceEventCursor: 0,
-    draftText: "",
-    draftUpdatedAt: null,
-    effort: null,
-  };
 }
 function modelCalls(provider: Provider): number {
   return provider.prompts.length;

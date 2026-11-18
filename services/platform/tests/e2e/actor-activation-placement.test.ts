@@ -8,7 +8,6 @@ import {
   activateActorRegistryEntry,
   beginActorExport,
   retireActorRegistryEntry,
-  listPlacementActorRegistryEntries,
   reserveActor,
   reserveActorPair,
   type ActorRegistryEntry,
@@ -44,10 +43,7 @@ import {
   CONNECTOR_ACTOR_SCHEMA_VERSION,
 } from "../../src/actors/actor-schema-versions";
 import { parseCaseId, parseConnectorId, parseSessionId } from "../../src/ids";
-import {
-  readOrganisationPlacementMove,
-  parseOrganisationPlacementMoveTarget,
-} from "../../src/data/organisation-placement";
+import { readOrganisationPlacementMove } from "../../src/data/organisation-placement";
 import {
   installDiscoveryActorFixture,
   ORGANISATION_ID,
@@ -58,6 +54,7 @@ import {
   type PlacementRace,
 } from "./placement-race-support";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { moveTarget, placementEntries } from "./placement-move-support";
 
 it(
   "drains activation before freeze and fences registry commits through relocation, restore and eviction",
@@ -193,7 +190,9 @@ async function activationPlacementJourney({
       now: Date.now(),
     }),
   ).toMatchObject({ ok: true });
-  for (const entry of await entries(sourceScope.placement.placementEpoch)) {
+  for (const entry of await placementEntries(
+    sourceScope.placement.placementEpoch,
+  )) {
     await runInDurableObject(stub(entry), advanceFixtureStateVersion);
     await fixtureDatabase()
       .prepare(
@@ -212,7 +211,9 @@ async function activationPlacementJourney({
     ok: true,
     value: { relocationId: started.value.relocationId },
   });
-  const sourceEntries = await entries(sourceScope.placement.placementEpoch);
+  const sourceEntries = await placementEntries(
+    sourceScope.placement.placementEpoch,
+  );
   expect(sourceEntries).toHaveLength(4);
 
   const race: PlacementRace = {
@@ -290,7 +291,9 @@ async function activationPlacementJourney({
     ok: false,
     error: { code: "registry_placement_conflict" },
   });
-  const frozenRegistry = await entries(sourceScope.placement.placementEpoch);
+  const frozenRegistry = await placementEntries(
+    sourceScope.placement.placementEpoch,
+  );
   for (const entry of sourceEntries) {
     if (entry.lifecycleStatus !== "active")
       throw new Error("Source Actor is not active");
@@ -333,7 +336,7 @@ async function activationPlacementJourney({
     ok: false,
     error: { code: "organisation_placement_missing" },
   });
-  expect(await entries(sourceScope.placement.placementEpoch)).toEqual(
+  expect(await placementEntries(sourceScope.placement.placementEpoch)).toEqual(
     frozenRegistry,
   );
 
@@ -376,7 +379,7 @@ async function activationPlacementJourney({
     now: Date.now(),
   });
   if (!foreign.ok) throw new Error(foreign.error.code);
-  const targetEntries = await entries(staged.placement.placementEpoch);
+  const targetEntries = await placementEntries(staged.placement.placementEpoch);
   expect(targetEntries).toHaveLength(4);
   for (const entry of targetEntries) {
     if (entry.lifecycleStatus !== "active")
@@ -438,7 +441,9 @@ async function activationPlacementJourney({
       }),
     ),
   ).toBe(false);
-  expect(await entries(staged.placement.placementEpoch)).toEqual(targetEntries);
+  expect(await placementEntries(staged.placement.placementEpoch)).toEqual(
+    targetEntries,
+  );
   expect(
     await resumeActorRelocation({
       env,
@@ -518,7 +523,9 @@ async function activationPlacementJourney({
     env,
     ORGANISATION_ID,
   );
-  const restoredEntries = await entries(restoredScope.placement.placementEpoch);
+  const restoredEntries = await placementEntries(
+    restoredScope.placement.placementEpoch,
+  );
   expect(restoredEntries).toHaveLength(4);
   for (const entry of restoredEntries) {
     expect(entry.stateVersion).toBe(7);
@@ -587,16 +594,6 @@ async function executionAdmission(
   return admission.value;
 }
 
-function moveTarget() {
-  const target = parseOrganisationPlacementMoveTarget({
-    kind: "affinity",
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!target.ok) throw new Error(target.error.code);
-  return target.value;
-}
-
 async function expectFreezeRefused(
   relocationId: Parameters<typeof resumeActorRelocation>[0]["relocationId"],
 ) {
@@ -623,16 +620,6 @@ async function expectFreezeRefused(
       .bind(relocationId)
       .first("status"),
   ).toBe("reserved");
-}
-
-async function entries(epoch: number) {
-  const result = await listPlacementActorRegistryEntries({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    placementEpoch: epoch,
-  });
-  if (!result.ok) throw new Error(result.error.code);
-  return result.value;
 }
 
 function stub(entry: ActorRegistryEntry) {
@@ -694,7 +681,7 @@ async function retiredIdentityJourney({ task }: TestContext): Promise<void> {
     publication: actors.value.registryActivation,
   });
   if (!published.ok) throw new Error(published.error.code);
-  const initial = await entries(source.placement.placementEpoch);
+  const initial = await placementEntries(source.placement.placementEpoch);
   let retiredCount = 0;
   for (const entry of initial) {
     if (
@@ -737,7 +724,7 @@ async function retiredIdentityJourney({ task }: TestContext): Promise<void> {
       value: { status: "retained" },
     });
     const scope = await requireOrganisationExecutionScope(env, ORGANISATION_ID);
-    const records = await entries(scope.placement.placementEpoch);
+    const records = await placementEntries(scope.placement.placementEpoch);
     expect(records.filter(isRetiredEntry)).toHaveLength(2);
     const rejected = await resolveActiveCaseSessionActorsAtPlacement({
       env,
@@ -823,7 +810,7 @@ async function retiredIdentityJourney({ task }: TestContext): Promise<void> {
         env,
         ORGANISATION_ID,
       );
-      const restoredEntries = await entries(
+      const restoredEntries = await placementEntries(
         restoredScope.placement.placementEpoch,
       );
       expect(restoredEntries.filter(isRetiredEntry)).toHaveLength(2);

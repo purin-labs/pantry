@@ -3,14 +3,6 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse } from "msw";
 import { isRecord } from "@seams/std";
-import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
-import {
-  readEmailRuntime,
-  type EmailProcessingState,
-} from "../../src/actors/connector-email";
-import { runConnectorEmailEvaluation } from "../../src/actors/connector-email-evaluation";
-import { gmailConnectorId } from "../../src/data/email-mailbox";
-import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";
@@ -18,7 +10,13 @@ import {
   connectGmailMailbox,
   sendAs,
   setUpMailbox,
+  evaluateAt,
+  mailboxConnector,
+  mailProcessing,
+  mailRuntime,
+  readReplyTurns,
 } from "./gmail-mailbox-support";
+import { readAlarm } from "./case-execution-support";
 
 const ADDRESS = "orders@example.test";
 const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
@@ -40,10 +38,6 @@ type GmailMailbox = {
   }[];
   profileReads: number;
 };
-
-type Connector = DurableObjectStub<
-  import("../../src/actors/connector").ConnectorDO
->;
 
 async function mailboxCheckJourney({ task }: TestContext): Promise<void> {
   const {
@@ -95,7 +89,7 @@ async function mailboxCheckJourney({ task }: TestContext): Promise<void> {
   const connector = await mailboxConnector(organisationId, account);
   await runDurableObjectAlarm(connector);
   await expect
-    .poll(processing.bind(null, connector), { timeout: 10_000 })
+    .poll(mailProcessing.bind(null, connector), { timeout: 10_000 })
     .toEqual({ kind: "waiting" });
   const profileReadsWhenOn = gmail.profileReads;
 
@@ -106,7 +100,7 @@ async function mailboxCheckJourney({ task }: TestContext): Promise<void> {
     threadId: "check_thread",
     historyId: 1005,
   });
-  expect(await processing(connector)).toEqual({ kind: "waiting" });
+  expect(await mailProcessing(connector)).toEqual({ kind: "waiting" });
 
   // 4. A member below the admin role, and a mailbox that does not exist, are
   //    refused. Neither asks Gmail anything or changes the mailbox.
@@ -124,7 +118,7 @@ async function mailboxCheckJourney({ task }: TestContext): Promise<void> {
     body: { ok: false, error: "agent_mailbox_missing" },
   });
   expect(gmail.profileReads).toBe(profileReadsWhenOn);
-  expect(await processing(connector)).toEqual({ kind: "waiting" });
+  expect(await mailProcessing(connector)).toEqual({ kind: "waiting" });
 
   // 5. The owner checks. The Connector reads the history id from the
   //    profile with the mailbox's credential and admits it as a push: the
@@ -137,7 +131,7 @@ async function mailboxCheckJourney({ task }: TestContext): Promise<void> {
   expect(at).toBeGreaterThanOrEqual(requestedAt + COALESCE_MS);
   expect(at).toBeLessThanOrEqual(answeredAt + COALESCE_MS);
   expect(gmail.profileReads).toBe(profileReadsWhenOn + 1);
-  const observed = await runtime(connector);
+  const observed = await mailRuntime(connector);
   expect(observed).toMatchObject({
     highestObservedHistoryId: "1005",
     acceptedHistoryId: "1000",
@@ -189,7 +183,7 @@ async function mailboxCheckJourney({ task }: TestContext): Promise<void> {
       { threadId: "check_thread", caseId, messageIds: ["check_message"] },
     ],
   });
-  expect(await runtime(connector)).toMatchObject({
+  expect(await mailRuntime(connector)).toMatchObject({
     acceptedHistoryId: "1005",
     processing: { kind: "waiting" },
   });
@@ -230,7 +224,7 @@ async function mailboxCheckJourney({ task }: TestContext): Promise<void> {
   gmail.historyId = 1012;
   const whilePaused = await check(owner);
   expect(whilePaused).toEqual({ status: 200, body: { kind: "observed" } });
-  expect(await runtime(connector)).toMatchObject({
+  expect(await mailRuntime(connector)).toMatchObject({
     acceptedHistoryId: "1005",
     highestObservedHistoryId: "1012",
     processing: { kind: "paused", reason: { kind: "active_case_limit" } },
@@ -351,41 +345,6 @@ function scheduledAt(body: unknown): number {
   return body.at;
 }
 
-async function mailboxConnector(
-  organisationId: OrganisationId,
-  account: IntegrationAccountId,
-): Promise<Connector> {
-  const connectorId = gmailConnectorId(account);
-  if (!connectorId.ok) throw new Error("Invalid connector");
-  const connector = await resolveActiveConnectorActor({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    connectorId: connectorId.value,
-    now: Date.now(),
-  });
-  if (!connector.ok) throw new Error(connector.error.code);
-  return connector.value;
-}
-
-async function runtime(connector: Connector) {
-  const stored = await runInDurableObject(connector, readRuntime);
-  if (stored === null) throw new Error("The mailbox has no mail runtime");
-  return stored;
-}
-
-async function processing(connector: Connector): Promise<EmailProcessingState> {
-  return (await runtime(connector)).processing;
-}
-
-function readRuntime(_actor: unknown, state: DurableObjectState) {
-  return readEmailRuntime(state.storage.sql);
-}
-
-function readAlarm(_actor: unknown, state: DurableObjectState) {
-  return state.storage.getAlarm();
-}
-
 function readNotificationIds(_actor: unknown, state: DurableObjectState) {
   return state.storage.sql
     .exec<{ id: string }>(
@@ -397,29 +356,4 @@ function readNotificationIds(_actor: unknown, state: DurableObjectState) {
 
 function isCheckNotification(id: string): boolean {
   return /^check:[0-9a-f-]{36}$/u.test(id);
-}
-
-function readReplyTurns(_actor: unknown, state: DurableObjectState) {
-  return state.storage.sql
-    .exec<{ messageId: string; caseId: string }>(
-      `SELECT provider_message_id AS messageId, case_id AS caseId
-       FROM connector_email_reply_turn ORDER BY provider_message_id`,
-    )
-    .toArray();
-}
-
-/** The Connector's own evaluation, on a clock at the given time. */
-async function evaluateAt(
-  organisationId: OrganisationId,
-  now: number,
-  _actor: unknown,
-  state: DurableObjectState,
-) {
-  return runConnectorEmailEvaluation({
-    scope: await requireOrganisationExecutionScope(env, organisationId),
-    env,
-    storage: state.storage,
-    now,
-    fetcher: fetch,
-  });
 }

@@ -45,6 +45,7 @@ import {
   slackSimulator,
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
+import { exportedItemCount } from "./placement-move-support";
 
 const CONVERSATION_ID = "conv_c55af3e2-19c2-446a-9f44-e00000000055";
 const USER_ID = "user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab";
@@ -713,16 +714,6 @@ function readSourceTurnState(
   actor: DurableObjectStub<SessionDO>,
 ): Promise<string> {
   return runInDurableObject(actor, sourceTurnState);
-}
-
-async function exportedItemCount(relocationId: string): Promise<number> {
-  const row = await env.DB.prepare(
-    "SELECT COUNT(*) AS count FROM state_object_relocation_item WHERE relocation_id = ? AND status <> 'pending'",
-  )
-    .bind(relocationId)
-    .first<{ count: number }>();
-  if (row === null) throw new Error("Missing relocation inventory");
-  return row.count;
 }
 
 function sourceHistory(_actor: unknown, ctx: DurableObjectState): string {

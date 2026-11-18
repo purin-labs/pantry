@@ -1,23 +1,24 @@
 import { runInDurableObject } from "cloudflare:test";
-import { fixtureDatabase } from "./organisation-database";
-import { env, exports } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import { connectorActorStub } from "../../src/actors/actor-router";
 import { network } from "./network";
 import {
-  ORGANISATION_ID,
+  connectorOf,
+  readReceipt,
+  readSteeredReplies,
+} from "./slack-follow-up-support";
+import {
   ROOT_TS,
   installSlackActorFixture,
   offeredToolNames,
   openRouterText,
   openRouterToolCall,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  sendSlack,
+  threadAndText,
+  userMessageContaining,
 } from "./slack-journey-support";
 
 /**
@@ -125,25 +126,6 @@ async function slackSteeringJourney(test: TestContext): Promise<void> {
   });
 }
 
-async function sendSlack(
-  eventId: string,
-  messageTs: string,
-  text: string,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: messageTs === ROOT_TS ? "app_mention" : "message",
-        eventId,
-        messageTs,
-        threadTs: ROOT_TS,
-        text,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
-}
-
 async function replyToModel(
   model: Model,
   { request }: Parameters<HttpResponseResolver>[0],
@@ -179,75 +161,10 @@ function isRootThreadStatus(status: Record<string, string>): boolean {
   return status.thread_ts === ROOT_TS;
 }
 
-function readSteeredReplies(
-  _actor: unknown,
-  ctx: DurableObjectState,
-): string[] {
-  return ctx.storage.sql
-    .exec<{ event_id: string }>(
-      "SELECT event_id FROM connector_case_steering ORDER BY event_id",
-    )
-    .toArray()
-    .map(function eventId(row) {
-      return row.event_id;
-    });
-}
-
-function readReceipt(
-  eventId: string,
-  _actor: unknown,
-  ctx: DurableObjectState,
-): string | null {
-  return (
-    ctx.storage.sql
-      .exec<{ outcome: string }>(
-        "SELECT outcome FROM connector_case_work_receipt WHERE event_id = ?",
-        eventId,
-      )
-      .toArray()[0]?.outcome ?? null
-  );
-}
-
 function messageList(body: Record<string, unknown> | undefined): unknown[] {
   return Array.isArray(body?.messages) ? body.messages : [];
 }
 
 function isToolMessage(message: unknown): boolean {
   return isRecord(message) && message.role === "tool";
-}
-
-function userMessageContaining(text: string, message: unknown): boolean {
-  return (
-    isRecord(message) &&
-    message.role === "user" &&
-    JSON.stringify(message.content).includes(text)
-  );
-}
-
-function threadAndText(post: Record<string, string>): {
-  readonly thread: string | undefined;
-  readonly text: string | undefined;
-} {
-  return { thread: post.thread_ts, text: post.text };
-}
-
-async function connectorOf(connectorId: string) {
-  const entries = await listPlacementActorRegistryEntries({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    placementEpoch: 1,
-  });
-  if (!entries.ok) throw new Error(entries.error.code);
-  const entry = entries.value.find(function isConnector(candidate) {
-    return (
-      candidate.identity.objectKind === "connector" &&
-      candidate.identity.logicalObjectId === connectorId
-    );
-  });
-  if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
-    env.CONNECTOR,
-    entry.physicalObjectName,
-    entry.placement,
-  );
 }

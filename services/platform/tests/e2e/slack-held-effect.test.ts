@@ -14,9 +14,16 @@ import type { FlowPolicyInput } from "../../src/policy/information-flow";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { CARD_ONLY_REPLY } from "../../src/slack/card-only-reply";
 import { reconcileHeldOutputRequests } from "../../src/slack/held-output-release";
-import { accessControlPath, enableCapability } from "./access-route-support";
-import { commerceHeaders } from "./commerce-support";
-import { admin, joiner, raiseLabel, type Person } from "./held-exit-support";
+import { enableCapability } from "./access-route-support";
+import {
+  admin,
+  decide,
+  heldStatus,
+  joiner,
+  pendingOf,
+  raiseLabel,
+  readHeld,
+} from "./held-exit-support";
 import { network } from "./network";
 import { givePortalHandles } from "./permission-request-support";
 import {
@@ -55,7 +62,10 @@ declare module "vitest" {
  */
 it("asks a person about a blocked tool effect", slackHeldEffect, 240_000);
 
-const OWNER = { kind: "organisation", organisationId: ORGANISATION_ID } as const;
+const OWNER = {
+  kind: "organisation",
+  organisationId: ORGANISATION_ID,
+} as const;
 const SECOND_ROOT_TS = "1787500200.000001";
 const THIRD_ROOT_TS = "1787500300.000001";
 const DRAFT_TEXT = "The flour supplier raises the price on Monday.";
@@ -73,9 +83,10 @@ async function slackHeldEffect({ task }: TestContext): Promise<void> {
   const other = await admin(joining[1], "Other admin");
   await givePortalHandles(ORGANISATION_ID);
   await discoverSlackChannel("public_channel", Date.now() - 60_000);
-  await fixtureDatabase().prepare(
-    "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_held_effect', activated_at = ? WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_held_effect', activated_at = ? WHERE organisation_id = ?",
+    )
     .bind(Date.now(), ORGANISATION_ID)
     .run();
   await enableCapability(
@@ -189,12 +200,19 @@ async function slackHeldEffect({ task }: TestContext): Promise<void> {
     };
 
   // 1. The turn read the direct message, and its draft stops.
-  const raised = (step: Step): Step => async (body) => {
-    await raiseLabel(direct);
-    return step(body);
-  };
+  const raised =
+    (step: Step): Step =>
+    async (body) => {
+      await raiseLabel(direct);
+      return step(body);
+    };
   const first = proposeSteps("first");
-  steps.push(first[0] as Step, first[1] as Step, raised(first[2] as Step), finish("first", CARD_ONLY_REPLY));
+  steps.push(
+    first[0] as Step,
+    first[1] as Step,
+    raised(first[2] as Step),
+    finish("first", CARD_ONLY_REPLY),
+  );
   await mention("EvHELD_EFFECT_ONE", ROOT_TS);
   await expect.poll(() => steps.length, { timeout: 40_000 }).toBe(0);
   await expect.poll(() => shown().length, { timeout: 40_000 }).toBe(1);
@@ -206,15 +224,21 @@ async function slackHeldEffect({ task }: TestContext): Promise<void> {
 
   // 2. Only the person in the audience sees the request.
   const listed = await pendingOf(member);
-  expect(listed.find((held) => held.requestId === effectRequest)).toMatchObject({
-    effect: expect.any(String),
-    reason: "private_source",
-  });
+  expect(listed.find((held) => held.requestId === effectRequest)).toMatchObject(
+    {
+      effect: expect.any(String),
+      reason: "private_source",
+    },
+  );
   expect(await pendingOf(other)).toEqual([]);
   expect((await readHeld(other, effectRequest)).status).toBe(404);
   expect((await decide(other, effectRequest, "allow")).status).toBe(404);
   const view = await readHeld(member, effectRequest);
-  expect(await view.json()).toMatchObject({ answer: null, covers: "step", status: "pending" });
+  expect(await view.json()).toMatchObject({
+    answer: null,
+    covers: "step",
+    status: "pending",
+  });
 
   // 3. Allow continues in a new turn. One pass lets one draft through.
   const noticesBefore = shown().length;
@@ -250,7 +274,12 @@ async function slackHeldEffect({ task }: TestContext): Promise<void> {
 
   // 4. Deny runs no turn, and the next turn of the thread knows.
   const second = proposeSteps("second");
-  steps.push(second[0] as Step, second[1] as Step, raised(second[2] as Step), finish("second", "I asked again."));
+  steps.push(
+    second[0] as Step,
+    second[1] as Step,
+    raised(second[2] as Step),
+    finish("second", "I asked again."),
+  );
   const beforeSecond = shown().length;
   await mention("EvHELD_EFFECT_TWO", SECOND_ROOT_TS);
   await expect
@@ -273,7 +302,12 @@ async function slackHeldEffect({ task }: TestContext): Promise<void> {
 
   // 5. Nobody decides, so the request expires.
   const third = proposeSteps("third");
-  steps.push(third[0] as Step, third[1] as Step, raised(third[2] as Step), finish("third", "I asked once more."));
+  steps.push(
+    third[0] as Step,
+    third[1] as Step,
+    raised(third[2] as Step),
+    finish("third", "I asked once more."),
+  );
   const beforeThird = shown().length;
   await mention("EvHELD_EFFECT_THREE", THIRD_ROOT_TS);
   await expect
@@ -336,49 +370,4 @@ function heldRequestId(card: Record<string, string> | undefined): string {
   const match = /heldOutput=([0-9a-f]{32})/u.exec(card?.blocks ?? "");
   if (match?.[1] === undefined) throw new Error("Held request link missing");
   return match[1];
-}
-
-function heldPath(requestId: string): string {
-  return `${accessControlPath(ORGANISATION_ID)}/held-outputs/${requestId}`;
-}
-
-function readHeld(person: Person, requestId: string): Promise<Response> {
-  return exports.default.fetch(heldPath(requestId), {
-    headers: commerceHeaders(person.session),
-  });
-}
-
-function decide(
-  person: Person,
-  requestId: string,
-  decision: "allow" | "deny",
-): Promise<Response> {
-  return exports.default.fetch(`${heldPath(requestId)}/decision`, {
-    method: "POST",
-    headers: commerceHeaders(person.session),
-    body: JSON.stringify({ decision }),
-  });
-}
-
-async function pendingOf(
-  person: Person,
-): Promise<readonly Record<string, unknown>[]> {
-  const response = await exports.default.fetch(
-    `${accessControlPath(ORGANISATION_ID)}/permission-requests`,
-    { headers: commerceHeaders(person.session) },
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  if (!isRecord(body) || !Array.isArray(body.heldOutputs))
-    throw new Error("Pending list invalid");
-  return body.heldOutputs.filter(isRecord);
-}
-
-async function heldStatus(requestId: string): Promise<unknown> {
-  const row = await fixtureDatabase().prepare(
-    "SELECT status FROM held_output_request WHERE organisation_id = ? AND request_id = ?",
-  )
-    .bind(ORGANISATION_ID, requestId)
-    .first<{ status: unknown }>();
-  return row?.status;
 }

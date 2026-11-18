@@ -8,7 +8,6 @@ import {
   parseMenuScreenFeed,
   parseMenuScreenPairing,
   parseMenuScreenPairingState,
-  parseMenuScreenSignal,
   parseMenuScreenSummaries,
   type MenuScreenFeed,
 } from "@seams/control-api";
@@ -46,6 +45,7 @@ import {
   openSocket,
 } from "./hibernatable-socket-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+import { applied, boardIdOf, nextSignal } from "./menu-board-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -579,16 +579,6 @@ async function menuRevision(
   return read.body.value.revision;
 }
 
-function boardIdOf(body: unknown): string {
-  if (
-    !isRecord(body) ||
-    !isRecord(body.board) ||
-    typeof body.board.boardId !== "string"
-  )
-    throw new Error(`No board: ${JSON.stringify(body)}`);
-  return body.board.boardId;
-}
-
 function releaseDigest(body: unknown): string {
   if (
     !isRecord(body) ||
@@ -665,23 +655,6 @@ async function openScreenSocket(token: string): Promise<WebSocket> {
   if (response.webSocket === null) throw new Error("No screen socket");
   response.webSocket.accept();
   return response.webSocket;
-}
-
-/** The time of the screen socket's next signal. */
-function nextSignal(socket: WebSocket): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      socket.removeEventListener("message", onMessage);
-      reject(new Error("The screen got no signal"));
-    }, 30_000);
-    const onMessage = (event: MessageEvent): void => {
-      if (!parseMenuScreenSignal(event.data)) return;
-      clearTimeout(timer);
-      socket.removeEventListener("message", onMessage);
-      resolve(Date.now());
-    };
-    socket.addEventListener("message", onMessage);
-  });
 }
 
 /** Staff count each lot of the café's taro powder as empty. */
@@ -862,13 +835,6 @@ function nextRoomMessage<M extends RoomMessage>(
     socket.addEventListener("message", onMessage);
     send();
   });
-}
-
-function applied(
-  result:
-    Readonly<{ ok: true }> | Readonly<{ ok: false; error: { code: string } }>,
-): void {
-  if (!result.ok) throw new Error(result.error.code);
 }
 
 async function required<T>(

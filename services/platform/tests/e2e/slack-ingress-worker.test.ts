@@ -19,10 +19,10 @@ import {
   installSlackActorFixture,
   isStringRecord,
   slackPostFields,
-  openRouterText,
   signedSlackRequest,
   slackEnvelope,
   slackEnvelopeFor,
+  replyingModel,
 } from "./slack-journey-support";
 
 /**
@@ -437,36 +437,6 @@ function tracedEvents(
       eventIds.push(String(row.event_id));
   }
   return eventIds;
-}
-
-function replyingModel(): {
-  readonly handler: ReturnType<typeof http.post>;
-  readonly sessionIds: (string | null)[];
-  readonly requests: number;
-} {
-  const sessionIds: (string | null)[] = [];
-  return {
-    sessionIds,
-    get requests() {
-      return sessionIds.length;
-    },
-    handler: http.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      replyToModel.bind(null, sessionIds),
-    ),
-  };
-}
-
-async function replyToModel(
-  sessionIds: (string | null)[],
-  { request }: Parameters<HttpResponseResolver>[0],
-): Promise<Response> {
-  await request.json();
-  sessionIds.push(request.headers.get("x-session-id"));
-  return openRouterText(
-    `Reply ${String(sessionIds.length)}.`,
-    `chatcmpl_55e_ingress_${String(sessionIds.length)}`,
-  );
 }
 
 function recordingSlack(): {

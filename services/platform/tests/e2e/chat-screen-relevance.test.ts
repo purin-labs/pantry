@@ -19,12 +19,12 @@ import {
   installMemoryFixture,
   post,
   storedConversation,
-  workKind,
   type Member,
   type MemoryFixture,
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText } from "./slack-journey-support";
+import { finished, latestUserInput } from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -114,7 +114,7 @@ it(
       observation: ORDER_OBSERVATION,
     });
     expect(first.status, await first.clone().text()).toBe(200);
-    await finish(author, conversationId);
+    await finished(author, conversationId);
 
     // The switch is off: the check sends nothing to Jev.
     const switchedOff = await check(
@@ -171,7 +171,7 @@ it(
       },
     );
     expect(without.status, await without.clone().text()).toBe(200);
-    await finish(author, conversationId);
+    await finished(author, conversationId);
     const withoutInput = latestUserInput(modelRequests);
     expect(withoutInput).toContain(
       "The current request carries no page from the operator's screen",
@@ -213,7 +213,7 @@ it(
       },
     );
     expect(attached.status, await attached.clone().text()).toBe(200);
-    await finish(author, conversationId);
+    await finished(author, conversationId);
     const attachedInput = latestUserInput(modelRequests);
     expect(attachedInput).toContain("Black sesame latte");
     expect(attachedInput).toContain("Shelf waste (spoil)");
@@ -424,15 +424,6 @@ async function sharedConversation(
   return conversationId;
 }
 
-async function finish(
-  author: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  await expect
-    .poll(workKind.bind(null, author, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
 function send(
   author: Member,
   chatPath: string,
@@ -488,19 +479,4 @@ async function recordTypeSafe(
     },
     usage: { input_tokens: 480, output_tokens: 2 },
   });
-}
-
-/** The newest user message of the newest model request. */
-function latestUserInput(requests: readonly string[]): string {
-  const latest = requests.at(-1);
-  if (latest === undefined) throw new Error("The model received no request");
-  const body: unknown = JSON.parse(latest);
-  const messages =
-    isRecord(body) && Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (isRecord(message) && message.role === "user")
-      return JSON.stringify(message.content);
-  }
-  throw new Error("The model request has no user message");
 }

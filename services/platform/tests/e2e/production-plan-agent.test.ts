@@ -4,20 +4,24 @@ import {
   newConversationId,
   newProjectId,
   parseInventoryProductionPlanResult,
-  type ConversationId,
 } from "@seams/control-api";
 import { isRecord } from "@seams/std";
 
+import {
+  answers,
+  ask,
+  lastCalledTool,
+  pausedRequest,
+  resumeChat,
+} from "./chat-permission-support";
 import { connectCommerceFixture } from "./commerce-support";
 import { openSocket } from "./hibernatable-socket-support";
 import {
   createConversation,
   installMemoryFixture,
-  post,
   postJson,
   storedConversation,
   workKind,
-  type Member,
 } from "./memory-support";
 import { network } from "./network";
 import { allowAsPortal, readRequest } from "./permission-request-support";
@@ -27,6 +31,7 @@ import {
   PlanJourney,
   PlanRoomClient,
   planPath,
+  readPlan,
 } from "./production-plan-support";
 import {
   offeredToolNames,
@@ -175,7 +180,7 @@ async function productionPlanAgentJourney({
     body: { sharing: { kind: "portal_chat", conversationId } },
   });
 
-  await ask(author, paths.chat, conversationId, route.model, QUESTION);
+  await ask(author, paths.chat, conversationId, route.model, QUESTION, "plan");
 
   // 1. The agent asks for the read and the edit in one prompt.
   const pause = await pausedRequest(author, paths.chat, conversationId);
@@ -252,7 +257,12 @@ async function productionPlanAgentJourney({
     pause.id,
   );
   expect(allowed.status, await allowed.clone().text()).toBe(200);
-  const resumed = await decide(author, paths.chat, conversationId, pause.id);
+  const resumed = await resumeChat(
+    author,
+    paths.chat,
+    conversationId,
+    pause.id,
+  );
   expect(resumed.status, JSON.stringify(resumed.body)).toBe(200);
   await expect
     .poll(workKind.bind(null, author, conversationId), { timeout: 60_000 })
@@ -318,35 +328,6 @@ async function productionPlanAgentJourney({
   };
 }
 
-async function ask(
-  person: Member,
-  chatPath: string,
-  conversationId: ConversationId,
-  model: string,
-  text: string,
-): Promise<void> {
-  const started = await post(person, chatPath, {
-    kind: "message",
-    conversationId,
-    requestId: `request_${conversationId}_plan`,
-    model,
-    text,
-    surfaceContext: null,
-    browserContext: { kind: "unavailable" },
-  });
-  expect(started.status, await started.clone().text()).toBe(200);
-}
-
-async function answers(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<string[]> {
-  const stored = await storedConversation(person, conversationId);
-  return (stored?.conversation.timeline ?? []).flatMap((event) =>
-    event.kind === "assistant" && "text" in event ? [event.text] : [],
-  );
-}
-
 /**
  * Answers each model request from the conversation so far. The first turn
  * asks for what the turn lacks; after the owner allows it, the agent reads
@@ -409,14 +390,6 @@ async function replyToModel(
   }
 }
 
-function readPlan(id: string): Promise<Response> | Response {
-  return openRouterToolCall(
-    "production_plan_read",
-    { locationId: LOCATION },
-    `call_${id}`,
-  );
-}
-
 function editLine(
   recorded: Recorded,
   requestId: string,
@@ -450,73 +423,4 @@ function requestableIds(body: Record<string, unknown>): string[] {
       );
   }
   return [];
-}
-
-/** The tool of the latest call, when the latest message is its output. */
-function lastCalledTool(body: Record<string, unknown>): string | null {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const last: unknown = messages.at(-1);
-  if (!isRecord(last) || last.role !== "tool") return null;
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (
-      isRecord(message) &&
-      message.role === "assistant" &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const call: unknown = message.tool_calls.at(-1);
-      return isRecord(call) &&
-        isRecord(call.function) &&
-        typeof call.function.name === "string"
-        ? call.function.name
-        : null;
-    }
-  }
-  return null;
-}
-
-async function pausedRequest(
-  person: Member,
-  chatPath: string,
-  conversationId: ConversationId,
-): Promise<Readonly<{ id: string }>> {
-  await expect
-    .poll(pausedRequestId.bind(null, person, chatPath, conversationId), {
-      timeout: 60_000,
-    })
-    .not.toBe("");
-  return { id: await pausedRequestId(person, chatPath, conversationId) };
-}
-
-async function pausedRequestId(
-  person: Member,
-  chatPath: string,
-  conversationId: ConversationId,
-): Promise<string> {
-  const query = new URLSearchParams({
-    conversation: conversationId,
-    view: "state",
-  });
-  const state = await postJson(person, `${chatPath}?${query}`, null);
-  expect(state.status).toBe(200);
-  const work = isRecord(state.body) ? state.body.work : null;
-  return isRecord(work) &&
-    work.kind === "awaiting_permission" &&
-    isRecord(work.permission) &&
-    typeof work.permission.permissionRequestId === "string"
-    ? work.permission.permissionRequestId
-    : "";
-}
-
-function decide(
-  person: Member,
-  chatPath: string,
-  conversationId: ConversationId,
-  permissionRequestId: string,
-): Promise<Readonly<{ status: number; body: unknown }>> {
-  return postJson(
-    person,
-    `${chatPath}/conversations/${conversationId}/permission`,
-    { permissionRequestId, decision: "resume" },
-  );
 }

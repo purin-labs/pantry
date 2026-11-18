@@ -1,17 +1,17 @@
-import { env, exports } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import {
-  resolveActiveCaseActor,
-  resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import type { SessionDO } from "../../src/actors/agent-session";
-import type { IssuedControlSession } from "../../src/data/control-plane";
-import { preparePortalChatJourney } from "./chat-journey-support";
+import {
+  preparePortalChatJourney,
+  assignmentStates,
+  caseOf,
+  dispatchCommand,
+  sessionOf,
+  turnState,
+} from "./chat-journey-support";
 import { network } from "./network";
 import {
   ORGANISATION_ID,
@@ -140,81 +140,8 @@ async function answerModel(
   );
 }
 
-function dispatchCommand(
-  session: IssuedControlSession,
-  key: string,
-  instruction: string,
-): Promise<Response> {
-  return exports.default.fetch(
-    `https://localhost/v1/control/organisations/${ORGANISATION_ID}/cases/commands`,
-    {
-      method: "POST",
-      headers: {
-        origin: "https://localhost",
-        "content-type": "application/json",
-        "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
-      },
-      body: JSON.stringify({ instruction }),
-    },
-  );
-}
-
 function errorOf(body: unknown): unknown {
   return isRecord(body) ? body.error : null;
-}
-
-async function sessionOf(
-  sessionId: Parameters<typeof resolveActiveSessionActor>[0]["sessionId"],
-): Promise<DurableObjectStub<SessionDO>> {
-  const resolved = await resolveActiveSessionActor({
-    env,
-    namespace: env.SESSION,
-    organisationId: ORGANISATION_ID,
-    sessionId,
-    now: Date.now(),
-  });
-  if (!resolved.ok) throw new Error(resolved.error.code);
-  return resolved.value;
-}
-
-async function caseOf(
-  caseId: Parameters<typeof resolveActiveCaseActor>[0]["caseId"],
-) {
-  const resolved = await resolveActiveCaseActor({
-    env,
-    namespace: env.CASE,
-    organisationId: ORGANISATION_ID,
-    caseId,
-    now: Date.now(),
-  });
-  if (!resolved.ok) throw new Error(resolved.error.code);
-  return resolved.value;
-}
-
-async function turnState(
-  session: DurableObjectStub<SessionDO>,
-  turnId: string,
-): Promise<string> {
-  const inspected = await session.inspectTurnStream({
-    organisationId: ORGANISATION_ID,
-    turnId,
-  });
-  if (!inspected.ok) return inspected.error.code;
-  return inspected.value.kind === "missing" ? "missing" : inspected.value.state;
-}
-
-async function assignmentStates(
-  caseActor: Awaited<ReturnType<typeof caseOf>>,
-): Promise<string[]> {
-  const snapshot = await caseActor.inspect();
-  if (!snapshot.ok) throw new Error(snapshot.error.code);
-  return snapshot.value.assignmentLifecycles.map((lifecycle) =>
-    lifecycle.kind === "settled"
-      ? `settled:${lifecycle.disposition.kind}`
-      : lifecycle.kind,
-  );
 }
 
 /** Deletes Pi's record of the turn's submission, the record of a lost start. */

@@ -1,14 +1,9 @@
 import { env, exports } from "cloudflare:workers";
-import { fixtureDatabase } from "./organisation-database";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import {
-  listPlacementActorRegistryEntries,
-  type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
 import { connectorActorStub } from "../../src/actors/actor-router";
 import { CaseDO } from "../../src/actors/case";
 import {
@@ -16,8 +11,8 @@ import {
   type WarmSlotName,
 } from "../../src/actors/conversation-residency";
 import { network } from "./network";
+import { registryEntries } from "./slack-follow-up-support";
 import {
-  ORGANISATION_ID,
   ROOT_TS,
   SLACK_BOT_TOKEN,
   installSlackActorFixture,
@@ -334,16 +329,6 @@ async function deliveries(recorded: Recorded, count: number): Promise<void> {
   await expect
     .poll(() => recorded.delivered.length, { timeout: 30_000 })
     .toBe(count);
-}
-
-async function registryEntries(): Promise<readonly ActorRegistryEntry[]> {
-  const entries = await listPlacementActorRegistryEntries({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    placementEpoch: 1,
-  });
-  if (!entries.ok) throw new Error(entries.error.code);
-  return entries.value;
 }
 
 async function connectorName(connectorId: string): Promise<string> {

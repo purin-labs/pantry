@@ -15,6 +15,11 @@ import {
   slackEnvelope,
   slackSimulator,
 } from "./slack-journey-support";
+import {
+  readAlarm,
+  readDamagedSurfaceEffects,
+  seedDamagedSurfaceEffects,
+} from "./case-execution-support";
 
 /**
  * One failing alarm step does not stop the Session's other work (Refactor
@@ -68,7 +73,10 @@ async function failingAlarmStepJourney(test: TestContext): Promise<void> {
   const session = env.SESSION.getByName(registry.name);
 
   // The faults: damaged effect rows, and a first alarm step that fails.
-  await runInDurableObject(session, seedDamagedSurfaceEffects);
+  await runInDurableObject(
+    session,
+    seedDamagedSurfaceEffects(ORGANISATION_ID, DAMAGED_EFFECTS),
+  );
   test.onTestFinished(failCheckpointCompletion());
 
   const ranAt = Date.now();
@@ -110,54 +118,4 @@ function failCheckpointCompletion(): () => void {
       configurable: true,
       writable: true,
     });
-}
-
-/** Writes settled and uncertain effects whose request recovery cannot read. */
-function seedDamagedSurfaceEffects(
-  _actor: unknown,
-  state: DurableObjectState,
-): void {
-  const now = Date.now();
-  for (let index = 0; index < DAMAGED_EFFECTS; index++) {
-    const settled = index % 2 === 0;
-    state.storage.sql.exec(
-      `INSERT INTO actor_outbox
-        (effect_id, organisation_id, originating_event_id, request_envelope, state_kind, state_projection, updated_at)
-       VALUES (?, ?, 'surface-dispatched', ?, ?, ?, ?)`,
-      `surface-damaged-${String(index).padStart(2, "0")}`,
-      ORGANISATION_ID,
-      JSON.stringify({ kind: "bakery_surface_effect.v1" }),
-      settled ? "settled" : "indeterminate",
-      JSON.stringify(
-        settled
-          ? { kind: "surface_settled", receipt: null, settledAt: now }
-          : { kind: "surface_indeterminate", reason: "expired_after_dispatch" },
-      ),
-      now - 60_000 + index,
-    );
-  }
-}
-
-function readDamagedSurfaceEffects(
-  _actor: unknown,
-  state: DurableObjectState,
-): { candidates: number; quarantined: number } {
-  const count = (states: string) =>
-    state.storage.sql
-      .exec<{ count: number }>(
-        `SELECT COUNT(*) AS count FROM actor_outbox
-         WHERE effect_id LIKE 'surface-damaged-%' AND state_kind IN (${states})`,
-      )
-      .one().count;
-  return {
-    candidates: count("'dispatching', 'settled', 'indeterminate'"),
-    quarantined: count("'quarantined'"),
-  };
-}
-
-function readAlarm(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<number | null> {
-  return state.storage.getAlarm();
 }

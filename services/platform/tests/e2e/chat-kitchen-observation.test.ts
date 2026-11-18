@@ -26,11 +26,15 @@ import {
   installMemoryFixture,
   post,
   storedConversation,
-  workKind,
   type Member,
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText } from "./slack-journey-support";
+import {
+  finished,
+  latestUserInput,
+  userScreenParts,
+} from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -75,7 +79,7 @@ it(
       surfaceObservation: kitchenObservation(context, privateChat),
     });
     expect(sent.status, await sent.clone().text()).toBe(200);
-    await finish(author, privateChat);
+    await finished(author, privateChat);
     const privateInput = latestUserInput(requests);
     expect(privateInput).toContain(
       "The current request carries Workflow simulator from the operator's screen",
@@ -155,7 +159,7 @@ it(
       surfaceContext: kitchen,
     });
     expect(oldTab.status, await oldTab.clone().text()).toBe(200);
-    await finish(author, privateChat);
+    await finished(author, privateChat);
     const oldTabInput = latestUserInput(requests);
     expect(oldTabInput).toContain(context.surfaceSessionId);
     expect(oldTabInput).toContain("Kitchen view");
@@ -174,7 +178,7 @@ it(
       surfaceObservation: kitchenObservation(context, storedChat),
     });
     expect(first.status, await first.clone().text()).toBe(200);
-    await finish(author, storedChat);
+    await finished(author, storedChat);
     await storeAsBeforePhaseTwo(author, storedChat, kitchen);
     const reopened = await readChat(author, paths.chat, storedChat);
     expect(userScreenParts(reopened)).toEqual([
@@ -195,7 +199,7 @@ it(
       text: "And what comes next?",
     });
     expect(continued.status, await continued.clone().text()).toBe(200);
-    await finish(author, storedChat);
+    await finished(author, storedChat);
     const continuedInput = latestUserInput(requests);
     expect(continuedInput).toContain("And what comes next?");
     expect(continuedInput).toContain(
@@ -216,7 +220,7 @@ it(
       surfaceObservation: kitchenObservation(context, shared),
     });
     expect(sharedSend.status, await sharedSend.clone().text()).toBe(200);
-    await finish(author, shared);
+    await finished(author, shared);
     const sharedInput = latestUserInput(requests);
     expect(sharedInput).toContain("What does my Kitchen show?");
     expect(sharedInput).toContain(
@@ -389,15 +393,6 @@ function send(
   });
 }
 
-async function finish(
-  author: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  await expect
-    .poll(workKind.bind(null, author, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
 type StoredParts = NonNullable<Awaited<ReturnType<typeof latestUserParts>>>;
 type ObservationPart = Extract<
   StoredParts[number],
@@ -442,19 +437,6 @@ async function readChat(
   return { conversation: body.conversation };
 }
 
-function userScreenParts(read: ChatRead): readonly unknown[] {
-  const timeline = Array.isArray(read.conversation.timeline)
-    ? read.conversation.timeline
-    : [];
-  return timeline.flatMap((event: unknown) =>
-    isRecord(event) && event.kind === "user" && Array.isArray(event.parts)
-      ? event.parts.filter(
-          (part: unknown) => isRecord(part) && part.kind === "screen",
-        )
-      : [],
-  );
-}
-
 async function recordAndReply(
   requests: string[],
   { request }: Parameters<HttpResponseResolver>[0],
@@ -466,19 +448,4 @@ async function recordAndReply(
     "Your Kitchen shows the shift.",
     `kitchen_${String(requests.length)}`,
   );
-}
-
-/** The newest user message of the newest model request. */
-function latestUserInput(requests: readonly string[]): string {
-  const latest = requests.at(-1);
-  if (latest === undefined) throw new Error("The model received no request");
-  const body: unknown = JSON.parse(latest);
-  const messages =
-    isRecord(body) && Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (isRecord(message) && message.role === "user")
-      return JSON.stringify(message.content);
-  }
-  throw new Error("The model request has no user message");
 }

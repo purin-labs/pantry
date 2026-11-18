@@ -7,7 +7,6 @@ import {
   parseMenuScreenPairing,
   parseMenuScreenPairingState,
   parseMenuScreenPickup,
-  parseMenuScreenSignal,
   parseBankPayouts,
   parseFailedPaymentsDay,
   parseOrderTimes,
@@ -47,6 +46,7 @@ import {
   openSocket,
 } from "./hibernatable-socket-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+import { boardIdOf, nextSignal } from "./menu-board-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -994,16 +994,6 @@ async function waitForBoard(
   return last;
 }
 
-function boardIdOf(body: unknown): string {
-  if (
-    !isRecord(body) ||
-    !isRecord(body.board) ||
-    typeof body.board.boardId !== "string"
-  )
-    throw new Error(`No board: ${JSON.stringify(body)}`);
-  return body.board.boardId;
-}
-
 async function boardRevision(
   base: string,
   session: IssuedControlSession,
@@ -1061,22 +1051,6 @@ async function openScreenSocket(token: string): Promise<WebSocket> {
   if (response.webSocket === null) throw new Error("No screen socket");
   response.webSocket.accept();
   return response.webSocket;
-}
-
-function nextSignal(socket: WebSocket): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      socket.removeEventListener("message", onMessage);
-      reject(new Error("The screen got no signal"));
-    }, 30_000);
-    const onMessage = (event: MessageEvent): void => {
-      if (!parseMenuScreenSignal(event.data)) return;
-      clearTimeout(timer);
-      socket.removeEventListener("message", onMessage);
-      resolve(Date.now());
-    };
-    socket.addEventListener("message", onMessage);
-  });
 }
 
 /** One customer on the QR order page: a cart, a checkout and a payment. */

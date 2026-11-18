@@ -96,10 +96,7 @@ export async function send(
     model,
     text,
     surfaceContext: null,
-    browserContext: {
-      kind: "available",
-      binding: { browserInstanceId, conversationId },
-    },
+    browserContext: portalBrowser(conversationId, browserInstanceId),
   });
   expect(response.status, await response.clone().text()).toBe(200);
 }
@@ -150,3 +147,17 @@ export function isCancellation(event: TimelineEvent): boolean {
 
 export const TAB = "5b726c04-dfcb-4e24-9a0e-1f8e5c6d2a31";
 export const OTHER_TAB = "6c837d15-e0dc-4f35-8b1f-2a9f6d7e3b42";
+
+/**
+ * The browser binding that the Portal sends with every message of a chat,
+ * also with a steer.
+ */
+export function portalBrowser(
+  conversationId: string,
+  browserInstanceId: string = TAB,
+) {
+  return {
+    kind: "available",
+    binding: { browserInstanceId, conversationId },
+  } as const;
+}

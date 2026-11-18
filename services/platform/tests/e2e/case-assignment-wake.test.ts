@@ -1,23 +1,23 @@
-import { env, exports } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
 
-import {
-  resolveActiveCaseActor,
-  resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import type { SessionDO } from "../../src/actors/agent-session";
-import type { IssuedControlSession } from "../../src/data/control-plane";
-import { preparePortalChatJourney } from "./chat-journey-support";
+import {
+  preparePortalChatJourney,
+  caseOf,
+  dispatchCommand,
+  leaveOldAssignment,
+  sessionOf,
+  turnState,
+} from "./chat-journey-support";
 import { network } from "./network";
 import {
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,
   openRouterText,
 } from "./slack-journey-support";
+import { readAlarm } from "./case-execution-support";
 
 /**
  * A stuck assignment from an earlier release ends with no new delivery.
@@ -48,8 +48,6 @@ it(
 const KEY = "case_assignment_wake";
 const INSTRUCTION = "Count the open supplier orders.";
 const ANSWER = "There are three open orders.";
-/** Older than the 30-minute abandon time. */
-const OLD_START_AGE_MS = 31 * 60_000;
 
 /** The first model request waits while its phase is `held`. */
 type Model = {
@@ -104,7 +102,7 @@ async function oldStuckAssignmentJourney(test: TestContext): Promise<void> {
   expect(await assignmentStates(stopped)).toEqual(["running"]);
 
   // The state that the earlier release left, then the end of the process.
-  await runInDurableObject(stopped, leaveEarlierReleaseState);
+  await runInDurableObject(stopped, leaveOldAssignment);
   await runInDurableObject(stopped, leaveUnrestorableRecord);
   expect(await stopped.inspect()).toEqual({
     ok: false,
@@ -160,67 +158,6 @@ async function answerModel(
   );
 }
 
-function dispatchCommand(
-  session: IssuedControlSession,
-  key: string,
-  instruction: string,
-): Promise<Response> {
-  return exports.default.fetch(
-    `https://localhost/v1/control/organisations/${ORGANISATION_ID}/cases/commands`,
-    {
-      method: "POST",
-      headers: {
-        origin: "https://localhost",
-        "content-type": "application/json",
-        "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
-      },
-      body: JSON.stringify({ instruction }),
-    },
-  );
-}
-
-async function sessionOf(
-  sessionId: Parameters<typeof resolveActiveSessionActor>[0]["sessionId"],
-): Promise<DurableObjectStub<SessionDO>> {
-  const resolved = await resolveActiveSessionActor({
-    env,
-    namespace: env.SESSION,
-    organisationId: ORGANISATION_ID,
-    sessionId,
-    now: Date.now(),
-  });
-  if (!resolved.ok) throw new Error(resolved.error.code);
-  return resolved.value;
-}
-
-async function caseOf(
-  caseId: Parameters<typeof resolveActiveCaseActor>[0]["caseId"],
-) {
-  const resolved = await resolveActiveCaseActor({
-    env,
-    namespace: env.CASE,
-    organisationId: ORGANISATION_ID,
-    caseId,
-    now: Date.now(),
-  });
-  if (!resolved.ok) throw new Error(resolved.error.code);
-  return resolved.value;
-}
-
-async function turnState(
-  session: DurableObjectStub<SessionDO>,
-  turnId: string,
-): Promise<string> {
-  const inspected = await session.inspectTurnStream({
-    organisationId: ORGANISATION_ID,
-    turnId,
-  });
-  if (!inspected.ok) return inspected.error.code;
-  return inspected.value.kind === "missing" ? "missing" : inspected.value.state;
-}
-
 async function assignmentStates(
   caseActor: Awaited<ReturnType<typeof caseOf>>,
 ): Promise<string[]> {
@@ -231,37 +168,6 @@ async function assignmentStates(
       ? `settled:${lifecycle.disposition.kind}`
       : lifecycle.kind,
   );
-}
-
-/**
- * What a Case of the earlier release holds: no wakeup, no assignment time,
- * and a start older than the abandon time.
- */
-async function leaveEarlierReleaseState(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  await state.storage.deleteAlarm();
-  const rows = state.storage.sql
-    .exec<{ assignment_id: string; lifecycle_json: string }>(
-      "SELECT assignment_id, lifecycle_json FROM case_assignment",
-    )
-    .toArray();
-  for (const row of rows) {
-    const lifecycle: unknown = JSON.parse(row.lifecycle_json);
-    if (!isRecord(lifecycle) || !isRecord(lifecycle.start))
-      throw new Error("case_assignment_start_missing");
-    const acceptedAt = Number(lifecycle.start.acceptedAt) - OLD_START_AGE_MS;
-    lifecycle.start.acceptedAt =
-      typeof lifecycle.start.acceptedAt === "string"
-        ? String(acceptedAt)
-        : acceptedAt;
-    state.storage.sql.exec(
-      "UPDATE case_assignment SET lifecycle_json = ?, assigned_at = NULL WHERE assignment_id = ?",
-      JSON.stringify(lifecycle),
-      row.assignment_id,
-    );
-  }
 }
 
 /** A binding row in a shape that the current release does not restore. */
@@ -290,13 +196,6 @@ async function staleCensus(
     census.find((entry) => entry.machine === "case_assignment_stale")?.states ??
     null
   );
-}
-
-function readAlarm(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<number | null> {
-  return state.storage.getAlarm();
 }
 
 function loseProcess(_actor: unknown, state: DurableObjectState): void {

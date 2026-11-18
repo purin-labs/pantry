@@ -1,4 +1,3 @@
-import { exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
@@ -11,8 +10,7 @@ import {
   isStringRecord,
   slackPostFields,
   openRouterText,
-  signedSlackRequest,
-  slackEnvelope,
+  acceptSlack,
 } from "./slack-journey-support";
 
 /**
@@ -121,17 +119,6 @@ async function concurrentCasesJourney(test: TestContext): Promise<void> {
       deliveries: deliveredReplies(delivered),
     },
   });
-}
-
-async function acceptSlack(
-  envelope: Parameters<typeof slackEnvelope>[0],
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(slackEnvelope(envelope)),
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  expect(isRecord(body) ? body.durableMode : null).toBe("case_accepted");
 }
 
 /** A failed run must not leave the held model request waiting. */

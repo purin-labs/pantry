@@ -1,6 +1,5 @@
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
-import { exports } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
@@ -21,9 +20,8 @@ import {
   openRouterText,
   openRouterToolCall,
   requireLastToolOutput,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  postMention,
 } from "./slack-journey-support";
 
 /**
@@ -69,7 +67,11 @@ async function followUpAuthorityJourney(test: TestContext): Promise<void> {
   );
 
   // 1. The agent schedules a follow-up, then the owner changes Access.
-  await postMention("Ev_AUTHORITY_DOUGH", ROOT_TS, "check the dough in 40 minutes");
+  await postMention(
+    "Ev_AUTHORITY_DOUGH",
+    ROOT_TS,
+    "check the dough in 40 minutes",
+  );
   await expect.poll(slack.visibleMessageCount, { timeout: 30_000 }).toBe(1);
   const connector = await connectorOf(fixture.connectorId);
   const versionBefore = await configurationVersion();
@@ -102,9 +104,10 @@ async function followUpAuthorityJourney(test: TestContext): Promise<void> {
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 30_000 }).toBe(3);
   expect(recorded.requests).toHaveLength(5);
-  await fixtureDatabase().prepare(
-    "UPDATE service_role_grant SET status = 'revoked', revoked_at = ? WHERE organisation_id = ? AND user_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE service_role_grant SET status = 'revoked', revoked_at = ? WHERE organisation_id = ? AND user_id = ?",
+    )
     .bind(Date.now(), ORGANISATION_ID, OPERATOR)
     .run();
   await runInDurableObject(connector, makeFollowUpsDue);
@@ -152,7 +155,10 @@ async function replyToModel(
       );
     case 2:
       expect(requireLastToolOutput(body)).toContain("follow_up_scheduled");
-      return openRouterText(ANSWERS.scheduledDough, "follow_up_dough_scheduled");
+      return openRouterText(
+        ANSWERS.scheduledDough,
+        "follow_up_dough_scheduled",
+      );
     case 3: {
       // The Access change gives the person a new Session, so the note of the
       // earlier call is not in its history. The person's request is.
@@ -175,30 +181,12 @@ async function replyToModel(
   }
 }
 
-async function postMention(
-  eventId: string,
-  ts: string,
-  question: string,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: "app_mention",
-        eventId,
-        messageTs: ts,
-        threadTs: ts,
-        text: `<@U0SATYR> ${question}`,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
-}
-
 /** The version that a Slack requester's authority is pinned to. */
 async function configurationVersion(): Promise<number> {
-  const row = await fixtureDatabase().prepare(
-    "SELECT MAX(configuration_version) AS version FROM organisation_onboarding WHERE organisation_id = ?",
-  )
+  const row = await fixtureDatabase()
+    .prepare(
+      "SELECT MAX(configuration_version) AS version FROM organisation_onboarding WHERE organisation_id = ?",
+    )
     .bind(ORGANISATION_ID)
     .first<{ readonly version: number }>();
   if (row === null) throw new Error("E2E onboarding missing");

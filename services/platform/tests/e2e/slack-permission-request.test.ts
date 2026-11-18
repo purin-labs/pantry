@@ -1,6 +1,6 @@
 import { runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
@@ -25,9 +25,8 @@ import {
   openRouterText,
   openRouterToolCall,
   requireLastToolOutput,
-  signedSlackRequest,
-  slackEnvelope,
   slackSimulator,
+  postMention,
 } from "./slack-journey-support";
 
 /**
@@ -81,7 +80,9 @@ async function permissionJourney(test: TestContext): Promise<void> {
   expect(recorded.requests).toHaveLength(2);
   const menuRequestId = requestIdIn(slack.messages);
   expect(textsOf(slack.messages)).toEqual([
-    expect.stringContaining("Sous Chef needs permission to read the shared menu draft"),
+    expect.stringContaining(
+      "Sous Chef needs permission to read the shared menu draft",
+    ),
     ANSWERS.askedMenu,
   ]);
 
@@ -230,25 +231,6 @@ async function replyToModel(
   }
 }
 
-async function postMention(
-  eventId: string,
-  ts: string,
-  question: string,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: "app_mention",
-        eventId,
-        messageTs: ts,
-        threadTs: ts,
-        text: `<@U0SATYR> ${question}`,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
-}
-
 function readRequest(
   session: Parameters<typeof readRequestView>[1],
   requestId: string,
@@ -303,14 +285,19 @@ async function connectorWork(connectorId: string) {
     entry.physicalObjectName,
     entry.placement,
   );
-  return runInDurableObject(stub, (_actor: unknown, ctx: DurableObjectState) => ({
-    parked: ctx.storage.sql
-      .exec("SELECT request_id, decision FROM connector_parked_case_work ORDER BY created_at")
-      .toArray(),
-    continued: ctx.storage.sql
-      .exec(
-        "SELECT event_id, outcome FROM connector_case_work_receipt WHERE event_id LIKE 'permission!_%' ESCAPE '!'",
-      )
-      .toArray(),
-  }));
+  return runInDurableObject(
+    stub,
+    (_actor: unknown, ctx: DurableObjectState) => ({
+      parked: ctx.storage.sql
+        .exec(
+          "SELECT request_id, decision FROM connector_parked_case_work ORDER BY created_at",
+        )
+        .toArray(),
+      continued: ctx.storage.sql
+        .exec(
+          "SELECT event_id, outcome FROM connector_case_work_receipt WHERE event_id LIKE 'permission!_%' ESCAPE '!'",
+        )
+        .toArray(),
+    }),
+  );
 }

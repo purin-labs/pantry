@@ -1,5 +1,14 @@
 import { env, exports } from "cloudflare:workers";
+import { runInDurableObject } from "cloudflare:test";
 import { expect } from "vitest";
+import { decodeBase64, isRecord } from "@seams/std";
+import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
+import type { ConnectorDO } from "../../src/actors/connector";
+import {
+  readEmailRuntime,
+  type EmailProcessingState,
+} from "../../src/actors/connector-email";
+import { runConnectorEmailEvaluation } from "../../src/actors/connector-email-evaluation";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
@@ -7,7 +16,10 @@ import {
 } from "../../src/authorization/capability-catalogue";
 import { storeVaultSecret } from "../../src/credential-vault";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
-import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
+import {
+  gmailConnectorId,
+  registerEmailMailboxAccount,
+} from "../../src/data/email-mailbox";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { persistProviderResourceSnapshot } from "../../src/data/provider-resource";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
@@ -20,9 +32,13 @@ import {
   runMailboxSetup,
   type MailboxSetupTransport,
 } from "../../../../apps/portal/src/features/mail-setup/run";
+import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import type { Member } from "./memory-support";
 import { fixtureDatabase } from "./organisation-database";
+
+/** The Connector Actor of a mailbox. */
+export type MailboxConnector = DurableObjectStub<ConnectorDO>;
 
 /**
  * A Gmail mailbox as the connection leaves it: the account, its credential,
@@ -171,6 +187,124 @@ export async function sendAs(
     body: JSON.stringify(body),
   });
   return { status: response.status, body: await response.json() };
+}
+
+/** The active Connector Actor of one mailbox account. */
+export async function mailboxConnector(
+  organisationId: OrganisationId,
+  account: IntegrationAccountId,
+): Promise<MailboxConnector> {
+  const connectorId = gmailConnectorId(account);
+  if (!connectorId.ok) throw new Error("Invalid connector");
+  const connector = await resolveActiveConnectorActor({
+    env,
+    namespace: env.CONNECTOR,
+    organisationId,
+    connectorId: connectorId.value,
+    now: Date.now(),
+  });
+  if (!connector.ok) throw new Error(connector.error.code);
+  return connector.value;
+}
+
+/** The mail runtime that a mailbox's Connector stores. */
+export async function mailRuntime(connector: MailboxConnector) {
+  const stored = await runInDurableObject(connector, readRuntime);
+  if (stored === null) throw new Error("The mailbox has no mail runtime");
+  return stored;
+}
+
+/** Where the Connector's mail processing stands. */
+export async function mailProcessing(
+  connector: MailboxConnector,
+): Promise<EmailProcessingState> {
+  return (await mailRuntime(connector)).processing;
+}
+
+function readRuntime(_actor: unknown, state: DurableObjectState) {
+  return readEmailRuntime(state.storage.sql);
+}
+
+/** The Connector's own evaluation, on a clock at the given time. */
+export async function evaluateAt(
+  organisationId: OrganisationId,
+  now: number,
+  _actor: unknown,
+  state: DurableObjectState,
+) {
+  return runConnectorEmailEvaluation({
+    scope: await requireOrganisationExecutionScope(env, organisationId),
+    env,
+    storage: state.storage,
+    now,
+    fetcher: fetch,
+  });
+}
+
+/** The time of the evaluation that a check scheduled. */
+export function scheduledAt(
+  checked: Readonly<{ status: number; body: unknown }>,
+): number {
+  const body = checked.body;
+  if (
+    checked.status !== 200 ||
+    !isRecord(body) ||
+    body.kind !== "scheduled" ||
+    typeof body.at !== "number"
+  )
+    throw new Error(`Not a scheduled check: ${JSON.stringify(checked)}`);
+  return body.at;
+}
+
+/** The Case of each mail that the Connector gave a reply turn. */
+export function readReplyTurns(_actor: unknown, state: DurableObjectState) {
+  return state.storage.sql
+    .exec<{ messageId: string; caseId: string }>(
+      `SELECT provider_message_id AS messageId, case_id AS caseId
+       FROM connector_email_reply_turn ORDER BY provider_message_id`,
+    )
+    .toArray();
+}
+
+/** How many self-tests of its mailboxes the Organisation holds. */
+export async function selfTestCount(
+  organisationId: OrganisationId,
+): Promise<number> {
+  const row = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS total FROM email_self_test WHERE organisation_id = ?",
+    )
+    .bind(organisationId)
+    .first<{ total: number }>();
+  return row?.total ?? 0;
+}
+
+/** The text of a base64url raw message, as Gmail takes it. */
+export function decodeRaw(encoded: string): string {
+  return new TextDecoder().decode(
+    decodeBase64(encoded.replaceAll("-", "+").replaceAll("_", "/")) ??
+      new Uint8Array(),
+  );
+}
+
+/** One header of a raw message, or null when it has none. */
+export function header(encoded: string, name: string): string | null {
+  const head = decodeRaw(encoded).split("\r\n\r\n")[0] ?? "";
+  return (
+    head
+      .split("\r\n")
+      .find((line) => line.startsWith(`${name}: `))
+      ?.slice(name.length + 2) ?? null
+  );
+}
+
+/** The decoded body of a raw message whose body is base64. */
+export function draftBody(encoded: string): string {
+  return new TextDecoder().decode(
+    decodeBase64(
+      (decodeRaw(encoded).split("\r\n\r\n")[1] ?? "").replaceAll(/\s+/gu, ""),
+    ) ?? new Uint8Array(),
+  );
 }
 
 /**

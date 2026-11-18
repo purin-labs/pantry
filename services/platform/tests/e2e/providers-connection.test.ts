@@ -11,6 +11,7 @@ import {
 import { parseIntegrationAccountId, type OrganisationId } from "../../src/ids";
 import { network } from "./network";
 import { commerceWorkspace } from "./commerce-support";
+import { controlReadHeaders } from "./hibernatable-socket-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { assertNever, bytesToHex, isRecord } from "@seams/std";
 
@@ -806,14 +807,6 @@ function controlMutationHeaders(
     "idempotency-key": idempotencyKey,
     "x-satyr-configuration-version": "1",
     "x-satyr-csrf": session.csrfToken,
-  };
-}
-
-function controlReadHeaders(
-  session: IssuedControlSession,
-): Record<string, string> {
-  return {
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
   };
 }
 

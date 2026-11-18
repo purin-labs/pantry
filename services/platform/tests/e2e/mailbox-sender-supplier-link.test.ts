@@ -3,19 +3,10 @@ import { fixtureDatabase } from "./organisation-database";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
-import { decodeBase64, encodeBase64Url, isRecord } from "@seams/std";
-import {
-  resolveActiveCaseActor,
-  resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+import { encodeBase64Url, isRecord } from "@seams/std";
+import { resolveActiveCaseActor } from "../../src/actors/actor-router";
 import { nextEmailCorrectionLearningAt } from "../../src/actors/connector-email";
-import { runConnectorEmailEvaluation } from "../../src/actors/connector-email-evaluation";
-import { gmailConnectorId } from "../../src/data/email-mailbox";
-import {
-  parseCaseId,
-  type IntegrationAccountId,
-  type OrganisationId,
-} from "../../src/ids";
+import { parseCaseId, type OrganisationId } from "../../src/ids";
 import { readVerifiedMessageSender } from "../../src/mail-inbox/verified-sender";
 import { resolveOrganisationModelRoute } from "../../src/models/route";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
@@ -27,8 +18,15 @@ import {
   connectGmailMailbox,
   sendAs,
   setUpMailbox,
+  draftBody,
+  evaluateAt,
+  header,
+  mailboxConnector,
+  scheduledAt,
+  type MailboxConnector,
 } from "./gmail-mailbox-support";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
+import { modelToolResults } from "./chat-journey-support";
 
 const ADDRESS = "orders@example.test";
 const SENDER = "supplier@example.test";
@@ -47,10 +45,6 @@ it(
   { timeout: 240_000 },
   senderSupplierLinkJourney,
 );
-
-type Connector = DurableObjectStub<
-  import("../../src/actors/connector").ConnectorDO
->;
 
 async function senderSupplierLinkJourney({ task }: TestContext): Promise<void> {
   const {
@@ -478,7 +472,7 @@ class ScriptedAgent {
   }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
     const raw: unknown = await request.json();
     const text = JSON.stringify(raw);
-    const results = toolResults(raw);
+    const results = modelToolResults(raw);
     if (text.includes('"propose_memory"')) {
       if (results === 0) {
         this.learningTurns += 1;
@@ -504,14 +498,6 @@ class ScriptedAgent {
         )
       : openRouterText("Prepared for review.", "reply_done");
   }
-}
-
-function toolResults(raw: unknown): number {
-  return isRecord(raw) && Array.isArray(raw.messages)
-    ? raw.messages.filter(
-        (message: unknown) => isRecord(message) && message.role === "tool",
-      ).length
-    : 0;
 }
 
 /** Gmail for this mailbox: its Inbox history, its messages and its drafts. */
@@ -690,33 +676,8 @@ class SupplierMailbox {
   }
 }
 
-function decodeRaw(encoded: string): string {
-  return new TextDecoder().decode(
-    decodeBase64(encoded.replaceAll("-", "+").replaceAll("_", "/")) ??
-      new Uint8Array(),
-  );
-}
-
-function header(encoded: string, name: string): string | null {
-  const head = decodeRaw(encoded).split("\r\n\r\n")[0] ?? "";
-  return (
-    head
-      .split("\r\n")
-      .find((line) => line.startsWith(`${name}: `))
-      ?.slice(name.length + 2) ?? null
-  );
-}
-
-function draftBody(encoded: string): string {
-  return new TextDecoder().decode(
-    decodeBase64(
-      (decodeRaw(encoded).split("\r\n\r\n")[1] ?? "").replaceAll(/\s+/gu, ""),
-    ) ?? new Uint8Array(),
-  );
-}
-
 /** Makes the Connector's held work due now and wakes it. */
-async function runDueWork(connector: Connector): Promise<void> {
+async function runDueWork(connector: MailboxConnector): Promise<void> {
   await runInDurableObject(
     connector,
     async (_actor: unknown, state: DurableObjectState) => {
@@ -730,7 +691,7 @@ async function runDueWork(connector: Connector): Promise<void> {
 }
 
 /** Moves the Collection discovery that waits a day ahead. */
-async function holdDiscovery(connector: Connector): Promise<void> {
+async function holdDiscovery(connector: MailboxConnector): Promise<void> {
   await runInDurableObject(
     connector,
     (_actor: unknown, state: DurableObjectState) => {
@@ -742,7 +703,7 @@ async function holdDiscovery(connector: Connector): Promise<void> {
   );
 }
 
-async function releaseDiscovery(connector: Connector): Promise<void> {
+async function releaseDiscovery(connector: MailboxConnector): Promise<void> {
   await runInDurableObject(
     connector,
     async (_actor: unknown, state: DurableObjectState) => {
@@ -766,7 +727,7 @@ function pendingDiscovery(_actor: unknown, state: DurableObjectState) {
 async function waitForDraft(
   person: Member,
   proposalId: string,
-  connector: Connector,
+  connector: MailboxConnector,
 ): Promise<void> {
   await expect
     .poll(
@@ -806,7 +767,7 @@ async function correct(person: Member, proposalId: string): Promise<void> {
   expect(edited.status, await edited.clone().text()).toBe(200);
 }
 
-async function waitForNoLearning(connector: Connector): Promise<void> {
+async function waitForNoLearning(connector: MailboxConnector): Promise<void> {
   await expect
     .poll(
       () =>
@@ -936,51 +897,4 @@ async function seedSuppliers(
   const seeded = await purchasingFixture(organisationId, merchantId, "seed");
   expect(seeded.status, await seeded.text()).toBe(200);
   return merchantId;
-}
-
-function scheduledAt(
-  checked: Readonly<{ status: number; body: unknown }>,
-): number {
-  const body = checked.body;
-  if (
-    checked.status !== 200 ||
-    !isRecord(body) ||
-    body.kind !== "scheduled" ||
-    typeof body.at !== "number"
-  )
-    throw new Error(`Not a scheduled check: ${JSON.stringify(checked)}`);
-  return body.at;
-}
-
-async function mailboxConnector(
-  organisationId: OrganisationId,
-  account: IntegrationAccountId,
-): Promise<Connector> {
-  const connectorId = gmailConnectorId(account);
-  if (!connectorId.ok) throw new Error("Invalid connector");
-  const connector = await resolveActiveConnectorActor({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    connectorId: connectorId.value,
-    now: Date.now(),
-  });
-  if (!connector.ok) throw new Error(connector.error.code);
-  return connector.value;
-}
-
-/** The Connector's own evaluation, on a clock at the given time. */
-async function evaluateAt(
-  organisationId: OrganisationId,
-  now: number,
-  _actor: unknown,
-  state: DurableObjectState,
-) {
-  return runConnectorEmailEvaluation({
-    scope: await requireOrganisationExecutionScope(env, organisationId),
-    env,
-    storage: state.storage,
-    now,
-    fetcher: fetch,
-  });
 }

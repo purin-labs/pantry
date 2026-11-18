@@ -1097,3 +1097,83 @@ export async function verifyCombinedProposalExecution(
     nodesAfterEachAssignment: reached.map((branch) => branch.size),
   };
 }
+
+/** The time of an Actor's next wakeup, or null when it has none. */
+export function readAlarm(
+  _actor: unknown,
+  state: DurableObjectState,
+): Promise<number | null> {
+  return state.storage.getAlarm();
+}
+
+/** Every table row and stored value of an Actor, as one JSON text. */
+export async function storedContent(
+  _actor: unknown,
+  state: DurableObjectState,
+): Promise<string> {
+  const tables = state.storage.sql
+    .exec<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT GLOB '_cf_*'",
+    )
+    .toArray();
+  const rows: unknown[] = [];
+  for (const table of tables)
+    rows.push({
+      table: table.name,
+      rows: state.storage.sql.exec(`SELECT * FROM "${table.name}"`).toArray(),
+    });
+  const values = await state.storage.list();
+  return JSON.stringify({ tables: rows, values: [...values.entries()] });
+}
+
+/**
+ * Writes `count` settled and uncertain Satyr Kitchen effects of a Session,
+ * whose request recovery cannot read.
+ */
+export function seedDamagedSurfaceEffects(
+  organisationId: string,
+  count: number,
+): (actor: unknown, state: DurableObjectState) => void {
+  return (_actor, state) => {
+    const now = Date.now();
+    for (let index = 0; index < count; index++) {
+      const settled = index % 2 === 0;
+      state.storage.sql.exec(
+        `INSERT INTO actor_outbox
+          (effect_id, organisation_id, originating_event_id, request_envelope, state_kind, state_projection, updated_at)
+         VALUES (?, ?, 'surface-dispatched', ?, ?, ?, ?)`,
+        `surface-damaged-${String(index).padStart(2, "0")}`,
+        organisationId,
+        JSON.stringify({ kind: "bakery_surface_effect.v1" }),
+        settled ? "settled" : "indeterminate",
+        JSON.stringify(
+          settled
+            ? { kind: "surface_settled", receipt: null, settledAt: now }
+            : {
+                kind: "surface_indeterminate",
+                reason: "expired_after_dispatch",
+              },
+        ),
+        now - 60_000 + index,
+      );
+    }
+  };
+}
+
+/** How many of the damaged effects recovery may still read, and has ended. */
+export function readDamagedSurfaceEffects(
+  _actor: unknown,
+  state: DurableObjectState,
+): { candidates: number; quarantined: number } {
+  const count = (states: string) =>
+    state.storage.sql
+      .exec<{ count: number }>(
+        `SELECT COUNT(*) AS count FROM actor_outbox
+         WHERE effect_id LIKE 'surface-damaged-%' AND state_kind IN (${states})`,
+      )
+      .one().count;
+  return {
+    candidates: count("'dispatching', 'settled', 'indeterminate'"),
+    quarantined: count("'quarantined'"),
+  };
+}

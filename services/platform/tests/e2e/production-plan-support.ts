@@ -29,12 +29,22 @@ import {
 } from "@seams/commerce-client";
 import { commerceClient, commerceHeaders } from "./commerce-support";
 import { closeSocket } from "./hibernatable-socket-support";
+import { openRouterToolCall } from "./slack-journey-support";
 
 export const LOCATION = "location_cafe";
 export const PRODUCTION = "/inventory/production-requests";
 
 export function planPath(action: "accept"): string {
   return `/inventory/production-plan/${LOCATION}/${action}`;
+}
+
+/** The model's call that reads the plan of the café's location. */
+export function readPlan(id: string): Promise<Response> | Response {
+  return openRouterToolCall(
+    "production_plan_read",
+    { locationId: LOCATION },
+    `call_${id}`,
+  );
 }
 
 export class PlanJourney {

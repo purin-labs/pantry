@@ -13,7 +13,6 @@ import {
   parseOrderQueueEntries,
   parsePaymentsDay,
   parseSoldOutItems,
-  type ConversationId,
   type OrderQueueEntry,
   type SoldOutItem,
 } from "@seams/control-api";
@@ -26,18 +25,15 @@ import {
   required,
 } from "./cafe-order-support";
 import {
-  ask,
   lastCalledTool,
   pausedRequest,
   resumeChat,
 } from "./chat-permission-support";
 import { connectCommerceFixture } from "./commerce-support";
 import {
-  createConversation,
   installMemoryFixture,
   post,
   postJson,
-  workKind,
   type Member,
   type MemoryFixture,
 } from "./memory-support";
@@ -51,6 +47,12 @@ import {
   openRouterToolCall,
   requireLastToolOutput,
 } from "./slack-journey-support";
+import {
+  chatDirect,
+  finished,
+  messageWord,
+  startChat,
+} from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -461,42 +463,6 @@ async function chatThrough(
   };
 }
 
-/** One chat message that needs no prompt. A pause fails the poll. */
-async function chatDirect(
-  fixture: MemoryFixture,
-  person: Member,
-  word: string,
-): Promise<void> {
-  await finished(person, await startChat(fixture, person, word));
-}
-
-async function startChat(
-  fixture: MemoryFixture,
-  person: Member,
-  word: string,
-): Promise<ConversationId> {
-  const conversationId = newConversationId();
-  await createConversation(person, conversationId, fixture.route);
-  await ask(
-    person,
-    fixture.paths.chat,
-    conversationId,
-    fixture.route.model,
-    `${word} now.`,
-    word,
-  );
-  return conversationId;
-}
-
-function finished(
-  person: Member,
-  conversationId: ConversationId,
-): Promise<void> {
-  return expect
-    .poll(workKind.bind(null, person, conversationId), { timeout: 60_000 })
-    .toBe("ready");
-}
-
 async function moveReceipts(
   fixture: MemoryFixture,
   fulfillmentId: string,
@@ -515,22 +481,6 @@ async function moveReceipts(
     )
     .all();
   return rows.results;
-}
-
-/** The word of the chat message: each chat holds one. */
-function messageWord(
-  body: Record<string, unknown>,
-  words: readonly string[],
-): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (!isRecord(message) || message.role !== "user") continue;
-    const text = JSON.stringify(message.content);
-    const word = words.find((candidate) => text.includes(candidate));
-    if (word !== undefined) return word;
-  }
-  throw new Error("The model request has no scripted message");
 }
 
 async function replyToModel(

@@ -2,21 +2,21 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import type { FlowPolicyInput } from "../../src/policy/information-flow";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { reconcileHeldOutputRequests } from "../../src/slack/held-output-release";
-import { accessControlPath } from "./access-route-support";
-import { commerceHeaders } from "./commerce-support";
 import {
   admin,
+  decide,
+  heldStatus,
   joiner,
+  pendingOf,
   raiseLabel,
+  readHeld,
   registeredActors,
-  type Person,
 } from "./held-exit-support";
 import { network } from "./network";
 import { givePortalHandles } from "./permission-request-support";
@@ -63,12 +63,17 @@ declare module "vitest" {
  */
 it("holds a blocked answer and asks a person", slackHeldOutput, 240_000);
 
-const OWNER = { kind: "organisation", organisationId: ORGANISATION_ID } as const;
+const OWNER = {
+  kind: "organisation",
+  organisationId: ORGANISATION_ID,
+} as const;
 const SECOND_ROOT_TS = "1787500200.000001";
 const THIRD_ROOT_TS = "1787500300.000001";
 const FOURTH_ROOT_TS = "1787500400.000001";
-const SECOND_ANSWER = "Your direct message says that the supplier raised flour.";
-const THIRD_ANSWER = "The private note still says that the supplier raised flour.";
+const SECOND_ANSWER =
+  "Your direct message says that the supplier raised flour.";
+const THIRD_ANSWER =
+  "The private note still says that the supplier raised flour.";
 const FOURTH_ANSWER = "Order 1042 ships on Friday with the gift boxes.";
 const FIFTH_ANSWER = "Order 1043 ships on Monday with the tins.";
 
@@ -82,9 +87,10 @@ async function slackHeldOutput({ task }: TestContext): Promise<void> {
   const other = await admin(joining[1], "Other admin");
   await givePortalHandles(ORGANISATION_ID);
   await discoverSlackChannel("public_channel", Date.now() - 60_000);
-  await fixtureDatabase().prepare(
-    "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_held_output', activated_at = ? WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_held_output', activated_at = ? WHERE organisation_id = ?",
+    )
     .bind(Date.now(), ORGANISATION_ID)
     .run();
   const organisation = await requireActiveOrganisationActor({
@@ -261,9 +267,10 @@ async function slackHeldOutput({ task }: TestContext): Promise<void> {
 
   // 8. Internal content waits at a channel that reaches another company.
   shared.value = true;
-  await fixtureDatabase().prepare(
-    "UPDATE slack_conversation_fact SET read_at = 0 WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE slack_conversation_fact SET read_at = 0 WHERE organisation_id = ?",
+    )
     .bind(ORGANISATION_ID)
     .run();
   const postsBeforeShared = posts().length;
@@ -357,51 +364,6 @@ function heldRequestId(card: string): string {
   return match[1];
 }
 
-function heldPath(requestId: string): string {
-  return `${accessControlPath(ORGANISATION_ID)}/held-outputs/${requestId}`;
-}
-
-function readHeld(person: Person, requestId: string): Promise<Response> {
-  return exports.default.fetch(heldPath(requestId), {
-    headers: commerceHeaders(person.session),
-  });
-}
-
-function decide(
-  person: Person,
-  requestId: string,
-  decision: "allow" | "deny",
-): Promise<Response> {
-  return exports.default.fetch(`${heldPath(requestId)}/decision`, {
-    method: "POST",
-    headers: commerceHeaders(person.session),
-    body: JSON.stringify({ decision }),
-  });
-}
-
-async function pendingOf(
-  person: Person,
-): Promise<readonly Record<string, unknown>[]> {
-  const response = await exports.default.fetch(
-    `${accessControlPath(ORGANISATION_ID)}/permission-requests`,
-    { headers: commerceHeaders(person.session) },
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  if (!isRecord(body) || !Array.isArray(body.heldOutputs))
-    throw new Error("Pending list invalid");
-  return body.heldOutputs.filter(isRecord);
-}
-
-async function heldStatus(requestId: string): Promise<unknown> {
-  const row = await fixtureDatabase().prepare(
-    "SELECT status FROM held_output_request WHERE organisation_id = ? AND request_id = ?",
-  )
-    .bind(ORGANISATION_ID, requestId)
-    .first<{ status: unknown }>();
-  return row?.status;
-}
-
 /** How many outputs of every Case are in each state, with no pending left. */
 async function outputKinds(): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
@@ -413,4 +375,3 @@ async function outputKinds(): Promise<Record<string, number>> {
   }
   return counts;
 }
-
