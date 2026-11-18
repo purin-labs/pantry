@@ -136,6 +136,14 @@ export function timestampAtOrBefore(left: string, right: string): boolean {
   return Date.parse(left) <= Date.parse(right);
 }
 
+export function timestampBefore(left: string, right: string): boolean {
+  return Date.parse(left) < Date.parse(right);
+}
+
+export function timestampAfter(timestamp: string, seconds: number): string {
+  return new Date(Date.parse(timestamp) + seconds * 1_000).toISOString();
+}
+
 export function orderLineIdFor(
   orderId: string,
   checkoutLineId: string,

@@ -8,10 +8,13 @@ import {
   parseRefreshBuyerPickupCheckoutCommand,
   parseRefreshBuyerShippingCheckoutCommand,
 } from "@seams/commerce-client";
+import type { BuyerSessionClaims } from "../../buyer-session.ts";
+import type { BuyerPaymentResult } from "../../commerce-authority.ts";
 import type { BuyerRoute } from "../../http-routes.ts";
 import { errorMessage, isRecord } from "@seams/std";
+import { verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
-import { bearerToken, readJsonBody } from "../request-body.ts";
+import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
 import { resolveShippingDestination } from "./buyer-cart.ts";
 
@@ -20,29 +23,15 @@ export async function createBuyerCheckoutRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "create_buyer_checkout" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
-  if (context.storefront.fulfillment.kind === "pickup") {
+  if (access.context.storefront.fulfillment.kind === "pickup") {
     try {
       const command = parseCreateBuyerPickupCheckoutCommand(body.value);
       const creation = ctx.authority.createBuyerPickupCheckout({
-        claims: verification.claims,
+        claims: access.claims,
         command: {
           schemaVersion: command.schemaVersion,
           idempotencyKey: command.idempotencyKey,
@@ -85,7 +74,7 @@ export async function createBuyerCheckoutRoute(
   const shippingDestination = await resolveShippingDestination(
     ctx.buyerAccounts,
     ctx.addressValidations,
-    verification.claims,
+    access.claims,
     command.shippingDestination,
   );
   if (shippingDestination === undefined) {
@@ -94,7 +83,7 @@ export async function createBuyerCheckoutRoute(
     });
   }
   const creation = ctx.authority.createBuyerShippingCheckout({
-    claims: verification.claims,
+    claims: access.claims,
     command: {
       schemaVersion: command.schemaVersion,
       idempotencyKey: command.idempotencyKey,
@@ -123,24 +112,10 @@ export async function readBuyerCheckoutRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "read_buyer_checkout" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   const checkout = ctx.authority.readBuyerRecoverableCheckout(
-    verification.claims,
+    access.claims,
     route.checkoutId,
   );
   return checkout === undefined
@@ -153,22 +128,8 @@ export async function createBuyerPaymentSessionRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "create_buyer_payment_session" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   let command;
@@ -178,7 +139,7 @@ export async function createBuyerPaymentSessionRoute(
     return jsonResponse(400, { message: errorMessage(error) });
   }
   const session = await ctx.authority.createBuyerPaymentSession({
-    claims: verification.claims,
+    claims: access.claims,
     checkoutId: route.checkoutId,
     command,
   });
@@ -192,22 +153,8 @@ export async function reconcileBuyerPaymentRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "reconcile_buyer_payment" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   let command;
@@ -217,35 +164,11 @@ export async function reconcileBuyerPaymentRoute(
     return jsonResponse(400, { message: errorMessage(error) });
   }
   const placement = await ctx.authority.reconcileBuyerCheckoutPayment({
-    claims: verification.claims,
+    claims: access.claims,
     checkoutId: route.checkoutId,
     command,
   });
-  if (placement.kind === "rejected") {
-    return jsonResponse(409, {
-      outcome: "rejected",
-      error: placement.error,
-    });
-  }
-  if (placement.result.state !== "placed")
-    return jsonResponse(200, placement.result);
-  const recovery = ctx.buyerSessions.issueOrderRecovery({
-    sessionId: verification.claims.sessionId,
-    merchantId: verification.claims.merchantId,
-    storefrontId: verification.claims.storefrontId,
-    storefrontRevision: verification.claims.storefrontRevision,
-    checkoutProfile: verification.claims.checkoutProfile,
-    checkoutId: placement.result.checkoutId,
-    orderId: placement.result.orderId,
-    issuedAt: placement.result.placedAt,
-  });
-  return jsonResponse(200, {
-    ...placement.result,
-    orderRecovery: {
-      token: recovery.token,
-      expiresAt: recovery.claims.expiresAt,
-    },
-  });
+  return buyerPaymentResponse(ctx, access.claims, placement);
 }
 
 export async function refreshBuyerCheckoutRoute(
@@ -253,29 +176,15 @@ export async function refreshBuyerCheckoutRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "refresh_buyer_checkout" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   try {
-    if (context.storefront.fulfillment.kind === "pickup") {
+    if (access.context.storefront.fulfillment.kind === "pickup") {
       const command = parseRefreshBuyerPickupCheckoutCommand(body.value);
       const refreshed = ctx.authority.refreshBuyerPickupCheckout({
-        claims: verification.claims,
+        claims: access.claims,
         checkoutId: route.checkoutId,
         command: {
           schemaVersion: command.schemaVersion,
@@ -296,7 +205,7 @@ export async function refreshBuyerCheckoutRoute(
     const shippingDestination = await resolveShippingDestination(
       ctx.buyerAccounts,
       ctx.addressValidations,
-      verification.claims,
+      access.claims,
       command.shippingDestination,
     );
     if (shippingDestination === undefined) {
@@ -305,7 +214,7 @@ export async function refreshBuyerCheckoutRoute(
       });
     }
     const refreshed = ctx.authority.refreshBuyerShippingCheckout({
-      claims: verification.claims,
+      claims: access.claims,
       checkoutId: route.checkoutId,
       command: {
         schemaVersion: command.schemaVersion,
@@ -333,22 +242,8 @@ export async function buyerStoredValueRoute(
     { kind: "read_gift_card_balance" | "place_buyer_stored_value_checkout" }
   >,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   if (route.kind === "read_gift_card_balance") {
@@ -371,23 +266,33 @@ export async function buyerStoredValueRoute(
     return jsonResponse(400, { message: errorMessage(error) });
   }
   const placement = ctx.authority.placeBuyerStoredValueCheckout({
-    claims: verification.claims,
+    claims: access.claims,
     checkoutId: route.checkoutId,
     command,
   });
-  if (placement.kind === "rejected")
+  return buyerPaymentResponse(ctx, access.claims, placement);
+}
+
+// A placed checkout answers with an order recovery token for its buyer.
+function buyerPaymentResponse(
+  ctx: HttpRouteContext,
+  claims: BuyerSessionClaims,
+  placement: BuyerPaymentResult,
+): Response {
+  if (placement.kind === "rejected") {
     return jsonResponse(409, {
       outcome: "rejected",
       error: placement.error,
     });
+  }
   if (placement.result.state !== "placed")
     return jsonResponse(200, placement.result);
   const recovery = ctx.buyerSessions.issueOrderRecovery({
-    sessionId: verification.claims.sessionId,
-    merchantId: verification.claims.merchantId,
-    storefrontId: verification.claims.storefrontId,
-    storefrontRevision: verification.claims.storefrontRevision,
-    checkoutProfile: verification.claims.checkoutProfile,
+    sessionId: claims.sessionId,
+    merchantId: claims.merchantId,
+    storefrontId: claims.storefrontId,
+    storefrontRevision: claims.storefrontRevision,
+    checkoutProfile: claims.checkoutProfile,
     checkoutId: placement.result.checkoutId,
     orderId: placement.result.orderId,
     issuedAt: placement.result.placedAt,

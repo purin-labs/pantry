@@ -22,7 +22,7 @@ import type {
   EntityPlaneChangeResource,
   EntityPlaneCommandRequest,
 } from "./entity-types.ts";
-import { parsePositiveRevision } from "./parsers.ts";
+import { parsePositiveRevision, parsePositiveText } from "./parsers.ts";
 import { refreshCommerceRelationshipRelation } from "./commerce-relationship-relation.ts";
 import { validateCommerceMutationReceiptWithLexicon } from "./lexicon.ts";
 import type { Variant } from "@seams/type-utils";
@@ -359,25 +359,10 @@ function commandDigest(command: CommerceEntityPlaneCommand): string {
   return commandJson(command);
 }
 
-function rejected(error: CommerceEntityPlaneError): CommerceCommandResult {
+export function rejected(
+  error: CommerceEntityPlaneError,
+): CommerceCommandResult {
   return { status: "rejected", error };
-}
-
-function parsePositiveText<T extends string>(value: unknown, field: string): T {
-  if (
-    typeof value !== "string" ||
-    value.length === 0 ||
-    value !== value.trim()
-  ) {
-    throw new Error(`${field} must be normalized text`);
-  }
-  if (!isPositiveText<T>(value))
-    throw new Error(`${field} must be normalized text`);
-  return value;
-}
-
-function isPositiveText<T extends string>(value: string): value is T {
-  return value.length > 0 && value === value.trim();
 }
 
 function jsonReplacer(_key: string, value: unknown): unknown {

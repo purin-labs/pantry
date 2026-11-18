@@ -1,6 +1,5 @@
 import type {
   CommerceCommandResult,
-  CommerceEntityPlaneError,
   CommerceEntityRef,
   CommerceEntityTypeId,
   CommerceRelationship,
@@ -26,6 +25,7 @@ import {
 import {
   EntityPlaneSettlement,
   type CommandRequest,
+  rejected,
 } from "./receipt-outbox-settlement.ts";
 import {
   relationshipDefinitionReference,
@@ -397,8 +397,4 @@ function nextMerchantRevision(previousRevision: number): MerchantRevision {
     previousRevision + 1,
     "merchantRevision",
   );
-}
-
-function rejected(error: CommerceEntityPlaneError): CommerceCommandResult {
-  return { status: "rejected", error };
 }

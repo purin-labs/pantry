@@ -17,7 +17,7 @@ import { findResource, variantIsSellable } from "../checkout-shared.ts";
 import { variantMedia } from "../../plugins/media/index.ts";
 import { pluginActive } from "../../plugins/plugin-state.ts";
 import { buyerCatalogStorefront } from "./carts.ts";
-import { requireIdentity } from "./shared.ts";
+import { requireIdentity } from "../command-guards.ts";
 import type { BuyerStorefrontContext } from "./types.ts";
 import { BuyerCheckoutBase } from "./base.ts";
 

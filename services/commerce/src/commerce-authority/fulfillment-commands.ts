@@ -24,7 +24,11 @@ import {
   type ShipmentLabelRateSnapshot,
 } from "@seams/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
-import { digestOfCommand } from "./ledger.ts";
+import { digestOfCommand, type MerchantRow } from "./ledger.ts";
+import {
+  beginSnapshotCommand,
+  type MerchantCommandPorts,
+} from "./merchant-command.ts";
 import {
   readShipmentLabelRate,
   readShipmentLabelRateByIdempotency,
@@ -47,12 +51,6 @@ import {
 } from "./fulfillment-planning.ts";
 import { guardMove } from "../plugins/machine-guards.ts";
 
-type FulfillmentMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 type FulfillmentMutationCommand =
   | MarkCommercePickupReadyV1
   | CompleteCommercePickupV1
@@ -60,57 +58,47 @@ type FulfillmentMutationCommand =
   | AttachFulfillmentTrackingCommand
   | RecordShippingTrackingCommand;
 
-type FulfillmentCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  readMerchant: (merchantId: string) => FulfillmentMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readFoodServiceResources: (
-    merchantId: string,
-  ) => CommerceFoodServiceResourcesV1;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: FulfillmentMutationCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: FulfillmentMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commitPickupReady: (
-    command: MarkCommercePickupReadyV1,
-    merchant: FulfillmentMerchantRow,
-    fulfillment: CommerceFulfillmentV1,
-  ) => CommerceMutationResultV1;
-  commitPickupCompletion: (
-    command: CompleteCommercePickupV1,
-    merchant: FulfillmentMerchantRow,
-    plan: PickupCompletionPlan,
-  ) => CommerceMutationResultV1;
-  commitShippingLabel: (
-    command: PurchaseShippingLabelCommand,
-    merchant: FulfillmentMerchantRow,
-    shipment: CommerceFirstPartyShipmentV1,
-    rate: ShipmentLabelRateSnapshot,
-    purchase: ShippingLabelPurchaseResult,
-  ) => CommerceMutationResultV1;
-  commitShippingTracking: (
-    command: RecordShippingTrackingCommand,
-    merchant: FulfillmentMerchantRow,
-    plan: ShippingTrackingPlan,
-  ) => CommerceMutationResultV1;
-  commitFulfillmentTrackingAttachment: (
-    command: AttachFulfillmentTrackingCommand,
-    merchant: FulfillmentMerchantRow,
-    plan: FulfillmentTrackingAttachmentPlan,
-  ) => CommerceMutationResultV1;
-  quoteLabelRate: ShippingGateway["quoteLabelRate"];
-  purchaseLabel: ShippingGateway["purchaseLabel"];
-  verifyTrackingEvent: ShippingGateway["verifyTrackingEvent"];
-}>;
+type FulfillmentCommandAuthorityOptions =
+  MerchantCommandPorts<FulfillmentMutationCommand> &
+    Readonly<{
+      database: CommerceDatabase;
+      readSnapshot: (
+        merchantId: string,
+      ) => CommerceMerchantSnapshotV1 | undefined;
+      readFoodServiceResources: (
+        merchantId: string,
+      ) => CommerceFoodServiceResourcesV1;
+      commitPickupReady: (
+        command: MarkCommercePickupReadyV1,
+        merchant: MerchantRow,
+        fulfillment: CommerceFulfillmentV1,
+      ) => CommerceMutationResultV1;
+      commitPickupCompletion: (
+        command: CompleteCommercePickupV1,
+        merchant: MerchantRow,
+        plan: PickupCompletionPlan,
+      ) => CommerceMutationResultV1;
+      commitShippingLabel: (
+        command: PurchaseShippingLabelCommand,
+        merchant: MerchantRow,
+        shipment: CommerceFirstPartyShipmentV1,
+        rate: ShipmentLabelRateSnapshot,
+        purchase: ShippingLabelPurchaseResult,
+      ) => CommerceMutationResultV1;
+      commitShippingTracking: (
+        command: RecordShippingTrackingCommand,
+        merchant: MerchantRow,
+        plan: ShippingTrackingPlan,
+      ) => CommerceMutationResultV1;
+      commitFulfillmentTrackingAttachment: (
+        command: AttachFulfillmentTrackingCommand,
+        merchant: MerchantRow,
+        plan: FulfillmentTrackingAttachmentPlan,
+      ) => CommerceMutationResultV1;
+      quoteLabelRate: ShippingGateway["quoteLabelRate"];
+      purchaseLabel: ShippingGateway["purchaseLabel"];
+      verifyTrackingEvent: ShippingGateway["verifyTrackingEvent"];
+    }>;
 
 export class FulfillmentCommandAuthority {
   readonly #options: FulfillmentCommandAuthorityOptions;
@@ -120,45 +108,14 @@ export class FulfillmentCommandAuthority {
   }
 
   markPickupReady(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: MarkCommercePickupReadyV1;
-    try {
-      command = parseMarkPickupReadyCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseMarkPickupReadyCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const plan = planPickupReady(
       command,
       snapshot.resources,
@@ -176,45 +133,14 @@ export class FulfillmentCommandAuthority {
   }
 
   completePickup(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CompleteCommercePickupV1;
-    try {
-      command = parseCompletePickupCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseCompletePickupCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const plan = planPickupCompletion(
       this.#options.database,
       command,
@@ -310,44 +236,14 @@ export class FulfillmentCommandAuthority {
   }
 
   purchaseShippingLabel(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: PurchaseShippingLabelCommand;
-    try {
-      command = parsePurchaseShippingLabelCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parsePurchaseShippingLabelCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const shipment = snapshot.resources.shipments.find(
       (candidate) => candidate.id === command.shipmentId,
     );
@@ -414,43 +310,14 @@ export class FulfillmentCommandAuthority {
   }
 
   recordShippingTracking(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: RecordShippingTrackingCommand;
-    try {
-      command = parseRecordShippingTrackingCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseRecordShippingTrackingCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const shipment = snapshot.resources.shipments.find(
       (candidate) => candidate.id === command.shipmentId,
     );
@@ -497,43 +364,14 @@ export class FulfillmentCommandAuthority {
   }
 
   attachFulfillmentTracking(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: AttachFulfillmentTrackingCommand;
-    try {
-      command = parseAttachFulfillmentTrackingCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseAttachFulfillmentTrackingCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const plan = planFulfillmentTrackingAttachment(command, snapshot.resources);
     if (plan.kind === "rejected") return this.#options.rejected(plan.error);
     return this.#options.commitFulfillmentTrackingAttachment(

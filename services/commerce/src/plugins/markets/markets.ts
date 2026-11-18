@@ -12,36 +12,24 @@ import {
 import { listVariants } from "../../commerce-persistence.ts";
 import { readStorefront } from "../../checkout-persistence.ts";
 import type { CommerceDatabase } from "../../database.ts";
-
-export type MarketMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  commitPlannedCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 
 export type MarketCommitRequest = Readonly<{
   command: CommerceMarketCommandV1;
-  merchant: MarketMerchantRow;
+  merchant: MerchantRow;
   market: CommerceMarketV1;
   previousRevision: number | undefined;
 }>;
 
-type MarketAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  readMerchant: (merchantId: string) => MarketMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CommerceMarketCommandV1,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: MarketMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: MarketCommitRequest) => CommerceMutationResultV1;
-}>;
+type MarketAuthorityOptions = MerchantCommandPorts<CommerceMarketCommandV1> &
+  Readonly<{
+    database: CommerceDatabase;
+    commit: (request: MarketCommitRequest) => CommerceMutationResultV1;
+  }>;
 
 export class MarketAuthority {
   readonly #options: MarketAuthorityOptions;
@@ -52,8 +40,14 @@ export class MarketAuthority {
 
   createMarket(rawCommand: unknown): CommerceMutationResultV1 {
     return this.#run(rawCommand, parseCreateMarketCommand, (command) => {
-      if (readMarket(this.#options.database, command.merchantId, command.marketId))
-        return { code: "resource_already_exists", kind: "market", id: command.marketId };
+      if (
+        readMarket(this.#options.database, command.merchantId, command.marketId)
+      )
+        return {
+          code: "resource_already_exists",
+          kind: "market",
+          id: command.marketId,
+        };
       const market: CommerceMarketV1 = {
         id: command.marketId,
         revision: 1,
@@ -71,9 +65,17 @@ export class MarketAuthority {
 
   updateMarket(rawCommand: unknown): CommerceMutationResultV1 {
     return this.#run(rawCommand, parseUpdateMarketCommand, (command) => {
-      const current = readMarket(this.#options.database, command.merchantId, command.marketId);
+      const current = readMarket(
+        this.#options.database,
+        command.merchantId,
+        command.marketId,
+      );
       if (current === undefined)
-        return { code: "resource_not_found", kind: "market", id: command.marketId };
+        return {
+          code: "resource_not_found",
+          kind: "market",
+          id: command.marketId,
+        };
       if (current.revision !== command.expectedRevision)
         return {
           code: "stale_resource_revision",
@@ -110,16 +112,30 @@ export class MarketAuthority {
     merchantId: string,
     market: CommerceMarketV1,
     previousRevision: number | undefined,
-  ): Omit<MarketCommitRequest, "command" | "merchant"> | CommerceMutationErrorV1 {
+  ):
+    | Omit<MarketCommitRequest, "command" | "merchant">
+    | CommerceMutationErrorV1 {
     const { database } = this.#options;
     for (const storefrontId of market.storefrontIds)
       if (readStorefront(database, merchantId, storefrontId) === undefined)
-        return { code: "resource_not_found", kind: "storefront", id: storefrontId };
+        return {
+          code: "resource_not_found",
+          kind: "storefront",
+          id: storefrontId,
+        };
     if (market.pricing.kind === "price_list") {
-      const known = new Set(listVariants(database, merchantId).map((variant) => variant.id));
-      const unknown = market.pricing.prices.find((price) => !known.has(price.variantId));
+      const known = new Set(
+        listVariants(database, merchantId).map((variant) => variant.id),
+      );
+      const unknown = market.pricing.prices.find(
+        (price) => !known.has(price.variantId),
+      );
       if (unknown !== undefined)
-        return { code: "resource_not_found", kind: "sellable_variant", id: unknown.variantId };
+        return {
+          code: "resource_not_found",
+          kind: "sellable_variant",
+          id: unknown.variantId,
+        };
     }
     return { market, previousRevision };
   }
@@ -129,34 +145,11 @@ export class MarketAuthority {
     parse: (value: unknown) => TCommand,
     plan: (
       command: TCommand,
-    ) => Omit<MarketCommitRequest, "command" | "merchant"> | CommerceMutationErrorV1,
+    ) =>
+      | Omit<MarketCommitRequest, "command" | "merchant">
+      | CommerceMutationErrorV1,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined) return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    const planned = plan(command);
-    if ("code" in planned) return this.#options.rejected(planned);
-    return this.#options.commit({ command, merchant, ...planned });
+    return commitPlannedCommand(this.#options, rawCommand, parse, plan);
   }
 }
 
@@ -200,7 +193,8 @@ export function writeMarket(
       market.id,
       previousRevision,
     );
-  if (written.changes !== 1) throw new Error(`Market ${market.id} moved during the write`);
+  if (written.changes !== 1)
+    throw new Error(`Market ${market.id} moved during the write`);
 }
 
 export function readMarket(
@@ -209,7 +203,9 @@ export function readMarket(
   marketId: string,
 ): CommerceMarketV1 | undefined {
   const row = database
-    .prepare("SELECT market_json AS json FROM market WHERE merchant_id = ? AND market_id = ?")
+    .prepare(
+      "SELECT market_json AS json FROM market WHERE merchant_id = ? AND market_id = ?",
+    )
     .get<Readonly<{ json: string }>>(merchantId, marketId);
   return row === undefined ? undefined : parseMarket(JSON.parse(row.json));
 }
@@ -221,7 +217,9 @@ export function marketUnitPrice(
   shopPrice: Readonly<{ amountMinor: number; currency: string }>,
 ): Readonly<{ amountMinor: number; currency: string }> | undefined {
   if (market.pricing.kind === "price_list") {
-    const price = market.pricing.prices.find((item) => item.variantId === variantId);
+    const price = market.pricing.prices.find(
+      (item) => item.variantId === variantId,
+    );
     return price === undefined
       ? undefined
       : { amountMinor: price.amountMinor, currency: market.currency };

@@ -55,17 +55,17 @@ import {
   type CatalogEditPlan,
   type CatalogEditPlanResult,
 } from "./catalog-edits.ts";
+import type { MerchantRow } from "./ledger.ts";
+import {
+  beginMerchantCommand,
+  beginSnapshotCommand,
+  type MerchantCommandPorts,
+} from "./merchant-command.ts";
 
 import {
   planProductDeletion,
   type ProductDeletionPlan,
 } from "./product-deletion.ts";
-
-export type CatalogMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
 
 type CatalogCommand =
   | CreateCommerceLocationV1
@@ -85,74 +85,63 @@ export type CatalogCommitRequest =
   | Readonly<{
       kind: "location";
       command: CreateCommerceLocationV1;
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
     }>
   | Readonly<{
       kind: "catalog_listing_preparation";
       command: PrepareCommerceCatalogListingV1;
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
     }>
   | Readonly<{
       kind: "product_description";
       command: UpdateCommerceProductDescriptionV1;
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
       product: CommerceProductV1;
     }>
   | Readonly<{
       kind: "pickup_storefront";
       command: ConfigureCommercePickupStorefrontV1;
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
       createLocation: boolean;
     }>
   | Readonly<{
       kind: "shipping_storefront";
       command: ConfigureCommerceShippingStorefrontV1;
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
       createLocation: boolean;
     }>
   | Readonly<{
       kind: "channel_listing";
       command: PlaceCommerceChannelListingV1;
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
     }>
   | Readonly<{
       kind: "publish_catalog_listing";
       command: PublishCommerceCatalogListingV1;
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
       offer: CommerceOfferV1;
     }>
   | Readonly<{
       kind: "catalog_edit";
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
       plan: CatalogEditPlan;
     }>
   | Readonly<{
       kind: "product_deletion";
-      merchant: CatalogMerchantRow;
+      merchant: MerchantRow;
       plan: ProductDeletionPlan;
     }>;
 
-type CatalogCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  readMerchant: (merchantId: string) => CatalogMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readMenus: (merchantId: string) => readonly CommerceMenuV1[];
-  now: () => string;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CatalogCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: CatalogCommitRequest) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: CatalogMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-}>;
+type CatalogCommandAuthorityOptions = MerchantCommandPorts<CatalogCommand> &
+  Readonly<{
+    database: CommerceDatabase;
+    readSnapshot: (
+      merchantId: string,
+    ) => CommerceMerchantSnapshotV1 | undefined;
+    readMenus: (merchantId: string) => readonly CommerceMenuV1[];
+    now: () => string;
+    commit: (request: CatalogCommitRequest) => CommerceMutationResultV1;
+  }>;
 
 function findProduct(
   products: readonly CommerceProductV1[],
@@ -172,47 +161,16 @@ export class CatalogCommandAuthority {
   }
 
   createLocation(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CreateCommerceLocationV1;
-    try {
-      command = parseCreateLocationCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseCreateLocationCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const current = this.#options.readSnapshot(command.merchantId);
-    if (current === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     if (
-      current.resources.locations.some(
+      snapshot.resources.locations.some(
         (location) => location.id === command.location.id,
       )
     ) {
@@ -235,66 +193,27 @@ export class CatalogCommandAuthority {
   }
 
   prepareCatalogListing(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: PrepareCommerceCatalogListingV1;
-    try {
-      command = parsePrepareCatalogListingCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parsePrepareCatalogListingCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const current = this.#options.readSnapshot(command.merchantId);
-    if (current === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const validation = validateCatalogListingPreparation(
       command,
-      current.resources,
+      snapshot.resources,
       readFoodServiceResources(this.#options.database, command.merchantId),
     );
     if (validation !== undefined) return this.#options.rejected(validation);
-    const duplicate = firstExistingCatalogResource(command, current.resources);
+    const duplicate = firstExistingCatalogResource(command, snapshot.resources);
     if (duplicate !== undefined) return this.#options.rejected(duplicate);
-    if (
-      readConsumptionPlan(
-        this.#options.database,
-        command.merchantId,
-        command.consumptionPlan.consumptionPlanId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "inventory_consumption_plan",
-        id: command.consumptionPlan.consumptionPlanId,
-      });
-    }
+    const existingPlan = this.#existingConsumptionPlan(
+      command.merchantId,
+      command.consumptionPlan.consumptionPlanId,
+    );
+    if (existingPlan !== undefined) return this.#options.rejected(existingPlan);
     return this.#options.commit({
       kind: "catalog_listing_preparation",
       command,
@@ -303,42 +222,21 @@ export class CatalogCommandAuthority {
   }
 
   updateProductDescription(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: UpdateCommerceProductDescriptionV1;
-    try {
-      command = parseUpdateProductDescriptionCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseUpdateProductDescriptionCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({ code: "merchant_not_found", merchantId: command.merchantId });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({ code: "merchant_not_found", merchantId: command.merchantId });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const current = findProduct(snapshot.resources.products, command.productId);
     if (current === undefined) {
-      return this.#options.rejected({ code: "resource_not_found", kind: "product", id: command.productId });
+      return this.#options.rejected({
+        code: "resource_not_found",
+        kind: "product",
+        id: command.productId,
+      });
     }
     if (current.revision !== command.expectedProductRevision) {
       return this.#options.rejected({
@@ -371,44 +269,24 @@ export class CatalogCommandAuthority {
   }
 
   deleteProduct(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: DeleteCommerceProductV1;
-    try {
-      command = parseDeleteProductCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseDeleteProductCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (merchant === undefined || snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
     const planned = planProductDeletion(
       this.#options.database,
-      command,
-      snapshot.resources,
-      this.#options.readMenus(command.merchantId),
+      start.command,
+      start.snapshot.resources,
+      this.#options.readMenus(start.command.merchantId),
       this.#options.now(),
     );
     if (planned.kind === "rejected")
       return this.#options.rejected(planned.error);
     return this.#options.commit({
       kind: "product_deletion",
-      merchant,
+      merchant: start.merchant,
       plan: planned.value,
     });
   }
@@ -422,35 +300,21 @@ export class CatalogCommandAuthority {
   }
 
   updateOffer(rawCommand: unknown): CommerceMutationResultV1 {
-    return this.#editCatalog(rawCommand, parseUpdateOfferCommand, planOfferUpdate);
+    return this.#editCatalog(
+      rawCommand,
+      parseUpdateOfferCommand,
+      planOfferUpdate,
+    );
   }
 
   updateStorefrontTax(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: UpdateCommerceStorefrontTaxV1;
-    try {
-      command = parseUpdateStorefrontTaxCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseUpdateStorefrontTaxCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const planned = planStorefrontTaxUpdate(
       command,
       readStorefront(
@@ -472,9 +336,7 @@ export class CatalogCommandAuthority {
   // different records do not wait for each other.
   #editCatalog<
     TCommand extends
-      | UpdateCommerceProductV1
-      | UpdateCommerceVariantV1
-      | UpdateCommerceOfferV1,
+      UpdateCommerceProductV1 | UpdateCommerceVariantV1 | UpdateCommerceOfferV1,
   >(
     rawCommand: unknown,
     parse: (value: unknown) => TCommand,
@@ -483,254 +345,85 @@ export class CatalogCommandAuthority {
       resources: CommerceMerchantSnapshotV1["resources"],
     ) => CatalogEditPlanResult,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (merchant === undefined || snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    const planned = plan(command, snapshot.resources);
+    const start = beginSnapshotCommand(this.#options, rawCommand, parse);
+    if (start.kind !== "ready") return start.result;
+    const planned = plan(start.command, start.snapshot.resources);
     if (planned.kind === "rejected")
       return this.#options.rejected(planned.error);
     return this.#options.commit({
       kind: "catalog_edit",
-      merchant,
+      merchant: start.merchant,
       plan: planned.value,
     });
   }
 
   configurePickupStorefront(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ConfigureCommercePickupStorefrontV1;
-    try {
-      command = parseConfigurePickupStorefrontCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseConfigurePickupStorefrontCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const validation = validatePickupStorefrontConfiguration(
       command,
       snapshot.resources,
     );
     if (validation !== undefined) return this.#options.rejected(validation);
-    if (
-      readStorefront(
-        this.#options.database,
-        command.merchantId,
-        command.storefront.storefrontId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "storefront",
-        id: command.storefront.storefrontId,
-      });
-    }
-    if (
-      readConsumptionPlan(
-        this.#options.database,
-        command.merchantId,
-        command.consumptionPlan.consumptionPlanId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "inventory_consumption_plan",
-        id: command.consumptionPlan.consumptionPlanId,
-      });
-    }
-    const existingLocation = findResource(
-      snapshot.resources.locations,
-      command.location.id,
-    );
+    const existing = this.#existingStorefrontOrPlan(command);
+    if (existing !== undefined) return this.#options.rejected(existing);
     return this.#options.commit({
       kind: "pickup_storefront",
       command,
       merchant,
-      createLocation: existingLocation === undefined,
+      createLocation:
+        findResource(snapshot.resources.locations, command.location.id) ===
+        undefined,
     });
   }
 
   configureShippingStorefront(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ConfigureCommerceShippingStorefrontV1;
-    try {
-      command = parseConfigureShippingStorefrontCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseConfigureShippingStorefrontCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const validation = validateShippingStorefrontConfiguration(
       command,
       snapshot.resources,
     );
     if (validation !== undefined) return this.#options.rejected(validation);
-    if (
-      readStorefront(
-        this.#options.database,
-        command.merchantId,
-        command.storefront.storefrontId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "storefront",
-        id: command.storefront.storefrontId,
-      });
-    }
-    if (
-      readConsumptionPlan(
-        this.#options.database,
-        command.merchantId,
-        command.consumptionPlan.consumptionPlanId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "inventory_consumption_plan",
-        id: command.consumptionPlan.consumptionPlanId,
-      });
-    }
+    const existing = this.#existingStorefrontOrPlan(command);
+    if (existing !== undefined) return this.#options.rejected(existing);
     const shippingDuplicate = findShippingConfigurationDuplicate(
       this.#options.database,
       command,
     );
     if (shippingDuplicate !== undefined)
       return this.#options.rejected(shippingDuplicate);
-    const existingLocation = findResource(
-      snapshot.resources.locations,
-      command.location.id,
-    );
     return this.#options.commit({
       kind: "shipping_storefront",
       command,
       merchant,
-      createLocation: existingLocation === undefined,
+      createLocation:
+        findResource(snapshot.resources.locations, command.location.id) ===
+        undefined,
     });
   }
 
   placeChannelListing(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: PlaceCommerceChannelListingV1;
-    try {
-      command = parsePlaceChannelListingCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parsePlaceChannelListingCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const shipping = channelPlacementShippingContext(
       this.#options.database,
       command,
@@ -742,54 +435,27 @@ export class CatalogCommandAuthority {
     );
     if (validation !== undefined) return this.#options.rejected(validation);
     if (
-      (command.catalog.kind === "new_product" ||
-        command.catalog.kind === "new_variant") &&
-      readConsumptionPlan(
-        this.#options.database,
+      command.catalog.kind === "new_product" ||
+      command.catalog.kind === "new_variant"
+    ) {
+      const existingPlan = this.#existingConsumptionPlan(
         command.merchantId,
         command.catalog.consumptionPlan.consumptionPlanId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "inventory_consumption_plan",
-        id: command.catalog.consumptionPlan.consumptionPlanId,
-      });
+      );
+      if (existingPlan !== undefined)
+        return this.#options.rejected(existingPlan);
     }
     return this.#options.commit({ kind: "channel_listing", command, merchant });
   }
 
   publishCatalogListing(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: PublishCommerceCatalogListingV1;
-    try {
-      command = parsePublishCatalogListingCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parsePublishCatalogListingCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const validation = validatePublish(command, snapshot.resources);
     if (validation !== undefined) return this.#options.rejected(validation);
     const offer = snapshot.resources.offers.find(
@@ -807,6 +473,49 @@ export class CatalogCommandAuthority {
       merchant,
       offer,
     });
+  }
+
+  // A new storefront refuses a storefront id, and then a consumption plan id,
+  // that exists.
+  #existingStorefrontOrPlan(
+    command:
+      | ConfigureCommercePickupStorefrontV1
+      | ConfigureCommerceShippingStorefrontV1,
+  ): CommerceMutationErrorV1 | undefined {
+    if (
+      readStorefront(
+        this.#options.database,
+        command.merchantId,
+        command.storefront.storefrontId,
+      ) !== undefined
+    ) {
+      return {
+        code: "resource_already_exists",
+        kind: "storefront",
+        id: command.storefront.storefrontId,
+      };
+    }
+    return this.#existingConsumptionPlan(
+      command.merchantId,
+      command.consumptionPlan.consumptionPlanId,
+    );
+  }
+
+  #existingConsumptionPlan(
+    merchantId: string,
+    consumptionPlanId: string,
+  ): CommerceMutationErrorV1 | undefined {
+    return readConsumptionPlan(
+      this.#options.database,
+      merchantId,
+      consumptionPlanId,
+    ) === undefined
+      ? undefined
+      : {
+          code: "resource_already_exists",
+          kind: "inventory_consumption_plan",
+          id: consumptionPlanId,
+        };
   }
 }
 

@@ -11,37 +11,26 @@ import {
 import { commerceTransition } from "@seams/commerce-contracts";
 
 import type { CommerceDatabase } from "../../database.ts";
-
-export type DiscountMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  commitPlannedCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 
 export type DiscountCommitRequest = Readonly<{
   command: CommerceDiscountCommandV1;
-  merchant: DiscountMerchantRow;
+  merchant: MerchantRow;
   discountId: string;
   revision: number;
   write: () => void;
 }>;
 
-type DiscountAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  readMerchant: (merchantId: string) => DiscountMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CommerceDiscountCommandV1,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: DiscountMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: DiscountCommitRequest) => CommerceMutationResultV1;
-}>;
+type DiscountAuthorityOptions =
+  MerchantCommandPorts<CommerceDiscountCommandV1> &
+    Readonly<{
+      database: CommerceDatabase;
+      commit: (request: DiscountCommitRequest) => CommerceMutationResultV1;
+    }>;
 
 /** What a checkout asks of the discounts: its codes and its buyer. */
 export type CheckoutDiscountRequest = Readonly<{
@@ -56,7 +45,10 @@ export type CheckoutDiscountRequest = Readonly<{
   keptDiscountIds?: readonly string[];
 }>;
 
-export type DiscountHold = Readonly<{ discountId: string; amountMinor: number }>;
+export type DiscountHold = Readonly<{
+  discountId: string;
+  amountMinor: number;
+}>;
 
 type DiscountEvaluation =
   | Readonly<{
@@ -77,7 +69,10 @@ export class DiscountAuthority {
   createDiscount(rawCommand: unknown): CommerceMutationResultV1 {
     return this.#run(rawCommand, parseCreateDiscountCommand, (command) => {
       const { database } = this.#options;
-      if (readDiscount(database, command.merchantId, command.discountId) !== undefined)
+      if (
+        readDiscount(database, command.merchantId, command.discountId) !==
+        undefined
+      )
         return {
           code: "resource_already_exists",
           kind: "discount",
@@ -135,7 +130,11 @@ export class DiscountAuthority {
         command.discountId,
       );
       if (current === undefined)
-        return { code: "resource_not_found", kind: "discount", id: command.discountId };
+        return {
+          code: "resource_not_found",
+          kind: "discount",
+          id: command.discountId,
+        };
       if (current.revision !== command.expectedRevision)
         return {
           code: "stale_resource_revision",
@@ -185,7 +184,11 @@ export class DiscountAuthority {
       )
       .all<Readonly<{ id: string }>>(merchantId)
       .flatMap((row) => {
-        const discount = readDiscount(this.#options.database, merchantId, row.id);
+        const discount = readDiscount(
+          this.#options.database,
+          merchantId,
+          row.id,
+        );
         return discount === undefined ? [] : [discount];
       });
   }
@@ -195,34 +198,11 @@ export class DiscountAuthority {
     parse: (value: unknown) => TCommand,
     plan: (
       command: TCommand,
-    ) => Omit<DiscountCommitRequest, "command" | "merchant"> | CommerceMutationErrorV1,
+    ) =>
+      | Omit<DiscountCommitRequest, "command" | "merchant">
+      | CommerceMutationErrorV1,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined) return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    const planned = plan(command);
-    if ("code" in planned) return this.#options.rejected(planned);
-    return this.#options.commit({ command, merchant, ...planned });
+    return commitPlannedCommand(this.#options, rawCommand, parse, plan);
   }
 }
 
@@ -241,13 +221,17 @@ export function evaluateCheckoutDiscounts(
     request: CheckoutDiscountRequest;
     at: string;
     currency: string;
-    lines: readonly Readonly<{ productId: string | null; amountMinor: number }>[];
+    lines: readonly Readonly<{
+      productId: string | null;
+      amountMinor: number;
+    }>[];
   }>,
 ): DiscountEvaluation {
   const codeDiscounts: string[] = [];
   for (const code of input.request.codes) {
     const discountId = discountIdForCode(database, merchantId, code);
-    if (discountId === undefined) return { kind: "rejected", field: "discount.code.unknown" };
+    if (discountId === undefined)
+      return { kind: "rejected", field: "discount.code.unknown" };
     if (!codeDiscounts.includes(discountId)) codeDiscounts.push(discountId);
   }
   const automatic = database
@@ -268,7 +252,8 @@ export function evaluateCheckoutDiscounts(
     if (discount === undefined) continue;
     const refusal = refusalOf(database, merchantId, discount, input, gross);
     if (refusal !== undefined) {
-      if (codeDiscounts.includes(discountId)) return { kind: "rejected", field: refusal };
+      if (codeDiscounts.includes(discountId))
+        return { kind: "rejected", field: refusal };
       continue;
     }
     candidates.push(discount);
@@ -282,12 +267,15 @@ export function evaluateCheckoutDiscounts(
   const lineDiscounts = input.lines.map(() => 0);
   const holds: DiscountHold[] = [];
   for (const discount of candidates) {
-    const eligible = input.lines.map((line, index) =>
-      discount.rule.kind === "amount_off_order" ||
-      (line.productId !== null && discount.rule.productIds.includes(line.productId))
-        ? index
-        : -1,
-    ).filter((index) => index >= 0 && (net[index] ?? 0) > 0);
+    const eligible = input.lines
+      .map((line, index) =>
+        discount.rule.kind === "amount_off_order" ||
+        (line.productId !== null &&
+          discount.rule.productIds.includes(line.productId))
+          ? index
+          : -1,
+      )
+      .filter((index) => index >= 0 && (net[index] ?? 0) > 0);
     const base = eligible.reduce((sum, index) => sum + (net[index] ?? 0), 0);
     if (base === 0) continue;
     const value = discount.rule.value;

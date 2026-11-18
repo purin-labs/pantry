@@ -50,6 +50,11 @@ import {
   readCheckout,
 } from "../checkout-persistence.ts";
 import { checkoutValidationInput } from "../commerce-authority/checkout-pipeline.ts";
+import type { MerchantRow } from "../commerce-authority/ledger.ts";
+import {
+  beginMerchantCommand,
+  type MerchantCommandPorts,
+} from "../commerce-authority/merchant-command.ts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   headCursor,
@@ -119,12 +124,6 @@ const PREVIEW_RUNS = 200;
 /** The most handler runs of one pass; the rest wait for the next pass. */
 export const HANDLER_RUNS = 50;
 
-export type PluginMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 /**
  * The system commands of a function failure: its report, and the pause at
  * the third failure in a row. Commerce makes them; no route takes them.
@@ -150,7 +149,7 @@ export type PluginCommand =
 
 export type PluginCommitRequest = Readonly<{
   command: PluginCommand;
-  merchant: PluginMerchantRow;
+  merchant: MerchantRow;
   pluginId: string;
   revision: number;
   /** The receipt's resource, when it is not the plugin itself. */
@@ -162,56 +161,43 @@ export type PluginCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-type PluginAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => PluginMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: PluginCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: PluginMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: PluginCommitRequest) => CommerceMutationResultV1;
-  /** What pausing a plugin leaves behind, from the plugin's own records. */
-  dataEffects: (
-    merchantId: string,
-    pluginId: string,
-  ) => readonly CommercePluginEffectV1[];
-  /** Clean function VMs, or undefined when the host runs no functions. */
-  prepareVms: (count: number) => Promise<PreparedFunctionVms> | undefined;
-  readVariants: (
-    merchantId: string,
-  ) => CommerceResourcesV1["variants"];
-  readProductIds: (merchantId: string) => readonly string[];
-  /** Whether a customer of the merchant exists, for its plugin fields. */
-  customerExists: (merchantId: string, customerId: string) => boolean;
-  /** The result stored under an idempotency key, whatever its command. */
-  readReceipt: (
-    merchantId: string,
-    idempotencyKey: string,
-  ) => CommerceMutationResultV1 | undefined;
-  /** Applies a command that a plugin returned, as a staff call would. */
-  applyCommand: (command: unknown) => CommerceMutationResultV1;
-  /**
-   * An order as a handler or an action reads it, by its id or the id of its
-   * fulfillment, or undefined.
-   */
-  readOrder: (
-    merchantId: string,
-    id: string,
-  ) => Readonly<Record<string, unknown>> | undefined;
-  /** An order's customer and its currency, or undefined. */
-  readOrderBuyer: (
-    merchantId: string,
-    orderId: string,
-  ) => Readonly<{ customerId: string; currency: string }> | undefined;
-}>;
+type PluginAuthorityOptions = MerchantCommandPorts<PluginCommand> &
+  Readonly<{
+    database: CommerceDatabase;
+    now: () => string;
+    commit: (request: PluginCommitRequest) => CommerceMutationResultV1;
+    /** What pausing a plugin leaves behind, from the plugin's own records. */
+    dataEffects: (
+      merchantId: string,
+      pluginId: string,
+    ) => readonly CommercePluginEffectV1[];
+    /** Clean function VMs, or undefined when the host runs no functions. */
+    prepareVms: (count: number) => Promise<PreparedFunctionVms> | undefined;
+    readVariants: (merchantId: string) => CommerceResourcesV1["variants"];
+    readProductIds: (merchantId: string) => readonly string[];
+    /** Whether a customer of the merchant exists, for its plugin fields. */
+    customerExists: (merchantId: string, customerId: string) => boolean;
+    /** The result stored under an idempotency key, whatever its command. */
+    readReceipt: (
+      merchantId: string,
+      idempotencyKey: string,
+    ) => CommerceMutationResultV1 | undefined;
+    /** Applies a command that a plugin returned, as a staff call would. */
+    applyCommand: (command: unknown) => CommerceMutationResultV1;
+    /**
+     * An order as a handler or an action reads it, by its id or the id of its
+     * fulfillment, or undefined.
+     */
+    readOrder: (
+      merchantId: string,
+      id: string,
+    ) => Readonly<Record<string, unknown>> | undefined;
+    /** An order's customer and its currency, or undefined. */
+    readOrderBuyer: (
+      merchantId: string,
+      orderId: string,
+    ) => Readonly<{ customerId: string; currency: string }> | undefined;
+  }>;
 
 type KnownPlugin = Readonly<{
   definition: PluginDefinition;
@@ -380,7 +366,7 @@ export class PluginAuthority {
 
   #failureCommand(
     failure: StoredPluginFailure,
-    merchant: PluginMerchantRow,
+    merchant: MerchantRow,
     schemaVersion: PluginFailureCommand["schemaVersion"],
   ): PluginFailureCommand {
     const key = `${schemaVersion === "underclerk.pause-failing-plugin.internal.v1" ? "plugin_pause" : "plugin_failure_report"}_${failure.failureId}`;
@@ -443,14 +429,13 @@ export class PluginAuthority {
   }
 
   changePlugin(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CommercePluginCommandV1;
-    try {
-      command = parsePluginCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const admitted = this.#admit(command);
-    if ("outcome" in admitted) return admitted;
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parsePluginCommand,
+    );
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plugin = this.#known(command.merchantId, command.pluginId);
     if (plugin !== undefined && plugin.revision !== command.expectedRevision)
       return this.#options.rejected({
@@ -472,7 +457,7 @@ export class PluginAuthority {
     if ("code" in planned) return this.#options.rejected(planned);
     return this.#options.commit({
       command,
-      merchant: admitted,
+      merchant,
       pluginId: command.pluginId,
       revision: planned.revision,
       write: () =>
@@ -491,14 +476,13 @@ export class PluginAuthority {
    * out goes back to the plugin's default. The plugin keeps its state.
    */
   configurePlugin(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ConfigureCommercePluginV1;
-    try {
-      command = parseConfigurePluginCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const admitted = this.#admit(command);
-    if ("outcome" in admitted) return admitted;
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseConfigurePluginCommand,
+    );
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plugin = this.#known(command.merchantId, command.pluginId);
     if (plugin === undefined)
       return this.#options.rejected({
@@ -527,7 +511,7 @@ export class PluginAuthority {
     const revision = plugin.revision + 1;
     return this.#options.commit({
       command,
-      merchant: admitted,
+      merchant,
       pluginId: command.pluginId,
       revision,
       write: () =>
@@ -547,14 +531,13 @@ export class PluginAuthority {
    * plugin stays paused until staff resume it.
    */
   installMerchantPlugin(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: InstallCommerceMerchantPluginV1;
-    try {
-      command = parseInstallMerchantPluginCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const admitted = this.#admit(command);
-    if ("outcome" in admitted) return admitted;
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseInstallMerchantPluginCommand,
+    );
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const { database } = this.#options;
     const { definition, settings, merchantId } = command;
     const invalid = (field: string) =>
@@ -645,7 +628,7 @@ export class PluginAuthority {
     const revision = (installed?.revision ?? 1) + 1;
     return this.#options.commit({
       command,
-      merchant: admitted,
+      merchant,
       pluginId: definition.pluginId,
       revision,
       write: () => {
@@ -654,7 +637,7 @@ export class PluginAuthority {
           merchantId,
           definition.pluginId,
           typeWrites,
-          admitted.revision + 1,
+          merchant.revision + 1,
           command.requestedAt,
         );
         writeMerchantPluginInstallation(
@@ -872,30 +855,13 @@ export class PluginAuthority {
    * A retry of the call answers with that receipt and runs nothing.
    */
   runAction(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: RunCommercePluginActionV1;
-    try {
-      command = parseRunPluginActionCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseRunPluginActionCommand,
     );
-    if (merchantError !== undefined || merchant === undefined)
-      return this.#options.rejected(
-        merchantError ?? {
-          code: "merchant_not_found",
-          merchantId: command.merchantId,
-        },
-      );
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const { database } = this.#options;
     const { merchantId, pluginId, actionId } = command;
     const plugin = listMerchantPlugins(database, merchantId).find(
@@ -1079,7 +1045,7 @@ export class PluginAuthority {
    * transaction), or why nothing was applied.
    */
   #applyAll(
-    merchant: PluginMerchantRow,
+    merchant: MerchantRow,
     plugin: Readonly<{ definition: PluginDefinition; version: number }>,
     from: Readonly<{ source: "handler" | "action"; sourceId: string }>,
     operations: readonly PluginOperation[],
@@ -1152,7 +1118,7 @@ export class PluginAuthority {
 
   /** One command of a run: its result, or why the core did not submit it. */
   #applyOne(
-    merchant: PluginMerchantRow,
+    merchant: MerchantRow,
     plugin: Readonly<{ definition: PluginDefinition; version: number }>,
     from: Readonly<{ source: "handler" | "action"; sourceId: string }>,
     operation: PluginOperation,
@@ -1217,14 +1183,13 @@ export class PluginAuthority {
    * removes a value.
    */
   setFieldValues(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: SetCommercePluginFieldValuesV1;
-    try {
-      command = parseSetPluginFieldValuesCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const admitted = this.#admit(command);
-    if ("outcome" in admitted) return admitted;
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseSetPluginFieldValuesCommand,
+    );
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const { database } = this.#options;
     const { merchantId, pluginId, entityType, entityId } = command;
     const invalid = (field: string) =>
@@ -1284,7 +1249,7 @@ export class PluginAuthority {
     const revision = (current?.revision ?? 0) + 1;
     return this.#options.commit({
       command,
-      merchant: admitted,
+      merchant,
       pluginId,
       revision: plugin.revision,
       resource: {
@@ -1435,8 +1400,7 @@ export class PluginAuthority {
     const variants = this.#options.readVariants(merchantId);
     const refused: Array<CommerceMerchantPluginPreviewV1["refused"][number]> =
       [];
-    const failed: Array<CommerceMerchantPluginPreviewV1["failed"][number]> =
-      [];
+    const failed: Array<CommerceMerchantPluginPreviewV1["failed"][number]> = [];
     await this.#withVms(checkoutIds.length * functions.length, () => {
       for (const checkoutId of checkoutIds) {
         const quote = readCheckout(database, merchantId, checkoutId)?.lifecycle
@@ -1508,31 +1472,6 @@ export class PluginAuthority {
     } finally {
       vms.dispose();
     }
-  }
-
-  #admit(
-    command: PluginCommand,
-  ): PluginMerchantRow | CommerceMutationResultV1 {
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    return (
-      merchant ??
-      this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      })
-    );
   }
 
   #all(merchantId: string): readonly KnownPlugin[] {

@@ -13,8 +13,9 @@ import type { BuyerAccountGateway } from "../../buyer-account.ts";
 import type { BuyerShippingDestinationAuthority } from "../../commerce-authority/checkout-planning.ts";
 import { ShippingAddressValidationService } from "../../shipping-address-validation.ts";
 import { assertNever, errorMessage } from "@seams/std";
+import { buyerSessionClaims, verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
-import { bearerToken, readJsonBody } from "../request-body.ts";
+import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
 
 export async function buyerCartRoute(
@@ -25,24 +26,10 @@ export async function buyerCartRoute(
     { kind: "create_buyer_cart" | "read_buyer_cart" | "replace_buyer_cart" }
   >,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   if (route.kind === "read_buyer_cart") {
-    const cart = ctx.authority.readBuyerCart(verification.claims, route.cartId);
+    const cart = ctx.authority.readBuyerCart(access.claims, route.cartId);
     return cart === undefined
       ? jsonResponse(404, { message: "Cart not found" })
       : jsonResponse(200, cart);
@@ -53,11 +40,11 @@ export async function buyerCartRoute(
     const mutation =
       route.kind === "create_buyer_cart"
         ? ctx.authority.createBuyerCart({
-            claims: verification.claims,
+            claims: access.claims,
             command: parseCreateBuyerCartCommand(body.value),
           })
         : ctx.authority.replaceBuyerCart({
-            claims: verification.claims,
+            claims: access.claims,
             cartId: route.cartId,
             command: parseReplaceBuyerCartCommand(body.value),
           });
@@ -91,16 +78,9 @@ export async function validateBuyerShippingAddressRoute(
       message: "Shipping storefront not found",
     });
   }
-  const token = bearerToken(request);
-  const verification =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verify(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-        });
-  if (!verification.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const claims = buyerSessionClaims(ctx, request, route, context);
+  if (claims === undefined)
+    return jsonResponse(401, { message: "Unauthorized" });
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   let command;
@@ -110,9 +90,9 @@ export async function validateBuyerShippingAddressRoute(
     return jsonResponse(400, { message: errorMessage(error) });
   }
   const result = await ctx.addressValidations.validate({
-    merchantId: verification.claims.merchantId,
-    storefrontId: verification.claims.storefrontId,
-    buyerSessionDigest: buyerSessionDigest(verification.claims.sessionId),
+    merchantId: claims.merchantId,
+    storefrontId: claims.storefrontId,
+    buyerSessionDigest: buyerSessionDigest(claims.sessionId),
     idempotencyKey: command.idempotencyKey,
     address: command.address,
   });

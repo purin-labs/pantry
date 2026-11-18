@@ -5,22 +5,23 @@ import {
   type CreateCommerceInventoryItemV1,
   type OpenCommerceInventoryPositionV1,
   type ReceiveCommerceInventoryV3,
-  type CommerceMutationResultV1,
 } from "@seams/commerce-client";
-import { pathToFileURL } from "node:url";
+import {
+  applyAtRevision,
+  clientFailure,
+  isMainModule,
+  parseMerchantScriptArguments,
+  type MerchantScriptArguments,
+} from "./merchant-script.ts";
 
 const REQUESTED_AT = "2026-08-14T09:45:00.000Z";
 const EXPECTED_CAFE_REVISION = 93;
 const EXPECTED_SHIPPING_REVISION = 100;
 
-type SetupArguments = Readonly<{
-  organisationId: string;
-  merchantId: string;
-  baseUrl: string;
-  serviceToken: string;
-}>;
-
-type SetupIdentity = Pick<SetupArguments, "organisationId" | "merchantId">;
+type SetupIdentity = Pick<
+  MerchantScriptArguments,
+  "organisationId" | "merchantId"
+>;
 
 export type Plan22Phase4ShippingSetupResult = Readonly<{
   ok: true;
@@ -34,7 +35,7 @@ export type Plan22Phase4ShippingSetupResult = Readonly<{
   availableCartons: 10;
 }>;
 
-if (isMainModule()) await main();
+if (isMainModule(import.meta.url)) await main();
 
 export async function configurePhase4Shipping(
   adminClient: CommerceAdminClient,
@@ -62,49 +63,49 @@ export async function configurePhase4Shipping(
   }
 
   let expectedRevision = cafeRevision;
-  expectedRevision = await apply(
+  expectedRevision = await applyAtRevision(
     adminClient.createInventoryItem(
       inventoryItem(identity, expectedRevision, "cookie_box"),
     ),
     "six-cookie inventory item",
     expectedRevision + 1,
   );
-  expectedRevision = await apply(
+  expectedRevision = await applyAtRevision(
     adminClient.createInventoryItem(
       inventoryItem(identity, expectedRevision, "carton"),
     ),
     "shipping carton inventory item",
     expectedRevision + 1,
   );
-  expectedRevision = await apply(
+  expectedRevision = await applyAtRevision(
     adminClient.configureShippingStorefront(
       shippingStorefront(identity, expectedRevision),
     ),
     "JP to Singapore storefront",
     expectedRevision + 1,
   );
-  expectedRevision = await apply(
+  expectedRevision = await applyAtRevision(
     adminClient.openInventoryPosition(
       inventoryPosition(identity, expectedRevision, "cookie_box"),
     ),
     "six-cookie inventory position",
     expectedRevision + 1,
   );
-  expectedRevision = await apply(
+  expectedRevision = await applyAtRevision(
     adminClient.openInventoryPosition(
       inventoryPosition(identity, expectedRevision, "carton"),
     ),
     "shipping carton inventory position",
     expectedRevision + 1,
   );
-  expectedRevision = await apply(
+  expectedRevision = await applyAtRevision(
     adminClient.receiveInventory(
       receipt(identity, expectedRevision, "cookie_box"),
     ),
     "six-cookie opening stock",
     expectedRevision + 1,
   );
-  expectedRevision = await apply(
+  expectedRevision = await applyAtRevision(
     adminClient.receiveInventory(receipt(identity, expectedRevision, "carton")),
     "shipping carton opening stock",
     expectedRevision + 1,
@@ -352,29 +353,6 @@ function receipt(
   };
 }
 
-async function apply(
-  pending: Promise<
-    Readonly<
-      | { ok: true; value: CommerceMutationResultV1 }
-      | { ok: false; error: Readonly<{ kind: string; message: string }> }
-    >
-  >,
-  operation: string,
-  expectedRevision: number,
-): Promise<number> {
-  const result = await pending;
-  if (!result.ok) throw clientFailure(operation, result);
-  if (result.value.outcome === "rejected") {
-    throw new Error(
-      `${operation} was rejected: ${JSON.stringify(result.value.error)}`,
-    );
-  }
-  if (result.value.receipt.merchantRevision !== expectedRevision) {
-    throw new Error(`${operation} produced an unexpected merchant revision`);
-  }
-  return expectedRevision;
-}
-
 function shippingSetupIsComplete(
   snapshot: Readonly<{
     merchantRevision: number;
@@ -428,90 +406,15 @@ function shippingSetupIsComplete(
 }
 
 async function main(): Promise<void> {
-  const arguments_ = parseArguments(process.argv.slice(2), process.env);
+  const arguments_ = parseMerchantScriptArguments(
+    "configure:plan22-phase4-shipping",
+    process.argv.slice(2),
+    process.env,
+  );
   const client = new CommerceAdminClient({
     baseUrl: arguments_.baseUrl,
     serviceToken: arguments_.serviceToken,
   });
   const result = await configurePhase4Shipping(client, arguments_);
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-}
-
-function isMainModule(): boolean {
-  const scriptPath = process.argv[1];
-  return (
-    scriptPath !== undefined &&
-    import.meta.url === pathToFileURL(scriptPath).href
-  );
-}
-
-function clientFailure(
-  operation: string,
-  result: Readonly<{
-    ok: false;
-    error: Readonly<{ kind: string; message: string }>;
-  }>,
-): Error {
-  return new Error(
-    `${operation} failed: ${result.error.kind}: ${result.error.message}`,
-  );
-}
-
-function parseArguments(
-  argv: readonly string[],
-  env: NodeJS.ProcessEnv,
-): SetupArguments {
-  const values = new Map<string, string>();
-  const start = argv[0] === "--" ? 1 : 0;
-  for (let index = start; index < argv.length; index += 2) {
-    const flag = argv[index];
-    const value = argv[index + 1];
-    if (flag === undefined || value === undefined || !flag.startsWith("--")) {
-      throw new Error(
-        "Usage: configure:plan22-phase4-shipping --organisation <organisation_id> --merchant <merchant_id>",
-      );
-    }
-    values.set(flag, value);
-  }
-  return {
-    organisationId: requireIdentity(values.get("--organisation"), "--organisation", "organisation_"),
-    merchantId: requireIdentity(
-      values.get("--merchant"),
-      "--merchant",
-      "merchant_",
-    ),
-    baseUrl: requireUrl(env.UNDERCLERK_BASE_URL),
-    serviceToken: requireSecret(env.UNDERCLERK_SERVICE_TOKEN),
-  };
-}
-
-function requireIdentity(
-  value: string | undefined,
-  field: string,
-  prefix: string,
-): string {
-  if (
-    value === undefined ||
-    !value.startsWith(prefix) ||
-    value !== value.trim()
-  ) {
-    throw new Error(`${field} must be a normalized ${prefix} identity`);
-  }
-  return value;
-}
-
-function requireUrl(value: string | undefined): string {
-  if (value === undefined) throw new Error("UNDERCLERK_BASE_URL is required");
-  const parsed = new URL(value);
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("UNDERCLERK_BASE_URL must use http or https");
-  }
-  return parsed.toString();
-}
-
-function requireSecret(value: string | undefined): string {
-  if (value === undefined || value.length === 0) {
-    throw new Error("UNDERCLERK_SERVICE_TOKEN is required");
-  }
-  return value;
 }

@@ -11,13 +11,16 @@ import {
   parseRecordInvoicePaymentCommand,
   type RecordCommerceInvoicePaymentV1,
   type CommerceCompanyInvoiceV1,
-  type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
 } from "@seams/commerce-client";
 
 import type { CommerceDatabase } from "../../database.ts";
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  beginMerchantCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 import { writeManualTender } from "../../payments/manual-tender.ts";
-import type { CompanyMerchantRow } from "./companies.ts";
 
 const DAY_MS = 86_400_000;
 
@@ -35,28 +38,17 @@ export type InvoiceCommand =
 
 export type InvoiceCommitRequest = Readonly<{
   command: InvoiceCommand;
-  merchant: CompanyMerchantRow;
+  merchant: MerchantRow;
   invoice: CommerceCompanyInvoiceV1;
   previousRevision: number;
 }>;
 
-type InvoiceAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => CompanyMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: InvoiceCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: CompanyMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: InvoiceCommitRequest) => CommerceMutationResultV1;
-}>;
+type InvoiceAuthorityOptions = MerchantCommandPorts<InvoiceCommand> &
+  Readonly<{
+    database: CommerceDatabase;
+    now: () => string;
+    commit: (request: InvoiceCommitRequest) => CommerceMutationResultV1;
+  }>;
 
 /** The invoice of an order that staff place on terms. */
 export function termsInvoice(
@@ -105,30 +97,13 @@ export class InvoiceAuthority {
 
   /** The company paid by bank transfer: the invoice is paid. */
   recordInvoicePayment(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: RecordCommerceInvoicePaymentV1;
-    try {
-      command = parseRecordInvoicePaymentCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseRecordInvoicePaymentCommand,
     );
-    if (merchantError !== undefined || merchant === undefined)
-      return this.#options.rejected(
-        merchantError ?? {
-          code: "merchant_not_found",
-          merchantId: command.merchantId,
-        },
-      );
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const current = readInvoice(
       this.#options.database,
       command.merchantId,

@@ -15,6 +15,7 @@ import {
   writePayment,
   writeShipment,
 } from "../commerce-persistence.ts";
+import type { CommerceDatabase } from "../database.ts";
 import { updateInventoryPosition } from "../inventory-persistence.ts";
 import {
   type CheckoutPaymentCapturePlan,
@@ -150,50 +151,7 @@ export function pickupCheckoutMutation(
     },
     observations: plan.positions.map(inventoryPositionObservation),
     write: (database) => {
-      writeCart(database, command.merchantId, plan.cart);
-      writeCheckout(database, command.merchantId, plan.checkout);
-      for (const allocation of plan.releasedAllocations ?? [])
-        writeInventoryAllocation(
-          database,
-          command.merchantId,
-          "release",
-          allocation,
-        );
-      // A refresh moves the holds of the lines that it keeps.
-      for (const allocation of plan.allocations) {
-        writeInventoryAllocation(
-          database,
-          command.merchantId,
-          allocation.revision === 1 ? "open" : "refresh",
-          allocation,
-        );
-      }
-      for (const position of plan.positions) {
-        updateInventoryPosition(
-          database,
-          command.merchantId,
-          position.revision - 1,
-          position,
-        );
-      }
-      if (plan.discountHolds !== undefined)
-        holdDiscounts(
-          database,
-          command.merchantId,
-          plan.checkout.checkoutId,
-          plan.discountHolds.customerId,
-          plan.discountHolds.holds,
-          plan.discountHolds.expiresAt,
-          committedAt,
-        );
-      if (plan.storedValueHolds !== undefined)
-        holdStoredValue(
-          database,
-          command.merchantId,
-          plan.checkout.checkoutId,
-          plan.storedValueHolds,
-          committedAt,
-        );
+      writeCheckoutHolds(database, command.merchantId, plan, committedAt);
       // The buyer's own pickup time, which a refresh keeps.
       if ("pickupAt" in command && command.pickupAt !== undefined)
         database
@@ -208,18 +166,7 @@ export function pickupCheckoutMutation(
             "DELETE FROM checkout_pickup_choice WHERE merchant_id = ? AND checkout_id = ?",
           )
           .run(command.merchantId, plan.checkout.checkoutId);
-      if (plan.checkout.lifecycle.state === "quoted")
-        recordFunctionRuns(
-          database,
-          command.merchantId,
-          {
-            id: plan.checkout.checkoutId,
-            attempt: String(plan.checkout.revision),
-          },
-          plan.checkout.lifecycle.quote.pluginRuns ?? [],
-          plan.pluginFailures ?? [],
-          committedAt,
-        );
+      recordQuoteFunctionRuns(database, command.merchantId, plan, committedAt);
     },
   };
 }
@@ -242,70 +189,84 @@ export function shippingCheckoutMutation(
     },
     observations: plan.positions.map(inventoryPositionObservation),
     write: (database) => {
-      writeCart(database, command.merchantId, plan.cart);
-      writeCheckout(database, command.merchantId, plan.checkout);
-      for (const allocation of plan.releasedAllocations ?? [])
-        writeInventoryAllocation(
-          database,
-          command.merchantId,
-          "release",
-          allocation,
-        );
-      // A refresh moves the holds of the lines that it keeps.
-      for (const allocation of plan.allocations) {
-        writeInventoryAllocation(
-          database,
-          command.merchantId,
-          allocation.revision === 1 ? "open" : "refresh",
-          allocation,
-        );
-      }
-      for (const position of plan.positions) {
-        updateInventoryPosition(
-          database,
-          command.merchantId,
-          position.revision - 1,
-          position,
-        );
-      }
-      if (plan.discountHolds !== undefined)
-        holdDiscounts(
-          database,
-          command.merchantId,
-          plan.checkout.checkoutId,
-          plan.discountHolds.customerId,
-          plan.discountHolds.holds,
-          plan.discountHolds.expiresAt,
-          committedAt,
-        );
-      if (plan.storedValueHolds !== undefined)
-        holdStoredValue(
-          database,
-          command.merchantId,
-          plan.checkout.checkoutId,
-          plan.storedValueHolds,
-          committedAt,
-        );
-      if (plan.checkout.lifecycle.state === "quoted")
-        recordFunctionRuns(
-          database,
-          command.merchantId,
-          {
-            id: plan.checkout.checkoutId,
-            attempt: String(plan.checkout.revision),
-          },
-          plan.checkout.lifecycle.quote.pluginRuns ?? [],
-          plan.pluginFailures ?? [],
-          committedAt,
-        );
+      writeCheckoutHolds(database, command.merchantId, plan, committedAt);
+      recordQuoteFunctionRuns(database, command.merchantId, plan, committedAt);
     },
   };
 }
 
+// The cart and checkout of a buyer checkout, with what its quote holds:
+// stock, discounts and stored value.
+function writeCheckoutHolds(
+  database: CommerceDatabase,
+  merchantId: string,
+  plan: PickupCheckoutPlan,
+  committedAt: string,
+): void {
+  writeCart(database, merchantId, plan.cart);
+  writeCheckout(database, merchantId, plan.checkout);
+  for (const allocation of plan.releasedAllocations ?? [])
+    writeInventoryAllocation(database, merchantId, "release", allocation);
+  // A refresh moves the holds of the lines that it keeps.
+  for (const allocation of plan.allocations) {
+    writeInventoryAllocation(
+      database,
+      merchantId,
+      allocation.revision === 1 ? "open" : "refresh",
+      allocation,
+    );
+  }
+  for (const position of plan.positions) {
+    updateInventoryPosition(
+      database,
+      merchantId,
+      position.revision - 1,
+      position,
+    );
+  }
+  if (plan.discountHolds !== undefined)
+    holdDiscounts(
+      database,
+      merchantId,
+      plan.checkout.checkoutId,
+      plan.discountHolds.customerId,
+      plan.discountHolds.holds,
+      plan.discountHolds.expiresAt,
+      committedAt,
+    );
+  if (plan.storedValueHolds !== undefined)
+    holdStoredValue(
+      database,
+      merchantId,
+      plan.checkout.checkoutId,
+      plan.storedValueHolds,
+      committedAt,
+    );
+}
+
+function recordQuoteFunctionRuns(
+  database: CommerceDatabase,
+  merchantId: string,
+  plan: PickupCheckoutPlan,
+  committedAt: string,
+): void {
+  if (plan.checkout.lifecycle.state === "quoted")
+    recordFunctionRuns(
+      database,
+      merchantId,
+      {
+        id: plan.checkout.checkoutId,
+        attempt: String(plan.checkout.revision),
+      },
+      plan.checkout.lifecycle.quote.pluginRuns ?? [],
+      plan.pluginFailures ?? [],
+      committedAt,
+    );
+}
+
 export function checkoutPaymentStartMutation(
   command:
-    | BeginCommerceCheckoutPaymentV1
-    | CollectCommerceInPersonCheckoutPaymentV1,
+    BeginCommerceCheckoutPaymentV1 | CollectCommerceInPersonCheckoutPaymentV1,
   merchant: MerchantRow,
   plan: CheckoutPaymentStartPlan,
   committedAt: string,

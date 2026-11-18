@@ -13,48 +13,39 @@ export function validateEntityAttributes(
   definitions: readonly AttributeDefinition[],
   values: readonly AttributeValueAssignment[],
 ): CommerceEntityPlaneError | undefined {
-  const byId = new Map(
-    definitions.map((definition) => [String(definition.id), definition]),
+  return validateAttributes(
+    definitions.map((definition) => ({
+      attributeId: String(definition.id),
+      definition,
+    })),
+    values,
   );
-  const seen = new Set<string>();
-  for (const entry of values) {
-    const attributeId = String(entry.attributeId);
-    if (!seen.add(attributeId)) return { code: "duplicate_identity" };
-    const definition = byId.get(attributeId);
-    if (
-      definition === undefined ||
-      Number(definition.revision) !== Number(entry.definitionRevision)
-    ) {
-      return { code: "attribute_definition_mismatch", attributeId };
-    }
-    if (
-      !sameAttributeScope(entry.scope, definition.scope) ||
-      entry.sensitivity !== definition.sensitivity
-    ) {
-      return { code: "attribute_definition_mismatch", attributeId };
-    }
-    if (!valueMatchesDefinition(definition, entry.value)) {
-      return { code: "invalid_attribute_value", attributeId };
-    }
-  }
-  for (const definition of definitions) {
-    if (definition.required && !seen.has(String(definition.id))) {
-      return {
-        code: "invalid_attribute_value",
-        attributeId: String(definition.id),
-      };
-    }
-  }
-  return undefined;
 }
 
 export function validateListEntryAttributes(
   list: CommerceList,
   values: readonly ListEntryAttributeValue[],
 ): CommerceEntityPlaneError | undefined {
-  const definitions = list.entryAttributeDefinitions;
+  return validateAttributes(
+    list.entryAttributeDefinitions.map((entry) => ({
+      attributeId: String(entry.attributeId),
+      definition: entry.definition,
+    })),
+    values,
+  );
+}
+
+// Each value matches its definition's revision, scope, sensitivity and kind,
+// at most once, and every required definition has a value.
+function validateAttributes(
+  definitions: readonly Readonly<{
+    attributeId: string;
+    definition: AttributeDefinition;
+  }>[],
+  values: readonly (AttributeValueAssignment | ListEntryAttributeValue)[],
+): CommerceEntityPlaneError | undefined {
   const byId = new Map(
-    definitions.map((entry) => [String(entry.attributeId), entry.definition]),
+    definitions.map((entry) => [entry.attributeId, entry.definition]),
   );
   const seen = new Set<string>();
   for (const entry of values) {
@@ -78,10 +69,10 @@ export function validateListEntryAttributes(
     }
   }
   for (const entry of definitions) {
-    if (entry.definition.required && !seen.has(String(entry.attributeId))) {
+    if (entry.definition.required && !seen.has(entry.attributeId)) {
       return {
         code: "invalid_attribute_value",
-        attributeId: String(entry.attributeId),
+        attributeId: entry.attributeId,
       };
     }
   }

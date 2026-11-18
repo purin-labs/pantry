@@ -59,6 +59,11 @@ import {
   releasedInventoryPosition,
   wholeAmountAtScale,
 } from "./inventory-planning.ts";
+import type { MerchantRow } from "./ledger.ts";
+import {
+  beginSnapshotCommand,
+  type MerchantCommandPorts,
+} from "./merchant-command.ts";
 import {
   listOrderChanges,
   orderMatchesAccepted,
@@ -70,15 +75,9 @@ import { guardMove, orderSubject } from "../plugins/machine-guards.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;
 
-export type OrderEditMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 export type OrderEditCommitRequest = Readonly<{
   command: EditCommerceOrderV1;
-  merchant: OrderEditMerchantRow;
+  merchant: MerchantRow;
   previousOrderRevision: number;
   order: CommerceOrderV1;
   fulfillment: CommerceFulfillmentV1;
@@ -89,7 +88,7 @@ export type OrderEditCommitRequest = Readonly<{
 
 export type OrderExchangeCommitRequest = Readonly<{
   command: ExchangeCommerceOrderLinesV1;
-  merchant: OrderEditMerchantRow;
+  merchant: MerchantRow;
   previousOrderRevision: number;
   order: CommerceOrderV1;
   /** The new fulfillment that hands over the exchange lines. */
@@ -114,7 +113,7 @@ export type OpenCommerceOrderBalanceInternalV1 = Readonly<{
 
 export type OrderBalanceCheckoutRequest = Readonly<{
   command: OpenCommerceOrderBalanceInternalV1;
-  merchant: OrderEditMerchantRow;
+  merchant: MerchantRow;
   /** One checkout has one cart; a balance checkout's cart has no lines. */
   cart: Cart;
   checkout: Checkout;
@@ -124,36 +123,29 @@ export type OrderBalanceCheckoutResult =
   | Readonly<{ kind: "created"; checkout: CommerceBuyerQuotedCheckoutV1 }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-type OrderEditCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => OrderEditMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readFoodServiceResources: (
-    merchantId: string,
-  ) => CommerceFoodServiceResourcesV1;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: EditCommerceOrderV1 | ExchangeCommerceOrderLinesV1,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: OrderEditCommitRequest) => CommerceMutationResultV1;
-  commitExchange: (request: OrderExchangeCommitRequest) => CommerceMutationResultV1;
-  commitBalanceCheckout: (request: OrderBalanceCheckoutRequest) => void;
-  readBuyerQuotedCheckout: (
-    merchantId: string,
-    checkoutId: string,
-    sessionId: string,
-  ) => CommerceBuyerQuotedCheckoutV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: OrderEditMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-}>;
+type OrderEditCommandAuthorityOptions = MerchantCommandPorts<
+  EditCommerceOrderV1 | ExchangeCommerceOrderLinesV1
+> &
+  Readonly<{
+    database: CommerceDatabase;
+    now: () => string;
+    readSnapshot: (
+      merchantId: string,
+    ) => CommerceMerchantSnapshotV1 | undefined;
+    readFoodServiceResources: (
+      merchantId: string,
+    ) => CommerceFoodServiceResourcesV1;
+    commit: (request: OrderEditCommitRequest) => CommerceMutationResultV1;
+    commitExchange: (
+      request: OrderExchangeCommitRequest,
+    ) => CommerceMutationResultV1;
+    commitBalanceCheckout: (request: OrderBalanceCheckoutRequest) => void;
+    readBuyerQuotedCheckout: (
+      merchantId: string,
+      checkoutId: string,
+      sessionId: string,
+    ) => CommerceBuyerQuotedCheckoutV1 | undefined;
+  }>;
 
 /** The buyer line of a balance checkout. */
 const ORDER_BALANCE_LINE_ID = "order_balance";
@@ -178,57 +170,26 @@ export class OrderEditCommandAuthority {
   }
 
   editOrder(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: EditCommerceOrderV1;
-    try {
-      command = parseEditOrderCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseEditOrderCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (merchant === undefined || snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const planned = this.#planEdit(command, snapshot.resources);
     if ("code" in planned) return this.#options.rejected(planned);
     return this.#options.commit({ command, merchant, ...planned });
   }
 
   exchangeOrderLines(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ExchangeCommerceOrderLinesV1;
-    try {
-      command = parseExchangeOrderLinesCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseExchangeOrderLinesCommand,
     );
-    if (merchantError !== undefined) return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(command.merchantId, command.idempotencyKey, command);
-    if (replay !== undefined) return replay;
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (merchant === undefined || snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const planned = this.#planExchange(command, snapshot.resources);
     if ("code" in planned) return this.#options.rejected(planned);
     return this.#options.commitExchange({ command, merchant, ...planned });
@@ -288,7 +249,8 @@ export class OrderEditCommandAuthority {
       claims.merchantId,
       order.origin.checkoutId,
     );
-    const originSource = origin === undefined ? undefined : checkoutOnlineSource(origin);
+    const originSource =
+      origin === undefined ? undefined : checkoutOnlineSource(origin);
     const storefront = readStorefront(
       this.#options.database,
       claims.merchantId,
@@ -323,7 +285,11 @@ export class OrderEditCommandAuthority {
           buyerSessionDigest: digest,
           revision: 1,
           lines: [],
-          lifecycle: { state: "submitted", checkoutId, submittedAt: requestedAt },
+          lifecycle: {
+            state: "submitted",
+            checkoutId,
+            submittedAt: requestedAt,
+          },
         };
         const checkout = parseCheckout({
           checkoutId,
@@ -387,7 +353,8 @@ export class OrderEditCommandAuthority {
         });
         return this.#view(claims, checkoutId);
       }
-      const owned = checkoutOnlineSource(existing)?.buyerSessionDigest === digest;
+      const owned =
+        checkoutOnlineSource(existing)?.buyerSessionDigest === digest;
       if (existing.lifecycle.state === "payment_pending")
         return rejected("orderBalance.paymentPending");
       if (
@@ -438,7 +405,8 @@ export class OrderEditCommandAuthority {
     // prepare or made ready takes a return instead.
     const editMove = commerceTransition("order", order.lifecycle, "edit");
     if (!editMove.allowed) return editMove.refusal;
-    if (order.origin.kind !== "online") return invalid("orderEdit.order.origin");
+    if (order.origin.kind !== "online")
+      return invalid("orderEdit.order.origin");
     const fulfillment = activePickupFulfillment(resources.fulfillments, order);
     if (fulfillment === undefined) return invalid("orderEdit.fulfillment");
     const pickupEdit = commerceTransition(
@@ -492,9 +460,14 @@ export class OrderEditCommandAuthority {
     for (const [orderLineId, quantity] of changes) {
       const line = findResource(order.lineItems, orderLineId);
       if (line === undefined)
-        return { code: "resource_not_found", kind: "order_line", id: orderLineId };
+        return {
+          code: "resource_not_found",
+          kind: "order_line",
+          id: orderLineId,
+        };
       // Only stock lines change; food made to order is cancelled instead.
-      if (line.source.kind !== "catalog") return invalid("orderEdit.lines.editable");
+      if (line.source.kind !== "catalog")
+        return invalid("orderEdit.lines.editable");
       if (quantity === line.quantity.amount)
         return invalid("orderEdit.lines.unchanged");
     }
@@ -502,7 +475,10 @@ export class OrderEditCommandAuthority {
     const advanced = new Set<string>();
     const allocations: InventoryAllocation[] = [];
     const lines: Array<
-      Readonly<{ line: CommerceOrderLineItemV1; allocationIds: readonly string[] }>
+      Readonly<{
+        line: CommerceOrderLineItemV1;
+        allocationIds: readonly string[];
+      }>
     > = [];
     for (const line of order.lineItems) {
       const acceptedLine = acceptedLines.get(line.id);
@@ -512,7 +488,8 @@ export class OrderEditCommandAuthority {
         lines.push({ line, allocationIds: acceptedLine.allocationIds });
         continue;
       }
-      if (line.source.kind !== "catalog") return invalid("orderEdit.lines.editable");
+      if (line.source.kind !== "catalog")
+        return invalid("orderEdit.lines.editable");
       for (const allocationId of acceptedLine.allocationIds) {
         const released = this.#release(
           command,
@@ -545,7 +522,8 @@ export class OrderEditCommandAuthority {
       if ("code" in allocated) return allocated;
       allocations.push(...allocated);
       const lineTotal = line.unitPrice.amountMinor * quantity;
-      if (!Number.isSafeInteger(lineTotal)) return invalid("orderEdit.lineTotal");
+      if (!Number.isSafeInteger(lineTotal))
+        return invalid("orderEdit.lineTotal");
       lines.push({
         line: {
           ...line,
@@ -581,7 +559,8 @@ export class OrderEditCommandAuthority {
       if (selection.kind === "rejected") return selection.error;
       const { variant, offer, source, requirements, consumeOn } =
         selection.value;
-      if (source.kind !== "catalog") return invalid("orderEdit.additions.source");
+      if (source.kind !== "catalog")
+        return invalid("orderEdit.additions.source");
       if (offer.price.currency !== currency)
         return invalid("orderEdit.additions.currency");
       if (consumeOn !== "fulfillment_completed")
@@ -604,7 +583,8 @@ export class OrderEditCommandAuthority {
       if ("code" in allocated) return allocated;
       allocations.push(...allocated);
       const lineTotal = offer.price.amountMinor * addition.quantity;
-      if (!Number.isSafeInteger(lineTotal)) return invalid("orderEdit.lineTotal");
+      if (!Number.isSafeInteger(lineTotal))
+        return invalid("orderEdit.lineTotal");
       lines.push({
         line: {
           id: orderLineId,
@@ -629,7 +609,10 @@ export class OrderEditCommandAuthority {
     if (taxed === undefined) return invalid("orderEdit.tax");
     const taxAmount = taxed.tax;
     const taxes = allocateTaxAcrossLines(
-      lines.map(({ line }) => ({ id: line.id, amountMinor: line.lineTotal.amountMinor })),
+      lines.map(({ line }) => ({
+        id: line.id,
+        amountMinor: line.lineTotal.amountMinor,
+      })),
       subtotal,
       { amountMinor: taxAmount, currency },
     );
@@ -688,7 +671,8 @@ export class OrderEditCommandAuthority {
       lineChanges: command.lineChanges.map((change) => ({
         orderLineId: change.orderLineId,
         quantityBefore:
-          findResource(order.lineItems, change.orderLineId)?.quantity.amount ?? 0,
+          findResource(order.lineItems, change.orderLineId)?.quantity.amount ??
+          0,
         quantityAfter: change.quantity,
       })),
       additions: command.additions.map((addition) => ({
@@ -732,7 +716,11 @@ export class OrderEditCommandAuthority {
     const { database } = this.#options;
     const order = findResource(resources.orders, command.orderId);
     if (order === undefined)
-      return { code: "resource_not_found", kind: "commerce_order", id: command.orderId };
+      return {
+        code: "resource_not_found",
+        kind: "commerce_order",
+        id: command.orderId,
+      };
     if (order.revision !== command.expectedOrderRevision)
       return {
         code: "stale_resource_revision",
@@ -747,10 +735,15 @@ export class OrderEditCommandAuthority {
       "exchange",
     );
     if (!exchangeMove.allowed) return exchangeMove.refusal;
-    if (order.origin.kind !== "online") return invalid("orderExchange.order.origin");
+    if (order.origin.kind !== "online")
+      return invalid("orderExchange.order.origin");
     const returned = readReturn(database, command.merchantId, command.returnId);
     if (returned === undefined || returned.orderId !== order.id)
-      return { code: "resource_not_found", kind: "return", id: command.returnId };
+      return {
+        code: "resource_not_found",
+        kind: "return",
+        id: command.returnId,
+      };
     if (returned.revision !== command.expectedReturnRevision)
       return {
         code: "stale_resource_revision",
@@ -808,16 +801,26 @@ export class OrderEditCommandAuthority {
     for (const orderLineId of back.keys())
       if (findResource(order.lineItems, orderLineId) === undefined)
         return invalid("orderExchange.return.lines");
-    const acceptedLines = new Map(accepted.lines.map((line) => [line.orderLineId, line]));
+    const acceptedLines = new Map(
+      accepted.lines.map((line) => [line.orderLineId, line]),
+    );
     const lines: Array<
-      Readonly<{ line: CommerceOrderLineItemV1; allocationIds: readonly string[] }>
+      Readonly<{
+        line: CommerceOrderLineItemV1;
+        allocationIds: readonly string[];
+      }>
     > = [];
     const lineChanges: Array<
-      Readonly<{ orderLineId: string; quantityBefore: number; quantityAfter: number }>
+      Readonly<{
+        orderLineId: string;
+        quantityBefore: number;
+        quantityAfter: number;
+      }>
     > = [];
     for (const line of order.lineItems) {
       const acceptedLine = acceptedLines.get(line.id);
-      if (acceptedLine === undefined) return invalid("orderExchange.acceptedOrder");
+      if (acceptedLine === undefined)
+        return invalid("orderExchange.acceptedOrder");
       const quantityBack = back.get(line.id) ?? 0;
       if (quantityBack === 0) {
         lines.push({ line, allocationIds: acceptedLine.allocationIds });
@@ -834,7 +837,8 @@ export class OrderEditCommandAuthority {
       });
       if (quantity === 0) continue;
       const lineTotal = line.unitPrice.amountMinor * quantity;
-      if (!Number.isSafeInteger(lineTotal)) return invalid("orderExchange.lineTotal");
+      if (!Number.isSafeInteger(lineTotal))
+        return invalid("orderExchange.lineTotal");
       lines.push({
         line: {
           ...line,
@@ -857,7 +861,9 @@ export class OrderEditCommandAuthority {
       requestedAt: command.requestedAt,
       editId: `exchange:${command.exchangeId}`,
     };
-    const foodService = this.#options.readFoodServiceResources(command.merchantId);
+    const foodService = this.#options.readFoodServiceResources(
+      command.merchantId,
+    );
     const added: CommerceOrderLineItemV1[] = [];
     for (const addition of command.additions) {
       const selection = resolveCheckoutSelection(
@@ -872,9 +878,12 @@ export class OrderEditCommandAuthority {
         undefined,
       );
       if (selection.kind === "rejected") return selection.error;
-      const { variant, offer, source, requirements, consumeOn } = selection.value;
-      if (source.kind !== "catalog") return invalid("orderExchange.additions.source");
-      if (offer.price.currency !== currency) return invalid("orderExchange.additions.currency");
+      const { variant, offer, source, requirements, consumeOn } =
+        selection.value;
+      if (source.kind !== "catalog")
+        return invalid("orderExchange.additions.source");
+      if (offer.price.currency !== currency)
+        return invalid("orderExchange.additions.currency");
       if (consumeOn !== "fulfillment_completed")
         return invalid("orderExchange.additions.consumption");
       const orderLineId = orderLineIdFor(
@@ -895,7 +904,8 @@ export class OrderEditCommandAuthority {
       if ("code" in allocated) return allocated;
       allocations.push(...allocated);
       const lineTotal = offer.price.amountMinor * addition.quantity;
-      if (!Number.isSafeInteger(lineTotal)) return invalid("orderExchange.lineTotal");
+      if (!Number.isSafeInteger(lineTotal))
+        return invalid("orderExchange.lineTotal");
       const line: CommerceOrderLineItemV1 = {
         id: orderLineId,
         source,
@@ -909,16 +919,23 @@ export class OrderEditCommandAuthority {
         lineTotal: { amountMinor: lineTotal, currency },
       };
       added.push(line);
-      lines.push({ line, allocationIds: allocated.map((allocation) => allocation.allocationId) });
+      lines.push({
+        line,
+        allocationIds: allocated.map((allocation) => allocation.allocationId),
+      });
     }
     let subtotal = 0;
     for (const { line } of lines) subtotal += line.lineTotal.amountMinor;
-    if (!Number.isSafeInteger(subtotal)) return invalid("orderExchange.subtotal");
+    if (!Number.isSafeInteger(subtotal))
+      return invalid("orderExchange.subtotal");
     const taxed = storefrontPercentageTax(subtotal, storefront.checkout.tax);
     if (taxed === undefined) return invalid("orderExchange.tax");
     const taxAmount = taxed.tax;
     const taxes = allocateTaxAcrossLines(
-      lines.map(({ line }) => ({ id: line.id, amountMinor: line.lineTotal.amountMinor })),
+      lines.map(({ line }) => ({
+        id: line.id,
+        amountMinor: line.lineTotal.amountMinor,
+      })),
       subtotal,
       { amountMinor: taxAmount, currency },
     );
@@ -955,7 +972,10 @@ export class OrderEditCommandAuthority {
       id: `fulfillment_${sha256(`${command.merchantId}:${order.id}:exchange:${command.exchangeId}`).slice(0, 32)}`,
       revision: 1,
       orderId: order.id,
-      lineItems: added.map((line) => ({ lineItemId: line.id, quantity: line.quantity.amount })),
+      lineItems: added.map((line) => ({
+        lineItemId: line.id,
+        quantity: line.quantity.amount,
+      })),
       locationId: previous.locationId,
       expectedBy,
       lifecycle: { state: "requested", requestedAt: command.requestedAt },
@@ -994,7 +1014,10 @@ export class OrderEditCommandAuthority {
         order.lineItems,
         (lineId) => acceptedLines.get(lineId)?.allocationIds ?? [],
       ),
-      linesAfter: changeLines(lineItems, (lineId) => allocationIdsAfter.get(lineId) ?? []),
+      linesAfter: changeLines(
+        lineItems,
+        (lineId) => allocationIdsAfter.get(lineId) ?? [],
+      ),
       occurredAt: command.requestedAt,
       returnId: returned.id,
       fulfillmentId: fulfillment.id,
@@ -1117,14 +1140,17 @@ export class OrderEditCommandAuthority {
         lineQuantity,
         position.balance.available.scale,
       );
-      if (required === undefined) return invalid("inventoryRequirement.quantity");
+      if (required === undefined)
+        return invalid("inventoryRequirement.quantity");
       const usable = readUsableInventoryQuantity(
         this.#options.database,
         command.merchantId,
         position,
         command.requestedAt,
       );
-      if (wholeAmountAtScale(usable, position.balance.available.scale) < required)
+      if (
+        wholeAmountAtScale(usable, position.balance.available.scale) < required
+      )
         return {
           code: "insufficient_inventory",
           inventoryItemId: requirement.inventoryItemId,
@@ -1183,10 +1209,7 @@ export class OrderEditCommandAuthority {
   }
 }
 
-function balanceCheckoutId(
-  order: CommerceOrderV1,
-  attempt: number,
-): string {
+function balanceCheckoutId(order: CommerceOrderV1, attempt: number): string {
   return `checkout_balance_${sha256(`${order.id}:${order.revision}`).slice(0, 32)}_${attempt}`;
 }
 
@@ -1214,7 +1237,8 @@ function handedOverFulfillments(
 ): readonly CommerceFulfillmentV1[] {
   return fulfillments.filter(
     (fulfillment) =>
-      fulfillment.orderId === order.id && fulfillment.lifecycle.state === "completed",
+      fulfillment.orderId === order.id &&
+      fulfillment.lifecycle.state === "completed",
   );
 }
 

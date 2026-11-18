@@ -34,6 +34,8 @@ import type { CommerceLists } from "../entity-plane/commerce-lists.ts";
 import type { EntityPlanePresetBundle } from "../entity-plane/presets.ts";
 import type { EntityPlaneMutationRequest } from "../entity-plane/receipt-outbox-settlement.ts";
 import type { CheckoutSelectionResult } from "../commerce-authority/checkout-planning.ts";
+import type { MerchantRow } from "../commerce-authority/ledger.ts";
+import type { MerchantCommandPorts } from "../commerce-authority/merchant-command.ts";
 import type { ProvisioningAuthorityOptions } from "../commerce-authority/provisioning.ts";
 
 export type PurchasingReconciliationResult =
@@ -90,20 +92,13 @@ export type ProductionDemandExtension = Readonly<{
   preset: EntityPlanePresetBundle;
 }>;
 
-/** The merchant row that a command plans against. */
-export type ExtensionMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 /**
  * One mutation of an extension. The core signs its delivery and receipt,
  * runs `write` and records both in one transaction, as for a core command.
  */
 export type ExtensionMutation<Command> = Readonly<{
   command: Command;
-  merchant: ExtensionMerchantRow;
+  merchant: MerchantRow;
   commandKind: CommerceMutationReceiptV1["commandKind"];
   resource: CommerceMutationReceiptV1["resource"];
   observations: readonly CommerceAggregateObservationV1[];
@@ -122,31 +117,21 @@ export type FoodServiceMutationCommand =
   | CompleteProductionBatchCommand;
 
 /** What the core lends the food service commands. */
-export type FoodServiceCommandContext = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => ExtensionMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readFoodServiceSnapshot: (
-    merchantId: string,
-  ) => CommerceFoodServiceSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: FoodServiceMutationCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (
-    mutation: ExtensionMutation<FoodServiceMutationCommand>,
-  ) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: ExtensionMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-}>;
+export type FoodServiceCommandContext =
+  MerchantCommandPorts<FoodServiceMutationCommand> &
+    Readonly<{
+      database: CommerceDatabase;
+      now: () => string;
+      readSnapshot: (
+        merchantId: string,
+      ) => CommerceMerchantSnapshotV1 | undefined;
+      readFoodServiceSnapshot: (
+        merchantId: string,
+      ) => CommerceFoodServiceSnapshotV1 | undefined;
+      commit: (
+        mutation: ExtensionMutation<FoodServiceMutationCommand>,
+      ) => CommerceMutationResultV1;
+    }>;
 
 type RawCommand = (rawCommand: unknown) => CommerceMutationResultV1;
 
@@ -182,10 +167,7 @@ export type FoodServiceMenus = Readonly<{
       database: CommerceDatabase;
       merchantId: string;
       foodService: CommerceFoodServiceResourcesV1;
-      resources: Pick<
-        CommerceResourcesV1,
-        "offers" | "variants" | "products"
-      >;
+      resources: Pick<CommerceResourcesV1, "offers" | "variants" | "products">;
       salesChannelId: string;
       locationId: string;
       now: string;

@@ -88,6 +88,13 @@ import { errorMessage, isRecord } from "@seams/std";
 import { storedValueRedemption } from "../plugins/stored-value/index.ts";
 import { readManualTender } from "../payments/manual-tender.ts";
 import type { Variant, VariantBy } from "@seams/type-utils";
+import type { MerchantRow } from "./ledger.ts";
+import {
+  beginMerchantCommand,
+  merchantNotFound,
+  staleMerchantRevision,
+  type MerchantCommandPorts,
+} from "./merchant-command.ts";
 import {
   balanceCheckoutOrder,
   orderMatchesAccepted,
@@ -97,12 +104,6 @@ import {
   type AcceptedOrder,
   type RefundCeilings,
 } from "./order-changes.ts";
-
-type AfterSaleMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
 
 export type CancellationReservationPlan = Readonly<{
   order: CommerceOrderV1;
@@ -159,58 +160,50 @@ export type RefundResolutionPlan = RefundResolutionBase &
       }>
   );
 
-type AfterSaleMutationCommand =
-  CancelCommerceOrderV1 | RefundCommerceOrderV1;
+type AfterSaleMutationCommand = CancelCommerceOrderV1 | RefundCommerceOrderV1;
 
 type CancellationPlanResult<Plan> =
   | Readonly<{ kind: "planned"; value: Plan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-type AfterSaleCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  paymentGateway: PaymentRefundGateway;
-  now: () => string;
-  readMerchant: (merchantId: string) => AfterSaleMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: AfterSaleMutationCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: AfterSaleMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commandDigest: (command: AfterSaleMutationCommand) => string;
-  reserveCancellation: (
-    command: CancelCommerceOrderV1,
-    merchant: AfterSaleMerchantRow,
-    plan: CancellationReservationPlan,
-    commandDigest: string,
-  ) => void;
-  resolveCancellation: (
-    command: CancelCommerceOrderV1,
-    merchant: AfterSaleMerchantRow,
-    plan: CancellationResolutionPlan,
-  ) => CommerceMutationResultV1;
-  reserveRefund: (
-    command: RefundCommerceOrderV1,
-    merchant: AfterSaleMerchantRow,
-    plan: RefundReservationPlan,
-    commandDigest: string,
-  ) => void;
-  resolveRefund: (
-    command: RefundCommerceOrderV1,
-    merchant: AfterSaleMerchantRow,
-    plan: RefundResolutionPlan,
-  ) => CommerceMutationResultV1;
-  /** The customer an order belongs to, for a refund to store credit. */
-  customerIdForOrder: (merchantId: string, orderId: string) => string | null;
-}>;
+type AfterSaleCommandAuthorityOptions =
+  MerchantCommandPorts<AfterSaleMutationCommand> &
+    Readonly<{
+      database: CommerceDatabase;
+      paymentGateway: PaymentRefundGateway;
+      now: () => string;
+      readSnapshot: (
+        merchantId: string,
+      ) => CommerceMerchantSnapshotV1 | undefined;
+      commandDigest: (command: AfterSaleMutationCommand) => string;
+      reserveCancellation: (
+        command: CancelCommerceOrderV1,
+        merchant: MerchantRow,
+        plan: CancellationReservationPlan,
+        commandDigest: string,
+      ) => void;
+      resolveCancellation: (
+        command: CancelCommerceOrderV1,
+        merchant: MerchantRow,
+        plan: CancellationResolutionPlan,
+      ) => CommerceMutationResultV1;
+      reserveRefund: (
+        command: RefundCommerceOrderV1,
+        merchant: MerchantRow,
+        plan: RefundReservationPlan,
+        commandDigest: string,
+      ) => void;
+      resolveRefund: (
+        command: RefundCommerceOrderV1,
+        merchant: MerchantRow,
+        plan: RefundResolutionPlan,
+      ) => CommerceMutationResultV1;
+      /** The customer an order belongs to, for a refund to store credit. */
+      customerIdForOrder: (
+        merchantId: string,
+        orderId: string,
+      ) => string | null;
+    }>;
 
 export class AfterSaleCommandAuthority {
   readonly #options: AfterSaleCommandAuthorityOptions;
@@ -220,34 +213,19 @@ export class AfterSaleCommandAuthority {
   }
 
   async cancelOrder(rawCommand: unknown): Promise<CommerceMutationResultV1> {
-    let command: CancelCommerceOrderV1;
-    try {
-      command = parseCancelOrderCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseCancelOrderCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) {
-      await this.#refundOtherPayments(command);
-      return replay;
+    // A replayed cancellation still refunds the other payments.
+    if (start.kind === "replayed") {
+      await this.#refundOtherPayments(start.command);
     }
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") {
+      return start.result;
     }
+    const { command, merchant } = start;
     const digest = this.#options.commandDigest(command);
     const stored = readRefundAttempt(
       this.#options.database,
@@ -334,7 +312,8 @@ export class AfterSaleCommandAuthority {
     const paymentIds = first.resources.payments
       .filter(
         (payment) =>
-          payment.orderId === command.orderId && payment.id !== command.paymentId,
+          payment.orderId === command.orderId &&
+          payment.id !== command.paymentId,
       )
       .map((payment) => payment.id);
     for (const paymentId of paymentIds) {
@@ -392,31 +371,15 @@ export class AfterSaleCommandAuthority {
   }
 
   async refundOrder(rawCommand: unknown): Promise<CommerceMutationResultV1> {
-    let command: RefundCommerceOrderV1;
-    try {
-      command = parseRefundOrderCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseRefundOrderCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") {
+      return start.result;
     }
+    const { command, merchant } = start;
     const digest = this.#options.commandDigest(command);
     const stored = readRefundAttempt(
       this.#options.database,
@@ -593,9 +556,7 @@ export class AfterSaleCommandAuthority {
   }
 
   /** Whether staff took the payment in cash or by bank transfer. */
-  #isManual(
-    command: CancelCommerceOrderV1 | RefundCommerceOrderV1,
-  ): boolean {
+  #isManual(command: CancelCommerceOrderV1 | RefundCommerceOrderV1): boolean {
     return (
       readManualTender(
         this.#options.database,
@@ -735,27 +696,17 @@ export class AfterSaleCommandAuthority {
 
   #reserveNewCancellation(
     command: CancelCommerceOrderV1,
-    merchant: AfterSaleMerchantRow,
+    merchant: MerchantRow,
     digest: string,
   ): RefundAttempt | CommerceMutationResultV1 {
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    const resources = this.#reservationResources(command, merchant);
+    if ("code" in resources) {
+      return this.#options.rejected(resources);
     }
     const reservation = planCancellationReservation(
       this.#options.database,
       command,
-      snapshot.resources,
+      resources,
     );
     if (reservation.kind === "rejected")
       return this.#options.rejected(reservation.error);
@@ -779,7 +730,9 @@ export class AfterSaleCommandAuthority {
         idempotencyKey: command.idempotencyKey,
       });
     }
-    if (isTerminalCommerceState("refund_attempt", stored.attempt.lifecycle.state)) {
+    if (
+      isTerminalCommerceState("refund_attempt", stored.attempt.lifecycle.state)
+    ) {
       throw new Error("Resolved refund attempt is missing its command receipt");
     }
     return stored.attempt;
@@ -787,32 +740,38 @@ export class AfterSaleCommandAuthority {
 
   #reserveNewRefund(
     command: RefundCommerceOrderV1,
-    merchant: AfterSaleMerchantRow,
+    merchant: MerchantRow,
     digest: string,
   ): RefundAttempt | CommerceMutationResultV1 {
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    const resources = this.#reservationResources(command, merchant);
+    if ("code" in resources) {
+      return this.#options.rejected(resources);
     }
     const reservation = planRefundReservation(
       this.#options.database,
       command,
-      snapshot.resources,
+      resources,
     );
     if (reservation.kind === "rejected")
       return this.#options.rejected(reservation.error);
     this.#options.reserveRefund(command, merchant, reservation.value, digest);
     return reservation.value.refundAttempt;
+  }
+
+  // A new reservation plans against the merchant revision that its command
+  // expects.
+  #reservationResources(
+    command: AfterSaleMutationCommand,
+    merchant: MerchantRow,
+  ): CommerceMerchantSnapshotV1["resources"] | CommerceMutationErrorV1 {
+    const stale = staleMerchantRevision(merchant, command);
+    if (stale !== undefined) {
+      return stale;
+    }
+    return (
+      this.#options.readSnapshot(command.merchantId)?.resources ??
+      merchantNotFound(command.merchantId)
+    );
   }
 
   #resumeRefund(
@@ -826,7 +785,9 @@ export class AfterSaleCommandAuthority {
         idempotencyKey: command.idempotencyKey,
       });
     }
-    if (isTerminalCommerceState("refund_attempt", stored.attempt.lifecycle.state)) {
+    if (
+      isTerminalCommerceState("refund_attempt", stored.attempt.lifecycle.state)
+    ) {
       throw new Error("Resolved refund attempt is missing its command receipt");
     }
     return stored.attempt;
@@ -834,7 +795,7 @@ export class AfterSaleCommandAuthority {
 }
 
 function refundReconciliationCommand(
-  merchant: AfterSaleMerchantRow,
+  merchant: MerchantRow,
   attempt: RefundAttempt,
   resources: CommerceResourcesV1,
 ): RefundCommerceOrderV1 | undefined {
@@ -890,7 +851,13 @@ function planCancellationReservation(
     commerceTransition("order", order.lifecycle, "cancel"),
     commerceTransition("payment", payment.lifecycle, "request_refund"),
     ...(fulfillment.kind === "pickup"
-      ? [commerceTransition("pickup_fulfillment", fulfillment.lifecycle, "cancel")]
+      ? [
+          commerceTransition(
+            "pickup_fulfillment",
+            fulfillment.lifecycle,
+            "cancel",
+          ),
+        ]
       : fulfillment.kind === "shipping"
         ? [
             commerceTransition(
@@ -1522,13 +1489,15 @@ function allocateRefund(
   const lineAllocations = [];
   for (const line of order.lineItems) {
     const taken = take(ceilings.lineTotals.get(line.id) ?? 0);
-    if (taken > 0) lineAllocations.push({ orderLineId: line.id, amount: money(taken) });
+    if (taken > 0)
+      lineAllocations.push({ orderLineId: line.id, amount: money(taken) });
   }
   // A line refund already returns the tax that its price included.
   const taxAllocations = [];
   for (const line of order.totals.taxIncluded === true ? [] : order.lineItems) {
     const taken = take(ceilings.lineTaxes.get(line.id) ?? 0);
-    if (taken > 0) taxAllocations.push({ orderLineId: line.id, amount: money(taken) });
+    if (taken > 0)
+      taxAllocations.push({ orderLineId: line.id, amount: money(taken) });
   }
   const firstLine = order.lineItems[0];
   const duty = take(order.totals.duty.amountMinor);

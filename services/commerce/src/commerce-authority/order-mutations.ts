@@ -5,6 +5,7 @@ import {
   writeInventoryAllocation,
 } from "../checkout-persistence.ts";
 import { writeFulfillment } from "../commerce-persistence.ts";
+import type { CommerceDatabase } from "../database.ts";
 import {
   insertReceiptMovement,
   updateInventoryPosition,
@@ -117,59 +118,40 @@ export function orderEditMutation(
   request: OrderEditCommitRequest,
   committedAt: string,
 ): CommerceMutation {
-  const { command, merchant } = request;
-  return {
-    command,
-    merchant,
-    committedAt,
-    commandKind: "edit_order",
-    resource: {
-      kind: "commerce_order",
-      id: request.order.id,
-      revision: request.order.revision,
-    },
-    observations: [
-      orderObservation(request.order),
-      fulfillmentObservation(request.fulfillment),
-      ...request.positions.map(inventoryPositionObservation),
-    ],
-    write: (database) => {
-      writeOrderAfterRevision(
-        database,
-        command.merchantId,
-        request.order,
-        request.previousOrderRevision,
-      );
-      writeFulfillment(database, command.merchantId, request.fulfillment);
-      for (const allocation of request.allocations)
-        writeInventoryAllocation(
-          database,
-          command.merchantId,
-          orderChangeAllocationWrite(allocation),
-          allocation,
-        );
-      for (const position of request.positions)
-        updateInventoryPosition(
-          database,
-          command.merchantId,
-          position.revision - 1,
-          position,
-        );
-      insertOrderChange(database, command.merchantId, request.edit);
-    },
-  };
+  return orderChangeMutation(request, committedAt, "edit_order", (database) =>
+    insertOrderChange(database, request.command.merchantId, request.edit),
+  );
 }
 
 export function orderExchangeMutation(
   request: OrderExchangeCommitRequest,
   committedAt: string,
 ): CommerceMutation {
+  return orderChangeMutation(
+    request,
+    committedAt,
+    "exchange_order_lines",
+    (database) => {
+      insertOrderChange(database, request.command.merchantId, request.exchange);
+      writeReturn(database, request.command.merchantId, request.returnRecord);
+    },
+  );
+}
+
+// An edit or an exchange writes the order, its fulfillment, the stock it
+// moves, and then its own change record.
+function orderChangeMutation(
+  request: OrderEditCommitRequest | OrderExchangeCommitRequest,
+  committedAt: string,
+  commandKind: "edit_order" | "exchange_order_lines",
+  writeChange: (database: CommerceDatabase) => void,
+): CommerceMutation {
   const { command, merchant } = request;
   return {
     command,
     merchant,
     committedAt,
-    commandKind: "exchange_order_lines",
+    commandKind,
     resource: {
       kind: "commerce_order",
       id: request.order.id,
@@ -202,8 +184,7 @@ export function orderExchangeMutation(
           position.revision - 1,
           position,
         );
-      insertOrderChange(database, command.merchantId, request.exchange);
-      writeReturn(database, command.merchantId, request.returnRecord);
+      writeChange(database);
     },
   };
 }

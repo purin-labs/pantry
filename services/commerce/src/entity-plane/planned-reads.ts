@@ -51,7 +51,7 @@ import {
   readRelationshipTraversalStep,
 } from "./commerce-relationship-relation.ts";
 import { listRelationshipDefinitions } from "./relationships.ts";
-import { parseSnapshotRevision } from "./parsers.ts";
+import { parseSnapshotRevision, parsePositiveText } from "./parsers.ts";
 import type {
   EntityPlaneQueryRequest,
   EntityPlaneSystemExtensionRequest,
@@ -1538,18 +1538,6 @@ function sameRef(left: CommerceEntityRef, right: CommerceEntityRef): boolean {
     left.typeId === right.typeId &&
     left.entityId === right.entityId
   );
-}
-
-function parsePositiveText<T extends string>(value: unknown, field: string): T {
-  if (typeof value !== "string" || value.length === 0 || value !== value.trim())
-    throw new Error(`${field} must be normalized text`);
-  if (!isPositiveText<T>(value))
-    throw new Error(`${field} must be normalized text`);
-  return value;
-}
-
-function isPositiveText<T extends string>(value: string): value is T {
-  return value.length > 0 && value === value.trim();
 }
 
 function buildNativePlanRequest(

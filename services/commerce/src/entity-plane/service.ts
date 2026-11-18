@@ -53,6 +53,7 @@ import {
   parseEntityPlaneQueryRequest,
   parseSavedCommerceView,
   parseSnapshotRevision,
+  parsePositiveText,
 } from "./parsers.ts";
 import {
   EXPORT_COORDINATION_PRESET,
@@ -81,6 +82,7 @@ import {
 import {
   EntityPlaneSettlement,
   type EntityPlaneMutationRequest,
+  rejected,
 } from "./receipt-outbox-settlement.ts";
 import { SchemaCommandHandler } from "./schema-commands.ts";
 import { EntityMutationHandler } from "./entity-mutations.ts";
@@ -237,7 +239,10 @@ export class EntityPlaneService {
     const published = readMerchant(this.#database, request.merchantId);
     if (published === undefined)
       throw new EntityPlaneHttpError(404, "Merchant not found");
-    const organisationId = parsePositiveText<OrganisationId>(request.organisationId, "organisationId");
+    const organisationId = parsePositiveText<OrganisationId>(
+      request.organisationId,
+      "organisationId",
+    );
     const merchantId = parsePositiveText<CommerceMerchantId>(
       request.merchantId,
       "merchantId",
@@ -790,10 +795,6 @@ function assertAcceptedPresetCommand(
     );
 }
 
-function rejected(error: CommerceEntityPlaneError): CommerceCommandResult {
-  return { status: "rejected", error };
-}
-
 function commandAuthorityError(reason: string): CommerceEntityPlaneError {
   switch (reason) {
     case "authority_expired":
@@ -821,16 +822,4 @@ function authorityValidationReason(error: unknown): string | undefined {
   return error.message.startsWith(prefix)
     ? error.message.slice(prefix.length)
     : undefined;
-}
-
-function parsePositiveText<T extends string>(value: unknown, field: string): T {
-  if (typeof value !== "string" || value.length === 0 || value !== value.trim())
-    throw new Error(`${field} must be normalized text`);
-  if (!isPositiveText<T>(value))
-    throw new Error(`${field} must be normalized text`);
-  return value;
-}
-
-function isPositiveText<T extends string>(value: string): value is T {
-  return value.length > 0 && value === value.trim();
 }

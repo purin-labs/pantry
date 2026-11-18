@@ -3,51 +3,40 @@ import {
   type CompleteProductionBatchCommand,
   type CommerceFoodServiceSnapshotV1,
   type CommerceMerchantSnapshotV1,
-  type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
 } from "@seams/commerce-client";
 import type { CommerceDatabase } from "../../database.ts";
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  beginSnapshotCommand,
+  merchantNotFound,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 import {
   planProductionBatch,
   type ProductionBatchPlan,
   type ProductionBatchPlanResult,
 } from "./production.ts";
 
-export type ProductionMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 export type ProductionCommitRequest = Readonly<{
   kind: "production_batch";
   command: CompleteProductionBatchCommand;
-  merchant: ProductionMerchantRow;
+  merchant: MerchantRow;
   plan: ProductionBatchPlan;
 }>;
 
-type ProductionCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  readMerchant: (merchantId: string) => ProductionMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readFoodServiceSnapshot: (
-    merchantId: string,
-  ) => CommerceFoodServiceSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CompleteProductionBatchCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: ProductionCommitRequest) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: ProductionMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-}>;
+type ProductionCommandAuthorityOptions =
+  MerchantCommandPorts<CompleteProductionBatchCommand> &
+    Readonly<{
+      database: CommerceDatabase;
+      readSnapshot: (
+        merchantId: string,
+      ) => CommerceMerchantSnapshotV1 | undefined;
+      readFoodServiceSnapshot: (
+        merchantId: string,
+      ) => CommerceFoodServiceSnapshotV1 | undefined;
+      commit: (request: ProductionCommitRequest) => CommerceMutationResultV1;
+    }>;
 
 export class ProductionCommandAuthority {
   readonly #options: ProductionCommandAuthorityOptions;
@@ -57,46 +46,19 @@ export class ProductionCommandAuthority {
   }
 
   completeProductionBatch(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CompleteProductionBatchCommand;
-    try {
-      command = parseCompleteProductionBatchCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseCompleteProductionBatchCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const foodService = this.#options.readFoodServiceSnapshot(
       command.merchantId,
     );
-    if (snapshot === undefined || foodService === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (foodService === undefined) {
+      return this.#options.rejected(merchantNotFound(command.merchantId));
     }
     const existing = foodService.resources.productionBatches.find(
       (batch) => batch.productionBatchId === command.productionBatchId,

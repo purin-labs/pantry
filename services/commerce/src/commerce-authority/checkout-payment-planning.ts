@@ -26,6 +26,7 @@ import {
   type MarkCommerceDraftOrderPaidV1,
   type PlaceCommerceDraftOrderOnTermsV1,
   type CommerceCompanyInvoiceV1,
+  type CommercePaymentCaptureResultV1,
 } from "@seams/commerce-client";
 import {
   commerceTransition,
@@ -224,8 +225,7 @@ type CheckoutExpirationPlanResult =
 
 export function planCheckoutPaymentStart(
   command:
-    | BeginCommerceCheckoutPaymentV1
-    | CollectCommerceInPersonCheckoutPaymentV1,
+    BeginCommerceCheckoutPaymentV1 | CollectCommerceInPersonCheckoutPaymentV1,
   checkout: Checkout | undefined,
   currentOfferRevision: (offerId: string) => number | undefined,
   currentOrderRevision: (orderId: string) => number | undefined,
@@ -377,28 +377,30 @@ export function existingPlacementResource(
     kind: string;
     id: string;
     resources: readonly Readonly<{ id: string }>[];
-  }>[] = balance ? [payment] : [
-    {
-      kind: "commerce_order",
-      id: command.orderId,
-      resources: resources.orders,
-    },
-    payment,
-    {
-      kind: "fulfillment",
-      id: command.fulfillmentId,
-      resources: resources.fulfillments,
-    },
-    ...(command.placement.kind === "shipping"
-      ? [
-          {
-            kind: "shipment",
-            id: command.placement.shipmentId,
-            resources: resources.shipments,
-          },
-        ]
-      : []),
-  ];
+  }>[] = balance
+    ? [payment]
+    : [
+        {
+          kind: "commerce_order",
+          id: command.orderId,
+          resources: resources.orders,
+        },
+        payment,
+        {
+          kind: "fulfillment",
+          id: command.fulfillmentId,
+          resources: resources.fulfillments,
+        },
+        ...(command.placement.kind === "shipping"
+          ? [
+              {
+                kind: "shipment",
+                id: command.placement.shipmentId,
+                resources: resources.shipments,
+              },
+            ]
+          : []),
+      ];
   for (const candidate of candidates) {
     if (findResource(candidate.resources, candidate.id) !== undefined) {
       return {
@@ -978,7 +980,11 @@ function planBalancePlacement(
   const order = findResource(resources.orders, command.orderId);
   if (order === undefined)
     return placementRejected("checkout.orderBalance.order");
-  const payBalance = commerceTransition("order", order.lifecycle, "pay_balance");
+  const payBalance = commerceTransition(
+    "order",
+    order.lifecycle,
+    "pay_balance",
+  );
   if (!payBalance.allowed)
     return { kind: "rejected", error: payBalance.refusal };
   const payment = parsePayment({
@@ -1049,9 +1055,7 @@ function parseShippingFulfillment(
   return fulfillment;
 }
 
-function parseFirstPartyShipment(
-  value: unknown,
-): CommerceFirstPartyShipmentV1 {
+function parseFirstPartyShipment(value: unknown): CommerceFirstPartyShipmentV1 {
   const shipment = parseShipment(value);
   if (shipment.kind !== "first_party") {
     throw new Error("First-party shipment parser returned a different branch");
@@ -1441,6 +1445,28 @@ function allocationTransferRejected(field: string): AllocationTransferResult {
     kind: "rejected",
     error: { code: "resource_relationship_invalid", field },
   };
+}
+
+/** The resolution that a provider answer other than a capture records. */
+export function providerResolutionOutcome(
+  provider: Exclude<
+    CommercePaymentCaptureResultV1,
+    Readonly<{ kind: "captured" }>
+  >,
+): ResolveCommerceCheckoutPaymentV1["outcome"] {
+  return provider.kind === "declined"
+    ? { kind: "declined", reasonCode: provider.reason }
+    : provider.kind === "processing"
+      ? {
+          kind: "processing",
+          reasonCode: provider.reason,
+          reconcileAfter: provider.reconcileAfter,
+        }
+      : {
+          kind: "indeterminate",
+          reasonCode: provider.reason,
+          reconcileAfter: provider.reconcileAfter,
+        };
 }
 
 export function planCheckoutPaymentResolution(

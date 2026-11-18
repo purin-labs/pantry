@@ -1041,6 +1041,13 @@ export function parsePositiveRevision<T extends number>(
   return brandedRevision<T>(value, field);
 }
 
+export function parsePositiveText<T extends string>(
+  value: unknown,
+  field: string,
+): T {
+  return brandedText<T>(value, field);
+}
+
 function isRevision<T extends number>(value: number): value is T {
   return Number.isSafeInteger(value) && value > 0;
 }

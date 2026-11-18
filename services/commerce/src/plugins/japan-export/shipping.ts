@@ -2,7 +2,7 @@
 // Post to Singapore and to the Australian, US and EU zones of a general
 // international route. All rates, taxes, duties and labels are test
 // fixtures; no carrier or tax service is called.
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 import type {
   DutyIncoterm,
@@ -23,6 +23,10 @@ import {
   type CarrierRateQuoteProviderRequest,
   type CarrierRateQuoteProviderResult,
 } from "../../checkout-carrier-rate-provider.ts";
+import {
+  sha256,
+  timestampAfter,
+} from "../../commerce-authority/checkout-shared.ts";
 import type {
   DutyQuoteProviderRequest,
   InternationalDutyQuoteProviderRequest,
@@ -404,10 +408,7 @@ function quoteJapanShippingRoute(
   );
   const packageInput = request.lines.map(packageDigestLine);
   const packagePlanDigest = sha256(JSON.stringify(packageInput));
-  const expiresAt = timestampAfterSeconds(
-    request.quotedAt,
-    request.quoteTtlSeconds,
-  );
+  const expiresAt = timestampAfter(request.quotedAt, request.quoteTtlSeconds);
   const destinationCountry = request.addressAuthority.address.countryCode;
   const carrierRateRequest = carrierRateProviderRequest(
     request,
@@ -939,7 +940,7 @@ function quoteJapanShippingLabelRate(
       amount: { amountMinor: route.labelAmountMinor, currency: "JPY" },
       packagePlanDigest: input.packagePlanDigest,
       quotedAt: input.quotedAt,
-      expiresAt: timestampAfterSeconds(input.quotedAt, 900),
+      expiresAt: timestampAfter(input.quotedAt, 900),
     },
   };
 }
@@ -1115,14 +1116,6 @@ function validateJapanAddress(
     return "shippingAddress.administrativeArea";
   if (address.locality.length === 0) return "shippingAddress.locality";
   return undefined;
-}
-
-function timestampAfterSeconds(timestamp: string, seconds: number): string {
-  return new Date(Date.parse(timestamp) + seconds * 1_000).toISOString();
-}
-
-function sha256(value: string): string {
-  return createHash("sha256").update(value).digest("hex");
 }
 
 function hmac(value: string, key: string): string {

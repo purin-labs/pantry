@@ -30,16 +30,15 @@ import {
   sha256,
   variantIsSellable,
 } from "../../commerce-authority/checkout-shared.ts";
-
-export type DraftOrderMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  beginMerchantCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 
 export type DraftOrderCommitRequest = Readonly<{
   command: CommerceDraftOrderCommandV1;
-  merchant: DraftOrderMerchantRow;
+  merchant: MerchantRow;
   draft: CommerceDraftOrderV1;
   /** A new buyer email, which the commit seals in a customer record. */
   buyerEmail: string | undefined;
@@ -51,67 +50,56 @@ type DraftOrderBuyers = Readonly<{
   customerEmail: (merchantId: string, customerId: string) => string | null;
 }>;
 
-type DraftOrderCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => DraftOrderMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command:
-      | CommerceDraftOrderCommandV1
-      | MarkCommerceDraftOrderPaidV1
-      | PlaceCommerceDraftOrderOnTermsV1,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: DraftOrderCommitRequest) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: DraftOrderMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  buyers: DraftOrderBuyers;
-  createDraftCheckout: (
-    input: Readonly<{
-      claims: BuyerCheckoutProfileClaims;
-      draft: CommerceDraftOrderV1;
-      buyerEmail: string;
-      checkoutId: string;
-    }>,
-  ) => DraftInvoiceCheckout;
-  readBuyerQuotedCheckout: (
-    merchantId: string,
-    checkoutId: string,
-    sessionId: string,
-  ) => CommerceBuyerQuotedCheckoutV1 | undefined;
-  /**
-   * The checkout terms that a staff checkout of the storefront's draft uses,
-   * or undefined while the storefront has no active checkout profile.
-   */
-  draftCheckoutClaims: (
-    merchantId: string,
-    storefrontId: string,
-    sessionId: string,
-  ) => BuyerCheckoutProfileClaims | undefined;
-  /**
-   * Places the draft's quoted checkout with the staff command's tender, or
-   * on the company terms that a placement on terms names.
-   */
-  placeManually: (
-    command:
-      MarkCommerceDraftOrderPaidV1 | PlaceCommerceDraftOrderOnTermsV1,
-    checkoutId: string,
-    terms?: Readonly<{ companyId: string; netDays: number }>,
-  ) => CommerceMutationResultV1;
-  /** The invoice terms of the draft buyer's company, or undefined. */
-  termsOf: (
-    merchantId: string,
-    customerId: string | null,
-  ) => Readonly<{ companyId: string; netDays: number }> | undefined;
-}>;
+type DraftOrderCommandAuthorityOptions = MerchantCommandPorts<
+  | CommerceDraftOrderCommandV1
+  | MarkCommerceDraftOrderPaidV1
+  | PlaceCommerceDraftOrderOnTermsV1
+> &
+  Readonly<{
+    database: CommerceDatabase;
+    now: () => string;
+    readSnapshot: (
+      merchantId: string,
+    ) => CommerceMerchantSnapshotV1 | undefined;
+    commit: (request: DraftOrderCommitRequest) => CommerceMutationResultV1;
+    buyers: DraftOrderBuyers;
+    createDraftCheckout: (
+      input: Readonly<{
+        claims: BuyerCheckoutProfileClaims;
+        draft: CommerceDraftOrderV1;
+        buyerEmail: string;
+        checkoutId: string;
+      }>,
+    ) => DraftInvoiceCheckout;
+    readBuyerQuotedCheckout: (
+      merchantId: string,
+      checkoutId: string,
+      sessionId: string,
+    ) => CommerceBuyerQuotedCheckoutV1 | undefined;
+    /**
+     * The checkout terms that a staff checkout of the storefront's draft uses,
+     * or undefined while the storefront has no active checkout profile.
+     */
+    draftCheckoutClaims: (
+      merchantId: string,
+      storefrontId: string,
+      sessionId: string,
+    ) => BuyerCheckoutProfileClaims | undefined;
+    /**
+     * Places the draft's quoted checkout with the staff command's tender, or
+     * on the company terms that a placement on terms names.
+     */
+    placeManually: (
+      command: MarkCommerceDraftOrderPaidV1 | PlaceCommerceDraftOrderOnTermsV1,
+      checkoutId: string,
+      terms?: Readonly<{ companyId: string; netDays: number }>,
+    ) => CommerceMutationResultV1;
+    /** The invoice terms of the draft buyer's company, or undefined. */
+    termsOf: (
+      merchantId: string,
+      customerId: string | null,
+    ) => Readonly<{ companyId: string; netDays: number }> | undefined;
+  }>;
 
 export type DraftInvoiceCheckout =
   | Readonly<{ kind: "created"; checkout: CommerceBuyerQuotedCheckoutV1 }>
@@ -250,25 +238,13 @@ export class DraftOrderCommandAuthority {
    * checkout, or a new one at the draft's prices, becomes the order.
    */
   markDraftOrderPaid(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: MarkCommerceDraftOrderPaidV1;
-    try {
-      command = parseMarkDraftOrderPaidCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseMarkDraftOrderPaidCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
+    if (start.kind !== "ready") return start.result;
+    const { command } = start;
     const checkoutId = this.#manualPaymentCheckout(command);
     return typeof checkoutId === "string"
       ? this.#options.placeManually(command, checkoutId)
@@ -280,25 +256,13 @@ export class DraftOrderCommandAuthority {
    * terms: the order is placed now and its invoice is due later.
    */
   placeDraftOrderOnTerms(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: PlaceCommerceDraftOrderOnTermsV1;
-    try {
-      command = parsePlaceDraftOrderOnTermsCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parsePlaceDraftOrderOnTermsCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
+    if (start.kind !== "ready") return start.result;
+    const { command } = start;
     const draft = this.#read(command.merchantId, command.draftOrderId);
     const terms =
       draft === undefined
@@ -418,8 +382,7 @@ export class DraftOrderCommandAuthority {
   // while its prices hold, or a new one. A checkout that a buyer is paying by
   // card is returned too, and the checkout machine refuses it.
   #manualPaymentCheckout(
-    command:
-      MarkCommerceDraftOrderPaidV1 | PlaceCommerceDraftOrderOnTermsV1,
+    command: MarkCommerceDraftOrderPaidV1 | PlaceCommerceDraftOrderOnTermsV1,
   ): string | CommerceMutationErrorV1 {
     const { merchantId } = command;
     const draft = this.#current(
@@ -464,10 +427,7 @@ export class DraftOrderCommandAuthority {
       : created.checkout.checkoutId;
   }
 
-  #buyerEmail(
-    merchantId: string,
-    draft: CommerceDraftOrderV1,
-  ): string | null {
+  #buyerEmail(merchantId: string, draft: CommerceDraftOrderV1): string | null {
     return draft.buyer.customerId === null
       ? draft.buyer.email
       : this.#options.buyers.customerEmail(merchantId, draft.buyer.customerId);
@@ -497,34 +457,11 @@ export class DraftOrderCommandAuthority {
   #run<TCommand extends CommerceDraftOrderCommandV1>(
     rawCommand: unknown,
     parse: (value: unknown) => TCommand,
-    plan: (
-      command: TCommand,
-    ) => CommerceDraftOrderV1 | CommerceMutationErrorV1,
+    plan: (command: TCommand) => CommerceDraftOrderV1 | CommerceMutationErrorV1,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    const start = beginMerchantCommand(this.#options, rawCommand, parse);
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const buyerEmail = "buyer" in command ? command.buyer.email : undefined;
     // The buyer's email lives only in a sealed customer record.
     if (buyerEmail !== undefined && !this.#options.buyers.sealsBuyers)

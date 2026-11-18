@@ -4,6 +4,7 @@ import {
   type CommerceBuyerQuotedShippingCheckoutV1,
   checkoutOnlineSource,
 } from "@seams/commerce-client";
+import type { Checkout } from "@seams/commerce-contracts";
 import { buyerSessionDigest } from "../../buyer-session.ts";
 import {
   readCart,
@@ -18,7 +19,7 @@ import {
   toBuyerQuotedShippingCheckout,
   toBuyerRecoverableQuote,
 } from "./quote-views.ts";
-import { timestampBefore } from "./shared.ts";
+import { timestampBefore } from "../checkout-shared.ts";
 import type {
   BuyerCheckoutProfileClaims,
   BuyerCheckoutRecovery,
@@ -34,26 +35,15 @@ export abstract class BuyerQuoteStage extends BuyerCartStage {
     checkoutId: string,
     sessionId: string,
   ): CommerceBuyerQuotedCheckoutV1 | undefined {
-    const checkout = readCheckout(
-      this.options.database,
+    const checkout = this.#liveQuote(
       merchantId,
       checkoutId,
+      sessionId,
+      "pickup",
     );
-    if (
-      checkout === undefined ||
-      checkoutOnlineSource(checkout)?.buyerSessionDigest !==
-        buyerSessionDigest(sessionId) ||
-      checkout.lifecycle.state !== "quoted" ||
-      !timestampBefore(
-        this.options.now(),
-        checkout.lifecycle.quote.expiresAt,
-      ) ||
-      checkout.lifecycle.quote.lines.length === 0 ||
-      checkout.lifecycle.quote.fulfillment.kind !== "pickup"
-    ) {
-      return undefined;
-    }
-    return toBuyerQuotedPickupCheckout(checkout);
+    return checkout === undefined
+      ? undefined
+      : toBuyerQuotedPickupCheckout(checkout);
   }
 
   readBuyerQuotedShippingCheckout(
@@ -61,6 +51,25 @@ export abstract class BuyerQuoteStage extends BuyerCartStage {
     checkoutId: string,
     sessionId: string,
   ): CommerceBuyerQuotedShippingCheckoutV1 | undefined {
+    const checkout = this.#liveQuote(
+      merchantId,
+      checkoutId,
+      sessionId,
+      "shipping",
+    );
+    return checkout === undefined
+      ? undefined
+      : toBuyerQuotedShippingCheckout(checkout);
+  }
+
+  // The session's checkout while its quote, with lines and the fulfillment,
+  // has not expired.
+  #liveQuote(
+    merchantId: string,
+    checkoutId: string,
+    sessionId: string,
+    fulfillment: "pickup" | "shipping",
+  ): Checkout | undefined {
     const checkout = readCheckout(
       this.options.database,
       merchantId,
@@ -76,11 +85,11 @@ export abstract class BuyerQuoteStage extends BuyerCartStage {
         checkout.lifecycle.quote.expiresAt,
       ) ||
       checkout.lifecycle.quote.lines.length === 0 ||
-      checkout.lifecycle.quote.fulfillment.kind !== "shipping"
+      checkout.lifecycle.quote.fulfillment.kind !== fulfillment
     ) {
       return undefined;
     }
-    return toBuyerQuotedShippingCheckout(checkout);
+    return checkout;
   }
 
   readBuyerRecoverableCheckout(

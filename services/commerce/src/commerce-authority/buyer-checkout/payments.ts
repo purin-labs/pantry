@@ -168,6 +168,20 @@ export function buyerPaymentIdentityDigest(
   );
 }
 
+/** An attempt under the payment's key that binds another checkout quote. */
+export function buyerPaymentAttemptConflicts(
+  attempt: CheckoutPaymentAttempt | undefined,
+  checkoutId: string,
+  command: Readonly<{ checkoutRevision: number; quoteDigest: string }>,
+): boolean {
+  return (
+    attempt !== undefined &&
+    (attempt.binding.checkoutId !== checkoutId ||
+      attempt.binding.checkoutRevision !== command.checkoutRevision ||
+      attempt.binding.quoteDigest !== command.quoteDigest)
+  );
+}
+
 export function buyerPaymentAttemptResult(
   checkout: Checkout | undefined,
   attempt: CheckoutPaymentAttempt | undefined,

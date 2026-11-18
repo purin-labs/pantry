@@ -7,6 +7,7 @@ import {
   type CommercePreparationTicketV1,
 } from "@seams/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
+import { requireIdentity } from "./command-guards.ts";
 import type { CommerceSigner } from "./contracts.ts";
 import {
   listFulfillments,
@@ -211,18 +212,10 @@ export class CommerceSnapshotReader {
     );
   }
 
-  readFoodServiceResources(
-    merchantId: string,
-  ): CommerceFoodServiceResourcesV1 {
+  readFoodServiceResources(merchantId: string): CommerceFoodServiceResourcesV1 {
     return readFoodServiceResources(
       this.#options.database,
       requireIdentity(merchantId, "merchantId"),
     );
   }
-}
-
-function requireIdentity(value: string, field: string): string {
-  if (value.length === 0 || value !== value.trim())
-    throw new Error(`${field} must be normalized text`);
-  return value;
 }

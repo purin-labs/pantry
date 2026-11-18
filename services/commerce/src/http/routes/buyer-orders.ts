@@ -5,6 +5,10 @@ import {
 } from "@seams/commerce-client";
 import type { BuyerRoute } from "../../http-routes.ts";
 import { errorMessage } from "@seams/std";
+import {
+  verifyDraftInvoiceAccess,
+  verifyOrderRecoveryAccess,
+} from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { bearerToken, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
@@ -14,22 +18,9 @@ export async function openDraftInvoiceRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "open_draft_invoice" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const invoice =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verifyDraftInvoice(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          draftOrderId: route.draftOrderId,
-        });
-  if (!invoice.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const invoice = verifyDraftInvoiceAccess(ctx, request, route);
+  if (!invoice.ok) return invoice.response;
+  const { context } = invoice;
   const draft = ctx.authority.readInvoicedDraft(
     route.merchantId,
     route.storefrontId,
@@ -82,23 +73,8 @@ export async function requestBuyerReturnRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "request_buyer_return" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const recovery =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verifyOrderRecovery(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-          checkoutId: route.checkoutId,
-        });
-  if (!recovery.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const recovery = verifyOrderRecoveryAccess(ctx, request, route);
+  if (!recovery.ok) return recovery.response;
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   let command;
@@ -147,23 +123,9 @@ export async function openBuyerOrderBalanceRoute(
   request: Request,
   route: Extract<BuyerRoute, { kind: "open_buyer_order_balance" }>,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  const recovery =
-    token === undefined
-      ? { ok: false as const }
-      : ctx.buyerSessions.verifyOrderRecovery(token, {
-          merchantId: route.merchantId,
-          storefrontId: route.storefrontId,
-          storefrontRevision: context.storefront.revision,
-          checkoutId: route.checkoutId,
-        });
-  if (!recovery.ok) return jsonResponse(401, { message: "Unauthorized" });
+  const recovery = verifyOrderRecoveryAccess(ctx, request, route);
+  if (!recovery.ok) return recovery.response;
+  const { context } = recovery;
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   try {

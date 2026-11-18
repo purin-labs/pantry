@@ -31,11 +31,13 @@ import {
   parseEntityRef,
   parseEntityTypeId,
   parsePositiveRevision,
+  parsePositiveText,
 } from "./parsers.ts";
 import {
   commandJson,
   EntityPlaneSettlement,
   type CommandRequest,
+  rejected,
 } from "./receipt-outbox-settlement.ts";
 import { findEntity } from "./relationships.ts";
 import {
@@ -310,30 +312,9 @@ export class CommerceLists {
     previousRevision: number,
   ): CommerceCommandResult {
     const command = request.command.command;
-    const entry = this.readEntry(
-      request.merchantId,
-      command.target.entry.entryId,
-    );
-    if (
-      entry === undefined ||
-      entry.lifecycleState !== "active" ||
-      entry.listId !== String(command.target.entry.listId)
-    ) {
-      return rejected({ code: "not_found" });
-    }
-    if (entry.revision !== Number(command.target.entry.revision)) {
-      return rejected({
-        code: "revision_conflict",
-        expected: BigInt(command.target.entry.revision),
-        received: BigInt(entry.revision),
-      });
-    }
-    if (entry.revision !== Number(command.target.expectedRevision)) {
-      return rejected({
-        code: "revision_conflict",
-        expected: BigInt(command.target.expectedRevision),
-        received: BigInt(entry.revision),
-      });
+    const entry = this.#targetEntry(request.merchantId, command.target);
+    if ("code" in entry) {
+      return rejected(entry);
     }
     const list = this.readList(
       request.merchantId,
@@ -452,30 +433,9 @@ export class CommerceLists {
     previousRevision: number,
   ): CommerceCommandResult {
     const command = request.command.command;
-    const entry = this.readEntry(
-      request.merchantId,
-      command.target.entry.entryId,
-    );
-    if (
-      entry === undefined ||
-      entry.lifecycleState !== "active" ||
-      entry.listId !== String(command.target.entry.listId)
-    ) {
-      return rejected({ code: "not_found" });
-    }
-    if (entry.revision !== Number(command.target.entry.revision)) {
-      return rejected({
-        code: "revision_conflict",
-        expected: BigInt(command.target.entry.revision),
-        received: BigInt(entry.revision),
-      });
-    }
-    if (entry.revision !== Number(command.target.expectedRevision)) {
-      return rejected({
-        code: "revision_conflict",
-        expected: BigInt(command.target.expectedRevision),
-        received: BigInt(entry.revision),
-      });
+    const entry = this.#targetEntry(request.merchantId, command.target);
+    if ("code" in entry) {
+      return rejected(entry);
     }
     const revision = parsePositiveRevision<CommerceListEntryRevision>(
       entry.revision + 1,
@@ -542,6 +502,39 @@ export class CommerceLists {
       >(merchantId, listId);
     if (row === undefined) return undefined;
     return { ...row, entityTypeId: parseStoredEntityTypeId(row.entityTypeId) };
+  }
+
+  // The active entry that a patch or a removal names, at the revision that
+  // the command names twice.
+  #targetEntry(
+    merchantId: string,
+    target:
+      | CommandRequest<"patch_commerce_list_entry">["command"]["command"]["target"]
+      | CommandRequest<"remove_commerce_list_entry">["command"]["command"]["target"],
+  ): StoredListEntryRow | CommerceEntityPlaneError {
+    const entry = this.readEntry(merchantId, target.entry.entryId);
+    if (
+      entry === undefined ||
+      entry.lifecycleState !== "active" ||
+      entry.listId !== String(target.entry.listId)
+    ) {
+      return { code: "not_found" };
+    }
+    if (entry.revision !== Number(target.entry.revision)) {
+      return {
+        code: "revision_conflict",
+        expected: BigInt(target.entry.revision),
+        received: BigInt(entry.revision),
+      };
+    }
+    if (entry.revision !== Number(target.expectedRevision)) {
+      return {
+        code: "revision_conflict",
+        expected: BigInt(target.expectedRevision),
+        received: BigInt(entry.revision),
+      };
+    }
+    return entry;
   }
 
   readEntry(
@@ -757,25 +750,4 @@ function timestampMillis(value: string, field: string): number {
     throw new Error(`${field} must be a non-negative millisecond timestamp`);
   }
   return milliseconds;
-}
-
-function parsePositiveText<T extends string>(value: unknown, field: string): T {
-  if (
-    typeof value !== "string" ||
-    value.length === 0 ||
-    value !== value.trim()
-  ) {
-    throw new Error(`${field} must be normalized text`);
-  }
-  if (!isPositiveText<T>(value))
-    throw new Error(`${field} must be normalized text`);
-  return value;
-}
-
-function isPositiveText<T extends string>(value: string): value is T {
-  return value.length > 0 && value === value.trim();
-}
-
-function rejected(error: CommerceEntityPlaneError): CommerceCommandResult {
-  return { status: "rejected", error };
 }

@@ -17,7 +17,7 @@ import {
   type PatisserieItem,
   type PatisserieMenuSetupResult,
 } from "@seams/commerce-client";
-import { pathToFileURL } from "node:url";
+import { isMainModule } from "./merchant-script.ts";
 
 export {
   PATISSERIE_ITEMS,
@@ -41,7 +41,7 @@ type SetupArguments = Readonly<{
   serviceToken: string;
 }>;
 
-if (isMainModule()) await main();
+if (isMainModule(import.meta.url)) await main();
 
 async function main(): Promise<void> {
   const arguments_ = parseArguments(process.argv.slice(2), process.env);
@@ -76,14 +76,6 @@ async function main(): Promise<void> {
           arguments_.includedTax,
         );
   process.stdout.write(`${JSON.stringify({ ...menu, tax }, null, 2)}\n`);
-}
-
-function isMainModule(): boolean {
-  const scriptPath = process.argv[1];
-  return (
-    scriptPath !== undefined &&
-    import.meta.url === pathToFileURL(scriptPath).href
-  );
 }
 
 function parseArguments(

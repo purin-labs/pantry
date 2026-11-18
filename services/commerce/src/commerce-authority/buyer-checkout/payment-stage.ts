@@ -20,14 +20,14 @@ import {
   readUnplacedCapture,
 } from "../../payments/unplaced-captures.ts";
 import { readProfile } from "../../checkout-profile-persistence.ts";
-import { amountDue } from "../checkout-shared.ts";
+import { amountDue, timestampAfter } from "../checkout-shared.ts";
 import { balanceCheckoutOrder } from "../order-changes.ts";
 import {
   buyerCheckoutCanStartPayment,
+  buyerPaymentAttemptConflicts,
   buyerPaymentIdentityDigest,
 } from "./payments.ts";
 import { orderBuyer } from "./placements.ts";
-import { timestampAfter } from "./shared.ts";
 import type {
   BuyerCheckoutProfileClaims,
   BuyerPaymentSessionResult,
@@ -83,11 +83,11 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
       paymentAttemptId,
     );
     if (
-      paymentAttempt !== undefined &&
-      (paymentAttempt.binding.checkoutId !== input.checkoutId ||
-        paymentAttempt.binding.checkoutRevision !==
-          input.command.checkoutRevision ||
-        paymentAttempt.binding.quoteDigest !== input.command.quoteDigest)
+      buyerPaymentAttemptConflicts(
+        paymentAttempt,
+        input.checkoutId,
+        input.command,
+      )
     ) {
       return {
         kind: "rejected",

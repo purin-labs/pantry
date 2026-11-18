@@ -3,18 +3,19 @@ import {
   type CommerceClientResult,
   type CommerceMutationResultV1,
 } from "@seams/commerce-client";
-import { pathToFileURL } from "node:url";
+import {
+  clientFailure,
+  isMainModule,
+  parseMerchantScriptArguments,
+  type MerchantScriptArguments,
+} from "./merchant-script.ts";
 
 const OCCURRED_AT = "2026-08-14T09:30:00.000Z";
 
-type RebuildArguments = Readonly<{
-  organisationId: string;
-  merchantId: string;
-  baseUrl: string;
-  serviceToken: string;
-}>;
-
-type RebuildIdentity = Pick<RebuildArguments, "organisationId" | "merchantId">;
+type RebuildIdentity = Pick<
+  MerchantScriptArguments,
+  "organisationId" | "merchantId"
+>;
 export type Plan22Phase1CafeRebuildResult = Readonly<{
   ok: true;
   organisationId: string;
@@ -29,7 +30,7 @@ export type Plan22Phase1CafeRebuildResult = Readonly<{
   pendingDeliveries: number;
 }>;
 
-if (isMainModule()) await main();
+if (isMainModule(import.meta.url)) await main();
 
 export async function rebuildPhase1Cafe(
   adminClient: CommerceAdminClient,
@@ -173,21 +174,17 @@ export async function rebuildPhase1Cafe(
 }
 
 async function main(): Promise<void> {
-  const arguments_ = parseArguments(process.argv.slice(2), process.env);
+  const arguments_ = parseMerchantScriptArguments(
+    "rebuild:plan22-phase1-cafe",
+    process.argv.slice(2),
+    process.env,
+  );
   const adminClient = new CommerceAdminClient({
     baseUrl: arguments_.baseUrl,
     serviceToken: arguments_.serviceToken,
   });
   const result = await rebuildPhase1Cafe(adminClient, arguments_);
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-}
-
-function isMainModule(): boolean {
-  const scriptPath = process.argv[1];
-  return (
-    scriptPath !== undefined &&
-    import.meta.url === pathToFileURL(scriptPath).href
-  );
 }
 
 async function requireApplied(
@@ -199,79 +196,4 @@ async function requireApplied(
   if (result.value.outcome === "rejected") {
     throw new Error(`${operation} rejected: ${result.value.error.code}`);
   }
-}
-
-function clientFailure(
-  operation: string,
-  result: Readonly<{
-    ok: false;
-    error: Readonly<{ kind: string; message: string }>;
-  }>,
-): Error {
-  return new Error(
-    `${operation} failed: ${result.error.kind}: ${result.error.message}`,
-  );
-}
-
-function parseArguments(
-  argv: readonly string[],
-  env: NodeJS.ProcessEnv,
-): RebuildArguments {
-  const values = new Map<string, string>();
-  const start = argv[0] === "--" ? 1 : 0;
-  for (let index = start; index < argv.length; index += 2) {
-    const flag = argv[index];
-    const value = argv[index + 1];
-    if (flag === undefined || value === undefined || !flag.startsWith("--")) {
-      throw new Error(
-        "Usage: rebuild:plan22-phase1-cafe --organisation <organisation_id> --merchant <merchant_id>",
-      );
-    }
-    values.set(flag, value);
-  }
-  return {
-    organisationId: requireIdentity(
-      values.get("--organisation"),
-      "--organisation",
-      "organisation_",
-    ),
-    merchantId: requireIdentity(
-      values.get("--merchant"),
-      "--merchant",
-      "merchant_",
-    ),
-    baseUrl: requireUrl(env.UNDERCLERK_BASE_URL),
-    serviceToken: requireSecret(env.UNDERCLERK_SERVICE_TOKEN),
-  };
-}
-
-function requireIdentity(
-  value: string | undefined,
-  field: string,
-  prefix: string,
-): string {
-  if (
-    value === undefined ||
-    !value.startsWith(prefix) ||
-    value !== value.trim()
-  ) {
-    throw new Error(`${field} must be a normalized ${prefix} identity`);
-  }
-  return value;
-}
-
-function requireUrl(value: string | undefined): string {
-  if (value === undefined) throw new Error("UNDERCLERK_BASE_URL is required");
-  const parsed = new URL(value);
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("UNDERCLERK_BASE_URL must use http or https");
-  }
-  return parsed.toString();
-}
-
-function requireSecret(value: string | undefined): string {
-  if (value === undefined || value.length === 0) {
-    throw new Error("UNDERCLERK_SERVICE_TOKEN is required");
-  }
-  return value;
 }

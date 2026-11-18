@@ -13,14 +13,20 @@ import {
   type CommerceInventoryPositionV1,
   type CommerceMerchantSnapshotV1,
   type CommerceMigrationInventoryV2,
-  type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
 } from "@seams/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
 import type { ReceiptPurchaseCheck } from "../plugins/built-in-ports.ts";
 import { readCommerceMigrationInventory } from "../migration-inventory.ts";
+import { requireIdentity } from "./command-guards.ts";
+import type { MerchantRow } from "./ledger.ts";
 import { expireLapsedLots } from "./lot-expiry.ts";
+import {
+  beginMerchantCommand,
+  staleMerchantRevision,
+  type MerchantCommandPorts,
+} from "./merchant-command.ts";
 import {
   listInventoryLots as listStoredInventoryLots,
   listInventoryMovements as listStoredInventoryMovements,
@@ -35,12 +41,6 @@ import {
   type InventoryMovementPlan,
 } from "./inventory.ts";
 
-export type InventoryMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 type InventoryCommand =
   | CreateCommerceInventoryItemV1
   | OpenCommerceInventoryPositionV1
@@ -51,49 +51,38 @@ export type InventoryCommitRequest =
   | Readonly<{
       kind: "inventory_item";
       command: CreateCommerceInventoryItemV1;
-      merchant: InventoryMerchantRow;
+      merchant: MerchantRow;
       item: CommerceInventoryItemV1;
     }>
   | Readonly<{
       kind: "inventory_position";
       command: OpenCommerceInventoryPositionV1;
-      merchant: InventoryMerchantRow;
+      merchant: MerchantRow;
       position: CommerceInventoryPositionV1;
     }>
   | Readonly<{
       kind: "inventory_receipt";
       command: ReceiveCommerceInventoryV3;
-      merchant: InventoryMerchantRow;
+      merchant: MerchantRow;
       plan: InventoryMovementPlan;
     }>
   | Readonly<{
       kind: "inventory_reconciliation";
       command: ReconcileCommerceInventoryV1;
-      merchant: InventoryMerchantRow;
+      merchant: MerchantRow;
       plan: InventoryMovementPlan;
     }>;
 
-type InventoryCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => InventoryMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: InventoryCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: InventoryCommitRequest) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: InventoryMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  checkReceiptPurchase: ReceiptPurchaseCheck;
-}>;
+type InventoryCommandAuthorityOptions = MerchantCommandPorts<InventoryCommand> &
+  Readonly<{
+    database: CommerceDatabase;
+    now: () => string;
+    readSnapshot: (
+      merchantId: string,
+    ) => CommerceMerchantSnapshotV1 | undefined;
+    commit: (request: InventoryCommitRequest) => CommerceMutationResultV1;
+    checkReceiptPurchase: ReceiptPurchaseCheck;
+  }>;
 
 export class InventoryCommandAuthority {
   readonly #options: InventoryCommandAuthorityOptions;
@@ -103,38 +92,14 @@ export class InventoryCommandAuthority {
   }
 
   createInventoryItem(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CreateCommerceInventoryItemV1;
-    try {
-      command = parseCreateInventoryItemCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseCreateInventoryItemCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plan = planInventoryItem(this.#options.database, command);
     if (plan.kind === "rejected") return this.#options.rejected(plan.error);
     return this.#options.commit({
@@ -146,38 +111,14 @@ export class InventoryCommandAuthority {
   }
 
   openInventoryPosition(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: OpenCommerceInventoryPositionV1;
-    try {
-      command = parseOpenInventoryPositionCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseOpenInventoryPositionCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plan = planInventoryPosition(
       this.#options.database,
       command,
@@ -193,31 +134,14 @@ export class InventoryCommandAuthority {
   }
 
   receiveInventory(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ReceiveCommerceInventoryV3;
-    try {
-      command = parseReceiveInventoryCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseReceiveInventoryCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
+    // A receipt line applied before is refused before a stale revision.
     const existingMovement = readReceiptMovement(
       this.#options.database,
       command.merchantId,
@@ -232,13 +156,8 @@ export class InventoryCommandAuthority {
         movementId: existingMovement.id,
       });
     }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    const stale = staleMerchantRevision(merchant, command);
+    if (stale !== undefined) return this.#options.rejected(stale);
     const plan = planInventoryReceipt(
       this.#options.database,
       command,
@@ -255,38 +174,14 @@ export class InventoryCommandAuthority {
   }
 
   reconcileInventory(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ReconcileCommerceInventoryV1;
-    try {
-      command = parseReconcileInventoryCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseReconcileInventoryCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plan = planInventoryReconciliation(
       this.#options.database,
       command,
@@ -320,8 +215,8 @@ export class InventoryCommandAuthority {
   ): CommerceInventoryLotV1 | undefined {
     return readStoredInventoryLot(
       this.#options.database,
-      requireInventoryIdentity(merchantId, "merchantId"),
-      requireInventoryIdentity(lotId, "lotId"),
+      requireIdentity(merchantId, "merchantId"),
+      requireIdentity(lotId, "lotId"),
     );
   }
 
@@ -330,14 +225,14 @@ export class InventoryCommandAuthority {
   ): readonly CommerceInventoryMovementV1[] {
     return listStoredInventoryMovements(
       this.#options.database,
-      requireInventoryIdentity(merchantId, "merchantId"),
+      requireIdentity(merchantId, "merchantId"),
     );
   }
 
   listInventoryLots(merchantId: string): readonly CommerceInventoryLotV1[] {
     return listStoredInventoryLots(
       this.#options.database,
-      requireInventoryIdentity(merchantId, "merchantId"),
+      requireIdentity(merchantId, "merchantId"),
     );
   }
 
@@ -346,10 +241,4 @@ export class InventoryCommandAuthority {
   ): CommerceMigrationInventoryV2 | undefined {
     return readCommerceMigrationInventory(this.#options.database, merchantId);
   }
-}
-
-function requireInventoryIdentity(value: string, field: string): string {
-  if (value.length === 0 || value !== value.trim())
-    throw new Error(`${field} must be normalized text`);
-  return value;
 }

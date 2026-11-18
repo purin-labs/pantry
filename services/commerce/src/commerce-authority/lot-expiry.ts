@@ -19,8 +19,8 @@ import {
   readInventoryLot,
   readInventoryPositionForItemLocation,
 } from "../inventory-persistence.ts";
-import type { InventoryMerchantRow } from "./inventory-commands.ts";
 import { isAccountedPosition, scaledAmount } from "./inventory-planning.ts";
+import type { MerchantRow } from "./ledger.ts";
 
 /** At most this many write-offs in one pass; the next pass goes on. */
 const PASS_LIMIT = 100;
@@ -28,7 +28,7 @@ const PASS_LIMIT = 100;
 type LotExpiryOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
-  readMerchant: (merchantId: string) => InventoryMerchantRow | undefined;
+  readMerchant: (merchantId: string) => MerchantRow | undefined;
   reconcileInventory: (
     command: ReconcileCommerceInventoryV1,
   ) => CommerceMutationResultV1;
@@ -106,10 +106,7 @@ function lapsedLots(
     .all<LapsedLotRow>(now);
 }
 
-function nextLotExpiry(
-  database: CommerceDatabase,
-  now: string,
-): string | null {
+function nextLotExpiry(database: CommerceDatabase, now: string): string | null {
   return (
     database
       .prepare(

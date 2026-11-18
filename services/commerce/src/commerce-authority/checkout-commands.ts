@@ -46,7 +46,15 @@ import {
   type InPersonCheckoutPlan,
   type PickupCheckoutPlan,
 } from "./checkout-planning.ts";
-import type { Cart } from "@seams/commerce-contracts";
+import type { Cart, Storefront } from "@seams/commerce-contracts";
+import type { MerchantRow } from "./ledger.ts";
+import {
+  admitMerchantCommand,
+  admitSnapshotCommand,
+  beginMerchantCommand,
+  beginSnapshotCommand,
+  type MerchantCommandPorts,
+} from "./merchant-command.ts";
 import { balanceCheckoutOrder } from "./order-changes.ts";
 import {
   existingPlacementResource,
@@ -68,12 +76,6 @@ import {
   type PlaceCommerceStoredValueCheckoutV1,
 } from "./checkout-payment-planning.ts";
 
-export type CheckoutMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 export type CheckoutCommand =
   | CreateCommercePickupCheckoutV1
   | BuyerPickupCheckoutCommand
@@ -93,19 +95,19 @@ export type CheckoutCommitRequest =
   | Readonly<{
       kind: "in_person_checkout";
       command: CreateCommerceInPersonCheckoutV1;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: InPersonCheckoutPlan;
     }>
   | Readonly<{
       kind: "pickup_checkout";
       command: CreateCommercePickupCheckoutV1 | BuyerPickupCheckoutCommand;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: PickupCheckoutPlan;
     }>
   | Readonly<{
       kind: "shipping_checkout";
       command: BuyerShippingCheckoutCommand;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: PickupCheckoutPlan;
     }>
   | Readonly<{
@@ -113,60 +115,49 @@ export type CheckoutCommitRequest =
       command:
         | BeginCommerceCheckoutPaymentV1
         | CollectCommerceInPersonCheckoutPaymentV1;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: CheckoutPaymentStartPlan;
     }>
   | Readonly<{
       kind: "checkout_payment_capture";
       command: RecordCommerceCheckoutPaymentCaptureV1;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: CheckoutPaymentCapturePlan;
     }>
   | Readonly<{
       kind: "paid_checkout_placement";
       command: PaidPlacementCommand;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: CheckoutPlacementPlan;
     }>
   | Readonly<{
       kind: "checkout_payment_resolution";
       command: ResolveCommerceCheckoutPaymentV1;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: CheckoutPaymentResolutionPlan;
     }>
   | Readonly<{
       kind: "checkout_expiration";
       command: ExpireCommerceCheckoutV1;
-      merchant: CheckoutMerchantRow;
+      merchant: MerchantRow;
       plan: CheckoutExpirationPlan;
     }>;
 
-type CheckoutCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  /** The merchant's regional shipping, or undefined when it has none. */
-  shipping: (merchantId: string) => RegionalShipping | undefined;
-  foodService: FoodServiceExtension | undefined;
-  now: () => string;
-  readMerchant: (merchantId: string) => CheckoutMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readFoodServiceSnapshot: (
-    merchantId: string,
-  ) => CommerceFoodServiceSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CheckoutCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: CheckoutCommitRequest) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: CheckoutMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-}>;
+type CheckoutCommandAuthorityOptions = MerchantCommandPorts<CheckoutCommand> &
+  Readonly<{
+    database: CommerceDatabase;
+    /** The merchant's regional shipping, or undefined when it has none. */
+    shipping: (merchantId: string) => RegionalShipping | undefined;
+    foodService: FoodServiceExtension | undefined;
+    now: () => string;
+    readSnapshot: (
+      merchantId: string,
+    ) => CommerceMerchantSnapshotV1 | undefined;
+    readFoodServiceSnapshot: (
+      merchantId: string,
+    ) => CommerceFoodServiceSnapshotV1 | undefined;
+    commit: (request: CheckoutCommitRequest) => CommerceMutationResultV1;
+  }>;
 
 export class CheckoutCommandAuthority {
   readonly #options: CheckoutCommandAuthorityOptions;
@@ -176,68 +167,16 @@ export class CheckoutCommandAuthority {
   }
 
   createPickupCheckout(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CreateCommercePickupCheckoutV1;
-    try {
-      command = parseCreatePickupCheckoutCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseCreatePickupCheckoutCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const storefront = readStorefront(
-      this.#options.database,
-      command.merchantId,
-      command.storefrontId,
-    );
-    if (storefront === undefined) {
-      return this.#options.rejected({
-        code: "resource_not_found",
-        kind: "storefront",
-        id: command.storefrontId,
-      });
-    }
-    if (storefront.revision !== command.storefrontRevision) {
-      return this.#options.rejected({
-        code: "stale_resource_revision",
-        kind: "storefront",
-        id: command.storefrontId,
-        expected: command.storefrontRevision,
-        actual: storefront.revision,
-      });
-    }
-    if (
-      storefront.lifecycle.state !== "active" ||
-      storefront.fulfillment.kind !== "pickup"
-    ) {
-      return this.#options.rejected({
-        code: "resource_relationship_invalid",
-        field: "storefront.lifecycle",
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
+    const storefront = this.#checkoutStorefront(command, "pickup");
+    if ("code" in storefront) return this.#options.rejected(storefront);
     if (
       new Set(command.lines.map((line) => line.cartLineId)).size !==
         command.lines.length ||
@@ -259,19 +198,9 @@ export class CheckoutCommandAuthority {
         id: command.cartId,
       });
     }
-    if (
-      readCheckout(
-        this.#options.database,
-        command.merchantId,
-        command.checkoutId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "checkout",
-        id: command.checkoutId,
-      });
-    }
+    const existingCheckout = this.#existingCheckout(command);
+    if (existingCheckout !== undefined)
+      return this.#options.rejected(existingCheckout);
     const snapshot = this.#options.readSnapshot(command.merchantId);
     const foodService = this.#options.readFoodServiceSnapshot(
       command.merchantId,
@@ -308,38 +237,14 @@ export class CheckoutCommandAuthority {
    * storefront carries the tax and lead-time policy the sale is priced under.
    */
   createInPersonCheckout(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CreateCommerceInPersonCheckoutV1;
-    try {
-      command = parseCreateInPersonCheckoutCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseCreateInPersonCheckoutCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     if (
       new Set(command.lines.map((line) => line.checkoutLineId)).size !==
       command.lines.length
@@ -349,19 +254,9 @@ export class CheckoutCommandAuthority {
         field: "checkout.lines",
       });
     }
-    if (
-      readCheckout(
-        this.#options.database,
-        command.merchantId,
-        command.checkoutId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "checkout",
-        id: command.checkoutId,
-      });
-    }
+    const existingCheckout = this.#existingCheckout(command);
+    if (existingCheckout !== undefined)
+      return this.#options.rejected(existingCheckout);
     // The counter sells under its own published policy. No online storefront,
     // payment binding, contact, or buyer session is a prerequisite.
     const configuration = readPublishedPointOfSaleConfiguration(
@@ -407,62 +302,13 @@ export class CheckoutCommandAuthority {
   submitBuyerPickupCheckout(
     command: BuyerPickupCheckoutCommand,
   ): CommerceMutationResultV1 {
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const storefront = readStorefront(
-      this.#options.database,
-      command.merchantId,
-      command.storefrontId,
-    );
-    if (storefront === undefined) {
-      return this.#options.rejected({
-        code: "resource_not_found",
-        kind: "storefront",
-        id: command.storefrontId,
-      });
-    }
-    if (storefront.revision !== command.storefrontRevision) {
-      return this.#options.rejected({
-        code: "stale_resource_revision",
-        kind: "storefront",
-        id: command.storefrontId,
-        expected: command.storefrontRevision,
-        actual: storefront.revision,
-      });
-    }
-    if (
-      storefront.lifecycle.state !== "active" ||
-      storefront.fulfillment.kind !== "pickup"
-    ) {
-      return this.#options.rejected({
-        code: "resource_relationship_invalid",
-        field: "storefront.lifecycle",
-      });
-    }
+    const start = admitMerchantCommand(this.#options, command, {
+      merchantRevision: true,
+    });
+    if (start.kind !== "ready") return start.result;
+    const { merchant } = start;
+    const storefront = this.#checkoutStorefront(command, "pickup");
+    if ("code" in storefront) return this.#options.rejected(storefront);
     const cart = readCart(
       this.#options.database,
       command.merchantId,
@@ -470,19 +316,9 @@ export class CheckoutCommandAuthority {
     );
     const cartError = pickupCartSubmissionError(cart, command);
     if (cartError !== undefined) return this.#options.rejected(cartError);
-    if (
-      readCheckout(
-        this.#options.database,
-        command.merchantId,
-        command.checkoutId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "checkout",
-        id: command.checkoutId,
-      });
-    }
+    const existingCheckout = this.#existingCheckout(command);
+    if (existingCheckout !== undefined)
+      return this.#options.rejected(existingCheckout);
     const snapshot = this.#options.readSnapshot(command.merchantId);
     const foodService = this.#options.readFoodServiceSnapshot(
       command.merchantId,
@@ -518,62 +354,13 @@ export class CheckoutCommandAuthority {
   submitBuyerShippingCheckout(
     command: BuyerShippingCheckoutCommand,
   ): CommerceMutationResultV1 {
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    }
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const storefront = readStorefront(
-      this.#options.database,
-      command.merchantId,
-      command.storefrontId,
-    );
-    if (storefront === undefined) {
-      return this.#options.rejected({
-        code: "resource_not_found",
-        kind: "storefront",
-        id: command.storefrontId,
-      });
-    }
-    if (storefront.revision !== command.storefrontRevision) {
-      return this.#options.rejected({
-        code: "stale_resource_revision",
-        kind: "storefront",
-        id: command.storefrontId,
-        expected: command.storefrontRevision,
-        actual: storefront.revision,
-      });
-    }
-    if (
-      storefront.lifecycle.state !== "active" ||
-      storefront.fulfillment.kind !== "shipping"
-    ) {
-      return this.#options.rejected({
-        code: "resource_relationship_invalid",
-        field: "storefront.lifecycle",
-      });
-    }
+    const start = admitMerchantCommand(this.#options, command, {
+      merchantRevision: true,
+    });
+    if (start.kind !== "ready") return start.result;
+    const { merchant } = start;
+    const storefront = this.#checkoutStorefront(command, "shipping");
+    if ("code" in storefront) return this.#options.rejected(storefront);
     if (
       command.lines.length === 0 ||
       new Set(command.lines.map((line) => line.cartLineId)).size !==
@@ -595,19 +382,9 @@ export class CheckoutCommandAuthority {
     );
     const cartError = shippingCartSubmissionError(cart, command);
     if (cartError !== undefined) return this.#options.rejected(cartError);
-    if (
-      readCheckout(
-        this.#options.database,
-        command.merchantId,
-        command.checkoutId,
-      ) !== undefined
-    ) {
-      return this.#options.rejected({
-        code: "resource_already_exists",
-        kind: "checkout",
-        id: command.checkoutId,
-      });
-    }
+    const existingCheckout = this.#existingCheckout(command);
+    if (existingCheckout !== undefined)
+      return this.#options.rejected(existingCheckout);
     const snapshot = this.#options.readSnapshot(command.merchantId);
     if (snapshot === undefined || cart === undefined) {
       return this.#options.rejected({
@@ -633,51 +410,33 @@ export class CheckoutCommandAuthority {
   }
 
   beginCheckoutPayment(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: BeginCommerceCheckoutPaymentV1;
-    try {
-      command = parseBeginCheckoutPaymentCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    return this.#startCheckoutPayment(command);
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseBeginCheckoutPaymentCommand,
+      { merchantRevision: true },
+    );
+    return start.kind === "ready"
+      ? this.#startCheckoutPayment(start.command, start.merchant)
+      : start.result;
   }
 
   startInPersonCheckoutPayment(
     command: CollectCommerceInPersonCheckoutPaymentV1,
   ): CommerceMutationResultV1 {
-    return this.#startCheckoutPayment(command);
+    const start = admitMerchantCommand(this.#options, command, {
+      merchantRevision: true,
+    });
+    return start.kind === "ready"
+      ? this.#startCheckoutPayment(start.command, start.merchant)
+      : start.result;
   }
 
   #startCheckoutPayment(
     command:
-      | BeginCommerceCheckoutPaymentV1
-      | CollectCommerceInPersonCheckoutPaymentV1,
+      BeginCommerceCheckoutPaymentV1 | CollectCommerceInPersonCheckoutPaymentV1,
+    merchant: MerchantRow,
   ): CommerceMutationResultV1 {
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
     if (
       readCheckoutPaymentAttempt(
         this.#options.database,
@@ -712,40 +471,15 @@ export class CheckoutCommandAuthority {
     });
   }
 
-  recordCheckoutPaymentCapture(
-    rawCommand: unknown,
-  ): CommerceMutationResultV1 {
-    let command: RecordCommerceCheckoutPaymentCaptureV1;
-    try {
-      command = parseRecordCheckoutPaymentCaptureCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+  recordCheckoutPaymentCapture(rawCommand: unknown): CommerceMutationResultV1 {
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseRecordCheckoutPaymentCaptureCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plan = planCheckoutPaymentCapture(
       command,
       readCheckout(
@@ -769,43 +503,14 @@ export class CheckoutCommandAuthority {
   }
 
   placePaidCheckout(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: PlaceCommercePaidCheckoutV1;
-    try {
-      command = parsePlacePaidCheckoutCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parsePlacePaidCheckoutCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const checkout = readCheckout(
       this.#options.database,
       command.merchantId,
@@ -844,36 +549,11 @@ export class CheckoutCommandAuthority {
   placeStoredValueCheckout(
     command: PlaceCommerceStoredValueCheckoutV1,
   ): CommerceMutationResultV1 {
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision)
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    const start = admitSnapshotCommand(this.#options, command, {
+      merchantRevision: true,
+    });
+    if (start.kind !== "ready") return start.result;
+    const { merchant, snapshot } = start;
     const existing = existingPlacementResource(
       command,
       snapshot.resources,
@@ -946,37 +626,14 @@ export class CheckoutCommandAuthority {
   }
 
   resolveCheckoutPayment(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ResolveCommerceCheckoutPaymentV1;
-    try {
-      command = parseResolveCheckoutPaymentCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseResolveCheckoutPaymentCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plan = planCheckoutPaymentResolution(
       this.#options.database,
       command,
@@ -1068,37 +725,14 @@ export class CheckoutCommandAuthority {
   }
 
   expireCheckout(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ExpireCommerceCheckoutV1;
-    try {
-      command = parseExpireCheckoutCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseExpireCheckoutCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const plan = planCheckoutExpiration(
       this.#options.database,
       command,
@@ -1115,6 +749,65 @@ export class CheckoutCommandAuthority {
       merchant,
       plan: plan.value,
     });
+  }
+
+  #existingCheckout(
+    command: Readonly<{ merchantId: string; checkoutId: string }>,
+  ): CommerceMutationErrorV1 | undefined {
+    return readCheckout(
+      this.#options.database,
+      command.merchantId,
+      command.checkoutId,
+    ) === undefined
+      ? undefined
+      : {
+          code: "resource_already_exists",
+          kind: "checkout",
+          id: command.checkoutId,
+        };
+  }
+
+  // The storefront that a new checkout names: at the command's revision,
+  // active, and with the fulfillment of the checkout.
+  #checkoutStorefront(
+    command: Readonly<{
+      merchantId: string;
+      storefrontId: string;
+      storefrontRevision: number;
+    }>,
+    fulfillment: Storefront["fulfillment"]["kind"],
+  ): Storefront | CommerceMutationErrorV1 {
+    const storefront = readStorefront(
+      this.#options.database,
+      command.merchantId,
+      command.storefrontId,
+    );
+    if (storefront === undefined) {
+      return {
+        code: "resource_not_found",
+        kind: "storefront",
+        id: command.storefrontId,
+      };
+    }
+    if (storefront.revision !== command.storefrontRevision) {
+      return {
+        code: "stale_resource_revision",
+        kind: "storefront",
+        id: command.storefrontId,
+        expected: command.storefrontRevision,
+        actual: storefront.revision,
+      };
+    }
+    if (
+      storefront.lifecycle.state !== "active" ||
+      storefront.fulfillment.kind !== fulfillment
+    ) {
+      return {
+        code: "resource_relationship_invalid",
+        field: "storefront.lifecycle",
+      };
+    }
+    return storefront;
   }
 }
 

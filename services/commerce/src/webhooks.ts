@@ -14,7 +14,6 @@ import {
   webhookTopicMatches,
   type CreateCommerceWebhookSubscriptionV1,
   type CommerceEventV1,
-  type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
   type CommerceWebhookEventV1,
   type CommerceWebhookSubscriptionCommandV1,
@@ -23,6 +22,11 @@ import {
 import { commerceTransition } from "@seams/commerce-contracts";
 import { canonicalJson } from "@seams/std";
 
+import type { MerchantRow } from "./commerce-authority/ledger.ts";
+import {
+  beginMerchantCommand,
+  type MerchantCommandPorts,
+} from "./commerce-authority/merchant-command.ts";
 import type { CommerceDatabase } from "./database.ts";
 import { headCursor, readEventPage } from "./event-feed.ts";
 
@@ -61,46 +65,30 @@ export class FetchWebhookSender implements WebhookSender {
   }
 }
 
-export type WebhookMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+type WebhookCommand =
+  CreateCommerceWebhookSubscriptionV1 | CommerceWebhookSubscriptionCommandV1;
 
 export type WebhookCommitRequest = Readonly<{
-  command:
-    | CreateCommerceWebhookSubscriptionV1
-    | CommerceWebhookSubscriptionCommandV1;
-  merchant: WebhookMerchantRow;
+  command: WebhookCommand;
+  merchant: MerchantRow;
   /** The subscription's revision after the change. */
   revision: number;
   write: () => void;
 }>;
 
-type WebhookAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => WebhookMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command:
-      | CreateCommerceWebhookSubscriptionV1
-      | CommerceWebhookSubscriptionCommandV1,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: WebhookMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: WebhookCommitRequest) => CommerceMutationResultV1;
-  /** The addresses that may get posts; `publicHttpsAddress` when absent. */
-  addressAllowed?: (url: string) => boolean;
-}>;
+type WebhookAuthorityOptions = MerchantCommandPorts<WebhookCommand> &
+  Readonly<{
+    database: CommerceDatabase;
+    now: () => string;
+    commit: (request: WebhookCommitRequest) => CommerceMutationResultV1;
+    /** The addresses that may get posts; `publicHttpsAddress` when absent. */
+    addressAllowed?: (url: string) => boolean;
+  }>;
 
 /** Seconds before each retry; the last delay repeats. */
-const RETRY_DELAYS = [60, 300, 900, 1_800, 3_600, 7_200, 14_400, 28_800, 43_200];
+const RETRY_DELAYS = [
+  60, 300, 900, 1_800, 3_600, 7_200, 14_400, 28_800, 43_200,
+];
 const GIVE_UP_AFTER_MS = 48 * 60 * 60 * 1_000;
 const FAN_OUT_PAGE = 100;
 const POST_BATCH = 50;
@@ -134,36 +122,13 @@ export class WebhookAuthority {
   createSubscription(
     rawCommand: unknown,
   ): Readonly<{ mutation: CommerceMutationResultV1; secret: string | null }> {
-    let command: CreateCommerceWebhookSubscriptionV1;
-    try {
-      command = parseCreateWebhookSubscriptionCommand(rawCommand);
-    } catch (error) {
-      return {
-        mutation: this.#options.rejected(this.#options.invalidCommand(error)),
-        secret: null,
-      };
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseCreateWebhookSubscriptionCommand,
     );
-    if (merchantError !== undefined)
-      return { mutation: this.#options.rejected(merchantError), secret: null };
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return { mutation: replay, secret: null };
-    if (merchant === undefined)
-      return {
-        mutation: this.#options.rejected({
-          code: "merchant_not_found",
-          merchantId: command.merchantId,
-        }),
-        secret: null,
-      };
+    if (start.kind !== "ready") return { mutation: start.result, secret: null };
+    const { command, merchant } = start;
     if (!this.#addressAllowed(command.url))
       return {
         mutation: this.#options.rejected({
@@ -355,33 +320,16 @@ export class WebhookAuthority {
     | CommerceMutationResultV1
     | Readonly<{
         command: CommerceWebhookSubscriptionCommandV1;
-        merchant: WebhookMerchantRow;
+        merchant: MerchantRow;
         subscription: SubscriptionRow;
       }> {
-    let command: CommerceWebhookSubscriptionCommandV1;
-    try {
-      command = parseWebhookSubscriptionCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseWebhookSubscriptionCommand,
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const subscription = this.#row(command.merchantId, command.subscriptionId);
     if (subscription === undefined)
       return this.#options.rejected({
@@ -404,7 +352,9 @@ export class WebhookAuthority {
     merchantId: string,
   ): readonly CommerceWebhookSubscriptionV1[] {
     const rows = this.#options.database
-      .prepare(`${SUBSCRIPTION_COLUMNS} WHERE merchant_id = ? ORDER BY subscription_id`)
+      .prepare(
+        `${SUBSCRIPTION_COLUMNS} WHERE merchant_id = ? ORDER BY subscription_id`,
+      )
       .all<SubscriptionRow>(merchantId);
     const now = this.#options.now();
     return rows.map((row) => {
@@ -478,7 +428,10 @@ export class WebhookAuthority {
       >(now, POST_BATCH);
     let posted = 0;
     for (const delivery of due) {
-      const subscription = this.#row(delivery.merchantId, delivery.subscriptionId);
+      const subscription = this.#row(
+        delivery.merchantId,
+        delivery.subscriptionId,
+      );
       if (subscription?.state !== "active") continue;
       const event = this.#event(delivery.merchantId, delivery.eventId);
       if (event === undefined) {
@@ -489,11 +442,7 @@ export class WebhookAuthority {
              WHERE merchant_id = ? AND subscription_id = ? AND event_id = ?
                AND status = 'pending'`,
           )
-          .run(
-            delivery.merchantId,
-            delivery.subscriptionId,
-            delivery.eventId,
-          );
+          .run(delivery.merchantId, delivery.subscriptionId, delivery.eventId);
         continue;
       }
       const body = canonicalJson(webhookBody(delivery.merchantId, event));
@@ -521,7 +470,11 @@ export class WebhookAuthority {
       posted += 1;
       const attempts = delivery.attempts + 1;
       const firstAttemptAt = delivery.firstAttemptAt ?? now;
-      if (result.kind === "response" && result.status >= 200 && result.status < 300) {
+      if (
+        result.kind === "response" &&
+        result.status >= 200 &&
+        result.status < 300
+      ) {
         database
           .prepare(
             `UPDATE webhook_delivery
@@ -647,7 +600,11 @@ export class WebhookAuthority {
             `UPDATE webhook_subscription SET cursor = ?
              WHERE merchant_id = ? AND subscription_id = ?`,
           )
-          .run(page.nextCursor, subscription.merchantId, subscription.subscriptionId);
+          .run(
+            page.nextCursor,
+            subscription.merchantId,
+            subscription.subscriptionId,
+          );
       });
       cursor = page.nextCursor;
       if (page.events.length < FAN_OUT_PAGE) break;
@@ -672,9 +629,14 @@ export class WebhookAuthority {
     return page.events.find((event) => event.eventId === eventId);
   }
 
-  #row(merchantId: string, subscriptionId: string): SubscriptionRow | undefined {
+  #row(
+    merchantId: string,
+    subscriptionId: string,
+  ): SubscriptionRow | undefined {
     return this.#options.database
-      .prepare(`${SUBSCRIPTION_COLUMNS} WHERE merchant_id = ? AND subscription_id = ?`)
+      .prepare(
+        `${SUBSCRIPTION_COLUMNS} WHERE merchant_id = ? AND subscription_id = ?`,
+      )
       .get<SubscriptionRow>(merchantId, subscriptionId);
   }
 }
@@ -708,7 +670,9 @@ function webhookSignature(
   timestamp: string,
   body: string,
 ): string {
-  return createHmac("sha256", secret).update(`${timestamp}.${body}`).digest("hex");
+  return createHmac("sha256", secret)
+    .update(`${timestamp}.${body}`)
+    .digest("hex");
 }
 
 /**

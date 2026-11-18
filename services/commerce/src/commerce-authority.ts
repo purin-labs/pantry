@@ -9,7 +9,6 @@ import {
   CommerceLedger,
   commandDigest,
   rejected,
-  validateMerchant,
 } from "./commerce-authority/ledger.ts";
 import type { CommerceSigner } from "./commerce-authority/contracts.ts";
 import { assertCommerceSchemaReady } from "./schema.ts";
@@ -136,11 +135,7 @@ export class CommerceAuthority extends BuyerFamily {
           ? undefined
           : new CustomerVault(options.customerDataRoot),
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitCustomer.bind(this),
       onErase: (merchantId, customerId) =>
         deletePluginFieldValuesOf(
@@ -153,78 +148,46 @@ export class CommerceAuthority extends BuyerFamily {
     this.archive = new ArchiveAuthority(this.database, this.now);
     this.markets = new MarketAuthority({
       database: this.database,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitMarket.bind(this),
     });
     this.companies = new CompanyAuthority({
       database: this.database,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: (request: CompanyCommitRequest) =>
         this.ledger.commit(companyMutation(request, this.now())),
     });
     this.invoices = new InvoiceAuthority({
       database: this.database,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: (request: InvoiceCommitRequest) =>
         this.ledger.commit(invoiceMutation(request, this.now())),
     });
     this.media = new MediaAuthority({
       database: this.database,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitMedia.bind(this),
     });
     this.discounts = new DiscountAuthority({
       database: this.database,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitDiscount.bind(this),
     });
     this.storedValue = new StoredValueAuthority({
       database: this.database,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitStoredValue.bind(this),
     });
     this.collections = new CollectionAuthority({
       database: this.database,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitCollection.bind(this),
     });
     this.plugins = new PluginAuthority({
       database: this.database,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitPlugin.bind(this),
       dataEffects: (merchantId, pluginId) => {
         if (pluginId === "stored_value") {
@@ -316,11 +279,7 @@ export class CommerceAuthority extends BuyerFamily {
     this.webhooks = new WebhookAuthority({
       database: this.database,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
+      ...this.ledger.commandPorts,
       commit: this.commitWebhookSubscription.bind(this),
       ...(options.webhookAddressAllowed === undefined
         ? {}
@@ -337,27 +296,19 @@ export class CommerceAuthority extends BuyerFamily {
     });
     this.catalogCommands = new CatalogCommandAuthority({
       database: this.database,
+      ...this.ledger.commandPorts,
       now: this.now,
       readMenus: (merchantId) =>
         this.commerceSnapshots.readFoodServiceResources(merchantId).menus,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
       commit: this.commitCatalogMutation.bind(this),
-      validateMerchant,
-      rejected,
-      invalidCommand,
     });
     this.inventoryCommands = new InventoryCommandAuthority({
       database: this.database,
+      ...this.ledger.commandPorts,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
       commit: this.commitInventoryMutation.bind(this),
-      validateMerchant,
-      rejected,
-      invalidCommand,
       checkReceiptPurchase: purchasingExtension.checkReceiptPurchase,
     });
     // A merchant who paused Japan export shipping ships nothing.
@@ -368,15 +319,11 @@ export class CommerceAuthority extends BuyerFamily {
         : undefined;
     this.checkoutCommands = new CheckoutCommandAuthority({
       database: this.database,
+      ...this.ledger.commandPorts,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
       readFoodServiceSnapshot: this.readFoodServiceSnapshot.bind(this),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
       commit: this.commitCheckoutMutation.bind(this),
-      validateMerchant,
-      rejected,
-      invalidCommand,
       shipping: regionalShipping,
       foodService: foodServiceExtension,
     });
@@ -406,14 +353,10 @@ export class CommerceAuthority extends BuyerFamily {
     const buyerCheckout = this.buyerCheckout;
     this.draftOrders = new DraftOrderCommandAuthority({
       database: this.database,
+      ...this.ledger.commandPorts,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
       commit: this.commitDraftOrder.bind(this),
-      validateMerchant,
-      rejected,
-      invalidCommand,
       buyers: {
         sealsBuyers: this.customers.sealsBuyers,
         customerEmail: (merchantId, customerId) =>
@@ -454,33 +397,25 @@ export class CommerceAuthority extends BuyerFamily {
     });
     this.orderEdits = new OrderEditCommandAuthority({
       database: this.database,
+      ...this.ledger.commandPorts,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
       readFoodServiceResources:
         this.commerceSnapshots.readFoodServiceResources.bind(
           this.commerceSnapshots,
         ),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
       commit: this.commitOrderEdit.bind(this),
       commitExchange: this.commitOrderExchange.bind(this),
       commitBalanceCheckout: this.commitBalanceCheckout.bind(this),
       readBuyerQuotedCheckout:
         buyerCheckout.readBuyerQuotedCheckout.bind(buyerCheckout),
-      validateMerchant,
-      rejected,
-      invalidCommand,
     });
     this.returns = new ReturnCommandAuthority({
       database: this.database,
+      ...this.ledger.commandPorts,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
       commit: this.commitReturn.bind(this),
-      validateMerchant,
-      rejected,
-      invalidCommand,
       readSettings: (merchantId) =>
         builtInPluginSettings(
           "returns",
@@ -489,14 +424,10 @@ export class CommerceAuthority extends BuyerFamily {
     });
     this.afterSaleCommands = new AfterSaleCommandAuthority({
       database: this.database,
+      ...this.ledger.commandPorts,
       paymentGateway: this.paymentGateway,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
       commandDigest,
       reserveCancellation: this.reserveCancellation.bind(this),
       resolveCancellation: this.resolveCancellation.bind(this),
@@ -507,16 +438,12 @@ export class CommerceAuthority extends BuyerFamily {
     });
     this.fulfillmentCommands = new FulfillmentCommandAuthority({
       database: this.database,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
+      ...this.ledger.commandPorts,
       readSnapshot: this.readSnapshot.bind(this),
       readFoodServiceResources:
         this.commerceSnapshots.readFoodServiceResources.bind(
           this.commerceSnapshots,
         ),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
-      validateMerchant,
-      rejected,
-      invalidCommand,
       commitPickupReady: this.commitPickupReady.bind(this),
       commitPickupCompletion: this.commitPickupCompletion.bind(this),
       commitShippingLabel: this.commitShippingLabel.bind(this),
@@ -529,15 +456,11 @@ export class CommerceAuthority extends BuyerFamily {
     });
     this.foodService = foodServiceExtension.commands({
       database: this.database,
+      ...this.ledger.commandPorts,
       now: this.now,
-      readMerchant: this.ledger.readMerchant.bind(this.ledger),
       readSnapshot: this.readSnapshot.bind(this),
       readFoodServiceSnapshot: this.readFoodServiceSnapshot.bind(this),
-      readReplay: this.ledger.readReplay.bind(this.ledger),
       commit: this.commitExtensionMutation.bind(this),
-      validateMerchant,
-      rejected,
-      invalidCommand,
     });
     this.provisioning = new ProvisioningAuthority({
       database: this.database,

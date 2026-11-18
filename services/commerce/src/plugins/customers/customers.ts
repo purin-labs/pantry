@@ -29,43 +29,32 @@ import type { CustomerVault, SealedCustomerKey } from "./customer-vault.ts";
 import type { CommerceDatabase } from "../../database.ts";
 import type { NotificationGateway } from "../../notification-gateway.ts";
 import { sha256 } from "../../commerce-authority/checkout-shared.ts";
-
-export type CustomerMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  beginMerchantCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 
 export type CustomerCommitRequest = Readonly<{
   command: CommerceCustomerCommandV1;
-  merchant: CustomerMerchantRow;
+  merchant: MerchantRow;
   customerId: string;
   revision: number;
   /** The table writes, run inside the commit's transaction. */
   write: () => void;
 }>;
 
-type CustomerAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  /** Absent when the Worker has no customer data secret: no accounts. */
-  vault: CustomerVault | undefined;
-  now: () => string;
-  readMerchant: (merchantId: string) => CustomerMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CommerceCustomerCommandV1,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: CustomerMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  /** Removes what other plugins keep about the customer, in the erasure. */
-  onErase?: (merchantId: string, customerId: string) => void;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: CustomerCommitRequest) => CommerceMutationResultV1;
-}>;
+type CustomerAuthorityOptions =
+  MerchantCommandPorts<CommerceCustomerCommandV1> &
+    Readonly<{
+      database: CommerceDatabase;
+      /** Absent when the Worker has no customer data secret: no accounts. */
+      vault: CustomerVault | undefined;
+      now: () => string;
+      /** Removes what other plugins keep about the customer, in the erasure. */
+      onErase?: (merchantId: string, customerId: string) => void;
+      commit: (request: CustomerCommitRequest) => CommerceMutationResultV1;
+    }>;
 
 export type CheckoutBuyer =
   | Readonly<{ kind: "guest"; email: string }>
@@ -135,35 +124,39 @@ export class CustomerAuthority {
   }
 
   createCustomer(rawCommand: unknown): CommerceMutationResultV1 {
-    return this.#run(rawCommand, parseCreateCustomerCommand, (command, vault) => {
-      const { merchantId } = command;
-      if (this.#row(merchantId, command.customerId) !== undefined)
+    return this.#run(
+      rawCommand,
+      parseCreateCustomerCommand,
+      (command, vault) => {
+        const { merchantId } = command;
+        if (this.#row(merchantId, command.customerId) !== undefined)
+          return {
+            code: "resource_already_exists",
+            kind: "customer",
+            id: command.customerId,
+          };
+        const lookup = vault.lookup(merchantId, "email", command.email);
+        if (this.#rowByLookup(merchantId, lookup) !== undefined)
+          return invalid("customer.email.taken");
+        const key = vault.newCustomerKey(merchantId, command.customerId);
         return {
-          code: "resource_already_exists",
-          kind: "customer",
-          id: command.customerId,
+          customerId: command.customerId,
+          revision: 1,
+          write: () =>
+            this.#insert(merchantId, command.customerId, lookup, key, {
+              profile: {
+                email: command.email,
+                name: command.name,
+                phone: command.phone,
+                note: command.note,
+                addresses: [],
+              },
+              fields: { ...ERASED_FIELDS, tags: command.tags },
+              at: command.requestedAt,
+            }),
         };
-      const lookup = vault.lookup(merchantId, "email", command.email);
-      if (this.#rowByLookup(merchantId, lookup) !== undefined)
-        return invalid("customer.email.taken");
-      const key = vault.newCustomerKey(merchantId, command.customerId);
-      return {
-        customerId: command.customerId,
-        revision: 1,
-        write: () =>
-          this.#insert(merchantId, command.customerId, lookup, key, {
-            profile: {
-              email: command.email,
-              name: command.name,
-              phone: command.phone,
-              note: command.note,
-              addresses: [],
-            },
-            fields: { ...ERASED_FIELDS, tags: command.tags },
-            at: command.requestedAt,
-          }),
-      };
-    });
+      },
+    );
   }
 
   updateCustomer(rawCommand: unknown): CommerceMutationResultV1 {
@@ -193,7 +186,10 @@ export class CustomerAuthority {
         ...current.fields,
         ...(changes.tags === undefined ? {} : { tags: changes.tags }),
         marketing: {
-          email: consent(current.fields.marketing.email, changes.marketing?.email),
+          email: consent(
+            current.fields.marketing.email,
+            changes.marketing?.email,
+          ),
           sms: consent(current.fields.marketing.sms, changes.marketing?.sms),
         },
       };
@@ -201,7 +197,13 @@ export class CustomerAuthority {
         customerId: command.customerId,
         revision: current.row.revision + 1,
         write: () =>
-          this.#rewrite(command.merchantId, current, profile, fields, command.requestedAt),
+          this.#rewrite(
+            command.merchantId,
+            current,
+            profile,
+            fields,
+            command.requestedAt,
+          ),
       };
     });
   }
@@ -218,7 +220,8 @@ export class CustomerAuthority {
       return {
         customerId: command.customerId,
         revision: current.row.revision + 1,
-        write: () => this.#erase(command.merchantId, current, command.requestedAt),
+        write: () =>
+          this.#erase(command.merchantId, current, command.requestedAt),
       };
     });
   }
@@ -232,7 +235,8 @@ export class CustomerAuthority {
     const orderIds = this.#linked(merchantId, customerId, "order").map(
       (link) => link.subjectId,
     );
-    const opened = row.state === "active" ? this.#open(merchantId, row) : undefined;
+    const opened =
+      row.state === "active" ? this.#open(merchantId, row) : undefined;
     const fields = opened?.fields ?? ERASED_FIELDS;
     return {
       id: row.customerId,
@@ -354,7 +358,9 @@ export class CustomerAuthority {
     subjectKind: "checkout" | "order",
     subjectId: string,
   ): string | null {
-    return this.#linkFor(merchantId, subjectKind, subjectId)?.customerId ?? null;
+    return (
+      this.#linkFor(merchantId, subjectKind, subjectId)?.customerId ?? null
+    );
   }
 
   /** Inside a fulfilment transaction: tells the buyer the order is ready. */
@@ -410,7 +416,9 @@ export class CustomerAuthority {
     const count = this.#count("notification_outbox", merchantId);
     const challengeId = `sign_in_${sha256(`${merchantId}:${lookup}:${count}`).slice(0, 32)}`;
     const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
-    const expiresAt = new Date(Date.parse(at) + SIGN_IN_LIFETIME_MS).toISOString();
+    const expiresAt = new Date(
+      Date.parse(at) + SIGN_IN_LIFETIME_MS,
+    ).toISOString();
     this.#options.database.transaction(() => {
       this.#options.database
         .prepare(
@@ -582,11 +590,20 @@ export class CustomerAuthority {
       ...current.profile,
       addresses: [
         ...current.profile.addresses,
-        { addressId: `address_${current.profile.addresses.length + 1}`, ...address },
+        {
+          addressId: `address_${current.profile.addresses.length + 1}`,
+          ...address,
+        },
       ],
     };
     this.#options.database.transaction(() =>
-      this.#rewrite(merchantId, current, profile, current.fields, this.#options.now()),
+      this.#rewrite(
+        merchantId,
+        current,
+        profile,
+        current.fields,
+        this.#options.now(),
+      ),
     );
     return this.buyerCustomer(merchantId, customerId);
   }
@@ -635,7 +652,13 @@ export class CustomerAuthority {
     for (const item of pending) {
       const message = this.#compose(item);
       if (message === undefined) {
-        this.#settle(item.merchantId, item.notificationId, "dropped", item.attempts, null);
+        this.#settle(
+          item.merchantId,
+          item.notificationId,
+          "dropped",
+          item.attempts,
+          null,
+        );
         continue;
       }
       const result = await gateway.send({
@@ -703,7 +726,9 @@ export class CustomerAuthority {
       };
     }
     const row =
-      item.customerId === null ? undefined : this.#row(item.merchantId, item.customerId);
+      item.customerId === null
+        ? undefined
+        : this.#row(item.merchantId, item.customerId);
     if (row?.state !== "active" || item.orderId === null) return undefined;
     const { profile } = this.#open(item.merchantId, row);
     const order = listOrders(this.#options.database, item.merchantId).find(
@@ -742,7 +767,11 @@ export class CustomerAuthority {
         const stored =
           item.refundAttemptId === null
             ? undefined
-            : readRefundAttempt(this.#options.database, item.merchantId, item.refundAttemptId);
+            : readRefundAttempt(
+                this.#options.database,
+                item.merchantId,
+                item.refundAttemptId,
+              );
         if (stored === undefined) return undefined;
         const amount = refundAttemptMoney(stored.attempt);
         return {
@@ -791,7 +820,8 @@ export class CustomerAuthority {
     }>,
   ): void {
     // One message of each kind per order, but one per refund.
-    const subject = input.challengeId ?? input.refundAttemptId ?? input.orderId ?? "";
+    const subject =
+      input.challengeId ?? input.refundAttemptId ?? input.orderId ?? "";
     this.#options.database
       .prepare(
         `INSERT OR IGNORE INTO notification_outbox (
@@ -872,7 +902,13 @@ export class CustomerAuthority {
         merchantId,
         customerId,
         lookup,
-        vault.sealForCustomer(merchantId, customerId, key, PROFILE_FIELD, input.profile),
+        vault.sealForCustomer(
+          merchantId,
+          customerId,
+          key,
+          PROFILE_FIELD,
+          input.profile,
+        ),
         JSON.stringify(input.fields),
         input.at,
         input.at,
@@ -916,7 +952,9 @@ export class CustomerAuthority {
         current.row.revision,
       );
     if (written.changes !== 1)
-      throw new Error(`Customer ${current.row.customerId} moved during the write`);
+      throw new Error(
+        `Customer ${current.row.customerId} moved during the write`,
+      );
   }
 
   // Erasure removes the key, the lookup value and the sealed profile. Links
@@ -942,7 +980,9 @@ export class CustomerAuthority {
     if (written.changes !== 1)
       throw new Error(`Customer ${customerId} moved during erasure`);
     database
-      .prepare("DELETE FROM customer_key WHERE merchant_id = ? AND customer_id = ?")
+      .prepare(
+        "DELETE FROM customer_key WHERE merchant_id = ? AND customer_id = ?",
+      )
       .run(merchantId, customerId);
     if (current.row.emailLookup !== null)
       database
@@ -969,29 +1009,9 @@ export class CustomerAuthority {
       | Omit<CustomerCommitRequest, "command" | "merchant">
       | CommerceMutationErrorV1,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined) return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    const start = beginMerchantCommand(this.#options, rawCommand, parse);
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const vault = this.#options.vault;
     if (vault === undefined)
       return this.#options.rejected(invalid("customer.accountsDisabled"));
@@ -1068,7 +1088,11 @@ export class CustomerAuthority {
         `SELECT customer_id AS customerId FROM customer_link
          WHERE merchant_id = ? AND subject_kind = ? AND subject_id = ?`,
       )
-      .get<Readonly<{ customerId: string }>>(merchantId, subjectKind, subjectId);
+      .get<Readonly<{ customerId: string }>>(
+        merchantId,
+        subjectKind,
+        subjectId,
+      );
   }
 
   #linked(
@@ -1089,7 +1113,10 @@ export class CustomerAuthority {
       );
   }
 
-  #count(table: "customer" | "notification_outbox", merchantId: string): number {
+  #count(
+    table: "customer" | "notification_outbox",
+    merchantId: string,
+  ): number {
     return (
       this.#options.database
         .prepare(`SELECT COUNT(*) AS count FROM ${table} WHERE merchant_id = ?`)
@@ -1115,7 +1142,9 @@ function invalid(field: string): CommerceMutationErrorV1 {
 
 function trackingNumberOf(shipment: CommerceShipmentV1): string | null {
   if (shipment.kind === "external") return shipment.trackingNumber;
-  return "trackingNumber" in shipment.lifecycle ? shipment.lifecycle.trackingNumber : null;
+  return "trackingNumber" in shipment.lifecycle
+    ? shipment.lifecycle.trackingNumber
+    : null;
 }
 
 /** Whether the merchant has this customer, not erased. */

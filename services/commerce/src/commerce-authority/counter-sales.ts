@@ -43,10 +43,7 @@ export function inPersonCollectionRejection(
 }
 
 export function unavailableInPersonCheckoutCollection(
-  started: Exclude<
-    CommerceMutationResultV1,
-    Readonly<{ outcome: "rejected" }>
-  >,
+  started: Exclude<CommerceMutationResultV1, Readonly<{ outcome: "rejected" }>>,
   retryAfter: string,
 ): CommerceInPersonCheckoutPaymentCollectionV1 {
   return {
@@ -56,11 +53,4 @@ export function unavailableInPersonCheckoutCollection(
     receipt: started.receipt,
     retryAfter,
   };
-}
-
-export function timestampAfterSeconds(
-  timestamp: string,
-  seconds: number,
-): string {
-  return new Date(Date.parse(timestamp) + seconds * 1_000).toISOString();
 }

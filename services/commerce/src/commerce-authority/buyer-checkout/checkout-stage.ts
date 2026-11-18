@@ -4,8 +4,12 @@ import {
   type BuyerShippingCheckoutCommand,
   type DraftPriceOverride,
 } from "../checkout-planning.ts";
-import type { CommerceDraftOrderV1 } from "@seams/commerce-client";
-import { sha256 } from "../checkout-shared.ts";
+import type {
+  CommerceDraftOrderV1,
+  CommerceMutationErrorV1,
+} from "@seams/commerce-client";
+import type { Cart } from "@seams/commerce-contracts";
+import { sha256, timestampBefore } from "../checkout-shared.ts";
 import { buyerIdentityRejected } from "./placements.ts";
 import {
   buyerCheckoutCartMissing,
@@ -17,7 +21,6 @@ import {
   pickupCheckoutLinesFromCart,
   shippingCheckoutLinesFromCart,
 } from "./quotes.ts";
-import { timestampBefore } from "./shared.ts";
 import type {
   BuyerCheckoutCreation,
   BuyerCheckoutProfileClaims,
@@ -114,23 +117,9 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
       throw new Error("Verified buyer session lost its merchant");
     }
     const { identityDigest, checkoutId } = input;
-    const cart = readCart(
-      this.options.database,
-      input.claims.merchantId,
-      input.command.cartId,
-    );
-    const cartError = buyerCheckoutCartReferenceError(
-      cart,
-      input.claims,
-      input.command.cartId,
-      input.command.cartRevision,
-      checkoutId,
-    );
-    if (cartError !== undefined || cart === undefined) {
-      return {
-        kind: "rejected",
-        error: cartError ?? buyerCheckoutCartMissing(input.command.cartId),
-      };
+    const cart = this.#checkoutCart(input.claims, input.command, checkoutId);
+    if ("error" in cart) {
+      return cart;
     }
     const buyerAuthority = createCheckoutBuyerAuthority(
       input.claims,
@@ -156,23 +145,7 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
       input.priceOverrides.length === 0
         ? {}
         : { priceOverrides: input.priceOverrides }),
-      discount: {
-        codes: input.command.discountCodes ?? [],
-        customerId: this.customerIdOf(input.claims, input.command.buyer),
-      },
-      ...(input.command.marketId === undefined
-        ? {}
-        : { marketId: input.command.marketId }),
-      ...(input.command.giftCardCodes === undefined &&
-      input.command.storeCredit !== true
-        ? {}
-        : {
-            storedValue: {
-              giftCardCodes: input.command.giftCardCodes ?? [],
-              customerId: this.customerIdOf(input.claims, input.command.buyer),
-              storeCredit: input.command.storeCredit === true,
-            },
-          }),
+      ...this.#checkoutOffers(input.claims, input.command),
       ...(input.command.pickupAt === undefined
         ? {}
         : { pickupAt: input.command.pickupAt }),
@@ -233,23 +206,9 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
       input.command.idempotencyKey,
     );
     const checkoutId = `checkout_${identityDigest}`;
-    const cart = readCart(
-      this.options.database,
-      input.claims.merchantId,
-      input.command.cartId,
-    );
-    const cartError = buyerCheckoutCartReferenceError(
-      cart,
-      input.claims,
-      input.command.cartId,
-      input.command.cartRevision,
-      checkoutId,
-    );
-    if (cartError !== undefined || cart === undefined) {
-      return {
-        kind: "rejected",
-        error: cartError ?? buyerCheckoutCartMissing(input.command.cartId),
-      };
+    const cart = this.#checkoutCart(input.claims, input.command, checkoutId);
+    if ("error" in cart) {
+      return cart;
     }
     if (
       !buyerShippingServiceIsAvailable(
@@ -285,23 +244,7 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
       lines: shippingCheckoutLinesFromCart(cart, identityDigest),
       shippingServiceCode: input.command.shippingServiceCode,
       shippingDestination: input.command.shippingDestination,
-      discount: {
-        codes: input.command.discountCodes ?? [],
-        customerId: this.customerIdOf(input.claims, input.command.buyer),
-      },
-      ...(input.command.marketId === undefined
-        ? {}
-        : { marketId: input.command.marketId }),
-      ...(input.command.giftCardCodes === undefined &&
-      input.command.storeCredit !== true
-        ? {}
-        : {
-            storedValue: {
-              giftCardCodes: input.command.giftCardCodes ?? [],
-              customerId: this.customerIdOf(input.claims, input.command.buyer),
-              storeCredit: input.command.storeCredit === true,
-            },
-          }),
+      ...this.#checkoutOffers(input.claims, input.command),
     };
     const result = this.submitBuyerShippingCheckout(command);
     if (result.outcome === "rejected")
@@ -321,5 +264,56 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
           },
         }
       : { kind: "created", checkout };
+  }
+
+  // The buyer's cart that a new checkout names, at the revision it names.
+  #checkoutCart(
+    claims: BuyerCheckoutProfileClaims,
+    command: Readonly<{ cartId: string; cartRevision: number }>,
+    checkoutId: string,
+  ): Cart | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }> {
+    const cart = readCart(
+      this.options.database,
+      claims.merchantId,
+      command.cartId,
+    );
+    const cartError = buyerCheckoutCartReferenceError(
+      cart,
+      claims,
+      command.cartId,
+      command.cartRevision,
+      checkoutId,
+    );
+    return cartError !== undefined || cart === undefined
+      ? {
+          kind: "rejected",
+          error: cartError ?? buyerCheckoutCartMissing(command.cartId),
+        }
+      : cart;
+  }
+
+  // The discount codes, market and stored value that a new checkout uses.
+  #checkoutOffers(
+    claims: BuyerCheckoutProfileClaims,
+    command:
+      | ResolvedCreateBuyerPickupCheckoutV1
+      | ResolvedCreateBuyerShippingCheckoutV1,
+  ) {
+    return {
+      discount: {
+        codes: command.discountCodes ?? [],
+        customerId: this.customerIdOf(claims, command.buyer),
+      },
+      ...(command.marketId === undefined ? {} : { marketId: command.marketId }),
+      ...(command.giftCardCodes === undefined && command.storeCredit !== true
+        ? {}
+        : {
+            storedValue: {
+              giftCardCodes: command.giftCardCodes ?? [],
+              customerId: this.customerIdOf(claims, command.buyer),
+              storeCredit: command.storeCredit === true,
+            },
+          }),
+    };
   }
 }

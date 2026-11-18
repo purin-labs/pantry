@@ -1,6 +1,5 @@
 import type {
   CommerceCommandResult,
-  CommerceEntityPlaneError,
   SavedCommerceViewId,
   SavedCommerceViewRevision,
 } from "@seams/commerce-contracts";
@@ -13,6 +12,7 @@ import {
   commandJson,
   EntityPlaneSettlement,
   type CommandRequest,
+  rejected,
 } from "./receipt-outbox-settlement.ts";
 
 type StoredSavedViewRow = Readonly<{
@@ -222,8 +222,4 @@ export class SavedViewMutations {
       )
       .get(merchantId, viewId);
   }
-}
-
-function rejected(error: CommerceEntityPlaneError): CommerceCommandResult {
-  return { status: "rejected", error };
 }

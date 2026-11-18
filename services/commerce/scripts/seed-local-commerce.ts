@@ -5,7 +5,6 @@ import {
   type CommerceCommandInput,
   type CommerceMerchantSnapshotV1,
 } from "@seams/commerce-client";
-import { pathToFileURL } from "node:url";
 
 import { configurePhase4Shipping } from "./configure-plan22-phase4-shipping.ts";
 import {
@@ -13,6 +12,7 @@ import {
   PLAN23_FLAVORS,
 } from "./configure-plan23-flavored-catalog.ts";
 import { rebuildPhase3Cafe } from "./rebuild-plan22-phase3-cafe.ts";
+import { clientFailure, isMainModule } from "./merchant-script.ts";
 
 const BASE_URL = process.env.UNDERCLERK_BASE_URL ?? "http://127.0.0.1:3102";
 const ORGANISATION_ID = "organisation_local_nuki_demo";
@@ -37,7 +37,7 @@ export const LOCAL_COMMERCE_MERCHANT = Object.freeze({
   merchantId: MERCHANT_ID,
 });
 
-if (isMainModule()) await main();
+if (isMainModule(import.meta.url)) await main();
 
 async function main(): Promise<void> {
   await waitForCommerce();
@@ -440,14 +440,6 @@ async function waitForCommerce(): Promise<void> {
   throw new Error("Underclerk did not become healthy within 30 seconds");
 }
 
-function isMainModule(): boolean {
-  const scriptPath = process.argv[1];
-  return (
-    scriptPath !== undefined &&
-    import.meta.url === pathToFileURL(scriptPath).href
-  );
-}
-
 function delay(milliseconds: number): Promise<void> {
   return new Promise(resolveDelay.bind(undefined, milliseconds));
 }
@@ -461,16 +453,4 @@ function requiredEnvironment(name: "UNDERCLERK_SERVICE_TOKEN"): string {
   if (value === undefined || value.length === 0)
     throw new Error(`${name} is required`);
   return value;
-}
-
-function clientFailure(
-  operation: string,
-  result: Readonly<{
-    ok: false;
-    error: Readonly<{ kind: string; message: string }>;
-  }>,
-): Error {
-  return new Error(
-    `${operation} failed: ${result.error.kind}: ${result.error.message}`,
-  );
 }

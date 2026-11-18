@@ -7,11 +7,13 @@ import {
 import { balanceCheckoutOrder } from "../order-changes.ts";
 import {
   buyerCheckoutCanReconcilePayment,
+  buyerPaymentAttemptConflicts,
   buyerPaymentAttemptResult,
   buyerPaymentIdentityDigest,
 } from "./payments.ts";
 import { orderBuyer } from "./placements.ts";
-import { timestampAfter } from "./shared.ts";
+import { timestampAfter } from "../checkout-shared.ts";
+import { providerResolutionOutcome } from "../checkout-payment-planning.ts";
 import type {
   BuyerCheckoutProfileClaims,
   BuyerPaymentResult,
@@ -85,11 +87,11 @@ export abstract class BuyerReconcileStage extends BuyerPlacementStage {
       paymentAttemptId,
     );
     if (
-      paymentAttempt !== undefined &&
-      (paymentAttempt.binding.checkoutId !== input.checkoutId ||
-        paymentAttempt.binding.checkoutRevision !==
-          input.command.checkoutRevision ||
-        paymentAttempt.binding.quoteDigest !== input.command.quoteDigest)
+      buyerPaymentAttemptConflicts(
+        paymentAttempt,
+        input.checkoutId,
+        input.command,
+      )
     ) {
       return {
         kind: "rejected",
@@ -211,20 +213,7 @@ export abstract class BuyerReconcileStage extends BuyerPlacementStage {
           quoteDigest: input.command.quoteDigest,
           paymentAttemptId,
           paymentAttemptRevision: paymentAttempt.revision,
-          outcome:
-            provider.kind === "declined"
-              ? { kind: "declined", reasonCode: provider.reason }
-              : provider.kind === "processing"
-                ? {
-                    kind: "processing",
-                    reasonCode: provider.reason,
-                    reconcileAfter: provider.reconcileAfter,
-                  }
-                : {
-                    kind: "indeterminate",
-                    reasonCode: provider.reason,
-                    reconcileAfter: provider.reconcileAfter,
-                  },
+          outcome: providerResolutionOutcome(provider),
         });
         if (resolved.outcome === "rejected")
           return { kind: "rejected", error: resolved.error };

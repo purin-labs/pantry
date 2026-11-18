@@ -15,7 +15,6 @@ import {
   type ManagePreparationTicketCommand,
   type CommerceFoodServiceSnapshotV1,
   type CommerceMerchantSnapshotV1,
-  type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
 } from "@seams/commerce-client";
 import { merchantOwner } from "./merchant-owner.ts";
@@ -27,6 +26,13 @@ import type {
   StockPolicy,
 } from "@seams/commerce-contracts";
 import type { CommerceDatabase } from "../../database.ts";
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  beginMerchantCommand,
+  beginSnapshotCommand,
+  merchantNotFound,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 import {
   foodProvenance,
   readPreparationTicket,
@@ -54,12 +60,6 @@ import {
   type writeSoldOutMark,
 } from "./sold-out-marks.ts";
 
-export type FoodServiceMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
-
 type FoodServiceCommand =
   | CreatePreparationStationCommand
   | CreateModifierGroupRevisionCommand
@@ -83,7 +83,7 @@ type FoodServiceResourceCommit<
 > = Readonly<{
   kind: "resource";
   command: Command;
-  merchant: FoodServiceMerchantRow;
+  merchant: MerchantRow;
   resource: Variant<FoodServiceResourceWrite, Kind>;
   commandKind: CommandKind;
 }>;
@@ -113,39 +113,29 @@ export type FoodServiceCommitRequest =
   | Readonly<{
       kind: "sold_out_mark";
       command: MarkSoldOutCommand;
-      merchant: FoodServiceMerchantRow;
+      merchant: MerchantRow;
       mark: Parameters<typeof writeSoldOutMark>[2];
     }>
   | Readonly<{
       kind: "preparation_ticket";
       command: ManagePreparationTicketCommand;
-      merchant: FoodServiceMerchantRow;
+      merchant: MerchantRow;
       plan: PreparationTicketPlan;
     }>;
 
-type FoodServiceCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => FoodServiceMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readFoodServiceSnapshot: (
-    merchantId: string,
-  ) => CommerceFoodServiceSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: FoodServiceCommand,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: FoodServiceCommitRequest) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: FoodServiceMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-}>;
+type FoodServiceCommandAuthorityOptions =
+  MerchantCommandPorts<FoodServiceCommand> &
+    Readonly<{
+      database: CommerceDatabase;
+      now: () => string;
+      readSnapshot: (
+        merchantId: string,
+      ) => CommerceMerchantSnapshotV1 | undefined;
+      readFoodServiceSnapshot: (
+        merchantId: string,
+      ) => CommerceFoodServiceSnapshotV1 | undefined;
+      commit: (request: FoodServiceCommitRequest) => CommerceMutationResultV1;
+    }>;
 
 export class FoodServiceCommandAuthority {
   readonly #options: FoodServiceCommandAuthorityOptions;
@@ -155,43 +145,14 @@ export class FoodServiceCommandAuthority {
   }
 
   createPreparationStation(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CreatePreparationStationCommand;
-    try {
-      command = parseCreatePreparationStationCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseCreatePreparationStationCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const commerce = this.#options.readSnapshot(command.merchantId);
-    if (commerce === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot: commerce } = start;
     const location = commerce.resources.locations.find(
       (candidate) => candidate.id === command.station.locationId,
     );
@@ -250,36 +211,14 @@ export class FoodServiceCommandAuthority {
   }
 
   createModifierGroupRevision(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CreateModifierGroupRevisionCommand;
-    try {
-      command = parseCreateModifierGroupRevisionCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseCreateModifierGroupRevisionCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision)
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     if (
       command.modifierGroupRevision.minimumSelections >
         command.modifierGroupRevision.maximumSelections ||
@@ -371,36 +310,14 @@ export class FoodServiceCommandAuthority {
   }
 
   createRecipeRevision(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: CreateRecipeRevisionCommand;
-    try {
-      command = parseCreateRecipeRevisionCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseCreateRecipeRevisionCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision)
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const latest = this.#options.database
       .prepare(
         `SELECT revision FROM food_service_resource
@@ -497,36 +414,14 @@ export class FoodServiceCommandAuthority {
   }
 
   configureStockPolicy(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ConfigureStockPolicyCommand;
-    try {
-      command = parseConfigureStockPolicyCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseConfigureStockPolicyCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision)
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant } = start;
     const inventoryItem = readInventoryItem(
       this.#options.database,
       command.merchantId,
@@ -619,42 +514,14 @@ export class FoodServiceCommandAuthority {
   }
 
   publishMenu(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: PublishMenuCommand;
-    try {
-      command = parsePublishMenuCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parsePublishMenuCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision)
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const salesChannel = snapshot.resources.salesChannels.find(
       (channel) => channel.id === command.menu.salesChannelId,
     );
@@ -750,42 +617,14 @@ export class FoodServiceCommandAuthority {
   }
 
   markSoldOut(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: MarkSoldOutCommand;
-    try {
-      command = parseMarkSoldOutCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseMarkSoldOutCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision)
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const location = snapshot.resources.locations.find(
       (candidate) => candidate.id === command.locationId,
     );
@@ -805,7 +644,10 @@ export class FoodServiceCommandAuthority {
         kind: "variant",
         id: command.variantId,
       });
-    if (command.mark.kind === "today" && !isKnownTimeZone(command.mark.timeZone))
+    if (
+      command.mark.kind === "today" &&
+      !isKnownTimeZone(command.mark.timeZone)
+    )
       return this.#options.rejected({
         code: "resource_relationship_invalid",
         field: "mark.timeZone",
@@ -837,46 +679,19 @@ export class FoodServiceCommandAuthority {
   }
 
   managePreparationTicket(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: ManagePreparationTicketCommand;
-    try {
-      command = parseManagePreparationTicketCommand(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseManagePreparationTicketCommand,
+      { merchantRevision: true },
     );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    if (merchant.revision !== command.expectedMerchantRevision) {
-      return this.#options.rejected({
-        code: "stale_merchant_revision",
-        expected: command.expectedMerchantRevision,
-        actual: merchant.revision,
-      });
-    }
-    const commerce = this.#options.readSnapshot(command.merchantId);
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot: commerce } = start;
     const foodService = this.#options.readFoodServiceSnapshot(
       command.merchantId,
     );
-    if (commerce === undefined || foodService === undefined) {
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (foodService === undefined) {
+      return this.#options.rejected(merchantNotFound(command.merchantId));
     }
     const ticket = readPreparationTicket(
       this.#options.database,

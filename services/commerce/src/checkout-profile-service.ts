@@ -134,30 +134,31 @@ type NormalizedCreateDraft = Readonly<{
   createdAt: string;
 }>;
 
-type NormalizedReplaceDraft = Readonly<{
+/** The profile revision that a replace, a publish or a retire names. */
+type ProfileTarget = Readonly<{
   merchantId: string;
   checkoutProfileId: string;
   expectedRevision: number;
-  name: string;
-  configuration: CheckoutProfileConfiguration;
-  updatedAt: string;
 }>;
 
-type NormalizedPublish = Readonly<{
-  merchantId: string;
-  checkoutProfileId: string;
-  expectedRevision: number;
-  publishedAt: string;
-  publishedBy: string;
-}>;
+type NormalizedReplaceDraft = ProfileTarget &
+  Readonly<{
+    name: string;
+    configuration: CheckoutProfileConfiguration;
+    updatedAt: string;
+  }>;
 
-type NormalizedRetire = Readonly<{
-  merchantId: string;
-  checkoutProfileId: string;
-  expectedRevision: number;
-  retiredAt: string;
-  retiredBy: string;
-}>;
+type NormalizedPublish = ProfileTarget &
+  Readonly<{
+    publishedAt: string;
+    publishedBy: string;
+  }>;
+
+type NormalizedRetire = ProfileTarget &
+  Readonly<{
+    retiredAt: string;
+    retiredBy: string;
+  }>;
 
 type NormalizedActivation = CheckoutProfileActivation;
 
@@ -345,18 +346,8 @@ function normalizeCreateDraft(
 function normalizeReplaceDraft(
   input: ReplaceCheckoutProfileDraft,
 ): CheckoutProfileCommandResult<NormalizedReplaceDraft> {
-  const merchantId = requireIdentity(input.merchantId, "merchantId");
-  if (!merchantId.ok) return merchantId;
-  const checkoutProfileId = requireIdentity(
-    input.checkoutProfileId,
-    "checkoutProfileId",
-  );
-  if (!checkoutProfileId.ok) return checkoutProfileId;
-  const expectedRevision = requireRevision(
-    input.expectedRevision,
-    "expectedRevision",
-  );
-  if (!expectedRevision.ok) return expectedRevision;
+  const target = normalizeProfileTarget(input);
+  if (!target.ok) return target;
   const name = requireIdentity(input.name, "name");
   if (!name.ok) return name;
   const updatedAt = requireTimestamp(input.updatedAt, "updatedAt");
@@ -364,9 +355,7 @@ function normalizeReplaceDraft(
   return {
     ok: true,
     value: {
-      merchantId: merchantId.value,
-      checkoutProfileId: checkoutProfileId.value,
-      expectedRevision: expectedRevision.value,
+      ...target.value,
       name: name.value,
       configuration: input.configuration,
       updatedAt: updatedAt.value,
@@ -377,18 +366,8 @@ function normalizeReplaceDraft(
 function normalizePublish(
   input: PublishCheckoutProfile,
 ): CheckoutProfileCommandResult<NormalizedPublish> {
-  const merchantId = requireIdentity(input.merchantId, "merchantId");
-  if (!merchantId.ok) return merchantId;
-  const checkoutProfileId = requireIdentity(
-    input.checkoutProfileId,
-    "checkoutProfileId",
-  );
-  if (!checkoutProfileId.ok) return checkoutProfileId;
-  const expectedRevision = requireRevision(
-    input.expectedRevision,
-    "expectedRevision",
-  );
-  if (!expectedRevision.ok) return expectedRevision;
+  const target = normalizeProfileTarget(input);
+  if (!target.ok) return target;
   const publishedAt = requireTimestamp(input.publishedAt, "publishedAt");
   if (!publishedAt.ok) return publishedAt;
   const publishedBy = requireIdentity(input.publishedBy, "publishedBy");
@@ -396,9 +375,7 @@ function normalizePublish(
   return {
     ok: true,
     value: {
-      merchantId: merchantId.value,
-      checkoutProfileId: checkoutProfileId.value,
-      expectedRevision: expectedRevision.value,
+      ...target.value,
       publishedAt: publishedAt.value,
       publishedBy: publishedBy.value,
     },
@@ -408,6 +385,26 @@ function normalizePublish(
 function normalizeRetire(
   input: RetireCheckoutProfile,
 ): CheckoutProfileCommandResult<NormalizedRetire> {
+  const target = normalizeProfileTarget(input);
+  if (!target.ok) return target;
+  const retiredAt = requireTimestamp(input.retiredAt, "retiredAt");
+  if (!retiredAt.ok) return retiredAt;
+  const retiredBy = requireIdentity(input.retiredBy, "retiredBy");
+  if (!retiredBy.ok) return retiredBy;
+  return {
+    ok: true,
+    value: {
+      ...target.value,
+      retiredAt: retiredAt.value,
+      retiredBy: retiredBy.value,
+    },
+  };
+}
+
+// The profile and the revision that a replace, a publish or a retire names.
+function normalizeProfileTarget(
+  input: ProfileTarget,
+): CheckoutProfileCommandResult<ProfileTarget> {
   const merchantId = requireIdentity(input.merchantId, "merchantId");
   if (!merchantId.ok) return merchantId;
   const checkoutProfileId = requireIdentity(
@@ -420,18 +417,12 @@ function normalizeRetire(
     "expectedRevision",
   );
   if (!expectedRevision.ok) return expectedRevision;
-  const retiredAt = requireTimestamp(input.retiredAt, "retiredAt");
-  if (!retiredAt.ok) return retiredAt;
-  const retiredBy = requireIdentity(input.retiredBy, "retiredBy");
-  if (!retiredBy.ok) return retiredBy;
   return {
     ok: true,
     value: {
       merchantId: merchantId.value,
       checkoutProfileId: checkoutProfileId.value,
       expectedRevision: expectedRevision.value,
-      retiredAt: retiredAt.value,
-      retiredBy: retiredBy.value,
     },
   };
 }
@@ -509,22 +500,9 @@ function replaceDraftTransaction(
   database: CommerceDatabase,
   input: NormalizedReplaceDraft,
 ): CheckoutProfileCommandResult<CheckoutProfile> {
-  const current = readLatestProfile(
-    database,
-    input.merchantId,
-    input.checkoutProfileId,
-  );
-  if (current === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: "profile_not_found",
-        checkoutProfileId: input.checkoutProfileId,
-      },
-    };
-  }
-  const revision = requireExpectedRevision(current, input.expectedRevision);
-  if (!revision.ok) return revision;
+  const target = readTargetProfile(database, input);
+  if (!target.ok) return target;
+  const current = target.value;
   const replace = commerceTransition(
     "checkout_profile",
     current.lifecycle,
@@ -554,22 +532,9 @@ function publishTransaction(
   database: CommerceDatabase,
   input: NormalizedPublish,
 ): CheckoutProfileCommandResult<CheckoutProfile> {
-  const current = readLatestProfile(
-    database,
-    input.merchantId,
-    input.checkoutProfileId,
-  );
-  if (current === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: "profile_not_found",
-        checkoutProfileId: input.checkoutProfileId,
-      },
-    };
-  }
-  const revision = requireExpectedRevision(current, input.expectedRevision);
-  if (!revision.ok) return revision;
+  const target = readTargetProfile(database, input);
+  if (!target.ok) return target;
+  const current = target.value;
   const publish = commerceTransition(
     "checkout_profile",
     current.lifecycle,
@@ -599,22 +564,9 @@ function retireTransaction(
   database: CommerceDatabase,
   input: NormalizedRetire,
 ): CheckoutProfileCommandResult<CheckoutProfile> {
-  const current = readLatestProfile(
-    database,
-    input.merchantId,
-    input.checkoutProfileId,
-  );
-  if (current === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: "profile_not_found",
-        checkoutProfileId: input.checkoutProfileId,
-      },
-    };
-  }
-  const revision = requireExpectedRevision(current, input.expectedRevision);
-  if (!revision.ok) return revision;
+  const target = readTargetProfile(database, input);
+  if (!target.ok) return target;
+  const current = target.value;
   const retire = commerceTransition(
     "checkout_profile",
     current.lifecycle,
@@ -698,6 +650,30 @@ function activateTransaction(
   }
   writeActivation(database, input);
   return { ok: true, value: { activation: input, profile } };
+}
+
+// The latest revision of the profile that a command names, when it is the
+// revision that the command expects.
+function readTargetProfile(
+  database: CommerceDatabase,
+  input: ProfileTarget,
+): CheckoutProfileCommandResult<CheckoutProfile> {
+  const current = readLatestProfile(
+    database,
+    input.merchantId,
+    input.checkoutProfileId,
+  );
+  if (current === undefined) {
+    return {
+      ok: false,
+      error: {
+        code: "profile_not_found",
+        checkoutProfileId: input.checkoutProfileId,
+      },
+    };
+  }
+  const revision = requireExpectedRevision(current, input.expectedRevision);
+  return revision.ok ? { ok: true, value: current } : revision;
 }
 
 function requireExpectedRevision(

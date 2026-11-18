@@ -20,6 +20,7 @@ import { parseEntityRef, parsePositiveRevision } from "./parsers.ts";
 import {
   EntityPlaneSettlement,
   type CommandRequest,
+  rejected,
 } from "./receipt-outbox-settlement.ts";
 
 type EntityMutationHandlerOptions = Readonly<{
@@ -118,19 +119,9 @@ export class EntityMutationHandler {
     previousRevision: number,
   ): CommerceCommandResult {
     const command = request.command.command;
-    const row = readEntityMutationRow(
-      this.#database,
-      request.merchantId,
-      command.entityRef,
-    );
-    if (row === undefined || row.lifecycleState !== "active")
-      return rejected({ code: "not_found" });
-    if (row.revision !== Number(command.expectedRevision)) {
-      return rejected({
-        code: "revision_conflict",
-        expected: BigInt(command.expectedRevision),
-        received: BigInt(row.revision),
-      });
+    const row = this.#activeEntity(request.merchantId, command);
+    if ("code" in row) {
+      return rejected(row);
     }
     const type = readCustomEntityTypeRevision(
       this.#database,
@@ -186,19 +177,9 @@ export class EntityMutationHandler {
     previousRevision: number,
   ): CommerceCommandResult {
     const command = request.command.command;
-    const row = readEntityMutationRow(
-      this.#database,
-      request.merchantId,
-      command.entityRef,
-    );
-    if (row === undefined || row.lifecycleState !== "active")
-      return rejected({ code: "not_found" });
-    if (row.revision !== Number(command.expectedRevision)) {
-      return rejected({
-        code: "revision_conflict",
-        expected: BigInt(command.expectedRevision),
-        received: BigInt(row.revision),
-      });
+    const row = this.#activeEntity(request.merchantId, command);
+    if ("code" in row) {
+      return rejected(row);
     }
     const revision = parsePositiveRevision<CommerceEntityRevision>(
       Number(command.expectedRevision) + 1,
@@ -227,6 +208,35 @@ export class EntityMutationHandler {
       },
     );
   }
+
+  // The active entity that a patch or an archive names, at its expected
+  // revision.
+  #activeEntity(
+    merchantId: string,
+    command: Readonly<{
+      entityRef: CustomCommerceEntityRef;
+      expectedRevision: CommerceEntityRevision;
+    }>,
+  ):
+    | NonNullable<ReturnType<typeof readEntityMutationRow>>
+    | CommerceEntityPlaneError {
+    const row = readEntityMutationRow(
+      this.#database,
+      merchantId,
+      command.entityRef,
+    );
+    if (row === undefined || row.lifecycleState !== "active") {
+      return { code: "not_found" };
+    }
+    if (row.revision !== Number(command.expectedRevision)) {
+      return {
+        code: "revision_conflict",
+        expected: BigInt(command.expectedRevision),
+        received: BigInt(row.revision),
+      };
+    }
+    return row;
+  }
 }
 
 function customEntityObservation(
@@ -249,8 +259,4 @@ function nextMerchantRevision(previousRevision: number): MerchantRevision {
     previousRevision + 1,
     "merchantRevision",
   );
-}
-
-function rejected(error: CommerceEntityPlaneError): CommerceCommandResult {
-  return { status: "rejected", error };
 }

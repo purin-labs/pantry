@@ -30,9 +30,10 @@ import {
   inPersonCollectionRejection,
   requireCounterSale,
   requireSuccessfulCounterSaleMutation,
-  timestampAfterSeconds,
   unavailableInPersonCheckoutCollection,
 } from "../counter-sales.ts";
+import { timestampAfter } from "../checkout-shared.ts";
+import { providerResolutionOutcome } from "../checkout-payment-planning.ts";
 import {
   buildObservedPaymentDispute,
   resolvePaymentDisputeCorrelation,
@@ -111,7 +112,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
     if (gateway === undefined) {
       return unavailableInPersonCheckoutCollection(
         started,
-        timestampAfterSeconds(this.now(), 60),
+        timestampAfter(this.now(), 60),
       );
     }
     let provider;
@@ -133,7 +134,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
     } catch {
       return unavailableInPersonCheckoutCollection(
         started,
-        timestampAfterSeconds(this.now(), 60),
+        timestampAfter(this.now(), 60),
       );
     }
     if (provider.kind === "unavailable") {
@@ -201,7 +202,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
           schemaVersion: "underclerk.payment-capture-result.v1" as const,
           kind: "indeterminate" as const,
           reason: "provider_transport_interrupted",
-          reconcileAfter: timestampAfterSeconds(this.now(), 60),
+          reconcileAfter: timestampAfter(this.now(), 60),
         };
       }
       merchant = this.ledger.readMerchant(merchantId);
@@ -232,20 +233,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
           quoteDigest: sale.paymentAttempt.binding.quoteDigest,
           paymentAttemptId: sale.paymentAttempt.paymentAttemptId,
           paymentAttemptRevision: sale.paymentAttempt.revision,
-          outcome:
-            provider.kind === "declined"
-              ? { kind: "declined", reasonCode: provider.reason }
-              : provider.kind === "processing"
-                ? {
-                    kind: "processing",
-                    reasonCode: provider.reason,
-                    reconcileAfter: provider.reconcileAfter,
-                  }
-                : {
-                    kind: "indeterminate",
-                    reasonCode: provider.reason,
-                    reconcileAfter: provider.reconcileAfter,
-                  },
+          outcome: providerResolutionOutcome(provider),
         });
         requireSuccessfulCounterSaleMutation(
           resolved,
@@ -482,7 +470,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
       )
       .all<
         Readonly<{ merchantId: string; checkoutId: string; createdAt: string }>
-      >(timestampAfterSeconds(now, -TERMINAL_POLL_WINDOW_SECONDS));
+      >(timestampAfter(now, -TERMINAL_POLL_WINDOW_SECONDS));
     const due: string[] = [];
     for (const row of rows) {
       let waiting: boolean;
@@ -497,9 +485,9 @@ export abstract class PaymentFamily extends CheckoutFamily {
       }
       if (!waiting) continue;
       const fresh =
-        row.createdAt > timestampAfterSeconds(now, -TERMINAL_FAST_POLL_SECONDS);
+        row.createdAt > timestampAfter(now, -TERMINAL_FAST_POLL_SECONDS);
       due.push(
-        timestampAfterSeconds(
+        timestampAfter(
           this.now(),
           fresh ? TERMINAL_POLL_SECONDS : TERMINAL_SLOW_POLL_SECONDS,
         ),

@@ -25,7 +25,7 @@ import {
   toBuyerCart,
   toCartLines,
 } from "./carts.ts";
-import { requireIdentity } from "./shared.ts";
+import { requireIdentity } from "../command-guards.ts";
 import type { BuyerCartMutation, BuyerCheckoutProfileClaims } from "./types.ts";
 import { BuyerStorefrontStage } from "./storefront-stage.ts";
 

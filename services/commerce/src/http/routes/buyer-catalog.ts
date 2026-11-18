@@ -1,8 +1,8 @@
 import { mediaObjectKey } from "../../plugins/media/index.ts";
 import type { BuyerRoute } from "../../http-routes.ts";
 import { catalogSearchRequest, searchCatalog } from "../../catalog-search.ts";
+import { verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
-import { bearerToken } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
 
 // Serves an image only while this storefront's catalog shows it, so the
@@ -66,23 +66,8 @@ export async function buyerCatalogRoute(
     { kind: "read_buyer_catalog" | "search_buyer_catalog" }
   >,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  if (
-    token === undefined ||
-    !ctx.buyerSessions.verify(token, {
-      merchantId: route.merchantId,
-      storefrontId: route.storefrontId,
-      storefrontRevision: context.storefront.revision,
-    }).ok
-  ) {
-    return jsonResponse(401, { message: "Unauthorized" });
-  }
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
   const catalog = ctx.authority.readBuyerCatalog(
     route.merchantId,
     route.storefrontId,
@@ -107,23 +92,9 @@ export async function buyerCollectionsRoute(
     { kind: "list_buyer_collections" | "read_buyer_collection" }
   >,
 ): Promise<Response> {
-  const context = ctx.authority.readBuyerStorefrontContext(
-    route.merchantId,
-    route.storefrontId,
-  );
-  if (context === undefined)
-    return jsonResponse(404, { message: "Storefront not found" });
-  const token = bearerToken(request);
-  if (
-    token === undefined ||
-    !ctx.buyerSessions.verify(token, {
-      merchantId: route.merchantId,
-      storefrontId: route.storefrontId,
-      storefrontRevision: context.storefront.revision,
-    }).ok
-  )
-    return jsonResponse(401, { message: "Unauthorized" });
-  const channel = context.storefront.salesChannelId;
+  const access = verifyBuyerAccess(ctx, request, route);
+  if (!access.ok) return access.response;
+  const channel = access.context.storefront.salesChannelId;
   if (route.kind === "list_buyer_collections")
     return jsonResponse(200, {
       schemaVersion: "underclerk.buyer-collections.v1",

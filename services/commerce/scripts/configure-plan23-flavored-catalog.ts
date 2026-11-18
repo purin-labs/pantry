@@ -5,9 +5,14 @@ import {
   type OpenCommerceInventoryPositionV1,
   type PlaceCommerceChannelListingV1,
   type ReceiveCommerceInventoryV3,
-  type CommerceMutationResultV1,
 } from "@seams/commerce-client";
-import { pathToFileURL } from "node:url";
+import {
+  applyAtRevision,
+  clientFailure,
+  isMainModule,
+  parseMerchantScriptArguments,
+  type MerchantScriptArguments,
+} from "./merchant-script.ts";
 
 const REQUESTED_AT = "2026-08-14T10:00:00.000Z";
 const LOT_EXPIRES_AT = "2036-08-21T00:00:00.000Z";
@@ -17,14 +22,10 @@ const LOCATION_ID = "location_tokyo_fulfillment";
 const CARTON_INVENTORY_ITEM_ID = "inventory_shipping_carton";
 const OPENING_STOCK_PER_FLAVOR = 10;
 
-type SetupArguments = Readonly<{
-  organisationId: string;
-  merchantId: string;
-  baseUrl: string;
-  serviceToken: string;
-}>;
-
-type SetupIdentity = Pick<SetupArguments, "organisationId" | "merchantId">;
+type SetupIdentity = Pick<
+  MerchantScriptArguments,
+  "organisationId" | "merchantId"
+>;
 
 export type FlavorKey = "sesame" | "ginger" | "taro" | "matcha";
 
@@ -82,7 +83,7 @@ export type Plan23FlavoredCatalogSetupResult = Readonly<{
   availableBoxesPerFlavor: 10;
 }>;
 
-if (isMainModule()) await main();
+if (isMainModule(import.meta.url)) await main();
 
 export async function configurePlan23FlavoredCatalog(
   adminClient: CommerceAdminClient,
@@ -101,7 +102,7 @@ export async function configurePlan23FlavoredCatalog(
 
   let expectedRevision = initial.value.merchantRevision;
   for (const flavor of PLAN23_FLAVORS) {
-    expectedRevision = await apply(
+    expectedRevision = await applyAtRevision(
       adminClient.createInventoryItem(
         inventoryItem(identity, expectedRevision, flavor),
       ),
@@ -110,7 +111,7 @@ export async function configurePlan23FlavoredCatalog(
     );
   }
   for (const flavor of PLAN23_FLAVORS) {
-    expectedRevision = await apply(
+    expectedRevision = await applyAtRevision(
       adminClient.placeChannelListing(
         channelListing(identity, expectedRevision, flavor),
       ),
@@ -119,7 +120,7 @@ export async function configurePlan23FlavoredCatalog(
     );
   }
   for (const flavor of PLAN23_FLAVORS) {
-    expectedRevision = await apply(
+    expectedRevision = await applyAtRevision(
       adminClient.openInventoryPosition(
         inventoryPosition(identity, expectedRevision, flavor),
       ),
@@ -128,7 +129,7 @@ export async function configurePlan23FlavoredCatalog(
     );
   }
   for (const flavor of PLAN23_FLAVORS) {
-    expectedRevision = await apply(
+    expectedRevision = await applyAtRevision(
       adminClient.receiveInventory(receipt(identity, expectedRevision, flavor)),
       `${flavor.key} box opening stock`,
       expectedRevision + 1,
@@ -382,31 +383,12 @@ function openingStockIsAvailable(
   );
 }
 
-async function apply(
-  pending: Promise<
-    Readonly<
-      | { ok: true; value: CommerceMutationResultV1 }
-      | { ok: false; error: Readonly<{ kind: string; message: string }> }
-    >
-  >,
-  operation: string,
-  expectedRevision: number,
-): Promise<number> {
-  const result = await pending;
-  if (!result.ok) throw clientFailure(operation, result);
-  if (result.value.outcome === "rejected") {
-    throw new Error(
-      `${operation} was rejected: ${JSON.stringify(result.value.error)}`,
-    );
-  }
-  if (result.value.receipt.merchantRevision !== expectedRevision) {
-    throw new Error(`${operation} produced an unexpected merchant revision`);
-  }
-  return expectedRevision;
-}
-
 async function main(): Promise<void> {
-  const arguments_ = parseArguments(process.argv.slice(2), process.env);
+  const arguments_ = parseMerchantScriptArguments(
+    "configure:plan23-flavored-catalog",
+    process.argv.slice(2),
+    process.env,
+  );
   const client = new CommerceAdminClient({
     baseUrl: arguments_.baseUrl,
     serviceToken: arguments_.serviceToken,
@@ -416,83 +398,4 @@ async function main(): Promise<void> {
     merchantId: arguments_.merchantId,
   });
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-}
-
-function isMainModule(): boolean {
-  const scriptPath = process.argv[1];
-  return (
-    scriptPath !== undefined &&
-    import.meta.url === pathToFileURL(scriptPath).href
-  );
-}
-
-function clientFailure(
-  operation: string,
-  result: Readonly<{
-    ok: false;
-    error: Readonly<{ kind: string; message: string }>;
-  }>,
-): Error {
-  return new Error(
-    `${operation} failed: ${result.error.kind}: ${result.error.message}`,
-  );
-}
-
-function parseArguments(
-  argv: readonly string[],
-  env: NodeJS.ProcessEnv,
-): SetupArguments {
-  const values = new Map<string, string>();
-  const start = argv[0] === "--" ? 1 : 0;
-  for (let index = start; index < argv.length; index += 2) {
-    const flag = argv[index];
-    const value = argv[index + 1];
-    if (flag === undefined || value === undefined || !flag.startsWith("--")) {
-      throw new Error(
-        "Usage: configure:plan23-flavored-catalog --organisation <organisation_id> --merchant <merchant_id>",
-      );
-    }
-    values.set(flag, value);
-  }
-  return {
-    organisationId: requireIdentity(values.get("--organisation"), "--organisation", "organisation_"),
-    merchantId: requireIdentity(
-      values.get("--merchant"),
-      "--merchant",
-      "merchant_",
-    ),
-    baseUrl: requireUrl(env.UNDERCLERK_BASE_URL),
-    serviceToken: requireSecret(env.UNDERCLERK_SERVICE_TOKEN),
-  };
-}
-
-function requireIdentity(
-  value: string | undefined,
-  field: string,
-  prefix: string,
-): string {
-  if (
-    value === undefined ||
-    !value.startsWith(prefix) ||
-    value !== value.trim()
-  ) {
-    throw new Error(`${field} must be a normalized ${prefix} identity`);
-  }
-  return value;
-}
-
-function requireUrl(value: string | undefined): string {
-  if (value === undefined) throw new Error("UNDERCLERK_BASE_URL is required");
-  const parsed = new URL(value);
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("UNDERCLERK_BASE_URL must use http or https");
-  }
-  return parsed.toString();
-}
-
-function requireSecret(value: string | undefined): string {
-  if (value === undefined || value.length === 0) {
-    throw new Error("UNDERCLERK_SERVICE_TOKEN is required");
-  }
-  return value;
 }

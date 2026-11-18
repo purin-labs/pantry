@@ -66,7 +66,9 @@ import {
 } from "@seams/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
+import { invalidCommand } from "./command-guards.ts";
 import type { CommerceSigner } from "./contracts.ts";
+import type { MerchantCommandPorts } from "./merchant-command.ts";
 
 export type MerchantRow = Readonly<{
   merchantId: string;
@@ -177,10 +179,19 @@ type StoredCommandRow = Readonly<{
 export class CommerceLedger {
   readonly #database: CommerceDatabase;
   readonly #signer: CommerceSigner;
+  /** What every command authority takes from the ledger. */
+  readonly commandPorts: MerchantCommandPorts<MutationCommand>;
 
   constructor(database: CommerceDatabase, signer: CommerceSigner) {
     this.#database = database;
     this.#signer = signer;
+    this.commandPorts = {
+      readMerchant: this.readMerchant.bind(this),
+      readReplay: this.readReplay.bind(this),
+      validateMerchant,
+      rejected,
+      invalidCommand,
+    };
   }
 
   commit(mutation: CommerceMutation): CommerceMutationResultV1 {

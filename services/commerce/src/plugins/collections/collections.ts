@@ -22,37 +22,26 @@ import {
   listVariants,
 } from "../../commerce-persistence.ts";
 import type { CommerceDatabase } from "../../database.ts";
-
-export type CollectionMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  commitPlannedCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 
 export type CollectionCommitRequest = Readonly<{
   command: CommerceCollectionCommandV1;
-  merchant: CollectionMerchantRow;
+  merchant: MerchantRow;
   collectionId: string;
   revision: number;
   write: () => void;
 }>;
 
-type CollectionAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  readMerchant: (merchantId: string) => CollectionMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CommerceCollectionCommandV1,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: CollectionMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: CollectionCommitRequest) => CommerceMutationResultV1;
-}>;
+type CollectionAuthorityOptions =
+  MerchantCommandPorts<CommerceCollectionCommandV1> &
+    Readonly<{
+      database: CommerceDatabase;
+      commit: (request: CollectionCommitRequest) => CommerceMutationResultV1;
+    }>;
 
 /** A product as a collection sees it on one sales channel. */
 type ProductFacts = Readonly<{
@@ -81,7 +70,10 @@ export class CollectionAuthority {
         };
       if (this.#byHandle(command.merchantId, command.handle) !== undefined)
         return invalid("collection.handle.taken");
-      const unknown = this.#unknownProduct(command.merchantId, command.selection);
+      const unknown = this.#unknownProduct(
+        command.merchantId,
+        command.selection,
+      );
       if (unknown !== undefined)
         return { code: "resource_not_found", kind: "product", id: unknown };
       const collection: CommerceCollectionV1 = {
@@ -151,7 +143,9 @@ export class CollectionAuthority {
             )
             .run(command.merchantId, current.id);
           database
-            .prepare("DELETE FROM collection WHERE merchant_id = ? AND collection_id = ?")
+            .prepare(
+              "DELETE FROM collection WHERE merchant_id = ? AND collection_id = ?",
+            )
             .run(command.merchantId, current.id);
         },
       };
@@ -165,7 +159,9 @@ export class CollectionAuthority {
          WHERE merchant_id = ? ORDER BY handle`,
       )
       .all<Readonly<{ json: string }>>(merchantId)
-      .map((row) => this.#withMembers(merchantId, parseCollection(JSON.parse(row.json))));
+      .map((row) =>
+        this.#withMembers(merchantId, parseCollection(JSON.parse(row.json))),
+      );
   }
 
   /**
@@ -180,8 +176,7 @@ export class CollectionAuthority {
     const facts = new Map<string, readonly ProductFacts[]>();
     for (const collection of collections) {
       const channel = collection.salesChannelId;
-      const products =
-        facts.get(channel) ?? this.#facts(merchantId, channel);
+      const products = facts.get(channel) ?? this.#facts(merchantId, channel);
       facts.set(channel, products);
       this.#replaceMembers(merchantId, collection, products);
     }
@@ -216,18 +211,32 @@ export class CollectionAuthority {
     )
       return undefined;
     const facts = new Map(
-      this.#facts(merchantId, salesChannelId).map((item) => [item.product.id, item]),
+      this.#facts(merchantId, salesChannelId).map((item) => [
+        item.product.id,
+        item,
+      ]),
     );
     // A product off sale or not active stays a member but is not shown.
     const visible: ProductFacts[] = [];
     for (const productId of collection.productIds) {
       const item = facts.get(productId);
-      if (item === undefined || item.price === null || item.product.status !== "active")
+      if (
+        item === undefined ||
+        item.price === null ||
+        item.product.status !== "active"
+      )
         continue;
-      if (filter.tag !== undefined && !item.product.tags.includes(filter.tag)) continue;
-      if (filter.minimumPrice !== undefined && item.price.amountMinor < filter.minimumPrice)
+      if (filter.tag !== undefined && !item.product.tags.includes(filter.tag))
         continue;
-      if (filter.maximumPrice !== undefined && item.price.amountMinor > filter.maximumPrice)
+      if (
+        filter.minimumPrice !== undefined &&
+        item.price.amountMinor < filter.minimumPrice
+      )
+        continue;
+      if (
+        filter.maximumPrice !== undefined &&
+        item.price.amountMinor > filter.maximumPrice
+      )
         continue;
       if (filter.availableOnly === true && !item.available) continue;
       visible.push(item);
@@ -308,23 +317,29 @@ export class CollectionAuthority {
       collection.selection.kind === "manual"
         ? collection.selection.productIds
         : facts
-            .filter((item) =>
-              collection.selection.kind === "automated" &&
-              item.product.status === "active" &&
-              collectionRuleMatches(collection.selection.rule, {
-                title: item.product.title,
-                productType: item.product.productType,
-                vendor: item.product.vendor,
-                tags: item.product.tags,
-                priceMinor: item.price?.amountMinor ?? null,
-              }),
+            .filter(
+              (item) =>
+                collection.selection.kind === "automated" &&
+                item.product.status === "active" &&
+                collectionRuleMatches(collection.selection.rule, {
+                  title: item.product.title,
+                  productType: item.product.productType,
+                  vendor: item.product.vendor,
+                  tags: item.product.tags,
+                  priceMinor: item.price?.amountMinor ?? null,
+                }),
             )
             .map((item) => item.product.id);
     const current = this.#members(merchantId, collection.id);
-    if (current.length === members.length && current.every((id, i) => id === members[i]))
+    if (
+      current.length === members.length &&
+      current.every((id, i) => id === members[i])
+    )
       return;
     database
-      .prepare("DELETE FROM collection_member WHERE merchant_id = ? AND collection_id = ?")
+      .prepare(
+        "DELETE FROM collection_member WHERE merchant_id = ? AND collection_id = ?",
+      )
       .run(merchantId, collection.id);
     members.forEach((productId, position) =>
       database
@@ -341,7 +356,8 @@ export class CollectionAuthority {
     const variants = listVariants(database, merchantId);
     const offers = listOffers(database, merchantId).filter(
       (offer) =>
-        offer.salesChannelId === salesChannelId && offer.lifecycle.state === "listed",
+        offer.salesChannelId === salesChannelId &&
+        offer.lifecycle.state === "listed",
     );
     return listProducts(database, merchantId)
       .slice()
@@ -350,11 +366,14 @@ export class CollectionAuthority {
         const variantIds = new Set(
           variants
             .filter(
-              (variant) => variant.productId === product.id && variant.status === "active",
+              (variant) =>
+                variant.productId === product.id && variant.status === "active",
             )
             .map((variant) => variant.id),
         );
-        const productOffers = offers.filter((offer) => variantIds.has(offer.variantId));
+        const productOffers = offers.filter((offer) =>
+          variantIds.has(offer.variantId),
+        );
         let price: ProductFacts["price"] = null;
         for (const offer of productOffers)
           if (price === null || offer.price.amountMinor < price.amountMinor)
@@ -362,7 +381,9 @@ export class CollectionAuthority {
         return {
           product,
           price,
-          available: productOffers.some((offer) => offer.availability.state === "available"),
+          available: productOffers.some(
+            (offer) => offer.availability.state === "available",
+          ),
         };
       });
   }
@@ -372,34 +393,11 @@ export class CollectionAuthority {
     parse: (value: unknown) => TCommand,
     plan: (
       command: TCommand,
-    ) => Omit<CollectionCommitRequest, "command" | "merchant"> | CommerceMutationErrorV1,
+    ) =>
+      | Omit<CollectionCommitRequest, "command" | "merchant">
+      | CommerceMutationErrorV1,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined) return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    const planned = plan(command);
-    if ("code" in planned) return this.#options.rejected(planned);
-    return this.#options.commit({ command, merchant, ...planned });
+    return commitPlannedCommand(this.#options, rawCommand, parse, plan);
   }
 
   #current(
@@ -409,7 +407,11 @@ export class CollectionAuthority {
   ): CommerceCollectionV1 | CommerceMutationErrorV1 {
     const current = this.#read(merchantId, collectionId);
     if (current === undefined)
-      return { code: "resource_not_found", kind: "collection", id: collectionId };
+      return {
+        code: "resource_not_found",
+        kind: "collection",
+        id: collectionId,
+      };
     if (current.revision !== expectedRevision)
       return {
         code: "stale_resource_revision",
@@ -427,27 +429,39 @@ export class CollectionAuthority {
   ): string | undefined {
     if (selection.kind !== "manual") return undefined;
     const known = new Set(
-      listProducts(this.#options.database, merchantId).map((product) => product.id),
+      listProducts(this.#options.database, merchantId).map(
+        (product) => product.id,
+      ),
     );
     return selection.productIds.find((productId) => !known.has(productId));
   }
 
-  #read(merchantId: string, collectionId: string): CommerceCollectionV1 | undefined {
+  #read(
+    merchantId: string,
+    collectionId: string,
+  ): CommerceCollectionV1 | undefined {
     const row = this.#options.database
       .prepare(
         "SELECT collection_json AS json FROM collection WHERE merchant_id = ? AND collection_id = ?",
       )
       .get<Readonly<{ json: string }>>(merchantId, collectionId);
-    return row === undefined ? undefined : parseCollection(JSON.parse(row.json));
+    return row === undefined
+      ? undefined
+      : parseCollection(JSON.parse(row.json));
   }
 
-  #byHandle(merchantId: string, handle: string): CommerceCollectionV1 | undefined {
+  #byHandle(
+    merchantId: string,
+    handle: string,
+  ): CommerceCollectionV1 | undefined {
     const row = this.#options.database
       .prepare(
         "SELECT collection_json AS json FROM collection WHERE merchant_id = ? AND handle = ?",
       )
       .get<Readonly<{ json: string }>>(merchantId, handle);
-    return row === undefined ? undefined : parseCollection(JSON.parse(row.json));
+    return row === undefined
+      ? undefined
+      : parseCollection(JSON.parse(row.json));
   }
 
   #members(merchantId: string, collectionId: string): readonly string[] {
@@ -464,7 +478,10 @@ export class CollectionAuthority {
     merchantId: string,
     collection: CommerceCollectionV1,
   ): CommerceCollectionV1 {
-    return { ...collection, productIds: this.#members(merchantId, collection.id) };
+    return {
+      ...collection,
+      productIds: this.#members(merchantId, collection.id),
+    };
   }
 }
 
@@ -483,10 +500,14 @@ function sortProducts(
       items.sort(byTitle);
       return;
     case "price_ascending":
-      items.sort((left, right) => price(left) - price(right) || byTitle(left, right));
+      items.sort(
+        (left, right) => price(left) - price(right) || byTitle(left, right),
+      );
       return;
     case "price_descending":
-      items.sort((left, right) => price(right) - price(left) || byTitle(left, right));
+      items.sort(
+        (left, right) => price(right) - price(left) || byTitle(left, right),
+      );
       return;
     case "newest":
       items.sort(
@@ -497,7 +518,9 @@ function sortProducts(
   }
 }
 
-function summary(collection: CommerceCollectionV1): CommerceBuyerCollectionSummaryV1 {
+function summary(
+  collection: CommerceCollectionV1,
+): CommerceBuyerCollectionSummaryV1 {
   return {
     handle: collection.handle,
     title: collection.title,

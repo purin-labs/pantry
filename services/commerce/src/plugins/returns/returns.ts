@@ -21,48 +21,40 @@ import { listRefundAttemptsForOrder } from "../../payments/payment-records.ts";
 import type { CommerceDatabase } from "../../database.ts";
 import type { ReceiptPurchaseCheck } from "../built-in-ports.ts";
 import { returnWindowMs } from "./settings.ts";
-import { findResource, sha256 } from "../../commerce-authority/checkout-shared.ts";
+import {
+  findResource,
+  sha256,
+} from "../../commerce-authority/checkout-shared.ts";
 import {
   planInventoryReceipt,
   type InventoryMovementPlan,
 } from "../../commerce-authority/inventory.ts";
-
-export type ReturnMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  beginSnapshotCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 
 export type ReturnCommitRequest = Readonly<{
   command: CommerceReturnCommandV1;
-  merchant: ReturnMerchantRow;
+  merchant: MerchantRow;
   record: CommerceReturnV1;
   /** Stock receipts for restocked units, one for each stock position. */
   restocks: readonly InventoryMovementPlan[];
 }>;
 
-type ReturnCommandAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  now: () => string;
-  readMerchant: (merchantId: string) => ReturnMerchantRow | undefined;
-  readSnapshot: (
-    merchantId: string,
-  ) => CommerceMerchantSnapshotV1 | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CommerceReturnCommandV1,
-  ) => CommerceMutationResultV1 | undefined;
-  commit: (request: ReturnCommitRequest) => CommerceMutationResultV1;
-  validateMerchant: (
-    merchantId: string,
-    merchant: ReturnMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  /** The plugin's settings for the merchant, with the defaults filled in. */
-  readSettings: (merchantId: string) => CommercePluginSettingsV1;
-}>;
+type ReturnCommandAuthorityOptions =
+  MerchantCommandPorts<CommerceReturnCommandV1> &
+    Readonly<{
+      database: CommerceDatabase;
+      now: () => string;
+      readSnapshot: (
+        merchantId: string,
+      ) => CommerceMerchantSnapshotV1 | undefined;
+      commit: (request: ReturnCommitRequest) => CommerceMutationResultV1;
+      /** The plugin's settings for the merchant, with the defaults filled in. */
+      readSettings: (merchantId: string) => CommercePluginSettingsV1;
+    }>;
 
 type Planned = Readonly<{
   record: CommerceReturnV1;
@@ -328,31 +320,9 @@ export class ReturnCommandAuthority {
       resources: CommerceMerchantSnapshotV1["resources"],
     ) => Planned | CommerceMutationErrorV1,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    const snapshot = this.#options.readSnapshot(command.merchantId);
-    if (merchant === undefined || snapshot === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    const start = beginSnapshotCommand(this.#options, rawCommand, parse);
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const planned = plan(command, snapshot.resources);
     if ("code" in planned) return this.#options.rejected(planned);
     return this.#options.commit({ command, merchant, ...planned });
@@ -514,7 +484,9 @@ export function readReturn(
        WHERE merchant_id = ? AND return_id = ?`,
     )
     .get<Readonly<{ returnJson: string }>>(merchantId, returnId);
-  return row === undefined ? undefined : parseReturn(JSON.parse(row.returnJson));
+  return row === undefined
+    ? undefined
+    : parseReturn(JSON.parse(row.returnJson));
 }
 
 export function writeReturn(

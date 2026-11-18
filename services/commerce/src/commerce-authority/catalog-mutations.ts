@@ -7,6 +7,7 @@ import {
   writeStorefront,
 } from "../checkout-persistence.ts";
 import { CheckoutProfileService } from "../checkout-profile-service.ts";
+import type { CommerceDatabase } from "../database.ts";
 import { buildStorefrontCheckoutProfileTemplate } from "../checkout-profile-template.ts";
 import {
   writeLocation,
@@ -143,28 +144,15 @@ export function pickupStorefrontConfigurationMutation(
       revision: command.storefront.revision,
     },
     observations: pickupStorefrontObservations(command, createLocation),
-    write: (database) => {
-      if (createLocation)
-        writeLocation(database, command.merchantId, command.location);
-      writeSalesChannel(database, command.merchantId, command.salesChannel);
-      writeProduct(database, command.merchantId, command.product);
-      writeVariant(database, command.merchantId, command.variant);
-      writeOffer(database, command.merchantId, command.offer);
-      collections.refreshAutomated(command.merchantId);
-      writeStorefront(database, command.merchantId, command.storefront);
-      ensureStorefrontCheckoutProfile(
-        checkoutProfiles,
-        command.merchantId,
-        command.storefront,
-        command.offer.price.currency,
-        committedAt,
-      );
-      writeConsumptionPlan(
+    write: (database) =>
+      writeStorefrontConfiguration(
         database,
-        command.merchantId,
-        command.consumptionPlan,
-      );
-    },
+        command,
+        createLocation,
+        committedAt,
+        collections,
+        checkoutProfiles,
+      ),
   };
 }
 
@@ -188,29 +176,46 @@ export function shippingStorefrontConfigurationMutation(
     },
     observations: shippingStorefrontObservations(command, createLocation),
     write: (database) => {
-      if (createLocation)
-        writeLocation(database, command.merchantId, command.location);
-      writeSalesChannel(database, command.merchantId, command.salesChannel);
-      writeProduct(database, command.merchantId, command.product);
-      writeVariant(database, command.merchantId, command.variant);
-      writeOffer(database, command.merchantId, command.offer);
-      collections.refreshAutomated(command.merchantId);
-      writeStorefront(database, command.merchantId, command.storefront);
-      ensureStorefrontCheckoutProfile(
-        checkoutProfiles,
-        command.merchantId,
-        command.storefront,
-        command.offer.price.currency,
-        committedAt,
-      );
-      writeConsumptionPlan(
+      writeStorefrontConfiguration(
         database,
-        command.merchantId,
-        command.consumptionPlan,
+        command,
+        createLocation,
+        committedAt,
+        collections,
+        checkoutProfiles,
       );
       writeShippingConfiguration(database, command);
     },
   };
+}
+
+// The catalog, storefront, checkout profile and consumption plan that a
+// pickup or a shipping storefront configures.
+function writeStorefrontConfiguration(
+  database: CommerceDatabase,
+  command:
+    ConfigureCommercePickupStorefrontV1 | ConfigureCommerceShippingStorefrontV1,
+  createLocation: boolean,
+  committedAt: string,
+  collections: CollectionAuthority,
+  checkoutProfiles: CheckoutProfileService,
+): void {
+  if (createLocation)
+    writeLocation(database, command.merchantId, command.location);
+  writeSalesChannel(database, command.merchantId, command.salesChannel);
+  writeProduct(database, command.merchantId, command.product);
+  writeVariant(database, command.merchantId, command.variant);
+  writeOffer(database, command.merchantId, command.offer);
+  collections.refreshAutomated(command.merchantId);
+  writeStorefront(database, command.merchantId, command.storefront);
+  ensureStorefrontCheckoutProfile(
+    checkoutProfiles,
+    command.merchantId,
+    command.storefront,
+    command.offer.price.currency,
+    committedAt,
+  );
+  writeConsumptionPlan(database, command.merchantId, command.consumptionPlan);
 }
 
 export function channelListingPlacementMutation(

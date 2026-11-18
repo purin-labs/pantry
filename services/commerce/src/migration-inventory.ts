@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 
 import type { CommerceMigrationInventoryV2 } from "@seams/commerce-client";
 
+import { requireIdentity } from "./commerce-authority/command-guards.ts";
+import type { MerchantRow } from "./commerce-authority/ledger.ts";
 import type {
   CountRow,
   CommerceDatabase,
@@ -35,11 +37,6 @@ const LEGACY_FOOD_SERVICE_TABLES = [
   "food_service_preparation_ticket",
   "food_service_observation_outbox",
 ] as const;
-type MerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
 type SchemaVersionRow = Readonly<{ version: number | null }>;
 type SqlRow = Record<string, CommerceSqlValue>;
 
@@ -53,7 +50,7 @@ export function readCommerceMigrationInventory(
       `SELECT merchant_id AS merchantId, external_reference AS organisationId, revision
      FROM merchant WHERE merchant_id = ?`,
     )
-    .get<MerchantRow>(requireIdentity(merchantId));
+    .get<MerchantRow>(requireIdentity(merchantId, "merchantId"));
   if (merchant === undefined) return undefined;
 
   const storageSchemaVersion = readStorageSchemaVersion(database);
@@ -892,11 +889,4 @@ function normalizedReceiptIdentity(
 
 function digest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
-}
-
-function requireIdentity(value: string): string {
-  if (value.length === 0 || value !== value.trim()) {
-    throw new Error("merchantId must be normalized text");
-  }
-  return value;
 }

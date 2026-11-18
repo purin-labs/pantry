@@ -19,6 +19,7 @@ import {
   parseCustomEntityTypeDraft,
   parsePositiveRevision,
   parseSavedCommerceView,
+  parsePositiveText,
 } from "./parsers.ts";
 import { listRelationshipDefinitions } from "./relationships.ts";
 import { canonicalSystemAttributeDefinitions } from "./commerce-attribute-relation.ts";
@@ -309,21 +310,4 @@ function sameEntityTypeId(
   right: CommerceEntityTypeId,
 ): boolean {
   return left.origin === right.origin && left.typeId === right.typeId;
-}
-
-function parsePositiveText<T extends string>(value: unknown, field: string): T {
-  if (
-    typeof value !== "string" ||
-    value.length === 0 ||
-    value !== value.trim()
-  ) {
-    throw new Error(`${field} must be normalized text`);
-  }
-  if (!isPositiveText<T>(value))
-    throw new Error(`${field} must be normalized text`);
-  return value;
-}
-
-function isPositiveText<T extends string>(value: string): value is T {
-  return value.length > 0 && value === value.trim();
 }

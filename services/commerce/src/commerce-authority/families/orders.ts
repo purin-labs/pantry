@@ -1,6 +1,5 @@
 import {
   parseRecordOrderManualPaymentCommand,
-  type RecordCommerceOrderManualPaymentV1,
   type CommerceMutationResultV1,
   type CommerceTenderRefundV1,
   type CommerceReturnV1,
@@ -9,7 +8,8 @@ import {
   type CommerceDraftOrderViewV1,
   type CommerceDraftOrderV1,
 } from "@seams/commerce-client";
-import { rejected, validateMerchant } from "../ledger.ts";
+import { rejected } from "../ledger.ts";
+import { beginSnapshotCommand } from "../merchant-command.ts";
 import { FulfillmentCommandAuthority } from "../fulfillment-commands.ts";
 import {
   DraftOrderCommandAuthority,
@@ -23,7 +23,6 @@ import {
   orderManualPaymentMutation,
   planOrderManualPayment,
 } from "../../payments/order-manual-payment.ts";
-import { invalidCommand } from "../command-guards.ts";
 import { InventoryFamily } from "./inventory.ts";
 
 /**
@@ -116,27 +115,16 @@ export abstract class OrderFamily extends InventoryFamily {
 
   /** Records what an order still owes as paid in cash or by bank transfer. */
   recordOrderManualPayment(rawCommand: unknown): CommerceMutationResultV1 {
-    let command: RecordCommerceOrderManualPaymentV1;
-    try {
-      command = parseRecordOrderManualPaymentCommand(rawCommand);
-    } catch (error) {
-      return rejected(invalidCommand(error));
-    }
-    const merchant = this.ledger.readMerchant(command.merchantId);
-    const merchantError = validateMerchant(command.merchantId, merchant);
-    if (merchantError !== undefined) return rejected(merchantError);
-    const replay = this.ledger.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
+    const start = beginSnapshotCommand(
+      {
+        ...this.ledger.commandPorts,
+        readSnapshot: (merchantId) => this.readSnapshot(merchantId),
+      },
+      rawCommand,
+      parseRecordOrderManualPaymentCommand,
     );
-    if (replay !== undefined) return replay;
-    const snapshot = this.readSnapshot(command.merchantId);
-    if (merchant === undefined || snapshot === undefined)
-      return rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
     const plan = planOrderManualPayment(
       this.database,
       command,

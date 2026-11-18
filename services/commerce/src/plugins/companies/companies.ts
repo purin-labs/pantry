@@ -16,36 +16,24 @@ import {
 import { listVariants } from "../../commerce-persistence.ts";
 import type { CommerceDatabase } from "../../database.ts";
 import { customerIsActive } from "../customers/index.ts";
-
-export type CompanyMerchantRow = Readonly<{
-  merchantId: string;
-  organisationId: string;
-  revision: number;
-}>;
+import type { MerchantRow } from "../../commerce-authority/ledger.ts";
+import {
+  commitPlannedCommand,
+  type MerchantCommandPorts,
+} from "../../commerce-authority/merchant-command.ts";
 
 export type CompanyCommitRequest = Readonly<{
   command: CommerceCompanyCommandV1;
-  merchant: CompanyMerchantRow;
+  merchant: MerchantRow;
   company: CommerceCompanyV1;
   previousRevision: number | undefined;
 }>;
 
-type CompanyAuthorityOptions = Readonly<{
-  database: CommerceDatabase;
-  readMerchant: (merchantId: string) => CompanyMerchantRow | undefined;
-  readReplay: (
-    merchantId: string,
-    idempotencyKey: string,
-    command: CommerceCompanyCommandV1,
-  ) => CommerceMutationResultV1 | undefined;
-  validateMerchant: (
-    merchantId: string,
-    merchant: CompanyMerchantRow | undefined,
-  ) => CommerceMutationErrorV1 | undefined;
-  rejected: (error: CommerceMutationErrorV1) => CommerceMutationResultV1;
-  invalidCommand: (error: unknown) => CommerceMutationErrorV1;
-  commit: (request: CompanyCommitRequest) => CommerceMutationResultV1;
-}>;
+type CompanyAuthorityOptions = MerchantCommandPorts<CommerceCompanyCommandV1> &
+  Readonly<{
+    database: CommerceDatabase;
+    commit: (request: CompanyCommitRequest) => CommerceMutationResultV1;
+  }>;
 
 export class CompanyAuthority {
   readonly #options: CompanyAuthorityOptions;
@@ -172,33 +160,7 @@ export class CompanyAuthority {
       | Omit<CompanyCommitRequest, "command" | "merchant">
       | CommerceMutationErrorV1,
   ): CommerceMutationResultV1 {
-    let command: TCommand;
-    try {
-      command = parse(rawCommand);
-    } catch (error) {
-      return this.#options.rejected(this.#options.invalidCommand(error));
-    }
-    const merchant = this.#options.readMerchant(command.merchantId);
-    const merchantError = this.#options.validateMerchant(
-      command.merchantId,
-      merchant,
-    );
-    if (merchantError !== undefined)
-      return this.#options.rejected(merchantError);
-    const replay = this.#options.readReplay(
-      command.merchantId,
-      command.idempotencyKey,
-      command,
-    );
-    if (replay !== undefined) return replay;
-    if (merchant === undefined)
-      return this.#options.rejected({
-        code: "merchant_not_found",
-        merchantId: command.merchantId,
-      });
-    const planned = plan(command);
-    if ("code" in planned) return this.#options.rejected(planned);
-    return this.#options.commit({ command, merchant, ...planned });
+    return commitPlannedCommand(this.#options, rawCommand, parse, plan);
   }
 }
 

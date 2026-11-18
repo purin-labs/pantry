@@ -1,7 +1,6 @@
 import type {
   AttributeDefinition,
   CommerceCommandResult,
-  CommerceEntityPlaneError,
   SystemCommerceEntityRef,
 } from "@seams/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
@@ -20,6 +19,7 @@ import {
 import {
   EntityPlaneSettlement,
   type CommandRequest,
+  rejected,
 } from "./receipt-outbox-settlement.ts";
 
 type SchemaCommandHandlerOptions = Readonly<{
@@ -364,8 +364,4 @@ function validateSystemExtensionDefinitions(
       );
     }
   }
-}
-
-function rejected(error: CommerceEntityPlaneError): CommerceCommandResult {
-  return { status: "rejected", error };
 }
