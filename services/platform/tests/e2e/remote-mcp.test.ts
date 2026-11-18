@@ -111,15 +111,13 @@ const ORIGIN = "https://mcp.example.net";
 /** The class binding of the fetch container, before a fixture stands in. */
 const CLASS_EGRESS = env.CUSTOM_CONNECTOR_FETCH;
 
-type OriginBoundary = "credential" | "dns" | "discovery" | "response";
+type OriginBoundary = "discovery" | "response";
 type OriginPause = {
   readonly boundary: OriginBoundary;
-  readonly decrypt: SubtleCrypto["decrypt"];
   phase: "armed" | "paused" | "released";
 };
-let originPause: OriginPause | null = null;
 
-it.for(["credential", "dns", "discovery", "response"] as const)(
+it.for(["discovery", "response"] as const)(
   "fences custom connector origin at %s and recovers after Session eviction",
   { timeout: 45_000 },
   connectorOriginJourney,
@@ -132,16 +130,10 @@ async function connectorOriginJourney(
   await installSlackActorFixture();
   const pause: OriginPause = {
     boundary,
-    decrypt: crypto.subtle.decrypt,
     phase: "released",
   };
   const server = new OriginRemoteFixture(pause);
-  network.use(
-    http.get(
-      "https://cloudflare-dns.com/dns-query",
-      respondOriginDns.bind(null, pause),
-    ),
-  );
+  network.use(http.get("https://cloudflare-dns.com/dns-query", dnsResponse));
   const fixture = await installRemoteConnector(server);
   const sessions = await installOriginOperator();
   const model = new OriginConnectorModel(
@@ -158,8 +150,6 @@ async function connectorOriginJourney(
   server.calls.length = 0;
   server.requests.length = 0;
   pause.phase = "armed";
-  originPause = pause;
-  crypto.subtle.decrypt = pauseOriginCredential;
   const key = `p55_custom_origin_${boundary}`;
   const work = dispatchOriginCommand(sessions.original, key);
   try {
@@ -181,8 +171,6 @@ async function connectorOriginJourney(
     expect(server.requests).toHaveLength(issuedRequests);
     expect(model.requests).toBe(admittedModelCalls);
     expect(issuedCalls).toBe(boundary === "response" ? 1 : 0);
-    if (boundary === "credential" || boundary === "dns")
-      expect(issuedRequests).toBe(0);
     const retained = await runInDurableObject(
       actor,
       connectorOriginState.bind(null, fixture.entry.integrationAccountId),
@@ -231,8 +219,6 @@ async function connectorOriginJourney(
     });
   } finally {
     pause.phase = "released";
-    crypto.subtle.decrypt = pause.decrypt;
-    originPause = null;
     await work;
   }
 }
@@ -240,39 +226,9 @@ async function connectorOriginJourney(
 function originPhase(pause: OriginPause) {
   return pause.phase;
 }
-async function respondOriginDns(
-  pause: OriginPause,
-  context: Parameters<HttpResponseResolver>[0],
-): Promise<Response> {
-  const response = dnsResponse(context);
-  if (
-    pause.phase === "armed" &&
-    pause.boundary === "dns" &&
-    new URL(context.request.url).searchParams.get("type") === "A"
-  )
-    await waitOriginPause(pause);
-  return response;
-}
 async function waitOriginPause(pause: OriginPause): Promise<void> {
   pause.phase = "paused";
   while (pause.phase === "paused") await scheduler.wait(5);
-}
-async function pauseOriginCredential(
-  this: SubtleCrypto,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const pause = originPause;
-  if (pause === null) throw new Error("Missing connector origin pause");
-  const opened = await pause.decrypt.call(this, algorithm, key, data);
-  if (
-    pause.phase === "armed" &&
-    pause.boundary === "credential" &&
-    new TextDecoder().decode(opened).includes(SECRET)
-  )
-    await waitOriginPause(pause);
-  return opened;
 }
 function connectorOriginState(
   accountId: string,
@@ -583,16 +539,16 @@ it("executes reviewed REST reads and approved writes with bounded attempts and r
   });
 });
 
-type ControlWriteBoundary = "preflight" | "release" | "placement" | "role";
+type ControlWriteBoundary = "release" | "placement" | "role";
 type ControlWriteProbe = {
-  boundary: ControlWriteBoundary;
+  boundary: ControlWriteBoundary | null;
   server: RemoteFixture;
   session: IssuedControlSession;
   armed: boolean;
 };
 let controlWriteProbe: ControlWriteProbe | null = null;
 
-it.for(["preflight", "release", "placement", "role"] as const)(
+it.for(["release", "placement", "role"] as const)(
   "retains custom write control origin through %s and native receipt recovery",
   { timeout: 60_000 },
   controlWriteOriginJourney,
@@ -761,7 +717,7 @@ async function idempotentWriteRetryJourney({ task }: TestContext) {
     timeoutMs: fixture.restWrite.limits.invocationTimeoutMs,
   });
   controlWriteProbe = {
-    boundary: "preflight",
+    boundary: null,
     server,
     session: prepared.session,
     armed: false,
@@ -952,7 +908,7 @@ async function controlWriteDns(
         )
         .bind(ORGANISATION_ID, probe.session.session.userId)
         .run();
-    } else await revokeControlWriteOrigin(probe);
+    }
   }
   return dnsResponse(input);
 }

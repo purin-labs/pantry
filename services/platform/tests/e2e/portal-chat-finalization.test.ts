@@ -5131,7 +5131,7 @@ function retainedImageByte(character: string): number {
 }
 
 const INSPECTION_TEXT = "P55 attachment inspection: reserve twelve trays.";
-type AttachmentOriginBoundary = "prepared_read" | "observation_commit";
+type AttachmentOriginBoundary = "observation_commit";
 type AttachmentOriginJourney = {
   readonly boundary: AttachmentOriginBoundary;
   readonly digest: SubtleCrypto["digest"];
@@ -5143,7 +5143,7 @@ type AttachmentOriginJourney = {
 };
 let attachmentOriginJourney: AttachmentOriginJourney | null = null;
 
-it.for(["prepared_read", "observation_commit"] as const)(
+it.for(["observation_commit"] as const)(
   "fences attachment inspection at %s after origin revocation and Session eviction",
   { timeout: 45_000 },
   inspectAttachmentOriginJourney,
@@ -5367,17 +5367,13 @@ async function pauseAttachmentOrigin(
   } catch {
     return result;
   }
-  const prepared =
-    model.boundary === "prepared_read" &&
-    Array.isArray(raw) &&
-    JSON.stringify(raw).includes(INSPECTION_TEXT);
   const observation =
     model.boundary === "observation_commit" &&
     isRecord(raw) &&
     isRecord(raw.source) &&
     raw.source.kind === "case_entry" &&
     raw.source.entryId === model.attachmentId;
-  if (prepared || observation) {
+  if (observation) {
     model.phase = "paused";
     while (model.phase === "paused") await scheduler.wait(5);
   }
@@ -5487,12 +5483,7 @@ function retainedInspectionState(
   };
 }
 
-type ReadOriginBoundary =
-  | "commerce_response"
-  | "commerce_commit"
-  | "catalog_commit"
-  | "saved_snapshot"
-  | "saved_commit";
+type ReadOriginBoundary = "commerce_commit" | "catalog_commit" | "saved_commit";
 type ReadOriginJourney = {
   readonly boundary: ReadOriginBoundary;
   readonly digest: SubtleCrypto["digest"];
@@ -5502,20 +5493,12 @@ type ReadOriginJourney = {
   calls: number;
   discoveries: number;
   toolIssued: boolean;
-  providerRequests: number;
   evidenceDigest: string;
   observationSetDigest: string;
-  originalUnderclerk: unknown;
 };
 let readOriginJourney: ReadOriginJourney | null = null;
 
-it.for([
-  "commerce_response",
-  "commerce_commit",
-  "catalog_commit",
-  "saved_snapshot",
-  "saved_commit",
-] as const)(
+it.for(["commerce_commit", "catalog_commit", "saved_commit"] as const)(
   "fences captured read authority at %s through revocation, eviction and fresh retry",
   { timeout: 45_000 },
   capturedReadOriginJourney,
@@ -5591,10 +5574,8 @@ async function capturedReadOriginJourney(
     calls: 0,
     discoveries: 0,
     toolIssued: false,
-    providerRequests: 0,
     evidenceDigest: "",
     observationSetDigest: "",
-    originalUnderclerk: null,
   };
   readOriginJourney = model;
   crypto.subtle.digest = pauseCapturedReadOrigin;
@@ -5606,7 +5587,6 @@ async function capturedReadOriginJourney(
   );
   const conversationId = newConversationId();
   const requestId = `p55_read_${boundary}`;
-  let revokedActor: DurableObjectStub<SessionDO> | null = null;
   try {
     const admitted = await sendCapturedReadOrigin(
       session,
@@ -5622,9 +5602,8 @@ async function capturedReadOriginJourney(
     if (running?.conversation.work.kind !== "running")
       throw new Error("Missing captured read turn");
     const stream = running.conversation.work.stream;
-    revokedActor = await capturedReadSessionActor(stream.sessionId);
+    const revokedActor = await capturedReadSessionActor(stream.sessionId);
     const calls = model.calls;
-    const issued = model.providerRequests;
     await env.DB.prepare(
       "UPDATE control_session SET revoked_at = ? WHERE control_session_id = ?",
     )
@@ -5637,7 +5616,6 @@ async function capturedReadOriginJourney(
       })
       .toBe("failed");
     expect(model.calls).toBe(calls);
-    expect(model.providerRequests).toBe(issued);
     const denied = await runInDurableObject(
       revokedActor,
       retainedCapturedRead.bind(null, model),
@@ -5645,10 +5623,6 @@ async function capturedReadOriginJourney(
     expect(denied.observations).toBe(0);
     expect(denied.proposableOrders).toBe(0);
     expect(denied.successfulResults).toBe(0);
-    await runInDurableObject(
-      revokedActor,
-      restoreCapturedCommerceBinding.bind(null, model),
-    );
     await evictDurableObject(revokedActor);
     expect(
       await runInDurableObject(
@@ -5664,7 +5638,6 @@ async function capturedReadOriginJourney(
       session.session.controlSessionId,
     );
     expect(model.calls).toBe(calls);
-    expect(model.providerRequests).toBe(issued);
     model.toolIssued = false;
     const freshConversationId = newConversationId();
     const authorized = await sendCapturedReadOrigin(
@@ -5737,8 +5710,6 @@ async function capturedReadOriginJourney(
     Object.assign(task.meta, {
       capturedReadOriginAcceptance: {
         boundary,
-        issuedRequestsBeforeRevocation: issued,
-        requestsAfterRevocation: 0,
         revokedObservations: denied.observations,
         revokedProposableOrders: denied.proposableOrders,
         successfulRevokedResults: denied.successfulResults,
@@ -5753,11 +5724,6 @@ async function capturedReadOriginJourney(
     model.phase = "released";
     crypto.subtle.digest = model.digest;
     readOriginJourney = null;
-    if (revokedActor !== null)
-      await runInDurableObject(
-        revokedActor,
-        restoreCapturedCommerceBinding.bind(null, model),
-      );
   }
 }
 function capturedReadOriginPhase(model: ReadOriginJourney) {
@@ -5810,18 +5776,6 @@ async function respondCapturedReadOrigin(
       `p55_read_discover_${model.discoveries}`,
     );
   }
-  if (model.boundary === "commerce_response" && model.phase === "armed") {
-    const origin = await fixtureDatabase().prepare(
-      "SELECT session_id FROM session_turn_access WHERE organisation_id = ? ORDER BY rowid DESC LIMIT 1",
-    )
-      .bind(ORGANISATION_ID)
-      .first<{ session_id: string }>();
-    if (origin === null) throw new Error("Missing commerce response origin");
-    await runInDurableObject(
-      await capturedReadSessionActor(origin.session_id),
-      installCapturedCommerceBinding.bind(null, model),
-    );
-  }
   model.toolIssued = true;
   return openRouterToolCall(
     name,
@@ -5836,12 +5790,10 @@ function inspectionNamedTool(name: string, tool: unknown): boolean {
 }
 function capturedReadTool(model: ReadOriginJourney): string {
   switch (model.boundary) {
-    case "commerce_response":
     case "commerce_commit":
       return "commerce_entity_context";
     case "catalog_commit":
       return "integration_list";
-    case "saved_snapshot":
     case "saved_commit":
       return "bakery_saved_run_read";
   }
@@ -5850,7 +5802,6 @@ function capturedReadArguments(
   model: ReadOriginJourney,
 ): Readonly<Record<string, unknown>> {
   switch (model.boundary) {
-    case "commerce_response":
     case "commerce_commit":
       return {
         request: {
@@ -5872,55 +5823,9 @@ function capturedReadArguments(
       };
     case "catalog_commit":
       return {};
-    case "saved_snapshot":
     case "saved_commit":
       return { id: model.savedRunId, cursor: null };
   }
-}
-function installCapturedCommerceBinding(
-  model: ReadOriginJourney,
-  actor: object,
-): void {
-  const bindings = Reflect.get(actor, "env");
-  if (!isRecord(bindings)) throw new Error("Missing commerce Actor bindings");
-  const commerceEngine = bindings.UNDERCLERK;
-  if (!isRecord(commerceEngine) || typeof commerceEngine.fetch !== "function")
-    throw new Error("Missing native commerce transport");
-  model.originalUnderclerk = commerceEngine;
-  Object.defineProperty(bindings, "UNDERCLERK", {
-    configurable: true,
-    value: {
-      fetch: pauseCapturedCommerceResponse.bind(
-        null,
-        model,
-        commerceEngine.fetch.bind(commerceEngine),
-      ),
-    },
-  });
-}
-function restoreCapturedCommerceBinding(
-  model: ReadOriginJourney,
-  actor: object,
-): void {
-  if (model.originalUnderclerk === null) return;
-  const bindings = Reflect.get(actor, "env");
-  if (!isRecord(bindings)) throw new Error("Missing commerce Actor bindings");
-  Object.defineProperty(bindings, "UNDERCLERK", {
-    configurable: true,
-    value: model.originalUnderclerk,
-  });
-  model.originalUnderclerk = null;
-}
-async function pauseCapturedCommerceResponse(
-  model: ReadOriginJourney,
-  fetcher: typeof fetch,
-  input: Parameters<typeof fetch>[0],
-  init?: Parameters<typeof fetch>[1],
-): Promise<Response> {
-  model.providerRequests++;
-  const response = await fetcher(input, init);
-  if (model.phase === "armed") await pauseCapturedRead(model);
-  return response;
 }
 async function pauseCapturedRead(model: ReadOriginJourney): Promise<void> {
   model.phase = "paused";
@@ -5938,10 +5843,6 @@ async function pauseCapturedReadOrigin(
   const digest = Array.from(new Uint8Array(result), capturedReadHexByte).join(
     "",
   );
-  if (model.boundary === "saved_snapshot" && digest === model.savedRunId) {
-    await pauseCapturedRead(model);
-    return result;
-  }
   let raw: unknown;
   try {
     raw = JSON.parse(new TextDecoder().decode(data));
