@@ -1,25 +1,23 @@
 import type { Env } from "../../../env";
 import { removeIntegrationAccount } from "../../../data/account-removal";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
 import {
   disableIntegrationAccount,
   listIntegrationAccounts,
   switchDefaultIntegrationAccount,
 } from "../../../data/integration-account";
-import { buildOnboardingProjection } from "../../../data/onboarding-projection";
-import { parseIntegrationAccountId } from "../../../ids";
+import {
+  admitUserMutation,
+  controlMutationIdentity,
+  projectionReplay,
+  projectionResponse,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import { controlCausationId } from "../../mutation";
-import { mutationProjectionResponse } from "../../mutation-projection";
 import { tearDownAgentMailboxForRemoval } from "../../../mail-inbox/agent-mailbox-teardown";
+import {
+  authorizeAccountRequest,
+  parseReplacementAccountId,
+} from "./account-request";
 
 export async function handleAccounts(
   request: Request,
@@ -52,76 +50,39 @@ export async function handleRemoveAccount(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "DELETE") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "DELETE",
+    "admin",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("remove_account_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId.value}`,
+    boundary: "configuration_versioned",
+    user: "before_replay",
+    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId}`,
     operation: "provider.account.remove",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const now = Date.now();
   // Stand a Gmail mailbox down before the connection goes: removal revokes the
   // Google grant, and a revoked grant cannot delete the drafts Pantry created.
   const mailboxTeardown = await tearDownAgentMailboxForRemoval(
     env,
     authorized.executionScope,
-    integrationAccountId.value,
+    integrationAccountId,
     "erase",
   );
   if (mailboxTeardown.kind === "connector_unavailable") {
@@ -131,19 +92,12 @@ export async function handleRemoveAccount(
     db: authorized.executionScope.database,
     directory: env.DB,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
-    removedByUserId: identity.userId,
+    integrationAccountId,
+    removedByUserId: admitted.user.userId,
     mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
     },
     now,
   });
@@ -153,37 +107,31 @@ export async function handleRemoveAccount(
       removed.error.code === "integration_account_not_found" ? 404 : 409,
     );
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("removed account projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: removed.value.receiptId,
-      organisation_id: authorized.organisationId,
+  return projectionResponse(
+    authorized,
+    "removed account projection is missing",
+    {
+      receipt: {
+        receipt_id: removed.value.receiptId,
+        organisation_id: authorized.organisationId,
+      },
+      // A draft Pantry could not delete stays in the organisation's mailbox
+      // after the grant is revoked, so it is reported rather than dropped
+      // silently.
+      ...(mailboxTeardown.kind === "torn_down"
+        ? {
+            mailbox_teardown: {
+              watch_stopped: mailboxTeardown.watchStopped,
+              cleanup_needed: mailboxTeardown.cleanupNeeded.map((entry) => ({
+                proposal_id: entry.proposalId,
+                version: entry.version,
+                state: entry.state,
+              })),
+            },
+          }
+        : {}),
     },
-    // A draft Pantry could not delete stays in the organisation's mailbox after the
-    // grant is revoked, so it is reported rather than dropped silently.
-    ...(mailboxTeardown.kind === "torn_down"
-      ? {
-          mailbox_teardown: {
-            watch_stopped: mailboxTeardown.watchStopped,
-            cleanup_needed: mailboxTeardown.cleanupNeeded.map((entry) => ({
-              proposal_id: entry.proposalId,
-              version: entry.version,
-              state: entry.state,
-            })),
-          },
-        }
-      : {}),
-  });
+  );
 }
 
 export async function handleDisableAccount(
@@ -192,87 +140,43 @@ export async function handleDisableAccount(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "POST",
+    "admin",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const body = await readJsonRecord(request);
   if (!body.ok) {
     return controlError("disable_account_request_invalid", 422);
   }
-  const replacementRaw = body.value.replacementIntegrationAccountId;
-  const replacement =
-    replacementRaw === undefined || replacementRaw === null
-      ? { ok: true as const, value: null }
-      : typeof replacementRaw === "string"
-        ? parseIntegrationAccountId(replacementRaw)
-        : {
-            ok: false as const,
-            error: { code: "invalid" as const, value: "" },
-          };
-  if (!replacement.ok) {
+  const replacement = parseReplacementAccountId(
+    body.value.replacementIntegrationAccountId,
+  );
+  if (replacement === undefined) {
     return controlError("default_account_replacement_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId.value}/disable`,
+    boundary: "configuration_versioned",
+    user: "before_replay",
+    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId}/disable`,
     operation: "provider.account.disable",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const now = Date.now();
   const teardown = await tearDownAgentMailboxForRemoval(
     env,
     authorized.executionScope,
-    integrationAccountId.value,
+    integrationAccountId,
     "stand_down",
   );
   if (teardown.kind === "connector_unavailable") {
@@ -281,21 +185,14 @@ export async function handleDisableAccount(
   const disabled = await disableIntegrationAccount({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
-    replacementIntegrationAccountId: replacement.value,
-    disabledByUserId: identity.userId,
+    integrationAccountId,
+    replacementIntegrationAccountId: replacement,
+    disabledByUserId: admitted.user.userId,
     reasonCode: "merchant_disabled",
     mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
     },
     now,
   });
@@ -304,23 +201,16 @@ export async function handleDisableAccount(
       disabled.error.code === "integration_account_not_found" ? 404 : 409;
     return controlError(disabled.error.code, status);
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("disabled account projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: disabled.value.receiptId,
-      organisation_id: authorized.organisationId,
+  return projectionResponse(
+    authorized,
+    "disabled account projection is missing",
+    {
+      receipt: {
+        receipt_id: disabled.value.receiptId,
+        organisation_id: authorized.organisationId,
+      },
     },
-  });
+  );
 }
 
 export async function handleDefaultAccount(
@@ -329,86 +219,42 @@ export async function handleDefaultAccount(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "POST",
+    "admin",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("default_account_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId.value}/default-for-provider`,
+    boundary: "configuration_versioned",
+    user: "before_replay",
+    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId}/default-for-provider`,
     operation: "provider.account.set_default_for_provider",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const now = Date.now();
   const switched = await switchDefaultIntegrationAccount({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    nextIntegrationAccountId: integrationAccountId.value,
-    changedByUserId: identity.userId,
+    nextIntegrationAccountId: integrationAccountId,
+    changedByUserId: admitted.user.userId,
     mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
     },
     now,
   });
@@ -418,21 +264,14 @@ export async function handleDefaultAccount(
       switched.error.code === "integration_account_not_found" ? 404 : 409,
     );
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("default account projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: switched.value.receiptId,
-      organisation_id: authorized.organisationId,
+  return projectionResponse(
+    authorized,
+    "default account projection is missing",
+    {
+      receipt: {
+        receipt_id: switched.value.receiptId,
+        organisation_id: authorized.organisationId,
+      },
     },
-  });
+  );
 }

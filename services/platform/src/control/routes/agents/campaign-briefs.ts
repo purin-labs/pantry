@@ -1,11 +1,11 @@
 import type { Env } from "../../../env";
 import type { Result } from "../../../result";
-import { resolveUser } from "../../../data/control-plane";
 import {
   decideCampaignBrief,
   listCaseCampaignBriefs,
   type CampaignMessageVariant,
 } from "../../../data/campaign-brief";
+import { resolveMutationUser } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {
   controlError,
@@ -89,11 +89,11 @@ export async function handleCampaignBriefDecision(
           value: { objective: null, messageVariants: null },
         };
   if (!edited.ok) return controlError("campaign_brief_invalid", 422);
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const decided = await decideCampaignBrief({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,

@@ -46,10 +46,8 @@ import {
 } from "../../authorization/capability-catalogue";
 import { validateFileGrantTarget } from "../../context/files";
 import { parseActiveCapabilityId } from "../../data/capability-policy";
-import { resolveUser } from "../../data/control-plane";
 import {
   hashPortalSubject,
-  parseControlMutationBoundary,
   readControlMutationReplay,
   type UnversionedControlMutationBoundary,
   type ControlMutationIdentity,
@@ -78,6 +76,11 @@ import { digestCanonical } from "../../policy";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
 import type { Result } from "../../result";
 import { controlCausationId } from "../mutation";
+import {
+  controlMutationScope,
+  parseMutationBoundary,
+  resolveMutationUser,
+} from "../admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -620,30 +623,17 @@ async function prepareMutation(
     true,
   );
   if (!authorized.ok) return authorized;
-  const boundary = await parseControlMutationBoundary({
-    request: input.request,
-    body: input.raw,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return {
-      ok: false,
-      response: controlError(
-        boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-        422,
-      ),
-    };
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
-    route: input.path,
-    operation: input.operation,
-  };
+  const boundary = await parseMutationBoundary(
+    input.request,
+    input.raw,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return { ok: false, response: boundary };
+  const scope = controlMutationScope(authorized, input.path, input.operation);
   const replay = await readControlMutationReplay({
     db: authorized.executionScope.database,
     scope,
-    boundary: boundary.value,
+    boundary,
   });
   if (replay.kind === "conflict") {
     return {
@@ -661,28 +651,20 @@ async function prepareMutation(
       ),
     };
   }
-  const user = await resolveUser({
-    db: input.env.DB,
-    userId: scope.userId,
-  });
-  if (user === null) {
-    return {
-      ok: false,
-      response: controlError("app_user_missing", 401),
-    };
-  }
+  const user = await resolveMutationUser(input.env, scope.userId);
+  if (user instanceof Response) return { ok: false, response: user };
   const now = Date.now();
   const portalSubjectHash = await hashPortalSubject(user.issuer, user.subject);
   const identity = await deterministicMutationIdentity({
     scope,
-    boundary: boundary.value,
+    boundary,
     portalSubjectHash,
     causationId: controlCausationId(input.request),
     now,
   });
   return {
     ok: true,
-    value: { authorized, boundary: boundary.value, scope, identity },
+    value: { authorized, boundary, scope, identity },
     replay: null,
   };
 }

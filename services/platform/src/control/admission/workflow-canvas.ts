@@ -4,9 +4,9 @@ import {
 } from "@seams/bakery-model/bakery-canvas-source";
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
-import { requirePublicOrigin } from "../../public-origin";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError } from "../http";
+import { authorizeOrganisationSocket } from "./organisation-socket";
 
 export type WorkflowCanvasRoute = Readonly<{
   kind: "workflowCanvas";
@@ -90,21 +90,13 @@ export async function authorizeWorkflowCanvasRequest(
       ok: false as const,
       response: controlError("method_not_allowed", 405),
     };
-  if (route.transport === "socket") {
-    if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket")
-      return {
-        ok: false as const,
-        response: controlError("websocket_required", 426),
-      };
-    if (
-      request.headers.get("Origin") !==
-      requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)
-    )
-      return {
-        ok: false as const,
-        response: controlError("origin_invalid", 403),
-      };
-  }
+  if (route.transport === "socket")
+    return authorizeOrganisationSocket(
+      request,
+      env,
+      route.organisationId,
+      "viewer",
+    );
   return authorizeOrganisationRequest(
     request,
     env,

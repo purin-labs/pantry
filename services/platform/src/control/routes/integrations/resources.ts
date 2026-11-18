@@ -6,19 +6,10 @@ import {
 } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import { resolveActiveSlackOrganisationCredential } from "../../../credential-vault";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
 import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,
 } from "../../../data/integration-account";
-import { buildOnboardingProjection } from "../../../data/onboarding-projection";
 import {
   listProviderResourcePage,
   refreshProviderResourceSnapshot,
@@ -33,13 +24,18 @@ import {
 import { configuredValue } from "../../../provider-adapters/authorization";
 import { discoverSlackChannels } from "../../../provider-adapters/slack";
 import { discoverSquareTerminalResources } from "../../../provider-adapters/square";
+import {
+  admitUserMutation,
+  controlMutationIdentity,
+  projectionReplay,
+  projectionResponse,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import { controlCausationId } from "../../mutation";
-import { mutationProjectionResponse } from "../../mutation-projection";
 import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
 import { assertNever } from "@seams/std";
 import { account } from "../integrations";
+import { authorizeAccountRequest } from "./account-request";
 import { providerErrorStatus } from "./provider-start";
 
 export async function handleAccountResources(
@@ -48,29 +44,20 @@ export async function handleAccountResources(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "GET") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "viewer",
-    false,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "GET",
+    "viewer",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const account = await resolveIntegrationAccount({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
+    integrationAccountId,
   });
   if (!account.ok) {
     return controlError(account.error.code, 404);
@@ -81,7 +68,7 @@ export async function handleAccountResources(
   const page = await listProviderResourcePage({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
+    integrationAccountId,
     query,
     cursor,
     now: Date.now(),
@@ -178,24 +165,20 @@ export async function handleAccountDrivePickerConfig(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "GET") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    false,
-  );
-  if (!authorized.ok) return authorized.response;
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "GET",
+    "admin",
   );
-  if (!integrationAccountId.ok)
-    return controlError("integration_account_not_found", 404);
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const account = await resolveIntegrationAccount({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
+    integrationAccountId,
   });
   if (!account.ok) return controlError(account.error.code, 404);
   if (
@@ -228,73 +211,36 @@ export async function handleRefreshAccountResources(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "POST",
+    "admin",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("provider_resource_refresh_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId.value}/resources/refresh`,
+    boundary: "configuration_versioned",
+    user: "before_replay",
+    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId}/resources/refresh`,
     operation: "provider.resource.refresh",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const context = await resolveActiveProviderAccountContext({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
+    integrationAccountId,
   });
   if (!context.ok) {
     return controlError(
@@ -326,7 +272,7 @@ export async function handleRefreshAccountResources(
         keys: env,
         installationIdentity: installationIdentity.value,
         organisationId: authorized.organisationId,
-        integrationAccountId: integrationAccountId.value,
+        integrationAccountId,
         workspaceId: workspaceId.value,
       });
       if (!credential.ok || credential.value.kind !== "bearer") {
@@ -379,21 +325,14 @@ export async function handleRefreshAccountResources(
   const refreshed = await refreshProviderResourceSnapshot({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
+    integrationAccountId,
     provider,
     environment: context.value.account.environment,
     resources,
     mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
     },
     now,
   });
@@ -403,26 +342,19 @@ export async function handleRefreshAccountResources(
       refreshed.error.code === "organisation_not_found" ? 404 : 409,
     );
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("provider resource refresh projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: refreshed.value.receiptId,
-      organisation_id: authorized.organisationId,
-      integration_account_id: integrationAccountId.value,
-      snapshot_revision: refreshed.value.snapshotRevision,
-      resource_count: refreshed.value.resourceCount,
-      configuration_version: refreshed.value.configurationVersion,
-      projection_revision: refreshed.value.projectionRevision,
+  return projectionResponse(
+    authorized,
+    "provider resource refresh projection is missing",
+    {
+      receipt: {
+        receipt_id: refreshed.value.receiptId,
+        organisation_id: authorized.organisationId,
+        integration_account_id: integrationAccountId,
+        snapshot_revision: refreshed.value.snapshotRevision,
+        resource_count: refreshed.value.resourceCount,
+        configuration_version: refreshed.value.configurationVersion,
+        projection_revision: refreshed.value.projectionRevision,
+      },
     },
-  });
+  );
 }

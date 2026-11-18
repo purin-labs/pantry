@@ -1,14 +1,6 @@
 import type { Env } from "../../../env";
 import type { Result } from "../../../result";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  prepareControlMutationReceipt,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
+import { prepareControlMutationReceipt } from "../../../data/control-mutation";
 import {
   parseOrganisationInferenceSelection,
   readOrganisationInferenceSelection,
@@ -24,6 +16,11 @@ import {
   type OpenAiApiKey,
 } from "../../../credential-vault";
 import { resolveOrganisationModelRouteForSelection } from "../../../models/route";
+import {
+  admitControlMutation,
+  controlMutationIdentity,
+  resolveMutationUser,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {
   controlError,
@@ -31,7 +28,6 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import { controlCausationId } from "../../mutation";
 import { activationModelRouteError } from "../../onboarding-runtime";
 import { assertNever, hasExactKeys } from "@seams/std";
 import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
@@ -77,44 +73,22 @@ export async function handleOrganisationInference(
   }
   const mutation = parseOrganisationInferenceMutation(body.value);
   if (!mutation.ok) return controlError(mutation.error.code, 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitControlMutation({
     request,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
     route: `/v1/control/organisations/${authorized.organisationId}/inference`,
     operation: "organisation.inference.select",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope } = admitted;
   const current = await readOrganisationInferenceSelection({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
   });
   if (current === null) return controlError("organisation_not_found", 404);
-  if (
-    current.configurationVersion !== boundary.value.expectedConfigurationVersion
-  ) {
+  if (current.configurationVersion !== boundary.expectedConfigurationVersion) {
     return controlError("configuration_version_conflict", 409);
   }
   const lifecycle = await readOnboardingRow(
@@ -169,25 +143,22 @@ export async function handleOrganisationInference(
       );
     }
   }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const now = Date.now();
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    identity,
     now,
-  });
+  );
   const selected = await selectOrganisationInferenceSelection({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     selection: mutation.value.selection,
-    expectedConfigurationVersion: boundary.value.expectedConfigurationVersion,
+    expectedConfigurationVersion: boundary.expectedConfigurationVersion,
     selectedByUserId: identity.userId,
     now,
   });
@@ -206,7 +177,7 @@ export async function handleOrganisationInference(
   await session.batch([
     prepareControlMutationReceipt(session, {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: mutationIdentity,
       responseStatus: 200,
       responseBody,

@@ -10,21 +10,11 @@ import {
   enumeratePublishedResources,
   type PublishedResourceBoundaryError,
 } from "../../../commerce/entity-plane/published-resources";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  prepareControlMutationReceipt,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
-import { resolveOrganisationCommerceMerchantBinding } from "../../../data/commerce-merchant-binding";
 import { ensureCommerceLowStockCueSnapshot } from "../../../cues/engine";
 import {
   commerceCanonicalResourceId,
   commerceProviderResourceId,
 } from "../../../commerce/provider";
-import { createCommerceClient } from "../../../commerce/outbox-worker";
 import {
   applyOfferPriceAllowance,
   parseOfferPriceAllowanceCommand,
@@ -40,13 +30,16 @@ import {
   previewTrackingBatch,
   readCommerceExceptionInbox,
 } from "../../../commerce/operations-workbench";
-import { authorizeOrganisationRequest } from "../../authorization";
 import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "../../http";
-import { readOrganisationEnvironment } from "../../organisation-runtime";
+  admitControlMutation,
+  recordSessionMutationReceipt,
+} from "../../admission/control-mutation";
+import {
+  resolveMerchantBinding,
+  resolveMerchantControlContext,
+} from "../../commerce-merchant";
+import { authorizeOrganisationRequest } from "../../authorization";
+import { controlError, controlJson, readJsonRecord } from "../../http";
 
 // Stock quantities and thresholds are absent from the entity graph attributes.
 export async function handleCommerceInventory(
@@ -63,28 +56,17 @@ export async function handleCommerceInventory(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) return controlError("underclerk_unavailable", 503);
-  const snapshot = await client.readStockSnapshot(binding.value.merchantId);
+  const merchant = await resolveMerchantControlContext(env, authorized);
+  if (merchant instanceof Response) return merchant;
+  const { client } = merchant;
+  const snapshot = await client.readStockSnapshot(merchant.merchantId);
   if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
-  if (snapshot.value.commerce.merchantId !== binding.value.merchantId)
+  if (snapshot.value.commerce.merchantId !== merchant.merchantId)
     return controlError("underclerk_scope_mismatch", 502);
   // A missing photo must not hide the stock, so a failed read leaves none.
   const [library, storefronts] = await Promise.all([
-    client.listMedia(binding.value.merchantId),
-    client.listStorefrontIds(binding.value.merchantId),
+    client.listMedia(merchant.merchantId),
+    client.listStorefrontIds(merchant.merchantId),
   ]);
   const base = env.UNDERCLERK_BASE_URL?.trim().replace(/\/+$/u, "");
   const storefrontId = storefronts.ok ? storefronts.value[0] : undefined;
@@ -92,7 +74,7 @@ export async function handleCommerceInventory(
     library.ok && base !== undefined && storefrontId !== undefined
       ? productPhotos(
           library.value,
-          `${base}/v1/public/merchants/${encodeURIComponent(binding.value.merchantId)}/storefronts/${encodeURIComponent(storefrontId)}/media`,
+          `${base}/v1/public/merchants/${encodeURIComponent(merchant.merchantId)}/storefronts/${encodeURIComponent(storefrontId)}/media`,
         )
       : undefined;
   return controlJson({
@@ -116,21 +98,10 @@ export async function handleCommercePricedOffers(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) return controlError("underclerk_unavailable", 503);
-  const snapshot = await client.readSnapshot(binding.value.merchantId);
+  const merchant = await resolveMerchantControlContext(env, authorized);
+  if (merchant instanceof Response) return merchant;
+  const { client } = merchant;
+  const snapshot = await client.readSnapshot(merchant.merchantId);
   if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
   return controlJson({
     ok: true,
@@ -139,16 +110,13 @@ export async function handleCommercePricedOffers(
     offers: snapshot.value.resources.offers
       .filter((offer) => offer.lifecycle.state === "listed")
       .map((offer) => ({
-        offerId: commerceCanonicalResourceId(
-          binding.value.merchantId,
-          offer.id,
-        ),
+        offerId: commerceCanonicalResourceId(merchant.merchantId, offer.id),
         variantId: commerceCanonicalResourceId(
-          binding.value.merchantId,
+          merchant.merchantId,
           offer.variantId,
         ),
         salesChannelId: commerceCanonicalResourceId(
-          binding.value.merchantId,
+          merchant.merchantId,
           offer.salesChannelId,
         ),
         revision: offer.revision,
@@ -175,32 +143,18 @@ export async function handleCommerceOfferPricePolicy(
     mutation,
   );
   if (!authorized.ok) return authorized.response;
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) return controlError("underclerk_unavailable", 503);
+  const merchant = await resolveMerchantControlContext(env, authorized);
+  if (merchant instanceof Response) return merchant;
+  const { client } = merchant;
   // Portal names Offers by their canonical id; Commerce knows its own.
-  const offerId = commerceProviderResourceId(
-    binding.value.merchantId,
-    offerIdRaw,
-  );
+  const offerId = commerceProviderResourceId(merchant.merchantId, offerIdRaw);
   if (offerId === null)
     return controlError("commerce_action_projection_invalid", 422);
   const now = Date.now();
 
   if (request.method === "GET") {
     return offerPricePolicyResponse(
-      await client.readOfferPricePolicy(binding.value.merchantId, offerId),
+      await client.readOfferPricePolicy(merchant.merchantId, offerId),
     );
   }
   const body = await readJsonRecord(request);
@@ -215,36 +169,15 @@ export async function handleCommerceOfferPricePolicy(
   // re-driving it: a second attempt reads a policy revision the first one
   // advanced and refuses as stale, telling the owner a change failed when it
   // succeeded. The Portal path had this hole; the Slack draft path does not.
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitControlMutation({
     request,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/offers/${offerIdRaw}/price-policy`,
     operation: `commerce.offer_price_policy.${command.value.kind}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   // The same boundary a confirmed Slack draft applies, so the two surfaces
   // cannot write an allowance differently.
   const result = await applyOfferPriceAllowance(
@@ -258,20 +191,12 @@ export async function handleCommerceOfferPricePolicy(
   // attempt undecided, and recording it would refuse the retry that should
   // carry it through.
   if (result.ok) {
-    await prepareControlMutationReceipt(authorized.executionScope.database, {
-      scope,
-      boundary: boundary.value,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          "control",
-          authorized.authenticated.session.userId,
-        ),
-        causationId: boundary.value.idempotencyKey,
-        now,
-      }),
-      responseStatus: response.status,
-      responseBody: await response.clone().json(),
-    }).run();
+    await recordSessionMutationReceipt(
+      authorized,
+      admitted,
+      { status: response.status, body: await response.clone().json() },
+      now,
+    );
   }
   return response;
 }
@@ -359,7 +284,10 @@ export async function handleCommerceTrackingBatchPreview(
   if (!body.ok) return controlError("tracking_batch_invalid", 422);
   const parsed = parseTrackingBatchPreviewRequest(body.value);
   if (!parsed.ok) return controlError(parsed.error.code, 422);
-  const inbox = await readCommerceExceptionInbox(env, authorized.organisationId);
+  const inbox = await readCommerceExceptionInbox(
+    env,
+    authorized.organisationId,
+  );
   const preview = await previewTrackingBatch(inbox, parsed.value, Date.now());
   return preview.ok
     ? controlJson({ ok: true, preview: preview.value })
@@ -424,14 +352,8 @@ export async function handleCommercePublishedResources(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
+  const binding = await resolveMerchantBinding(authorized);
+  if (binding instanceof Response) return binding;
   if (
     env.UNDERCLERK_BASE_URL === undefined ||
     env.UNDERCLERK_SERVICE_TOKEN === undefined
@@ -451,7 +373,7 @@ export async function handleCommercePublishedResources(
   const result = await enumeratePublishedResources({
     client,
     organisationId: authorized.organisationId,
-    merchantId: binding.value.merchantId,
+    merchantId: binding.merchantId,
   });
   return result.ok
     ? controlJson({ ok: true, metadata: result.value })

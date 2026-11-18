@@ -86,7 +86,9 @@ export async function handleMenuScreenRequest(
       ? readPickup(request, env)
       : controlError("method_not_allowed", 405);
   if (pathname === "/v1/screens/socket") return openSocket(request, env);
-  const media = /^\/v1\/screens\/media\/([^/]+)\/(media_[0-9a-f]{32})$/u.exec(pathname);
+  const media = /^\/v1\/screens\/media\/([^/]+)\/(media_[0-9a-f]{32})$/u.exec(
+    pathname,
+  );
   if (media !== null)
     return request.method === "GET"
       ? readScreenMedia(env, decodeURIComponent(media[1] ?? ""), media[2] ?? "")
@@ -122,7 +124,11 @@ async function readScreenMedia(
     return controlError("not_found", 404);
   }
   if (!read.ok || !read.value.named) return controlError("not_found", 404);
-  const content = await readCafeImageContent(env, organisationId.value, mediaId);
+  const content = await readCafeImageContent(
+    env,
+    organisationId.value,
+    mediaId,
+  );
   if (content === null) return controlError("not_found", 404);
   return new Response(content.bytes, {
     status: 200,
@@ -224,7 +230,23 @@ async function readPairing(
   return controlJson(state);
 }
 
-async function readFeed(request: Request, env: Env): Promise<Response> {
+type ScreenFeedCommand = Readonly<{
+  kind: "screen_feed";
+  screenId: string;
+  secret: string;
+}>;
+
+/** The paired screen of the bearer token, as the Organisation Actor reads it. */
+async function readPairedScreen(
+  request: Request,
+  env: Env,
+): Promise<
+  | Readonly<{
+      organisationId: OrganisationId;
+      read: Extract<MenuBoardCommandReply<ScreenFeedCommand>, { ok: true }>;
+    }>
+  | Response
+> {
   const raw = bearer(request);
   const token = raw === null ? null : parseMenuScreenToken(raw);
   if (token === null) return controlError("menu_screen_refused", 401);
@@ -253,10 +275,16 @@ async function readFeed(request: Request, env: Env): Promise<Response> {
     return read.error.code === "menu_screen_refused"
       ? controlError("menu_screen_refused", 401)
       : controlError("menu_screen_unavailable", 503);
+  return { organisationId: organisationId.value, read };
+}
+
+async function readFeed(request: Request, env: Env): Promise<Response> {
+  const screen = await readPairedScreen(request, env);
+  if (screen instanceof Response) return screen;
   const feed: MenuScreenFeed = {
-    screen: read.value.screen,
-    release: read.value.release,
-    facts: await readMenuScreenFacts(env, organisationId.value),
+    screen: screen.read.value.screen,
+    release: screen.read.value.release,
+    facts: await readMenuScreenFacts(env, screen.organisationId),
   };
   return controlJson(feed);
 }
@@ -267,35 +295,9 @@ async function readFeed(request: Request, env: Env): Promise<Response> {
  * no buyer, so any paired screen of the shop may show them.
  */
 async function readPickup(request: Request, env: Env): Promise<Response> {
-  const raw = bearer(request);
-  const token = raw === null ? null : parseMenuScreenToken(raw);
-  if (token === null) return controlError("menu_screen_refused", 401);
-  const organisationId = parseOrganisationId(token.organisationId);
-  if (!organisationId.ok) return controlError("menu_screen_refused", 401);
-  const command = {
-    kind: "screen_feed",
-    screenId: token.screenId,
-    secret: token.secret,
-  } as const;
-  let read: MenuBoardCommandReply<typeof command>;
-  try {
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId: organisationId.value,
-      now: Date.now(),
-    });
-    read = (await organisation.menuBoardCommand({
-      organisationId: organisationId.value,
-      command,
-    })) as MenuBoardCommandReply<typeof command>;
-  } catch {
-    return controlError("menu_screen_unavailable", 503);
-  }
-  if (!read.ok)
-    return read.error.code === "menu_screen_refused"
-      ? controlError("menu_screen_refused", 401)
-      : controlError("menu_screen_unavailable", 503);
-  const pickup = await readMenuScreenPickup(env, organisationId.value);
+  const screen = await readPairedScreen(request, env);
+  if (screen instanceof Response) return screen;
+  const pickup = await readMenuScreenPickup(env, screen.organisationId);
   return pickup === null
     ? controlError("menu_screen_unavailable", 503)
     : controlJson(pickup);

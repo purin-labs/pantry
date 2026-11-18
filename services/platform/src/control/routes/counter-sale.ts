@@ -1,6 +1,5 @@
 import { terminalAssignmentPaymentBinding } from "@seams/contracts";
 import type {
-  CommerceAdminClient,
   CommerceClientError,
   CommerceCounterSaleV1,
   CommercePickupFulfillmentV1,
@@ -11,6 +10,11 @@ import type {
 } from "@seams/commerce-client";
 
 import type { Env } from "../../env";
+import { admitUserMutation } from "../admission/control-mutation";
+import {
+  resolveMerchantControlContext,
+  type MerchantControlContext,
+} from "../commerce-merchant";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -22,19 +26,13 @@ import {
   type JsonRecord,
 } from "../http";
 import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
   type UnversionedControlMutationBoundary,
   type ControlMutationReceiptScope,
 } from "../../data/control-mutation";
-import { createCommerceClient } from "../../commerce/outbox-worker";
 import { readActiveTerminalAssignment } from "../../data/terminal-assignment-store";
 import { readCounterSale as readCounterSaleState } from "../../data/counter-sale-readback";
 import type { CounterSaleReadback } from "../../data/counter-sale-readback";
-import { readOrganisationEnvironment } from "../organisation-runtime";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { resolveUser } from "../../data/control-plane";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import type { Variant } from "@seams/type-utils";
 import { assertNever } from "@seams/std";
 
@@ -100,11 +98,6 @@ type CounterSaleView = CounterSaleReadback &
     afterSale: CounterSaleAfterSale | null;
   }>;
 
-type CounterSaleContext = Readonly<{
-  merchantId: string;
-  client: CommerceAdminClient;
-}>;
-
 type StartedMutation = Readonly<{
   authorized: AuthorizedOrganisationRequest;
   identity: Readonly<{
@@ -114,7 +107,7 @@ type StartedMutation = Readonly<{
   }>;
   scope: ControlMutationReceiptScope;
   boundary: UnversionedControlMutationBoundary;
-  context: CounterSaleContext;
+  context: MerchantControlContext;
   body: JsonRecord;
   now: number;
 }>;
@@ -226,7 +219,7 @@ async function handleCounterSaleRead(
   if (!authorized.ok) {
     return authorized.response;
   }
-  const context = await resolveCounterSaleContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) {
     return context;
   }
@@ -267,10 +260,7 @@ async function handleCounterSaleOpen(
     return controlError("counter_sale_request_invalid", 422);
   }
 
-  const resolved = await resolveCounterAuthority(
-    started,
-    sale.satyrLocationId,
-  );
+  const resolved = await resolveCounterAuthority(started, sale.satyrLocationId);
   if (resolved instanceof Response) {
     return resolved;
   }
@@ -704,7 +694,7 @@ type PlacedCounterSale = Readonly<{
 }>;
 
 async function resolvePlacedCounterSale(
-  context: CounterSaleContext,
+  context: MerchantControlContext,
   checkoutId: string,
 ): Promise<PlacedCounterSale | Response> {
   const sale = await context.client.readCounterSale(
@@ -739,7 +729,7 @@ async function resolvePlacedCounterSale(
 }
 
 async function buildCounterSaleView(
-  context: CounterSaleContext,
+  context: MerchantControlContext,
   sale: CommerceCounterSaleV1,
 ): Promise<CounterSaleView | Response> {
   const state = readCounterSaleState(sale);
@@ -914,45 +904,19 @@ async function beginCounterSaleMutation(
   if (!body.ok) {
     return controlError("counter_sale_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/counter-sales`,
     operation,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  const context = await resolveCounterSaleContext(env, authorized);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) {
     return context;
   }
@@ -960,7 +924,7 @@ async function beginCounterSaleMutation(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     context,
     body: body.value,
     now: Date.now(),
@@ -1016,7 +980,12 @@ function parseCollectionRequest(body: JsonRecord): Readonly<{
   quoteDigest: string;
   amount: Readonly<{ amountMinor: number; currency: string }>;
 }> | null {
-  const { satyrLocationId: pantryLocationId, checkoutRevision, quoteDigest, amount } = body;
+  const {
+    satyrLocationId: pantryLocationId,
+    checkoutRevision,
+    quoteDigest,
+    amount,
+  } = body;
   if (typeof pantryLocationId !== "string" || pantryLocationId.length === 0) {
     return null;
   }
@@ -1057,36 +1026,6 @@ function parseCollectionRequest(body: JsonRecord): Readonly<{
       currency: money.currency,
     },
   };
-}
-
-async function resolveCounterSaleContext(
-  env: Env,
-  authorized: AuthorizedOrganisationRequest,
-): Promise<CounterSaleContext | Response> {
-  const environment = await readOrganisationEnvironment(
-    authorized.executionScope.database,
-    authorized.organisationId,
-  );
-  if (environment === null) {
-    return controlError("organisation_not_found", 404);
-  }
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) {
-    return controlError("underclerk_binding_missing", 503);
-  }
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) {
-    return controlError("underclerk_unavailable", 503);
-  }
-  return { merchantId: binding.value.merchantId, client };
 }
 
 function commerceErrorResponse(error: CommerceClientError): Response {

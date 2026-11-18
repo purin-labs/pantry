@@ -1,27 +1,16 @@
 import { isOrderQueueAction } from "@seams/control-api";
 
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import { resolveUser } from "../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
 import {
   advanceOrderQueueEntry,
   presentOrderQueueEntry,
-  type OrderQueueContext,
 } from "../../commerce/order-queue-commands";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import type { Env } from "../../env";
-import { createCommerceClient } from "../../commerce/outbox-worker";
-import {
-  authorizeOrganisationRequest,
-  type AuthorizedOrganisationRequest,
-} from "../authorization";
+import { admitUserMutation } from "../admission/control-mutation";
+import { resolveMerchantControlContext } from "../commerce-merchant";
+import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { readOrganisationEnvironment } from "../organisation-runtime";
 
 /** The staff order queue on the page (Plan 40B phase 3). */
 export type OrderQueueControlRoute =
@@ -78,7 +67,7 @@ async function readOrderQueue(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const context = await resolveOrderQueueContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const queue = await context.client.readPickupQueue(context.merchantId);
   if (!queue.ok) return controlError("underclerk_unavailable", 503);
@@ -106,46 +95,25 @@ async function advanceOrder(
   if (!body.ok || !isOrderQueueAction(body.value.action))
     return controlError("order_queue_request_invalid", 422);
   const action = body.value.action;
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/order-queue/${route.fulfillmentIdRaw}/advance`,
     operation: `order_queue.${action}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const context = await resolveOrderQueueContext(env, authorized);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const moved = await advanceOrderQueueEntry(
     context,
     route.fulfillmentIdRaw,
     action,
-    boundary.value.idempotencyKey,
+    boundary.idempotencyKey,
   );
   if (!moved.ok) {
     switch (moved.code) {
@@ -171,7 +139,7 @@ async function advanceOrder(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now: Date.now(),
@@ -187,30 +155,6 @@ async function advanceOrder(
     ?.signalMenuScreens({ organisationId: authorized.organisationId })
     .catch(ignoreFailure);
   return controlJson(responseBody);
-}
-
-export async function resolveOrderQueueContext(
-  env: Env,
-  authorized: AuthorizedOrganisationRequest,
-): Promise<OrderQueueContext | Response> {
-  const environment = await readOrganisationEnvironment(
-    authorized.executionScope.database,
-    authorized.organisationId,
-  );
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) return controlError("underclerk_unavailable", 503);
-  return { client, merchantId: binding.value.merchantId };
 }
 
 function ignoreFailure(): null {

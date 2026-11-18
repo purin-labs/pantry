@@ -1,12 +1,12 @@
 import { isProductionPlanLocationId } from "../../actors/production-plan";
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
-import { requirePublicOrigin } from "../../public-origin";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { controlError } from "../http";
+import { authorizeOrganisationSocket } from "./organisation-socket";
 
 /**
  * Plan 40D: the shared production plan of one location. The socket carries
@@ -87,21 +87,10 @@ export async function authorizeProductionPlanSocket(
   }
   if (route.transport !== "socket")
     return { ok: false, response: controlError("not_found", 404) };
-  if (request.method !== "GET")
-    return { ok: false, response: controlError("method_not_allowed", 405) };
-  if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket")
-    return { ok: false, response: controlError("websocket_required", 426) };
-  // Browser WebSockets cannot set the CSRF header. Require the exact configured origin.
-  if (
-    request.headers.get("Origin") !==
-    requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)
-  )
-    return { ok: false, response: controlError("origin_invalid", 403) };
-  return authorizeOrganisationRequest(
+  return authorizeOrganisationSocket(
     request,
     env,
     route.organisationId,
     "viewer",
-    false,
   );
 }

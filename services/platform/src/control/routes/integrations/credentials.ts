@@ -14,27 +14,25 @@ import {
   markCredentialRotationVerified,
   recordCredentialRevocationMutation,
 } from "../../../data/credential-lifecycle";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
-import { buildOnboardingProjection } from "../../../data/onboarding-projection";
-import { parseIntegrationAccountId } from "../../../ids";
 import { activateProviderCredentialCutover } from "../../../provider-lifecycle/credential-cutover";
+import {
+  admitUserMutation,
+  controlMutationIdentity,
+  projectionReplay,
+  projectionResponse,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import { controlCausationId } from "../../mutation";
-import { mutationProjectionResponse } from "../../mutation-projection";
 import { activateRevocationPolicy } from "../../credential-revocation-policy";
 import { tearDownAgentMailboxForRemoval } from "../../../mail-inbox/agent-mailbox-teardown";
 import {
   credentialRotationSlug,
   validateReplacementCredential,
 } from "../../../provider-lifecycle/credential-replacement";
+import {
+  authorizeAccountRequest,
+  parseReplacementAccountId,
+} from "./account-request";
 
 export async function handleCredentialInventory(
   request: Request,
@@ -74,87 +72,43 @@ export async function handleRevokeAccountCredential(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "POST",
+    "admin",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const body = await readJsonRecord(request);
   if (!body.ok) {
     return controlError("revoke_credential_request_invalid", 422);
   }
-  const replacementRaw = body.value.replacementIntegrationAccountId;
-  const replacement =
-    replacementRaw === undefined || replacementRaw === null
-      ? { ok: true as const, value: null }
-      : typeof replacementRaw === "string"
-        ? parseIntegrationAccountId(replacementRaw)
-        : {
-            ok: false as const,
-            error: { code: "invalid" as const, value: "" },
-          };
-  if (!replacement.ok) {
+  const replacement = parseReplacementAccountId(
+    body.value.replacementIntegrationAccountId,
+  );
+  if (replacement === undefined) {
     return controlError("default_account_replacement_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId.value}/revoke-credential`,
+    boundary: "configuration_versioned",
+    user: "before_replay",
+    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId}/revoke-credential`,
     operation: "provider.credential.revoke",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const now = Date.now();
   const teardown = await tearDownAgentMailboxForRemoval(
     env,
     authorized.executionScope,
-    integrationAccountId.value,
+    integrationAccountId,
     "erase",
   );
   if (teardown.kind === "connector_unavailable") {
@@ -163,9 +117,10 @@ export async function handleRevokeAccountCredential(
   const authorization = await authorizeCredentialRevocation({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
-    replacementIntegrationAccountId: replacement.value,
-    expectedConfigurationVersion: boundary.value.expectedConfigurationVersion,
+    integrationAccountId,
+    replacementIntegrationAccountId: replacement,
+    expectedConfigurationVersion:
+      admitted.boundary.expectedConfigurationVersion,
   });
   if (!authorization.ok) {
     const status =
@@ -200,46 +155,32 @@ export async function handleRevokeAccountCredential(
     organisationId: authorized.organisationId,
     authorization: authorization.value,
     mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
     },
-    actorUserId: identity.userId,
+    actorUserId: admitted.user.userId,
     receiptBody: {
       receipt_id: `credential-revocation:${authorized.organisationId}`,
       organisation_id: authorized.organisationId,
-      integration_account_id: integrationAccountId.value,
+      integration_account_id: integrationAccountId,
     },
     now,
   });
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("credential revocation projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    revocation: {
-      revocation_id: committed.revocationId,
-      state: committed.state,
-      credential_generation_count: committed.credentialGenerationCount,
-      vault_secret_count: committed.vaultSecretCount,
-      started_at: committed.startedAt,
-      committed_at: committed.committedAt,
+  return projectionResponse(
+    authorized,
+    "credential revocation projection is missing",
+    {
+      revocation: {
+        revocation_id: committed.revocationId,
+        state: committed.state,
+        credential_generation_count: committed.credentialGenerationCount,
+        vault_secret_count: committed.vaultSecretCount,
+        started_at: committed.startedAt,
+        committed_at: committed.committedAt,
+      },
     },
-  });
+  );
 }
 
 const CREDENTIAL_ROTATION_PROVIDERS = [
@@ -255,25 +196,16 @@ export async function handleRotateAccountCredentialSupplied(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "POST",
+    "admin",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
   const body = await readJsonRecord(request);
   if (
     !body.ok ||
@@ -283,48 +215,20 @@ export async function handleRotateAccountCredentialSupplied(
     return controlError("credential_rotation_request_invalid", 422);
   }
   const replacementSecret = body.value.replacementSecret.trim();
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId.value}/credential-rotations`,
+    boundary: "configuration_versioned",
+    user: "before_replay",
+    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId}/credential-rotations`,
     operation: "provider.credential.rotate_supplied",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const now = Date.now();
-  const rotationSlug = credentialRotationSlug(boundary.value.idempotencyKey);
+  const rotationSlug = credentialRotationSlug(admitted.boundary.idempotencyKey);
   const replacementHandle = parseVaultHandle(
     `vault:${authorized.organisationId.toLowerCase()}:rotation:${rotationSlug}`,
   );
@@ -334,11 +238,12 @@ export async function handleRotateAccountCredentialSupplied(
   const rotation = await beginCredentialRotation({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
+    integrationAccountId,
     credentialRotationId: `rotation_${authorized.organisationId}_${rotationSlug}`,
     replacementHandle: replacementHandle.value,
-    createdByUserId: identity.userId,
-    expectedConfigurationVersion: boundary.value.expectedConfigurationVersion,
+    createdByUserId: admitted.user.userId,
+    expectedConfigurationVersion:
+      admitted.boundary.expectedConfigurationVersion,
     now,
   });
   if (!rotation.ok) {
@@ -421,22 +326,15 @@ export async function handleRotateAccountCredentialSupplied(
       organisationId: authorized.organisationId,
       rotation: rotation.value,
       mutation: {
-        boundary: boundary.value,
-        scope,
-        identity: newControlMutationIdentity({
-          portalSubjectHash: await hashPortalSubject(
-            identity.issuer,
-            identity.subject,
-          ),
-          causationId: controlCausationId(request),
-          now,
-        }),
+        boundary: admitted.boundary,
+        scope: admitted.scope,
+        identity: await controlMutationIdentity(request, admitted.user, now),
       },
-      actorUserId: identity.userId,
+      actorUserId: admitted.user.userId,
       receiptBody: {
         receipt_id: rotation.value.credentialRotationId,
         organisation_id: authorized.organisationId,
-        integration_account_id: integrationAccountId.value,
+        integration_account_id: integrationAccountId,
       },
       now: Date.now(),
     });
@@ -462,24 +360,17 @@ export async function handleRotateAccountCredentialSupplied(
   } catch {
     activation = "reconciling";
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("credential rotation projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    rotation: {
-      credential_rotation_id: rotation.value.credentialRotationId,
-      status: "committed",
-      previous_generation: rotation.value.authority.credentialGeneration,
-      active_generation: rotation.value.authority.credentialGeneration + 1,
-      policy_activation: activation,
+  return projectionResponse(
+    authorized,
+    "credential rotation projection is missing",
+    {
+      rotation: {
+        credential_rotation_id: rotation.value.credentialRotationId,
+        status: "committed",
+        previous_generation: rotation.value.authority.credentialGeneration,
+        active_generation: rotation.value.authority.credentialGeneration + 1,
+        policy_activation: activation,
+      },
     },
-  });
+  );
 }

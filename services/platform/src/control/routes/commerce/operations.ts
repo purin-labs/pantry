@@ -1,12 +1,6 @@
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import { admitCommerceCapability } from "../../../data/commerce-capability-activation";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
 import { resolveOrganisationCommerceMerchantBinding } from "../../../data/commerce-merchant-binding";
 import {
   executeCafeOperation,
@@ -21,18 +15,18 @@ import {
   type ShippingOperationRequest,
 } from "../../../commerce/shipping-operations";
 import { createCommerceOutboxReconcileQueueMessage } from "../../../ingress-queue";
-import {
-  newRequestId,
-  type IntegrationAccountId,
-} from "../../../ids";
+import { newRequestId, type IntegrationAccountId } from "../../../ids";
 import { commerceProviderResourceId } from "../../../commerce/provider";
 import { createCommerceClient } from "../../../commerce/outbox-worker";
-import { authorizeOrganisationRequest } from "../../authorization";
 import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "../../http";
+  admitUserMutation,
+  type AdmittedUserMutation,
+} from "../../admission/control-mutation";
+import {
+  authorizeOrganisationRequest,
+  type AuthorizedOrganisationRequest,
+} from "../../authorization";
+import { controlError, controlJson, readJsonRecord } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { readOrganisationEnvironment } from "../../organisation-runtime";
 import { assertNever } from "@seams/std";
@@ -59,54 +53,35 @@ export async function handleCafeOperations(
   }
   const action = parseCafeOperationAction(body.value.action);
   if (action === null) return controlError("cafe_operation_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/cafe-operations`,
     operation: `cafe.operation.${action}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const admitted = await admitCommerceCapability({
+  if (admitted instanceof Response) return admitted;
+  const { boundary } = admitted;
+  const capability = await admitCommerceCapability({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     capability: "food_service",
     scope: { kind: "organisation" },
   });
-  if (!admitted.ok) return controlError("commerce_capability_inactive", 409);
-  const context = await resolveCafeOperationsContext(env, authorized.executionScope);
+  if (!capability.ok) return controlError("commerce_capability_inactive", 409);
+  const context = await resolveCafeOperationsContext(
+    env,
+    authorized.executionScope,
+  );
   if (!context.ok) return context.response;
   const executed = await executeCafeOperation({
     client: context.client,
     merchantId: context.merchantId,
     action,
-    idempotencyKey: boundary.value.idempotencyKey,
+    idempotencyKey: boundary.idempotencyKey,
   });
   if (!executed.ok) return cafeOperationErrorResponse(executed.error);
   const now = Date.now();
@@ -115,31 +90,15 @@ export async function handleCafeOperations(
     cafeOperations: executed.value.view,
     receipt: executed.value.receipt,
   };
-  try {
-    await env.EVENT_Q.send(
-      createCommerceOutboxReconcileQueueMessage({
-        requestId: newRequestId(),
-        receivedAt: now,
-        organisationId: authorized.organisationId,
-        integrationAccountId: context.integrationAccountId,
-      }),
-      { contentType: "json" },
-    );
-  } catch {
-    return controlError("underclerk_projection_refresh_unavailable", 503);
-  }
-  const recordedMutationReceipt = await recordCommerceMutationReceipt({
-    authorized,
-    identity,
-    scope,
-    boundary: boundary.value,
+  return finishCommerceOperation({
     request,
+    env,
+    authorized,
+    admitted,
+    integrationAccountId: context.integrationAccountId,
     responseBody,
     now,
   });
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  return controlJson(responseBody);
 }
 
 async function readCafeOperationsResponse(
@@ -155,7 +114,10 @@ async function readCafeOperationsResponse(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const context = await resolveCafeOperationsContext(env, authorized.executionScope);
+  const context = await resolveCafeOperationsContext(
+    env,
+    authorized.executionScope,
+  );
   if (!context.ok) return context.response;
   const loaded = await readCafeOperations(context.client, context.merchantId);
   return loaded.ok
@@ -176,7 +138,10 @@ async function resolveCafeOperationsContext(
   | Readonly<{ ok: false; response: Response }>
 > {
   const organisationId = execution.organisationId;
-  const environment = await readOrganisationEnvironment(execution.database, organisationId);
+  const environment = await readOrganisationEnvironment(
+    execution.database,
+    organisationId,
+  );
   if (environment === null)
     return { ok: false, response: controlError("organisation_not_found", 404) };
   const binding = await resolveOrganisationCommerceMerchantBinding({
@@ -283,41 +248,22 @@ export async function handleShippingOperations(
   const operation = parseShippingOperationRequest(body.value);
   if (operation === null)
     return controlError("shipping_operation_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/shipping-operations/${shipmentId}`,
     operation: `shipping.operation.${operation.action}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const context = await resolveCafeOperationsContext(env, authorized.executionScope);
+  if (admitted instanceof Response) return admitted;
+  const { boundary } = admitted;
+  const context = await resolveCafeOperationsContext(
+    env,
+    authorized.executionScope,
+  );
   if (!context.ok) return context.response;
   const providerShipmentId = commerceProviderResourceId(
     context.merchantId,
@@ -335,18 +281,44 @@ export async function handleShippingOperations(
     merchantId: context.merchantId,
     shipmentId: providerShipmentId,
     request: operation,
-    idempotencyKey: boundary.value.idempotencyKey,
+    idempotencyKey: boundary.idempotencyKey,
     requestedAt: new Date(now).toISOString(),
   });
   if (!executed.ok) return shippingOperationErrorResponse(executed.error);
   const responseBody = { ok: true, shippingOperations: executed.value };
+  return finishCommerceOperation({
+    request,
+    env,
+    authorized,
+    admitted,
+    integrationAccountId: context.integrationAccountId,
+    responseBody,
+    now,
+  });
+}
+
+/**
+ * Asks for the projection refresh of an operation that Commerce carried out,
+ * then records its receipt and answers its result.
+ */
+async function finishCommerceOperation(
+  input: Readonly<{
+    request: Request;
+    env: Env;
+    authorized: AuthorizedOrganisationRequest;
+    admitted: AdmittedUserMutation<"unversioned">;
+    integrationAccountId: IntegrationAccountId;
+    responseBody: unknown;
+    now: number;
+  }>,
+): Promise<Response> {
   try {
-    await env.EVENT_Q.send(
+    await input.env.EVENT_Q.send(
       createCommerceOutboxReconcileQueueMessage({
         requestId: newRequestId(),
-        receivedAt: now,
-        organisationId: authorized.organisationId,
-        integrationAccountId: context.integrationAccountId,
+        receivedAt: input.now,
+        organisationId: input.authorized.organisationId,
+        integrationAccountId: input.integrationAccountId,
       }),
       { contentType: "json" },
     );
@@ -354,17 +326,17 @@ export async function handleShippingOperations(
     return controlError("underclerk_projection_refresh_unavailable", 503);
   }
   const recordedMutationReceipt = await recordCommerceMutationReceipt({
-    authorized,
-    identity,
-    scope,
-    boundary: boundary.value,
-    request,
-    responseBody,
-    now,
+    authorized: input.authorized,
+    identity: input.admitted.user,
+    scope: input.admitted.scope,
+    boundary: input.admitted.boundary,
+    request: input.request,
+    responseBody: input.responseBody,
+    now: input.now,
   });
   if (!recordedMutationReceipt.ok)
     return controlError(recordedMutationReceipt.error.code, 409);
-  return controlJson(responseBody);
+  return controlJson(input.responseBody);
 }
 
 function parseShippingOperationShipmentId(value: string): string | null {

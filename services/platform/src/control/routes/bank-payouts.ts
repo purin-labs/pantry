@@ -1,9 +1,9 @@
 import type { BankPayoutsWindow } from "@seams/control-api";
 
 import type { Env } from "../../env";
+import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
-import { resolveOrderQueueContext } from "./order-queue";
 
 /**
  * The money that Stripe and Square send to the shop's bank. Commerce holds
@@ -65,7 +65,7 @@ export async function handleBankPayoutsControlRoute(
     to - from > MAX_WINDOW_DAYS * DAY_MS
   )
     return controlError("bank_payouts_window_invalid", 422);
-  const context = await resolveOrderQueueContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const read = await context.client.readBankPayouts(context.merchantId, {
     start,

@@ -1,14 +1,13 @@
 import type { Env } from "../../../env";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  prepareControlMutationReceipt,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
 import { readCurrentOrganisationPolicySnapshot } from "../../../policy-snapshot";
-import { installMerchantAgent, merchantAgentDefaultSkills } from "../../../data/merchant-agent-preset";
+import {
+  installMerchantAgent,
+  merchantAgentDefaultSkills,
+} from "../../../data/merchant-agent-preset";
+import {
+  admitControlMutation,
+  recordSessionMutationReceipt,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import type { AgentSkillRef } from "@seams/control-api";
@@ -39,36 +38,15 @@ export async function handleMerchantAgentInstallation(
   if (!authorized.ok) return authorized.response;
   const body = await readJsonRecord(request);
   if (!body.ok) return controlError("urk_install_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitControlMutation({
     request,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
     route: `/v1/control/organisations/${authorized.organisationId}/agents/urk`,
     operation: "agents.urk.install",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const policy = await readCurrentOrganisationPolicySnapshot(
     authorized.executionScope.database,
     authorized.organisationId,
@@ -93,19 +71,11 @@ export async function handleMerchantAgentInstallation(
       ),
     },
   };
-  await prepareControlMutationReceipt(authorized.executionScope.database, {
-    scope,
-    boundary: boundary.value,
-    identity: newControlMutationIdentity({
-      portalSubjectHash: await hashPortalSubject(
-        "control",
-        authorized.authenticated.session.userId,
-      ),
-      causationId: boundary.value.idempotencyKey,
-      now,
-    }),
-    responseStatus: 201,
-    responseBody,
-  }).run();
+  await recordSessionMutationReceipt(
+    authorized,
+    admitted,
+    { status: 201, body: responseBody },
+    now,
+  );
   return controlJson(responseBody, 201);
 }

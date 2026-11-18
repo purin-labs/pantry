@@ -9,12 +9,6 @@ import {
 import { BODY_LIMIT } from "@seams/mail-reply-crdt";
 import { decodeCanonicalBase64, isNonBlankString } from "@seams/std";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
-import { resolveUser } from "../../data/control-plane";
 import { readEmailMailboxAccount } from "../../data/email-mailbox";
 import { listEmailReviewProjections } from "../../data/email-review";
 import {
@@ -29,6 +23,12 @@ import { parseIntegrationAccountId } from "../../ids";
 import { authorizeMailSource } from "../../mail-inbox/authorization";
 import { PROVIDER_ADAPTERS } from "../../provider-adapters/catalogue";
 import { runtimeFetch } from "../../runtime-fetch";
+import {
+  controlMutationScope,
+  parseMutationBoundary,
+  replayControlMutation,
+  resolveMutationUser,
+} from "../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../authorization";
 import {
   controlError,
@@ -87,16 +87,12 @@ export async function handleMailPersonReplyRoute(
   if (!accountId.ok) return controlError("mail_person_reply_invalid", 422);
   const body = await readJsonRecord(request);
   if (!body.ok) return controlError("mail_person_reply_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
+    body.value,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return boundary;
   const { threadId, document: documentRaw } = body.value;
   // A formatted reply sends its document. The server renders both parts from
   // it, so the text part always says what the HTML part says.
@@ -118,29 +114,22 @@ export async function handleMailPersonReplyRoute(
     return controlError("mail_person_reply_attachment_blocked", 422);
   if (attachments.kind === "invalid")
     return controlError("mail_person_reply_invalid", 422);
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/agent-mailboxes/${accountId.value}/person-reply`,
-    operation: "mail_person_reply.send",
-  };
-  const replay = await readControlMutationReplay({
+  const scope = controlMutationScope(
+    authorized,
+    `/v1/control/organisations/${authorized.organisationId}/agent-mailboxes/${accountId.value}/person-reply`,
+    "mail_person_reply.send",
+  );
+  const replayed = await replayControlMutation({
     db: authorized.executionScope.database,
     scope,
-    boundary: boundary.value,
+    boundary,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (replayed !== null) return replayed;
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const authority = await mailControlAuthority(authorized);
   if (
     authority === null ||
@@ -245,7 +234,7 @@ export async function handleMailPersonReplyRoute(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,

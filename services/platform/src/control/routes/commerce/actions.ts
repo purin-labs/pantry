@@ -4,10 +4,7 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import type { Result } from "../../../result";
-import type {
-  CaseBinding,
-  CommerceSource,
-} from "@seams/contracts";
+import type { CaseBinding, CommerceSource } from "@seams/contracts";
 import {
   resolveActiveCaseActor,
   requireActiveOrganisationActor,
@@ -49,14 +46,9 @@ import {
 } from "../../oidc";
 import {
   readActiveOrganisationMembershipRevision,
-  resolveUser,
   type ActiveOrganisationMembership,
 } from "../../../data/control-plane";
 import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  readControlMutationReplay,
   type UnversionedControlMutationBoundary,
   type ControlMutationReceiptScope,
 } from "../../../data/control-mutation";
@@ -98,6 +90,14 @@ import {
 } from "../../../commerce/provider";
 import { createCommerceClient } from "../../../commerce/outbox-worker";
 import {
+  admitUserMutation,
+  controlMutationIdentity,
+  controlMutationScope,
+  parseMutationBoundary,
+  replayControlMutation,
+  resolveMutationUser,
+} from "../../admission/control-mutation";
+import {
   authorizeOrganisationRequest,
   APPROVAL_GRANT_COOKIE,
   parseCookies,
@@ -107,13 +107,8 @@ import { readSupplierPayout } from "../../../data/supplier-payout-store";
 import { readSealedPayoutPlan } from "../../../data/supplier-payout-plan";
 import { readSupplierPayoutAttempt } from "../../../data/supplier-payout-attempt";
 import { readSupplierDestinationRevision } from "../../../data/supplier-payable-store";
-import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "../../http";
+import { controlError, controlJson, readJsonRecord } from "../../http";
 import { googleConfig } from "../../google-oidc-config";
-import { controlCausationId } from "../../mutation";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { readOrganisationEnvironment } from "../../organisation-runtime";
 import { executeApprovedSupplierPayout } from "../supplier-payout-execution";
@@ -305,40 +300,18 @@ export async function handleCommerceActions(
     ),
   );
   if (!parsed.ok) return commerceActionErrorResponse(parsed.error);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/actions`,
     operation: "commerce.action.propose",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const target = commerceActionProjectionTarget(parsed.value);
   if (target === null) {
     if (
@@ -356,7 +329,7 @@ export async function handleCommerceActions(
       organisation,
       identity,
       scope,
-      boundary: boundary.value,
+      boundary,
       action: parsed.value,
       now: Date.now(),
     });
@@ -468,7 +441,7 @@ export async function handleCommerceActions(
       });
     }
   }
-  const digest = await commerceActionMutationDigest(boundary.value);
+  const digest = await commerceActionMutationDigest(boundary);
   const sessionId = parseSessionId(
     authorized.authenticated.session.controlSessionId,
   );
@@ -601,7 +574,10 @@ export async function handleCommerceActions(
   const turnAuthority = await prepareTurnAuthority({
     db: authorized.executionScope.database,
     accountAccess: authorized.executionScope.accountAccess,
-    userAuthority: { kind: "authenticated_session", nativeSessionId: authorized.authenticated.session.controlSessionId },
+    userAuthority: {
+      kind: "authenticated_session",
+      nativeSessionId: authorized.authenticated.session.controlSessionId,
+    },
     action: "execute",
     organisationId: authorized.organisationId,
     requestAuthority,
@@ -615,7 +591,10 @@ export async function handleCommerceActions(
   const actionAuthority = await authorizeCapabilityUse({
     db: authorized.executionScope.database,
     accountAccess: authorized.executionScope.accountAccess,
-    userAuthority: { kind: "authenticated_session", nativeSessionId: authorized.authenticated.session.controlSessionId },
+    userAuthority: {
+      kind: "authenticated_session",
+      nativeSessionId: authorized.authenticated.session.controlSessionId,
+    },
     action: "execute",
     organisationId: authorized.organisationId,
     authority: requestAuthority,
@@ -665,7 +644,10 @@ export async function handleCommerceActions(
   });
   if (!placed.ok) return controlError(placed.error.code, 409);
   const ensured = await caseActor.value.ensure({
-    identity: { organisationId: authorized.organisationId, caseId: caseId.value },
+    identity: {
+      organisationId: authorized.organisationId,
+      caseId: caseId.value,
+    },
     purpose: "merchant commerce action",
     workspaceRevision: `commerce:${integrationAccountId.value}`,
     lifecycle: { kind: "open", openedAt: now },
@@ -677,14 +659,7 @@ export async function handleCommerceActions(
     membership: authorized.membership,
     caseId: caseId.value,
     caseActor: caseActor.value,
-    mutationIdentity: newControlMutationIdentity({
-      portalSubjectHash: await hashPortalSubject(
-        identity.issuer,
-        identity.subject,
-      ),
-      causationId: controlCausationId(request),
-      now,
-    }),
+    mutationIdentity: await controlMutationIdentity(request, identity, now),
   });
   if (!bound.ok) return controlError(bound.error.code, 409);
   const inspected = await caseActor.value.inspect();
@@ -770,7 +745,7 @@ export async function handleCommerceActions(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -893,7 +868,10 @@ async function proposePayoutAction(
   const turn = await prepareTurnAuthority({
     db: authorized.executionScope.database,
     accountAccess: authorized.executionScope.accountAccess,
-    userAuthority: { kind: "authenticated_session", nativeSessionId: authorized.authenticated.session.controlSessionId },
+    userAuthority: {
+      kind: "authenticated_session",
+      nativeSessionId: authorized.authenticated.session.controlSessionId,
+    },
     action: "execute",
     organisationId: authorized.organisationId,
     requestAuthority,
@@ -909,7 +887,10 @@ async function proposePayoutAction(
   const allowed = await authorizeCapabilityUse({
     db: authorized.executionScope.database,
     accountAccess: authorized.executionScope.accountAccess,
-    userAuthority: { kind: "authenticated_session", nativeSessionId: authorized.authenticated.session.controlSessionId },
+    userAuthority: {
+      kind: "authenticated_session",
+      nativeSessionId: authorized.authenticated.session.controlSessionId,
+    },
     action: "execute",
     organisationId: authorized.organisationId,
     authority: requestAuthority,
@@ -935,7 +916,10 @@ async function proposePayoutAction(
   });
   if (!placed.ok) return controlError(placed.error.code, 409);
   const ensured = await actor.ensure({
-    identity: { organisationId: authorized.organisationId, caseId: caseId.value },
+    identity: {
+      organisationId: authorized.organisationId,
+      caseId: caseId.value,
+    },
     purpose: "supplier payout approval",
     workspaceRevision: `payout:${payout.payoutId}:${payout.revision}`,
     lifecycle: { kind: "open", openedAt: now },
@@ -947,14 +931,7 @@ async function proposePayoutAction(
     membership: authorized.membership,
     caseId: caseId.value,
     caseActor: actor,
-    mutationIdentity: newControlMutationIdentity({
-      portalSubjectHash: await hashPortalSubject(
-        identity.issuer,
-        identity.subject,
-      ),
-      causationId: controlCausationId(request),
-      now,
-    }),
+    mutationIdentity: await controlMutationIdentity(request, identity, now),
   });
   if (!bound.ok) return controlError(bound.error.code, 409);
   const inspected = await actor.inspect();
@@ -1050,7 +1027,10 @@ async function attachMerchantActionDestination(input: {
   readonly membership: ActiveOrganisationMembership;
   readonly caseId: CaseId;
   readonly caseActor: DurableObjectStub<CaseDO>;
-  readonly mutationIdentity: Readonly<{ auditEventId: string; receiptId: string }>;
+  readonly mutationIdentity: Readonly<{
+    auditEventId: string;
+    receiptId: string;
+  }>;
 }): Promise<
   Result<
     { readonly kind: "attached" | "already_attached" },
@@ -1176,16 +1156,12 @@ export async function handleCommerceActionApproval(
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0)
     return controlError("commerce_action_approval_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
+    body.value,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return boundary;
   const now = Date.now();
   if (
     now - authorized.authenticated.session.createdAt >
@@ -1218,11 +1194,11 @@ export async function handleCommerceActionApproval(
   ) {
     return controlError("approval_step_up_required", 401);
   }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: authorized.organisationId,
@@ -1274,24 +1250,17 @@ export async function handleCommerceActionApproval(
   ) {
     return controlError("approval_step_up_required", 409);
   }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/commerce/actions/${actionNonceRaw}/approval`,
-    operation: "commerce.action.approval",
-  };
-  const replay = await readControlMutationReplay({
+  const scope = controlMutationScope(
+    authorized,
+    `/v1/control/organisations/${authorized.organisationId}/commerce/actions/${actionNonceRaw}/approval`,
+    "commerce.action.approval",
+  );
+  const replayed = await replayControlMutation({
     db: authorized.executionScope.database,
     scope,
-    boundary: boundary.value,
+    boundary,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
+  if (replayed !== null) return replayed;
   const approval: ApprovalEvidence = {
     kind: "app_user",
     principal: {
@@ -1368,7 +1337,7 @@ export async function handleCommerceActionApproval(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -1403,23 +1372,18 @@ export async function handleCommerceActionRejection(
   ) {
     return controlError("commerce_action_rejection_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
+    body.value,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return boundary;
   const now = Date.now();
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: authorized.organisationId,
@@ -1458,24 +1422,17 @@ export async function handleCommerceActionRejection(
             },
           },
         };
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/commerce/actions/${actionNonceRaw}/rejection`,
-    operation: "commerce.action.rejection",
-  };
-  const replay = await readControlMutationReplay({
+  const scope = controlMutationScope(
+    authorized,
+    `/v1/control/organisations/${authorized.organisationId}/commerce/actions/${actionNonceRaw}/rejection`,
+    "commerce.action.rejection",
+  );
+  const replayed = await replayControlMutation({
     db: authorized.executionScope.database,
     scope,
-    boundary: boundary.value,
+    boundary,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
+  if (replayed !== null) return replayed;
   const rejected = await organisation.rejectAction({
     organisationId: authorized.organisationId,
     nonce: actionNonceRaw,
@@ -1534,7 +1491,7 @@ export async function handleCommerceActionRejection(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -1628,39 +1585,18 @@ export async function handleCommerceActionExecution(
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0)
     return controlError("commerce_action_execution_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/actions/${actionNonceRaw}/execute`,
     operation: "commerce.action.execute",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   const organisation = await requireActiveOrganisationActor({
     env,
@@ -1709,7 +1645,7 @@ export async function handleCommerceActionExecution(
       authorized,
       identity,
       scope,
-      boundary: boundary.value,
+      boundary,
       organisation,
       action: existing.value,
       actionNonce: actionNonceRaw,
@@ -1740,7 +1676,7 @@ export async function handleCommerceActionExecution(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody: executed.value.body,
     now,
@@ -1751,7 +1687,9 @@ export async function handleCommerceActionExecution(
 }
 
 /** The HTTP answer for a commerce action that did not finish. */
-function commerceActionFailureResponse(failure: CommerceActionFailure): Response {
+function commerceActionFailureResponse(
+  failure: CommerceActionFailure,
+): Response {
   switch (failure.kind) {
     case "case_unavailable":
       return controlError("commerce_action_case_unavailable", 503);

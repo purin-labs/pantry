@@ -1,10 +1,10 @@
 import type { FailedPaymentsDay } from "@seams/control-api";
 
 import type { Env } from "../../env";
+import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
 import { isPaymentWindow } from "../../commerce/payments-read";
-import { resolveOrderQueueContext } from "./order-queue";
 
 /**
  * The shop's failed payments of a window, with the retries that followed them.
@@ -54,7 +54,7 @@ export async function handleFailedPaymentsControlRoute(
   const window = readPaymentWindow(new URL(request.url).searchParams);
   if (window === null)
     return controlError("failed_payments_window_invalid", 422);
-  const context = await resolveOrderQueueContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const failed = await context.client.readFailedPayments(context.merchantId, {
     start: new Date(window.from).toISOString(),

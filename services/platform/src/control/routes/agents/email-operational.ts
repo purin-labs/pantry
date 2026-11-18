@@ -5,16 +5,11 @@ import {
   registerOperationalEmailContact,
   readEmailOperationalProposalProjection,
 } from "../../../data/email-operational";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
 } from "../../../ids";
+import { admitUserMutation } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {
   controlError,
@@ -75,42 +70,18 @@ export async function handleEmailOperationalContactSync(
   ) {
     return controlError("email_operational_contact_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/email-operational-contacts`,
     operation: "email_operational.contact_sync",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   const registered = await registerOperationalEmailContact({
     db: authorized.executionScope.database,
@@ -132,7 +103,7 @@ export async function handleEmailOperationalContactSync(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -252,42 +223,18 @@ export async function handleEmailOperational(
   }
   const body = await readJsonRecord(request);
   if (!body.ok) return controlError("email_operational_request_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/email-operational/${projection.proposalId}/${action}`,
     operation: `email_operational.${action}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
 
   let responseBody: Record<string, unknown>;
   if (action === "attest-present" || action === "attest-absent") {
@@ -497,7 +444,7 @@ export async function handleEmailOperational(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,

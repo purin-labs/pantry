@@ -1,26 +1,20 @@
-import {
-  resolveUser,
-  type ControlRole,
-} from "../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type UnversionedControlMutationBoundary,
-  type ControlMutationReceiptScope,
+import type { ControlRole, User } from "../../data/control-plane";
+import type {
+  UnversionedControlMutationBoundary,
+  ControlMutationReceiptScope,
 } from "../../data/control-mutation";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import type { Env } from "../../env";
 import { createCommerceOutboxReconcileQueueMessage } from "../../ingress-queue";
 import { newRequestId, type IntegrationAccountId } from "../../ids";
-import { createCommerceClient } from "../../commerce/outbox-worker";
 import { traceWarn } from "../../observability";
+import { admitUserMutation } from "../admission/control-mutation";
+import { resolveMerchantControlContext } from "../commerce-merchant";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { controlError, controlJson } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { readOrganisationEnvironment } from "../organisation-runtime";
 import type { CommerceAdminClient } from "@seams/commerce-client";
 
 export type InventoryControlAccess = Readonly<{
@@ -33,7 +27,7 @@ export type InventoryControlAccess = Readonly<{
 }>;
 export type InventoryControlMutation = InventoryControlAccess &
   Readonly<{
-    identity: NonNullable<Awaited<ReturnType<typeof resolveUser>>>;
+    identity: User;
     scope: ControlMutationReceiptScope;
     boundary: UnversionedControlMutationBoundary;
   }>;
@@ -58,27 +52,12 @@ export async function resolveInventoryAccess(
     request.method === "POST",
   );
   if (!authorized.ok) return authorized;
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null)
-    return { ok: false, response: controlError("organisation_not_found", 404) };
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok)
-    return {
-      ok: false,
-      response: controlError("underclerk_binding_missing", 503),
-    };
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null)
-    return { ok: false, response: controlError("underclerk_unavailable", 503) };
-  return { ok: true, value: { authorized, binding: binding.value, client } };
+  const merchant = await resolveMerchantControlContext(env, authorized);
+  if (merchant instanceof Response) return { ok: false, response: merchant };
+  return {
+    ok: true,
+    value: { authorized, binding: merchant, client: merchant.client },
+  };
 }
 
 export async function resolveInventoryMutation(
@@ -88,63 +67,30 @@ export async function resolveInventoryMutation(
   body: Readonly<Record<string, unknown>>,
   operation: string,
 ): Promise<MutationResult> {
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized: access.authorized,
     body,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return {
-      ok: false,
-      response: controlError(
-        boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-        422,
-      ),
-    };
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: access.authorized.authenticated.session.userId,
-  });
-  if (identity === null)
-    return {
-      ok: false,
-      response: controlError("app_user_missing", 401),
-    };
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: access.authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: new URL(request.url).pathname,
     operation,
-  };
-  const replay = await readControlMutationReplay({
-    db: access.authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: async (receipt) => {
+      await refreshInventoryProjection(env, access);
+      return controlJson(receipt.responseBody, receipt.responseStatus);
+    },
   });
-  if (replay.kind === "conflict")
-    return {
-      ok: false,
-      response: controlError("idempotency_key_conflict", 409),
-    };
-  if (replay.kind === "replay") {
-    await refreshInventoryProjection(env, access);
-    return {
-      ok: false,
-      response: controlJson(
-        replay.receipt.responseBody,
-        replay.receipt.responseStatus,
-      ),
-    };
-  }
+  if (admitted instanceof Response) return { ok: false, response: admitted };
   return {
     ok: true,
     value: {
       authorized: access.authorized,
       binding: access.binding,
       client: access.client,
-      identity,
-      scope,
-      boundary: boundary.value,
+      identity: admitted.user,
+      scope: admitted.scope,
+      boundary: admitted.boundary,
     },
   };
 }

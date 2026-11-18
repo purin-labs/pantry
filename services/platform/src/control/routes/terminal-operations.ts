@@ -7,13 +7,10 @@ import {
 } from "@seams/contracts";
 
 import type { Env } from "../../env";
+import { admitUserMutation } from "../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+import type { ControlMutationReceiptScope } from "../../data/control-mutation";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
 import { resolveUser } from "../../data/control-plane";
 import {
@@ -422,41 +419,18 @@ async function handleTerminalSandboxConfiguration(
   const selection = parseTerminalConfigurationRequest(body.value);
   if (selection === null)
     return controlError("terminal_configuration_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/terminal-operations`,
     operation: "terminal.assignment.configure_sandbox",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const configuration = await readTerminalConfiguration(
     env,
     authorized.executionScope,
@@ -530,7 +504,7 @@ async function handleTerminalSandboxConfiguration(
       authorized,
       identity,
       scope,
-      boundary: boundary.value,
+      boundary,
       request,
       responseBody,
       now,
@@ -566,7 +540,7 @@ async function handleTerminalSandboxConfiguration(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -961,41 +935,22 @@ async function beginCounterMutation(
   operation: string,
   routeSuffix: string,
 ): Promise<CounterMutation | Response> {
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/terminal-operations${routeSuffix}`,
     operation,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  return { identity, scope, boundary: boundary.value };
+  if (admitted instanceof Response) return admitted;
+  return {
+    identity: admitted.user,
+    scope: admitted.scope,
+    boundary: admitted.boundary,
+  };
 }
 
 async function finishCounterMutation(
@@ -1228,41 +1183,18 @@ async function handleTerminalRetirement(
   if (!authorized.ok) return authorized.response;
   const body = await readJsonRecord(request);
   if (!body.ok) return controlError("terminal_retirement_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/terminal-operations/${route.satyrLocationIdRaw}/retirement`,
     operation: "terminal.assignment.retire",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
 
   const assignment = await readActiveTerminalAssignment(
     authorized.executionScope.database,
@@ -1297,7 +1229,7 @@ async function handleTerminalRetirement(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,

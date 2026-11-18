@@ -1,11 +1,11 @@
 import type { CommerceClientError } from "@seams/commerce-client";
 
 import type { Env } from "../../env";
+import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { resolveOpenProviderSupportReferences } from "../../data/onboarding-support";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { PRIMARY_ONLINE_PAYMENT_BINDING_ID } from "../../commerce/stripe-link";
-import { resolveMerchantControlContext } from "./commerce-api-keys";
 
 /**
  * The payment accounts of an organisation's merchant (Plan 80 step 5): an

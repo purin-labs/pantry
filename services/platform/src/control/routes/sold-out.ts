@@ -3,17 +3,12 @@ import {
   readCafeSoldOutMenu,
   setSoldOutMark,
 } from "../../commerce/order-queue-commands";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
-import { resolveUser } from "../../data/control-plane";
 import type { Env } from "../../env";
+import { admitUserMutation } from "../admission/control-mutation";
+import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { resolveOrderQueueContext } from "./order-queue";
 
 /**
  * "Sold out today" (Plan 40B phase 3). Staff mark a menu item that has no stock
@@ -74,7 +69,7 @@ async function readSoldOutItems(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const context = await resolveOrderQueueContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const menu = await readCafeSoldOutMenu(context);
   if (menu === null) return controlError("underclerk_unavailable", 503);
@@ -100,40 +95,19 @@ async function markItem(
   const { soldOut, timeZone } = body.value;
   if (typeof soldOut !== "boolean" || (soldOut && typeof timeZone !== "string"))
     return controlError("sold_out_request_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/sold-out/${route.variantIdRaw}`,
     operation: soldOut ? "sold_out.mark" : "sold_out.clear",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const context = await resolveOrderQueueContext(env, authorized);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const marked = await setSoldOutMark(
     context,
@@ -141,7 +115,7 @@ async function markItem(
     soldOut && typeof timeZone === "string"
       ? { kind: "today", timeZone }
       : { kind: "cleared" },
-    boundary.value.idempotencyKey,
+    boundary.idempotencyKey,
   );
   if (!marked.ok) {
     switch (marked.code) {
@@ -158,7 +132,7 @@ async function markItem(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now: Date.now(),

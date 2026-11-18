@@ -9,12 +9,6 @@ import {
 } from "@seams/commerce-client";
 
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
-import { resolveUser } from "../../data/control-plane";
 import { readEmailMailboxAccount } from "../../data/email-mailbox";
 import { resolveActiveProviderAccountContext } from "../../data/integration-account";
 import type { Env } from "../../env";
@@ -27,6 +21,7 @@ import {
   readSenderSupplierLink,
   senderLinkAddress,
 } from "../../mail-inbox/sender-supplier-link";
+import { admitUserMutation } from "../admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -152,41 +147,18 @@ async function linkSender(
   const address = parsed === null ? null : senderLinkAddress(parsed.address);
   if (!body.ok || parsed === null || address === null)
     return controlError("mailbox_sender_link_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/agent-mailboxes/${accountId.value}/sender-links`,
     operation: "agent_mailbox.sender_link",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const mailbox = await activeGmailMailbox(authorized, accountId.value);
   if (mailbox === null) return controlError("agent_mailbox_missing", 404);
   // The mailbox does not answer itself.
@@ -208,7 +180,7 @@ async function linkSender(
     expectedRevision: parsed.expectedRevision,
     // One request is one command, also when it is sent again.
     commandId: `mailbox_sender_link:${await sha256Hex(
-      `${identity.userId}\u0000${boundary.value.idempotencyKey}`,
+      `${identity.userId}\u0000${boundary.idempotencyKey}`,
     )}`,
     now,
   });
@@ -242,7 +214,7 @@ async function linkSender(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,

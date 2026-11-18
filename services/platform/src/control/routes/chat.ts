@@ -19,6 +19,7 @@ import { authorizeChatForkRead } from "../../chat/forks";
 import { bindAdmittedProjectContext } from "../../chat/project-context-binding";
 import { reconcileStoredContextObservations } from "../../chat/turn/context";
 import { timeThreadRead } from "../../chat/thread-read-timing";
+import type { OrganisationDatabase } from "../../database-handles";
 import type { Env } from "../../env";
 import { setAdmittedConversationGoal } from "./chat-goal";
 import { buildControlAuthority } from "../../request-authority";
@@ -618,29 +619,18 @@ async function handlePortalChatRequest(
   );
   if (admittedCommand.kind === "steer") {
     // The message joins the running turn when the turn can take it (Plan 71).
-    const steered = await steerRunningConversation({
-      env,
-      placement,
-      scope,
-      stored,
-      command: admittedCommand,
-      model: selectedModel.value,
-    });
-    if (steered !== null) {
-      await clearSubmittedConversationDraft(
-        authorized.executionScope.database,
+    const steered = await steerIntoRunningTurn(
+      {
+        env,
+        placement,
         scope,
         stored,
-        admittedCommand.text,
-      );
-      return controlJson({
-        conversation: publicConversation(
-          steered.conversation,
-          stored?.metadata ?? { lifecycle: "active", pinnedAt: null },
-          steered.revision,
-        ),
-      });
-    }
+        command: admittedCommand,
+        model: selectedModel.value,
+      },
+      authorized.executionScope.database,
+    );
+    if (steered !== null) return steered;
     const admittedSteering = admitSteering(
       stored,
       admittedCommand,
@@ -716,29 +706,18 @@ async function handlePortalChatRequest(
   if (admittedCommand.kind === "next") {
     // A message sent while a turn runs joins that turn when the turn can
     // take it (Plan 71). Otherwise it waits as the next turn, as before.
-    const steered = await steerRunningConversation({
-      env,
-      placement,
-      scope,
-      stored,
-      command: admittedCommand,
-      model: selectedModel.value,
-    });
-    if (steered !== null) {
-      await clearSubmittedConversationDraft(
-        authorized.executionScope.database,
+    const steered = await steerIntoRunningTurn(
+      {
+        env,
+        placement,
         scope,
         stored,
-        admittedCommand.text,
-      );
-      return controlJson({
-        conversation: publicConversation(
-          steered.conversation,
-          stored?.metadata ?? { lifecycle: "active", pinnedAt: null },
-          steered.revision,
-        ),
-      });
-    }
+        command: admittedCommand,
+        model: selectedModel.value,
+      },
+      authorized.executionScope.database,
+    );
+    if (steered !== null) return steered;
   }
   const unboundAdmission = await admitTurn(
     stored,
@@ -861,6 +840,31 @@ async function handlePortalChatRequest(
       admitted.conversation,
       stored?.metadata ?? { lifecycle: "active", pinnedAt: null },
       (stored?.revision ?? 0) + 1,
+    ),
+  });
+}
+
+/**
+ * Joins the message to the running turn when the turn can take it, and
+ * answers the conversation; null when the turn cannot take it.
+ */
+async function steerIntoRunningTurn(
+  input: Parameters<typeof steerRunningConversation>[0],
+  database: OrganisationDatabase,
+): Promise<Response | null> {
+  const steered = await steerRunningConversation(input);
+  if (steered === null) return null;
+  await clearSubmittedConversationDraft(
+    database,
+    input.scope,
+    input.stored,
+    input.command.text,
+  );
+  return controlJson({
+    conversation: publicConversation(
+      steered.conversation,
+      input.stored?.metadata ?? { lifecycle: "active", pinnedAt: null },
+      steered.revision,
     ),
   });
 }

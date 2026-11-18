@@ -1,5 +1,4 @@
 import { lifecycleFenceOf } from "../../data/organisation-lifecycle-moves";
-import type { OrganisationDatabase } from "../../database-handles";
 import { signalChat } from "../../chat/signals";
 import { runtimeFetch } from "../../runtime-fetch";
 import {
@@ -32,17 +31,11 @@ import {
   parseAssignableControlRole,
   parseControlRole,
   parseOrganisationInvitationEmail,
-  resolveUser,
   applyAccountServiceGrantRevocation,
-  type ActiveOrganisationMembership,
 } from "../../data/control-plane";
 import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
   prepareOnboardingEvent,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
+  type StoredControlMutationReceipt,
 } from "../../data/control-mutation";
 import {
   archiveOrganisation,
@@ -59,9 +52,18 @@ import { resolveOrganisationModelRoute } from "../../models/route";
 import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
 import { reconcileProviderManifestObservations } from "../../provider-lifecycle/observation";
 import {
+  admitUserMutation,
+  controlMutationIdentity,
+  mutationProjection,
+  projectionReplay,
+  projectionResponse,
+  resolveMutationUser,
+} from "../admission/control-mutation";
+import {
   authenticateControlMutation,
   authenticateControlRead,
   authorizeOrganisationRequest,
+  type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { readOrganisationHomeRegions } from "../home-region";
 import {
@@ -70,8 +72,6 @@ import {
   controlHeaders,
   controlJson,
 } from "../http";
-import { controlCausationId } from "../mutation";
-import { mutationProjectionResponse } from "../mutation-projection";
 import {
   activationErrorStatus,
   activationModelRouteError,
@@ -366,43 +366,19 @@ async function handleOrganisationRename(
   ) {
     return controlError("organisation_rename_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}`,
     operation: "organisation.rename",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   const renamed = await renameOrganisation({
     directory: env.DB,
@@ -410,36 +386,23 @@ async function handleOrganisationRename(
     actorUserId: identity.userId,
     name,
     mutation: {
-      boundary: boundary.value,
+      boundary,
       scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      identity: await controlMutationIdentity(request, identity, now),
     },
     now,
   });
   if (!renamed.ok) return controlError(renamed.error.code, 409);
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null)
-    throw new Error("renamed organisation projection is missing");
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: renamed.value.receiptId,
-      organisation_id: renamed.value.organisationId,
+  return projectionResponse(
+    authorized,
+    "renamed organisation projection is missing",
+    {
+      receipt: {
+        receipt_id: renamed.value.receiptId,
+        organisation_id: renamed.value.organisationId,
+      },
     },
-  });
+  );
 }
 
 async function handleOrganisationDelete(
@@ -458,56 +421,28 @@ async function handleOrganisationDelete(
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0)
     return controlError("organisation_delete_request_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}`,
     operation: "organisation.delete",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: receiptReplay,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      { kind: "success", receipt: replay.receipt.responseBody },
-      replay.receipt.responseStatus,
-    );
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   const deleted = await deleteArchivedOrganisation({
     directory: env.DB,
     execution: authorized.executionScope,
     actorUserId: identity.userId,
     mutation: {
-      boundary: boundary.value,
+      boundary,
       scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      identity: await controlMutationIdentity(request, identity, now),
     },
     now,
   });
@@ -519,6 +454,14 @@ async function handleOrganisationDelete(
       organisation_id: deleted.value.organisationId,
     },
   });
+}
+
+/** The replay of a mutation whose answer is its receipt alone. */
+function receiptReplay(receipt: StoredControlMutationReceipt): Response {
+  return controlJson(
+    { kind: "success", receipt: receipt.responseBody },
+    receipt.responseStatus,
+  );
 }
 
 async function handleMembers(
@@ -582,63 +525,27 @@ async function handleMember(
   ) {
     return controlError("organisation_membership_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const operation =
-    request.method === "PATCH"
-      ? "organisation.service-role.change"
-      : "organisation.membership.revoke";
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/members/${targetUserId.value}`,
-    operation,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    operation:
+      request.method === "PATCH"
+        ? "organisation.service-role.change"
+        : "organisation.membership.revoke",
+    replay: receiptReplay,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      {
-        kind: "success",
-        receipt: replay.receipt.responseBody,
-      },
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, user: identity } = admitted;
   const now = Date.now();
   const mutation = {
-    boundary: boundary.value,
-    scope,
-    identity: newControlMutationIdentity({
-      portalSubjectHash: await hashPortalSubject(
-        identity.issuer,
-        identity.subject,
-      ),
-      causationId: controlCausationId(request),
-      now,
-    }),
+    boundary,
+    scope: admitted.scope,
+    identity: await controlMutationIdentity(request, identity, now),
   };
   if (request.method === "PATCH") {
     if (nextRole === null || !nextRole.ok) {
@@ -682,7 +589,7 @@ async function handleMember(
     context.value,
     authorized.executionScope,
     targetUserId.value,
-    boundary.value.expectedConfigurationVersion,
+    boundary.expectedConfigurationVersion,
   );
   if (!receipt.ok) return accountMembershipError(receipt.error.code);
   const revoked = await applyAccountServiceGrantRevocation({
@@ -907,11 +814,11 @@ async function handleAcceptInvitation(
     organisation.value,
   );
   if (!execution.ok) return controlError(execution.error.code, 409);
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authenticated.value.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authenticated.value.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const applied = await applyAccountServiceGrantAcceptance({
     execution: execution.value,
     receipt: receipt.value,
@@ -988,46 +895,19 @@ async function handleSetup(
   if (!selection.ok) {
     return controlError(selection.error.code, 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/setup`,
     operation: "setup.save",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   const execution = await OrganisationExecutionScope.resolve(
     env,
@@ -1039,34 +919,16 @@ async function handleSetup(
     selectedByUserId: identity.userId,
     selection: selection.value,
     mutation: {
-      boundary: boundary.value,
+      boundary,
       scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      identity: await controlMutationIdentity(request, identity, now),
     },
     now,
   });
   if (!saved.ok) {
     return controlError(saved.error.code, 409);
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("saved setup projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
+  return projectionResponse(authorized, "saved setup projection is missing", {
     receipt: {
       receipt_id: saved.value.receiptId,
       organisation_id: authorized.organisationId,
@@ -1143,11 +1005,11 @@ async function handleStageViewed(
   ) {
     return controlError("onboarding_stage_invalid", 422);
   }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const row = await readOnboardingRow(
     authorized.executionScope.database,
     authorized.organisationId,
@@ -1160,14 +1022,7 @@ async function handleStageViewed(
     return controlError("organisation_not_found", 404);
   }
   const now = Date.now();
-  const eventIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
-    now,
-  });
+  const eventIdentity = await controlMutationIdentity(request, identity, now);
   const session =
     authorized.executionScope.database.withSession("first-primary");
   await session.batch([
@@ -1210,46 +1065,18 @@ async function handleActivate(
   ) {
     return controlError("activation_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/activate`,
     operation: "organisation.activation.start",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: (receipt) => activationMutationReplayResponse(authorized, receipt),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return activationMutationReplayResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const now = Date.now();
   const modelRoute = await resolveOrganisationModelRoute({
     env,
@@ -1279,14 +1106,11 @@ async function handleActivate(
       now,
     ),
   });
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    admitted.user,
     now,
-  });
+  );
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: authorized.organisationId,
@@ -1297,23 +1121,18 @@ async function handleActivate(
     readinessVersion: body.value.readinessVersion,
     readinessHash: body.value.readinessHash,
     mutation: {
-      boundary: boundary.value,
-      scope,
+      boundary: admitted.boundary,
+      scope: admitted.scope,
       identity: mutationIdentity,
     },
     now,
   });
   if (!activated.ok) {
     if ("supportReference" in activated.error) {
-      const projection = await buildOnboardingProjection({
-        db: authorized.executionScope.database,
-        organisationId: authorized.organisationId,
-        membership: authorized.membership,
-        now: Date.now(),
-      });
-      if (projection === null) {
-        throw new Error("failed activation projection is missing");
-      }
+      const projection = await mutationProjection(
+        authorized,
+        "failed activation projection is missing",
+      );
       return controlJson(
         {
           kind: activated.error.retryable
@@ -1342,39 +1161,30 @@ async function handleActivate(
       activationErrorStatus(activated.error.code),
     );
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("activated organisation projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: mutationIdentity.receiptId,
-      organisation_id: authorized.organisationId,
-      activation_receipt_id: activated.value.activationReceiptId,
-      first_task: activated.value.firstTask,
+  return projectionResponse(
+    authorized,
+    "activated organisation projection is missing",
+    {
+      receipt: {
+        receipt_id: mutationIdentity.receiptId,
+        organisation_id: authorized.organisationId,
+        activation_receipt_id: activated.value.activationReceiptId,
+        first_task: activated.value.firstTask,
+      },
     },
-  });
+  );
 }
 
 async function activationMutationReplayResponse(
-  db: OrganisationDatabase,
-  organisationId: OrganisationId,
-  membership: ActiveOrganisationMembership,
-  receipt: { readonly responseStatus: number; readonly responseBody: unknown },
+  authorized: AuthorizedOrganisationRequest,
+  receipt: StoredControlMutationReceipt,
 ): Promise<Response> {
   if (receipt.responseStatus < 400) {
-    return mutationProjectionResponse(db, organisationId, membership, receipt);
+    return projectionReplay(authorized)(receipt);
   }
   if (
     !isRecord(receipt.responseBody) ||
-    receipt.responseBody.organisation_id !== organisationId ||
+    receipt.responseBody.organisation_id !== authorized.organisationId ||
     (receipt.responseBody.kind !== "retryable_failure" &&
       receipt.responseBody.kind !== "terminal_failure") ||
     typeof receipt.responseBody.reason_code !== "string" ||
@@ -1383,15 +1193,10 @@ async function activationMutationReplayResponse(
   ) {
     throw new Error("activation failure mutation receipt is invalid");
   }
-  const projection = await buildOnboardingProjection({
-    db,
-    organisationId,
-    membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("activation failure replay projection is missing");
-  }
+  const projection = await mutationProjection(
+    authorized,
+    "activation failure replay projection is missing",
+  );
   return controlJson(
     {
       kind: receipt.responseBody.kind,
@@ -1441,62 +1246,28 @@ async function handleArchive(
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("archive_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/archive`,
     operation: "organisation.archive",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   const archived = await archiveOrganisation({
     identityDatabase: env.DB,
     execution: authorized.executionScope,
     actorUserId: identity.userId,
     mutation: {
-      boundary: boundary.value,
+      boundary,
       scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      identity: await controlMutationIdentity(request, identity, now),
     },
     authority: { kind: "organisation_owner" },
     reasonCode: "merchant_archived",
@@ -1509,23 +1280,16 @@ async function handleArchive(
     kv: env.POLICY_KV,
     organisationId: authorized.organisationId,
   });
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("archived organisation projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: archived.value.receiptId,
-      organisation_id: archived.value.organisationId,
+  return projectionResponse(
+    authorized,
+    "archived organisation projection is missing",
+    {
+      receipt: {
+        receipt_id: archived.value.receiptId,
+        organisation_id: archived.value.organisationId,
+      },
     },
-  });
+  );
 }
 
 async function handleRestore(
@@ -1550,83 +1314,42 @@ async function handleRestore(
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("restore_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/restore`,
     operation: "organisation.restore",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: projectionReplay(authorized),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return mutationProjectionResponse(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      authorized.membership,
-      replay.receipt,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   const restored = await restoreOrganisation({
     directory: env.DB,
     execution: authorized.executionScope,
     actorUserId: identity.userId,
     mutation: {
-      boundary: boundary.value,
+      boundary,
       scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      identity: await controlMutationIdentity(request, identity, now),
     },
     now,
   });
   if (!restored.ok) {
     return controlError(restored.error.code, 409);
   }
-  const projection = await buildOnboardingProjection({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    membership: authorized.membership,
-    now: Date.now(),
-  });
-  if (projection === null) {
-    throw new Error("restored organisation projection is missing");
-  }
-  return controlJson({
-    kind: "success",
-    projection,
-    receipt: {
-      receipt_id: restored.value.receiptId,
-      organisation_id: restored.value.organisationId,
+  return projectionResponse(
+    authorized,
+    "restored organisation projection is missing",
+    {
+      receipt: {
+        receipt_id: restored.value.receiptId,
+        organisation_id: restored.value.organisationId,
+      },
     },
-  });
+  );
 }

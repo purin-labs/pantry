@@ -17,16 +17,11 @@ import { disableIntegrationAccount } from "../../data/integration-account";
 import { readGmailPilotBudget } from "../../data/email-mailbox";
 import {
   hashOpaqueSecret,
-  resolveUser,
   type ActiveControlSession,
 } from "../../data/control-plane";
 import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
-  readControlMutationReplay,
   type ControlMutationReceiptScope,
 } from "../../data/control-mutation";
 import {
@@ -54,6 +49,12 @@ import {
 } from "../../ids";
 import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
 import {
+  controlMutationIdentity,
+  parseMutationBoundary,
+  replayControlMutation,
+  resolveMutationUser,
+} from "../admission/control-mutation";
+import {
   authenticateControlMutation,
   authenticateControlRead,
   authorizeOrganisationRequest,
@@ -64,7 +65,6 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../http";
-import { controlCausationId } from "../mutation";
 import {
   activationErrorStatus,
   runtimeAdmissionStatus,
@@ -144,9 +144,8 @@ export function matchOperatorControlRoute(
       rotationIdRaw: decodeURIComponent(rotation[1]),
     };
   }
-  const support = /^\/v1\/control\/organisations\/([^/]+)\/support\/([^/]+)$/u.exec(
-    pathname,
-  );
+  const support =
+    /^\/v1\/control\/organisations\/([^/]+)\/support\/([^/]+)$/u.exec(pathname);
   if (support?.[1] !== undefined && support[2] !== undefined) {
     return {
       kind: "merchantSupport",
@@ -214,9 +213,17 @@ export function handleOperatorControlRoute(
     case "operatorAction":
       return handleOperatorAction(request, env, route.organisationIdRaw);
     case "operatorHarnessHistory":
-      return handleOperatorHarnessHistory(request, env, route.organisationIdRaw);
+      return handleOperatorHarnessHistory(
+        request,
+        env,
+        route.organisationIdRaw,
+      );
     case "operatorHarnessErasure":
-      return handleOperatorHarnessErasure(request, env, route.organisationIdRaw);
+      return handleOperatorHarnessErasure(
+        request,
+        env,
+        route.organisationIdRaw,
+      );
     default:
       return assertNever(route);
   }
@@ -558,31 +565,30 @@ async function handleOperatorReconcile(
   if (!organisationId.ok) {
     return controlError("organisation_not_found", 404);
   }
-  const execution = await OrganisationExecutionScope.resolve(env, organisationId.value);
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId.value,
+  );
   if (!execution.ok) return controlError(execution.error.code, 409);
   const placement = execution.value;
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("reconciliation_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const before = await readOnboardingRow(placement.database, organisationId.value);
+    body.value,
+    "configuration_versioned",
+  );
+  if (boundary instanceof Response) return boundary;
+  const before = await readOnboardingRow(
+    placement.database,
+    organisationId.value,
+  );
   if (before === null) {
     return controlError("organisation_not_found", 404);
   }
-  if (
-    before.configurationVersion !== boundary.value.expectedConfigurationVersion
-  ) {
+  if (before.configurationVersion !== boundary.expectedConfigurationVersion) {
     return controlError("configuration_version_conflict", 409);
   }
   if (
@@ -592,44 +598,28 @@ async function handleOperatorReconcile(
   ) {
     throw new Error("operator reconciliation organisation state is invalid");
   }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: role.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
+  const identity = await resolveMutationUser(env, role.userId);
+  if (identity instanceof Response) return identity;
   const scope: ControlMutationReceiptScope = {
     userId: role.userId,
     organisationScope: organisationId.value,
     route: `/v1/control/operator/organisations/${organisationId.value}/reconcile`,
     operation: "onboarding.reconcile",
   };
-  const replay = await readControlMutationReplay({
+  const replayed = await replayControlMutation({
     db: placement.database,
     scope,
-    boundary: boundary.value,
+    boundary,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (replayed !== null) return replayed;
   const now = Date.now();
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    identity,
     now,
-  });
+  );
   const reconciled = await reconcileOrganisationOnboarding({
-        env,
+    env,
     db: placement.database,
     archive: env.ARCHIVE,
     sessionNamespace: env.SESSION,
@@ -641,7 +631,10 @@ async function handleOperatorReconcile(
   if (!reconciled.ok) {
     return controlError(reconciled.error.code, 404);
   }
-  const after = await readOnboardingRow(placement.database, organisationId.value);
+  const after = await readOnboardingRow(
+    placement.database,
+    organisationId.value,
+  );
   if (
     after === null ||
     typeof after.configurationVersion !== "number" ||
@@ -661,7 +654,7 @@ async function handleOperatorReconcile(
   await session.batch([
     prepareControlMutationReceipt(session, {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: mutationIdentity,
       responseStatus: 200,
       responseBody,
@@ -706,7 +699,10 @@ async function handleOperatorAction(
   if (!organisationId.ok) {
     return controlError("organisation_not_found", 404);
   }
-  const execution = await OrganisationExecutionScope.resolve(env, organisationId.value);
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId.value,
+  );
   if (!execution.ok) return controlError(execution.error.code, 409);
   const placement = execution.value;
   const body = await readJsonRecord(request);
@@ -714,60 +710,40 @@ async function handleOperatorAction(
   if (!body.ok || action === null) {
     return controlError("operator_action_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: supportRole.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
+    body.value,
+    "configuration_versioned",
+  );
+  if (boundary instanceof Response) return boundary;
+  const identity = await resolveMutationUser(env, supportRole.userId);
+  if (identity instanceof Response) return identity;
   const scope: ControlMutationReceiptScope = {
     userId: supportRole.userId,
     organisationScope: organisationId.value,
     route: `/v1/control/operator/organisations/${organisationId.value}/actions`,
     operation: operatorActionOperation(action),
   };
-  const replay = await readControlMutationReplay({
+  const replayed = await replayControlMutation({
     db: placement.database,
     scope,
-    boundary: boundary.value,
+    boundary,
+    replay: (receipt) =>
+      controlJson(
+        {
+          kind: "success",
+          action: action.kind,
+          receipt: receipt.responseBody,
+        },
+        receipt.responseStatus,
+      ),
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      {
-        kind: "success",
-        action: action.kind,
-        receipt: replay.receipt.responseBody,
-      },
-      replay.receipt.responseStatus,
-    );
-  }
+  if (replayed !== null) return replayed;
   const now = Date.now();
   const mutation = {
-    boundary: boundary.value,
+    boundary,
     scope,
-    identity: newControlMutationIdentity({
-      portalSubjectHash: await hashPortalSubject(
-        identity.issuer,
-        identity.subject,
-      ),
-      causationId: controlCausationId(request),
-      now,
-    }),
+    identity: await controlMutationIdentity(request, identity, now),
   };
   switch (action.kind) {
     case "invalidate_attempt":
@@ -825,7 +801,10 @@ async function handleOperatorHarnessHistory(
   if (!organisationId.ok) {
     return controlError("organisation_not_found", 404);
   }
-  const execution = await OrganisationExecutionScope.resolve(env, organisationId.value);
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId.value,
+  );
   if (!execution.ok) return controlError(execution.error.code, 409);
   const placement = execution.value;
   const inventory = await inspectOrganisationHarnessHistory({
@@ -862,7 +841,10 @@ async function handleOperatorHarnessErasure(
   if (!organisationId.ok) {
     return controlError("organisation_not_found", 404);
   }
-  const execution = await OrganisationExecutionScope.resolve(env, organisationId.value);
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId.value,
+  );
   if (!execution.ok) return controlError(execution.error.code, 409);
   const placement = execution.value;
   const receipts = await readOrganisationHarnessErasureReceipts(

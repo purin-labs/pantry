@@ -27,17 +27,17 @@ import {
   parseScenarioCopy,
   type ScenarioCopy,
 } from "@seams/bakery-model/bakery-scenario";
-import { resolveUser } from "../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-} from "../../data/control-mutation";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import type { Env } from "../../env";
+import {
+  controlMutationScope,
+  parseMutationBoundary,
+  replayControlMutation,
+  resolveMutationUser,
+} from "../admission/control-mutation";
+import { resolveMerchantBinding } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { readOrganisationEnvironment } from "../organisation-runtime";
 import { assertNever } from "@seams/std";
 
 export type BakeryAction =
@@ -71,22 +71,17 @@ export async function handleBakeryControl(
   if (mutation === null) return controlError("bakery_request_invalid", 422);
   const agentSave = parseAgentScenarioOrigin(agentEffectId, mutation);
   if (agentSave === null) return controlError("bakery_request_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  const scope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/commerce/bakery/${action}`,
-    operation: `commerce.bakery.${action}`,
-  };
+    body.value,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return boundary;
+  const scope = controlMutationScope(
+    authorized,
+    `/v1/control/organisations/${authorized.organisationId}/commerce/bakery/${action}`,
+    `commerce.bakery.${action}`,
+  );
   const saveIdentity =
     agentSave.kind === "agent_effect"
       ? {
@@ -102,40 +97,36 @@ export async function handleBakeryControl(
     !(await approveAgentScenarioSave(saveIdentity, agentSave.payload))
   )
     return controlError("bakery_agent_save_approval_invalid", 409);
-  const replay = await readControlMutationReplay({
+  const replayed = await replayControlMutation({
     db: authorized.executionScope.database,
     scope,
-    boundary: boundary.value,
-  });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    if (
-      saveIdentity !== null &&
-      agentSave.kind === "agent_effect" &&
-      replay.receipt.responseStatus === 200 &&
-      isSavedScenarioResult(replay.receipt.responseBody, agentSave)
-    ) {
-      try {
-        await settleAgentScenarioSave(
-          saveIdentity,
-          agentSave.payload,
-          replay.receipt.responseBody,
-        );
-      } catch {
-        return controlError("bakery_request_unavailable", 503);
+    boundary,
+    replay: async (receipt) => {
+      if (
+        saveIdentity !== null &&
+        agentSave.kind === "agent_effect" &&
+        receipt.responseStatus === 200 &&
+        isSavedScenarioResult(receipt.responseBody, agentSave)
+      ) {
+        try {
+          await settleAgentScenarioSave(
+            saveIdentity,
+            agentSave.payload,
+            receipt.responseBody,
+          );
+        } catch {
+          return controlError("bakery_request_unavailable", 503);
+        }
       }
-    }
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
+      return controlJson(receipt.responseBody, receipt.responseStatus);
+    },
   });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (replayed !== null) return replayed;
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   if (saveIdentity !== null) {
     const completed = await readCompletedAgentScenarioSave(saveIdentity);
     if (completed !== null) {
@@ -143,7 +134,7 @@ export async function handleBakeryControl(
         authorized,
         identity,
         scope,
-        boundary: boundary.value,
+        boundary,
         request,
         responseBody: completed,
         now: Date.now(),
@@ -153,14 +144,8 @@ export async function handleBakeryControl(
       return controlJson(completed);
     }
   }
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
+  const binding = await resolveMerchantBinding(authorized);
+  if (binding instanceof Response) return binding;
   if (
     env.UNDERCLERK_BASE_URL === undefined ||
     env.UNDERCLERK_SERVICE_TOKEN === undefined
@@ -180,7 +165,7 @@ export async function handleBakeryControl(
     const input = {
       client,
       organisationId: authorized.organisationId,
-      merchantId: binding.value.merchantId,
+      merchantId: binding.merchantId,
       principalId: identity.userId,
       expiresAt: new Date(now + 5 * 60_000).toISOString(),
     };
@@ -192,14 +177,14 @@ export async function handleBakeryControl(
       case "operation":
         result = await saveOperationDuration({
           ...input,
-          commandId: boundary.value.idempotencyKey,
+          commandId: boundary.idempotencyKey,
           edit: mutation.edit,
         });
         break;
       case "assignment":
         result = await saveOvenAssignment({
           ...input,
-          commandId: boundary.value.idempotencyKey,
+          commandId: boundary.idempotencyKey,
           edit: mutation.edit,
         });
         break;
@@ -225,7 +210,7 @@ export async function handleBakeryControl(
       authorized,
       identity,
       scope,
-      boundary: boundary.value,
+      boundary,
       request,
       responseBody,
       now,

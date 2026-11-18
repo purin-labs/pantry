@@ -12,14 +12,6 @@ import {
   readEmailMailboxAccount,
   readMailboxIngressPolicy,
 } from "../../../data/email-mailbox";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
 import { setIntegrationAccountLifecycle } from "../../../data/integration-account";
 import { revokeCredential } from "../../../credential-vault";
 import { resolveCredentialRevocationSecret } from "../../../credential-vault/credential-revocation-resolution";
@@ -27,6 +19,10 @@ import { revokeGoogleOAuthToken } from "../../../provider-adapters/gmail";
 import { newRequestId, parseIntegrationAccountId } from "../../../ids";
 import { traceWarn } from "../../../observability";
 import { activateRevocationPolicy } from "../../credential-revocation-policy";
+import {
+  admitUserMutation,
+  controlMutationIdentity,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {
   controlError,
@@ -35,7 +31,6 @@ import {
   readJsonRecord,
 } from "../../http";
 import { readInstallationPins } from "../../installation-pins";
-import { controlCausationId } from "../../mutation";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { assertNever, hasExactKeys, isRecord } from "@seams/std";
 import { readIntegrationAccountReasonCode } from "../../../data/integration-account-reads";
@@ -93,45 +88,18 @@ export async function handleAgentMailbox(
   // Revocation destroys credentials and drafts, so it carries the same
   // configuration-version precondition as every other destructive account
   // mutation. The reversible mailbox actions stay unversioned.
-  const requiresConfigurationVersion = action === "revoke";
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: requiresConfigurationVersion,
-  });
-  const expectedBoundaryKind = requiresConfigurationVersion
-    ? "configuration_versioned"
-    : "unversioned";
-  if (!boundary.ok || boundary.value.kind !== expectedBoundaryKind) {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: action === "revoke" ? "configuration_versioned" : "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/agent-mailboxes/${accountId.value}/${action}`,
     operation: `agent_mailbox.${action.replaceAll("-", "_")}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const mailbox = await readEmailMailboxAccount({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
@@ -327,7 +295,7 @@ export async function handleAgentMailbox(
     if (Object.keys(body.value).length > 0) {
       return controlError("agent_mailbox_request_invalid", 422);
     }
-    if (boundary.value.kind !== "configuration_versioned") {
+    if (boundary.kind !== "configuration_versioned") {
       return controlError("mutation_boundary_invalid", 422);
     }
     const authorization = await authorizeCredentialRevocation({
@@ -335,7 +303,7 @@ export async function handleAgentMailbox(
       organisationId: authorized.organisationId,
       integrationAccountId: accountId.value,
       replacementIntegrationAccountId: null,
-      expectedConfigurationVersion: boundary.value.expectedConfigurationVersion,
+      expectedConfigurationVersion: boundary.expectedConfigurationVersion,
     });
     if (!authorization.ok) {
       const status =
@@ -433,16 +401,9 @@ export async function handleAgentMailbox(
       organisationId: authorized.organisationId,
       authorization: authorization.value,
       mutation: {
-        boundary: boundary.value,
+        boundary,
         scope,
-        identity: newControlMutationIdentity({
-          portalSubjectHash: await hashPortalSubject(
-            identity.issuer,
-            identity.subject,
-          ),
-          causationId: controlCausationId(request),
-          now,
-        }),
+        identity: await controlMutationIdentity(request, identity, now),
       },
       actorUserId: identity.userId,
       receiptBody: {
@@ -503,14 +464,14 @@ export async function handleAgentMailbox(
   }
   // Revocation returned above with its own receipt, so every remaining action
   // carries the unversioned boundary this recorder accepts.
-  if (boundary.value.kind !== "unversioned") {
+  if (boundary.kind !== "unversioned") {
     return controlError("mutation_boundary_invalid", 422);
   }
   const recordedMutationReceipt = await recordCommerceMutationReceipt({
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -547,41 +508,18 @@ export async function handleAgentMailboxCheck(
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length > 0)
     return controlError("agent_mailbox_request_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/agent-mailboxes/${accountId.value}/check`,
     operation: "agent_mailbox.check",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const mailbox = await readEmailMailboxAccount({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
@@ -639,7 +577,7 @@ export async function handleAgentMailboxCheck(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,

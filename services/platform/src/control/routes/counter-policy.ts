@@ -1,29 +1,16 @@
-import type {
-  CommerceAdminClient,
-  CommerceClientError,
-} from "@seams/commerce-client";
+import type { CommerceClientError } from "@seams/commerce-client";
 
 import type { Env } from "../../env";
-import {
-  authorizeOrganisationRequest,
-  type AuthorizedOrganisationRequest,
-} from "../authorization";
+import { admitUserMutation } from "../admission/control-mutation";
+import { resolveMerchantControlContext } from "../commerce-merchant";
+import { authorizeOrganisationRequest } from "../authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
 } from "../http";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
-import { createCommerceClient } from "../../commerce/outbox-worker";
-import { readOrganisationEnvironment } from "../organisation-runtime";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { resolveUser } from "../../data/control-plane";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import type { Variant } from "@seams/type-utils";
 
 /**
@@ -42,11 +29,6 @@ export type CounterPolicyControlRoute =
       organisationIdRaw: string;
       satyrLocationIdRaw: string;
     }>;
-
-type CounterPolicyContext = Readonly<{
-  merchantId: string;
-  client: CommerceAdminClient;
-}>;
 
 export function matchCounterPolicyControlRoute(
   pathname: string,
@@ -97,7 +79,7 @@ async function handleCounterPolicies(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const context = await resolveCounterPolicyContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const configurations = await context.client.listPointOfSaleConfigurations(
     context.merchantId,
@@ -121,7 +103,7 @@ async function handleCounterPolicy(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const context = await resolveCounterPolicyContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const configuration = await context.client.readPointOfSaleConfiguration(
     context.merchantId,
@@ -157,42 +139,19 @@ async function publishCounterPolicy(
   const publication = parsePublication(body.value);
   if (publication === null)
     return controlError("counter_policy_request_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/counter-policies`,
     operation: "counter_policy.publish",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  const context = await resolveCounterPolicyContext(env, authorized);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const now = Date.now();
   const published = await context.client.publishPointOfSaleConfiguration({
@@ -215,7 +174,7 @@ async function publishCounterPolicy(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -249,30 +208,6 @@ function parsePublication(body: JsonRecord): Readonly<{
     expectedRevision: Number(expectedRevision),
     configuration: configuration as JsonRecord,
   };
-}
-
-async function resolveCounterPolicyContext(
-  env: Env,
-  authorized: AuthorizedOrganisationRequest,
-): Promise<CounterPolicyContext | Response> {
-  const environment = await readOrganisationEnvironment(
-    authorized.executionScope.database,
-    authorized.organisationId,
-  );
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) return controlError("underclerk_unavailable", 503);
-  return { merchantId: binding.value.merchantId, client };
 }
 
 function commerceErrorResponse(error: CommerceClientError): Response {

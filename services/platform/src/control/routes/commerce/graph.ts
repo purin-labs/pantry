@@ -5,10 +5,7 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import type { Result } from "../../../result";
-import type {
-  CommerceGraphQuery,
-  RequestAuthority,
-} from "@seams/contracts";
+import type { CommerceGraphQuery, RequestAuthority } from "@seams/contracts";
 import {
   parseCommerceCommandId,
   CommerceEntityPlaneClient,
@@ -52,25 +49,16 @@ import {
 } from "../../../commerce/entity-plane/saved-view-mutations";
 import {
   readActiveOrganisationMembershipRevision,
-  resolveUser,
   type ActiveControlSession,
   type ActiveOrganisationMembership,
   type User,
 } from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type UnversionedControlMutationBoundary,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
+import { type UnversionedControlMutationBoundary } from "../../../data/control-mutation";
 import {
   parseCommerceExportPresetPublishRequest,
   publishCommerceExportPreset,
   type CommerceExportPresetError,
 } from "../../../data/export-preset";
-import { resolveOrganisationCommerceMerchantBinding } from "../../../data/commerce-merchant-binding";
 import { prepareTurnAuthority } from "../../../context/turn-context";
 import { createCommerceOutboxReconcileQueueMessage } from "../../../ingress-queue";
 import {
@@ -98,20 +86,20 @@ import {
 } from "../../../policy";
 import { buildControlAuthority } from "../../../request-authority";
 import { resolveOrganisationModelRoute } from "../../../models/route";
-import { authorizeOrganisationRequest } from "../../authorization";
 import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "../../http";
-import { controlCausationId } from "../../mutation";
+  admitUserMutation,
+  controlMutationIdentity,
+  resolveMutationUser,
+} from "../../admission/control-mutation";
+import { resolveMerchantBinding } from "../../commerce-merchant";
+import { authorizeOrganisationRequest } from "../../authorization";
+import { controlError, controlJson, readJsonRecord } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import {
   commerceGraphControlAuthority,
   controlCommerceSensitivityCeiling,
   openControlCommerceGraph,
 } from "../../commerce-graph";
-import { readOrganisationEnvironment } from "../../organisation-runtime";
 import { assertNever } from "@seams/std";
 import {
   capabilitySwitchedOffRefusal,
@@ -136,48 +124,20 @@ export async function handleCommerceExportPreset(
   if (!body.ok) return controlError("commerce_export_preset_invalid", 422);
   const parsed = parseCommerceExportPresetPublishRequest(body.value);
   if (!parsed.ok) return controlError(parsed.error.code, 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/export-preset`,
     operation: "commerce_export_preset.publish",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
+  const binding = await resolveMerchantBinding(authorized);
+  if (binding instanceof Response) return binding;
   if (
     env.UNDERCLERK_BASE_URL === undefined ||
     env.UNDERCLERK_SERVICE_TOKEN === undefined
@@ -199,14 +159,11 @@ export async function handleCommerceExportPreset(
     return controlError("underclerk_unavailable", 503);
   }
   const now = Date.now();
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    identity,
     now,
-  });
+  );
   const execution = await OrganisationExecutionScope.resolve(
     env,
     authorized.organisationId,
@@ -214,13 +171,13 @@ export async function handleCommerceExportPreset(
   if (!execution.ok) return controlError(execution.error.code, 409);
   const published = await publishCommerceExportPreset({
     scope: execution.value,
-    environment,
-    merchantId: binding.value.merchantId,
+    environment: binding.environment,
+    merchantId: binding.merchantId,
     request: parsed.value,
-    expectedConfigurationVersion: boundary.value.expectedConfigurationVersion,
+    expectedConfigurationVersion: boundary.expectedConfigurationVersion,
     controlMutation: {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: mutationIdentity,
     },
     client,
@@ -374,14 +331,8 @@ export async function handleCommerceGraphChanges(
       parsed.error.code,
       commerceGraphErrorStatus(parsed.error),
     );
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
+  const binding = await resolveMerchantBinding(authorized);
+  if (binding instanceof Response) return binding;
   if (
     env.UNDERCLERK_BASE_URL === undefined ||
     env.UNDERCLERK_SERVICE_TOKEN === undefined
@@ -403,7 +354,7 @@ export async function handleCommerceGraphChanges(
     return controlError("underclerk_unavailable", 503);
   }
   const changes = await client.changes(
-    binding.value.merchantId,
+    binding.merchantId,
     parsed.value.after,
     parsed.value.limit,
   );
@@ -458,11 +409,11 @@ export async function handleCommerceBoardPresence(
   if (!body.ok) return controlError("commerce_board_presence_invalid", 422);
   const parsed = parseCommerceBoardPresenceRouteBody(body.value);
   if (!parsed.ok) return controlError("commerce_board_presence_invalid", 422);
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const updated = await organisation.updateCommerceBoardPresence({
     organisationId: authorized.organisationId,
     userId: identity.userId,
@@ -497,40 +448,18 @@ export async function handleCommerceListEntryPatch(
   const command = parseCommerceListEntryPatchRouteBody(body.value, entryIdRaw);
   if (!command.ok)
     return controlError("commerce_list_entry_patch_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/list-entries/${entryIdRaw}/patch`,
     operation: "commerce.list_entry.patch",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
 
   const policy = await readCurrentOrganisationPolicySnapshot(
     authorized.executionScope.database,
@@ -547,14 +476,8 @@ export async function handleCommerceListEntryPatch(
       "commerce_list_entry_patch",
     );
   }
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
+  const binding = await resolveMerchantBinding(authorized);
+  if (binding instanceof Response) return binding;
   if (
     policy.value.authz.approvalRequired.includes("commerce.list_entry.patch")
   ) {
@@ -564,9 +487,9 @@ export async function handleCommerceListEntryPatch(
       membership: authorized.membership,
       session: authorized.authenticated.session,
       identity,
-      boundary: boundary.value,
+      boundary,
       command: command.value,
-      integrationAccountId: binding.value.integrationAccountId,
+      integrationAccountId: binding.integrationAccountId,
       now: Date.now(),
     });
     if (!requested.ok) return requested.error;
@@ -574,7 +497,7 @@ export async function handleCommerceListEntryPatch(
       authorized,
       identity,
       scope,
-      boundary: boundary.value,
+      boundary,
       request,
       responseBody: requested.value,
       responseStatus: 202,
@@ -606,14 +529,14 @@ export async function handleCommerceListEntryPatch(
   }
   let commandId: ReturnType<typeof parseCommerceCommandId>;
   try {
-    commandId = parseCommerceCommandId(boundary.value.idempotencyKey);
+    commandId = parseCommerceCommandId(boundary.idempotencyKey);
   } catch {
     return controlError("commerce_list_entry_patch_invalid", 422);
   }
   const commandNow = Date.now();
   const authority = buildCommerceListEntryCommandAuthority({
     organisationId: authorized.organisationId,
-    merchantId: binding.value.merchantId,
+    merchantId: binding.merchantId,
     principalId: identity.userId,
     expiresAt: commerceEntityCommandAuthorityExpiry(commandNow),
     commandId,
@@ -624,7 +547,7 @@ export async function handleCommerceListEntryPatch(
   const patched = await patchPublishedCommerceListEntry({
     client,
     organisationId: authorized.organisationId,
-    merchantId: binding.value.merchantId,
+    merchantId: binding.merchantId,
     commandId,
     authority: authority.value,
     command: command.value,
@@ -638,7 +561,7 @@ export async function handleCommerceListEntryPatch(
         requestId: newRequestId(),
         receivedAt: now,
         organisationId: authorized.organisationId,
-        integrationAccountId: binding.value.integrationAccountId,
+        integrationAccountId: binding.integrationAccountId,
       }),
       { contentType: "json" },
     );
@@ -650,7 +573,7 @@ export async function handleCommerceListEntryPatch(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,
@@ -753,7 +676,10 @@ async function requestCommerceListEntryPatchApproval(
   const turnAuthority = await prepareTurnAuthority({
     db: input.execution.database,
     accountAccess: input.execution.accountAccess,
-    userAuthority: { kind: "authenticated_session", nativeSessionId: input.session.controlSessionId },
+    userAuthority: {
+      kind: "authenticated_session",
+      nativeSessionId: input.session.controlSessionId,
+    },
     action: "execute",
     organisationId: input.execution.organisationId,
     requestAuthority,
@@ -769,7 +695,10 @@ async function requestCommerceListEntryPatchApproval(
   const providerAuthority = await authorizeCapabilityUse({
     db: input.execution.database,
     accountAccess: input.execution.accountAccess,
-    userAuthority: { kind: "authenticated_session", nativeSessionId: input.session.controlSessionId },
+    userAuthority: {
+      kind: "authenticated_session",
+      nativeSessionId: input.session.controlSessionId,
+    },
     action: "execute",
     organisationId: input.execution.organisationId,
     authority: requestAuthority,
@@ -832,7 +761,10 @@ async function requestCommerceListEntryPatchApproval(
   if (!placed.ok)
     return { ok: false, error: controlError(placed.error.code, 409) };
   const ensured = await caseActor.value.ensure({
-    identity: { organisationId: input.execution.organisationId, caseId: caseId.value },
+    identity: {
+      organisationId: input.execution.organisationId,
+      caseId: caseId.value,
+    },
     purpose: "approve commerce list entry patch",
     workspaceRevision: `commerce:${input.integrationAccountId}`,
     lifecycle: { kind: "open", openedAt: input.now },
@@ -1118,40 +1050,18 @@ export async function handleCommerceSavedViewPresentationPatch(
     viewIdRaw,
   );
   if (!patch.ok) return controlError("commerce_saved_view_patch_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/saved-views/${viewIdRaw}/presentation`,
     operation: "commerce.saved_view.presentation.publish",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
 
   const policy = await readCurrentOrganisationPolicySnapshot(
     authorized.executionScope.database,
@@ -1173,14 +1083,8 @@ export async function handleCommerceSavedViewPresentationPatch(
   ) {
     return controlError("commerce_saved_view_patch_approval_required", 409);
   }
-  const environment = await readOrganisationEnvironment(authorized.executionScope.database, authorized.organisationId);
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
+  const binding = await resolveMerchantBinding(authorized);
+  if (binding instanceof Response) return binding;
   if (
     env.UNDERCLERK_BASE_URL === undefined ||
     env.UNDERCLERK_SERVICE_TOKEN === undefined
@@ -1203,14 +1107,14 @@ export async function handleCommerceSavedViewPresentationPatch(
   }
   let commandId: ReturnType<typeof parseCommerceCommandId>;
   try {
-    commandId = parseCommerceCommandId(boundary.value.idempotencyKey);
+    commandId = parseCommerceCommandId(boundary.idempotencyKey);
   } catch {
     return controlError("commerce_saved_view_patch_invalid", 422);
   }
   const commandNow = Date.now();
   const authority = buildSavedViewAdministrationAuthority({
     organisationId: authorized.organisationId,
-    merchantId: binding.value.merchantId,
+    merchantId: binding.merchantId,
     principalId: identity.userId,
     expiresAt: commerceEntityCommandAuthorityExpiry(commandNow),
     commandId,
@@ -1222,7 +1126,7 @@ export async function handleCommerceSavedViewPresentationPatch(
   const published = await publishSavedCommerceViewPresentation({
     client,
     organisationId: authorized.organisationId,
-    merchantId: binding.value.merchantId,
+    merchantId: binding.merchantId,
     commandId,
     authority: authority.value,
     patch: patch.value,
@@ -1235,7 +1139,7 @@ export async function handleCommerceSavedViewPresentationPatch(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now: commandNow,

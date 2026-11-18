@@ -10,15 +10,18 @@ import {
 } from "@seams/commerce-client";
 
 import type { Env } from "../../env";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
-import { resolveUser } from "../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-  type UnversionedControlMutationBoundary,
+import type {
+  ControlMutationReceiptScope,
+  UnversionedControlMutationBoundary,
 } from "../../data/control-mutation";
-import { readOrganisationEnvironment } from "../organisation-runtime";
+import {
+  admitControlMutation,
+  resolveMutationUser,
+} from "../admission/control-mutation";
+import {
+  resolveMerchantControlContext,
+  type MerchantControlContext,
+} from "../commerce-merchant";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -30,7 +33,6 @@ import {
   type JsonRecord,
 } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { createCommerceClient } from "../../commerce/outbox-worker";
 import type { Variant } from "@seams/type-utils";
 import { hasExactKeys, sha256Hex } from "@seams/std";
 
@@ -63,12 +65,7 @@ export type CheckoutProfileControlRoute =
       storefrontIdRaw: string;
     }>;
 
-type CheckoutProfileReadContext = Readonly<{
-  merchantId: string;
-  client: CommerceAdminClient;
-}>;
-
-type CheckoutProfileMutationContext = CheckoutProfileReadContext &
+type CheckoutProfileMutationContext = MerchantControlContext &
   Readonly<{
     changedBy: string;
     authorized: AuthorizedOrganisationRequest;
@@ -457,7 +454,7 @@ async function resolveCheckoutProfileReadContext(
   request: Request,
   env: Env,
   organisationIdRaw: string,
-): Promise<CheckoutProfileReadContext | Response> {
+): Promise<MerchantControlContext | Response> {
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
@@ -466,7 +463,7 @@ async function resolveCheckoutProfileReadContext(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  return resolveCheckoutProfileAuthority(env, authorized);
+  return resolveMerchantControlContext(env, authorized);
 }
 
 async function resolveCheckoutProfileMutationContext(
@@ -482,45 +479,18 @@ async function resolveCheckoutProfileMutationContext(
     true,
   );
   if (!authorized.ok) return authorized.response;
-  const authority = await resolveCheckoutProfileAuthority(env, authorized);
+  const authority = await resolveMerchantControlContext(env, authorized);
   if (authority instanceof Response) return authority;
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   return {
     ...authority,
     changedBy: authorized.authenticated.session.userId,
     authorized,
     identity,
-  };
-}
-
-async function resolveCheckoutProfileAuthority(
-  env: Env,
-  authorized: AuthorizedOrganisationRequest,
-): Promise<CheckoutProfileReadContext | Response> {
-  const environment = await readOrganisationEnvironment(
-    authorized.executionScope.database,
-    authorized.organisationId,
-  );
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) return controlError("underclerk_unavailable", 503);
-  return {
-    merchantId: binding.value.merchantId,
-    client,
   };
 }
 
@@ -537,40 +507,18 @@ async function beginCheckoutProfileMutation(
     organisationIdRaw,
   );
   if (context instanceof Response) return context;
-  const boundary = await parseControlMutationBoundary({
-    request,
-    body,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId:
-      context.authorized.authenticated.session.userId,
-    organisationScope: context.authorized.organisationId,
-    route: new URL(request.url).pathname,
-    operation,
-  };
   // The receipt is in the Organisation's database, beside its effect
   // (recordCommerceMutationReceipt), so the replay reads it there.
-  const replay = await readControlMutationReplay({
-    db: context.authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+  const admitted = await admitControlMutation({
+    request,
+    authorized: context.authorized,
+    body,
+    boundary: "unversioned",
+    route: new URL(request.url).pathname,
+    operation,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
-  return { context, boundary: boundary.value, scope, now: Date.now() };
+  if (admitted instanceof Response) return admitted;
+  return { context, ...admitted, now: Date.now() };
 }
 
 async function completeCheckoutProfileMutation(

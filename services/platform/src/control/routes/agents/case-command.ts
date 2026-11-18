@@ -1,22 +1,15 @@
 import type { Env } from "../../../env";
 import { processDirectCaseCommand } from "../../../actors/case-direct-processing";
-import {
-  readActiveOrganisationMembershipRevision,
-  resolveUser,
-} from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  prepareControlMutationReceipt,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
+import { readActiveOrganisationMembershipRevision } from "../../../data/control-plane";
+import { prepareControlMutationReceipt } from "../../../data/control-mutation";
 import { parseRequestId } from "../../../ids";
 import { buildControlAuthority } from "../../../request-authority";
+import {
+  admitUserMutation,
+  controlMutationIdentity,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import { controlCausationId } from "../../mutation";
 
 export async function handleCaseCommand(
   request: Request,
@@ -40,42 +33,19 @@ export async function handleCaseCommand(
   if (instruction.length === 0 || instruction.length > 8_000) {
     return controlError("case_command_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const route = `/v1/control/organisations/${authorized.organisationId}/cases/commands`;
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
-    route,
+    boundary: "unversioned",
+    user: "after_replay",
+    route: `/v1/control/organisations/${authorized.organisationId}/cases/commands`,
     operation: "case.command",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const digest = boundary.value.requestHash.slice(0, 32);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
+  const digest = boundary.requestHash.slice(0, 32);
   const requestId = parseRequestId(`request_case_api_${digest}`);
   if (!requestId.ok) return controlError("case_command_identity_invalid", 500);
   const now = Date.now();
@@ -97,7 +67,7 @@ export async function handleCaseCommand(
     projectContext: null,
     organisationId: authorized.organisationId,
     requestId: requestId.value,
-    stableIdentity: `${authorized.organisationId}:api:${authorized.authenticated.session.userId}:${boundary.value.idempotencyKey}`,
+    stableIdentity: `${authorized.organisationId}:api:${authorized.authenticated.session.userId}:${boundary.idempotencyKey}`,
     operatorOrigin: {
       kind: "control_session",
       controlSessionId: authorized.authenticated.session.controlSessionId,
@@ -122,20 +92,17 @@ export async function handleCaseCommand(
     session_id: processed.value.sessionId,
     assignment_id: processed.value.assignmentId,
   };
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    identity,
     now,
-  });
+  );
   const session =
     authorized.executionScope.database.withSession("first-primary");
   await session.batch([
     prepareControlMutationReceipt(session, {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: mutationIdentity,
       responseStatus: 200,
       responseBody,

@@ -1,9 +1,9 @@
 import type { OrderTimesWindow } from "@seams/control-api";
 
 import type { Env } from "../../env";
+import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
-import { resolveOrderQueueContext } from "./order-queue";
 
 /**
  * How long the shop's orders of a window took. Commerce holds the orders and
@@ -55,7 +55,7 @@ export async function handleOrderTimesControlRoute(
     to - from > MAX_WINDOW_MS
   )
     return controlError("order_times_window_invalid", 422);
-  const context = await resolveOrderQueueContext(env, authorized);
+  const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const times = await context.client.readOrderTimes(context.merchantId, {
     start: new Date(from).toISOString(),

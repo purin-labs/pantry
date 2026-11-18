@@ -2,18 +2,13 @@ import { hasExactKeys } from "@seams/std";
 import { isChatEffort, type ChatEffort } from "@seams/control-api";
 
 import type { Env } from "../../env";
+import {
+  admitUserMutation,
+  controlMutationIdentity,
+} from "../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
-import { controlCausationId } from "../mutation";
-import { resolveUser } from "../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  prepareControlMutationReceipt,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+import { prepareControlMutationReceipt } from "../../data/control-mutation";
 import {
   prepareOrganisationSlackReasoningEffortWrite,
   readOrganisationInferenceSelection,
@@ -62,50 +57,24 @@ export async function handleOrganisationSlackReasoningEffort(
   const effort = parseSlackReasoningEffortMutation(body.value);
   if (effort === undefined)
     return controlError("slack_reasoning_effort_invalid", 422);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/inference/slack-reasoning-effort`,
     operation: "organisation.inference.slack_reasoning_effort",
-  };
-  const database = authorized.executionScope.database;
-  const replay = await readControlMutationReplay({
-    db: database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    identity,
     now,
-  });
+  );
   const responseBody = {
     ok: true,
     effort,
@@ -114,7 +83,8 @@ export async function handleOrganisationSlackReasoningEffort(
       organisation_id: authorized.organisationId,
     },
   };
-  const session = database.withSession("first-primary");
+  const session =
+    authorized.executionScope.database.withSession("first-primary");
   await session.batch([
     prepareOrganisationSlackReasoningEffortWrite(session, {
       organisationId: authorized.organisationId,
@@ -124,7 +94,7 @@ export async function handleOrganisationSlackReasoningEffort(
     }),
     prepareControlMutationReceipt(session, {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: mutationIdentity,
       responseStatus: 200,
       responseBody,

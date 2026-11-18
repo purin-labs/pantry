@@ -1,11 +1,7 @@
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
-import { requirePublicOrigin } from "../../public-origin";
-import {
-  authorizeOrganisationRequest,
-  type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError } from "../http";
+import type { AuthorizedOrganisationRequest } from "../authorization";
+import { authorizeOrganisationSocket } from "./organisation-socket";
 
 export type ChatSignalRoute = Readonly<{
   kind: "chatSignals";
@@ -41,20 +37,10 @@ export async function authorizeChatSignalRequest(
 ): Promise<
   AuthorizedOrganisationRequest | Readonly<{ ok: false; response: Response }>
 > {
-  if (request.method !== "GET")
-    return { ok: false, response: controlError("method_not_allowed", 405) };
-  if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket")
-    return { ok: false, response: controlError("websocket_required", 426) };
-  if (
-    request.headers.get("Origin") !==
-    requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)
-  )
-    return { ok: false, response: controlError("origin_invalid", 403) };
-  return authorizeOrganisationRequest(
+  return authorizeOrganisationSocket(
     request,
     env,
     route.organisationId,
     "admin",
-    false,
   );
 }

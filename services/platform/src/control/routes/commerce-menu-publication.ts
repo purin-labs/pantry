@@ -3,6 +3,7 @@ import { parseMenuHours } from "@seams/control-api";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { Env } from "../../env";
 import { sha256Hex } from "@seams/std";
+import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {
@@ -13,7 +14,6 @@ import {
   planCafeMenu,
   publishedCafeMenu,
 } from "../../commerce/cafe-menu-publication";
-import { resolveMerchantControlContext } from "./commerce-api-keys";
 
 export {
   CAFE_MENU_ID,
@@ -172,9 +172,9 @@ export async function handleCommerceMenuPublicationControlRoute(
           result.value.error.field === "menu.validity"
             ? "menu_hours_invalid"
             : result.value.error.code === "stale_merchant_revision" ||
-          result.value.error.code === "stale_resource_revision"
-            ? "menu_publication_conflict"
-            : "menu_publication_refused",
+                result.value.error.code === "stale_resource_revision"
+              ? "menu_publication_conflict"
+              : "menu_publication_refused",
         detail: result.value.error.code,
       },
       409,

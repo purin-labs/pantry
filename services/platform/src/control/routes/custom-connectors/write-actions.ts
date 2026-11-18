@@ -22,15 +22,19 @@ import {
 } from "../../../custom-connectors";
 import {
   authorizeOrganisationControl,
-  resolveUser,
+  type User,
 } from "../../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type UnversionedControlMutationBoundary,
-  type ControlMutationReceiptScope,
+import type {
+  UnversionedControlMutationBoundary,
+  ControlMutationReceiptScope,
 } from "../../../data/control-mutation";
 import { FlowBinding } from "../../../policy/information-flow";
+import {
+  controlMutationScope,
+  parseMutationBoundary,
+  replayControlMutation,
+  resolveMutationUser,
+} from "../../admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   authenticateControlMutation,
@@ -167,21 +171,8 @@ async function approveCustomConnectorWriteAction(
   ) {
     return controlError("approval_step_up_required", 409);
   }
-  const replay = await readControlMutationReplay({
-    db: context.executionScope.database,
-    scope: context.scope,
-    boundary: context.boundary,
-  });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    if (!(await authorizeWriteMutation(request, env, context)))
-      return controlError("custom_connector_write_forbidden", 403);
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  const replayed = await replayWriteMutation(request, env, context);
+  if (replayed !== null) return replayed;
   if (
     existing.value.state === "proposed" ||
     existing.value.state === "approval_requested"
@@ -260,20 +251,7 @@ async function approveCustomConnectorWriteAction(
       context.authorized.membership.role,
     ),
   };
-  const recordedMutationReceipt = await recordCommerceMutationReceipt({
-    authorized: context.authorized,
-    identity: context.identity,
-    scope: context.scope,
-    boundary: context.boundary,
-    request,
-    responseBody,
-    now,
-  });
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  if (!(await authorizeWriteMutation(request, env, context)))
-    return controlError("custom_connector_write_forbidden", 403);
-  return controlJson(responseBody);
+  return answerWriteAction(request, env, context, responseBody, now);
 }
 
 async function executeCustomConnectorWriteAction(
@@ -287,21 +265,8 @@ async function executeCustomConnectorWriteAction(
   const operation = route.action === "retry" ? "retry" : "execute";
   const context = await prepareWriteMutation(request, env, route, operation);
   if (!context.ok) return context.response;
-  const replay = await readControlMutationReplay({
-    db: context.executionScope.database,
-    scope: context.scope,
-    boundary: context.boundary,
-  });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay") {
-    if (!(await authorizeWriteMutation(request, env, context)))
-      return controlError("custom_connector_write_forbidden", 403);
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  const replayed = await replayWriteMutation(request, env, context);
+  if (replayed !== null) return replayed;
   const now = Date.now();
   const existing = await context.organisation.getAction({
     organisationId: context.authorized.organisationId,
@@ -326,17 +291,7 @@ async function executeCustomConnectorWriteAction(
         context.authorized.membership.role,
       ),
     };
-    const recordedMutationReceipt = await recordWriteReceipt(
-      request,
-      context,
-      responseBody,
-      now,
-    );
-    if (!recordedMutationReceipt.ok)
-      return controlError(recordedMutationReceipt.error.code, 409);
-    if (!(await authorizeWriteMutation(request, env, context)))
-      return controlError("custom_connector_write_forbidden", 403);
-    return controlJson(responseBody);
+    return answerWriteAction(request, env, context, responseBody, now);
   }
   if (existing.value.state === "indeterminate" && operation === "execute") {
     if (!(await authorizeWriteMutation(request, env, context)))
@@ -505,18 +460,12 @@ async function executeCustomConnectorWriteAction(
       context.authorized.membership.role,
     ),
   };
-  const recordedMutationReceipt = await recordWriteReceipt(
+  return answerWriteAction(
     request,
+    env,
     context,
     responseBody,
     Date.now(),
-  );
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  if (!(await authorizeWriteMutation(request, env, context)))
-    return controlError("custom_connector_write_forbidden", 403);
-  return controlJson(
-    responseBody,
     completed.value.state === "indeterminate" ? 202 : 200,
   );
 }
@@ -604,23 +553,30 @@ async function reconcileCustomConnectorWriteAction(
       context.authorized.membership.role,
     ),
   };
-  const recordedMutationReceipt = await recordWriteReceipt(
-    request,
-    context,
-    responseBody,
-    now,
-  );
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  if (!(await authorizeWriteMutation(request, env, context)))
-    return controlError("custom_connector_write_forbidden", 403);
-  return controlJson(responseBody);
+  return answerWriteAction(request, env, context, responseBody, now);
+}
+
+/** The answer of an earlier attempt, to a caller who may still write. */
+function replayWriteMutation(
+  request: Request,
+  env: Env,
+  context: WriteMutationContext,
+): Promise<Response | null> {
+  return replayControlMutation({
+    db: context.executionScope.database,
+    scope: context.scope,
+    boundary: context.boundary,
+    replay: async (receipt) =>
+      (await authorizeWriteMutation(request, env, context))
+        ? controlJson(receipt.responseBody, receipt.responseStatus)
+        : controlError("custom_connector_write_forbidden", 403),
+  });
 }
 
 type WriteMutationContext = Readonly<{
   executionScope: OrganisationExecutionScope;
   authorized: AuthorizedOrganisationRequest;
-  identity: NonNullable<Awaited<ReturnType<typeof resolveUser>>>;
+  identity: User;
   organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
   boundary: UnversionedControlMutationBoundary;
   scope: ControlMutationReceiptScope;
@@ -652,30 +608,17 @@ async function prepareWriteMutation(
       response: controlError("custom_connector_action_invalid", 422),
     };
   }
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return {
-      ok: false,
-      response: controlError(
-        boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-        422,
-      ),
-    };
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return {
-      ok: false,
-      response: controlError("app_user_missing", 401),
-    };
-  }
+    body.value,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return { ok: false, response: boundary };
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return { ok: false, response: identity };
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: authorized.organisationId,
@@ -687,24 +630,29 @@ async function prepareWriteMutation(
     authorized,
     identity,
     organisation,
-    boundary: boundary.value,
+    boundary,
     body: body.value,
-    scope: {
-      userId: authorized.authenticated.session.userId,
-      organisationScope: authorized.organisationId,
-      route: `/v1/control/organisations/${authorized.organisationId}/custom-connectors/${route.connectorIdRaw}/actions/${route.actionNonceRaw}/${operation}`,
-      operation: `custom_connector.action.${operation}`,
-    },
+    scope: controlMutationScope(
+      authorized,
+      `/v1/control/organisations/${authorized.organisationId}/custom-connectors/${route.connectorIdRaw}/actions/${route.actionNonceRaw}/${operation}`,
+      `custom_connector.action.${operation}`,
+    ),
   };
 }
 
-async function recordWriteReceipt(
+/**
+ * Records the receipt of a write action's answer, then gives the answer to a
+ * caller who may still write.
+ */
+async function answerWriteAction(
   request: Request,
+  env: Env,
   context: WriteMutationContext,
   responseBody: Readonly<Record<string, unknown>>,
   now: number,
-): ReturnType<typeof recordCommerceMutationReceipt> {
-  return recordCommerceMutationReceipt({
+  status?: number,
+): Promise<Response> {
+  const recordedMutationReceipt = await recordCommerceMutationReceipt({
     authorized: context.authorized,
     identity: context.identity,
     scope: context.scope,
@@ -713,6 +661,11 @@ async function recordWriteReceipt(
     responseBody,
     now,
   });
+  if (!recordedMutationReceipt.ok)
+    return controlError(recordedMutationReceipt.error.code, 409);
+  if (!(await authorizeWriteMutation(request, env, context)))
+    return controlError("custom_connector_write_forbidden", 403);
+  return controlJson(responseBody, status);
 }
 
 function customActionLedgerError(code: string): Response {

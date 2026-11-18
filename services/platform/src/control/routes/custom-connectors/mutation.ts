@@ -1,21 +1,19 @@
 import type { Env } from "../../../env";
-import { resolveUser } from "../../../data/control-plane";
 import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
   prepareControlMutationReceipt,
-  readControlMutationReplay,
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
 } from "../../../data/control-mutation";
 import {
+  admitUserMutation,
+  controlMutationIdentity,
+} from "../../admission/control-mutation";
+import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../../authorization";
 import { controlError, controlJson, type JsonRecord } from "../../http";
-import { controlCausationId } from "../../mutation";
 import type { Variant } from "@seams/type-utils";
 import {
   prepareConfigurationVersionAdvance,
@@ -46,64 +44,30 @@ export async function beginMutation(
     true,
   );
   if (!authorized.ok) return authorized.response;
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/custom-connectors/${routeSuffix}`,
     operation,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const version = await readOnboardingRow(
     authorized.executionScope.database,
     authorized.organisationId,
   );
-  if (
-    version?.configurationVersion !==
-    boundary.value.expectedConfigurationVersion
-  ) {
+  if (version?.configurationVersion !== boundary.expectedConfigurationVersion) {
     return controlError("configuration_version_conflict", 409);
   }
   const now = Date.now();
   return {
     authorized,
-    boundary: boundary.value,
-    mutationIdentity: newControlMutationIdentity({
-      portalSubjectHash: await hashPortalSubject(
-        identity.issuer,
-        identity.subject,
-      ),
-      causationId: controlCausationId(request),
-      now,
-    }),
+    boundary,
+    mutationIdentity: await controlMutationIdentity(request, identity, now),
     scope,
   };
 }

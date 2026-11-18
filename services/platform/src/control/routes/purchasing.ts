@@ -6,14 +6,10 @@ import {
   registerSupplier,
   type SupplierRegistrationError,
 } from "../../commerce/purchasing/supplier-creation";
-import { resolveUser } from "../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type UnversionedControlMutationBoundary,
-  type ControlMutationReceiptScope,
+import type {
+  UnversionedControlMutationBoundary,
+  ControlMutationReceiptScope,
 } from "../../data/control-mutation";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import type { Env } from "../../env";
 import { createCommerceOutboxReconcileQueueMessage } from "../../ingress-queue";
 import {
@@ -21,13 +17,14 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../../ids";
+import { admitUserMutation } from "../admission/control-mutation";
+import { resolveMerchantBinding } from "../commerce-merchant";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { readOrganisationEnvironment } from "../organisation-runtime";
 
 export type PurchasingControlAction =
   "activate" | "reconcile" | "create_supplier";
@@ -202,70 +199,19 @@ async function resolvePurchasingControlContext(
     true,
   );
   if (!authorized.ok) return authorized;
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return {
-      ok: false,
-      response: controlError(
-        boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-        422,
-      ),
-    };
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: purchasingRoute(authorized.organisationId, action),
     operation: purchasingOperation(action),
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return {
-      ok: false,
-      response: controlError("idempotency_key_conflict", 409),
-    };
-  if (replay.kind === "replay") {
-    return {
-      ok: false,
-      response: controlJson(
-        replay.receipt.responseBody,
-        replay.receipt.responseStatus,
-      ),
-    };
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null)
-    return {
-      ok: false,
-      response: controlError("app_user_missing", 401),
-    };
-  const environment = await readOrganisationEnvironment(
-    authorized.executionScope.database,
-    authorized.organisationId,
-  );
-  if (environment === null)
-    return { ok: false, response: controlError("organisation_not_found", 404) };
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok)
-    return {
-      ok: false,
-      response: controlError("underclerk_binding_missing", 503),
-    };
+  if (admitted instanceof Response) return { ok: false, response: admitted };
+  const binding = await resolveMerchantBinding(authorized);
+  if (binding instanceof Response) return { ok: false, response: binding };
   const client = createPurchasingClient(env, String(authorized.organisationId));
   if (client === null)
     return { ok: false, response: controlError("underclerk_unavailable", 503) };
@@ -273,12 +219,12 @@ async function resolvePurchasingControlContext(
     ok: true,
     value: {
       authorized,
-      identity,
+      identity: admitted.user,
       client,
-      merchantId: binding.value.merchantId,
-      integrationAccountId: binding.value.integrationAccountId,
-      boundary: boundary.value,
-      scope,
+      merchantId: binding.merchantId,
+      integrationAccountId: binding.integrationAccountId,
+      boundary: admitted.boundary,
+      scope: admitted.scope,
     },
   };
 }

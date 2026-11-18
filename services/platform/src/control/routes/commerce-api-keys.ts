@@ -1,26 +1,21 @@
 import {
   isCommerceApiScope,
-  type CommerceAdminClient,
   type CommerceApiScope,
   type CommerceClientError,
 } from "@seams/commerce-client";
 
 import type { Env } from "../../env";
+import { admitUserMutation } from "../admission/control-mutation";
+import {
+  resolveMerchantControlContext,
+  type MerchantControlContext,
+} from "../commerce-merchant";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
-import { createCommerceClient } from "../../commerce/outbox-worker";
-import { readOrganisationEnvironment } from "../organisation-runtime";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { resolveUser } from "../../data/control-plane";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 
 /**
  * The API keys of an organisation's merchant (Plan 80 step 3): an owner or
@@ -36,11 +31,6 @@ export type CommerceApiKeyControlRoute =
       organisationIdRaw: string;
       credentialIdRaw: string;
     }>;
-
-type MerchantControlContext = Readonly<{
-  merchantId: string;
-  client: CommerceAdminClient;
-}>;
 
 export function matchCommerceApiKeyControlRoute(
   pathname: string,
@@ -121,8 +111,7 @@ async function issueKey(
     "commerce_api_key.issue",
     async (context) => {
       const issued = await context.client.issueApiKey(context.merchantId, key);
-      if (!issued.ok)
-        return { response: commerceErrorResponse(issued.error) };
+      if (!issued.ok) return { response: commerceErrorResponse(issued.error) };
       const { key: secret, ...apiKey } = issued.value;
       // The secret is shown once and never kept in Pantry's receipts.
       return {
@@ -183,39 +172,18 @@ async function mutate(
     | Readonly<{ response: Response }>
   >,
 ): Promise<Response> {
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned")
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: new URL(request.url).pathname,
     operation,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const context = await resolveMerchantControlContext(env, authorized);
   if (context instanceof Response) return context;
   const result = await change(context);
@@ -224,7 +192,7 @@ async function mutate(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody: result.body,
     now: Date.now(),
@@ -247,31 +215,6 @@ function parseKey(
   )
     return null;
   return { label: trimmed, scopes: [...new Set(scopes)] };
-}
-
-/** The organisation's merchant, reached as the member who asked. */
-export async function resolveMerchantControlContext(
-  env: Env,
-  authorized: AuthorizedOrganisationRequest,
-): Promise<MerchantControlContext | Response> {
-  const environment = await readOrganisationEnvironment(
-    authorized.executionScope.database,
-    authorized.organisationId,
-  );
-  if (environment === null) return controlError("organisation_not_found", 404);
-  const binding = await resolveOrganisationCommerceMerchantBinding({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    environment,
-  });
-  if (!binding.ok) return controlError("underclerk_binding_missing", 503);
-  const client = createCommerceClient(env, undefined, {
-    kind: "organisation",
-    organisationId: String(authorized.organisationId),
-    actor: String(authorized.membership.personId),
-  });
-  if (client === null) return controlError("underclerk_unavailable", 503);
-  return { merchantId: binding.value.merchantId, client };
 }
 
 function commerceErrorResponse(error: CommerceClientError): Response {

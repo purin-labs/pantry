@@ -8,18 +8,13 @@ import {
   readAgentDefinitionRevisions,
   readSkillRevisions,
 } from "../../../data/agent-operations/revisions";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
 import {
   isPublishedResourceBoundaryError,
   runAgentOperation,
 } from "../../../data/agent-operation-runner";
 import type { PublishedResourceBoundaryError } from "../../../commerce/entity-plane/published-resources";
 import { readAgentOperationsWithActivity } from "../../agent-operation-activity";
+import { admitUserMutation } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
@@ -97,40 +92,18 @@ export async function handleAgentOperations(
   if (!body.ok) return controlError("agent_operation_invalid", 422);
   const parsed = parseAgentOperationInput(body.value);
   if (!parsed.ok) return agentOperationsErrorResponse(parsed.error);
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: authorized.authenticated.session.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/operations`,
     operation: `agent.operations.${parsed.value.kind}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict")
-    return controlError("idempotency_key_conflict", 409);
-  if (replay.kind === "replay")
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const now = Date.now();
   // The same runner a confirmed Slack draft uses, so the two surfaces cannot
   // carry out a command differently.
@@ -147,7 +120,7 @@ export async function handleAgentOperations(
         controlSessionId: authorized.authenticated.session.controlSessionId,
       },
     },
-    operationId: operationIdFor(parsed.value.kind, boundary.value.requestHash),
+    operationId: operationIdFor(parsed.value.kind, boundary.requestHash),
     now,
   });
   if (!applied.ok) {
@@ -171,7 +144,7 @@ export async function handleAgentOperations(
     authorized,
     identity,
     scope,
-    boundary: boundary.value,
+    boundary,
     request,
     responseBody,
     now,

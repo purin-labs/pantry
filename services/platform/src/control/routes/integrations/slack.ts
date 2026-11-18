@@ -1,14 +1,9 @@
 import { runtimeFetch } from "../../../runtime-fetch";
 import type { Env } from "../../../env";
 import { resolveActiveSlackOrganisationCredential } from "../../../credential-vault";
-import { resolveUser } from "../../../data/control-plane";
 import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
   prepareControlMutationReceipt,
   readControlMutationReplay,
-  type ControlMutationReceiptScope,
   prepareControlMutationReceiptCompletion,
 } from "../../../data/control-mutation";
 import {
@@ -21,6 +16,14 @@ import {
 } from "../../../ids";
 import { configuredValue } from "../../../provider-adapters/authorization";
 import { uninstallSlackApplication } from "../../../provider-adapters/slack";
+import {
+  admitControlMutation,
+  admitUserMutation,
+  controlMutationIdentity,
+  controlMutationScope,
+  parseMutationBoundary,
+  resolveMutationUser,
+} from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {
   controlError,
@@ -28,7 +31,6 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import { controlCausationId } from "../../mutation";
 import {
   configureSlackChannelDefault,
   userMayChangeSlackChannelDefault,
@@ -100,11 +102,11 @@ export async function handleSlackChannelDefault(
   if (!body.ok) {
     return controlError("slack_channel_default_request_invalid", 422);
   }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const change = parseSlackChannelDefaultChange({
     body: body.value,
     sourceOrganisationId: authorized.organisationId,
@@ -116,37 +118,17 @@ export async function handleSlackChannelDefault(
   if (change === null) {
     return controlError("slack_channel_default_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitControlMutation({
     request,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
     route: `/v1/control/organisations/${authorized.organisationId}/slack-routing/installations/${installationId.value}/channels/${channelId.value}`,
     operation: "slack.channel_default.change",
-  };
-  const replay = await readControlMutationReplay({
     db: env.DB,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope } = admitted;
   if (
     !(await userMayChangeSlackChannelDefault(env, {
       userId: identity.userId,
@@ -168,14 +150,11 @@ export async function handleSlackChannelDefault(
     );
     if (!granted) return controlError("slack_channel_grant_failed", 409);
   }
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
-    now: change.changedAt,
-  });
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    identity,
+    change.changedAt,
+  );
   const responseBody = {
     kind: "success",
     channelDefault: configured.value,
@@ -184,7 +163,7 @@ export async function handleSlackChannelDefault(
   await env.DB.batch([
     prepareControlMutationReceipt(env.DB, {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: mutationIdentity,
       responseStatus: 200,
       responseBody,
@@ -224,42 +203,19 @@ export async function handleSlackDmSelection(
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("slack_dm_selection_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "unversioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/slack-routing/installations/${installationId.value}/dm-selection`,
     operation: "slack.dm_organisation.select",
-  };
-  const replay = await readControlMutationReplay({
     db: env.DB,
-    scope,
-    boundary: boundary.value,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return controlJson(
-      replay.receipt.responseBody,
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
+  const { boundary, scope, user: identity } = admitted;
   const routing = await listSlackOrganisationRouting(
     env.DB,
     authorized.organisationId,
@@ -280,14 +236,11 @@ export async function handleSlackDmSelection(
     selectedAt,
   });
   if (!selected.ok) return controlError(selected.error.code, 403);
-  const mutationIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
-    now: selectedAt,
-  });
+  const mutationIdentity = await controlMutationIdentity(
+    request,
+    identity,
+    selectedAt,
+  );
   const responseBody = {
     kind: "success",
     installationId: installationId.value,
@@ -297,7 +250,7 @@ export async function handleSlackDmSelection(
   await env.DB.batch([
     prepareControlMutationReceipt(env.DB, {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: mutationIdentity,
       responseStatus: 200,
       responseBody,
@@ -341,32 +294,27 @@ export async function handleDisconnectSlackInstallation(
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("slack_installation_disconnect_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const boundary = await parseMutationBoundary(
     request,
-    body: body.value,
-    requireConfigurationVersion: false,
-  });
-  if (!boundary.ok || boundary.value.kind !== "unversioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) return controlError("app_user_missing", 401);
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route: `/v1/control/organisations/${authorized.organisationId}/slack-routing/installations/${installationId.value}/disconnect`,
-    operation: "slack.installation.disconnect",
-  };
+    body.value,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return boundary;
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
+  const scope = controlMutationScope(
+    authorized,
+    `/v1/control/organisations/${authorized.organisationId}/slack-routing/installations/${installationId.value}/disconnect`,
+    "slack.installation.disconnect",
+  );
+  // A disconnect that waits on its cleanup (202) runs again on a retry.
   const replay = await readControlMutationReplay({
     db: env.DB,
     scope,
-    boundary: boundary.value,
+    boundary,
   });
   if (replay.kind === "conflict") {
     return controlError("idempotency_key_conflict", 409);
@@ -378,14 +326,11 @@ export async function handleDisconnectSlackInstallation(
     );
   }
   const now = Date.now();
-  const proposedIdentity = newControlMutationIdentity({
-    portalSubjectHash: await hashPortalSubject(
-      identity.issuer,
-      identity.subject,
-    ),
-    causationId: controlCausationId(request),
+  const proposedIdentity = await controlMutationIdentity(
+    request,
+    identity,
     now,
-  });
+  );
   let cleanupReceiptId: string;
   let cleanupAuditEventId: string;
   let disconnectedAt: number;
@@ -473,7 +418,7 @@ export async function handleDisconnectSlackInstallation(
     disconnectedAt = now;
     await prepareControlMutationReceipt(env.DB, {
       scope,
-      boundary: boundary.value,
+      boundary,
       identity: proposedIdentity,
       responseStatus: 202,
       responseBody: {
@@ -500,7 +445,7 @@ export async function handleDisconnectSlackInstallation(
   await env.DB.batch([
     prepareControlMutationReceiptCompletion(env.DB, {
       receiptId: cleanupReceiptId,
-      requestHash: boundary.value.requestHash,
+      requestHash: boundary.requestHash,
       responseBody,
     }),
     prepareSlackInstallationDisconnectAuditEvent(env.DB, {

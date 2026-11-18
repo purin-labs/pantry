@@ -1,11 +1,11 @@
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
-import { requirePublicOrigin } from "../../public-origin";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { controlError } from "../http";
+import { authorizeOrganisationSocket } from "./organisation-socket";
 
 export type CostsSheetTransport = "snapshot" | "socket" | "reset";
 
@@ -76,20 +76,10 @@ export async function authorizeCostsSheetRequest(
       false,
     );
   }
-  if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
-    return { ok: false, response: controlError("websocket_required", 426) };
-  }
-  if (
-    request.headers.get("Origin") !==
-    requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)
-  ) {
-    return { ok: false, response: controlError("origin_invalid", 403) };
-  }
-  return authorizeOrganisationRequest(
+  return authorizeOrganisationSocket(
     request,
     env,
     route.organisationId,
     "viewer",
-    false,
   );
 }

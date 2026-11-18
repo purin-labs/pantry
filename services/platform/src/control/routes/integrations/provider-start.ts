@@ -1,15 +1,7 @@
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import { parseGmailAuthorizationProduct } from "../../../mail/gmail-authorization";
-import { resolveUser } from "../../../data/control-plane";
-import {
-  hashPortalSubject,
-  newControlMutationIdentity,
-  parseControlMutationBoundary,
-  readControlMutationReplay,
-  type ControlMutationBoundary,
-  type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
+import { hashPortalSubject } from "../../../data/control-mutation";
 import {
   integrationAccountAllowsCredentialMutation,
   providerConnectionAllowsCredentialMutation,
@@ -24,8 +16,8 @@ import {
   readProviderAttempt,
 } from "../../../data/provider-attempt";
 import {
-  parseIntegrationAccountId,
   parseProviderConnectionAttemptId,
+  type IntegrationAccountId,
   type OrganisationId,
 } from "../../../ids";
 import {
@@ -34,19 +26,27 @@ import {
 } from "../../../provider-lifecycle/authorization";
 import type { OnboardingProvider } from "../../../provider-lifecycle/domain";
 import type { ProviderStartContext } from "../../../provider-adapters/domain";
-import { authorizeOrganisationRequest } from "../../authorization";
+import {
+  type AdmittedMutation,
+  admitUserMutation,
+  controlMutationIdentity,
+  resolveMutationUser,
+} from "../../admission/control-mutation";
+import {
+  authorizeOrganisationRequest,
+  type AuthorizedOrganisationRequest,
+} from "../../authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import { controlCausationId } from "../../mutation";
-import type { Variant } from "@seams/type-utils";
 import { isRecord } from "@seams/std";
 import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
 import { account } from "../integrations";
 import { providerContextForExistingAccount } from "../../../provider-lifecycle/existing-account-context";
+import { authorizeAccountRequest } from "./account-request";
 
 export async function handleExistingAccountProviderStart(
   request: Request,
@@ -55,30 +55,21 @@ export async function handleExistingAccountProviderStart(
   integrationAccountIdRaw: string,
   purpose: "reconnect" | "rotate",
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const authorized = await authorizeOrganisationRequest(
+  const target = await authorizeAccountRequest(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
-  const now = Date.now();
-  const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
+    "POST",
+    "admin",
   );
-  if (!integrationAccountId.ok) {
-    return controlError("integration_account_not_found", 404);
-  }
+  if (target instanceof Response) return target;
+  const { authorized, integrationAccountId } = target;
+  const now = Date.now();
   const account = await resolveIntegrationAccount({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
-    integrationAccountId: integrationAccountId.value,
+    integrationAccountId,
   });
   if (!account.ok) {
     return controlError(account.error.code, 404);
@@ -121,70 +112,67 @@ export async function handleExistingAccountProviderStart(
   if (!body.ok) {
     return controlError("provider_context_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  return startProviderAttempt({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const route = `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId.value}/${purpose}`;
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
-    route,
+    context,
+    route: `/v1/control/organisations/${authorized.organisationId}/accounts/${integrationAccountId}/${purpose}`,
     operation: `provider.account.${purpose}`,
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    existingIntegrationAccountId: integrationAccountId,
+    purpose,
+    provider: account.value.provider,
+    now,
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return providerStartReplayResponse({
-      env,
-      context,
-      boundary: boundary.value,
-      scope,
-      receipt: replay.receipt,
-    });
-  }
+}
+
+/**
+ * Starts one provider authorization attempt, or answers the replay of an
+ * earlier start with a fresh authorization URL.
+ */
+async function startProviderAttempt(input: {
+  readonly request: Request;
+  readonly env: Env;
+  readonly authorized: AuthorizedOrganisationRequest;
+  readonly body: JsonRecord;
+  readonly context: ProviderStartContext;
+  readonly route: string;
+  readonly operation: string;
+  readonly existingIntegrationAccountId: IntegrationAccountId | null;
+  readonly purpose: "connect" | "reconnect" | "rotate";
+  readonly provider: string;
+  readonly now: number;
+}): Promise<Response> {
+  const { request, env, authorized, context, now } = input;
+  const admitted = await admitUserMutation({
+    request,
+    env,
+    authorized,
+    body: input.body,
+    boundary: "configuration_versioned",
+    user: "before_replay",
+    route: input.route,
+    operation: input.operation,
+    replay: (receipt, mutation) =>
+      providerStartReplayResponse({ env, context, mutation, receipt }),
+  });
+  if (admitted instanceof Response) return admitted;
   const started = await beginProviderOAuth({
     env,
     session: authorized.authenticated.session,
     organisationId: authorized.organisationId,
     context,
-    existingIntegrationAccountId: integrationAccountId.value,
-    purpose,
+    existingIntegrationAccountId: input.existingIntegrationAccountId,
+    purpose: input.purpose,
     returnPath:
-      typeof body.value.returnPath === "string"
-        ? body.value.returnPath
+      typeof input.body.returnPath === "string"
+        ? input.body.returnPath
         : `/portal/${authorized.organisationId}`,
     mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
     },
     now,
   });
@@ -205,9 +193,9 @@ export async function handleExistingAccountProviderStart(
       ? providerStartConfigurationFailure({
           scope: authorized.executionScope,
           organisationId: authorized.organisationId,
-          provider: account.value.provider,
-          userId: identity.userId,
-          route: scope.route,
+          provider: input.provider,
+          userId: admitted.user.userId,
+          route: admitted.scope.route,
           now,
         })
       : controlError(
@@ -285,98 +273,19 @@ export async function handleProviderStart(
   if (context === null) {
     return controlError("provider_context_invalid", 400);
   }
-  const boundary = await parseControlMutationBoundary({
+  return startProviderAttempt({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    context,
     route: `/v1/control/organisations/${authorized.organisationId}/providers/${provider}/start`,
     operation: "provider.attempt.start",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
-  });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    return providerStartReplayResponse({
-      env,
-      context,
-      boundary: boundary.value,
-      scope,
-      receipt: replay.receipt,
-    });
-  }
-  const started = await beginProviderOAuth({
-    env,
-    session: authorized.authenticated.session,
-    organisationId: authorized.organisationId,
-    context,
     existingIntegrationAccountId: null,
     purpose: "connect",
-    returnPath:
-      typeof body.value.returnPath === "string"
-        ? body.value.returnPath
-        : `/portal/${authorized.organisationId}`,
-    mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
-    },
+    provider,
     now,
   });
-  return started.ok
-    ? controlJson(
-        {
-          kind: "success",
-          attempt: started.value.attempt,
-          authorization_url: started.value.authorizationUrl,
-          receipt: {
-            receipt_id: started.value.receiptId,
-            organisation_id: authorized.organisationId,
-          },
-        },
-        201,
-      )
-    : started.error.code === "provider_configuration_missing"
-      ? providerStartConfigurationFailure({
-          scope: authorized.executionScope,
-          organisationId: authorized.organisationId,
-          provider,
-          userId: identity.userId,
-          route: scope.route,
-          now,
-        })
-      : controlError(
-          started.error.code,
-          providerErrorStatus(started.error.code),
-        );
 }
 
 export async function handleProviderAttempt(
@@ -402,13 +311,11 @@ export async function handleProviderAttempt(
   if (!attemptId.ok) {
     return controlError("provider_attempt_not_found", 404);
   }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
+  const identity = await resolveMutationUser(
+    env,
+    authorized.authenticated.session.userId,
+  );
+  if (identity instanceof Response) return identity;
   const attempt = await expireProviderAttemptIfDue({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
@@ -454,74 +361,46 @@ export async function handleCancelProviderAttempt(
   if (!body.ok || Object.keys(body.value).length !== 0) {
     return controlError("provider_attempt_cancel_request_invalid", 422);
   }
-  const boundary = await parseControlMutationBoundary({
+  const admitted = await admitUserMutation({
     request,
+    env,
+    authorized,
     body: body.value,
-    requireConfigurationVersion: true,
-  });
-  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
-    return controlError(
-      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
-      422,
-    );
-  }
-  const identity = await resolveUser({
-    db: env.DB,
-    userId: authorized.authenticated.session.userId,
-  });
-  if (identity === null) {
-    return controlError("app_user_missing", 401);
-  }
-  const scope: ControlMutationReceiptScope = {
-    userId: identity.userId,
-    organisationScope: authorized.organisationId,
+    boundary: "configuration_versioned",
+    user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/provider-attempts/${attemptId.value}/cancel`,
     operation: "provider.attempt.cancel",
-  };
-  const replay = await readControlMutationReplay({
-    db: authorized.executionScope.database,
-    scope,
-    boundary: boundary.value,
+    replay: async (receipt) => {
+      const current = await readProviderAttempt({
+        db: authorized.executionScope.database,
+        organisationId: authorized.organisationId,
+        attemptId: attemptId.value,
+      });
+      if (!current.ok) {
+        return controlError(current.error.code, 404);
+      }
+      return controlJson(
+        {
+          kind: "success",
+          attempt: providerAttemptWire(current.value),
+          receipt: receipt.responseBody,
+        },
+        receipt.responseStatus,
+      );
+    },
   });
-  if (replay.kind === "conflict") {
-    return controlError("idempotency_key_conflict", 409);
-  }
-  if (replay.kind === "replay") {
-    const current = await readProviderAttempt({
-      db: authorized.executionScope.database,
-      organisationId: authorized.organisationId,
-      attemptId: attemptId.value,
-    });
-    if (!current.ok) {
-      return controlError(current.error.code, 404);
-    }
-    return controlJson(
-      {
-        kind: "success",
-        attempt: providerAttemptWire(current.value),
-        receipt: replay.receipt.responseBody,
-      },
-      replay.receipt.responseStatus,
-    );
-  }
+  if (admitted instanceof Response) return admitted;
   const now = Date.now();
   const cancelled = await cancelProviderAttempt({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     attemptId: attemptId.value,
-    actorUserId: identity.userId,
+    actorUserId: admitted.user.userId,
     reasonCode: "authorization_cancelled",
     mutation: {
-      boundary: boundary.value,
-      scope,
-      identity: newControlMutationIdentity({
-        portalSubjectHash: await hashPortalSubject(
-          identity.issuer,
-          identity.subject,
-        ),
-        causationId: controlCausationId(request),
-        now,
-      }),
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
     },
     now,
   });
@@ -616,11 +495,7 @@ export function providerErrorStatus(code: string): number {
 async function providerStartReplayResponse(input: {
   readonly env: Env;
   readonly context: ProviderStartContext;
-  readonly boundary: Variant<
-    ControlMutationBoundary,
-    "configuration_versioned"
-  >;
-  readonly scope: ControlMutationReceiptScope;
+  readonly mutation: AdmittedMutation<"configuration_versioned">;
   readonly receipt: {
     readonly responseStatus: number;
     readonly responseBody: unknown;
@@ -637,10 +512,7 @@ async function providerStartReplayResponse(input: {
   const authorizationUrl = await providerAuthorizationUrlForMutation({
     env: input.env,
     context: input.context,
-    mutation: {
-      boundary: input.boundary,
-      scope: input.scope,
-    },
+    mutation: input.mutation,
   });
   return controlJson(
     {
