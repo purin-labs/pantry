@@ -3,7 +3,10 @@
 // the United States or the European Union. Each country keeps the postal code
 // form that its post office uses; Australia and the United States also need
 // the state.
-import { parseInternationalShippingAddressOf } from "@seams/commerce-contracts/records/api-international-addresses";
+import {
+  COMMERCE_POSTAL_CODES,
+  parseInternationalShippingAddressOf,
+} from "@seams/commerce-contracts/records/api-international-addresses";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 export const COMMERCE_EUROPEAN_UNION_COUNTRIES = [
@@ -59,47 +62,12 @@ export type CommerceInternationalShippingAddressV1 = Readonly<{
   postalCode: string;
 }>; // prettier-ignore
 
-/** The postal code form of each country, after upper-casing. */
-const POSTAL_CODES: Readonly<
-  Record<CommerceInternationalShippingCountry, RegExp>
-> = {
-  AU: /^\d{4}$/u,
-  US: /^\d{5}(?:-\d{4})?$/u,
-  AT: /^\d{4}$/u,
-  BE: /^\d{4}$/u,
-  BG: /^\d{4}$/u,
-  CY: /^\d{4}$/u,
-  CZ: /^\d{3} ?\d{2}$/u,
-  DE: /^\d{5}$/u,
-  DK: /^\d{4}$/u,
-  EE: /^\d{5}$/u,
-  ES: /^\d{5}$/u,
-  FI: /^\d{5}$/u,
-  FR: /^\d{5}$/u,
-  GR: /^\d{3} ?\d{2}$/u,
-  HR: /^\d{5}$/u,
-  HU: /^\d{4}$/u,
-  IE: /^[A-Z]\d[\dW] ?[\dA-Z]{4}$/u,
-  IT: /^\d{5}$/u,
-  LT: /^(?:LT-)?\d{5}$/u,
-  LU: /^(?:L-)?\d{4}$/u,
-  LV: /^(?:LV-)?\d{4}$/u,
-  MT: /^[A-Z]{3} ?\d{4}$/u,
-  NL: /^\d{4} ?[A-Z]{2}$/u,
-  PL: /^\d{2}-\d{3}$/u,
-  PT: /^\d{4}-\d{3}$/u,
-  RO: /^\d{6}$/u,
-  SE: /^\d{3} ?\d{2}$/u,
-  SI: /^\d{4}$/u,
-  SK: /^\d{3} ?\d{2}$/u,
-};
-
 /** Whether `value`, upper-cased, is a postal code of `countryCode`. */
 export function isCommercePostalCode(
   countryCode: CommerceInternationalShippingCountry,
   value: string,
 ): boolean {
-  return POSTAL_CODES[countryCode].test(value.trim().toUpperCase());
+  return COMMERCE_POSTAL_CODES[countryCode].test(value.trim().toUpperCase());
 }
 
 /** Australia and the United States need the state in an address. */
@@ -112,7 +80,7 @@ export function commerceAddressNeedsState(
 export function isCommerceInternationalShippingCountry(
   value: string,
 ): value is CommerceInternationalShippingCountry {
-  return Object.hasOwn(POSTAL_CODES, value);
+  return Object.hasOwn(COMMERCE_POSTAL_CODES, value);
 }
 
 export function parseInternationalShippingAddress(

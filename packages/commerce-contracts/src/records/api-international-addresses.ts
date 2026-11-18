@@ -85,7 +85,7 @@ const UNITED_STATES_STATES: ReadonlySet<string> = new Set([
 ]); // prettier-ignore
 
 /** The postal code form of each country, after upper-casing. */
-const POSTAL_CODES: Readonly<
+export const COMMERCE_POSTAL_CODES: Readonly<
   Record<CommerceInternationalShippingCountry, RegExp>
 > = {
   AU: /^\d{4}$/u,
@@ -188,7 +188,7 @@ function internationalAddressSchema(
     locality: normalizedTextSchema,
     postalCode: Type.Refine(
       normalizedTextSchema,
-      upperCaseMatches.bind(null, POSTAL_CODES[countryCode]),
+      upperCaseMatches.bind(null, COMMERCE_POSTAL_CODES[countryCode]),
       postalCodeError,
     ),
   };

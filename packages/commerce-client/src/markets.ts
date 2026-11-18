@@ -8,31 +8,12 @@ import {
 } from "./wire-readers.ts";
 import { parseCreateCommerceMarketV1 as parseCreateCommerceMarketV1Record, parseCommerceMarketV1 as parseCommerceMarketV1Record, parseUpdateCommerceMarketV1 as parseUpdateCommerceMarketV1Record, parseCommerceMarketsV1 as parseCommerceMarketsV1Record, parseCommerceOrderMarketV1 as parseCommerceOrderMarketV1Record } from "@seams/commerce-contracts/records/api-markets";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
-import { convertMarketAmount } from "@seams/commerce-contracts/records/commerce-fields";
+import {
+  CURRENCY_MINOR_UNITS,
+  convertMarketAmount,
+} from "@seams/commerce-contracts/records/commerce-fields";
 
-/** ISO 4217 minor units for the currencies Commerce sells in. */
-export const CURRENCY_MINOR_UNITS: Readonly<Record<string, number>> = {
-  AUD: 2,
-  CAD: 2,
-  CHF: 2,
-  CNY: 2,
-  EUR: 2,
-  GBP: 2,
-  HKD: 2,
-  IDR: 2,
-  INR: 2,
-  JPY: 0,
-  KRW: 0,
-  KWD: 3,
-  MYR: 2,
-  NZD: 2,
-  PHP: 2,
-  SGD: 2,
-  THB: 2,
-  TWD: 2,
-  USD: 2,
-  VND: 0,
-};
+export { CURRENCY_MINOR_UNITS };
 
 export function currencyMinorUnits(currency: string): number {
   const units = CURRENCY_MINOR_UNITS[currency];

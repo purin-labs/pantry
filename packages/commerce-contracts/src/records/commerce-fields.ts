@@ -53,11 +53,8 @@ export function uniqueValuesError(): string {
   return "must not repeat a value";
 }
 
-/**
- * The minor units of each currency a market can use, as the client table in
- * packages/commerce-client/src/markets.ts lists them.
- */
-const MARKET_CURRENCY_MINOR_UNITS: Readonly<Record<string, number>> = {
+/** ISO 4217 minor units for the currencies Commerce sells in. */
+export const CURRENCY_MINOR_UNITS: Readonly<Record<string, number>> = {
   AUD: 2,
   CAD: 2,
   CHF: 2,
@@ -92,8 +89,8 @@ export function convertMarketAmount(
   rate: string,
   roundingIncrement: number,
 ): number {
-  const shopDigits = MARKET_CURRENCY_MINOR_UNITS[shopCurrency];
-  const marketDigits = MARKET_CURRENCY_MINOR_UNITS[marketCurrency];
+  const shopDigits = CURRENCY_MINOR_UNITS[shopCurrency];
+  const marketDigits = CURRENCY_MINOR_UNITS[marketCurrency];
   if (shopDigits === undefined || marketDigits === undefined)
     throw new Error("The currency is not supported");
   const [whole = "0", fraction = ""] = rate.split(".");
@@ -133,7 +130,7 @@ function eachScaleError(): string {
 }
 
 function isMarketCurrency(value: string): boolean {
-  return MARKET_CURRENCY_MINOR_UNITS[value] !== undefined;
+  return CURRENCY_MINOR_UNITS[value] !== undefined;
 }
 
 function marketCurrencyError(): string {
