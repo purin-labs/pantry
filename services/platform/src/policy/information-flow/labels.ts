@@ -5,7 +5,7 @@ import type { RequestAuthority } from "@seams/contracts";
 import { parseFlowReader as parseContextVisibility } from "./readers";
 import type { FlowAudience as ContextVisibility } from "./types";
 import type { Result } from "../../result";
-import { digestCanonical, isSha256Digest } from "./digest";
+import { digestCanonical } from "./digest";
 import type {
   CanonicalFlowPolicy,
   FlowAudience,
@@ -26,6 +26,7 @@ import {
   isNonBlankString,
   isPositiveInteger,
   isRecord,
+  isSha256Hex,
 } from "@seams/std";
 
 export class FlowLabel {
@@ -73,7 +74,7 @@ export class FlowLabel {
     if (
       !isRecord(raw) ||
       !Array.isArray(raw.policies) ||
-      !isSha256Digest(raw.digest)
+      !isSha256Hex(raw.digest)
     ) {
       return invalidLabel("shape");
     }
@@ -499,7 +500,7 @@ export function parseFlowRecipient(raw: unknown): FlowRecipient | null {
     !isPositiveInteger(raw.contactRevision) ||
     !isNonBlankString(raw.verificationId) ||
     !isPositiveInteger(raw.verificationRevision) ||
-    !isSha256Digest(raw.endpointDigest) ||
+    !isSha256Hex(raw.endpointDigest) ||
     !(
       (raw.partyKind === "supplier" && raw.purpose === "supplier_reply") ||
       (raw.partyKind === "customer" && raw.purpose === "customer_reply")

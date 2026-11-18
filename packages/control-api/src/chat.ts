@@ -4,6 +4,7 @@ import {
   isNonEmptyString,
   isNonNegativeInteger,
   isRecord,
+  isSha256Hex,
 } from "@seams/std";
 
 export type ChatThreadActivity = "idle" | "working" | "approval" | "failed";
@@ -105,7 +106,7 @@ export function parseChatContextDetails(
       ]) ||
       !isNonEmptyString(source.id) ||
       !isNonEmptyString(source.revision) ||
-      !isContextDigest(source.digest) ||
+      !isSha256Hex(source.digest) ||
       !isNonNegativeInteger(source.observedAt) ||
       (source.origin !== "saved" &&
         source.origin !== "business" &&
@@ -156,7 +157,7 @@ export function parseChatContextDetails(
     isNonEmptyString(raw.browserInstanceId) &&
     isNonEmptyString(raw.surfaceSessionId) &&
     isNonNegativeInteger(raw.surfaceEpoch) &&
-    isContextDigest(raw.digest) &&
+    isSha256Hex(raw.digest) &&
     isNonNegativeInteger(raw.observedAt)
   )
     return {
@@ -170,10 +171,6 @@ export function parseChatContextDetails(
       observedAt: raw.observedAt,
     };
   return null;
-}
-
-function isContextDigest(raw: unknown): raw is string {
-  return typeof raw === "string" && /^[0-9a-f]{64}$/u.test(raw);
 }
 
 export type ChatQuestion = {

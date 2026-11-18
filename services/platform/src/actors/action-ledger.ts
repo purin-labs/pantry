@@ -37,11 +37,11 @@ import {
   parseStoredAuthorityPartition,
 } from "../authorization/access-grants/turn-authority";
 import type { SerializedFlowBinding } from "../policy";
-import { flowBindingMatchesIdentity, isSha256Digest } from "../policy";
+import { flowBindingMatchesIdentity } from "../policy";
 import { parseCommerceEntityPlaneEffect } from "../commerce/entity-plane/proposals";
 import { slackMayApproveAction } from "../commerce/action-model";
 import type { VariantBy } from "@seams/type-utils";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord, isSha256Hex } from "@seams/std";
 
 export type CanonicalActionDraft = {
   host: string;
@@ -1342,9 +1342,9 @@ function validSerializedFlowBinding(
     value.sessionId.length === 0 ||
     typeof value.turnId !== "string" ||
     value.turnId.length === 0 ||
-    !isSha256Digest(value.authorityPartitionDigest) ||
-    !isSha256Digest(value.informationFlowContextDigest) ||
-    !isSha256Digest(value.observationSetDigest) ||
+    !isSha256Hex(value.authorityPartitionDigest) ||
+    !isSha256Hex(value.informationFlowContextDigest) ||
+    !isSha256Hex(value.observationSetDigest) ||
     !isNonNegativeInteger(value.contextRevision)
   ) {
     return false;
@@ -1352,7 +1352,7 @@ function validSerializedFlowBinding(
   return (
     isRecord(value.flowLabel) &&
     Array.isArray(value.flowLabel.policies) &&
-    isSha256Digest(value.flowLabel.digest)
+    isSha256Hex(value.flowLabel.digest)
   );
 }
 
@@ -1405,7 +1405,7 @@ function validCustomConnectorActionAuthority(
     authority.connectorId.length > 0 &&
     Number.isSafeInteger(authority.definitionRevision) &&
     authority.definitionRevision > 0 &&
-    isSha256Digest(authority.definitionDigest) &&
+    isSha256Hex(authority.definitionDigest) &&
     Number.isSafeInteger(authority.bindingRevision) &&
     authority.bindingRevision > 0 &&
     Number.isSafeInteger(authority.credentialGeneration) &&
@@ -1415,8 +1415,8 @@ function validCustomConnectorActionAuthority(
       authority.effect === "external_record_update") &&
     validCustomConnectorRetryPolicy(authority.retryPolicy) &&
     authority.canonicalInputJson.length > 0 &&
-    isSha256Digest(authority.canonicalInputDigest) &&
-    isSha256Digest(authority.outputContractDigest) &&
+    isSha256Hex(authority.canonicalInputDigest) &&
+    isSha256Hex(authority.outputContractDigest) &&
     authority.providerEffectId.length > 0 &&
     authority.providerEffectId.length <= 256 &&
     validCustomConnectorResourceIdentity(authority.resourceIdentity)

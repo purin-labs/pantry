@@ -23,6 +23,7 @@ import {
   hasExactKeys,
   isNonEmptyString,
   isRecord,
+  isSha256Hex,
   nonNegativeIntegerOrNull,
   sha256Hex,
 } from "@seams/std";
@@ -515,7 +516,7 @@ function parseTurnIdentity(value: unknown): TurnIdentity | null {
 }
 
 function isSha256Digest(value: unknown): value is Sha256Digest {
-  return typeof value === "string" && /^[0-9a-f]{64}$/.test(value);
+  return isSha256Hex(value);
 }
 
 function isJsonValue(value: unknown): boolean {

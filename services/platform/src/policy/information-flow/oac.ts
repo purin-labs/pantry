@@ -1,7 +1,7 @@
 import { parseFlowReader as parseContextVisibility } from "./readers";
 import { parseCaseId } from "../../ids";
 import type { Result } from "../../result";
-import { digestCanonical, isSha256Digest } from "./digest";
+import { digestCanonical } from "./digest";
 import {
   canonicalFlowLabel,
   emptyFlowLabel,
@@ -23,6 +23,7 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
+  isSha256Hex,
 } from "@seams/std";
 
 export class ObservationEvidence {
@@ -91,13 +92,13 @@ export class ObservationEvidence {
     if (source === null) return invalidObservation("source");
     if (!isPositiveInteger(raw.sourceRevision))
       return invalidObservation("sourceRevision");
-    if (!isSha256Digest(raw.contentDigest))
+    if (!isSha256Hex(raw.contentDigest))
       return invalidObservation("contentDigest");
-    if (!isSha256Digest(raw.flowLabelDigest))
+    if (!isSha256Hex(raw.flowLabelDigest))
       return invalidObservation("flowLabelDigest");
     if (!isNonNegativeInteger(raw.observedAt))
       return invalidObservation("observedAt");
-    if (!isSha256Digest(raw.evidenceDigest))
+    if (!isSha256Hex(raw.evidenceDigest))
       return invalidObservation("evidenceDigest");
     const canonical = canonicalObservation({
       source,
@@ -181,7 +182,7 @@ export class InformationFlowContext {
     if (!isNonBlankString(input.organisationId))
       return invalidContext("organisationId");
     if (!isNonBlankString(input.sessionId)) return invalidContext("sessionId");
-    if (!isSha256Digest(input.authorityPartitionDigest)) {
+    if (!isSha256Hex(input.authorityPartitionDigest)) {
       return invalidContext("authorityPartitionDigest");
     }
     const workLabel = await emptyFlowLabel();
@@ -206,7 +207,7 @@ export class InformationFlowContext {
     if (!isNonBlankString(input.organisationId))
       return invalidContext("organisationId");
     if (!isNonBlankString(input.sessionId)) return invalidContext("sessionId");
-    if (!isSha256Digest(input.authorityPartitionDigest)) {
+    if (!isSha256Hex(input.authorityPartitionDigest)) {
       return invalidContext("authorityPartitionDigest");
     }
     if (!FlowLabel.is(input.workLabel)) return invalidContext("workLabel");
@@ -219,7 +220,7 @@ export class InformationFlowContext {
       canonicalDigests.length !== input.observationDigests.length ||
       canonicalDigests.some(
         (digest, index) =>
-          !isSha256Digest(digest) || digest !== input.observationDigests[index],
+          !isSha256Hex(digest) || digest !== input.observationDigests[index],
       )
     ) {
       return invalidContext("observationDigests");
@@ -254,18 +255,18 @@ export class InformationFlowContext {
       !isRecord(raw) ||
       !isNonBlankString(raw.organisationId) ||
       !isNonBlankString(raw.sessionId) ||
-      !isSha256Digest(raw.authorityPartitionDigest) ||
+      !isSha256Hex(raw.authorityPartitionDigest) ||
       !Array.isArray(raw.observationDigests) ||
       !isNonNegativeInteger(raw.revision) ||
-      !isSha256Digest(raw.observationSetDigest) ||
-      !isSha256Digest(raw.digest)
+      !isSha256Hex(raw.observationSetDigest) ||
+      !isSha256Hex(raw.digest)
     )
       return invalidContext("shape");
     const label = await FlowLabel.restore(raw.workLabel);
     if (!label.ok) return invalidContext("workLabel");
     const observationDigests: string[] = [];
     for (const digest of raw.observationDigests) {
-      if (!isSha256Digest(digest)) return invalidContext("observationDigests");
+      if (!isSha256Hex(digest)) return invalidContext("observationDigests");
       observationDigests.push(digest);
     }
     const canonicalDigests = [...new Set(observationDigests)].sort();
@@ -368,9 +369,9 @@ export class FlowBinding {
       !isNonBlankString(raw.organisationId) ||
       !isNonBlankString(raw.sessionId) ||
       !isNonBlankString(raw.turnId) ||
-      !isSha256Digest(raw.authorityPartitionDigest) ||
-      !isSha256Digest(raw.informationFlowContextDigest) ||
-      !isSha256Digest(raw.observationSetDigest) ||
+      !isSha256Hex(raw.authorityPartitionDigest) ||
+      !isSha256Hex(raw.informationFlowContextDigest) ||
+      !isSha256Hex(raw.observationSetDigest) ||
       !isNonNegativeInteger(raw.contextRevision)
     ) {
       return invalidBinding("shape");
@@ -594,7 +595,7 @@ function invalidObservationInput(
   if (parseFlowSource(input.source) === null) return "source";
   if (!Number.isSafeInteger(input.sourceRevision) || input.sourceRevision <= 0)
     return "sourceRevision";
-  if (!isSha256Digest(input.contentDigest)) return "contentDigest";
+  if (!isSha256Hex(input.contentDigest)) return "contentDigest";
   return Number.isSafeInteger(input.observedAt) && input.observedAt >= 0
     ? null
     : "observedAt";
@@ -606,7 +607,7 @@ export function parseFlowSource(value: unknown): FlowSource | null {
     case "case_context_collection_evidence":
       return isNonBlankString(value.organisationId) &&
         isNonBlankString(value.caseContextCollectionId) &&
-        isSha256Digest(value.dependencyDigest)
+        isSha256Hex(value.dependencyDigest)
         ? {
             kind: "case_context_collection_evidence",
             organisationId: value.organisationId.trim(),

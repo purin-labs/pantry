@@ -1,5 +1,5 @@
-import { isSha256Digest } from "../policy/information-flow/digest";
 import type { Result } from "../result";
+import { isSha256Hex } from "@seams/std";
 
 declare const customConnectorIdBrand: unique symbol;
 declare const customConnectorRevisionBrand: unique symbol;
@@ -99,7 +99,7 @@ export function parseCustomConnectorRevision(
 export function parseCustomConnectorDefinitionDigest(
   raw: unknown,
 ): Result<CustomConnectorDefinitionDigest, CustomConnectorIdentityParseError> {
-  if (!isSha256Digest(raw)) {
+  if (!isSha256Hex(raw)) {
     return invalidIdentity("definitionDigest");
   }
 
@@ -109,7 +109,7 @@ export function parseCustomConnectorDefinitionDigest(
 export function parseCustomConnectorAuthoringDigest(
   raw: unknown,
 ): Result<CustomConnectorAuthoringDigest, CustomConnectorIdentityParseError> {
-  if (!isSha256Digest(raw)) {
+  if (!isSha256Hex(raw)) {
     return invalidIdentity("authoringDigest");
   }
 

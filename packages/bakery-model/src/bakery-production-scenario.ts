@@ -214,8 +214,8 @@ export function parseProductionScenario(
     !text(value.name, 80) ||
     !text(value.note, 2000) ||
     !text(value.procedureId, 128) ||
-    !fingerprint(value.sourceFingerprint) ||
-    !fingerprint(value.definitionFingerprint) ||
+    !isSha256Hex(value.sourceFingerprint) ||
+    !isSha256Hex(value.definitionFingerprint) ||
     !isRecord(value.settings) ||
     (value.variant !== "normal" && value.variant !== "outage") ||
     !Array.isArray(value.assignments) ||
@@ -315,7 +315,7 @@ export function parseProductionScenario(
     if (
       cell === null ||
       cell.fixture !== "persistent-oven-rack/1" ||
-      !fingerprint(value.executionBundleId)
+      !isSha256Hex(value.executionBundleId)
     )
       return null;
     return Object.freeze<ProductionScenario>({
@@ -389,10 +389,6 @@ function compareAssignment(
   return left.batchId.localeCompare(right.batchId) || left.tray - right.tray;
 }
 
-function fingerprint(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{64}$/.test(value);
-}
-
 function text(value: unknown, length: number): value is string {
   return (
     typeof value === "string" &&
@@ -410,6 +406,7 @@ import {
   canonicalJson,
   hasExactKeys,
   isRecord,
+  isSha256Hex,
   isString,
   parseJsonOrNull,
 } from "@seams/std";

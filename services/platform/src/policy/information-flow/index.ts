@@ -14,7 +14,7 @@ export {
   acceptedByPersonFlowLabel,
 } from "./labels";
 export { decideAutomaticContextAdmission, decideContextAdmission } from "./pac";
-export { digestCanonical, isSha256Digest, serializeCanonical } from "./digest";
+export { digestCanonical, serializeCanonical } from "./digest";
 export {
   advanceInformationFlowContext,
   canonicalInformationFlowContext,

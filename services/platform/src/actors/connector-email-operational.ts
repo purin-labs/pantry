@@ -45,7 +45,7 @@ import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
 } from "../authorization/capability-catalogue";
-import { isNonNegativeInteger, sha256Hex } from "@seams/std";
+import { isNonNegativeInteger, isSha256Hex, sha256Hex } from "@seams/std";
 
 const OPERATIONAL_EMAIL_PROJECTION_BATCH_SIZE = 100;
 const OPERATIONAL_EMAIL_PROJECTION_RETRY_MS = 60_000;
@@ -1406,10 +1406,10 @@ function parseOperationalEmailProposalRow(
     integrationAccountId === null ||
     !integrationAccountId.ok ||
     target === null ||
-    !digest(row.targetDigest) ||
-    !digest(row.subjectDigest) ||
-    !digest(row.bodyDigest) ||
-    !digest(row.snapshotDigest) ||
+    !isSha256Hex(row.targetDigest) ||
+    !isSha256Hex(row.subjectDigest) ||
+    !isSha256Hex(row.bodyDigest) ||
+    !isSha256Hex(row.snapshotDigest) ||
     typeof row.policyVersion !== "number" ||
     !Number.isSafeInteger(row.policyVersion) ||
     row.policyVersion <= 0 ||
@@ -1418,7 +1418,7 @@ function parseOperationalEmailProposalRow(
     row.credentialGeneration <= 0 ||
     !isProposalState(row.state) ||
     (row.approvedSnapshotDigest !== null &&
-      !digest(row.approvedSnapshotDigest)) ||
+      !isSha256Hex(row.approvedSnapshotDigest)) ||
     (row.nonceB64 !== null && typeof row.nonceB64 !== "string") ||
     (row.ciphertextB64 !== null && typeof row.ciphertextB64 !== "string") ||
     (row.contentBytes !== null &&
@@ -1480,10 +1480,6 @@ function isProposalState(
     value === "superseded" ||
     value === "revoked"
   );
-}
-
-function digest(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
 }
 
 export function isDefinitiveGmailSendRejection(error: GmailApiError): boolean {

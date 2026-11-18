@@ -2,7 +2,6 @@ import type { CommerceSensitivity } from "@seams/contracts";
 import type { JsonRecord } from "../control/http";
 import {
   digestCanonical,
-  isSha256Digest,
   serializeCanonical,
 } from "../policy/information-flow/digest";
 import type { Result } from "../result";
@@ -11,7 +10,12 @@ import {
   type CustomConnectorDefinitionDigest,
 } from "./identity";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
-import { assertNever, isNonNegativeInteger, isRecord } from "@seams/std";
+import {
+  assertNever,
+  isNonNegativeInteger,
+  isRecord,
+  isSha256Hex,
+} from "@seams/std";
 import { isCommerceSensitivity } from "../commerce/sensitivity";
 
 export type JsonPrimitive = string | number | boolean | null;
@@ -456,7 +460,7 @@ function parseDocumentation(
     if (!keys.ok) return keys;
     const url = parseDocumentationUrl(item.url, `${field}.url`);
     if (!url.ok) return url;
-    if (!isSha256Digest(item.sha256)) {
+    if (!isSha256Hex(item.sha256)) {
       return invalid(`${field}.sha256`, "must be a lowercase SHA-256 digest");
     }
     if (urls.has(url.value)) {

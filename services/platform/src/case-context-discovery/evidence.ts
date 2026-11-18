@@ -1,12 +1,9 @@
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, isSha256Hex, parseJsonOrNull } from "@seams/std";
 import type { OrganisationId } from "../ids";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import {
-  digestCanonical,
-  isSha256Digest,
-} from "../policy/information-flow/digest";
+import { digestCanonical } from "../policy/information-flow/digest";
 import { parseFlowRecipient } from "../policy/information-flow/labels";
 import type { FlowRecipient } from "../policy/information-flow/types";
 import type { Result } from "../result";
@@ -302,9 +299,9 @@ export function parseCaseContextCollectionEffectAttempt(
     !identifier(raw.proposalId) ||
     !integerIn(raw.proposalVersion, 1, Number.MAX_SAFE_INTEGER) ||
     (raw.effect !== "draft" && raw.effect !== "send") ||
-    !isSha256Digest(raw.targetDigest) ||
-    !isSha256Digest(raw.contentDigest) ||
-    !isSha256Digest(raw.flowBindingDigest) ||
+    !isSha256Hex(raw.targetDigest) ||
+    !isSha256Hex(raw.contentDigest) ||
+    !isSha256Hex(raw.flowBindingDigest) ||
     !integerIn(raw.expiresAt, 1, Number.MAX_SAFE_INTEGER)
   )
     return null;
@@ -576,7 +573,7 @@ function parseFence(raw: unknown): CaseContextCollectionEffectFence | null {
   if (
     !isRecord(raw) ||
     !identifier(raw.attemptId) ||
-    !isSha256Digest(raw.requestDigest)
+    !isSha256Hex(raw.requestDigest)
   )
     return null;
   if (
@@ -676,8 +673,8 @@ export function parseCaseEvidenceDependency(
     !identifier(raw.caseContextCollectionId) ||
     !integerIn(raw.caseContextCollectionRevision, 1, Number.MAX_SAFE_INTEGER) ||
     !integerIn(raw.policyRevision, 1, Number.MAX_SAFE_INTEGER) ||
-    !isSha256Digest(raw.recipientDigest) ||
-    !isSha256Digest(raw.dependencyDigest) ||
+    !isSha256Hex(raw.recipientDigest) ||
+    !isSha256Hex(raw.dependencyDigest) ||
     !Array.isArray(raw.selections) ||
     raw.selections.length < 2 ||
     raw.selections.length > 21

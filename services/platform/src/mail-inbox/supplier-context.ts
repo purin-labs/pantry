@@ -14,7 +14,7 @@ import {
   REPLENISHMENT_QUEUE_LIST_ID,
   parseCommerceGraphQuery,
 } from "@seams/commerce-client";
-import { isRecord, isPositiveInteger, assertNever } from "@seams/std";
+import { assertNever, isPositiveInteger, isRecord, isSha256Hex } from "@seams/std";
 import type { Env } from "../env";
 import { parseOrganisationId, type OrganisationId } from "../ids";
 import { listAccessGrants } from "../data/access-grants";
@@ -49,7 +49,6 @@ import {
 } from "../policy";
 import {
   digestCanonical,
-  isSha256Digest,
 } from "../policy/information-flow/digest";
 import type { Result } from "../result";
 import type {
@@ -1008,7 +1007,7 @@ export function parseEmailCommerceEvidence(
     !isRecord(raw) ||
     Object.keys(raw).length !== 7 ||
     !isPositiveInteger(raw.merchantRevision) ||
-    !isSha256Digest(raw.labelDigest) ||
+    !isSha256Hex(raw.labelDigest) ||
     !text(raw.integrationAccountId) ||
     !text(raw.merchantId) ||
     !text(raw.grantId) ||

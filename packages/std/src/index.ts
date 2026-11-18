@@ -265,6 +265,17 @@ export function decodeBase64(value: string): Uint8Array | null {
 }
 
 /**
+ * Decodes URL-safe base64 without padding, or returns null when `value` is
+ * empty, holds a character outside the URL-safe alphabet (padding included),
+ * or is not base64.
+ */
+export function decodeBase64Url(value: string): Uint8Array | null {
+  if (!/^[A-Za-z0-9_-]+$/u.test(value)) return null;
+  const standard = value.replaceAll("-", "+").replaceAll("_", "/");
+  return decodeBase64(standard.padEnd(Math.ceil(standard.length / 4) * 4, "="));
+}
+
+/**
  * Decodes canonical, padded base64 of at most `maxBytes` bytes, or returns
  * null. Canonical means that re-encoding the bytes reproduces `value`, so the
  * whitespace and alternative spellings `atob` tolerates are rejected, and
@@ -302,6 +313,11 @@ export function parseJsonOrNull(text: string): unknown {
 }
 
 // Digests
+
+/** Whether `value` is a SHA-256 digest as 64 lowercase hex digits. */
+export function isSha256Hex(value: unknown): value is string {
+  return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
+}
 
 /** The SHA-256 digest of a UTF-8 string or of bytes, as lowercase hex. */
 export async function sha256Hex(

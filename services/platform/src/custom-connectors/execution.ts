@@ -25,7 +25,6 @@ import {
   type FlowBinding,
   type FlowLabel,
 } from "../policy/information-flow";
-import { isSha256Digest } from "../policy/information-flow/digest";
 import type { Result } from "../result";
 import {
   customConnectorValueMatchesSchema,
@@ -828,7 +827,7 @@ function parseCursorPayload(raw: unknown): CursorPayload | null {
     typeof raw.integrationAccountId !== "string" ||
     typeof raw.connectorId !== "string" ||
     !isSafeInteger(raw.definitionRevision) ||
-    !isSha256Digest(raw.definitionDigest) ||
+    !isSha256Hex(raw.definitionDigest) ||
     !isSafeInteger(raw.bindingRevision) ||
     !isSafeInteger(raw.credentialGeneration) ||
     typeof raw.operationId !== "string" ||
@@ -949,4 +948,4 @@ function invalidRead(field: string): Result<never, CustomConnectorReadError> {
 }
 import { basicApiKeyFromVault } from "./basic-authentication";
 import { projectReviewedResponse } from "./response-projection";
-import { encodeBase64Url, isRecord } from "@seams/std";
+import { encodeBase64Url, isRecord, isSha256Hex } from "@seams/std";

@@ -14,6 +14,7 @@ import {
 import {
   isNonEmptyString,
   isRecord,
+  isSha256Hex,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
 } from "@seams/std";
@@ -81,7 +82,7 @@ export function parseEmailReplyPreviewResponse(
     typeof proposal.subject !== "string" ||
     !isNonEmptyString(proposal.gmail_thread_id) ||
     typeof proposal.body !== "string" ||
-    !sha256Digest(proposal.snapshot_digest) ||
+    !isSha256Hex(proposal.snapshot_digest) ||
     expiresAt === null
   ) {
     throw new Error("The server returned invalid email reply content.");
@@ -173,8 +174,8 @@ export function parseEmailOperationalPreviewResponse(
       !isNonEmptyString(proposal.recipient_display_name)) ||
     typeof proposal.subject !== "string" ||
     typeof proposal.body !== "string" ||
-    !sha256Digest(proposal.target_digest) ||
-    !sha256Digest(proposal.snapshot_digest) ||
+    !isSha256Hex(proposal.target_digest) ||
+    !isSha256Hex(proposal.snapshot_digest) ||
     expiresAt === null
   ) {
     throw new Error("The server returned invalid operational email content.");
@@ -252,7 +253,7 @@ function parseEmailOperationalQueueItem(
     !isNonEmptyString(raw.case_id) ||
     version === null ||
     target === null ||
-    !sha256Digest(backing.snapshot_digest) ||
+    !isSha256Hex(backing.snapshot_digest) ||
     !isNonEmptyString(raw.lifecycle_kind) ||
     (backing.indeterminate_rfc_message_id !== null &&
       !isNonEmptyString(backing.indeterminate_rfc_message_id)) ||
@@ -306,8 +307,4 @@ function parseEmailOperationalTargetView(
     };
   }
   return null;
-}
-
-function sha256Digest(raw: unknown): raw is string {
-  return typeof raw === "string" && /^[0-9a-f]{64}$/u.test(raw);
 }

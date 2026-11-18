@@ -44,9 +44,14 @@ import {
   FlowLabel,
 } from "../../policy";
 import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
-import { assertNever, isNonBlankString, isRecord, sha256Hex } from "@seams/std";
 import {
-  digest,
+  assertNever,
+  isNonBlankString,
+  isRecord,
+  isSha256Hex,
+  sha256Hex,
+} from "@seams/std";
+import {
   equal,
   invalid,
   isPresent,
@@ -407,7 +412,7 @@ export async function readCaseContextTail(
   if (
     !organisationId.ok ||
     !caseId.ok ||
-    !digest(input.authorityPartitionDigest) ||
+    !isSha256Hex(input.authorityPartitionDigest) ||
     !Number.isSafeInteger(input.limit) ||
     input.limit < 1 ||
     input.limit > 100
@@ -513,7 +518,7 @@ function parseCaseContextReplayAuthority(
     }
     return raw.kind === "authority_partition" &&
       Object.keys(raw).length === 2 &&
-      digest(raw.authorityPartitionDigest)
+      isSha256Hex(raw.authorityPartitionDigest)
       ? Object.freeze({
           kind: "authority_partition",
           authorityPartitionDigest: raw.authorityPartitionDigest,

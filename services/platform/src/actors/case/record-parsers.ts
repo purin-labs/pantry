@@ -714,10 +714,6 @@ export function integer(value: unknown): value is number {
   return Number.isSafeInteger(value) && Number(value) >= 0;
 }
 
-export function digest(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
-}
-
 export function isOpen(value: string): boolean {
   return parseLifecycle(value)?.kind === "open";
 }

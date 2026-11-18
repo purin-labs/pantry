@@ -2,9 +2,9 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
+  isSha256Hex,
   parseJson,
 } from "@seams/std";
-import { isSha256Digest } from "../policy/information-flow/digest";
 import {
   MAX_REPLY_CITATIONS,
   type EmailChatContext,
@@ -433,7 +433,7 @@ function parseSpans(raw: unknown): readonly EmailReplySpan[] {
       !isNonNegativeInteger(span.start) ||
       !isPositiveInteger(span.end) ||
       span.end <= span.start ||
-      !isSha256Digest(span.digest) ||
+      !isSha256Hex(span.digest) ||
       !isNonNegativeInteger(span.fingerprint) ||
       span.fingerprint > 0xffff_ffff
     )

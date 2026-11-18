@@ -8,6 +8,7 @@ import {
   type OrganisationId,
 } from "../ids";
 import type { Result } from "../result";
+import { isSha256Hex } from "@seams/std";
 
 export type OperationalEmailTarget =
   | Readonly<{
@@ -194,10 +195,10 @@ export async function projectEmailOperationalProposal(input: {
   readonly now: number;
 }): Promise<Result<null, EmailOperationalProposalProjectionError>> {
   if (
-    !isDigest(input.targetDigest) ||
-    !isDigest(input.subjectDigest) ||
-    !isDigest(input.bodyDigest) ||
-    !isDigest(input.snapshotDigest) ||
+    !isSha256Hex(input.targetDigest) ||
+    !isSha256Hex(input.subjectDigest) ||
+    !isSha256Hex(input.bodyDigest) ||
+    !isSha256Hex(input.snapshotDigest) ||
     input.currentVersion <= 0 ||
     input.now < input.createdAt ||
     !parseEmailProposalTarget(input.target)
@@ -826,10 +827,10 @@ function parseOperationalProposalProjectionRow(
     typeof row.currentVersion !== "number" ||
     !Number.isSafeInteger(row.currentVersion) ||
     row.currentVersion <= 0 ||
-    !isDigest(row.targetDigest) ||
-    !isDigest(row.subjectDigest) ||
-    !isDigest(row.bodyDigest) ||
-    !isDigest(row.snapshotDigest) ||
+    !isSha256Hex(row.targetDigest) ||
+    !isSha256Hex(row.subjectDigest) ||
+    !isSha256Hex(row.bodyDigest) ||
+    !isSha256Hex(row.snapshotDigest) ||
     !isOperationalProposalProjectionLifecycle(row.lifecycleKind) ||
     (row.providerMessageId !== null &&
       typeof row.providerMessageId !== "string") ||
@@ -887,10 +888,6 @@ function isOperationalProposalProjectionLifecycle(
     value === "operator_attested_present" ||
     value === "operator_attested_absent"
   );
-}
-
-function isDigest(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
 }
 
 function isPresent<T>(value: T | null): value is T {

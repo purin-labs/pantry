@@ -20,7 +20,6 @@ import {
 } from "../ids";
 import {
   digestCanonical,
-  isSha256Digest,
   serializeCanonical,
 } from "../policy/information-flow/digest";
 import type { Result } from "../result";
@@ -1462,7 +1461,7 @@ function parseVerification(
   if (
     typeof row.verifiedProviderAccountId !== "string" ||
     typeof row.verifiedDisplayName !== "string" ||
-    !isSha256Digest(row.resultSchemaDigest)
+    !isSha256Hex(row.resultSchemaDigest)
   ) {
     return setupCorrupt("verification");
   }
@@ -1670,4 +1669,4 @@ import {
   basicApiKeyVaultSecret,
 } from "./basic-authentication";
 import type { VariantBy } from "@seams/type-utils";
-import { isPositiveInteger } from "@seams/std";
+import { isPositiveInteger, isSha256Hex } from "@seams/std";

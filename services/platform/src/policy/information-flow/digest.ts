@@ -21,10 +21,6 @@ export function serializeCanonical(value: unknown): string {
   return serialized;
 }
 
-export function isSha256Digest(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
-}
-
 function hexByte(value: number): string {
   return value.toString(16).padStart(2, "0");
 }

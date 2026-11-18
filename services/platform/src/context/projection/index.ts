@@ -6,11 +6,7 @@ import type {
   UserMessage,
   FileContextProvider,
 } from "@seams/contracts";
-import {
-  FlowLabel,
-  isSha256Digest,
-  type SerializedFlowLabel,
-} from "../../policy";
+import { FlowLabel, type SerializedFlowLabel } from "../../policy";
 import {
   encodeContextVisibility,
   parseContextVisibility as parseStoredContextVisibility,
@@ -22,6 +18,7 @@ import type { VariantBy } from "@seams/type-utils";
 import {
   isNonBlankString,
   isRecord,
+  isSha256Hex,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
   sha256Hex,
@@ -981,7 +978,7 @@ function parseCaseProjectionProvenance(
   }
   return value.replayAuthority.kind === "authority_partition" &&
     Object.keys(value.replayAuthority).length === 2 &&
-    isSha256Digest(value.replayAuthority.authorityPartitionDigest)
+    isSha256Hex(value.replayAuthority.authorityPartitionDigest)
     ? {
         kind: "authority_partition",
         authorityPartitionDigest:

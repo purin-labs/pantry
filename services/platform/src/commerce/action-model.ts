@@ -51,7 +51,6 @@ import {
   parseMenuPriceActionPath,
   type ChangeMenuPriceAction,
 } from "./menu-price-action";
-import { isSha256Digest } from "../policy";
 import { hashOpaqueSecret } from "../data/control-plane";
 import type { UnversionedControlMutationBoundary } from "../data/control-mutation";
 import {
@@ -64,6 +63,7 @@ import {
   hasExactKeys,
   isPositiveInteger,
   isRecord,
+  isSha256Hex,
   positiveIntegerOrNull,
   sha256Hex,
 } from "@seams/std";
@@ -369,8 +369,8 @@ export function parseCommerceProviderReceipt(
     !Number.isSafeInteger(raw.revision) ||
     raw.revision < 1 ||
     typeof raw.observedAt !== "string" ||
-    !isSha256Digest(raw.flowBindingDigest) ||
-    !isSha256Digest(raw.decisionDigest)
+    !isSha256Hex(raw.flowBindingDigest) ||
+    !isSha256Hex(raw.decisionDigest)
   ) {
     return { ok: false, error: { code: "commerce_provider_receipt_invalid" } };
   }

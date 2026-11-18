@@ -1,4 +1,9 @@
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
+import {
+  hasExactKeys,
+  isNonNegativeInteger,
+  isRecord,
+  isSha256Hex,
+} from "@seams/std";
 import type { StrictUnion } from "@seams/type-utils";
 
 /** Every command names one live continuation and its reviewed control state. */
@@ -67,9 +72,6 @@ function time(raw: unknown): raw is number {
     isNonNegativeInteger(raw) && Number.isSafeInteger(raw) && raw % 2000 === 0
   );
 }
-function digest(raw: unknown): raw is string {
-  return typeof raw === "string" && /^[0-9a-f]{64}$/u.test(raw);
-}
 function checkpointHex(raw: unknown): raw is string {
   return typeof raw === "string" && /^[0-9a-f]{16,64}$/u.test(raw);
 }
@@ -88,7 +90,7 @@ export function parseBakeryProductionTarget(
     !identifier(raw.runId) ||
     !identifier(raw.executionId) ||
     !identifier(raw.hostSession) ||
-    !digest(raw.bundleId) ||
+    !isSha256Hex(raw.bundleId) ||
     !isNonNegativeInteger(raw.controlRevision)
   )
     return null;
@@ -175,7 +177,7 @@ export function parseBakeryProductionReview(
   if (
     !isRecord(raw) ||
     !hasExactKeys(raw, ["digest", "target", "control", "expiresAt"]) ||
-    !digest(raw.digest) ||
+    !isSha256Hex(raw.digest) ||
     !isNonNegativeInteger(raw.expiresAt)
   )
     return null;
@@ -272,9 +274,9 @@ export function parseBakeryProductionSnapshotSurface(
       "events",
     ]) ||
     raw.kind !== "persistent-snapshot" ||
-    !digest(raw.snapshotId) ||
+    !isSha256Hex(raw.snapshotId) ||
     !identifier(raw.runId) ||
-    !digest(raw.bundleId) ||
+    !isSha256Hex(raw.bundleId) ||
     !time(raw.time) ||
     !isNonNegativeInteger(raw.events)
   )
