@@ -224,7 +224,7 @@ legacy removal.
 | Warm actor slots switch | `816a0a3` | 7 | 5 | `SATYR_WARM_ACTOR_SLOTS`; every Connector keeps its warm slots. |
 | File-native product folders | `4ebf423` | 56 (17 deleted) | 9,138 | The tool, its capability, `file_native.rs` and its binary, the executor's JSON product path, the workspace execution coordinator (2,706 lines), the product changeset revision kind and the Plan 50 "workspace" group. |
 | Old-row adapters | `aff2272` | 23 | 556 | Chat rows from before the timeline, the old Gmail product mapping, the costs plan runtime ALTER, the pre-Plan 89 held output id, and the SurfaceActor and ThreadActor relics. |
-| Unused exports | `2672a7d` | 877 | 2,183 | `export` removed from 3,539 values and types that only their own file used; declarations that no file used are deleted. |
+| Unused exports | `23d1f2f` | 877 | 2,183 | `export` removed from 3,539 values and types that only their own file used; declarations that no file used are deleted. |
 
 **Proof.** Each commit passed the platform, test and E2E type checks, the
 lints, the unit suites and the E2E files near its change. After all of them,
