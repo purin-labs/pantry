@@ -15,7 +15,7 @@ import {
 } from "./costs-bom-inline";
 import { renderSupplyLotCostCell } from "./costs-lots-drawer";
 import {
-   supplyDraftFromItem,
+  supplyDraftFromItem,
   type ProjectedCostsSheet,
   type SupplyRowDraft,
 } from "./costs-sheet-draft";
@@ -30,6 +30,8 @@ import {
   type PresenceIndex,
 } from "./costs-sheet-presence";
 import { SupplyBadge } from "./costs-ui";
+
+type SupplyNumberField = Exclude<keyof SupplyRowDraft, "packUnit">;
 
 type SheetFocusedCell = Readonly<{
   cellKey: string;
@@ -87,6 +89,59 @@ export function CostsSuppliesSheet(
   const draftFor = (item: SupplyCostItem): SupplyRowDraft =>
     projected.supplyEdits[item.id] ?? supplyDraftFromItem(item, currency);
 
+  /** One number cell of a supply row, with its peers and an optional prefix. */
+  const numberCell = (
+    item: SupplyCostItem,
+    rowIndex: number,
+    field: SupplyNumberField,
+    cell: Readonly<{
+      column: string;
+      label: string;
+      min: number;
+      step: number | "any";
+      placeholder?: string;
+      prefix?: React.ReactNode;
+    }>,
+  ): React.ReactNode => {
+    const value = draftFor(item)[field];
+    const key = supplyFieldCellKey(item.id, field);
+    const peers = presence.peersByCell.get(key);
+    return (
+      <div
+        className={`costs-cell-box${peers?.length ? " has-peer" : ""}`}
+        style={peerCellStyle(peers)}
+        onMouseDown={handleCellBoxMouseDown}
+      >
+        <CellPeerOutline peers={peers} below={rowIndex === 0} />
+        {cell.prefix}
+        <input
+          type="number"
+          className="costs-cell-input"
+          min={cell.min}
+          step={cell.step}
+          placeholder={cell.placeholder}
+          disabled={!canEdit}
+          data-sheet-row={rowIndex}
+          data-sheet-col={cell.column}
+          aria-label={`${item.name} ${cell.label}`}
+          value={cellValue(focusedCell, key, value)}
+          onFocus={(e) => props.onFocusCell(key, value, e.currentTarget)}
+          onBlur={() => props.onBlurCell(key)}
+          onChange={(event) => {
+            const raw = event.currentTarget.value;
+            props.onUpdateSupplyField(item, currency, key, raw, {
+              [field]: raw,
+            });
+          }}
+          onKeyDown={(event) =>
+            handleSheetKeyDown(event, rowIndex, cell.column)
+          }
+        />
+      </div>
+    );
+  };
+  const priceStep = digits === 0 ? 10 : "any";
+
   const columns: readonly CrmColumn<SupplyCostItem>[] = [
     {
       id: "supply",
@@ -123,46 +178,16 @@ export function CostsSuppliesSheet(
       cellProps: (item) => ({
         cellKey: supplyFieldCellKey(item.id, "packQuantity"),
       }),
-      render: (item, rowIndex) => {
-        const draft = draftFor(item);
-        const key = supplyFieldCellKey(item.id, "packQuantity");
-        const peers = presence.peersByCell.get(key);
-        const rowDirty = dirtyInfo.dirtySupplies.has(item.id);
-        return (
-          <div
-            className={`costs-cell-box${peers?.length ? " has-peer" : ""}`}
-            style={peerCellStyle(peers)}
-            onMouseDown={handleCellBoxMouseDown}
-          >
-            <CellPeerOutline peers={peers} below={rowIndex === 0} />
-            {rowDirty && <span className="costs-dirty-dot" aria-hidden="true" />}
-            <input
-              type="number"
-              className="costs-cell-input"
-              min={0.001}
-              step="any"
-              disabled={!canEdit}
-              data-sheet-row={rowIndex}
-              data-sheet-col="pack_qty"
-              aria-label={`${item.name} pack quantity`}
-              value={cellValue(focusedCell, key, draft.packQuantity)}
-              onFocus={(e) =>
-                props.onFocusCell(key, draft.packQuantity, e.currentTarget)
-              }
-              onBlur={() => props.onBlurCell(key)}
-              onChange={(event) => {
-                const raw = event.currentTarget.value;
-                props.onUpdateSupplyField(item, currency, key, raw, {
-                  packQuantity: raw,
-                });
-              }}
-              onKeyDown={(event) =>
-                handleSheetKeyDown(event, rowIndex, "pack_qty")
-              }
-            />
-          </div>
-        );
-      },
+      render: (item, rowIndex) =>
+        numberCell(item, rowIndex, "packQuantity", {
+          column: "pack_qty",
+          label: "pack quantity",
+          min: 0.001,
+          step: "any",
+          prefix: dirtyInfo.dirtySupplies.has(item.id) && (
+            <span className="costs-dirty-dot" aria-hidden="true" />
+          ),
+        }),
     },
     {
       id: "packUnit",
@@ -194,7 +219,9 @@ export function CostsSuppliesSheet(
               disabled={!canEdit}
               value={draft.packUnit}
               onValueChange={(raw) => {
-                if (raw === null) return;
+                if (raw === null) {
+                  return;
+                }
                 props.onUpdateSupplyField(item, currency, key, raw, {
                   packUnit: raw as CostUnit,
                 });
@@ -210,7 +237,9 @@ export function CostsSuppliesSheet(
                 onBlur={() => props.onBlurCell(key)}
                 onKeyDown={(event) => {
                   handleSheetKeyDown(event, rowIndex, "pack_unit");
-                  if (event.defaultPrevented) event.preventBaseUIHandler();
+                  if (event.defaultPrevented) {
+                    event.preventBaseUIHandler();
+                  }
                 }}
               >
                 <Select.Value />
@@ -241,45 +270,14 @@ export function CostsSuppliesSheet(
       cellProps: (item) => ({
         cellKey: supplyFieldCellKey(item.id, "packPriceMajor"),
       }),
-      render: (item, rowIndex) => {
-        const draft = draftFor(item);
-        const key = supplyFieldCellKey(item.id, "packPriceMajor");
-        const peers = presence.peersByCell.get(key);
-        return (
-          <div
-            className={`costs-cell-box${peers?.length ? " has-peer" : ""}`}
-            style={peerCellStyle(peers)}
-            onMouseDown={handleCellBoxMouseDown}
-          >
-            <CellPeerOutline peers={peers} below={rowIndex === 0} />
-            <span className="costs-cell-affix">{sym}</span>
-            <input
-              type="number"
-              className="costs-cell-input"
-              min={0}
-              step={digits === 0 ? 10 : "any"}
-              disabled={!canEdit}
-              data-sheet-row={rowIndex}
-              data-sheet-col="pack_price"
-              aria-label={`${item.name} pack price`}
-              value={cellValue(focusedCell, key, draft.packPriceMajor)}
-              onFocus={(e) =>
-                props.onFocusCell(key, draft.packPriceMajor, e.currentTarget)
-              }
-              onBlur={() => props.onBlurCell(key)}
-              onChange={(event) => {
-                const raw = event.currentTarget.value;
-                props.onUpdateSupplyField(item, currency, key, raw, {
-                  packPriceMajor: raw,
-                });
-              }}
-              onKeyDown={(event) =>
-                handleSheetKeyDown(event, rowIndex, "pack_price")
-              }
-            />
-          </div>
-        );
-      },
+      render: (item, rowIndex) =>
+        numberCell(item, rowIndex, "packPriceMajor", {
+          column: "pack_price",
+          label: "pack price",
+          min: 0,
+          step: priceStep,
+          prefix: <span className="costs-cell-affix">{sym}</span>,
+        }),
     },
     {
       id: "bulkMin",
@@ -295,45 +293,14 @@ export function CostsSuppliesSheet(
       cellProps: (item) => ({
         cellKey: supplyFieldCellKey(item.id, "bulkMin7dQuantity"),
       }),
-      render: (item, rowIndex) => {
-        const draft = draftFor(item);
-        const key = supplyFieldCellKey(item.id, "bulkMin7dQuantity");
-        const peers = presence.peersByCell.get(key);
-        return (
-          <div
-            className={`costs-cell-box${peers?.length ? " has-peer" : ""}`}
-            style={peerCellStyle(peers)}
-            onMouseDown={handleCellBoxMouseDown}
-          >
-            <CellPeerOutline peers={peers} below={rowIndex === 0} />
-            <input
-              type="number"
-              className="costs-cell-input"
-              min={0}
-              step="any"
-              placeholder="—"
-              disabled={!canEdit}
-              data-sheet-row={rowIndex}
-              data-sheet-col="bulk_min"
-              aria-label={`${item.name} 7-day bulk minimum`}
-              value={cellValue(focusedCell, key, draft.bulkMin7dQuantity)}
-              onFocus={(e) =>
-                props.onFocusCell(key, draft.bulkMin7dQuantity, e.currentTarget)
-              }
-              onBlur={() => props.onBlurCell(key)}
-              onChange={(event) => {
-                const raw = event.currentTarget.value;
-                props.onUpdateSupplyField(item, currency, key, raw, {
-                  bulkMin7dQuantity: raw,
-                });
-              }}
-              onKeyDown={(event) =>
-                handleSheetKeyDown(event, rowIndex, "bulk_min")
-              }
-            />
-          </div>
-        );
-      },
+      render: (item, rowIndex) =>
+        numberCell(item, rowIndex, "bulkMin7dQuantity", {
+          column: "bulk_min",
+          label: "7-day bulk minimum",
+          min: 0,
+          step: "any",
+          placeholder: "—",
+        }),
     },
     {
       id: "bulkQty",
@@ -349,45 +316,14 @@ export function CostsSuppliesSheet(
       cellProps: (item) => ({
         cellKey: supplyFieldCellKey(item.id, "bulkPackQuantity"),
       }),
-      render: (item, rowIndex) => {
-        const draft = draftFor(item);
-        const key = supplyFieldCellKey(item.id, "bulkPackQuantity");
-        const peers = presence.peersByCell.get(key);
-        return (
-          <div
-            className={`costs-cell-box${peers?.length ? " has-peer" : ""}`}
-            style={peerCellStyle(peers)}
-            onMouseDown={handleCellBoxMouseDown}
-          >
-            <CellPeerOutline peers={peers} below={rowIndex === 0} />
-            <input
-              type="number"
-              className="costs-cell-input"
-              min={0}
-              step="any"
-              placeholder="—"
-              disabled={!canEdit}
-              data-sheet-row={rowIndex}
-              data-sheet-col="bulk_qty"
-              aria-label={`${item.name} bulk pack quantity`}
-              value={cellValue(focusedCell, key, draft.bulkPackQuantity)}
-              onFocus={(e) =>
-                props.onFocusCell(key, draft.bulkPackQuantity, e.currentTarget)
-              }
-              onBlur={() => props.onBlurCell(key)}
-              onChange={(event) => {
-                const raw = event.currentTarget.value;
-                props.onUpdateSupplyField(item, currency, key, raw, {
-                  bulkPackQuantity: raw,
-                });
-              }}
-              onKeyDown={(event) =>
-                handleSheetKeyDown(event, rowIndex, "bulk_qty")
-              }
-            />
-          </div>
-        );
-      },
+      render: (item, rowIndex) =>
+        numberCell(item, rowIndex, "bulkPackQuantity", {
+          column: "bulk_qty",
+          label: "bulk pack quantity",
+          min: 0,
+          step: "any",
+          placeholder: "—",
+        }),
     },
     {
       id: "bulkPrice",
@@ -404,52 +340,17 @@ export function CostsSuppliesSheet(
       cellProps: (item) => ({
         cellKey: supplyFieldCellKey(item.id, "bulkPackPriceMajor"),
       }),
-      render: (item, rowIndex) => {
-        const draft = draftFor(item);
-        const key = supplyFieldCellKey(item.id, "bulkPackPriceMajor");
-        const peers = presence.peersByCell.get(key);
-        return (
-          <div
-            className={`costs-cell-box${peers?.length ? " has-peer" : ""}`}
-            style={peerCellStyle(peers)}
-            onMouseDown={handleCellBoxMouseDown}
-          >
-            <CellPeerOutline peers={peers} below={rowIndex === 0} />
-            {draft.bulkPackPriceMajor.length > 0 && (
-              <span className="costs-cell-affix">{sym}</span>
-            )}
-            <input
-              type="number"
-              className="costs-cell-input"
-              min={0}
-              step={digits === 0 ? 10 : "any"}
-              placeholder="—"
-              disabled={!canEdit}
-              data-sheet-row={rowIndex}
-              data-sheet-col="bulk_price"
-              aria-label={`${item.name} bulk pack price`}
-              value={cellValue(focusedCell, key, draft.bulkPackPriceMajor)}
-              onFocus={(e) =>
-                props.onFocusCell(
-                  key,
-                  draft.bulkPackPriceMajor,
-                  e.currentTarget,
-                )
-              }
-              onBlur={() => props.onBlurCell(key)}
-              onChange={(event) => {
-                const raw = event.currentTarget.value;
-                props.onUpdateSupplyField(item, currency, key, raw, {
-                  bulkPackPriceMajor: raw,
-                });
-              }}
-              onKeyDown={(event) =>
-                handleSheetKeyDown(event, rowIndex, "bulk_price")
-              }
-            />
-          </div>
-        );
-      },
+      render: (item, rowIndex) =>
+        numberCell(item, rowIndex, "bulkPackPriceMajor", {
+          column: "bulk_price",
+          label: "bulk pack price",
+          min: 0,
+          step: priceStep,
+          placeholder: "—",
+          prefix: draftFor(item).bulkPackPriceMajor.length > 0 && (
+            <span className="costs-cell-affix">{sym}</span>
+          ),
+        }),
     },
     {
       id: "usage7d",
@@ -491,8 +392,7 @@ export function CostsSuppliesSheet(
       align: "start",
       width: 132,
       minWidth: 108,
-      value: (item) =>
-        supplyStockCoverageSortValue(usageByItemId.get(item.id)),
+      value: (item) => supplyStockCoverageSortValue(usageByItemId.get(item.id)),
       cellProps: (item) => ({
         cellKey: `supply:${item.id}:stockCoverage`,
       }),
@@ -537,11 +437,11 @@ export function CostsSuppliesSheet(
         const usage = usageByItemId.get(item.id);
         return projected.assumptions.lotCostBasis === "weighted_lot"
           ? (usage?.weightedEquivalentPackPriceMinor ??
-            usage?.fifoEquivalentPackPriceMinor ??
-            null)
+              usage?.fifoEquivalentPackPriceMinor ??
+              null)
           : (usage?.fifoEquivalentPackPriceMinor ??
-            usage?.weightedEquivalentPackPriceMinor ??
-            null);
+              usage?.weightedEquivalentPackPriceMinor ??
+              null);
       },
       format: fmtMoney,
       cellProps: (item) => ({
@@ -554,8 +454,7 @@ export function CostsSuppliesSheet(
           lotCostBasis: projected.assumptions.lotCostBasis,
           currency,
           rowIndex,
-          onKeyDown: (event) =>
-            handleSheetKeyDown(event, rowIndex, "lot_cost"),
+          onKeyDown: (event) => handleSheetKeyDown(event, rowIndex, "lot_cost"),
           onOpenLots: props.onInspectSupplyLots,
         }),
     },
@@ -567,9 +466,15 @@ export function CostsSuppliesSheet(
       minWidth: 84,
       value: (item) => {
         const usage = usageByItemId.get(item.id);
-        if (usage?.effectiveCostPerBaseUnitMinor == null) return "Unpriced";
-        if (usage.costSource === "fifo_lot") return "FIFO lot";
-        if (usage.costSource === "weighted_lot") return "Weighted lot";
+        if (usage?.effectiveCostPerBaseUnitMinor == null) {
+          return "Unpriced";
+        }
+        if (usage.costSource === "fifo_lot") {
+          return "FIFO lot";
+        }
+        if (usage.costSource === "weighted_lot") {
+          return "Weighted lot";
+        }
         return usage.bulkUnlocked ? "Bulk tier" : "Standard";
       },
       cellProps: (item) => ({
@@ -666,7 +571,9 @@ function cellValue(
 }
 
 function formatSupplyCategory(section: string): string {
-  if (section.length === 0) return "General";
+  if (section.length === 0) {
+    return "General";
+  }
   const spaced = section.replace(/_/gu, " ");
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }

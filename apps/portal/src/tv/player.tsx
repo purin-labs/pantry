@@ -14,6 +14,8 @@ import {
   type MenuScreenPairing,
   type MenuScreenPickup,
 } from "@seams/control-api";
+import { backoffDelay } from "@seams/std";
+import { webSocketUrl } from "../features/collaboration/document-client";
 import { ScaledBoard } from "../features/menu-boards/board-view";
 
 /**
@@ -73,7 +75,7 @@ export function TvPlayer(): React.ReactNode {
       return <PairingScreen pairing={state.pairing} failure={state.failure} />;
     case "playing": {
       const release = state.feed?.release ?? null;
-      if (state.feed === null || release === null)
+      if (state.feed === null || release === null) {
         return (
           <div className="tv-message">
             <h1>{state.feed?.screen.name ?? "Paired"}</h1>
@@ -83,6 +85,7 @@ export function TvPlayer(): React.ReactNode {
             </p>
           </div>
         );
+      }
       return (
         <ScaledBoard
           content={release}
@@ -91,7 +94,8 @@ export function TvPlayer(): React.ReactNode {
             // A pickup board shows no menu facts, so only its codes count.
             verified:
               state.verified &&
-              (state.feed.facts !== null || release.elements.some(isPickupCodes)),
+              (state.feed.facts !== null ||
+                release.elements.some(isPickupCodes)),
             pickup: state.pickup,
           }}
           fill
@@ -160,8 +164,11 @@ class Player {
 
   start(): void {
     window.addEventListener("online", this.#online);
-    if (this.#stored.token === null) void this.#pair();
-    else this.#play();
+    if (this.#stored.token === null) {
+      void this.#pair();
+    } else {
+      this.#play();
+    }
   }
 
   stop(): void {
@@ -172,11 +179,15 @@ class Player {
   }
 
   readonly #online = (): void => {
-    if (this.#stored.token !== null) void this.#read();
+    if (this.#stored.token !== null) {
+      void this.#read();
+    }
   };
 
   async #pair(): Promise<void> {
-    if (this.#stopped) return;
+    if (this.#stopped) {
+      return;
+    }
     const kept = this.#stored.pairing;
     let pairing =
       kept !== null && kept.expiresAt > Date.now() + 15_000 ? kept : null;
@@ -237,12 +248,16 @@ class Player {
 
   async #read(): Promise<void> {
     const token = this.#stored.token;
-    if (this.#stopped || token === null) return;
+    if (this.#stopped || token === null) {
+      return;
+    }
     const response = await fetch("/v1/screens/feed", {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     }).catch(() => null);
-    if (response?.status === 401) return this.#unpaired();
+    if (response?.status === 401) {
+      return this.#unpaired();
+    }
     const feed =
       response?.ok === true
         ? parseMenuScreenFeed(await response.json().catch(() => null))
@@ -265,7 +280,9 @@ class Player {
     if (feed.release?.elements.some(isPickupCodes) === true) {
       const pickup = await this.#readPickup(token);
       this.#verified = pickup !== null;
-      if (pickup !== null) this.#pickup = pickup;
+      if (pickup !== null) {
+        this.#pickup = pickup;
+      }
     }
     this.#notify({
       kind: "playing",
@@ -287,12 +304,15 @@ class Player {
 
   #connect(): void {
     const token = this.#stored.token;
-    if (this.#stopped || token === null) return;
-    const url = new URL("/v1/screens/socket", window.location.href);
-    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    if (this.#stopped || token === null) {
+      return;
+    }
     let socket: WebSocket;
     try {
-      socket = new WebSocket(url, [MENU_SCREEN_SOCKET_PROTOCOL, token]);
+      socket = new WebSocket(webSocketUrl("/v1/screens/socket"), [
+        MENU_SCREEN_SOCKET_PROTOCOL,
+        token,
+      ]);
     } catch {
       this.#reconnect();
       return;
@@ -301,29 +321,38 @@ class Player {
     socket.addEventListener("open", () => {
       this.#attempts = 0;
       this.#ping = setInterval(() => {
-        if (socket.readyState === WebSocket.OPEN)
+        if (socket.readyState === WebSocket.OPEN) {
           socket.send(COLLABORATION_PING);
+        }
       }, COLLABORATION_PING_INTERVAL_MS);
       // A signal may have come while the socket was closed.
       void this.#read();
     });
     socket.addEventListener("message", (event) => {
-      if (parseMenuScreenSignal(event.data)) void this.#read();
+      if (parseMenuScreenSignal(event.data)) {
+        void this.#read();
+      }
     });
     socket.addEventListener("close", (event) => {
-      if (this.#socket !== socket) return;
+      if (this.#socket !== socket) {
+        return;
+      }
       this.#closeSocket();
-      if (event.code === 4403) return this.#unpaired();
+      if (event.code === 4403) {
+        return this.#unpaired();
+      }
       this.#reconnect();
     });
   }
 
   #reconnect(): void {
-    if (this.#stopped) return;
+    if (this.#stopped) {
+      return;
+    }
     this.#attempts = Math.min(this.#attempts + 1, 5);
     this.#later(
       this.#connect.bind(this),
-      Math.min(1_000 * 2 ** this.#attempts, 30_000),
+      backoffDelay(this.#attempts, 1_000, 30_000),
     );
     void this.#read();
   }
@@ -336,23 +365,35 @@ class Player {
   }
 
   #closeSocket(): void {
-    if (this.#ping !== null) clearInterval(this.#ping);
+    if (this.#ping !== null) {
+      clearInterval(this.#ping);
+    }
     this.#ping = null;
     const socket = this.#socket;
     this.#socket = null;
-    if (socket !== null && socket.readyState <= WebSocket.OPEN) socket.close();
+    if (socket !== null && socket.readyState <= WebSocket.OPEN) {
+      socket.close();
+    }
   }
 
   #clearTimers(): void {
-    if (this.#timer !== null) clearTimeout(this.#timer);
-    if (this.#reader !== null) clearInterval(this.#reader);
+    if (this.#timer !== null) {
+      clearTimeout(this.#timer);
+    }
+    if (this.#reader !== null) {
+      clearInterval(this.#reader);
+    }
     this.#timer = null;
     this.#reader = null;
   }
 
   #later(run: () => void, ms: number): void {
-    if (this.#stopped) return;
-    if (this.#timer !== null) clearTimeout(this.#timer);
+    if (this.#stopped) {
+      return;
+    }
+    if (this.#timer !== null) {
+      clearTimeout(this.#timer);
+    }
     this.#timer = setTimeout(run, ms);
   }
 
@@ -375,7 +416,9 @@ function readStored(): Stored {
     const raw: unknown = JSON.parse(
       localStorage.getItem(STORAGE_KEY) ?? "null",
     );
-    if (typeof raw !== "object" || raw === null) return EMPTY;
+    if (typeof raw !== "object" || raw === null) {
+      return EMPTY;
+    }
     const value = raw as Record<string, unknown>;
     const token =
       typeof value.token === "string" && value.token.startsWith("scr1.")

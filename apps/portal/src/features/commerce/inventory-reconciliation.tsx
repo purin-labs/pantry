@@ -13,6 +13,12 @@ import { controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import { parseInventoryQuantityText as inventoryQuantityInput } from "@seams/control-api";
 import type { CommerceMutationTransport } from "./entity-plane/api";
+import {
+  StockDialogCancel,
+  StockDialogContext,
+  StockDialogDone,
+  StockDialogRetry,
+} from "./stock-dialog";
 
 import {
   readReconciliationSubmission,
@@ -32,6 +38,7 @@ type Props = Readonly<{
   close: () => void;
   changed: () => void;
 }>;
+
 type Draft = Readonly<{
   quantity: string;
   lot: string;
@@ -39,6 +46,7 @@ type Draft = Readonly<{
   direction: string;
   reason: string;
 }>;
+
 export type ReconciliationState =
   | Readonly<{ kind: "loading"; submission?: never }>
   | Readonly<{ kind: "unavailable"; message: string; submission?: never }>
@@ -81,16 +89,18 @@ export class InventoryReconciliationDialog extends React.Component<
       this.state.kind === "refreshing" ||
       this.state.kind === "saving" ||
       this.state.kind === "uncertain"
-    )
+    ) {
       return;
+    }
     const preserved = this.state.kind === "editing" ? this.state : null;
-    if (preserved !== null)
+    if (preserved !== null) {
       this.setState({
         kind: "refreshing",
         context: preserved.context,
         draft: preserved.draft,
         message: null,
       });
+    }
     try {
       const submission =
         preserved === null ? readReconciliationSubmission(this.scope()) : null;
@@ -99,10 +109,11 @@ export class InventoryReconciliationDialog extends React.Component<
           `${reconciliationPath(this.props.organisationId)}?position=${encodeURIComponent(this.props.positionId)}`,
         ),
       );
-      if (context.onHandQuantity === null)
+      if (context.onHandQuantity === null) {
         throw new Error(
           "On-hand stock has not been reported. Configure an accounted stock position before recording a count.",
         );
+      }
       if (this.active && submission !== null) {
         this.setState({
           kind: "uncertain",
@@ -114,7 +125,7 @@ export class InventoryReconciliationDialog extends React.Component<
         });
         return;
       }
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "editing",
           context,
@@ -127,8 +138,9 @@ export class InventoryReconciliationDialog extends React.Component<
           },
           message: null,
         });
+      }
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState(
           preserved === null
             ? { kind: "unavailable", message: reconciliationError(error) }
@@ -139,18 +151,23 @@ export class InventoryReconciliationDialog extends React.Component<
                 message: reconciliationError(error),
               },
         );
+      }
     }
   }
   edit(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     this.change(event.target.name, event.target.value);
   }
   change(name: string, value: string | null) {
-    if (this.state.kind !== "editing" || value === null) return;
+    if (this.state.kind !== "editing" || value === null) {
+      return;
+    }
     const draft = {
       ...this.state.draft,
       [name]: value,
     };
-    if (draft.direction === "increase") draft.reason = "correction";
+    if (draft.direction === "increase") {
+      draft.reason = "correction";
+    }
     this.dirty = true;
     this.discard = false;
     this.setState({
@@ -161,8 +178,9 @@ export class InventoryReconciliationDialog extends React.Component<
     });
   }
   close() {
-    if (this.state.kind === "saving" || this.state.kind === "refreshing")
+    if (this.state.kind === "saving" || this.state.kind === "refreshing") {
       return;
+    }
     if (this.dirty && this.state.kind === "editing") {
       this.discard = true;
       this.setState({
@@ -186,7 +204,9 @@ export class InventoryReconciliationDialog extends React.Component<
   }
   async submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (this.state.kind !== "editing") return;
+    if (this.state.kind !== "editing") {
+      return;
+    }
     const { context, draft } = this.state;
     let submission: ReconciliationSubmission;
     try {
@@ -212,7 +232,9 @@ export class InventoryReconciliationDialog extends React.Component<
     await this.sendSubmission(context, draft, submission);
   }
   async retry() {
-    if (this.state.kind !== "uncertain") return;
+    if (this.state.kind !== "uncertain") {
+      return;
+    }
     await this.sendSubmission(
       this.state.context,
       this.state.draft,
@@ -237,29 +259,33 @@ export class InventoryReconciliationDialog extends React.Component<
         submission.body,
         { kind: "prepared", idempotencyKey: submission.idempotencyKey },
       );
-      if (!isRecord(response) || response.ok !== true)
+      if (!isRecord(response) || response.ok !== true) {
         throw new Error(
           "The stock update has an unknown outcome. Check the update to recover its result.",
         );
+      }
       const result = parseMutationResult(response.result);
-      if (result.outcome === "rejected")
+      if (result.outcome === "rejected") {
         throw new Error("The stock update could not be confirmed.");
+      }
       clearReconciliationSubmission(this.scope());
       this.dirty = false;
       this.props.changed();
-      if (this.active)
+      if (this.active) {
         this.setState({ kind: "saved" });
+      }
     } catch (error) {
       if (reconciliationFailure(error).kind === "rejected") {
         try {
           clearReconciliationSubmission(this.scope());
-          if (this.active)
+          if (this.active) {
             this.setState({
               kind: "editing",
               context,
               draft,
               message: reconciliationError(error),
             });
+          }
           return;
         } catch {
           // Keep the frozen submission until browser recovery storage can be cleared.
@@ -299,35 +325,16 @@ export class InventoryReconciliationDialog extends React.Component<
           </div>
         )}
         {state.kind === "unavailable" && (
-          <>
-            <div className="stock-dialog-body">
-              <p role="alert">{state.message}</p>
-            </div>
-            <footer className="stock-dialog-actions">
-              <button type="button" onClick={this.close.bind(this)}>
-                Close
-              </button>
-              <button type="button" onClick={this.load.bind(this)}>
-                Try again
-              </button>
-            </footer>
-          </>
+          <StockDialogRetry
+            message={state.message}
+            close={this.close.bind(this)}
+            retry={this.load.bind(this)}
+          />
         )}
         {state.kind === "saved" && (
-          <>
-            <div className="stock-dialog-body">
-              <p role="status">Stock updated.</p>
-            </div>
-            <footer className="stock-dialog-actions">
-              <button
-                type="button"
-                className="connection-primary-action"
-                onClick={this.close.bind(this)}
-              >
-                Done
-              </button>
-            </footer>
-          </>
+          <StockDialogDone close={this.close.bind(this)}>
+            <p role="status">Stock updated.</p>
+          </StockDialogDone>
         )}
         {(state.kind === "editing" ||
           state.kind === "refreshing" ||
@@ -339,14 +346,11 @@ export class InventoryReconciliationDialog extends React.Component<
             aria-busy={state.kind === "saving" || state.kind === "refreshing"}
           >
             <div className="stock-dialog-body">
-              <section
-                className="stock-dialog-context"
-                aria-label="Current stock"
+              <StockDialogContext
+                label="Current stock"
+                name={state.context.itemName}
+                detail={state.context.locationName}
               >
-                <div>
-                  <strong>{state.context.itemName}</strong>
-                  <span>{state.context.locationName}</span>
-                </div>
                 <dl>
                   <div>
                     <dt>On hand</dt>
@@ -357,7 +361,7 @@ export class InventoryReconciliationDialog extends React.Component<
                     <dd>{state.context.allocated}</dd>
                   </div>
                 </dl>
-              </section>
+              </StockDialogContext>
               {state.kind === "uncertain" && (
                 <p className="stock-dialog-notice" role="alert">
                   {state.message}
@@ -476,19 +480,12 @@ export class InventoryReconciliationDialog extends React.Component<
               )}
             </div>
             <footer className="stock-dialog-actions">
-              {this.discard ? (
-                <button
-                  type="button"
-                  className="danger"
-                  onClick={this.props.close}
-                >
-                  Discard changes
-                </button>
-              ) : (
-                <button type="button" onClick={this.close.bind(this)}>
-                  {state.kind === "uncertain" ? "Close" : "Cancel"}
-                </button>
-              )}
+              <StockDialogCancel
+                discard={this.discard}
+                discardChanges={this.props.close}
+                close={this.close.bind(this)}
+                label={state.kind === "uncertain" ? "Close" : "Cancel"}
+              />
               {state.kind === "uncertain" ? (
                 <button
                   type="button"
@@ -541,12 +538,14 @@ const RECONCILIATION_REASONS = [
   { value: "waste", label: "Waste" },
   { value: "damage", label: "Damage" },
 ];
+
 function reasonAllowed(
   direction: string,
   reason: Readonly<{ value: string }>,
 ): boolean {
   return direction === "decrease" || reason.value === "correction";
 }
+
 function renderReconciliationItem(
   item: Readonly<{ value: string; label: string }>,
 ) {
@@ -556,12 +555,14 @@ function renderReconciliationItem(
     </Select.Item>
   );
 }
+
 function reconciliationLotItem(lot: InventoryReceiptContext["lots"][number]) {
   return {
     value: lot.id,
     label: `${lot.code} · ${lot.quantity.amount / 10 ** lot.quantity.scale} ${lot.quantity.unit}`,
   };
 }
+
 function reconciliationLotOption(lot: InventoryReceiptContext["lots"][number]) {
   return (
     <Select.Item key={lot.id} value={lot.id}>
@@ -570,6 +571,7 @@ function reconciliationLotOption(lot: InventoryReceiptContext["lots"][number]) {
     </Select.Item>
   );
 }
+
 function reconciliationBody(
   kind: Props["kind"],
   context: InventoryReceiptContext,
@@ -582,11 +584,13 @@ function reconciliationBody(
     kind === "count",
   );
   const explanation = draft.explanation.trim();
-  if (explanation.length === 0) throw new Error("Explain the stock change.");
+  if (explanation.length === 0) {
+    throw new Error("Explain the stock change.");
+  }
   let change: ReconcileCommerceInventoryV1["change"];
-  if (kind === "count")
+  if (kind === "count") {
     change = { kind: "count", observedQuantity: quantity, explanation };
-  else if (draft.direction === "increase")
+  } else if (draft.direction === "increase") {
     change = {
       kind: "adjustment",
       direction: "increase",
@@ -594,11 +598,11 @@ function reconciliationBody(
       reason: "correction",
       explanation,
     };
-  else if (
+  } else if (
     draft.reason === "correction" ||
     draft.reason === "waste" ||
     draft.reason === "damage"
-  )
+  ) {
     change = {
       kind: "adjustment",
       direction: "decrease",
@@ -606,11 +610,15 @@ function reconciliationBody(
       reason: draft.reason,
       explanation,
     };
-  else throw new Error("Select the stock adjustment reason.");
+  } else {
+    throw new Error("Select the stock adjustment reason.");
+  }
   let target: ReconcileCommerceInventoryV1["target"] = { kind: "aggregate" };
   if (context.tracking.kind === "lot_tracked") {
     const lot = context.lots.find(lotIdMatches.bind(null, draft.lot));
-    if (lot === undefined) throw new Error("Select a recorded lot.");
+    if (lot === undefined) {
+      throw new Error("Select a recorded lot.");
+    }
     target = { kind: "lot", lotId: lot.id, lotRevision: lot.revision };
   }
   return {
@@ -622,12 +630,14 @@ function reconciliationBody(
     change,
   };
 }
+
 function lotIdMatches(
   id: string,
   lot: InventoryReceiptContext["lots"][number],
 ): boolean {
   return lot.id === id;
 }
+
 function reconciliationPreview(
   counting: boolean,
   context: InventoryReceiptContext,
@@ -637,8 +647,9 @@ function reconciliationPreview(
     context.tracking.kind === "aggregate"
       ? context.onHandQuantity
       : context.lots.find(lotIdMatches.bind(null, draft.lot))?.quantity;
-  if (current === null || current === undefined || draft.quantity === "")
+  if (current === null || current === undefined || draft.quantity === "") {
     return "Enter a quantity to review the change.";
+  }
   try {
     const quantity = inventoryQuantityInput(
       draft.quantity,
@@ -686,9 +697,11 @@ function reconciliationPreview(
     return "Enter a supported quantity to review the change.";
   }
 }
+
 function reconciliationPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/inventory/reconciliations`;
 }
+
 function reconciliationError(error: unknown): string {
   return error instanceof Error
     ? error.message

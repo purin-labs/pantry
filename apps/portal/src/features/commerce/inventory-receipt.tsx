@@ -13,6 +13,12 @@ import { errorMessage, isRecord } from "@seams/std";
 import { controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import type { CommerceMutationTransport } from "./entity-plane/api";
+import {
+  StockDialogCancel,
+  StockDialogContext,
+  StockDialogDone,
+  StockDialogRetry,
+} from "./stock-dialog";
 
 type Props = Readonly<{
   organisationId: string;
@@ -21,6 +27,7 @@ type Props = Readonly<{
   close: () => void;
   received: () => void;
 }>;
+
 type Draft = Readonly<{
   quantity: string;
   receiptId: string;
@@ -29,6 +36,7 @@ type Draft = Readonly<{
   lotCode: string;
   expiry: string;
 }>;
+
 type State =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "unavailable"; message: string }>
@@ -53,8 +61,9 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
     this.discard = false;
   }
   close() {
-    if (this.state.kind === "saving" || this.state.kind === "refreshing")
+    if (this.state.kind === "saving" || this.state.kind === "refreshing") {
       return;
+    }
     if (this.dirty && this.state.kind === "editing") {
       this.discard = true;
       this.setState({
@@ -77,7 +86,9 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
     syncDialog(this.dialog, false);
   }
   edit(event: React.ChangeEvent<HTMLInputElement>) {
-    if (this.state.kind !== "editing") return;
+    if (this.state.kind !== "editing") {
+      return;
+    }
     this.markDirty();
     this.setState({
       ...this.state,
@@ -86,7 +97,9 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
     });
   }
   editPurchase(purchase: string | null) {
-    if (this.state.kind !== "editing" || purchase === null) return;
+    if (this.state.kind !== "editing" || purchase === null) {
+      return;
+    }
     this.markDirty();
     this.setState({
       ...this.state,
@@ -95,18 +108,20 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
     });
   }
   async load() {
-    if (this.state.kind === "refreshing" || this.state.kind === "saving")
+    if (this.state.kind === "refreshing" || this.state.kind === "saving") {
       return;
+    }
     const preserved = this.state.kind === "editing" ? this.state : null;
-    if (preserved !== null)
+    if (preserved !== null) {
       this.setState({ ...preserved, kind: "refreshing", message: null });
+    }
     try {
       const context = parseInventoryReceiptContext(
         await controlRead(
           `${receiptPath(this.props.organisationId)}?position=${encodeURIComponent(this.props.positionId)}`,
         ),
       );
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "editing",
           context,
@@ -120,8 +135,9 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
           },
           message: null,
         });
+      }
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState(
           preserved === null
             ? {
@@ -140,11 +156,14 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
                 ),
               },
         );
+      }
     }
   }
   async submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (this.state.kind !== "editing") return;
+    if (this.state.kind !== "editing") {
+      return;
+    }
     const { context, draft } = this.state;
     const form = new FormData(event.currentTarget);
     let body;
@@ -185,18 +204,21 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
         body,
         `inventory.receive:${body.receiptId}:${body.receiptLineId}`,
       );
-      if (!isRecord(response) || response.ok !== true)
+      if (!isRecord(response) || response.ok !== true) {
         throw new Error(
           "The receipt result is unavailable. Retry with the same receipt reference.",
         );
+      }
       const result = parseMutationResult(response.result);
-      if (result.outcome === "rejected")
+      if (result.outcome === "rejected") {
         throw new Error("The delivery could not be recorded.");
+      }
       this.props.received();
-      if (this.active)
+      if (this.active) {
         this.setState({ kind: "received" });
+      }
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "editing",
           context,
@@ -206,6 +228,7 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
             "The delivery could not be recorded. Retry with the same receipt reference.",
           ),
         });
+      }
     }
   }
   render(): React.ReactNode {
@@ -228,35 +251,16 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
           </div>
         )}
         {state.kind === "unavailable" && (
-          <>
-            <div className="stock-dialog-body">
-              <p role="alert">{state.message}</p>
-            </div>
-            <footer className="stock-dialog-actions">
-              <button type="button" onClick={this.close.bind(this)}>
-                Close
-              </button>
-              <button type="button" onClick={this.load.bind(this)}>
-                Try again
-              </button>
-            </footer>
-          </>
+          <StockDialogRetry
+            message={state.message}
+            close={this.close.bind(this)}
+            retry={this.load.bind(this)}
+          />
         )}
         {state.kind === "received" && (
-          <>
-            <div className="stock-dialog-body">
-              <p role="status">Delivery recorded. Stock has been updated.</p>
-            </div>
-            <footer className="stock-dialog-actions">
-              <button
-                type="button"
-                className="connection-primary-action"
-                onClick={this.close.bind(this)}
-              >
-                Done
-              </button>
-            </footer>
-          </>
+          <StockDialogDone close={this.close.bind(this)}>
+            <p role="status">Delivery recorded. Stock has been updated.</p>
+          </StockDialogDone>
         )}
         {(state.kind === "editing" ||
           state.kind === "refreshing" ||
@@ -267,14 +271,11 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
             aria-busy={state.kind !== "editing"}
           >
             <div className="stock-dialog-body">
-              <section
-                className="stock-dialog-context"
-                aria-label="Current stock"
+              <StockDialogContext
+                label="Current stock"
+                name={state.context.itemName}
+                detail={state.context.locationName}
               >
-                <div>
-                  <strong>{state.context.itemName}</strong>
-                  <span>{state.context.locationName}</span>
-                </div>
                 <dl>
                   <div>
                     <dt>On hand</dt>
@@ -285,7 +286,7 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
                     <dd>{state.context.available}</dd>
                   </div>
                 </dl>
-              </section>
+              </StockDialogContext>
               <fieldset
                 className="stock-dialog-fields"
                 disabled={state.kind !== "editing"}
@@ -347,19 +348,11 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
               </p>
             </div>
             <footer className="stock-dialog-actions">
-              {this.discard ? (
-                <button
-                  type="button"
-                  className="danger"
-                  onClick={this.props.close}
-                >
-                  Discard changes
-                </button>
-              ) : (
-                <button type="button" onClick={this.close.bind(this)}>
-                  Cancel
-                </button>
-              )}
+              <StockDialogCancel
+                discard={this.discard}
+                discardChanges={this.props.close}
+                close={this.close.bind(this)}
+              />
               <button
                 type="submit"
                 className="connection-primary-action"
@@ -384,7 +377,9 @@ function lotFields(
   draft: Draft,
   edit: (event: React.ChangeEvent<HTMLInputElement>) => void,
 ): React.ReactNode {
-  if (context.tracking.kind === "aggregate") return null;
+  if (context.tracking.kind === "aggregate") {
+    return null;
+  }
   const required = context.tracking.expiry === "required";
   return (
     <>
@@ -418,13 +413,16 @@ function receiptLot(
   form: FormData,
   lotId: string,
 ): CommerceInventoryLotInputV1 {
-  if (context.tracking.kind === "aggregate") return { kind: "not_tracked" };
+  if (context.tracking.kind === "aggregate") {
+    return { kind: "not_tracked" };
+  }
   const expiry = form.get("expiry");
   if (
     context.tracking.expiry === "required" &&
     (typeof expiry !== "string" || expiry.length === 0)
-  )
+  ) {
     throw new Error("Enter the lot expiry.");
+  }
   return {
     kind: "tracked",
     lotId,
@@ -438,8 +436,9 @@ function receiptLot(
 
 function formText(form: FormData, name: string): string {
   const value = form.get(name);
-  if (typeof value !== "string" || value.trim().length === 0)
+  if (typeof value !== "string" || value.trim().length === 0) {
     throw new Error("Complete the required receipt fields.");
+  }
   return value.trim();
 }
 
@@ -452,13 +451,14 @@ function purchaseFields(
   draft: Draft,
   choose: (purchase: string | null) => void,
 ): React.ReactNode {
-  if (context.purchases.kind === "unavailable")
+  if (context.purchases.kind === "unavailable") {
     return (
       <p className="stock-footnote">
         Purchase requests could not be loaded. This delivery will be recorded
         without a purchase link.
       </p>
     );
+  }
   return (
     <label className="stock-dialog-full-width">
       Purchase request
@@ -482,16 +482,19 @@ function purchaseFields(
     </label>
   );
 }
+
 type PurchaseEntry = Extract<
   InventoryReceiptContext["purchases"],
   { kind: "ready" }
 >["entries"][number];
+
 function purchaseItem(entry: PurchaseEntry) {
   return {
     value: entry.id,
     label: `${entry.supplier} · ${entry.received} received / ${entry.required} requested`,
   };
 }
+
 function purchaseOption(entry: PurchaseEntry) {
   return (
     <Select.Item key={entry.id} value={entry.id}>
@@ -499,19 +502,25 @@ function purchaseOption(entry: PurchaseEntry) {
     </Select.Item>
   );
 }
+
 function receiptPurchase(
   context: InventoryReceiptContext,
   form: FormData,
 ): import("@seams/commerce-client").CommerceInventoryReceiptPurchase {
   const id = form.get("purchase");
-  if (id === "" || id === null) return { kind: "unlinked" };
-  if (context.purchases.kind === "ready")
-    for (const entry of context.purchases.entries)
-      if (entry.id === id)
+  if (id === "" || id === null) {
+    return { kind: "unlinked" };
+  }
+  if (context.purchases.kind === "ready") {
+    for (const entry of context.purchases.entries) {
+      if (entry.id === id) {
         return {
           kind: "replenishment",
           entryId: entry.id,
           entryRevision: entry.revision,
         };
+      }
+    }
+  }
   throw new Error("Refresh purchase requests before receiving this delivery.");
 }

@@ -20,18 +20,17 @@ import {
 import {
   encodeMenuBoardClientMessage,
   parseMenuBoardServerMessage,
-  POINTER_IDLE_MS,
-  type MenuBoardClientMessage,
   type MenuBoardFailureCode,
-  type MenuBoardParticipant,
-  type MenuBoardServerMessage,
+  type MenuBoardRoomMetadata,
 } from "@seams/menu-board-crdt/protocol";
-import type {
-  CollaborationAgentActivity,
-  CollaborationPointerPosition,
-} from "@seams/collaboration";
+import type { CollaborationAgentActivity } from "@seams/collaboration";
 import { assertNever } from "@seams/std";
-import { SocketLiveness } from "../collaboration/socket-liveness";
+import {
+  DocumentClient,
+  webSocketUrl,
+  type DocumentParticipant,
+  type DocumentState,
+} from "../collaboration/document-client";
 
 /**
  * The Portal's side of one board's shared draft (Plan 40B). It is the menu
@@ -39,16 +38,6 @@ import { SocketLiveness } from "../collaboration/socket-liveness";
  * once, goes to the room one at a time, and waits for the room's
  * acknowledgement before the next.
  */
-
-type Connection =
-  | Readonly<{ kind: "connecting" | "awaiting_sync" | "syncing" | "connected"; socket: WebSocket }>
-  | Readonly<{ kind: "reconnecting"; timer: ReturnType<typeof setTimeout> }>
-  | Readonly<{ kind: "failed"; code: MenuBoardFailureCode }>
-  | Readonly<{ kind: "closed" }>;
-
-type Pending =
-  | Readonly<{ kind: "idle" }>
-  | Readonly<{ kind: "sync" | "edit"; updateId: string; revision: number; stateVector: MenuBoardStateVector }>;
 
 export type MenuBoardView = Readonly<{
   board: MenuBoardSnapshot;
@@ -64,12 +53,14 @@ export type MenuBoardView = Readonly<{
    * so the board is no longer the one at `documentRevision`.
    */
   changedSinceRevision: boolean;
-}> & (
-  | Readonly<{ kind: "connecting" | "syncing" | "synced" | "reconnecting" }>
-  | Readonly<{ kind: "failed"; message: string }>
-);
+}> &
+  (
+    | Readonly<{ kind: "connecting" | "syncing" | "synced" | "reconnecting" }>
+    | Readonly<{ kind: "failed"; message: string }>
+  );
 
-export type MenuBoardPresenceView = MenuBoardParticipant & Readonly<{ isSelf: boolean }>;
+export type MenuBoardPresenceView =
+  DocumentParticipant<MenuBoardPresenceSelection>;
 
 /**
  * What the room holds against the board on the screen: the same board at
@@ -93,10 +84,17 @@ type ShownCheck = Readonly<{
  */
 type BoardOperation =
   | Readonly<{ kind: "rename"; title: string }>
-  | Readonly<{ kind: "props"; elementId: string; changes: MenuBoardPropChanges }>
+  | Readonly<{
+      kind: "props";
+      elementId: string;
+      changes: MenuBoardPropChanges;
+    }>
   | Readonly<{ kind: "add"; element: MenuBoardElement }>
   | Readonly<{ kind: "remove"; elementId: string }>
-  | Readonly<{ kind: "place"; placements: readonly MenuBoardElementPlacement[] }>
+  | Readonly<{
+      kind: "place";
+      placements: readonly MenuBoardElementPlacement[];
+    }>
   | Readonly<{ kind: "style"; changes: MenuBoardStyleChanges }>
   | Readonly<{
       kind: "layout";
@@ -117,69 +115,67 @@ const MOVING_INTERVAL_MS = 66;
 const HISTORY_MERGE_MS = 1_000;
 
 export class MenuBoardClient {
-  readonly #doc: MenuBoardDoc;
-  readonly #url: string;
-  readonly #surface: HTMLElement;
+  readonly #client: DocumentClient<
+    MenuBoardDoc,
+    MenuBoardUpdate,
+    MenuBoardStateVector,
+    MenuBoardPresenceSelection,
+    MenuBoardFailureCode,
+    MenuBoardRoomMetadata
+  >;
   readonly #notify: (view: MenuBoardView) => void;
-  #connection: Connection = { kind: "closed" };
-  #pending: Pending = { kind: "idle" };
-  #participants: readonly MenuBoardParticipant[] = [];
-  #agents: readonly CollaborationAgentActivity[] = [];
   #selection: MenuBoardPresenceSelection | null = null;
-  #access: "read" | "edit" = "read";
   #documentRevision: number | null = null;
   #changedSinceRevision = false;
   #check: ShownCheck | null = null;
-  #sessionId: string | null = null;
-  #revision = 0;
-  #acknowledgedRevision = 0;
-  #attempts = 0;
-  #pointer: CollaborationPointerPosition | null = null;
-  #pointerTimer: ReturnType<typeof setTimeout> | null = null;
-  #pointerIdle: ReturnType<typeof setTimeout> | null = null;
-  #liveness: SocketLiveness | null = null;
-  readonly #pointerMove = this.#movePointer.bind(this);
-  readonly #pointerHide = this.#hidePointer.bind(this);
-  readonly #pointerSend = this.#sendPointer.bind(this);
-  readonly #beforeUnload = this.#onBeforeUnload.bind(this);
-  #pointerSurface: HTMLElement;
   #movingTimer: ReturnType<typeof setTimeout> | null = null;
   readonly #movingSend = this.#sendMoving.bind(this);
   #undo: HistoryEntry[] = [];
   #redo: HistoryEntry[] = [];
 
-  constructor(organisationId: string, boardId: string, surface: HTMLElement, notify: (view: MenuBoardView) => void) {
-    this.#doc = MenuBoardDoc.createReplica();
-    this.#surface = surface;
-    this.#pointerSurface = surface;
+  constructor(
+    organisationId: string,
+    boardId: string,
+    surface: HTMLElement,
+    notify: (view: MenuBoardView) => void,
+  ) {
     this.#notify = notify;
-    const url = new URL(
-      `/v1/control/organisations/${encodeURIComponent(organisationId)}/menu-boards/${encodeURIComponent(boardId)}/socket`,
-      window.location.origin,
-    );
-    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-    this.#url = url.href;
-    surface.addEventListener("pointermove", this.#pointerMove);
-    surface.addEventListener("pointerleave", this.#pointerHide);
-    surface.addEventListener("pointercancel", this.#pointerHide);
-    window.addEventListener("beforeunload", this.#beforeUnload);
-    this.#connect();
+    this.#client = new DocumentClient({
+      url: webSocketUrl(
+        `/v1/control/organisations/${encodeURIComponent(organisationId)}/menu-boards/${encodeURIComponent(boardId)}/socket`,
+      ),
+      surface,
+      create: () => MenuBoardDoc.createReplica(),
+      parse: parseMenuBoardServerMessage,
+      encode: encodeMenuBoardClientMessage,
+      invalidMessage: "invalid_message",
+      ignoredEditFailures: [
+        "collection_limit",
+        "record_conflict",
+        "text_too_long",
+      ],
+      keepAgents: true,
+      presence: () => this.#selection,
+      syncResponse: (message) => {
+        this.#documentRevision = message.documentRevision;
+        // Edits that the room has not accepted yet go in after this revision.
+        this.#changedSinceRevision = this.#client.hasUnsyncedEdits();
+        return true;
+      },
+      synced: this.#endCheckOnSync.bind(this),
+      updated: () => {
+        this.#changedSinceRevision = true;
+      },
+      lost: this.#endCheck.bind(this, { kind: "unavailable" }),
+      emit: this.#emit.bind(this),
+    });
+    this.#client.connect();
   }
 
   dispose(): void {
-    this.#hidePointer();
     this.#stopMoving();
-    const previous = this.#connection;
-    this.#connection = { kind: "closed" };
-    if (previous.kind === "reconnecting") clearTimeout(previous.timer);
-    else socketOf(previous)?.close();
-    this.#stopLiveness();
-    this.#surface.removeEventListener("pointermove", this.#pointerMove);
-    this.#surface.removeEventListener("pointerleave", this.#pointerHide);
-    this.#surface.removeEventListener("pointercancel", this.#pointerHide);
-    window.removeEventListener("beforeunload", this.#beforeUnload);
+    this.#client.dispose();
     this.#endCheck({ kind: "unavailable" });
-    this.#doc.destroy();
   }
 
   /**
@@ -188,17 +184,32 @@ export class MenuBoardClient {
    * show yet, the screen shows them now and the check answers `changed`.
    */
   checkShown(): Promise<MenuBoardShownCheck> {
-    const connection = this.#connection;
-    if (connection.kind !== "connected" || this.#pending.kind !== "idle" || this.hasUnsyncedEdits() ||
-      this.#check !== null)
+    if (this.#check !== null) {
       return Promise.resolve({ kind: "unavailable" });
-    const vector = this.#doc.stateVector();
-    if (!vector.ok) return Promise.resolve({ kind: "unavailable" });
+    }
     return new Promise((resolve) => {
-      this.#check = { board: JSON.stringify(this.#doc.read()), revision: this.#revision, resolve };
-      this.#connection = { kind: "awaiting_sync", socket: connection.socket };
-      this.#send({ kind: "sync_request", stateVector: vector.value });
+      this.#check = {
+        board: JSON.stringify(this.#client.replica.read()),
+        revision: this.#client.revision,
+        resolve,
+      };
+      if (!this.#client.resync()) {
+        this.#endCheck({ kind: "unavailable" });
+      }
     });
+  }
+
+  #endCheckOnSync(message: Readonly<{ documentRevision: number }>): void {
+    const check = this.#check;
+    if (check === null) {
+      return;
+    }
+    this.#endCheck(
+      check.board === JSON.stringify(this.#client.replica.read()) &&
+        check.revision === this.#client.revision
+        ? { kind: "current", documentRevision: message.documentRevision }
+        : { kind: "changed" },
+    );
   }
 
   #endCheck(result: MenuBoardShownCheck): void {
@@ -208,13 +219,13 @@ export class MenuBoardClient {
   }
 
   hasUnsyncedEdits(): boolean {
-    return this.#revision > this.#acknowledgedRevision;
+    return this.#client.hasUnsyncedEdits();
   }
 
   select(selection: MenuBoardPresenceSelection | null): void {
     this.#stopMoving();
     this.#selection = selection;
-    this.#sendPresence();
+    this.#client.sendPresence(selection);
   }
 
   /**
@@ -223,16 +234,20 @@ export class MenuBoardClient {
    */
   showMoving(selection: MenuBoardMovingSelection): void {
     this.#selection = selection;
-    if (this.#movingTimer === null) this.#movingTimer = setTimeout(this.#movingSend, MOVING_INTERVAL_MS);
+    if (this.#movingTimer === null) {
+      this.#movingTimer = setTimeout(this.#movingSend, MOVING_INTERVAL_MS);
+    }
   }
 
   #sendMoving(): void {
     this.#movingTimer = null;
-    this.#sendPresence();
+    this.#client.sendPresence(this.#selection);
   }
 
   #stopMoving(): void {
-    if (this.#movingTimer !== null) clearTimeout(this.#movingTimer);
+    if (this.#movingTimer !== null) {
+      clearTimeout(this.#movingTimer);
+    }
     this.#movingTimer = null;
   }
 
@@ -241,7 +256,7 @@ export class MenuBoardClient {
    * draws a cursor at the same place on the board.
    */
   setPointerSurface(element: HTMLElement | null): void {
-    this.#pointerSurface = element ?? this.#surface;
+    this.#client.setPointerSurface(element);
   }
 
   canUndo(): boolean {
@@ -269,23 +284,47 @@ export class MenuBoardClient {
     placements: readonly MenuBoardElementPlacement[],
     removed: readonly string[] = [],
   ): void {
-    this.#record([
-      { kind: "layout", layout, placements },
-      ...removed.map((elementId): BoardOperation => ({ kind: "remove", elementId })),
-    ], null);
+    this.#record(
+      [
+        { kind: "layout", layout, placements },
+        ...removed.map((elementId): BoardOperation => ({
+          kind: "remove",
+          elementId,
+        })),
+      ],
+      null,
+    );
   }
 
   /**
    * Puts elements in a new auto-layout stack as one edit (slice 8): the
    * stack, then each element's place in it.
    */
-  stackElements(stack: MenuBoardElement, placements: readonly MenuBoardElementPlacement[]): void {
-    this.#record([{ kind: "add", element: stack }, { kind: "place", placements }], null);
+  stackElements(
+    stack: MenuBoardElement,
+    placements: readonly MenuBoardElementPlacement[],
+  ): void {
+    this.#record(
+      [
+        { kind: "add", element: stack },
+        { kind: "place", placements },
+      ],
+      null,
+    );
   }
 
   /** Takes every element out of a stack onto the canvas, and removes the stack. */
-  unstack(stackId: string, placements: readonly MenuBoardElementPlacement[]): void {
-    this.#record([{ kind: "place", placements }, { kind: "remove", elementId: stackId }], null);
+  unstack(
+    stackId: string,
+    placements: readonly MenuBoardElementPlacement[],
+  ): void {
+    this.#record(
+      [
+        { kind: "place", placements },
+        { kind: "remove", elementId: stackId },
+      ],
+      null,
+    );
   }
 
   addElement(element: MenuBoardElement): void {
@@ -300,7 +339,10 @@ export class MenuBoardClient {
   }
 
   moveElement(elementId: string, placement: MenuBoardPlacement): void {
-    this.#record([{ kind: "place", placements: [{ elementId, placement }] }], null);
+    this.#record(
+      [{ kind: "place", placements: [{ elementId, placement }] }],
+      null,
+    );
   }
 
   /**
@@ -308,12 +350,17 @@ export class MenuBoardClient {
    * a row, such as a colour drag, join one undo step.
    */
   setStyle(changes: MenuBoardStyleChanges): void {
-    this.#record([{ kind: "style", changes }], `style:${Object.keys(changes).sort().join(",")}`);
+    this.#record(
+      [{ kind: "style", changes }],
+      `style:${Object.keys(changes).sort().join(",")}`,
+    );
   }
 
   /** Moves several elements as one edit: a drag, an align or a distribute. */
   placeElements(placements: readonly MenuBoardElementPlacement[]): void {
-    if (placements.length === 0) return;
+    if (placements.length === 0) {
+      return;
+    }
     this.#record([{ kind: "place", placements }], null);
   }
 
@@ -323,21 +370,36 @@ export class MenuBoardClient {
    * element when it was removed since.
    */
   restoreElements(elements: readonly MenuBoardElement[]): void {
-    const current = new Set([...this.#doc.read().elements, ...this.#doc.read().unplaced].map((element) => element.id));
+    const board = this.#client.replica.read();
+    const current = new Set(
+      [...board.elements, ...board.unplaced].map((element) => element.id),
+    );
     const operations: BoardOperation[] = [];
     for (const element of elements) {
       if (!current.has(element.id)) {
         operations.push({ kind: "add", element });
         continue;
       }
-      const props = menuBoardElementProps(element) as Readonly<Record<string, unknown>>;
+      const props = menuBoardElementProps(element) as Readonly<
+        Record<string, unknown>
+      >;
       const changes: Record<string, string> = {};
-      for (const key of [...MENU_BOARD_TEXT_PROPS[element.kind], ...MENU_BOARD_ID_PROPS[element.kind], ...MENU_BOARD_OPTIONAL_PROPS[element.kind]])
+      for (const key of [
+        ...MENU_BOARD_TEXT_PROPS[element.kind],
+        ...MENU_BOARD_ID_PROPS[element.kind],
+        ...MENU_BOARD_OPTIONAL_PROPS[element.kind],
+      ]) {
         changes[key] = typeof props[key] === "string" ? String(props[key]) : "";
+      }
       operations.push({ kind: "props", elementId: element.id, changes });
-      operations.push({ kind: "place", placements: [{ elementId: element.id, placement: element.placement }] });
+      operations.push({
+        kind: "place",
+        placements: [{ elementId: element.id, placement: element.placement }],
+      });
     }
-    if (operations.length > 0) this.#record(operations, null);
+    if (operations.length > 0) {
+      this.#record(operations, null);
+    }
   }
 
   removeElement(elementId: string): void {
@@ -346,8 +408,13 @@ export class MenuBoardClient {
 
   /** Removes several elements as one edit. */
   removeElements(elementIds: readonly string[]): void {
-    if (elementIds.length === 0) return;
-    this.#record(elementIds.map((elementId) => ({ kind: "remove", elementId })), null);
+    if (elementIds.length === 0) {
+      return;
+    }
+    this.#record(
+      elementIds.map((elementId) => ({ kind: "remove", elementId })),
+      null,
+    );
   }
 
   undo(): void {
@@ -362,297 +429,138 @@ export class MenuBoardClient {
    * Applies operations as one undo step. An operation whose element another
    * person removed in the meantime is left out.
    */
-  #record(operations: readonly BoardOperation[], mergeKey: string | null): void {
+  #record(
+    operations: readonly BoardOperation[],
+    mergeKey: string | null,
+  ): void {
     const inverse = this.#applyOperations(operations);
-    if (inverse === null) return;
+    if (inverse === null) {
+      return;
+    }
     this.#redo = [];
     const now = Date.now();
     const last = this.#undo.at(-1);
-    if (mergeKey !== null && last?.mergeKey === mergeKey && now - last.at < HISTORY_MERGE_MS) {
-      this.#undo[this.#undo.length - 1] = { inverse: last.inverse, mergeKey, at: now };
+    if (
+      mergeKey !== null &&
+      last?.mergeKey === mergeKey &&
+      now - last.at < HISTORY_MERGE_MS
+    ) {
+      this.#undo[this.#undo.length - 1] = {
+        inverse: last.inverse,
+        mergeKey,
+        at: now,
+      };
     } else {
       this.#undo.push({ inverse, mergeKey, at: now });
-      if (this.#undo.length > HISTORY_LIMIT) this.#undo.shift();
+      if (this.#undo.length > HISTORY_LIMIT) {
+        this.#undo.shift();
+      }
     }
   }
 
   #travel(from: HistoryEntry[], to: HistoryEntry[]): void {
     while (from.length > 0) {
       const entry = from.pop();
-      if (entry === undefined) return;
+      if (entry === undefined) {
+        return;
+      }
       const inverse = this.#applyOperations(entry.inverse);
-      if (inverse === null) continue;
+      if (inverse === null) {
+        continue;
+      }
       to.push({ inverse, mergeKey: null, at: Date.now() });
       return;
     }
-    this.#emit();
+    this.#client.emit();
   }
 
   /** Applies operations in order; answers their inverse, or null if none applied. */
-  #applyOperations(operations: readonly BoardOperation[]): BoardOperation[] | null {
+  #applyOperations(
+    operations: readonly BoardOperation[],
+  ): BoardOperation[] | null {
     const inverse: BoardOperation[] = [];
     for (const operation of operations) {
-      const undo = inverseOf(this.#doc.read(), operation);
-      if (undo === null) continue;
-      if (this.#edit(this.#apply(operation))) inverse.unshift(undo);
+      const undo = inverseOf(this.#client.replica.read(), operation);
+      if (undo === null) {
+        continue;
+      }
+      if (this.#edit(this.#apply(operation))) {
+        inverse.unshift(undo);
+      }
     }
     return inverse.length === 0 ? null : inverse;
   }
 
   #apply(operation: BoardOperation): MenuBoardCrdtResult<MenuBoardUpdate> {
+    const doc = this.#client.replica;
     switch (operation.kind) {
       case "rename":
-        return this.#doc.rename(operation.title);
+        return doc.rename(operation.title);
       case "props":
-        return this.#doc.updateElement(operation.elementId, operation.changes);
+        return doc.updateElement(operation.elementId, operation.changes);
       case "add":
-        return this.#doc.addElement(operation.element);
+        return doc.addElement(operation.element);
       case "remove":
-        return this.#doc.removeElement(operation.elementId);
+        return doc.removeElement(operation.elementId);
       case "place":
-        return this.#doc.placeElements(operation.placements);
+        return doc.placeElements(operation.placements);
       case "style":
-        return this.#doc.setStyle(operation.changes);
+        return doc.setStyle(operation.changes);
       case "layout":
         return operation.placements.length === 0
-          ? this.#doc.setLayout(operation.layout)
-          : this.#doc.arrangeLayout(operation.layout, operation.placements);
+          ? doc.setLayout(operation.layout)
+          : doc.arrangeLayout(operation.layout, operation.placements);
       default:
         return assertNever(operation, "Unexpected board operation");
     }
   }
 
-  #connect(): void {
-    const socket = new WebSocket(this.#url);
-    this.#connection = { kind: "connecting", socket };
-    socket.addEventListener("open", this.#opened.bind(this, socket));
-    socket.addEventListener("message", this.#received.bind(this, socket));
-    socket.addEventListener("close", this.#disconnected.bind(this, socket));
-    socket.addEventListener("error", this.#disconnected.bind(this, socket));
-    this.#emit();
-  }
-
-  #opened(socket: WebSocket): void {
-    if (socketOf(this.#connection) !== socket) return;
-    this.#connection = { kind: "awaiting_sync", socket };
-    this.#stopLiveness();
-    this.#liveness = new SocketLiveness(socket, this.#disconnected.bind(this, socket));
-    const vector = this.#doc.stateVector();
-    if (!vector.ok) return this.#fail(vector.error.code);
-    this.#send({ kind: "sync_request", stateVector: vector.value });
-  }
-
-  #received(socket: WebSocket, event: MessageEvent): void {
-    if (socketOf(this.#connection) !== socket) return;
-    if (this.#liveness?.received(event.data) === true) return;
-    const parsed = parseMenuBoardServerMessage(event.data);
-    if (!parsed.ok) return this.#fail(parsed.error.code);
-    this.#handle(socket, parsed.value);
-  }
-
-  #handle(socket: WebSocket, message: MenuBoardServerMessage): void {
-    switch (message.kind) {
-      case "sync_response": {
-        if (this.#connection.kind !== "awaiting_sync") return this.#fail("invalid_message");
-        this.#access = message.access;
-        this.#documentRevision = message.documentRevision;
-        // Edits that the room has not accepted yet go in after this revision.
-        this.#changedSinceRevision = this.hasUnsyncedEdits();
-        this.#sessionId = message.sessionId;
-        const applied = this.#doc.apply(message.missingUpdate);
-        if (!applied.ok) return this.#fail(applied.error.code);
-        const check = this.#check;
-        if (check !== null)
-          this.#endCheck(check.board === JSON.stringify(this.#doc.read()) && check.revision === this.#revision
-            ? { kind: "current", documentRevision: message.documentRevision }
-            : { kind: "changed" });
-        this.#attempts = 0;
-        this.#pending = { kind: "idle" };
-        if (message.access === "edit") {
-          const update = this.#doc.syncUpdate(message.serverStateVector);
-          if (!update.ok) return this.#fail(update.error.code);
-          this.#connection = { kind: "syncing", socket };
-          this.#submit(update.value, "sync");
-        } else {
-          this.#connection = { kind: "connected", socket };
-        }
-        this.#sendPresence();
-        break;
-      }
-      case "update_broadcast": {
-        const applied = this.#doc.apply(message.update);
-        if (!applied.ok) return this.#fail(applied.error.code);
-        this.#changedSinceRevision = true;
-        break;
-      }
-      case "update_accepted": {
-        const pending = this.#pending;
-        if (pending.kind === "idle" || pending.updateId !== message.updateId) return this.#fail("invalid_message");
-        this.#acknowledgedRevision = Math.max(this.#acknowledgedRevision, pending.revision);
-        this.#pending = { kind: "idle" };
-        if (pending.kind === "sync") this.#connection = { kind: "connected", socket };
-        if (this.#revision > this.#acknowledgedRevision) {
-          const update = this.#doc.syncUpdate(pending.stateVector);
-          if (!update.ok) return this.#fail(update.error.code);
-          this.#submit(update.value, "edit");
-        }
-        break;
-      }
-      case "presence_changed":
-        this.#participants = message.participants;
-        this.#agents = message.agents;
-        break;
-      case "failure":
-        return this.#fail(message.code);
-      default:
-        return assertNever(message, "Unexpected board client branch");
-    }
-    this.#emit();
-  }
-
   #edit(result: MenuBoardCrdtResult<MenuBoardUpdate>): boolean {
-    if (!result.ok) {
-      if (
-        result.error.code === "collection_limit" ||
-        result.error.code === "record_conflict" ||
-        result.error.code === "text_too_long"
-      ) {
-        this.#emit();
-        return false;
-      }
-      this.#fail(result.error.code);
-      return false;
+    if (result.ok) {
+      this.#changedSinceRevision = true;
     }
-    this.#revision++;
-    this.#changedSinceRevision = true;
-    if ((this.#connection.kind === "connected" || this.#connection.kind === "syncing") && this.#pending.kind === "idle") {
-      this.#submit(result.value, "edit");
-    }
-    this.#emit();
-    return true;
+    return this.#client.edit(result);
   }
 
-  #submit(update: MenuBoardUpdate, kind: "sync" | "edit"): void {
-    const stateVector = this.#doc.stateVector();
-    if (!stateVector.ok) return this.#fail(stateVector.error.code);
-    const updateId = crypto.randomUUID();
-    this.#pending = { kind, updateId, revision: this.#revision, stateVector: stateVector.value };
-    this.#send({ kind: "submit_update", updateId, update });
-  }
-
-  #send(message: MenuBoardClientMessage): void {
-    const socket = socketOf(this.#connection);
-    if (socket?.readyState !== WebSocket.OPEN) return;
-    socket.send(encodeMenuBoardClientMessage(message));
-  }
-
-  #sendPresence(): void {
-    if (this.#connection.kind !== "connected" && this.#connection.kind !== "syncing") return;
-    this.#send({
-      kind: "presence_update",
-      state: this.#selection === null ? "viewing" : "editing",
-      selection: this.#selection,
-    });
-  }
-
-  #movePointer(event: PointerEvent): void {
-    if (event.pointerType === "touch") return;
-    const rect = this.#pointerSurface.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    this.#pointer = {
-      x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)),
-      y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)),
-    };
-    if (this.#pointerTimer === null) this.#pointerTimer = setTimeout(this.#pointerSend, 50);
-    if (this.#pointerIdle !== null) clearTimeout(this.#pointerIdle);
-    this.#pointerIdle = setTimeout(this.#pointerHide, POINTER_IDLE_MS);
-  }
-
-  #sendPointer(): void {
-    this.#pointerTimer = null;
-    if (this.#connection.kind === "connected" || this.#connection.kind === "syncing") {
-      this.#send({ kind: "pointer_update", position: this.#pointer });
-    }
-  }
-
-  #hidePointer(): void {
-    if (this.#pointerTimer !== null) clearTimeout(this.#pointerTimer);
-    if (this.#pointerIdle !== null) clearTimeout(this.#pointerIdle);
-    this.#pointerTimer = null;
-    this.#pointerIdle = null;
-    if (this.#pointer === null) return;
-    this.#pointer = null;
-    this.#sendPointer();
-  }
-
-  #disconnected(socket: WebSocket): void {
-    if (socketOf(this.#connection) !== socket) return;
-    this.#stopLiveness();
-    this.#attempts = Math.min(this.#attempts + 1, 4);
-    this.#connection = {
-      kind: "reconnecting",
-      timer: setTimeout(this.#connect.bind(this), Math.min(1_000 * 2 ** this.#attempts, 10_000)),
-    };
-    this.#participants = [];
-    socket.close();
-    this.#endCheck({ kind: "unavailable" });
-    this.#emit();
-  }
-
-  #stopLiveness(): void {
-    this.#liveness?.stop();
-    this.#liveness = null;
-  }
-
-  #fail(code: MenuBoardFailureCode): void {
-    const previous = this.#connection;
-    this.#connection = { kind: "failed", code };
-    this.#stopLiveness();
-    if (previous.kind === "reconnecting") clearTimeout(previous.timer);
-    else socketOf(previous)?.close();
-    this.#endCheck({ kind: "unavailable" });
-    this.#emit();
-  }
-
-  #onBeforeUnload(event: BeforeUnloadEvent): void {
-    if (!this.hasUnsyncedEdits()) return;
-    event.preventDefault();
-    event.returnValue = "";
-  }
-
-  #emit(): void {
-    if (this.#connection.kind === "closed") return;
+  #emit(
+    state: DocumentState<
+      MenuBoardDoc,
+      MenuBoardPresenceSelection,
+      MenuBoardFailureCode
+    >,
+  ): void {
     const base = {
-      board: this.#doc.read(),
-      participants: this.#participants.map(markBoardParticipant.bind(null, this.#sessionId)),
-      agents: this.#agents,
-      access: this.#access,
+      board: state.replica.read(),
+      participants: state.participants,
+      agents: state.agents,
+      access: state.access,
       documentRevision: this.#documentRevision,
       changedSinceRevision: this.#changedSinceRevision,
     };
-    if (this.#connection.kind === "failed") {
+    if (state.status === "failed") {
       // The code names the refused rule for a support report.
       this.#notify({
         ...base,
         kind: "failed",
-        message: `${failureMessage(this.#connection.code)} Code: ${this.#connection.code}.`,
+        message: `${failureMessage(state.code)} Code: ${state.code}.`,
       });
       return;
     }
-    const kind = this.#connection.kind === "reconnecting"
-      ? "reconnecting"
-      : this.#connection.kind === "connecting" ||
-          (this.#connection.kind === "awaiting_sync" && this.#check === null)
-        ? "connecting"
-        : this.#connection.kind === "syncing" || this.#pending.kind !== "idle" || this.hasUnsyncedEdits()
-          ? "syncing"
-          : "synced";
-    this.#notify({ ...base, kind });
+    // A shown-board check asks on the open socket: the board stays usable.
+    const checking =
+      state.connection === "awaiting_sync" && this.#check !== null;
+    this.#notify({
+      ...base,
+      kind: checking ? (state.settled ? "synced" : "syncing") : state.status,
+    });
   }
 }
 
 /** The operation that undoes `operation` on `board`; null if it cannot apply. */
-function inverseOf(board: MenuBoardSnapshot, operation: BoardOperation): BoardOperation | null {
+function inverseOf(
+  board: MenuBoardSnapshot,
+  operation: BoardOperation,
+): BoardOperation | null {
   const all = [...board.elements, ...board.unplaced];
   const find = (elementId: string): MenuBoardElement | undefined =>
     all.find((element) => element.id === elementId);
@@ -661,14 +569,20 @@ function inverseOf(board: MenuBoardSnapshot, operation: BoardOperation): BoardOp
       return { kind: "rename", title: board.title };
     case "props": {
       const element = find(operation.elementId);
-      if (element === undefined) return null;
+      if (element === undefined) {
+        return null;
+      }
       const values = element as unknown as Readonly<Record<string, unknown>>;
       const changes: Record<string, string> = {};
-      for (const key of Object.keys(operation.changes)) changes[key] = String(values[key] ?? "");
+      for (const key of Object.keys(operation.changes)) {
+        changes[key] = String(values[key] ?? "");
+      }
       return { kind: "props", elementId: element.id, changes };
     }
     case "add":
-      return find(operation.element.id) === undefined ? { kind: "remove", elementId: operation.element.id } : null;
+      return find(operation.element.id) === undefined
+        ? { kind: "remove", elementId: operation.element.id }
+        : null;
     case "remove": {
       const element = find(operation.elementId);
       return element === undefined ? null : { kind: "add", element };
@@ -676,14 +590,20 @@ function inverseOf(board: MenuBoardSnapshot, operation: BoardOperation): BoardOp
     case "place": {
       const placements = operation.placements.flatMap(({ elementId }) => {
         const element = find(elementId);
-        return element === undefined ? [] : [{ elementId, placement: element.placement }];
+        return element === undefined
+          ? []
+          : [{ elementId, placement: element.placement }];
       });
       return placements.length === 0 ? null : { kind: "place", placements };
     }
     case "style": {
-      const current = board.style as Readonly<Record<string, string | number | undefined>>;
+      const current = board.style as Readonly<
+        Record<string, string | number | undefined>
+      >;
       const changes: Record<string, string | number | null> = {};
-      for (const token of Object.keys(operation.changes)) changes[token] = current[token] ?? null;
+      for (const token of Object.keys(operation.changes)) {
+        changes[token] = current[token] ?? null;
+      }
       return { kind: "style", changes };
     }
     case "layout":
@@ -692,34 +612,13 @@ function inverseOf(board: MenuBoardSnapshot, operation: BoardOperation): BoardOp
         layout: board.layout,
         placements: operation.placements.flatMap(({ elementId }) => {
           const element = find(elementId);
-          return element === undefined ? [] : [{ elementId, placement: element.placement }];
+          return element === undefined
+            ? []
+            : [{ elementId, placement: element.placement }];
         }),
       };
     default:
       return assertNever(operation, "Unexpected board operation");
-  }
-}
-
-function markBoardParticipant(
-  sessionId: string | null,
-  participant: MenuBoardParticipant,
-): MenuBoardPresenceView {
-  return { ...participant, isSelf: participant.sessionId === sessionId };
-}
-
-function socketOf(connection: Connection): WebSocket | null {
-  switch (connection.kind) {
-    case "connecting":
-    case "awaiting_sync":
-    case "syncing":
-    case "connected":
-      return connection.socket;
-    case "reconnecting":
-    case "failed":
-    case "closed":
-      return null;
-    default:
-      return assertNever(connection, "Unexpected board client branch");
   }
 }
 

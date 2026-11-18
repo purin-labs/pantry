@@ -6,9 +6,23 @@ import {
   type ProductDescriptionStateVector,
   type ProductDescriptionUpdate,
 } from "@seams/product-description-crdt";
-import { encodeDraftClientMessage, type DraftFailureCode, type ProductDescriptionRoomMetadata } from "@seams/product-description-crdt/protocol";
-import type { CollaborationAgentActivity, TextSelectionDirection } from "@seams/collaboration";
-import { TextCollaborationClient, type TextCollaborationClientMessage, type TextCollaborationView, type TextDocumentAdapter, type TextProtocolAdapter } from "../../collaboration/text-client";
+import {
+  encodeDraftClientMessage,
+  type DraftFailureCode,
+  type ProductDescriptionRoomMetadata,
+} from "@seams/product-description-crdt/protocol";
+import type {
+  CollaborationAgentActivity,
+  TextSelectionDirection,
+} from "@seams/collaboration";
+import {
+  TextCollaborationClient,
+  type TextCollaborationClientMessage,
+  type TextCollaborationView,
+  type TextDocumentAdapter,
+  type TextProtocolAdapter,
+} from "../../collaboration/text-client";
+import { webSocketUrl } from "../../collaboration/document-client";
 import type { DraftPresenceView } from "./presence";
 import { assertNever } from "@seams/std";
 import { parseDescriptionServerMessage } from "@seams/control-api/portal/description-collaboration";
@@ -44,10 +58,11 @@ export type DescriptionDraftView = Readonly<{
   agents: readonly CollaborationAgentActivity[];
   initialization: DraftInitialization;
   readOnly: boolean;
-}> & (
-  | Readonly<{ kind: "connecting" | "synced" | "syncing" | "reconnecting" }>
-  | Readonly<{ kind: "failed"; message: string }>
-);
+}> &
+  (
+    | Readonly<{ kind: "connecting" | "synced" | "syncing" | "reconnecting" }>
+    | Readonly<{ kind: "failed"; message: string }>
+  );
 
 const DESCRIPTION_DOCUMENT: TextDocumentAdapter<
   DescriptionField,
@@ -96,15 +111,16 @@ export class DescriptionDraftClient {
     textarea: HTMLTextAreaElement,
     notify: (view: DescriptionDraftView) => void,
   ) {
-    const surface = textarea.closest<HTMLElement>(".description-draft-workspace");
-    if (surface === null) throw new Error("Draft workspace is missing");
-    const url = new URL(
-      `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/products/${encodeURIComponent(productId)}/description-draft/socket`,
-      window.location.origin,
+    const surface = textarea.closest<HTMLElement>(
+      ".description-draft-workspace",
     );
-    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    if (surface === null) {
+      throw new Error("Draft workspace is missing");
+    }
     this.#client = new TextCollaborationClient({
-      url: url.href,
+      url: webSocketUrl(
+        `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/products/${encodeURIComponent(productId)}/description-draft/socket`,
+      ),
       surface,
       textareas: { description: textarea },
       document: DESCRIPTION_DOCUMENT,
@@ -150,7 +166,10 @@ function editDescription(
   return document.edit(next, range);
 }
 
-function applyDescriptionUpdate(document: ProductDescriptionDoc, update: ProductDescriptionUpdate) {
+function applyDescriptionUpdate(
+  document: ProductDescriptionDoc,
+  update: ProductDescriptionUpdate,
+) {
   return document.apply(update);
 }
 
@@ -158,7 +177,10 @@ function readDescriptionStateVector(document: ProductDescriptionDoc) {
   return document.stateVector();
 }
 
-function createDescriptionSyncUpdate(document: ProductDescriptionDoc, vector: ProductDescriptionStateVector) {
+function createDescriptionSyncUpdate(
+  document: ProductDescriptionDoc,
+  vector: ProductDescriptionStateVector,
+) {
   return document.syncUpdate(vector);
 }
 
@@ -172,7 +194,10 @@ function captureDescriptionLocalSelection(
   return document.captureSelection(start, end, direction);
 }
 
-function resolveDescriptionLocalSelection(document: ProductDescriptionDoc, selection: ProductDescriptionSelection) {
+function resolveDescriptionLocalSelection(
+  document: ProductDescriptionDoc,
+  selection: ProductDescriptionSelection,
+) {
   return document.resolveSelection(selection);
 }
 
@@ -208,13 +233,20 @@ function encodeDescriptionClientMessage(
   return encodeDraftClientMessage(message);
 }
 
-function notifyDescriptionView(notify: (view: DescriptionDraftView) => void, view: DescriptionTextView): void {
-  const initialization: DraftInitialization = view.metadata === null
-    ? { kind: "uninitialized" }
-    : {
-        kind: "initialized",
-        metadata: { ...view.metadata, access: view.readOnly ? "read" : "edit" },
-      };
+function notifyDescriptionView(
+  notify: (view: DescriptionDraftView) => void,
+  view: DescriptionTextView,
+): void {
+  const initialization: DraftInitialization =
+    view.metadata === null
+      ? { kind: "uninitialized" }
+      : {
+          kind: "initialized",
+          metadata: {
+            ...view.metadata,
+            access: view.readOnly ? "read" : "edit",
+          },
+        };
   const participants = view.participants.map(descriptionParticipant);
   const base = {
     description: view.values.description,
@@ -223,12 +255,16 @@ function notifyDescriptionView(notify: (view: DescriptionDraftView) => void, vie
     initialization,
     readOnly: view.readOnly,
   };
-  notify(view.kind === "failed"
-    ? { ...base, kind: "failed", message: view.message }
-    : { ...base, kind: view.kind });
+  notify(
+    view.kind === "failed"
+      ? { ...base, kind: "failed", message: view.message }
+      : { ...base, kind: view.kind },
+  );
 }
 
-function descriptionParticipant(participant: DescriptionTextView["participants"][number]): DraftPresenceView {
+function descriptionParticipant(
+  participant: DescriptionTextView["participants"][number],
+): DraftPresenceView {
   return {
     sessionId: participant.sessionId,
     userId: participant.userId,

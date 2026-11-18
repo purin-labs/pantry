@@ -10,7 +10,11 @@ import {
   type DraftParticipant,
   type DraftServerMessage,
 } from "@seams/workflow-canvas-crdt/draft-protocol";
-import { SocketLiveness } from "../collaboration/socket-liveness";
+import {
+  DocumentSocket,
+  webSocketUrl,
+  type DocumentConnection,
+} from "../collaboration/document-client";
 
 export type DraftConnectionView = Readonly<{
   status: "connecting" | "syncing" | "synced" | "reconnecting" | "failed";
@@ -27,18 +31,6 @@ type Listener = Readonly<{
   revisionChanged(): void;
 }>;
 
-type Connection =
-  | Readonly<{
-      kind: "connecting" | "awaiting_sync" | "connected";
-      socket: WebSocket;
-    }>
-  | Readonly<{
-      kind: "reconnecting";
-      timer: ReturnType<typeof setTimeout>;
-    }>
-  | Readonly<{ kind: "failed"; message: string }>
-  | Readonly<{ kind: "closed" }>;
-
 /**
  * The page's view of one recipe's draft room. Edits reach the replica first, and
  * `flush` sends what the room has not acknowledged, so an edit made without a
@@ -47,12 +39,10 @@ type Connection =
  */
 export class WorkflowDraftClient {
   readonly doc = WorkflowDraftDoc.createReplica();
-  readonly #url: string;
   readonly #listener: Listener;
-  #connection: Connection = { kind: "closed" };
-  #liveness: SocketLiveness | null = null;
+  /** The socket's failure is the message that the page shows. */
+  readonly #socket: DocumentSocket<string, DraftClientMessage>;
   #access: "read" | "edit" = "read";
-  #attempts = 0;
   /** Local edits so far, and how many of them the room acknowledged. */
   #revision = 0;
   #acknowledgedRevision = 0;
@@ -68,22 +58,23 @@ export class WorkflowDraftClient {
 
   constructor(organisationId: string, workflowId: string, listener: Listener) {
     this.#listener = listener;
-    const url = new URL(
-      `/v1/control/organisations/${encodeURIComponent(organisationId)}/bakery/workflows/${encodeURIComponent(workflowId)}/socket`,
-      window.location.origin,
+    this.#socket = new DocumentSocket(
+      webSocketUrl(
+        `/v1/control/organisations/${encodeURIComponent(organisationId)}/bakery/workflows/${encodeURIComponent(workflowId)}/socket`,
+      ),
+      encodeDraftClientMessage,
+      {
+        connecting: this.#emit.bind(this),
+        opened: this.#requestSync.bind(this),
+        received: this.#received.bind(this),
+        closed: this.#closed.bind(this),
+      },
     );
-    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-    this.#url = url.href;
-    this.#connect();
+    this.#socket.connect();
   }
 
   dispose(): void {
-    const previous = this.#connection;
-    this.#connection = { kind: "closed" };
-    if (previous.kind === "reconnecting") clearTimeout(previous.timer);
-    else socketOf(previous)?.close();
-    this.#liveness?.stop();
-    this.#liveness = null;
+    this.#socket.close();
     this.doc.destroy();
   }
 
@@ -95,8 +86,9 @@ export class WorkflowDraftClient {
   /** Call after each local edit. It sends what the room has not acknowledged. */
   flush(): void {
     this.#revision++;
-    if (this.#connection.kind === "connected" && this.#pending === null)
+    if (this.#socket.kind === "connected" && this.#pending === null) {
       this.#submitUnacknowledged();
+    }
     this.#emit();
   }
 
@@ -104,64 +96,55 @@ export class WorkflowDraftClient {
     return this.#revision > this.#acknowledgedRevision;
   }
 
-  #connect(): void {
-    const socket = new WebSocket(this.#url);
-    this.#connection = { kind: "connecting", socket };
-    socket.addEventListener("open", this.#opened.bind(this, socket));
-    socket.addEventListener("message", this.#received.bind(this, socket));
-    socket.addEventListener("close", this.#disconnected.bind(this, socket));
-    socket.addEventListener("error", this.#disconnected.bind(this, socket));
-    this.#emit();
-  }
-
-  #opened(socket: WebSocket): void {
-    if (socketOf(this.#connection) !== socket) return;
-    this.#connection = { kind: "awaiting_sync", socket };
-    this.#liveness?.stop();
-    this.#liveness = new SocketLiveness(
-      socket,
-      this.#disconnected.bind(this, socket),
-    );
+  #requestSync(): void {
     const vector = this.doc.stateVector();
-    if (!vector.ok) return this.#fail("The draft cannot be read.");
-    this.#send({ kind: "sync_request", stateVector: vector.value });
+    if (!vector.ok) {
+      return this.#fail("The draft cannot be read.");
+    }
+    this.#socket.send({ kind: "sync_request", stateVector: vector.value });
   }
 
-  #received(socket: WebSocket, event: MessageEvent): void {
-    if (socketOf(this.#connection) !== socket) return;
-    if (this.#liveness?.received(event.data) === true) return;
-    const parsed = parseDraftServerMessage(event.data);
-    if (!parsed.ok) return this.#fail("The draft cannot be synchronized.");
-    this.#handle(socket, parsed.value);
+  #received(frame: unknown): void {
+    const parsed = parseDraftServerMessage(frame);
+    if (!parsed.ok) {
+      return this.#fail("The draft cannot be synchronized.");
+    }
+    this.#handle(parsed.value);
   }
 
-  #handle(socket: WebSocket, message: DraftServerMessage): void {
+  #handle(message: DraftServerMessage): void {
     switch (message.kind) {
       case "sync_response": {
         const applied = this.doc.apply(message.missingUpdate);
-        if (!applied.ok) return this.#fail("The draft cannot be synchronized.");
+        if (!applied.ok) {
+          return this.#fail("The draft cannot be synchronized.");
+        }
         this.#access = message.access;
-        this.#attempts = 0;
+        this.#socket.resetBackoff();
         this.#pending = null;
         this.#roomVector = message.serverStateVector;
-        this.#connection = { kind: "connected", socket };
+        this.#socket.mark("connected");
         this.#listener.changed();
-        if (this.hasUnsyncedEdits() && this.#access !== "edit")
+        if (this.hasUnsyncedEdits() && this.#access !== "edit") {
           return this.#fail("Your access to edit this draft ended.");
+        }
         this.#submitUnacknowledged();
         this.#presence();
         break;
       }
       case "update_broadcast": {
         const applied = this.doc.apply(message.update);
-        if (!applied.ok) return this.#fail("The draft cannot be synchronized.");
+        if (!applied.ok) {
+          return this.#fail("The draft cannot be synchronized.");
+        }
         this.#listener.changed();
         break;
       }
       case "update_accepted": {
         const pending = this.#pending;
-        if (pending === null || pending.id !== message.updateId)
+        if (pending === null || pending.id !== message.updateId) {
           return this.#fail("The room sent an unexpected receipt.");
+        }
         this.#roomVector = pending.vector;
         this.#acknowledgedRevision = pending.revision;
         this.#pending = null;
@@ -191,77 +174,65 @@ export class WorkflowDraftClient {
       this.#roomVector === null ||
       this.#access !== "edit" ||
       !this.hasUnsyncedEdits()
-    )
+    ) {
       return;
+    }
     const update = this.doc.syncUpdate(this.#roomVector);
     const vector = this.doc.stateVector();
-    if (!update.ok || !vector.ok)
+    if (!update.ok || !vector.ok) {
       return this.#fail("The draft cannot be saved. Reload the page.");
+    }
     const id = crypto.randomUUID();
     this.#pending = { id, revision: this.#revision, vector: vector.value };
-    this.#send({ kind: "submit_update", updateId: id, update: update.value });
-  }
-
-  #send(message: DraftClientMessage): void {
-    const socket = socketOf(this.#connection);
-    if (socket?.readyState === WebSocket.OPEN)
-      socket.send(encodeDraftClientMessage(message));
+    this.#socket.send({
+      kind: "submit_update",
+      updateId: id,
+      update: update.value,
+    });
   }
 
   #presence(): void {
-    if (this.#connection.kind !== "connected") return;
-    this.#send({
+    if (this.#socket.kind !== "connected") {
+      return;
+    }
+    this.#socket.send({
       kind: "presence_update",
       state: this.#selection === null ? "viewing" : "editing",
       selection: this.#selection,
     });
   }
 
-  #disconnected(socket: WebSocket): void {
-    if (socketOf(this.#connection) !== socket) return;
-    this.#liveness?.stop();
-    this.#liveness = null;
+  #closed(): void {
     this.#participants = [];
     this.#pending = null;
-    this.#attempts = Math.min(this.#attempts + 1, 4);
-    this.#connection = {
-      kind: "reconnecting",
-      timer: setTimeout(
-        this.#connect.bind(this),
-        Math.min(1000 * 2 ** this.#attempts, 10000),
-      ),
-    };
-    socket.close();
     this.#emit();
   }
 
   #fail(message: string): void {
-    this.#liveness?.stop();
-    this.#liveness = null;
+    this.#socket.fail(message);
     this.#participants = [];
-    const previous = this.#connection;
-    this.#connection = { kind: "failed", message };
-    if (previous.kind === "reconnecting") clearTimeout(previous.timer);
-    else socketOf(previous)?.close();
     this.#emit();
   }
 
   #emit(): void {
-    const connection = this.#connection;
-    if (connection.kind === "closed") return;
+    const connection = this.#socket.kind;
+    if (connection === "closed") {
+      return;
+    }
     this.#listener.view({
-      ...statusOf(connection, this.hasUnsyncedEdits()),
-      canEdit: connection.kind !== "failed" && this.#access === "edit",
-      participants: connection.kind === "connected" ? this.#participants : [],
+      ...statusOf(connection, this.#socket.failure, this.hasUnsyncedEdits()),
+      canEdit: connection !== "failed" && this.#access === "edit",
+      participants: connection === "connected" ? this.#participants : [],
     });
   }
 }
 
 function statusOf(
-  connection: Exclude<Connection, Readonly<{ kind: "closed" }>>,
+  connection: Exclude<DocumentConnection, "closed">,
+  failure: string | null,
   unsynced: boolean,
 ): Pick<DraftConnectionView, "status" | "message"> {
-  switch (connection.kind) {
+  switch (connection) {
     case "connecting":
     case "awaiting_sync":
       return { status: "connecting", message: "Connecting the draft…" };
@@ -271,26 +242,12 @@ function statusOf(
         message: "Reconnecting. Your changes stay on this page until then.",
       };
     case "failed":
-      return { status: "failed", message: connection.message };
+      return { status: "failed", message: failure ?? "" };
+    case "syncing":
     case "connected":
       return unsynced
         ? { status: "syncing", message: "Saving the draft…" }
         : { status: "synced", message: "Draft saved." };
-    default:
-      return assertNever(connection, "Unexpected draft connection");
-  }
-}
-
-function socketOf(connection: Connection): WebSocket | null {
-  switch (connection.kind) {
-    case "connecting":
-    case "awaiting_sync":
-    case "connected":
-      return connection.socket;
-    case "reconnecting":
-    case "failed":
-    case "closed":
-      return null;
     default:
       return assertNever(connection, "Unexpected draft connection");
   }

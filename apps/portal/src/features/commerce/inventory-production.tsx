@@ -12,10 +12,7 @@ import {
   type InventoryProductionRequest,
 } from "@seams/control-api";
 import { assertNever, isRecord } from "@seams/std";
-import {
-  StatusChip,
-  type StatusChipStatus,
-} from "../../page-components";
+import { StatusChip, type StatusChipStatus } from "../../page-components";
 import type { Quantity } from "@seams/contracts";
 import { ControlApiError, controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
@@ -28,6 +25,12 @@ import {
   type ProductionSubmission,
   type ProductionSubmissionScope,
 } from "./inventory-production-submission";
+import {
+  StockDialogCancel,
+  StockDialogContext,
+  StockDialogDone,
+  StockDialogRetry,
+} from "./stock-dialog";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 import { ProductionPlanPanel } from "./production-plan";
 import {
@@ -46,7 +49,9 @@ type Props = Readonly<{
   mutate: CommerceMutationTransport;
   close: () => void;
 }>;
+
 type Draft = Readonly<{ recipe: string; quantity: string; neededBy: string }>;
+
 type State =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>
@@ -105,17 +110,20 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
     }
   }
   async load() {
-    if (this.state.kind === "uncertain" || this.state.kind === "submitting")
+    if (this.state.kind === "uncertain" || this.state.kind === "submitting") {
       return;
+    }
     await this.loadContext(null);
   }
   private async loadContext(restoredDraft: Draft | null) {
-    if (this.state.kind === "refreshing") return;
+    if (this.state.kind === "refreshing") {
+      return;
+    }
     const preserved =
       this.state.kind === "editing" || this.state.kind === "saving"
         ? this.state
         : null;
-    if (preserved !== null)
+    if (preserved !== null) {
       this.setState({
         kind: "refreshing",
         context: preserved.context,
@@ -123,6 +131,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
         message: null,
         discard: false,
       });
+    }
     try {
       const context = parseInventoryProductionContext(
         await controlRead(
@@ -130,7 +139,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
         ),
       );
       const recipe = context.recipes[0] ?? context.linkableRecipes[0];
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "editing",
           context,
@@ -153,8 +162,9 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
           message: null,
           discard: false,
         });
+      }
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState(
           preserved === null
             ? { kind: "failed", message: productionError(error) }
@@ -166,10 +176,13 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
                 discard: false,
               },
         );
+      }
     }
   }
   edit(event: React.ChangeEvent<HTMLInputElement>) {
-    if (this.state.kind !== "editing") return;
+    if (this.state.kind !== "editing") {
+      return;
+    }
     this.dirty = true;
     this.setState({
       kind: "editing",
@@ -180,7 +193,9 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
     });
   }
   editRecipe(recipe: string | null) {
-    if (this.state.kind !== "editing" || recipe === null) return;
+    if (this.state.kind !== "editing" || recipe === null) {
+      return;
+    }
     this.dirty = true;
     this.setState({
       kind: "editing",
@@ -195,8 +210,9 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
       this.state.kind === "saving" ||
       this.state.kind === "refreshing" ||
       this.state.kind === "submitting"
-    )
+    ) {
       return;
+    }
     if (this.dirty && this.state.kind === "editing") {
       this.setState({
         kind: "editing",
@@ -211,7 +227,9 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
     this.props.close();
   }
   async setup() {
-    if (this.state.kind !== "editing") return;
+    if (this.state.kind !== "editing") {
+      return;
+    }
     const { context, draft } = this.state;
     this.setState({
       kind: "saving",
@@ -228,7 +246,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
       );
       await this.load();
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "editing",
           context,
@@ -236,15 +254,20 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
           message: productionError(error),
           discard: false,
         });
+      }
     }
   }
   async linkRecipe() {
-    if (this.state.kind !== "editing") return;
+    if (this.state.kind !== "editing") {
+      return;
+    }
     const { context, draft } = this.state;
     const recipe = context.linkableRecipes.find(
       recipeMatches.bind(null, draft.recipe),
     );
-    if (recipe === undefined) return;
+    if (recipe === undefined) {
+      return;
+    }
     this.setState({
       kind: "saving",
       context,
@@ -268,7 +291,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
       );
       await this.load();
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "editing",
           context,
@@ -276,25 +299,30 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
           message: productionError(error),
           discard: false,
         });
+      }
     }
   }
   async submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (this.state.kind !== "editing") return;
+    if (this.state.kind !== "editing") {
+      return;
+    }
     const { context, draft } = this.state;
     try {
       const recipe = context.recipes.find(
         recipeMatches.bind(null, draft.recipe),
       );
-      if (recipe === undefined)
+      if (recipe === undefined) {
         throw new Error("Link a recipe that produces this stock item.");
+      }
       const quantity = parseInventoryQuantityText(
         draft.quantity,
         recipe.yield.unit,
       );
       const neededBy = neededByTimestamp(draft.neededBy);
-      if (context.demand.kind !== "ready")
+      if (context.demand.kind !== "ready") {
         throw new Error("Set up production requests before submitting.");
+      }
       const submission: ProductionSubmission<InventoryProductionCreation> = {
         idempotencyKey: `production:${crypto.randomUUID()}`,
         body: {
@@ -315,7 +343,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
       storeProductionSubmission(this.scope(), submission);
       await this.sendSubmission(submission);
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "editing",
           context,
@@ -323,11 +351,13 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
           message: productionError(error),
           discard: false,
         });
+      }
     }
   }
   async retrySubmission() {
-    if (this.state.kind === "uncertain")
+    if (this.state.kind === "uncertain") {
       await this.sendSubmission(this.state.submission);
+    }
   }
   private async sendSubmission(
     submission: ProductionSubmission<InventoryProductionCreation>,
@@ -344,11 +374,14 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
         { kind: "prepared", idempotencyKey: submission.idempotencyKey },
       );
       const requestId = productionReceipt(response);
-      if (requestId !== `production_request_${submission.idempotencyKey}`)
+      if (requestId !== `production_request_${submission.idempotencyKey}`) {
         throw new Error("The production receipt does not match this request.");
+      }
       clearProductionSubmission(this.scope());
       this.dirty = false;
-      if (this.active) this.setState({ kind: "requested" });
+      if (this.active) {
+        this.setState({ kind: "requested" });
+      }
     } catch (error) {
       if (
         productionFailure(error) === "rejected" &&
@@ -357,7 +390,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
         try {
           clearProductionSubmission(this.scope());
           await this.loadContext(creationDraft(submission.body));
-          if (this.active && this.state.kind === "editing")
+          if (this.active && this.state.kind === "editing") {
             this.setState({
               kind: "editing",
               context: this.state.context,
@@ -365,17 +398,19 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
               discard: false,
               message: productionError(error),
             });
+          }
           return;
         } catch {
           // A retained submission must remain recoverable before another command is allowed.
         }
       }
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "uncertain",
           submission,
           message: productionError(error),
         });
+      }
     }
   }
   render(): React.ReactNode {
@@ -412,19 +447,11 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
           </div>
         )}
         {state.kind === "failed" && (
-          <>
-            <div className="stock-dialog-body">
-              <p role="alert">{state.message}</p>
-            </div>
-            <footer className="stock-dialog-actions">
-              <button type="button" onClick={this.close.bind(this)}>
-                Close
-              </button>
-              <button type="button" onClick={this.restore.bind(this)}>
-                Try again
-              </button>
-            </footer>
-          </>
+          <StockDialogRetry
+            message={state.message}
+            close={this.close.bind(this)}
+            retry={this.restore.bind(this)}
+          />
         )}
         {(state.kind === "uncertain" || state.kind === "submitting") && (
           <>
@@ -459,24 +486,13 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
           </>
         )}
         {state.kind === "requested" && (
-          <>
-            <div className="stock-dialog-body">
-              <p role="status">
-                Production requested. Stock will increase when a confirmed batch
-                is recorded.
-              </p>
-              <Link to={this.props.requestsHref}>Open Kitchen requests</Link>
-            </div>
-            <footer className="stock-dialog-actions">
-              <button
-                type="button"
-                className="connection-primary-action"
-                onClick={this.close.bind(this)}
-              >
-                Done
-              </button>
-            </footer>
-          </>
+          <StockDialogDone close={this.close.bind(this)}>
+            <p role="status">
+              Production requested. Stock will increase when a confirmed batch
+              is recorded.
+            </p>
+            <Link to={this.props.requestsHref}>Open Kitchen requests</Link>
+          </StockDialogDone>
         )}
         {(state.kind === "editing" ||
           state.kind === "refreshing" ||
@@ -487,14 +503,11 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
             aria-busy={state.kind !== "editing"}
           >
             <div className="stock-dialog-body">
-              <section
-                className="stock-dialog-context"
-                aria-label="Production item"
+              <StockDialogContext
+                label="Production item"
+                name={state.context.itemName}
+                detail="Finished product"
               >
-                <div>
-                  <strong>{state.context.itemName}</strong>
-                  <span>Finished product</span>
-                </div>
                 {recipe !== undefined && (
                   <dl>
                     <div>
@@ -508,7 +521,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
                     </div>
                   </dl>
                 )}
-              </section>
+              </StockDialogContext>
               {state.context.demand.kind === "inactive" && (
                 <div className="stock-dialog-notice stock-dialog-setup">
                   <div>
@@ -544,8 +557,8 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
                   </p>
                   {state.context.linkableRecipes.length === 0 ? (
                     <p>
-                      No compatible stocked recipes are available. Create a recipe
-                      in Kitchen → Recipes.
+                      No compatible stocked recipes are available. Create a
+                      recipe in Kitchen → Recipes.
                     </p>
                   ) : (
                     <>
@@ -656,19 +669,11 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
               )}
             </div>
             <footer className="stock-dialog-actions">
-              {state.discard ? (
-                <button
-                  type="button"
-                  className="danger"
-                  onClick={this.props.close}
-                >
-                  Discard changes
-                </button>
-              ) : (
-                <button type="button" onClick={this.close.bind(this)}>
-                  Cancel
-                </button>
-              )}
+              <StockDialogCancel
+                discard={state.discard}
+                discardChanges={this.props.close}
+                close={this.close.bind(this)}
+              />
               {linking ? (
                 <button
                   type="button"
@@ -709,6 +714,7 @@ type RequestsProps = Readonly<{
   productsHref: string;
   mutate: CommerceMutationTransport;
 }>;
+
 type RequestsWork =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "loading"; cursor: string | null }>
@@ -720,6 +726,7 @@ type RequestsWork =
       submission: ProductionSubmission<InventoryProductionTransition>;
     }>
   | Readonly<{ kind: "settled"; requestId: string }>;
+
 type RequestsState =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>
@@ -730,6 +737,7 @@ type RequestsState =
       continuation: "current" | "restart_required";
       message: string | null;
     }>;
+
 export class InventoryProductionRequestsPage extends React.Component<
   RequestsProps,
   RequestsState
@@ -742,7 +750,9 @@ export class InventoryProductionRequestsPage extends React.Component<
   }
   componentDidUpdate() {
     // A plan link changes the location filter in the address only.
-    if (window.location.search === this.search) return;
+    if (window.location.search === this.search) {
+      return;
+    }
     this.search = window.location.search;
     void this.load();
   }
@@ -755,9 +765,10 @@ export class InventoryProductionRequestsPage extends React.Component<
       previous !== null &&
       previous.work.kind !== "idle" &&
       previous.work.kind !== "retry"
-    )
+    ) {
       return;
-    if (previous !== null)
+    }
+    if (previous !== null) {
       this.setState({
         kind: "ready",
         demand: previous.demand,
@@ -765,26 +776,30 @@ export class InventoryProductionRequestsPage extends React.Component<
         work: { kind: "loading", cursor },
         message: null,
       });
+    }
     try {
       const raw = await controlRead(
         productionRequestsPath(this.props.organisationId, cursor),
       );
-      if (!isRecord(raw) || raw.ok !== true)
+      if (!isRecord(raw) || raw.ok !== true) {
         throw new Error("Production requests are unavailable.");
+      }
       const page = parseProductionDemand(raw.demand);
-      if (page.kind === "unavailable")
+      if (page.kind === "unavailable") {
         throw new Error("Production requests are unavailable.");
+      }
       let demand: InventoryProductionContext["demand"] = page;
       if (cursor !== null) {
         if (
           previous?.demand.kind !== "ready" ||
           page.kind !== "ready" ||
           previous.demand.merchantRevision !== page.merchantRevision
-        )
+        ) {
           throw new ControlApiError(
             "Requests changed while loading.",
             "production_cursor_stale",
           );
+        }
         demand = {
           kind: "ready",
           merchantRevision: page.merchantRevision,
@@ -797,7 +812,7 @@ export class InventoryProductionRequestsPage extends React.Component<
           nextCursor: page.nextCursor,
         };
       }
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "ready",
           demand,
@@ -805,8 +820,11 @@ export class InventoryProductionRequestsPage extends React.Component<
           work: { kind: "idle" },
           message: null,
         });
+      }
     } catch (error) {
-      if (!this.active) return;
+      if (!this.active) {
+        return;
+      }
       if (previous === null) {
         this.setState({ kind: "failed", message: productionError(error) });
         return;
@@ -832,12 +850,14 @@ export class InventoryProductionRequestsPage extends React.Component<
       this.state.continuation === "current" &&
       this.state.demand.kind === "ready" &&
       this.state.demand.nextCursor !== null
-    )
+    ) {
       void this.load(this.state.demand.nextCursor);
+    }
   }
   retryLoad() {
-    if (this.state.kind === "ready" && this.state.work.kind === "retry")
+    if (this.state.kind === "ready" && this.state.work.kind === "retry") {
       void this.load(this.state.work.cursor);
+    }
   }
   private scope(
     requestId: string,
@@ -850,7 +870,9 @@ export class InventoryProductionRequestsPage extends React.Component<
     };
   }
   async setup() {
-    if (this.state.kind !== "ready" || this.state.work.kind !== "idle") return;
+    if (this.state.kind !== "ready" || this.state.work.kind !== "idle") {
+      return;
+    }
     const { demand, continuation } = this.state;
     this.setState({
       kind: "ready",
@@ -866,10 +888,11 @@ export class InventoryProductionRequestsPage extends React.Component<
         `production:setup:${crypto.randomUUID()}`,
       );
       const raw = await controlRead(productionPath(this.props.organisationId));
-      if (!isRecord(raw) || raw.ok !== true)
+      if (!isRecord(raw) || raw.ok !== true) {
         throw new Error("Production requests are unavailable.");
+      }
       const updated = parseProductionDemand(raw.demand);
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "ready",
           demand: updated,
@@ -877,8 +900,9 @@ export class InventoryProductionRequestsPage extends React.Component<
           work: { kind: "idle" },
           message: null,
         });
+      }
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "ready",
           demand,
@@ -886,14 +910,16 @@ export class InventoryProductionRequestsPage extends React.Component<
           work: { kind: "idle" },
           message: productionError(error),
         });
+      }
     }
   }
   async advance(request: InventoryProductionRequest) {
     if (
       this.state.kind !== "ready" ||
       (this.state.work.kind !== "idle" && this.state.work.kind !== "retry")
-    )
+    ) {
       return;
+    }
     const { demand, continuation } = this.state;
     this.setState({
       kind: "ready",
@@ -916,10 +942,11 @@ export class InventoryProductionRequestsPage extends React.Component<
         target.revision !== request.revision ||
         target.status !== request.status ||
         target.status === "scheduled"
-      )
+      ) {
         throw new Error(
           "This request changed. Refresh requests before continuing.",
         );
+      }
       const submission: ProductionSubmission<InventoryProductionTransition> = {
         idempotencyKey: `production:${crypto.randomUUID()}`,
         body: {
@@ -939,7 +966,7 @@ export class InventoryProductionRequestsPage extends React.Component<
       storeProductionSubmission(this.scope(request.id), submission);
       await this.sendTransition(request.id, submission);
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "ready",
           demand,
@@ -947,23 +974,29 @@ export class InventoryProductionRequestsPage extends React.Component<
           work: { kind: "idle" },
           message: productionError(error),
         });
+      }
     }
   }
   async retryAction() {
-    if (this.state.kind !== "ready") return;
-    if (this.state.work.kind === "pending")
+    if (this.state.kind !== "ready") {
+      return;
+    }
+    if (this.state.work.kind === "pending") {
       await this.sendTransition(
         this.state.work.requestId,
         this.state.work.submission,
       );
-    else if (this.state.work.kind === "settled")
+    } else if (this.state.work.kind === "settled") {
       await this.refreshRequest(this.state.work.requestId);
+    }
   }
   private async sendTransition(
     id: string,
     submission: ProductionSubmission<InventoryProductionTransition>,
   ) {
-    if (this.state.kind !== "ready") return;
+    if (this.state.kind !== "ready") {
+      return;
+    }
     const { demand, continuation } = this.state;
     this.setState({
       kind: "ready",
@@ -978,14 +1011,15 @@ export class InventoryProductionRequestsPage extends React.Component<
         submission.body,
         { kind: "prepared", idempotencyKey: submission.idempotencyKey },
       );
-      if (productionReceipt(response) !== id)
+      if (productionReceipt(response) !== id) {
         throw new Error("The production receipt does not match this request.");
+      }
       clearProductionSubmission(this.scope(id));
     } catch (error) {
       if (productionFailure(error) === "rejected") {
         try {
           clearProductionSubmission(this.scope(id));
-          if (this.active)
+          if (this.active) {
             this.setState({
               kind: "ready",
               demand,
@@ -993,12 +1027,13 @@ export class InventoryProductionRequestsPage extends React.Component<
               work: { kind: "idle" },
               message: productionError(error),
             });
+          }
           return;
         } catch {
           // Preserve recovery when browser storage cannot be cleared.
         }
       }
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "ready",
           demand,
@@ -1006,6 +1041,7 @@ export class InventoryProductionRequestsPage extends React.Component<
           work: { kind: "pending", requestId: id, submission },
           message: productionError(error),
         });
+      }
       return;
     }
     await this.refreshRequest(id);
@@ -1016,19 +1052,23 @@ export class InventoryProductionRequestsPage extends React.Component<
     const raw = await controlRead(
       `${productionPath(this.props.organisationId)}?request=${encodeURIComponent(id)}`,
     );
-    if (!isRecord(raw) || raw.ok !== true)
+    if (!isRecord(raw) || raw.ok !== true) {
       throw new Error("The updated request could not be loaded.");
+    }
     const updated = parseProductionDemand(raw.demand);
     if (
       updated.kind !== "ready" ||
       updated.requests.length !== 1 ||
       updated.requests[0]?.id !== id
-    )
+    ) {
       throw new Error("The updated request could not be loaded.");
+    }
     return updated;
   }
   private async refreshRequest(id: string) {
-    if (this.state.kind !== "ready") return;
+    if (this.state.kind !== "ready") {
+      return;
+    }
     const { demand } = this.state;
     this.setState({
       kind: "ready",
@@ -1040,9 +1080,10 @@ export class InventoryProductionRequestsPage extends React.Component<
     try {
       const updated = await this.readRequest(id);
       const target = updated.requests[0];
-      if (target === undefined || demand.kind !== "ready")
+      if (target === undefined || demand.kind !== "ready") {
         throw new Error("The updated request could not be loaded.");
-      if (this.active)
+      }
+      if (this.active) {
         this.setState({
           kind: "ready",
           demand: {
@@ -1059,8 +1100,9 @@ export class InventoryProductionRequestsPage extends React.Component<
           work: { kind: "idle" },
           message: null,
         });
+      }
     } catch (error) {
-      if (this.active)
+      if (this.active) {
         this.setState({
           kind: "ready",
           demand,
@@ -1068,6 +1110,7 @@ export class InventoryProductionRequestsPage extends React.Component<
           work: { kind: "settled", requestId: id },
           message: `The update was accepted. ${productionError(error)}`,
         });
+      }
     }
   }
   renderRequest(request: InventoryProductionRequest): React.ReactNode {
@@ -1115,15 +1158,17 @@ export class InventoryProductionRequestsPage extends React.Component<
   }
   render(): React.ReactNode {
     const state = this.state;
-    if (state.kind === "loading")
+    if (state.kind === "loading") {
       return <p role="status">Loading production requests…</p>;
-    if (state.kind === "failed")
+    }
+    if (state.kind === "failed") {
       return (
         <div>
           <p role="alert">{state.message}</p>
           <button onClick={this.load.bind(this, null)}>Try again</button>
         </div>
       );
+    }
     const requests = state.demand.kind === "ready" ? state.demand.requests : [];
     const locationId = selectedLocation();
     return (
@@ -1260,20 +1305,24 @@ function productionRequestStatus(
 function productionPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/inventory/production-requests`;
 }
+
 function productionError(error: unknown): string {
   return error instanceof Error
     ? error.message
     : "Production could not be updated.";
 }
+
 function recipeMatches(id: string, recipe: InventoryProductionRecipe): boolean {
   return recipe.id === id;
 }
+
 function recipeItem(recipe: InventoryProductionRecipe) {
   return {
     value: recipe.id,
     label: `${recipe.name} · revision ${recipe.revision}`,
   };
 }
+
 function recipeOption(recipe: InventoryProductionRecipe) {
   return (
     <Select.Item key={recipe.id} value={recipe.id}>
@@ -1281,6 +1330,7 @@ function recipeOption(recipe: InventoryProductionRecipe) {
     </Select.Item>
   );
 }
+
 function completedBatch(batch: InventoryProductionRequest["batches"][number]) {
   return (
     <li key={batch.id}>
@@ -1290,6 +1340,7 @@ function completedBatch(batch: InventoryProductionRequest["batches"][number]) {
     </li>
   );
 }
+
 function ingredientReview(
   recipe: InventoryProductionRecipe,
   requested: string,
@@ -1357,23 +1408,33 @@ function productionRequestsPath(
   const query = new URLSearchParams();
   for (const name of ["inventoryItem", "location"]) {
     const value = selected.get(name);
-    if (value !== null) query.set(name, value);
+    if (value !== null) {
+      query.set(name, value);
+    }
   }
-  if (cursor !== null) query.set("cursor", cursor);
+  if (cursor !== null) {
+    query.set("cursor", cursor);
+  }
   return `${productionPath(organisationId)}${query.size === 0 ? "" : `?${query}`}`;
 }
+
 function selectedLocation(): string | null {
   return new URLSearchParams(window.location.search).get("location");
 }
+
 /** The locations whose requests wait for acceptance, for the plan links. */
 function planLocations(
   requests: readonly InventoryProductionRequest[],
 ): string[] {
   const locations = new Set<string>();
-  for (const request of requests)
-    if (request.status === "requested") locations.add(request.locationId);
+  for (const request of requests) {
+    if (request.status === "requested") {
+      locations.add(request.locationId);
+    }
+  }
   return [...locations].sort();
 }
+
 function planLocationLink(locationId: string): React.ReactNode {
   return (
     <Link key={locationId} to={`?location=${encodeURIComponent(locationId)}`}>
@@ -1381,21 +1442,25 @@ function planLocationLink(locationId: string): React.ReactNode {
     </Link>
   );
 }
+
 function waitsAtLocation(
   locationId: string,
   request: InventoryProductionRequest,
 ): boolean {
   return request.status === "requested" && request.locationId === locationId;
 }
+
 function settledAtLocation(
   locationId: string,
   request: InventoryProductionRequest,
 ): boolean {
   return request.status !== "requested" && request.locationId === locationId;
 }
+
 function requestIdentity(request: InventoryProductionRequest): string {
   return request.id;
 }
+
 function replaceProductionRequest(
   updated: InventoryProductionRequest,
   current: InventoryProductionRequest,
