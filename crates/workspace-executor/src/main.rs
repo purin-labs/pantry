@@ -14,7 +14,7 @@ use serde::Serialize;
 use tokio::net::TcpListener;
 use workspace_executor::{
     ENVELOPE_HEADER_BYTES, MAX_ATTACHMENT_BYTES, MAX_REQUEST_BYTES, WorkspaceExecutorErrorCode,
-    execute_envelope, execute_json,
+    execute_envelope,
 };
 
 const LISTEN_ADDRESS: &str = "0.0.0.0:8080";
@@ -53,55 +53,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 async fn handle_request(request: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
     let response = match (request.method(), request.uri().path()) {
         (&Method::GET, "/health") => json_response(StatusCode::OK, br#"{"status":"ok"}"#.to_vec()),
-        (&Method::POST, "/v1/execute") => execute_request(request).await,
         (&Method::POST, "/v1/execute-envelope") => execute_envelope_request(request).await,
         _ => empty_response(StatusCode::NOT_FOUND),
     };
     Ok(response)
-}
-
-async fn execute_request(request: Request<Incoming>) -> Response<Full<Bytes>> {
-    if request
-        .headers()
-        .get(CONTENT_TYPE)
-        .and_then(|value| value.to_str().ok())
-        != Some("application/json")
-    {
-        return error_response(
-            StatusCode::UNSUPPORTED_MEDIA_TYPE,
-            WorkspaceExecutorErrorCode::InvalidRequest,
-            "content type must be application/json",
-        );
-    }
-    if content_length_exceeds_limit(&request) {
-        return error_response(
-            StatusCode::PAYLOAD_TOO_LARGE,
-            WorkspaceExecutorErrorCode::InputTooLarge,
-            "workspace executor request exceeds the byte limit",
-        );
-    }
-
-    let body = match read_bounded_body(request.into_body()).await {
-        Ok(body) => body,
-        Err(code) => {
-            return error_response(
-                StatusCode::PAYLOAD_TOO_LARGE,
-                code,
-                "workspace executor request exceeds the byte limit",
-            );
-        }
-    };
-    match execute_json(&body, SystemTime::now()) {
-        Ok(result) => match serde_json::to_vec(&result) {
-            Ok(body) => json_response(StatusCode::OK, body),
-            Err(_) => error_response(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                WorkspaceExecutorErrorCode::InternalFailure,
-                "workspace executor failed internally",
-            ),
-        },
-        Err(error) => error_response(error_status(error.code()), error.code(), error.message()),
-    }
 }
 
 /// The binary path: an 8-byte JSON length, the JSON request, then raw bytes.
@@ -183,29 +138,6 @@ async fn read_body_bounded_to(
     Ok(output)
 }
 
-fn content_length_exceeds_limit(request: &Request<Incoming>) -> bool {
-    request
-        .headers()
-        .get(CONTENT_LENGTH)
-        .and_then(|value| value.to_str().ok())
-        .and_then(|value| value.parse::<usize>().ok())
-        .is_some_and(|value| value > MAX_REQUEST_BYTES)
-}
-
-async fn read_bounded_body(mut body: Incoming) -> Result<Vec<u8>, WorkspaceExecutorErrorCode> {
-    let mut output = Vec::new();
-    while let Some(frame) = body.frame().await {
-        let frame = frame.map_err(|_| WorkspaceExecutorErrorCode::InvalidRequest)?;
-        if let Some(data) = frame.data_ref() {
-            if output.len().saturating_add(data.len()) > MAX_REQUEST_BYTES {
-                return Err(WorkspaceExecutorErrorCode::InputTooLarge);
-            }
-            output.extend_from_slice(data);
-        }
-    }
-    Ok(output)
-}
-
 fn error_status(code: WorkspaceExecutorErrorCode) -> StatusCode {
     match code {
         WorkspaceExecutorErrorCode::InputTooLarge => StatusCode::PAYLOAD_TOO_LARGE,
@@ -213,10 +145,7 @@ fn error_status(code: WorkspaceExecutorErrorCode) -> StatusCode {
         WorkspaceExecutorErrorCode::InternalFailure => StatusCode::INTERNAL_SERVER_ERROR,
         WorkspaceExecutorErrorCode::AttachmentDigestMismatch
         | WorkspaceExecutorErrorCode::InvalidRequest
-        | WorkspaceExecutorErrorCode::DeadlineTooFarAhead
-        | WorkspaceExecutorErrorCode::InvalidProductRoot
-        | WorkspaceExecutorErrorCode::InvalidProductFolder
-        | WorkspaceExecutorErrorCode::InvalidChangesetCandidate => StatusCode::BAD_REQUEST,
+        | WorkspaceExecutorErrorCode::DeadlineTooFarAhead => StatusCode::BAD_REQUEST,
     }
 }
 

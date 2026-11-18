@@ -202,7 +202,6 @@ import {
   queryWorkspaceForEmbeddedHarness,
   readFileForEmbeddedHarness,
   searchFilesForEmbeddedHarness,
-  updateWorkspaceProductFolderForEmbeddedHarness,
 } from "../../agent-tools/files/handlers";
 import {
   listIntegrationsForEmbeddedHarness,
@@ -1069,9 +1068,6 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         this.ctx.storage,
         input.execution,
         input.lease,
-      ),
-      updateWorkspaceProductFolder: tool(
-        updateWorkspaceProductFolderForEmbeddedHarness,
       ),
       proposeCommerceAction: tool(proposeCommerceActionForHarness),
       editMenuDraft: tool(editMenuDraftForEmbeddedHarness),

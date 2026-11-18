@@ -11,7 +11,6 @@
 use std::fmt;
 
 use serde::{Deserialize, Deserializer, Serialize};
-use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
 // ---------------------------------------------------------------------------
 // Actor identities
@@ -52,9 +51,6 @@ macro_rules! actor_identity {
 
 actor_identity!(SessionId);
 actor_identity!(TurnId);
-actor_identity!(WorkspaceRevision);
-actor_identity!(ExecutionId);
-actor_identity!(EffectReceiptId);
 
 // ---------------------------------------------------------------------------
 // Bounded identities
@@ -64,62 +60,6 @@ actor_identity!(EffectReceiptId);
 pub enum IdentityError {
     InvalidIdentity { field: String },
 }
-
-macro_rules! prefixed_identity {
-    ($name:ident, $prefix:literal) => {
-        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
-        #[serde(transparent)]
-        pub struct $name(String);
-
-        impl $name {
-            pub fn parse(value: impl Into<String>) -> Result<Self, IdentityError> {
-                let value = value.into();
-                if value.len() <= $prefix.len()
-                    || !value.starts_with($prefix)
-                    || !valid_identity_text(&value)
-                {
-                    return Err(IdentityError::InvalidIdentity {
-                        field: stringify!($name).to_string(),
-                    });
-                }
-                Ok(Self(value))
-            }
-
-            pub fn as_str(&self) -> &str {
-                &self.0
-            }
-        }
-    };
-}
-
-macro_rules! bounded_identity {
-    ($name:ident) => {
-        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
-        #[serde(transparent)]
-        pub struct $name(String);
-
-        impl $name {
-            pub fn parse(value: impl Into<String>) -> Result<Self, IdentityError> {
-                let value = value.into();
-                if !valid_identity_text(&value) {
-                    return Err(IdentityError::InvalidIdentity {
-                        field: stringify!($name).to_string(),
-                    });
-                }
-                Ok(Self(value))
-            }
-
-            pub fn as_str(&self) -> &str {
-                &self.0
-            }
-        }
-    };
-}
-
-prefixed_identity!(WorkspaceId, "workspace_");
-bounded_identity!(PolicyVersion);
-bounded_identity!(ActorId);
-bounded_identity!(IdempotencyKey);
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 #[serde(transparent)]
@@ -141,25 +81,13 @@ impl Sha256Digest {
     }
 }
 
-pub fn valid_identity_text(value: &str) -> bool {
-    !value.is_empty()
-        && value.len() <= 256
-        && value == value.trim()
-        && value
-            .bytes()
-            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-' | b'.' | b':'))
-}
-
 // ---------------------------------------------------------------------------
 // Commerce values
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CommerceValidationError {
-    InvalidCurrency,
-    NegativeMoney,
     InvalidIdentity { field: String },
-    InvalidTimestamp,
 }
 
 macro_rules! string_identity {
@@ -191,93 +119,6 @@ macro_rules! string_identity {
 }
 
 string_identity!(OrganisationId);
-string_identity!(ResourceId);
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct CommerceTimestamp(String);
-
-impl CommerceTimestamp {
-    pub fn parse(value: impl Into<String>) -> Result<Self, CommerceValidationError> {
-        let value = value.into();
-        let parsed = OffsetDateTime::parse(&value, &Rfc3339)
-            .map_err(|_| CommerceValidationError::InvalidTimestamp)?;
-        let normalized = parsed
-            .checked_to_offset(time::UtcOffset::UTC)
-            .ok_or(CommerceValidationError::InvalidTimestamp)?
-            .format(&Rfc3339)
-            .map_err(|_| CommerceValidationError::InvalidTimestamp)?;
-        Ok(Self(normalized))
-    }
-
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-
-    pub fn validate(&self) -> Result<(), CommerceValidationError> {
-        Self::parse(self.0.clone()).map(|_| ())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct CurrencyCode(String);
-
-impl CurrencyCode {
-    pub fn new(value: impl Into<String>) -> Result<Self, CommerceValidationError> {
-        let value = value.into();
-        if value.len() != 3 || !value.bytes().all(|byte| byte.is_ascii_uppercase()) {
-            return Err(CommerceValidationError::InvalidCurrency);
-        }
-        Ok(Self(value))
-    }
-
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.0.len() == 3 && self.0.bytes().all(|byte| byte.is_ascii_uppercase())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Money {
-    amount_minor: i64,
-    currency: CurrencyCode,
-}
-
-impl Money {
-    pub fn new(
-        amount_minor: i64,
-        currency: impl Into<String>,
-    ) -> Result<Self, CommerceValidationError> {
-        Ok(Self {
-            amount_minor,
-            currency: CurrencyCode::new(currency)?,
-        })
-    }
-
-    pub fn amount_minor(&self) -> i64 {
-        self.amount_minor
-    }
-
-    pub fn currency(&self) -> &CurrencyCode {
-        &self.currency
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.currency.is_valid()
-    }
-
-    pub fn ensure_non_negative(self) -> Result<Self, CommerceValidationError> {
-        if self.amount_minor < 0 {
-            return Err(CommerceValidationError::NegativeMoney);
-        }
-        Ok(self)
-    }
-}
 
 // ---------------------------------------------------------------------------
 // Message attachment preparation

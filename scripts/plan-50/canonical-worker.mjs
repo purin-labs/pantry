@@ -127,7 +127,6 @@ const checkpointScenarios = new Set([
   "provider_codemode_restart",
   "provider_codemode_settlement",
   "provider_codemode_organisation_settlement",
-  "provider_codemode_workspace",
   "provider_codemode_queue",
   "provider_codemode_cancel",
   "provider_codemode_effect_cancel",

@@ -5,10 +5,7 @@ import { executorWireSchemas } from "../src/workspace-executor.ts";
 
 const schemas = executorWireSchemas;
 const definitions = new Map();
-const requestTypes = new Set([
-  "WorkspaceExecutorRequestWire",
-  "WorkspaceExecutorPreparationRequestWire",
-]);
+const requestTypes = new Set(["WorkspaceExecutorPreparationRequestWire"]);
 for (const [name, schema] of Object.entries(schemas)) {
   definitions.set(name, schema);
   collectDefinitions(schema);
@@ -125,12 +122,11 @@ function declaration(name, schema) {
 
 const declarations = [];
 for (const [constant, schema] of [
-  ["REQUEST_SCHEMA_VERSION", schemas.WorkspaceExecutorRequestWire],
   [
     "PREPARATION_REQUEST_SCHEMA_VERSION",
     schemas.WorkspaceExecutorPreparationRequestWire,
   ],
-  ["RESPONSE_SCHEMA_VERSION", schemas.WorkspaceExecutorResponse],
+  ["RESPONSE_SCHEMA_VERSION", schemas.WorkspaceExecutorPreparationResponse],
 ]) {
   declarations.push(
     `pub const ${constant}: &str = ${JSON.stringify(schema.properties.schemaVersion.const)};`,

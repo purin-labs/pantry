@@ -64,49 +64,6 @@ const spreadAuthority: WorkspaceRevisionAuthority = {
   kind: "placement",
 };
 void spreadAuthority;
-declare const changeset: Extract<
-  WorkspaceRevisionProposal,
-  { kind: "product_folder_changeset" }
->;
-void prepareWorkspaceRevisionMutation(
-  scope,
-  // @ts-expect-error Placement-only authority can initialize a workspace, but cannot edit one.
-  { kind: "placement" },
-  archive,
-  changeset,
-);
-declare const pendingCommit: Extract<
-  import("../src/actors/workspace-execution-coordinator").CodeModeExecutionProjection,
-  { kind: "workspace_commit_pending" }
->;
-const { harnessLease, ...originlessIntent } = pendingCommit.intent;
-void harnessLease;
-// @ts-expect-error Durable recovery must retain the originating harness lease.
-const invalidIntent: typeof pendingCommit.intent = originlessIntent;
-void invalidIntent;
-
-const { placement: originalPlacement, ...unplacedCommitIntent } =
-  pendingCommit.intent;
-void originalPlacement;
-// @ts-expect-error Commit recovery cannot reacquire a new epoch for old work.
-const invalidUnplacedCommit: typeof pendingCommit.intent = unplacedCommitIntent;
-void invalidUnplacedCommit;
-declare const committedExecution: Extract<
-  import("../src/actors/workspace-execution-coordinator").CodeModeExecutionProjection,
-  { kind: "workspace_committed" }
->;
-// @ts-expect-error An unused allocation cannot carry a charged execution receipt.
-const invalidCancellation: import("../src/actors/workspace-execution-coordinator").CodeModeExecutionProjection =
-  {
-    ...committedExecution,
-    kind: "workspace_allocation_cancelled",
-    allocationId: "allocation_fixture",
-  };
-void invalidCancellation;
-declare const executor: import("../src/workspace-executor-container").WorkspaceExecutorContainer;
-declare const executorRequest: import("../src/workspace-executor-container").WorkspaceExecutorRequest;
-// @ts-expect-error Executor dispatch requires captured placement, origin and deadline.
-void executor.executeWorkspaceOperation(executorRequest);
 
 declare const campaignDraft: import("../src/data/campaign-brief").ProposeCampaignBriefInput;
 const { authorizeCommit: campaignAuthority, ...unboundCampaign } =

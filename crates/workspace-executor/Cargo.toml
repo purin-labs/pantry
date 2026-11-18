@@ -14,9 +14,5 @@ openh264 = "0.9"
 media-inspect = { path = "../media-inspect", default-features = false }
 serde.workspace = true
 serde_json.workspace = true
-serde_yaml.workspace = true
 sha2.workspace = true
-unicode-normalization.workspace = true
-tempfile = "3"
-time = { version = "0.3", features = ["formatting", "parsing"] }
 tokio = { version = "1", features = ["macros", "net", "rt-multi-thread"] }

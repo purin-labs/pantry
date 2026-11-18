@@ -2,7 +2,6 @@ import { createRequire } from "node:module";
 import { readFile, readdir } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { readWorkspaceFixture } from "./workspace-files.mjs";
 import { accountAuthorityRuntime } from "./account-worker.mjs";
 import { singleDatabaseMigrations } from "../../services/platform/scripts/single-database-schema.mjs";
 
@@ -102,13 +101,6 @@ const worker = {
     // Platform's paid route, on the cheaper model that tests run.
     OPENROUTER_API_KEY: "native-model-fixture-key",
     SATYR_PLATFORM_PI_MODEL: "qwen/qwen3.7-flash",
-    ...(group === "workspace"
-      ? {
-          WORKSPACE_FIXTURE: JSON.stringify(
-            await readWorkspaceFixture(repository),
-          ),
-        }
-      : {}),
     ...(usesDraftCollaboration
       ? {
           DRAFT_SCENARIO: basename(persistenceDirectory),

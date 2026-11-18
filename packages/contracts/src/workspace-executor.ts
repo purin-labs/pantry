@@ -19,17 +19,6 @@ const attachmentIdSchema = Type.Unsafe<AttachmentId>(
   Type.String({ pattern: "^att_[0-9a-z]{1,64}$" }),
 );
 
-// TypeBox ReadonlyObject rebuilds object options. Apply strictness to its readonly properties.
-export const workspaceExecutorProductFilesSchema = StrictObject(
-  Type.ReadonlyObject(
-    OpenObject({
-      productMarkdown: Type.String(),
-      variantsYaml: Type.String(),
-    }),
-  ).properties,
-  { title: "ProductFolderFilesWire" },
-);
-
 // These native domain builders retain semantic checks until their areas migrate.
 const preparationIdentitySchema = StrictObject(
   {
@@ -59,51 +48,12 @@ const preparationLimitsSchema = StrictObject(
   },
 );
 
-const changesetSchema = StrictObject(
-  {
-    schemaVersion: Type.String(),
-    organisationId: identity,
-    workspaceId: identity,
-    baseRevision: identity,
-    resultingSemanticHash: digest,
-    diff: StrictObject({
-      productId: identity,
-      fields: Type.Array(
-        Type.Enum(["slug", "title", "description", "currency"]),
-      ),
-      variantIds: Type.Array(identity),
-    }),
-    changesetDigest: digest,
-  },
-  {
-    title: "ValidatedChangeset",
-    "x-rust-type": "crate::file_native::ValidatedProductFolderChangesetV1",
-  },
-);
-
-const claimedChangesetSchema = Type.With(changesetSchema, {
-  title: "ClaimedChangeset",
-  "x-rust-type": "serde_json::Value",
-});
-
-// serde accepts extra fields on this request branch. The native boundary ignores them.
-const productOperationSchema = Type.ReadonlyObject(
-  OpenObject({
-    kind: Type.Literal("product_folder_candidate"),
-    productRoot: Type.String(),
-    workspaceYaml: Type.String(),
-    base: workspaceExecutorProductFilesSchema,
-    candidate: workspaceExecutorProductFilesSchema,
-    claimedChangeset: claimedChangesetSchema,
-  }),
-  { title: "WorkspaceExecutorOperationWire" },
-);
-
 const attachmentMediaClassSchema = Type.Enum(
   ["document", "audio", "video", "opaque"],
   { title: "AttachmentMediaClassWire" },
 );
 
+// TypeBox ReadonlyObject rebuilds object options. Apply strictness to its readonly properties.
 const preparationOperationSchema = StrictObject(
   Type.ReadonlyObject(
     OpenObject({
@@ -117,21 +67,6 @@ const preparationOperationSchema = StrictObject(
   { title: "WorkspaceExecutorPreparationOperationWire" },
 );
 
-export const workspaceExecutorRequestSchema = StrictObject(
-  Type.ReadonlyObject(
-    OpenObject({
-      schemaVersion: Type.Literal("workspace_executor_request.v1"),
-      executionId: identity,
-      executionReceiptId: identity,
-      deadlineAtUnixMs: unsignedInteger,
-      baseRevision: identity,
-      baseCanonicalHead: digest,
-      baseManifestDigest: digest,
-      operation: productOperationSchema,
-    }),
-  ).properties,
-);
-
 export const workspaceExecutorInspectionRequestSchema = StrictObject(
   Type.ReadonlyObject(
     OpenObject({
@@ -143,21 +78,6 @@ export const workspaceExecutorInspectionRequestSchema = StrictObject(
       operation: preparationOperationSchema,
     }),
   ).properties,
-);
-
-const fileReplacementSchema = StrictObject(
-  Type.ReadonlyObject(OpenObject({ path: Type.String(), utf8: Type.String() }))
-    .properties,
-  { title: "WorkspaceFileReplacement" },
-);
-const replacementOverlaySchema = StrictObject(
-  Type.ReadonlyObject(
-    OpenObject({
-      productMarkdown: fileReplacementSchema,
-      variantsYaml: fileReplacementSchema,
-    }),
-  ).properties,
-  { title: "ProductFolderReplacementOverlay" },
 );
 
 export const workspaceExecutorDecodedFrameSchema = StrictObject(
@@ -228,36 +148,7 @@ export const workspaceExecutorInspectionOperationSchema = Type.Union(
   { title: "WorkspaceExecutorInspectionOperation" },
 );
 
-const productResultSchema = StrictObject(
-  Type.ReadonlyObject(
-    OpenObject({
-      kind: Type.Literal("validated_product_folder_changeset"),
-      productRoot: Type.String(),
-      replacementOverlay: replacementOverlaySchema,
-      validatedChangeset: changesetSchema,
-    }),
-  ).properties,
-  { title: "WorkspaceExecutorProductResult" },
-);
-
 const responseVersion = Type.Literal("workspace_executor_response.v1");
-export const workspaceExecutorResponseSchema = StrictObject(
-  Type.ReadonlyObject(
-    OpenObject({
-      schemaVersion: responseVersion,
-      executionId: identity,
-      executionReceiptId: identity,
-      baseRevision: identity,
-      baseCanonicalHead: digest,
-      baseManifestDigest: digest,
-      operation: productResultSchema,
-      inputBytes: unsignedInteger,
-      outputBytes: unsignedInteger,
-      durationMs: unsignedInteger,
-    }),
-  ).properties,
-);
-
 export const workspaceExecutorInspectionResponseSchema = StrictObject(
   Type.ReadonlyObject(
     OpenObject({
@@ -273,25 +164,14 @@ export const workspaceExecutorInspectionResponseSchema = StrictObject(
 );
 
 export const executorWireSchemas = {
-  WorkspaceExecutorRequestWire: workspaceExecutorRequestSchema,
   WorkspaceExecutorPreparationRequestWire:
     workspaceExecutorInspectionRequestSchema,
-  WorkspaceExecutorResponse: workspaceExecutorResponseSchema,
   WorkspaceExecutorPreparationResponse:
     workspaceExecutorInspectionResponseSchema,
 };
 
-export type WorkspaceExecutorProductFiles = Static<
-  typeof workspaceExecutorProductFilesSchema
->;
-export type WorkspaceExecutorRequest = Static<
-  typeof workspaceExecutorRequestSchema
->;
 export type WorkspaceExecutorInspectionRequest = Static<
   typeof workspaceExecutorInspectionRequestSchema
->;
-export type WorkspaceExecutorResponse = Static<
-  typeof workspaceExecutorResponseSchema
 >;
 export type WorkspaceExecutorInspectionResponse = Static<
   typeof workspaceExecutorInspectionResponseSchema
@@ -302,15 +182,6 @@ export type WorkspaceExecutorInspectionOperation = StrictUnion<
 export type WorkspaceExecutorDecodedFrame = Static<
   typeof workspaceExecutorDecodedFrameSchema
 >;
-export type WorkspaceExecutorFileReplacement = Static<
-  typeof fileReplacementSchema
->;
-
-export function parseWorkspaceExecutorRequest(
-  value: unknown,
-): ContractDecodeResult<WorkspaceExecutorRequest> {
-  return parseContract(workspaceExecutorRequestSchema, value, invalidRequest);
-}
 
 export function parseWorkspaceExecutorInspectionRequest(
   value: unknown,

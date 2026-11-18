@@ -40,9 +40,7 @@ import type {
 export type JsonSchema = Readonly<Record<string, unknown>>;
 
 export type StaticHarnessToolName =
-  | RegisteredToolName
-  | "commerce_entity_context"
-  | "workspace_product_folder_update";
+  RegisteredToolName | "commerce_entity_context";
 
 export type StaticHarnessToolDefinition = HarnessToolDefinition & {
   readonly name: StaticHarnessToolName;
@@ -190,79 +188,6 @@ export const CATALOG_DEFINITIONS = [
   ...registeredModelDefinitions(PROPOSAL_TOOLS),
   // Refactor 10, step 1: defined in agent-tools/files.
   ...registeredModelDefinitions(FILE_TOOLS),
-  {
-    type: "function",
-    name: "workspace_product_folder_update",
-    description:
-      "Validate and commit a product.md and variants.yaml replacement against the " +
-      "current immutable workspace revision in a short-lived Linux executor.",
-    strict: true,
-    parameters: {
-      type: "object",
-      properties: {
-        productRoot: { type: "string", pattern: "^products/[A-Za-z0-9._-]+$" },
-        candidate: {
-          type: "object",
-          properties: {
-            productMarkdown: { type: "string", maxLength: 262144 },
-            variantsYaml: { type: "string", maxLength: 262144 },
-          },
-          required: ["productMarkdown", "variantsYaml"],
-          additionalProperties: false,
-        },
-        claimedChangeset: {
-          type: "object",
-          properties: {
-            schemaVersion: {
-              type: "string",
-              const: "satyr.product-folder-changeset.v1",
-            },
-            organisationId: { type: "string", minLength: 1 },
-            workspaceId: {
-              type: "string",
-              pattern: "^workspace_[A-Za-z0-9._:-]+$",
-            },
-            baseRevision: { type: "string", minLength: 1 },
-            resultingSemanticHash: {
-              type: "string",
-              pattern: "^[0-9a-f]{64}$",
-            },
-            diff: {
-              type: "object",
-              properties: {
-                productId: { type: "string", minLength: 1 },
-                fields: {
-                  type: "array",
-                  items: {
-                    enum: ["slug", "title", "description", "currency"],
-                  },
-                },
-                variantIds: {
-                  type: "array",
-                  items: { type: "string", minLength: 1 },
-                },
-              },
-              required: ["productId", "fields", "variantIds"],
-              additionalProperties: false,
-            },
-            changesetDigest: { type: "string", pattern: "^[0-9a-f]{64}$" },
-          },
-          required: [
-            "schemaVersion",
-            "organisationId",
-            "workspaceId",
-            "baseRevision",
-            "resultingSemanticHash",
-            "diff",
-            "changesetDigest",
-          ],
-          additionalProperties: false,
-        },
-      },
-      required: ["productRoot", "candidate", "claimedChangeset"],
-      additionalProperties: false,
-    },
-  },
   // Refactor 10, step 1: defined in agent-tools/messages.
   ...registeredModelDefinitions(MESSAGE_TOOLS),
 ] as const satisfies readonly StaticHarnessToolDefinition[];
@@ -384,8 +309,6 @@ export function definitionCapability(
   switch (name) {
     case "commerce_entity_context":
       return CAPABILITY_KEYS.commerceEntityPlaneContext;
-    case "workspace_product_folder_update":
-      return CAPABILITY_KEYS.workspaceProductFolderUpdate;
   }
 }
 

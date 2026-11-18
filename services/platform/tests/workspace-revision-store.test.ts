@@ -26,7 +26,6 @@ import {
   type WorkspaceRevisionProposal,
 } from "../src/workspace-revision-store";
 import { d1Database } from "./sqlite-d1";
-import { sha256Hex } from "@seams/std";
 
 describe("workspace revision store", () => {
   test("provisions one stable default workspace per organisation", async function provisionsOrganisationWorkspace() {
@@ -90,7 +89,6 @@ describe("workspace revision store", () => {
     const fixture = await revisionStoreFixture();
     const genesis = await prepareProposal(
       fixture,
-      null,
       "workspace-genesis",
       "a",
       10,
@@ -147,51 +145,30 @@ describe("workspace revision store", () => {
       ),
     ).resolves.toEqual({ ok: true, value: duplicate.value.receipt });
 
-    const next = await prepareProposal(
-      fixture,
-      first.value.receipt.revision,
-      "workspace-next",
-      "b",
-      20,
-    );
-    const committed = await commitWorkspaceRevision(
-      fixture.bucket.binding(),
-      next,
-    );
-    expect(committed).toMatchObject({
-      ok: true,
-      value: { kind: "committed", receipt: { canonicalHead: digest("b") } },
-    });
-    if (!committed.ok) throw new Error(committed.error.code);
     await expect(
       readCurrentWorkspaceRevisionReceipt(
         fixture.db,
         "organisation_1",
         "workspace_catalog_1",
       ),
-    ).resolves.toEqual({ ok: true, value: committed.value.receipt });
+    ).resolves.toEqual({ ok: true, value: first.value.receipt });
 
-    const stale = await prepareProposal(
-      fixture,
-      first.value.receipt.revision,
-      "workspace-stale",
-      "c",
-      30,
-    );
+    // A second genesis cannot replace the head that the first one set.
+    const stale = await prepareProposal(fixture, "workspace-stale", "c", 30);
     await expect(
       commitWorkspaceRevision(fixture.bucket.binding(), stale),
     ).resolves.toMatchObject({
       ok: false,
       error: {
         code: "workspace_revision_base_conflict",
-        currentHead: digest("b"),
+        currentHead: first.value.receipt.canonicalHead,
       },
     });
     expect(
       fixture.database
         .prepare("SELECT COUNT(*) AS count FROM workspace_revision")
         .get(),
-    ).toMatchObject({ count: 2 });
+    ).toMatchObject({ count: 1 });
 
     await expect(
       verifyWorkspaceRevisionReceipt(fixture.scope, "organisation_1", {
@@ -208,7 +185,6 @@ describe("workspace revision store", () => {
     const fixture = await revisionStoreFixture();
     const missing = await prepareProposal(
       fixture,
-      null,
       "workspace-missing",
       "a",
       10,
@@ -224,7 +200,6 @@ describe("workspace revision store", () => {
 
     const corrupt = await prepareProposal(
       fixture,
-      null,
       "workspace-corrupt",
       "b",
       20,
@@ -321,17 +296,11 @@ async function revisionStoreFixture(): Promise<{
 
 async function prepareProposal(
   fixture: Awaited<ReturnType<typeof revisionStoreFixture>>,
-  baseRevision: string | null,
   idempotencyKey: string,
   fill: string,
   committedAt: number,
 ): Promise<PreparedWorkspaceRevisionMutation> {
-  const proposal = await revisionProposal(
-    baseRevision,
-    idempotencyKey,
-    fill,
-    committedAt,
-  );
+  const proposal = revisionProposal(idempotencyKey, fill, committedAt);
   const prepared = await prepareWorkspaceRevisionMutation(
     fixture.scope,
     {
@@ -345,12 +314,11 @@ async function prepareProposal(
   return prepared.value;
 }
 
-async function revisionProposal(
-  baseRevision: string | null,
+function revisionProposal(
   idempotencyKey: string,
   fill: string,
   committedAt: number,
-): Promise<WorkspaceRevisionProposal> {
+): WorkspaceRevisionProposal {
   const common = {
     organisationId: "organisation_1",
     workspaceId: "workspace_catalog_1",
@@ -369,29 +337,7 @@ async function revisionProposal(
     },
     committedAt,
   };
-  if (baseRevision === null) {
-    return { ...common, kind: "genesis" };
-  }
-  const material = {
-    schemaVersion: "satyr.product-folder-changeset.v1",
-    organisationId: common.organisationId,
-    workspaceId: common.workspaceId,
-    baseRevision,
-    resultingSemanticHash: digest(fill),
-    diff: {
-      productId: "product_1",
-      fields: ["title" as const],
-      variantIds: [],
-    },
-  };
-  return {
-    ...common,
-    kind: "product_folder_changeset",
-    changeset: {
-      ...material,
-      changesetDigest: await sha256Hex(JSON.stringify(material)),
-    },
-  };
+  return { ...common, kind: "genesis" };
 }
 
 function digest(fill: string): string {

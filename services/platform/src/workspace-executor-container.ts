@@ -1,12 +1,6 @@
-import { parseOrganisationId } from "./ids";
-import { parseOrganisationPlacement } from "./placement";
-import { parseOrganisationPlacementFenceToken } from "./data/organisation-placement";
 import { Container } from "@cloudflare/containers";
 
 import type {
-  WorkspaceExecutorRequest,
-  WorkspaceExecutorResponse,
-  WorkspaceExecutorFileReplacement,
   WorkspaceExecutorInspectionRequest,
   WorkspaceExecutorDecodedFrame,
   WorkspaceExecutorInspectionOperation,
@@ -15,29 +9,13 @@ import type {
 
 import type { Env } from "./env";
 import type { Result } from "./result";
-import {
-  hasExactKeys,
-  isNonNegativeInteger,
-  isRecord,
-  sha256Hex,
-  assertNever,
-} from "@seams/std";
-import { OrganisationExecutionScope } from "./organisation-execution-scope";
-import {
-  authorizeSessionTurnExecution,
-  type SessionTurnExecution,
-} from "./chat/turn-access";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
 
 const WORKSPACE_EXECUTOR_PORT = 8080;
 const WORKSPACE_EXECUTOR_TIMEOUT_MS = 30_000;
 const MAX_EXECUTOR_RESPONSE_BYTES = 1024 * 1024;
-const MAX_EXECUTOR_FILE_BYTES = 256 * 1024;
 
 export type {
-  WorkspaceExecutorProductFiles,
-  WorkspaceExecutorRequest,
-  WorkspaceExecutorResponse,
-  WorkspaceExecutorFileReplacement,
   WorkspaceExecutorInspectionRequest,
   WorkspaceExecutorDecodedFrame,
   WorkspaceExecutorInspectionOperation,
@@ -56,18 +34,6 @@ export type WorkspaceExecutorTrustedUsage = {
   readonly responseBytes: number;
   readonly gatewayDurationMs: number;
 };
-
-export type WorkspaceExecutorInvocation =
-  | {
-      readonly kind: "succeeded";
-      readonly response: WorkspaceExecutorResponse;
-      readonly usage: WorkspaceExecutorTrustedUsage;
-    }
-  | {
-      readonly kind: "failed";
-      readonly error: WorkspaceExecutorContainerError;
-      readonly usage: WorkspaceExecutorTrustedUsage;
-    };
 
 export type WorkspaceExecutorTransport = {
   containerFetch(
@@ -95,44 +61,6 @@ export class WorkspaceExecutorContainer extends Container<Env> {
   sleepAfter = "30s";
   enableInternet = false;
   pingEndpoint = "/health";
-
-  async executeWorkspaceOperation(
-    request: WorkspaceExecutorRequest,
-    authority: WorkspaceExecutorDispatchAuthority,
-  ): Promise<WorkspaceExecutorOperationResult> {
-    return executeRecordedWorkspaceOperation(
-      this.ctx.storage.sql,
-      request,
-      authorizeWorkspaceExecutorDispatch.bind(
-        null,
-        this.env,
-        authority,
-        request,
-      ),
-      dispatchWorkspaceExecution.bind(null, this, request),
-      this.destroy.bind(this),
-    );
-  }
-
-  async recoverWorkspaceOperation(
-    request: WorkspaceExecutorRequest,
-  ): Promise<WorkspaceExecutorOperationResult> {
-    return recoverRecordedWorkspaceOperation(
-      this.ctx.storage.sql,
-      request,
-      this.destroy.bind(this),
-    );
-  }
-
-  async releaseWorkspaceOperation(
-    request: WorkspaceExecutorRequest,
-  ): Promise<void> {
-    await releaseRecordedWorkspaceOperation(
-      this.ctx.storage.sql,
-      request,
-      this.destroy.bind(this),
-    );
-  }
 
   async inspectAttachment(
     request: WorkspaceExecutorInspectionRequest,
@@ -165,7 +93,7 @@ const ENVELOPE_HEADER_BYTES = 8;
  * string, which the Worker's memory ceiling does not allow for a real file.
  */
 export function encodeWorkspaceExecutorEnvelope(
-  request: WorkspaceExecutorRequest | WorkspaceExecutorInspectionRequest,
+  request: WorkspaceExecutorInspectionRequest,
   attachment: Uint8Array,
 ): Uint8Array {
   const json = new TextEncoder().encode(JSON.stringify(request));
@@ -461,85 +389,6 @@ function parseInspectionOperation(
   }
 }
 
-export async function dispatchWorkspaceExecution(
-  container: WorkspaceExecutorTransport,
-  request: WorkspaceExecutorRequest,
-): Promise<WorkspaceExecutorInvocation> {
-  const requestBody = JSON.stringify(request);
-  const requestBytes = new TextEncoder().encode(requestBody).byteLength;
-  const startedAt = performance.now();
-  let response: Response;
-
-  try {
-    const remainingMs = Math.max(
-      1,
-      Math.min(
-        WORKSPACE_EXECUTOR_TIMEOUT_MS,
-        request.deadlineAtUnixMs - Date.now(),
-      ),
-    );
-    response = await container.containerFetch(
-      "http://container/v1/execute",
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: requestBody,
-        signal: AbortSignal.timeout(remainingMs),
-      },
-      WORKSPACE_EXECUTOR_PORT,
-    );
-  } catch (error) {
-    if (isAbortError(error)) {
-      return failedInvocation(
-        { kind: "deadline_exceeded" },
-        requestBytes,
-        0,
-        startedAt,
-      );
-    }
-    return failedInvocation(
-      { kind: "container_unavailable", reason: safeErrorMessage(error) },
-      requestBytes,
-      0,
-      startedAt,
-    );
-  }
-
-  const body = await readBoundedResponseBody(response);
-
-  if (!body.ok) {
-    return failedInvocation(
-      body.error,
-      requestBytes,
-      body.responseBytes,
-      startedAt,
-    );
-  }
-  if (!response.ok) {
-    return failedInvocation(
-      { kind: "executor_rejected", status: response.status },
-      requestBytes,
-      body.value.responseBytes,
-      startedAt,
-    );
-  }
-
-  const parsed = parseWorkspaceExecutorResponse(body.value.body, request);
-  if (!parsed.ok) {
-    return failedInvocation(
-      parsed.error,
-      requestBytes,
-      body.value.responseBytes,
-      startedAt,
-    );
-  }
-  return {
-    kind: "succeeded",
-    response: parsed.value,
-    usage: trustedUsage(requestBytes, body.value.responseBytes, startedAt),
-  };
-}
-
 async function readBoundedResponseBody(response: Response): Promise<
   | {
       readonly ok: true;
@@ -622,19 +471,6 @@ async function readBoundedResponseBody(response: Response): Promise<
   }
 }
 
-function failedInvocation(
-  error: WorkspaceExecutorContainerError,
-  requestBytes: number,
-  responseBytes: number,
-  startedAt: number,
-): WorkspaceExecutorInvocation {
-  return {
-    kind: "failed",
-    error,
-    usage: trustedUsage(requestBytes, responseBytes, startedAt),
-  };
-}
-
 function trustedUsage(
   requestBytes: number,
   responseBytes: number,
@@ -645,173 +481,6 @@ function trustedUsage(
     responseBytes,
     gatewayDurationMs: Math.max(0, Math.ceil(performance.now() - startedAt)),
   };
-}
-
-export function parseWorkspaceExecutorResponse(
-  rawBody: string,
-  request: WorkspaceExecutorRequest,
-): Result<WorkspaceExecutorResponse, WorkspaceExecutorContainerError> {
-  let raw: unknown;
-
-  try {
-    raw = JSON.parse(rawBody);
-  } catch {
-    return invalidResponse("json");
-  }
-  if (!isRecord(raw) || !hasExactKeys(raw, PRODUCT_RESPONSE_KEYS)) {
-    return invalidResponse("response");
-  }
-  if (raw.schemaVersion !== "workspace_executor_response.v1") {
-    return invalidResponse("schemaVersion");
-  }
-  if (raw.executionId !== request.executionId) {
-    return invalidResponse("executionId");
-  }
-  if (raw.executionReceiptId !== request.executionReceiptId) {
-    return invalidResponse("executionReceiptId");
-  }
-  if (raw.baseRevision !== request.baseRevision) {
-    return invalidResponse("baseRevision");
-  }
-  if (raw.baseCanonicalHead !== request.baseCanonicalHead) {
-    return invalidResponse("baseCanonicalHead");
-  }
-  if (raw.baseManifestDigest !== request.baseManifestDigest) {
-    return invalidResponse("baseManifestDigest");
-  }
-  if (!isNonNegativeInteger(raw.inputBytes)) {
-    return invalidResponse("inputBytes");
-  }
-  if (!isNonNegativeInteger(raw.outputBytes)) {
-    return invalidResponse("outputBytes");
-  }
-  if (!isNonNegativeInteger(raw.durationMs)) {
-    return invalidResponse("durationMs");
-  }
-
-  const operation = parseOperation(raw.operation, request);
-
-  if (!operation.ok) {
-    return operation;
-  }
-
-  return {
-    ok: true,
-    value: {
-      schemaVersion: "workspace_executor_response.v1",
-      executionId: request.executionId,
-      executionReceiptId: request.executionReceiptId,
-      baseRevision: request.baseRevision,
-      baseCanonicalHead: request.baseCanonicalHead,
-      baseManifestDigest: request.baseManifestDigest,
-      operation: operation.value,
-      inputBytes: raw.inputBytes,
-      outputBytes: raw.outputBytes,
-      durationMs: raw.durationMs,
-    },
-  };
-}
-
-function parseOperation(
-  raw: unknown,
-  request: WorkspaceExecutorRequest,
-): Result<
-  WorkspaceExecutorResponse["operation"],
-  WorkspaceExecutorContainerError
-> {
-  if (!isRecord(raw) || !hasExactKeys(raw, OPERATION_KEYS)) {
-    return invalidResponse("operation");
-  }
-  if (raw.kind !== "validated_product_folder_changeset") {
-    return invalidResponse("operation.kind");
-  }
-  if (raw.productRoot !== request.operation.productRoot) {
-    return invalidResponse("operation.productRoot");
-  }
-  if (
-    !jsonValuesEqual(raw.validatedChangeset, request.operation.claimedChangeset)
-  ) {
-    return invalidResponse("operation.validatedChangeset");
-  }
-
-  const overlay = parseReplacementOverlay(
-    raw.replacementOverlay,
-    request.operation.productRoot,
-  );
-
-  if (!overlay.ok) {
-    return overlay;
-  }
-
-  return {
-    ok: true,
-    value: {
-      kind: "validated_product_folder_changeset",
-      productRoot: request.operation.productRoot,
-      replacementOverlay: overlay.value,
-      validatedChangeset: request.operation.claimedChangeset,
-    },
-  };
-}
-
-function parseReplacementOverlay(
-  raw: unknown,
-  productRoot: string,
-): Result<
-  WorkspaceExecutorResponse["operation"]["replacementOverlay"],
-  WorkspaceExecutorContainerError
-> {
-  if (!isRecord(raw) || !hasExactKeys(raw, REPLACEMENT_OVERLAY_KEYS)) {
-    return invalidResponse("operation.replacementOverlay");
-  }
-
-  const productMarkdown = parseFileReplacement(
-    raw.productMarkdown,
-    `${productRoot}/product.md`,
-    "operation.replacementOverlay.productMarkdown",
-  );
-
-  if (!productMarkdown.ok) {
-    return productMarkdown;
-  }
-
-  const variantsYaml = parseFileReplacement(
-    raw.variantsYaml,
-    `${productRoot}/variants.yaml`,
-    "operation.replacementOverlay.variantsYaml",
-  );
-
-  if (!variantsYaml.ok) {
-    return variantsYaml;
-  }
-
-  return {
-    ok: true,
-    value: {
-      productMarkdown: productMarkdown.value,
-      variantsYaml: variantsYaml.value,
-    },
-  };
-}
-
-function parseFileReplacement(
-  raw: unknown,
-  expectedPath: string,
-  field: string,
-): Result<WorkspaceExecutorFileReplacement, WorkspaceExecutorContainerError> {
-  if (!isRecord(raw) || !hasExactKeys(raw, FILE_REPLACEMENT_KEYS)) {
-    return invalidResponse(field);
-  }
-  if (raw.path !== expectedPath) {
-    return invalidResponse(`${field}.path`);
-  }
-  if (
-    typeof raw.utf8 !== "string" ||
-    byteLength(raw.utf8) > MAX_EXECUTOR_FILE_BYTES
-  ) {
-    return invalidResponse(`${field}.utf8`);
-  }
-  return { ok: true, value: { path: expectedPath, utf8: raw.utf8 } };
 }
 
 function invalidResponse<TValue>(
@@ -868,10 +537,6 @@ function safeErrorMessage(error: unknown): string {
     : "workspace executor unavailable";
 }
 
-function byteLength(value: string): number {
-  return new TextEncoder().encode(value).byteLength;
-}
-
 function operationKeys(kind: unknown): readonly string[] | null {
   switch (kind) {
     case "attachment_text":
@@ -924,341 +589,3 @@ const ATTACHMENT_NOT_INSPECTABLE_KEYS = [
   "reason",
   "sourceSha256",
 ] as const;
-const PRODUCT_RESPONSE_KEYS = [
-  "schemaVersion",
-  "executionId",
-  "executionReceiptId",
-  "baseRevision",
-  "baseCanonicalHead",
-  "baseManifestDigest",
-  "operation",
-  "inputBytes",
-  "outputBytes",
-  "durationMs",
-] as const;
-const OPERATION_KEYS = [
-  "kind",
-  "productRoot",
-  "replacementOverlay",
-  "validatedChangeset",
-] as const;
-const REPLACEMENT_OVERLAY_KEYS = ["productMarkdown", "variantsYaml"] as const;
-const FILE_REPLACEMENT_KEYS = ["path", "utf8"] as const;
-
-export type WorkspaceExecutorPlacement = Pick<
-  OrganisationExecutionScope,
-  "organisationId" | "placement" | "fenceToken"
->;
-
-export type WorkspaceExecutorDispatchAuthority = Readonly<{
-  placement: WorkspaceExecutorPlacement;
-  execution: SessionTurnExecution;
-  expiresAt: number;
-}>;
-
-export type WorkspaceExecutorOperationResult = Result<
-  | Readonly<{ kind: "completed"; invocation: WorkspaceExecutorInvocation }>
-  | Readonly<{ kind: "cancelled" }>,
-  Readonly<{
-    code:
-      | "workspace_operation_conflict"
-      | "workspace_operation_pending"
-      | "workspace_operation_released"
-      | "workspace_operation_authority_inactive";
-  }>
->;
-
-type WorkspaceOperationRecord =
-  | Readonly<{ kind: "missing" | "conflict" }>
-  | Readonly<{ kind: "running"; startedAt: number }>
-  | Readonly<{ kind: "completed"; invocation: WorkspaceExecutorInvocation }>
-  | Readonly<{ kind: "cancelled" | "released" }>;
-
-export async function authorizeWorkspaceExecutorDispatch(
-  env: Env,
-  authority: WorkspaceExecutorDispatchAuthority,
-  request: WorkspaceExecutorRequest,
-): Promise<boolean> {
-  if (
-    Date.now() >= authority.expiresAt ||
-    Date.now() >= request.deadlineAtUnixMs ||
-    request.operation.claimedChangeset.organisationId !==
-      authority.placement.organisationId
-  )
-    return false;
-  const scope = await OrganisationExecutionScope.resolve(
-    env,
-    authority.placement.organisationId,
-  );
-  if (
-    !scope.ok ||
-    scope.value.fenceToken !== authority.placement.fenceToken ||
-    scope.value.placement.placementEpoch !==
-      authority.placement.placement.placementEpoch ||
-    scope.value.placement.placementCellId !==
-      authority.placement.placement.placementCellId
-  )
-    return false;
-  if (
-    !(await authorizeSessionTurnExecution(
-      env.DB,
-      scope.value.database,
-      scope.value.organisationId,
-      authority.execution,
-      scope.value.accountAccess,
-    ))
-  )
-    return false;
-  return (
-    (await scope.value.isActive()) &&
-    Date.now() < authority.expiresAt &&
-    Date.now() < request.deadlineAtUnixMs
-  );
-}
-
-export async function executeRecordedWorkspaceOperation(
-  sql: SqlStorage,
-  request: WorkspaceExecutorRequest,
-  authorize: () => Promise<boolean>,
-  dispatch: () => Promise<WorkspaceExecutorInvocation>,
-  stop: () => Promise<void>,
-): Promise<WorkspaceExecutorOperationResult> {
-  const digest = await sha256Hex(JSON.stringify(request));
-  let record = readWorkspaceOperation(sql, request, digest);
-  if (record.kind !== "missing") {
-    if (record.kind === "completed") await stop();
-    return workspaceOperationResult(record);
-  }
-  if (!(await authorize()))
-    return {
-      ok: false,
-      error: { code: "workspace_operation_authority_inactive" },
-    };
-  // Another request can claim or cancel this allocation while authorization waits.
-  record = readWorkspaceOperation(sql, request, digest);
-  if (record.kind !== "missing") {
-    if (record.kind === "completed") await stop();
-    return workspaceOperationResult(record);
-  }
-  sql.exec(
-    "INSERT INTO workspace_executor_operation (singleton, request_digest, state, started_at, invocation) VALUES (1, ?, 'running', ?, NULL)",
-    digest,
-    Date.now(),
-  );
-  try {
-    const invocation = await dispatch();
-    sql.exec(
-      "UPDATE workspace_executor_operation SET state = 'completed', invocation = ? WHERE singleton = 1 AND request_digest = ? AND state = 'running'",
-      JSON.stringify(invocation),
-      digest,
-    );
-  } finally {
-    await stop();
-  }
-  return workspaceOperationResult(readWorkspaceOperation(sql, request, digest));
-}
-
-export async function recoverRecordedWorkspaceOperation(
-  sql: SqlStorage,
-  request: WorkspaceExecutorRequest,
-  stop: () => Promise<void>,
-): Promise<WorkspaceExecutorOperationResult> {
-  const digest = await sha256Hex(JSON.stringify(request));
-  let record = readWorkspaceOperation(sql, request, digest);
-  if (record.kind === "conflict") return workspaceOperationResult(record);
-  if (record.kind === "missing") {
-    // Seal admission before cancellation so a delayed original RPC cannot start.
-    sql.exec(
-      "INSERT INTO workspace_executor_operation (singleton, request_digest, state, started_at, invocation) VALUES (1, ?, 'cancelled', NULL, NULL)",
-      digest,
-    );
-  }
-  await stop();
-  record = readWorkspaceOperation(sql, request, digest);
-  if (record.kind === "running") {
-    const invocation: WorkspaceExecutorInvocation = {
-      kind: "failed",
-      error: {
-        kind: "container_unavailable",
-        reason: "workspace_operation_interrupted",
-      },
-      usage: {
-        requestBytes: new TextEncoder().encode(JSON.stringify(request))
-          .byteLength,
-        responseBytes: 0,
-        gatewayDurationMs: Math.max(0, Date.now() - record.startedAt),
-      },
-    };
-    sql.exec(
-      "UPDATE workspace_executor_operation SET state = 'completed', invocation = ? WHERE singleton = 1 AND request_digest = ? AND state = 'running'",
-      JSON.stringify(invocation),
-      digest,
-    );
-  }
-  return workspaceOperationResult(readWorkspaceOperation(sql, request, digest));
-}
-
-export async function releaseRecordedWorkspaceOperation(
-  sql: SqlStorage,
-  request: WorkspaceExecutorRequest,
-  stop: () => Promise<void>,
-): Promise<void> {
-  const digest = await sha256Hex(JSON.stringify(request));
-  const record = readWorkspaceOperation(sql, request, digest);
-  if (record.kind !== "completed" && record.kind !== "released")
-    throw new Error("workspace_operation_release_conflict");
-  await stop();
-  sql.exec(
-    "UPDATE workspace_executor_operation SET state = 'released', invocation = NULL WHERE singleton = 1 AND request_digest = ? AND state = 'completed'",
-    digest,
-  );
-}
-
-function readWorkspaceOperation(
-  sql: SqlStorage,
-  request: WorkspaceExecutorRequest,
-  digest: string,
-): WorkspaceOperationRecord {
-  sql.exec(`CREATE TABLE IF NOT EXISTS workspace_executor_operation (
-    singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
-    request_digest TEXT NOT NULL,
-    state TEXT NOT NULL CHECK (state IN ('running', 'completed', 'cancelled', 'released')),
-    started_at INTEGER,
-    invocation TEXT,
-    CHECK ((state = 'cancelled' AND started_at IS NULL AND invocation IS NULL)
-      OR (state IN ('running', 'released') AND started_at IS NOT NULL AND invocation IS NULL)
-      OR (state = 'completed' AND started_at IS NOT NULL AND invocation IS NOT NULL))
-  )`);
-  const row = sql
-    .exec<{
-      request_digest: string;
-      state: string;
-      started_at: number | null;
-      invocation: string | null;
-    }>(
-      "SELECT request_digest, state, started_at, invocation FROM workspace_executor_operation WHERE singleton = 1",
-    )
-    .toArray()[0];
-  if (row === undefined) return { kind: "missing" };
-  if (row.request_digest !== digest) return { kind: "conflict" };
-  switch (row.state) {
-    case "running":
-      if (row.started_at === null)
-        throw new Error("workspace_operation_corrupt");
-      return { kind: "running", startedAt: row.started_at };
-    case "completed": {
-      const invocation =
-        row.invocation === null
-          ? null
-          : parseWorkspaceInvocation(JSON.parse(row.invocation), request);
-      if (invocation === null) throw new Error("workspace_operation_corrupt");
-      return { kind: "completed", invocation };
-    }
-    case "cancelled":
-      return { kind: "cancelled" };
-    case "released":
-      return { kind: "released" };
-    default:
-      throw new Error("workspace_operation_corrupt");
-  }
-}
-
-function workspaceOperationResult(
-  record: WorkspaceOperationRecord,
-): WorkspaceExecutorOperationResult {
-  switch (record.kind) {
-    case "completed":
-      return {
-        ok: true,
-        value: { kind: "completed", invocation: record.invocation },
-      };
-    case "cancelled":
-      return { ok: true, value: { kind: "cancelled" } };
-    case "running":
-      return { ok: false, error: { code: "workspace_operation_pending" } };
-    case "released":
-      return { ok: false, error: { code: "workspace_operation_released" } };
-    case "conflict":
-      return { ok: false, error: { code: "workspace_operation_conflict" } };
-    case "missing":
-      throw new Error("workspace_operation_missing");
-    default:
-      return assertNever(record);
-  }
-}
-
-export function parseWorkspaceInvocation(
-  raw: unknown,
-  request: WorkspaceExecutorRequest,
-): WorkspaceExecutorInvocation | null {
-  if (!isRecord(raw)) return null;
-  const usage = parseTrustedUsage(raw.usage);
-  if (usage === null) return null;
-  if (raw.kind === "succeeded") {
-    const response = parseWorkspaceExecutorResponse(
-      JSON.stringify(raw.response),
-      request,
-    );
-    return response.ok
-      ? { kind: "succeeded", response: response.value, usage }
-      : null;
-  }
-  if (raw.kind === "failed") {
-    const error = parseWorkspaceExecutorError(raw.error);
-    return error === null ? null : { kind: "failed", error, usage };
-  }
-  return null;
-}
-
-function parseTrustedUsage(raw: unknown): WorkspaceExecutorTrustedUsage | null {
-  return isRecord(raw) &&
-    isNonNegativeInteger(raw.requestBytes) &&
-    isNonNegativeInteger(raw.responseBytes) &&
-    isNonNegativeInteger(raw.gatewayDurationMs)
-    ? {
-        requestBytes: raw.requestBytes,
-        responseBytes: raw.responseBytes,
-        gatewayDurationMs: raw.gatewayDurationMs,
-      }
-    : null;
-}
-
-function parseWorkspaceExecutorError(
-  raw: unknown,
-): WorkspaceExecutorContainerError | null {
-  if (!isRecord(raw)) return null;
-  switch (raw.kind) {
-    case "deadline_exceeded":
-    case "response_too_large":
-      return { kind: raw.kind };
-    case "container_unavailable":
-      return typeof raw.reason === "string"
-        ? { kind: "container_unavailable", reason: raw.reason }
-        : null;
-    case "executor_rejected":
-      return isNonNegativeInteger(raw.status)
-        ? { kind: "executor_rejected", status: raw.status }
-        : null;
-    case "invalid_response":
-      return typeof raw.field === "string"
-        ? { kind: "invalid_response", field: raw.field }
-        : null;
-    default:
-      return null;
-  }
-}
-
-export function parseWorkspaceExecutorPlacement(
-  raw: unknown,
-): WorkspaceExecutorPlacement | null {
-  if (!isRecord(raw) || typeof raw.organisationId !== "string") return null;
-  const organisationId = parseOrganisationId(raw.organisationId);
-  const placement = parseOrganisationPlacement(raw.placement);
-  const fenceToken = parseOrganisationPlacementFenceToken(raw.fenceToken);
-  if (!organisationId.ok || !placement.ok || !fenceToken.ok) return null;
-  return {
-    organisationId: organisationId.value,
-    placement: placement.value,
-    fenceToken: fenceToken.value,
-  };
-}

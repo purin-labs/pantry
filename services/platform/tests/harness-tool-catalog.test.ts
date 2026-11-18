@@ -112,7 +112,6 @@ async function executesProductionTools(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
     nowNs: monotonicClock(),
   });
@@ -211,7 +210,6 @@ async function executesRehearsalEditTool(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
     nowNs: monotonicClock(),
   });
@@ -286,7 +284,6 @@ async function executesBakerySurfaceTool(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
     nowNs: monotonicClock(),
   });
@@ -439,7 +436,6 @@ async function executesAirtableTools(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     readAirtable: airtableReadFixture,
     writeAirtable: airtableWriteFixture,
     nowNs: monotonicClock(),
@@ -526,7 +522,6 @@ async function executesEmailSelfTest(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -633,7 +628,6 @@ async function executesEmailMailboxTools(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -723,7 +717,6 @@ async function executesWhatsAppSupportRead(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -798,7 +791,6 @@ async function executesWhatsAppSupportReplySend(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -873,7 +865,6 @@ async function readsPreparedAttachment(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     inspectMessageAttachment: recordPreparedInspection.bind(null, inspected),
     readMessageLink: async function read(input) {
       return { outcome: "read", url: input.url };
@@ -922,7 +913,6 @@ async function gatesMessageToolsByCapability(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!absent.ok) throw new Error(absent.error.code);
@@ -961,7 +951,6 @@ async function gatesMessageToolsByCapability(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     inspectMessageAttachment: async function inspect(input) {
       return inlineToolOutput(`inspected:${input.attachmentId}`);
     },
@@ -1032,7 +1021,6 @@ async function executesIntegrationDiscovery(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -1119,7 +1107,6 @@ async function executesFileTools(): Promise<void> {
       continuation: { kind: "complete" },
     }),
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -1204,7 +1191,6 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -1253,7 +1239,6 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!readOnly.ok) throw new Error(readOnly.error.code);
@@ -1315,7 +1300,6 @@ async function executesEmailDraftTools(): Promise<void> {
       return snapshot;
     },
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -1379,7 +1363,6 @@ async function screensDirectFailure(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -1437,7 +1420,6 @@ async function selectsCurrentMessageCatalog(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     inspectMessageAttachment: async (input) => ({
       outcome: "inspected",
       attachmentId: input.attachmentId,
@@ -1472,7 +1454,6 @@ async function rejectsCatalogMismatch(): Promise<void> {
     readEmailDraft: rejectEmailDraftRead,
     editEmailDraft: rejectEmailDraftEdit,
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
 
@@ -1507,7 +1488,6 @@ async function executesCommerceProposal(): Promise<void> {
       };
     },
     queryWorkspace,
-    updateWorkspaceProductFolder,
     nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
@@ -1704,10 +1684,6 @@ function queryWorkspace(
     sha256: "a".repeat(64),
     content: "# Shoe",
   });
-}
-
-function updateWorkspaceProductFolder(): Promise<never> {
-  return Promise.reject(new Error("workspace update is outside this test"));
 }
 
 function monotonicClock(): () => number {

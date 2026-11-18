@@ -219,7 +219,6 @@ export class CandidateActor extends CanonicalActor {
         readEmailDraft: unavailableTool,
         editEmailDraft: unavailableTool,
         queryWorkspace: unavailableTool,
-        updateWorkspaceProductFolder: unavailableTool,
         claimCapability: this.claimToolCapability.bind(this, lease),
         nowNs: nowNs,
       }),

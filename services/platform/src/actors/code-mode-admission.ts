@@ -44,11 +44,9 @@ import { requireActiveOrganisationActorAtPlacement } from "./actor-router";
 import { CodeModeAdmissionFrozenError, type HarnessCodeModeAdmission, type HarnessCodeModeAdmittedExecution, type HarnessCodeModeExecutionLease, type HarnessCodeModeExecutionOutcome } from "../agent-tools/catalog/types";
 import {
   parseCodeModeExecutionProjection,
-  readCodeModeExecutionProjection,
   writeCodeModeExecutionCounter,
   type CodeModeExecutionProjection,
-  type WorkspaceAllocationReceipt,
-} from "./workspace-execution-coordinator";
+} from "./code-mode-execution-projection";
 import {
   codeModeExecutionLeaseId,
   deriveCodeModeLeaseBinding,
@@ -336,19 +334,10 @@ async function settleCodeModeExecution(
     authority,
     execution,
   );
-  const workspaceExecutorUsage = currentWorkspaceExecutorUsage(
-    authority.storage.sql,
-    execution.identity.executionId,
-  );
-  const aggregateOutcome = aggregateCodeModeOutcome(
-    outcome,
-    workspaceExecutorUsage,
-  );
-  const actualCostMicros =
-    CODE_MODE_ENGINE_RESERVED_COST_MICROS +
-    (workspaceExecutorUsage.kind === "settled"
-      ? workspaceExecutorUsage.actualCostMicros
-      : 0);
+  // No Code Mode operation allocates a workspace executor since Plan 92.
+  const workspaceExecutorUsage: WorkspaceExecutorUsage = { kind: "unused" };
+  const aggregateOutcome = outcome;
+  const actualCostMicros = CODE_MODE_ENGINE_RESERVED_COST_MICROS;
   const receiptDigest = await sha256Hex(
     JSON.stringify({
       executionId: execution.identity.executionId,
@@ -707,72 +696,8 @@ function durableExecution(
       inputBytes: projection.inputBytes,
       outputBytes: projection.outputBytes,
     },
-    workspaceRevisionReceipt:
-      projection.kind === "workspace_committed"
-        ? projection.workspaceRevisionReceipt
-        : null,
+    workspaceRevisionReceipt: null,
   };
-}
-
-function currentWorkspaceExecutorUsage(
-  sql: SqlStorage,
-  executionId: string,
-): WorkspaceExecutorUsage {
-  const projection = parseRequiredExecutionProjection(sql, executionId);
-  switch (projection.kind) {
-    case "workspace_allocation_cancelled":
-    case "pending":
-    case "dispatching":
-      return { kind: "unused" };
-    case "workspace_allocation_pending":
-    case "workspace_allocation_settlement_pending":
-      throw new Error(
-        "Workspace executor allocation has not reached a terminal receipt",
-      );
-    case "workspace_execution_failed":
-    case "workspace_commit_failed":
-    case "workspace_commit_pending":
-    case "workspace_inspection_settled":
-    case "workspace_committed":
-      return workspaceExecutorUsage(projection.allocationReceipt);
-  }
-}
-
-function parseRequiredExecutionProjection(
-  sql: SqlStorage,
-  executionId: string,
-): CodeModeExecutionProjection {
-  const projection = readCodeModeExecutionProjection(sql, executionId);
-  if (projection === null)
-    throw new Error("Code Mode execution projection is corrupt");
-  return projection;
-}
-
-function workspaceExecutorUsage(
-  receipt: WorkspaceAllocationReceipt,
-): Variant<WorkspaceExecutorUsage, "settled"> {
-  return {
-    kind: "settled",
-    allocationId: receipt.allocationId,
-    allocationDigest: receipt.allocationDigest,
-    receiptId: receipt.receiptId,
-    receiptDigest: receipt.receiptDigest,
-    reservedCostMicros: receipt.reservedCostMicros,
-    actualCostMicros: receipt.actualCostMicros,
-    inputBytes: receipt.inputBytes,
-    outputBytes: receipt.outputBytes,
-    durationMs: receipt.durationMs,
-    outcome: receipt.outcome,
-  };
-}
-
-function aggregateCodeModeOutcome(
-  rootOutcome: HarnessCodeModeExecutionOutcome,
-  usage: WorkspaceExecutorUsage,
-): HarnessCodeModeExecutionOutcome {
-  if (usage.kind === "unused" || usage.outcome === "succeeded")
-    return rootOutcome;
-  return usage.outcome;
 }
 
 function writeExecutionCounter(

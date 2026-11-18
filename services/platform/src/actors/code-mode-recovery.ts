@@ -7,7 +7,7 @@ import {
   parseCodeModeReceiptPhase,
   type CodeModeReceiptPhase,
 } from "./pi-durable-code-receipt";
-import { parseCodeModeExecutionProjection } from "./workspace-execution-coordinator";
+import { parseCodeModeExecutionProjection } from "./code-mode-execution-projection";
 
 /** An admitted execution that a runtime lease can hold. */
 export type RecoverableCodeModeExecution = {
@@ -37,17 +37,8 @@ export type CodeModeRecovery = StrictUnion<
   /** Reconcile the original operation. Do not repeat an uncertain write. */
   | {
       readonly kind: "awaiting_effect_evidence";
-      readonly cause:
-        | "receipt_invalid"
-        | "execution_record_invalid"
-        | "workspace_commit_pending";
+      readonly cause: "receipt_invalid" | "execution_record_invalid";
       readonly effectId: string | null;
-    }
-  /** Reconcile usage before further funded execution. */
-  | {
-      readonly kind: "awaiting_usage_evidence";
-      readonly cause: "workspace_allocation_pending";
-      readonly effectId: string;
     }
   /** Settle the saved result under its recorded lease. Do not run the script. */
   | {
@@ -166,31 +157,6 @@ function classifyAdmittedScript(
     stored.stored.stateProjection,
   );
   if (projection === null) return invalid;
-  switch (projection.kind) {
-    case "workspace_allocation_pending":
-    case "workspace_allocation_settlement_pending":
-      return {
-        kind: "awaiting_usage_evidence",
-        cause: "workspace_allocation_pending",
-        effectId: active.effectId,
-      };
-    case "workspace_commit_pending":
-      return {
-        kind: "awaiting_effect_evidence",
-        cause: "workspace_commit_pending",
-        effectId: active.effectId,
-      };
-    case "pending":
-    case "dispatching":
-    case "workspace_allocation_cancelled":
-    case "workspace_execution_failed":
-    case "workspace_commit_failed":
-    case "workspace_inspection_settled":
-    case "workspace_committed":
-      break;
-    default:
-      return projection satisfies never;
-  }
   const execution: RecoverableCodeModeExecution = {
     executionId: active.executionId,
     effectId: active.effectId,
@@ -215,7 +181,6 @@ export function codeModeRecoveryRebind(
       return recovery.execution;
     case "no_execution":
     case "awaiting_effect_evidence":
-    case "awaiting_usage_evidence":
     case "pending_settlement":
     case "completed":
       return null;
@@ -239,11 +204,6 @@ export function codeModeRecoveryAction(
     case "completed":
     case "terminal_failure":
       return { kind: "resume_task" };
-    case "awaiting_usage_evidence":
-      return {
-        kind: "await_evidence",
-        evidence: { kind: "effect_receipt", effectId: recovery.effectId },
-      };
     case "awaiting_effect_evidence":
       return recovery.effectId === null
         ? { kind: "blocked", reason: "implementation" }

@@ -281,16 +281,6 @@ const DEFINITIONS: readonly CapabilityDefinition[] = [
     "enabled_disabled",
   ),
   seed(
-    "workspace.product_folder.update",
-    "Update a product workspace folder",
-    "Apply an approved product-folder update to the agent workspace.",
-    "agent_operations",
-    "external_effect",
-    "platform",
-    NONE,
-    "enabled_disabled",
-  ),
-  seed(
     "stripe.charge.create",
     "Create a Stripe charge",
     "Create an approved charge on the exact connected Stripe account.",

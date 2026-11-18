@@ -26,21 +26,17 @@ import type {
   AirtableReadInput,
   AirtableWriteInput,
 } from "../../actors/airtable-tool-input";
-import type {
-  ProductFieldV1,
-  CommerceContextRequest,
-} from "@seams/contracts";
+import type { CommerceContextRequest } from "@seams/contracts";
 import { CommerceReadRequestError } from "../../context/assembly/commerce";
 import type {
   AuthorizedHarnessToolResult,
   HarnessToolOutput,
-  ValidatedProductFolderChangesetV1,
 } from "@seams/contracts";
 import { MenuDraftRequestError } from "../../actors/menu-draft";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { CustomConnectorCatalogEntry } from "../../custom-connectors";
-import { errorMessage, isRecord, isString, sha256Hex } from "@seams/std";
+import { errorMessage, isRecord, sha256Hex } from "@seams/std";
 import {
   findCustomConnectorOperation,
   isReadEntry,
@@ -129,8 +125,6 @@ import {
   type SupplierReadTool,
   type WhatsAppSupportRead,
   type WhatsAppSupportReplySend,
-  type WorkspaceProductFolderCapabilityInput,
-  type WorkspaceProductFolderUpdate,
   type WorkspaceQuery,
 } from "./types";
 
@@ -140,7 +134,6 @@ export const ENCODER = new TextEncoder();
 
 export const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 
-export const PRODUCT_ROOT_PATTERN = /^products\/[A-Za-z0-9._-]+$/;
 
 export const CAPABILITY_FAILURE_TEXT =
   "The capability could not complete this request. Authoritative data is unavailable; retry once without inferring a broader outage.";
@@ -249,7 +242,6 @@ export async function executeCatalogTool(
     readonly proposeCommerceAction?: CommerceActionProposal;
     readonly proposeMerchantPlugin?: MerchantPluginProposal;
     readonly queryWorkspace: WorkspaceQuery;
-    readonly updateWorkspaceProductFolder: WorkspaceProductFolderUpdate;
     readonly readSavedBakeryRun?: (
       query: SavedBakeryRunQuery,
     ) => Promise<SavedBakeryRunResult>;
@@ -362,15 +354,6 @@ export async function executeCatalogTool(
     metadata: null,
     process_trace: null,
   });
-  if (
-    name === "workspace_product_folder_update" &&
-    execution.kind === "code_mode"
-  ) {
-    return authorizedCodeExecution(
-      output,
-      execution.executionLease.executionId,
-    );
-  }
   if (registeredTool(name)?.effect === "surface") {
     return authorizedSurfaceEffect(
       output,
@@ -494,7 +477,6 @@ export async function executeDirectCatalogTool(
     readonly proposeCommerceAction?: CommerceActionProposal;
     readonly proposeMerchantPlugin?: MerchantPluginProposal;
     readonly queryWorkspace: WorkspaceQuery;
-    readonly updateWorkspaceProductFolder: WorkspaceProductFolderUpdate;
     readonly readSavedBakeryRun?: (
       query: SavedBakeryRunQuery,
     ) => Promise<SavedBakeryRunResult>;
@@ -575,26 +557,6 @@ export async function executeDirectCatalogTool(
     throw new Error("Tool request exceeded its accepted boundary");
   }
   switch (name) {
-    case "workspace_product_folder_update": {
-      if (execution.kind !== "code_mode") {
-        throw new TypeError(
-          "workspace_product_folder_update requires Code Mode execution",
-        );
-      }
-      const parsed = parseWorkspaceProductFolderUpdateArgs([input]);
-      const claimed = await authority.claimCapability({
-        callId,
-        capability: CAPABILITY_KEYS.workspaceProductFolderUpdate,
-        boundary: "code_mode",
-      });
-      if (!claimed.ok) {
-        throw new Error(claimed.error.detail);
-      }
-      return authority.updateWorkspaceProductFolder(
-        parsed,
-        execution.executionLease,
-      );
-    }
   }
 }
 
@@ -778,87 +740,6 @@ function withRecordLifecycle(
   };
 }
 
-export function parseWorkspaceProductFolderUpdateArgs(
-  args: readonly unknown[],
-): WorkspaceProductFolderCapabilityInput {
-  if (args.length !== 1) {
-    throw new TypeError(
-      "workspace_product_folder_update requires one object argument",
-    );
-  }
-  const parsed = parseWorkspaceProductFolderCapabilityInput(args[0]);
-  if (parsed === null) {
-    throw new TypeError(
-      "workspace_product_folder_update arguments are invalid",
-    );
-  }
-  return parsed;
-}
-
-export function parseWorkspaceProductFolderCapabilityInput(
-  raw: unknown,
-): WorkspaceProductFolderCapabilityInput | null {
-  if (
-    !isRecord(raw) ||
-    !PRODUCT_ROOT_PATTERN.test(stringOrEmpty(raw.productRoot)) ||
-    !isRecord(raw.candidate) ||
-    typeof raw.candidate.productMarkdown !== "string" ||
-    raw.candidate.productMarkdown.length > 262_144 ||
-    typeof raw.candidate.variantsYaml !== "string" ||
-    raw.candidate.variantsYaml.length > 262_144
-  ) {
-    return null;
-  }
-  const claimedChangeset = parseWorkspaceProductFolderChangeset(
-    raw.claimedChangeset,
-  );
-  return claimedChangeset === null
-    ? null
-    : {
-        productRoot: stringOrEmpty(raw.productRoot),
-        candidate: {
-          productMarkdown: raw.candidate.productMarkdown,
-          variantsYaml: raw.candidate.variantsYaml,
-        },
-        claimedChangeset,
-      };
-}
-
-export function parseWorkspaceProductFolderChangeset(
-  raw: unknown,
-): ValidatedProductFolderChangesetV1 | null {
-  if (
-    !isRecord(raw) ||
-    !isRecord(raw.diff) ||
-    raw.schemaVersion !== "satyr.product-folder-changeset.v1" ||
-    typeof raw.organisationId !== "string" ||
-    typeof raw.workspaceId !== "string" ||
-    typeof raw.baseRevision !== "string" ||
-    !SHA256_PATTERN.test(stringOrEmpty(raw.resultingSemanticHash)) ||
-    !SHA256_PATTERN.test(stringOrEmpty(raw.changesetDigest)) ||
-    typeof raw.diff.productId !== "string" ||
-    !Array.isArray(raw.diff.fields) ||
-    !raw.diff.fields.every(isProductField) ||
-    !Array.isArray(raw.diff.variantIds) ||
-    !raw.diff.variantIds.every(isString)
-  ) {
-    return null;
-  }
-  return {
-    schemaVersion: "satyr.product-folder-changeset.v1",
-    organisationId: raw.organisationId,
-    workspaceId: raw.workspaceId,
-    baseRevision: raw.baseRevision,
-    resultingSemanticHash: stringOrEmpty(raw.resultingSemanticHash),
-    diff: {
-      productId: raw.diff.productId,
-      fields: raw.diff.fields,
-      variantIds: raw.diff.variantIds,
-    },
-    changesetDigest: stringOrEmpty(raw.changesetDigest),
-  };
-}
-
 export function boundedOutput(value: unknown): string {
   let serialized: string;
   try {
@@ -878,15 +759,6 @@ export function boundedText(value: string): string {
     bytes.slice(0, MAX_CODE_MODE_OUTPUT_BYTES),
   );
   return `${prefix}\n[output truncated from ${bytes.byteLength} bytes]`;
-}
-
-export function isProductField(value: unknown): value is ProductFieldV1 {
-  return (
-    value === "slug" ||
-    value === "title" ||
-    value === "description" ||
-    value === "currency"
-  );
 }
 
 export function stringOrEmpty(value: unknown): string {

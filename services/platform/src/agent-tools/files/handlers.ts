@@ -20,14 +20,10 @@ import { storeSessionExecutionVaultSecret } from "../../credential-vault/service
 import type { FileProviderCredentialStore } from "../../provider-workflows/file-context-credential";
 import { readCanonicalSessionForPersistence } from "../../actors/agent-session-canonical";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
-import { admittedExecutionDeadline } from "../../actors/code-mode-admission";
 import type {
-  HarnessExecutionLease,
   HarnessWorkspaceQuery,
   HarnessWorkspaceQueryResult,
-  HarnessWorkspaceProductFolderInput,
 } from "../../actors/embedded-harness-tool-host";
-import { executeWorkspaceProductFolderOperation } from "../../actors/workspace-execution-coordinator";
 import type {
   HarnessEmailMailboxSearchResult,
   HarnessFileRead,
@@ -218,37 +214,6 @@ export async function queryWorkspaceForEmbeddedHarness(
     default:
       return assertNever(query);
   }
-}
-
-export async function updateWorkspaceProductFolderForEmbeddedHarness(
-  context: SessionToolContext,
-  input: HarnessWorkspaceProductFolderInput,
-  executionLease: HarnessExecutionLease,
-): Promise<WorkspaceRevisionReceipt> {
-  const { env, storage, execution: admission, lease: harnessLease } = context;
-  await requireSessionExecution(admission, harnessLease);
-  const now = Date.now();
-  const result = await executeWorkspaceProductFolderOperation({
-    scope: admission.scope,
-    env,
-    storage,
-    operation: {
-      harnessLease,
-      executionLease,
-      productRoot: input.productRoot,
-      candidate: input.candidate,
-      claimedChangeset: input.claimedChangeset,
-      // Bounded by the deadline that admission set for the parent execution.
-      // A later deadline is refused as a reservation conflict.
-      deadlineAtUnixMs: admittedExecutionDeadline(storage.sql, executionLease),
-      committedAt: now,
-    },
-  });
-  if (!result.ok) {
-    throw new Error(`workspace product update failed: ${result.error.code}`);
-  }
-  await requireSessionExecution(admission, harnessLease);
-  return result.value;
 }
 
 export async function materializeWorkspaceForEmbeddedHarness(

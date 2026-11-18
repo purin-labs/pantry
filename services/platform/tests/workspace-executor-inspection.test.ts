@@ -223,7 +223,7 @@ describe("workspace executor inspection response", function inspectionResponseSu
   it("refuses an operation kind it does not know", function refusesUnknownKind() {
     const parsed = parseWorkspaceExecutorInspectionResponse(
       envelope({
-        kind: "validated_product_folder_changeset",
+        kind: "attachment_unknown",
         attachmentId: WORKSPACE_EXECUTOR_ATTACHMENT_ID,
         sourceSha256: SHA,
       }),

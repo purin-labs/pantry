@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { fork, spawn, spawnSync } from "node:child_process";
-import { readWorkspaceFixture } from "./workspace-files.mjs";
 import { once } from "node:events";
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
@@ -22,10 +21,9 @@ const repository = resolve(scripts, "../..");
 const portability = process.argv[4] === "portability";
 const draft = process.argv[4] === "draft";
 const proposal = process.argv[4] === "proposal";
-const workspaceTrial = process.argv[4] === "workspace";
 const effectCancellation = process.argv[4] === "effect-cancel";
 const codeModeTrial =
-  process.argv[4] === "codemode" || workspaceTrial || effectCancellation;
+  process.argv[4] === "codemode" || effectCancellation;
 const draftBrowser = process.argv[4] === "draft-browser";
 // The draft trial runs the draft collaboration Worker on the provider stack.
 const providerTrial =
@@ -41,7 +39,7 @@ const canonical = process.argv[4] === "canonical" || portability || recovery;
 const integration = process.argv[4] === "integration" || canonical;
 assert(
   process.argv[4] === undefined || integration,
-  "The optional scenario group must be integration, canonical, portability, recovery, recovery-portability, draft, draft-browser, proposal, provider, codemode, workspace, or effect-cancel",
+  "The optional scenario group must be integration, canonical, portability, recovery, recovery-portability, draft, draft-browser, proposal, provider, codemode, or effect-cancel",
 );
 const output = resolve(
   process.argv[3] ??
@@ -68,7 +66,6 @@ assert.deepEqual(
 const require = createRequire(join(resolve(runtimeDirectory), "package.json"));
 const { build } = require("esbuild");
 const artifacts = await mkdtemp(join(tmpdir(), "satyr-plan50-run-"));
-let workspaceExecutor = null;
 const worker = join(artifacts, "candidate-worker.mjs");
 let browserBuild = null;
 if (draftBrowser) {
@@ -197,7 +194,6 @@ const evidence = {
   scenarios: [],
 };
 try {
-  if (workspaceTrial) workspaceExecutor = await startWorkspaceExecutor();
   for (const scenario of scenarios) {
     console.log(`Evaluating ${scenario}`);
     const result = await evaluateTrialScenario(scenario);
@@ -213,10 +209,6 @@ try {
   await saveEvidence();
   provider.closeAllConnections();
   provider.close();
-  if (workspaceExecutor !== null) {
-    workspaceExecutor.kill("SIGTERM");
-    await once(workspaceExecutor, "exit");
-  }
 }
 assert(
   evidence.scenarios.every(passed),
@@ -226,7 +218,6 @@ console.log(`Evidence: ${output}`);
 
 function trialWorkerFile() {
   if (effectCancellation) return "effect-cancellation-worker.mjs";
-  if (workspaceTrial) return "workspace-worker.mjs";
   if (draftBrowser) return "draft-collaboration-worker.mjs";
   if (draft) return "draft-worker.mjs";
   if (codeModeTrial) return "codemode-worker.mjs";
@@ -240,7 +231,6 @@ function trialWorkerFile() {
 
 function trialScenarios() {
   if (effectCancellation) return ["provider_codemode_effect_cancel"];
-  if (workspaceTrial) return ["provider_codemode_workspace"];
   if (draftBrowser) return ["draft_browser_restricted", "draft_browser"];
   if (draft)
     return [
@@ -483,25 +473,6 @@ async function sourceEvidence() {
       "services/platform/src/policy/information-flow/source-labels.ts",
     );
   const sourcePaths = new Set(files);
-  if (workspaceTrial) {
-    for (const path of [
-      "scripts/plan-50/workspace-files.mjs",
-      "crates/workspace-executor/src/main.rs",
-      "crates/workspace-executor/src/lib.rs",
-      "crates/workspace-executor/src/bin/pantry-file-native.rs",
-      "crates/workspace-executor/src/file_native.rs",
-      "crates/workspace-executor/src/wire.rs",
-      "crates/media-inspect/src/video_frames.rs",
-      "crates/media-inspect/src/media_metadata.rs",
-      "Cargo.lock",
-      "target/debug/workspace-executor",
-      "target/debug/satyr-file-native",
-      "packages/contracts/fixtures/product-folder-v1/workspace.yaml",
-      "packages/contracts/fixtures/product-folder-v1/products/product_field_watch/product.md",
-      "packages/contracts/fixtures/product-folder-v1/products/product_field_watch/variants.yaml",
-    ])
-      sourcePaths.add(path);
-  }
   if (draftBrowser)
     sourcePaths.add("scripts/plan-50/draft-browser-acceptance.js");
   for (const path of commerceSources) sourcePaths.add(path);
@@ -701,22 +672,6 @@ async function handleProvider(fixtures, request, response) {
           return sendJson(response, { acknowledged: true });
         fixture.organisationSettlement = body;
         return;
-      case "/workspace-initialized":
-        fixture.workspaceInput = await prepareWorkspaceChange(body.receipt);
-        return sendJson(response, { acknowledged: true });
-      case "/workspace-execute": {
-        fixture.workspaceExecutions = (fixture.workspaceExecutions ?? 0) + 1;
-        const executed = await fetch("http://127.0.0.1:8080/v1/execute", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(body.request),
-        });
-        response.writeHead(executed.status, {
-          "content-type": "application/json",
-        });
-        response.end(await executed.text());
-        return;
-      }
       case "/extension-blocked":
         return sendJson(response, { acknowledged: true });
       case "/partial-model-observed":
@@ -1376,10 +1331,8 @@ function codeModeModelResponse(fixture, body) {
           id: "discover_original",
           name: "tool_search",
           arguments: {
-            query: workspaceTrial
-              ? "workspace_product_folder_update commerce_propose_action inventory_read"
-              : "commerce_propose_action inventory_read",
-            limit: workspaceTrial ? 3 : 2,
+            query: "commerce_propose_action inventory_read",
+            limit: 2,
           },
         },
       ],
@@ -1396,7 +1349,7 @@ function codeModeModelResponse(fixture, body) {
           id: "code_original",
           name: "codemode",
           arguments: {
-            code: `const reads = await Promise.all([tools.${remote}({}), tools.${remote}({})]); store("inventory", JSON.parse(reads[0]).count + JSON.parse(reads[1]).count); const value = JSON.parse(await tools.commerce_propose_action(${JSON.stringify(proposal)})); store("proposal", value); ${workspaceTrial ? `store("workspace", JSON.parse(await tools.workspace_product_folder_update(${JSON.stringify(fixture.workspaceInput)})));` : ""} text(load("proposal"));`,
+            code: `const reads = await Promise.all([tools.${remote}({}), tools.${remote}({})]); store("inventory", JSON.parse(reads[0]).count + JSON.parse(reads[1]).count); const value = JSON.parse(await tools.commerce_propose_action(${JSON.stringify(proposal)})); store("proposal", value); text(load("proposal"));`,
           },
         },
       ],
@@ -1550,17 +1503,6 @@ async function evaluateCodeModeScenario(scenario) {
     const accepted = await request(runtime, scenario, "/start");
     assert.equal(accepted.accepted, true, accepted.error);
     await waitFor(proposalHeld.bind(null, fixture), "nested proposal result");
-    let workspaceDirectDenial = null;
-    if (workspaceTrial) {
-      workspaceDirectDenial = await requestJson(
-        runtime,
-        scenario,
-        "/workspace-direct-probe",
-        fixture.workspaceInput,
-      );
-      assert.equal(workspaceDirectDenial.status, "failed");
-      assert.equal(fixture.workspaceExecutions ?? 0, 0);
-    }
     const deniedCommands = await verifyDeniedPortalCommands(runtime, scenario);
     const watch =
       scenario === "provider_codemode_restart"
@@ -2115,31 +2057,6 @@ async function evaluateCodeModeScenario(scenario) {
         "inventory_read",
       ]);
       assert(after.tasks.every(terminalTask));
-      if (workspaceTrial) {
-        assert.equal(fixture.workspaceExecutions, 1);
-        assert.equal(before.workspace.counts.revisions, 2);
-        assert.deepEqual(after.workspace, before.workspace);
-        assert.equal(after.executionRows.length, 1);
-        assert.equal(after.executionRows[0].state_kind, "settled");
-        const settlement = JSON.parse(after.executionRows[0].request_envelope);
-        assert.deepEqual(
-          settlement.receipt.workspaceRevisionReceipt,
-          after.workspace.receipt,
-        );
-        assert.deepEqual(
-          after.lifecycle.state.resumePoint.checkpoint.workspaceRevisionReceipt,
-          after.workspace.receipt,
-        );
-        assert.equal(
-          after.codeStore.values.workspace.receiptId,
-          after.workspace.receipt.receiptId,
-        );
-        assert(
-          after.workspace.materialized.manifest.files.some(
-            updatedWorkspaceProduct,
-          ),
-        );
-      }
       if (scenario === "provider_codemode_organisation_settlement") {
         assert.equal(fixture.organisationSettlementAttempts.length, 2);
         const [original, recovered] = fixture.organisationSettlementAttempts;
@@ -2156,8 +2073,6 @@ async function evaluateCodeModeScenario(scenario) {
         pendingSettlement: fixture.codeResult.taskResult,
         organisationSettlement: fixture.organisationSettlement ?? null,
         organisationSettlementAttempts: fixture.organisationSettlementAttempts,
-        workspaceExecutions: fixture.workspaceExecutions ?? 0,
-        workspaceDirectDenial,
         alarmRecovery,
         trace: fixture.events,
         logs: [...logs, ...runtime.logs],
@@ -2362,7 +2277,6 @@ function codeResultHeld(fixture) {
 
 function isSettlementScenario(scenario) {
   return (
-    scenario === "provider_codemode_workspace" ||
     scenario === "provider_codemode_settlement" ||
     scenario === "provider_codemode_organisation_settlement"
   );
@@ -3305,72 +3219,7 @@ async function evaluateProviderScenario(scenario) {
   }
 }
 
-function updatedWorkspaceProduct(file) {
-  return (
-    file.path.endsWith("/product.md") && file.content.includes("Field Watch II")
-  );
-}
-
-async function prepareWorkspaceChange(receipt) {
-  const fixture = await readWorkspaceFixture(repository);
-  const before = join(artifacts, "workspace-before");
-  const after = join(artifacts, "workspace-after");
-  for (const root of [before, after]) {
-    for (const file of fixture.files) {
-      const path = join(root, file.path);
-      await mkdir(dirname(path), { recursive: true });
-      const content =
-        root === after && file.path.endsWith("/product.md")
-          ? fixture.candidate.productMarkdown
-          : file.content;
-      await writeFile(path, content);
-    }
-  }
-  const derived = spawnSync(
-    join(repository, "target/debug/satyr-file-native"),
-    ["changeset", receipt.revision, before, after],
-    { encoding: "utf8" },
-  );
-  assert.equal(derived.status, 0, derived.stderr);
-  return {
-    productRoot: fixture.productRoot,
-    candidate: fixture.candidate,
-    claimedChangeset: JSON.parse(derived.stdout),
-  };
-}
-
-async function startWorkspaceExecutor() {
-  const child = spawn(join(repository, "target/debug/workspace-executor"), [], {
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-  const logs = [];
-  child.stdout.on("data", recordOutput.bind(null, logs));
-  child.stderr.on("data", recordOutput.bind(null, logs));
-  try {
-    await waitFor(
-      workspaceExecutorReady.bind(null, child, logs),
-      "local Rust workspace executor",
-    );
-    return child;
-  } catch (error) {
-    child.kill("SIGTERM");
-    throw error;
-  }
-}
-
-async function workspaceExecutorReady(child, logs) {
-  if (child.exitCode !== null)
-    throw new Error(`Workspace executor exited: ${logs.join("")}`);
-  try {
-    const response = await fetch("http://127.0.0.1:8080/health");
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
 function runtimeGroup() {
-  if (workspaceTrial) return "workspace";
   if (draftBrowser) return "draft-browser";
   if (draft) return "draft";
   if (codeModeTrial) return "codemode";

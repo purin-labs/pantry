@@ -430,7 +430,6 @@ export class CandidateActor extends ProviderActor {
         [
           "provider_codemode_settlement",
           "provider_codemode_organisation_settlement",
-          "provider_codemode_workspace",
         ].includes(await this.ctx.storage.get("evaluation_scenario"))
       )
         await this.provider("/code-result-held", {

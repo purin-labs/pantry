@@ -122,7 +122,6 @@ async function acceptsCommerceReads(): Promise<void> {
         readEmailDraft: unexpectedCapability,
         editEmailDraft: unexpectedCapability,
         queryWorkspace: unexpectedCapability,
-        updateWorkspaceProductFolder: unexpectedCapability,
         nowNs: clock,
       }),
     );

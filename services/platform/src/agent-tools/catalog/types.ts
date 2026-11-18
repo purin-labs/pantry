@@ -48,11 +48,7 @@ import type {
   CommerceGraphQueryResult,
 } from "@seams/contracts";
 import type { Result } from "../../result";
-import type {
-  AuthorizedHarnessToolResult,
-  ValidatedProductFolderChangesetV1,
-  WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+import type { AuthorizedHarnessToolResult } from "@seams/contracts";
 import type {
   BakeryWorkspaceViewAction,
   BakeryProductionPanel,
@@ -68,7 +64,6 @@ import type {
 } from "@seams/bakery-model/bakery-surface";
 import type { AgentRunSaveVerification } from "../../commerce/bakery/agent-run-save";
 import type { AgentScenarioSaveResult } from "../../commerce/bakery/agent-scenario-save";
-import type { WorkspaceExecutorProductFiles } from "../../workspace-executor-container";
 import type {
   DraftAgentEditRequest,
   DraftAgentReadArgs,
@@ -387,8 +382,7 @@ export type HarnessCapabilityName =
   | typeof CAPABILITY_KEYS.messageLinkRead
   | typeof CAPABILITY_KEYS.customConnectorRead
   | typeof CAPABILITY_KEYS.customConnectorWrite
-  | typeof CAPABILITY_KEYS.workspaceQuery
-  | typeof CAPABILITY_KEYS.workspaceProductFolderUpdate;
+  | typeof CAPABILITY_KEYS.workspaceQuery;
 
 /** The tool call a proposal comes from, as the accepted history names it. */
 export type CommerceActionProposalOrigin = Readonly<{ toolCallId: string }>;
@@ -738,12 +732,6 @@ export type HarnessSourceAuthorization = (
 ) => Promise<Result<null, { readonly detail: string }>>;
 
 export type HarnessCodeModeExecutionOutcome = CodeModeExecutionOutcome;
-
-export type WorkspaceProductFolderCapabilityInput = {
-  readonly productRoot: string;
-  readonly candidate: WorkspaceExecutorProductFiles;
-  readonly claimedChangeset: ValidatedProductFolderChangesetV1;
-};
 
 /**
  * A capability claim that a global admission freeze refused. The script that
@@ -1106,8 +1094,3 @@ export type MessageAttachmentInspect = (input: {
 export type MessageLinkRead = (input: {
   readonly url: string;
 }) => Promise<MessageLinkReadResult>;
-
-export type WorkspaceProductFolderUpdate = (
-  input: WorkspaceProductFolderCapabilityInput,
-  executionLease: HarnessCodeModeExecutionLease,
-) => Promise<WorkspaceRevisionReceipt>;

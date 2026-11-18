@@ -46,7 +46,6 @@ import type {
   AcceptedInputRef,
   HarnessCheckpointRecord,
   HarnessTurnLease,
-  WorkspaceRevisionReceipt,
 } from "@seams/contracts";
 import type { ActorActivationRequest } from "./actor-registry";
 import type { Env } from "../env";
@@ -118,12 +117,6 @@ import {
   reconcileFrozenCodeModeSettlements,
   type RelocationSessionSettlementRequest,
 } from "./agent-session-code-mode-settlement";
-import {
-  executeWorkspaceProductFolderOperation,
-  reconcileWorkspaceCommitIntents,
-  type WorkspaceExecutionCoordinatorError,
-  type WorkspaceProductFolderOperation,
-} from "./workspace-execution-coordinator";
 import type {
   EmbeddedHarnessUserInput,
   EmbeddedHarnessSteerError,
@@ -1064,34 +1057,6 @@ export class SessionDO extends SessionTransientTurns {
     return { ok: true, value: { kind: "interrupted", turnId } };
   }
 
-  async executeCanonicalWorkspaceProductFolder(
-    operation: WorkspaceProductFolderOperation,
-  ): Promise<
-    Result<WorkspaceRevisionReceipt, WorkspaceExecutionCoordinatorError>
-  > {
-    const organisationId = parseOrganisationId(
-      operation.harnessLease.session.organisationId,
-    );
-    const admission = organisationId.ok
-      ? await SessionExecutionAdmission.resolve(
-          this.env,
-          this.ctx.storage,
-          organisationId.value,
-        )
-      : null;
-    if (admission === null)
-      return {
-        ok: false,
-        error: { code: "workspace_execution_lease_rejected" },
-      };
-    return executeWorkspaceProductFolderOperation({
-      scope: admission.scope,
-      env: this.env,
-      storage: this.ctx.storage,
-      operation,
-    });
-  }
-
   async restoreCanonicalHarnessCheckpoint(input: {
     requestingOrganisationId: OrganisationId;
     checkpoint: HarnessCheckpointRecord;
@@ -1458,15 +1423,6 @@ export class SessionDO extends SessionTransientTurns {
         run: () => this.resumeAcceptedCheckpointFinalization(),
       },
       { name: "run_budget_deadline", run: () => this.endExhaustedRun() },
-      {
-        name: "workspace_commit_intents",
-        run: () =>
-          reconcileWorkspaceCommitIntents({
-            scope: admission.scope,
-            env: this.env,
-            storage: this.ctx.storage,
-          }),
-      },
       {
         name: "code_mode_settlements",
         run: () =>

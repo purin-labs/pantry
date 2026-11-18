@@ -1,22 +1,15 @@
-use std::{
-    fs,
-    path::Path,
-    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
-};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-pub mod contracts;
-pub mod file_native;
+mod contracts;
 
 use crate::contracts::{
-    EffectReceiptId, ExecutionId, MessageAttachmentPreparationIdentity,
-    MessageAttachmentPreparationLimits, Sha256Digest, WorkspaceRevision,
+    MessageAttachmentPreparationIdentity, MessageAttachmentPreparationLimits, Sha256Digest,
 };
-use crate::file_native::ProductFolderV1;
-use serde::{Deserialize, Serialize};
-use tempfile::TempDir;
+use serde::Serialize;
 
+/// The ceiling for the JSON request inside the binary envelope.
 pub const MAX_REQUEST_BYTES: usize = 1024 * 1024;
-pub const MAX_FILE_BYTES: usize = 256 * 1024;
+
 /// The ceiling for an attachment carried in the binary envelope.
 ///
 /// Deliberately far below the ingestion limit. Ingestion stores whatever the
@@ -29,32 +22,14 @@ const MAX_DEADLINE_AHEAD: Duration = Duration::from_secs(10 * 60);
 
 mod wire;
 use wire::{
-    AttachmentInspectionLimit, AttachmentMediaClassWire, DecodedVideoFrame, ProductFolderFilesWire,
-    ProductFolderReplacementOverlay, WorkspaceExecutorInspectionOperation,
-    WorkspaceExecutorOperationWire, WorkspaceExecutorPreparationOperationWire,
-    WorkspaceExecutorPreparationRequestWire, WorkspaceExecutorProductResult,
-    WorkspaceFileReplacement,
+    AttachmentInspectionLimit, AttachmentMediaClassWire, DecodedVideoFrame,
+    WorkspaceExecutorInspectionOperation, WorkspaceExecutorPreparationOperationWire,
+    WorkspaceExecutorPreparationRequestWire,
 };
 pub use wire::{
-    PREPARATION_REQUEST_SCHEMA_VERSION, REQUEST_SCHEMA_VERSION, RESPONSE_SCHEMA_VERSION,
-    WorkspaceExecutorPreparationResponse, WorkspaceExecutorRequestWire, WorkspaceExecutorResponse,
+    PREPARATION_REQUEST_SCHEMA_VERSION, RESPONSE_SCHEMA_VERSION,
+    WorkspaceExecutorPreparationResponse,
 };
-
-#[derive(Debug, Deserialize)]
-enum RequestWire {
-    Product(WorkspaceExecutorRequestWire),
-    Preparation(WorkspaceExecutorPreparationRequestWire),
-}
-
-#[derive(Debug)]
-struct ValidatedProductRequest {
-    execution_id: ExecutionId,
-    execution_receipt_id: EffectReceiptId,
-    base_revision: WorkspaceRevision,
-    base_canonical_head: Sha256Digest,
-    base_manifest_digest: Sha256Digest,
-    operation: ValidatedProductOperation,
-}
 
 #[derive(Debug)]
 struct ValidatedPreparationRequest {
@@ -66,29 +41,12 @@ struct ValidatedPreparationRequest {
 }
 
 #[derive(Debug)]
-enum ValidatedRequest {
-    Product(ValidatedProductRequest),
-    Preparation(ValidatedPreparationRequest),
-}
-
-#[derive(Debug)]
 enum ValidatedPreparationOperation {
     PrepareMessageAttachment {
         media_class: AttachmentMediaClassWire,
         media_type: String,
         byte_length: u64,
         max_text_chars: u32,
-    },
-}
-
-#[derive(Debug)]
-enum ValidatedProductOperation {
-    ProductFolderCandidate {
-        product_root: String,
-        workspace_yaml: String,
-        base: ProductFolderFilesWire,
-        candidate: ProductFolderFilesWire,
-        claimed_changeset: serde_json::Value,
     },
 }
 
@@ -110,9 +68,6 @@ pub enum WorkspaceExecutorErrorCode {
     InputTooLarge,
     /// The received bytes did not hash to the digest the request named.
     AttachmentDigestMismatch,
-    InvalidProductRoot,
-    InvalidProductFolder,
-    InvalidChangesetCandidate,
     InternalFailure,
 }
 
@@ -147,15 +102,8 @@ pub fn execute_envelope(
     now: SystemTime,
 ) -> Result<WorkspaceExecutorPreparationResponse, WorkspaceExecutorError> {
     let (request_bytes, attachment_bytes) = split_envelope(envelope)?;
-    let request = validate_request(decode_request_wire(request_bytes)?, now)?;
+    let request = validate_preparation_request(decode_request_wire(request_bytes)?, now)?;
     let started = Instant::now();
-
-    let ValidatedRequest::Preparation(request) = request else {
-        return Err(error(
-            WorkspaceExecutorErrorCode::InvalidRequest,
-            "the binary envelope carries attachment inspection only",
-        ));
-    };
 
     let ValidatedPreparationOperation::PrepareMessageAttachment {
         media_class,
@@ -496,53 +444,9 @@ fn digest_hex(bytes: &[u8]) -> String {
     hex
 }
 
-pub fn execute_json(
+fn decode_request_wire(
     request_bytes: &[u8],
-    now: SystemTime,
-) -> Result<WorkspaceExecutorResponse, WorkspaceExecutorError> {
-    if request_bytes.len() > MAX_REQUEST_BYTES {
-        return Err(error(
-            WorkspaceExecutorErrorCode::InputTooLarge,
-            "workspace executor request exceeds the byte limit",
-        ));
-    }
-
-    let request = validate_request(decode_request_wire(request_bytes)?, now)?;
-    let ValidatedRequest::Product(request) = request else {
-        return Err(error(
-            WorkspaceExecutorErrorCode::InvalidRequest,
-            "attachment preparation requires the binary envelope entry point",
-        ));
-    };
-    let started = SystemTime::now();
-    let operation = execute_operation(&request)?;
-    let duration_ms = SystemTime::now()
-        .duration_since(started)
-        .unwrap_or_default()
-        .as_millis()
-        .try_into()
-        .unwrap_or(u64::MAX);
-    let output_bytes = serde_json::to_vec(&operation)
-        .map_err(internal_error)?
-        .len()
-        .try_into()
-        .unwrap_or(u64::MAX);
-
-    Ok(WorkspaceExecutorResponse {
-        schema_version: RESPONSE_SCHEMA_VERSION.to_owned(),
-        execution_id: request.execution_id.as_str().to_owned(),
-        execution_receipt_id: request.execution_receipt_id.as_str().to_owned(),
-        base_revision: request.base_revision.as_str().to_owned(),
-        base_canonical_head: request.base_canonical_head.as_str().to_owned(),
-        base_manifest_digest: request.base_manifest_digest.as_str().to_owned(),
-        operation,
-        input_bytes: request_bytes.len().try_into().unwrap_or(u64::MAX),
-        output_bytes,
-        duration_ms,
-    })
-}
-
-fn decode_request_wire(request_bytes: &[u8]) -> Result<RequestWire, WorkspaceExecutorError> {
+) -> Result<WorkspaceExecutorPreparationRequestWire, WorkspaceExecutorError> {
     let raw: serde_json::Value = serde_json::from_slice(request_bytes).map_err(|_| {
         error(
             WorkspaceExecutorErrorCode::InvalidRequest,
@@ -555,80 +459,18 @@ fn decode_request_wire(request_bytes: &[u8]) -> Result<RequestWire, WorkspaceExe
         .and_then(serde_json::Value::as_str);
 
     match kind {
-        Some("product_folder_candidate") => {
-            serde_json::from_value::<WorkspaceExecutorRequestWire>(raw)
-                .map(RequestWire::Product)
-                .map_err(|_| invalid_request(()))
-        }
         Some("prepare_message_attachment") => {
             serde_json::from_value::<WorkspaceExecutorPreparationRequestWire>(raw)
-                .map(RequestWire::Preparation)
                 .map_err(|_| invalid_request(()))
         }
         _ => Err(invalid_request(())),
     }
 }
 
-fn validate_request(
-    wire: RequestWire,
-    now: SystemTime,
-) -> Result<ValidatedRequest, WorkspaceExecutorError> {
-    match wire {
-        RequestWire::Product(wire) => validate_product_request(wire, now),
-        RequestWire::Preparation(wire) => validate_preparation_request(wire, now),
-    }
-}
-
-fn validate_product_request(
-    wire: WorkspaceExecutorRequestWire,
-    now: SystemTime,
-) -> Result<ValidatedRequest, WorkspaceExecutorError> {
-    if wire.schema_version != REQUEST_SCHEMA_VERSION {
-        return Err(error(
-            WorkspaceExecutorErrorCode::InvalidRequest,
-            "workspace executor schema version is unsupported",
-        ));
-    }
-    validate_deadline(wire.deadline_at_unix_ms, now)?;
-
-    let WorkspaceExecutorOperationWire::ProductFolderCandidate {
-        product_root,
-        workspace_yaml,
-        base,
-        candidate,
-        claimed_changeset,
-    } = wire.operation;
-
-    validate_product_root(&product_root)?;
-    validate_file_size(&workspace_yaml)?;
-    validate_file_size(&base.product_markdown)?;
-    validate_file_size(&base.variants_yaml)?;
-    validate_file_size(&candidate.product_markdown)?;
-    validate_file_size(&candidate.variants_yaml)?;
-
-    Ok(ValidatedRequest::Product(ValidatedProductRequest {
-        execution_id: ExecutionId::parse(wire.execution_id).map_err(invalid_request)?,
-        execution_receipt_id: EffectReceiptId::parse(wire.execution_receipt_id)
-            .map_err(invalid_request)?,
-        base_revision: WorkspaceRevision::parse(wire.base_revision).map_err(invalid_request)?,
-        base_canonical_head: Sha256Digest::parse(wire.base_canonical_head)
-            .map_err(invalid_request)?,
-        base_manifest_digest: Sha256Digest::parse(wire.base_manifest_digest)
-            .map_err(invalid_request)?,
-        operation: ValidatedProductOperation::ProductFolderCandidate {
-            product_root,
-            workspace_yaml,
-            base,
-            candidate,
-            claimed_changeset,
-        },
-    }))
-}
-
 fn validate_preparation_request(
     wire: WorkspaceExecutorPreparationRequestWire,
     now: SystemTime,
-) -> Result<ValidatedRequest, WorkspaceExecutorError> {
+) -> Result<ValidatedPreparationRequest, WorkspaceExecutorError> {
     if wire.schema_version != PREPARATION_REQUEST_SCHEMA_VERSION {
         return Err(error(
             WorkspaceExecutorErrorCode::InvalidRequest,
@@ -662,7 +504,7 @@ fn validate_preparation_request(
         ));
     }
 
-    Ok(ValidatedRequest::Preparation(ValidatedPreparationRequest {
+    Ok(ValidatedPreparationRequest {
         preparation_id: wire.preparation_id,
         identity: wire.identity,
         limits: wire.limits,
@@ -673,7 +515,7 @@ fn validate_preparation_request(
             byte_length,
             max_text_chars,
         },
-    }))
+    })
 }
 
 fn validate_deadline(
@@ -716,31 +558,6 @@ fn validate_preparation_deadline(
     Ok(deadline)
 }
 
-fn validate_product_root(product_root: &str) -> Result<(), WorkspaceExecutorError> {
-    let Some(product_id) = product_root.strip_prefix("products/") else {
-        return Err(invalid_product_root());
-    };
-    if product_id.is_empty()
-        || product_id.contains('/')
-        || product_id.contains('\\')
-        || product_id == "."
-        || product_id == ".."
-    {
-        return Err(invalid_product_root());
-    }
-    Ok(())
-}
-
-fn validate_file_size(value: &str) -> Result<(), WorkspaceExecutorError> {
-    if value.len() > MAX_FILE_BYTES {
-        return Err(error(
-            WorkspaceExecutorErrorCode::InputTooLarge,
-            "workspace executor file exceeds the byte limit",
-        ));
-    }
-    Ok(())
-}
-
 fn validate_opaque_identity(value: &str) -> Result<(), WorkspaceExecutorError> {
     if value.is_empty()
         || value.len() > 256
@@ -749,98 +566,6 @@ fn validate_opaque_identity(value: &str) -> Result<(), WorkspaceExecutorError> {
     {
         return Err(invalid_request(()));
     }
-    Ok(())
-}
-
-fn execute_operation(
-    request: &ValidatedProductRequest,
-) -> Result<WorkspaceExecutorProductResult, WorkspaceExecutorError> {
-    match &request.operation {
-        ValidatedProductOperation::ProductFolderCandidate {
-            product_root,
-            workspace_yaml,
-            base,
-            candidate,
-            claimed_changeset,
-        } => execute_product_folder_candidate(
-            request,
-            product_root,
-            workspace_yaml,
-            base,
-            candidate,
-            claimed_changeset,
-        ),
-    }
-}
-
-fn execute_product_folder_candidate(
-    request: &ValidatedProductRequest,
-    product_root: &str,
-    workspace_yaml: &str,
-    base: &ProductFolderFilesWire,
-    candidate: &ProductFolderFilesWire,
-    claimed_changeset: &serde_json::Value,
-) -> Result<WorkspaceExecutorProductResult, WorkspaceExecutorError> {
-    let base_dir = TempDir::new().map_err(internal_error)?;
-    let candidate_dir = TempDir::new().map_err(internal_error)?;
-    write_product_folder(base_dir.path(), product_root, workspace_yaml, base)?;
-    write_product_folder(
-        candidate_dir.path(),
-        product_root,
-        workspace_yaml,
-        candidate,
-    )?;
-
-    let before = ProductFolderV1::parse(base_dir.path()).map_err(|_| invalid_product_folder())?;
-    let after =
-        ProductFolderV1::parse(candidate_dir.path()).map_err(|_| invalid_product_folder())?;
-    let expected_product_id = product_root
-        .strip_prefix("products/")
-        .ok_or_else(invalid_product_root)?;
-    if before.product().product_id().as_str() != expected_product_id
-        || after.product().product_id().as_str() != expected_product_id
-    {
-        return Err(invalid_product_root());
-    }
-
-    let validated_changeset = before
-        .validate_changeset_candidate(&after, request.base_revision.clone(), claimed_changeset)
-        .map_err(|_| {
-            error(
-                WorkspaceExecutorErrorCode::InvalidChangesetCandidate,
-                "product-folder changeset candidate did not match the derived change",
-            )
-        })?;
-
-    Ok(
-        WorkspaceExecutorProductResult::ValidatedProductFolderChangeset {
-            product_root: product_root.to_string(),
-            replacement_overlay: ProductFolderReplacementOverlay {
-                product_markdown: WorkspaceFileReplacement {
-                    path: format!("{product_root}/product.md"),
-                    utf8: candidate.product_markdown.clone(),
-                },
-                variants_yaml: WorkspaceFileReplacement {
-                    path: format!("{product_root}/variants.yaml"),
-                    utf8: candidate.variants_yaml.clone(),
-                },
-            },
-            validated_changeset,
-        },
-    )
-}
-
-fn write_product_folder(
-    root: &Path,
-    product_root: &str,
-    workspace_yaml: &str,
-    files: &ProductFolderFilesWire,
-) -> Result<(), WorkspaceExecutorError> {
-    let product_dir = root.join(product_root);
-    fs::create_dir_all(&product_dir).map_err(internal_error)?;
-    fs::write(root.join("workspace.yaml"), workspace_yaml).map_err(internal_error)?;
-    fs::write(product_dir.join("product.md"), &files.product_markdown).map_err(internal_error)?;
-    fs::write(product_dir.join("variants.yaml"), &files.variants_yaml).map_err(internal_error)?;
     Ok(())
 }
 
@@ -855,157 +580,11 @@ fn invalid_request(_: impl std::fmt::Debug) -> WorkspaceExecutorError {
     )
 }
 
-fn invalid_product_root() -> WorkspaceExecutorError {
-    error(
-        WorkspaceExecutorErrorCode::InvalidProductRoot,
-        "product root is outside the authorized product-folder scope",
-    )
-}
-
-fn invalid_product_folder() -> WorkspaceExecutorError {
-    error(
-        WorkspaceExecutorErrorCode::InvalidProductFolder,
-        "product folder is invalid",
-    )
-}
-
 fn internal_error(_: impl std::fmt::Debug) -> WorkspaceExecutorError {
     error(
         WorkspaceExecutorErrorCode::InternalFailure,
         "workspace executor failed internally",
     )
-}
-
-#[cfg(test)]
-mod tests {
-    use std::{
-        fs,
-        path::{Path, PathBuf},
-        time::SystemTime,
-    };
-
-    use serde_json::{Value, json};
-
-    use super::{WorkspaceExecutorErrorCode, execute_json};
-
-    fn fixture_root() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../packages/contracts/fixtures/product-folder-v1")
-    }
-
-    fn fixture(path: &str) -> String {
-        fs::read_to_string(fixture_root().join(path)).unwrap()
-    }
-
-    fn candidate_product() -> String {
-        fixture("products/product_field_watch/product.md").replace("Field Watch", "Field Watch II")
-    }
-
-    fn claimed_changeset(candidate_product_markdown: &str) -> Value {
-        let before_dir = tempfile::TempDir::new().unwrap();
-        let after_dir = tempfile::TempDir::new().unwrap();
-        write_fixture(
-            before_dir.path(),
-            &fixture("products/product_field_watch/product.md"),
-        );
-        write_fixture(after_dir.path(), candidate_product_markdown);
-        let before = crate::file_native::ProductFolderV1::parse(before_dir.path()).unwrap();
-        let after = crate::file_native::ProductFolderV1::parse(after_dir.path()).unwrap();
-        serde_json::to_value(
-            before
-                .validated_changeset(
-                    &after,
-                    crate::contracts::WorkspaceRevision::parse("workspace_revision_42").unwrap(),
-                )
-                .unwrap(),
-        )
-        .unwrap()
-    }
-
-    fn write_fixture(root: &Path, product_markdown: &str) {
-        let product = root.join("products/product_field_watch");
-        fs::create_dir_all(&product).unwrap();
-        fs::write(root.join("workspace.yaml"), fixture("workspace.yaml")).unwrap();
-        fs::write(product.join("product.md"), product_markdown).unwrap();
-        fs::write(
-            product.join("variants.yaml"),
-            fixture("products/product_field_watch/variants.yaml"),
-        )
-        .unwrap();
-    }
-
-    fn request(claimed: Value) -> Vec<u8> {
-        let deadline = SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_millis() as u64
-            + 60_000;
-        serde_json::to_vec(&json!({
-            "schemaVersion": "workspace_executor_request.v1",
-            "executionId": "execution_123",
-            "executionReceiptId": "receipt-execution_123",
-            "deadlineAtUnixMs": deadline,
-            "baseRevision": "workspace_revision_42",
-            "baseCanonicalHead": "8cf934c40388c5b902ee1fd48bd60aeb7eb21bbad135a362db30ae4dbb1e4f31",
-            "baseManifestDigest": "7e58973e38c083cd0d7bf2762b44a952f39bbad0b321d7ac539bb9b5cd9fd9a0",
-            "operation": {
-                "kind": "product_folder_candidate",
-                "productRoot": "products/product_field_watch",
-                "workspaceYaml": fixture("workspace.yaml"),
-                "base": {
-                    "productMarkdown": fixture("products/product_field_watch/product.md"),
-                    "variantsYaml": fixture("products/product_field_watch/variants.yaml")
-                },
-                "candidate": {
-                    "productMarkdown": candidate_product(),
-                    "variantsYaml": fixture("products/product_field_watch/variants.yaml")
-                },
-                "claimedChangeset": claimed
-            }
-        }))
-        .unwrap()
-    }
-
-    #[test]
-    fn validates_candidate_and_returns_only_the_product_overlay() {
-        let candidate = candidate_product();
-        let response =
-            execute_json(&request(claimed_changeset(&candidate)), SystemTime::now()).unwrap();
-        let value = serde_json::to_value(response).unwrap();
-        assert_eq!(value["schemaVersion"], "workspace_executor_response.v1");
-        assert_eq!(value["baseManifestDigest"].as_str().unwrap().len(), 64);
-        assert_eq!(
-            value["operation"]["replacementOverlay"]["productMarkdown"]["path"],
-            "products/product_field_watch/product.md"
-        );
-        assert_eq!(
-            value["operation"]["replacementOverlay"]["variantsYaml"]["path"],
-            "products/product_field_watch/variants.yaml"
-        );
-    }
-
-    #[test]
-    fn rejects_a_forged_changeset() {
-        let error = execute_json(&request(json!({})), SystemTime::now()).unwrap_err();
-        assert_eq!(
-            error.code(),
-            WorkspaceExecutorErrorCode::InvalidChangesetCandidate
-        );
-    }
-
-    #[test]
-    fn rejects_a_product_root_that_does_not_match_the_folder() {
-        let candidate = candidate_product();
-        let mut value: Value =
-            serde_json::from_slice(&request(claimed_changeset(&candidate))).unwrap();
-        value["operation"]["productRoot"] = json!("products/product_other");
-        let error =
-            execute_json(&serde_json::to_vec(&value).unwrap(), SystemTime::now()).unwrap_err();
-        assert_eq!(
-            error.code(),
-            WorkspaceExecutorErrorCode::InvalidProductFolder
-        );
-    }
 }
 
 #[cfg(test)]
@@ -1306,19 +885,6 @@ mod envelope_tests {
         }
 
         out
-    }
-
-    #[test]
-    fn refuses_the_json_entry_point_for_attachment_inspection() {
-        let body = b"x";
-        let json = request_json("document", "text/plain", body, 10);
-
-        // Bytes cannot arrive through the JSON path, so asking there is an
-        // error rather than an empty inspection.
-        let failure = execute_json(json.as_bytes(), now())
-            .expect_err("json entry point refuses attachment inspection");
-
-        assert_eq!(failure.code(), WorkspaceExecutorErrorCode::InvalidRequest);
     }
 
     fn preparation_operation(

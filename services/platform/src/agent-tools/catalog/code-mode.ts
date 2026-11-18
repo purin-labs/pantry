@@ -122,7 +122,6 @@ import type {
   SupplierReadTool,
   WhatsAppSupportRead,
   WhatsAppSupportReplySend,
-  WorkspaceProductFolderUpdate,
   WorkspaceQuery,
 } from "./types";
 
@@ -332,7 +331,6 @@ export async function createCatalogHarnessCodeMode(input: {
   readonly readSavedBakeryRun?: (
     query: SavedBakeryRunQuery,
   ) => Promise<SavedBakeryRunResult>;
-  readonly updateWorkspaceProductFolder: WorkspaceProductFolderUpdate;
   readonly executeBakerySurface?: HarnessBakerySurfaceExecute;
   readonly executeCostsViewCommand?: import("../costs/view").HarnessCostsViewExecute;
   readonly proposeMemory?: HarnessMemoryProposal;
@@ -478,7 +476,6 @@ export async function createCatalogHarnessCodeMode(input: {
     proposeMerchantPlugin: input.proposeMerchantPlugin,
     queryWorkspace: input.queryWorkspace,
     readSavedBakeryRun: input.readSavedBakeryRun,
-    updateWorkspaceProductFolder: input.updateWorkspaceProductFolder,
     executeBakerySurface: input.executeBakerySurface,
     ...(input.executeCostsViewCommand === undefined
       ? {}
@@ -611,7 +608,6 @@ export function capabilityFromResourceScope(
     case CAPABILITY_KEYS.messageAttachmentInspect:
     case CAPABILITY_KEYS.messageLinkRead:
     case CAPABILITY_KEYS.workspaceQuery:
-    case CAPABILITY_KEYS.workspaceProductFolderUpdate:
       return match[1];
     default:
       return null;
@@ -661,7 +657,6 @@ export function capabilityFromProviderResourceScope(
     case CAPABILITY_KEYS.commerceActionPropose:
     case CAPABILITY_KEYS.fileRead:
     case CAPABILITY_KEYS.workspaceQuery:
-    case CAPABILITY_KEYS.workspaceProductFolderUpdate:
       return capabilityId;
     case CAPABILITY_KEYS.whatsappSupportRead:
     case CAPABILITY_KEYS.whatsappSupportReplySend:

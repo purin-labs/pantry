@@ -7,10 +7,6 @@ import type {
   SavedBakeryRunResult,
 } from "../commerce/bakery/saved-runs";
 import type {
-  ValidatedProductFolderChangesetV1,
-  WorkspaceRevisionReceipt,
-} from "@seams/contracts";
-import type {
   IntegrationDiscoveryView,
   CommerceContextRequest,
   CommerceGraphQueryResult,
@@ -20,11 +16,80 @@ import type { Env } from "../env";
 import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
 import type { HarnessCodeModeSandbox } from "./embedded-harness";
 import type { OrganisationId } from "../ids";
-import type { WorkspaceExecutorProductFiles } from "../workspace-executor-container";
 import type { RequestableCapability } from "../authorization/requestable-capabilities";
 import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "../agent-tools/catalog/code-mode";
 import { catalogHarnessToolCatalogDigest, harnessBaseCapabilities } from "../agent-tools/catalog/selection";
-import type { HarnessCapabilityClaim, HarnessCapabilityName, HarnessSourceAuthorization, HarnessBakerySurfaceExecute, HarnessMemoryProposal, HarnessFollowUpSchedule, HarnessSideCaseProposal, HarnessCustomConnectorRead, HarnessCustomConnectorWriteProposal, HarnessCodeModeExecutionLease, HarnessFileRead, HarnessFileSearch, HarnessEmailMailboxSearch, HarnessEmailMailboxSearchResult, HarnessEmailReplyPropose, EmailReplyDraftRead, EmailReplyDraftEdit, ProductionPlanEditTool, ProductionPlanReadTool, HarnessEmailReplyProposalReceipt, HarnessEmailOperationalPropose, HarnessEmailOperationalProposalReceipt, HarnessSlackMessagePropose, HarnessSlackMessageProposalReceipt, HarnessIntegrationListRequest, HarnessCampaignBriefRequest, HarnessConfigurationProposalRequest, OrderRefundProposal, StockActionProposal, OrderQueueReadTool, PaymentsReadTool, OrderQueueAdvanceTool, SoldOutReadTool, SoldOutMarkTool, MenuBoardReadTool, MenuBoardEditTool, MenuBoardCreateTool, MenuBoardArchiveTool, MenuPriceProposal, RecipeReadTool, RecipeSaveTool, CostsReadTool, SupplyCostSaveTool, LotCostSaveTool, CostsPlanSaveTool, CostsSheetEditTool, SupplierReadTool, SupplierCreateTool, RecipeWorkflowReadTool, RecipeWorkflowProposeTool, DeviceReadTool, DevicePauseTool, DeviceProposeTool, DeviceSnapshotReadTool, JevFeaturesReadTool, JevFeatureProposeTool, HarnessMerchantReportRequest, HarnessWhatsAppSupportInbox, HarnessWhatsAppSupportRead, HarnessWhatsAppSupportReplyReceipt, HarnessWhatsAppSupportReplySend, ProductDescriptionDraftRead, ProductDescriptionDraftEdit, CafeMenuPublicationProposal, MenuDraftEditTool, MenuDraftReadTool, EmailDraftReadTool, EmailDraftEditTool, CommerceActionProposal, MerchantPluginProposal } from "../agent-tools/catalog/types";
+import type {
+  HarnessCapabilityClaim,
+  HarnessCapabilityName,
+  HarnessSourceAuthorization,
+  HarnessBakerySurfaceExecute,
+  HarnessMemoryProposal,
+  HarnessFollowUpSchedule,
+  HarnessSideCaseProposal,
+  HarnessCustomConnectorRead,
+  HarnessCustomConnectorWriteProposal,
+  HarnessFileRead,
+  HarnessFileSearch,
+  HarnessEmailMailboxSearch,
+  HarnessEmailMailboxSearchResult,
+  HarnessEmailReplyPropose,
+  EmailReplyDraftRead,
+  EmailReplyDraftEdit,
+  ProductionPlanEditTool,
+  ProductionPlanReadTool,
+  HarnessEmailReplyProposalReceipt,
+  HarnessEmailOperationalPropose,
+  HarnessEmailOperationalProposalReceipt,
+  HarnessSlackMessagePropose,
+  HarnessSlackMessageProposalReceipt,
+  HarnessIntegrationListRequest,
+  HarnessCampaignBriefRequest,
+  HarnessConfigurationProposalRequest,
+  OrderRefundProposal,
+  StockActionProposal,
+  OrderQueueReadTool,
+  PaymentsReadTool,
+  OrderQueueAdvanceTool,
+  SoldOutReadTool,
+  SoldOutMarkTool,
+  MenuBoardReadTool,
+  MenuBoardEditTool,
+  MenuBoardCreateTool,
+  MenuBoardArchiveTool,
+  MenuPriceProposal,
+  RecipeReadTool,
+  RecipeSaveTool,
+  CostsReadTool,
+  SupplyCostSaveTool,
+  LotCostSaveTool,
+  CostsPlanSaveTool,
+  CostsSheetEditTool,
+  SupplierReadTool,
+  SupplierCreateTool,
+  RecipeWorkflowReadTool,
+  RecipeWorkflowProposeTool,
+  DeviceReadTool,
+  DevicePauseTool,
+  DeviceProposeTool,
+  DeviceSnapshotReadTool,
+  JevFeaturesReadTool,
+  JevFeatureProposeTool,
+  HarnessMerchantReportRequest,
+  HarnessWhatsAppSupportInbox,
+  HarnessWhatsAppSupportRead,
+  HarnessWhatsAppSupportReplyReceipt,
+  HarnessWhatsAppSupportReplySend,
+  ProductDescriptionDraftRead,
+  ProductDescriptionDraftEdit,
+  CafeMenuPublicationProposal,
+  MenuDraftEditTool,
+  MenuDraftReadTool,
+  EmailDraftReadTool,
+  EmailDraftEditTool,
+  CommerceActionProposal,
+  MerchantPluginProposal,
+} from "../agent-tools/catalog/types";
 import { type HarnessPermissionRequest, type HarnessPermissionRequestResult, type HarnessPermissionRequestTool, missingRequestableCapabilities } from "../agent-tools/catalog/permission";
 import type {
   FileReadToolResult,
@@ -64,12 +129,6 @@ export type HarnessWorkspaceQueryResult =
 export type HarnessExecutionLease = {
   readonly executionId: string;
   readonly leaseId: string;
-};
-
-export type HarnessWorkspaceProductFolderInput = {
-  readonly productRoot: string;
-  readonly candidate: WorkspaceExecutorProductFiles;
-  readonly claimedChangeset: ValidatedProductFolderChangesetV1;
 };
 
 export type HarnessToolHostConstructionError =
@@ -226,10 +285,6 @@ export async function createCatalogHarnessToolHost(input: {
   readonly queryWorkspace: (
     input: HarnessWorkspaceQuery,
   ) => Promise<HarnessWorkspaceQueryResult>;
-  readonly updateWorkspaceProductFolder: (
-    input: HarnessWorkspaceProductFolderInput,
-    lease: HarnessExecutionLease,
-  ) => Promise<WorkspaceRevisionReceipt>;
   readonly executeBakerySurface: HarnessBakerySurfaceExecute;
   readonly executeCostsViewCommand?: import("../agent-tools/costs/view").HarnessCostsViewExecute;
   readonly proposeMemory: HarnessMemoryProposal;
@@ -341,10 +396,6 @@ export async function createCatalogHarnessToolHost(input: {
     proposeConfiguration: input.proposeConfiguration,
     readSavedBakeryRun: input.readSavedBakeryRun,
     queryWorkspace: input.queryWorkspace,
-    updateWorkspaceProductFolder: adaptWorkspaceUpdate.bind(
-      null,
-      input.updateWorkspaceProductFolder,
-    ),
     executeBakerySurface: input.executeBakerySurface,
     ...(input.executeCostsViewCommand === undefined
       ? {}
@@ -404,16 +455,6 @@ function codeModeSandboxRemote(
   };
 }
 
-function adaptWorkspaceUpdate(
-  update: (
-    input: HarnessWorkspaceProductFolderInput,
-    lease: HarnessExecutionLease,
-  ) => Promise<WorkspaceRevisionReceipt>,
-  input: HarnessWorkspaceProductFolderInput,
-  lease: HarnessCodeModeExecutionLease,
-): Promise<WorkspaceRevisionReceipt> {
-  return update(input, lease);
-}
 import type {
   AirtableReadInput,
   AirtableWriteInput,

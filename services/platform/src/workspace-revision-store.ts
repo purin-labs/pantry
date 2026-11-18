@@ -5,7 +5,6 @@ import type {
   IdempotencyKey,
   Sha256Digest,
   Timestamp,
-  ValidatedProductFolderChangesetV1,
   WorkspaceId,
   WorkspaceRevision,
   WorkspaceRevisionReceipt,
@@ -57,14 +56,10 @@ type WorkspaceRevisionProposalBase = {
   readonly committedAt: Timestamp;
 };
 
-export type WorkspaceRevisionProposal =
-  | (WorkspaceRevisionProposalBase & {
-      readonly kind: "genesis";
-    })
-  | (WorkspaceRevisionProposalBase & {
-      readonly kind: "product_folder_changeset";
-      readonly changeset: ValidatedProductFolderChangesetV1;
-    });
+/** Plan 92 removed the product-folder changeset; a revision is a genesis. */
+export type WorkspaceRevisionProposal = WorkspaceRevisionProposalBase & {
+  readonly kind: "genesis";
+};
 
 export type WorkspaceRevisionAuthority =
   | {
@@ -709,15 +704,7 @@ async function normalizeProposal(proposal: WorkspaceRevisionProposal): Promise<
   if (!validProposalBase(proposal)) {
     return { ok: false, error: { code: "workspace_revision_input_invalid" } };
   }
-  const baseRevision =
-    proposal.kind === "genesis" ? null : proposal.changeset.baseRevision;
-  if (
-    proposal.kind === "product_folder_changeset" &&
-    !validProductFolderChangeset(proposal)
-  ) {
-    return { ok: false, error: { code: "workspace_revision_input_invalid" } };
-  }
-  const manifest = await buildManifest(proposal, baseRevision);
+  const manifest = await buildManifest(proposal, null);
   if (manifest === null) {
     return { ok: false, error: { code: "workspace_revision_input_invalid" } };
   }
@@ -726,24 +713,11 @@ async function normalizeProposal(proposal: WorkspaceRevisionProposal): Promise<
     return { ok: false, error: { code: "workspace_revision_input_invalid" } };
   }
   const manifestDigest = await sha256Hex(manifestBytes);
-  const canonicalHead =
-    proposal.kind === "genesis"
-      ? manifestDigest
-      : proposal.changeset.resultingSemanticHash;
+  const canonicalHead = manifestDigest;
   const changesetBytes = ENCODER.encode(
-    JSON.stringify(
-      proposal.kind === "genesis"
-        ? { kind: "genesis", canonicalHead }
-        : productFolderChangesetDigestMaterial(proposal.changeset),
-    ),
+    JSON.stringify({ kind: "genesis", canonicalHead }),
   );
   const changesetDigest = await sha256Hex(changesetBytes);
-  if (
-    proposal.kind === "product_folder_changeset" &&
-    changesetDigest !== proposal.changeset.changesetDigest
-  ) {
-    return { ok: false, error: { code: "workspace_revision_input_invalid" } };
-  }
   const manifestRef = workspaceObjectRef(
     proposal.organisationId,
     proposal.workspaceId,
@@ -762,7 +736,7 @@ async function normalizeProposal(proposal: WorkspaceRevisionProposal): Promise<
       input: {
         organisationId: proposal.organisationId,
         workspaceId: proposal.workspaceId,
-        baseRevision,
+        baseRevision: null,
         idempotencyKey: proposal.idempotencyKey,
         canonicalHead,
         manifestRef,
@@ -1050,55 +1024,6 @@ function validProposalBase(proposal: WorkspaceRevisionProposal): boolean {
     Number.isSafeInteger(proposal.committedAt) &&
     proposal.committedAt >= 0
   );
-}
-
-function validProductFolderChangeset(
-  proposal: Variant<WorkspaceRevisionProposal, "product_folder_changeset">,
-): boolean {
-  const changeset = proposal.changeset;
-  return (
-    changeset.schemaVersion === "satyr.product-folder-changeset.v1" &&
-    changeset.organisationId === proposal.organisationId &&
-    changeset.workspaceId === proposal.workspaceId &&
-    changeset.baseRevision.length > 0 &&
-    SHA256_PATTERN.test(changeset.resultingSemanticHash) &&
-    SHA256_PATTERN.test(changeset.changesetDigest) &&
-    changeset.diff.productId.length > 0 &&
-    changeset.diff.fields.every(validProductField) &&
-    changeset.diff.variantIds.every(validResourceId)
-  );
-}
-
-function productFolderChangesetDigestMaterial(
-  changeset: ValidatedProductFolderChangesetV1,
-): Record<string, unknown> {
-  return {
-    schemaVersion: changeset.schemaVersion,
-    organisationId: changeset.organisationId,
-    workspaceId: changeset.workspaceId,
-    baseRevision: changeset.baseRevision,
-    resultingSemanticHash: changeset.resultingSemanticHash,
-    diff: {
-      productId: changeset.diff.productId,
-      fields: changeset.diff.fields,
-      variantIds: changeset.diff.variantIds,
-    },
-  };
-}
-
-function validProductField(value: string): boolean {
-  switch (value) {
-    case "slug":
-    case "title":
-    case "description":
-    case "currency":
-      return true;
-  }
-  return false;
-}
-
-function validResourceId(value: string): boolean {
-  return value.length > 0;
 }
 
 function validWorkspaceFileCandidate(

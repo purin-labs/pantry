@@ -359,10 +359,6 @@ export class CandidateActor extends RecoveryActor {
         readEmailDraft: unavailableTool,
         editEmailDraft: unavailableTool,
         queryWorkspace: unavailableTool,
-        updateWorkspaceProductFolder: this.updateWorkspaceProductFolder.bind(
-          this,
-          lease,
-        ),
         proposeCommerceAction: this.propose.bind(this, lease),
         readCustomConnector: this.readCustomConnector.bind(this, lease),
         claimCapability: this.claimToolCapability.bind(this, lease),
@@ -389,10 +385,6 @@ export class CandidateActor extends RecoveryActor {
   }
 
   async editProductDescriptionDraft() {
-    return unavailableTool();
-  }
-
-  async updateWorkspaceProductFolder() {
     return unavailableTool();
   }
 
