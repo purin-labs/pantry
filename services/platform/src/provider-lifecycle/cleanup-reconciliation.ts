@@ -33,7 +33,7 @@ import type {
   ProviderManualActionInstruction,
 } from "../provider-adapters/domain";
 import type { Variant } from "@seams/type-utils";
-import { isString } from "@seams/std";
+import { backoffDelay, isString } from "@seams/std";
 
 type ProviderCleanupEnvironment = ProviderCleanupBindings &
   CredentialVaultBindings &
@@ -496,8 +496,9 @@ function providerCleanupSettlementStatement(
 }
 
 function providerCleanupRetryDelay(attempt: number): number {
-  return Math.min(
-    PROVIDER_CLEANUP_RETRY_BASE_MS * 2 ** Math.max(0, attempt - 1),
+  return backoffDelay(
+    attempt - 1,
+    PROVIDER_CLEANUP_RETRY_BASE_MS,
     PROVIDER_CLEANUP_RETRY_MAX_MS,
   );
 }

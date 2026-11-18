@@ -1,7 +1,7 @@
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import type { Result } from "../result";
-import { isRecord } from "@seams/std";
+import { backoffDelay, isRecord } from "@seams/std";
 import type { SchemaTransaction } from "./schema-migrations";
 import {
   advanceWhatsAppProposal,
@@ -1521,8 +1521,9 @@ export function deferWhatsAppNotice(
         )
         .toArray()[0]?.attempts ?? 0,
     ) + 1;
-  const delay = Math.min(
-    WHATSAPP_NOTICE_RETRY_BASE_MS * 2 ** (attempts - 1),
+  const delay = backoffDelay(
+    attempts - 1,
+    WHATSAPP_NOTICE_RETRY_BASE_MS,
     WHATSAPP_NOTICE_RETRY_CEILING_MS,
   );
   sql.exec(

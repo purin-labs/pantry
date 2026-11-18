@@ -24,7 +24,12 @@ import { projectReplyStreamText } from "./reply-stream-projector";
 
 import type { PortalChatStreamRecord } from "@seams/contracts";
 import type { Variant } from "@seams/type-utils";
-import { assertNever, errorMessage, parseJsonOrNull } from "@seams/std";
+import {
+  assertNever,
+  backoffDelay,
+  errorMessage,
+  parseJsonOrNull,
+} from "@seams/std";
 import { parseRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import { authorizeSessionTurnOrigin } from "./turn-access";
@@ -632,8 +637,9 @@ async function waitForConversationAdvance(
     )
       return true;
     await scheduler.wait(
-      Math.min(
-        250 * 2 ** Math.min(attempt, 3),
+      backoffDelay(
+        Math.min(attempt, 3),
+        250,
         Math.max(0, deadline - Date.now()),
       ),
     );
@@ -659,8 +665,9 @@ async function waitForConversationStateChange(
     )
       return true;
     await scheduler.wait(
-      Math.min(
-        250 * 2 ** Math.min(attempt, 3),
+      backoffDelay(
+        Math.min(attempt, 3),
+        250,
         Math.max(0, deadline - Date.now()),
       ),
     );

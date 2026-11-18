@@ -1,4 +1,4 @@
-import { canonicalJson, sha256Hex } from "@seams/std";
+import { backoffDelay, canonicalJson, sha256Hex } from "@seams/std";
 import { createAccountPlatformClient } from "../account-platform/client";
 import { resolvePantryAccountBinding } from "../account-platform/binding";
 import type { AccountPlatformBindings } from "../account-platform/config";
@@ -329,7 +329,7 @@ function retry(
   sql.exec(
     `UPDATE jev_usage_hour SET attempts = attempts + 1, due_at = ?
     WHERE organisation_id = ? AND feature = ? AND hour_start = ? AND state = 'pending'`,
-    now + Math.min(60_000 * 2 ** hour.attempts, MAX_RETRY_MS),
+    now + backoffDelay(hour.attempts, 60_000, MAX_RETRY_MS),
     organisationId,
     hour.feature,
     hour.hour_start,
