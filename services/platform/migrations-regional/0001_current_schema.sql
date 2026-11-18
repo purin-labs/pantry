@@ -9,17 +9,7 @@ CREATE TABLE organisation (
   name TEXT NOT NULL,
   plan TEXT NOT NULL DEFAULT 'beta',
   created_at INTEGER NOT NULL
-, authoritative_runtime TEXT NOT NULL DEFAULT 'inherited'
-  CHECK (authoritative_runtime IN ('inherited', 'cloudflare')), runtime_cutover_state TEXT NOT NULL DEFAULT 'inherited_authoritative'
-  CHECK (
-    runtime_cutover_state IN (
-      'inherited_authoritative',
-      'cloudflare_prepared',
-      'cloudflare_rollback_open',
-      'cloudflare_forward_only',
-      'inherited_rolled_back'
-    )
-  ), cloudflare_prepared_at INTEGER, cloudflare_activated_at INTEGER, runtime_rollback_expires_at INTEGER, first_cloudflare_write_at INTEGER, runtime_rolled_back_at INTEGER, organisation_handle TEXT, status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted', 'purged')));
+, organisation_handle TEXT, status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted', 'purged')));
 CREATE TABLE workspace_ai_budget (
   organisation_id TEXT PRIMARY KEY REFERENCES organisation(organisation_id),
   max_tokens INTEGER NOT NULL DEFAULT 64000 CHECK (max_tokens BETWEEN 1 AND 1000000),
@@ -1531,8 +1521,6 @@ CREATE TABLE external_vault_import (
 );
 CREATE INDEX idx_external_vault_import_organisation_state
   ON external_vault_import (organisation_id, state);
-CREATE INDEX idx_organisation_authoritative_runtime
-  ON organisation (authoritative_runtime, runtime_cutover_state);
 CREATE TABLE workspace_revision_head (
   organisation_id TEXT NOT NULL REFERENCES organisation(organisation_id) ON DELETE CASCADE,
   workspace_id TEXT NOT NULL CHECK (length(workspace_id) > 10),

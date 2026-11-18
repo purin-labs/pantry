@@ -21,10 +21,6 @@ import {
   resolvePinnedAgentProfile,
   type PinnedAgentProfile,
 } from "../data/pinned-agent-profile";
-import {
-  authorizeCloudflareAuthoritativeMutation,
-  type CloudflareAuthoritativeMutationError,
-} from "../data/authoritative-runtime-cutover";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import {
   createActiveConnectedIntegration,
@@ -529,17 +525,6 @@ export async function handleCommerceDeliveryQueueMessage(
     };
   }
 
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: scope.database,
-    organisationId: body.organisationId,
-    occurredAt: body.receivedAt,
-  });
-
-  if (!authority.ok) {
-    settleUnauthorizedCommerceQueueMessage(message, body, authority.error);
-    return;
-  }
-
   const organisation = await requireActiveOrganisationActorAtPlacement({
     env,
     organisationId: body.organisationId,
@@ -593,41 +578,6 @@ export async function handleCommerceDeliveryQueueMessage(
     observation_count: applied.value.observations.length,
   });
   message.ack();
-}
-
-export function settleUnauthorizedCommerceQueueMessage(
-  message: Message<unknown>,
-  body: CommerceDeliveryQueueMessage,
-  error: CloudflareAuthoritativeMutationError,
-): void {
-  switch (error.code) {
-    case "runtime_not_authoritative":
-      traceWarn("event_queue.commerce_runtime_not_authoritative", {
-        requestId: body.requestId,
-        message_id: message.id,
-        organisation_id: body.organisationId,
-        runtime_state: error.state,
-      });
-      message.ack();
-      return;
-    case "mutation_precedes_activation":
-      traceWarn("event_queue.commerce_mutation_precedes_activation", {
-        requestId: body.requestId,
-        message_id: message.id,
-        organisation_id: body.organisationId,
-        received_at: body.receivedAt,
-        activated_at: error.activatedAt,
-      });
-      message.ack();
-      return;
-    case "organisation_not_found":
-    case "runtime_cutover_state_invalid":
-    case "runtime_cutover_transition_invalid":
-      retryCommerceQueueMessage(message, body, error.code);
-      return;
-    default:
-      return assertNever(error);
-  }
 }
 
 export type CommerceLabQueueRunResolution =
@@ -988,52 +938,6 @@ export async function readOrganisationEnvironment(
     throw new Error("organisation onboarding environment is invalid");
   }
   return row.environment;
-}
-
-export async function admitsWebhookMutation(
-  env: Env,
-  organisationId: OrganisationId,
-  occurredAt: number,
-  requestId: RequestId,
-): Promise<boolean> {
-  const execution = await OrganisationExecutionScope.resolve(
-    env,
-    organisationId,
-  );
-  if (!execution.ok) throw new Error(execution.error.code);
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: execution.value.database,
-    organisationId,
-    occurredAt,
-  });
-
-  if (authority.ok) {
-    return true;
-  }
-
-  switch (authority.error.code) {
-    case "runtime_not_authoritative":
-      traceWarn("integration_gateway.webhook_runtime_not_authoritative", {
-        requestId,
-        organisation_id: organisationId,
-        runtime_state: authority.error.state,
-      });
-      return false;
-    case "mutation_precedes_activation":
-      traceWarn("integration_gateway.webhook_mutation_precedes_activation", {
-        requestId,
-        organisation_id: organisationId,
-        occurred_at: occurredAt,
-        activated_at: authority.error.activatedAt,
-      });
-      return false;
-    case "organisation_not_found":
-    case "runtime_cutover_state_invalid":
-    case "runtime_cutover_transition_invalid":
-      throw new Error(authority.error.code);
-    default:
-      return assertNever(authority.error);
-  }
 }
 
 export async function handleEmailChangeQueueMessage(

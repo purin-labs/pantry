@@ -35,7 +35,6 @@ import {
 } from "../credential-vault";
 import { assertNever } from "@seams/std";
 import {
-  admitsWebhookMutation,
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,
   isLocalDebugRequest,
@@ -193,7 +192,6 @@ export async function handleDiscordInteraction(
   }
 
   const organisationId = parseOrganisationPath(organisationIdRaw);
-  const requestId = newRequestId();
 
   if (!organisationId.ok) {
     return notFound();
@@ -271,14 +269,6 @@ export async function handleDiscordInteraction(
     return discordPongResponse();
   }
 
-  const now = Date.now();
-  if (
-    !(await admitsWebhookMutation(env, organisationId.value, now, requestId))
-  ) {
-    return discordEphemeralResponse(
-      "Seams Pantry is unavailable while this workspace changes runtime ownership.",
-    );
-  }
   return discordEphemeralResponse(
     "Identity linking is available from an organisation-owned Slack workspace.",
   );

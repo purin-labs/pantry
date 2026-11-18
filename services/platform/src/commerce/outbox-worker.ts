@@ -14,7 +14,6 @@ import {
 
 import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
 import type { PendingCommerceCue } from "../actors/commerce-projection";
-import { authorizeCloudflareAuthoritativeMutation } from "../data/authoritative-runtime-cutover";
 import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import {
   ensureCommerceWebhookSubscription,
@@ -263,14 +262,6 @@ export async function reconcileCommerceOutbox(
     };
   }
   const now = input.now ?? Date.now();
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: scope.database,
-    organisationId: input.message.organisationId,
-    occurredAt: input.message.receivedAt,
-  });
-  if (!authority.ok) {
-    return { kind: "retry", deliveryId: null, code: authority.error.code };
-  }
   const organisation = await requireActiveOrganisationActorAtPlacement({
     env: input.env,
     organisationId: input.message.organisationId,

@@ -384,36 +384,6 @@ export function slackInstallAdmissionErrorResponse(
         "Slack installation organisation state is unavailable.",
         503,
       );
-    case "runtime_not_authoritative":
-      return errorResponse(
-        error.code,
-        "Complete this organisation's Cloudflare runtime cutover before reinstalling Slack.",
-        409,
-      );
-    case "mutation_precedes_activation":
-      return errorResponse(
-        error.code,
-        "Complete this organisation's Cloudflare runtime activation before reinstalling Slack.",
-        409,
-      );
-    case "organisation_not_found":
-      return errorResponse(
-        error.code,
-        "Slack installation organisation is missing.",
-        404,
-      );
-    case "runtime_cutover_state_invalid":
-      return errorResponse(
-        error.code,
-        "Slack installation state is unavailable.",
-        500,
-      );
-    case "runtime_cutover_transition_invalid":
-      return errorResponse(
-        error.code,
-        "Slack installation state conflicted.",
-        409,
-      );
     default:
       return assertNever(error);
   }

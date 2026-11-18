@@ -7,17 +7,7 @@ CREATE TABLE organisation (
   name TEXT NOT NULL,
   plan TEXT NOT NULL DEFAULT 'beta',
   created_at INTEGER NOT NULL
-, authoritative_runtime TEXT NOT NULL DEFAULT 'inherited'
-  CHECK (authoritative_runtime IN ('inherited', 'cloudflare')), runtime_cutover_state TEXT NOT NULL DEFAULT 'inherited_authoritative'
-  CHECK (
-    runtime_cutover_state IN (
-      'inherited_authoritative',
-      'cloudflare_prepared',
-      'cloudflare_rollback_open',
-      'cloudflare_forward_only',
-      'inherited_rolled_back'
-    )
-  ), cloudflare_prepared_at INTEGER, cloudflare_activated_at INTEGER, runtime_rollback_expires_at INTEGER, first_cloudflare_write_at INTEGER, runtime_rolled_back_at INTEGER, organisation_handle TEXT, status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted', 'purged')));
+, organisation_handle TEXT, status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted', 'purged')));
 CREATE TABLE organisation_placement (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   placement_epoch INTEGER NOT NULL CHECK (placement_epoch > 0),
@@ -502,8 +492,6 @@ CREATE TABLE vault_root_rotation_job (
 CREATE UNIQUE INDEX idx_vault_root_rotation_single_active
   ON vault_root_rotation_job ((1))
   WHERE lifecycle IN ('pending', 'running', 'paused');
-CREATE INDEX idx_organisation_authoritative_runtime
-  ON organisation (authoritative_runtime, runtime_cutover_state);
 CREATE TABLE IF NOT EXISTS "state_object_relocation_item" (
   relocation_id TEXT NOT NULL REFERENCES state_object_relocation (relocation_id),
   object_kind TEXT NOT NULL CHECK (

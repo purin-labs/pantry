@@ -40,7 +40,6 @@ import {
 import type { VariantBy } from "@seams/type-utils";
 import { assertNever } from "@seams/std";
 import {
-  admitsWebhookMutation,
   commerceObservationIdentity,
   decodePathSegmentValue,
 } from "../gateway/support";
@@ -193,16 +192,6 @@ export async function handleShopifyWebhook(
   }
 
   const requestId = newRequestId();
-  if (
-    !(await admitsWebhookMutation(
-      env,
-      organisationId.value,
-      receivedAt,
-      requestId,
-    ))
-  ) {
-    return jsonResponse({ ok: true, ignored: true });
-  }
 
   if (commerceRefresh.ok && headers.webhookId !== null) {
     await env.EVENT_Q.send(
@@ -366,17 +355,6 @@ async function revokeUninstalledShopifyAccount(
     shop.toLowerCase() !== input.shopDomain.toLowerCase()
   ) {
     return shopifyWebhookErrorResponse({ code: "shopify_event_invalid" });
-  }
-  const requestId = newRequestId();
-  if (
-    !(await admitsWebhookMutation(
-      input.env,
-      input.scope.organisationId,
-      input.receivedAt,
-      requestId,
-    ))
-  ) {
-    return jsonResponse({ ok: true, ignored: true });
   }
   const outcome = await revokeAccountRemovedAtProvider({
     env: input.env,

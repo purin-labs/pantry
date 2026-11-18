@@ -15,7 +15,6 @@ import {
   listOnboardingReconciliationOrganisationIds,
   reconcileOrganisationOnboarding,
 } from "./data/onboarding-reconciliation";
-import { authorizeCloudflareAuthoritativeMutation } from "./data/authoritative-runtime-cutover";
 import { reconcileProviderAccountCleanup } from "./provider-lifecycle/cleanup-reconciliation";
 import { archiveOrganisation } from "./data/organisation-lifecycle";
 import { publishOrganisationDirectoryRow } from "./data/shared-rows/organisation-row";
@@ -35,7 +34,6 @@ import {
   holdOrganisationPolicyDistribution,
   reconcileOrganisationPolicyPublication,
 } from "./policy-snapshot";
-import { assertNever } from "@seams/std";
 type StalledActivationRow = {
   readonly configurationVersion: unknown;
   readonly readinessVersion: unknown;
@@ -50,14 +48,6 @@ type ArchiveCandidateRow = {
   readonly configurationVersion: unknown;
   readonly userId: unknown;
 };
-
-type ScheduledOrganisationMutationAdmission =
-  | { readonly kind: "authorized" }
-  | {
-      readonly kind: "skipped";
-      readonly reason:
-        "runtime_not_authoritative" | "mutation_precedes_activation";
-    };
 
 const AUTOMATIC_ARCHIVE_IDLE_MS = 30 * 24 * 60 * 60 * 1_000;
 
@@ -83,18 +73,6 @@ export async function runScheduledOnboardingReconciliation(
       );
       if (!execution.ok || execution.value.database !== database) continue;
       const scope = execution.value;
-      const admission = await authorizeScheduledOrganisationMutation(
-        scope,
-        now,
-      );
-      switch (admission.kind) {
-        case "authorized":
-          break;
-        case "skipped":
-          continue;
-        default:
-          assertNever(admission);
-      }
       // A rename, an archive, a restore and a deletion write the regional row
       // only. The directory's copy follows within one run.
       await publishOrganisationDirectoryRow({
@@ -254,18 +232,6 @@ async function archiveIdleConfiguringOrganisations(
       const identity = await resolveUser({ db: env.DB, userId: userId.value });
       if (identity === null) continue;
       seen.add(row.organisationId);
-      const admission = await authorizeScheduledOrganisationMutation(
-        execution.value,
-        now,
-      );
-      switch (admission.kind) {
-        case "authorized":
-          break;
-        case "skipped":
-          continue;
-        default:
-          assertNever(admission);
-      }
       const idempotencyKey = `auto-archive:${organisationId.value}:${row.configurationVersion}`;
       const archived = await archiveOrganisation({
         identityDatabase: env.DB,
@@ -306,38 +272,6 @@ async function archiveIdleConfiguringOrganisations(
         });
       }
     }
-  }
-}
-
-async function authorizeScheduledOrganisationMutation(
-  scope: OrganisationExecutionScope,
-  now: number,
-): Promise<ScheduledOrganisationMutationAdmission> {
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: scope.database,
-    organisationId: scope.organisationId,
-    occurredAt: now,
-  });
-
-  if (authority.ok) {
-    return { kind: "authorized" };
-  }
-
-  switch (authority.error.code) {
-    case "runtime_not_authoritative":
-    case "mutation_precedes_activation":
-      return {
-        kind: "skipped",
-        reason: authority.error.code,
-      };
-    case "organisation_not_found":
-    case "runtime_cutover_state_invalid":
-    case "runtime_cutover_transition_invalid":
-      throw new Error(
-        `scheduled organisation authority failed: ${authority.error.code}`,
-      );
-    default:
-      return assertNever(authority.error);
   }
 }
 

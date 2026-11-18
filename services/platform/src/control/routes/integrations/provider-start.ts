@@ -1,10 +1,6 @@
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import { parseGmailAuthorizationProduct } from "../../../mail/gmail-authorization";
-import {
-  authorizeCloudflareAuthoritativeMutation,
-  type CloudflareAuthoritativeMutationError,
-} from "../../../data/authoritative-runtime-cutover";
 import { resolveUser } from "../../../data/control-plane";
 import {
   hashPortalSubject,
@@ -47,7 +43,7 @@ import {
 } from "../../http";
 import { controlCausationId } from "../../mutation";
 import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+import { isRecord } from "@seams/std";
 import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
 import { account } from "../integrations";
 import { providerContextForExistingAccount } from "../../../provider-lifecycle/existing-account-context";
@@ -73,14 +69,6 @@ export async function handleExistingAccountProviderStart(
     return authorized.response;
   }
   const now = Date.now();
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    occurredAt: now,
-  });
-  if (!authority.ok) {
-    return providerStartAuthorityFailure(authority.error);
-  }
   const integrationAccountId = parseIntegrationAccountId(
     integrationAccountIdRaw,
   );
@@ -289,14 +277,6 @@ export async function handleProviderStart(
     return authorized.response;
   }
   const now = Date.now();
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-    occurredAt: now,
-  });
-  if (!authority.ok) {
-    return providerStartAuthorityFailure(authority.error);
-  }
   const body = await readJsonRecord(request);
   if (!body.ok) {
     return controlError("provider_context_invalid", 400);
@@ -397,23 +377,6 @@ export async function handleProviderStart(
           started.error.code,
           providerErrorStatus(started.error.code),
         );
-}
-
-export function providerStartAuthorityFailure(
-  error: CloudflareAuthoritativeMutationError,
-): Response {
-  switch (error.code) {
-    case "runtime_not_authoritative":
-    case "mutation_precedes_activation":
-      return controlError(error.code, 409);
-    case "organisation_not_found":
-      return controlError(error.code, 404);
-    case "runtime_cutover_state_invalid":
-    case "runtime_cutover_transition_invalid":
-      return controlError(error.code, 503);
-    default:
-      return assertNever(error);
-  }
 }
 
 export async function handleProviderAttempt(

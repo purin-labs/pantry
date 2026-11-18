@@ -51,10 +51,6 @@ function identityLinkSuite(): void {
     "does not consume the challenge for a non-member",
     rejectsNonMemberWithoutConsumption,
   );
-  it(
-    "rejects invitation issuance before Cloudflare becomes authoritative",
-    rejectsInheritedIssue,
-  );
 }
 
 async function linksAlternateGoogleIssuer(): Promise<void> {
@@ -206,15 +202,6 @@ async function rejectsNonMemberWithoutConsumption(): Promise<void> {
   expect(completed.status).toBe(200);
 }
 
-async function rejectsInheritedIssue(): Promise<void> {
-  const fixture = await createFixture({ authoritative: false });
-  const response = await issueLinkResponse(fixture, "U0IDENTITYINHERITED");
-  expect(response.status).toBe(409);
-  await expect(response.json()).resolves.toMatchObject({
-    error: { code: "runtime_not_authoritative" },
-  });
-}
-
 type IdentityFixture = {
   readonly db: SingleDatabase;
   readonly env: UnitTestEnv;
@@ -226,7 +213,6 @@ type IdentityFixture = {
 
 async function createFixture(
   options: {
-    readonly authoritative?: boolean;
     readonly issuer?: string;
   } = {},
 ): Promise<IdentityFixture> {
@@ -297,11 +283,6 @@ async function createFixture(
     scopes: ["channels:read", "chat:write"],
     installedAt: now,
   });
-  if (options.authoritative !== false) {
-    await makeCloudflareAuthoritative(db, organisation.organisationId, now);
-  } else {
-    await makeInheritedAuthoritative(db, organisation.organisationId);
-  }
   const ownerSession = await issueControlSession({
     db,
     userId: owner.userId,
@@ -321,39 +302,6 @@ async function createFixture(
     ownerUserId: owner.userId,
     ownerSession,
   };
-}
-
-async function makeCloudflareAuthoritative(
-  db: SingleDatabase,
-  organisationId: OrganisationId,
-  now: number,
-): Promise<void> {
-  await db
-    .prepare(
-      `UPDATE organisation SET authoritative_runtime = 'cloudflare',
-       runtime_cutover_state = 'cloudflare_forward_only',
-       cloudflare_prepared_at = ?, cloudflare_activated_at = ?,
-       runtime_rollback_expires_at = ?, first_cloudflare_write_at = ?,
-       runtime_rolled_back_at = NULL WHERE organisation_id = ?`,
-    )
-    .bind(now - 2, now - 1, now + 60_000, now - 1, organisationId)
-    .run();
-}
-
-async function makeInheritedAuthoritative(
-  db: SingleDatabase,
-  organisationId: OrganisationId,
-): Promise<void> {
-  await db
-    .prepare(
-      `UPDATE organisation SET authoritative_runtime = 'inherited',
-       runtime_cutover_state = 'inherited_authoritative',
-       cloudflare_prepared_at = NULL, cloudflare_activated_at = NULL,
-       runtime_rollback_expires_at = NULL, first_cloudflare_write_at = NULL,
-       runtime_rolled_back_at = NULL WHERE organisation_id = ?`,
-    )
-    .bind(organisationId)
-    .run();
 }
 
 async function issueLink(

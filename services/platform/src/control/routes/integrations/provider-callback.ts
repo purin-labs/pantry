@@ -1,10 +1,6 @@
 import { runtimeFetch } from "../../../runtime-fetch";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
-import {
-  authorizeCloudflareAuthoritativeMutation,
-  type CloudflareAuthoritativeMutationError,
-} from "../../../data/authoritative-runtime-cutover";
 import { hashOpaqueSecret } from "../../../data/control-plane";
 import type { ProviderAttemptStateWire } from "../../../data/provider-attempt";
 import { parseOrganisationId } from "../../../ids";
@@ -43,18 +39,6 @@ export async function handleProviderCallback(
       503,
       requirePublicOrigin(env),
       "/portal",
-    );
-  }
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: context.value.scope.database,
-    organisationId: context.value.scope.organisationId,
-    occurredAt: now,
-  });
-  if (!authority.ok) {
-    return providerCallbackAuthorityFailure(
-      authority.error,
-      requirePublicOrigin(env),
-      context.value.returnPath,
     );
   }
   const completed = await completeProviderOAuth({
@@ -124,34 +108,6 @@ export type ProviderCallbackContextResult =
         | ProviderOnboardingError
         | { readonly code: "provider_callback_state_corrupt" };
     };
-
-export function providerCallbackAuthorityFailure(
-  error: CloudflareAuthoritativeMutationError,
-  portalOrigin: string,
-  returnPath: string,
-): Response {
-  switch (error.code) {
-    case "runtime_not_authoritative":
-    case "mutation_precedes_activation":
-      return providerCallbackFailurePage(
-        error.code,
-        409,
-        portalOrigin,
-        returnPath,
-      );
-    case "organisation_not_found":
-    case "runtime_cutover_state_invalid":
-    case "runtime_cutover_transition_invalid":
-      return providerCallbackFailurePage(
-        error.code,
-        503,
-        portalOrigin,
-        returnPath,
-      );
-    default:
-      return assertNever(error);
-  }
-}
 
 export async function readProviderCallbackContext(
   env: Env,

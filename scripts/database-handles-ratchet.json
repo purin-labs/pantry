@@ -10,7 +10,6 @@
   "services/platform/src/control/routes/bakery-runs.ts": 2,
   "services/platform/src/data/access-control-options.ts": 1,
   "services/platform/src/data/agent-operations/failure.ts": 2,
-  "services/platform/src/data/authoritative-runtime-cutover.ts": 6,
   "services/platform/src/data/bakery-agent-run-save.ts": 1,
   "services/platform/src/data/control-plane.ts": 2,
   "services/platform/src/data/held-output-context.ts": 1,

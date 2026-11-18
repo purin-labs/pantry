@@ -28,7 +28,6 @@ import type { Result } from "../result";
 import { assertNever, isRecord } from "@seams/std";
 import { revokeAccountRemovedAtProvider } from "../provider-lifecycle/provider-revocation";
 import {
-  admitsWebhookMutation,
   decodePathSegmentValue,
 } from "../gateway/support";
 
@@ -106,16 +105,6 @@ export async function handleStripeConnectWebhook(
       return stripeWebhookErrorResponse(event.error);
     }
     const requestId = newRequestId();
-    if (
-      !(await admitsWebhookMutation(
-        env,
-        target.organisationId,
-        receivedAt,
-        requestId,
-      ))
-    ) {
-      continue;
-    }
     await env.CUE_Q.send(
       createCueQueueMessage({
         requestId,
@@ -150,17 +139,6 @@ async function revokeDeauthorizedStripeAccounts(
 ): Promise<Response> {
   let revoked = 0;
   for (const target of targets) {
-    const requestId = newRequestId();
-    if (
-      !(await admitsWebhookMutation(
-        env,
-        target.organisationId,
-        receivedAt,
-        requestId,
-      ))
-    ) {
-      continue;
-    }
     const scope = await OrganisationExecutionScope.resolve(
       env,
       target.organisationId,
@@ -270,16 +248,6 @@ export async function handleStripeWebhook(
   }
 
   const requestId = newRequestId();
-  if (
-    !(await admitsWebhookMutation(
-      env,
-      organisationId.value,
-      receivedAt,
-      requestId,
-    ))
-  ) {
-    return jsonResponse({ ok: true, ignored: true });
-  }
 
   await env.CUE_Q.send(
     createCueQueueMessage({

@@ -22,11 +22,6 @@ import {
   type InitialOrganisationPlacement,
 } from "../placement";
 import {
-  authorizeCloudflareAuthoritativeMutation,
-  readAuthoritativeRuntime,
-  type CloudflareAuthoritativeMutationError,
-} from "../data/authoritative-runtime-cutover";
-import {
   parseOrganisationId,
   type OrganisationId,
   type WorkspaceId,
@@ -42,7 +37,6 @@ type SlackInstallOrganisationResolution =
     };
 
 export type SlackInstallOrganisationAdmissionError =
-  | CloudflareAuthoritativeMutationError
   | {
       readonly code: "slack_install_existing_workspace_requires_organisation_flow";
     }
@@ -167,14 +161,6 @@ export async function admitSlackInstallOrganisation(input: {
       error: { code: "slack_install_bootstrap_state_invalid" },
     };
   }
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: selected.value,
-    organisationId: resolved.organisationId,
-    occurredAt: input.occurredAt,
-  });
-  if (!authority.ok) {
-    return authority;
-  }
   return {
     ok: true,
     value: {
@@ -231,15 +217,7 @@ async function prepareCloudflareNativeSlackInstallOrganisation(input: {
     .prepare("SELECT status FROM organisation WHERE organisation_id = ?")
     .bind(input.organisationId)
     .first<{ readonly status: unknown }>();
-  const runtime = await readAuthoritativeRuntime({
-    db: input.db,
-    organisationId: input.organisationId,
-  });
-  if (
-    organisation?.status !== "active" ||
-    !runtime.ok ||
-    runtime.value.state !== "cloudflare_forward_only"
-  ) {
+  if (organisation?.status !== "active") {
     return {
       ok: false,
       error: { code: "slack_install_bootstrap_state_invalid" },

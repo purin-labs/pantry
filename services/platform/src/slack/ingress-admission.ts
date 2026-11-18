@@ -94,7 +94,6 @@ export type AuthorizedSlackCaseIngress = {
   readonly connectorId: ConnectorId;
   readonly sessionId: SessionId;
   readonly assignmentId: AssignmentId;
-  readonly authority: "forward_only" | "rollback_open";
 };
 
 export type SlackCommandRole = "owner" | "admin" | "operator";
@@ -116,8 +115,6 @@ export type SlackCaseIngressAdmission =
       readonly reason:
         | "organisation_inactive"
         | "install_inactive"
-        | "runtime_not_authoritative"
-        | "mutation_precedes_activation"
         | "destination_missing"
         | "case_missing"
         | "identity_link_missing"
@@ -132,9 +129,6 @@ type SlackCaseIngressRow = {
   readonly organisationStatus: unknown;
   readonly accountLifecycle: unknown;
   readonly destinationChannelId: unknown;
-  readonly authoritativeRuntime: unknown;
-  readonly runtimeCutoverState: unknown;
-  readonly cloudflareActivatedAt: unknown;
   readonly placementKind: unknown;
   readonly placementEpoch: unknown;
   readonly placementCellId: unknown;
@@ -228,7 +222,6 @@ export async function authorizeResolvedSlackCaseIngress(input: {
   readonly env: OrganisationPlacementBindings;
   readonly keys: CredentialVaultBindings;
   readonly event: SlackMessageEvent;
-  readonly occurredAt: number;
   readonly route: ResolvedSlackThreadRoute;
 }): Promise<SlackCaseIngress> {
   const scope = await OrganisationExecutionScope.resolve(
@@ -248,7 +241,6 @@ export async function authorizeResolvedSlackCaseIngress(input: {
     authorizeSlackCaseIngressAtScope({
       scope: scope.value,
       event: input.event,
-      occurredAt: input.occurredAt,
       route: input.route,
     }),
     credentialScope.value === scope.value
@@ -315,7 +307,6 @@ function ignoreUnusedIngressRead(): void {}
 export async function authorizeSlackCaseIngressAtScope(input: {
   readonly scope: OrganisationExecutionScope;
   readonly event: SlackMessageEvent;
-  readonly occurredAt: number;
   readonly route: SlackCaseIngressRoute;
   readonly started?: SlackCaseIngressRead | null;
 }): Promise<SlackCaseIngressAdmission> {
@@ -329,12 +320,7 @@ export async function authorizeSlackCaseIngressAtScope(input: {
         input.route,
       ));
   if (row === null) return { kind: "retry", code: "install_missing" };
-  const parsed = parseSlackCaseIngressRow(
-    row,
-    input.event,
-    input.occurredAt,
-    input.route,
-  );
+  const parsed = parseSlackCaseIngressRow(row, input.event, input.route);
   // The statement that read the records also read the regional fence: its
   // placement row is the active one. The decision stands only when that row
   // is the placement and fence this scope was admitted under, so it never
@@ -380,7 +366,6 @@ export async function authorizeSlackCaseIngressAtScope(input: {
   const current = parseSlackCaseIngressRow(
     currentRow,
     input.event,
-    input.occurredAt,
     input.route,
   );
   if (current.kind !== "authorized") return current;
@@ -426,9 +411,6 @@ function readSlackCaseIngressRow(
        organisation.status AS organisationStatus,
        account.lifecycle AS accountLifecycle,
        destination.channel_id AS destinationChannelId,
-       organisation.authoritative_runtime AS authoritativeRuntime,
-       organisation.runtime_cutover_state AS runtimeCutoverState,
-       organisation.cloudflare_activated_at AS cloudflareActivatedAt,
        placement.placement_kind AS placementKind,
        placement.placement_epoch AS placementEpoch,
        placement.placement_cell_id AS placementCellId,
@@ -499,7 +481,6 @@ function readSlackCaseIngressRow(
 function parseSlackCaseIngressRow(
   row: SlackCaseIngressRow,
   event: SlackMessageEvent,
-  occurredAt: number,
   pinnedRoute: SlackCaseIngressRoute,
 ): SlackCaseIngressAdmission {
   if (
@@ -539,8 +520,6 @@ function parseSlackCaseIngressRow(
       ? { kind: "rejected", reason: "destination_missing" }
       : retryCorrupt();
   }
-  const authority = parseIngressAuthority(row, occurredAt);
-  if (authority.kind !== "ready") return authority.value;
   if (row.userId === null) {
     return {
       kind: "identity_link_required",
@@ -612,7 +591,6 @@ function parseSlackCaseIngressRow(
       membershipRevision: row.membershipRevision,
       placement: placement.value,
       ...identities.value,
-      authority: authority.value,
     },
   };
 }
@@ -621,60 +599,6 @@ function parseSlackCommandRole(value: unknown): SlackCommandRole | null {
   return value === "owner" || value === "admin" || value === "operator"
     ? value
     : null;
-}
-
-function parseIngressAuthority(
-  row: SlackCaseIngressRow,
-  occurredAt: number,
-):
-  | { readonly kind: "ready"; readonly value: "forward_only" | "rollback_open" }
-  | {
-      readonly kind: "rejected";
-      readonly value: Variant<SlackCaseIngressAdmission, "rejected">;
-    }
-  | {
-      readonly kind: "retry";
-      readonly value: Variant<SlackCaseIngressAdmission, "retry">;
-    } {
-  if (row.authoritativeRuntime !== "cloudflare") {
-    return row.authoritativeRuntime === "inherited"
-      ? {
-          kind: "rejected",
-          value: { kind: "rejected", reason: "runtime_not_authoritative" },
-        }
-      : { kind: "retry", value: retryCorrupt() };
-  }
-  if (
-    row.runtimeCutoverState !== "cloudflare_forward_only" &&
-    row.runtimeCutoverState !== "cloudflare_rollback_open"
-  ) {
-    return typeof row.runtimeCutoverState === "string"
-      ? {
-          kind: "rejected",
-          value: { kind: "rejected", reason: "runtime_not_authoritative" },
-        }
-      : { kind: "retry", value: retryCorrupt() };
-  }
-  if (
-    typeof row.cloudflareActivatedAt !== "number" ||
-    !Number.isSafeInteger(row.cloudflareActivatedAt) ||
-    row.cloudflareActivatedAt < 0
-  ) {
-    return { kind: "retry", value: retryCorrupt() };
-  }
-  if (occurredAt < row.cloudflareActivatedAt) {
-    return {
-      kind: "rejected",
-      value: { kind: "rejected", reason: "mutation_precedes_activation" },
-    };
-  }
-  return {
-    kind: "ready",
-    value:
-      row.runtimeCutoverState === "cloudflare_forward_only"
-        ? "forward_only"
-        : "rollback_open",
-  };
 }
 
 function connectorRouteIsValidOrAbsent(

@@ -18,7 +18,6 @@ import type {
   OrganisationDatabase,
 } from "../../database-handles";
 import { newRequestId, type OrganisationId } from "../../ids";
-import type { AuthoritativeRuntimeReceipt } from "../authoritative-runtime-cutover";
 import type { OrganisationBootstrapReservation } from "../control-plane";
 import type { OrganisationQuerySource, QuerySource } from "../query-source";
 
@@ -108,20 +107,13 @@ export function prepareBootstrapOrganisationRow(
   return database
     .prepare(
       `INSERT OR IGNORE INTO organisation (
-      organisation_id, organisation_handle, name, plan, created_at, status,
-      authoritative_runtime, runtime_cutover_state, cloudflare_prepared_at,
-      cloudflare_activated_at, runtime_rollback_expires_at, first_cloudflare_write_at,
-      runtime_rolled_back_at
-    ) VALUES (?, ?, ?, 'beta', ?, 'active', 'cloudflare', 'cloudflare_forward_only', ?, ?, ?, ?, NULL)`,
+      organisation_id, organisation_handle, name, plan, created_at, status
+    ) VALUES (?, ?, ?, 'beta', ?, 'active')`,
     )
     .bind(
       reservation.organisationId,
       reservation.organisationHandle,
       organisationName,
-      reservation.createdAt,
-      reservation.createdAt,
-      reservation.createdAt,
-      reservation.createdAt + 1,
       reservation.createdAt,
     );
 }
@@ -138,26 +130,10 @@ export function prepareSlackInstallOrganisationRow(
   return db
     .prepare(
       `INSERT OR IGNORE INTO organisation (
-         organisation_id, name, plan, created_at, status,
-         authoritative_runtime, runtime_cutover_state,
-         cloudflare_prepared_at, cloudflare_activated_at,
-         runtime_rollback_expires_at, first_cloudflare_write_at,
-         runtime_rolled_back_at
-       ) VALUES (
-         ?, ?, 'beta', ?, 'active',
-         'cloudflare', 'cloudflare_forward_only',
-         ?, ?, ?, ?, NULL
-       )`,
+         organisation_id, name, plan, created_at, status
+       ) VALUES (?, ?, 'beta', ?, 'active')`,
     )
-    .bind(
-      input.organisationId,
-      input.teamName,
-      input.now,
-      input.now,
-      input.now,
-      input.now + 1,
-      input.now,
-    );
+    .bind(input.organisationId, input.teamName, input.now);
 }
 
 /** An install that predates onboarding writes the regional row. */
@@ -280,48 +256,4 @@ export function prepareRetiredCellOrganisationRow(
       "UPDATE organisation SET name = '', organisation_handle = NULL, status = 'deleted' WHERE organisation_id = ?",
     )
     .bind(organisationId);
-}
-
-/** A change of the authoritative runtime, in the database that holds it. */
-export function prepareRuntimeCutoverUpdate(
-  db: Pick<D1DatabaseSession, "prepare">,
-  current: AuthoritativeRuntimeReceipt,
-  next: AuthoritativeRuntimeReceipt,
-): D1PreparedStatement {
-  return db
-    .prepare(
-      `UPDATE organisation
-     SET authoritative_runtime = ?,
-         runtime_cutover_state = ?,
-         cloudflare_prepared_at = ?,
-         cloudflare_activated_at = ?,
-         runtime_rollback_expires_at = ?,
-         first_cloudflare_write_at = ?,
-         runtime_rolled_back_at = ?
-     WHERE organisation_id = ?
-       AND authoritative_runtime = ?
-       AND runtime_cutover_state = ?
-       AND cloudflare_prepared_at IS ?
-       AND cloudflare_activated_at IS ?
-       AND runtime_rollback_expires_at IS ?
-       AND first_cloudflare_write_at IS ?
-       AND runtime_rolled_back_at IS ?`,
-    )
-    .bind(
-      next.authoritativeRuntime,
-      next.state,
-      next.preparedAt,
-      next.activatedAt,
-      next.rollbackExpiresAt,
-      next.firstAuthoritativeWriteAt,
-      next.rolledBackAt,
-      current.organisationId,
-      current.authoritativeRuntime,
-      current.state,
-      current.preparedAt,
-      current.activatedAt,
-      current.rollbackExpiresAt,
-      current.firstAuthoritativeWriteAt,
-      current.rolledBackAt,
-    );
 }

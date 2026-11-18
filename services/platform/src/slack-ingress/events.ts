@@ -1,5 +1,4 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { authorizeCloudflareAuthoritativeMutation } from "../data/authoritative-runtime-cutover";
 import { issueIdentityLink } from "../data/identity-link";
 import type { Env } from "../env";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
@@ -72,8 +71,6 @@ export type SlackDurableAccept =
       reason:
         | "organisation_inactive"
         | "install_inactive"
-        | "runtime_not_authoritative"
-        | "mutation_precedes_activation"
         | "destination_missing"
         | "case_missing"
         | "identity_link_missing"
@@ -311,7 +308,6 @@ export async function resolveSlackCaseIngress(
     env,
     keys: env,
     event,
-    occurredAt: receivedAt,
     route: routing.route,
   });
   if (ingress.admission.kind !== "authorized") {
@@ -603,38 +599,6 @@ export async function acceptSlackCaseCandidate(
       requestId,
       receivedAt,
     );
-  }
-  if (admission.value.authority === "rollback_open") {
-    // The Connector resolution below repeats this placement check for every
-    // message. Only the rollback transition needs the database here.
-    const execution = await OrganisationExecutionScope.resolveAtPlacement(
-      env,
-      admission.value.organisationId,
-      admission.value.placement,
-    );
-    if (!execution.ok) {
-      return {
-        ok: false,
-        error: {
-          code: "slack_event_not_durable",
-          detail: execution.error.code,
-        },
-      };
-    }
-    const transitioned = await authorizeCloudflareAuthoritativeMutation({
-      db: execution.value.database,
-      organisationId: admission.value.organisationId,
-      occurredAt: receivedAt,
-    });
-    if (!transitioned.ok) {
-      return {
-        ok: false,
-        error: {
-          code: "slack_event_not_durable",
-          detail: transitioned.error.code,
-        },
-      };
-    }
   }
   const connector = await resolveActiveConnectorActorAtPlacement({
     env: env,

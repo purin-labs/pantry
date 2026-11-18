@@ -44,7 +44,6 @@ import {
   postSlackSideCaseProposal,
   type SlackSideCaseStartOutcome,
 } from "./connector-side-case";
-import { authorizeCloudflareAuthoritativeMutation } from "../data/authoritative-runtime-cutover";
 import { buildAdmittedSlackCaseCommand } from "../slack/case-command";
 import {
   authorizeSlackCaseIngressAtScope,
@@ -233,7 +232,6 @@ export class ConnectorDO extends ConnectorEmail {
     const admission = await authorizeSlackCaseIngressAtScope({
       scope,
       event: input.event,
-      occurredAt: input.receivedAt,
       route: input.route,
       started,
     });
@@ -267,25 +265,6 @@ export class ConnectorDO extends ConnectorEmail {
       command,
     });
     if (work === null) return invalid("connector_case_work_invalid");
-    if (admission.value.authority === "rollback_open") {
-      const transitioned = await authorizeCloudflareAuthoritativeMutation({
-        db: scope.database,
-        organisationId: admission.value.organisationId,
-        occurredAt: input.receivedAt,
-      });
-      if (!transitioned.ok) {
-        return {
-          ok: true,
-          value: { kind: "retry", code: transitioned.error.code },
-        };
-      }
-      if (!(await scope.isActive())) {
-        return {
-          ok: true,
-          value: { kind: "retry", code: "organisation_placement_conflict" },
-        };
-      }
-    }
     // Admission waited on regional reads. The local barrier is observed again
     // with no wait before the write.
     if (!actorExecutionAdmissionOpen(this.ctx.storage.sql))

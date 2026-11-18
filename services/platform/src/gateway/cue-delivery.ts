@@ -21,7 +21,6 @@ import type {
   SavedSelectorCueResolverError,
   SavedSelectorCueResolverInput,
 } from "../data/agent-operations";
-import { authorizeCloudflareAuthoritativeMutation } from "../data/authoritative-runtime-cutover";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { resolveOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import type { CueClaimResult } from "../actors/cue-delivery";
@@ -72,42 +71,7 @@ export async function authorizeQueuedCueDelivery(
       kind: "retry",
       retryAt: Date.now() + EVENT_QUEUE_RETRY_DELAY_SECONDS * 1_000,
     };
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: execution.value.database,
-    organisationId: message.event.organisationId,
-    occurredAt: message.receivedAt,
-  });
-
-  if (authority.ok) {
-    return { kind: "authorized" };
-  }
-
-  switch (authority.error.code) {
-    case "runtime_not_authoritative":
-      traceWarn("cue_queue.runtime_not_authoritative", {
-        requestId: message.requestId,
-        organisation_id: message.event.organisationId,
-        runtime_state: authority.error.state,
-      });
-      return { kind: "drop" };
-    case "mutation_precedes_activation":
-      traceWarn("cue_queue.mutation_precedes_activation", {
-        requestId: message.requestId,
-        organisation_id: message.event.organisationId,
-        received_at: message.receivedAt,
-        activated_at: authority.error.activatedAt,
-      });
-      return { kind: "drop" };
-    case "organisation_not_found":
-    case "runtime_cutover_state_invalid":
-    case "runtime_cutover_transition_invalid":
-      return {
-        kind: "retry",
-        retryAt: Date.now() + EVENT_QUEUE_RETRY_DELAY_SECONDS * 1_000,
-      };
-    default:
-      return assertNever(authority.error);
-  }
+  return { kind: "authorized" };
 }
 
 /**

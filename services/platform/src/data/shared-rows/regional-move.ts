@@ -15,13 +15,6 @@ const ORGANISATION_COLUMNS = [
   "plan",
   "created_at",
   "status",
-  "authoritative_runtime",
-  "runtime_cutover_state",
-  "cloudflare_prepared_at",
-  "cloudflare_activated_at",
-  "runtime_rollback_expires_at",
-  "first_cloudflare_write_at",
-  "runtime_rolled_back_at",
   "organisation_handle",
 ] as const;
 

@@ -705,18 +705,6 @@ async function installRecoveryFixture(): Promise<{
   if (!stored.ok) throw new Error(stored.error.code);
 
   await publishGlobalOrganisation(ORGANISATION_ID);
-  // Slack ingress reads these columns from the Organisation's own database.
-  for (const database of new Set([env.DB, fixtureDatabase()]))
-    await database.prepare(
-      `UPDATE organisation
-       SET authoritative_runtime = 'cloudflare',
-           runtime_cutover_state = 'cloudflare_forward_only',
-           cloudflare_prepared_at = ?,
-           cloudflare_activated_at = ?,
-           runtime_rollback_expires_at = ?,
-           first_cloudflare_write_at = ?
-       WHERE organisation_id = ?`,
-    ).bind(now - 1_000, now - 1_000, now - 500, now - 900, ORGANISATION_ID).run();
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO app_user (

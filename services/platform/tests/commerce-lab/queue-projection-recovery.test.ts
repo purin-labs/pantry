@@ -14,10 +14,6 @@ import {
 vi.mock("../../src/commerce/commerce-wasm", commerceWasmMock);
 vi.mock("../../src/commerce-lab/lab-metadata", labMetadataMock);
 vi.mock("../../src/actors/actor-router", actorRouterMock);
-vi.mock(
-  "../../src/data/authoritative-runtime-cutover",
-  authoritativeRuntimeMock,
-);
 
 const queueMocks = vi.hoisted(function createQueueMocks() {
   const organisation = {
@@ -37,14 +33,6 @@ const labMetadataMocks = vi.hoisted(function createLabMetadataMocks() {
     listCommerceLabRuns: vi.fn(),
   };
 });
-
-const authoritativeRuntimeMocks = vi.hoisted(
-  function createAuthoritativeRuntimeMocks() {
-    return {
-      authorizeCloudflareAuthoritativeMutation: vi.fn(),
-    };
-  },
-);
 
 import { cueLogIntegrationAccountId } from "../../src/gateway/cue-delivery";
 import { handleCommerceDeliveryQueueMessage } from "../../src/gateway/support";
@@ -87,9 +75,6 @@ describe("commerce queue projection recovery", function queueProjectionRecoveryS
         error: { code: "commerce_projection_corrupt" },
       })
       .mockResolvedValueOnce({ ok: true, value: null });
-    authoritativeRuntimeMocks.authorizeCloudflareAuthoritativeMutation.mockResolvedValue(
-      cloudflareForwardOnlyReceipt(),
-    );
   });
 
   it("replays after cue-mark interruption with one projection effect identity", async function queueProjectionReplay() {
@@ -162,22 +147,6 @@ function commerceQueueBody() {
     canonicalDeliveryJson: JSON.stringify(paymentFailedEvent()),
     canonicalCueFactsJson: JSON.stringify([paymentFailedFact()]),
   });
-}
-
-function cloudflareForwardOnlyReceipt() {
-  return {
-    ok: true,
-    value: {
-      organisationId: ORGANISATION_ID,
-      state: "cloudflare_forward_only",
-      authoritativeRuntime: "cloudflare",
-      preparedAt: 1,
-      activatedAt: 2,
-      rollbackExpiresAt: 3,
-      firstAuthoritativeWriteAt: 2,
-      rolledBackAt: null,
-    },
-  };
 }
 
 function paymentFailedEvent() {
@@ -324,13 +293,6 @@ function actorRouterMock() {
     requireActiveOrganisationActorAtPlacement:
       queueMocks.requireActiveOrganisationActor,
     requireActiveSessionActor: vi.fn(),
-  };
-}
-
-function authoritativeRuntimeMock() {
-  return {
-    authorizeCloudflareAuthoritativeMutation:
-      authoritativeRuntimeMocks.authorizeCloudflareAuthoritativeMutation,
   };
 }
 

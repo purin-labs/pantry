@@ -5,10 +5,6 @@ import {
   readWorkspaceIdField,
 } from "../boundary";
 import {
-  authorizeCloudflareAuthoritativeMutation,
-  type CloudflareAuthoritativeMutationError,
-} from "../data/authoritative-runtime-cutover";
-import {
   consumeIdentityLink,
   issueIdentityLink,
   parseIdentityLinkToken,
@@ -101,16 +97,6 @@ export async function handleIssueIdentityLink(
       "Organisation region is unavailable.",
       503,
     );
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: execution.value.database,
-    organisationId: organisationId.value,
-    occurredAt: now,
-  });
-
-  if (!authority.ok) {
-    return identityLinkAuthorityErrorResponse(authority.error);
-  }
-
   const issued = await issueIdentityLink({
     env,
     organisationId: organisationId.value,
@@ -313,16 +299,6 @@ export async function handleCompleteIdentityLink(
       "Organisation region is unavailable.",
       503,
     );
-  const authority = await authorizeCloudflareAuthoritativeMutation({
-    db: execution.value.database,
-    organisationId: invitation.value.organisationId,
-    occurredAt: now,
-  });
-
-  if (!authority.ok) {
-    return identityLinkAuthorityErrorResponse(authority.error);
-  }
-
   const consumed = await consumeIdentityLink({
     env,
     token,
@@ -348,32 +324,6 @@ export async function handleCompleteIdentityLink(
     ok: true,
     link: consumed.value,
   });
-}
-
-export function identityLinkAuthorityErrorResponse(
-  error: CloudflareAuthoritativeMutationError,
-): Response {
-  switch (error.code) {
-    case "runtime_not_authoritative":
-    case "mutation_precedes_activation":
-      return errorResponse(error.code, "Identity linking is unavailable.", 409);
-    case "organisation_not_found":
-      return notFound();
-    case "runtime_cutover_state_invalid":
-      return errorResponse(
-        error.code,
-        "Identity linking state is unavailable.",
-        500,
-      );
-    case "runtime_cutover_transition_invalid":
-      return errorResponse(
-        error.code,
-        "Identity linking state conflicted.",
-        409,
-      );
-    default:
-      return assertNever(error);
-  }
 }
 
 export function parseIdentityLinkPathToken(raw: string) {

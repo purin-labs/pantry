@@ -108,7 +108,6 @@ async function resolvesAuthorizedRoot(context: TestContext): Promise<void> {
       caseId: "case_slack_T0LATENCY_C0LATENCY_1785810000_000001",
       sessionId: "session_case_slack_T0LATENCY_C0LATENCY_1785810000_000001",
       placement: TEST_INITIAL_ORGANISATION_PLACEMENT,
-      authority: "forward_only",
     },
   });
   await expect(slackCredential).resolves.toEqual({
@@ -179,7 +178,6 @@ async function ingressFor(fixture: Awaited<ReturnType<typeof createFixture>>) {
     env: fixture.env,
     keys: { SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" },
     event: rootMention(),
-    occurredAt: NOW,
     route: fixture.route,
   });
 }
@@ -239,11 +237,6 @@ async function createFixture() {
   const owner = await createGoogleMember(db, organisationId, "owner");
   const operator = await createGoogleMember(db, organisationId, "operator");
   await db.batch([
-    db
-      .prepare(
-        `UPDATE organisation SET authoritative_runtime = 'cloudflare', runtime_cutover_state = 'cloudflare_forward_only', cloudflare_prepared_at = 1, cloudflare_activated_at = 1, first_cloudflare_write_at = 1 WHERE organisation_id = ?`,
-      )
-      .bind(organisationId),
     db
       .prepare(
         `INSERT INTO slack_installation (installation_id, environment, app_id, workspace_id, credential_organisation_id, bot_token_ref, install_model, scopes_json, lifecycle, installed_at, updated_at) VALUES ('slack_installation_latency_test', 'development', 'A_PLAN25B', 'T0LATENCY', ?, 'vault:slack:bot:t0latency', 'unlisted', '["app_mentions:read","chat:write"]', 'active', 1, 1)`,

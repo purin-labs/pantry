@@ -5,7 +5,6 @@ import { describe, expect, it } from "vitest";
 import { createOrganisationInstall } from "../src/data/organisation";
 import { readAccessControlView } from "../src/access-control/read-model";
 import { READ_AND_PROPOSE_ORGANISATION_GRANT_IDS } from "../src/data/capability-policy";
-import { readAuthoritativeRuntime } from "../src/data/authoritative-runtime-cutover";
 import { parseVaultHandle } from "../src/credential-vault";
 import { newSlackInstallationId, parseSlackAppId } from "../src/ids";
 import { parseInitialOrganisationPlacement } from "../src/placement";
@@ -20,7 +19,7 @@ describe("Slack install organisation admission", function slackInstallOrganisati
     "creates an install with readable access controls and baseline grants",
     createsInstallAccessControls,
   );
-  it("routes an existing forward-only workspace to its organisation flow", async function rejectsExistingOrganisation() {
+  it("routes an existing workspace to its organisation flow", async function rejectsExistingOrganisation() {
     const db = createMigratedDatabase();
     const organisationId = requireOrganisationId(
       "organisation_existing_portal",
@@ -61,7 +60,6 @@ describe("Slack install organisation admission", function slackInstallOrganisati
       createdAt: now,
       installedAt: now + 1,
     });
-    await makeCloudflareForwardOnly(db, organisationId, now + 2);
     await seedPhysicalSlackInstallation(
       db,
       organisationId,
@@ -108,7 +106,7 @@ describe("Slack install organisation admission", function slackInstallOrganisati
     );
   });
 
-  it("prepares a new install organisation as Cloudflare forward-only", async function preparesNewOrganisation() {
+  it("prepares a new install organisation", async function preparesNewOrganisation() {
     const db = createMigratedDatabase();
     const workspaceId = requireWorkspaceId("T_NEW");
     const now = 1_784_555_000_000;
@@ -149,24 +147,6 @@ describe("Slack install organisation admission", function slackInstallOrganisati
 
     const organisationId = requireOrganisationId("organisation_T_NEW");
     expect(await organisationExists(db, organisationId)).toBe(true);
-    await expect(
-      readAuthoritativeRuntime({
-        db,
-        organisationId,
-      }),
-    ).resolves.toEqual({
-      ok: true,
-      value: {
-        organisationId,
-        state: "cloudflare_forward_only",
-        authoritativeRuntime: "cloudflare",
-        preparedAt: now,
-        activatedAt: now,
-        rollbackExpiresAt: now + 1,
-        firstAuthoritativeWriteAt: now,
-        rolledBackAt: null,
-      },
-    });
   });
 });
 
@@ -303,27 +283,6 @@ async function organisationExists(
     .first<{ organisationId: string }>();
 
   return row !== null;
-}
-
-async function makeCloudflareForwardOnly(
-  db: SingleDatabase,
-  organisationId: string,
-  now: number,
-): Promise<void> {
-  await db
-    .prepare(
-      `UPDATE organisation
-     SET authoritative_runtime = 'cloudflare',
-         runtime_cutover_state = 'cloudflare_forward_only',
-         cloudflare_prepared_at = ?,
-         cloudflare_activated_at = ?,
-         runtime_rollback_expires_at = ?,
-         first_cloudflare_write_at = ?,
-         runtime_rolled_back_at = NULL
-     WHERE organisation_id = ?`,
-    )
-    .bind(now, now, now + 1, now, organisationId)
-    .run();
 }
 
 async function expectCredentialGenerations(
