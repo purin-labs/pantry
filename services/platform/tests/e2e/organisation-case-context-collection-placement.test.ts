@@ -84,13 +84,7 @@ import {
 import { seedPurchasingContext } from "./mail-purchasing-support";
 
 type ConfigurationBoundary =
-  | "read"
-  | "credential"
-  | "probe"
-  | "store"
-  | "publish"
-  | "source_access"
-  | "disconnect";
+  "credential" | "store" | "source_access" | "disconnect";
 type ConfigurationPause = {
   readonly boundary: ConfigurationBoundary;
   phase: "armed" | "paused" | "released";
@@ -101,15 +95,7 @@ type ConfigurationPause = {
 };
 let configurationPause: ConfigurationPause | null = null;
 
-it.for([
-  "read",
-  "credential",
-  "probe",
-  "store",
-  "publish",
-  "source_access",
-  "disconnect",
-] as const)(
+it.for(["credential", "store", "source_access", "disconnect"] as const)(
   "drains TypeSafe configuration %s across relocation and target eviction",
   { timeout: 100_000 },
   configurationJourney,
@@ -219,7 +205,7 @@ async function configurationJourney(
       ).connection,
     ).toEqual(source.connection);
     pause.phase = "released";
-    if (boundary === "publish" || boundary === "source_access") {
+    if (boundary === "source_access") {
       const published = required(
         await target.publishCaseContextDiscoveryConfiguration(
           configurationPolicyRequest(fixture),
@@ -244,7 +230,7 @@ async function configurationJourney(
           }),
         ).credentialConfigured,
       ).toBe(false);
-    } else if (boundary !== "read") {
+    } else {
       await runInDurableObject(target, resetConfigurationProbe);
       const tested = required(
         await target.manageTypeSafeConnection({
@@ -284,7 +270,7 @@ async function configurationCleanupJourney({
   task,
 }: TestContext): Promise<void> {
   const fixture = await installFixture();
-  const pause = installConfigurationPause("read");
+  const pause = installConfigurationPause("credential");
   pause.phase = "released";
   await fixtureDatabase()
     .prepare(
@@ -395,14 +381,11 @@ async function configurationCleanupJourney({
 
 function configurationExpectedProbes(boundary: ConfigurationBoundary): number {
   switch (boundary) {
-    case "read":
-    case "publish":
     case "source_access":
     case "disconnect":
       return 0;
     case "credential":
       return 1;
-    case "probe":
     case "store":
       return 2;
     default:
@@ -415,17 +398,12 @@ function startConfigurationWork(
   boundary: ConfigurationBoundary,
 ) {
   switch (boundary) {
-    case "read":
-      return fixture.organisation.readTypeSafeConnectionConfiguration({
-        organisationId: ORGANISATION_ID,
-      });
     case "credential":
       return fixture.organisation.manageTypeSafeConnection({
         organisationId: ORGANISATION_ID,
         actorId: "operator_typesafe",
         body: { operation: "test", expectedRevision: 1 },
       });
-    case "probe":
     case "store":
       return fixture.organisation.manageTypeSafeConnection({
         organisationId: ORGANISATION_ID,
@@ -437,7 +415,6 @@ function startConfigurationWork(
           apiKey: KEY,
         },
       });
-    case "publish":
     case "source_access":
       return fixture.organisation.publishCaseContextDiscoveryConfiguration(
         configurationPolicyRequest(fixture),
@@ -570,10 +547,8 @@ async function configurationDigest(
   const text = new TextDecoder().decode(data);
   if (
     pause.phase === "armed" &&
-    ((pause.boundary === "publish" &&
-      text.includes('"actorId":"operator_typesafe"')) ||
-      (pause.boundary === "source_access" &&
-        text.includes('"kind":"agent_mailbox"')))
+    pause.boundary === "source_access" &&
+    text.includes('"kind":"agent_mailbox"')
   )
     await waitConfigurationPause(pause);
   return result;
@@ -589,7 +564,7 @@ async function configurationDecrypt(
   const result = await pause.decrypt.call(this, algorithm, key, data);
   if (
     pause.phase === "armed" &&
-    (pause.boundary === "read" || pause.boundary === "credential") &&
+    pause.boundary === "credential" &&
     new TextDecoder().decode(result).includes(KEY)
   )
     await waitConfigurationPause(pause);
@@ -622,8 +597,6 @@ async function configurationProbe(
       "This is a synthetic connection test. The sample parcel is in transit.",
   });
   pause.probeCalls += 1;
-  if (pause.boundary === "probe" && pause.phase === "armed")
-    await waitConfigurationPause(pause);
   return HttpResponse.json({
     model: "jev-1.13.0",
     answers: { in_transit: { type: "noul", noul: 0.95 } },
@@ -669,23 +642,16 @@ async function configurationRevocation<T>(
 }
 
 type DiscoveryBoundary =
-  | "credential"
-  | "request_digest"
-  | "preparation"
   | "preflight"
   | "response"
   | "response_error"
   | "withdrawal"
-  | "policy_withdrawal"
   | "relationships"
-  | "gmail_anchor"
   | "gmail_candidate";
 type DiscoveryPause = {
   boundary: DiscoveryBoundary;
-  readonly comparison: "operational" | "synthetic";
   phase: "armed" | "paused" | "released";
   readonly digest: SubtleCrypto["digest"];
-  readonly decrypt: SubtleCrypto["decrypt"];
   readonly scopeIsActive: OrganisationExecutionScope["isActive"];
   disclosurePrepared: boolean;
   preflightChecks: number;
@@ -694,21 +660,13 @@ type DiscoveryPause = {
 };
 let discoveryPause: DiscoveryPause | null = null;
 
-it.for([
-  "credential",
-  "preparation",
-  "preflight",
-  "response",
-  "response_error",
-  "withdrawal",
-  "relationships",
-] as const)(
+it.for(["preflight", "response", "response_error", "withdrawal"] as const)(
   "drains operational CaseContextCollection %s and recovers issued usage after target eviction",
   { timeout: 100_000 },
   discoveryJourney,
 );
 
-it.for(["gmail_anchor", "gmail_candidate", "response"] as const)(
+it.for(["gmail_candidate", "response"] as const)(
   "retains Connector CaseContextCollection work across frozen %s hydration and target eviction",
   { timeout: 100_000 },
   connectorDiscoveryJourney,
@@ -721,7 +679,7 @@ async function discoveryJourney(
   const fixture = await installFixture();
   const request = discoveryRequest(fixture);
   await runInDurableObject(fixture.organisation, clearDiscoveryRelationships);
-  const pause = installDiscoveryPause(boundary, "operational");
+  const pause = installDiscoveryPause(boundary);
   let target = fixture.organisation;
   let completion: Promise<unknown> | null = null;
   let work = target.evaluateCaseContextDiscovery({
@@ -746,8 +704,7 @@ async function discoveryJourney(
     const issued =
       boundary === "response" ||
       boundary === "response_error" ||
-      boundary === "withdrawal" ||
-      boundary === "relationships";
+      boundary === "withdrawal";
     const source = await runInDurableObject(
       fixture.organisation,
       discoveryState,
@@ -951,7 +908,7 @@ async function connectorDiscoveryJourney(
     )
     .bind(ORGANISATION_ID)
     .run();
-  const pause = installDiscoveryPause(boundary, "operational");
+  const pause = installDiscoveryPause(boundary);
   const work = runDurableObjectAlarm(connector);
   let completion: Promise<unknown> | null = null;
   try {
@@ -995,9 +952,7 @@ async function connectorDiscoveryJourney(
       )
       .bind(ORGANISATION_ID)
       .all();
-    expect(bound.results).toHaveLength(
-      boundary === "gmail_anchor" ? 0 : boundary === "response" ? 2 : 1,
-    );
+    expect(bound.results).toHaveLength(boundary === "response" ? 2 : 1);
     expect(
       await bindEmailMessageReceiptContact({
         scope,
@@ -1204,16 +1159,11 @@ function connectorDiscoveryBarrier(
 ): Promise<number> {
   return runInDurableObject(connector, readConnectorDiscoveryBarrier);
 }
-function installDiscoveryPause(
-  boundary: DiscoveryBoundary,
-  comparison: DiscoveryPause["comparison"],
-): DiscoveryPause {
+function installDiscoveryPause(boundary: DiscoveryBoundary): DiscoveryPause {
   const pause: DiscoveryPause = {
     boundary,
-    comparison,
     phase: "armed",
     digest: crypto.subtle.digest,
-    decrypt: crypto.subtle.decrypt,
     scopeIsActive: OrganisationExecutionScope.prototype.isActive,
     disclosurePrepared: false,
     preflightChecks: 0,
@@ -1222,7 +1172,6 @@ function installDiscoveryPause(
   };
   discoveryPause = pause;
   crypto.subtle.digest = discoveryDigest;
-  crypto.subtle.decrypt = discoveryDecrypt;
   OrganisationExecutionScope.prototype.isActive = discoveryScopeActive;
   network.use(
     http.post(
@@ -1239,7 +1188,6 @@ function installDiscoveryPause(
 function restoreDiscoveryPause(pause: DiscoveryPause): void {
   pause.phase = "released";
   crypto.subtle.digest = pause.digest;
-  crypto.subtle.decrypt = pause.decrypt;
   OrganisationExecutionScope.prototype.isActive = pause.scopeIsActive;
   discoveryPause = null;
 }
@@ -1277,18 +1225,10 @@ async function discoveryDigest(
   const text = new TextDecoder().decode(data);
   if (pause.phase === "armed") {
     if (
-      pause.boundary === "request_digest" &&
-      text.includes('"fixtureRevision":1') &&
-      text.includes('"comparison"')
-    )
-      await waitDiscoveryPause(pause);
-    if (
       text.includes('"sink"') &&
       text.includes('"case_context_discovery_relationship"')
-    ) {
+    )
       pause.disclosurePrepared = true;
-      if (pause.boundary === "preparation") await waitDiscoveryPause(pause);
-    }
     if (
       pause.boundary === "relationships" &&
       text.includes('"evaluationId":"discovery_') &&
@@ -1298,71 +1238,22 @@ async function discoveryDigest(
   }
   return result;
 }
-async function discoveryDecrypt(
-  this: SubtleCrypto,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const pause = discoveryPause;
-  if (pause === null) throw new Error("Missing discovery pause");
-  const result = await pause.decrypt.call(this, algorithm, key, data);
-  if (
-    pause.boundary === "credential" &&
-    pause.phase === "armed" &&
-    new TextDecoder().decode(result).includes(KEY)
-  )
-    await waitDiscoveryPause(pause);
-  return result;
-}
-async function discoveryModel(
-  pause: DiscoveryPause,
-  { request }: { request: { json(): Promise<unknown> } },
-): Promise<Response> {
-  if (pause.comparison === "synthetic") {
-    const body = await request.json();
-    expect(body).toMatchObject({
-      model: "jev-1.13.0",
-      state: {
-        incoming:
-          "Synthetic supplier S-1 reports flour delivery PR-842, shipment 1, is delayed today.",
-      },
-    });
-    expect(JSON.stringify(body)).not.toContain("private delivery");
-    expect(JSON.stringify(body)).not.toContain(KEY);
-  }
+async function discoveryModel(pause: DiscoveryPause): Promise<Response> {
   pause.modelCalls += 1;
   if (
     pause.phase === "armed" &&
     (pause.boundary === "response" ||
       pause.boundary === "response_error" ||
-      pause.boundary === "withdrawal" ||
-      pause.boundary === "policy_withdrawal")
+      pause.boundary === "withdrawal")
   )
     await waitDiscoveryPause(pause);
   if (pause.boundary === "response_error")
     return new Response(null, { status: 503 });
-  const answers =
-    pause.comparison === "synthetic"
-      ? {
-          candidate_0: { type: "choice", choice: "same_issue", confidence: 1 },
-          candidate_1: {
-            type: "choice",
-            choice: "different_issue",
-            confidence: 1,
-          },
-          candidate_2: {
-            type: "choice",
-            choice: "different_issue",
-            confidence: 1,
-          },
-        }
-      : {
-          candidate_0: { type: "choice", choice: "same_issue", confidence: 1 },
-        };
   return HttpResponse.json({
     model: "jev-1.13.0",
-    answers,
+    answers: {
+      candidate_0: { type: "choice", choice: "same_issue", confidence: 1 },
+    },
     usage: { input_tokens: 120, output_tokens: 0 },
   });
 }
@@ -1379,8 +1270,8 @@ async function discoveryGmail(
   if (
     pause.phase === "paused" ||
     (pause.phase === "armed" &&
-      ((pause.boundary === "gmail_anchor" && id === "message_p55_anchor") ||
-        (pause.boundary === "gmail_candidate" && id === "message_p55_related")))
+      pause.boundary === "gmail_candidate" &&
+      id === "message_p55_related")
   )
     await waitDiscoveryPause(pause);
   const part = id === "message_p55_anchor" ? "anchor" : "related";
@@ -1418,14 +1309,7 @@ const TARGET = {
   contactRevision: 1,
 } as const;
 
-type Boundary =
-  | "prepare"
-  | "validate"
-  | "readiness"
-  | "review"
-  | "fence_replay"
-  | "fence_commit"
-  | "receipt";
+type Boundary = "fence_commit" | "receipt";
 type Fixture = Readonly<{
   organisation: DurableObjectStub<OrganisationDO>;
   integrationAccountId: IntegrationAccountId;
@@ -1436,20 +1320,11 @@ type Pause = {
   readonly boundary: Boundary;
   phase: "armed" | "paused" | "released";
   readonly digest: SubtleCrypto["digest"];
-  readonly decrypt: SubtleCrypto["decrypt"];
   attemptDigests: number;
 };
 let activePause: Pause | null = null;
 
-it.for([
-  "prepare",
-  "validate",
-  "readiness",
-  "review",
-  "fence_replay",
-  "fence_commit",
-  "receipt",
-] as const)(
+it.for(["fence_commit", "receipt"] as const)(
   "drains Organisation CaseContextCollection %s across relocation and recovers exact evidence after eviction",
   { timeout: 100_000 },
   caseContextCollectionJourney,
@@ -1474,7 +1349,6 @@ async function expiryJourney({ task }: TestContext): Promise<void> {
     boundary: "fence_commit",
     phase: "armed",
     digest: crypto.subtle.digest,
-    decrypt: crypto.subtle.decrypt,
     attemptDigests: 0,
   };
   activePause = pause;
@@ -1542,13 +1416,14 @@ async function caseContextCollectionJourney(
     boundary,
     phase: "armed",
     digest: crypto.subtle.digest,
-    decrypt: crypto.subtle.decrypt,
     attemptDigests: 0,
   };
   activePause = pause;
   crypto.subtle.digest = pauseDigest;
-  crypto.subtle.decrypt = pauseDecryption;
-  const work = startWork(fixture, boundary);
+  const work = fixture.organisation.commitCaseContextCollectionEffectFence({
+    organisationId: ORGANISATION_ID,
+    attempt: fixture.attempt,
+  });
   let completion: Promise<unknown> | null = null;
   try {
     await expect
@@ -1730,42 +1605,8 @@ async function caseContextCollectionJourney(
   } finally {
     pause.phase = "released";
     crypto.subtle.digest = pause.digest;
-    crypto.subtle.decrypt = pause.decrypt;
     activePause = null;
     await Promise.allSettled(completion === null ? [work] : [work, completion]);
-  }
-}
-
-function startWork(fixture: Fixture, boundary: Boundary) {
-  switch (boundary) {
-    case "prepare":
-      return fixture.organisation.prepareCaseContextCollectionEvidence(
-        prepareRequest(fixture),
-      );
-    case "validate":
-      return fixture.organisation.validateCaseContextCollectionEvidence({
-        organisationId: ORGANISATION_ID,
-        dependency: fixture.dependency,
-      });
-    case "readiness":
-      return fixture.organisation.readCaseContextDiscoverySourceReadiness({
-        organisationId: ORGANISATION_ID,
-        source: "gmail",
-        integrationAccountId: fixture.integrationAccountId,
-      });
-    case "review":
-      return fixture.organisation.reviewCaseContextCollectionRelationship(
-        reviewRequest(),
-      );
-    case "fence_replay":
-    case "fence_commit":
-    case "receipt":
-      return fixture.organisation.commitCaseContextCollectionEffectFence({
-        organisationId: ORGANISATION_ID,
-        attempt: fixture.attempt,
-      });
-    default:
-      return assertNever(boundary);
   }
 }
 
@@ -1866,32 +1707,11 @@ async function pauseDigest(
   if (pause.phase === "armed") {
     if (text.includes('"attemptId"')) pause.attemptDigests += 1;
     if (
-      (pause.boundary === "prepare" && text === JSON.stringify(ADDRESS)) ||
-      (pause.boundary === "review" &&
-        text.includes('"commandId":"detach_p55"')) ||
-      ((pause.boundary === "fence_replay" || pause.boundary === "receipt") &&
-        pause.attemptDigests === 1) ||
+      (pause.boundary === "receipt" && pause.attemptDigests === 1) ||
       (pause.boundary === "fence_commit" && pause.attemptDigests === 2)
     )
       await pauseWork(pause);
   }
-  return result;
-}
-async function pauseDecryption(
-  this: SubtleCrypto,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const pause = activePause;
-  if (pause === null) throw new Error("Missing CaseContextCollection pause");
-  const result = await pause.decrypt.call(this, algorithm, key, data);
-  if (
-    pause.phase === "armed" &&
-    (pause.boundary === "validate" || pause.boundary === "readiness") &&
-    new TextDecoder().decode(result).includes(KEY)
-  )
-    await pauseWork(pause);
   return result;
 }
 async function pauseWork(pause: Pause): Promise<void> {

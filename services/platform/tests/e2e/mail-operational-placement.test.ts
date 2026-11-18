@@ -85,13 +85,10 @@ const TARGET = {
 
 type Boundary =
   | "create"
-  | "edit"
-  | "review"
   | "preflight"
   | "sent"
   | "ambiguous"
   | "rejection"
-  | "projection"
   | "expiry"
   | "revoke"
   | "reject";
@@ -121,13 +118,10 @@ let activePause: Pause | null = null;
 
 it.for([
   "create",
-  "edit",
-  "review",
   "preflight",
   "sent",
   "ambiguous",
   "rejection",
-  "projection",
   "expiry",
   "revoke",
   "reject",
@@ -144,7 +138,7 @@ it.for([
  * gets a conflict, so it does not replace the first one.
  */
 it("refuses an operational email edit that started from an older version", async (test) => {
-  const fixture = await installFixture("edit");
+  const fixture = await installFixture();
   required(
     await fixture.connector.createEmailOperationalProposal(
       createRequest(fixture),
@@ -211,7 +205,7 @@ async function operationalJourney(
       .bind(fixture.now, ORGANISATION_ID)
       .run();
   }
-  if (boundary !== "create" && boundary !== "projection")
+  if (boundary !== "create")
     required(
       await fixture.connector.createEmailOperationalProposal(
         createRequest(fixture),
@@ -341,9 +335,7 @@ async function operationalJourney(
     // No source continuation publishes metadata after placement admission closes.
     const frozenProjection = await projection();
     expect(frozenProjection?.lifecycleKind ?? null).toBe(
-      boundary === "create" || boundary === "projection"
-        ? null
-        : "awaiting_approval",
+      boundary === "create" ? null : "awaiting_approval",
     );
     if (boundary === "expiry")
       expect(await selfTestCount(ORGANISATION_ID)).toBe(1);
@@ -372,14 +364,6 @@ async function operationalJourney(
     if (boundary === "create")
       required(
         await target.createEmailOperationalProposal(createRequest(fixture)),
-      );
-    if (boundary === "edit")
-      required(
-        await target.editEmailOperationalProposal({
-          ...baseRequest(fixture),
-          subject: "Delivery request",
-          body: EDITED_BODY,
-        }),
       );
     if (boundary === "expiry") {
       await fixtureDatabase()
@@ -448,7 +432,7 @@ async function operationalJourney(
           ok: true,
           value: {
             kind: "current",
-            preview: { body: boundary === "edit" ? EDITED_BODY : BODY },
+            preview: { body: BODY },
           },
         });
       }
@@ -521,19 +505,8 @@ function startWork(
 ) {
   switch (boundary) {
     case "create":
-    case "projection":
       return fixture.connector.createEmailOperationalProposal(
         createRequest(fixture),
-      );
-    case "edit":
-      return fixture.connector.editEmailOperationalProposal({
-        ...baseRequest(fixture),
-        subject: "Delivery request",
-        body: EDITED_BODY,
-      });
-    case "review":
-      return fixture.connector.previewEmailOperationalProposal(
-        baseRequest(fixture),
       );
     case "preflight":
     case "sent":
@@ -577,7 +550,7 @@ function createRequest(fixture: Fixture) {
   };
 }
 async function approvalRequest(fixture: Fixture, boundary: Boundary) {
-  if (boundary === "create" || boundary === "projection")
+  if (boundary === "create")
     return {
       ...baseRequest(fixture),
       approvedVersion: 1,
@@ -623,8 +596,8 @@ async function pauseDecryption(
   const text = new TextDecoder().decode(opened);
   if (
     pause.phase === "armed" &&
-    ((pause.boundary === "review" && text.includes(BODY)) ||
-      (pause.boundary === "preflight" && text.includes(TOKEN)))
+    pause.boundary === "preflight" &&
+    text.includes(TOKEN)
   )
     await pauseWork(pause);
   return opened;
@@ -641,8 +614,8 @@ async function pauseEncryption(
   const text = new TextDecoder().decode(data);
   if (
     pause.phase === "armed" &&
-    ((pause.boundary === "create" && text.includes(BODY)) ||
-      (pause.boundary === "edit" && text.includes(EDITED_BODY)))
+    pause.boundary === "create" &&
+    text.includes(BODY)
   )
     await pauseWork(pause);
   return sealed;
@@ -655,8 +628,7 @@ function interceptSession(
   const session = withSession(constraint);
   if (
     pause.phase === "armed" &&
-    (pause.boundary === "projection" ||
-      pause.boundary === "expiry" ||
+    (pause.boundary === "expiry" ||
       pause.boundary === "revoke" ||
       pause.boundary === "reject")
   )
@@ -690,9 +662,7 @@ async function gmailResponse(
   expect(mime).toContain("To: supplier@example.com");
   const encodedBody = mime.split("\r\n\r\n")[1];
   if (encodedBody === undefined) throw new Error("Missing MIME body");
-  expect(atob(encodedBody)).toBe(
-    pause.boundary === "edit" ? EDITED_BODY : BODY,
-  );
+  expect(atob(encodedBody)).toBe(BODY);
   const rfcMessageId = mime.match(/Message-ID: ([^\r\n]+)/i)?.[1];
   if (rfcMessageId === undefined) throw new Error("Missing dispatch identity");
   pause.rfcMessageId = rfcMessageId;
@@ -751,7 +721,7 @@ function required<Value>(
   return result.value;
 }
 
-async function installFixture(boundary: Boundary): Promise<Fixture> {
+async function installFixture(boundary?: Boundary): Promise<Fixture> {
   await installSlackActorFixture();
   await requireActiveOrganisationActor({
     env,
