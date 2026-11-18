@@ -1,12 +1,12 @@
 import { Select } from "../../ui/select";
 import React from "react";
 import type { HostRequest, HostView } from "@seams/production-simulation";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import { seconds } from "./oven-logistics";
 
-export type ReviewedScenarioControl = Extract<
+export type ReviewedScenarioControl = Variant<
   HostRequest,
-  { kind: "extend-horizon" | "withhold-resource" }
+  "extend-horizon" | "withhold-resource"
 >;
 /**
  * The latest time that a cell has computed. A withheld interval must start

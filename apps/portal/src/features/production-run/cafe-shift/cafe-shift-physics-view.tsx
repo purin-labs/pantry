@@ -40,6 +40,7 @@ import {
 import "../oven-workspace.css";
 // The station readout uses the pour-over styles, so this view loads them itself.
 import "../pour-over/pour-over.css";
+import type { Variant } from "@seams/type-utils";
 
 type ViewProps = Readonly<{
   frames: LiveSource<RecipeFrames<CafeShiftSample>>;
@@ -174,12 +175,10 @@ function CafeShiftPhysicsView(props: ViewProps): React.ReactNode {
 type WorkspaceProps = Readonly<{
   recipe: CafeShiftRecipeConfig;
   close(): void;
-  applyToSchedule?(
-    outcome: Extract<CafeShiftOutcome, { kind: "completed" }>,
-  ): void;
+  applyToSchedule?(outcome: Variant<CafeShiftOutcome, "completed">): void;
 }>;
 
-type CompletedShift = Extract<CafeShiftOutcome, { kind: "completed" }>;
+type CompletedShift = Variant<CafeShiftOutcome, "completed">;
 
 /** The completed runs with this outcome, once for each scenario. */
 function withCompletedRun(

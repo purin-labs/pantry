@@ -11,6 +11,7 @@ import {
   SelectedOvenTask,
   type TaskSelection,
 } from "./oven-logistics";
+import type { Variant } from "@seams/type-utils";
 
 type Props = TaskSelection &
   Readonly<{
@@ -21,7 +22,7 @@ type Props = TaskSelection &
   }>;
 type AvailableProps = TaskSelection &
   Readonly<{
-    view: Extract<LogisticsView, { kind: "available" }>;
+    view: Variant<LogisticsView, "available">;
     time: number;
     horizon: number;
   }>;

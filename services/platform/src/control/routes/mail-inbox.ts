@@ -33,6 +33,7 @@ import {
 } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import { openMailInboxCursor, sealMailInboxCursor } from "../mail-inbox-cursor";
+import type { Variant } from "@seams/type-utils";
 
 export type MailInboxRoute = Readonly<{
   kind: "mailInbox";
@@ -348,7 +349,7 @@ async function listMailboxes(
 
 export async function mailControlAuthority(
   authorized: AuthorizedOrganisationRequest,
-): Promise<Extract<RequestAuthority, { kind: "control" }> | null> {
+): Promise<Variant<RequestAuthority, "control"> | null> {
   const membershipRevision = await readActiveOrganisationMembershipRevision({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,

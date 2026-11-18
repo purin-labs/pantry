@@ -32,8 +32,9 @@ import {
   type SynchronizedApplianceState,
   type SynchronizedCobotTransferState,
 } from "./morning-shift-appliances";
+import type { Variant } from "@seams/type-utils";
 
-type Logistics = Extract<LogisticsView, { kind: "available" }>;
+type Logistics = Variant<LogisticsView, "available">;
 
 function linkItem(
   select: (task: string) => void,

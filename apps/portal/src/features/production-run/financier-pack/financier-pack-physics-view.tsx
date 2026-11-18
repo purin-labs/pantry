@@ -33,6 +33,7 @@ import {
   type RecipeRun,
   type RecipeRunView,
 } from "../shared/recipe-workspace";
+import type { Variant } from "@seams/type-utils";
 
 const PACK_STEPS: readonly RecipeStep[] = [
   {
@@ -179,7 +180,7 @@ const FINANCIER_PACK_RUN: RecipeRun<
   endS: 56,
 };
 
-type CompletedPack = Extract<FinancierPackOutcome, { kind: "completed" }>;
+type CompletedPack = Variant<FinancierPackOutcome, "completed">;
 
 export function FinancierPackWorkspace(
   props: Readonly<{

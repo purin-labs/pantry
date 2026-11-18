@@ -35,6 +35,7 @@ import {
   type RecipeRun,
   type RecipeRunView,
 } from "../shared/recipe-workspace";
+import type { Variant } from "@seams/type-utils";
 
 const BAKE_STEPS: readonly RecipeStep[] = [
   {
@@ -175,7 +176,7 @@ const FINANCIER_BAKE_RUN: RecipeRun<
   endS: 60,
 };
 
-type CompletedBake = Extract<FinancierBakeOutcome, { kind: "completed" }>;
+type CompletedBake = Variant<FinancierBakeOutcome, "completed">;
 
 export function FinancierBakeWorkspace(
   props: Readonly<{

@@ -107,6 +107,7 @@ import {
   type DraftConnectionView,
 } from "./workflow-draft-client";
 import "./recipe-workflow-graph.css";
+import type { Variant } from "@seams/type-utils";
 
 /** A larger recipe opens on one workflow. The whole of it can still show. */
 const LARGE_RECIPE_STEPS = 64;
@@ -164,7 +165,7 @@ type Loaded = Readonly<{
   /** The applied revision, which a draft is compared with. */
   document: RecipeSource["document"];
   base: DraftSnapshot;
-  applied: Extract<DraftCompilation, { kind: "ready" }>;
+  applied: Variant<DraftCompilation, "ready">;
   /** The revision before an approved proposal, whose badges stay until the next one. */
   replaced: DraftSnapshot | null;
   shared: Readonly<{
@@ -198,7 +199,7 @@ type ChromeParts = Readonly<
 type OpenProposal = Readonly<{
   proposal: WorkflowProposal;
   snapshot: DraftSnapshot;
-  compilation: Extract<DraftCompilation, { kind: "ready" }>;
+  compilation: Variant<DraftCompilation, "ready">;
 }>;
 
 type State = Readonly<{
@@ -397,7 +398,7 @@ export class RecipeWorkflowGraph extends React.Component<Props, State> {
   private async compiledBase(
     document: RecipeSource["document"],
     base: DraftSnapshot,
-  ): Promise<Extract<DraftCompilation, { kind: "ready" }>> {
+  ): Promise<Variant<DraftCompilation, "ready">> {
     const applied = await compileDraft(document, base);
     if (applied.kind !== "ready")
       throw new Error(applied.problems[0]?.message ?? "The recipe is invalid.");

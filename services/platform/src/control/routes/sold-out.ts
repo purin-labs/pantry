@@ -9,6 +9,7 @@ import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * "Sold out today" (Plan 40B phase 3). Staff mark a menu item that has no stock
@@ -79,7 +80,7 @@ async function readSoldOutItems(
 async function markItem(
   request: Request,
   env: Env,
-  route: Extract<SoldOutControlRoute, { kind: "soldOutItem" }>,
+  route: Variant<SoldOutControlRoute, "soldOutItem">,
 ): Promise<Response> {
   if (request.method !== "POST") return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(

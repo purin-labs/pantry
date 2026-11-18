@@ -6,15 +6,12 @@ import type {
   RecoveryView,
   CompiledScenario,
 } from "@seams/production-simulation";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import { seconds } from "./oven-logistics";
 
-export type ReviewedRecovery = Extract<
-  HostRequest,
-  { kind: "recover" | "recover-with-worker" }
-> &
+export type ReviewedRecovery = Variant<HostRequest, "recover" | "recover-with-worker"> &
   Readonly<{ expectedControlRevision: number }>;
-type RequiredRecovery = Extract<RecoveryView, { kind: "recovery-required" }>;
+type RequiredRecovery = Variant<RecoveryView, "recovery-required">;
 type Props = Readonly<{
   scenario: CompiledScenario;
   view: HostView;

@@ -42,6 +42,7 @@ import {
   positiveIntegerOrNull,
   sha256Hex,
 } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 export const CONTEXT_CASE_READ_CAPABILITY = CAPABILITY_KEYS.contextCaseRead;
 export const CASE_CONTEXT_COLLECTION_METADATA_READ_CAPABILITY =
@@ -1029,9 +1030,9 @@ function parseMailboxReplyScope(
 
 export async function bindMailboxCaseContextCollectionAuthority(
   authority: CompiledTurnAuthority,
-  scope: Extract<
+  scope: Variant<
     import("@seams/contracts").MailboxReplyScope,
-    { kind: "case_context_collection_evidence" }
+    "case_context_collection_evidence"
   >,
 ): Promise<Result<CompiledTurnAuthority, TurnAuthorityCompileError>> {
   if (authority.authorityPartition.key.kind !== "agent_mailbox")

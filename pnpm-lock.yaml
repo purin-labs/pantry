@@ -241,6 +241,9 @@ importers:
       '@seams/std':
         specifier: workspace:*
         version: link:../std
+      '@seams/type-utils':
+        specifier: workspace:*
+        version: link:../type-utils
       '@seams/workflow-canvas-crdt':
         specifier: workspace:*
         version: link:../workflow-canvas-crdt

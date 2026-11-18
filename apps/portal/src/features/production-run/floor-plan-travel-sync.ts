@@ -26,6 +26,7 @@ import {
   scenarioPeerApplianceIds,
 } from "./floor-plan-shift-travel";
 import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import type { Variant } from "@seams/type-utils";
 
 type FloorPlanTravelSyncHooks = Readonly<{
   isMounted: () => boolean;
@@ -46,10 +47,7 @@ type FloorPlanTravelSyncResult = Readonly<{
   notice: string;
 }>;
 
-type EquipmentPlacementControl = Extract<
-  BakeryProductionControl,
-  { kind: "move-equipment" | "rotate-equipment" }
->;
+type EquipmentPlacementControl = Variant<BakeryProductionControl, "move-equipment" | "rotate-equipment">;
 
 type EquipmentPlacementOutcome =
   | Readonly<{ kind: "blocked"; notice: string }>

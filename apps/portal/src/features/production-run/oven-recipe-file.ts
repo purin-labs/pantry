@@ -41,6 +41,7 @@ import {
   prepareGingerBlackTeaRecipe,
   type OvenRunSource,
 } from "@seams/production-simulation/runs/oven-run-file";
+import type { Variant } from "@seams/type-utils";
 
 /** A file contains either the shared definition or the host's saved reply. */
 export async function readOvenRunFile(
@@ -100,7 +101,7 @@ export async function readOvenRunFile(
 
 export async function prepareNativeRecipe(
   recipe: NativeRecipeInput,
-): Promise<Result<Extract<OvenRunSource, { kind: "native-recipe" }>, string>> {
+): Promise<Result<Variant<OvenRunSource, "native-recipe">, string>> {
   const opened = await openExecutionWorker(null);
   if (!opened.ok)
     return err(`Cannot prepare this recipe: ${opened.error.code}.`);
@@ -202,7 +203,7 @@ export async function prepareNativeRecipe(
 /** One brew on a prepared FR10 pour-over station, defined by this runtime. */
 export async function preparePourOverRecipe(
   input: unknown,
-): Promise<Result<Extract<OvenRunSource, { kind: "native-recipe" }>, string>> {
+): Promise<Result<Variant<OvenRunSource, "native-recipe">, string>> {
   let recipe;
   try {
     recipe = parsePourOverRecipe(input);

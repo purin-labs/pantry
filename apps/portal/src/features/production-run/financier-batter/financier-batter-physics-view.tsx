@@ -39,6 +39,7 @@ import {
   type RecipeRun,
   type RecipeRunView,
 } from "../shared/recipe-workspace";
+import type { Variant } from "@seams/type-utils";
 
 const BATTER_STEPS: readonly RecipeStep[] = [
   {
@@ -196,7 +197,7 @@ export function FinancierBatterWorkspace(
     recipe: FinancierBatterRecipeConfig;
     close(): void;
     applyToSchedule?: (
-      outcome: Extract<FinancierBatterOutcome, { kind: "completed" }>,
+      outcome: Variant<FinancierBatterOutcome, "completed">,
     ) => void;
   }>,
 ): React.ReactNode {
@@ -213,9 +214,7 @@ export function FinancierBatterWorkspace(
 function financierBatterContent(
   run: RecipeRunView<FinancierBatterSample, FinancierBatterRecipeConfig>,
   applyToSchedule:
-    | ((
-        outcome: Extract<FinancierBatterOutcome, { kind: "completed" }>,
-      ) => void)
+    | ((outcome: Variant<FinancierBatterOutcome, "completed">) => void)
     | undefined,
 ): RecipeContent {
   const { recipe, frames, outcome } = run;

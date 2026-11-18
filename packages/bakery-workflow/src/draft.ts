@@ -20,6 +20,7 @@ import {
   type StepBody,
 } from "./index.ts";
 import { BAND_GAP, layoutGraph, NODE_ROW, placeGraph } from "./layout.ts";
+import type { Variant } from "@seams/type-utils";
 
 /** A document's shared draft starts as this. */
 export function draftSeed(document: BakeryWorkflowDocument): DraftSnapshot {
@@ -375,10 +376,7 @@ export function newStepNode(
 
 function isWorker(
   resource: CompiledScenario["resources"][number],
-): resource is Extract<
-  CompiledScenario["resources"][number],
-  { kind: "worker" }
-> {
+): resource is Variant<CompiledScenario["resources"][number], "worker"> {
   return resource.kind === "worker";
 }
 

@@ -89,6 +89,7 @@ import {
   readServiceInvitationRole,
   serviceInvitationRoleExists,
 } from "../../data/service-invitation-role";
+import type { Variant } from "@seams/type-utils";
 
 export type OnboardingControlRoute =
   | Readonly<{ kind: "accountOnboarding" }>
@@ -628,7 +629,7 @@ type PendingPantryServiceInvitation = Readonly<{
 
 async function pendingServiceInvitation(
   execution: OrganisationExecutionScope,
-  invitation: Extract<AccountInvitation, { kind: "pending" }>,
+  invitation: Variant<AccountInvitation, "pending">,
 ): Promise<PendingPantryServiceInvitation | null> {
   const row = await readServiceInvitationRole(
     execution.database,

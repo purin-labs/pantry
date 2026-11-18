@@ -17,6 +17,7 @@ import {
   type AuthorizedOrganisationRequest,
 } from "./authorization";
 import { mailControlAuthority } from "./routes/mail-inbox";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The most threads that one read of the queue names. Each costs a Gmail
@@ -24,7 +25,7 @@ import { mailControlAuthority } from "./routes/mail-inbox";
  */
 const EMAIL_REPLY_HEADLINE_LIMIT = 10;
 
-type ControlAuthority = Extract<RequestAuthority, { kind: "control" }>;
+type ControlAuthority = Variant<RequestAuthority, "control">;
 /** The waiting drafts of one mailbox, by the Gmail thread that they answer. */
 type MailboxThreads = Readonly<{
   accountId: IntegrationAccountId;

@@ -22,6 +22,7 @@ import type {
 import { assertNever } from "@seams/std";
 import { downloadBakeryFile } from "../workflow-simulator/file-download";
 import { seconds } from "./oven-logistics";
+import type { Variant } from "@seams/type-utils";
 
 const MAX_SIX_HOUR_MEASUREMENT_BYTES = 1024 * 1024;
 
@@ -346,7 +347,7 @@ type SixHourImportState =
 
 class SixHourMeasuredShiftPanel extends React.Component<
   Readonly<{
-    measurements: Extract<ShiftReport, { kind: "available" }>["measurements"];
+    measurements: Variant<ShiftReport, "available">["measurements"];
   }>,
   Readonly<{ imported: SixHourImportState }>
 > {

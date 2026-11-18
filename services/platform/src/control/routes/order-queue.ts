@@ -11,6 +11,7 @@ import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
+import type { Variant } from "@seams/type-utils";
 
 /** The staff order queue on the page (Plan 40B phase 3). */
 export type OrderQueueControlRoute =
@@ -80,7 +81,7 @@ async function readOrderQueue(
 async function advanceOrder(
   request: Request,
   env: Env,
-  route: Extract<OrderQueueControlRoute, { kind: "orderQueueAdvance" }>,
+  route: Variant<OrderQueueControlRoute, "orderQueueAdvance">,
 ): Promise<Response> {
   if (request.method !== "POST") return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(

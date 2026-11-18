@@ -15,10 +15,7 @@ const mixedControl: BakeryProductionControl = {
   kind: "pause",
   resource: "baker",
 };
-const resourceControl: Extract<
-  BakeryProductionControl,
-  { kind: "withhold-resource" }
-> = {
+const resourceControl: Variant<BakeryProductionControl, "withhold-resource"> = {
   kind: "withhold-resource",
   resource: "baker",
   interval: { start: 2000, end: 4000 },
@@ -36,6 +33,7 @@ const incompleteSurface: BakeryPersistentSurface = {
 void [incompleteTarget, mixedControl, spreadControl, incompleteSurface];
 
 import type { BakeryProductionSnapshotSurface } from "@seams/bakery-model/bakery-surface";
+import type { Variant } from "@seams/type-utils";
 declare const savedEvidence: BakeryProductionSnapshotSurface;
 declare const executionTarget: BakeryProductionTarget;
 const activeSnapshot: BakeryProductionSnapshotSurface = {

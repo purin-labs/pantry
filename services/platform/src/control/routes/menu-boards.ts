@@ -27,6 +27,7 @@ import {
   claimScreenPairing,
   readOpenScreenPairing,
 } from "../../data/screen-pairing";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The Portal's routes for menu boards and screens (Plan 40B phase 1):
@@ -518,7 +519,7 @@ async function handleCommentRoute(
     };
   }
   const result = (await command(env, authorized, input)) as Awaited<
-    MenuBoardCommandReply<Extract<MenuBoardCommand, { kind: "list_comments" }>>
+    MenuBoardCommandReply<Variant<MenuBoardCommand, "list_comments">>
   >;
   if (result.ok)
     return controlJson(
@@ -581,7 +582,7 @@ async function handleVersionRoute(
     };
   }
   const result = (await command(env, authorized, input)) as Awaited<
-    MenuBoardCommandReply<Extract<MenuBoardCommand, { kind: "list_versions" }>>
+    MenuBoardCommandReply<Variant<MenuBoardCommand, "list_versions">>
   >;
   if (result.ok)
     return controlJson(

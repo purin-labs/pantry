@@ -15,8 +15,9 @@ import {
   placeLabel,
   taskLabel,
 } from "./factory-places";
+import type { Variant } from "@seams/type-utils";
 
-type Logistics = Extract<LogisticsView, { kind: "available" }>;
+type Logistics = Variant<LogisticsView, "available">;
 
 /**
  * One link of a wait. The first link names what the task lacks, the middle
@@ -280,7 +281,7 @@ class Explanation {
     if (users[0] !== undefined) this.follow(users[0], "holder");
   }
 
-  private endOf(task: Extract<TaskView, { kind: "executing" }>): number | null {
+  private endOf(task: Variant<TaskView, "executing">): number | null {
     if (task.completesAt !== null && task.completesAt > 0)
       return task.completesAt;
     const definition = this.definition(task);

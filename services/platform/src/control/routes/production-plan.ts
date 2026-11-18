@@ -30,6 +30,7 @@ import {
   type ProductionPlanRoute,
   authorizeProductionPlanSocket,
 } from "../admission/production-plan";
+import type { Variant } from "@seams/type-utils";
 
 export async function handleProductionPlanRoute(
   request: Request,
@@ -207,7 +208,7 @@ async function commandStep(
     requestRevision: number;
     step: "revise" | "accept";
     fields: ProductionRequestFields;
-    first: Extract<ReadEntry, { kind: "found" }> | null;
+    first: Variant<ReadEntry, "found"> | null;
   }>,
 ): Promise<StepResult> {
   let read: ReadEntry =

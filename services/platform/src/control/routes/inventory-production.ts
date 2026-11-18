@@ -29,6 +29,7 @@ import {
   resolveInventoryMutation,
   type InventoryControlMutation,
 } from "./inventory-control";
+import type { Variant } from "@seams/type-utils";
 
 type ProductionAction =
   | Readonly<{ kind: "setup" }>
@@ -488,7 +489,7 @@ function productionEntries(
   snapshot: CommerceStockSnapshot,
   entries: readonly CommerceListEntry[],
 ): Pick<
-  Extract<InventoryProductionContext["demand"], { kind: "ready" }>,
+  Variant<InventoryProductionContext["demand"], "ready">,
   "requests" | "invalidRequests"
 > {
   const requests: InventoryProductionRequest[] = [];
@@ -593,7 +594,7 @@ async function linkProductionRecipe(
   request: Request,
   env: Env,
   mutation: InventoryControlMutation,
-  action: Extract<ProductionAction, { kind: "link_recipe" }>,
+  action: Variant<ProductionAction, "link_recipe">,
   snapshot: CommerceStockSnapshot,
 ): Promise<Response> {
   const details = productionContext(snapshot, action.positionId, {

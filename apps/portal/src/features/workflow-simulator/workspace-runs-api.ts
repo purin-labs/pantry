@@ -38,7 +38,7 @@ import {
   parseExecutionBundle,
   type ResumableDocument,
 } from "@seams/production-simulation";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import { visitSharedArtifacts } from "@seams/production-simulation/simulator/shared-artifact-batches";
 import { parseApplianceWorkflow } from "@seams/bakery-model/bakery-appliance-workflow";
 
@@ -385,7 +385,7 @@ export async function preparePersistentWorkspaceRun(
 async function stageWorkspaceArtifacts(
   organisationId: string,
   mutate: CommerceMutationTransport,
-  prepared: Extract<PreparedWorkspaceRun, { kind: "artifacts" }>,
+  prepared: Variant<PreparedWorkspaceRun, "artifacts">,
 ): Promise<void> {
   const path = `${workspaceRunPath(organisationId)}/prepared/${prepared.id}`;
   const response = await mutate(
@@ -447,7 +447,7 @@ async function uploadSharedArtifact(
 export type PersistentSnapshot = StrictUnion<
   | Readonly<{
       kind: "embedded";
-      source: Extract<OvenRunSource, { kind: "snapshot" }>;
+      source: Variant<OvenRunSource, "snapshot">;
     }>
   | Readonly<{ kind: "artifacts"; document: ResumableDocument }>
 >;

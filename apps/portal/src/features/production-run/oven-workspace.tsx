@@ -53,7 +53,7 @@ import {
   type InspectionView,
 } from "@seams/production-simulation";
 import { assertNever, isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@seams/type-utils";
 import {
   openAuthoredCellWorker,
   openExecutionWorker,
@@ -231,7 +231,7 @@ type State = Readonly<{
   inspectionNote: string;
   applianceFaults: Readonly<Record<string, ApplianceFaultRecord>>;
 }>;
-type SavedSource = Extract<OvenRunSource, { kind: "snapshot" }>;
+type SavedSource = Variant<OvenRunSource, "snapshot">;
 type SavedBoundary = StrictUnion<
   | Readonly<{ kind: "empty" }>
   | Readonly<{ kind: "saved"; worker: ExecutionWorker; source: SavedSource }>

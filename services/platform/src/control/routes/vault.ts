@@ -20,6 +20,7 @@ import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * Settings → Vault (Plan 79): website logins and contact profiles, kept in
@@ -152,7 +153,7 @@ async function createItem(
 async function commandItem(
   request: Request,
   env: Env,
-  route: Extract<VaultRoute, { kind: "vaultItemCommands" }>,
+  route: Variant<VaultRoute, "vaultItemCommands">,
 ): Promise<Response> {
   const authorized = await authorizeOrganisationRequest(
     request,

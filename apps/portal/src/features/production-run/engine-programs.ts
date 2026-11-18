@@ -11,6 +11,7 @@ import {
 import { parseRobotModel } from "@seams/bakery-model/bakery-robots";
 import { parseNativeContinuation } from "@seams/production-simulation/recipes/bakery/native-continuation";
 import { isRecord, sha256Hex } from "@seams/std";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The one-shot jobs of the engine worker (Refactor 16, step 5): a robot
@@ -281,7 +282,7 @@ export class EnginePrograms {
   /** A comparison opens its cell at once: the cell builds the request. */
   private async selection(
     job: string,
-    task: Extract<JobTask, { kind: "selection" }>,
+    task: Variant<JobTask, "selection">,
   ): Promise<Job> {
     const robot = parseRobotModel(task.robot);
     const ingredients = parseIngredientLoad(task.ingredients);
@@ -392,7 +393,7 @@ function programFor(mode: JobMode, request: unknown): Program {
   }
 }
 
-function continuation(task: Extract<JobTask, { kind: "continuation" }>): Job {
+function continuation(task: Variant<JobTask, "continuation">): Job {
   const handoff = parseNativeContinuation(task.file);
   const request =
     handoff.predecessor.kind === "bakery-physics-recording"

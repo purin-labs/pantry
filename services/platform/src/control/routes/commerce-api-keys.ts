@@ -16,6 +16,7 @@ import {
 } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The API keys of an organisation's merchant (Plan 80 step 3): an owner or
@@ -125,10 +126,7 @@ async function issueKey(
 async function revokeKey(
   request: Request,
   env: Env,
-  route: Extract<
-    CommerceApiKeyControlRoute,
-    { kind: "commerceApiKeyRevocation" }
-  >,
+  route: Variant<CommerceApiKeyControlRoute, "commerceApiKeyRevocation">,
 ): Promise<Response> {
   const authorized = await authorizeOrganisationRequest(
     request,
