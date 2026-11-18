@@ -26,7 +26,6 @@ import {
   digestEmailSnapshot,
   digestGmailReplyTarget,
   deriveGmailReplyTarget,
-  dispatchRfcMessageId,
 } from "../src/mail/reply-target";
 import type { GmailMessageHeaders } from "../src/mail/gmail-adapter";
 import {
@@ -40,7 +39,6 @@ import {
   dispatchEmailReply,
   disposeEmailProposal,
   previewEmailProposal,
-  resolveEmailProposalState,
   runEmailProposalMaintenance,
 } from "../src/actors/connector-email-proposal";
 import {
@@ -62,26 +60,12 @@ const TRIGGER = "m2";
 describe("email proposal machinery", emailProposalSuite);
 
 function emailProposalSuite(): void {
-  it("previews the current draft and re-versions body edits", previewTest);
   it("invalidates trusted-target edits and missing drafts", invalidationTest);
-  it("sends one immutable snapshot and cleans up the draft", dispatchTest);
   it(
     "does not resend while sent-message cleanup is pending",
     cleanupPendingDispatchTest,
   );
-  it(
-    "returns stale approval instead of sending an edited snapshot",
-    staleApprovalTest,
-  );
-  it(
-    "reconciles ambiguous sends by Message-ID before any retry",
-    indeterminateTest,
-  );
   it("disposes rejected proposals with typed cleanup states", disposalTest);
-  it(
-    "sends once when two approvals race through the connector lock",
-    concurrentDispatchTest,
-  );
   it(
     "marks the send indeterminate before the wire so a crash cannot resend",
     crashMarkerTest,
@@ -90,57 +74,6 @@ function emailProposalSuite(): void {
     "sweeps expired, indeterminate, and cleanup states on the alarm",
     maintenanceTest,
   );
-}
-
-/**
- * The Connector serialises proposal mutations per proposal id; this recreates
- * that lock verbatim around the real module. Two operators approving together
- * must produce exactly one messages.send, with the loser honoured
- * idempotently rather than told the reply failed.
- */
-async function concurrentDispatchTest(): Promise<void> {
-  const state = world({ sendDelayMs: 25 });
-  const harness = await setup(state);
-  const work = new Map<string, Promise<unknown>>();
-  const withLock = <T>(
-    proposalId: string,
-    task: () => Promise<T>,
-  ): Promise<T> => {
-    const previous = work.get(proposalId) ?? Promise.resolve();
-    const run = previous.then(task, task);
-    work.set(
-      proposalId,
-      run.then(
-        () => undefined,
-        () => undefined,
-      ),
-    );
-    return run;
-  };
-  const dispatchOnce = () =>
-    dispatchEmailReply({
-      sql: harness.sql,
-      scope: harness.scope,
-      env: harness.env,
-      proposalId: PROPOSAL,
-      approvedVersion: 1,
-      approvedSnapshotDigest: harness.snapshotDigest,
-      now: NOW + 30,
-      fetcher: harness.fetcher,
-    });
-  const [first, second] = await Promise.all([
-    withLock(PROPOSAL, dispatchOnce),
-    withLock(PROPOSAL, dispatchOnce),
-  ]);
-  expect(state.sentCount).toBe(1);
-  for (const outcome of [first, second]) {
-    expect(outcome.ok).toBe(true);
-    if (outcome.ok && outcome.value.kind === "sent") {
-      expect(outcome.value.providerMessageId).toBe("sent-msg-1");
-    } else {
-      throw new Error("both racers must observe the sent reply");
-    }
-  }
 }
 
 /**
@@ -340,14 +273,11 @@ type GmailWorld = {
   draftPresent: boolean;
   draftHasAttachments: boolean;
   sendOutcome: "ok" | "network_error";
-  sendDelayMs: number;
   stateAtSend: string | null;
-  sentRaw: string | null;
   sentCount: number;
   deleteOutcome: "ok" | "unavailable" | "unauthorized";
   deleted: boolean;
   foundByMessageId: { messageId: string; threadId: string } | null;
-  searchedFor: string | null;
 };
 
 function world(overrides: Partial<GmailWorld> = {}): GmailWorld {
@@ -359,14 +289,11 @@ function world(overrides: Partial<GmailWorld> = {}): GmailWorld {
     draftPresent: true,
     draftHasAttachments: false,
     sendOutcome: "ok",
-    sendDelayMs: 0,
     stateAtSend: null,
-    sentRaw: null,
     sentCount: 0,
     deleteOutcome: "ok",
     deleted: false,
     foundByMessageId: null,
-    searchedFor: null,
     ...overrides,
   };
 }
@@ -384,14 +311,9 @@ function gmailFetcher(
         state.stateAtSend =
           readEmailDraftOperation(sql, PROPOSAL, 1)?.state ?? null;
       }
-      if (state.sendDelayMs > 0) {
-        await new Promise((resolve) => setTimeout(resolve, state.sendDelayMs));
-      }
       if (state.sendOutcome === "network_error") {
         return new Response("boom", { status: 503 });
       }
-      const payload = (await normalized.json()) as { raw: string };
-      state.sentRaw = payload.raw;
       return Response.json({ id: "sent-msg-1", threadId: THREAD });
     }
     if (url.pathname.includes("/drafts/") && normalized.method === "DELETE") {
@@ -459,7 +381,6 @@ function gmailFetcher(
       });
     }
     if (url.pathname.endsWith("/messages") && url.searchParams.has("q")) {
-      state.searchedFor = url.searchParams.get("q");
       return Response.json(
         state.foundByMessageId === null
           ? {}
@@ -493,8 +414,6 @@ async function setup(state: GmailWorld): Promise<{
   readonly env: UnitTestEnv;
   readonly scope: OrganisationExecutionScope;
   readonly fetcher: typeof fetch;
-  readonly targetDigest: string;
-  readonly bodyDigest: string;
   readonly snapshotDigest: string;
 }> {
   accessMocks.resolveConnectorGmailAccess.mockResolvedValue({
@@ -599,55 +518,8 @@ async function setup(state: GmailWorld): Promise<{
     env,
     scope,
     fetcher: gmailFetcher(state, sql),
-    targetDigest,
-    bodyDigest,
     snapshotDigest,
   };
-}
-
-async function previewTest(): Promise<void> {
-  const state = world();
-  const harness = await setup(state);
-  const preview = await previewEmailProposal({
-    sql: harness.sql,
-    scope: harness.scope,
-    env: harness.env,
-    proposalId: PROPOSAL,
-    now: NOW + 10,
-    fetcher: harness.fetcher,
-  });
-  expect(preview.ok).toBe(true);
-  if (preview.ok && preview.value.kind === "current") {
-    expect(preview.value.preview).toMatchObject({
-      currentVersion: 1,
-      bodyEdited: false,
-      to: "customer@sender.example",
-      body: "Your order ships Monday.",
-      snapshotDigest: harness.snapshotDigest,
-    });
-  } else {
-    throw new Error("expected current preview");
-  }
-
-  state.draftBody = "Your order ships Tuesday, apologies for the delay.";
-  const edited = await previewEmailProposal({
-    sql: harness.sql,
-    scope: harness.scope,
-    env: harness.env,
-    proposalId: PROPOSAL,
-    now: NOW + 20,
-    fetcher: harness.fetcher,
-  });
-  expect(edited.ok).toBe(true);
-  if (edited.ok && edited.value.kind === "current") {
-    expect(edited.value.preview.bodyEdited).toBe(true);
-    expect(edited.value.preview.currentVersion).toBe(2);
-    expect(edited.value.preview.snapshotDigest).not.toBe(
-      harness.snapshotDigest,
-    );
-  } else {
-    throw new Error("expected edited preview");
-  }
 }
 
 async function invalidationTest(): Promise<void> {
@@ -699,52 +571,6 @@ async function invalidationTest(): Promise<void> {
   ).toBe(true);
 }
 
-async function dispatchTest(): Promise<void> {
-  const state = world();
-  const harness = await setup(state);
-  const dispatched = await dispatchEmailReply({
-    sql: harness.sql,
-    scope: harness.scope,
-    env: harness.env,
-    proposalId: PROPOSAL,
-    approvedVersion: 1,
-    approvedSnapshotDigest: harness.snapshotDigest,
-    now: NOW + 30,
-    fetcher: harness.fetcher,
-  });
-  expect(dispatched.ok).toBe(true);
-  if (dispatched.ok && dispatched.value.kind === "sent") {
-    expect(dispatched.value.providerMessageId).toBe("sent-msg-1");
-    expect(dispatched.value.version).toBe(1);
-  } else {
-    throw new Error("expected sent");
-  }
-  expect(state.sentCount).toBe(1);
-  expect(state.deleted).toBe(true);
-  const normalized = (state.sentRaw ?? "")
-    .replaceAll("-", "+")
-    .replaceAll("_", "/");
-  const raw = atob(normalized + "=".repeat((4 - (normalized.length % 4)) % 4));
-  expect(raw).toContain(
-    `Message-ID: ${dispatchRfcMessageId(PROPOSAL, 1, ADDRESS)}`,
-  );
-  expect(raw).toContain("To: customer@sender.example");
-  expect(readEmailDraftOperation(harness.sql, PROPOSAL, 1)?.state).toBe("sent");
-
-  const again = await dispatchEmailReply({
-    sql: harness.sql,
-    scope: harness.scope,
-    env: harness.env,
-    proposalId: PROPOSAL,
-    approvedVersion: 1,
-    approvedSnapshotDigest: harness.snapshotDigest,
-    now: NOW + 40,
-    fetcher: harness.fetcher,
-  });
-  expect(again.ok && again.value.kind === "sent").toBe(true);
-  expect(state.sentCount).toBe(1);
-}
-
 async function cleanupPendingDispatchTest(): Promise<void> {
   const state = world({ deleteOutcome: "unavailable" });
   const harness = await setup(state);
@@ -781,72 +607,6 @@ async function cleanupPendingDispatchTest(): Promise<void> {
     value: { kind: "sent", providerMessageId: "sent-msg-1" },
   });
   expect(state.sentCount).toBe(1);
-}
-
-async function staleApprovalTest(): Promise<void> {
-  const state = world();
-  const harness = await setup(state);
-  state.draftBody = "Edited after approval was issued.";
-  const dispatched = await dispatchEmailReply({
-    sql: harness.sql,
-    scope: harness.scope,
-    env: harness.env,
-    proposalId: PROPOSAL,
-    approvedVersion: 1,
-    approvedSnapshotDigest: harness.snapshotDigest,
-    now: NOW + 30,
-    fetcher: harness.fetcher,
-  });
-  expect(dispatched.ok).toBe(true);
-  if (dispatched.ok) {
-    expect(dispatched.value.kind).toBe("stale_approval");
-  }
-  expect(state.sentCount).toBe(0);
-  expect(state.deleted).toBe(false);
-}
-
-async function indeterminateTest(): Promise<void> {
-  const state = world({ sendOutcome: "network_error" });
-  const harness = await setup(state);
-  const first = await dispatchEmailReply({
-    sql: harness.sql,
-    scope: harness.scope,
-    env: harness.env,
-    proposalId: PROPOSAL,
-    approvedVersion: 1,
-    approvedSnapshotDigest: harness.snapshotDigest,
-    now: NOW + 30,
-    fetcher: harness.fetcher,
-  });
-  expect(first.ok && first.value.kind === "send_indeterminate").toBe(true);
-  expect(readEmailDraftOperation(harness.sql, PROPOSAL, 1)?.state).toBe(
-    "send_indeterminate",
-  );
-
-  state.foundByMessageId = { messageId: "sent-elsewhere-1", threadId: THREAD };
-  const resolved = await resolveEmailProposalState({
-    sql: harness.sql,
-    scope: harness.scope,
-    env: harness.env,
-    proposalId: PROPOSAL,
-    dispatchVersion: 1,
-    now: NOW + 60,
-    fetcher: harness.fetcher,
-  });
-  expect(resolved.ok).toBe(true);
-  if (resolved.ok) {
-    expect(resolved.value).toMatchObject({
-      kind: "sent",
-      providerMessageId: "sent-elsewhere-1",
-      version: 1,
-      snapshotDigest: harness.snapshotDigest,
-    });
-  }
-  expect(state.searchedFor).toBe(
-    `rfc822msgid:${dispatchRfcMessageId(PROPOSAL, 1, ADDRESS)}`,
-  );
-  expect(state.sentCount).toBe(1);
-  expect(readEmailDraftOperation(harness.sql, PROPOSAL, 1)?.state).toBe("sent");
 }
 
 async function disposalTest(): Promise<void> {

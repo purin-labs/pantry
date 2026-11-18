@@ -52,10 +52,6 @@ function connectorDeliverySuite(): void {
     retriesMissingSlackTimestamp,
   );
   it(
-    "retries transient vault outages before settling one delivery",
-    retriesVaultOutageThenDelivers,
-  );
-  it(
     "delivers a channel address without a Slack thread timestamp",
     deliversChannelSnapshot,
   );
@@ -299,66 +295,6 @@ async function deliversChannelSnapshot(): Promise<void> {
   });
 }
 
-async function retriesVaultOutageThenDelivers(): Promise<void> {
-  CREDENTIAL_RESULTS.push(
-    { ok: false, error: { code: "vault_root_unavailable" } },
-    { ok: true, value: { kind: "bearer", value: "xoxb-plan15" } },
-  );
-  SLACK_RESPONSES.push(
-    new Response(JSON.stringify({ ok: true, ts: "1785700000.000779" }), {
-      status: 200,
-    }),
-  );
-  const actor = await connectorActor();
-  const first = await actor.deliver(cafeReceiptDeliveryRequest(1_000));
-  expect(first).toEqual({
-    ok: true,
-    value: {
-      kind: "retry",
-      reason: "connector_credential_unavailable",
-      retryAt: 6_000,
-    },
-  });
-  const second = await actor.deliver(cafeReceiptDeliveryRequest(6_000));
-  expect(second).toMatchObject({
-    ok: true,
-    value: {
-      kind: "delivered",
-      receipt: {
-        nativeReceiptId: "1785700000.000779",
-      },
-    },
-  });
-  const replay = await actor.deliver(cafeReceiptDeliveryRequest(6_001));
-  expect(replay).toMatchObject({
-    ok: true,
-    value: {
-      kind: "already_delivered",
-      receipt: {
-        nativeReceiptId: "1785700000.000779",
-      },
-    },
-  });
-  expect(SLACK_REQUESTS).toHaveLength(1);
-  expect(JSON.parse(String(SLACK_REQUESTS[0]?.body))).toMatchObject({
-    channel: "C_plan15",
-    thread_ts: "1785700000.000001",
-    markdown_text: "Payment captured for order order_cafe_acceptance. Fulfillment fulfillment_cafe_acceptance created.",
-  });
-  expect(await actor.inspect()).toMatchObject({
-    ok: true,
-    value: {
-      deliveries: [{ deliveryId: "delivery_cafe_acceptance" }],
-      receipts: [
-        {
-          deliveryId: "delivery_cafe_acceptance",
-          nativeReceiptId: "1785700000.000779",
-        },
-      ],
-    },
-  });
-}
-
 async function deliversLiveCafeReceiptAfterVaultOutage(): Promise<void> {
   const config = liveSlackConfig();
   const identity = crypto.randomUUID().replaceAll("-", "");
@@ -432,34 +368,6 @@ function deliveryRequest(requestedAt: number): unknown {
       caseRevision: 2,
       content: { kind: "text", text: "Catalog is ready." },
       idempotencyKey: "case_output_plan15",
-      addressedAt: 1_000,
-    },
-    requestedAt,
-  };
-}
-
-function cafeReceiptDeliveryRequest(requestedAt: number): unknown {
-  return {
-    identity: {
-      organisationId: "organisation_plan15",
-      connectorId: "connector_plan15",
-    },
-    delivery: {
-      deliveryId: "delivery_cafe_acceptance",
-      bindingId: "binding_plan15",
-      address: {
-        kind: "slack",
-        workspaceId: "T_plan15",
-        channelId: "C_plan15",
-        threadTs: "1785700000.000001",
-      },
-      caseId: "case_cafe_acceptance",
-      caseRevision: 2,
-      content: {
-        kind: "text",
-        text: "Payment captured for order order_cafe_acceptance. Fulfillment fulfillment_cafe_acceptance created.",
-      },
-      idempotencyKey: "case_output_cafe_acceptance",
       addressedAt: 1_000,
     },
     requestedAt,

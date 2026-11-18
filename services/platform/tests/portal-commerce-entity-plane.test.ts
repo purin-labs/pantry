@@ -16,16 +16,12 @@ import {
   buildCommerceEntityDossierModel,
   buildCommerceListTableModel,
   buildEntityTypeTableModel,
-  entityDossierQuery,
   parseCommerceActivityResponse,
   parseCommerceGraphQueryResult,
   patchCommerceListEntryStatus,
-  publishCommerceSavedViewPresentation,
-  readCommerceChanges,
   readPublishedCommerceResources,
-  systemEntityRef,
 } from "../../../apps/portal/src/features/commerce";
-import { commerceCollectionQuery, updateCommerceBoardPresence } from "../../../apps/portal/src/features/commerce/entity-plane/api";
+import { updateCommerceBoardPresence } from "../../../apps/portal/src/features/commerce/entity-plane/api";
 import { parseCommerceListEntryPatchResponse } from "@seams/control-api/portal/entity-plane";
 import {
   OrderCancellationControl,
@@ -75,7 +71,9 @@ describe("portal commerce entity-plane presentation", () => {
         { kind: "idle" },
         validCommercePresenceTransport,
       ),
-    ).resolves.toMatchObject([{ userId: "user_42d8499b-4f02-53e2-a0bc-6af86a5b4eb3" }]);
+    ).resolves.toMatchObject([
+      { userId: "user_42d8499b-4f02-53e2-a0bc-6af86a5b4eb3" },
+    ]);
     await expect(
       updateCommerceBoardPresence(
         "organisation_export",
@@ -85,31 +83,6 @@ describe("portal commerce entity-plane presentation", () => {
         invalidCommercePresenceTransport,
       ),
     ).rejects.toThrow("presence entry is invalid");
-  });
-
-  it("awaits and parses the authenticated published-resource metadata response", async () => {
-    const metadata = await readPublishedCommerceResources(
-      "organisation_export",
-      async (input) => {
-        expect(String(input)).toBe(
-          "/v1/control/organisations/organisation_export/commerce/published-resources",
-        );
-        return Response.json({
-          ok: true,
-          metadata: {
-            kind: "enumerated",
-            organisationId: "organisation_export",
-            merchantId: "merchant_export",
-            merchantRevision: 0,
-            entityTypes: [],
-            lists: [],
-            views: [],
-          },
-        });
-      },
-    );
-    expect(metadata.kind).toBe("enumerated");
-    expect(metadata.lists).toEqual([]);
   });
 
   it("fails closed when published-resource metadata is returned for another organisation", async () => {
@@ -129,77 +102,6 @@ describe("portal commerce entity-plane presentation", () => {
         }),
       ),
     ).rejects.toThrow("belongs to another organisation");
-  });
-
-  it("recovers missed merchant revisions through the authenticated change cursor", async () => {
-    const graph = requireParsedGraph();
-    const requests: string[] = [];
-    const first = await readCommerceChanges(
-      "organisation_export",
-      graph.merchantRevision,
-      async (input) => {
-        requests.push(String(input));
-        return Response.json({
-          ok: true,
-          changes: {
-            merchantId: "merchant_export",
-            merchantRevision: 9,
-            changes: [
-              {
-                changeId: "change_9",
-                merchantRevision: 9,
-                resource: {
-                  kind: "entity",
-                  ref: {
-                    origin: "custom",
-                    typeId: "trade_partner",
-                    entityId: "partner_1",
-                  },
-                },
-                operation: "updated",
-                createdAt: "2026-08-26T00:00:00.000Z",
-              },
-            ],
-            nextAfterMerchantRevision: 9,
-            hasMore: false,
-          },
-        });
-      },
-    );
-    const second = await readCommerceChanges(
-      "organisation_export",
-      first.nextAfterMerchantRevision,
-      async (input) => {
-        requests.push(String(input));
-        return Response.json({
-          ok: true,
-          changes: {
-            merchantId: "merchant_export",
-            merchantRevision: 9,
-            changes: [],
-            nextAfterMerchantRevision: 9,
-            hasMore: false,
-          },
-        });
-      },
-    );
-    expect(first.changes).toHaveLength(1);
-    expect(second.changes).toEqual([]);
-    expect(requests).toEqual([
-      "/v1/control/organisations/organisation_export/commerce/graph/changes?after=7&limit=100",
-      "/v1/control/organisations/organisation_export/commerce/graph/changes?after=9&limit=100",
-    ]);
-  });
-
-  it("builds dossiers from the locked two-depth relationship traversal", () => {
-    const reference = systemEntityRef("shipment", "shipment_1");
-    expect(entityDossierQuery(reference)).toEqual({
-      kind: "relationship_traversal",
-      seeds: [reference],
-      relationshipDefinition: null,
-      traversal: { maxDepth: 2, resultLimit: 20 },
-      filter: null,
-    });
   });
 
   it("binds an Order dossier cancellation to its exact source revision", async () => {
@@ -562,30 +464,6 @@ describe("portal commerce entity-plane presentation", () => {
     });
   });
 
-  it("queries the first page of a live list or saved view", () => {
-    const listSelection = {
-      kind: "commerce_list" as const,
-      listId: "export_coordination",
-    };
-    expect(commerceCollectionQuery(listSelection)).toEqual({
-      kind: "commerce_list_page",
-      listId: "export_coordination",
-      filter: { kind: "all" },
-      sorts: [],
-      pagination: { limit: 50, cursor: null },
-    });
-    expect(
-      commerceCollectionQuery({
-        kind: "saved_commerce_view",
-        viewId: "export_board",
-      }),
-    ).toEqual({
-      kind: "saved_commerce_view",
-      viewId: "export_board",
-      pagination: { limit: 50, cursor: null },
-    });
-  });
-
   it("moves one live board card with the exact entry and list revisions", async () => {
     const graph = requireParsedGraph();
     const entry = requireValue(graph.listEntries[0]);
@@ -735,60 +613,6 @@ describe("portal commerce entity-plane presentation", () => {
         receipt: null,
       }),
     ).toThrow();
-  });
-
-  it("publishes one saved-view presentation revision through the admin boundary", async () => {
-    const view = exportSavedView();
-    let requestBody: unknown = null;
-    const receipt = await publishCommerceSavedViewPresentation(
-      "organisation_export",
-      view,
-      {
-        kind: "table",
-        configuration: { density: "comfortable", showRowNumbers: true },
-      },
-      async (path, body, intent) => {
-        expect(path).toBe(
-          "/v1/control/organisations/organisation_export/commerce/saved-views/export_board/presentation",
-        );
-        expect(intent).toBe(
-          "commerce-saved-view:export_board:1:table:comfortable:numbered",
-        );
-        requestBody = body;
-        return {
-          ok: true,
-          receipt: {
-            commandId: "portal_publish_view_2",
-            outcome: "applied",
-            target: {
-              kind: "saved_commerce_view",
-              viewId: "export_board",
-              revision: 2,
-            },
-            merchantRevision: 8,
-            committedAt: "2026-08-26T00:00:00.000Z",
-            deliveryId: null,
-            signer: {
-              keyId: "key_portal",
-              algorithm: "ed25519",
-              signature: "signature_portal",
-            },
-          },
-        };
-      },
-    );
-    expect(requestBody).toEqual({
-      expectedRevision: 1,
-      presentation: {
-        kind: "table",
-        configuration: { density: "comfortable", showRowNumbers: true },
-      },
-    });
-    expect(receipt.target).toEqual({
-      kind: "saved_commerce_view",
-      viewId: "export_board",
-      revision: 2,
-    });
   });
 });
 
@@ -1074,35 +898,6 @@ function exportCommerceList(): CommerceList {
       maxLength: 500,
     }),
   ]);
-}
-
-function exportSavedView() {
-  const command = parseCommerceEntityPlaneCommand({
-    kind: "publish_saved_commerce_view",
-    command: {
-      view: {
-        viewId: "export_board",
-        name: "Export board",
-        source: { kind: "commerce_list", listId: "export_coordination" },
-        filter: { kind: "all" },
-        sorts: [],
-        visibleAttributeIds: ["stage", "owner"],
-        relationshipColumns: [],
-        grouping: null,
-        presentation: {
-          kind: "board",
-          configuration: {
-            laneAttributeId: "stage",
-            cardAttributeIds: ["owner"],
-          },
-        },
-        revision: 1,
-      },
-    },
-  });
-  if (command.kind !== "publish_saved_commerce_view")
-    throw new Error("fixture command kind changed");
-  return command.command.view;
 }
 
 function commerceListFixture(

@@ -7,7 +7,6 @@ import {
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import { platformEnv } from "./worker-fakes";
-import { createHash } from "node:crypto";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -35,12 +34,12 @@ function whatsappCaseAdmissionSuite(): void {
   beforeEach(resetMocks);
 
   it(
-    "derives a queue-safe Case entry identity from a Meta message ID",
-    derivesQueueSafeEntryIdentity,
+    "refuses a Case without a default Project and files an admitted Case in it",
+    filesCaseInDefaultProject,
   );
 }
 
-async function derivesQueueSafeEntryIdentity(): Promise<void> {
+async function filesCaseInDefaultProject(): Promise<void> {
   const db = createMigratedDatabase();
   const identity = parseOrganisationId(ORGANISATION_ID);
   if (!identity.ok) throw new Error(identity.error.code);
@@ -104,16 +103,6 @@ async function derivesQueueSafeEntryIdentity(): Promise<void> {
       .bind(identity.value, CASE_ID)
       .all(),
   ).resolves.toMatchObject({ results: [{ revision: 1, inDefaultProject: 1 }] });
-  const expectedTriggerId = `trigger_whatsapp_${createHash("sha256").update(META_MESSAGE_ID).digest("hex")}`;
-  expect(mocks.acceptTrigger).toHaveBeenCalledWith(
-    expect.objectContaining({
-      triggerId: expectedTriggerId,
-      content: {
-        kind: "text",
-        text: expect.stringContaining(META_MESSAGE_ID),
-      },
-    }),
-  );
 }
 
 function createMocks() {

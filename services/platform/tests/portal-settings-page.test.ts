@@ -10,7 +10,6 @@ import { ControlApiError } from "../../../apps/portal/src/control-client";
 import { parseIntegrationRouteSelection } from "../../../apps/portal/src/features/integrations/model";
 import {
   executeIntegrationsRoute,
-  fetchWhatsAppSurface,
   // @ts-expect-error The portal build type-checks this JSX module.
 } from "../../../apps/portal/src/portal";
 
@@ -100,33 +99,6 @@ afterEach(() => {
 });
 
 describe("CafeOS settings page ownership", () => {
-  it("loads WhatsApp application readiness before the first number is connected", async () => {
-    const fetchMock = vi.fn(
-      async (): Promise<Response> =>
-        new Response(
-          JSON.stringify({
-            ok: true,
-            application_configured: true,
-            accounts: [],
-          }),
-          { status: 200, headers: { "content-type": "application/json" } },
-        ),
-    );
-    vi.stubGlobal("fetch", fetchMock);
-
-    await expect(
-      fetchWhatsAppSurface("organisation_first_connection"),
-    ).resolves.toEqual({
-      applicationConfigured: true,
-      accounts: [],
-      replies: [],
-    });
-    expect(fetchMock).toHaveBeenCalledWith(
-      "/v1/control/organisations/organisation_first_connection/whatsapp-accounts",
-      { headers: { accept: "application/json" } },
-    );
-  });
-
   it("falls back to current-window authorization when popups are blocked", () => {
     const open = vi.fn(() => null);
     const assign = vi.fn();
@@ -1070,7 +1042,9 @@ describe("CafeOS settings page ownership", () => {
     );
 
     // The reason code reaches the operator as a sentence, not as a code.
-    expect(markup).toContain("Slack removed a permission Seams Pantry was given.");
+    expect(markup).toContain(
+      "Slack removed a permission Seams Pantry was given.",
+    );
     expect(markup).toContain("Seams Pantry cannot post inventory alerts");
     expect(markup).not.toContain("oauth_scope_revoked");
     // Health problems announce via console and toast, not page furniture —

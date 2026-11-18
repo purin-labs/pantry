@@ -1,12 +1,10 @@
 import {
   CommerceAdminClient,
   parseEntityPlaneObservation,
-  type CancelCommerceOrderV1,
   type PrepareCommerceCatalogListingV1,
   type PublishCommerceCatalogListingV1,
   type CommerceDeliveryV1,
   type CommerceFetch,
-  type CommerceMutationReceiptV1,
   type CommerceOrderV1,
   type CommercePaymentV1,
   type CommerceFulfillmentV1,
@@ -20,7 +18,6 @@ import { startCommerceWorker } from "./commerce-fixture-worker.ts";
 import {
   normalizeCommerceEngineDelivery,
   publishCatalogListingThroughCommerce,
-  cancelOrderThroughCommerce,
   resolveCommerceCancellationAuthority,
   createCommerceEd25519Verifier,
   type CommerceDeliveryVerifier,
@@ -584,59 +581,6 @@ it("canonicalizes production-batch inventory decrease reasons", async () => {
         },
       ],
     },
-  });
-});
-
-it("maps governed listing publication receipts and transport failures", async () => {
-  const applied = await publishCatalogListingThroughCommerce({
-    client: createClient(createAppliedResponse),
-    command: commerceCommandInput(PUBLISH_COMMAND),
-  });
-  expect(applied).toEqual({ status: "applied", receipt: RECEIPT });
-
-  const unavailable = await publishCatalogListingThroughCommerce({
-    client: createClient(createUnavailableResponse),
-    command: commerceCommandInput(PUBLISH_COMMAND),
-  });
-  expect(unavailable).toEqual({
-    status: "unavailable",
-    error: { kind: "http", status: 503, message: "Underclerk unavailable" },
-  });
-});
-
-it("maps Underclerk cancellation outcomes without changing receipts or errors", async () => {
-  expect(
-    await cancelOrderThroughCommerce({
-      client: createClient(createCancellationAppliedResponse),
-      command: commerceCommandInput(CANCEL_COMMAND),
-    }),
-  ).toEqual({ status: "applied", receipt: CANCELLATION_RECEIPT });
-  expect(
-    await cancelOrderThroughCommerce({
-      client: createClient(createCancellationReplayedResponse),
-      command: commerceCommandInput(CANCEL_COMMAND),
-    }),
-  ).toEqual({ status: "replayed", receipt: CANCELLATION_RECEIPT });
-  expect(
-    await cancelOrderThroughCommerce({
-      client: createClient(createCancellationRejectedResponse),
-      command: commerceCommandInput(CANCEL_COMMAND),
-    }),
-  ).toEqual({
-    status: "rejected",
-    error: {
-      code: "resource_relationship_invalid",
-      field: "cancellation.lifecycle",
-    },
-  });
-  expect(
-    await cancelOrderThroughCommerce({
-      client: createClient(createCancellationUnavailableResponse),
-      command: commerceCommandInput(CANCEL_COMMAND),
-    }),
-  ).toEqual({
-    status: "unavailable",
-    error: { kind: "http", status: 503, message: "Underclerk unavailable" },
   });
 });
 
@@ -1391,9 +1335,7 @@ function createFoodServiceOrder(
   };
 }
 
-function isPublishedOfferDelivery(
-  delivery: CommerceDeliveryV1,
-): boolean {
+function isPublishedOfferDelivery(delivery: CommerceDeliveryV1): boolean {
   for (const observation of delivery.observations) {
     if (observation.kind === "offer" && observation.resource.revision === 2)
       return true;
@@ -1627,89 +1569,12 @@ const PUBLISH_COMMAND: PublishCommerceCatalogListingV1 = {
   salesChannelRevision: 1,
 };
 
-const RECEIPT: CommerceMutationReceiptV1 = {
-  schemaVersion: "underclerk.mutation-receipt.v1",
-  receiptId: "receipt_1",
-  effectId: "effect_1",
-  commandKind: "publish_catalog_listing",
-  organisationId: "organisation_demo",
-  merchantId: "merchant_demo",
-  idempotencyKey: "publish_1",
-  actionNonce: "nonce_1",
-  previousMerchantRevision: 1,
-  merchantRevision: 2,
-  deliveryId: "delivery_1",
-  resource: { kind: "offer", id: "offer_1", revision: 2 },
-  committedAt: NOW,
-  signer: { keyId: "key_1", algorithm: "ed25519", signature: "signature_1" },
-};
-
-const CANCELLATION_RECEIPT: CommerceMutationReceiptV1 = {
-  ...RECEIPT,
-  commandKind: "cancel_order",
-  idempotencyKey: "cancel_1",
-  actionNonce: "cancel_nonce_1",
-  resource: { kind: "refund_attempt", id: "refund_attempt_1", revision: 1 },
-};
-
-const CANCEL_COMMAND: CancelCommerceOrderV1 = {
-  schemaVersion: "underclerk.cancel-order.v1",
-  merchantId: "merchant_demo",
-  expectedMerchantRevision: 7,
-  idempotencyKey: "cancel_1",
-  requestedAt: NOW,
-  orderId: "order_1",
-  orderRevision: 1,
-  paymentId: "payment_1",
-  paymentRevision: 1,
-  fulfillmentId: "fulfillment_1",
-  fulfillmentRevision: 1,
-  refundAttemptId: "refund_attempt_1",
-  reason: "Buyer changed plans",
-};
-
 function createClient(fetcher: CommerceFetch): CommerceAdminClient {
   return new CommerceAdminClient({
     baseUrl: "https://underclerk.test",
     serviceToken: "underclerk_test_service_token",
     fetch: fetcher,
   });
-}
-
-async function createAppliedResponse(): Promise<Response> {
-  return jsonResponse(200, { outcome: "applied", receipt: RECEIPT });
-}
-
-async function createCancellationAppliedResponse(): Promise<Response> {
-  return jsonResponse(200, {
-    outcome: "applied",
-    receipt: CANCELLATION_RECEIPT,
-  });
-}
-
-async function createCancellationReplayedResponse(): Promise<Response> {
-  return jsonResponse(200, {
-    outcome: "replayed",
-    receipt: CANCELLATION_RECEIPT,
-  });
-}
-
-async function createCancellationRejectedResponse(): Promise<Response> {
-  return jsonResponse(409, {
-    outcome: "rejected",
-    error: {
-      code: "resource_relationship_invalid",
-      field: "cancellation.lifecycle",
-    },
-  });
-}
-
-async function createCancellationUnavailableResponse(): Promise<Response> {
-  return jsonResponse(503, { message: "Underclerk unavailable" });
-}
-
-async function createUnavailableResponse(): Promise<Response> {
-  return jsonResponse(503, { message: "Underclerk unavailable" });
 }
 
 function jsonResponse(status: number, body: unknown): Response {

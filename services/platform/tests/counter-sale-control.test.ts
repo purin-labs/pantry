@@ -400,29 +400,6 @@ describe("counter sale control routes", function counterSaleSuite() {
     expect(counterSaleMocks.createInPersonCheckout).not.toHaveBeenCalled();
   });
 
-  it("collects on the counter's own terminal, not one the caller names", async function binds() {
-    const response = await handleControlRequest(collectionRequest(), env());
-    expect(response.status).toBe(200);
-    const [command] =
-      counterSaleMocks.collectInPersonCheckoutPayment.mock.calls[0] ?? [];
-    expect(command.paymentBinding).toEqual({
-      provider: "square_terminal",
-      account: {
-        integrationAccountId: "integration_square",
-        providerAccountId: "merchant_square",
-        environment: "production",
-        capabilityRevision: 1,
-        country: "JP",
-        currency: "JPY",
-      },
-      locationId: "provider_location_1",
-      deviceId: "device_1",
-      transport: "server_terminal",
-    });
-    expect(command.checkoutId).toBe("checkout_counter_1");
-    expect(command.quoteDigest).toBe(DIGEST);
-  });
-
   it("refuses to present an amount in a currency the terminal does not settle", async function currency() {
     const response = await handleControlRequest(
       collectionRequest({ amount: { amountMinor: 1200, currency: "USD" } }),

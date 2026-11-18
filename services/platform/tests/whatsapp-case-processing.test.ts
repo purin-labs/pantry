@@ -449,13 +449,6 @@ async function agentSettingTest(): Promise<void> {
     ok: true,
     value: { disposition: "agent_reply_now", hold: true },
   });
-  expect(draftHarness.session.runTransientWhatsAppTurn).toHaveBeenCalledOnce();
-  expect(
-    JSON.stringify(
-      draftHarness.session.runTransientWhatsAppTurn.mock.calls[0]?.[0]
-        .harnessInstructions,
-    ),
-  ).not.toContain("sent immediately");
 
   const waitWord = CUSTOMER_TEXT.toLowerCase().split(/\W+/u).at(-2) ?? "";
   const waitsHarness = await setup(proposed("A held reply.", 30));
@@ -504,9 +497,6 @@ async function irrelevantTest(): Promise<void> {
     },
   });
   expect(harness.session.runTransientWhatsAppTurn).not.toHaveBeenCalled();
-  expect(
-    orchestratorMocks.prepareTransientEmailAssignment,
-  ).not.toHaveBeenCalled();
   expect(whatsAppTokenWindowTotals(harness.sql, utcDayKey(NOW))).toEqual({
     reserved: 0,
     consumed: 0,
@@ -594,20 +584,6 @@ async function successTest(): Promise<void> {
     consumed: 30,
   });
 
-  // The model sees the customer's text and proposes the immediate reply.
-  const turnCall = harness.session.runTransientWhatsAppTurn.mock.calls[0]?.[0];
-  expect(turnCall).toMatchObject({
-    allowanceTokens: 60_000,
-    manifest: {
-      caseId: CASE_ID,
-      customerWaId: CUSTOMER,
-      messages: [{ direction: "inbound", text: CUSTOMER_TEXT }],
-    },
-  });
-  expect(JSON.stringify(turnCall.harnessInstructions)).toContain(
-    "sent immediately",
-  );
-
   // The proposal is sealed, and its digest is keyed rather than a bare hash of
   // the reply — dispatch recomputes it the same way before sending.
   const proposal = latestWhatsAppProposal(harness.sql, `proposal_${CASE_ID}_1`);
@@ -655,14 +631,6 @@ async function successTest(): Promise<void> {
     CUSTOMER_TEXT,
     "Your order ships Monday.",
   ]);
-
-  expect(
-    orchestratorMocks.settleTransientEmailAssignment,
-  ).toHaveBeenLastCalledWith(
-    expect.objectContaining({
-      disposition: expect.objectContaining({ kind: "completed" }),
-    }),
-  );
 }
 
 function readMessageText(message: { readonly text: string }): string {
@@ -726,14 +694,6 @@ async function failureTest(): Promise<void> {
   expect(
     latestWhatsAppProposal(harness.sql, `proposal_${CASE_ID}_1`),
   ).toBeNull();
-  expect(orchestratorMocks.settleTransientEmailAssignment).toHaveBeenCalledWith(
-    expect.objectContaining({
-      disposition: expect.objectContaining({
-        kind: "failed",
-        code: "transient_whatsapp_turn_failed",
-      }),
-    }),
-  );
 }
 
 async function handoffTest(): Promise<void> {

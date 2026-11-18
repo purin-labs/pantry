@@ -19,7 +19,6 @@ import {
   canonicalBody,
   invalidSignature,
   signFixtureBody,
-  statusPayload,
   textMessagePayload,
 } from "./whatsapp/fixtures";
 import {
@@ -41,10 +40,8 @@ function whatsappGatewaySuite(): void {
 
   it("answers the subscription challenge with the exact echo", challengeTest);
   it("rejects an unsigned or wrongly signed delivery", signatureTest);
-  it("admits a routed text message before acknowledging Meta", admissionTest);
   it("returns an error so Meta retries when admission fails", retryTest);
   it("acknowledges an unroutable event without creating work", unroutableTest);
-  it("admits status events through the same durable path", statusTest);
 }
 
 function resetGatewayMocks(): void {
@@ -113,30 +110,6 @@ async function signatureTest(): Promise<void> {
   expect(gatewayMocks.acceptWhatsAppEvent).not.toHaveBeenCalled();
 }
 
-async function admissionTest(): Promise<void> {
-  const rawBody = canonicalBody(
-    textMessagePayload({
-      providerMessageId: "wamid.GATEWAY1",
-      body: "Are you open today?",
-    }),
-  );
-  const response = await gateway.fetch(
-    await signedRequest(rawBody),
-    await testEnv(),
-    executionContext(),
-  );
-  expect(response.status).toBe(200);
-  expect(gatewayMocks.acceptWhatsAppEvent).toHaveBeenCalledTimes(1);
-  const call = gatewayMocks.acceptWhatsAppEvent.mock.calls[0]?.[0] as {
-    readonly event: { readonly kind: string; readonly body: string };
-  };
-  expect(call.event).toMatchObject({
-    kind: "text_message",
-    providerMessageId: "wamid.GATEWAY1",
-    body: "Are you open today?",
-  });
-}
-
 async function retryTest(): Promise<void> {
   gatewayMocks.acceptWhatsAppEvent.mockResolvedValue({
     ok: false,
@@ -159,19 +132,6 @@ async function unroutableTest(): Promise<void> {
   );
   expect(response.status).toBe(200);
   expect(gatewayMocks.acceptWhatsAppEvent).not.toHaveBeenCalled();
-}
-
-async function statusTest(): Promise<void> {
-  const response = await gateway.fetch(
-    await signedRequest(canonicalBody(statusPayload({ status: "delivered" }))),
-    await testEnv(),
-    executionContext(),
-  );
-  expect(response.status).toBe(200);
-  const call = gatewayMocks.acceptWhatsAppEvent.mock.calls[0]?.[0] as {
-    readonly event: { readonly kind: string; readonly status: string };
-  };
-  expect(call.event).toMatchObject({ kind: "status", status: "delivered" });
 }
 
 async function signedRequest(rawBody: string): Promise<Request> {

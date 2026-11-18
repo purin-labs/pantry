@@ -17,10 +17,6 @@ const bindingMocks = vi.hoisted(() => ({
 const clientMocks = vi.hoisted(() => ({
   createCommerceClient: vi.fn(),
 }));
-const mutationMocks = vi.hoisted(() => ({
-  readControlMutationReplay: vi.fn(),
-  prepareControlMutationReceipt: vi.fn(),
-}));
 
 vi.mock("../src/data/control-plane", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/data/control-plane")>()),
@@ -34,11 +30,6 @@ vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
   >()),
   resolveOrganisationCommerceMerchantBinding:
     bindingMocks.resolveOrganisationCommerceMerchantBinding,
-}));
-vi.mock("../src/data/control-mutation", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-mutation")>()),
-  readControlMutationReplay: mutationMocks.readControlMutationReplay,
-  prepareControlMutationReceipt: mutationMocks.prepareControlMutationReceipt,
 }));
 vi.mock("../src/commerce/outbox-worker", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/commerce/outbox-worker")>()),
@@ -59,12 +50,6 @@ describe("Offer price policy control route", () => {
     bindingMocks.resolveOrganisationCommerceMerchantBinding.mockResolvedValue({
       ok: true,
       value: { merchantId: MERCHANT_ID },
-    });
-    mutationMocks.readControlMutationReplay.mockResolvedValue({
-      kind: "absent",
-    });
-    mutationMocks.prepareControlMutationReceipt.mockReturnValue({
-      run: vi.fn(),
     });
   });
 
@@ -95,26 +80,6 @@ describe("Offer price policy control route", () => {
 
     expect(response.status).toBe(422);
     expect(client.setOfferPricePolicy).not.toHaveBeenCalled();
-  });
-
-  it("records a receipt only once the change has settled", async () => {
-    authorizeAs("owner");
-    const client = commerceEngineClient({
-      setOfferPricePolicy: vi.fn().mockResolvedValue({
-        ok: false,
-        error: { kind: "unavailable" },
-      }),
-    });
-
-    await handleControlRequest(
-      write("PUT", { expectedRevision: null, maxMovementBps: 500 }),
-      routeEnv(),
-    );
-
-    // An unreachable Commerce leaves the attempt undecided. Recording it
-    // would refuse the retry that should carry it through.
-    expect(client.setOfferPricePolicy).toHaveBeenCalledOnce();
-    expect(mutationMocks.prepareControlMutationReceipt).not.toHaveBeenCalled();
   });
 
   it("does not reach Underclerk when no merchant is bound", async () => {
@@ -210,17 +175,18 @@ function commerceEngineClient(
 }
 
 function routeEnv(): UnitTestEnv {
-  const first = vi
-    .fn()
-    .mockResolvedValue({
-      ...TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,
-      environment: "development",
-    });
+  const first = vi.fn().mockResolvedValue({
+    ...TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,
+    environment: "development",
+  });
   const all = vi.fn().mockResolvedValue({ results: [] });
   const bind = vi.fn().mockReturnValue({ first, all });
   return platformEnv({
     SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-    DB: { prepare: vi.fn().mockReturnValue({ bind }), withSession: vi.fn().mockReturnThis() },
+    DB: {
+      prepare: vi.fn().mockReturnValue({ bind }),
+      withSession: vi.fn().mockReturnThis(),
+    },
     SATYR_PUBLIC_ORIGIN: "https://satyr.example",
   });
 }

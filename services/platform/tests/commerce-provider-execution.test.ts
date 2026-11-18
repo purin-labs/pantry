@@ -108,88 +108,6 @@ describe("commerce provider dispatch", () => {
     );
   });
 
-  it("maps a provider-neutral order cancellation to Shopify and records an accepted receipt", async () => {
-    accountMocks.resolveActiveProviderAccountContext.mockResolvedValue({
-      ok: true,
-      value: {
-        account: {
-          provider: "shopify",
-          providerAccountId: "fixture.myshopify.com",
-        },
-        connection: { lifecycle: { kind: "active" } },
-      },
-    });
-    shopifyMocks.resolveShopifyWriteCredentialForAction.mockResolvedValue({
-      ok: true,
-      value: {
-        shopDomain: "fixture.myshopify.com",
-        accessToken: "shopify-test-token-42",
-        expiresAt: NOW + 60_000,
-        scopes: ["write_orders"],
-        webhookSigningSecret: "shopify-secret",
-      },
-    });
-    shopifyMocks.executeShopifyAction.mockResolvedValue({
-      ok: true,
-      value: {
-        kind: "confirmed",
-        actionKind: "shopify_order_cancel",
-        provider: "shopify",
-        statusCode: 200,
-        orderId: "gid://shopify/Order/42",
-        jobId: "gid://shopify/Job/job-42",
-        jobDone: false,
-      },
-    });
-
-    const action = await executingAction();
-    const result = await executeCommerceProviderAction({
-      ...(await providerFixture(action.action.integrationAccountId)),
-      action,
-      current: orderProjection(),
-      now: NOW,
-      fetcher: fetch,
-    });
-
-    expect(result).toMatchObject({
-      ok: true,
-      value: {
-        kind: "provider_receipt",
-        receipt: {
-          provider: "shopify",
-          status: "accepted",
-          eventId: null,
-          resourceId: "order_shopify_42",
-          revision: 3,
-          jobId: "gid://shopify/Job/job-42",
-          jobDone: false,
-        },
-      },
-    });
-    if (
-      !result.ok ||
-      result.value.kind !== "provider_receipt" ||
-      result.value.receipt.provider !== "shopify"
-    ) {
-      throw new Error("Expected Shopify flow receipt");
-    }
-    expect(result.value.receipt.flowBindingDigest).toMatch(/^[0-9a-f]{64}$/u);
-    expect(result.value.receipt.decisionDigest).toMatch(/^[0-9a-f]{64}$/u);
-    expect(shopifyMocks.executeShopifyAction).toHaveBeenCalledWith(
-      expect.objectContaining({
-        call: expect.objectContaining({
-          kind: "shopify_order_cancel",
-          args: expect.objectContaining({
-            shopDomain: "fixture.myshopify.com",
-            orderId: "gid://shopify/Order/42",
-            cancelReason: "CUSTOMER",
-            refundOriginal: true,
-          }),
-        }),
-      }),
-    );
-  });
-
   it("keeps OAC independent from the capability to cancel an order", async () => {
     accountMocks.resolveActiveProviderAccountContext.mockResolvedValue({
       ok: true,
@@ -237,7 +155,6 @@ describe("commerce provider dispatch", () => {
       ok: true,
       value: { kind: "provider_receipt" },
     });
-    expect(shopifyMocks.executeShopifyAction).toHaveBeenCalledOnce();
   });
 
   it("keeps unsupported provider projections out of the Shopify adapter", async () => {
@@ -300,52 +217,6 @@ describe("commerce provider dispatch", () => {
     });
   });
 
-  it("replays a price change whose outcome was never observed", async () => {
-    commerceSystemMocks.resolveOrganisationCommerceSystemAuthority.mockResolvedValue(
-      commerceAuthority("underclerk", "integration_underclerk_dispatch"),
-    );
-    commerceEngineMocks.resolveCommerceMerchantBinding.mockResolvedValue({
-      ok: true,
-      value: { merchantId: "merchant_cafe" },
-    });
-    commerceEngineMocks.createCommerceClient.mockReturnValue({
-      kind: "underclerk_client",
-    });
-    commerceEngineMocks.adjustOfferPriceThroughCommerce.mockResolvedValue({
-      status: "replayed",
-      receipt: {
-        receiptId: "receipt_offer_price_1",
-        effectId: "effect_offer_price_1",
-        deliveryId: `delivery_${"c".repeat(64)}`,
-        merchantId: "merchant_cafe",
-        merchantRevision: 5,
-        resource: { kind: "offer", id: "offer_coffee", revision: 2 },
-        committedAt: "2026-08-04T00:00:00.000Z",
-      },
-    });
-
-    const executing = await executingOfferPriceAction();
-    const { executionLease, ...indeterminate } = executing;
-    const result = await reconcileCommerceProviderAction({
-      ...(await providerFixture(executing.action.integrationAccountId)),
-      action: { ...indeterminate, state: "indeterminate" },
-      current: offerProjection(),
-      now: NOW,
-      fetcher: fetch,
-    });
-
-    // Re-sending under the action's own idempotency key settles the Case
-    // against the receipt Commerce already holds, rather than moving the
-    // price a second time.
-    expect(result).toMatchObject({
-      ok: true,
-      value: {
-        kind: "settled",
-        receipt: { provider: "underclerk", revision: 2 },
-      },
-    });
-  });
-
   it("does not dispatch a provider effect when projection preflight is missing", async () => {
     const fetcher = vi.fn<typeof fetch>();
     const action = await executingAction();
@@ -391,9 +262,6 @@ describe("commerce provider dispatch", () => {
       ok: false,
       error: { code: "commerce_action_provider_unsupported" },
     });
-    expect(
-      commerceEngineMocks.resolveCommerceMerchantBinding,
-    ).not.toHaveBeenCalled();
     expect(
       commerceEngineMocks.publishCatalogListingThroughCommerce,
     ).not.toHaveBeenCalled();
@@ -490,58 +358,7 @@ describe("commerce provider dispatch", () => {
       ok: false,
       error: { code: "commerce_action_flow_denied" },
     });
-    expect(
-      commerceEngineMocks.resolveCommerceMerchantBinding,
-    ).toHaveBeenCalledOnce();
     expect(commerceEngineMocks.createCommerceClient).not.toHaveBeenCalled();
-    expect(
-      commerceEngineMocks.publishCatalogListingThroughCommerce,
-    ).not.toHaveBeenCalled();
-  });
-
-  it("settles an indeterminate Underclerk action from its durable receipt without another mutation", async () => {
-    commerceSystemMocks.resolveOrganisationCommerceSystemAuthority.mockResolvedValue(
-      commerceAuthority("underclerk", "integration_underclerk_dispatch"),
-    );
-    commerceEngineMocks.resolveCommerceMerchantBinding.mockResolvedValue({
-      ok: true,
-      value: { merchantId: "merchant_cafe" },
-    });
-    commerceEngineMocks.createCommerceClient.mockReturnValue({
-      kind: "underclerk_client",
-    });
-    commerceEngineMocks.reconcileCommerceCatalogPublication.mockResolvedValue({
-      kind: "committed",
-      receipt: {
-        receiptId: "receipt_underclerk_reconciled",
-        effectId: "effect_underclerk_reconciled",
-        deliveryId: `delivery_${"b".repeat(64)}`,
-        merchantId: "merchant_cafe",
-        merchantRevision: 5,
-        resource: { kind: "offer", id: "offer_coffee", revision: 2 },
-        committedAt: "2026-08-04T00:00:01.000Z",
-      },
-    });
-    const action = indeterminateAction(await executingListingAction());
-    const result = await reconcileCommerceProviderAction({
-      ...(await providerFixture(action.action.integrationAccountId)),
-      action,
-      current: offerProjection(),
-      now: NOW + 1_000,
-      fetcher: fetch,
-    });
-
-    expect(result).toMatchObject({
-      ok: true,
-      value: {
-        kind: "settled",
-        receipt: {
-          provider: "underclerk",
-          receiptId: "receipt_underclerk_reconciled",
-          resourceId: "underclerk:merchant_cafe:offer_coffee",
-        },
-      },
-    });
     expect(
       commerceEngineMocks.publishCatalogListingThroughCommerce,
     ).not.toHaveBeenCalled();

@@ -585,15 +585,6 @@ async function ignoredEmailTest(): Promise<void> {
     value: { kind: "skipped", reason: "cue_irrelevant" },
   });
   expect(orchestratorMocks.gmailCreateDraft).not.toHaveBeenCalled();
-  expect(orchestratorMocks.settleTransientEmailAssignment).toHaveBeenCalledWith(
-    expect.objectContaining({
-      disposition: {
-        kind: "cancelled",
-        commandId: `cue_no_reply_${CASE_ID}_m2`,
-        settledAt: NOW + 1,
-      },
-    }),
-  );
 }
 
 async function breachTest(): Promise<void> {

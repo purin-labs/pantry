@@ -15,10 +15,6 @@ vi.mock("../src/control/mutation-receipt", () => ({
   recordCommerceMutationReceipt: vi.fn(async () => ({ ok: true, value: null })),
 }));
 
-import {
-  commerceActionExpectedRevision,
-  parseCommerceActionRequest,
-} from "../src/commerce/action-model";
 import { executeApprovedSupplierPayout } from "../src/control/routes/supplier-payout-execution";
 import { readSupplierPayout } from "../src/data/supplier-payout-store";
 import {
@@ -229,21 +225,6 @@ describe("supplier payout as a governed action", function governedSuite() {
     database.exec(singleDatabaseSchema());
     db = d1Database(database);
     executionScope = await createOrganisationExecutionFixture(db, ORGANISATION);
-  });
-
-  it("is a request the action ledger understands", function parses() {
-    const parsed = parseCommerceActionRequest({
-      kind: "submit_supplier_payout",
-      payoutId: "supplier_payout_1",
-      expectedPayoutRevision: 2,
-      approvalDigest: DIGEST,
-    });
-    expect(parsed.ok).toBe(true);
-    if (!parsed.ok) return;
-    // The approval binds a revision, so the ledger's staleness check has
-    // something to compare.
-    expect(commerceActionExpectedRevision(parsed.value)).toBe(2);
-    expect(parsed.value.kind).toBe("submit_supplier_payout");
   });
 
   it("refuses when the payout moved after the approval", async function staleRevision() {

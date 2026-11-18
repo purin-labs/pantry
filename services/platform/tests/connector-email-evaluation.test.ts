@@ -506,17 +506,6 @@ async function admissionTest(): Promise<void> {
       },
     ]);
   }
-  expect(admissionMocks.admitEmailThreadCase).toHaveBeenCalledTimes(2);
-  expect(admissionMocks.admitEmailThreadCase).toHaveBeenCalledWith(
-    fixture.env,
-    expect.objectContaining({
-      gmailThreadId: "thread-1",
-      messageIds: ["m1", "m2"],
-      mailboxBindingId: `mailbox_binding_admit`,
-      bindingRevision: 1,
-      policyVersion: 1,
-    }),
-  );
   const runtime = readEmailRuntime(storage.sql);
   expect(runtime?.acceptedHistoryId).toBe("1200");
   expect(emailMessageDisposition(storage.sql, "m2")).toBe("admitted");

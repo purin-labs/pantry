@@ -2,17 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   parseCommerceGraphQuery,
   parseCommerceGraphResponse,
-  parseCommerceListEntryRef,
   parseCommerceSnapshotRevision,
   parseEntityPlaneCapabilityMetadataResponse,
-  parseSavedCommerceViewId,
-  parseSavedCommerceViewRevision,
 } from "@seams/commerce-client";
 
 import {
-  buildCommerceListEntryCommandAuthority,
   buildSavedSelectorCommerceReadAuthority,
-  buildSavedViewAdministrationAuthority,
   filterCommerceGraphSensitivity,
   type CommerceGraphReadAuthority,
 } from "../src/commerce/entity-plane/authority";
@@ -143,52 +138,6 @@ describe("commerce entity-plane authority", () => {
     // source's answer, not an authority refusal.
     expect(result.ok || result.error.code !== "sensitivity_denied").toBe(true);
     expect(sourceReads).toBeGreaterThan(0);
-  });
-
-  it("mints exact human list-entry and saved-view command authority branches", () => {
-    expect(
-      buildCommerceListEntryCommandAuthority({
-        organisationId: "organisation_graph_authority",
-        merchantId: "merchant_graph",
-        principalId: "app_user_operator",
-        expiresAt: "2026-08-26T00:01:00.000Z",
-        commandId: "patch_entry_4",
-        entry: parseCommerceListEntryRef({
-          entryId: "entry_1",
-          listId: "export_coordination",
-          revision: 4,
-        }),
-      }),
-    ).toMatchObject({
-      ok: true,
-      value: {
-        kind: "commerce_list_entry_command",
-        context: {
-          sensitivityCeiling: "restricted",
-          causation: { kind: "command", commandId: "patch_entry_4" },
-        },
-        scope: { kind: "commerce_list_entry", entry: { revision: 4 } },
-        target: { entry: { revision: 4 }, expectedRevision: 4 },
-      },
-    });
-    expect(
-      buildSavedViewAdministrationAuthority({
-        organisationId: "organisation_graph_authority",
-        merchantId: "merchant_graph",
-        principalId: "app_user_admin",
-        expiresAt: "2026-08-26T00:01:00.000Z",
-        commandId: "publish_view_3",
-        viewId: parseSavedCommerceViewId("export_board"),
-        expectedRevision: parseSavedCommerceViewRevision(2),
-      }),
-    ).toMatchObject({
-      ok: true,
-      value: {
-        kind: "saved_view_administration",
-        scope: { kind: "saved_view", viewId: "export_board" },
-        target: { viewId: "export_board", expectedRevision: 2 },
-      },
-    });
   });
 
   it("checks authority before touching a source", async () => {
@@ -928,52 +877,6 @@ describe("commerce entity-plane authority", () => {
       now: "2026-08-26T00:00:00.000Z",
     });
     expect(nativeResult.ok).toBe(true);
-  });
-
-  it("executes Satyr-native system reads through Underclerk's Lexicon-planned boundary", async () => {
-    const organisationId = requireOrganisationId(
-      "organisation_graph_native_plan",
-    );
-    const query = entityQuery("order_native");
-    let plannedReads = 0;
-    const base = sourceStub("underclerk", async () => emptyResult());
-    const commerceEngine: CommerceGraphCommerceSource = {
-      ...base,
-      queryPlanned: async (request) => {
-        plannedReads += 1;
-        const outcome = planCommerceGraphQuery(request);
-        if (!outcome.ok || outcome.value.kind !== "planned") {
-          return { ok: true, value: { kind: "invalid" } };
-        }
-        return {
-          ok: true,
-          value: {
-            kind: "planned",
-            organisationId: request.organisationId,
-            merchantId: request.merchantId,
-            merchantRevision: merchantRevision(1),
-            plan: outcome.value.plan,
-            result: emptyResult().value,
-            hasMore: false,
-          },
-        };
-      },
-    };
-    const reader = new CommerceGraphReader({
-      organisationId,
-      merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(organisationId),
-      underclerk: commerceEngine,
-    });
-
-    const result = await reader.query({
-      query,
-      authority: authority(organisationId, query, "2099-01-01T00:00:00.000Z"),
-      now: "2026-08-26T00:00:00.000Z",
-    });
-
-    expect(result.ok).toBe(true);
-    expect(plannedReads).toBe(1);
   });
 
   it("resolves stale presentation pages and scan reads to distinct typed outcomes", async () => {

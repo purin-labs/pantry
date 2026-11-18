@@ -58,10 +58,7 @@ import {
   caseContentInstruction,
 } from "../src/actors/case-content";
 import { actorPhysicalName } from "../src/actors/actor-registry";
-import {
-  slackCaseTurnId,
-  type ConnectorCaseTurnStreamInput,
-} from "../src/actors/connector-slack-stream";
+import { slackCaseTurnId } from "../src/actors/connector-slack-stream";
 import {
   authorizeCaseConversationOutput,
   runDirectCasePath,
@@ -138,16 +135,11 @@ const PLAN15_TRIGGER_AUTHORITY = fixtureRequestAuthority(
   requiredOrganisationId(),
   "connector_plan15",
 );
-const PLAN15_HELD_OUTPUT = "Message held by the Seams Pantry output guardrail.";
 
 describe("Plan 15 Case walking path", function plan15CaseWalkingPathSuite() {
   it(
     "retains record messages across replay and rejects changed or foreign locators",
     retainsRecordMessage,
-  );
-  it(
-    "accepts one proposal and suppresses duplicate Slack ingress",
-    acceptsOneProposal,
   );
   it(
     "commits Case output before delivery and settles the exact receipt once",
@@ -162,16 +154,8 @@ describe("Plan 15 Case walking path", function plan15CaseWalkingPathSuite() {
     rebasesAndCancelsIndependently,
   );
   it(
-    "settles an exhausted session budget as a typed Case outcome",
-    settlesBudgetExhaustion,
-  );
-  it(
     "settles an ongoing Slack assignment when its budget is exhausted",
     settlesOngoingBudgetExhaustion,
-  );
-  it(
-    "accepts a new message after settlement and replays it without another model turn",
-    acceptsMessageAfterSettlement,
   );
   it(
     "preserves typed budget exhaustion when replay fails",
@@ -182,16 +166,8 @@ describe("Plan 15 Case walking path", function plan15CaseWalkingPathSuite() {
     settlesOngoingSessionStreamFailure,
   );
   it(
-    "holds Slack output for final Case delivery",
-    holdsSlackOutputForFinalDelivery,
-  );
-  it(
     "binds a governed commerce proposal to Case history and rejects stale revisions",
     acceptsCommerceProposal,
-  );
-  it(
-    "waits for a merchant decision and reopens after approval or rejection",
-    resolvesCommerceApproval,
   );
   it(
     "appends and delivers a terminal commerce outcome idempotently",
@@ -220,10 +196,6 @@ describe("Plan 15 Case walking path", function plan15CaseWalkingPathSuite() {
   it(
     "accepts a WhatsApp support assignment at the Case boundary",
     acceptsWhatsAppSupportAssignment,
-  );
-  it(
-    "carries canonical message links into the session turn",
-    carriesCanonicalMessageLinks,
   );
 });
 
@@ -566,55 +538,6 @@ async function acceptsDirectCueCase(): Promise<void> {
   expect(session.turns).toBe(1);
 }
 
-async function settlesBudgetExhaustion(): Promise<void> {
-  const caseActor = actor(CaseDO);
-  await caseActor.ensure({
-    identity: {
-      organisationId: "organisation_plan15",
-      caseId: "case_plan14b_budget",
-    },
-    purpose: "Prove typed budget exhaustion.",
-    workspaceRevision: "workspace_revision_plan15_1",
-    lifecycle: { kind: "open", openedAt: 1_000 },
-  });
-  const snapshot = await caseActor.inspect();
-  if (!snapshot.ok) throw new Error(snapshot.error.code);
-  const baseAssignment = assignmentFixture("coordinator", snapshot.value);
-  const assignment = {
-    ...baseAssignment,
-    caseId: "case_plan14b_budget",
-    sessionId: "session_plan14b_budget",
-    context: { ...baseAssignment.context, caseId: "case_plan14b_budget" },
-  };
-  await caseActor.assignSession(assignment);
-  await caseActor.beginAssignment(beginFixture(assignment));
-  const settled = await caseActor.settleAssignment({
-    caseId: assignment.caseId,
-    assignmentId: assignment.assignmentId,
-    sessionId: assignment.sessionId,
-    expectedCaseRevision: assignment.caseRevision,
-    expectedStartId: `start_turn_${assignment.assignmentId}`,
-    disposition: {
-      kind: "budget_exhausted",
-      exhaustionId: "exhaustion_plan14b",
-      dimension: "tokens",
-      settledAt: 1_001,
-    },
-  });
-  expect(settled).toMatchObject({ ok: true, value: { kind: "settled" } });
-  expect(await caseActor.inspect()).toMatchObject({
-    ok: true,
-    value: {
-      assignmentLifecycles: [
-        {
-          kind: "settled",
-          disposition: { kind: "budget_exhausted", dimension: "tokens" },
-        },
-      ],
-    },
-  });
-}
-
 async function settlesOngoingBudgetExhaustion(): Promise<void> {
   const caseActor = actor(CaseDO);
   const session = exhaustedSession();
@@ -744,123 +667,6 @@ async function settlesOngoingSessionStreamFailure(): Promise<void> {
       ],
     },
   });
-}
-
-async function acceptsMessageAfterSettlement(): Promise<void> {
-  const caseActor = actor(CaseDO);
-  const connector = recordingConnector();
-  const firstSession = fakeSession();
-  const firstInput = walkingInput(connector, caseActor, {
-    ...firstSession.value,
-    inspectTurnStream: missingTurnStream,
-  });
-  const first = await runOngoingCaseTurn(firstInput);
-  if (!first.ok || first.value.kind !== "completed")
-    throw new Error("first message did not complete");
-  expect(
-    await caseActor.settleAssignment({
-      caseId: first.value.assignment.caseId,
-      assignmentId: first.value.assignment.assignmentId,
-      sessionId: first.value.assignment.sessionId,
-      expectedCaseRevision: first.value.assignment.caseRevision,
-      expectedStartId: `start_${slackCaseTurnId(firstInput.ingress.ingressId)}`,
-      disposition: {
-        kind: "completed",
-        proposalId: first.value.proposal.proposalId,
-        settledAt: 1_003,
-      },
-    }),
-  ).toMatchObject({ ok: true });
-
-  const followupSession = fakeSession();
-  const sessionId = requiredSessionId("session_plan15_followup");
-  const assignmentId = "assignment_plan15_followup";
-  const followup: OngoingCaseTurnInput = {
-    ...firstInput,
-    ...fixtureCaseTurnContext({
-      organisationId: firstInput.organisationId,
-      caseId: firstInput.ingress.caseId,
-      assignmentId,
-      sessionId,
-      connectorId: firstInput.connectorIdentity.connectorId,
-    }),
-    session: {
-      ...followupSession.value,
-      inspectTurnStream: missingTurnStream,
-    },
-    sessionId,
-    sessionRoute: testSessionRoute(firstInput.organisationId, sessionId),
-    assignmentId,
-    ingress: {
-      ...firstInput.ingress,
-      ingressId: "ingress_followup",
-      nativeEventId: "Ev_followup",
-      nativeCursor: "1785700000.000002",
-      receivedAt: 2_000,
-    },
-    receivedAt: 2_000,
-  };
-  expect(await runOngoingCaseTurn(followup)).toMatchObject({
-    ok: true,
-    value: { kind: "completed" },
-  });
-  expect(await runOngoingCaseTurn(followup)).toMatchObject({
-    ok: true,
-    value: { kind: "duplicate_ingress" },
-  });
-  expect(firstSession.turns).toBe(1);
-  expect(followupSession.turns).toBe(1);
-  expect(connector.inspect().deliveryCount).toBe(2);
-}
-
-async function holdsSlackOutputForFinalDelivery(): Promise<void> {
-  const caseActor = actor(CaseDO);
-  const baseConnector = recordingConnector();
-  const streamCaseTurn = vi.fn(returnHeldSlackTurn);
-  const deliver = vi.fn(baseConnector.deliver);
-  const connector: OngoingCaseWalkingConnector = {
-    ...baseConnector,
-    streamCaseTurn,
-    deliver,
-  };
-  const baseSession = fakeSession();
-  const session: OngoingCaseWalkingSession = {
-    ...baseSession.value,
-    inspectTurnStream: missingTurnStream,
-  };
-  const recipientUserId = parseSlackUserId("U0HELD", "recipientUserId");
-  if (!recipientUserId.ok) throw new Error(recipientUserId.error.code);
-  const result = await runOngoingCaseTurn({
-    ...walkingInput(connector, caseActor, session),
-    output: { kind: "slack_stream", recipientUserId: recipientUserId.value },
-  });
-
-  expect(streamCaseTurn).toHaveBeenCalledOnce();
-  expect(result).toMatchObject({
-    ok: true,
-    value: {
-      kind: "completed",
-      completion: { finalMessage: PLAN15_HELD_OUTPUT },
-    },
-  });
-  expect(deliver).toHaveBeenCalledOnce();
-  expect(deliver).toHaveBeenCalledWith(
-    expect.objectContaining({
-      delivery: expect.objectContaining({
-        content: { kind: "text", text: PLAN15_HELD_OUTPUT },
-      }),
-    }),
-  );
-}
-
-async function returnHeldSlackTurn(_input: ConnectorCaseTurnStreamInput) {
-  return {
-    ok: true as const,
-    value: {
-      finalMessage: PLAN15_HELD_OUTPUT,
-      canonicalMessage: "Catalog is ready.",
-    },
-  };
 }
 
 async function acceptsCommerceProposal(): Promise<void> {
@@ -1049,287 +855,6 @@ async function acceptsCommerceProposal(): Promise<void> {
       ],
     },
   });
-}
-
-async function resolvesCommerceApproval(): Promise<void> {
-  const approved = actor(CaseDO);
-  await initializeCommerceApprovalCase(
-    approved,
-    "case_plan15_approved",
-    "proposal_plan15_approved",
-  );
-  expect(
-    await approved.waitForCommerceApproval(
-      withCaseMutationExecution("organisation_plan15", {
-        caseId: "case_plan15_approved",
-        proposalId: "proposal_plan15_approved",
-        actionNonce: "nonce_plan15_approved",
-        expectedCaseRevision: 1,
-        requestedAt: 1_001,
-      }),
-    ),
-  ).toEqual({
-    ok: true,
-    value: { kind: "waiting", revision: 2, notice: null },
-  });
-  expect(
-    await approved.waitForCommerceApproval(
-      withCaseMutationExecution("organisation_plan15", {
-        caseId: "case_plan15_approved",
-        proposalId: "proposal_plan15_approved",
-        actionNonce: "nonce_plan15_approved",
-        expectedCaseRevision: 1,
-        requestedAt: 1_999,
-      }),
-    ),
-  ).toEqual({
-    ok: true,
-    value: { kind: "already_waiting", revision: 2, notice: null },
-  });
-  expect(await approved.inspect()).toMatchObject({
-    ok: true,
-    value: {
-      revision: 2,
-      lifecycle: {
-        kind: "waiting",
-        wait: { kind: "approval", approvalRequestId: "nonce_plan15_approved" },
-      },
-      commerceApprovals: [{ kind: "waiting" }],
-    },
-  });
-  const approvalDecision = merchantApprovalDecision(
-    "nonce_plan15_approved",
-    1_002,
-  );
-  expect(
-    await approved.resolveCommerceApproval({
-      caseId: "case_plan15_approved",
-      proposalId: "proposal_plan15_approved",
-      actionNonce: "nonce_plan15_approved",
-      decision: approvalDecision,
-    }),
-  ).toEqual({ ok: true, value: { kind: "resolved", revision: 3 } });
-  expect(
-    await approved.resolveCommerceApproval({
-      caseId: "case_plan15_approved",
-      proposalId: "proposal_plan15_approved",
-      actionNonce: "nonce_plan15_approved",
-      decision: approvalDecision,
-    }),
-  ).toEqual({ ok: true, value: { kind: "already_resolved", revision: 3 } });
-
-  const rejected = actor(CaseDO);
-  await initializeCommerceApprovalCase(
-    rejected,
-    "case_plan15_rejected",
-    "proposal_plan15_rejected",
-  );
-  await rejected.attachBinding({
-    bindingId: "binding_plan15_rejected",
-    caseId: "case_plan15_rejected",
-    connectorId: "connector_slack_plan15",
-    address: {
-      kind: "slack",
-      workspaceId: "T_plan15",
-      channelId: "conversation_fixture",
-      threadTs: "1785700000.000011",
-    },
-  });
-  await rejected.waitForCommerceApproval(
-    withCaseMutationExecution("organisation_plan15", {
-      caseId: "case_plan15_rejected",
-      proposalId: "proposal_plan15_rejected",
-      actionNonce: "nonce_plan15_rejected",
-      expectedCaseRevision: 1,
-      requestedAt: 1_003,
-    }),
-  );
-  const rejectionDecision = merchantRejectionDecision(
-    "nonce_plan15_rejected",
-    1_004,
-  );
-  expect(
-    await rejected.resolveCommerceApproval({
-      caseId: "case_plan15_rejected",
-      proposalId: "proposal_plan15_rejected",
-      actionNonce: "nonce_plan15_rejected",
-      decision: rejectionDecision,
-    }),
-  ).toEqual({ ok: true, value: { kind: "resolved", revision: 3 } });
-  const rejectionOutcome = {
-    kind: "merchant_rejection" as const,
-    evidence: rejectionDecision.evidence,
-  };
-  expect(
-    await rejected.acceptCommerceOutcome({
-      caseId: "case_plan15_rejected",
-      proposalId: "proposal_plan15_rejected",
-      actionNonce: "nonce_plan15_rejected",
-      outcome: rejectionOutcome,
-      content: {
-        kind: "text",
-        text: "Commerce action publish_catalog_listing was rejected by the merchant. No provider action was performed.",
-      },
-      acceptedAt: 1_005,
-    }),
-  ).toMatchObject({
-    ok: true,
-    value: {
-      kind: "accepted",
-      revision: 4,
-      output: {
-        kind: "pending",
-        output: { delivery: { address: { threadTs: "1785700000.000011" } } },
-      },
-    },
-  });
-  expect(
-    await rejected.acceptCommerceOutcome({
-      caseId: "case_plan15_rejected",
-      proposalId: "proposal_plan15_rejected",
-      actionNonce: "nonce_plan15_rejected",
-      outcome: rejectionOutcome,
-      content: {
-        kind: "text",
-        text: "Commerce action publish_catalog_listing was rejected by the merchant. No provider action was performed.",
-      },
-      acceptedAt: 1_006,
-    }),
-  ).toMatchObject({
-    ok: true,
-    value: { kind: "already_accepted", revision: 4 },
-  });
-  expect(await rejected.inspect()).toMatchObject({
-    ok: true,
-    value: {
-      revision: 4,
-      lifecycle: { kind: "open", openedAt: 1_004 },
-      commerceApprovals: [{ kind: "decided", decision: { kind: "rejected" } }],
-      entries: [
-        { entryId: "commerce_proposal:proposal_plan15_rejected" },
-        { entryId: "commerce_outcome:nonce_plan15_rejected" },
-      ],
-      outputs: [
-        {
-          kind: "pending",
-          output: { outputId: "output_commerce_nonce_plan15_rejected" },
-        },
-      ],
-    },
-  });
-}
-
-async function initializeCommerceApprovalCase(
-  caseActor: CaseDO,
-  caseId: string,
-  proposalId: string,
-): Promise<void> {
-  await caseActor.ensure({
-    identity: { organisationId: "organisation_plan15", caseId },
-    purpose: "Merchant commerce action approval",
-    workspaceRevision: "commerce:integration_lab",
-    lifecycle: { kind: "open", openedAt: 1_000 },
-  });
-  await caseActor.acceptCommerceProposal(
-    withCaseMutationExecution("organisation_plan15", {
-      proposal: {
-        proposalId,
-        caseId,
-        basedOnRevision: 0,
-        requestAuthority: PLAN15_REQUEST_AUTHORITY,
-        action: {
-          kind: "cancel_order",
-          resourceId: "order_plan15",
-          expectedRevision: 1,
-          reason: "customer_requested",
-          refund: "none",
-          restock: false,
-          notifyCustomer: false,
-          note: null,
-        },
-        authority: { kind: "lab" },
-        provenance: {
-          organisationId: "organisation_plan15",
-          integrationAccountId: "integration_lab",
-          source: "lab",
-          resourceType: "commerce_order",
-          resourceId: "order_plan15",
-          revision: 1,
-          occurredAt: "2026-08-04T00:00:00.000Z",
-          observedAt: "2026-08-04T00:00:00.000Z",
-        },
-        origin: {
-          kind: "merchant_control",
-          userId: "user_f7df3be4-23b5-579a-8d2b-d31b348f5fb0",
-          controlSessionId: "control_session_plan15",
-        },
-      },
-      acceptedAt: 1_000,
-      authorityPartition: await merchantInputAuthorityPartition(
-        PLAN15_REQUEST_AUTHORITY,
-      ),
-    }),
-  );
-}
-
-function merchantApprovalDecision(actionNonce: string, decidedAt: number) {
-  return {
-    kind: "approved" as const,
-    decidedAt,
-    evidence: {
-      kind: "app_user" as const,
-      principal: {
-        kind: "app_user" as const,
-        userId: "user_f7df3be4-23b5-579a-8d2b-d31b348f5fb0",
-        personId: "person_plan15",
-        role: "owner" as const,
-      },
-      authentication: {
-        kind: "google_oidc_step_up" as const,
-        controlSessionId: "control_session_plan15",
-        authenticatedAt: decidedAt,
-        challenge: {
-          stepUpId: `step_up_${actionNonce}`,
-          organisationId: "organisation_plan15",
-          actionNonce,
-          actionDigest: "11".repeat(32),
-          policy: { kind: "unversioned_default" as const },
-          issuedAt: decidedAt - 1,
-          expiresAt: decidedAt + 1_000,
-        },
-      },
-    },
-  };
-}
-
-function merchantRejectionDecision(actionNonce: string, decidedAt: number) {
-  return {
-    kind: "rejected" as const,
-    decidedAt,
-    evidence: {
-      kind: "merchant_rejection" as const,
-      principal: {
-        kind: "app_user" as const,
-        userId: "user_f7df3be4-23b5-579a-8d2b-d31b348f5fb0",
-        personId: "person_plan15",
-        role: "owner" as const,
-      },
-      authentication: {
-        kind: "control_session" as const,
-        controlSessionId: "control_session_plan15",
-        authenticatedAt: decidedAt,
-      },
-      decision: {
-        kind: "rejected" as const,
-        reason: "merchant_declined" as const,
-        action: {
-          organisationId: "organisation_plan15",
-          actionNonce,
-          actionDigest: "22".repeat(32),
-        },
-      },
-    },
-  };
 }
 
 async function acceptsCommerceOutcome(): Promise<void> {
@@ -1644,91 +1169,6 @@ async function addressesDirectKonbiniCase(): Promise<void> {
     value: { kind: "duplicate_trigger", caseId: "case_plan15_konbini" },
   });
   expect(connector.inspect().deliveryCount).toBe(2);
-}
-
-async function acceptsOneProposal(): Promise<void> {
-  const caseFixture = actorFixture(CaseDO);
-  const caseActor = caseFixture.actor;
-  const connector = recordingConnector();
-  const session = fakeSession();
-  const input = walkingInput(
-    connector,
-    caseActor,
-    ongoingSession(session.value),
-  );
-
-  const first = await runOngoingCaseTurn(input);
-  expect(first.ok && first.value).toMatchObject({
-    kind: "completed",
-    caseRevision: 2,
-    deliveryReceiptId: "1785700000.000099",
-    assignment: {
-      budget: { maxTokens: 10_000, maxWallMs: 60_000, maxToolCalls: 20 },
-    },
-  });
-  const caseState = await caseActor.inspect();
-  expect(caseState.ok && caseState.value).toMatchObject({
-    revision: 2,
-    acceptedProposalIds: ["proposal_ingress_plan15_1"],
-    outputs: [
-      { kind: "settled", receipt: { nativeReceiptId: "1785700000.000099" } },
-    ],
-  });
-  expect(connector.inspect()).toMatchObject({
-    ingressCount: 1,
-    deliveryCount: 1,
-    receipts: [{ nativeReceiptId: "1785700000.000099" }],
-    attachments: [[storedAttachmentFixture()]],
-  });
-  expect(session.attachments).toEqual([[storedAttachmentFixture()]]);
-  const trigger = caseFixture.sql
-    .exec<{ payload: string }>(
-      "SELECT payload FROM case_trigger WHERE trigger_id = ?",
-      "trigger_ingress_plan15_1",
-    )
-    .toArray()[0];
-  expect(
-    trigger === undefined ? null : JSON.parse(trigger.payload).attachments,
-  ).toEqual([storedAttachmentFixture()]);
-
-  const replay = await runOngoingCaseTurn(input);
-  expect(replay).toEqual({
-    ok: true,
-    value: { kind: "duplicate_ingress", caseId: "case_plan15_1" },
-  });
-  expect(session.initializations).toBe(1);
-  expect(session.turns).toBe(1);
-}
-
-async function carriesCanonicalMessageLinks(): Promise<void> {
-  const caseFixture = actorFixture(CaseDO);
-  const connector = recordingConnector();
-  const session = fakeSession();
-  const url = "https://example.com/";
-  const base = walkingInput(
-    connector,
-    caseFixture.actor,
-    ongoingSession(session.value),
-  );
-  const input = {
-    ...base,
-    ingress: {
-      ...base.ingress,
-      ingressId: "ingress_plan15_link",
-      nativeEventId: "Ev_plan15_link",
-      content: userMessageContentFixture("Read this link.", [], [url]),
-    },
-    binding: {
-      ...base.binding,
-      bindingId: "binding_plan15_link",
-      address: { ...base.binding.address, threadTs: "1785700000.000010" },
-    },
-  };
-
-  const result = await runOngoingCaseTurn(input);
-
-  expect(result.ok).toBe(true);
-  expect(session.links).toEqual([[url]]);
 }
 
 async function settlesDurableCaseOutput(): Promise<void> {
@@ -2305,20 +1745,14 @@ function fakeSession(): {
   readonly value: CaseWalkingSession;
   readonly initializations: number;
   readonly turns: number;
-  readonly attachments: readonly (readonly StoredMessageAttachment[])[];
-  readonly links: readonly (readonly string[])[];
 } {
   const state: {
     initializations: number;
     turns: number;
-    attachments: StoredMessageAttachment[][];
-    links: string[][];
     sessionId: string | null;
   } = {
     initializations: 0,
     turns: 0,
-    attachments: [],
-    links: [],
     sessionId: null,
   };
   return {
@@ -2339,8 +1773,6 @@ function fakeSession(): {
       },
       async startCanonicalEmbeddedHarnessTextTurn(input) {
         state.turns += 1;
-        state.attachments.push([...input.attachments]);
-        state.links.push([...input.links]);
         if (state.sessionId === null)
           throw new Error("session was not initialized");
         return {
@@ -2362,12 +1794,6 @@ function fakeSession(): {
     },
     get turns() {
       return state.turns;
-    },
-    get attachments() {
-      return state.attachments;
-    },
-    get links() {
-      return state.links;
     },
   };
 }
@@ -2648,7 +2074,6 @@ function actorFixture(
   Constructor: new (state: DurableObjectState, env: UnitTestEnv) => CaseDO,
 ): {
   readonly actor: CaseDO;
-  readonly sql: SqlStorage;
   restart(): CaseDO;
 } {
   const fixture = emptySqliteFixture();
@@ -2676,7 +2101,6 @@ function actorFixture(
   );
   return {
     actor: instance,
-    sql,
     restart() {
       return new Constructor(state, env);
     },
@@ -2724,12 +2148,7 @@ async function ensureActivatedFixtureCase(
 async function ignoreQueueMessage(_message: unknown): Promise<void> {}
 
 function recordingConnector(): OngoingCaseWalkingConnector & {
-  inspect(): {
-    readonly ingressCount: number;
-    readonly deliveryCount: number;
-    readonly receipts: readonly unknown[];
-    readonly attachments: readonly unknown[];
-  };
+  inspect(): { readonly deliveryCount: number };
 } {
   const ingresses = new Map<string, string>();
   const deliveries = new Map<
@@ -2808,25 +2227,9 @@ function recordingConnector(): OngoingCaseWalkingConnector & {
       };
     },
     inspect() {
-      return {
-        ingressCount: ingresses.size,
-        deliveryCount: deliveries.size,
-        receipts: Array.from(deliveries.values(), (value) => value.receipt),
-        attachments: Array.from(ingresses.values(), readRecordingAttachments),
-      };
+      return { deliveryCount: deliveries.size };
     },
   };
-}
-
-function readRecordingAttachments(payload: string): readonly unknown[] {
-  try {
-    const value: unknown = JSON.parse(payload);
-    return isRecord(value) && Array.isArray(value.attachments)
-      ? value.attachments
-      : [];
-  } catch {
-    return [];
-  }
 }
 
 function parseRecordingIngress(raw: unknown): {

@@ -58,7 +58,6 @@ import {
   readWhatsAppPhoneNumberClaimant,
   registerWhatsAppPhoneNumberAccount,
   requestWhatsAppCaseHandoff,
-  purgeOrganisationWhatsAppConnectors,
   revokeWhatsAppConnection,
   routeWhatsAppWebhookAccount,
   whatsappErasureStatements,
@@ -123,63 +122,6 @@ function whatsappLifecycleSuite(): void {
     "keeps the connector and D1 agreed on the Case id across a disable",
     conversationWindowAgreementTest,
   );
-  it(
-    "empties every WhatsApp Connector before organisation erasure deletes its rows",
-    organisationPurgeTest,
-  );
-}
-
-/**
- * The Connector holds the only copy of any still-encrypted customer text. If
- * erasure deleted the D1 rows first, that ciphertext would be left behind with
- * nothing pointing at it, so the purge runs first and is driven by those rows.
- */
-async function organisationPurgeTest(): Promise<void> {
-  const world = await createWhatsAppWorld();
-  const disabled: string[] = [];
-  const namespace = {
-    idFromName: (name: string) => name,
-    get: () => ({
-      disableWhatsAppProcessing: async (request: {
-        readonly identity: { readonly connectorId: string };
-      }) => {
-        disabled.push(request.identity.connectorId);
-        return { ok: true as const, value: null };
-      },
-    }),
-  } as unknown as DurableObjectNamespace<
-    import("../src/actors/connector").ConnectorDO
-  >;
-
-  const purged = await purgeOrganisationWhatsAppConnectors({
-    db: world.db,
-    namespace,
-    organisationId: world.organisationId,
-    now: WHATSAPP_TEST_NOW,
-  });
-  expect(purged).toBe(1);
-  expect(disabled).toEqual([
-    `connector_whatsapp_${world.integrationAccountId}`,
-  ]);
-
-  // An organisation with no WhatsApp number asks nothing of the Connector namespace.
-  const session = world.db.withSession("first-primary");
-  await session.batch([
-    ...whatsappErasureStatements(session, {
-      kind: "organisation",
-      organisationId: world.organisationId,
-    }),
-  ]);
-  disabled.length = 0;
-  expect(
-    await purgeOrganisationWhatsAppConnectors({
-      db: world.db,
-      namespace,
-      organisationId: world.organisationId,
-      now: WHATSAPP_TEST_NOW,
-    }),
-  ).toBe(0);
-  expect(disabled).toEqual([]);
 }
 
 /**

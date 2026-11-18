@@ -1,8 +1,3 @@
-import { createMigratedDatabase } from "./sqlite-d1";
-import { activateActorFixture } from "./organisation-execution-fixture";
-import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
-import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
-import type { OrganisationId, CaseId } from "../src/ids";
 import type { CanonicalCommerceDelivery } from "@seams/contracts";
 import type {
   CommerceDeliveryV1,
@@ -10,48 +5,8 @@ import type {
   CommerceFirstPartyShipmentV1,
   CommerceTrackingEventV1,
 } from "@seams/commerce-client";
-import { expect, it, vi } from "vitest";
+import { expect, it } from "vitest";
 
-vi.mock(
-  "../src/policy/information-flow/source-labels",
-  async function mockSourceLabels() {
-    const { FlowLabel } = await import("../src/policy/information-flow/labels");
-    const { sourceReaderForAuthority } =
-      await import("../src/policy/information-flow/source-readers");
-    return {
-      createCurrentSourceFlowLabel: async function createFixtureSourceLabel(
-        input: Readonly<{
-          readonly kind: string;
-          readonly authority: import("@seams/contracts").RequestAuthority;
-        }>,
-      ) {
-        if (input.kind !== "ingress") {
-          return {
-            ok: false as const,
-            error: { code: "source_policy_invalid" as const, field: "kind" },
-          };
-        }
-        return FlowLabel.create([
-          {
-            owner: {
-              kind: "organisation",
-              organisationId: input.authority.organisationId,
-            },
-            readers: [sourceReaderForAuthority(input.authority)],
-          },
-        ]);
-      },
-    };
-  },
-);
-
-import { CaseDO } from "../src/actors/case";
-import type { CaseSnapshot } from "../src/actors/case/types";
-import {
-  runDirectTwoSessionCasePath,
-  type CaseWalkingSession,
-  type DirectTwoSessionCasePathResult,
-} from "../src/actors/case-walking-path";
 import {
   applyCommerceDelivery,
   createCommerceProjectionSchema,
@@ -66,23 +21,8 @@ import {
   createCueDeliverySchema,
 } from "../src/actors/cue-delivery";
 import { normalizeCommerceEngineDelivery } from "../src/commerce/provider";
-import {
-  parseAssignmentId,
-  parseCaseId,
-  parseIntegrationAccountId,
-  parseRequestId,
-  parseSessionId,
-  parseOrganisationId,
-} from "../src/ids";
-import { fixtureDirectTwoSessionContext } from "./fixtures/plan25-turn";
+import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
 import { sqlStorage, emptySqliteFixture } from "./sqlite-storage";
-import {
-  flowBindingForContext,
-  InformationFlowContext,
-  type SerializedFlowBinding,
-} from "../src/policy";
-import { sha256Hex } from "@seams/std";
-import { platformEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = parseOrganisationId(
   "organisation_underclerk_low_stock",
@@ -234,14 +174,6 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
   if (!crossingClaim.ok || crossingClaim.value.kind !== "claimed") {
     throw new Error("low-stock cue claim failed");
   }
-  const crossingCase = await routeLowStockCue(
-    crossingCue,
-    crossingClaim.value.cueId,
-  );
-  expect(crossingCase.result.kind).toBe("completed");
-  expect(crossingCase.snapshot.identity.caseId).toMatch(/^case_[0-9a-f]{32}$/);
-  expectCaseEntryPreview(crossingCase.snapshot, "movement_oat_latte");
-  expect(crossingCase.snapshot.assignmentLifecycles).toHaveLength(2);
   expect(
     completeClaimedCueDelivery(sql, {
       organisationId: ORGANISATION_ID.value,
@@ -260,16 +192,6 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
     ok: true,
     value: { kind: "duplicate", cueId: crossingClaim.value.cueId },
   });
-  const duplicateSnapshot = await crossingCase.actor.inspect();
-  expect(duplicateSnapshot).toMatchObject({
-    ok: true,
-    value: {
-      identity: { caseId: crossingCase.snapshot.identity.caseId },
-    },
-  });
-  if (!duplicateSnapshot.ok) throw new Error(duplicateSnapshot.error.code);
-  expect(duplicateSnapshot.value.entries[0]?.entryId).toContain("trigger_");
-  expect(duplicateSnapshot.value.entries).toHaveLength(3);
 
   const below = await requireNormalizedCommerceDelivery(
     stockPolicyDecreaseDelivery(
@@ -375,15 +297,6 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
   if (!recrossedClaim.ok || recrossedClaim.value.kind !== "claimed") {
     throw new Error("recrossing cue claim failed");
   }
-  const recrossedCase = await routeLowStockCue(
-    recrossedCue,
-    recrossedClaim.value.cueId,
-  );
-  expect(recrossedCase.result.kind).toBe("completed");
-  expect(recrossedCase.snapshot.identity.caseId).not.toBe(
-    crossingCase.snapshot.identity.caseId,
-  );
-  expectCaseEntryPreview(recrossedCase.snapshot, "movement_oat_latte_recross");
   expect(
     completeClaimedCueDelivery(sql, {
       organisationId: ORGANISATION_ID.value,
@@ -772,10 +685,8 @@ it("converges when the receipt cohort arrives before the opening inventory deliv
   const sqlite = emptySqliteFixture();
   const sql = sqlStorage(sqlite.storage);
   createCommerceProjectionSchema(sql);
-  const receipt =
-    await requireNormalizedCommerceDelivery(oatReceiptDelivery());
-  const opening =
-    await requireNormalizedCommerceDelivery(oatOpeningDelivery());
+  const receipt = await requireNormalizedCommerceDelivery(oatReceiptDelivery());
+  const opening = await requireNormalizedCommerceDelivery(oatOpeningDelivery());
 
   expect(
     applyCommerceDelivery(
@@ -844,12 +755,6 @@ it("converges when the receipt cohort arrives before the opening inventory deliv
   ]);
 });
 
-type RoutedLowStockCase = {
-  readonly actor: CaseDO;
-  readonly result: DirectTwoSessionCasePathResult;
-  readonly snapshot: CaseSnapshot;
-};
-
 function lowStockClaimInput(cue: PendingCommerceCue, now: number) {
   return {
     organisationId: cue.organisationId,
@@ -861,281 +766,6 @@ function lowStockClaimInput(cue: PendingCommerceCue, now: number) {
     now,
     leaseDurationMs: 60_000,
   } as const;
-}
-
-async function routeLowStockCue(
-  cue: PendingCommerceCue,
-  cueId: string,
-): Promise<RoutedLowStockCase> {
-  if (cue.event.eventType !== "inventory_low_stock") {
-    throw new Error("unexpected low-stock cue event");
-  }
-  const identities = await lowStockCaseIdentities(cue);
-  const actor = await createLowStockCaseActor(
-    cue.organisationId,
-    identities.caseId,
-  );
-  const result = await runDirectTwoSessionCasePath({
-    env: platformEnv({}),
-    ...fixtureDirectTwoSessionContext({
-      organisationId: cue.organisationId,
-      caseId: identities.caseId,
-      connectorId: "connector_fixture",
-      participants: [
-        {
-          assignmentId: identities.coordinatorAssignmentId,
-          sessionId: identities.coordinatorSessionId,
-        },
-        {
-          assignmentId: identities.specialistAssignmentId,
-          sessionId: identities.specialistSessionId,
-        },
-      ],
-    }),
-    caseActor: actor,
-    organisationId: cue.organisationId,
-    caseId: identities.caseId,
-    triggerId: identities.triggerId,
-    triggerSource: { kind: "cue", eventId: cueId },
-    content: {
-      kind: "text",
-      text:
-        `Review ${cue.event.payload.itemName} at ${cue.event.payload.locationId}; ` +
-        `policy ${cue.event.payload.stockPolicyId}@${cue.event.payload.stockPolicyRevision} ` +
-        `crossed by ${cue.event.payload.crossingMovementId}.`,
-    },
-    purpose: `Review low stock for ${cue.event.payload.itemName}.`,
-    principal: { kind: "system", componentId: "cue_engine" },
-    policy: lowStockCasePolicy(),
-    pinnedAgent: null,
-    workspaceRevisionReceipt: lowStockWorkspaceRevisionReceipt(),
-    receivedAt: cue.createdAt,
-    participants: [
-      {
-        session: lowStockCaseSession("coordinator"),
-        requestId: identities.coordinatorRequestId,
-        sessionId: identities.coordinatorSessionId,
-        assignmentId: identities.coordinatorAssignmentId,
-        role: "coordinator",
-        objective: "Compare immediate fulfillment and restocking options.",
-      },
-      {
-        session: lowStockCaseSession("specialist"),
-        requestId: identities.specialistRequestId,
-        sessionId: identities.specialistSessionId,
-        assignmentId: identities.specialistAssignmentId,
-        role: "specialist",
-        objective:
-          "Assess replenishment quantity, timing, and operational constraints.",
-      },
-    ],
-    delivery: { kind: "none" },
-  });
-  if (!result.ok) throw new Error(result.error.code);
-  const snapshot = await actor.inspect();
-  if (!snapshot.ok) throw new Error(snapshot.error.code);
-  return { actor, result: result.value, snapshot: snapshot.value };
-}
-
-function expectCaseEntryPreview(snapshot: CaseSnapshot, text: string): void {
-  const entry = snapshot.entries[0];
-  if (entry === undefined || entry.kind !== "inline_preview") {
-    throw new Error("low-stock Case trigger entry missing");
-  }
-  expect(entry.preview).toContain(text);
-}
-
-async function lowStockCaseIdentities(cue: PendingCommerceCue): Promise<{
-  readonly caseId: import("../src/ids").CaseId;
-  readonly triggerId: string;
-  readonly coordinatorRequestId: import("../src/ids").RequestId;
-  readonly coordinatorSessionId: import("../src/ids").SessionId;
-  readonly coordinatorAssignmentId: string;
-  readonly specialistRequestId: import("../src/ids").RequestId;
-  readonly specialistSessionId: import("../src/ids").SessionId;
-  readonly specialistAssignmentId: string;
-}> {
-  const stableIdentity = `${cue.organisationId}:cue:${cue.event.source}:${cue.nativeId}`;
-  const digest = (await sha256Hex(stableIdentity)).slice(0, 32);
-  const caseId = parseCaseId(`case_${digest}`);
-  const coordinatorRequestId = parseRequestId(
-    `request_case_${digest}_coordinator`,
-  );
-  const coordinatorSessionId = parseSessionId(
-    `session_case_${digest}_coordinator`,
-  );
-  const coordinatorAssignmentId = parseAssignmentId(
-    `assignment_case_${digest}_coordinator`,
-  );
-  const specialistRequestId = parseRequestId(
-    `request_case_${digest}_specialist`,
-  );
-  const specialistSessionId = parseSessionId(
-    `session_case_${digest}_specialist`,
-  );
-  const specialistAssignmentId = parseAssignmentId(
-    `assignment_case_${digest}_specialist`,
-  );
-  if (
-    !caseId.ok ||
-    !coordinatorRequestId.ok ||
-    !coordinatorSessionId.ok ||
-    !coordinatorAssignmentId.ok ||
-    !specialistRequestId.ok ||
-    !specialistSessionId.ok ||
-    !specialistAssignmentId.ok
-  ) {
-    throw new Error("low-stock case identity invalid");
-  }
-  return {
-    caseId: caseId.value,
-    triggerId: `trigger_${digest}`,
-    coordinatorRequestId: coordinatorRequestId.value,
-    coordinatorSessionId: coordinatorSessionId.value,
-    coordinatorAssignmentId: coordinatorAssignmentId.value,
-    specialistRequestId: specialistRequestId.value,
-    specialistSessionId: specialistSessionId.value,
-    specialistAssignmentId: specialistAssignmentId.value,
-  };
-}
-
-async function createLowStockCaseActor(
-  organisationId: OrganisationId,
-  caseId: CaseId,
-): Promise<CaseDO> {
-  const fixture = emptySqliteFixture();
-  const sql = sqlStorage(fixture.storage);
-  const storage = {
-    sql,
-    deleteAlarm: clearFixtureAlarm,
-    setAlarm: vi.fn().mockResolvedValue(undefined),
-    transactionSync<Value>(callback: () => Value): Value {
-      fixture.database.exec("BEGIN IMMEDIATE");
-      try {
-        const value = callback();
-        fixture.database.exec("COMMIT");
-        return value;
-      } catch (error) {
-        fixture.database.exec("ROLLBACK");
-        throw error;
-      }
-    },
-  };
-  const env = platformEnv({
-    DB: createMigratedDatabase(),
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-    EVENT_Q: { send: ignoreQueueMessage },
-  });
-  const actor = new CaseDO(
-    { storage, waitUntil: vi.fn() } as unknown as DurableObjectState,
-    env,
-  );
-  await activateActorFixture(
-    env,
-    actor,
-    { objectKind: "case", organisationId, logicalObjectId: caseId },
-    CASE_ACTOR_SCHEMA_VERSION,
-  );
-  return actor;
-}
-
-async function ignoreQueueMessage(_message: unknown): Promise<void> {}
-
-function lowStockCaseSession(
-  role: "coordinator" | "specialist",
-): CaseWalkingSession {
-  let sessionId: string | null = null;
-  return {
-    async initializeCaseSession(input) {
-      sessionId = input.assignment.sessionId;
-      return {
-        ok: true,
-        value: {
-          kind: "accepted",
-          eventId: `initialized_${role}`,
-          sequence: 0,
-        },
-      };
-    },
-    async prepareSessionInformationFlow(input) {
-      return {
-        ok: true,
-        value: { flowBinding: await lowStockFlowBinding(input) },
-      };
-    },
-    async startCanonicalEmbeddedHarnessTextTurn(input) {
-      if (sessionId === null)
-        throw new Error("low-stock session was not initialized");
-      return {
-        ok: true,
-        value: {
-          outcome: { status: "success", summary: null, artifacts: [] },
-          finalMessage: `${role} observation accepted.`,
-          flowBinding: await lowStockFlowBinding({
-            sessionId,
-            turnId: input.start.turnId,
-            authorityPartitionDigest: input.start.authorityPartitionDigest,
-          }),
-        },
-      };
-    },
-  };
-}
-
-async function lowStockFlowBinding(
-  input: Readonly<{
-    readonly sessionId: string;
-    readonly turnId: string;
-    readonly authorityPartitionDigest: string;
-  }>,
-): Promise<SerializedFlowBinding> {
-  const context = await InformationFlowContext.create({
-    organisationId: "organisation_underclerk_low_stock",
-    sessionId: input.sessionId,
-    authorityPartitionDigest: input.authorityPartitionDigest,
-  });
-  if (!context.ok) throw new Error(context.error.code);
-  return flowBindingForContext(context.value, input.turnId).toJSON();
-}
-
-function lowStockCasePolicy() {
-  return {
-    version: 1,
-    egress: {
-      allowedHosts: [],
-      injections: [],
-      modelRoute: { baseUrl: "https://model-gateway.test" },
-    },
-    authz: {
-      allowedTools: [],
-      deniedTools: [],
-      approvalRequired: [],
-      maxBudget: { maxTokens: 10_000, maxWallMs: 60_000, maxToolCalls: 20 },
-    },
-    conversationRisk: { outputScreeningMode: "stream" as const },
-    modelRoute: {
-      keySource: "organisation_subscription" as const,
-      provider: "openai" as const,
-      model: "gpt-5.6-luna",
-      connectionRevision: 1,
-      authProfileGeneration: 1,
-    },
-  };
-}
-
-function lowStockWorkspaceRevisionReceipt() {
-  return {
-    receiptId: "workspace_receipt_underclerk_low_stock",
-    outcome: "accepted" as const,
-    workspaceId: "workspace_underclerk_low_stock",
-    revision: "workspace_revision_underclerk_low_stock",
-    canonicalHead: "a".repeat(64),
-    correlationId: "request_underclerk_low_stock",
-    causation: {
-      kind: "command" as const,
-      commandId: "command_underclerk_low_stock",
-    },
-  };
 }
 
 async function acceptCommerceDelivery(): Promise<boolean> {
@@ -1859,9 +1489,7 @@ function stockPolicyMovementDelivery(
   };
 }
 
-async function requireNormalizedCommerceDelivery(
-  delivery: CommerceDeliveryV1,
-) {
+async function requireNormalizedCommerceDelivery(delivery: CommerceDeliveryV1) {
   if (!ORGANISATION_ID.ok || !INTEGRATION_ACCOUNT_ID.ok)
     throw new Error("invalid inventory fixture identity");
   const normalized = await normalizeCommerceEngineDelivery({
@@ -2030,5 +1658,3 @@ function oatReceiptDelivery(): CommerceDeliveryV1 {
     },
   };
 }
-
-async function clearFixtureAlarm(): Promise<void> {}

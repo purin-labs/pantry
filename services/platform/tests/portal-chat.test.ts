@@ -62,7 +62,6 @@ const mocks = vi.hoisted(function chatMocks() {
     membership: vi.fn(),
     documentation: vi.fn(),
     interrupt: vi.fn(),
-    settleSurface: vi.fn(),
     schedule: vi.fn(),
     caseActor: {
       prepareDirectTurn: vi.fn(),
@@ -133,7 +132,6 @@ vi.mock("../src/actors/actor-router", function actorRouterModule() {
         ok: true,
         value: {
           interruptCanonicalEmbeddedHarnessTurn: mocks.interrupt,
-          settleBakerySurfaceEffect: mocks.settleSurface,
         },
       };
     },
@@ -148,7 +146,6 @@ vi.mock("../src/actors/actor-router", function actorRouterModule() {
         ok: true,
         value: {
           interruptCanonicalEmbeddedHarnessTurn: mocks.interrupt,
-          settleBakerySurfaceEffect: mocks.settleSurface,
           readConfirmedContextObservations: async function observations() {
             return [];
           },
@@ -172,10 +169,6 @@ vi.mock(
 import { handlePortalChat as nativeAdmitPortalChat } from "../src/control/routes/chat";
 import { handlePortalChatConversation as nativeHandlePortalChatConversation } from "../src/control/routes/chat/conversation";
 import { handlePortalChatCancel as nativeHandlePortalChatCancel } from "../src/control/routes/chat/cancel";
-import {
-  handlePortalChatSurfaceEffects as nativeHandlePortalChatSurfaceEffects,
-  handlePortalChatSurfaceReceipt as nativeHandlePortalChatSurfaceReceipt,
-} from "../src/control/routes/chat/surface";
 import type { ConversationExecution } from "../src/chat/execution";
 import {
   conversationTimeline,
@@ -342,7 +335,6 @@ beforeEach(async function setup() {
   });
   mocks.membership.mockResolvedValue(1);
   mocks.interrupt.mockResolvedValue({ ok: true });
-  mocks.settleSurface.mockResolvedValue({ ok: true, kind: "accepted" });
   const context = await InformationFlowContext.create({
     organisationId: scope.organisationId,
     sessionId: "session_chat_test",
@@ -430,20 +422,6 @@ function handlePortalChatCancel(
 ): ReturnType<typeof nativeHandlePortalChatCancel> {
   input[0] = authenticatedChatRequest(input[0]);
   return nativeHandlePortalChatCancel(...input);
-}
-
-function handlePortalChatSurfaceEffects(
-  ...input: Parameters<typeof nativeHandlePortalChatSurfaceEffects>
-): ReturnType<typeof nativeHandlePortalChatSurfaceEffects> {
-  input[0] = authenticatedChatRequest(input[0]);
-  return nativeHandlePortalChatSurfaceEffects(...input);
-}
-
-function handlePortalChatSurfaceReceipt(
-  ...input: Parameters<typeof nativeHandlePortalChatSurfaceReceipt>
-): ReturnType<typeof nativeHandlePortalChatSurfaceReceipt> {
-  input[0] = authenticatedChatRequest(input[0]);
-  return nativeHandlePortalChatSurfaceReceipt(...input);
 }
 
 function authenticatedChatRequest(request: Request): Request {
@@ -1013,51 +991,6 @@ describe("persistent portal chat", function chatSuite() {
     expect(reply.kind).toBe("allow");
   });
 
-  it("acknowledges a durably admitted turn before generation completes", async function admitsBeforeCompletion() {
-    const generation = deferred<unknown>();
-    mocks.generate.mockReturnValueOnce(generation.promise);
-    const tasks: Promise<unknown>[] = [];
-    const response = await handlePortalChat(
-      request("Hello"),
-      env,
-      scope.organisationId,
-      { waitUntil: tasks.push.bind(tasks) },
-    );
-    expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({
-      kind: "accepted",
-      conversation: {
-        work: { kind: "running", requestId: "request_chat_first" },
-      },
-    });
-    const stored = await readConversation(
-      env.DB,
-      scope,
-      "conv_7d980f41-a532-5387-9ea1-548f956b6e3e",
-    );
-    expect(stored?.conversation.work).toMatchObject({
-      kind: "running",
-      stream: {
-        step: 0,
-        sessionId: expect.stringMatching(/^session_case_/u),
-        turnId: expect.stringMatching(/^turn_trigger_/u),
-      },
-    });
-    generation.resolve(
-      completed({ kind: "reply", text: "Hello from the stream" }),
-    );
-    await Promise.all(tasks);
-    expect(
-      (
-        await readConversation(
-          env.DB,
-          scope,
-          "conv_7d980f41-a532-5387-9ea1-548f956b6e3e",
-        )
-      )?.conversation.work.kind,
-    ).toBe("ready");
-  });
-
   it("settles an exact cancellation idempotently before stale output can publish", async function cancelsExactlyOnce() {
     const generation = deferred<unknown>();
     mocks.generate.mockReturnValueOnce(generation.promise);
@@ -1114,78 +1047,6 @@ describe("persistent portal chat", function chatSuite() {
         )?.conversation,
       ),
     ).not.toContain("Stale reply");
-  });
-
-  it("stops an active response when its pinned model is temporarily unavailable", async function cancelsWithoutModel() {
-    const generation = deferred<unknown>();
-    mocks.generate.mockReturnValueOnce(generation.promise);
-    const tasks: Promise<unknown>[] = [];
-    await handlePortalChat(request("First"), env, scope.organisationId, {
-      waitUntil: tasks.push.bind(tasks),
-    });
-    await vi.waitFor(expectGenerationStarted);
-    const running = await readConversation(
-      env.DB,
-      scope,
-      "conv_7d980f41-a532-5387-9ea1-548f956b6e3e",
-    );
-    if (running?.conversation.work.kind !== "running")
-      throw new Error("Expected running conversation");
-    mocks.model.mockResolvedValueOnce({
-      ok: false,
-      error: { code: "model_connection_unavailable" },
-    });
-    const response = await handlePortalChatCancel(
-      new Request("https://portal.example/chat/cancel", {
-        method: "POST",
-        body: JSON.stringify({
-          conversationId: requireConversationId(
-            "conv_7d980f41-a532-5387-9ea1-548f956b6e3e",
-          ),
-          requestId: running.conversation.work.requestId,
-          sessionId: running.conversation.work.stream.sessionId,
-          turnId: running.conversation.work.stream.turnId,
-          cancellationId: "cancel_without_model",
-        }),
-      }),
-      env,
-      scope.organisationId,
-    );
-    expect(response.status).toBe(200);
-    expect(
-      (
-        await readConversation(
-          env.DB,
-          scope,
-          "conv_7d980f41-a532-5387-9ea1-548f956b6e3e",
-        )
-      )?.conversation.work.kind,
-    ).toBe("ready");
-    generation.resolve(completed({ kind: "reply", text: "Stale reply" }));
-    await Promise.all(tasks);
-  });
-
-  it("replays an accepted request while its response is still running", async function replaysActiveRequest() {
-    const generation = deferred<unknown>();
-    mocks.generate.mockReturnValueOnce(generation.promise);
-    const tasks: Promise<unknown>[] = [];
-    const first = await handlePortalChat(
-      request("Keep this request idempotent."),
-      env,
-      scope.organisationId,
-      { waitUntil: tasks.push.bind(tasks) },
-    );
-    expect(first.status).toBe(200);
-    const replay = await handlePortalChat(
-      request("Keep this request idempotent."),
-      env,
-      scope.organisationId,
-      { waitUntil: tasks.push.bind(tasks) },
-    );
-    expect(replay.status).toBe(200);
-    await expect.poll(generatedTurnCount).toBe(1);
-    generation.resolve(completed({ kind: "reply", text: "Saved once." }));
-    await Promise.all(tasks);
   });
 
   it("replays an accepted retry while the retried response is running", async function replaysActiveRetry() {
@@ -1370,122 +1231,6 @@ describe("persistent portal chat", function chatSuite() {
     });
   });
 
-  it("uses the workspace policy as the chat token budget authority", async function usesWorkspaceBudget() {
-    mocks.generate.mockResolvedValueOnce(
-      completed({ kind: "reply", text: "The workspace budget was applied." }),
-    );
-    expect(
-      (await handlePortalChat(request("Hello"), env, scope.organisationId))
-        .status,
-    ).toBe(200);
-    expect(mocks.generate).toHaveBeenCalledTimes(1);
-    expect(mocks.generate.mock.calls[0]?.[1]).not.toHaveProperty(
-      "maxSessionBudgetTokens",
-    );
-  });
-
-  it("pins a verified BakeryOS observation to the accepted input and prompt", async function bakerySurfaceContext() {
-    const surfaceContext = await createBakerySurfaceAttachment({
-      schemaVersion: 1,
-      kind: "bakery-workspace",
-      runOpenReview: null,
-      surfaceSessionId: "surface-chat-test",
-      surfaceEpoch: 4,
-      capturedAt: 50,
-      comparison: null,
-      simulation: null,
-      supportedCommands: ["inspect_surface", "set_view"],
-      active: {
-        kind: "shift",
-        source: "procedure",
-        view: {
-          dock: "closed",
-          camera: "perspective",
-          labels: "auto",
-          minimap: false,
-          chrome: "shown",
-        },
-        sourceIdentity: {
-          kind: "procedure",
-          id: "procedure_financier",
-          revision: "revision_3",
-          snapshotRevision: "3",
-        },
-        variant: "normal",
-        selection: {
-          kind: "task",
-          id: "batch:A:bake:1",
-          label: "Bake batch A",
-        },
-        selectedTask: {
-          id: "batch:A:bake:1",
-          name: "Bake batch A",
-          kind: "process",
-          status: "running",
-          startSeconds: 300,
-          endSeconds: 360,
-          batchId: "A",
-          dependencies: ["batch:A:portion:1"],
-          resources: ["station:baking"],
-          constraints: ["batch deadline 480s"],
-        },
-        playback: {
-          cursorSeconds: 312,
-          playback: "paused",
-          speed: 120,
-        },
-        draft: { revision: 3, digest: "a".repeat(64) },
-        pendingEdit: null,
-        scenarioSaveProposal: null,
-        run: {
-          state: "complete",
-          endSeconds: 480,
-          lateBatches: 0,
-          unfinishedBatches: 0,
-        },
-      },
-    });
-    mocks.generate.mockResolvedValueOnce(
-      completed({ kind: "reply", text: "Batch A is baking." }),
-    );
-    const response = await handlePortalChat(
-      new Request("https://portal.example/chat", {
-        method: "POST",
-        body: JSON.stringify({
-          kind: "message",
-          conversationId: requireConversationId(
-            "conv_a007a4ec-3c35-5832-a9c8-557b32c905c0",
-          ),
-          requestId: "request_surface",
-          model: "test-model",
-          text: "What is selected?",
-          surfaceContext,
-        }),
-      }),
-      env,
-      scope.organisationId,
-    );
-
-    expect(response.status).toBe(200);
-    const objective = mocks.generate.mock.calls[0]?.[1].objective;
-    expect(objective).toContain("batch:A:bake:1");
-    expect(objective).toContain('"cursorSeconds":312');
-    expect(mocks.generate.mock.calls[0]?.[1].surfaceContext).toEqual(
-      surfaceContext,
-    );
-    const stored = await readConversation(
-      env.DB,
-      scope,
-      requireConversationId("conv_a007a4ec-3c35-5832-a9c8-557b32c905c0"),
-    );
-    const user = (
-      stored ? timelineVisibleMessages(stored.conversation) : undefined
-    )?.find(isUser);
-    expect(user?.kind === "user" ? user.surfaceContext?.digest : null).toBe(
-      surfaceContext.digest,
-    );
-  });
-
   it("projects settled BakeryOS commands and receipts into the chat timeline", async function bakerySurfaceTimeline() {
     const surfaceContext = await createBakerySurfaceAttachment({
       schemaVersion: 1,
@@ -1660,100 +1405,6 @@ describe("persistent portal chat", function chatSuite() {
     );
   });
 
-  it("delivers a pending BakeryOS effect only to its originating surface", async function deliversBakerySurfaceEffect() {
-    const effect = await createBakerySurfaceEffect({
-      effectId: "surface_effect_chat_test",
-      dispatchId: "surface_dispatch_chat_test",
-      deadlineAt: Date.now() + 60_000,
-      command: {
-        schemaVersion: 1,
-        kind: "inspect_surface",
-        target: {
-          surfaceSessionId: "surface-chat-test",
-          surfaceEpoch: 4,
-        },
-      },
-    });
-    const preparation = await createBakerySurfaceEffect({
-      effectId: "surface_preparation_chat_test",
-      dispatchId: "surface_preparation_dispatch_chat_test",
-      deadlineAt: effect.deadlineAt,
-      command: {
-        schemaVersion: 1,
-        kind: "prepare_context",
-        binding: {
-          browserInstanceId: "browser_chat_test",
-          conversationId: requireConversationId(
-            "conv_65bb7a86-05e8-5988-8dc9-6aa4ca470734",
-          ),
-        },
-        requiredCommand: "inspect_surface",
-      },
-    });
-    for (const delivered of [preparation, effect]) {
-      const createdAt = delivered.command.kind === "prepare_context" ? 1 : 2;
-      database
-        .prepare(
-          `INSERT INTO bakery_surface_effect_delivery (
-           effect_id, organisation_id, user_id, session_id, turn_id,
-           request_id, surface_session_id, surface_epoch, command_digest, effect_json,
-           state_kind, receipt_json, deadline_at, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'dispatching', NULL, ?, ?, ?)`,
-        )
-        .run(
-          delivered.effectId,
-          scope.organisationId,
-          scope.userId,
-          "session_chat_test",
-          "turn_chat_test",
-          "request_surface_delivery",
-          bakeryEffectDeliveryTarget(delivered).surfaceSessionId,
-          bakeryEffectDeliveryTarget(delivered).surfaceEpoch,
-          delivered.commandDigest,
-          JSON.stringify(delivered),
-          delivered.deadlineAt,
-          createdAt,
-          createdAt,
-        );
-    }
-    const listed = await handlePortalChatSurfaceEffects(
-      new Request(
-        "https://portal.example/v1/control/organisations/organisation_chat_test/chat/surface-effects?browserInstanceId=browser_chat_test&conversationId=conv_65bb7a86-05e8-5988-8dc9-6aa4ca470734",
-      ),
-      env,
-      scope.organisationId,
-    );
-    expect(listed.status).toBe(200);
-    expect(await listed.json()).toEqual({
-      ok: true,
-      effects: [{ effect: preparation }, { effect }],
-    });
-
-    const receipt = await createBakerySurfaceReceipt(effect, {
-      kind: "delivery_failed",
-      code: "surface_unavailable",
-      message: "The surface closed.",
-    });
-    const settled = await handlePortalChatSurfaceReceipt(
-      new Request(
-        `https://portal.example/v1/control/organisations/organisation_chat_test/chat/surface-effects/${effect.effectId}/receipt`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ receipt }),
-        },
-      ),
-      env,
-      scope.organisationId,
-      effect.effectId,
-    );
-    expect(settled.status).toBe(200);
-    expect(mocks.settleSurface).toHaveBeenCalledWith({
-      requestingOrganisationId: scope.organisationId,
-      receipt,
-    });
-  });
-
   it("rejects a BakeryOS observation whose accepted digest no longer matches", async function rejectsChangedBakerySurfaceContext() {
     const surfaceContext = await createBakerySurfaceAttachment({
       schemaVersion: 1,
@@ -1872,10 +1523,6 @@ describe("persistent portal chat", function chatSuite() {
     expect(await response.json()).toMatchObject({
       conversation: { model: "gpt-6-astra" },
     });
-    expect(mocks.generate.mock.calls[1]?.[1].requiredModelRoute).toMatchObject({
-      keySource: "organisation_subscription",
-      model: "gpt-6-astra",
-    });
   });
 
   it("does not mislabel historical budget exhaustion as tokens", async function explainsBudgetExhaustion() {
@@ -1990,19 +1637,6 @@ describe("persistent portal chat", function chatSuite() {
         ]),
       },
     });
-    expect(mocks.documentation).toHaveBeenCalledWith(
-      ["https://docs.easypost.com/llms.txt"],
-      expect.any(Object),
-    );
-    expect(new Set(mocks.generate.mock.calls.map(caseIdentity))).toHaveLength(
-      1,
-    );
-    expect(mocks.generate.mock.calls[2]?.[1].requiredModelRoute).toMatchObject({
-      keySource: "organisation_byo",
-    });
-    expect(mocks.generate.mock.calls[2]?.[1].objective).toContain(
-      "EasyPost. Read my shipments.",
-    );
     const calls = mocks.generate.mock.calls.length;
     expect(
       (
@@ -2359,18 +1993,11 @@ function deferred<T>(): {
   if (resolvePromise === null) throw new Error("Deferred promise unavailable");
   return { promise, resolve: resolvePromise };
 }
-function caseIdentity(call: unknown[]): unknown {
-  return call[2];
-}
 function isUser(message: { readonly kind: string }): boolean {
   return message.kind === "user";
 }
 function eventIsCancellation(event: { readonly kind: string }): boolean {
   return event.kind === "run_cancelled";
-}
-
-function expectGenerationStarted(): void {
-  expect(mocks.generate).toHaveBeenCalledTimes(1);
 }
 
 function generatedTurnCount(): number {

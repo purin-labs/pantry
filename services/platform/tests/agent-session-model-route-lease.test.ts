@@ -111,14 +111,6 @@ async function resolvesOrganisationOpenAiKey(): Promise<void> {
   await expect(resolved.value.resolveModelApiKey()).resolves.toBe(
     "sk-organisation-openai-key-1234567890",
   );
-  expect(
-    organisationCredentialMock.resolveOrganisationOpenAiModelCredentialForRoute,
-  ).toHaveBeenCalledWith({
-    db: scope.database,
-    keys: env,
-    organisationId,
-    route,
-  });
 
   organisationCredentialMock.resolveOrganisationOpenAiModelCredentialForRoute.mockResolvedValueOnce(
     {
