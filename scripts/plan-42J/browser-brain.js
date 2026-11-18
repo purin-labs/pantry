@@ -259,12 +259,12 @@ async (page) => {
         .waitFor();
       return this.details(target);
     }
-    // The Brain entry of the Portal navigation, as a screen reader names it.
+    // The Knowledge entry of the Portal navigation, as a screen reader names it.
     async brainEntry(target) {
       return (
         await target
           .getByRole("navigation", { name: "Workspace pages", exact: true })
-          .getByRole("link", { name: /^Brain/u })
+          .getByRole("link", { name: /^Knowledge/u })
           .first()
           .innerText()
       ).replace(/\s+/gu, " ");
@@ -382,7 +382,7 @@ async (page) => {
       // The agent proposed an eval with the memory, so two items wait.
       const ownerSummary = await this.summary(this.owner);
       await this.owner
-        .getByRole("link", { name: "Brain, 2 to review", exact: true })
+        .getByRole("link", { name: "Knowledge, 2 to review", exact: true })
         .waitFor();
       this.check(
         "the navigation counts what waits for the owner",
@@ -427,7 +427,7 @@ async (page) => {
         otherSummary.status === 200 &&
           otherSummary.body ===
             '{"ok":true,"summary":{"memoriesToReview":0,"evalsToReview":0}}' &&
-          otherEntry === "Brain",
+          otherEntry === "Knowledge",
         { otherSummary, otherEntry },
       );
       const otherStatus = await other.locator("#brain-status-line").innerText();
@@ -517,7 +517,7 @@ async (page) => {
       );
       await memoryDetails.getByText("In use", { exact: true }).waitFor();
       await this.owner
-        .getByRole("link", { name: "Brain, 1 to review", exact: true })
+        .getByRole("link", { name: "Knowledge, 1 to review", exact: true })
         .waitFor();
       this.check(
         "the navigation count follows the decision",
