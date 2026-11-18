@@ -1,6 +1,6 @@
 # Plan 92 — A new pantry repository
 
-Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2 open.
+Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); duplicate code and tests open.
 Owner: the whole repository.
 Touches: [Plan 91 — names](plan-91-seams-atelier-rename.md),
 [Refactor 16 — Kitchen physics](refactor-16.md), the deploy procedure and
@@ -208,3 +208,59 @@ run once for each internal step.
   secrets `R2_READ_ACCESS_KEY_ID`, `R2_READ_SECRET_ACCESS_KEY` and
   `R2_ENDPOINT`. Until then, and until the Actions budget allows a run, CI
   cannot run.
+
+## Phase 2 results: unused and legacy code (18 November 2026)
+
+Six commits on `dev` remove 35,980 lines and add 3,735 (net 32,245 fewer
+lines) in 1,059 files; 108 files are gone. Production did not change: no
+deploy and no write. A read-only census (`wrangler d1 execute --remote`,
+SELECT only) of the production global and regional databases decided each
+legacy removal.
+
+| Workstream | Commit | Files | Lines removed (net) | What went |
+|---|---|---|---|---|
+| Unused files | `af06012` | 98 (88 deleted) | 18,701 | Knip and an import check on the new tree found 207 unused files; a hand check kept the ones that a plan, runbook or type check names. Deleted: browser journeys and probes of finished plans, the Plan 53 identity cutover tools, `scripts/plan-54`, 23 unused package subpath exports, the Plan 70C contract example and an unused dependency. |
+| Plan 13 runtime cutover | `4d04bd2` | 30 | 1,662 | The cutover module and every gate (Slack ingress, Connector, queues, provider routes, identity links, webhooks, reconciliation). Every Organisation was forward-only. The seven `organisation` cutover columns and their index left both baselines. |
+| Warm actor slots switch | `816a0a3` | 7 | 5 | `SATYR_WARM_ACTOR_SLOTS`; every Connector keeps its warm slots. |
+| File-native product folders | `4ebf423` | 56 (17 deleted) | 9,138 | The tool, its capability, `file_native.rs` and its binary, the executor's JSON product path, the workspace execution coordinator (2,706 lines), the product changeset revision kind and the Plan 50 "workspace" group. |
+| Old-row adapters | `aff2272` | 23 | 556 | Chat rows from before the timeline, the old Gmail product mapping, the costs plan runtime ALTER, the pre-Plan 89 held output id, and the SurfaceActor and ThreadActor relics. |
+| Unused exports | `2672a7d` | 877 | 2,183 | `export` removed from 3,539 values and types that only their own file used; declarations that no file used are deleted. |
+
+**Proof.** Each commit passed the platform, test and E2E type checks, the
+lints, the unit suites and the E2E files near its change. After all of them,
+the full E2E suite passed 533 tests in 247 files. It failed the three known
+Plan 88 journeys (J4, J7: an old account Worker artifact) and the placement
+move journey, whose fixture relied on the cutover gate; the next commit gives
+that fixture's second Organisation a policy, and the journey passes.
+
+**Apply after the next release** (each patch names its databases):
+1. `services/platform/scripts/plan-92-product-folder-capability-d1-data-patch.sql`
+   on each regional database, right after the release: the Access read refuses
+   the two old policy rows of the removed capability.
+2. `services/platform/scripts/plan-92-runtime-cutover-drop-d1-patch.sql` on the
+   global and each regional database. The patched schema equals the new
+   baseline (tested on the old baselines).
+
+**Kept, with the reason.**
+- Plan 33B supplier payouts and the Plan 46 synthetic evaluation API: asked
+  the owner on 18 November 2026; kept until the answer (default: keep).
+- Adapters whose old rows exist: chat Kitchen context v1 (12 parts), chat voice
+  parts with no engine (9), Square OAuth credentials (3 accounts), the `codex`
+  backend id (removed 18 October, after the actor storage restart of
+  9 October). The context projection `model_text` fallback is not an adapter:
+  the file projection writer still leaves the column empty.
+- Adapters that D1 cannot count: every Durable Object storage upgrade
+  (Organisation, Session, Case, Connector, DeviceFleet), the Commerce schema
+  chain 66 to 90 and the other Commerce storage readers, and the R2 saved-run
+  chains. Each needs an in-actor read, or the Commerce admin endpoint
+  `GET /v1/admin/merchants/{id}/migration-inventory`, which is outside the
+  approved D1 census.
+- Client-compatibility readers (old Portal tabs, shop Macs, TV players,
+  bookmarks): they read wire messages, not stored rows.
+- The D1 CHECK lists still name the actor kinds `surface` and `thread`; a CHECK
+  change needs a table rebuild in production.
+- The Code Mode receipt keeps its workspace fields (always unused and null),
+  because the receipt shape is signed.
+- 147 type re-exports in `packages/contracts/src/index.ts` that no package
+  imports, and 332 re-export lines that knip reports: they need a decision on
+  the public surface of each package.
