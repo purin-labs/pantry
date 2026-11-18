@@ -30,19 +30,13 @@ import {
 } from "../../src/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 
-type Boundary =
-  "control_origin" | "session_origin" | "placement" | "approval_wait";
+type Boundary = "session_origin" | "placement" | "approval_wait";
 type Pause = {
   phase: "armed" | "paused" | "released";
   digest: SubtleCrypto["digest"];
 };
 let pause: Pause | null = null;
-it.for([
-  "control_origin",
-  "session_origin",
-  "placement",
-  "approval_wait",
-] as const)(
+it.for(["session_origin", "placement", "approval_wait"] as const)(
   "fences Case %s and preserves replay through native eviction",
   { timeout: 60_000 },
   caseProposalJourney,

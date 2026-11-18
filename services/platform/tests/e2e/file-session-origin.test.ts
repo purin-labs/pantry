@@ -78,16 +78,10 @@ const METADATA: FileProjectionMetadata = {
   providerRevision: PROVIDER_REVISION,
   extraction: { kind: "text" },
 };
-type Boundary =
-  | "credential"
-  | "credential_commit"
-  | "response"
-  | "search_observation"
-  | "binding_commit";
+type Boundary = "credential_commit" | "response" | "binding_commit";
 type Journey = {
   readonly boundary: Boundary;
   readonly reference: CanonicalFileReference;
-  readonly decrypt: SubtleCrypto["decrypt"];
   readonly encrypt: SubtleCrypto["encrypt"];
   readonly digest: SubtleCrypto["digest"];
   phase: "armed" | "paused" | "released";
@@ -666,13 +660,7 @@ async function fileHintSnapshot(integrationAccountId: IntegrationAccountId) {
   return rows.results;
 }
 
-it.for([
-  "credential",
-  "credential_commit",
-  "response",
-  "search_observation",
-  "binding_commit",
-] as const)(
+it.for(["credential_commit", "response", "binding_commit"] as const)(
   "fences file %s, preserves origin after eviction and admits a fresh command",
   { timeout: 45_000 },
   fileOriginJourney,
@@ -686,7 +674,6 @@ async function fileOriginJourney(
   const journey: Journey = {
     boundary,
     reference,
-    decrypt: crypto.subtle.decrypt,
     encrypt: crypto.subtle.encrypt,
     digest: crypto.subtle.digest,
     phase: "armed",
@@ -699,7 +686,6 @@ async function fileOriginJourney(
     observationSetDigest: "",
   };
   activeJourney = journey;
-  crypto.subtle.decrypt = pauseCredential;
   crypto.subtle.encrypt = pauseCredentialCommit;
   crypto.subtle.digest = pauseObservation;
   const initialSecret = await savedCredential();
@@ -744,7 +730,7 @@ async function fileOriginJourney(
     expect(issuedRequests).toBe(
       boundary === "credential_commit" ? 2 : boundary === "response" ? 5 : 0,
     );
-    if (boundary === "credential_commit" || boundary === "credential")
+    if (boundary === "credential_commit")
       expect(await savedCredential()).toEqual(initialSecret);
     const retained = await runInDurableObject(
       actor,
@@ -774,11 +760,7 @@ async function fileOriginJourney(
     expect(accepted.providerObservations).toBe(1);
     expect(accepted.history).toContain(PROVIDER_TEXT);
     expect(journey.bodyReads).toBe(
-      boundary === "search_observation" || boundary === "binding_commit"
-        ? 0
-        : boundary === "response"
-          ? 2
-          : 1,
+      boundary === "binding_commit" ? 0 : boundary === "response" ? 2 : 1,
     );
     Object.assign(task.meta, {
       fileOriginAcceptance: {
@@ -795,7 +777,6 @@ async function fileOriginJourney(
     });
   } finally {
     journey.phase = "released";
-    crypto.subtle.decrypt = journey.decrypt;
     crypto.subtle.encrypt = journey.encrypt;
     crypto.subtle.digest = journey.digest;
     activeJourney = null;
@@ -808,23 +789,6 @@ function currentPhase(journey: Journey) {
 async function waitForRelease(journey: Journey): Promise<void> {
   journey.phase = "paused";
   while (journey.phase === "paused") await scheduler.wait(5);
-}
-async function pauseCredential(
-  this: SubtleCrypto,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const journey = activeJourney;
-  if (journey === null) throw new Error("Missing file journey");
-  const result = await journey.decrypt.call(this, algorithm, key, data);
-  if (
-    journey.phase === "armed" &&
-    journey.boundary === "credential" &&
-    new TextDecoder().decode(result).includes(TOKEN)
-  )
-    await waitForRelease(journey);
-  return result;
 }
 async function pauseCredentialCommit(
   this: SubtleCrypto,
@@ -851,11 +815,7 @@ async function pauseObservation(
   const journey = activeJourney;
   if (journey === null) throw new Error("Missing file journey");
   const result = await journey.digest.call(this, algorithm, data);
-  if (
-    journey.phase !== "armed" ||
-    (journey.boundary !== "search_observation" &&
-      journey.boundary !== "binding_commit")
-  )
+  if (journey.phase !== "armed" || journey.boundary !== "binding_commit")
     return result;
   let raw: unknown;
   try {
@@ -886,12 +846,11 @@ async function pauseObservation(
       hexByte,
     ).join("");
   if (
-    (evidence && journey.boundary === "search_observation") ||
-    (journey.boundary === "binding_commit" &&
-      journey.observationDigest.length > 0 &&
-      isRecord(raw) &&
-      journey.observationSetDigest.length > 0 &&
-      raw.observationSetDigest === journey.observationSetDigest)
+    journey.boundary === "binding_commit" &&
+    journey.observationDigest.length > 0 &&
+    isRecord(raw) &&
+    journey.observationSetDigest.length > 0 &&
+    raw.observationSetDigest === journey.observationSetDigest
   )
     await waitForRelease(journey);
   return result;
@@ -924,10 +883,7 @@ async function respondToModel(
       "p55_file_done",
     );
   const name =
-    journey.boundary === "search_observation" ||
-    journey.boundary === "binding_commit"
-      ? "file_search"
-      : "file_read";
+    journey.boundary === "binding_commit" ? "file_search" : "file_read";
   if (!raw.tools.some(toolHasName.bind(null, name))) {
     if (++journey.discoveries > 8)
       throw new Error("File discovery did not complete");

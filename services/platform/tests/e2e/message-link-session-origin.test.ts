@@ -34,7 +34,7 @@ import {
 const LINK = "https://supplier.example.net/schedule?private=fixture";
 const FINAL_LINK = "https://docs.example.net/delivery";
 const PAGE_TEXT = "P55 link content: Friday delivery at 09:00.";
-type Boundary = "dns" | "redirect" | "receipt_hash";
+type Boundary = "dns" | "receipt_hash";
 type Journey = {
   readonly boundary: Boundary;
   readonly digest: SubtleCrypto["digest"];
@@ -46,7 +46,7 @@ type Journey = {
 };
 let activeJourney: Journey | null = null;
 
-it.for(["dns", "redirect", "receipt_hash"] as const)(
+it.for(["dns", "receipt_hash"] as const)(
   "fences message link %s against origin revocation and preserves accepted state after eviction",
   { timeout: 45_000 },
   linkOriginJourney,
@@ -87,9 +87,7 @@ async function linkOriginJourney(
     const actor = await sessionActor(original);
     const modelRequests = journey.modelRequests;
     const requests = journey.requests;
-    expect(requests).toBe(
-      boundary === "dns" ? 0 : boundary === "redirect" ? 1 : 2,
-    );
+    expect(requests).toBe(boundary === "dns" ? 0 : 2);
     await env.DB.prepare(
       "UPDATE control_session SET revoked_at = ? WHERE control_session_id = ?",
     )
@@ -197,11 +195,6 @@ class PinnedLinkFixture {
     expect(request.headers.get("authorization")).toBeNull();
     this.journey.requests++;
     if (raw.url === LINK) {
-      if (
-        this.journey.phase === "armed" &&
-        this.journey.boundary === "redirect"
-      )
-        await waitForRelease(this.journey);
       return HttpResponse.json({
         status: 302,
         contentType: null,

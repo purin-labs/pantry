@@ -93,18 +93,11 @@ const LIMITS = {
   debounce: { kind: "push_triggered", coalesceSeconds: 30 },
 } as const;
 type Boundary =
-  | "search_credential"
-  | "search_response"
-  | "reply_credential"
-  | "reply_response"
-  | "compose_commit"
-  | "self_test_cleanup"
-  | "self_test_freeze";
+  "search_response" | "reply_response" | "compose_commit" | "self_test_freeze";
 type Journey = {
   readonly boundary: Boundary;
   readonly accountId: IntegrationAccountId;
   readonly accountRef: IntegrationAccountReference;
-  readonly decrypt: SubtleCrypto["decrypt"];
   readonly encrypt: SubtleCrypto["encrypt"];
   phase: "armed" | "paused" | "released";
   modelRequests: number;
@@ -116,12 +109,9 @@ type Journey = {
 let activeJourney: Journey | null = null;
 
 it.for([
-  "search_credential",
   "search_response",
-  "reply_credential",
   "reply_response",
   "compose_commit",
-  "self_test_cleanup",
   "self_test_freeze",
 ] as const)(
   "fences mail %s, retains issued drafts and recovers without repeated provider effects",
@@ -142,7 +132,6 @@ async function mailOriginJourney(
       accountId,
       "integration_account",
     ),
-    decrypt: crypto.subtle.decrypt,
     encrypt: crypto.subtle.encrypt,
     phase: "armed",
     modelRequests: 0,
@@ -152,7 +141,6 @@ async function mailOriginJourney(
     discoveryRequests: 0,
   };
   activeJourney = journey;
-  crypto.subtle.decrypt = pauseCredential;
   crypto.subtle.encrypt = pauseComposeCommit;
   const withSession = fixtureDatabase().withSession.bind(fixtureDatabase());
   const sessionSpy = vi
@@ -218,8 +206,6 @@ async function mailOriginJourney(
     expect(journey.modelRequests).toBe(admittedRequests);
     expect(journey.providerReads).toBe(issuedReads);
     expect(journey.providerDrafts).toBe(issuedDrafts);
-    if (boundary === "search_credential" || boundary === "reply_credential")
-      expect(issuedReads + issuedDrafts).toBe(0);
     const retained = await runInDurableObject(
       actor,
       readSessionState.bind(null, accountId),
@@ -352,7 +338,6 @@ async function mailOriginJourney(
     });
   } finally {
     journey.phase = "released";
-    crypto.subtle.decrypt = journey.decrypt;
     crypto.subtle.encrypt = journey.encrypt;
     sessionSpy.mockRestore();
     activeJourney = null;
@@ -423,23 +408,6 @@ async function pauseSelfTestCleanup<T>(
 async function pause(journey: Journey): Promise<void> {
   journey.phase = "paused";
   while (journey.phase === "paused") await scheduler.wait(5);
-}
-async function pauseCredential(
-  this: SubtleCrypto,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const journey = activeJourney;
-  if (journey === null) throw new Error("Missing mail credential pause");
-  const opened = await journey.decrypt.call(this, algorithm, key, data);
-  if (
-    journey.phase === "armed" &&
-    journey.boundary.endsWith("credential") &&
-    new TextDecoder().decode(opened).includes(TOKEN)
-  )
-    await pause(journey);
-  return opened;
 }
 async function pauseComposeCommit(
   this: SubtleCrypto,

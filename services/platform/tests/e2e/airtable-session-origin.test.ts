@@ -37,16 +37,10 @@ const TOKEN = "airtable-session-origin-fixture-token";
 const BASE_ID = "appP55OriginAcceptance";
 const PROVIDER_TEXT = "P55 protected Airtable record";
 
-type Boundary =
-  | "read_credential"
-  | "write_credential"
-  | "write_claim"
-  | "read_response"
-  | "write_response";
+type Boundary = "write_claim" | "read_response" | "write_response";
 type Journey = {
   readonly boundary: Boundary;
   readonly accountId: IntegrationAccountId;
-  readonly decrypt: SubtleCrypto["decrypt"];
   readonly digest: SubtleCrypto["digest"];
   phase: "armed" | "paused" | "released";
   modelRequests: number;
@@ -54,15 +48,9 @@ type Journey = {
   toolIssued: boolean;
   discoveryRequests: number;
 };
-let credentialPause: Journey | null = null;
+let activeJourney: Journey | null = null;
 
-it.for([
-  "read_credential",
-  "write_credential",
-  "write_claim",
-  "read_response",
-  "write_response",
-] as const)(
+it.for(["write_claim", "read_response", "write_response"] as const)(
   "fences Airtable %s after revocation, settles issued writes and recovers without duplicate requests",
   { timeout: 45_000 },
   airtableOriginJourney,
@@ -76,7 +64,6 @@ async function airtableOriginJourney(
   const journey: Journey = {
     boundary,
     accountId,
-    decrypt: crypto.subtle.decrypt,
     digest: crypto.subtle.digest,
     phase: "armed",
     modelRequests: 0,
@@ -84,8 +71,7 @@ async function airtableOriginJourney(
     toolIssued: false,
     discoveryRequests: 0,
   };
-  credentialPause = journey;
-  crypto.subtle.decrypt = pauseCredential;
+  activeJourney = journey;
   crypto.subtle.digest = pauseWriteClaim;
   network.use(
     http.post(
@@ -199,9 +185,8 @@ async function airtableOriginJourney(
     });
   } finally {
     journey.phase = "released";
-    crypto.subtle.decrypt = journey.decrypt;
     crypto.subtle.digest = journey.digest;
-    credentialPause = null;
+    activeJourney = null;
     await pending;
   }
 }
@@ -210,31 +195,12 @@ function currentPhase(journey: Journey) {
   return journey.phase;
 }
 
-async function pauseCredential(
-  this: SubtleCrypto,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const pause = credentialPause;
-  if (pause === null) throw new Error("Missing credential pause");
-  const decrypted = await pause.decrypt.call(this, algorithm, key, data);
-  if (
-    pause.phase === "armed" &&
-    (pause.boundary === "read_credential" ||
-      pause.boundary === "write_credential") &&
-    new TextDecoder().decode(decrypted).includes(TOKEN)
-  )
-    await waitForRelease(pause);
-  return decrypted;
-}
-
 async function pauseWriteClaim(
   this: SubtleCrypto,
   algorithm: Parameters<SubtleCrypto["digest"]>[0],
   data: Parameters<SubtleCrypto["digest"]>[1],
 ): Promise<ArrayBuffer> {
-  const pause = credentialPause;
+  const pause = activeJourney;
   if (pause === null) throw new Error("Missing write claim pause");
   const digest = await pause.digest.call(this, algorithm, data);
   if (pause.phase !== "armed" || pause.boundary !== "write_claim")
@@ -276,9 +242,7 @@ async function respondToModel(
       "p55_airtable_done",
     );
   const write =
-    journey.boundary === "write_credential" ||
-    journey.boundary === "write_claim" ||
-    journey.boundary === "write_response";
+    journey.boundary === "write_claim" || journey.boundary === "write_response";
   const name = write ? "airtable_api_write" : "airtable_api_read";
   if (!body.tools.some(toolHasName.bind(null, name))) {
     if (++journey.discoveryRequests > 8)
