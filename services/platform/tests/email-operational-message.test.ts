@@ -17,7 +17,7 @@ describe("operational email message", () => {
     } as const;
     const first = buildOperationalEmailRaw(input);
     expect(buildOperationalEmailRaw(input)).toBe(first);
-    const decoded = decodeBase64Url(first);
+    const decoded = decodeBase64UrlText(first);
     expect(decoded).toContain("From: ops@example.com\r\n");
     expect(decoded).toContain("To: supplier@example.com\r\n");
     expect(decoded).toContain("Subject: Delivery update\r\n");
@@ -42,7 +42,7 @@ describe("operational email message", () => {
   });
 });
 
-function decodeBase64Url(value: string): string {
+function decodeBase64UrlText(value: string): string {
   const padded = value.replaceAll("-", "+").replaceAll("_", "/");
   return atob(padded + "=".repeat((4 - (padded.length % 4)) % 4));
 }

@@ -178,7 +178,7 @@ function rawBuildTest(): void {
     body,
     rfcMessageId: proposalRfcMessageId("p1", 1, "shop@example.com"),
   });
-  const decoded = decodeBase64Url(raw);
+  const decoded = decodeBase64UrlText(raw);
   const [headerBlock, bodyBlock] = splitOnce(decoded, "\r\n\r\n");
   expect(headerBlock).toContain("To: customer@sender.example");
   expect(headerBlock).toContain("Subject: Re: Order status?");
@@ -199,7 +199,7 @@ function rawBuildTest(): void {
     body: "Grüße",
     rfcMessageId: proposalRfcMessageId("p2", 1, "shop@example.com"),
   });
-  const unicodeHeaders = splitOnce(decodeBase64Url(unicode), "\r\n\r\n")[0];
+  const unicodeHeaders = splitOnce(decodeBase64UrlText(unicode), "\r\n\r\n")[0];
   expect(unicodeHeaders).toContain("Subject: =?UTF-8?B?");
 }
 
@@ -254,7 +254,7 @@ function splitOnce(value: string, separator: string): [string, string] {
     : [value.slice(0, index), value.slice(index + separator.length)];
 }
 
-function decodeBase64Url(segment: string): string {
+function decodeBase64UrlText(segment: string): string {
   const normalized = segment.replaceAll("-", "+").replaceAll("_", "/");
   return atob(normalized + "=".repeat((4 - (normalized.length % 4)) % 4));
 }
