@@ -15,6 +15,7 @@ declare const crypto: {
 declare const TextEncoder: new () => { encode(input: string): Uint8Array };
 declare function atob(data: string): string;
 declare function btoa(data: string): string;
+declare function setTimeout(callback: () => void, milliseconds: number): unknown;
 
 // Rust-compatible text rules. Validate Unicode scalar values at the boundary.
 
@@ -193,6 +194,27 @@ function describeUnexpected(value: unknown): string {
   } catch {
     return String(value);
   }
+}
+
+// Time
+
+/** Resolves after `milliseconds`. */
+export function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+/**
+ * Exponential backoff: `baseMs` for retry 0, doubled for each later retry and
+ * capped at `maxMs`. A negative retry counts as retry 0.
+ */
+export function backoffDelay(
+  retry: number,
+  baseMs: number,
+  maxMs = Number.POSITIVE_INFINITY,
+): number {
+  return Math.min(baseMs * 2 ** Math.max(0, retry), maxMs);
 }
 
 // Encoding
