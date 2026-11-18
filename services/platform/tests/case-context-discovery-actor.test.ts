@@ -29,10 +29,7 @@ describe("Cue CaseContextCollection Actor boundary", suite);
 
 function suite(): void {
   afterEach(vi.unstubAllGlobals);
-  it(
-    "requires the owning organisation, explicit opt-in and fixed synthetic inputs",
-    guardsActorInputs,
-  );
+  it("requires the owning organisation and explicit opt-in", guardsActorInputs);
   it(
     "reads and rejects stored suggestions through the organisation boundary",
     reviewsStoredSuggestions,
@@ -216,21 +213,6 @@ async function guardsActorInputs(): Promise<void> {
   ).resolves.toEqual({
     ok: false,
     error: { code: "case_context_discovery_activation_unavailable" },
-  });
-  await expect(
-    actor.evaluateCaseContextDiscoverySyntheticFixture({
-      organisationId: organisationId.value,
-      body: {
-        evaluationId: "eval-1",
-        expectedRevision: 1,
-        source: "commerce",
-        integrationAccountId: "account-1",
-        evidence: "private customer text must never enter this rollout",
-      },
-    }),
-  ).resolves.toEqual({
-    ok: false,
-    error: { code: "case_context_discovery_evaluation_invalid" },
   });
   expect(fetcher).not.toHaveBeenCalled();
   fixture.database.close();

@@ -14,7 +14,6 @@ import {
   repinCaseContextDiscoveryPolicy,
   readCaseContextDiscoveryPolicy,
 } from "../../case-context-discovery/evaluation-store";
-import { evaluateSyntheticCaseContextDiscovery } from "../../case-context-discovery/synthetic-evaluation";
 import {
   commitCaseContextCollectionEffectFence,
   evidenceForCaseContextCollection,
@@ -695,68 +694,6 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
     });
     await this.rearm();
     return result;
-  }
-
-  async evaluateCaseContextDiscoverySyntheticFixture(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      body: unknown;
-    }>,
-  ) {
-    const start =
-      this.admittedEvaluateCaseContextDiscoverySyntheticFixture.bind(
-        this,
-        input,
-      );
-    return this.command(input.organisationId, start);
-  }
-
-  protected async admittedEvaluateCaseContextDiscoverySyntheticFixture(
-    input: Readonly<{ organisationId: OrganisationId; body: unknown }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    const body = input.body;
-    if (
-      !isRecord(body) ||
-      Object.keys(body).length !== 4 ||
-      !identifier(body.evaluationId) ||
-      !integerIn(body.expectedRevision, 1, Number.MAX_SAFE_INTEGER) ||
-      !identifier(body.integrationAccountId) ||
-      (body.source !== "commerce" &&
-        body.source !== "gmail" &&
-        body.source !== "whatsapp")
-    ) {
-      return {
-        ok: false as const,
-        error: { code: "case_context_discovery_evaluation_invalid" as const },
-      };
-    }
-    const credential = await resolveTypeSafeCredential({
-      sql: this.ctx.storage.sql,
-      db: scope.database,
-      keys: this.env,
-      organisationId: scope.organisationId,
-    });
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    return evaluateSyntheticCaseContextDiscovery({
-      sql: this.ctx.storage.sql,
-      transaction: schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
-      credential,
-      scope,
-      evaluationId: body.evaluationId,
-      expectedRevision: body.expectedRevision,
-      source: body.source,
-      integrationAccountId: body.integrationAccountId,
-      signal: new AbortController().signal,
-      fetcher: runtimeFetch,
-      now: Date.now,
-    });
   }
 
   async evaluateCaseContextDiscovery(

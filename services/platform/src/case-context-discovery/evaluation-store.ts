@@ -340,7 +340,7 @@ function settleTransaction(
 }
 
 /** Withdrawal advances the fence even if the operator later republishes identical config. */
-export function disableCaseContextDiscoveryPolicy(
+function disableCaseContextDiscoveryPolicy(
   sql: SqlStorage,
   organisationId: OrganisationId,
   expectedRevision: number,

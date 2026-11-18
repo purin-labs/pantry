@@ -13,7 +13,7 @@ import { isNonNegativeInteger, isRecord } from "@seams/std";
 export const CASE_CONTEXT_DISCOVERY_JEV_MODEL = "jev-1.13.0";
 // Full pinned-model context reservation; no tokenizer estimate is treated as a hard bound.
 export const CASE_CONTEXT_DISCOVERY_INPUT_TOKEN_RESERVATION = 65_536;
-export const CASE_CONTEXT_DISCOVERY_QUESTION_REVISION = 1;
+const CASE_CONTEXT_DISCOVERY_QUESTION_REVISION = 1;
 const MAX_CASE_CONTEXT_DISCOVERY_CANDIDATES = 5;
 
 export type CaseContextCollectionRelationshipOutcome =

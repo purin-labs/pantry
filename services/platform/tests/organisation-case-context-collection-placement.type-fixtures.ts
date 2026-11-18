@@ -9,19 +9,11 @@ import {
 import { evaluateOperationalCaseContextDiscovery } from "../src/case-context-discovery/operational-evaluation";
 import { bindEmailMessageReceiptContact } from "../src/data/email-mailbox";
 import { storeOrganisationExecutionVaultSecret } from "../src/credential-vault/service";
-import { evaluateSyntheticCaseContextDiscovery } from "../src/case-context-discovery/synthetic-evaluation";
 import {
   fetchCaseContextDiscoveryEvaluation,
   releaseUnissuedCaseContextDiscoveryEvaluation,
 } from "../src/case-context-discovery/evaluation-store";
 
-declare const synthetic: Parameters<
-  typeof evaluateSyntheticCaseContextDiscovery
->[0];
-const { scope: syntheticScope, ...unscopedSynthetic } = synthetic;
-void syntheticScope;
-// @ts-expect-error Synthetic inference must retain its admitted placement.
-void evaluateSyntheticCaseContextDiscovery(unscopedSynthetic);
 declare const transport: Parameters<
   typeof fetchCaseContextDiscoveryEvaluation
 >[0];

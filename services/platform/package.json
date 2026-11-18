@@ -11,7 +11,6 @@
     "actions:check": "node --experimental-strip-types scripts/generate-actions.ts --check",
     "audit:credential-closure": "pnpm exec esbuild scripts/audit-credential-closure.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-audit-credential-closure.mjs --log-level=warning && node /tmp/satyr-audit-credential-closure.mjs",
     "audit:credential-closure:remote": "pnpm exec esbuild scripts/audit-credential-closure.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-audit-credential-closure.mjs --log-level=warning && node /tmp/satyr-audit-credential-closure.mjs --remote",
-    "eval:case-context-discovery": "pnpm exec esbuild scripts/evaluate-case-context-discovery.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-case-context-discovery-evaluation.mjs --log-level=warning && node --env-file-if-exists=../../.env.local /tmp/satyr-case-context-discovery-evaluation.mjs",
     "test": "vitest run",
     "test:e2e": "pnpm contracts:media && vitest run --config vitest.e2e.config.ts",
     "test:migrations": "vitest run tests/d1-schema.test.ts",

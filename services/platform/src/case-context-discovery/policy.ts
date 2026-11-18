@@ -8,7 +8,7 @@ import {
   type TypeSafeAuthority,
 } from "../integrations/typesafe/authority";
 
-export type CaseContextCollectionSource = "commerce" | "gmail" | "whatsapp";
+type CaseContextCollectionSource = "commerce" | "gmail" | "whatsapp";
 
 export type CaseContextDiscoveryPolicy =
   | Readonly<{

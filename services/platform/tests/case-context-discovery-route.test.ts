@@ -63,7 +63,6 @@ function reset(): void {
   });
   mocks.actor.mockResolvedValue({
     publishCaseContextDiscoveryConfiguration: mocks.publish,
-    evaluateCaseContextDiscoverySyntheticFixture: mocks.evaluate,
     readCaseContextDiscoveryConfiguration: mocks.read,
     readCaseContextCollection: mocks.readCaseContextCollection,
     reviewCaseContextCollectionRelationship: mocks.review,
@@ -189,9 +188,7 @@ async function boundsRequest(): Promise<void> {
 function boundsRoutes(): void {
   expect(
     matchCaseContextDiscoveryRoute(PATH + "/synthetic-evaluation"),
-  ).toMatchObject({
-    operation: "synthetic_evaluation",
-  });
+  ).toBeNull();
   expect(
     matchCaseContextDiscoveryRoute(PATH + "/cases/case_one"),
   ).toMatchObject({

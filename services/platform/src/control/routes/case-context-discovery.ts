@@ -30,7 +30,6 @@ export type CaseContextDiscoveryRoute = Readonly<{
 }> &
   (
     | Readonly<{ operation: "configuration" }>
-    | Readonly<{ operation: "synthetic_evaluation" }>
     | Readonly<{ operation: "inspector" }>
     | Readonly<{ operation: "screen_observations" }>
     | Readonly<{ operation: "case_relationships"; caseId: CaseId }>
@@ -47,7 +46,7 @@ export type CaseContextDiscoveryRoute = Readonly<{
 type CaseContextDiscoveryMetadataRoute = Exclude<
   CaseContextDiscoveryRoute,
   {
-    operation: "configuration" | "synthetic_evaluation" | "screen_observations";
+    operation: "configuration" | "screen_observations";
   }
 >;
 
@@ -76,9 +75,6 @@ function parseCaseContextCollectionOperation(
 ): CaseContextDiscoveryRoute | null {
   const base = { kind: "caseContextCollections" as const, organisationId };
   if (suffix === undefined) return { ...base, operation: "configuration" };
-  if (suffix === "synthetic-evaluation") {
-    return { ...base, operation: "synthetic_evaluation" };
-  }
   if (suffix === "inspector") return { ...base, operation: "inspector" };
   if (suffix === "screen-observations")
     return { ...base, operation: "screen_observations" };
@@ -147,7 +143,6 @@ export async function handleCaseContextDiscoveryRoute(
           route,
         );
       case "configuration":
-      case "synthetic_evaluation":
         break;
       default:
         return assertNever(route);
@@ -165,17 +160,11 @@ export async function handleCaseContextDiscoveryRoute(
     }
     const body = await readCaseContextCollectionBody(request);
     if (body === null) return invalidRequest();
-    const result =
-      route.operation === "configuration"
-        ? await actor.publishCaseContextDiscoveryConfiguration({
-            organisationId: authorized.organisationId,
-            actorId: authorized.actorId,
-            body,
-          })
-        : await actor.evaluateCaseContextDiscoverySyntheticFixture({
-            organisationId: authorized.organisationId,
-            body,
-          });
+    const result = await actor.publishCaseContextDiscoveryConfiguration({
+      organisationId: authorized.organisationId,
+      actorId: authorized.actorId,
+      body,
+    });
     return caseContextCollectionResult(result);
   } catch {
     return controlError(unavailableCode(route), 503);
@@ -353,7 +342,6 @@ function caseContextCollectionMutation(
     case "configuration":
       if (method === "GET") return false;
       return method === "PUT" ? true : null;
-    case "synthetic_evaluation":
     case "case_context_collection_review":
       return method === "POST" ? true : null;
     case "case_relationships":
@@ -406,7 +394,6 @@ function unavailableCode(route: CaseContextDiscoveryRoute): string {
     case "screen_observations":
       return "case_screen_observations_unavailable";
     case "configuration":
-    case "synthetic_evaluation":
       return "case_context_discovery_evaluation_unavailable";
     default:
       return assertNever(route);
