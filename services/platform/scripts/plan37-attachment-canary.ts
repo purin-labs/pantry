@@ -30,7 +30,7 @@
 import { randomUUID } from "node:crypto";
 import { Buffer } from "node:buffer";
 import { readFile, writeFile } from "node:fs/promises";
-import { isRecord } from "@seams/std";
+import { isRecord, sleep } from "@seams/std";
 
 type CanaryCase = {
   readonly name: string;
@@ -441,7 +441,7 @@ async function awaitReply(
   startedAt: number,
 ): Promise<{ readonly ts: string; readonly text: string } | null> {
   while (Date.now() - startedAt < REPLY_TIMEOUT_MS) {
-    await delay(REPLY_POLL_MS);
+    await sleep(REPLY_POLL_MS);
 
     const replies = await slackJson(
       config.token,
@@ -758,12 +758,6 @@ function solidRedPng(): Uint8Array {
       "base64",
     ),
   );
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise(function resolveAfter(resolve) {
-    setTimeout(resolve, ms);
-  });
 }
 
 if (import.meta.main) await main();

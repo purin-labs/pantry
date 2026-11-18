@@ -5,6 +5,7 @@
  * only, until a reload.
  */
 import type { SlackDraftView } from "@seams/control-api/portal/slack-drafts";
+import { sleep } from "@seams/std";
 
 const DIGEST = "a".repeat(64);
 const params = new URLSearchParams(window.location.search);
@@ -168,7 +169,7 @@ export async function previewDraftResponse(
     url.pathname,
   );
   if (slack !== null) {
-    await pause();
+    await sleep(450);
     if (
       params.get("draftFault") === "slack-read" &&
       slack[1] === undefined &&
@@ -227,7 +228,7 @@ export async function previewDraftResponse(
       url.pathname,
     );
   if (email === null) return null;
-  await pause();
+  await sleep(450);
   if (
     params.get("draftFault") === "email-read" &&
     email[1] === undefined &&
@@ -297,7 +298,7 @@ async function previewReplyResponse(
   step: string | undefined,
   init: RequestInit | undefined,
 ): Promise<Response> {
-  await pause();
+  await sleep(450);
   switch (step) {
     case "approve":
       replyLifecycle = "sent";
@@ -376,8 +377,4 @@ function previewEmailState(raw: string | null): string {
     default:
       return "awaiting_approval";
   }
-}
-
-function pause(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, 450));
 }

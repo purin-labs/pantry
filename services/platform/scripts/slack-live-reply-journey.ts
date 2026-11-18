@@ -21,7 +21,7 @@
 
 import { randomUUID } from "node:crypto";
 import { writeFile } from "node:fs/promises";
-import { isRecord } from "@seams/std";
+import { isRecord, sleep } from "@seams/std";
 
 const SLACK_API = "https://slack.com/api";
 const REPLY_TIMEOUT_MS = 180_000;
@@ -62,7 +62,7 @@ async function main(): Promise<void> {
 
   const reply = await awaitReply(config, threadTs, nonce, startedAt);
   const firstReplyMs = reply === null ? null : Date.now() - startedAt;
-  if (reply !== null) await delay(QUIET_PERIOD_MS);
+  if (reply !== null) await sleep(QUIET_PERIOD_MS);
   const appMessages = await readAppMessages(config, threadTs);
 
   const failures: string[] = [];
@@ -117,7 +117,7 @@ async function awaitReply(
   startedAt: number,
 ): Promise<AppMessage | null> {
   while (Date.now() - startedAt < REPLY_TIMEOUT_MS) {
-    await delay(POLL_MS);
+    await sleep(POLL_MS);
     const messages = await readAppMessages(config, threadTs);
     const reply = messages.find((message) => message.text.includes(nonce));
     if (reply !== undefined) return reply;
@@ -180,10 +180,6 @@ async function slackJson(
     throw new Error(`${method} failed: ${detail}`);
   }
   return parsed;
-}
-
-function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 await main();
