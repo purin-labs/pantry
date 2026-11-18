@@ -321,6 +321,17 @@ function commerceFixtureWorker() {
 const ACCOUNT_PLATFORM_TEST_WORKER = "seams-account-platform-e2e";
 const ACCOUNT_PLATFORM_TEST_ORIGIN = "https://account.shared-account.invalid";
 
+/**
+ * Prices that the account Worker must know. The Plan 88 journeys charge Jev
+ * use at both (`JEV_PRICE` in `src/jev-features/paid-use.ts`; Node cannot
+ * load that module here). An account Worker built before seams-monorepo
+ * `aee87e9a` knows neither, and those journeys then fail far from the cause.
+ */
+const ACCOUNT_WORKER_PRICES = [
+  "satyr-jev-input-tokens-v1",
+  "satyr-jev-input-tokens-customer-v1",
+] as const;
+
 /** Load the built account Worker. This test runtime never imports Seams source. */
 function sharedAccountPlatformTestRuntime() {
   const artifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
@@ -329,6 +340,11 @@ function sharedAccountPlatformTestRuntime() {
   if (!artifact) return { workers: [] as const, bindings, serviceBindings };
   const artifactPath = resolve(artifact);
   const artifactBytes = readFileSync(artifactPath);
+  for (const version of ACCOUNT_WORKER_PRICES)
+    if (!artifactBytes.includes(version))
+      throw new Error(
+        `The account Worker ${artifactPath} has no price ${version}. Rebuild it in seams-monorepo (aee87e9a or later): pnpm -C tests exec node helpers/buildSharedAccountPlatformWorker.mjs`,
+      );
   const assertion = generateKeyPairSync("ed25519");
   const google = generateKeyPairSync("rsa", { modulusLength: 2048 });
   const provision = generateKeyPairSync("ed25519");
