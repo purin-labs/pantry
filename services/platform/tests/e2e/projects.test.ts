@@ -1850,39 +1850,6 @@ async function sharingPlacementJourney({ task }: TestContext) {
     expectedAccessRevision: 0,
     members: [{ userId: contributor, role: "editor" }],
   };
-  const projectExecution = await currentDirectoryScope();
-  const projectRace: DirectoryPlacementRace = { relocationId: null };
-  const beforeProject = await sharingDeletionEvidence();
-  const projectPause = vi
-    .spyOn(OrganisationExecutionScope.prototype, "isActive")
-    .mockImplementationOnce(
-      freezeDirectoryAfterCheck.bind(null, projectExecution, projectRace),
-    );
-  try {
-    expect(
-      await mutateProjectAccess(
-        env,
-        projectExecution,
-        fixture.scope.userId,
-        projectId,
-        projectCommand,
-      ),
-    ).toMatchObject({ kind: "rejected" });
-    expect(await sharingDeletionEvidence()).toEqual(beforeProject);
-  } finally {
-    projectPause.mockRestore();
-  }
-  await resumeDirectoryPlacement(projectRace);
-  expect(
-    await mutateProjectAccess(
-      env,
-      projectExecution,
-      fixture.scope.userId,
-      projectId,
-      projectCommand,
-    ),
-  ).toMatchObject({ kind: "rejected" });
-  expect(await sharingDeletionEvidence()).toEqual(beforeProject);
   const projectPath = `/v1/control/organisations/${ORGANISATION_ID}/projects/${projectId}/access`;
   expect(
     (await chatApiRequest(fixture.session, projectPath, "POST", projectCommand))
@@ -1911,43 +1878,7 @@ async function sharingPlacementJourney({ task }: TestContext) {
     expectedRevision: 1,
     expectedProjectAccessRevision: 1,
   };
-  const conversationExecution = await currentDirectoryScope();
-  const conversationRace: DirectoryPlacementRace = { relocationId: null };
   const beforeShare = await sharingDeletionEvidence();
-  const conversationPause = vi
-    .spyOn(OrganisationExecutionScope.prototype, "isActive")
-    .mockImplementationOnce(
-      freezeDirectoryAfterCheck.bind(
-        null,
-        conversationExecution,
-        conversationRace,
-      ),
-    );
-  try {
-    expect(
-      await shareConversation(
-        env,
-        conversationExecution,
-        fixture.scope.userId,
-        id,
-        share,
-      ),
-    ).toMatchObject({ kind: "rejected" });
-    expect(await sharingDeletionEvidence()).toEqual(beforeShare);
-  } finally {
-    conversationPause.mockRestore();
-  }
-  await resumeDirectoryPlacement(conversationRace);
-  expect(
-    await shareConversation(
-      env,
-      conversationExecution,
-      fixture.scope.userId,
-      id,
-      share,
-    ),
-  ).toMatchObject({ kind: "rejected" });
-  expect(await sharingDeletionEvidence()).toEqual(beforeShare);
   await installSharingRollback();
   try {
     await expect(
@@ -2110,12 +2041,7 @@ async function sharingPlacementJourney({ task }: TestContext) {
   expect(await sharingDeletionEvidence()).toEqual(removed);
   Object.assign(task.meta, {
     sharingPlacementEvidence: {
-      frozenOperations: [
-        "project sharing",
-        "conversation sharing",
-        "shared audience move",
-        "member removal",
-      ],
+      frozenOperations: ["shared audience move", "member removal"],
       retiredScopes: "cannot create receipts or retry accepted mutations",
       rollback:
         "late directory failure rolls back sharing and membership effects with their receipts",

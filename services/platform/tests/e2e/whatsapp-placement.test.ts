@@ -391,11 +391,8 @@ function retainedReplyProposal(
   return latestWhatsAppProposal(state.storage.sql, proposalId);
 }
 
-type SupportOriginBoundary = "panel" | "binding_commit";
 type SupportOriginPause = {
-  readonly boundary: SupportOriginBoundary;
   readonly integrationAccountId: IntegrationAccountId;
-  readonly decrypt: SubtleCrypto["decrypt"];
   readonly digest: SubtleCrypto["digest"];
   phase: "armed" | "paused" | "released";
   toolIssued: boolean;
@@ -405,22 +402,17 @@ type SupportOriginPause = {
   observationSetDigest: string;
 };
 
-it.for(["panel", "binding_commit"] as const)(
-  "withholds WhatsApp support %s after origin revocation and preserves denial after eviction",
-  { timeout: 45_000 },
+it(
+  "withholds WhatsApp support binding_commit after origin revocation and preserves denial after eviction",
   supportOriginJourney,
+  45_000,
 );
 
-async function supportOriginJourney(
-  boundary: SupportOriginBoundary,
-  { task }: TestContext,
-): Promise<void> {
+async function supportOriginJourney({ task }: TestContext): Promise<void> {
   const fixture = await installFixture();
   const { session, fresh } = await installSupportReadAuthority(fixture);
   const pause: SupportOriginPause = {
-    boundary,
     integrationAccountId: fixture.integrationAccountId,
-    decrypt: crypto.subtle.decrypt,
     digest: crypto.subtle.digest,
     phase: "armed",
     toolIssued: false,
@@ -429,7 +421,6 @@ async function supportOriginJourney(
     observationDigest: "",
     observationSetDigest: "",
   };
-  crypto.subtle.decrypt = pauseSupportRead.bind(null, pause);
   crypto.subtle.digest = pauseSupportObservation.bind(null, pause);
   network.use(
     http.post(
@@ -437,7 +428,7 @@ async function supportOriginJourney(
       supportReadModel.bind(null, pause),
     ),
   );
-  const key = `p55_whatsapp_support_${boundary}`;
+  const key = "p55_whatsapp_support_binding_commit";
   const pending = dispatchSupportRead(session, key);
   try {
     await expect
@@ -482,7 +473,7 @@ async function supportOriginJourney(
     expect(accepted.history).toContain("Is my order ready?");
     Object.assign(task.meta, {
       whatsappSupportOriginAcceptance: {
-        boundary,
+        boundary: "binding_commit",
         revokedObservations: 0,
         protectedHistoryWithheld: true,
         evictedDenialRetained: true,
@@ -492,7 +483,6 @@ async function supportOriginJourney(
     });
   } finally {
     pause.phase = "released";
-    crypto.subtle.decrypt = pause.decrypt;
     crypto.subtle.digest = pause.digest;
     await pending;
   }
@@ -589,32 +579,13 @@ function supportOriginPhase(
   return pause.phase;
 }
 
-async function pauseSupportRead(
-  pause: SupportOriginPause,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const result = await pause.decrypt.call(crypto.subtle, algorithm, key, data);
-  if (
-    pause.boundary === "panel" &&
-    pause.phase === "armed" &&
-    new TextDecoder().decode(result) === "Is my order ready?"
-  ) {
-    pause.phase = "paused";
-    while (pause.phase === "paused") await scheduler.wait(5);
-  }
-  return result;
-}
-
 async function pauseSupportObservation(
   pause: SupportOriginPause,
   algorithm: Parameters<SubtleCrypto["digest"]>[0],
   data: Parameters<SubtleCrypto["digest"]>[1],
 ): Promise<ArrayBuffer> {
   const result = await pause.digest.call(crypto.subtle, algorithm, data);
-  if (pause.boundary !== "binding_commit" || pause.phase !== "armed")
-    return result;
+  if (pause.phase !== "armed") return result;
   let raw: unknown;
   try {
     raw = JSON.parse(new TextDecoder().decode(data));

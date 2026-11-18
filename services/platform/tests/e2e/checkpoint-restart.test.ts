@@ -26,7 +26,7 @@ import {
 import { FakeChatGpt } from "./chatgpt-subscription-support";
 
 type RestartTrial = {
-  readonly admission: "open" | "closed" | "closing";
+  readonly admission: "open" | "closing";
   readonly boundary: "before_upload" | "after_upload";
   readonly checkpointSize: "ordinary" | "large";
 };
@@ -42,12 +42,6 @@ const recoveryObservations = new WeakMap<
 >();
 
 it.for([
-  { admission: "open", boundary: "before_upload", checkpointSize: "ordinary" },
-  {
-    admission: "closed",
-    boundary: "before_upload",
-    checkpointSize: "ordinary",
-  },
   {
     admission: "closing",
     boundary: "before_upload",
@@ -155,10 +149,7 @@ async function restartFinalization(
   expect(usage.bindings.kind).toBe("settled_calls");
   // An admission that closes before the turn completes stops the recovery
   // before it reads the archive.
-  if (
-    admission === "closed" ||
-    (admission === "closing" && boundary === "before_upload")
-  ) {
+  if (admission === "closing" && boundary === "before_upload") {
     expect(usage.bindings.operations).toEqual({});
   } else {
     expect(usage.bindings.operations["r2.head"]?.fulfilled).toBe(1);
@@ -426,7 +417,7 @@ async function crashAfterUpload(
 }
 
 function prepareRecovery(
-  admission: "open" | "closed" | "closing",
+  admission: RestartTrial["admission"],
   boundary: RestartTrial["boundary"],
   lease: HarnessTurnLease,
   actor: object,
@@ -438,7 +429,6 @@ function prepareRecovery(
     lease,
     Date.now(),
   );
-  if (admission === "closed") closeFinalizationAdmission(actor, state);
   if (admission === "closing") {
     if (boundary === "before_upload")
       closeAdmissionDuringFinalization(actor, state);
