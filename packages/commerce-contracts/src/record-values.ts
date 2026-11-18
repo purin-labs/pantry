@@ -7,6 +7,7 @@
 import { IsArray, IsIntersect, IsObject, IsUnion, type TSchema } from "typebox";
 import { Value } from "typebox/value";
 import { cleanValue } from "./sorted-unions.ts";
+import { isRecord } from "@seams/std";
 
 type Schema = TSchema & Readonly<Record<string, unknown>>;
 
@@ -21,7 +22,7 @@ export function fillRecordDefaults(schema: TSchema, value: unknown): unknown {
   if (value === undefined && "default" in node)
     return Value.Clone(node.default);
   if (IsObject(node)) {
-    if (!isPlainObject(value)) return value;
+    if (!isRecord(value)) return value;
     for (const [key, property] of Object.entries(objectProperties(node))) {
       const filled = fillRecordDefaults(property, value[key]);
       if (filled !== undefined) value[key] = filled;
@@ -55,7 +56,7 @@ export function cleanCheckedRecord(schema: TSchema, value: unknown): unknown {
   if (IsObject(node) && isSchemaValue(node.additionalProperties))
     return cleanValue(schema, value);
   if (IsObject(node) || isObjectIntersection(node)) {
-    if (!isPlainObject(value)) return value;
+    if (!isRecord(value)) return value;
     const properties = objectProperties(node);
     for (const key of Object.keys(value)) {
       const property = properties[key];
@@ -85,7 +86,7 @@ export function cleanCheckedRecord(schema: TSchema, value: unknown): unknown {
 function checkedVariant(union: Schema, value: unknown): TSchema | undefined {
   const variants = union.anyOf as TSchema[];
   const tag = unionTag(union);
-  if (tag !== undefined && isPlainObject(value)) {
+  if (tag !== undefined && isRecord(value)) {
     const variant = tag.variants.get(value[tag.field]);
     if (variant !== undefined) return variant;
   }
@@ -191,8 +192,4 @@ function isOpenObjectPart(schema: Schema): boolean {
 
 function isSchemaValue(value: unknown): boolean {
   return typeof value === "object" && value !== null;
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

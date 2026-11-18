@@ -15,6 +15,7 @@ import type {
   HarnessCapabilityName,
   HarnessToolDefinition,
 } from "./catalog/types";
+import { isRecord } from "@seams/std";
 
 /**
  * A tool argument that the agent can correct: the message names the field and
@@ -284,7 +285,7 @@ function modelSchema(schema: unknown): unknown {
   const source = schema as Readonly<Record<string, unknown>>;
   const copy: Record<string, unknown> = {};
   for (const key of LEADING_KEYS) {
-    if (key === "properties" && isSchemaMap(source[key])) {
+    if (key === "properties" && isRecord(source[key])) {
       copy[key] = Object.fromEntries(
         Object.entries(source[key]).map(([name, value]) => [
           name,
@@ -313,8 +314,3 @@ function modelSchema(schema: unknown): unknown {
   return copy;
 }
 
-function isSchemaMap(
-  value: unknown,
-): value is Readonly<Record<string, unknown>> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
