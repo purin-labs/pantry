@@ -1,44 +1,25 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
+import {
+  beginRun,
+  driveRun,
+  evidenceDirectory,
+  evidenceWriter,
+  pendingInspection,
+  pinnedEngine,
+  sameId,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   compileFinancierRecipe,
   financierRecipeInput,
 } from "../../packages/production-simulation/src/recipes/bakery/financier.ts";
 import { PRODUCTION_EXECUTION_MANIFEST as manifest } from "../../packages/production-simulation/src/execution-manifest.generated.ts";
-import { prepareCell, runtimeModule } from "./build-execution-bundle.mjs";
+import { prepareCell } from "./build-execution-bundle.mjs";
 
-assert.equal(process.argv.length, 3, "Provide a fresh evidence directory");
-const output = resolve(process.argv[2]);
-assert.equal(existsSync(output), false, "Choose a fresh evidence directory");
-mkdirSync(output, { recursive: true });
-
-const engineDirectory = resolve(
-  `apps/portal/public/bakery-physics/executions/${manifest.bundle.id}`,
-);
-const runtime = resolve(
-  `apps/portal/public/bakery-physics/bundles/${manifest.runtime.id}`,
-);
-const E = await import(
-  pathToFileURL(join(engineDirectory, manifest.engine.file)).href
-);
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
-
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
-function save(name, data) {
-  writeFileSync(join(output, name), `${canonicalJson(data)}\n`);
-}
+const output = evidenceDirectory("Choose a fresh evidence directory");
+const save = evidenceWriter(output);
+const engine = await pinnedEngine();
+const { E, runtime } = engine;
 
 const cell = await prepareCell(runtime, "financier-cold-cell");
 assert.equal(cell.fixture, "persistent-rack/1");
@@ -73,67 +54,26 @@ save("recipe.json", {
 save("execution.json", manifest);
 save("scenario.json", scenario);
 
-async function open(activeScenario, saved, leg) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const reply = await host.handle({
-    kind: "begin",
+function open(activeScenario, saved, leg) {
+  return beginRun(engine, {
     bundle: manifest.bundle,
     cells: [cell],
-    identity: {
-      runId: "financier-cold-carrier-acceptance",
-      executionId: `financier-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario: activeScenario }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "financier-cold-carrier-acceptance",
+    executionId: `financier-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario: activeScenario,
+    saved,
   });
-  assert.equal(reply.kind, "began", JSON.stringify(reply));
-  return host;
 }
 
-async function drive(host, until = 21_600_000_000) {
-  for (let turn = 0; turn < 2000; turn++) {
-    const reply = await host.handle({ kind: "drive", turns: 128, until });
-    assert.equal(reply.kind, "drove", JSON.stringify(reply));
-    if (
-      reply.view.time >= until ||
-      [
-        "completed",
-        "blocked",
-        "stopped-at-limit",
-        "awaiting-inspection",
-      ].includes(reply.view.status.kind)
-    ) {
-      const state = await host.handle({ kind: "state" });
-      assert.equal(state.kind, "state");
-      return { run: state.run, view: reply.view };
-    }
-  }
-  throw new Error("Financier cold-handling run exceeded its execution bound");
+function drive(host, until = 21_600_000_000) {
+  return driveRun(host, {
+    until,
+    calls: 2000,
+    bound: "Financier cold-handling run exceeded its execution bound",
+  });
 }
 
-function pendingInspection(item) {
-  return item.kind === "pending";
-}
-function sameId(id, item) {
-  return item.id === id;
-}
 function recipeTask(run, workflow, key) {
   const id = `${workflow}#0/${key}`;
   const found = run.tasks.find(sameId.bind(null, id));

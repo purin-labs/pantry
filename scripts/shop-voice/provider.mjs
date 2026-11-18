@@ -3,29 +3,21 @@
 // API, Workers AI and the model provider. They only record each call and answer
 // it. The account authority is the built account Worker of the acceptance tests,
 // as in Plan 81.
-import { unstable_startWorker } from "../../services/platform/node_modules/wrangler/wrangler-dist/cli.js";
-import { generateKeyPairSync } from "node:crypto";
-import { resolve } from "node:path";
+import {
+  accountArtifact,
+  runKeys,
+  startAccountWorker,
+  startFixtureWorker,
+  stopOnSignal,
+  text,
+} from "../lib/fixture-worker.mjs";
+import { sleep } from "../../packages/std/src/index.ts";
 
 const [config, persistence] = process.argv.slice(2);
 const port = Number(process.env.SHOP_VOICE_PORT ?? 8891);
 
-const accountArtifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
-if (!accountArtifact)
-  throw new Error(
-    "Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.",
-  );
-const assertionKeys = generateKeyPairSync("ed25519");
-const provisionKeys = generateKeyPairSync("ed25519");
-const googleKeys = generateKeyPairSync("rsa", { modulusLength: 2048 });
-
-function text(value) {
-  return { type: "plain_text", value };
-}
-
-function jwk(key) {
-  return text(JSON.stringify(key.export({ format: "jwk" })));
-}
+const artifact = accountArtifact();
+const keys = runKeys();
 
 const records = new Map();
 const writes = [];
@@ -172,7 +164,7 @@ async function model(request) {
     if (stage !== null) return stage;
   }
   const slow = SLOW_TURNS.find(([pattern]) => pattern.test(asked.slice(-300)));
-  if (slow) await new Promise((resolve) => setTimeout(resolve, slow[1]));
+  if (slow) await sleep(slow[1]);
   const base = {
     id: `shop_voice_${modelRequests.length}`,
     object: "chat.completion.chunk",
@@ -197,7 +189,7 @@ async function model(request) {
               ),
             ),
           );
-          await new Promise((resolve) => setTimeout(resolve, REST_AFTER_MS));
+          await sleep(REST_AFTER_MS);
           controller.enqueue(
             encoder.encode(
               line({ content: `${REST_OF_ANSWER}"}` }, null) +
@@ -247,38 +239,17 @@ async function model(request) {
   );
 }
 
-function unexpectedAccountRequest(request) {
-  throw new Error(`Unexpected request of the account Worker: ${request.url}`);
-}
-
-const account = await unstable_startWorker({
+const account = await startAccountWorker({
+  artifact,
   name: "satyr-shop-voice-account-authority",
-  entrypoint: resolve(accountArtifact),
-  compatibilityDate: "2026-07-07",
-  compatibilityFlags: ["nodejs_compat"],
-  build: { nodejsCompatMode: "v2" },
-  bindings: {
-    ACCOUNT_DB: {
-      type: "d1",
-      database_name: "shop-voice-account-authority",
-      database_id: "00000000-0000-0000-0000-000000000582",
-    },
-    FIXTURE_ASSERTION_PUBLIC_JWK: jwk(assertionKeys.publicKey),
-    FIXTURE_GOOGLE_PRIVATE_JWK: jwk(googleKeys.privateKey),
-    FIXTURE_GOOGLE_PUBLIC_JWK: jwk(googleKeys.publicKey),
-    FIXTURE_GOOGLE_CLIENT_ID: text("shared-account-satyr-e2e"),
-    FIXTURE_PROVISION_PRIVATE_JWK: jwk(provisionKeys.privateKey),
+  database: {
+    name: "shop-voice-account-authority",
+    id: "00000000-0000-0000-0000-000000000582",
   },
-  dev: {
-    remote: false,
-    persist: persistence,
-    server: { hostname: "127.0.0.1", port: port + 1 },
-    inspector: false,
-    watch: false,
-    outboundService: unexpectedAccountRequest,
-  },
+  persistence,
+  port: port + 1,
+  keys,
 });
-await account.ready;
 
 async function respond(request) {
   const url = new URL(request.url);
@@ -298,14 +269,13 @@ async function respond(request) {
   throw new Error(`Unexpected external request: ${request.url}`);
 }
 
-const worker = await unstable_startWorker({
+const worker = await startFixtureWorker({
   config,
-  build: { nodejsCompatMode: "v2" },
+  persistence,
+  port,
+  keys,
+  account: (request) => account.fetch(request),
   bindings: {
-    ACCOUNT_PLATFORM: {
-      type: "fetcher",
-      fetcher: (request) => account.fetch(request),
-    },
     // This shop has no commerce backend. An agent turn reads it, and each read
     // finds it unavailable, as a shop with Commerce down would.
     UNDERCLERK: {
@@ -315,27 +285,7 @@ const worker = await unstable_startWorker({
     SATYR_PUBLIC_ORIGIN: text(
       process.env.SHOP_VOICE_PUBLIC_ORIGIN ?? `http://127.0.0.1:${port}`,
     ),
-    ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U: text(
-      assertionKeys.privateKey
-        .export({ format: "der", type: "pkcs8" })
-        .toString("base64url"),
-    ),
-    ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK: jwk(provisionKeys.publicKey),
   },
-  dev: {
-    remote: false,
-    persist: persistence,
-    server: { hostname: "127.0.0.1", port },
-    inspector: false,
-    watch: false,
-    outboundService: respond,
-  },
+  respond,
 });
-await worker.ready;
-async function stop() {
-  await worker.dispose();
-  await account.dispose();
-  process.exit(0);
-}
-process.on("SIGTERM", stop);
-process.on("SIGINT", stop);
+stopOnSignal(worker, account);

@@ -4,6 +4,7 @@ import {
   parseMenuDraftClientMessage,
 } from "@seams/menu-draft-crdt/protocol";
 import { COLLABORATION_PING, COLLABORATION_PONG } from "@seams/collaboration";
+import { chooseOption } from "../lib/browser-journey.mjs";
 
 // Bundle like portal-account-setup-journey.mjs, then run in the browser CLI.
 // The room answers protocol messages; the real editor creates every edit.
@@ -200,35 +201,4 @@ export async function runMenuJourney(page, options) {
     unsyncedNavigation:
       "Draft preserved on cancellation; navigation succeeded after acknowledgement.",
   };
-}
-
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
-// combobox that opens a listbox popup. Choose by { value }, { label } or
-// { index }. { values } sets the items of a multiple Select, then Escape
-// closes its popup.
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator('.pantry-select-popup[data-open]');
-  await popup.waitFor();
-  const items = popup.locator('.pantry-select-item');
-  if ("values" in choice) {
-    const wanted = choice.values.map(String);
-    for (const item of await items.all()) {
-      const chosen = wanted.includes(await item.getAttribute("data-value"));
-      const selected = (await item.getAttribute("aria-selected")) === "true";
-      if (chosen !== selected) await item.click();
-    }
-    await page.keyboard.press("Escape");
-  } else if ("value" in choice) {
-    await popup
-      .locator(
-        `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-      )
-      .click();
-  } else if ("label" in choice) {
-    await popup.getByRole("option", { name: choice.label, exact: true }).click();
-  } else {
-    await items.nth(choice.index).click();
-  }
-  await popup.waitFor({ state: "hidden" });
 }

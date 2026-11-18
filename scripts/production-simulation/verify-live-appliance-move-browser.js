@@ -291,27 +291,6 @@ async function verifyLiveApplianceMoveBrowser(page) {
   };
 }
 
-// The form value of a Portal Select. Base UI keeps it in a hidden input that
-// it renders after the Select's parts.
-function selectValue(trigger) {
-  return trigger.evaluate(function hiddenSelectValue(button) {
-    for (let node = button; node !== null; node = node.parentElement) {
-      for (
-        let next = node.nextElementSibling;
-        next !== null;
-        next = next.nextElementSibling
-      ) {
-        if (
-          next instanceof HTMLInputElement &&
-          next.getAttribute("aria-hidden") === "true"
-        )
-          return next.value;
-      }
-    }
-    throw new Error("A Portal Select has no hidden input.");
-  });
-}
-
 async function downloadCurrentSave(page, targetPath) {
   const saveTab = page
     .getByRole("group", { name: "Detail panels", exact: true })

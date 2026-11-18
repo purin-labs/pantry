@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 
-import { resolve } from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
 
 import { promptForHiddenTerminalValue } from "./ensure-app-config-token.mjs";
 import { upsertLocalEnv } from "./local-env.mjs";
+import {
+  handleFatalError,
+  isMainModule,
+  requiredLocalEnv,
+} from "../lib/cli.mjs";
 
 const ENV_PATH = ".env.local";
 
 async function main() {
-  const workerUrl = requiredEnv("SATYR_WORKER_URL");
-  const teamId = requiredEnv("SLACK_TEAM_ID");
+  const workerUrl = requiredLocalEnv("SATYR_WORKER_URL");
+  const teamId = requiredLocalEnv("SLACK_TEAM_ID");
   const organisationId = `organisation_${teamId}`;
-  const shopDomain = requiredEnv("SHOPIFY_SHOP_DOMAIN");
+  const shopDomain = requiredLocalEnv("SHOPIFY_SHOP_DOMAIN");
   const configuredAdminToken =
     process.env.ORGANISATION_ADMIN_TOKEN?.trim() ?? "";
   const adminToken =
@@ -137,28 +140,6 @@ function readFailure(body, status) {
   }
 
   return `Shopify credential import failed with HTTP ${status}`;
-}
-
-function requiredEnv(name) {
-  const value = process.env[name]?.trim() ?? "";
-
-  if (value.length === 0) {
-    throw new Error(`${name} is required in .env.local`);
-  }
-
-  return value;
-}
-
-function isMainModule(moduleUrl, entryPath) {
-  return (
-    typeof entryPath === "string" &&
-    fileURLToPath(moduleUrl) === resolve(entryPath)
-  );
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {

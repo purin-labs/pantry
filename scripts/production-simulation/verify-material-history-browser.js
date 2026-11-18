@@ -153,14 +153,3 @@ async function mountMaterialHistory() {
     ),
   );
 }
-
-// Physics diagnostics render only in the workflow preview with ?evidence.
-async function openPhysicsEvidence(page) {
-  const url = new URL(page.url());
-  if (url.searchParams.has("evidence")) {
-    await page.reload();
-    return;
-  }
-  url.searchParams.set("evidence", "");
-  await page.goto(url.href);
-}

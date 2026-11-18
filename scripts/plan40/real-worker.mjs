@@ -4,6 +4,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { sleep } from "../../packages/std/src/index.ts";
 import { singleDatabaseMigrations } from "../../services/platform/scripts/single-database-schema.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
@@ -140,7 +141,7 @@ async function waitForWorker(child, workerOrigin) {
     } catch {
       // The local server is still compiling.
     }
-    await delay(250);
+    await sleep(250);
   }
   throw new Error("Timed out waiting for the disposable Worker");
 }
@@ -150,10 +151,6 @@ function waitForExit(child) {
     child.once("exit", resolveExit);
     child.once("error", rejectExit);
   });
-}
-
-function delay(milliseconds) {
-  return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
 }
 
 function readPort(value, name) {

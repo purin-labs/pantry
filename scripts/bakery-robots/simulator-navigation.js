@@ -1,6 +1,6 @@
-// Shared navigation for the bakery simulator browser journeys.
-// browser-acceptance.mjs puts these functions in front of every journey, so a
-// journey calls them as it calls its own helpers.
+// Shared navigation and page fixtures for the bakery simulator browser
+// journeys. browser-acceptance.mjs puts these functions in front of every
+// journey, so a journey calls them as it calls its own helpers.
 //
 // Each function uses the control that a person sees and clicks. The Workflow
 // panel opens the rehearsal, the production and the recipe authors from its
@@ -242,4 +242,146 @@ async function downloadFactorySave(page) {
     .getByRole("button", { name: "Download save file", exact: true })
     .click();
   return download;
+}
+
+// A live run asks before it stops. The journey accepts that question.
+async function backToRecipes(page) {
+  const accept = (dialog) => dialog.accept();
+  page.on("dialog", accept);
+  try {
+    await page
+      .getByRole("button", { name: "Back to recipes", exact: true })
+      .click();
+  } finally {
+    page.off("dialog", accept);
+  }
+}
+
+// Physics diagnostics render only in the workflow preview with ?evidence.
+async function openPhysicsEvidence(page) {
+  const url = new URL(page.url());
+  if (url.searchParams.has("evidence")) {
+    await page.reload();
+    return;
+  }
+  url.searchParams.set("evidence", "");
+  await page.goto(url.href);
+}
+
+// Holds one worker's asset fetch so Stop or Apply lands at a known task
+// boundary: the journey routes the fetches to handle(), waits for `blocked`
+// and calls release().
+class WorkerFetchGate {
+  count = 0;
+  releaseWait = null;
+  reached = null;
+  constructor(blockAt) {
+    this.blockAt = blockAt;
+    this.blocked = new Promise(this.captureReached.bind(this));
+  }
+  captureReached(resolve) {
+    this.reached = resolve;
+  }
+  captureRelease(resolve) {
+    this.releaseWait = resolve;
+  }
+  async handle(route) {
+    this.count++;
+    if (this.count === this.blockAt) {
+      const wait = new Promise(this.captureRelease.bind(this));
+      this.reached();
+      await wait;
+    }
+    try {
+      await route.continue();
+    } catch {
+      /* Stop terminates the fetching worker. */
+    }
+  }
+  release() {
+    this.releaseWait();
+  }
+}
+
+// A saved run opens from the Files panel.
+async function openRackRun(page, file) {
+  await page.getByRole("button", { name: "Files", exact: true }).click();
+  await page
+    .getByLabel("Open production run or native recording", { exact: true })
+    .setInputFiles(file);
+  await page
+    .getByRole("button", { name: "Use saved production run", exact: true })
+    .click();
+  await page
+    .locator(".production-panel .production-notice")
+    .filter({ hasText: "Saved rehearsal reopened paused" })
+    .waitFor();
+}
+
+// The Files panel saves the run as <directory>/<name>.json.
+async function saveRackRun(page, directory, name) {
+  await page.getByRole("button", { name: "Files", exact: true }).click();
+  const pending = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "Save production run", exact: true })
+    .click();
+  const download = await pending;
+  await download.saveAs(`${directory}/${name}.json`);
+}
+
+// A journey that mounts the workflow simulator itself routes
+// "**/src/dev/workflow-preview.tsx" here: the preview module then only loads
+// the Portal's styles.
+async function previewStyles(route) {
+  await route.fulfill({
+    contentType: "application/javascript",
+    body: 'import "/src/styles.css";',
+  });
+}
+
+// Page code: mounts the Portal's workflow simulator route with `connection`
+// ({ kind: "preview" }, { kind: "standalone" } or a "workspace"). A workspace
+// saves through window.saveRecipeCopy, which installRecipeMutation sets.
+async function mountWorkflowSimulator(connection) {
+  const { default: React } = await import("/@id/react");
+  const { default: ReactDOM } = await import("/@id/react-dom/client");
+  const { MemoryRouter } = await import("/@id/react-router");
+  const { default: WorkflowSimulatorRoute } =
+    await import("/src/features/workflow-simulator/route.tsx");
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    React.createElement(
+      MemoryRouter,
+      null,
+      React.createElement(WorkflowSimulatorRoute, {
+        connection:
+          connection.kind === "workspace"
+            ? { ...connection, mutate: window.saveRecipeCopy }
+            : connection,
+      }),
+    ),
+  );
+}
+
+// Puts `save` in the page as window.saveRecipeCopy, the workspace's mutation.
+async function installRecipeMutation(page, save = saveRecipeCopy) {
+  await page.addScriptTag({
+    content: `${save.toString()}\nwindow.saveRecipeCopy = ${save.name};`,
+  });
+}
+
+// Page code: the oven workspace's save of a recipe copy, which may only post
+// a run of the "oven-ui-acceptance" Organisation.
+async function saveRecipeCopy(path, body) {
+  if (path !== "/v1/control/organisations/oven-ui-acceptance/bakery/runs") {
+    throw new Error("This journey must not mutate commerce.");
+  }
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    throw new Error("The shared run save did not return a receipt.");
+  }
+  return response.json();
 }

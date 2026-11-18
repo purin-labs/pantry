@@ -2,10 +2,10 @@
 
 import { createHmac } from "node:crypto";
 import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import process from "node:process";
 import { setTimeout as delayExecution } from "node:timers/promises";
-import { fileURLToPath } from "node:url";
+import { isRecord } from "../../packages/std/src/index.ts";
+import { handleFatalError, isMainModule } from "../lib/cli.mjs";
 
 export const COMMERCE_LAB_SCENARIO_IDS = Object.freeze([
   "product-listing",
@@ -445,22 +445,6 @@ function stripTrailingSlash(value) {
 
 function nonEmptyString(value) {
   return typeof value === "string" && value.length > 0;
-}
-
-function isRecord(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isMainModule(moduleUrl, entryPath) {
-  return (
-    typeof entryPath === "string" &&
-    fileURLToPath(moduleUrl) === resolve(entryPath)
-  );
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {

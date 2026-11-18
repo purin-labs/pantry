@@ -31,13 +31,6 @@ import {
   type AgentOperationCommand,
 } from "../../services/platform/src/data/agent-operations";
 import { publishContactVerification } from "../../services/platform/src/data/contact-verification";
-import { newControlMutationIdentity } from "../../services/platform/src/data/control-mutation";
-import {
-  bootstrapOrganisation,
-  issueControlSession,
-  upsertUser,
-  type User,
-} from "../../services/platform/src/data/control-plane";
 import {
   assignAgentMailbox,
   gmailConnectorId,
@@ -57,12 +50,11 @@ import {
 } from "../../services/platform/src/ids";
 import { resolveOrganisationModelRoute } from "../../services/platform/src/models/route";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
-import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement";
 import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";
 import {
   admitMailboxAgent,
   attachToAccountAuthority,
-  type AccountPerson,
+  fixturePeople,
 } from "./account-authority";
 
 export {
@@ -73,6 +65,13 @@ export {
 
 const CONTROL = "https://brain-fixture.internal";
 const names = ["Owner", "Other"] as const;
+const {
+  fixtureUser,
+  fixtureOrganisation,
+  fixturePerson,
+  auxiliaryOwner,
+  login,
+} = fixturePeople("", "plan42j-browser");
 const SUPPLIER = "supplier@example.test";
 const LIMITS: EmailIngressLimits = {
   maxActiveCases: 5,
@@ -199,7 +198,7 @@ export default {
     if (url.pathname === "/test/setup" && request.method === "POST")
       return Response.json(await seed(env));
     if (url.pathname === "/test/session" && request.method === "POST")
-      return login(env, url.searchParams.get("user"));
+      return login(env, names, url.searchParams.get("user"));
     if (url.pathname === "/test/mail/arrive" && request.method === "POST")
       return Response.json(await arrive(env, await request.json()));
     if (url.pathname === "/test/mail/state" && request.method === "GET")
@@ -207,126 +206,6 @@ export default {
     return gateway.fetch(request, env, context);
   },
 };
-
-function hasName(name: string | null, candidate: string): boolean {
-  return name === candidate;
-}
-
-/** The account authority verifies a Google identity, so each person has one. */
-async function fixtureUser(env: Env, name: string) {
-  const subject = name.toLowerCase().replaceAll(" ", "-");
-  return upsertUser({
-    db: env.DB,
-    now: Date.now(),
-    identity: {
-      issuer: "https://accounts.google.com",
-      subject,
-      email: `${subject}@example.test`,
-      displayName: name,
-      emailVerified: true,
-    },
-  });
-}
-
-async function fixtureOrganisation(
-  env: Env,
-  owner: User,
-  name: string,
-): Promise<OrganisationId> {
-  const now = Date.now();
-  const placement = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId: "plan42j-browser",
-    locationHint: "wnam",
-  });
-  if (!placement.ok) throw new Error(placement.error.path);
-  const created = await bootstrapOrganisation({
-    env,
-    owner,
-    organisationName: name,
-    environment: "development",
-    placement: placement.value,
-    now,
-    mutation: {
-      scope: {
-        userId: owner.userId,
-        organisationScope: "organisation:create",
-        route: "/v1/control/organisations",
-        operation: "organisation.create",
-      },
-      boundary: {
-        kind: "unversioned",
-        idempotencyKey: crypto.randomUUID(),
-        requestHash: "plan42j-browser",
-      },
-      identity: newControlMutationIdentity({
-        portalSubjectHash: "plan42j-browser",
-        causationId: crypto.randomUUID(),
-        now,
-      }),
-    },
-  });
-  if (!created.ok) throw new Error(created.error.code);
-  return created.value.organisationId;
-}
-
-/** One person's role in an Organisation, with a control session of theirs. */
-async function fixturePerson(
-  env: Env,
-  organisationId: OrganisationId,
-  user: User,
-): Promise<AccountPerson> {
-  const grant = await env.DB.prepare(
-    "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ? AND status = 'active'",
-  )
-    .bind(organisationId, user.userId)
-    .first<{ personId: string }>();
-  if (grant === null) throw new Error("Fixture person has no role");
-  const issued = await issueControlSession({
-    db: env.DB,
-    userId: user.userId,
-    now: Date.now(),
-    ttlMs: 3_600_000,
-  });
-  return { user, personId: grant.personId, session: issued.session };
-}
-
-/** A person of the account fixture who owns a separate organisation. */
-async function auxiliaryOwner(env: Env, label: string) {
-  const user = await fixtureUser(env, `Auxiliary ${label}`);
-  const organisationId = await fixtureOrganisation(
-    env,
-    user,
-    `Account fixture ${label}`,
-  );
-  return {
-    organisationId,
-    person: await fixturePerson(env, organisationId, user),
-  };
-}
-
-async function login(env: Env, name: string | null): Promise<Response> {
-  if (name === null || !names.some(hasName.bind(null, name)))
-    return new Response(null, { status: 400 });
-  const user = await fixtureUser(env, name);
-  const issued = await issueControlSession({
-    db: env.DB,
-    userId: user.userId,
-    now: Date.now(),
-    ttlMs: 3_600_000,
-  });
-  const response = Response.json({ userId: user.userId });
-  response.headers.append(
-    "set-cookie",
-    `satyr_control_session=${issued.token}; HttpOnly; Path=/; SameSite=Lax`,
-  );
-  response.headers.append(
-    "set-cookie",
-    `satyr_control_csrf=${issued.csrfToken}; Path=/; SameSite=Lax`,
-  );
-  return response;
-}
 
 type Fixture = Readonly<{
   organisationId: OrganisationId;

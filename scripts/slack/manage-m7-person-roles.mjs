@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
 import process from "node:process";
+import { handleFatalError, requiredLocalEnv } from "../lib/cli.mjs";
 
 const PERSON_ID_PATTERN = /^person_[A-Za-z0-9-]+$/u;
 const OPERATIONS = new Set(["grant", "revoke"]);
 const ROLES = new Set(["command", "approve"]);
 
 async function main() {
-  const workerUrl = requiredEnv("SATYR_WORKER_URL");
-  const adminToken = requiredEnv("ORGANISATION_ADMIN_TOKEN");
-  const organisationId = `organisation_${requiredEnv("SLACK_TEAM_ID")}`;
+  const workerUrl = requiredLocalEnv("SATYR_WORKER_URL");
+  const adminToken = requiredLocalEnv("ORGANISATION_ADMIN_TOKEN");
+  const organisationId = `organisation_${requiredLocalEnv("SLACK_TEAM_ID")}`;
   const command = process.argv[2] ?? "";
 
   if (command === "list") {
@@ -102,16 +103,6 @@ function requireSuccess(response, body) {
   throw new Error(`Person role request failed with HTTP ${response.status}.`);
 }
 
-function requiredEnv(name) {
-  const value = process.env[name]?.trim() ?? "";
-
-  if (value.length === 0) {
-    throw new Error(`${name} is required in .env.local`);
-  }
-
-  return value;
-}
-
 function usage() {
   return [
     "Usage:",
@@ -119,11 +110,6 @@ function usage() {
     "  pnpm identity:m7:roles -- grant person_<id> command|approve",
     "  pnpm identity:m7:roles -- revoke person_<id> command|approve",
   ].join("\n");
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }
 
 await main().catch(handleFatalError);

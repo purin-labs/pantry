@@ -2,10 +2,10 @@
 
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { handleFatalError, isMainModule } from "../lib/cli.mjs";
 
 function main() {
   const token = requiredEnv("SLACK_APP_CONFIG_TOKEN");
@@ -58,18 +58,6 @@ function requiredEnv(name) {
 function optionalEnv(name) {
   const value = process.env[name]?.trim() ?? "";
   return value.length === 0 ? null : value;
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-}
-
-function isMainModule(moduleUrl, entryPath) {
-  return (
-    typeof entryPath === "string" &&
-    fileURLToPath(moduleUrl) === resolve(entryPath)
-  );
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {

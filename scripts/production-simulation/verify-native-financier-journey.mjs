@@ -1,10 +1,15 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
 // Authored production, repeated use of one physical cell, and fresh-host restore.
+import {
+  beginRun,
+  driveRun,
+  evidenceWriter,
+  textCodec,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   parseSettings,
   sampleSettings,
@@ -26,6 +31,7 @@ import { WasmHost, program } from "./engine-hosts.mjs";
 
 assert.equal(process.argv.length, 3, "Provide a fresh output directory");
 const output = resolve(process.argv[2]);
+const save = evidenceWriter(output);
 assert.equal(existsSync(output), false);
 mkdirSync(output, { recursive: true });
 const runtime = resolve(
@@ -107,68 +113,28 @@ save("input.json", {
   cells: [cell],
   plan: JSON.parse(exportProductionWorkcells(plan)),
 });
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
+const engine = { E, runtime, codec: textCodec() };
 
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
-function save(name, content) {
-  writeFileSync(join(output, name), `${canonicalJson(content)}\n`);
-}
-async function open(saved, leg, definition = scenario, nativeCell = cell) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const reply = await host.handle({
-    kind: "begin",
+function open(saved, leg, definition = scenario, nativeCell = cell) {
+  return beginRun(engine, {
     bundle,
     cells: [nativeCell],
-    identity: {
-      runId: "native-financier",
-      executionId: `leg-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario: definition }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "native-financier",
+    executionId: `leg-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario: definition,
+    saved,
   });
-  assert.equal(reply.kind, "began", JSON.stringify(reply));
-  return host;
 }
 async function drive(host, until) {
-  for (let turn = 0; turn < 2000; turn++) {
-    const reply = await host.handle({ kind: "drive", turns: 128, until });
-    assert.equal(reply.kind, "drove", JSON.stringify(reply));
-    if (
-      reply.view.time >= until ||
-      reply.view.status.kind === "completed" ||
-      reply.view.status.kind === "blocked"
-    ) {
-      const state = await host.handle({ kind: "state" });
-      assert.equal(state.kind, "state");
-      return state.run;
-    }
-  }
-  throw new Error("Native recipe exceeded its host-call bound");
+  return (
+    await driveRun(host, {
+      until,
+      calls: 2000,
+      bound: "Native recipe exceeded its host-call bound",
+      stops: ["completed", "blocked"],
+    })
+  ).run;
 }
 function byId(id, item) {
   return item.id === id;

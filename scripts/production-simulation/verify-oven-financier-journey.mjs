@@ -1,9 +1,17 @@
+import {
+  beginRequest,
+  evidenceWriter,
+  executionHost,
+  sameId,
+  textCodec,
+  value,
+} from "./execution-journey.mjs";
 import { collectingExecutionHost } from "./collecting-execution-host.mjs";
 // Authored full recipe through one persistent oven cell, cooling congestion,
 // fresh-host continuation, and failed loading with material rejection.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { canonicalJson, sha256Hex } from "../../packages/std/src/index.ts";
@@ -37,6 +45,7 @@ import {
 
 assert.equal(process.argv.length, 3, "Provide a fresh output directory");
 const output = resolve(process.argv[2]);
+const save = evidenceWriter(output);
 const liveObservations = new Map();
 const hostCells = new WeakMap();
 let liveReplies = 0;
@@ -163,29 +172,15 @@ assert.equal(
 );
 value(await E.admitScenario(scenario));
 save("input.json", { settings, manualTasks, cell, scenario, bundle });
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
+const codec = textCodec();
+const engine = { E, runtime, codec };
 const snapshotViews = new Map();
 const continuedArtifacts = new Map();
 
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
 function checkedSettings(overrides) {
   const result = parseSettings({ ...sampleSettings(), ...overrides });
   assert.equal(result.kind, "valid", JSON.stringify(result));
   return result.settings;
-}
-function save(name, record) {
-  writeFileSync(join(output, name), `${canonicalJson(record)}\n`);
-}
-function sameId(id, item) {
-  return item.id === id;
 }
 function task(run, batch, key) {
   const found = run.tasks.find(sameId.bind(null, `batch-${batch}#0/${key}`));
@@ -203,36 +198,19 @@ function world(run) {
   return { ...state, time: position.time };
 }
 async function open(saved, leg, definition = scenario, nativeCell = cell) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
+  const host = await executionHost(engine);
   hostCells.set(host, nativeCell);
-  const reply = await host.handle({
-    kind: "begin",
-    bundle,
-    cells: [nativeCell],
-    identity: {
+  const reply = await host.handle(
+    beginRequest({
+      bundle,
+      cells: [nativeCell],
       runId: "oven-financier",
       executionId: `leg-${leg}`,
       hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario: definition }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
-  });
+      scenario: definition,
+      saved,
+    }),
+  );
   assert.equal(reply.kind, "began", JSON.stringify(reply));
   const view = value(parseHostView(reply.view));
   assert.equal(view.logistics.kind, "available");

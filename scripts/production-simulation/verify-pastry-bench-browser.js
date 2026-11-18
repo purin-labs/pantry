@@ -4,7 +4,7 @@
 // across camera presets, verify results telemetry, then inject the unfloured-bench fault
 // and verify rejection + 14 g T55 flour recovery.
 async function verifyPastryBenchBrowser(page) {
-  await page.route("**/src/dev/workflow-preview.tsx", serveStyles);
+  await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);
 
@@ -301,18 +301,6 @@ async function readStationState(station) {
   };
 }
 
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator(".pantry-select-popup[data-open]");
-  await popup.waitFor();
-  await popup
-    .locator(
-      `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-    )
-    .click();
-  await popup.waitFor({ state: "hidden" });
-}
-
 async function openPastryBenchRecipeForm(page) {
   const form = page.getByRole("form", {
     name: "Pie pastry bench deformable recipe",
@@ -340,31 +328,7 @@ async function openPastryBenchRecipeForm(page) {
 
 async function openWorkspace(page) {
   await page.reload();
-  await page.evaluate(mountWorkspace);
-}
-
-async function mountWorkspace() {
-  const { default: React } = await import("/@id/react");
-  const { default: ReactDOM } = await import("/@id/react-dom/client");
-  const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  ReactDOM.createRoot(document.getElementById("root")).render(
-    React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(WorkflowSimulatorRoute, {
-        connection: { kind: "standalone" },
-      }),
-    ),
-  );
-}
-
-async function serveStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
+  await page.evaluate(mountWorkflowSimulator, { kind: "standalone" });
 }
 
 verifyPastryBenchBrowser;

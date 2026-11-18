@@ -23,9 +23,9 @@ async function verifyOvenWorkspaceBrowser(page) {
     `**/bakery-physics/executions/${definition.executionBundleId}/*`,
     serveOvenRetainedExecution,
   );
-  await page.route("**/src/dev/workflow-preview.tsx", serveOvenWorkspaceStyles);
+  await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await page.reload();
-  await installRecipeMutation(page);
+  await installRecipeMutation(page, saveRecipeCopyWithArtifacts);
   await page.evaluate(mountConnectedOvenWorkspace, portalSimulationSource());
   await page.setViewportSize({ width: 1440, height: 1000 });
   await openOvenProduction(page);
@@ -130,7 +130,7 @@ async function verifyOvenWorkspaceBrowser(page) {
 
   // A page reload destroys the original worker and all its in-memory worlds.
   await page.reload();
-  await installRecipeMutation(page);
+  await installRecipeMutation(page, saveRecipeCopyWithArtifacts);
   await page.evaluate(mountConnectedOvenWorkspace, portalSimulationSource());
   await openOvenProduction(page);
   await page
@@ -185,7 +185,7 @@ async function verifyOvenWorkspaceBrowser(page) {
   );
   await backToRecipes(page);
   await page.reload();
-  await installRecipeMutation(page);
+  await installRecipeMutation(page, saveRecipeCopyWithArtifacts);
   await page.evaluate(mountConnectedOvenWorkspace, portalSimulationSource());
   await openOvenProduction(page);
   await page
@@ -782,13 +782,6 @@ async function checkStorageHistory(path) {
   };
 }
 
-async function serveOvenWorkspaceStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
-}
-
 // The stubbed preview module would turn on the evidence views; the mount
 // does it on the Portal's own module instance.
 async function mountConnectedOvenWorkspace(simulationSource) {
@@ -843,39 +836,6 @@ async function checkOvenSurfaceSuspended() {
     throw new Error(
       "A stale surface reference captured the hidden finite run.",
     );
-}
-
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
-// combobox that opens a listbox popup. Choose by { value }, { label } or
-// { index }. { values } sets the items of a multiple Select, then Escape
-// closes its popup.
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator(".pantry-select-popup[data-open]");
-  await popup.waitFor();
-  const items = popup.locator(".pantry-select-item");
-  if ("values" in choice) {
-    const wanted = choice.values.map(String);
-    for (const item of await items.all()) {
-      const chosen = wanted.includes(await item.getAttribute("data-value"));
-      const selected = (await item.getAttribute("aria-selected")) === "true";
-      if (chosen !== selected) await item.click();
-    }
-    await page.keyboard.press("Escape");
-  } else if ("value" in choice) {
-    await popup
-      .locator(
-        `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-      )
-      .click();
-  } else if ("label" in choice) {
-    await popup
-      .getByRole("option", { name: choice.label, exact: true })
-      .click();
-  } else {
-    await items.nth(choice.index).click();
-  }
-  await popup.waitFor({ state: "hidden" });
 }
 
 async function financierRecipeFile(simulationSource) {
@@ -1725,7 +1685,7 @@ async function exerciseFinancierOperator(page) {
     fullPage: true,
   });
   await page.reload();
-  await installRecipeMutation(page);
+  await installRecipeMutation(page, saveRecipeCopyWithArtifacts);
   await page.evaluate(mountConnectedOvenWorkspace, portalSimulationSource());
   await openOvenProduction(page);
   await page
@@ -1836,13 +1796,7 @@ async function checkFinancierOperatorFiles({ held, completed }) {
   };
 }
 
-async function installRecipeMutation(page) {
-  await page.addScriptTag({
-    content: `${saveRecipeCopy.toString()}\nwindow.saveRecipeCopy = saveRecipeCopy;`,
-  });
-}
-
-async function saveRecipeCopy(path, body) {
+async function saveRecipeCopyWithArtifacts(path, body) {
   // A save with artifacts also posts to runs/prepared/<id> and its artifacts.
   const runs = "/v1/control/organisations/oven-ui-acceptance/bakery/runs";
   if (path !== runs && !path.startsWith(`${runs}/prepared/`))
@@ -1942,18 +1896,5 @@ async function recipeArchiveRequest(route) {
       status: 200,
       json: { ok: true, snapshots, nextCursor: null },
     });
-  }
-}
-
-// A live run asks before it stops. The journey accepts that question.
-async function backToRecipes(page) {
-  const accept = (dialog) => dialog.accept();
-  page.on("dialog", accept);
-  try {
-    await page
-      .getByRole("button", { name: "Back to recipes", exact: true })
-      .click();
-  } finally {
-    page.off("dialog", accept);
   }
 }

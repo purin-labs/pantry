@@ -176,62 +176,6 @@ async function verifyTwoCellWorkspaceBrowser(page) {
   };
 }
 
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
-// combobox that opens a listbox popup. Choose by { value }, { label } or
-// { index }. { values } sets the items of a multiple Select, then Escape
-// closes its popup.
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator(".pantry-select-popup[data-open]");
-  await popup.waitFor();
-  const items = popup.locator(".pantry-select-item");
-  if ("values" in choice) {
-    const wanted = choice.values.map(String);
-    for (const item of await items.all()) {
-      const chosen = wanted.includes(await item.getAttribute("data-value"));
-      const selected = (await item.getAttribute("aria-selected")) === "true";
-      if (chosen !== selected) await item.click();
-    }
-    await page.keyboard.press("Escape");
-  } else if ("value" in choice) {
-    await popup
-      .locator(
-        `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-      )
-      .click();
-  } else if ("label" in choice) {
-    await popup
-      .getByRole("option", { name: choice.label, exact: true })
-      .click();
-  } else {
-    await items.nth(choice.index).click();
-  }
-  await popup.waitFor({ state: "hidden" });
-}
-
-// The items of a Portal Select, read from its open popup, which Escape then
-// closes.
-async function selectItems(page, trigger) {
-  await trigger.click();
-  const popup = page.locator(".pantry-select-popup[data-open]");
-  await popup.waitFor();
-  const items = await popup
-    .locator(".pantry-select-item")
-    .evaluateAll(function readSelectItems(nodes) {
-      return nodes.map(function readSelectItem(node) {
-        return {
-          value: node.getAttribute("data-value"),
-          label: node.textContent.replace(/\s+/g, " ").trim(),
-          disabled: node.hasAttribute("data-disabled"),
-          selected: node.getAttribute("aria-selected") === "true",
-        };
-      });
-    });
-  await page.keyboard.press("Escape");
-  await popup.waitFor({ state: "hidden" });
-  return items;
-}
-
 async function factoryWorkerMemory(page) {
   const browser = page.context().browser();
   if (browser === null) throw new Error("A browser connection is required.");
@@ -523,28 +467,4 @@ async function checkTwoCellRestore() {
 
 function twoCellRestoreReceived() {
   return window.twoCellRestoredView !== undefined;
-}
-
-// A live run asks before it stops. The journey accepts that question.
-async function backToRecipes(page) {
-  const accept = (dialog) => dialog.accept();
-  page.on("dialog", accept);
-  try {
-    await page
-      .getByRole("button", { name: "Back to recipes", exact: true })
-      .click();
-  } finally {
-    page.off("dialog", accept);
-  }
-}
-
-// Physics diagnostics render only in the workflow preview with ?evidence.
-async function openPhysicsEvidence(page) {
-  const url = new URL(page.url());
-  if (url.searchParams.has("evidence")) {
-    await page.reload();
-    return;
-  }
-  url.searchParams.set("evidence", "");
-  await page.goto(url.href);
 }

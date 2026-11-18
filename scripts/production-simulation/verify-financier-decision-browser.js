@@ -230,16 +230,3 @@ async function verifyFinancierDecisionBrowser(page) {
     exported,
   };
 }
-
-// A live run asks before it stops. The journey accepts that question.
-async function backToRecipes(page) {
-  const accept = (dialog) => dialog.accept();
-  page.on("dialog", accept);
-  try {
-    await page
-      .getByRole("button", { name: "Back to recipes", exact: true })
-      .click();
-  } finally {
-    page.off("dialog", accept);
-  }
-}

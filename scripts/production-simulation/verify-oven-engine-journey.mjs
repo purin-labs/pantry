@@ -1,10 +1,14 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
 // The production engine composes six physical operations and restores inside each.
+import {
+  beginRun,
+  evidenceWriter,
+  textCodec,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   coldCellJourneyAdapter,
   coldCellJourneySnapshot,
@@ -12,7 +16,6 @@ import {
 import {
   OVEN_CELL,
   buildExecutionBundle,
-  runtimeModule,
   prepareCell,
 } from "./build-execution-bundle.mjs";
 
@@ -23,6 +26,7 @@ assert.equal(
 );
 const runtime = resolve(process.argv[2]);
 const output = resolve(process.argv[3]);
+const save = evidenceWriter(output);
 assert.equal(existsSync(output), false);
 mkdirSync(output, { recursive: true });
 const built = await buildExecutionBundle(runtime, join(output, "executions"));
@@ -102,20 +106,8 @@ const racking = physical(transfer.key, "rack-transfer", source, rack, [
 workflow.tasks = [admission, load, wait, retrieve, racking, removal];
 value(await E.admitScenario(scenario));
 save("scenario.json", { scenario, cell, bundle });
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
+const engine = { E, runtime, codec: textCodec() };
 
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
-function save(name, record) {
-  writeFileSync(join(output, name), `${canonicalJson(record)}\n`);
-}
 function physical(key, skill, from, to, prerequisites) {
   return {
     key,
@@ -141,38 +133,16 @@ function physical(key, skill, from, to, prerequisites) {
     ],
   };
 }
-async function open(saved, leg, definition = scenario, nativeCell = cell) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const began = await host.handle({
-    kind: "begin",
+function open(saved, leg, definition = scenario, nativeCell = cell) {
+  return beginRun(engine, {
     bundle,
     cells: [nativeCell],
-    identity: {
-      runId: "oven-engine",
-      executionId: `leg-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario: definition }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "oven-engine",
+    executionId: `leg-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario: definition,
+    saved,
   });
-  assert.equal(began.kind, "began", JSON.stringify(began));
-  return host;
 }
 async function drive(host, until, expectFailure = false) {
   for (let calls = 0; calls < 2000; calls++) {

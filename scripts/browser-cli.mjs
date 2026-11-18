@@ -51,6 +51,11 @@ export function runBrowserCli(options, command, args = []) {
     throw new Error(
       `${command} ran longer than its ${timeoutMs / 1000} s limit and was stopped`,
     );
+  return cliResult(command, result);
+}
+
+/** The value of one finished browser CLI command (a spawnSync result). */
+export function cliResult(command, result) {
   if (result.error !== undefined) throw result.error;
   const output = result.stdout.trim();
   if (result.status !== 0) {

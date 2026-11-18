@@ -7,35 +7,23 @@
 // account Worker of the acceptance tests as a second local Worker with its
 // own database, and binds it to the fixture Worker as `ACCOUNT_PLATFORM`.
 // The account Worker has no public address in this journey.
-import { unstable_startWorker } from "../../services/platform/node_modules/wrangler/wrangler-dist/cli.js";
-import { createHash, generateKeyPairSync } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import {
+  accountArtifact,
+  artifactSha256,
+  json,
+  runKeys,
+  startAccountWorker,
+  startFixtureWorker,
+  stopOnSignal,
+  stream,
+} from "../lib/fixture-worker.mjs";
+import { writeFileSync } from "node:fs";
 
 const [config, persistence, evidencePath] = process.argv.slice(2);
 
-const accountArtifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
-if (!accountArtifact)
-  throw new Error(
-    "Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.",
-  );
-// The keys of one run. The fixture Worker signs each user assertion and the
-// account Worker checks it. The account Worker signs the provision of the
-// Organisation and the fixture Worker checks it.
-const accountSha256 = createHash("sha256")
-  .update(readFileSync(resolve(accountArtifact)))
-  .digest("hex");
-const assertionKeys = generateKeyPairSync("ed25519");
-const provisionKeys = generateKeyPairSync("ed25519");
-const googleKeys = generateKeyPairSync("rsa", { modulusLength: 2048 });
-
-function text(value) {
-  return { type: "plain_text", value };
-}
-
-function jwk(key) {
-  return text(JSON.stringify(key.export({ format: "jwk" })));
-}
+const artifact = accountArtifact();
+const accountSha256 = artifactSha256(artifact);
+const keys = runKeys();
 
 const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
 const MODEL = "https://openrouter.ai/api/v1/chat/completions";
@@ -91,13 +79,6 @@ function record() {
 }
 record();
 
-function json(body, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json" },
-  });
-}
-
 function encode(text) {
   return Buffer.from(text, "utf8").toString("base64url");
 }
@@ -116,14 +97,6 @@ function decodeRaw(raw) {
     headers,
     body: Buffer.from(body.replaceAll(/\s+/gu, ""), "base64").toString("utf8"),
   };
-}
-
-function stream(chunks) {
-  return new Response(
-    chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join("") +
-      "data: [DONE]\n\n",
-    { headers: { "content-type": "text/event-stream" } },
-  );
 }
 
 function modelText(text, id) {
@@ -390,38 +363,17 @@ async function control(request, url) {
   throw new Error(`Unexpected control request: ${request.url}`);
 }
 
-function unexpectedAccountRequest(request) {
-  throw new Error(`Unexpected request of the account Worker: ${request.url}`);
-}
-
-const account = await unstable_startWorker({
+const account = await startAccountWorker({
+  artifact,
   name: "satyr-plan42j-account-authority",
-  entrypoint: resolve(accountArtifact),
-  compatibilityDate: "2026-07-07",
-  compatibilityFlags: ["nodejs_compat"],
-  build: { nodejsCompatMode: "v2" },
-  bindings: {
-    ACCOUNT_DB: {
-      type: "d1",
-      database_name: "plan42j-account-authority",
-      database_id: "00000000-0000-0000-0000-000000000427",
-    },
-    FIXTURE_ASSERTION_PUBLIC_JWK: jwk(assertionKeys.publicKey),
-    FIXTURE_GOOGLE_PRIVATE_JWK: jwk(googleKeys.privateKey),
-    FIXTURE_GOOGLE_PUBLIC_JWK: jwk(googleKeys.publicKey),
-    FIXTURE_GOOGLE_CLIENT_ID: text("shared-account-satyr-e2e"),
-    FIXTURE_PROVISION_PRIVATE_JWK: jwk(provisionKeys.privateKey),
+  database: {
+    name: "plan42j-account-authority",
+    id: "00000000-0000-0000-0000-000000000427",
   },
-  dev: {
-    remote: false,
-    persist: persistence,
-    server: { hostname: "127.0.0.1", port: 8843 },
-    inspector: false,
-    watch: false,
-    outboundService: unexpectedAccountRequest,
-  },
+  persistence,
+  port: 8843,
+  keys,
 });
-await account.ready;
 
 /** The binding of the fixture Worker to the account Worker. */
 function accountCall(request) {
@@ -437,32 +389,12 @@ async function respond(request) {
   throw new Error(`Unexpected external request: ${request.url}`);
 }
 
-const worker = await unstable_startWorker({
+const worker = await startFixtureWorker({
   config,
-  build: { nodejsCompatMode: "v2" },
-  bindings: {
-    ACCOUNT_PLATFORM: { type: "fetcher", fetcher: accountCall },
-    ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U: text(
-      assertionKeys.privateKey
-        .export({ format: "der", type: "pkcs8" })
-        .toString("base64url"),
-    ),
-    ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK: jwk(provisionKeys.publicKey),
-  },
-  dev: {
-    remote: false,
-    persist: persistence,
-    server: { hostname: "127.0.0.1", port: 8842 },
-    inspector: false,
-    watch: false,
-    outboundService: respond,
-  },
+  persistence,
+  port: 8842,
+  keys,
+  account: accountCall,
+  respond,
 });
-await worker.ready;
-async function stop() {
-  await worker.dispose();
-  await account.dispose();
-  process.exit(0);
-}
-process.on("SIGTERM", stop);
-process.on("SIGINT", stop);
+stopOnSignal(worker, account);

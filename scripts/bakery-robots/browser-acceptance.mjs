@@ -11,6 +11,7 @@ import { dirname, resolve, join } from "node:path";
 import { homedir } from "node:os";
 import { parseArgs } from "node:util";
 import { runBrowserCli } from "../browser-cli.mjs";
+import { pageHelperSource } from "../lib/browser-journey.mjs";
 
 const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
 const { values } = parseArgs({
@@ -180,6 +181,8 @@ function resolvePrerequisite(path) {
 await main();
 
 // A journey file may declare helpers beside its `async function verify…(page)`.
+// It also calls the page helpers of scripts/lib/browser-journey.mjs and the
+// navigation of simulator-navigation.js, which come in front of it.
 function journeyEntry(source) {
   const entries = [
     ...source.matchAll(/^async function (verify\w*)\(page\) \{$/gmu),
@@ -220,6 +223,7 @@ function scopedJourney(journey) {
     globalThis.bakeryEvidence = ${JSON.stringify(artifactDir)};
     globalThis.bakeryBase = ${JSON.stringify(new URL(values.url).origin)};
     const result = await (() => {
+${pageHelperSource()}
 ${navigation}
 ${source}
 return ${entry};

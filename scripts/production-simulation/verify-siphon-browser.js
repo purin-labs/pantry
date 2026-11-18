@@ -3,7 +3,7 @@
 // presets, pause and resume, complete vacuum drawdown, test Run again, and
 // verify fault handling on an unsealed neck gasket.
 async function verifySiphonBrowser(page) {
-  await page.route("**/src/dev/workflow-preview.tsx", serveStyles);
+  await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);
 
@@ -176,37 +176,6 @@ async function verifySiphonBrowser(page) {
   };
 }
 
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
-// combobox that opens a listbox popup. Choose by { value }, { label } or
-// { index }. { values } sets the items of a multiple Select, then Escape
-// closes its popup.
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator('.pantry-select-popup[data-open]');
-  await popup.waitFor();
-  const items = popup.locator('.pantry-select-item');
-  if ("values" in choice) {
-    const wanted = choice.values.map(String);
-    for (const item of await items.all()) {
-      const chosen = wanted.includes(await item.getAttribute("data-value"));
-      const selected = (await item.getAttribute("aria-selected")) === "true";
-      if (chosen !== selected) await item.click();
-    }
-    await page.keyboard.press("Escape");
-  } else if ("value" in choice) {
-    await popup
-      .locator(
-        `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-      )
-      .click();
-  } else if ("label" in choice) {
-    await popup.getByRole("option", { name: choice.label, exact: true }).click();
-  } else {
-    await items.nth(choice.index).click();
-  }
-  await popup.waitFor({ state: "hidden" });
-}
-
 async function readSiphonValues(page) {
   const station = page.locator(".siphon-station").first();
   await station.waitFor();
@@ -264,31 +233,7 @@ async function openSiphonRecipeForm(page) {
 
 async function openWorkspace(page) {
   await page.reload();
-  await page.evaluate(mountWorkspace);
-}
-
-async function mountWorkspace() {
-  const { default: React } = await import("/@id/react");
-  const { default: ReactDOM } = await import("/@id/react-dom/client");
-  const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  ReactDOM.createRoot(document.getElementById("root")).render(
-    React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(WorkflowSimulatorRoute, {
-        connection: { kind: "standalone" },
-      }),
-    ),
-  );
-}
-
-async function serveStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
+  await page.evaluate(mountWorkflowSimulator, { kind: "standalone" });
 }
 
 verifySiphonBrowser;

@@ -9,6 +9,7 @@ import {
   assertShopifyDomain,
 } from "./import-m7-shopify-credential.mjs";
 import { upsertLocalEnv } from "./local-env.mjs";
+import { handleFatalError } from "../lib/cli.mjs";
 
 const ENV_PATH = ".env.local";
 
@@ -57,11 +58,6 @@ async function configuredOrPrompt(name, prompt) {
   return configured.length > 0
     ? configured
     : promptForHiddenTerminalValue(process.stdin, process.stderr, prompt);
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }
 
 await main().catch(handleFatalError);

@@ -7,39 +7,6 @@ const productionFixture =
   globalThis.bakeryFixture ??
   "output/acceptance/plan42f-production-browser/pending-slip.json";
 
-// Holds one worker's asset fetch so Stop and Apply land at a known boundary.
-class ProductionWorkerGate {
-  count = 0;
-  releaseWait = null;
-  reached = null;
-  constructor(blockAt) {
-    this.blockAt = blockAt;
-    this.blocked = new Promise(this.captureReached.bind(this));
-  }
-  captureReached(resolve) {
-    this.reached = resolve;
-  }
-  captureRelease(resolve) {
-    this.releaseWait = resolve;
-  }
-  async handle(route) {
-    this.count++;
-    if (this.count === this.blockAt) {
-      const wait = new Promise(this.captureRelease.bind(this));
-      this.reached();
-      await wait;
-    }
-    try {
-      await route.continue();
-    } catch {
-      /* Stop terminates the fetching worker. */
-    }
-  }
-  release() {
-    this.releaseWait();
-  }
-}
-
 async function openProduction(page) {
   await page.goto(`${productionBase}/workflow-preview.html`);
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -119,7 +86,7 @@ async function verifyProductionBrowserAssets(page) {
   await openProduction(page);
 
   // Stop after the first accepted result, then continue from the saved file.
-  const stop = new ProductionWorkerGate(2);
+  const stop = new WorkerFetchGate(2);
   await page.route(
     "**/bakery-physics/bundles/*/bakery_native.data",
     stop.handle.bind(stop),
@@ -168,7 +135,7 @@ async function verifyProductionBrowser(page) {
     })
     .click();
   await chooseVariant(page, "normal");
-  const replace = new ProductionWorkerGate(1);
+  const replace = new WorkerFetchGate(1);
   await page.route(
     "**/bakery-physics/bundles/*/bakery_native.wasm",
     replace.handle.bind(replace),
@@ -215,37 +182,4 @@ async function verifyProductionBrowser(page) {
       "desktop timeline and 390px evidence captured",
     ],
   };
-}
-
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
-// combobox that opens a listbox popup. Choose by { value }, { label } or
-// { index }. { values } sets the items of a multiple Select, then Escape
-// closes its popup.
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator(".pantry-select-popup[data-open]");
-  await popup.waitFor();
-  const items = popup.locator(".pantry-select-item");
-  if ("values" in choice) {
-    const wanted = choice.values.map(String);
-    for (const item of await items.all()) {
-      const chosen = wanted.includes(await item.getAttribute("data-value"));
-      const selected = (await item.getAttribute("aria-selected")) === "true";
-      if (chosen !== selected) await item.click();
-    }
-    await page.keyboard.press("Escape");
-  } else if ("value" in choice) {
-    await popup
-      .locator(
-        `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-      )
-      .click();
-  } else if ("label" in choice) {
-    await popup
-      .getByRole("option", { name: choice.label, exact: true })
-      .click();
-  } else {
-    await items.nth(choice.index).click();
-  }
-  await popup.waitFor({ state: "hidden" });
 }

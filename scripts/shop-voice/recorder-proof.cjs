@@ -7,12 +7,12 @@
 // It prints the session's name. Then: phrase-bench.py human .cache/human/<session>
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE);
 const { fakeMicrophone, play, speech } = require("./fake-microphone.cjs");
+const { sleep } = require("../../packages/std/src/index.ts");
 
 const PAGE = process.argv[2] ?? "http://127.0.0.1:3185/voice-recorder.html";
 const VOICE = process.env.SHOP_VOICE_VOICE ?? "Moira";
 // The wake phrase as the Portal journey says it to the wake model.
 const WAKE = speech("Tessa", "hey, sayter");
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function main() {
   const browser = await chromium.launch({

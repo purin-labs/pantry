@@ -1,22 +1,20 @@
-import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
   mkdirSync,
-  mkdtempSync,
   readdirSync,
   readFileSync,
-  rmSync,
   statSync,
   writeFileSync,
 } from "node:fs";
 import { createRequire } from "node:module";
-import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import { gzipSync } from "node:zlib";
+import { readVaultOnePasswordEnvironment } from "./worker-environment.mjs";
 import {
-  readVaultOnePasswordEnvironment,
-  workerDeployArguments,
-} from "./worker-environment.mjs";
+  checkAndDeploy,
+  isUploadedModule,
+  platformDirectory as directory,
+} from "./lib/side-worker.mjs";
 
 // The 1Password store Worker runs the 1Password SDK for the Vault (Plan 79).
 // The platform Worker binds it by name, so this Worker deploys first.
@@ -45,29 +43,19 @@ if (operation !== "prepare" && operation !== "check" && operation !== "deploy")
 if (extra.length > 0)
   throw new Error("Options are forbidden; edit the named Wrangler profile");
 
-const directory = resolve(import.meta.dirname, "../services/platform");
 prepareLoader();
 if (operation === "prepare") process.exit(0);
 
 const config = readVaultOnePasswordEnvironment(environment);
-const target = ["--config", "wrangler.vault-onepassword.jsonc"];
 console.log(`${operation}: ${config.name} (${environment})`);
 
-const bundle = mkdtempSync(join(tmpdir(), "satyr-vault-onepassword-"));
-try {
-  wrangler([
-    ...workerDeployArguments(environment),
-    ...target,
-    "--dry-run",
-    "--outdir",
-    bundle,
-  ]);
-  requireBoundedScript(bundle);
-} finally {
-  rmSync(bundle, { recursive: true, force: true });
-}
-if (operation === "deploy")
-  wrangler([...workerDeployArguments(environment), ...target]);
+checkAndDeploy({
+  operation,
+  environment,
+  profile: "wrangler.vault-onepassword.jsonc",
+  prefix: "satyr-vault-onepassword-",
+  check: requireBoundedScript,
+});
 
 function prepareLoader() {
   const require = createRequire(join(directory, "package.json"));
@@ -89,16 +77,6 @@ function prepareLoader() {
   );
   copyFileSync(join(core, "core_bg.wasm"), join(output, "core_bg.wasm"));
   console.log(`prepare: SDK loader written to ${output}`);
-}
-
-function wrangler(args) {
-  const result = spawnSync("pnpm", ["exec", "wrangler", ...args], {
-    cwd: directory,
-    stdio: "inherit",
-    env: { ...process.env, CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false" },
-  });
-  if (result.error) throw result.error;
-  if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
 function requireBoundedScript(bundle) {
@@ -123,8 +101,4 @@ function requireBoundedScript(bundle) {
   console.log(
     `check: script is ${bytes} bytes (${compressed} compressed) in ${modules.length} module(s)`,
   );
-}
-
-function isUploadedModule(name) {
-  return !name.endsWith(".map") && name !== "README.md";
 }

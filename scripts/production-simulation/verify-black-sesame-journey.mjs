@@ -1,36 +1,24 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
+import {
+  beginRun,
+  driveRun,
+  evidenceDirectory,
+  evidenceWriter,
+  pinnedEngine,
+  reported,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   blackSesameRecipeInput,
   compileBlackSesameRecipe,
 } from "../../packages/production-simulation/src/recipes/bakery/black-sesame.ts";
 import { PRODUCTION_EXECUTION_MANIFEST } from "../../packages/production-simulation/src/execution-manifest.generated.ts";
-import { runtimeModule } from "./build-execution-bundle.mjs";
 
-assert.equal(process.argv.length, 3, "Provide a fresh evidence directory");
-const output = resolve(process.argv[2]);
-assert.equal(existsSync(output), false);
-mkdirSync(output, { recursive: true });
+const output = evidenceDirectory();
+const save = evidenceWriter(output);
 const manifest = PRODUCTION_EXECUTION_MANIFEST;
-const engineDirectory = resolve(
-  `apps/portal/public/bakery-physics/executions/${manifest.bundle.id}`,
-);
-const runtime = resolve(
-  `apps/portal/public/bakery-physics/bundles/${manifest.runtime.id}`,
-);
-const E = await import(
-  pathToFileURL(join(engineDirectory, manifest.engine.file)).href
-);
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
+const engine = await pinnedEngine();
+const { E } = engine;
 const input = blackSesameRecipeInput();
 const scenario = value(await compileBlackSesameRecipe(input));
 value(await E.admitScenario(scenario));
@@ -38,69 +26,26 @@ save("recipe.json", { kind: "black-sesame-recipe", recipe: input });
 save("execution.json", manifest);
 save("scenario.json", scenario);
 
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
-function save(name, data) {
-  writeFileSync(join(output, name), `${canonicalJson(data)}\n`);
-}
-async function open(scenario, saved, leg) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const reply = await host.handle({
-    kind: "begin",
+function open(scenario, saved, leg) {
+  return beginRun(engine, {
     bundle: manifest.bundle,
     cells: [],
-    identity: {
-      runId: "black-sesame-acceptance",
-      executionId: `sesame-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "black-sesame-acceptance",
+    executionId: `sesame-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario,
+    saved,
   });
-  assert.equal(reply.kind, "began", JSON.stringify(reply));
-  return host;
 }
 async function drive(host, until) {
-  for (let turn = 0; turn < 100; turn++) {
-    const reply = await host.handle({ kind: "drive", turns: 128, until });
-    assert.equal(reply.kind, "drove", JSON.stringify(reply));
-    if (
-      reply.view.time >= until ||
-      ["completed", "blocked", "stopped-at-limit"].includes(
-        reply.view.status.kind,
-      )
-    ) {
-      const state = await host.handle({ kind: "state" });
-      assert.equal(state.kind, "state");
-      return state.run;
-    }
-  }
-  throw new Error("Recipe exceeded its execution bound");
-}
-function reported(run, destination) {
-  let amount = 0;
-  for (const event of run.events)
-    if (event.kind === "quantity-reported" && event.destination === destination)
-      amount += event.quantity.amount;
-  return amount;
+  return (
+    await driveRun(host, {
+      until,
+      calls: 100,
+      bound: "Recipe exceeded its execution bound",
+      stops: ["completed", "blocked", "stopped-at-limit"],
+    })
+  ).run;
 }
 function bottles(run) {
   const result = [];

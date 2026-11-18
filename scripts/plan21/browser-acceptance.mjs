@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
+import { cliCommand, cliResult } from "../browser-cli.mjs";
 
 const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
 const artifactDir = join(root, "output/playwright/plan21-browser");
@@ -34,33 +35,6 @@ const providerRecoveryPath = join(
 
 mkdirSync(daemonDir, { recursive: true });
 
-function cliCommand() {
-  const explicit = process.env.PLAYWRIGHT_CLI;
-  if (explicit !== undefined && explicit.length > 0) {
-    return { file: explicit, args: [] };
-  }
-  const codexHome = process.env.CODEX_HOME ?? join(homedir(), ".codex");
-  const wrapper = join(
-    codexHome,
-    "skills/playwright/scripts/playwright_cli.sh",
-  );
-  if (existsSync(wrapper)) {
-    return { file: "bash", args: [wrapper] };
-  }
-  try {
-    const global = execFileSync("sh", ["-lc", "command -v playwright-cli"], {
-      encoding: "utf8",
-    }).trim();
-    if (global.length > 0) return { file: global, args: [] };
-  } catch {
-    // Fall through to the dependency-free npx wrapper.
-  }
-  return {
-    file: "npx",
-    args: ["--yes", "--package", "@playwright/cli", "playwright-cli"],
-  };
-}
-
 const cli = cliCommand();
 const cliEnv = {
   ...process.env,
@@ -80,32 +54,7 @@ function runCli(command, args = []) {
       encoding: "utf8",
     },
   );
-  if (result.error !== undefined) {
-    throw result.error;
-  }
-  const output = result.stdout.trim();
-  if (result.status !== 0) {
-    const diagnostic = [output, result.stderr.trim()]
-      .filter((value) => value.length > 0)
-      .join("\n");
-    throw new Error(`${command} failed (${result.status}): ${diagnostic}`);
-  }
-  let parsed;
-  try {
-    parsed = JSON.parse(output);
-  } catch {
-    throw new Error(`${command} returned non-JSON output: ${output}`);
-  }
-  if (parsed.isError === true) {
-    throw new Error(`${command} failed: ${parsed.error ?? output}`);
-  }
-  const value = parsed.result ?? parsed;
-  if (typeof value !== "string") return value;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return value;
-  }
+  return cliResult(command, result);
 }
 
 function assertCheck(condition, message) {

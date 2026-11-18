@@ -4,7 +4,7 @@ async function verifyBlackSesameBrowser(page) {
     throw new Error("Provide the black sesame evidence URL.");
   await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await page.reload();
-  await page.evaluate(mountRecipeWorkspace);
+  await page.evaluate(mountWorkflowSimulator, { kind: "preview" });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.getByRole("button", { name: "Workflow", exact: true }).click();
   await page
@@ -67,28 +67,6 @@ async function verifyBlackSesameBrowser(page) {
     fullPage: true,
   });
   return { result: "passed", ...result, authored, continued };
-}
-async function previewStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
-}
-async function mountRecipeWorkspace() {
-  const { default: React } = await import("/@id/react");
-  const { default: ReactDOM } = await import("/@id/react-dom/client");
-  const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  ReactDOM.createRoot(document.getElementById("root")).render(
-    React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(WorkflowSimulatorRoute, {
-        connection: { kind: "preview" },
-      }),
-    ),
-  );
 }
 async function completed(page) {
   await page
@@ -176,16 +154,3 @@ async function compareRecipeRuns({ authored, continued, evidence }) {
   };
 }
 verifyBlackSesameBrowser;
-
-// A live run asks before it stops. The journey accepts that question.
-async function backToRecipes(page) {
-  const accept = (dialog) => dialog.accept();
-  page.on("dialog", accept);
-  try {
-    await page
-      .getByRole("button", { name: "Back to recipes", exact: true })
-      .click();
-  } finally {
-    page.off("dialog", accept);
-  }
-}

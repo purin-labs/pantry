@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
 import process from "node:process";
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { resolveSlackCliPath, runSlackCli } from "./login-slack-cli.mjs";
+import { handleFatalError, isMainModule } from "../lib/cli.mjs";
 
 function main() {
   const commandArgs = process.argv.slice(2);
@@ -32,18 +31,6 @@ function requiredEnv(name) {
   }
 
   return value;
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-}
-
-function isMainModule(moduleUrl, entryPath) {
-  return (
-    typeof entryPath === "string" &&
-    fileURLToPath(moduleUrl) === resolve(entryPath)
-  );
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {

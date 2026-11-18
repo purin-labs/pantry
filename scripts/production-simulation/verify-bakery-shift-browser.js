@@ -5,10 +5,14 @@ async function verifyBakeryShiftBrowser(page) {
     "**/v1/control/organisations/oven-ui-acceptance/bakery/runs**",
     recipeArchiveRequest,
   );
-  await page.route("**/src/dev/workflow-preview.tsx", serveOvenWorkspaceStyles);
+  await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await page.reload();
   await installRecipeMutation(page);
-  await page.evaluate(mountConnectedOvenWorkspace);
+  await page.evaluate(mountWorkflowSimulator, {
+    kind: "workspace",
+    organisationId: "oven-ui-acceptance",
+    canManage: true,
+  });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.getByRole("button", { name: "Recipes", exact: true }).click();
   await page.getByLabel("Financier trays", { exact: true }).fill("2");
@@ -131,7 +135,11 @@ async function saveShared(page, name, lostReply) {
 async function reopenShared(page, name) {
   await page.reload();
   await installRecipeMutation(page);
-  await page.evaluate(mountConnectedOvenWorkspace);
+  await page.evaluate(mountWorkflowSimulator, {
+    kind: "workspace",
+    organisationId: "oven-ui-acceptance",
+    canManage: true,
+  });
   await page.getByRole("button", { name: "Recipes", exact: true }).click();
   await page.getByText("Shared production runs", { exact: true }).click();
   await page.getByRole("button", { name: `Open ${name}`, exact: true }).click();
@@ -223,54 +231,6 @@ async function recipeArchiveRequest(route) {
       json: { ok: true, snapshots, nextCursor: null },
     });
   }
-}
-
-async function installRecipeMutation(page) {
-  await page.addScriptTag({
-    content: `${saveRecipeCopy.toString()}\nwindow.saveRecipeCopy = saveRecipeCopy;`,
-  });
-}
-
-async function saveRecipeCopy(path, body) {
-  if (path !== "/v1/control/organisations/oven-ui-acceptance/bakery/runs")
-    throw new Error("This journey must not mutate commerce.");
-  const response = await fetch(path, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok)
-    throw new Error("The shared run save did not return a receipt.");
-  return response.json();
-}
-
-async function mountConnectedOvenWorkspace() {
-  const { default: React } = await import("/@id/react");
-  const { default: ReactDOM } = await import("/@id/react-dom/client");
-  const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  ReactDOM.createRoot(document.getElementById("root")).render(
-    React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(WorkflowSimulatorRoute, {
-        connection: {
-          kind: "workspace",
-          organisationId: "oven-ui-acceptance",
-          canManage: true,
-          mutate: window.saveRecipeCopy,
-        },
-      }),
-    ),
-  );
-}
-
-async function serveOvenWorkspaceStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
 }
 
 async function saveOvenDownload(page, name) {

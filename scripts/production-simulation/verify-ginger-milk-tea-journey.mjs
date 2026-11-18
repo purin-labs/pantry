@@ -1,9 +1,16 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
+import {
+  beginRun,
+  driveRun,
+  evidenceDirectory,
+  evidenceWriter,
+  inspectPending,
+  pendingInspection,
+  pinnedEngine,
+  processEvents,
+  reported,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   gingerMilkTeaRecipeInput,
   compileGingerMilkTeaRecipe,
@@ -14,27 +21,12 @@ import {
   mixedTeaRecipeInput,
 } from "../../packages/production-simulation/src/recipes/bakery/mixed-tea.ts";
 import { PRODUCTION_EXECUTION_MANIFEST as manifest } from "../../packages/production-simulation/src/execution-manifest.generated.ts";
-import { prepareCell, runtimeModule } from "./build-execution-bundle.mjs";
+import { prepareCell } from "./build-execution-bundle.mjs";
 
-assert.equal(process.argv.length, 3, "Provide a fresh evidence directory");
-const output = resolve(process.argv[2]);
-assert.equal(existsSync(output), false);
-mkdirSync(output, { recursive: true });
-const engineDirectory = resolve(
-  `apps/portal/public/bakery-physics/executions/${manifest.bundle.id}`,
-);
-const runtime = resolve(
-  `apps/portal/public/bakery-physics/bundles/${manifest.runtime.id}`,
-);
-const E = await import(
-  pathToFileURL(join(engineDirectory, manifest.engine.file)).href
-);
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
+const output = evidenceDirectory();
+const save = evidenceWriter(output);
+const engine = await pinnedEngine();
+const { E, runtime } = engine;
 const cell = await prepareCell(runtime, "tea-pan-cell", {
   fixture: "pan-staging",
 });
@@ -46,107 +38,37 @@ save("recipe.json", { kind: "ginger-milk-tea-recipe", recipe: input });
 save("execution.json", manifest);
 save("scenario.json", scenario);
 
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
-function save(name, data) {
-  writeFileSync(join(output, name), `${canonicalJson(data)}\n`);
-}
-async function open(scenario, saved, leg) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const reply = await host.handle({
-    kind: "begin",
+function open(scenario, saved, leg) {
+  return beginRun(engine, {
     bundle: manifest.bundle,
     cells: [cell],
-    identity: {
-      runId: "ginger-milk-tea-acceptance",
-      executionId: `tea-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "ginger-milk-tea-acceptance",
+    executionId: `tea-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario,
+    saved,
   });
-  assert.equal(reply.kind, "began", JSON.stringify(reply));
-  return host;
 }
-async function drive(host, until = 14_400_000_000) {
-  for (let turn = 0; turn < 2000; turn++) {
-    const reply = await host.handle({ kind: "drive", turns: 128, until });
-    assert.equal(reply.kind, "drove", JSON.stringify(reply));
-    if (
-      reply.view.time >= until ||
-      [
-        "completed",
-        "blocked",
-        "stopped-at-limit",
-        "awaiting-inspection",
-      ].includes(reply.view.status.kind)
-    ) {
-      const state = await host.handle({ kind: "state" });
-      assert.equal(state.kind, "state");
-      return { run: state.run, view: reply.view };
-    }
-  }
-  throw new Error("Tea exceeded its execution bound");
-}
-function pendingInspection(item) {
-  return item.kind === "pending";
-}
-function reported(run, destination) {
-  let amount = 0;
-  for (const event of run.events)
-    if (event.kind === "quantity-reported" && event.destination === destination)
-      amount += event.quantity.amount;
-  return amount;
+function drive(host, until = 14_400_000_000) {
+  return driveRun(host, {
+    until,
+    calls: 2000,
+    bound: "Tea exceeded its execution bound",
+  });
 }
 function task(run, batch, key) {
   for (const entry of run.tasks)
     if (entry.id === `milk-tea-batches#${batch}/${key}`) return entry;
   throw new Error(`Missing ${batch}/${key}`);
 }
-async function inspect(host, view, outcome, checkRefusals) {
-  const pending = view.inspections.find(pendingInspection);
-  assert.ok(pending);
-  const request = {
-    kind: "inspect",
-    commandId: `inspect-${pending.task.replace(/[^a-z0-9-]/g, "-")}`,
-    expectedControlRevision: view.controlRevision,
-    task: pending.task,
-    definition: pending.definition,
-    lots: pending.lots,
+function inspect(host, view, outcome, checkRefusals) {
+  return inspectPending(
+    host,
+    view,
     outcome,
-    note: "Synthetic extraction review for acceptance",
-  };
-  if (checkRefusals) {
-    const wrong = await host.handle({
-      ...request,
-      commandId: "wrong-tea-lot",
-      lots: ["wrong-lot"],
-    });
-    assert.equal(wrong.receipt.reason, "inspection_binding_mismatch");
-  }
-  const reply = await host.handle(request);
-  assert.equal(reply.kind, "commanded", JSON.stringify(reply));
-  assert.equal(reply.receipt.status, "accepted", JSON.stringify(reply));
-  const duplicate = await host.handle(request);
-  assert.deepEqual(duplicate.receipt, reply.receipt);
+    checkRefusals,
+    "Synthetic extraction review for acceptance",
+  );
 }
 async function finish(host, first, rejectLate) {
   let boundary = first;
@@ -194,13 +116,6 @@ function massBalance(run, expected = 1_858_000) {
     )
       amount += event.quantity.amount;
   assert.equal(amount, expected);
-}
-function processEvents(run) {
-  const events = [];
-  for (const { sequence, execution, ...event } of run.events)
-    if (!["command-admitted", "pause-settled"].includes(event.kind))
-      events.push(event);
-  return events;
 }
 
 function remaining(run, id) {

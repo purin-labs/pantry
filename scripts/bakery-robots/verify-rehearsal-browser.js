@@ -4,39 +4,6 @@ const rehearsalBase = globalThis.bakeryBase ?? "http://127.0.0.1:5188";
 const rehearsalEvidence =
   globalThis.bakeryEvidence ?? "output/playwright/plan42f-rehearsal-browser";
 
-// Holds one worker's asset fetch so Stop lands at a known task boundary.
-class RehearsalWorkerGate {
-  count = 0;
-  releaseWait = null;
-  reached = null;
-  constructor(blockAt) {
-    this.blockAt = blockAt;
-    this.blocked = new Promise(this.captureReached.bind(this));
-  }
-  captureReached(resolve) {
-    this.reached = resolve;
-  }
-  captureRelease(resolve) {
-    this.releaseWait = resolve;
-  }
-  async handle(route) {
-    this.count++;
-    if (this.count === this.blockAt) {
-      const wait = new Promise(this.captureRelease.bind(this));
-      this.reached();
-      await wait;
-    }
-    try {
-      await route.continue();
-    } catch {
-      /* Stop terminates the fetching worker. */
-    }
-  }
-  release() {
-    this.releaseWait();
-  }
-}
-
 function rehearsalNotice(page, text) {
   return page
     .locator(".production-panel .production-notice")
@@ -131,7 +98,7 @@ async function verifyRehearsalBrowser(page) {
   await saveRehearsal(page, "authored");
 
   // Stop after C's loading, save, reopen and continue from its saved handoff.
-  const gate = new RehearsalWorkerGate(2);
+  const gate = new WorkerFetchGate(2);
   await page.route(
     "**/bakery-physics/bundles/*/bakery_native.wasm",
     gate.handle.bind(gate),
@@ -180,37 +147,4 @@ async function verifyRehearsalBrowser(page) {
       "workflow, timeline, details and 390px evidence captured",
     ],
   };
-}
-
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
-// combobox that opens a listbox popup. Choose by { value }, { label } or
-// { index }. { values } sets the items of a multiple Select, then Escape
-// closes its popup.
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator(".pantry-select-popup[data-open]");
-  await popup.waitFor();
-  const items = popup.locator(".pantry-select-item");
-  if ("values" in choice) {
-    const wanted = choice.values.map(String);
-    for (const item of await items.all()) {
-      const chosen = wanted.includes(await item.getAttribute("data-value"));
-      const selected = (await item.getAttribute("aria-selected")) === "true";
-      if (chosen !== selected) await item.click();
-    }
-    await page.keyboard.press("Escape");
-  } else if ("value" in choice) {
-    await popup
-      .locator(
-        `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-      )
-      .click();
-  } else if ("label" in choice) {
-    await popup
-      .getByRole("option", { name: choice.label, exact: true })
-      .click();
-  } else {
-    await items.nth(choice.index).click();
-  }
-  await popup.waitFor({ state: "hidden" });
 }

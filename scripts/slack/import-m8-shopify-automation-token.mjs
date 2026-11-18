@@ -4,6 +4,7 @@ import process from "node:process";
 
 import { promptForHiddenTerminalValue } from "./ensure-app-config-token.mjs";
 import { upsertLocalEnv } from "./local-env.mjs";
+import { handleFatalError } from "../lib/cli.mjs";
 
 const ENV_PATH = ".env.local";
 
@@ -23,11 +24,6 @@ export function assertShopifyAutomationToken(value) {
   if (!/^atkn_[A-Za-z0-9_-]{32,}$/u.test(value)) {
     throw new Error("The pasted Shopify App Automation Token is invalid");
   }
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }
 
 await main().catch(handleFatalError);

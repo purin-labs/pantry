@@ -1,8 +1,15 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
 // Compile the current financier recipe and compare persistent execution with
 // its established scheduler, through fresh retained hosts and finite buffers.
+import {
+  beginRun,
+  evidenceWriter,
+  pendingInspection,
+  sameId,
+  textCodec,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { canonicalJson, sha256Hex } from "../../packages/std/src/index.ts";
@@ -21,13 +28,11 @@ import {
   simulateSteps,
 } from "../../packages/production-simulation/src/recipes/bakery/schedule.ts";
 import { BAKERY_BROWSER_BUNDLE } from "../../packages/production-simulation/src/simulator/browser-physics-asset.ts";
-import {
-  buildExecutionBundle,
-  runtimeModule,
-} from "./build-execution-bundle.mjs";
+import { buildExecutionBundle } from "./build-execution-bundle.mjs";
 
 assert.equal(process.argv.length, 3, "Provide a fresh output directory");
 const output = resolve(process.argv[2]);
+const save = evidenceWriter(output);
 assert.equal(existsSync(output), false, "Choose a fresh output directory");
 mkdirSync(output, { recursive: true });
 const runtime = resolve(
@@ -38,57 +43,23 @@ const E = await import(
   pathToFileURL(join(built.directory, "production-engine.mjs")).href
 );
 const bundle = built.manifest.bundle;
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
+const engine = { E, runtime, codec: textCodec() };
 
-function save(name, content) {
-  writeFileSync(join(output, name), `${canonicalJson(content)}\n`);
-}
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
 function settings(overrides) {
   const parsed = parseSettings({ ...sampleSettings(), ...overrides });
   assert.equal(parsed.kind, "valid", JSON.stringify(parsed));
   return parsed.settings;
 }
-async function open(scenario, saved, leg) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const reply = await host.handle({
-    kind: "begin",
+function open(scenario, saved, leg) {
+  return beginRun(engine, {
     bundle,
     cells: [],
-    identity: {
-      runId: "financier",
-      executionId: `execution-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "financier",
+    executionId: `execution-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario,
+    saved,
   });
-  assert.equal(reply.kind, "began", JSON.stringify(reply));
-  return host;
 }
 async function drive(host, seconds) {
   const reply = await host.handle({
@@ -127,9 +98,6 @@ function taskId(task) {
       ? task.operation
       : `transfer-${task.from}-${task.station}`;
   return `batch-${task.batch}#0/${key}`;
-}
-function sameId(id, item) {
-  return item.id === id;
 }
 function taskEvent(kind, id, event) {
   return event.kind === kind && event.task === id;
@@ -791,9 +759,6 @@ async function driveRecipe(host, until, label) {
     assert.equal(conflict.receipt.reason, "conflicting_payload");
   }
   throw new Error("Recipe did not settle after its inspections");
-}
-function pendingInspection(item) {
-  return item.kind === "pending";
 }
 function recipeTask(run, load, key) {
   const task = run.tasks.find(sameId.bind(null, `${load}#0/${key}`));

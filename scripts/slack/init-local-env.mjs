@@ -3,6 +3,7 @@
 import { constants } from "node:fs";
 import { copyFile, chmod } from "node:fs/promises";
 import process from "node:process";
+import { handleFatalError } from "../lib/cli.mjs";
 
 const TEMPLATE_PATH = ".env.slack.example";
 const TARGET_PATH = ".env.local";
@@ -28,9 +29,4 @@ async function main() {
 
 function isExistingFileError(error) {
   return error instanceof Error && "code" in error && error.code === "EEXIST";
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }

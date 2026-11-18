@@ -1,9 +1,15 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
+import {
+  beginRun,
+  driveRun,
+  evidenceDirectory,
+  evidenceWriter,
+  pendingInspection,
+  pinnedEngine,
+  processEvents,
+  reported,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   compileAfternoonPrep,
   compileBakeryShift,
@@ -25,32 +31,14 @@ import {
 import { PIE_TYPES } from "../../packages/production-simulation/src/recipes/bakery/pie-products.ts";
 import { teaStrainTiming } from "../../packages/production-simulation/src/recipes/bakery/tea-process.ts";
 import { PRODUCTION_EXECUTION_MANIFEST as manifest } from "../../packages/production-simulation/src/execution-manifest.generated.ts";
-import { prepareCell, runtimeModule } from "./build-execution-bundle.mjs";
+import { prepareCell } from "./build-execution-bundle.mjs";
 
-assert.equal(process.argv.length, 3, "Provide a fresh evidence directory");
-const output = resolve(process.argv[2]);
-assert.equal(
-  existsSync(output),
-  false,
-  `Output directory already exists: ${output}`,
+const output = evidenceDirectory(
+  (path) => `Output directory already exists: ${path}`,
 );
-mkdirSync(output, { recursive: true });
-
-const engineDirectory = resolve(
-  `apps/portal/public/bakery-physics/executions/${manifest.bundle.id}`,
-);
-const runtime = resolve(
-  `apps/portal/public/bakery-physics/bundles/${manifest.runtime.id}`,
-);
-const E = await import(
-  pathToFileURL(join(engineDirectory, manifest.engine.file)).href
-);
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
+const save = evidenceWriter(output);
+const engine = await pinnedEngine();
+const { E, runtime } = engine;
 
 const cell = await prepareCell(runtime, "tea-pan-cell", {
   fixture: "pan-staging",
@@ -58,80 +46,26 @@ const cell = await prepareCell(runtime, "tea-pan-cell", {
 save("cell-definition.json", cell);
 save("execution.json", manifest);
 
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
-function save(name, data) {
-  writeFileSync(join(output, name), `${canonicalJson(data)}\n`);
-}
-async function open(scenario, saved, leg, cells = [cell]) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const reply = await host.handle({
-    kind: "begin",
+function open(scenario, saved, leg, cells = [cell]) {
+  return beginRun(engine, {
     bundle: manifest.bundle,
     cells,
-    identity: {
-      runId: "morning-shift-acceptance",
-      executionId: `shift-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "morning-shift-acceptance",
+    executionId: `shift-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario,
+    saved,
   });
-  assert.equal(reply.kind, "began", JSON.stringify(reply));
-  return host;
 }
 
 const HORIZON_US = 28_800_000_000;
 
-async function drive(host, until = HORIZON_US) {
-  for (let turn = 0; turn < 5000; turn++) {
-    const reply = await host.handle({ kind: "drive", turns: 128, until });
-    assert.equal(reply.kind, "drove", JSON.stringify(reply));
-    if (
-      reply.view.time >= until ||
-      [
-        "completed",
-        "blocked",
-        "stopped-at-limit",
-        "awaiting-inspection",
-      ].includes(reply.view.status.kind)
-    ) {
-      const state = await host.handle({ kind: "state" });
-      assert.equal(state.kind, "state");
-      return { run: state.run, view: reply.view };
-    }
-  }
-  throw new Error("Morning shift exceeded its execution bound");
-}
-
-function pendingInspection(item) {
-  return item.kind === "pending";
-}
-
-function reported(run, destination) {
-  let amount = 0;
-  for (const event of run.events)
-    if (event.kind === "quantity-reported" && event.destination === destination)
-      amount += event.quantity.amount;
-  return amount;
+function drive(host, until = HORIZON_US) {
+  return driveRun(host, {
+    until,
+    calls: 5000,
+    bound: "Morning shift exceeded its execution bound",
+  });
 }
 
 /** Packed financiers of each flavour, read from the packing task's load. */
@@ -246,14 +180,6 @@ async function finishShift(host, first, checkFirstRefusal = false) {
     `Expected completed status, got ${JSON.stringify(boundary.run.status)} at t=${boundary.run.position.time / 1_000_000}s`,
   );
   return { ...boundary, inspections };
-}
-
-function processEvents(run) {
-  const events = [];
-  for (const { sequence, execution, ...event } of run.events)
-    if (!["command-admitted", "pause-settled"].includes(event.kind))
-      events.push(event);
-  return events;
 }
 
 function totalMassMg(run) {

@@ -7,6 +7,7 @@ import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { readFile } from "node:fs/promises";
 import { parseEnv } from "node:util";
+import { sleep } from "../../packages/std/src/index.ts";
 import {
   readWorkerEnvironment,
   requireLocalWorkerSecrets,
@@ -268,7 +269,7 @@ export async function readLocalIngressOrigin(tunnel) {
 async function waitForPlatform(platformOrigin) {
   for (let attempt = 0; attempt < 120; attempt += 1) {
     if (await platformIsReady(platformOrigin)) return;
-    await delay(250);
+    await sleep(250);
   }
   throw new Error("The local platform did not become ready within 30 seconds");
 }
@@ -282,14 +283,6 @@ async function platformIsReady(platformOrigin) {
   } catch {
     return false;
   }
-}
-
-function delay(milliseconds) {
-  return new Promise(resolveDelay.bind(undefined, milliseconds));
-}
-
-function resolveDelay(milliseconds, resolve) {
-  setTimeout(resolve, milliseconds);
 }
 
 async function runNode(args, token) {

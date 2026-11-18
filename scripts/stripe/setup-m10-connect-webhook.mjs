@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 
 import { upsertLocalEnv } from "../slack/local-env.mjs";
 import { syncWorkerSecret } from "./setup-m10-connect.mjs";
+import { errorMessage, isRecord } from "../../packages/std/src/index.ts";
+import { handleFatalError, isMainModule } from "../lib/cli.mjs";
 
 const DEFAULT_PANTRY_ORIGIN = "https://satyr-edge.n6378056.workers.dev";
 const WEBHOOK_ID_NAME = "STRIPE_CONNECT_WEBHOOK_ID";
@@ -124,26 +126,6 @@ function stripeResponseError(status, raw) {
     return `Stripe rejected Connect webhook registration: HTTP ${status} ${code}${param}`;
   }
   return `Stripe rejected Connect webhook registration: HTTP ${status}`;
-}
-
-function isRecord(raw) {
-  return typeof raw === "object" && raw !== null && !Array.isArray(raw);
-}
-
-function errorMessage(error) {
-  return error instanceof Error ? error.message : String(error);
-}
-
-function handleFatalError(error) {
-  console.error(errorMessage(error));
-  process.exitCode = 1;
-}
-
-function isMainModule(moduleUrl, entryPath) {
-  return (
-    typeof entryPath === "string" &&
-    fileURLToPath(moduleUrl) === resolve(entryPath)
-  );
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {

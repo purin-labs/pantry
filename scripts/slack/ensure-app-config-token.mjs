@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 import { once } from "node:events";
-import { resolve } from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
 
 import { upsertLocalEnv } from "./local-env.mjs";
 import { readWorkerEnvironment } from "../worker-environment.mjs";
+import { isRecord } from "../../packages/std/src/index.ts";
+import { handleFatalError, isMainModule } from "../lib/cli.mjs";
 
 const SLACK_API_BASE = "https://slack.com/api";
 const DEFAULT_ENV_PATH = ".env.local";
@@ -318,17 +318,6 @@ function slackErrorCode(parsed, response) {
     : `http_${response.status}`;
 }
 
-function isRecord(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isMainModule(moduleUrl, entryPath) {
-  return (
-    typeof entryPath === "string" &&
-    fileURLToPath(moduleUrl) === resolve(entryPath)
-  );
-}
-
 function printUsageAndExit(code) {
   console.log(`Usage:
   pnpm slack:config-token:import
@@ -340,11 +329,6 @@ saves both replacements to .env.local. Direct calls require --environment local
 or --environment production. Refresh rotates the configured token and
 atomically stores both replacement credentials.`);
   process.exit(code);
-}
-
-function handleFatalError(error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {

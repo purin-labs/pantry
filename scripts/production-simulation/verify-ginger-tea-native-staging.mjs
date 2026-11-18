@@ -1,45 +1,28 @@
-import { collectingExecutionHost } from "./collecting-execution-host.mjs";
+import {
+  beginRun,
+  driveRun,
+  evidenceDirectory,
+  evidenceWriter,
+  inspectPending,
+  pendingInspection,
+  pinnedEngine,
+  reported,
+  sameId,
+  value,
+} from "./execution-journey.mjs";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   gingerBlackTeaRecipeInput,
   compileGingerBlackTeaRecipe,
 } from "../../packages/production-simulation/src/recipes/bakery/ginger-black-tea.ts";
 import { teaStrainTiming } from "../../packages/production-simulation/src/recipes/bakery/tea-process.ts";
 import { PRODUCTION_EXECUTION_MANIFEST as manifest } from "../../packages/production-simulation/src/execution-manifest.generated.ts";
-import { prepareCell, runtimeModule } from "./build-execution-bundle.mjs";
+import { prepareCell } from "./build-execution-bundle.mjs";
 
-assert.equal(process.argv.length, 3, "Provide a fresh evidence directory");
-const output = resolve(process.argv[2]);
-assert.equal(existsSync(output), false, "Choose a fresh evidence directory");
-mkdirSync(output, { recursive: true });
-
-const engineDirectory = resolve(
-  `apps/portal/public/bakery-physics/executions/${manifest.bundle.id}`,
-);
-const runtime = resolve(
-  `apps/portal/public/bakery-physics/bundles/${manifest.runtime.id}`,
-);
-const E = await import(
-  pathToFileURL(join(engineDirectory, manifest.engine.file)).href
-);
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const codec = {
-  encode: encoder.encode.bind(encoder),
-  decode: decoder.decode.bind(decoder),
-};
-
-function value(result) {
-  assert.equal(result.ok, true, JSON.stringify(result.error));
-  return result.value;
-}
-function save(name, data) {
-  writeFileSync(join(output, name), `${canonicalJson(data)}\n`);
-}
+const output = evidenceDirectory("Choose a fresh evidence directory");
+const save = evidenceWriter(output);
+const engine = await pinnedEngine();
+const { E, runtime } = engine;
 
 const cell = await prepareCell(runtime, "tea-pan-cell", {
   fixture: "pan-staging",
@@ -66,107 +49,39 @@ save("recipe.json", {
 save("execution.json", manifest);
 save("scenario.json", scenario);
 
-async function open(activeScenario, saved, leg) {
-  const host = collectingExecutionHost(
-    E,
-    E.wasmTransport(await runtimeModule(runtime), codec),
-  );
-  const reply = await host.handle({
-    kind: "begin",
+function open(activeScenario, saved, leg) {
+  return beginRun(engine, {
     bundle: manifest.bundle,
     cells: [cell],
-    identity: {
-      runId: "ginger-black-tea-native-staging-acceptance",
-      executionId: `tea-${leg}`,
-      hostSession: `host-${leg}`,
-      parent:
-        saved === null
-          ? null
-          : {
-              snapshot: saved.document.snapshot,
-              execution: saved.document.state.identity.executionId,
-            },
-    },
-    origin:
-      saved === null
-        ? { kind: "scenario", scenario: activeScenario }
-        : {
-            kind: "snapshot",
-            document: saved.document,
-            checkpoints: saved.artifacts,
-          },
+    runId: "ginger-black-tea-native-staging-acceptance",
+    executionId: `tea-${leg}`,
+    hostSession: `host-${leg}`,
+    scenario: activeScenario,
+    saved,
   });
-  assert.equal(reply.kind, "began", JSON.stringify(reply));
-  return host;
 }
 
-async function drive(host, until = 10_800_000_000) {
-  for (let turn = 0; turn < 2000; turn++) {
-    const reply = await host.handle({ kind: "drive", turns: 128, until });
-    assert.equal(reply.kind, "drove", JSON.stringify(reply));
-    if (
-      reply.view.time >= until ||
-      [
-        "completed",
-        "blocked",
-        "stopped-at-limit",
-        "awaiting-inspection",
-      ].includes(reply.view.status.kind)
-    ) {
-      const state = await host.handle({ kind: "state" });
-      assert.equal(state.kind, "state");
-      return { run: state.run, view: reply.view };
-    }
-  }
-  throw new Error(
-    "Ginger black tea native-staging run exceeded its execution bound",
-  );
+function drive(host, until = 10_800_000_000) {
+  return driveRun(host, {
+    until,
+    calls: 2000,
+    bound: "Ginger black tea native-staging run exceeded its execution bound",
+  });
 }
 
-function pendingInspection(item) {
-  return item.kind === "pending";
-}
-function reported(run, destination) {
-  let amount = 0;
-  for (const event of run.events)
-    if (event.kind === "quantity-reported" && event.destination === destination)
-      amount += event.quantity.amount;
-  return amount;
-}
 function task(run, batch, key) {
   for (const entry of run.tasks)
     if (entry.id === `tea-batches#${batch}/${key}`) return entry;
   throw new Error(`Missing ${batch}/${key}`);
 }
-function sameId(id, item) {
-  return item.id === id;
-}
-async function inspect(host, view, outcome, checkRefusals) {
-  const pending = view.inspections.find(pendingInspection);
-  assert.ok(pending);
-  const request = {
-    kind: "inspect",
-    commandId: `inspect-${pending.task.replace(/[^a-z0-9-]/g, "-")}`,
-    expectedControlRevision: view.controlRevision,
-    task: pending.task,
-    definition: pending.definition,
-    lots: pending.lots,
+function inspect(host, view, outcome, checkRefusals) {
+  return inspectPending(
+    host,
+    view,
     outcome,
-    note: "Synthetic extraction review for native staging acceptance",
-  };
-  if (checkRefusals) {
-    const wrong = await host.handle({
-      ...request,
-      commandId: "wrong-tea-lot",
-      lots: ["wrong-lot"],
-    });
-    assert.equal(wrong.receipt.reason, "inspection_binding_mismatch");
-  }
-  const reply = await host.handle(request);
-  assert.equal(reply.kind, "commanded", JSON.stringify(reply));
-  assert.equal(reply.receipt.status, "accepted", JSON.stringify(reply));
-  const duplicate = await host.handle(request);
-  assert.deepEqual(duplicate.receipt, reply.receipt);
+    checkRefusals,
+    "Synthetic extraction review for native staging acceptance",
+  );
 }
 async function finish(host, first, rejectLate) {
   let boundary = first;

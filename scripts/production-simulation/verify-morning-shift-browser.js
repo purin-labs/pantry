@@ -43,13 +43,14 @@ async function verifyMorningShiftBrowser(page) {
         `,
       }),
     );
-    await page.route(
-      "**/src/dev/workflow-preview.tsx",
-      serveOvenWorkspaceStyles,
-    );
+    await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
     await page.reload();
     await installRecipeMutation(page);
-    await page.evaluate(mountConnectedOvenWorkspace);
+    await page.evaluate(mountWorkflowSimulator, {
+      kind: "workspace",
+      organisationId: "oven-ui-acceptance",
+      canManage: true,
+    });
   } else {
     await page.route("**/v1/control/**", portalControlRequest);
     await page.goto(
@@ -1186,85 +1187,6 @@ async function recipeArchiveRequest(route) {
       json: { ok: true, snapshots, nextCursor: null },
     });
   }
-}
-
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
-// combobox that opens a listbox popup. Choose by { value }, { label } or
-// { index }. { values } sets the items of a multiple Select, then Escape
-// closes its popup.
-async function chooseOption(page, trigger, choice) {
-  await trigger.click();
-  const popup = page.locator('.pantry-select-popup[data-open]');
-  await popup.waitFor();
-  const items = popup.locator('.pantry-select-item');
-  if ("values" in choice) {
-    const wanted = choice.values.map(String);
-    for (const item of await items.all()) {
-      const chosen = wanted.includes(await item.getAttribute("data-value"));
-      const selected = (await item.getAttribute("aria-selected")) === "true";
-      if (chosen !== selected) await item.click();
-    }
-    await page.keyboard.press("Escape");
-  } else if ("value" in choice) {
-    await popup
-      .locator(
-        `.pantry-select-item[data-value=${JSON.stringify(String(choice.value))}]`,
-      )
-      .click();
-  } else if ("label" in choice) {
-    await popup.getByRole("option", { name: choice.label, exact: true }).click();
-  } else {
-    await items.nth(choice.index).click();
-  }
-  await popup.waitFor({ state: "hidden" });
-}
-
-async function installRecipeMutation(page) {
-  await page.addScriptTag({
-    content: `${saveRecipeCopy.toString()}\nwindow.saveRecipeCopy = saveRecipeCopy;`,
-  });
-}
-
-async function saveRecipeCopy(path, body) {
-  if (path !== "/v1/control/organisations/oven-ui-acceptance/bakery/runs")
-    throw new Error("This journey must not mutate commerce.");
-  const response = await fetch(path, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok)
-    throw new Error("The shared run save did not return a receipt.");
-  return response.json();
-}
-
-async function mountConnectedOvenWorkspace() {
-  const { default: React } = await import("/@id/react");
-  const { default: ReactDOM } = await import("/@id/react-dom/client");
-  const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  ReactDOM.createRoot(document.getElementById("root")).render(
-    React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(WorkflowSimulatorRoute, {
-        connection: {
-          kind: "workspace",
-          organisationId: "oven-ui-acceptance",
-          canManage: true,
-          mutate: window.saveRecipeCopy,
-        },
-      }),
-    ),
-  );
-}
-
-async function serveOvenWorkspaceStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
 }
 
 async function portalControlRequest(route) {

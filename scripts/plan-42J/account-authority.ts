@@ -1,6 +1,7 @@
-// Attaches the Brain journey's Organisation to the real account authority.
-// The provider process runs the built account Worker and binds it to the
-// Worker under test, so each request below passes through that binding.
+// Attaches the Organisation of a journey's fixture Worker (the Brain, side
+// Case and Kitchen journeys) to the real account authority. The provider
+// process runs the built account Worker and binds it to the Worker under
+// test, so each request below passes through that binding.
 import { isRecord } from "../../packages/std/src/index";
 import { ensurePantryAccountAutomationGrant } from "../../services/platform/src/account-platform/automation";
 import { resolvePantryAccountBinding } from "../../services/platform/src/account-platform/binding";
@@ -8,13 +9,18 @@ import { linkPantryAccountUser } from "../../services/platform/src/account-platf
 import { readPantryProvisionApplied } from "../../services/platform/src/account-platform/provisioning-boundary";
 import { handleAccountPlatformRequest } from "../../services/platform/src/account-platform/routes";
 import { accountText } from "../../services/platform/src/account-platform/types";
-import type {
-  ActiveControlSession,
-  User,
+import { newControlMutationIdentity } from "../../services/platform/src/data/control-mutation";
+import {
+  bootstrapOrganisation,
+  issueControlSession,
+  upsertUser,
+  type ActiveControlSession,
+  type User,
 } from "../../services/platform/src/data/control-plane";
 import type { Env } from "../../services/platform/src/env";
 import type { OrganisationId } from "../../services/platform/src/ids";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
+import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement";
 
 /** A person with a role in one Organisation and a control session. */
 export type AccountPerson = Readonly<{
@@ -63,6 +69,162 @@ async function accountFixture(
       `Account fixture ${operation} failed: ${String(response.status)} ${JSON.stringify(raw)}`,
     );
   return raw;
+}
+
+function hasName(name: string | null, candidate: string): boolean {
+  return name === candidate;
+}
+
+/**
+ * The people and Organisations of a journey's fixture Worker (Plans 42J, 74
+ * and 81). Each Google subject is `subjectPrefix` and the person's name;
+ * `label` names the placement cell and the hashes of each Organisation that
+ * the fixture creates.
+ */
+export function fixturePeople(subjectPrefix: string, label: string) {
+  /** The account authority verifies a Google identity, so each person has one. */
+  async function fixtureUser(env: Env, name: string) {
+    const subject = `${subjectPrefix}${name.toLowerCase().replaceAll(" ", "-")}`;
+    return upsertUser({
+      db: env.DB,
+      now: Date.now(),
+      identity: {
+        issuer: "https://accounts.google.com",
+        subject,
+        email: `${subject}@example.test`,
+        displayName: name,
+        emailVerified: true,
+      },
+    });
+  }
+
+  async function fixtureOrganisation(
+    env: Env,
+    owner: User,
+    name: string,
+  ): Promise<OrganisationId> {
+    const now = Date.now();
+    const placement = parseInitialOrganisationPlacement({
+      kind: "affinity",
+      placementEpoch: 1,
+      placementCellId: label,
+      locationHint: "wnam",
+    });
+    if (!placement.ok) {
+      throw new Error(placement.error.path);
+    }
+    const created = await bootstrapOrganisation({
+      env,
+      owner,
+      organisationName: name,
+      environment: "development",
+      placement: placement.value,
+      now,
+      mutation: {
+        scope: {
+          userId: owner.userId,
+          organisationScope: "organisation:create",
+          route: "/v1/control/organisations",
+          operation: "organisation.create",
+        },
+        boundary: {
+          kind: "unversioned",
+          idempotencyKey: crypto.randomUUID(),
+          requestHash: label,
+        },
+        identity: newControlMutationIdentity({
+          portalSubjectHash: label,
+          causationId: crypto.randomUUID(),
+          now,
+        }),
+      },
+    });
+    if (!created.ok) {
+      throw new Error(created.error.code);
+    }
+    return created.value.organisationId;
+  }
+
+  /** One person's role in an Organisation, with a control session of theirs. */
+  async function fixturePerson(
+    env: Env,
+    organisationId: OrganisationId,
+    user: User,
+  ): Promise<AccountPerson> {
+    const grant = await env.DB.prepare(
+      "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ? AND status = 'active'",
+    )
+      .bind(organisationId, user.userId)
+      .first<{ personId: string }>();
+    if (grant === null) {
+      throw new Error("Fixture person has no role");
+    }
+    const issued = await issueControlSession({
+      db: env.DB,
+      userId: user.userId,
+      now: Date.now(),
+      ttlMs: 3_600_000,
+    });
+    return { user, personId: grant.personId, session: issued.session };
+  }
+
+  /** A person of the account fixture who owns a separate organisation. */
+  async function auxiliaryOwner(env: Env, auxiliary: string) {
+    const user = await fixtureUser(env, `Auxiliary ${auxiliary}`);
+    const organisationId = await fixtureOrganisation(
+      env,
+      user,
+      `Account fixture ${auxiliary}`,
+    );
+    return {
+      organisationId,
+      person: await fixturePerson(env, organisationId, user),
+    };
+  }
+
+  /**
+   * Signs in `name`, one of `names`, with the control session and CSRF
+   * cookies. With `withCsrfToken` the body also names the CSRF token.
+   */
+  async function login(
+    env: Env,
+    names: readonly string[],
+    name: string | null,
+    withCsrfToken = false,
+  ): Promise<Response> {
+    if (name === null || !names.some(hasName.bind(null, name))) {
+      return new Response(null, { status: 400 });
+    }
+    const user = await fixtureUser(env, name);
+    const issued = await issueControlSession({
+      db: env.DB,
+      userId: user.userId,
+      now: Date.now(),
+      ttlMs: 3_600_000,
+    });
+    const response = Response.json(
+      withCsrfToken
+        ? { userId: user.userId, csrfToken: issued.csrfToken }
+        : { userId: user.userId },
+    );
+    response.headers.append(
+      "set-cookie",
+      `satyr_control_session=${issued.token}; HttpOnly; Path=/; SameSite=Lax`,
+    );
+    response.headers.append(
+      "set-cookie",
+      `satyr_control_csrf=${issued.csrfToken}; Path=/; SameSite=Lax`,
+    );
+    return response;
+  }
+
+  return {
+    fixtureUser,
+    fixtureOrganisation,
+    fixturePerson,
+    auxiliaryOwner,
+    login,
+  };
 }
 
 /**
