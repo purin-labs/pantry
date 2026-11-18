@@ -45,7 +45,6 @@ const TEST_VALUE_BINDINGS = {
   NOTION_OAUTH_CLIENT_ID: "notion-e2e-client",
   SATYR_DEPLOYMENT_PROFILE: "local",
   SATYR_PUBLIC_ORIGIN: "https://localhost",
-  SATYR_WARM_ACTOR_SLOTS: "on",
   SQUARE_OAUTH_CLIENT_ID: "sandbox-sq0idb-e2e",
   SQUARE_OAUTH_ENVIRONMENT: "development",
   SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({

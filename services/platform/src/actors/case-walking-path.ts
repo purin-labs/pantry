@@ -97,7 +97,7 @@ export type OngoingCaseWalkingConnector = CaseWalkingConnector & {
     release: ConnectorCaseStreamRelease,
   ): Promise<Result<ConnectorCaseTurnStreamResult, ConnectorCaseTurnStreamError>>;
   /** The Connector's warm Case and Session slots (Plan 55F). */
-  readonly warmActorSlots?: ConnectorWarmActorSlots;
+  readonly warmActorSlots: ConnectorWarmActorSlots;
 };
 export type CaseWalkingCase = Pick<
   CaseDO,

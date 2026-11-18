@@ -567,7 +567,6 @@
         "WHATSAPP_APP_ID": "3167174123466651",
         "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
         "SATYR_DEPLOYMENT_PROFILE": "production",
-        "SATYR_WARM_ACTOR_SLOTS": "on",
         "SQUARE_OAUTH_ENVIRONMENT": "production",
         "GOOGLE_OIDC_CLIENT_ID": "971053349716-6307q8845efbiript6fbj86jo11mcfr4.apps.googleusercontent.com",
         "SLACK_APP_ID": "A0BFVDZLFLM",

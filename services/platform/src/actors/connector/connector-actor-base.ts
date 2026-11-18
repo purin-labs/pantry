@@ -294,14 +294,11 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
       acceptIngress: this.acceptIngressAtScope.bind(this, scope),
       deliver: this.deliverAtScope.bind(this, scope),
       streamCaseTurn: this.streamCaseTurnAtScope.bind(this, scope),
-      warmActorSlots:
-        this.env.SATYR_WARM_ACTOR_SLOTS === "on"
-          ? connectorWarmActorSlots(
-              this.ctx.storage,
-              scope.organisationId,
-              scope.placement,
-            )
-          : undefined,
+      warmActorSlots: connectorWarmActorSlots(
+        this.ctx.storage,
+        scope.organisationId,
+        scope.placement,
+      ),
     };
   }
 

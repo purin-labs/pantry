@@ -2746,6 +2746,12 @@ function recordingConnector(): OngoingCaseWalkingConnector & {
     }
   >();
   return {
+    // This Connector keeps no warm slots, so every thread creates its Actors.
+    warmActorSlots: {
+      take: () => null,
+      giveBack: () => undefined,
+      refresh: () => ({ current: [], stale: [] }),
+    },
     async acceptIngress(raw) {
       const input = parseRecordingIngress(raw);
       if (input === null)

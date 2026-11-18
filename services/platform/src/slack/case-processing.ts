@@ -433,7 +433,7 @@ async function processAcceptedSlackCaseMessage(
       scope,
       { ...body, target: partitionTarget },
       body.receivedAt,
-      connector.warmActorSlots ?? null,
+      connector.warmActorSlots,
     );
     if (pair.kind !== "ready") return pair;
     createdPair = pair;
@@ -591,7 +591,7 @@ async function processAcceptedSlackCaseMessage(
               scope,
               { ...body, target: partitionTarget },
               body.receivedAt,
-              connector.warmActorSlots ?? null,
+              connector.warmActorSlots,
             ),
     ),
     timed(
@@ -755,7 +755,7 @@ async function processAcceptedSlackCaseMessage(
   // slot that the Connector no longer keeps is emptied after the residency
   // Actor drops it. The call runs beside the turn, so the turn waits for
   // nothing more. It never rejects.
-  const slots = connector.warmActorSlots?.refresh() ?? NO_WARM_SLOTS;
+  const slots = connector.warmActorSlots.refresh();
   const residency = keepConversationResident({
     env,
     organisationId: body.organisationId,
@@ -1173,11 +1173,6 @@ type CreatedCaseActors = {
     | null;
 };
 
-const NO_WARM_SLOTS: ReturnType<ConnectorWarmActorSlots["refresh"]> = {
-  current: [],
-  stale: [],
-};
-
 /**
  * Create the Case and its Session where either is missing, and publish the
  * activation. The publication keeps its own directory check.
@@ -1193,15 +1188,15 @@ async function createCaseActors(
   scope: OrganisationExecutionScope,
   body: SlackCaseCommand,
   now: number,
-  slotStore: ConnectorWarmActorSlots | null,
+  slotStore: ConnectorWarmActorSlots,
 ): Promise<
   CreatedCaseActors | Variant<SlackCaseProcessingResult, "retry" | "rejected">
 > {
-  const slots = slotStore?.take() ?? null;
+  const slots = slotStore.take();
   const resolved = await resolveCaseActors(env, scope, body, now, slots);
   if (resolved.kind !== "ready") return resolved;
   const used = slots === null ? [] : usedWarmSlots(slots, resolved);
-  if (slotStore !== null && slots !== null)
+  if (slots !== null)
     slotStore.giveBack(
       [slots.case, slots.session].filter((slot) => !used.includes(slot)),
     );

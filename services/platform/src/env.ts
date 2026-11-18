@@ -100,7 +100,6 @@ export interface Env {
    * version reads a slot-backed Actor, so the setting turns on in a release
    * after the one that ships the reading code, and turning it off is safe.
    */
-  SATYR_WARM_ACTOR_SLOTS?: string;
   ORGANISATION_ADMIN_TOKEN?: string;
   COMMERCE_LAB_SIGNING_SECRET?: string;
   SEAMS_WALLET_ORIGIN?: string;
