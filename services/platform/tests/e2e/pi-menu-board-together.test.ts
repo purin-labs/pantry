@@ -9,16 +9,12 @@
 // QR placement. Nothing reaches the TV and no price moves until people act:
 // the owner publishes the merged board, the TV plays it on a canvas layout,
 // and only the owner's approval changes the price.
-import { fixtureDatabase } from "./organisation-database";
-import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import {
   type MenuBoardElement,
   type MenuBoardSnapshot,
 } from "@seams/menu-board-crdt";
 import { isRecord } from "@seams/std";
-import { enableCapability } from "./access-route-support";
-import { commerceClient } from "./commerce-support";
 import { closeSocket } from "./hibernatable-socket-support";
 import {
   BASE,
@@ -31,7 +27,7 @@ import {
   dropFromDraft,
   entryOf,
   feed,
-  member,
+  installBoardJourney,
   menuRevision,
   offer,
   pairScreen,
@@ -40,27 +36,17 @@ import {
   send,
   toolOutput,
 } from "./menu-board-journey-support";
-import { network } from "./network";
-import { givePortalHandles } from "./permission-request-support";
 import {
-  MERCHANT,
   OWNER,
-  installEffectAuthority,
   listingNonce,
   postControl,
-  providerClient,
   sendListingMessage,
 } from "./pi-sdk-effect-support";
 import {
-  ORGANISATION_ID,
   ROOT_TS,
-  createRequiredGrant,
-  discoverSlackChannel,
-  installSlackActorFixture,
   isApprovalCard,
   openRouterText,
   openRouterToolCall,
-  slackSimulator,
 } from "./slack-journey-support";
 
 declare module "vitest" {
@@ -74,7 +60,12 @@ const TARO = "Taro Milk Tea";
 const MATCHA = "Matcha Tea";
 const MERCHANT_AGENT_TITLE = "Made together";
 const STAFF_LABEL = "Staff pick";
-const MERCHANT_AGENT_FEATURED_RECT = { x: 1072, y: 600, width: 480, height: 200 };
+const MERCHANT_AGENT_FEATURED_RECT = {
+  x: 1072,
+  y: 600,
+  width: 480,
+  height: 200,
+};
 const OWNER_HEADING_RECT = { x: 48, y: 24, width: 1504, height: 140 };
 const OWNER_QR_RECT = { x: 64, y: 664, width: 400, height: 200 };
 const STAFF_QR_RECT = { x: 1136, y: 40, width: 416, height: 192 };
@@ -93,32 +84,7 @@ it(
   "lets two people and Urk edit one free-canvas board at once, converge on one board, and keep Urk's price waiting for the owner",
   { timeout: 300_000 },
   async ({ task }: TestContext): Promise<void> => {
-    const staffClient = await commerceClient("board-together-staff");
-    const viewerClient = await commerceClient("board-together-viewer");
-    const fixture = await installSlackActorFixture({
-      privateMember: {
-        client: staffClient,
-        laterPersonId: "person_together_staff",
-      },
-      extraMembers: [
-        { client: viewerClient, laterPersonId: "person_together_viewer" },
-      ],
-    });
-    await fixtureDatabase().batch([
-      ...member(
-        staffClient.identity.userId,
-        "person_together_staff",
-        "operator",
-      ),
-      ...member(
-        viewerClient.identity.userId,
-        "person_together_viewer",
-        "viewer",
-      ),
-    ]);
-    const slack = slackSimulator();
     const requests: Record<string, unknown>[] = [];
-    const clicks: string[] = [];
     const script: Script = {
       productIds: {},
       itemIds: {},
@@ -128,57 +94,14 @@ it(
       featuredId: "",
       outputs: [],
     };
-    network.use(
-      slack.handler,
-      http.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        respond.bind(null, requests, script),
-      ),
-      http.post(
-        "https://hooks.slack.com/actions/:team/:id/:token",
-        async function recordAnswer({ request }) {
-          const body: unknown = await request.json();
-          clicks.push(isRecord(body) ? String(body.text) : "");
-          return HttpResponse.text("ok");
-        },
-      ),
-    );
-    const owner = await installEffectAuthority(
-      fixture.selectedIntegrationAccountId,
-      "plugin",
-    );
-    await givePortalHandles(ORGANISATION_ID);
-    await discoverSlackChannel("public_channel", Date.now() - 60_000);
-    for (const capabilityId of [
-      "commerce.menu_draft.read",
-      "commerce.menu_draft.edit",
-    ] as const) {
-      await enableCapability(ORGANISATION_ID, owner, capabilityId);
-      await createRequiredGrant({
-        grantId: `grant_together_${capabilityId.replaceAll(".", "_")}`,
-        subject: { kind: "organisation_role", role: "owner" },
-        target: {
-          kind: "platform_capability",
-          capabilityId,
-          capabilityVersion: 1,
-        },
-        now: Date.now(),
-      });
-    }
-    const shop = await providerClient().provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
-      externalReference: ORGANISATION_ID,
-      merchantId: MERCHANT,
-      profile: "cafe_patisserie",
-      createdAt: new Date().toISOString(),
-    });
-    if (!shop.ok) throw new Error(JSON.stringify(shop.error));
-    for (const title of [TARO, MATCHA]) {
-      const product = shop.value.resources.products.find(
-        (candidate) => candidate.title === title,
+    const { owner, staff, viewer, slack, answers, products } =
+      await installBoardJourney("together", (body) =>
+        respond(requests, script, body),
       );
-      if (product === undefined) throw new Error(`No product ${title}`);
-      script.productIds[title] = product.id;
+    for (const title of [TARO, MATCHA]) {
+      const productId = products.get(title);
+      if (productId === undefined) throw new Error(`No product ${title}`);
+      script.productIds[title] = productId;
     }
 
     // Turn 1: Sous Chef puts two drinks on the menu draft. The owner publishes the
@@ -201,7 +124,7 @@ it(
     );
     expect(menuPublished.status, JSON.stringify(menuPublished.body)).toBe(200);
     const matchaId = script.itemIds[MATCHA] ?? "";
-    await dropFromDraft(staffClient.session, matchaId);
+    await dropFromDraft(staff, matchaId);
 
     // The owner makes a free-canvas board for a landscape TV. Its template
     // places every element on the canvas with a rect and constraints.
@@ -213,8 +136,8 @@ it(
     script.boardId = boardIdOf(created.body);
     const boardSocket = `${BASE}/menu-boards/${script.boardId}/socket`;
     const ownerPeer = await BoardPeer.open(boardSocket, owner);
-    const staffPeer = await BoardPeer.open(boardSocket, staffClient.session);
-    const viewerPeer = await BoardPeer.open(boardSocket, viewerClient.session);
+    const staffPeer = await BoardPeer.open(boardSocket, staff);
+    const viewerPeer = await BoardPeer.open(boardSocket, viewer);
     try {
       expect(ownerPeer.access).toBe("edit");
       expect(staffPeer.access).toBe("edit");
@@ -335,8 +258,8 @@ it(
 
       // Only the owner's approval moves the price; the TV reads it live.
       await click(nonce, card.ts ?? "");
-      await expect.poll(() => clicks.length, { timeout: 30_000 }).toBe(1);
-      expect(clicks[0]).toContain("Seams Pantry made the change.");
+      await expect.poll(() => answers.length, { timeout: 30_000 }).toBe(1);
+      expect(answers[0]?.text).toContain("Seams Pantry made the change.");
       expect(await actionState(nonce)).toBe("confirmed");
       expect((await offer(matchaId)).price.amountMinor).toBe(550);
       await expect
@@ -396,10 +319,8 @@ it(
 async function respond(
   requests: Record<string, unknown>[],
   script: Script,
-  { request }: Parameters<HttpResponseResolver>[0],
+  body: Record<string, unknown>,
 ): Promise<Response> {
-  const body: unknown = await request.json();
-  if (!isRecord(body)) throw new Error("Invalid board model request");
   requests.push(body);
   const step = requests.length;
   const last = toolOutput(body);
@@ -492,7 +413,10 @@ async function respond(
         change: {
           after: {
             kind: "featured",
-            placement: { frameId: "canvas", rect: MERCHANT_AGENT_FEATURED_RECT },
+            placement: {
+              frameId: "canvas",
+              rect: MERCHANT_AGENT_FEATURED_RECT,
+            },
           },
         },
       });

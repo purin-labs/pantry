@@ -131,8 +131,9 @@ test and any fixture that exists only for the obsolete behavior.
   agent's next draft is not sent; a revoke or the end of the approval time
   during the call stays, and Meta's answer records no reply over it
   (Refactor 15). `e2e/whatsapp-connector-support.ts` installs the WhatsApp
-  number, Case and proposal that it shares with `whatsapp-placement.test.ts`.
-  It needs the account Worker.
+  number, Case and proposal that it shares with `whatsapp-placement.test.ts`
+  and `inbox-whatsapp.test.ts` (with `inbox: true`, the number is selected and
+  the draft is in the Inbox). It needs the account Worker.
 - `e2e/slack-held-output.test.ts` follows an answer that the exit check
   holds (Plan 27C): it waits as `held` until a person decides, and an allowed
   answer that Slack refuses for good ends as `rejected`, so the

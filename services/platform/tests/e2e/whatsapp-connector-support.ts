@@ -16,10 +16,12 @@ import {
 } from "../../src/actors/connector-whatsapp";
 import { createWhatsAppContentCipher } from "../../src/actors/whatsapp-active-content";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import type { IssuedControlSession } from "../../src/data/control-plane";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {
   assignWhatsAppSupportAgent,
   openWhatsAppCaseConversationWindow,
+  projectWhatsAppReplyProposal,
   publishWhatsAppIngressPolicy,
   registerWhatsAppPhoneNumberAccount,
   whatsappConversationWindowCaseId,
@@ -64,10 +66,27 @@ export type Fixture = {
   readonly caseId: string;
   readonly now: number;
   readonly policyVersion: number;
+  /** The Organisation's owner, signed in to the Portal. */
+  readonly owner: IssuedControlSession;
+  /** The customer's message in the open Case. */
+  readonly customerText: string;
 };
 
-export async function installFixture(): Promise<Fixture> {
-  await installSlackActorFixture();
+export type FixtureOptions = Readonly<{
+  customerText?: string;
+  /** The agent's draft that waits for approval. */
+  reply?: string;
+  /**
+   * Select the number and project the draft, as setup and the agent's turn
+   * do, so that the Portal Inbox lists the conversation.
+   */
+  inbox?: boolean;
+}>;
+
+export async function installFixture(
+  options: FixtureOptions = {},
+): Promise<Fixture> {
+  const { ownerSession } = await installSlackActorFixture();
   await requireActiveOrganisationActor({
     env,
     organisationId: ORGANISATION_ID,
@@ -80,9 +99,7 @@ export async function installFixture(): Promise<Fixture> {
     )
     .bind(now, now, ORGANISATION_ID)
     .run();
-  const userId = required(
-    parseUserId("user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab"),
-  );
+  const userId = required(parseUserId(ownerSession.session.userId));
   const handle = required(parseVaultHandle("vault:whatsapp:p55-placement"));
   required(
     await storeVaultSecret({
@@ -129,6 +146,13 @@ export async function installFixture(): Promise<Fixture> {
       now,
     }),
   );
+  if (options.inbox === true)
+    await fixtureDatabase()
+      .prepare(
+        "UPDATE whatsapp_phone_number_account SET selected_at = ? WHERE integration_account_id = ?",
+      )
+      .bind(now, integrationAccountId)
+      .run();
   await fixtureDatabase().batch([
     fixtureDatabase()
       .prepare(
@@ -233,13 +257,33 @@ export async function installFixture(): Promise<Fixture> {
     caseId,
     now,
     policyVersion: policy.policyVersion,
+    owner: ownerSession,
+    customerText: options.customerText ?? "Is my order ready?",
   };
-  await runInDurableObject(connector, seedProposal.bind(null, fixture));
+  const reply = options.reply ?? REPLY;
+  await runInDurableObject(connector, seedProposal.bind(null, fixture, reply));
+  if (options.inbox === true)
+    required(
+      await projectWhatsAppReplyProposal({
+        db: fixtureDatabase(),
+        organisationId: ORGANISATION_ID,
+        integrationAccountId,
+        proposalId: PROPOSAL_ID,
+        caseId,
+        customerWaId: CUSTOMER_ID,
+        currentVersion: 1,
+        lifecycleKind: "awaiting_approval",
+        author: "agent",
+        serviceWindowExpiresAt: now + 86_400_000,
+        now,
+      }),
+    );
   return fixture;
 }
 
 async function seedProposal(
   fixture: Fixture,
+  reply: string,
   _actor: unknown,
   state: DurableObjectState,
 ): Promise<void> {
@@ -255,7 +299,7 @@ async function seedProposal(
     providerMessageId: "wamid.P55_CUSTOMER",
     customerWaId: CUSTOMER_ID,
     providerTimestamp: fixture.now,
-    declaredBytes: 20,
+    declaredBytes: new TextEncoder().encode(fixture.customerText).byteLength,
     limits: limits(),
     caseIdFor: fixtureCaseId.bind(null, fixture),
     now: fixture.now,
@@ -264,7 +308,7 @@ async function seedProposal(
   const sealed = await cipher.seal(
     fixture.caseId,
     { kind: "message", providerMessageId: "wamid.P55_CUSTOMER" },
-    "Is my order ready?",
+    fixture.customerText,
   );
   commitWhatsAppAdmission(sql, {
     caseId: fixture.caseId,
@@ -280,7 +324,7 @@ async function seedProposal(
   });
   claimDueWhatsAppCase(sql, fixture.now + 16_000);
   completeWhatsAppProcessing(sql);
-  await recordAgentDraft(fixture, PROPOSAL_ID, REPLY, null, state);
+  await recordAgentDraft(fixture, PROPOSAL_ID, reply, null, state);
 }
 
 /**

@@ -10,47 +10,42 @@
 // board's text change reaches the TV only when a person publishes the board.
 import { fixtureDatabase } from "./organisation-database";
 import { exports } from "cloudflare:workers";
-import { env } from "cloudflare:workers";
-import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import {
-  parseMenuScreenFeed,
-  parseMenuScreenPairing,
-  parseMenuScreenPairingState,
-  type MenuScreenFeed,
-} from "@seams/control-api";
+import type { MenuScreenFeed } from "@seams/control-api";
 import { isRecord } from "@seams/std";
 import { commerceActionTitle } from "../../../../apps/portal/src/features/governed-actions/commerce";
 import { parseCommerceActionRecordResponse } from "@seams/control-api/portal/commerce-actions";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
-import type { IssuedControlSession } from "../../src/data/control-plane";
-import { enableCapability } from "./access-route-support";
-import { network } from "./network";
-import { givePortalHandles } from "./permission-request-support";
 import {
-  MERCHANT,
+  BASE,
+  actionState,
+  boardIdOf,
+  click,
+  delivered,
+  draftItemId,
+  entryOf,
+  feed,
+  installBoardJourney,
+  menuRevision,
+  offer,
+  pairScreen,
+  publishBoard,
+  readHeaders,
+  send,
+  toolOutput,
+} from "./menu-board-journey-support";
+import {
   OWNER,
-  installEffectAuthority,
-  lastListingToolText,
   listingNonce,
   postControl,
-  providerClient,
   sendListingMessage,
 } from "./pi-sdk-effect-support";
-import { signedButtonClick } from "./slack-side-case-support";
 import {
-  CHANNEL_ID,
   ORGANISATION_ID,
   ROOT_TS,
-  USER_ID,
   cardButtons,
-  createRequiredGrant,
-  discoverSlackChannel,
-  installSlackActorFixture,
   isApprovalCard,
   openRouterText,
   openRouterToolCall,
-  slackSimulator,
 } from "./slack-journey-support";
 
 declare module "vitest" {
@@ -59,8 +54,6 @@ declare module "vitest" {
   }
 }
 
-const ORIGIN = "https://localhost";
-const BASE = `${ORIGIN}/v1/control/organisations/${ORGANISATION_ID}`;
 const SECTION = "section_main";
 const ITEM = "Taro Milk Tea";
 const FEATURED_LABEL = "Today’s pick";
@@ -74,20 +67,11 @@ type Script = {
   outputs: string[];
 };
 
-type Answer = Readonly<{
-  ephemeral: boolean;
-  replaceOriginal: boolean;
-  text: string;
-}>;
-
 it(
   "lets Urk change a board and propose a deal that reaches the TV only after an owner approves its before-and-after card",
   { timeout: 240_000 },
   async ({ task }: TestContext): Promise<void> => {
-    const fixture = await installSlackActorFixture();
-    const slack = slackSimulator();
     const requests: Record<string, unknown>[] = [];
-    const answers: Answer[] = [];
     const script: Script = {
       taroProductId: "",
       itemId: "",
@@ -95,61 +79,13 @@ it(
       featuredId: "",
       outputs: [],
     };
-    network.use(
-      slack.handler,
-      http.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        respond.bind(null, requests, script),
-      ),
-      http.post(
-        "https://hooks.slack.com/actions/:team/:id/:token",
-        async function recordAnswer({ request }) {
-          const body: unknown = await request.json();
-          if (!isRecord(body)) throw new Error("Invalid click answer");
-          answers.push({
-            ephemeral: body.response_type === "ephemeral",
-            replaceOriginal: body.replace_original === true,
-            text: String(body.text),
-          });
-          return HttpResponse.text("ok");
-        },
-      ),
+    const { owner, slack, answers, products } = await installBoardJourney(
+      "price",
+      (body) => respond(requests, script, body),
     );
-    const owner = await installEffectAuthority(
-      fixture.selectedIntegrationAccountId,
-      "plugin",
-    );
-    await givePortalHandles(ORGANISATION_ID);
-    await discoverSlackChannel("public_channel", Date.now() - 60_000);
-    for (const capabilityId of [
-      "commerce.menu_draft.read",
-      "commerce.menu_draft.edit",
-    ] as const) {
-      await enableCapability(ORGANISATION_ID, owner, capabilityId);
-      await createRequiredGrant({
-        grantId: `grant_board_${capabilityId.replaceAll(".", "_")}`,
-        subject: { kind: "organisation_role", role: "owner" },
-        target: {
-          kind: "platform_capability",
-          capabilityId,
-          capabilityVersion: 1,
-        },
-        now: Date.now(),
-      });
-    }
-    const shop = await providerClient().provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
-      externalReference: ORGANISATION_ID,
-      merchantId: MERCHANT,
-      profile: "cafe_patisserie",
-      createdAt: new Date().toISOString(),
-    });
-    if (!shop.ok) throw new Error(JSON.stringify(shop.error));
-    const taro = shop.value.resources.products.find(
-      (product) => product.title === ITEM,
-    );
-    if (taro === undefined) throw new Error(`No product ${ITEM}`);
-    script.taroProductId = taro.id;
+    const taroProductId = products.get(ITEM);
+    if (taroProductId === undefined) throw new Error(`No product ${ITEM}`);
+    script.taroProductId = taroProductId;
 
     // Turn 1: the agent puts the item on the menu draft.
     await sendListingMessage(
@@ -321,10 +257,8 @@ it(
 async function respond(
   requests: Record<string, unknown>[],
   script: Script,
-  { request }: Parameters<HttpResponseResolver>[0],
+  body: Record<string, unknown>,
 ): Promise<Response> {
-  const body: unknown = await request.json();
-  if (!isRecord(body)) throw new Error("Invalid board model request");
   requests.push(body);
   const step = requests.length;
   const last = toolOutput(body);
@@ -450,35 +384,6 @@ function boardEdit(
   };
 }
 
-/** The text that the tool returned, without the model request's wrapper. */
-function toolOutput(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  if (!messages.some((item) => isRecord(item) && item.role === "tool"))
-    return "";
-  const wrapped: unknown = JSON.parse(lastListingToolText(body));
-  return isRecord(wrapped) && typeof wrapped.output === "string"
-    ? wrapped.output
-    : JSON.stringify(wrapped);
-}
-
-function draftItemId(toolText: string, displayName: string): string {
-  const parsed: unknown = JSON.parse(toolText);
-  const items =
-    isRecord(parsed) &&
-    isRecord(parsed.draft) &&
-    Array.isArray(parsed.draft.items)
-      ? (parsed.draft.items as unknown[])
-      : [];
-  for (const item of items)
-    if (
-      isRecord(item) &&
-      item.displayName === displayName &&
-      typeof item.id === "string"
-    )
-      return item.id;
-  throw new Error(`No item ${displayName} in ${toolText}`);
-}
-
 function boardRead(toolText: string): Readonly<{
   items: readonly unknown[];
   featured: Readonly<{ id: string; label: string }>;
@@ -504,166 +409,11 @@ function boardRead(toolText: string): Readonly<{
   };
 }
 
-function delivered(slack: ReturnType<typeof slackSimulator>): string {
-  return slack.messages.map((message) => message.text).join("\n");
-}
-
-function readHeaders(session: IssuedControlSession): Record<string, string> {
-  return {
-    origin: ORIGIN,
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
-  };
-}
-
-async function send(
-  url: string,
-  session: IssuedControlSession,
-  method: "GET" | "POST" | "PUT",
-  body?: unknown,
-): Promise<Readonly<{ status: number; body: unknown }>> {
-  const headers: Record<string, string> = readHeaders(session);
-  if (method !== "GET") {
-    headers["content-type"] = "application/json";
-    headers["idempotency-key"] = crypto.randomUUID();
-    headers["x-satyr-configuration-version"] = "1";
-  }
-  const response = await exports.default.fetch(url, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  return { status: response.status, body: await response.json() };
-}
-
-async function menuRevision(session: IssuedControlSession): Promise<number> {
-  const read = await send(`${BASE}/collaboration/menu-draft`, session, "GET");
-  if (
-    !isRecord(read.body) ||
-    !isRecord(read.body.value) ||
-    typeof read.body.value.revision !== "number"
-  )
-    throw new Error(`No draft revision: ${JSON.stringify(read.body)}`);
-  return read.body.value.revision;
-}
-
-function boardIdOf(body: unknown): string {
-  if (
-    !isRecord(body) ||
-    !isRecord(body.board) ||
-    typeof body.board.boardId !== "string"
-  )
-    throw new Error(`No board: ${JSON.stringify(body)}`);
-  return body.board.boardId;
-}
-
-/** Publishes the board's current draft revision; answers the release revision. */
-async function publishBoard(
-  session: IssuedControlSession,
-  boardId: string,
-  expectedReleaseRevision: number | null,
-): Promise<number> {
-  const list = await send(`${BASE}/menu-boards`, session, "GET");
-  const boards =
-    isRecord(list.body) && Array.isArray(list.body.boards)
-      ? list.body.boards
-      : [];
-  const board: unknown = boards.find(
-    (candidate: unknown) =>
-      isRecord(candidate) && candidate.boardId === boardId,
-  );
-  if (!isRecord(board) || typeof board.documentRevision !== "number")
-    throw new Error(`No board ${boardId}: ${JSON.stringify(list.body)}`);
-  const release = await send(
-    `${BASE}/menu-boards/${boardId}/releases`,
-    session,
-    "POST",
-    { documentRevision: board.documentRevision, expectedReleaseRevision },
-  );
-  expect(release.status, JSON.stringify(release.body)).toBe(201);
-  if (
-    !isRecord(release.body) ||
-    !isRecord(release.body.release) ||
-    typeof release.body.release.releaseRevision !== "number"
-  )
-    throw new Error(`No release: ${JSON.stringify(release.body)}`);
-  return release.body.release.releaseRevision;
-}
-
-/** A TV shows its code; the owner pairs it; the TV collects its token. */
-async function pairScreen(
-  session: IssuedControlSession,
-  boardId: string,
-): Promise<string> {
-  const started = await exports.default.fetch(`${ORIGIN}/v1/screens/pairings`, {
-    method: "POST",
-  });
-  expect(started.status).toBe(201);
-  const pairing = parseMenuScreenPairing(await started.json());
-  if (pairing === null) throw new Error("No pairing");
-  const paired = await send(`${BASE}/menu-screens`, session, "POST", {
-    code: pairing.code,
-    name: "Counter TV",
-    boardId,
-  });
-  expect(paired.status, JSON.stringify(paired.body)).toBe(201);
-  const state = await exports.default.fetch(
-    `${ORIGIN}/v1/screens/pairings/${pairing.pairingId}`,
-    { headers: { Authorization: `Bearer ${pairing.secret}` } },
-  );
-  const collected = parseMenuScreenPairingState(await state.json());
-  if (collected?.state !== "paired") throw new Error("Screen not paired");
-  return collected.token;
-}
-
-async function feed(token: string): Promise<MenuScreenFeed> {
-  const response = await exports.default.fetch(`${ORIGIN}/v1/screens/feed`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  expect(response.status).toBe(200);
-  const parsed = parseMenuScreenFeed(await response.json());
-  if (parsed === null) throw new Error("The screen feed did not parse");
-  return parsed;
-}
-
-function entryOf(screen: MenuScreenFeed, itemId: string) {
-  return screen.facts?.entries.find(
-    (candidate) => candidate.menuEntryId === itemId,
-  );
-}
-
 function featuredLabel(screen: MenuScreenFeed): string | undefined {
   const element = screen.release?.elements.find(
     (candidate) => candidate.kind === "featured",
   );
   return element?.kind === "featured" ? element.label : undefined;
-}
-
-async function offer(itemId: string) {
-  const stock = await providerClient().readStockSnapshot(MERCHANT);
-  if (!stock.ok) throw new Error(JSON.stringify(stock.error));
-  const entry = stock.value.foodService.resources.menus
-    .flatMap((menu) => menu.entries)
-    .find((candidate) => candidate.menuEntryId === itemId);
-  const found = stock.value.commerce.resources.offers.find(
-    (candidate) => candidate.id === entry?.offerId,
-  );
-  if (found === undefined) throw new Error(`No offer for ${itemId}`);
-  return found;
-}
-
-async function click(nonce: string, noticeTs: string): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedButtonClick({
-      actionId: "commerce_action_approve",
-      value: nonce,
-      user: USER_ID,
-      channel: CHANNEL_ID,
-      threadTs: ROOT_TS,
-      proposalTs: noticeTs,
-    }),
-  );
-  expect(response.status).toBe(200);
 }
 
 async function setRole(role: "owner" | "operator"): Promise<void> {
@@ -673,19 +423,4 @@ async function setRole(role: "owner" | "operator"): Promise<void> {
     )
     .bind(role, ORGANISATION_ID, OWNER)
     .run();
-}
-
-async function actionState(nonce: string): Promise<unknown> {
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId: ORGANISATION_ID,
-    now: Date.now(),
-  });
-  const action = await organisation.getAction({
-    organisationId: ORGANISATION_ID,
-    nonce,
-    now: Date.now(),
-  });
-  if (!action.ok) throw new Error(action.error.code);
-  return action.value.state;
 }

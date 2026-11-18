@@ -511,13 +511,20 @@ export async function actionState(nonce: string): Promise<unknown> {
   return action.value.state;
 }
 
+/** Slack's answer to a click on a card, at its response URL. */
+export type ClickAnswer = Readonly<{
+  ephemeral: boolean;
+  replaceOriginal: boolean;
+  text: string;
+}>;
+
 export type BoardJourney = Readonly<{
   owner: IssuedControlSession;
   staff: IssuedControlSession;
   viewer: IssuedControlSession;
   slack: ReturnType<typeof slackSimulator>;
   /** The Slack answers to card clicks, in order. */
-  clicks: string[];
+  answers: ClickAnswer[];
   products: ReadonlyMap<string, string>;
 }>;
 
@@ -546,7 +553,7 @@ export async function installBoardJourney(
     ...member(viewerClient.identity.userId, `person_${name}_viewer`, "viewer"),
   ]);
   const slack = slackSimulator();
-  const clicks: string[] = [];
+  const answers: ClickAnswer[] = [];
   network.use(
     slack.handler,
     http.post(
@@ -561,7 +568,12 @@ export async function installBoardJourney(
       "https://hooks.slack.com/actions/:team/:id/:token",
       async function recordAnswer({ request }) {
         const body: unknown = await request.json();
-        clicks.push(isRecord(body) ? String(body.text) : "");
+        if (!isRecord(body)) throw new Error("Invalid click answer");
+        answers.push({
+          ephemeral: body.response_type === "ephemeral",
+          replaceOriginal: body.replace_original === true,
+          text: String(body.text),
+        });
         return HttpResponse.text("ok");
       },
     ),
@@ -601,7 +613,7 @@ export async function installBoardJourney(
     staff: staffClient.session,
     viewer: viewerClient.session,
     slack,
-    clicks,
+    answers,
     products: new Map(
       shop.value.resources.products.map((product) => [
         product.title,
