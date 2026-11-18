@@ -1,0 +1,386 @@
+.portal-chat-stage {
+  position: relative;
+  isolation: isolate;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--portal-chat-background, var(--surface));
+}
+
+.portal-chat-foreground {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Keep fixed workspace controls on the foreground surface. */
+  transform: translateX(0);
+  background: var(--ground);
+}
+
+.portal-chat-foreground > .portal-shell-workspace {
+  height: 100%;
+  min-height: 0;
+}
+
+.portal-chat-stage {
+  /* The space around each floating card and between cards. */
+  --portal-chat-gutter: 0.5rem;
+  --portal-chat-card-shadow:
+    0 0 0 1px rgb(0 0 0 / 5%), 0 8px 24px rgb(0 0 0 / 10%);
+}
+
+.portal-chat-stage[data-chat-open="true"] .portal-chat-foreground {
+  width: calc(100% - var(--chat-underlay-width) - var(--portal-chat-gutter));
+  height: calc(100% - 2 * var(--portal-chat-gutter));
+  margin: var(--portal-chat-gutter);
+  border-radius: 22px;
+  box-shadow: var(--portal-chat-card-shadow);
+}
+
+.chat-underlay {
+  position: absolute;
+  inset-block: var(--portal-chat-gutter);
+  right: 0;
+  width: var(--chat-underlay-width);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  container-type: inline-size;
+  outline: none;
+  visibility: hidden;
+}
+
+.portal-chat-stage[data-chat-open="true"] .chat-underlay {
+  visibility: visible;
+}
+
+.chat-underlay-resize {
+  position: absolute;
+  outline: none;
+  inset-block: 0;
+  right: -6px;
+  width: 12px;
+  z-index: 2;
+  touch-action: none;
+  user-select: none;
+  visibility: hidden;
+}
+
+.portal-chat-stage[data-chat-open="true"] .chat-underlay-resize {
+  inset-block: var(--portal-chat-gutter);
+  right: calc(var(--chat-underlay-width) - 6px);
+  visibility: visible;
+}
+
+.chat-underlay-resize::before {
+  content: "";
+  position: absolute;
+  inset: 35% 4px;
+  border-radius: 3px;
+  background: var(--border);
+}
+
+/* The light border fades into the light panels, so the idle grip takes the
+   hairline tone there. */
+:where(:root:not([data-portal-theme="dark"])) .chat-underlay-resize::before {
+  background: var(--hairline);
+}
+
+.chat-underlay-resize:is(:hover, :active, :focus-visible)::before {
+  background: var(--ink-2);
+}
+
+.portal-chat-stage[data-chat-fullscreen="true"] .portal-chat-foreground {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.portal-chat-stage[data-chat-fullscreen="true"] .chat-underlay {
+  inset-block: 0;
+  width: 100%;
+}
+
+.portal-chat-stage[data-chat-fullscreen="true"]
+  .chat-thread
+  > :not(.chat-scroller),
+.portal-chat-stage[data-chat-fullscreen="true"] .chat-transcript {
+  max-width: 800px;
+}
+
+.portal-chat-stage[data-chat-fullscreen="true"] .chat-underlay-resize {
+  display: none;
+}
+
+/* Full screen beside the workspace rail: the foreground narrows to a rail
+   card, the thread list floats as a second card, and the chat fills the
+   rest of the stage. The two cards touch with square inner corners, so
+   they read as one column. */
+.portal-chat-stage[data-chat-fullscreen="true"][data-chat-navigation="true"] {
+  & .portal-chat-foreground {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    width: var(--portal-sidebar-width);
+    border-radius: 22px 0 0 22px;
+  }
+  & .portal-chat-foreground .console-sidebar {
+    border-inline-end: 0;
+  }
+  /* With the thread list collapsed, the rail stands alone: all four
+     corners round, and its own edge returns. */
+  &:has(.chat-thread-sidebar[data-expanded="false"]) {
+    & .portal-chat-foreground {
+      border-radius: 22px;
+    }
+    & .portal-chat-foreground .console-sidebar {
+      border-inline-end: 1px solid var(--border);
+    }
+  }
+  & .portal-chat-foreground :is(.portal-workspace-header, .portal-main) {
+    opacity: 0;
+    visibility: hidden;
+  }
+  & .chat-underlay {
+    inset-inline-start: calc(
+      var(--portal-sidebar-width) + var(--portal-chat-gutter)
+    );
+    width: auto;
+  }
+  & .chat-layout > .chat-thread-sidebar {
+    margin-block: var(--portal-chat-gutter);
+    border-inline-end: 0;
+    border-radius: 0 22px 22px 0;
+    box-shadow: var(--portal-chat-card-shadow);
+  }
+}
+
+.portal-chat-stage[data-chat-fullscreen="false"]
+  .chat-underlay-sidebar-controls,
+.portal-chat-stage[data-chat-fullscreen="false"]
+  .chat-layout
+  > .chat-thread-sidebar {
+  display: none;
+}
+
+.portal-chat-stage[data-chat-fullscreen="false"] .chat-layout {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
+}
+
+.portal-chat-stage[data-chat-fullscreen="false"]
+  .chat-layout
+  > .chat-main-panel {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.portal-chat-stage:has(.chat-underlay-resize:active)
+  :is(.portal-chat-foreground, .chat-underlay-resize) {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .portal-chat-stage {
+    /* The workspace resizes with the chat; keep it quick. */
+    --portal-chat-motion: calc(240ms * var(--agent-motion-factor, 1))
+      var(--pantry-spring-smooth-ease);
+  }
+
+  .chat-underlay-resize {
+    transition:
+      right var(--portal-chat-motion),
+      inset-block var(--portal-chat-motion);
+  }
+
+  .chat-underlay .chat-composer {
+    translate: 0 0;
+    transition: translate var(--motion-quick)
+      calc(120ms * var(--agent-motion-factor, 1));
+  }
+
+  @starting-style {
+    .chat-underlay .chat-composer {
+      translate: 0 calc(100% + 12px);
+    }
+  }
+
+  .portal-chat-foreground {
+    /* Size, corners and position share one spring so the shape stays whole. */
+    transition:
+      width var(--portal-chat-motion),
+      height var(--portal-chat-motion),
+      margin var(--portal-chat-motion),
+      border-radius var(--portal-chat-motion),
+      transform var(--portal-chat-motion);
+  }
+
+  /* Beside the rail, the foreground and the chat move with the rail. */
+  .portal-chat-stage[data-chat-fullscreen="true"][data-chat-navigation="true"] {
+    & .portal-chat-foreground {
+      transition:
+        width var(--portal-sidebar-motion) var(--portal-sidebar-layout-ease),
+        height var(--portal-sidebar-motion) var(--portal-sidebar-layout-ease),
+        margin var(--portal-sidebar-motion) var(--portal-sidebar-layout-ease),
+        border-radius var(--portal-sidebar-motion)
+          var(--portal-sidebar-layout-ease);
+    }
+    & .chat-underlay {
+      transition: inset-inline-start var(--portal-sidebar-motion)
+        var(--portal-sidebar-layout-ease);
+    }
+
+    /* The corners round once the thread list has slid away; they square
+       at once when it returns. */
+    &:has(.chat-thread-sidebar[data-expanded="false"]) .portal-chat-foreground {
+      transition:
+        width var(--portal-sidebar-motion) var(--portal-sidebar-layout-ease),
+        height var(--portal-sidebar-motion) var(--portal-sidebar-layout-ease),
+        margin var(--portal-sidebar-motion) var(--portal-sidebar-layout-ease),
+        border-radius var(--portal-sidebar-motion)
+          var(--portal-sidebar-layout-ease) 220ms;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Expanding and collapsing swap the workspace for the chat with a quick
+     fade. Nothing resizes: on expand the workspace fades out, then the
+     layout snaps; on collapse the layout snaps and the workspace fades in. */
+  .portal-chat-stage[data-chat-open="true"][data-chat-display-switch="true"] {
+    --portal-chat-fade: calc(140ms * var(--agent-motion-factor, 1));
+    --portal-chat-fade-in: calc(110ms * var(--agent-motion-factor, 1));
+
+    & .chat-underlay {
+      /* The chat edge settles from the gutter to the window edge, so the
+         header buttons glide a few pixels instead of jumping. */
+      transition: inset-block calc(200ms * var(--agent-motion-factor, 1))
+        var(--pantry-spring-smooth-ease);
+    }
+
+    &[data-chat-fullscreen="true"] {
+      & .portal-chat-foreground {
+        opacity: 0;
+        transition:
+          opacity var(--portal-chat-fade) ease-out,
+          visibility 0s linear var(--portal-chat-fade);
+      }
+      & .chat-underlay {
+        transition:
+          inset-block calc(200ms * var(--agent-motion-factor, 1))
+            var(--pantry-spring-smooth-ease),
+          inset-inline-start 0s linear var(--portal-chat-fade);
+      }
+      &[data-chat-navigation="true"] {
+        & .portal-chat-foreground {
+          opacity: 1;
+          transition:
+            width 0s linear var(--portal-chat-fade),
+            height 0s linear var(--portal-chat-fade),
+            margin 0s linear var(--portal-chat-fade),
+            border-radius 0s linear var(--portal-chat-fade);
+        }
+        & .portal-chat-foreground :is(.portal-workspace-header, .portal-main) {
+          opacity: 0;
+          transition:
+            opacity var(--portal-chat-fade) ease-out,
+            visibility 0s linear var(--portal-chat-fade);
+        }
+      }
+    }
+
+    &:not([data-chat-fullscreen="true"]) {
+      & .portal-chat-foreground {
+        transition: opacity var(--portal-chat-fade-in) ease-out;
+      }
+      & .portal-chat-foreground :is(.portal-workspace-header, .portal-main) {
+        transition: opacity var(--portal-chat-fade-in) ease-out;
+      }
+    }
+  }
+}
+
+@media (max-width: 760px) {
+  .chat-underlay {
+    width: calc(100% - 24px);
+  }
+
+  .portal-chat-stage[data-chat-open="true"] .portal-chat-foreground {
+    width: calc(100% - 24px);
+    transform: translateX(calc(-100% + 12px));
+    pointer-events: none;
+  }
+
+  .chat-underlay-resize {
+    display: none;
+  }
+}
+
+/* The header floats over the transcript, so messages scroll to the top edge
+   and stay visible behind it, blurred, and never run into the title. */
+.chat-underlay .chat-main-panel {
+  --chat-header-space: 68px;
+  position: relative;
+
+  & > .chat-underlay-header {
+    position: absolute;
+    /* Start clear of the workspace panel's border and shadow, which the
+       blurred backdrop would otherwise paint over. */
+    inset: 0 0 auto 12px;
+    z-index: 2;
+    padding: 10px 16px 14px 8px;
+    background: color-mix(
+      in srgb,
+      var(--portal-chat-background, var(--ground)) 82%,
+      transparent
+    );
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+  }
+  &
+    > .chat-underlay-header
+    :is(.chat-header-actions, .chat-main-identity[aria-hidden="false"]) {
+    pointer-events: auto;
+  }
+  & > .chat-underlay-header .chat-main-identity {
+    gap: 0;
+  }
+  & > .chat-underlay-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  & > .chat-thread > .chat-visibility {
+    position: absolute;
+    inset-block-start: var(--chat-header-space);
+    inset-inline-start: 50%;
+    z-index: 2;
+    width: auto;
+    margin: 0;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: color-mix(
+      in srgb,
+      var(--portal-chat-background, var(--ground)) 82%,
+      transparent
+    );
+    backdrop-filter: blur(8px);
+    translate: -50% 0;
+    pointer-events: none;
+  }
+  & .chat-transcript {
+    padding-block-start: calc(var(--chat-header-space) + 40px);
+  }
+}
+/* Full screen with the thread list open: the header holds only its buttons. */
+.portal-chat-stage[data-chat-fullscreen="true"]
+  .chat-main-panel:has(
+    > .chat-underlay-header > .chat-main-identity[aria-hidden="true"]
+  ) {
+  --chat-header-space: 16px;
+}

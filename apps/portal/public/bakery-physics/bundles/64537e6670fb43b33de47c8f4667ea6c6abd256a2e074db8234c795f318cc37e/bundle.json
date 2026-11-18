@@ -1,0 +1,21 @@
+{
+  "id": "64537e6670fb43b33de47c8f4667ea6c6abd256a2e074db8234c795f318cc37e",
+  "schemaVersion": 1,
+  "files": {
+    "module": {
+      "file": "bakery-native.js",
+      "sha256": "e647c20f45318ffe06d5f54a547f00ae89a71ed3cbd6b16d2e36bd42ceb9983b",
+      "byteLength": 103580
+    },
+    "wasm": {
+      "file": "bakery_native.wasm",
+      "sha256": "19667810c012d7ef244077549735e27a119216f00c612f7600f07179b0e8e5cc",
+      "byteLength": 5003379
+    },
+    "data": {
+      "file": "bakery_native.data",
+      "sha256": "daeda0fbc3b3dd7588efd1260bff623f920faf7c1c24599d0f15c843e31ad441",
+      "byteLength": 22110875
+    }
+  }
+}

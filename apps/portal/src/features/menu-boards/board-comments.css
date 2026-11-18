@@ -1,0 +1,173 @@
+/* Plan 40B phase 5, slice 6: comments pinned to a board's elements. */
+
+.menu-boards-board-area {
+  position: relative;
+}
+
+.menu-board-comment-pin {
+  position: absolute;
+  z-index: 6;
+  min-width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  padding: 0 7px;
+  border: 2px solid #fff;
+  border-radius: 13px 13px 13px 2px;
+  background: #2e86ab;
+  color: #fff;
+  font: 600 12px/22px Inter, "Helvetica Neue", Arial, sans-serif;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.menu-board-comments,
+.menu-board-comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-board-comments h4,
+.menu-board-comment-list h3 {
+  margin: 4px 0 0;
+  font-size: var(--pantry-text-body);
+}
+
+.menu-board-comment-list {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+.menu-board-comment-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.menu-board-comment-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+
+.menu-board-comment-preview {
+  flex: 1 1 160px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+}
+
+.menu-board-comment-off {
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+}
+
+.menu-board-comment-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.menu-board-comment-thread[data-resolved="true"] {
+  opacity: 0.72;
+}
+
+.menu-board-comment-thread ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.menu-board-comment-thread header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: var(--pantry-text-label);
+}
+
+.menu-board-comment-thread time {
+  color: var(--ink-2);
+}
+
+.menu-board-comment-thread p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.menu-board-comment-agent {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 11px;
+}
+
+.menu-board-comment-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+  text-decoration: underline;
+}
+
+.menu-board-comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.menu-board-comment-composer {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-board-comment-composer label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--pantry-text-label);
+  color: var(--ink-2);
+}
+
+.menu-board-comment-composer textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font: inherit;
+}
+
+.menu-board-comment-composer button:not(:where(.pantry-select-trigger)) {
+  align-self: flex-start;
+}
+
+/* The side column when no element is selected: open comments, then style. */
+.menu-boards-side {
+  flex: 1 1 280px;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-boards-side > .menu-boards-drawer {
+  max-width: none;
+}

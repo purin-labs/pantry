@@ -1,0 +1,2 @@
+
+export type DispatchAttempt = number;

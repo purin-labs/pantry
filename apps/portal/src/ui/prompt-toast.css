@@ -1,0 +1,140 @@
+/* The toast of a minimized permission prompt (prompt-toast.tsx), in the look
+   of the Portal's other Sonner toasts: a paper card with the card shadow, a
+   tone icon, a title and one line of detail. */
+.prompt-toast {
+  width: var(--width, 356px);
+  max-width: 100%;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow:
+    0 0 0 1px var(--border),
+    var(--shadow-card);
+  color: var(--ink);
+}
+
+.prompt-toast[data-hidden] {
+  opacity: 0;
+}
+
+/* A morph lands on the toast's final place, so the toast must not slide. */
+[data-sonner-toast][data-prompt-placed] {
+  transition: none !important;
+}
+
+.prompt-toast-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: start;
+  /* The Portal's buttons keep their label on one line; a toast wraps. */
+  white-space: normal;
+}
+
+button.prompt-toast-body {
+  cursor: pointer;
+}
+
+button.prompt-toast-body:hover {
+  background: color-mix(in oklch, var(--surface) 45%, transparent);
+}
+
+button.prompt-toast-body:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.prompt-toast-icon {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 18px;
+  color: var(--ink-2);
+}
+
+.prompt-toast[data-tone="success"] .prompt-toast-icon {
+  color: var(--ok-text);
+}
+
+.prompt-toast[data-tone="failure"] .prompt-toast-icon {
+  color: var(--danger-text);
+}
+
+.prompt-toast-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.prompt-toast-title {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.prompt-toast-message {
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.prompt-toast-open {
+  display: grid;
+  place-items: center;
+  height: 18px;
+  color: var(--ink-3);
+}
+
+button.prompt-toast-body:hover .prompt-toast-open {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .prompt-toast-spin {
+    animation: prompt-toast-spin 0.65s linear infinite;
+  }
+
+  .prompt-toast-title,
+  .prompt-toast-message,
+  .prompt-toast-icon {
+    animation: prompt-toast-change var(--pantry-spring-smooth-duration)
+      var(--pantry-spring-smooth-ease) both;
+  }
+}
+
+/* Sonner turns its own motion off for reduced motion; the toast still fades
+   in, in place of the morph. */
+@media (prefers-reduced-motion: reduce) {
+  .prompt-toast {
+    animation: prompt-toast-fade 200ms ease-out both;
+  }
+}
+
+@keyframes prompt-toast-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes prompt-toast-change {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+@keyframes prompt-toast-fade {
+  from {
+    opacity: 0;
+  }
+}

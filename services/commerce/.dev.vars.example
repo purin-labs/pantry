@@ -1,0 +1,5 @@
+# Copy to .dev.vars.local, or run pnpm local:init to create these local secrets.
+UNDERCLERK_SERVICE_TOKEN=
+UNDERCLERK_BUYER_SESSION_SECRET=
+UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64=
+JAPAN_CARRIER_SIGNING_KEY=

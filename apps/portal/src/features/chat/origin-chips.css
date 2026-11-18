@@ -1,0 +1,41 @@
+.chat-origin {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.chat-origin-chip {
+  min-width: 0;
+  max-width: 100%;
+  padding: 1px 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-origin-divider {
+  color: var(--ink-3);
+}
+.chat-origin-line {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-organizer-name {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}

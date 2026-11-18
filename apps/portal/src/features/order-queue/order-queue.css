@@ -1,0 +1,154 @@
+/* The staff order queue: one list for a tablet at the counter, with large
+   codes and large buttons. Colors come from the portal theme tokens. */
+.order-queue {
+  display: grid;
+  gap: 32px;
+  max-inline-size: 860px;
+  min-width: 0;
+}
+
+.order-queue h2 {
+  margin: 0 0 12px;
+  color: var(--ink-strong);
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.order-queue h2 span {
+  color: var(--ink-2);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-queue ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-queue-note {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.order-queue-row {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  gap: 8px 20px;
+  align-items: center;
+  padding: 16px 0;
+  border-block-start: 1px solid var(--border);
+}
+
+.order-queue-code {
+  display: grid;
+  gap: 2px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.order-queue-code strong {
+  color: var(--ink-strong);
+  font-size: 26px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-queue-lines li {
+  padding-block: 2px;
+  color: var(--ink-strong);
+  font-size: 16px;
+}
+
+.order-queue-lines b {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-queue-lines small {
+  display: block;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.order-queue-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-queue-actions button:not(:where(.pantry-select-trigger)) {
+  min-block-size: 48px;
+  min-inline-size: 96px;
+  font-size: 16px;
+}
+
+.order-queue-actions .order-queue-primary {
+  border: 0;
+  box-shadow: none;
+  border-radius: 999px;
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.order-queue-actions .order-queue-primary:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+
+.order-queue-actions .order-queue-primary:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.order-queue-started {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.order-queue-refusal {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--danger-text);
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .order-queue-row {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .order-queue-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+.order-queue-sold-out ul {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-queue-sold-out-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  color: var(--ink-strong);
+}
+
+.order-queue-sold-out-row button:not(:where(.pantry-select-trigger)) {
+  flex: none;
+  min-block-size: 44px;
+}
+
+.order-queue-sold-out-row[data-sold-out="true"] span {
+  color: var(--ink-2);
+  text-decoration: line-through;
+}

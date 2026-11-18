@@ -1,0 +1,537 @@
+{
+  "WorkspaceExecutorRequestWire": {
+    "type": "object",
+    "required": [
+      "schemaVersion",
+      "executionId",
+      "executionReceiptId",
+      "deadlineAtUnixMs",
+      "baseRevision",
+      "baseCanonicalHead",
+      "baseManifestDigest",
+      "operation"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "type": "string",
+        "const": "workspace_executor_request.v1"
+      },
+      "executionId": { "type": "string" },
+      "executionReceiptId": { "type": "string" },
+      "deadlineAtUnixMs": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "baseRevision": { "type": "string" },
+      "baseCanonicalHead": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+      "baseManifestDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+      "operation": {
+        "type": "object",
+        "required": [
+          "kind",
+          "productRoot",
+          "workspaceYaml",
+          "base",
+          "candidate",
+          "claimedChangeset"
+        ],
+        "properties": {
+          "kind": { "type": "string", "const": "product_folder_candidate" },
+          "productRoot": { "type": "string" },
+          "workspaceYaml": { "type": "string" },
+          "base": {
+            "type": "object",
+            "required": ["productMarkdown", "variantsYaml"],
+            "properties": {
+              "productMarkdown": { "type": "string" },
+              "variantsYaml": { "type": "string" }
+            },
+            "additionalProperties": false,
+            "title": "ProductFolderFilesWire"
+          },
+          "candidate": {
+            "type": "object",
+            "required": ["productMarkdown", "variantsYaml"],
+            "properties": {
+              "productMarkdown": { "type": "string" },
+              "variantsYaml": { "type": "string" }
+            },
+            "additionalProperties": false,
+            "title": "ProductFolderFilesWire"
+          },
+          "claimedChangeset": {
+            "type": "object",
+            "required": [
+              "schemaVersion",
+              "organisationId",
+              "workspaceId",
+              "baseRevision",
+              "resultingSemanticHash",
+              "diff",
+              "changesetDigest"
+            ],
+            "properties": {
+              "schemaVersion": { "type": "string" },
+              "organisationId": { "type": "string" },
+              "workspaceId": { "type": "string" },
+              "baseRevision": { "type": "string" },
+              "resultingSemanticHash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "diff": {
+                "type": "object",
+                "required": ["productId", "fields", "variantIds"],
+                "properties": {
+                  "productId": { "type": "string" },
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "enum": ["slug", "title", "description", "currency"]
+                    }
+                  },
+                  "variantIds": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "changesetDigest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "additionalProperties": false,
+            "title": "ClaimedChangeset",
+            "x-rust-type": "serde_json::Value"
+          }
+        },
+        "title": "WorkspaceExecutorOperationWire"
+      }
+    },
+    "additionalProperties": false
+  },
+  "WorkspaceExecutorPreparationRequestWire": {
+    "type": "object",
+    "required": [
+      "schemaVersion",
+      "preparationId",
+      "identity",
+      "limits",
+      "deadlineAtUnixMs",
+      "operation"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "type": "string",
+        "const": "workspace_executor_preparation.v1"
+      },
+      "preparationId": { "type": "string" },
+      "identity": {
+        "type": "object",
+        "required": [
+          "organisationId",
+          "sessionId",
+          "turnId",
+          "attachmentId",
+          "sourceSha256",
+          "handlerRevision"
+        ],
+        "properties": {
+          "organisationId": { "type": "string" },
+          "sessionId": { "type": "string" },
+          "turnId": { "type": "string" },
+          "attachmentId": {
+            "type": "string",
+            "pattern": "^att_[0-9a-z]{1,64}$"
+          },
+          "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "handlerRevision": { "type": "string" }
+        },
+        "additionalProperties": false,
+        "title": "PreparationIdentity",
+        "x-rust-type": "crate::contracts::MessageAttachmentPreparationIdentity"
+      },
+      "limits": {
+        "type": "object",
+        "required": [
+          "maxInputBytes",
+          "maxOutputBytes",
+          "maxDurationMs",
+          "maxFrames"
+        ],
+        "properties": {
+          "maxInputBytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "maxOutputBytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "maxDurationMs": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "maxFrames": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "additionalProperties": false,
+        "title": "PreparationLimits",
+        "x-rust-type": "crate::contracts::MessageAttachmentPreparationLimits"
+      },
+      "deadlineAtUnixMs": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "operation": {
+        "type": "object",
+        "required": [
+          "kind",
+          "mediaClass",
+          "mediaType",
+          "byteLength",
+          "maxTextChars"
+        ],
+        "properties": {
+          "kind": { "type": "string", "const": "prepare_message_attachment" },
+          "mediaClass": {
+            "enum": ["document", "audio", "video", "opaque"],
+            "title": "AttachmentMediaClassWire"
+          },
+          "mediaType": { "type": "string" },
+          "byteLength": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "maxTextChars": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          }
+        },
+        "additionalProperties": false,
+        "title": "WorkspaceExecutorPreparationOperationWire"
+      }
+    },
+    "additionalProperties": false
+  },
+  "WorkspaceExecutorResponse": {
+    "type": "object",
+    "required": [
+      "schemaVersion",
+      "executionId",
+      "executionReceiptId",
+      "baseRevision",
+      "baseCanonicalHead",
+      "baseManifestDigest",
+      "operation",
+      "inputBytes",
+      "outputBytes",
+      "durationMs"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "type": "string",
+        "const": "workspace_executor_response.v1"
+      },
+      "executionId": { "type": "string" },
+      "executionReceiptId": { "type": "string" },
+      "baseRevision": { "type": "string" },
+      "baseCanonicalHead": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+      "baseManifestDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+      "operation": {
+        "type": "object",
+        "required": [
+          "kind",
+          "productRoot",
+          "replacementOverlay",
+          "validatedChangeset"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "validated_product_folder_changeset"
+          },
+          "productRoot": { "type": "string" },
+          "replacementOverlay": {
+            "type": "object",
+            "required": ["productMarkdown", "variantsYaml"],
+            "properties": {
+              "productMarkdown": {
+                "type": "object",
+                "required": ["path", "utf8"],
+                "properties": {
+                  "path": { "type": "string" },
+                  "utf8": { "type": "string" }
+                },
+                "additionalProperties": false,
+                "title": "WorkspaceFileReplacement"
+              },
+              "variantsYaml": {
+                "type": "object",
+                "required": ["path", "utf8"],
+                "properties": {
+                  "path": { "type": "string" },
+                  "utf8": { "type": "string" }
+                },
+                "additionalProperties": false,
+                "title": "WorkspaceFileReplacement"
+              }
+            },
+            "additionalProperties": false,
+            "title": "ProductFolderReplacementOverlay"
+          },
+          "validatedChangeset": {
+            "type": "object",
+            "required": [
+              "schemaVersion",
+              "organisationId",
+              "workspaceId",
+              "baseRevision",
+              "resultingSemanticHash",
+              "diff",
+              "changesetDigest"
+            ],
+            "properties": {
+              "schemaVersion": { "type": "string" },
+              "organisationId": { "type": "string" },
+              "workspaceId": { "type": "string" },
+              "baseRevision": { "type": "string" },
+              "resultingSemanticHash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "diff": {
+                "type": "object",
+                "required": ["productId", "fields", "variantIds"],
+                "properties": {
+                  "productId": { "type": "string" },
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "enum": ["slug", "title", "description", "currency"]
+                    }
+                  },
+                  "variantIds": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "changesetDigest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "additionalProperties": false,
+            "title": "ValidatedChangeset",
+            "x-rust-type": "crate::file_native::ValidatedProductFolderChangesetV1"
+          }
+        },
+        "additionalProperties": false,
+        "title": "WorkspaceExecutorProductResult"
+      },
+      "inputBytes": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "outputBytes": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "durationMs": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      }
+    },
+    "additionalProperties": false
+  },
+  "WorkspaceExecutorPreparationResponse": {
+    "type": "object",
+    "required": [
+      "schemaVersion",
+      "preparationId",
+      "identity",
+      "operation",
+      "inputBytes",
+      "outputBytes",
+      "durationMs"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "type": "string",
+        "const": "workspace_executor_response.v1"
+      },
+      "preparationId": { "type": "string" },
+      "identity": {
+        "type": "object",
+        "required": [
+          "organisationId",
+          "sessionId",
+          "turnId",
+          "attachmentId",
+          "sourceSha256",
+          "handlerRevision"
+        ],
+        "properties": {
+          "organisationId": { "type": "string" },
+          "sessionId": { "type": "string" },
+          "turnId": { "type": "string" },
+          "attachmentId": {
+            "type": "string",
+            "pattern": "^att_[0-9a-z]{1,64}$"
+          },
+          "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "handlerRevision": { "type": "string" }
+        },
+        "additionalProperties": false,
+        "title": "PreparationIdentity",
+        "x-rust-type": "crate::contracts::MessageAttachmentPreparationIdentity"
+      },
+      "operation": {
+        "anyOf": [
+          {
+            "type": "object",
+            "required": [
+              "kind",
+              "attachmentId",
+              "text",
+              "truncated",
+              "sourceSha256"
+            ],
+            "properties": {
+              "kind": { "type": "string", "const": "attachment_text" },
+              "attachmentId": { "type": "string" },
+              "text": { "type": "string" },
+              "truncated": { "type": "boolean" },
+              "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "kind",
+              "attachmentId",
+              "policyRevision",
+              "selectedTimestampsMs",
+              "frames",
+              "omittedFrames",
+              "sourceSha256"
+            ],
+            "properties": {
+              "kind": { "type": "string", "const": "attachment_video_frames" },
+              "attachmentId": { "type": "string" },
+              "policyRevision": { "type": "string" },
+              "selectedTimestampsMs": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "frames": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "timestampMs",
+                    "width",
+                    "height",
+                    "mediaType",
+                    "jpegBase64",
+                    "sha256"
+                  ],
+                  "properties": {
+                    "timestampMs": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "width": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "height": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "mediaType": { "type": "string" },
+                    "jpegBase64": { "type": "string" },
+                    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+                  },
+                  "additionalProperties": false,
+                  "title": "DecodedVideoFrame"
+                }
+              },
+              "omittedFrames": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["kind", "attachmentId", "reason", "sourceSha256"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "attachment_not_inspectable"
+              },
+              "attachmentId": { "type": "string" },
+              "reason": {
+                "enum": [
+                  "handler_unavailable",
+                  "format_unreadable",
+                  "codec_unsupported",
+                  "picture_too_large"
+                ],
+                "title": "AttachmentInspectionLimit"
+              },
+              "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "title": "WorkspaceExecutorInspectionOperation"
+      },
+      "inputBytes": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "outputBytes": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "durationMs": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      }
+    },
+    "additionalProperties": false
+  }
+}

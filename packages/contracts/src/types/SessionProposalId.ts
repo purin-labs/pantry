@@ -1,0 +1,2 @@
+
+export type SessionProposalId = string;

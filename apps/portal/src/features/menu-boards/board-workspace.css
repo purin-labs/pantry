@@ -1,0 +1,902 @@
+/* The Boards workspace (Plan 40B): a canvas that fills the page below the
+   Portal's top bar, with floating panels over it, as in a design tool. On a
+   narrow screen the panels stay in the page flow above and below the
+   canvas. */
+
+.menu-board-workspace {
+  --panel-gap: 8px;
+  /* The floating panels sit below the Portal's top bar, over the canvas
+     that runs under it. */
+  --float-top: var(--panel-gap);
+  --panel-start-width: 248px;
+  --panel-end-width: 304px;
+  --menu-canvas-bg: var(--surface);
+  --menu-canvas-dot: color-mix(in oklch, var(--hairline) 38%, transparent);
+  --float-shadow:
+    var(--shadow-card),
+    0 10px 28px -14px color-mix(in oklch, var(--pantry-shadow-color, #000) 28%, transparent);
+  --pantry-radius-control: 6px;
+  position: relative;
+  min-height: 640px;
+  font-size: 13px;
+  container: menu-board-workspace / inline-size;
+}
+
+/* The body carries the layout, because a container query styles only the
+   container's descendants. */
+.menu-board-workspace-body {
+  position: absolute;
+  inset: 0;
+}
+
+/* On a phone the workspace stays in the page flow and scrolls with it. */
+@media (max-width: 900px) {
+  .menu-board-workspace-body {
+    position: static;
+  }
+}
+
+/* Over 900 px wide, the workspace takes the whole Portal pane. */
+@media (min-width: 901px) {
+  .portal-main:has(.menu-board-workspace) {
+    position: relative;
+    overflow: hidden;
+  }
+  .portal-main-inner:has(.menu-board-workspace) {
+    height: 100%;
+    max-width: none;
+    padding: 0;
+  }
+  .portal-main-inner:has(.menu-board-workspace) > .portal-heading {
+    display: none;
+  }
+  /* The canvas runs under the Portal's top bar to the top of the screen;
+     the bar's buttons float over it, as the panels do. */
+  .menu-board-workspace {
+    --float-top: calc(var(--portal-header-top, 0px) + var(--panel-gap));
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    overflow: hidden auto;
+    background: var(--menu-canvas-bg);
+  }
+}
+
+.menu-boards-editor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.menu-boards-editor > *,
+.menu-canvas > * {
+  pointer-events: auto;
+}
+
+.menu-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  outline: none;
+}
+
+/* ── The canvas ─────────────────────────────────────────────────────── */
+
+.menu-board-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: var(--menu-canvas-bg);
+  background-image: radial-gradient(var(--menu-canvas-dot) 1px, transparent 1.4px);
+  background-size: 20px 20px;
+  cursor: default;
+  touch-action: none;
+  user-select: none;
+}
+
+.menu-board-viewport[data-pan="true"],
+.menu-board-viewport[data-pan="true"] * {
+  cursor: grab !important;
+}
+
+.menu-board-viewport[data-panning="true"],
+.menu-board-viewport[data-panning="true"] * {
+  cursor: grabbing !important;
+}
+
+.menu-board-stage {
+  position: absolute;
+  z-index: 1;
+}
+
+.menu-board-stage .menu-board-frame {
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--ink) 10%, transparent),
+    0 18px 40px -24px color-mix(in oklch, var(--pantry-shadow-color, #000) 55%, transparent);
+}
+
+.menu-board-stage-label {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  max-width: 100%;
+  padding-bottom: 6px;
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* While Space is held, a drag anywhere pans, also over the board. */
+.menu-board-pan-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+/* ── Floating chrome ────────────────────────────────────────────────── */
+
+.menu-board-float,
+.menu-board-panel {
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--float-shadow);
+}
+
+.menu-board-panel {
+  position: absolute;
+  /* On a canvas page the panels start below the board editor's top row. */
+  top: var(--panel-top, var(--float-top));
+  bottom: var(--panel-gap);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.menu-board-panel-start {
+  left: var(--panel-gap);
+  width: var(--panel-start-width);
+}
+
+.menu-board-panel-end {
+  right: var(--panel-gap);
+  width: var(--panel-end-width);
+}
+
+.menu-board-panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.menu-board-panel-section > header,
+.menu-canvas-layers > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  padding-inline: 4px;
+}
+
+.menu-board-panel-section h3,
+.menu-canvas-layers h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.menu-board-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.menu-board-text-button:is(:hover, :focus-visible),
+.menu-board-icon-button:is(:hover, :focus-visible):not(:disabled) {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.menu-board-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.menu-board-icon-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.menu-board-icon-button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* The Menus tabs as a segmented control at the top of the left panel. */
+.menu-tabs.menu-tabs-segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  margin: 10px 10px 0;
+  padding: 2px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.menu-tabs.menu-tabs-segmented button:not(:where(.pantry-select-trigger)) {
+  margin: 0;
+  padding: 5px 4px;
+  border: 0;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.menu-tabs.menu-tabs-segmented.menu-board-menu-links {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.menu-tabs.menu-tabs-segmented button:not(:where(.pantry-select-trigger))[aria-pressed="true"],
+.menu-tabs.menu-tabs-segmented button:not(:where(.pantry-select-trigger))[aria-current="page"] {
+  background: var(--paper);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 14%, transparent);
+}
+
+/* The board list, as the pages list of a design tool. */
+.menu-boards-list .menu-boards-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+}
+
+.menu-boards-list .menu-boards-chips button:not(:where(.pantry-select-trigger)) {
+  justify-content: space-between;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  text-align: left;
+}
+
+.menu-boards-list .menu-boards-chips button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.menu-boards-list .menu-boards-chips button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  box-shadow: none;
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.menu-boards-list .menu-boards-chips span {
+  font-size: 11px;
+}
+
+.menu-boards-list .menu-boards-new {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.menu-boards-list .menu-boards-new input {
+  min-height: 32px;
+}
+
+.menu-boards-list .menu-boards-new .menu-boards-primary {
+  min-height: 32px;
+}
+
+.menu-board-layers-host {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-board-layers-host:empty {
+  display: none;
+}
+
+/* The layers list fills the rest of the left panel. */
+.menu-board-layers-host .menu-canvas-layers {
+  flex: 1;
+  min-height: 0;
+  gap: 6px;
+  padding: 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.menu-board-layers-host .menu-canvas-layers ol {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: start;
+  gap: 1px;
+}
+
+.menu-board-layers-host .menu-canvas-layers li button:not(:where(.pantry-select-trigger)) {
+  padding: 5px 8px;
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.menu-board-layers-host .menu-canvas-layers li button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.menu-board-layers-host .menu-canvas-layers li button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: color-mix(in oklch, var(--accent, #2e86ab) 16%, var(--paper));
+}
+
+.menu-board-layers-host .menu-canvas-layer-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.menu-board-layers-host .menu-canvas-layer-actions button:not(:where(.pantry-select-trigger)) {
+  min-height: 28px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+
+/* The toolbar floats at the top, between the panels. */
+.menu-board-toolbar {
+  position: absolute;
+  top: var(--float-top);
+  left: calc(var(--panel-start-width) + var(--panel-gap) * 2);
+  /* Room on the right for the zoom bar. */
+  right: calc(var(--panel-end-width) + var(--panel-gap) * 3 + 168px);
+  z-index: 9;
+  width: fit-content;
+  max-width: calc(100% - var(--panel-start-width) - var(--panel-end-width) - var(--panel-gap) * 5 - 168px);
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.menu-board-toolbar-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.menu-board-toolbar-field > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.menu-board-toolbar .pantry-select-trigger,
+.menu-board-toolbar button:where(.pantry-select-trigger) {
+  min-width: 0;
+  min-height: 30px;
+  font-size: 13px;
+}
+
+.menu-board-toolbar-divider {
+  width: 1px;
+  height: 20px;
+  margin-inline: 2px;
+  background: var(--border);
+}
+
+.menu-board-toolbar .menu-boards-history {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.menu-board-toolbar-context:empty {
+  display: none;
+}
+
+.menu-board-toolbar-context {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 6px;
+  border-left: 1px solid var(--border);
+}
+
+.menu-canvas-toolbar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-canvas-toolbar .menu-canvas-toolbar-group {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.menu-canvas-toolbar .menu-canvas-toolbar-group + .menu-canvas-toolbar-group {
+  padding-left: 6px;
+  border-left: 1px solid var(--border);
+}
+
+/* Zoom, top right of the canvas, beside the inspector, as in Figma; the
+   guides and "Show on" sit at the bottom left. */
+.menu-board-zoom,
+.menu-board-view-footer {
+  position: absolute;
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+}
+
+.menu-board-zoom {
+  top: var(--float-top);
+  right: calc(var(--panel-end-width) + var(--panel-gap) * 2);
+}
+
+.menu-board-view-footer {
+  bottom: var(--panel-gap);
+  left: calc(var(--panel-start-width) + var(--panel-gap) * 2);
+}
+
+.menu-board-zoom-level {
+  min-width: 52px;
+  min-height: 30px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.menu-board-zoom-level:hover {
+  background: var(--surface);
+}
+
+.menu-board-view-footer .menu-canvas-preview-shape {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 0 4px;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.menu-board-view-footer .menu-canvas-preview-shape button:where(.pantry-select-trigger) {
+  min-height: 28px;
+  border-radius: var(--pantry-radius-control);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+}
+
+.menu-board-preview-note {
+  position: absolute;
+  top: calc(var(--float-top) + 48px);
+  left: 50%;
+  z-index: 8;
+  max-width: 420px;
+  margin: 0;
+  padding: 8px 12px;
+  transform: translateX(-50%);
+  color: var(--ink-2);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Notices float at the bottom centre. */
+.menu-board-notices {
+  position: absolute;
+  bottom: var(--panel-gap);
+  left: calc(var(--panel-start-width) + var(--panel-gap) * 2 + 260px);
+  right: calc(var(--panel-end-width) + var(--panel-gap) * 2);
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.menu-board-notices > * {
+  pointer-events: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+}
+
+.menu-board-notices:empty {
+  display: none;
+}
+
+/* ── The inspector (right panel) ────────────────────────────────────── */
+
+.menu-board-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 8px 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.menu-board-panel-actions .description-draft-sync-status {
+  margin-right: auto;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.menu-board-panel-actions .menu-boards-primary {
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.menu-board-people {
+  display: inline-flex;
+}
+
+.menu-board-people:empty {
+  display: none;
+}
+
+.menu-board-person {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-right: -6px;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--participant);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.menu-board-panel-end > .menu-boards-publish {
+  margin: 0;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.menu-board-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The drawers become flat sections of the panel. */
+.menu-board-panel-body .menu-boards-side {
+  max-width: none;
+  gap: 0;
+}
+
+.menu-board-panel-body .menu-boards-drawer,
+.menu-board-panel-body .menu-board-comment-list,
+.menu-board-panel-body .menu-board-prompt {
+  flex: none;
+  max-width: none;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.menu-board-panel-body .menu-boards-drawer > .menu-board-prompt {
+  margin: 0 -14px;
+  padding-top: 0;
+}
+
+.menu-board-panel-body .menu-boards-drawer header h3 {
+  font-size: 15px;
+}
+
+.menu-board-panel-body .menu-boards-drawer label {
+  gap: 4px;
+  font-size: 12px;
+}
+
+.menu-board-panel-body .menu-boards-drawer input,
+.menu-board-panel-body .menu-boards-drawer button:where(.pantry-select-trigger),
+.menu-board-panel-body .menu-boards-drawer textarea {
+  min-height: 32px;
+  font-size: 13px;
+}
+
+.menu-board-panel-body .menu-boards-drawer button:not(:where(.pantry-select-trigger)).secondary {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+/* ── A narrow pane: the panels stay in the page flow. ──────────────── */
+
+@container menu-board-workspace (max-width: 760px) {
+  .menu-board-workspace-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    padding-top: var(--float-top);
+  }
+  .menu-boards-editor,
+  .menu-canvas {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .menu-board-panel,
+  .menu-board-toolbar,
+  .menu-board-zoom,
+  .menu-board-notices,
+  .menu-board-preview-note {
+    position: static;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    transform: none;
+  }
+  .menu-board-panel-body {
+    overflow: visible;
+  }
+  .menu-board-viewport {
+    position: relative;
+    height: min(70vh, 560px);
+    border-radius: 10px;
+  }
+  .menu-board-zoom {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+  .menu-board-view-footer {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+  }
+  .menu-board-toolbar {
+    order: -1;
+  }
+  .menu-boards-editor,
+  .menu-canvas {
+    position: static;
+    pointer-events: auto;
+  }
+}
+
+/* A pane of middle width, as when the chat is open: narrower panels and
+   one row of tools. */
+@container menu-board-workspace (min-width: 761px) and (max-width: 1180px) {
+  .menu-board-workspace-body {
+    --panel-start-width: 208px;
+    --panel-end-width: 268px;
+  }
+  .menu-board-toolbar .pantry-select-trigger,
+  .menu-board-toolbar button:where(.pantry-select-trigger) {
+    max-width: 148px;
+  }
+}
+
+/* Each colour is one row: swatch, name, value. The drawer's column labels
+   would stack them. */
+.menu-boards-drawer .menu-board-style-colors label {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+
+.menu-boards-drawer .menu-board-style-colors input[type="color"] {
+  width: 28px;
+  height: 24px;
+  min-height: 0;
+  padding: 0;
+}
+
+/* Screen guides: where a screen of another shape cuts the board. */
+.menu-canvas-screen-guide {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  border: 1.5px dashed var(--guide);
+  pointer-events: none;
+}
+
+.menu-canvas-screen-guide span {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--guide);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.menu-canvas-screen-guide[data-shape="tablet"] span {
+  right: auto;
+  left: 6px;
+}
+
+.menu-canvas-guides {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+}
+
+.menu-canvas-guides-label {
+  margin-right: 2px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.menu-canvas-guides .menu-board-text-button[aria-pressed="false"] {
+  opacity: 0.55;
+}
+
+.menu-canvas-guides .menu-board-text-button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.menu-canvas-guide-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* The Select in the board editor: full width in a drawer field,
+   its own width in the toolbar. */
+.menu-board-panel-body label > .pantry-select-trigger,
+.menu-canvas-fields label > .pantry-select-trigger {
+  width: 100%;
+}
+
+.menu-board-toolbar .pantry-select-trigger {
+  max-width: 230px;
+}
+
+/* The align row at the top of the inspector (Figma's Design panel). */
+.menu-board-align-row {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.menu-board-align-row:empty {
+  display: none;
+}
+
+.menu-board-align-row .menu-canvas-toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.menu-board-align-row .menu-canvas-toolbar-group + .menu-canvas-toolbar-group {
+  padding-left: 4px;
+}
+
+/* X, Y, W and H in a compact grid, each label inside its field. */
+.menu-board-panel-body .menu-canvas-fields-grid label {
+  position: relative;
+  display: block;
+}
+
+.menu-board-panel-body .menu-canvas-fields-grid label > span {
+  position: absolute;
+  top: 50%;
+  left: 9px;
+  transform: translateY(-50%);
+  color: var(--ink-2);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.menu-board-panel-body .menu-canvas-fields-grid input {
+  width: 100%;
+  min-height: 30px;
+  padding-left: 52px;
+  font-variant-numeric: tabular-nums;
+}
+
+.menu-board-align-row .menu-canvas-toolbar {
+  flex-wrap: nowrap;
+  gap: 2px;
+}
+
+.menu-board-align-row .menu-canvas-toolbar-group {
+  gap: 0;
+}
+
+.menu-board-align-row .menu-board-icon-button {
+  width: 26px;
+  height: 28px;
+}
+
+/* A Menus sheet (Plan 40B): the menu items, with the shop's publication
+   and serving hours, or the screens, in the Portal's side drawer. The menu
+   editor needs a wider drawer than the default. */
+.side-drawer.menu-board-sheet-drawer[open] {
+  inline-size: min(760px, 100vw);
+}
+
+.menu-board-sheet-body {
+  font-size: 14px;
+}
+
+/* A grid item takes its content's width; the sheets wrap to the drawer. */
+.menu-board-sheet-body > * {
+  min-width: 0;
+}

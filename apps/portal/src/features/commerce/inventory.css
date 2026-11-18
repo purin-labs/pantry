@@ -1,0 +1,714 @@
+.stock-page {
+  margin-top: 28px;
+}
+.stock-linked-records {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  font-size: 13px;
+}
+.stock-linked-records li {
+  display: grid;
+  gap: 5px;
+}
+.stock-linked-records a {
+  color: var(--ink);
+}
+.stock-linked-records span,
+.stock-linked-records small {
+  color: var(--ink-2);
+}
+.stock-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.stock-metric {
+  display: grid;
+  gap: 10px;
+  padding: 24px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.stock-metric > span {
+  font-size: 14px;
+  font-weight: 600;
+}
+.stock-metric > strong {
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.stock-metric small,
+.stock-footnote {
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.stock-list {
+  flex: 1;
+  min-width: 0;
+}
+.stock-toolbar,
+.stock-tools,
+.stock-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stock-toolbar {
+  justify-content: space-between;
+}
+.stock-toolbar h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+.stock-toolbar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.stock-toolbar a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+.stock-search {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  padding-inline: 12px;
+}
+.stock-search input {
+  min-width: 0;
+  width: 100%;
+  padding: 11px 0;
+  border: 0;
+  background: transparent;
+}
+.stock-search input:focus-visible {
+  outline: none;
+}
+.stock-search:has(input:focus-visible) {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+.stock-tools button:where(.pantry-select-trigger) {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  max-width: 220px;
+}
+.stock-filters {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.stock-filters button:not(:where(.pantry-select-trigger)) {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.stock-filters button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+.stock-filters button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+.stock-filters > span {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.stock-detail-photo {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  outline: 1px solid oklch(0 0 0 / 0.1);
+  outline-offset: -1px;
+}
+.stock-detail-summary {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.stock-detail p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.stock-detail-balance {
+  display: grid;
+  gap: 6px;
+}
+.stock-detail-balance small {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.stock-detail-balance strong {
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.stock-detail dl {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-block: 16px;
+  border-block: 1px solid var(--hairline);
+  font-size: 13px;
+}
+.stock-detail dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.stock-detail dt {
+  color: var(--ink-2);
+}
+.stock-detail dd {
+  margin: 0;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.stock-detail section {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.stock-detail h3 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 14px;
+  font-weight: 500;
+}
+.stock-detail .stock-linked-records {
+  margin: 0;
+}
+.stock-detail-links {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: 1px solid var(--hairline);
+}
+.stock-detail-links li {
+  border-block-end: 1px solid var(--hairline);
+}
+.stock-detail-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: 14px;
+  text-decoration: none;
+}
+.stock-detail-links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.stock-detail-links svg {
+  flex: none;
+  color: var(--ink-2);
+}
+.stock-empty {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--ink-2);
+}
+.stock-dialog {
+  width: min(40rem, calc(100vw - 32px));
+  max-height: min(48rem, calc(100dvh - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+.stock-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.stock-dialog::backdrop {
+  background: color-mix(in oklch, var(--pantry-shadow-color) 14%, transparent);
+  backdrop-filter: blur(2.5px);
+}
+.stock-dialog .access35-dialog-heading {
+  flex: 0 0 auto;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--hairline);
+}
+.stock-dialog h2 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+.stock-dialog button:not(:where(.pantry-select-trigger)) {
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--ring);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.stock-dialog button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--surface);
+}
+.stock-dialog button:not(:where(.pantry-select-trigger)):disabled {
+  cursor: default;
+}
+.stock-dialog button:not(:where(.pantry-select-trigger)).connection-primary-action {
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  box-shadow: var(--pantry-primary-ring);
+}
+.stock-dialog button:not(:where(.pantry-select-trigger)).connection-primary-action:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+.stock-dialog button:not(:where(.pantry-select-trigger)).danger {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+  box-shadow: var(--pantry-danger-ring);
+}
+.stock-dialog button:not(:where(.pantry-select-trigger)).icon-button {
+  display: grid;
+  flex: 0 0 40px;
+  place-items: center;
+  width: 40px;
+  padding: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+.stock-dialog-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.stock-dialog-body {
+  display: grid;
+  gap: 20px;
+  min-height: 0;
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.stock-dialog-body > p {
+  margin: 0;
+  line-height: 1.5;
+}
+.stock-dialog-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+.stock-dialog-context > div,
+.stock-dialog-context dl > div {
+  display: grid;
+  gap: 4px;
+}
+.stock-dialog-context strong {
+  font-size: 16px;
+}
+.stock-dialog-context span,
+.stock-dialog-context dt {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.stock-dialog-context dl {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+}
+.stock-dialog-context dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.stock-dialog-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 16px;
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.stock-dialog-full-width {
+  grid-column: 1 / -1;
+}
+.stock-dialog label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.stock-dialog :is(input, button:where(.pantry-select-trigger), textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+.stock-dialog textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+.stock-dialog-preview {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.stock-dialog-preview dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.stock-dialog-preview dt {
+  margin-bottom: 4px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.stock-dialog-preview dd {
+  margin: 0;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.stock-dialog-notice {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.stock-dialog-notice p {
+  margin: 0;
+}
+.stock-dialog-notice > button:not(:where(.pantry-select-trigger)) {
+  margin-top: 12px;
+}
+.stock-dialog-setup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.stock-dialog-setup strong {
+  display: block;
+  margin-bottom: 3px;
+}
+.stock-dialog-setup p {
+  color: var(--ink-2);
+}
+.stock-dialog-setup > button:not(:where(.pantry-select-trigger)) {
+  margin: 0;
+}
+.stock-dialog-link-recipe {
+  display: grid;
+  gap: 16px;
+}
+.stock-dialog-link-recipe p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.stock-dialog-ingredients {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.stock-dialog-ingredients caption {
+  padding-bottom: 12px;
+  text-align: start;
+  font-size: 14px;
+  font-weight: 500;
+}
+.stock-dialog-ingredients :is(th, td) {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--hairline);
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.stock-dialog-ingredients th {
+  font-weight: 500;
+}
+.stock-dialog-ingredients thead th {
+  padding-top: 0;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 400;
+}
+.stock-dialog-ingredients th:first-child {
+  padding-inline-start: 0;
+  text-align: start;
+}
+.stock-dialog-ingredients :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+.stock-dialog-availability {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.stock-dialog-availability small {
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  font-size: 11px;
+}
+.stock-dialog a {
+  color: var(--ink);
+  font-size: 14px;
+  text-underline-offset: 3px;
+}
+.stock-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--hairline);
+}
+@media (max-width: 540px) {
+  .stock-dialog {
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+    border-radius: 16px;
+  }
+  .stock-dialog .access35-dialog-heading {
+    padding: 12px 16px;
+  }
+  .stock-dialog h2 {
+    font-size: 20px;
+  }
+  .stock-dialog button:not(:where(.pantry-select-trigger)) {
+    min-height: 44px;
+  }
+  .stock-dialog-body {
+    padding: 20px 16px;
+  }
+  .stock-dialog-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stock-dialog :is(input, button:where(.pantry-select-trigger), textarea) {
+    font-size: 16px;
+  }
+  .stock-dialog-context {
+    align-items: start;
+  }
+  .stock-dialog-context dl {
+    flex-wrap: wrap;
+    gap: 12px 24px;
+  }
+  .stock-dialog-actions {
+    padding: 16px;
+  }
+  .stock-dialog-actions > button:not(:where(.pantry-select-trigger)) {
+    flex: 1;
+    padding-inline: 12px;
+  }
+}
+@media (max-width: 650px) {
+  .stock-metrics {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .stock-metric {
+    grid-template-columns: 1fr auto;
+    padding: 16px;
+  }
+  .stock-metric small {
+    grid-column: 1 / -1;
+  }
+  .stock-metric > strong {
+    font-size: 24px;
+  }
+  .stock-tools,
+  .stock-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .stock-tools button:where(.pantry-select-trigger) {
+    max-width: none;
+  }
+}
+
+.stock-production-requests {
+  display: grid;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+.stock-production-request {
+  padding: var(--pantry-space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.stock-production-request-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pantry-space-3);
+}
+.stock-production-request-heading h3 {
+  margin: 0;
+  font-size: var(--pantry-text-body);
+  font-weight: 500;
+  line-height: 1.5;
+}
+.stock-production-request > p {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.stock-production-request a,
+.production-plan-locations a {
+  color: var(--pantry-link);
+  text-underline-offset: 3px;
+}
+.stock-production-request .stock-operation-actions {
+  align-items: center;
+  gap: var(--pantry-space-4);
+}
+.stock-operation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 1rem;
+}
+/* Plan 40D: the shared production plan of one location. */
+.production-plan {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--border, #80808044);
+  border-radius: 8px;
+  margin-block-end: 1rem;
+}
+.production-plan-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.production-plan-header h2,
+.production-plan-header p {
+  margin: 0;
+}
+.production-plan-lines {
+  width: 100%;
+  border-collapse: collapse;
+}
+.production-plan-lines th,
+.production-plan-lines td {
+  padding: 0.4rem 0.5rem;
+  text-align: start;
+  vertical-align: top;
+  border-block-end: 1px solid var(--border, #80808022);
+}
+.production-plan-lines input {
+  width: 7rem;
+}
+.production-plan-changed,
+.production-plan-editor {
+  display: block;
+  margin-block-start: 0.25rem;
+}
+.production-plan-editor {
+  color: var(--accent, #3b6fd8);
+}
+.production-plan-locations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-block-end: 1rem;
+}
+.production-plan-results {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+@media (max-width: 640px) {
+  .production-plan-lines thead {
+    display: none;
+  }
+  .production-plan-lines tr {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.5rem;
+  }
+  .production-plan-lines th,
+  .production-plan-lines td {
+    border: 0;
+    padding: 0;
+  }
+}
+
+.stock-display {
+  margin-inline-start: auto;
+}
+.stock-lanes {
+  margin-bottom: 20px;
+}

@@ -1,0 +1,2 @@
+
+export type ApprovalRequestId = string;

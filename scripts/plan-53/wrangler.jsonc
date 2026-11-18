@@ -1,0 +1,14 @@
+{
+  "name": "satyr-plan53-acceptance",
+  "main": "browser-worker.ts",
+  "compatibility_date": "2026-07-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": { "SATYR_PUBLIC_ORIGIN": "http://127.0.0.1:3115" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "plan53-acceptance",
+      "database_id": "00000000-0000-0000-0000-000000000053",
+    },
+  ],
+}

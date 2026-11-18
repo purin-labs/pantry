@@ -1,0 +1,25 @@
+{
+  "name": "@seams/bakery-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./changes": "./src/changes.ts",
+    "./draft": "./src/draft.ts",
+    "./findings": "./src/findings.ts",
+    "./layout": "./src/layout.ts"
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@seams/production-simulation": "workspace:*",
+    "@seams/std": "workspace:*",
+    "@seams/workflow-canvas-crdt": "workspace:*",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

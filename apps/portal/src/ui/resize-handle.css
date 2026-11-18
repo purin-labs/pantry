@@ -1,0 +1,30 @@
+[data-resize-handle] {
+  cursor: ew-resize;
+}
+
+[data-resize-handle]::after {
+  content: attr(aria-label);
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: calc(100% + 8px);
+  transform: translateY(-50%);
+  width: max-content;
+  padding: 7px 11px;
+  border-radius: 9px;
+  background: #000;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 12%);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+[data-resize-handle]:is(:hover, :focus-visible)::after {
+  visibility: visible;
+}
+
+[data-resize-handle]:active::after {
+  visibility: hidden;
+}

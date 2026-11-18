@@ -1,0 +1,215 @@
+/* Plan 40B phase 5: the free canvas editor. The overlay sits in the board's
+   scaled box, so its children use board units. */
+
+/* The canvas editor sits in the Boards workspace (board-workspace.css):
+   the viewport draws the board, the toolbar and the layers list float. */
+
+.menu-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  touch-action: none;
+  user-select: none;
+}
+
+.menu-canvas-hit {
+  position: absolute;
+  box-sizing: border-box;
+  cursor: move;
+  outline: 1px dashed transparent;
+}
+
+.menu-canvas-hit:hover {
+  outline-color: rgba(242, 235, 221, 0.45);
+}
+
+.menu-canvas-hit[data-selected="true"] {
+  outline: 3px solid #f29e4c;
+  outline-offset: 2px;
+}
+
+.menu-canvas-hit[data-marquee="true"] {
+  outline: 2px solid #2e86ab;
+  outline-offset: 2px;
+}
+
+/* Plan 40B phase 5, slice 4: the marquee of an area select. */
+.menu-canvas-marquee {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid #2e86ab;
+  background: rgba(46, 134, 171, 0.12);
+  pointer-events: none;
+}
+
+.menu-canvas-handle {
+  position: absolute;
+  box-sizing: border-box;
+  background: #f2ebdd;
+  border: 2px solid #f29e4c;
+  border-radius: 2px;
+}
+
+.menu-canvas-handle[data-handle="n"],
+.menu-canvas-handle[data-handle="s"] {
+  cursor: ns-resize;
+}
+
+.menu-canvas-handle[data-handle="e"],
+.menu-canvas-handle[data-handle="w"] {
+  cursor: ew-resize;
+}
+
+.menu-canvas-handle[data-handle="ne"],
+.menu-canvas-handle[data-handle="sw"] {
+  cursor: nesw-resize;
+}
+
+.menu-canvas-handle[data-handle="nw"],
+.menu-canvas-handle[data-handle="se"] {
+  cursor: nwse-resize;
+}
+
+.menu-canvas-guide {
+  position: absolute;
+  background: #e4572e;
+  pointer-events: none;
+}
+
+.menu-canvas-remote-selection {
+  position: absolute;
+  box-sizing: border-box;
+  outline: 3px solid var(--participant);
+  outline-offset: 6px;
+  pointer-events: none;
+}
+
+.menu-canvas-remote-selection span,
+.menu-canvas-cursor span {
+  position: absolute;
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--participant);
+  color: #fff;
+  font: 600 18px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+.menu-canvas-remote-selection span {
+  top: -40px;
+  left: -6px;
+}
+
+.menu-canvas-cursor {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--participant);
+  border: 2px solid #fff;
+  transform-origin: 7px 7px;
+  pointer-events: none;
+}
+
+.menu-canvas-cursor span {
+  top: 14px;
+  left: 14px;
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
+.menu-canvas-layers {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+.menu-canvas-layers header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.menu-canvas-layers h3 {
+  margin: 0;
+  font-size: var(--pantry-text-body);
+}
+
+.menu-canvas-layers header span,
+.menu-canvas-layer-detail {
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+}
+
+.menu-canvas-layers ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.menu-canvas-layers li button:not(:where(.pantry-select-trigger)) {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 8px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.menu-canvas-layers li button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--surface);
+}
+
+.menu-canvas-layer-detail {
+  grid-column: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-canvas-layer-editor {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  min-width: 24px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--participant);
+  color: #fff;
+  font-size: 11px;
+  text-align: center;
+}
+
+.menu-canvas-layer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.menu-canvas-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-canvas-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* Plan 40B phase 5, slice 8: the elements of a stack sit under it. */
+.menu-canvas-layers li[data-in-stack="true"] {
+  padding-left: 16px;
+}

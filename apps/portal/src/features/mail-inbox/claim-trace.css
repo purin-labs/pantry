@@ -1,0 +1,269 @@
+/* The marked claims of a reply draft and Claim Trace. The Inbox and the
+   email draft cards in chat share them. */
+.mail-source-number {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-block-start: 1px;
+  border-radius: 6px;
+  color: var(--pantry-accent-text);
+  background: var(--pantry-accent-surface);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.mail-source-number:empty {
+  background: var(--surface);
+}
+/* A run of words that a record supports. The underline stays quiet; the
+   words of the source in focus are marked. */
+.mail-draft-claim {
+  padding: 1px 0;
+  border-radius: 3px;
+  color: inherit;
+  background: transparent;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--pantry-accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  transition: background-color 120ms ease;
+}
+.mail-draft-claim[data-active="true"] {
+  background: color-mix(in oklch, var(--pantry-accent-surface) 70%, transparent);
+}
+.mail-draft-claim-number {
+  margin-inline-start: 2px;
+  color: var(--pantry-accent-text);
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mail-draft-claim {
+    transition: none;
+  }
+}
+/* A sentence with a detail that no record supports: a dashed line asks the
+   reviewer to check it. */
+.mail-draft-unsourced {
+  padding: 1px 0;
+  border-radius: 3px;
+  color: inherit;
+  background: transparent;
+  text-decoration: underline dashed;
+  text-decoration-color: var(--pantry-danger-text);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  transition: background-color 120ms ease;
+}
+.mail-draft-unsourced[data-active="true"] {
+  background: var(--pantry-danger-surface);
+}
+.mail-claim-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+}
+.mail-claim-summary p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.mail-claim-summary p[data-unsourced="true"] {
+  color: var(--pantry-danger-text);
+}
+.mail-claim-summary button:not(:where(.pantry-select-trigger)) {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 12.5px;
+}
+/* Claim Trace: the draft's claims beside the records behind them. */
+.mail-trace {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1.1fr);
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+  container-type: inline-size;
+}
+.mail-trace-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.mail-trace-line path {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1.5;
+  opacity: 0.45;
+  transition: opacity 120ms ease;
+}
+.mail-trace-line circle {
+  fill: var(--ink-3);
+  opacity: 0.6;
+}
+.mail-trace-line[data-unsourced="true"] path {
+  stroke: var(--pantry-danger-text);
+  stroke-dasharray: 4 3;
+}
+.mail-trace-line[data-unsourced="true"] circle {
+  fill: var(--pantry-danger-text);
+}
+.mail-trace-line[data-lit="true"] path {
+  stroke: var(--ink);
+  opacity: 1;
+}
+.mail-trace-line[data-lit="true"] circle {
+  fill: var(--ink);
+  opacity: 1;
+}
+.mail-trace-line[data-unsourced="true"][data-lit="true"] path {
+  stroke: var(--pantry-danger-text);
+}
+.mail-trace-line[data-unsourced="true"][data-lit="true"] circle {
+  fill: var(--pantry-danger-text);
+}
+.mail-trace-claims,
+.mail-trace-records {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mail-trace-claims {
+  grid-column: 1;
+  grid-row: 1;
+}
+.mail-trace-records {
+  grid-column: 3;
+  grid-row: 1;
+}
+.mail-trace-claim {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 13.5px;
+  line-height: 1.45;
+  outline-offset: 2px;
+  transition: background-color 120ms ease;
+}
+.mail-trace-claim q {
+  quotes: "“" "”";
+}
+.mail-trace-claim[data-lit="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--ink-2);
+}
+.mail-trace-claim[data-unsourced="true"] {
+  background: color-mix(in oklch, var(--pantry-danger-surface) 70%, transparent);
+}
+.mail-trace-claim[data-unsourced="true"][data-lit="true"] {
+  background: var(--pantry-danger-surface);
+  box-shadow: inset 0 0 0 1.5px var(--pantry-danger-ring);
+}
+.mail-trace-claim-refs {
+  display: flex;
+  gap: 4px;
+  color: var(--pantry-danger-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+.mail-trace-claim-refs .mail-source-number {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  font-size: 10.5px;
+}
+.mail-trace-record {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.45;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+.mail-trace-record[data-lit="true"] {
+  border-color: var(--ink-2);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ink) 10%, transparent);
+}
+.mail-trace-record-head {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.mail-trace-record-head .mail-source-number {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  font-size: 10.5px;
+}
+.mail-trace-record-kind {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+.mail-trace-record-detail {
+  color: var(--ink-2);
+}
+.mail-trace-record a {
+  justify-self: start;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  text-underline-offset: 3px;
+}
+.mail-trace-record[data-unsourced="true"] {
+  border: 1px dashed var(--pantry-danger-ring);
+  background: var(--pantry-danger-surface);
+}
+.mail-trace-record[data-unsourced="true"] strong {
+  color: var(--pantry-danger-text);
+}
+.mail-trace-record[data-unsourced="true"][data-lit="true"] {
+  box-shadow: 0 0 0 3px
+    color-mix(in oklch, var(--pantry-danger-ring) 30%, transparent);
+}
+.mail-trace-record button:not(:where(.pantry-select-trigger)) {
+  justify-self: start;
+  min-height: 28px;
+  margin-block-start: 4px;
+  padding: 0 10px;
+  font-size: 12.5px;
+}
+/* A narrow pane stacks the records under the claims; the numbers link them. */
+@container (max-width: 420px) {
+  .mail-trace-claims,
+  .mail-trace-records {
+    grid-column: 1 / -1;
+  }
+  .mail-trace-records {
+    grid-row: 2;
+    margin-block-start: 12px;
+  }
+  .mail-trace-lines {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mail-draft-unsourced,
+  .mail-trace-line path,
+  .mail-trace-claim,
+  .mail-trace-record {
+    transition: none;
+  }
+}

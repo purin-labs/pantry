@@ -1,0 +1,29 @@
+{
+  // The standalone demo shop on Commerce (Plan 40B, decision 8), and the
+  // QR order pages at `<shop name>.<MENU_HOST_SUFFIX>` (Plan 40B phase 2).
+  // Deploy with `pnpm --filter @seams/storefront deploy:seams-shop`.
+  // The order page domain is not chosen yet, so no route sends an order page
+  // host here. Its route needs a proxied wildcard DNS record and a
+  // certificate that covers the wildcard.
+  "$schema": "../../services/commerce/node_modules/wrangler/config-schema.json",
+  "name": "seams-shop",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-07-07",
+  "observability": {
+    "enabled": true,
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // An order page host needs the Worker for every request: it checks the
+    // shop name before it serves a page.
+    "run_worker_first": true,
+  },
+  "vars": {
+    "MENU_HOST_SUFFIX": "menu.seams.tokyo",
+  },
+  "services": [{ "binding": "UNDERCLERK", "service": "underclerk" }],
+  "routes": [{ "pattern": "shop.seams.tokyo", "custom_domain": true }],
+  "workers_dev": false,
+}

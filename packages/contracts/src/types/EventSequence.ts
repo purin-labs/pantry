@@ -1,0 +1,2 @@
+
+export type EventSequence = number;

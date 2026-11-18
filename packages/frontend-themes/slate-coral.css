@@ -1,0 +1,148 @@
+/* Slate & coral: the default Pantry theme. Slate carries surfaces, text,
+   actions, and selection; coral marks links, focus, and small accents. */
+:root:not([data-pantry-theme]),
+:root[data-pantry-theme="slate-coral"] {
+  /* Anchors: slate 450 #8b9ba7, 500 #778899, 700 #3c4552. */
+  --pantry-slate-50: oklch(0.978 0.004 248);
+  --pantry-slate-100: oklch(0.95 0.007 248);
+  --pantry-slate-150: oklch(0.922 0.009 248);
+  --pantry-slate-200: oklch(0.893 0.012 248);
+  --pantry-slate-250: oklch(0.856 0.015 247);
+  --pantry-slate-300: oklch(0.817 0.018 246);
+  --pantry-slate-350: oklch(0.772 0.021 244);
+  --pantry-slate-400: oklch(0.727 0.023 242);
+  --pantry-slate-450: oklch(0.681 0.025 240.3);
+  --pantry-slate-500: oklch(0.619 0.032 248.4);
+  --pantry-slate-550: oklch(0.561 0.031 250.7);
+  --pantry-slate-600: oklch(0.503 0.03 253);
+  --pantry-slate-650: oklch(0.445 0.028 255.2);
+  --pantry-slate-700: oklch(0.387 0.025 257.5);
+  --pantry-slate-750: oklch(0.332 0.023 258);
+  --pantry-slate-800: oklch(0.278 0.021 258);
+
+  /* Anchors: coral 100 #f6e8e3, 300 #f0b1a1, 500 #c96357. */
+  --pantry-coral-50: oklch(0.973 0.008 42);
+  --pantry-coral-100: oklch(0.941 0.017 40.8);
+  --pantry-coral-150: oklch(0.91 0.032 39.3);
+  --pantry-coral-200: oklch(0.878 0.048 37.8);
+  --pantry-coral-250: oklch(0.847 0.063 36.2);
+  --pantry-coral-300: oklch(0.815 0.078 34.7);
+  --pantry-coral-350: oklch(0.766 0.092 33.1);
+  --pantry-coral-400: oklch(0.717 0.106 31.5);
+  --pantry-coral-450: oklch(0.668 0.119 30);
+  --pantry-coral-500: oklch(0.619 0.132 28.4);
+  --pantry-coral-550: oklch(0.561 0.128 28);
+  --pantry-coral-600: oklch(0.503 0.12 27.5);
+  --pantry-coral-650: oklch(0.445 0.108 27);
+  --pantry-coral-700: oklch(0.387 0.094 27);
+  --pantry-coral-750: oklch(0.332 0.08 27);
+  --pantry-coral-800: oklch(0.278 0.066 27);
+
+  --pantry-ground: var(--pantry-slate-100);
+  --pantry-paper: var(--pantry-slate-50);
+  --pantry-surface: var(--pantry-slate-150);
+  --pantry-border: var(--pantry-slate-200);
+  --pantry-hairline: var(--pantry-slate-500);
+  --pantry-ink: var(--pantry-slate-800);
+  --pantry-ink-strong: var(--pantry-slate-800);
+  --pantry-ink-muted: var(--pantry-slate-650);
+  --pantry-ink-subtle: var(--pantry-slate-600);
+  --pantry-ink-hover: var(--pantry-slate-800);
+
+  --pantry-primary: var(--pantry-slate-700);
+  --pantry-primary-hover: var(--pantry-slate-750);
+  --pantry-on-primary: var(--pantry-slate-50);
+  --pantry-primary-border: var(--pantry-slate-700);
+  --pantry-hover: var(--pantry-slate-50);
+  --pantry-selected: var(--pantry-slate-150);
+  --pantry-on-selected: var(--pantry-slate-800);
+  --pantry-link: var(--pantry-coral-600);
+  --pantry-focus: var(--pantry-coral-600);
+  --pantry-accent: var(--pantry-coral-500);
+  --pantry-accent-soft: var(--pantry-coral-300);
+  --pantry-accent-text: var(--pantry-coral-650);
+  --pantry-accent-surface: var(--pantry-coral-100);
+  --pantry-disabled-surface: var(--pantry-slate-150);
+  --pantry-disabled-text: var(--pantry-slate-550);
+
+  --pantry-success-text: oklch(0.45 0.06 158);
+  --pantry-success-surface: oklch(0.95 0.02 160);
+  --pantry-info-text: oklch(0.46 0.07 252);
+  --pantry-info-surface: oklch(0.955 0.018 252);
+  --pantry-warning-text: oklch(0.44 0.075 75);
+  --pantry-warning-surface: oklch(0.94 0.035 85);
+  --pantry-danger-text: oklch(0.48 0.11 22);
+  --pantry-danger-surface: oklch(0.95 0.018 20);
+  --pantry-category-accent-text: var(--pantry-coral-800);
+  --pantry-category-accent-surface: var(--pantry-coral-150);
+  --pantry-category-neutral-text: var(--pantry-slate-800);
+  --pantry-category-neutral-surface: var(--pantry-slate-200);
+
+  /* With chat open, the workspace floats on the chat surface. Keep the chat
+     surface darkest, then the workspace canvas, then the sidebar. */
+  --pantry-sidebar: var(--pantry-slate-50);
+  --pantry-sidebar-hover: var(--pantry-slate-100);
+  --pantry-sidebar-selected: var(--pantry-selected);
+  --pantry-sidebar-selected-ring: none;
+  --pantry-chat-surface: var(--pantry-slate-150);
+
+  --pantry-shadow-color: var(--pantry-slate-800);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 2px 4px color-mix(in oklch, var(--pantry-shadow-color) 4%, transparent),
+    0 6px 16px color-mix(in oklch, var(--pantry-shadow-color) 4%, transparent);
+}
+
+:root:not([data-pantry-theme])[data-portal-theme="dark"],
+:root[data-pantry-theme="slate-coral"][data-portal-theme="dark"] {
+  --pantry-ground: var(--pantry-slate-800);
+  --pantry-paper: var(--pantry-slate-700);
+  --pantry-surface: var(--pantry-slate-750);
+  --pantry-border: var(--pantry-slate-650);
+  --pantry-hairline: var(--pantry-slate-400);
+  --pantry-ink: var(--pantry-slate-50);
+  --pantry-ink-strong: var(--pantry-slate-100);
+  --pantry-ink-muted: var(--pantry-slate-200);
+  --pantry-ink-subtle: var(--pantry-slate-300);
+  --pantry-ink-hover: var(--pantry-slate-100);
+
+  --pantry-primary: var(--pantry-slate-150);
+  --pantry-primary-hover: var(--pantry-slate-100);
+  --pantry-on-primary: var(--pantry-slate-800);
+  --pantry-primary-border: var(--pantry-slate-400);
+  --pantry-hover: var(--pantry-paper);
+  --pantry-selected: var(--pantry-slate-650);
+  --pantry-on-selected: var(--pantry-slate-50);
+  --pantry-link: var(--pantry-coral-300);
+  --pantry-focus: var(--pantry-coral-400);
+  --pantry-accent: var(--pantry-coral-400);
+  --pantry-accent-text: var(--pantry-coral-200);
+  --pantry-accent-surface: var(--pantry-coral-750);
+  --pantry-disabled-surface: var(--pantry-surface);
+  --pantry-disabled-text: var(--pantry-slate-450);
+
+  --pantry-success-text: oklch(0.84 0.06 158);
+  --pantry-success-surface: oklch(0.36 0.03 160);
+  --pantry-info-text: oklch(0.86 0.05 252);
+  --pantry-info-surface: oklch(0.37 0.045 252);
+  --pantry-warning-text: oklch(0.89 0.087 85);
+  --pantry-warning-surface: oklch(0.4 0.045 75);
+  --pantry-danger-text: oklch(0.84 0.06 22);
+  --pantry-danger-surface: oklch(0.36 0.045 20);
+  --pantry-category-accent-text: var(--pantry-coral-200);
+  --pantry-category-accent-surface: var(--pantry-coral-750);
+  --pantry-category-neutral-text: var(--pantry-slate-100);
+  --pantry-category-neutral-surface: var(--pantry-surface);
+
+  --pantry-sidebar: var(--pantry-slate-750);
+  --pantry-sidebar-hover: var(--pantry-hover);
+  --pantry-sidebar-selected: var(--pantry-selected);
+  --pantry-sidebar-selected-ring: 0 0 0 1px var(--pantry-slate-400) inset;
+  --pantry-chat-surface: oklch(0.225 0.018 258);
+
+  --pantry-shadow-color: oklch(0.18 0.02 258);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 2px 4px color-mix(in oklch, var(--pantry-shadow-color) 24%, transparent),
+    0 6px 16px color-mix(in oklch, var(--pantry-shadow-color) 24%, transparent);
+}

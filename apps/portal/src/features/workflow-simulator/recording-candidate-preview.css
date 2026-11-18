@@ -1,0 +1,41 @@
+.recording-candidate-preview {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+}
+
+.recording-candidate-preview p {
+  margin: 0;
+}
+
+.recording-candidate-scene {
+  position: relative;
+  height: min(32vh, 280px);
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.recording-candidate-scene canvas {
+  display: block;
+}
+
+.recording-candidate-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recording-candidate-controls button:not(:where(.pantry-select-trigger)) {
+  min-height: 44px;
+}
+
+.recording-candidate-controls label {
+  display: grid;
+  gap: 8px;
+  flex: 1 1 100%;
+}
+
+.recording-candidate-controls input {
+  width: 100%;
+}

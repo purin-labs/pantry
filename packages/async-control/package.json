@@ -1,0 +1,34 @@
+{
+  "name": "@seams/async-control",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./cancellable-task": {
+      "types": "./dist/cancellable-task.d.ts",
+      "import": "./dist/cancellable-task.js"
+    },
+    "./deadline": {
+      "types": "./dist/deadline.d.ts",
+      "import": "./dist/deadline.js"
+    },
+    "./serial-queue": {
+      "types": "./dist/serial-queue.d.ts",
+      "import": "./dist/serial-queue.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsrs -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:exports": "pnpm build && node --test tests/runtime-exports.mjs",
+    "typecheck": "tsrs --noEmit"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vitest": "4.1.9"
+  }
+}

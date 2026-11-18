@@ -1,0 +1,65 @@
+{
+  "manifest": {
+    "schemaVersion": "satyr.catalog-activation.v1",
+    "organisationId": "organisation_demo",
+    "merchantId": "merchant_demo",
+    "releaseId": "release_d1e96d48f032cfca43310abd62319f23e0a4866fd8e8bf51f395170063c98d24",
+    "releaseHash": "d1e96d48f032cfca43310abd62319f23e0a4866fd8e8bf51f395170063c98d24",
+    "baseCatalogRevision": "catalog_revision_7",
+    "createdAt": "2026-07-27T00:00:00Z",
+    "catalog": {
+      "digest": "c3eadd754aaf200b69d4f30d00bee6249a9de7e932e6d1cdb724b2d767c88661",
+      "products": [
+        {
+          "productId": "product_field_watch",
+          "slug": "field-watch",
+          "title": "Field Watch",
+          "description": "A precise, durable field watch for everyday use.",
+          "currency": "USD",
+          "variants": [
+            {
+              "variantId": "variant_field_watch_black",
+              "sku": "FIELD-BLACK",
+              "title": "Black dial",
+              "price": {
+                "amountMinor": 42500,
+                "currency": "USD"
+              }
+            },
+            {
+              "variantId": "variant_field_watch_white",
+              "sku": "FIELD-WHITE",
+              "title": "White dial",
+              "price": {
+                "amountMinor": 42500,
+                "currency": "USD"
+              }
+            }
+          ]
+        }
+      ],
+      "offers": [],
+      "mediaReferences": []
+    },
+    "approval": {
+      "receiptId": "approval_demo",
+      "policyVersion": "policy_1",
+      "approvedBy": {
+        "kind": "human",
+        "userId": "user_demo"
+      },
+      "approvedAt": "2026-07-27T00:00:00Z"
+    },
+    "signer": {
+      "keyId": "key_test",
+      "algorithm": "ed25519",
+      "signature": "test_524bcfb714668f0257e7783841253333e77783fee441670bdd893368ad0d6ac4"
+    }
+  },
+  "idempotencyKey": "activate_release_rust_fixture",
+  "requestedBy": {
+    "kind": "human",
+    "userId": "user_demo"
+  },
+  "requestedAt": "2026-07-27T00:00:00Z"
+}

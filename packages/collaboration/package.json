@@ -1,0 +1,21 @@
+{
+  "name": "@seams/collaboration",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@seams/std": "workspace:*",
+    "yjs": "13.6.32"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vitest": "4.1.9"
+  }
+}

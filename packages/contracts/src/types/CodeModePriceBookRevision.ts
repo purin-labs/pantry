@@ -1,0 +1,2 @@
+
+export type CodeModePriceBookRevision = string;

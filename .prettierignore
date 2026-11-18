@@ -1,0 +1,10 @@
+**/node_modules/**
+**/dist/**
+**/build/**
+**/generated/**
+**/wasm-pkg/**
+**/media-wasm-pkg/**
+**/.wrangler/**
+**/.vitepress/cache/**
+target/**
+pnpm-lock.yaml

@@ -1,0 +1,28 @@
+{
+  "name": "@seams/storefront",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsrs --noEmit && vite build",
+    "build:seams-shop": "tsrs --noEmit && VITE_SHOP_MERCHANT_ID=merchant_satyr_b43a32c5_f5ff_4ad8_9536_2cdee9dd2958 vite build",
+    "deploy:seams-shop": "pnpm build:seams-shop && pnpm --dir ../../services/commerce exec wrangler deploy --config ../../apps/storefront/wrangler.jsonc",
+    "dev": "vite",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams/commerce-client": "workspace:*",
+    "qrcode-generator": "^2.0.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.0"
+  }
+}

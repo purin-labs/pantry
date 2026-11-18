@@ -1,0 +1,1236 @@
+/* Consent card for a permission request. Colors come from the portal theme
+   tokens, so the light and dark appearances both follow the active theme. */
+.permission-request {
+  --permission-request-band: color-mix(
+    in oklch,
+    var(--surface) 55%,
+    var(--paper)
+  );
+  width: min(100%, 400px);
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.permission-request p {
+  margin: 0;
+}
+
+/* The head, the right-hand list and the decision are siblings. A stacked
+   card puts them in one narrow column; the split layout below puts the list
+   in a second column. */
+.permission-request-head {
+  display: grid;
+  gap: 14px;
+  padding: 32px 20px 14px;
+}
+
+.permission-request-aside {
+  position: relative;
+  min-width: 0;
+  padding-inline: 20px;
+}
+
+.permission-request-decision {
+  display: grid;
+  gap: 14px;
+  padding: 14px 20px 20px;
+}
+
+/* The person who decides. A chip, as on a provider's consent page. */
+.permission-request-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  gap: 8px;
+  max-width: 100%;
+  min-height: 34px;
+  margin: 0;
+  padding: 3px 12px 3px 3px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--border);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+button:not(:where(.pantry-select-trigger)).permission-request-chip {
+  cursor: pointer;
+}
+
+button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
+  background: var(--surface);
+}
+
+.permission-request-chip-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.permission-request-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.permission-request-chip > svg {
+  flex-shrink: 0;
+  color: var(--ink-2);
+}
+
+/* A long list folds. Its end fades out under a "View all" button; nothing
+   scrolls inside the card. */
+.permission-request-aside:not([data-expanded])
+  .permission-request-aside-viewport {
+  max-height: 260px;
+  overflow: hidden;
+}
+
+/* The inline card keeps its list in a box, so the fade is an overlay in
+   the card's colour and the box keeps its edge. */
+.permission-request[data-layout="stacked"] .permission-request-aside-viewport {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  /* An outline paints above the rows, so the heading band cannot hide it. */
+  outline: 1px solid var(--border);
+  outline-offset: -1px;
+}
+
+.permission-request[data-layout="stacked"]
+  .permission-request-aside[data-folded]
+  .permission-request-aside-viewport::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 96px;
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(to bottom, transparent, var(--paper) 72%);
+  pointer-events: none;
+}
+
+/* The screen's list sits on its own band, so the rows fade into it. */
+.permission-request[data-layout="split"]
+  .permission-request-aside[data-folded]
+  .permission-request-aside-viewport {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 96px),
+    transparent calc(100% - 12px)
+  );
+}
+
+.permission-request-more {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: 10px auto 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--paper);
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 2px 10px color-mix(in oklch, var(--pantry-shadow-color) 12%, transparent);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.permission-request-more:hover {
+  background: var(--surface);
+}
+
+.permission-request-aside[data-folded] .permission-request-more {
+  position: absolute;
+  inset-block-end: 10px;
+  inset-inline-start: 50%;
+  margin: 0;
+  translate: -50% 0;
+}
+
+.permission-request-more > svg {
+  color: var(--ink-2);
+}
+
+.permission-request-more[aria-expanded="true"] > svg {
+  rotate: 180deg;
+}
+
+.permission-request-parties {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-block-end: 4px;
+}
+
+.permission-request-avatar {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--border);
+  color: var(--ink);
+}
+
+.permission-request-avatar > :is(img, svg) {
+  display: block;
+}
+
+.permission-request-avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.permission-request-connector {
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+}
+
+.permission-request-title {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  text-align: center;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.permission-request .permission-request-subtitle {
+  margin-block-start: -8px;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.permission-request-scope {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.permission-request-scope > label {
+  color: var(--ink-2);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.permission-request-select {
+  position: relative;
+  display: flex;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.permission-request-select button:where(.pantry-select-trigger) {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  background: var(--paper);
+  box-shadow: var(--pantry-button-ring);
+  color: var(--ink);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.permission-request-select[data-icon="true"] button:where(.pantry-select-trigger) {
+  padding-inline-start: 38px;
+}
+
+.permission-request-select button:where(.pantry-select-trigger):hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.permission-request-select button:where(.pantry-select-trigger):disabled {
+  color: var(--pantry-disabled-text);
+  cursor: default;
+}
+
+.permission-request-select-icon {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+
+.permission-request-select-icon {
+  display: grid;
+  place-items: center;
+  inset-inline-start: 10px;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 6px;
+  color: var(--ink-2);
+}
+
+.permission-request-select-icon > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.permission-request-list {
+  min-width: 0;
+}
+
+.permission-request-list-heading {
+  padding: 9px 14px;
+  border-block-end: 1px solid var(--border);
+  background: var(--permission-request-band);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.permission-request-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.permission-request-list li + li {
+  border-block-start: 1px solid var(--border);
+}
+
+.permission-request-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.permission-request-item:is([data-required="true"], [data-readonly="true"]) {
+  cursor: default;
+}
+
+.permission-request-check {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-block-start: 1px;
+}
+
+.permission-request-check input {
+  width: 18px;
+  height: 18px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1.5px var(--ink-3);
+  appearance: none;
+  cursor: inherit;
+}
+
+.permission-request-check input:checked {
+  background: var(--pantry-primary);
+  box-shadow: inset 0 0 0 1.5px var(--pantry-primary);
+}
+
+.permission-request-check input:disabled {
+  background: var(--pantry-disabled-surface);
+  box-shadow: inset 0 0 0 1.5px var(--border);
+}
+
+.permission-request-check input:disabled:checked {
+  background: var(--ink-3);
+  box-shadow: inset 0 0 0 1.5px var(--ink-3);
+}
+
+.permission-request-check input:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.permission-request-check svg {
+  position: absolute;
+  color: var(--pantry-on-primary);
+  opacity: 0;
+  scale: 0.6;
+  pointer-events: none;
+}
+
+.permission-request-check input:checked + svg {
+  opacity: 1;
+  scale: 1;
+}
+
+.permission-request-check input:disabled:checked + svg {
+  color: var(--paper);
+}
+
+.permission-request-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-block-start: 1px;
+  color: var(--ink-2);
+}
+
+.permission-request-item-copy {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.permission-request-item-label {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.permission-request-item-description {
+  color: var(--ink-2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.permission-request-pill {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.permission-request-explain {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--pantry-info-surface);
+  color: var(--pantry-info-text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.permission-request-explain > svg {
+  flex-shrink: 0;
+  margin-block-start: 2px;
+}
+
+.permission-request-explain p + p {
+  margin-block-start: 6px;
+}
+
+.permission-request .permission-request-error {
+  margin-block-end: -6px;
+  color: var(--danger-text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.permission-request-actions {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 10px;
+}
+
+/* Each tone and state sets these properties. The rule below them reads them. */
+.permission-request-button {
+  --permission-request-button-height: 42px;
+  --permission-request-button-text: 14px;
+  --permission-request-button-opacity: 1;
+}
+
+.permission-request-button[data-tone="secondary"] {
+  --permission-request-button-fill: var(--paper);
+  --permission-request-button-hover: var(--surface);
+  --permission-request-button-ink: var(--ink);
+  --permission-request-button-ring: 0 0 0 1px
+    color-mix(in oklch, var(--pantry-hairline) 55%, var(--border)) inset;
+}
+
+.permission-request-button[data-tone="primary"] {
+  --permission-request-button-fill: var(--pantry-primary);
+  --permission-request-button-hover: var(--pantry-primary-hover);
+  --permission-request-button-ink: var(--pantry-on-primary);
+  --permission-request-button-ring: none;
+}
+
+/* While the other button is busy, this one waits: a quiet secondary keeps
+   its outline and a readable label; the primary fades. */
+.permission-request-button[data-tone="secondary"][aria-disabled="true"]:not(
+    [aria-busy="true"]
+  ) {
+  --permission-request-button-ink: var(--ink-2);
+}
+
+.permission-request-button[data-tone="primary"][aria-disabled="true"]:not(
+    [aria-busy="true"]
+  ) {
+  --permission-request-button-opacity: 0.6;
+}
+
+/* A host page can style every button in it, such as
+   `.access35-page button:hover:not(:disabled)`, and the dialog sits inside
+   that page. These selectors outrank such rules in every state, so a busy
+   Allow keeps its fill under the pointer. Only the inset ring draws an edge. */
+.permission-request
+  .permission-request-actions
+  button:not(:where(.pantry-select-trigger)).permission-request-button[data-tone] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: var(--permission-request-button-height);
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--permission-request-button-fill);
+  box-shadow: var(--permission-request-button-ring);
+  color: var(--permission-request-button-ink);
+  font-size: var(--permission-request-button-text);
+  font-weight: 500;
+  white-space: normal;
+  opacity: var(--permission-request-button-opacity);
+  cursor: pointer;
+}
+
+.permission-request
+  .permission-request-actions
+  button:not(:where(.pantry-select-trigger)).permission-request-button[data-tone]:hover:not(
+    [aria-disabled="true"]
+  ) {
+  background: var(--permission-request-button-hover);
+}
+
+.permission-request
+  .permission-request-actions
+  button:not(:where(.pantry-select-trigger)).permission-request-button[data-tone][aria-disabled="true"] {
+  cursor: default;
+}
+
+.permission-request-button:focus-visible,
+.permission-request-chip:focus-visible,
+.permission-request-more:focus-visible,
+.permission-request-select button:where(.pantry-select-trigger):focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.permission-request-footnote {
+  color: var(--ink-3);
+  font-size: 12px;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.permission-request-footnote a {
+  color: inherit;
+}
+
+/* Split layout: a wide modal card. The question, the account and the
+   decision are on the left; the permissions are on the right. It collapses
+   to the stacked order on a narrow window. */
+.permission-request[data-layout="split"] {
+  position: relative;
+  width: min(860px, calc(100vw - 32px));
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px var(--border),
+    var(--shadow-card);
+}
+
+/* The close button sits in the list's corner. */
+.permission-request[data-layout="split"] .permission-request-list-heading {
+  padding-inline-end: 28px;
+}
+
+.permission-request[data-layout="split"] .permission-request-parties {
+  justify-content: flex-start;
+  gap: 10px;
+  margin-block-end: 2px;
+}
+
+.permission-request[data-layout="split"] .permission-request-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+}
+
+.permission-request-avatar > .provider-tile {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.permission-request-avatar > .provider-tile :is(svg, img) {
+  width: 30px;
+  height: 30px;
+}
+
+.permission-request[data-layout="split"] .permission-request-title {
+  font-size: 24px;
+  line-height: 1.22;
+  text-align: start;
+  text-wrap: balance;
+}
+
+.permission-request[data-layout="split"] .permission-request-chip {
+  justify-self: start;
+}
+
+.permission-request[data-layout="split"] .permission-request-subtitle,
+.permission-request[data-layout="split"] .permission-request-footnote {
+  margin-block-start: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-align: start;
+}
+
+.permission-request[data-layout="split"] .permission-request-explain {
+  border-radius: 12px;
+}
+
+.permission-request[data-layout="split"] .permission-request-aside {
+  padding: 16px 20px 0;
+  border-block: 1px solid var(--border);
+  background: var(--permission-request-band);
+}
+
+.permission-request[data-layout="split"] .permission-request-aside-viewport {
+  padding-block-end: 16px;
+}
+
+.permission-request[data-layout="split"]
+  .permission-request-aside[data-expanded] {
+  padding-block-end: 16px;
+}
+
+.permission-request[data-layout="split"] .permission-request-list-heading {
+  padding: 0 0 8px;
+  border-block-end: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.permission-request[data-layout="split"] .permission-request-list li + li {
+  border-block-start: 0;
+}
+
+.permission-request[data-layout="split"] .permission-request-item {
+  padding: 8px 0;
+}
+
+.permission-request[data-layout="split"] .connect-consent-points {
+  gap: 16px;
+  padding: 4px 0 0;
+}
+
+@media (min-width: 760px) {
+  .permission-request[data-layout="split"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "head aside"
+      "decision aside";
+    grid-template-rows: auto 1fr;
+    min-height: 400px;
+  }
+
+  .permission-request[data-layout="split"] .permission-request-head {
+    grid-area: head;
+    padding: 32px 32px 0;
+  }
+
+  .permission-request[data-layout="split"] .permission-request-decision {
+    grid-area: decision;
+    align-content: end;
+    padding: 20px 32px 32px;
+  }
+
+  /* The list keeps the height of the left column: its own size does not
+     count until the person opens it with "View all". */
+  .permission-request[data-layout="split"] .permission-request-aside {
+    grid-area: aside;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 32px 0;
+    border-block: 0;
+    border-inline-start: 1px solid var(--border);
+  }
+
+  .permission-request[data-layout="split"]
+    .permission-request-aside:not([data-expanded]) {
+    contain: size;
+  }
+
+  .permission-request[data-layout="split"] .permission-request-aside-viewport {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    padding-block-end: 32px;
+  }
+
+  .permission-request[data-layout="split"]
+    .permission-request-aside[data-expanded] {
+    padding-block-end: 24px;
+  }
+
+  .permission-request[data-layout="split"]
+    .permission-request-aside[data-expanded]
+    .permission-request-aside-viewport {
+    padding-block-end: 4px;
+  }
+
+  .permission-request[data-layout="split"]
+    .permission-request-aside[data-folded]
+    .permission-request-more {
+    inset-block-end: 18px;
+  }
+}
+
+/* Compact layout: a short request as a centred sheet over the page, with
+   one large app icon, the points in a filled box and full-width actions. */
+.permission-request[data-layout="compact"] {
+  position: relative;
+  width: min(440px, calc(100vw - 32px));
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px var(--border),
+    var(--shadow-card);
+}
+
+/* A page's own button rules (the Access page's pill buttons) must not reach
+   the close button of a prompt that the page opens. */
+.permission-request-dialog button:not(:where(.pantry-select-trigger)).permission-request-close {
+  position: absolute;
+  inset-block-start: 14px;
+  inset-inline-end: 14px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+
+.permission-request-dialog
+  button:not(:where(.pantry-select-trigger)).permission-request-close:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.permission-request-dialog button:not(:where(.pantry-select-trigger)).permission-request-close:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+/* Minimize sits beside the close button and turns the prompt into a toast
+   at the bottom right (see useMinimizablePrompt). */
+.permission-request-dialog
+  button:not(:where(.pantry-select-trigger)).permission-request-minimize {
+  position: absolute;
+  inset-block-start: 14px;
+  inset-inline-end: 54px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+
+.permission-request-dialog
+  button:not(:where(.pantry-select-trigger)).permission-request-minimize:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.permission-request-dialog
+  button:not(:where(.pantry-select-trigger)).permission-request-minimize:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+/* While a toast grows back into the modal, the morph draws the card; the
+   dialog skips its own entry and only the backdrop fades in. */
+.permission-request-dialog[data-morphing] {
+  transition: none;
+}
+
+.permission-request-dialog[data-morphing] > .permission-request {
+  opacity: 0;
+}
+
+.permission-request[data-layout="compact"] .permission-request-head {
+  gap: 8px;
+  padding: 36px 28px 4px;
+}
+
+.permission-request[data-layout="compact"] .permission-request-parties {
+  margin-block-end: 10px;
+}
+
+.permission-request[data-layout="compact"] .permission-request-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+}
+
+.permission-request[data-layout="compact"]
+  .permission-request-avatar
+  > .provider-tile
+  :is(svg, img) {
+  width: 40px;
+  height: 40px;
+}
+
+.permission-request[data-layout="compact"] .permission-request-title {
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.permission-request[data-layout="compact"] .permission-request-subtitle {
+  margin-block-start: 0;
+  font-size: 15px;
+}
+
+.permission-request[data-layout="compact"] .permission-request-aside {
+  margin-block-start: 18px;
+  padding-inline: 24px;
+}
+
+.permission-request[data-layout="compact"] .permission-request-aside-viewport {
+  position: relative;
+  overflow: hidden;
+  padding: 4px 20px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.permission-request[data-layout="compact"]
+  .permission-request-aside[data-folded]
+  .permission-request-aside-viewport::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 96px;
+  background: linear-gradient(to bottom, transparent, var(--surface) 72%);
+  pointer-events: none;
+}
+
+/* The sheet's title already says what is asked; the list heading stays for
+   screen readers. */
+.permission-request[data-layout="compact"] .permission-request-list-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.permission-request[data-layout="compact"] .permission-request-list li + li {
+  border-block-start: 0;
+}
+
+.permission-request[data-layout="compact"] .permission-request-item {
+  padding: 12px 0;
+}
+
+.permission-request[data-layout="compact"] .connect-consent-points {
+  gap: 18px;
+  padding: 16px 0;
+}
+
+.permission-request[data-layout="compact"] .permission-request-decision {
+  gap: 16px;
+  padding: 18px 24px 24px;
+}
+
+.permission-request[data-layout="compact"] .permission-request-footnote {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.permission-request[data-layout="compact"] .permission-request-button {
+  --permission-request-button-height: 46px;
+  --permission-request-button-text: 15px;
+}
+
+/* Result: the short card after a decision. The content is centred, so it
+   stays in place while the card shrinks or grows around it. */
+.permission-request[data-layout="result"] {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  width: min(400px, calc(100vw - 32px));
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px var(--border),
+    var(--shadow-card);
+}
+
+.permission-request-result {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: var(--permission-request-final-width, auto);
+  min-width: 0;
+  padding: 40px 28px 24px;
+}
+
+.permission-request-result-mark {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-block-end: 8px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-2);
+}
+
+.permission-request-result[data-tone="allowed"]
+  .permission-request-result-mark {
+  background: var(--pantry-success-surface);
+  color: var(--pantry-success-text);
+}
+
+.permission-request-result .permission-request-title {
+  font-size: 22px;
+}
+
+.permission-request-result .permission-request-subtitle {
+  margin-block-start: 0;
+  font-size: 14px;
+}
+
+.permission-request-result .permission-request-error {
+  margin-block-end: 0;
+  text-align: center;
+}
+
+.permission-request-result .permission-request-actions {
+  justify-self: stretch;
+  margin-block-start: 14px;
+}
+
+.permission-request-result .permission-request-button {
+  --permission-request-button-height: 46px;
+  --permission-request-button-text: 15px;
+}
+
+/* Consent points in the right-hand list take the list's surface. */
+.permission-request-aside .connect-consent-points {
+  gap: 14px;
+  margin: 0;
+  padding: 14px;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Every authorization screen is a modal card over the dimmed page. The dialog
+   is as large as its card, so it stays centred while the card resizes, and
+   it scrolls when the card is taller than the window. */
+.permission-request-dialog {
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  /* A modal dialog is fixed to all four edges; fit-content keeps it as tall
+     as its card. */
+  height: fit-content;
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: var(--ink);
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll, contain);
+  /* The page still scrolls when the opened list is taller than the window,
+     without a scroll bar beside the card. */
+  scrollbar-width: none;
+}
+
+.permission-request-dialog::-webkit-scrollbar {
+  display: none;
+}
+
+.permission-request-dialog[open] {
+  display: block;
+}
+
+.permission-request-dialog:focus {
+  outline: none;
+}
+
+.permission-request-dialog::backdrop {
+  background: color-mix(in oklch, var(--pantry-shadow-color) 45%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.permission-request-dialog > .permission-request {
+  margin: 0;
+}
+
+body:has(.permission-request-dialog[open]) {
+  overflow: hidden;
+}
+
+/* The screen moves like a connection sheet: it fades in and out, and with
+   motion allowed it rises from a 4px blur and lifts away as it leaves. A
+   sign-in screen that stands in for a sheet (data-stands-in) shows on that
+   sheet's backdrop and grows from the sheet instead of entering. */
+.permission-request-dialog,
+.permission-request-dialog::backdrop {
+  transition: opacity var(--sheet-fade);
+}
+
+@starting-style {
+  .permission-request-dialog[open],
+  .permission-request-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.permission-request-dialog[data-closing],
+.permission-request-dialog[data-closing]::backdrop {
+  opacity: 0;
+}
+
+.permission-request-dialog[data-closing] {
+  pointer-events: none;
+}
+
+.permission-request-dialog[data-stands-in]::backdrop {
+  background: transparent;
+  backdrop-filter: none;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .permission-request-dialog {
+    transition:
+      opacity var(--sheet-enter),
+      translate var(--sheet-enter),
+      filter var(--sheet-enter);
+  }
+
+  .permission-request-dialog::backdrop {
+    transition: opacity var(--sheet-enter);
+  }
+
+  @starting-style {
+    .permission-request-dialog[open] {
+      translate: 0 var(--sheet-rise);
+      filter: blur(4px);
+    }
+  }
+
+  .permission-request-dialog[data-closing] {
+    translate: 0 var(--sheet-lift);
+    filter: blur(4px);
+    transition:
+      opacity var(--sheet-exit),
+      translate var(--sheet-exit),
+      filter var(--sheet-exit);
+  }
+
+  .permission-request-dialog[data-closing]::backdrop {
+    transition: opacity var(--sheet-exit);
+  }
+
+  .permission-request-dialog[data-stands-in] {
+    transition: none;
+  }
+}
+
+/* The Portal stops every transition under reduced motion; the screen keeps
+   its fade, so it cross-fades instead of cutting. */
+@media (prefers-reduced-motion: reduce) {
+  .permission-request-dialog,
+  .permission-request-dialog::backdrop {
+    transition-duration: var(--sheet-fade-duration) !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .permission-request-button,
+  .permission-request-check svg,
+  .permission-request-more > svg {
+    transition:
+      background-color var(--motion-quick),
+      opacity var(--motion-quick),
+      rotate var(--motion-quick),
+      scale var(--motion-quick);
+  }
+
+  .permission-request-check input {
+    transition:
+      background-color var(--motion-quick),
+      box-shadow var(--motion-quick);
+  }
+
+  .permission-request-button:active:not([aria-disabled="true"]) {
+    scale: 0.97;
+  }
+
+  /* A change of view, such as the question to the result, resizes the card
+     from its old size; the script sets both sizes. */
+  .permission-request[data-resizing] {
+    transition:
+      width var(--motion-glide),
+      height var(--motion-glide);
+  }
+
+  .permission-request-result {
+    animation: permission-request-result-enter var(--motion-glide) both;
+    animation-delay: 60ms;
+  }
+
+  .permission-request-result-mark {
+    animation: permission-request-mark-enter var(--motion-glide) both;
+    animation-delay: 140ms;
+  }
+
+  .permission-request-spin {
+    animation: permission-request-spin 0.65s linear infinite;
+  }
+}
+
+@keyframes permission-request-result-enter {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes permission-request-mark-enter {
+  from {
+    opacity: 0;
+    scale: 0.5;
+  }
+
+  60% {
+    opacity: 1;
+    scale: 1.08;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes permission-request-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (max-width: 480px) {
+  .permission-request-head {
+    padding: 26px 16px 12px;
+  }
+
+  .permission-request-aside,
+  .permission-request[data-layout="split"] .permission-request-aside {
+    padding-inline: 16px;
+  }
+
+  .permission-request-decision {
+    padding: 12px 16px 16px;
+  }
+
+  .permission-request[data-layout="split"] .permission-request-title {
+    font-size: 21px;
+  }
+
+  .permission-request-select button:where(.pantry-select-trigger) {
+    font-size: 16px;
+  }
+}
+
+@media (forced-colors: active) {
+  .permission-request,
+  .permission-request-list {
+    border: 1px solid CanvasText;
+  }
+
+  .permission-request
+    .permission-request-actions
+    button:not(:where(.pantry-select-trigger)).permission-request-button[data-tone] {
+    border: 1px solid ButtonText;
+  }
+
+  .permission-request-check input {
+    appearance: auto;
+  }
+
+  .permission-request-check svg {
+    display: none;
+  }
+}

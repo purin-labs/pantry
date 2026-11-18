@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
+    "erasableSyntaxOnly": false
+  },
+  "include": [
+    "src/recipes/bakery/**/*.ts",
+    "src/recipes/*/model.ts",
+    "src/recipes/pour-over/sample.ts",
+    "src/runs/**/*.ts",
+    "src/floor/**/*.ts",
+    "src/simulator/**/*.ts",
+    "src/execution-manifest.generated.ts"
+  ],
+  "exclude": []
+}

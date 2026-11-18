@@ -1,0 +1,72 @@
+{
+  "name": "@seams/production-simulation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./execution-entry": "./src/execution-entry.ts",
+    "./native/cell-adapter": "./src/native/cell-adapter.ts",
+    "./native/wasm-transport": "./src/native/wasm-transport.ts",
+    "./native/model-packs": "./src/native/model-packs.ts",
+    "./recipes/cold-cell-journey": "./src/recipes/cold-cell-journey.ts",
+    "./recipes/recurring-cold-cell": "./src/recipes/recurring-cold-cell.ts",
+    "./recipes/contract-example": "./src/recipes/contract-example.ts",
+    "./recipes/bakery/cafe-shift": "./src/recipes/bakery/cafe-shift.ts",
+    "./scenario-document": "./src/scenario-document.ts",
+    "./recipes/bakery/espresso": "./src/recipes/bakery/espresso.ts",
+    "./recipes/bakery/latte": "./src/recipes/bakery/latte.ts",
+    "./recipes/bakery/siphon": "./src/recipes/bakery/siphon.ts",
+    "./recipes/bakery/pour-over": "./src/recipes/bakery/pour-over.ts",
+    "./recipes/bakery/schedule": "./src/recipes/bakery/schedule.ts",
+    "./recipes/bakery/appliance-execution": "./src/recipes/bakery/appliance-execution.ts",
+    "./recipes/bakery/financier": "./src/recipes/bakery/financier.ts",
+    "./recipes/bakery/financier-flavours": "./src/recipes/bakery/financier-flavours.ts",
+    "./recipes/bakery/pie": "./src/recipes/bakery/pie.ts",
+    "./recipes/bakery/pie-products": "./src/recipes/bakery/pie-products.ts",
+    "./recipes/bakery/black-sesame": "./src/recipes/bakery/black-sesame.ts",
+    "./recipes/bakery/black-sesame-milk": "./src/recipes/bakery/black-sesame-milk.ts",
+    "./recipes/bakery/tea": "./src/recipes/bakery/tea.ts",
+    "./recipes/bakery/ginger-milk-tea": "./src/recipes/bakery/ginger-milk-tea.ts",
+    "./recipes/bakery/shift-report": "./src/recipes/bakery/shift-report.ts",
+    "./recipes/bakery/bakery-shift": "./src/recipes/bakery/bakery-shift.ts",
+    "./recipes/bakery/recurring-financier": "./src/recipes/bakery/recurring-financier.ts",
+    "./recipes/bakery/mixed-tea": "./src/recipes/bakery/mixed-tea.ts",
+    "./recipes/bakery/tea-process": "./src/recipes/bakery/tea-process.ts",
+    "./recipes/bakery/ginger-black-tea": "./src/recipes/bakery/ginger-black-tea.ts",
+    "./recipes/bakery/human-cell-transfer": "./src/recipes/bakery/human-cell-transfer.ts",
+    "./recipes/bakery/native-continuation": "./src/recipes/bakery/native-continuation.ts",
+    "./recipes/bakery/physics-playback": "./src/recipes/bakery/physics-playback.ts",
+    "./recipes/bakery/production-material": "./src/recipes/bakery/production-material.ts",
+    "./recipes/bakery/production-workcells": "./src/recipes/bakery/production-workcells.ts",
+    "./recipes/bakery/run-faults": "./src/recipes/bakery/run-faults.ts",
+    "./recipes/bakery/workcell-attempt": "./src/recipes/bakery/workcell-attempt.ts",
+    "./recipes/bakery/workcell-experiment": "./src/recipes/bakery/workcell-experiment.ts",
+    "./recipes/bakery/workcell-input": "./src/recipes/bakery/workcell-input.ts",
+    "./recipes/bakery/workcell-instances": "./src/recipes/bakery/workcell-instances.ts",
+    "./execution-manifest": "./src/execution-manifest.generated.ts",
+    "./runs/*": "./src/runs/*.ts",
+    "./floor/*": "./src/floor/*.ts",
+    "./simulator/*": "./src/simulator/*.ts",
+    "./kinematics/*": "./src/kinematics/*.ts",
+    "./recipes/*": "./src/recipes/*.ts"
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit && tsrs --project tsconfig.recipes.json --noEmit"
+  },
+  "dependencies": {
+    "@seams/bakery-model": "workspace:*",
+    "@seams/contracts": "workspace:*",
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "fflate": "0.8.3",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

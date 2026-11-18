@@ -1,0 +1,104 @@
+/* Above the composer rule that makes each of its buttons a round icon. */
+.chat-composer .chat-screen-chip {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  min-height: 24px;
+  margin: 0 0 6px;
+  padding: 2px 8px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.chat-composer .chat-screen-chip > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-composer .chat-screen-chip[data-attached="true"] {
+  border-color: transparent;
+  background: var(--ground);
+  color: var(--ink);
+}
+.chat-composer .chat-screen-chip:focus-visible {
+  outline: 2px solid var(--ink-2);
+  outline-offset: 1px;
+}
+.chat-sent-from {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 11px;
+}
+.chat-composer .chat-screen-chip[data-attached="blocked"] {
+  border-color: transparent;
+  cursor: default;
+  white-space: normal;
+}
+/* The Jev suggestion beside the off chip (Plan 87 section 3A). */
+.chat-composer .chat-screen-suggestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 0 6px;
+}
+.chat-composer .chat-screen-suggestion > .chat-screen-chip {
+  margin: 0;
+}
+.chat-composer .chat-screen-tag {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.chat-composer .chat-screen-question {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--ground);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.chat-composer .chat-screen-question-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chat-composer .chat-screen-question-actions > button {
+  width: auto;
+  height: auto;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chat-composer .chat-screen-question-actions > button:first-child {
+  border-color: transparent;
+  background: var(--ink);
+  color: var(--ground);
+}
+.chat-composer .chat-screen-question-actions > button:focus-visible {
+  outline: 2px solid var(--ink-2);
+  outline-offset: 1px;
+}

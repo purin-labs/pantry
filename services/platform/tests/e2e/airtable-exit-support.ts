@@ -1,0 +1,156 @@
+// The Airtable account and the pending list of the journeys of a held Airtable
+// write (Plan 27C, Plan 89).
+import { env, exports } from "cloudflare:workers";
+import { expect } from "vitest";
+import { isRecord } from "@seams/std";
+
+import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import type { IssuedControlSession } from "../../src/data/control-plane";
+import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { parseUserId } from "../../src/ids";
+import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { accessControlPath, enableCapability } from "./access-route-support";
+import { commerceHeaders } from "./commerce-support";
+import { fixtureDatabase } from "./organisation-database";
+import {
+  CHANNEL_ID,
+  createRequiredGrant,
+  ORGANISATION_ID,
+  SLACK_ACTOR_USER_ID,
+} from "./slack-journey-support";
+
+const TOKEN = "airtable-exit-approval-token";
+export const BASE_ID = "appExitApproval";
+export const SUPPLIER_BASE_ID = "appExitSuppliers";
+
+export async function pending(
+  session: IssuedControlSession,
+): Promise<readonly Record<string, unknown>[]> {
+  const response = await exports.default.fetch(
+    `${accessControlPath(ORGANISATION_ID)}/permission-requests`,
+    { headers: commerceHeaders(session) },
+  );
+  expect(response.status).toBe(200);
+  const body: unknown = await response.json();
+  if (!isRecord(body) || !Array.isArray(body.heldOutputs))
+    throw new Error("Pending list invalid");
+  return body.heldOutputs.filter(isRecord);
+}
+
+export async function connectAirtable(
+  owner: IssuedControlSession,
+  slackAccountId: string,
+): Promise<string> {
+  const user = parseUserId(SLACK_ACTOR_USER_ID);
+  const handle = parseVaultHandle("vault:airtable:exit-approval");
+  if (!user.ok || !handle.ok) throw new Error("Invalid provider identity");
+  const now = Date.now();
+  await fixtureDatabase().batch([
+    fixtureDatabase()
+      .prepare(
+        "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_airtable_exit', activated_at = ? WHERE organisation_id = ?",
+      )
+      .bind(now, ORGANISATION_ID),
+    fixtureDatabase()
+      .prepare(
+        "UPDATE workspace_ai_budget SET max_tokens = 128000, previous_limits_json = json_set(previous_limits_json, '$.maxTokens', 128000) WHERE organisation_id = ?",
+      )
+      .bind(ORGANISATION_ID),
+  ]);
+  const stored = await storeVaultSecret({
+    db: fixtureDatabase(),
+    keys: env,
+    organisationId: ORGANISATION_ID,
+    handle: handle.value,
+    secret: { kind: "bearer", value: TOKEN },
+    now,
+  });
+  if (!stored.ok) throw new Error(stored.error.code);
+  const connected = await createActiveConnectedIntegration(fixtureDatabase(), {
+    organisationId: ORGANISATION_ID,
+    provider: "airtable",
+    providerSubjectId: "usrExitApproval",
+    environment: "development",
+    authMode: "api_key",
+    authority: { kind: "connection_credential", credentialRef: handle.value },
+    grantedScopes: ["data.records:read", "data.records:write"],
+    createdByUserId: user.value,
+    providerAccountId: "usrExitApproval",
+    accountKind: "user_grant",
+    displayName: "Order base",
+    capabilities: [
+      CAPABILITY_KEYS.airtableApiRead,
+      CAPABILITY_KEYS.airtableApiWrite,
+    ],
+    audiencePolicy: { kind: "operator" },
+    retentionPolicy: { kind: "organisation_default" },
+    now,
+  });
+  const accountId = connected.account.integrationAccountId;
+  // A channel turn acts for the channel and for the person, so each holds them.
+  const subjects = [
+    { kind: "organisation_role", role: "operator" },
+    { kind: "organisation_role", role: "owner" },
+    {
+      kind: "conversation",
+      integrationAccountId: slackAccountId,
+      conversationId: CHANNEL_ID,
+    },
+  ] as const;
+  for (const capabilityId of [
+    CAPABILITY_KEYS.airtableApiRead,
+    CAPABILITY_KEYS.airtableApiWrite,
+  ]) {
+    await enableCapability(ORGANISATION_ID, owner, capabilityId);
+    for (const baseId of [BASE_ID, SUPPLIER_BASE_ID])
+      for (const [index, subject] of subjects.entries())
+        await createRequiredGrant({
+          grantId: `grant_airtable_exit_${capabilityId}_${baseId}_${index}`,
+          subject,
+          target: {
+            kind: "provider_resource",
+            capabilityId,
+            capabilityVersion: 1,
+            integrationAccountId: accountId,
+            resourceScope: `base:${baseId}`,
+          },
+          now,
+        });
+  }
+  const organisation = await requireActiveOrganisationActor({
+    env,
+    organisationId: ORGANISATION_ID,
+    now,
+  });
+  const published = await compilePublishAndActivateOrganisationPolicy({
+    bindings: { db: fixtureDatabase(), kv: env.POLICY_KV },
+    organisation,
+    organisationId: ORGANISATION_ID,
+    now,
+  });
+  if (!published.ok) throw new Error(published.error.code);
+  return accountId;
+}
+
+/** A Portal request of this member, as one Case command. */
+export function command(
+  session: IssuedControlSession,
+  key: string,
+): Promise<Response> {
+  return exports.default.fetch(
+    `https://localhost/v1/control/organisations/${ORGANISATION_ID}/cases/commands`,
+    {
+      method: "POST",
+      headers: {
+        origin: "https://localhost",
+        "content-type": "application/json",
+        "idempotency-key": key,
+        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        "x-satyr-csrf": session.csrfToken,
+      },
+      body: JSON.stringify({ instruction: "Add order 481 to the order base." }),
+    },
+  );
+}

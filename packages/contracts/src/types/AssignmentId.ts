@@ -1,0 +1,2 @@
+
+export type AssignmentId = string;

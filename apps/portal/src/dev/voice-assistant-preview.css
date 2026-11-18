@@ -1,0 +1,116 @@
+html,
+body,
+#root {
+  min-block-size: 100%;
+  margin: 0;
+}
+
+.voice-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-block-size: 100dvh;
+  padding: 64px 24px 32px;
+  background: #111;
+  color: #f2f2f2;
+}
+
+.voice-preview[data-theme="light"] {
+  background: #f9f9f9;
+  color: #0d0d0d;
+}
+
+.voice-preview-heading {
+  text-align: center;
+}
+
+.voice-preview-heading p:first-child {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.voice-preview-heading h1 {
+  margin: 12px 0 8px;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.voice-preview-heading p {
+  margin: 0;
+  color: #909090;
+  font-size: 13px;
+}
+
+.voice-preview-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  inline-size: min(100%, 560px);
+  padding-block: 48px;
+}
+
+.voice-assistant-transcript > p {
+  margin: 0;
+}
+
+.voice-preview-word {
+  opacity: 0;
+  transition: opacity 350ms var(--pantry-spring-smooth-ease);
+}
+
+.voice-preview-word[data-visible="true"] {
+  opacity: 1;
+}
+
+.voice-preview-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.voice-preview-controls button:not(:where(.pantry-select-trigger)) {
+  min-block-size: 36px;
+  padding: 8px 14px;
+  border: 1px solid rgb(128 128 128 / 20%);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.voice-preview-controls button:not(:where(.pantry-select-trigger)):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.voice-preview-help {
+  margin: 18px 0 40px;
+  color: #909090;
+  font-size: 11px;
+  line-height: 1.8;
+  text-align: center;
+}
+
+.voice-preview-credit {
+  margin-block-start: auto;
+  color: #909090;
+  font-size: 10px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.voice-preview-credit a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-preview-word {
+    transition: none;
+  }
+}

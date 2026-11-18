@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "name": "GitHub",
+  "description": "Read the authenticated GitHub account and its repositories.",
+  "origin": "https://api.github.com",
+  "authentication": {
+    "kind": "header",
+    "name": "Authorization"
+  },
+  "documentation": [
+    {
+      "url": "https://docs.github.com/en/rest/users/users#get-the-authenticated-user",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "url": "https://docs.github.com/en/rest/repos/repos#list-repositories-for-the-authenticated-user",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "operations": [
+    {
+      "id": "current_user",
+      "description": "Read the authenticated GitHub user.",
+      "effect": { "kind": "read" },
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "transport": {
+        "kind": "rest",
+        "method": "GET",
+        "pathTemplate": "/user",
+        "pathBindings": {},
+        "queryBindings": {},
+        "bodyBindings": null
+      },
+      "response": {
+        "successStatuses": [200],
+        "resultPointer": "",
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "integer" },
+            "login": { "type": "string", "minLength": 1, "maxLength": 39 }
+          },
+          "required": ["id", "login"],
+          "additionalProperties": false
+        },
+        "classification": "internal"
+      },
+      "pagination": { "kind": "none" }
+    },
+    {
+      "id": "list_repositories",
+      "description": "List repositories visible to the authenticated user.",
+      "effect": { "kind": "read" },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 100 }
+        },
+        "required": ["per_page"],
+        "additionalProperties": false
+      },
+      "transport": {
+        "kind": "rest",
+        "method": "GET",
+        "pathTemplate": "/user/repos",
+        "pathBindings": {},
+        "queryBindings": {
+          "per_page": { "kind": "input", "field": "per_page" }
+        },
+        "bodyBindings": null
+      },
+      "response": {
+        "successStatuses": [200],
+        "resultPointer": "",
+        "outputSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 201
+              },
+              "id": { "type": "integer" }
+            },
+            "required": ["full_name", "id"],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 100
+        },
+        "classification": "internal"
+      },
+      "pagination": { "kind": "none" }
+    }
+  ],
+  "identity": {
+    "operationId": "current_user",
+    "arguments": {},
+    "accountIdPointer": "/id",
+    "displayNamePointer": "/login"
+  },
+  "limits": {
+    "wireBytes": 524288,
+    "decodedBytes": 524288
+  }
+}

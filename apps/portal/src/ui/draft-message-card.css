@@ -1,0 +1,385 @@
+/* A message the agent drafted for another app, waiting for a person to send
+   it. Colors come from the portal theme tokens, so light and dark follow the
+   active theme. */
+.draft-message {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 680px);
+  min-width: 0;
+  padding: 14px 14px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.draft-message p {
+  margin: 0;
+}
+
+.draft-message-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-inline: 4px;
+}
+
+.draft-message-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.draft-message-icon > .provider-tile {
+  width: 22px;
+  height: 22px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.draft-message-icon > .provider-tile :is(svg, img),
+.draft-message-icon > :is(svg, img) {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.draft-message-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.draft-message-status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.draft-message-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.draft-message[data-status="ready"] .draft-message-dot {
+  background: var(--ok-text);
+}
+
+.draft-message[data-status="sent"] .draft-message-status {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+
+.draft-message[data-status="sent"] .draft-message-dot {
+  background: var(--ok-text);
+}
+
+.draft-message:is([data-status="unconfirmed"], [data-status="unavailable"])
+  .draft-message-dot {
+  background: var(--warn-text);
+}
+
+.draft-message-sheet {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.draft-message-fields {
+  margin: 0;
+}
+
+.draft-message-field {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 16px;
+  border-block-end: 1px solid var(--border);
+}
+
+.draft-message-fields:last-child .draft-message-field:last-child {
+  border-block-end: 0;
+}
+
+.draft-message-field dt {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.draft-message-field dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.draft-message-select {
+  max-width: 100%;
+  min-height: 44px;
+  margin-block: -4px;
+  padding: 0 28px 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--border);
+  color: var(--ink);
+  font: inherit;
+}
+
+.draft-message-select:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.draft-message-body {
+  max-height: none;
+  padding: 14px 16px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.draft-message-body[data-placeholder] {
+  color: var(--ink-3);
+}
+
+/* About nine lines, then fold. Folding is decided by measuring, so a short
+   message never shows a Show more control. */
+.draft-message-body:not([data-expanded]) {
+  max-height: calc(14px * 1.5 * 9 + 28px);
+  overflow: hidden;
+}
+
+.draft-message-body[data-folded] {
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+}
+
+.draft-message-review {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding-inline: 4px;
+}
+
+.draft-message-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: -6px 0 6px 8px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.draft-message-more:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.draft-message-more[aria-expanded="true"] svg {
+  rotate: 180deg;
+}
+
+.draft-message-edit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 10px;
+  padding: 12px;
+}
+
+.draft-message-edit textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 96px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--border);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.draft-message-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.draft-message-notice {
+  padding-inline: 4px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.draft-message-error {
+  padding-inline: 4px;
+  color: var(--danger-text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.draft-message-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.draft-message-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.draft-message-button[data-tone="primary"] {
+  background: var(--pantry-primary);
+  box-shadow: var(--pantry-primary-ring);
+  color: var(--pantry-on-primary);
+}
+
+.draft-message-button[data-tone="primary"]:hover:not([aria-disabled="true"]) {
+  background: var(--pantry-primary-hover);
+}
+
+.draft-message-button[data-tone="secondary"] {
+  background: var(--paper);
+  box-shadow: var(--pantry-button-ring);
+  color: var(--ink);
+}
+
+.draft-message-button[data-tone="quiet"] {
+  padding-inline: 12px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+
+.draft-message-button:is(
+    [data-tone="secondary"],
+    [data-tone="quiet"]
+  ):hover:not([aria-disabled="true"]) {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.draft-message-button[aria-disabled="true"] {
+  cursor: default;
+}
+
+.draft-message-button[aria-disabled="true"]:not(:has(.draft-message-spin)) {
+  opacity: 0.55;
+}
+
+.draft-message:focus-visible,
+.draft-message-button:focus-visible,
+.draft-message-more:focus-visible,
+.draft-message-edit textarea:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.draft-message-approval {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: auto;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .draft-message-button,
+  .draft-message-more svg {
+    transition:
+      background-color var(--motion-quick),
+      opacity var(--motion-quick),
+      rotate var(--motion-quick),
+      scale var(--motion-quick);
+  }
+
+  .draft-message-button:active:not([aria-disabled="true"]) {
+    scale: 0.97;
+  }
+
+  .draft-message-spin {
+    animation: draft-message-spin 0.65s linear infinite;
+  }
+}
+
+@keyframes draft-message-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (max-width: 480px) {
+  .draft-message-head {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+
+  .draft-message-status {
+    grid-column: 2;
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  .draft-message-more {
+    min-height: 44px;
+  }
+  .draft-message-field {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .draft-message-approval {
+    flex-basis: 100%;
+    margin-inline-start: 4px;
+  }
+}
+
+@media (forced-colors: active) {
+  .draft-message,
+  .draft-message-sheet {
+    border: 1px solid CanvasText;
+  }
+}

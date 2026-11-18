@@ -1,0 +1,20 @@
+[workspace]
+resolver = "3"
+exclude = ["crates/bakery-native"]
+members = [
+    "crates/custom-connector-fetch",
+    "crates/message-link-fetch",
+    "crates/workspace-executor",
+    "crates/media-inspect",
+    "crates/shop-gateway",
+]
+[workspace.package]
+edition = "2024"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+sha2 = "0.10"
+unicode-normalization = "0.1"

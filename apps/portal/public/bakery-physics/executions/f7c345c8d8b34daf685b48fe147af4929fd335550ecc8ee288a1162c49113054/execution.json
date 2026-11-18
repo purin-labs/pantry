@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "bundle": {
+    "id": "f7c345c8d8b34daf685b48fe147af4929fd335550ecc8ee288a1162c49113054",
+    "backend": "browser",
+    "protocolVersion": 5,
+    "checkpointSchemaVersion": 4,
+    "controllerSourceHash": "f4a7cfc227c4aa83660449bc07d70f7102f65447d429ead64b21963c27a58cd5",
+    "controllerHash": "98ef64f4ce73f43a684c88b2365e03ab6d82a4bbdd5aebf34a797603b54482a8",
+    "runtimeHash": "f0aef22352294ed400901a49d95d374aef44f3563b0fecebe28148bc04f5f74a",
+    "engineHash": "75a25491238e2600fab350fe796b4f29be517b177454c0c1d247c265d59e65db"
+  },
+  "engine": {
+    "file": "production-engine.mjs",
+    "sha256": "75a25491238e2600fab350fe796b4f29be517b177454c0c1d247c265d59e65db",
+    "byteLength": 809959
+  },
+  "runtime": {
+    "id": "31da6f43ef17b1989682e4f2c19745da7feffeac5dc1da9743b606ea059d8d57",
+    "files": [
+      {
+        "file": "bakery-native.js",
+        "sha256": "1a1d72dc999626d2be2da9e8651b8fd66c7595b6f486fd3d0bd69e559d05cdb4",
+        "byteLength": 65863
+      },
+      {
+        "file": "bakery_native.wasm",
+        "sha256": "59e3d8f39c2381a32c98ab429b110628885cabcfe67cdd2684e3b81d780dede9",
+        "byteLength": 6256090
+      },
+      {
+        "file": "models.json",
+        "sha256": "0632c1801b10b0bc8ce048c0db7fae57fde9aa68bbc3e61d804f9ab136654bc6",
+        "byteLength": 22922
+      },
+      {
+        "file": "models-aicoh-ms-30.pack",
+        "sha256": "cdad6e1ef017d5e726ebd1b4152071a827b60d98ffe8f74fb0a1f2b4aaf711b3",
+        "byteLength": 3434425
+      },
+      {
+        "file": "models-core.pack",
+        "sha256": "92c47f05f120e8cd2171446c2534dbc1b8232e7b5d95352045b13388da3893e3",
+        "byteLength": 655377
+      },
+      {
+        "file": "models-dobot-cr10.pack",
+        "sha256": "e9625f724c3678e086c16f62491a6438ec567e9438b35136c01444d4448d9698",
+        "byteLength": 3574434
+      },
+      {
+        "file": "models-fairino-fr10.pack",
+        "sha256": "59320a64d83e938c213b98c98107be6d7384607ba7e840bc11c3bd50723f6f17",
+        "byteLength": 4991409
+      },
+      {
+        "file": "models-fairino-fr5.pack",
+        "sha256": "f3ea0465f4e90c1741097e3e4f6f3d3af89db4b5ac8388bbabc75a9914ecb8b9",
+        "byteLength": 3645907
+      },
+      {
+        "file": "models-fanuc-crx10ial.pack",
+        "sha256": "3d5acecdd3aac2404ec68197e428dd8894bbcf598c8fa22f69bd27ab9cfc4683",
+        "byteLength": 949574
+      },
+      {
+        "file": "models-ufactory-xarm6.pack",
+        "sha256": "5b6788fb7e3e1eb8a5be989afdb8b7979fabab340f013b53bef7c192a9997557",
+        "byteLength": 1498327
+      },
+      {
+        "file": "models-universal-robots-ur5e.pack",
+        "sha256": "ae5f22351250610d063c878e0a3e477b06ca6594147697c9503f358eead92040",
+        "byteLength": 1200748
+      },
+      {
+        "file": "models-hobart-hl200.pack",
+        "sha256": "ebea44337da6c74767b6f71648af6c56ab6ad2dbce1e6df159c624a71291b23b",
+        "byteLength": 2258615
+      },
+      {
+        "file": "models-winterhalter-uc-l.pack",
+        "sha256": "7ac4101a33e86e17998ce8ea3d2e933524ffb6e7bc1a966693d62be12308feb6",
+        "byteLength": 119067
+      }
+    ]
+  }
+}

@@ -1,0 +1,2 @@
+
+export type HarnessSubmissionId = string;

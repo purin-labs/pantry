@@ -1,0 +1,25 @@
+{
+  "name": "@seams/commerce-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Underclerk's typed commerce client: wire parsers and the admin and storefront API clients.",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams/commerce-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

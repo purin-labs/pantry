@@ -1,0 +1,114 @@
+/* Plan 40B phase 5: the board's style panel, in the editor's side panel. */
+
+.menu-board-style {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-board-style-presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.menu-board-style-presets button:not(:where(.pantry-select-trigger)) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.menu-board-style-presets button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 2px var(--ink, #1f1a14);
+}
+
+.menu-board-style-swatch {
+  flex: none;
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.menu-board-style-swatch span {
+  width: 8px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.menu-board-style-colors {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.menu-board-style-colors legend {
+  margin-bottom: 6px;
+  font-size: var(--pantry-text-label);
+  color: var(--ink-2);
+}
+
+.menu-board-style-colors label {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-board-style-colors input[type="color"] {
+  width: 36px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+}
+
+.menu-board-style-colors code {
+  font-size: var(--pantry-text-label);
+  color: var(--ink-2);
+}
+
+.menu-board-style-contrast {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+  font-size: var(--pantry-text-label);
+}
+
+.menu-board-style-contrast[data-readable="false"] {
+  color: var(--danger, #b42318);
+}
+
+.menu-board-style-contrast[data-readable="false"] span:last-child {
+  flex-basis: 100%;
+}
+
+.menu-board-style-type {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.menu-board-style-scale {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  font-size: var(--pantry-text-label);
+}
+
+.menu-board-style-scale li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink-2);
+}

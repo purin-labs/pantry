@@ -1,0 +1,122 @@
+/* GrainFieldSelect: the Portal Select with a swatch trigger and a dark glass
+   popup. It sits on a coloured ground, so the trigger is glass too, and its
+   keyboard focus shows as darker glass, with no ring. select.css owns the
+   caret; the swatch variant has none. */
+
+.pantry-select-trigger.pantry-grain-select-trigger {
+  background-color: rgba(10, 10, 10, 0.26);
+}
+
+.pantry-select-trigger.pantry-grain-select-trigger[data-variant="swatch"]:hover:not(
+    :disabled
+  ) {
+  background-color: rgba(10, 10, 10, 0.42);
+}
+
+.pantry-select-trigger.pantry-grain-select-trigger[data-popup-open],
+.pantry-select-trigger.pantry-grain-select-trigger:focus-visible {
+  outline: none;
+  background-color: rgba(10, 10, 10, 0.48);
+}
+
+.pantry-grain-select-swatch {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background-position: center;
+  background-size: cover;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  transition: scale var(--pantry-motion-fast) ease;
+}
+
+.pantry-grain-select-trigger[data-popup-open] .pantry-grain-select-swatch {
+  scale: 1.12;
+}
+
+/* Wide enough for the longest name with a tag: the Portal item keeps 32px at
+   its end for the check. */
+.pantry-select-popup.pantry-grain-select-popup {
+  width: 288px;
+  min-width: 0;
+  padding: 6px;
+  border-radius: 16px;
+  color: #ffffff;
+  background: rgba(22, 24, 28, 0.78);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 24px 48px -16px rgba(0, 0, 0, 0.55);
+  font-size: 13.5px;
+}
+
+.pantry-grain-select-popup .pantry-select-scroll {
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+}
+
+.pantry-grain-select-label {
+  padding: 6px 10px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pantry-grain-select-item {
+  min-height: 36px;
+  padding-block: 0;
+  padding-inline: 7px 32px;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pantry-grain-select-item[data-highlighted] {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.pantry-grain-select-item[data-selected] {
+  font-weight: 600;
+}
+
+.pantry-grain-select-item .pantry-select-item-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pantry-grain-select-thumb {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background-position: center;
+  background-size: cover;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.pantry-grain-select-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pantry-grain-select-tag {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantry-grain-select-swatch {
+    transition: none;
+  }
+}

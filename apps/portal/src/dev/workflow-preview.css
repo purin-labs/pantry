@@ -1,0 +1,37 @@
+.development-fixture-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 12px;
+  color: var(--ink-2);
+}
+
+.development-fixture-notice > svg {
+  flex: none;
+}
+
+.development-fixture-copy {
+  display: grid;
+  gap: 2px;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.development-fixture-copy > :first-child {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .development-fixture-notice {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .development-fixture-copy {
+  display: none;
+}

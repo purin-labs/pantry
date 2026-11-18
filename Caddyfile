@@ -1,0 +1,58 @@
+{
+	auto_https disable_redirects
+	default_bind 127.0.0.1
+}
+
+http://cafe.localhost:3001 {
+	@root {
+		path /
+		not header Connection *Upgrade*
+	}
+	redir @root /store/cafe 302
+
+	@underclerk path /v1/*
+	handle @underclerk {
+		reverse_proxy 127.0.0.1:3102
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:3104
+	}
+}
+
+http://store.localhost:3002 {
+	@root {
+		path /
+		not header Connection *Upgrade*
+	}
+	redir @root /store/shipping 302
+
+	@underclerk path /v1/*
+	handle @underclerk {
+		reverse_proxy 127.0.0.1:3102
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:3104
+	}
+}
+
+https://localhost:3003 {
+	tls internal
+	@platform path /v1/* /hook/* /slack/* /health /cdn-cgi/*
+	handle @platform {
+		reverse_proxy 127.0.0.1:3101
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:3103
+	}
+}
+
+http://docs.localhost:3005 {
+	reverse_proxy 127.0.0.1:3105
+}
+
+http://underclerk.localhost:3004 {
+	reverse_proxy 127.0.0.1:3102
+}

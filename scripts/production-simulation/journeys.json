@@ -1,0 +1,2678 @@
+{
+  "about": "Every Kitchen physics journey of scripts/production-simulation and scripts/bakery-robots (Refactor 16, step 14). run-journeys.mjs runs them, and its --check (pnpm lint:journey-index) refuses a journey file with no row. Tiers: fast runs in less than 300 s, slow takes 300 s or more or a large heap, browser needs a Portal page. lastRun is the last measured time on one Mac; a journey that does not pass gives failure.reason and failure.proof. The set ci is the headless part of the bakery-physics CI job, in its order.",
+  "sets": {
+    "ci": [
+      "two-cell",
+      "batch-cycles",
+      "oven-native",
+      "oven-wasm",
+      "oven-engine",
+      "financier",
+      "schedule-layout",
+      "native-financier",
+      "oven-financier",
+      "authoring",
+      "material",
+      "recovery-native",
+      "recovery-wasm",
+      "robot-limits",
+      "ur5e-payload-envelope",
+      "ingredient-loads",
+      "ur5e-mass-check"
+    ],
+    "ci-browser": [
+      "rehearsal-presets-browser",
+      "rehearsal-presets-artifacts",
+      "robot-selection-browser",
+      "robot-selection-artifacts",
+      "chat-scheduled-browser",
+      "chat-scheduled-artifacts",
+      "ingredient-concurrency",
+      "engine-cell-browser",
+      "financier-browser",
+      "financier-browser-artifact",
+      "native-financier-browser",
+      "native-financier-browser-artifact",
+      "oven-financier-browser",
+      "oven-workspace-browser",
+      "oven-authoring-browser",
+      "oven-engine-browser",
+      "oven-engine-browser-artifact",
+      "batch-recovery-browser",
+      "recovery-browser",
+      "recovery-browser-artifact",
+      "two-cell-workspace-browser",
+      "persistent-chat-browser"
+    ]
+  },
+  "journeys": [
+    {
+      "id": "two-cell",
+      "file": "scripts/production-simulation/verify-two-cell-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70A",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "dir": "two-cell",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 54.5,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "batch-cycles",
+      "file": "scripts/production-simulation/verify-batch-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70A",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "dir": "batch-cycles",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 10.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "oven-native",
+      "file": "scripts/production-simulation/verify-persistent-oven-cell.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "dir": "oven-native",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 12.7,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "oven-wasm",
+      "file": "scripts/production-simulation/verify-persistent-oven-cell.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "env": {
+          "PLAN_70_BROWSER_BUNDLE": "{runtime}"
+        }
+      },
+      "dir": "oven-wasm",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 12.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "oven-engine",
+      "file": "scripts/production-simulation/verify-oven-engine-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "tsx",
+        "args": ["{runtime}", "{out}"]
+      },
+      "dir": "oven-engine",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 37.5,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "financier",
+      "file": "scripts/production-simulation/verify-financier-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "dir": "financier",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 6.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "schedule-layout",
+      "file": "scripts/production-simulation/verify-schedule-layout-journey.mjs",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "dir": "schedule-layout",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 3.7,
+        "date": "2026-11-17",
+        "commit": "3c3c91031"
+      }
+    },
+    {
+      "id": "native-financier",
+      "file": "scripts/production-simulation/verify-native-financier-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "dir": "native-financier",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 104.9,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "oven-financier",
+      "file": "scripts/production-simulation/verify-oven-financier-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "dir": "oven-financier",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 146.3,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "authoring",
+      "file": "scripts/bakery-robots/verify-production-authoring.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "dir": "authoring",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.9,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "material",
+      "file": "scripts/bakery-robots/verify-production-material.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "dir": "material",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 2,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "recovery-native",
+      "file": "scripts/production-simulation/verify-recovery-journey.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 70A",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "dir": "recovery-native",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 4.6,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "recovery-wasm",
+      "file": "scripts/production-simulation/verify-recovery-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70A",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "env": {
+          "PLAN_70_BROWSER_BUNDLE": "{runtime}"
+        }
+      },
+      "dir": "recovery-wasm",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 4.4,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "robot-limits",
+      "file": "scripts/production-simulation/verify-robot-limits.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 70",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "dir": "robot-limits",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 9.8,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "ur5e-payload-envelope",
+      "file": "scripts/bakery-robots/ur5e_payload_envelope.py",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": ["{out}"]
+      },
+      "dir": "loads",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 3.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "ingredient-loads",
+      "file": "scripts/bakery-robots/verify-ingredient-loads.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "sharesOutputOf": "ur5e-payload-envelope",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 72.5,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "ur5e-mass-check",
+      "file": "scripts/bakery-robots/ur5e_mass_check.py",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": ["{out}"],
+        "stdout": "{out}/mass-check.json"
+      },
+      "sharesOutputOf": "ur5e-payload-envelope",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 12.6,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "one-shot-results",
+      "file": "scripts/production-simulation/measure-one-shot-results.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}/results.json"],
+        "mkdir": true
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "phase-1-targets",
+      "file": "scripts/production-simulation/measure-phase-1-targets.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "nodeOptions": ["--expose-gc"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 136.8,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "physics-baseline",
+      "file": "scripts/production-simulation/measure-physics-baseline.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 70E",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 7.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "step-profile",
+      "file": "scripts/production-simulation/measure-step-profile.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 181.7,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "bakery-shift",
+      "file": "scripts/production-simulation/verify-bakery-shift-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 8.5,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "black-sesame-cold-handling",
+      "file": "scripts/production-simulation/verify-black-sesame-cold-handling.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 13.9,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "black-sesame",
+      "file": "scripts/production-simulation/verify-black-sesame-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.7,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "comparison-matches-run",
+      "file": "scripts/production-simulation/verify-comparison-matches-run.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 4.5,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "engine-cell",
+      "file": "scripts/production-simulation/verify-engine-cell-journey.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 70",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.9,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "espresso",
+      "file": "scripts/production-simulation/verify-espresso-journey.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 60A",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 13.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "financier-cold-handling",
+      "file": "scripts/production-simulation/verify-financier-cold-handling.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 10.8,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "ginger-milk-tea",
+      "file": "scripts/production-simulation/verify-ginger-milk-tea-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61D",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 25.2,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "ginger-tea",
+      "file": "scripts/production-simulation/verify-ginger-tea-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61C",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.6,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "ginger-tea-native-staging",
+      "file": "scripts/production-simulation/verify-ginger-tea-native-staging.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61C",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 18.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "host-programs",
+      "file": "scripts/production-simulation/verify-host-programs.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 29.8,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "hosted-deployment-artifacts",
+      "file": "scripts/production-simulation/verify-hosted-deployment-artifacts.mjs",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 70",
+      "run": {
+        "tool": "node",
+        "args": ["output/acceptance/plan-70/hosted-release-2026-10-12"]
+      },
+      "status": "not run",
+      "failure": {
+        "reason": "It needs the documents of a hosted A-to-B run in output/acceptance/plan-70/hosted-release-2026-10-12. They are not in git and not on this Mac.",
+        "proof": "ENOENT for saved-a.json at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "idle-contacts",
+      "file": "scripts/production-simulation/verify-idle-contacts.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70E",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 1.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "live-appliance-move",
+      "file": "scripts/production-simulation/verify-live-appliance-move-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 81",
+      "run": {
+        "tool": "node",
+        "args": []
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 9.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "morning-shift",
+      "file": "scripts/production-simulation/verify-morning-shift-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 192.3,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "pan-staging-cell",
+      "file": "scripts/production-simulation/verify-pan-staging-cell.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 127.9,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "persistent-cell",
+      "file": "scripts/production-simulation/verify-persistent-cell.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 254.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "physics-result-cache",
+      "file": "scripts/production-simulation/verify-physics-result-cache.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "nodeOptions": ["--expose-gc"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 156.9,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "physics-result-cache-24",
+      "file": "scripts/production-simulation/verify-physics-result-cache.mjs",
+      "tier": "slow",
+      "backend": "both",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}", "--scenario", "orders-24"],
+        "nodeOptions": ["--expose-gc", "--max-old-space-size=12000"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 1101.9,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "playback-fidelity",
+      "file": "scripts/production-simulation/verify-playback-fidelity.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70E",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 13,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "pour-over",
+      "file": "scripts/production-simulation/verify-pour-over-journey.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 124.6,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "recipe-appliance-wasm",
+      "file": "scripts/production-simulation/verify-recipe-appliance-wasm.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 230.1,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "recurring-logistics",
+      "file": "scripts/production-simulation/verify-recurring-logistics.mjs",
+      "tier": "slow",
+      "backend": "wasm",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "nodeOptions": ["--expose-gc"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 632,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "artifact-handoff",
+      "file": "scripts/production-simulation/verify-artifact-handoff.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": [
+          "{out:recurring-logistics}/stress-one-slot",
+          "{runtime}",
+          "{out}"
+        ]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 1.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "recurring-recovery",
+      "file": "scripts/production-simulation/verify-recurring-recovery.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "nodeOptions": ["--expose-gc"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 99.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "recurring-recovery-reference",
+      "file": "scripts/production-simulation/verify-recurring-recovery.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": ["{out}", "--reference"],
+        "nodeOptions": ["--expose-gc"]
+      },
+      "sharesOutputOf": "recurring-recovery",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 76.5,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "recurring-recovery-verify",
+      "file": "scripts/production-simulation/verify-recurring-recovery.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": ["{out}", "--verify", "{out}/reference.json"]
+      },
+      "sharesOutputOf": "recurring-recovery",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.2,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "retained-case",
+      "file": "scripts/production-simulation/write-retained-case.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": [
+          "apps/portal/public/bakery-physics/bundles/c9f6e8cc0a8a86038aa3f716fbf0678af89b01d1b7d3f3a8c21b8bf7cfb3af2a",
+          "{out}"
+        ]
+      },
+      "status": "passes",
+      "notes": "The step 11 runtime prepares the two cells, so that file-execution saves under the step 11 execution bundle and resumes on the pinned one. Change the runtime at each engine release.",
+      "lastRun": {
+        "seconds": 0.3,
+        "date": "2026-11-17",
+        "commit": "550f199c4"
+      }
+    },
+    {
+      "id": "file-execution",
+      "file": "scripts/production-simulation/verify-file-execution.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": [
+          "{out:retained-case}",
+          "8ecd88c13a602872adad17edbe0f3065713704e7f5008c23a12792f02f7f26f8",
+          "f7c345c8d8b34daf685b48fe147af4929fd335550ecc8ee288a1162c49113054",
+          "{out}"
+        ]
+      },
+      "status": "passes",
+      "notes": "Release A is the execution bundle of the step 11 runtime that steps 12 to 15A pin; release B adds the pinned execution bundle (step 9). The journey needs a different engine file in B. Change both at each engine release. The step 11 bundles are outside git after the move of step 9B: fetch them first (node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics).",
+      "lastRun": {
+        "seconds": 152,
+        "date": "2026-11-17",
+        "commit": "550f199c4"
+      }
+    },
+    {
+      "id": "recording-equivalence",
+      "file": "scripts/production-simulation/verify-recording-equivalence.mjs",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "node",
+        "args": [
+          "REFERENCE_SNAPSHOT",
+          "CANDIDATE_SNAPSHOT",
+          "{out}/report.json"
+        ]
+      },
+      "status": "not run",
+      "failure": {
+        "reason": "It needs two saved snapshots of one route from runs with different advance allowances (the Plan 70 J3 inputs). No journey in the index writes them, and the J3 outputs are not on this Mac.",
+        "proof": "docs/evidence/plan-70-j3-bounded-operation-batching.md names the inputs"
+      }
+    },
+    {
+      "id": "six-hour-shift",
+      "file": "scripts/production-simulation/verify-six-hour-shift-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 289.7,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "workflow-branch",
+      "file": "scripts/production-simulation/verify-workflow-branch-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 57.2,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "workflow-document",
+      "file": "scripts/production-simulation/verify-workflow-document-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 233.8,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "workflow-findings",
+      "file": "scripts/production-simulation/verify-workflow-findings-journey.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 55,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "test-models",
+      "file": "scripts/bakery-robots/test_models.py",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": []
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "test_prepared_inertials_and_preserved_mass_axes_and_limits: a Dobot CR10 actuator has the force range -300 to 300, and its vendor URDF gives effort 0.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17); the test (2efc04330) and the Dobot model (bfe934b4f) did not change since 2026-10-09"
+      }
+    },
+    {
+      "id": "test-oven-access",
+      "file": "scripts/bakery-robots/test_oven_access.py",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": []
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.4,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "test-workcell",
+      "file": "scripts/bakery-robots/test_workcell.py",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": []
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 1.3,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "arm-glb",
+      "file": "scripts/bakery-robots/verify-arm-glb.mjs",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "node",
+        "args": ["dobot-cr10"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "arm-python",
+      "file": "scripts/bakery-robots/verify_arm.py",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": ["dobot-cr10"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 4.5,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      },
+      "notes": "Needs MUJOCO_DIR (it builds the arm_asset_acceptance example). It rewrites the committed files in assets/bakery-robots/<robot>/acceptance; on 2026-11-17 they differed only near 1e-14, and the run restored them."
+    },
+    {
+      "id": "authored-continuation",
+      "file": "scripts/bakery-robots/verify-authored-continuation.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}", "universal-robots-ur5e"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 5,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "browser-chain-artifacts",
+      "file": "scripts/bakery-robots/verify-browser-chain-artifacts.mjs",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["output/playwright/browser-authored-chain"]
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "An old browser file opens as 'rejected', not 'ready'. The input files (output/playwright/browser-authored-chain) are not in git; only the main checkout of this Mac has them.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "browser-linkage",
+      "file": "scripts/bakery-robots/verify-browser-linkage.mjs",
+      "tier": "fast",
+      "backend": "both",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "node",
+        "args": ["{runtime}", "{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 63.7,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      },
+      "notes": "Needs MUJOCO_DIR (the native SDK)."
+    },
+    {
+      "id": "cell-robot-bindings",
+      "file": "scripts/bakery-robots/verify-cell-robot-bindings.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out}"]
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The process grows to about 20 GB of resident memory, and macOS stops it (exit 137) after about 90 s. It wrote the oven cycle files of the first arm before it stopped.",
+        "proof": "exit 137 at a30c096a8, three runs on 2026-11-17; /usr/bin/time -l gave a maximum resident set size of 19,971,309,568 bytes"
+      }
+    },
+    {
+      "id": "container-recovery",
+      "file": "scripts/bakery-robots/verify-container-recovery.mjs",
+      "tier": "slow",
+      "backend": "native",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "node",
+        "args": ["satyr-bakery-native:host-validation", "{out}"],
+        "nodeOptions": ["--experimental-strip-types"]
+      },
+      "status": "not run",
+      "failure": {
+        "reason": "It needs the Docker image satyr-bakery-native:host-validation. The image is not on this Mac, and the disk has no room to build it.",
+        "proof": "docker images on 2026-11-17"
+      }
+    },
+    {
+      "id": "isaac-lab-import",
+      "file": "scripts/bakery-robots/verify_isaac_lab_import.py",
+      "tier": "fast",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": []
+      },
+      "status": "not run",
+      "failure": {
+        "reason": "It needs NVIDIA Newton (Isaac Lab). The physics venv has no newton module.",
+        "proof": "ModuleNotFoundError: No module named 'newton' at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "native-cli",
+      "file": "scripts/bakery-robots/verify-native.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "A step count is 14,750, and the pinned reference gives 14,250. The journey has failed for this old reason since at least 2026-10-07.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17); docs/evidence/refactor-8/README.md records the failure at 0b0aba06d"
+      },
+      "notes": "Needs MUJOCO_DIR, because it runs cargo build."
+    },
+    {
+      "id": "timeout-recovery",
+      "file": "scripts/bakery-robots/verify-timeout-recovery.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "A native rack sequence is 'rejected', not 'accepted' ('Choose a native rack sequence'). The probable cause is the limit check of Refactor 16 step 7 (618c9ecb7); the commit before it was not run.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "ur5e-rack",
+      "file": "scripts/bakery-robots/verify-ur5e-rack.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "A rejected placement fails with 'joint-speed', not 'unreachable'. Refactor 16 step 7 (618c9ecb7) added the 'joint-speed' failure; the commit before it was not run.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "automatic-context-browser",
+      "file": "scripts/bakery-robots/verify-automatic-context-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42G",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "chat-production-browser",
+      "file": "scripts/bakery-robots/verify-chat-production-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "chat-scheduled-browser",
+      "file": "scripts/bakery-robots/verify-chat-scheduled-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "timeoutMs": 3600000
+      },
+      "status": "passes",
+      "dir": "chat",
+      "lastRun": {
+        "seconds": 826.2,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "device-browser",
+      "file": "scripts/bakery-robots/verify-device-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "floor-plan-geometry-browser",
+      "file": "scripts/bakery-robots/verify-floor-plan-geometry.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "ingredient-editor-browser",
+      "file": "scripts/bakery-robots/verify-ingredient-editor-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "native-import-browser",
+      "file": "scripts/bakery-robots/verify-native-import-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "operating-defaults-browser",
+      "file": "scripts/bakery-robots/verify-operating-defaults.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "production-browser",
+      "file": "scripts/bakery-robots/verify-production-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "recording-rehearsal-browser",
+      "file": "scripts/bakery-robots/verify-recording-rehearsal-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "rehearsal-browser",
+      "file": "scripts/bakery-robots/verify-rehearsal-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "rehearsal-faults-browser",
+      "file": "scripts/bakery-robots/verify-rehearsal-faults-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "rehearsal-presets-browser",
+      "file": "scripts/bakery-robots/verify-rehearsal-presets-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "timeoutMs": 900000
+      },
+      "status": "passes",
+      "dir": "presets",
+      "lastRun": {
+        "seconds": 204.1,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "robot-selection-browser",
+      "file": "scripts/bakery-robots/verify-robot-selection-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "dir": "comparison",
+      "lastRun": {
+        "seconds": 116.4,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "scene-host-browser",
+      "file": "scripts/bakery-robots/verify-scene-host-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 18,
+        "date": "2026-11-17",
+        "commit": "cefdcf4cc"
+      }
+    },
+    {
+      "id": "scene-lighting-browser",
+      "file": "scripts/bakery-robots/verify-scene-lighting-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 13,
+        "date": "2026-11-17",
+        "commit": "cefdcf4cc"
+      }
+    },
+    {
+      "id": "spatial-events-browser",
+      "file": "scripts/bakery-robots/verify-spatial-events.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "prerequisites": ["output/playwright/plan42d-blocked-recording.json"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "spatial-inspection-browser",
+      "file": "scripts/bakery-robots/verify-spatial-inspection.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "tray-layout-drag-browser",
+      "file": "scripts/bakery-robots/verify-tray-layout-drag-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "ur5e-rack-browser",
+      "file": "scripts/bakery-robots/verify-ur5e-rack-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "simulator-undo-redo-browser",
+      "file": "scripts/bakery-robots/verify-simulator-undo-redo-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.7,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "store-layout-browser",
+      "file": "scripts/bakery-robots/verify-store-layout-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 15.8,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "chat-scheduled-artifacts",
+      "file": "scripts/bakery-robots/verify-chat-scheduled-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:chat-scheduled-browser}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.6,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "ingredient-concurrency",
+      "file": "scripts/bakery-robots/verify-ingredient-concurrency.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": [
+          "{out:chat-scheduled-browser}/chat-exported-rehearsal.json",
+          "{out}"
+        ]
+      },
+      "status": "passes",
+      "dir": "concurrency",
+      "lastRun": {
+        "seconds": 1,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "ingredient-editor-artifacts",
+      "file": "scripts/bakery-robots/verify-ingredient-editor-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:ingredient-editor-browser}"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "native-import-artifacts",
+      "file": "scripts/bakery-robots/verify-native-import-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:native-import-browser}"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "production-browser-artifacts",
+      "file": "scripts/bakery-robots/verify-production-browser-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:production-browser}"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "rehearsal-browser-artifacts",
+      "file": "scripts/bakery-robots/verify-rehearsal-browser-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:rehearsal-browser}"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "rehearsal-faults-artifacts",
+      "file": "scripts/bakery-robots/verify-rehearsal-faults-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:rehearsal-faults-browser}"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "rehearsal-presets-artifacts",
+      "file": "scripts/bakery-robots/verify-rehearsal-presets-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:rehearsal-presets-browser}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.6,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "robot-selection-artifacts",
+      "file": "scripts/bakery-robots/verify-robot-selection-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:robot-selection-browser}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 6.7,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "tray-layout-drag-artifacts",
+      "file": "scripts/bakery-robots/verify-tray-layout-drag-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:tray-layout-drag-browser}"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "ur5e-rack-artifacts",
+      "file": "scripts/bakery-robots/verify-ur5e-rack-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:ur5e-rack-browser}", "{out:ur5e-rack}"]
+      },
+      "status": "repaired on branch ci-browser",
+      "failure": {
+        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
+        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      }
+    },
+    {
+      "id": "engine-cell-browser",
+      "file": "scripts/production-simulation/verify-engine-cell-journey-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70",
+      "run": {
+        "tool": "browser",
+        "url": "/production-run-preview.html"
+      },
+      "status": "passes",
+      "dir": "production-run",
+      "lastRun": {
+        "seconds": 29.5,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "financier-browser",
+      "file": "scripts/production-simulation/verify-financier-journey-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "browser",
+        "url": "/production-run-preview.html?evidence=/@fs/{abs:financier}",
+        "prerequisites": ["{out:financier}/report.json"]
+      },
+      "dir": "financier-browser",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 12.9,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "financier-browser-artifact",
+      "file": "scripts/production-simulation/verify-financier-browser-artifact.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:financier}", "{out:financier-browser}/report.json"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.2,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "native-financier-browser",
+      "file": "scripts/production-simulation/verify-native-financier-journey-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "browser",
+        "url": "/production-run-preview.html"
+      },
+      "dir": "native-financier-browser",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 106,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "native-financier-browser-artifact",
+      "file": "scripts/production-simulation/verify-native-financier-browser-artifact.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "tsx",
+        "args": [
+          "{out:native-financier}",
+          "{out:native-financier-browser}/report.json"
+        ]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.2,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "oven-financier-browser",
+      "file": "scripts/production-simulation/verify-oven-financier-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61A",
+      "run": {
+        "tool": "browser",
+        "url": "/production-run-preview.html?evidence=/@fs/{abs:oven-financier}",
+        "prerequisites": ["{out:oven-financier}/report.json"]
+      },
+      "dir": "oven-financier-browser",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 40.6,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "oven-workspace-browser",
+      "file": "scripts/production-simulation/verify-oven-workspace-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:oven-financier}",
+        "prerequisites": ["{out:oven-financier}/report.json"],
+        "timeoutMs": 4200000
+      },
+      "status": "passes",
+      "dir": "oven-workspace-browser",
+      "lastRun": {
+        "seconds": 981.6,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "oven-authoring-browser",
+      "file": "scripts/production-simulation/verify-oven-authoring-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?fixture=http://127.0.0.1:5197",
+        "timeoutMs": 1500000
+      },
+      "status": "passes",
+      "dir": "oven-authoring-browser",
+      "lastRun": {
+        "seconds": 305.8,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "oven-engine-browser",
+      "file": "scripts/production-simulation/verify-oven-engine-journey-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "browser",
+        "url": "/production-run-preview.html"
+      },
+      "dir": "oven-browser",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 31.1,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "oven-engine-browser-artifact",
+      "file": "scripts/production-simulation/verify-oven-engine-browser-artifact.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:oven-engine}", "{out:oven-engine-browser}/report.json"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.1,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "batch-recovery-browser",
+      "file": "scripts/production-simulation/verify-batch-recovery-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70B",
+      "run": {
+        "tool": "browser",
+        "url": "/production-run-preview.html?evidence=/@fs/{abs:oven-engine}",
+        "prerequisites": ["{out:oven-engine}/recovered-retrievals.json"]
+      },
+      "dir": "batch-recovery-browser",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.6,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "recovery-browser",
+      "file": "scripts/production-simulation/verify-recovery-journey-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70A",
+      "run": {
+        "tool": "browser",
+        "url": "/production-run-preview.html"
+      },
+      "status": "passes",
+      "dir": "recovery-browser",
+      "lastRun": {
+        "seconds": 14.6,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "recovery-browser-artifact",
+      "file": "scripts/production-simulation/verify-recovery-browser-artifact.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 70A",
+      "run": {
+        "tool": "tsx",
+        "args": ["{out:recovery-browser}/recovery-session.json"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.3,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "two-cell-workspace-browser",
+      "file": "scripts/production-simulation/verify-two-cell-workspace-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "timeoutMs": 2100000
+      },
+      "status": "passes",
+      "dir": "factory-workspace",
+      "lastRun": {
+        "seconds": 465.1,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "persistent-chat-browser",
+      "file": "scripts/production-simulation/verify-persistent-chat-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "timeoutMs": 1200000
+      },
+      "status": "passes",
+      "dir": "persistent-chat",
+      "lastRun": {
+        "seconds": 285.8,
+        "date": "2026-11-18",
+        "commit": "69a67f517"
+      }
+    },
+    {
+      "id": "artifact-storage-browser",
+      "file": "scripts/production-simulation/verify-artifact-storage-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:artifact-handoff}"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It imports src/features/production-run/oven-run-file.ts, which 319ba55b5 (Refactor 10 step 4) moved into @seams/production-simulation.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "artifact-import-browser",
+      "file": "scripts/production-simulation/verify-artifact-import-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:artifact-storage-browser}"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It reads the report of artifact-storage-browser, which fails.",
+        "proof": "artifact-storage-browser fails"
+      }
+    },
+    {
+      "id": "bakery-shift-browser",
+      "file": "scripts/production-simulation/verify-bakery-shift-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The 'Shared production runs' control does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
+        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
+      }
+    },
+    {
+      "id": "black-sesame-browser",
+      "file": "scripts/production-simulation/verify-black-sesame-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61B",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:black-sesame}"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 10.9,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "cafe-shift-grinders-browser",
+      "file": "scripts/production-simulation/verify-cafe-shift-grinders-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 60A",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 19.5,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "contact-inspection-browser",
+      "file": "scripts/production-simulation/verify-contact-inspection-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It fetches its fixture by the absolute path of the main checkout (/Users/pta/Dev/lowerarchy/satyr/...). Vite in any other checkout answers with HTML.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "engine-jobs-browser",
+      "file": "scripts/production-simulation/verify-engine-jobs-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 30.3,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "engine-visits-browser",
+      "file": "scripts/production-simulation/verify-engine-visits-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "browser",
+        "url": "/linea-rehearsal.html",
+        "timeoutMs": 900000
+      },
+      "status": "passes",
+      "notes": "Runs on the built Portal: pnpm portal:build, then node scripts/production-simulation/serve-portal-assets.mjs apps/portal/dist <port>, and --base-url http://127.0.0.1:<port>.",
+      "lastRun": {
+        "seconds": 22,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "factory-canvas-browser",
+      "file": "scripts/production-simulation/verify-factory-canvas-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The 'Split' button of the 'Persistent production' region does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
+        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
+      }
+    },
+    {
+      "id": "factory-controls-browser",
+      "file": "scripts/production-simulation/verify-factory-controls-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "factory-overview-browser",
+      "file": "scripts/production-simulation/verify-factory-overview-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It reads the Plan 70 J2 campaign by an absolute path in the main checkout. That output (j2-recurring-campaign-2026-10-11-r2) is gone.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "financier-decision-browser",
+      "file": "scripts/production-simulation/verify-financier-decision-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70D",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The 'Minutes between batches' field of the 'Recurring financier production' form does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
+        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
+      }
+    },
+    {
+      "id": "ginger-milk-tea-browser",
+      "file": "scripts/production-simulation/verify-ginger-milk-tea-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61D",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:ginger-milk-tea}"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "ginger-tea-browser",
+      "file": "scripts/production-simulation/verify-ginger-tea-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61C",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:ginger-tea}"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "large-shared-archive-browser",
+      "file": "scripts/production-simulation/verify-large-shared-archive-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "Its fixture server serve-archive-acceptance.mjs does not build: archive-browser-worker.mjs imports ensureInitialOrganisationPlacement, which 76bc930c7 (Refactor 12 part 2) removed.",
+        "proof": "esbuild error at a30c096a8 (run on 2026-11-17)"
+      },
+      "notes": "Needs node scripts/production-simulation/serve-archive-acceptance.mjs DIR <Portal origin> on port 8840."
+    },
+    {
+      "id": "live-appliance-move-browser",
+      "file": "scripts/production-simulation/verify-live-appliance-move-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 81",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 33.2,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "material-history-browser",
+      "file": "scripts/production-simulation/verify-material-history-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "morning-shift-browser",
+      "file": "scripts/production-simulation/verify-morning-shift-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "timeoutMs": 1200000
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It expects 11 synchronized Morning Shift appliances; the Portal shows 12.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "pastry-bench-browser",
+      "file": "scripts/production-simulation/verify-pastry-bench-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 60A",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 65.1,
+        "date": "2026-11-17",
+        "commit": "a30c096a8"
+      }
+    },
+    {
+      "id": "physical-recovery-browser",
+      "file": "scripts/production-simulation/verify-physical-recovery-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70A",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:recovery-wasm}"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The 'Open recipe, oven route or saved production run' input does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date. Also, no journey writes its input reference-failure-file.json (only this file names it, since 4aa5061bb).",
+        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
+      }
+    },
+    {
+      "id": "pour-over-browser",
+      "file": "scripts/production-simulation/verify-pour-over-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The 'Kettle water (g)' field of the 'Pour-over recipe' form does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
+        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
+      }
+    },
+    {
+      "id": "recipe-split-browser",
+      "file": "scripts/production-simulation/verify-recipe-split-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The PortalFrame top-right controls overlap the factory toolbar in Split mode.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "recipe-workflow-browser",
+      "file": "scripts/production-simulation/verify-recipe-workflow-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html",
+        "timeoutMs": 900000
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 161.4,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "playback-render-browser",
+      "file": "scripts/production-simulation/verify-playback-render-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html",
+        "timeoutMs": 1200000
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 265,
+        "date": "2026-11-17",
+        "commit": "cefdcf4cc"
+      }
+    },
+    {
+      "id": "recording-pages-evidence",
+      "file": "scripts/production-simulation/prepare-recording-pages-evidence.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 70E",
+      "run": {
+        "tool": "node",
+        "args": ["{out:recurring-logistics}/stress-one-slot/reference", "{out}"]
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "No recorded operation of the recurring route has more than 65,536 records now, and the journey needs one that crosses pack boundaries. All three cases (stress-one-slot, stress-two-slots, balanced-baseline) fail.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "recording-pages-browser",
+      "file": "scripts/production-simulation/verify-recording-pages-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:recording-pages-evidence}"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It reads the evidence of recording-pages-evidence, which fails.",
+        "proof": "recording-pages-evidence fails"
+      }
+    },
+    {
+      "id": "recurring-logistics-browser",
+      "file": "scripts/production-simulation/verify-recurring-logistics-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:recurring-logistics}"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "page.waitForFunction did not finish in 30 s. It failed in one run at a load average near 15; a second run was stopped because the disk had no room for the 2.2 GB recurring-logistics output, so a slow page is not ruled out.",
+        "proof": "fails at a30c096a8 (one run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "recurring-artifacts",
+      "file": "scripts/production-simulation/verify-recurring-artifacts.mjs",
+      "tier": "browser",
+      "backend": "none",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "tsx",
+        "args": [
+          "{out:recurring-logistics-browser}",
+          "{out:recurring-logistics}/balanced-baseline"
+        ]
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "It reads the download of recurring-logistics-browser, which fails.",
+        "proof": "recurring-logistics-browser fails"
+      }
+    },
+    {
+      "id": "shared-artifacts-browser",
+      "file": "scripts/production-simulation/verify-shared-artifacts-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 70C",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "Its fixture server serve-archive-acceptance.mjs does not build: archive-browser-worker.mjs imports ensureInitialOrganisationPlacement, which 76bc930c7 (Refactor 12 part 2) removed.",
+        "proof": "esbuild error at a30c096a8 (run on 2026-11-17)"
+      },
+      "notes": "Needs node scripts/production-simulation/serve-archive-acceptance.mjs DIR <Portal origin> on port 8840."
+    },
+    {
+      "id": "siphon-browser",
+      "file": "scripts/production-simulation/verify-siphon-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The page has no 'Switch workflow' button.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "six-hour-shift-browser",
+      "file": "scripts/production-simulation/verify-six-hour-shift-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 61E",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "fails",
+      "failure": {
+        "reason": "The file has no 'async function verify…(page)' entry, so browser-acceptance.mjs cannot run it. It also reads the Plan 61E output of 2026-11-02 from a fixed path.",
+        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      }
+    },
+    {
+      "id": "workflow-branch-browser",
+      "file": "scripts/production-simulation/verify-workflow-branch-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 17.6,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "workflow-edit-browser",
+      "file": "scripts/production-simulation/verify-workflow-edit-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html",
+        "timeoutMs": 900000
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 49.1,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "workflow-engine-edit-browser",
+      "file": "scripts/production-simulation/verify-workflow-engine-edit-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 47,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    },
+    {
+      "id": "workflow-graph-browser",
+      "file": "scripts/production-simulation/verify-workflow-graph-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 84",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html",
+        "timeoutMs": 900000
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 145.8,
+        "date": "2026-11-17",
+        "commit": "7cf65aa77"
+      }
+    }
+  ]
+}

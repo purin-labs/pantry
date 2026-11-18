@@ -1,0 +1,28 @@
+.agent-surface-label {
+  --agent-label-color: #7c3aed;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  border: 2px solid var(--agent-label-color);
+  border-radius: 6px;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.agent-surface-label-tag {
+  position: absolute;
+  top: -18px;
+  left: -2px;
+  height: 16px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--agent-label-color);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+

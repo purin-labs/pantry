@@ -1,0 +1,21 @@
+{
+  "name": "@seams/punter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:types": "tsrs --noEmit",
+    "scenario:pickup": "node --experimental-strip-types src/cli.ts",
+    "scenario:shipping": "node --experimental-strip-types src/shipping-cli.ts"
+  },
+  "dependencies": {
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams/commerce-client": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vitest": "^4.1.0"
+  }
+}

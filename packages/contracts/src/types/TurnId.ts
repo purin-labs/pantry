@@ -1,0 +1,2 @@
+
+export type TurnId = string;

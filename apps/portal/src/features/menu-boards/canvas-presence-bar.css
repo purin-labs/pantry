@@ -1,0 +1,103 @@
+/* Plan 40B phase 7, slice 6: the presence bar under the canvas. It floats
+   above the canvas footer, beside the layers panel. */
+
+.menu-presence-bar {
+  position: absolute;
+  z-index: 9;
+  bottom: calc(var(--panel-gap, 12px) + 46px);
+  left: calc(var(--panel-start-width, 180px) + var(--panel-gap, 12px) * 2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: min(720px, calc(100% - var(--panel-start-width, 180px) - var(--panel-end-width, 220px) - var(--panel-gap, 12px) * 4));
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.menu-presence-avatars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-presence-person {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--participant);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.menu-presence-agent {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px 0 6px;
+  border-radius: 999px;
+  background: var(--agent);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.menu-presence-count {
+  color: var(--ink-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.menu-presence-follow,
+.menu-presence-stop {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.menu-presence-follow[aria-pressed="true"] {
+  background: color-mix(in oklch, var(--ink) 10%, transparent);
+}
+
+/* The agent's own words, for the person who asked. */
+.menu-presence-words {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 2px 4px;
+  color: var(--ink);
+}
+
+.menu-presence-words svg {
+  flex: none;
+  color: var(--agent);
+}
+
+.menu-presence-words span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-presence-words[data-agent-color] {
+  --agent: #6d3fe0;
+}
+
+.menu-presence-words[data-agent-color="teal"] {
+  --agent: #00796b;
+}
+
+.menu-presence-words[data-agent-color="gold"] {
+  --agent: #8f6300;
+}

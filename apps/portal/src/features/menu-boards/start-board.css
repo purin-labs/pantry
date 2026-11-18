@@ -1,0 +1,314 @@
+/* The start screen of a new board (Plan 40B): one sheet on the canvas
+   ground, over the workspace. */
+
+.menu-board-start-layer {
+  position: absolute;
+  inset: 0;
+  /* Under the Portal's top bar (z-index 30), whose buttons stay on top. */
+  z-index: 20;
+  overflow-y: auto;
+  padding: calc(var(--float-top, 0px) + 16px) 20px 40px;
+  box-sizing: border-box;
+  background-color: var(--menu-canvas-bg, var(--surface));
+  background-image: radial-gradient(var(--menu-canvas-dot, transparent) 1px, transparent 1.4px);
+  background-size: 20px 20px;
+}
+
+.menu-board-start {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px 32px 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--float-shadow, var(--shadow-card));
+}
+
+/* The sheet keeps its own look; the old form rules do not apply. */
+.menu-board-start.menu-boards-new {
+  flex-wrap: nowrap;
+  align-items: stretch;
+  margin-bottom: 0;
+}
+
+.menu-board-start-tabs .menu-tabs.menu-tabs-segmented {
+  max-width: 300px;
+  margin: 0;
+}
+
+.menu-board-start header h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.menu-board-start header p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.menu-board-start fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.menu-board-start legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.menu-board-start legend span {
+  font-weight: 400;
+}
+
+.menu-board-start-grid {
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+}
+
+.menu-board-start-card {
+  position: relative;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.menu-board-start-detail {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.menu-board-start-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+}
+
+/* The radio stays for the keyboard and the journeys; the card shows it. */
+.menu-board-start input[type="radio"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.menu-board-start-card:hover {
+  border-color: var(--hairline);
+}
+
+.menu-board-start-card:has(input:checked) {
+  border-color: #2e6fd8;
+  box-shadow: inset 0 0 0 2px #2e6fd8;
+}
+
+.menu-board-start-card:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring, #2e6fd8);
+  outline-offset: 2px;
+}
+
+.menu-board-start-picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 124px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.menu-board-start-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.menu-board-start-frame {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.menu-board-start-frame-landscape { width: 172px; height: 97px; }
+
+.menu-board-start-blank {
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed var(--hairline);
+  color: var(--ink-2);
+  font-size: 18px;
+}
+
+.menu-board-start-wire {
+  padding: 6px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+}
+
+.menu-board-start-wire i {
+  display: block;
+  flex: none;
+  height: 3px;
+  border-radius: 2px;
+  background: color-mix(in oklch, var(--ink) 16%, transparent);
+}
+
+.menu-board-start-wire i.bar {
+  width: 45%;
+  height: 6px;
+  background: color-mix(in oklch, var(--ink) 40%, transparent);
+}
+
+.menu-board-start-wire .cols {
+  flex: 1;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.menu-board-start-wire .cols[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.menu-board-start-wire .cols[data-cols="featured"] { grid-template-columns: 3fr 2fr; }
+
+.menu-board-start-wire .cols > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 2px;
+  background: var(--surface);
+}
+
+.menu-board-start-wire .cols > span.card {
+  background: color-mix(in oklch, var(--ink) 20%, transparent);
+}
+
+.menu-board-start-wire .cols > span.ready {
+  background: color-mix(in oklch, #2f9e5b 22%, var(--paper));
+}
+
+.menu-board-start-wire .free {
+  position: relative;
+  flex: 1;
+}
+
+.menu-board-start-wire .free i {
+  position: absolute;
+  height: auto;
+  border-radius: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.menu-board-start-wire .free i:nth-child(1) { left: 0; top: 4px; width: 38%; bottom: 8px; }
+.menu-board-start-wire .free i:nth-child(2) { left: 44%; top: 0; width: 30%; height: 45%; }
+.menu-board-start-wire .free i:nth-child(3) { right: 0; bottom: 0; width: 22%; height: 40%; }
+
+.menu-board-start-design {
+  padding: 8px;
+}
+
+.menu-board-start-design i.eyebrow {
+  width: 30%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.menu-board-start-design b {
+  font: 600 13px/1.1 Georgia, "Times New Roman", serif;
+}
+
+.menu-board-start-design .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.menu-board-start-design .row i {
+  display: block;
+  width: 55%;
+  height: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.menu-board-start-design .row i.price {
+  width: 16%;
+  background: var(--accent);
+  opacity: 1;
+}
+
+.menu-board-start footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.menu-board-start footer label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-right: auto;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.menu-board-start footer input {
+  width: min(280px, 70vw);
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+
+.menu-board-start-summary {
+  align-self: center;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.menu-board-start footer .menu-boards-primary {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+@media (max-width: 640px) {
+  .menu-board-start {
+    padding: 20px 16px;
+  }
+}

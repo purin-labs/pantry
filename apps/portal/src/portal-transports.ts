@@ -1,0 +1,182 @@
+import type {
+  MailboxSetupAgentChoice,
+  MailboxSetupPlan,
+} from "@seams/control-api";
+import {
+  controlRead,
+  controlSignal,
+  controlMutation,
+} from "./control-client";
+import type { BrainTransport } from "./features/brain/api";
+import { readMailboxSetup } from "./features/mail-setup/run";
+import type { OrganisationActions } from "./pages/workspaces";
+import type { ProductDescriptionActionTransport } from "./features/commerce/description-draft/editor";
+import type {
+  IntegrationsRouteTransport,
+  WhatsAppRouteTransport,
+  WorkspaceSettingsRouteTransport,
+} from "./features/integrations/settings-types";
+import { type CommerceActionRecord, parseCommerceActionRecordResponse } from "@seams/control-api/portal/commerce-actions";
+import type { CommerceOperationsTransport } from "./features/commerce/operations";
+import type { AgentOperationsTransport } from "./pages/automation";
+import { createAccessRouteTransport } from "./features/access/api";
+import { pickGoogleDriveFile } from "./features/access/google-drive-picker";
+import {
+  readEmailOperationalPreview,
+  readEmailReplyPreview,
+} from "./features/integrations/mailbox-transport";
+import {
+  executeIntegrationsRoute,
+  executeWorkspaceSettingsRoute,
+  lastIntegrationsOverview,
+  notImplementedWhatsAppConnect,
+  readIntegrationDetail,
+  readIntegrationsOverview,
+  readWorkspaceSettingsRoute,
+  runWhatsAppAccountAction,
+} from "./features/integrations/settings-transport";
+import {
+  archiveControlOrganisation,
+  deleteControlOrganisation,
+  renameControlOrganisation,
+  restoreControlOrganisation,
+} from "./portal-reads";
+import { MAILBOX_SETUP_TRANSPORT } from "./portal-support";
+
+export const AGENT_OPERATIONS_TRANSPORT: AgentOperationsTransport = {
+  read: readAgentOperationsTransport,
+  mutate: mutateAgentOperationsTransport,
+  readRevisions: readAgentRevisionsTransport,
+};
+
+export const COMMERCE_OPERATIONS_TRANSPORT: CommerceOperationsTransport = {
+  previewTrackingBatch: previewTrackingBatchTransport,
+  proposeAction: proposeCommerceActionTransport,
+};
+
+export const PRODUCT_DESCRIPTION_ACTION_TRANSPORT: ProductDescriptionActionTransport =
+  {
+    proposeAction: proposeProductDescriptionActionTransport,
+  };
+
+export const ORGANISATION_ACTIONS: OrganisationActions = {
+  rename: renameControlOrganisation,
+  archive: archiveControlOrganisation,
+  restore: restoreControlOrganisation,
+  delete: deleteControlOrganisation,
+};
+
+export const WHATSAPP_ROUTE_TRANSPORT: WhatsAppRouteTransport = {
+  connect: notImplementedWhatsAppConnect,
+  accountAction: runWhatsAppAccountAction,
+};
+
+export function readMailboxSetupTransport(
+  organisationId: string,
+  integrationAccountId: string,
+  choice: MailboxSetupAgentChoice,
+): Promise<MailboxSetupPlan> {
+  return readMailboxSetup(
+    MAILBOX_SETUP_TRANSPORT,
+    { organisationId, integrationAccountId },
+    choice,
+  );
+}
+
+export const INTEGRATIONS_ROUTE_TRANSPORT: IntegrationsRouteTransport = {
+  readOverview: readIntegrationsOverview,
+  readMailboxSetup: readMailboxSetupTransport,
+  lastOverview: lastIntegrationsOverview,
+  readDetail: readIntegrationDetail,
+  execute: executeIntegrationsRoute,
+  readEmailReply: readEmailReplyPreview,
+  readEmailOperational: readEmailOperationalPreview,
+  whatsapp: WHATSAPP_ROUTE_TRANSPORT,
+};
+
+export const WORKSPACE_SETTINGS_ROUTE_TRANSPORT: WorkspaceSettingsRouteTransport = {
+  read: readWorkspaceSettingsRoute,
+  execute: executeWorkspaceSettingsRoute,
+};
+
+export const BRAIN_TRANSPORT: BrainTransport = {
+  read: controlRead,
+  mutate: controlMutation,
+};
+
+export const ACCESS_ROUTE_TRANSPORT = createAccessRouteTransport(
+  controlRead,
+  controlMutation,
+  pickGoogleDriveFile,
+);
+
+export function readAgentOperationsTransport(
+  organisationId: string,
+): Promise<unknown> {
+  return controlRead(
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/operations`,
+  );
+}
+
+export function readAgentRevisionsTransport(
+  organisationId: string,
+  target: { readonly kind: "agent_definition" | "skill"; readonly id: string },
+): Promise<unknown> {
+  const segment = target.kind === "agent_definition" ? "definitions" : "skills";
+  return controlRead(
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/operations/${segment}/${encodeURIComponent(target.id)}/revisions`,
+  );
+}
+
+export function mutateAgentOperationsTransport(
+  organisationId: string,
+  command: Parameters<AgentOperationsTransport["mutate"]>[1],
+  mutationIntent: string,
+): Promise<unknown> {
+  return controlMutation(
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/operations`,
+    "POST",
+    command,
+    undefined,
+    mutationIntent,
+  );
+}
+
+export function previewTrackingBatchTransport(
+  organisationId: string,
+  exceptionIds: readonly string[],
+): Promise<unknown> {
+  return controlSignal(
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/operations/tracking-batches/preview`,
+    { exceptionIds },
+  );
+}
+
+export function proposeCommerceActionTransport(
+  organisationId: string,
+  action: Parameters<CommerceOperationsTransport["proposeAction"]>[1],
+  intent: string,
+): Promise<unknown> {
+  return controlMutation(
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/actions`,
+    "POST",
+    action,
+    undefined,
+    intent,
+  );
+}
+
+export async function proposeProductDescriptionActionTransport(
+  organisationId: string,
+  action: Parameters<ProductDescriptionActionTransport["proposeAction"]>[1],
+  intent: string,
+): Promise<CommerceActionRecord> {
+  const raw = await controlMutation(
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/actions`,
+    "POST",
+    action,
+    undefined,
+    intent,
+  );
+  return parseCommerceActionRecordResponse(raw);
+}

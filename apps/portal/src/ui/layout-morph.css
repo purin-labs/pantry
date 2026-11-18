@@ -1,0 +1,56 @@
+/* The surface of a shared layout morph (layout-morph.ts). The root fills the
+   window in the top layer and lets every pointer through; the surface takes
+   the look that the card and the toast share. */
+.layout-morph {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: none;
+}
+
+.layout-morph::backdrop {
+  background: transparent;
+}
+
+/* The same dimmed page as a permission prompt's ::backdrop. */
+.layout-morph-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--pantry-shadow-color) 45%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.layout-morph-surface {
+  position: absolute;
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow:
+    0 0 0 1px var(--border),
+    var(--shadow-card);
+  color: var(--ink);
+}
+
+.layout-morph-layer {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  transform-origin: top left;
+  /* Overrides of the context classes, such as a dialog's own size rules. */
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  transition: none;
+}
+
+.layout-morph-layer > * {
+  margin: 0;
+  box-shadow: none;
+}

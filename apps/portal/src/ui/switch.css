@@ -1,0 +1,72 @@
+/* The Base UI Switch with Portal tokens. */
+
+.pantry-switch {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 20px;
+  padding: 2px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background-color: var(--hairline);
+  cursor: pointer;
+  outline: 0;
+  user-select: none;
+  transition: background-color var(--pantry-motion-fast) ease;
+}
+
+.pantry-switch[data-checked] {
+  background-color: var(--ink-strong);
+}
+
+.pantry-switch:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.pantry-switch[data-disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pantry-switch-thumb {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background-color: var(--paper);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 16%);
+  transition: translate var(--pantry-motion-fast) ease;
+}
+
+.pantry-switch[data-checked] .pantry-switch-thumb {
+  translate: 16px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantry-switch,
+  .pantry-switch-thumb {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .pantry-switch {
+    border-color: ButtonText;
+  }
+
+  .pantry-switch[data-checked] {
+    background-color: Highlight;
+  }
+
+  .pantry-switch-thumb {
+    background-color: ButtonText;
+  }
+
+  .pantry-switch[data-checked] .pantry-switch-thumb {
+    background-color: HighlightText;
+  }
+}

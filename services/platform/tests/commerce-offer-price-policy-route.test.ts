@@ -1,0 +1,226 @@
+import {
+  TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,
+  TEST_ORGANISATION_PLACEMENT_PROFILE,
+} from "./fixtures/organisation-placement";
+/// <reference types="@cloudflare/workers-types" />
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const controlMocks = vi.hoisted(() => ({
+  authorizeOrganisationControl: vi.fn(),
+  resolveControlSession: vi.fn(),
+  validateControlCsrf: vi.fn(),
+}));
+const bindingMocks = vi.hoisted(() => ({
+  resolveOrganisationCommerceMerchantBinding: vi.fn(),
+}));
+const clientMocks = vi.hoisted(() => ({
+  createCommerceClient: vi.fn(),
+}));
+const mutationMocks = vi.hoisted(() => ({
+  readControlMutationReplay: vi.fn(),
+  prepareControlMutationReceipt: vi.fn(),
+}));
+
+vi.mock("../src/data/control-plane", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+  authorizeOrganisationControl: controlMocks.authorizeOrganisationControl,
+  resolveControlSession: controlMocks.resolveControlSession,
+  validateControlCsrf: controlMocks.validateControlCsrf,
+}));
+vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("../src/data/commerce-merchant-binding")
+  >()),
+  resolveOrganisationCommerceMerchantBinding:
+    bindingMocks.resolveOrganisationCommerceMerchantBinding,
+}));
+vi.mock("../src/data/control-mutation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/data/control-mutation")>()),
+  readControlMutationReplay: mutationMocks.readControlMutationReplay,
+  prepareControlMutationReceipt: mutationMocks.prepareControlMutationReceipt,
+}));
+vi.mock("../src/commerce/outbox-worker", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/commerce/outbox-worker")>()),
+  createCommerceClient: clientMocks.createCommerceClient,
+}));
+
+import { handleControlRequest } from "../src/control-router";
+import { platformEnv, type UnitTestEnv } from "./worker-fakes";
+
+const ORGANISATION_ID = "organisation_price_policy";
+const MERCHANT_ID = "merchant_cafe";
+const OFFER_PATH = "underclerk%3Amerchant_cafe%3Aoffer_coffee";
+const ROUTE = `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/offers/${OFFER_PATH}/price-policy`;
+
+describe("Offer price policy control route", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    bindingMocks.resolveOrganisationCommerceMerchantBinding.mockResolvedValue({
+      ok: true,
+      value: { merchantId: MERCHANT_ID },
+    });
+    mutationMocks.readControlMutationReplay.mockResolvedValue({
+      kind: "absent",
+    });
+    mutationMocks.prepareControlMutationReceipt.mockReturnValue({
+      run: vi.fn(),
+    });
+  });
+
+  it("refuses to let an admin grant pricing authority", async () => {
+    authorizeAs("admin");
+    const client = commerceEngineClient({ setOfferPricePolicy: vi.fn() });
+
+    const response = await handleControlRequest(
+      write("PUT", { expectedRevision: null, maxMovementBps: 500 }),
+      routeEnv(),
+    );
+
+    // Enabling an allowance is what lets the agent reprice unattended, so it
+    // sits above the role that may merely configure the agent. Control routes
+    // report an insufficient role as absence.
+    expect(response.status).toBe(404);
+    expect(client.setOfferPricePolicy).not.toHaveBeenCalled();
+  });
+
+  it("rejects an allowance wider than the whole price", async () => {
+    authorizeAs("owner");
+    const client = commerceEngineClient({ setOfferPricePolicy: vi.fn() });
+
+    const response = await handleControlRequest(
+      write("PUT", { expectedRevision: null, maxMovementBps: 10_001 }),
+      routeEnv(),
+    );
+
+    expect(response.status).toBe(422);
+    expect(client.setOfferPricePolicy).not.toHaveBeenCalled();
+  });
+
+  it("records a receipt only once the change has settled", async () => {
+    authorizeAs("owner");
+    const client = commerceEngineClient({
+      setOfferPricePolicy: vi.fn().mockResolvedValue({
+        ok: false,
+        error: { kind: "unavailable" },
+      }),
+    });
+
+    await handleControlRequest(
+      write("PUT", { expectedRevision: null, maxMovementBps: 500 }),
+      routeEnv(),
+    );
+
+    // An unreachable Commerce leaves the attempt undecided. Recording it
+    // would refuse the retry that should carry it through.
+    expect(client.setOfferPricePolicy).toHaveBeenCalledOnce();
+    expect(mutationMocks.prepareControlMutationReceipt).not.toHaveBeenCalled();
+  });
+
+  it("does not reach Underclerk when no merchant is bound", async () => {
+    authorizeAs("viewer");
+    bindingMocks.resolveOrganisationCommerceMerchantBinding.mockResolvedValue({
+      ok: false,
+      error: { code: "underclerk_binding_not_found" },
+    });
+    const client = commerceEngineClient({ readOfferPricePolicy: vi.fn() });
+
+    const response = await handleControlRequest(read(), routeEnv());
+
+    expect(response.status).toBe(503);
+    expect(client.readOfferPricePolicy).not.toHaveBeenCalled();
+  });
+});
+
+const ROLE_RANK = { viewer: 1, operator: 2, admin: 3, owner: 4 } as const;
+
+const COOKIE =
+  "satyr_control_session=session-price; satyr_control_csrf=csrf-price";
+
+function read(): Request {
+  return new Request(ROUTE, { headers: { cookie: COOKIE } });
+}
+
+function write(
+  method: "PUT" | "DELETE",
+  body: unknown,
+  idempotencyKey = "price-policy-once",
+): Request {
+  return new Request(ROUTE, {
+    method,
+    headers: {
+      cookie: COOKIE,
+      origin: "https://satyr.example",
+      "x-satyr-csrf": "csrf-price",
+      "content-type": "application/json",
+      "idempotency-key": idempotencyKey,
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+function authorizeAs(role: "viewer" | "admin" | "owner"): void {
+  const now = Date.now();
+  controlMocks.resolveControlSession.mockResolvedValue({
+    ok: true,
+    value: {
+      kind: "active",
+      controlSessionId: "control_session_price",
+      userId: "user_0b1a0c7c-370c-5cc3-bd7d-6d0b62bb39b5",
+      rotationGeneration: 1,
+      createdAt: now,
+      rotatedAt: now,
+      expiresAt: now + 60_000,
+    },
+  });
+  controlMocks.validateControlCsrf.mockResolvedValue({ ok: true, value: true });
+  // Honour the role the route asks for, so the test exercises the gate itself
+  // rather than a mock that lets every membership through.
+  controlMocks.authorizeOrganisationControl.mockImplementation(
+    async (input: { readonly requiredRole: keyof typeof ROLE_RANK }) =>
+      ROLE_RANK[role] >= ROLE_RANK[input.requiredRole]
+        ? {
+            ok: true,
+            value: {
+              session: undefined,
+              membership: {
+                kind: "active",
+                organisationId: ORGANISATION_ID,
+                userId: "user_0b1a0c7c-370c-5cc3-bd7d-6d0b62bb39b5",
+                personId: "person_price",
+                role,
+                createdAt: now - 60_000,
+              },
+            },
+          }
+        : { ok: false, error: { code: "organisation_role_insufficient" } },
+  );
+}
+
+function commerceEngineClient(
+  methods: Record<string, unknown>,
+): Record<string, ReturnType<typeof vi.fn>> {
+  const client = {
+    readOfferPricePolicy: vi.fn(),
+    setOfferPricePolicy: vi.fn(),
+    ...methods,
+  } as Record<string, ReturnType<typeof vi.fn>>;
+  clientMocks.createCommerceClient.mockReturnValue(client);
+  return client;
+}
+
+function routeEnv(): UnitTestEnv {
+  const first = vi
+    .fn()
+    .mockResolvedValue({
+      ...TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,
+      environment: "development",
+    });
+  const all = vi.fn().mockResolvedValue({ results: [] });
+  const bind = vi.fn().mockReturnValue({ first, all });
+  return platformEnv({
+    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    DB: { prepare: vi.fn().mockReturnValue({ bind }), withSession: vi.fn().mockReturnThis() },
+    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+  });
+}

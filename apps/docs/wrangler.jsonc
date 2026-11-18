@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Reuses the worker name the retired Vocs site published under, so the
+  // existing docs origin keeps serving without a URL change.
+  "name": "satyr-docs",
+  "compatibility_date": "2026-05-05",
+  "preview_urls": true,
+  "assets": {
+    // `vitepress build src --outDir dist` resolves the outDir against the repo
+    // package, so the build lands here rather than under src/.
+    "directory": "./dist",
+    // VitePress emits cleanUrls pages as `<route>.html`; dropping the trailing
+    // slash matches the canonical each page advertises.
+    "html_handling": "drop-trailing-slash",
+    // The site ships a real 404 document, so unmatched paths get it rather
+    // than an SPA fallback.
+    "not_found_handling": "404-page",
+  },
+}

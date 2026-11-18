@@ -1,0 +1,9 @@
+{
+  "name": "Seams screen",
+  "short_name": "Screen",
+  "start_url": "/tv",
+  "scope": "/tv",
+  "display": "fullscreen",
+  "background_color": "#17140F",
+  "theme_color": "#17140F"
+}

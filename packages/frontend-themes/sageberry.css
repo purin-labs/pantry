@@ -1,0 +1,176 @@
+/* Sageberry: chiffon surfaces, sage actions, and lilac accents. Anchors are
+   the Sageberry Bliss reference: purple #B296CA (lilac 400), lilac #CEB7D7
+   (lilac 300), chiffon #E0DCD1 (chiffon 200), soft sage #ACB9AD (sage 300),
+   and sage #81987F (sage 400). */
+:root[data-pantry-theme="sageberry"] {
+  --pantry-chiffon-50: oklch(0.977 0.006 90);
+  --pantry-chiffon-100: oklch(0.945 0.011 90);
+  --pantry-chiffon-150: oklch(0.92 0.013 90.123);
+  --pantry-chiffon-200: oklch(0.895 0.015 90.245);
+  --pantry-chiffon-250: oklch(0.861 0.018 90.123);
+  --pantry-chiffon-300: oklch(0.827 0.021 90);
+  --pantry-chiffon-350: oklch(0.776 0.024 90);
+  --pantry-chiffon-400: oklch(0.725 0.026 90);
+  --pantry-chiffon-450: oklch(0.645 0.026 90);
+  --pantry-chiffon-500: oklch(0.565 0.026 90);
+  --pantry-chiffon-550: oklch(0.515 0.024 90);
+  --pantry-chiffon-600: oklch(0.465 0.022 90);
+  --pantry-chiffon-650: oklch(0.429 0.02 90);
+  --pantry-chiffon-700: oklch(0.393 0.018 90);
+  --pantry-chiffon-750: oklch(0.359 0.016 90);
+  --pantry-chiffon-800: oklch(0.324 0.014 90);
+
+  --pantry-sage-50: oklch(0.977 0.006 147);
+  --pantry-sage-100: oklch(0.94 0.012 147);
+  --pantry-sage-150: oklch(0.904 0.015 147);
+  --pantry-sage-200: oklch(0.868 0.018 147);
+  --pantry-sage-250: oklch(0.82 0.02 147.282);
+  --pantry-sage-300: oklch(0.772 0.022 147.565);
+  --pantry-sage-350: oklch(0.714 0.034 145.233);
+  --pantry-sage-400: oklch(0.655 0.045 142.901);
+  --pantry-sage-450: oklch(0.61 0.044 142.951);
+  --pantry-sage-500: oklch(0.565 0.044 143);
+  --pantry-sage-550: oklch(0.525 0.042 143);
+  --pantry-sage-600: oklch(0.485 0.04 143);
+  --pantry-sage-650: oklch(0.445 0.037 143);
+  --pantry-sage-700: oklch(0.405 0.034 143);
+  --pantry-sage-750: oklch(0.37 0.03 143);
+  --pantry-sage-800: oklch(0.335 0.027 143);
+
+  /* Sage lightness and hue, with 30% of its chroma. */
+  --pantry-sage-muted-50: oklch(0.977 0.002 147);
+  --pantry-sage-muted-100: oklch(0.94 0.004 147);
+  --pantry-sage-muted-150: oklch(0.904 0.005 147);
+  --pantry-sage-muted-200: oklch(0.868 0.005 147);
+  --pantry-sage-muted-250: oklch(0.82 0.006 147.282);
+  --pantry-sage-muted-300: oklch(0.772 0.007 147.565);
+  --pantry-sage-muted-350: oklch(0.714 0.01 145.233);
+  --pantry-sage-muted-400: oklch(0.655 0.014 142.901);
+  --pantry-sage-muted-450: oklch(0.61 0.013 142.951);
+  --pantry-sage-muted-500: oklch(0.565 0.013 143);
+  --pantry-sage-muted-550: oklch(0.525 0.013 143);
+  --pantry-sage-muted-600: oklch(0.485 0.012 143);
+  --pantry-sage-muted-650: oklch(0.445 0.011 143);
+  --pantry-sage-muted-700: oklch(0.405 0.01 143);
+  --pantry-sage-muted-750: oklch(0.37 0.009 143);
+  --pantry-sage-muted-800: oklch(0.335 0.008 143);
+
+  --pantry-lilac-50: oklch(0.975 0.013 316);
+  --pantry-lilac-100: oklch(0.945 0.025 316);
+  --pantry-lilac-150: oklch(0.916 0.032 316);
+  --pantry-lilac-200: oklch(0.888 0.039 316);
+  --pantry-lilac-250: oklch(0.849 0.045 316.251);
+  --pantry-lilac-300: oklch(0.809 0.051 316.503);
+  --pantry-lilac-350: oklch(0.762 0.066 312.698);
+  --pantry-lilac-400: oklch(0.716 0.08 308.893);
+  --pantry-lilac-450: oklch(0.672 0.09 308.947);
+  --pantry-lilac-500: oklch(0.628 0.1 309);
+  --pantry-lilac-550: oklch(0.582 0.102 309);
+  --pantry-lilac-600: oklch(0.535 0.104 309);
+  --pantry-lilac-650: oklch(0.49 0.097 309);
+  --pantry-lilac-700: oklch(0.445 0.089 309);
+  --pantry-lilac-750: oklch(0.4 0.079 309);
+  --pantry-lilac-800: oklch(0.355 0.069 309);
+
+  --pantry-ground: var(--pantry-chiffon-100);
+  --pantry-paper: var(--pantry-chiffon-50);
+  --pantry-surface: var(--pantry-chiffon-200);
+  --pantry-border: var(--pantry-chiffon-200);
+  --pantry-hairline: var(--pantry-chiffon-500);
+  --pantry-ink: var(--pantry-chiffon-800);
+  --pantry-ink-strong: var(--pantry-chiffon-800);
+  --pantry-ink-muted: var(--pantry-chiffon-700);
+  --pantry-ink-subtle: var(--pantry-chiffon-600);
+  --pantry-ink-hover: var(--pantry-chiffon-800);
+
+  --pantry-primary: var(--pantry-sage-600);
+  --pantry-primary-hover: var(--pantry-sage-650);
+  --pantry-on-primary: var(--pantry-chiffon-50);
+  --pantry-primary-border: var(--pantry-sage-600);
+  --pantry-hover: var(--pantry-sage-50);
+  --pantry-selected: var(--pantry-sage-200);
+  --pantry-on-selected: var(--pantry-sage-800);
+  --pantry-link: var(--pantry-sage-800);
+  --pantry-focus: var(--pantry-lilac-700);
+  --pantry-accent: var(--pantry-lilac-400);
+  --pantry-accent-soft: var(--pantry-lilac-300);
+  --pantry-accent-text: var(--pantry-lilac-700);
+  --pantry-accent-surface: var(--pantry-lilac-100);
+  --pantry-disabled-surface: var(--pantry-chiffon-200);
+  --pantry-disabled-text: var(--pantry-chiffon-600);
+
+  --pantry-success-text: var(--pantry-sage-800);
+  --pantry-success-surface: var(--pantry-sage-50);
+  --pantry-info-text: var(--pantry-chiffon-800);
+  --pantry-info-surface: var(--pantry-chiffon-100);
+  --pantry-warning-text: oklch(0.44 0.075 75);
+  --pantry-warning-surface: oklch(0.94 0.035 85);
+  --pantry-danger-text: var(--pantry-chiffon-800);
+  --pantry-danger-surface: var(--pantry-chiffon-300);
+  --pantry-category-accent-text: var(--pantry-sage-800);
+  --pantry-category-accent-surface: var(--pantry-sage-200);
+  --pantry-category-neutral-text: var(--pantry-chiffon-800);
+  --pantry-category-neutral-surface: var(--pantry-chiffon-200);
+
+  --pantry-sidebar: var(--pantry-chiffon-200);
+  --pantry-sidebar-hover: var(--pantry-chiffon-100);
+  --pantry-sidebar-selected: var(--pantry-chiffon-300);
+  --pantry-sidebar-selected-ring: none;
+  --pantry-chat-surface: var(--pantry-sage-250);
+
+  --pantry-shadow-color: var(--pantry-chiffon-800);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 2px 4px color-mix(in oklch, var(--pantry-shadow-color) 4%, transparent),
+    0 6px 16px color-mix(in oklch, var(--pantry-shadow-color) 4%, transparent);
+}
+
+:root[data-pantry-theme="sageberry"][data-portal-theme="dark"] {
+  --pantry-ground: var(--pantry-sage-muted-650);
+  --pantry-paper: var(--pantry-sage-muted-550);
+  --pantry-surface: var(--pantry-sage-muted-600);
+  --pantry-border: var(--pantry-sage-muted-500);
+  --pantry-hairline: var(--pantry-sage-muted-250);
+  --pantry-ink: var(--pantry-chiffon-50);
+  --pantry-ink-strong: var(--pantry-chiffon-100);
+  --pantry-ink-muted: var(--pantry-chiffon-100);
+  --pantry-ink-subtle: var(--pantry-chiffon-100);
+  --pantry-ink-hover: var(--pantry-chiffon-100);
+  --pantry-primary: var(--pantry-sage-300);
+  --pantry-primary-hover: var(--pantry-sage-200);
+  --pantry-on-primary: var(--pantry-chiffon-800);
+  --pantry-primary-border: var(--pantry-sage-500);
+  --pantry-hover: var(--pantry-paper);
+  --pantry-selected: var(--pantry-sage-muted-550);
+  --pantry-on-selected: var(--pantry-chiffon-50);
+  --pantry-link: var(--pantry-sage-100);
+  --pantry-focus: var(--pantry-lilac-250);
+  --pantry-accent-text: var(--pantry-lilac-200);
+  --pantry-accent-surface: var(--pantry-lilac-650);
+  --pantry-disabled-surface: var(--pantry-surface);
+  --pantry-disabled-text: var(--pantry-chiffon-400);
+  --pantry-success-text: var(--pantry-sage-200);
+  --pantry-success-surface: var(--pantry-ground);
+  --pantry-info-text: var(--pantry-chiffon-100);
+  --pantry-info-surface: var(--pantry-surface);
+  --pantry-warning-text: oklch(0.89 0.087 85);
+  --pantry-warning-surface: oklch(0.43 0.033 75);
+  --pantry-danger-text: var(--pantry-chiffon-50);
+  --pantry-danger-surface: var(--pantry-surface);
+  --pantry-category-accent-text: var(--pantry-sage-100);
+  --pantry-category-accent-surface: var(--pantry-ground);
+  --pantry-category-neutral-text: var(--pantry-chiffon-100);
+  --pantry-category-neutral-surface: var(--pantry-surface);
+
+  --pantry-sidebar: var(--pantry-sage-muted-600);
+  --pantry-sidebar-hover: var(--pantry-hover);
+  --pantry-sidebar-selected: var(--pantry-selected);
+  --pantry-sidebar-selected-ring: 0 0 0 1px var(--pantry-sage-muted-400) inset;
+  --pantry-chat-surface: oklch(from var(--pantry-sage-700) l calc(c * 0.6) h);
+
+  --pantry-shadow-color: var(--pantry-sage-muted-800);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 2px 4px color-mix(in oklch, var(--pantry-shadow-color) 12%, transparent),
+    0 6px 16px color-mix(in oklch, var(--pantry-shadow-color) 12%, transparent);
+}

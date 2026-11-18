@@ -1,0 +1,2 @@
+
+export type HarnessEventSequence = number;

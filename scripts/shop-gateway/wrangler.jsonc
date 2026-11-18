@@ -1,0 +1,87 @@
+{
+  "name": "satyr-shop-gateway-journey",
+  "main": "worker.ts",
+  "compatibility_date": "2026-07-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "../../output/shop-gateway/assets",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/v1/*", "/test/*", "/account-platform/*"],
+  },
+  "vars": {
+    "SATYR_PUBLIC_ORIGIN": "http://127.0.0.1:8893",
+    "SATYR_DEPLOYMENT_PROFILE": "local",
+    "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"plan81-browser\",\"locationHint\":\"wnam\",\"databaseBinding\":\"DB\"}",
+    "OPENROUTER_API_KEY": "synthetic-kitchen-fixture-simulated-provider",
+    "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+    "VOICE_DNS_API_TOKEN": "synthetic-shop-voice-journey-dns-token",
+    "VOICE_DNS_ZONE_ID": "shop-voice-journey-zone",
+    "VOICE_DNS_ZONE_NAME": "shop-voice.test",
+    "SESSION_TOKEN_SECRET": "synthetic-kitchen-fixture-session-token-secret",
+    // The built account Worker of the acceptance tests. The provider process
+    // runs it, binds it as ACCOUNT_PLATFORM and adds the two keys of each run.
+    "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "shared-account-satyr-e2e",
+    "ACCOUNT_PLATFORM_PROVISION_TOKEN": "shared-account-e2e-satyr-provision",
+    "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-shared-account-e2e",
+    "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "https://account.shared-account.invalid",
+    "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://satyr.shared-account.invalid",
+    "ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID": "satyr-shared-account-e2e",
+    "ACCOUNT_PLATFORM_ASSERTION_ISSUER": "https://satyr.shared-account.invalid",
+    "ACCOUNT_PLATFORM_ASSERTION_AUDIENCE": "https://account.shared-account.invalid",
+    "GOOGLE_OIDC_CLIENT_ID": "shared-account-satyr-e2e",
+  },
+  "exports": {
+    "OrganisationDO": { "type": "durable-object", "storage": "sqlite" },
+    "SessionDO": { "type": "durable-object", "storage": "sqlite" },
+    "CaseDO": { "type": "durable-object", "storage": "sqlite" },
+    "ConnectorDO": { "type": "durable-object", "storage": "sqlite" },
+    "CodeModePlatformGovernorActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "DeviceFleetActor": { "type": "durable-object", "storage": "sqlite" },
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "ORGANISATION", "class_name": "OrganisationDO" },
+      { "name": "SESSION", "class_name": "SessionDO" },
+      { "name": "CASE", "class_name": "CaseDO" },
+      { "name": "CONNECTOR", "class_name": "ConnectorDO" },
+      {
+        "name": "CODE_MODE_PLATFORM_GOVERNOR_ACTOR",
+        "class_name": "CodeModePlatformGovernorActor",
+      },
+      { "name": "DEVICE_FLEET", "class_name": "DeviceFleetActor" },
+    ],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "shop-voice-journey",
+      "database_id": "00000000-0000-0000-0000-000000000581",
+    },
+  ],
+  "secrets_store_secrets": [
+    {
+      "binding": "DATA_ENCRYPTION_ROOT",
+      "store_id": "browser-fixture",
+      "secret_name": "checkpoint-root",
+    },
+    {
+      "binding": "VAULT_ROOT_V1",
+      "store_id": "browser-fixture",
+      "secret_name": "vault-root",
+    },
+  ],
+  "queues": {
+    "producers": [{ "binding": "EVENT_Q", "queue": "satyr-events" }],
+    "consumers": [{ "queue": "satyr-events", "max_batch_timeout": 1 }],
+  },
+  "kv_namespaces": [
+    { "binding": "POLICY_KV", "id": "00000000000000000000000000000581" },
+  ],
+  "r2_buckets": [
+    { "binding": "ARCHIVE", "bucket_name": "shop-voice-journey" },
+  ],
+}

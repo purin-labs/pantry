@@ -1,0 +1,511 @@
+import { spawnSync } from "node:child_process";
+import { createHash, generateKeyPairSync } from "node:crypto";
+import { readFileSync, readdirSync, rmSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath, URL as NodeUrl } from "node:url";
+import { builtinModules } from "node:module";
+
+import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
+import { defineConfig } from "vitest/config";
+import { unstable_readConfig } from "wrangler";
+
+import { commerceFixtureWorkerArtifact } from "./tests/commerce-fixture-worker";
+
+const TEST_SECRET_BINDINGS = {
+  AIRTABLE_OAUTH_CLIENT_SECRET: "airtable-e2e-secret",
+  COMMERCE_LAB_SIGNING_SECRET: "commerce-lab-e2e-secret",
+  GMAIL_OAUTH_CLIENT_SECRET: "gmail-e2e-secret",
+  GOOGLE_OIDC_CLIENT_SECRET: "google-oidc-e2e-secret",
+  NOTION_OAUTH_CLIENT_SECRET: "notion-e2e-secret",
+  OPENROUTER_API_KEY: "openrouter-e2e-key",
+  TYPESAFE_API_KEY: "typesafe-satyr-e2e-key-0000000000",
+  SESSION_TOKEN_SECRET: "session-token-e2e-secret",
+  SHOPIFY_CLIENT_ID: "shopify-e2e-client",
+  SHOPIFY_CLIENT_SECRET: "shopify-e2e-secret",
+  SLACK_CLIENT_ID: "slack-e2e-client",
+  SLACK_CLIENT_SECRET: "slack-e2e-secret",
+  SLACK_OAUTH_STATE_SECRET: "slack-oauth-state-e2e-secret",
+  SLACK_SIGNING_SECRET: "slack-signing-e2e-secret",
+  SQUARE_OAUTH_CLIENT_SECRET: "square-e2e-secret",
+  STRIPE_CONNECT_CLIENT_ID: "stripe-e2e-client",
+  STRIPE_CONNECT_CLIENT_SECRET: "sk_test_satyr_platform_e2e",
+  STRIPE_CONNECT_WEBHOOK_ID: "we_e2e",
+  STRIPE_CONNECT_WEBHOOK_SECRET: "whsec_e2e",
+  ORGANISATION_ADMIN_TOKEN: "organisation-admin-e2e-token-000000000000",
+  UNDERCLERK_SERVICE_TOKEN: "underclerk-e2e-token",
+  SATYR_FAULT_INJECTION_TOKEN: "fault-injection-e2e-token",
+  WHATSAPP_APP_SECRET: "whatsapp-e2e-app-secret",
+} as const;
+
+const TEST_VALUE_BINDINGS = {
+  AIRTABLE_OAUTH_CLIENT_ID: "airtable-e2e-client",
+  GMAIL_OAUTH_CLIENT_ID: "gmail-e2e-client",
+  GMAIL_PUBSUB_TOPIC: "projects/mail-e2e/topics/mail-e2e",
+  GOOGLE_OIDC_CLIENT_ID: "google-oidc-e2e-client",
+  NOTION_OAUTH_CLIENT_ID: "notion-e2e-client",
+  SATYR_DEPLOYMENT_PROFILE: "local",
+  SATYR_PUBLIC_ORIGIN: "https://localhost",
+  SATYR_WARM_ACTOR_SLOTS: "on",
+  SQUARE_OAUTH_CLIENT_ID: "sandbox-sq0idb-e2e",
+  SQUARE_OAUTH_ENVIRONMENT: "development",
+  SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+    kind: "affinity",
+    placementCellId: "e2e",
+    locationHint: "wnam",
+    databaseBinding: "DB",
+    cells: [
+      {
+        kind: "affinity",
+        placementCellId: "e2e-policy-snapshot",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-policy-activation",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-policy-kv",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-cleanup-live",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-cleanup-recovery",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-archive-cleanup",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-fork-admission",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-fork-preparation",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-fork-publication",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+      {
+        kind: "affinity",
+        placementCellId: "e2e-fork-failure",
+        locationHint: "wnam",
+        databaseBinding: "DB",
+      },
+    ],
+  }),
+  SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+  SLACK_APP_ID: "A12345678",
+  UNDERCLERK_BASE_URL: "http://underclerk.test",
+  SHOP_ORDER_PAGE_ORIGIN: "https://{name}.menu.test",
+  WHATSAPP_APP_ID: "1000000000000001",
+  WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID: "3000000000000003",
+} as const;
+
+export default defineConfig({
+  plugins: [cloudflareTest(cloudflareOptions)],
+  ssr: {
+    resolve: {
+      // Native journeys must select the same package exports as Wrangler.
+      conditions: [
+        "workerd",
+        "worker",
+        "module",
+        "browser",
+        "development|production",
+      ],
+    },
+  },
+  test: {
+    include: ["tests/e2e/**/*.test.ts"],
+    setupFiles: ["./tests/e2e/setup.ts"],
+    fileParallelism: false,
+    retry: 0,
+    testTimeout: 30_000,
+    deps: {
+      optimizer: {
+        ssr: {
+          enabled: true,
+          include: ["@earendil-works/pi-durable"],
+          rolldownOptions: {
+            external: [...builtinModules, /^node:/u],
+          },
+        },
+      },
+    },
+  },
+});
+
+/** The cells of the fixture profile, each bound to a regional database. */
+function regionalFixtureCells(): readonly Record<string, unknown>[] {
+  const profile = JSON.parse(
+    TEST_VALUE_BINDINGS.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+  ) as Record<string, unknown> & { cells: Record<string, unknown>[] };
+  const { cells, ...root } = profile;
+  return [root, ...cells].map((cell) => ({
+    ...cell,
+    databaseBinding: "ORGANISATION_DB_WNAM",
+  }));
+}
+
+async function cloudflareOptions() {
+  const accountPlatform = sharedAccountPlatformTestRuntime();
+  // Global records and each Organisation's records live in two databases, as
+  // in production.
+  const migrations = await readD1Migrations(
+    fileURLToPath(new NodeUrl("./migrations-global", import.meta.url)),
+  );
+  const regionalMigrations = await readD1Migrations(
+    fileURLToPath(new NodeUrl("./migrations-regional", import.meta.url)),
+  );
+  return {
+    remoteBindings: false,
+    wrangler: {
+      configPath: fileURLToPath(
+        new NodeUrl("./tests/e2e/wrangler.jsonc", import.meta.url),
+      ),
+    },
+    miniflare: {
+      durableObjects: {
+        CODE_MODE_SANDBOX: {
+          className: "CodeModeSandbox",
+          scriptName: CODE_MODE_SANDBOX_WORKER,
+        },
+      },
+      workers: [
+        codeModeSandboxWorker(),
+        modelExitWorker(),
+        commerceFixtureWorker(),
+        ...accountPlatform.workers,
+      ],
+      bindings: {
+        ...TEST_SECRET_BINDINGS,
+        OPENROUTER_API_KEY:
+          process.env.SATYR_PI_ACCEPTANCE_API_KEY ??
+          TEST_SECRET_BINDINGS.OPENROUTER_API_KEY,
+        ...TEST_VALUE_BINDINGS,
+        ...accountPlatform.bindings,
+        TEST_MIGRATIONS: migrations,
+        TEST_REGIONAL_MIGRATIONS: regionalMigrations,
+        TEST_PRODUCTION_CRONS: productionCrons(),
+        SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+          kind: "affinity",
+          placementCellId: "regional-wnam",
+          locationHint: "wnam",
+          databaseBinding: "ORGANISATION_DB_WNAM",
+          cells: [
+            {
+              kind: "affinity",
+              placementCellId: "regional-apac",
+              locationHint: "apac",
+              databaseBinding: "ORGANISATION_DB_APAC",
+            },
+            // The fixtures name the cells of the value bindings profile;
+            // here each of them keeps its data in the WNAM database.
+            ...regionalFixtureCells(),
+          ],
+        }),
+      },
+      serviceBindings: {
+        UNDERCLERK: { name: COMMERCE_FIXTURE_WORKER },
+        MODEL_EXIT: { name: MODEL_EXIT_WORKER },
+        // The E2E runtime cannot run the ChatGPT exit container (Plan 75); an
+        // entrypoint of the runner runs its steps instead.
+        CHATGPT_EXIT: { name: RUNNER_WORKER, entrypoint: "ChatGptExitNetwork" },
+        VAULT_ONEPASSWORD: {
+          name: RUNNER_WORKER,
+          entrypoint: "OnePasswordNetwork",
+        },
+        ...accountPlatform.serviceBindings,
+      },
+    },
+  };
+}
+
+/**
+ * The cron triggers of the production Worker. The idle-cost journey runs
+ * every one of them, so that a new trigger is measured without a test change.
+ */
+function productionCrons(): string[] {
+  const config = unstable_readConfig({
+    config: fileURLToPath(new NodeUrl("./wrangler.jsonc", import.meta.url)),
+    env: "production",
+  });
+  return [...(config.triggers.crons ?? [])];
+}
+
+const COMMERCE_FIXTURE_WORKER = "underclerk-fixture-e2e";
+
+/**
+ * Commerce's built fixture Worker (Plan 76 phase 1). This test runtime never
+ * imports Commerce source; the journeys seed it through its scenarios. The
+ * deterministic Ed25519 key (32 bytes of 7) lets the delivery verifier run.
+ */
+function commerceFixtureWorker() {
+  const artifact = commerceFixtureWorkerArtifact();
+  const settings = JSON.parse(
+    readFileSync(join(artifact, "fixture-worker.json"), "utf8"),
+  ) as { compatibilityDate: string; compatibilityFlags: string[] };
+  const signingKey = Buffer.concat([
+    Buffer.from("302e020100300506032b657004220420", "hex"),
+    Buffer.alloc(32, 7),
+  ]).toString("base64url");
+  const files = readdirSync(artifact).filter(
+    (file) => file.endsWith(".js") || file.endsWith(".wasm"),
+  );
+  return {
+    name: COMMERCE_FIXTURE_WORKER,
+    modulesRoot: artifact,
+    compatibilityDate: settings.compatibilityDate,
+    compatibilityFlags: settings.compatibilityFlags,
+    modules: ["worker.js", ...files.filter((file) => file !== "worker.js")].map(
+      (file) => ({
+        type: file.endsWith(".wasm")
+          ? ("CompiledWasm" as const)
+          : ("ESModule" as const),
+        path: join(artifact, file),
+      }),
+    ),
+    durableObjects: {
+      UNDERCLERK_MERCHANT: {
+        className: "CommerceFixtureMerchantDO",
+        useSQLite: true,
+      },
+      UNDERCLERK_SHOP_NAME: {
+        className: "UnderclerkShopNameDO",
+        useSQLite: true,
+      },
+    },
+    // Product photos live in R2, as in production.
+    r2Buckets: ["BUCKET"],
+    bindings: {
+      SATYR_DEPLOYMENT_PROFILE: "local",
+      UNDERCLERK_SERVICE_TOKEN: TEST_SECRET_BINDINGS.UNDERCLERK_SERVICE_TOKEN,
+      UNDERCLERK_BUYER_SESSION_SECRET: "bakery-e2e-buyer-secret-00000001",
+      UNDERCLERK_SIGNING_KEY_ID: "key_bakery_e2e",
+      UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64: signingKey,
+      JAPAN_CARRIER_SIGNING_KEY: "bakery-e2e-shipping",
+      // Commerce holds Pantry merchants' Square connections (Plan 80 step 4).
+      SQUARE_OAUTH_CLIENT_ID: TEST_VALUE_BINDINGS.SQUARE_OAUTH_CLIENT_ID,
+      SQUARE_OAUTH_CLIENT_SECRET:
+        TEST_SECRET_BINDINGS.SQUARE_OAUTH_CLIENT_SECRET,
+      // Commerce links Pantry merchants' Stripe accounts (Plan 80 step 5).
+      STRIPE_SECRET_KEY: "sk_test_underclerk_e2e",
+    },
+    // Webhook posts to the platform's origin reach the platform Worker.
+    outboundService: { name: RUNNER_WORKER, entrypoint: "CommerceNetwork" },
+  };
+}
+
+const ACCOUNT_PLATFORM_TEST_WORKER = "seams-account-platform-e2e";
+const ACCOUNT_PLATFORM_TEST_ORIGIN = "https://account.shared-account.invalid";
+
+/** Load the built account Worker. This test runtime never imports Seams source. */
+function sharedAccountPlatformTestRuntime() {
+  const artifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
+  const bindings: Record<string, string> = {};
+  const serviceBindings: Record<string, { name: string }> = {};
+  if (!artifact) return { workers: [] as const, bindings, serviceBindings };
+  const artifactPath = resolve(artifact);
+  const artifactBytes = readFileSync(artifactPath);
+  const assertion = generateKeyPairSync("ed25519");
+  const google = generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const provision = generateKeyPairSync("ed25519");
+  const privateAssertion = assertion.privateKey.export({
+    format: "der",
+    type: "pkcs8",
+  });
+  Object.assign(bindings, {
+    TEST_ACCOUNT_PLATFORM_WORKER_SHA256: createHash("sha256")
+      .update(artifactBytes)
+      .digest("hex"),
+    ACCOUNT_PLATFORM_DEPLOYMENT_ID: "shared-account-satyr-e2e",
+    ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-satyr-provision",
+    ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK: JSON.stringify(
+      provision.publicKey.export({ format: "jwk" }),
+    ),
+    ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID: "account-shared-account-e2e",
+    ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER: ACCOUNT_PLATFORM_TEST_ORIGIN,
+    ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE:
+      "https://satyr.shared-account.invalid",
+    ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID: "satyr-shared-account-e2e",
+    ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U:
+      privateAssertion.toString("base64url"),
+    ACCOUNT_PLATFORM_ASSERTION_ISSUER: "https://satyr.shared-account.invalid",
+    ACCOUNT_PLATFORM_ASSERTION_AUDIENCE: ACCOUNT_PLATFORM_TEST_ORIGIN,
+    GOOGLE_OIDC_CLIENT_ID: "shared-account-satyr-e2e",
+    TEST_ACCOUNT_PLATFORM_BASE_URL: ACCOUNT_PLATFORM_TEST_ORIGIN,
+    TEST_ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-satyr-provision",
+  });
+  serviceBindings.ACCOUNT_PLATFORM = { name: ACCOUNT_PLATFORM_TEST_WORKER };
+  serviceBindings.ACCOUNT_PLATFORM_FIXTURE = {
+    name: ACCOUNT_PLATFORM_TEST_WORKER,
+  };
+  const worker = {
+    name: ACCOUNT_PLATFORM_TEST_WORKER,
+    modulesRoot: dirname(artifactPath),
+    compatibilityDate: "2026-07-07",
+    compatibilityFlags: ["nodejs_compat"],
+    modules: [{ type: "ESModule" as const, path: artifactPath }],
+    d1Databases: { ACCOUNT_DB: "shared-account-platform-acceptance" },
+    bindings: {
+      FIXTURE_ASSERTION_PUBLIC_JWK: JSON.stringify(
+        assertion.publicKey.export({ format: "jwk" }),
+      ),
+      FIXTURE_GOOGLE_PRIVATE_JWK: JSON.stringify(
+        google.privateKey.export({ format: "jwk" }),
+      ),
+      FIXTURE_GOOGLE_PUBLIC_JWK: JSON.stringify(
+        google.publicKey.export({ format: "jwk" }),
+      ),
+      FIXTURE_GOOGLE_CLIENT_ID: "shared-account-satyr-e2e",
+      FIXTURE_PROVISION_PRIVATE_JWK: JSON.stringify(
+        provision.privateKey.export({ format: "jwk" }),
+      ),
+    },
+  };
+  return { workers: [worker], bindings, serviceBindings };
+}
+
+const CODE_MODE_SANDBOX_WORKER = "satyr-code-mode-sandbox-e2e";
+
+let sandboxWorker: ReturnType<typeof buildCodeModeSandboxWorker> | null = null;
+
+/** The sandbox Worker of this Vitest process: one build serves every file. */
+function codeModeSandboxWorker() {
+  sandboxWorker ??= buildCodeModeSandboxWorker();
+  return sandboxWorker;
+}
+
+/**
+ * Builds the Code Mode sandbox Worker with Wrangler, as a deployment does, and
+ * returns it as a second Worker of the test runtime. The platform Worker
+ * reaches its class through a `script_name` binding, as in production.
+ */
+function buildCodeModeSandboxWorker() {
+  return {
+    name: CODE_MODE_SANDBOX_WORKER,
+    compatibilityDate: "2026-07-07",
+    ...buildWorkerModules(
+      "wrangler.code-mode-sandbox.jsonc",
+      "code-mode-sandbox",
+    ),
+    durableObjects: {
+      SANDBOX: { className: "CodeModeSandbox", useSQLite: true },
+    },
+  };
+}
+
+const MODEL_EXIT_WORKER = "satyr-model-exit-e2e";
+/**
+ * The Worker that runs the test files. The Cloudflare Vitest plugin names it
+ * after the Vitest project, and this project has no name.
+ */
+const RUNNER_WORKER = "vitest-plugin-runner-";
+
+let exitWorker: ReturnType<typeof buildModelExitWorker> | null = null;
+
+/** The model exit Worker of this Vitest process (Plan 73). */
+function modelExitWorker() {
+  exitWorker ??= buildModelExitWorker();
+  return exitWorker;
+}
+
+/**
+ * Builds the model exit Worker with Wrangler, as a deployment does. The
+ * platform Worker reaches it through its `MODEL_EXIT` service binding, as in
+ * production. Its outbound requests go to the `ModelExitNetwork` entrypoint
+ * of the runner Worker, which sends them on through the test network with a
+ * mark. A fake provider can then tell a request that left through it.
+ */
+function buildModelExitWorker() {
+  return {
+    name: MODEL_EXIT_WORKER,
+    compatibilityDate: "2026-07-07",
+    ...buildWorkerModules("wrangler.model-exit.jsonc", "model-exit"),
+    bindings: { SATYR_DEPLOYMENT_PROFILE: "local" },
+    outboundService: { name: RUNNER_WORKER, entrypoint: "ModelExitNetwork" },
+  };
+}
+
+/**
+ * Builds a Worker of this package with Wrangler from its local profile.
+ *
+ * The build has a directory for each Vitest process. The runtime reads the
+ * modules from that directory when it starts a test file, so two runs in one
+ * checkout must not share it.
+ */
+function buildWorkerModules(config: string, label: string) {
+  const root = fileURLToPath(new NodeUrl("./", import.meta.url));
+  const directory = join(root, `.wrangler/${label}-e2e-${process.pid}`);
+  rmSync(directory, { recursive: true, force: true });
+  process.once(
+    "exit",
+    rmSync.bind(null, directory, { recursive: true, force: true }),
+  );
+  const built = spawnSync(
+    "pnpm",
+    [
+      "exec",
+      "wrangler",
+      "deploy",
+      "--config",
+      config,
+      "--env",
+      "local",
+      "--dry-run",
+      "--outdir",
+      directory,
+    ],
+    {
+      cwd: root,
+      encoding: "utf8",
+      env: { ...process.env, CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false" },
+    },
+  );
+  if (built.status !== 0)
+    throw new Error(`${label} Worker build failed: ${built.stderr}`);
+  return {
+    modulesRoot: directory,
+    // The main module comes first.
+    modules: readdirSync(directory)
+      .sort(mainModuleFirst)
+      .flatMap(workerModule.bind(null, directory)),
+  };
+}
+
+function workerModule(
+  directory: string,
+  name: string,
+): { type: "ESModule" | "CompiledWasm"; path: string }[] {
+  const path = join(directory, name);
+  if (name.endsWith(".js")) return [{ type: "ESModule", path }];
+  if (name.endsWith(".wasm")) return [{ type: "CompiledWasm", path }];
+  return [];
+}
+
+function mainModuleFirst(left: string, right: string) {
+  return Number(right === "worker.js") - Number(left === "worker.js");
+}

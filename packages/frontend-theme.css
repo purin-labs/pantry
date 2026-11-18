@@ -1,0 +1,88 @@
+/* Each theme defines palette shades and semantic color roles for both
+   appearances. Select one with data-pantry-theme on <html>; without the
+   attribute, slate-coral applies. data-portal-theme selects the appearance.
+   The account palette preference (PORTAL_PALETTES in @seams/control-api)
+   lists the themes that people can choose. */
+@import "./frontend-themes/slate-coral.css";
+@import "./frontend-themes/espresso.css";
+@import "./frontend-themes/paper.css";
+@import "./frontend-themes/sageberry.css";
+
+:root {
+  color-scheme: light;
+  --pantry-ring: 0 0 0 1px var(--pantry-hairline) inset;
+  --pantry-button-ring: 0 0 0 1px var(--pantry-border) inset;
+  /* A decorative pattern for large empty panels; a theme may set one. The
+     texture is a mask image, and the texture ink is its colour. */
+  --pantry-texture: none;
+  --pantry-texture-ink: transparent;
+  --pantry-primary-ring: 0 0 0 1px var(--pantry-primary-border) inset;
+  --pantry-danger-ring: 0 0 0 1px var(--pantry-danger-text) inset;
+  --pantry-radius-control: 10px;
+  --pantry-radius-notice: 12px;
+  --pantry-radius-card: 16px;
+  --pantry-radius-panel: 20px;
+  --pantry-radius-pill: 9999px;
+  --pantry-space-1: 4px;
+  --pantry-space-2: 8px;
+  --pantry-space-3: 12px;
+  --pantry-space-4: 16px;
+  --pantry-space-6: 24px;
+  --pantry-space-8: 32px;
+  --pantry-space-12: 48px;
+  --pantry-motion-fast: 150ms;
+  /* Closed-form spring step responses, sampled from spring(duration, bounce)
+     in apps/portal/src/ui/spring.ts. Each easing spans the whole settle, so
+     use it with its paired duration. Quick (150ms, bounce 0) is for icons and
+     small controls; smooth (250ms, bounce 0) is for containers and layout;
+     glide (300ms, bounce 0.2, 1.5% overshoot) is for shape morphs. */
+  --pantry-spring-quick-duration: 210ms;
+  --pantry-spring-quick-ease: linear(
+    0, 0.006 1.2%, 0.021 2.5%, 0.049 4%, 0.085 5.5%, 0.12 6.8%, 0.165 8.2%,
+    0.364 14.5%, 0.455 17.5%, 0.505 19.2%, 0.551 21%, 0.629 24.2%, 0.696 27.5%,
+    0.756 31%, 0.809 34.8%, 0.852 38.5%, 0.891 43%, 0.923 48%, 0.948 53.5%,
+    0.967 59.8%, 0.98 66.5%, 0.989 74.8%, 0.995 83.5%, 1
+  );
+  --pantry-spring-smooth-duration: 340ms;
+  --pantry-spring-smooth-ease: linear(
+    0, 0.005 1.2%, 0.02 2.5%, 0.047 4%, 0.081 5.5%, 0.114 6.8%, 0.158 8.2%,
+    0.367 15%, 0.462 18.2%, 0.554 21.8%, 0.63 25%, 0.695 28.2%, 0.754 31.8%,
+    0.806 35.5%, 0.848 39.2%, 0.887 43.8%, 0.92 48.8%, 0.945 54.2%,
+    0.965 60.5%, 0.978 67.2%, 0.988 75.2%, 0.995 85.8%, 0.998 99.8%, 1
+  );
+  --pantry-spring-glide-duration: 390ms;
+  --pantry-spring-glide-ease: linear(
+    0, 0.005 1.2%, 0.022 2.8%, 0.055 4.5%, 0.099 6.2%, 0.142 7.8%, 0.198 9.5%,
+    0.429 16.2%, 0.534 19.5%, 0.63 22.8%, 0.676 24.5%, 0.713 26%, 0.779 29%,
+    0.839 32.2%, 0.887 35.5%, 0.928 39%, 0.96 42.8%, 0.985 47%, 1.001 51.5%,
+    1.011 56.8%, 1.015 61.5%, 1.015 67.2%, 1.002 99.8%, 1
+  );
+  /* Leaving elements accelerate away instead of settling. */
+  --pantry-exit-duration: 140ms;
+  --pantry-exit-ease: cubic-bezier(0.4, 0, 1, 1);
+  --pantry-font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --pantry-font-display:
+    "Waldenburg", "Helvetica Neue", Inter, ui-sans-serif, system-ui,
+    -apple-system, sans-serif;
+  --pantry-text-caption: 0.75rem;
+  --pantry-text-label: 0.875rem;
+  --pantry-text-body: 1rem;
+  --pantry-text-heading: 1.5rem;
+  --pantry-text-title: clamp(2.25rem, 5vw, 2.75rem);
+}
+
+:root[data-portal-theme="dark"] {
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pantry-motion-fast: 0ms;
+    --pantry-spring-quick-duration: 0ms;
+    --pantry-spring-smooth-duration: 0ms;
+    --pantry-spring-glide-duration: 0ms;
+    --pantry-exit-duration: 0ms;
+  }
+}

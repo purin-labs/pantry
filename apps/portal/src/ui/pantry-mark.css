@@ -1,0 +1,12 @@
+/* Two class names outrank an avatar's own `> img { display: block }`. */
+.pantry-mark.pantry-mark-on-dark {
+  display: none;
+}
+
+[data-portal-theme="dark"] .pantry-mark.pantry-mark-on-light {
+  display: none;
+}
+
+[data-portal-theme="dark"] .pantry-mark.pantry-mark-on-dark {
+  display: block;
+}

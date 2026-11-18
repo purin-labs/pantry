@@ -1,0 +1,113 @@
+.production-activity-trace {
+  gap: 20px;
+}
+.production-activity-trace .operations-trace-context {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.production-activity-trace .operations-trace-context span {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.production-activity-trace .production-activity-seconds {
+  display: inline-block;
+  min-width: 6ch;
+  text-align: end;
+}
+.production-activity-group {
+  min-width: 0;
+}
+.production-activity-group > h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.production-activity-group > .pantry-trace {
+  gap: 6px;
+  border-inline-start: 1px solid var(--border);
+  padding-inline-start: 14px;
+  margin-inline-start: 7px;
+  width: auto;
+}
+.production-activity-trace .pantry-trace-collapsible-trigger {
+  width: 100%;
+  min-height: 32px;
+  gap: 8px;
+}
+.production-activity-trace .pantry-trace-line {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.production-activity-trace .pantry-trace-title {
+  justify-self: start;
+  max-width: 100%;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.production-activity-trace .pantry-trace-description {
+  margin: 0;
+  width: auto;
+  font-size: 11px;
+  max-width: 130px;
+  white-space: normal;
+  text-align: end;
+  line-height: 1.4;
+}
+.production-activity-trace .pantry-trace-collapsible-content-inner {
+  font-size: 12px;
+}
+.production-task-time {
+  font-variant-numeric: tabular-nums;
+}
+.production-activity-trace .production-task-prerequisites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 8px 0 12px;
+  list-style: none;
+}
+.production-activity-trace .production-task-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: none;
+  line-height: 18px;
+  white-space: normal;
+  text-align: start;
+}
+.production-task-button svg {
+  flex-shrink: 0;
+  color: var(--ink-2);
+}
+.production-activity-trace .production-task-button:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .production-activity-trace .production-task-button:hover {
+    background: var(--surface);
+  }
+}
+@media (pointer: coarse) {
+  .production-activity-trace .pantry-trace-collapsible-trigger,
+  .production-activity-trace .production-task-button {
+    min-height: 44px;
+  }
+}

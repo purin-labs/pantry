@@ -1,0 +1,6 @@
+# The physics pins without Blender. CI installs this file; requirements.txt
+# includes it. The engine accepts only MuJoCo 4.0.0 (crates/bakery-native).
+mujoco==4.0.0
+numpy==1.26.4
+xacro==2.1.1
+PyYAML==6.0.3

@@ -1,0 +1,312 @@
+name: Pantry
+
+on:
+  pull_request:
+    branches: [main]
+    # "labeled" starts a run when a person adds the label run-ci.
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+  merge_group:
+  # The draft pull request from dev to main runs the jobs for each push to dev
+  # while it has the label run-ci. "Run workflow" (Actions, Pantry) works only
+  # after main holds this file.
+  workflow_dispatch:
+
+concurrency:
+  group: pantry-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Contracts and edge checks
+    # A draft pull request runs a job only with the label run-ci. Every session
+    # pushes to dev, and one full run takes about 290 runner minutes. A run for
+    # each push used about 2,160 runner minutes in two days (16-17 November 2026).
+    if: ${{ !github.event.pull_request.draft || contains(github.event.pull_request.labels.*.name, 'run-ci') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: 1.97.0
+          targets: wasm32-unknown-unknown
+          components: rustfmt
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 10.28.1
+          run_install: false
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Fetch large files from R2
+        # The Kitchen models, the unpinned Kitchen bundles and the equipment manuals
+        # live in R2 (repo-binaries.json, Plan 92). The secrets hold a read-only key.
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_READ_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_READ_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        run: node scripts/repo-binaries.mjs fetch --jobs 16
+
+      - name: Checkout pinned account acceptance authority
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: seams-tech/seams-monorepo
+          ref: 3a05ce4864dbbcec87d43122e9263bfecf922264
+          path: output/shared-account-authority/source
+          persist-credentials: false
+
+      - name: Build account acceptance authority
+        run: |
+          pnpm -C output/shared-account-authority/source install --frozen-lockfile
+          pnpm -C output/shared-account-authority/source/tests exec node helpers/buildSharedAccountPlatformWorker.mjs
+          account_worker="$GITHUB_WORKSPACE/output/shared-account-authority/source/.artifacts/shared-account-platform/account-worker/index.mjs"
+          sha256sum "$account_worker"
+          printf 'SATYR_ACCOUNT_WORKER_ARTIFACT=%s\n' "$account_worker" >> "$GITHUB_ENV"
+
+      - name: Check shared helpers are not copied
+        run: pnpm check:shared-helpers
+
+      - name: Check shared async-control package
+        run: pnpm async-control:check
+
+      - name: Commerce machines and plugins check
+        run: pnpm --filter @seams/commerce-contracts commerce-data:check
+
+      - name: Install pinned wasm-pack
+        run: cargo install wasm-pack --version 0.13.1 --locked
+
+      - name: Contracts TypeScript check
+        run: |
+          pnpm --filter @seams/commerce-contracts check:types
+          pnpm --filter @seams/contracts check:types
+
+      - name: Runtime boundary between Pantry and Commerce
+        run: pnpm lint:runtime-boundary
+
+      - name: Information-flow boundary ownership
+        run: pnpm lint:ifc-boundaries
+
+      - name: Portal dropdowns use Select
+        run: pnpm lint:portal-select
+
+      - name: Engine source matches the pinned physics bundle
+        run: pnpm lint:physics-bundle
+
+      - name: Appliance lists match the appliance registry
+        run: pnpm lint:appliance-registry
+
+      - name: D1 baseline changes have a patch script
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # The checkout keeps no credentials, so this one fetch carries the job token.
+        run: |
+          auth="$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" \
+            fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          node scripts/check-d1-patch.mjs --base "origin/${{ github.base_ref }}"
+
+      - name: Edge TypeScript check
+        run: pnpm --filter @seams/platform check:types
+
+      - name: Edge test TypeScript check
+        run: pnpm --filter @seams/platform check:test-types
+
+      - name: Edge end-to-end journeys
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: |
+          pnpm --filter @seams/platform contracts:media
+          edge_failed=0
+          for edge_shard in 1 2 3 4; do
+            if ! pnpm --filter @seams/platform exec vitest run --config vitest.e2e.config.ts --shard="$edge_shard/4"; then
+              edge_failed=1
+            fi
+          done
+          exit "$edge_failed"
+
+      - name: Durable Object optimization benchmark smoke
+        run: pnpm benchmark:optimization-1:smoke
+
+  bakery-physics:
+    name: Bakery native and browser acceptance
+    if: ${{ !github.event.pull_request.draft || contains(github.event.pull_request.labels.*.name, 'run-ci') }}
+    runs-on: ubuntu-latest
+    # The full job takes about 220 minutes on the 2-vCPU runner of a private
+    # repository (17 November 2026). GitHub stops a hosted job at 360 minutes.
+    timeout-minutes: 300
+    env:
+      MUJOCO_DIR: ${{ github.workspace }}/output/bakery-ci/sdk
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/output/bakery-ci/browsers
+      PLAYWRIGHT_MCP_CONFIG: ${{ github.workspace }}/output/bakery-ci/browser-config.json
+      PLAYWRIGHT_CLI: ${{ github.workspace }}/output/bakery-ci/tools/node_modules/.bin/playwright-cli
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: 1.97.0
+          targets: wasm32-unknown-unknown
+          components: rustfmt
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 10.28.1
+          run_install: false
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.11"
+
+      - name: Fetch large files from R2
+        # The Kitchen models, the unpinned Kitchen bundles and the equipment manuals
+        # live in R2 (repo-binaries.json, Plan 92). The secrets hold a read-only key.
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_READ_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_READ_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        run: node scripts/repo-binaries.mjs fetch --jobs 16
+
+      - name: Install acceptance dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          cargo install wasm-pack --version 0.13.1 --locked
+          sudo apt-get update
+          sudo apt-get install -y libclang-dev
+          mkdir -p output/bakery-ci
+          npm install --prefix output/bakery-ci/tools @playwright/cli@0.1.22 tsx@4.23.15
+          "$PLAYWRIGHT_CLI" install-browser chromium --with-deps
+          python -m pip install -r scripts/bakery-robots/requirements-physics.txt
+          node --input-type=module <<'JS'
+          import { writeFileSync } from "node:fs";
+          writeFileSync(process.env.PLAYWRIGHT_MCP_CONFIG, JSON.stringify({
+            browser: {
+              browserName: "chromium",
+              launchOptions: {
+                headless: true,
+                channel: "chromium",
+                args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+              },
+            },
+          }, null, 2));
+          JS
+
+      - name: Build the shared native runner and Portal
+        run: |
+          node scripts/bakery-robots/install-native-sdk.mjs "$MUJOCO_DIR"
+          cargo build --locked --release --manifest-path crates/bakery-native/Cargo.toml
+          pnpm --filter @seams/contracts media:build
+          pnpm --filter @seams/production-simulation check:types
+          node --input-type=module <<'JS'
+          import { execFileSync } from "node:child_process";
+          import { BAKERY_BROWSER_BUNDLE } from "./packages/production-simulation/src/simulator/browser-physics-asset.ts";
+          execFileSync(process.execPath, [
+            "scripts/production-simulation/build-execution-bundle.mjs",
+            `apps/portal/public/bakery-physics/bundles/${BAKERY_BROWSER_BUNDLE.id}`,
+            "--check",
+          ], { stdio: "inherit" });
+          JS
+          pnpm portal:build
+          pnpm --filter @seams/commerce-client check:types
+          pnpm --filter @seams/bakery-model check:types
+
+      # scripts/production-simulation/journeys.json lists every journey; its set
+      # "ci" holds the headless journeys of this job, in this order. The runner
+      # gives each one a fresh directory under output/bakery-ci, and the browser
+      # step below reads some of them (financier, oven-engine and others).
+      - name: Verify the headless journeys of the index (set ci)
+        run: node scripts/production-simulation/run-journeys.mjs --set ci --output output/bakery-ci --tsx output/bakery-ci/tools/node_modules/.bin/tsx --python python
+
+      - name: Verify browser comparison, chat edits and saved runs
+        run: |
+          pnpm --filter @seams/portal dev --host 127.0.0.1 --port 5194 --strictPort > output/bakery-ci/vite.log 2>&1 &
+          bakery_vite_pid=$!
+          output/bakery-ci/tools/node_modules/.bin/tsx scripts/production-simulation/serve-oven-authoring.mjs output/bakery-ci/oven-authoring-storage > output/bakery-ci/oven-authoring-storage.log 2>&1 &
+          bakery_authoring_pid=$!
+          trap 'kill "$bakery_vite_pid" "$bakery_authoring_pid"' EXIT
+          node --input-type=module <<'JS'
+          import { setTimeout } from "node:timers/promises";
+          let ready = false;
+          for (let attempt = 0; attempt < 30; attempt++) {
+            try {
+              const response = await fetch("http://127.0.0.1:5194/workflow-preview.html");
+              const fixture = await fetch("http://127.0.0.1:5197/fixture.json");
+              if (response.ok && fixture.ok) {
+                ready = true;
+                break;
+              }
+            } catch {
+              // Vite can still be starting.
+            }
+            await setTimeout(1000);
+          }
+          if (!ready) throw new Error("Portal and storage fixture did not start within 30 seconds.");
+          JS
+          # The journey index (scripts/production-simulation/journeys.json) holds the
+          # commands, their order and their time limits; set ci-browser is this step.
+          # It reuses the passed journeys of the headless set in output/bakery-ci and
+          # runs the rest after a failure, so that one run reports every failure.
+          node scripts/production-simulation/run-journeys.mjs --set ci-browser --output output/bakery-ci --tsx output/bakery-ci/tools/node_modules/.bin/tsx --python python
+
+      - name: Retain recordings, traces and acceptance reports
+        if: always()
+        # The account's artifact storage quota can be full; only the owner can
+        # free it. A failed upload must not hide the result of the journeys.
+        continue-on-error: true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: bakery-physics-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            output/bakery-ci/journeys-summary.json
+            output/bakery-ci/journey-logs
+            output/bakery-ci/loads
+            output/bakery-ci/authoring
+            output/bakery-ci/material
+            output/bakery-ci/presets
+            output/bakery-ci/comparison
+            output/bakery-ci/chat
+            output/bakery-ci/concurrency
+            output/bakery-ci/production-run
+            output/bakery-ci/financier
+            output/bakery-ci/financier-browser
+            output/bakery-ci/native-financier
+            output/bakery-ci/native-financier-browser
+            output/bakery-ci/oven-financier
+            output/bakery-ci/oven-financier-browser
+            output/bakery-ci/oven-workspace-browser
+            output/bakery-ci/oven-authoring-browser
+            output/bakery-ci/oven-authoring-storage
+            output/bakery-ci/oven-authoring-storage.log
+            output/bakery-ci/oven-native
+            output/bakery-ci/oven-wasm
+            output/bakery-ci/oven-engine
+            output/bakery-ci/oven-browser
+            output/bakery-ci/batch-recovery-browser
+            output/bakery-ci/two-cell
+            output/bakery-ci/batch-cycles
+            output/bakery-ci/recovery-native
+            output/bakery-ci/recovery-wasm
+            output/bakery-ci/robot-limits
+            output/bakery-ci/recovery-browser
+            output/bakery-ci/factory-workspace
+            output/bakery-ci/persistent-chat
+            output/bakery-ci/vite.log

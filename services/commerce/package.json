@@ -1,0 +1,36 @@
+{
+  "name": "@seams/commerce-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:storefront": "pnpm --filter @seams/storefront build",
+    "build:fixture-worker": "node scripts/build-fixture-worker.mjs",
+    "check:types": "tsrs --noEmit",
+    "test": "vitest run",
+    "rebuild:plan22-phase1-cafe": "node --experimental-strip-types --env-file-if-exists=../../.env.local scripts/rebuild-plan22-phase1-cafe.ts",
+    "rebuild:plan22-phase3-cafe": "node --experimental-strip-types --env-file-if-exists=../../.env.local scripts/rebuild-plan22-phase3-cafe.ts",
+    "configure:plan22-phase4-shipping": "node --experimental-strip-types --env-file-if-exists=../../.env.local scripts/configure-plan22-phase4-shipping.ts",
+    "configure:patisserie-menu": "node --experimental-strip-types --env-file-if-exists=../../.env.local scripts/configure-patisserie-menu.ts",
+    "set:shop-name": "node --experimental-strip-types --env-file-if-exists=../../.env.local scripts/set-shop-name.ts",
+    "seed:cafe": "pnpm rebuild:plan22-phase3-cafe",
+    "dev": "node ../../scripts/run-worker.mjs underclerk dev local",
+    "deploy": "node ../../scripts/run-worker.mjs underclerk deploy production",
+    "deploy:staging": "node ../../scripts/run-worker.mjs underclerk deploy staging"
+  },
+  "dependencies": {
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams/commerce-client": "workspace:*",
+    "@seams/commerce-query-sqlite": "workspace:*",
+    "@seams/commerce-contracts": "workspace:*",
+    "quickjs-wasi": "3.6.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "@types/node": "^25.5.0",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vitest": "^4.1.0",
+    "wrangler": "4.107.0"
+  }
+}

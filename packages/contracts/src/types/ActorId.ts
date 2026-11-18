@@ -1,0 +1,2 @@
+
+export type ActorId = string;

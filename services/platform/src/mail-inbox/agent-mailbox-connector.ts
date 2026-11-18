@@ -1,0 +1,67 @@
+import type { Env } from "../env";
+import type { Result } from "../result";
+import { resolveActiveConnectorActor } from "../actors/actor-router";
+import {
+  gmailConnectorIdValue,
+  type MailboxIngressPolicy,
+} from "../data/email-mailbox";
+import {
+  parseConnectorId,
+  type IntegrationAccountId,
+  type OrganisationId,
+} from "../ids";
+import type { Variant } from "@seams/type-utils";
+
+export function emailLimitsFromPolicy(
+  policy: Variant<MailboxIngressPolicy, "enabled">,
+): {
+  readonly maxActiveCases: number;
+  readonly maxMessagesPerHour: number;
+  readonly dailyTokenBudget: number;
+  readonly maxMessageBytes: number;
+  readonly maxAttachmentBytes: number;
+} {
+  return {
+    maxActiveCases: policy.maxActiveCases,
+    maxMessagesPerHour: policy.maxMessagesPerHour,
+    dailyTokenBudget: policy.dailyTokenBudget,
+    maxMessageBytes: policy.maxMessageBytes,
+    maxAttachmentBytes: policy.maxAttachmentBytes,
+  };
+}
+
+export type AgentMailboxConnectorHandle = {
+  readonly stub: DurableObjectStub<import("../actors/connector").ConnectorDO>;
+  readonly identity: {
+    readonly organisationId: OrganisationId;
+    readonly connectorId: string;
+  };
+};
+
+export async function agentMailboxConnector(
+  env: Env,
+  organisationId: OrganisationId,
+  integrationAccountId: IntegrationAccountId,
+): Promise<Result<AgentMailboxConnectorHandle, { readonly code: string }>> {
+  const connectorId = parseConnectorId(
+    gmailConnectorIdValue(integrationAccountId),
+  );
+  if (!connectorId.ok)
+    return { ok: false, error: { code: "agent_mailbox_connector_invalid" } };
+  const connector = await resolveActiveConnectorActor({
+    env: env,
+    namespace: env.CONNECTOR,
+    organisationId,
+    connectorId: connectorId.value,
+    now: Date.now(),
+  });
+  return connector.ok
+    ? {
+        ok: true,
+        value: {
+          stub: connector.value,
+          identity: { organisationId, connectorId: connectorId.value },
+        },
+      }
+    : { ok: false, error: { code: connector.error.code } };
+}

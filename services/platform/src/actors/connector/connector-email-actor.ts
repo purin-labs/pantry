@@ -1,0 +1,1651 @@
+import { runtimeFetch } from "../../runtime-fetch";
+import {
+  reconcileFrozenMailReceipt,
+  type RelocationMailReceiptRequest,
+} from "../actor-relocation-mail";
+import { PROVIDER_ADAPTERS } from "../../provider-adapters/catalogue";
+import {
+  fetchSessionConnectorMail,
+  isSessionMailExecutionActive,
+} from "../../mail-inbox/execution";
+import {
+  readEmailProposalFlow,
+  validateEmailCaseContextCollectionDependency,
+} from "../email-case-context-collection-evidence";
+import {
+  runMailAssistant,
+  readMailAssistantStatus,
+  type MailAssistantActorInput,
+} from "../../mail-inbox/assistant";
+import { eraseMailClassificationRecords } from "../../mail-inbox/store";
+import { parseStoredRequestAuthority } from "../../request-authority";
+import { readClassifiedPage, readDecision } from "../../mail-inbox/reads";
+import {
+  readOrganization,
+  manageOrganization,
+  type MailOrganizationActorInput,
+  type MailOrganizationReadInput,
+  type MailClassifiedPageInput,
+  type MailDecisionInput,
+} from "../../mail-inbox/commands";
+import type { MailOrganizationCommand } from "@seams/control-api";
+import type { ConnectorIdentity } from "@seams/contracts";
+import {
+  parseCaseId,
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "../../ids";
+import { readAgentMailboxBinding } from "../../data/email-mailbox";
+import {
+  connectionCredentialAuthority,
+  resolveActiveProviderAccountContext,
+} from "../../data/integration-account";
+import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import {
+  actorExecutionAdmissionOpen,
+  isActorExecutionActive,
+} from "../actor-execution-quiescence";
+import { admitActorRecovery } from "../actor-activation";
+import {
+  activateEmailRuntime,
+  countEmailAdmissionsSince,
+  countOpenEmailCases,
+  disableEmailRuntime,
+  emailTokenWindowTotals,
+  latestEmailDraftOperation,
+  nextEmailCorrectionLearningAt,
+  nextEmailWatchCleanupAt,
+  pendingEmailDraftProposals,
+  reconnectEmailRuntime,
+  nextEmailEvaluationAt,
+  readEmailReplyCorrection,
+  readEmailRuntime,
+  resumeEmailRuntime,
+  updateEmailRuntimePolicy,
+  utcDayKey,
+  type EmailHintAcceptance,
+  type EmailReplyCorrection,
+  type EmailRuntimeSnapshot,
+} from "../connector-email";
+import {
+  establishConnectorEmailWatch,
+  readConnectorEmailHistoryId,
+  renewConnectorEmailWatch,
+  stopConnectorEmailWatch,
+  resolveConnectorGmailAccess,
+} from "../connector-email-evaluation";
+import {
+  readEmailProposalChatContext,
+  readEmailProposalChatSources,
+  recordChatEditProvenance,
+} from "../email-proposal-sources";
+import {
+  authorizeEmailReplyReview,
+  editEmailReplyBody,
+  previewEmailRelationship,
+  correctEmailRelationship,
+  type EmailRelationshipPreview,
+  type EmailReplyEditReceipt,
+  dispatchEmailReply,
+  disposeEmailProposal,
+  previewEmailProposal,
+  resolveEmailProposalState,
+  type EmailDispatchOutcome,
+  type EmailDisposalOutcome,
+  type EmailProposalPreviewOutcome,
+  type EmailProposalResolution,
+} from "../connector-email-proposal";
+import {
+  createOperationalEmailProposal,
+  dispatchOperationalEmail,
+  editOperationalEmailProposal,
+  previewOperationalEmailProposal,
+  revokeOperationalEmailProposals,
+  type OperationalEmailDispatchOutcome,
+  type OperationalEmailProposalOutcome,
+  type OperationalEmailProposalRecord,
+} from "../connector-email-operational";
+import { isRecord } from "@seams/std";
+import { armConnectorAlarm } from "./alarm";
+import {
+  emailMessageExceedsLimit,
+  parseEmailActivationRequest,
+  parseEmailChangeRequest,
+  parseEmailCheckRequest,
+  parseEmailDispatchRequest,
+  parseEmailIdentityRequest,
+  parseEmailMailboxRevocationRequest,
+  parseEmailMailboxSearchRequest,
+  parseEmailOperationalAccountRequest,
+  parseEmailOperationalDispatchRequest,
+  parseEmailOperationalProposalCreateRequest,
+  parseEmailOperationalProposalEditRequest,
+  parseEmailOperationalProposalRequest,
+  parseEmailProposalRequest,
+  parseEmailReconnectRequest,
+  parseEmailReplyProposalCreateRequest,
+  parseEmailResolveRequest,
+  parseEmailResumeRequest,
+} from "./email-parsers";
+import {
+  executeOperationalEmailCommand,
+  projectOperationalEmailRecord,
+  rejectAdmittedOperationalEmail,
+} from "./email-work";
+import {
+  acceptConnectorEmailChange,
+  createConnectorEmailReplyProposal,
+  fenceConnectorEmailMailbox,
+} from "./email";
+import { ensureConnectorIdentity } from "./ingress-parsers";
+import { invalid } from "./support";
+import {
+  type ConnectorEmailMailboxSearch,
+  type ConnectorEmailReplyProposal,
+  type ConnectorResult,
+  type EmailMailboxDisposal,
+  type EmailMailboxRevocation,
+  type EmailRuntimeStatus,
+} from "./types";
+import {
+  type ConnectorEmailIdentityRequest,
+  type EmailReplyProvenance,
+} from "./whatsapp-parsers";
+import type { ConnectorDO } from "../connector";
+import { ConnectorEvals } from "./connector-evals";
+
+/**
+ * Email processing for the Connector: the mailbox, reply turns, operational proposals, correction learning and Case context discovery.
+ */
+export abstract class ConnectorEmail extends ConnectorEvals {
+  async reconcileRelocationMailReceipt(request: RelocationMailReceiptRequest) {
+    return reconcileFrozenMailReceipt(this.env, this.ctx.storage, request);
+  }
+
+  async mailAssistant(input: MailAssistantActorInput) {
+    return this.trackExecution(this.runAdmittedMailAssistant.bind(this, input));
+  }
+
+  protected async runAdmittedMailAssistant(
+    input: MailAssistantActorInput,
+  ): Promise<
+    Awaited<
+      ReturnType<typeof runMailAssistant | typeof readMailAssistantStatus>
+    >
+  > {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid<never>("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const result =
+      input.command === null
+        ? await readMailAssistantStatus(this.env, input)
+        : await runMailAssistant(
+            { env: this.env, storage: this.ctx.storage, scope },
+            { ...input, command: input.command },
+          );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid<never>("connector_placement_conflict");
+    return result;
+  }
+
+  async readMailOrganization(input: MailOrganizationReadInput) {
+    return this.trackExecution(
+      this.readAdmittedMailOrganization.bind(this, input),
+    );
+  }
+
+  protected async readAdmittedMailOrganization(
+    input: MailOrganizationReadInput,
+  ): Promise<Awaited<ReturnType<typeof readOrganization>>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid<never>("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    return readOrganization(
+      { env: this.env, storage: this.ctx.storage, scope },
+      input,
+    );
+  }
+
+  async readMailClassifiedPage(input: MailClassifiedPageInput) {
+    return this.trackExecution(
+      this.readAdmittedMailClassifiedPage.bind(this, input),
+    );
+  }
+
+  protected async readAdmittedMailClassifiedPage(
+    input: MailClassifiedPageInput,
+  ): Promise<Awaited<ReturnType<typeof readClassifiedPage>>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid<never>("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    return readClassifiedPage(
+      { env: this.env, storage: this.ctx.storage, scope },
+      input,
+    );
+  }
+
+  async readMailDecision(input: MailDecisionInput) {
+    return this.trackExecution(this.readAdmittedMailDecision.bind(this, input));
+  }
+
+  protected async readAdmittedMailDecision(
+    input: MailDecisionInput,
+  ): Promise<Awaited<ReturnType<typeof readDecision>>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid<never>("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    return readDecision(
+      { env: this.env, storage: this.ctx.storage, scope },
+      input,
+    );
+  }
+
+  async manageMailOrganization(
+    input: MailOrganizationActorInput &
+      Readonly<{ command: MailOrganizationCommand }>,
+  ) {
+    return this.trackExecution(
+      this.manageAdmittedMailOrganization.bind(this, input),
+    );
+  }
+
+  protected async manageAdmittedMailOrganization(
+    input: MailOrganizationActorInput &
+      Readonly<{ command: MailOrganizationCommand }>,
+  ): Promise<Awaited<ReturnType<typeof manageOrganization>>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid<never>("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const result = await manageOrganization(
+      { env: this.env, storage: this.ctx.storage, scope },
+      input,
+    );
+    await armConnectorAlarm(this.ctx.storage);
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid<never>("connector_placement_conflict");
+    return result;
+  }
+
+  async acceptEmailChange(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailHintAcceptance>> {
+    return this.trackExecution(this.acceptAdmittedEmailChange.bind(this, raw));
+  }
+
+  protected async acceptAdmittedEmailChange(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailHintAcceptance>> {
+    const input = parseEmailChangeRequest(raw);
+    if (input === null) return invalid("connector_email_hint_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const accepted = this.ctx.storage.transactionSync(
+      acceptConnectorEmailChange.bind(null, this.ctx.storage.sql, input),
+    );
+    if (!accepted.ok) return accepted;
+    await armConnectorAlarm(this.ctx.storage);
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return accepted;
+  }
+
+  /**
+   * Checks Gmail for new mail now. A push can be late, and a local backend
+   * gets none. The mailbox's current history id then goes through the same
+   * admission as a push, under a notification id that no Pub/Sub id has, so
+   * deduplication and the next evaluation's time are the ones a push gets.
+   */
+  async checkEmailChange(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailHintAcceptance>> {
+    return this.trackExecution(this.checkAdmittedEmailChange.bind(this, raw));
+  }
+
+  protected async checkAdmittedEmailChange(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailHintAcceptance>> {
+    const input = parseEmailCheckRequest(raw);
+    if (input === null) return invalid("connector_email_check_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const runtime = readEmailRuntime(this.ctx.storage.sql);
+    if (
+      runtime === null ||
+      runtime.disabledAt !== null ||
+      runtime.integrationAccountId !== input.integrationAccountId
+    )
+      return { ok: true, value: { kind: "inactive" } };
+    const historyId = await readConnectorEmailHistoryId({
+      env: this.env,
+      storage: this.ctx.storage,
+      scope,
+      integrationAccountId: runtime.integrationAccountId,
+      now: input.now,
+      fetcher: runtimeFetch,
+    });
+    if (!historyId.ok) return invalid(historyId.error.code);
+    return this.acceptAdmittedEmailChange({
+      identity: input.identity,
+      notificationId: `check:${input.checkId}`,
+      historyId: historyId.value,
+      now: input.now,
+    });
+  }
+
+  protected async trackMailboxExecution<Value>(
+    start: () => Promise<Value>,
+  ): Promise<Value> {
+    return this.trackExecution(
+      (this.emailMailboxWork.enqueue<Value>).bind(this.emailMailboxWork, start),
+    );
+  }
+
+  async activateEmailProcessing(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
+    return this.trackMailboxExecution(
+      this.activateAdmittedEmailProcessing.bind(this, raw),
+    );
+  }
+
+  protected async activateAdmittedEmailProcessing(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
+    const input = parseEmailActivationRequest(raw);
+    if (input === null) return invalid("connector_email_activation_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    return this.activateEmailProcessingWithScope(scope, input);
+  }
+
+  protected async activateEmailProcessingWithScope(
+    scope: OrganisationExecutionScope,
+    input: NonNullable<ReturnType<typeof parseEmailActivationRequest>>,
+  ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
+    const sql = this.ctx.storage.sql;
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    if (nextEmailWatchCleanupAt(sql) !== null)
+      return invalid("connector_email_watch_cleanup_pending");
+    const current = readEmailRuntime(sql);
+    if (
+      current !== null &&
+      current.integrationAccountId !== input.integrationAccountId
+    )
+      return invalid("connector_email_identity_conflict");
+    if (current !== null && current.disabledAt === null) {
+      const updated = this.ctx.storage.transactionSync(
+        updateEmailRuntimePolicy.bind(null, sql, {
+          policyVersion: input.policyVersion,
+          limits: input.limits,
+        }),
+      );
+      await armConnectorAlarm(this.ctx.storage);
+      if (!(await isActorExecutionActive(sql, scope)))
+        return invalid("connector_placement_conflict");
+      return updated;
+    }
+    const watch = await establishConnectorEmailWatch({
+      env: this.env,
+      storage: this.ctx.storage,
+      scope,
+      integrationAccountId: input.integrationAccountId,
+      now: input.now,
+      fetcher: runtimeFetch,
+    });
+    if (!watch.ok) {
+      if (!(await isActorExecutionActive(sql, scope)))
+        return invalid("connector_placement_conflict");
+      return invalid(watch.error.code);
+    }
+    // The accepted watch and its floor travel with the drained export.
+    const activated = this.ctx.storage.transactionSync(
+      activateEmailRuntime.bind(null, sql, {
+        organisationId: input.identity.organisationId,
+        integrationAccountId: input.integrationAccountId,
+        policyVersion: input.policyVersion,
+        limits: input.limits,
+        activationFloor: watch.value.activationFloor,
+        watchExpiresAt: watch.value.watchExpiresAt,
+        now: input.now,
+      }),
+    );
+    await armConnectorAlarm(this.ctx.storage);
+    if (!(await isActorExecutionActive(sql, scope)))
+      return invalid("connector_placement_conflict");
+    return activated;
+  }
+
+  async disableEmailProcessing(raw: unknown): Promise<ConnectorResult<null>> {
+    return this.trackMailboxExecution(
+      this.disableAdmittedEmailProcessing.bind(this, raw),
+    );
+  }
+
+  protected async disableAdmittedEmailProcessing(
+    raw: unknown,
+  ): Promise<ConnectorResult<null>> {
+    const input = parseEmailIdentityRequest(raw);
+    if (input === null) return invalid("connector_email_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const disabled = this.ctx.storage.transactionSync(
+      disableEmailRuntime.bind(null, this.ctx.storage.sql, { now: input.now }),
+    );
+    await armConnectorAlarm(this.ctx.storage);
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return disabled;
+  }
+
+  async resumeEmailProcessing(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
+    return this.trackMailboxExecution(
+      this.resumeAdmittedEmailProcessing.bind(this, raw),
+    );
+  }
+
+  protected async resumeAdmittedEmailProcessing(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
+    const input = parseEmailResumeRequest(raw);
+    if (input === null) return invalid("connector_email_resume_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const sql = this.ctx.storage.sql;
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    if (nextEmailWatchCleanupAt(sql) !== null)
+      return invalid("connector_email_watch_cleanup_pending");
+    const resumed = this.ctx.storage.transactionSync(
+      resumeEmailRuntime.bind(null, sql, {
+        policyVersion: input.policyVersion,
+        limits: input.limits,
+        skipProviderMessageId: input.skipProviderMessageId,
+        now: input.now,
+      }),
+    );
+    await armConnectorAlarm(this.ctx.storage);
+    if (!(await isActorExecutionActive(sql, scope)))
+      return invalid("connector_placement_conflict");
+    return resumed;
+  }
+
+  async reconnectEmailProcessing(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
+    return this.trackMailboxExecution(
+      this.reconnectAdmittedEmailProcessing.bind(this, raw),
+    );
+  }
+
+  protected async reconnectAdmittedEmailProcessing(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
+    const input = parseEmailReconnectRequest(raw);
+    if (input === null) return invalid("connector_email_reconnect_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const sql = this.ctx.storage.sql;
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    if (nextEmailWatchCleanupAt(sql) !== null)
+      return invalid("connector_email_watch_cleanup_pending");
+    const runtime = readEmailRuntime(sql);
+    if (
+      runtime === null ||
+      runtime.integrationAccountId !== input.integrationAccountId
+    )
+      return invalid("connector_email_runtime_missing");
+    if (input.resetCursor) {
+      const disabled = this.ctx.storage.transactionSync(
+        disableEmailRuntime.bind(null, sql, { now: input.now }),
+      );
+      if (!disabled.ok) return disabled;
+      return this.activateEmailProcessingWithScope(scope, input);
+    }
+    const watch = await renewConnectorEmailWatch({
+      storage: this.ctx.storage,
+      env: this.env,
+      scope,
+      integrationAccountId: input.integrationAccountId,
+      now: input.now,
+      fetcher: runtimeFetch,
+    });
+    if (!watch.ok) {
+      if (!(await isActorExecutionActive(sql, scope)))
+        return invalid("connector_placement_conflict");
+      return invalid(watch.error.code);
+    }
+    const reconnected = this.ctx.storage.transactionSync(
+      reconnectEmailRuntime.bind(null, sql, {
+        policyVersion: input.policyVersion,
+        limits: input.limits,
+        watchExpiresAt: watch.value,
+        now: input.now,
+      }),
+    );
+    await armConnectorAlarm(this.ctx.storage);
+    if (!(await isActorExecutionActive(sql, scope)))
+      return invalid("connector_placement_conflict");
+    return reconnected;
+  }
+
+  async renewEmailWatch(raw: unknown): Promise<ConnectorResult<number>> {
+    return this.trackMailboxExecution(
+      this.renewAdmittedEmailWatch.bind(this, raw),
+    );
+  }
+
+  protected async renewAdmittedEmailWatch(
+    raw: unknown,
+  ): Promise<ConnectorResult<number>> {
+    const input = parseEmailIdentityRequest(raw);
+    if (input === null) return invalid("connector_email_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const sql = this.ctx.storage.sql;
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const runtime = readEmailRuntime(sql);
+    if (runtime === null || runtime.disabledAt !== null)
+      return invalid("connector_email_runtime_missing");
+    if (nextEmailWatchCleanupAt(sql) !== null)
+      return invalid("connector_email_watch_cleanup_pending");
+    const renewed = await renewConnectorEmailWatch({
+      storage: this.ctx.storage,
+      env: this.env,
+      scope,
+      integrationAccountId: runtime.integrationAccountId,
+      now: input.now,
+      fetcher: runtimeFetch,
+    });
+    if (!(await isActorExecutionActive(sql, scope)))
+      return invalid("connector_placement_conflict");
+    return renewed;
+  }
+
+  async inspectEmailRuntime(): Promise<
+    ConnectorResult<EmailRuntimeStatus | null>
+  > {
+    return this.trackExecution(this.inspectAdmittedEmailRuntime.bind(this));
+  }
+
+  protected async inspectAdmittedEmailRuntime(): Promise<
+    ConnectorResult<EmailRuntimeStatus | null>
+  > {
+    const sql = this.ctx.storage.sql;
+    if (!actorExecutionAdmissionOpen(sql))
+      return invalid("connector_placement_conflict");
+    const admission = await admitActorRecovery(this.env, this.ctx.storage);
+    if (
+      admission.kind !== "admitted" ||
+      !(await isActorExecutionActive(sql, admission.scope))
+    )
+      return invalid("connector_placement_conflict");
+    const runtime = readEmailRuntime(sql);
+    if (runtime === null) return { ok: true, value: null };
+    const now = Date.now();
+    return {
+      ok: true,
+      value: {
+        ...runtime,
+        usage: {
+          activeCases: countOpenEmailCases(sql),
+          admittedLastHour: countEmailAdmissionsSince(sql, now - 3_600_000),
+          tokens: emailTokenWindowTotals(sql, utcDayKey(now)),
+          nextEvaluationAt: nextEmailEvaluationAt(sql),
+        },
+      },
+    };
+  }
+
+  async searchEmailMailbox(
+    raw: unknown,
+  ): Promise<ConnectorResult<ConnectorEmailMailboxSearch>> {
+    return this.trackExecution(this.searchAdmittedEmailMailbox.bind(this, raw));
+  }
+
+  protected async searchAdmittedEmailMailbox(
+    raw: unknown,
+  ): Promise<ConnectorResult<ConnectorEmailMailboxSearch>> {
+    const input = parseEmailMailboxSearchRequest(raw);
+    if (input === null)
+      return invalid("connector_email_search_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const sql = this.ctx.storage.sql;
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const runtime = readEmailRuntime(sql);
+    if (runtime === null || runtime.disabledAt !== null)
+      return invalid("connector_email_runtime_inactive");
+    const fetcher = fetchSessionConnectorMail.bind(
+      null,
+      sql,
+      scope,
+      this.env.DB,
+      input.execution,
+      runtimeFetch,
+    );
+    const access = await resolveConnectorGmailAccess({
+      env: this.env,
+      organisationId: runtime.organisationId,
+      integrationAccountId: runtime.integrationAccountId,
+      now: input.now,
+      fetcher,
+    });
+    if (
+      !(await isSessionMailExecutionActive(
+        sql,
+        scope,
+        this.env.DB,
+        input.execution,
+      ))
+    )
+      return invalid("connector_execution_authority_inactive");
+    if (!access.ok) return invalid(access.error.code);
+    const searched =
+      await PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.reads.searchMessages(
+        {
+          accessToken: access.value,
+          query: input.query,
+          limit: input.limit,
+          fetcher,
+        },
+      );
+    if (
+      !(await isSessionMailExecutionActive(
+        sql,
+        scope,
+        this.env.DB,
+        input.execution,
+      ))
+    )
+      return invalid("connector_execution_authority_inactive");
+    if (!searched.ok) return invalid(searched.error.code);
+    if (
+      searched.value.messages.some(
+        emailMessageExceedsLimit.bind(null, runtime.limits.maxMessageBytes),
+      )
+    )
+      return invalid("connector_email_search_message_too_large");
+    return {
+      ok: true,
+      value: {
+        integrationAccountId: runtime.integrationAccountId,
+        messages: searched.value.messages,
+        truncated: searched.value.truncated,
+      },
+    };
+  }
+
+  async createEmailReplyProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<ConnectorEmailReplyProposal>> {
+    return this.trackExecution(
+      this.createAdmittedEmailReplyProposal.bind(this, raw),
+    );
+  }
+
+  protected async createAdmittedEmailReplyProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<ConnectorEmailReplyProposal>> {
+    const input = parseEmailReplyProposalCreateRequest(raw);
+    if (input === null)
+      return invalid("connector_email_reply_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const runtime = readEmailRuntime(this.ctx.storage.sql);
+    if (
+      runtime === null ||
+      runtime.disabledAt !== null ||
+      runtime.organisationId !== input.identity.organisationId
+    ) {
+      return invalid("connector_email_runtime_inactive");
+    }
+    const organisationId = parseOrganisationId(runtime.organisationId);
+    const integrationAccountId = parseIntegrationAccountId(
+      runtime.integrationAccountId,
+    );
+    const caseId = parseCaseId(input.caseId);
+    if (!organisationId.ok || !integrationAccountId.ok || !caseId.ok) {
+      return invalid("connector_email_reply_proposal_identity_invalid");
+    }
+    const binding = await readAgentMailboxBinding({
+      db: scope.database,
+      organisationId: organisationId.value,
+      integrationAccountId: integrationAccountId.value,
+    });
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    if (!binding.ok) return invalid(binding.error.code);
+    return this.withEmailProposalLock(
+      input.proposalId,
+      createConnectorEmailReplyProposal.bind(null, {
+        scope,
+        env: this.env,
+        sql: this.ctx.storage.sql,
+        runtime,
+        caseId: caseId.value,
+        mailboxBindingId: binding.value.binding.mailboxBindingId,
+        bindingRevision: binding.value.currentRevision.revision,
+        request: input,
+      }),
+    );
+  }
+
+  async createEmailOperationalProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailProposalRecord>> {
+    return this.trackMailboxExecution(
+      this.admittedCreateEmailOperationalProposal.bind(this, raw),
+    );
+  }
+
+  protected async admittedCreateEmailOperationalProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailProposalRecord>> {
+    const input = parseEmailOperationalProposalCreateRequest(raw);
+    if (input === null) {
+      return invalid("connector_email_operational_proposal_request_invalid");
+    }
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const integrationAccountId = parseIntegrationAccountId(
+      input.integrationAccountId,
+    );
+    if (!integrationAccountId.ok) {
+      return invalid("connector_email_operational_identity_invalid");
+    }
+    const context = await resolveActiveProviderAccountContext({
+      db: scope.database,
+      organisationId: scope.organisationId,
+      integrationAccountId: integrationAccountId.value,
+    });
+    if (!context.ok || context.value.account.provider !== "gmail") {
+      return invalid("connector_email_operational_provider_invalid");
+    }
+    const authority = connectionCredentialAuthority(
+      context.value.connection.authority,
+    );
+    return executeOperationalEmailCommand<OperationalEmailProposalRecord>(
+      this.ctx.storage,
+      scope,
+      input.proposalId,
+      input.now,
+      createOperationalEmailProposal.bind(null, {
+        execution: input.execution,
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        integrationAccountId: integrationAccountId.value,
+        proposalId: input.proposalId,
+        caseId: input.caseId,
+        target: input.target,
+        subject: input.subject,
+        body: input.body,
+        policyVersion: input.policyVersion,
+        credentialGeneration: authority.credentialGeneration,
+        now: input.now,
+        expiresAt: input.expiresAt,
+      }),
+    );
+  }
+
+  async editEmailOperationalProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailProposalRecord>> {
+    return this.trackMailboxExecution(
+      this.admittedEditEmailOperationalProposal.bind(this, raw),
+    );
+  }
+
+  protected async admittedEditEmailOperationalProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailProposalRecord>> {
+    const input = parseEmailOperationalProposalEditRequest(raw);
+    if (input === null) {
+      return invalid("connector_email_operational_proposal_edit_invalid");
+    }
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const integrationAccountId = parseIntegrationAccountId(
+      input.integrationAccountId,
+    );
+    if (!integrationAccountId.ok) {
+      return invalid("connector_email_operational_identity_invalid");
+    }
+    return executeOperationalEmailCommand<OperationalEmailProposalRecord>(
+      this.ctx.storage,
+      scope,
+      input.proposalId,
+      input.now,
+      editOperationalEmailProposal.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        integrationAccountId: integrationAccountId.value,
+        proposalId: input.proposalId,
+        subject: input.subject,
+        body: input.body,
+        expectedVersion: input.expectedVersion,
+        now: input.now,
+      }),
+    );
+  }
+
+  async previewEmailOperationalProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailProposalOutcome>> {
+    return this.trackMailboxExecution(
+      this.admittedPreviewEmailOperationalProposal.bind(this, raw),
+    );
+  }
+
+  protected async admittedPreviewEmailOperationalProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailProposalOutcome>> {
+    const input = parseEmailOperationalProposalRequest(raw);
+    if (input === null) {
+      return invalid("connector_email_operational_proposal_request_invalid");
+    }
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const integrationAccountId = parseIntegrationAccountId(
+      input.integrationAccountId,
+    );
+    if (!integrationAccountId.ok) {
+      return invalid("connector_email_operational_identity_invalid");
+    }
+    return executeOperationalEmailCommand<OperationalEmailProposalOutcome>(
+      this.ctx.storage,
+      scope,
+      input.proposalId,
+      input.now,
+      previewOperationalEmailProposal.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        integrationAccountId: integrationAccountId.value,
+        proposalId: input.proposalId,
+        now: input.now,
+      }),
+    );
+  }
+
+  async dispatchEmailOperational(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailDispatchOutcome>> {
+    return this.trackMailboxExecution(
+      this.admittedDispatchEmailOperational.bind(this, raw),
+    );
+  }
+
+  protected async admittedDispatchEmailOperational(
+    raw: unknown,
+  ): Promise<ConnectorResult<OperationalEmailDispatchOutcome>> {
+    const input = parseEmailOperationalDispatchRequest(raw);
+    if (input === null) {
+      return invalid("connector_email_operational_dispatch_invalid");
+    }
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const integrationAccountId = parseIntegrationAccountId(
+      input.integrationAccountId,
+    );
+    if (!integrationAccountId.ok) {
+      return invalid("connector_email_operational_identity_invalid");
+    }
+    return executeOperationalEmailCommand<OperationalEmailDispatchOutcome>(
+      this.ctx.storage,
+      scope,
+      input.proposalId,
+      input.now,
+      dispatchOperationalEmail.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        integrationAccountId: integrationAccountId.value,
+        proposalId: input.proposalId,
+        approvedVersion: input.approvedVersion,
+        approvedSnapshotDigest: input.approvedSnapshotDigest,
+        now: input.now,
+      }),
+    );
+  }
+
+  async rejectEmailOperational(raw: unknown): Promise<ConnectorResult<null>> {
+    return this.trackMailboxExecution(
+      this.admittedRejectEmailOperational.bind(this, raw),
+    );
+  }
+
+  protected async admittedRejectEmailOperational(
+    raw: unknown,
+  ): Promise<ConnectorResult<null>> {
+    const input = parseEmailOperationalDispatchRequest(raw);
+    if (input === null) {
+      return invalid("connector_email_operational_dispatch_invalid");
+    }
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const integrationAccountId = parseIntegrationAccountId(
+      input.integrationAccountId,
+    );
+    if (!integrationAccountId.ok)
+      return invalid("connector_email_operational_identity_invalid");
+    return executeOperationalEmailCommand<null>(
+      this.ctx.storage,
+      scope,
+      input.proposalId,
+      input.now,
+      rejectAdmittedOperationalEmail.bind(
+        null,
+        this.ctx.storage.sql,
+        scope,
+        integrationAccountId.value,
+        input.proposalId,
+        input.approvedVersion,
+        input.now,
+      ),
+    );
+  }
+
+  async revokeEmailOperationalProposals(
+    raw: unknown,
+  ): Promise<ConnectorResult<{ readonly revoked: number }>> {
+    return this.trackMailboxExecution(
+      this.admittedRevokeEmailOperationalProposals.bind(this, raw),
+    );
+  }
+
+  protected async admittedRevokeEmailOperationalProposals(
+    raw: unknown,
+  ): Promise<ConnectorResult<{ readonly revoked: number }>> {
+    const input = parseEmailOperationalAccountRequest(raw);
+    if (input === null) {
+      return invalid("connector_email_operational_account_request_invalid");
+    }
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const integrationAccountId = parseIntegrationAccountId(
+      input.integrationAccountId,
+    );
+    if (!integrationAccountId.ok) {
+      return invalid("connector_email_operational_identity_invalid");
+    }
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    const revoked = this.ctx.storage.transactionSync(
+      revokeOperationalEmailProposals.bind(
+        null,
+        this.ctx.storage.sql,
+        integrationAccountId.value,
+        input.now,
+      ),
+    );
+    await armConnectorAlarm(this.ctx.storage);
+    for (const proposal of revoked) {
+      const projected = await projectOperationalEmailRecord(
+        this.ctx.storage.sql,
+        scope,
+        proposal,
+        input.now,
+      );
+      if (!projected.ok) return projected;
+    }
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return { ok: true, value: { revoked: revoked.length } };
+  }
+
+  async previewEmailProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailProposalPreviewOutcome>> {
+    return this.trackExecution(
+      this.admittedPreviewEmailProposal.bind(this, raw),
+    );
+  }
+
+  protected async admittedPreviewEmailProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailProposalPreviewOutcome>> {
+    const input = parseEmailProposalRequest(raw);
+    if (input === null)
+      return invalid("connector_email_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const preview = await previewEmailProposal({
+      sql: this.ctx.storage.sql,
+      env: this.env,
+      scope,
+      proposalId: input.proposalId,
+      now: input.now,
+      fetcher: runtimeFetch,
+    });
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return preview.ok ? preview : invalid(preview.error.code);
+  }
+
+  async authorizeEmailProposalDelivery(
+    raw: unknown,
+  ): Promise<ConnectorResult<null>> {
+    return this.trackExecution(
+      this.admittedAuthorizeEmailProposalDelivery.bind(this, raw),
+    );
+  }
+
+  protected async admittedAuthorizeEmailProposalDelivery(
+    raw: unknown,
+  ): Promise<ConnectorResult<null>> {
+    const input = parseEmailProposalRequest(raw);
+    if (input === null || !isRecord(raw))
+      return invalid("connector_email_proposal_request_invalid");
+    const authority = parseStoredRequestAuthority(raw.authority);
+    if (
+      !authority.ok ||
+      authority.value.requestAuthority.kind !== "control" ||
+      authority.value.requestAuthority.organisationId !==
+        input.identity.organisationId
+    )
+      return invalid("connector_email_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const authorized = await authorizeEmailReplyReview(
+      this.ctx.storage.sql,
+      this.env,
+      scope,
+      authority.value.requestAuthority,
+      input.proposalId,
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return authorized.ok ? authorized : invalid(authorized.error.code);
+  }
+
+  async dispatchEmailReply(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailDispatchOutcome>> {
+    return this.trackExecution(this.admittedDispatchEmailReply.bind(this, raw));
+  }
+
+  protected async admittedDispatchEmailReply(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailDispatchOutcome>> {
+    const input = parseEmailDispatchRequest(raw);
+    if (input === null) return invalid("connector_email_dispatch_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const dispatched = await this.withEmailProposalLock(
+      input.proposalId,
+      dispatchEmailReply.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        proposalId: input.proposalId,
+        approvedVersion: input.approvedVersion,
+        approvedSnapshotDigest: input.approvedSnapshotDigest,
+        now: input.now,
+        fetcher: runtimeFetch,
+      }),
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return dispatched.ok ? dispatched : invalid(dispatched.error.code);
+  }
+
+  /**
+   * Plan 40D: what a reply rests on, for an agent edit of its shared draft.
+   * A reply that the mailbox agent drafted carries its turn's flow; one that
+   * a Portal chat drafted carries the chat's sources and context.
+   */
+  async readEmailReplyProvenance(
+    input: ConnectorEmailIdentityRequest & Readonly<{ proposalId: string }>,
+  ): Promise<ConnectorResult<EmailReplyProvenance>> {
+    return this.trackExecution(
+      this.admittedReadEmailReplyProvenance.bind(this, input),
+    );
+  }
+
+  protected async admittedReadEmailReplyProvenance(
+    input: Parameters<ConnectorDO["readEmailReplyProvenance"]>[0],
+  ): Promise<ConnectorResult<EmailReplyProvenance>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const sql = this.ctx.storage.sql;
+    const operation = latestEmailDraftOperation(sql, input.proposalId);
+    if (operation === null || operation.state !== "awaiting_approval")
+      return invalid("email_reply_edit_unavailable");
+    const value: EmailReplyProvenance =
+      readEmailProposalFlow(sql, input.proposalId) !== null
+        ? { kind: "mailbox" }
+        : {
+            kind: "chat",
+            chatSources: readEmailProposalChatSources(sql, input.proposalId),
+            chatContext: readEmailProposalChatContext(sql, input.proposalId),
+          };
+    if (!(await isActorExecutionActive(sql, scope)))
+      return invalid("connector_placement_conflict");
+    return { ok: true, value };
+  }
+
+  /**
+   * Plan 40D: adds what an editing Portal chat read to a chat-drafted reply,
+   * before its words reach the shared draft.
+   */
+  async recordEmailReplyEditProvenance(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{
+        proposalId: string;
+        chatSources: readonly import("../../mail-inbox/reply-sources").EmailChatSource[];
+        chatContext: import("../../mail-inbox/reply-sources").EmailChatContext;
+      }>,
+  ): Promise<ConnectorResult<null>> {
+    return this.trackExecution(
+      this.admittedRecordEmailReplyEditProvenance.bind(this, input),
+    );
+  }
+
+  protected async admittedRecordEmailReplyEditProvenance(
+    input: Parameters<ConnectorDO["recordEmailReplyEditProvenance"]>[0],
+  ): Promise<ConnectorResult<null>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const recorded = await this.withEmailProposalLock(
+      input.proposalId,
+      async (): Promise<ConnectorResult<null>> => {
+        const sql = this.ctx.storage.sql;
+        const operation = latestEmailDraftOperation(sql, input.proposalId);
+        if (
+          operation === null ||
+          operation.state !== "awaiting_approval" ||
+          readEmailProposalFlow(sql, input.proposalId) !== null
+        )
+          return invalid("email_reply_edit_unavailable");
+        const kept = this.ctx.storage.transactionSync(
+          recordChatEditProvenance.bind(null, sql, input.proposalId, {
+            chatSources: input.chatSources,
+            chatContext: input.chatContext,
+          }),
+        );
+        return kept
+          ? { ok: true, value: null }
+          : invalid("email_reply_provenance_too_large");
+      },
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return recorded;
+  }
+
+  async editReviewedEmailReply(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{
+        proposalId: string;
+        authority: Extract<
+          import("@seams/contracts").RequestAuthority,
+          { kind: "control" }
+        >;
+        edit: import("@seams/control-api").MailReplyEdit;
+        /** Plan 40D: `shared` for a body that several authors wrote. */
+        attribution?: "single_editor" | "shared";
+      }>,
+  ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
+    return this.trackExecution(
+      this.admittedEditReviewedEmailReply.bind(this, input),
+    );
+  }
+
+  protected async admittedEditReviewedEmailReply(
+    input: Parameters<ConnectorDO["editReviewedEmailReply"]>[0],
+  ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
+    if (input.authority.organisationId !== input.identity.organisationId)
+      return invalid("connector_email_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const edited = await this.withEmailProposalLock(
+      input.proposalId,
+      editEmailReplyBody.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        proposalId: input.proposalId,
+        authority: input.authority,
+        edit: input.edit,
+        attribution: input.attribution ?? "single_editor",
+        now: input.now,
+        fetcher: runtimeFetch,
+      }),
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    // A recorded correction queued its learning turn; wake for it. An edit
+    // that recorded none leaves the alarm as it was.
+    if (
+      edited.ok &&
+      nextEmailCorrectionLearningAt(this.ctx.storage.sql) !== null
+    )
+      await armConnectorAlarm(this.ctx.storage);
+    return edited.ok ? edited : invalid(edited.error.code);
+  }
+
+  /**
+   * The recorded correction that produced one reply version, or null. It is
+   * returned only while every source the proposal drew on still stands at
+   * the revision the proposal cited. The caller decides who may read it from
+   * the binding's label. Neither body is returned.
+   */
+  async readEmailReplyCorrection(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{ proposalId: string; version: number }>,
+  ): Promise<ConnectorResult<EmailReplyCorrection | null>> {
+    return this.trackExecution(
+      this.admittedReadEmailReplyCorrection.bind(this, input),
+    );
+  }
+
+  protected async admittedReadEmailReplyCorrection(
+    input: Parameters<ConnectorDO["readEmailReplyCorrection"]>[0],
+  ): Promise<ConnectorResult<EmailReplyCorrection | null>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const correction = readEmailReplyCorrection(
+      this.ctx.storage.sql,
+      input.proposalId,
+      input.version,
+    );
+    if (correction === null) return { ok: true, value: null };
+    const sources = await this.emailProposalSourcesStand(
+      input.identity,
+      input.proposalId,
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    if (!sources.ok) return sources;
+    return { ok: true, value: sources.value ? correction : null };
+  }
+
+  /**
+   * Whether the sources a proposal's recorded flow depends on still stand at
+   * their cited revisions. A changed or erased source is a known fact and
+   * answers false; a check that could not be made is an error.
+   */
+  protected async emailProposalSourcesStand(
+    identity: ConnectorIdentity,
+    proposalId: string,
+  ): Promise<ConnectorResult<boolean>> {
+    const flow = readEmailProposalFlow(this.ctx.storage.sql, proposalId);
+    if (flow === null) return { ok: true, value: false };
+    const valid = await validateEmailCaseContextCollectionDependency(
+      this.env,
+      identity.organisationId,
+      flow.dependency,
+    );
+    if (valid.ok) return { ok: true, value: true };
+    return valid.error.code === "case_context_collection_evidence_stale" ||
+      valid.error.code === "case_context_collection_evidence_invalid"
+      ? { ok: true, value: false }
+      : invalid(valid.error.code);
+  }
+
+  async previewEmailRelationship(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{
+        proposalId: string;
+        authority: Extract<
+          import("@seams/contracts").RequestAuthority,
+          { kind: "control" }
+        >;
+        lookup: import("@seams/control-api").MailRelationshipLookup;
+      }>,
+  ): Promise<ConnectorResult<EmailRelationshipPreview>> {
+    return this.trackExecution(
+      this.admittedPreviewEmailRelationship.bind(this, input),
+    );
+  }
+
+  protected async admittedPreviewEmailRelationship(
+    input: Parameters<ConnectorDO["previewEmailRelationship"]>[0],
+  ): Promise<ConnectorResult<EmailRelationshipPreview>> {
+    if (input.authority.organisationId !== input.identity.organisationId)
+      return invalid("connector_email_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const preview = await this.withEmailProposalLock(
+      input.proposalId,
+      previewEmailRelationship.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        proposalId: input.proposalId,
+        authority: input.authority,
+        lookup: input.lookup,
+        now: input.now,
+        fetcher: runtimeFetch,
+      }),
+    );
+
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return preview;
+  }
+
+  async correctEmailRelationship(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{
+        proposalId: string;
+        authority: Extract<
+          import("@seams/contracts").RequestAuthority,
+          { kind: "control" }
+        >;
+        correction: import("@seams/control-api").MailReplyCorrection;
+      }>,
+  ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
+    return this.trackExecution(
+      this.admittedCorrectEmailRelationship.bind(this, input),
+    );
+  }
+
+  protected async admittedCorrectEmailRelationship(
+    input: Parameters<ConnectorDO["correctEmailRelationship"]>[0],
+  ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
+    if (input.authority.organisationId !== input.identity.organisationId)
+      return invalid("connector_email_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const corrected = await this.withEmailProposalLock(
+      input.proposalId,
+      correctEmailRelationship.bind(null, {
+        sql: this.ctx.storage.sql,
+        storage: this.ctx.storage,
+        env: this.env,
+        scope,
+        proposalId: input.proposalId,
+        authority: input.authority,
+        correction: input.correction,
+        now: input.now,
+        fetcher: runtimeFetch,
+      }),
+    );
+
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return corrected;
+  }
+
+  async dispatchReviewedEmailReply(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailDispatchOutcome>> {
+    return this.trackExecution(
+      this.admittedDispatchReviewedEmailReply.bind(this, raw),
+    );
+  }
+
+  protected async admittedDispatchReviewedEmailReply(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailDispatchOutcome>> {
+    const input = parseEmailDispatchRequest(raw);
+    if (input === null || !isRecord(raw))
+      return invalid("connector_email_dispatch_invalid");
+    const parsed = parseStoredRequestAuthority(raw.authority);
+    if (
+      !parsed.ok ||
+      parsed.value.requestAuthority.kind !== "control" ||
+      parsed.value.requestAuthority.organisationId !==
+        input.identity.organisationId
+    )
+      return invalid("connector_email_dispatch_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const beforeSend = authorizeEmailReplyReview.bind(
+      null,
+      this.ctx.storage.sql,
+      this.env,
+      scope,
+      parsed.value.requestAuthority,
+      input.proposalId,
+    );
+    const dispatched = await this.withEmailProposalLock(
+      input.proposalId,
+      dispatchEmailReply.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        proposalId: input.proposalId,
+        approvedVersion: input.approvedVersion,
+        approvedSnapshotDigest: input.approvedSnapshotDigest,
+        now: input.now,
+        fetcher: runtimeFetch,
+        beforeSend,
+      }),
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return dispatched.ok ? dispatched : invalid(dispatched.error.code);
+  }
+
+  async resolveEmailProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailProposalResolution>> {
+    return this.trackExecution(
+      this.admittedResolveEmailProposal.bind(this, raw),
+    );
+  }
+
+  protected async admittedResolveEmailProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailProposalResolution>> {
+    const input = parseEmailResolveRequest(raw);
+    if (input === null)
+      return invalid("connector_email_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const resolved = await this.withEmailProposalLock(
+      input.proposalId,
+      resolveEmailProposalState.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        proposalId: input.proposalId,
+        dispatchVersion: input.dispatchVersion,
+        now: input.now,
+        fetcher: runtimeFetch,
+      }),
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return resolved.ok ? resolved : invalid(resolved.error.code);
+  }
+
+  async disposeEmailProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailDisposalOutcome>> {
+    return this.trackExecution(
+      this.admittedDisposeEmailProposal.bind(this, raw),
+    );
+  }
+
+  protected async admittedDisposeEmailProposal(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailDisposalOutcome>> {
+    const input = parseEmailProposalRequest(raw);
+    if (input === null)
+      return invalid("connector_email_proposal_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const identity = this.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    );
+    if (!identity.ok) return identity;
+    const disposed = await this.withEmailProposalLock(
+      input.proposalId,
+      disposeEmailProposal.bind(null, {
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        proposalId: input.proposalId,
+        now: input.now,
+        fetcher: runtimeFetch,
+      }),
+    );
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    return disposed.ok ? disposed : invalid(disposed.error.code);
+  }
+
+  /**
+   * Mailbox teardown. Fencing comes first so no approval in flight can reach
+   * messages.send once revocation begins, then every outstanding Pantry-created
+   * draft is disposed, then the Gmail watch is stopped so Google stops
+   * publishing. Draft disposal is reported per proposal rather than summarised,
+   * because a draft Pantry cannot delete stays in the organisation's mailbox and the
+   * operator has to know about it.
+   */
+  async revokeEmailMailbox(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailMailboxRevocation>> {
+    return this.trackMailboxExecution(
+      this.admittedRevokeEmailMailbox.bind(this, raw),
+    );
+  }
+
+  protected async admittedRevokeEmailMailbox(
+    raw: unknown,
+  ): Promise<ConnectorResult<EmailMailboxRevocation>> {
+    const input = parseEmailMailboxRevocationRequest(raw);
+    if (input === null) return invalid("connector_email_request_invalid");
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const fenced = this.ctx.storage.transactionSync(
+      fenceConnectorEmailMailbox.bind(null, this.ctx.storage.sql, input),
+    );
+    if (!fenced.ok) return invalid(fenced.error.code);
+    if (input.kind === "erase") {
+      await eraseMailClassificationRecords(scope, input.integrationAccountId);
+    }
+    await armConnectorAlarm(this.ctx.storage);
+    const pending = pendingEmailDraftProposals(this.ctx.storage.sql);
+    const disposals: EmailMailboxDisposal[] = [];
+    for (const operation of pending) {
+      const disposed = await disposeEmailProposal({
+        sql: this.ctx.storage.sql,
+        env: this.env,
+        scope,
+        proposalId: operation.proposalId,
+        now: input.now,
+        fetcher: runtimeFetch,
+      });
+      disposals.push({
+        proposalId: operation.proposalId,
+        version: operation.version,
+        kind: disposed.ok ? disposed.value.kind : "cleanup_pending",
+      });
+    }
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    const stopped = await stopConnectorEmailWatch({
+      env: this.env,
+      storage: this.ctx.storage,
+      scope,
+      now: input.now,
+      fetcher: runtimeFetch,
+    });
+    await armConnectorAlarm(this.ctx.storage);
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return invalid("connector_placement_conflict");
+    const watchStopped = stopped.ok;
+    return { ok: true, value: { watchStopped, disposals } };
+  }
+}

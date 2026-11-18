@@ -1,0 +1,7 @@
+export const EMAIL_SUBJECT_LIMIT = 200;
+export const EMAIL_PREVIEW_LIMIT = 300;
+export const EMAIL_BODY_LIMIT = 50_000;
+export const EMAIL_AGGREGATE_LIMIT = 50_500;
+export const EMAIL_UPDATE_LIMIT = 256 * 1024;
+export const EMAIL_STATE_LIMIT = 512 * 1024;
+export const EMAIL_STATE_VECTOR_LIMIT = 64 * 1024;

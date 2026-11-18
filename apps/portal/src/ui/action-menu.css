@@ -1,0 +1,86 @@
+.action-menu {
+  z-index: 1000;
+  min-inline-size: 160px;
+  max-inline-size: calc(100vw - 24px);
+  padding: 5px;
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+  font-size: 13px;
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  --glide-highlight-radius: 6px;
+}
+.action-menu-section + .action-menu-section {
+  margin-block-start: 4px;
+  padding-block-start: 4px;
+  border-block-start: 1px solid var(--border);
+}
+.action-menu-heading {
+  padding: 6px 10px 4px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+}
+.action-menu-item[data-tone="danger"] {
+  color: var(--danger-text);
+}
+.action-menu-item[data-disabled] {
+  color: var(--ink-3);
+  cursor: default;
+}
+.action-menu-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.action-menu-icon svg {
+  inline-size: 16px;
+  block-size: 16px;
+}
+.action-menu-copy {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-inline-size: 0;
+}
+.action-menu-copy small {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.action-menu-item[data-disabled] small {
+  color: inherit;
+}
+.action-menu-item kbd {
+  margin-inline-start: 16px;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 12px;
+}
+/* The exit fade and the chosen item's blink come from glide-highlight.css. */
+@media (prefers-reduced-motion: no-preference) {
+  .action-menu {
+    animation: action-menu-enter var(--motion-quick);
+  }
+}
+[data-agent-preview-motion="reduced"] .action-menu {
+  animation: none;
+}
+@keyframes action-menu-enter {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+.action-menu-separator {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--border);
+}

@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "name": "EasyPost",
+  "description": "Read recent shipments. Account verification requires a Production API key.",
+  "origin": "https://api.easypost.com",
+  "authentication": {
+    "kind": "basic_api_key"
+  },
+  "documentation": [
+    {
+      "url": "https://docs.easypost.com/markdown/docs/users.md",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "url": "https://docs.easypost.com/markdown/docs/shipments.md",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "operations": [
+    {
+      "id": "current_user",
+      "description": "Read the authenticated EasyPost user.",
+      "effect": {
+        "kind": "read"
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "transport": {
+        "kind": "rest",
+        "method": "GET",
+        "pathTemplate": "/v2/users",
+        "pathBindings": {},
+        "queryBindings": {},
+        "bodyBindings": null
+      },
+      "response": {
+        "successStatuses": [200],
+        "resultPointer": "",
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "required": ["id", "name"],
+          "additionalProperties": false
+        },
+        "classification": "confidential"
+      },
+      "pagination": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "list_shipments",
+      "description": "Read the first 10 recent shipments and their tracking status.",
+      "effect": {
+        "kind": "read"
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "transport": {
+        "kind": "rest",
+        "method": "GET",
+        "pathTemplate": "/v2/shipments",
+        "pathBindings": {},
+        "queryBindings": {
+          "page_size": {
+            "kind": "constant",
+            "value": 10
+          }
+        },
+        "bodyBindings": null
+      },
+      "response": {
+        "successStatuses": [200],
+        "resultPointer": "/shipments",
+        "outputSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "tracking_code": {
+                "type": ["string", "null"],
+                "minLength": 0,
+                "maxLength": 128
+              }
+            },
+            "required": ["id", "status", "tracking_code"],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 10
+        },
+        "classification": "confidential"
+      },
+      "pagination": {
+        "kind": "none"
+      }
+    }
+  ],
+  "identity": {
+    "operationId": "current_user",
+    "arguments": {},
+    "accountIdPointer": "/id",
+    "displayNamePointer": "/name"
+  },
+  "limits": {
+    "wireBytes": 524288,
+    "decodedBytes": 524288
+  }
+}

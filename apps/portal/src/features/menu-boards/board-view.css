@@ -1,0 +1,503 @@
+/* One menu board at its native screen size (1600×900 or 720×1280),
+   scaled to its frame. The board keeps its own dark palette in both
+   Portal themes, because it shows what the shop's screen shows. */
+
+.menu-board-frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--board-bg, #17140f);
+}
+
+.menu-board-frame-fill {
+  height: 100%;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-board-scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.menu-board-frame-fill .menu-board-scaler {
+  position: relative;
+  flex: none;
+  transform-origin: center;
+}
+
+.menu-board {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding: 56px 72px 44px;
+  overflow: hidden;
+  background: var(--board-bg, #17140f);
+  color: var(--board-ink, #f2ebdd);
+  font-family: var(--board-font-body, Inter, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif);
+}
+
+.menu-board-portrait {
+  gap: 30px;
+  padding: 56px 52px 44px;
+}
+
+.menu-board-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-board-element-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.menu-board-portrait .menu-board-element-heading {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.menu-board-heading-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-board-eyebrow {
+  font-size: var(--board-step-0, 17px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--board-muted-62, #a89f90);
+}
+
+.menu-board h1 {
+  margin: 0;
+  font-family: var(--board-font-display, Fraunces, Georgia, "Times New Roman", serif);
+  font-weight: 300;
+  font-size: var(--board-step-6, 76px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.menu-board-portrait h1 {
+  font-size: var(--board-step-6, 68px);
+}
+
+.menu-board-detail,
+.menu-board-note {
+  font-size: var(--board-step-0, 18px);
+  color: var(--board-muted-62, #a89f90);
+}
+
+.menu-board-columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 56px;
+}
+
+.menu-board-column,
+.menu-board-footer {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.menu-board-footer {
+  margin-top: auto;
+}
+
+.menu-board-element {
+  border-radius: 8px;
+}
+
+.menu-board-element[data-selected="true"] {
+  outline: 3px solid #7fb0ff;
+  outline-offset: 6px;
+}
+
+.menu-board-element-order_qr {
+  margin-top: auto;
+}
+
+.menu-board-section-title {
+  margin: 0 0 8px;
+  font-size: var(--board-step-0, 18px);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--board-accent, #d2b07a);
+}
+
+.menu-board-items {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.menu-board-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--board-rule, #2e2922);
+}
+
+.menu-board-item-name,
+.menu-board-price {
+  font-size: var(--board-step-2, 28px);
+  font-weight: 500;
+}
+
+.menu-board-portrait .menu-board-item-name,
+.menu-board-portrait .menu-board-price {
+  font-size: var(--board-step-1, 24px);
+}
+
+.menu-board-price {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.menu-board-price[data-verified="false"] {
+  color: var(--board-muted-50, #8a8173);
+}
+
+.menu-board-was-price {
+  color: var(--board-muted-50, #8a8173);
+  font-size: 0.75em;
+  text-decoration-thickness: 2px;
+}
+
+.menu-board-item[data-sold-out="true"] .menu-board-item-name,
+.menu-board-featured[data-sold-out="true"] .menu-board-featured-name {
+  color: var(--board-muted-42, #776f62);
+  text-decoration: line-through;
+}
+
+.menu-board-sold-out {
+  flex: none;
+  font-size: var(--board-step-m1, 14px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--board-muted-80, #c9bfaf);
+  border: 1px solid var(--board-rule-strong, #4a443a);
+  border-radius: 999px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.menu-board-featured {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 28px 26px;
+  border-radius: 16px;
+  background: var(--board-surface, #221e18);
+}
+
+.menu-board-featured-label {
+  font-size: var(--board-step-m1, 15px);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--board-accent, #d2b07a);
+}
+
+.menu-board-featured-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.menu-board-featured-name {
+  font-family: var(--board-font-display, Fraunces, Georgia, "Times New Roman", serif);
+  font-size: var(--board-step-3, 36px);
+  line-height: 1.1;
+}
+
+.menu-board-featured p,
+.menu-board-text {
+  margin: 0;
+  font-size: var(--board-step-0, 18px);
+  line-height: 1.45;
+  color: var(--board-muted-80, #c9bfaf);
+}
+
+.menu-board-qr-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 24px;
+  border: 1px solid var(--board-rule, #2e2922);
+  border-radius: 16px;
+}
+
+.menu-board-qr,
+.menu-board-qr-missing {
+  flex: none;
+  width: 128px;
+  height: 128px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #f2ebdd;
+}
+
+.menu-board-qr-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-board-qr-copy strong {
+  font-size: var(--board-step-1, 24px);
+  font-weight: 500;
+}
+
+.menu-board-qr-copy span {
+  font-size: var(--board-step-0, 17px);
+  line-height: 1.4;
+  color: var(--board-muted-80, #c9bfaf);
+}
+
+.menu-board-missing {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--board-rule-strong, #4a443a);
+  border-radius: 12px;
+  font-size: var(--board-step-0, 18px);
+  color: var(--board-muted-62, #a89f90);
+}
+
+.menu-board-unverified {
+  margin: 0;
+  align-self: flex-start;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--board-badge-bg, #3a2a14);
+  color: var(--board-badge-ink, #f2d9a8);
+  font-size: var(--board-step-0, 18px);
+}
+
+.menu-board-pickup-codes {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px 24px;
+  font-size: var(--board-step-5, 52px);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--board-muted-80, #c9bfaf);
+}
+
+.menu-board-pickup[data-stage="ready"] .menu-board-pickup-codes {
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  font-size: var(--board-step-7, 84px);
+  color: var(--board-ink, #f2ebdd);
+}
+
+.menu-board-not-serving {
+  margin: 0;
+  padding: 0.5em 1em;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 8%);
+  font-size: 1.4em;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Plan 40B phase 5: the variants of the item-row component. "line" is the
+   rule above. */
+.menu-board-item[data-row="leader"] {
+  justify-content: flex-start;
+  border-bottom: 0;
+}
+
+.menu-board-item-leader {
+  flex: 1 1 auto;
+  min-width: 24px;
+  align-self: flex-end;
+  margin-bottom: 0.45em;
+  border-bottom: 3px dotted var(--board-rule-strong, #4a443a);
+}
+
+.menu-board-item[data-row="stacked"] {
+  align-items: flex-start;
+}
+
+.menu-board-item-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.menu-board-item-description {
+  font-size: var(--board-step-0, 18px);
+  color: var(--board-muted-62, #a89f90);
+}
+
+.menu-board-item[data-row="price_first"] {
+  justify-content: flex-start;
+}
+
+.menu-board-item[data-row="price_first"] .menu-board-price,
+.menu-board-item[data-row="price_first"] .menu-board-sold-out {
+  min-width: 4.5em;
+}
+
+.menu-board-items[data-row="tiles"] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.menu-board-item[data-row="tiles"] {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--board-rule, #2e2922);
+  border-radius: 14px;
+  background: var(--board-surface, #221e18);
+}
+
+/* Plan 40B phase 5: a free canvas. Each element sits at its own rect, in
+   board units; the board has no padding and no flow. */
+.menu-board-canvas {
+  position: relative;
+  /* The elements stack inside the board, below the editor's overlay. */
+  isolation: isolate;
+  display: block;
+  padding: 0;
+}
+
+.menu-board-canvas-element {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.menu-board-canvas .menu-board-not-serving,
+.menu-board-canvas .menu-board-unverified {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  bottom: 12px;
+  z-index: 1000;
+}
+
+/* A product photo from the shop (Plan 40B): it fills the width of a card
+   or a tile, and the copy sits below it. */
+.menu-board-photo {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--board-rule, #2e2922);
+}
+
+.menu-board-featured[data-photo="true"] {
+  padding: 14px 14px 22px;
+}
+
+.menu-board-featured[data-photo="true"] > :not(.menu-board-photo) {
+  margin-inline: 14px;
+}
+
+.menu-board-item[data-row="tiles"][data-photo="true"] {
+  padding: 10px 10px 16px;
+}
+
+.menu-board-item[data-row="tiles"][data-photo="true"] > :not(.menu-board-photo) {
+  margin-inline: 6px;
+}
+
+/* In a product's own frame the card fills the frame, and the photo takes
+   the room that the copy leaves. */
+.menu-board-canvas-element > .menu-board-featured[data-photo="true"] {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.menu-board-product-items .menu-board-photo,
+.menu-board-canvas-element > .menu-board-featured .menu-board-photo {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  min-height: 40%;
+}
+
+.menu-board-featured[data-sold-out="true"] .menu-board-photo,
+.menu-board-item[data-sold-out="true"] .menu-board-photo {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+/* Plan 40B, the Products panel: one product as a row, a tile or a big price. */
+.menu-board-product-items {
+  margin: 0;
+}
+
+.menu-board-product-items[data-row="tiles"] {
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+}
+
+.menu-board-product-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4em 0.8em;
+}
+
+.menu-board-product-price-name {
+  font-family: var(--board-font-display, Fraunces, Georgia, "Times New Roman", serif);
+  font-size: var(--board-step-3, 35px);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.menu-board-product-price .menu-board-price,
+.menu-board-product-price .menu-board-sold-out {
+  font-size: var(--board-step-2, 28px);
+}
+
+/* Plan 40B, the image element: a photo from the shop's media library. */
+.menu-board-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-board-image[data-fit="contain"] {
+  object-fit: contain;
+}
+
+.menu-board-image-missing {
+  width: 100%;
+  height: 100%;
+  background: var(--board-rule, #2e2922);
+}

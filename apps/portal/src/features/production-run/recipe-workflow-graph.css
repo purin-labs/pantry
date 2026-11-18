@@ -1,0 +1,1421 @@
+/* The canvas fills the workspace. The workspace bars, the stages, the notices
+   and the tools float over it, at the offsets that the graph measures. */
+.recipe-workflow:has(.recipe-graph[data-graph="ready"]),
+.recipe-graph[data-graph="ready"] {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+/* The canvas shows the work, so its headings are for assistive technology only. */
+.recipe-graph[data-graph="ready"] > h3,
+.recipe-workflow:has(.recipe-graph[data-graph="ready"]) > h3,
+.recipe-workflow:has(.recipe-graph[data-graph="ready"]) > p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.recipe-workflow > h3,
+.recipe-graph > h3 {
+  padding-block-end: 0;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+}
+.recipe-workflow > p,
+.recipe-graph > p {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+/* The stages are one floating track below the header: a segment for each
+   stage, in the order of the run. */
+.recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol {
+  position: absolute;
+  inset: var(--chrome-top, 12px) 12px auto;
+  z-index: 4;
+  flex-flow: row wrap;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  padding: 4px;
+  background: var(--paper);
+  border-radius: var(--pantry-radius-card);
+  box-shadow: var(--float-shadow);
+}
+/* An open panel never covers a stage. */
+.recipe-workflow:has(.recipe-graph-canvas[data-panel="true"]) > ol {
+  inset-inline-end: 364px;
+}
+.recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol > li {
+  position: relative;
+  flex: 1 1 160px;
+  flex-direction: row;
+  align-items: stretch;
+  width: auto;
+  min-width: 0;
+}
+.recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol > li + li::before {
+  content: "";
+  position: absolute;
+  inset-block: 14px;
+  inset-inline-start: 0;
+  width: 1px;
+  background: var(--border);
+}
+.recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol > li > button:not(:where(.pantry-select-trigger)) {
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  padding: 8px 14px;
+  background: transparent;
+  border-radius: calc(var(--pantry-radius-card) - 4px);
+  box-shadow: none;
+  transition: background-color var(--pantry-motion-fast) ease;
+}
+@media (hover: hover) {
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"])
+    > ol
+    > li
+    > button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+    background: var(--surface);
+  }
+}
+.recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  > ol
+  > li[data-state="current"]
+  > button:not(:where(.pantry-select-trigger)) {
+  background: var(--pantry-accent-surface);
+  color: var(--pantry-accent-text);
+  box-shadow: none;
+}
+/* The dark accent surface is heavy over a full segment, so it mixes with paper. */
+[data-portal-theme="dark"]
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  > ol
+  > li[data-state="current"]
+  > button:not(:where(.pantry-select-trigger)) {
+  background: color-mix(
+    in oklch,
+    var(--pantry-accent-surface) 55%,
+    var(--paper)
+  );
+}
+.recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  > ol
+  > li[data-state="failed"]
+  > button:not(:where(.pantry-select-trigger)) {
+  box-shadow: none;
+}
+/* "Not started" is the resting state, so only assistive technology reads it. */
+.recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  > ol
+  > li[data-state="not-started"]
+  .recipe-workflow-state {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* A filled segment needs no divider beside it. */
+.recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  > ol
+  > li:is([data-state="current"], [data-state="failed"])::before,
+.recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  > ol
+  > li:is([data-state="current"], [data-state="failed"])
+  + li::before {
+  display: none;
+}
+/* A long stage name takes two lines at most, so the canvas keeps its height. */
+.recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  > ol
+  > li
+  > button:not(:where(.pantry-select-trigger))
+  strong {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-weight: 500;
+}
+.recipe-workflow:has(.recipe-graph[data-graph="ready"])
+  svg.recipe-workflow-arrow {
+  display: none;
+}
+.recipe-graph {
+  margin-block-start: 16px;
+}
+.recipe-graph > h3,
+.recipe-graph > p {
+  margin-block: 0;
+}
+.recipe-graph > h3 {
+  padding-block-end: 2px;
+}
+.recipe-graph > p {
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+/* The canvas is the whole surface, a step lower than the bars, with dots behind the steps. */
+.recipe-graph-canvas {
+  --canvas-ground: color-mix(in oklch, var(--ground), var(--surface) 55%);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--canvas-ground);
+}
+.recipe-graph-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--ink-3) 40%, transparent) 1px,
+    transparent 1.2px
+  );
+  background-size: 20px 20px;
+  background-position: 10px 10px;
+}
+/* The padding keeps the first and the last row clear of the floating bars.
+   A small graph sits in the middle of the free space; a large one scrolls from its edge. */
+.recipe-graph-scroll {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  padding: calc(var(--chrome-stack, 12px) + var(--notices-height, 0px) + 24px)
+    48px
+    calc(
+      var(--chrome-bottom, 12px) + var(--tools-height, 52px) +
+        var(--result-height, 0px) + 24px
+    );
+  overflow: auto;
+  overscroll-behavior: contain;
+  /* A step that runs past the board fades out, so the cut reads as "more". */
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent
+    ),
+    linear-gradient(
+      to bottom,
+      transparent,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent
+    );
+  mask-composite: intersect;
+}
+.recipe-graph-scroll > div {
+  flex: none;
+  margin: auto;
+}
+.recipe-graph-canvas[data-panel="true"] .recipe-graph-scroll {
+  padding-inline-end: 380px;
+}
+.recipe-graph-canvas[data-pan="true"] .recipe-graph-scroll,
+.recipe-graph-canvas[data-pan="true"] .recipe-graph-node {
+  cursor: grab;
+}
+.recipe-graph-canvas[data-panning="true"] .recipe-graph-scroll,
+.recipe-graph-canvas[data-panning="true"] .recipe-graph-node {
+  cursor: grabbing;
+  user-select: none;
+}
+/* Left aligned, so the canvas does not shift under a drag when it grows. */
+.recipe-graph-content {
+  position: relative;
+}
+.recipe-graph-content > svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+/* One hue for each kind of step. A port and its wire take the same hue. */
+.recipe-graph [data-kind] {
+  --port-fill: oklch(0.9 0.05 var(--port-hue));
+  --port-ink: oklch(0.42 0.14 var(--port-hue));
+  --port-wire: oklch(0.6 0.09 var(--port-hue));
+}
+[data-portal-theme="dark"] .recipe-graph [data-kind] {
+  --port-fill: oklch(0.36 0.07 var(--port-hue));
+  --port-ink: oklch(0.88 0.08 var(--port-hue));
+  --port-wire: oklch(0.66 0.09 var(--port-hue));
+}
+.recipe-graph [data-kind="work"],
+.recipe-graph [data-kind="workflow"] {
+  --port-hue: 250;
+}
+.recipe-graph [data-kind="process"] {
+  --port-hue: 65;
+}
+.recipe-graph [data-kind="machine"] {
+  --port-hue: 195;
+}
+.recipe-graph [data-kind="robot"] {
+  --port-hue: 295;
+}
+.recipe-graph [data-kind="check"] {
+  --port-hue: 335;
+}
+.recipe-graph [data-kind="accept"] {
+  --port-hue: 150;
+}
+.recipe-graph [data-kind="reject"] {
+  --port-hue: 25;
+}
+/* A wire is a thin line: the ports at its ends carry the colour. */
+.recipe-graph-content path {
+  fill: none;
+  stroke: var(--port-wire);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* A step: the kind tile, the name, and a line for the kind and the state. */
+.recipe-graph-node {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: 10px;
+  row-gap: 2px;
+  padding: 0 14px 0 10px;
+  overflow: hidden;
+  color: var(--ink);
+  text-align: start;
+  white-space: normal;
+  background: var(--paper);
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-card);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--pantry-motion-fast) ease-out;
+}
+/* The lift has no specificity, so every state ring still wins over it. */
+@media (hover: hover) {
+  .recipe-graph-node:where(:hover:not(:disabled)) {
+    box-shadow: var(--float-shadow);
+  }
+}
+.recipe-graph-node:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+.recipe-graph-kind {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--port-ink);
+  background: var(--port-fill);
+  border-radius: 6px;
+}
+.recipe-graph-node > strong {
+  grid-column: 2;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recipe-graph-line {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+.recipe-graph-meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recipe-graph-node[data-role="accept"] .recipe-graph-meta {
+  color: var(--ok-text);
+}
+.recipe-graph-node[data-role="reject"] .recipe-graph-meta {
+  color: var(--danger-text);
+}
+/* The line holds the time of the step; only the state word takes the state colour. */
+.recipe-graph-meta b {
+  font-weight: inherit;
+}
+.recipe-graph-node[data-state="done"] .recipe-graph-meta b {
+  color: var(--ok-text);
+}
+.recipe-graph-node[data-state="current"] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--pantry-focus),
+    var(--float-shadow);
+}
+.recipe-graph-node[data-state="current"] .recipe-graph-meta b {
+  color: var(--pantry-accent-text);
+}
+.recipe-graph-node[data-state="failed"] {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  box-shadow:
+    inset 0 0 0 1px currentColor,
+    var(--shadow-card);
+}
+.recipe-graph-node[data-state="failed"] .recipe-graph-line {
+  color: inherit;
+}
+/* The corner mark repeats the state for a quick look; the line holds the word. */
+.recipe-graph-mark {
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  display: grid;
+  place-items: center;
+}
+.recipe-graph-mark[data-mark="current"] {
+  width: 8px;
+  height: 8px;
+  background: var(--pantry-focus);
+  border-radius: 50%;
+}
+.recipe-graph-mark[data-mark="current"]::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--pantry-focus) 30%, transparent);
+  animation: recipe-graph-pulse 1.6s ease-out infinite;
+}
+@keyframes recipe-graph-pulse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes recipe-graph-pulse {
+    from {
+      opacity: 1;
+      scale: 0.6;
+    }
+    to {
+      opacity: 0;
+      scale: 1.4;
+    }
+  }
+}
+.recipe-graph-mark[data-mark="done"] {
+  width: 16px;
+  height: 16px;
+  color: var(--ok-text);
+  background: var(--ok-bg);
+  border-radius: 50%;
+}
+.recipe-graph-mark[data-mark="failed"] {
+  color: var(--danger-text);
+}
+.recipe-graph-node:has(.recipe-graph-mark) > strong {
+  padding-inline-end: 12px;
+}
+/* The controls float above the canvas. Only the groups take the pointer. */
+.recipe-graph-chrome,
+.recipe-graph-notices {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+.recipe-graph-chrome {
+  inset: 0;
+}
+/* The draft group sits at the end of the header row: its status, the review
+   choice, Run and Apply. */
+.recipe-graph-chrome-top {
+  position: absolute;
+  inset-block-start: var(--chrome-end-top, 12px);
+  inset-inline-end: 12px;
+  max-width: calc(100% - 24px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: stretch;
+  gap: 8px;
+}
+.recipe-graph-chrome-top > .recipe-graph-float {
+  min-height: 56px;
+  padding: 5px;
+}
+.recipe-graph-chrome-top > .recipe-graph-float button:not(:where(.pantry-select-trigger)),
+.recipe-graph-chrome-top
+  > .recipe-graph-float
+  button.pantry-select-trigger {
+  min-height: 44px;
+  height: 44px;
+}
+/* One row on the footer: the zoom at the start and the tools in the middle.
+   A narrow canvas wraps the row. */
+.recipe-graph-chrome-row {
+  position: absolute;
+  inset: auto 12px var(--chrome-bottom, 12px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+/* An open panel never covers a control. */
+.recipe-graph-canvas[data-panel="true"] .recipe-graph-chrome-row {
+  inset-inline-end: 364px;
+}
+/* Both sides share the space that is left, so the tools stay in the middle. */
+.recipe-graph-chrome-start,
+.recipe-graph-chrome-end {
+  display: flex;
+  flex: 1 1 0;
+  min-width: max-content;
+}
+.recipe-graph-chrome-end {
+  justify-content: flex-end;
+}
+.recipe-graph-dock {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+.recipe-graph-float {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 4px;
+  font-size: 0.8125rem;
+  pointer-events: auto;
+  background: var(--paper);
+  border-radius: var(--pantry-radius-card);
+  box-shadow: var(--float-shadow);
+}
+.recipe-graph-float button:not(:where(.pantry-select-trigger)) {
+  transition: background-color var(--pantry-motion-fast) ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: inherit;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  box-shadow: none;
+}
+/* An icon before a label sits closer to the edge, so the pair looks centred. */
+.recipe-graph-float :is(.recipe-graph-add, .recipe-graph-run-draft) {
+  padding-inline: 8px 12px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .recipe-graph-float button:not(:where(.pantry-select-trigger)) {
+    transition-property: background-color, scale;
+  }
+  .recipe-graph-float button:not(:where(.pantry-select-trigger)):not(:disabled):active {
+    scale: 0.96;
+  }
+}
+/* An add tool shows the hue of the step that it adds. */
+.recipe-graph-add > svg {
+  color: var(--port-ink);
+}
+.recipe-graph-add:disabled > svg {
+  color: inherit;
+}
+@media (hover: hover) {
+  .recipe-graph-float button:not(:where(.pantry-select-trigger)):hover:not(:disabled),
+  .recipe-graph-float button:where(.pantry-select-trigger):hover:not(:disabled) {
+    background-color: var(--surface);
+  }
+}
+.recipe-graph-canvas .recipe-graph-float button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--pantry-category-accent-surface);
+  color: var(--pantry-category-accent-text);
+}
+.recipe-graph-float button:not(:where(.pantry-select-trigger)) > svg {
+  flex: none;
+}
+.recipe-graph-float output {
+  min-width: 40px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.recipe-graph-float .recipe-graph-filter {
+  gap: 2px;
+  padding-inline-start: 8px;
+  color: var(--ink-2);
+}
+/* A toolbar select is the quiet Select: text, a close caret, no box. */
+.recipe-graph-float button.pantry-select-trigger {
+  min-height: 36px;
+  height: 36px;
+  color: var(--ink);
+  font-size: inherit;
+  border-radius: var(--pantry-radius-control);
+}
+.recipe-graph-float .recipe-graph-primary,
+.recipe-proposal-actions .recipe-graph-primary {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  border-radius: var(--pantry-radius-control);
+  box-shadow: var(--pantry-primary-ring);
+}
+.recipe-graph-float .recipe-graph-primary:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+.recipe-graph-float .recipe-graph-primary:disabled,
+.recipe-proposal-actions .recipe-graph-primary:disabled {
+  color: var(--pantry-disabled-text);
+  background: var(--pantry-disabled-surface);
+  box-shadow: none;
+}
+.recipe-graph-divider {
+  width: 1px;
+  height: 20px;
+  margin-inline: 4px;
+  background: var(--border);
+}
+/* A set width, so the row measures the composer as it shows and keeps it beside
+   the tools while they fit. */
+.recipe-graph-composer {
+  flex: 0 1 auto;
+  gap: 8px;
+  width: 380px;
+  max-width: 100%;
+  min-width: min(240px, 100%);
+  padding-inline-start: 14px;
+}
+.recipe-graph-composer > svg {
+  flex: none;
+  color: var(--pantry-accent-text);
+}
+.recipe-graph-composer input {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+.recipe-graph-composer:focus-within {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+.recipe-graph-composer button:not(:where(.pantry-select-trigger)):not(:disabled) {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+}
+.recipe-graph-composer button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+.recipe-graph-composer button:not(:where(.pantry-select-trigger)) {
+  border-radius: var(--pantry-radius-control);
+}
+.recipe-graph-notices {
+  inset: var(--chrome-stack, 12px) auto auto 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: min(380px, calc(100% - 24px));
+  max-height: calc(
+    100% - var(--chrome-stack, 12px) - var(--chrome-bottom, 12px) -
+      var(--tools-height, 52px) - var(--result-height, 0px) - 16px
+  );
+  overflow: auto;
+}
+.recipe-graph-notices > * {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  pointer-events: auto;
+  background: var(--paper);
+  border-radius: var(--pantry-radius-notice);
+  box-shadow: var(--shadow-card);
+}
+.recipe-graph-hint,
+.recipe-graph-removed {
+  color: var(--ink-2);
+}
+/* The draft status: a dot, the revision and what happens to the edits, and the
+   people on the draft. */
+.recipe-graph-chrome-top > .recipe-graph-status {
+  gap: 10px;
+  margin: 0;
+  padding: 4px 14px;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.recipe-graph-status strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.recipe-graph-status .recipe-graph-divider {
+  margin: 0;
+}
+.recipe-graph-people {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.recipe-graph-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* The draft status dot: green when every edit is saved, amber while it connects. */
+.recipe-graph-live {
+  flex: none;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--ink-3);
+  border-radius: 50%;
+}
+[data-draft-status="synced"] > .recipe-graph-live {
+  background: var(--ok-text);
+  box-shadow: 0 0 0 3px var(--ok-bg);
+}
+:is([data-draft-status="connecting"], [data-draft-status="reconnecting"])
+  > .recipe-graph-live {
+  background: var(--warn-text);
+  box-shadow: 0 0 0 3px var(--warn-bg);
+}
+.recipe-graph-notices .recipe-graph-problems {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+.recipe-graph-problems ul {
+  margin: 4px 0 0;
+  padding-inline-start: 20px;
+}
+.recipe-proposal h4,
+.recipe-proposal h5 {
+  margin: 0 0 4px;
+}
+.recipe-proposal h5 {
+  margin-block-start: 8px;
+}
+.recipe-graph-drawer.recipe-proposal h5 {
+  margin: 0 0 -10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.recipe-graph-drawer.recipe-proposal > p,
+.recipe-graph-drawer.recipe-proposal > ul {
+  margin: 0;
+}
+.recipe-proposal p {
+  margin: 4px 0;
+}
+.recipe-proposal ul {
+  margin: 0;
+  padding-inline-start: 20px;
+}
+.recipe-proposal li button:not(:where(.pantry-select-trigger)) {
+  margin-inline-start: 8px;
+}
+.recipe-proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 8px;
+}
+/* A review keeps the graph in place, and the steps that it changes stand out. */
+.recipe-graph-node-frame[data-review="unchanged"] {
+  opacity: 0.6;
+}
+.recipe-graph-node-frame[data-review="changed"] > .recipe-graph-node {
+  box-shadow:
+    inset 0 0 0 1.5px var(--pantry-focus),
+    var(--shadow-card);
+}
+/* The result of a run is a sheet above the tools: the numbers at the start,
+   the task timeline beside them. The steps move up to stay clear of it. */
+.recipe-graph-comparison {
+  position: absolute;
+  inset: auto 12px
+    calc(var(--chrome-bottom, 12px) + var(--tools-height, 52px) + 8px);
+  z-index: 4;
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  grid-auto-rows: min-content;
+  column-gap: 24px;
+  max-height: min(
+    320px,
+    38%,
+    calc(
+      100% - var(--chrome-stack, 12px) - var(--chrome-bottom, 12px) -
+        var(--tools-height, 52px) - 24px
+    )
+  );
+  margin: 0;
+  padding: 12px 16px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  font-size: 0.8125rem;
+  background: var(--paper);
+  border-radius: var(--pantry-radius-card);
+  box-shadow: var(--float-shadow);
+}
+.recipe-graph:has(.recipe-graph-canvas[data-panel="true"])
+  > .recipe-graph-comparison {
+  inset-inline-end: 364px;
+}
+.recipe-graph-comparison > :not(section) {
+  grid-column: 1;
+}
+.recipe-graph-comparison > section {
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  min-width: 0;
+}
+.recipe-graph-comparison > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-block-end: 8px;
+}
+.recipe-graph-comparison > header > button:not(:where(.pantry-select-trigger)) {
+  flex: none;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+}
+.recipe-graph-comparison :is(h3, h4) {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.recipe-graph-comparison p {
+  margin: 8px 0 0;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+/* The task timeline: one lane for each task, its bar in the hue of its step. */
+.recipe-graph-comparison > section > header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-block-end: 8px;
+}
+.recipe-graph-comparison > section > header > span {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+.recipe-graph-timeline {
+  display: grid;
+  grid-template-columns: minmax(0, 120px) minmax(0, 1fr);
+  row-gap: 3px;
+  column-gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.recipe-graph-timeline > li {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+}
+.recipe-graph-timeline > li > span:first-child {
+  overflow: hidden;
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.recipe-graph-timeline > li[data-added="true"] > span:first-child {
+  font-weight: 500;
+  color: var(--pantry-accent-text);
+}
+.recipe-graph-lane {
+  position: relative;
+  height: 16px;
+  background: var(--surface);
+  border-radius: 3px;
+}
+.recipe-graph-bar {
+  position: absolute;
+  inset-block: 2px;
+  min-width: 2px;
+  background: var(--port-fill);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--port-wire);
+}
+.recipe-graph-bar:is([data-phase="waiting"], [data-phase="reserved"]) {
+  background: transparent;
+}
+.recipe-graph-bar[data-phase="unresolved"] {
+  background: var(--danger-bg);
+  box-shadow: inset 0 0 0 1px var(--danger-text);
+}
+.recipe-graph-timeline > li[data-added="true"] .recipe-graph-bar {
+  background: var(--pantry-accent-surface);
+  box-shadow: inset 0 0 0 1.5px var(--pantry-focus);
+}
+.recipe-graph-comparison table {
+  justify-self: start;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.recipe-graph-comparison th,
+.recipe-graph-comparison td {
+  padding: 2px 16px 2px 0;
+  text-align: start;
+}
+.recipe-graph-comparison th {
+  font-weight: 500;
+}
+.recipe-graph-comparison thead th,
+.recipe-graph-comparison tbody th {
+  color: var(--ink-2);
+}
+.recipe-graph-node-frame {
+  position: absolute;
+}
+/* A port stands 6px off the card, as a small tinted circle that names what
+   flows through it. */
+.recipe-graph-port {
+  position: absolute;
+  inset-block-start: calc(50% - 9px);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--port-ink);
+  pointer-events: none;
+  background: var(--port-fill);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--port-wire) 45%, transparent),
+    0 0 0 2px var(--canvas-ground, var(--ground));
+}
+.recipe-graph-port[data-side="in"] {
+  inset-inline-start: -24px;
+}
+.recipe-graph-port[data-side="out"] {
+  inset-inline-end: -24px;
+}
+/* The label above a step: its kind on the start side, and on the end side who or
+   what does it. */
+.recipe-graph-label {
+  position: absolute;
+  inset: -20px 2px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 14px;
+  font-size: 0.6875rem;
+  line-height: 14px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.recipe-graph-label > span:first-child {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink-2);
+}
+.recipe-graph-label > span + span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recipe-graph-label svg {
+  flex: none;
+}
+.recipe-graph-node-frame > .recipe-graph-node {
+  position: static;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+/* The outline marks a selected step, so its surface stays the same. */
+.recipe-graph-canvas .recipe-graph-node[aria-pressed="true"] {
+  color: inherit;
+  background: var(--paper);
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 1px;
+}
+.recipe-graph-node[data-problem="true"] {
+  box-shadow:
+    inset 0 0 0 2px var(--danger-text),
+    var(--shadow-card);
+}
+.recipe-graph-badge {
+  flex: none;
+  padding: 0 6px;
+  font-style: normal;
+  font-weight: 500;
+  color: var(--pantry-accent-text);
+  background: var(--pantry-accent-surface);
+  border-radius: var(--pantry-radius-control);
+}
+.recipe-graph-connect {
+  position: absolute;
+  inset: calc(50% - 11px) -26px auto auto;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  min-height: 22px;
+  padding: 0;
+  color: var(--ink-2);
+  background: var(--paper);
+  border-radius: 50%;
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  transition: opacity var(--pantry-motion-fast) ease-out;
+}
+.recipe-graph-connect[data-active="true"] {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+}
+.recipe-graph-node-frame:focus-within > .recipe-graph-connect,
+.recipe-graph-connect[data-active="true"] {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .recipe-graph-node-frame:hover > .recipe-graph-connect {
+    opacity: 1;
+  }
+}
+/* The panel stands between the header and the footer, at the end of the canvas. */
+.recipe-graph-drawer {
+  position: absolute;
+  inset: var(--chrome-top, 12px) 12px var(--chrome-bottom, 12px) auto;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(340px, calc(100% - 24px));
+  padding: 0 16px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  text-align: start;
+  background: var(--paper);
+  border-radius: var(--pantry-radius-panel);
+  box-shadow: var(--float-shadow);
+}
+/* The header and the actions stay in view while the fields scroll. */
+.recipe-graph-drawer > header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-inline: -16px;
+  padding: 12px 8px 12px 16px;
+  background: var(--paper);
+  border-block-end: 1px solid var(--border);
+}
+.recipe-graph-drawer > header > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.recipe-graph-drawer h4 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.recipe-graph-drawer > header small {
+  font-size: 0.75rem;
+  color: var(--ink-2);
+}
+.recipe-graph-drawer > header small[data-state="done"] {
+  color: var(--ok-text);
+}
+.recipe-graph-drawer > header small[data-state="current"] {
+  color: var(--pantry-accent-text);
+}
+.recipe-graph-drawer > header small[data-state="failed"] {
+  color: var(--danger-text);
+}
+.recipe-graph-drawer .recipe-graph-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+}
+@media (hover: hover) {
+  .recipe-graph-drawer .recipe-graph-close:hover {
+    background: var(--surface);
+  }
+}
+.recipe-graph-agent {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--pantry-accent-text);
+  background: var(--pantry-accent-surface);
+  border-radius: 6px;
+}
+/* A field name reads as a small label above its field. */
+.recipe-graph-drawer > label,
+.recipe-graph-drawer fieldset > legend {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.recipe-graph-drawer fieldset > legend {
+  margin-block-end: 2px;
+  padding: 0;
+}
+.recipe-graph-drawer > label,
+.recipe-graph-drawer fieldset > label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.recipe-graph-drawer > label {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+.recipe-graph-drawer fieldset > label {
+  min-height: 32px;
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+.recipe-graph-drawer input:not([type="checkbox"], [type="radio"]) {
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  background: var(--ground);
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-control);
+}
+.recipe-graph-drawer input[type="checkbox"] {
+  accent-color: var(--pantry-focus);
+}
+.recipe-graph-drawer fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 0 0;
+  border: 0;
+}
+.recipe-graph-drawer-actions,
+.recipe-graph-drawer > .recipe-proposal-actions {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin: auto -16px 0;
+  padding: 12px 16px;
+  background: var(--paper);
+  border-block-start: 1px solid var(--border);
+}
+.recipe-graph-drawer > .recipe-proposal-actions {
+  justify-content: flex-start;
+}
+.recipe-graph-danger {
+  color: var(--danger-text);
+}
+.recipe-animation-notice {
+  position: absolute;
+  inset: 96px auto auto 50%;
+  z-index: 5;
+  margin: 0;
+  padding: 6px 12px;
+  background: var(--ground);
+  border-radius: var(--pantry-radius-notice);
+  box-shadow: var(--shadow-card);
+  transform: translateX(-50%);
+}
+.recipe-graph-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.recipe-graph-content text {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  fill: var(--port-ink);
+  paint-order: stroke;
+  stroke: var(--ground);
+  stroke-width: 3;
+}
+.recipe-graph-node[data-run="skipped"] {
+  opacity: 0.6;
+}
+.recipe-graph-range {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.recipe-graph-range > label,
+.recipe-graph-branch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.recipe-graph-branch {
+  margin-inline-start: 24px;
+}
+
+.recipe-graph-needs {
+  display: none;
+}
+.recipe-graph-content {
+  transform-origin: 0 0;
+}
+/* In a split pane, keep the stage track on one compact row and place the step
+   drawer below the stages so an open step never crushes the stage bar. */
+@container workflow-pane (max-width: 900px) {
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol > li {
+    flex: 1 1 116px;
+  }
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol > li > button:not(:where(.pantry-select-trigger)) {
+    padding: 6px 10px;
+  }
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"])
+    > ol
+    > li
+    > button:not(:where(.pantry-select-trigger))
+    strong {
+    font-size: 0.8125rem;
+  }
+  .recipe-graph-chrome-top > .recipe-graph-float {
+    min-height: 44px;
+    padding: 4px;
+  }
+  .recipe-graph-chrome-top > .recipe-graph-float button:not(:where(.pantry-select-trigger)),
+  .recipe-graph-chrome-top
+    > .recipe-graph-float
+    button.pantry-select-trigger {
+    min-height: 36px;
+    height: 36px;
+  }
+  .recipe-workflow:has(.recipe-graph-canvas[data-panel="true"]) > ol,
+  .recipe-graph-canvas[data-panel="true"] .recipe-graph-chrome-row,
+  .recipe-graph:has(.recipe-graph-canvas[data-panel="true"])
+    > .recipe-graph-comparison {
+    inset-inline-end: 12px;
+  }
+  .recipe-graph-drawer {
+    inset-block: var(--chrome-summary-top, 12px)
+      calc(var(--chrome-bottom, 12px) + var(--tools-height, 52px) + 8px);
+  }
+  .recipe-graph-comparison {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .recipe-graph-comparison > section {
+    grid-column: 1;
+    grid-row: auto;
+    margin-block-start: 12px;
+  }
+}
+@container workflow-pane (max-width: 560px) {
+  .recipe-graph-chrome-end {
+    display: none;
+  }
+  .recipe-graph-dock {
+    justify-content: flex-start;
+  }
+  .recipe-graph-dock > .recipe-graph-float {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+}
+/* A phone shows the same steps as a list. Each opens the same drawer. */
+@media (max-width: 1100px) {
+  .recipe-graph-comparison {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .recipe-graph-comparison > section {
+    grid-column: 1;
+    grid-row: auto;
+    margin-block-start: 12px;
+  }
+}
+/* A phone shows the steps as a list in the page flow. Each opens the same panel. */
+@media (max-width: 640px) {
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"]),
+  .recipe-graph[data-graph="ready"] {
+    height: auto;
+  }
+  .recipe-graph-canvas {
+    position: static;
+    overflow: visible;
+    background: none;
+  }
+  .recipe-graph-scroll {
+    display: block;
+    mask-image: none;
+  }
+  /* A phone stacks the stages, so each divider runs across. */
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol {
+    position: static;
+    flex-direction: column;
+    margin-block-end: 12px;
+    box-shadow: var(--shadow-card);
+  }
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"]) > ol > li {
+    flex-basis: auto;
+  }
+  .recipe-workflow:has(.recipe-graph[data-graph="ready"])
+    > ol
+    > li
+    + li::before {
+    inset: 0 14px auto;
+    width: auto;
+    height: 1px;
+  }
+  .recipe-graph-scroll > div {
+    margin: 0;
+  }
+  .recipe-graph-node {
+    padding-block: 10px;
+  }
+  .recipe-graph-kind {
+    grid-row: 1 / span 3;
+    align-self: start;
+  }
+  .recipe-graph-needs {
+    grid-column: 2;
+  }
+  .recipe-graph-scroll,
+  .recipe-graph-chrome,
+  .recipe-graph-notices,
+  .recipe-graph-comparison {
+    position: static;
+    width: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+  }
+  .recipe-graph-comparison {
+    margin-block-start: 12px;
+    padding: 12px 16px;
+  }
+  .recipe-graph-canvas {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .recipe-graph-chrome {
+    order: -1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .recipe-graph-chrome-top,
+  .recipe-graph-chrome-row {
+    position: static;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .recipe-graph-chrome-top > .recipe-graph-status {
+    white-space: normal;
+  }
+  .recipe-graph-canvas::before,
+  .recipe-graph-tool,
+  .recipe-graph-chrome-start,
+  .recipe-graph-chrome-end,
+  .recipe-graph-dock .recipe-graph-divider {
+    display: none;
+  }
+  .recipe-graph-float {
+    flex-wrap: wrap;
+  }
+  .recipe-graph-dock {
+    justify-content: flex-start;
+  }
+  .recipe-graph-drawer {
+    position: fixed;
+    inset: 12px 12px 12px auto;
+    z-index: 30;
+  }
+  .recipe-graph-scroll > div,
+  .recipe-graph-content {
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+  }
+  .recipe-graph-content > svg,
+  .recipe-graph-connect,
+  .recipe-graph-port {
+    display: none;
+  }
+  .recipe-graph-node-frame {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin-block-end: 12px;
+  }
+  .recipe-graph-label {
+    position: static;
+    margin: 0 2px 6px;
+  }
+  .recipe-graph-node {
+    width: 100%;
+  }
+  .recipe-graph-needs {
+    display: block;
+  }
+}

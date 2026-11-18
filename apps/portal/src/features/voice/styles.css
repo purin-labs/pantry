@@ -1,0 +1,501 @@
+.chat-composer .voice-toggle {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+.chat-composer-surface:has(.voice-toggle) > textarea {
+  padding-right: 40px;
+}
+.chat-composer .voice-toggle:hover {
+  background: var(--surface);
+}
+.chat-composer
+  .voice-toggle:is(
+    [data-state="listening"],
+    [data-state="capturing"],
+    [data-state="transcribing"]
+  ) {
+  color: var(--ink);
+  background: var(--surface);
+}
+.chat-composer .voice-toggle[data-state="capturing"] {
+  color: #c2410c;
+}
+.voice-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.voice-status[data-state="capturing"] {
+  color: #c2410c;
+}
+.voice-cloud {
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+.chat-composer .voice-tap {
+  width: auto;
+  height: auto;
+  min-height: 44px;
+  border: 0;
+  padding: 0 4px;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+}
+.voice-header-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--ink-2);
+}
+.voice-message-mark {
+  display: inline-grid;
+  margin-left: 6px;
+  vertical-align: -2px;
+  place-items: center;
+  color: var(--ink-2);
+}
+.voice-dialog {
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+  padding: 24px 28px 28px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  color: var(--ink);
+  background: var(--paper);
+}
+.voice-dialog::backdrop {
+  background: color-mix(in oklch, var(--pantry-shadow-color) 35%, transparent);
+}
+.voice-dialog:focus {
+  outline: none;
+}
+.voice-dialog h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+.voice-view-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin-left: -8px;
+}
+.voice-lead {
+  margin: 10px 0 18px;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.voice-dot {
+  display: inline-block;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+.voice-dot[data-tone="ready"] {
+  background: var(--ok-text);
+}
+.voice-dot[data-tone="problem"] {
+  background: var(--pantry-danger-text);
+}
+.voice-dialog-status {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-size: 14px;
+}
+.voice-dialog-status .voice-dot {
+  transform: translateY(-1px);
+}
+.voice-dialog-status[data-tone="problem"] {
+  color: var(--pantry-danger-text);
+}
+.voice-dialog-status + .voice-lead {
+  margin-top: 4px;
+}
+.voice-terms {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.voice-terms li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 12px;
+}
+.voice-terms svg {
+  margin-top: 1px;
+  color: var(--ink-3);
+}
+.voice-terms-fold {
+  margin: -10px 0 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.voice-terms-fold summary {
+  min-height: 32px;
+  border-radius: 8px;
+  line-height: 32px;
+  cursor: pointer;
+}
+.voice-terms-fold summary:hover {
+  color: var(--ink);
+}
+.voice-terms-fold .voice-terms {
+  margin: 8px 0 0;
+}
+.voice-microphone {
+  display: grid;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.voice-microphone-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--pantry-radius-control);
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: none;
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  cursor: pointer;
+}
+.voice-microphone-trigger span {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.voice-microphone-trigger svg {
+  flex: none;
+  color: var(--ink-2);
+  transition: transform var(--motion-quick);
+}
+.voice-microphone-trigger[data-state="open"] svg {
+  transform: rotate(180deg);
+}
+.voice-microphone-trigger:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+.action-menu.voice-microphone-menu {
+  width: var(--radix-dropdown-menu-trigger-width);
+  font-size: 14px;
+}
+.voice-microphone-mark {
+  width: 16px;
+  height: 16px;
+}
+.voice-mac-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px 10px 10px;
+  border: 0;
+  border-radius: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.voice-mac-link:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--surface) 92%, var(--ink));
+}
+.voice-mac-link > svg {
+  flex: none;
+  color: var(--ink-3);
+}
+.voice-mac-link-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: var(--ink-2);
+  background: var(--paper);
+}
+.voice-mac-link-copy {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+  font-size: 14px;
+}
+.voice-mac-link-copy small,
+.voice-mac-row-copy small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.voice-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+.voice-dialog .primary-button {
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.voice-secondary-button {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.voice-secondary-button:hover:not(:disabled) {
+  background: var(--surface);
+}
+.voice-text-button {
+  flex: none;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.voice-text-button:hover:not(:disabled) {
+  color: var(--ink);
+  background: color-mix(in oklch, var(--surface) 92%, var(--ink));
+}
+.voice-mac-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.voice-mac-row {
+  display: grid;
+  gap: 8px;
+  padding: 12px 10px 12px 14px;
+  border-radius: 14px;
+  background: var(--surface);
+}
+.voice-mac-row-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.voice-mac-row-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.voice-mac-row strong {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 400;
+}
+.voice-mac-row .voice-note {
+  margin: 0;
+  padding-right: 4px;
+}
+.voice-mac-engine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.voice-mac-engine .voice-note {
+  flex-basis: 100%;
+}
+.voice-mac-confirm {
+  padding-right: 4px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.voice-mac-confirm p {
+  margin: 0;
+}
+.voice-mac-confirm .voice-dialog-actions {
+  margin-top: 12px;
+}
+.voice-install {
+  display: grid;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.voice-install p {
+  margin: 0;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.voice-install code {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 12px;
+  line-height: 1.6;
+  user-select: all;
+}
+.voice-install code span {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.voice-install .voice-dialog-actions {
+  margin-top: 0;
+}
+.voice-install .voice-error {
+  margin: 0;
+}
+.voice-error {
+  margin: 12px 0 0;
+  color: var(--pantry-danger-text);
+  font-size: 13px;
+}
+.voice-note {
+  margin: 16px 0 0;
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+@media (max-width: 760px) {
+  .voice-dialog {
+    padding: 18px 20px 20px;
+  }
+  .voice-dialog
+    .voice-dialog-actions
+    > button:not(:where(.pantry-select-trigger)) {
+    flex: 1 1 100%;
+  }
+  .voice-dialog button:not(:where(.pantry-select-trigger))[data-voice-add] {
+    width: 100%;
+  }
+  .voice-text-button {
+    min-height: 44px;
+  }
+}
+.voice-approval-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.voice-approval-line strong {
+  color: var(--ink);
+}
+/* Voice control on every page while the chat is closed (page-mark.tsx). */
+button:not(:where(.pantry-select-trigger)).voice-page-mark {
+  position: fixed;
+  z-index: 40;
+  bottom: 16px;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-pill);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 14px;
+  transform: translateX(-50%);
+}
+button:not(:where(.pantry-select-trigger)).voice-page-mark:hover {
+  color: var(--ink);
+}
+button:not(:where(.pantry-select-trigger)).voice-page-mark:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+button:not(
+    :where(.pantry-select-trigger)
+  ).voice-page-mark[data-state="capturing"] {
+  color: #c2410c;
+}
+@media (prefers-reduced-motion: no-preference) {
+  button:not(
+      :where(.pantry-select-trigger)
+    ).voice-page-mark[data-state="capturing"] {
+    animation: voice-page-mark-pulse 1.2s ease-in-out infinite;
+  }
+}
+@keyframes voice-page-mark-pulse {
+  50% {
+    box-shadow:
+      var(--shadow-card),
+      0 0 0 4px color-mix(in srgb, #c2410c 18%, transparent);
+  }
+}

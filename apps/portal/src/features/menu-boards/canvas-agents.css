@@ -1,0 +1,241 @@
+/* Plan 40B phase 7, slice 2: agents on the free canvas. The overlay uses
+   board units; a cursor and its tag scale back to screen size. Agents have
+   their own colours, apart from the six colours of people. */
+
+.menu-canvas-agent,
+.menu-canvas-agent-mark,
+.menu-canvas-agent-outline,
+.menu-canvas-agent-ghost,
+.menu-canvas-agent-draft,
+.menu-canvas-layer-agent,
+.menu-canvas-ruler-range,
+.menu-presence-agent {
+  --agent: #6d3fe0;
+}
+
+[data-agent-color="teal"] {
+  --agent: #00796b;
+}
+
+[data-agent-color="gold"] {
+  --agent: #8f6300;
+}
+
+.menu-canvas-agent-outline {
+  position: absolute;
+  box-sizing: border-box;
+  outline: var(--agent-line, 3px) solid var(--agent);
+  outline-offset: var(--agent-line, 3px);
+  background: color-mix(in srgb, var(--agent) 8%, transparent);
+  pointer-events: none;
+}
+
+/* One agent's mark. It has no size: its parts stand in board units. */
+.menu-canvas-agent-mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* A mark that went away while it was pending fades; nothing moves. */
+.menu-canvas-agent-mark[data-leaving="true"] {
+  animation: menu-canvas-agent-leave 320ms ease-out forwards;
+}
+
+@keyframes menu-canvas-agent-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+/* The colour halo of an accepted edit, for the 5 s hold. */
+.menu-canvas-agent-outline[data-state="applied"] {
+  box-shadow: 0 0 calc(var(--agent-line, 3px) * 6) calc(var(--agent-line, 3px) * 2)
+    color-mix(in srgb, var(--agent) 32%, transparent);
+}
+
+/* Slice 3: the ghost box at the rect that a pending edit proposes. */
+.menu-canvas-agent-ghost {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: var(--agent-line, 3px) dashed var(--agent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--agent) 10%, transparent);
+  pointer-events: none;
+}
+
+.menu-canvas-agent-ghost:has(.menu-canvas-agent-letters) {
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.3em 0.5em;
+  background: color-mix(in srgb, #fff 90%, var(--agent));
+  font-size: var(--agent-text);
+}
+
+.menu-canvas-agent-generating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px 2px 7px;
+  border-radius: 999px;
+  background: var(--agent);
+  color: #fff;
+  font: 600 12px/18px Inter, "Helvetica Neue", Arial, sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* Slice 4: the text that the model writes, over its element. */
+.menu-canvas-agent-draft {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  padding: 0.3em 0.5em;
+  overflow: hidden;
+  outline: var(--agent-line, 3px) solid var(--agent);
+  outline-offset: var(--agent-line, 3px);
+  background: color-mix(in srgb, #fff 92%, var(--agent));
+  font-size: var(--agent-text);
+  pointer-events: none;
+}
+
+.menu-canvas-agent-letters {
+  margin: 0;
+  color: #1c2520;
+  font: 500 1em/1.25 Inter, "Helvetica Neue", Arial, sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.menu-canvas-agent-caret {
+  display: inline-block;
+  width: max(2px, 0.08em);
+  height: 1.1em;
+  margin-left: 0.06em;
+  vertical-align: text-bottom;
+  background: var(--agent);
+  animation: menu-canvas-agent-blink 1s steps(1) infinite;
+}
+
+@keyframes menu-canvas-agent-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-canvas-agent-caret {
+    animation: none;
+  }
+}
+
+.menu-canvas-agent {
+  position: absolute;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  color: var(--agent);
+  pointer-events: none;
+}
+
+.menu-canvas-agent-pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  fill: currentColor;
+  stroke: #fff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+/* A crosshair and a text cursor stand with their middle on the point. */
+.menu-canvas-agent:is([data-kind="create"], [data-kind="resize"]) .menu-canvas-agent-pointer {
+  top: -11px;
+  left: -11px;
+  fill: none;
+  stroke: currentColor;
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff);
+}
+
+.menu-canvas-agent[data-kind="text"] .menu-canvas-agent-pointer {
+  top: -11px;
+  left: -4px;
+  fill: none;
+  stroke: currentColor;
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff);
+}
+
+.menu-canvas-agent-tag {
+  position: absolute;
+  top: 18px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  font: 500 12px/18px Inter, "Helvetica Neue", Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.menu-canvas-agent-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+  background: var(--agent);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* The AI mark: an agent's tag never reads as a person's name. */
+.menu-canvas-agent-ai {
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.24);
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+}
+
+.menu-canvas-agent-action,
+.menu-canvas-agent-size {
+  max-width: 240px;
+  padding: 1px 7px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #1c2520;
+  color: #fff;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.menu-canvas-agent-size {
+  background: var(--agent);
+  font-variant-numeric: tabular-nums;
+}
+
+.menu-canvas-layer-agent {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--agent);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+}

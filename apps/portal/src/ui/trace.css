@@ -1,0 +1,197 @@
+@import "./activity-shimmer.css";
+
+/* Trace rows on Base UI Collapsible, with Portal tokens. */
+.pantry-trace,
+.pantry-trace-collapsible {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+.pantry-trace {
+  gap: var(--pantry-space-2);
+}
+.pantry-trace-line {
+  display: flex;
+  align-items: center;
+  gap: var(--pantry-space-2);
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 20px;
+  transition:
+    color var(--motion-quick),
+    opacity var(--motion-quick),
+    transform var(--motion-quick);
+}
+.pantry-trace-line[data-status="error"] {
+  color: var(--danger-text);
+}
+.pantry-trace-line[data-status="pending"] {
+  opacity: 0.6;
+}
+.pantry-trace-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+.pantry-trace-icon svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+.pantry-trace-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pantry-trace-title ~ .pantry-trace-icon {
+  margin-inline-start: -4px;
+}
+.pantry-trace-description {
+  flex-shrink: 0;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.pantry-trace > :is(a, button:not(:where(.pantry-select-trigger))),
+.pantry-trace-collapsible-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--pantry-space-1);
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  min-block-size: 20px;
+  border: 0;
+  border-radius: var(--pantry-space-1);
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink-2);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+@media (pointer: coarse) {
+  .pantry-trace > :is(a, button:not(:where(.pantry-select-trigger))),
+  .pantry-trace-collapsible-trigger {
+    min-block-size: 44px;
+  }
+}
+.pantry-trace > :is(a, button:not(:where(.pantry-select-trigger))):focus-visible,
+.pantry-trace-collapsible-trigger:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 3px;
+}
+.pantry-trace-collapsible-trigger[disabled] {
+  cursor: default;
+  opacity: 0.6;
+}
+.pantry-trace-collapsible-trigger:has([data-status="error"]) {
+  color: var(--danger-text);
+}
+[data-trace-chevron] {
+  transition:
+    transform var(--motion-quick),
+    opacity var(--motion-quick);
+}
+[aria-expanded="true"] > [data-trace-chevron] {
+  transform: rotate(90deg);
+}
+.pantry-trace-collapsible-content {
+  height: var(--collapsible-panel-height);
+  min-width: 0;
+  overflow: hidden;
+  transition: height var(--motion-quick);
+}
+.pantry-trace-collapsible-content[data-starting-style],
+.pantry-trace-collapsible-content[data-ending-style] {
+  height: 0;
+}
+.pantry-trace-collapsible-content-inner {
+  margin-block: var(--pantry-space-2) var(--pantry-space-1);
+  margin-inline-start: 7px;
+  padding-inline: var(--pantry-space-4) var(--pantry-space-1);
+  border-inline-start: 1px solid var(--border);
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.pantry-trace-collapsible-content-inner > p {
+  margin: 0;
+}
+.pantry-trace-collapsible-content-inner > :is(p, pre) {
+  transition:
+    opacity var(--motion-quick),
+    transform var(--motion-quick);
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(a, button:not(:where(.pantry-select-trigger))):hover > .pantry-trace-line:not([data-status="error"]),
+  .pantry-trace-collapsible-trigger:hover:not([disabled]):not(
+      :has([data-status="error"])
+    ) {
+    color: var(--ink);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Animate the incoming row, not its group. Nested traces then avoid stacking
+     opacity fades, and an update does not replay the rows already on screen. */
+  @starting-style {
+    [data-trace-chevron] {
+      opacity: 0;
+    }
+    .pantry-trace-line[data-status],
+    .pantry-trace-collapsible-content-inner > :is(p, pre) {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+  .pantry-trace-icon[data-spinning] {
+    animation: trace-spin calc(1s * var(--agent-motion-factor, 1)) linear
+      infinite;
+  }
+}
+@keyframes trace-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pantry-trace-collapsible-content,
+  [data-trace-chevron] {
+    transition: none;
+    /* Override Portal's universal 0.01ms reduced-motion duration. Base UI
+       uses computed durations to decide when a panel finishes its exit. */
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}
+:root[data-agent-preview-motion="reduced"]
+  .pantry-trace-icon[data-spinning] {
+  animation: none;
+}
+:root[data-agent-preview-motion="reduced"]
+  :is(.pantry-trace-collapsible-content, [data-trace-chevron]) {
+  transition: none;
+  opacity: 1;
+}
+:root[data-agent-preview-motion="reduced"] .pantry-trace-line,
+:root[data-agent-preview-motion="reduced"]
+  .pantry-trace-collapsible-content-inner
+  > :is(p, pre) {
+  transition: none;
+  opacity: 1;
+  transform: none;
+}

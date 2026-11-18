@@ -1,0 +1,1036 @@
+.custom-connector-review-heading,
+.custom-connector-setup-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.custom-connector-review-heading h3,
+.custom-connector-review-heading p,
+.custom-connector-setup-heading h4,
+.custom-connector-setup-heading p {
+  margin: 0;
+}
+
+.custom-connector-review-heading > div,
+.custom-connector-setup-heading > div {
+  display: grid;
+  gap: 6px;
+}
+
+.custom-connector-card-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  min-height: 42px;
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.custom-connector-editor {
+  display: grid;
+  gap: 28px;
+  max-width: 920px;
+}
+
+.custom-connector-definition-form textarea,
+.custom-connector-technical pre {
+  width: 100%;
+  max-width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.custom-connector-definition-form textarea {
+  resize: vertical;
+}
+
+.custom-connector-state {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.custom-connector-review-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.custom-connector-review-facts > div {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.custom-connector-review-facts dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.custom-connector-review-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+
+.custom-connector-operations {
+  display: grid;
+  gap: 12px;
+}
+
+.custom-connector-operations h4,
+.custom-connector-operations p {
+  margin: 0;
+}
+
+.custom-connector-operations ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.custom-connector-operations li,
+.custom-connector-account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.custom-connector-operations li span,
+.custom-connector-account span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.custom-connector-technical {
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.custom-connector-technical pre {
+  max-height: 440px;
+  margin: 0;
+  padding: 0 14px 14px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.custom-connector-actions,
+.custom-connector-account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.custom-connector-setup {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.custom-connector-write-review {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.custom-connector-reconciliation-form {
+  max-width: 640px;
+}
+
+.custom-connector-rejection-form {
+  flex-basis: 100%;
+  max-width: 640px;
+}
+
+.custom-connector-actions {
+  align-items: flex-start;
+}
+
+.custom-connector-account-list {
+  display: grid;
+  gap: 10px;
+}
+
+.custom-connector-account > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.custom-connector-feedback {
+  min-height: 1.5em;
+  margin: 0;
+}
+
+@media (max-width: 42rem) {
+  .custom-connector-review-heading,
+  .custom-connector-setup-heading,
+  .custom-connector-operations li,
+  .custom-connector-account {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+.connector-step-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+/* The steps as a thin segmented bar with small labels. */
+.connector-setup-steps {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.connector-setup-steps li {
+  display: grid;
+  gap: 6px;
+  padding-block-start: 8px;
+  border-block-start: 2px solid var(--border);
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.connector-setup-steps li > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.connector-setup-steps li[aria-current="step"] {
+  border-block-start-color: var(--ink);
+  color: var(--ink);
+  font-weight: 500;
+}
+.connector-surface,
+.connector-review-content {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+}
+.connector-surface h4,
+.connector-write-fields h4,
+.connector-receipt h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.connector-surface p,
+.connector-receipt > p,
+.connector-write-fields > p {
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.connector-review-content > .custom-connector-operations {
+  margin-block: 24px;
+}
+.connector-surface .custom-connector-technical label,
+.connector-surface .custom-connector-technical textarea {
+  margin: 0 14px 12px;
+  width: calc(100% - 28px);
+}
+.connector-surface .custom-connector-technical label {
+  display: block;
+}
+.connector-step-footer {
+  margin-top: 12px;
+}
+.connector-revision-editor > form {
+  padding: 16px;
+}
+.connector-revision-editor textarea {
+  font-family: ui-monospace, monospace;
+  min-height: 180px;
+  resize: vertical;
+}
+.connector-write-fields dl {
+  margin: 20px 0 0;
+}
+.connector-write-fields dl > div {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(0, 2fr);
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.connector-write-fields dt {
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.connector-write-fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.connector-write-fields pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 13px;
+}
+.connector-receipt {
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--ok-bg);
+}
+.custom-connector-editor {
+  width: 100%;
+}
+.custom-connector-editor .custom-connector-setup {
+  background: var(--paper);
+  border: 1px solid var(--border);
+}
+.custom-connector-editor button:not(:where(.pantry-select-trigger)),
+.custom-connector-editor .button-link {
+  min-height: 40px;
+  white-space: normal;
+}
+.custom-connector-state {
+  text-transform: none;
+}
+@media (max-width: 42rem) {
+  .connector-surface,
+  .connector-review-content {
+    padding: 18px;
+  }
+  .connector-write-fields dl > div {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+.connector-directory .button-link,
+.custom-connector-editor .button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--pantry-primary-ring);
+}
+.connector-directory .button-link:hover,
+.custom-connector-editor .button-link:hover {
+  background: var(--pantry-primary-hover);
+}
+.custom-connector-editor .connector-primary-action,
+.custom-connector-editor .connector-step-footer > button:not(:where(.pantry-select-trigger)),
+.custom-connector-editor .custom-connector-credential-form > button:not(:where(.pantry-select-trigger)),
+.custom-connector-editor
+  .custom-connector-setup
+  > button:not(:where(.pantry-select-trigger)):not(.button-secondary),
+.custom-connector-editor
+  .custom-connector-write-review
+  > .custom-connector-actions
+  > button:not(:where(.pantry-select-trigger)) {
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  box-shadow: var(--pantry-primary-ring);
+}
+.custom-connector-editor .custom-connector-setup > button:not(:where(.pantry-select-trigger)) {
+  justify-self: start;
+}
+/* A connection opens as a sheet like the consent sheet: compact, as tall as
+   its content, with the provider centred above the controls. */
+.connection-dialog {
+  width: min(560px, calc(100vw - 32px));
+  height: fit-content;
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+  overscroll-behavior: var(--portal-contained-overscroll);
+}
+.connection-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.connection-dialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+/* Sheet motion. Every sheet fades in and out. With motion allowed it also
+   rises 12px from a 4px blur as it enters, and lifts 12px into a blur as it
+   leaves. ConnectionDialog keeps a new sheet unseen while its size still
+   changes (data-phase="settling"), so the sheet and its backdrop enter once,
+   at the sheet's size. After that, the sheet follows its content height
+   (data-resizing). */
+.connection-dialog,
+.connection-dialog::backdrop {
+  transition: opacity var(--sheet-fade);
+}
+@starting-style {
+  .connection-dialog[open],
+  .connection-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+.connection-dialog[data-phase="settling"],
+.connection-dialog[data-phase="settling"]::backdrop {
+  opacity: 0;
+  transition: none;
+}
+.connection-dialog[data-closing],
+.connection-dialog[data-closing]::backdrop {
+  opacity: 0;
+}
+.connection-dialog[data-closing] {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .connection-dialog {
+    transition:
+      opacity var(--sheet-enter),
+      translate var(--sheet-enter),
+      filter var(--sheet-enter);
+  }
+  .connection-dialog::backdrop {
+    transition: opacity var(--sheet-enter);
+  }
+  @starting-style {
+    .connection-dialog[open] {
+      translate: 0 var(--sheet-rise);
+      filter: blur(4px);
+    }
+  }
+  .connection-dialog[data-phase="settling"] {
+    translate: 0 var(--sheet-rise);
+    filter: blur(4px);
+  }
+  .connection-dialog[data-closing] {
+    translate: 0 var(--sheet-lift);
+    filter: blur(4px);
+    transition:
+      opacity var(--sheet-exit),
+      translate var(--sheet-exit),
+      filter var(--sheet-exit);
+  }
+  .connection-dialog[data-closing]::backdrop {
+    transition: opacity var(--sheet-exit);
+  }
+}
+/* A sheet that opens inside another sheet takes its place (data-handoff):
+   the outer sheet and its backdrop hide, and the inner sheet shows on the
+   same backdrop with no entrance, growing from the outer sheet's height.
+   When the inner sheet closes, the outer one grows back from its height.
+   With reduced motion the two sheets cross-fade. */
+.connection-dialog[open]:has(
+    .connection-dialog[open][data-phase="shown"]:not([data-closing])
+  ),
+.connection-dialog[open]:has(
+    .connection-dialog[open][data-phase="shown"]:not([data-closing])
+  )::backdrop {
+  visibility: hidden;
+}
+.connection-dialog[open] .connection-dialog[open] {
+  visibility: visible;
+}
+.connection-dialog[data-handoff]::backdrop,
+.connection-dialog[open] .connection-dialog[data-closing]::backdrop {
+  transition: none;
+}
+.connection-dialog[open] .connection-dialog[data-closing]::backdrop {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .connection-dialog[data-handoff] {
+    transition: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .connection-dialog[open]:has(
+      .connection-dialog[open][data-phase="shown"]:not([data-closing])
+    ) {
+    opacity: 0;
+    transition:
+      opacity var(--sheet-fade),
+      visibility var(--sheet-fade);
+  }
+  /* The Portal stops every transition under reduced motion. Sheets keep
+     their opacity fade, so they cross-fade instead of cutting. */
+  .connection-dialog,
+  .connection-dialog::backdrop,
+  .connection-dialog-body,
+  .connection-dialog-body > :not(dialog),
+  .connection-dialog .integration-detail > :not(dialog) {
+    transition-duration: var(--sheet-fade-duration) !important;
+  }
+}
+/* New content fades in where it replaces old content, such as the panel
+   that replaces the loading bars, while the sheet resizes around it. When
+   an inner sheet closes, the outer sheet's content fades back in
+   (data-returning). */
+.connection-dialog-body > :not(dialog),
+.connection-dialog .integration-detail > :not(dialog),
+.connection-dialog-body {
+  transition: opacity var(--sheet-fade);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .connection-dialog-body > :not(dialog),
+  .connection-dialog .integration-detail > :not(dialog),
+  .connection-dialog-body {
+    transition: opacity var(--motion-smooth);
+  }
+}
+@starting-style {
+  .connection-dialog-body > :not(dialog),
+  .connection-dialog .integration-detail > :not(dialog) {
+    opacity: 0;
+  }
+}
+.connection-dialog[data-returning] .connection-dialog-body {
+  opacity: 0;
+  transition: none;
+}
+body:has(.connection-dialog[open]) {
+  overflow: hidden;
+}
+/* The close button stays in the corner while the content scrolls. */
+.connection-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+}
+.connection-dialog-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+  padding: 32px 24px 24px;
+}
+/* The content at its own height, which the sheet follows. */
+.connection-dialog-body {
+  display: flow-root;
+}
+/* No scroll bar flashes while the sheet grows to its new content. */
+.connection-dialog[data-resizing] .connection-dialog-content {
+  overflow: hidden;
+}
+.connection-dialog-head {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.connection-dialog-head > .provider-tile {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 12px;
+  border-radius: 15px;
+}
+.connection-dialog-head > .provider-tile :is(svg, img) {
+  width: 32px;
+  height: 32px;
+}
+.connection-dialog-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+.connection-dialog-head p {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--ink-2);
+}
+/* As on the consent sheet, the one filled action spans the sheet, and the
+   actions beside it stack under it at the same width. */
+.connection-dialog
+  :is(.connection-actions, .setup-form-actions):has(
+    > .connection-primary-action
+  ) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.connection-dialog
+  :is(.connection-actions, .setup-form-actions):has(
+    > .connection-primary-action
+  )
+  > :is(button:not(:where(.pantry-select-trigger)), a) {
+  width: 100%;
+  justify-content: center;
+}
+/* The sign-in screen stands in for the sheet that opened it rather than
+   stacking on it (data-stands-in). The sheet stays open, unseen, on its own
+   backdrop, and shows again when the screen starts to close. With motion the
+   screen grows from the sheet and the sheet grows back; with reduced motion
+   the two cross-fade. */
+body:has(.permission-request-dialog[data-stands-in][open]:not([data-closing]))
+  .connection-dialog[open] {
+  visibility: hidden;
+}
+/* A backdrop inherits its dialog's visibility; the sheet's dim stays. */
+body:has(.permission-request-dialog[data-stands-in][open]:not([data-closing]))
+  .connection-dialog[open]:not(:has(.connection-dialog[open]))::backdrop {
+  visibility: visible;
+}
+@media (prefers-reduced-motion: reduce) {
+  body:has(.permission-request-dialog[data-stands-in][open]:not([data-closing]))
+    .connection-dialog[open] {
+    transition:
+      opacity var(--sheet-fade),
+      visibility var(--sheet-fade);
+  }
+}
+.connect-consent-points {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0 16px;
+  padding: 18px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  list-style: none;
+  text-align: left;
+}
+.connect-consent-points li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.connect-consent-points svg {
+  flex: none;
+  color: var(--ink-2);
+}
+.connect-consent-points strong {
+  display: block;
+  font-weight: 500;
+}
+.connect-consent-points small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: 13.5px;
+}
+.connect-consent-note {
+  font-size: 13px;
+}
+.connect-consent-caution svg {
+  color: var(--pantry-warning-text);
+}
+/* A provider card built like the consent sheet: its points, then one action,
+   then the small print. */
+.provider-consent {
+  display: grid;
+  gap: 16px;
+}
+.provider-consent .connect-consent-points {
+  margin: 0;
+}
+/* What happens to the data, for the person who wants to read it. It stays on
+   the sheet, quiet, so nothing has to be opened to see it. */
+.connection-fine-print {
+  display: grid;
+  gap: 8px;
+  padding-block-start: 14px;
+  border-block-start: 1px solid var(--border);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.connection-fine-print p {
+  margin: 0;
+}
+/* Everything in a sheet sits on the sheet: no panel inside a panel. A step is
+   set apart by space, and a live account by one hairline box. */
+.connection-dialog .integration-setup,
+.connection-dialog .slack-setup {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+.connection-dialog .integration-setup .status-chip-neutral {
+  background: var(--surface);
+  box-shadow: none;
+}
+.connection-dialog .account-list,
+.connection-dialog .mailbox-list {
+  border-radius: 14px;
+  background: none;
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+.connection-dialog .connection-card {
+  padding: 14px 16px;
+  background: none;
+}
+.connection-dialog .codex-integration {
+  gap: 24px;
+}
+.connection-dialog .codex-integration .codex-connection-state {
+  padding: 16px;
+  border-radius: 14px;
+  background: none;
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+.connection-dialog .connection-card button:not(:where(.pantry-select-trigger)):not(.connection-primary-action) {
+  min-height: 36px;
+  padding-inline: 14px;
+  font-size: 13px;
+}
+.connection-dialog .connection-command:empty {
+  display: none;
+}
+.connection-dialog .credential-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  margin: 0;
+}
+.connection-dialog .setup-form label {
+  align-self: start;
+}
+.connection-dialog .mailbox-setup dl {
+  border-radius: 14px;
+  background: none;
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+/* A mailbox's own view is a wide sheet in two columns, built like the wide
+   permission screen: the mailbox and what it does on the left, and what it
+   is allowed to do on a band on the right. The mailbox heading takes the
+   place of the sheet's heading, which stays for screen readers. Below 760px
+   the columns stack. */
+.connection-dialog:has(.mailbox-detail[data-layout="split"]) {
+  width: min(860px, calc(100vw - 32px));
+}
+.connection-dialog:has(.mailbox-detail[data-layout="split"])
+  .connection-dialog-head {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.mailbox-detail-main,
+.mailbox-detail-rest {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 18px;
+}
+.mailbox-detail:not([data-layout="split"])
+  .mailbox-detail-head
+  > .provider-tile {
+  display: none;
+}
+.mailbox-detail[data-layout="split"] .mailbox-detail-head {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+.mailbox-detail[data-layout="split"] .mailbox-detail-head > .provider-tile {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+}
+.mailbox-detail[data-layout="split"]
+  .mailbox-detail-head
+  > .provider-tile
+  :is(svg, img) {
+  width: 30px;
+  height: 30px;
+}
+.mailbox-detail[data-layout="split"] .mailbox-detail-head h3 {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.22;
+}
+.connection-dialog .mailbox-detail[data-layout="split"] {
+  gap: 0;
+  margin: -32px -24px -24px;
+}
+.connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-main {
+  padding: 28px 24px 24px;
+}
+.connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-rest {
+  padding: 24px;
+}
+.connection-dialog .mailbox-detail-aside {
+  padding: 20px 24px 24px;
+  border-block: 1px solid var(--border);
+  background: color-mix(in oklch, var(--surface) 55%, var(--paper));
+}
+/* On the band the setup is a plain list: each row's name above its text. */
+.connection-dialog .mailbox-detail-aside .mailbox-setup {
+  gap: 14px;
+}
+.connection-dialog .mailbox-detail-aside .mailbox-setup h4 {
+  padding-inline-end: 28px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+.connection-dialog .mailbox-detail-aside .mailbox-setup dl {
+  gap: 18px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.connection-dialog .mailbox-detail-aside .mailbox-setup dl > div {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 0;
+}
+.connection-dialog .mailbox-detail-aside .mailbox-setup dl > div + div {
+  border-top: 0;
+}
+@media (min-width: 760px) {
+  .connection-dialog .mailbox-detail[data-layout="split"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "lead aside"
+      "rest aside";
+    grid-template-rows: auto 1fr;
+  }
+  .connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-main {
+    grid-area: lead;
+    padding: 32px 32px 0;
+  }
+  .connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-rest {
+    grid-area: rest;
+    padding: 18px 32px 32px;
+  }
+  .connection-dialog .mailbox-detail-aside {
+    grid-area: aside;
+    padding: 32px;
+    border-block: 0;
+    border-inline-start: 1px solid var(--border);
+  }
+  /* The setup stays in view while the left column scrolls. */
+  .connection-dialog .mailbox-detail-aside > .mailbox-setup {
+    position: sticky;
+    top: 32px;
+  }
+}
+.typesafe-key-link {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+.connection-dialog .provider-connect {
+  flex: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.connection-dialog .provider-connect > :is(button:not(:where(.pantry-select-trigger)), label) {
+  flex: none;
+  width: 100%;
+}
+@media (max-width: 640px) {
+  .connection-dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 16px;
+  }
+  .connection-dialog-content {
+    padding: 28px 16px 16px;
+  }
+  .connection-dialog .mailbox-detail[data-layout="split"] {
+    margin: -28px -16px -16px;
+  }
+  .connection-dialog
+    .mailbox-detail[data-layout="split"]
+    :is(.mailbox-detail-main, .mailbox-detail-rest),
+  .connection-dialog .mailbox-detail-aside {
+    padding-inline: 16px;
+  }
+}
+.custom-connector-editor:has(.connector-method-tabs) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.connector-modal-description {
+  margin: 0;
+  color: var(--ink-2);
+}
+.connector-method-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+}
+.connector-method-tabs button:not(:where(.pantry-select-trigger)) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  padding: 9px;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+.connector-method-tabs button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+.connector-chat-start {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+.connector-chat-start textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+.connector-chat-start .field-hint {
+  margin: 0;
+}
+.connector-method-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 14px 0;
+  color: var(--ink-2);
+}
+.connector-method-hint svg {
+  flex: none;
+  margin-top: 2px;
+}
+.connector-method-footer,
+.custom-connector-editor:has(.connector-method-tabs) .connector-step-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.connector-method-footer a,
+.custom-connector-editor:has(.connector-method-tabs) .connector-step-footer a {
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.custom-connector-editor:has(.connector-method-tabs)
+  :is(.connector-primary-action, .connector-step-footer > button:not(:where(.pantry-select-trigger))) {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 999px;
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  box-shadow: var(--pantry-primary-ring);
+  padding: 10px 16px;
+}
+.custom-connector-editor:has(.connector-method-tabs)
+  :is(.connector-primary-action, .connector-step-footer > button:not(:where(.pantry-select-trigger))):hover:not(
+    :disabled
+  ) {
+  background: var(--pantry-primary-hover);
+}
+.custom-connector-editor:has(.connector-method-tabs)
+  .custom-connector-definition-form {
+  gap: 12px;
+}
+.custom-connector-editor:has(.connector-method-tabs)
+  .custom-connector-technical {
+  background: transparent;
+  padding: 0;
+}
+.custom-connector-editor:has(.connector-method-tabs) input[type="file"] {
+  width: 100%;
+  padding: 20px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 9px;
+}
+.custom-connector-editor:has(.connector-method-tabs)
+  input::file-selector-button {
+  padding: 8px 12px;
+  margin-inline-end: 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.custom-connector-editor:has(.connector-method-tabs) [hidden] {
+  display: none;
+}
+@media (pointer: coarse) {
+  .connector-chat-start textarea {
+    font-size: 16px;
+  }
+}
+.typesafe-connection {
+  display: grid;
+  gap: 16px;
+}
+
+.typesafe-connection p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.typesafe-connection fieldset.setup-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.typesafe-connection legend {
+  margin-bottom: 16px;
+  font-weight: 600;
+}

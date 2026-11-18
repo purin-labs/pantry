@@ -1,0 +1,24 @@
+{
+  "name": "@seams/docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev src --port 3105",
+    "build": "vitepress build src --outDir dist",
+    "preview": "vite preview --outDir dist --port 3105",
+    "type-check": "tsrs --noEmit",
+    "check:links": "node scripts/check-links.mjs",
+    "check:fences": "node scripts/check-code-fences.mjs",
+    "check": "pnpm check:links && pnpm check:fences && pnpm type-check",
+    "deploy": "pnpm check && pnpm build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@types/node": "25.9.3",
+    "mermaid": "^11.12.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vite": "^5.4.21",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.22",
+    "wrangler": "4.107.0"
+  }
+}

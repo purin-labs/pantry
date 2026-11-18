@@ -1,0 +1,1632 @@
+import { lifecycleFenceOf } from "../../data/organisation-lifecycle-moves";
+import type { OrganisationDatabase } from "../../database-handles";
+import { signalChat } from "../../chat/signals";
+import { runtimeFetch } from "../../runtime-fetch";
+import {
+  resolveAccountMembershipContext,
+  AccountServiceGrantAcceptance,
+  AccountServiceGrantRevocation,
+  applyAccountServiceGrantAcceptance,
+} from "../../account-platform/service-membership";
+import type { OrganizationInvitation as AccountInvitation } from "@seams-internal/console-shared/accountPlatform";
+import type { Env } from "../../env";
+import { handlePantryOnboarding } from "../../account-platform/onboarding";
+import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { commerceSystemReadiness } from "../../commerce/system-readiness";
+import {
+  ensureCurrentReadiness,
+  ensureCurrentReadinessFromSignals,
+  parseSetupSelection,
+  selectSetupTemplates,
+  setupCatalog,
+} from "../../data/onboarding";
+import {
+  buildOnboardingProjection,
+  type OnboardingProjection,
+} from "../../data/onboarding-projection";
+import {
+  changeOrganisationServiceRole,
+  listEligibleControlMemberships,
+  listOrganisationMemberProfiles,
+  parseAssignableControlRole,
+  parseControlRole,
+  parseOrganisationInvitationEmail,
+  resolveUser,
+  applyAccountServiceGrantRevocation,
+  type ActiveOrganisationMembership,
+} from "../../data/control-plane";
+import {
+  hashPortalSubject,
+  newControlMutationIdentity,
+  parseControlMutationBoundary,
+  prepareOnboardingEvent,
+  readControlMutationReplay,
+  type ControlMutationReceiptScope,
+} from "../../data/control-mutation";
+import {
+  archiveOrganisation,
+  deleteArchivedOrganisation,
+  renameOrganisation,
+  restoreOrganisation,
+} from "../../data/organisation-lifecycle";
+import {
+  parseUserId,
+  parseOrganisationId,
+  type OrganisationId,
+} from "../../ids";
+import { resolveOrganisationModelRoute } from "../../models/route";
+import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
+import { reconcileProviderManifestObservations } from "../../provider-lifecycle/observation";
+import {
+  authenticateControlMutation,
+  authenticateControlRead,
+  authorizeOrganisationRequest,
+} from "../authorization";
+import { readOrganisationHomeRegions } from "../home-region";
+import {
+  readJsonRecord,
+  controlError,
+  controlHeaders,
+  controlJson,
+} from "../http";
+import { controlCausationId } from "../mutation";
+import { mutationProjectionResponse } from "../mutation-projection";
+import {
+  activationErrorStatus,
+  activationModelRouteError,
+  runtimeAdmissionStatus,
+} from "../onboarding-runtime";
+import {
+  assertNever,
+  hasExactKeys,
+  isPositiveInteger,
+  isRecord,
+} from "@seams/std";
+import { readOnboardingRow } from "../../data/organisation-onboarding-row";
+import {
+  prepareServiceInvitationRole,
+  readServiceInvitationRole,
+  serviceInvitationRoleExists,
+} from "../../data/service-invitation-role";
+
+export type OnboardingControlRoute =
+  | Readonly<{ kind: "accountOnboarding" }>
+  | Readonly<{ kind: "organisations" }>
+  | Readonly<{ kind: "organisation"; organisationIdRaw: string }>
+  | Readonly<{ kind: "members"; organisationIdRaw: string }>
+  | Readonly<{
+      kind: "member";
+      organisationIdRaw: string;
+      userIdRaw: string;
+    }>
+  | Readonly<{ kind: "invitations"; organisationIdRaw: string }>
+  | Readonly<{
+      kind: "revokeInvitation";
+      organisationIdRaw: string;
+      organisationInvitationIdRaw: string;
+    }>
+  | Readonly<{ kind: "setupCatalog" }>
+  | Readonly<{
+      kind: "acceptInvitation";
+      organisationIdRaw: string;
+      invitationIdRaw: string;
+    }>
+  | Readonly<{ kind: "homeRegions" }>
+  | Readonly<{ kind: "setup"; organisationIdRaw: string }>
+  | Readonly<{ kind: "stageViewed"; organisationIdRaw: string }>
+  | Readonly<{ kind: "readiness"; organisationIdRaw: string }>
+  | Readonly<{ kind: "activate"; organisationIdRaw: string }>
+  | Readonly<{ kind: "archive"; organisationIdRaw: string }>
+  | Readonly<{ kind: "restore"; organisationIdRaw: string }>;
+
+export function matchOnboardingControlRoute(
+  pathname: string,
+): OnboardingControlRoute | null {
+  if (pathname === "/v1/control/account-onboarding")
+    return { kind: "accountOnboarding" };
+  if (pathname === "/v1/control/organisations")
+    return { kind: "organisations" };
+  if (pathname === "/v1/control/setup/catalog") return { kind: "setupCatalog" };
+  if (pathname === "/v1/control/home-regions") return { kind: "homeRegions" };
+  const member = two(
+    pathname,
+    /^\/v1\/control\/organisations\/([^/]+)\/members\/([^/]+)$/u,
+  );
+  if (member !== null) {
+    return {
+      kind: "member",
+      organisationIdRaw: member.organisationIdRaw,
+      userIdRaw: member.valueRaw,
+    };
+  }
+  const acceptInvitation = two(
+    pathname,
+    /^\/v1\/control\/organisations\/([^/]+)\/invitations\/([^/]+)\/accept$/u,
+  );
+  if (acceptInvitation !== null)
+    return {
+      kind: "acceptInvitation",
+      organisationIdRaw: acceptInvitation.organisationIdRaw,
+      invitationIdRaw: acceptInvitation.valueRaw,
+    };
+  const revokeInvitation = two(
+    pathname,
+    /^\/v1\/control\/organisations\/([^/]+)\/invitations\/([^/]+)\/revoke$/u,
+  );
+  if (revokeInvitation !== null) {
+    return {
+      kind: "revokeInvitation",
+      organisationIdRaw: revokeInvitation.organisationIdRaw,
+      organisationInvitationIdRaw: revokeInvitation.valueRaw,
+    };
+  }
+  const members = organisation(pathname, "members");
+  if (members !== null) return { kind: "members", organisationIdRaw: members };
+  const invitations = organisation(pathname, "invitations");
+  if (invitations !== null)
+    return { kind: "invitations", organisationIdRaw: invitations };
+  const stageViewed = organisation(pathname, "onboarding/stage-viewed");
+  if (stageViewed !== null)
+    return { kind: "stageViewed", organisationIdRaw: stageViewed };
+  const setup = organisation(pathname, "setup");
+  if (setup !== null) return { kind: "setup", organisationIdRaw: setup };
+  const readiness = organisation(pathname, "readiness");
+  if (readiness !== null)
+    return { kind: "readiness", organisationIdRaw: readiness };
+  const activate = organisation(pathname, "activate");
+  if (activate !== null)
+    return { kind: "activate", organisationIdRaw: activate };
+  const archive = organisation(pathname, "archive");
+  if (archive !== null) return { kind: "archive", organisationIdRaw: archive };
+  const restore = organisation(pathname, "restore");
+  if (restore !== null) return { kind: "restore", organisationIdRaw: restore };
+  const root = /^\/v1\/control\/organisations\/([^/]+)$/u.exec(pathname);
+  return root?.[1] === undefined
+    ? null
+    : { kind: "organisation", organisationIdRaw: decodeURIComponent(root[1]) };
+}
+
+function organisation(pathname: string, suffix: string): string | null {
+  const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const result = new RegExp(
+    `^/v1/control/organisations/([^/]+)/${escaped}$`,
+    "u",
+  ).exec(pathname);
+  return result?.[1] === undefined ? null : decodeURIComponent(result[1]);
+}
+
+function two(
+  pathname: string,
+  pattern: RegExp,
+): Readonly<{ organisationIdRaw: string; valueRaw: string }> | null {
+  const result = pattern.exec(pathname);
+  return result?.[1] === undefined || result[2] === undefined
+    ? null
+    : {
+        organisationIdRaw: decodeURIComponent(result[1]),
+        valueRaw: decodeURIComponent(result[2]),
+      };
+}
+
+export function handleOnboardingControlRoute(
+  request: Request,
+  env: Env,
+  route: OnboardingControlRoute,
+): Promise<Response> {
+  switch (route.kind) {
+    case "accountOnboarding":
+      return handlePantryOnboarding(request, env);
+    case "organisations":
+      return handleOrganisations(request, env);
+    case "organisation":
+      return handleOrganisation(request, env, route.organisationIdRaw);
+    case "members":
+      return handleMembers(request, env, route.organisationIdRaw);
+    case "member":
+      return handleMember(
+        request,
+        env,
+        route.organisationIdRaw,
+        route.userIdRaw,
+      );
+    case "invitations":
+      return handleInvitations(request, env, route.organisationIdRaw);
+    case "revokeInvitation":
+      return handleRevokeInvitation(
+        request,
+        env,
+        route.organisationIdRaw,
+        route.organisationInvitationIdRaw,
+      );
+    case "setupCatalog":
+      return handleSetupCatalog(request, env);
+    case "acceptInvitation":
+      return handleAcceptInvitation(
+        request,
+        env,
+        route.organisationIdRaw,
+        route.invitationIdRaw,
+      );
+    case "homeRegions":
+      return handleHomeRegions(request, env);
+    case "setup":
+      return handleSetup(request, env, route.organisationIdRaw);
+    case "stageViewed":
+      return handleStageViewed(request, env, route.organisationIdRaw);
+    case "readiness":
+      return handleReadiness(request, env, route.organisationIdRaw);
+    case "activate":
+      return handleActivate(request, env, route.organisationIdRaw);
+    case "archive":
+      return handleArchive(request, env, route.organisationIdRaw);
+    case "restore":
+      return handleRestore(request, env, route.organisationIdRaw);
+    default:
+      return assertNever(route);
+  }
+}
+
+async function handleOrganisations(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (request.method !== "GET") return controlError("method_not_allowed", 405);
+  const authenticated = await authenticateControlRead(request, env);
+  if (!authenticated.ok) return authenticated.response;
+  const memberships = await listEligibleControlMemberships({
+    env,
+    session: authenticated.value.session,
+  });
+  return controlJson({
+    ok: true,
+    memberships: memberships.memberships,
+    membershipAvailability: memberships.availability,
+  });
+}
+
+async function handleOrganisation(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method === "PATCH")
+    return handleOrganisationRename(request, env, organisationIdRaw);
+  if (request.method === "DELETE")
+    return handleOrganisationDelete(request, env, organisationIdRaw);
+  if (request.method !== "GET") return controlError("method_not_allowed", 405);
+  const organisationId = parseOrganisationId(organisationIdRaw);
+  if (!organisationId.ok) {
+    return controlError("organisation_not_found", 404);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "viewer",
+    false,
+  );
+  if (!authorized.ok) return authorized.response;
+  const now = Date.now();
+  await ensureCurrentReadinessFromSignals({
+    db: authorized.executionScope.database,
+    organisationId: organisationId.value,
+    fence: lifecycleFenceOf(authorized.executionScope),
+    now,
+    signals: readReadinessSignals.bind(null, env, organisationId.value, now),
+  });
+  const projection = await buildOnboardingProjection({
+    db: authorized.executionScope.database,
+    organisationId: organisationId.value,
+    membership: authorized.membership,
+    now: Date.now(),
+  });
+  if (projection === null) {
+    return controlError("organisation_not_found", 404);
+  }
+  return onboardingProjectionResponse(request, projection);
+}
+
+/** The two live signals of a readiness assessment, read together. */
+async function readReadinessSignals(
+  env: Env,
+  organisationId: OrganisationId,
+  now: number,
+) {
+  const [runtimeAdmission, commerce] = await Promise.all([
+    runtimeAdmissionStatus(env, organisationId, now),
+    commerceSystemReadiness(env, organisationId, now),
+  ]);
+  return { runtimeAdmission, commerceSystemReadiness: commerce };
+}
+
+async function handleOrganisationRename(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "owner",
+    true,
+  );
+  if (!authorized.ok) return authorized.response;
+  const body = await readJsonRecord(request);
+  const name =
+    body.ok && typeof body.value.name === "string"
+      ? body.value.name.trim()
+      : "";
+  if (
+    !body.ok ||
+    name.length < 2 ||
+    name.length > 80 ||
+    Object.keys(body.value).length !== 1
+  ) {
+    return controlError("organisation_rename_request_invalid", 422);
+  }
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: true,
+  });
+  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) return controlError("app_user_missing", 401);
+  const scope: ControlMutationReceiptScope = {
+    userId: identity.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}`,
+    operation: "organisation.rename",
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict")
+    return controlError("idempotency_key_conflict", 409);
+  if (replay.kind === "replay") {
+    return mutationProjectionResponse(
+      authorized.executionScope.database,
+      authorized.organisationId,
+      authorized.membership,
+      replay.receipt,
+    );
+  }
+  const now = Date.now();
+  const renamed = await renameOrganisation({
+    directory: env.DB,
+    execution: authorized.executionScope,
+    actorUserId: identity.userId,
+    name,
+    mutation: {
+      boundary: boundary.value,
+      scope,
+      identity: newControlMutationIdentity({
+        portalSubjectHash: await hashPortalSubject(
+          identity.issuer,
+          identity.subject,
+        ),
+        causationId: controlCausationId(request),
+        now,
+      }),
+    },
+    now,
+  });
+  if (!renamed.ok) return controlError(renamed.error.code, 409);
+  const projection = await buildOnboardingProjection({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    membership: authorized.membership,
+    now: Date.now(),
+  });
+  if (projection === null)
+    throw new Error("renamed organisation projection is missing");
+  return controlJson({
+    kind: "success",
+    projection,
+    receipt: {
+      receipt_id: renamed.value.receiptId,
+      organisation_id: renamed.value.organisationId,
+    },
+  });
+}
+
+async function handleOrganisationDelete(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "owner",
+    true,
+  );
+  if (!authorized.ok) return authorized.response;
+  const body = await readJsonRecord(request);
+  if (!body.ok || Object.keys(body.value).length !== 0)
+    return controlError("organisation_delete_request_invalid", 422);
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: true,
+  });
+  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) return controlError("app_user_missing", 401);
+  const scope: ControlMutationReceiptScope = {
+    userId: identity.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}`,
+    operation: "organisation.delete",
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict")
+    return controlError("idempotency_key_conflict", 409);
+  if (replay.kind === "replay")
+    return controlJson(
+      { kind: "success", receipt: replay.receipt.responseBody },
+      replay.receipt.responseStatus,
+    );
+  const now = Date.now();
+  const deleted = await deleteArchivedOrganisation({
+    directory: env.DB,
+    execution: authorized.executionScope,
+    actorUserId: identity.userId,
+    mutation: {
+      boundary: boundary.value,
+      scope,
+      identity: newControlMutationIdentity({
+        portalSubjectHash: await hashPortalSubject(
+          identity.issuer,
+          identity.subject,
+        ),
+        causationId: controlCausationId(request),
+        now,
+      }),
+    },
+    now,
+  });
+  if (!deleted.ok) return controlError(deleted.error.code, 409);
+  return controlJson({
+    kind: "success",
+    receipt: {
+      receipt_id: deleted.value.receiptId,
+      organisation_id: deleted.value.organisationId,
+    },
+  });
+}
+
+async function handleMembers(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "GET") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "viewer",
+    false,
+  );
+  if (!authorized.ok) {
+    return authorized.response;
+  }
+  const members = await listOrganisationMemberProfiles({
+    db: authorized.executionScope.database,
+    identityDatabase: env.DB,
+    organisationId: authorized.organisationId,
+  });
+  return controlJson({ ok: true, members });
+}
+
+async function handleMember(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  userIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "PATCH" && request.method !== "DELETE") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "admin",
+    true,
+  );
+  if (!authorized.ok) {
+    return authorized.response;
+  }
+  const targetUserId = parseUserId(userIdRaw);
+  if (!targetUserId.ok) {
+    return controlError("organisation_membership_not_found", 404);
+  }
+  const body = await readJsonRecord(request);
+  const nextRole =
+    request.method === "PATCH" && body.ok
+      ? parseControlRole(body.value.role)
+      : null;
+  if (
+    !body.ok ||
+    (request.method === "PATCH" && (nextRole === null || !nextRole.ok)) ||
+    (request.method === "DELETE" && Object.keys(body.value).length !== 0)
+  ) {
+    return controlError("organisation_membership_request_invalid", 422);
+  }
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: true,
+  });
+  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) {
+    return controlError("app_user_missing", 401);
+  }
+  const operation =
+    request.method === "PATCH"
+      ? "organisation.service-role.change"
+      : "organisation.membership.revoke";
+  const scope: ControlMutationReceiptScope = {
+    userId: identity.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}/members/${targetUserId.value}`,
+    operation,
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict") {
+    return controlError("idempotency_key_conflict", 409);
+  }
+  if (replay.kind === "replay") {
+    return controlJson(
+      {
+        kind: "success",
+        receipt: replay.receipt.responseBody,
+      },
+      replay.receipt.responseStatus,
+    );
+  }
+  const now = Date.now();
+  const mutation = {
+    boundary: boundary.value,
+    scope,
+    identity: newControlMutationIdentity({
+      portalSubjectHash: await hashPortalSubject(
+        identity.issuer,
+        identity.subject,
+      ),
+      causationId: controlCausationId(request),
+      now,
+    }),
+  };
+  if (request.method === "PATCH") {
+    if (nextRole === null || !nextRole.ok) {
+      throw new Error("organisation member role boundary invariant failed");
+    }
+    const changed = await changeOrganisationServiceRole({
+      db: authorized.executionScope.database,
+      organisationId: authorized.organisationId,
+      targetUserId: targetUserId.value,
+      nextRole: nextRole.value,
+      changedByUserId: identity.userId,
+      mutation,
+      now,
+    });
+    // A role decides chat access, and a revoked run stops on the next read.
+    if (changed.ok)
+      signalChat(authorized.executionScope, { kind: "organisation" });
+    return changed.ok
+      ? controlJson({
+          kind: "success",
+          member: changed.value.member,
+          receipt: {
+            receipt_id: changed.value.receiptId,
+            organisation_id: authorized.organisationId,
+          },
+        })
+      : controlError(
+          changed.error.code,
+          changed.error.code === "organisation_membership_not_found"
+            ? 404
+            : 409,
+        );
+  }
+  const context = await resolveAccountMembershipContext(
+    env,
+    authorized.organisationId,
+    authorized.authenticated.session,
+  );
+  if (!context.ok) return accountMembershipError(context.error.code);
+  const receipt = await AccountServiceGrantRevocation.revoke(
+    context.value,
+    authorized.executionScope,
+    targetUserId.value,
+    boundary.value.expectedConfigurationVersion,
+  );
+  if (!receipt.ok) return accountMembershipError(receipt.error.code);
+  const revoked = await applyAccountServiceGrantRevocation({
+    execution: authorized.executionScope,
+    receipt: receipt.value,
+    organisationId: authorized.organisationId,
+    targetUserId: targetUserId.value,
+    revokedByUserId: identity.userId,
+    mutation,
+    now,
+  });
+  if (revoked.ok)
+    signalChat(authorized.executionScope, { kind: "organisation" });
+  return revoked.ok
+    ? controlJson({
+        kind: "success",
+        receipt: {
+          receipt_id: revoked.value.receiptId,
+          organisation_id: authorized.organisationId,
+        },
+      })
+    : controlError(
+        revoked.error.code,
+        revoked.error.code === "organisation_membership_not_found" ? 404 : 409,
+      );
+}
+
+type PendingPantryServiceInvitation = Readonly<{
+  organisationInvitationId: string;
+  invitedEmail: string;
+  role: "admin" | "operator" | "viewer";
+  createdAt: number;
+  expiresAt: number;
+  kind: "pending";
+}>;
+
+async function pendingServiceInvitation(
+  execution: OrganisationExecutionScope,
+  invitation: Extract<AccountInvitation, { kind: "pending" }>,
+): Promise<PendingPantryServiceInvitation | null> {
+  const row = await readServiceInvitationRole(
+    execution.database,
+    execution.organisationId,
+    invitation.id,
+  );
+  if (row === null) return null;
+  const role = parseAssignableControlRole(row.role);
+  if (!role.ok) throw new Error("Invalid retained service invitation role");
+  return {
+    organisationInvitationId: invitation.id,
+    invitedEmail: invitation.email,
+    role: role.value,
+    createdAt: Date.parse(invitation.createdAt),
+    expiresAt: Date.parse(invitation.expiresAt),
+    kind: "pending",
+  };
+}
+
+async function handleInvitations(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "GET" && request.method !== "POST")
+    return controlError("method_not_allowed", 405);
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    request.method === "GET" ? "viewer" : "admin",
+    request.method === "POST",
+  );
+  if (!authorized.ok) return authorized.response;
+  const context = await resolveAccountMembershipContext(
+    env,
+    authorized.organisationId,
+    authorized.authenticated.session,
+  );
+  if (!context.ok) return accountMembershipError(context.error.code);
+  if (request.method === "GET") {
+    const listed = await context.value.client.listMemberships(
+      context.value.actor,
+    );
+    if (!listed.ok) return accountMembershipError(listed.error.code);
+    const invitations: PendingPantryServiceInvitation[] = [];
+    for (const invitation of listed.value.invitations) {
+      if (invitation.kind !== "pending") continue;
+      const projected = await pendingServiceInvitation(
+        authorized.executionScope,
+        invitation,
+      );
+      if (projected !== null) invitations.push(projected);
+    }
+    if (!(await authorized.executionScope.isActive()))
+      return controlError("organisation_placement_conflict", 409);
+    return controlJson({ ok: true, invitations });
+  }
+  const body = await readJsonRecord(request);
+  if (!body.ok || !hasExactKeys(body.value, ["email", "role"]))
+    return controlError("organisation_invitation_invalid", 422);
+  const role = parseAssignableControlRole(body.value.role);
+  const email = parseOrganisationInvitationEmail(body.value.email);
+  if (!role.ok || !email.ok)
+    return controlError("organisation_invitation_invalid", 422);
+  const issued = await context.value.client.inviteMembership({
+    binding: context.value.actor.binding,
+    user: context.value.actor.user,
+    authority: context.value.actor.authority,
+    invitation: {
+      email: email.value.value,
+      role: "MEMBER",
+      projectAccess: [
+        {
+          projectId: context.value.actor.binding.scope.projectId,
+          accessLevel: role.value === "viewer" ? "viewer" : "editor",
+        },
+      ],
+    },
+  });
+  if (!issued.ok) return accountMembershipError(issued.error.code);
+  await authorized.executionScope.database.batch([
+    authorized.executionScope.prepareMutationFence(),
+    prepareServiceInvitationRole(authorized.executionScope.database, {
+      organisationId: authorized.organisationId,
+      invitationId: issued.value.invitation.id,
+      role: role.value,
+      invitedBy: authorized.authenticated.session.userId,
+      createdAt: Date.parse(issued.value.invitation.createdAt),
+    }),
+  ]);
+  const invitation = await pendingServiceInvitation(
+    authorized.executionScope,
+    issued.value.invitation,
+  );
+  if (invitation === null || invitation.role !== role.value)
+    return controlError("operation_conflict", 409);
+  return controlJson({ ok: true, invitation, token: issued.value.token }, 201);
+}
+
+async function handleRevokeInvitation(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  invitationId: string,
+): Promise<Response> {
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "admin",
+    true,
+  );
+  if (!authorized.ok) return authorized.response;
+  const body = await readJsonRecord(request);
+  if (
+    !body.ok ||
+    !hasExactKeys(body.value, []) ||
+    invitationId.length === 0 ||
+    invitationId.trim() !== invitationId
+  )
+    return controlError("organisation_invitation_revoke_invalid", 422);
+  const context = await resolveAccountMembershipContext(
+    env,
+    authorized.organisationId,
+    authorized.authenticated.session,
+  );
+  if (!context.ok) return accountMembershipError(context.error.code);
+  const retained = await serviceInvitationRoleExists(
+    authorized.executionScope.database,
+    authorized.organisationId,
+    invitationId,
+  );
+  if (!retained) return controlError("organisation_invitation_not_found", 404);
+  const revoked = await context.value.client.revokeInvitation({
+    binding: context.value.actor.binding,
+    user: context.value.actor.user,
+    authority: context.value.actor.authority,
+    invitationId,
+  });
+  return revoked.ok
+    ? controlJson({ ok: true, invitation: revoked.value })
+    : accountMembershipError(revoked.error.code);
+}
+
+async function handleAcceptInvitation(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  invitationId: string,
+): Promise<Response> {
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const authenticated = await authenticateControlMutation(request, env);
+  if (!authenticated.ok) return authenticated.response;
+  const organisation = parseOrganisationId(organisationIdRaw);
+  const body = await readJsonRecord(request);
+  if (
+    !organisation.ok ||
+    !body.ok ||
+    !hasExactKeys(body.value, ["token"]) ||
+    typeof body.value.token !== "string" ||
+    body.value.token.trim() !== body.value.token ||
+    body.value.token.length === 0 ||
+    invitationId.trim() !== invitationId ||
+    invitationId.length === 0
+  )
+    return controlError("organisation_invitation_accept_invalid", 422);
+  const context = await resolveAccountMembershipContext(
+    env,
+    organisation.value,
+    authenticated.value.session,
+  );
+  if (!context.ok) return accountMembershipError(context.error.code);
+  const receipt = await AccountServiceGrantAcceptance.accept(
+    context.value,
+    invitationId,
+    body.value.token,
+  );
+  if (!receipt.ok) return accountMembershipError(receipt.error.code);
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisation.value,
+  );
+  if (!execution.ok) return controlError(execution.error.code, 409);
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authenticated.value.session.userId,
+  });
+  if (identity === null) return controlError("app_user_missing", 401);
+  const applied = await applyAccountServiceGrantAcceptance({
+    execution: execution.value,
+    receipt: receipt.value,
+    displayName: identity.displayName,
+    now: Date.now(),
+  });
+  return applied.ok
+    ? controlJson({ ok: true, member: applied.value })
+    : accountMembershipError(applied.error.code);
+}
+
+function accountMembershipError(code: string): Response {
+  return controlError(
+    code,
+    code === "authority_unavailable"
+      ? 503
+      : code === "operation_conflict"
+        ? 409
+        : 403,
+  );
+}
+
+async function handleSetupCatalog(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (request.method !== "GET") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authenticated = await authenticateControlRead(request, env);
+  return authenticated.ok
+    ? controlJson({ ok: true, catalog: setupCatalog() })
+    : authenticated.response;
+}
+
+async function handleHomeRegions(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (request.method !== "GET") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authenticated = await authenticateControlRead(request, env);
+  if (!authenticated.ok) return authenticated.response;
+  const homeRegions = readOrganisationHomeRegions(env, request);
+  return homeRegions.ok
+    ? controlJson({ ok: true, homeRegions: homeRegions.value })
+    : controlError(homeRegions.error.code, 503);
+}
+
+async function handleSetup(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "PUT") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "admin",
+    true,
+  );
+  if (!authorized.ok) {
+    return authorized.response;
+  }
+  const body = await readJsonRecord(request);
+  if (!body.ok) {
+    return controlError("invalid_setup_selection", 422);
+  }
+  const selection = parseSetupSelection(body.value);
+  if (!selection.ok) {
+    return controlError(selection.error.code, 422);
+  }
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: true,
+  });
+  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) {
+    return controlError("app_user_missing", 401);
+  }
+  const scope: ControlMutationReceiptScope = {
+    userId: identity.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}/setup`,
+    operation: "setup.save",
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict") {
+    return controlError("idempotency_key_conflict", 409);
+  }
+  if (replay.kind === "replay") {
+    return mutationProjectionResponse(
+      authorized.executionScope.database,
+      authorized.organisationId,
+      authorized.membership,
+      replay.receipt,
+    );
+  }
+  const now = Date.now();
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    authorized.organisationId,
+  );
+  if (!execution.ok) return controlError(execution.error.code, 409);
+  const saved = await selectSetupTemplates({
+    scope: execution.value,
+    selectedByUserId: identity.userId,
+    selection: selection.value,
+    mutation: {
+      boundary: boundary.value,
+      scope,
+      identity: newControlMutationIdentity({
+        portalSubjectHash: await hashPortalSubject(
+          identity.issuer,
+          identity.subject,
+        ),
+        causationId: controlCausationId(request),
+        now,
+      }),
+    },
+    now,
+  });
+  if (!saved.ok) {
+    return controlError(saved.error.code, 409);
+  }
+  const projection = await buildOnboardingProjection({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    membership: authorized.membership,
+    now: Date.now(),
+  });
+  if (projection === null) {
+    throw new Error("saved setup projection is missing");
+  }
+  return controlJson({
+    kind: "success",
+    projection,
+    receipt: {
+      receipt_id: saved.value.receiptId,
+      organisation_id: authorized.organisationId,
+    },
+  });
+}
+
+async function handleReadiness(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "GET") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "viewer",
+    false,
+  );
+  if (!authorized.ok) {
+    return authorized.response;
+  }
+  const now = Date.now();
+  await reconcileProviderManifestObservations({
+    env,
+    organisationId: authorized.organisationId,
+    now,
+    fetcher: runtimeFetch,
+  });
+  const assessment = await ensureCurrentReadiness({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    fence: lifecycleFenceOf(authorized.executionScope),
+    now,
+    runtimeAdmission: await runtimeAdmissionStatus(
+      env,
+      authorized.organisationId,
+      now,
+    ),
+    commerceSystemReadiness: await commerceSystemReadiness(
+      env,
+      authorized.organisationId,
+      now,
+    ),
+  });
+  if (assessment === null) return controlError("organisation_not_found", 404);
+  return controlJson({ kind: "success", assessment });
+}
+
+async function handleStageViewed(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "viewer",
+    false,
+  );
+  if (!authorized.ok) return authorized.response;
+  const body = await readJsonRecord(request);
+  if (
+    !body.ok ||
+    typeof body.value.stage !== "string" ||
+    !/^[a-z][a-z0-9_:-]{0,63}$/u.test(body.value.stage)
+  ) {
+    return controlError("onboarding_stage_invalid", 422);
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) return controlError("app_user_missing", 401);
+  const row = await readOnboardingRow(
+    authorized.executionScope.database,
+    authorized.organisationId,
+  );
+  if (
+    row === null ||
+    (row.environment !== "development" && row.environment !== "production") ||
+    typeof row.projectionRevision !== "number"
+  ) {
+    return controlError("organisation_not_found", 404);
+  }
+  const now = Date.now();
+  const eventIdentity = newControlMutationIdentity({
+    portalSubjectHash: await hashPortalSubject(
+      identity.issuer,
+      identity.subject,
+    ),
+    causationId: controlCausationId(request),
+    now,
+  });
+  const session =
+    authorized.executionScope.database.withSession("first-primary");
+  await session.batch([
+    prepareOnboardingEvent(session, eventIdentity, {
+      eventId: eventIdentity.auditEventId,
+      eventType: "onboarding_stage_viewed",
+      organisationId: authorized.organisationId,
+      environment: row.environment,
+      projectionRevision: row.projectionRevision,
+      attributes: { stage: body.value.stage },
+    }),
+  ]);
+  return controlJson({ kind: "success" });
+}
+
+async function handleActivate(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "admin",
+    true,
+  );
+  if (!authorized.ok) {
+    return authorized.response;
+  }
+  const body = await readJsonRecord(request);
+  if (
+    !body.ok ||
+    !isPositiveInteger(body.value.readinessVersion) ||
+    typeof body.value.readinessHash !== "string" ||
+    body.value.readinessHash.length === 0
+  ) {
+    return controlError("activation_request_invalid", 422);
+  }
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: true,
+  });
+  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) {
+    return controlError("app_user_missing", 401);
+  }
+  const scope: ControlMutationReceiptScope = {
+    userId: identity.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}/activate`,
+    operation: "organisation.activation.start",
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict") {
+    return controlError("idempotency_key_conflict", 409);
+  }
+  if (replay.kind === "replay") {
+    return activationMutationReplayResponse(
+      authorized.executionScope.database,
+      authorized.organisationId,
+      authorized.membership,
+      replay.receipt,
+    );
+  }
+  const now = Date.now();
+  const modelRoute = await resolveOrganisationModelRoute({
+    env,
+    organisationId: authorized.organisationId,
+    now,
+  });
+  if (!modelRoute.ok) {
+    return controlError(activationModelRouteError(modelRoute.error.code), 409);
+  }
+  const runtimeAdmission = await runtimeAdmissionStatus(
+    env,
+    authorized.organisationId,
+    now,
+  );
+  if (runtimeAdmission === "unavailable") {
+    return controlError("runtime_admission_unavailable", 503);
+  }
+  await ensureCurrentReadiness({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    fence: lifecycleFenceOf(authorized.executionScope),
+    now,
+    runtimeAdmission,
+    commerceSystemReadiness: await commerceSystemReadiness(
+      env,
+      authorized.organisationId,
+      now,
+    ),
+  });
+  const mutationIdentity = newControlMutationIdentity({
+    portalSubjectHash: await hashPortalSubject(
+      identity.issuer,
+      identity.subject,
+    ),
+    causationId: controlCausationId(request),
+    now,
+  });
+  const organisation = await requireActiveOrganisationActor({
+    env,
+    organisationId: authorized.organisationId,
+    now,
+  });
+  const activated = await organisation.activateOnboarding({
+    organisationId: authorized.organisationId,
+    readinessVersion: body.value.readinessVersion,
+    readinessHash: body.value.readinessHash,
+    mutation: {
+      boundary: boundary.value,
+      scope,
+      identity: mutationIdentity,
+    },
+    now,
+  });
+  if (!activated.ok) {
+    if ("supportReference" in activated.error) {
+      const projection = await buildOnboardingProjection({
+        db: authorized.executionScope.database,
+        organisationId: authorized.organisationId,
+        membership: authorized.membership,
+        now: Date.now(),
+      });
+      if (projection === null) {
+        throw new Error("failed activation projection is missing");
+      }
+      return controlJson(
+        {
+          kind: activated.error.retryable
+            ? "retryable_failure"
+            : "terminal_failure",
+          reason_code: activated.error.code,
+          correlation_id: activated.error.correlationId,
+          support_reference: activated.error.supportReference,
+          projection,
+        },
+        activated.error.retryable ? 503 : 422,
+      );
+    }
+    if (activated.error.code === "activation_readiness_stale") {
+      return controlJson(
+        {
+          ok: false,
+          error: activated.error.code,
+          detail: activated.error.detail,
+        },
+        activationErrorStatus(activated.error.code),
+      );
+    }
+    return controlError(
+      activated.error.code,
+      activationErrorStatus(activated.error.code),
+    );
+  }
+  const projection = await buildOnboardingProjection({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    membership: authorized.membership,
+    now: Date.now(),
+  });
+  if (projection === null) {
+    throw new Error("activated organisation projection is missing");
+  }
+  return controlJson({
+    kind: "success",
+    projection,
+    receipt: {
+      receipt_id: mutationIdentity.receiptId,
+      organisation_id: authorized.organisationId,
+      activation_receipt_id: activated.value.activationReceiptId,
+      first_task: activated.value.firstTask,
+    },
+  });
+}
+
+async function activationMutationReplayResponse(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  membership: ActiveOrganisationMembership,
+  receipt: { readonly responseStatus: number; readonly responseBody: unknown },
+): Promise<Response> {
+  if (receipt.responseStatus < 400) {
+    return mutationProjectionResponse(db, organisationId, membership, receipt);
+  }
+  if (
+    !isRecord(receipt.responseBody) ||
+    receipt.responseBody.organisation_id !== organisationId ||
+    (receipt.responseBody.kind !== "retryable_failure" &&
+      receipt.responseBody.kind !== "terminal_failure") ||
+    typeof receipt.responseBody.reason_code !== "string" ||
+    typeof receipt.responseBody.correlation_id !== "string" ||
+    typeof receipt.responseBody.support_reference !== "string"
+  ) {
+    throw new Error("activation failure mutation receipt is invalid");
+  }
+  const projection = await buildOnboardingProjection({
+    db,
+    organisationId,
+    membership,
+    now: Date.now(),
+  });
+  if (projection === null) {
+    throw new Error("activation failure replay projection is missing");
+  }
+  return controlJson(
+    {
+      kind: receipt.responseBody.kind,
+      reason_code: receipt.responseBody.reason_code,
+      correlation_id: receipt.responseBody.correlation_id,
+      support_reference: receipt.responseBody.support_reference,
+      projection,
+    },
+    receipt.responseStatus,
+  );
+}
+
+function onboardingProjectionResponse(
+  request: Request,
+  projection: OnboardingProjection,
+): Response {
+  const headers = controlHeaders();
+  const etag = `"organisation:${projection.organisation.organisation_id}:revision:${projection.projection_revision}"`;
+  headers.set("cache-control", "private, no-cache");
+  headers.set("etag", etag);
+  if (request.headers.get("if-none-match") === etag) {
+    return new Response(null, { status: 304, headers });
+  }
+  headers.set("content-type", "application/json; charset=utf-8");
+  return new Response(JSON.stringify(projection), { status: 200, headers });
+}
+
+async function handleArchive(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "admin",
+    true,
+  );
+  if (!authorized.ok) {
+    return authorized.response;
+  }
+  const body = await readJsonRecord(request);
+  if (!body.ok || Object.keys(body.value).length !== 0) {
+    return controlError("archive_request_invalid", 422);
+  }
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: true,
+  });
+  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) {
+    return controlError("app_user_missing", 401);
+  }
+  const scope: ControlMutationReceiptScope = {
+    userId: identity.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}/archive`,
+    operation: "organisation.archive",
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict") {
+    return controlError("idempotency_key_conflict", 409);
+  }
+  if (replay.kind === "replay") {
+    return mutationProjectionResponse(
+      authorized.executionScope.database,
+      authorized.organisationId,
+      authorized.membership,
+      replay.receipt,
+    );
+  }
+  const now = Date.now();
+  const archived = await archiveOrganisation({
+    identityDatabase: env.DB,
+    execution: authorized.executionScope,
+    actorUserId: identity.userId,
+    mutation: {
+      boundary: boundary.value,
+      scope,
+      identity: newControlMutationIdentity({
+        portalSubjectHash: await hashPortalSubject(
+          identity.issuer,
+          identity.subject,
+        ),
+        causationId: controlCausationId(request),
+        now,
+      }),
+    },
+    authority: { kind: "organisation_owner" },
+    reasonCode: "merchant_archived",
+    now,
+  });
+  if (!archived.ok) {
+    return controlError(archived.error.code, 409);
+  }
+  await holdOrganisationPolicyDistribution({
+    kv: env.POLICY_KV,
+    organisationId: authorized.organisationId,
+  });
+  const projection = await buildOnboardingProjection({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    membership: authorized.membership,
+    now: Date.now(),
+  });
+  if (projection === null) {
+    throw new Error("archived organisation projection is missing");
+  }
+  return controlJson({
+    kind: "success",
+    projection,
+    receipt: {
+      receipt_id: archived.value.receiptId,
+      organisation_id: archived.value.organisationId,
+    },
+  });
+}
+
+async function handleRestore(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return controlError("method_not_allowed", 405);
+  }
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "admin",
+    true,
+  );
+  if (!authorized.ok) {
+    return authorized.response;
+  }
+  const body = await readJsonRecord(request);
+  if (!body.ok || Object.keys(body.value).length !== 0) {
+    return controlError("restore_request_invalid", 422);
+  }
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: true,
+  });
+  if (!boundary.ok || boundary.value.kind !== "configuration_versioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) {
+    return controlError("app_user_missing", 401);
+  }
+  const scope: ControlMutationReceiptScope = {
+    userId: identity.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}/restore`,
+    operation: "organisation.restore",
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict") {
+    return controlError("idempotency_key_conflict", 409);
+  }
+  if (replay.kind === "replay") {
+    return mutationProjectionResponse(
+      authorized.executionScope.database,
+      authorized.organisationId,
+      authorized.membership,
+      replay.receipt,
+    );
+  }
+  const now = Date.now();
+  const restored = await restoreOrganisation({
+    directory: env.DB,
+    execution: authorized.executionScope,
+    actorUserId: identity.userId,
+    mutation: {
+      boundary: boundary.value,
+      scope,
+      identity: newControlMutationIdentity({
+        portalSubjectHash: await hashPortalSubject(
+          identity.issuer,
+          identity.subject,
+        ),
+        causationId: controlCausationId(request),
+        now,
+      }),
+    },
+    now,
+  });
+  if (!restored.ok) {
+    return controlError(restored.error.code, 409);
+  }
+  const projection = await buildOnboardingProjection({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    membership: authorized.membership,
+    now: Date.now(),
+  });
+  if (projection === null) {
+    throw new Error("restored organisation projection is missing");
+  }
+  return controlJson({
+    kind: "success",
+    projection,
+    receipt: {
+      receipt_id: restored.value.receiptId,
+      organisation_id: restored.value.organisationId,
+    },
+  });
+}

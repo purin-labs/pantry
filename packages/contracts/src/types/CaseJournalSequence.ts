@@ -1,0 +1,2 @@
+
+export type CaseJournalSequence = number;

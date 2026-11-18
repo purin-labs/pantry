@@ -1,0 +1,52 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "satyr-plan40-browser",
+  "main": "./real-worker.ts",
+  "compatibility_date": "2026-07-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "../../apps/portal/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/__plan40/*", "/v1/*", "/health"]
+  },
+  "vars": {
+    "SATYR_DEPLOYMENT_PROFILE": "local",
+    "SATYR_PUBLIC_ORIGIN": "http://127.0.0.1:31840",
+    "SATYR_OAUTH_CALLBACK_ORIGIN": "http://127.0.0.1:31840",
+    "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"plan40-browser\",\"locationHint\":\"wnam\"}",
+    "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+    "SESSION_TOKEN_SECRET": "plan40-browser-session-secret",
+    "ORGANISATION_ADMIN_TOKEN": "plan40-browser-admin-token",
+    "UNDERCLERK_BASE_URL": "http://127.0.0.1:3102",
+    "UNDERCLERK_SERVICE_TOKEN": "plan40-browser-underclerk-token"
+  },
+  "services": [
+    { "binding": "UNDERCLERK", "service": "underclerk" }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "ORGANISATION", "class_name": "Plan40OrganisationDO" },
+      { "name": "SESSION", "class_name": "SessionDO" },
+      { "name": "CASE", "class_name": "CaseDO" },
+      { "name": "CONNECTOR", "class_name": "ConnectorDO" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Plan40OrganisationDO", "SessionDO", "CaseDO", "ConnectorDO"] }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "satyr-plan40-browser",
+      "database_id": "00000000-0000-0000-0000-000000000040"
+    }
+  ],
+  "kv_namespaces": [{ "binding": "POLICY_KV", "id": "00000000000000000000000000000040" }],
+  "r2_buckets": [{ "binding": "ARCHIVE", "bucket_name": "satyr-plan40-browser" }],
+  "queues": {
+    "producers": [
+      { "binding": "EVENT_Q", "queue": "satyr-plan40-browser-events" },
+      { "binding": "CUE_Q", "queue": "satyr-plan40-browser-cues" }
+    ]
+  }
+}

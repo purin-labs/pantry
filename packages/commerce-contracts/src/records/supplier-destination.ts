@@ -1,0 +1,75 @@
+// Plan 78: generated once from the ts-rs bindings of the Rust contracts.
+// TypeScript is now the source; edit these schemas by hand.
+import { Type, type Static } from "typebox";
+import { OpenObject, SafeInteger, recordParser } from "../schema.ts";
+import { resourceIdSchema } from "./identifiers.ts";
+import { commerceTimestampSchema } from "./provenance.ts";
+
+/**
+ * Which rail a destination is addressed for. A destination is rail-specific:
+ * a Japanese bank account and a Wise recipient are not interchangeable.
+ */
+export const supplierDestinationRailSchema = Type.Union([
+  OpenObject({ kind: Type.Literal("gmo_aozora_domestic") }),
+  OpenObject({
+    kind: Type.Literal("wise_recipient"),
+    providerRecipientId: resourceIdSchema,
+    detailsFingerprint: Type.String(),
+  }),
+]);
+export type SupplierDestinationRail = Static<
+  typeof supplierDestinationRailSchema
+>;
+
+/**
+ * Where a destination revision stands. Only `active` can receive money.
+ */
+export const supplierDestinationStateSchema = Type.Union([
+  OpenObject({ kind: Type.Literal("draft"), proposedBy: resourceIdSchema }),
+  OpenObject({
+    kind: Type.Literal("verified"),
+    proposedBy: resourceIdSchema,
+    verifiedAt: commerceTimestampSchema,
+  }),
+  OpenObject({
+    kind: Type.Literal("active"),
+    proposedBy: resourceIdSchema,
+    activatedBy: resourceIdSchema,
+    activatedAt: commerceTimestampSchema,
+  }),
+  OpenObject({
+    kind: Type.Literal("retired"),
+    retiredAt: commerceTimestampSchema,
+  }),
+]);
+export type SupplierDestinationState = Static<
+  typeof supplierDestinationStateSchema
+>;
+
+/**
+ * One immutable revision of a supplier destination.
+ */
+export const supplierDestinationRevisionSchema = OpenObject({
+  revisionId: resourceIdSchema,
+  destinationId: resourceIdSchema,
+  supplierId: resourceIdSchema,
+  rail: supplierDestinationRailSchema,
+  maskedSummary: Type.String(),
+  configurationRef: resourceIdSchema,
+  revision: SafeInteger,
+  state: supplierDestinationStateSchema,
+});
+export type SupplierDestinationRevision = Static<
+  typeof supplierDestinationRevisionSchema
+>;
+
+// Parsers of the records above (Plan 78 step 2).
+export const parseSupplierDestinationRail = recordParser(
+  supplierDestinationRailSchema,
+);
+export const parseSupplierDestinationState = recordParser(
+  supplierDestinationStateSchema,
+);
+export const parseSupplierDestinationRevision = recordParser(
+  supplierDestinationRevisionSchema,
+);

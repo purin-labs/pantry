@@ -1,0 +1,24 @@
+# The bench versions of Plan 82 G0.1. mlx-whisper 0.4.3 also declares torch, which only its
+# model conversion imports, so lock.sh locks mlx-whisper alone with --no-deps. The same holds for
+# mlx-audio 0.6.5 (Qwen3-ASR, Plan 82C): its microphone and audio-file packages (miniaudio,
+# sounddevice) are for its own input, so lock.sh locks it alone, and this names the parts that its
+# Qwen3-ASR decode imports.
+mlx==0.32.4
+numba
+numpy==2.4.6
+scipy==1.17.1
+tqdm==4.70.1
+more-itertools==11.2.1
+tiktoken==0.14.0
+huggingface-hub
+certbot
+# Spoken answers. misaki's `en` extra also declares espeak-ng (GPL), so this names the parts of it
+# that the service uses, with no fallback to espeak-ng.
+onnxruntime==1.31.1
+misaki==0.9.4
+spacy==3.8.18
+num2words
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+# Qwen3-ASR's tokenizer and chat template (Apache-2.0).
+transformers==5.23.0
+sentencepiece==0.2.3

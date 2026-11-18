@@ -1,0 +1,180 @@
+/* This preview also runs inside a content-sized iframe. Let wheel and touch
+   gestures continue to the outer page when the frame has no more to scroll. */
+html:root {
+  overscroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  font-family: var(--pantry-font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+}
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 26px 28px;
+}
+.production-run-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.production-run-heading h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.production-run-status {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: var(--surface);
+  color: var(--ink-2);
+}
+body[data-status="blocked"] .production-run-status,
+body[data-phase="error"] .production-run-status {
+  color: var(--danger-text);
+}
+.production-run-summary {
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 20px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.production-run-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.production-run-controls label {
+  flex: 1;
+  min-width: 160px;
+}
+.production-run-controls label,
+.production-run-diagnostics label,
+.production-run-recovery label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--ink-2);
+}
+.production-run-controls button:where(.pantry-select-trigger),
+.production-run-diagnostics button:where(.pantry-select-trigger),
+.production-run-recovery button:where(.pantry-select-trigger) {
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+  font-size: 12px;
+  box-shadow: none;
+}
+.production-run-controls button:not(:where(.pantry-select-trigger)),
+.production-run-recovery button:not(:where(.pantry-select-trigger)),
+.production-run-diagnostics button:not(:where(.pantry-select-trigger)) {
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  box-shadow: none;
+  cursor: pointer;
+}
+.production-run-controls button:not(:where(.pantry-select-trigger)),
+.production-run-recovery button:not(:where(.pantry-select-trigger)) {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.production-run-diagnostics button:not(:where(.pantry-select-trigger)) {
+  margin-top: 12px;
+  background: var(--paper);
+  color: var(--ink-2);
+}
+.production-run-controls :disabled,
+.production-run-recovery :disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.production-run-controls :focus-visible,
+.production-run-recovery :focus-visible,
+.production-run-diagnostics :focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 3px;
+}
+.production-run-notice:empty {
+  display: none;
+}
+.production-run-notice {
+  margin: 12px 0;
+  color: var(--danger-text);
+}
+.production-run-recovery:not(:empty) {
+  margin: 16px 0 24px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 12px;
+}
+.production-run-recovery p {
+  margin: 0 0 12px;
+}
+.production-run-recovery label {
+  margin-bottom: 12px;
+}
+.production-run-diagnostics {
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+  padding-top: 14px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.production-run-diagnostics > summary {
+  cursor: pointer;
+  width: fit-content;
+  font-size: 11px;
+}
+.production-run-diagnostics p {
+  overflow-wrap: anywhere;
+}
+.production-run-timeline {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--satyr-font-mono, monospace);
+  font-size: 10px;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 520px) {
+  main {
+    padding: 22px 18px;
+  }
+}
+@media (pointer: coarse) {
+  .production-run-controls button:not(:where(.pantry-select-trigger)),
+  .production-run-recovery button:not(:where(.pantry-select-trigger)),
+  .production-run-controls button:where(.pantry-select-trigger),
+  .production-run-recovery button:where(.pantry-select-trigger) {
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "heartbeatSeconds": 5,
+  "sampleSeconds": 5,
+  "snapshotFile": "scripts/shop-gateway/snapshot.jpg",
+  "devices": [
+    {
+      "sourceKey": "cobot-1",
+      "kind": "cobot",
+      "suggestedName": "Tray cobot",
+      "model": "Simulated FR10",
+      "serial": "SIM-COBOT-1",
+      "firmwareVersion": "1.0.0",
+      "capabilities": [
+        { "id": "move_cold_tray", "label": "Move a cold tray", "revision": 1 }
+      ]
+    },
+    {
+      "sourceKey": "oven-1",
+      "kind": "appliance",
+      "suggestedName": "Oven",
+      "model": "Simulated MBCO-5E",
+      "serial": "SIM-OVEN-1",
+      "firmwareVersion": "1.0.0",
+      "capabilities": [
+        { "id": "start_program", "label": "Start a saved bake program", "revision": 1 }
+      ]
+    },
+    {
+      "sourceKey": "camera-1",
+      "kind": "camera",
+      "suggestedName": "Bench camera",
+      "model": "Simulated camera",
+      "serial": "SIM-CAMERA-1",
+      "firmwareVersion": "1.0.0",
+      "capabilities": []
+    }
+  ],
+  "health": [
+    { "sourceKey": "cobot-1", "health": "ok", "faultCode": null, "faultText": null },
+    { "sourceKey": "oven-1", "health": "ok", "faultCode": null, "faultText": null }
+  ],
+  "samples": [
+    { "sourceKey": "oven-1", "name": "temperature", "value": 178, "unit": "C" }
+  ],
+  "events": [
+    {
+      "afterSeconds": 12,
+      "reports": [
+        { "sourceKey": "oven-1", "health": "fault", "faultCode": "E07", "faultText": "Door sensor does not answer." }
+      ]
+    }
+  ]
+}

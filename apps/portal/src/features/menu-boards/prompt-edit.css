@@ -1,0 +1,46 @@
+/* Plan 40B phase 5, slice 9: prompt to edit from the selected elements. */
+
+.menu-board-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.menu-board-prompt form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-board-prompt label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--pantry-text-label);
+  color: var(--ink-2);
+}
+
+.menu-board-prompt textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font: inherit;
+}
+
+.menu-board-prompt button:not(:where(.pantry-select-trigger)) {
+  align-self: flex-start;
+}
+
+.menu-board-prompt-result {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-board-prompt-result p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

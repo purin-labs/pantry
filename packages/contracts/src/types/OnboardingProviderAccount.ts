@@ -1,0 +1,30 @@
+import type { OnboardingAudiencePolicy } from "./OnboardingAudiencePolicy";
+import type { OnboardingCredentialHealth } from "./OnboardingCredentialHealth";
+import type { OnboardingEnvironment } from "./OnboardingEnvironment";
+import type { OnboardingEventRecency } from "./OnboardingEventRecency";
+import type { OnboardingIntegrationAccountLifecycle } from "./OnboardingIntegrationAccountLifecycle";
+import type { OnboardingProvider } from "./OnboardingProvider";
+import type { OnboardingRetentionPolicy } from "./OnboardingRetentionPolicy";
+import type { OnboardingSelectedResource } from "./OnboardingSelectedResource";
+import type { OnboardingWebhookHealth } from "./OnboardingWebhookHealth";
+
+export type OnboardingProviderAccount = {
+  integration_account_id: string;
+  provider: OnboardingProvider;
+  provider_account_id: string;
+  environment: OnboardingEnvironment;
+  account_kind: string;
+  display_name: string;
+  lifecycle: OnboardingIntegrationAccountLifecycle;
+  is_default_for_provider: boolean;
+  capabilities: Array<string>;
+  scopes: Array<string>;
+  selected_resources: Array<OnboardingSelectedResource>;
+  credential_health: OnboardingCredentialHealth;
+  webhook_health: OnboardingWebhookHealth;
+  event_recency: OnboardingEventRecency;
+  audience_policy: OnboardingAudiencePolicy;
+  retention_policy: OnboardingRetentionPolicy;
+  created_at: number;
+  updated_at: number;
+};

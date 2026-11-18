@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Wake phrase test</title></head>
+<body>
+<pre id="out"></pre>
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.wasm.min.js"></script>
+<script>
+// Plan 82 G0.4: run the wake phrase in a browser as a live stream, 80 ms at a time.
+const CHUNK = 1280;
+const THRESHOLD = 0.995;
+const LOCK_FRAMES = 25;
+
+async function main() {
+  ort.env.wasm.numThreads = 1;
+  ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/";
+  const load = (name) => ort.InferenceSession.create(`models/${name}.onnx`, { executionProviders: ["wasm"] });
+  const [mel, embed, wake] = await Promise.all([load("melspectrogram"), load("embedding_model"), load("hey_satyr")]);
+  const buffer = await (await fetch("stream.pcm")).arrayBuffer();
+  const pcm = new Int16Array(buffer);
+
+  const melFrames = [];
+  const embeddings = [];
+  const events = [];
+  const times = [];
+  let best = 0;
+  let last = -LOCK_FRAMES;
+  let frame = 0;
+  for (let at = 0; at + CHUNK <= pcm.length; at += CHUNK) {
+    const started = performance.now();
+    // Each chunk also carries the last 480 samples, as openWakeWord streams it.
+    const from = Math.max(0, at - 480);
+    const input = new Float32Array(pcm.subarray(from, at + CHUNK));
+    const melOut = await mel.run({ [mel.inputNames[0]]: new ort.Tensor("float32", input, [1, input.length]) });
+    const values = melOut[mel.outputNames[0]];
+    const count = values.data.length / 32;
+    for (let i = 0; i < count; i += 1) melFrames.push(values.data.slice(i * 32, (i + 1) * 32).map((v) => v / 10 + 2));
+    if (melFrames.length > 76) melFrames.splice(0, melFrames.length - 76);
+    if (melFrames.length === 76) {
+      const flat = new Float32Array(76 * 32);
+      melFrames.forEach((row, i) => flat.set(row, i * 32));
+      const embedOut = await embed.run({ [embed.inputNames[0]]: new ort.Tensor("float32", flat, [1, 76, 32, 1]) });
+      embeddings.push(embedOut[embed.outputNames[0]].data.slice());
+      if (embeddings.length > 16) embeddings.shift();
+      if (embeddings.length === 16) {
+        const x = new Float32Array(16 * 96);
+        embeddings.forEach((row, i) => x.set(row, i * 96));
+        const score = (await wake.run({ input: new ort.Tensor("float32", x, [1, 16, 96]) })).score.data[0];
+        best = Math.max(best, score);
+        if (score >= THRESHOLD && frame - last >= LOCK_FRAMES) {
+          events.push(Math.round((at + CHUNK) / 16));
+          last = frame;
+        }
+      }
+    }
+    frame += 1;
+    times.push(performance.now() - started);
+  }
+  times.sort((a, b) => a - b);
+  const total = times.reduce((a, b) => a + b, 0);
+  document.querySelector("#out").textContent = JSON.stringify({
+    audioSeconds: pcm.length / 16000, eventsAtMs: events, bestScore: best,
+    chunkP50Ms: times[Math.floor(times.length * 0.5)], chunkP95Ms: times[Math.floor(times.length * 0.95)],
+    oneCorePercent: (total / (pcm.length / 16)) * 100, userAgent: navigator.userAgent,
+  });
+}
+main().catch((error) => { document.querySelector("#out").textContent = JSON.stringify({ failure: String(error) }); });
+</script>
+</body>
+</html>

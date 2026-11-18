@@ -1,0 +1,21 @@
+.robot-limits {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 16rem;
+}
+.robot-limits p {
+  margin: 0;
+}
+.robot-limits-muted {
+  color: var(--pantry-ink-muted);
+}
+.robot-limits-verdict {
+  font-weight: 600;
+  color: var(--pantry-success-text);
+}
+.robot-limits[data-verdict="warning"] .robot-limits-verdict {
+  color: var(--pantry-warning-text);
+}
+.robot-limits[data-verdict="failed"] .robot-limits-verdict {
+  color: var(--pantry-danger-text);
+}

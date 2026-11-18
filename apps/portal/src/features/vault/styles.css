@@ -1,0 +1,577 @@
+/* Settings → Vault (Plan 79): one quiet list, the item in a side drawer. */
+
+.vault-page {
+  display: grid;
+  gap: var(--pantry-space-3);
+  max-inline-size: 760px;
+}
+
+.vault-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pantry-space-3);
+}
+
+.vault-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.vault-page .vault-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 36px;
+  padding: 0 14px;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+}
+
+.vault-page .vault-tab:hover:not([aria-pressed="true"]) {
+  color: var(--ink-strong);
+  background: var(--surface);
+}
+
+.vault-page .vault-tab[aria-pressed="true"] {
+  color: var(--ink-strong);
+  background: var(--surface);
+  box-shadow: var(--pantry-button-ring);
+}
+
+.vault-tab-count {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.vault-add,
+.vault-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+:is(.vault-page, .vault-drawer, .vault-integration)
+  :is(.vault-primary, .vault-secondary, .vault-danger, .vault-text-button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 40px;
+  padding: 0 18px;
+  font-weight: 500;
+}
+
+:is(.vault-page, .vault-drawer, .vault-integration) .vault-primary {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  box-shadow: none;
+}
+
+:is(.vault-page, .vault-drawer, .vault-integration)
+  .vault-primary:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+
+:is(.vault-page, .vault-drawer, .vault-integration) .vault-danger {
+  color: var(--pantry-on-primary);
+  background: var(--danger-text);
+  box-shadow: none;
+}
+
+:is(.vault-page, .vault-drawer, .vault-integration) .vault-text-button {
+  padding: 0 12px;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+  font-weight: 400;
+}
+
+:is(.vault-page, .vault-drawer, .vault-integration)
+  .vault-text-button:hover:not(:disabled) {
+  color: var(--ink-strong);
+  background: var(--surface);
+}
+
+:is(.vault-drawer, .vault-integration) .vault-remove {
+  margin-inline-start: auto;
+  color: var(--danger-text);
+}
+
+.vault-notice:empty {
+  display: none;
+}
+
+.vault-notice,
+.vault-loading {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.vault-load-failed {
+  display: grid;
+  justify-items: start;
+  gap: var(--pantry-space-2);
+  color: var(--danger-text);
+}
+
+.vault-load-failed p {
+  margin: 0;
+}
+
+.vault-list {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--pantry-border) inset;
+}
+
+.vault-page .vault-row {
+  display: flex;
+  inline-size: 100%;
+  align-items: center;
+  gap: 14px;
+  min-block-size: 64px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+  text-align: start;
+  white-space: normal;
+}
+
+.vault-page .vault-row:hover:not(:disabled),
+.vault-page .vault-row[aria-current="true"] {
+  background: var(--surface);
+}
+
+.vault-row-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 32px;
+  border-radius: 8px;
+  color: var(--ink-2);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--pantry-border) inset;
+}
+
+.vault-row-text {
+  display: grid;
+  min-inline-size: 0;
+  gap: 2px;
+}
+
+.vault-row-title {
+  overflow: hidden;
+  color: var(--ink-strong);
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vault-row-detail {
+  overflow: hidden;
+  color: var(--ink-3);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Drawer ---------- */
+
+/* The drawer frame is the shared SideDrawer (ui/side-drawer.css). */
+
+.vault-details {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.vault-details > div {
+  display: grid;
+  gap: 2px;
+}
+
+.vault-details dt {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.vault-details dd {
+  margin: 0;
+  color: var(--ink-strong);
+  overflow-wrap: anywhere;
+}
+
+.vault-details address {
+  display: grid;
+  font-style: normal;
+}
+
+.vault-origins {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vault-secret-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--ink-2);
+  background: var(--surface);
+  font-size: 13px;
+}
+
+.vault-remove-confirm {
+  display: grid;
+  gap: var(--pantry-space-2);
+}
+
+.vault-remove-confirm p,
+.vault-failure {
+  margin: 0;
+}
+
+.vault-failure {
+  color: var(--danger-text);
+  font-size: 14px;
+}
+
+/* ---------- Forms ---------- */
+
+.vault-form-fields {
+  display: grid;
+  gap: var(--pantry-space-3);
+}
+
+.vault-field-group {
+  display: grid;
+  gap: var(--pantry-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.vault-field-group > legend {
+  margin-block-end: 2px;
+  padding: 0;
+  color: var(--ink-strong);
+  font-size: 14px;
+}
+
+.vault-field {
+  display: grid;
+  gap: 4px;
+  min-inline-size: 0;
+}
+
+.vault-field > label {
+  color: var(--ink-strong);
+  font-size: 14px;
+}
+
+.vault-optional {
+  margin-inline-start: 6px;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.vault-field-hint {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.vault-field-error {
+  margin: 0;
+  color: var(--danger-text);
+  font-size: 13px;
+}
+
+.vault-field input,
+.vault-field button:where(.pantry-select-trigger) {
+  inline-size: 100%;
+  min-block-size: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--ink-strong);
+  background: var(--paper);
+}
+
+.vault-field[data-invalid="true"] :is(input, button:where(.pantry-select-trigger)) {
+  border-color: var(--danger-text);
+}
+
+.vault-field-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--pantry-space-2);
+}
+
+.vault-origin-row {
+  display: flex;
+  align-items: start;
+  gap: 4px;
+}
+
+.vault-origin-row > .vault-field {
+  flex: 1;
+}
+
+.vault-origin-remove {
+  margin-block-start: 2px;
+}
+
+.vault-form-fields .vault-text-button {
+  justify-self: start;
+  margin-inline-start: -12px;
+}
+
+.vault-password {
+  position: relative;
+}
+
+.vault-password input {
+  padding-inline-end: 48px;
+}
+
+.vault-password .icon-button {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 4px;
+  translate: 0 -50%;
+}
+
+@media (max-width: 520px) {
+  .vault-field-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .vault-add {
+    inline-size: 100%;
+  }
+
+  .vault-add > * {
+    flex: 1;
+  }
+}
+
+/* A link that leaves the Vault looks like the quiet pill it stands beside. */
+:is(.vault-drawer, .vault-integration) a.vault-secondary {
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--pantry-button-ring);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+:is(.vault-drawer, .vault-integration) a.vault-secondary:hover {
+  background: var(--surface);
+}
+
+/* ---------- Store ---------- */
+
+.vault-store-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pantry-space-2);
+  padding: 0;
+  border-radius: 12px;
+  color: var(--ink-2);
+  background: transparent;
+  font-size: 14px;
+}
+
+.vault-store-line p {
+  margin: 0;
+}
+
+.vault-store-line strong {
+  color: var(--ink-strong);
+}
+
+.vault-store-warning {
+  color: var(--warn-text);
+}
+
+.vault-steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 20px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.vault-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--pantry-border) inset;
+  cursor: pointer;
+}
+
+.vault-choice:has(input:checked) {
+  box-shadow: 0 0 0 1.5px var(--ink-strong) inset;
+}
+
+.vault-choice > span {
+  display: grid;
+  gap: 2px;
+}
+
+.vault-history {
+  display: grid;
+  gap: 8px;
+  padding-block-start: var(--pantry-space-2);
+  border-block-start: 1px solid var(--hairline);
+}
+
+.vault-history h3 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vault-history ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.vault-history li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--pantry-space-2);
+  color: var(--ink-2);
+}
+
+.vault-history time {
+  flex: none;
+  color: var(--ink-3);
+}
+
+/* ---------- 1Password card on Integrations ---------- */
+
+.vault-integration {
+  display: grid;
+  gap: var(--pantry-space-3);
+  max-inline-size: 560px;
+}
+
+.vault-integration > .side-drawer-body {
+  padding: 0;
+}
+
+.vault-integration-lead {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.vault-integration-link {
+  margin: 0;
+  font-size: 14px;
+}
+
+.vault-search input {
+  inline-size: 100%;
+  min-block-size: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink-strong);
+  font-size: 16px;
+}
+
+.vault-page a.vault-primary {
+  border-radius: 9999px;
+  text-decoration: none;
+}
+
+.vault-key-status {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 13px;
+}
+
+.vault-edit-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.vault-form-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.vault-form-footer {
+  flex-shrink: 0;
+  padding: 16px 24px max(16px, env(safe-area-inset-bottom));
+  border-block-start: 1px solid var(--hairline);
+  background: var(--ground);
+}
+
+@media (max-width: 520px) {
+  .vault-field input,
+  .vault-field button:where(.pantry-select-trigger) {
+    font-size: 16px;
+  }
+  .vault-page .vault-row {
+    flex-wrap: wrap;
+  }
+  .vault-row-text {
+    flex: 1;
+  }
+}
+
+.vault-discard {
+  max-inline-size: min(400px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  color: var(--ink-strong);
+  background: var(--ground);
+}
+
+.vault-discard h2 {
+  margin-block-start: 0;
+  font-size: 20px;
+}
+.vault-discard::backdrop {
+  background: rgb(0 0 0 / 25%);
+}
+.vault-discard .vault-discard-confirm {
+  color: var(--pantry-on-primary);
+  background: var(--danger-text);
+}

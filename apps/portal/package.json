@@ -1,0 +1,49 @@
+{
+  "name": "@seams/portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsrs --noEmit && vite build && node ../../services/shop-voice/pack.mjs dist/shop-voice/install.sh && node ../../services/shop-gateway/pack.mjs dist/shop-gateway && node ../../scripts/bakery-robots/check-asset-sizes.mjs dist",
+    "dev": "vite",
+    "test": "node --test src/features/workflow-simulator/schedule.test.mjs src/features/workflow-simulator/task-events.test.mjs src/features/workflow-simulator/procedure.test.mjs src/features/workflow-simulator/equipment-timeline.test.mjs src/features/workflow-simulator/workcell-view.test.mjs"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.8.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.24",
+    "@seams/bakery-model": "workspace:*",
+    "@seams/bakery-workflow": "workspace:*",
+    "@seams/collaboration": "workspace:*",
+    "@seams/contracts": "workspace:*",
+    "@seams/control-api": "workspace:*",
+    "@seams/costs-sheet-crdt": "workspace:*",
+    "@seams/email-draft-crdt": "workspace:*",
+    "@seams/mail-reply-crdt": "workspace:*",
+    "@seams/menu-board-crdt": "workspace:*",
+    "@seams/menu-draft-crdt": "workspace:*",
+    "@seams/product-description-crdt": "workspace:*",
+    "@seams/production-plan-crdt": "workspace:*",
+    "@seams/production-simulation": "workspace:*",
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams/workflow-canvas-crdt": "workspace:*",
+    "@seams/commerce-client": "workspace:*",
+    "@seams/commerce-contracts": "workspace:*",
+    "lucide-react": "^0.542.0",
+    "onnxruntime-web": "1.22.0",
+    "qrcode-generator": "^2.0.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router": "^7.18.2",
+    "sonner": "^2.0.7",
+    "three": "0.180.0",
+    "voice-glow": "0.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@types/three": "0.180.0",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vite": "^8.0.16"
+  }
+}

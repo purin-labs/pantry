@@ -1,0 +1,356 @@
+.task-list {
+  inline-size: 100%;
+  min-inline-size: 0;
+  color: var(--ink);
+  interpolate-size: allow-keywords;
+  box-sizing: border-box;
+  padding: 0;
+  font-size: 14px;
+  line-height: 20px;
+  --task-muted: color-mix(in srgb, var(--ink) 55%, transparent);
+  --task-done: color-mix(in srgb, var(--ink) 45%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+  align-self: start;
+}
+.task-list > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px 8px;
+  min-block-size: 20px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  line-height: 20px;
+}
+.task-list > summary::-webkit-details-marker {
+  display: none;
+}
+.task-list > summary:focus-visible {
+  outline: 2px solid var(--ink-2);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.task-list-chevron {
+  margin-inline-start: -8px;
+  rotate: 0deg;
+  flex-shrink: 0;
+  color: var(--ink-2);
+}
+.task-list[open] .task-list-chevron {
+  rotate: 180deg;
+}
+.task-list-count {
+  margin-inline-start: auto;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.task-list-header-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 14px;
+
+  color: var(--ink-2);
+}
+.task-list-header-icon {
+  position: relative;
+  inline-size: 14px;
+  block-size: 14px;
+}
+.task-list-donut,
+.task-list-header-check {
+  position: absolute;
+  inset: 0;
+  inline-size: 14px;
+  block-size: 14px;
+}
+.task-list-donut {
+  stroke-width: 1.75;
+}
+.task-list-donut-track {
+  stroke: var(--task-done);
+}
+.task-list-donut-fill {
+  stroke: var(--ink);
+  stroke-linecap: round;
+}
+.task-list-header-check {
+  opacity: 0;
+  scale: 0.75;
+}
+.task-list-header-icon[data-completed="true"] .task-list-donut {
+  opacity: 0;
+}
+.task-list-header-icon[data-completed="true"] .task-list-header-check {
+  opacity: 1;
+  scale: 1;
+}
+.task-list > ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 14px 8px;
+  display: grid;
+  gap: 0;
+}
+.task-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-block: 3px;
+}
+.task-list-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 14px;
+  block-size: 20px;
+  color: var(--ink-2);
+}
+.task-list-content {
+  flex: 1;
+  min-inline-size: 0;
+}
+.task-list-label {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.task-list-status {
+  color: var(--ink-2);
+  font-size: 0.8em;
+}
+.task-list
+  :is([data-state="pending"], [data-state="running"], [data-state="completed"])
+  .task-list-status {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.task-list-task-title {
+  color: var(--task-muted);
+}
+.task-list-strike {
+  background: linear-gradient(currentColor, currentColor) 0 55% / 0% 1px
+    no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.task-list [data-state="completed"] .task-list-strike {
+  background-size: 100% 1px;
+}
+.task-list-content > p {
+  margin: 2px 0 0;
+  color: var(--ink-2);
+  font-size: 0.9em;
+}
+.task-list-mark {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.task-list-mark-ring,
+.task-list-mark-fill,
+.task-list-mark-arrow,
+.task-list-mark-check {
+  opacity: 0;
+}
+.task-list-mark-fill {
+  fill: var(--task-done);
+  stroke: none;
+}
+.task-list-mark-check {
+  stroke: var(--paper);
+  stroke-width: 1.8;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.task-list [data-state="running"] .task-list-mark {
+  color: var(--ink);
+}
+.task-list [data-state="running"] .task-list-mark-ring,
+.task-list [data-state="running"] .task-list-mark-arrow,
+.task-list [data-state="completed"] .task-list-mark-fill,
+.task-list [data-state="completed"] .task-list-mark-check {
+  opacity: 1;
+}
+.task-list [data-state="completed"] .task-list-mark-check {
+  stroke-dashoffset: 0;
+}
+.task-list [data-state="running"] .task-list-mark-pending,
+.task-list [data-state="completed"] .task-list-mark-pending {
+  opacity: 0;
+}
+.task-list [data-state="completed"] .task-list-task-title {
+  color: var(--task-done);
+}
+.task-list [data-state="pending"] .task-list-icon {
+  color: var(--task-done);
+}
+.task-list [data-state="failed"] .task-list-icon {
+  color: var(--pantry-danger-text);
+}
+.task-list-progress {
+  display: inline-flex;
+  align-items: baseline;
+  flex-shrink: 0;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--task-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+.task-list-percent-sign {
+  font-size: 0.85em;
+  align-self: flex-start;
+}
+.task-list-number {
+  display: inline-flex;
+  vertical-align: top;
+}
+.task-list-percent-window {
+  display: inline-grid;
+  block-size: 20px;
+  inline-size: 1ch;
+  overflow: clip;
+  text-align: center;
+}
+.task-list-percent-window > span {
+  grid-area: 1 / 1;
+}
+.task-list-percent-out {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .task-list-strike {
+    transition: background-size var(--motion-smooth) calc(40ms * var(--agent-motion-factor, 1));
+  }
+  .task-list [data-state="running"] .task-list-title-ink {
+    background:
+      linear-gradient(
+        90deg,
+        transparent calc(50% - 60px),
+        var(--ink),
+        transparent calc(50% + 60px)
+      ),
+      linear-gradient(var(--task-done), var(--task-done));
+    background-size:
+      240% 100%,
+      100% 100%;
+    background-position:
+      100% 0,
+      0 0;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: task-list-shimmer calc(1350ms * var(--agent-motion-factor, 1))
+      linear infinite;
+  }
+  .task-list-percent-window[data-changing="true"] .task-list-percent-in {
+    animation: task-list-number-in var(--motion-smooth) both;
+  }
+  .task-list-percent-window[data-changing="true"] .task-list-percent-out {
+    visibility: visible;
+    animation: task-list-number-out var(--motion-smooth) both;
+  }
+  .task-list-chevron {
+    transition: rotate var(--motion-quick);
+  }
+  .task-list-donut-fill {
+    transition: stroke-dashoffset var(--motion-smooth);
+  }
+  .task-list-mark > *,
+  .task-list-donut,
+  .task-list-header-check {
+    transition:
+      opacity var(--motion-quick),
+      scale var(--motion-quick);
+  }
+  .task-list-mark-check {
+    transition:
+      stroke-dashoffset var(--motion-quick),
+      opacity var(--motion-quick);
+  }
+  .task-list::details-content {
+    block-size: 0;
+    opacity: 0;
+    overflow: clip;
+    content-visibility: hidden;
+    transition:
+      block-size var(--motion-smooth),
+      opacity var(--motion-quick),
+      content-visibility var(--motion-smooth) allow-discrete;
+  }
+  .task-list[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+    content-visibility: visible;
+  }
+}
+@keyframes task-list-shimmer {
+  to {
+    background-position:
+      -100% 0,
+      0 0;
+  }
+}
+@keyframes task-list-number-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes task-list-number-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+[data-agent-preview-motion="reduced"] .task-list-strike {
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .task-list-strike {
+    transition: none !important;
+  }
+}
+[data-agent-preview-motion="reduced"] .task-list-title-ink {
+  animation: none !important;
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+[data-agent-preview-motion="reduced"] .task-list-percent-window > span {
+  animation: none !important;
+}
+[data-agent-preview-motion="reduced"] .task-list-percent-out {
+  visibility: hidden !important;
+}
+[data-agent-preview-motion="reduced"] .task-list::details-content,
+[data-agent-preview-motion="reduced"] .task-list * {
+  transition: none !important;
+}

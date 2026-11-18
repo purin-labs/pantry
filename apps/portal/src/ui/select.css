@@ -1,0 +1,315 @@
+/* The Base UI Select parts with Portal tokens. The trigger is a
+   <button role="combobox">. A page rule for a select field targets
+   `button:where(.pantry-select-trigger)` or `.pantry-select-trigger`, and a
+   page rule for buttons excludes the trigger with
+   `button:not(:where(.pantry-select-trigger))`. The :where() keeps the
+   specificity of a plain `select` or `button` type selector.
+
+   This file owns the caret: its size, its inset from the end edge and the gap
+   before it. Those declarations are important, so no page rule can move the
+   caret to the edge or let the text run under it. A page may set the width,
+   height, start padding, font, border and colours of a trigger. */
+
+.pantry-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 40px;
+  padding-block: 0;
+  padding-inline-start: 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--pantry-radius-control);
+  color: var(--ink);
+  background-color: var(--paper);
+  box-shadow: none;
+  font: inherit;
+  font-size: inherit;
+  line-height: 1.25;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--pantry-motion-fast) ease,
+    background-color var(--pantry-motion-fast) ease;
+}
+
+.pantry-select-trigger[data-size="sm"] {
+  min-height: 32px;
+  padding-inline-start: 10px;
+  font-size: 13px;
+}
+
+/* A toolbar or table-cell select: text and a smaller caret, no box. */
+.pantry-select-trigger[data-variant="ghost"] {
+  min-height: 32px;
+  padding-inline-start: 8px;
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.pantry-select-trigger[data-variant="ghost"]:hover:not(:disabled) {
+  background-color: var(--surface);
+}
+
+.pantry-select-trigger[data-popup-open] {
+  border-color: var(--pantry-focus);
+}
+
+.pantry-select-trigger[data-variant="ghost"][data-popup-open] {
+  border-color: transparent;
+  background-color: var(--surface);
+}
+
+/* A swatch select: a round button that shows only its children, a colour or
+   a picture of the value, and no caret (below). Its aria-label names the
+   value. */
+.pantry-select-trigger[data-variant="swatch"] {
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding-inline-start: 0;
+  border-color: transparent;
+  border-radius: 9999px;
+  background-color: transparent;
+}
+
+.pantry-select-trigger[data-variant="swatch"]:hover:not(:disabled),
+.pantry-select-trigger[data-variant="swatch"][data-popup-open] {
+  border-color: transparent;
+  background-color: var(--surface);
+}
+
+.pantry-select-trigger:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.pantry-select-trigger:disabled,
+.pantry-select-trigger[data-disabled] {
+  color: var(--pantry-disabled-text);
+  cursor: not-allowed;
+}
+
+.pantry-select-trigger[aria-invalid="true"] {
+  border-color: var(--pantry-danger-ring, var(--danger-text));
+}
+
+.pantry-select-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pantry-select-value[data-placeholder] {
+  color: var(--ink-3);
+}
+
+.pantry-select-icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+/* The caret geometry: a 16px caret, 6px after the value and 8px from the
+   end edge. */
+.pantry-select-trigger {
+  gap: 0 !important;
+  padding-inline-end: 0 !important;
+}
+
+.pantry-select-icon {
+  margin-inline: 6px 8px !important;
+}
+
+.pantry-select-trigger[data-variant="ghost"] .pantry-select-icon {
+  margin-inline: 4px 6px !important;
+}
+
+.pantry-select-icon > svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.pantry-select-trigger[data-variant="ghost"] .pantry-select-icon > svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.pantry-select-trigger[data-variant="swatch"] .pantry-select-icon {
+  display: none !important;
+}
+
+.pantry-select-trigger:disabled .pantry-select-icon,
+.pantry-select-trigger[data-disabled] .pantry-select-icon {
+  color: inherit;
+}
+
+.pantry-select-positioner {
+  z-index: 1000;
+  outline: 0;
+}
+
+.pantry-select-popup {
+  box-sizing: border-box;
+  min-width: max(var(--anchor-width), 144px);
+  max-width: calc(100vw - 24px);
+  max-height: var(--available-height);
+  padding: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  font-size: 14px;
+  outline: 0;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--pantry-motion-fast) ease,
+    scale var(--pantry-motion-fast) ease;
+}
+
+.pantry-select-popup[data-starting-style],
+.pantry-select-popup[data-ending-style] {
+  opacity: 0;
+  scale: 0.97;
+}
+
+/* Over the trigger, the popup opens in place, as a native select does. */
+.pantry-select-popup[data-align-trigger="true"] {
+  transition: none;
+}
+
+.pantry-select-list {
+  outline: 0;
+}
+
+.pantry-select-group + .pantry-select-group {
+  margin-block-start: 4px;
+  padding-block-start: 4px;
+  border-block-start: 1px solid var(--border);
+}
+
+.pantry-select-group-label {
+  padding: 6px 8px 4px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.pantry-select-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding-block: 6px;
+  padding-inline: 8px 32px;
+  border-radius: 6px;
+  cursor: default;
+  outline: 0;
+  user-select: none;
+}
+
+.pantry-select-item[data-highlighted] {
+  background: var(--surface);
+}
+
+.pantry-select-item[data-disabled] {
+  color: var(--ink-3);
+  pointer-events: none;
+}
+
+.pantry-select-item-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.pantry-select-item-indicator {
+  position: absolute;
+  inset-inline-end: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.pantry-select-item-indicator > svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pantry-select-separator {
+  height: 1px;
+  margin: 4px -4px;
+  background: var(--border);
+  pointer-events: none;
+}
+
+.pantry-select-scroll {
+  position: sticky;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-block: 4px;
+  color: var(--ink-2);
+  background: var(--paper);
+  cursor: default;
+}
+
+.pantry-select-scroll-up {
+  top: 0;
+}
+
+.pantry-select-scroll-down {
+  bottom: 0;
+}
+
+.pantry-select-scroll > svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (pointer: coarse) {
+  .pantry-select-trigger:not([data-size="sm"]):not([data-variant="ghost"]):not(
+      [data-variant="swatch"]
+    ) {
+    min-height: 44px;
+  }
+
+  .pantry-select-trigger[data-variant="swatch"] {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .pantry-select-item {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantry-select-trigger,
+  .pantry-select-popup {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .pantry-select-trigger {
+    border-color: ButtonText;
+  }
+
+  .pantry-select-item[data-highlighted] {
+    color: HighlightText;
+    background: Highlight;
+  }
+}

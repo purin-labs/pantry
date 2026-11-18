@@ -1,0 +1,54 @@
+import {
+  type ControlMutationIntent,
+  controlMutation,
+  controlSignal,
+  readCookie,
+} from "./control-client";
+import type { CheckoutProfileMutationTransport } from "./features/checkout-profiles/api";
+import type { PayoutMutationTransport } from "./features/payouts/api";
+
+export function commerceEntityPlaneControlMutation(
+  path: string,
+  body: unknown,
+  intent: ControlMutationIntent,
+): Promise<unknown> {
+  return controlMutation(path, "POST", body, undefined, intent);
+}
+
+export function supplierPayoutControlMutation(
+  path: string,
+  method: Parameters<PayoutMutationTransport>[1],
+  body: unknown,
+  intent: string,
+): Promise<unknown> {
+  return controlMutation(path, method, body, undefined, intent);
+}
+
+export function terminalControlMutation(
+  path: string,
+  method: "POST",
+  body: unknown,
+  intent: string,
+): Promise<unknown> {
+  return controlMutation(path, method, body, undefined, intent);
+}
+
+export function checkoutProfileControlMutation(
+  path: string,
+  method: Parameters<CheckoutProfileMutationTransport>[1],
+  body: unknown,
+  intent: string,
+): Promise<unknown> {
+  return controlMutation(path, method, body, undefined, intent);
+}
+
+export async function commerceBoardPresenceTransport(
+  path: string,
+  body: unknown,
+): Promise<unknown> {
+  const csrf = readCookie("satyr_control_csrf");
+  if (csrf === null) {
+    throw new Error("Your control session expired. Sign in again.");
+  }
+  return controlSignal(path, body);
+}

@@ -1,0 +1,299 @@
+/* Goal bar: a quiet strip tucked behind the top edge of the composer. */
+.chat-goal-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-end: -14px;
+  padding: 6px 8px 20px 14px;
+  border: 0;
+  border-radius: 22px 22px 0 0;
+  background: color-mix(in srgb, var(--paper) 55%, var(--ground));
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.chat-goal-bar > svg {
+  flex-shrink: 0;
+  color: var(--ink-3);
+}
+.chat-goal-bar[data-state="active"] > svg {
+  color: var(--ink);
+}
+.chat-goal-bar-text {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-goal-bar-text strong {
+  margin-inline-end: 2px;
+  color: var(--ink);
+  font-weight: 500;
+}
+.chat-goal-bar[data-state="budget_limited"] .chat-goal-bar-text strong {
+  color: var(--warn-text);
+}
+.chat-goal-bar-usage {
+  flex-shrink: 0;
+  margin-inline-end: 4px;
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.chat-goal-bar.chat-goal-bar button:not(:where(.pantry-select-trigger)) {
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  min-block-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.chat-goal-bar.chat-goal-bar button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--ink);
+}
+.chat-goal-bar.chat-goal-bar button:not(:where(.pantry-select-trigger)):disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.chat-goal-error {
+  margin: 0 0 8px;
+  color: var(--error-text);
+  font-size: 13px;
+}
+
+/* Goal editor: a side sheet on the inline end of the window. */
+.chat-thread > .chat-goal-drawer.chat-goal-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(400px, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-inline-start: 1px solid var(--hairline);
+  border-radius: 0;
+  background: var(--ground);
+  color: var(--ink);
+  box-shadow: -16px 0 40px rgb(0 0 0 / 14%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.chat-goal-drawer::backdrop {
+  background: rgb(0 0 0 / 18%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chat-thread > .chat-goal-drawer.chat-goal-drawer[open] {
+    transition: translate 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    @starting-style {
+      translate: 24px 0;
+    }
+  }
+}
+.chat-goal-drawer-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px 10px 20px;
+  border-block-end: 1px solid var(--hairline);
+  background: var(--ground);
+}
+.chat-goal-drawer-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.chat-goal-loading {
+  margin: 0;
+  padding: 20px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.chat-goal-panel {
+  display: grid;
+  gap: 20px;
+  min-inline-size: 0;
+  padding: 20px;
+  font-size: 14px;
+}
+.chat-goal-panel p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.chat-goal-notice {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.chat-goal-notice[data-tone="error"] {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+.chat-goal-hint {
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.chat-goal-summary {
+  display: grid;
+  gap: 8px;
+}
+.chat-goal-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.chat-goal-state {
+  color: var(--ink);
+  font-weight: 500;
+}
+.chat-goal-state[data-state="budget_limited"] {
+  color: var(--warn-text);
+}
+.chat-goal-meter {
+  block-size: 4px;
+  border-radius: 9999px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.chat-goal-meter > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--ink);
+}
+.chat-goal-meter:is([data-state="paused"], [data-state="completed"]) > span {
+  background: var(--ink-3);
+}
+.chat-goal-meter[data-state="budget_limited"] > span {
+  background: var(--warn-text);
+}
+
+.chat-goal-form fieldset {
+  display: grid;
+  gap: 14px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.chat-goal-form label {
+  display: grid;
+  gap: 6px;
+}
+.chat-goal-form label > span {
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 500;
+}
+.chat-goal-form :is(textarea, input) {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.chat-goal-form textarea {
+  min-block-size: 132px;
+  resize: vertical;
+}
+.chat-goal-form input {
+  font-variant-numeric: tabular-nums;
+}
+.chat-goal-form :is(textarea, input)::placeholder {
+  color: var(--ink-3);
+}
+.chat-goal-form fieldset:disabled :is(textarea, input) {
+  opacity: 0.6;
+}
+.chat-goal-form label + .chat-goal-hint {
+  margin-block-start: -8px;
+}
+.chat-goal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.chat-goal-panel button:not(:where(.pantry-select-trigger)):is(.secondary, .danger, .chat-goal-primary) {
+  min-block-size: 44px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+.chat-goal-panel button:not(:where(.pantry-select-trigger)).chat-goal-primary {
+  border: 0;
+  border-radius: 9999px;
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  box-shadow: var(--pantry-primary-ring);
+  font-weight: 500;
+  cursor: pointer;
+}
+.chat-goal-panel button:not(:where(.pantry-select-trigger)).chat-goal-primary:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+.chat-goal-panel fieldset:disabled button:not(:where(.pantry-select-trigger)) {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.chat-goal-more {
+  display: grid;
+  gap: 12px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--hairline);
+}
+.chat-goal-more-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .chat-goal-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(3, 44px);
+    gap: 4px;
+    padding-inline: 12px;
+  }
+  .chat-goal-bar > svg {
+    display: none;
+  }
+  .chat-goal-bar-text {
+    grid-column: 1 / -1;
+  }
+  .chat-goal-bar.chat-goal-bar button:not(:where(.pantry-select-trigger)) {
+    inline-size: 44px;
+    block-size: 44px;
+  }
+}

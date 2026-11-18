@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "bundle": {
+    "id": "0dfc48575c54c058c2bcea9e6527842397585a4cc40900836d2818fee8d85f3a",
+    "backend": "browser",
+    "protocolVersion": 1,
+    "checkpointSchemaVersion": 4,
+    "controllerSourceHash": "ad646ae8c456644fdc6e32385f81e9f64efb4b357cec89a10061e6ffd1e90814",
+    "controllerHash": "d46d7491bd352a05b7003dbef5ace306f900c07ed06b8b0853943612ff7785f8",
+    "runtimeHash": "de4f545cfd4a1cb2a3006e80693275c7f01c0297e5c87cf589f42ca15cf90fa3",
+    "engineHash": "ff8cf923d9720318d366a3b99976ac23e62813c0f67122353f6979b991cbae29"
+  },
+  "engine": {
+    "file": "production-engine.mjs",
+    "sha256": "ff8cf923d9720318d366a3b99976ac23e62813c0f67122353f6979b991cbae29",
+    "byteLength": 333539
+  },
+  "runtime": {
+    "id": "1fa6f2708269de43fc769f7162084346df40a6df064cbc29460660393c1d3f75",
+    "files": [
+      {
+        "file": "bakery-native.js",
+        "sha256": "19ba1f35518a1d466b29a5280490104147786e5d3f42a9174211e1b7dbc8f62a",
+        "byteLength": 102857
+      },
+      {
+        "file": "bakery_native.wasm",
+        "sha256": "ff0393e4a9f5293a3313bfcad1517c3b7901b4a4fb0895c6c2109e226da08a7e",
+        "byteLength": 4944473
+      },
+      {
+        "file": "bakery_native.data",
+        "sha256": "9388a96f4a2c1682dd7c8d957424440c4762bd9f51ea4f224334e3d7b68e87d7",
+        "byteLength": 21950927
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+name = "luna_xhigh"
+description = "Preferred delegated subagent for demanding, well-bounded tasks."
+model = "gpt-5.6-luna"
+model_reasoning_effort = "xhigh"
+service_tier = "fast"
+developer_instructions = """
+Complete the assigned bounded task with careful reasoning and validation.
+Stay within scope and return an evidence-backed summary to the parent agent.
+"""

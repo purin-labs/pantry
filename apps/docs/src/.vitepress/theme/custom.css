@@ -1,0 +1,397 @@
+/* Keep VitePress's default component styles and replace only its color roles. */
+:root {
+  color-scheme: light;
+
+  --vp-c-gray-1: #4d4943;
+  --vp-c-gray-2: #ded9d2;
+  --vp-c-gray-3: #ebe8e4;
+  --vp-c-gray-soft: rgb(109 103 95 / 0.14);
+
+  --vp-c-indigo-1: #44403b;
+  --vp-c-indigo-2: #000000;
+  --vp-c-indigo-3: #44403b;
+  --vp-c-indigo-soft: rgb(68 64 59 / 0.14);
+
+  --vp-c-green-1: #2e6b47;
+  --vp-c-green-2: #2e6b47;
+  --vp-c-green-3: #2e6b47;
+  --vp-c-green-soft: rgb(46 107 71 / 0.14);
+
+  --vp-c-yellow-1: #7c5220;
+  --vp-c-yellow-2: #7c5220;
+  --vp-c-yellow-3: #7c5220;
+  --vp-c-yellow-soft: rgb(124 82 32 / 0.14);
+
+  --vp-c-red-1: #b3423a;
+  --vp-c-red-2: #b3423a;
+  --vp-c-red-3: #b3423a;
+  --vp-c-red-soft: rgb(179 66 58 / 0.14);
+
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f5f3f1;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #f5f3f1;
+  --vp-c-border: #c3bdb4;
+  --vp-c-divider: #ded9d2;
+  --vp-c-gutter: #ded9d2;
+  --vp-c-text-1: #0a0a0a;
+  --vp-c-text-2: #4d4943;
+  --vp-c-text-3: #6d675f;
+}
+
+/* The same roles on a warm neutral ink, so the two modes read as one brand. */
+.dark {
+  color-scheme: dark;
+
+  --vp-c-gray-1: #b5aea5;
+  --vp-c-gray-2: #33302c;
+  --vp-c-gray-3: #2a2724;
+  --vp-c-gray-soft: rgb(180 173 164 / 0.16);
+
+  --vp-c-indigo-1: #d7d2cc;
+  --vp-c-indigo-2: #f1ede8;
+  --vp-c-indigo-3: #b5aea5;
+  --vp-c-indigo-soft: rgb(215 210 204 / 0.16);
+
+  --vp-c-green-1: #86c69a;
+  --vp-c-green-2: #86c69a;
+  --vp-c-green-3: #68aa7d;
+  --vp-c-green-soft: rgb(134 198 154 / 0.16);
+
+  --vp-c-yellow-1: #d8ad6d;
+  --vp-c-yellow-2: #d8ad6d;
+  --vp-c-yellow-3: #ba8e4d;
+  --vp-c-yellow-soft: rgb(216 173 109 / 0.16);
+
+  --vp-c-red-1: #e58c81;
+  --vp-c-red-2: #e58c81;
+  --vp-c-red-3: #c76f66;
+  --vp-c-red-soft: rgb(229 140 129 / 0.16);
+
+  --vp-c-bg: #121110;
+  --vp-c-bg-alt: #1a1917;
+  --vp-c-bg-elv: #1e1c1a;
+  --vp-c-bg-soft: #1e1c1a;
+  --vp-c-border: #423e39;
+  --vp-c-divider: #2d2a27;
+  --vp-c-gutter: #2d2a27;
+  --vp-c-text-1: #f1ede8;
+  --vp-c-text-2: #b5aea5;
+  --vp-c-text-3: #857e76;
+}
+
+/* A soft, fixed page wash: two cool washes and one warm one, all under 10%
+   alpha, so the page reads as white paper with light in it rather than as a
+   colored surface. Content surfaces go transparent to let it through. */
+body {
+  background-color: var(--vp-c-bg);
+  background-image:
+    radial-gradient(
+      1100px 620px at 6% -10%,
+      rgb(122 137 214 / 0.07),
+      transparent 62%
+    ),
+    radial-gradient(
+      900px 540px at 98% 4%,
+      rgb(214 186 168 / 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      1250px 700px at 80% 100%,
+      rgb(126 159 210 / 0.09),
+      transparent 66%
+    );
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(
+      1100px 620px at 6% -10%,
+      rgb(122 137 214 / 0.14),
+      transparent 62%
+    ),
+    radial-gradient(
+      900px 540px at 98% 4%,
+      rgb(224 172 104 / 0.06),
+      transparent 60%
+    ),
+    radial-gradient(
+      1250px 700px at 80% 100%,
+      rgb(110 199 164 / 0.08),
+      transparent 66%
+    );
+}
+
+.VPContent,
+.VPDoc,
+.VPPage,
+.VPNotFound {
+  background-color: transparent;
+}
+
+.Layout .VPSidebar {
+  background-color: color-mix(in srgb, var(--vp-c-bg-alt) 80%, transparent);
+}
+
+/* The sidebar carries the brand, search, and appearance switch, so the top
+   nav bar has nothing left to show. Zeroing its height collapses the offsets
+   the default theme derives from it. */
+:root {
+  --vp-nav-height: 0px;
+}
+
+.VPNav {
+  display: none;
+}
+
+/* Sidebar: pull the tree toward the left edge so long entries wrap less. */
+@media (min-width: 960px) {
+  .Layout .VPSidebar {
+    padding-top: 24px;
+    padding-right: 16px;
+    padding-left: 20px;
+  }
+
+  .Layout .VPSidebar .curtain {
+    display: none;
+  }
+
+  .Layout .VPSidebar .group {
+    width: auto;
+  }
+}
+
+.VPSidebar .nav {
+  padding-top: 0;
+}
+
+/* The section headings carry the structure on their own, so drop the rules
+   between groups and tighten the rhythm around each one. */
+.VPSidebar .group,
+.VPSidebar .group + .group {
+  border-top: 0;
+  padding-top: 2px;
+}
+
+.VPSidebar .VPSidebarItem.level-0 {
+  padding-bottom: 20px;
+}
+
+.VPSidebar .VPSidebarItem.level-0.collapsed {
+  padding-bottom: 8px;
+}
+
+/* Section headings read as labels above their items. */
+.VPSidebar .VPSidebarItem.level-0 > .item .text {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.VPSidebar .VPSidebarItem .text {
+  padding: 3px 0;
+  line-height: 22px;
+}
+
+/* Items hang off a continuous indent-guide rule under their heading; nested
+   groups repeat the rule one level in. */
+.VPSidebar .VPSidebarItem .items {
+  margin-left: 4px;
+  border-left: 1px solid var(--vp-c-divider);
+  padding-left: 14px;
+}
+
+/* The active item lights up its segment of the guide rule. */
+.VPSidebar .VPSidebarItem .item .indicator {
+  top: 4px;
+  bottom: 4px;
+  left: -15px;
+  width: 2px;
+  border-radius: 0;
+}
+
+.VPSidebar .VPSidebarItem.level-1.is-active > .item > .indicator {
+  background-color: var(--vp-c-brand-1);
+}
+
+/* Markdown keeps its H1 so VitePress local search indexes the page title.
+   The layout header renders the visible semantic title. */
+.vp-doc > div > h1:first-child {
+  display: none;
+}
+
+/* The content column starts on body copy; keep it flush with the subtitle. */
+.vp-doc > div > :first-child {
+  margin-top: 0;
+}
+
+/* The default theme paints a fixed gradient strip over the bottom of the
+   outline column; it covers the footer instead of fading the outline. */
+.VPDoc .aside .aside-curtain {
+  display: none;
+}
+
+/* Site footer. The sidebar is fixed to the viewport, so the footer has to be
+   inset by its width on wide screens or its first column is clipped. */
+.satyr-docs-footer {
+  /* The outline column is fixed and full height, so it sits over the footer's
+     right half and swallows those clicks unless the footer is raised. */
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--vp-c-divider);
+  background-color: transparent;
+  padding: 20px 24px;
+}
+
+@media (min-width: 768px) {
+  .satyr-docs-footer {
+    padding-inline: 32px;
+  }
+}
+
+@media (min-width: 960px) {
+  .satyr-docs-footer {
+    padding-left: calc(var(--vp-sidebar-width) + 32px);
+  }
+}
+
+@media (min-width: 1440px) {
+  .satyr-docs-footer {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px);
+    padding-left: calc(
+      (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width) + 32px
+    );
+  }
+}
+
+.satyr-docs-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  /* The brand and its copyright line sit on the baseline of the tallest
+     column, not at the top of the row. */
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 40px;
+  margin: 0 auto;
+  max-width: 1104px;
+}
+
+.satyr-docs-footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.satyr-docs-footer__brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.satyr-docs-footer__mark {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.satyr-docs-footer__mark--dark,
+.dark .satyr-docs-footer__mark--light {
+  display: none;
+}
+
+.dark .satyr-docs-footer__mark--dark {
+  display: block;
+}
+
+.satyr-docs-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 40px;
+}
+
+.satyr-docs-footer__group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.satyr-docs-footer__group h2 {
+  margin: 0 0 2px;
+  color: var(--vp-c-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.satyr-docs-footer__group a {
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.satyr-docs-footer__group a:hover {
+  color: var(--vp-c-brand-1);
+}
+
+.satyr-docs-footer__legal {
+  margin: 0;
+  color: var(--vp-c-text-3);
+  font-size: 12px;
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mermaid is generated after VitePress renders the page. These rules provide
+   the layout behavior that the default theme cannot supply. */
+.mermaid-figure {
+  margin: 16px 0;
+}
+
+.mermaid {
+  overflow-x: auto;
+}
+
+.mermaid svg {
+  display: block;
+  min-width: min(100%, 520px);
+  max-width: none;
+  margin-inline: auto;
+}
+
+.mermaid-figure figcaption,
+.mermaid-figure details {
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}
+
+.mermaid-figure summary {
+  cursor: pointer;
+}
+
+.mermaid-figure details div[class*="language-"] {
+  max-height: 24rem;
+}

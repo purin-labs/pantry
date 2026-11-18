@@ -1,0 +1,54 @@
+/* Each system is one row button; its access opens in a side drawer. */
+.access35-page button:not(:where(.pantry-select-trigger)).access35-system-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  inline-size: 100%;
+  min-height: 0;
+  padding: 14px 18px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: start;
+  white-space: normal;
+}
+.access35-page button:not(:where(.pantry-select-trigger)).access35-system-row:hover:not(:disabled) {
+  background: var(--surface);
+}
+.access35-page button:not(:where(.pantry-select-trigger)).access35-system-row:focus-visible {
+  outline-offset: -2px;
+}
+/* The hover fill follows the rounded corners of the list. */
+.access35-system:first-child > .access35-system-row {
+  border-start-start-radius: 11px;
+  border-start-end-radius: 11px;
+}
+.access35-system:last-child > .access35-system-row {
+  border-end-start-radius: 11px;
+  border-end-end-radius: 11px;
+}
+.access35-system-chevron {
+  flex: 0 0 auto;
+  color: var(--ink-3);
+}
+.access35-system-chevron:dir(rtl) {
+  rotate: 180deg;
+}
+.access35-summary-warn {
+  color: var(--warn-text);
+}
+.access35-system-drawer .access35-system-approvals {
+  padding-top: 0;
+  border-top: 0;
+}
+.access35-system-drawer .access35-recipient-list {
+  display: grid;
+  gap: 4px;
+}
+.access35-system-drawer-link {
+  margin-inline-end: auto;
+  color: var(--ink);
+  font-size: 13.5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

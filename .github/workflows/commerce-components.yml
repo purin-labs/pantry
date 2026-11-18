@@ -1,0 +1,60 @@
+name: Commerce components
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+    paths:
+      - "packages/contracts/**"
+      - "packages/commerce-contracts/**"
+      - "packages/commerce-client/**"
+      - "packages/commerce-query-sqlite/**"
+      - "packages/std/**"
+      - "packages/type-utils/**"
+      - "services/commerce/**"
+      - "apps/storefront/**"
+      - "scripts/check-runtime-boundary.mjs"
+      - ".github/workflows/commerce-components.yml"
+  merge_group:
+
+concurrency:
+  group: commerce-components-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Contracts and Commerce
+    # A draft pull request runs this job only with the label run-ci, as in pantry.yml.
+    if: ${{ !github.event.pull_request.draft || contains(github.event.pull_request.labels.*.name, 'run-ci') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 10.28.1
+          run_install: false
+
+      - name: Install root workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Check the runtime boundary
+        run: pnpm lint:runtime-boundary
+
+      - name: Check the commerce machines and plugins
+        run: pnpm --filter @seams/commerce-contracts commerce-data:check
+
+      - name: Check Commerce types
+        run: pnpm underclerk:check
+
+      - name: Test Commerce
+        run: pnpm underclerk:test

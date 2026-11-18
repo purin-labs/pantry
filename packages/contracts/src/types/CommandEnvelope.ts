@@ -1,0 +1,32 @@
+import type { ActorId } from "./ActorId";
+import type { CausationRef } from "./CausationRef";
+import type { CommandId } from "./CommandId";
+import type { CorrelationId } from "./CorrelationId";
+import type { EnvelopeVersion } from "./EnvelopeVersion";
+import type { EventPrincipal } from "./EventPrincipal";
+import type { EventSensitivity } from "./EventSensitivity";
+import type { IdempotencyKey } from "./IdempotencyKey";
+import type { OrganisationId } from "@seams/commerce-contracts";
+import type { PayloadVersion } from "./PayloadVersion";
+import type { RetentionClass } from "./RetentionClass";
+import type { RuntimeRevision } from "./RuntimeRevision";
+import type { SourceTime } from "./SourceTime";
+import type { Timestamp } from "./Timestamp";
+
+export type CommandEnvelope<T> = {
+  envelopeVersion: EnvelopeVersion;
+  payloadVersion: PayloadVersion;
+  commandId: CommandId;
+  organisationId: OrganisationId;
+  targetActorId: ActorId;
+  sourceTime: SourceTime;
+  receivedAt: Timestamp;
+  correlationId: CorrelationId;
+  causation: CausationRef;
+  idempotencyKey: IdempotencyKey;
+  runtimeRevision: RuntimeRevision;
+  principal: EventPrincipal;
+  sensitivity: EventSensitivity;
+  retention: RetentionClass;
+  body: T;
+};

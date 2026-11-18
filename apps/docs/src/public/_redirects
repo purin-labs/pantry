@@ -1,0 +1,13 @@
+# The Vocs documentation site published these paths until it was retired.
+# They were the public docs, so they keep working and point at the page that
+# now owns the material rather than 404ing on a bookmark.
+/quickstart              /operate/local-development  301
+/architecture            /concepts/architecture      301
+/security                /concepts/authority-and-boundaries  301
+/secrets/vault           /operate/vault              301
+/reference/configuration /operate/vault              301
+
+# The retired site mirrored every page as plain markdown under /md/ so agents
+# could curl the source. VitePress serves the markdown for each page from its
+# own route, so send the mirror to the site root rather than leaving it dead.
+/md/*                    /                           301

@@ -1,0 +1,25 @@
+{
+  "name": "@seams/std",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./state-machine": {
+      "types": "./src/state-machine.ts",
+      "default": "./src/state-machine.ts"
+    }
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
+    "vitest": "4.1.9"
+  }
+}

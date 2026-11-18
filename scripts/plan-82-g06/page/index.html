@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Voice path test</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: light dark; --bg: #fff; --fg: #1c1c1c; --line: #d8d8d8; --muted: #666; --ok: #17703a; --bad: #b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #161616; --fg: #eee; --line: #3a3a3a; --muted: #a5a5a5; --ok: #6fd08f; --bad: #ff8a80; } }
+  body { margin: 0 auto; max-width: 640px; padding: 16px; background: var(--bg); color: var(--fg); font: 16px/1.45 system-ui, sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p { margin: 4px 0 12px; color: var(--muted); }
+  label { display: block; font-size: 14px; margin-bottom: 4px; }
+  input { box-sizing: border-box; width: 100%; padding: 10px; font: 15px ui-monospace, monospace; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+  .buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 12px 0; }
+  button { padding: 12px; font: inherit; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+  button:disabled { opacity: .5; }
+  #status { min-height: 1.5em; font-weight: 600; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.5 ui-monospace, monospace; border-top: 1px solid var(--line); padding-top: 8px; }
+</style>
+</head>
+<body>
+<h1>Voice path test</h1>
+<p>This page sends one recorded 3 s command to the Mac in the shop and measures the answer. It uses no microphone.</p>
+<label for="mac">Mac address</label>
+<input id="mac" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url">
+<div class="buttons">
+  <button data-test="check">1. Check the Mac</button>
+  <button data-test="warm">2. 50 commands</button>
+  <button data-test="cold">3. 20 cold commands</button>
+  <button data-test="bakers">4. Three bakers</button>
+  <button data-test="hang">5. Mac hangs</button>
+  <button data-test="off">6. Mac is off</button>
+</div>
+<div id="status" role="status"></div>
+<pre id="out"></pre>
+<script>
+const EXPECTED = "run the financier shift and start the second oven now";
+const AUDIO_SECONDS = 3;
+const DEADLINE_MS = 1000 + 300 * AUDIO_SECONDS; // Plan 82 D1b.
+const LIMIT_P95_MS = 1500; // Plan 82 D1a.
+const input = document.querySelector("#mac");
+const out = document.querySelector("#out");
+const statusLine = document.querySelector("#status");
+const buttons = [...document.querySelectorAll("button")];
+input.value = new URLSearchParams(location.search).get("mac") || "";
+let audio;
+
+const say = (text, kind = "") => { statusLine.textContent = text; statusLine.className = kind; };
+const macUrl = (path) => input.value.trim().replace(/\/$/, "") + path;
+const normalize = (text) => text.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
+const percentile = (sorted, p) => sorted.length ? sorted[Math.min(sorted.length - 1, Math.ceil(p * sorted.length) - 1)] : null;
+
+function describeError(error) {
+  return `${error.name}: ${error.message}`;
+}
+
+async function command(query = "", timeoutMs = 30000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const url = macUrl(`/transcriptions${query}${query ? "&" : "?"}n=${crypto.randomUUID()}`);
+  const started = performance.now();
+  try {
+    const response = await fetch(url, { method: "POST", headers: { "content-type": "audio/wav" }, body: audio, signal: controller.signal, cache: "no-store" });
+    const body = await response.json();
+    const ms = performance.now() - started;
+    return { ms, status: response.status, ...body, correct: normalize(body.text || "") === EXPECTED, timing: phases(url) };
+  } catch (error) {
+    return { ms: performance.now() - started, error: describeError(error) };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function phases(url) {
+  const entry = performance.getEntriesByName(url).pop();
+  if (!entry || !entry.responseStart) return null;
+  return {
+    dnsMs: Math.round(entry.domainLookupEnd - entry.domainLookupStart),
+    connectMs: Math.round(entry.connectEnd - entry.connectStart),
+    tlsMs: entry.secureConnectionStart ? Math.round(entry.connectEnd - entry.secureConnectionStart) : 0,
+    protocol: entry.nextHopProtocol,
+  };
+}
+
+function summary(results) {
+  const passed = results.filter((r) => !r.error && r.status === 200);
+  const times = passed.map((r) => r.ms).sort((a, b) => a - b);
+  const errors = {};
+  for (const r of results) {
+    const key = r.error || (r.status !== 200 ? `HTTP ${r.status} ${r.error || ""}`.trim() : null);
+    if (key) errors[key] = (errors[key] || 0) + 1;
+  }
+  const round = (v) => v === null ? null : Math.round(v);
+  const cold = passed.filter((r) => r.timing && r.timing.connectMs > 0).length;
+  return {
+    commands: results.length, answered: passed.length, correct: passed.filter((r) => r.correct).length,
+    p50Ms: round(percentile(times, 0.5)), p95Ms: round(percentile(times, 0.95)), maxMs: round(times[times.length - 1] ?? null),
+    firstMs: round(results[0]?.ms ?? null), newConnections: cold, passLimit: percentile(times, 0.95) !== null && percentile(times, 0.95) <= LIMIT_P95_MS,
+    errors, sampleTiming: passed.find((r) => r.timing)?.timing ?? null, sampleText: passed[0]?.text ?? null,
+  };
+}
+
+async function series(count, query, gapMs, onProgress) {
+  const results = [];
+  for (let i = 0; i < count; i += 1) {
+    results.push(await command(query));
+    onProgress?.(i + 1);
+    if (gapMs) await sleep(gapMs);
+  }
+  return results;
+}
+
+const tests = {
+  async check() {
+    const started = performance.now();
+    const response = await fetch(macUrl(`/health?n=${crypto.randomUUID()}`), { cache: "no-store" });
+    const body = await response.json();
+    return { healthMs: Math.round(performance.now() - started), status: response.status, health: body };
+  },
+  async warm() {
+    return summary(await series(50, "", 500, (n) => say(`Command ${n} of 50`)));
+  },
+  async cold() {
+    // A baker's commands come minutes apart, so each one can need a new connection.
+    return summary(await series(20, "?cold=1", 1000, (n) => say(`Command ${n} of 20`)));
+  },
+  async bakers() {
+    const groups = await Promise.all([0, 1, 2].map(async (baker) => {
+      await sleep(baker * 170);
+      return series(20, "", 300, () => {});
+    }));
+    return { ...summary(groups.flat()), bakers: 3 };
+  },
+  async hang() {
+    const result = await command("?hang=1", DEADLINE_MS);
+    return { deadlineMs: DEADLINE_MS, stoppedAtMs: Math.round(result.ms), result: result.error ?? `HTTP ${result.status}` };
+  },
+  async off() {
+    const url = new URL(input.value.trim());
+    const saved = input.value;
+    url.port = "8444";
+    input.value = url.origin;
+    try {
+      const result = await command("", DEADLINE_MS);
+      return { deadlineMs: DEADLINE_MS, failedAtMs: Math.round(result.ms), result: result.error ?? `HTTP ${result.status}` };
+    } finally {
+      input.value = saved;
+    }
+  },
+};
+
+async function run(name) {
+  buttons.forEach((b) => { b.disabled = true; });
+  say("The test runs. Keep this page open.");
+  out.textContent = "";
+  const report = {
+    test: name, at: new Date().toISOString(), origin: location.origin, mac: input.value.trim(),
+    userAgent: navigator.userAgent, secureContext: isSecureContext,
+    connection: navigator.connection?.effectiveType ?? null,
+  };
+  try {
+    if (!audio) audio = await (await fetch("command.wav")).arrayBuffer();
+    report.result = await tests[name]();
+    say(`Done: ${name}`, "ok");
+    report.saved = await sendReport(report);
+  } catch (error) {
+    report.failure = describeError(error);
+    say(`The browser did not reach the Mac: ${report.failure}`, "bad");
+  }
+  out.textContent = JSON.stringify(report, null, 2);
+  buttons.forEach((b) => { b.disabled = false; });
+}
+
+async function sendReport(report) {
+  try {
+    const response = await fetch(macUrl("/results"), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(report) });
+    return (await response.json()).saved ?? false;
+  } catch {
+    return false;
+  }
+}
+
+buttons.forEach((b) => b.addEventListener("click", () => run(b.dataset.test)));
+</script>
+</body>
+</html>

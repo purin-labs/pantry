@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tool Health Smoke"
+  short_description: "Check Platform capability and provider readiness"
+  default_prompt: "Use $tool-health-smoke to check Seams Pantry capability discovery, connection readiness, and authorized provider reads in the selected environment."

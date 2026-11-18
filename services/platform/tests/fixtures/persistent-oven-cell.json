@@ -1,0 +1,21 @@
+{
+  "cellId": "cold-cell-1",
+  "clampForceN": 100,
+  "execution": {
+    "backend": "browser",
+    "controllerHash": "d46d7491bd352a05b7003dbef5ace306f900c07ed06b8b0853943612ff7785f8",
+    "controllerSourceHash": "ad646ae8c456644fdc6e32385f81e9f64efb4b357cec89a10061e6ffd1e90814",
+    "runtimeHash": "de4f545cfd4a1cb2a3006e80693275c7f01c0297e5c87cf589f42ca15cf90fa3"
+  },
+  "fixture": "persistent-oven-rack/1",
+  "ingredients": {
+    "forwardMm": 0,
+    "lateralMm": 0,
+    "massKg": 1
+  },
+  "modelHash": "b73d7c27386ef14bf296d13f221d1b0acdc9ae19a57fc393002837f39f38a348",
+  "robot": "universal-robots-ur5e",
+  "runId": "run-dbf59f3be83ece2c8fca2b959d9b36a9081e0bd6cbfd791575f1b6f7c62ee0d7",
+  "schemaVersion": 1,
+  "timestep": 0.002
+}

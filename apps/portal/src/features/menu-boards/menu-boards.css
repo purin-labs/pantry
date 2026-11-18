@@ -1,0 +1,344 @@
+/* Menus › Boards and Menus › Screens (Plan 40B). One column of content with
+   a side drawer for the selected element; the primary action is a dark
+   pill. */
+
+.menu-tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* The tabs and the chips draw their own edge, so the Portal's global button
+   ring stays off them. */
+.menu-tabs button {
+  margin-bottom: -1px;
+  padding: 10px 2px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+.menu-tabs button:not(:where(.pantry-select-trigger))[aria-current="page"] {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.menu-boards-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.menu-boards-header h2 {
+  margin: 0 0 6px;
+}
+
+.menu-boards-header p {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.menu-boards-primary {
+  min-height: 40px;
+  padding: 0 20px;
+  border: 0;
+  box-shadow: none;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.menu-boards-primary:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.menu-boards-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.menu-boards-chips button:not(:where(.pantry-select-trigger)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+.menu-boards-chips button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.menu-boards-chips span {
+  color: var(--ink-3);
+  font-size: var(--pantry-text-label);
+  font-weight: 400;
+}
+
+.menu-boards-new {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.menu-boards-new label,
+.menu-boards-toolbar label,
+.menu-boards-drawer label,
+.menu-screens-dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--pantry-text-label);
+  color: var(--ink-2);
+}
+
+.menu-boards-new input,
+.menu-boards-drawer input,
+.menu-screens-dialog input {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--pantry-radius-control);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.menu-boards-new .description-draft-error {
+  flex-basis: 100%;
+}
+
+.menu-boards-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.menu-boards-main {
+  flex: 999 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.menu-boards-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.menu-boards-history {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.menu-boards-toolbar .description-draft-sync-status {
+  margin-left: auto;
+}
+
+.menu-boards-preview {
+  padding: clamp(12px, 2vw, 28px);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.menu-boards-preview .menu-board-element[data-element-id] {
+  cursor: pointer;
+}
+
+.menu-boards-hint,
+.menu-boards-drawer-note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+}
+
+.menu-boards-unplaced {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+.menu-boards-unplaced ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.menu-boards-unplaced li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-boards-publish {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  color: var(--ink-2);
+}
+
+.menu-boards-publish p {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: right;
+}
+
+.menu-boards-drawer {
+  flex: 1 1 280px;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+}
+
+.menu-boards-drawer header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-boards-drawer header span {
+  color: var(--ink-3);
+  font-size: var(--pantry-text-label);
+}
+
+.menu-boards-drawer h3 {
+  margin: 2px 0 0;
+}
+
+.menu-boards-drawer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.menu-screens-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.menu-screens-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+.menu-screens-name {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-screens-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+}
+
+.menu-screens-status span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ink-3);
+}
+
+.menu-screens-status[data-live="true"] span {
+  background: #2f9e5b;
+}
+
+.menu-screens-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-screens-dialog {
+  width: min(460px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.menu-screens-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.menu-screens-dialog p {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.menu-screens-code {
+  font-size: 1.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.menu-screens-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

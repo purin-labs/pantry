@@ -1,0 +1,24 @@
+/* A side Case card (Plan 74). It uses the draft card's shell; these rules add
+   the short lead line and the brief, which never folds: a brief holds at
+   most 2,000 characters. */
+.side-case-card-lead {
+  padding-inline: 4px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.side-case-card-brief {
+  padding: 14px 16px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.side-case-card a.draft-message-button {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.side-case-card a.draft-message-button:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}

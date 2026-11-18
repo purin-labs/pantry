@@ -1,0 +1,32 @@
+.hover-label-anchor {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+.hover-label-positioner {
+  z-index: 100;
+}
+.hover-label {
+  max-width: min(240px, calc(100vw - 16px));
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 12%);
+  transform-origin: var(--transform-origin);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hover-label {
+    transition:
+      opacity 120ms ease,
+      translate 120ms ease;
+  }
+  .hover-label[data-starting-style],
+  .hover-label[data-ending-style] {
+    opacity: 0;
+    translate: 0 -2px;
+  }
+}

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta
+      name="description"
+      content="Seams Pantry: the operating system for modern bakeries &amp; cafés."
+    />
+    <script>
+      if (location.pathname.startsWith("/portal")) {
+        let mode = "system";
+        let palette = null;
+        try {
+          let saved = localStorage.getItem("satyr:portal-appearance");
+          palette = localStorage.getItem("satyr:portal-palette");
+          if (saved === null) {
+            const appearances = [];
+            for (const key of Object.keys(localStorage)) {
+              if (
+                key.startsWith("satyr:preferences:") &&
+                key.endsWith(":appearance")
+              ) {
+                appearances.push(key);
+              }
+            }
+            if (appearances.length === 1) {
+              const preferences = JSON.parse(
+                localStorage.getItem(appearances.at(0)),
+              );
+              saved = preferences?.values?.mode;
+              palette ??= preferences?.values?.palette ?? null;
+            }
+          }
+          if (saved === "light" || saved === "dark") mode = saved;
+        } catch {}
+        let theme = mode;
+        if (mode === "system") {
+          theme = matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        document.documentElement.dataset.portalMode = mode;
+        document.documentElement.dataset.portalTheme = theme;
+        // Keep in step with PORTAL_PALETTES and parseAppearance in
+        // @seams/control-api: "porcelain" was Espresso's first name.
+        if (palette === "porcelain") palette = "espresso";
+        if (
+          palette === "slate-coral" ||
+          palette === "espresso" ||
+          palette === "paper"
+        )
+          document.documentElement.dataset.pantryTheme = palette;
+        // A theme with a texture has three variants of it; take one at random.
+        document.documentElement.dataset.satyrTexture = String(
+          1 + Math.floor(Math.random() * 3),
+        );
+        document.documentElement.style.colorScheme = theme;
+      }
+    </script>
+    <link
+      rel="icon"
+      type="image/png"
+      href="/brand/satyr-mark-dark-32.png"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/brand/satyr-mark-light-32.png"
+      media="(prefers-color-scheme: dark)"
+    />
+    <title>Seams Pantry</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/bootstrap.tsx"></script>
+  </body>
+</html>

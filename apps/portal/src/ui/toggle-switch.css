@@ -1,0 +1,70 @@
+/* The Base UI Switch with Portal tokens: a 36 × 20 track and a 16px thumb. */
+
+.pantry-toggle-switch {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  inline-size: 36px;
+  block-size: 20px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--hairline);
+  cursor: pointer;
+  transition: background-color var(--pantry-motion-fast) ease;
+}
+
+.pantry-toggle-switch[data-checked] {
+  background: var(--pantry-primary);
+}
+
+.pantry-toggle-switch:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.pantry-toggle-switch[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pantry-toggle-switch[data-busy] {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.pantry-toggle-switch-thumb {
+  display: block;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  transition: translate var(--pantry-motion-fast) ease;
+}
+
+.pantry-toggle-switch-thumb[data-checked] {
+  translate: 16px 0;
+}
+
+:root[dir="rtl"] .pantry-toggle-switch-thumb[data-checked] {
+  translate: -16px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantry-toggle-switch,
+  .pantry-toggle-switch-thumb {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .pantry-toggle-switch {
+    border: 1px solid ButtonText;
+  }
+
+  .pantry-toggle-switch[data-checked] .pantry-toggle-switch-thumb,
+  .pantry-toggle-switch-thumb[data-checked] {
+    background: Highlight;
+  }
+}

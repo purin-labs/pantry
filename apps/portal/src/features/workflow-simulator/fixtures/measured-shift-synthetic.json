@@ -1,0 +1,147 @@
+{
+  "kind": "bakery-measured-shift",
+  "schemaVersion": 2,
+  "shiftId": "SYNTHETIC-UI-ACCEPTANCE",
+  "site": "Synthetic browser fixture",
+  "startTime": "2026-09-24T06:00:00+09:00",
+  "measurementMethod": "Generated values for browser acceptance; no physical observation",
+  "evidenceRef": "Synthetic fixture only",
+  "ovenId": "synthetic-oven-1",
+  "mouldId": "synthetic-mould-1",
+  "recipeRevision": "synthetic-recipe-1",
+  "emptyTrayMassKg": 0.6,
+  "filledTrayMassKg": 1.2,
+  "portionMassGrams": 25,
+  "workerIds": ["baker-1", "baker-2"],
+  "ovenTrays": 4,
+  "rackTrays": 8,
+  "piecesPerTray": 24,
+  "batches": [
+    {
+      "id": "A",
+      "trayCount": 2,
+      "intervals": {
+        "stage": {
+          "start": 0,
+          "end": 120
+        },
+        "portion": {
+          "start": 150,
+          "end": 510
+        },
+        "load": {
+          "start": 540,
+          "end": 580
+        },
+        "bake": {
+          "start": 710,
+          "end": 1670
+        },
+        "unload": {
+          "start": 1680,
+          "end": 1715
+        },
+        "cool": {
+          "start": 1740,
+          "end": 2370
+        },
+        "demould": {
+          "start": 2390,
+          "end": 2590
+        },
+        "finishCooling": {
+          "start": 2590,
+          "end": 3790
+        },
+        "pack": {
+          "start": 3810,
+          "end": 4050
+        }
+      }
+    },
+    {
+      "id": "B",
+      "trayCount": 2,
+      "intervals": {
+        "stage": {
+          "start": 120,
+          "end": 250
+        },
+        "portion": {
+          "start": 270,
+          "end": 650
+        },
+        "load": {
+          "start": 660,
+          "end": 705
+        },
+        "bake": {
+          "start": 710,
+          "end": 1670
+        },
+        "unload": {
+          "start": 1725,
+          "end": 1765
+        },
+        "cool": {
+          "start": 1785,
+          "end": 2415
+        },
+        "demould": {
+          "start": 2435,
+          "end": 2625
+        },
+        "finishCooling": {
+          "start": 2625,
+          "end": 3825
+        },
+        "pack": {
+          "start": 3845,
+          "end": 4095
+        }
+      }
+    },
+    {
+      "id": "C",
+      "trayCount": 2,
+      "intervals": {
+        "stage": {
+          "start": 650,
+          "end": 770
+        },
+        "portion": {
+          "start": 780,
+          "end": 1150
+        },
+        "load": {
+          "start": 1880,
+          "end": 1920
+        },
+        "bake": {
+          "start": 1940,
+          "end": 2900
+        },
+        "unload": {
+          "start": 2910,
+          "end": 2950
+        },
+        "cool": {
+          "start": 2970,
+          "end": 3600
+        },
+        "demould": {
+          "start": 3620,
+          "end": 3820
+        },
+        "finishCooling": {
+          "start": 3820,
+          "end": 5020
+        },
+        "pack": {
+          "start": 5050,
+          "end": 5290
+        }
+      }
+    }
+  ]
+}

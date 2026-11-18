@@ -1,0 +1,17 @@
+packages:
+  - packages/*
+  - apps/*
+  - services/platform
+  - scripts/punter
+  - services/commerce
+
+allowBuilds:
+  esbuild: true
+  sharp: false
+  workerd: true
+
+minimumReleaseAgeExclude:
+  - "@cloudflare/workers-types@5.20260707.1"
+
+patchedDependencies:
+  "@cloudflare/vitest-plugin@1.0.0": patches/@cloudflare__vitest-plugin@1.0.0.patch

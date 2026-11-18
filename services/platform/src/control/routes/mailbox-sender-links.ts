@@ -1,0 +1,342 @@
+import {
+  parseMailSenderLinkRequest,
+  type MailSenderLink,
+} from "@seams/control-api";
+import { sha256Hex } from "@seams/std";
+import {
+  parseCommerceGraphQuery,
+  SUPPLIER_ENTITY_TYPE_ID,
+} from "@seams/commerce-client";
+
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import {
+  parseControlMutationBoundary,
+  readControlMutationReplay,
+  type ControlMutationReceiptScope,
+} from "../../data/control-mutation";
+import { resolveUser } from "../../data/control-plane";
+import { readEmailMailboxAccount } from "../../data/email-mailbox";
+import { resolveActiveProviderAccountContext } from "../../data/integration-account";
+import type { Env } from "../../env";
+import {
+  parseIntegrationAccountId,
+  type IntegrationAccountId,
+} from "../../ids";
+import {
+  linkSenderToSupplier,
+  readSenderSupplierLink,
+  senderLinkAddress,
+} from "../../mail-inbox/sender-supplier-link";
+import {
+  authorizeOrganisationRequest,
+  type AuthorizedOrganisationRequest,
+} from "../authorization";
+import {
+  commerceGraphControlAuthority,
+  controlCommerceSensitivityCeiling,
+  openControlCommerceGraph,
+} from "../commerce-graph";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+  readJsonRecord,
+} from "../http";
+import { authorizeMailSource } from "../../mail-inbox/authorization";
+import { mailControlAuthority } from "./mail-inbox";
+import { recordCommerceMutationReceipt } from "../mutation-receipt";
+
+/**
+ * The supplier that one sender of a mailbox is linked to, for the Inbox.
+ *
+ * A member reads the link of an address. An administrator links the address
+ * to a supplier of the Organisation, which makes it a verified supplier
+ * contact of the mailbox. Mail admitted after that is bound to the supplier;
+ * mail admitted before keeps the binding it got at admission.
+ */
+export async function handleAgentMailboxSenderLinks(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  integrationAccountIdRaw: string,
+  read: boolean,
+): Promise<Response> {
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  // The address is the sender's mail address: it travels in the body, never
+  // in a URL that a log keeps.
+  return read
+    ? readSenderLink(request, env, organisationIdRaw, integrationAccountIdRaw)
+    : linkSender(request, env, organisationIdRaw, integrationAccountIdRaw);
+}
+
+async function readSenderLink(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  integrationAccountIdRaw: string,
+): Promise<Response> {
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "viewer",
+    true,
+  );
+  if (!authorized.ok) return authorized.response;
+  const accountId = parseIntegrationAccountId(integrationAccountIdRaw);
+  if (!accountId.ok) return controlError("agent_mailbox_missing", 404);
+  const body = await readBoundedJsonRecord(request, 1_024);
+  const address =
+    body !== null &&
+    Object.keys(body).length === 1 &&
+    typeof body.address === "string"
+      ? senderLinkAddress(body.address)
+      : null;
+  if (address === null) return controlError("mailbox_sender_link_invalid", 422);
+  // The sender of a message is mail content: only a person who may read the
+  // mailbox learns how its senders are linked.
+  const authority = await mailControlAuthority(authorized);
+  const source =
+    authority === null
+      ? null
+      : await authorizeMailSource(env, authority, accountId.value);
+  if (source === null) return controlError("agent_mailbox_missing", 404);
+  const mailbox = await readEmailMailboxAccount({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    integrationAccountId: accountId.value,
+  });
+  if (!mailbox.ok) return controlError("agent_mailbox_missing", 404);
+  const link = await readSenderSupplierLink({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    integrationAccountId: accountId.value,
+    address,
+  });
+  if (!link.ok) return controlError(link.error.code, 503);
+  const supplierId = link.value.supplierId;
+  if (supplierId === null)
+    return controlJson(
+      linkBody({ supplier: null, revision: link.value.revision }),
+    );
+  const supplier = await readSupplier(env, authorized, supplierId);
+  return controlJson(
+    linkBody({
+      supplier: {
+        supplierId,
+        name: supplier.kind === "found" ? supplier.name : null,
+      },
+      revision: link.value.revision,
+    }),
+  );
+}
+
+async function linkSender(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  integrationAccountIdRaw: string,
+): Promise<Response> {
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "admin",
+    true,
+  );
+  if (!authorized.ok) return authorized.response;
+  const accountId = parseIntegrationAccountId(integrationAccountIdRaw);
+  if (!accountId.ok) return controlError("agent_mailbox_missing", 404);
+  const body = await readJsonRecord(request);
+  const parsed = body.ok ? parseMailSenderLinkRequest(body.value) : null;
+  const address = parsed === null ? null : senderLinkAddress(parsed.address);
+  if (!body.ok || parsed === null || address === null)
+    return controlError("mailbox_sender_link_invalid", 422);
+  const boundary = await parseControlMutationBoundary({
+    request,
+    body: body.value,
+    requireConfigurationVersion: false,
+  });
+  if (!boundary.ok || boundary.value.kind !== "unversioned") {
+    return controlError(
+      boundary.ok ? "mutation_boundary_invalid" : boundary.error.code,
+      422,
+    );
+  }
+  const scope: ControlMutationReceiptScope = {
+    userId: authorized.authenticated.session.userId,
+    organisationScope: authorized.organisationId,
+    route: `/v1/control/organisations/${authorized.organisationId}/agent-mailboxes/${accountId.value}/sender-links`,
+    operation: "agent_mailbox.sender_link",
+  };
+  const replay = await readControlMutationReplay({
+    db: authorized.executionScope.database,
+    scope,
+    boundary: boundary.value,
+  });
+  if (replay.kind === "conflict")
+    return controlError("idempotency_key_conflict", 409);
+  if (replay.kind === "replay") {
+    return controlJson(
+      replay.receipt.responseBody,
+      replay.receipt.responseStatus,
+    );
+  }
+  const identity = await resolveUser({
+    db: env.DB,
+    userId: authorized.authenticated.session.userId,
+  });
+  if (identity === null) return controlError("app_user_missing", 401);
+  const mailbox = await activeGmailMailbox(authorized, accountId.value);
+  if (mailbox === null) return controlError("agent_mailbox_missing", 404);
+  // The mailbox does not answer itself.
+  if (address === mailbox.observedAddress.trim().toLowerCase())
+    return controlError("mailbox_sender_link_invalid", 422);
+  const supplier = await readSupplier(env, authorized, parsed.supplierId);
+  if (supplier.kind === "missing")
+    return controlError("mailbox_sender_supplier_missing", 404);
+  if (supplier.kind === "unavailable")
+    return controlError("mailbox_sender_link_unavailable", 503);
+  const now = Date.now();
+  const linked = await linkSenderToSupplier({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    integrationAccountId: accountId.value,
+    actorId: identity.userId,
+    address,
+    supplierId: parsed.supplierId,
+    expectedRevision: parsed.expectedRevision,
+    // One request is one command, also when it is sent again.
+    commandId: `mailbox_sender_link:${await sha256Hex(
+      `${identity.userId}\u0000${boundary.value.idempotencyKey}`,
+    )}`,
+    now,
+  });
+  if (!linked.ok)
+    return controlError(
+      linked.error.code,
+      linked.error.code === "mailbox_sender_link_unavailable" ? 503 : 409,
+    );
+  // Collected evidence that rests on an earlier revision of this
+  // verification is not used again.
+  try {
+    const organisation = await requireActiveOrganisationActorAtPlacement({
+      env,
+      placement: authorized.executionScope.placement,
+      organisationId: authorized.organisationId,
+      now: Date.now(),
+    });
+    await organisation.invalidateCaseContextCollectionVerification({
+      organisationId: authorized.organisationId,
+      verificationId: linked.value.verificationId,
+      revision: linked.value.revision,
+    });
+  } catch {
+    return controlError("mailbox_sender_link_unavailable", 503);
+  }
+  const responseBody = linkBody({
+    supplier: { supplierId: parsed.supplierId, name: supplier.name ?? null },
+    revision: linked.value.revision,
+  });
+  const recorded = await recordCommerceMutationReceipt({
+    authorized,
+    identity,
+    scope,
+    boundary: boundary.value,
+    request,
+    responseBody,
+    now,
+  });
+  if (!recorded.ok) return controlError(recorded.error.code, 409);
+  return controlJson(responseBody);
+}
+
+/** The mailbox when it is an active Gmail mailbox of this Organisation. */
+async function activeGmailMailbox(
+  authorized: AuthorizedOrganisationRequest,
+  integrationAccountId: IntegrationAccountId,
+): Promise<Readonly<{ observedAddress: string }> | null> {
+  const [mailbox, account] = await Promise.all([
+    readEmailMailboxAccount({
+      db: authorized.executionScope.database,
+      organisationId: authorized.organisationId,
+      integrationAccountId,
+    }),
+    resolveActiveProviderAccountContext({
+      db: authorized.executionScope.database,
+      organisationId: authorized.organisationId,
+      integrationAccountId,
+    }),
+  ]);
+  return mailbox.ok && account.ok && account.value.account.provider === "gmail"
+    ? { observedAddress: mailbox.value.observedAddress }
+    : null;
+}
+
+type SupplierRead =
+  | Readonly<{ kind: "found"; name: string }>
+  | Readonly<{ kind: "missing" | "unavailable"; name?: never }>;
+
+/**
+ * One supplier of the Organisation, read from its commerce data with the
+ * person's own read authority, as the Suppliers page reads it.
+ */
+async function readSupplier(
+  env: Env,
+  authorized: AuthorizedOrganisationRequest,
+  supplierId: string,
+): Promise<SupplierRead> {
+  let query;
+  try {
+    query = parseCommerceGraphQuery({
+      kind: "entity_by_ref",
+      reference: {
+        origin: "custom",
+        typeId: SUPPLIER_ENTITY_TYPE_ID,
+        entityId: supplierId,
+      },
+      traversal: { maxDepth: 0, resultLimit: 1 },
+      filter: null,
+    });
+  } catch {
+    return { kind: "missing" };
+  }
+  const graph = await openControlCommerceGraph(env, authorized);
+  if (!graph.ok) return { kind: "unavailable" };
+  const now = Date.now();
+  const authority = commerceGraphControlAuthority({
+    organisationId: authorized.organisationId,
+    merchantId: graph.value.merchantId,
+    principalId: authorized.authenticated.session.userId,
+    sensitivityCeiling: controlCommerceSensitivityCeiling(authorized),
+    query,
+    now,
+  });
+  if (!authority.ok) return { kind: "unavailable" };
+  let result;
+  try {
+    result = await graph.value.reader.query({
+      query,
+      authority: authority.value,
+      now: new Date(now).toISOString(),
+    });
+  } catch {
+    return { kind: "unavailable" };
+  }
+  if (!result.ok) return { kind: "unavailable" };
+  for (const entity of result.value.entities)
+    if (
+      entity.reference.origin === "custom" &&
+      entity.reference.typeId === SUPPLIER_ENTITY_TYPE_ID &&
+      entity.reference.entityId === supplierId
+    )
+      return { kind: "found", name: entity.displayName };
+  return { kind: "missing" };
+}
+
+function linkBody(link: MailSenderLink): Readonly<{
+  ok: true;
+  link: MailSenderLink;
+}> {
+  return { ok: true, link };
+}

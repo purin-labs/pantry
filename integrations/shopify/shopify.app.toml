@@ -1,0 +1,21 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "54e4960b970012a1e8259fc94237602d"
+application_url = "https://satyr-edge.n6378056.workers.dev/portal"
+embedded = false
+name = "Nuki"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_inventory,read_orders,read_products,read_publications,write_inventory,write_orders"
+optional_scopes = [ ]
+use_legacy_install_flow = true
+
+[auth]
+redirect_urls = [
+  "https://satyr-edge.n6378056.workers.dev/v1/control/providers/shopify/callback",
+  "https://localhost:3003/v1/control/providers/shopify/callback"
+]
+
+[webhooks]
+api_version = "2026-07"

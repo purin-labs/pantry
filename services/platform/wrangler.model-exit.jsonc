@@ -1,0 +1,47 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The model exit Worker (Plan 73). The Platform Worker sends each direct
+  // request to a model provider through it: the ChatGPT subscription, the
+  // BYO OpenAI and Anthropic keys and the Claude account, with their
+  // sign-in, refresh and allowance requests. OpenAI and Anthropic refuse
+  // requests from Hong Kong, and a Session with the "apac" location hint
+  // can run there. This Worker runs near AWS Tokyo, so the provider sees a
+  // Japanese address.
+  //
+  // It has no route, no credential and no binding except its profile
+  // variable. The Platform Worker reaches it through the service binding
+  // MODEL_EXIT. Deploy this Worker before the platform Worker that binds it.
+  // `pnpm --filter @seams/platform model-exit:check` checks this profile.
+  "main": "src/model-exit/worker.ts",
+  "compatibility_date": "2026-07-07",
+  "workers_dev": false,
+  // Cloudflare runs the fetch handler in the data centre closest to AWS
+  // Tokyo. Never use Smart Placement here: it would move the Worker toward
+  // the providers, in the United States.
+  "placement": {
+    "region": "aws:ap-northeast-1",
+  },
+  "observability": {
+    "enabled": true,
+    // The Worker's own trace lines name the host, the status and the data
+    // centre. Cloudflare's invocation record would also keep the request
+    // and the response of each call, which this Worker must not log.
+    "logs": {
+      "invocation_logs": false,
+    },
+  },
+  "env": {
+    "local": {
+      "name": "satyr-model-exit-local",
+      "vars": { "SATYR_DEPLOYMENT_PROFILE": "local" },
+    },
+    "staging": {
+      "name": "satyr-model-exit-staging",
+      "vars": { "SATYR_DEPLOYMENT_PROFILE": "staging" },
+    },
+    "production": {
+      "name": "satyr-model-exit",
+      "vars": { "SATYR_DEPLOYMENT_PROFILE": "production" },
+    },
+  },
+}

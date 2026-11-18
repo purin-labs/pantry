@@ -1,0 +1,2 @@
+
+export type PrincipalId = string;

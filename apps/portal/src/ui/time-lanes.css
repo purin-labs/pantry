@@ -1,0 +1,641 @@
+/* Items on a time axis (time-lanes.tsx). Each tone is one owner or state;
+   colours follow the portal theme, light and dark. */
+:root {
+  --lanes-violet: oklch(0.58 0.15 285);
+  --lanes-blue: oklch(0.6 0.12 235);
+  --lanes-green: oklch(0.58 0.1 170);
+  --lanes-coral: oklch(0.64 0.16 40);
+  --lanes-coral-text: oklch(0.5 0.15 38);
+  --lanes-red: oklch(0.56 0.18 25);
+  --lanes-grey: oklch(0.66 0.01 70);
+  --lanes-link: oklch(0.68 0.01 60);
+  --lanes-link-on: var(--ink-2);
+  /* Each control has this height; the buttons inside a pill keep its inset. */
+  --lanes-control: 36px;
+  --lanes-control-inner: calc(var(--lanes-control) - 6px);
+}
+
+@media (pointer: coarse) {
+  :root {
+    --lanes-control: 44px;
+  }
+}
+
+:root[data-portal-theme="dark"] {
+  --lanes-violet: oklch(0.74 0.11 285);
+  --lanes-blue: oklch(0.78 0.09 235);
+  --lanes-green: oklch(0.78 0.09 170);
+  --lanes-coral: oklch(0.74 0.13 40);
+  --lanes-coral-text: oklch(0.8 0.1 45);
+  --lanes-red: oklch(0.7 0.15 25);
+  --lanes-grey: oklch(0.6 0.01 70);
+  --lanes-link: oklch(0.55 0.01 60);
+}
+
+.time-lanes {
+  overflow-x: auto;
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.time-lanes-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pantry-space-2) var(--pantry-space-4);
+  margin: 0;
+  padding: var(--pantry-space-3) var(--pantry-space-4);
+  border-block-end: 1px solid var(--border);
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  list-style: none;
+}
+
+.time-lanes-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.time-lanes-key i {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 5px;
+  background: var(--lanes-violet);
+  color: var(--paper);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.time-lanes-key i[data-tone="blue"] {
+  background: var(--lanes-blue);
+}
+
+.time-lanes-key i[data-tone="green"] {
+  background: var(--lanes-green);
+}
+
+.time-lanes-key i[data-tone="red"] {
+  background: var(--lanes-red);
+}
+
+.time-lanes-key i[data-tone="grey"] {
+  background: var(--lanes-grey);
+}
+
+.time-lanes-key i[data-tone="coral"] {
+  background: var(--lanes-coral);
+}
+
+.time-lanes-key i[data-shape="person"] {
+  border-radius: 50%;
+}
+
+.time-lanes-key-link span {
+  position: relative;
+  inline-size: 26px;
+  block-size: 10px;
+  border-block-end: 1.5px solid var(--lanes-link);
+  border-inline-start: 1.5px solid var(--lanes-link);
+  border-end-start-radius: 8px;
+  transform: translateY(-4px);
+}
+
+.time-lanes-stage {
+  position: relative;
+}
+
+.time-lanes-canvas {
+  display: block;
+  /* A drag moves the time window; a vertical swipe still scrolls the page. */
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.time-lanes-canvas:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: -2px;
+}
+
+.time-lanes-stage.is-panning :is(.time-lanes-canvas, .time-lanes-item) {
+  cursor: grabbing;
+}
+
+.time-lanes-future {
+  fill: var(--ground);
+  opacity: 0.55;
+}
+
+.time-lanes-grid {
+  stroke: var(--border);
+  stroke-opacity: 0.7;
+}
+
+.time-lanes-rule {
+  stroke: var(--border);
+}
+
+.time-lanes-axis {
+  fill: var(--ink-3);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-lanes-section {
+  fill: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.time-lanes-section.is-emphasis {
+  fill: var(--lanes-coral-text);
+  font-weight: 600;
+}
+
+.time-lanes-section-count {
+  fill: var(--ink-3);
+  font-weight: 400;
+}
+
+.time-lanes-now {
+  stroke: var(--lanes-coral);
+  stroke-width: 1.5;
+}
+
+.time-lanes-now-pill {
+  fill: var(--lanes-coral);
+}
+
+.time-lanes-now-text {
+  fill: var(--paper);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-lanes-link-line {
+  fill: none;
+  stroke: var(--lanes-link);
+  stroke-width: 1.4;
+}
+
+.time-lanes-link-head {
+  fill: var(--lanes-link);
+}
+
+.time-lanes-link-start {
+  fill: var(--paper);
+  stroke: var(--lanes-link);
+  stroke-width: 1.4;
+}
+
+.time-lanes-link.is-on .time-lanes-link-line {
+  stroke: var(--lanes-link-on);
+  stroke-width: 1.9;
+}
+
+.time-lanes-link.is-on .time-lanes-link-head {
+  fill: var(--lanes-link-on);
+}
+
+.time-lanes-link.is-on .time-lanes-link-start {
+  stroke: var(--lanes-link-on);
+}
+
+.time-lanes-item {
+  cursor: pointer;
+  outline: none;
+}
+
+.time-lanes-hit {
+  fill: transparent;
+}
+
+.time-lanes-seg {
+  fill: var(--lanes-violet);
+}
+
+.time-lanes-seg[data-tone="blue"] {
+  fill: var(--lanes-blue);
+}
+
+.time-lanes-seg[data-tone="green"] {
+  fill: var(--lanes-green);
+}
+
+.time-lanes-seg[data-tone="coral"] {
+  fill: var(--lanes-coral);
+}
+
+.time-lanes-seg[data-tone="red"] {
+  fill: var(--lanes-red);
+}
+
+.time-lanes-seg[data-tone="grey"] {
+  fill: var(--lanes-grey);
+}
+
+.time-lanes-seg.is-wait {
+  fill: color-mix(in oklch, var(--lanes-coral) 22%, var(--surface));
+}
+
+.time-lanes-hatch {
+  fill: var(--lanes-coral);
+}
+
+.time-lanes-item.is-muted .time-lanes-bar {
+  opacity: 0.6;
+}
+
+.time-lanes-ring {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  opacity: 0;
+}
+
+.time-lanes-item.is-active .time-lanes-ring,
+.time-lanes-item:focus-visible .time-lanes-ring {
+  opacity: 1;
+}
+
+.time-lanes-item:focus-visible .time-lanes-ring {
+  stroke: var(--pantry-focus);
+  stroke-width: 2;
+}
+
+.time-lanes-label-back {
+  fill: var(--paper);
+}
+
+.time-lanes-avatar rect,
+.time-lanes-avatar circle {
+  fill: var(--lanes-violet);
+  stroke: var(--paper);
+  stroke-width: 1.5;
+}
+
+.time-lanes-avatar[data-tone="blue"] rect {
+  fill: var(--lanes-blue);
+}
+
+.time-lanes-avatar[data-tone="green"] rect {
+  fill: var(--lanes-green);
+}
+
+.time-lanes-avatar[data-tone="coral"] :is(rect, circle) {
+  fill: var(--lanes-coral);
+}
+
+.time-lanes-avatar[data-tone="red"] :is(rect, circle) {
+  fill: var(--lanes-red);
+}
+
+.time-lanes-avatar[data-tone="grey"] :is(rect, circle) {
+  fill: var(--lanes-grey);
+}
+
+.time-lanes-avatar text {
+  fill: var(--paper);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.time-lanes-avatar svg {
+  color: var(--paper);
+}
+
+.time-lanes-title,
+.time-lanes-suffix {
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.time-lanes-title {
+  fill: var(--ink);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.time-lanes-title.is-untitled {
+  fill: var(--ink-2);
+  font-weight: 400;
+}
+
+.time-lanes-item.is-muted .time-lanes-title {
+  fill: var(--ink-2);
+  font-weight: 400;
+}
+
+.time-lanes-suffix {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-lanes-suffix[data-tone="coral"] {
+  fill: var(--lanes-coral-text);
+}
+
+.time-lanes-suffix[data-tone="red"] {
+  fill: var(--danger-text);
+}
+
+.time-lanes-suffix[data-tone="grey"] {
+  fill: var(--ink-2);
+}
+
+.time-lanes-suffix[data-tone="violet"] {
+  fill: var(--lanes-violet);
+}
+
+.time-lanes-suffix[data-tone="blue"] {
+  fill: var(--lanes-blue);
+}
+
+.time-lanes-suffix[data-tone="green"] {
+  fill: var(--lanes-green);
+}
+
+.time-lanes-card {
+  position: absolute;
+  z-index: 2;
+  inline-size: 320px;
+  padding: var(--pantry-space-3) var(--pantry-space-4);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 14px 36px oklch(0.2 0.01 60 / 16%);
+  font-size: 0.8125rem;
+}
+
+:root[data-portal-theme="dark"] .time-lanes-card {
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 14px 36px oklch(0 0 0 / 45%);
+}
+
+.time-lanes-card-meta {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: var(--pantry-text-caption);
+}
+
+.time-lanes-card h4 {
+  margin: 2px 0 var(--pantry-space-3);
+  color: var(--ink-strong);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.time-lanes-card h4.is-untitled {
+  color: var(--ink-2);
+}
+
+.time-lanes-card-steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.time-lanes-card-steps li {
+  display: grid;
+  grid-template-columns: 40px 10px minmax(0, 1fr);
+  gap: 6px;
+  align-items: baseline;
+  color: var(--ink-2);
+  line-height: 1.35;
+}
+
+.time-lanes-card-steps[data-dated] li {
+  grid-template-columns: 84px 10px minmax(0, 1fr);
+}
+
+.time-lanes-card-steps time {
+  color: var(--ink-3);
+  font-size: var(--pantry-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.time-lanes-card-steps i {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 2px;
+  background: var(--lanes-violet);
+}
+
+.time-lanes-card-steps li[data-tone="wait"] i {
+  background: var(--lanes-coral);
+}
+
+.time-lanes-card-steps li[data-tone="failed"] i {
+  background: var(--danger-text);
+}
+
+.time-lanes-card-steps li[data-tone="done"] i {
+  background: var(--ok-text);
+}
+
+.time-lanes-card-steps li[data-tone="wait"]:last-child {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.time-lanes-card-note {
+  margin: var(--pantry-space-2) 0 0;
+  color: var(--ink-3);
+  font-size: var(--pantry-text-caption);
+}
+
+.time-lanes-card-links {
+  display: grid;
+  gap: 4px;
+  margin-block-start: var(--pantry-space-3);
+  padding-block-start: var(--pantry-space-3);
+  border-block-start: 1px solid var(--border);
+  color: var(--ink-2);
+}
+
+.time-lanes-card-links p {
+  margin: 0;
+}
+
+.time-lanes-card-links b {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.time-lanes-card-actions {
+  display: flex;
+  gap: var(--pantry-space-2);
+  margin-block-start: var(--pantry-space-3);
+}
+
+.time-lanes-card-actions button:not(:where(.pantry-select-trigger)) {
+  white-space: nowrap;
+}
+
+/* The bar above a timeline: the span, the period, Fit and a summary. */
+/* A toolbar and the timeline or the empty state under it. */
+.time-lanes-frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--pantry-space-4);
+}
+
+.time-lanes-toolbar {
+  container-type: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pantry-space-2) var(--pantry-space-3);
+  font-size: 0.875rem;
+}
+
+.time-lanes-spans {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-block-size: var(--lanes-control);
+  padding: 3px;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--paper);
+  box-shadow: var(--pantry-button-ring);
+}
+
+.time-lanes-spans button:not(:where(.pantry-select-trigger)) {
+  min-height: var(--lanes-control-inner);
+  padding: 0 var(--pantry-space-3);
+  font-size: 0.875rem;
+  border-radius: var(--pantry-radius-pill);
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.time-lanes-spans button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.time-lanes-day {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pantry-space-1);
+  min-block-size: var(--lanes-control);
+  padding: 3px;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--pantry-border) inset;
+}
+
+/* Wide enough for the usual labels, so Fit stays still between the ranges. */
+.time-lanes-day b {
+  flex: 1;
+  min-inline-size: 13rem;
+  padding-inline: var(--pantry-space-2);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.time-lanes-step {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--lanes-control-inner);
+  min-height: var(--lanes-control-inner);
+  block-size: var(--lanes-control-inner);
+  padding: 0;
+  border-radius: var(--pantry-radius-pill);
+  background: transparent;
+  color: var(--ink-2);
+  box-shadow: none;
+}
+
+.time-lanes-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pantry-space-4);
+  margin-inline-start: auto;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+
+.time-lanes-summary b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.time-lanes-summary-wait b {
+  color: var(--lanes-coral-text);
+}
+
+.time-lanes-toolbar .time-lanes-fit {
+  min-height: var(--lanes-control);
+  padding-inline: var(--pantry-space-3);
+  font-size: inherit;
+  font-weight: 500;
+}
+
+/* On a narrow page the period fills its row and the summary starts at the edge. */
+@container (max-width: 760px) {
+  .time-lanes-summary {
+    inline-size: 100%;
+    margin-inline-start: 0;
+  }
+}
+
+@container (max-width: 480px) {
+  .time-lanes-day {
+    flex: 1 1 100%;
+  }
+
+  .time-lanes-day b {
+    min-inline-size: 0;
+  }
+}
+
+.time-lanes-summary-failed b {
+  color: var(--danger-text);
+}
+
+/* An error fills the width that the timeline would. */
+.time-lanes-frame > .home-recovery {
+  inline-size: 100%;
+  max-inline-size: none;
+}
+
+.time-lanes-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.time-lanes-note a {
+  color: var(--pantry-link);
+}
+
+/* A list and its timeline, with the switch above them. */
+.orders-display {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--pantry-space-4);
+  margin-block-end: var(--pantry-space-4);
+}
+
+.orders-display > .time-lanes-spans {
+  justify-self: start;
+}

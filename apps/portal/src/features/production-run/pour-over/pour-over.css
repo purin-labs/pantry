@@ -1,0 +1,143 @@
+.pour-over-station {
+  position: relative;
+  height: 100%;
+}
+.pour-over-canvas {
+  height: 100%;
+  min-height: 560px;
+}
+.pour-over-camera-bar {
+  position: absolute;
+  right: 12px;
+  bottom: max(108px, var(--chrome-bottom, 108px));
+  max-width: calc(100% - 24px);
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+.pour-over-camera-bar button:not(:where(.pantry-select-trigger)) {
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.pour-over-camera-bar button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.pour-over-status {
+  position: absolute;
+  top: var(--chrome-status-top, 64px);
+  right: 12px;
+  z-index: 3;
+  width: min(316px, calc(100% - 24px));
+  max-height: calc(
+    100% - var(--chrome-status-top, 64px) -
+      max(126px, var(--chrome-bottom, 126px))
+  );
+  overflow: auto;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  font-size: 0.78rem;
+}
+/* The page header spans the width here, so the readout starts below it. */
+@media (max-width: 1180px) {
+  .pour-over-status {
+    top: max(132px, var(--chrome-status-top, 132px));
+    max-height: calc(
+      100% - max(132px, var(--chrome-status-top, 132px)) -
+        max(126px, var(--chrome-bottom, 126px))
+    );
+  }
+}
+.pour-over-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.pour-over-step-pill {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.pour-over-step-pill span {
+  color: var(--muted);
+}
+.pour-over-step-pill[data-step-state="active"] {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
+}
+.pour-over-step-pill[data-step-state="done"] {
+  background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+}
+.pour-over-status dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  margin: 0;
+}
+.pour-over-status dt {
+  color: var(--muted);
+}
+.pour-over-status dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.pour-over-status h4 {
+  margin: 12px 0 4px;
+  font-size: 0.8rem;
+}
+.pour-over-status ul {
+  margin: 0;
+  padding-left: 16px;
+}
+.pour-over-status details {
+  margin-top: 8px;
+}
+.pour-over-status [role="alert"] {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.pour-over-note {
+  position: absolute;
+  left: 16px;
+  bottom: max(108px, var(--chrome-bottom, 108px));
+  z-index: 2;
+  max-width: min(340px, calc(100% - 32px));
+  margin: 0;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+@container station-pane (max-width: 720px) {
+  .pour-over-note {
+    display: none;
+  }
+}

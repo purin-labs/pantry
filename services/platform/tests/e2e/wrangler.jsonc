@@ -1,0 +1,131 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "satyr-edge-e2e",
+  "main": "./runtime-worker.ts",
+  "compatibility_date": "2026-07-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "../../../../apps/portal/public",
+    "binding": "ASSETS",
+  },
+  "secrets_store_secrets": [
+    {
+      "binding": "DATA_ENCRYPTION_ROOT",
+      "store_id": "00000000000000000000000000000001",
+      "secret_name": "data-encryption-root-e2e",
+    },
+    {
+      "binding": "VAULT_ROOT_V1",
+      "store_id": "00000000000000000000000000000001",
+      "secret_name": "vault-root-v1-e2e",
+    },
+    {
+      "binding": "VAULT_ROOT_V2",
+      "store_id": "00000000000000000000000000000001",
+      "secret_name": "vault-root-v2-e2e",
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "MESSAGE_LINK_FETCH", "class_name": "MessageLinkFetchContainer" },
+      { "name": "CUSTOM_CONNECTOR_FETCH", "class_name": "CustomConnectorFetchContainer" },
+      {
+        "name": "ORGANISATION",
+        "class_name": "OrganisationDO",
+      },
+      {
+        "name": "SESSION",
+        "class_name": "SessionDO",
+      },
+      {
+        "name": "CASE",
+        "class_name": "CaseDO",
+      },
+      {
+        "name": "CONNECTOR",
+        "class_name": "ConnectorDO",
+      },
+      {
+        "name": "CODE_MODE_PLATFORM_GOVERNOR_ACTOR",
+        "class_name": "CodeModePlatformGovernorActor",
+      },
+      {
+        "name": "CONVERSATION_RESIDENCY",
+        "class_name": "ConversationResidencyActor",
+      },
+      {
+        "name": "DEVICE_FLEET",
+        "class_name": "DeviceFleetActor",
+      },
+    ],
+  },
+  "exports": {
+    "MessageLinkFetchContainer": { "type": "durable-object", "storage": "sqlite" },
+    "CustomConnectorFetchContainer": { "type": "durable-object", "storage": "sqlite" },
+    "OrganisationDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "SessionDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CaseDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "ConnectorDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CodeModePlatformGovernorActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "ConversationResidencyActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "DeviceFleetActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+  },
+  "d1_databases": [
+    { "binding": "ORGANISATION_DB_WNAM", "database_name": "satyr-e2e-wnam", "database_id": "00000000-0000-0000-0000-000000000002" },
+    { "binding": "ORGANISATION_DB_APAC", "database_name": "satyr-e2e-apac", "database_id": "00000000-0000-0000-0000-000000000003" },
+    {
+      "binding": "DB",
+      "database_name": "satyr-e2e",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "POLICY_KV",
+      "id": "00000000000000000000000000000001",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ARCHIVE",
+      "bucket_name": "satyr-e2e-archive",
+    },
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "EVENT_Q",
+        "queue": "satyr-events",
+      },
+      {
+        "binding": "CUE_Q",
+        "queue": "satyr-cues",
+      },
+    ],
+    "consumers": [
+      { "queue": "satyr-events", "max_batch_size": 1, "max_batch_timeout": 1 },
+      { "queue": "satyr-cues", "max_batch_size": 1, "max_batch_timeout": 1 },
+    ],
+  },
+}

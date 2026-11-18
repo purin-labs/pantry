@@ -1,0 +1,195 @@
+.product-dossier {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding-top: 0;
+  border-top: 0;
+}
+.product-dossier > .commerce-back,
+.product-dossier > .section-heading,
+.product-dossier > .description-draft-section,
+.product-dossier > .commerce-dossier-actions,
+.product-dossier > .notice {
+  grid-column: 1 / -1;
+}
+.product-dossier > .commerce-dossier-actions {
+  margin: 0;
+}
+.product-dossier > button:not(:where(.pantry-select-trigger)).commerce-back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+.product-dossier > button:not(:where(.pantry-select-trigger)).commerce-back:hover {
+  background: color-mix(in srgb, var(--ink) 10%, var(--paper));
+  color: var(--ink);
+}
+.product-dossier > .section-heading {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 8px;
+}
+.product-dossier .section-heading h1 {
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+.product-dossier .section-heading p {
+  color: var(--ink-2);
+  font-size: 13px;
+  margin-block-start: 6px;
+}
+.product-detail-icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  flex: none;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink-2);
+}
+.product-dossier > .commerce-dossier-section {
+  min-width: 0;
+  margin: 0;
+  padding: 24px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.product-dossier .commerce-dossier-section h3 {
+  font-size: 15px;
+  font-weight: 550;
+  margin-block-end: 12px;
+}
+.product-dossier .empty-state.commerce-empty {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.product-dossier .description-draft-heading {
+  align-items: center;
+  flex-wrap: wrap;
+}
+.product-dossier .description-draft-heading p {
+  font-size: 14px;
+}
+.product-dossier .commerce-facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.product-sale-details {
+  display: grid;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.product-sale-details img {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  outline: 1px solid oklch(0 0 0 / 0.1);
+  outline-offset: -1px;
+}
+.product-sale-details strong {
+  font-size: 18px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.product-sale-details p {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+}
+.product-photos {
+  display: grid;
+  gap: 12px;
+}
+.product-photo-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* The main photo leads at full width; the others follow as a row. */
+.product-photo:first-child {
+  grid-column: 1 / -1;
+}
+.product-photo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+}
+.product-photo img {
+  flex: 1 0 100%;
+}
+.product-photo:not(:first-child) img {
+  border-radius: 8px;
+}
+.product-photo-main {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.product-photo-actions {
+  display: inline-flex;
+  margin-inline-start: auto;
+}
+.product-photo-actions button:not(:where(.pantry-select-trigger)).icon-button {
+  min-width: 32px;
+  min-height: 32px;
+}
+.product-photo-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.product-photo-add button:not(:where(.pantry-select-trigger)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.product-sale-details .product-photos-notice {
+  margin: 0;
+  color: var(--danger-text);
+}
+.product-dossier .commerce-fact-prose {
+  grid-column: 1 / -1;
+}
+.product-dossier .commerce-fact-prose dd {
+  max-width: 70ch;
+}
+@media (max-width: 760px) {
+  .product-dossier {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .product-dossier > .commerce-dossier-section {
+    padding: 20px;
+  }
+}

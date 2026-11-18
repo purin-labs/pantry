@@ -1,0 +1,17 @@
+{
+  "limit": 3000,
+  "files": {
+    "apps/portal/src/features/chat/route.tsx": 4255,
+    "apps/portal/src/features/commerce/entity-plane/route.tsx": 4051,
+    "apps/portal/src/features/production-run/morning-shift-appliances.ts": 3681,
+    "apps/portal/src/features/production-run/recipe-workflow-graph.tsx": 3053,
+    "apps/portal/src/features/workflow-simulator/bakery-surface.ts": 3908,
+    "apps/portal/src/features/workflow-simulator/production-workspace.tsx": 5188,
+    "apps/storefront/src/storefront.tsx": 9335,
+    "packages/bakery-model/src/bakery-surface.ts": 4991,
+    "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3819,
+    "packages/production-simulation/src/recipes/bakery/schedule.ts": 4510,
+    "packages/commerce-contracts/src/records/commerce-records.ts": 3309,
+    "scripts/plan-50/evaluate-pi-durable.mjs": 5444
+  }
+}

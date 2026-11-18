@@ -1,0 +1,366 @@
+@font-face {
+  font-family: "Geist";
+  src: url("./fonts/geist-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("./fonts/geist-mono-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+/* Sampled from the supplied video. These colors belong to the reference page;
+   Trace continues to inherit Portal's semantic colors in production. */
+:root:has(.trace-preview) {
+  font-family: "Geist", var(--pantry-font-sans);
+  --ground: #f3f3f3;
+  --paper: #fdfdfd;
+  --surface: #efefef;
+  --border: #e5e5e5;
+  --ink: #171717;
+  --ink-strong: #171717;
+  --ink-2: #737373;
+  --ink-3: #a3a3a3;
+}
+:root[data-portal-theme="dark"]:has(.trace-preview) {
+  --ground: #171717;
+  --paper: #202020;
+  --surface: #292929;
+  --border: #383838;
+  --ink: #f5f5f5;
+  --ink-strong: #ffffff;
+  --ink-2: #a3a3a3;
+  --ink-3: #737373;
+}
+.trace-preview {
+  max-width: 1888px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+.trace-preview-header,
+.trace-preview-live-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-block-end: 32px;
+}
+.trace-preview-header h1 {
+  margin: 8px 0;
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.trace-preview-header {
+  margin-block-end: 0;
+}
+.trace-preview-header p,
+.trace-preview-live-heading p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.trace-preview-header .trace-preview-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+.trace-preview-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.trace-preview-controls :is(button:not(:where(.pantry-select-trigger)), button:where(.pantry-select-trigger)) {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 12px;
+  cursor: pointer;
+}
+.trace-preview-controls label {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.trace-preview-controls button:not(:where(.pantry-select-trigger)):disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.trace-preview-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 48px;
+  position: relative;
+  isolation: isolate;
+}
+.trace-preview-gallery .pantry-trace {
+  gap: var(--pantry-space-4);
+}
+.trace-preview-card
+  > .pantry-trace
+  > .pantry-trace-collapsible
+  > .pantry-trace-collapsible-content
+  > .pantry-trace-collapsible-content-inner {
+  margin-block-start: var(--pantry-space-4);
+}
+.trace-preview-gallery [data-status="error"],
+.trace-preview-gallery
+  .pantry-trace-collapsible-trigger:has([data-status="error"]) {
+  color: var(--ink);
+}
+.trace-preview-example {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transform-origin: top left;
+}
+.trace-preview-card {
+  flex: 1;
+  position: relative;
+  min-height: 284px;
+  padding: 44px 20px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-control);
+  isolation: isolate;
+}
+.trace-preview-card-surface {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+  border-radius: var(--pantry-radius-control);
+  background: var(--paper);
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.03),
+    0 16px 24px -8px rgb(0 0 0 / 0.12);
+}
+.trace-preview-example:last-child h2 {
+  color: var(--ink);
+}
+.trace-preview-dots {
+  position: absolute;
+  display: flex;
+  top: 10px;
+  left: 10px;
+  gap: 4px;
+}
+.trace-preview-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.trace-preview-example h2 {
+  margin: 18px 0 0;
+  font-size: clamp(18px, 1.75vw, 32px);
+  font-weight: 400;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--ink-2);
+}
+.trace-preview-output {
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 10px;
+  font-family:
+    "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.6;
+  white-space: pre;
+  tab-size: 2;
+}
+.trace-preview-output + .trace-preview-output {
+  margin-top: 8px;
+}
+.trace-preview-output code {
+  font: inherit;
+}
+.trace-preview-terminal-line {
+  white-space: pre;
+}
+.trace-reference-stage {
+  position: relative;
+  overflow: clip;
+  padding: 24px;
+  margin: -24px;
+}
+.trace-reference-backdrop {
+  display: none;
+  inset: auto;
+  z-index: 0;
+  transform-origin: top left;
+}
+.trace-reference-stage[data-replaying] .trace-reference-backdrop {
+  display: block;
+}
+.trace-reference-stage[data-replaying] h2 {
+  color: var(--ink);
+}
+.trace-reference-stage[data-overview] h2 {
+  color: var(--ink-2);
+}
+.trace-reference-stage[data-overview] .trace-preview-example:last-child h2 {
+  color: var(--ink);
+}
+.trace-reference-stage[data-replaying] .trace-preview-card {
+  overflow: hidden;
+}
+.trace-reference-stage[data-replaying] .pantry-trace-icon[data-spinning] {
+  animation: none;
+}
+.trace-reference-stage h2 {
+  transform-origin: center top;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trace-reference-stage
+    :is(
+      .trace-preview-example,
+      h2,
+      .trace-preview-terminal-line,
+      [data-spinning]
+    ) {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .trace-reference-stage .trace-reference-backdrop {
+    display: none !important;
+  }
+  .trace-reference-stage .trace-preview-card-surface {
+    opacity: 1 !important;
+  }
+}
+:root[data-agent-preview-motion="reduced"]
+  .trace-reference-stage
+  :is(
+    .trace-preview-example,
+    h2,
+    .trace-preview-terminal-line,
+    [data-spinning]
+  ) {
+  transform: none !important;
+  opacity: 1 !important;
+}
+:root[data-agent-preview-motion="reduced"]
+  .trace-reference-stage
+  .trace-reference-backdrop {
+  display: none !important;
+}
+:root[data-agent-preview-motion="reduced"]
+  .trace-reference-stage
+  .trace-preview-card-surface {
+  opacity: 1 !important;
+}
+.trace-reference-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.trace-reference-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.trace-reference-controls input {
+  width: 120px;
+  accent-color: var(--ink-2);
+}
+.trace-reference-controls output {
+  min-width: 58px;
+  font-variant-numeric: tabular-nums;
+}
+.trace-preview-live {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.trace-preview-live h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 500;
+}
+.trace-preview-turn {
+  max-width: 680px;
+  min-height: 220px;
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+}
+.trace-preview-prompt {
+  margin: 0 0 24px;
+  font-size: 15px;
+}
+.trace-preview-answer {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 24px 0 0;
+}
+.trace-preview-progress {
+  color: var(--ink-3);
+  font-size: 11px;
+  margin: 24px 0 0;
+}
+.trace-preview footer {
+  margin-top: 32px;
+  color: var(--ink-2);
+  font-size: 12px;
+  text-align: center;
+}
+.trace-preview footer a {
+  color: inherit;
+}
+.trace-preview-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 1199px) {
+  .trace-preview-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 24px;
+  }
+}
+@media (max-width: 639px) {
+  .trace-reference-stage {
+    padding: 16px;
+    margin: -16px;
+  }
+  .trace-preview {
+    padding: 24px 16px;
+  }
+  .trace-preview-gallery {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .trace-preview-header,
+  .trace-preview-live-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .trace-preview-turn {
+    padding: 20px;
+  }
+}

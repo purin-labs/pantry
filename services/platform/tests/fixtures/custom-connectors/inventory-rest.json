@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "name": "Inventory API",
+  "description": "Read an inventory account and search its product catalog.",
+  "origin": "https://api.inventory.example",
+  "authentication": { "kind": "bearer" },
+  "documentation": [
+    {
+      "url": "https://developers.inventory.example/api",
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  ],
+  "operations": [
+    {
+      "id": "current_account",
+      "description": "Read the inventory account attached to the API key.",
+      "effect": { "kind": "read" },
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "transport": {
+        "kind": "rest",
+        "method": "GET",
+        "pathTemplate": "/v1/account",
+        "pathBindings": {},
+        "queryBindings": {},
+        "bodyBindings": null
+      },
+      "response": {
+        "successStatuses": [200],
+        "resultPointer": "/account",
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "name": { "type": "string", "minLength": 1, "maxLength": 120 }
+          },
+          "required": ["id", "name"],
+          "additionalProperties": false
+        },
+        "classification": "internal"
+      },
+      "pagination": { "kind": "none" }
+    },
+    {
+      "id": "search_products",
+      "description": "Search products using a fixed JSON request shape.",
+      "effect": { "kind": "read" },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "query": { "type": "string", "minLength": 1, "maxLength": 200 }
+        },
+        "required": ["query"],
+        "additionalProperties": false
+      },
+      "transport": {
+        "kind": "rest",
+        "method": "POST",
+        "pathTemplate": "/v1/products/search",
+        "pathBindings": {},
+        "queryBindings": {},
+        "bodyBindings": {
+          "cursor": { "kind": "input", "field": "cursor" },
+          "query": { "kind": "input", "field": "query" },
+          "status": { "kind": "constant", "value": "active" }
+        }
+      },
+      "response": {
+        "successStatuses": [200],
+        "resultPointer": "/data",
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "nextCursor": {
+              "type": ["string", "null"],
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "sku": { "type": "string", "minLength": 1, "maxLength": 80 }
+                },
+                "required": ["name", "sku"],
+                "additionalProperties": false
+              },
+              "minItems": 0,
+              "maxItems": 100
+            }
+          },
+          "required": ["nextCursor", "products"],
+          "additionalProperties": false
+        },
+        "classification": "confidential"
+      },
+      "pagination": {
+        "kind": "cursor",
+        "cursorInput": "cursor",
+        "nextCursorPointer": "/nextCursor"
+      }
+    }
+  ],
+  "identity": {
+    "operationId": "current_account",
+    "arguments": {},
+    "accountIdPointer": "/id",
+    "displayNamePointer": "/name"
+  },
+  "limits": {}
+}

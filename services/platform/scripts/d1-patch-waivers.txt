@@ -1,0 +1,4 @@
+# Baseline objects that need no patch script because no deployed database holds them.
+# One entry per line: <table, index or trigger name>: <reason>
+# `pnpm lint:d1-patch` reads this file. Add an entry only when no deployed
+# database needs the change; otherwise write a patch script that names the object.

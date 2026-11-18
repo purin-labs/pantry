@@ -1,0 +1,45 @@
+{
+  "name": "@seams/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "description": "Satyr contract schemas in TypeScript (Plan 78).",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./browser-validators": "./src/browser-validators.ts",
+    "./connector-rpc": "./src/connector-rpc.ts",
+    "./case-rpc": "./src/case-rpc.ts",
+    "./media-wasm": {
+      "types": "./src/media-wasm.d.ts",
+      "default": "./media-wasm-pkg/media_inspect.js"
+    },
+    "./media-inspect": "./src/media-inspect.ts",
+    "./workspace-executor": "./src/workspace-executor.ts",
+    "./model-route": "./src/model-route.ts",
+    "./digest-encoders": "./src/digest-encoders.ts",
+    "./session-reducer": "./src/session-reducer.ts",
+    "./session-schemas": "./src/session-schemas.ts",
+    "./message": "./src/message.ts",
+    "./attachment-preparation": "./src/attachment-preparation.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "check:types": "tsrs --noEmit",
+    "executor:generate": "node scripts/generate-executor-wire.mjs",
+    "executor:check": "node scripts/generate-executor-wire.mjs --check",
+    "media:build": "pnpm executor:check && wasm-pack build ../../crates/media-inspect --target web --release --out-dir ../../packages/contracts/media-wasm-pkg"
+  },
+  "dependencies": {
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams/commerce-contracts": "workspace:*",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

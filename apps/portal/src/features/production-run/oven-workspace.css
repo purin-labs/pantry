@@ -1,0 +1,1683 @@
+.production-cell-scenes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  gap: 16px;
+}
+
+.production-cell-scenes > div {
+  min-width: 0;
+}
+
+.oven-workspace-cells {
+  margin-block: 16px;
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.oven-workspace-cells th,
+.oven-workspace-cells td {
+  padding: 8px;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.oven-logistics-scroll {
+  max-height: 420px;
+  overflow: auto;
+  margin-block: 16px;
+}
+
+.oven-logistics-scroll .oven-workspace-cells {
+  margin: 0;
+}
+
+[aria-label="Carrier storage accounting"] th,
+[aria-label="Carrier storage accounting"] td {
+  overflow-wrap: normal;
+}
+
+[aria-label="Carrier storage accounting"] td {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.oven-logistics-scroll ul {
+  margin: 0;
+  padding-inline-start: 20px;
+}
+
+.oven-logistics-scroll tr[data-selected="true"] {
+  background: var(--pantry-category-accent-surface);
+  color: var(--pantry-category-accent-text);
+}
+
+.oven-task-graph-content {
+  position: relative;
+  margin: 8px;
+}
+
+.oven-task-graph svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.oven-task-graph path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: 0.4;
+}
+
+.oven-task-graph [data-selected="true"] path {
+  opacity: 1;
+  stroke-width: 3;
+}
+
+.oven-task-card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px;
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: var(--pantry-surface, Canvas);
+  color: inherit;
+}
+
+.oven-task-card span,
+.oven-task-card strong {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oven-task-card[aria-pressed="true"],
+.oven-task-track button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--pantry-category-accent-surface);
+  color: var(--pantry-category-accent-text);
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.oven-task-track {
+  display: grid;
+  grid-template-columns: 260px minmax(600px, 1fr);
+  gap: 12px;
+  min-width: 900px;
+  min-height: 36px;
+}
+
+.oven-task-track > button:not(:where(.pantry-select-trigger)) {
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.oven-task-lane {
+  position: relative;
+  margin-block: 4px;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+}
+
+.oven-task-span {
+  position: absolute;
+  inset-block: 0;
+  min-width: 3px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  background: var(--pantry-category-accent-surface);
+  color: var(--pantry-category-accent-text);
+  font-size: 11px;
+}
+
+.oven-task-span[data-phase="waiting"],
+.oven-task-span[data-phase="reserved"] {
+  border-style: dashed;
+  background: transparent;
+  color: inherit;
+}
+
+.oven-task-span[data-phase="unresolved"] {
+  border-width: 2px;
+}
+
+.oven-task-cursor {
+  position: absolute;
+  inset-block: -4px;
+  border-inline-start: 1px solid currentColor;
+  pointer-events: none;
+}
+
+.oven-physics-scene {
+  height: 460px;
+  position: relative;
+  margin-block: 12px;
+}
+
+[aria-label="Accepted physics inspection"] input[type="range"] {
+  width: 100%;
+}
+
+[aria-label="Exact physics sample"] {
+  max-height: 260px;
+  overflow: auto;
+}
+
+.oven-logistics-scroll [data-task] > td:nth-child(2) {
+  white-space: nowrap;
+}
+
+.oven-scheduling-accounting .oven-workspace-cells td:not(:first-child),
+.oven-scheduling-accounting .oven-workspace-cells th,
+.oven-wait-history .oven-workspace-cells th,
+.oven-wait-history .oven-workspace-cells td:nth-child(n + 2):nth-child(-n + 5) {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.oven-wait-history .oven-workspace-cells {
+  min-width: 64rem;
+}
+
+.factory-positions,
+.factory-transfers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 12px;
+  margin-block: 12px;
+}
+
+.factory-positions > article,
+.factory-transfers > li {
+  min-width: 0;
+  border: 1px solid var(--pantry-border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+
+.factory-positions [data-full="true"] {
+  border-style: dashed;
+}
+
+.factory-transfers {
+  padding-inline-start: 24px;
+}
+
+.factory-positions button:not(:where(.pantry-select-trigger)),
+.factory-transfers button:not(:where(.pantry-select-trigger)) {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.production-workspace .production-contact-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.production-workspace .production-contact-toggle input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  margin: 0;
+}
+[aria-label="Exact contact evidence"] {
+  overflow-x: auto;
+}
+[aria-label="Exact contact evidence"] th,
+[aria-label="Exact contact evidence"] td {
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.factory-physics-canvas {
+  width: 100%;
+  height: clamp(22rem, 48vw, 38rem);
+}
+[aria-label="Shared recorded factory"] ul,
+[aria-label="Factory carrier stores from left to right"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+}
+
+/* One canvas workspace, one execution toolbar, and one optional detail panel. */
+.production-workspace.persistent-production {
+  display: block;
+  padding: 0;
+  background: var(--ground);
+}
+/* The workspace has tighter corners than the rest of the Portal, and one
+   shadow for each bar that floats over a canvas. */
+.persistent-production {
+  --pantry-radius-control: 4px;
+  --pantry-radius-notice: 6px;
+  --pantry-radius-card: 8px;
+  --pantry-radius-panel: 10px;
+  --recipe-split-size: clamp(
+    340px,
+    var(--recipe-split-percent, 48%),
+    calc(100% - 340px)
+  );
+  --float-shadow:
+    var(--shadow-card),
+    0 12px 28px -12px
+      color-mix(in oklch, var(--pantry-shadow-color) 22%, transparent);
+}
+/* A button with no style of its own takes the workspace corner, not a pill. */
+:where(.persistent-production) button:not(:where(.pantry-select-trigger)) {
+  border-radius: var(--pantry-radius-control);
+}
+.persistent-production > header.factory-toolbar,
+.persistent-production > .production-panel.factory-drawer {
+  border-radius: var(--pantry-radius-card);
+  box-shadow: var(--float-shadow);
+}
+.persistent-production .workflow-segmented-control {
+  border-radius: calc(var(--pantry-radius-control) + 3px);
+}
+.persistent-production .workflow-segmented-thumb,
+.persistent-production .workflow-segmented-option {
+  border-radius: var(--pantry-radius-control);
+}
+.persistent-production [hidden] {
+  display: none !important;
+}
+.factory-main-canvas,
+.factory-workflow-canvas {
+  position: absolute;
+  inset: 0;
+}
+.factory-main-canvas .production-cell-scenes {
+  height: 100%;
+  display: block;
+}
+.factory-main-canvas .production-cell-scenes > div,
+.factory-main-canvas .production-cell-scenes > div > section {
+  height: 100%;
+}
+.factory-main-canvas .oven-physics-scene {
+  height: 100%;
+  margin: 0;
+}
+.factory-main-canvas
+  .production-cell-scenes
+  > div
+  > section
+  > :not(.oven-physics-scene) {
+  display: none;
+}
+.factory-workflow-canvas {
+  padding: 160px 24px 120px;
+  overflow: auto;
+}
+/* The Workflow canvas fills its pane, as the Factory scene does. The bars
+   float over it, and the canvas keeps its steps clear of them. */
+.persistent-production:is([data-surface="workflow"], [data-surface="split"])
+  > .factory-workflow-canvas {
+  padding: 0;
+}
+.persistent-production:is([data-surface="workflow"], [data-surface="split"])
+  > .factory-summary {
+  top: var(--chrome-summary-top, 92px);
+}
+.persistent-production:is([data-surface="workflow"], [data-surface="split"])
+  > .production-panel.factory-drawer {
+  inset-block: var(--chrome-summary-top, 160px)
+    calc(var(--chrome-bottom, 12px) + var(--tools-height, 52px) + 8px);
+}
+/* Split places the Workflow canvas in the start slot (same slot as the floor
+   plan) and the 3D simulation in the end slot, separated by a drag handle. */
+.persistent-production[data-surface="split"] > .factory-workflow-canvas {
+  inset: 0 auto 0 0;
+  width: var(--recipe-split-size);
+  border-inline-end: 1px solid var(--border);
+  container: workflow-pane / inline-size;
+}
+.persistent-production[data-surface="split"] > .factory-main-canvas {
+  inset: 0 0 0 var(--recipe-split-size);
+  overflow: hidden;
+  container: station-pane / inline-size;
+}
+.persistent-production[data-surface="split"] > .factory-summary {
+  max-width: calc(var(--recipe-split-size) - 24px);
+}
+.factory-split-divider {
+  position: absolute;
+  inset: 0 auto 0 calc(var(--recipe-split-size) - 6px);
+  width: 12px;
+  z-index: 3;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+.factory-split-divider::before {
+  content: "";
+  position: absolute;
+  inset: 38% 4px;
+  border-radius: 3px;
+  background: var(--border);
+  transition: background-color 140ms ease;
+}
+.factory-split-divider:hover::before,
+.factory-split-divider:focus-visible::before,
+.factory-split-divider[data-dragging]::before {
+  background: var(--pantry-focus);
+}
+.factory-workflow-canvas .oven-task-graph {
+  max-height: none;
+}
+.factory-workflow-canvas .oven-task-graph-content {
+  margin: 16px;
+}
+/* A phone shows the steps as a list, so the Workflow bars stay in flow there:
+   a wrapped toolbar or an open timeline shortens the list and covers no step. */
+@media (max-width: 640px) {
+  .production-workspace.persistent-production[data-surface="workflow"] {
+    display: flex;
+    flex-direction: column;
+  }
+  .persistent-production[data-surface="workflow"] > header.factory-toolbar {
+    position: relative;
+    inset: auto;
+    flex: none;
+    margin: 12px 12px 0;
+  }
+  .persistent-production[data-surface="workflow"] > .factory-summary {
+    position: static;
+    flex: none;
+    align-self: flex-start;
+    margin: 8px 12px 0;
+  }
+  .persistent-production[data-surface="workflow"] > .factory-workflow-canvas {
+    position: relative;
+    inset: auto;
+    flex: 1;
+    min-height: 0;
+    padding: 12px 24px 24px;
+  }
+  .persistent-production[data-surface="workflow"] > footer.factory-bottom {
+    position: relative;
+    inset: auto;
+    flex: none;
+    margin: 0 12px 12px;
+  }
+}
+.recipe-workflow {
+  width: min(100%, 540px);
+  margin-inline: auto;
+}
+.recipe-workflow > h3 {
+  margin-block: 0;
+  padding-block-end: 4px;
+}
+.recipe-workflow > p {
+  margin-block: 0;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.recipe-workflow > ol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.recipe-workflow > ol > li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+/* The button floor gives the background, the hover state and the ring. */
+.recipe-workflow > ol > li > button:not(:where(.pantry-select-trigger)) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  height: auto;
+  padding: 12px 16px;
+  overflow: hidden;
+  text-align: start;
+  white-space: normal;
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-notice);
+  box-shadow: var(--shadow-card);
+}
+.recipe-workflow > ol > li > button:not(:where(.pantry-select-trigger)):disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+.recipe-workflow-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+.recipe-workflow-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.recipe-workflow > ol > li > button:not(:where(.pantry-select-trigger)) > strong {
+  text-wrap: pretty;
+}
+.recipe-workflow > ol > li[data-state="done"] .recipe-workflow-state {
+  color: var(--ok-text);
+}
+.recipe-workflow > ol > li[data-state="not-started"] > button:not(:where(.pantry-select-trigger)) > strong,
+.recipe-workflow > ol > li[data-state="not-reached"] > button:not(:where(.pantry-select-trigger)) > strong {
+  color: var(--ink-2);
+}
+.recipe-workflow > ol > li[data-state="current"] > button:not(:where(.pantry-select-trigger)) {
+  background: var(--pantry-category-accent-surface);
+  color: var(--pantry-category-accent-text);
+  box-shadow: inset 0 0 0 1px currentColor, var(--shadow-card);
+}
+.recipe-workflow > ol > li[data-state="failed"] > button:not(:where(.pantry-select-trigger)) {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  box-shadow: inset 0 0 0 1px currentColor, var(--shadow-card);
+}
+.recipe-workflow > ol > li[data-state="current"] .recipe-workflow-meta,
+.recipe-workflow > ol > li[data-state="failed"] .recipe-workflow-meta {
+  color: inherit;
+}
+/* Out of flow, so a card keeps its height when it becomes current. */
+.recipe-workflow progress {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 3px;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+}
+.recipe-workflow progress::-webkit-progress-bar {
+  background: transparent;
+}
+.recipe-workflow progress::-webkit-progress-value {
+  background: currentColor;
+}
+.recipe-workflow progress::-moz-progress-bar {
+  background: currentColor;
+}
+.recipe-workflow svg.recipe-workflow-arrow {
+  display: block;
+  flex: none;
+}
+.recipe-workflow-arrow path {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1.5;
+}
+.factory-empty-scene {
+  position: absolute;
+  inset: 40% 16px auto;
+  text-align: center;
+  color: var(--muted);
+}
+.persistent-production > header.factory-toolbar {
+  position: absolute;
+  inset: 12px auto auto 12px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  min-height: 56px;
+  padding: 5px 10px 5px 5px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+/* Inside the Portal shell, keep the top-start toolbar clear of the top-end workspace actions. */
+.portal-shell-workspace:not(
+    [data-sidebar-mode="drawer"][data-sidebar-state="open"]
+  )
+  .persistent-production
+  > header.factory-toolbar {
+  max-width: calc(100% - var(--workflow-header-clearance, 224px));
+}
+@media (pointer: coarse) {
+  .portal-shell-workspace:not(
+      [data-sidebar-mode="drawer"][data-sidebar-state="open"]
+    )
+    .persistent-production
+    > header.factory-toolbar {
+    max-width: calc(100% - var(--workflow-header-clearance, 260px));
+  }
+}
+/* The way back is an icon at the start; a rule parts it from the recipe name. */
+.persistent-production .factory-back {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+}
+@media (hover: hover) {
+  .persistent-production .factory-back:hover {
+    background: var(--surface);
+  }
+}
+/* The name shares the row with the back icon, and wraps there on a phone. */
+.factory-back + .factory-title {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding-inline-start: 12px;
+  border-inline-start: 1px solid var(--border);
+}
+.factory-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+.factory-title > div {
+  min-width: 0;
+}
+.factory-title span,
+.factory-save-status,
+.factory-clock > span {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.factory-title h2 {
+  font-size: 0.92rem;
+  margin: 1px 0 0;
+  overflow-wrap: anywhere;
+}
+.persistent-production .factory-toolbar nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.persistent-production .factory-toolbar .workflow-segmented-control {
+  min-width: calc(var(--segment-count, 2) * 76px);
+  margin-block: 0;
+}
+/* The detail panels are plain buttons; an open panel takes the accent. */
+.factory-panel-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+.factory-panel-pills button:not(:where(.pantry-select-trigger)) {
+  border: 0;
+  border-radius: var(--pantry-radius-control);
+  background: transparent;
+  box-shadow: none;
+  min-height: 36px;
+  padding: 0 10px !important;
+  font-size: 0.8125rem !important;
+}
+@media (hover: hover) {
+  .factory-panel-pills button:not(:where(.pantry-select-trigger)):hover:not([aria-expanded="true"]) {
+    background: var(--surface);
+  }
+}
+.persistent-production .factory-toolbar nav button:not(:where(.pantry-select-trigger)) {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}
+.persistent-production button:not(:where(.pantry-select-trigger))[aria-pressed="true"],
+.persistent-production .factory-toolbar button:not(:where(.pantry-select-trigger))[aria-expanded="true"] {
+  background: var(--pantry-category-accent-surface);
+  color: var(--pantry-category-accent-text);
+}
+.persistent-production .factory-summary {
+  position: absolute;
+  left: 12px;
+  top: 200px;
+  z-index: 3;
+  background: var(--paper);
+  box-shadow: var(--float-shadow);
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-card);
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
+.persistent-production > .production-panel.factory-drawer {
+  position: absolute;
+  inset: 160px 12px 132px auto;
+  width: min(520px, 48%);
+  z-index: 5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid var(--hairline);
+  padding: 16px;
+}
+.factory-drawer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.factory-drawer-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.factory-drawer-heading button:not(:where(.pantry-select-trigger)) {
+  flex: none;
+  font-size: 0.75rem;
+}
+.factory-drawer section,
+.factory-drawer table,
+.factory-drawer input,
+.factory-drawer button:where(.pantry-select-trigger) {
+  max-width: 100%;
+}
+.factory-drawer p,
+.factory-drawer li,
+.factory-drawer dd {
+  overflow-wrap: anywhere;
+}
+.factory-drawer details {
+  margin-block: 16px;
+}
+.factory-drawer .wait-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+}
+.factory-drawer .wait-summary dt {
+  color: var(--muted);
+}
+.factory-drawer .wait-summary dd {
+  margin: 0;
+  font-weight: 600;
+}
+.factory-drawer .wait-chain {
+  padding-left: 20px;
+  font-size: 0.85rem;
+}
+.factory-drawer .wait-chain li + li {
+  margin-top: 6px;
+}
+.factory-drawer .wait-chain button:not(:where(.pantry-select-trigger)) {
+  white-space: normal;
+  text-align: left;
+  font-size: inherit;
+  padding: 4px 8px;
+}
+.factory-drawer .wait-chain li[data-wait-role="constraint"] {
+  font-weight: 600;
+}
+.factory-drawer .financier-comparison td[data-changed="true"] {
+  background: var(--pantry-category-accent-surface);
+  color: var(--pantry-category-accent-text);
+}
+.factory-drawer .oven-physics-scene {
+  height: 320px;
+}
+.persistent-production > footer.factory-bottom {
+  position: absolute;
+  inset: auto 12px 12px;
+  width: auto;
+  z-index: 4;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 0;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  pointer-events: none;
+}
+.factory-bottom > * {
+  pointer-events: auto;
+}
+.factory-timeline-shell {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: -8px;
+  pointer-events: none;
+  transition:
+    grid-template-rows 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease;
+}
+.factory-timeline-shell[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  pointer-events: auto;
+}
+.factory-timeline-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.factory-playback,
+.factory-timeline-panel {
+  padding: 12px 16px;
+  background: var(--paper);
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-card);
+  box-shadow: var(--float-shadow);
+}
+.factory-bottom[data-timeline-open="true"] .factory-timeline-panel {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.factory-bottom[data-timeline-open="true"] .factory-playback {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 0;
+}
+/* A footer button shows its icon before its words. */
+.factory-playback button:not(:where(.pantry-select-trigger)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.factory-playback {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.factory-clock {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+.factory-clock > output {
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+}
+.factory-playback-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+.factory-history-state {
+  background: var(--pantry-category-accent-surface);
+}
+.factory-attention {
+  align-self: flex-start;
+  max-width: 100%;
+  background: var(--paper);
+  white-space: normal;
+  text-align: left;
+}
+.factory-timeline-panel {
+  max-height: min(32vh, 300px);
+  overflow: auto;
+}
+.factory-timeline-panel p {
+  font-size: 0.75rem;
+}
+.factory-timeline-panel .oven-logistics-scroll {
+  max-height: none;
+}
+.factory-canvas-workspace {
+  position: absolute;
+  inset: 0;
+}
+.factory-canvas-switch {
+  position: absolute;
+  top: 76px;
+  left: 12px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--paper);
+  padding: 4px;
+  border-radius: var(--pantry-radius-card);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-card);
+}
+.factory-canvas-switch .workflow-segmented-control {
+  margin-block: 0;
+  min-width: 210px;
+}
+.persistent-production .factory-canvas-switch button:not(:where(.pantry-select-trigger)) {
+  font-size: 0.78rem;
+  min-height: 30px;
+  padding: 4px 10px;
+}
+.persistent-production button:not(:where(.pantry-select-trigger)).factory-primary {
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  border-color: var(--pantry-link);
+  font-weight: 600;
+}
+.persistent-production button:not(:where(.pantry-select-trigger)).factory-primary:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+  border-color: var(--pantry-primary-border);
+}
+.factory-cell-selection {
+  position: absolute;
+  left: 12px;
+  bottom: 110px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--pantry-radius-card);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-card);
+  z-index: 3;
+}
+.factory-cell-selection button:not(:where(.pantry-select-trigger)) {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-control);
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+.factory-panes {
+  position: absolute;
+  inset: 0;
+  display: grid;
+}
+.factory-pane {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+.factory-pane .factory-physics-canvas {
+  width: 100%;
+  height: 100%;
+}
+.factory-pane-label {
+  position: absolute;
+  bottom: 154px;
+  left: 16px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+.persistent-production .factory-pane-divider {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  min-width: 0;
+  background: var(--hairline);
+  touch-action: none;
+  cursor: col-resize;
+  z-index: 2;
+}
+.factory-pane-divider:hover,
+.factory-pane-divider:focus-visible {
+  background: var(--pantry-link);
+}
+.factory-canvas-message {
+  position: absolute;
+  inset: 45% 16px auto;
+  text-align: center;
+  padding: 12px;
+  background: var(--paper);
+}
+@media (max-width: 1000px) {
+  .persistent-production > header.factory-toolbar {
+    max-width: calc(100% - 24px);
+  }
+  .persistent-production > .production-panel.factory-drawer {
+    width: min(420px, calc(100% - 24px));
+  }
+}
+@media (max-width: 600px) {
+  .persistent-production > header.factory-toolbar {
+    inset: 58px 8px auto;
+    width: auto;
+    max-width: none;
+    padding: 8px 12px;
+  }
+  .factory-title {
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .persistent-production .factory-toolbar nav {
+    gap: 2px;
+  }
+  .persistent-production .factory-toolbar nav button:not(:where(.pantry-select-trigger)) {
+    min-height: 36px;
+    padding: 4px 7px;
+  }
+  .factory-canvas-switch {
+    top: 234px;
+    left: 8px;
+  }
+  .persistent-production .factory-summary {
+    top: 282px;
+    left: 8px;
+  }
+  .persistent-production > .production-panel.factory-drawer {
+    inset: 220px 8px 152px;
+    width: auto;
+  }
+  .factory-playback {
+    gap: 8px;
+    padding: 8px;
+  }
+  .factory-clock {
+    min-width: 120px;
+  }
+  .factory-playback-actions {
+    margin-left: 0;
+  }
+  .factory-cell-selection {
+    bottom: 164px;
+  }
+  .factory-workflow-canvas {
+    padding: 240px 12px 160px;
+  }
+  .persistent-production[data-surface="workflow"] > header.factory-toolbar {
+    margin: 58px 8px 0;
+  }
+  .persistent-production[data-surface="workflow"] > .factory-summary {
+    margin: 8px 8px 0;
+  }
+  .persistent-production[data-surface="workflow"] > .factory-workflow-canvas {
+    padding: 12px;
+  }
+  .persistent-production[data-surface="workflow"] > footer.factory-bottom {
+    margin: 0 8px 8px;
+  }
+}
+.factory-pane .factory-station-label {
+  position: absolute;
+  top: max(var(--factory-label-min-top, 48px), var(--factory-label-top));
+  transform: translate(-50%, -100%);
+  z-index: 1;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-card);
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  min-height: 36px;
+}
+.factory-pane .factory-station-label[data-appliance-status="active"],
+.factory-pane .factory-station-label[data-cell] {
+  border-color: var(--pantry-link);
+  font-weight: 600;
+}
+.factory-pane[data-camera="floor"] .factory-station-label[data-station] {
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  min-height: 28px;
+}
+
+.factory-appliance-strip {
+  position: absolute;
+  top: 124px;
+  left: 12px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px;
+  pointer-events: auto;
+}
+.factory-sync-pill {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 170px;
+  max-width: 240px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+  font-size: 0.75rem;
+}
+.factory-sync-pill[data-sync-status="active"],
+.factory-sync-pill[data-sync-status="executing"],
+.factory-sync-pill[data-sync-status="handoff"] {
+  border-color: var(--pantry-link);
+  background: color-mix(
+    in srgb,
+    var(--pantry-category-accent-surface) 35%,
+    var(--paper)
+  );
+}
+.factory-sync-pill-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.factory-sync-pill small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.factory-sync-badge {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 1px solid var(--hairline);
+}
+.factory-drawer [aria-label="Synchronized station appliances"] .oven-workspace-cells,
+.factory-drawer [aria-label="Multi-batch fault-cascade recovery"] .oven-workspace-cells {
+  font-size: 0.76rem;
+  table-layout: auto;
+}
+.factory-drawer [aria-label="Synchronized station appliances"] th,
+.factory-drawer [aria-label="Multi-batch fault-cascade recovery"] th {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  padding: 5px 6px;
+}
+.factory-drawer [aria-label="Synchronized station appliances"] td,
+.factory-drawer [aria-label="Multi-batch fault-cascade recovery"] td {
+  overflow-wrap: break-word;
+  padding: 6px;
+}
+.factory-drawer [aria-label="Synchronized station appliances"] button:not(:where(.pantry-select-trigger)),
+.factory-drawer [aria-label="Reviewed chat production control"] button:not(:where(.pantry-select-trigger)) {
+  font-size: 0.74rem;
+  padding: 4px 8px;
+  margin: 2px 4px 2px 0;
+}
+
+.shift-measured {
+  display: grid;
+  gap: 8px;
+  margin-block: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.shift-measured h4,
+.shift-measured p {
+  margin: 0;
+}
+.shift-measured > p:not([role]) {
+  color: var(--ink-2);
+}
+.shift-measured-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.shift-measured-actions button:not(:where(.pantry-select-trigger)),
+.shift-measured-import {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  white-space: normal;
+}
+.shift-measured-import {
+  position: relative;
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  cursor: pointer;
+  transition: background-color var(--pantry-motion-fast) ease;
+}
+.shift-measured-import:hover {
+  background: var(--pantry-primary-hover);
+}
+.shift-measured-import:focus-within {
+  outline: 2px solid var(--pantry-link);
+  outline-offset: 2px;
+}
+.shift-measured [role="status"] {
+  color: var(--ink-2);
+}
+.shift-measured [role="alert"] {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+.shift-measured-result {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+  min-width: 0;
+}
+.shift-measured-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
+  gap: 8px 10px;
+  margin: 0;
+}
+.shift-measured-facts > div {
+  padding: 8px 10px;
+  border: 1px solid var(--hairline, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ground) 45%, var(--paper));
+}
+.shift-measured-facts dt {
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.shift-measured-facts dd {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.shift-measured .shift-measured-limit {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--warn-text);
+  background: var(--warn-bg);
+}
+.shift-measured-table {
+  min-width: 0;
+  overflow-x: auto;
+}
+.shift-measured table {
+  font-variant-numeric: tabular-nums;
+}
+.shift-measured :is(th, td) {
+  overflow-wrap: normal;
+}
+.shift-measured tr > :first-child {
+  min-width: 150px;
+}
+.shift-measured tr > :not(:first-child) {
+  white-space: nowrap;
+}
+.shift-measured caption {
+  padding-bottom: 8px;
+  font-weight: 600;
+  text-align: left;
+}
+.shift-measured th {
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 500;
+}
+.shift-measured tr > * {
+  border-bottom: 1px solid var(--border);
+}
+.shift-measured tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.shift-measured tr > :nth-child(n + 2):nth-child(-n + 4) {
+  text-align: right;
+}
+.shift-measured td[data-band="within-assumption"] {
+  color: var(--ok-text);
+}
+.shift-measured td[data-band="outside-assumption"] {
+  color: var(--warn-text);
+}
+.shift-measured td[data-band="unavailable"] {
+  color: var(--ink-2);
+}
+
+/* BakeryShiftAuthor: structured shift authoring card & grouped grid */
+.bakery-shift-author {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  max-width: 960px;
+}
+.bakery-shift-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+.bakery-shift-header h3 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink-strong, var(--ink));
+}
+.bakery-shift-lead {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+  max-width: 62ch;
+}
+.bakery-shift-summary-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bakery-shift-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.bakery-shift-pill[data-tone="accent"] {
+  background: color-mix(in srgb, var(--pantry-primary) 10%, var(--paper));
+  border-color: color-mix(in srgb, var(--pantry-primary) 28%, var(--border));
+  color: var(--ink-strong, var(--ink));
+}
+.bakery-shift-fieldset {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ground) 55%, var(--paper));
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.bakery-shift-fieldset > legend {
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.bakery-shift-section {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--hairline, var(--border));
+  border-radius: 10px;
+  background: var(--paper);
+}
+.bakery-shift-section-title {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.bakery-shift-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 10px 12px;
+}
+/* Outranks .production-panel label, which the workflow simulator loads later. */
+.bakery-shift-section .bakery-shift-grid > label {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+  margin: 0;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+/* A wide field takes the full row, not span 2: in a one-column card, span 2
+   adds an empty implicit column, and the next field falls into it. */
+.bakery-shift-grid > label.bakery-shift-span-full,
+.bakery-shift-grid > label.bakery-shift-span-2 {
+  grid-column: 1 / -1;
+}
+.bakery-shift-grid button:where(.pantry-select-trigger),
+.bakery-shift-grid input[type="number"] {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-variant-numeric: tabular-nums;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+.bakery-shift-grid button:where(.pantry-select-trigger):hover:not(:disabled),
+.bakery-shift-grid input[type="number"]:hover:not(:disabled) {
+  border-color: var(--ink-3);
+}
+.bakery-shift-grid button:where(.pantry-select-trigger):focus-visible,
+.bakery-shift-grid input[type="number"]:focus-visible {
+  outline: 2px solid var(--pantry-link);
+  outline-offset: 1px;
+}
+.bakery-shift-submit {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  justify-content: center;
+}
+.bakery-shift-submit:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+.bakery-shift-status {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.bakery-shift-status:empty {
+  display: none;
+}
+.bakery-shift-notes {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--hairline, var(--border));
+  background: color-mix(in srgb, var(--ground) 50%, var(--paper));
+}
+.bakery-shift-notes p {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ProductionResults & ShiftResults: cards, numeric alignment, and status badges */
+.production-results-panel {
+  display: grid;
+  gap: 12px;
+}
+.production-results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+.production-results-header h3 {
+  margin: 0 0 4px;
+}
+.production-results-header p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+}
+.production-results-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.production-results-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  color: var(--ink-2);
+}
+.production-results-pill strong {
+  color: var(--ink);
+}
+.production-results-panel > .oven-logistics-scroll {
+  max-height: none;
+  display: grid;
+  gap: 16px;
+  margin-block: 4px;
+}
+.shift-evidence-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ground) 40%, var(--paper));
+}
+.shift-evidence-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+.shift-evidence-header h4 {
+  margin: 0 0 4px;
+  font-size: 0.98rem;
+}
+.shift-evidence-subtitle {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ink-2);
+}
+.shift-evidence-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.shift-band-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.shift-band-badge[data-band="within-assumption"] {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+  border-color: color-mix(in srgb, var(--ok-text) 22%, transparent);
+}
+.shift-band-badge[data-band="outside-assumption"] {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+  border-color: color-mix(in srgb, var(--warn-text) 25%, transparent);
+}
+.shift-band-badge[data-band="unavailable"] {
+  color: var(--ink-2);
+  background: var(--surface);
+  border-color: var(--border);
+}
+.shift-evidence-table,
+.production-table-card {
+  min-width: 0;
+  overflow-x: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+}
+.shift-evidence-table table,
+.production-table-card table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+.shift-evidence-table caption,
+.production-table-card caption {
+  padding-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  color: var(--ink);
+}
+.shift-evidence-table th,
+.production-table-card th {
+  padding: 7px 8px;
+  color: var(--ink-2);
+  font-size: 0.74rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.shift-evidence-table td,
+.production-table-card td {
+  padding: 8px;
+  border-bottom: 1px solid var(--hairline, var(--border));
+  vertical-align: middle;
+  overflow-wrap: break-word;
+}
+.shift-evidence-table tbody tr:last-child td,
+.production-table-card tbody tr:last-child td {
+  border-bottom: 0;
+}
+.shift-evidence-table .num-col,
+.production-table-card .num-col,
+.shift-measured .num-col {
+  text-align: right;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.shift-evidence-table .unavailable-col,
+.shift-measured .unavailable-col {
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  text-align: right;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.production-table-card tr[data-zero="true"] td {
+  color: var(--ink-2);
+  opacity: 0.75;
+}
+.production-table-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline, var(--border));
+  display: flex;
+  justify-content: flex-start;
+}
+.production-stock-toggle {
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  min-height: 30px;
+  border-radius: 999px;
+}
+.shift-evidence-table td[data-band],
+.shift-measured td[data-band] {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.shift-evidence-table .basis-col {
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  min-width: 180px;
+}
+.shift-trace-card {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+}
+.shift-trace-card h4,
+.shift-trace-card p {
+  margin: 0;
+}
+.shift-trace-card h4 {
+  font-size: 0.86rem;
+}
+.shift-trace-summary {
+  font-size: 0.82rem;
+  color: var(--ink-2);
+}
+.shift-trace-empty {
+  font-size: 0.82rem;
+  color: var(--warn-text);
+}
+.production-empty-cell {
+  text-align: center;
+  padding: 14px 8px !important;
+  color: var(--ink-2);
+  font-style: italic;
+}
+.production-order-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.production-order-badge[data-state="completed"] {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+  border-color: color-mix(in srgb, var(--ok-text) 22%, transparent);
+}
+.production-order-badge[data-state="failed"] {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+  border-color: color-mix(in srgb, var(--danger-text) 22%, transparent);
+}
+.shift-measured {
+  margin-block: 0;
+}
+
+@media (max-width: 600px) {
+  .factory-station-label {
+    --factory-label-min-top: 360px;
+  }
+}

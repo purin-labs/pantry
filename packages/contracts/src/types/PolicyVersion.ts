@@ -1,0 +1,2 @@
+
+export type PolicyVersion = string;

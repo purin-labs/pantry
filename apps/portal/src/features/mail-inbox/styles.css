@@ -1,0 +1,2190 @@
+/* Inbox uses Portal tokens. The page has two panes: the list of conversations
+   and one conversation, with its reply box at the foot. Without room for two
+   panes, it shows one at a time. */
+.mail-inbox {
+  --mail-drawer-width: 600px;
+  --mail-list-width: 348px;
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  color: var(--ink);
+}
+.mail-inbox [hidden] {
+  display: none !important;
+}
+.mail-inbox :is(h1, h2, h3, h4, h5) {
+  color: var(--ink-strong);
+}
+.mail-inbox h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.mail-inbox h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.mail-inbox h3 {
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+.mail-inbox :is(h4, h5) {
+  font-size: 14px;
+  margin-block: 16px 8px;
+}
+.mail-inbox :is(input, button:where(.pantry-select-trigger), textarea, button:not(:where(.pantry-select-trigger))) {
+  font: inherit;
+  color: inherit;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 44px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.mail-inbox :is(input, button:where(.pantry-select-trigger), textarea) {
+  font-size: 16px;
+  min-width: 0;
+}
+/* A touch screen keeps 16px, because iOS zooms the page on smaller text. */
+@media (pointer: fine) {
+  .mail-inbox :is(input, button:where(.pantry-select-trigger), textarea) {
+    font-size: 14.5px;
+  }
+}
+.mail-inbox textarea {
+  width: 100%;
+  resize: vertical;
+}
+/* The Portal's button ring draws the edge. The border stays transparent, so
+   that the edge is not doubled and forced colors still draw one. */
+.mail-inbox button {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-color: transparent;
+}
+.mail-inbox button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--surface);
+}
+.mail-inbox button:not(:where(.pantry-select-trigger)):disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.mail-inbox button:not(:where(.pantry-select-trigger)).connection-primary-action {
+  border-color: transparent;
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  box-shadow: var(--pantry-primary-ring);
+  font-weight: 600;
+}
+.mail-inbox button:not(:where(.pantry-select-trigger)).connection-primary-action:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+.mail-inbox :focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+/* A heading or a note takes focus from a script, so that a screen reader reads
+   it. Tab cannot reach it, and a box would cover the line below it. */
+.mail-inbox [tabindex="-1"]:focus-visible {
+  outline: none;
+}
+.mail-inbox :is(button:not(:where(.pantry-select-trigger)), summary) svg {
+  flex-shrink: 0;
+}
+.mail-inbox label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.mail-inbox-note,
+.mail-inbox-status {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.mail-inbox .mail-icon-button {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-color: transparent;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+.mail-inbox .mail-icon-button:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--ink);
+}
+/* The fold chevron is the shared one in styles.css (Disclosures). */
+.mail-inbox summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding-block: 12px;
+  font-size: 13px;
+}
+
+/* ---------- the page column ---------- */
+.mail-page {
+  container: mail-page / inline-size;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 760px;
+  margin-inline: auto;
+}
+.mail-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 16px;
+}
+.mail-page-title {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.mail-page-summary {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.mail-page-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+/* Search and the channel sit on the list's top edge. */
+.mail-page-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 12px;
+}
+/* ---------- the sections of the one list ---------- */
+.mail-section {
+  margin-block-start: 20px;
+}
+.mail-inbox .mail-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.mail-section-head:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+.mail-section-count {
+  color: var(--ink-2);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.mail-section .mail-inbox-status {
+  margin: 10px 0 0;
+}
+/* An empty section says so in one plain line, with no card. */
+.mail-section .mail-case-empty {
+  margin-block-start: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 13.5px;
+}
+.mail-section .mail-case-empty svg {
+  flex: none;
+}
+.mail-section-bar {
+  margin-block-end: 8px;
+}
+.mail-inbox .mail-back {
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 12px 0 8px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+/* Read mail is quieter than mail that is new. */
+.mail-case-list[data-list="other"]
+  .mail-case-row:not([data-unread])
+  .mail-case-row-name {
+  font-weight: 500;
+}
+/* The mailbox and its agent, in one small control. */
+.mail-inbox .mail-status-trigger {
+  flex: 0 1 auto;
+  min-width: 0;
+  gap: 8px;
+  min-height: 38px;
+  max-width: 15rem;
+  padding: 0 10px 0 12px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.mail-status-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-status-word {
+  flex: none;
+  color: var(--ink-2);
+}
+.mail-status-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+.mail-status-trigger[data-agent="on"] .mail-status-dot {
+  background: var(--ok-text);
+}
+.mail-status-trigger[data-agent="paused"] .mail-status-dot {
+  background: var(--warn-text);
+}
+.mail-status-menu {
+  inline-size: 17rem;
+}
+.mail-status-state {
+  margin: 0;
+  padding: 4px 10px 8px;
+  font-size: 13px;
+}
+.mail-status-check {
+  inline-size: 16px;
+}
+/* The check is read out; the header's busy mark shows it, so that the
+   header keeps its height. */
+.mail-agent-check {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.mail-agent-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-block-start: 12px;
+  padding: 8px 8px 8px 16px;
+  background: var(--surface);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.mail-agent-strip p {
+  flex: 1 1 12rem;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* An agent that is off is a state, not a warning: one quiet line. */
+.mail-agent-strip[data-agent="off"] {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 12px;
+  margin-block-start: 8px;
+  padding: 0 0 0 2px;
+  background: none;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.mail-agent-strip[data-agent="off"] p {
+  flex: 0 1 auto;
+  color: var(--ink);
+}
+.mail-inbox .mail-agent-strip[data-agent="off"] button:not(:where(.pantry-select-trigger)) {
+  min-height: 28px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.mail-agent-strip[data-agent="paused"] {
+  background: var(--warn-bg);
+}
+.mail-agent-strip[data-agent="paused"] p {
+  color: var(--warn-text);
+}
+.mail-agent-strip[data-tone="danger"] {
+  background: var(--danger-bg);
+}
+.mail-agent-strip[data-tone="danger"] p {
+  color: var(--danger-text);
+}
+.mail-agent-strip p[role="alert"] {
+  flex-basis: 100%;
+  font-size: 13px;
+}
+.mail-inbox .mail-agent-strip button:not(:where(.pantry-select-trigger)) {
+  border-radius: 9999px;
+  padding-inline: 18px;
+}
+.mail-agent-strip a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 12px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  text-underline-offset: 3px;
+}
+/* The status regions stay in the page, so that a later status is read out. */
+.mail-pane-notice {
+  margin: 12px 0 0;
+}
+.mail-pane-notice:empty {
+  margin: 0;
+}
+
+/* ---------- one quiet list ---------- */
+.mail-case-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.mail-case-list > li + li {
+  border-block-start: 1px solid var(--border);
+}
+/* The list draws the dividers, so a row has no edge of its own. */
+.mail-inbox .mail-case-row {
+  position: relative;
+  justify-content: flex-start;
+  gap: 14px;
+  width: 100%;
+  min-height: 0;
+  padding: 16px 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: start;
+}
+@media (hover: hover) {
+  .mail-inbox .mail-case-row:hover:not(:disabled, [aria-current="true"]) {
+    background: color-mix(in oklch, var(--surface) 60%, transparent);
+  }
+}
+/* Three lines: the name and the wait, the subject or the message at the full
+   width of the row, and then what the row waits for. */
+.mail-inbox .mail-case-row:not(.mail-handled-row) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "avatar name age"
+    "avatar line line"
+    "avatar kind kind";
+  align-items: baseline;
+  row-gap: 1px;
+}
+.mail-case-row:not(.mail-handled-row)
+  :is(.mail-case-row-main, .mail-case-row-side) {
+  display: contents;
+}
+.mail-case-row:not(.mail-handled-row) > .mail-avatar {
+  grid-area: avatar;
+  align-self: start;
+  margin-block-start: 2px;
+}
+/* The button does not wrap its text, so a long name ends in an ellipsis
+   before the wait. The conversation shows the whole name. */
+.mail-case-row-name {
+  grid-area: name;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-case-row-line {
+  grid-area: line;
+}
+.mail-case-row-age {
+  grid-area: age;
+}
+.mail-case-row-kind {
+  grid-area: kind;
+}
+.mail-inbox .mail-case-row[aria-current="true"] {
+  background: var(--surface);
+}
+/* The open case has a short bar, clear of the list's rounded corners. */
+.mail-inbox .mail-case-row[aria-current="true"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 14px;
+  inset-inline-start: 5px;
+  width: 3px;
+  border-radius: 9999px;
+  background: var(--pantry-accent);
+}
+.mail-inbox .mail-case-row:focus-visible {
+  outline-offset: -2px;
+}
+.mail-avatar {
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--pantry-accent-surface);
+  color: var(--pantry-accent-text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.mail-avatar[data-tone="ok"] {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+.mail-avatar[data-tone="warn"] {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.mail-avatar[data-size="small"] {
+  flex-basis: 32px;
+  width: 32px;
+  height: 32px;
+  font-size: 11.5px;
+}
+.mail-case-row-main {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+.mail-case-row-name {
+  overflow-wrap: anywhere;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-strong);
+}
+.mail-case-row-line {
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-case-row-line strong {
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+.mail-case-row-side {
+  display: grid;
+  flex: none;
+  gap: 3px;
+  justify-items: end;
+}
+.mail-case-row-age {
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.mail-case-row-kind {
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.mail-handled-time {
+  flex: 0 0 4rem;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.mail-case-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-block-start: 12px;
+  padding: 22px 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.mail-case-empty p {
+  margin: 0;
+}
+.mail-case-empty svg {
+  color: var(--ok-text);
+}
+/* Done, All mail and Spam are views, below the last section. */
+.mail-view-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-block-start: 16px;
+  margin-inline-start: -8px;
+}
+.mail-inbox .mail-view-link {
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+@media (hover: hover) {
+  .mail-inbox .mail-view-link:hover {
+    background: var(--surface);
+    color: var(--ink);
+  }
+}
+
+/* ---------- All mail and Spam ---------- */
+.mail-view {
+  margin-block-start: 12px;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.mail-view-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 10px 4px 18px;
+}
+/* The search field is a pill. The pill shows the focus, so the field inside
+   it draws none of its own. */
+.mail-search {
+  display: flex;
+  flex: 1 1 8rem;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  padding-inline: 4px 16px;
+  border-radius: 9999px;
+  background: var(--surface);
+}
+.mail-search:focus-within {
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.mail-inbox .mail-search input {
+  flex: 1;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+}
+.mail-inbox .mail-search input:focus-visible {
+  outline: none;
+}
+/* With a mouse the search is as tall as the controls beside it. */
+@media (pointer: fine) {
+  .mail-inbox .mail-search input {
+    min-height: 38px;
+  }
+}
+.mail-nav-views {
+  display: grid;
+  gap: 4px;
+  padding: 0 12px 8px;
+}
+.mail-nav-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.mail-inbox .mail-nav-item {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  font-size: 13px;
+}
+.mail-inbox .mail-nav-item[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+.mail-nav-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-inbox-coverage {
+  display: grid;
+  gap: 4px;
+  padding-inline: 4px;
+}
+.mail-inbox-coverage p {
+  margin: 0;
+}
+/* The status and the page arrows share one bar above the list. */
+.mail-list-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding-inline: 18px 8px;
+  border-block-start: 1px solid var(--border);
+}
+.mail-list-bar .mail-inbox-status {
+  margin: 0;
+}
+.mail-inbox-messages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.mail-inbox-messages > li {
+  border-block-start: 1px solid var(--border);
+}
+/* One row a message: sender, subject with its marks, then the date. Read
+   mail sits on the surface tint and unread mail on paper. A Spam row is a
+   link to Gmail. */
+.mail-inbox :is(button:not(:where(.pantry-select-trigger)), a).mail-inbox-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(7rem, 12rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in oklch, var(--surface) 55%, var(--paper));
+  box-shadow: none;
+  text-align: start;
+}
+.mail-inbox :is(button:not(:where(.pantry-select-trigger)), a).mail-inbox-row[data-unread="true"] {
+  background: var(--paper);
+}
+.mail-inbox :is(button:not(:where(.pantry-select-trigger)), a).mail-inbox-row:hover:not(:disabled),
+.mail-inbox button:not(:where(.pantry-select-trigger)).mail-inbox-row[aria-current="true"] {
+  background: var(--surface);
+}
+.mail-inbox :is(button:not(:where(.pantry-select-trigger)), a).mail-inbox-row:focus-visible {
+  outline-offset: -2px;
+}
+.mail-inbox a.mail-spam-row {
+  grid-template-columns: minmax(7rem, 12rem) minmax(0, 1fr) auto auto;
+  color: inherit;
+  text-decoration: none;
+}
+.mail-spam-open {
+  color: var(--ink-2);
+}
+.mail-spam-note {
+  margin: 0;
+  padding: 0 18px 10px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.mail-inbox-row-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.mail-inbox-row-end {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mail-inbox-sender,
+.mail-inbox-subject {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.mail-inbox-row time {
+  color: var(--ink-2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.mail-inbox-row[data-unread="true"]
+  :is(.mail-inbox-subject, .mail-inbox-sender, time) {
+  color: var(--ink-strong);
+  font-weight: 650;
+}
+.mail-inbox-kind {
+  color: var(--ink-3);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.mail-inbox-label {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 6px;
+  color: var(--ink-2);
+  box-shadow: var(--ring);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.mail-inbox-pagination {
+  display: flex;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+.mail-inbox-empty-state {
+  margin: 0 12px 12px;
+  padding: 32px 16px;
+  border-radius: 12px;
+  background: var(--surface);
+  text-align: center;
+}
+.mail-inbox-empty-state p {
+  margin: 0;
+}
+
+.mail-inbox-empty-state > button:not(:where(.pantry-select-trigger)) {
+  margin-block-start: var(--pantry-space-3);
+}
+
+/* ---------- the drawer ---------- */
+/* Beside the list, from the app's toolbar to the foot of the window. The
+   list stays in reach. */
+.mail-drawer {
+  position: sticky;
+  top: var(--portal-header-top, 0px);
+  flex: 0 1 var(--mail-drawer-width);
+  min-width: 0;
+  height: calc(100dvh - var(--portal-header-top, 0px));
+  margin-inline-start: 24px;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border-inline-start: 1px solid var(--border);
+}
+/* The column with no email open. */
+.mail-column-empty {
+  display: grid;
+  flex: 1;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--ink-2);
+  text-align: center;
+}
+.mail-column-empty p {
+  max-width: 22rem;
+  margin: 0;
+  font-size: 14px;
+  text-wrap: balance;
+}
+
+/* The busy mark has its own fixed slot in the header. */
+.mail-busy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 36px;
+  color: var(--ink-2);
+}
+.mail-busy-icon {
+  animation: mail-busy-turn 900ms linear infinite;
+}
+@keyframes mail-busy-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mail-busy-icon {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+.mail-drawer-case,
+.mail-drawer .mail-jev-panel {
+  flex: 1;
+  min-height: 0;
+}
+.mail-drawer-case {
+  display: flex;
+  flex-direction: column;
+}
+/* Two panes: the list and the conversation meet the window's edges. Each pane
+   scrolls by itself. */
+@media (min-width: 1160px) {
+  .portal-main[data-page="inbox"] > .portal-main-inner:has(.mail-inbox) {
+    padding: 0;
+  }
+  /* The list reaches the top of the window. The app's toolbar has its tools
+     on the right, above the conversation. */
+  .mail-inbox .mail-page {
+    position: sticky;
+    top: 0;
+    flex: 0 0 var(--mail-list-width);
+    min-width: 0;
+    max-width: none;
+    height: 100dvh;
+    margin-inline: 0;
+    padding: 20px 16px 24px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--paper);
+    border-inline-end: 1px solid var(--border);
+  }
+  .mail-inbox .mail-drawer {
+    flex: 1 1 0;
+    margin-inline-start: 0;
+    background: transparent;
+    border-inline-start: 0;
+  }
+  .mail-inbox .mail-jev-panel {
+    background: var(--paper);
+  }
+  /* The pane draws the list's edge, so the rows meet it. */
+  .mail-inbox .mail-case-list {
+    margin-inline: -16px;
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+/* ---------- one case ---------- */
+.mail-case {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+.mail-case-bar {
+  --mail-pane-inset: max(24px, calc((100% - 58rem) / 2));
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 64px;
+  padding-block: 8px;
+  padding-inline: var(--mail-pane-inset)
+    max(10px, calc(var(--mail-pane-inset) - 14px));
+  background: var(--paper);
+  border-block-end: 1px solid var(--border);
+}
+.mail-case-heading {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: var(--mail-case-title-room, 8rem);
+}
+/* A long subject takes a second line. Its full text is the heading's title. */
+.mail-inbox .mail-case-heading h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.mail-case-channel {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-case-state {
+  margin: 0;
+  padding: 24px;
+}
+/* The tools ask for their full width and give way to the title's last
+   8rem. What does not fit waits behind an ellipsis. */
+.mail-case-tools {
+  gap: 2px;
+}
+/* ---------- the console's tools in the pane ---------- */
+/* On a wide screen the console's tools share the conversation's top row.
+   The handle between the two groups moves; each group keeps what fits. */
+.mail-drawer > .mail-console-dock {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  z-index: 31;
+  display: flex;
+  width: var(--mail-console-dock-set, max-content);
+  min-width: var(--mail-console-dock-min, 112px);
+  max-width: var(--mail-console-dock-max, calc(100% - 200px));
+  height: 64px;
+  pointer-events: auto;
+}
+.mail-console-dock .portal-nav {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  gap: 0;
+  padding: 0 10px 0 0;
+}
+.mail-console-dock .mail-console-handle {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-self: center;
+  justify-content: center;
+  width: 15px;
+  height: 32px;
+  border-radius: 6px;
+  outline: none;
+  touch-action: none;
+}
+.mail-console-handle::before {
+  content: "";
+  width: 1px;
+  height: 100%;
+  background: var(--border);
+  transition: background-color 120ms ease;
+}
+.mail-console-handle:is(:hover, :focus-visible, :active)::before {
+  width: 2px;
+  background: var(--ink-2);
+}
+.mail-console-dock .mail-console-tools {
+  flex: 1 1 auto;
+  min-width: 82px;
+  gap: 8px;
+  margin-inline-start: 6px;
+}
+.mail-drawer:has(> .mail-console-dock) .mail-case-bar {
+  align-items: flex-start;
+  padding-inline-end: var(--mail-console-dock, 0px);
+}
+/* The tools stay on the row's first line, level with the console's tools,
+   when a long title takes a second line. */
+.mail-drawer:has(> .mail-console-dock) .mail-case-tools {
+  margin-block-start: 6px;
+}
+.mail-drawer:has(> .mail-console-dock) .mail-case-heading {
+  padding-block-start: 3px;
+}
+.mail-drawer:has(> .mail-console-dock)
+  .mail-jev-panel
+  > .mail-inbox-thread-heading {
+  min-height: 32px;
+  padding-inline-end: calc(var(--mail-console-dock, 0px) - 16px);
+}
+.mail-case-menu {
+  max-inline-size: min(20rem, calc(100vw - 24px));
+}
+.mail-case-body {
+  container: mail-case / inline-size;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+/* The messages scroll. The reply box stays at the foot of the pane. */
+.mail-conversation {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+/* On a very wide screen, the text and the reply box keep a reading width. */
+.mail-conversation {
+  --mail-pane-inset: max(24px, calc((100% - 58rem) / 2));
+}
+.mail-conversation-scroll {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: 20px var(--mail-pane-inset) 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.mail-composer {
+  flex: none;
+  max-height: 62%;
+  margin: 0 var(--mail-pane-inset) 16px;
+  padding: 14px 16px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.mail-inbox-thread-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-end: 16px;
+}
+.mail-processing-menu {
+  inline-size: 23rem;
+}
+.mail-processing-menu .action-menu-item[data-highlighted] {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+.mail-processing-menu .action-menu-heading {
+  white-space: normal;
+  line-height: 1.5;
+}
+.mail-processing-check {
+  inline-size: 16px;
+}
+.mail-processing-state {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.mail-processing-dialog {
+  inline-size: min(680px, calc(100vw - 24px));
+  block-size: fit-content;
+}
+.mail-processing-dialog .connection-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.mail-processing-dialog p {
+  margin: 0;
+  line-height: 1.6;
+}
+.mail-processing-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.mail-rule-actions,
+.mail-assistant-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 16px;
+}
+/* A message is a bubble: the customer's on the left, the mailbox's on the
+   right. */
+.mail-inbox-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: fit-content;
+  max-width: min(46rem, 88%);
+  margin-block-end: 16px;
+  overflow-wrap: anywhere;
+}
+.mail-inbox-message > .mail-inbox-body {
+  padding: 11px 15px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.mail-inbox-message[data-own="true"] {
+  align-items: flex-end;
+  margin-inline-start: auto;
+}
+.mail-inbox-message[data-own="true"] > .mail-inbox-body {
+  background: var(--pantry-primary);
+  border-color: transparent;
+  color: var(--pantry-on-primary);
+}
+/* Above each bubble: the sender's name, the address and the date. */
+.mail-message-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin-block-end: 5px;
+}
+.mail-inbox .mail-message-head h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+}
+.mail-message-address {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.mail-message-head time {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.mail-inbox-body {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 14px;
+  max-width: 75ch;
+}
+/* The automatic acknowledgement is one quiet line. */
+.mail-inbox-own {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 32px;
+  margin-block: 0 16px;
+  padding-block: 6px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.mail-inbox-own-label {
+  min-width: 0;
+  font-weight: 500;
+}
+.mail-inbox-own time {
+  flex: none;
+  font-size: 12px;
+}
+/* The earlier mail that the first message of a thread carries. */
+.mail-inbox-quoted {
+  margin-block-start: 8px;
+}
+.mail-inbox-quoted > .mail-inbox-body {
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--border);
+  color: var(--ink-2);
+}
+.mail-draft {
+  display: grid;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.mail-draft + .mail-draft {
+  margin-block-start: 16px;
+}
+.mail-draft p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.mail-draft > button:not(:where(.pantry-select-trigger)) {
+  justify-self: start;
+}
+.mail-inbox .mail-draft-title {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+.mail-inbox .mail-draft-chip {
+  justify-self: start;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  color: var(--pantry-info-text);
+  background: var(--pantry-info-surface);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.mail-inbox .mail-draft[data-draft="unconfirmed"] {
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--warn-bg);
+}
+.mail-inbox .mail-draft[data-draft="unconfirmed"] .mail-draft-chip {
+  color: var(--warn-text);
+  background: var(--paper);
+}
+.mail-draft .mail-draft-to {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.mail-draft-body {
+  font-size: 14.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.mail-sources {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mail-source {
+  display: flex;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.mail-source[data-active="true"] {
+  background: color-mix(in oklch, var(--pantry-accent-surface) 45%, transparent);
+}
+.mail-source[data-active="true"] .mail-source-number {
+  background: var(--paper);
+}
+.mail-source-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.mail-source-kind {
+  color: var(--ink-3);
+}
+.mail-source-detail {
+  color: var(--ink-2);
+}
+.mail-source-text a {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 24px;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  text-decoration-color: color-mix(in oklch, var(--ink-2) 40%, transparent);
+  text-underline-offset: 3px;
+}
+.mail-source-text a:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+.mail-draft-edit {
+  display: grid;
+  gap: 8px;
+}
+/* The bar holds to the pane's lower edge while the conversation scrolls. */
+.mail-draft-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  margin-block-start: 12px;
+  padding-block: 0 max(14px, env(safe-area-inset-bottom));
+  background: var(--paper);
+}
+/* Text fades out as it scrolls under the bar. A rule here would double
+   each divider that passes under it. */
+.mail-draft-bar::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  height: 12px;
+  background: linear-gradient(to bottom, transparent, var(--paper));
+  pointer-events: none;
+}
+.mail-draft-bar p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.mail-draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+/* Focus scrolls a control clear of the bar. */
+.mail-conversation :is(a, button:not(:where(.pantry-select-trigger)), input, button:where(.pantry-select-trigger), summary, textarea) {
+  scroll-margin-block-end: 96px;
+}
+.mail-conversation-problem {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-block: 12px;
+}
+.mail-conversation-problem p {
+  margin: 0;
+}
+.mail-conversation-notice {
+  width: fit-content;
+  max-width: min(46rem, 100%);
+  margin-block: 12px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: var(--pantry-info-surface);
+  color: var(--pantry-info-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.mail-case-details,
+.mail-details-section {
+  overflow-wrap: anywhere;
+}
+.mail-details-section {
+  margin-block-end: 24px;
+}
+.mail-details-section > :first-child {
+  margin-block-start: 0;
+}
+.mail-details-section a {
+  color: var(--pantry-link);
+  text-underline-offset: 0.18em;
+}
+.mail-details-section > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+}
+.mail-details-case {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.mail-details-state {
+  margin: 0;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+/* No mailbox yet: the page title, then one quiet card with the way in. */
+.mail-inbox-empty {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 24px;
+  max-width: 44rem;
+  line-height: 1.6;
+}
+.mail-inbox-connect {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding: 28px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+.mail-inbox-connect p {
+  margin: 0;
+  color: var(--ink-2);
+}
+.mail-inbox-connect a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-block-start: 8px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  box-shadow: var(--pantry-primary-ring);
+  font-weight: 500;
+  text-decoration: none;
+}
+.mail-inbox-connect a:hover {
+  background: var(--pantry-primary-hover);
+}
+.mail-jev-panel {
+  min-width: 0;
+  padding: 16px 24px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+.mail-jev-context {
+  font-size: 13px;
+  font-weight: 600;
+  margin-block: 0 24px;
+}
+.mail-assistant {
+  margin-block-end: 24px;
+}
+.mail-assistant p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.mail-assistant form {
+  display: grid;
+  gap: 12px;
+  margin-block: 16px;
+}
+.mail-assistant textarea {
+  min-height: 7rem;
+}
+.mail-assistant button:not(:where(.pantry-select-trigger)) {
+  width: fit-content;
+}
+.mail-assistant-suggestions button:not(:where(.pantry-select-trigger)) {
+  font-size: 13px;
+  padding-inline: 10px;
+}
+.mail-inbox :is(.mail-assistant-consent, .mail-rule-consent) {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  line-height: 1.6;
+  font-size: 13px;
+}
+.mail-inbox :is(.mail-assistant-consent, .mail-rule-consent) input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  margin-block-start: 3px;
+  padding: 0;
+}
+.mail-assistant-result,
+.mail-preview {
+  margin-block-start: 16px;
+  padding: 12px;
+  background: var(--paper);
+  border-radius: 8px;
+}
+.mail-assistant-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.mail-organization {
+  margin-block-start: 24px;
+}
+.mail-organization > h3 {
+  margin-block: 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.mail-rule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  margin-block: 16px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.mail-rule label {
+  grid-template-columns: minmax(0, 1fr);
+}
+.mail-rule :is(input, textarea) {
+  width: 100%;
+}
+.mail-rule textarea {
+  min-height: 96px;
+}
+.mail-preview-results {
+  padding-inline-start: 20px;
+  font-size: 13px;
+}
+.mail-preview-results li + li {
+  margin-block-start: 8px;
+}
+.mail-correction {
+  display: grid;
+  gap: 8px;
+  margin-block: 16px;
+}
+.mail-decision {
+  padding: 12px;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.mail-work-list {
+  padding-inline-start: 20px;
+}
+.mail-work-list li + li {
+  margin-block-start: 16px;
+}
+.mail-details-section .email-review-edit {
+  display: grid;
+  gap: 12px;
+}
+.mail-details-section .email-review-edit :is(input, button:where(.pantry-select-trigger), textarea) {
+  width: 100%;
+}
+.mail-sender-supplier-state {
+  margin-block: 0 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.mail-sender-supplier-state a {
+  font-weight: 500;
+}
+.mail-sender-supplier-form {
+  display: grid;
+  gap: 8px;
+  max-width: 28rem;
+}
+.mail-sender-supplier-form button:where(.pantry-select-trigger) {
+  width: 100%;
+}
+.mail-sender-supplier-form p {
+  margin: 0;
+}
+.mail-sender-supplier-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mail-relationship-correction form {
+  display: grid;
+  gap: 12px;
+}
+.mail-relationship-correction dl,
+.mail-details-facts {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+}
+.mail-relationship-correction dt,
+.mail-details-facts dt {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.mail-relationship-correction dd,
+.mail-details-facts dd {
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+/* A narrow list puts each mail row on two lines: sender and date, then the
+   subject. */
+@container mail-page (max-width: 36rem) {
+  .mail-inbox :is(button:not(:where(.pantry-select-trigger)), a).mail-inbox-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "sender time"
+      "main main";
+    gap: 2px 12px;
+    padding-block: 10px;
+  }
+  .mail-inbox a.mail-spam-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "sender time open"
+      "main main main";
+  }
+  .mail-spam-open {
+    grid-area: open;
+  }
+  .mail-inbox-row .mail-inbox-sender {
+    grid-area: sender;
+  }
+  .mail-inbox-row-end {
+    grid-area: time;
+  }
+  .mail-inbox-row-main {
+    grid-area: main;
+  }
+  .mail-inbox .mail-case-row {
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  /* One line of tools: the mailbox lines up with the title, and the icons with
+     the list's far edge. The busy mark waits beside the mailbox. */
+  .mail-inbox .mail-page-tools {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    min-width: 0;
+    justify-content: flex-start;
+    margin-inline: 0 -9px;
+  }
+  .mail-inbox .mail-busy {
+    margin-inline-end: auto;
+  }
+  /* The name needs the room. The strip below says the same, and a screen
+     reader still reads the word. */
+  .mail-status-word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+/* Three actions do not fit one row of a phone: the main action leads. */
+@container mail-case (max-width: 22rem) {
+  .mail-draft-actions button:not(:where(.pantry-select-trigger)) {
+    flex: 1 1 0;
+  }
+  .mail-draft-actions .connection-primary-action {
+    flex-basis: 100%;
+  }
+  .mail-conversation :is(a, button:not(:where(.pantry-select-trigger)), input, button:where(.pantry-select-trigger), summary, textarea) {
+    scroll-margin-block-end: 152px;
+  }
+}
+/* Without room for two panes, the page shows the list or the conversation.
+   Close returns to the list. */
+@media (max-width: 1159px) {
+  .mail-drawer[data-open="false"] {
+    display: none;
+  }
+  .portal-main[data-page="inbox"]
+    > .portal-main-inner:has(.mail-inbox[data-drawer="open"]) {
+    padding: 0;
+  }
+  .mail-inbox[data-drawer="open"] .mail-page {
+    display: none;
+  }
+  /* The app's toolbar stands above the page here, so nothing needs to stick. */
+  .mail-inbox .mail-drawer {
+    position: relative;
+    top: 0;
+    flex: 1 1 100%;
+    margin: 0;
+    background: transparent;
+    border-inline-start: 0;
+  }
+}
+@media (max-width: 760px) {
+  .mail-case-bar {
+    --mail-pane-inset: 16px;
+    padding-inline-end: 10px;
+  }
+  .mail-conversation {
+    --mail-pane-inset: 16px;
+  }
+  .mail-conversation-scroll {
+    padding-block: 16px 12px;
+  }
+  .mail-composer {
+    max-height: 68%;
+    margin: 0 8px 8px;
+    padding: 12px 12px 0;
+  }
+}
+.mail-sender-supplier-empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.mail-sender-supplier-empty p {
+  margin: 0;
+}
+/* Plan 40D: the shared reply draft, with presence and agent cursors. */
+.mail-reply-draft {
+  display: grid;
+  gap: 8px;
+}
+.mail-reply-draft-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.mail-reply-draft-wrap {
+  position: relative;
+}
+.mail-reply-draft textarea {
+  min-height: 200px;
+  resize: vertical;
+}
+.mail-reply-draft-error:empty {
+  display: none;
+}
+.mail-reply-draft-error {
+  color: var(--danger-text);
+}
+/* Plan 83: WhatsApp rows and the agent setting. */
+.mail-avatar[data-channel="whatsapp"] {
+  background: var(--surface);
+  color: var(--ok-text);
+}
+/* The open row has the same tint, so the mark takes the paper. */
+.mail-case-row[aria-current="true"] .mail-avatar[data-channel="whatsapp"] {
+  background: var(--paper);
+}
+.mail-channel-filter {
+  display: block;
+  flex: 0 0 9.5rem;
+}
+.mail-channel-filter button:where(.pantry-select-trigger) {
+  width: 100%;
+}
+/* With a mouse the filter matches the mailbox control beside it. */
+@media (pointer: fine) {
+  .mail-inbox
+    .mail-channel-filter
+    button.pantry-select-trigger {
+    min-height: 38px;
+    padding-block: 0;
+    border-radius: 11px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
+/* ---------- the person's reply ---------- */
+/* Closed, the reply is one bar across the pane's foot. Open, it is an email
+   composer card, as in Gmail; it can also take the whole pane. */
+.mail-composer[data-kind="person"] {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: 72%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  /* The mail under the card's margins stays readable and selectable. */
+  pointer-events: none;
+}
+.mail-composer[data-kind="person"] .mail-reply,
+.mail-composer[data-kind="person"] .mail-reply-closed > * {
+  pointer-events: auto;
+}
+.mail-conversation:has(> .mail-composer[data-kind="person"]) {
+  position: relative;
+}
+.mail-conversation:has(> .mail-composer[data-kind="person"])
+  > .mail-conversation-scroll {
+  padding-block-end: calc(var(--mail-reply-room, 0px) + 8px);
+}
+.mail-reply-closed {
+  display: grid;
+  gap: 8px;
+  padding: 10px var(--mail-pane-inset) max(16px, env(safe-area-inset-bottom));
+}
+.mail-inbox .mail-reply-closed .mail-reply-open {
+  box-shadow:
+    0 1px 2px rgb(60 64 67 / 20%),
+    0 1px 4px 1px rgb(60 64 67 / 10%);
+}
+.mail-reply-problem {
+  margin: 0;
+  font-size: 13px;
+}
+.mail-reply-closed > .mail-reply-problem {
+  justify-self: start;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--paper);
+}
+.mail-inbox .mail-reply-open {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-2);
+  box-shadow: none;
+  font-size: 14px;
+  text-align: start;
+  cursor: text;
+}
+.mail-inbox .mail-reply-open:is(:hover, :focus-visible) {
+  border-color: color-mix(in srgb, var(--ink) 28%, transparent);
+  color: var(--ink);
+}
+.mail-reply-open-label {
+  flex: none;
+  color: var(--ink);
+  font-weight: 500;
+}
+.mail-reply-open-preview {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-reply {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: 8px var(--mail-pane-inset) max(16px, env(safe-area-inset-bottom));
+  padding: 12px 16px 14px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow:
+    0 1px 2px rgb(60 64 67 / 30%),
+    0 2px 6px 2px rgb(60 64 67 / 15%);
+}
+.mail-reply[hidden] {
+  display: none;
+}
+/* The whole pane: the messages give their room to the reply. */
+.mail-conversation[data-replying="expanded"] > .mail-conversation-scroll {
+  display: none;
+}
+.mail-conversation[data-replying="expanded"]
+  > .mail-composer[data-kind="person"] {
+  inset-block-start: 0;
+  max-height: none;
+  min-height: 0;
+}
+.mail-conversation[data-replying="expanded"] .mail-reply {
+  margin-block-start: 16px;
+}
+.mail-reply-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  color: var(--ink-2);
+}
+.mail-reply-to {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-reply-address {
+  color: var(--ink-2);
+}
+.mail-reply-editor {
+  position: relative;
+  flex: 1;
+  min-height: 9rem;
+  margin-block: 6px 10px;
+  padding: 4px 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  outline: none;
+}
+/* The caret shows the focus, as in a mail client. */
+.mail-inbox .mail-reply-editor:is(:focus, :focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+.mail-reply-editor[data-empty]::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  color: var(--ink-2);
+  pointer-events: none;
+}
+/* The editor reads bold from the weight, and the mail shows it at 700. */
+.mail-inbox .mail-reply-editor :is(b, strong) {
+  font-weight: 700;
+}
+.mail-reply-editor :is(h1, h2) {
+  margin: 0.4em 0;
+  line-height: 1.25;
+}
+.mail-reply-editor h1 {
+  font-size: 26px;
+}
+.mail-reply-editor h2 {
+  font-size: 20px;
+}
+.mail-reply-editor :is(ul, ol) {
+  margin: 0;
+  padding-inline-start: 28px;
+}
+.mail-reply-editor blockquote:not([style]) {
+  margin: 0 0 0 0.8ex;
+  padding-inline-start: 1ex;
+  border-inline-start: 1px solid #ccc;
+}
+.mail-reply-editor a {
+  color: #1a73e8;
+}
+/* Each file is one chip, as in Gmail: its name, its size and Remove. */
+.mail-reply-files {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+.mail-reply-files li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 28rem;
+  min-height: 34px;
+  padding: 0 4px 0 10px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.mail-reply-file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mail-reply-file-size {
+  flex: none;
+}
+.mail-reply-files .mail-icon-button {
+  width: 28px;
+  height: 28px;
+}
+.mail-reply-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  margin-block-end: 10px;
+  font-size: 13px;
+}
+.mail-reply-link label {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 12rem;
+}
+.mail-reply-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-self: flex-start;
+  gap: 2px;
+  max-width: 100%;
+  margin-block-end: 10px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: var(--surface);
+}
+.mail-reply-rule {
+  width: 1px;
+  height: 20px;
+  margin-inline: 4px;
+  background: var(--border);
+}
+.mail-inbox .mail-reply-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+.mail-inbox .mail-reply-tool[data-wide] {
+  padding-inline: 10px 6px;
+}
+.mail-inbox .mail-reply-tool:is(:hover, :focus-visible, [data-state="open"]) {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.mail-inbox .mail-reply-tool[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+.mail-reply-tool-text {
+  white-space: nowrap;
+}
+.mail-reply-aa {
+  font-size: 15px;
+  font-weight: 500;
+}
+.mail-reply-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.mail-reply-menu {
+  min-inline-size: 11rem;
+}
+.mail-reply-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.mail-inbox .mail-reply-send {
+  min-height: 40px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pantry-primary, var(--ink));
+  color: var(--pantry-on-primary, var(--paper));
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.mail-inbox .mail-reply-send:hover:not(:disabled) {
+  background: var(--pantry-primary-hover, var(--ink));
+}
+.mail-inbox .mail-reply-send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.mail-reply-spacer {
+  flex: 1;
+}
+.inbox-agent-sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.inbox-agent-sheet .connection-actions {
+  margin-block-end: 0;
+}
+.inbox-agent-channels {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--surface);
+}
+.inbox-agent-channels button:not(:where(.pantry-select-trigger)) {
+  flex: 1 1 0;
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.inbox-agent-channels button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--ink-strong);
+  box-shadow: var(--ring);
+}
+.inbox-agent-choices {
+  display: grid;
+  gap: 8px;
+}
+.inbox-agent-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--border);
+  text-align: start;
+  white-space: normal;
+}
+.inbox-agent-choice[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.inbox-agent-choice:disabled {
+  opacity: 0.6;
+}
+.inbox-agent-choice-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+.inbox-agent-choice-title {
+  font-weight: 600;
+}
+.inbox-agent-choice-detail {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.inbox-agent-choice-mark {
+  display: grid;
+  flex: 0 0 22px;
+  place-items: center;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--pantry-on-primary);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.inbox-agent-choice[aria-pressed="true"] .inbox-agent-choice-mark {
+  background: var(--pantry-primary);
+  box-shadow: none;
+}
+.inbox-agent-topics {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.inbox-agent-topics textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: inherit;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 400;
+  resize: vertical;
+}
+/* A link in mail text shows its host. Its title holds the whole address. */
+.mail-body-link {
+  color: var(--ink-strong);
+  text-decoration: underline;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+.mail-no-reply {
+  flex: none;
+  margin: 0;
+  padding: 0 var(--mail-pane-inset) 20px;
+}
+/* The route's wrapper only catches the links that open and close the
+   mailbox settings page; it takes no box of its own. */
+.mail-inbox-route {
+  display: contents;
+}

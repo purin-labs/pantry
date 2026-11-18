@@ -1,0 +1,55 @@
+/* Board removal (Plan 40B): archive under the board list, restore below it. */
+.menu-board-archive {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.menu-board-archive .menu-board-text-button {
+  align-self: flex-start;
+  color: var(--ink-2);
+}
+
+.menu-boards-archived ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-boards-archived li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 30px;
+  padding: 0 0 0 8px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.menu-boards-archived li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* With every board archived, the list shows under the start screen's card. */
+.menu-board-start-layer > .menu-boards-archived {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1080px;
+  margin: 16px auto 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.menu-board-start-layer > .menu-boards-archived h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}

@@ -1,0 +1,107 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The ChatGPT exit Worker (Plan 75). chatgpt.com refuses requests from a
+  // Worker and accepts them from a container. The Platform Worker sends each
+  // chatgpt.com request of the ChatGPT subscription route here through the
+  // service binding CHATGPT_EXIT, and this Worker hands it to one shared
+  // container. Other provider requests use the model exit Worker (Plan 73).
+  //
+  // It has no route and no credential. Deploy this Worker before the
+  // platform Worker that binds it.
+  // `pnpm --filter @seams/platform chatgpt-exit:check` checks this profile.
+  "main": "src/chatgpt-exit/worker.ts",
+  "compatibility_date": "2026-07-07",
+  "workers_dev": false,
+  // The Worker runs near AWS Tokyo, so its container's Actor starts in Japan.
+  // Never use Smart Placement here: it would move the Worker toward the
+  // providers, in the United States.
+  "placement": {
+    "region": "aws:ap-northeast-1",
+  },
+  // Actor classes are declared with `exports`, as in the platform profile.
+  "exports": {
+    "ChatGptExitContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+  },
+  "observability": {
+    "enabled": true,
+    // Cloudflare's invocation record would keep the request and the response
+    // of each call, which this Worker must not log.
+    "logs": {
+      "invocation_logs": false,
+    },
+  },
+  "env": {
+    "local": {
+      "name": "satyr-chatgpt-exit-local",
+      "vars": { "SATYR_DEPLOYMENT_PROFILE": "local" },
+      "containers": [
+        {
+          "class_name": "ChatGptExitContainer",
+          "image": "../chatgpt-exit/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          "constraints": { "regions": ["APAC"] },
+          "name": "satyr-chatgpt-exit-container-local",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "CHATGPT_EXIT_CONTAINER",
+            "class_name": "ChatGptExitContainer",
+          },
+        ],
+      },
+    },
+    "staging": {
+      "name": "satyr-chatgpt-exit-staging",
+      "vars": { "SATYR_DEPLOYMENT_PROFILE": "staging" },
+      "containers": [
+        {
+          "class_name": "ChatGptExitContainer",
+          "image": "../chatgpt-exit/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          "constraints": { "regions": ["APAC"] },
+          "name": "satyr-chatgpt-exit-container-staging",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "CHATGPT_EXIT_CONTAINER",
+            "class_name": "ChatGptExitContainer",
+          },
+        ],
+      },
+    },
+    "production": {
+      "name": "satyr-chatgpt-exit",
+      "vars": { "SATYR_DEPLOYMENT_PROFILE": "production" },
+      "containers": [
+        {
+          "class_name": "ChatGptExitContainer",
+          "image": "../chatgpt-exit/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          "constraints": { "regions": ["APAC"] },
+          "name": "satyr-chatgpt-exit-container",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "CHATGPT_EXIT_CONTAINER",
+            "class_name": "ChatGptExitContainer",
+          },
+        ],
+      },
+    },
+  },
+}

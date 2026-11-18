@@ -1,0 +1,80 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The Slack ingress Worker. It holds the fast path of a Slack event and no
+  // Actor class, so a new isolate of it starts sooner than one of the
+  // platform Worker. It calls the Connector class of the platform Worker and
+  // passes every other request to the platform Worker.
+  //
+  // The values that it shares with the production profile of wrangler.jsonc
+  // must be equal. `pnpm --filter @seams/platform slack-ingress:deploy` refuses a
+  // deployment when they differ, and when the script holds platform code.
+  "main": "src/slack-ingress/worker.ts",
+  "compatibility_date": "2026-07-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "minify": true,
+  "observability": {
+    "enabled": true,
+  },
+  "env": {
+    "production": {
+      "name": "satyr-slack-ingress",
+      // Slack sends its events from the east of North America, so the edge
+      // that receives them is far from the route database and from the
+      // Connectors, which are in Tokyo. The handler therefore runs near the
+      // databases. The event then crosses the Pacific one time. From the
+      // edge, the route read and the Connector call each crossed it and came
+      // back.
+      "placement": {
+        "region": "aws:ap-northeast-1",
+      },
+      "vars": {
+        "SATYR_DEPLOYMENT_PROFILE": "production",
+        "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"production-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
+        "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+        "SLACK_APP_ID": "A0BFVDZLFLM",
+      },
+      // SLACK_SIGNING_SECRET is a Worker secret: a copy of the secret of
+      // the platform Worker. Without it, or with an outdated copy, this
+      // Worker passes every request to the platform Worker.
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "satyr-global-tokyo",
+          "database_id": "9c1e5467-2985-4ca9-8cb0-3b3b933249ef",
+        },
+        {
+          "binding": "ORGANISATION_DB_APAC",
+          "database_name": "satyr-organisation-apac",
+          "database_id": "fe8a597e-b094-4229-8a70-139fa239c168",
+        },
+      ],
+      "secrets_store_secrets": [
+        {
+          "binding": "VAULT_ROOT_V1",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "vault-root-v1",
+        },
+        {
+          "binding": "VAULT_ROOT_V2",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "vault-root-v2",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "CONNECTOR",
+            "class_name": "ConnectorDO",
+            "script_name": "satyr-edge",
+          },
+        ],
+      },
+      "services": [
+        {
+          "binding": "PLATFORM",
+          "service": "satyr-edge",
+        },
+      ],
+    },
+  },
+}

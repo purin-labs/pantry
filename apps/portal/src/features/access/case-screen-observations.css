@@ -1,0 +1,30 @@
+.access-on-screen-list {
+  display: grid;
+  gap: 0;
+  margin: var(--pantry-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.access-on-screen-list li {
+  display: grid;
+  gap: 2px;
+  padding: var(--pantry-space-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.access-on-screen-list li:last-child {
+  border-bottom: none;
+}
+
+.access-on-screen-page {
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+
+.access-on-screen-meta,
+.access-on-screen-sources {
+  color: var(--ink-2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}

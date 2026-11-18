@@ -1,0 +1,118 @@
+/* Plan 40B phase 7, slice 5: rulers on the board's edges, and the size and
+   spacing of a box that moves. The rulers use screen pixels; the measures
+   use board units and scale their labels back to screen size. */
+
+.menu-canvas-ruler {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--surface, #fff);
+  color: var(--ink-2, #5b6660);
+  font: 500 9px/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.menu-canvas-ruler[data-axis="x"] {
+  bottom: calc(100% + 1px);
+  left: 0;
+  border-bottom: 1px solid var(--border, #d9ddd8);
+}
+
+.menu-canvas-ruler[data-axis="y"] {
+  top: 0;
+  right: calc(100% + 1px);
+  border-right: 1px solid var(--border, #d9ddd8);
+}
+
+/* The board's name stands above the ruler. */
+.menu-board-stage:has(.menu-canvas-ruler) .menu-board-stage-label {
+  bottom: calc(100% + 20px);
+}
+
+.menu-canvas-ruler-tick {
+  position: absolute;
+  background: color-mix(in oklch, var(--ink, #1c2520) 35%, transparent);
+}
+
+.menu-canvas-ruler[data-axis="x"] .menu-canvas-ruler-tick {
+  bottom: 0;
+  width: 1px;
+  height: 6px;
+}
+
+.menu-canvas-ruler[data-axis="y"] .menu-canvas-ruler-tick {
+  right: 0;
+  width: 6px;
+  height: 1px;
+}
+
+.menu-canvas-ruler-label {
+  position: absolute;
+  white-space: nowrap;
+}
+
+.menu-canvas-ruler[data-axis="x"] .menu-canvas-ruler-label {
+  bottom: 7px;
+  left: 3px;
+}
+
+.menu-canvas-ruler[data-axis="y"] .menu-canvas-ruler-label {
+  right: 7px;
+  top: 2px;
+  transform: rotate(-90deg) translateX(-100%);
+  transform-origin: 100% 0;
+}
+
+/* An actor's selection on the ruler, in that actor's colour. */
+.menu-canvas-ruler-range {
+  position: absolute;
+  background: color-mix(in srgb, var(--range, var(--agent)) 28%, transparent);
+  box-shadow: inset 0 0 0 1px var(--range, var(--agent));
+}
+
+.menu-canvas-ruler[data-axis="x"] .menu-canvas-ruler-range {
+  top: 0;
+  bottom: 0;
+}
+
+.menu-canvas-ruler[data-axis="y"] .menu-canvas-ruler-range {
+  left: 0;
+  right: 0;
+}
+
+.menu-canvas-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.menu-canvas-spacing-line {
+  position: absolute;
+  background: #e5243b;
+}
+
+.menu-canvas-spacing,
+.menu-canvas-measure-size {
+  position: absolute;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #fff;
+  font: 600 11px/16px Inter, "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.menu-canvas-spacing {
+  background: #e5243b;
+}
+
+.menu-canvas-measure-size {
+  transform-origin: 50% 0;
+  background: #1c2520;
+}

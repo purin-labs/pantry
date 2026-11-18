@@ -1,0 +1,68 @@
+[data-glide-highlight] {
+  position: relative;
+  isolation: isolate;
+}
+/* Consumers theme it with --glide-highlight-background, -radius and -shadow. */
+.glide-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: var(--glide-highlight-radius, 6px);
+  background: var(--glide-highlight-background, var(--surface));
+  box-shadow: var(--glide-highlight-shadow, none);
+  opacity: 0;
+  pointer-events: none;
+}
+.glide-highlight[data-visible="true"] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .glide-highlight {
+    transition: opacity var(--motion-quick);
+  }
+  .glide-highlight[data-visible="false"] {
+    transition: opacity var(--motion-exit);
+  }
+}
+[data-agent-preview-motion="reduced"] .glide-highlight {
+  transition: none;
+}
+/* A closing menu fades out. When an item was chosen, its highlight first dips
+   off and back on, and the fade waits for that blink. */
+[data-glide-highlight][role="menu"] {
+  --glide-blink: calc(140ms * var(--agent-motion-factor, 1));
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-glide-highlight][role="menu"][data-state="closed"] {
+    pointer-events: none;
+    animation: glide-menu-exit var(--motion-exit) forwards;
+  }
+  [data-glide-highlight][role="menu"][data-state="closed"]:has(
+      > .glide-highlight[data-blink]
+    ) {
+    animation-delay: var(--glide-blink);
+  }
+  [role="menu"][data-state="closed"] > .glide-highlight[data-blink] {
+    animation: glide-highlight-blink var(--glide-blink) linear;
+  }
+}
+[data-agent-preview-motion="reduced"]
+  [data-glide-highlight][role="menu"][data-state="closed"],
+[data-agent-preview-motion="reduced"] .glide-highlight[data-blink] {
+  animation: none;
+}
+@keyframes glide-menu-exit {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes glide-highlight-blink {
+  20%,
+  50% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+}

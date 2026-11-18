@@ -1,0 +1,53 @@
+.overflow-toolbar {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  min-width: 32px;
+}
+.overflow-toolbar-item {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+.overflow-toolbar-more {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+.overflow-toolbar .overflow-toolbar-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.overflow-toolbar .overflow-toolbar-button:is(:hover, :focus-visible),
+.overflow-toolbar .overflow-toolbar-button[aria-expanded="true"] {
+  background: var(--surface-hover, var(--portal-header-hover));
+  color: var(--ink);
+}
+/* The tray hangs below the ellipsis and keeps the controls in one row. */
+.overflow-toolbar-tray {
+  position: absolute;
+  inset-block-start: calc(100% + 6px);
+  inset-inline-end: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+.overflow-toolbar-tray[hidden] {
+  display: none;
+}

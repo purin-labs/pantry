@@ -1,0 +1,51 @@
+{
+  "organisationId": "organisation_plan25",
+  "membershipRevision": 1,
+  "role": "operator",
+  "people": {
+    "personA": "person_plan25_a",
+    "personB": "person_plan25_b"
+  },
+  "slack": {
+    "workspaceId": "T_PLAN25",
+    "integrationAccountId": "account_plan25_slack",
+    "connectorId": "connector_plan25_slack",
+    "directConversationId": "D_PLAN25_A",
+    "sharedConversationId": "C_PLAN25_SHARED"
+  },
+  "workflow": {
+    "kind": "cue_subscription",
+    "id": "cue_plan25_inventory",
+    "revision": 1,
+    "systemPrincipal": "cue_engine"
+  },
+  "cases": {
+    "direct": "case_plan25_direct",
+    "shared": "case_plan25_shared",
+    "workflow": "case_plan25_workflow"
+  },
+  "assignments": {
+    "direct": "assignment_plan25_direct",
+    "shared": "assignment_plan25_shared",
+    "workflow": "assignment_plan25_workflow"
+  },
+  "sessions": {
+    "direct": "session_plan25_direct",
+    "shared": "session_plan25_shared",
+    "workflow": "session_plan25_workflow"
+  },
+  "capabilities": {
+    "roleRead": "catalog.read",
+    "personRead": "orders.read",
+    "conversationRead": "inventory.read",
+    "workflowRead": "inventory.read"
+  },
+  "context": {
+    "personEntryId": "entry_plan25_person",
+    "personText": "Person A private supplier note",
+    "sharedEntryId": "entry_plan25_shared",
+    "sharedText": "Shared channel inventory note",
+    "workflowEntryId": "entry_plan25_workflow",
+    "workflowText": "Workflow-visible low-stock note"
+  }
+}

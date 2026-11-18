@@ -1,0 +1,68 @@
+.preference-appearance-menu {
+  z-index: 100;
+  min-inline-size: 220px;
+  max-inline-size: calc(100vw - 24px);
+  max-block-size: var(--radix-dropdown-menu-content-available-height);
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+  font-size: 13px;
+}
+.preference-appearance-menu [role="menuitemradio"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 36px;
+  padding-inline: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.preference-appearance-menu [data-highlighted] {
+  background: var(--portal-selected);
+  outline: 2px solid var(--ink-2);
+  outline-offset: -2px;
+}
+.preference-appearance-check {
+  display: inline-flex;
+  inline-size: 16px;
+}
+.preference-appearance-menu [role="separator"] {
+  block-size: 1px;
+  margin: 4px;
+  background: var(--border);
+}
+.preference-appearance-label {
+  padding: 6px 10px 4px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+/* Each swatch shows its theme's primary and accent, whatever theme is on. */
+.preference-palette-swatch {
+  inline-size: 16px;
+  block-size: 16px;
+  flex: 0 0 16px;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1px color-mix(in oklch, currentColor 20%, transparent);
+}
+.preference-palette-swatch[data-palette="slate-coral"] {
+  background: linear-gradient(135deg, #3c4552 50%, #c96357 50%);
+}
+.preference-palette-swatch[data-palette="espresso"] {
+  background: linear-gradient(
+    135deg,
+    oklch(0.27 0.009 58) 50%,
+    oklch(0.66 0.14 58) 50%
+  );
+}
+/* Paper's accent is quiet, so its swatch shows the beige that names it. */
+.preference-palette-swatch[data-palette="paper"] {
+  background: linear-gradient(
+    135deg,
+    oklch(0.178 0 90) 50%,
+    oklch(0.95 0.007 81) 50%
+  );
+}

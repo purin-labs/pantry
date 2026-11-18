@@ -1,0 +1,55 @@
+body {
+  background: var(--paper);
+}
+
+.voice-recorder {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 16px;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.voice-recorder h1 {
+  color: var(--ink-strong);
+  font-size: 28px;
+  margin: 0 0 16px;
+}
+
+.voice-recorder-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 24px 0;
+}
+
+.voice-recorder button {
+  padding: 8px 14px;
+}
+
+.voice-recorder-start {
+  font-size: 18px;
+}
+
+.voice-recorder-count,
+.voice-recorder-step {
+  opacity: 0.7;
+}
+
+.voice-recorder-how {
+  margin: 8px 0 24px;
+}
+
+.voice-recorder-say {
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 24px;
+}
+
+.voice-recorder-note {
+  color: var(--warn-text);
+  font-weight: 600;
+}

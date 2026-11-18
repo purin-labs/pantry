@@ -1,0 +1,658 @@
+.chat-layout > .chat-thread-sidebar {
+  background: color-mix(
+    in oklch,
+    var(--pantry-sidebar) 75%,
+    var(--portal-chat-background, var(--surface))
+  );
+}
+.chat-directory-bar {
+  container: chat-library / inline-size;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 12px 0;
+  flex-shrink: 0;
+}
+.chat-directory-tabs {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+}
+.chat-directory-tabs > button:not(:where(.pantry-select-trigger)) {
+  position: relative;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  box-shadow: none;
+}
+.chat-directory-tabs > button:not(:where(.pantry-select-trigger))[aria-selected="true"] {
+  color: var(--ink);
+  font-weight: 500;
+}
+.chat-directory-tabs > button:not(:where(.pantry-select-trigger))[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ink);
+}
+.chat-directory-tools button:not(:where(.pantry-select-trigger)) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  box-shadow: none;
+  border-radius: 6px;
+  padding-inline: 4px;
+}
+.chat-directory-bar button:not(:where(.pantry-select-trigger)):focus-visible {
+  outline: 2px solid var(--ink-2);
+  outline-offset: 2px;
+}
+.chat-directory-tools button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--paper);
+}
+.chat-directory-load-more {
+  flex-shrink: 0;
+  margin: 4px;
+  min-block-size: 36px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+}
+.project-group {
+  margin-block: 14px;
+}
+.project-heading {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 34px;
+  color: var(--ink-2);
+}
+.project-heading button:not(:where(.pantry-select-trigger)) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  min-width: 32px;
+  padding: 4px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  box-shadow: none;
+}
+.project-heading .project-title {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: start;
+}
+.project-heading > button:not(:where(.pantry-select-trigger))[aria-expanded] {
+  justify-content: center;
+  flex: 0 0 28px;
+  min-inline-size: 28px;
+  min-block-size: 28px;
+  padding: 0;
+  border-radius: 6px;
+  color: var(--ink-2);
+}
+.project-heading button:not(:where(.pantry-select-trigger)):focus-visible {
+  outline: 2px solid var(--ink-2);
+  outline-offset: 2px;
+}
+.project-title > span {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.project-heading svg {
+  flex-shrink: 0;
+}
+.project-title > .project-default {
+  flex-shrink: 0;
+  margin-inline-start: 6px;
+  color: var(--ink-3);
+}
+.project-edit {
+  justify-content: center;
+  margin-inline-start: auto;
+}
+.project-edit + .project-edit {
+  margin-inline-start: 0;
+}
+.project-empty {
+  padding: 4px 8px 8px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+.chat-organizer-row {
+  /* How far a row sits in from the list. The highlight starts there too, so
+     a title never starts deep inside its own highlight. */
+  --chat-row-inset: 0px;
+  display: flex;
+  position: relative;
+  align-items: center;
+  min-height: 36px;
+  margin-inline-start: var(--chat-row-inset);
+  border-radius: 8px;
+  gap: 2px;
+}
+.chat-organizer-row:hover,
+.chat-organizer-row:focus-within {
+  background: color-mix(in oklch, var(--ink) 7%, transparent);
+}
+.chat-organizer-row:has(a[aria-current="page"]) {
+  background: color-mix(in oklch, var(--ink) 11%, transparent);
+}
+/* A side Case under the chat it came from (Plan 74): one level in, joined to
+   its source chat by a rounded elbow that starts under the source's title.
+   The elbow stays outside this row's highlight. When another side Case
+   follows, the line runs on past this row to it. */
+.chat-organizer-row[data-side-case="true"] {
+  /* Under the source's title, which starts 24px to the left of this one's. */
+  --chat-tree-x: -10px;
+  --chat-tree-line: color-mix(in oklch, var(--ink) 24%, transparent);
+  margin-inline-start: calc(var(--chat-row-inset) + 24px);
+}
+.chat-organizer-row[data-side-case="true"]::before,
+.chat-organizer-row[data-side-case="true"]:has(
+    + .chat-organizer-row[data-side-case="true"]
+  )::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: var(--chat-tree-x);
+  border-inline-start: 1.5px solid var(--chat-tree-line);
+  pointer-events: none;
+}
+.chat-organizer-row[data-side-case="true"]::before {
+  inset-block-start: -2px;
+  block-size: calc(50% + 2px);
+  inline-size: 7px;
+  border-block-end: 1.5px solid var(--chat-tree-line);
+  border-end-start-radius: 8px;
+}
+.chat-organizer-row[data-side-case="true"]:has(
+    + .chat-organizer-row[data-side-case="true"]
+  )::after {
+  inset-block: -2px 0;
+}
+.chat-organizer-row > a[data-reorderable="true"] {
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+.chat-organizer-row[data-dragging="true"] > a {
+  cursor: grabbing;
+}
+.chat-organizer-row > a:focus-visible {
+  outline: 2px solid var(--ink-2);
+  outline-offset: -2px;
+}
+.chat-organizer-list .chat-organizer-row > a {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px;
+  padding-inline-start: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.chat-organizer-row[data-dragging="true"] {
+  opacity: 0.5;
+}
+.chat-organizer-actions {
+  display: flex;
+  flex-shrink: 0;
+}
+.chat-organizer-actions button:not(:where(.pantry-select-trigger)) {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  min-height: 32px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ink-2);
+  padding: 3px;
+  box-shadow: none;
+}
+[data-sonner-toast][data-styled="true"]
+  .chat-archive-toast-close[data-close-button] {
+  min-block-size: 32px;
+  block-size: 32px;
+  inline-size: 24px;
+  padding: 0;
+}
+.chat-pinned-marker {
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  flex-shrink: 0;
+  color: var(--ink-3);
+}
+.project-heading button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+/* On the row's own highlight, so a tint and not a second surface. */
+.chat-organizer-actions button:hover {
+  background: color-mix(in oklch, var(--ink) 9%, transparent);
+}
+/* A long title slides left on hover. It may use the link's padding, so it
+   runs to the edge of the highlight and fades there. */
+.chat-organizer-row .chat-title-viewport {
+  margin-inline-start: -8px;
+  padding-inline-start: 8px;
+}
+.chat-organizer-row:is(:hover, :focus-within)
+  .chat-title-viewport[data-overflow="true"] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8px,
+    black calc(100% - 24px),
+    transparent
+  );
+}
+.chat-insertion-line {
+  position: relative;
+  block-size: 0;
+  pointer-events: none;
+}
+.chat-insertion-line::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: -1px;
+  border-block-start: 2px dotted var(--ink-2);
+}
+.chat-former-project {
+  display: block;
+  margin: 0 4px 8px;
+  color: var(--ink-3);
+}
+.project-menu.action-menu {
+  display: flex;
+  flex-direction: column;
+  max-block-size: min(
+    320px,
+    var(--radix-dropdown-menu-content-available-height)
+  );
+  overflow: hidden;
+  overscroll-behavior: contain;
+  inline-size: 240px;
+}
+.project-menu .action-menu-section + .action-menu-section {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+}
+.project-menu .action-menu-heading {
+  flex-shrink: 0;
+}
+.project-menu .action-menu-section + .action-menu-section .action-menu-items {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.project-menu .action-menu-copy {
+  overflow-wrap: anywhere;
+}
+@container (max-width: 760px) {
+  .chat-underlay .chat-thread-sidebar {
+    max-block-size: min(60dvh, 480px);
+  }
+}
+.project-menu .action-menu-section + .action-menu-section .action-menu-item {
+  padding-inline-start: 26px;
+}
+.project-dialog {
+  inline-size: min(540px, calc(100vw - 24px));
+  max-block-size: calc(100dvh - 24px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 20px;
+}
+.project-dialog form {
+  display: grid;
+  gap: 16px;
+}
+.project-dialog .access35-dialog-heading h2 {
+  font-size: 20px;
+  line-height: 1.3;
+}
+.project-dialog .access35-dialog-heading {
+  margin-block-end: 20px;
+}
+.project-dialog label {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+.project-dialog input,
+.project-dialog textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.5;
+}
+.project-dialog textarea {
+  resize: vertical;
+  min-block-size: 100px;
+}
+.project-hint {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin: 0;
+  line-height: 1.5;
+}
+.project-dialog label + .project-hint {
+  margin-block-start: -10px;
+}
+.chat-delete-description {
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.chat-delete-description p {
+  margin: 0 0 12px;
+}
+.chat-delete-description p:last-child {
+  margin: 0;
+  color: var(--ink-2);
+}
+.project-dialog [role="alert"] {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  color: var(--danger-text);
+  background: var(--danger-bg);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.project-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-block-start: 8px;
+}
+.project-dialog-actions button:not(:where(.pantry-select-trigger)) {
+  min-height: 36px;
+  padding: 8px 14px;
+}
+.chat-reference-results {
+  display: grid;
+  max-height: 160px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+}
+.chat-reference-results:empty,
+.project-references:empty {
+  display: none;
+}
+.chat-reference-results button:not(:where(.pantry-select-trigger)) {
+  text-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 8px;
+  border-radius: 5px;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  font-size: 13px;
+  box-shadow: none;
+}
+.chat-reference-results button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--surface);
+}
+.chat-reference-results button:not(:where(.pantry-select-trigger)) span,
+.project-references li span {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.chat-reference-results svg {
+  flex-shrink: 0;
+}
+.project-references {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+.project-references li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 4px 6px 4px 12px;
+  background: var(--surface);
+  border-radius: 8px;
+}
+.project-references button:not(:where(.pantry-select-trigger)) {
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  min-width: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  box-shadow: none;
+}
+.project-overview {
+  max-inline-size: 800px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding: 32px 24px;
+  overflow: auto;
+}
+.project-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-block-end: 28px;
+}
+.project-overview-heading > div {
+  flex: 1 1 220px;
+  min-inline-size: 0;
+}
+.project-overview-heading h2 {
+  margin: 8px 0 0;
+  font-size: 26px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.project-overview-label,
+.project-overview-heading button:not(:where(.pantry-select-trigger)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.project-overview-label {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.project-overview-heading button:not(:where(.pantry-select-trigger)) {
+  min-block-size: 40px;
+  flex-shrink: 0;
+}
+.project-overview-section {
+  padding-block: 20px;
+  border-block-start: 1px solid var(--border);
+}
+.project-overview-section h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.project-overview-cases {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.project-overview-cases > li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  min-block-size: 40px;
+  font-size: 14px;
+}
+.project-case-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 200px;
+  min-inline-size: 0;
+}
+.project-overview-cases time {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.project-overview-cases button:where(.pantry-select-trigger) {
+  min-block-size: 32px;
+}
+.project-overview p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.project-overview-empty {
+  color: var(--ink-2);
+}
+.project-overview-references,
+.project-overview-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.project-overview-references li,
+.project-overview-list a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.project-overview-references li {
+  background: var(--paper);
+}
+.project-overview svg {
+  flex-shrink: 0;
+}
+.project-overview-list a span {
+  flex: 1;
+  min-inline-size: 0;
+}
+.project-overview-list a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.project-overview-list a:hover {
+  background: var(--paper);
+}
+.project-context {
+  margin-block: 12px;
+  padding-block: 12px;
+  border-block: 1px solid var(--border);
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.project-context > strong {
+  color: var(--ink);
+}
+.project-context p {
+  margin: 8px 0;
+}
+.project-context p:last-child {
+  margin-block-end: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .chat-organizer-actions {
+    position: absolute;
+    inset-inline-end: 0;
+    border-radius: 7px;
+    background: inherit;
+  }
+  .chat-organizer-row:hover > a,
+  .chat-organizer-row:focus-within > a {
+    padding-inline-end: 60px;
+  }
+  .chat-organizer-actions,
+  .project-edit {
+    opacity: 0;
+  }
+  .chat-organizer-row:hover .chat-organizer-actions,
+  .chat-organizer-row:focus-within .chat-organizer-actions {
+    opacity: 1;
+  }
+  .project-heading:hover .project-edit,
+  .project-heading:focus-within .project-edit {
+    opacity: 1;
+  }
+}
+@media (pointer: coarse) {
+  .chat-organizer-actions button:not(:where(.pantry-select-trigger)),
+  .project-heading button:not(:where(.pantry-select-trigger)),
+  .project-dialog-actions button:not(:where(.pantry-select-trigger)),
+  .project-references button:not(:where(.pantry-select-trigger)),
+  .chat-reference-results button:not(:where(.pantry-select-trigger)) {
+    min-block-size: 44px;
+  }
+  .chat-organizer-actions button:not(:where(.pantry-select-trigger)),
+  .project-edit {
+    min-inline-size: 44px;
+  }
+  .project-dialog input,
+  .project-dialog textarea {
+    font-size: 16px;
+  }
+}
+@media (forced-colors: active) {
+  .chat-insertion-line::before {
+    border-color: Highlight;
+  }
+}

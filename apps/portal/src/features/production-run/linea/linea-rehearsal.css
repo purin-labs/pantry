@@ -1,0 +1,113 @@
+body {
+  margin: 0;
+  background: #f4f4f0;
+  color: #242724;
+  font:
+    15px system-ui,
+    sans-serif;
+}
+main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 24px;
+}
+h1 {
+  font-size: 28px;
+}
+header p {
+  max-width: 850px;
+  color: #535853;
+}
+.linea-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+  gap: 24px;
+}
+#view {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+#controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#controls h3 {
+  width: 100%;
+  margin: 12px 0 0;
+  text-transform: capitalize;
+}
+button:not(:where(.pantry-select-trigger)) {
+  padding: 10px 14px;
+  border: 1px solid #a4aaa4;
+  border-radius: 6px;
+  background: white;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+button:not(:where(.pantry-select-trigger)):disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+button:not(:where(.pantry-select-trigger)):focus-visible,
+input:focus-visible {
+  outline: 3px solid #245bd2;
+  outline-offset: 3px;
+}
+#status {
+  padding: 12px;
+  background: #e4e9e2;
+  border-radius: 6px;
+}
+input[type="range"] {
+  width: 100%;
+}
+pre {
+  max-height: 280px;
+  overflow: auto;
+  font-size: 12px;
+}
+a {
+  display: inline-block;
+  margin-top: 12px;
+}
+@media (max-width: 850px) {
+  .linea-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+#controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+#controls input[type="number"] {
+  width: 72px;
+  padding: 8px;
+  font: inherit;
+}
+#cups {
+  line-height: 1.7;
+}
+@media (max-width: 850px) {
+  #view {
+    position: static;
+  }
+}
+
+#files {
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid #a4aaa4;
+  border-radius: 8px;
+}
+#files label {
+  margin-left: 16px;
+}

@@ -1,0 +1,160 @@
+/* Espresso: warm white cards on a warm canvas, espresso actions, and caramel
+   links, focus, and small accents. Cards are pure white so they stand clear of
+   the canvas. */
+:root[data-pantry-theme="espresso"] {
+  /* Warm neutrals; 800 is the espresso ink. */
+  --pantry-espresso-50: oklch(0.985 0.003 80);
+  --pantry-espresso-100: oklch(0.975 0.004 80);
+  --pantry-espresso-150: oklch(0.958 0.006 75);
+  --pantry-espresso-200: oklch(0.935 0.009 72);
+  --pantry-espresso-250: oklch(0.91 0.01 72);
+  --pantry-espresso-300: oklch(0.87 0.012 70);
+  --pantry-espresso-350: oklch(0.8 0.013 70);
+  --pantry-espresso-400: oklch(0.7 0.013 68);
+  --pantry-espresso-450: oklch(0.62 0.012 66);
+  --pantry-espresso-500: oklch(0.55 0.011 64);
+  --pantry-espresso-550: oklch(0.52 0.01 62);
+  --pantry-espresso-600: oklch(0.44 0.012 60);
+  --pantry-espresso-650: oklch(0.36 0.012 58);
+  --pantry-espresso-700: oklch(0.32 0.01 58);
+  --pantry-espresso-750: oklch(0.27 0.009 58);
+  --pantry-espresso-800: oklch(0.235 0.008 58);
+
+  /* Caramel; 500 is the accent. */
+  --pantry-caramel-50: oklch(0.975 0.015 80);
+  --pantry-caramel-100: oklch(0.96 0.03 75);
+  --pantry-caramel-150: oklch(0.93 0.05 72);
+  --pantry-caramel-200: oklch(0.88 0.08 70);
+  --pantry-caramel-250: oklch(0.85 0.1 68);
+  --pantry-caramel-300: oklch(0.8 0.11 65);
+  --pantry-caramel-350: oklch(0.77 0.12 62);
+  --pantry-caramel-400: oklch(0.74 0.13 60);
+  --pantry-caramel-450: oklch(0.7 0.14 58);
+  --pantry-caramel-500: oklch(0.66 0.14 58);
+  --pantry-caramel-550: oklch(0.62 0.14 55);
+  --pantry-caramel-600: oklch(0.54 0.13 52);
+  --pantry-caramel-650: oklch(0.48 0.12 50);
+  --pantry-caramel-700: oklch(0.41 0.1 50);
+  --pantry-caramel-750: oklch(0.33 0.06 52);
+  --pantry-caramel-800: oklch(0.27 0.045 52);
+
+  --pantry-ground: var(--pantry-espresso-100);
+  --pantry-paper: oklch(1 0 0);
+  --pantry-surface: var(--pantry-espresso-150);
+  --pantry-border: var(--pantry-espresso-250);
+  --pantry-hairline: var(--pantry-espresso-450);
+  --pantry-ink: var(--pantry-espresso-800);
+  --pantry-ink-strong: var(--pantry-espresso-800);
+  --pantry-ink-muted: var(--pantry-espresso-600);
+  --pantry-ink-subtle: var(--pantry-espresso-550);
+  --pantry-ink-hover: var(--pantry-espresso-800);
+
+  --pantry-primary: var(--pantry-espresso-750);
+  --pantry-primary-hover: var(--pantry-espresso-800);
+  --pantry-on-primary: var(--pantry-espresso-50);
+  --pantry-primary-border: var(--pantry-espresso-750);
+  --pantry-hover: var(--pantry-espresso-100);
+  --pantry-selected: var(--pantry-espresso-200);
+  --pantry-on-selected: var(--pantry-espresso-800);
+  --pantry-link: var(--pantry-caramel-650);
+  --pantry-focus: var(--pantry-caramel-550);
+  --pantry-accent: var(--pantry-caramel-500);
+  --pantry-accent-soft: var(--pantry-caramel-200);
+  --pantry-accent-text: var(--pantry-caramel-650);
+  --pantry-accent-surface: var(--pantry-caramel-100);
+  --pantry-disabled-surface: var(--pantry-espresso-150);
+  --pantry-disabled-text: var(--pantry-espresso-450);
+
+  --pantry-success-text: oklch(0.45 0.1 155);
+  --pantry-success-surface: oklch(0.96 0.03 155);
+  --pantry-info-text: oklch(0.46 0.1 245);
+  --pantry-info-surface: oklch(0.96 0.02 245);
+  --pantry-warning-text: oklch(0.47 0.1 65);
+  --pantry-warning-surface: oklch(0.955 0.045 80);
+  --pantry-danger-text: oklch(0.5 0.16 25);
+  --pantry-danger-surface: oklch(0.96 0.025 25);
+  --pantry-category-accent-text: var(--pantry-caramel-650);
+  --pantry-category-accent-surface: var(--pantry-caramel-150);
+  --pantry-category-neutral-text: var(--pantry-espresso-800);
+  --pantry-category-neutral-surface: var(--pantry-espresso-200);
+
+  /* The selected sidebar row is a white card on the warm rail. */
+  --pantry-sidebar: var(--pantry-espresso-150);
+  --pantry-sidebar-hover: var(--pantry-espresso-200);
+  --pantry-sidebar-selected: var(--pantry-paper);
+  --pantry-sidebar-selected-ring:
+    0 0 0 1px var(--pantry-espresso-250) inset,
+    0 1px 2px color-mix(in oklch, var(--pantry-espresso-800) 6%, transparent);
+  --pantry-chat-surface: var(--pantry-espresso-200);
+
+  --pantry-shadow-color: var(--pantry-espresso-800);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 1px 2px color-mix(in oklch, var(--pantry-shadow-color) 5%, transparent),
+    0 8px 24px color-mix(in oklch, var(--pantry-shadow-color) 5%, transparent);
+}
+
+:root[data-pantry-theme="espresso"][data-portal-theme="dark"] {
+  /* Mocha: a warm, dim dark. The chat, rail, canvas and cards step up from
+     L 0.27 to 0.355, so the dark mode reads as mocha, not black. */
+  --pantry-mocha-chat: oklch(0.27 0.01 62);
+  --pantry-mocha-rail: oklch(0.285 0.01 62);
+  --pantry-mocha-canvas: oklch(0.31 0.011 62);
+  --pantry-mocha-surface: oklch(0.33 0.011 62);
+  --pantry-mocha-paper: oklch(0.355 0.012 62);
+  --pantry-mocha-hover: oklch(0.39 0.012 62);
+  --pantry-mocha-selected: oklch(0.41 0.013 62);
+  --pantry-mocha-border: oklch(0.43 0.013 62);
+  --pantry-mocha-ring: oklch(0.48 0.013 62);
+
+  --pantry-ground: var(--pantry-mocha-canvas);
+  --pantry-paper: var(--pantry-mocha-paper);
+  --pantry-surface: var(--pantry-mocha-surface);
+  --pantry-border: var(--pantry-mocha-border);
+  --pantry-hairline: var(--pantry-espresso-450);
+  --pantry-ink: var(--pantry-espresso-150);
+  --pantry-ink-strong: var(--pantry-espresso-50);
+  --pantry-ink-muted: var(--pantry-espresso-350);
+  --pantry-ink-subtle: oklch(0.74 0.013 68);
+  --pantry-ink-hover: var(--pantry-espresso-50);
+
+  --pantry-primary: var(--pantry-espresso-200);
+  --pantry-primary-hover: var(--pantry-espresso-50);
+  --pantry-on-primary: var(--pantry-espresso-750);
+  --pantry-primary-border: var(--pantry-espresso-200);
+  --pantry-hover: var(--pantry-mocha-hover);
+  --pantry-selected: var(--pantry-mocha-selected);
+  --pantry-on-selected: var(--pantry-espresso-50);
+  --pantry-link: var(--pantry-caramel-250);
+  --pantry-focus: var(--pantry-caramel-400);
+  --pantry-accent: var(--pantry-caramel-400);
+  --pantry-accent-text: var(--pantry-caramel-250);
+  --pantry-accent-surface: oklch(0.42 0.07 55);
+  --pantry-disabled-surface: var(--pantry-surface);
+  --pantry-disabled-text: var(--pantry-espresso-450);
+
+  --pantry-success-text: oklch(0.84 0.1 155);
+  --pantry-success-surface: oklch(0.38 0.045 155);
+  --pantry-info-text: oklch(0.85 0.08 245);
+  --pantry-info-surface: oklch(0.38 0.045 245);
+  --pantry-warning-text: oklch(0.88 0.1 80);
+  --pantry-warning-surface: oklch(0.41 0.055 70);
+  --pantry-danger-text: oklch(0.84 0.1 25);
+  --pantry-danger-surface: oklch(0.39 0.06 25);
+  --pantry-category-accent-text: var(--pantry-caramel-250);
+  --pantry-category-accent-surface: oklch(0.42 0.07 55);
+  --pantry-category-neutral-text: var(--pantry-espresso-200);
+  --pantry-category-neutral-surface: var(--pantry-mocha-selected);
+
+  --pantry-sidebar: var(--pantry-mocha-rail);
+  --pantry-sidebar-hover: var(--pantry-mocha-surface);
+  --pantry-sidebar-selected: var(--pantry-mocha-selected);
+  --pantry-sidebar-selected-ring: 0 0 0 1px var(--pantry-mocha-ring) inset;
+  --pantry-chat-surface: var(--pantry-mocha-chat);
+
+  --pantry-shadow-color: oklch(0.12 0.01 60);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 2px 4px color-mix(in oklch, var(--pantry-shadow-color) 25%, transparent),
+    0 8px 24px color-mix(in oklch, var(--pantry-shadow-color) 25%, transparent);
+}

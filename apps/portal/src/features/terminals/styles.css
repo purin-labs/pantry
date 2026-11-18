@@ -1,0 +1,375 @@
+.terminal-panel {
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-panel);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+  display: grid;
+  gap: 24px;
+}
+
+.terminal-panel-quiet {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.terminal-panel-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.terminal-panel-heading h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--pantry-text-heading);
+  font-weight: 300;
+}
+
+.terminal-panel-timestamp {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.terminal-panel-warning {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.terminal-setup {
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 20px;
+  display: grid;
+  gap: 18px;
+}
+
+.terminal-setup-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.terminal-setup-heading h3,
+.terminal-setup-heading p {
+  margin: 0;
+}
+
+.terminal-setup-heading h3 {
+  font-size: 16px;
+}
+
+.terminal-setup-heading p {
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.terminal-setup-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.terminal-setup-fields label {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.terminal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.terminal-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-card);
+}
+
+.terminal-row-identity {
+  display: grid;
+  gap: 4px;
+}
+
+.terminal-row-location {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+}
+
+.terminal-row-device {
+  color: var(--ink-2);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.terminal-row-state {
+  display: flex;
+  align-content: start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.terminal-badge {
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.terminal-badge-ready {
+  color: var(--pantry-success-text);
+  background: var(--pantry-success-surface);
+}
+
+.terminal-badge-caution {
+  color: var(--pantry-warning-text);
+  background: transparent;
+}
+
+.terminal-badge-quiet {
+  color: var(--ink-2);
+  background: transparent;
+}
+
+.terminal-row-collection {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.terminal-row-action {
+  justify-self: start;
+}
+
+.terminal-row > :not(.terminal-row-identity, .terminal-row-state) {
+  grid-column: 1 / -1;
+}
+
+.terminal-confirm-content {
+  padding: 22px;
+  display: grid;
+  gap: 20px;
+  overflow-wrap: anywhere;
+}
+
+.terminal-confirm p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.terminal-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.terminal-confirm-actions button:not(:where(.pantry-select-trigger)) {
+  flex: 1 1 180px;
+  min-height: 44px;
+  white-space: normal;
+}
+
+.terminal-confirm .terminal-confirm-proceed {
+  color: var(--pantry-danger-text);
+  background: var(--pantry-danger-surface);
+  border-color: var(--pantry-danger-text);
+}
+
+.counter-sale {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.counter-sale-guidance {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.counter-sale-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: 12px;
+}
+
+.counter-sale-facts div {
+  display: grid;
+  gap: 2px;
+}
+
+.counter-sale-facts dt {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.counter-sale-facts dd {
+  margin: 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.counter-sale-recovery {
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.counter-sale-recovery p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.counter-sale-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.counter-sale-actions > button:not(:where(.pantry-select-trigger)) {
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.counter-sale-print-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/*
+ * The receipt is what prints, not the portal around it. Everything else is
+ * chrome the customer has no use for.
+ */
+@media print {
+  body:has([data-counter-receipt]) {
+    background: white;
+  }
+  body:has([data-counter-receipt]) * {
+    visibility: hidden;
+  }
+  .counter-sale[data-counter-receipt],
+  .counter-sale[data-counter-receipt] * {
+    visibility: visible;
+  }
+  .counter-sale[data-counter-receipt] {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: fit-content;
+    color: black;
+    background: white;
+    border-radius: 0;
+  }
+  .counter-sale-actions,
+  .counter-sale-print-note {
+    display: none;
+  }
+
+  .counter-sale {
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.terminal-settings {
+  border-top: 1px solid var(--hairline);
+  padding-top: 16px;
+}
+.terminal-settings > summary {
+  cursor: pointer;
+  min-height: 40px;
+  padding-block: 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.terminal-settings > .terminal-setup {
+  margin-top: 16px;
+}
+.terminal-row-device {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.terminal-setup-fields input,
+.terminal-setup-fields button:where(.pantry-select-trigger) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--pantry-radius-control);
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+  font-size: 14px;
+}
+.terminal-sale-form .terminal-setup-fields {
+  grid-template-columns: minmax(0, 1fr) 100px;
+}
+.terminal-sale-form > button:not(:where(.pantry-select-trigger)) {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  border-radius: var(--pantry-radius-pill);
+  box-shadow: var(--pantry-primary-ring);
+}
+.terminal-panel button:not(:where(.pantry-select-trigger)):focus-visible,
+.terminal-panel summary:focus-visible,
+.terminal-panel input:focus-visible,
+.terminal-panel button:where(.pantry-select-trigger):focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+@media (max-width: 680px) {
+  .terminal-panel {
+    padding: 16px;
+  }
+  .terminal-setup,
+  .terminal-row {
+    padding: 14px;
+  }
+  .terminal-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .terminal-setup-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .terminal-sale-form .terminal-setup-fields {
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 12px 8px;
+  }
+  .terminal-setup-fields input,
+  .terminal-setup-fields button:where(.pantry-select-trigger) {
+    font-size: 16px;
+  }
+}
+
+/* The code that the owner types on a signed-out Square Terminal. */
+.terminal-pairing-code {
+  margin: 8px 0 12px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+}

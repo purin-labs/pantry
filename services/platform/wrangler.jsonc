@@ -1,0 +1,812 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": "src/integration-gateway.ts",
+  "compatibility_date": "2026-07-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "minify": true,
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 3101,
+    "inspector_port": 9231,
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "../../apps/portal/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/v1/*",
+      "/account-platform/*",
+      "/hook/*",
+      "/slack/*",
+      "/health",
+      "/__scheduled",
+      "/cdn-cgi/local/scheduled",
+    ],
+  },
+  "exports": {
+    "OrganisationDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "SessionDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CaseDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "ConnectorDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CodeModePlatformGovernorActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "ConversationResidencyActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "DeviceFleetActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "WorkspaceExecutorContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "MessageLinkFetchContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CustomConnectorFetchContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    // Plan 72 removed the Codex harness. Cloudflare deletes these classes'
+    // namespaces at the next deploy; remove the entries after that release.
+    "CodexHarnessContainer": {
+      "type": "durable-object",
+      "state": "deleted",
+    },
+    "ApacCodexHarnessContainer": {
+      "type": "durable-object",
+      "state": "deleted",
+    },
+    "EuCodexHarnessContainer": {
+      "type": "durable-object",
+      "state": "deleted",
+    },
+  },
+  "env": {
+    "local": {
+      "name": "satyr-edge",
+      "triggers": {
+        "crons": [],
+      },
+      "vars": {
+        "SATYR_DEPLOYMENT_PROFILE": "local",
+        "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"local-wnam\",\"locationHint\":\"wnam\",\"databaseBinding\":\"ORGANISATION_DB_WNAM\",\"cells\":[{\"kind\":\"affinity\",\"placementCellId\":\"local-eu\",\"locationHint\":\"weur\",\"databaseBinding\":\"ORGANISATION_DB_EU\"},{\"kind\":\"affinity\",\"placementCellId\":\"multi-region-preview\",\"locationHint\":\"wnam\",\"databaseBinding\":\"DB\"}]}",
+        "SATYR_PUBLIC_ORIGIN": "https://localhost:3003",
+        "SATYR_OAUTH_CALLBACK_ORIGIN": "https://localhost:3003",
+        "SATYR_PROVIDER_INGRESS_ORIGIN": "https://square-sandbox-webhook.seams.sh",
+        "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+        "SQUARE_OAUTH_ENVIRONMENT": "development",
+        "UNDERCLERK_BASE_URL": "http://127.0.0.1:3102",
+        "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "satyr-local",
+        "ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID": "satyr-local-user-v1",
+        "ACCOUNT_PLATFORM_ASSERTION_ISSUER": "https://localhost:3003",
+        "ACCOUNT_PLATFORM_ASSERTION_AUDIENCE": "http://127.0.0.1:8787",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-local-provision-v1",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "http://127.0.0.1:8787",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://localhost:3003",
+        "AIRTABLE_OAUTH_CLIENT_ID": "55e93b04-5c92-4a8d-b96b-d83e7a4caa32",
+        "DROPBOX_OAUTH_CLIENT_ID": "08go391f1qw6vbd",
+        "GDRIVE_OAUTH_CLIENT_ID": "791319521481-4ebf0qsifdtqddm66ev837ouem2kffc1.apps.googleusercontent.com",
+        "GDRIVE_PICKER_APP_ID": "791319521481",
+        "GMAIL_OAUTH_CLIENT_ID": "502066821359-gurke0m6ja02sv7t824lgei8f93vvn04.apps.googleusercontent.com",
+        "GMAIL_PUBSUB_AUDIENCE": "https://localhost:3003/hook/email/google",
+        "GMAIL_PUBSUB_TOPIC": "projects/satyr-gmail-dev/topics/satyr-gmail-push",
+        "GMAIL_PUBSUB_SERVICE_ACCOUNT": "satyr-gmail-push@satyr-gmail-dev.iam.gserviceaccount.com",
+        "GOOGLE_OIDC_CLIENT_ID": "971053349716-6307q8845efbiript6fbj86jo11mcfr4.apps.googleusercontent.com",
+        "SQUARE_OAUTH_CLIENT_ID": "sandbox-sq0idb-dhhMJAse67TqZ6YdbxKlJw",
+        "SLACK_APP_ID": "A0BTDETNVJ5",
+        "SLACK_CLIENT_ID": "11568910548192.11931503777617",
+        "WHATSAPP_APP_ID": "3167174123466651",
+        "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
+      },
+      "services": [
+        {
+          "binding": "ACCOUNT_PLATFORM",
+          "service": "seams-sdk-d1-local",
+          "entrypoint": "SatyrAccountPlatform",
+        },
+        {
+          "binding": "UNDERCLERK",
+          "service": "underclerk",
+        },
+        {
+          "binding": "MODEL_EXIT",
+          "service": "satyr-model-exit-local",
+        },
+        {
+          "binding": "CHATGPT_EXIT",
+          "service": "satyr-chatgpt-exit-local",
+        },
+        {
+          "binding": "VAULT_ONEPASSWORD",
+          "service": "satyr-vault-onepassword-local",
+        },
+      ],
+      "ai": { "binding": "AI" },
+      "secrets_store_secrets": [
+        {
+          "binding": "DATA_ENCRYPTION_ROOT",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "data-encryption-root-v1",
+        },
+        {
+          "binding": "VAULT_ROOT_V1",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "vault-root-v1",
+        },
+        {
+          "binding": "VAULT_ROOT_V2",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "vault-root-v2",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "ORGANISATION",
+            "class_name": "OrganisationDO",
+          },
+          {
+            "name": "SESSION",
+            "class_name": "SessionDO",
+          },
+          {
+            "name": "CASE",
+            "class_name": "CaseDO",
+          },
+          {
+            "name": "CONNECTOR",
+            "class_name": "ConnectorDO",
+          },
+          {
+            "name": "CODE_MODE_PLATFORM_GOVERNOR_ACTOR",
+            "class_name": "CodeModePlatformGovernorActor",
+          },
+          {
+            // The QuickJS VM of a Pi Code Mode script runs in a Worker of
+            // its own (wrangler.code-mode-sandbox.jsonc). Deploy that
+            // Worker first.
+            "name": "CODE_MODE_SANDBOX",
+            "class_name": "CodeModeSandbox",
+            "script_name": "satyr-code-mode-sandbox-local",
+          },
+          {
+            "name": "CONVERSATION_RESIDENCY",
+            "class_name": "ConversationResidencyActor",
+          },
+          {
+            "name": "DEVICE_FLEET",
+            "class_name": "DeviceFleetActor",
+          },
+          {
+            "name": "WORKSPACE_EXECUTOR",
+            "class_name": "WorkspaceExecutorContainer",
+          },
+          {
+            "name": "MESSAGE_LINK_FETCH",
+            "class_name": "MessageLinkFetchContainer",
+          },
+          {
+            "name": "CUSTOM_CONNECTOR_FETCH",
+            "class_name": "CustomConnectorFetchContainer",
+          },
+        ],
+      },
+      "containers": [
+        {
+          "class_name": "MessageLinkFetchContainer",
+          "image": "../message-link-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+        },
+        {
+          "class_name": "CustomConnectorFetchContainer",
+          "image": "../custom-connector-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 10,
+        },
+        {
+          "class_name": "WorkspaceExecutorContainer",
+          "image": "../workspace-executor/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 4,
+          "constraints": {
+            "regions": ["ENAM", "WNAM", "EEUR", "WEUR"],
+          },
+        },
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "satyr",
+          "database_id": "b97fca3b-5335-4888-a0bf-8a5df5ed194c",
+          "migrations_dir": "migrations-global",
+        },
+        // Local emulator databases. These IDs do not name production resources.
+        {
+          "binding": "ORGANISATION_DB_WNAM",
+          "database_name": "satyr-local-wnam",
+          "database_id": "00000000-0000-4000-8000-000000000055",
+          "migrations_dir": "migrations-regional",
+        },
+        {
+          "binding": "ORGANISATION_DB_EU",
+          "database_name": "satyr-local-eu",
+          "database_id": "00000000-0000-4000-8000-000000000056",
+          "migrations_dir": "migrations-regional",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "POLICY_KV",
+          "id": "6a6f26a1712b46989f3f731ae9cb2998",
+          "preview_id": "6a6f26a1712b46989f3f731ae9cb2998",
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "ARCHIVE",
+          "bucket_name": "satyr-archive",
+          "preview_bucket_name": "satyr-archive-dev",
+        },
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "EVENT_Q",
+            "queue": "satyr-events",
+          },
+          {
+            "binding": "CUE_Q",
+            "queue": "satyr-cues",
+          },
+        ],
+        "consumers": [
+          {
+            "queue": "satyr-events",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "satyr-event-dlq",
+          },
+          {
+            "queue": "satyr-cues",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "satyr-cue-dlq",
+          },
+        ],
+      },
+    },
+    "staging": {
+      "name": "satyr-edge-staging",
+      "placement": {
+        "region": "aws:ap-southeast-1",
+      },
+      "workers_dev": true,
+      "routes": [
+        {
+          "pattern": "staging.satyr.seams.sh",
+          "custom_domain": true,
+        },
+      ],
+      "triggers": {
+        "crons": ["* * * * *", "*/5 * * * *", "*/15 * * * *"],
+      },
+      "vars": {
+        "SATYR_DEPLOYMENT_PROFILE": "staging",
+        "SATYR_PUBLIC_ORIGIN": "https://staging.satyr.seams.sh",
+        "SATYR_OAUTH_CALLBACK_ORIGIN": "https://staging.satyr.seams.sh",
+        "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"staging-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
+        "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+        "UNDERCLERK_BASE_URL": "https://underclerk-staging.n6378056.workers.dev",
+        "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "satyr-staging",
+        "ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID": "satyr-staging-user-v1",
+        "ACCOUNT_PLATFORM_ASSERTION_ISSUER": "https://staging.satyr.seams.sh",
+        "ACCOUNT_PLATFORM_ASSERTION_AUDIENCE": "https://staging.wallet.seams.sh",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-staging-provision-v1",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "https://staging.wallet.seams.sh",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://staging.satyr.seams.sh",
+        "GOOGLE_OIDC_CLIENT_ID": "971053349716-6307q8845efbiript6fbj86jo11mcfr4.apps.googleusercontent.com",
+        "SQUARE_OAUTH_ENVIRONMENT": "development",
+      },
+      "services": [
+        {
+          "binding": "ACCOUNT_PLATFORM",
+          "service": "seams-sdk-d1-console-staging",
+          "entrypoint": "SatyrAccountPlatform",
+        },
+        {
+          "binding": "UNDERCLERK",
+          "service": "underclerk-staging",
+        },
+        {
+          "binding": "MODEL_EXIT",
+          "service": "satyr-model-exit-staging",
+        },
+        {
+          "binding": "CHATGPT_EXIT",
+          "service": "satyr-chatgpt-exit-staging",
+        },
+        {
+          "binding": "VAULT_ONEPASSWORD",
+          "service": "satyr-vault-onepassword-staging",
+        },
+      ],
+      "secrets": {
+        "required": [
+          "SESSION_TOKEN_SECRET",
+          "SLACK_OAUTH_STATE_SECRET",
+          "ORGANISATION_ADMIN_TOKEN",
+          "GOOGLE_OIDC_CLIENT_SECRET",
+          "UNDERCLERK_SERVICE_TOKEN",
+          "ACCOUNT_PLATFORM_PROVISION_TOKEN",
+          "ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U",
+          "ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK",
+        ],
+      },
+      "ai": { "binding": "AI" },
+      "secrets_store_secrets": [
+        {
+          "binding": "DATA_ENCRYPTION_ROOT",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "satyr-staging-data-encryption-root-v1",
+        },
+        {
+          "binding": "VAULT_ROOT_V1",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "satyr-staging-vault-root-v1",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "ORGANISATION",
+            "class_name": "OrganisationDO",
+          },
+          {
+            "name": "SESSION",
+            "class_name": "SessionDO",
+          },
+          {
+            "name": "CASE",
+            "class_name": "CaseDO",
+          },
+          {
+            "name": "CONNECTOR",
+            "class_name": "ConnectorDO",
+          },
+          {
+            "name": "CODE_MODE_PLATFORM_GOVERNOR_ACTOR",
+            "class_name": "CodeModePlatformGovernorActor",
+          },
+          {
+            "name": "CODE_MODE_SANDBOX",
+            "class_name": "CodeModeSandbox",
+            "script_name": "satyr-code-mode-sandbox-staging",
+          },
+          {
+            "name": "CONVERSATION_RESIDENCY",
+            "class_name": "ConversationResidencyActor",
+          },
+          {
+            "name": "DEVICE_FLEET",
+            "class_name": "DeviceFleetActor",
+          },
+          {
+            "name": "WORKSPACE_EXECUTOR",
+            "class_name": "WorkspaceExecutorContainer",
+          },
+          {
+            "name": "MESSAGE_LINK_FETCH",
+            "class_name": "MessageLinkFetchContainer",
+          },
+          {
+            "name": "CUSTOM_CONNECTOR_FETCH",
+            "class_name": "CustomConnectorFetchContainer",
+          },
+        ],
+      },
+      "containers": [
+        {
+          "class_name": "MessageLinkFetchContainer",
+          "image": "../message-link-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "satyr-edge-staging-messagelinkfetchcontainer",
+        },
+        {
+          "class_name": "CustomConnectorFetchContainer",
+          "image": "../custom-connector-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "satyr-edge-staging-customconnectorfetchcontainer",
+        },
+        {
+          "class_name": "WorkspaceExecutorContainer",
+          "image": "../workspace-executor/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "satyr-edge-staging-workspaceexecutorcontainer",
+        },
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "satyr-staging-global-apac",
+          "database_id": "71685d97-1ff9-48fc-9b95-b8aa5068f03a",
+          "migrations_dir": "migrations-global",
+        },
+        {
+          "binding": "ORGANISATION_DB_APAC",
+          "database_name": "satyr-staging-organisation-apac",
+          "database_id": "e4c84444-8f5e-4506-b0eb-f00bcca915e5",
+          "migrations_dir": "migrations-regional",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "POLICY_KV",
+          "id": "5de1fad064024ffb87af816438b1e51c",
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "ARCHIVE",
+          "bucket_name": "satyr-staging-archive-apac",
+        },
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "EVENT_Q",
+            "queue": "satyr-staging-events",
+          },
+          {
+            "binding": "CUE_Q",
+            "queue": "satyr-staging-cues",
+          },
+        ],
+        "consumers": [
+          {
+            "queue": "satyr-staging-events",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "satyr-staging-event-dlq",
+          },
+          {
+            "queue": "satyr-staging-cues",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "satyr-staging-cue-dlq",
+          },
+        ],
+      },
+    },
+    "production": {
+      "name": "satyr-edge",
+      // Each storage step crosses an ocean when the Worker runs where a request
+      // enters, and a browser in Japan can enter at Los Angeles over HTTP/3.
+      "placement": {
+        "region": "aws:ap-northeast-1",
+      },
+      "triggers": {
+        "crons": ["* * * * *", "*/5 * * * *", "*/15 * * * *"],
+      },
+      "vars": {
+        "SATYR_PUBLIC_ORIGIN": "https://satyr-edge.n6378056.workers.dev",
+        "SATYR_OAUTH_CALLBACK_ORIGIN": "https://satyr-edge.n6378056.workers.dev",
+        // Production has one cell, in Asia Pacific. The global database, the
+        // regional database, the archive bucket and the Actors are in Tokyo.
+        "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"production-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
+        "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+        "SEAMS_RELAYER_URL": "https://seams-sdk-d1-gateway.n6378056.workers.dev",
+        "SEAMS_WALLET_ORIGIN": "https://sign.seams.sh",
+        "AIRTABLE_OAUTH_CLIENT_ID": "55e93b04-5c92-4a8d-b96b-d83e7a4caa32",
+        "NOTION_OAUTH_CLIENT_ID": "3c3d872b-594c-814a-9992-0037b6a1421f",
+        "DROPBOX_OAUTH_CLIENT_ID": "08go391f1qw6vbd",
+        "GDRIVE_OAUTH_CLIENT_ID": "791319521481-4ebf0qsifdtqddm66ev837ouem2kffc1.apps.googleusercontent.com",
+        "GDRIVE_PICKER_APP_ID": "791319521481",
+        "GMAIL_OAUTH_CLIENT_ID": "502066821359-gurke0m6ja02sv7t824lgei8f93vvn04.apps.googleusercontent.com",
+        "GMAIL_PUBSUB_AUDIENCE": "https://satyr-edge.n6378056.workers.dev/hook/email/google",
+        "GMAIL_PUBSUB_TOPIC": "projects/satyr-gmail-dev/topics/satyr-gmail-push",
+        "GMAIL_PUBSUB_SERVICE_ACCOUNT": "satyr-gmail-push@satyr-gmail-dev.iam.gserviceaccount.com",
+        "GMAIL_OAUTH_PILOT_EXPIRY_DAYS": "7",
+        "UNDERCLERK_BASE_URL": "https://underclerk.n6378056.workers.dev",
+        // No SHOP_ORDER_PAGE_ORIGIN yet: the order page domain is not chosen,
+        // so QR codes keep the shop.seams.tokyo/shops/<merchant> address.
+        "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "satyr-production",
+        "ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID": "satyr-production-user-v1",
+        "ACCOUNT_PLATFORM_ASSERTION_ISSUER": "https://satyr-edge.n6378056.workers.dev",
+        "ACCOUNT_PLATFORM_ASSERTION_AUDIENCE": "https://wallet.seams.sh",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-production-provision-v1",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "https://wallet.seams.sh",
+        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://satyr-edge.n6378056.workers.dev",
+        "WHATSAPP_APP_ID": "3167174123466651",
+        "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
+        "SATYR_DEPLOYMENT_PROFILE": "production",
+        "SATYR_WARM_ACTOR_SLOTS": "on",
+        "SQUARE_OAUTH_ENVIRONMENT": "production",
+        "GOOGLE_OIDC_CLIENT_ID": "971053349716-6307q8845efbiript6fbj86jo11mcfr4.apps.googleusercontent.com",
+        "SLACK_APP_ID": "A0BFVDZLFLM",
+        "SLACK_CLIENT_ID": "11568910548192.11539475695701",
+      },
+      "services": [
+        {
+          "binding": "ACCOUNT_PLATFORM",
+          "service": "seams-sdk-d1-console",
+          "entrypoint": "SatyrAccountPlatform",
+        },
+        {
+          "binding": "UNDERCLERK",
+          "service": "underclerk",
+        },
+        // Plan 73: every direct model-provider request leaves through this
+        // Worker, which runs near AWS Tokyo. It deploys first.
+        {
+          "binding": "MODEL_EXIT",
+          "service": "satyr-model-exit",
+        },
+        {
+          "binding": "CHATGPT_EXIT",
+          "service": "satyr-chatgpt-exit",
+        },
+        {
+          "binding": "VAULT_ONEPASSWORD",
+          "service": "satyr-vault-onepassword",
+        },
+      ],
+      "secrets": {
+        "required": [
+          "ACCOUNT_PLATFORM_PROVISION_TOKEN",
+          "ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U",
+          "ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK",
+          "SLACK_SIGNING_SECRET",
+          "SLACK_CLIENT_SECRET",
+          "SLACK_OAUTH_STATE_SECRET",
+          "SQUARE_OAUTH_CLIENT_ID",
+          "SQUARE_OAUTH_CLIENT_SECRET",
+          "SQUARE_SANDBOX_DEFAULT_ACCESS_TOKEN",
+          "STRIPE_CONNECT_CLIENT_ID",
+          "STRIPE_CONNECT_CLIENT_SECRET",
+          "STRIPE_CONNECT_WEBHOOK_ID",
+          "STRIPE_CONNECT_WEBHOOK_SECRET",
+          "SHOPIFY_CLIENT_ID",
+          "SHOPIFY_CLIENT_SECRET",
+          "SESSION_TOKEN_SECRET",
+          "ORGANISATION_ADMIN_TOKEN",
+          "GOOGLE_OIDC_CLIENT_SECRET",
+          "AIRTABLE_OAUTH_CLIENT_SECRET",
+          "NOTION_OAUTH_CLIENT_SECRET",
+          "GMAIL_OAUTH_CLIENT_SECRET",
+          "DROPBOX_OAUTH_CLIENT_SECRET",
+          "GDRIVE_OAUTH_CLIENT_SECRET",
+          "GDRIVE_PICKER_API_KEY",
+          "UNDERCLERK_SERVICE_TOKEN",
+          "OPENROUTER_API_KEY",
+          "TYPESAFE_API_KEY",
+          "WHATSAPP_APP_SECRET",
+          "WHATSAPP_VERIFY_TOKEN",
+        ],
+      },
+      "ai": { "binding": "AI" },
+      "secrets_store_secrets": [
+        {
+          "binding": "DATA_ENCRYPTION_ROOT",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "data-encryption-root-v1",
+        },
+        {
+          "binding": "VAULT_ROOT_V1",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "vault-root-v1",
+        },
+        {
+          "binding": "VAULT_ROOT_V2",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "vault-root-v2",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "ORGANISATION",
+            "class_name": "OrganisationDO",
+          },
+          {
+            "name": "SESSION",
+            "class_name": "SessionDO",
+          },
+          {
+            "name": "CASE",
+            "class_name": "CaseDO",
+          },
+          {
+            "name": "CONNECTOR",
+            "class_name": "ConnectorDO",
+          },
+          {
+            "name": "CODE_MODE_PLATFORM_GOVERNOR_ACTOR",
+            "class_name": "CodeModePlatformGovernorActor",
+          },
+          {
+            // The QuickJS VM of a Pi Code Mode script runs in a Worker of
+            // its own (wrangler.code-mode-sandbox.jsonc). Deploy that
+            // Worker first.
+            "name": "CODE_MODE_SANDBOX",
+            "class_name": "CodeModeSandbox",
+            "script_name": "satyr-code-mode-sandbox",
+          },
+          {
+            "name": "CONVERSATION_RESIDENCY",
+            "class_name": "ConversationResidencyActor",
+          },
+          {
+            "name": "DEVICE_FLEET",
+            "class_name": "DeviceFleetActor",
+          },
+          {
+            "name": "WORKSPACE_EXECUTOR",
+            "class_name": "WorkspaceExecutorContainer",
+          },
+          {
+            "name": "MESSAGE_LINK_FETCH",
+            "class_name": "MessageLinkFetchContainer",
+          },
+          {
+            "name": "CUSTOM_CONNECTOR_FETCH",
+            "class_name": "CustomConnectorFetchContainer",
+          },
+        ],
+      },
+      "containers": [
+        {
+          "class_name": "MessageLinkFetchContainer",
+          "image": "../message-link-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          // Each region has one link-fetch Actor, named after the location
+          // hint of its organisations. Production has one cell, in Asia
+          // Pacific. A cell of another region needs a class of its own with
+          // its own region.
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "satyr-edge-messagelinkfetchcontainer",
+        },
+        {
+          "class_name": "CustomConnectorFetchContainer",
+          "image": "../custom-connector-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 10,
+          // Each organisation has its own fetch container Actor, asked for
+          // with the location hint of the organisation's placement.
+          // Production has one cell, in Asia Pacific. A cell of another
+          // region needs a class of its own with its own region.
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "satyr-edge-customconnectorfetchcontainer",
+        },
+        {
+          "class_name": "WorkspaceExecutorContainer",
+          "image": "../workspace-executor/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 4,
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "satyr-edge-workspaceexecutorcontainer",
+        },
+      ],
+      "d1_databases": [
+        // A location hint names a region, and Cloudflare chooses the site in
+        // it. The first global database of this region was served from Hong
+        // Kong: 66 ms for each read from Tokyo. This one is served from Tokyo
+        // (`served_by_colo` of a query is NRT). Check that value for a new
+        // database before a release binds it.
+        {
+          "binding": "DB",
+          "database_name": "satyr-global-tokyo",
+          "database_id": "9c1e5467-2985-4ca9-8cb0-3b3b933249ef",
+          "migrations_dir": "migrations-global",
+        },
+        {
+          "binding": "ORGANISATION_DB_APAC",
+          "database_name": "satyr-organisation-apac",
+          "database_id": "fe8a597e-b094-4229-8a70-139fa239c168",
+          "migrations_dir": "migrations-regional",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "POLICY_KV",
+          "id": "090482885c334e3db277c69a14f5a805",
+          "preview_id": "090482885c334e3db277c69a14f5a805",
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "ARCHIVE",
+          "bucket_name": "satyr-archive-apac",
+          "preview_bucket_name": "satyr-archive-dev",
+        },
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "EVENT_Q",
+            "queue": "satyr-events",
+          },
+          {
+            "binding": "CUE_Q",
+            "queue": "satyr-cues",
+          },
+        ],
+        "consumers": [
+          {
+            "queue": "satyr-events",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "satyr-event-dlq",
+          },
+          {
+            "queue": "satyr-cues",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "satyr-cue-dlq",
+          },
+        ],
+      },
+    },
+  },
+}

@@ -1,0 +1,1027 @@
+/* Selection and fit colours, shared with details hosted outside the plan. */
+.spatial-workspace,
+.spatial-inspector-content {
+  --spatial-selected: #2563eb;
+  --spatial-blocked: #b42318;
+}
+[data-portal-theme="dark"] :is(.spatial-workspace, .spatial-inspector-content) {
+  --spatial-selected: #93c5fd;
+  --spatial-blocked: #fca5a5;
+}
+.spatial-workspace {
+  --spatial-room: var(--ground);
+  --spatial-grid: color-mix(in srgb, var(--ink) 6%, transparent);
+  --spatial-grid-primary: color-mix(in srgb, var(--ink) 13%, transparent);
+  --spatial-edge: color-mix(in srgb, var(--ink) 34%, transparent);
+  --spatial-wall: color-mix(in srgb, var(--ink) 58%, transparent);
+  --spatial-equipment: color-mix(in srgb, var(--ink) 8%, var(--paper));
+  --spatial-equipment-edge: color-mix(in srgb, var(--ink) 40%, transparent);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  pointer-events: none;
+}
+/*
+ * One floating surface whose flat buttons it clips: a lone button is the
+ * surface itself, and Floor plan with 3D view read as two segments.
+ */
+.spatial-view-controls {
+  position: absolute;
+  inset-block-start: var(--spatial-toolbar-top);
+  inset-inline-start: 12px;
+  z-index: 2;
+  display: flex;
+  align-self: flex-start;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  pointer-events: auto;
+}
+.spatial-workspace .spatial-view-controls button:not(:where(.pantry-select-trigger)) {
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+  font-size: 13px;
+}
+.spatial-workspace .spatial-view-controls button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--surface);
+}
+.spatial-workspace .spatial-view-controls button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--pantry-selected);
+  color: var(--pantry-on-selected);
+}
+/* The surface clips an outer ring, so focus draws inside the button. */
+.spatial-workspace .spatial-view-controls button:not(:where(.pantry-select-trigger)):focus-visible {
+  outline-offset: -3px;
+}
+.spatial-view-stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.spatial-scene-viewport {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  pointer-events: auto;
+}
+.spatial-scene-viewport[data-visible="false"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+.spatial-pane-resizer {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--spatial-pane-width) - 6px);
+  width: 12px;
+  z-index: 2;
+  background: transparent;
+  touch-action: none;
+  pointer-events: auto;
+}
+.spatial-pane-resizer::before {
+  content: "";
+  position: absolute;
+  inset: 35% 4px;
+  border-radius: 3px;
+  background: var(--border);
+}
+.spatial-pane-resizer:is(:hover, :focus-visible)::before {
+  background: var(--ink-2);
+}
+.spatial-pane-resizer:focus-visible {
+  outline: none;
+}
+.spatial-floor-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 0 0 var(--spatial-pane-width);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--spatial-content-top) 12px var(--spatial-content-bottom);
+  overflow: hidden;
+  overscroll-behavior: var(--portal-contained-overscroll);
+  pointer-events: auto;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.spatial-workspace [hidden] {
+  display: none !important;
+}
+.spatial-workspace[data-compact="true"] .spatial-floor-plan {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+}
+.workflow-simulator:has(
+    .workflow-scene > .spatial-workspace[data-plan-only="true"]
+  )
+  :is(.workflow-topbar, .workflow-bottom-bar),
+.physics-replay:has(.physics-scene > .spatial-workspace[data-plan-only="true"])
+  :is(.physics-header, .physics-controls) {
+  visibility: hidden;
+}
+.spatial-plan-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  pointer-events: none;
+}
+.spatial-plan-footer {
+  pointer-events: auto;
+  position: relative;
+  display: grid;
+  gap: 4px;
+  margin-block-start: auto;
+}
+.spatial-plan-drawing-slot {
+  position: absolute;
+  inset: 0;
+}
+.spatial-plan-drawing {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+.spatial-plan-drawing[data-variant="panel"] {
+  position: absolute;
+  inset: 0;
+}
+.spatial-plan-drawing[data-variant="panel"] .spatial-floor-map {
+  border-radius: 0;
+}
+/* The viewport clips a drawing that pans and zooms in world metres. */
+.spatial-floor-map {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  direction: ltr;
+  border-radius: 6px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.spatial-floor-map[data-panning="true"] {
+  cursor: grabbing;
+}
+.spatial-plan-drawing[data-variant="minimap"] .spatial-floor-map {
+  cursor: default;
+  touch-action: auto;
+}
+.spatial-floor-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Strokes stay one screen pixel wide at every zoom level. */
+.spatial-floor-svg * {
+  vector-effect: non-scaling-stroke;
+}
+.spatial-room-floor {
+  fill: var(--spatial-room);
+}
+.spatial-room-grid,
+.spatial-room-grid-fine {
+  fill: none;
+  stroke: var(--spatial-grid);
+  stroke-width: 0.5;
+}
+.spatial-room-grid {
+  fill: none;
+  stroke: var(--spatial-grid-primary);
+  stroke-width: 1;
+}
+.spatial-room-wall {
+  fill: var(--spatial-wall);
+}
+.spatial-footprint {
+  cursor: pointer;
+}
+.spatial-footprint[data-draggable="true"] {
+  cursor: grab;
+}
+/* A 2 px edge under an opaque fill leaves a 1 px outline of the union only. */
+.spatial-footprint-edge {
+  fill: none;
+  stroke: var(--spatial-equipment-edge);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.spatial-footprint-fill {
+  fill: var(--spatial-equipment);
+  stroke: none;
+}
+.spatial-footprint[data-context="true"] .spatial-footprint-fill {
+  fill: color-mix(in srgb, var(--ink) 4%, var(--paper));
+}
+.spatial-footprint[data-context="true"] .spatial-footprint-edge {
+  stroke: var(--spatial-edge);
+}
+.spatial-footprint[data-hovered="true"] .spatial-footprint-edge {
+  stroke: var(--ink);
+}
+.spatial-footprint[data-fit="unchecked"] .spatial-footprint-edge {
+  stroke-dasharray: 4 3;
+}
+.spatial-footprint[data-selected="true"] .spatial-footprint-edge {
+  stroke: var(--spatial-selected);
+  stroke-width: 4;
+  stroke-dasharray: none;
+}
+.spatial-footprint[data-selected="true"] .spatial-footprint-fill {
+  fill: color-mix(in srgb, var(--spatial-selected) 16%, var(--paper));
+}
+.spatial-footprint[data-fit="blocked"] .spatial-footprint-edge {
+  stroke: var(--spatial-blocked);
+  stroke-width: 4;
+  stroke-dasharray: none;
+}
+.spatial-footprint[data-fit="blocked"] .spatial-footprint-fill {
+  fill: color-mix(in srgb, var(--spatial-blocked) 12%, var(--paper));
+}
+/* The world-axis envelope that fit checks use, distinct from the outline. */
+.spatial-check-envelope {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  pointer-events: none;
+}
+.spatial-original-placement {
+  fill: none;
+  stroke: var(--spatial-equipment-edge);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+.spatial-opening-envelope {
+  fill: color-mix(in srgb, var(--ink-2) 8%, transparent);
+  stroke: var(--ink-2);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+.spatial-room-opening {
+  cursor: pointer;
+  pointer-events: all;
+}
+.spatial-room-opening :is(line, path) {
+  vector-effect: none;
+}
+.spatial-room-opening:focus-visible {
+  outline: none;
+}
+.spatial-room-opening:focus-visible
+  :is(.spatial-room-window-sash, .spatial-room-door-leaf) {
+  stroke: var(--pantry-focus);
+  stroke-width: 3px;
+  vector-effect: non-scaling-stroke;
+}
+.spatial-room-opening-hit {
+  stroke: transparent;
+  stroke-width: 0.28;
+  stroke-linecap: round;
+  pointer-events: stroke;
+}
+.spatial-room-window-frame {
+  stroke: color-mix(in srgb, #38bdf8 35%, var(--paper));
+  stroke-width: 0.08;
+  pointer-events: none;
+}
+.spatial-room-window-sash {
+  stroke: #0284c7;
+  stroke-width: 0.05;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.spatial-room-door-arc {
+  fill: color-mix(in srgb, var(--ink) 4%, transparent);
+  stroke: color-mix(in srgb, var(--ink) 28%, transparent);
+  stroke-width: 0.025;
+  stroke-dasharray: 0.08 0.06;
+  pointer-events: all;
+}
+.spatial-room-door-leaf {
+  stroke: #b45309;
+  stroke-width: 0.065;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.spatial-room-opening:hover .spatial-room-window-sash,
+.spatial-room-opening:hover .spatial-room-door-leaf {
+  stroke: #38bdf8;
+}
+.spatial-room-fixture-base {
+  fill: color-mix(in srgb, #0284c7 12%, var(--paper));
+  stroke: color-mix(in srgb, #0284c7 48%, var(--ink));
+  stroke-width: 1.25;
+}
+.spatial-room-fixture[data-fixture-kind="toilet"] .spatial-room-fixture-base {
+  fill: color-mix(in srgb, var(--ink) 8%, var(--paper));
+  stroke: var(--spatial-edge);
+}
+.spatial-room-fixture-basin {
+  fill: color-mix(in srgb, #38bdf8 22%, var(--paper));
+  stroke: #0284c7;
+  stroke-width: 1;
+}
+.spatial-utility-line {
+  stroke: rgba(14, 165, 233, 0.42);
+  stroke-width: 1.25;
+  stroke-dasharray: 4 4;
+  pointer-events: none;
+}
+.spatial-utility-line[data-over-reach="true"] {
+  stroke: rgba(217, 119, 6, 0.72);
+  stroke-dasharray: 3 3;
+}
+.spatial-floor-actor {
+  pointer-events: none;
+}
+.spatial-floor-actor-body {
+  stroke: var(--paper);
+  stroke-width: 1.5;
+}
+.spatial-floor-actor-heading {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.spatial-floor-actor-tray {
+  fill: #f59e0b;
+  stroke: var(--paper);
+  stroke-width: 1;
+}
+.spatial-rotate-gizmo-ring {
+  fill: none;
+  stroke: rgba(96, 165, 250, 0.42);
+  stroke-width: 2.25;
+  pointer-events: none;
+  transition: stroke 120ms ease;
+}
+.spatial-rotate-gizmo-stem {
+  stroke: rgba(96, 165, 250, 0.42);
+  stroke-width: 1.75;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+  transition: stroke 120ms ease;
+}
+.spatial-rotate-gizmo[data-active="true"] .spatial-rotate-gizmo-ring,
+.spatial-rotate-gizmo[data-active="true"] .spatial-rotate-gizmo-stem {
+  stroke: #38bdf8;
+}
+.spatial-rotate-gizmo-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  cursor: grab;
+  pointer-events: stroke;
+}
+.spatial-rotate-gizmo-hit:active {
+  cursor: grabbing;
+}
+.spatial-floor-map .spatial-rotate-gizmo-knob {
+  position: absolute;
+  z-index: 3;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  min-height: 22px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid rgba(96, 165, 250, 0.52);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 78%, transparent);
+  color: rgba(56, 189, 248, 0.85);
+  box-shadow: var(--shadow-card);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  pointer-events: auto;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+.spatial-floor-map .spatial-rotate-gizmo-knob[hidden] {
+  display: none;
+}
+.spatial-floor-map .spatial-rotate-gizmo-knob[data-active="true"],
+.spatial-floor-map .spatial-rotate-gizmo-knob:hover {
+  border-color: #38bdf8;
+  background: #38bdf8;
+  color: #ffffff;
+}
+.spatial-floor-map .spatial-rotate-gizmo-knob:active {
+  cursor: grabbing;
+}
+.spatial-plan-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.spatial-opening-label {
+  position: absolute;
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.spatial-plan-drawing[data-variant="minimap"] .spatial-opening-label {
+  display: none;
+}
+.spatial-task-guide nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.spatial-task-guide button:not(:where(.pantry-select-trigger)) {
+  min-height: 32px;
+  padding: 4px 8px;
+}
+.workflow-task-pin {
+  pointer-events: auto;
+  min-width: 32px;
+  min-height: 32px;
+}
+.spatial-floor-map .spatial-footprint-marker[data-draggable="true"] {
+  cursor: grab;
+}
+.spatial-floor-map .spatial-footprint-marker[data-draggable="true"]:active {
+  cursor: grabbing;
+}
+.spatial-layout-controls:empty {
+  display: none;
+}
+/* The room frame follows the drawing; the SVG paints floor, grid and wall. */
+.spatial-room-boundary {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px dashed var(--spatial-edge);
+  pointer-events: none;
+}
+.spatial-room-width,
+.spatial-room-depth,
+.spatial-room-wall-label {
+  position: absolute;
+  color: var(--ink-2);
+  white-space: nowrap;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.spatial-room-boundary[data-selected="true"] {
+  outline: 2px solid var(--spatial-selected);
+  outline-offset: 3px;
+}
+/* Architectural dimension lines: a thin rule with end ticks. */
+.spatial-room-width {
+  inset-block-end: calc(100% + 10px);
+  inset-inline: 0;
+  padding-block-end: 2px;
+  text-align: center;
+  line-height: 1;
+  background: linear-gradient(currentColor, currentColor) center bottom / 100%
+    1px no-repeat;
+}
+.spatial-room-width::before,
+.spatial-room-width::after,
+.spatial-room-depth::before,
+.spatial-room-depth::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+}
+.spatial-room-width::before,
+.spatial-room-width::after {
+  inset-block-end: -3px;
+  width: 1px;
+  height: 7px;
+}
+.spatial-room-width::before {
+  left: 0;
+}
+.spatial-room-width::after {
+  right: 0;
+}
+.spatial-room-depth {
+  left: calc(100% + 10px);
+  top: 0;
+  height: 100%;
+  padding-left: 4px;
+  writing-mode: vertical-rl;
+  text-align: center;
+  line-height: 1;
+  background: linear-gradient(currentColor, currentColor) left center / 1px 100%
+    no-repeat;
+}
+.spatial-room-depth::before,
+.spatial-room-depth::after {
+  left: -3px;
+  width: 7px;
+  height: 1px;
+}
+.spatial-room-depth::before {
+  top: 0;
+}
+.spatial-room-depth::after {
+  bottom: 0;
+}
+.spatial-room-wall-label {
+  inset-block-start: 5px;
+  inset-inline-start: 6px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+/* The scale bar tracks the current zoom; the view controls stand above its row. */
+.spatial-plan-nav {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+/*
+ * Map-style controls at the plan's edge. Zoom stays put; Fit room and Fit
+ * selection stack above it only while they would change the view.
+ */
+.spatial-plan-stack {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-end: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.spatial-workspace .spatial-plan-stack button:not(:where(.pantry-select-trigger)) {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+.spatial-plan-zoom {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+.spatial-workspace .spatial-plan-zoom button:not(:where(.pantry-select-trigger)) {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.spatial-workspace .spatial-plan-zoom button:not(:where(.pantry-select-trigger)) + button:not(:where(.pantry-select-trigger)) {
+  border-block-start: 1px solid var(--border);
+}
+.spatial-workspace .spatial-plan-stack button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--surface);
+}
+.spatial-workspace .spatial-plan-stack button:not(:where(.pantry-select-trigger))[hidden] {
+  display: none;
+}
+/* The zoom surface clips an outer ring, so focus draws inside the button. */
+.spatial-workspace .spatial-plan-zoom button:not(:where(.pantry-select-trigger)):focus-visible {
+  outline-offset: -3px;
+}
+/* A hosted plan's details open over the drawing from beside the scale bar. */
+.spatial-workspace .spatial-plan-details-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  margin-inline-start: 12px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-2);
+  box-shadow: none;
+  font-size: 12px;
+}
+.spatial-workspace
+  .spatial-plan-details-toggle:is(:hover, [aria-expanded="true"]) {
+  background: var(--surface);
+  color: var(--ink);
+}
+.spatial-plan-details {
+  flex: 0 1 auto;
+  align-self: flex-start;
+  width: min(340px, calc(100% - 56px));
+  min-height: 0;
+  margin-block-start: auto;
+  overflow: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  pointer-events: auto;
+}
+.spatial-plan-details:not([hidden]) + .spatial-plan-footer {
+  margin-block-start: 0;
+}
+.spatial-plan-scale {
+  flex: none;
+  padding-block-start: 3px;
+  background: linear-gradient(currentColor, currentColor) left top / 100% 2px
+    no-repeat;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.spatial-inspection-panel {
+  position: absolute;
+  inset-block: var(--spatial-content-top) var(--spatial-content-bottom);
+  inset-inline-end: 12px;
+  width: min(340px, calc(100% - 24px));
+  pointer-events: none;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.spatial-selection-inspector {
+  max-height: 100%;
+  overflow: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  pointer-events: auto;
+}
+.spatial-inspector-content {
+  padding: 12px;
+}
+.spatial-door-inspection {
+  margin-block-start: 12px;
+}
+.spatial-door-inspection label {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+}
+.spatial-door-inspection input {
+  width: 100%;
+  min-height: 32px;
+}
+.spatial-door-inspection :is(input, button:not(:where(.pantry-select-trigger)), summary) {
+  scroll-margin-block: 20px;
+}
+.spatial-footprint-number {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.spatial-footprint-label {
+  position: absolute;
+  transform: translateX(-50%);
+  width: max-content;
+  /* Neighbouring stations sit about a metre apart; wrap long names. */
+  max-width: 68px;
+  white-space: normal;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  /* A halo in the room colour keeps names legible over grid lines. */
+  text-shadow:
+    0 0 3px var(--spatial-room),
+    0 0 3px var(--spatial-room),
+    0 0 1px var(--spatial-room);
+  pointer-events: none;
+}
+.spatial-floor-map[data-labels="false"] .spatial-footprint-label {
+  display: none;
+}
+.spatial-footprint-label[data-fit="blocked"] {
+  display: none;
+}
+/* Hidden, not removed, so the next arrangement can still measure it. */
+.spatial-footprint-label[data-collides="true"] {
+  visibility: hidden;
+}
+.spatial-footprint-label[data-context="true"] {
+  color: var(--ink-2);
+}
+/*
+ * A fixed-size marker centered on the footprint. It carries the reference
+ * number, focus and the accessible name, and never sets physical size.
+ */
+.spatial-floor-map .spatial-footprint-marker {
+  position: absolute;
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  min-height: 20px;
+  margin: 0;
+  padding: 0 3px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+  font-size: 0.75rem;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+.spatial-floor-map .spatial-footprint-marker[aria-disabled="true"] {
+  cursor: default;
+}
+.spatial-footprint-marker[data-selected="true"] {
+  z-index: 1;
+}
+.spatial-footprint-marker[data-selected="true"] .spatial-footprint-number {
+  color: var(--ink);
+}
+.spatial-footprint-label[data-selected="true"] {
+  font-weight: 700;
+}
+/* Live station state, matching the dot on the 3D label. */
+.spatial-footprint-marker[data-state]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: -4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--spatial-state, transparent);
+}
+.spatial-footprint-marker[data-state="running"] {
+  --spatial-state: var(--ok-text);
+}
+.spatial-footprint-marker[data-state="ready"] {
+  --spatial-state: var(--warn-text);
+}
+.spatial-footprint-marker[data-state="fault"] {
+  --spatial-state: var(--danger-text);
+}
+.workflow-scene-labels {
+  z-index: 0;
+}
+.spatial-footprint-marker[data-fit="blocked"] .spatial-footprint-number {
+  color: var(--spatial-blocked);
+}
+.spatial-workspace button:not(:where(.pantry-select-trigger)):focus-visible {
+  outline: 3px solid var(--pantry-focus);
+  outline-offset: 2px;
+  z-index: 3;
+}
+.spatial-inspector-content p {
+  margin: 0;
+  font-size: inherit;
+  line-height: 1.5;
+}
+.spatial-fit-status {
+  color: var(--ink-2);
+}
+.spatial-fit-status[data-fit="blocked"] {
+  color: var(--spatial-blocked);
+  font-weight: 600;
+}
+.spatial-fit-findings {
+  padding: 0;
+  margin: 8px 0;
+  list-style: none;
+}
+.spatial-fit-findings li + li {
+  margin-block-start: 8px;
+}
+.spatial-fit-findings button:not(:where(.pantry-select-trigger)) {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: start;
+  white-space: normal;
+  font-size: inherit;
+  line-height: 1.5;
+}
+.spatial-fit-findings button:not(:where(.pantry-select-trigger))[data-fit="blocked"] {
+  color: var(--spatial-blocked);
+  background: color-mix(in srgb, var(--spatial-blocked) 6%, var(--paper));
+  border-color: var(--spatial-blocked);
+}
+.spatial-inspector-content .spatial-plan-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-block: 0 10px;
+  color: var(--ink-2);
+  font-size: inherit;
+}
+.spatial-plan-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.spatial-plan-legend span::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--spatial-selected);
+  border-radius: 2px;
+}
+.spatial-plan-legend [data-state="blocked"]::before {
+  border-color: var(--spatial-blocked);
+}
+.spatial-plan-legend [data-state="unchecked"]::before {
+  border: 1px dashed var(--ink-2);
+}
+.spatial-plan-legend [data-state="envelope"]::before {
+  border: 1px dotted var(--ink-2);
+}
+.spatial-dimensions {
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--ground);
+  font-variant-numeric: tabular-nums;
+}
+.spatial-dimensions p + p {
+  margin-block-start: 10px;
+}
+.spatial-dimensions strong,
+.spatial-dimensions span {
+  display: block;
+}
+.spatial-dimensions strong {
+  font-weight: 600;
+}
+.spatial-plan-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 0;
+  flex: none;
+}
+.spatial-plan-toolbar button:not(:where(.pantry-select-trigger)) {
+  flex: 1;
+  min-height: 36px;
+  padding: 6px;
+  font-size: inherit;
+  white-space: normal;
+}
+.spatial-plan-toolbar:has(button:not(:where(.pantry-select-trigger)):nth-child(4)) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+/* Corner overview: the same plan drawing, moved here while the panel is shut. */
+.spatial-minimap {
+  position: absolute;
+  inset-inline-end: 12px;
+  inset-block-end: var(--spatial-content-bottom);
+  z-index: 2;
+  width: 232px;
+  padding: 4px 8px 10px;
+  border-radius: 14px;
+  pointer-events: auto;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+.spatial-minimap-header {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-block-end: 4px;
+}
+.spatial-workspace .spatial-minimap-header button:not(:where(.pantry-select-trigger)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+.spatial-workspace .spatial-minimap-header button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+.spatial-minimap-expand {
+  flex: 1;
+  justify-content: space-between;
+}
+.spatial-minimap-expand svg,
+.spatial-minimap-hide svg {
+  color: var(--ink-2);
+}
+.spatial-minimap-body {
+  display: flex;
+  justify-content: center;
+}
+.spatial-minimap
+  :is(
+    .spatial-room-width,
+    .spatial-room-depth,
+    .spatial-room-wall-label,
+    .spatial-plan-scale
+  ) {
+  display: none;
+}
+.spatial-minimap .spatial-plan-drawing {
+  width: 100%;
+  align-items: center;
+}
+.spatial-minimap .spatial-footprint-number {
+  font-size: 10px;
+}
+[data-portal-theme="dark"]
+  .spatial-inspector-content
+  :is(
+    .spatial-fit-status[data-fit="blocked"],
+    .spatial-fit-findings button:not(:where(.pantry-select-trigger))[data-fit="blocked"]
+  ) {
+  color: var(--ink);
+}
+@media (pointer: coarse) {
+  .spatial-plan-toolbar button:not(:where(.pantry-select-trigger)) {
+    min-height: 44px;
+  }
+  .spatial-workspace .spatial-plan-stack button:not(:where(.pantry-select-trigger)) {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .spatial-workspace .spatial-plan-details-toggle {
+    min-height: 44px;
+  }
+}
+@media (forced-colors: active) {
+  .spatial-footprint[data-fit="blocked"] .spatial-footprint-edge {
+    stroke: CanvasText;
+    stroke-width: 6;
+  }
+  .spatial-footprint[data-selected="true"] .spatial-footprint-edge {
+    stroke: Highlight;
+  }
+  .spatial-floor-map .spatial-footprint-marker[aria-pressed="true"],
+  .spatial-workspace button:not(:where(.pantry-select-trigger)):focus-visible {
+    outline-color: Highlight;
+  }
+  /* Forced colours drop the shadows that edge the floating controls. */
+  .spatial-view-controls,
+  .spatial-plan-zoom,
+  .spatial-workspace .spatial-plan-stack > button:not(:where(.pantry-select-trigger)) {
+    border: 1px solid ButtonText;
+  }
+}
+
+.physics-floor-plan-only
+  :is(
+    .spatial-scene-viewport,
+    .spatial-pane-resizer,
+    .spatial-view-controls button:not(:where(.pantry-select-trigger)):last-child,
+    .spatial-plan-toolbar
+  ) {
+  display: none;
+}
+.physics-floor-plan-only .spatial-floor-plan {
+  flex: 1;
+}
+.physics-replay:has(.physics-floor-plan-only)
+  :is(.physics-header, .physics-controls) {
+  visibility: visible;
+}

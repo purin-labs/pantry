@@ -1,0 +1,43 @@
+.collaboration-agent-cursor {
+  position: absolute;
+  left: calc(100% - 12px);
+  z-index: 6;
+  margin: 0;
+  color: var(--agent-color);
+  pointer-events: none;
+}
+.collaboration-agent-cursor svg {
+  position: static;
+  display: block;
+  color: inherit;
+}
+.collaboration-agent-cursor .collaboration-agent-name,
+.collaboration-agent-cursor .collaboration-agent-action {
+  display: block;
+  width: max-content;
+  max-width: 180px;
+  margin: 3px 0 0 14px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.collaboration-agent-cursor .collaboration-agent-name {
+  border-radius: 999px;
+  background: var(--agent-color);
+  color: white;
+}
+.collaboration-agent-cursor .collaboration-agent-action {
+  border-radius: 6px;
+  background: var(--ink, #1c2520);
+  color: var(--paper, #fff);
+}
+.collaboration-agent-cursor[data-label-left="true"] .collaboration-agent-name,
+.collaboration-agent-cursor[data-label-left="true"]
+  .collaboration-agent-action {
+  margin-left: 0;
+  transform: translateX(-100%);
+}

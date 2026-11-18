@@ -1,0 +1,293 @@
+import { Select } from "../../../ui/select";
+import React from "react";
+import {
+  DEFAULT_CAFE_SHIFT_RECIPE,
+  type CafeShiftAppliance,
+  type CafeShiftCheck,
+  type CafeShiftGrinder,
+  type CafeShiftRecipeConfig,
+  type CafeShiftStaffing,
+} from "@seams/production-simulation/recipes/cafe-shift/model";
+
+type Props = Readonly<{
+  prepared(recipe: CafeShiftRecipeConfig): void;
+}>;
+
+type State = Readonly<{
+  appliance: CafeShiftAppliance;
+  grinder: CafeShiftGrinder;
+  financierLoads: 1 | 2 | 3;
+  espressoOrders: 2 | 4;
+  staffing: CafeShiftStaffing;
+  check: CafeShiftCheck;
+}>;
+
+const APPLIANCE_ITEMS = [
+  { value: "linea", label: "La Marzocco Linea Classic S (2-group)" },
+  { value: "eagle-one", label: "Victoria Arduino Eagle One (2-group)" },
+];
+
+const GRINDER_ITEMS = [
+  {
+    value: "miicoffee-df64-gen2",
+    label: "MiiCoffee DF64 II (Gen 2 · 64 mm flat burr)",
+  },
+  { value: "option-o-lagom-casa", label: "Option-O Lagom Casa (conical burr)" },
+  { value: "timemore-bricks-01s", label: "Timemore Bricks 01S (40 mm S2C)" },
+  { value: "fellow-opus-2", label: "Fellow Opus 2 (conical burr)" },
+];
+
+const FINANCIER_LOAD_ITEMS = [
+  {
+    value: "1",
+    label:
+      "1 load · 8 cavities (7 packed financiers + 1 sample · 526.0 g retained batter)",
+  },
+  {
+    value: "2",
+    label:
+      "2 loads · 16 cavities (15 packed financiers + 1 sample · 326.0 g retained batter)",
+  },
+  {
+    value: "3",
+    label:
+      "3 loads · 24 cavities (23 packed financiers + 1 sample · 126.0 g retained batter)",
+  },
+];
+
+const ESPRESSO_ORDERS_ITEMS = [
+  { value: "2", label: "2 espresso orders (72.0 g served)" },
+  { value: "4", label: "4 espresso orders (144.0 g served)" },
+];
+
+const STAFFING_ITEMS = [
+  {
+    value: "two-workers",
+    label: "Two workers · Baker #1 + Dedicated Barista #2 (parallel)",
+  },
+  {
+    value: "single-worker",
+    label:
+      "Single shared worker · Patisserie & Espresso contention (+wait time)",
+  },
+];
+
+const CHECK_ITEMS = [
+  {
+    value: "none",
+    label: "Uninterrupted shift · accept all loads & complete espresso service",
+  },
+  {
+    value: "reject-second-load",
+    label:
+      "Plan 61E fault journey · 2 loads, reject Load 2 (7 packed, 8 rejected, 72.0 g espresso)",
+  },
+  {
+    value: "interrupted-extraction",
+    label:
+      "Interrupted extraction on Order 2 (18.0 g discarded & recovered to 72.0 g served)",
+  },
+];
+
+export class CafeShiftRecipeAuthor extends React.Component<Props, State> {
+  state: State = {
+    appliance: DEFAULT_CAFE_SHIFT_RECIPE.appliance,
+    grinder: DEFAULT_CAFE_SHIFT_RECIPE.grinder ?? "miicoffee-df64-gen2",
+    financierLoads: DEFAULT_CAFE_SHIFT_RECIPE.financierLoads,
+    espressoOrders: DEFAULT_CAFE_SHIFT_RECIPE.espressoOrders,
+    staffing: DEFAULT_CAFE_SHIFT_RECIPE.staffing,
+    check: DEFAULT_CAFE_SHIFT_RECIPE.check,
+  };
+
+  private submit(event: React.FormEvent): void {
+    event.preventDefault();
+    this.props.prepared({
+      appliance: this.state.appliance,
+      grinder: this.state.grinder,
+      financierLoads:
+        this.state.check === "reject-second-load" &&
+        this.state.financierLoads < 2
+          ? 2
+          : this.state.financierLoads,
+      espressoOrders: this.state.espressoOrders,
+      staffing: this.state.staffing,
+      check: this.state.check,
+    });
+  }
+
+  render(): React.ReactNode {
+    const effectiveLoads =
+      this.state.check === "reject-second-load" && this.state.financierLoads < 2
+        ? 2
+        : this.state.financierLoads;
+    const rejectedLoads = this.state.check === "reject-second-load" ? 1 : 0;
+    const acceptedPieces = (effectiveLoads - rejectedLoads) * 8;
+    const packedPieces = Math.max(0, acceptedPieces - 1);
+    const servedEspressoG = (this.state.espressoOrders * 36.0).toFixed(1);
+
+    return (
+      <form
+        onSubmit={this.submit.bind(this)}
+        aria-label="Combined café shift recipe"
+      >
+        <h3>
+          Combined Café Shift · Financier Patisserie &amp; Espresso Service
+        </h3>
+        <p>
+          Plan 61E composes Financier production (152 °C beurre noisette on
+          Maruzen MIH-02C, Hobart HL200 726.0 g batter, Matsunaga 8P mould
+          dosing, Maruzen MBCO-5E 170 °C bake, 16-rack cooling, 23.5 g Ohaus
+          crumb sample, and gold-ribbon ballotin packing) with preheated
+          espresso bar service ({servedEspressoG} g served across{" "}
+          {this.state.espressoOrders} orders) under one shared logical clock.
+        </p>
+        <p>
+          Expected saleable output: <strong>{packedPieces}</strong> packed
+          financiers ({(packedPieces * 23.5).toFixed(1)} g net) +{" "}
+          <strong>1</strong> crumb sample (23.5 g)
+          {rejectedLoads > 0 ? " + 8 rejected financiers (188.0 g)" : ""} and{" "}
+          <strong>{servedEspressoG} g</strong> served espresso.
+        </p>
+        <label>
+          Espresso machine
+          <Select.Root
+            items={APPLIANCE_ITEMS}
+            value={this.state.appliance}
+            onValueChange={(value) => {
+              if (value === null) return;
+              this.setState({
+                appliance: value === "eagle-one" ? "eagle-one" : "linea",
+              });
+            }}
+          >
+            <Select.Trigger aria-label="Espresso machine">
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Popup>{APPLIANCE_ITEMS.map(renderItem)}</Select.Popup>
+          </Select.Root>
+        </label>
+        <label>
+          Single-dose coffee grinder
+          <Select.Root
+            items={GRINDER_ITEMS}
+            value={this.state.grinder}
+            onValueChange={(v) => {
+              if (v === null) return;
+              this.setState({
+                grinder:
+                  v === "option-o-lagom-casa" ||
+                  v === "timemore-bricks-01s" ||
+                  v === "fellow-opus-2"
+                    ? v
+                    : "miicoffee-df64-gen2",
+              });
+            }}
+          >
+            <Select.Trigger aria-label="Single-dose coffee grinder">
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Popup>{GRINDER_ITEMS.map(renderItem)}</Select.Popup>
+          </Select.Root>
+        </label>
+        <label>
+          Financier baking loads (Matsunaga 8P · 8 cavities/load)
+          <Select.Root
+            items={FINANCIER_LOAD_ITEMS}
+            value={String(effectiveLoads)}
+            onValueChange={(value) => {
+              if (value === null) return;
+              const v = Number(value);
+              this.setState({
+                financierLoads: v === 3 ? 3 : v === 2 ? 2 : 1,
+              });
+            }}
+          >
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Popup>
+              {FINANCIER_LOAD_ITEMS.map(renderItem)}
+            </Select.Popup>
+          </Select.Root>
+        </label>
+        <label>
+          Espresso orders (18.0 g dose → 36.0 g served shot)
+          <Select.Root
+            items={ESPRESSO_ORDERS_ITEMS}
+            value={String(this.state.espressoOrders)}
+            onValueChange={(value) => {
+              if (value === null) return;
+              this.setState({
+                espressoOrders: value === "4" ? 4 : 2,
+              });
+            }}
+          >
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Popup>
+              {ESPRESSO_ORDERS_ITEMS.map(renderItem)}
+            </Select.Popup>
+          </Select.Root>
+        </label>
+        <label>
+          Shift staffing (Plan 61E controlled comparison)
+          <Select.Root
+            items={STAFFING_ITEMS}
+            value={this.state.staffing}
+            onValueChange={(value) => {
+              if (value === null) return;
+              this.setState({
+                staffing:
+                  value === "single-worker" ? "single-worker" : "two-workers",
+              });
+            }}
+          >
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Popup>{STAFFING_ITEMS.map(renderItem)}</Select.Popup>
+          </Select.Root>
+        </label>
+        <label>
+          Quality &amp; recovery check
+          <Select.Root
+            items={CHECK_ITEMS}
+            value={this.state.check}
+            onValueChange={(v) => {
+              if (v === null) return;
+              const check: CafeShiftCheck =
+                v === "reject-second-load" || v === "interrupted-extraction"
+                  ? v
+                  : "none";
+              this.setState({
+                check,
+                financierLoads:
+                  check === "reject-second-load" &&
+                  this.state.financierLoads < 2
+                    ? 2
+                    : this.state.financierLoads,
+              });
+            }}
+          >
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Popup>{CHECK_ITEMS.map(renderItem)}</Select.Popup>
+          </Select.Root>
+        </label>
+        <button type="submit">Prepare combined café shift</button>
+      </form>
+    );
+  }
+}
+
+function renderItem(
+  item: Readonly<{ value: string; label: string }>,
+): React.ReactNode {
+  return (
+    <Select.Item key={item.value} value={item.value}>
+      {item.label}
+    </Select.Item>
+  );
+}

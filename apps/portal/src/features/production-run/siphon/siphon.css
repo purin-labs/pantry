@@ -1,0 +1,133 @@
+.siphon-station {
+  position: relative;
+  height: 100%;
+}
+.siphon-canvas {
+  height: 100%;
+  min-height: 560px;
+}
+.siphon-camera-bar {
+  position: absolute;
+  right: 12px;
+  bottom: max(152px, var(--chrome-bottom, 152px));
+  max-width: calc(100% - 24px);
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+.siphon-camera-bar button:not(:where(.pantry-select-trigger)) {
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.siphon-camera-bar button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.siphon-status {
+  position: absolute;
+  top: var(--chrome-status-top, 64px);
+  right: 12px;
+  z-index: 3;
+  width: min(334px, calc(100% - 24px));
+  max-height: calc(
+    100% - var(--chrome-status-top, 64px) -
+      max(160px, var(--chrome-bottom, 160px))
+  );
+  overflow: auto;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  font-size: 0.78rem;
+}
+.siphon-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.siphon-step-pill {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 5px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.siphon-step-pill span {
+  color: var(--muted);
+}
+.siphon-step-pill[data-step-state="active"] {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
+}
+.siphon-step-pill[data-step-state="done"] {
+  background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+}
+.siphon-status dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  margin: 0;
+}
+.siphon-status dt {
+  color: var(--muted);
+}
+.siphon-status dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.siphon-status h4 {
+  margin: 12px 0 4px;
+  font-size: 0.8rem;
+}
+.siphon-status ul {
+  margin: 0;
+  padding-left: 16px;
+}
+.siphon-status details {
+  margin-top: 8px;
+}
+.siphon-status [role="alert"] {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.siphon-note {
+  position: absolute;
+  left: 16px;
+  bottom: max(152px, var(--chrome-bottom, 152px));
+  z-index: 2;
+  max-width: min(348px, calc(100% - 32px));
+  margin: 0;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+@container station-pane (max-width: 720px) {
+  .siphon-note {
+    display: none;
+  }
+}

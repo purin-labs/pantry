@@ -1,0 +1,42 @@
+.empty-state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-inline-size: 0;
+  padding: 24px;
+  text-align: center;
+  color: var(--ink);
+}
+.empty-state-panel > h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 700;
+  text-wrap: balance;
+}
+.empty-state-panel > .empty-state-description {
+  max-inline-size: 48ch;
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  line-height: 1.625;
+  text-wrap: pretty;
+}
+.empty-state-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  margin-block-end: 16px;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-block-start: 24px;
+}

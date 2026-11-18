@@ -1,0 +1,30 @@
+/** The wake phrase and speech detection files, kept only while voice control is on. */
+const CACHE_NAME = "satyr-voice-v1";
+
+/**
+ * A voice file, from the cache when the cache holds the real file. The Portal
+ * answers a missing file with its own page and status 200. A page is never a
+ * voice file, so it is not kept, and a page that a device kept earlier is
+ * fetched again.
+ */
+export async function cachedBytes(url: string): Promise<ArrayBuffer> {
+  const cache = await caches.open(CACHE_NAME);
+  const stored = await cache.match(url);
+  if (stored !== undefined && !isPortalPage(stored))
+    return stored.arrayBuffer();
+  const response = await fetch(url);
+  if (!response.ok || isPortalPage(response))
+    throw new Error(`Voice file ${url} is missing (${response.status})`);
+  await cache.put(url, response.clone());
+  return response.arrayBuffer();
+}
+
+function isPortalPage(response: Response): boolean {
+  return (
+    response.headers.get("content-type")?.startsWith("text/html") === true
+  );
+}
+
+export async function deleteVoiceModels(): Promise<void> {
+  await caches.delete(CACHE_NAME);
+}

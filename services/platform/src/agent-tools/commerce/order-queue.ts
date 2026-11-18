@@ -1,0 +1,133 @@
+import { Type } from "typebox";
+import { isIanaTimezone } from "@seams/control-api";
+import type { SoldOutMarkRequest } from "../catalog/types";
+import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import {
+  ProposalArgumentError,
+  defineTool,
+  noArguments,
+  stringEnum,
+} from "../define-tool";
+
+const ID_PATTERN = "^[A-Za-z0-9_:-]{1,128}$";
+
+export const orderQueueRead = defineTool({
+  name: "order_queue_read",
+  description:
+    "Read the shop's open pickup orders, as staff see them on the order queue page: each order's pickup code, stage, preparation state, lines and fulfillmentId. It names no buyer.",
+  input: noArguments(),
+  decode: () => null,
+  effect: "read",
+  rerun: { kind: "any_caller", reason: "A read changes nothing." },
+  selection: {
+    kind: "capability",
+    capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
+  },
+  unavailable: "order queue read is unavailable",
+  handler: ({ readOrderQueue }) =>
+    readOrderQueue === undefined ? undefined : () => readOrderQueue(),
+});
+
+export const orderQueueAdvance = defineTool({
+  name: "order_queue_advance",
+  description:
+    "Move one order through the shop's order queue, as staff do on the order queue page. Use a fulfillmentId from order_queue_read. " +
+    "action start: staff begin to prepare the order. ready: the order waits for pickup. hand_over: the buyer has the order, and it leaves the queue. " +
+    "Hand over only when the person says that the buyer has the order. An order must be ready before it is handed over. This moves no money. A person's order queue page and pickup board show the move.",
+  input: Type.Object(
+    {
+      fulfillmentId: Type.String({ pattern: ID_PATTERN }),
+      action: stringEnum(["start", "ready", "hand_over"]),
+    },
+    { additionalProperties: false },
+  ),
+  decode: (input) => ({
+    fulfillmentId: input.fulfillmentId,
+    action: input.action,
+  }),
+  effect: "receipt",
+  rerun: {
+    kind: "any_caller",
+    reason:
+      "A move has a receipt under the call's key, and the queue's stage refuses a step that already happened, so a repeated call moves nothing twice.",
+  },
+  selection: {
+    kind: "capability",
+    capability: CAPABILITY_KEYS.commerceOrderQueueAdvance,
+  },
+  unavailable: "order queue move is unavailable",
+  handler: ({ advanceOrderQueue }) =>
+    advanceOrderQueue === undefined
+      ? undefined
+      : (request, call) => advanceOrderQueue(request, call.operationId),
+});
+
+export const soldOutRead = defineTool({
+  name: "sold_out_read",
+  description:
+    "Read the items of the café's published menu, as staff see them on the order queue page: each item's variantId, title and soldOutUntil. soldOutUntil is null for an item on sale.",
+  input: noArguments(),
+  decode: () => null,
+  effect: "read",
+  rerun: { kind: "any_caller", reason: "A read changes nothing." },
+  selection: {
+    kind: "capability",
+    capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
+  },
+  unavailable: "sold out read is unavailable",
+  handler: ({ readSoldOut }) =>
+    readSoldOut === undefined ? undefined : () => readSoldOut(),
+});
+
+export const soldOutMark = defineTool({
+  name: "sold_out_mark",
+  description:
+    "Mark one menu item sold out today, or clear its mark, as staff do on the order queue page. Use a variantId from sold_out_read. " +
+    "With soldOut true, give timeZone: the shop's IANA time zone, such as Asia/Tokyo. The mark ends at the next midnight there. If you do not know the shop's time zone, ask the person. " +
+    "With soldOut false, set timeZone to null. Screens and the order page show the mark, and checkout refuses the item. The stock count and the price do not change.",
+  input: Type.Object(
+    {
+      variantId: Type.String({ pattern: ID_PATTERN }),
+      soldOut: Type.Boolean(),
+      timeZone: Type.Unsafe<string | null>({
+        type: ["string", "null"],
+        maxLength: 64,
+      }),
+    },
+    { additionalProperties: false },
+  ),
+  decode: (input): SoldOutMarkRequest => {
+    if (!input.soldOut) {
+      if (input.timeZone !== null) {
+        throw new TypeError(
+          "sold_out_mark timeZone must be null to clear a mark",
+        );
+      }
+      return { variantId: input.variantId, mark: { kind: "cleared" } };
+    }
+    if (!isIanaTimezone(input.timeZone)) {
+      throw new ProposalArgumentError(
+        "sold_out_mark needs the shop's IANA time zone, such as Asia/Tokyo. Ask the person if you do not know it.",
+      );
+    }
+    return {
+      variantId: input.variantId,
+      mark: { kind: "today", timeZone: input.timeZone },
+    };
+  },
+  effect: "receipt",
+  rerun: {
+    kind: "any_caller",
+    reason:
+      "The same receipt answers a repeated mark, and a mark that stands has the same result.",
+  },
+  selection: {
+    kind: "capability",
+    capability: CAPABILITY_KEYS.commerceSoldOutMark,
+  },
+  unavailable: "sold out mark is unavailable",
+  handler: ({ markSoldOut }) =>
+    markSoldOut === undefined
+      ? undefined
+      : (request, call) => markSoldOut(request, call.operationId),
+});

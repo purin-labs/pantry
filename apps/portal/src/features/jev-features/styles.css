@@ -1,0 +1,204 @@
+/* Settings › Jev (Plan 88): one flat list of switches. */
+
+.jev-page {
+  display: grid;
+  gap: var(--pantry-space-4);
+  max-inline-size: 760px;
+}
+
+.jev-funding {
+  display: grid;
+  gap: var(--pantry-space-1);
+}
+
+.jev-funding p,
+.jev-row p {
+  margin: 0;
+}
+
+.jev-funding-line a {
+  margin-inline-start: 4px;
+}
+
+.jev-muted {
+  color: var(--ink-3);
+}
+
+.jev-warning,
+.jev-error {
+  color: var(--danger-text);
+}
+
+.jev-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: 1px solid var(--border);
+}
+
+.jev-row {
+  display: grid;
+  gap: var(--pantry-space-2);
+  padding-block: var(--pantry-space-4);
+  border-block-end: 1px solid var(--border);
+}
+
+.jev-row-head {
+  display: flex;
+  align-items: center;
+  gap: var(--pantry-space-3);
+}
+
+.jev-row-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.jev-row-state {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.jev-row-description {
+  max-inline-size: 60ch;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.jev-mailboxes {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jev-mailbox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px var(--pantry-space-3);
+  font-size: 14px;
+}
+
+.jev-mailbox-name {
+  color: var(--ink);
+}
+
+.jev-mailbox-state {
+  color: var(--ink-3);
+}
+
+.jev-mailbox-state[data-covered] {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.jev-mailbox-hint {
+  flex-basis: 100%;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.jev-mode {
+  display: flex;
+  align-items: center;
+  gap: var(--pantry-space-2);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+/* Paid use and the prompt (Plan 88 section 4). */
+
+.jev-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pantry-space-2) var(--pantry-space-3);
+  color: var(--ink-strong);
+}
+
+.jev-prompt > span {
+  flex: 1 1 32ch;
+}
+
+.jev-prompt-link {
+  font-weight: 500;
+}
+
+.jev-paid-use {
+  display: grid;
+  gap: var(--pantry-space-2);
+  padding-block: var(--pantry-space-4);
+  /* The switch list below draws the closing border. */
+  border-block-start: 1px solid var(--border);
+  scroll-margin-block-start: var(--pantry-space-4);
+}
+
+.jev-paid-use:focus {
+  outline: none;
+}
+
+.jev-paid-use p {
+  margin: 0;
+}
+
+.jev-limit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pantry-space-2) var(--pantry-space-3);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.jev-limit-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.jev-limit-field input {
+  inline-size: 9ch;
+}
+
+.jev-limit > .jev-muted {
+  flex-basis: 100%;
+  font-size: 13px;
+}
+
+/* Settings › Billing: one flat list of values. */
+
+.billing-values {
+  display: grid;
+  margin: 0;
+  border-block-start: 1px solid var(--border);
+}
+
+.billing-value {
+  display: grid;
+  grid-template-columns: minmax(12ch, 16rem) 1fr;
+  gap: var(--pantry-space-1) var(--pantry-space-4);
+  padding-block: var(--pantry-space-3);
+  border-block-end: 1px solid var(--border);
+}
+
+.billing-value dt {
+  color: var(--ink-3);
+}
+
+.billing-value dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+@media (max-width: 560px) {
+  .billing-value {
+    grid-template-columns: 1fr;
+  }
+}

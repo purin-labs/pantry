@@ -1,0 +1,41 @@
+{
+  "name": "@seams/bakery-model",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./bakery": "./src/bakery.ts",
+    "./bakery-procedure": "./src/bakery-procedure.ts",
+    "./bakery-scenario": "./src/bakery-scenario.ts",
+    "./bakery-production-scenario": "./src/bakery-production-scenario.ts",
+    "./bakery-physics": "./src/bakery-physics.ts",
+    "./bakery-run-snapshot": "./src/bakery-run-snapshot.ts",
+    "./bakery-agent-scenario-save": "./src/bakery-agent-scenario-save.ts",
+    "./bakery-surface": "./src/bakery-surface.ts",
+    "./bakery-context": "./src/bakery-context.ts",
+    "./espresso-rehearsal-file": "./src/espresso-rehearsal-file.ts",
+    "./bakery-appliance-protocol": "./src/bakery-appliance-protocol.ts",
+    "./bakery-checkpoint": "./src/bakery-checkpoint.ts",
+    "./bakery-appliance-workflow": "./src/bakery-appliance-workflow.ts",
+    "./bakery-canvas-source": "./src/bakery-canvas-source.ts",
+    "./bakery-robots": "./src/bakery-robots.ts",
+    "./bakery-load-assessment": "./src/bakery-load-assessment.ts",
+    "./bakery-margins": "./src/bakery-margins.ts"
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@seams/contracts": "workspace:*",
+    "@seams/control-api": "workspace:*",
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams/workflow-canvas-crdt": "workspace:*",
+    "@seams/commerce-client": "workspace:*",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  },
+  "description": "Satyr's BakeryOS model: recipes, procedures, physics and the bakery surface."
+}

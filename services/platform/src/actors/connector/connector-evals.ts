@@ -1,0 +1,162 @@
+import { readEmailRuntime } from "../connector-email";
+import {
+  admitEvalRun,
+  cancelEvalRun,
+  findEvalRunCommand,
+  readEvalRunProgress,
+  type ClaimedEvalTask,
+} from "../connector-eval";
+import { armConnectorAlarm } from "./alarm";
+import { invalid } from "./support";
+import { type ConnectorResult } from "./types";
+import { type ConnectorEmailIdentityRequest } from "./whatsapp-parsers";
+import type { ConnectorDO } from "../connector";
+import { ConnectorWhatsApp } from "./connector-whatsapp-actor";
+
+/**
+ * Eval runs and their settlement for the Connector.
+ */
+export abstract class ConnectorEvals extends ConnectorWhatsApp {
+  /**
+   * Starts one eval run of this mailbox's agent. The caller has checked who
+   * asks and what they may try. The same command sent again answers with the
+   * run it made.
+   */
+  async startEvalRun(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{
+        runId: string;
+        caseId: string;
+        commandId: string;
+        requestDigest: string;
+        eval: Readonly<{ evalId: string; revision: number }>;
+        scenarioIds: readonly string[];
+        routes: ClaimedEvalTask["run"]["routes"];
+        configurations: ClaimedEvalTask["run"]["configurations"];
+        startedByPersonId: string;
+      }>,
+  ): Promise<ConnectorResult<Readonly<{ runId: string; caseId: string }>>> {
+    return this.trackExecution(this.admittedStartEvalRun.bind(this, input));
+  }
+
+  protected async admittedStartEvalRun(
+    input: Parameters<ConnectorDO["startEvalRun"]>[0],
+  ): Promise<ConnectorResult<Readonly<{ runId: string; caseId: string }>>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const runtime = readEmailRuntime(this.ctx.storage.sql);
+    if (runtime === null || runtime.disabledAt !== null)
+      return invalid("eval_unavailable");
+    const admitted = this.ctx.storage.transactionSync(
+      admitEvalRun.bind(null, this.ctx.storage.sql, {
+        runId: input.runId,
+        caseId: input.caseId,
+        commandId: input.commandId,
+        requestDigest: input.requestDigest,
+        eval: input.eval,
+        scenarioIds: input.scenarioIds,
+        routes: input.routes,
+        configurations: input.configurations,
+        startedByPersonId: input.startedByPersonId,
+        now: input.now,
+      }),
+    );
+    if (admitted.kind === "command_conflict")
+      return invalid("eval_command_conflict");
+    if (admitted.kind === "capacity_exceeded")
+      return invalid("eval_capacity_exceeded");
+    await armConnectorAlarm(this.ctx.storage);
+    return {
+      ok: true,
+      value: { runId: admitted.run.runId, caseId: admitted.run.caseId },
+    };
+  }
+
+  /**
+   * The run that an earlier send of a start command made. Null means the
+   * command is new to this mailbox. The caller asks this before it checks
+   * the present state, so a repeated command gets its first answer.
+   */
+  async readEvalRunCommand(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{ commandId: string; requestDigest: string }>,
+  ): Promise<
+    ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
+  > {
+    return this.trackExecution(
+      this.admittedReadEvalRunCommand.bind(this, input),
+    );
+  }
+
+  protected async admittedReadEvalRunCommand(
+    input: Parameters<ConnectorDO["readEvalRunCommand"]>[0],
+  ): Promise<
+    ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
+  > {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const earlier = findEvalRunCommand(this.ctx.storage.sql, input);
+    if (earlier === null) return { ok: true, value: null };
+    if (earlier.kind === "command_conflict")
+      return invalid("eval_command_conflict");
+    return {
+      ok: true,
+      value: { runId: earlier.run.runId, caseId: earlier.run.caseId },
+    };
+  }
+
+  /**
+   * Cancels one eval run in progress. Tasks not yet started end as
+   * cancelled. Null means this mailbox holds no such run.
+   */
+  async cancelEvalRun(
+    input: ConnectorEmailIdentityRequest &
+      Readonly<{ evalId: string; runId: string }>,
+  ): Promise<
+    ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
+  > {
+    return this.trackExecution(this.admittedCancelEvalRun.bind(this, input));
+  }
+
+  protected async admittedCancelEvalRun(
+    input: Parameters<ConnectorDO["cancelEvalRun"]>[0],
+  ): Promise<
+    ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
+  > {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const run = this.ctx.storage.transactionSync(() =>
+      cancelEvalRun(this.ctx.storage.sql, {
+        evalId: input.evalId,
+        runId: input.runId,
+        now: input.now,
+      }),
+    );
+    if (run === null) return { ok: true, value: null };
+    await armConnectorAlarm(this.ctx.storage);
+    return { ok: true, value: { runId: run.runId, caseId: run.caseId } };
+  }
+
+  /**
+   * The runs of one Eval in progress on this mailbox. They carry no result:
+   * a result is released only from the settled run, under its label.
+   */
+  async readEvalRunProgress(
+    input: ConnectorEmailIdentityRequest & Readonly<{ evalId: string }>,
+  ): Promise<ConnectorResult<ReturnType<typeof readEvalRunProgress>>> {
+    return this.trackExecution(
+      this.admittedReadEvalRunProgress.bind(this, input),
+    );
+  }
+
+  protected async admittedReadEvalRunProgress(
+    input: Parameters<ConnectorDO["readEvalRunProgress"]>[0],
+  ): Promise<ConnectorResult<ReturnType<typeof readEvalRunProgress>>> {
+    const scope = await this.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    return {
+      ok: true,
+      value: readEvalRunProgress(this.ctx.storage.sql, input.evalId),
+    };
+  }
+}

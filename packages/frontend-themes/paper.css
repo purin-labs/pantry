@@ -1,0 +1,179 @@
+/* Paper: white cards on a near-white canvas, after elevenlabs.io. Gray
+   neutrals with a trace of warmth, near-black actions with a near-black
+   outline on secondary buttons, and a bright sky blue for hover, links, focus,
+   and small accents. */
+:root[data-pantry-theme="paper"] {
+  /* Light neutrals; 50 is the paper #FFFFFF, 100 the canvas #FAFAF9, 150 the
+     surface #F5F5F4, 300 the border #E5E5E4, 500 the muted text #737372, and
+     800 the ink #111111. */
+  --pantry-linen-50: oklch(1 0 0);
+  --pantry-linen-100: oklch(0.985 0.001 90);
+  --pantry-linen-150: oklch(0.97 0.001 90);
+  --pantry-linen-200: oklch(0.948 0.002 90);
+  --pantry-linen-250: oklch(0.932 0.002 90);
+  --pantry-linen-300: oklch(0.92 0.002 90);
+  --pantry-linen-350: oklch(0.86 0.003 90);
+  --pantry-linen-400: oklch(0.72 0.004 90);
+  --pantry-linen-450: oklch(0.63 0.004 90);
+  --pantry-linen-500: oklch(0.556 0.004 90);
+  --pantry-linen-550: oklch(0.5 0.004 90);
+  --pantry-linen-600: oklch(0.44 0.004 90);
+  --pantry-linen-650: oklch(0.37 0.003 90);
+  --pantry-linen-700: oklch(0.3 0.002 90);
+  --pantry-linen-750: oklch(0.24 0.001 90);
+  --pantry-linen-800: oklch(0.178 0 90);
+
+  /* Blue: a bright sky blue; 150 is the light blue #CCE8FF, 500 the hover
+     #0096FF, 600 the accent, focus and link #0071C4, and 750 the dark blue
+     #084172. */
+  --pantry-blue-50: oklch(0.977 0.01 250);
+  --pantry-blue-100: oklch(0.955 0.022 250);
+  --pantry-blue-150: oklch(0.92 0.044 250);
+  --pantry-blue-200: oklch(0.88 0.066 250);
+  --pantry-blue-250: oklch(0.83 0.09 250);
+  --pantry-blue-300: oklch(0.78 0.112 250);
+  --pantry-blue-350: oklch(0.73 0.135 250);
+  --pantry-blue-400: oklch(0.69 0.155 250);
+  --pantry-blue-450: oklch(0.672 0.172 250);
+  --pantry-blue-500: oklch(0.662 0.187 250);
+  --pantry-blue-550: oklch(0.59 0.17 250);
+  --pantry-blue-600: oklch(0.54 0.155 250);
+  --pantry-blue-650: oklch(0.49 0.14 250);
+  --pantry-blue-700: oklch(0.43 0.12 250);
+  --pantry-blue-750: oklch(0.37 0.1 250);
+  --pantry-blue-800: oklch(0.29 0.075 250);
+
+  --pantry-ground: var(--pantry-linen-100);
+  --pantry-paper: var(--pantry-linen-50);
+  --pantry-surface: var(--pantry-linen-150);
+  --pantry-border: var(--pantry-linen-300);
+  --pantry-hairline: var(--pantry-linen-500);
+  --pantry-ink: var(--pantry-linen-800);
+  --pantry-ink-strong: var(--pantry-linen-800);
+  --pantry-ink-muted: var(--pantry-linen-600);
+  --pantry-ink-subtle: var(--pantry-linen-550);
+  --pantry-ink-hover: var(--pantry-linen-800);
+
+  --pantry-primary: var(--pantry-linen-800);
+  --pantry-primary-hover: var(--pantry-blue-500);
+  --pantry-on-primary: oklch(1 0 0);
+  --pantry-primary-border: var(--pantry-linen-800);
+  --pantry-button-ring: 0 0 0 1px var(--pantry-ink) inset;
+  /* The dithered dot cloud of intercom.com, drawn by
+     scripts/frontend-themes/paper-dots.py. It follows the ink, so it turns
+     light in dark mode. The page picks one of three clouds on each load. */
+  --pantry-texture: url("./paper-dots-1.png");
+  --pantry-texture-ink: color-mix(in oklch, var(--pantry-ink) 85%, transparent);
+  --pantry-hover: var(--pantry-linen-100);
+  --pantry-selected: var(--pantry-linen-200);
+  --pantry-on-selected: var(--pantry-linen-800);
+  --pantry-link: var(--pantry-blue-600);
+  --pantry-focus: var(--pantry-blue-600);
+  --pantry-accent: var(--pantry-blue-600);
+  --pantry-accent-soft: var(--pantry-blue-200);
+  --pantry-accent-text: var(--pantry-blue-600);
+  --pantry-accent-surface: var(--pantry-blue-100);
+  --pantry-disabled-surface: var(--pantry-linen-150);
+  --pantry-disabled-text: var(--pantry-linen-450);
+
+  --pantry-success-text: oklch(0.44 0.09 155);
+  --pantry-success-surface: oklch(0.95 0.03 150);
+  --pantry-info-text: oklch(0.45 0.075 225);
+  --pantry-info-surface: oklch(0.95 0.02 225);
+  --pantry-warning-text: oklch(0.46 0.1 65);
+  --pantry-warning-surface: oklch(0.945 0.045 85);
+  --pantry-danger-text: oklch(0.526 0.2 28);
+  --pantry-danger-surface: oklch(0.95 0.025 30);
+  --pantry-category-accent-text: var(--pantry-blue-750);
+  --pantry-category-accent-surface: var(--pantry-blue-150);
+  --pantry-category-neutral-text: var(--pantry-linen-800);
+  --pantry-category-neutral-surface: var(--pantry-linen-200);
+
+  /* The rail is almost white; the selected row is a gray fill. */
+  --pantry-sidebar: var(--pantry-linen-100);
+  --pantry-sidebar-hover: var(--pantry-linen-150);
+  --pantry-sidebar-selected: var(--pantry-linen-200);
+  --pantry-sidebar-selected-ring: none;
+  --pantry-chat-surface: var(--pantry-linen-150);
+
+  --pantry-shadow-color: var(--pantry-linen-800);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 1px 2px color-mix(in oklch, var(--pantry-shadow-color) 4%, transparent),
+    0 8px 24px color-mix(in oklch, var(--pantry-shadow-color) 4%, transparent);
+}
+
+:root[data-pantry-theme="paper"][data-satyr-texture="2"] {
+  --pantry-texture: url("./paper-dots-2.png");
+}
+
+:root[data-pantry-theme="paper"][data-satyr-texture="3"] {
+  --pantry-texture: url("./paper-dots-3.png");
+}
+
+:root[data-pantry-theme="paper"][data-portal-theme="dark"] {
+  /* Carbon: the ink of the light mode as a surface. The chat, rail, canvas and
+     cards step up from L 0.2 to 0.275, with the warm hue of the paper. */
+  --pantry-carbon-chat: oklch(0.2 0.005 85);
+  --pantry-carbon-rail: oklch(0.215 0.005 85);
+  --pantry-carbon-canvas: oklch(0.235 0.006 85);
+  --pantry-carbon-surface: oklch(0.255 0.006 85);
+  --pantry-carbon-paper: oklch(0.275 0.007 85);
+  --pantry-carbon-hover: oklch(0.31 0.007 85);
+  --pantry-carbon-selected: oklch(0.335 0.008 85);
+  --pantry-carbon-border: oklch(0.355 0.008 85);
+  --pantry-carbon-ring: oklch(0.42 0.009 85);
+
+  --pantry-ground: var(--pantry-carbon-canvas);
+  --pantry-paper: var(--pantry-carbon-paper);
+  --pantry-surface: var(--pantry-carbon-surface);
+  --pantry-border: var(--pantry-carbon-border);
+  --pantry-hairline: var(--pantry-linen-450);
+  --pantry-ink: var(--pantry-linen-150);
+  --pantry-ink-strong: var(--pantry-linen-50);
+  --pantry-ink-muted: var(--pantry-linen-350);
+  --pantry-ink-subtle: var(--pantry-linen-400);
+  --pantry-ink-hover: var(--pantry-linen-50);
+
+  --pantry-primary: var(--pantry-linen-150);
+  --pantry-primary-hover: var(--pantry-linen-50);
+  --pantry-on-primary: var(--pantry-linen-800);
+  --pantry-primary-border: var(--pantry-linen-150);
+  --pantry-button-ring: 0 0 0 1px var(--pantry-linen-400) inset;
+  --pantry-texture-ink: color-mix(in oklch, var(--pantry-ink) 45%, transparent);
+  --pantry-hover: var(--pantry-carbon-hover);
+  --pantry-selected: var(--pantry-carbon-selected);
+  --pantry-on-selected: var(--pantry-linen-50);
+  --pantry-link: var(--pantry-blue-250);
+  --pantry-focus: var(--pantry-blue-300);
+  --pantry-accent: var(--pantry-blue-300);
+  --pantry-accent-text: var(--pantry-blue-250);
+  --pantry-accent-surface: oklch(0.36 0.1 250);
+  --pantry-disabled-surface: var(--pantry-surface);
+  --pantry-disabled-text: var(--pantry-linen-450);
+
+  --pantry-success-text: oklch(0.84 0.09 155);
+  --pantry-success-surface: oklch(0.33 0.04 155);
+  --pantry-info-text: oklch(0.85 0.07 225);
+  --pantry-info-surface: oklch(0.33 0.04 225);
+  --pantry-warning-text: oklch(0.88 0.09 80);
+  --pantry-warning-surface: oklch(0.35 0.05 70);
+  --pantry-danger-text: oklch(0.84 0.085 25);
+  --pantry-danger-surface: oklch(0.34 0.06 25);
+  --pantry-category-accent-text: var(--pantry-blue-250);
+  --pantry-category-accent-surface: oklch(0.36 0.1 250);
+  --pantry-category-neutral-text: var(--pantry-linen-200);
+  --pantry-category-neutral-surface: var(--pantry-carbon-selected);
+
+  --pantry-sidebar: var(--pantry-carbon-rail);
+  --pantry-sidebar-hover: var(--pantry-carbon-surface);
+  --pantry-sidebar-selected: var(--pantry-carbon-selected);
+  --pantry-sidebar-selected-ring: 0 0 0 1px var(--pantry-carbon-ring) inset;
+  --pantry-chat-surface: var(--pantry-carbon-chat);
+
+  --pantry-shadow-color: oklch(0.1 0.005 85);
+  --pantry-shadow-card:
+    0 0 0 1px var(--pantry-border),
+    0 2px 4px color-mix(in oklch, var(--pantry-shadow-color) 25%, transparent),
+    0 8px 24px color-mix(in oklch, var(--pantry-shadow-color) 25%, transparent);
+}

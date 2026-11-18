@@ -1,0 +1,10 @@
+schemaVersion: satyr.variants.v1
+variants:
+  - variantId: variant_field_watch_black
+    sku: FIELD-BLACK
+    title: Black dial
+    priceMinor: 42500
+  - variantId: variant_field_watch_white
+    sku: FIELD-WHITE
+    title: White dial
+    priceMinor: 42500

@@ -1,0 +1,36 @@
+/* The grain field preview: one hero panel on a moving field. */
+.gradients-preview {
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--paper);
+}
+
+.gradients-preview-hero {
+  position: relative;
+  isolation: isolate;
+  max-width: 1120px;
+  min-height: 420px;
+  margin: 0 auto;
+  padding: 16px 24px 40px;
+  border-radius: 20px;
+  color: #ffffff;
+}
+
+.gradients-preview-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gradients-preview-hero h1 {
+  margin: 180px 0 8px;
+  font-size: 44px;
+  font-weight: 400;
+}
+
+.gradients-preview-hero p {
+  max-width: 44ch;
+  margin: 0;
+  font-size: 16px;
+}

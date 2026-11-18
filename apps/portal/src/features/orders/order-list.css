@@ -1,0 +1,382 @@
+/* The orders page. Colors come from the portal theme tokens, so light and
+   dark follow the active theme. Only the orders that a rule holds use the
+   danger and warning colors. */
+.order-list {
+  display: grid;
+  gap: 24px;
+  max-inline-size: 860px;
+  min-width: 0;
+  container-type: inline-size;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.order-list p,
+.order-list h2,
+.order-list h3,
+.order-list ul {
+  margin: 0;
+}
+
+.order-list ul {
+  padding: 0;
+  list-style: none;
+}
+
+.order-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.order-list-head h2 {
+  color: var(--ink-strong);
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.order-list-head p,
+.order-list-day {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.order-list-head p {
+  margin-block-start: 4px;
+}
+
+.order-list-day {
+  flex: none;
+}
+
+/* the stage counts: one row of quiet filters */
+.order-list-stages {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.order-list .order-list-stages button:not(:where(.pantry-select-trigger)) {
+  display: grid;
+  justify-items: start;
+  padding: 10px 14px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-align: start;
+}
+
+.order-list .order-list-stages button:not(:where(.pantry-select-trigger)) + button:not(:where(.pantry-select-trigger)) {
+  border-inline-start: 1px solid var(--border);
+}
+
+.order-list .order-list-stages button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.order-list .order-list-stages button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.order-list-stages strong {
+  color: var(--ink-strong);
+  font-size: 20px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-list-section {
+  display: flex;
+  justify-content: space-between;
+  margin-block-end: 8px;
+  padding-inline: 4px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.order-list-section span {
+  font-variant-numeric: tabular-nums;
+}
+
+.order-list-held {
+  display: grid;
+  gap: 8px;
+}
+
+.order-list-held-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+.order-list-held-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.order-list-held-title strong {
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+
+.order-list-held-title span {
+  color: var(--ink-2);
+}
+
+.order-list-problem {
+  font-size: 13.5px;
+}
+
+.order-list-held-row[data-tone="danger"] .order-list-problem {
+  color: var(--danger-text);
+}
+
+.order-list-held-row[data-tone="warning"] .order-list-problem {
+  color: var(--warn-text);
+}
+
+.order-list-update {
+  color: var(--ink-2);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.order-list-rows li + li {
+  border-block-start: 1px solid var(--border);
+}
+
+.order-list .order-list-rows button:not(:where(.pantry-select-trigger)) {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 150px 72px;
+  align-items: center;
+  gap: 12px;
+  inline-size: 100%;
+  min-height: 44px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13.5px;
+  text-align: start;
+  white-space: normal;
+}
+
+.order-list .order-list-rows button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.order-list-rows strong {
+  color: var(--ink-strong);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-list-who {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-list-stage,
+.order-list-due,
+.order-list-more {
+  color: var(--ink-2);
+}
+
+.order-list-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.order-list-due {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-list-more {
+  padding: 10px 4px 0;
+  font-size: 13px;
+}
+
+/* the drawer */
+.order-list-detail {
+  display: grid;
+  gap: 20px;
+}
+
+.order-list-detail p {
+  margin: 0;
+}
+
+.order-list-detail-title {
+  color: var(--ink-strong);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.order-list-detail-meta,
+.order-list-detail-label {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.order-list-detail-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-block-end: 6px;
+}
+
+.order-list-detail-label svg {
+  flex: none;
+  margin-block-start: 3px;
+}
+
+.order-list-detail-problem {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.order-list-detail-problem p + p {
+  font-size: 12.5px;
+}
+
+.order-list-detail-problem[data-tone="danger"] {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.order-list-detail-problem[data-tone="warning"] {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.order-list-detail-update {
+  display: grid;
+  gap: 10px;
+}
+
+.order-list-detail-update blockquote {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  line-height: 1.6;
+}
+
+.order-list-checks {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-list-checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* the icon sits on the first line when a check wraps */
+.order-list-checks svg {
+  flex: none;
+  margin-block-start: 3px;
+}
+
+.order-list-checks [data-state="passed"] svg {
+  color: var(--ok-text);
+}
+
+.order-list-checks [data-state="failed"] {
+  color: var(--danger-text);
+}
+
+.order-list-checks [data-state="warning"] {
+  color: var(--warn-text);
+}
+
+.order-list-checks [data-state="waiting"],
+.order-list-checks [data-state="running"] {
+  color: var(--ink-2);
+}
+
+.order-list-checks [data-state="pending"] {
+  color: var(--ink-3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .order-list-stage svg,
+  .order-list-checks [data-state="running"] svg {
+    animation: order-list-spin 1s linear infinite;
+  }
+}
+
+@keyframes order-list-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@container (max-width: 600px) {
+  .order-list-head {
+    display: grid;
+    gap: 4px;
+  }
+
+  .order-list-stages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .order-list .order-list-stages button:not(:where(.pantry-select-trigger)):nth-child(3) {
+    border-inline-start: 0;
+  }
+
+  .order-list .order-list-stages button:not(:where(.pantry-select-trigger)):nth-child(n + 3) {
+    border-block-start: 1px solid var(--border);
+  }
+
+  .order-list-held-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .order-list-held-row button:not(:where(.pantry-select-trigger)) {
+    grid-row: 4;
+    justify-self: start;
+  }
+
+  .order-list .order-list-rows button:not(:where(.pantry-select-trigger)) {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    padding-block: 8px;
+  }
+
+  .order-list-stage {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 12.5px;
+  }
+
+  .order-list-due {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}

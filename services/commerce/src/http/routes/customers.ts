@@ -1,0 +1,160 @@
+import type { BuyerRoute, CommerceRoute } from "../../http-routes.ts";
+import { isRecord } from "@seams/std";
+import type { HttpRouteContext } from "../context.ts";
+import { hasMerchantId, readJsonBody } from "../request-body.ts";
+import { jsonResponse } from "../responses.ts";
+
+export async function customerCommandRoute(
+  ctx: HttpRouteContext,
+  request: Request,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "create_customer" | "update_customer" | "erase_customer" }
+  >,
+): Promise<Response> {
+  const body = await readJsonBody(request);
+  if (!body.ok) return body.response;
+  if (
+    !hasMerchantId(body.value, route.merchantId) ||
+    !isRecord(body.value) ||
+    (route.kind !== "create_customer" &&
+      body.value.customerId !== route.customerId)
+  ) {
+    return jsonResponse(400, {
+      message: "Merchant path and command must match",
+    });
+  }
+  return jsonResponse(
+    200,
+    route.kind === "create_customer"
+      ? ctx.authority.createCustomer(body.value)
+      : route.kind === "update_customer"
+        ? ctx.authority.updateCustomer(body.value)
+        : ctx.authority.eraseCustomer(body.value),
+  );
+}
+
+export async function readCustomerRoute(
+  ctx: HttpRouteContext,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "read_customer" }
+  >,
+): Promise<Response> {
+  const customer = ctx.authority.readCustomer(
+    route.merchantId,
+    route.customerId,
+  );
+  return customer === undefined
+    ? jsonResponse(404, { message: "Customer not found" })
+    : jsonResponse(200, customer);
+}
+
+export async function exportCustomerRoute(
+  ctx: HttpRouteContext,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "export_customer" }
+  >,
+): Promise<Response> {
+  const exported = ctx.authority.exportCustomer(
+    route.merchantId,
+    route.customerId,
+  );
+  return exported === undefined
+    ? jsonResponse(404, { message: "Customer not found" })
+    : jsonResponse(200, exported);
+}
+
+export async function companyCommandRoute(
+  ctx: HttpRouteContext,
+  request: Request,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "create_company" | "update_company" }
+  >,
+): Promise<Response> {
+  const body = await readJsonBody(request);
+  if (!body.ok) return body.response;
+  if (
+    !hasMerchantId(body.value, route.merchantId) ||
+    !isRecord(body.value) ||
+    (route.kind === "update_company" &&
+      body.value.companyId !== route.companyId)
+  )
+    return jsonResponse(400, {
+      message: "Merchant path and command must match",
+    });
+  return jsonResponse(
+    200,
+    route.kind === "create_company"
+      ? ctx.authority.createCompany(body.value)
+      : ctx.authority.updateCompany(body.value),
+  );
+}
+
+export async function marketCommandRoute(
+  ctx: HttpRouteContext,
+  request: Request,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "create_market" | "update_market" }
+  >,
+): Promise<Response> {
+  const body = await readJsonBody(request);
+  if (!body.ok) return body.response;
+  if (
+    !hasMerchantId(body.value, route.merchantId) ||
+    !isRecord(body.value) ||
+    (route.kind === "update_market" && body.value.marketId !== route.marketId)
+  ) {
+    return jsonResponse(400, {
+      message: "Merchant path and command must match",
+    });
+  }
+  return jsonResponse(
+    200,
+    route.kind === "create_market"
+      ? ctx.authority.createMarket(body.value)
+      : ctx.authority.updateMarket(body.value),
+  );
+}
+
+export async function listMarketsRoute(
+  ctx: HttpRouteContext,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "list_markets" }
+  >,
+): Promise<Response> {
+  return jsonResponse(200, {
+    schemaVersion: "underclerk.markets.v1",
+    markets: ctx.authority.listMarkets(route.merchantId),
+  });
+}
+
+export async function listCompaniesRoute(
+  ctx: HttpRouteContext,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "list_companies" }
+  >,
+): Promise<Response> {
+  return jsonResponse(200, {
+    schemaVersion: "underclerk.companies.v1",
+    companies: ctx.authority.listCompanies(route.merchantId),
+  });
+}
+
+export async function listNotificationsRoute(
+  ctx: HttpRouteContext,
+  route: Extract<
+    Exclude<CommerceRoute, BuyerRoute>,
+    { kind: "list_notifications" }
+  >,
+): Promise<Response> {
+  return jsonResponse(200, {
+    schemaVersion: "underclerk.notifications.v1",
+    notifications: ctx.authority.listNotifications(route.merchantId),
+  });
+}

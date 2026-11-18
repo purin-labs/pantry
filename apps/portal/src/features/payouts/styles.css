@@ -1,0 +1,188 @@
+.payout-panel {
+  border: 1px solid transparent;
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.payout-panel-quiet {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.payout-panel-hidden {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.payout-panel-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.payout-panel-heading h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--pantry-text-heading);
+  font-weight: 300;
+}
+
+.payout-panel-badges {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.payout-panel-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.payout-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.payout-row {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-control);
+}
+
+.payout-audit-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  justify-self: start;
+  margin-top: 4px;
+  color: var(--pantry-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.payout-exceptions {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--pantry-warning-text);
+  border-radius: 10px;
+  background: var(--pantry-warning-surface);
+}
+
+.payout-exceptions h3,
+.payout-exceptions p {
+  margin: 0;
+}
+
+.payout-exceptions h3 {
+  font-size: 14px;
+}
+
+.payout-exceptions p {
+  margin-top: 4px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.payout-exception-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.payout-exception-row {
+  display: grid;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline);
+}
+
+.payout-row-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.payout-row-supplier {
+  font-weight: 500;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.payout-row-amount {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.payout-row-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.payout-row-guidance,
+.payout-row-detail {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.payout-row-detail {
+  font-size: 12px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.payout-badge {
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+
+.payout-badge-settled {
+  color: var(--pantry-success-text);
+  background: var(--pantry-success-surface);
+}
+
+.payout-badge-moving {
+  color: var(--ink-2);
+  background: transparent;
+}
+
+.payout-badge-attention {
+  color: var(--pantry-warning-text);
+  background: var(--pantry-warning-surface);
+}
+
+.payout-badge-quiet {
+  color: var(--ink-2);
+  background: transparent;
+}

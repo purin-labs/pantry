@@ -1,0 +1,47 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The Code Mode sandbox Worker. It runs the QuickJS VM of a Pi Code Mode
+  // script in an isolate of its own, so that a script that computes cannot
+  // hold the session Actor's thread. It has no credential, database, storage,
+  // route, or outbound binding. The platform Worker binds the class with
+  // `script_name` and passes every capability call through its own exchange.
+  //
+  // Deploy this Worker before the platform Worker that binds it.
+  "main": "src/code-mode-sandbox/worker.ts",
+  "compatibility_date": "2026-07-07",
+  "workers_dev": false,
+  // One execution computes for five seconds at most: the interrupt budget in
+  // src/code-mode-sandbox/limits.ts. The deploy check compares both values.
+  "limits": {
+    "cpu_ms": 30000,
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["CodeModeSandbox"] }],
+  "env": {
+    "local": {
+      "name": "satyr-code-mode-sandbox-local",
+      "durable_objects": {
+        "bindings": [{ "name": "SANDBOX", "class_name": "CodeModeSandbox" }],
+      },
+    },
+    "staging": {
+      "name": "satyr-code-mode-sandbox-staging",
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "SANDBOX",
+            "class_name": "CodeModeSandbox",
+          },
+        ],
+      },
+    },
+    "production": {
+      "name": "satyr-code-mode-sandbox",
+      "durable_objects": {
+        "bindings": [{ "name": "SANDBOX", "class_name": "CodeModeSandbox" }],
+      },
+    },
+  },
+}

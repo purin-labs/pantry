@@ -1,0 +1,13 @@
+.chat-work-glow[data-voice-beam] {
+  position: absolute;
+  inset: -1px;
+  z-index: 1;
+  border-radius: 22px;
+  pointer-events: none;
+}
+
+.chat-work-glow-shape {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}

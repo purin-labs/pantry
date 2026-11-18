@@ -1,0 +1,43 @@
+{
+  "name": "@seams/control-api",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./ids": {
+      "types": "./src/ids.ts",
+      "default": "./src/ids.ts"
+    },
+    "./portal/*": {
+      "types": "./src/portal/*.ts",
+      "default": "./src/portal/*.ts"
+    }
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@seams/collaboration": "workspace:*",
+    "@seams/contracts": "workspace:*",
+    "@seams/email-draft-crdt": "workspace:*",
+    "@seams/mail-reply-crdt": "workspace:*",
+    "@seams/menu-board-crdt": "workspace:*",
+    "@seams/menu-draft-crdt": "workspace:*",
+    "@seams/product-description-crdt": "workspace:*",
+    "@seams/std": "workspace:*",
+    "@seams/type-utils": "workspace:*",
+    "@seams-internal/console-shared": "file:../../vendor/seams/seams-internal-console-shared-0.1.3-ebed186cf39a.tgz",
+    "@seams/commerce-client": "workspace:*",
+    "@seams/commerce-contracts": "workspace:*",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

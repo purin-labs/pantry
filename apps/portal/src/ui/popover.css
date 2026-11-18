@@ -1,0 +1,57 @@
+/* The Base UI Popover parts with Portal tokens. */
+
+.pantry-popover-positioner {
+  z-index: 1000;
+  outline: 0;
+}
+
+.pantry-popover-popup {
+  box-sizing: border-box;
+  max-width: calc(100vw - 24px);
+  max-height: var(--available-height);
+  padding: 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  font-size: 13px;
+  outline: 0;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--pantry-motion-fast) ease,
+    scale var(--pantry-motion-fast) ease;
+}
+
+.pantry-popover-popup[data-starting-style],
+.pantry-popover-popup[data-ending-style] {
+  opacity: 0;
+  scale: 0.97;
+}
+
+.pantry-popover-title {
+  margin: 0 0 3px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-strong);
+}
+
+.pantry-popover-description {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantry-popover-popup {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .pantry-popover-popup {
+    border-color: ButtonText;
+  }
+}
