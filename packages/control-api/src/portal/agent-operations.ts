@@ -359,10 +359,22 @@ export type AgentOperationCommand =
       readonly proposalId: string;
     }
   | {
+      /**
+       * Adopts a published definition revision for one installation.
+       *
+       * Publication records what an agent may run; activation decides what it
+       * does run. New Cases pin the activated revision; Cases already assigned
+       * keep the revision they recorded.
+       */
       readonly kind: "activate_agent_definition_revision";
       readonly installationId: string;
       readonly expectedDefinitionRevision: number;
       readonly definitionRevision: number;
+      /**
+       * The ordered skill set the operator is activating. It must equal the
+       * chosen revision's set exactly, so the confirmation names what will run
+       * rather than trusting whatever the definition holds at execution.
+       */
       readonly skillRefs: readonly AgentSkillRef[];
     }
   | {
