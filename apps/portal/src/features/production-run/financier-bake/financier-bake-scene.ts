@@ -1,7 +1,5 @@
 import * as THREE from "three";
-import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { SceneHost } from "../scene-host";
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
@@ -14,16 +12,25 @@ import maruzenOvenUrl from "../../../../../../assets/bakery-mujoco/maruzen-mbco-
 import ohausScaleUrl from "../../../../../../assets/bakery-mujoco/ohaus-ranger-3000/ohaus-r31pe6.glb?url";
 import type { FinancierBakeSample } from "@seams/production-simulation/recipes/financier-bake/model";
 import {
-  fr10GripperKinematics,
-  fr10Links,
-  fr10ShoulderIk,
-} from "@seams/production-simulation/kinematics/fr10";
+  addPatisserieBench,
+  enableSceneShadows as enableShadows,
+  lerpVec3,
+  playSampleBatch,
+  ScalePan,
+  studioLights,
+} from "../appliance-sample-three";
+import {
+  buildPaddedGripper,
+  fr10Arm,
+  lerpCobot,
+  mountFr10Visual,
+  openFr10Fingers,
+  reachFr10,
+  type Fr10Pivot,
+} from "../shared/cobot-rig";
 
 export type FinancierBakeCameraPreset =
-  | "station"
-  | "depositor"
-  | "oven"
-  | "cooling";
+  "station" | "depositor" | "oven" | "cooling";
 
 type Vec3 = readonly [number, number, number];
 
@@ -56,16 +63,25 @@ const CAMERA_PRESETS: Readonly<
 
 const ROBOT_BASE_ZUP: Vec3 = [-0.36, 0.48, 0.0];
 const INTERPOLATION_MS = 55;
-const forwardKinematicsFr10 = fr10GripperKinematics(fr10Links(ROBOT_BASE_ZUP));
-const solveFr10Ik = fr10ShoulderIk(ROBOT_BASE_ZUP);
+const ARM = fr10Arm(ROBOT_BASE_ZUP);
 
-function enableShadows(object: THREE.Object3D, cast = true, receive = true) {
-  object.traverse((node) => {
-    if (node instanceof THREE.Mesh) {
-      node.castShadow = cast;
-      node.receiveShadow = receive;
-    }
-  });
+/** The stainless funnel rest stand behind the Ohaus scale (`[-0.58, 0.14, 0]`). */
+function funnelStand(
+  legMat: THREE.MeshStandardMaterial,
+): readonly THREE.Object3D[] {
+  const funnelStandBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.058, 0.064, 0.012, 28),
+    legMat,
+  );
+  funnelStandBase.rotation.x = Math.PI / 2;
+  funnelStandBase.position.set(-0.58, 0.14, 0.006);
+
+  const funnelStandRing = new THREE.Mesh(
+    new THREE.TorusGeometry(0.048, 0.0045, 12, 32),
+    legMat,
+  );
+  funnelStandRing.position.set(-0.58, 0.14, 0.145);
+  return [funnelStandBase, funnelStandRing];
 }
 
 function interpolateSample(
@@ -76,11 +92,7 @@ function interpolateSample(
   if (u <= 0) return a;
   if (u >= 1) return b;
   const lerp = THREE.MathUtils.lerp;
-  const lv3 = (v1: Vec3, v2: Vec3): Vec3 => [
-    lerp(v1[0], v2[0], u),
-    lerp(v1[1], v2[1], u),
-    lerp(v1[2], v2[2], u),
-  ];
+  const lv3 = (v1: Vec3, v2: Vec3): Vec3 => lerpVec3(v1, v2, u);
   return {
     ...b,
     timeS: lerp(a.timeS, b.timeS, u),
@@ -128,12 +140,7 @@ function interpolateSample(
       handleAngleRad: lerp(a.oven.handleAngleRad, b.oven.handleAngleRad, u),
       steamLossG: lerp(a.oven.steamLossG, b.oven.steamLossG, u),
     },
-    cobot: {
-      ...b.cobot,
-      toolZUp: lv3(a.cobot.toolZUp, b.cobot.toolZUp),
-      wristPitchRad: lerp(a.cobot.wristPitchRad, b.cobot.wristPitchRad, u),
-      fingerOpeningM: lerp(a.cobot.fingerOpeningM, b.cobot.fingerOpeningM, u),
-    },
+    cobot: lerpCobot(a.cobot, b.cobot, u),
   };
 }
 
@@ -182,8 +189,18 @@ function drawFinancierCrustCanvas(
   const rg = Math.round(Math.max(10, cg - 38 * clamped - 45 * over));
   const rb = Math.round(Math.max(5, cb - 22 * clamped - 20 * over));
 
-  const grad = ctx.createRadialGradient(w / 2, h / 2, 18, w / 2, h / 2, w * 0.65);
-  grad.addColorStop(0, `rgb(${Math.min(255, cr + 18)}, ${Math.min(255, cg + 14)}, ${Math.min(255, cb + 8)})`);
+  const grad = ctx.createRadialGradient(
+    w / 2,
+    h / 2,
+    18,
+    w / 2,
+    h / 2,
+    w * 0.65,
+  );
+  grad.addColorStop(
+    0,
+    `rgb(${Math.min(255, cr + 18)}, ${Math.min(255, cg + 14)}, ${Math.min(255, cb + 8)})`,
+  );
   grad.addColorStop(0.62, `rgb(${cr}, ${cg}, ${cb})`);
   grad.addColorStop(1, `rgb(${rr}, ${rg}, ${rb})`);
   ctx.fillStyle = grad;
@@ -215,20 +232,17 @@ export class FinancierBakeScene {
   private readonly host: SceneHost;
   private readonly scene: THREE.Scene;
   private readonly camera = new THREE.PerspectiveCamera(35, 1, 0.02, 20);
-  private readonly orbit: OrbitControls;
   private readonly zUpRoot = new THREE.Group();
   private readonly model = new THREE.Group();
   private readonly robot = new THREE.Group();
   private readonly gripper = new THREE.Group();
   private readonly leftFinger = new THREE.Group();
   private readonly rightFinger = new THREE.Group();
-  private pivots: Readonly<{ object: THREE.Object3D; axis: THREE.Vector3 }>[] =
-    [];
+  private pivots: readonly Fr10Pivot[] = [];
 
   // Appliances
   private readonly scaleRoot = new THREE.Group();
-  private scalePanNode: THREE.Object3D | null = null;
-  private scalePanBaseY = 0.117;
+  private readonly scalePan = new ScalePan();
 
   private readonly ovenRoot = new THREE.Group();
   private ovenVisual: OvenVisual | null = null;
@@ -276,31 +290,22 @@ export class FinancierBakeScene {
       step: this.step.bind(this),
     });
     this.scene = this.host.scene;
-    this.orbit = this.host.orbit;
 
-    this.camera.position.set(...CAMERA_PRESETS.station.position);
-    this.orbit.target.set(...CAMERA_PRESETS.station.target);
-    this.orbit.enableDamping = true;
-    this.orbit.dampingFactor = 0.08;
-    this.orbit.maxPolarAngle = Math.PI * 0.49;
-    this.orbit.minDistance = 0.25;
-    this.orbit.maxDistance = 4.5;
-    this.orbit.update();
+    this.host.startAt(CAMERA_PRESETS.station, {
+      minDistance: 0.25,
+      maxDistance: 4.5,
+      maxPolarAngle: Math.PI * 0.49,
+    });
 
-    const hemi = new THREE.HemisphereLight(0xfffcf5, 0x6b6257, 1.25);
-    const keyLight = new THREE.DirectionalLight(0xfff8ed, 1.9);
-    keyLight.position.set(1.2, 2.6, 2.2);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.camera.near = 0.3;
-    keyLight.shadow.camera.far = 6.5;
-    keyLight.shadow.camera.left = -1.7;
-    keyLight.shadow.camera.right = 1.7;
-    keyLight.shadow.camera.top = 1.6;
-    keyLight.shadow.camera.bottom = -1.6;
-    keyLight.shadow.bias = -0.0004;
-    const rimLight = new THREE.DirectionalLight(0xdce8f5, 0.75);
-    rimLight.position.set(-1.5, 1.8, -1.2);
+    const [hemi, keyLight, rimLight] = studioLights({
+      hemi: 1.25,
+      keyIntensity: 1.9,
+      keyAt: [1.2, 2.6, 2.2],
+      shadow: [0.3, 6.5],
+      shadowExtent: [1.7, 1.6],
+      rimIntensity: 0.75,
+      rimAt: [-1.5, 1.8, -1.2],
+    });
 
     // Warm interior halogen chamber lamp inside the Maruzen MBCO-5E
     this.chamberPointLight = new THREE.PointLight(0xffb454, 1.8, 0.95);
@@ -326,8 +331,27 @@ export class FinancierBakeScene {
     this.crustTexture = new THREE.CanvasTexture(this.crustCanvas);
     this.crustTexture.colorSpace = THREE.SRGBColorSpace;
 
-    this.buildPatisserieBench();
-    this.buildParallelGripper();
+    // 1.76 m wide brushed stainless patisserie worktable (`Z = 0` top surface)
+    addPatisserieBench(this.zUpRoot, {
+      floor: 6.0,
+      grid: [4.6, 23],
+      centre: [0.06, -0.06],
+      top: [1.78, 0.92],
+      shelf: [1.68, 0.82],
+      legRadius: 0.024,
+      legs: [
+        [-0.76, -0.46],
+        [0.88, -0.46],
+        [-0.76, 0.34],
+        [0.88, 0.34],
+      ],
+      robotBase: ROBOT_BASE_ZUP,
+      extras: funnelStand,
+    });
+    buildPaddedGripper(this.gripper, this.leftFinger, this.rightFinger, {
+      barX: 0.074,
+      padY: 0.006,
+    });
     this.buildCoolingWireGrid();
     this.buildCarrierTray();
 
@@ -347,138 +371,6 @@ export class FinancierBakeScene {
     this.model.add(this.scaleRoot, this.ovenRoot);
 
     this.host.requestFrame();
-  }
-
-  private buildPatisserieBench(): void {
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(6.0, 6.0),
-      new THREE.MeshStandardMaterial({
-        color: 0xc9c3b8,
-        roughness: 0.88,
-        metalness: 0.02,
-      }),
-    );
-    floor.position.z = -0.78;
-    floor.receiveShadow = true;
-
-    const grid = new THREE.GridHelper(4.6, 23, 0x9e978b, 0xbab3a7);
-    grid.rotation.x = Math.PI / 2;
-    grid.position.z = -0.779;
-
-    // 1.76 m wide brushed stainless patisserie worktable (`Z = 0` top surface)
-    const tableTop = new THREE.Mesh(
-      new THREE.BoxGeometry(1.78, 0.92, 0.038),
-      new THREE.MeshStandardMaterial({
-        color: 0xd4dbe2,
-        roughness: 0.26,
-        metalness: 0.78,
-      }),
-    );
-    tableTop.position.set(0.06, -0.06, -0.019);
-    tableTop.castShadow = true;
-    tableTop.receiveShadow = true;
-
-    const underShelf = new THREE.Mesh(
-      new THREE.BoxGeometry(1.68, 0.82, 0.024),
-      new THREE.MeshStandardMaterial({
-        color: 0xbec7cf,
-        roughness: 0.34,
-        metalness: 0.72,
-      }),
-    );
-    underShelf.position.set(0.06, -0.06, -0.52);
-    underShelf.receiveShadow = true;
-
-    const legGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.74, 16);
-    legGeo.rotateX(Math.PI / 2);
-    const legMat = new THREE.MeshStandardMaterial({
-      color: 0xb8c2ca,
-      roughness: 0.3,
-      metalness: 0.8,
-    });
-    for (const [lx, ly] of [
-      [-0.76, -0.46],
-      [0.88, -0.46],
-      [-0.76, 0.34],
-      [0.88, 0.34],
-    ] as const) {
-      const leg = new THREE.Mesh(legGeo, legMat);
-      leg.position.set(lx, ly, -0.41);
-      leg.castShadow = true;
-      this.zUpRoot.add(leg);
-    }
-
-    // Cobot steel pedestal behind the bench
-    const robotPedestal = new THREE.Mesh(
-      new THREE.BoxGeometry(0.28, 0.28, 0.76),
-      new THREE.MeshStandardMaterial({
-        color: 0x394149,
-        roughness: 0.45,
-        metalness: 0.55,
-      }),
-    );
-    robotPedestal.position.set(ROBOT_BASE_ZUP[0], ROBOT_BASE_ZUP[1], -0.4);
-    robotPedestal.castShadow = true;
-    robotPedestal.receiveShadow = true;
-
-    // Stainless funnel rest stand behind the Ohaus scale (`[-0.58, 0.14, 0]`)
-    const funnelStandBase = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.058, 0.064, 0.012, 28),
-      legMat,
-    );
-    funnelStandBase.rotation.x = Math.PI / 2;
-    funnelStandBase.position.set(-0.58, 0.14, 0.006);
-
-    const funnelStandRing = new THREE.Mesh(
-      new THREE.TorusGeometry(0.048, 0.0045, 12, 32),
-      legMat,
-    );
-    funnelStandRing.position.set(-0.58, 0.14, 0.145);
-
-    this.zUpRoot.add(
-      floor,
-      grid,
-      tableTop,
-      underShelf,
-      robotPedestal,
-      funnelStandBase,
-      funnelStandRing,
-    );
-  }
-
-  private buildParallelGripper(): void {
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x1e242b,
-      roughness: 0.36,
-      metalness: 0.55,
-    });
-    const padMat = new THREE.MeshStandardMaterial({
-      color: 0x1a5661,
-      roughness: 0.45,
-      metalness: 0.15,
-    });
-
-    const palm = new THREE.Mesh(
-      new THREE.BoxGeometry(0.065, 0.088, 0.044),
-      bodyMat,
-    );
-    palm.position.set(0.025, 0, 0);
-    this.gripper.add(palm);
-
-    const fingerGeo = new THREE.BoxGeometry(0.072, 0.012, 0.026);
-    const padGeo = new THREE.BoxGeometry(0.048, 0.006, 0.024);
-
-    const lFingerMesh = new THREE.Mesh(fingerGeo, bodyMat);
-    lFingerMesh.position.set(0.074, 0, 0);
-    const lPadMesh = new THREE.Mesh(padGeo, padMat);
-    lPadMesh.position.set(0.082, -0.006, 0);
-    this.leftFinger.add(lFingerMesh, lPadMesh);
-
-    const rFingerMesh = new THREE.Mesh(fingerGeo, bodyMat);
-    rFingerMesh.position.set(0.074, 0, 0);
-    const rPadMesh = new THREE.Mesh(padGeo, padMat);
-    rPadMesh.position.set(0.082, 0.006, 0);
-    this.rightFinger.add(rFingerMesh, rPadMesh);
   }
 
   private buildCoolingWireGrid(): void {
@@ -756,29 +648,14 @@ export class FinancierBakeScene {
     }
 
     enableShadows(scaleGltf.scene);
-    this.scalePanNode =
-      scaleGltf.scene.getObjectByName("ranger_weighing_pan") ?? null;
-    if (this.scalePanNode) {
-      this.scalePanBaseY = this.scalePanNode.position.y;
-    }
+    this.scalePan.bind(scaleGltf.scene);
     this.scaleRoot.add(scaleGltf.scene);
 
     enableShadows(ovenGltf.scene);
     this.ovenVisual = bindOvenVisual(ovenGltf.scene);
     this.ovenRoot.add(ovenGltf.scene);
 
-    const pivots = [];
-    for (const joint of ROBOTS["fairino-fr10"].joints) {
-      const object = loadedRobot.getObjectByName(joint.node);
-      if (object === undefined) {
-        throw new Error("Robot visual has an incompatible joint hierarchy.");
-      }
-      pivots.push({ object, axis: new THREE.Vector3(...joint.axis) });
-    }
-    enableShadows(loadedRobot);
-    loadedRobot.rotation.x = Math.PI / 2;
-    this.robot.add(loadedRobot);
-    this.pivots = pivots;
+    this.pivots = mountFr10Visual(this.robot, loadedRobot);
     this.lifecycle = "ready";
 
     if (this.displayedFrame !== null) {
@@ -788,11 +665,7 @@ export class FinancierBakeScene {
   }
 
   setCameraPreset(preset: FinancierBakeCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   setFrame(sample: FinancierBakeSample): void {
@@ -814,10 +687,7 @@ export class FinancierBakeScene {
     this.displayedFrame = sample;
 
     // 1. Ohaus Ranger 3000 scale pan deflection
-    if (this.scalePanNode) {
-      this.scalePanNode.position.y =
-        this.scalePanBaseY - sample.scale.panDeflectionM;
-    }
+    this.scalePan.deflect(sample.scale.panDeflectionM);
 
     // 2. Confectionery piston depositor & dosing stream
     const { depositor, mouldTray, oven } = sample;
@@ -886,11 +756,7 @@ export class FinancierBakeScene {
       if (bosse) {
         bosse.visible = mouldTray.bosseRise > 0.04 && fill > 0.5;
         if (bosse.visible) {
-          bosse.scale.set(
-            1.55,
-            0.04 + mouldTray.bosseRise * 0.28,
-            0.72,
-          );
+          bosse.scale.set(1.55, 0.04 + mouldTray.bosseRise * 0.28, 0.72);
           bosse.position.y = 0.011 + mouldTray.bosseRise * 0.0025;
         }
       }
@@ -910,47 +776,31 @@ export class FinancierBakeScene {
     this.chamberPointLight.intensity = oven.lampActive ? 2.1 : 0.15;
 
     // 5. FAIRINO FR10 6-DOF inverse kinematics & parallel gripper
-    const joints = solveFr10Ik(
+    reachFr10(
+      ARM,
+      this.pivots,
+      this.gripper,
       sample.cobot.toolZUp,
       sample.cobot.wristPitchRad,
     );
-    const fk = forwardKinematicsFr10(joints);
-    for (const [index, pivot] of this.pivots.entries()) {
-      const angle = fk.joints[index];
-      if (angle !== undefined) {
-        pivot.object.quaternion.setFromAxisAngle(pivot.axis, angle);
-      }
-    }
-    this.gripper.position.set(fk.gripper[0], fk.gripper[1], fk.gripper[2]);
-    this.gripper.quaternion.set(
-      fk.gripper[4],
-      fk.gripper[5],
-      fk.gripper[6],
-      fk.gripper[3],
+    openFr10Fingers(
+      this.leftFinger,
+      this.rightFinger,
+      sample.cobot.fingerOpeningM,
     );
-    const open = sample.cobot.fingerOpeningM;
-    this.leftFinger.position.set(0, 0.014 + open, 0);
-    this.rightFinger.position.set(0, -0.014 - open, 0);
   }
 
   /** Plays a batch of samples between two ticks; true while it plays. */
   private step(now: number): boolean {
     if (this.batchSamples.length > 1) {
-      const alpha = Math.min(
-        1,
-        (now - this.transitionStartedAt) / INTERPOLATION_MS,
+      this.batchSamples = playSampleBatch(
+        this.batchSamples,
+        this.transitionStartedAt,
+        now,
+        INTERPOLATION_MS,
+        interpolateSample,
+        (sample) => this.applySample(sample),
       );
-      const scaled = alpha * (this.batchSamples.length - 1);
-      const index = Math.min(this.batchSamples.length - 2, Math.floor(scaled));
-      const first = this.batchSamples[index];
-      const next = this.batchSamples[index + 1];
-      if (first !== undefined && next !== undefined) {
-        this.applySample(interpolateSample(first, next, scaled - index));
-      }
-      if (alpha >= 1) {
-        const last = this.batchSamples.at(-1);
-        this.batchSamples = last === undefined ? [] : [last];
-      }
     } else if (this.displayedFrame !== null) {
       this.applySample(this.displayedFrame);
     }

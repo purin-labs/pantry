@@ -23,12 +23,7 @@ import maruzenOvenGlbUrl from "../../../../../../assets/bakery-mujoco/maruzen-mb
 import pastryBenchGlbUrl from "../../../../../../assets/bakery-mujoco/pastry-bench/pastry-bench.glb?url";
 
 export type PastryBenchCameraPreset =
-  | "bench"
-  | "dough-block"
-  | "tin-cavity"
-  | "roller"
-  | "overhead"
-  | "oven";
+  "bench" | "dough-block" | "tin-cavity" | "roller" | "overhead" | "oven";
 
 type Vec3 = readonly [number, number, number];
 
@@ -371,11 +366,7 @@ export class PastryBenchScene {
   }
 
   setCameraPreset(preset: PastryBenchCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   setWireframeVisible(visible: boolean): void {

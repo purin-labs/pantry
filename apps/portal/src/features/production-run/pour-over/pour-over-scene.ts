@@ -6,6 +6,11 @@ import type { PersistentPourOverCell } from "@seams/bakery-model/bakery-physics"
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { SceneHost } from "../scene-host";
+import {
+  enableSceneShadows as enableShadows,
+  studioLights,
+} from "../appliance-sample-three";
+import { fr10Pivots } from "../shared/cobot-rig";
 import type {
   PourOverSample,
   StationPose,
@@ -117,15 +122,7 @@ export function initialPourOverSample(
     joints: INITIAL_POUR_OVER_JOINTS,
     fingers: [0.016, 0.016],
     gripper: [0.27, -0.325, 1.005, 1, 0, 0, 0],
-    kettle: [
-      0.62,
-      -0.22,
-      0.83,
-      0.7071067811865476,
-      0,
-      0,
-      0.7071067811865476,
-    ],
+    kettle: [0.62, -0.22, 0.83, 0.7071067811865476, 0, 0, 0.7071067811865476],
     dripper: [0.62, 0.17, 0.93, 1, 0, 0, 0],
     server: [0.62, 0.17, 0.83, 1, 0, 0, 0],
     scale: {
@@ -373,15 +370,6 @@ function interpolateSample(
   };
 }
 
-function enableShadows(object: THREE.Object3D, cast = true, receive = true) {
-  object.traverse((node) => {
-    if (node instanceof THREE.Mesh) {
-      node.castShadow = cast;
-      node.receiveShadow = receive;
-    }
-  });
-}
-
 /**
  * 30-pleat natural bamboo paper wave filter basket (`bb-kit-0.jpg`, `bb-kit-1.jpg`).
  * Conforms to the interior of the Blue Bottle Kuemon porcelain cone, rises ~3.5 mm
@@ -621,7 +609,10 @@ function buildTaperingStreamGeometry(
   );
   const pos = geometry.attributes.position;
   if (pos !== undefined) {
-    const flowNorm = Math.max(0.35, Math.min(1.25, Math.sqrt(Math.max(0.8, flowGS) / 11)));
+    const flowNorm = Math.max(
+      0.35,
+      Math.min(1.25, Math.sqrt(Math.max(0.8, flowGS) / 11)),
+    );
     const baseRadius = 0.0024 * flowNorm;
     const v0 = speeds[0] ?? 0.4;
     const ringStride = radialSegments + 1;
@@ -713,7 +704,11 @@ export class PourOverScene {
   );
   private beverageCapKey = "";
   private readonly beverageMeniscus = new THREE.Mesh(
-    new THREE.RingGeometry(SERVER_RADIUS_M - 0.0052, SERVER_RADIUS_M - 0.0004, 56),
+    new THREE.RingGeometry(
+      SERVER_RADIUS_M - 0.0052,
+      SERVER_RADIUS_M - 0.0004,
+      56,
+    ),
     new THREE.MeshBasicMaterial({
       color: 0xc98d4e,
       transparent: true,
@@ -808,20 +803,15 @@ export class PourOverScene {
     this.scene = this.host.scene;
     this.orbit = this.host.orbit;
 
-    const hemi = new THREE.HemisphereLight(0xfffcf5, 0x6b6257, 1.15);
-    const keyLight = new THREE.DirectionalLight(0xfff8ed, 1.85);
-    keyLight.position.set(1.4, 2.6, 1.8);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.camera.near = 0.4;
-    keyLight.shadow.camera.far = 6.5;
-    keyLight.shadow.camera.left = -1.2;
-    keyLight.shadow.camera.right = 1.2;
-    keyLight.shadow.camera.top = 1.2;
-    keyLight.shadow.camera.bottom = -1.2;
-    keyLight.shadow.bias = -0.0004;
-    const rimLight = new THREE.DirectionalLight(0xdce8f5, 0.65);
-    rimLight.position.set(-1.6, 1.8, -1.2);
+    const [hemi, keyLight, rimLight] = studioLights({
+      hemi: 1.15,
+      keyIntensity: 1.85,
+      keyAt: [1.4, 2.6, 1.8],
+      shadow: [0.4, 6.5],
+      shadowExtent: [1.2, 1.2],
+      rimIntensity: 0.65,
+      rimAt: [-1.6, 1.8, -1.2],
+    });
     this.scene.add(hemi, keyLight, rimLight, this.root);
 
     this.scaleDisplayCanvas.width = 256;
@@ -1874,7 +1864,9 @@ export class PourOverScene {
 
     // 7. Prepared 27 g roasted coffee bed inside the bamboo filter cone.
     const coffeeBed = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.0398, 0.0315, 0.026, 48).rotateX(Math.PI / 2),
+      new THREE.CylinderGeometry(0.0398, 0.0315, 0.026, 48).rotateX(
+        Math.PI / 2,
+      ),
       new THREE.MeshStandardMaterial({
         color: 0x3b2010,
         roughness: 0.9,
@@ -2110,13 +2102,7 @@ export class PourOverScene {
       visual.traverse(disposePhysicsObject);
       return;
     }
-    const pivots = [];
-    for (const joint of ROBOTS["fairino-fr10"].joints) {
-      const object = visual.getObjectByName(joint.node);
-      if (object === undefined)
-        throw new Error("Robot visual has an incompatible joint hierarchy.");
-      pivots.push({ object, axis: new THREE.Vector3(...joint.axis) });
-    }
+    const pivots = fr10Pivots(visual);
     enableShadows(visual);
     // The GLB already uses Y-up, so undo that conversion inside the physics root.
     visual.rotation.x = Math.PI / 2;
@@ -2129,11 +2115,7 @@ export class PourOverScene {
   }
 
   setCameraPreset(preset: PourOverCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   private resetBedSurfaceCanvas(): void {
@@ -2149,8 +2131,8 @@ export class PourOverScene {
     // Granular dry roasted coffee grounds particles before first pour.
     const palette = ["#241107", "#331a0c", "#4d2914", "#5e3319", "#3d2010"];
     for (let i = 0; i < 1400; i++) {
-      const x = (i * 73 + (i * i * 19) % 251) % 256;
-      const y = (i * 137 + (i * 31) % 241) % 256;
+      const x = (i * 73 + ((i * i * 19) % 251)) % 256;
+      const y = (i * 137 + ((i * 31) % 241)) % 256;
       const r = 1 + (i % 3) * 0.65;
       context.fillStyle = palette[i % palette.length]!;
       context.beginPath();
@@ -2386,10 +2368,7 @@ export class PourOverScene {
     this.percolation.visible = steadyPercolation;
     if (steadyPercolation) {
       const dropLen = Math.max(0.005, topZ - bottomZ);
-      const streamRadiusScale = Math.min(
-        1.35,
-        0.65 + sample.water.freeG / 65,
-      );
+      const streamRadiusScale = Math.min(1.35, 0.65 + sample.water.freeG / 65);
       this.percolation.scale.set(streamRadiusScale, streamRadiusScale, dropLen);
       this.percolation.position.set(0, 0, bottomZ + dropLen / 2);
     }
@@ -2441,10 +2420,7 @@ export class PourOverScene {
   }
 
   /** The recorded jet: its outlet, velocity, flight time and flow rate, under gravity. */
-  private setStream(
-    stream: PourOverSample["stream"],
-    flowGS: number,
-  ): void {
+  private setStream(stream: PourOverSample["stream"], flowGS: number): void {
     if (stream === null || stream.flightS <= 0) {
       if (this.stream.visible) {
         this.stream.geometry.dispose();
@@ -2485,8 +2461,8 @@ export class PourOverScene {
     if (sample !== null) {
       // Animate expanding concentric ripples around the stream impact point.
       if (this.landingRipple.visible) {
-        const rPhase1 = ((now * 0.0032) % 1 + 1) % 1;
-        const rPhase2 = ((now * 0.0032 + 0.5) % 1 + 1) % 1;
+        const rPhase1 = (((now * 0.0032) % 1) + 1) % 1;
+        const rPhase2 = (((now * 0.0032 + 0.5) % 1) + 1) % 1;
         const s1 = 0.65 + rPhase1 * 1.45;
         const s2 = 0.65 + rPhase2 * 1.45;
         this.landingRipple.scale.set(s1, s1, 1);

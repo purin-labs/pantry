@@ -1,14 +1,8 @@
 import * as THREE from "three";
-import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
 import { SceneHost } from "../scene-host";
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
 import waringWsg60Url from "../../../../../../assets/bakery-mujoco/waring-wsg60/waring-wsg60.glb?url";
-import maruzenHobUrl from "../../../../../../assets/bakery-mujoco/maruzen-mih-02c/maruzen-mih-02c.glb?url";
-import vollrathHobUrl from "../../../../../../assets/bakery-mujoco/vollrath-59500p/vollrath-59500p.glb?url";
-import panasonicHobUrl from "../../../../../../assets/bakery-mujoco/panasonic-kz-ck1402/panasonic-kz-ck1402.glb?url";
-import rinnaiHobUrl from "../../../../../../assets/bakery-mujoco/rinnai-rsb-150pj/rinnai-rsb-150pj.glb?url";
 import vitamixQuietOneUrl from "../../../../../../assets/bakery-mujoco/vitamix-quiet-one/vitamix-quiet-one.glb?url";
 import ohausScaleUrl from "../../../../../../assets/bakery-mujoco/ohaus-ranger-3000/ohaus-r31pe6.glb?url";
 import hoshizakiUrl from "../../../../../../assets/bakery-mujoco/hoshizaki-rt-120snj/hoshizaki-rt-120snj.glb?url";
@@ -18,16 +12,27 @@ import type {
   BlackSesameHobModel,
 } from "@seams/production-simulation/recipes/black-sesame/model";
 import {
-  fr10GripperKinematics,
-  fr10Links,
-  fr10ShoulderIk,
-} from "@seams/production-simulation/kinematics/fr10";
+  addWorkcellBench,
+  addWorkcellLights,
+  enableSceneShadows as enableShadows,
+  inductionCoilGlow,
+  inductionHobUrl,
+  lerpVec3,
+  playSampleBatch,
+  ScalePan,
+} from "../appliance-sample-three";
+import {
+  buildWorkcellGripper,
+  fr10Arm,
+  lerpCobot,
+  mountFr10Visual,
+  openFr10Fingers,
+  reachFr10,
+  type Fr10Pivot,
+} from "../shared/cobot-rig";
 
 export type BlackSesameCameraPreset =
-  | "station"
-  | "grinder-blender"
-  | "refrigerator"
-  | "service";
+  "station" | "grinder-blender" | "refrigerator" | "service";
 
 type Vec3 = readonly [number, number, number];
 
@@ -60,17 +65,7 @@ const CAMERA_PRESETS: Readonly<
 
 const ROBOT_BASE_ZUP: Vec3 = [-0.14, 0.48, 0.0];
 const INTERPOLATION_MS = 55;
-const forwardKinematicsFr10 = fr10GripperKinematics(fr10Links(ROBOT_BASE_ZUP));
-const solveFr10Ik = fr10ShoulderIk(ROBOT_BASE_ZUP);
-
-function enableShadows(object: THREE.Object3D, cast = true, receive = true) {
-  object.traverse((node) => {
-    if (node instanceof THREE.Mesh) {
-      node.castShadow = cast;
-      node.receiveShadow = receive;
-    }
-  });
-}
+const ARM = fr10Arm(ROBOT_BASE_ZUP);
 
 function interpolateSample(
   a: BlackSesameCobotSample,
@@ -80,11 +75,7 @@ function interpolateSample(
   if (u <= 0) return a;
   if (u >= 1) return b;
   const lerp = THREE.MathUtils.lerp;
-  const lv3 = (v1: Vec3, v2: Vec3): Vec3 => [
-    lerp(v1[0], v2[0], u),
-    lerp(v1[1], v2[1], u),
-    lerp(v1[2], v2[2], u),
-  ];
+  const lv3 = (v1: Vec3, v2: Vec3): Vec3 => lerpVec3(v1, v2, u);
   return {
     ...b,
     timeS: lerp(a.timeS, b.timeS, u),
@@ -177,12 +168,7 @@ function interpolateSample(
       drinkTempC: lerp(a.milkMixer.drinkTempC, b.milkMixer.drinkTempC, u),
       servedCupG: lerp(a.milkMixer.servedCupG, b.milkMixer.servedCupG, u),
     },
-    cobot: {
-      ...b.cobot,
-      toolZUp: lv3(a.cobot.toolZUp, b.cobot.toolZUp),
-      wristPitchRad: lerp(a.cobot.wristPitchRad, b.cobot.wristPitchRad, u),
-      fingerOpeningM: lerp(a.cobot.fingerOpeningM, b.cobot.fingerOpeningM, u),
-    },
+    cobot: lerpCobot(a.cobot, b.cobot, u),
   };
 }
 
@@ -190,15 +176,11 @@ export class BlackSesameScene {
   private readonly host: SceneHost;
   private readonly scene: THREE.Scene;
   private readonly camera = new THREE.PerspectiveCamera(34, 1, 0.04, 18);
-  private readonly orbit: OrbitControls;
   private readonly robot = new THREE.Group();
   private readonly gripper = new THREE.Group();
   private readonly leftFinger = new THREE.Mesh();
   private readonly rightFinger = new THREE.Mesh();
-  private pivots: readonly Readonly<{
-    object: THREE.Object3D;
-    axis: THREE.Vector3;
-  }>[] = [];
+  private pivots: readonly Fr10Pivot[] = [];
 
   // Articulated equipment nodes
   private wsgCoverNode: THREE.Object3D | null = null;
@@ -208,8 +190,7 @@ export class BlackSesameScene {
   private tqoDoorNode: THREE.Object3D | null = null;
   private tqoBladeNode: THREE.Object3D | null = null;
 
-  private scalePanNode: THREE.Object3D | null = null;
-  private scalePanBaseY = 0.111;
+  private readonly scalePan = new ScalePan();
 
   private hoshizakiRightDoorNode: THREE.Object3D | null = null;
 
@@ -277,42 +258,18 @@ export class BlackSesameScene {
       step: this.step.bind(this),
     });
     this.scene = this.host.scene;
-    this.orbit = this.host.orbit;
 
-    const preset = CAMERA_PRESETS.station;
-    this.camera.position.set(...preset.position);
-    this.orbit.target.set(...preset.target);
-    this.orbit.enableDamping = true;
-    this.orbit.dampingFactor = 0.08;
-    this.orbit.maxDistance = 3.2;
-    this.orbit.minDistance = 0.3;
-    this.orbit.update();
+    this.host.startAt(CAMERA_PRESETS.station, {
+      minDistance: 0.3,
+      maxDistance: 3.2,
+    });
 
-    this.addLighting();
-    this.addWorkcellBench();
+    addWorkcellLights(this.scene, 1.1);
+    // Upper stainless bench top at Y = 0, with open front bay on right for Hoshizaki RT-120SNJ undercounter refrigerator
+    addWorkcellBench(this.scene, { width: 1.68, x: 0.02, floor: 4.4 });
 
     // Induction coil glow on hob surface (X = -0.22, Z = 0.18 in Three Y-up)
-    this.coilGlowMesh = new THREE.Mesh(
-      new THREE.RingGeometry(0.036, 0.082, 48),
-      new THREE.MeshBasicMaterial({
-        color: 0xff5a1f,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.0,
-      }),
-    );
-    this.coilGlowMesh.rotation.x = -Math.PI / 2;
-    this.coilGlowMesh.position.set(
-      -0.22,
-      this.hobModel === "maruzen"
-        ? 0.122
-        : this.hobModel === "vollrath"
-          ? 0.084
-          : this.hobModel === "rinnai-rsb-150pj"
-            ? 0.1065
-            : 0.0545,
-      0.18,
-    );
+    this.coilGlowMesh = inductionCoilGlow(-0.22, this.hobModel);
     this.scene.add(this.coilGlowMesh);
 
     // 200 mm stainless steel slurry pan + translucent sweet rice-flour slurry
@@ -508,98 +465,16 @@ export class BlackSesameScene {
     // Robot + parallel gripper
     this.robot.rotation.x = -Math.PI / 2;
     this.scene.add(this.robot);
-    this.buildGripper();
+    buildWorkcellGripper(this.gripper, this.leftFinger, this.rightFinger);
     this.robot.add(this.gripper);
     this.scene.add(this.severinJugGroup);
 
     this.host.requestFrame();
   }
 
-  private addLighting(): void {
-    const ambient = new THREE.HemisphereLight(0xfff6ea, 0x26221e, 0.68);
-    this.scene.add(ambient);
-
-    const key = new THREE.DirectionalLight(0xfff3e2, 2.2);
-    key.position.set(0.95, 1.85, 1.35);
-    key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
-    key.shadow.camera.near = 0.2;
-    key.shadow.camera.far = 4.5;
-    const d = 1.1;
-    key.shadow.camera.left = -d;
-    key.shadow.camera.right = d;
-    key.shadow.camera.top = d;
-    key.shadow.camera.bottom = -d;
-    key.shadow.bias = -0.0004;
-    this.scene.add(key);
-
-    const fill = new THREE.DirectionalLight(0xdce8f8, 0.78);
-    fill.position.set(-1.1, 1.1, 0.9);
-    this.scene.add(fill);
-  }
-
-  private addWorkcellBench(): void {
-    // Upper stainless bench top at Y = 0, with open front bay on right for Hoshizaki RT-120SNJ undercounter refrigerator
-    const benchTop = new THREE.Mesh(
-      new THREE.BoxGeometry(1.68, 0.036, 0.96),
-      new THREE.MeshStandardMaterial({
-        color: 0xc8cfd6,
-        metalness: 0.78,
-        roughness: 0.26,
-      }),
-    );
-    benchTop.position.set(0.02, -0.018, 0.04);
-    benchTop.receiveShadow = true;
-    this.scene.add(benchTop);
-
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(4.4, 4.4),
-      new THREE.MeshStandardMaterial({
-        color: 0x1c1a18,
-        roughness: 0.85,
-      }),
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.82;
-    floor.receiveShadow = true;
-    this.scene.add(floor);
-  }
-
-  private buildGripper(): void {
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x2a2e33,
-      metalness: 0.65,
-      roughness: 0.32,
-    });
-    const palm = new THREE.Mesh(
-      new THREE.BoxGeometry(0.048, 0.082, 0.036),
-      bodyMat,
-    );
-    this.gripper.add(palm);
-
-    const fingerGeom = new THREE.BoxGeometry(0.062, 0.01, 0.022);
-    const fingerMat = new THREE.MeshStandardMaterial({
-      color: 0x565d66,
-      metalness: 0.75,
-      roughness: 0.25,
-    });
-    this.leftFinger.geometry = fingerGeom;
-    this.leftFinger.material = fingerMat;
-    this.rightFinger.geometry = fingerGeom;
-    this.rightFinger.material = fingerMat;
-    this.gripper.add(this.leftFinger, this.rightFinger);
-  }
-
   async load(): Promise<void> {
     const loader = new GLTFLoader();
-    const hobUrl =
-      this.hobModel === "maruzen"
-        ? maruzenHobUrl
-        : this.hobModel === "vollrath"
-          ? vollrathHobUrl
-          : this.hobModel === "rinnai-rsb-150pj"
-            ? rinnaiHobUrl
-            : panasonicHobUrl;
+    const hobUrl = inductionHobUrl(this.hobModel);
 
     const [
       wsgGltf,
@@ -649,11 +524,7 @@ export class BlackSesameScene {
     const scaleRoot = scaleGltf.scene;
     scaleRoot.position.set(0.36, 0, 0.18);
     enableShadows(scaleRoot);
-    this.scalePanNode =
-      scaleRoot.getObjectByName("ranger_weighing_pan") ?? null;
-    if (this.scalePanNode) {
-      this.scalePanBaseY = this.scalePanNode.position.y;
-    }
+    this.scalePan.bind(scaleRoot);
     this.scene.add(scaleRoot);
 
     // 5. Hoshizaki RT-120SNJ refrigerated worktop mounted under the bench (Y = -0.82, X = +0.05, Z = +0.12)
@@ -678,18 +549,7 @@ export class BlackSesameScene {
     this.scene.add(severinRoot);
 
     // 7. FAIRINO FR10 Cobot
-    const pivots = [];
-    for (const joint of ROBOTS["fairino-fr10"].joints) {
-      const object = loadedRobot.getObjectByName(joint.node);
-      if (object === undefined) {
-        throw new Error("Robot visual has an incompatible joint hierarchy.");
-      }
-      pivots.push({ object, axis: new THREE.Vector3(...joint.axis) });
-    }
-    enableShadows(loadedRobot);
-    loadedRobot.rotation.x = Math.PI / 2;
-    this.robot.add(loadedRobot);
-    this.pivots = pivots;
+    this.pivots = mountFr10Visual(this.robot, loadedRobot);
     this.lifecycle = "ready";
 
     if (this.displayedFrame !== null) {
@@ -699,11 +559,7 @@ export class BlackSesameScene {
   }
 
   setCameraPreset(preset: BlackSesameCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   setFrame(sample: BlackSesameCobotSample): void {
@@ -773,10 +629,7 @@ export class BlackSesameScene {
     }
 
     // 4. Ohaus Ranger 3000 scale pan deflection
-    if (this.scalePanNode) {
-      this.scalePanNode.position.y =
-        this.scalePanBaseY - sample.scale.panDeflectionM;
-    }
+    this.scalePan.deflect(sample.scale.panDeflectionM);
 
     // 5. Covered cold-container carrier & Hoshizaki RT-120SNJ right door
     const { coldCarrier } = sample;
@@ -823,47 +676,31 @@ export class BlackSesameScene {
     }
 
     // 7. FAIRINO FR10 6-DOF inverse kinematics & parallel gripper
-    const joints = solveFr10Ik(
+    reachFr10(
+      ARM,
+      this.pivots,
+      this.gripper,
       sample.cobot.toolZUp,
       sample.cobot.wristPitchRad,
     );
-    const fk = forwardKinematicsFr10(joints);
-    for (const [index, pivot] of this.pivots.entries()) {
-      const angle = fk.joints[index];
-      if (angle !== undefined) {
-        pivot.object.quaternion.setFromAxisAngle(pivot.axis, angle);
-      }
-    }
-    this.gripper.position.set(fk.gripper[0], fk.gripper[1], fk.gripper[2]);
-    this.gripper.quaternion.set(
-      fk.gripper[4],
-      fk.gripper[5],
-      fk.gripper[6],
-      fk.gripper[3],
+    openFr10Fingers(
+      this.leftFinger,
+      this.rightFinger,
+      sample.cobot.fingerOpeningM,
     );
-    const open = sample.cobot.fingerOpeningM;
-    this.leftFinger.position.set(0, 0.014 + open, 0);
-    this.rightFinger.position.set(0, -0.014 - open, 0);
   }
 
   /** Plays a batch of samples between two ticks; true while it plays. */
   private step(now: number): boolean {
     if (this.batchSamples.length > 1) {
-      const alpha = Math.min(
-        1,
-        (now - this.transitionStartedAt) / INTERPOLATION_MS,
+      this.batchSamples = playSampleBatch(
+        this.batchSamples,
+        this.transitionStartedAt,
+        now,
+        INTERPOLATION_MS,
+        interpolateSample,
+        (sample) => this.applySample(sample, now),
       );
-      const scaled = alpha * (this.batchSamples.length - 1);
-      const index = Math.min(this.batchSamples.length - 2, Math.floor(scaled));
-      const first = this.batchSamples[index];
-      const next = this.batchSamples[index + 1];
-      if (first !== undefined && next !== undefined) {
-        this.applySample(interpolateSample(first, next, scaled - index), now);
-      }
-      if (alpha >= 1) {
-        const last = this.batchSamples.at(-1);
-        this.batchSamples = last === undefined ? [] : [last];
-      }
     } else if (this.displayedFrame !== null) {
       this.applySample(this.displayedFrame, now);
     }

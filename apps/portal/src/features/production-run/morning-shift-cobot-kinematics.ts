@@ -4,6 +4,7 @@ import type {
   TaskView,
 } from "@seams/production-simulation";
 import type { OvenLiveFrame } from "@seams/production-simulation/runs/oven-live-physics";
+import { fr10WristIk } from "@seams/production-simulation/kinematics/fr10";
 import type { SynchronizedCobotTransferState } from "./morning-shift-appliances";
 
 export type BaseCobotTransferEntry = Omit<
@@ -20,46 +21,21 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
+/** The espresso arm's wrist IK with a wrist roll, rounded to 1 mrad. */
 function solveAnalyticalFr10Ik(
   targetTool: readonly [number, number, number],
   baseZUp: readonly [number, number, number],
   psi: number,
   wristRollRad = 0,
 ): readonly [number, number, number, number, number, number] {
-  const a2 = 0.7;
-  const a3 = 0.586;
-  const d4 = 0.159;
-  const p5x = targetTool[0] - 0.236 * Math.cos(psi);
-  const p5y = targetTool[1] - 0.236 * Math.sin(psi);
-  const p5z = targetTool[2] + 0.114;
-
-  const dx = p5x - baseZUp[0];
-  const dy = p5y - baseZUp[1];
-  const dz = p5z - baseZUp[2];
-
-  const u = Math.sqrt(Math.max(0.04, dx * dx + dy * dy - d4 * d4));
-  const j1 = Math.atan2(dy, dx) + Math.atan2(d4, u);
-
-  const z = dz - 0.18;
-  const cosJ3 = Math.max(
-    -0.999,
-    Math.min(0.999, (u * u + z * z - a2 * a2 - a3 * a3) / (2 * a2 * a3)),
-  );
-  const j3 = -Math.acos(cosJ3);
-  let j2 =
-    Math.atan2(-z, -u) -
-    Math.atan2(a3 * Math.sin(j3), a2 + a3 * Math.cos(j3));
-  if (j2 > 0) j2 -= Math.PI * 2;
-  const j4 = -Math.PI * 2 - j2 - j3;
-  const j5 = j1 - psi - Math.PI / 2;
-  const j6 = Math.PI / 2 + wristRollRad;
+  const [j1, j2, j3, j4, j5, j6] = fr10WristIk(baseZUp)(targetTool, psi);
   return [
     Number(j1.toFixed(3)),
     Number(j2.toFixed(3)),
     Number(j3.toFixed(3)),
     Number(j4.toFixed(3)),
     Number(j5.toFixed(3)),
-    Number(j6.toFixed(3)),
+    Number((j6 + wristRollRad).toFixed(3)),
   ];
 }
 
@@ -116,28 +92,12 @@ export function computeCobotKinematicsAndDynamics(
       tcp = [-0.15, -0.34, 0.315];
       gripperWidthMm = 60;
     }
-    const joints = solveAnalyticalFr10Ik(
-      tcp,
-      baseZUp,
-      Math.PI * 0.44,
-      wristRollRad,
-    );
-    const reachM = Math.hypot(tcp[0] - baseZUp[0], tcp[1] - baseZUp[1]);
-    const shoulderTorqueNm = Number(
-      ((3.8 + payloadMassKg) * 9.81 * reachM + Math.abs(wristRollRad) * 4.2).toFixed(2),
-    );
-    return {
-      jointAnglesRad: joints,
-      endEffectorPoseMeters: [
-        Number(tcp[0].toFixed(3)),
-        Number(tcp[1].toFixed(3)),
-        Number(tcp[2].toFixed(3)),
-      ],
+    return armState(tcp, baseZUp, Math.PI * 0.44, 4.2, {
       gripperWidthMm,
       gripperForceNewtons,
       payloadMassKg,
-      shoulderTorqueNm,
-    };
+      wristRollRad,
+    });
   }
 
   if (cellId === "pour-over-cell") {
@@ -182,23 +142,12 @@ export function computeCobotKinematicsAndDynamics(
       tcp = [0.52, 0.02, 1.06];
       gripperWidthMm = 52;
     }
-    const joints = solveAnalyticalFr10Ik(tcp, baseZUp, 0, wristRollRad);
-    const reachM = Math.hypot(tcp[0] - baseZUp[0], tcp[1] - baseZUp[1]);
-    const shoulderTorqueNm = Number(
-      ((3.8 + payloadMassKg) * 9.81 * reachM + Math.abs(wristRollRad) * 5.6).toFixed(2),
-    );
-    return {
-      jointAnglesRad: joints,
-      endEffectorPoseMeters: [
-        Number(tcp[0].toFixed(3)),
-        Number(tcp[1].toFixed(3)),
-        Number(tcp[2].toFixed(3)),
-      ],
+    return armState(tcp, baseZUp, 0, 5.6, {
       gripperWidthMm,
       gripperForceNewtons,
       payloadMassKg,
-      shoulderTorqueNm,
-    };
+      wristRollRad,
+    });
   }
 
   // Pan & cold-carrier MuJoCo cell (`tea-pan-cell` / `cold-rack-cell`)
@@ -209,7 +158,9 @@ export function computeCobotKinematicsAndDynamics(
         : frame.motion
       : undefined;
   const sample =
-    motion !== undefined ? motion.samples[motion.samples.length - 1] : undefined;
+    motion !== undefined
+      ? motion.samples[motion.samples.length - 1]
+      : undefined;
   const rawJoints = sample?.joints;
   const baseZUp: readonly [number, number, number] = [0, 0, 0.72];
   const activeGrasp = status === "executing" || status === "handoff";
@@ -242,16 +193,107 @@ export function computeCobotKinematicsAndDynamics(
   );
   return {
     jointAnglesRad: joints,
-    endEffectorPoseMeters: [
-      Number(tcp[0].toFixed(3)),
-      Number(tcp[1].toFixed(3)),
-      Number(tcp[2].toFixed(3)),
-    ],
+    endEffectorPoseMeters: roundedPose(tcp),
     gripperWidthMm,
     gripperForceNewtons,
     payloadMassKg,
     shoulderTorqueNm,
   };
+}
+
+type ArmGrip = Readonly<{
+  gripperWidthMm: number;
+  gripperForceNewtons: number;
+  payloadMassKg: number;
+  wristRollRad: number;
+}>;
+
+function roundedPose(
+  tcp: readonly [number, number, number],
+): [number, number, number] {
+  return [
+    Number(tcp[0].toFixed(3)),
+    Number(tcp[1].toFixed(3)),
+    Number(tcp[2].toFixed(3)),
+  ];
+}
+
+/**
+ * The state of a beverage arm at a tool point: its joints, its rounded pose,
+ * and a shoulder torque estimate in which the wrist roll costs
+ * `rollTorqueNm` per radian.
+ */
+function armState(
+  tcp: readonly [number, number, number],
+  baseZUp: readonly [number, number, number],
+  wristPitchRad: number,
+  rollTorqueNm: number,
+  grip: ArmGrip,
+): ReturnType<typeof computeCobotKinematicsAndDynamics> {
+  const { gripperWidthMm, gripperForceNewtons, payloadMassKg, wristRollRad } =
+    grip;
+  const joints = solveAnalyticalFr10Ik(
+    tcp,
+    baseZUp,
+    wristPitchRad,
+    wristRollRad,
+  );
+  const reachM = Math.hypot(tcp[0] - baseZUp[0], tcp[1] - baseZUp[1]);
+  const shoulderTorqueNm = Number(
+    (
+      (3.8 + payloadMassKg) * 9.81 * reachM +
+      Math.abs(wristRollRad) * rollTorqueNm
+    ).toFixed(2),
+  );
+  return {
+    jointAnglesRad: joints,
+    endEffectorPoseMeters: roundedPose(tcp),
+    gripperWidthMm,
+    gripperForceNewtons,
+    payloadMassKg,
+    shoulderTorqueNm,
+  };
+}
+
+/** The brew tasks of one beverage workflow at `timeUs`. */
+function brewTasks(
+  logistics: LogisticsView,
+  timeUs: number,
+  instancePrefix: string,
+  isBrew: (key: string) => boolean,
+): Readonly<{
+  completed: number;
+  total: number;
+  activeBrew: TaskView | null;
+  activePrep: TaskView | null;
+  lastBrew: TaskView | null;
+}> {
+  let completed = 0;
+  let total = 0;
+  let activeBrew: TaskView | null = null;
+  let activePrep: TaskView | null = null;
+  let lastBrew: TaskView | null = null;
+  if (logistics.kind === "available") {
+    for (const task of logistics.tasks) {
+      if (
+        task.subject.kind !== "workflow" ||
+        !task.subject.instance.startsWith(instancePrefix)
+      )
+        continue;
+      if (isBrew(task.subject.key)) {
+        total += 1;
+        if (task.kind === "completed" && task.completedAt <= timeUs) {
+          completed += 1;
+          lastBrew = task;
+        } else if (task.kind === "executing") {
+          activeBrew = task;
+        }
+      } else if (task.kind === "executing") {
+        activePrep = task;
+      }
+    }
+  }
+  return { completed, total, activeBrew, activePrep, lastBrew };
 }
 
 export function appendBeverageCobotCells(
@@ -268,35 +310,22 @@ export function appendBeverageCobotCells(
           t.subject.kind === "workflow" &&
           t.subject.instance.startsWith("espresso-order"),
       ));
-  if (hasEspressoWorkflow && !results.some((r) => r.cellId === "espresso-cell")) {
-    let espressoCompleted = 0;
-    let espressoTotal = 0;
-    let activeBrew: TaskView | null = null;
-    let activePrep: TaskView | null = null;
-    let lastBrew: TaskView | null = null;
-    if (logistics.kind === "available") {
-      for (const task of logistics.tasks) {
-        if (
-          task.subject.kind !== "workflow" ||
-          !task.subject.instance.startsWith("espresso-order")
-        )
-          continue;
-        if (
-          task.subject.key === "extract-espresso" ||
-          task.subject.key === "prepare-espresso"
-        ) {
-          espressoTotal += 1;
-          if (task.kind === "completed" && task.completedAt <= timeUs) {
-            espressoCompleted += 1;
-            lastBrew = task;
-          } else if (task.kind === "executing") {
-            activeBrew = task;
-          }
-        } else if (task.kind === "executing") {
-          activePrep = task;
-        }
-      }
-    }
+  if (
+    hasEspressoWorkflow &&
+    !results.some((r) => r.cellId === "espresso-cell")
+  ) {
+    const {
+      completed: espressoCompleted,
+      total: espressoTotal,
+      activeBrew,
+      activePrep,
+      lastBrew,
+    } = brewTasks(
+      logistics,
+      timeUs,
+      "espresso-order",
+      (key) => key === "extract-espresso" || key === "prepare-espresso",
+    );
     if (activeBrew !== null && activeBrew.kind === "executing") {
       const start = activeBrew.startedAt;
       const end = activeBrew.completesAt ?? start + 18_000_000;
@@ -374,31 +403,18 @@ export function appendBeverageCobotCells(
     hasPourOverWorkflow &&
     !results.some((r) => r.cellId === "pour-over-cell")
   ) {
-    let pourOverCompleted = 0;
-    let pourOverTotal = 0;
-    let activeBrew: TaskView | null = null;
-    let activePrep: TaskView | null = null;
-    let lastBrew: TaskView | null = null;
-    if (logistics.kind === "available") {
-      for (const task of logistics.tasks) {
-        if (
-          task.subject.kind !== "workflow" ||
-          !task.subject.instance.startsWith("pour-over-order#")
-        )
-          continue;
-        if (task.subject.key === "brew-pour-over") {
-          pourOverTotal += 1;
-          if (task.kind === "completed" && task.completedAt <= timeUs) {
-            pourOverCompleted += 1;
-            lastBrew = task;
-          } else if (task.kind === "executing") {
-            activeBrew = task;
-          }
-        } else if (task.kind === "executing") {
-          activePrep = task;
-        }
-      }
-    }
+    const {
+      completed: pourOverCompleted,
+      total: pourOverTotal,
+      activeBrew,
+      activePrep,
+      lastBrew,
+    } = brewTasks(
+      logistics,
+      timeUs,
+      "pour-over-order#",
+      (key) => key === "brew-pour-over",
+    );
     if (activeBrew !== null && activeBrew.kind === "executing") {
       const start = activeBrew.startedAt;
       const end = activeBrew.completesAt ?? start + 210_000_000;

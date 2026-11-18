@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
 import {
   LINEA_GLB_SHA256,
   EAGLE_GLB_SHA256,
@@ -13,11 +11,21 @@ import { SceneHost } from "../scene-host";
 import modelUrl from "../../../../../../assets/bakery-mujoco/la-marzocco-linea-classic-s-2g/la-marzocco-linea-classic-s-2g.glb?url";
 import eagleUrl from "../../../../../../assets/bakery-mujoco/victoria-arduino-eagle-one-2g/victoria-arduino-eagle-one-2g.glb?url";
 import type { LatteSample } from "@seams/production-simulation/recipes/latte/model";
+import { fr10PlanarIk } from "@seams/production-simulation/kinematics/fr10";
 import {
-  fr10GripperKinematics,
-  fr10Links,
-  fr10PlanarIk,
-} from "@seams/production-simulation/kinematics/fr10";
+  baristaCounter,
+  enableSceneShadows as enableShadows,
+  playSampleBatch,
+  studioFloor,
+  studioLights,
+} from "../appliance-sample-three";
+import {
+  fr10Arm,
+  mountFr10Visual,
+  openFr10Fingers,
+  reachFr10,
+  type Fr10Pivot,
+} from "../shared/cobot-rig";
 
 export type LatteCameraPreset = "station" | "steam" | "pour" | "overhead";
 
@@ -52,17 +60,7 @@ const CAMERA_PRESETS: Readonly<
 
 const ROBOT_BASE_ZUP: Vec3 = [-0.56, -0.66, -0.03];
 const INTERPOLATION_MS = 55;
-const forwardKinematicsFr10 = fr10GripperKinematics(fr10Links(ROBOT_BASE_ZUP));
-const solveFr10Ik = fr10PlanarIk(ROBOT_BASE_ZUP);
-
-function enableShadows(object: THREE.Object3D, cast = true, receive = true) {
-  object.traverse((node) => {
-    if (node instanceof THREE.Mesh) {
-      node.castShadow = cast;
-      node.receiveShadow = receive;
-    }
-  });
-}
+const ARM = fr10Arm(ROBOT_BASE_ZUP, fr10PlanarIk);
 
 /**
  * Draws the procedural 512x512 espresso crema + multi-leaf Rosetta & Heart latte art canvas.
@@ -281,8 +279,7 @@ export class LatteScene {
   private readonly gripper = new THREE.Group();
   private readonly leftFinger = new THREE.Group();
   private readonly rightFinger = new THREE.Group();
-  private pivots: Readonly<{ object: THREE.Object3D; axis: THREE.Vector3 }>[] =
-    [];
+  private pivots: readonly Fr10Pivot[] = [];
 
   // Latte bowl & Rosetta art canvas
   private readonly cupGroup = new THREE.Group();
@@ -337,7 +334,6 @@ export class LatteScene {
     THREE.MeshPhysicalMaterial
   >;
 
-  private readonly orbit: OrbitControls;
   private readonly loadAbort = new AbortController();
   private batchSamples: readonly LatteSample[] = [];
   private displayedFrame: LatteSample | null = null;
@@ -361,31 +357,22 @@ export class LatteScene {
       step: this.step.bind(this),
     });
     this.scene = this.host.scene;
-    this.orbit = this.host.orbit;
 
-    this.camera.position.set(...CAMERA_PRESETS.station.position);
-    this.orbit.target.set(...CAMERA_PRESETS.station.target);
-    this.orbit.enableDamping = true;
-    this.orbit.dampingFactor = 0.08;
-    this.orbit.maxPolarAngle = Math.PI * 0.49;
-    this.orbit.minDistance = 0.24;
-    this.orbit.maxDistance = 4.2;
-    this.orbit.update();
+    this.host.startAt(CAMERA_PRESETS.station, {
+      minDistance: 0.24,
+      maxDistance: 4.2,
+      maxPolarAngle: Math.PI * 0.49,
+    });
 
-    const hemi = new THREE.HemisphereLight(0xfffcf5, 0x6b6257, 1.25);
-    const keyLight = new THREE.DirectionalLight(0xfff8ed, 1.9);
-    keyLight.position.set(1.2, 2.4, 2.1);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.camera.near = 0.3;
-    keyLight.shadow.camera.far = 6.0;
-    keyLight.shadow.camera.left = -1.3;
-    keyLight.shadow.camera.right = 1.3;
-    keyLight.shadow.camera.top = 1.3;
-    keyLight.shadow.camera.bottom = -1.3;
-    keyLight.shadow.bias = -0.0004;
-    const rimLight = new THREE.DirectionalLight(0xdce8f5, 0.75);
-    rimLight.position.set(-1.5, 1.7, -1.2);
+    const [hemi, keyLight, rimLight] = studioLights({
+      hemi: 1.25,
+      keyIntensity: 1.9,
+      keyAt: [1.2, 2.4, 2.1],
+      shadow: [0.3, 6.0],
+      shadowExtent: [1.3, 1.3],
+      rimIntensity: 0.75,
+      rimAt: [-1.5, 1.7, -1.2],
+    });
 
     this.zUpRoot.rotation.x = -Math.PI / 2;
     this.robot.position.set(...ROBOT_BASE_ZUP);
@@ -482,63 +469,8 @@ export class LatteScene {
   }
 
   private buildBaristaStation(): void {
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(5.2, 5.2),
-      new THREE.MeshStandardMaterial({
-        color: 0xc9c3b8,
-        roughness: 0.88,
-        metalness: 0.02,
-      }),
-    );
-    floor.position.z = -0.78;
-    floor.receiveShadow = true;
-
-    const grid = new THREE.GridHelper(3.8, 19, 0x9e978b, 0xbab3a7);
-    grid.rotation.x = Math.PI / 2;
-    grid.position.z = -0.779;
-
-    const counterTop = new THREE.Mesh(
-      new THREE.BoxGeometry(0.96, 0.84, 0.036),
-      new THREE.MeshStandardMaterial({
-        color: 0xa87648,
-        roughness: 0.46,
-        metalness: 0.04,
-      }),
-    );
-    counterTop.position.set(0.02, -0.08, -0.018);
-    counterTop.castShadow = true;
-    counterTop.receiveShadow = true;
-
-    const frontTrim = new THREE.Mesh(
-      new THREE.BoxGeometry(0.964, 0.012, 0.038),
-      new THREE.MeshStandardMaterial({
-        color: 0xd0d7de,
-        roughness: 0.24,
-        metalness: 0.82,
-      }),
-    );
-    frontTrim.position.set(0.02, -0.502, -0.018);
-
-    const legMat = new THREE.MeshStandardMaterial({
-      color: 0x2a2e33,
-      roughness: 0.5,
-      metalness: 0.45,
-    });
-    for (const [lx, ly] of [
-      [-0.42, -0.46],
-      [0.46, -0.46],
-      [-0.42, 0.28],
-      [0.46, 0.28],
-    ] as const) {
-      const leg = new THREE.Mesh(
-        new THREE.BoxGeometry(0.048, 0.048, 0.744),
-        legMat,
-      );
-      leg.position.set(lx, ly, -0.408);
-      leg.castShadow = true;
-      leg.receiveShadow = true;
-      this.zUpRoot.add(leg);
-    }
+    const [floor, grid] = studioFloor(5.2, [3.8, 19]);
+    const [counterTop, frontTrim] = baristaCounter(this.zUpRoot);
 
     const cupDeckTopZ = this.appliance === "linea" ? 0.189 : 0.132;
     const serviceRiser = new THREE.Mesh(
@@ -629,11 +561,7 @@ export class LatteScene {
       new THREE.BoxGeometry(0.2, 0.2, 0.7),
       pedestalMat,
     );
-    pedestalColumn.position.set(
-      ROBOT_BASE_ZUP[0],
-      ROBOT_BASE_ZUP[1],
-      -0.43,
-    );
+    pedestalColumn.position.set(ROBOT_BASE_ZUP[0], ROBOT_BASE_ZUP[1], -0.43);
     const pedestalPlate = new THREE.Mesh(
       new THREE.BoxGeometry(0.34, 0.34, 0.05),
       pedestalMat,
@@ -740,10 +668,7 @@ export class LatteScene {
    * so the Rosetta latte art is broad and clearly visible from Station, Pour, and Overhead views.
    */
   private buildPorcelainLatteBowl(): Readonly<{
-    liquidBody: THREE.Mesh<
-      THREE.CylinderGeometry,
-      THREE.MeshPhysicalMaterial
-    >;
+    liquidBody: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhysicalMaterial>;
     artDisc: THREE.Mesh<THREE.CircleGeometry, THREE.MeshStandardMaterial>;
     meniscusRing: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
     steamWisps: readonly THREE.Mesh<
@@ -793,12 +718,7 @@ export class LatteScene {
     );
 
     const liquidBody = new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        innerRadius * 0.95,
-        innerRadius * 0.8,
-        1,
-        44,
-      ),
+      new THREE.CylinderGeometry(innerRadius * 0.95, innerRadius * 0.8, 1, 44),
       new THREE.MeshPhysicalMaterial({
         color: 0x3b1707,
         roughness: 0.12,
@@ -853,13 +773,7 @@ export class LatteScene {
       return wisp;
     });
 
-    this.cupGroup.add(
-      bowlMesh,
-      handleMesh,
-      liquidBody,
-      artDisc,
-      meniscusRing,
-    );
+    this.cupGroup.add(bowlMesh, handleMesh, liquidBody, artDisc, meniscusRing);
     return { liquidBody, artDisc, meniscusRing, steamWisps };
   }
 
@@ -868,10 +782,7 @@ export class LatteScene {
    * strap handle on `+X`, expanding creamy milk interior, spinning whirlpool rings, and steam plume.
    */
   private buildStainlessMilkPitcher(): Readonly<{
-    milkBody: THREE.Mesh<
-      THREE.CylinderGeometry,
-      THREE.MeshPhysicalMaterial
-    >;
+    milkBody: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshPhysicalMaterial>;
     milkTop: THREE.Mesh<THREE.CircleGeometry, THREE.MeshStandardMaterial>;
   }> {
     const stainlessMat = new THREE.MeshStandardMaterial({
@@ -1013,18 +924,7 @@ export class LatteScene {
     enableShadows(loadedMachine);
     this.model.add(loadedMachine);
 
-    const pivots = [];
-    for (const joint of ROBOTS["fairino-fr10"].joints) {
-      const object = loadedRobot.getObjectByName(joint.node);
-      if (object === undefined) {
-        throw new Error("Robot visual has an incompatible joint hierarchy.");
-      }
-      pivots.push({ object, axis: new THREE.Vector3(...joint.axis) });
-    }
-    enableShadows(loadedRobot);
-    loadedRobot.rotation.x = Math.PI / 2;
-    this.robot.add(loadedRobot);
-    this.pivots = pivots;
+    this.pivots = mountFr10Visual(this.robot, loadedRobot);
     this.lifecycle = "ready";
 
     if (this.displayedFrame !== null) {
@@ -1034,11 +934,7 @@ export class LatteScene {
   }
 
   setCameraPreset(preset: LatteCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   setFrame(sample: LatteSample): void {
@@ -1050,8 +946,7 @@ export class LatteScene {
 
   setSamples(samples: readonly LatteSample[]): void {
     if (samples.length === 0) return;
-    const first =
-      this.displayedFrame ?? samples[0]!;
+    const first = this.displayedFrame ?? samples[0]!;
     this.batchSamples = [first, ...samples];
     this.transitionStartedAt = performance.now();
     this.host.requestFrame();
@@ -1062,25 +957,24 @@ export class LatteScene {
     const prefix = this.appliance === "linea" ? "lcs" : "eo";
 
     // 1. Actuate steam wand & steam knob on the Espresso machine `.glb`
-    const rightWand = this.model.getObjectByName(
-      `${prefix}_right_steam_wand`,
-    );
+    const rightWand = this.model.getObjectByName(`${prefix}_right_steam_wand`);
     if (rightWand) {
       rightWand.rotation.x = THREE.MathUtils.degToRad(
         sample.espresso.wandAngleDeg,
       );
     }
-    const rightKnob = this.model.getObjectByName(
-      `${prefix}_right_steam_knob`,
-    );
+    const rightKnob = this.model.getObjectByName(`${prefix}_right_steam_knob`);
     if (rightKnob) {
-      rightKnob.rotation.z = sample.espresso.steamValveOpen ? Math.PI * 0.65 : 0;
+      rightKnob.rotation.z = sample.espresso.steamValveOpen
+        ? Math.PI * 0.65
+        : 0;
     }
 
     // 2. Position & update the 240 mL porcelain Caffe Latte bowl
     const { cup } = sample;
     this.cupGroup.position.set(cup.posZUp[0], cup.posZUp[2], -cup.posZUp[1]);
-    const hasCupLiquid = cup.totalMassG > 0.25 || sample.phase === "espresso-shot";
+    const hasCupLiquid =
+      cup.totalMassG > 0.25 || sample.phase === "espresso-shot";
     this.cupLiquidBody.visible = hasCupLiquid;
     this.cupArtDisc.visible = hasCupLiquid;
     this.cupMeniscusRing.visible = hasCupLiquid;
@@ -1128,9 +1022,11 @@ export class LatteScene {
     }
 
     // 3. Dual portafilter espresso streams during `espresso-shot`
-    const dispensingEspresso = sample.phase === "espresso-shot" && sample.espresso.brewPressureBar > 2;
+    const dispensingEspresso =
+      sample.phase === "espresso-shot" && sample.espresso.brewPressureBar > 2;
     const spoutBaseY = this.appliance === "linea" ? 0.285 : 0.246;
-    const cupSurfaceWorldY = this.cupGroup.position.y + this.cupArtDisc.position.y;
+    const cupSurfaceWorldY =
+      this.cupGroup.position.y + this.cupArtDisc.position.y;
     const streamDrop = Math.max(0.014, spoutBaseY - cupSurfaceWorldY);
     for (const streamMesh of this.spoutStreams) {
       streamMesh.visible = dispensingEspresso;
@@ -1151,11 +1047,7 @@ export class LatteScene {
       pitcher.posZUp[2],
       -pitcher.posZUp[1],
     );
-    this.pitcherGroup.rotation.set(
-      pitcher.wobbleRad,
-      0,
-      pitcher.tiltRad,
-    );
+    this.pitcherGroup.rotation.set(pitcher.wobbleRad, 0, pitcher.tiltRad);
 
     const hasMilkInPitcher = pitcher.milkMassG > 2;
     this.pitcherMilkBody.visible = hasMilkInPitcher;
@@ -1203,50 +1095,31 @@ export class LatteScene {
     }
 
     // 6. Solve FAIRINO FR10 6-DOF inverse kinematics & parallel gripper
-    const joints = solveFr10Ik(
+    reachFr10(
+      ARM,
+      this.pivots,
+      this.gripper,
       sample.cobot.toolZUp,
       sample.cobot.wristPitchRad,
     );
-    const fk = forwardKinematicsFr10(joints);
-    for (const [index, pivot] of this.pivots.entries()) {
-      const angle = fk.joints[index];
-      if (angle !== undefined) {
-        pivot.object.quaternion.setFromAxisAngle(pivot.axis, angle);
-      }
-    }
-    this.gripper.position.set(fk.gripper[0], fk.gripper[1], fk.gripper[2]);
-    this.gripper.quaternion.set(
-      fk.gripper[4],
-      fk.gripper[5],
-      fk.gripper[6],
-      fk.gripper[3],
+    openFr10Fingers(
+      this.leftFinger,
+      this.rightFinger,
+      sample.cobot.fingerOpeningM,
     );
-    const open = sample.cobot.fingerOpeningM;
-    this.leftFinger.position.set(0, 0.014 + open, 0);
-    this.rightFinger.position.set(0, -0.014 - open, 0);
   }
 
   /** Plays a batch of samples between two ticks; true while it plays. */
   private step(now: number): boolean {
     if (this.batchSamples.length > 1) {
-      const alpha = Math.min(
-        1,
-        (now - this.transitionStartedAt) / INTERPOLATION_MS,
+      this.batchSamples = playSampleBatch(
+        this.batchSamples,
+        this.transitionStartedAt,
+        now,
+        INTERPOLATION_MS,
+        interpolateLatteSample,
+        (sample) => this.applySample(sample, now),
       );
-      const scaled = alpha * (this.batchSamples.length - 1);
-      const index = Math.min(this.batchSamples.length - 2, Math.floor(scaled));
-      const first = this.batchSamples[index];
-      const next = this.batchSamples[index + 1];
-      if (first !== undefined && next !== undefined) {
-        this.applySample(
-          interpolateLatteSample(first, next, scaled - index),
-          now,
-        );
-      }
-      if (alpha >= 1) {
-        const last = this.batchSamples.at(-1);
-        this.batchSamples = last === undefined ? [] : [last];
-      }
     } else if (this.displayedFrame !== null) {
       this.applySample(this.displayedFrame, now);
     }

@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {
   LINEA_GLB_SHA256,
@@ -8,6 +7,10 @@ import {
 import { loadVisual } from "../../workflow-simulator/spatial/physics-asset-loader";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { SceneHost } from "../scene-host";
+import {
+  enableSceneShadows as enableShadows,
+  studioLights,
+} from "../appliance-sample-three";
 import {
   buildArticulatedHumanWorker,
   poseArticulatedHumanWorker,
@@ -41,10 +44,7 @@ import type {
 } from "@seams/production-simulation/recipes/cafe-shift/model";
 
 export type CafeShiftCameraPreset =
-  | "overview"
-  | "bakery"
-  | "espresso-bar"
-  | "packing";
+  "overview" | "bakery" | "espresso-bar" | "packing";
 
 type Vec3 = readonly [number, number, number];
 
@@ -77,15 +77,6 @@ const CAMERA_PRESETS: Readonly<
 
 const BAKER_BASE_ZUP: Vec3 = [-0.64, 0.34, 0.0];
 const INTERPOLATION_MS = 55;
-
-function enableShadows(object: THREE.Object3D, cast = true, receive = true) {
-  object.traverse((node) => {
-    if (node instanceof THREE.Mesh) {
-      node.castShadow = cast;
-      node.receiveShadow = receive;
-    }
-  });
-}
 
 export class CafeShiftScene {
   private readonly host: SceneHost;
@@ -133,7 +124,6 @@ export class CafeShiftScene {
     baseQuat: THREE.Quaternion;
   }> | null = null;
 
-  private readonly orbit: OrbitControls;
   private readonly loadAbort = new AbortController();
   private batchSamples: readonly CafeShiftSample[] = [];
   private displayedFrame: CafeShiftSample | null = null;
@@ -159,32 +149,26 @@ export class CafeShiftScene {
       step: this.step.bind(this),
     });
     this.scene = this.host.scene;
-    this.orbit = this.host.orbit;
 
-    this.camera.position.set(...CAMERA_PRESETS.overview.position);
-    this.orbit.target.set(...CAMERA_PRESETS.overview.target);
-    this.orbit.enableDamping = true;
-    this.orbit.dampingFactor = 0.08;
-    this.orbit.maxPolarAngle = Math.PI * 0.49;
-    this.orbit.minDistance = 0.35;
-    this.orbit.maxDistance = 5.5;
-    this.orbit.update();
+    this.host.startAt(CAMERA_PRESETS.overview, {
+      minDistance: 0.35,
+      maxDistance: 5.5,
+      maxPolarAngle: Math.PI * 0.49,
+    });
 
-    const hemi = new THREE.HemisphereLight(0xfffaf0, 0x6f685f, 1.25);
-    const keyLight = new THREE.DirectionalLight(0xfff6e8, 2.0);
-    keyLight.position.set(1.4, 2.8, 2.2);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.camera.near = 0.3;
-    keyLight.shadow.camera.far = 7.5;
-    keyLight.shadow.camera.left = -2.0;
-    keyLight.shadow.camera.right = 2.0;
-    keyLight.shadow.camera.top = 1.8;
-    keyLight.shadow.camera.bottom = -1.8;
-    keyLight.shadow.bias = -0.0004;
-
-    const fillLight = new THREE.DirectionalLight(0xdce8f8, 0.78);
-    fillLight.position.set(-1.6, 1.9, -1.3);
+    const [hemi, keyLight, fillLight] = studioLights({
+      sky: 0xfffaf0,
+      ground: 0x6f685f,
+      hemi: 1.25,
+      key: 0xfff6e8,
+      keyIntensity: 2.0,
+      keyAt: [1.4, 2.8, 2.2],
+      shadow: [0.3, 7.5],
+      shadowExtent: [2.0, 1.8],
+      rim: 0xdce8f8,
+      rimIntensity: 0.78,
+      rimAt: [-1.6, 1.9, -1.3],
+    });
 
     this.zUpRoot.rotation.x = -Math.PI / 2;
     this.bakerWorker.root.position.set(BAKER_BASE_ZUP[0], -0.78, -0.36);
@@ -804,8 +788,7 @@ export class CafeShiftScene {
     }
     this.loadingEspressoAppliance = appliance;
     const url = appliance === "linea" ? lineaUrl : eagleUrl;
-    const sha256 =
-      appliance === "linea" ? LINEA_GLB_SHA256 : EAGLE_GLB_SHA256;
+    const sha256 = appliance === "linea" ? LINEA_GLB_SHA256 : EAGLE_GLB_SHA256;
     try {
       const visual = await loadVisual(url, sha256, this.loadAbort.signal);
       if (this.lifecycle === "disposed") {
@@ -829,10 +812,7 @@ export class CafeShiftScene {
   }
 
   private async ensureGrinderVisual(grinder: CafeShiftGrinder): Promise<void> {
-    if (
-      this.loadedGrinder === grinder ||
-      this.loadingGrinder === grinder
-    ) {
+    if (this.loadedGrinder === grinder || this.loadingGrinder === grinder) {
       return;
     }
     this.loadingGrinder = grinder;
@@ -875,11 +855,7 @@ export class CafeShiftScene {
   }
 
   setCameraPreset(preset: CafeShiftCameraPreset): void {
-    const target = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...target.position),
-      new THREE.Vector3(...target.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   setFrame(sample: CafeShiftSample): void {
@@ -954,7 +930,10 @@ export class CafeShiftScene {
     });
 
     // 3. Patisserie Line visual state
-    const brownRatio = Math.min(1, Math.max(0, (sample.butterTempC - 30) / 122));
+    const brownRatio = Math.min(
+      1,
+      Math.max(0, (sample.butterTempC - 30) / 122),
+    );
     this.butterLiquidMat.color
       .setHex(0xe8c564)
       .lerp(new THREE.Color(0xa65818), brownRatio);
@@ -964,11 +943,8 @@ export class CafeShiftScene {
     for (let i = 0; i < this.mouldIngots.length; i++) {
       const ingot = this.mouldIngots[i]!;
       const mat = this.mouldIngotMats[i]!;
-      ingot.visible =
-        i < visibleMouldCavities && sample.demouldedPieces === 0;
-      mat.color
-        .setHex(0xdfae5c)
-        .lerp(new THREE.Color(0xc47122), bakedTint);
+      ingot.visible = i < visibleMouldCavities && sample.demouldedPieces === 0;
+      mat.color.setHex(0xdfae5c).lerp(new THREE.Color(0xc47122), bakedTint);
       ingot.scale.y = 1 + bakedTint * 0.45;
     }
 
@@ -1046,7 +1022,10 @@ export class CafeShiftScene {
       this.imDoorNode.object.quaternion
         .copy(this.imDoorNode.baseQuat)
         .multiply(
-          new THREE.Quaternion().setFromAxisAngle(xAxis, sample.iceDoorAngleRad),
+          new THREE.Quaternion().setFromAxisAngle(
+            xAxis,
+            sample.iceDoorAngleRad,
+          ),
         );
     }
     if (this.imWaterPlateNode !== null) {

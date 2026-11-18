@@ -9,12 +9,10 @@ import {
   loadRobotVisual,
   preloadRobotVisual,
 } from "../../workflow-simulator/spatial/physics-robot-visual";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
 import {
   LINEA_GLB_SHA256,
   EAGLE_GLB_SHA256,
 } from "@seams/bakery-model/bakery-physics";
-import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { SceneHost } from "../scene-host";
 import type {
   ApplianceDisplay,
@@ -23,16 +21,26 @@ import type {
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import {
   applyRecordedAppliancePose,
+  baristaCounter,
   enableSceneShadows as enableShadows,
   interpolateApplianceSample,
+  playSampleBatch,
+  studioFloor,
+  studioLights,
 } from "../appliance-sample-three";
 import modelUrl from "../../../../../../assets/bakery-mujoco/la-marzocco-linea-classic-s-2g/la-marzocco-linea-classic-s-2g.glb?url";
 import eagleUrl from "../../../../../../assets/bakery-mujoco/victoria-arduino-eagle-one-2g/victoria-arduino-eagle-one-2g.glb?url";
 import {
-  fr10Links,
   fr10ToolKinematics,
   fr10WristIk,
 } from "@seams/production-simulation/kinematics/fr10";
+import {
+  fr10Arm,
+  fr10Pivots,
+  openFr10Fingers,
+  reachFr10,
+  type Fr10Pivot,
+} from "../shared/cobot-rig";
 
 type EspressoModel = "linea" | "eagle-one";
 export type EspressoCameraPreset = "station" | "group" | "overhead";
@@ -91,8 +99,7 @@ const CAMERA_PRESETS: Readonly<
 
 const ROBOT_BASE_ZUP: Vec3 = [-0.56, -0.66, -0.03];
 const INTERPOLATION_MS = 55;
-const forwardKinematicsFr10 = fr10ToolKinematics(fr10Links(ROBOT_BASE_ZUP));
-const solveFr10Ik = fr10WristIk(ROBOT_BASE_ZUP);
+const ARM = fr10Arm(ROBOT_BASE_ZUP, fr10WristIk, fr10ToolKinematics);
 
 export function preloadEspressoVisual(appliance: EspressoModel): void {
   preloadVisual(
@@ -365,7 +372,7 @@ function createEspressoCremaTexture(): THREE.CanvasTexture {
 
     // Concentric tiger-stripe mottling streaks characteristic of 9-bar espresso extraction.
     for (let i = 0; i < 420; i++) {
-      const angle = (i * 1.6180339) * Math.PI * 2;
+      const angle = i * 1.6180339 * Math.PI * 2;
       const radius = 14 + ((i * 59) % 98);
       const x = 128 + Math.cos(angle) * radius;
       const y = 128 + Math.sin(angle) * radius;
@@ -399,7 +406,10 @@ type CupVisual = Readonly<{
   cremaDisc: THREE.Mesh<THREE.CircleGeometry, THREE.MeshStandardMaterial>;
   meniscusRing: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
   ripples: readonly THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>[];
-  steamWisps: readonly THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>[];
+  steamWisps: readonly THREE.Mesh<
+    THREE.RingGeometry,
+    THREE.MeshBasicMaterial
+  >[];
   innerRadius: number;
 }>;
 
@@ -415,8 +425,7 @@ export class EspressoScene {
   private readonly gripper = new THREE.Group();
   private readonly leftFinger = new THREE.Group();
   private readonly rightFinger = new THREE.Group();
-  private pivots: Readonly<{ object: THREE.Object3D; axis: THREE.Vector3 }>[] =
-    [];
+  private pivots: readonly Fr10Pivot[] = [];
   private readonly displayPlanes = new Map<
     string,
     THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>
@@ -442,7 +451,6 @@ export class EspressoScene {
     THREE.MeshPhysicalMaterial
   >;
   private readonly cremaTexture = createEspressoCremaTexture();
-  private readonly orbit: OrbitControls;
   private readonly loadAbort = new AbortController();
   private batchSamples: readonly ApplianceSample[] = [];
   private displayedFrame: ApplianceSample | null = null;
@@ -468,31 +476,22 @@ export class EspressoScene {
       step: this.step.bind(this),
     });
     this.scene = this.host.scene;
-    this.orbit = this.host.orbit;
 
-    this.camera.position.set(...CAMERA_PRESETS.station.position);
-    this.orbit.target.set(...CAMERA_PRESETS.station.target);
-    this.orbit.enableDamping = true;
-    this.orbit.dampingFactor = 0.08;
-    this.orbit.maxPolarAngle = Math.PI * 0.49;
-    this.orbit.minDistance = 0.26;
-    this.orbit.maxDistance = 4.2;
-    this.orbit.update();
+    this.host.startAt(CAMERA_PRESETS.station, {
+      minDistance: 0.26,
+      maxDistance: 4.2,
+      maxPolarAngle: Math.PI * 0.49,
+    });
 
-    const hemi = new THREE.HemisphereLight(0xfffcf5, 0x6b6257, 1.25);
-    const keyLight = new THREE.DirectionalLight(0xfff8ed, 1.9);
-    keyLight.position.set(1.2, 2.4, 2.1);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.camera.near = 0.3;
-    keyLight.shadow.camera.far = 6.0;
-    keyLight.shadow.camera.left = -1.3;
-    keyLight.shadow.camera.right = 1.3;
-    keyLight.shadow.camera.top = 1.3;
-    keyLight.shadow.camera.bottom = -1.3;
-    keyLight.shadow.bias = -0.0004;
-    const rimLight = new THREE.DirectionalLight(0xdce8f5, 0.75);
-    rimLight.position.set(-1.5, 1.7, -1.2);
+    const [hemi, keyLight, rimLight] = studioLights({
+      hemi: 1.25,
+      keyIntensity: 1.9,
+      keyAt: [1.2, 2.4, 2.1],
+      shadow: [0.3, 6.0],
+      shadowExtent: [1.3, 1.3],
+      rimIntensity: 0.75,
+      rimAt: [-1.5, 1.7, -1.2],
+    });
 
     this.zUpRoot.rotation.x = -Math.PI / 2;
     this.robot.position.set(...ROBOT_BASE_ZUP);
@@ -504,11 +503,7 @@ export class EspressoScene {
     this.buildParallelGripper();
 
     for (const label of ["left", "right", "hot_water"] as const) {
-      const cupVisual = createPorcelainCup(
-        label,
-        appliance,
-        this.cremaTexture,
-      );
+      const cupVisual = createPorcelainCup(label, appliance, this.cremaTexture);
       this.model.add(cupVisual.group);
       this.cupVisuals.push(cupVisual);
     }
@@ -603,66 +598,9 @@ export class EspressoScene {
    * studio floor, and FAIRINO FR10 mounting pedestal in Z-up station coordinates.
    */
   private buildBaristaStation(): void {
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(5.2, 5.2),
-      new THREE.MeshStandardMaterial({
-        color: 0xc9c3b8,
-        roughness: 0.88,
-        metalness: 0.02,
-      }),
-    );
-    floor.position.z = -0.78;
-    floor.receiveShadow = true;
-
-    const grid = new THREE.GridHelper(3.8, 19, 0x9e978b, 0xbab3a7);
-    grid.rotation.x = Math.PI / 2;
-    grid.position.z = -0.779;
-
-    // Warm walnut/oak barista counter top (`mz = -0.036 .. 0.000`).
-    const counterTop = new THREE.Mesh(
-      new THREE.BoxGeometry(0.96, 0.84, 0.036),
-      new THREE.MeshStandardMaterial({
-        color: 0xa87648,
-        roughness: 0.46,
-        metalness: 0.04,
-      }),
-    );
-    counterTop.position.set(0.02, -0.08, -0.018);
-    counterTop.castShadow = true;
-    counterTop.receiveShadow = true;
-
-    // Brushed stainless-steel front bullnose trim along the barista edge.
-    const frontTrim = new THREE.Mesh(
-      new THREE.BoxGeometry(0.964, 0.012, 0.038),
-      new THREE.MeshStandardMaterial({
-        color: 0xd0d7de,
-        roughness: 0.24,
-        metalness: 0.82,
-      }),
-    );
-    frontTrim.position.set(0.02, -0.502, -0.018);
-
-    // Dark slate cabinet frame & legs supporting the counter down to `mz = -0.78`.
-    const legMat = new THREE.MeshStandardMaterial({
-      color: 0x2a2e33,
-      roughness: 0.5,
-      metalness: 0.45,
-    });
-    for (const [lx, ly] of [
-      [-0.42, -0.46],
-      [0.46, -0.46],
-      [-0.42, 0.28],
-      [0.46, 0.28],
-    ] as const) {
-      const leg = new THREE.Mesh(
-        new THREE.BoxGeometry(0.048, 0.048, 0.744),
-        legMat,
-      );
-      leg.position.set(lx, ly, -0.408);
-      leg.castShadow = true;
-      leg.receiveShadow = true;
-      this.zUpRoot.add(leg);
-    }
+    const [floor, grid] = studioFloor(5.2, [3.8, 19]);
+    // Walnut barista counter, steel front trim, and the slate legs down to `mz = -0.78`.
+    const [counterTop, frontTrim] = baristaCounter(this.zUpRoot);
 
     const underShelf = new THREE.Mesh(
       new THREE.BoxGeometry(0.86, 0.72, 0.024),
@@ -824,11 +762,7 @@ export class EspressoScene {
       new THREE.BoxGeometry(0.2, 0.2, 0.7),
       pedestalMat,
     );
-    pedestalColumn.position.set(
-      ROBOT_BASE_ZUP[0],
-      ROBOT_BASE_ZUP[1],
-      -0.43,
-    );
+    pedestalColumn.position.set(ROBOT_BASE_ZUP[0], ROBOT_BASE_ZUP[1], -0.43);
     pedestalColumn.castShadow = true;
     pedestalColumn.receiveShadow = true;
 
@@ -938,13 +872,7 @@ export class EspressoScene {
       siliconePadMat,
     );
 
-    this.gripper.add(
-      changerCoupling,
-      statusRing,
-      palmBody,
-      guideRail,
-      ioCable,
-    );
+    this.gripper.add(changerCoupling, statusRing, palmBody, guideRail, ioCable);
 
     for (const [fingerGroup, signY] of [
       [this.leftFinger, 1],
@@ -1008,13 +936,7 @@ export class EspressoScene {
     enableShadows(loadedMachine);
     this.model.add(loadedMachine);
 
-    const pivots = [];
-    for (const joint of ROBOTS["fairino-fr10"].joints) {
-      const object = loadedRobot.getObjectByName(joint.node);
-      if (object === undefined)
-        throw new Error("Robot visual has an incompatible joint hierarchy.");
-      pivots.push({ object, axis: new THREE.Vector3(...joint.axis) });
-    }
+    const pivots = fr10Pivots(loadedRobot);
     enableShadows(loadedRobot);
     loadedRobot.rotation.x = Math.PI / 2;
     this.loadedRobot = loadedRobot;
@@ -1030,11 +952,7 @@ export class EspressoScene {
   }
 
   setCameraPreset(preset: EspressoCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   setFrame(sample: ApplianceSample): void {
@@ -1164,8 +1082,7 @@ export class EspressoScene {
         for (const ripple of leftCupVisual.ripples) ripple.visible = false;
       }
 
-      const steaming =
-        massG > 1.5 && telemetry.leftCup.temperatureC > 48;
+      const steaming = massG > 1.5 && telemetry.leftCup.temperatureC > 48;
       for (const [idx, wisp] of leftCupVisual.steamWisps.entries()) {
         wisp.visible = steaming;
         if (steaming) {
@@ -1233,8 +1150,7 @@ export class EspressoScene {
       0.68,
     );
     const cupSurfaceWorldY =
-      cupZUp[2] +
-      THREE.MathUtils.lerp(-0.002, 0.026, fillFractionForStream);
+      cupZUp[2] + THREE.MathUtils.lerp(-0.002, 0.026, fillFractionForStream);
     const streamDrop = Math.max(0.014, spoutBaseY - cupSurfaceWorldY);
     const elapsedS = telemetry.leftShot.elapsedS;
     if (dispensing) {
@@ -1320,7 +1236,11 @@ export class EspressoScene {
       if (e < 0.45) {
         // Press the manual brew button on the left group head.
         const t = smooth(e / 0.45);
-        targetTool = lerpVec(buttonZUp, [buttonZUp[0], buttonZUp[1] + 0.008, buttonZUp[2]], t);
+        targetTool = lerpVec(
+          buttonZUp,
+          [buttonZUp[0], buttonZUp[1] + 0.008, buttonZUp[2]],
+          t,
+        );
         fingerOpening = 0.008;
       } else if (e < 1.6) {
         // Retract smoothly from the brew button to the barista observation hover pose.
@@ -1355,10 +1275,7 @@ export class EspressoScene {
         0.008,
         settleProgress,
       );
-    } else if (
-      leftCup.position === "removed" &&
-      leftCup.travelM >= 0.176
-    ) {
+    } else if (leftCup.position === "removed" && leftCup.travelM >= 0.176) {
       // Prepared or completed on the front service mat: cradle gently with slightly relaxed fingers.
       const releaseFactor = smooth((leftCup.travelM - 0.176) / 0.004);
       targetTool = [
@@ -1377,46 +1294,21 @@ export class EspressoScene {
       fingerOpening = closedFingerOpening;
     }
 
-    const joints = solveFr10Ik(targetTool, Math.PI * 0.44);
-    const fk = forwardKinematicsFr10(joints);
-    for (const [index, pivot] of this.pivots.entries()) {
-      const angle = fk.joints[index];
-      if (angle !== undefined) {
-        pivot.object.quaternion.setFromAxisAngle(pivot.axis, angle);
-      }
-    }
-    this.gripper.position.set(fk.gripper[0], fk.gripper[1], fk.gripper[2]);
-    this.gripper.quaternion.set(
-      fk.gripper[4],
-      fk.gripper[5],
-      fk.gripper[6],
-      fk.gripper[3],
-    );
-    this.leftFinger.position.set(0, 0.014 + fingerOpening, 0);
-    this.rightFinger.position.set(0, -0.014 - fingerOpening, 0);
+    reachFr10(ARM, this.pivots, this.gripper, targetTool, Math.PI * 0.44);
+    openFr10Fingers(this.leftFinger, this.rightFinger, fingerOpening);
   }
 
   /** Plays a batch of samples between two ticks; true while it plays. */
   private step(now: number): boolean {
     if (this.batchSamples.length > 1) {
-      const alpha = Math.min(
-        1,
-        (now - this.transitionStartedAt) / INTERPOLATION_MS,
+      this.batchSamples = playSampleBatch(
+        this.batchSamples,
+        this.transitionStartedAt,
+        now,
+        INTERPOLATION_MS,
+        interpolateApplianceSample,
+        (sample) => this.applySample(sample, now),
       );
-      const scaled = alpha * (this.batchSamples.length - 1);
-      const index = Math.min(this.batchSamples.length - 2, Math.floor(scaled));
-      const first = this.batchSamples[index];
-      const next = this.batchSamples[index + 1];
-      if (first !== undefined && next !== undefined) {
-        this.applySample(
-          interpolateApplianceSample(first, next, scaled - index),
-          now,
-        );
-      }
-      if (alpha >= 1) {
-        const last = this.batchSamples.at(-1);
-        this.batchSamples = last === undefined ? [] : [last];
-      }
     } else if (this.displayedFrame !== null) {
       this.applySample(this.displayedFrame, now);
     }
@@ -1527,11 +1419,9 @@ function createPorcelainCup(
 
   // Capillary golden crema meniscus ring against the inner porcelain wall.
   const meniscusRing = new THREE.Mesh(
-    new THREE.RingGeometry(
-      innerRadius * 0.84,
-      innerRadius * 0.96,
-      44,
-    ).rotateX(-Math.PI / 2),
+    new THREE.RingGeometry(innerRadius * 0.84, innerRadius * 0.96, 44).rotateX(
+      -Math.PI / 2,
+    ),
     new THREE.MeshBasicMaterial({
       color: 0xd88b3a,
       transparent: true,

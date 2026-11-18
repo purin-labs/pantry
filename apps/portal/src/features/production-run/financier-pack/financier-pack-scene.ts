@@ -1,7 +1,5 @@
 import * as THREE from "three";
-import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { SceneHost } from "../scene-host";
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
@@ -9,16 +7,24 @@ import ohausScaleUrl from "../../../../../../assets/bakery-mujoco/ohaus-ranger-3
 import coolingRackUrl from "../models/cooling-rack-16.glb?url";
 import type { FinancierPackSample } from "@seams/production-simulation/recipes/financier-pack/model";
 import {
-  fr10GripperKinematics,
-  fr10Links,
-  fr10ShoulderIk,
-} from "@seams/production-simulation/kinematics/fr10";
+  addPatisserieBench,
+  enableSceneShadows as enableShadows,
+  lerpVec3,
+  ScalePan,
+  studioLights,
+} from "../appliance-sample-three";
+import {
+  buildPaddedGripper,
+  fr10Arm,
+  lerpCobot,
+  mountFr10Visual,
+  openFr10Fingers,
+  reachFr10,
+  type Fr10Pivot,
+} from "../shared/cobot-rig";
 
 export type FinancierPackCameraPreset =
-  | "station"
-  | "demould"
-  | "crumb"
-  | "giftbox";
+  "station" | "demould" | "crumb" | "giftbox";
 
 type Vec3 = readonly [number, number, number];
 
@@ -51,17 +57,7 @@ const CAMERA_PRESETS: Readonly<
 
 const ROBOT_BASE_ZUP: Vec3 = [-0.14, 0.48, 0.0];
 const INTERPOLATION_MS = 55;
-const forwardKinematicsFr10 = fr10GripperKinematics(fr10Links(ROBOT_BASE_ZUP));
-const solveFr10Ik = fr10ShoulderIk(ROBOT_BASE_ZUP);
-
-function enableShadows(object: THREE.Object3D, cast = true, receive = true) {
-  object.traverse((node) => {
-    if (node instanceof THREE.Mesh) {
-      node.castShadow = cast;
-      node.receiveShadow = receive;
-    }
-  });
-}
+const ARM = fr10Arm(ROBOT_BASE_ZUP);
 
 function interpolateSample(
   a: FinancierPackSample,
@@ -71,11 +67,7 @@ function interpolateSample(
   if (u <= 0) return a;
   if (u >= 1) return b;
   const lerp = THREE.MathUtils.lerp;
-  const lv3 = (v1: Vec3, v2: Vec3): Vec3 => [
-    lerp(v1[0], v2[0], u),
-    lerp(v1[1], v2[1], u),
-    lerp(v1[2], v2[2], u),
-  ];
+  const lv3 = (v1: Vec3, v2: Vec3): Vec3 => lerpVec3(v1, v2, u);
   return {
     ...b,
     timeS: lerp(a.timeS, b.timeS, u),
@@ -116,12 +108,7 @@ function interpolateSample(
         u,
       ),
     },
-    cobot: {
-      ...b.cobot,
-      toolZUp: lv3(a.cobot.toolZUp, b.cobot.toolZUp),
-      wristPitchRad: lerp(a.cobot.wristPitchRad, b.cobot.wristPitchRad, u),
-      fingerOpeningM: lerp(a.cobot.fingerOpeningM, b.cobot.fingerOpeningM, u),
-    },
+    cobot: lerpCobot(a.cobot, b.cobot, u),
   };
 }
 
@@ -138,15 +125,7 @@ function buildFinancierIngotMesh(
   base.castShadow = true;
   base.receiveShadow = true;
   const bosse = new THREE.Mesh(
-    new THREE.SphereGeometry(
-      0.014,
-      14,
-      10,
-      0,
-      Math.PI * 2,
-      0,
-      Math.PI * 0.55,
-    ),
+    new THREE.SphereGeometry(0.014, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55),
     bosseMat,
   );
   bosse.scale.set(1.5, 0.34, 0.78);
@@ -159,7 +138,6 @@ export class FinancierPackScene {
   private readonly host: SceneHost;
   private readonly scene: THREE.Scene;
   private readonly camera = new THREE.PerspectiveCamera(34, 1, 0.04, 18);
-  private readonly orbit: OrbitControls;
   private readonly loadAbort = new AbortController();
 
   private readonly zUpRoot = new THREE.Group();
@@ -171,8 +149,7 @@ export class FinancierPackScene {
   private readonly model = new THREE.Group();
   private readonly scaleRoot = new THREE.Group();
   private readonly coolingRackRoot = new THREE.Group();
-  private scalePanNode: THREE.Object3D | null = null;
-  private scalePanBaseY = 0;
+  private readonly scalePan = new ScalePan();
 
   private readonly mouldGroup = new THREE.Group();
   private readonly gridFinanciers: THREE.Group[] = [];
@@ -184,10 +161,7 @@ export class FinancierPackScene {
   private readonly giftBoxLid = new THREE.Group();
   private readonly giftBoxRibbon = new THREE.Group();
 
-  private pivots: readonly Readonly<{
-    object: THREE.Object3D;
-    axis: THREE.Vector3;
-  }>[] = [];
+  private pivots: readonly Fr10Pivot[] = [];
 
   private lifecycle: "loading" | "ready" | "disposed" = "loading";
   private displayedFrame: FinancierPackSample | null = null;
@@ -206,31 +180,22 @@ export class FinancierPackScene {
       step: this.step.bind(this),
     });
     this.scene = this.host.scene;
-    this.orbit = this.host.orbit;
 
-    this.camera.position.set(...CAMERA_PRESETS.station.position);
-    this.orbit.target.set(...CAMERA_PRESETS.station.target);
-    this.orbit.enableDamping = true;
-    this.orbit.dampingFactor = 0.08;
-    this.orbit.maxPolarAngle = Math.PI * 0.49;
-    this.orbit.minDistance = 0.25;
-    this.orbit.maxDistance = 4.5;
-    this.orbit.update();
+    this.host.startAt(CAMERA_PRESETS.station, {
+      minDistance: 0.25,
+      maxDistance: 4.5,
+      maxPolarAngle: Math.PI * 0.49,
+    });
 
-    const hemi = new THREE.HemisphereLight(0xfffcf5, 0x6b6257, 1.3);
-    const keyLight = new THREE.DirectionalLight(0xfff8ed, 1.95);
-    keyLight.position.set(1.2, 2.6, 2.2);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.camera.near = 0.3;
-    keyLight.shadow.camera.far = 6.5;
-    keyLight.shadow.camera.left = -1.8;
-    keyLight.shadow.camera.right = 1.8;
-    keyLight.shadow.camera.top = 1.6;
-    keyLight.shadow.camera.bottom = -1.6;
-    keyLight.shadow.bias = -0.0004;
-    const rimLight = new THREE.DirectionalLight(0xdce8f5, 0.75);
-    rimLight.position.set(-1.5, 1.8, -1.2);
+    const [hemi, keyLight, rimLight] = studioLights({
+      hemi: 1.3,
+      keyIntensity: 1.95,
+      keyAt: [1.2, 2.6, 2.2],
+      shadow: [0.3, 6.5],
+      shadowExtent: [1.8, 1.6],
+      rimIntensity: 0.75,
+      rimAt: [-1.5, 1.8, -1.2],
+    });
 
     this.zUpRoot.rotation.x = -Math.PI / 2;
     this.robot.position.set(...ROBOT_BASE_ZUP);
@@ -249,8 +214,25 @@ export class FinancierPackScene {
       metalness: 0.02,
     });
 
-    this.buildPatisserieBench();
-    this.buildParallelGripper();
+    addPatisserieBench(this.zUpRoot, {
+      floor: 6.0,
+      grid: [4.6, 23],
+      centre: [0.0, -0.06],
+      top: [1.78, 0.92],
+      shelf: [1.68, 0.82],
+      legRadius: 0.024,
+      legs: [
+        [-0.82, -0.46],
+        [0.82, -0.46],
+        [-0.82, 0.34],
+        [0.82, 0.34],
+      ],
+      robotBase: ROBOT_BASE_ZUP,
+    });
+    buildPaddedGripper(this.gripper, this.leftFinger, this.rightFinger, {
+      barX: 0.07,
+      padY: 0.007,
+    });
     this.buildCoolingGridAndWashBasin(crustMat, bosseMat);
     this.buildMatsunagaMould(crustMat, bosseMat);
 
@@ -274,114 +256,6 @@ export class FinancierPackScene {
     this.model.add(this.scaleRoot, this.coolingRackRoot);
 
     this.host.requestFrame();
-  }
-
-  private buildPatisserieBench(): void {
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(6.0, 6.0),
-      new THREE.MeshStandardMaterial({
-        color: 0xc9c3b8,
-        roughness: 0.88,
-        metalness: 0.02,
-      }),
-    );
-    floor.position.z = -0.78;
-    floor.receiveShadow = true;
-
-    const grid = new THREE.GridHelper(4.6, 23, 0x9e978b, 0xbab3a7);
-    grid.rotation.x = Math.PI / 2;
-    grid.position.z = -0.779;
-
-    const tableTop = new THREE.Mesh(
-      new THREE.BoxGeometry(1.78, 0.92, 0.038),
-      new THREE.MeshStandardMaterial({
-        color: 0xd4dbe2,
-        roughness: 0.26,
-        metalness: 0.78,
-      }),
-    );
-    tableTop.position.set(0.0, -0.06, -0.019);
-    tableTop.castShadow = true;
-    tableTop.receiveShadow = true;
-
-    const underShelf = new THREE.Mesh(
-      new THREE.BoxGeometry(1.68, 0.82, 0.024),
-      new THREE.MeshStandardMaterial({
-        color: 0xbec7cf,
-        roughness: 0.34,
-        metalness: 0.72,
-      }),
-    );
-    underShelf.position.set(0.0, -0.06, -0.52);
-    underShelf.receiveShadow = true;
-
-    const legGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.74, 16);
-    legGeo.rotateX(Math.PI / 2);
-    const legMat = new THREE.MeshStandardMaterial({
-      color: 0xb8c2ca,
-      roughness: 0.3,
-      metalness: 0.8,
-    });
-    for (const [lx, ly] of [
-      [-0.82, -0.46],
-      [0.82, -0.46],
-      [-0.82, 0.34],
-      [0.82, 0.34],
-    ] as const) {
-      const leg = new THREE.Mesh(legGeo, legMat);
-      leg.position.set(lx, ly, -0.41);
-      leg.castShadow = true;
-      this.zUpRoot.add(leg);
-    }
-
-    const robotPedestal = new THREE.Mesh(
-      new THREE.BoxGeometry(0.28, 0.28, 0.76),
-      new THREE.MeshStandardMaterial({
-        color: 0x394149,
-        roughness: 0.45,
-        metalness: 0.55,
-      }),
-    );
-    robotPedestal.position.set(ROBOT_BASE_ZUP[0], ROBOT_BASE_ZUP[1], -0.4);
-    robotPedestal.castShadow = true;
-    robotPedestal.receiveShadow = true;
-
-    this.zUpRoot.add(floor, grid, tableTop, underShelf, robotPedestal);
-  }
-
-  private buildParallelGripper(): void {
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x1e242b,
-      roughness: 0.36,
-      metalness: 0.55,
-    });
-    const padMat = new THREE.MeshStandardMaterial({
-      color: 0x1a5661,
-      roughness: 0.45,
-      metalness: 0.15,
-    });
-
-    const palm = new THREE.Mesh(
-      new THREE.BoxGeometry(0.065, 0.088, 0.044),
-      bodyMat,
-    );
-    palm.position.set(0.025, 0, 0);
-    this.gripper.add(palm);
-
-    const fingerGeo = new THREE.BoxGeometry(0.072, 0.012, 0.026);
-    const padGeo = new THREE.BoxGeometry(0.048, 0.006, 0.024);
-
-    const lBar = new THREE.Mesh(fingerGeo, bodyMat);
-    lBar.position.set(0.07, 0, 0);
-    const lPad = new THREE.Mesh(padGeo, padMat);
-    lPad.position.set(0.082, -0.007, 0);
-    this.leftFinger.add(lBar, lPad);
-
-    const rBar = new THREE.Mesh(fingerGeo, bodyMat);
-    rBar.position.set(0.07, 0, 0);
-    const rPad = new THREE.Mesh(padGeo, padMat);
-    rPad.position.set(0.082, 0.007, 0);
-    this.rightFinger.add(rBar, rPad);
   }
 
   private buildCoolingGridAndWashBasin(
@@ -408,9 +282,12 @@ export class FinancierPackScene {
       bar.position.set(0, railH, zOff);
       gridGroup.add(bar);
     }
-    const wireGeo = new THREE.CylinderGeometry(0.0018, 0.0018, frameD, 8).rotateX(
-      Math.PI / 2,
-    );
+    const wireGeo = new THREE.CylinderGeometry(
+      0.0018,
+      0.0018,
+      frameD,
+      8,
+    ).rotateX(Math.PI / 2);
     for (let i = -6; i <= 6; i++) {
       const wire = new THREE.Mesh(wireGeo, wireMat);
       wire.position.set(i * 0.024, railH + 0.002, 0);
@@ -686,28 +563,13 @@ export class FinancierPackScene {
     }
 
     enableShadows(scaleGltf.scene);
-    this.scalePanNode =
-      scaleGltf.scene.getObjectByName("ranger_weighing_pan") ?? null;
-    if (this.scalePanNode) {
-      this.scalePanBaseY = this.scalePanNode.position.y;
-    }
+    this.scalePan.bind(scaleGltf.scene);
     this.scaleRoot.add(scaleGltf.scene);
 
     enableShadows(rackGltf.scene);
     this.coolingRackRoot.add(rackGltf.scene);
 
-    const pivots = [];
-    for (const joint of ROBOTS["fairino-fr10"].joints) {
-      const object = loadedRobot.getObjectByName(joint.node);
-      if (object === undefined) {
-        throw new Error("Robot visual has an incompatible joint hierarchy.");
-      }
-      pivots.push({ object, axis: new THREE.Vector3(...joint.axis) });
-    }
-    enableShadows(loadedRobot);
-    loadedRobot.rotation.x = Math.PI / 2;
-    this.robot.add(loadedRobot);
-    this.pivots = pivots;
+    this.pivots = mountFr10Visual(this.robot, loadedRobot);
     this.lifecycle = "ready";
 
     if (this.displayedFrame !== null) {
@@ -717,13 +579,7 @@ export class FinancierPackScene {
   }
 
   setCameraPreset(preset: FinancierPackCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-      360,
-      "smooth",
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset], 360, "smooth");
   }
 
   setFrame(sample: FinancierPackSample): void {
@@ -746,9 +602,7 @@ export class FinancierPackScene {
     const { scale, coolingGrid, crumbCheck, giftBox, cobot } = sample;
 
     // 1. Ohaus Ranger 3000 spring pan deflection
-    if (this.scalePanNode) {
-      this.scalePanNode.position.y = this.scalePanBaseY - scale.panDeflectionM;
-    }
+    this.scalePan.deflect(scale.panDeflectionM);
 
     // 2. Matsunaga 8P mould & wire cooling grid financiers
     this.mouldGroup.position.set(
@@ -836,24 +690,14 @@ export class FinancierPackScene {
     }
 
     // 5. FAIRINO FR10 6-DOF inverse kinematics & parallel gripper
-    const joints = solveFr10Ik(cobot.toolZUp, cobot.wristPitchRad);
-    const fk = forwardKinematicsFr10(joints);
-    for (const [index, pivot] of this.pivots.entries()) {
-      const angle = fk.joints[index];
-      if (angle !== undefined) {
-        pivot.object.quaternion.setFromAxisAngle(pivot.axis, angle);
-      }
-    }
-    this.gripper.position.set(fk.gripper[0], fk.gripper[1], fk.gripper[2]);
-    this.gripper.quaternion.set(
-      fk.gripper[4],
-      fk.gripper[5],
-      fk.gripper[6],
-      fk.gripper[3],
+    reachFr10(
+      ARM,
+      this.pivots,
+      this.gripper,
+      cobot.toolZUp,
+      cobot.wristPitchRad,
     );
-    const open = cobot.fingerOpeningM;
-    this.leftFinger.position.set(0, 0.014 + open, 0);
-    this.rightFinger.position.set(0, -0.014 - open, 0);
+    openFr10Fingers(this.leftFinger, this.rightFinger, cobot.fingerOpeningM);
   }
 
   /** Plays a batch of samples between two ticks; true while it plays. */

@@ -170,6 +170,47 @@ export class SceneHost {
     this.requestFrame();
   }
 
+  /** Places the camera at its first view and sets the damped orbit's limits. */
+  startAt(
+    view: Readonly<{
+      position: readonly [number, number, number];
+      target: readonly [number, number, number];
+    }>,
+    limits: Readonly<{
+      minDistance: number;
+      maxDistance: number;
+      maxPolarAngle?: number;
+    }>,
+  ): void {
+    this.camera.position.set(...view.position);
+    this.orbit.target.set(...view.target);
+    this.orbit.enableDamping = true;
+    this.orbit.dampingFactor = 0.08;
+    if (limits.maxPolarAngle !== undefined) {
+      this.orbit.maxPolarAngle = limits.maxPolarAngle;
+    }
+    this.orbit.minDistance = limits.minDistance;
+    this.orbit.maxDistance = limits.maxDistance;
+    this.orbit.update();
+  }
+
+  /** Moves the camera to a preset view, for example a station close-up. */
+  moveCameraTo(
+    view: Readonly<{
+      position: readonly [number, number, number];
+      target: readonly [number, number, number];
+    }>,
+    durationMs?: number,
+    ease?: CameraMove["ease"],
+  ): void {
+    this.moveCamera(
+      new THREE.Vector3(...view.position),
+      new THREE.Vector3(...view.target),
+      durationMs,
+      ease,
+    );
+  }
+
   stopCameraMove(): void {
     this.cameraMove = null;
   }

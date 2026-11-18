@@ -259,6 +259,33 @@ export function updateDeformablePastryBufferGeometry(
  * in local tin coordinates, used by Kitchen 3D factory & oven stations.
  */
 export function createCanonicalCrimpedPastryFlexMesh(): ApplianceFlexMesh {
+  return pastrySheetFlexMesh((x, y, r, theta) => {
+    if (r < 0.054) {
+      const dome = 1 - (r / 0.054) ** 2;
+      return [x, y, 0.025 + 0.004 * dome];
+    }
+    if (r <= 0.065) {
+      const flute = 0.0012 * Math.cos(theta * 16);
+      return [x, y, 0.0285 + flute];
+    }
+    // Trimmed / tucked skirt around the 12 cm fluted tin rim
+    const clampScale = 0.065 / r;
+    return [x * clampScale, y * clampScale, 0.0265];
+  });
+}
+
+/**
+ * The 9×9 `pastry_sheet` grid of 17.5 mm cells in local tin coordinates;
+ * `place` gives each vertex from its grid point and its polar position.
+ */
+function pastrySheetFlexMesh(
+  place: (
+    x: number,
+    y: number,
+    r: number,
+    theta: number,
+  ) => readonly [number, number, number],
+): ApplianceFlexMesh {
   const gridSide = 9;
   const spacing = 0.0175;
   const half = ((gridSide - 1) * spacing) / 2;
@@ -267,22 +294,7 @@ export function createCanonicalCrimpedPastryFlexMesh(): ApplianceFlexMesh {
     for (let col = 0; col < gridSide; col += 1) {
       const x = -half + col * spacing;
       const y = -half + row * spacing;
-      const r = Math.hypot(x, y);
-      const theta = Math.atan2(y, x);
-      let z = 0.027;
-      if (r < 0.054) {
-        const dome = 1 - (r / 0.054) ** 2;
-        z = 0.025 + 0.004 * dome;
-      } else if (r <= 0.065) {
-        const flute = 0.0012 * Math.cos(theta * 16);
-        z = 0.0285 + flute;
-      } else {
-        // Trimmed / tucked skirt around the 12 cm fluted tin rim
-        const clampScale = 0.065 / r;
-        vertices.push(x * clampScale, y * clampScale, 0.0265);
-        continue;
-      }
-      vertices.push(x, y, z);
+      vertices.push(...place(x, y, Math.hypot(x, y), Math.atan2(y, x)));
     }
   }
   const faces: number[] = [];
@@ -343,47 +355,20 @@ function quantizeStep(value: number, step = 0.05): number {
  * fluted pie tin cavity before puff-lid sealing (`line-tins` / `fill-pies`).
  */
 function createCanonicalLinedCavityFlexMesh(drapeScale = 1): ApplianceFlexMesh {
-  const gridSide = 9;
-  const spacing = 0.0175;
-  const half = ((gridSide - 1) * spacing) / 2;
   const depth = 0.0225 * clamp01(drapeScale);
-  const vertices: number[] = [];
-  for (let row = 0; row < gridSide; row += 1) {
-    for (let col = 0; col < gridSide; col += 1) {
-      const x = -half + col * spacing;
-      const y = -half + row * spacing;
-      const r = Math.hypot(x, y);
-      const theta = Math.atan2(y, x);
-      if (r < 0.049) {
-        const bowl = 1 - (r / 0.049) ** 3;
-        vertices.push(x, y, 0.028 - depth * bowl);
-      } else if (r <= 0.065) {
-        const wallU = clamp01((r - 0.049) / 0.012);
-        const flute = 0.0012 * Math.cos(theta * 16);
-        vertices.push(x, y, 0.028 - depth * (1 - wallU) + flute * wallU);
-      } else {
-        const clampScale = 0.065 / r;
-        vertices.push(x * clampScale, y * clampScale, 0.0265);
-      }
+  return pastrySheetFlexMesh((x, y, r, theta) => {
+    if (r < 0.049) {
+      const bowl = 1 - (r / 0.049) ** 3;
+      return [x, y, 0.028 - depth * bowl];
     }
-  }
-  const faces: number[] = [];
-  for (let row = 0; row < gridSide - 1; row += 1) {
-    for (let col = 0; col < gridSide - 1; col += 1) {
-      const a = row * gridSide + col;
-      const b = a + 1;
-      const c = a + gridSide;
-      const d = c + 1;
-      faces.push(a, b, d, a, d, c);
+    if (r <= 0.065) {
+      const wallU = clamp01((r - 0.049) / 0.012);
+      const flute = 0.0012 * Math.cos(theta * 16);
+      return [x, y, 0.028 - depth * (1 - wallU) + flute * wallU];
     }
-  }
-  return {
-    name: "pastry_sheet",
-    dim: 2,
-    vertexCount: gridSide * gridSide,
-    vertices,
-    faces,
-  };
+    const clampScale = 0.065 / r;
+    return [x * clampScale, y * clampScale, 0.0265];
+  });
 }
 
 function createProgressiveShellGeometry(

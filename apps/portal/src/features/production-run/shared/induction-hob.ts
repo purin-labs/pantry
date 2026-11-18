@@ -1,5 +1,5 @@
 /** The hobs of the FR10 recipe benches: the same four in each recipe model. */
-type InductionHob =
+export type InductionHob =
   "maruzen" | "vollrath" | "panasonic-kz-ck1402" | "rinnai-rsb-150pj";
 
 /** The hob choices of a scenario form. */

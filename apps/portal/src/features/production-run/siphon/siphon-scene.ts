@@ -1,11 +1,19 @@
 import * as THREE from "three";
 import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { SceneHost } from "../scene-host";
+import {
+  enableSceneShadows as enableShadows,
+  studioLights,
+} from "../appliance-sample-three";
+import { fr10Pivots } from "../shared/cobot-rig";
 import type { StationPose } from "@seams/production-simulation/recipes/pour-over/sample";
-import type { SiphonBody, SiphonSample, SiphonSetup } from "@seams/production-simulation/recipes/siphon/model";
+import type {
+  SiphonBody,
+  SiphonSample,
+  SiphonSetup,
+} from "@seams/production-simulation/recipes/siphon/model";
 
 export type SiphonCameraPreset = "bench" | "chambers" | "overhead";
 
@@ -225,15 +233,6 @@ function interpolateSample(
   };
 }
 
-function enableShadows(object: THREE.Object3D, cast = true, receive = true) {
-  object.traverse((node) => {
-    if (node instanceof THREE.Mesh) {
-      node.castShadow = cast;
-      node.receiveShadow = receive;
-    }
-  });
-}
-
 /**
  * Beer-Lambert optical absorption color for coffee extract as a function of TDS (%).
  * Transitions smoothly from clear hot water (0% TDS) -> honey gold -> garnet amber -> deep mahogany (1.42% TDS).
@@ -274,7 +273,8 @@ function buildSpentCoffeeDomeGeometry(): THREE.BufferGeometry {
     const radialNorm = r / rOuter;
     const h =
       0.0035 +
-      (maxH - 0.0035) * Math.pow(Math.max(0, 1 - radialNorm * radialNorm), 0.78);
+      (maxH - 0.0035) *
+        Math.pow(Math.max(0, 1 - radialNorm * radialNorm), 0.78);
     const wallR = upperInnerRadiusAtZ(zBase + h) - 0.0005;
     profile.push(new THREE.Vector2(Math.min(r, wallR), h));
   }
@@ -297,8 +297,8 @@ function createCoffeeGroundsTexture(): THREE.CanvasTexture {
 
     const palette = ["#1c0b03", "#2b1307", "#4c2410", "#613118", "#381a0b"];
     for (let i = 0; i < 1800; i++) {
-      const x = (i * 73 + (i * i * 19) % 251) % 256;
-      const y = (i * 137 + (i * 31) % 241) % 256;
+      const x = (i * 73 + ((i * i * 19) % 251)) % 256;
+      const y = (i * 137 + ((i * 31) % 241)) % 256;
       const r = 1 + (i % 3) * 0.7;
       ctx.fillStyle = palette[i % palette.length]!;
       ctx.beginPath();
@@ -505,7 +505,10 @@ function createBambooGrainTexture(): THREE.CanvasTexture {
     // Longitudinal vascular bamboo fibers.
     for (let x = 2; x < 256; x += 4) {
       const alpha = 0.05 + ((x * 17) % 10) * 0.012;
-      ctx.fillStyle = x % 8 === 0 ? `rgba(110, 72, 28, ${alpha})` : `rgba(245, 216, 168, ${alpha})`;
+      ctx.fillStyle =
+        x % 8 === 0
+          ? `rgba(110, 72, 28, ${alpha})`
+          : `rgba(245, 216, 168, ${alpha})`;
       ctx.fillRect(x, 0, 2, 512);
     }
 
@@ -525,7 +528,9 @@ function createBambooGrainTexture(): THREE.CanvasTexture {
   return texture;
 }
 
-function createBorosilicateGlassMaterial(opacity = 0.38): THREE.MeshPhysicalMaterial {
+function createBorosilicateGlassMaterial(
+  opacity = 0.38,
+): THREE.MeshPhysicalMaterial {
   return new THREE.MeshPhysicalMaterial({
     color: 0xf4fbff,
     roughness: 0.035,
@@ -711,20 +716,15 @@ export class SiphonScene {
     this.scene = this.host.scene;
     this.orbit = this.host.orbit;
 
-    const hemi = new THREE.HemisphereLight(0xfffcf5, 0x6b6257, 1.15);
-    const keyLight = new THREE.DirectionalLight(0xfff8ed, 1.85);
-    keyLight.position.set(1.45, 2.65, 1.75);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.camera.near = 0.4;
-    keyLight.shadow.camera.far = 6.5;
-    keyLight.shadow.camera.left = -1.2;
-    keyLight.shadow.camera.right = 1.2;
-    keyLight.shadow.camera.top = 1.2;
-    keyLight.shadow.camera.bottom = -1.2;
-    keyLight.shadow.bias = -0.0004;
-    const rimLight = new THREE.DirectionalLight(0xdce8f5, 0.68);
-    rimLight.position.set(-1.5, 1.85, -1.2);
+    const [hemi, keyLight, rimLight] = studioLights({
+      hemi: 1.15,
+      keyIntensity: 1.85,
+      keyAt: [1.45, 2.65, 1.75],
+      shadow: [0.4, 6.5],
+      shadowExtent: [1.2, 1.2],
+      rimIntensity: 0.68,
+      rimAt: [-1.5, 1.85, -1.2],
+    });
     this.scene.add(hemi, keyLight, rimLight, this.root);
 
     this.heaterDisplayCanvas.width = 256;
@@ -2000,13 +2000,7 @@ export class SiphonScene {
       visual.traverse(disposePhysicsObject);
       return;
     }
-    const pivots = [];
-    for (const joint of ROBOTS["fairino-fr10"].joints) {
-      const object = visual.getObjectByName(joint.node);
-      if (object === undefined)
-        throw new Error("Robot visual has an incompatible joint hierarchy.");
-      pivots.push({ object, axis: new THREE.Vector3(...joint.axis) });
-    }
+    const pivots = fr10Pivots(visual);
     enableShadows(visual);
     visual.rotation.x = Math.PI / 2;
     this.robot.add(visual);
@@ -2018,11 +2012,7 @@ export class SiphonScene {
   }
 
   setCameraPreset(preset: SiphonCameraPreset): void {
-    const next = CAMERA_PRESETS[preset];
-    this.host.moveCamera(
-      new THREE.Vector3(...next.position),
-      new THREE.Vector3(...next.target),
-    );
+    this.host.moveCameraTo(CAMERA_PRESETS[preset]);
   }
 
   private updateHeaterDisplay(sample: SiphonSample): void {
@@ -2201,7 +2191,10 @@ export class SiphonScene {
     const mixFraction =
       drainedCoffeeG <= 0
         ? 0
-        : Math.min(1, (drainedCoffeeG * 2.2) / Math.max(1, sample.water.lowerG));
+        : Math.min(
+            1,
+            (drainedCoffeeG * 2.2) / Math.max(1, sample.water.lowerG),
+          );
     const lowerEffectiveTds = sample.extraction.tdsPct * mixFraction;
     const lowerColor = beerLambertCoffeeColor(lowerEffectiveTds);
 
@@ -2268,12 +2261,13 @@ export class SiphonScene {
       const jetBottomZ = 0.004;
       const jetTopZ = Math.min(zSurface - 0.0005, 0.0125);
       const streamLen = Math.max(0.004, jetTopZ - jetBottomZ);
-      const flowScale = Math.min(1.35, 0.75 + Math.abs(sample.water.flowGS) / 22);
+      const flowScale = Math.min(
+        1.35,
+        0.75 + Math.abs(sample.water.flowGS) / 22,
+      );
       this.drawdownStream.scale.set(flowScale, flowScale, streamLen);
       this.drawdownStream.position.set(0, 0, jetBottomZ + streamLen / 2);
-      if (
-        this.drawdownStream.material instanceof THREE.MeshPhysicalMaterial
-      ) {
+      if (this.drawdownStream.material instanceof THREE.MeshPhysicalMaterial) {
         this.drawdownStream.material.color.copy(extractColor);
       }
     }
@@ -2292,7 +2286,10 @@ export class SiphonScene {
     //    drains all the way down through the emerging domed coffee bed and disappears when `upperFreeG <= 0.6 g`.
     const upperFreeFraction = Math.max(
       0,
-      Math.min(1, sample.water.upperFreeG / Math.max(1, sample.water.initialG - heelG)),
+      Math.min(
+        1,
+        sample.water.upperFreeG / Math.max(1, sample.water.initialG - heelG),
+      ),
     );
     const upperHeight = upperFreeFraction * 0.058;
     const crustThickness = 0.012;
@@ -2345,7 +2342,10 @@ export class SiphonScene {
             upperHeight * (0.45 + 0.52 * sample.extraction.crustBuoyancy) -
               crustThickness * 0.45,
           );
-        const cBot = Math.max(zBottom + 0.002, crustCenterZ - crustThickness / 2);
+        const cBot = Math.max(
+          zBottom + 0.002,
+          crustCenterZ - crustThickness / 2,
+        );
         const cTop = Math.min(zTop + 0.0003, crustCenterZ + crustThickness / 2);
         const cKey = `${cBot.toFixed(3)}:${cTop.toFixed(3)}`;
         if (cKey !== this.crustLayerKey) {
