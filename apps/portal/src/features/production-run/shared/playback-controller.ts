@@ -183,8 +183,11 @@ export class RecipePlayback<Sample extends RecipeRunSample, Recipe> {
       }
     }
     this.frames.set({ sample: best, samples: [best], history: frames.history });
+    // The view reads the outcome of the shown sample when it renders. A scrub
+    // away from the outcome sample, or back to it, renders the view again.
     if (this.view.state.status === "running")
       this.view.setState({ status: "paused" });
+    else if (best.outcome !== frames.sample.outcome) this.view.forceUpdate();
   }
 
   private animated(recipe: Recipe): RecipeEngine<Sample> {
