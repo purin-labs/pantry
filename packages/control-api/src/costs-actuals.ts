@@ -10,7 +10,7 @@ import {
   type OrganisationCostPlan,
   type ProductActualsObservation,
   type SupplyLotCost,
-} from "./costs";
+} from "./costs.ts";
 
 export type PlanVsActualComparisonMode =
   | "orders_and_costs"

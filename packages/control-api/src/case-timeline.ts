@@ -9,7 +9,7 @@ import {
   isCaseExecutionAssignmentRole,
   isCaseExecutionAssignmentState,
   type CaseExecutionAssignmentState,
-} from "./case-execution";
+} from "./case-execution.ts";
 
 /**
  * One Case as an event on the day's timeline: its title, who held it and

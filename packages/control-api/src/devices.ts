@@ -1,14 +1,14 @@
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 
-import { voiceMacModelStateSchema } from "./voice";
-import { voiceEngineIdSchema } from "./voice-engines";
+import { voiceMacModelStateSchema } from "./voice.ts";
+import { voiceEngineIdSchema } from "./voice-engines.ts";
 
 import {
   deviceCapabilitySchema,
   deviceHealthSchema,
   deviceKindSchema,
-} from "./device-gateway";
+} from "./device-gateway.ts";
 import type { Variant } from "@seams/type-utils";
 
 /**
@@ -18,7 +18,7 @@ import type { Variant } from "@seams/type-utils";
  * here.
  */
 
-export * from "./device-gateway";
+export * from "./device-gateway.ts";
 
 const strict = { additionalProperties: false } as const;
 const timestamp = Type.Integer({ minimum: 0 });

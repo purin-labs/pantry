@@ -17,7 +17,7 @@ import {
   COMMERCE_ENTITY_RELATION,
   COMMERCE_LIST_ENTRY_RELATION,
   COMMERCE_RELATIONSHIP_RELATION,
-} from "./relations";
+} from "./relations.ts";
 import type { Variant } from "@seams/type-utils";
 import { assertNever } from "@seams/std";
 

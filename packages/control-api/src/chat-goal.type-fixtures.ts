@@ -1,4 +1,4 @@
-import type { ChatGoalSupport } from "./chat-goal";
+import type { ChatGoalSupport } from "./chat-goal.ts";
 
 // @ts-expect-error A supported route cannot carry an unsupported-route reason.
 const mixedSupport: ChatGoalSupport = {

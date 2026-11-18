@@ -1,4 +1,4 @@
-import type { RecipeWrite } from "./recipes";
+import type { RecipeWrite } from "./recipes.ts";
 
 declare const recipe: RecipeWrite["recipe"];
 declare function acceptRecipeWrite(value: RecipeWrite): void;

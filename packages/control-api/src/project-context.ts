@@ -1,5 +1,5 @@
-import type { ProjectId } from "./ids";
-import { isProjectId } from "./ids";
+import type { ProjectId } from "./ids.ts";
+import { isProjectId } from "./ids.ts";
 import {
   hasExactKeys,
   isNonNegativeInteger,
@@ -11,7 +11,7 @@ import {
   parseProjectContent,
   parseProjectReference,
   type ProjectReference,
-} from "./projects";
+} from "./projects.ts";
 
 export type ProjectContextAdmission = Readonly<{
   flowLabelJson: string;

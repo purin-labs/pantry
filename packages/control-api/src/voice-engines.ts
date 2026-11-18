@@ -1,7 +1,7 @@
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 
-import type { ChatTranscriptionPath } from "./voice";
+import type { ChatTranscriptionPath } from "./voice.ts";
 
 /**
  * The speech engines of voice control (Plan 82C). An engine is one model with

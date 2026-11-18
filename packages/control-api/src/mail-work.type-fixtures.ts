@@ -1,10 +1,10 @@
-import type { MailInboxCommand } from "./mail-inbox";
+import type { MailInboxCommand } from "./mail-inbox.ts";
 import type {
   MailInboxWork,
   MailWorkReplyState,
   MailWorkAssignment,
   MailInboxReplyPreview,
-} from "./mail-work";
+} from "./mail-work.ts";
 
 // @ts-expect-error Work reads require the selected thread.
 const missingThread: MailInboxCommand = {

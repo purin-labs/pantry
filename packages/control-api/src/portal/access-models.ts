@@ -14,7 +14,7 @@ import type {
   OnboardingControlRole,
 } from "@seams/contracts";
 import type { StrictUnion } from "@seams/type-utils";
-import type { ControlErrorKind } from "./errors";
+import type { ControlErrorKind } from "./errors.ts";
 import type {
   AccessControlAvailability,
   AccessControlBoundedPage,

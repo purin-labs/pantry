@@ -1,7 +1,7 @@
 import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
 
-import { VOICE_VOCABULARY_LIMITS, voiceEngineIdSchema } from "./voice-engines";
+import { VOICE_VOCABULARY_LIMITS, voiceEngineIdSchema } from "./voice-engines.ts";
 
 /**
  * Portal voice control (Plan 82): the shapes of the grant and fallback routes

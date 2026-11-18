@@ -4,7 +4,7 @@ import {
   mailRevision,
   parseMailRules,
   type MailRule,
-} from "./mail-organization";
+} from "./mail-organization.ts";
 
 export type MailAssistantCommand =
   | Readonly<{

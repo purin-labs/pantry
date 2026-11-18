@@ -1,7 +1,7 @@
-import { parseProjectAccess, type ProjectAccess } from "./project-access";
-import type { ProjectId } from "./ids";
-import { isConversationId, isProjectId } from "./ids";
-import type { ConversationId } from "./ids";
+import { parseProjectAccess, type ProjectAccess } from "./project-access.ts";
+import type { ProjectId } from "./ids.ts";
+import { isConversationId, isProjectId } from "./ids.ts";
+import type { ConversationId } from "./ids.ts";
 import {
   assertNever,
   hasExactKeys,

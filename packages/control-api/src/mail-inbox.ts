@@ -4,13 +4,13 @@ import {
   parseMailInboxReplyPreview,
   type MailInboxWork,
   type MailInboxReplyPreview,
-} from "./mail-work";
+} from "./mail-work.ts";
 import {
   mailIdentifier,
   mailRevision,
   parseMailDecision,
   type MailDecision,
-} from "./mail-organization";
+} from "./mail-organization.ts";
 
 export type MailClassifiedFilter =
   | Readonly<{ kind: "important"; ruleId?: never }>

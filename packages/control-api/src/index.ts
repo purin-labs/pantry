@@ -23,62 +23,62 @@ export type * from "./payouts.ts";
 export type * from "./schedule.ts";
 export type * from "./terminals.ts";
 export type * from "./whatsapp.ts";
-export * from "./inbox";
-export * from "./mail-inbox";
-export * from "./mail-reply-document";
-export * from "./mail-organization";
-export * from "./mail-assistant";
-export * from "./mail-work";
-export * from "./mail-reply";
-export * from "./mail-sender-link";
-export * from "./email-review";
-export * from "./inventory-receipt";
+export * from "./inbox.ts";
+export * from "./mail-inbox.ts";
+export * from "./mail-reply-document.ts";
+export * from "./mail-organization.ts";
+export * from "./mail-assistant.ts";
+export * from "./mail-work.ts";
+export * from "./mail-reply.ts";
+export * from "./mail-sender-link.ts";
+export * from "./email-review.ts";
+export * from "./inventory-receipt.ts";
 
-export * from "./inventory-production";
+export * from "./inventory-production.ts";
 
-export * from "./chat-forks";
-export * from "./chat-side-cases";
-export * from "./chat-signals";
+export * from "./chat-forks.ts";
+export * from "./chat-side-cases.ts";
+export * from "./chat-signals.ts";
 
-export * from "./ids";
+export * from "./ids.ts";
 
-export * from "./project-access";
+export * from "./project-access.ts";
 
-export * from "./user-preferences";
+export * from "./user-preferences.ts";
 
-export * from "./mailbox-setup";
-export * from "./home-region";
+export * from "./mailbox-setup.ts";
+export * from "./home-region.ts";
 
-export * from "./chat-disclosure";
-export * from "./case-context-collections";
-export * from "./memory";
-export * from "./evals";
-export * from "./case-execution";
-export * from "./case-timeline";
-export * from "./menu-boards";
-export * from "./menu-board-reviews";
-export * from "./failed-payments";
-export * from "./payments";
-export * from "./bank-payouts";
-export * from "./order-queue";
-export * from "./brain";
-export * from "./message-attachments";
+export * from "./chat-disclosure.ts";
+export * from "./case-context-collections.ts";
+export * from "./memory.ts";
+export * from "./evals.ts";
+export * from "./case-execution.ts";
+export * from "./case-timeline.ts";
+export * from "./menu-boards.ts";
+export * from "./menu-board-reviews.ts";
+export * from "./failed-payments.ts";
+export * from "./payments.ts";
+export * from "./bank-payouts.ts";
+export * from "./order-queue.ts";
+export * from "./brain.ts";
+export * from "./message-attachments.ts";
 
 export type {
   ChatGoalCommand,
   ChatGoalSupport,
   ChatGoalView,
-} from "./chat-goal";
+} from "./chat-goal.ts";
 
-export { parseChatGoalView } from "./chat-goal";
+export { parseChatGoalView } from "./chat-goal.ts";
 
-export * from "./claude";
-export * from "./slack-reasoning-effort";
-export * from "./account-onboarding";
-export * from "./vault";
-export * from "./voice";
-export * from "./voice-engines";
-export * from "./voice-text-check";
-export * from "./devices";
-export * from "./recipes";
-export * from "./costs";
+export * from "./claude.ts";
+export * from "./slack-reasoning-effort.ts";
+export * from "./account-onboarding.ts";
+export * from "./vault.ts";
+export * from "./voice.ts";
+export * from "./voice-engines.ts";
+export * from "./voice-text-check.ts";
+export * from "./devices.ts";
+export * from "./recipes.ts";
+export * from "./costs.ts";

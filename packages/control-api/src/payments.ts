@@ -1,6 +1,6 @@
 import { isRecord } from "@seams/std";
 
-import { isFailedPaymentStep, type FailedPaymentStep } from "./failed-payments";
+import { isFailedPaymentStep, type FailedPaymentStep } from "./failed-payments.ts";
 
 /**
  * The payments of a window: each card payment that the provider answered, paid

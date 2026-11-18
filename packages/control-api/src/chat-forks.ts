@@ -1,6 +1,6 @@
-import { isConversationId, type ConversationId } from "./ids";
+import { isConversationId, type ConversationId } from "./ids.ts";
 import { isRecord } from "@seams/std";
-import { isSideCaseProposalId } from "./chat-side-cases";
+import { isSideCaseProposalId } from "./chat-side-cases.ts";
 
 export type ChatThreadLineage =
   | Readonly<{

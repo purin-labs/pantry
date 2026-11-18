@@ -1,5 +1,5 @@
 import { isRecord, assertNever } from "@seams/std";
-import { mailIdentifier, mailRevision } from "./mail-organization";
+import { mailIdentifier, mailRevision } from "./mail-organization.ts";
 
 export type MailWorkCaseState =
   | Readonly<{

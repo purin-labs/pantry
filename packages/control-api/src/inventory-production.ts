@@ -1,6 +1,6 @@
 import type { Quantity } from "@seams/contracts";
 import { isPositiveInteger, isRecord } from "@seams/std";
-import { parseInventoryQuantity } from "./inventory-receipt";
+import { parseInventoryQuantity } from "./inventory-receipt.ts";
 
 export type InventoryProductionRecipe = Readonly<{
   id: string;

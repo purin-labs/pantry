@@ -1,5 +1,5 @@
 import { isNonNegativeInteger, isRecord } from "@seams/std";
-import { isConversationId, type ConversationId } from "./ids";
+import { isConversationId, type ConversationId } from "./ids.ts";
 
 /**
  * A side Case that an agent proposed in a Portal chat (Plan 74). The card

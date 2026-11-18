@@ -1,6 +1,6 @@
 import { Type, type Static } from "typebox";
 import { recordParser } from "@seams/commerce-contracts/schema";
-import { KITCHEN_SURFACE } from "./surface-observation";
+import { KITCHEN_SURFACE } from "./surface-observation.ts";
 
 /**
  * A command that the agent runs on a Portal page in the person's browser

@@ -5,9 +5,9 @@ import {
   evaluateCostFormula,
   isCostFormulaColumn,
   isValidCostFormulaString,
-} from "./costs-formulas";
-import { costForecastPlanSchema } from "./costs-forecast";
-export * from "./costs-formulas";
+} from "./costs-formulas.ts";
+import { costForecastPlanSchema } from "./costs-forecast.ts";
+export * from "./costs-formulas.ts";
 
 const text = Type.String({ minLength: 1 });
 const nullableText = Type.Union([text, Type.Null()]);
@@ -2631,5 +2631,5 @@ function clampInteger(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, Math.round(value)));
 }
 
-export * from "./costs-actuals";
-export * from "./costs-forecast";
+export * from "./costs-actuals.ts";
+export * from "./costs-forecast.ts";

@@ -3,7 +3,7 @@ import type {
   MailRelationshipLookup,
   MailReplyCorrection,
   MailReplySourceRecord,
-} from "./mail-reply";
+} from "./mail-reply.ts";
 
 const edit: MailReplyEdit = {
   version: 1,

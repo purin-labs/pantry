@@ -4,7 +4,7 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@seams/std";
-import { isUserId, type UserId } from "./ids";
+import { isUserId, type UserId } from "./ids.ts";
 
 export type PreferenceArea = "appearance" | "chat" | "bakeryos";
 /** Each palette is a data-pantry-theme value in packages/frontend-themes. */

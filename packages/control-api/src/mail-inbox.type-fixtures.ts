@@ -2,7 +2,7 @@ import type {
   MailInboxCommand,
   MailInboxResult,
   MailClassifiedFilter,
-} from "./mail-inbox";
+} from "./mail-inbox.ts";
 
 const page = {
   kind: "page",

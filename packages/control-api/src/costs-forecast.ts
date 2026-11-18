@@ -6,7 +6,7 @@ import {
   type CostsOverview,
   type OrganisationCostPlan,
   type SupplyLotCost,
-} from "./costs";
+} from "./costs.ts";
 
 const nonNegativeInt = Type.Integer({ minimum: 0 });
 

@@ -4,7 +4,7 @@ import {
   isNonNegativeInteger,
   isRecord,
 } from "@seams/std";
-import { isProjectId, isUserId, type ProjectId, type UserId } from "./ids";
+import { isProjectId, isUserId, type ProjectId, type UserId } from "./ids.ts";
 
 export type ProjectRole = "owner" | "editor" | "viewer";
 

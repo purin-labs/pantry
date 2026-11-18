@@ -5,7 +5,7 @@ import type {
   EvalRunCommand,
   EvalRunResult,
   EvalTaskOutcome,
-} from "./evals";
+} from "./evals.ts";
 
 // @ts-expect-error An outcome criterion names an outcome, not reply text.
 export const outcomeWithText: EvalCriterion = {

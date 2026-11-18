@@ -5,7 +5,7 @@ import type {
   MemoryDecision,
   MemoryRejection,
   MemoryRevisionState,
-} from "./memory";
+} from "./memory.ts";
 
 const decision: MemoryDecision = {
   reviewerPersonId: "person_reviewer",

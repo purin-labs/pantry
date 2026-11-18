@@ -2,7 +2,7 @@ import type {
   MailAssistantCommand,
   MailAssistantResult,
   MailAssistantStatus,
-} from "./mail-assistant";
+} from "./mail-assistant.ts";
 const propose = {
   kind: "proposeRule",
   prompt: "Prioritize supplier delays",

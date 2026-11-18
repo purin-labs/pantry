@@ -2,7 +2,7 @@ import type {
   MailOrganizationCommand,
   MailRule,
   MailRuleSet,
-} from "./mail-organization";
+} from "./mail-organization.ts";
 
 const category = {
   kind: "categorize",

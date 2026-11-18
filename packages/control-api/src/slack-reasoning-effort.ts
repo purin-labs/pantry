@@ -1,6 +1,6 @@
 import { isRecord } from "@seams/std";
 
-import type { ChatEffort } from "./chat";
+import type { ChatEffort } from "./chat.ts";
 
 /**
  * The reasoning effort that an owner or admin chose for Slack answers. `null`

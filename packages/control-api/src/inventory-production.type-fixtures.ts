@@ -1,7 +1,7 @@
 import type {
   InventoryProductionCreation,
   InventoryProductionTransition,
-} from "./inventory-production";
+} from "./inventory-production.ts";
 
 declare const creation: InventoryProductionCreation;
 declare const transition: InventoryProductionTransition;

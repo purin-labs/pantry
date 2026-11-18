@@ -9,12 +9,12 @@ import {
   isReviewedRecordId,
   parseMemoryEvidenceList,
   parseMemoryRevisionState,
-} from "./memory";
+} from "./memory.ts";
 import type {
   MemoryEvidence,
   MemoryRevisionRef,
   MemoryRevisionState,
-} from "./memory";
+} from "./memory.ts";
 
 /** One exact Eval revision. Runs and results cite this pair. */
 export type EvalRevisionRef = Readonly<{
