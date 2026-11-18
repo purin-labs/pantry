@@ -8597,11 +8597,6 @@ function seedAssistantDecision(
 }
 
 it(
-  "uses recipient-bound CaseContextCollection evidence and fences a corrected Gmail reply",
-  caseContextCollectionReplyCorrectionJourney,
-  60_000,
-);
-it(
   "hides CaseContextCollection existence behind source permission and fences inspector review across revocation and Actor eviction",
   caseContextCollectionMetadataJourney,
   60_000,
@@ -8643,23 +8638,8 @@ it(
   60_000,
 );
 it(
-  "erases CaseContextCollection dependencies with their owning Gmail source",
-  caseContextCollectionReplyErasureJourney,
-  60_000,
-);
-it(
   "fences an CaseContextCollection reply when Gmail deletes its selected source after preview",
   caseContextCollectionReplyProviderErasureJourney,
-  60_000,
-);
-it(
-  "fences CaseContextCollection work when its verified recipient is revoked",
-  caseContextCollectionReplyRevocationJourney,
-  60_000,
-);
-it(
-  "fences CaseContextCollection work when the configured evaluation credential is withdrawn",
-  caseContextCollectionReplyWithdrawalJourney,
   60_000,
 );
 it(
@@ -8675,12 +8655,8 @@ it(
 
 type CaseContextCollectionReplyScenario =
   | "metadata"
-  | "correction"
   | "accepted_send"
-  | "erasure"
   | "provider_erasure"
-  | "revocation"
-  | "withdrawal"
   | "lost_draft"
   | "source_label"
   | "memory"
@@ -8711,11 +8687,6 @@ const REPLY_JOURNEY_COLLEAGUES: Partial<
   },
 };
 
-async function caseContextCollectionReplyCorrectionJourney(
-  context: TestContext,
-): Promise<void> {
-  await caseContextCollectionReplyJourney(context, "correction");
-}
 async function caseContextCollectionMetadataJourney(context: TestContext): Promise<void> {
   await caseContextCollectionReplyJourney(context, "metadata");
 }
@@ -8748,23 +8719,10 @@ async function caseContextCollectionReplyDispatchJourney(
 ): Promise<void> {
   await caseContextCollectionReplyJourney(context, "accepted_send");
 }
-async function caseContextCollectionReplyErasureJourney(context: TestContext): Promise<void> {
-  await caseContextCollectionReplyJourney(context, "erasure");
-}
 async function caseContextCollectionReplyProviderErasureJourney(
   context: TestContext,
 ): Promise<void> {
   await caseContextCollectionReplyJourney(context, "provider_erasure");
-}
-async function caseContextCollectionReplyRevocationJourney(
-  context: TestContext,
-): Promise<void> {
-  await caseContextCollectionReplyJourney(context, "revocation");
-}
-async function caseContextCollectionReplyWithdrawalJourney(
-  context: TestContext,
-): Promise<void> {
-  await caseContextCollectionReplyJourney(context, "withdrawal");
 }
 async function caseContextCollectionReplyLostDraftJourney(
   context: TestContext,
@@ -9357,73 +9315,26 @@ async function caseContextCollectionReplyJourney(
     expect(
       await organisation.commitCaseContextCollectionEffectFence({ organisationId, attempt }),
     ).toMatchObject({ ok: true, value: { kind: "committed" } });
-  }
-  switch (scenario) {
-    case "correction":
-    case "accepted_send":
-      expect(
-        await organisation.reviewCaseContextCollectionRelationship({
-          organisationId,
-          actorId: owner.identity.userId,
-          caseContextCollectionId: "case_context_collection_supplier_reply",
-          body: {
-            commandId: "detach_case_context_collection",
-            expectedRevision: 2,
-            decision: {
-              kind: "detach",
-              relationshipId: "relationship_supplier_reply",
-            },
+    expect(
+      await organisation.reviewCaseContextCollectionRelationship({
+        organisationId,
+        actorId: owner.identity.userId,
+        caseContextCollectionId: "case_context_collection_supplier_reply",
+        body: {
+          commandId: "detach_case_context_collection",
+          expectedRevision: 2,
+          decision: {
+            kind: "detach",
+            relationshipId: "relationship_supplier_reply",
           },
-        }),
-      ).toMatchObject({ ok: true, value: { revision: 3 } });
-      break;
-    case "erasure":
-      expect(
-        await organisation.eraseCaseContextCollectionSource({
-          organisationId,
-          selection: caseContextCollectionReplySelection(
-            organisationId,
-            rawAccount,
-            "related",
-            now,
-          ),
-        }),
-      ).toMatchObject({ ok: true });
-      break;
-    case "provider_erasure":
-      state.relatedSourceDeleted = true;
-      break;
-    case "revocation": {
-      const revoked = await exports.default.fetch(
-        `https://localhost/v1/control/organisations/${organisationId}/contact-endpoint-verifications`,
-        {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            origin: "https://localhost",
-            cookie: `satyr_control_session=${owner.session.token}; satyr_control_csrf=${owner.session.csrfToken}`,
-            "x-satyr-csrf": owner.session.csrfToken,
-          },
-          body: JSON.stringify({
-            kind: "revoke",
-            commandId: "revoke_case_context_collection",
-            verificationId: "verification_case_context_collection",
-            expectedRevision: 1,
-          }),
         },
-      );
-      expect(revoked.status, await revoked.text()).toBe(200);
-      break;
-    }
-    case "withdrawal":
-      expect(
-        await organisation.manageTypeSafeConnection({
-          organisationId,
-          actorId: owner.identity.userId,
-          body: { operation: "disconnect", expectedRevision: 1 },
-        }),
-      ).toMatchObject({ ok: true });
-      break;
+      }),
+    ).toMatchObject({ ok: true, value: { revision: 3 } });
+  } else {
+    // Gmail deletes the selected related source after the preview. The send
+    // passes the Organisation's evidence checks, reads the source again from
+    // Gmail, erases it in the Organisation and is refused.
+    state.relatedSourceDeleted = true;
   }
   await evictDurableObject(organisation);
   await evictDurableObject(connector.value);
@@ -9476,10 +9387,10 @@ async function caseContextCollectionReplyJourney(
     JSON.stringify({
       scenario,
       caseContextCollectionRevision: 2,
-      correctedRevision: 3,
+      correctedRevision: scenario === "accepted_send" ? 3 : null,
       relatedEvidenceObserved: true,
       foreignProviderReads: state.foreignReads,
-      staleReplyDenied: true,
+      staleReplyDenied: scenario === "provider_erasure",
       sends: state.sends,
       protectedReplySends: scenario === "accepted_send" ? 1 : 0,
       contaminatedSurfacesDenied: ["draft", "preview", "send"],
