@@ -500,6 +500,30 @@ export async function installDiscoveryActorFixture(): Promise<{
   if (otherConnection === null)
     throw new Error("other Slack connection missing");
 
+  // Every Organisation that a scheduled run reaches holds a published policy.
+  const otherOrganisation = await requireActiveOrganisationActor({
+    env,
+    organisationId: OTHER_ORGANISATION_ID,
+    now,
+  });
+  await otherOrganisation.ensureOrganisation({
+    organisationId: OTHER_ORGANISATION_ID,
+    name: "Other E2E Slack organisation",
+    plan: "beta",
+    status: "active",
+    createdAt: now - 700,
+  });
+  const otherPolicy = await compilePublishAndActivateOrganisationPolicy({
+    bindings: {
+      db: organisationDatabase(OTHER_ORGANISATION_ID),
+      kv: env.POLICY_KV,
+    },
+    organisationId: OTHER_ORGANISATION_ID,
+    organisation: otherOrganisation,
+    now,
+  });
+  if (!otherPolicy.ok) throw new Error(otherPolicy.error.code);
+
   const dropbox = await createActiveConnectedIntegration(fixtureDatabase(), {
     organisationId: ORGANISATION_ID,
     provider: "dropbox",
