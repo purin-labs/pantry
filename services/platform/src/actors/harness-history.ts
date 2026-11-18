@@ -18,6 +18,7 @@ import type {
 
 import { parseStoredAttachment } from "../messages/stored-attachment";
 import {
+  assertNever,
   canonicalJson,
   hasExactKeys,
   isNonEmptyString,
@@ -545,12 +546,6 @@ export function renderHarnessHistoryContent(
     case "attachment":
       return `[attachment:${content.attachment.id}]`;
     default:
-      return assertNeverHistoryContent(content);
+      return assertNever(content, "Unhandled harness history content");
   }
-}
-
-function assertNeverHistoryContent(value: never): never {
-  throw new Error(
-    `Unhandled harness history content: ${JSON.stringify(value)}`,
-  );
 }

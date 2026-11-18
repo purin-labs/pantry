@@ -12,7 +12,7 @@ import {
 import { customConnectorCollectionPath, customConnectorActionPath, customConnectorPath, customConnectorRevisionPath, customConnectorSetupCollectionPath, customConnectorSetupPath, mutateCustomConnector, mutateCustomConnectorAction, readCustomConnectorCatalog, readCustomConnectorAction, readCustomConnectorDetail, readCustomConnectorSetup, type CustomConnectorDetail, type CustomConnectorRevisionAction } from "./custom-connector-api";
 import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@seams/control-api/portal/custom-connectors";
 import type { Variant } from "@seams/type-utils";
-import { errorMessage, isRecord } from "@seams/std";
+import { assertNever, errorMessage, isRecord } from "@seams/std";
 
 type Loadable<Value> =
   | { readonly kind: "loading" }
@@ -1301,7 +1301,7 @@ async function runRevisionAction(
       };
       break;
     default:
-      return assertNeverAction(action);
+      return assertNever(action, "Unexpected custom connector state");
   }
   const result = await runMutation({
     path: customConnectorRevisionPath(
@@ -1951,7 +1951,7 @@ function effectLabel(
     case "external_record_update":
       return "Updates records after approval";
     default:
-      return assertNeverAction(effect);
+      return assertNever(effect, "Unexpected custom connector state");
   }
 }
 
@@ -1970,7 +1970,7 @@ function reviewStateLabel(
     case "retired":
       return "Retired";
     default:
-      return assertNeverAction(state);
+      return assertNever(state, "Unexpected custom connector state");
   }
 }
 
@@ -1995,7 +1995,7 @@ function setupStateLabel(
     case "expired":
       return "Setup expired";
     default:
-      return assertNeverAction(state);
+      return assertNever(state, "Unexpected custom connector state");
   }
 }
 
@@ -2019,7 +2019,7 @@ function actionStateLabel(state: CustomConnectorAction["state"]): string {
     case "indeterminate":
       return "Outcome unknown";
     default:
-      return assertNeverAction(state);
+      return assertNever(state, "Unexpected custom connector state");
   }
 }
 
@@ -2060,7 +2060,7 @@ function setupGuidance(attempt: CustomConnectorSetupAttempt): string {
     case "expired":
       return "This setup expired. Start again with a fresh API key.";
     default:
-      return assertNeverAction(attempt.lifecycle);
+      return assertNever(attempt.lifecycle, "Unexpected custom connector state");
   }
 }
 
@@ -2101,10 +2101,6 @@ function MutationFeedback(props: {
   );
 }
 
-function assertNeverAction(value: never): never {
-  throw new Error(`Unexpected custom connector state: ${String(value)}`);
-}
-
 function currentSetupStep(
   head: CustomConnectorRevisionView,
   attempt: CustomConnectorSetupAttempt | null,
@@ -2125,7 +2121,7 @@ function currentSetupStep(
       case "expired":
         return "connect";
       default:
-        return assertNeverAction(attempt.lifecycle);
+        return assertNever(attempt.lifecycle, "Unexpected custom connector state");
     }
   }
   if (head.reviewState !== "approved") return "review";
@@ -2259,7 +2255,7 @@ function setupTitle(attempt: CustomConnectorSetupAttempt): string {
     case "new_account":
       return "Connect your account";
     default:
-      return assertNeverAction(attempt.target);
+      return assertNever(attempt.target, "Unexpected custom connector state");
   }
 }
 
@@ -2344,7 +2340,7 @@ function writePreviewUnavailableCopy(
     case "input_invalid":
       return "The proposed request could not be verified. Ask for a new proposal before approving.";
     default:
-      return assertNeverAction(reason);
+      return assertNever(reason, "Unexpected custom connector state");
   }
 }
 

@@ -31,7 +31,7 @@ import {
   type VaultCiphertext,
 } from "./crypto";
 import type { OrganisationQuerySource } from "../data/query-source";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { assertNever, isNonNegativeInteger, isRecord } from "@seams/std";
 
 type VaultAlgorithm = "AES-GCM-256";
 
@@ -1010,7 +1010,7 @@ function serializeVaultSecret(secret: VaultSecret): Uint8Array {
         }),
       );
     default:
-      return assertNeverSecret(secret);
+      return assertNever(secret, "Unhandled vault secret");
   }
 }
 
@@ -1063,7 +1063,7 @@ function vaultSecretsEqual(left: VaultSecret, right: VaultSecret): boolean {
         left.password === right.password
       );
     default:
-      return assertNeverSecret(left);
+      return assertNever(left, "Unhandled vault secret");
   }
 }
 
@@ -1151,7 +1151,7 @@ function parseVaultPlaintext(
         },
       };
     default:
-      return assertNeverPayload(payload.value);
+      return assertNever(payload.value, "Unhandled vault payload");
   }
 }
 
@@ -1283,14 +1283,6 @@ function decodeUtf8Json(
   }
 }
 
-function assertNeverSecret(value: never): never {
-  throw new Error(`Unhandled vault secret: ${JSON.stringify(value)}`);
-}
-
-function assertNeverPayload(value: never): never {
-  throw new Error(`Unhandled vault payload: ${JSON.stringify(value)}`);
-}
-
 function vaultKeyRingStoreError(
   error: VaultKeyRingError,
 ): Result<never, VaultStoreError> {
@@ -1305,7 +1297,7 @@ function vaultKeyRingStoreError(
     case "vault_root_invalid":
       return { ok: false, error: { code: "vault_root_invalid" } };
     default:
-      return assertNeverKeyRingError(error);
+      return assertNever(error, "Unhandled Vault keyring error");
   }
 }
 
@@ -1323,12 +1315,8 @@ function vaultKeyRingResolveError(
     case "vault_root_invalid":
       return { ok: false, error: { code: "vault_root_invalid" } };
     default:
-      return assertNeverKeyRingError(error);
+      return assertNever(error, "Unhandled Vault keyring error");
   }
-}
-
-function assertNeverKeyRingError(value: never): never {
-  throw new Error(`Unhandled Vault keyring error: ${JSON.stringify(value)}`);
 }
 
 function vaultRootSelectionResolveError(
@@ -1346,12 +1334,6 @@ function vaultRootSelectionResolveError(
     case "vault_root_version_unavailable":
       return { ok: false, error: { code: "vault_root_unavailable" } };
     default:
-      return assertNeverRootSelectionError(error);
+      return assertNever(error, "Unhandled Vault root-selection error");
   }
-}
-
-function assertNeverRootSelectionError(value: never): never {
-  throw new Error(
-    `Unhandled Vault root-selection error: ${JSON.stringify(value)}`,
-  );
 }

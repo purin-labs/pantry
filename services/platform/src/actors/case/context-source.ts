@@ -565,7 +565,7 @@ export function caseContentPreview(content: CaseContent): string {
     case "entity_plane_proposal":
       return "entity-plane proposal";
     default:
-      return assertNeverCaseContent(content);
+      return assertNever(content, "Unhandled Case content");
   }
 }
 
@@ -575,10 +575,6 @@ function caseContentAuthoredText(message: UserMessage): string | null {
     if (part.kind === "text") authored.push(part.text);
   }
   return authored.length === 0 ? null : authored.join(" ");
-}
-
-function assertNeverCaseContent(value: never): never {
-  throw new Error(`Unhandled Case content: ${JSON.stringify(value)}`);
 }
 
 function boundedContextExcerpt(content: CaseContent): string | null {

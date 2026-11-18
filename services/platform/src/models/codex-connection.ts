@@ -28,7 +28,12 @@ import {
   revokeVaultSecret,
   storeVaultSecret,
 } from "../credential-vault/service";
-import { isPositiveInteger, isRecord, parseJsonOrNull } from "@seams/std";
+import {
+  assertNever,
+  isPositiveInteger,
+  isRecord,
+  parseJsonOrNull,
+} from "@seams/std";
 import type { CodexAllowance } from "@seams/control-api";
 import {
   chatGptAccessTokenExpiry,
@@ -489,7 +494,7 @@ async function startAttemptSecret(
           };
     }
     default:
-      return assertNeverStatus(signIn);
+      return assertNever(signIn, "Unhandled ChatGPT sign-in value");
   }
 }
 
@@ -607,7 +612,10 @@ export async function completeOrganisationChatGptSignIn(input: {
           input.now,
         );
       default:
-        return assertNeverStatus(exchanged.error.code);
+        return assertNever(
+          exchanged.error.code,
+          "Unhandled ChatGPT sign-in value",
+        );
     }
   }
   return connectAuthorizedProfile(
@@ -1081,7 +1089,7 @@ async function refreshSignInProfile(
         : null;
     }
     default:
-      return assertNeverStatus(current);
+      return assertNever(current, "Unhandled ChatGPT sign-in value");
   }
 }
 
@@ -1109,7 +1117,7 @@ function profileSecret(
         value: serializeChatGptAgentProfile(profile.profile),
       };
     default:
-      return assertNeverStatus(profile);
+      return assertNever(profile, "Unhandled ChatGPT sign-in value");
   }
 }
 
@@ -1492,7 +1500,7 @@ async function settleAuthorizationStatus(
         now,
       );
     default:
-      return assertNeverStatus(status);
+      return assertNever(status, "Unhandled ChatGPT sign-in value");
   }
 }
 
@@ -1637,7 +1645,7 @@ async function firstAllowance(
         allowance: { kind: "not_reported" },
       };
     default:
-      return assertNeverStatus(profile);
+      return assertNever(profile, "Unhandled ChatGPT sign-in value");
   }
 }
 
@@ -1937,8 +1945,4 @@ function parseActionRequiredReason(
     raw === "account_unavailable"
     ? raw
     : null;
-}
-
-function assertNeverStatus(value: never): never {
-  throw new Error(`Unhandled ChatGPT sign-in value: ${JSON.stringify(value)}`);
 }

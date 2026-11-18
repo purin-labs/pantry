@@ -12,7 +12,7 @@ import { buildStoredMessageAttachment } from "../messages/message-wasm";
 import { traceLog } from "../observability";
 import type { Result } from "../result";
 import type { SlackHostedFileMetadata, SlackMessageEvent } from "./events";
-import { isRecord, sha256Hex } from "@seams/std";
+import { assertNever, isRecord, sha256Hex } from "@seams/std";
 /**
  * A permanent refusal. Every variant names the rule that was applied and the
  * value that broke it, so the Connector's user-visible notice can say exactly
@@ -207,7 +207,7 @@ async function resolveSlackHostedFiles(
       case "remote_link":
         break;
       default:
-        return assertNeverFileCandidate(candidate);
+        return assertNever(candidate, "Unhandled Slack file candidate");
     }
   }
 
@@ -221,10 +221,6 @@ async function resolveSlackHostedFiles(
   }
 
   return hydrateSlackMessageFiles(input);
-}
-
-function assertNeverFileCandidate(value: never): never {
-  throw new Error(`Unhandled Slack file candidate: ${JSON.stringify(value)}`);
 }
 
 function checkDeclaredLimits(

@@ -7,7 +7,7 @@ import type {
 import { sameRelationshipDefinitionRef } from "@seams/commerce-contracts/commerce-relationship-references";
 import { assertCommerceEntityPlaneCommandWithLexicon } from "../commerce-wasm";
 import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@seams/std";
 import { parseRecordedCommerceEntityPlaneEffect } from "@seams/commerce-contracts/entity-plane-effects";
 
 type RecordValue = Record<string, unknown>;
@@ -171,7 +171,7 @@ export function commandFromCommerceEntityPlaneProposal(
         command: { target: proposal.entry },
       };
     default:
-      return assertNeverProposal(proposal);
+      return assertNever(proposal, "unsupported entity-plane proposal");
   }
 }
 
@@ -358,7 +358,7 @@ function effectFromProposal(
     case "remove_commerce_list_entry":
       return { kind: proposal.kind, entry: proposal.entry, receipt };
     default:
-      return assertNeverProposal(proposal);
+      return assertNever(proposal, "unsupported entity-plane proposal");
   }
 }
 
@@ -430,7 +430,7 @@ function effectReceiptMatchesProposal(
         receipt.target.revision === proposal.entry.entry.revision + 1
       );
     default:
-      return assertNeverProposal(proposal);
+      return assertNever(proposal, "unsupported entity-plane proposal");
   }
 }
 
@@ -472,8 +472,4 @@ function strictObjectValue(
     throw new Error(`${field} has unsupported fields`);
   }
   return value;
-}
-
-function assertNeverProposal(value: never): never {
-  throw new Error(`unsupported entity-plane proposal: ${String(value)}`);
 }

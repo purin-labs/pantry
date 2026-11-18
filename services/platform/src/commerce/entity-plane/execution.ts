@@ -57,6 +57,7 @@ import {
   commandFromCommerceEntityPlaneProposal,
 } from "./proposals";
 import type { VariantBy } from "@seams/type-utils";
+import { assertNever } from "@seams/std";
 
 type EntityPlaneAction = ActionLedgerEntry;
 type ApprovedEntityPlaneAction = VariantBy<
@@ -449,7 +450,10 @@ function commandAuthorityForExecution(
         },
       };
     default:
-      return assertNeverEntityPlaneProposal(input.proposal);
+      return assertNever(
+        input.proposal,
+        "Unhandled commerce entity-plane proposal",
+      );
   }
 }
 
@@ -462,7 +466,7 @@ function entityTypeIdForReference(
     case "custom":
       return { origin: reference.origin, typeId: reference.typeId };
     default:
-      return assertNeverEntityReference(reference);
+      return assertNever(reference, "Unhandled commerce entity reference");
   }
 }
 
@@ -502,24 +506,8 @@ function commandPrincipalId(authority: RequestAuthority): string {
     case "whatsapp_support":
       return authority.supportBindingId;
     default:
-      return assertNeverRequestAuthority(authority);
+      return assertNever(authority, "Unhandled request authority");
   }
-}
-
-function assertNeverEntityPlaneProposal(value: never): never {
-  throw new Error(
-    `Unhandled commerce entity-plane proposal: ${JSON.stringify(value)}`,
-  );
-}
-
-function assertNeverEntityReference(value: never): never {
-  throw new Error(
-    `Unhandled commerce entity reference: ${JSON.stringify(value)}`,
-  );
-}
-
-function assertNeverRequestAuthority(value: never): never {
-  throw new Error(`Unhandled request authority: ${JSON.stringify(value)}`);
 }
 
 async function authorizeEntityPlaneAction(

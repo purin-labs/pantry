@@ -1,6 +1,6 @@
 import type { SessionId, OrganisationId } from "../ids";
 import type { Result } from "../result";
-import { isNonNegativeInteger } from "@seams/std";
+import { assertNever, isNonNegativeInteger } from "@seams/std";
 
 type SessionCutoverRuntime = {
   readonly persistence: "v28_canonical";
@@ -283,7 +283,10 @@ function pushRuntimeBlockers(
       blockers.push("busy_lifecycle");
       return;
     default:
-      assertNeverLifecycle(runtime.lifecycleKind);
+      assertNever(
+        runtime.lifecycleKind,
+        "Unhandled canonical session lifecycle",
+      );
   }
 }
 
@@ -310,8 +313,4 @@ function invalidState(
   field: string,
 ): Result<never, SessionCutoverInspectionError> {
   return { ok: false, error: { code: "session_cutover_state_invalid", field } };
-}
-
-function assertNeverLifecycle(value: never): never {
-  throw new Error(`Unhandled canonical session lifecycle: ${String(value)}`);
 }

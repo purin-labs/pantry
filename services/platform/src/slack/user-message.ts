@@ -15,6 +15,7 @@ import type {
   SlackFileCandidate,
   SlackMessageEvent,
 } from "./events";
+import { assertNever } from "@seams/std";
 
 /**
  * Assembles the canonical message for one Slack delivery.
@@ -90,12 +91,8 @@ function authoredPart(authored: SlackAuthoredPart): UserMessagePart {
         },
       };
     default:
-      return assertNeverAuthoredPart(authored);
+      return assertNever(authored, "Unhandled Slack authored part");
   }
-}
-
-function assertNeverAuthoredPart(value: never): never {
-  throw new Error(`Unhandled Slack authored part: ${JSON.stringify(value)}`);
 }
 
 export type { SlackFileCandidate };

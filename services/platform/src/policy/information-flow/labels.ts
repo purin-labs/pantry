@@ -21,6 +21,7 @@ import type {
 } from "./types";
 import type { Variant } from "@seams/type-utils";
 import {
+  assertNever,
   hasExactKeys,
   isNonBlankString,
   isPositiveInteger,
@@ -593,7 +594,7 @@ function canonicalReader(reader: ContextVisibility): SerializedFlowReader {
         bindingRevision: reader.bindingRevision,
       };
     default:
-      return assertNeverReader(reader);
+      return assertNever(reader, "unhandled flow reader");
   }
 }
 
@@ -622,10 +623,6 @@ function compareEntries<T>(
 
 function compareStrings(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
-}
-
-function assertNeverReader(value: never): never {
-  throw new Error(`unhandled flow reader: ${String(value)}`);
 }
 
 function invalidPolicy(field: string): Result<never, FlowLabelError> {

@@ -15,6 +15,7 @@ import {
   type CustomConnectorRevisionError,
   type CustomConnectorRevisionRecord,
 } from "./revisions";
+import { assertNever } from "@seams/std";
 
 type CustomConnectorLifecycleError = CustomConnectorRevisionError
   | { readonly code: "custom_connector_lifecycle_conflict" }
@@ -247,10 +248,7 @@ function conflict(
     case "custom_connector_approval_review_mismatch":
       throw new Error("revision detail is required for this lifecycle error");
     default:
-      return assertNeverLifecycleCode(code);
+      return assertNever(code, "unexpected custom connector lifecycle code");
   }
 }
 
-function assertNeverLifecycleCode(value: never): never {
-  throw new Error(`unexpected custom connector lifecycle code: ${String(value)}`);
-}

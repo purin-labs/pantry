@@ -1,6 +1,6 @@
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
-import { isNonNegativeInteger } from "@seams/std";
+import { assertNever, isNonNegativeInteger } from "@seams/std";
 
 type OrganisationCutoverBacklog = {
   readonly proposedActions: number;
@@ -295,7 +295,7 @@ function pushTimestampBlocker(
       blockers.push({ kind, count, earliestLeaseExpiresAt: timestamp });
       return;
     default:
-      assertNeverTimestampBlocker(kind);
+      assertNever(kind, "Unhandled Organisation cutover blocker");
   }
 }
 
@@ -306,8 +306,4 @@ function invalidState(
     ok: false,
     error: { code: "organisation_cutover_state_invalid", field },
   };
-}
-
-function assertNeverTimestampBlocker(value: never): never {
-  throw new Error(`Unhandled Organisation cutover blocker: ${String(value)}`);
 }

@@ -17,7 +17,7 @@ import {
   type VaultRootBinding,
 } from "./keyring";
 import type { Variant } from "@seams/type-utils";
-import { isNonNegativeInteger } from "@seams/std";
+import { assertNever, isNonNegativeInteger } from "@seams/std";
 
 const vaultRootRotationIdBrand: unique symbol = Symbol("VaultRootRotationId");
 const vaultRotationBatchLimitBrand: unique symbol = Symbol(
@@ -1062,7 +1062,7 @@ function rotationKeyRingError(
     case "vault_root_invalid":
       return { ok: false, error: { code: "rotation_keyring_invalid" } };
     default:
-      return assertNeverKeyRingError(error);
+      return assertNever(error, "Unhandled Vault keyring error");
   }
 }
 
@@ -1079,8 +1079,4 @@ function keyRingFailureCode(
   }
 
   return "persistence_conflict";
-}
-
-function assertNeverKeyRingError(value: never): never {
-  throw new Error(`Unhandled Vault keyring error: ${JSON.stringify(value)}`);
 }

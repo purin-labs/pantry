@@ -46,7 +46,7 @@ import {
 } from "../actors/commerce-projection";
 import type { Result } from "../result";
 import type { Variant, VariantBy } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@seams/std";
 
 export type CommerceWasmError =
   | { readonly code: "commerce_wasm_input_invalid" }
@@ -531,10 +531,6 @@ function commerceWasmErrorReason(error: CommerceWasmError): string {
     case "commerce_wasm_rejected":
       return error.reason;
     default:
-      return assertNeverCommerceWasmError(error);
+      return assertNever(error, "Unexpected commerce Wasm error");
   }
-}
-
-function assertNeverCommerceWasmError(value: never): never {
-  throw new Error(`Unexpected commerce Wasm error: ${String(value)}`);
 }
