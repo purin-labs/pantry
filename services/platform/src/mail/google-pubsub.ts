@@ -1,5 +1,6 @@
+import { paddedStandardBase64 } from "../lenient-base64";
 import type { Result } from "../result";
-import { isRecord } from "@seams/std";
+import { decodeBase64, isRecord, parseJsonOrNull } from "@seams/std";
 
 /**
  * Google Cloud Pub/Sub push authentication. Push requests carry a
@@ -84,12 +85,15 @@ export async function verifyGooglePushToken(
       false,
       ["verify"],
     );
-    verified = await crypto.subtle.verify(
-      "RSASSA-PKCS1-v1_5",
-      key,
-      decodeBase64Url(parts[2] ?? ""),
-      new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
-    );
+    const signature = decodeBase64(paddedStandardBase64(parts[2] ?? ""));
+    verified =
+      signature !== null &&
+      (await crypto.subtle.verify(
+        "RSASSA-PKCS1-v1_5",
+        key,
+        signature,
+        new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
+      ));
   } catch {
     verified = false;
   }
@@ -175,21 +179,10 @@ function normalizeHistoryId(value: string | number): string {
   return typeof value === "number" ? String(value) : value;
 }
 
+/** Pub/Sub message data is padded standard base64; token segments are not. */
 function decodeJson(segment: string): unknown {
-  try {
-    return JSON.parse(new TextDecoder().decode(decodeBase64Url(segment)));
-  } catch {
-    return null;
-  }
-}
-
-function decodeBase64Url(segment: string): Uint8Array {
-  const normalized = segment.replaceAll("-", "+").replaceAll("_", "/");
-  const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
-  const binary = atob(padded);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-  return bytes;
+  const bytes = decodeBase64(paddedStandardBase64(segment));
+  return bytes === null
+    ? null
+    : parseJsonOrNull(new TextDecoder().decode(bytes));
 }

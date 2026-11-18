@@ -48,6 +48,7 @@ import {
   encodeBase64Url,
   isRecord,
 } from "@seams/std";
+import { standardBase64 } from "../lenient-base64";
 import type { Result } from "../result";
 import type { AccountAdmissionAction, AccountUserAuthority } from "./access";
 import {
@@ -576,9 +577,7 @@ async function signAccountPayload(
   assertion: AccountAssertionPayload,
 ): Promise<Result<string, AccountPlatformError>> {
   try {
-    const privateBytes = decodeBase64(
-      config.assertion.pkcs8.replaceAll("-", "+").replaceAll("_", "/"),
-    );
+    const privateBytes = decodeBase64(standardBase64(config.assertion.pkcs8));
     if (privateBytes === null) return accountUnavailable();
     const key = await crypto.subtle.importKey(
       "pkcs8",

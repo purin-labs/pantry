@@ -63,7 +63,7 @@ import {
   parseShipmentEntityId,
 } from "@seams/commerce-client";
 import type { Variant } from "@seams/type-utils";
-import { isPositiveInteger } from "@seams/std";
+import { decodeBase64Url, isPositiveInteger } from "@seams/std";
 
 export interface CommerceDeliveryVerifier {
   verify(
@@ -2416,17 +2416,4 @@ function commerceQuantity(quantity: CommerceQuantityV1): Quantity {
     scale: quantity.scale,
     unit: quantity.unit,
   };
-}
-
-function decodeBase64Url(value: string): Uint8Array | null {
-  if (!/^[A-Za-z0-9_-]+$/u.test(value)) return null;
-  try {
-    const standard = value.replaceAll("-", "+").replaceAll("_", "/");
-    const binary = atob(
-      standard.padEnd(Math.ceil(standard.length / 4) * 4, "="),
-    );
-    return Uint8Array.from(binary, (character) => character.charCodeAt(0));
-  } catch {
-    return null;
-  }
 }

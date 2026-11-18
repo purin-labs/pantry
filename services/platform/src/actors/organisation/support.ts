@@ -293,16 +293,6 @@ function compareActivePolicyCredentialRefs(
   );
 }
 
-export async function digestPolicyBody(body: string): Promise<string> {
-  const bytes = new TextEncoder().encode(body);
-  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
-  return [...digest]
-    .map(function hexByte(value) {
-      return value.toString(16).padStart(2, "0");
-    })
-    .join("");
-}
-
 export function existingPolicyActivation(
   _sql: SqlStorage,
   row: OrganisationPolicyHeadRow,

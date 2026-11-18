@@ -9,6 +9,7 @@ import type {
   Sha256Digest,
 } from "./types";
 import type { RequestAuthority } from "@seams/contracts";
+import { sha256Hex } from "@seams/std";
 import type { CaseContextReplayAuthority } from "../projection";
 
 export type {
@@ -226,10 +227,12 @@ export function materializeContextBundle(
 export async function digestContextBundle(
   bundle: ContextBundle,
 ): Promise<Sha256Digest> {
-  return digestCanonicalBundle({
-    ...canonicalBundleFields(bundle),
-    memory: canonicalMemoryOutcome(bundle.memory),
-  });
+  return sha256Hex(
+    JSON.stringify({
+      ...canonicalBundleFields(bundle),
+      memory: canonicalMemoryOutcome(bundle.memory),
+    }),
+  );
 }
 
 /**
@@ -239,7 +242,7 @@ export async function digestContextBundle(
 export async function digestHistoricalContextBundle(
   bundle: Omit<ContextBundle, "memory">,
 ): Promise<Sha256Digest> {
-  return digestCanonicalBundle(canonicalBundleFields(bundle));
+  return sha256Hex(JSON.stringify(canonicalBundleFields(bundle)));
 }
 
 function canonicalBundleFields(
@@ -257,16 +260,6 @@ function canonicalBundleFields(
     usage: bundle.usage,
     disposition: bundle.disposition,
   };
-}
-
-async function digestCanonicalBundle(
-  canonical: Record<string, unknown>,
-): Promise<Sha256Digest> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(JSON.stringify(canonical)),
-  );
-  return Array.from(new Uint8Array(digest), formatHexByte).join("");
 }
 
 function canonicalContextItem(item: ContextBundle["items"][number]): unknown {
@@ -414,8 +407,4 @@ function modelProvenance(
 
 export function normalizeContextQuery(value: string): string {
   return value.normalize("NFKC").trim().replace(/\s+/g, " ").toLowerCase();
-}
-
-function formatHexByte(value: number): string {
-  return value.toString(16).padStart(2, "0");
 }

@@ -1,4 +1,5 @@
 import type { Env } from "../env";
+import { jwtClaims } from "../lenient-base64";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 import type { GmailAuthorizationProduct } from "./gmail-authorization";
@@ -352,9 +353,9 @@ function validateGmailIdTokenClaims(
   if (parts.length !== 3) {
     return { ok: false, error: { code: "provider_oauth_response_invalid" } };
   }
-  const claims = decodeJson(parts[1] ?? "");
+  const claims = jwtClaims(input.idToken);
   if (
-    !isRecord(claims) ||
+    claims === null ||
     typeof claims.iss !== "string" ||
     typeof claims.aud !== "string" ||
     typeof claims.exp !== "number" ||
@@ -381,14 +382,4 @@ function parseGrantedScopes(raw: unknown): readonly string[] {
   return typeof raw === "string"
     ? raw.split(" ").filter((scope) => scope.length > 0)
     : [];
-}
-
-function decodeJson(segment: string): unknown {
-  try {
-    const normalized = segment.replaceAll("-", "+").replaceAll("_", "/");
-    const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
-    return JSON.parse(atob(padded));
-  } catch {
-    return null;
-  }
 }

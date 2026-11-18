@@ -15,7 +15,13 @@ import type {
   OpenCaseExecutionNode,
 } from "@seams/control-api";
 import { isConversationId } from "@seams/control-api";
-import { isNonNegativeInteger, isRecord, parseJsonOrNull } from "@seams/std";
+import {
+  decodeBase64Url,
+  isNonNegativeInteger,
+  isRecord,
+  isSha256Hex,
+  parseJsonOrNull,
+} from "@seams/std";
 
 import {
   findActiveCaseActorAtScope,
@@ -888,14 +894,10 @@ function encodeCursor(cursor: Cursor): string {
 }
 
 function decodeCursor(raw: string): Cursor | null {
-  if (raw.length === 0 || raw.length > 512 || !/^[A-Za-z0-9_-]+$/u.test(raw))
-    return null;
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(atob(raw.replaceAll("-", "+").replaceAll("_", "/")));
-  } catch {
-    return null;
-  }
+  const bytes = raw.length > 512 ? null : decodeBase64Url(raw);
+  if (bytes === null) return null;
+  // One character for each byte, as btoa in encodeCursor reads them.
+  const parsed = parseJsonOrNull(String.fromCharCode(...bytes));
   if (
     !isRecord(parsed) ||
     typeof parsed.basis !== "string" ||
@@ -913,7 +915,7 @@ function decodeCursor(raw: string): Cursor | null {
       index: parsed.index,
       offset: parsed.offset,
     };
-  return typeof parsed.part === "string" && /^[0-9a-f]{64}$/u.test(parsed.part)
+  return isSha256Hex(parsed.part)
     ? {
         basis: parsed.basis,
         phase: "session",

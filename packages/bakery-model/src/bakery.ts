@@ -1,4 +1,5 @@
 import type { CommerceEntity, CommerceRelationship } from "@seams/contracts";
+import { sha256Hex } from "@seams/std";
 
 export type StationId = "stage" | "portion" | "bake" | "cool" | "pack";
 
@@ -266,16 +267,8 @@ export function bakeryProcedureKey(
   return JSON.stringify(versions.sort());
 }
 
-export async function bakeryFingerprint(key: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(key),
-  );
-  return Array.from(new Uint8Array(digest), hexByte).join("");
-}
-
-function hexByte(value: number): string {
-  return value.toString(16).padStart(2, "0");
+export function bakeryFingerprint(key: string): Promise<string> {
+  return sha256Hex(key);
 }
 
 export const financierOperations: readonly Readonly<{

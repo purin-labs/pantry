@@ -7,7 +7,7 @@ import {
 } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationEnvironment } from "./control-plane";
-import { encodeBase64Url } from "@seams/std";
+import { decodeBase64Url, encodeBase64Url } from "@seams/std";
 
 declare const commerceBindingIdBrand: unique symbol;
 declare const commerceMerchantIdBrand: unique symbol;
@@ -350,9 +350,9 @@ function parseActiveBinding(
           integrationAccountId: integrationAccountId.value,
           merchantId: row.merchantId,
           deliverySigningKeyId: row.deliverySigningKeyId,
-          deliverySigningPublicKey: decodeBase64Url(
-            row.deliverySigningPublicKeyB64,
-          ),
+          deliverySigningPublicKey:
+            decodeBase64Url(row.deliverySigningPublicKeyB64) ??
+            new Uint8Array(),
         })
       : invalid("identity");
   if (
@@ -371,9 +371,8 @@ function parseActiveBinding(
       organisationId: organisationId.value,
       integrationAccountId: integrationAccountId.value,
       environment: row.environment,
-      deliverySigningPublicKey: decodeBase64Url(
-        row.deliverySigningPublicKeyB64,
-      ),
+      deliverySigningPublicKey:
+        decodeBase64Url(row.deliverySigningPublicKeyB64) ?? new Uint8Array(),
       revision: row.revision,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -429,19 +428,6 @@ function parseBoundedId(
   prefix: string,
 ): Result<string, CommerceMerchantBindingError> {
   return parseCommerceId(value, field, prefix);
-}
-
-function decodeBase64Url(value: string): Uint8Array {
-  if (!/^[A-Za-z0-9_-]+$/u.test(value)) return new Uint8Array();
-  try {
-    const standard = value.replaceAll("-", "+").replaceAll("_", "/");
-    const binary = atob(
-      standard.padEnd(Math.ceil(standard.length / 4) * 4, "="),
-    );
-    return Uint8Array.from(binary, (character) => character.charCodeAt(0));
-  } catch {
-    return new Uint8Array();
-  }
 }
 
 function invalid(field: string): Result<never, CommerceMerchantBindingError> {

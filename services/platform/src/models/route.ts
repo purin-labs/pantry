@@ -29,7 +29,7 @@ import {
   ORGANISATION_CODEX_MODEL_OPTIONS,
 } from "./catalog";
 import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import { assertNever, sha256Hex } from "@seams/std";
 
 export const ORGANISATION_CODEX_MODEL = DEFAULT_ORGANISATION_CODEX_MODEL;
 
@@ -439,11 +439,7 @@ export async function resolveOrganisationModelRouteForSelection(input: {
 }
 
 export async function digestModelRoute(route: ModelRoute): Promise<string> {
-  const encoded = new TextEncoder().encode(
-    JSON.stringify(modelRouteDigestMaterial(route)),
-  );
-  const digest = await crypto.subtle.digest("SHA-256", encoded);
-  return Array.from(new Uint8Array(digest), byteToHex).join("");
+  return sha256Hex(JSON.stringify(modelRouteDigestMaterial(route)));
 }
 
 function modelRouteDigestMaterial(route: ModelRoute): ModelRoute {
@@ -477,8 +473,4 @@ function modelRouteDigestMaterial(route: ModelRoute): ModelRoute {
         authProfileGeneration: route.authProfileGeneration,
       };
   }
-}
-
-function byteToHex(value: number): string {
-  return value.toString(16).padStart(2, "0");
 }

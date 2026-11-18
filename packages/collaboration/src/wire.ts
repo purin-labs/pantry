@@ -1,5 +1,5 @@
 import type { TextPresenceSelection } from "./text-selection";
-import { isRecord } from "@seams/std";
+import { decodeBase64Url, isRecord } from "@seams/std";
 export const COLLABORATION_FRAME_LIMIT = 384 * 1024;
 export const COLLABORATION_SOCKET_LIMIT = 20;
 // The Actor's runtime answers this text frame without waking the Actor, so a
@@ -71,19 +71,9 @@ export function encodeProtocolBytes(bytes: Uint8Array): string {
 }
 
 export function decodeProtocolBytes(value: unknown): Uint8Array | null {
-  if (typeof value !== "string" || !/^[A-Za-z0-9_-]+$/u.test(value)) {
-    return null;
-  }
-  try {
-    const binary = atob(value.replaceAll("-", "+").replaceAll("_", "/"));
-    const bytes = new Uint8Array(binary.length);
-    for (let index = 0; index < binary.length; index++) {
-      bytes[index] = binary.charCodeAt(index);
-    }
-    return encodeProtocolBytes(bytes) === value ? bytes : null;
-  } catch {
-    return null;
-  }
+  if (typeof value !== "string") return null;
+  const bytes = decodeBase64Url(value);
+  return bytes !== null && encodeProtocolBytes(bytes) === value ? bytes : null;
 }
 
 export function isShortProtocolText(value: unknown): value is string {

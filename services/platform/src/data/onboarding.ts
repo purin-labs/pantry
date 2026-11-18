@@ -41,7 +41,7 @@ import {
 } from "./capability-policy";
 import type { Variant } from "@seams/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
-import { isRecord } from "@seams/std";
+import { isRecord, sha256Hex } from "@seams/std";
 import type { CuePresetId } from "@seams/control-api";
 
 export type CapabilityProfile = "read_and_propose" | "approved_provider_writes";
@@ -579,19 +579,21 @@ export async function evaluateAndStoreReadiness(input: {
     input.db,
     input.organisationId,
   );
-  const readinessHash = await readinessDigest({
-    organisationId: input.organisationId,
-    readinessVersion,
-    configurationVersion,
-    environment: configuration.environment,
-    capabilityProfile,
-    policySnapshotId: snapshots.policy?.snapshotId ?? null,
-    cueSnapshotId: snapshots.cue?.snapshotId ?? null,
-    runtimeAdmission: input.runtimeAdmission,
-    commerceSystemReadiness: input.commerceSystemReadiness,
-    blockers,
-    ...(approvalAuthentication.length > 0 ? { approvalAuthentication } : {}),
-  });
+  const readinessHash = await sha256Hex(
+    JSON.stringify({
+      organisationId: input.organisationId,
+      readinessVersion,
+      configurationVersion,
+      environment: configuration.environment,
+      capabilityProfile,
+      policySnapshotId: snapshots.policy?.snapshotId ?? null,
+      cueSnapshotId: snapshots.cue?.snapshotId ?? null,
+      runtimeAdmission: input.runtimeAdmission,
+      commerceSystemReadiness: input.commerceSystemReadiness,
+      blockers,
+      ...(approvalAuthentication.length > 0 ? { approvalAuthentication } : {}),
+    }),
+  );
   if (
     blockers.length > 0 ||
     snapshots.policy === null ||
@@ -1586,16 +1588,6 @@ async function nextReadinessVersion(
     .bind(organisationId)
     .first<{ version: unknown }>();
   return typeof row?.version === "number" ? row.version + 1 : 1;
-}
-
-async function readinessDigest(value: unknown): Promise<string> {
-  const bytes = new TextEncoder().encode(JSON.stringify(value));
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest), hexByte).join("");
-}
-
-function hexByte(value: number): string {
-  return value.toString(16).padStart(2, "0");
 }
 
 function readinessAssessmentInsert(

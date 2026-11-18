@@ -36,7 +36,12 @@ import {
 } from "./compiler";
 import type { AccessGrant } from "./types";
 import { CAPABILITY_KEYS } from "../capability-catalogue";
-import { assertNever, isRecord, positiveIntegerOrNull } from "@seams/std";
+import {
+  assertNever,
+  isRecord,
+  positiveIntegerOrNull,
+  sha256Hex,
+} from "@seams/std";
 
 export const CONTEXT_CASE_READ_CAPABILITY = CAPABILITY_KEYS.contextCaseRead;
 export const CASE_CONTEXT_COLLECTION_METADATA_READ_CAPABILITY =
@@ -996,13 +1001,7 @@ async function readCurrentOrganisationPolicy(
 }
 
 async function digestCanonical(value: unknown): Promise<Sha256Digest> {
-  const bytes = new TextEncoder().encode(JSON.stringify(value));
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest), formatHexByte).join("");
-}
-
-function formatHexByte(byte: number): string {
-  return byte.toString(16).padStart(2, "0");
+  return sha256Hex(JSON.stringify(value));
 }
 
 function parseMailboxReplyScope(

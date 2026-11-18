@@ -19,6 +19,7 @@ import {
   hasExactKeys,
   isNonNegativeInteger,
   isRecord,
+  sha256Hex,
 } from "@seams/std";
 
 const NONE_RESERVATION: RunBudgetReservationState = { kind: "none" };
@@ -244,21 +245,16 @@ type ValidateCheckpointBudgetGapInput = {
 export async function sessionBudgetAccountDigest(
   account: SessionBudgetAccount,
 ): Promise<Sha256Digest> {
-  const canonical = JSON.stringify({
-    kind: account.kind,
-    budget: account.budget,
-    usage: account.usage,
-    usageCursor: account.usageCursor,
-    reservation: account.reservation,
-    exhaustion: account.kind === "exhausted" ? account.exhaustion : null,
-  });
-  const bytes = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(canonical),
+  return sha256Hex(
+    JSON.stringify({
+      kind: account.kind,
+      budget: account.budget,
+      usage: account.usage,
+      usageCursor: account.usageCursor,
+      reservation: account.reservation,
+      exhaustion: account.kind === "exhausted" ? account.exhaustion : null,
+    }),
   );
-  return Array.from(new Uint8Array(bytes), (byte) =>
-    byte.toString(16).padStart(2, "0"),
-  ).join("");
 }
 
 export function createSessionBudgetAccount(

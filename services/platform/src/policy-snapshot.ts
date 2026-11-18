@@ -23,6 +23,7 @@ import {
   hasExactKeys,
   isRecord,
   positiveIntegerOrNull,
+  sha256Hex,
 } from "@seams/std";
 
 export type OrganisationPolicySnapshot = {
@@ -357,7 +358,9 @@ async function activateAndDistributeOrganisationPolicy(input: {
       },
     };
   }
-  const expectedDigest = await policySnapshotDigest(input.publication.snapshot);
+  const expectedDigest = await sha256Hex(
+    JSON.stringify(input.publication.snapshot),
+  );
   if (
     activation.value.head.activeVersion !==
       input.publication.snapshot.version ||
@@ -1533,16 +1536,6 @@ function policySnapshotsMatch(
     authoritative.version === distributed.version &&
     JSON.stringify(authoritative) === JSON.stringify(distributed)
   );
-}
-
-async function policySnapshotDigest(
-  snapshot: OrganisationPolicySnapshot,
-): Promise<string> {
-  const bytes = new TextEncoder().encode(JSON.stringify(snapshot));
-  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
-  let hex = "";
-  for (const value of digest) hex += value.toString(16).padStart(2, "0");
-  return hex;
 }
 
 function capabilityPolicyErrorDetail(

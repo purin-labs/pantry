@@ -12,7 +12,12 @@ import type { Result } from "./result";
 import type { NearEd25519PublicKey, SeamsIdentityId } from "./seams/nep413";
 import type { CanonicalAction } from "@seams/contracts";
 import type { Variant } from "@seams/type-utils";
-import { bytesToHex, isNonNegativeInteger, isRecord } from "@seams/std";
+import {
+  isNonNegativeInteger,
+  isRecord,
+  isSha256Hex,
+  sha256Hex,
+} from "@seams/std";
 
 declare const approvalProofDigestBrand: unique symbol;
 
@@ -140,34 +145,29 @@ type ApprovalEvidenceError = {
 export function parseApprovalProofDigest(
   raw: unknown,
 ): ApprovalProofDigest | null {
-  return typeof raw === "string" && /^[0-9a-f]{64}$/u.test(raw)
-    ? (raw as ApprovalProofDigest)
-    : null;
+  return isSha256Hex(raw) ? (raw as ApprovalProofDigest) : null;
 }
 
 export async function digestApprovalAction(
   action: CanonicalAction,
 ): Promise<ApprovalProofDigest> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(
-      JSON.stringify({
-        organisationId: action.organisationId,
-        integrationAccountId: action.integrationAccountId,
-        threadId: action.threadId,
-        sessionId: action.sessionId,
-        host: action.host,
-        verb: action.verb,
-        path: action.path,
-        argsHash: action.argsHash,
-        amount: action.amount,
-        nonce: action.nonce.value,
-        exp: action.exp,
-        resourceKey: action.resourceKey,
-      }),
-    ),
+  const digest = await sha256Hex(
+    JSON.stringify({
+      organisationId: action.organisationId,
+      integrationAccountId: action.integrationAccountId,
+      threadId: action.threadId,
+      sessionId: action.sessionId,
+      host: action.host,
+      verb: action.verb,
+      path: action.path,
+      argsHash: action.argsHash,
+      amount: action.amount,
+      nonce: action.nonce.value,
+      exp: action.exp,
+      resourceKey: action.resourceKey,
+    }),
   );
-  const parsed = parseApprovalProofDigest(bytesToHex(new Uint8Array(digest)));
+  const parsed = parseApprovalProofDigest(digest);
   if (parsed === null) {
     throw new Error("approval_action_digest_invariant");
   }

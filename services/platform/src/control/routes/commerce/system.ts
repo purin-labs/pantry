@@ -68,7 +68,7 @@ import {
   ensureCreatedOrganisationActor,
   readOrganisationEnvironment,
 } from "../../organisation-runtime";
-import { assertNever } from "@seams/std";
+import { assertNever, decodeBase64Url } from "@seams/std";
 
 export async function handleCommerceSystem(
   request: Request,
@@ -945,19 +945,6 @@ function normalizedCommerceIdentity(
     /^[a-z0-9_-]{8,160}$/u.test(value)
     ? value
     : null;
-}
-
-function decodeBase64Url(value: string): Uint8Array | null {
-  if (!/^[A-Za-z0-9_-]+$/u.test(value)) return null;
-  try {
-    const standard = value.replaceAll("-", "+").replaceAll("_", "/");
-    const binary = atob(
-      standard.padEnd(Math.ceil(standard.length / 4) * 4, "="),
-    );
-    return Uint8Array.from(binary, (character) => character.charCodeAt(0));
-  } catch {
-    return null;
-  }
 }
 
 function requireCapabilityActivationRouteId(raw: string | null): string {

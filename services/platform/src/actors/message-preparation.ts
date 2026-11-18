@@ -21,7 +21,7 @@ import {
   readMessagePreparation,
 } from "./message-preparation-store";
 import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import { isRecord, sha256Hex } from "@seams/std";
 
 const MESSAGE_PREPARATION_HANDLER_REVISION = "message-preparation.v1";
 export const MESSAGE_PREPARATION_LIMITS: MessageAttachmentPreparationLimits = {
@@ -80,7 +80,7 @@ export function messagePreparationIdentity(
 export async function messagePreparationId(
   identity: MessageAttachmentPreparationIdentity,
 ): Promise<string> {
-  return `prep-${await digest(JSON.stringify(identity))}`;
+  return `prep-${await sha256Hex(JSON.stringify(identity))}`;
 }
 
 export async function prepareAcceptedMessageAttachment(input: {
@@ -356,7 +356,7 @@ async function prepareAndPersist(input: {
     const validated = validateMessageAttachmentPreparationReceipt({
       identity,
       limits: pending.limits,
-      resultDigest: await digest(resultJson),
+      resultDigest: await sha256Hex(resultJson),
       derivedObjectKeys: [input.objectKey],
       usage: {
         activeWallMs: completedAt - pending.startedAt,
@@ -499,7 +499,8 @@ async function readPreparedAttachment(
           : attachment.byteLength) ||
       receipt.value.usage.outputBytes !==
         new TextEncoder().encode(JSON.stringify(raw.inputs)).byteLength ||
-      (await digest(JSON.stringify(raw.inputs))) !== receipt.value.resultDigest
+      (await sha256Hex(JSON.stringify(raw.inputs))) !==
+        receipt.value.resultDigest
     ) {
       return { ok: false, error: "preparation_receipt_mismatch" };
     }
@@ -589,13 +590,4 @@ function failed(
       reason,
     },
   };
-}
-
-async function digest(value: string): Promise<string> {
-  const bytes = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
-  );
-  let hex = "";
-  for (const byte of bytes) hex += byte.toString(16).padStart(2, "0");
-  return hex;
 }

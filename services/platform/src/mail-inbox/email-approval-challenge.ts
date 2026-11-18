@@ -1,3 +1,4 @@
+import { decodeBase64Url, encodeBase64Url } from "@seams/std";
 import type { Env } from "../env";
 import { digestCanonical } from "../policy/information-flow/digest";
 
@@ -23,7 +24,7 @@ export async function emailApprovalChallenge(
     key,
     new TextEncoder().encode(emailApprovalChallengePayload(input)),
   );
-  return base64UrlBytes(new Uint8Array(signature));
+  return encodeBase64Url(new Uint8Array(signature));
 }
 
 export async function verifyEmailApprovalChallenge(
@@ -36,7 +37,8 @@ export async function verifyEmailApprovalChallenge(
     challenge: string;
   }>,
 ): Promise<boolean> {
-  const signature = decodeBase64UrlBytes(input.challenge);
+  const signature =
+    input.challenge.length <= 512 ? decodeBase64Url(input.challenge) : null;
   if (signature === null) return false;
   const key = await emailApprovalKey(input.secret, ["verify"]);
   return crypto.subtle.verify(
@@ -80,34 +82,6 @@ function emailApprovalKey(
 export function emailApprovalSecret(env: Env): string | null {
   const secret = env.SESSION_TOKEN_SECRET;
   return secret === undefined || secret.trim().length === 0 ? null : secret;
-}
-
-function base64UrlBytes(bytes: Uint8Array): string {
-  let binary = "";
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary)
-    .replaceAll("+", "-")
-    .replaceAll("/", "_")
-    .replaceAll("=", "");
-}
-
-function decodeBase64UrlBytes(value: string): Uint8Array | null {
-  if (!/^[A-Za-z0-9_-]{1,512}$/u.test(value)) return null;
-  try {
-    const normalized = value.replaceAll("-", "+").replaceAll("_", "/");
-    const binary = atob(
-      normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "="),
-    );
-    const bytes = new Uint8Array(binary.length);
-    for (let index = 0; index < binary.length; index += 1) {
-      bytes[index] = binary.charCodeAt(index);
-    }
-    return bytes;
-  } catch {
-    return null;
-  }
 }
 
 export function relationshipChallengeDigest(

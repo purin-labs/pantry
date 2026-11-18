@@ -6,6 +6,7 @@ import {
   type RunSnapshotSummary,
 } from "@seams/bakery-model/bakery-run-snapshot";
 import type { OrganisationId } from "../../ids";
+import { sha256Hex } from "@seams/std";
 
 export type AgentRunSaveVerification =
   | Readonly<{ kind: "none" }>
@@ -82,12 +83,7 @@ export async function readLatestAgentRunSave(
     object.customMetadata?.kind !== snapshot.kind
   )
     return { kind: "unavailable", effectId: row.effectId };
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(content),
-  );
-  const id = Array.from(new Uint8Array(digest), hexByte).join("");
-  return id === snapshot.id
+  return (await sha256Hex(content)) === snapshot.id
     ? { kind: "verified", effectId: row.effectId, snapshot }
     : { kind: "unavailable", effectId: row.effectId };
 }
@@ -105,8 +101,4 @@ function parseSavedSummary(row: SavedAgentRunRow): RunSnapshotSummary | null {
     summary.name === row.name
     ? summary
     : null;
-}
-
-function hexByte(byte: number): string {
-  return byte.toString(16).padStart(2, "0");
 }

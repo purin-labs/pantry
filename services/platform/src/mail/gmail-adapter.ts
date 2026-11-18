@@ -1,3 +1,4 @@
+import { paddedStandardBase64, standardBase64 } from "../lenient-base64";
 import { RequestDeadline } from "../request-deadline";
 import type { Result } from "../result";
 import { decodeBase64, isRecord } from "@seams/std";
@@ -1003,7 +1004,7 @@ export async function gmailGetAttachment(
   if (typeof raw.value.data !== "string") {
     return { ok: false, error: { code: "gmail_response_invalid" } };
   }
-  const bytes = decodeBase64UrlBytes(raw.value.data);
+  const bytes = decodeBase64(paddedStandardBase64(raw.value.data));
   return bytes === null
     ? { ok: false, error: { code: "gmail_response_invalid" } }
     : { ok: true, value: { bytes } };
@@ -1161,9 +1162,7 @@ async function gmailUploadSend(
     fetcher: typeof fetch;
   }>,
 ): Promise<Result<Record<string, unknown>, GmailApiError>> {
-  const message = decodeBase64(
-    input.raw.replaceAll("-", "+").replaceAll("_", "/"),
-  );
+  const message = decodeBase64(standardBase64(input.raw));
   if (message === null)
     return { ok: false, error: { code: "gmail_response_invalid" } };
   const boundary = `satyr_upload_${crypto.randomUUID()}`;
@@ -1342,7 +1341,7 @@ function decodePartText(
   part: Record<string, unknown>,
 ): { readonly text: string; readonly decodedBytes: number } | null {
   if (!isRecord(part.body) || typeof part.body.data !== "string") return null;
-  const bytes = decodeBase64UrlBytes(part.body.data);
+  const bytes = decodeBase64(paddedStandardBase64(part.body.data));
   if (bytes === null) return null;
   return { text: new TextDecoder().decode(bytes), decodedBytes: bytes.length };
 }
@@ -1415,21 +1414,6 @@ export function extractMailbox(raw: string): string | null {
   if (angled?.[1] !== undefined) return angled[1].toLowerCase();
   const bare = raw.trim();
   return /^[^<>\s]+@[^<>\s]+$/u.test(bare) ? bare.toLowerCase() : null;
-}
-
-function decodeBase64UrlBytes(segment: string): Uint8Array | null {
-  try {
-    const normalized = segment.replaceAll("-", "+").replaceAll("_", "/");
-    const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
-    const binary = atob(padded);
-    const bytes = new Uint8Array(binary.length);
-    for (let index = 0; index < binary.length; index += 1) {
-      bytes[index] = binary.charCodeAt(index);
-    }
-    return bytes;
-  } catch {
-    return null;
-  }
 }
 
 /**

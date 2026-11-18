@@ -39,6 +39,15 @@ import {
   type CustomConnectorReadCatalogEntry,
 } from "./grants";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
+import { basicApiKeyFromVault } from "./basic-authentication";
+import { projectReviewedResponse } from "./response-projection";
+import { paddedStandardBase64 } from "../lenient-base64";
+import {
+  decodeBase64,
+  encodeBase64Url,
+  isRecord,
+  isSha256Hex,
+} from "@seams/std";
 
 const authorizedReadBrand: unique symbol = Symbol(
   "AuthorizedCustomConnectorRead",
@@ -812,8 +821,10 @@ async function decodeCursor(
   const signature = parts[2];
   if (body === undefined || signature === undefined) return null;
   if (!(await verifyCursorSignature(body, signature, signingKey))) return null;
+  const bytes = decodeBase64(paddedStandardBase64(body));
+  if (bytes === null) return null;
   try {
-    const raw: unknown = JSON.parse(TEXT_DECODER.decode(decodeBase64Url(body)));
+    const raw: unknown = JSON.parse(TEXT_DECODER.decode(bytes));
     return parseCursorPayload(raw);
   } catch {
     return null;
@@ -866,11 +877,15 @@ async function verifyCursorSignature(
 ): Promise<boolean> {
   try {
     const key = await importCursorKey(signingKey, ["verify"]);
-    return await crypto.subtle.verify(
-      "HMAC",
-      key,
-      decodeBase64Url(signature),
-      TEXT_ENCODER.encode(body),
+    const bytes = decodeBase64(paddedStandardBase64(signature));
+    return (
+      bytes !== null &&
+      (await crypto.subtle.verify(
+        "HMAC",
+        key,
+        bytes,
+        TEXT_ENCODER.encode(body),
+      ))
     );
   } catch {
     return false;
@@ -888,17 +903,6 @@ function importCursorKey(
     false,
     usages,
   );
-}
-
-function decodeBase64Url(value: string): Uint8Array {
-  const standard = value.replaceAll("-", "+").replaceAll("_", "/");
-  const padded = standard.padEnd(Math.ceil(standard.length / 4) * 4, "=");
-  const binary = atob(padded);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-  return bytes;
 }
 
 function replaceJsonPointer(
@@ -946,6 +950,3 @@ function isSafeInteger(value: unknown): value is number {
 function invalidRead(field: string): Result<never, CustomConnectorReadError> {
   return { ok: false, error: { code: "custom_connector_read_invalid", field } };
 }
-import { basicApiKeyFromVault } from "./basic-authentication";
-import { projectReviewedResponse } from "./response-projection";
-import { encodeBase64Url, isRecord, isSha256Hex } from "@seams/std";

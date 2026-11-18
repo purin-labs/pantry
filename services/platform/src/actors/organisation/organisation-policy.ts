@@ -83,7 +83,7 @@ import {
 } from "../../jev-features/paid-use";
 import { resolvePantryAccountBinding } from "../../account-platform/binding";
 import { listIntegrationAccounts } from "../../data/integration-account";
-import { assertNever, errorMessage, isRecord } from "@seams/std";
+import { assertNever, errorMessage, isRecord, sha256Hex } from "@seams/std";
 import {
   caseContextCollectionReviewDecision,
   caseContextCollectionSourceAccess,
@@ -94,7 +94,6 @@ import {
 import { schemaTransaction } from "./schema";
 import {
   activePolicyCredentialRefs,
-  digestPolicyBody,
   existingPolicyActivation,
   organisationPlacementConflict,
   parseStoredOrganisationPolicy,
@@ -1390,7 +1389,7 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
     if (
       head.organisation_id !== input.organisationId ||
       snapshot.value.version !== head.active_version ||
-      (await digestPolicyBody(head.body)) !== head.digest
+      (await sha256Hex(head.body)) !== head.digest
     ) {
       return { ok: false, error: { code: "invalid_policy_snapshot" } };
     }
@@ -1433,7 +1432,7 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
     }
 
     const body = JSON.stringify(parsed.value);
-    const digest = await digestPolicyBody(body);
+    const digest = await sha256Hex(body);
     if (
       !(await isOrganisationPolicyPlacementActive(
         this.env.DB,

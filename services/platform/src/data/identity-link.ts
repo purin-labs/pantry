@@ -18,7 +18,7 @@ import {
   type SlackEventId,
   type SlackUserId,
 } from "../slack/events";
-import { assertNever, encodeBase64Url } from "@seams/std";
+import { assertNever, encodeBase64Url, sha256Hex } from "@seams/std";
 
 declare const identityLinkChallengeIdBrand: unique symbol;
 declare const identityLinkTokenBrand: unique symbol;
@@ -172,7 +172,7 @@ export async function issueIdentityLink(input: {
       )
       .bind(
         challengeId,
-        await hashIdentityLinkToken(token),
+        await sha256Hex(token),
         input.organisationId,
         workspaceConnectionId.value,
         input.workspaceId,
@@ -260,7 +260,7 @@ async function readIdentityLinkChallenge(input: {
             expires_at AS expiresAt, consumed_at AS consumedAt
      FROM external_identity_link_challenge WHERE token_hash = ?`,
     )
-    .bind(await hashIdentityLinkToken(input.token))
+    .bind(await sha256Hex(input.token))
     .first<ChallengeRow>();
   if (row === null) return { ok: false, error: { code: "link_not_found" } };
   return parseChallengeRow(row, input.now);
@@ -477,20 +477,6 @@ function newIdentityLinkToken(
   );
   if (token === null) throw new Error("identity_link_token_invalid");
   return token;
-}
-
-async function hashIdentityLinkToken(
-  token: IdentityLinkToken,
-): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(token),
-  );
-  return Array.from(new Uint8Array(digest), encodeHexByte).join("");
-}
-
-function encodeHexByte(value: number): string {
-  return value.toString(16).padStart(2, "0");
 }
 
 function changedExactlyOnce(result: D1Result<unknown> | undefined): boolean {

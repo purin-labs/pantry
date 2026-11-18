@@ -47,6 +47,7 @@ import {
 } from "../credential-vault";
 import {
   assertNever,
+  encodeBase64Url,
   errorMessage,
   isRecord,
 } from "@seams/std";
@@ -636,7 +637,7 @@ async function signSlackOAuthState(
     encoder.encode(payload),
   );
 
-  return base64UrlEncode(new Uint8Array(signature));
+  return encodeBase64Url(new Uint8Array(signature));
 }
 
 function timingSafeEqualString(left: string, right: string): boolean {
@@ -654,19 +655,6 @@ function timingSafeEqualString(left: string, right: string): boolean {
   }
 
   return diff === 0;
-}
-
-function base64UrlEncode(value: Uint8Array): string {
-  let binary = "";
-
-  for (const byte of value) {
-    binary += String.fromCharCode(byte);
-  }
-
-  return btoa(binary)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
 }
 
 function readStaleAfterMs(url: URL): number {

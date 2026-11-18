@@ -11,6 +11,7 @@ import {
 import { buildWhatsAppSupportAuthority } from "../request-authority";
 import type { Result } from "../result";
 import { resolveActiveCaseActorAtPlacement } from "./actor-router";
+import { sha256Hex } from "@seams/std";
 
 /**
  * System-origin WhatsApp Case admission. One support conversationWindow maps to one
@@ -146,10 +147,5 @@ function whatsappTriggerManifest(input: WhatsAppCaseAdmissionInput): string {
 async function createWhatsAppTriggerId(
   providerMessageId: string,
 ): Promise<string> {
-  const bytes = new TextEncoder().encode(providerMessageId);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  const hex = Array.from(new Uint8Array(digest), (byte) =>
-    byte.toString(16).padStart(2, "0"),
-  ).join("");
-  return `trigger_whatsapp_${hex}`;
+  return `trigger_whatsapp_${await sha256Hex(providerMessageId)}`;
 }

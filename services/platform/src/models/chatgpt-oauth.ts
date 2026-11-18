@@ -1,5 +1,6 @@
 import { isRecord, parseJsonOrNull } from "@seams/std";
 import type { CodexAllowance } from "@seams/control-api";
+import { jwtClaims } from "../lenient-base64";
 import type { Result } from "../result";
 import { RequestDeadline } from "../request-deadline";
 
@@ -403,20 +404,6 @@ function chatGptAccountId(accessToken: string): string | null {
     auth.chatgpt_account_id.length > 0
     ? auth.chatgpt_account_id
     : null;
-}
-
-function jwtClaims(token: string): Record<string, unknown> | null {
-  const payload = token.split(".")[1];
-  if (payload === undefined || payload.length === 0) return null;
-  try {
-    const base64 = payload.replaceAll("-", "+").replaceAll("_", "/");
-    const claims = parseJsonOrNull(
-      atob(base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=")),
-    );
-    return isRecord(claims) ? claims : null;
-  } catch {
-    return null;
-  }
 }
 
 function finiteNumber(raw: unknown): number | null {

@@ -1,5 +1,5 @@
 import type { Result } from "./result";
-import { decodeBase64 } from "@seams/std";
+import { decodeBase64, sha256Hex } from "@seams/std";
 
 export type HarnessCheckpointError =
   | { code: "checkpoint_invalid" }
@@ -51,9 +51,7 @@ export async function sealHarnessCheckpointPayload(input: {
   if (!key.ok) return key;
 
   const plaintext = new Uint8Array(input.checkpoint);
-  const digest = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", plaintext),
-  );
+  const sha256 = await sha256Hex(plaintext);
   const iv = crypto.getRandomValues(new Uint8Array(CHECKPOINT_IV_BYTES));
   const encrypted = await crypto.subtle.encrypt(
     {
@@ -68,7 +66,7 @@ export async function sealHarnessCheckpointPayload(input: {
     ok: true,
     value: {
       body: checkpointEnvelope(iv, new Uint8Array(encrypted)),
-      sha256: encodeHex(digest),
+      sha256,
     },
   };
 }
@@ -169,12 +167,6 @@ async function derivePayloadKey(
   );
 
   return { ok: true, value: key };
-}
-
-function encodeHex(value: Uint8Array): string {
-  return Array.from(value, function encodeByte(byte) {
-    return byte.toString(16).padStart(2, "0");
-  }).join("");
 }
 
 function decodeHex(value: string): Uint8Array {

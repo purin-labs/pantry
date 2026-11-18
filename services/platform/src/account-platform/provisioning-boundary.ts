@@ -22,7 +22,7 @@ export type {
 } from "@seams-internal/console-shared/accountPlatform";
 import {
   canonicalJson,
-  decodeBase64,
+  decodeBase64Url,
   encodeBase64Url,
   isRecord,
   sha256Hex,
@@ -111,10 +111,9 @@ export async function verifyPantryProvisionOwner(
   }
 }
 function decodeSegment(value: string): Uint8Array {
-  if (!/^[A-Za-z0-9_-]+$/.test(value))
-    throw new Error("Invalid signed segment");
-  const bytes = decodeBase64(value.replaceAll("-", "+").replaceAll("_", "/"));
-  if (bytes === null || encodeBase64Url(bytes) !== value)
+  const bytes = decodeBase64Url(value);
+  if (bytes === null) throw new Error("Invalid signed segment");
+  if (encodeBase64Url(bytes) !== value)
     throw new Error("Noncanonical signed segment");
   return bytes;
 }

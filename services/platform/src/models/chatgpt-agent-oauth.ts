@@ -1,4 +1,5 @@
 import { encodeBase64Url, isRecord, parseJsonOrNull } from "@seams/std";
+import { jwtClaims } from "../lenient-base64";
 import { pkceChallenge } from "../provider-adapters/authorization";
 import type { Result } from "../result";
 import { RequestDeadline } from "../request-deadline";
@@ -345,20 +346,6 @@ async function requestTokens(
       scopes,
     },
   };
-}
-
-function jwtClaims(token: string): Record<string, unknown> | null {
-  const payload = token.split(".")[1];
-  if (payload === undefined || payload.length === 0) return null;
-  try {
-    const base64 = payload.replaceAll("-", "+").replaceAll("_", "/");
-    const claims = parseJsonOrNull(
-      atob(base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=")),
-    );
-    return isRecord(claims) ? claims : null;
-  } catch {
-    return null;
-  }
 }
 
 function randomValue(): string {

@@ -1,10 +1,7 @@
-import { isRecord } from "@seams/std";
+import { isRecord, sha256Hex } from "@seams/std";
 
 export async function digestCanonical(value: unknown): Promise<string> {
-  const serialized = serializeCanonical(value);
-  const bytes = new TextEncoder().encode(serialized);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest), hexByte).join("");
+  return sha256Hex(serializeCanonical(value));
 }
 
 /**
@@ -19,10 +16,6 @@ export function serializeCanonical(value: unknown): string {
   if (serialized === undefined)
     throw new Error("canonical serialization requires a JSON value");
   return serialized;
-}
-
-function hexByte(value: number): string {
-  return value.toString(16).padStart(2, "0");
 }
 
 function sortObjectKeys(_key: string, value: unknown): unknown {

@@ -71,7 +71,7 @@ import {
 } from "../projects/default-project";
 import { prepareReturnPrivateChatsToDefault } from "../projects/case-project";
 import type { OnboardingControlRole } from "@seams/contracts";
-import { isPositiveInteger, isRecord } from "@seams/std";
+import { encodeBase64Url, isPositiveInteger, isRecord } from "@seams/std";
 
 export type ControlRole = OnboardingControlRole;
 export type AssignableControlRole = Exclude<ControlRole, "owner">;
@@ -1701,7 +1701,7 @@ export async function applyAccountServiceGrantRevocation(input: {
 export async function hashOpaqueSecret(value: string): Promise<string> {
   const bytes = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return bytesToBase64Url(new Uint8Array(digest));
+  return encodeBase64Url(new Uint8Array(digest));
 }
 
 function parseActiveControlSessionRow(
@@ -2121,18 +2121,7 @@ function portalHandleBase(name: string, fallback: string): string {
 function randomOpaqueToken(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  return bytesToBase64Url(bytes);
-}
-
-function bytesToBase64Url(bytes: Uint8Array): string {
-  let binary = "";
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary)
-    .replaceAll("+", "-")
-    .replaceAll("/", "_")
-    .replace(/=+$/u, "");
+  return encodeBase64Url(bytes);
 }
 
 function requireOrganisationEnvironment(

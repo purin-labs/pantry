@@ -25,7 +25,7 @@ import {
 import type { Settings } from "@seams/bakery-model/bakery";
 import type { ProductionScenarioRead } from "./production-scenario-api";
 import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { assertNever, isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
 import {
   readOvenSave,
   savedCellDefinitions,
@@ -39,7 +39,6 @@ import {
   type ResumableDocument,
 } from "@seams/production-simulation";
 import type { StrictUnion } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
 import { visitSharedArtifacts } from "@seams/production-simulation/simulator/shared-artifact-batches";
 import { parseApplianceWorkflow } from "@seams/bakery-model/bakery-appliance-workflow";
 
@@ -193,13 +192,8 @@ async function prepareSnapshot(
   snapshot: RunSnapshot,
 ): Promise<PreparedWorkspaceRun> {
   const content = new TextEncoder().encode(snapshot.content);
-  const digest = await crypto.subtle.digest("SHA-256", content);
-  const id = Array.from(new Uint8Array(digest), hexByte).join("");
+  const id = await sha256Hex(content);
   return Object.freeze({ kind: "inline", snapshot, id, bytes: content.length });
-}
-
-function hexByte(byte: number): string {
-  return byte.toString(16).padStart(2, "0");
 }
 
 type CheckSavedFile = (file: string) => Promise<void>;

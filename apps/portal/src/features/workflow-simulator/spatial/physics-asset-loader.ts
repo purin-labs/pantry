@@ -1,3 +1,4 @@
+import { sha256Hex } from "@seams/std";
 import type * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { enableShadowMeshes } from "./scene-lighting";
@@ -16,8 +17,7 @@ function fetchVerifiedBytes(
     const response = await fetch(url, signal ? { signal } : undefined);
     if (!response.ok) throw new Error("Unable to load workcell visual.");
     const bytes = await response.arrayBuffer();
-    const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
-    if (Array.from(digest, hexByte).join("") !== fingerprint) {
+    if ((await sha256Hex(bytes)) !== fingerprint) {
       throw new Error("Workcell visual fingerprint mismatch.");
     }
     return bytes;
@@ -46,8 +46,4 @@ export async function loadVisual(
   const gltf = await new GLTFLoader().parseAsync(bytes.slice(0), "");
   enableShadowMeshes(gltf.scene);
   return gltf.scene;
-}
-
-function hexByte(value: number): string {
-  return value.toString(16).padStart(2, "0");
 }

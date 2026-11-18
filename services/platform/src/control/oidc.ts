@@ -10,7 +10,8 @@ import {
 } from "../approval-authentication";
 import type { Result } from "../result";
 import type { VariantBy } from "@seams/type-utils";
-import { encodeBase64Url, isRecord } from "@seams/std";
+import { decodeBase64Url, encodeBase64Url, isRecord } from "@seams/std";
+import { paddedStandardBase64 } from "../lenient-base64";
 
 export type GoogleOidcConfig = {
   readonly clientId: string;
@@ -262,7 +263,7 @@ export async function verifyGoogleApprovalGrant(input: {
     return { ok: false, error: { code: "approval_grant_invalid" } };
   }
   const payload = parts[1];
-  const signature = decodeBase64UrlSafe(parts[2] ?? "");
+  const signature = decodeBase64Url(parts[2] ?? "");
   if (payload === undefined || signature === null) {
     return { ok: false, error: { code: "approval_grant_invalid" } };
   }
@@ -276,7 +277,7 @@ export async function verifyGoogleApprovalGrant(input: {
   if (!valid) {
     return { ok: false, error: { code: "approval_grant_invalid" } };
   }
-  const decoded = decodeBase64UrlSafe(payload);
+  const decoded = decodeBase64Url(payload);
   if (decoded === null) {
     return { ok: false, error: { code: "approval_grant_invalid" } };
   }
@@ -402,7 +403,7 @@ async function verifyGoogleIdToken(input: {
   const verified = await crypto.subtle.verify(
     "RSASSA-PKCS1-v1_5",
     key,
-    decodeBase64Url(parts[2] ?? ""),
+    decodeLenientBase64Url(parts[2] ?? ""),
     new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
   );
 
@@ -543,17 +544,18 @@ function parseRsaJwk(
 
 function decodeJson(encoded: string): unknown {
   try {
-    return JSON.parse(new TextDecoder().decode(decodeBase64Url(encoded)));
+    return JSON.parse(new TextDecoder().decode(decodeLenientBase64Url(encoded)));
   } catch {
     return null;
   }
 }
 
-function decodeBase64Url(encoded: string): Uint8Array {
-  const normalized = encoded.replaceAll("-", "+").replaceAll("_", "/");
-  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
-  const binary = atob(padded);
-  return Uint8Array.from(binary, charCode);
+/**
+ * Lenient base64url for the Google ID token: like atob it also takes padding
+ * and the standard alphabet, and it throws on input that atob refuses.
+ */
+function decodeLenientBase64Url(encoded: string): Uint8Array {
+  return Uint8Array.from(atob(paddedStandardBase64(encoded)), charCode);
 }
 
 function charCode(value: string): number {
@@ -662,7 +664,7 @@ function parseApprovalRedirectPath(path: string): {
 function parseApprovalChallengeMarker(
   raw: string,
 ): ApprovalActionBinding | null {
-  const decoded = decodeBase64UrlSafe(raw);
+  const decoded = decodeBase64Url(raw);
   if (decoded === null) {
     return null;
   }
@@ -763,13 +765,3 @@ async function importGrantKey(secret: string): Promise<CryptoKey> {
   );
 }
 
-function decodeBase64UrlSafe(encoded: string): Uint8Array | null {
-  if (!/^[A-Za-z0-9_-]+$/u.test(encoded)) {
-    return null;
-  }
-  try {
-    return decodeBase64Url(encoded);
-  } catch {
-    return null;
-  }
-}
