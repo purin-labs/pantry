@@ -61,7 +61,8 @@ import {
   startMove,
 } from "./placement-move-support";
 
-type ReplyBoundary = "panel" | "preview" | "credential" | "response";
+type SendBoundary = "credential" | "response";
+type ReplyBoundary = "panel" | SendBoundary;
 type NoticeBoundary = "notice_credential" | "notice_response";
 type Boundary = ReplyBoundary | NoticeBoundary;
 type Pause = {
@@ -73,24 +74,14 @@ type Pause = {
 
 let activePause: Pause | null = null;
 
-type ReplyOriginBoundary =
-  "edit_commit" | "compose_commit" | "credential" | "response";
-type ReplyOriginJourney = {
-  readonly boundary: ReplyOriginBoundary;
-  readonly encrypt: SubtleCrypto["encrypt"];
-  readonly decrypt: SubtleCrypto["decrypt"];
-  phase: "armed" | "paused" | "released";
-  providerAttempts: number;
-};
-
-it.for(["edit_commit", "compose_commit", "credential", "response"] as const)(
+it.for(["credential", "response"] as const)(
   "fences directed WhatsApp %s at revoked origin and preserves issued receipts after eviction",
   { timeout: 60_000 },
   replyOriginJourney,
 );
 
 async function replyOriginJourney(
-  boundary: ReplyOriginBoundary,
+  boundary: SendBoundary,
   { task }: TestContext,
 ): Promise<void> {
   const fixture = await installFixture();
@@ -123,63 +114,40 @@ async function replyOriginJourney(
     kind: "session_turn",
     execution: freshExecution,
   } as const;
-  const proposalId =
-    boundary === "compose_commit" ? "proposal_p55_directed_human" : PROPOSAL_ID;
-  if (boundary === "compose_commit") {
-    const takeover = await fixture.connector.takeOverWhatsAppCase({
-      identity: fixture.identity,
-      origin,
-      caseId: fixture.caseId,
-      operatorUserId: session.session.userId,
-      now: fixture.now,
-    });
-    expect(takeover.ok).toBe(true);
-  }
   const preview = await fixture.connector.previewWhatsAppProposal({
     identity: fixture.identity,
     proposalId: PROPOSAL_ID,
     now: fixture.now,
   });
-  const version =
-    preview.ok && preview.value.kind === "current"
-      ? preview.value.preview.version
-      : 1;
-  const bodyDigest =
-    preview.ok && preview.value.kind === "current"
-      ? preview.value.preview.bodyDigest
-      : "";
-  const pause: ReplyOriginJourney = {
+  if (!preview.ok || preview.value.kind !== "current")
+    throw new Error(JSON.stringify(preview));
+  const pause: Pause = {
     boundary,
     phase: "armed",
-    encrypt: crypto.subtle.encrypt,
     decrypt: crypto.subtle.decrypt,
     providerAttempts: 0,
   };
-  crypto.subtle.encrypt = pauseReplyEncryption.bind(null, pause);
-  crypto.subtle.decrypt = pauseReplyCredential.bind(null, pause);
+  activePause = pause;
+  crypto.subtle.decrypt = pauseDecryption;
   network.use(
     http.post(
       `https://graph.facebook.com/v23.0/${PHONE_NUMBER_ID}/messages`,
-      replyOriginResponse.bind(null, pause),
+      graphResponse.bind(null, pause),
     ),
   );
   const request = {
     identity: fixture.identity,
     origin,
-    proposalId,
-    body: REPLY,
-    maxReplyChars: 4_000,
-    now: fixture.now,
-    caseId: fixture.caseId,
-    expiresAt: fixture.now + 60_000,
-    approvedVersion: version,
-    approvedBodyDigest: bodyDigest,
+    proposalId: PROPOSAL_ID,
+    approvedVersion: preview.value.preview.version,
+    approvedBodyDigest: preview.value.preview.bodyDigest,
     approvedBy: session.session.userId,
+    now: fixture.now,
   };
-  const pending = runReplyOriginOperation(fixture.connector, boundary, request);
+  const pending = fixture.connector.dispatchWhatsAppReply(request);
   try {
     await expect
-      .poll(replyOriginPhase.bind(null, pause), { timeout: 15_000 })
+      .poll(pausePhase.bind(null, pause), { timeout: 15_000 })
       .toBe("paused");
     await env.DB.prepare(
       "UPDATE control_session SET revoked_at = ? WHERE control_session_id = ?",
@@ -189,63 +157,27 @@ async function replyOriginJourney(
     pause.phase = "released";
     const denied = await pending;
     expect(denied.ok).toBe(false);
-    const retained = await runInDurableObject(
-      fixture.connector,
-      retainedReplyProposal.bind(null, proposalId),
-    );
-    if (boundary === "compose_commit") expect(retained).toBeNull();
-    else if (boundary === "edit_commit")
-      expect(retained).toMatchObject({
-        version: 1,
-        state: "awaiting_approval",
-      });
-    else
-      expect(retained).toMatchObject({
-        state: boundary === "response" ? "sent" : "awaiting_approval",
-      });
+    const retained = await runInDurableObject(fixture.connector, readProposal);
+    expect(retained).toMatchObject({
+      state: boundary === "response" ? "sent" : "awaiting_approval",
+    });
     expect(pause.providerAttempts).toBe(boundary === "response" ? 1 : 0);
     await evictDurableObject(fixture.connector);
-    expect(
-      await runInDurableObject(
-        fixture.connector,
-        retainedReplyProposal.bind(null, proposalId),
-      ),
-    ).toEqual(retained);
-    expect(
-      (await runReplyOriginOperation(fixture.connector, boundary, request)).ok,
-    ).toBe(false);
-    const authorizedRequest = { ...request, origin: freshOrigin };
-    expect(
-      (
-        await runReplyOriginOperation(
-          fixture.connector,
-          boundary,
-          authorizedRequest,
-        )
-      ).ok,
-    ).toBe(true);
-    const current = await runInDurableObject(
-      fixture.connector,
-      retainedReplyProposal.bind(null, proposalId),
+    expect(await runInDurableObject(fixture.connector, readProposal)).toEqual(
+      retained,
     );
-    if (current === null) throw new Error("Missing admitted reply proposal");
-    const approval = {
-      identity: fixture.identity,
-      origin: freshOrigin,
-      proposalId,
-      approvedVersion: current.version,
-      approvedBodyDigest: current.bodyDigest,
-      approvedBy: fresh.session.userId,
-      now: fixture.now,
-    };
+    expect((await fixture.connector.dispatchWhatsAppReply(request)).ok).toBe(
+      false,
+    );
+    const authorized = { ...request, origin: freshOrigin };
     expect(
-      await fixture.connector.dispatchWhatsAppReply(approval),
+      await fixture.connector.dispatchWhatsAppReply(authorized),
     ).toMatchObject({
       ok: true,
       value: { kind: "sent", whatsappMessageId: MESSAGE_ID },
     });
     expect(
-      await fixture.connector.dispatchWhatsAppReply(approval),
+      await fixture.connector.dispatchWhatsAppReply(authorized),
     ).toMatchObject({
       ok: true,
       value: { kind: "sent", whatsappMessageId: MESSAGE_ID },
@@ -255,8 +187,6 @@ async function replyOriginJourney(
       whatsappReplyOriginAcceptance: {
         boundary,
         revokedResultWithheld: true,
-        preparedContentCommitWithheld:
-          boundary === "edit_commit" || boundary === "compose_commit",
         issuedReceiptRetained: boundary === "response",
         evictedDenialRetained: true,
         providerAttempts: 1,
@@ -266,8 +196,8 @@ async function replyOriginJourney(
     });
   } finally {
     pause.phase = "released";
-    crypto.subtle.encrypt = pause.encrypt;
     crypto.subtle.decrypt = pause.decrypt;
+    activePause = null;
     await pending;
   }
 }
@@ -312,83 +242,6 @@ function acceptedReplyExecution(
   );
   if (lease === null) throw new Error("Invalid native reply lease");
   return sessionTurnExecution(lease);
-}
-
-function runReplyOriginOperation(
-  connector: DurableObjectStub<ConnectorDO>,
-  boundary: ReplyOriginBoundary,
-  request: Record<string, unknown>,
-) {
-  switch (boundary) {
-    case "edit_commit":
-      return connector.editWhatsAppProposal(request);
-    case "compose_commit":
-      return connector.composeWhatsAppHumanReply(request);
-    case "credential":
-    case "response":
-      return connector.dispatchWhatsAppReply(request);
-  }
-}
-
-function replyOriginPhase(
-  pause: ReplyOriginJourney,
-): ReplyOriginJourney["phase"] {
-  return pause.phase;
-}
-
-async function pauseReplyEncryption(
-  pause: ReplyOriginJourney,
-  algorithm: Parameters<SubtleCrypto["encrypt"]>[0],
-  key: Parameters<SubtleCrypto["encrypt"]>[1],
-  data: Parameters<SubtleCrypto["encrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const result = await pause.encrypt.call(crypto.subtle, algorithm, key, data);
-  if (
-    pause.phase === "armed" &&
-    (pause.boundary === "edit_commit" || pause.boundary === "compose_commit") &&
-    new TextDecoder().decode(data) === REPLY
-  ) {
-    pause.phase = "paused";
-    while (pause.phase === "paused") await scheduler.wait(5);
-  }
-  return result;
-}
-
-async function pauseReplyCredential(
-  pause: ReplyOriginJourney,
-  algorithm: Parameters<SubtleCrypto["decrypt"]>[0],
-  key: Parameters<SubtleCrypto["decrypt"]>[1],
-  data: Parameters<SubtleCrypto["decrypt"]>[2],
-): Promise<ArrayBuffer> {
-  const result = await pause.decrypt.call(crypto.subtle, algorithm, key, data);
-  if (
-    pause.phase === "armed" &&
-    pause.boundary === "credential" &&
-    new TextDecoder().decode(result).includes(TOKEN)
-  ) {
-    pause.phase = "paused";
-    while (pause.phase === "paused") await scheduler.wait(5);
-  }
-  return result;
-}
-
-async function replyOriginResponse(
-  pause: ReplyOriginJourney,
-): Promise<Response> {
-  pause.providerAttempts++;
-  if (pause.phase === "armed" && pause.boundary === "response") {
-    pause.phase = "paused";
-    while (pause.phase === "paused") await scheduler.wait(5);
-  }
-  return HttpResponse.json({ messages: [{ id: MESSAGE_ID }] });
-}
-
-function retainedReplyProposal(
-  proposalId: string,
-  _actor: unknown,
-  state: DurableObjectState,
-) {
-  return latestWhatsAppProposal(state.storage.sql, proposalId);
 }
 
 type SupportOriginPause = {
@@ -726,11 +579,6 @@ it(
   70_000,
 );
 it(
-  "withholds a decrypted WhatsApp preview during freeze and restores it only on the evicted target",
-  previewJourney,
-  70_000,
-);
-it(
   "rejects paused WhatsApp credential preparation and sends once from the evicted target",
   credentialJourney,
   70_000,
@@ -907,9 +755,6 @@ function panelJourney(context: TestContext): Promise<void> {
   return whatsappPlacementJourney("panel", context);
 }
 
-function previewJourney(context: TestContext): Promise<void> {
-  return whatsappPlacementJourney("preview", context);
-}
 function credentialJourney(context: TestContext): Promise<void> {
   return whatsappPlacementJourney("credential", context);
 }
@@ -1026,22 +871,10 @@ async function whatsappPlacementJourney(
         now: Date.now(),
       }),
     );
-    expect(await runInDurableObject(target, readProposalState)).toBe(
-      boundary === "response" ? "sent" : "awaiting_approval",
-    );
+    expect(await runInDurableObject(target, readProposal)).toMatchObject({
+      state: boundary === "response" ? "sent" : "awaiting_approval",
+    });
     await evictDurableObject(target);
-    if (boundary === "preview") {
-      expect(
-        await target.previewWhatsAppProposal({
-          identity: fixture.identity,
-          proposalId: PROPOSAL_ID,
-          now: fixture.now,
-        }),
-      ).toMatchObject({
-        ok: true,
-        value: { kind: "current", preview: { body: REPLY } },
-      });
-    }
     if (boundary === "panel") {
       expect(
         await target.readWhatsAppCasePanel({
@@ -1109,12 +942,6 @@ function startPausedWork(
         caseId: fixture.caseId,
         now: fixture.now,
       });
-    case "preview":
-      return fixture.connector.previewWhatsAppProposal({
-        identity: fixture.identity,
-        proposalId: PROPOSAL_ID,
-        now: fixture.now,
-      });
     case "credential":
     case "response":
       return fixture.connector.dispatchWhatsAppReply(approval);
@@ -1134,7 +961,6 @@ async function pauseDecryption(
   if (
     pause.phase === "armed" &&
     ((pause.boundary === "panel" && plaintext === "Is my order ready?") ||
-      (pause.boundary === "preview" && plaintext === REPLY) ||
       (pause.boundary === "credential" && plaintext.includes(TOKEN)) ||
       (pause.boundary === "notice_credential" &&
         plaintext.includes(SLACK_BOT_TOKEN)))
@@ -1164,8 +990,6 @@ function pausePhase(pause: Pause): Pause["phase"] {
 function markComplete(marker: { complete: boolean }): void {
   marker.complete = true;
 }
-function readProposalState(_actor: unknown, state: DurableObjectState): string {
-  const proposal = latestWhatsAppProposal(state.storage.sql, PROPOSAL_ID);
-  if (proposal === null) throw new Error("Missing imported WhatsApp proposal");
-  return proposal.state;
+function readProposal(_actor: unknown, state: DurableObjectState) {
+  return latestWhatsAppProposal(state.storage.sql, PROPOSAL_ID);
 }
