@@ -554,11 +554,9 @@ export async function passOrAskForExitApproval(
         capabilityId: effect.capabilityId,
         integrationAccountId: effect.integrationAccountId,
         resourceScope: effect.resourceScope,
-        // Two actions of one turn are two requests. Another reason keeps the
-        // id that it had before Plan 89.
-        ...(input.reason === "outside_written"
-          ? { reason: input.reason, actionDigest: action?.digest ?? null }
-          : {}),
+        // Two actions of one turn are two requests.
+        reason: input.reason,
+        actionDigest: action?.digest ?? null,
       }),
     )
   ).slice(0, 32);

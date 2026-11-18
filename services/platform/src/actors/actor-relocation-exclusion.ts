@@ -144,9 +144,7 @@ function isActorObjectKind(
 ): value is ActorRelocationExclusion["objectKind"] {
   return (
     value === "organisation" ||
-    value === "surface" ||
     value === "session" ||
-    value === "thread" ||
     value === "case" ||
     value === "connector"
   );

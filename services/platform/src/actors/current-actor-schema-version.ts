@@ -5,8 +5,6 @@ import {
   CASE_ACTOR_SCHEMA_VERSION,
   CONNECTOR_ACTOR_SCHEMA_VERSION,
   ORGANISATION_ACTOR_SCHEMA_VERSION,
-  SURFACE_ACTOR_SCHEMA_VERSION,
-  THREAD_ACTOR_SCHEMA_VERSION,
 } from "./actor-schema-versions";
 
 export function currentActorSchemaVersion(
@@ -15,12 +13,8 @@ export function currentActorSchemaVersion(
   switch (objectKind) {
     case "organisation":
       return ORGANISATION_ACTOR_SCHEMA_VERSION;
-    case "surface":
-      return SURFACE_ACTOR_SCHEMA_VERSION;
     case "session":
       return CANONICAL_SESSION_SCHEMA_VERSION;
-    case "thread":
-      return THREAD_ACTOR_SCHEMA_VERSION;
     case "case":
       return CASE_ACTOR_SCHEMA_VERSION;
     case "connector":

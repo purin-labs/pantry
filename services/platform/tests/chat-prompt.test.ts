@@ -12,12 +12,16 @@ describe("portal chat prompt", function portalChatPromptSuite() {
         provider: "openai-compatible",
         model: "test-model",
       },
-      messages: Array.from({ length: 12 }, function userMessage(_, index) {
+      timeline: Array.from({ length: 12 }, function userEvent(_, index) {
+        const text = `${index}:${"request ".repeat(1_000)}`;
         return {
           kind: "user" as const,
-          id: `message_prompt_${index}`,
-          text: `${index}:${"request ".repeat(1_000)}`,
-          surfaceContext: null,
+          eventId: `message_prompt_${index}`,
+          sequence: index + 1,
+          requestId: `message_prompt_${index}`,
+          createdAt: index + 1,
+          text,
+          parts: [{ kind: "text" as const, text }],
         };
       }),
       documents: [
@@ -32,7 +36,7 @@ describe("portal chat prompt", function portalChatPromptSuite() {
       work: { kind: "ready" },
       surfaceEventCursor: 0,
       pendingInputs: [],
-      latestSequence: 0,
+      latestSequence: 12,
       lastReadSequence: 0,
       draftText: "",
       draftUpdatedAt: null,

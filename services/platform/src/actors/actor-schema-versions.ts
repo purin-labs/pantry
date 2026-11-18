@@ -4,7 +4,5 @@
  * The Session's version lives with its schema.
  */
 export const ORGANISATION_ACTOR_SCHEMA_VERSION = 10;
-export const SURFACE_ACTOR_SCHEMA_VERSION = 14;
-export const THREAD_ACTOR_SCHEMA_VERSION = 1;
 export const CASE_ACTOR_SCHEMA_VERSION = 2;
 export const CONNECTOR_ACTOR_SCHEMA_VERSION = 2;

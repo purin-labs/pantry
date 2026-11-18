@@ -23,12 +23,10 @@ import {
   type ActorIdentity,
 } from "../src/actors/actor-registry";
 import {
-  parseChannelId,
   parseCaseId,
   parseConnectorId,
   parseSessionId,
   parseOrganisationId,
-  parseThreadId,
   type OrganisationId,
 } from "../src/ids";
 import { parseOrganisationPlacement } from "../src/placement";
@@ -458,15 +456,11 @@ describe("actor registry", function actorRegistrySuite() {
 
     expect(physicalNames(identities, initial)).toEqual([
       "organisation_registry_names",
-      "organisation_registry_names:channel_registry_names",
       "organisation_registry_names:session_registry_names",
-      "organisation_registry_names:thread_registry_names",
     ]);
     expect(physicalNames(identities, relocated)).toEqual([
       "organisation_registry_names:p2",
-      "organisation_registry_names:channel_registry_names:p2",
       "organisation_registry_names:session_registry_names:p2",
-      "organisation_registry_names:thread_registry_names:p2",
     ]);
   });
 
@@ -877,11 +871,9 @@ function physicalNames(
 
 function registryIdentities(): readonly ActorIdentity[] {
   const organisationId = parseOrganisationId("organisation_registry_names");
-  const channelId = parseChannelId("channel_registry_names");
   const sessionId = parseSessionId("session_registry_names");
-  const threadId = parseThreadId("thread_registry_names");
 
-  if (!organisationId.ok || !channelId.ok || !sessionId.ok || !threadId.ok) {
+  if (!organisationId.ok || !sessionId.ok) {
     throw new Error("registry naming fixture invariant failed");
   }
 
@@ -892,19 +884,9 @@ function registryIdentities(): readonly ActorIdentity[] {
       logicalObjectId: organisationId.value,
     },
     {
-      objectKind: "surface",
-      organisationId: organisationId.value,
-      logicalObjectId: channelId.value,
-    },
-    {
       objectKind: "session",
       organisationId: organisationId.value,
       logicalObjectId: sessionId.value,
-    },
-    {
-      objectKind: "thread",
-      organisationId: organisationId.value,
-      logicalObjectId: threadId.value,
     },
   ];
 }

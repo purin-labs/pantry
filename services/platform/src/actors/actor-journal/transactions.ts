@@ -594,9 +594,8 @@ export function acceptedInputCaseIdentityMatchesBundle(
   bundle: StoredContextBundle,
 ): boolean {
   return (
-    acceptedInput.kind === "thread" ||
-    (acceptedInput.caseId === bundle.caseId &&
-      acceptedInput.assignmentId === bundle.assignmentId)
+    acceptedInput.caseId === bundle.caseId &&
+    acceptedInput.assignmentId === bundle.assignmentId
   );
 }
 

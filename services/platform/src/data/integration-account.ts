@@ -2139,15 +2139,10 @@ function requireProviderConnectionRow(
     typeof row.authorizationProduct === "string"
       ? parseGmailAuthorizationProduct(row.authorizationProduct)
       : null;
-  const legacyFullMailboxScopes =
-    grantedScopes.length === 2 &&
-    grantedScopes.includes("openid") &&
-    grantedScopes.includes("email");
   const gmailProduct =
     provider === "gmail" &&
     gmailProductFromScopes(grantedScopes) === null &&
-    (persistedProduct === "full_mailbox_pilot" ||
-      (row.authorizationProduct === "standard" && legacyFullMailboxScopes))
+    persistedProduct === "full_mailbox_pilot"
       ? "full_mailbox_pilot"
       : provider === "gmail"
         ? gmailProductFromScopes(grantedScopes)

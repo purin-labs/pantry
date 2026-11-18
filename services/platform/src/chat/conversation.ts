@@ -44,9 +44,6 @@ import {
 import type { Result } from "../result";
 import { parseSessionId, type SessionId } from "../ids";
 import {
-  buildAssistantTimelineEvent,
-  buildTextTimelineEvent,
-  buildUserTimelineEvent,
   parseChatTimelineEvent,
   parseInputParts,
   type ChatInputPart,
@@ -540,23 +537,6 @@ function commandScreen(
   return { observation: merged, kitchen: kitchenAttachment(merged) };
 }
 
-function legacyUserParts(
-  message: Variant<ChatMessage, "user">,
-): readonly ChatInputPart[] {
-  const observation = withOldKitchenAttachment(
-    undefined,
-    message.surfaceContext,
-    message.browserContext,
-  );
-  return [
-    { kind: "text", text: message.text },
-    ...(observation === undefined
-      ? []
-      : [{ kind: "surface_observation" as const, observation }]),
-    { kind: "browser", context: message.browserContext },
-  ];
-}
-
 function parseSurfaceContext(
   raw: unknown,
 ): BakerySurfaceAttachmentV1 | null | undefined {
@@ -588,65 +568,11 @@ export function parseConversation(raw: unknown): Conversation {
     !isRecord(raw) ||
     !isConversationId(raw.id) ||
     typeof raw.title !== "string" ||
-    (!Array.isArray(raw.messages) && !Array.isArray(raw.timeline)) ||
+    !Array.isArray(raw.timeline) ||
     !Array.isArray(raw.documents) ||
     !Array.isArray(raw.completedRequests)
   )
     throw new Error("conversation_storage_invalid");
-  const messages: ChatMessage[] = [];
-  const rawMessages = Array.isArray(raw.messages) ? raw.messages : [];
-  for (const message of rawMessages) {
-    if (
-      !isRecord(message) ||
-      typeof message.id !== "string" ||
-      typeof message.text !== "string"
-    )
-      throw new Error("conversation_message_invalid");
-    switch (message.kind) {
-      case "user":
-        {
-          const surfaceContext = parseStoredSurfaceContext(
-            message.surfaceContext,
-          );
-          if (surfaceContext === undefined)
-            throw new Error("conversation_message_invalid");
-          messages.push({
-            kind: "user",
-            id: message.id,
-            text: message.text,
-            browserContext:
-              message.browserContext === undefined
-                ? { kind: "unavailable" }
-                : requireStoredBrowserContext(message.browserContext),
-            surfaceContext,
-            attachments: [],
-          });
-        }
-        break;
-      case "assistant":
-      case "activity":
-      case "context":
-        messages.push({
-          kind: message.kind,
-          id: message.id,
-          text: message.text,
-        });
-        break;
-      case "connector":
-        if (!isRecord(message.document))
-          throw new Error("conversation_connector_invalid");
-        messages.push({
-          kind: "connector",
-          id: message.id,
-          text: message.text,
-          document: message.document,
-          target: parseCardTarget(message.target),
-        });
-        break;
-      default:
-        throw new Error("conversation_message_invalid");
-    }
-  }
   const documents: ConnectorDocumentation[] = [];
   for (const document of raw.documents) {
     if (
@@ -669,13 +595,7 @@ export function parseConversation(raw: unknown): Conversation {
     if (!isChatId(id)) throw new Error("conversation_request_invalid");
     completedRequests.push(id);
   }
-  const timeline = parseStoredTimeline(raw.timeline, messages);
-  const projectedMessages =
-    messages.length === 0 && timeline.length > 0
-      ? timelineVisibleMessagesFromEvents(timeline)
-      : messages;
-  if (!timelineMatchesMessages(timeline, projectedMessages))
-    throw new Error("conversation_timeline_projection_invalid");
+  const timeline = parseStoredTimeline(raw.timeline);
   const latestSequence = parseSequence(
     raw.latestSequence,
     latestTimelineSequence(timeline),
@@ -786,21 +706,12 @@ export function timelineVisibleMessages(
 }
 
 function parseStoredModelRoute(raw: JsonRecord): ModelRoute {
-  const value: unknown =
-    raw.modelRoute ??
-    (typeof raw.modelFingerprint === "string"
-      ? JSON.parse(raw.modelFingerprint)
-      : null);
-  const route = parseSessionModelRoute(value);
+  const route = parseSessionModelRoute(raw.modelRoute);
   if (!route.ok) throw new Error("conversation_model_invalid");
   return route.value;
 }
 
-function parseStoredTimeline(
-  raw: unknown,
-  messages: readonly ChatMessage[],
-): readonly ChatTimelineEvent[] {
-  if (raw === undefined) return legacyTimeline(messages);
+function parseStoredTimeline(raw: unknown): readonly ChatTimelineEvent[] {
   if (!Array.isArray(raw)) throw new Error("conversation_timeline_invalid");
   const events: ChatTimelineEvent[] = [];
   let previous = -1;
@@ -813,7 +724,7 @@ function parseStoredTimeline(
     previous = parsed.value.sequence;
     events.push(parsed.value);
   }
-  return normalizeStoredTimelineEventIds(events, messages);
+  return events;
 }
 
 function normalizeStoredSurfaceParts(raw: unknown): unknown {
@@ -844,15 +755,6 @@ function normalizeStoredSurfaceParts(raw: unknown): unknown {
   return { ...raw, parts };
 }
 
-function parseStoredSurfaceContext(
-  raw: unknown,
-): BakerySurfaceAttachmentV1 | null | undefined {
-  const parsed = parseSurfaceContext(raw);
-  return parsed === undefined && historicalSurfaceText(raw) !== null
-    ? null
-    : parsed;
-}
-
 function historicalSurfaceText(raw: unknown): string | null {
   if (
     !isRecord(raw) ||
@@ -865,120 +767,6 @@ function historicalSurfaceText(raw: unknown): string | null {
   )
     return null;
   return `Historical Kitchen context (read-only snapshot):\n${JSON.stringify(raw)}`;
-}
-
-function normalizeStoredTimelineEventIds(
-  events: readonly ChatTimelineEvent[],
-  messages: readonly ChatMessage[],
-): readonly ChatTimelineEvent[] {
-  const visible = timelineVisibleMessagesFromEvents(events);
-  if (
-    visible.length !== messages.length ||
-    !visible.every(messageContentMatches.bind(null, messages))
-  )
-    return events;
-  let visibleIndex = 0;
-  const normalized: ChatTimelineEvent[] = [];
-  for (const event of events) {
-    if (!timelineEventIsVisible(event)) {
-      normalized.push(event);
-      continue;
-    }
-    const message = messages[visibleIndex];
-    visibleIndex += 1;
-    normalized.push(
-      message === undefined || event.eventId === message.id
-        ? event
-        : { ...event, eventId: message.id },
-    );
-  }
-  return normalized;
-}
-
-function messageContentMatches(
-  messages: readonly ChatMessage[],
-  message: ChatMessage,
-  index: number,
-): boolean {
-  const expected = messages[index];
-  return (
-    expected !== undefined &&
-    message.kind === expected.kind &&
-    message.text === expected.text
-  );
-}
-
-function timelineEventIsVisible(event: ChatTimelineEvent): boolean {
-  switch (event.kind) {
-    case "user":
-    case "assistant":
-    case "activity":
-    case "context":
-    case "progress":
-    case "connector":
-    case "run_failed":
-    case "run_cancelled":
-      return true;
-    case "tool_started":
-    case "tool_settled":
-    case "approval":
-    case "receipt":
-      return false;
-    default:
-      throw new Error(`conversation_timeline_event_unhandled:${String(event)}`);
-  }
-}
-
-function legacyTimeline(
-  messages: readonly ChatMessage[],
-): readonly ChatTimelineEvent[] {
-  const events: ChatTimelineEvent[] = [];
-  messages.forEach(function convert(message, index) {
-    const base = {
-      eventId: message.id,
-      sequence: index + 1,
-      requestId: message.id,
-      createdAt: index + 1,
-    };
-    switch (message.kind) {
-      case "user":
-        events.push(
-          buildUserTimelineEvent({
-            ...base,
-            text: message.text,
-            parts: legacyUserParts(message),
-          }),
-        );
-        break;
-      case "assistant":
-        events.push(
-          buildAssistantTimelineEvent({ ...base, text: message.text }),
-        );
-        break;
-      case "activity":
-      case "context":
-        events.push(
-          buildTextTimelineEvent({
-            ...base,
-            kind: message.kind,
-            text: message.text,
-          }),
-        );
-        break;
-      case "connector":
-        events.push({
-          ...base,
-          kind: "connector",
-          text: message.text,
-          document: message.document,
-          target: message.target,
-        });
-        break;
-      default:
-        throw new Error(`conversation_message_unhandled:${String(message)}`);
-    }
-  });
-  return events;
 }
 
 function parseSequence(raw: unknown, fallback: number): number {
@@ -1032,24 +820,6 @@ function latestTimelineSequence(
 ): number {
   const last = timeline[timeline.length - 1];
   return last === undefined ? 0 : last.sequence;
-}
-
-function timelineMatchesMessages(
-  timeline: readonly ChatTimelineEvent[],
-  messages: readonly ChatMessage[],
-): boolean {
-  const visible = timelineVisibleMessagesFromEvents(timeline);
-  if (visible.length !== messages.length) return false;
-  return visible.every(function matches(message, index) {
-    const expected = messages[index];
-    return (
-      expected !== undefined &&
-      message.id === expected.id &&
-      message.kind === expected.kind &&
-      message.text === expected.text &&
-      userSurfaceDigest(message) === userSurfaceDigest(expected)
-    );
-  });
 }
 
 function timelineVisibleMessagesFromEvents(
@@ -1127,12 +897,6 @@ function surfaceContextFromParts(
     if (part.kind === "surface_observation")
       return kitchenAttachment(part.observation);
   return null;
-}
-
-function userSurfaceDigest(message: ChatMessage): string | null {
-  return message.kind === "user"
-    ? (message.surfaceContext?.digest ?? null)
-    : null;
 }
 
 function parseConversationRecovery(
@@ -1431,34 +1195,9 @@ export function personDocumentationLinks(
   return [...links];
 }
 
-function parseCardTarget(raw: unknown): ConnectorCardTarget {
-  if (!isRecord(raw)) throw new Error("conversation_card_target_invalid");
-  if (raw.kind === "new") return { kind: "new" };
-  const id = parseCustomConnectorId(raw.connectorId);
-  if (
-    raw.kind === "revision" &&
-    id.ok &&
-    typeof raw.expectedHeadRevision === "number" &&
-    Number.isSafeInteger(raw.expectedHeadRevision) &&
-    raw.expectedHeadRevision > 0
-  )
-    return {
-      kind: "revision",
-      connectorId: id.value,
-      expectedHeadRevision: raw.expectedHeadRevision,
-    };
-  throw new Error("conversation_card_target_invalid");
-}
-
 export function browserContextFromParts(
   parts: readonly ChatInputPart[],
 ): BakeryBrowserContext {
   for (const part of parts) if (part.kind === "browser") return part.context;
   return { kind: "unavailable" };
-}
-
-function requireStoredBrowserContext(raw: unknown): BakeryBrowserContext {
-  const context = parseBakeryBrowserContext(raw);
-  if (context === null) throw new Error("conversation_message_invalid");
-  return context;
 }

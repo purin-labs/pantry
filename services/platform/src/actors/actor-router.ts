@@ -757,11 +757,6 @@ export function actorStubForRegistryEntry(input: {
         input.entry.physicalObjectName,
         input.entry.placement,
       );
-    case "surface":
-    case "thread":
-      throw new Error(
-        `historical_actor_runtime_deleted:${input.entry.identity.objectKind}`,
-      );
     default:
       return assertNever(input.entry.identity);
   }

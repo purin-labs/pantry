@@ -1925,10 +1925,11 @@ function inputAcceptedEvent(
     body: {
       kind: "input_accepted",
       input: {
-        kind: "thread",
+        kind: "case",
         inputId: "input_1",
-        threadActorId: "thread_1",
-        threadBlockId: "block_1",
+        caseId: "case_1",
+        assignmentId: "assignment_1",
+        caseRevision: 1,
         contentDigest:
           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         workspaceRevision: "workspace_1",

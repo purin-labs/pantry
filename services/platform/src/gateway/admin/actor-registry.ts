@@ -879,8 +879,6 @@ export function actorSchemaAdvanceStub(
         entry.placement,
       );
     case "session":
-    case "surface":
-    case "thread":
     case "case":
       throw new Error(
         `actor_schema_advance_unsupported:${entry.identity.objectKind}`,

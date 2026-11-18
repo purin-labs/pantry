@@ -209,32 +209,6 @@ function parseToolResult(
 function parseAcceptedInputRef(value: unknown): AcceptedInputRef | null {
   if (!isRecord(value) || typeof value.kind !== "string") return null;
   if (!isSha256Digest(value.contextBundleDigest)) return null;
-  if (value.kind === "thread") {
-    return hasExactKeys(value, [
-      "kind",
-      "inputId",
-      "threadActorId",
-      "threadBlockId",
-      "contentDigest",
-      "workspaceRevision",
-      "contextBundleDigest",
-    ]) &&
-      isNonEmptyString(value.inputId) &&
-      isNonEmptyString(value.threadActorId) &&
-      isNonEmptyString(value.threadBlockId) &&
-      isSha256Digest(value.contentDigest) &&
-      isNonEmptyString(value.workspaceRevision)
-      ? {
-          kind: "thread",
-          inputId: value.inputId,
-          threadActorId: value.threadActorId,
-          threadBlockId: value.threadBlockId,
-          contentDigest: value.contentDigest,
-          workspaceRevision: value.workspaceRevision,
-          contextBundleDigest: value.contextBundleDigest,
-        }
-      : null;
-  }
   if (value.kind === "case") {
     return hasExactKeys(value, [
       "kind",

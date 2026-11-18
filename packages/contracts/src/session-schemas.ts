@@ -315,14 +315,6 @@ export const agentSessionLifecycleSchema = Type.Union([
 ]);
 
 export const acceptedInputRefSchema = Type.Union([
-  variant("thread", {
-    inputId: actorId(),
-    threadActorId: text("bounded_identity"),
-    threadBlockId: actorId(),
-    contentDigest: sha256(),
-    workspaceRevision: actorId(),
-    contextBundleDigest: sha256(),
-  }),
   variant("case", {
     inputId: actorId(),
     caseId: actorId(),

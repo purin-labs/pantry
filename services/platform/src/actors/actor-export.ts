@@ -1,10 +1,8 @@
 import {
-  parseChannelId,
   parseCaseId,
   parseConnectorId,
   parseSessionId,
   parseOrganisationId,
-  parseThreadId,
   type OrganisationId,
 } from "../ids";
 import type { Result } from "../result";
@@ -1800,19 +1798,6 @@ function parseRawExportIdentity(
             },
           }
         : { ok: false, error: { code: "export_manifest_corrupt" } };
-    case "surface": {
-      const id = parseChannelId(value.logicalObjectId);
-      return id.ok
-        ? {
-            ok: true,
-            value: {
-              objectKind: "surface",
-              organisationId: organisationId.value,
-              logicalObjectId: id.value,
-            },
-          }
-        : { ok: false, error: { code: "export_manifest_corrupt" } };
-    }
     case "session": {
       const id = parseSessionId(value.logicalObjectId);
       return id.ok
@@ -1820,19 +1805,6 @@ function parseRawExportIdentity(
             ok: true,
             value: {
               objectKind: "session",
-              organisationId: organisationId.value,
-              logicalObjectId: id.value,
-            },
-          }
-        : { ok: false, error: { code: "export_manifest_corrupt" } };
-    }
-    case "thread": {
-      const id = parseThreadId(value.logicalObjectId);
-      return id.ok
-        ? {
-            ok: true,
-            value: {
-              objectKind: "thread",
               organisationId: organisationId.value,
               logicalObjectId: id.value,
             },

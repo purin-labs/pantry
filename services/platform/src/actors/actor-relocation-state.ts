@@ -233,8 +233,6 @@ export function inspectActorRelocationReadiness(
         WHERE json_extract(state_json, '$.kind') = 'sending' AND ? = 'quiescent' LIMIT 1`);
       break;
     case "case":
-    case "surface":
-    case "thread":
       break;
     default:
       return assertNever(activation.value.identity);

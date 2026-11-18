@@ -339,10 +339,11 @@ const validCommandEnvelope: CommandEnvelope<TestCommand> = {
 const acceptedInputCommand: SessionCommand = {
   kind: "accept_input",
   input: {
-    kind: "thread",
+    kind: "case",
     inputId: "input_1",
-    threadActorId: "thread_1",
-    threadBlockId: "block_1",
+    caseId: "case_1",
+    assignmentId: "assignment_1",
+    caseRevision: 1,
     contentDigest:
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     workspaceRevision: "workspace_1",
@@ -357,9 +358,11 @@ const invalidAcceptedInputCommand: SessionCommand = {
   kind: "accept_input",
   // @ts-expect-error Accepted input commands require canonical content provenance.
   input: {
+    kind: "case",
     inputId: "input_1",
-    threadActorId: "thread_1",
-    threadBlockId: "block_1",
+    caseId: "case_1",
+    assignmentId: "assignment_1",
+    caseRevision: 1,
     workspaceRevision: "workspace_1",
   },
   turnId: "turn_1",

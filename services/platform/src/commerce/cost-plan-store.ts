@@ -266,7 +266,7 @@ export async function saveOrganisationCostPlan(
       ),
     ];
 
-    const batchResults = await executeCostPlanBatch(input.db, statements);
+    const batchResults = await input.db.batch(statements);
     if ((batchResults[0]?.meta.changes ?? 0) !== 1) {
       return { ok: false, code: "cost_plan_changed" };
     }
@@ -335,7 +335,7 @@ export async function saveOrganisationCostPlan(
     ),
   ];
 
-  const batchResults = await executeCostPlanBatch(input.db, statements);
+  const batchResults = await input.db.batch(statements);
   if ((batchResults[0]?.meta.changes ?? 0) !== 1) {
     return { ok: false, code: "cost_plan_changed" };
   }
@@ -459,38 +459,6 @@ function buildGuardedProductStatements(
   }
 
   return statements;
-}
-
-async function executeCostPlanBatch(
-  db: OrganisationDatabase,
-  statements: D1PreparedStatement[],
-): Promise<D1Result[]> {
-  try {
-    return await db.batch(statements);
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (
-      msg.includes("cogs_override_minor") ||
-      msg.includes("waste_override_minor") ||
-      msg.includes("formulas_json") ||
-      msg.includes("forecast_json")
-    ) {
-      for (const sql of [
-        `ALTER TABLE bakery_cost_plan ADD COLUMN forecast_json TEXT`,
-        `ALTER TABLE bakery_cost_product_plan ADD COLUMN cogs_override_minor INTEGER CHECK (cogs_override_minor IS NULL OR cogs_override_minor >= 0)`,
-        `ALTER TABLE bakery_cost_product_plan ADD COLUMN waste_override_minor INTEGER CHECK (waste_override_minor IS NULL OR waste_override_minor >= 0)`,
-        `ALTER TABLE bakery_cost_product_plan ADD COLUMN formulas_json TEXT`,
-      ]) {
-        try {
-          await db.prepare(sql).run();
-        } catch {
-          // Column already present.
-        }
-      }
-      return await db.batch(statements);
-    }
-    throw error;
-  }
 }
 
 function normalizeProductEntry(

@@ -5,17 +5,13 @@ import type {
 import { samePlacement } from "../data/organisation-placement";
 import {
   parseCaseId,
-  parseChannelId,
   parseConnectorId,
   parseSessionId,
   parseOrganisationId,
-  parseThreadId,
-  type ChannelId,
   type CaseId,
   type ConnectorId,
   type SessionId,
   type OrganisationId,
-  type ThreadId,
 } from "../ids";
 import {
   parseOrganisationPlacement,
@@ -62,19 +58,9 @@ export type ActorIdentity =
       readonly logicalObjectId: OrganisationId;
     }
   | {
-      readonly objectKind: "surface";
-      readonly organisationId: OrganisationId;
-      readonly logicalObjectId: ChannelId;
-    }
-  | {
       readonly objectKind: "session";
       readonly organisationId: OrganisationId;
       readonly logicalObjectId: SessionId;
-    }
-  | {
-      readonly objectKind: "thread";
-      readonly organisationId: OrganisationId;
-      readonly logicalObjectId: ThreadId;
     }
   | {
       readonly objectKind: "case";
@@ -1179,9 +1165,7 @@ export function initialActorPhysicalName(identity: ActorIdentity): string {
   switch (identity.objectKind) {
     case "organisation":
       return identity.organisationId;
-    case "surface":
     case "session":
-    case "thread":
     case "case":
     case "connector":
       return `${identity.organisationId}:${identity.logicalObjectId}`;
@@ -1420,34 +1404,8 @@ function parseActorIdentity(
             },
           }
         : corruptRegistry();
-    case "surface": {
-      const logicalObjectId = parseChannelId(row.logicalObjectId);
-      return logicalObjectId.ok
-        ? {
-            ok: true,
-            value: {
-              objectKind: row.objectKind,
-              organisationId: organisationId.value,
-              logicalObjectId: logicalObjectId.value,
-            },
-          }
-        : corruptRegistry();
-    }
     case "session": {
       const logicalObjectId = parseSessionId(row.logicalObjectId);
-      return logicalObjectId.ok
-        ? {
-            ok: true,
-            value: {
-              objectKind: row.objectKind,
-              organisationId: organisationId.value,
-              logicalObjectId: logicalObjectId.value,
-            },
-          }
-        : corruptRegistry();
-    }
-    case "thread": {
-      const logicalObjectId = parseThreadId(row.logicalObjectId);
       return logicalObjectId.ok
         ? {
             ok: true,

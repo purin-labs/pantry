@@ -9,12 +9,10 @@ import {
 } from "./actor-export";
 import type { Env } from "../env";
 import {
-  parseChannelId,
   parseCaseId,
   parseConnectorId,
   parseSessionId,
   parseOrganisationId,
-  parseThreadId,
   type OrganisationId,
 } from "../ids";
 import type { Result } from "../result";
@@ -466,46 +464,12 @@ function parseRestoreIdentity(
             },
           }
         : invalidManifest(`objects[${index}].identity.logicalObjectId`);
-    case "surface": {
-      if (typeof raw.logicalObjectId !== "string") {
-        return invalidManifest(`objects[${index}].identity.logicalObjectId`);
-      }
-
-      const logicalObjectId = parseChannelId(raw.logicalObjectId);
-      return logicalObjectId.ok
-        ? {
-            ok: true,
-            value: {
-              objectKind: raw.objectKind,
-              organisationId,
-              logicalObjectId: logicalObjectId.value,
-            },
-          }
-        : invalidManifest(`objects[${index}].identity.logicalObjectId`);
-    }
     case "session": {
       if (typeof raw.logicalObjectId !== "string") {
         return invalidManifest(`objects[${index}].identity.logicalObjectId`);
       }
 
       const logicalObjectId = parseSessionId(raw.logicalObjectId);
-      return logicalObjectId.ok
-        ? {
-            ok: true,
-            value: {
-              objectKind: raw.objectKind,
-              organisationId,
-              logicalObjectId: logicalObjectId.value,
-            },
-          }
-        : invalidManifest(`objects[${index}].identity.logicalObjectId`);
-    }
-    case "thread": {
-      if (typeof raw.logicalObjectId !== "string") {
-        return invalidManifest(`objects[${index}].identity.logicalObjectId`);
-      }
-
-      const logicalObjectId = parseThreadId(raw.logicalObjectId);
       return logicalObjectId.ok
         ? {
             ok: true,

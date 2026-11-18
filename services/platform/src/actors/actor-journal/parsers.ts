@@ -346,36 +346,7 @@ export function parseAcceptedInputEnvelope(
       },
     };
   }
-  if (
-    input.kind !== "thread" ||
-    !hasExactKeys(input, [
-      "kind",
-      "inputId",
-      "threadActorId",
-      "threadBlockId",
-      "contentDigest",
-      "workspaceRevision",
-      "contextBundleDigest",
-    ]) ||
-    !isNonEmptyString(input.threadActorId) ||
-    !isNonEmptyString(input.threadBlockId) ||
-    typeof input.contentDigest !== "string" ||
-    !/^[0-9a-f]{64}$/u.test(input.contentDigest) ||
-    !isNonEmptyString(input.workspaceRevision)
-  )
-    return { ok: false, error: { code: "invalid_persisted_state" } };
-  return {
-    ok: true,
-    value: {
-      kind: "thread",
-      inputId: lookup.inputId,
-      threadActorId: input.threadActorId,
-      threadBlockId: input.threadBlockId,
-      contentDigest: input.contentDigest,
-      workspaceRevision: input.workspaceRevision,
-      contextBundleDigest: input.contextBundleDigest,
-    },
-  };
+  return { ok: false, error: { code: "invalid_persisted_state" } };
 }
 
 export function serializeContextBundle(bundle: StoredContextBundle): unknown {

@@ -552,13 +552,13 @@ function readyConversation(id: string, title: string) {
   return parseConversation({
     id,
     title,
-    modelFingerprint: JSON.stringify({
+    modelRoute: {
       keySource: "organisation_byo",
       provider: "openai",
       model: "test-model",
       byoKeyRef: "vault_model",
-    }),
-    messages: [],
+    },
+    timeline: [],
     documents: [],
     completedRequests: [],
     work: { kind: "ready" },
@@ -652,66 +652,16 @@ describe("persistent portal chat", function chatSuite() {
     expect(JSON.stringify(body.emailReviews)).not.toContain("body");
   });
 
-  it("normalizes prior message IDs without dropping accepted tool history", function migratesTimelineIds() {
-    const conversation = parseConversation({
-      id: "conv_4754b060-cbaf-5c6b-a360-07cef0cfc19e",
-      title: "Legacy timeline",
-      modelRoute: {
-        keySource: "platform",
-        provider: "openai-compatible",
-        model: "test-model",
-      },
-      messages: [
-        { kind: "user", id: "request_legacy", text: "Read the API docs." },
-      ],
-      documents: [],
-      completedRequests: [],
-      work: { kind: "ready" },
-      timeline: [
-        {
-          kind: "user",
-          eventId:
-            "legacy-conv_4754b060-cbaf-5c6b-a360-07cef0cfc19e-0-request_legacy",
-          sequence: 1,
-          requestId: "request_legacy",
-          createdAt: 1,
-          text: "Read the API docs.",
-          parts: [{ kind: "text", text: "Read the API docs." }],
-        },
-        {
-          kind: "tool_started",
-          eventId: "tool_legacy",
-          sequence: 2,
-          requestId: "request_legacy",
-          createdAt: 2,
-          tool: {
-            toolCallId: "tool_call_legacy",
-            action: "Read documentation",
-            object: "API documentation",
-            destination: "example.com",
-            risk: "read",
-            detailsExpandable: true,
-          },
-        },
-      ],
-    });
-    expect(conversationTimeline(conversation)).toMatchObject([
-      { kind: "user", eventId: "request_legacy" },
-      { kind: "tool_started", eventId: "tool_legacy" },
-    ]);
-  });
-
   it("pins, archives, and restores private conversations idempotently", async function managesConversationDirectory() {
     const first = parseConversation({
       id: "conv_73ab3e3e-12cf-50ce-941e-f64df2c6ed27",
       title: "First chat",
-      modelFingerprint: JSON.stringify({
+      modelRoute: {
         keySource: "organisation_byo",
         provider: "openai",
         model: "test-model",
         byoKeyRef: "vault_model",
-      }),
-      messages: [],
+      },
       documents: [],
       work: { kind: "ready" as const },
       completedRequests: [],
@@ -728,7 +678,6 @@ describe("persistent portal chat", function chatSuite() {
       id: "conv_52f2bc55-f9ee-5ff8-9116-89c8e274b69a",
       title: "Second chat",
       modelRoute: first.modelRoute,
-      messages: [],
       documents: [],
       work: { kind: "ready" as const },
       completedRequests: [],
@@ -921,14 +870,6 @@ describe("persistent portal chat", function chatSuite() {
         "conv_033c2636-fa7e-5677-b65a-b28266e16040",
         "Projection test",
       ),
-      messages: [
-        { kind: "user", id: "request_projection", text: "Hello" },
-        {
-          kind: "context",
-          id: "context_projection",
-          text: "Private tool context",
-        },
-      ],
       timeline: [
         {
           kind: "user",
