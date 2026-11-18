@@ -1,6 +1,6 @@
 # Plan 92 — A new pantry repository
 
-Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); tests done on 19 November 2026 (see "Phase 2 results: tests" and "the fold of the E2E fault cases"); duplicate code open.
+Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); tests done on 19 November 2026 (see "Phase 2 results: tests" and "the fold of the E2E fault cases"); duplicate code done on 19 November 2026 (see "Phase 2 results: duplicate code").
 Owner: the whole repository.
 Touches: [Plan 91 — names](plan-91-seams-atelier-rename.md),
 [Refactor 16 — Kitchen physics](refactor-16.md), the deploy procedure and
@@ -302,7 +302,8 @@ owns it:
    money path).
 
 **Product exports that only deleted tests used.** I did not change them,
-because the duplicate-code workstream owns product code:
+because the duplicate-code workstream owns product code; that workstream
+removed them (see "Phase 2 results: duplicate code"):
 - `apps/portal/src/features/commerce/index.ts` re-exports
   `entityDossierQuery`, `readCommerceChanges`, `systemEntityRef` and
   `publishCommerceSavedViewPresentation`, and nothing imports them from there.
@@ -375,3 +376,74 @@ separate product fence, so they did not happen:
 - `mail-inbox`: the five Case context evidence causes that all end with
   `case_context_collection_evidence_stale`.
 - `portal-chat-finalization`: the catalog commit with the saved-run commit.
+
+## Phase 2 results: duplicate code (19 November 2026)
+
+26 commits on `dev` remove 25,944 lines and add 16,046 outside `docs/` (net
+9,898 fewer) in 566 files. jscpd 4 (`--min-tokens 70`, product code apart
+from tests) found 885 clones with 18,610 duplicated lines (2.3 %) on `dev`
+`f94fc5e`; it now finds 491 clones with 8,010 lines (1.0 %). The scan
+excludes generated code, bundles and `apps/portal/public`, so its numbers
+are lower than the first scan of the old tree. No API, wire frame, stored
+shape, status code or error text changed. No deploy.
+
+| Merge | Commit | Lines removed (added) | Where the shared code is |
+|---|---|---|---|
+| Browser journey helpers (about 90 scripts) | `2375b81` | 4,123 (1,590) | `scripts/lib/browser-journey.mjs`, `fixture-worker.mjs`, `side-worker.mjs`, `cli.mjs`; the bakery prelude `simulator-navigation.js`; `production-simulation/execution-journey.mjs` |
+| Recipe workspace shell (9 workspaces, 14 authors) | `24eba23` | 6,008 (3,529) | `production-run/shared/recipe-workspace.tsx`, `recipe-station.tsx`, `recipe-form.tsx`, `induction-hob.ts` |
+| Recipe three.js scenes | `871b7ca` | 1,901 (1,434) | `production-run/appliance-sample-three.ts`, new `shared/cobot-rig.ts`, `scene-host.ts` |
+| Commerce command prologue (about 60 sites) | `024413c` | 4,578 (2,883) | `commerce-authority/merchant-command.ts`, `http/buyer-access.ts`, `scripts/merchant-script.ts` |
+| Control route mutations (38 routes) | `3205be6` | 3,980 (2,293) | `control/admission/control-mutation.ts`, `control/commerce-merchant.ts`, `admission/organisation-socket.ts`, `routes/integrations/account-request.ts` |
+| Portal CRDT socket clients (6 clients) | `b12678e` | 2,452 (2,394) | `features/collaboration/document-client.ts`, `commerce/stock-dialog.tsx` |
+| Canvas and draft sync protocols | `589c36a` | 690 (271) | `createSyncProtocol` in `@seams/collaboration` |
+| Copies of exports | `5961bd7`, `e0b58d5`, `bbf9775`, `9c180e0`, `1b82009` | 457 (184) | The address and currency tables of `commerce-contracts`; one `ArchiveConfirm`; one `readCookie`; the agent operation commands of `control-api`; five re-exports that nothing imports |
+| `Extract<U, { kind }>` to `Variant` (389 sites) | `1b0b70d`, `b1bd2b1`, `03da1d6` | 868 (674) | `@seams/type-utils` |
+| Helper copies | `4c9f1a1`, `6d205c2`, `c2ddfae`, `c94d892`, `7936cca`, `3060c87`, `c93e2c9`, `a4e9d56`, `c769959` | 814 (500) | `@seams/std` gains `sleep`, `backoffDelay`, `isSha256Hex` and `decodeBase64Url`. Replaced: 21 renamed `assertNever`, 9 SHA-256 hex checks, 20 SHA-256 hex digests, the strict base64url decoders, 3 `sleep`, 5 Platform backoff formulas and 3 `isRecord` (the script and CRDT client merges replace 7 more `sleep`, 3 more `isRecord` and the Portal backoff formulas). The lenient Gmail, Pub/Sub and JWT decoders share `services/platform/src/lenient-base64.ts`. |
+| The lint | `15f41be` | 32 (246) | `scripts/check-shared-helpers.mjs` |
+| File-size cap | `e4d45e4` | 49 (56) | `production-run/draft-placement.ts` |
+
+**The lint.** `node scripts/check-shared-helpers.mjs` now reads `.mjs`,
+`.js` and `.cjs` files too. It finds a renamed copy of `assertNever`,
+`isRecord`, `sha256Hex`, `isSha256Hex`, `decodeBase64Url` or `sleep` by its
+form, an inline backoff formula, and `Extract<U, { kind: K }>`. The name rule
+covers tests; the new rules cover product code. `--list` prints every finding.
+One `Extract` is allowed with its reason: the generic sync protocol factory.
+
+**Proof.** After the rebase on the test cleanup, every lint, the Platform,
+test, E2E, Portal, Commerce and package type checks, the Platform unit suite
+(1,816 tests), the Commerce suite (202 tests), the Commerce lab (54 tests)
+and the Portal build pass. Each merge also passed the E2E files near it
+(about 80 files: the control routes, the canvas and draft rooms, Gmail,
+ChatGPT sign-in, approvals, WhatsApp, custom connectors, merchant binding).
+Byte-for-byte or fuzz comparisons of old and new code cover the sync frames,
+the decoders and digests, the cobot kinematics and the pastry meshes. The
+bakery browser journeys (16) and the Plan 84 and Plan 40B harness journeys
+pass, apart from the failures below. `mail-inbox` and `remote-mcp` each
+failed one timing step while other runs loaded the machine; on a quiet
+machine both pass (51 tests).
+
+**Failures that `origin/dev` has too.** `workflow-edit-browser` (the "pour"
+stage never becomes current), `engine-visits-browser` (an empty JSON
+response) and the Plan 74 side Case harness journey (the simulated model gets
+no call, and the reply never shows) fail the same way on `origin/dev`
+`f14a6fe`. The Portal unit test
+`schedule.test.mjs` fails because `packages/control-api` imports relative
+paths without `.ts` (for example `./surface-observation` in
+`surface-command.ts`), which `node --test` refuses.
+
+**Kept, with the reason.**
+- The Commerce digest branches in `ledger.ts`: their JSON key order is part
+  of stored digests.
+- Copies whose behaviour differs: the generic control route head (about 100
+  routes, a mass rewrite), Commerce commands with their own replay
+  (`adjustOfferPrice`, `observePaymentDispute`, `quoteShipmentLabelRate`,
+  `refundOrderTenders`), the siphon, café shift and pastry engines, the TV
+  player socket (another protocol), the Python-run `run-code` journeys (no
+  prelude), and small pairs under 20 lines.
+- `showOnEachUpdate` in five recipe views keeps a probable old bug (the
+  scene shows the last frame batch again on each render); a separate change
+  can remove it.
+
+**Left for later.** `messages/derived-stills.ts` keeps a throwing copy of
+`decodeBase64`, and the generated action registry keeps its own `isRecord`
+(the lint skips generated code).
