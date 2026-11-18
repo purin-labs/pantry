@@ -110,9 +110,22 @@ export async function startAccountWorker({
 }
 
 /**
+ * Every chat turn binds the Commerce service when it starts (the Costs
+ * tools). A fixture shop has no commerce backend, so a call is refused, as
+ * in a shop with Commerce down.
+ */
+function unavailableCommerce(request) {
+  return Response.json(
+    { error: "underclerk_unavailable", url: request.url },
+    { status: 503 },
+  );
+}
+
+/**
  * Starts the fixture Worker of `config` on `port`. `account` answers its
- * ACCOUNT_PLATFORM binding, `bindings` adds others, and `respond` answers
- * every request that it sends out.
+ * ACCOUNT_PLATFORM binding, UNDERCLERK refuses each call, `bindings` adds
+ * others or replaces these, and `respond` answers every request that it
+ * sends out.
  */
 export async function startFixtureWorker({
   config,
@@ -128,6 +141,7 @@ export async function startFixtureWorker({
     build: { nodejsCompatMode: "v2" },
     bindings: {
       ACCOUNT_PLATFORM: { type: "fetcher", fetcher: account },
+      UNDERCLERK: { type: "fetcher", fetcher: unavailableCommerce },
       ...bindings,
       ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U: text(
         keys.assertion.privateKey

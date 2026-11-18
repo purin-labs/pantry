@@ -276,12 +276,6 @@ const worker = await startFixtureWorker({
   keys,
   account: (request) => account.fetch(request),
   bindings: {
-    // This shop has no commerce backend. An agent turn reads it, and each read
-    // finds it unavailable, as a shop with Commerce down would.
-    UNDERCLERK: {
-      type: "fetcher",
-      fetcher: () => new Response(null, { status: 503 }),
-    },
     SATYR_PUBLIC_ORIGIN: text(
       process.env.SHOP_VOICE_PUBLIC_ORIGIN ?? `http://127.0.0.1:${port}`,
     ),

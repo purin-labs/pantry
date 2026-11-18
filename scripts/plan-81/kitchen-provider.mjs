@@ -1028,17 +1028,6 @@ function accountCall(request) {
   return account.fetch(request);
 }
 
-/**
- * Every chat turn binds the Commerce service when it starts (the Costs
- * tools). These journeys make no commerce call, so a call is refused.
- */
-function unavailableCommerce(request) {
-  return Response.json(
-    { error: "underclerk_unavailable", url: request.url },
-    { status: 503 },
-  );
-}
-
 async function respond(request) {
   const url = new URL(request.url);
   if (request.url === MODEL) return model(request);
@@ -1052,9 +1041,6 @@ const worker = await startFixtureWorker({
   port: 8881,
   keys,
   account: accountCall,
-  bindings: {
-    UNDERCLERK: { type: "fetcher", fetcher: unavailableCommerce },
-  },
   respond,
 });
 stopOnSignal(worker, account);
