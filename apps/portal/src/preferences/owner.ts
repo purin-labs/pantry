@@ -7,8 +7,12 @@ import {
   type UserPreferenceEdit,
 } from "@seams/control-api";
 import { isRecord } from "@seams/std";
-import { ControlApiError, controlRead, controlWrite } from "../control-client";
-import { readCookie } from "../features/chat/api";
+import {
+  ControlApiError,
+  controlRead,
+  controlWrite,
+  readCookie,
+} from "../control-client";
 import { parsePreferenceResponse } from "@seams/control-api/portal/preferences";
 
 export type PendingEdit = Readonly<{

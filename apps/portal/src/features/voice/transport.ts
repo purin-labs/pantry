@@ -16,13 +16,13 @@ import {
 } from "@seams/control-api";
 import { isRecord } from "@seams/std";
 
-import { readCookie } from "../chat/api";
 import {
-  ControlApiError,
   controlAnswer,
+  ControlApiError,
   controlRead,
   controlSend,
   controlWrite,
+  readCookie,
 } from "../../control-client";
 
 /** The Portal checks the Mac this often while voice control is on (Plan 82 D1b). */

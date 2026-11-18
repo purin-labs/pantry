@@ -8,9 +8,9 @@ import {
   type ChatInsertion,
 } from "@seams/control-api";
 import { errorMessage, isNonNegativeInteger, isRecord } from "@seams/std";
-import { controlRead, controlWrite, refusedBody } from "../../control-client";
+import { controlRead, controlWrite, readCookie, refusedBody } from "../../control-client";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
-import { readChat, readCookie, mutateChatDirectory, UNFINISHED_WORK_MESSAGE } from "./api";
+import { readChat, mutateChatDirectory, UNFINISHED_WORK_MESSAGE } from "./api";
 import type { ChatConversationSummary } from "@seams/control-api/portal/chat";
 import "./project-sharing.css";
 

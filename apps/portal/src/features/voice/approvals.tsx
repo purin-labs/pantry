@@ -12,8 +12,11 @@ import {
 import { Mic } from "lucide-react";
 import React from "react";
 
-import { readCookie } from "../chat/api";
-import { ControlApiError, controlWrite } from "../../control-client";
+import {
+  ControlApiError,
+  controlWrite,
+  readCookie,
+} from "../../control-client";
 import { voiceIsListening, type VoiceSession } from "./session";
 
 type VoiceApprovalScope = Readonly<{

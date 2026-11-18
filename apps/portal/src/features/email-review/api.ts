@@ -4,6 +4,7 @@ import {
   ControlApiError,
   controlRead,
   controlWrite,
+  readCookie,
 } from "../../control-client";
 import { isRecord } from "@seams/std";
 import {
@@ -338,16 +339,3 @@ function emailOperationalPath(
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/email-operational/${encodeURIComponent(proposalId)}`;
 }
 
-function readCookie(name: string): string | null {
-  const documentValue = Reflect.get(globalThis, "document");
-  if (typeof documentValue !== "object" || documentValue === null) return null;
-  const rawCookie = Reflect.get(documentValue, "cookie");
-  if (typeof rawCookie !== "string") return null;
-  for (const cookie of rawCookie.split(";")) {
-    const trimmed = cookie.trim();
-    if (trimmed.startsWith(`${name}=`)) {
-      return decodeURIComponent(trimmed.slice(name.length + 1));
-    }
-  }
-  return null;
-}

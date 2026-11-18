@@ -7,6 +7,7 @@ import {
   controlRead,
   controlUpload,
   controlWrite,
+  readCookie,
 } from "../../control-client";
 import { isConversationId } from "@seams/control-api";
 import type { ConversationId, ProjectId } from "@seams/control-api";
@@ -552,15 +553,6 @@ async function chatRequest(
     );
   }
   return raw;
-}
-
-export function readCookie(name: string): string | null {
-  for (const cookie of document.cookie.split(";")) {
-    const trimmed = cookie.trim();
-    if (trimmed.startsWith(`${name}=`))
-      return decodeURIComponent(trimmed.slice(name.length + 1));
-  }
-  return null;
 }
 
 export async function readChatStatus(

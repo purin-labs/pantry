@@ -38,11 +38,11 @@ import {
   mayEnableEvery,
   type RequestedCapability,
 } from "../access/permission-enable";
-import { readCookie } from "../chat/api";
 import {
   ControlApiError,
   controlRead,
   controlWrite,
+  readCookie,
 } from "../../control-client";
 import { voiceCountsToday, voiceHeardLastDays } from "./counts";
 import {

@@ -23,7 +23,12 @@ import {
 } from "./surface-effect-signals";
 import type { Variant } from "@seams/type-utils";
 import { errorMessage, isRecord } from "@seams/std";
-import { ControlApiError, controlRead, controlWrite } from "../control-client";
+import {
+  ControlApiError,
+  controlRead,
+  controlWrite,
+  readCookie,
+} from "../control-client";
 
 type BakerySurfaceEffectBridgeProps = Readonly<{
   organisationId: string;
@@ -456,16 +461,6 @@ async function submitSurfaceReceipt(
       throw new Error("Kitchen receipt settlement failed");
     throw error;
   }
-}
-
-function readCookie(name: string): string | null {
-  const prefix = `${name}=`;
-  for (const part of document.cookie.split(";")) {
-    const value = part.trim();
-    if (value.startsWith(prefix))
-      return decodeURIComponent(value.slice(prefix.length));
-  }
-  return null;
 }
 
 export function bakerySurfaceConversationId(): string | null {

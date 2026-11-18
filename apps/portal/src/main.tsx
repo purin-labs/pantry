@@ -3,6 +3,7 @@ import React from "react";
 
 import { identityServiceErrorMessage } from "./identity-copy";
 import { assertNever, isRecord } from "@seams/std";
+import { readCookie } from "./control-client";
 
 type Invitation = {
   challengeId: string;
@@ -258,7 +259,7 @@ async function fetchInvitation(token: string): Promise<Invitation> {
 }
 
 async function completeInvitation(token: string): Promise<void> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readControlCsrf();
   if (csrf === null) throw new Error("control_session_missing");
   const response = await fetch(
     `/v1/identity-links/${encodeURIComponent(token)}/complete`,
@@ -306,18 +307,14 @@ function clearIdentityLinkToken(): void {
   window.history.replaceState(null, "", "/identity/link");
 }
 
-function readCookie(name: string): string | null {
-  for (const segment of document.cookie.split(";")) {
-    const separator = segment.indexOf("=");
-    if (separator < 0 || segment.slice(0, separator).trim() !== name) continue;
-    const value = segment.slice(separator + 1).trim();
-    return value.length === 0 ? null : decodeURIComponent(value);
-  }
-  return null;
+function hasControlSession(): boolean {
+  return readControlCsrf() !== null;
 }
 
-function hasControlSession(): boolean {
-  return readCookie("satyr_control_csrf") !== null;
+/** The control CSRF token, or null when the cookie is missing or empty. */
+function readControlCsrf(): string | null {
+  const csrf = readCookie("satyr_control_csrf");
+  return csrf === "" ? null : csrf;
 }
 
 function readApiError(raw: unknown): string {

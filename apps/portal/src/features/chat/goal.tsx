@@ -7,9 +7,8 @@ import {
   type ConversationId,
 } from "@seams/control-api";
 import { errorMessage } from "@seams/std";
-import { controlRead, controlWrite } from "../../control-client";
+import { controlRead, controlWrite, readCookie } from "../../control-client";
 import { syncDialog, cancelDialog } from "../../dialog";
-import { readCookie } from "./api";
 import "./goal.css";
 
 /** Token budget that `/goal <objective>` uses when the chat has no goal yet. */

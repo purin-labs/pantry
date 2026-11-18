@@ -15,9 +15,8 @@ import {
   type UserId,
 } from "@seams/control-api";
 import { errorMessage, isRecord } from "@seams/std";
-import { controlRead, controlWrite, refusedBody } from "../../control-client";
+import { controlRead, controlWrite, readCookie, refusedBody } from "../../control-client";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
-import { readCookie } from "./api";
 import "./project-sharing.css";
 
 const MEMBER_ROLES: ReadonlyArray<{ value: ProjectRole; label: string }> = [
