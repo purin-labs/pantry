@@ -781,7 +781,7 @@ export async function runWhatsAppAccountAction(
   );
 }
 
-export async function fetchWhatsAppSurface(
+async function fetchWhatsAppSurface(
   organisationId: string,
 ): Promise<WhatsAppSurface> {
   // Reply approvals moved to the Inbox (Plan 83), so this page reads no queue.

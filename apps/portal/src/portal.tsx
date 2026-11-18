@@ -117,7 +117,7 @@ import type { PortalState, SessionSnapshot } from "./portal-types";
 import { PAGES } from "./pages";
 
 // The platform tests import these through this JSX module.
-export { executeIntegrationsRoute, fetchWhatsAppSurface } from "./features/integrations/settings-transport";
+export { executeIntegrationsRoute } from "./features/integrations/settings-transport";
 export { selectPreferredWorkspace } from "./portal-projection";
 
 type ActivationProjectionTracking = {
