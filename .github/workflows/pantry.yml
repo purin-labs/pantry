@@ -136,9 +136,6 @@ jobs:
           done
           exit "$edge_failed"
 
-      - name: Durable Object optimization benchmark smoke
-        run: pnpm benchmark:optimization-1:smoke
-
   bakery-physics:
     name: Bakery native and browser acceptance
     if: ${{ !github.event.pull_request.draft || contains(github.event.pull_request.labels.*.name, 'run-ci') }}

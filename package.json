@@ -6,8 +6,6 @@
     "site": "node scripts/run-local-sites.mjs",
     "portal": "pnpm --filter @seams/portal dev --host 127.0.0.1 --port 3103 --strictPort",
     "backend": "node scripts/run-local-commerce.mjs",
-    "benchmark:optimization-1": "node scripts/benchmark-optimization-1.mjs",
-    "benchmark:optimization-1:smoke": "node scripts/benchmark-optimization-1.mjs --smoke",
     "proxy:reload": "caddy validate --config Caddyfile && caddy reload --config Caddyfile",
     "local:init": "node scripts/init-local-commerce-env.mjs",
     "plan21:browser": "node scripts/plan21/browser-acceptance.mjs",

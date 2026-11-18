@@ -257,7 +257,7 @@ const VERIFIED_SESSION_POINTS = new WeakMap<
   VerifiedSessionPoint
 >();
 
-export async function readVerifiedImportedCanonicalSession(
+async function readVerifiedImportedCanonicalSession(
   sql: SqlStorage,
   requestingOrganisationId: string,
   persistence?: AgentSessionPersistence,

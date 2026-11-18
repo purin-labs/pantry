@@ -305,7 +305,7 @@ function failOperations(
     });
 }
 
-export function customOperationChoices(
+function customOperationChoices(
   detail: CustomConnectorDetail,
   accountId: string,
   capabilityId: PickerProps["capabilityId"],

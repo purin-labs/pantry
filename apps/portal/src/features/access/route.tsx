@@ -557,7 +557,7 @@ async function beginLoad(
   }
 }
 
-export async function loadAccessRouteContent(
+async function loadAccessRouteContent(
   props: Pick<AccessRouteProps, "organisationId" | "subview" | "transport">,
 ): Promise<AccessResult<AccessRouteContent>> {
   const viewResult = await props.transport.read(
@@ -1592,7 +1592,7 @@ function closeGrantDialog(
   window.requestAnimationFrame(focusElement.bind(null, trigger.current));
 }
 
-export function readInitialFileAccessProvider(
+function readInitialFileAccessProvider(
   search: string,
 ): FileResourceAccount["provider"] | null {
   const query = new URLSearchParams(search);

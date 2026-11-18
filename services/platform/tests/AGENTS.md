@@ -71,6 +71,10 @@ test and any fixture that exists only for the obsolete behavior.
   verified supplier's goes. `e2e/airtable-exit-support.ts` holds the Airtable
   account that it shares with `e2e/airtable-exit-approval.test.ts`. Both need
   the account Worker.
+- `e2e/case-context-discovery-access.test.ts` is the allowed/denied journey of
+  the case context policy route: an administrator publishes the policy, and a
+  viewer's read, change and relationship review are refused. It needs the
+  account Worker.
 - `e2e/chat-side-case.test.ts` follows a side Case (Plan 74) from the agent's
   proposal to the person's start, the limit of open proposals, a dismissal
   and the deletion of the source chat. `e2e/chat-side-case-ifc.test.ts` is

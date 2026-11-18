@@ -234,7 +234,7 @@ export async function admitPantryExecutionBilling(
 }
 
 /** Retain the resolved explicit fee policy and pinned funding before any account request. */
-export function writePantryExecutionAdmissionInTransaction(
+function writePantryExecutionAdmissionInTransaction(
   sql: SqlStorage,
   input: Readonly<{
     binding: PantryAccountBinding;
