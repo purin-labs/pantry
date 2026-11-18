@@ -1,6 +1,6 @@
 # Plan 92 — A new pantry repository
 
-Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); tests done on 19 November 2026 (see "Phase 2 results: tests"; the fold of E2E fault cases waits for the owner); duplicate code open.
+Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); tests done on 19 November 2026 (see "Phase 2 results: tests" and "the fold of the E2E fault cases"); duplicate code open.
 Owner: the whole repository.
 Touches: [Plan 91 — names](plan-91-seams-atelier-rename.md),
 [Refactor 16 — Kitchen physics](refactor-16.md), the deploy procedure and
@@ -314,47 +314,64 @@ helpers of six lines or less (`required`), the Portal session cookie header
 that 54 journeys build, and small steering helpers (`readSteeringStates`,
 `messageList`).
 
-## Proposal for the owner: fold the E2E fault cases (18 November 2026)
+## Phase 2 results: the fold of the E2E fault cases (19 November 2026)
 
-Status: a proposal only. No fault journey changed. The journeys belong to
-other plans: mail and the Inbox (Plans 42J, 83, 88, 89), the Portal chat
-(Plans 42J, 87), Projects (Refactor 9), and the placement and origin journeys
-(Refactors 10 to 15). The owner of each plan folds its journeys, or tells me
-to do it.
+The owner said "do the fold" on 19 November 2026. Five commits fold the
+fault families of 14 journeys from 170 cases to 130 (40 cases fewer). They
+remove 971 lines and add 207 (net 764 fewer). No product code changed.
 
 The rule (AGENTS.md, "Testing"): keep one case per distinct outcome, not one
-case per internal timing window. Today many journeys run the same outcome
-once for each internal step: an `it.for` over step names, or a separate case
-for each freeze, relocation or eviction point. Each case costs 60 to 180
-seconds of E2E time, and each new step in the product adds a case.
+case per internal timing window. For each family, the steps were grouped by
+the outcome that a person or an operator sees, and each group keeps its
+latest step before the effect, because that step crosses every fence before
+it. A step stays when it has its own outcome, its own refusal code, or the
+only check of its own operation.
 
-**Scan** (`services/platform/tests/e2e`, 18 November 2026; titles with fault
-words and the parameters of each `it.for`): 21 files with three or more fault
-cases hold 43,300 lines and about 200 fault cases. The families below are
-the clearest. "Keep" is the proposed number of cases.
+| Journey | Commit | Cases | Lines removed (added) | What went |
+|---|---|---|---|---|
+| `mail-inbox` | `9e3df7d` | 48 → 41 | 289 (116) | Supplier draft preparation 7 → 4, mailbox watch steps 7 → 4, supplier proposal steps 7 → 6 |
+| `organisation-case-context-collection-placement` | `cfe349d` | 26 → 14 | 210 (30) | TypeSafe configuration 7 → 4, operational discovery 7 → 4, Connector hydration 3 → 2, Organisation evidence 7 → 2 |
+| `mail-operational-placement` | `cfe349d` | 12 → 9 | 42 (12) | Compose steps 11 → 8: edit, review and projection end like preflight |
+| `portal-chat-finalization` | `dae338f` | 17 → 14 | 105 (6) | Attachment inspection 2 → 1, captured read authority 5 → 3 |
+| `remote-mcp` | `dae338f` | 13 → 10 | 52 (8) | Connector origin 4 → 2, write control origin 4 → 3 |
+| Origin journeys (`file`, `mail`, `airtable`, `case-proposal`, `message-link`, `action-mutation`) | `2d0f7e0` | 29 → 20 | 149 (24) | The credential decrypt points fold into the later commit point; `action-mutation-origin` keeps its 3 steps |
+| `whatsapp-placement`, `projects`, `checkpoint-restart` | `7795573` | 25 → 22 | 124 (11) | The support read 2 → 1, two Projects share freezes, checkpoint admission 6 → 4 |
 
-| Journey | Now | Keep | The outcome that each kept case proves |
-|---|---|---|---|
-| `mail-inbox` (16,444 lines) | 38 fault cases: 7 mailbox lifecycle steps, 7 supplier proposal steps, 3 supplier assignment steps and about 20 single freeze, relocation or eviction cases | 6 | Issued mail work drains across a relocation and the evicted target recovers it once, with no second draft, Case or inference; a revoked read withholds content; the budget stops work without a draft |
-| `organisation-case-context-collection-placement` (2,322) | 26: 7 TypeSafe configuration steps, 7 operational steps, 7 Organisation steps, 3 hydration steps, 2 others | 4 | Issued work drains across a relocation, and the evicted target recovers it once, with the exact evidence and usage |
-| `mail-operational-placement` (941) | 11 compose steps | 1 | A compose drains across a relocation and recovers on the evicted target with one provider effect |
-| `portal-chat-finalization` (6,036) | 15: 5 captured-read steps, 2 attachment steps, 2 paused-response kinds, 2 dispatch kinds, 2 late-readiness kinds, 2 others | 6 | The originating session is kept through eviction; a revoked read fences the next step; a disconnected turn finalizes once |
-| Origin journeys: `file-session-origin` (5 steps), `mail-session-origin` (7), `airtable-session-origin` (5), `case-proposal-origin` (4), `message-link-session-origin` (3), `action-mutation-origin` (3) | 27 | 6 | One case each: a revoked origin refuses new work, issued effects settle once, and a fresh command is admitted after eviction |
-| `remote-mcp` (2,450) | 8: 4 origin steps, 4 write-control steps | 2 | A custom connector origin is fenced and recovers after eviction; a write's receipt is kept |
-| `whatsapp-placement` (1,236) | 6 in 2 step families, and 6 single cases | 4 | A revoked origin withholds the send and the preview; an issued send settles once after eviction |
-| `projects` (2,419) | 6 fence and rollback cases | 3 | A competing tab, a relocation and a rollback each leave one receipt and no lost chat |
-| `checkpoint-restart` (595) | 6 (3 admission kinds, 2 upload boundaries, 2 sizes) | 2 | A saved checkpoint recovers without a repeated inference, under open and closed admission |
+**Proof.** Each folded file passes in full: `mail-inbox` 41 tests (216
+seconds), `organisation-case-context-collection-placement` 14,
+`mail-operational-placement` 9, `portal-chat-finalization` 14,
+`remote-mcp` 10, the origin journeys 2 to 5 each, `whatsapp-placement` 11,
+`projects` 7 and `checkpoint-restart` 4. The E2E type check is clean.
 
-**How to fold one family.** Keep the setup and the outcome assertions. Keep
-the hardest internal point as the one fault (usually the last point before
-the effect). Delete the switch arms and seed helpers that only the other
-points use. If two points give different outcomes for a person (for example
-"refused" and "sent once"), keep both.
+**The estimate was wrong.** The proposal expected 149 cases to become 34 and
+about 25,000 lines to go. The real result is 40 cases and 764 lines. Two
+reasons:
+1. A parameterised family runs one journey function. A removed step frees
+   only its own branch, its pause and its seed, not the shared setup and
+   assertions, which are most of the lines.
+2. Most steps are not timing windows of one operation. They guard different
+   operations (an edit, a compose, a send, a credential refresh) or end with
+   their own refusal code, so each is a distinct outcome and stays.
 
-**Gain.** The families in the table go from 149 cases to 34, each case of 60
-to 180 seconds, and about 25,000 lines go, which is the earlier estimate of phase 2. Each
-owner measures the lines when the fold lands.
+**What lost its own case.** The kept later step still crosses each of these
+fences, and the evicted source still refuses each operation, but no case now
+pauses at these points:
+- a revocation at the credential decrypt (Airtable, mail and file origin
+  journeys), the redirect follow of a message link, and the file search
+  observation;
+- the mailbox watch activation, renewal and reconnect (the reset stays), and
+  the frozen `watchExpiresAt` that only activation and renewal asserted;
+- the in-flight prepare, validate, readiness and review checks of the
+  Organisation evidence commit, and the active check after the policy
+  request digest;
+- the supplier draft's frozen Gmail read and Case ensure.
 
-**Risk.** A step that only one deleted case reached can break without a
-signal. The fold keeps the last point before each effect, because a fault
-there exercises every fence before it. A step with its own outcome stays.
+**Left for the owner.** Further folds would remove the only test of a
+separate product fence, so they did not happen:
+- `whatsapp-placement`: the edit and compose refusals into the credential
+  step, and the panel read with the preview read.
+- `projects`: the four operator edits (rename, pin, draft, read), and the
+  directory create with the move.
+- `mail-inbox`: the five Case context evidence causes that all end with
+  `case_context_collection_evidence_stale`.
+- `portal-chat-finalization`: the catalog commit with the saved-run commit.
