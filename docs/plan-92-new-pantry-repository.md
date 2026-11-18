@@ -211,9 +211,9 @@ run once for each internal step.
 
 ## Phase 2 results: unused and legacy code (18 November 2026)
 
-Six commits on `dev` remove 35,980 lines and add 3,735 (net 32,245 fewer
-lines) in 1,059 files; 108 files are gone. Production did not change: no
-deploy and no write. A read-only census (`wrangler d1 execute --remote`,
+Seven workstream commits on `dev` remove 37,459 lines and add 3,768 outside
+`docs/` (net 33,691 fewer lines) in 1,068 files; 111 files are gone.
+Production did not change: no deploy and no write. A read-only census (`wrangler d1 execute --remote`,
 SELECT only) of the production global and regional databases decided each
 legacy removal.
 
@@ -225,6 +225,7 @@ legacy removal.
 | File-native product folders | `4ebf423` | 56 (17 deleted) | 9,138 | The tool, its capability, `file_native.rs` and its binary, the executor's JSON product path, the workspace execution coordinator (2,706 lines), the product changeset revision kind and the Plan 50 "workspace" group. |
 | Old-row adapters | `aff2272` | 23 | 556 | Chat rows from before the timeline, the old Gmail product mapping, the costs plan runtime ALTER, the pre-Plan 89 held output id, and the SurfaceActor and ThreadActor relics. |
 | Unused exports | `23d1f2f` | 877 | 2,183 | `export` removed from 3,539 values and types that only their own file used; declarations that no file used are deleted. |
+| Plan 46 synthetic evaluation | `ab8335f` | 13 (3 deleted) | 1,470 | The owner's answer of 18 November 2026: the `synthetic-evaluation` route operation, its Organisation Actor command and module, the hand-run evaluation script, its unit test and eight synthetic placement journeys. Configuration, screen observations and the operational evaluation stay. |
 
 **Proof.** Each commit passed the platform, test and E2E type checks, the
 lints, the unit suites and the E2E files near its change. After all of them,
@@ -242,8 +243,8 @@ that fixture's second Organisation a policy, and the journey passes.
    baseline (tested on the old baselines).
 
 **Kept, with the reason.**
-- Plan 33B supplier payouts and the Plan 46 synthetic evaluation API: asked
-  the owner on 18 November 2026; kept until the answer (default: keep).
+- Plan 33B supplier payouts: the owner decided on 18 November 2026 to keep
+  them ("Delete 46 only").
 - Adapters whose old rows exist: chat Kitchen context v1 (12 parts), chat voice
   parts with no engine (9), Square OAuth credentials (3 accounts), the `codex`
   backend id (removed 18 October, after the actor storage restart of
