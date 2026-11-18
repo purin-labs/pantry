@@ -9,13 +9,11 @@ import {
 } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
 import { mediaBaseUrl } from "./buyer-catalog.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function readOfferPricePolicyRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_offer_price_policy" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_offer_price_policy">,
 ): Promise<Response> {
   return offerPriceResponse(
     ctx.authority.readOfferPricePolicy(route.merchantId, route.offerId),
@@ -25,10 +23,7 @@ export async function readOfferPricePolicyRoute(
 export async function setOfferPricePolicyRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "set_offer_price_policy" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "set_offer_price_policy">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -44,9 +39,9 @@ export async function setOfferPricePolicyRoute(
 export async function disableOfferPricePolicyRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "disable_offer_price_policy" }
+    "disable_offer_price_policy"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -65,9 +60,9 @@ export async function disableOfferPricePolicyRoute(
 export async function collectionCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "create_collection" | "update_collection" | "delete_collection" }
+    "create_collection" | "update_collection" | "delete_collection"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -94,10 +89,7 @@ export async function collectionCommandRoute(
 
 export async function listCollectionsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_collections" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_collections">,
 ): Promise<Response> {
   return jsonResponse(200, {
     schemaVersion: "underclerk.collections.v1",
@@ -108,10 +100,7 @@ export async function listCollectionsRoute(
 export async function readCatalogSnapshotRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_catalog_snapshot" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_catalog_snapshot">,
 ): Promise<Response> {
   // What the Worker serves catalog reads from (catalog-snapshots.ts).
   const context = ctx.authority.readBuyerStorefrontContext(
@@ -154,9 +143,9 @@ export async function readCatalogSnapshotRoute(
 export async function catalogEditRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "update_product" | "update_variant" | "update_offer" }
+    "update_product" | "update_variant" | "update_offer"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -189,10 +178,7 @@ export async function catalogEditRoute(
 export async function deleteProductRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "delete_product" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "delete_product">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -211,10 +197,7 @@ export async function deleteProductRoute(
 export async function updateStorefrontTaxRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "update_storefront_tax" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "update_storefront_tax">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -233,10 +216,7 @@ export async function updateStorefrontTaxRoute(
 export async function adjustOfferPriceRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "adjust_offer_price" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "adjust_offer_price">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;

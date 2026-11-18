@@ -5,6 +5,7 @@ import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
 } from "@seams/control-api";
+import type { Variant } from "@seams/type-utils";
 
 type Props = Readonly<{
   organisationId: string;
@@ -65,9 +66,9 @@ export class InventoryPurchases extends React.Component<Props, State> {
 }
 
 function renderPurchase(
-  purchase: Extract<
+  purchase: Variant<
     InventoryReceiptContext["purchases"],
-    { kind: "ready" }
+    "ready"
   >["entries"][number],
 ) {
   return (

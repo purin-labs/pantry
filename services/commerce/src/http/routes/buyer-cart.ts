@@ -17,13 +17,14 @@ import { buyerSessionClaims, verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function buyerCartRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     BuyerRoute,
-    { kind: "create_buyer_cart" | "read_buyer_cart" | "replace_buyer_cart" }
+    "create_buyer_cart" | "read_buyer_cart" | "replace_buyer_cart"
   >,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);
@@ -59,7 +60,7 @@ export async function buyerCartRoute(
 export async function validateBuyerShippingAddressRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "validate_buyer_shipping_address" }>,
+  route: Variant<BuyerRoute, "validate_buyer_shipping_address">,
 ): Promise<Response> {
   if (ctx.addressValidations === undefined) {
     return jsonResponse(503, {

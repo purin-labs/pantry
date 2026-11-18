@@ -70,6 +70,7 @@ import {
   COMPANIES_ROUTES,
   type CompaniesRoute,
 } from "./plugins/companies/index.ts";
+import type { Variant } from "@seams/type-utils";
 
 export type CheckoutProfileRoute =
   | Readonly<{ kind: "list_checkout_profiles"; merchantId: string }>
@@ -563,10 +564,7 @@ const BUYER_ROUTE_KINDS = [
 ] as const satisfies readonly CommerceRoute["kind"][];
 
 /** Routes a storefront buyer calls without the service token. */
-export type BuyerRoute = Extract<
-  CommerceRoute,
-  { kind: (typeof BUYER_ROUTE_KINDS)[number] }
->;
+export type BuyerRoute = Variant<CommerceRoute, (typeof BUYER_ROUTE_KINDS)[number]>;
 
 export function isBuyerRoute(route: CommerceRoute): route is BuyerRoute {
   return BUYER_ROUTE_KINDS.some((kind) => kind === route.kind);

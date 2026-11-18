@@ -3,14 +3,12 @@ import { isRecord } from "@seams/std";
 import type { HttpRouteContext } from "../context.ts";
 import { hasMerchantId, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function customerCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "create_customer" | "update_customer" | "erase_customer" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "create_customer" | "update_customer" | "erase_customer">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -36,10 +34,7 @@ export async function customerCommandRoute(
 
 export async function readCustomerRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_customer" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_customer">,
 ): Promise<Response> {
   const customer = ctx.authority.readCustomer(
     route.merchantId,
@@ -52,10 +47,7 @@ export async function readCustomerRoute(
 
 export async function exportCustomerRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "export_customer" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "export_customer">,
 ): Promise<Response> {
   const exported = ctx.authority.exportCustomer(
     route.merchantId,
@@ -69,10 +61,7 @@ export async function exportCustomerRoute(
 export async function companyCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "create_company" | "update_company" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "create_company" | "update_company">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -96,10 +85,7 @@ export async function companyCommandRoute(
 export async function marketCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "create_market" | "update_market" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "create_market" | "update_market">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -122,10 +108,7 @@ export async function marketCommandRoute(
 
 export async function listMarketsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_markets" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_markets">,
 ): Promise<Response> {
   return jsonResponse(200, {
     schemaVersion: "underclerk.markets.v1",
@@ -135,10 +118,7 @@ export async function listMarketsRoute(
 
 export async function listCompaniesRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_companies" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_companies">,
 ): Promise<Response> {
   return jsonResponse(200, {
     schemaVersion: "underclerk.companies.v1",
@@ -148,10 +128,7 @@ export async function listCompaniesRoute(
 
 export async function listNotificationsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_notifications" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_notifications">,
 ): Promise<Response> {
   return jsonResponse(200, {
     schemaVersion: "underclerk.notifications.v1",

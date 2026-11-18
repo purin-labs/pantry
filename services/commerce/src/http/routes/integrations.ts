@@ -99,9 +99,9 @@ function issueApiKey(
 export async function feedConsumerRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_feed_consumer" | "advance_feed_consumer" }
+    "read_feed_consumer" | "advance_feed_consumer"
   >,
 ): Promise<Response> {
   const consumers = ctx.feedConsumers;
@@ -125,9 +125,9 @@ export async function feedConsumerRoute(
 export async function createWebhookSubscriptionRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "create_webhook_subscription" }
+    "create_webhook_subscription"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -145,14 +145,11 @@ export async function createWebhookSubscriptionRoute(
 export async function webhookSubscriptionChangeRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    {
-      kind:
-        | "restart_webhook_subscription"
-        | "rotate_webhook_secret"
-        | "delete_webhook_subscription";
-    }
+    | "restart_webhook_subscription"
+    | "rotate_webhook_secret"
+    | "delete_webhook_subscription"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -182,9 +179,9 @@ export async function webhookSubscriptionChangeRoute(
 
 export async function listWebhookSubscriptionsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_webhook_subscriptions" }
+    "list_webhook_subscriptions"
   >,
 ): Promise<Response> {
   return jsonResponse(200, {

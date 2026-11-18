@@ -39,6 +39,7 @@ import {
   neededByDateInput,
   neededByTimestamp,
 } from "./needed-by";
+import type { Variant } from "@seams/type-utils";
 
 type Props = Readonly<{
   userId: string;
@@ -1048,7 +1049,7 @@ export class InventoryProductionRequestsPage extends React.Component<
   }
   private async readRequest(
     id: string,
-  ): Promise<Extract<InventoryProductionContext["demand"], { kind: "ready" }>> {
+  ): Promise<Variant<InventoryProductionContext["demand"], "ready">> {
     const raw = await controlRead(
       `${productionPath(this.props.organisationId)}?request=${encodeURIComponent(id)}`,
     );

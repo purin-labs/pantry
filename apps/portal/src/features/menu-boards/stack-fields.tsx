@@ -9,6 +9,7 @@ import { Select } from "../../ui/select";
 import type { MenuBoardClient } from "./board-client";
 import { unstackPlacements } from "./canvas-editor";
 import { normalizeRect } from "./canvas-geometry";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The drawer fields of an auto-layout stack and of an element in one
@@ -17,7 +18,7 @@ import { normalizeRect } from "./canvas-geometry";
  * keep their change.
  */
 
-type StackElement = Extract<MenuBoardElement, { kind: "stack" }>;
+type StackElement = Variant<MenuBoardElement, "stack">;
 
 const DIRECTIONS = [
   { value: "vertical", label: "Down" },

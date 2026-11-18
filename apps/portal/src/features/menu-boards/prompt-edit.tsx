@@ -13,6 +13,7 @@ import { controlAnswer, controlRead, controlWrite } from "../../control-client";
 import { controlPath } from "./menu-board-requests";
 import type { MenuBoardClient } from "./board-client";
 import "./prompt-edit.css";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * Prompt to edit (Plan 40B phase 5, slice 9): the person selects elements
@@ -98,7 +99,7 @@ export function PromptEdit(props: Readonly<{
   }, [agentOnSelection]);
   const changed = asked === null ? [] : changedSince(asked.before, props.board);
   /** Sends the words in a new chat, or again in the same chat. */
-  const sendWords = async (words: string, previous: Extract<Ask, { kind: "asked" }> | null): Promise<void> => {
+  const sendWords = async (words: string, previous: Variant<Ask, "asked"> | null): Promise<void> => {
     setAsk({ kind: "sending" });
     try {
       const data = await readChat(props.organisationId, previous?.conversationId ?? null, "", "observe");
@@ -137,7 +138,7 @@ export function PromptEdit(props: Readonly<{
     await sendWords(`${instruction}\n\n(About the selected ${names} on the board “${props.board.title}”.)`, null);
   };
   /** The person allows the held step and asks again with the same words. */
-  const allow = async (held: string, previous: Extract<Ask, { kind: "asked" }>): Promise<void> => {
+  const allow = async (held: string, previous: Variant<Ask, "asked">): Promise<void> => {
     const answer = await controlAnswer(controlWrite(
       controlPath(props.organisationId, `access-control/held-outputs/${encodeURIComponent(held)}/decision`),
       "POST",

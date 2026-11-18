@@ -4,14 +4,12 @@ import { parseBankPayoutWindow } from "../../payments/bank-payouts.ts";
 import { errorMessage } from "@seams/std";
 import type { HttpRouteContext } from "../context.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function readProductSalesRoute(
   ctx: HttpRouteContext,
   url: URL,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_product_sales" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_product_sales">,
 ): Promise<Response> {
   const window = parseProductSalesWindow(
     url.searchParams.get("start"),
@@ -30,10 +28,7 @@ export async function readProductSalesRoute(
 export async function readFailedPaymentsRoute(
   ctx: HttpRouteContext,
   url: URL,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_failed_payments" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_failed_payments">,
 ): Promise<Response> {
   const window = parseProductSalesWindow(
     url.searchParams.get("start"),
@@ -52,10 +47,7 @@ export async function readFailedPaymentsRoute(
 export async function readPaymentsRoute(
   ctx: HttpRouteContext,
   url: URL,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_payments" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_payments">,
 ): Promise<Response> {
   const window = parseProductSalesWindow(
     url.searchParams.get("start"),
@@ -74,10 +66,7 @@ export async function readPaymentsRoute(
 export async function readOrderTimesRoute(
   ctx: HttpRouteContext,
   url: URL,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_order_times" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_order_times">,
 ): Promise<Response> {
   const window = parseProductSalesWindow(
     url.searchParams.get("start"),
@@ -96,10 +85,7 @@ export async function readOrderTimesRoute(
 export async function readBankPayoutsRoute(
   ctx: HttpRouteContext,
   url: URL,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_bank_payouts" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_bank_payouts">,
 ): Promise<Response> {
   const window = parseBankPayoutWindow(
     url.searchParams.get("start"),
@@ -125,10 +111,7 @@ export async function readBankPayoutsRoute(
 
 export async function readSnapshotRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_snapshot" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_snapshot">,
 ): Promise<Response> {
   const snapshot = ctx.authority.readSnapshot(route.merchantId);
   return snapshot === undefined
@@ -138,10 +121,7 @@ export async function readSnapshotRoute(
 
 export async function readMigrationInventoryRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_migration_inventory" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_migration_inventory">,
 ): Promise<Response> {
   const inventory = ctx.authority.readMigrationInventory(route.merchantId);
   return inventory === undefined
@@ -151,10 +131,7 @@ export async function readMigrationInventoryRoute(
 
 export async function readFoodServiceSnapshotRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_food_service_snapshot" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_food_service_snapshot">,
 ): Promise<Response> {
   const snapshot = ctx.authority.readFoodServiceSnapshot(route.merchantId);
   return snapshot === undefined
@@ -164,10 +141,7 @@ export async function readFoodServiceSnapshotRoute(
 
 export async function readStockSnapshotRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_stock_snapshot" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_stock_snapshot">,
 ): Promise<Response> {
   const snapshot = ctx.authority.readStockSnapshot(route.merchantId);
   return snapshot === undefined
@@ -177,10 +151,7 @@ export async function readStockSnapshotRoute(
 
 export async function readPickupQueueRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_pickup_queue" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_pickup_queue">,
 ): Promise<Response> {
   const queue = ctx.authority.readPickupQueue(route.merchantId);
   return queue === undefined
@@ -190,10 +161,7 @@ export async function readPickupQueueRoute(
 
 export async function readSoldOutMarksRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_sold_out_marks" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_sold_out_marks">,
 ): Promise<Response> {
   const marks = ctx.authority.readSoldOutMarks(route.merchantId);
   return marks === undefined
@@ -203,10 +171,7 @@ export async function readSoldOutMarksRoute(
 
 export async function readPreparationTicketRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_preparation_ticket" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_preparation_ticket">,
 ): Promise<Response> {
   const ticket = ctx.authority.readPreparationTicket(
     route.merchantId,
@@ -220,7 +185,7 @@ export async function readPreparationTicketRoute(
 export async function readEventsRoute(
   ctx: HttpRouteContext,
   url: URL,
-  route: Extract<Exclude<CommerceRoute, BuyerRoute>, { kind: "read_events" }>,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_events">,
 ): Promise<Response> {
   const after = url.searchParams.get("after") ?? undefined;
   const limit = Number(url.searchParams.get("limit") ?? "100");
@@ -245,10 +210,7 @@ export async function readEventsRoute(
 
 export async function readOrderRecordRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_order_record" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_order_record">,
 ): Promise<Response> {
   const record = await ctx.authority.readOrderRecord(
     route.merchantId,

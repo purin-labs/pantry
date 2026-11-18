@@ -4,6 +4,7 @@ import { catalogSearchRequest, searchCatalog } from "../../catalog-search.ts";
 import { verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 // Serves an image only while this storefront's catalog shows it, so the
 // images of a draft or archived product stay private.
@@ -61,10 +62,7 @@ export function mediaBaseUrl(
 export async function buyerCatalogRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    BuyerRoute,
-    { kind: "read_buyer_catalog" | "search_buyer_catalog" }
-  >,
+  route: Variant<BuyerRoute, "read_buyer_catalog" | "search_buyer_catalog">,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);
   if (!access.ok) return access.response;
@@ -87,9 +85,9 @@ export async function buyerCatalogRoute(
 export async function buyerCollectionsRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     BuyerRoute,
-    { kind: "list_buyer_collections" | "read_buyer_collection" }
+    "list_buyer_collections" | "read_buyer_collection"
   >,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);

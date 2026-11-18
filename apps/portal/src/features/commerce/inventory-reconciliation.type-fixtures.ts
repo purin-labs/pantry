@@ -1,12 +1,13 @@
 import type { InventoryReceiptContext } from "@seams/control-api";
 import type { ReconciliationState } from "./inventory-reconciliation";
 import type { ReconciliationSubmission } from "./inventory-reconciliation-submission";
+import type { Variant } from "@seams/type-utils";
 
 declare const context: InventoryReceiptContext;
 declare const submission: ReconciliationSubmission;
-declare const draft: Extract<
+declare const draft: Variant<
   ReconciliationState,
-  { kind: "editing" | "refreshing" }
+  "editing" | "refreshing"
 >["draft"];
 
 // @ts-expect-error An unknown outcome must retain the exact submission.
@@ -26,10 +27,7 @@ export const editablePendingSubmission: ReconciliationState = {
   submission,
 };
 
-declare const pending: Extract<
-  ReconciliationState,
-  { kind: "saving" | "uncertain" }
->;
+declare const pending: Variant<ReconciliationState, "saving" | "uncertain">;
 // @ts-expect-error A broad spread cannot turn an unresolved submission into an editable draft.
 export const spreadPendingSubmission: ReconciliationState = {
   ...pending,

@@ -138,6 +138,7 @@ import {
   categoryChipIcon,
 } from "./costs-ui";
 import "./styles.css";
+import type { Variant } from "@seams/type-utils";
 
 type Props = Readonly<{
   organisationId: string;
@@ -325,7 +326,7 @@ export class CostsPage extends React.Component<Props, State> {
     }
   }
 
-  private canEditSheet(state: Extract<State, { kind: "ready" }>): boolean {
+  private canEditSheet(state: Variant<State, "ready">): boolean {
     if (!this.props.canEdit) return false;
     if (
       state.sheetView.kind === "synced" ||

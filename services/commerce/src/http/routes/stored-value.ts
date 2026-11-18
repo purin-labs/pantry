@@ -3,13 +3,14 @@ import { isRecord } from "@seams/std";
 import type { HttpRouteContext } from "../context.ts";
 import { hasMerchantId, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function discountCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "create_discount" | "deactivate_discount" }
+    "create_discount" | "deactivate_discount"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -34,10 +35,7 @@ export async function discountCommandRoute(
 
 export async function listDiscountsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_discounts" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_discounts">,
 ): Promise<Response> {
   return jsonResponse(200, {
     schemaVersion: "underclerk.discounts.v1",
@@ -48,14 +46,9 @@ export async function listDiscountsRoute(
 export async function storedValueCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    {
-      kind:
-        | "issue_gift_card"
-        | "credit_store_credit"
-        | "disable_stored_value_account";
-    }
+    "issue_gift_card" | "credit_store_credit" | "disable_stored_value_account"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -82,9 +75,9 @@ export async function storedValueCommandRoute(
 
 export async function listStoredValueAccountsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_stored_value_accounts" }
+    "list_stored_value_accounts"
   >,
 ): Promise<Response> {
   return jsonResponse(200, {
@@ -96,9 +89,9 @@ export async function listStoredValueAccountsRoute(
 export async function readStoredValueLiabilityRoute(
   ctx: HttpRouteContext,
   url: URL,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_stored_value_liability" }
+    "read_stored_value_liability"
   >,
 ): Promise<Response> {
   const at = url.searchParams.get("at") ?? ctx.authority.currentTime();

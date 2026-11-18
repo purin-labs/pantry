@@ -4,13 +4,11 @@ import { refuseCommandScopes } from "../admission.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { hasMerchantId, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function listPluginsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_plugins" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_plugins">,
 ): Promise<Response> {
   return jsonResponse(200, ctx.authority.listPlugins(route.merchantId));
 }
@@ -18,10 +16,7 @@ export async function listPluginsRoute(
 export async function previewPluginChangeRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "preview_plugin_change" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "preview_plugin_change">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -43,10 +38,7 @@ export async function previewPluginChangeRoute(
 export async function installMerchantPluginRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "install_merchant_plugin" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "install_merchant_plugin">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -71,10 +63,7 @@ export async function installMerchantPluginRoute(
 export async function setPluginFieldValuesRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "set_plugin_field_values" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "set_plugin_field_values">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -94,10 +83,7 @@ export async function setPluginFieldValuesRoute(
 export async function runPluginActionRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "run_plugin_action" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "run_plugin_action">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -125,10 +111,7 @@ export async function runPluginActionRoute(
 
 export async function listPluginFieldValuesRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_plugin_field_values" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_plugin_field_values">,
 ): Promise<Response> {
   const list = ctx.authority.listPluginFieldValues(
     route.merchantId,
@@ -142,10 +125,7 @@ export async function listPluginFieldValuesRoute(
 export async function merchantPluginFunctionRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "run_plugin_function" | "preview_merchant_plugin" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "run_plugin_function" | "preview_merchant_plugin">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -169,10 +149,7 @@ export async function merchantPluginFunctionRoute(
 export async function pluginStateRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "pause_plugin" | "resume_plugin" | "remove_plugin" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "pause_plugin" | "resume_plugin" | "remove_plugin">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -197,10 +174,7 @@ export async function pluginStateRoute(
 export async function configurePluginRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "configure_plugin" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "configure_plugin">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;

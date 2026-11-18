@@ -19,6 +19,7 @@ import {
   StockDialogDone,
   StockDialogRetry,
 } from "./stock-dialog";
+import type { Variant } from "@seams/type-utils";
 
 type Props = Readonly<{
   organisationId: string;
@@ -483,9 +484,9 @@ function purchaseFields(
   );
 }
 
-type PurchaseEntry = Extract<
+type PurchaseEntry = Variant<
   InventoryReceiptContext["purchases"],
-  { kind: "ready" }
+  "ready"
 >["entries"][number];
 
 function purchaseItem(entry: PurchaseEntry) {

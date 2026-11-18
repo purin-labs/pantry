@@ -2,8 +2,9 @@
 // and the end of a "sold out today" mark. Commerce stores instants in UTC, so
 // each rule names the IANA time zone that it reads the clock in.
 import type { MenuValidity } from "@seams/commerce-contracts";
+import type { Variant } from "@seams/type-utils";
 
-type MenuSchedule = Extract<MenuValidity, { kind: "schedule" }>;
+type MenuSchedule = Variant<MenuValidity, "schedule">;
 
 const MAX_SLOTS = 28;
 const START_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;

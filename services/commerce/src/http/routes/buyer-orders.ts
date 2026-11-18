@@ -12,11 +12,12 @@ import {
 import type { HttpRouteContext } from "../context.ts";
 import { bearerToken, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function openDraftInvoiceRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "open_draft_invoice" }>,
+  route: Variant<BuyerRoute, "open_draft_invoice">,
 ): Promise<Response> {
   const invoice = verifyDraftInvoiceAccess(ctx, request, route);
   if (!invoice.ok) return invoice.response;
@@ -71,7 +72,7 @@ export async function openDraftInvoiceRoute(
 export async function requestBuyerReturnRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "request_buyer_return" }>,
+  route: Variant<BuyerRoute, "request_buyer_return">,
 ): Promise<Response> {
   const recovery = verifyOrderRecoveryAccess(ctx, request, route);
   if (!recovery.ok) return recovery.response;
@@ -121,7 +122,7 @@ export async function requestBuyerReturnRoute(
 export async function openBuyerOrderBalanceRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "open_buyer_order_balance" }>,
+  route: Variant<BuyerRoute, "open_buyer_order_balance">,
 ): Promise<Response> {
   const recovery = verifyOrderRecoveryAccess(ctx, request, route);
   if (!recovery.ok) return recovery.response;
@@ -171,7 +172,7 @@ export async function openBuyerOrderBalanceRoute(
 export async function readBuyerOrderRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "read_buyer_order" }>,
+  route: Variant<BuyerRoute, "read_buyer_order">,
 ): Promise<Response> {
   const context = ctx.authority.readBuyerStorefrontContext(
     route.merchantId,

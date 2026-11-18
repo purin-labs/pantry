@@ -8,13 +8,11 @@ import {
   readJsonBody,
 } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function listInvoicesRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_invoices" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_invoices">,
 ): Promise<Response> {
   return jsonResponse(200, {
     schemaVersion: "underclerk.company-invoices.v1",
@@ -25,10 +23,7 @@ export async function listInvoicesRoute(
 export async function invoiceCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "place_draft_order_on_terms" | "record_invoice_payment" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "place_draft_order_on_terms" | "record_invoice_payment">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -52,10 +47,7 @@ export async function invoiceCommandRoute(
 
 export async function readOrderChangesRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_order_changes" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_order_changes">,
 ): Promise<Response> {
   const changes = ctx.authority.readOrderChanges(
     route.merchantId,
@@ -69,13 +61,7 @@ export async function readOrderChangesRoute(
 export async function orderEditRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    {
-      kind:
-        "edit_order" | "record_order_manual_payment" | "exchange_order_lines";
-    }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "edit_order" | "record_order_manual_payment" | "exchange_order_lines">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -100,10 +86,7 @@ export async function orderEditRoute(
 
 export async function listOrderReturnsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_order_returns" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_order_returns">,
 ): Promise<Response> {
   return jsonResponse(200, {
     schemaVersion: "underclerk.returns.v1",
@@ -114,16 +97,10 @@ export async function listOrderReturnsRoute(
 export async function returnCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    {
-      kind:
-        | "request_return"
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, | "request_return"
         | "authorize_return"
         | "receive_return"
-        | "close_return";
-    }
-  >,
+        | "close_return">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -152,10 +129,7 @@ export async function returnCommandRoute(
 
 export async function readDraftOrderRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_draft_order" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_draft_order">,
 ): Promise<Response> {
   const view = ctx.authority.readDraftOrderView(
     route.merchantId,
@@ -169,10 +143,7 @@ export async function readDraftOrderRoute(
 export async function refundOrderTendersRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "refund_order_tenders" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "refund_order_tenders">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -189,17 +160,11 @@ export async function refundOrderTendersRoute(
 export async function draftOrderCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    {
-      kind:
-        | "create_draft_order"
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, | "create_draft_order"
         | "update_draft_order"
         | "cancel_draft_order"
         | "mark_draft_order_paid"
-        | "send_draft_invoice";
-    }
-  >,
+        | "send_draft_invoice">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -253,10 +218,7 @@ export async function draftOrderCommandRoute(
 export async function quoteShipmentLabelRateRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "quote_shipment_label_rate" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "quote_shipment_label_rate">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;

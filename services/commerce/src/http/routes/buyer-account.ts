@@ -17,6 +17,7 @@ import { errorMessage } from "@seams/std";
 import type { HttpRouteContext } from "../context.ts";
 import { bearerToken, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 /**
  * The storefront's organisation, when its active checkout profile lets
@@ -43,7 +44,7 @@ function customerContext(
 export async function requestCustomerSignInRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "request_customer_sign_in" }>,
+  route: Variant<BuyerRoute, "request_customer_sign_in">,
 ): Promise<Response> {
   const context = customerContext(ctx, route);
   if (context === undefined)
@@ -74,7 +75,7 @@ export async function requestCustomerSignInRoute(
 export async function verifyCustomerSignInRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "verify_customer_sign_in" }>,
+  route: Variant<BuyerRoute, "verify_customer_sign_in">,
 ): Promise<Response> {
   const context = customerContext(ctx, route);
   if (context === undefined)
@@ -118,10 +119,7 @@ export async function verifyCustomerSignInRoute(
 export async function buyerCustomerRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    BuyerRoute,
-    { kind: "read_buyer_customer" | "save_customer_address" }
-  >,
+  route: Variant<BuyerRoute, "read_buyer_customer" | "save_customer_address">,
 ): Promise<Response> {
   const context = customerContext(ctx, route);
   const token = bearerToken(request);

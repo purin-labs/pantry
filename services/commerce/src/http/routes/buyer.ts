@@ -33,11 +33,12 @@ import {
   readBuyerOrderRoute,
   requestBuyerReturnRoute,
 } from "./buyer-orders.ts";
+import type { Variant } from "@seams/type-utils";
 
 async function createBuyerSessionRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "create_buyer_session" }>,
+  route: Variant<BuyerRoute, "create_buyer_session">,
 ): Promise<Response> {
   const context = ctx.authority.readBuyerStorefrontContext(
     route.merchantId,

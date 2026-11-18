@@ -22,6 +22,7 @@ import {
   type TimeLanesItem,
   type TimeLanesSection,
 } from "../../ui";
+import type { Variant } from "@seams/type-utils";
 
 // What expires and what arrives: each lot on its expiry date and each open
 // purchase on its delivery date. The rows are the ones the page's search,
@@ -151,7 +152,7 @@ function StockLanes(props: {
   readonly control: PeriodControl;
   readonly clock: number;
   readonly rows: readonly StockRow[];
-  readonly deliveries: Extract<InventoryDeliveries, { kind: "ready" }>;
+  readonly deliveries: Variant<InventoryDeliveries, "ready">;
   readonly onOpen: (rowId: string) => void;
   readonly notice?: React.ReactNode;
 }): React.ReactNode {

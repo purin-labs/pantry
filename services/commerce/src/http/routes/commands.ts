@@ -14,49 +14,47 @@ import {
   readJsonBody,
 } from "../request-body.ts";
 import { entityPlaneErrorResponse, jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function merchantCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    {
-      kind:
-        | "create_location"
-        | "prepare_catalog_listing"
-        | "update_product_description"
-        | "place_channel_listing"
-        | "configure_pickup_storefront"
-        | "configure_shipping_storefront"
-        | "create_in_person_checkout"
-        | "create_pickup_checkout"
-        | "begin_checkout_payment"
-        | "collect_in_person_checkout_payment"
-        | "record_checkout_payment_capture"
-        | "observe_payment_dispute"
-        | "place_paid_checkout"
-        | "mark_pickup_ready"
-        | "complete_pickup"
-        | "cancel_order"
-        | "refund_order"
-        | "resolve_checkout_payment"
-        | "expire_checkout"
-        | "create_preparation_station"
-        | "create_modifier_group_revision"
-        | "create_recipe_revision"
-        | "configure_stock_policy"
-        | "publish_menu"
-        | "mark_sold_out"
-        | "manage_preparation_ticket"
-        | "complete_production_batch"
-        | "purchase_shipping_label"
-        | "attach_fulfillment_tracking"
-        | "record_shipping_tracking"
-        | "publish_catalog_listing"
-        | "create_inventory_item"
-        | "open_inventory_position"
-        | "receive_inventory";
-    }
+    | "create_location"
+    | "prepare_catalog_listing"
+    | "update_product_description"
+    | "place_channel_listing"
+    | "configure_pickup_storefront"
+    | "configure_shipping_storefront"
+    | "create_in_person_checkout"
+    | "create_pickup_checkout"
+    | "begin_checkout_payment"
+    | "collect_in_person_checkout_payment"
+    | "record_checkout_payment_capture"
+    | "observe_payment_dispute"
+    | "place_paid_checkout"
+    | "mark_pickup_ready"
+    | "complete_pickup"
+    | "cancel_order"
+    | "refund_order"
+    | "resolve_checkout_payment"
+    | "expire_checkout"
+    | "create_preparation_station"
+    | "create_modifier_group_revision"
+    | "create_recipe_revision"
+    | "configure_stock_policy"
+    | "publish_menu"
+    | "mark_sold_out"
+    | "manage_preparation_ticket"
+    | "complete_production_batch"
+    | "purchase_shipping_label"
+    | "attach_fulfillment_tracking"
+    | "record_shipping_tracking"
+    | "publish_catalog_listing"
+    | "create_inventory_item"
+    | "open_inventory_position"
+    | "receive_inventory"
   >,
 ): Promise<Response> {
   if (FOOD_SERVICE_ROUTES.has(route.kind) && !ctx.authority.hasFoodService)
@@ -230,9 +228,9 @@ export async function merchantCommandRoute(
 export async function publishProductionDemandPresetRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "publish_production_demand_preset" }
+    "publish_production_demand_preset"
   >,
 ): Promise<Response> {
   if (ctx.entityPlane === undefined)
@@ -258,10 +256,7 @@ export async function publishProductionDemandPresetRoute(
 export async function reconcileInventoryRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "reconcile_inventory" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "reconcile_inventory">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;

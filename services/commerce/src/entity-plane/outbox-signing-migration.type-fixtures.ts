@@ -1,8 +1,9 @@
 import type { OutboxSigningMigrationBatch } from "./outbox-signing-migration.ts";
+import type { Variant } from "@seams/type-utils";
 
-declare const continuation: Extract<
+declare const continuation: Variant<
   OutboxSigningMigrationBatch,
-  { kind: "continuation" }
+  "continuation"
 >;
 
 // @ts-expect-error A completed migration cannot retain a continuation cursor.

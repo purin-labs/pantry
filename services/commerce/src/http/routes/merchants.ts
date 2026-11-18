@@ -9,14 +9,15 @@ import {
   readJsonBody,
 } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 /** A storefront's shop name: read it, or take a new one. */
 export async function handleShopName(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     CommerceRoute,
-    { kind: "read_storefront_shop_name" | "set_storefront_shop_name" }
+    "read_storefront_shop_name" | "set_storefront_shop_name"
   >,
 ): Promise<Response> {
   if (ctx.shopNames === undefined)
@@ -47,10 +48,7 @@ export async function handleShopName(
 
 export async function closeMerchantRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "close_merchant" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "close_merchant">,
 ): Promise<Response> {
   if (ctx.access === undefined)
     return jsonResponse(409, {
@@ -69,10 +67,7 @@ export async function closeMerchantRoute(
 export async function provisionMerchantRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "provision_merchant" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "provision_merchant">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -91,10 +86,7 @@ export async function provisionMerchantRoute(
 export async function provisionDemoRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "provision_demo" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "provision_demo">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -116,10 +108,7 @@ export async function provisionDemoRoute(
 export async function acknowledgeDeliveryRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "acknowledge_delivery" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "acknowledge_delivery">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -140,7 +129,7 @@ export async function acknowledgeDeliveryRoute(
 
 export async function runArchiveRoute(
   ctx: HttpRouteContext,
-  route: Extract<Exclude<CommerceRoute, BuyerRoute>, { kind: "run_archive" }>,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "run_archive">,
 ): Promise<Response> {
   if (ctx.archive === undefined)
     return jsonResponse(409, {

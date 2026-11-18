@@ -17,11 +17,12 @@ import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
 import { resolveShippingDestination } from "./buyer-cart.ts";
+import type { Variant } from "@seams/type-utils";
 
 export async function createBuyerCheckoutRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "create_buyer_checkout" }>,
+  route: Variant<BuyerRoute, "create_buyer_checkout">,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);
   if (!access.ok) return access.response;
@@ -110,7 +111,7 @@ export async function createBuyerCheckoutRoute(
 export async function readBuyerCheckoutRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "read_buyer_checkout" }>,
+  route: Variant<BuyerRoute, "read_buyer_checkout">,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);
   if (!access.ok) return access.response;
@@ -126,7 +127,7 @@ export async function readBuyerCheckoutRoute(
 export async function createBuyerPaymentSessionRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "create_buyer_payment_session" }>,
+  route: Variant<BuyerRoute, "create_buyer_payment_session">,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);
   if (!access.ok) return access.response;
@@ -151,7 +152,7 @@ export async function createBuyerPaymentSessionRoute(
 export async function reconcileBuyerPaymentRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "reconcile_buyer_payment" }>,
+  route: Variant<BuyerRoute, "reconcile_buyer_payment">,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);
   if (!access.ok) return access.response;
@@ -174,7 +175,7 @@ export async function reconcileBuyerPaymentRoute(
 export async function refreshBuyerCheckoutRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<BuyerRoute, { kind: "refresh_buyer_checkout" }>,
+  route: Variant<BuyerRoute, "refresh_buyer_checkout">,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);
   if (!access.ok) return access.response;
@@ -237,9 +238,9 @@ export async function refreshBuyerCheckoutRoute(
 export async function buyerStoredValueRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     BuyerRoute,
-    { kind: "read_gift_card_balance" | "place_buyer_stored_value_checkout" }
+    "read_gift_card_balance" | "place_buyer_stored_value_checkout"
   >,
 ): Promise<Response> {
   const access = verifyBuyerAccess(ctx, request, route);

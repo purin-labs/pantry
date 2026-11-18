@@ -4,24 +4,22 @@ import { assertNever } from "@seams/std";
 import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 /** A merchant's Square connection and what it reads (Plan 80 step 4). */
 export async function squareConnectionRoute(
   ctx: HttpRouteContext,
   request: Request,
   url: URL,
-  route: Extract<
+  route: Variant<
     CommerceRoute,
-    {
-      kind:
-        | "connect_square"
-        | "read_square_connection"
-        | "disconnect_square"
-        | "list_square_locations"
-        | "list_square_devices"
-        | "create_square_device_code"
-        | "read_square_device_code";
-    }
+    | "connect_square"
+    | "read_square_connection"
+    | "disconnect_square"
+    | "list_square_locations"
+    | "list_square_devices"
+    | "create_square_device_code"
+    | "read_square_device_code"
   >,
 ): Promise<Response> {
   const connections = ctx.squareAccounts?.connections;
@@ -88,10 +86,7 @@ export async function squareConnectionRoute(
 
 export async function listPaymentAccountsRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_payment_accounts" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_payment_accounts">,
 ): Promise<Response> {
   return jsonResponse(200, {
     accounts: [
@@ -104,10 +99,7 @@ export async function listPaymentAccountsRoute(
 export async function linkSquareAccountRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "link_square_account" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "link_square_account">,
 ): Promise<Response> {
   const accounts = ctx.squareAccounts;
   if (accounts === undefined)
@@ -123,9 +115,9 @@ export async function linkSquareAccountRoute(
 export async function stripeAccountRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "link_stripe_account" | "start_stripe_onboarding" }
+    "link_stripe_account" | "start_stripe_onboarding"
   >,
 ): Promise<Response> {
   const accounts = ctx.paymentAccounts;
@@ -144,10 +136,7 @@ export async function stripeAccountRoute(
 
 export async function settleOnlinePaymentRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "settle_online_payment" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "settle_online_payment">,
 ): Promise<Response> {
   return jsonResponse(
     200,
@@ -160,10 +149,7 @@ export async function settleOnlinePaymentRoute(
 
 export async function listUnplacedCapturesRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "list_unplaced_captures" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_unplaced_captures">,
 ): Promise<Response> {
   const captures = ctx.authority.listUnplacedCaptures(route.merchantId);
   return captures === undefined
@@ -174,9 +160,9 @@ export async function listUnplacedCapturesRoute(
 export async function resolveUnplacedCaptureRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
+  route: Variant<
     Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "resolve_unplaced_capture" }
+    "resolve_unplaced_capture"
   >,
 ): Promise<Response> {
   const body = await readJsonBody(request);
@@ -206,10 +192,7 @@ export async function resolveUnplacedCaptureRoute(
 export async function observeStripeDisputeRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "observe_stripe_dispute" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "observe_stripe_dispute">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;

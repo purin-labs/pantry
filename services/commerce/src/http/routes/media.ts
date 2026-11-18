@@ -8,6 +8,7 @@ import { errorMessage, isRecord } from "@seams/std";
 import type { HttpRouteContext } from "../context.ts";
 import { hasMerchantId, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
+import type { Variant } from "@seams/type-utils";
 
 // The media commands. A new record names bytes the store must hold; the
 // last record of some bytes takes them out of the store after it commits.
@@ -62,10 +63,7 @@ async function mediaCommand(
 export async function uploadMediaRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "upload_media" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "upload_media">,
 ): Promise<Response> {
   if (ctx.media === undefined)
     return jsonResponse(503, {
@@ -91,13 +89,7 @@ export async function uploadMediaRoute(
 export async function mediaCommandRoute(
   ctx: HttpRouteContext,
   request: Request,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    {
-      kind:
-        "create_media" | "update_media" | "delete_media" | "set_product_media";
-    }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "create_media" | "update_media" | "delete_media" | "set_product_media">,
 ): Promise<Response> {
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
@@ -118,7 +110,7 @@ export async function mediaCommandRoute(
 
 export async function listMediaRoute(
   ctx: HttpRouteContext,
-  route: Extract<Exclude<CommerceRoute, BuyerRoute>, { kind: "list_media" }>,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_media">,
 ): Promise<Response> {
   return jsonResponse(200, ctx.authority.readMediaLibrary(route.merchantId));
 }
@@ -130,10 +122,7 @@ export async function listMediaRoute(
  */
 export async function readMediaContentRoute(
   ctx: HttpRouteContext,
-  route: Extract<
-    Exclude<CommerceRoute, BuyerRoute>,
-    { kind: "read_media_content" }
-  >,
+  route: Variant<Exclude<CommerceRoute, BuyerRoute>, "read_media_content">,
 ): Promise<Response> {
   const media =
     ctx.media === undefined

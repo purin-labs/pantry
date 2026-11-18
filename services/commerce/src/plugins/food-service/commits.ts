@@ -28,6 +28,7 @@ import {
 import { writeSoldOutMark } from "./sold-out-marks.ts";
 import type { FoodServiceCommitRequest } from "./food-service-commands.ts";
 import type { ProductionCommitRequest } from "./production-commands.ts";
+import type { Variant } from "@seams/type-utils";
 
 export function foodServiceMutation(
   request: FoodServiceCommitRequest | ProductionCommitRequest,
@@ -139,7 +140,7 @@ function productionBatchMutation(
 }
 
 function preparationTicketMutation(
-  request: Extract<FoodServiceCommitRequest, { kind: "preparation_ticket" }>,
+  request: Variant<FoodServiceCommitRequest, "preparation_ticket">,
 ): ExtensionMutation<FoodServiceMutationCommand> {
   const { command, plan } = request;
   const observations: CommerceAggregateObservationV1[] = [
