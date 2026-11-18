@@ -280,9 +280,16 @@ type DocumentClientConfig<
   /** Pointer positions go to the room as fractions of this element. */
   surface: HTMLElement;
   create(): Replica;
+  /**
+   * `Room` is not inferred from here: a parser returns the whole message
+   * union, which would become `Room`. It comes from the client's own type.
+   */
   parse(
     frame: unknown,
-  ): Result<ServerMessage<Selection, StateVector, Update, Code, Room>, Code>;
+  ): Result<
+    ServerMessage<Selection, StateVector, Update, Code, NoInfer<Room>>,
+    Code
+  >;
   encode(message: SyncClientMessage<Selection, StateVector, Update>): string;
   invalidMessage: Code;
   /** Local edit refusals that keep the connection: the view shows again. */
