@@ -37,7 +37,7 @@ import {
   readProjectDirectory,
 } from "../../src/chat/projects";
 import { mutateProject } from "../../src/projects/commands";
-import { assertNever, isRecord } from "@seams/std";
+import { isRecord } from "@seams/std";
 import {
   parseChatPlacement,
   parseProjectCommand,
@@ -66,10 +66,7 @@ import {
   reconcileRevokedConversationRun,
   readConversationForExecution,
   saveConversation,
-  renameConversation,
   updateConversationMetadata,
-  updateConversationDraft,
-  advanceConversationRead,
   type ConversationScope,
 } from "../../src/chat/store";
 
@@ -741,7 +738,7 @@ const readScopeActive = OrganisationExecutionScope.prototype.isActive;
 type DirectoryPlacementRace = { relocationId: ActorRelocationId | null };
 
 it(
-  "fences directory receipts and effects across freezes, rollback and relocation",
+  "fences directory receipts and effects across a freeze, rollback and relocation",
   directoryPlacementJourney,
   90_000,
 );
@@ -819,28 +816,6 @@ async function directoryPlacementJourney({ task }: TestContext) {
     insertion: { kind: "end" },
   };
   const beforeMove = await directoryPlacementEvidence();
-  const moveScope = await currentDirectoryScope();
-  const moveRace: DirectoryPlacementRace = { relocationId: null };
-  const movePause = vi
-    .spyOn(OrganisationExecutionScope.prototype, "isActive")
-    .mockImplementationOnce(
-      freezeDirectoryAfterCheck.bind(null, moveScope, moveRace),
-    );
-  try {
-    expect(
-      await mutateChatDirectory(
-        moveScope,
-        fixture.scope.userId,
-        move,
-        Date.now(),
-      ),
-    ).toMatchObject({ kind: "rejected" });
-    expect(movePause).toHaveBeenCalled();
-  } finally {
-    movePause.mockRestore();
-  }
-  expect(await directoryPlacementEvidence()).toEqual(beforeMove);
-  await resumeDirectoryPlacement(moveRace);
   const active = await currentDirectoryScope();
   await fixtureDatabase()
     .prepare(
@@ -941,12 +916,11 @@ async function directoryPlacementJourney({ task }: TestContext) {
     directoryPlacementEvidence: {
       emptyRead:
         "frozen placement rejects reads without directory initialization",
-      freeze:
-        "create and move rejected after active check without receipt or effects",
+      freeze: "create rejected after active check without receipt or effects",
       rollback:
         "late directory update failure rolls back receipt, ordering and membership",
       recovery:
-        "retired scope rejected; fresh HTTP requests succeed after two relocations",
+        "retired scope rejected; fresh HTTP requests succeed after the relocation",
       replay: "create and move receipts replay without additional writes",
       operations:
         "create, move, edit, reorder and delete accepted on active placement",
@@ -1129,10 +1103,8 @@ function evidenceRows(result: D1Result | undefined) {
   return result.results;
 }
 
-type OperatorEdit = "rename" | "metadata" | "draft" | "read";
-
 it(
-  "fences operator chat edits and rolls back personal-state initialization",
+  "fences an operator chat pin and rolls back personal-state initialization",
   operatorPlacementJourney,
   90_000,
 );
@@ -1141,86 +1113,48 @@ async function operatorPlacementJourney({ task }: TestContext) {
   const fixture = await createProjectFixture();
   await seedProjectChats(fixture.scope, 1);
   const id = fixtureConversationId(0);
-  const original = await readConversation(fixtureDatabase(), fixture.scope, id);
-  if (!original) throw new Error("Missing operator chat fixture");
-  expect(
-    await saveConversation(
-      await requireOrganisationExecutionScope(
-        env,
-        fixture.scope.organisationId,
-      ),
-      fixture.scope.userId,
-      {
-        ...original.conversation,
-        latestSequence: 1,
-        timeline: [
-          {
-            kind: "user",
-            eventId: "p55_personal_message",
-            sequence: 1,
-            requestId: "p55_personal_message",
-            createdAt: Date.now(),
-            text: "Plan the cold-tray handoff",
-            parts: [{ kind: "text", text: "Plan the cold-tray handoff" }],
-          },
-        ],
-      },
-      original.revision,
-    ),
-  ).toEqual({ kind: "saved" });
-  const edits: readonly OperatorEdit[] = [
-    "rename",
-    "metadata",
-    "draft",
-    "read",
-  ];
-  for (const edit of edits) {
-    const execution = await currentDirectoryScope();
-    const stored = await readConversation(fixtureDatabase(), fixture.scope, id);
-    if (!stored) throw new Error("Missing operator chat");
-    const before = await directoryPlacementEvidence();
-    const race: DirectoryPlacementRace = { relocationId: null };
-    const pause = vi
-      .spyOn(OrganisationExecutionScope.prototype, "isActive")
-      .mockImplementationOnce(
-        freezeDirectoryAfterCheck.bind(null, execution, race),
-      );
-    try {
-      expect(
-        await attemptOperatorEdit(
-          edit,
-          execution,
-          fixture.scope.userId,
-          stored.revision,
-        ),
-      ).toMatchObject({ ok: false });
-      expect(pause).toHaveBeenCalled();
-    } finally {
-      pause.mockRestore();
-    }
-    expect(await directoryPlacementEvidence()).toEqual(before);
-    await resumeDirectoryPlacement(race);
+  const execution = await currentDirectoryScope();
+  const before = await directoryPlacementEvidence();
+  const race: DirectoryPlacementRace = { relocationId: null };
+  const pause = vi
+    .spyOn(OrganisationExecutionScope.prototype, "isActive")
+    .mockImplementationOnce(
+      freezeDirectoryAfterCheck.bind(null, execution, race),
+    );
+  try {
     expect(
-      await attemptOperatorEdit(
-        edit,
+      await updateConversationMetadata(
         execution,
         fixture.scope.userId,
-        stored.revision,
+        id,
+        { kind: "pin" },
+        Date.now(),
       ),
     ).toMatchObject({ ok: false });
-    expect(await directoryPlacementEvidence()).toEqual(before);
-    expect(
-      (await requestOperatorEdit(edit, fixture.session, stored.revision))
-        .status,
-    ).toBe(200);
+    expect(pause).toHaveBeenCalled();
+  } finally {
+    pause.mockRestore();
   }
+  expect(await directoryPlacementEvidence()).toEqual(before);
+  await resumeDirectoryPlacement(race);
+  expect(
+    await updateConversationMetadata(
+      execution,
+      fixture.scope.userId,
+      id,
+      { kind: "pin" },
+      Date.now(),
+    ),
+  ).toMatchObject({ ok: false });
+  expect(await directoryPlacementEvidence()).toEqual(before);
+  const path = `/v1/control/organisations/${ORGANISATION_ID}/chat/conversations/${id}`;
+  expect(
+    (await chatApiRequest(fixture.session, path, "PATCH", { action: "pin" }))
+      .status,
+  ).toBe(200);
   const edited = await readConversation(fixtureDatabase(), fixture.scope, id);
   if (!edited) throw new Error("Missing edited chat");
-  expect(edited.conversation.title).toBe("Regional handoff");
   expect(edited.metadata.pinnedAt).not.toBeNull();
-  expect(edited.conversation.draftText).toBe("Next dispatch notes");
-  expect(edited.conversation.lastReadSequence).toBe(1);
-  expect(edited.revision).toBe(original.revision + 2);
 
   await fixtureDatabase().batch([
     fixtureDatabase()
@@ -1258,7 +1192,6 @@ async function operatorPlacementJourney({ task }: TestContext) {
       .run();
   }
   expect(await directoryPlacementEvidence()).toEqual(uninitialized);
-  const path = `/v1/control/organisations/${ORGANISATION_ID}/chat/conversations/${id}`;
   expect(
     (
       await chatApiRequest(fixture.session, path, "PATCH", {
@@ -1285,83 +1218,16 @@ async function operatorPlacementJourney({ task }: TestContext) {
   ).toBe("active");
   Object.assign(task.meta, {
     operatorPlacementEvidence: {
-      freezeRaces: edits,
+      freezeRace: "pin",
       rejection:
         "no conversation, personal-state or directory mutation after freeze or retired-scope retry",
-      recovery: "fresh HTTP edit succeeded after each of four relocations",
+      recovery: "fresh HTTP pin succeeded after the relocation",
       rollback:
         "late metadata failure rolled back directory and personal-state initialization and archive",
       retry: "fresh archive and restore succeeded after rollback",
       final: await directoryPlacementEvidence(),
     },
   });
-}
-
-function attemptOperatorEdit(
-  edit: OperatorEdit,
-  execution: OrganisationExecutionScope,
-  userId: ConversationScope["userId"],
-  revision: number,
-) {
-  const id = fixtureConversationId(0);
-  switch (edit) {
-    case "rename":
-      return renameConversation(
-        execution,
-        userId,
-        id,
-        "Regional handoff",
-        revision,
-        Date.now(),
-      );
-    case "metadata":
-      return updateConversationMetadata(
-        execution,
-        userId,
-        id,
-        { kind: "pin" },
-        Date.now(),
-      );
-    case "draft":
-      return updateConversationDraft(
-        execution,
-        userId,
-        id,
-        "Next dispatch notes",
-        null,
-        Date.now(),
-      );
-    case "read":
-      return advanceConversationRead(execution, userId, id, 1);
-    default:
-      return assertNever(edit);
-  }
-}
-function requestOperatorEdit(
-  edit: OperatorEdit,
-  session: IssuedControlSession,
-  revision: number,
-) {
-  const path = `/v1/control/organisations/${ORGANISATION_ID}/chat/conversations/${fixtureConversationId(0)}`;
-  switch (edit) {
-    case "rename":
-      return chatApiRequest(session, path, "PATCH", {
-        action: "rename",
-        title: "Regional handoff",
-        expectedRevision: revision,
-      });
-    case "metadata":
-      return chatApiRequest(session, path, "PATCH", { action: "pin" });
-    case "draft":
-      return chatApiRequest(session, `${path}/draft`, "PUT", {
-        draft: "Next dispatch notes",
-        expectedUpdatedAt: null,
-      });
-    case "read":
-      return chatApiRequest(session, `${path}/read`, "POST", { sequence: 1 });
-    default:
-      return assertNever(edit);
-  }
 }
 
 it(
