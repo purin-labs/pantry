@@ -88,9 +88,6 @@ importers:
       '@seams/costs-sheet-crdt':
         specifier: workspace:*
         version: link:../../packages/costs-sheet-crdt
-      '@seams/email-draft-crdt':
-        specifier: workspace:*
-        version: link:../../packages/email-draft-crdt
       '@seams/mail-reply-crdt':
         specifier: workspace:*
         version: link:../../packages/mail-reply-crdt
@@ -361,9 +358,6 @@ importers:
       '@seams/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@seams/email-draft-crdt':
-        specifier: workspace:*
-        version: link:../email-draft-crdt
       '@seams/mail-reply-crdt':
         specifier: workspace:*
         version: link:../mail-reply-crdt

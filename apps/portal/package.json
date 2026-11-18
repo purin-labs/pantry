@@ -17,7 +17,6 @@
     "@seams/contracts": "workspace:*",
     "@seams/control-api": "workspace:*",
     "@seams/costs-sheet-crdt": "workspace:*",
-    "@seams/email-draft-crdt": "workspace:*",
     "@seams/mail-reply-crdt": "workspace:*",
     "@seams/menu-board-crdt": "workspace:*",
     "@seams/menu-draft-crdt": "workspace:*",

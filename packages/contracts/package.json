@@ -19,10 +19,7 @@
     },
     "./media-inspect": "./src/media-inspect.ts",
     "./workspace-executor": "./src/workspace-executor.ts",
-    "./model-route": "./src/model-route.ts",
-    "./digest-encoders": "./src/digest-encoders.ts",
     "./session-reducer": "./src/session-reducer.ts",
-    "./session-schemas": "./src/session-schemas.ts",
     "./message": "./src/message.ts",
     "./attachment-preparation": "./src/attachment-preparation.ts"
   },

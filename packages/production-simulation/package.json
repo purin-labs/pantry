@@ -15,7 +15,6 @@
     "./native/model-packs": "./src/native/model-packs.ts",
     "./recipes/cold-cell-journey": "./src/recipes/cold-cell-journey.ts",
     "./recipes/recurring-cold-cell": "./src/recipes/recurring-cold-cell.ts",
-    "./recipes/contract-example": "./src/recipes/contract-example.ts",
     "./recipes/bakery/cafe-shift": "./src/recipes/bakery/cafe-shift.ts",
     "./scenario-document": "./src/scenario-document.ts",
     "./recipes/bakery/espresso": "./src/recipes/bakery/espresso.ts",

@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./protocol": "./src/protocol.ts",
-    "./limits": "./src/limits.ts"
+    "./protocol": "./src/protocol.ts"
   },
   "scripts": {
     "check:types": "tsrs --noEmit"

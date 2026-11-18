@@ -25,7 +25,6 @@
   "dependencies": {
     "@seams/collaboration": "workspace:*",
     "@seams/contracts": "workspace:*",
-    "@seams/email-draft-crdt": "workspace:*",
     "@seams/mail-reply-crdt": "workspace:*",
     "@seams/menu-board-crdt": "workspace:*",
     "@seams/menu-draft-crdt": "workspace:*",
