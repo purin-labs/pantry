@@ -9,6 +9,7 @@ import type { CommerceActionRecord } from "@seams/control-api/portal/commerce-ac
 import type { VariantBy } from "@seams/type-utils";
 import type { PermissionRequired } from "@seams/control-api";
 import { PermissionRequiredPrompt, permissionRequiredOf } from "../../access/permission-required-prompt";
+import { assertNever } from "@seams/std";
 
 export type ProductDescriptionSnapshot = Readonly<{
   productId: string;
@@ -296,11 +297,9 @@ function connectionLabel(view: DescriptionDraftView): string {
     case "syncing": return "Syncing…";
     case "reconnecting": return "Reconnecting… Unsynced edits are held only on this page.";
     case "failed": return "Sync stopped";
-    default: return unreachable(view);
+    default: return assertNever(view, "Unexpected editor state");
   }
 }
-
-function unreachable(value: never): never { throw new Error(`Unexpected editor state: ${String(value)}`); }
 
 function descriptionAgentLabel(activity: DescriptionDraftView["agents"][number]): string {
   return `${activity.agent.displayName} edits description`;
