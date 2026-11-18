@@ -132,7 +132,7 @@ The owner's plan on 2026-11-18:
 
 1. The GitHub organisation changes from `seams-tech` to `purin-io`.
 2. The repositories move from `~/Dev/lowerarchy` and `~/Dev/rust` to `~/Dev/purin-io`. The owner named
-   `~/Dev/purin-io/pantry` for the pantry clone on 2026-11-18. The other folder names are not
+   `~/Dev/purin-io/pantry` for the pantry clone, and the clone moved there on 2026-11-18. The other folder names are not
    confirmed.
 3. A few days later, after the hackathon, the Seams names change to Purin.
 
@@ -144,8 +144,8 @@ Git ignores these files. A moved folder keeps them, but a new clone does not hav
 
 | Item                                         | Size   | What to do                                                                                                            |
 | -------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------- |
-| `.cache/human/2026-11-16-1912/`              | 9.6 MB | The owner's voice. The D5 run needs it. Never commit it. Copied to the clone `~/Dev/lowerarchy/pantry` on 2026-11-18. |
-| `output/shop-voice/`                         | 25 MB  | Journey and bench results that the plans cite. Copied to the clone `~/Dev/lowerarchy/pantry` on 2026-11-18.           |
+| `.cache/human/2026-11-16-1912/`              | 9.6 MB | The owner's voice. The D5 run needs it. Never commit it. In the clone `~/Dev/purin-io/pantry` since 2026-11-18. |
+| `output/shop-voice/`                         | 25 MB  | Journey and bench results that the plans cite. In the clone `~/Dev/purin-io/pantry` since 2026-11-18.           |
 | `.claude/launch.json`, `voice-recorder-p82c` | —      | The new clone has no `.claude/launch.json`. Add the entry with the new path if you use the recorder.                  |
 
 ### What stays where it is
@@ -174,7 +174,7 @@ These are outside the repositories, so the move does not change them:
   new path starts with no notes. Today three folders hold separate copies, named after the clones
   `satyr`, `seams-atelier` and `pantry`, for example
   `~/.claude/projects/-Users-pta-Dev-lowerarchy-pantry/memory`. The `pantry` folder has the voice
-  notes of 2026-11-18. Merge the three into the folder of `~/Dev/purin-io/pantry`,
+  notes of 2026-11-18. The move of 2026-11-18 merged the three into the folder of `~/Dev/purin-io/pantry`,
   `~/.claude/projects/-Users-pta-Dev-purin-io-pantry/memory`.
 
 ### What the Purin rename changes for voice
