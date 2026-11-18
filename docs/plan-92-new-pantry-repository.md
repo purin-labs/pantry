@@ -1,6 +1,6 @@
 # Plan 92 — A new pantry repository
 
-Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); duplicate code and tests open.
+Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); tests done on 19 November 2026 (see "Phase 2 results: tests"; the fold of E2E fault cases waits for the owner); duplicate code open.
 Owner: the whole repository.
 Touches: [Plan 91 — names](plan-91-seams-atelier-rename.md),
 [Refactor 16 — Kitchen physics](refactor-16.md), the deploy procedure and
@@ -265,3 +265,96 @@ that fixture's second Organisation a policy, and the journey passes.
 - 147 type re-exports in `packages/contracts/src/index.ts` that no package
   imports, and 332 re-export lines that knip reports: they need a decision on
   the public surface of each package.
+
+## Phase 2 results: tests (19 November 2026)
+
+Five commits on `dev` remove 13,637 lines and add 2,568 in
+`services/platform/tests` (net 11,069 fewer). Outside the tests, 784 lines
+go (the benchmark runner, its two root scripts and CI step, and the `export`
+of four functions that only deleted tests imported), and 21 lines come (16 of
+them the account Worker check). No product behavior changed. No deploy.
+
+| Workstream | Commit | Test lines removed (added) | What changed |
+|---|---|---|---|
+| Clearest weak tests | `95f4acf` | 4,878 (74) | `code-mode-admission`, `optimization-1-benchmark`, `portal-access-route`, `case-context-discovery-route` and `actor-journal-transaction` are gone. The new allowed/denied journey `e2e/case-context-discovery-access` replaces the route test. `e2e/session-quarantine-end` and `e2e/pi-sdk-actor` cover the journal test's quarantine case: a Session with an unknown effect stays quarantined and asks the model nothing more, and a recorded result reconciles once. |
+| Account Worker check | `69a8378` | 0 (16 config lines) | `vitest.e2e.config.ts` refuses an account Worker that does not know both Jev prices, and tells how to rebuild it. |
+| Board and WhatsApp journeys | `b96e879` | 776 (143) | `pi-menu-board-price` and `pi-menu-board-together` call `installBoardJourney`; `inbox-whatsapp` calls `whatsapp-connector-support`'s `installFixture({ inbox: true })`. |
+| Mock-heavy unit tests | `f14a6fe` | 3,637 (78) | 49 files reviewed case by case; 47 cases and 2 files deleted (product mock calls, tautologies, or outcomes that a named journey asserts); mock-call checks removed from kept cases. The commit message names the journey for each deletion. |
+| E2E helper copies | `7065a53` | 4,346 (2,273) | 105 groups of copied helper functions now import one home; 4 new support modules (`link-fetch`, `placement-move`, `commerce-journey`, `vault`). Some added lines are Prettier rewraps of old lines. |
+
+**Proof.** The unit suite passes 314 files and 1,816 tests (1 skipped), with
+no failure. The test and E2E type checks are clean. Each changed E2E journey
+passed (about 120 files, in batches of at most eight).
+
+**The account Worker.** The artifact at
+`~/Dev/rust/seams-monorepo/.artifacts/shared-account-platform/account-worker/index.mjs`
+is rebuilt from seams-monorepo `dev` `cb0b80eb` (after `aee87e9a`; it holds
+nine unpushed console-server commits that only fail closed), SHA-256
+`87403b7d…`. `e2e/plan-88-jev-features` passes 6 of 6 with it. The old
+artifact (27 October) failed J4 and J7 (3 tests); the config now refuses it.
+
+**Outcomes with no test now.** Their only cases asserted calls on product
+mocks, so they proved nothing. A journey for each is open for the plan that
+owns it:
+1. An Organisation's erasure empties every WhatsApp Connector before its rows
+   go.
+2. An attachment preparation settles or cancels its executor allocation (a
+   money path).
+
+**Product exports that only deleted tests used.** I did not change them,
+because the duplicate-code workstream owns product code:
+- `apps/portal/src/features/commerce/index.ts` re-exports
+  `entityDossierQuery`, `readCommerceChanges`, `systemEntityRef` and
+  `publishCommerceSavedViewPresentation`, and nothing imports them from there.
+- `apps/portal/src/portal.tsx` re-exports `fetchWhatsAppSurface`, and nothing
+  imports it from there.
+
+**Copies left.** `observeProviders` (the copies bind different fakes), generic
+helpers of six lines or less (`required`), the Portal session cookie header
+that 54 journeys build, and small steering helpers (`readSteeringStates`,
+`messageList`).
+
+## Proposal for the owner: fold the E2E fault cases (18 November 2026)
+
+Status: a proposal only. No fault journey changed. The journeys belong to
+other plans: mail and the Inbox (Plans 42J, 83, 88, 89), the Portal chat
+(Plans 42J, 87), Projects (Refactor 9), and the placement and origin journeys
+(Refactors 10 to 15). The owner of each plan folds its journeys, or tells me
+to do it.
+
+The rule (AGENTS.md, "Testing"): keep one case per distinct outcome, not one
+case per internal timing window. Today many journeys run the same outcome
+once for each internal step: an `it.for` over step names, or a separate case
+for each freeze, relocation or eviction point. Each case costs 60 to 180
+seconds of E2E time, and each new step in the product adds a case.
+
+**Scan** (`services/platform/tests/e2e`, 18 November 2026; titles with fault
+words and the parameters of each `it.for`): 21 files with three or more fault
+cases hold 43,300 lines and about 200 fault cases. The families below are
+the clearest. "Keep" is the proposed number of cases.
+
+| Journey | Now | Keep | The outcome that each kept case proves |
+|---|---|---|---|
+| `mail-inbox` (16,444 lines) | 38 fault cases: 7 mailbox lifecycle steps, 7 supplier proposal steps, 3 supplier assignment steps and about 20 single freeze, relocation or eviction cases | 6 | Issued mail work drains across a relocation and the evicted target recovers it once, with no second draft, Case or inference; a revoked read withholds content; the budget stops work without a draft |
+| `organisation-case-context-collection-placement` (2,322) | 26: 7 TypeSafe configuration steps, 7 operational steps, 7 Organisation steps, 3 hydration steps, 2 others | 4 | Issued work drains across a relocation, and the evicted target recovers it once, with the exact evidence and usage |
+| `mail-operational-placement` (941) | 11 compose steps | 1 | A compose drains across a relocation and recovers on the evicted target with one provider effect |
+| `portal-chat-finalization` (6,036) | 15: 5 captured-read steps, 2 attachment steps, 2 paused-response kinds, 2 dispatch kinds, 2 late-readiness kinds, 2 others | 6 | The originating session is kept through eviction; a revoked read fences the next step; a disconnected turn finalizes once |
+| Origin journeys: `file-session-origin` (5 steps), `mail-session-origin` (7), `airtable-session-origin` (5), `case-proposal-origin` (4), `message-link-session-origin` (3), `action-mutation-origin` (3) | 27 | 6 | One case each: a revoked origin refuses new work, issued effects settle once, and a fresh command is admitted after eviction |
+| `remote-mcp` (2,450) | 8: 4 origin steps, 4 write-control steps | 2 | A custom connector origin is fenced and recovers after eviction; a write's receipt is kept |
+| `whatsapp-placement` (1,236) | 6 in 2 step families, and 6 single cases | 4 | A revoked origin withholds the send and the preview; an issued send settles once after eviction |
+| `projects` (2,419) | 6 fence and rollback cases | 3 | A competing tab, a relocation and a rollback each leave one receipt and no lost chat |
+| `checkpoint-restart` (595) | 6 (3 admission kinds, 2 upload boundaries, 2 sizes) | 2 | A saved checkpoint recovers without a repeated inference, under open and closed admission |
+
+**How to fold one family.** Keep the setup and the outcome assertions. Keep
+the hardest internal point as the one fault (usually the last point before
+the effect). Delete the switch arms and seed helpers that only the other
+points use. If two points give different outcomes for a person (for example
+"refused" and "sent once"), keep both.
+
+**Gain.** The families in the table go from 149 cases to 34, each case of 60
+to 180 seconds, and about 25,000 lines go, which is the earlier estimate of phase 2. Each
+owner measures the lines when the fold lands.
+
+**Risk.** A step that only one deleted case reached can break without a
+signal. The fold keeps the last point before each effect, because a fault
+there exercises every fence before it. A step with its own outcome stays.
