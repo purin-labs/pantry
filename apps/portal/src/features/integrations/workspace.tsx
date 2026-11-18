@@ -1,6 +1,7 @@
 import { Select } from "../../ui/select";
 import React from "react";
 import { MutationLedger } from "../../mutation-state";
+import { ArchiveConfirm } from "./archive-confirm";
 import type { Variant } from "@seams/type-utils";
 import {
   formatControlRole,
@@ -287,68 +288,6 @@ function renderOrganisationInvitationRow(
   );
 }
 
-function ArchiveConfirm(props: {
-  readonly organisationName: string;
-  readonly busy: boolean;
-  readonly onArchive: () => Promise<void>;
-}): React.ReactNode {
-  const [open, setOpen] = React.useState(false);
-  const [typed, setTyped] = React.useState("");
-  const trigger = React.useRef<HTMLButtonElement>(null);
-  const panelId = React.useId();
-  if (!open) {
-    return (
-      <button
-        type="button"
-        className="danger-button"
-        ref={trigger}
-        aria-expanded="false"
-        aria-controls={panelId}
-        onClick={setArchiveConfirmOpen.bind(null, setOpen)}
-      >
-        Archive workspace
-      </button>
-    );
-  }
-  const matches = typed.trim() === props.organisationName;
-  return (
-    <div
-      className="archive-confirm"
-      id={panelId}
-      role="group"
-      aria-label="Archive workspace confirmation"
-    >
-      <label>
-        <span>
-          Type <strong>{props.organisationName}</strong> to confirm
-        </span>
-        <input
-          value={typed}
-          onChange={setArchiveConfirmText.bind(null, setTyped)}
-          placeholder={props.organisationName}
-          autoFocus
-        />
-      </label>
-      <div className="archive-confirm-actions">
-        <button
-          type="button"
-          className="danger-button"
-          disabled={!matches || props.busy}
-          onClick={runArchive.bind(null, props.onArchive)}
-        >
-          Confirm archive
-        </button>
-        <button
-          type="button"
-          onClick={closeArchiveConfirm.bind(null, setOpen, setTyped, trigger)}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export function ConfirmButton(props: {
   readonly confirmKey: string;
   readonly pendingConfirm: string | null;
@@ -406,10 +345,6 @@ function requestButtonConfirm(
   request(key);
 }
 
-function runArchive(action: () => Promise<void>): void {
-  void action();
-}
-
 function renderRoleItem(
   role: Readonly<{ value: string; label: string }>,
 ): React.ReactNode {
@@ -426,33 +361,4 @@ function changeMemberRole(
   role: string | null,
 ): void {
   if (role !== null) void changeRole(userId, role);
-}
-
-function setArchiveConfirmOpen(
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-): void {
-  setOpen(true);
-}
-
-function setArchiveConfirmText(
-  setTyped: React.Dispatch<React.SetStateAction<string>>,
-  event: React.ChangeEvent<HTMLInputElement>,
-): void {
-  setTyped(event.currentTarget.value);
-}
-
-function closeArchiveConfirm(
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setTyped: React.Dispatch<React.SetStateAction<string>>,
-  trigger: React.RefObject<HTMLButtonElement | null>,
-): void {
-  setOpen(false);
-  setTyped("");
-  window.requestAnimationFrame(focusArchiveTrigger.bind(null, trigger));
-}
-
-function focusArchiveTrigger(
-  trigger: React.RefObject<HTMLButtonElement | null>,
-): void {
-  trigger.current?.focus();
 }

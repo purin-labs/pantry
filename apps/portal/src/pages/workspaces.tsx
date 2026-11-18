@@ -16,6 +16,7 @@ import type {
   OrganisationOnboardingLifecycle,
 } from "@seams/contracts";
 import { ControlApiError } from "../control-client";
+import { ArchiveConfirm } from "../features/integrations/archive-confirm";
 import {
   EmptyState,
   Notice,
@@ -1051,10 +1052,11 @@ function WorkspaceSupportToolsPanel(props: {
             </div>
           </dl>
           {supportCase.lifecycle === "active" ? (
-            <SupportArchiveConfirm
+            <ArchiveConfirm
               organisationName={supportCase.organisationId}
               busy={props.tools.busy}
               onArchive={props.tools.archive}
+              confirmLabel="Archive workspace"
             />
           ) : null}
         </div>
@@ -1084,104 +1086,4 @@ function supportCaseLifecycleLabel(lifecycle: string): string {
     default:
       return "Unknown status";
   }
-}
-
-function SupportArchiveConfirm(props: {
-  readonly organisationName: string;
-  readonly busy: boolean;
-  readonly onArchive: () => Promise<void>;
-}): React.ReactNode {
-  const [open, setOpen] = React.useState(false);
-  const [typed, setTyped] = React.useState("");
-  const trigger = React.useRef<HTMLButtonElement>(null);
-  const panelId = React.useId();
-  if (!open) {
-    return (
-      <button
-        type="button"
-        className="danger-button"
-        ref={trigger}
-        aria-expanded="false"
-        aria-controls={panelId}
-        onClick={openSupportArchiveConfirm.bind(null, setOpen)}
-      >
-        Archive workspace
-      </button>
-    );
-  }
-  const matches = typed.trim() === props.organisationName;
-  return (
-    <div
-      className="archive-confirm"
-      id={panelId}
-      role="group"
-      aria-label="Archive workspace confirmation"
-    >
-      <label>
-        <span>
-          Type <strong>{props.organisationName}</strong> to confirm
-        </span>
-        <input
-          value={typed}
-          onChange={setSupportArchiveText.bind(null, setTyped)}
-          placeholder={props.organisationName}
-          autoFocus
-        />
-      </label>
-      <div className="archive-confirm-actions">
-        <button
-          type="button"
-          className="danger-button"
-          disabled={!matches || props.busy}
-          onClick={runSupportArchive.bind(null, props.onArchive)}
-        >
-          Archive workspace
-        </button>
-        <button
-          type="button"
-          onClick={closeSupportArchiveConfirm.bind(
-            null,
-            setOpen,
-            setTyped,
-            trigger,
-          )}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function openSupportArchiveConfirm(
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-): void {
-  setOpen(true);
-}
-
-function setSupportArchiveText(
-  setTyped: React.Dispatch<React.SetStateAction<string>>,
-  event: React.ChangeEvent<HTMLInputElement>,
-): void {
-  setTyped(event.currentTarget.value);
-}
-
-function runSupportArchive(onArchive: () => Promise<void>): void {
-  void onArchive();
-}
-
-function closeSupportArchiveConfirm(
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setTyped: React.Dispatch<React.SetStateAction<string>>,
-  trigger: React.RefObject<HTMLButtonElement | null>,
-): void {
-  setOpen(false);
-  setTyped("");
-  window.requestAnimationFrame(focusSupportArchiveTrigger.bind(null, trigger));
-}
-
-function focusSupportArchiveTrigger(
-  trigger: React.RefObject<HTMLButtonElement | null>,
-): void {
-  trigger.current?.focus();
 }
