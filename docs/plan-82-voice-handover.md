@@ -2,7 +2,7 @@
 
 Date: 18 November 2026. Written for the move to the new repository `seams-tech/pantry`
 ([Plan 91](plan-91-seams-atelier-rename.md)), and for the next move: the GitHub organisation
-`purin-io`, the folder `/Users/pta/Dev/purin-io` and the Purin rename (see "The move to purin-io").
+`purin-io`, the folder `~/Dev/purin` and the Purin rename (see "The move to purin-io").
 This file is the entry point for voice work. Each plan keeps its decisions, its phases and its
 evidence.
 
@@ -131,7 +131,9 @@ owner said "Yes, delete them" on 2026-11-18.
 The owner's plan on 2026-11-18:
 
 1. The GitHub organisation changes from `seams-tech` to `purin-io`.
-2. The repositories move from `~/Dev/lowerarchy` and `~/Dev/rust` to `/Users/pta/Dev/purin-io`.
+2. The repositories move from `~/Dev/lowerarchy` and `~/Dev/rust` to `~/Dev/purin`. The owner named
+   `~/Dev/purin/pantry` for the pantry clone on 2026-11-18. The other folder names are not
+   confirmed.
 3. A few days later, after the hackathon, the Seams names change to Purin.
 
 No voice file names the GitHub organisation, so step 1 changes nothing for voice.
@@ -172,7 +174,8 @@ These are outside the repositories, so the move does not change them:
   new path starts with no notes. Today three folders hold separate copies, named after the clones
   `satyr`, `seams-atelier` and `pantry`, for example
   `~/.claude/projects/-Users-pta-Dev-lowerarchy-pantry/memory`. The `pantry` folder has the voice
-  notes of 2026-11-18. Merge the three into the new project's `memory/` folder.
+  notes of 2026-11-18. Merge the three into the folder of `~/Dev/purin/pantry`,
+  `~/.claude/projects/-Users-pta-Dev-purin-pantry/memory`.
 
 ### What the Purin rename changes for voice
 
