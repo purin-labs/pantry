@@ -5483,7 +5483,7 @@ function retainedInspectionState(
   };
 }
 
-type ReadOriginBoundary = "commerce_commit" | "catalog_commit" | "saved_commit";
+type ReadOriginBoundary = "commerce_commit" | "saved_commit";
 type ReadOriginJourney = {
   readonly boundary: ReadOriginBoundary;
   readonly digest: SubtleCrypto["digest"];
@@ -5498,7 +5498,7 @@ type ReadOriginJourney = {
 };
 let readOriginJourney: ReadOriginJourney | null = null;
 
-it.for(["commerce_commit", "catalog_commit", "saved_commit"] as const)(
+it.for(["commerce_commit", "saved_commit"] as const)(
   "fences captured read authority at %s through revocation, eviction and fresh retry",
   { timeout: 45_000 },
   capturedReadOriginJourney,
@@ -5524,47 +5524,6 @@ async function capturedReadOriginJourney(
     .bind(ORGANISATION_ID)
     .first<{ integration_account_id: string }>();
   if (connection === null) throw new Error("Missing commerce origin fixture");
-  if (boundary === "catalog_commit") {
-    const now = Date.now();
-    await createRequiredGrant({
-      grantId: "grant_p55_integration_discovery",
-      subject: { kind: "person", personId: "person_e2e-slack-actor" },
-      target: {
-        kind: "platform_capability",
-        capabilityId: "integration.discovery.read",
-        capabilityVersion: 1,
-      },
-      now,
-    });
-    const changed = await writeOrganisationCapabilityPolicy({
-      scope: await requireOrganisationExecutionScope(env, ORGANISATION_ID),
-      write: {
-        kind: "change",
-        capabilityId: "integration.discovery.read",
-        expectedRevision: 1,
-        mode: "enabled",
-        provenance: {
-          kind: "operator",
-          userId: scope.userId,
-          mutationReceiptId: "receipt_p55_integration_discovery",
-        },
-        now,
-      },
-    });
-    if (!changed.ok) throw new Error(changed.error.code);
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId: ORGANISATION_ID,
-      now,
-    });
-    const published = await compilePublishAndActivateOrganisationPolicy({
-      bindings: { db: fixtureDatabase(), kv: env.POLICY_KV },
-      organisationId: ORGANISATION_ID,
-      organisation,
-      now,
-    });
-    if (!published.ok) throw new Error(published.error.code);
-  }
   const model: ReadOriginJourney = {
     boundary,
     digest: crypto.subtle.digest,
@@ -5792,8 +5751,6 @@ function capturedReadTool(model: ReadOriginJourney): string {
   switch (model.boundary) {
     case "commerce_commit":
       return "commerce_entity_context";
-    case "catalog_commit":
-      return "integration_list";
     case "saved_commit":
       return "bakery_saved_run_read";
   }
@@ -5821,8 +5778,6 @@ function capturedReadArguments(
           freshnessRequirement: "current_only",
         },
       };
-    case "catalog_commit":
-      return {};
     case "saved_commit":
       return { id: model.savedRunId, cursor: null };
   }
@@ -5862,9 +5817,7 @@ async function pauseCapturedReadOrigin(
         : source.kind === "integration_resource" &&
           source.integrationAccountId === model.integrationAccountId &&
           typeof source.resourceScope === "string" &&
-          (model.boundary === "catalog_commit"
-            ? source.resourceScope.startsWith("integration_metadata:")
-            : source.resourceScope.startsWith("commerce"));
+          source.resourceScope.startsWith("commerce");
     if (matched) model.evidenceDigest = digest;
   }
   if (
