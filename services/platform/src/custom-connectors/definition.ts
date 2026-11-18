@@ -149,7 +149,7 @@ export type CustomConnectorPagination =
  * key in the named header, so an administrator can retry a write whose
  * outcome is unknown; the service must apply one write for each key.
  */
-export type CustomConnectorWriteRetryPolicy =
+type CustomConnectorWriteRetryPolicy =
   | Readonly<{ readonly kind: "single_attempt"; readonly header?: never }>
   | Readonly<{ readonly kind: "provider_idempotent"; readonly header: string }>;
 

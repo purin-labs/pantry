@@ -29,7 +29,7 @@ export type ConnectorCaseWorkRequest = {
   readonly command: SlackCaseCommand;
 };
 
-export type ConnectorCaseWorkRecoveryRequest = {
+type ConnectorCaseWorkRecoveryRequest = {
   readonly identity: ConnectorIdentity;
   readonly requestId: RequestId;
 };
@@ -76,19 +76,19 @@ export const CASE_WORK_ATTEMPTS_EXHAUSTED =
 export const CASE_WORK_EXHAUSTED_NOTICE_UNDELIVERED =
   "connector_case_work_exhausted_notice_undelivered";
 
-export type ConnectorCaseWorkAcceptance = {
+type ConnectorCaseWorkAcceptance = {
   readonly kind: "accepted" | "duplicate";
   readonly eventId: string;
 };
 
-export type ConnectorCaseWorkError = { readonly code: string };
+type ConnectorCaseWorkError = { readonly code: string };
 
 export type ConnectorCaseWorkEfficiency = {
   readonly activeRows: number;
   readonly receiptRows: number;
 };
 
-export type ConnectorCaseWorkQuery<T> = {
+type ConnectorCaseWorkQuery<T> = {
   readonly result: T;
   readonly rowsRead: number;
 };
@@ -289,7 +289,7 @@ export function acceptConnectorCaseWork(
  * The Session then says whether the turn read it: a placed reply settles as
  * completed, and a withdrawn one returns to the queue as the next turn.
  */
-export type SteeredCaseWork = Readonly<{
+type SteeredCaseWork = Readonly<{
   eventId: string;
   command: SlackCaseCommand | null;
   runningEventId: string;
@@ -509,7 +509,7 @@ export const SLACK_FOLLOW_UP_TEXT =
   "Scheduled follow-up. Earlier in this thread you called schedule_follow_up, and its time has come. Read the note of that call, do the follow-up now and answer in this thread. If that call is not in your history, do what the person asked earlier in this thread.";
 
 /** A Case holds at most this many follow-ups that wait for their time. */
-export const MAX_PENDING_FOLLOW_UPS = 3;
+const MAX_PENDING_FOLLOW_UPS = 3;
 
 const FOLLOW_UP_EVENT_PREFIX = "followup_";
 
@@ -673,7 +673,7 @@ export type SlackPermissionParkRequest = {
   readonly requestId: string;
 };
 
-export type SlackPermissionNotice = {
+type SlackPermissionNotice = {
   readonly identity: ConnectorIdentity;
   readonly requestId: string;
   /** Fixed platform text for the thread; it holds no model output. */
@@ -1079,7 +1079,7 @@ export type ParkedSlackSideCase = Readonly<{
   linkTs: string | null;
 }>;
 
-export type SlackSideCasePost = "proposal" | "thread" | "link";
+type SlackSideCasePost = "proposal" | "thread" | "link";
 
 type ConnectorSideCaseRow = Record<string, SqlStorageValue> & {
   readonly payload: string;

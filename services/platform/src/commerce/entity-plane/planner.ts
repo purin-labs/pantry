@@ -18,7 +18,7 @@ import type { Result } from "../../result";
 import type { Variant } from "@seams/type-utils";
 import { assertNever } from "@seams/std";
 
-export type CommerceSafeQueryError = Readonly<{
+type CommerceSafeQueryError = Readonly<{
   code: "commerce_query_surface_unsupported";
 }>;
 

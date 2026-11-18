@@ -1,12 +1,12 @@
 import { bytesToHex } from "@seams/std";
 
-export type CommerceLabSignatureFailure =
+type CommerceLabSignatureFailure =
   | { code: "commerce_lab_signature_missing" }
   | { code: "commerce_lab_timestamp_invalid" }
   | { code: "commerce_lab_signature_expired" }
   | { code: "commerce_lab_signature_invalid" };
 
-export type CommerceLabSignatureVerification =
+type CommerceLabSignatureVerification =
   | { ok: true; timestampSeconds: number }
   | { ok: false; error: CommerceLabSignatureFailure };
 

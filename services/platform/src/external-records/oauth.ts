@@ -111,7 +111,7 @@ export type ExternalOAuthClientEnv = Pick<
   | "NOTION_OAUTH_CLIENT_SECRET"
 >;
 
-export type ExternalOAuthError =
+type ExternalOAuthError =
   | { readonly code: "provider_configuration_missing" }
   | { readonly code: "provider_context_invalid" }
   | {

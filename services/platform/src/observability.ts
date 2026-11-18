@@ -1,7 +1,7 @@
 import type { RequestId } from "./ids";
 import { isolateLocation } from "./isolate-location";
 
-export type TraceFields = {
+type TraceFields = {
   requestId: RequestId;
 } & Record<string, unknown>;
 

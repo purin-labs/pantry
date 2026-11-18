@@ -1,7 +1,7 @@
 import type { EmailReviewProjection } from "../data/email-review";
 import { assertNever } from "@seams/std";
 
-export type SlackEmailReviewNotice = Readonly<{
+type SlackEmailReviewNotice = Readonly<{
   deliveryId: string;
   text: string;
 }>;

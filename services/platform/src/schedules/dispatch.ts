@@ -17,7 +17,7 @@ import {
 import { traceWarn } from "../observability";
 import { computeScheduleWindowKey } from "./window";
 
-export type ScheduleDispatchOutcome = {
+type ScheduleDispatchOutcome = {
   readonly dispatched: number;
   readonly skipped: number;
   readonly failed: number;

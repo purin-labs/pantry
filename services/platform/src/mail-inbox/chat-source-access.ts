@@ -21,7 +21,7 @@ const COMMERCE_READ_SCOPE_PREFIX = "commerce_read:";
 
 const NO_CHAT_CONTEXT: EmailChatContext = { memory: [], projects: [] };
 
-export type EmailChatSourceError = Readonly<{
+type EmailChatSourceError = Readonly<{
   code: "email_commerce_unavailable" | "email_source_unavailable";
 }>;
 

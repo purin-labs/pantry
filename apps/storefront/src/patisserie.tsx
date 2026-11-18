@@ -26,7 +26,7 @@ export function patisserieMastheadDetail(language: PatisserieLanguage): string {
     : "Pâtisserie · Tokyo — order ahead, collect at the counter";
 }
 
-export const PATISSERIE_SLUGS = [
+const PATISSERIE_SLUGS = [
   "financier_black_sesame",
   "financier_hazelnut",
   "financier_maple",
@@ -55,7 +55,7 @@ export const PATISSERIE_SLUGS = [
 
 export type PatisserieSlug = (typeof PATISSERIE_SLUGS)[number];
 export type PatisserieProductId = `menu_entry_patisserie_${PatisserieSlug}`;
-export type PatisserieLanguage = "en" | "ja";
+type PatisserieLanguage = "en" | "ja";
 
 type FinancierFlavour =
   | "sesame"
@@ -79,7 +79,7 @@ type PatisserieArt =
 
 type LocalText = Readonly<Record<PatisserieLanguage, string>>;
 
-export type PatisserieCopy = Readonly<{
+type PatisserieCopy = Readonly<{
   title: string;
   description: string;
   allergens: string;
@@ -537,7 +537,7 @@ export type PatisserieMenuItem = Readonly<{
 }>;
 
 /** The cart and the order status, which the section bar also holds. */
-export type PatisserieShopNav = Readonly<{
+type PatisserieShopNav = Readonly<{
   cartLabel: string;
   cartCount: number;
   cartOpen: boolean;

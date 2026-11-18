@@ -99,14 +99,14 @@ const LOT_INVOICE_COST_SCOPE = "bakery-lot-invoice-cost:shop";
 const BAKERY_COST_PLAN_SCOPE = "bakery-cost-plan:shop";
 const COSTS_SHEET_DRAFT_SCOPE = "costs-sheet:shop";
 
-export type SessionCostsStaffWork = Readonly<{
+type SessionCostsStaffWork = Readonly<{
   merchantId: string;
   userId: string;
   personId: string;
   client: CommerceAdminClient;
 }>;
 
-export type SessionCostsHost = Readonly<{
+type SessionCostsHost = Readonly<{
   env: Env;
   database: OrganisationDatabase;
   organisationId: string;
@@ -446,7 +446,7 @@ export function embeddedHarnessCostsTools(
   });
 }
 
-export function createEmbeddedHarnessCostsTools(
+function createEmbeddedHarnessCostsTools(
   host: SessionCostsHost,
 ): Readonly<{
   readCosts: CostsReadTool;

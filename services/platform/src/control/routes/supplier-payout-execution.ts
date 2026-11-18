@@ -33,7 +33,7 @@ import type { Variant } from "@seams/type-utils";
  *
  * Nothing here re-approves. Every check below can only refuse.
  */
-export type ApprovedPayoutExecutionInput = Readonly<{
+type ApprovedPayoutExecutionInput = Readonly<{
   request: Request;
   env: Env;
   authorized: AuthorizedOrganisationRequest;

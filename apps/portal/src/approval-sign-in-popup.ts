@@ -5,7 +5,7 @@
  * closes. The session and approval cookies that the callback sets reach
  * this page too, so the approval goes on here.
  */
-export type ApprovalSignIn = "signed_in" | "closed" | "blocked";
+type ApprovalSignIn = "signed_in" | "closed" | "blocked";
 
 const CHANNEL = "satyr-approval-sign-in";
 const RETURN_PAGE = "/approval-signed-in.html";

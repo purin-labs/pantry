@@ -9,7 +9,7 @@ import {
   type ConsoleSidebarState,
 } from "./console-sidebar";
 
-export type DashboardNavigationProps = {
+type DashboardNavigationProps = {
   /** Null when the page draws the console tools in its own top row. */
   readonly topbar: {
     readonly brand: React.ReactNode;

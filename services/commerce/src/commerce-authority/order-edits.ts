@@ -124,7 +124,7 @@ export type OrderBalanceCheckoutResult =
   | Readonly<{ kind: "created"; checkout: CommerceBuyerQuotedCheckoutV1 }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type OrderEditCommandAuthorityOptions = Readonly<{
+type OrderEditCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => OrderEditMerchantRow | undefined;
@@ -156,7 +156,7 @@ export type OrderEditCommandAuthorityOptions = Readonly<{
 }>;
 
 /** The buyer line of a balance checkout. */
-export const ORDER_BALANCE_LINE_ID = "order_balance";
+const ORDER_BALANCE_LINE_ID = "order_balance";
 
 type PositionPlan = Map<string, CommerceInventoryPositionV1>;
 
@@ -1183,7 +1183,7 @@ export class OrderEditCommandAuthority {
   }
 }
 
-export function balanceCheckoutId(
+function balanceCheckoutId(
   order: CommerceOrderV1,
   attempt: number,
 ): string {

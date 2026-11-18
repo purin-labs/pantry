@@ -87,7 +87,7 @@ export type ArchiveOptions = Readonly<{
   batchSize: number;
 }>;
 
-export const DEFAULT_ARCHIVE_OPTIONS: ArchiveOptions = {
+const DEFAULT_ARCHIVE_OPTIONS: ArchiveOptions = {
   orderDelayDays: 180,
   eventRetentionDays: 90,
   batchSize: 500,

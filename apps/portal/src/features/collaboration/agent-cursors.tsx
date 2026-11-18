@@ -16,7 +16,7 @@ export function AgentCursors(props: Props): React.ReactNode {
     .map(renderCursor.bind(null, props));
 }
 
-export function targetMatches(
+function targetMatches(
   target: string,
   activity: CollaborationAgentActivity,
 ): boolean {

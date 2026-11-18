@@ -35,7 +35,7 @@ export function connectionAttentionMessage(
   return `${formatConnectionList(names)} need${names.length === 1 ? "s" : ""} attention.`;
 }
 
-export function accountProviderName(account: IntegrationAccount): string {
+function accountProviderName(account: IntegrationAccount): string {
   return providerLabel(account.provider);
 }
 
@@ -45,7 +45,7 @@ export function announceConnectionAttention(message: string | null): void {
   toast.warning(message);
 }
 
-export function formatConnectionList(names: readonly string[]): string {
+function formatConnectionList(names: readonly string[]): string {
   if (names.length <= 1) return names[0] ?? "";
   if (names.length === 2) return `${names[0]} and ${names[1]}`;
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
@@ -117,7 +117,7 @@ export function providerAttemptDiagnostics(
   };
 }
 
-export type FileStorageIntegrationPanelProps = {
+type FileStorageIntegrationPanelProps = {
   readonly provider: FileContextProvider;
   readonly accounts: readonly IntegrationAccount[];
   readonly accountList: (
@@ -160,7 +160,7 @@ export function FileStorageIntegrationPanel(
   );
 }
 
-export function FileStorageSetup(props: {
+function FileStorageSetup(props: {
   readonly connected: boolean;
   readonly provider: FileContextProvider;
   readonly mutations: MutationLedger;
@@ -235,7 +235,7 @@ export function FileStorageSetup(props: {
   );
 }
 
-export function fileStorageHelp(provider: FileContextProvider): string {
+function fileStorageHelp(provider: FileContextProvider): string {
   const service = providerLabel(provider);
   return `Opens ${service} in a new window. Use a business account if you have one.`;
 }

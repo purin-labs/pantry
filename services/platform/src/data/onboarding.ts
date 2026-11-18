@@ -76,9 +76,9 @@ export type ReadinessBlocker =
   | { readonly code: "runtime_admission_unavailable" };
 
 export type RuntimeAdmissionStatus = "available" | "unavailable" | "unknown";
-export type CommerceSystemReadiness = "ready" | "syncing" | "unknown";
+type CommerceSystemReadiness = "ready" | "syncing" | "unknown";
 
-export type ReadyAssessment = {
+type ReadyAssessment = {
   readonly kind: "ready";
   readonly organisationId: OrganisationId;
   readonly readinessVersion: number;
@@ -92,7 +92,7 @@ export type ReadyAssessment = {
   readonly assessedAt: number;
 };
 
-export type BlockedAssessment = {
+type BlockedAssessment = {
   readonly kind: "blocked";
   readonly organisationId: OrganisationId;
   readonly readinessVersion: number;
@@ -105,7 +105,7 @@ export type BlockedAssessment = {
   readonly assessedAt: number;
 };
 
-export type ReadinessAssessment = ReadyAssessment | BlockedAssessment;
+type ReadinessAssessment = ReadyAssessment | BlockedAssessment;
 
 type SetupSnapshotRow = {
   snapshotId: unknown;
@@ -137,7 +137,7 @@ type SetupSelectionRow = {
 const POLICY_TEMPLATE_VERSION = 1;
 const CUE_TEMPLATE_VERSION = 1;
 
-export type SetupMutation = {
+type SetupMutation = {
   readonly boundary: Variant<
     ControlMutationBoundary,
     "configuration_versioned"
@@ -146,7 +146,7 @@ export type SetupMutation = {
   readonly identity: ControlMutationIdentity;
 };
 
-export type SetupMutationResult = {
+type SetupMutationResult = {
   readonly policySnapshotId: SetupSnapshotId;
   readonly cueSnapshotId: SetupSnapshotId;
   readonly configurationVersion: number;
@@ -154,7 +154,7 @@ export type SetupMutationResult = {
   readonly receiptId: string;
 };
 
-export type SetupMutationError =
+type SetupMutationError =
   | { readonly code: "organisation_placement_conflict" }
   | { readonly code: "organisation_not_found" }
   | { readonly code: "configuration_version_conflict" }
@@ -1433,7 +1433,7 @@ async function latestSetupSnapshots(
  * readiness; the report is informational until the selected branch's
  * verifier can be satisfied.
  */
-export function resolveApprovalAuthenticationReadiness(
+function resolveApprovalAuthenticationReadiness(
   policyBody: unknown,
 ): readonly ApprovalAuthenticationReadiness[] {
   if (!isRecord(policyBody) || !isRecord(policyBody.approvalAuthentication)) {
@@ -1464,7 +1464,7 @@ export function resolveApprovalAuthenticationReadiness(
   }
 }
 
-export async function loadOrganisationCapabilityProfile(input: {
+async function loadOrganisationCapabilityProfile(input: {
   readonly db: OrganisationQuerySource;
   readonly organisationId: OrganisationId;
 }): Promise<CapabilityProfile> {

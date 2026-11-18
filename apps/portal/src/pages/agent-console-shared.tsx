@@ -104,7 +104,7 @@ function areaIsActive(area: AgentOperationsSnapshot["areas"][number]): boolean {
   return area.lifecycle === "active";
 }
 
-export type CapabilityChoice = {
+type CapabilityChoice = {
   readonly value: string;
   readonly label: string;
 };

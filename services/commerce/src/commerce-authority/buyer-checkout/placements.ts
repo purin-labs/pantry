@@ -271,9 +271,7 @@ export function buyerCancellationRefundStatus(
   }
 }
 
-export function refundAttemptIsCancellation(
-  stored: StoredRefundAttempt,
-): boolean {
+function refundAttemptIsCancellation(stored: StoredRefundAttempt): boolean {
   return stored.attempt.reason.kind === "cancellation";
 }
 

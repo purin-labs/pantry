@@ -14,7 +14,7 @@ import type { SquareConnectionV1 } from "./square/square-connection.ts";
 import type { SquarePaymentAccounts } from "./square/square-payments.ts";
 import type { StripePaymentAccounts } from "./stripe/stripe-payments.ts";
 
-export type BankPayoutWindow = Readonly<{ start: string; end: string }>;
+type BankPayoutWindow = Readonly<{ start: string; end: string }>;
 
 type Provider = CommerceBankPayoutV1["provider"];
 type Status = CommerceBankPayoutV1["status"];

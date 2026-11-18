@@ -48,7 +48,7 @@ const WORKSPACE_ALLOCATION_ID_PATTERN = /^wxa-[a-zA-Z0-9_-]{1,120}$/;
 const OPAQUE_ID_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,191}$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
 
-export type CodeModePlatformGovernorPing = {
+type CodeModePlatformGovernorPing = {
   readonly ok: true;
   readonly kind: "code-mode-platform-governor";
 };
@@ -69,7 +69,7 @@ export type CodeModePlatformAdmissionControlInput =
       readonly command: "open_admission";
     });
 
-export type CodeModePlatformAdmissionState =
+type CodeModePlatformAdmissionState =
   | {
       readonly state: "open";
       readonly generation: number;
@@ -85,7 +85,7 @@ export type CodeModePlatformAdmissionState =
       readonly reason: string;
     };
 
-export type CodeModePlatformCutoverBlocker =
+type CodeModePlatformCutoverBlocker =
   | { readonly kind: "admission_open" }
   | { readonly kind: "live_root_reservations"; readonly count: number }
   | { readonly kind: "live_workspace_allocations"; readonly count: number }
@@ -100,7 +100,7 @@ type CodeModePlatformCutoverBase = {
   readonly settledUnreconciled: number;
 };
 
-export type CodeModePlatformCutoverQuiescence =
+type CodeModePlatformCutoverQuiescence =
   | (CodeModePlatformCutoverBase & {
       readonly kind: "quiescent";
       readonly blockers: readonly [];

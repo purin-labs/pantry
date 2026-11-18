@@ -39,7 +39,7 @@ import {
   resourceTypeForProjection,
 } from "./records";
 
-export function storedFulfillmentLifecycleValid(
+function storedFulfillmentLifecycleValid(
   kind: FulfillmentKind,
   raw: unknown,
 ): boolean {
@@ -96,7 +96,7 @@ export function storedFulfillmentLifecycleValid(
   }
 }
 
-export function storedFirstPartyShipmentLifecycleValid(raw: unknown): boolean {
+function storedFirstPartyShipmentLifecycleValid(raw: unknown): boolean {
   if (!isRecord(raw) || typeof raw.state !== "string") return false;
   switch (raw.state) {
     case "ready":
@@ -125,7 +125,7 @@ export function storedFirstPartyShipmentLifecycleValid(raw: unknown): boolean {
   }
 }
 
-export function storedExternalShipmentLifecycleValid(raw: unknown): boolean {
+function storedExternalShipmentLifecycleValid(raw: unknown): boolean {
   if (!isRecord(raw) || typeof raw.state !== "string") return false;
   switch (raw.state) {
     case "label_created":
@@ -143,7 +143,7 @@ export function storedExternalShipmentLifecycleValid(raw: unknown): boolean {
   }
 }
 
-export function storedShipmentEventsValid(raw: unknown): boolean {
+function storedShipmentEventsValid(raw: unknown): boolean {
   if (!Array.isArray(raw)) return false;
   return raw.every((event) => {
     if (
@@ -172,7 +172,7 @@ export function storedShipmentEventsValid(raw: unknown): boolean {
   });
 }
 
-export function storedShipmentPackageValid(raw: unknown): boolean {
+function storedShipmentPackageValid(raw: unknown): boolean {
   if (
     !isRecord(raw) ||
     !isRecord(raw.weight) ||
@@ -238,7 +238,7 @@ export function storedShipmentPackageValid(raw: unknown): boolean {
   return true;
 }
 
-export function storedPositiveShipmentQuantity(raw: unknown): boolean {
+function storedPositiveShipmentQuantity(raw: unknown): boolean {
   return (
     isRecord(raw) &&
     isPositiveInteger(raw.amount) &&
@@ -250,7 +250,7 @@ export function storedPositiveShipmentQuantity(raw: unknown): boolean {
   );
 }
 
-export function isShipmentQuantityUnit(value: string): boolean {
+function isShipmentQuantityUnit(value: string): boolean {
   return (
     value === "each" ||
     value === "gram" ||
@@ -260,10 +260,7 @@ export function isShipmentQuantityUnit(value: string): boolean {
   );
 }
 
-export function storedShipmentQuantityEqual(
-  left: unknown,
-  right: unknown,
-): boolean {
+function storedShipmentQuantityEqual(left: unknown, right: unknown): boolean {
   return (
     isRecord(left) &&
     isRecord(right) &&
@@ -273,7 +270,7 @@ export function storedShipmentQuantityEqual(
   );
 }
 
-export function storedNonNegativeMoney(raw: unknown): boolean {
+function storedNonNegativeMoney(raw: unknown): boolean {
   return (
     isRecord(raw) &&
     isNonNegativeInteger(raw.amountMinor) &&
@@ -282,14 +279,11 @@ export function storedNonNegativeMoney(raw: unknown): boolean {
   );
 }
 
-export function hasStoredText(
-  raw: Record<string, unknown>,
-  key: string,
-): boolean {
+function hasStoredText(raw: Record<string, unknown>, key: string): boolean {
   return typeof raw[key] === "string" && raw[key] !== "";
 }
 
-export function hasStoredReason(raw: Record<string, unknown>): boolean {
+function hasStoredReason(raw: Record<string, unknown>): boolean {
   return typeof raw.reason === "string" && raw.reason.trim().length > 0;
 }
 
@@ -548,7 +542,7 @@ export function parseProjectionIdentity(
   };
 }
 
-export function parseDeletionIdentity(
+function parseDeletionIdentity(
   raw: unknown,
 ): Result<ProjectionIdentity, CommerceProjectionError> {
   if (
@@ -588,7 +582,7 @@ export function parseDeletionIdentity(
   };
 }
 
-export function projectionShapeValid(
+function projectionShapeValid(
   kind: CommerceProjectionKind,
   projection: Record<string, unknown>,
 ): boolean {
@@ -792,7 +786,7 @@ export function projectionShapeValid(
   }
 }
 
-export function projectionKeysValid(
+function projectionKeysValid(
   kind: CommerceProjectionKind,
   projection: Record<string, unknown>,
 ): boolean {
@@ -1008,7 +1002,7 @@ export function projectionKeysValid(
   }
 }
 
-export function projectionPrimaryIdentityMatchesProvenance(
+function projectionPrimaryIdentityMatchesProvenance(
   kind: CommerceProjectionKind,
   projection: Record<string, unknown>,
 ): boolean {
@@ -1034,7 +1028,7 @@ export function projectionPrimaryIdentityMatchesProvenance(
   }
 }
 
-export function isCafeProjectionKind(
+function isCafeProjectionKind(
   kind: CommerceProjectionKind,
 ): kind is
   | "menu"
@@ -1055,7 +1049,7 @@ export function isCafeProjectionKind(
   );
 }
 
-export type StoredInventoryQuantity = Readonly<{
+type StoredInventoryQuantity = Readonly<{
   amount: number;
   scale: number;
   unit: string;
@@ -1075,7 +1069,7 @@ export function storedInventoryQuantity(raw: unknown): StoredInventoryQuantity {
   return amount === null ? null : { amount, scale: raw.scale, unit: raw.unit };
 }
 
-export function storedAvailableQuantity(raw: unknown): StoredInventoryQuantity {
+function storedAvailableQuantity(raw: unknown): StoredInventoryQuantity {
   if (
     !isRecord(raw) ||
     !isNonNegativeInteger(raw.scale) ||
@@ -1090,13 +1084,13 @@ export function storedAvailableQuantity(raw: unknown): StoredInventoryQuantity {
   return { amount: raw.amount, scale: raw.scale, unit: raw.unit };
 }
 
-export function safeNonNegativeInteger(raw: unknown): number | null {
+function safeNonNegativeInteger(raw: unknown): number | null {
   if (typeof raw !== "number" && typeof raw !== "bigint") return null;
   const value = Number(raw);
   return Number.isSafeInteger(value) && value >= 0 ? value : null;
 }
 
-export function storedInventoryBalance(raw: unknown): boolean {
+function storedInventoryBalance(raw: unknown): boolean {
   if (!isRecord(raw) || typeof raw.kind !== "string") return false;
   if (raw.kind === "available_only")
     return storedAvailableQuantity(raw.available) !== null;
@@ -1114,7 +1108,7 @@ export function storedInventoryBalance(raw: unknown): boolean {
   );
 }
 
-export function storedInventoryCategory(raw: unknown): boolean {
+function storedInventoryCategory(raw: unknown): boolean {
   return (
     raw === "ingredient" ||
     raw === "packaging" ||
@@ -1123,7 +1117,7 @@ export function storedInventoryCategory(raw: unknown): boolean {
   );
 }
 
-export function storedInventoryTracking(raw: unknown): boolean {
+function storedInventoryTracking(raw: unknown): boolean {
   if (!isRecord(raw)) return false;
   return (
     raw.kind === "aggregate" ||
@@ -1132,11 +1126,11 @@ export function storedInventoryTracking(raw: unknown): boolean {
   );
 }
 
-export function storedInventoryItemLifecycle(raw: unknown): boolean {
+function storedInventoryItemLifecycle(raw: unknown): boolean {
   return raw === "active" || raw === "inactive";
 }
 
-export function isStockPolicyReplenishment(raw: unknown): boolean {
+function isStockPolicyReplenishment(raw: unknown): boolean {
   if (!isRecord(raw) || typeof raw.kind !== "string") return false;
   if (raw.kind === "none") return true;
   return (
@@ -1146,7 +1140,7 @@ export function isStockPolicyReplenishment(raw: unknown): boolean {
   );
 }
 
-export function isProductionBatchDemand(raw: unknown): boolean {
+function isProductionBatchDemand(raw: unknown): boolean {
   if (!isRecord(raw) || typeof raw.kind !== "string") return false;
   if (raw.kind === "stock") return true;
   return (

@@ -500,7 +500,7 @@ export function handleCustomConnectorControlRoute(
   }
 }
 
-export function match(
+function match(
   pathname: string,
   pattern: RegExp,
 ): readonly [string, string, string, string] | null {
@@ -509,11 +509,11 @@ export function match(
   return [result[1] ?? "", result[2] ?? "", result[3] ?? "", result[4] ?? ""];
 }
 
-export function slackMessageAction(raw: string): SlackMessageAction | null {
+function slackMessageAction(raw: string): SlackMessageAction | null {
   return raw === "send" || raw === "discard" || raw === "edit" ? raw : null;
 }
 
-export function decode(raw: string): string {
+function decode(raw: string): string {
   try {
     return decodeURIComponent(raw);
   } catch {
@@ -528,14 +528,12 @@ export function parseRevisionSegment(raw: string) {
   );
 }
 
-export function requireConnectorAction(
-  value: string | null,
-): "disable" | "resume" {
+function requireConnectorAction(value: string | null): "disable" | "resume" {
   if (value === "disable" || value === "resume") return value;
   throw new Error("custom connector route action is invalid");
 }
 
-export function requireRevisionAction(
+function requireRevisionAction(
   value: string | null,
 ): "validate" | "approve" | "reject" | "retire" {
   if (
@@ -549,7 +547,7 @@ export function requireRevisionAction(
   throw new Error("custom connector revision action is invalid");
 }
 
-export function requireSetupAction(
+function requireSetupAction(
   value: string | null,
 ): "credential" | "test" | "commit" | "cancel" {
   if (
@@ -563,7 +561,7 @@ export function requireSetupAction(
   throw new Error("custom connector setup action is invalid");
 }
 
-export function requireWriteAction(
+function requireWriteAction(
   value: string | null,
 ): "read" | "approval" | "execute" | "retry" | "reconcile" {
   if (

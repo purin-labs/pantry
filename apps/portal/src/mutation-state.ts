@@ -55,7 +55,7 @@ export type OrganisationMutation =
  * A scope represents the record or control-plane surface that may be changed
  * by one mutation. Different scopes may proceed concurrently.
  */
-export type MutationScope =
+type MutationScope =
   | { readonly kind: "commerce" }
   | { readonly kind: "provider"; readonly provider: MutationProvider }
   | { readonly kind: "codex_connection" }
@@ -76,13 +76,13 @@ export type MutationScope =
   | { readonly kind: "email_reply"; readonly proposalId: string }
   | { readonly kind: "email_operational"; readonly proposalId: string };
 
-export type MutationConflict = {
+type MutationConflict = {
   readonly requested: OrganisationMutation;
   readonly active: OrganisationMutation;
   readonly scope: MutationScope;
 };
 
-export type MutationAddResult =
+type MutationAddResult =
   | {
       readonly kind: "added";
       readonly ledger: MutationLedger;
@@ -205,7 +205,7 @@ export class MutationLedger {
   }
 }
 
-export function mutationScope(mutation: OrganisationMutation): MutationScope {
+function mutationScope(mutation: OrganisationMutation): MutationScope {
   switch (mutation.kind) {
     case "select_commerce":
     case "provision_commerce":

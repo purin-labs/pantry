@@ -40,7 +40,7 @@ export type {
 
 type RawRecord = Record<string, unknown>;
 
-export type RequestAuthorityBoundaryError =
+type RequestAuthorityBoundaryError =
   | { readonly code: "invalid_input"; readonly field: string }
   | { readonly code: "missing_field"; readonly field: string }
   | { readonly code: "invalid_field"; readonly field: string }
@@ -48,7 +48,7 @@ export type RequestAuthorityBoundaryError =
   | { readonly code: "cross_organisation_scope"; readonly field: string }
   | { readonly code: "cross_workspace_scope"; readonly field: string };
 
-export type RequestAuthorityProjection = {
+type RequestAuthorityProjection = {
   readonly requestAuthority: RequestAuthority;
 };
 
@@ -56,7 +56,7 @@ export type LiveRequestAuthorityValidationError =
   | { readonly code: "request_authority_inactive"; readonly detail: string }
   | { readonly code: "request_authority_unavailable"; readonly detail: string };
 
-export type DirectSlackAuthorityInput = {
+type DirectSlackAuthorityInput = {
   readonly organisationId: OrganisationId;
   readonly requesterPersonId: PrincipalId;
   readonly membershipRevision: number;
@@ -66,15 +66,15 @@ export type DirectSlackAuthorityInput = {
   readonly conversationId: string;
 };
 
-export type SharedSlackAuthorityInput = DirectSlackAuthorityInput;
+type SharedSlackAuthorityInput = DirectSlackAuthorityInput;
 
-export type WorkflowAuthorityInput = {
+type WorkflowAuthorityInput = {
   readonly organisationId: OrganisationId;
   readonly workflowId: string;
   readonly workflowRevision: number;
 };
 
-export type ControlAuthorityInput = {
+type ControlAuthorityInput = {
   readonly organisationId: OrganisationId;
   readonly requesterPersonId: PrincipalId;
   readonly userId: string;
@@ -82,7 +82,7 @@ export type ControlAuthorityInput = {
   readonly role: string;
 };
 
-export type AgentMailboxAuthorityInput = {
+type AgentMailboxAuthorityInput = {
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
   readonly mailboxBindingId: string;
@@ -90,7 +90,7 @@ export type AgentMailboxAuthorityInput = {
   readonly mailboxPolicyVersion: number;
 };
 
-export type WhatsAppSupportAuthorityInput = {
+type WhatsAppSupportAuthorityInput = {
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
   readonly supportBindingId: string;

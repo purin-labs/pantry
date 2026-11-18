@@ -51,7 +51,7 @@ import { requireLiveBakeryReadAuthority } from "../session-support";
 const KITCHEN_EXCLUDED =
   "The person sent this request with the screen chip off on Kitchen, so Kitchen is not part of it. Ask them to turn the chip on and send again.";
 
-export type BakerySurfaceReadiness =
+type BakerySurfaceReadiness =
   | Readonly<{ kind: "unprepared"; surface?: never; preparation?: never }>
   | Readonly<{
       kind: "preparing";
@@ -197,7 +197,7 @@ export async function executeBakerySurfaceForHarness(
   return { ...dispatched, saveVerification, scenarioSaveResult };
 }
 
-export async function prepareBakerySurfaceForHarness(
+async function prepareBakerySurfaceForHarness(
   authority: Parameters<typeof executeBakerySurfaceForHarness>[0],
   requiredCommand: HarnessBakerySurfaceToolRequest["kind"],
   callId: string,
@@ -244,7 +244,7 @@ export async function prepareBakerySurfaceForHarness(
   return { kind: "ready", surface };
 }
 
-export function requireSupportedBakeryCommand(
+function requireSupportedBakeryCommand(
   surface: BakerySurfaceAttachmentV1,
   requiredCommand: HarnessBakerySurfaceToolRequest["kind"],
 ): void {
@@ -255,15 +255,15 @@ export function requireSupportedBakeryCommand(
   }
 }
 
-export function readFailedRunSave(): import("../../commerce/bakery/agent-run-save").AgentRunSaveVerification {
+function readFailedRunSave(): import("../../commerce/bakery/agent-run-save").AgentRunSaveVerification {
   return { kind: "read_failed" };
 }
 
-export function readFailedScenarioSave(): import("../../commerce/bakery/agent-scenario-save").AgentScenarioSaveResult {
+function readFailedScenarioSave(): import("../../commerce/bakery/agent-scenario-save").AgentScenarioSaveResult {
   return { kind: "read_failed" };
 }
 
-export function bakerySurfaceCommand(
+function bakerySurfaceCommand(
   surface: BakerySurfaceAttachmentV1,
   request: HarnessBakerySurfaceToolRequest,
 ): BakerySurfaceCommandV1 {
@@ -726,7 +726,7 @@ export function bakerySurfaceCommand(
   }
 }
 
-export async function dispatchBakeryContextPreparation(
+async function dispatchBakeryContextPreparation(
   authority: Parameters<typeof executeBakerySurfaceForHarness>[0],
   requiredCommand: import("@seams/bakery-model/bakery-surface").BakerySurfaceToolCommandName,
   callId: string,

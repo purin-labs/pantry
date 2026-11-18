@@ -58,7 +58,7 @@ export type VaultItemStoreError =
   | { readonly code: "vault_store_rate_limited" }
   | { readonly code: "vault_store_unavailable" };
 
-export type VaultStoreEnv = Readonly<{
+type VaultStoreEnv = Readonly<{
   VAULT_ONEPASSWORD: Fetcher;
 }> &
   CredentialVaultBindings;
@@ -77,11 +77,11 @@ type OnePasswordStore = Readonly<{
   connectedAt: number;
 }>;
 
-export type VaultStoreConnectOutcome =
+type VaultStoreConnectOutcome =
   | Readonly<{ kind: "store"; store: VaultStoreView }>
   | Readonly<{ kind: "choose_vault"; vaults: readonly OnePasswordVault[] }>;
 
-export type VaultMoveOutcome = Readonly<{
+type VaultMoveOutcome = Readonly<{
   store: VaultStoreView;
   moved: number;
   remaining: number;

@@ -124,7 +124,7 @@ export function ActivationBand(props: {
  * code means the step is done, so finished work stays visibly checked off
  * instead of vanishing from a shrinking list.
  */
-export type SetupStep = {
+type SetupStep = {
   readonly id: "inference" | "commerce" | "slack" | "channel" | "updates";
   readonly title: string;
   readonly detail: string;
@@ -154,20 +154,20 @@ export type SetupStep = {
   } | null;
 };
 
-export type SetupLiveFacts = {
+type SetupLiveFacts = {
   readonly inferenceChosen: boolean;
   readonly commerceChosen: boolean;
   readonly slackConnected: boolean;
   readonly channelChosen: boolean;
 };
 
-export type SetupLiveState = SetupLiveFacts & {
+type SetupLiveState = SetupLiveFacts & {
   readonly inferenceLabel: string | null;
   readonly commerceLabel: string | null;
   readonly slackLabel: string | null;
 };
 
-export const SETUP_STEPS: readonly SetupStep[] = [
+const SETUP_STEPS: readonly SetupStep[] = [
   {
     id: "inference",
     title: "Choose your AI account",
@@ -228,15 +228,15 @@ export const SETUP_STEPS: readonly SetupStep[] = [
 ];
 
 /** Codes the guided steps claim; anything else renders as its own issue row. */
-export const SETUP_STEP_CODES: ReadonlySet<string> = new Set(
+const SETUP_STEP_CODES: ReadonlySet<string> = new Set(
   SETUP_STEPS.flatMap(setupStepCodeList),
 );
 
-export function setupStepCodeList(step: SetupStep): readonly string[] {
+function setupStepCodeList(step: SetupStep): readonly string[] {
   return step.codes;
 }
 
-export function SetupChecklist(props: {
+function SetupChecklist(props: {
   readonly organisationHandle: string;
   readonly workspaceHandle: string;
   readonly readiness: Variant<ReadinessAssessment, "blocked"> | null;
@@ -307,14 +307,14 @@ export function SetupChecklist(props: {
   );
 }
 
-export function readinessBlockerCode(blocker: {
+function readinessBlockerCode(blocker: {
   readonly code: string;
   readonly integrationAccountId: string | null;
 }): string {
   return blocker.code;
 }
 
-export function setupTrackFillStyle(doneCount: number): React.CSSProperties {
+function setupTrackFillStyle(doneCount: number): React.CSSProperties {
   return { width: `${(doneCount / SETUP_STEPS.length) * 100}%` };
 }
 
@@ -325,7 +325,7 @@ export function setupTrackFillStyle(doneCount: number): React.CSSProperties {
  * assessment predates a disconnection. Codes decide only what the page
  * cannot observe directly.
  */
-export function setupStepIsDone(
+function setupStepIsDone(
   codes: ReadonlySet<string> | null,
   live: SetupLiveState,
   step: SetupStep,
@@ -338,13 +338,13 @@ export function setupStepIsDone(
   return codes !== null && step.codes.every(setupCodeAbsent.bind(null, codes));
 }
 
-export function setupCodeAbsent(codes: ReadonlySet<string>, code: string): boolean {
+function setupCodeAbsent(codes: ReadonlySet<string>, code: string): boolean {
   return !codes.has(code);
 }
 
-export type SetupStepState = "done" | "actionable" | "waiting";
+type SetupStepState = "done" | "actionable" | "waiting";
 
-export function setupStepState(
+function setupStepState(
   codes: ReadonlySet<string> | null,
   live: SetupLiveState,
   step: SetupStep,
@@ -363,11 +363,11 @@ export function setupStepState(
   return "actionable";
 }
 
-export function matchesSetupStep(id: SetupStep["id"], step: SetupStep): boolean {
+function matchesSetupStep(id: SetupStep["id"], step: SetupStep): boolean {
   return step.id === id;
 }
 
-export function renderSetupStep(
+function renderSetupStep(
   codes: ReadonlySet<string> | null,
   live: SetupLiveState,
   canManage: boolean,
@@ -391,7 +391,7 @@ export function renderSetupStep(
 }
 
 /** Done steps name what was chosen when the page knows it. */
-export function setupStepDoneLabel(live: SetupLiveState, step: SetupStep): string {
+function setupStepDoneLabel(live: SetupLiveState, step: SetupStep): string {
   if (step.id === "inference" && live.inferenceLabel !== null)
     return live.inferenceLabel;
   if (step.id === "commerce" && live.commerceLabel !== null)
@@ -400,7 +400,7 @@ export function setupStepDoneLabel(live: SetupLiveState, step: SetupStep): strin
   return "Done";
 }
 
-export function renderSetupStepEnd(
+function renderSetupStepEnd(
   state: SetupStepState,
   step: SetupStep,
   live: SetupLiveState,
@@ -431,14 +431,14 @@ export function renderSetupStepEnd(
   );
 }
 
-export function openSetupStepIntegration(
+function openSetupStepIntegration(
   onOpenIntegration: (integrationId: string) => void,
   integrationId: string,
 ): void {
   onOpenIntegration(integrationId);
 }
 
-export function renderSetupVerifyRow(checking: boolean): React.ReactNode {
+function renderSetupVerifyRow(checking: boolean): React.ReactNode {
   return (
     <li className="setup-step setup-step-auto">
       <span className="setup-step-glyph" aria-hidden="true">
@@ -458,7 +458,7 @@ export function renderSetupVerifyRow(checking: boolean): React.ReactNode {
 }
 
 /** Blocker codes outside the guided steps still surface, each exactly once. */
-export function renderSetupIssues(
+function renderSetupIssues(
   codes: ReadonlySet<string>,
   organisationHandle: string,
   workspaceHandle: string,
@@ -476,19 +476,19 @@ export function renderSetupIssues(
   );
 }
 
-export function setupCodeIsUnclaimed(code: string): boolean {
+function setupCodeIsUnclaimed(code: string): boolean {
   return !SETUP_STEP_CODES.has(code);
 }
 
-export function setupCodeHasCopy(code: string): boolean {
+function setupCodeHasCopy(code: string): boolean {
   return BLOCKER_COPY[code] !== undefined;
 }
 
-export function setupCodeIsUnknown(code: string): boolean {
+function setupCodeIsUnknown(code: string): boolean {
   return BLOCKER_COPY[code] === undefined;
 }
 
-export function announceUnknownBlockers(codes: string): void {
+function announceUnknownBlockers(codes: string): void {
   if (codes.length === 0) return;
   console.warn(`[readiness] Unmapped blocker code(s): ${codes}`);
   toast.warning(
@@ -496,7 +496,7 @@ export function announceUnknownBlockers(codes: string): void {
   );
 }
 
-export function renderSetupIssue(
+function renderSetupIssue(
   organisationHandle: string,
   workspaceHandle: string,
   code: string,

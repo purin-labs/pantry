@@ -26,7 +26,7 @@ const sensitivity = Type.Enum([
   "restricted",
 ]);
 const systemKind = systemEntityTypeIdSchema.properties.typeId;
-export const attributeScopeWireSchema = Type.Union([
+const attributeScopeWireSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("system"),
     entityTypeId: systemKind,

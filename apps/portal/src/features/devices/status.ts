@@ -8,8 +8,8 @@ import { assertNever } from "@seams/std";
 
 /** How a device's facts read on the Devices page. */
 
-export type Tone = "ok" | "busy" | "warn" | "bad" | "muted";
-export type DeviceStatus = Readonly<{
+type Tone = "ok" | "busy" | "warn" | "bad" | "muted";
+type DeviceStatus = Readonly<{
   label: string;
   reason: string;
   tone: Tone;
@@ -308,7 +308,7 @@ export function lastHeard(device: DeviceView): string {
   }
 }
 
-export function elapsed(at: number): string {
+function elapsed(at: number): string {
   const seconds = Math.max(0, Math.round((Date.now() - at) / 1000));
   if (seconds < 60) return "Just now";
   const minutes = Math.round(seconds / 60);

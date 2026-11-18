@@ -42,7 +42,7 @@ export type WorkflowChangeCommand = Readonly<{
   operationId: string;
 }>;
 
-export type PreparedWorkflowProposal =
+type PreparedWorkflowProposal =
   | Readonly<{ kind: "ready"; command: WorkflowChangeCommand }>
   | Readonly<{ kind: "refused"; message: string }>;
 
@@ -154,7 +154,7 @@ function problemText(
     .join(" ");
 }
 
-export type ApprovedWorkflowChange =
+type ApprovedWorkflowChange =
   | Readonly<{ kind: "applied"; receipt: WorkflowRevisionReceipt }>
   | Readonly<{ kind: "revision_conflict" }>
   | Readonly<{ kind: "human_intervention"; steps: readonly string[] }>
@@ -243,7 +243,7 @@ export async function applyApprovedWorkflowChange(
   return { kind: "applied", receipt };
 }
 
-export type OpenWorkflowProposal = Readonly<{
+type OpenWorkflowProposal = Readonly<{
   draftId: string;
   command: WorkflowChangeCommand;
   createdAt: number;

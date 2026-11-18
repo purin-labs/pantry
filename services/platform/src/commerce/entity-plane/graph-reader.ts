@@ -75,7 +75,7 @@ export type CommerceGraphReaderError =
       capability: CommerceQueryPlanErrorCapability;
     }>;
 
-export type CommerceGraphReaderOptions =
+type CommerceGraphReaderOptions =
   | Readonly<{
       organisationId: string;
       merchantId: string;

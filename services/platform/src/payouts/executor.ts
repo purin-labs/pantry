@@ -63,7 +63,7 @@ export type PayoutExecutionResult =
   | Readonly<{ kind: "indeterminate"; operation: PayoutIndeterminateOperation }>
   | Readonly<{ kind: "not_executable"; reason: PayoutRefusal }>;
 
-export type PayoutRefusal =
+type PayoutRefusal =
   | "approval_expired"
   | "approval_digest_mismatch"
   | "plan_invalid"
@@ -78,7 +78,7 @@ export type SupplierPayoutPlanValidator = (
     }>
   | Readonly<{ ok: false }>;
 
-export type PayoutExecutionInput = Readonly<{
+type PayoutExecutionInput = Readonly<{
   plan: SupplierPayoutExecutionPlan;
   attemptId: string;
   payoutApprovalDigest: string;
@@ -88,7 +88,7 @@ export type PayoutExecutionInput = Readonly<{
   validate: SupplierPayoutPlanValidator;
 }>;
 
-export type PayoutFundingInput = Readonly<{
+type PayoutFundingInput = Readonly<{
   plan: Variant<SupplierPayoutExecutionPlan, "wise">;
   attemptId: string;
   providerTransferId: string;

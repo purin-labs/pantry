@@ -15,7 +15,7 @@ import { listEmailReviewProjectionsForCase } from "../data/email-review";
 import { emailReviewQueueWire } from "../control/email-review";
 import { listConversationSideCases, readSideCaseSource } from "./side-cases";
 
-export const CONVERSATION_EMAIL_REVIEW_LIMIT = 20;
+const CONVERSATION_EMAIL_REVIEW_LIMIT = 20;
 
 export async function readConversationEmailReviews(
   placement: OrganisationExecutionScope,

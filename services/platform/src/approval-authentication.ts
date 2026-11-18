@@ -133,7 +133,7 @@ export type MerchantActionDecision =
       readonly evidence: MerchantActionRejectionEvidence;
     };
 
-export type ApprovalEvidenceError = {
+type ApprovalEvidenceError = {
   readonly code: "approval_evidence_invalid";
 };
 

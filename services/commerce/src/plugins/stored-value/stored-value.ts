@@ -40,7 +40,7 @@ export type StoredValueCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-export type StoredValueAuthorityOptions = Readonly<{
+type StoredValueAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => StoredValueMerchantRow | undefined;
   readReplay: (
@@ -393,7 +393,7 @@ export type CheckoutStoredValueRequest = Readonly<{
   keptAccountIds?: readonly string[];
 }>;
 
-export type StoredValueEvaluation =
+type StoredValueEvaluation =
   | Readonly<{ kind: "applied"; tenders: readonly CheckoutStoredValueTender[] }>
   | Readonly<{ kind: "rejected"; field: string }>;
 
@@ -691,10 +691,7 @@ export function creditStoredValueRefund(
   return accountId;
 }
 
-export function storeCreditAccountId(
-  customerId: string,
-  currency: string,
-): string {
+function storeCreditAccountId(customerId: string, currency: string): string {
   return `store_credit_${sha256(`${customerId}:${currency}`).slice(0, 24)}`;
 }
 

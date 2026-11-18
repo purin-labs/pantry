@@ -20,7 +20,7 @@ type CostsViewState = Readonly<{
   }>;
 }>;
 
-export type CostsViewCommandStep<State> =
+type CostsViewCommandStep<State> =
   | Readonly<{ kind: "next"; state: State }>
   | Readonly<{ kind: "rejected"; message: string }>;
 

@@ -229,7 +229,7 @@ export async function reserveOrganisationPlacementMove(input: {
   };
 }
 
-export const regionalFreezeReadiness = `
+const regionalFreezeReadiness = `
   AND NOT EXISTS (SELECT 1 FROM durable_object_registry registry
     WHERE registry.organisation_id = organisation_placement.organisation_id
       AND registry.placement_epoch = organisation_placement.placement_epoch
@@ -321,9 +321,7 @@ export async function freezeOrganisationPlacementMove(
   };
 }
 
-export function publicationJournal(
-  publication: OrganisationPlacementPublication,
-) {
+function publicationJournal(publication: OrganisationPlacementPublication) {
   switch (publication.kind) {
     case "relocation":
       return {
@@ -477,11 +475,11 @@ export async function publishOrganisationPlacementMove(
   };
 }
 
-export function publicationWriteRejected(result: D1Result): boolean {
+function publicationWriteRejected(result: D1Result): boolean {
   return result.meta.changes !== 1;
 }
 
-export function nextPlacement(
+function nextPlacement(
   lastEpoch: number,
   target: OrganisationPlacementMoveTarget,
   organisationId: OrganisationId,
@@ -498,7 +496,7 @@ export function nextPlacement(
   return parsed.ok ? parsed : placementCorrupt(organisationId);
 }
 
-export function newOrganisationPlacementFenceToken(): OrganisationPlacementFenceToken {
+function newOrganisationPlacementFenceToken(): OrganisationPlacementFenceToken {
   const token = parseOrganisationPlacementFenceToken(
     `tpf_${crypto.randomUUID()}`,
   );

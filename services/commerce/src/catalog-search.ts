@@ -10,8 +10,8 @@ import type {
   CommerceBuyerCatalogV1,
 } from "@seams/commerce-client";
 
-export const CATALOG_SEARCH_DEFAULT_LIMIT = 20;
-export const CATALOG_SEARCH_MAXIMUM_LIMIT = 50;
+const CATALOG_SEARCH_DEFAULT_LIMIT = 20;
+const CATALOG_SEARCH_MAXIMUM_LIMIT = 50;
 
 /**
  * The listings that contain every term of the query, best first: a term in

@@ -19,12 +19,12 @@ const COUNTS_KEY = "satyr.voice.counts";
 const COUNT_DAYS = 14;
 
 /** What one engine on one host heard: the texts that the Portal kept, and the texts that it dropped. */
-export type VoiceHeardCount = Readonly<{ commands: number; noise: number }>;
+type VoiceHeardCount = Readonly<{ commands: number; noise: number }>;
 
 /** The key of `heardBy`: the host and the engine, as `shop_mac:qwen3-asr-1.7b`. */
 type HeardKey = `${ChatTranscriptionPath}:${VoiceEngineId}`;
 
-export type VoiceCounts = Readonly<{
+type VoiceCounts = Readonly<{
   wakes: number;
   nearWakes: number;
   holds: number;
@@ -88,7 +88,7 @@ export function voiceCountsToday(): VoiceCounts {
   return { ...NO_COUNTS, ...readCounts()[day(new Date())] };
 }
 
-export type VoiceHeardTotal = VoiceHeard & VoiceHeardCount;
+type VoiceHeardTotal = VoiceHeard & VoiceHeardCount;
 
 /** Each host and engine that heard a transcript on this device in the last `days` days, today included. */
 export function voiceHeardLastDays(days: number): VoiceHeardTotal[] {

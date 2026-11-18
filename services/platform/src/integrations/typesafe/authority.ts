@@ -1,7 +1,6 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { CredentialVaultBindings } from "../../credential-vault/keyring";
 import type { OrganisationId } from "../../ids";
-import { isRecord } from "@seams/std";
 import type { TypeSafeCredential } from "./credential";
 import {
   readTypeSafeConnection,
@@ -17,13 +16,11 @@ export type TypeSafeAuthority =
   | Readonly<{ kind: "satyr_platform"; connectionRevision?: never }>
   | Readonly<{ kind: "organisation_byo"; connectionRevision: number }>;
 
-export type TypeSafeFunding = TypeSafeAuthority["kind"];
-
-export const SATYR_TYPESAFE_AUTHORITY: TypeSafeAuthority = Object.freeze({
+const SATYR_TYPESAFE_AUTHORITY: TypeSafeAuthority = Object.freeze({
   kind: "satyr_platform",
 });
 
-export type TypeSafePlatformBindings = Readonly<{
+type TypeSafePlatformBindings = Readonly<{
   TYPESAFE_API_KEY?: string;
 }>;
 
@@ -84,15 +81,6 @@ export function typeSafeAuthorityFromStored(
   )
     return { kind: "organisation_byo", connectionRevision: revision };
   return null;
-}
-
-export function parseTypeSafeAuthority(raw: unknown): TypeSafeAuthority | null {
-  if (!isRecord(raw)) return null;
-  if (raw.kind === "satyr_platform")
-    return Object.keys(raw).length === 1 ? SATYR_TYPESAFE_AUTHORITY : null;
-  if (raw.kind !== "organisation_byo" || Object.keys(raw).length !== 2)
-    return null;
-  return typeSafeAuthorityFromStored("organisation_byo", raw.connectionRevision);
 }
 
 /**

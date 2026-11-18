@@ -2,7 +2,7 @@ import type { Env } from "../env";
 import { holdCaseOutput } from "./case-output-hold";
 import type { Outcome } from "@seams/contracts";
 import type { ProjectSnapshot } from "@seams/control-api";
-import { type BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignment,
@@ -184,7 +184,7 @@ export type CaseWalkingPathInput = {
   readonly pinnedAgent: PinnedAgentProfile | null;
 };
 
-export type OngoingCaseTurnResult =
+type OngoingCaseTurnResult =
   | { readonly kind: "duplicate_ingress"; readonly caseId: string }
   | {
       readonly kind: "delivery_pending";
@@ -233,7 +233,7 @@ export type OngoingCaseTurnInput = Omit<
     | { readonly kind: "slack_stream"; readonly recipientUserId: SlackUserId };
 };
 
-export type CaseParticipantInput = {
+type CaseParticipantInput = {
   readonly session: CaseWalkingSession;
   readonly requestId: RequestId;
   readonly sessionId: SessionId;
@@ -249,7 +249,7 @@ export type CaseParticipantInput = {
  * participants ended, and its context holds what both proposed. Its proposal
  * so follows from the two assignments.
  */
-export type CombinedCaseParticipantInput = {
+type CombinedCaseParticipantInput = {
   readonly participant: CaseParticipantInput;
   /**
    * Assembled after the trigger is accepted, so that each participant's turn
@@ -322,7 +322,7 @@ export type DirectCasePathResult =
       readonly delivery: CompletedCaseParticipant["delivery"];
     };
 
-export type DirectTwoSessionCasePathInput = {
+type DirectTwoSessionCasePathInput = {
   readonly env: Env;
   readonly pinnedAgent: PinnedAgentProfile | null;
   readonly caseActor: CaseWalkingCase;
@@ -510,7 +510,7 @@ export type TransientEmailAssignmentInput = {
   readonly projectContext: ProjectSnapshot | null;
 };
 
-export type TransientEmailAssignmentError =
+type TransientEmailAssignmentError =
   | CaseWalkingPathError
   | {
       readonly kind: "placement_changed";
@@ -1862,7 +1862,7 @@ async function currentDeliveryAuthority(
     : failure("case_delivery_authority_partition_changed");
 }
 
-export function hasActiveCaseAssignment(snapshot: CaseSnapshot): boolean {
+function hasActiveCaseAssignment(snapshot: CaseSnapshot): boolean {
   for (const lifecycle of snapshot.assignmentLifecycles) {
     if (lifecycle.kind === "assigned" || lifecycle.kind === "running")
       return true;

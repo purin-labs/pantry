@@ -213,7 +213,7 @@ export type ProviderAuthorizationContext = {
   readonly portalSubjectHash: string;
 };
 
-export type ProviderAttemptError =
+type ProviderAttemptError =
   | { readonly code: "provider_attempt_not_found" }
   | { readonly code: "provider_attempt_open" }
   | { readonly code: "provider_attempt_terminal" }

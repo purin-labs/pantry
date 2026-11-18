@@ -16,7 +16,7 @@ import { readCookie } from "../chat/api";
 import { ControlApiError, controlWrite } from "../../control-client";
 import { voiceIsListening, type VoiceSession } from "./session";
 
-export type VoiceApprovalScope = Readonly<{
+type VoiceApprovalScope = Readonly<{
   session: VoiceSession;
   conversationId: string;
 }>;

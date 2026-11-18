@@ -58,7 +58,7 @@ type StoredSheet = Readonly<{
 
 type SheetResult<T> = Result<T, Readonly<{ code: CostsSheetFailureCode }>>;
 
-export type CostsSheetDraftRead = Readonly<{
+type CostsSheetDraftRead = Readonly<{
   documentId: typeof COSTS_SHEET_ID;
   revision: number;
   generation: number;

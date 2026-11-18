@@ -264,7 +264,7 @@ export function readPourOverScene(
 }
 
 /** Parses the station setup the runtime packaged with its model, once. */
-export function parsePourOverSetup(raw: unknown): PourOverSetup {
+function parsePourOverSetup(raw: unknown): PourOverSetup {
   if (!isRecord(raw) || !Array.isArray(raw.geometry) || !isRecord(raw.frames))
     invalid();
   const frames = raw.frames;

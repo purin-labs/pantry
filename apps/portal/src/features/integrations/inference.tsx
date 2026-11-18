@@ -109,7 +109,7 @@ export function codexPanelHeading(
   );
 }
 
-export type InferenceSource = Readonly<{
+type InferenceSource = Readonly<{
   kind: OrganisationInferenceSelection["kind"];
   label: string;
   detail: string;
@@ -117,7 +117,7 @@ export type InferenceSource = Readonly<{
   use: string;
 }>;
 
-export const INFERENCE_SOURCES: readonly InferenceSource[] = [
+const INFERENCE_SOURCES: readonly InferenceSource[] = [
   {
     kind: "codex_subscription",
     label: "ChatGPT",
@@ -150,13 +150,13 @@ export const INFERENCE_SOURCES: readonly InferenceSource[] = [
   },
 ];
 
-export type InferenceApiKeyField = Readonly<{
+type InferenceApiKeyField = Readonly<{
   name: "openAiApiKey" | "anthropicApiKey";
   label: string;
   provider: string;
 }>;
 
-export function inferenceApiKeyField(
+function inferenceApiKeyField(
   kind: OrganisationInferenceSelection["kind"],
 ): InferenceApiKeyField | null {
   switch (kind) {
@@ -186,7 +186,7 @@ export function inferenceApiKeyField(
  * of a menu that hides them. The save button shows only when it would change
  * something, so the connection below stays the one action of a saved source.
  */
-export function InferenceSourceChoice(props: {
+function InferenceSourceChoice(props: {
   readonly selection: OrganisationInferenceSelection;
   readonly draft: OrganisationInferenceSelection["kind"];
   readonly setDraft: React.Dispatch<
@@ -294,14 +294,14 @@ export function InferenceSourceChoice(props: {
   );
 }
 
-export function matchesInferenceSource(
+function matchesInferenceSource(
   kind: OrganisationInferenceSelection["kind"],
   source: InferenceSource,
 ): boolean {
   return source.kind === kind;
 }
 
-export function renderInferenceChoice(
+function renderInferenceChoice(
   saved: OrganisationInferenceSelection["kind"],
   draft: OrganisationInferenceSelection["kind"],
   setDraft: React.Dispatch<
@@ -331,7 +331,7 @@ export function renderInferenceChoice(
   );
 }
 
-export function updateInferenceSelectionDraft(
+function updateInferenceSelectionDraft(
   setDraftSelectionKind: React.Dispatch<
     React.SetStateAction<OrganisationInferenceSelection["kind"]>
   >,
@@ -341,7 +341,7 @@ export function updateInferenceSelectionDraft(
   if (selection !== null) setDraftSelectionKind(selection.kind);
 }
 
-export function inferenceSelectionSummary(
+function inferenceSelectionSummary(
   selection: OrganisationInferenceSelection,
 ): string {
   switch (selection.kind) {

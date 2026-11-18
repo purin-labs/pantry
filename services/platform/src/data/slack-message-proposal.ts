@@ -57,7 +57,7 @@ export type SlackChannelOptions = Readonly<{
 }>;
 
 export const SLACK_MESSAGE_MAX_LENGTH = 8000;
-export const SLACK_MESSAGE_DRAFT_LIFETIME_MS = 24 * 60 * 60_000;
+const SLACK_MESSAGE_DRAFT_LIFETIME_MS = 24 * 60 * 60_000;
 const CASE_DRAFT_LIMIT = 20;
 const CHANNEL_OPTION_LIMIT = 50;
 

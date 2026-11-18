@@ -358,7 +358,7 @@ export function matchAgentControlRoute(
     : { kind: "organisationInference", organisationIdRaw: inference };
 }
 
-export function matchWhatsAppReply(
+function matchWhatsAppReply(
   pathname: string,
 ): Variant<AgentControlRoute, "whatsappReply" | "whatsappReplyQueue"> | null {
   const action = captures(
@@ -390,7 +390,7 @@ export function matchWhatsAppReply(
     : { kind: "whatsappReplyQueue", organisationIdRaw: queue };
 }
 
-export function matchWhatsAppCase(
+function matchWhatsAppCase(
   pathname: string,
 ): Variant<AgentControlRoute, "whatsappCase"> | null {
   const action = captures(
@@ -419,7 +419,7 @@ export function matchWhatsAppCase(
       };
 }
 
-export function matchEmailReply(
+function matchEmailReply(
   pathname: string,
 ): Variant<AgentControlRoute, "emailReply"> | null {
   const action = captures(
@@ -460,7 +460,7 @@ export function matchEmailReply(
   return null;
 }
 
-export function matchEmailOperational(
+function matchEmailOperational(
   pathname: string,
 ): Variant<AgentControlRoute, "emailOperational"> | null {
   const action = captures(
@@ -500,7 +500,7 @@ export function matchEmailOperational(
   return null;
 }
 
-export function isAgentMailboxRouteAction(
+function isAgentMailboxRouteAction(
   value: string | undefined,
 ): value is AgentMailboxRouteAction {
   return (
@@ -514,7 +514,7 @@ export function isAgentMailboxRouteAction(
   );
 }
 
-export function organisation(pathname: string, suffix: string): string | null {
+function organisation(pathname: string, suffix: string): string | null {
   const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
   const value = captures(
     pathname,
@@ -523,7 +523,7 @@ export function organisation(pathname: string, suffix: string): string | null {
   return value === null ? null : decode(value[0]);
 }
 
-export function captures(
+function captures(
   pathname: string,
   pattern: RegExp,
 ): readonly string[] | null {
@@ -531,7 +531,7 @@ export function captures(
   return result === null ? null : result.slice(1);
 }
 
-export function decode(value: string | undefined): string {
+function decode(value: string | undefined): string {
   if (value === undefined)
     throw new Error("Agent control route capture is missing");
   return decodeURIComponent(value);

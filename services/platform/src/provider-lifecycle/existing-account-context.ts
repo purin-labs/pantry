@@ -14,7 +14,7 @@ export function providerContextForExistingAccount(
     : existingAccountContext(active, providerAccountId, authorizationProduct);
 }
 
-export function existingAccountContext(
+function existingAccountContext(
   provider: OnboardingProvider,
   providerAccountId: string,
   authorizationProduct: string | null = null,

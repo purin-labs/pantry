@@ -26,16 +26,16 @@ import {
   type PluginFunctionFailure,
 } from "./merchant-plugins.ts";
 
-export type CheckoutHookPoint =
+type CheckoutHookPoint =
   | "checkout.lines"
   | "checkout.discount"
   | "checkout.tenders"
   | "checkout.delivery";
 
 /** Every hook point that the runner serves; validate keeps its own stage. */
-export type HookPoint = CheckoutHookPoint | "machine.guard";
+type HookPoint = CheckoutHookPoint | "machine.guard";
 
-export type HookResult<T> =
+type HookResult<T> =
   | Readonly<{
       kind: "ran";
       outputs: readonly Readonly<{ pluginId: string; output: T }>[];

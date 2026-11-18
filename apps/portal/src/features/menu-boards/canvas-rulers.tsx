@@ -118,7 +118,7 @@ type Gap = Readonly<{
  * whose span across that side overlaps the box. With none, the distance
  * goes to the board's edge. A box over the edge shows no gap on that side.
  */
-export function boxGaps(
+function boxGaps(
   box: MenuBoardRect,
   others: readonly MenuBoardRect[],
   design: BoardSize,

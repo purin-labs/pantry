@@ -38,7 +38,7 @@ export type WorkflowProposal = Readonly<{
   change: ProposalChangeSummary;
 }>;
 
-export type AppliedWorkflow = Readonly<{
+type AppliedWorkflow = Readonly<{
   document: BakeryWorkflowDocument;
   digest: string;
   revision: number;
@@ -213,7 +213,7 @@ export async function recordRunFindings(
   );
 }
 
-export type ApplyResult =
+type ApplyResult =
   | Readonly<{ kind: "applied"; digest: string; revision: number }>
   | Readonly<{ kind: "stale" }>;
 

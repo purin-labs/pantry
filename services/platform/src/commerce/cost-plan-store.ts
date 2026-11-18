@@ -44,7 +44,7 @@ export type CostPlanSaveResult =
   | Readonly<{ ok: false; code: "cost_plan_changed" }>
   | Readonly<{ ok: false; code: "cost_plan_invalid"; detail: string }>;
 
-export type OfferPriceSaveResult =
+type OfferPriceSaveResult =
   | Readonly<{ ok: true; merchantRevision: number | null }>
   | Readonly<{
       ok: false;

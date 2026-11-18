@@ -18,7 +18,7 @@ export function isPaymentWindow(from: number, to: number): boolean {
  * How a run of tries ended. A run starts with one payment. A later try follows
  * a decline, so a run that ends paid after a decline is recovered.
  */
-export type PaymentRunOutcome =
+type PaymentRunOutcome =
   "paid_first_try" | "recovered_after_decline" | "not_recovered";
 
 export type PaymentsSummary = Readonly<{

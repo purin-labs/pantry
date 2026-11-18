@@ -62,7 +62,7 @@ export type EmailRuntimeSnapshot = {
   readonly disabledAt: number | null;
 };
 
-export type EmailRuntimeError = { readonly code: string };
+type EmailRuntimeError = { readonly code: string };
 
 export type EmailCaseContextDiscoveryWork = Readonly<{
   organisationId: string;
@@ -920,7 +920,7 @@ export function settleEmailWatchCleanup(sql: SqlStorage): void {
   );
 }
 
-export type EmailMaintenanceCandidate = {
+type EmailMaintenanceCandidate = {
   readonly operation: EmailDraftOperation;
   readonly action: "dispose_expired" | "resolve";
 };
@@ -1275,7 +1275,7 @@ export function nextEmailEvaluationAt(sql: SqlStorage): number | null {
     : null;
 }
 
-export type EmailEvaluationClaim =
+type EmailEvaluationClaim =
   | { readonly kind: "idle" }
   | { readonly kind: "due"; readonly runtime: EmailRuntimeSnapshot };
 
@@ -1694,7 +1694,7 @@ export function utcDayEndsAt(now: number): number {
   return dayStart + 86_400_000;
 }
 
-export type EmailTokenWindow = {
+type EmailTokenWindow = {
   readonly reserved: number;
   readonly consumed: number;
 };
@@ -1715,7 +1715,7 @@ export function emailTokenWindowTotals(
   return { reserved: row?.reserved ?? 0, consumed: row?.consumed ?? 0 };
 }
 
-export type EmailTokenReservation =
+type EmailTokenReservation =
   | { readonly kind: "reserved"; readonly reservationId: string }
   | { readonly kind: "duplicate" }
   | {

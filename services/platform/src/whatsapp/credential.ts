@@ -8,13 +8,13 @@ import type { Env } from "../env";
 import type { IntegrationAccountId } from "../ids";
 import type { Result } from "../result";
 
-export type WhatsAppOrganisationCredential = {
+type WhatsAppOrganisationCredential = {
   readonly accessToken: string;
   readonly expiresAt: number | null;
   readonly credentialGeneration: number;
 };
 
-export type WhatsAppOrganisationCredentialError = {
+type WhatsAppOrganisationCredentialError = {
   readonly code:
     | "whatsapp_connection_inactive"
     | "whatsapp_credential_unavailable"

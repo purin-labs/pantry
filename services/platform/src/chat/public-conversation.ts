@@ -15,7 +15,7 @@ import type { ConversationMetadata } from "./store";
 import { assertNever } from "@seams/std";
 import { conversationOrigin } from "./origin";
 
-export function visibleMessage(message: ChatMessage): boolean {
+function visibleMessage(message: ChatMessage): boolean {
   return message.kind !== "context";
 }
 
@@ -57,7 +57,7 @@ export function publicConversation(
   };
 }
 
-export function isPublicTimelineEvent(
+function isPublicTimelineEvent(
   event: ReturnType<typeof conversationTimeline>[number],
 ): boolean {
   return event.kind !== "context" || event.contextDetails !== undefined;
@@ -67,7 +67,7 @@ export function isPublicTimelineEvent(
  * The mark of the page that went with a message: its name, never its view.
  * The view stays on the server, because a shared chat has other readers.
  */
-export function screenParts(
+function screenParts(
   parts: readonly ChatInputPart[],
 ): readonly unknown[] {
   for (const part of parts)
@@ -92,11 +92,11 @@ function publicMessage(message: ChatMessage): ChatMessage {
 }
 
 /** The mark of a spoken command, which the Portal shows on the message. */
-export function voiceParts(parts: readonly ChatInputPart[]): readonly ChatInputPart[] {
+function voiceParts(parts: readonly ChatInputPart[]): readonly ChatInputPart[] {
   return parts.filter((part) => part.kind === "voice");
 }
 
-export function publicTimelineEvent(event: ChatTimelineEvent): unknown {
+function publicTimelineEvent(event: ChatTimelineEvent): unknown {
   const base = {
     eventId: event.eventId,
     sequence: event.sequence,
@@ -197,7 +197,7 @@ export function publicConversationWork(work: Conversation["work"]): unknown {
       : work;
 }
 
-export function completedResponseBinding(
+function completedResponseBinding(
   completedRequests: readonly string[],
   binding: Conversation["historyBindings"][number],
 ): boolean {
@@ -206,7 +206,7 @@ export function completedResponseBinding(
   );
 }
 
-export function responseBindingId(
+function responseBindingId(
   binding: Conversation["historyBindings"][number],
 ): string | null {
   return binding.responseId;

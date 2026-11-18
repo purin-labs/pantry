@@ -1,14 +1,14 @@
-import {
-  type CommerceAdminClient,
-  type CommerceClientError,
-  type CommerceResourcesV1,
-  type CommerceFoodServiceResourcesV1,
-  type CommerceMutationResultV1,
-  type CommerceOrderV1,
-  type CommerceQuantityV1,
-  type CommercePaymentV1,
-  type CommerceFulfillmentV1,
-  type CommercePickupFulfillmentV1,
+import type {
+  CommerceAdminClient,
+  CommerceClientError,
+  CommerceResourcesV1,
+  CommerceFoodServiceResourcesV1,
+  CommerceMutationResultV1,
+  CommerceOrderV1,
+  CommerceQuantityV1,
+  CommercePaymentV1,
+  CommerceFulfillmentV1,
+  CommercePickupFulfillmentV1,
 } from "@seams/commerce-client";
 import type { Variant } from "@seams/type-utils";
 
@@ -107,7 +107,7 @@ export type CafeOperationAction =
   | "mark_pickup_ready"
   | "complete_pickup";
 
-export type CafeRelatedResource = Readonly<{
+type CafeRelatedResource = Readonly<{
   kind:
     | "menu"
     | "production_batch"
@@ -120,14 +120,14 @@ export type CafeRelatedResource = Readonly<{
   label: string;
 }>;
 
-export type CafeOrderModifier = Readonly<{
+type CafeOrderModifier = Readonly<{
   modifierGroupId: string;
   modifierOptionId: string;
   groupName: string;
   name: string;
 }>;
 
-export type CafeOrderItem = Readonly<{
+type CafeOrderItem = Readonly<{
   lineItemId: string;
   sku: string;
   title: string;
@@ -137,13 +137,13 @@ export type CafeOrderItem = Readonly<{
   linkedResources: readonly CafeRelatedResource[];
 }>;
 
-export type CafePickupOrder = Readonly<{
+type CafePickupOrder = Readonly<{
   orderId: string;
   fulfillmentId: string;
   items: readonly CafeOrderItem[];
 }>;
 
-export type CafeOperationsView = Readonly<{
+type CafeOperationsView = Readonly<{
   schemaVersion: "satyr.cafe-operations.v1";
   merchantRevision: number;
   menu: "ready_to_publish" | "published";
@@ -174,7 +174,7 @@ export type CafeOperationError =
       result: CommerceMutationResultV1;
     }>;
 
-export type CafeOperationResult<T> =
+type CafeOperationResult<T> =
   | Readonly<{ ok: true; value: T }>
   | Readonly<{ ok: false; error: CafeOperationError }>;
 

@@ -83,13 +83,13 @@ import {
 export type { AccountPlatformBindings } from "./config";
 /** What a check names of the binding. A check does not read the fee policy. */
 type CheckedAccountBinding = Pick<PantryAccountBinding, "instanceId" | "scope">;
-export type AccountUserCheck = Readonly<{
+type AccountUserCheck = Readonly<{
   binding: CheckedAccountBinding;
   user: LinkedPantryAccountUser;
   authority: AccountUserAuthority;
   action: AccountAdmissionAction;
 }>;
-export type AccountAutomationCheck = Readonly<{
+type AccountAutomationCheck = Readonly<{
   binding: CheckedAccountBinding;
   automation: LinkedPantryAccountAutomation;
   action: AccountAdmissionAction;
@@ -99,7 +99,7 @@ export type AccountMembershipActor = Readonly<{
   user: LinkedPantryAccountUser;
   authority: Extract<AccountUserAuthority, { kind: "authenticated_session" }>;
 }>;
-export type AccountAutomationGrantRequest = Omit<
+type AccountAutomationGrantRequest = Omit<
   AccountAutomationGrantChangeV1,
   "instanceId"
 >;

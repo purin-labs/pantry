@@ -18,8 +18,6 @@ import type {
   CustomCommerceEntityRef,
   CustomCommerceEntityTypeId,
   CustomEntityTypeRevision,
-  ListEntryAttributeDefinition,
-  ListEntryAttributeValue,
   RelationshipDefinitionId,
   RelationshipDefinition,
   RelationshipId,
@@ -62,7 +60,6 @@ import type {
   EntityPlaneChangeRequest,
   EntityPlaneCommandRequest,
   EntityPlaneQueryRequest,
-  EntityPlaneSystemExtensionRequest,
 } from "./entity-types.ts";
 import {
   validateCommerceEntityAuthorityWithLexicon,
@@ -143,39 +140,7 @@ export function parseEntityPlaneQueryRequest(
   };
 }
 
-export function parseEntityPlaneSystemExtensionRequest(
-  value: unknown,
-): EntityPlaneSystemExtensionRequest {
-  const object = objectValue(value, "systemExtensionRequest");
-  const entityRefs = arrayValue(
-    object.entityRefs,
-    "systemExtensionRequest.entityRefs",
-  );
-  if (entityRefs.length > 100)
-    throw new Error("systemExtensionRequest.entityRefs exceeds the limit");
-  return {
-    organisationId: normalizedText(
-      object.organisationId,
-      "systemExtensionRequest.organisationId",
-    ),
-    merchantId: normalizedText(
-      object.merchantId,
-      "systemExtensionRequest.merchantId",
-    ),
-    entityRefs: entityRefs.map(parseSystemEntityRefValue),
-  };
-}
-
-function parseSystemEntityRefValue(value: unknown): SystemCommerceEntityRef {
-  const reference = parseEntityRef(value);
-  if (reference.origin !== "system")
-    throw new Error(
-      "systemExtensionRequest.entityRefs must contain system references",
-    );
-  return reference;
-}
-
-export function parseCommerceGraphQuery(value: unknown): CommerceGraphQuery {
+function parseCommerceGraphQuery(value: unknown): CommerceGraphQuery {
   validateCommerceGraphQueryWithLexicon(value);
   return value;
 }
@@ -461,9 +426,7 @@ export function parseCustomEntityTypeDraft(value: unknown) {
   };
 }
 
-export function parseAttributeDefinitionKind(
-  value: unknown,
-): AttributeDefinitionKind {
+function parseAttributeDefinitionKind(value: unknown): AttributeDefinitionKind {
   const object = objectValue(value, "attributeDefinition.kind");
   const kind = enumValue(
     object.kind,
@@ -640,41 +603,6 @@ export function parseAttributeAssignment(
     sensitivity: parseSensitivity(
       object.sensitivity,
       "attributeAssignment.sensitivity",
-    ),
-    value: parseAttributeValue(object.value),
-  };
-}
-
-export function parseListEntryAttributeDefinition(
-  value: unknown,
-): ListEntryAttributeDefinition {
-  const object = objectValue(value, "listEntryAttributeDefinition");
-  return {
-    attributeId: brandedText<AttributeDefinitionId>(
-      object.attributeId,
-      "listEntryAttributeDefinition.attributeId",
-    ),
-    definition: parseAttributeDefinition(object.definition),
-  };
-}
-
-export function parseListEntryAttributeValue(
-  value: unknown,
-): ListEntryAttributeValue {
-  const object = objectValue(value, "listEntryAttributeValue");
-  return {
-    attributeId: brandedText<AttributeDefinitionId>(
-      object.attributeId,
-      "listEntryAttributeValue.attributeId",
-    ),
-    scope: parseAttributeScope(object.scope, "listEntryAttributeValue.scope"),
-    definitionRevision: brandedRevision<AttributeDefinitionRevision>(
-      object.definitionRevision,
-      "listEntryAttributeValue.definitionRevision",
-    ),
-    sensitivity: parseSensitivity(
-      object.sensitivity,
-      "listEntryAttributeValue.sensitivity",
     ),
     value: parseAttributeValue(object.value),
   };
@@ -886,13 +814,6 @@ export function parseSystemEntityRef(
 export function parseCommerceList(value: unknown): CommerceList {
   validateCommerceListWithLexicon(value);
   return value;
-}
-
-export function parseCustomEntityRef(value: unknown): CustomCommerceEntityRef {
-  const ref = parseEntityRef(value);
-  if (ref.origin !== "custom")
-    throw new Error("custom entity reference is required");
-  return ref;
 }
 
 export function parseEntityTypeId(value: unknown): CommerceEntityTypeId {

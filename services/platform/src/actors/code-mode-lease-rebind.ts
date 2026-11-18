@@ -2,9 +2,9 @@ import type { StrictUnion } from "@seams/type-utils";
 import type { Env } from "../env";
 import { newRequestId, type OrganisationId } from "../ids";
 import { requireActiveOrganisationActorAtPlacement } from "./actor-router";
-import {
-  type CodeModeLeaseBinding,
-  type CodeModeLeaseRebindInput,
+import type {
+  CodeModeLeaseBinding,
+  CodeModeLeaseRebindInput,
 } from "./code-mode-budget";
 import { codeModePlatformGovernor } from "./code-mode-platform-governor-stub";
 import {
@@ -35,14 +35,14 @@ export type ConfirmedCodeModeLeaseRebind = {
   readonly [CONFIRMED]: true;
 };
 
-export type CodeModeLeaseRebindPreparation = StrictUnion<
+type CodeModeLeaseRebindPreparation = StrictUnion<
   | { readonly kind: "prepared"; readonly rebind: PreparedCodeModeLeaseRebind }
   /** The intended lease already holds the execution. */
   | { readonly kind: "bound" }
   | { readonly kind: "refused"; readonly reason: string }
 >;
 
-export type CodeModeLeaseRebindConfirmation = StrictUnion<
+type CodeModeLeaseRebindConfirmation = StrictUnion<
   | {
       readonly kind: "confirmed";
       readonly rebind: ConfirmedCodeModeLeaseRebind;

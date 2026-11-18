@@ -8,7 +8,7 @@ import type { Variant } from "@seams/type-utils";
 import type { ChannelId, WorkspaceId } from "../ids";
 
 /** One online order that a feed delivery placed and paid in one commit. */
-export type PaidPlacement = Readonly<{
+type PaidPlacement = Readonly<{
   order: CommerceOrderProjection;
   payment: PaymentProjection;
   fulfillment: FulfillmentProjection;

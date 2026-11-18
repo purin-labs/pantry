@@ -20,11 +20,11 @@ import { parseReplyServerMessage } from "@seams/control-api/portal/reply-draft";
  * Plan 40D: the shared draft of one Inbox reply. People and agents edit the
  * same text; a save makes it the next Gmail version.
  */
-export type BodyField = "body";
+type BodyField = "body";
 
-export type ReplyTextView = TextCollaborationView<BodyField, MailReplyRoomMetadata>;
+type ReplyTextView = TextCollaborationView<BodyField, MailReplyRoomMetadata>;
 
-export type ReplyTextClient = TextCollaborationClient<
+type ReplyTextClient = TextCollaborationClient<
   BodyField,
   MailReplyDoc,
   MailReplyUpdate,
@@ -48,7 +48,7 @@ export type ReplyDraftView = Readonly<{
     | Readonly<{ kind: "failed"; message: string; closed: boolean }>
   );
 
-export const REPLY_DOCUMENT: TextDocumentAdapter<
+const REPLY_DOCUMENT: TextDocumentAdapter<
   BodyField,
   MailReplyDoc,
   MailReplyUpdate,
@@ -73,7 +73,7 @@ export const REPLY_DOCUMENT: TextDocumentAdapter<
   destroy: destroyReplyDocument,
 };
 
-export const REPLY_PROTOCOL: TextProtocolAdapter<
+const REPLY_PROTOCOL: TextProtocolAdapter<
   MailReplyUpdate,
   MailReplyStateVector,
   MailReplyPresenceSelection,
@@ -121,26 +121,26 @@ export class ReplyDraftClient {
   }
 }
 
-export function createReplyDocument() {
+function createReplyDocument() {
   return MailReplyDoc.create("");
 }
 
-export function cloneReplyDocument(document: MailReplyDoc) {
+function cloneReplyDocument(document: MailReplyDoc) {
   const state = document.state();
   return state.ok ? MailReplyDoc.restore(state.value) : state;
 }
 
-export function readReply(document: MailReplyDoc): string {
+function readReply(document: MailReplyDoc): string {
   return document.read();
 }
 
-export function readReplyInputs(
+function readReplyInputs(
   textareas: Readonly<Record<BodyField, HTMLTextAreaElement>>,
 ): Readonly<Record<BodyField, string>> {
   return { body: textareas.body.value };
 }
 
-export function editReply(
+function editReply(
   document: MailReplyDoc,
   _field: BodyField,
   next: string,
@@ -149,22 +149,22 @@ export function editReply(
   return document.edit(next, range);
 }
 
-export function applyReplyUpdate(document: MailReplyDoc, update: MailReplyUpdate) {
+function applyReplyUpdate(document: MailReplyDoc, update: MailReplyUpdate) {
   return document.apply(update);
 }
 
-export function readReplyStateVector(document: MailReplyDoc) {
+function readReplyStateVector(document: MailReplyDoc) {
   return document.stateVector();
 }
 
-export function createReplySyncUpdate(
+function createReplySyncUpdate(
   document: MailReplyDoc,
   vector: MailReplyStateVector,
 ) {
   return document.syncUpdate(vector);
 }
 
-export function captureReplyLocalSelection(
+function captureReplyLocalSelection(
   document: MailReplyDoc,
   _field: BodyField,
   start: number,
@@ -174,14 +174,14 @@ export function captureReplyLocalSelection(
   return document.captureSelection(start, end, direction);
 }
 
-export function resolveReplyLocalSelection(
+function resolveReplyLocalSelection(
   document: MailReplyDoc,
   selection: MailReplySelection,
 ) {
   return document.resolveSelection(selection);
 }
 
-export function captureReplyPresenceSelection(
+function captureReplyPresenceSelection(
   document: MailReplyDoc,
   _field: BodyField,
   start: number,
@@ -191,7 +191,7 @@ export function captureReplyPresenceSelection(
   return document.capturePresenceSelection(start, end, direction);
 }
 
-export function resolveReplyPresenceSelection(
+function resolveReplyPresenceSelection(
   document: MailReplyDoc,
   selection: MailReplyPresenceSelection,
 ) {
@@ -199,11 +199,11 @@ export function resolveReplyPresenceSelection(
   return range === null ? null : { field: "body" as const, range };
 }
 
-export function destroyReplyDocument(document: MailReplyDoc): void {
+function destroyReplyDocument(document: MailReplyDoc): void {
   document.destroy();
 }
 
-export function encodeReplyClientMessage(
+function encodeReplyClientMessage(
   message: TextCollaborationClientMessage<
     MailReplyUpdate,
     MailReplyStateVector,
@@ -213,7 +213,7 @@ export function encodeReplyClientMessage(
   return encodeDraftClientMessage(message);
 }
 
-export function notifyReplyView(
+function notifyReplyView(
   notify: (view: ReplyDraftView) => void,
   view: ReplyTextView,
 ): void {
@@ -236,7 +236,7 @@ export function notifyReplyView(
   );
 }
 
-export function replyParticipant(
+function replyParticipant(
   participant: ReplyTextView["participants"][number],
 ): DraftPresenceView {
   return {
@@ -251,7 +251,7 @@ export function replyParticipant(
   };
 }
 
-export function replyFailureMessage(code: DraftFailureCode): string {
+function replyFailureMessage(code: DraftFailureCode): string {
   switch (code) {
     case "draft_closed":
       return "This reply closed. It was sent, rejected or replaced, or the shared changes were reloaded from Gmail.";

@@ -3,7 +3,7 @@ import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 export type LabelSwatch = Readonly<{ color: string; text: string }>;
 
 /** Structured label text. The element is rebuilt only when the text changes. */
-export type LabelContent = Readonly<{
+type LabelContent = Readonly<{
   kind: "station" | "batch" | "worker";
   badge: string | null;
   title: string;

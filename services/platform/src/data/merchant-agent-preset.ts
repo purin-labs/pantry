@@ -56,7 +56,7 @@ export function merchantAgentSkillId(
   return `skill_urk_${name}_${merchantAgentSuffix(organisationId)}`;
 }
 
-export type MerchantAgentInstallInput = Readonly<{
+type MerchantAgentInstallInput = Readonly<{
   db: OrganisationDatabase;
   organisationId: OrganisationId;
   /** The control identity performing the installation. */

@@ -45,7 +45,7 @@ import {
  * is never retried automatically.
  */
 
-export type WhatsAppProposalError = { readonly code: string };
+type WhatsAppProposalError = { readonly code: string };
 
 export type WhatsAppProposalPreview = {
   readonly proposalId: string;
@@ -146,7 +146,7 @@ export async function previewWhatsAppProposal(
   };
 }
 
-export type WhatsAppProposalEditOutcome =
+type WhatsAppProposalEditOutcome =
   | {
       readonly kind: "versioned";
       readonly version: number;
@@ -733,7 +733,7 @@ export function fenceAbandonedWhatsAppSends(
   return notices;
 }
 
-export type WhatsAppDisposalOutcome =
+type WhatsAppDisposalOutcome =
   | { readonly kind: "disposed"; readonly state: WhatsAppProposalRow["state"] }
   | { readonly kind: "proposal_missing" };
 

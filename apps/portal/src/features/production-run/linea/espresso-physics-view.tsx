@@ -302,13 +302,3 @@ export async function readEspressoSamples(
   }
   return result;
 }
-
-export async function readEspressoFrame(
-  view: Exclude<PhysicsView, { kind: "unavailable" }>,
-  cell: PersistentEspressoCell,
-): Promise<ApplianceSample> {
-  const samples = await readEspressoSamples(view, cell);
-  const last = samples.at(-1);
-  if (last === undefined) throw new Error("Missing espresso sample.");
-  return last;
-}

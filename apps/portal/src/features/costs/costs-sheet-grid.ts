@@ -29,7 +29,7 @@ import {
   type SupplyRowDraft,
 } from "./costs-sheet-draft";
 
-export type SheetCellElement =
+type SheetCellElement =
   | HTMLInputElement
   | HTMLButtonElement
   | HTMLElement;

@@ -52,7 +52,7 @@ export type CodeModeExecutionRecord = {
   readonly authority: CodeModeExecutionAuthority;
 };
 
-export type StoredCodeModeExecution = {
+type StoredCodeModeExecution = {
   readonly record: CodeModeExecutionRecord;
   readonly stateKind: string;
   readonly stateProjection: string;

@@ -6,7 +6,10 @@ import {
   controlWrite,
 } from "../../control-client";
 import { isRecord } from "@seams/std";
-import { type EmailReviewQueue, parseEmailOperationalPreviewResponse, parseEmailReplyPreviewResponse, parseEmailReviewQueue } from "@seams/control-api/portal/email-review";
+import {
+  parseEmailOperationalPreviewResponse,
+  parseEmailReplyPreviewResponse,
+} from "@seams/control-api/portal/email-review";
 
 export type EmailReviewActions = Readonly<{
   loadEmailReply: (proposalId: string) => Promise<EmailReplyPreviewResult>;
@@ -75,22 +78,6 @@ export function createEmailReviewActions(
   };
 }
 
-/** The organisation's email proposals, newest first. It holds no content. */
-export async function readEmailReviewQueue(
-  organisationId: string,
-  signal?: AbortSignal,
-): Promise<EmailReviewQueue> {
-  const raw = await emailReviewResult(
-    controlRead(
-      `/v1/control/organisations/${encodeURIComponent(organisationId)}/email-reviews`,
-      signal,
-    ),
-  );
-  if (raw.ok !== true)
-    throw new Error("The server returned an invalid email approval queue.");
-  return parseEmailReviewQueue(raw.reviews);
-}
-
 export async function readEmailReplyPreview(
   organisationId: string,
   proposalId: string,
@@ -103,7 +90,7 @@ export async function readEmailReplyPreview(
   );
 }
 
-export async function readEmailOperationalPreview(
+async function readEmailOperationalPreview(
   organisationId: string,
   proposalId: string,
 ): Promise<EmailOperationalPreviewResult> {
@@ -114,7 +101,7 @@ export async function readEmailOperationalPreview(
   );
 }
 
-export async function approveEmailReply(
+async function approveEmailReply(
   organisationId: string,
   proposalId: string,
   approval: Readonly<{
@@ -163,7 +150,7 @@ export async function reloadEmailReplyDraft(
 /** A save found a newer version in Gmail than the shared draft started from. */
 export class EmailReplyDraftStaleError extends Error {}
 
-export async function rejectEmailReply(
+async function rejectEmailReply(
   organisationId: string,
   proposalId: string,
 ): Promise<void> {
@@ -173,7 +160,7 @@ export async function rejectEmailReply(
   );
 }
 
-export async function resolveEmailReply(
+async function resolveEmailReply(
   organisationId: string,
   proposalId: string,
   dispatchVersion: number,
@@ -186,7 +173,7 @@ export async function resolveEmailReply(
   );
 }
 
-export async function approveEmailOperational(
+async function approveEmailOperational(
   organisationId: string,
   proposalId: string,
   approval: Readonly<{
@@ -202,7 +189,7 @@ export async function approveEmailOperational(
   );
 }
 
-export async function rejectEmailOperational(
+async function rejectEmailOperational(
   organisationId: string,
   proposalId: string,
 ): Promise<void> {
@@ -212,7 +199,7 @@ export async function rejectEmailOperational(
   );
 }
 
-export async function editEmailOperational(
+async function editEmailOperational(
   organisationId: string,
   proposalId: string,
   subject: string,
@@ -229,7 +216,7 @@ export async function editEmailOperational(
   );
 }
 
-export async function attestEmailOperational(
+async function attestEmailOperational(
   organisationId: string,
   proposalId: string,
   attestation: "present" | "absent",
@@ -240,7 +227,7 @@ export async function attestEmailOperational(
   );
 }
 
-export async function emailReviewMutation(path: string, body: unknown): Promise<void> {
+async function emailReviewMutation(path: string, body: unknown): Promise<void> {
   const csrf = readCookie("satyr_control_csrf");
   if (csrf === null) {
     throw new Error("Your control session expired. Sign in again.");
@@ -248,7 +235,7 @@ export async function emailReviewMutation(path: string, body: unknown): Promise<
   await emailReviewResult(controlWrite(path, "POST", body));
 }
 
-export async function emailReviewResult(
+async function emailReviewResult(
   request: Promise<unknown>,
 ): Promise<Record<string, unknown>> {
   let raw: unknown;
@@ -340,18 +327,18 @@ export async function emailReviewResult(
   return raw;
 }
 
-export function emailReplyPath(organisationId: string, proposalId: string): string {
+function emailReplyPath(organisationId: string, proposalId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/email-replies/${encodeURIComponent(proposalId)}`;
 }
 
-export function emailOperationalPath(
+function emailOperationalPath(
   organisationId: string,
   proposalId: string,
 ): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/email-operational/${encodeURIComponent(proposalId)}`;
 }
 
-export function readCookie(name: string): string | null {
+function readCookie(name: string): string | null {
   const documentValue = Reflect.get(globalThis, "document");
   if (typeof documentValue !== "object" || documentValue === null) return null;
   const rawCookie = Reflect.get(documentValue, "cookie");

@@ -45,10 +45,7 @@ export type WorkspaceId = string & {
 };
 export type ChannelId = string & { readonly [channelIdBrand]: "ChannelId" };
 export type SessionId = string & { readonly [sessionIdBrand]: "SessionId" };
-export type SandboxId = string & { readonly [sandboxIdBrand]: "SandboxId" };
 export type ThreadKey = string & { readonly [threadKeyBrand]: "ThreadKey" };
-export type ThreadId = string & { readonly [threadIdBrand]: "ThreadId" };
-export type BlockId = string & { readonly [blockIdBrand]: "BlockId" };
 export type RequestId = string & { readonly [requestIdBrand]: "RequestId" };
 export type ControlSessionId = string & {
   readonly [controlSessionIdBrand]: "ControlSessionId";
@@ -99,8 +96,7 @@ export type SlackOrganisationConnectionId = string & {
   readonly [slackOrganisationConnectionIdBrand]: "SlackOrganisationConnectionId";
 };
 
-export type IdParseError =
-  { code: "empty" } | { code: "invalid"; value: string };
+type IdParseError = { code: "empty" } | { code: "invalid"; value: string };
 
 const STABLE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:_-]*$/;
 const PORTAL_HANDLE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -250,20 +246,6 @@ export function parseThreadKey(raw: string): Result<ThreadKey, IdParseError> {
   }
 
   return { ok: true, value: value as ThreadKey };
-}
-
-export function parseThreadId(raw: string): Result<ThreadId, IdParseError> {
-  const value = raw.trim();
-  const parsed = parseStableId(value);
-
-  return parsed.ok ? { ok: true, value: parsed.value as ThreadId } : parsed;
-}
-
-export function parseBlockId(raw: string): Result<BlockId, IdParseError> {
-  const value = raw.trim();
-  const parsed = parseStableId(value);
-
-  return parsed.ok ? { ok: true, value: parsed.value as BlockId } : parsed;
 }
 
 export function parseRequestId(raw: string): Result<RequestId, IdParseError> {
@@ -453,34 +435,6 @@ export function newCodexAuthorizationAttemptId(): CodexAuthorizationAttemptId {
 
 export function newRequestId(): RequestId {
   return crypto.randomUUID() as RequestId;
-}
-
-export function canonicalThreadKey(threadId: ThreadId): ThreadKey {
-  const parsed = parseThreadKey(`thread:${threadId}`);
-
-  if (!parsed.ok) {
-    throw new Error("canonical thread key invariant failed");
-  }
-
-  return parsed.value;
-}
-
-export function threadIdFromCanonicalThreadKey(
-  threadKey: ThreadKey,
-): Result<ThreadId, IdParseError> {
-  const prefix = "thread:";
-
-  return threadKey.startsWith(prefix)
-    ? parseThreadId(threadKey.slice(prefix.length))
-    : { ok: false, error: { code: "invalid", value: threadKey } };
-}
-
-export function sandboxObjectName(sandboxId: SandboxId): string {
-  return `sandbox:${sandboxId}`;
-}
-
-export function poolObjectName(regionBucket: string): string {
-  return `pool:${regionBucket}`;
 }
 
 function parseStableId(value: string): Result<string, IdParseError> {

@@ -112,7 +112,7 @@ export function name<T extends string>(
  * as a name only. Content that serde buffered, such as the variant fields
  * after an internal tag, also accepts the variant's declaration index.
  */
-export type SerdeSource = "direct" | "buffered";
+type SerdeSource = "direct" | "buffered";
 let source: SerdeSource = "direct";
 
 /** Reads with serde rules for one source. */

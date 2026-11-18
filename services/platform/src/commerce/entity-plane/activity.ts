@@ -90,7 +90,7 @@ export type CommerceActivityEvent =
       providerResult: string | null;
     }>;
 
-export type CommerceActivitySources = Readonly<{
+type CommerceActivitySources = Readonly<{
   blotterHistory: readonly BlotterHistoryActivity[];
   cases: readonly CaseActivity[];
   proposals: readonly ProposalActivity[];
@@ -100,46 +100,46 @@ export type CommerceActivitySources = Readonly<{
   actionLedger: readonly ActionLedgerActivity[];
 }>;
 
-export type BlotterHistoryActivity = Readonly<{
+type BlotterHistoryActivity = Readonly<{
   resource: CommerceActivityResource;
   entry: CommerceProjectionHistoryEntry;
 }>;
 
-export type CaseActivity = Readonly<{
+type CaseActivity = Readonly<{
   resource: CommerceActivityResource;
   caseId: string;
   state: CaseSnapshot["lifecycle"]["kind"];
   occurredAt: string;
 }>;
 
-export type ProposalActivity = Readonly<{
+type ProposalActivity = Readonly<{
   resource: CommerceActivityResource;
   proposalId: string;
   state: OrganisationActionLedgerActivity["state"];
   occurredAt: string;
 }>;
 
-export type ApprovalActivity = Readonly<{
+type ApprovalActivity = Readonly<{
   resource: CommerceActivityResource;
   approvalId: string;
   state: CaseCommerceApprovalRecord["kind"];
   occurredAt: string;
 }>;
 
-export type CommerceReceiptActivity = Readonly<{
+type CommerceReceiptActivity = Readonly<{
   resource: CommerceActivityResource;
   receiptId: string;
   outcome: CommerceProviderReceipt["status"] | CommerceMutationReceiptOutcome;
   occurredAt: string;
 }>;
 
-export type EntityPlaneEffectActivity = Readonly<{
+type EntityPlaneEffectActivity = Readonly<{
   resource: CommerceActivityResource;
   effect: CommerceEntityPlaneEffect;
   occurredAt: string;
 }>;
 
-export type ActionLedgerActivity = Readonly<{
+type ActionLedgerActivity = Readonly<{
   resource: CommerceActivityResource;
   actionNonce: string;
   caseId: string;
@@ -155,12 +155,12 @@ export type CommerceActivityReadResult = Readonly<{
   unsupportedSources: readonly CommerceActivitySourceName[];
 }>;
 
-export type CommerceActivityOrganisationReader = Pick<
+type CommerceActivityOrganisationReader = Pick<
   OrganisationDO,
   "readCommerceProjectionHistory" | "readActionActivity"
 >;
 
-export type CommerceActivityCaseReader = Readonly<{
+type CommerceActivityCaseReader = Readonly<{
   read: (caseId: string) => Promise<CaseSnapshot | null>;
 }>;
 
@@ -169,14 +169,14 @@ export type CommerceActivityReadRequest = Readonly<{
   limit: number;
 }>;
 
-export type CommerceActivityReadInput = CommerceActivityReadRequest &
+type CommerceActivityReadInput = CommerceActivityReadRequest &
   Readonly<{
     organisationId: OrganisationId;
     organisation: CommerceActivityOrganisationReader;
     caseReader: CommerceActivityCaseReader | null;
   }>;
 
-export type CommerceActivityReadError = Readonly<{
+type CommerceActivityReadError = Readonly<{
   code: "activity_source_unavailable";
   source: "blotter_history" | "action_ledger";
 }>;

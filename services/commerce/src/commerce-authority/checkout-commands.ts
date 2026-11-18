@@ -141,7 +141,7 @@ export type CheckoutCommitRequest =
       plan: CheckoutExpirationPlan;
     }>;
 
-export type CheckoutCommandAuthorityOptions = Readonly<{
+type CheckoutCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   /** The merchant's regional shipping, or undefined when it has none. */
   shipping: (merchantId: string) => RegionalShipping | undefined;

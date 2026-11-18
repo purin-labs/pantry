@@ -12,7 +12,7 @@ import { errorMessage, isRecord } from "@seams/std";
 
 export const SLACK_STREAM_TEXT_LIMIT = 12_000;
 
-export type SlackStreamTarget = Readonly<{
+type SlackStreamTarget = Readonly<{
   workspaceId: WorkspaceId;
   channelId: ChannelId;
   threadTs: string;

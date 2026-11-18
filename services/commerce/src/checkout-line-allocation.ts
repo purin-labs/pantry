@@ -3,7 +3,7 @@ export type CheckoutLineAllocationInput = Readonly<{
   weightMinor: number;
 }>;
 
-export type JpyCheckoutLineAllocation = Readonly<{
+type JpyCheckoutLineAllocation = Readonly<{
   checkoutLineId: string;
   amount: Readonly<{ amountMinor: number; currency: "JPY" }>;
 }>;

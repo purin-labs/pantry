@@ -17,7 +17,7 @@ import { readSupplierPayout } from "../data/supplier-payout-store";
 import type { OrganisationId } from "../ids";
 import { isRecord } from "@seams/std";
 
-export type PayoutEventResult = "applied" | "waiting" | "conflict" | "retry";
+type PayoutEventResult = "applied" | "waiting" | "conflict" | "retry";
 
 export async function reconcilePayoutInbox(
   db: OrganisationDatabase,

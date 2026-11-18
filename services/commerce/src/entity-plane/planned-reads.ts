@@ -78,7 +78,7 @@ import {
 import type { Variant } from "@seams/type-utils";
 import { assertNever, canonicalJson, sameJson } from "@seams/std";
 
-export type EntityPlanePlannedReadsOptions = Readonly<{
+type EntityPlanePlannedReadsOptions = Readonly<{
   database: CommerceDatabase;
   commerceLists: CommerceLists;
 }>;

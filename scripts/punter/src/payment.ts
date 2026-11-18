@@ -20,12 +20,12 @@ export type PunterPaymentSessionIdentity = Readonly<{
   providerSessionReference: string;
 }>;
 
-export type PunterPaymentResolution = Readonly<{
+type PunterPaymentResolution = Readonly<{
   session: PunterPaymentSessionIdentity;
   payment: CommerceBuyerPaymentResultV1;
 }>;
 
-export type PunterPaymentResult =
+type PunterPaymentResult =
   | Readonly<{ ok: true; value: PunterPaymentResolution }>
   | Readonly<{ ok: false; message: string }>;
 
@@ -97,7 +97,7 @@ export async function replayAndReconcilePayment(
   return reconcilePayment(input, identity);
 }
 
-export async function reconcilePaymentAfterIndeterminate(
+async function reconcilePaymentAfterIndeterminate(
   input: Readonly<{
     client: CommerceStorefrontClient;
     merchantId: string;

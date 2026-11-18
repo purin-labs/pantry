@@ -273,7 +273,7 @@ export function collaborationEditDeadline(
 }
 
 /** What the staff page tools need before they read or change anything. */
-export type StaffPageWork = Readonly<{
+type StaffPageWork = Readonly<{
   member: OrganisationMember;
   prepared: PreparedCommerceRead;
   context: OrderQueueContext;
@@ -342,7 +342,7 @@ export async function prepareStaffPageWork(
 }
 
 /** The person's role now, as the page reads it, and not as the turn began. */
-export async function liveStaffMember(
+async function liveStaffMember(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   lease: HarnessTurnLease,
@@ -558,7 +558,7 @@ export async function settleStaffPageEffect(
   return { receiptId, result: effect.result };
 }
 
-export function selectSupplierDirectorySourceGrant(
+function selectSupplierDirectorySourceGrant(
   lease: HarnessTurnLease,
   input: Readonly<{
     organisationId: string;
@@ -600,7 +600,7 @@ export type DraftThreadLink = Pick<
 >;
 
 /** An agent edit of a draft that every organisation role reads. */
-export type SharedDraftEdit = Readonly<{
+type SharedDraftEdit = Readonly<{
   /** The draft's name in a refusal, such as "Email draft". */
   draft: string;
   caseId: string;
@@ -629,7 +629,7 @@ export type SharedDraftEdit = Readonly<{
  * they did not. A shared chat brings its Project and the person who shared it,
  * whose chat it was while it was private. A Portal chat matches by its Case.
  */
-export async function draftSharedReaders(
+async function draftSharedReaders(
   organisationId: OrganisationId,
   lease: HarnessTurnLease,
   edit: SharedDraftEdit,

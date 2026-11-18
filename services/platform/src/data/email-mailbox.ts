@@ -30,9 +30,9 @@ import {
   positiveIntegerOrNull,
 } from "@seams/std";
 
-export type EmailEnvironment = "development" | "production";
+type EmailEnvironment = "development" | "production";
 
-export type EmailMailboxAccount = {
+type EmailMailboxAccount = {
   readonly integrationAccountId: IntegrationAccountId;
   readonly organisationId: OrganisationId;
   readonly environment: EmailEnvironment;
@@ -41,7 +41,7 @@ export type EmailMailboxAccount = {
   readonly addressObservedAt: number;
 };
 
-export type AgentMailboxBinding = {
+type AgentMailboxBinding = {
   readonly mailboxBindingId: string;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -51,7 +51,7 @@ export type AgentMailboxBinding = {
   readonly updatedAt: number;
 };
 
-export type AgentMailboxBindingRevision = {
+type AgentMailboxBindingRevision = {
   readonly mailboxBindingId: string;
   readonly revision: number;
   readonly organisationId: OrganisationId;
@@ -95,7 +95,7 @@ export type MailboxIngressPolicy =
       readonly publishedAt: number;
     };
 
-export type MailboxIngressPolicyPublishRequest =
+type MailboxIngressPolicyPublishRequest =
   | { readonly kind: "disabled_by_operator" }
   | {
       readonly kind: "enabled";
@@ -213,42 +213,22 @@ export type EmailReplyProposalLifecycle =
       readonly disposal: EmailProposalDisposal;
     };
 
-export type EmailReplyProposal = {
-  readonly proposalId: string;
-  readonly version: number;
-  readonly caseId: CaseId;
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly mailboxBindingId: string;
-  readonly bindingRevision: number;
-  readonly policyVersion: number;
-  readonly providerDraftId: string;
-  readonly providerDraftMessageId: string;
-  readonly triggeringProviderMessageId: string;
-  readonly gmailThreadId: string;
-  readonly targetDigest: string;
-  readonly bodyDigest: string;
-  readonly snapshotDigest: string;
-  readonly createdAt: number;
-  readonly expiresAt: number;
-  readonly lifecycle: EmailReplyProposalLifecycle;
-};
-
-export type EmailFieldError = {
+type EmailFieldError = {
   readonly code: "missing_field" | "invalid_field";
   readonly field: string;
 };
 
-export type EmailMailboxAccountError =
+type EmailMailboxAccountError =
   | { readonly code: "email_mailbox_identity_claimed" }
   | { readonly code: "email_mailbox_account_missing" }
   | { readonly code: "email_mailbox_write_failed" };
 
-export type AgentMailboxAssignmentError =
+type AgentMailboxAssignmentError =
   | { readonly code: "email_mailbox_account_missing" }
   | { readonly code: "mailbox_installation_inactive" }
   | { readonly code: "mailbox_binding_write_failed" };
 
-export type MailboxPolicyPublishError =
+type MailboxPolicyPublishError =
   | { readonly code: "email_mailbox_account_missing" }
   | { readonly code: "mailbox_policy_publish_conflict" };
 
@@ -286,7 +266,7 @@ export function gmailThreadCaseIdValue(
     : { ok: false, error: { code: "invalid_field", field: "gmailThreadId" } };
 }
 
-export type GmailPilotBudget = {
+type GmailPilotBudget = {
   readonly environment: string;
   readonly consumed: number;
   readonly operatingCap: number;

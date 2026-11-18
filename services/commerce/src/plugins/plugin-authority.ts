@@ -162,7 +162,7 @@ export type PluginCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-export type PluginAuthorityOptions = Readonly<{
+type PluginAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => PluginMerchantRow | undefined;

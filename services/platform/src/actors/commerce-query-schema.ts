@@ -60,7 +60,7 @@ export type CommerceEntityRelationRow = Readonly<{
   payload_json: string;
 }>;
 
-export type CommerceEntityRelationRowError = Readonly<{
+type CommerceEntityRelationRowError = Readonly<{
   readonly code: "commerce_entity_relation_row_invalid";
   readonly field: string;
 }>;
@@ -84,19 +84,19 @@ export type CommerceRelationshipRelationRow = Readonly<{
   provenance_json: string;
 }>;
 
-export type CommerceRelationshipRelationRowError = Readonly<{
+type CommerceRelationshipRelationRowError = Readonly<{
   readonly code: "commerce_relationship_relation_row_invalid";
   readonly field: string;
 }>;
 
 type CommerceRelationshipRelationWrite = CommerceRelationshipRelationRow;
 
-export type CommerceRelationText = Readonly<{
+type CommerceRelationText = Readonly<{
   readonly displayNameFolded: string;
   readonly searchTextFolded: string;
 }>;
 
-export type CommerceRelationTextError = Readonly<{
+type CommerceRelationTextError = Readonly<{
   readonly code: "commerce_unicode_normalization_failed";
 }>;
 
@@ -331,34 +331,6 @@ function validateCommerceAttributeRelation(sql: SqlStorage): void {
   }
 }
 
-export function rebuildCommerceRelationshipRelations(sql: SqlStorage): void {
-  sql.exec(`DELETE FROM ${COMMERCE_RELATIONSHIP_INDEX_TABLE}`);
-  const projections = sql
-    .exec<
-      Readonly<{
-        readonly integrationAccountId: string;
-        readonly projectionKind: string;
-        readonly canonicalId: string;
-        readonly revision: number;
-        readonly projectionJson: string;
-      }>
-    >(
-      `SELECT integration_account_id AS integrationAccountId,
-            projection_kind AS projectionKind,
-            canonical_id AS canonicalId,
-            revision,
-            projection_json AS projectionJson
-       FROM commerce_projection`,
-    )
-    .toArray();
-  for (const projection of projections) {
-    const relationships = materializeBlotterRelationshipRows(projection);
-    for (const relationship of relationships) {
-      writeCommerceRelationshipRelation(sql, relationship);
-    }
-  }
-}
-
 export function rebuildCommerceRelationshipRelationsForOwner(
   sql: SqlStorage,
   merchantId: string,
@@ -413,17 +385,6 @@ type CommerceAttributeRelationWrite = Readonly<{
   comparable_real: number | null;
   comparable_boolean: number | null;
 }>;
-
-export function rebuildCommerceAttributeRelations(sql: SqlStorage): void {
-  sql.exec(`DELETE FROM ${COMMERCE_ATTRIBUTE_INDEX_TABLE}`);
-  const owners = sql
-    .exec<{ readonly merchantId: string }>(
-      `SELECT DISTINCT integration_account_id AS merchantId FROM commerce_projection`,
-    )
-    .toArray();
-  for (const owner of owners)
-    rebuildCommerceAttributeRelationsForOwner(sql, owner.merchantId);
-}
 
 function rebuildCommerceAttributeRelationsForOwner(
   sql: SqlStorage,
@@ -638,7 +599,7 @@ function quantity(value: unknown): CommerceQuantity | null {
   return { amount: value.amount, scale: value.scale, unit: value.unit };
 }
 
-export function materializeBlotterRelationshipRows(
+function materializeBlotterRelationshipRows(
   input: Readonly<{
     readonly integrationAccountId: string;
     readonly projectionKind: string;

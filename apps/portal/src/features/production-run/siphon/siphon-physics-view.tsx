@@ -92,7 +92,7 @@ const PHASE_ORDER: Readonly<Record<SiphonPhase, number>> = {
 };
 
 /** Interactive 3D Hario ECA-3-B Electric Coffee Syphon + FAIRINO FR10 view. */
-export class SiphonPhysicsView extends React.Component<ViewProps, ViewState> {
+class SiphonPhysicsView extends React.Component<ViewProps, ViewState> {
   state: ViewState = { error: null, camera: "bench" };
   private readonly element = React.createRef<HTMLDivElement>();
   private readonly station = React.createRef<HTMLElement>();

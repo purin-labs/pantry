@@ -83,10 +83,7 @@ const PHASE_INDEX: Readonly<Record<CafeShiftPhase, number>> = {
   failed: -1,
 };
 
-export class CafeShiftPhysicsView extends React.Component<
-  ViewProps,
-  ViewState
-> {
+class CafeShiftPhysicsView extends React.Component<ViewProps, ViewState> {
   state: ViewState = { error: null, camera: "overview" };
   private readonly element = React.createRef<HTMLDivElement>();
   private readonly station = React.createRef<HTMLElement>();

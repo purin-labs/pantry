@@ -50,7 +50,7 @@ export function missingRequestableCapabilities(
   return PERMISSION_REQUESTABLE.filter(isMissingFrom.bind(null, granted));
 }
 
-export function isMissingFrom(
+function isMissingFrom(
   granted: ReadonlySet<HarnessCapabilityName>,
   capability: RequestableCapability,
 ): boolean {
@@ -138,9 +138,7 @@ export function permissionRequestDefinition(
   };
 }
 
-export function requestableCapabilityLine(
-  capability: RequestableCapability,
-): string {
+function requestableCapabilityLine(capability: RequestableCapability): string {
   return `${capability} (${capabilityDefinitionById(capability).label})`;
 }
 

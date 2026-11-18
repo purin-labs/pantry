@@ -30,7 +30,7 @@ import {
  * acceptance has a planned quantity that every open page sees. "Accept plan"
  * revises changed quantities and accepts each request.
  */
-export type Props = Readonly<{
+type Props = Readonly<{
   organisationId: string;
   locationId: string;
   /** The location's requests that wait for acceptance. */
@@ -44,7 +44,7 @@ export type Props = Readonly<{
   onAccepted: () => void;
 }>;
 
-export type State = Readonly<{
+type State = Readonly<{
   view: ProductionPlanView | null;
   /** Text in the focused field, which may not be a valid quantity yet. */
   editing: Readonly<{ requestId: string; text: string }> | null;
@@ -328,11 +328,11 @@ export class ProductionPlanPanel extends React.Component<Props, State> {
 }
 
 /** Pieces take whole numbers; weights and volumes take decimals. */
-export function validQuantity(text: string, unit: Quantity["unit"]): boolean {
+function validQuantity(text: string, unit: Quantity["unit"]): boolean {
   return isPlanQuantity(text) && (unit !== "each" || !text.includes("."));
 }
 
-export function planStatus(view: ProductionPlanView | null): string {
+function planStatus(view: ProductionPlanView | null): string {
   if (view === null) return "Connecting…";
   switch (view.kind) {
     case "connecting":
@@ -350,7 +350,7 @@ export function planStatus(view: ProductionPlanView | null): string {
   }
 }
 
-export function outcomeItem(
+function outcomeItem(
   names: ReadonlyMap<string, string>,
   line: InventoryProductionPlanOutcome,
 ): React.ReactNode {
@@ -362,13 +362,11 @@ export function outcomeItem(
   );
 }
 
-export function requestName(
-  request: InventoryProductionRequest,
-): [string, string] {
+function requestName(request: InventoryProductionRequest): [string, string] {
   return [request.id, request.name];
 }
 
-export function outcomeText(line: InventoryProductionPlanOutcome): string {
+function outcomeText(line: InventoryProductionPlanOutcome): string {
   switch (line.outcome) {
     case "accepted":
       return line.revised
@@ -394,13 +392,13 @@ export function outcomeText(line: InventoryProductionPlanOutcome): string {
   }
 }
 
-export function isOtherParticipant(
+function isOtherParticipant(
   participant: ProductionPlanView["participants"][number],
 ): boolean {
   return !participant.isSelf;
 }
 
-export function editsLine(
+function editsLine(
   requestId: string,
   participant: ProductionPlanView["participants"][number],
 ): boolean {
@@ -411,26 +409,24 @@ export function editsLine(
   );
 }
 
-export function agentEditsLine(
+function agentEditsLine(
   requestId: string,
   activity: ProductionPlanView["agents"][number],
 ): boolean {
   return activity.target === requestId;
 }
 
-export function agentName(
-  activity: ProductionPlanView["agents"][number],
-): string {
+function agentName(activity: ProductionPlanView["agents"][number]): string {
   return activity.agent.displayName;
 }
 
-export function participantName(
+function participantName(
   participant: ProductionPlanView["participants"][number],
 ): string {
   return participant.displayName;
 }
 
-export function requestIdentity(
+function requestIdentity(
   id: string,
   request: InventoryProductionRequest,
 ): boolean {
@@ -438,7 +434,7 @@ export function requestIdentity(
 }
 
 /** The exact decimal text of a quantity, without trailing zeros. */
-export function quantityText(quantity: Quantity): string {
+function quantityText(quantity: Quantity): string {
   const digits = String(quantity.amount).padStart(quantity.scale + 1, "0");
   const whole = digits.slice(0, digits.length - quantity.scale);
   const fraction = digits
@@ -447,7 +443,7 @@ export function quantityText(quantity: Quantity): string {
   return fraction.length === 0 ? whole : `${whole}.${fraction}`;
 }
 
-export function unitLabel(unit: Quantity["unit"]): string {
+function unitLabel(unit: Quantity["unit"]): string {
   switch (unit) {
     case "each":
       return "each";
@@ -464,7 +460,7 @@ export function unitLabel(unit: Quantity["unit"]): string {
   }
 }
 
-export type PlanShareState =
+type PlanShareState =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "ready" | "saving"; sharing: PlanSharing }>
   | Readonly<{ kind: "failed"; sharing: PlanSharing; message: string }>;
@@ -474,9 +470,7 @@ export type PlanShareState =
  * chat that is shared in a Project. Its context may then reach every role
  * that reads the plan.
  */
-export function PlanShareControl(
-  props: Readonly<{ path: string }>,
-): React.ReactNode {
+function PlanShareControl(props: Readonly<{ path: string }>): React.ReactNode {
   const [state, setState] = React.useState<PlanShareState>({
     kind: "loading",
   });
@@ -536,7 +530,7 @@ export function PlanShareControl(
 }
 
 /** Which conversation, if any, an agent may change this plan from. */
-export function planSharingStatus(sharing: PlanSharing): React.ReactNode {
+function planSharingStatus(sharing: PlanSharing): React.ReactNode {
   if (sharing === null) return "No conversation can change this plan.";
   switch (sharing.kind) {
     case "slack_thread":
@@ -556,7 +550,7 @@ export function planSharingStatus(sharing: PlanSharing): React.ReactNode {
   }
 }
 
-export function loadPlanShare(
+function loadPlanShare(
   path: string,
   setState: React.Dispatch<React.SetStateAction<PlanShareState>>,
 ): () => void {
@@ -575,7 +569,7 @@ export function loadPlanShare(
   };
 }
 
-export async function savePlanShare(
+async function savePlanShare(
   path: string,
   sharing: PlanSharing,
   setState: React.Dispatch<React.SetStateAction<PlanShareState>>,

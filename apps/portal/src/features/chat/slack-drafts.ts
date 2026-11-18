@@ -71,7 +71,7 @@ export function createSlackDraftActions(
   };
 }
 
-export async function slackDraftMutation(
+async function slackDraftMutation(
   path: string,
   body: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
@@ -80,7 +80,7 @@ export async function slackDraftMutation(
   return slackDraftResult(controlWrite(path, "POST", body));
 }
 
-export async function slackDraftResult(
+async function slackDraftResult(
   request: Promise<unknown>,
 ): Promise<Record<string, unknown>> {
   let raw: unknown;

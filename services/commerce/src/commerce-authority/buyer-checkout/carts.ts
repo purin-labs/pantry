@@ -83,7 +83,7 @@ export function toCartLines(
   return cartLines;
 }
 
-export function buyerCartLineSource(
+function buyerCartLineSource(
   line: CommerceBuyerCartLineV1,
   catalog: CommerceBuyerCatalogV1,
 ): Cart["lines"][number]["source"] {
@@ -183,7 +183,7 @@ export function invalidBuyerCartField(
   return undefined;
 }
 
-export function optionSelectedFromGroup(
+function optionSelectedFromGroup(
   optionGroups: ReadonlyMap<string, string>,
   groupId: string,
   optionId: string,
@@ -191,21 +191,21 @@ export function optionSelectedFromGroup(
   return optionGroups.get(optionId) === groupId;
 }
 
-export function buyerListingMatches(
+function buyerListingMatches(
   variantId: string,
   listing: CommerceBuyerCatalogV1["listings"][number],
 ): boolean {
   return listing.variantId === variantId;
 }
 
-export function buyerMenuMatches(
+function buyerMenuMatches(
   menuId: string,
   menu: CommerceBuyerCatalogV1["menus"][number],
 ): boolean {
   return menu.menuId === menuId;
 }
 
-export function buyerMenuEntryMatches(
+function buyerMenuEntryMatches(
   menuEntryId: string,
   entry: CommerceBuyerCatalogV1["menus"][number]["entries"][number],
 ): boolean {
@@ -238,9 +238,7 @@ export function toBuyerCart(
   }
 }
 
-export function toBuyerCartLine(
-  line: Cart["lines"][number],
-): CommerceBuyerCartLineV1 {
+function toBuyerCartLine(line: Cart["lines"][number]): CommerceBuyerCartLineV1 {
   if (line.quantity.scale !== 0 || line.quantity.unit !== "each") {
     throw new Error("Stored buyer Cart quantity is invalid");
   }

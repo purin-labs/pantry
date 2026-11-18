@@ -55,16 +55,16 @@ export const caseGoalOperationOutcomeSchema = Type.Union([
   }),
 ]);
 
-export const portalChatRunStateSchema = Type.Union([
+const portalChatRunStateSchema = Type.Union([
   Type.Literal("running"),
   Type.Literal("cancelling"),
   Type.Literal("ready"),
   Type.Literal("failed"),
 ]);
-export const portalChatPauseReasonSchema = Type.Union([
+const portalChatPauseReasonSchema = Type.Union([
   Type.Literal("awaiting_permission"),
 ]);
-export const portalChatStreamFailureSchema = Type.Object({
+const portalChatStreamFailureSchema = Type.Object({
   code: Type.String(),
   retryable: Type.Boolean(),
 });
@@ -191,7 +191,7 @@ export const fileGrantAdmissionSchema = Type.Object({
   containingScopeKey: Type.String(),
   providerRevision: providerFileRevisionSchema,
 });
-export const fileExtractionBudgetSchema = Type.Object({
+const fileExtractionBudgetSchema = Type.Object({
   integrationAccountId: Type.String(),
   utcDay: Type.String(),
   admittedSourceBytes: Type.Number(),
@@ -204,11 +204,6 @@ export type CaseGoalSnapshotValue = Static<typeof caseGoalSnapshotSchema>;
 export type CaseGoalCommandValue = Static<typeof caseGoalCommandSchema>;
 export type CaseGoalOperationOutcomeValue = Static<
   typeof caseGoalOperationOutcomeSchema
->;
-export type PortalChatRunState = Static<typeof portalChatRunStateSchema>;
-export type PortalChatPauseReason = Static<typeof portalChatPauseReasonSchema>;
-export type PortalChatStreamFailure = Static<
-  typeof portalChatStreamFailureSchema
 >;
 export type PortalChatStreamRecord = Static<
   typeof portalChatStreamRecordSchema

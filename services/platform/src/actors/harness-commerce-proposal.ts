@@ -157,7 +157,7 @@ function commerceActionProviderSupported(
   return false;
 }
 
-export type CommerceCancellationDraftError =
+type CommerceCancellationDraftError =
   | { readonly code: "underclerk_projection_mismatch" }
   | { readonly code: "underclerk_binding_unavailable" }
   | { readonly code: "underclerk_binding_identity_mismatch" }
@@ -166,7 +166,7 @@ export type CommerceCancellationDraftError =
   | { readonly code: "underclerk_cancellation_authority_unavailable" }
   | CommerceActionError;
 
-export async function buildCommerceCancellationActionDraftForAgent(
+async function buildCommerceCancellationActionDraftForAgent(
   input: Readonly<{
     readonly env: Env;
     readonly db: OrganisationDatabase;

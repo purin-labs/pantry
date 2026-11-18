@@ -93,7 +93,7 @@ export function readNeedsPrivateChat(read: RequestableEntityTypeRead): boolean {
 }
 
 /** The commerce read scope that a requestable read's grant covers. */
-export type RequestableReadScope =
+type RequestableReadScope =
   | Readonly<{
       kind: "entity_type";
       typeId:

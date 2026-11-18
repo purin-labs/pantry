@@ -216,7 +216,7 @@ export async function handleExistingAccountProviderStart(
         );
 }
 
-export async function providerStartConfigurationFailure(input: {
+async function providerStartConfigurationFailure(input: {
   readonly scope: OrganisationExecutionScope;
   readonly organisationId: OrganisationId;
   readonly provider: string;
@@ -540,7 +540,7 @@ export async function handleCancelProviderAttempt(
       );
 }
 
-export function providerStartContext(
+function providerStartContext(
   provider: OnboardingProvider,
   body: JsonRecord,
 ): ProviderStartContext | null {
@@ -613,7 +613,7 @@ export function providerErrorStatus(code: string): number {
   }
 }
 
-export async function providerStartReplayResponse(input: {
+async function providerStartReplayResponse(input: {
   readonly env: Env;
   readonly context: ProviderStartContext;
   readonly boundary: Variant<

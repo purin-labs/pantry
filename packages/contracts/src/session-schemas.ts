@@ -7,7 +7,7 @@ import { modelRouteSchema } from "./model-route.ts";
 // the Rust parser that the boundary applies after the JSON shape passes.
 
 /** The Rust parser that a boundary applies to a string or an integer. */
-export type SessionFieldRule =
+type SessionFieldRule =
   | "actor_identity"
   | "bounded_identity"
   | "workspace_id"
@@ -56,7 +56,7 @@ export const runtimeLeaseSchema = StrictObject({
   leaseId: actorId(),
 });
 
-export const causationRefSchema = Type.Union([
+const causationRefSchema = Type.Union([
   variant("ingress", { observationId: actorId() }),
   variant("schedule", { scheduleId: actorId() }),
   variant("command", { commandId: actorId() }),
@@ -78,7 +78,7 @@ export const workspaceRevisionReceiptSchema = StrictObject({
   causation: causationRefSchema,
 });
 
-export const sessionBudgetUsageSchema = StrictObject({
+const sessionBudgetUsageSchema = StrictObject({
   tokens: counter(),
   activeWallMs: counter(),
   capabilityCalls: counter(),
@@ -153,7 +153,7 @@ export const turnLifecycleSchema = Type.Union([
   }),
 ]);
 
-export const harnessHistoryCursorSchema = StrictObject({
+const harnessHistoryCursorSchema = StrictObject({
   lastSequence: positive(),
   lastEntryDigest: sha256(),
 });
@@ -359,7 +359,7 @@ function eventBodySchema<Value extends TSchema>(value: Value) {
   ]);
 }
 
-export const codeModeExecutionRequestSchema = StrictObject({
+const codeModeExecutionRequestSchema = StrictObject({
   executionId: actorId(),
   turn: turnIdentitySchema,
   admissionDigest: sha256(),
@@ -397,7 +397,7 @@ export const codeModeExecutionReceiptSchema = StrictObject({
   workspaceRevisionReceipt: workspaceRevisionReceiptSchema,
 });
 
-export const pendingExecutionEffectSchema = StrictObject({
+const pendingExecutionEffectSchema = StrictObject({
   effectId: actorId(),
   kind: effectKindSchema,
   capability: adapterCapabilitySchema,
@@ -405,7 +405,7 @@ export const pendingExecutionEffectSchema = StrictObject({
   request: eventBodySchema(codeModeExecutionRequestSchema),
 });
 
-export const settledExecutionEffectSchema = StrictObject({
+const settledExecutionEffectSchema = StrictObject({
   effectId: actorId(),
   kind: effectKindSchema,
   capability: adapterCapabilitySchema,
@@ -473,7 +473,7 @@ export const sessionCommandSchema = Type.Union([
   variant("terminate", { reason: terminalReasonSchema, terminalAt: counter() }),
 ]);
 
-export const sessionImportEvidenceSchema = StrictObject({
+const sessionImportEvidenceSchema = StrictObject({
   sourceSchemaVersion: counter(),
   sourceRuntimeGeneration: positive(),
   sourceStateDigest: sha256(),
@@ -585,17 +585,8 @@ export type QuarantinedSession = Static<typeof quarantinedSessionSchema>;
 export type TerminalSession = Static<typeof terminalSessionSchema>;
 export type AgentSessionLifecycle = Static<typeof agentSessionLifecycleSchema>;
 export type AcceptedInputRef = Static<typeof acceptedInputRefSchema>;
-export type CodeModeExecutionRequest = Static<
-  typeof codeModeExecutionRequestSchema
->;
 export type CodeModeExecutionReceipt = Static<
   typeof codeModeExecutionReceiptSchema
->;
-export type PendingExecutionEffect = Static<
-  typeof pendingExecutionEffectSchema
->;
-export type SettledExecutionEffect = Static<
-  typeof settledExecutionEffectSchema
 >;
 export type SessionCommand = Static<typeof sessionCommandSchema>;
 export type SessionImportEvidence = Static<typeof sessionImportEvidenceSchema>;

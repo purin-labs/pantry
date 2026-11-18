@@ -105,7 +105,7 @@ type CanonicalEntityRow = Readonly<{
   occurredAt: string | null;
   payloadJson: string | null;
 }>;
-export type CommerceEntityDefinition = Readonly<{
+type CommerceEntityDefinition = Readonly<{
   typeId: SystemKind;
   table: string;
   idColumn: string;
@@ -116,7 +116,7 @@ export type CommerceEntityDefinition = Readonly<{
   resourceType: CommerceResourceType;
 }>;
 
-export const SYSTEM_ENTITY_DEFINITIONS: readonly CommerceEntityDefinition[] = [
+const SYSTEM_ENTITY_DEFINITIONS: readonly CommerceEntityDefinition[] = [
   definition(
     "location",
     "location",
@@ -508,7 +508,7 @@ export function listCustomEntityTypes(
   return rows.map(parseCustomEntityTypeRow);
 }
 
-export type CustomEntityTypeRecord = Readonly<{
+type CustomEntityTypeRecord = Readonly<{
   definition: ReturnType<typeof parseCustomEntityTypeDraft>;
   revision: number;
   lifecycle: "draft" | "published" | "archived";
@@ -1338,7 +1338,7 @@ export function storedValue(row: StoredAttributeRow): unknown {
   }
 }
 
-export type StoredFields = Readonly<{
+type StoredFields = Readonly<{
   shortText: string | null;
   longText: string | null;
   integer: number | null;

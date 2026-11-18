@@ -24,7 +24,7 @@ import type {
 } from "../provider.ts";
 
 // The platform account's default version on 2026-10-21.
-export const STRIPE_API_VERSION = "2026-03-25.dahlia";
+const STRIPE_API_VERSION = "2026-03-25.dahlia";
 const STRIPE_API_ORIGIN = "https://api.stripe.com";
 const RETRY_SECONDS = 60;
 
@@ -34,9 +34,9 @@ type StripeOnlineBinding = VariantBy<
   "stripe_online"
 >;
 
-export type StripeEnvironment = "development" | "production";
+type StripeEnvironment = "development" | "production";
 
-export type StripeResponse =
+type StripeResponse =
   | Readonly<{ kind: "ok"; body: Record<string, unknown> }>
   | Readonly<{ kind: "refused"; status: number; code: string | null }>
   | Readonly<{ kind: "unavailable" }>;
@@ -118,9 +118,9 @@ export class StripeApi {
   }
 }
 
-export type StripeAccountState = "onboarding" | "active" | "restricted";
+type StripeAccountState = "onboarding" | "active" | "restricted";
 
-export type StripePaymentAccountV1 = Readonly<{
+type StripePaymentAccountV1 = Readonly<{
   provider: "stripe";
   paymentProviderBindingId: string;
   providerAccountId: string;
@@ -131,7 +131,7 @@ export type StripePaymentAccountV1 = Readonly<{
   updatedAt: string;
 }>;
 
-export type StripeAccountResult<Value> =
+type StripeAccountResult<Value> =
   | Readonly<{ kind: "ok"; value: Value }>
   | Readonly<{ kind: "error"; status: 404 | 409 | 422 | 503; message: string }>;
 
@@ -453,7 +453,7 @@ export class StripePaymentAccounts {
  * Runs online Stripe payments for the merchants that connected an account
  * and passes every other payment to the fallback gateway.
  */
-export type StripePaymentIntentRow = Readonly<{
+type StripePaymentIntentRow = Readonly<{
   paymentIntentId: string;
   providerAccountId: string;
 }>;

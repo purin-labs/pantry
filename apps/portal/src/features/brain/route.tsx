@@ -58,7 +58,7 @@ import { BrainOverview } from "./overview";
 import { useSeenRecords, type SeenRecords } from "./seen";
 import "./styles.css";
 
-export type BrainContent =
+type BrainContent =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>
   | Readonly<{
@@ -87,13 +87,13 @@ function lastBrainContent(organisationId: string): BrainContent {
   };
 }
 
-export type MemoryFeedback = Readonly<{
+type MemoryFeedback = Readonly<{
   memoryId: string;
   tone: "success" | "warning";
   message: string;
 }>;
 
-export type BrainRouteViewProps = MemoryReviewProps &
+type BrainRouteViewProps = MemoryReviewProps &
   Readonly<{
     /** The page that is open. Only Knowledge shows tabs. */
     section: BrainSection;
@@ -399,7 +399,7 @@ function editCommand(
 }
 
 /** The page without its data lifecycle, for previews and tests. */
-export function BrainRouteView(props: BrainRouteViewProps): React.ReactNode {
+function BrainRouteView(props: BrainRouteViewProps): React.ReactNode {
   // What the last selection opened. The keyboard moves to it in the render
   // that shows it, so a person who does not use a pointer keeps their place.
   const focusNext = React.useRef<string | null>(null);

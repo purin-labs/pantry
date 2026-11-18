@@ -19,7 +19,6 @@ import type {
   CaseTrigger,
   CaseOutput as ContractCaseOutput,
   RequestAuthority,
-  SessionBudgetDimension,
   SessionProposal,
   SessionProposalDisposition,
   StoredMessageAttachment,
@@ -114,7 +113,7 @@ export function parseCaseTrigger(value: unknown): CaseTriggerRecord | null {
       };
 }
 
-export function parseCaseTriggerSource(
+function parseCaseTriggerSource(
   value: Record<string, unknown>,
 ): CaseTrigger["source"] | null {
   const source = checked(caseTriggerSourceSchema, value);
@@ -156,7 +155,7 @@ export function parseCaseBinding(value: unknown): CaseBinding | null {
   };
 }
 
-export function parseConnectorAddress(
+function parseConnectorAddress(
   value: unknown,
 ): CaseBinding["address"] | null {
   return parseConnectorAddressWire(value);
@@ -172,7 +171,7 @@ export function parseAssignmentLifecycleJson(
   }
 }
 
-export function parseAssignmentLifecycle(
+function parseAssignmentLifecycle(
   value: unknown,
 ): CaseAssignmentLifecycle | null {
   const lifecycle = checked(assignmentLifecycleSchema, value);
@@ -244,16 +243,6 @@ export function parseTerminalDisposition(
         settledAt: disposition.settledAt,
       };
   }
-}
-
-export function isBudgetDimension(
-  value: unknown,
-): value is SessionBudgetDimension {
-  return (
-    value === "tokens" ||
-    value === "active_wall_ms" ||
-    value === "capability_calls"
-  );
 }
 
 export function parseCaseAssignment(value: unknown): CaseAssignment | null {
@@ -336,7 +325,7 @@ export function parseCaseAssignment(value: unknown): CaseAssignment | null {
   };
 }
 
-export function parseAuthorityPartition(
+function parseAuthorityPartition(
   value: unknown,
 ): AuthorityPartition | null {
   const parsed = parseStoredAuthorityPartition(value);
@@ -383,7 +372,7 @@ export function parseCaseProposalAcceptanceJson(
   }
 }
 
-export function parseCaseProposalAcceptance(
+function parseCaseProposalAcceptance(
   value: unknown,
 ): RawCaseProposalAcceptance | null {
   const acceptance = checked(caseProposalAcceptanceSchema, value);
@@ -405,7 +394,7 @@ export function parseOutputLifecycleJson(
   }
 }
 
-export function parseOutputLifecycle(
+function parseOutputLifecycle(
   value: unknown,
 ): RawCaseOutputLifecycle | null {
   const lifecycle = checked(outputLifecycleSchema, value);
@@ -453,7 +442,7 @@ export function parseOutputLifecycle(
       };
 }
 
-export function parseCaseContributionSource(
+function parseCaseContributionSource(
   value: unknown,
 ): CaseContributionSource | null {
   const source = checked(caseContributionSourceSchema, value);
@@ -488,7 +477,7 @@ export function parseCaseContributionSource(
   }
 }
 
-export function parseCaseOutput(value: unknown): RawCaseOutput | null {
+function parseCaseOutput(value: unknown): RawCaseOutput | null {
   const output = checked(caseOutputSchema, value);
   if (output === null || output.flowBinding === undefined) return null;
   const delivery = parseConnectorDelivery(output.delivery);
@@ -505,7 +494,7 @@ export function parseCaseOutput(value: unknown): RawCaseOutput | null {
       };
 }
 
-export function parseConnectorDelivery(
+function parseConnectorDelivery(
   value: unknown,
 ): ContractCaseOutput["delivery"] | null {
   const delivery = checked(connectorDeliverySchema, value);
@@ -543,7 +532,7 @@ export function parseConnectorDeliveryReceipt(
       };
 }
 
-export function parseContextEntry(value: unknown): CaseContextEntryRef | null {
+function parseContextEntry(value: unknown): CaseContextEntryRef | null {
   const entry = checked(contextEntrySchema, value);
   if (entry === null) return null;
   return entry.kind === "inline_preview"
@@ -565,7 +554,7 @@ export function parseContextEntry(value: unknown): CaseContextEntryRef | null {
       };
 }
 
-export function parseProposedEffect(
+function parseProposedEffect(
   value: unknown,
 ): SessionProposal["requestedEffects"][number] | null {
   const effect = checked(proposedEffectSchema, value);
@@ -578,7 +567,7 @@ export function parseProposedEffect(
       };
 }
 
-export function parseProposedEntry(
+function parseProposedEntry(
   value: unknown,
 ): SessionProposal["entries"][number] | null {
   const entry = checked(proposedEntrySchema, value);
@@ -627,7 +616,7 @@ export function parseCommerceAction(
   return parsed.ok ? parsed.value : null;
 }
 
-export function parseCursor(
+function parseCursor(
   value: Record<string, unknown>,
 ): CaseJournalCursor | null {
   const cursor = checked(journalCursorSchema, value);
@@ -641,7 +630,7 @@ export function parseCursor(
       };
 }
 
-export function parseDisposition(
+function parseDisposition(
   value: unknown,
 ): SessionProposalDisposition | null {
   const disposition = checked(proposalDispositionSchema, value);
@@ -723,10 +712,6 @@ export function equal(left: unknown, right: unknown): boolean {
 
 export function integer(value: unknown): value is number {
   return Number.isSafeInteger(value) && Number(value) >= 0;
-}
-
-export function positive(value: unknown): value is number {
-  return Number.isSafeInteger(value) && Number(value) > 0;
 }
 
 export function digest(value: unknown): value is string {

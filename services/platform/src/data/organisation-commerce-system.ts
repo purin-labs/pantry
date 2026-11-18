@@ -57,7 +57,7 @@ export type CommerceSystemSelection =
       integrationAccountId: IntegrationAccountId;
     }>;
 
-export type CommerceSystemSelectionOutcome =
+type CommerceSystemSelectionOutcome =
   | Readonly<{ kind: "selected"; commerceSystem: CommerceSystem }>
   | Readonly<{ kind: "already_selected"; commerceSystem: CommerceSystem }>;
 

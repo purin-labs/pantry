@@ -4,7 +4,7 @@ import { formatOfferPrice } from "../governed-actions/commerce";
 import { isRecord } from "@seams/std";
 import { type OfferPriceAllowanceView, type PricedOffer, parseOfferPriceAllowanceView, parsePricedOffers } from "@seams/control-api/portal/price-allowance";
 
-export type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
+type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
 export type OfferPriceAllowanceTransport = Readonly<{
   save: (
@@ -23,7 +23,7 @@ export type OfferPriceAllowanceTransport = Readonly<{
   ) => Promise<unknown>;
 }>;
 
-export type AllowanceControlState =
+type AllowanceControlState =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "saving" }>
   | Readonly<{ kind: "saved" }>
@@ -185,7 +185,7 @@ export function OfferPriceAllowanceControl(
   );
 }
 
-export function dismissAllowanceBackdrop(
+function dismissAllowanceBackdrop(
   close: () => void,
   event: React.MouseEvent<HTMLDialogElement>,
 ): void {
@@ -200,7 +200,7 @@ export function dismissAllowanceBackdrop(
     close();
 }
 
-export type AllowanceWrite = Readonly<{
+type AllowanceWrite = Readonly<{
   transport: OfferPriceAllowanceTransport;
   organisationId: string;
   offerId: string;
@@ -297,16 +297,16 @@ export function allowanceSummary(view: OfferPriceAllowanceView): string {
   return `${current}. Allowed between ${low} and ${high}, measured from ${reference}.`;
 }
 
-export function allowanceErrorMessage(error: unknown): string {
+function allowanceErrorMessage(error: unknown): string {
   return error instanceof Error && error.message.length > 0
     ? error.message
     : "The allowance could not be saved.";
 }
 
-export const BASE = (organisationId: string) =>
+const BASE = (organisationId: string) =>
   `/v1/control/organisations/${encodeURIComponent(organisationId)}`;
 
-export async function readPricedOffers(
+async function readPricedOffers(
   organisationId: string,
   fetcher: Fetcher = globalThis.fetch.bind(globalThis),
 ): Promise<readonly PricedOffer[]> {
@@ -320,7 +320,7 @@ export async function readPricedOffers(
   return parsePricedOffers(await response.json());
 }
 
-export async function readOfferPriceAllowance(
+async function readOfferPriceAllowance(
   organisationId: string,
   offerId: string,
   fetcher: Fetcher = globalThis.fetch.bind(globalThis),
@@ -388,7 +388,7 @@ export function offerPriceAllowanceTransport(
 }
 
 /** Says what the route refused, in words an operator can act on. */
-export function allowanceRouteMessage(body: unknown): string {
+function allowanceRouteMessage(body: unknown): string {
   const code =
     isRecord(body) && typeof body.error === "string"
       ? body.error
@@ -414,7 +414,7 @@ export function allowanceRouteMessage(body: unknown): string {
   }
 }
 
-export type OfferPriceAllowanceSectionState =
+type OfferPriceAllowanceSectionState =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>
   | Readonly<{
@@ -514,7 +514,7 @@ export function OfferPriceAllowanceSection(
  * ever shows "loading" under static rendering, since its load runs in an
  * effect.
  */
-export function renderAllowanceBody(
+function renderAllowanceBody(
   props: Readonly<{
     organisationId: string;
     canConfigure: boolean;
@@ -565,7 +565,7 @@ export function renderAllowanceBody(
   );
 }
 
-export function allowanceVariantLabel(variantId: string): string {
+function allowanceVariantLabel(variantId: string): string {
   const label = (variantId.split(":").at(-1) ?? variantId)
     .replace(/^variant_/, "")
     .replaceAll("_", " ");

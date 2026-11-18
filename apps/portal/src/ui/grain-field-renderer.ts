@@ -11,7 +11,7 @@ import {
    or while the context is lost. */
 
 /* The motion and grain of every field on the site. */
-export type GrainStyle = {
+type GrainStyle = {
   /* how far the flow moves a field, in heights of its short side */
   distortion: number;
   /* film grain amplitude */
@@ -20,7 +20,7 @@ export type GrainStyle = {
   speed: number;
 };
 
-export const DEFAULT_GRAIN_STYLE: GrainStyle = {
+const DEFAULT_GRAIN_STYLE: GrainStyle = {
   distortion: 0.75,
   grain: 0.08,
   speed: 1.9,
@@ -398,11 +398,6 @@ function watchEnvironment(): void {
 }
 
 /* The gradient lab tunes the style live; the site keeps the default. */
-export function setGrainStyle(next: GrainStyle): void {
-  style = next;
-  for (const view of views) view.stale = true;
-  schedule();
-}
 
 function deviceSide(side: number): number {
   return Math.min(Math.max(Math.round(side), 0), MAX_SIDE);

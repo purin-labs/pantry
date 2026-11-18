@@ -40,14 +40,14 @@ export type ChatGptDeviceAuthorizationStatus =
   | Readonly<{ kind: "authorized"; profile: ChatGptAuthProfile }>;
 
 /** What the ChatGPT backend reports about the included allowance. */
-export type ChatGptAllowanceObservation = Readonly<{
+type ChatGptAllowanceObservation = Readonly<{
   planType: string | null;
   allowance: CodexAllowance;
   /** True when the backend refuses requests until a window resets. */
   limitReached: boolean;
 }>;
 
-export type ChatGptOAuthError = Readonly<{
+type ChatGptOAuthError = Readonly<{
   code: "chatgpt_oauth_provider_unavailable";
 }>;
 

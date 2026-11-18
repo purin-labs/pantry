@@ -13,11 +13,11 @@ import {
 export type RecipeRunStatus =
   "review" | "running" | "paused" | "completed" | "blocked";
 
-export type RecipeRunOutcome =
+type RecipeRunOutcome =
   | Readonly<{ kind: "completed" }>
   | Readonly<{ kind: "failed"; reason: string }>;
 
-export type RecipeRunSample = Readonly<{
+type RecipeRunSample = Readonly<{
   timeS: number;
   outcome: RecipeRunOutcome | null;
 }>;
@@ -56,10 +56,7 @@ function clockOf<Sample extends RecipeRunSample>(
   };
 }
 
-export type RecipePlaybackOptions<
-  Sample extends RecipeRunSample,
-  Recipe,
-> = Readonly<{
+type RecipePlaybackOptions<Sample extends RecipeRunSample, Recipe> = Readonly<{
   /** The recipe that a restart and a new animation plan run. */
   recipe: () => Recipe;
   /** A new model engine for a recipe. */

@@ -68,7 +68,7 @@ type Input = Readonly<{
   expiresAt: string;
   edit: OvenAssignmentEdit;
 }>;
-export type OvenAssignmentResult =
+type OvenAssignmentResult =
   | Readonly<{ ok: true }>
   | Readonly<{
       ok: false;

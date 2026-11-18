@@ -251,7 +251,7 @@ export function IntegrationsPage(
   );
 }
 
-export function navigateIntegrationLink(
+function navigateIntegrationLink(
   navigate: NavigateFunction,
   event: React.MouseEvent<HTMLDivElement>,
 ): void {
@@ -300,7 +300,7 @@ export function openIntegrationConnection(
   );
 }
 
-export function closeIntegrationConnection(
+function closeIntegrationConnection(
   navigate: NavigateFunction,
   search: string,
 ): void {
@@ -321,7 +321,7 @@ export function closeIntegrationConnection(
   );
 }
 
-export function requestedIntegrationEntry(
+function requestedIntegrationEntry(
   entries: readonly IntegrationEntry[],
   integrationId: string | undefined,
 ): IntegrationEntry | null {
@@ -331,7 +331,7 @@ export function requestedIntegrationEntry(
   );
 }
 
-export function matchesIntegrationEntryId(
+function matchesIntegrationEntryId(
   integrationId: string,
   entry: IntegrationEntry,
 ): boolean {
@@ -345,7 +345,7 @@ export function matchesRequestedIntegrationAccountId(
   return account.integrationAccountId === accountId;
 }
 
-export function syncIntegrationQuery(
+function syncIntegrationQuery(
   initialQuery: string | undefined,
   setQuery: React.Dispatch<React.SetStateAction<string>>,
 ): void {
@@ -359,7 +359,7 @@ export function syncIntegrationQuery(
  * source become ready while the readiness still says it is not, it reads the
  * overview once more, so the setup checklist does not stay behind.
  */
-export function refreshWhenInferenceReady(
+function refreshWhenInferenceReady(
   wasReady: React.MutableRefObject<boolean>,
   ready: boolean,
   readinessLags: boolean,
@@ -370,7 +370,7 @@ export function refreshWhenInferenceReady(
   if (became && readinessLags) refresh();
 }
 
-export function readinessHolds(
+function readinessHolds(
   readiness: ReadinessAssessment | null,
   code: string,
 ): boolean {
@@ -380,7 +380,7 @@ export function readinessHolds(
   );
 }
 
-export function readinessBlockerHasCode(
+function readinessBlockerHasCode(
   code: string,
   blocker: { readonly code: string },
 ): boolean {
@@ -393,7 +393,7 @@ export function readinessBlockerHasCode(
  * at once and the consent dialog is the one dialog on screen. Continue then
  * opens the Slack panel, which waits for the Slack window.
  */
-export function openSetupIntegration(
+function openSetupIntegration(
   open: (integrationId: string) => void,
   connectSlack: () => Promise<void>,
   hasSlack: boolean,
@@ -403,7 +403,7 @@ export function openSetupIntegration(
   else open(integrationId);
 }
 
-export function navigateToIntegration(
+function navigateToIntegration(
   navigate: NavigateFunction,
   basePath: string,
   query: string,
@@ -414,7 +414,7 @@ export function navigateToIntegration(
   });
 }
 
-export function integrationDetailPath(
+function integrationDetailPath(
   basePath: string,
   integrationId: string,
   accountId: string | null,
@@ -426,7 +426,7 @@ export function integrationDetailPath(
   return appendIntegrationParameters(basePath, parameters);
 }
 
-export function appendIntegrationParameters(
+function appendIntegrationParameters(
   basePath: string,
   parameters: URLSearchParams,
 ): string {
@@ -434,7 +434,7 @@ export function appendIntegrationParameters(
   return `${basePath}${separator}${parameters.toString()}`;
 }
 
-export function IntegrationDetail(props: {
+function IntegrationDetail(props: {
   readonly entry: IntegrationEntry;
   readonly detailContent: SelectedIntegrationDetailContent | undefined;
   readonly retryDetail: (() => void) | undefined;
@@ -454,7 +454,7 @@ export function IntegrationDetail(props: {
   );
 }
 
-export function renderSelectedIntegrationDetail(
+function renderSelectedIntegrationDetail(
   entry: IntegrationEntry,
   content: SelectedIntegrationDetailContent | undefined,
   retry: (() => void) | undefined,
@@ -485,7 +485,7 @@ export function renderSelectedIntegrationDetail(
   }
 }
 
-export function revealRequestedIntegrationAccount(
+function revealRequestedIntegrationAccount(
   accountId: string | null,
 ): (() => void) | undefined {
   if (accountId === null) return;
@@ -495,13 +495,13 @@ export function revealRequestedIntegrationAccount(
   return cancelAnimationFrame.bind(null, frame);
 }
 
-export function revealIntegrationAccountElement(accountId: string): void {
+function revealIntegrationAccountElement(accountId: string): void {
   const target = document.getElementById(`integration-account-${accountId}`);
   if (target === null || target.closest("dialog[open]") === null) return;
   target.scrollIntoView({ block: "nearest" });
 }
 
-export function focusIntegrationOverviewReturnTarget(
+function focusIntegrationOverviewReturnTarget(
   activeId: string | null,
   entries: readonly IntegrationEntry[],
   accounts: readonly IntegrationAccount[],
@@ -516,7 +516,7 @@ export function focusIntegrationOverviewReturnTarget(
   requestAnimationFrame(focusIntegrationOverviewElement.bind(null, targetId));
 }
 
-export function resolveIntegrationOverviewFocusId(
+function resolveIntegrationOverviewFocusId(
   entries: readonly IntegrationEntry[],
   accounts: readonly IntegrationAccount[],
   focusId: string,
@@ -540,7 +540,7 @@ export function resolveIntegrationOverviewFocusId(
   return "browse-apps-title";
 }
 
-export function focusIntegrationOverviewElement(targetId: string): void {
+function focusIntegrationOverviewElement(targetId: string): void {
   const target = document.getElementById(targetId);
   if (target !== null) {
     target.focus();
@@ -549,7 +549,7 @@ export function focusIntegrationOverviewElement(targetId: string): void {
   document.getElementById("browse-apps-title")?.focus();
 }
 
-export function buildIntegrationCatalogItem(
+function buildIntegrationCatalogItem(
   basePath: string,
   query: string,
   entry: IntegrationEntry,
@@ -567,11 +567,11 @@ export function buildIntegrationCatalogItem(
   };
 }
 
-export function isNotRevoked(account: IntegrationAccount): boolean {
+function isNotRevoked(account: IntegrationAccount): boolean {
   return account.lifecycle.kind !== "revoked";
 }
 
-export function integrationSearchAliases(integrationId: string): readonly string[] {
+function integrationSearchAliases(integrationId: string): readonly string[] {
   if (integrationId === "typesafe")
     return [
       "jev",
@@ -591,7 +591,7 @@ export function integrationSearchAliases(integrationId: string): readonly string
   return providerSearchAliases(integrationId);
 }
 
-export function integrationCatalogKind(
+function integrationCatalogKind(
   integrationId: string,
 ): IntegrationCatalogItem["kind"] {
   return integrationId === "codex" ||
@@ -601,15 +601,15 @@ export function integrationCatalogKind(
     : "app";
 }
 
-export function isAppCatalogItem(item: IntegrationCatalogItem): boolean {
+function isAppCatalogItem(item: IntegrationCatalogItem): boolean {
   return item.kind === "app";
 }
 
-export function isWorkspaceSetupCatalogItem(item: IntegrationCatalogItem): boolean {
+function isWorkspaceSetupCatalogItem(item: IntegrationCatalogItem): boolean {
   return item.kind === "workspace_setup";
 }
 
-export function compareIntegrationCatalogItems(
+function compareIntegrationCatalogItems(
   left: IntegrationCatalogItem,
   right: IntegrationCatalogItem,
 ): number {
@@ -617,13 +617,13 @@ export function compareIntegrationCatalogItems(
   return priority === 0 ? left.label.localeCompare(right.label) : priority;
 }
 
-export function catalogPriority(id: string): number {
+function catalogPriority(id: string): number {
   if (id === "google_drive") return 0;
   if (id === "slack") return 1;
   return 2;
 }
 
-export function buildConnectedAppItems(
+function buildConnectedAppItems(
   basePath: string,
   query: string,
   entries: readonly IntegrationEntry[],
@@ -652,7 +652,7 @@ export async function loadOnePasswordIntegrationPanel() {
 }
 
 /** A connected 1Password vault is a connected app without a provider account. */
-export function onePasswordConnectedApp(
+function onePasswordConnectedApp(
   basePath: string,
   query: string,
   onePassword: OnePasswordStatus,
@@ -676,7 +676,7 @@ export function onePasswordConnectedApp(
   ];
 }
 
-export function buildConnectedAppItem(
+function buildConnectedAppItem(
   basePath: string,
   query: string,
   integrationId: string,
@@ -701,7 +701,7 @@ export function buildConnectedAppItem(
   };
 }
 
-export function integrationOverviewAccountStatus(
+function integrationOverviewAccountStatus(
   lifecycle: IntegrationAccountLifecycle,
 ): StatusChipStatus {
   switch (lifecycle.kind) {
@@ -724,7 +724,7 @@ export function integrationOverviewAccountStatus(
   }
 }
 
-export function integrationOverviewAccountAction(
+function integrationOverviewAccountAction(
   account: IntegrationAccount,
   canManage: boolean,
 ): string {
@@ -751,7 +751,7 @@ export function integrationOverviewAccountAction(
   }
 }
 
-export function integrationEntryStatus(
+function integrationEntryStatus(
   entry: IntegrationEntry,
 ): IntegrationRailStatus {
   return entry.status ?? integrationStatus(entry.accounts, entry.connected);
@@ -777,7 +777,7 @@ export type IntegrationRailStatus = {
   readonly label: string;
 };
 
-export function integrationStatus(
+function integrationStatus(
   accounts: readonly IntegrationAccount[],
   connected: boolean,
 ): IntegrationRailStatus {
@@ -787,7 +787,7 @@ export function integrationStatus(
   return { kind: "idle", label: "Not connected" };
 }
 
-export function codexIntegrationStatus(
+function codexIntegrationStatus(
   connection: OrganisationCodexConnection,
 ): IntegrationRailStatus {
   switch (connection.kind) {

@@ -427,7 +427,7 @@ export type DeliveryReceiptRow = Record<string, SqlStorageValue> & {
   readonly commerceSystemRevision: number | null;
 };
 
-export type ProjectionHistoryRow = Record<string, SqlStorageValue> & {
+type ProjectionHistoryRow = Record<string, SqlStorageValue> & {
   readonly eventId: string;
   readonly disposition: string;
   readonly projectionKind: string;
@@ -481,7 +481,7 @@ const COMMERCE_PROJECTION_SCHEMA_V17: readonly string[] = [
     )`,
 ];
 
-export const COMMERCE_SCHEMA_PLAN = {
+const COMMERCE_SCHEMA_PLAN = {
   key: "commerce_projection",
   currentVersion: 17,
   preservedTables: [] as const,
@@ -513,7 +513,7 @@ export const COMMERCE_SCHEMA_PLAN = {
   ],
 } as const;
 
-export const TERMINAL_LIFECYCLES = new Set(["delivered", "returned"]);
+const TERMINAL_LIFECYCLES = new Set(["delivered", "returned"]);
 
 export function createCommerceProjectionSchema(sql: SqlStorage): void;
 
@@ -531,7 +531,7 @@ export function createCommerceProjectionSchema(
   createCommerceQuerySchema(sql, execute);
 }
 
-export function transactionFromSql(sql: SqlStorage): SchemaTransaction {
+function transactionFromSql(sql: SqlStorage): SchemaTransaction {
   if (
     !("transactionSync" in sql) ||
     typeof sql.transactionSync !== "function"
@@ -997,7 +997,7 @@ export function readCommerceProjectionHistory(
   return { ok: true, value: entries };
 }
 
-export function isProjectionHistoryRow(
+function isProjectionHistoryRow(
   row: ProjectionHistoryRow,
   input: ReadCommerceProjectionHistoryInput,
 ): row is ProjectionHistoryRow & {
@@ -1356,7 +1356,7 @@ export function verifyCommerceLab(
   };
 }
 
-export function validateCommerceProjectionTextFolds(sql: SqlStorage): void {
+function validateCommerceProjectionTextFolds(sql: SqlStorage): void {
   validateCommerceProjectionTables(sql);
   assertRequiredColumns(sql, "commerce_projection", [
     "organisation_id",

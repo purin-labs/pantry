@@ -16,7 +16,7 @@ import type {
   GlobalQuerySource,
 } from "./query-source";
 
-export type ControlSupportRole =
+type ControlSupportRole =
   | {
       readonly kind: "support_agent";
       readonly userId: UserId;
@@ -26,7 +26,7 @@ export type ControlSupportRole =
       readonly userId: UserId;
     };
 
-export type MerchantSupportDiagnostics = {
+type MerchantSupportDiagnostics = {
   readonly kind: "support_diagnostics";
   readonly supportReference: string;
   readonly provider: string | null;
@@ -50,7 +50,7 @@ export type OperatorOnboardingLookup =
   | { readonly kind: "provider_account"; readonly value: string }
   | { readonly kind: "correlation_id"; readonly value: string };
 
-export type OperatorOnboardingCase = {
+type OperatorOnboardingCase = {
   readonly organisationId: string;
   readonly environment: "development" | "production";
   readonly lifecycle: string;
@@ -71,7 +71,7 @@ export type OperatorOnboardingCase = {
   readonly timeline: readonly OperatorTimelineEntry[];
 };
 
-export type OperatorTimelineEntry =
+type OperatorTimelineEntry =
   | {
       readonly kind: "event";
       readonly occurredAt: number;

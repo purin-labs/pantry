@@ -82,7 +82,7 @@ export function turnTriggerEntryId(turnId: string): string | null {
 
 export type SteeringInputState = "admitted" | "queued" | "placed" | "withdrawn";
 
-export type SteeringInput = Readonly<{
+type SteeringInput = Readonly<{
   sessionId: string;
   turnId: string;
   inputId: string;
@@ -321,7 +321,7 @@ export function settledSteeringInput(
 }
 
 /** A placed input of a turn that the Case has not journaled yet. */
-export type SteeringInputToJournal = Readonly<{
+type SteeringInputToJournal = Readonly<{
   inputId: string;
   inputRef: AcceptedInputRef;
   message: UserMessage;

@@ -41,7 +41,7 @@ export type EmailSelfTestTarget = Readonly<{
 
 export type EmailProposalTarget = OperationalEmailTarget | EmailSelfTestTarget;
 
-export type OperationalEmailContact = Readonly<{
+type OperationalEmailContact = Readonly<{
   readonly organisationId: OrganisationId;
   readonly target: OperationalEmailTarget;
   readonly address: string;
@@ -51,7 +51,7 @@ export type OperationalEmailContact = Readonly<{
   readonly updatedAt: number;
 }>;
 
-export type EmailSenderAccount = Readonly<{
+type EmailSenderAccount = Readonly<{
   readonly integrationAccountId: IntegrationAccountId;
   readonly organisationId: OrganisationId;
   readonly environment: "development" | "production";
@@ -60,7 +60,7 @@ export type EmailSenderAccount = Readonly<{
   readonly addressObservedAt: number;
 }>;
 
-export type EmailOperationalDirectoryError = Readonly<{
+type EmailOperationalDirectoryError = Readonly<{
   readonly code:
     | "email_operational_contact_not_found"
     | "email_operational_contact_suppressed"
@@ -102,7 +102,7 @@ export type EmailOperationalProposalProjection = Readonly<{
   readonly updatedAt: number;
 }>;
 
-export type EmailOperationalProposalProjectionError = Readonly<{
+type EmailOperationalProposalProjectionError = Readonly<{
   readonly code:
     | "email_operational_projection_write_failed"
     | "email_operational_attestation_conflict"

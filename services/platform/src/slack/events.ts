@@ -117,11 +117,7 @@ export type SlackPayloadError =
   | { code: "missing_field"; field: string }
   | { code: "invalid_field"; field: string };
 
-export type SlackFieldError = VariantBy<
-  SlackPayloadError,
-  "code",
-  "invalid_field"
->;
+type SlackFieldError = VariantBy<SlackPayloadError, "code", "invalid_field">;
 
 const SLACK_SURFACE_KIND = "slack" as const;
 
@@ -496,7 +492,7 @@ type SlackAuthoredContent =
  * the user-visible content, the caller refuses the message rather than
  * admitting a lossy version of it.
  */
-export function parseSlackAuthoredContent(
+function parseSlackAuthoredContent(
   event: JsonObject,
 ): Result<SlackAuthoredContent, SlackPayloadError> {
   const richText = parseSlackRichTextBlocks(event.blocks);
@@ -750,9 +746,7 @@ const SLACK_ANGLE_TOKEN = /<([^<>]*)>/gu;
  * construct — user, channel, broadcast, mailto — stays literal text, matching
  * what the author sees.
  */
-export function parseSlackMrkdwnParts(
-  text: string,
-): readonly SlackAuthoredPart[] {
+function parseSlackMrkdwnParts(text: string): readonly SlackAuthoredPart[] {
   const collector = new SlackPartCollector();
   let cursor = 0;
 
@@ -812,7 +806,7 @@ export function slackAuthoredText(parts: readonly SlackAuthoredPart[]): string {
 // File candidates
 // ---------------------------------------------------------------------------
 
-export function parseSlackFileCandidates(
+function parseSlackFileCandidates(
   event: JsonObject,
   messageTs: string,
 ): Result<readonly SlackFileCandidate[], SlackPayloadError> {

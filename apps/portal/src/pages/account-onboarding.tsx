@@ -34,7 +34,7 @@ export type AccountSetupListing =
     }>
   | Readonly<{ kind: "missing" }>;
 
-export type AccountSetupStep =
+type AccountSetupStep =
   "organisation" | "project" | "billing" | "prepare" | "jev" | "done";
 
 /** The choices of steps 1 to 3. Back keeps every choice and typed name. */
@@ -64,7 +64,7 @@ type AccountSetupRecovery =
     }>
   | Readonly<{ kind: "new_project"; draft: AccountSetupDraft | null }>;
 
-export type AccountSetupFailure = Readonly<{
+type AccountSetupFailure = Readonly<{
   step: AccountSetupStep;
   tone: "danger" | "warning";
   title: string;
@@ -282,7 +282,7 @@ function projectCount(organization: AccountOnboardingOrganization): string {
   return count === 1 ? "1 project" : `${count} projects`;
 }
 
-export function formatSetupTime(milliseconds: number): string {
+function formatSetupTime(milliseconds: number): string {
   const seconds = Math.max(0, Math.floor(milliseconds / 1000));
   const rest = seconds % 60;
   return `${Math.floor(seconds / 60)}:${rest < 10 ? "0" : ""}${rest}`;
@@ -452,7 +452,7 @@ function newProjectDraft(draft: AccountSetupDraft): AccountSetupDraft {
   };
 }
 
-export type AccountSetupProps = Readonly<{
+type AccountSetupProps = Readonly<{
   userId: string;
   /** Reads the session again and reports if it lists the organisation. */
   finish: (nativeOrganizationId: string) => Promise<AccountSetupListing>;

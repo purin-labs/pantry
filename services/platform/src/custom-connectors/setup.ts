@@ -201,7 +201,7 @@ export type CustomConnectorSetupAttempt =
       readonly cancelledByUserId?: never;
     });
 
-export type CustomConnectorSetupError =
+type CustomConnectorSetupError =
   | { readonly code: "custom_connector_revision_not_available" }
   | { readonly code: "custom_connector_account_not_available" }
   | { readonly code: "custom_connector_account_identity_mismatch" }
@@ -249,7 +249,7 @@ type ExistingSetupTargetRow = {
   definitionDigest: unknown;
 };
 
-export type TestedCustomConnectorSetup = {
+type TestedCustomConnectorSetup = {
   readonly attempt: VariantBy<
     CustomConnectorSetupAttempt,
     "lifecycle",

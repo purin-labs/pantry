@@ -97,13 +97,13 @@ export type EnabledCaseContextDiscoveryPolicy = Exclude<
   { mode: "disabled" }
 >;
 
-export type CaseContextCollectionInactiveReason =
+type CaseContextCollectionInactiveReason =
   | "disabled"
   | "credential_unavailable"
   | "source_not_enabled"
   | "recipient_isolation_unavailable";
 
-export type CaseContextDiscoveryReadiness =
+type CaseContextDiscoveryReadiness =
   | Readonly<{ kind: "inactive"; reason: CaseContextCollectionInactiveReason }>
   | Readonly<{
       kind: "ready";

@@ -359,7 +359,7 @@ export function parseScheduleBindingRow(
   };
 }
 
-export function parseStoredScheduleSpec(row: RawScheduleBinding): ScheduleSpec {
+function parseStoredScheduleSpec(row: RawScheduleBinding): ScheduleSpec {
   switch (row.cadence) {
     case "hourly": {
       const minuteOfHour = row.minuteOfHour;
@@ -482,7 +482,7 @@ export function parseCaseAssignmentPinRow(
   };
 }
 
-export function sqliteBoolean(value: unknown): boolean {
+function sqliteBoolean(value: unknown): boolean {
   if (value === 1 || value === true) {
     return true;
   }
@@ -492,7 +492,7 @@ export function sqliteBoolean(value: unknown): boolean {
   return fail("boolean");
 }
 
-export function parseStoredResponsibilityScope(
+function parseStoredResponsibilityScope(
   row: RawResponsibilityScope,
 ): AgentResponsibilityScope {
   const scopeKind = row.scopeKind;
@@ -636,23 +636,23 @@ export function organisation(value: unknown): OrganisationId {
   return parsed.ok ? parsed.value : fail("organisation id");
 }
 
-export function lifecycle(value: unknown): AgentLifecycle {
+function lifecycle(value: unknown): AgentLifecycle {
   return value === "active" || value === "archived" ? value : fail("lifecycle");
 }
 
-export function skillLifecycle(value: unknown): SkillLifecycle {
+function skillLifecycle(value: unknown): SkillLifecycle {
   return value === "published" || value === "archived"
     ? value
     : fail("skill lifecycle");
 }
 
-export function installationLifecycle(value: unknown): InstallationLifecycle {
+function installationLifecycle(value: unknown): InstallationLifecycle {
   return value === "active" || value === "suspended" || value === "archived"
     ? value
     : fail("installation lifecycle");
 }
 
-export function sensitivity(value: unknown): SkillSensitivity {
+function sensitivity(value: unknown): SkillSensitivity {
   return value === "ordinary" || value === "sensitive"
     ? value
     : fail("sensitivity");

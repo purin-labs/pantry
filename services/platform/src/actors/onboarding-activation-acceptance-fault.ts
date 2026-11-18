@@ -40,7 +40,7 @@ export type OnboardingActivationAcceptanceFaultInspection =
       readonly fault: OnboardingActivationAcceptanceFaultRecord;
     };
 
-export type OnboardingActivationAcceptanceFaultConsumption =
+type OnboardingActivationAcceptanceFaultConsumption =
   | { readonly kind: "inactive" }
   | {
       readonly kind: "consumed";

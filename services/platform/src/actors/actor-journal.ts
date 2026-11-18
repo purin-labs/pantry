@@ -105,7 +105,7 @@ export type CheckpointCommittedTransition = Variant<
   "checkpoint_committed"
 >;
 
-export type CancellationStartedTransition = Variant<
+type CancellationStartedTransition = Variant<
   SessionTransition,
   "cancellation_started"
 >;
@@ -228,7 +228,7 @@ export type SessionTurnContextLookup = {
   readonly sessionId: string;
 };
 
-export type SessionTurnContextReadError =
+type SessionTurnContextReadError =
   | { readonly code: "project_evidence_unavailable" }
   | { readonly code: "session_turn_context_missing" }
   | { readonly code: "invalid_persisted_state" };
@@ -432,7 +432,7 @@ export type SessionTurnContextRow = Record<string, SqlStorageValue> & {
   bundle_json: string;
 };
 
-export type AcceptedInputEnvelopeRow = Record<string, SqlStorageValue> & {
+type AcceptedInputEnvelopeRow = Record<string, SqlStorageValue> & {
   envelope: string;
 };
 

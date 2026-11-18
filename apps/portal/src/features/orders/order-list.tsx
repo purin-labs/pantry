@@ -26,7 +26,7 @@ export type OrderCheck = {
   state: "passed" | "failed" | "warning" | "waiting" | "running" | "pending";
 };
 
-export type CustomerUpdate = {
+type CustomerUpdate = {
   at: string;
   // The message the agent drafted, in full, for the drawer.
   draft: string;
@@ -58,7 +58,7 @@ export type ListedOrder = {
   checks: readonly OrderCheck[];
 };
 
-export type OrderListProps = {
+type OrderListProps = {
   day: string;
   orders: readonly ListedOrder[];
   // Orders in each stage that are on track, with the ones the page does not

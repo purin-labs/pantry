@@ -50,7 +50,7 @@ type InventoryItemsState =
   | Readonly<{ kind: "ready"; items: readonly CommerceEntity[] }>
   | Readonly<{ kind: "failed" }>;
 
-export type PurchasingControlsProps = Readonly<{
+type PurchasingControlsProps = Readonly<{
   organisationId: string;
   active: boolean;
   canManage: boolean;

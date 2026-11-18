@@ -47,7 +47,7 @@ export type SquareApplication = Readonly<{
   clientSecret: string;
 }>;
 
-export type SquareConfiguration =
+type SquareConfiguration =
   | { readonly kind: "unconfigured" }
   | {
       readonly kind: "invalid";
@@ -94,7 +94,7 @@ export function readSquareConfiguration(
   };
 }
 
-export type SquareProtocolError =
+type SquareProtocolError =
   | { readonly code: "provider_configuration_missing" }
   | { readonly code: "provider_oauth_response_invalid" }
   | { readonly code: "provider_account_ineligible" }
@@ -163,7 +163,7 @@ async function squareAuthorizationUrl(
  * credentials, so the environment selects the origin rather than a flag on one
  * shared host.
  */
-export function squareConnectOrigin(
+function squareConnectOrigin(
   environment: "development" | "production",
 ): string {
   return environment === "development"

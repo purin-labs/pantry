@@ -135,11 +135,11 @@ export type AccessControlViewInput = Readonly<{
   sourcePolicyOffset: number;
 }>;
 
-export type AccessControlCapabilityActions =
+type AccessControlCapabilityActions =
   | Readonly<{ kind: "read_only" }>
   | Readonly<{ kind: "change_capability_mode" }>;
 
-export type AccessControlGrantActions =
+type AccessControlGrantActions =
   Readonly<{ kind: "read_only" }> | Readonly<{ kind: "revoke_grant" }>;
 
 export type AccessControlViewActions =
@@ -166,14 +166,14 @@ export type AccessControlIntegrationView = Readonly<{
   actions: Readonly<{ kind: "none" }>;
 }>;
 
-export type AccessControlSubjectView = Readonly<{
+type AccessControlSubjectView = Readonly<{
   subjectRefId: string;
   kind: GrantSubject["kind"] | ContextVisibility["kind"];
   label: string;
   availability: "available" | "unavailable";
 }>;
 
-export type AccessControlResourceView = Readonly<{
+type AccessControlResourceView = Readonly<{
   targetRefId: string;
   kind: AccessControlResourceProjection["kind"];
   label: string;
@@ -181,7 +181,7 @@ export type AccessControlResourceView = Readonly<{
   revision: number;
 }>;
 
-export type AccessControlProvenanceView = Readonly<{
+type AccessControlProvenanceView = Readonly<{
   kind: GrantProvenance["kind"];
   label: string;
 }>;
@@ -252,7 +252,7 @@ export type AccessControlView = Readonly<{
   sourceFlowPolicies: AccessControlBoundedPage<AccessControlSourcePolicyView>;
 }>;
 
-export type AccessControlViewError = Readonly<{
+type AccessControlViewError = Readonly<{
   code: "access_control_view_invalid";
   field: string;
 }>;

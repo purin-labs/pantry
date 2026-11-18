@@ -142,7 +142,7 @@ export async function handleCafeOperations(
   return controlJson(responseBody);
 }
 
-export async function readCafeOperationsResponse(
+async function readCafeOperationsResponse(
   request: Request,
   env: Env,
   organisationIdRaw: string,
@@ -163,7 +163,7 @@ export async function readCafeOperationsResponse(
     : cafeOperationErrorResponse(loaded.error);
 }
 
-export async function resolveCafeOperationsContext(
+async function resolveCafeOperationsContext(
   env: Env,
   execution: OrganisationExecutionScope,
 ): Promise<
@@ -203,7 +203,7 @@ export async function resolveCafeOperationsContext(
   };
 }
 
-export function cafeOperationErrorResponse(error: CafeOperationError): Response {
+function cafeOperationErrorResponse(error: CafeOperationError): Response {
   switch (error.code) {
     case "underclerk_unavailable":
       return controlError("underclerk_unavailable", 503);
@@ -367,7 +367,7 @@ export async function handleShippingOperations(
   return controlJson(responseBody);
 }
 
-export function parseShippingOperationShipmentId(value: string): string | null {
+function parseShippingOperationShipmentId(value: string): string | null {
   return value.length > 0 &&
     value === value.trim() &&
     /^[A-Za-z0-9_:-]+$/u.test(value)
@@ -375,7 +375,7 @@ export function parseShippingOperationShipmentId(value: string): string | null {
     : null;
 }
 
-export function parseShippingOperationRequest(
+function parseShippingOperationRequest(
   body: Readonly<Record<string, unknown>>,
 ): ShippingOperationRequest | null {
   if (body.action === "quote_label_rate" && Object.keys(body).length === 1) {
@@ -399,7 +399,7 @@ export function parseShippingOperationRequest(
   };
 }
 
-export function shippingOperationErrorResponse(
+function shippingOperationErrorResponse(
   error: ShippingOperationError,
 ): Response {
   switch (error.code) {

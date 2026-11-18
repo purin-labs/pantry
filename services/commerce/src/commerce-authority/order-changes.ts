@@ -73,19 +73,6 @@ export function readPaymentChange(
   return change;
 }
 
-export function readPaymentChangeForCheckout(
-  database: CommerceDatabase,
-  merchantId: string,
-  orderId: string,
-  checkoutId: string,
-): CommerceOrderPaymentChangeV1 | undefined {
-  for (const change of listOrderChanges(database, merchantId, orderId)) {
-    if (change.kind === "payment" && change.checkoutId === checkoutId)
-      return change;
-  }
-  return undefined;
-}
-
 export function insertOrderChange(
   database: CommerceDatabase,
   merchantId: string,

@@ -20,7 +20,7 @@ const SCOPE = `openid profile email offline_access resource.invoke ${DIRECT_TOKE
  * OpenAI accepts a loopback callback only. Nothing listens there: the
  * person copies the address of the page that does not load into Portal.
  */
-export const CHATGPT_AGENT_REDIRECT_URI = "http://127.0.0.1:1455/auth/callback";
+const CHATGPT_AGENT_REDIRECT_URI = "http://127.0.0.1:1455/auth/callback";
 const JWT_AUTH_CLAIM = "https://api.openai.com/auth";
 const MAX_PASTED_ADDRESS_LENGTH = 8_192;
 
@@ -57,14 +57,14 @@ export type ChatGptAgentReuse = Pick<
   "clientId" | "hostId" | "idToken"
 >;
 
-export type ChatGptAgentCallbackError = Readonly<{
+type ChatGptAgentCallbackError = Readonly<{
   code:
     | "chatgpt_sign_in_address_invalid"
     | "chatgpt_sign_in_denied"
     | "chatgpt_sign_in_client_mismatch";
 }>;
 
-export type ChatGptAgentTokenError = Readonly<{
+type ChatGptAgentTokenError = Readonly<{
   code:
     | "chatgpt_oauth_provider_unavailable"
     | "chatgpt_oauth_grant_refused"

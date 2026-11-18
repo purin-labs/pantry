@@ -120,7 +120,7 @@ export function refundCounterSale(
   );
 }
 
-export async function mutateCounterSaleAfterSale(
+async function mutateCounterSaleAfterSale(
   organisationId: string,
   checkoutId: string,
   action: "ready" | "handover" | "refund",
@@ -172,14 +172,14 @@ export async function openCounterSale(
   return readCounterSale(organisationId, checkoutId, read);
 }
 
-export type CounterSaleOpenLine = Readonly<{
+type CounterSaleOpenLine = Readonly<{
   cartLineId: string;
   checkoutLineId: string;
   source: Readonly<{ kind: "catalog"; variantId: string }>;
   quantity: Readonly<{ amount: number; scale: 0; unit: "each" }>;
 }>;
 
-export function buildCounterSaleLines(
+function buildCounterSaleLines(
   selections: readonly Readonly<{ variantId: string; quantity: number }>[],
 ): readonly CounterSaleOpenLine[] {
   const lines: CounterSaleOpenLine[] = [];
@@ -230,6 +230,6 @@ export function counterSaleGuidance(sale: CounterSale): string {
   }
 }
 
-export function counterSalesPath(organisationId: string): string {
+function counterSalesPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/counter-sales`;
 }

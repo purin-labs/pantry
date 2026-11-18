@@ -16,10 +16,10 @@
  */
 
 /** The request header that names the provider URL to forward to. */
-export const CHATGPT_EXIT_UPSTREAM_HEADER = "x-satyr-upstream-url";
+const CHATGPT_EXIT_UPSTREAM_HEADER = "x-satyr-upstream-url";
 
 /** The response header that names the data centre of the exit. */
-export const CHATGPT_EXIT_COLO_HEADER = "x-satyr-exit-colo";
+const CHATGPT_EXIT_COLO_HEADER = "x-satyr-exit-colo";
 
 /** Request headers that belong to one connection and are never forwarded. */
 const CONNECTION_HEADERS: ReadonlySet<string> = new Set([
@@ -49,7 +49,7 @@ export function containerRequest(request: Request): Request | null {
   });
 }
 
-export type ChatGptExitContext = {
+type ChatGptExitContext = {
   readonly fetch: typeof fetch;
   /** The data-centre code of the exit, or null when it is not known. */
   readonly colo: string | null;

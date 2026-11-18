@@ -79,7 +79,7 @@ export function renderCommerceSystemCard(
 /* An in-flight sync command reads as syncing even while the projection still
    says delayed, so auto-sync never flashes "Behind" on its way to current. */
 
-export function renderCommerceSystemSyncChip(
+function renderCommerceSystemSyncChip(
   sync: CommerceSystemSync,
   syncing: boolean,
 ): React.ReactNode {
@@ -97,7 +97,7 @@ export function renderCommerceSystemSyncChip(
   }
 }
 
-export function formatCommerceSystemSync(
+function formatCommerceSystemSync(
   sync: CommerceSystemSync,
   syncing: boolean,
 ): string {

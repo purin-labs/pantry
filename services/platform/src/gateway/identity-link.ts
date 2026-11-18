@@ -326,12 +326,12 @@ export async function handleCompleteIdentityLink(
   });
 }
 
-export function parseIdentityLinkPathToken(raw: string) {
+function parseIdentityLinkPathToken(raw: string) {
   const decoded = decodePathSegment(raw);
   return decoded.ok ? parseIdentityLinkToken(decoded.value) : null;
 }
 
-export function readRequestCookie(request: Request, name: string): string | null {
+function readRequestCookie(request: Request, name: string): string | null {
   const header = request.headers.get("cookie");
   if (header === null) {
     return null;
@@ -347,14 +347,14 @@ export function readRequestCookie(request: Request, name: string): string | null
   return null;
 }
 
-export function identityLinkJsonResponse(body: JsonObject, status = 200): Response {
+function identityLinkJsonResponse(body: JsonObject, status = 200): Response {
   const response = jsonResponse(body, status);
   response.headers.set("cache-control", "no-store");
   response.headers.set("referrer-policy", "no-referrer");
   return response;
 }
 
-export function identityLinkResolutionErrorResponse(
+function identityLinkResolutionErrorResponse(
   error: ResolveIdentityLinkError,
 ): Response {
   switch (error.code) {
@@ -383,7 +383,7 @@ export function identityLinkResolutionErrorResponse(
   }
 }
 
-export function identityLinkConsumptionErrorResponse(
+function identityLinkConsumptionErrorResponse(
   error: ConsumeIdentityLinkError,
 ): Response {
   switch (error.code) {

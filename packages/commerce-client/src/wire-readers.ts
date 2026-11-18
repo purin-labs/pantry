@@ -1,5 +1,3 @@
-import type { CountryCode } from "@seams/commerce-contracts";
-
 export function requireObject(
   value: unknown,
   field: string,
@@ -8,21 +6,6 @@ export function requireObject(
     throw new Error(`${field} must be an object`);
   }
   return Object.fromEntries(Object.entries(value));
-}
-
-export function requireExactObjectKeys(
-  value: Record<string, unknown>,
-  keys: readonly string[],
-  field: string,
-): void {
-  const expected = new Set(keys);
-  const actual = Object.keys(value);
-  if (
-    actual.length !== expected.size ||
-    actual.some((key) => !expected.has(key))
-  ) {
-    throw new Error(`${field} fields are invalid`);
-  }
 }
 
 export function requireArray(
@@ -55,72 +38,11 @@ export function requireBoundedText(
   return text;
 }
 
-export function requireSha256Digest(value: unknown, field: string): string {
-  const digest = requireText(value, field);
-  if (!/^[a-f0-9]{64}$/u.test(digest))
-    throw new Error(`${field} must be a SHA-256 digest`);
-  return digest;
-}
-
-export function requireCountryCode(value: unknown, field: string): CountryCode {
-  const text = requireText(value, field);
-  if (!/^[A-Z]{2}$/u.test(text)) {
-    throw new Error(`${field} must be a two-letter uppercase country code`);
-  }
-  return text;
-}
-
-export function requireHsCode(value: unknown, field: string): string {
-  const text = requireText(value, field);
-  if (!/^\d{6,10}$/u.test(text))
-    throw new Error(`${field} must contain 6 to 10 digits`);
-  return text;
-}
-
-export function requireSha256(value: unknown, field: string): string {
-  const text = requireText(value, field);
-  if (!/^[a-f0-9]{64}$/u.test(text))
-    throw new Error(`${field} must be a SHA-256 digest`);
-  return text;
-}
-
-export function requireTimestamp(value: unknown, field: string): string {
-  const text = requireText(value, field);
-  if (!text.endsWith("Z") || Number.isNaN(Date.parse(text))) {
-    throw new Error(`${field} must be an RFC 3339 UTC timestamp`);
-  }
-  return text;
-}
-
 export function requirePositiveInteger(value: unknown, field: string): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1) {
     throw new Error(`${field} must be a positive safe integer`);
   }
   return value;
-}
-
-export function requireNonNegativeInteger(
-  value: unknown,
-  field: string,
-): number {
-  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) {
-    throw new Error(`${field} must be a non-negative safe integer`);
-  }
-  return value;
-}
-
-export function requireCurrency(value: unknown, field: string): string {
-  const text = requireText(value, field);
-  if (!/^[A-Z]{3}$/u.test(text))
-    throw new Error(`${field} must be an ISO-style currency code`);
-  return text;
-}
-
-export function requireUrl(value: unknown, field: string): string {
-  const text = requireText(value, field);
-  const parsed = new URL(text);
-  if (parsed.protocol !== "https:") throw new Error(`${field} must use HTTPS`);
-  return text;
 }
 
 export function requireEnum<const T extends string>(

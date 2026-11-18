@@ -33,7 +33,7 @@ type ExecutionRequestIdentity = {
   readonly organisationId: OrganisationId;
 };
 
-export function readCodeModeExecutionProjection(
+function readCodeModeExecutionProjection(
   sql: SqlStorage,
   executionId: string,
 ): CodeModeExecutionProjection | null {

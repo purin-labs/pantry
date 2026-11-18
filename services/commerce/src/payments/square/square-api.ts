@@ -2,7 +2,7 @@
 // and answers sorted into success, refusal and unavailability.
 import { isRecord } from "@seams/std";
 
-export const SQUARE_API_VERSION = "2026-08-19";
+const SQUARE_API_VERSION = "2026-08-19";
 
 export type SquareEnvironment = "development" | "production";
 

@@ -280,7 +280,7 @@ export function foodServiceResourceRevision(
   }
 }
 
-export function foodServiceDisplayName(
+function foodServiceDisplayName(
   input: FoodServiceResourceWrite,
 ): string {
   switch (input.kind) {
@@ -301,7 +301,7 @@ export function foodServiceDisplayName(
   }
 }
 
-export function foodServiceLifecycleState(
+function foodServiceLifecycleState(
   input: FoodServiceResourceWrite,
 ): string {
   switch (input.kind) {

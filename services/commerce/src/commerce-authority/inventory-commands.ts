@@ -41,7 +41,7 @@ export type InventoryMerchantRow = Readonly<{
   revision: number;
 }>;
 
-export type InventoryCommand =
+type InventoryCommand =
   | CreateCommerceInventoryItemV1
   | OpenCommerceInventoryPositionV1
   | ReceiveCommerceInventoryV3
@@ -73,7 +73,7 @@ export type InventoryCommitRequest =
       plan: InventoryMovementPlan;
     }>;
 
-export type InventoryCommandAuthorityOptions = Readonly<{
+type InventoryCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => InventoryMerchantRow | undefined;

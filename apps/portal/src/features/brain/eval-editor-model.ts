@@ -92,7 +92,7 @@ const two = (value: number | undefined): string =>
   String(value ?? 0).padStart(2, "0");
 
 /** A time as a clock in one zone shows it, for a date and time field. */
-export function clockInZone(epoch: number, zone: string): string {
+function clockInZone(epoch: number, zone: string): string {
   const at = clockParts(epoch, zone);
   return `${String(at.year ?? 1970).padStart(4, "0")}-${two(at.month)}-${two(at.day)}T${two(at.hour)}:${two(at.minute)}`;
 }
@@ -101,7 +101,7 @@ export function clockInZone(epoch: number, zone: string): string {
  * The time at which a clock in one zone shows `clock`, or null when the text
  * is no date and time. A time that a zone skips takes the next valid time.
  */
-export function epochFromClock(clock: string, zone: string): number | null {
+function epochFromClock(clock: string, zone: string): number | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/u.exec(clock);
   if (match === null || !isIanaTimezone(zone)) return null;
   const wanted = Date.UTC(

@@ -47,20 +47,20 @@ import {
 } from "./fulfillment-planning.ts";
 import { guardMove } from "../plugins/machine-guards.ts";
 
-export type FulfillmentMerchantRow = Readonly<{
+type FulfillmentMerchantRow = Readonly<{
   merchantId: string;
   organisationId: string;
   revision: number;
 }>;
 
-export type FulfillmentMutationCommand =
+type FulfillmentMutationCommand =
   | MarkCommercePickupReadyV1
   | CompleteCommercePickupV1
   | PurchaseShippingLabelCommand
   | AttachFulfillmentTrackingCommand
   | RecordShippingTrackingCommand;
 
-export type FulfillmentCommandAuthorityOptions = Readonly<{
+type FulfillmentCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => FulfillmentMerchantRow | undefined;
   readSnapshot: (

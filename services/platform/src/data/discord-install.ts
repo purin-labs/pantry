@@ -21,7 +21,7 @@ export type DiscordInteractionInstall = {
   status: "active";
 };
 
-export type DiscordInstallError =
+type DiscordInstallError =
   | { code: "discord_install_not_found" }
   | { code: "discord_install_invalid"; field: string };
 

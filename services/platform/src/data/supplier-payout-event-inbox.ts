@@ -42,7 +42,7 @@ export type SupplierPayoutEvent = SupplierPayoutEvidence &
 export const PAYOUT_EVENT_ATTEMPT_MATCH = `((e.target_kind = 'transfer' AND e.target_id = a.provider_transfer_id)
   OR (e.target_kind = 'request' AND e.target_id = a.request_identity))`;
 
-export type EventAdmission = Readonly<{
+type EventAdmission = Readonly<{
   outcome: "admitted" | "duplicate" | "conflict";
   event: SupplierPayoutEvent;
 }>;

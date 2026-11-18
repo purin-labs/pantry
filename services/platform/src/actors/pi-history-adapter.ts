@@ -22,7 +22,7 @@ import type {
 import type { Variant } from "@seams/type-utils";
 import { assertNever, isRecord } from "@seams/std";
 
-export type PiMaterializedHistory = {
+type PiMaterializedHistory = {
   readonly systemPrompt: string;
   readonly messages: readonly Message[];
 };

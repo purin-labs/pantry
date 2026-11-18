@@ -17,7 +17,7 @@ export type ProjectAccessScope = Readonly<{
   userId: UserId;
 }>;
 
-export type AuthorizedProject = Readonly<{
+type AuthorizedProject = Readonly<{
   projectId: ProjectId;
   access: ProjectAccess;
 }>;
@@ -126,17 +126,6 @@ function parseProjectMemberRow(row: {
   }
   return { userId: row.user_id, displayName: row.display_name, role: row.role };
 }
-
-// Parameters are organisation ID, requesting user ID, and destination project ID.
-export const PROJECT_DESTINATION_SQL = `SELECT 1 FROM project p
-  JOIN (SELECT ? AS organisation_id, ? AS user_id, ? AS project_id) target
-    ON target.organisation_id = p.organisation_id AND target.project_id = p.project_id
-  JOIN service_role_grant tm ON tm.organisation_id = target.organisation_id
-    AND tm.user_id = target.user_id AND tm.status = 'active'
-  WHERE (p.access_kind = 'personal' AND p.user_id = tm.user_id)
-    OR (p.access_kind = 'shared' AND EXISTS (
-      SELECT 1 FROM project_member member WHERE member.organisation_id = p.organisation_id
-        AND member.project_id = p.project_id AND member.user_id = tm.user_id))`;
 
 export async function listProjectCandidates(
   db: OrganisationDatabase,

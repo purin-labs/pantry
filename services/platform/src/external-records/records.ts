@@ -39,7 +39,7 @@ export async function discoverAirtableBases(
   return { ok: true, value: bases };
 }
 
-export type AirtableRecordsRead = Readonly<{
+type AirtableRecordsRead = Readonly<{
   kind: "airtable_records";
   baseId: string;
   tableId: string;
@@ -48,15 +48,15 @@ export type AirtableRecordsRead = Readonly<{
   limit: number;
 }>;
 
-export type NotionSearchRead = Readonly<{
+type NotionSearchRead = Readonly<{
   kind: "notion_search";
   query: string | null;
   limit: number;
 }>;
 
-export type ExternalRecordsRead = AirtableRecordsRead | NotionSearchRead;
+type ExternalRecordsRead = AirtableRecordsRead | NotionSearchRead;
 
-export type ExternalRecordSummary = Readonly<{
+type ExternalRecordSummary = Readonly<{
   id: string;
   title: string;
   url: string | null;
@@ -64,14 +64,14 @@ export type ExternalRecordSummary = Readonly<{
   fields: Readonly<Record<string, string | number | boolean | null>>;
 }>;
 
-export type ExternalRecordsResult = Readonly<{
+type ExternalRecordsResult = Readonly<{
   kind: "external_records";
   provider: ExternalRecordsProvider;
   items: readonly ExternalRecordSummary[];
   truncated: boolean;
 }>;
 
-export type ExternalProviderIdentity = Readonly<{
+type ExternalProviderIdentity = Readonly<{
   provider: ExternalRecordsProvider;
   providerAccountId: string;
   displayName: string;

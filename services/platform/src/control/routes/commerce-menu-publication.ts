@@ -277,7 +277,7 @@ async function readCafeMenuOptions(
 }
 
 /** Commerce serves each shop's café page at `/shops/<merchantId>`. */
-export function hostedShopUrl(env: Env, merchantId: string): string | null {
+function hostedShopUrl(env: Env, merchantId: string): string | null {
   const base = env.UNDERCLERK_BASE_URL?.trim();
   if (base === undefined || base.length === 0) return null;
   return `${base.replace(/\/+$/u, "")}/shops/${encodeURIComponent(merchantId)}`;

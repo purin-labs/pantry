@@ -213,7 +213,7 @@ function organisationPath(organisationId: string): string {
 }
 
 /** The playbooks and agents that the Knowledge view lists. It changes neither. */
-export type AgentKnowledge = Readonly<{
+type AgentKnowledge = Readonly<{
   playbooks: readonly Skill[];
   agents: readonly AgentDefinition[];
 }>;

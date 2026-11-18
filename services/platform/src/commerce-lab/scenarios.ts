@@ -31,7 +31,7 @@ export type CommerceLabIdempotencyKey = string & {
   readonly [commerceLabIdempotencyKeyBrand]: "CommerceLabIdempotencyKey";
 };
 
-export type CommerceLabScenarioEventSpec =
+type CommerceLabScenarioEventSpec =
   | {
       readonly eventType: "product_listed";
       readonly resourceId: "product_field_watch";
@@ -188,7 +188,7 @@ export type CommerceLabPublicationProposal =
       readonly providerEventId: string;
     };
 
-export type CommerceLabScenario = {
+type CommerceLabScenario = {
   readonly scenarioId: CommerceLabScenarioId;
   readonly scenarioVersion: typeof COMMERCE_LAB_SCENARIO_VERSION;
   readonly catalogVersion: typeof COMMERCE_LAB_CATALOG_VERSION;
@@ -214,7 +214,7 @@ export type CommerceLabScenario = {
       };
 };
 
-export type CommerceLabScenarioRun = {
+type CommerceLabScenarioRun = {
   readonly runId: string;
   readonly scenarioId: CommerceLabScenarioId;
   readonly scenarioVersion: typeof COMMERCE_LAB_SCENARIO_VERSION;
@@ -227,9 +227,9 @@ export type CommerceLabScenarioRun = {
   readonly publicationProposal: CommerceLabPublicationProposal;
 };
 
-export type CommerceLabScenarioRunEvent = LabEventV1;
+type CommerceLabScenarioRunEvent = LabEventV1;
 
-export type CommerceLabScenarioError =
+type CommerceLabScenarioError =
   | { readonly code: "scenario_id_invalid" }
   | { readonly code: "idempotency_key_invalid" }
   | { readonly code: "started_at_invalid" };
@@ -306,7 +306,7 @@ function orderPreparationEvents(
   ];
 }
 
-export const COMMERCE_LAB_SCENARIOS = [
+const COMMERCE_LAB_SCENARIOS = [
   {
     scenarioId: "product-listing",
     scenarioVersion: COMMERCE_LAB_SCENARIO_VERSION,
@@ -564,7 +564,7 @@ export function parseCommerceLabIdempotencyKey(
   return { ok: true, value: raw as CommerceLabIdempotencyKey };
 }
 
-export function getCommerceLabScenario(
+function getCommerceLabScenario(
   scenarioId: CommerceLabScenarioId,
 ): CommerceLabScenario {
   for (const scenario of COMMERCE_LAB_SCENARIOS) {

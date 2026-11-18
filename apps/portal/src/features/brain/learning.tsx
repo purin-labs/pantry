@@ -10,7 +10,7 @@ import {
 } from "./learning-model";
 
 /** Where the parts of the Learning view lead. */
-export type LearningLinks = Readonly<{
+type LearningLinks = Readonly<{
   /** The Knowledge list, limited to what is in use or not limited. */
   knowledgeHref: (inUse: boolean) => string;
   onOpenKnowledge: (inUse: boolean) => void;
@@ -20,7 +20,7 @@ export type LearningLinks = Readonly<{
   onOpenEvent: (event: LearningEvent) => void;
 }>;
 
-export const LEARNING_LOG_ID = "brain-learning-log";
+const LEARNING_LOG_ID = "brain-learning-log";
 
 const CARD_WIDTH = 264;
 const CARD_HEIGHT = 64;

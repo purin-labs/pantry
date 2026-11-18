@@ -1,34 +1,37 @@
 import type { Variant } from "@seams/type-utils";
-import {
-  type CommerceInvalidTransition,
-} from "@seams/commerce-contracts";
-import {
-  type CommerceQuantityUnit,
-  type CommerceFulfillmentV1,
-  type CommerceInventoryItemV1,
-  type CommerceInventoryLotV1,
-  type CommerceInventoryMovementV1,
-  type CommerceInventoryPositionV1,
-  type CommerceLocationV1,
-  type CommerceOfferV1,
-  type CommerceOrderV1,
-  type CommercePaymentV1,
-  type CommerceProductV1,
-  type CommerceSalesChannelV1,
-  type CommerceShipmentV1,
-  type CommerceEngineTimestamp,
-  type CommerceVariantV1,
+import type { CommerceInvalidTransition } from "@seams/commerce-contracts";
+import type {
+  CommerceQuantityUnit,
+  CommerceFulfillmentV1,
+  CommerceInventoryItemV1,
+  CommerceInventoryLotV1,
+  CommerceInventoryMovementV1,
+  CommerceInventoryPositionV1,
+  CommerceLocationV1,
+  CommerceOfferV1,
+  CommerceOrderV1,
+  CommercePaymentV1,
+  CommerceProductV1,
+  CommerceSalesChannelV1,
+  CommerceShipmentV1,
+  CommerceEngineTimestamp,
+  CommerceVariantV1,
 } from "./commerce-resources.ts";
-import {
-  type CommerceEntityPlaneObservationV1,
+import type {
+  CommerceEntityPlaneObservationV1,
 } from "./entity-plane/parsers.ts";
-import {
-  type CommerceFoodServiceObservationV1,
-} from "./food-service.ts";
+import type { CommerceFoodServiceObservationV1 } from "./food-service.ts";
 import {
   requireObject,
 } from "./wire-readers.ts";
-import { parseAcknowledgeCommerceDeliveryV1 as parseAcknowledgeCommerceDeliveryV1Record, parseCommerceDeliveryV1 as parseCommerceDeliveryV1Record, parseCommerceDeliveryAcknowledgementV1 as parseCommerceDeliveryAcknowledgementV1Record, parseCommerceMutationErrorV1 as parseCommerceMutationErrorV1Record, parseCommerceMutationReceiptV1 as parseCommerceMutationReceiptV1Record, parseCommerceMutationResultV1 as parseCommerceMutationResultV1Record, parseCommerceReceivedDeliveryV1 as parseCommerceReceivedDeliveryV1Record } from "@seams/commerce-contracts/records/api-mutations";
+import {
+  parseAcknowledgeCommerceDeliveryV1 as parseAcknowledgeCommerceDeliveryV1Record,
+  parseCommerceDeliveryV1 as parseCommerceDeliveryV1Record,
+  parseCommerceDeliveryAcknowledgementV1 as parseCommerceDeliveryAcknowledgementV1Record,
+  parseCommerceMutationErrorV1 as parseCommerceMutationErrorV1Record,
+  parseCommerceMutationReceiptV1 as parseCommerceMutationReceiptV1Record,
+  parseCommerceMutationResultV1 as parseCommerceMutationResultV1Record,
+} from "@seams/commerce-contracts/records/api-mutations";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import type * as contracts from "@seams/commerce-contracts/records/api-mutations";
 
@@ -356,10 +359,6 @@ export function parseOptionalReceipt(
 
 function parseMutationError(value: unknown): CommerceMutationErrorV1 {
   return decodeRecord(parseCommerceMutationErrorV1Record, value);
-}
-
-export function parseReceivedDelivery(value: unknown): CommerceReceivedDeliveryV1 {
-  return decodeRecord(parseCommerceReceivedDeliveryV1Record, value);
 }
 
 export function parseRejectedMutation(

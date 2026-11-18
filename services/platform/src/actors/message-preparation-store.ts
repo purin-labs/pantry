@@ -22,7 +22,7 @@ type MessagePreparationCompleted = Variant<
   "completed"
 >;
 
-export type MessagePreparationStoreError =
+type MessagePreparationStoreError =
   | { readonly code: "message_preparation_input_invalid" }
   | { readonly code: "message_preparation_state_invalid" }
   | { readonly code: "message_preparation_receipt_invalid" }

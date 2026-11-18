@@ -56,7 +56,7 @@ import { PermissionRequestQueue } from "./permission-request-queue";
 import { refreshPermissionRequests } from "../../permission-requests-summary";
 import { AiBudgetRaisePrompt } from "./ai-budget-raise";
 
-export type AccessRouteProps = Readonly<{
+type AccessRouteProps = Readonly<{
   organisationId: string;
   subview: AccessSubview;
   paths: Readonly<Record<AccessSubview, string>>;

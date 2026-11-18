@@ -95,7 +95,7 @@ export const CODE_MODE_EXCHANGE_LIMITS: CodeModeExchangeLimits = {
 /** An upper estimate of one journal entry without a global's content. */
 const JOURNAL_ENTRY_BYTES = 96;
 
-export type GovernedCodeModeRemoteInput = {
+type GovernedCodeModeRemoteInput = {
   readonly remote: () => CodemodeRemote;
   readonly gate: CodeModeExchangeGate;
   readonly limits?: CodeModeExchangeLimits;

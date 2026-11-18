@@ -208,7 +208,7 @@ export async function createSessionGoalExecution(
   return { control, close: closeExecution.bind(null, context, binding, owner) };
 }
 
-export type TransientGoalExecution = {
+type TransientGoalExecution = {
   readonly control: GoalModelCallControl;
   readonly state: { stop: GoalModelStop | null };
   close(): Promise<void>;

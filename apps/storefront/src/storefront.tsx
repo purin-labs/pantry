@@ -855,7 +855,7 @@ type ShippingConfiguration = Readonly<{
   name: "Nuki Cookie Post";
 }>;
 
-export type StorefrontConfiguration = CafeConfiguration | ShippingConfiguration;
+type StorefrontConfiguration = CafeConfiguration | ShippingConfiguration;
 
 const CAFE_CONFIGURATION: CafeConfiguration = {
   kind: "cafe",
@@ -4674,7 +4674,7 @@ export class StorefrontApp extends React.Component<
   }
 }
 
-export function shippingDutyMessage(
+function shippingDutyMessage(
   incoterm: "not_applicable" | "ddp" | "dap",
 ): string {
   switch (incoterm) {
@@ -5464,7 +5464,7 @@ type CheckoutViewCopy = Readonly<{
   paymentNote: string;
 }>;
 
-export function CheckoutView(
+function CheckoutView(
   props: Readonly<{
     eyebrow: string;
     title: string;
@@ -9259,7 +9259,7 @@ export function orderNeedsPolling(order: CommerceBuyerOrderV1): boolean {
   }
 }
 
-export function paymentReviewIsActive(
+function paymentReviewIsActive(
   disputes: readonly CommerceBuyerPaymentDisputeStatusV1[],
 ): boolean {
   for (const dispute of disputes) {

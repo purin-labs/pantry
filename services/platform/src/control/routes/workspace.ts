@@ -56,11 +56,11 @@ type HomeActionActivity = Pick<
       }>;
   }>;
 
-export const HOME_VIEW_SCHEMA_VERSION = "satyr.cafeos.home.v1" as const;
+const HOME_VIEW_SCHEMA_VERSION = "satyr.cafeos.home.v1" as const;
 const HOME_ATTENTION_LIMIT = 5;
 const HOME_BLOCKER_LIMIT = 8;
 
-export type HomeView = {
+type HomeView = {
   readonly schemaVersion: typeof HOME_VIEW_SCHEMA_VERSION;
   readonly generatedAt: number;
   readonly home: {

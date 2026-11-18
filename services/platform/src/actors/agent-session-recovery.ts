@@ -29,7 +29,7 @@ type RecoveryBuildError = {
   readonly reason: string;
 };
 
-export type ResumableSessionRecovery = Omit<RecoveringSession, "action"> & {
+type ResumableSessionRecovery = Omit<RecoveringSession, "action"> & {
   action: Variant<SessionRecoveryAction, "resume_task">;
 };
 

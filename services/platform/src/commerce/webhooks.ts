@@ -33,7 +33,7 @@ const MAXIMUM_BODY_BYTES = 64 * 1_024;
 const QUEUED_READ_MS = 60_000;
 const textEncoder = new TextEncoder();
 
-export type CommerceWebhookSubscriptionOutcome =
+type CommerceWebhookSubscriptionOutcome =
   "current" | "subscribed" | "rotated" | "restarted" | "unavailable";
 
 /**

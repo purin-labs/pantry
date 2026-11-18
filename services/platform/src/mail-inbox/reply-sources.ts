@@ -4,7 +4,7 @@ import type { EmailCommerceEvidence } from "./supplier-context";
 /** The most citations that one draft may carry. More are dropped. */
 export const MAX_REPLY_CITATIONS = 12;
 /** The longest run of the draft's words that one citation may name. */
-export const MAX_REPLY_SPAN_CHARS = 600;
+const MAX_REPLY_SPAN_CHARS = 600;
 
 /**
  * A source that a Portal chat read: a connector, a file or the commerce

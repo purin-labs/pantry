@@ -19,7 +19,7 @@ import {
   jsonBodyErrorResponse,
 } from "./support";
 
-export type CueStatusRow = {
+type CueStatusRow = {
   cueId: unknown;
   nativeId: unknown;
   decision: unknown;
@@ -28,7 +28,7 @@ export type CueStatusRow = {
   at: unknown;
 };
 
-export type CueStatusEntry = {
+type CueStatusEntry = {
   cueId: string;
   nativeId: string;
   decision: "matched" | "proposed" | "store_only";
@@ -37,7 +37,7 @@ export type CueStatusEntry = {
   at: number;
 };
 
-export type CueStatusSource = "stripe" | "shopify" | "slack";
+type CueStatusSource = "stripe" | "shopify" | "slack";
 
 export async function handleCueStatus(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") {
@@ -122,7 +122,7 @@ export async function handleCueStatus(request: Request, env: Env): Promise<Respo
   });
 }
 
-export function parseCueStatusEntry(
+function parseCueStatusEntry(
   raw: CueStatusRow,
 ): Result<CueStatusEntry, { code: "cue_status_row_invalid" }> {
   if (
@@ -150,12 +150,12 @@ export function parseCueStatusEntry(
   };
 }
 
-export function isCueAcceptanceDecision(
+function isCueAcceptanceDecision(
   raw: unknown,
 ): raw is CueStatusEntry["decision"] {
   return raw === "matched" || raw === "proposed" || raw === "store_only";
 }
 
-export function isCueStatusSource(raw: string): raw is CueStatusSource {
+function isCueStatusSource(raw: string): raw is CueStatusSource {
   return raw === "stripe" || raw === "shopify" || raw === "slack";
 }

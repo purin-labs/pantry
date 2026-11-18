@@ -102,13 +102,6 @@ export function pluginOfRoute(routeKind: string): BuiltInPlugin | undefined {
   return ROUTE_OWNERS.get(routeKind);
 }
 
-/** The plugins that depend on `pluginId`. */
-export function dependentsOf(pluginId: string): readonly BuiltInPlugin[] {
-  return BUILT_IN_PLUGINS.filter((plugin) =>
-    plugin.requirements.dependsOn.includes(pluginId),
-  );
-}
-
 /** Every command that a built-in plugin commits through the ledger. */
 export type BuiltInPluginCommand =
   | CollectionsCommand

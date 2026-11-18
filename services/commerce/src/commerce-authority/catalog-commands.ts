@@ -67,7 +67,7 @@ export type CatalogMerchantRow = Readonly<{
   revision: number;
 }>;
 
-export type CatalogCommand =
+type CatalogCommand =
   | CreateCommerceLocationV1
   | PrepareCommerceCatalogListingV1
   | UpdateCommerceProductDescriptionV1
@@ -132,7 +132,7 @@ export type CatalogCommitRequest =
       plan: ProductDeletionPlan;
     }>;
 
-export type CatalogCommandAuthorityOptions = Readonly<{
+type CatalogCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => CatalogMerchantRow | undefined;
   readSnapshot: (

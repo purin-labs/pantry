@@ -30,9 +30,9 @@ import {
 } from "./identity";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 
-export const CUSTOM_CONNECTOR_VALIDATOR_VERSION = "definition-v1";
+const CUSTOM_CONNECTOR_VALIDATOR_VERSION = "definition-v1";
 
-export type CustomConnectorDraftDocument = {
+type CustomConnectorDraftDocument = {
   readonly value: JsonObject;
   readonly canonicalJson: string;
   readonly digest: CustomConnectorAuthoringDigest;

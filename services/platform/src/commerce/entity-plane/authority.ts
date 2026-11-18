@@ -14,7 +14,6 @@ import type {
   CommerceGraphQuery,
   CommerceSensitivity,
   PantryCommerceReadAuthority,
-  CommerceContextRequest,
   CommerceListEntryRef,
   SavedCommerceViewId,
   SavedCommerceViewRevision,
@@ -37,7 +36,7 @@ import { isCommerceSensitivity, sensitivityAtMost } from "../sensitivity";
 
 export type CommerceGraphReadAuthority = PantryCommerceReadAuthority;
 
-export type CommerceGraphAuthorityError = CommerceEntityPlaneError;
+type CommerceGraphAuthorityError = CommerceEntityPlaneError;
 
 export function buildCommerceListEntryCommandAuthority(
   input: Readonly<{
@@ -463,7 +462,7 @@ function freshnessKey(value: CommerceFreshness): string {
   }
 }
 
-export function sameEntityRef(
+function sameEntityRef(
   left: CommerceEntityRef,
   right: CommerceEntityRef,
 ): boolean {
@@ -647,10 +646,4 @@ function denied(
     default:
       return { ok: false, error: { code: "parse", reason: code } };
   }
-}
-
-export function contextRequest(
-  query: CommerceGraphQuery,
-): CommerceContextRequest | null {
-  return query.kind === "underclerk_context" ? query : null;
 }

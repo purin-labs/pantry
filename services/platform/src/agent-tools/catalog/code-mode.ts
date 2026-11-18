@@ -127,53 +127,53 @@ import type {
 
 export const MAX_CODE_MODE_SOURCE_BYTES = 64 * 1024;
 
-export async function unavailableAttachmentInspect(): Promise<MessageAttachmentInspectResult> {
+async function unavailableAttachmentInspect(): Promise<MessageAttachmentInspectResult> {
   throw new Error("message attachment inspection is unavailable");
 }
 
-export async function unavailableMessageLinkRead(): Promise<MessageLinkReadResult> {
+async function unavailableMessageLinkRead(): Promise<MessageLinkReadResult> {
   throw new Error("public link reading is unavailable");
 }
 
-export async function unavailableFileSearch(): Promise<
+async function unavailableFileSearch(): Promise<
   readonly FileSearchToolResult[]
 > {
   throw new Error("file search is unavailable");
 }
 
-export async function unavailableFileRead(): Promise<FileReadToolResult> {
+async function unavailableFileRead(): Promise<FileReadToolResult> {
   throw new Error("file read is unavailable");
 }
 
-export async function unavailableEmailMailboxSearch(): Promise<HarnessEmailMailboxSearchResult> {
+async function unavailableEmailMailboxSearch(): Promise<HarnessEmailMailboxSearchResult> {
   throw new Error("Email mailbox search is unavailable");
 }
 
-export async function unavailableEmailReplyPropose(): Promise<HarnessEmailReplyProposalReceipt> {
+async function unavailableEmailReplyPropose(): Promise<HarnessEmailReplyProposalReceipt> {
   throw new Error("Email reply proposal is unavailable");
 }
 
-export async function unavailableEmailReplyDraft(): Promise<HarnessEmailReplyDraft> {
+async function unavailableEmailReplyDraft(): Promise<HarnessEmailReplyDraft> {
   throw new Error("Email reply drafts are unavailable");
 }
 
-export async function unavailableProductionPlan(): Promise<HarnessProductionPlan> {
+async function unavailableProductionPlan(): Promise<HarnessProductionPlan> {
   throw new Error("Production plans are unavailable");
 }
 
-export async function unavailableEmailOperationalPropose(): Promise<HarnessEmailOperationalProposalReceipt> {
+async function unavailableEmailOperationalPropose(): Promise<HarnessEmailOperationalProposalReceipt> {
   throw new Error("Operational email proposal is unavailable");
 }
 
-export async function unavailableSlackMessagePropose(): Promise<HarnessSlackMessageProposalReceipt> {
+async function unavailableSlackMessagePropose(): Promise<HarnessSlackMessageProposalReceipt> {
   throw new Error("Slack message drafting is unavailable");
 }
 
-export async function unavailableWhatsAppSupportRead(): Promise<HarnessWhatsAppSupportInbox> {
+async function unavailableWhatsAppSupportRead(): Promise<HarnessWhatsAppSupportInbox> {
   throw new Error("WhatsApp support read is unavailable");
 }
 
-export async function unavailableWhatsAppSupportReplySend(): Promise<HarnessWhatsAppSupportReplyReceipt> {
+async function unavailableWhatsAppSupportReplySend(): Promise<HarnessWhatsAppSupportReplyReceipt> {
   throw new Error("WhatsApp support reply send is unavailable");
 }
 
@@ -523,9 +523,9 @@ export async function createCatalogHarnessCodeMode(input: {
 }
 
 /** The capabilities that each call of this host claimed, by call ID. */
-export type ClaimedCapabilities = Map<string, Set<HarnessCapabilityName>>;
+type ClaimedCapabilities = Map<string, Set<HarnessCapabilityName>>;
 
-export async function recordCapabilityClaim(
+async function recordCapabilityClaim(
   claimed: ClaimedCapabilities,
   claimCapability: HarnessCapabilityClaim,
   input: HarnessCapabilityClaimInput,
@@ -539,7 +539,7 @@ export async function recordCapabilityClaim(
   return result;
 }
 
-export function readClaimedCapabilities(
+function readClaimedCapabilities(
   claimed: ClaimedCapabilities,
   callId: string,
 ): readonly string[] {
@@ -550,7 +550,7 @@ export function readClaimedCapabilities(
  * A recorded source is a name from storage. It counts only when this turn's
  * catalog still allows the capability, and current authority still grants it.
  */
-export async function authorizeRecordedSources(
+async function authorizeRecordedSources(
   allowed: readonly HarnessCapabilityName[],
   authorizeSources: HarnessSourceAuthorization | undefined,
   capabilities: readonly string[],
@@ -569,14 +569,14 @@ export async function authorizeRecordedSources(
   return authorizeSources(sources);
 }
 
-export function sameCapability(
+function sameCapability(
   name: string,
   capability: HarnessCapabilityName,
 ): boolean {
   return capability === name;
 }
 
-export function capabilityFromResourceScope(
+function capabilityFromResourceScope(
   scope: string,
 ): HarnessCapabilityName | null {
   const match = /^platform:(.+):1$/u.exec(scope);
@@ -614,7 +614,7 @@ export function capabilityFromResourceScope(
   }
 }
 
-export function capabilityFromProviderResourceScope(
+function capabilityFromProviderResourceScope(
   scope: string,
 ): HarnessCapabilityName | null {
   const providerPrefix = "provider:";
@@ -681,7 +681,7 @@ export function capabilityFromProviderResourceScope(
   }
 }
 
-export function capabilityFromFileResourceScope(
+function capabilityFromFileResourceScope(
   scope: string,
 ): HarnessCapabilityName | null {
   const parsed = parseCapabilityKey(scope);
@@ -692,7 +692,7 @@ export function capabilityFromFileResourceScope(
     : null;
 }
 
-export function compareCapabilities(
+function compareCapabilities(
   left: HarnessCapabilityName,
   right: HarnessCapabilityName,
 ): number {

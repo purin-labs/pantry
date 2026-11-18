@@ -3,7 +3,7 @@ import type { StoredMessageAttachment } from "@seams/contracts";
 import { validateStoredMessageAttachment } from "./message-wasm";
 import type { Result } from "../result";
 
-export type StoredAttachmentParseError = { code: "invalid_stored_attachment" };
+type StoredAttachmentParseError = { code: "invalid_stored_attachment" };
 
 /**
  * Revalidates one persisted attachment.

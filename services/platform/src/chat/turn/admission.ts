@@ -354,7 +354,7 @@ export async function admitTurn(
   };
 }
 
-export function retryIsAlreadyActive(
+function retryIsAlreadyActive(
   conversation: Conversation,
   requestId: string,
 ): boolean {
@@ -405,19 +405,19 @@ export function userMessageMatchesCommand(
   );
 }
 
-export function isTextPart(
+function isTextPart(
   part: PendingChatInput["parts"][number],
 ): part is Variant<PendingChatInput["parts"][number], "text"> {
   return part.kind === "text";
 }
 
-export function readTextPart(
+function readTextPart(
   part: Variant<PendingChatInput["parts"][number], "text">,
 ): string {
   return part.text;
 }
 
-export type Withdrawal =
+type Withdrawal =
   | {
       readonly ok: true;
       readonly kind: "replay" | "admitted";

@@ -15,7 +15,7 @@ import {
 import { checkpointMatchesCheckpointingState } from "./agent-session-text-turn";
 import { readSessionTurnReplay } from "./agent-session-turn-stream";
 
-export type AcceptedCheckpointFinalization = {
+type AcceptedCheckpointFinalization = {
   readonly current: Variant<AgentSessionLifecycle, "checkpointing">;
   readonly checkpoint: HarnessCheckpointRecord;
   readonly publication: HarnessCheckpointPublication;

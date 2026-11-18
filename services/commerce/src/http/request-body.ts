@@ -1,7 +1,7 @@
 import type { CommerceDemoProfile } from "@seams/commerce-client";
 import { jsonResponse } from "./responses.ts";
 
-export type JsonBodyResult =
+type JsonBodyResult =
   | Readonly<{ ok: true; value: unknown }>
   | Readonly<{ ok: false; response: Response }>;
 

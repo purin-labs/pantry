@@ -1,9 +1,9 @@
 import { isRecord } from "@seams/std";
 import type { PendingCommerceApproval } from "./portal-types";
 
-export const PENDING_COMMERCE_APPROVAL_STORAGE_KEY = "satyr:commerce-approval";
+const PENDING_COMMERCE_APPROVAL_STORAGE_KEY = "satyr:commerce-approval";
 
-export const PENDING_COMMERCE_APPROVAL_MAX_AGE_MS = 10 * 60 * 1000;
+const PENDING_COMMERCE_APPROVAL_MAX_AGE_MS = 10 * 60 * 1000;
 
 export function currentPortalPath(): string {
   return `${window.location.pathname}${window.location.search}${window.location.hash}`;

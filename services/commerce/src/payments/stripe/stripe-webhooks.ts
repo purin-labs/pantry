@@ -14,7 +14,7 @@ import { parseStripeDisputeEvent } from "./stripe-disputes.ts";
 /** Stripe's default tolerance for the signed timestamp. */
 const TOLERANCE_SECONDS = 300;
 
-export type StripePaymentNotification =
+type StripePaymentNotification =
   | Readonly<{
       kind: "payment_attempt";
       eventId: string;

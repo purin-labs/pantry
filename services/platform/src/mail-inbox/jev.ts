@@ -12,8 +12,8 @@ import type { JevError } from "../integrations/typesafe/system-one-client";
 import type { Result } from "../result";
 import type { TypeSafeUsageMeasurement } from "../integrations/typesafe/evaluation-ledger";
 
-export type MailDecision = Readonly<{ ruleId: string; outcome: MailMatch }>;
-export type MailEvaluation = Readonly<{
+type MailDecision = Readonly<{ ruleId: string; outcome: MailMatch }>;
+type MailEvaluation = Readonly<{
   decisions: readonly MailDecision[];
   usage: TypeSafeUsageMeasurement;
 }>;

@@ -112,7 +112,7 @@ export type ConnectorCaseTurnStreamError =
     }
   | { readonly kind: "operational"; readonly code: string };
 
-export type ConnectorCaseTurnStreamSession = Pick<
+type ConnectorCaseTurnStreamSession = Pick<
   SessionDO,
   "replayStream" | "readSessionTurnFlowBinding"
 >;

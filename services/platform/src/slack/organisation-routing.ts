@@ -37,7 +37,7 @@ import { parseSlackUserId, type SlackUserId } from "./events";
 import type { Variant } from "@seams/type-utils";
 import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
 
-export type SlackInstallationSeed = {
+type SlackInstallationSeed = {
   readonly installationId: SlackInstallationId;
   readonly environment: OrganisationEnvironment;
   readonly appId: SlackAppId;
@@ -49,7 +49,7 @@ export type SlackInstallationSeed = {
   readonly installedAt: number;
 };
 
-export type SlackOrganisationConnectionSeed = {
+type SlackOrganisationConnectionSeed = {
   readonly connectionId: SlackOrganisationConnectionId;
   readonly installationId: SlackInstallationId;
   readonly organisationId: OrganisationId;
@@ -57,7 +57,7 @@ export type SlackOrganisationConnectionSeed = {
   readonly connectedAt: number;
 };
 
-export type SlackInstallationResolution =
+type SlackInstallationResolution =
   | { readonly kind: "available" }
   | {
       readonly kind: "existing";
@@ -100,7 +100,7 @@ export type SlackChannelDefault = {
   readonly boundAt: number;
 };
 
-export type SlackChannelDefaultChangeError = {
+type SlackChannelDefaultChangeError = {
   readonly code:
     | "slack_channel_default_conflict"
     | "slack_channel_destination_inactive"
@@ -149,7 +149,7 @@ export type ResolvedSlackThreadRoute = {
   readonly placement: OrganisationPlacement | null;
 };
 
-export type SlackThreadRouteResolution =
+type SlackThreadRouteResolution =
   | { readonly kind: "resolved"; readonly value: ResolvedSlackThreadRoute }
   | { readonly kind: "unbound" }
   | {
@@ -164,7 +164,7 @@ export type SlackThreadRouteResolution =
         | "routing_record_corrupt";
     };
 
-export type ActiveSlackDestinationConnection = {
+type ActiveSlackDestinationConnection = {
   readonly installationId: SlackInstallationId;
   readonly connectionId: SlackOrganisationConnectionId;
   readonly integrationAccountId: IntegrationAccountId;

@@ -181,7 +181,7 @@ export type InboxWhatsAppSource =
       refused: PermissionRequired | null;
     }>;
 
-export type InboxRead = Readonly<{
+type InboxRead = Readonly<{
   /** Null when the email source could not be read. */
   replies: readonly EmailReplyQueueItem[] | null;
   unanswered: readonly InboxUnansweredThread[];
@@ -224,7 +224,7 @@ export async function readInbox(
 }
 
 /** The result of a reply that a person wrote. Gmail may not confirm it. */
-export type MailPersonReplyResult = "sent" | "send_indeterminate";
+type MailPersonReplyResult = "sent" | "send_indeterminate";
 
 /**
  * Sends a person's reply. The caller keeps one idempotency key for the
@@ -268,10 +268,7 @@ export async function disableMailAgent(
   );
 }
 
-export function mailAgentPath(
-  organisationId: string,
-  accountId: string,
-): string {
+function mailAgentPath(organisationId: string, accountId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/agent-mailboxes/${encodeURIComponent(accountId)}`;
 }
 
@@ -325,12 +322,12 @@ export async function readMailInbox(
   return result;
 }
 
-export function isCsrfCookie(cookie: string): boolean {
+function isCsrfCookie(cookie: string): boolean {
   return cookie.startsWith("satyr_control_csrf=");
 }
 
 /** A write needs the session's CSRF cookie: without one the person signs in again. */
-export function requireSession(): void {
+function requireSession(): void {
   if (!document.cookie.split("; ").some(isCsrfCookie))
     throw new Error("Your session expired. Sign in again.");
 }

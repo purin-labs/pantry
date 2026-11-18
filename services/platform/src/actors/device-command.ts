@@ -12,7 +12,7 @@ import { writeActorTransition } from "./lifecycle/state-transition";
 export type DeviceCommandKind = "pause" | "resume";
 type DeviceCommandState = keyof typeof DEVICE_COMMAND_MACHINE.states;
 
-export type DeviceCommandRow = Readonly<{
+type DeviceCommandRow = Readonly<{
   command_id: string;
   gateway_id: string;
   device_id: string;
@@ -131,7 +131,7 @@ export function markDeviceCommandSent(
     );
 }
 
-export type DeviceCommandAnswer =
+type DeviceCommandAnswer =
   | Readonly<{ kind: "unknown" }>
   | Readonly<{ kind: "ignored" }>
   | Readonly<{

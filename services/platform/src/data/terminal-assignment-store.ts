@@ -17,7 +17,7 @@ import type { Result } from "../result";
  * terminal must not orphan a collection that is still unresolved — and the
  * operator surface has to be able to explain what a payment was taken on.
  */
-export type TerminalAssignmentError = Readonly<{
+type TerminalAssignmentError = Readonly<{
   code:
     | "terminal_assignment_not_found"
     | "terminal_assignment_corrupt"

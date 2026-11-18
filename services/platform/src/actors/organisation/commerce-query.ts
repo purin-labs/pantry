@@ -101,14 +101,11 @@ export function validateOrganisationCommercePlan(
 
 // Plans carry i64 attribute values as bigints, which may exceed the JSON-safe
 // range @seams/std's sameJson enforces, so they compare as decimal text.
-export function samePlan(
-  left: CommerceQueryPlan,
-  right: CommerceQueryPlan,
-): boolean {
+function samePlan(left: CommerceQueryPlan, right: CommerceQueryPlan): boolean {
   return planText(left) === planText(right);
 }
 
-export function planText(plan: CommerceQueryPlan): string {
+function planText(plan: CommerceQueryPlan): string {
   return JSON.stringify(plan, (_key, value: unknown) =>
     typeof value === "bigint" ? value.toString() : value,
   );

@@ -186,7 +186,7 @@ export type ActorActivationResult = Result<
   | { readonly code: "activation_placement_conflict" }
 >;
 
-export type ActorReservation = {
+type ActorReservation = {
   readonly identity: ActorIdentity;
   readonly admission: ActorPlacementAdmission;
   readonly schemaVersion: number;
@@ -1123,10 +1123,7 @@ export function newWarmActorSlotName(
 }
 
 /** Whether the name is a warm slot of the identity's Organisation and kind. */
-export function isWarmActorSlotName(
-  name: string,
-  identity: ActorIdentity,
-): boolean {
+function isWarmActorSlotName(name: string, identity: ActorIdentity): boolean {
   return (
     (identity.objectKind === "case" || identity.objectKind === "session") &&
     isWarmActorSlotNameOf(name, identity.organisationId, identity.objectKind)

@@ -160,7 +160,7 @@ export type BakerySurfaceEffectSettlement =
         | "surface_effect_authority_invalid";
     }>;
 
-export type PendingBakerySurfaceEffect = Readonly<{
+type PendingBakerySurfaceEffect = Readonly<{
   effect: BakerySurfaceEffectV1;
 }>;
 

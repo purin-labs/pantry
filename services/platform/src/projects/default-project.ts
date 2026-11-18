@@ -8,7 +8,7 @@ import { assertNever, sha256Hex } from "@seams/std";
 import type { OrganisationQuerySource } from "../data/query-source";
 import type { OrganisationId, UserId } from "../ids";
 
-export const BASE_PROJECT_NAME = "Base";
+const BASE_PROJECT_NAME = "Base";
 
 // Provisioning can repeat. One identifier per Organisation makes every attempt
 // converge on the same Project instead of leaving a second one behind.
@@ -78,7 +78,7 @@ export function prepareBaseProject(
   return statements;
 }
 
-export function baseProjectRole(role: OnboardingControlRole): ProjectRole {
+function baseProjectRole(role: OnboardingControlRole): ProjectRole {
   switch (role) {
     case "owner":
     case "admin":

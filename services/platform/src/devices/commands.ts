@@ -48,7 +48,7 @@ export const DEVICE_COMMAND_ROLE: Readonly<
   revoke: "admin",
 };
 
-export type DeviceCommandResult =
+type DeviceCommandResult =
   | Readonly<{ ok: true; receiptId: string; replayed: boolean }>
   | Readonly<{
       ok: false;

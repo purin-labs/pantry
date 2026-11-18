@@ -30,16 +30,16 @@ type OrganisationWorkspaceBinding = {
   readonly createdAt: number;
 };
 
-export type OrganisationWorkspaceError =
+type OrganisationWorkspaceError =
   | WorkspaceRevisionStoreError
   | { readonly code: "organisation_workspace_binding_failed" }
   | { readonly code: "organisation_workspace_binding_corrupt" };
 
-export type OrganisationWorkspacePortalAddressError =
+type OrganisationWorkspacePortalAddressError =
   | { readonly code: "organisation_workspace_portal_address_missing" }
   | { readonly code: "organisation_workspace_portal_address_corrupt" };
 
-export type OrganisationWorkspacePortalAddress = Readonly<{
+type OrganisationWorkspacePortalAddress = Readonly<{
   organisationHandle: OrganisationHandle;
   workspaceHandle: WorkspaceHandle;
 }>;

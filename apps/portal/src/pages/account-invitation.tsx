@@ -9,7 +9,7 @@ type Invitation = Readonly<{
   token: string;
 }>;
 
-export type AccountInvitationRoute =
+type AccountInvitationRoute =
   | Readonly<{ kind: "none"; invitation?: never }>
   | Readonly<{ kind: "invalid"; invitation?: never }>
   | Readonly<{ kind: "link_failed"; retryHref: string; invitation?: never }>

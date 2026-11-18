@@ -1,6 +1,6 @@
 import { OpenObject, PositiveInteger } from "./schema.ts";
 import { Type, type StaticDecode } from "typebox";
-import { type StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@seams/type-utils";
 import { commerceEntityRefSchema } from "./entity-reference.ts";
 import {
   commerceFilterSchema,
@@ -62,7 +62,7 @@ export const commerceAggregationSchema = Type.Union([
     }),
   }),
 ]);
-export const commerceSelectorQuerySchema = Type.Union([
+const commerceSelectorQuerySchema = Type.Union([
   OpenObject({
     kind: Type.Literal("entity_by_ref"),
     reference: commerceEntityRefSchema,
@@ -126,7 +126,7 @@ export const publishedCommerceSelectorSchema = OpenObject({
 export type PublishedCommerceSelector = StaticDecode<
   typeof publishedCommerceSelectorSchema
 >;
-export const entitySeedsContextSelectionSchema = OpenObject({
+const entitySeedsContextSelectionSchema = OpenObject({
   kind: Type.Literal("entity_seeds"),
   seeds,
 });

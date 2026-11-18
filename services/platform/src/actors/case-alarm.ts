@@ -88,7 +88,7 @@ function abandonedAssignmentDue(sql: SqlStorage, now: number): number | null {
  * When the oldest active assignment becomes old enough to abandon, or null
  * when the Case has none. The time can be in the past.
  */
-export function oldestAssignmentAbandonAt(sql: SqlStorage): number | null {
+function oldestAssignmentAbandonAt(sql: SqlStorage): number | null {
   const times = activeAssignmentTimes(sql);
   if (times.length === 0) return null;
   return Math.min(...times) + ASSIGNMENT_ABANDON_AFTER_MS;
@@ -99,10 +99,7 @@ export function oldestAssignmentAbandonAt(sql: SqlStorage): number | null {
  * the one that the Case waits for, and each waiting approval that the Case
  * no longer waits for, as after the Case was archived during the wait.
  */
-export function commerceApprovalWaitDue(
-  sql: SqlStorage,
-  now: number,
-): number | null {
+function commerceApprovalWaitDue(sql: SqlStorage, now: number): number | null {
   const requested = openCommerceApprovals(sql, now).map(
     (approval) => approval.requestedAt,
   );

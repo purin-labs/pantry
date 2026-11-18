@@ -76,7 +76,7 @@ async function cafeShopClient(
 }
 
 /** One image of the shop's media library, as an agent names it. */
-export type CafeImage = Readonly<{ mediaId: string; altText: string }>;
+type CafeImage = Readonly<{ mediaId: string; altText: string }>;
 
 /**
  * The images of an Organisation's shop library, for an agent that places
@@ -96,7 +96,7 @@ export async function readCafeImages(
   }));
 }
 
-export type CafeImageDeletion = Result<
+type CafeImageDeletion = Result<
   Readonly<{ mediaId: string }>,
   | Readonly<{ code: "media_on_board"; boards: readonly string[] }>
   | Readonly<{

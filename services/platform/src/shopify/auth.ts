@@ -2,12 +2,12 @@ import type { Result } from "../result";
 import type { VaultSecret } from "../credential-vault";
 import { isRecord } from "@seams/std";
 
-export type ShopifyClientCredentials = {
+type ShopifyClientCredentials = {
   clientId: string;
   clientSecret: string;
 };
 
-export type ShopifyAdminAccess = {
+type ShopifyAdminAccess = {
   accessToken: string;
   expiresAt: number;
   scopes: readonly string[];

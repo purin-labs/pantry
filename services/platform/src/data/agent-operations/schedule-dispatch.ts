@@ -45,7 +45,7 @@ export async function listEnabledScheduleBindings(
   return rows.map(parseScheduleBindingRow);
 }
 
-export function scheduleBindingColumnsFor(alias: string): string {
+function scheduleBindingColumnsFor(alias: string): string {
   return `${alias}.binding_id AS bindingId, ${alias}.organisation_id AS organisationId,
     ${alias}.area_id AS areaId, ${alias}.scope_ids_json AS scopeIds,
     ${alias}.installation_id AS installationId,

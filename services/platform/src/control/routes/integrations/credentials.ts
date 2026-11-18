@@ -242,7 +242,7 @@ export async function handleRevokeAccountCredential(
   });
 }
 
-export const CREDENTIAL_ROTATION_PROVIDERS = [
+const CREDENTIAL_ROTATION_PROVIDERS = [
   "airtable",
   "notion",
   "stripe",

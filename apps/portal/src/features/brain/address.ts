@@ -185,7 +185,7 @@ function brainPage(
     : pageAddress(location);
 }
 
-export type BrainNavigation = Readonly<{
+type BrainNavigation = Readonly<{
   address: BrainAddress;
   /** The link to an address, for a tab or a row. */
   href: (address: BrainAddress) => string;

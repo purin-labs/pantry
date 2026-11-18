@@ -316,6 +316,6 @@ function pickupElements(title: string): MenuBoardElement[] {
   ];
 }
 
-export function elementId(): string {
+function elementId(): string {
   return `element_${crypto.randomUUID().replaceAll("-", "").slice(0, 16)}`;
 }

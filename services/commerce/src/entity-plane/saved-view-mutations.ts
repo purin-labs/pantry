@@ -15,13 +15,13 @@ import {
   type CommandRequest,
 } from "./receipt-outbox-settlement.ts";
 
-export type StoredSavedViewRow = Readonly<{
+type StoredSavedViewRow = Readonly<{
   revision: number;
   lifecycleState: "draft" | "published" | "archived";
   definitionJson: string;
 }>;
 
-export type SavedViewMutationsOptions = Readonly<{
+type SavedViewMutationsOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   settlement: EntityPlaneSettlement;

@@ -18,12 +18,12 @@ import type { Result } from "../result";
 import type { AuthorizedOrganisationRequest } from "./authorization";
 import { readOrganisationEnvironment } from "./organisation-runtime";
 
-export type ControlCommerceGraph = Readonly<{
+type ControlCommerceGraph = Readonly<{
   reader: CommerceGraphReader;
   merchantId: string;
 }>;
 
-export type ControlCommerceGraphError = Readonly<{
+type ControlCommerceGraphError = Readonly<{
   code:
     | CommerceSystemError["code"]
     | "organisation_not_found"

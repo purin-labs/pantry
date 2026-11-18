@@ -1,13 +1,9 @@
 import {
   StrictObject,
-  parseContract,
-  type ContractDecodeResult,
-  type ContractRejection,
   NonNegativeInteger as generation,
 } from "@seams/commerce-contracts/schema";
 import { Type, type Static } from "typebox";
-import type { TLocalizedValidationError } from "typebox/error";
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever } from "@seams/std";
 import type { StrictUnion } from "@seams/type-utils";
 
 export const modelRouteSchema = Type.Union([
@@ -38,12 +34,6 @@ export const modelRouteSchema = Type.Union([
 ]);
 
 export type ModelRoute = StrictUnion<Static<typeof modelRouteSchema>>;
-
-export function parseModelRoute(
-  value: unknown,
-): ContractDecodeResult<ModelRoute> {
-  return parseContract(modelRouteSchema, value, invalidRoute);
-}
 
 /** serde writes the tag first, followed by fields in Rust declaration order. */
 export function encodeModelRoute(route: ModelRoute): string {
@@ -79,16 +69,4 @@ export function encodeModelRoute(route: ModelRoute): string {
     default:
       return assertNever(route);
   }
-}
-
-export function digestModelRoute(route: ModelRoute): Promise<string> {
-  return sha256Hex(encodeModelRoute(route));
-}
-
-function invalidRoute(_issue: TLocalizedValidationError): ContractRejection {
-  return {
-    code: "invalid_input",
-    reason: "invalid model route",
-    details: null,
-  };
 }

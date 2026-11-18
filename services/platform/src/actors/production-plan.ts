@@ -64,7 +64,7 @@ type StoredPlan = Readonly<{
 }>;
 type PlanResult<T> = Result<T, Readonly<{ code: PlanFailureCode }>>;
 
-export type ProductionPlanRead = Readonly<{
+type ProductionPlanRead = Readonly<{
   locationId: string;
   /** 0 before anyone opened or edited the plan. */
   revision: number;
@@ -74,7 +74,7 @@ export type ProductionPlanRead = Readonly<{
  * The Slack thread or Portal chat that an owner or admin shared with a
  * location's plan. An agent edit from it may reach every role (Plan 40D).
  */
-export type ProductionPlanShare =
+type ProductionPlanShare =
   | Readonly<{
       kind: "slack_thread";
       caseId: string;
@@ -95,7 +95,7 @@ export type ProductionPlanShare =
  * edit may carry into the plan what only that person may read, because that
  * person shared the conversation with every role that reads the plan.
  */
-export type ProductionPlanSharedTarget = ProductionPlanShare &
+type ProductionPlanSharedTarget = ProductionPlanShare &
   Readonly<{ approverPersonId: string }>;
 
 export type ProductionPlanAgentEdit = Readonly<{

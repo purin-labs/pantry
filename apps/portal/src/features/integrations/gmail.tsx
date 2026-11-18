@@ -177,7 +177,7 @@ export function matchesGmailMailboxEntry(
  * It keeps every other query parameter and drops the hash, so the list link
  * also leaves a review that the hash had opened.
  */
-export function gmailMailboxHref(
+function gmailMailboxHref(
   pathname: string,
   search: string,
   accountId: string | null,
@@ -194,7 +194,7 @@ export function gmailMailboxHref(
  * live in a mailbox's own view, so the link opens the mailbox that owns the
  * proposal.
  */
-export function emailReviewAccountId(
+function emailReviewAccountId(
   hash: string,
   replies: readonly EmailReplyQueueItem[],
   operational: readonly EmailOperationalQueueItem[],
@@ -219,7 +219,7 @@ export function emailReviewAccountId(
  * Focus moves to the new view, so a keyboard or screen-reader user lands on
  * it. The first render leaves focus where the dialog put it.
  */
-export function focusGmailViewAfterSwitch(
+function focusGmailViewAfterSwitch(
   previous: React.RefObject<string | null | undefined>,
   shownId: string | null,
 ): void {
@@ -263,7 +263,7 @@ export function mailboxAgentName(
   );
 }
 
-export function matchesMailboxInstallation(
+function matchesMailboxInstallation(
   installationId: string,
   option: MailboxInstallationOption,
 ): boolean {
@@ -295,7 +295,7 @@ export function gmailMailboxEntrySummary(
 }
 
 /** The second line of a list row: who answers the mail, and what waits. */
-export function gmailMailboxRowDetail(
+function gmailMailboxRowDetail(
   panel: GmailIntegrationPanelProps,
   entry: GmailMailboxEntry,
 ): string {
@@ -320,7 +320,7 @@ export function gmailMailboxRowDetail(
  * The list view: one row for each connection and nothing that changes a
  * mailbox. A row opens that mailbox's own view.
  */
-export function GmailMailboxList(props: {
+function GmailMailboxList(props: {
   readonly panel: GmailIntegrationPanelProps;
   readonly entries: readonly GmailMailboxEntry[];
   readonly pathname: string;
@@ -428,7 +428,7 @@ export function GmailMailboxList(props: {
   );
 }
 
-export function renderGmailMailboxRow(
+function renderGmailMailboxRow(
   panel: GmailIntegrationPanelProps,
   pathname: string,
   search: string,
@@ -467,7 +467,7 @@ export function settingsEmailReviewFeedback(
   );
 }
 
-export function emailReviewOrganisationMutation(
+function emailReviewOrganisationMutation(
   mutation: EmailReviewMutation,
 ): OrganisationMutation {
   switch (mutation.kind) {
@@ -488,7 +488,7 @@ export function emailReviewOrganisationMutation(
   }
 }
 
-export function focusEmailReviewFromLocationHash(): void {
+function focusEmailReviewFromLocationHash(): void {
   const encodedId = window.location.hash.slice(1);
   if (!encodedId.startsWith("email-review-")) return;
   let id: string;

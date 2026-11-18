@@ -178,7 +178,7 @@ function itemResponse(item: OnePasswordItem): OnePasswordResponse {
 }
 
 /** The item as the Vault page shows it: never a password. */
-export function itemView(item: OnePasswordItem): VaultItemView | null {
+function itemView(item: OnePasswordItem): VaultItemView | null {
   const common = {
     itemId: item.id,
     store: "onepassword" as const,

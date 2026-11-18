@@ -257,7 +257,7 @@ export async function adjustOfferPriceRoute(
  * A refusal is 409 rather than 400: the request was well formed, and what it
  * asked for was refused by the merchant's own policy or by state that moved.
  */
-export function offerPriceResponse(
+function offerPriceResponse(
   result: OfferPriceCommandResult<unknown>,
 ): Response {
   return result.ok
@@ -268,11 +268,11 @@ export function offerPriceResponse(
       });
 }
 
-export function offerPriceBadRequest<T>(message: string): ParsedBody<T> {
+function offerPriceBadRequest<T>(message: string): ParsedBody<T> {
   return { ok: false, response: jsonResponse(400, { message }) };
 }
 
-export function parseSetOfferPricePolicyBody(
+function parseSetOfferPricePolicyBody(
   body: unknown,
   merchantId: string,
   offerId: string,
@@ -322,7 +322,7 @@ export function parseSetOfferPricePolicyBody(
   };
 }
 
-export function parseDisableOfferPricePolicyBody(
+function parseDisableOfferPricePolicyBody(
   body: unknown,
   merchantId: string,
   offerId: string,

@@ -100,23 +100,23 @@ export type MenuBoardCommand =
       controlSessionId: ControlSessionId;
     }>;
 
-export type MenuBoardVersionsResult = Result<
+type MenuBoardVersionsResult = Result<
   Readonly<{ versions: readonly MenuBoardVersionSummary[] }>,
   MenuBoardEditError
 >;
 
-export type MenuBoardCommentsResult = Result<
+type MenuBoardCommentsResult = Result<
   Readonly<{ threads: readonly MenuBoardCommentThread[] }>,
   MenuBoardEditError
 >;
 
-export type MenuScreenFeedRead = Readonly<{
+type MenuScreenFeedRead = Readonly<{
   screen: Readonly<{ screenId: string; name: string }>;
   release: MenuBoardRelease | null;
 }>;
 
 /** The result of each command kind. */
-export type MenuBoardCommandResults = Readonly<{
+type MenuBoardCommandResults = Readonly<{
   list_boards: Result<
     Readonly<{
       boards: readonly MenuBoardSummary[];

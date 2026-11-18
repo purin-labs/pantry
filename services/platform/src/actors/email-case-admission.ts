@@ -20,7 +20,7 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
  * the agent later through the purpose-bound read tools.
  */
 
-export type EmailCaseAdmissionInput = Readonly<{
+type EmailCaseAdmissionInput = Readonly<{
   scope: OrganisationExecutionScope;
   organisationId: string;
   integrationAccountId: string;
@@ -35,7 +35,7 @@ export type EmailCaseAdmissionInput = Readonly<{
   subject: string | null;
 }>;
 
-export type EmailCaseAdmissionError = { readonly code: string };
+type EmailCaseAdmissionError = { readonly code: string };
 
 export async function admitEmailThreadCase(
   env: Env,

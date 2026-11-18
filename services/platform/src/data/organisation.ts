@@ -94,12 +94,12 @@ export type InstallLivenessRecord = {
   lastEventReceivedAt: number | null;
 };
 
-export type InstallLookupKey = {
+type InstallLookupKey = {
   surfaceKind: SurfaceKind;
   workspaceId: WorkspaceId;
 };
 
-export type InstallLookupError = {
+type InstallLookupError = {
   code: "install_not_found";
   surfaceKind: SurfaceKind;
 };

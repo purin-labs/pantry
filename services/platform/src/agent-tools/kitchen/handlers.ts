@@ -65,7 +65,7 @@ import {
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
-export function stepFacts(document: BakeryWorkflowDocument) {
+function stepFacts(document: BakeryWorkflowDocument) {
   const steps = [];
   const arrows = [];
   const seed = draftSeed(document);
@@ -210,12 +210,12 @@ export async function readRecipeWorkflowForEmbeddedHarness(
   return value;
 }
 
-export const RECIPE_LIBRARY_SCOPE = "recipe-library:shop";
+const RECIPE_LIBRARY_SCOPE = "recipe-library:shop";
 
-export const SUPPLIER_DIRECTORY_SCOPE = "supplier-directory:shop";
+const SUPPLIER_DIRECTORY_SCOPE = "supplier-directory:shop";
 
 /** The Suppliers page shows this many, and so does the agent's read. */
-export const SUPPLIER_READ_LIMIT = 100;
+const SUPPLIER_READ_LIMIT = 100;
 
 export async function readRecipesForEmbeddedHarness(
   context: SessionToolContext,
@@ -394,7 +394,7 @@ export async function readSuppliersForEmbeddedHarness(
   return value;
 }
 
-export type SupplierAttributes =
+type SupplierAttributes =
   Awaited<ReturnType<typeof readNamedCommerceQuery>> extends infer Read
     ? Read extends {
         ok: true;
@@ -406,7 +406,7 @@ export type SupplierAttributes =
       : never
     : never;
 
-export function supplierEntryText(
+function supplierEntryText(
   attributes: SupplierAttributes,
   attributeId: string,
 ): string | null {
@@ -418,9 +418,7 @@ export function supplierEntryText(
     : null;
 }
 
-export function supplierEntryDecimal(
-  attributes: SupplierAttributes,
-): string | null {
+function supplierEntryDecimal(attributes: SupplierAttributes): string | null {
   const value = attributes.find(
     (attribute) => attribute.attributeId === "minimum_order_quantity",
   )?.value;
@@ -538,7 +536,7 @@ export async function createSupplierForEmbeddedHarness(
   });
 }
 
-export function recipeSaveRefusal(saved: RecipeSaveResult): string | null {
+function recipeSaveRefusal(saved: RecipeSaveResult): string | null {
   if (saved.ok) {
     return null;
   }
@@ -558,7 +556,7 @@ export function recipeSaveRefusal(saved: RecipeSaveResult): string | null {
   }
 }
 
-export function supplierRefusal(error: SupplierRegistrationError): string {
+function supplierRefusal(error: SupplierRegistrationError): string {
   switch (error.code) {
     case "invalid":
       return `${error.detail ?? "The supplier fields are invalid"}. Nothing changed. Correct the fields, or ask the person.`;

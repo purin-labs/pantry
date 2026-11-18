@@ -10,7 +10,7 @@ import {
 import { isRecord } from "@seams/std";
 import { ControlApiError } from "./control-client";
 
-export type ExecutionTransport = Readonly<{
+type ExecutionTransport = Readonly<{
   read: (path: string) => Promise<unknown>;
 }>;
 

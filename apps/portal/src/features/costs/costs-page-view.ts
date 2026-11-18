@@ -23,7 +23,7 @@ import { formatCostQuantity } from "./api";
 import type { PresetId, ProjectedCostsSheet } from "./costs-sheet-draft";
 
 /** The values that the Costs & margins page computes for one render. */
-export type CostsPageSnapshot = Readonly<{
+type CostsPageSnapshot = Readonly<{
   state: Readonly<{
     tab: CostsSheetTab;
     sectionFilter: string;
@@ -146,7 +146,7 @@ const TABS_SECTION: PortalPageViewSection = {
   table: null,
 };
 
-export function costsPageView(
+function costsPageView(
   snapshot: CostsPageSnapshot,
   path: string,
 ): PortalPageViewV1 {

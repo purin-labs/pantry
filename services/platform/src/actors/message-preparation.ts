@@ -23,7 +23,7 @@ import {
 import type { Variant } from "@seams/type-utils";
 import { isRecord } from "@seams/std";
 
-export const MESSAGE_PREPARATION_HANDLER_REVISION = "message-preparation.v1";
+const MESSAGE_PREPARATION_HANDLER_REVISION = "message-preparation.v1";
 export const MESSAGE_PREPARATION_LIMITS: MessageAttachmentPreparationLimits = {
   maxInputBytes: 25 * 1024 * 1024,
   maxOutputBytes: 36 * 1024 * 1024,
@@ -50,7 +50,7 @@ type PreparedAttachment = {
 export type MessagePreparationAttempt =
   { readonly kind: "initial" } | { readonly kind: "recovery" };
 
-export type MessagePreparationMaterializer = (
+type MessagePreparationMaterializer = (
   deadlineAt: number,
   attempt: MessagePreparationAttempt,
 ) => Promise<readonly AttachmentInput[]>;

@@ -41,7 +41,7 @@ export function isMovedRegistryEntry(entry: ActorRegistryEntry): boolean {
   );
 }
 
-export function isQuarantinedRegistryEntry(
+function isQuarantinedRegistryEntry(
   entry: ActorRegistryEntry,
 ): entry is QuarantinedRegistryEntry {
   return entry.lifecycleStatus === "quarantined";

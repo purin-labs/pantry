@@ -78,7 +78,7 @@ type ReconciledFile = Readonly<{
   readonly deepLink: string;
 }>;
 
-export type ProviderReconciliation =
+type ProviderReconciliation =
   | Readonly<{ readonly kind: "unavailable" }>
   | Readonly<{
       readonly kind: "unchanged";

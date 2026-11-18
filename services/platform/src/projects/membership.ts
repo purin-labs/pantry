@@ -18,11 +18,11 @@ import type { ChatDisclosureFailure } from "@seams/control-api";
 import { checkProjectHistoryDisclosure } from "../chat/conversation-sharing";
 import { listProjectMembers } from "./access";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
-import {
-  type ProjectAccessCommand,
-  type ProjectId,
-  type ProjectRole,
-  type UserId,
+import type {
+  ProjectAccessCommand,
+  ProjectId,
+  ProjectRole,
+  UserId,
 } from "@seams/control-api";
 import {
   assertNever,
@@ -36,7 +36,7 @@ import { prepareReturnPrivateChatsToDefault } from "./case-project";
 import { readProject } from "./records";
 import { observeProjectReference } from "./references";
 
-export type ProjectAccessResult =
+type ProjectAccessResult =
   | ChatDisclosureFailure
   | Readonly<{ kind: "accepted"; accessRevision: number }>
   | Readonly<{

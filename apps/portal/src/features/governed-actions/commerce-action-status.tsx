@@ -117,7 +117,7 @@ export function CommerceActionStatus(input: {
   );
 }
 
-export function ActionDecisionControls(props: {
+function ActionDecisionControls(props: {
   readonly approve: () => Promise<void>;
   readonly reject: () => Promise<void>;
   readonly disabled: boolean;
@@ -176,7 +176,7 @@ export function ActionDecisionControls(props: {
   );
 }
 
-export function resetActionDecisionAfterDelay(
+function resetActionDecisionAfterDelay(
   decision: "idle" | "confirm_rejection",
   setDecision: React.Dispatch<
     React.SetStateAction<"idle" | "confirm_rejection">
@@ -190,9 +190,9 @@ export function resetActionDecisionAfterDelay(
   return window.clearTimeout.bind(window, timer);
 }
 
-export function noCleanup(): void {}
+function noCleanup(): void {}
 
-export function setActionDecision(
+function setActionDecision(
   setDecision: React.Dispatch<
     React.SetStateAction<"idle" | "confirm_rejection">
   >,
@@ -201,7 +201,7 @@ export function setActionDecision(
   setDecision(decision);
 }
 
-export function commerceSystemName(system: "satyr_commerce" | "shopify"): string {
+function commerceSystemName(system: "satyr_commerce" | "shopify"): string {
   switch (system) {
     case "satyr_commerce":
       return "Seams Checkout";
@@ -212,7 +212,7 @@ export function commerceSystemName(system: "satyr_commerce" | "shopify"): string
   }
 }
 
-export function commerceActionAuthorityName(
+function commerceActionAuthorityName(
   authority: CommerceActionRecord["commerceSystem"],
 ): string {
   switch (authority.kind) {
@@ -254,7 +254,7 @@ export function commerceActionDetailSummary(details: CommerceActionDetails): str
   }
 }
 
-export function focusCommerceAction(
+function focusCommerceAction(
   heading: React.RefObject<HTMLHeadingElement | null>,
 ): void {
   heading.current?.focus({ preventScroll: true });
@@ -522,7 +522,7 @@ export function renderCommerceActionChange(
   }
 }
 
-export function commerceCancellationApprovalGuidance(
+function commerceCancellationApprovalGuidance(
   execution: Variant<CommerceActionDetails, "cancel_order">["execution"],
 ): string {
   switch (execution.kind) {
@@ -537,7 +537,7 @@ export function commerceCancellationApprovalGuidance(
   }
 }
 
-export function commerceCancellationReasonLabel(
+function commerceCancellationReasonLabel(
   reason: Variant<CommerceActionDetails, "cancel_order">["reason"],
 ): string {
   switch (reason) {
@@ -552,7 +552,7 @@ export function commerceCancellationReasonLabel(
   }
 }
 
-export function commerceRefundLabel(
+function commerceRefundLabel(
   refund: Variant<CommerceActionDetails, "cancel_order">["refund"],
 ): string {
   switch (refund) {
@@ -565,7 +565,7 @@ export function commerceRefundLabel(
   }
 }
 
-export type PluginPreviewState =
+type PluginPreviewState =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "ready"; preview: MerchantPluginPreview }>
   | Readonly<{ kind: "unavailable" }>;
@@ -575,7 +575,7 @@ export type PluginPreviewState =
  * card opens: each refusal message with the number of checkouts it would
  * refuse, and each failure.
  */
-export function MerchantPluginPreviewPanel(input: {
+function MerchantPluginPreviewPanel(input: {
   readonly read: () => Promise<MerchantPluginPreview>;
 }): React.ReactNode {
   const [state, setState] = React.useState<PluginPreviewState>({
@@ -632,7 +632,7 @@ export function MerchantPluginPreviewPanel(input: {
   );
 }
 
-export function readPluginPreviewOnce(
+function readPluginPreviewOnce(
   read: () => Promise<MerchantPluginPreview>,
   setState: (state: PluginPreviewState) => void,
 ): () => void {
@@ -650,11 +650,11 @@ export function readPluginPreviewOnce(
   };
 }
 
-export function checkoutCount(checkouts: number): string {
+function checkoutCount(checkouts: number): string {
   return checkouts === 1 ? "1 checkout" : `${checkouts} checkouts`;
 }
 
-export function merchantPluginSettingText(
+function merchantPluginSettingText(
   value: MerchantPluginSettingDetails["value"],
 ): string {
   if (Array.isArray(value)) return value.join(", ");
@@ -662,7 +662,7 @@ export function merchantPluginSettingText(
 }
 
 /** One line for the provider's receipt: who settled the change, and when. */
-export function renderCommerceReceiptLine(
+function renderCommerceReceiptLine(
   receipt: CommerceProviderReceipt | null,
 ): React.ReactNode {
   if (receipt === null) return null;

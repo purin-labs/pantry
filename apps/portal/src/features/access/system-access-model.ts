@@ -121,14 +121,6 @@ export function levelLabel(level: AccessLevel): string {
   }
 }
 
-export function recipientsWithAccess(system: AccessSystem): number {
-  let count = 0;
-  for (const recipient of system.recipients) {
-    if (recipient.level !== "paused") count += 1;
-  }
-  return count;
-}
-
 export function recipientsWhoCanChange(system: AccessSystem): number {
   let count = 0;
   for (const recipient of system.recipients) {

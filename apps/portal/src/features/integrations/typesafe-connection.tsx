@@ -15,9 +15,7 @@ export type TypeSafeConnectionState =
   | Readonly<{ kind: "failed"; message: string }>
   | Readonly<{ kind: "ready"; configuration: Configuration }>;
 
-export type SetState = React.Dispatch<
-  React.SetStateAction<TypeSafeConnectionState>
->;
+type SetState = React.Dispatch<React.SetStateAction<TypeSafeConnectionState>>;
 
 export function useTypeSafeConnection(
   organisationId: string,
@@ -186,18 +184,15 @@ export function TypeSafeConnectionPanel(props: {
   );
 }
 
-export function path(organisationId: string): string {
+function path(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/integrations/typesafe`;
 }
 
-export function retryConnection(
-  organisationId: string,
-  setState: SetState,
-): void {
+function retryConnection(organisationId: string, setState: SetState): void {
   void reloadConnection(organisationId, setState);
 }
 
-export function loadConnection(
+function loadConnection(
   organisationId: string,
   canManage: boolean,
   setState: SetState,
@@ -208,7 +203,7 @@ export function loadConnection(
   return controller.abort.bind(controller);
 }
 
-export async function reloadConnection(
+async function reloadConnection(
   organisationId: string,
   setState: SetState,
   signal?: AbortSignal,
@@ -225,7 +220,7 @@ export async function reloadConnection(
   }
 }
 
-export function submitConnection(
+function submitConnection(
   organisationId: string,
   revision: number,
   setState: SetState,
@@ -246,7 +241,7 @@ export function submitConnection(
   void runMutation(organisationId, body, setState, setBusy, setMessage);
 }
 
-export async function runMutation(
+async function runMutation(
   organisationId: string,
   body: Readonly<Record<string, unknown>>,
   setState: SetState,
@@ -278,7 +273,7 @@ export async function runMutation(
   }
 }
 
-export function csrfCookie(): string | null {
+function csrfCookie(): string | null {
   for (const part of document.cookie.split(";")) {
     const value = part.trim();
     if (value.startsWith("satyr_control_csrf="))
@@ -288,7 +283,7 @@ export function csrfCookie(): string | null {
 }
 
 /** An answer, or the body of a refusal: its error code names the problem. */
-export function readResponse(raw: unknown): unknown {
+function readResponse(raw: unknown): unknown {
   if (!isRecord(raw) || raw.ok !== true) {
     const code =
       isRecord(raw) && typeof raw.error === "string" ? raw.error : "";
@@ -328,7 +323,7 @@ export function readResponse(raw: unknown): unknown {
   return raw.value;
 }
 
-export function problem(error: unknown): string {
+function problem(error: unknown): string {
   return error instanceof Error
     ? error.message
     : "The connection could not be updated.";

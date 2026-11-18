@@ -86,7 +86,7 @@ export function mediaObjectKey(merchantId: string, sha256: string): string {
   return `merchants/${merchantId}/media/${sha256}`;
 }
 
-export type MediaUploadOutcome =
+type MediaUploadOutcome =
   | Readonly<{ kind: "stored"; upload: CommerceMediaUploadV1 }>
   | Readonly<{ kind: "refused"; status: 413 | 415; message: string }>;
 

@@ -47,7 +47,7 @@ export type ScheduleRun = Readonly<{
   caseId: string | null;
 }>;
 
-export type ScheduleLanesProps = Readonly<{
+type ScheduleLanesProps = Readonly<{
   control: PeriodControl;
   now: number | null;
   agents: readonly ScheduledAgent[];

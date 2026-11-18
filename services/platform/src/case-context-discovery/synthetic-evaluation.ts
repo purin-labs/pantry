@@ -28,7 +28,7 @@ import {
 } from "./evaluation-store";
 
 // This evaluator accepts only the fixed public fixture.
-export const SYNTHETIC_CASE_CONTEXT_DISCOVERY_COMPARISON = {
+const SYNTHETIC_CASE_CONTEXT_DISCOVERY_COMPARISON = {
   evidence:
     "Synthetic supplier S-1 reports flour delivery PR-842, shipment 1, is delayed today.",
   candidates: [
@@ -50,7 +50,7 @@ export const SYNTHETIC_CASE_CONTEXT_DISCOVERY_COMPARISON = {
   ],
 } as const;
 
-export type CaseContextDiscoverySyntheticResult = Readonly<{
+type CaseContextDiscoverySyntheticResult = Readonly<{
   receipt: TypeSafeEvaluationReceipt;
   evaluation: JevEvaluation | null;
 }>;

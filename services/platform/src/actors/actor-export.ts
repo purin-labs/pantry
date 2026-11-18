@@ -43,7 +43,7 @@ export type PortableStateValue =
       readonly entries: readonly PortableActorEntry[];
     };
 
-export type PortableActorEntry = {
+type PortableActorEntry = {
   readonly key: string;
   readonly value: PortableStateValue;
 };
@@ -59,7 +59,7 @@ export type ActorImportSqlMigration = {
   complete(sql: SqlStorage): void;
 };
 
-export type ActorExportKvEntry = {
+type ActorExportKvEntry = {
   readonly key: string;
   readonly value: PortableStateValue;
 };
@@ -212,7 +212,7 @@ export function createActorImportSchema(sql: SqlStorage): void {
   );
 }
 
-export function createUserIdentityRestoreReceiptSchema(sql: SqlStorage): void {
+function createUserIdentityRestoreReceiptSchema(sql: SqlStorage): void {
   sql.exec(`CREATE TABLE IF NOT EXISTS user_identity_restore (
     singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
     export_digest TEXT NOT NULL, mapping_digest TEXT NOT NULL,

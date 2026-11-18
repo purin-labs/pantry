@@ -4,9 +4,9 @@ import { loadVisual, preloadVisual } from "./physics-asset-loader";
 import humanPatissierUrl from "../../../../../../assets/bakery-living/human-patissier.glb?url";
 import botanicalPlantersUrl from "../../../../../../assets/bakery-living/botanical-planters.glb?url";
 
-export const HUMAN_PATISSIER_GLB_SHA256 =
+const HUMAN_PATISSIER_GLB_SHA256 =
   "ae7bdcdb270932b4dd430b9a53640275691f77ae55fbc6873038abf06e50d9ae";
-export const BOTANICAL_PLANTERS_GLB_SHA256 =
+const BOTANICAL_PLANTERS_GLB_SHA256 =
   "4d3aeea2326cb10f2f21badd9aba9174e0798c341061840b79dd65b4838c7ddf";
 
 export type LivingAssetTemplates = Readonly<{
@@ -17,21 +17,6 @@ export type LivingAssetTemplates = Readonly<{
 let cachedTemplates: LivingAssetTemplates | null = null;
 let loadingPromise: Promise<LivingAssetTemplates> | null = null;
 const readyListeners = new Set<() => void>();
-
-export function getCachedLivingAssets(): LivingAssetTemplates | null {
-  return cachedTemplates;
-}
-
-export function onLivingAssetsReady(listener: () => void): () => void {
-  if (cachedTemplates !== null) {
-    listener();
-    return () => {};
-  }
-  readyListeners.add(listener);
-  return () => {
-    readyListeners.delete(listener);
-  };
-}
 
 export function ensureLivingAssetsLoaded(
   signal?: AbortSignal,

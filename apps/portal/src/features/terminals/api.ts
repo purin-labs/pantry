@@ -117,6 +117,6 @@ export async function retireTerminalCounter(
   );
 }
 
-export function terminalOperationsPath(organisationId: string): string {
+function terminalOperationsPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/terminal-operations`;
 }

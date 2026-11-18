@@ -29,7 +29,7 @@ export type StripeWebhookError =
   | { code: "stripe_event_unsupported" }
   | VaultResolveError;
 
-export type StripeWebhookRegistration =
+type StripeWebhookRegistration =
   | {
       kind: "created";
       endpointId: string;
@@ -42,7 +42,7 @@ export type StripeWebhookRegistration =
       status: "enabled";
     };
 
-export type StripeWebhookRegistrationError =
+type StripeWebhookRegistrationError =
   | { code: "stripe_registration_failed"; status: number }
   | { code: "stripe_registration_transport_failed" }
   | { code: "stripe_registration_invalid" }

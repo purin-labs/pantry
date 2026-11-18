@@ -76,7 +76,7 @@ export type SlackCaseIngressRoute = Pick<
   | "routingSource"
 >;
 
-export type SlackCaseIngressRouting =
+type SlackCaseIngressRouting =
   | { readonly kind: "routed"; readonly route: ResolvedSlackThreadRoute }
   | Variant<SlackCaseIngressAdmission, "rejected" | "retry">;
 
@@ -269,7 +269,7 @@ function undecided(code: string): SlackCaseIngress {
 }
 
 /** A read of one message's ingress records, started before its scope was known. */
-export type SlackCaseIngressRead = {
+type SlackCaseIngressRead = {
   readonly database: D1Database;
   readonly row: Promise<SlackCaseIngressRow | null>;
 };
@@ -664,7 +664,7 @@ export async function resolveSlackIngressCredentialAtPlacement(input: {
   }
 }
 
-export async function resolveSlackIngressCredential(input: {
+async function resolveSlackIngressCredential(input: {
   readonly keys: CredentialVaultBindings;
   readonly scope: OrganisationExecutionScope;
   readonly route: Pick<

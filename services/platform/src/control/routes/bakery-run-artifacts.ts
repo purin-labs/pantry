@@ -95,9 +95,7 @@ let lastParsedRun: Readonly<{
 const MAX_CACHED_DOCUMENT_BYTES = 4 * 1024 * 1024;
 
 /** Persistence boundary only. Embedded older snapshots remain readable. */
-export async function preparedArtifactRun(
-  raw: unknown,
-): Promise<PreparedRun | null> {
+async function preparedArtifactRun(raw: unknown): Promise<PreparedRun | null> {
   const snapshot = parseRunSnapshot(raw);
   if (snapshot === null || snapshot.kind !== "persistent-production")
     return null;

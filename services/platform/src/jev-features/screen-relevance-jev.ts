@@ -30,7 +30,7 @@ export type ScreenRelevanceState = Readonly<{
   }>;
 }>;
 
-export type ScreenRelevanceScores = Readonly<{
+type ScreenRelevanceScores = Readonly<{
   aboutScreen: number;
   fitsChat: number;
   usage: Readonly<{

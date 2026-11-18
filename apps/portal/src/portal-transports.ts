@@ -66,12 +66,12 @@ export const ORGANISATION_ACTIONS: OrganisationActions = {
   delete: deleteControlOrganisation,
 };
 
-export const WHATSAPP_ROUTE_TRANSPORT: WhatsAppRouteTransport = {
+const WHATSAPP_ROUTE_TRANSPORT: WhatsAppRouteTransport = {
   connect: notImplementedWhatsAppConnect,
   accountAction: runWhatsAppAccountAction,
 };
 
-export function readMailboxSetupTransport(
+function readMailboxSetupTransport(
   organisationId: string,
   integrationAccountId: string,
   choice: MailboxSetupAgentChoice,
@@ -110,7 +110,7 @@ export const ACCESS_ROUTE_TRANSPORT = createAccessRouteTransport(
   pickGoogleDriveFile,
 );
 
-export function readAgentOperationsTransport(
+function readAgentOperationsTransport(
   organisationId: string,
 ): Promise<unknown> {
   return controlRead(
@@ -118,7 +118,7 @@ export function readAgentOperationsTransport(
   );
 }
 
-export function readAgentRevisionsTransport(
+function readAgentRevisionsTransport(
   organisationId: string,
   target: { readonly kind: "agent_definition" | "skill"; readonly id: string },
 ): Promise<unknown> {
@@ -128,7 +128,7 @@ export function readAgentRevisionsTransport(
   );
 }
 
-export function mutateAgentOperationsTransport(
+function mutateAgentOperationsTransport(
   organisationId: string,
   command: Parameters<AgentOperationsTransport["mutate"]>[1],
   mutationIntent: string,
@@ -142,7 +142,7 @@ export function mutateAgentOperationsTransport(
   );
 }
 
-export function previewTrackingBatchTransport(
+function previewTrackingBatchTransport(
   organisationId: string,
   exceptionIds: readonly string[],
 ): Promise<unknown> {
@@ -152,7 +152,7 @@ export function previewTrackingBatchTransport(
   );
 }
 
-export function proposeCommerceActionTransport(
+function proposeCommerceActionTransport(
   organisationId: string,
   action: Parameters<CommerceOperationsTransport["proposeAction"]>[1],
   intent: string,
@@ -166,7 +166,7 @@ export function proposeCommerceActionTransport(
   );
 }
 
-export async function proposeProductDescriptionActionTransport(
+async function proposeProductDescriptionActionTransport(
   organisationId: string,
   action: Parameters<ProductDescriptionActionTransport["proposeAction"]>[1],
   intent: string,

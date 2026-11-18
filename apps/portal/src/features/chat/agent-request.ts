@@ -10,7 +10,7 @@ import type { PageState } from "./page-state";
  * Session in a board room's presence. Stop is the chat's own Cancel, with
  * its checks and its receipt. Nothing here leaves the person's browser.
  */
-export type ChatAgentRequest = Readonly<{
+type ChatAgentRequest = Readonly<{
   sessionId: string;
   latestLine: string | null;
   stopping: boolean;

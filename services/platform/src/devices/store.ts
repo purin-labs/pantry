@@ -156,7 +156,7 @@ function deviceFromRow(row: DeviceRow): DeviceRecord {
 }
 
 /** Removes control characters and the marks of a Slack or Markdown link. */
-export function cleanGatewayText(value: string): string {
+function cleanGatewayText(value: string): string {
   return value
     .replaceAll(/\p{Cc}/gu, " ")
     .replaceAll(/\s+/gu, " ")
@@ -473,7 +473,7 @@ export async function applyGatewayHello(
   await db.batch(statements);
 }
 
-export type HealthChange = Readonly<{
+type HealthChange = Readonly<{
   device: DeviceRecord;
   previous: DeviceHealth;
 }>;
@@ -574,7 +574,7 @@ export async function recordGatewayHeard(
   return row !== null;
 }
 
-export type DeviceEventInput = Readonly<{
+type DeviceEventInput = Readonly<{
   organisationId: OrganisationId;
   subjectId: string;
   kind: string;
@@ -678,7 +678,7 @@ export async function listDeviceEvents(
 }
 
 /** State changes and faults stay for 90 days. Receipts stay in the ledger. */
-export const DEVICE_EVENT_RETENTION_MS = 90 * 24 * 60 * 60_000;
+const DEVICE_EVENT_RETENTION_MS = 90 * 24 * 60 * 60_000;
 
 export async function pruneDeviceEvents(
   db: OrganisationDatabase,

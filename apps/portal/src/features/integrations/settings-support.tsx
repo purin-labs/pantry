@@ -96,7 +96,7 @@ export function renderShopifyCommerceChoice(
   );
 }
 
-export function renderSelectedResource(resource: OnboardingSelectedResource): string {
+function renderSelectedResource(resource: OnboardingSelectedResource): string {
   return resource.display_label;
 }
 
@@ -431,11 +431,11 @@ export function readAssignableControlRole(
   return typeof raw === "string" && isAssignableControlRole(raw) ? raw : null;
 }
 
-export function isCapabilityProfile(raw: string): raw is CapabilityProfile {
+function isCapabilityProfile(raw: string): raw is CapabilityProfile {
   return raw === "read_and_propose" || raw === "approved_provider_writes";
 }
 
-export function isCuePresetId(raw: string): raw is SetupFormDefaults["cuePresetId"] {
+function isCuePresetId(raw: string): raw is SetupFormDefaults["cuePresetId"] {
   return (
     raw === "observe_commerce" ||
     raw === "commerce_operator" ||
@@ -443,19 +443,19 @@ export function isCuePresetId(raw: string): raw is SetupFormDefaults["cuePresetI
   );
 }
 
-export function isControlRole(raw: string): raw is ControlRole {
+function isControlRole(raw: string): raw is ControlRole {
   return (
     raw === "owner" || raw === "admin" || raw === "operator" || raw === "viewer"
   );
 }
 
-export function isAssignableControlRole(
+function isAssignableControlRole(
   raw: string,
 ): raw is Exclude<ControlRole, "owner"> {
   return raw === "admin" || raw === "operator" || raw === "viewer";
 }
 
-export type SetupSelectionResult =
+type SetupSelectionResult =
   | { readonly ok: true; readonly value: SetupSelection }
   | {
       readonly ok: false;

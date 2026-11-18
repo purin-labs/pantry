@@ -186,18 +186,3 @@ export async function conversationCaseIdentity(
     scope.organisationId,
   );
 }
-
-export async function ensureConversationUser(
-  db: OrganisationDatabase,
-  scope: ConversationScope,
-  conversationId: ConversationId,
-): Promise<void> {
-  await db
-    .prepare(
-      `${VISIBLE_CONVERSATIONS_SQL}
-    INSERT OR IGNORE INTO portal_conversation_user (organisation_id, user_id, conversation_id)
-    SELECT organisation_id, ?, conversation_id FROM visible_conversation WHERE conversation_id = ?`,
-    )
-    .bind(scope.organisationId, scope.userId, scope.userId, conversationId)
-    .run();
-}

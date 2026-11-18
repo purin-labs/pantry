@@ -63,12 +63,12 @@ import {
   type PlacedNode,
 } from "./execution-model";
 
-export type ActivityCases =
+type ActivityCases =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>
   | Readonly<{ kind: "ready"; cases: readonly CaseExecutionCaseRef[] }>;
 
-export type ActivityExecution =
+type ActivityExecution =
   | Readonly<{ kind: "none" }>
   | Readonly<{ kind: "loading"; caseId: string }>
   | Readonly<{ kind: "failed"; caseId: string; message: string }>
@@ -79,19 +79,19 @@ export type ActivityExecution =
       reading: boolean;
     }>;
 
-export type ActivityDetail =
+type ActivityDetail =
   | Readonly<{ kind: "none" }>
   | Readonly<{ kind: "loading"; nodeId: string }>
   | Readonly<{ kind: "failed"; nodeId: string; message: string }>
   | Readonly<{ kind: "withheld"; nodeId: string }>
   | Readonly<{ kind: "ready"; detail: CaseExecutionNodeDetail }>;
 
-export type ActivityLayout = "graph" | "list";
+type ActivityLayout = "graph" | "list";
 
 /** How the Cases show before one is open: a period on a timeline, or a list. */
-export type ActivityCaseView = "timeline" | "list";
+type ActivityCaseView = "timeline" | "list";
 
-export type ActivityPanelViewProps = Readonly<{
+type ActivityPanelViewProps = Readonly<{
   cases: ActivityCases;
   caseView: ActivityCaseView;
   timeline: ActivityTimeline;
@@ -327,9 +327,7 @@ function initialLayout(): ActivityLayout {
 }
 
 /** The panel without its data lifecycle, for previews and tests. */
-export function ActivityPanelView(
-  props: ActivityPanelViewProps,
-): React.ReactNode {
+function ActivityPanelView(props: ActivityPanelViewProps): React.ReactNode {
   return (
     <section className="brain-activity" aria-labelledby="brain-activity">
       {/* The tab names the view, so the heading is for a screen reader. */}

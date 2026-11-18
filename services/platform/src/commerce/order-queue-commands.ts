@@ -61,7 +61,7 @@ export type SoldOutMarkResult =
     }>;
 
 /** The items of the café's published menu, with their marks at its location. */
-export type CafeSoldOutMenu = Readonly<{
+type CafeSoldOutMenu = Readonly<{
   locationId: string;
   merchantRevision: number;
   items: readonly SoldOutItem[];

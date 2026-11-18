@@ -1,6 +1,6 @@
 import { canonicalJson, encodeBase64Url } from "@seams/std";
 
-export type CredentialPolicyRuleSource = {
+type CredentialPolicyRuleSource = {
   provider: string;
   name: string;
   integrationAccountId: string;
@@ -26,7 +26,7 @@ export async function credentialPolicyRuleId(
   return `egress.credential.${ruleSegment(input.provider)}.${ruleSegment(input.name)}.${hash}`;
 }
 
-export function canonicalizeRuleInjectAs(raw: string): string {
+function canonicalizeRuleInjectAs(raw: string): string {
   try {
     return canonicalJson(JSON.parse(raw));
   } catch {

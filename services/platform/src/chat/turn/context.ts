@@ -289,7 +289,7 @@ export async function reconcileStoredContextObservations(
   return stored;
 }
 
-export function isReadyContextEvent(
+function isReadyContextEvent(
   event: ChatTimelineEvent,
 ): event is Variant<ChatTimelineEvent, "context" | "activity" | "progress"> {
   return (

@@ -53,7 +53,7 @@ export function readJevScreenRelevanceSwitch(
     : { enabled: row.enabled === 1, revision: row.revision };
 }
 
-export type ScreenRelevanceRecord = Readonly<{
+type ScreenRelevanceRecord = Readonly<{
   organisationId: OrganisationId;
   checkId: string;
   userId: string;
@@ -124,24 +124,6 @@ export function decideScreenRelevanceRecord(
     input.userId,
   );
   return true;
-}
-
-/** The records of an Organisation, newest first, for a later view and the evidence. */
-export function listScreenRelevanceRecords(
-  sql: SqlStorage,
-  organisationId: OrganisationId,
-  limit: number,
-): readonly Readonly<Record<string, SqlStorageValue>>[] {
-  return sql
-    .exec<Record<string, SqlStorageValue>>(
-      `SELECT check_id, user_id, conversation_id, surface, about_screen, fits_chat, band, offer_new_chat,
-        model, choice, created_at, decided_at
-      FROM jev_screen_relevance_record WHERE organisation_id = ?
-      ORDER BY created_at DESC LIMIT ?`,
-      organisationId,
-      limit,
-    )
-    .toArray();
 }
 
 export function readJevScreenRelevance(

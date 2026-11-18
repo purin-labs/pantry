@@ -32,7 +32,7 @@ export function PageSkeleton(props: {
   );
 }
 
-export type EmptyStateContent =
+type EmptyStateContent =
   | {
       readonly title: string;
       readonly detail: string;
@@ -165,7 +165,7 @@ type ResourceRowProps = {
   readonly action: React.ReactNode | null;
 };
 
-export function ResourceRow(props: ResourceRowProps): React.ReactNode {
+function ResourceRow(props: ResourceRowProps): React.ReactNode {
   return (
     <article className="resource-row">
       <div className="resource-row-main">
@@ -195,31 +195,6 @@ function renderResourceRowTitle(
     default:
       return assertNever(target, "Unhandled shared component variant");
   }
-}
-
-export function ResourceList<T>(props: {
-  readonly label: string;
-  readonly items: readonly T[];
-  readonly getKey: (item: T) => string;
-  readonly renderRow: (item: T) => React.ReactNode;
-  readonly empty: React.ReactNode;
-}): React.ReactNode {
-  if (props.items.length === 0) {
-    return <div className="resource-list-empty">{props.empty}</div>;
-  }
-  const rows: React.ReactNode[] = [];
-  for (const item of props.items) {
-    rows.push(
-      <div role="listitem" key={props.getKey(item)}>
-        {props.renderRow(item)}
-      </div>,
-    );
-  }
-  return (
-    <div className="resource-list" role="list" aria-label={props.label}>
-      {rows}
-    </div>
-  );
 }
 
 export type WorkItemState =
@@ -298,9 +273,7 @@ function renderWorkItemDue(due: WorkItemDue): React.ReactNode {
   }
 }
 
-export function WorkItem(props: {
-  readonly item: WorkItemData;
-}): React.ReactNode {
+function WorkItem(props: { readonly item: WorkItemData }): React.ReactNode {
   const action =
     props.item.action.kind === "button" ? (
       <button
@@ -348,64 +321,6 @@ export function WorkQueue(props: {
   return (
     <div className="work-queue" role="list" aria-label={props.label}>
       {items}
-    </div>
-  );
-}
-
-export type ActionBarAction =
-  | {
-      readonly kind: "primary";
-      readonly label: string;
-      readonly onActivate: React.MouseEventHandler<HTMLButtonElement>;
-      readonly disabled: boolean;
-    }
-  | {
-      readonly kind: "secondary";
-      readonly label: string;
-      readonly onActivate: React.MouseEventHandler<HTMLButtonElement>;
-      readonly disabled: boolean;
-    }
-  | {
-      readonly kind: "danger";
-      readonly label: string;
-      readonly onActivate: React.MouseEventHandler<HTMLButtonElement>;
-      readonly disabled: boolean;
-    };
-
-function actionBarButtonClass(action: ActionBarAction): string {
-  switch (action.kind) {
-    case "primary":
-      return "action-bar-button action-bar-button-primary";
-    case "secondary":
-      return "action-bar-button action-bar-button-secondary";
-    case "danger":
-      return "action-bar-button action-bar-button-danger";
-    default:
-      return assertNever(action, "Unhandled shared component variant");
-  }
-}
-
-export function ActionBar(props: {
-  readonly label: string;
-  readonly actions: readonly [ActionBarAction, ...ActionBarAction[]];
-}): React.ReactNode {
-  const actions: React.ReactNode[] = [];
-  for (const action of props.actions) {
-    actions.push(
-      <button
-        className={actionBarButtonClass(action)}
-        type="button"
-        key={action.label}
-        onClick={action.onActivate}
-        disabled={action.disabled}
-      >
-        {action.label}
-      </button>,
-    );
-  }
-  return (
-    <div className="action-bar" role="group" aria-label={props.label}>
-      {actions}
     </div>
   );
 }

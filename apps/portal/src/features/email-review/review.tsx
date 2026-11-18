@@ -21,7 +21,7 @@ export type EmailReviewMutation =
       operation: "approve" | "reject" | "edit" | "attest";
     }>;
 
-export type EmailReviewSurfaceProps = Readonly<{
+type EmailReviewSurfaceProps = Readonly<{
   queue: EmailReviewQueue;
   canManage: boolean;
   context: "workspace" | "conversation";
@@ -1085,7 +1085,7 @@ function reviewProblem(error: unknown): string {
  * list holds only what this person may inspect, and it is absent when the
  * draft used none of them.
  */
-export function EmailReplyMemoryList(props: {
+function EmailReplyMemoryList(props: {
   readonly memory: readonly EmailReplyMemory[];
 }) {
   if (props.memory.length === 0) return null;

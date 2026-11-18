@@ -52,7 +52,7 @@ import { CUE_CLAIM_ABANDONED_AFTER_MS } from "../actors/cue-delivery";
  */
 const COMMERCE_CUE_RESEND_AFTER_MS = CUE_CLAIM_ABANDONED_AFTER_MS + 5 * 60_000;
 
-export type CommerceOutboxReconcileResult =
+type CommerceOutboxReconcileResult =
   | Readonly<{
       kind: "drained";
       acknowledged: number;

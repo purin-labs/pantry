@@ -36,11 +36,11 @@ import {
   readInventoryPositionForItemLocation,
 } from "../inventory-persistence.ts";
 
-export type InventoryItemPlanResult =
+type InventoryItemPlanResult =
   | Readonly<{ kind: "planned"; value: CommerceInventoryItemV1 }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type InventoryPositionPlanResult =
+type InventoryPositionPlanResult =
   | Readonly<{ kind: "planned"; value: CommerceInventoryPositionV1 }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -51,7 +51,7 @@ export type InventoryMovementPlan = Readonly<{
   committedAt: string;
 }>;
 
-export type InventoryMovementPlanResult =
+type InventoryMovementPlanResult =
   | Readonly<{ kind: "planned"; value: InventoryMovementPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 

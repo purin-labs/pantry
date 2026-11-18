@@ -31,7 +31,7 @@ export type EntityPlaneMutationRequest = Omit<
   EntityPlaneCommandRequest,
   "authority"
 >;
-export type MutationTarget = CommerceMutationReceiptV1["target"];
+type MutationTarget = CommerceMutationReceiptV1["target"];
 export type CommandKind = CommerceEntityPlaneCommand["kind"];
 export type CommandRequest<K extends CommandKind> = Omit<
   EntityPlaneMutationRequest,
@@ -69,7 +69,7 @@ type UnsignedEntityPlaneReceipt = UnsignedMutationReceipt &
     deliveryId: CommerceEntityPlaneDeliveryId | null;
   }>;
 
-export type EntityPlaneSettlementOptions = Readonly<{
+type EntityPlaneSettlementOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   signer: CommerceSigner;

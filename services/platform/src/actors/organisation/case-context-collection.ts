@@ -69,7 +69,7 @@ export function parseOperationalCaseContextDiscoverySourceRequest(
   };
 }
 
-export function parseOperationalCaseContextDiscoveryEvidence(
+function parseOperationalCaseContextDiscoveryEvidence(
   raw: unknown,
 ): OperationalCaseContextDiscoveryEvidence | null {
   if (
@@ -210,7 +210,7 @@ export async function verifiedOperationalCaseContextDiscoveryRequest(
     : scope;
 }
 
-export function sameVerifiedCaseContextCollectionParty(
+function sameVerifiedCaseContextCollectionParty(
   left: VerifiedContactEndpoint,
   right: VerifiedContactEndpoint,
 ): boolean {
@@ -239,7 +239,7 @@ export function sameVerifiedCaseContextCollectionParty(
   }
 }
 
-export function caseContextCollectionScopeForVerifiedContact(
+function caseContextCollectionScopeForVerifiedContact(
   organisationId: OrganisationId,
   verified: VerifiedContactEndpoint,
   issueKind: string,
@@ -257,7 +257,7 @@ export function caseContextCollectionScopeForVerifiedContact(
   };
 }
 
-export function existingOperationalCaseContextDiscoveryScope(
+function existingOperationalCaseContextDiscoveryScope(
   sql: SqlStorage,
   organisationId: OrganisationId,
   initialScope: CaseContextCollectionScope,
@@ -310,7 +310,7 @@ export function existingOperationalCaseContextDiscoveryScope(
   return { ok: true, value: caseContextCollection.scope };
 }
 
-export type CaseContextCollectionReviewDecision = Parameters<
+type CaseContextCollectionReviewDecision = Parameters<
   typeof decideCaseContextCollectionRelationship
 >[0]["decision"];
 
@@ -397,7 +397,7 @@ export async function caseContextCollectionReviewDecision(
   }
 }
 
-export function findCaseContextCollectionRelationship(
+function findCaseContextCollectionRelationship(
   caseContextCollection: CaseContextCollection,
   relationshipId: string,
 ): CaseContextCollectionRelationship | null {
@@ -407,7 +407,7 @@ export function findCaseContextCollectionRelationship(
   return null;
 }
 
-export function confirmedCaseContextCollectionSourceScope(
+function confirmedCaseContextCollectionSourceScope(
   caseContextCollection: CaseContextCollection,
   relationship: CaseContextCollectionRelationship,
   verified: VerifiedContactEndpoint,

@@ -32,7 +32,7 @@ import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "./whatsapp-reply-proposal.machi
 type ProposalMachine = typeof WHATSAPP_REPLY_PROPOSAL_MACHINE;
 
 export type WhatsAppProposalState = MachineState<ProposalMachine>;
-export type WhatsAppProposalEvent = MachineEvent<ProposalMachine>;
+type WhatsAppProposalEvent = MachineEvent<ProposalMachine>;
 
 /**
  * A `sending` attempt that has not settled in this time stopped with its
@@ -42,7 +42,7 @@ export const WHATSAPP_SEND_ATTEMPT_LEASE_MS =
   WHATSAPP_REPLY_PROPOSAL_MACHINE.states.sending.exit.afterMs;
 
 /** The fields of a stored version that a move compares. */
-export type WhatsAppProposalClaim = Readonly<{
+type WhatsAppProposalClaim = Readonly<{
   proposalId: string;
   version: number;
   state: WhatsAppProposalState;
@@ -50,14 +50,14 @@ export type WhatsAppProposalClaim = Readonly<{
 }>;
 
 /** The data that each event writes besides the state. */
-export type WhatsAppProposalMove<Event extends WhatsAppProposalEvent> =
+type WhatsAppProposalMove<Event extends WhatsAppProposalEvent> =
   Event extends "claim"
     ? Readonly<{ event: Event; attemptId: string; approvedBodyDigest: string }>
     : Event extends "provider_accepted" | "operator_saw_delivery"
       ? Readonly<{ event: Event; sentMessageId: string }>
       : Readonly<{ event: Event }>;
 
-export type WhatsAppProposalMoveError =
+type WhatsAppProposalMoveError =
   | "whatsapp_proposal_transition_invalid"
   /** The row changed since the caller read it; read it again and decide. */
   | "whatsapp_proposal_transition_stale";

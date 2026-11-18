@@ -65,7 +65,7 @@ export type {
 export { humanizeIdentifier, runAsync } from "./agent-console-shared";
 export { AgentsPage, SkillsLibraryPage } from "./agent-console";
 
-export type AgentOperationsPage =
+type AgentOperationsPage =
   | "operations"
   | "agents"
   | "skills"
@@ -82,7 +82,7 @@ type OperationMutationSetter = React.Dispatch<
   React.SetStateAction<AgentOperationMutationState>
 >;
 
-export type AgentOperationsRouteProps = {
+type AgentOperationsRouteProps = {
   readonly organisationId: string;
   readonly page: AgentOperationsPage;
   readonly canManage: boolean;
@@ -597,7 +597,7 @@ function invalidateRequest(requestRevision: RequestRevision): void {
   requestRevision.current += 1;
 }
 
-export function refreshingAgentOperationsContent(
+function refreshingAgentOperationsContent(
   content: AgentOperationsPageContent,
 ): AgentOperationsPageContent {
   return content.kind === "ready"
@@ -616,7 +616,7 @@ function readyAgentOperationsContent(
   };
 }
 
-export function agentOperationsFailureContent(
+function agentOperationsFailureContent(
   errorKind: ControlErrorKind | null,
 ): Variant<AgentOperationsPageContent, "failed" | "unauthorized"> {
   if (errorKind === "forbidden") {
@@ -665,7 +665,7 @@ function agentOperationIntent(command: AgentOperationCommand): string {
   return `agent-operation:${command.kind}:${JSON.stringify(command)}`;
 }
 
-export type OperationsPageProps = {
+type OperationsPageProps = {
   readonly organisationId: string;
   readonly snapshot: AgentOperationsSnapshot;
   readonly loadAction: (actionNonce: string) => Promise<void>;
@@ -675,7 +675,7 @@ export type OperationsPageProps = {
   readonly refresh: () => void;
 };
 
-export function OperationsPage(props: OperationsPageProps): React.ReactNode {
+function OperationsPage(props: OperationsPageProps): React.ReactNode {
   return (
     <section
       className="portal-band commerce-panel"

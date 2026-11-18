@@ -15,7 +15,7 @@ export type CancellableTask<TValue, TCancellation> = {
   cancel(reason: TaskCancellationReason): Promise<TCancellation>;
 };
 
-export type CancellableTaskInput<TValue, TCancellation> = {
+type CancellableTaskInput<TValue, TCancellation> = {
   readonly completion: Promise<TValue>;
   readonly cancel: (reason: TaskCancellationReason) => Promise<TCancellation>;
 };

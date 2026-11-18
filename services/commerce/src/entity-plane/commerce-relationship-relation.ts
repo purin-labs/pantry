@@ -67,7 +67,7 @@ type RelationshipRelationViewRow = Readonly<{
 
 type RelationSchemaRow = Readonly<{ version: number; viewSql: string | null }>;
 
-export type CommerceRelationshipRelationRow = Readonly<{
+type CommerceRelationshipRelationRow = Readonly<{
   merchantId: string;
   relationshipOrigin: "system" | "custom";
   relationshipId: string;
@@ -82,7 +82,7 @@ export type CommerceRelationshipRelationRow = Readonly<{
   provenanceJson: string;
 }>;
 
-export type CommerceRelationshipTraversalStepResult =
+type CommerceRelationshipTraversalStepResult =
   | Readonly<{ kind: "rows"; rows: readonly CommerceRelationshipRelationRow[] }>
   | Readonly<{
       kind: "unsupported";
@@ -410,7 +410,7 @@ function readSystemEntityProvenance(
   return entity.provenance;
 }
 
-export function parseCommerceRelationshipRelationRow(
+function parseCommerceRelationshipRelationRow(
   row: RelationshipRelationViewRow,
 ): CommerceRelationshipRelationRow {
   const merchantId = normalizedText(

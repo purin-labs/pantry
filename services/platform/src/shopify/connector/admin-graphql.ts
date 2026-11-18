@@ -10,14 +10,14 @@ import type {
 import { shopifyRevision } from "./values";
 import type { ShopifyRegistrationOperation } from "./webhook-registration";
 
-export type ShopifyGraphqlRequest = {
+type ShopifyGraphqlRequest = {
   query: string;
   variables: JsonObject;
 };
 
 export const SHOPIFY_ADMIN_API_VERSION = "2026-07";
 
-export const SHOPIFY_INITIAL_SYNC_PAGE_SIZE = 100;
+const SHOPIFY_INITIAL_SYNC_PAGE_SIZE = 100;
 
 export const SHOPIFY_INITIAL_SYNC_MAX_PAGES = 100;
 
@@ -126,7 +126,7 @@ export async function fetchShopifyGraphqlSnapshot(input: {
   return { ok: true, value: raw };
 }
 
-export function summarizeShopifyGraphqlErrors(
+function summarizeShopifyGraphqlErrors(
   rawErrors: readonly unknown[],
 ): readonly {
   readonly message: string;
@@ -192,7 +192,7 @@ export function parseInitialPageInfo(
   };
 }
 
-export type ShopifyGidResourceType =
+type ShopifyGidResourceType =
   | "Channel"
   | "Fulfillment"
   | "FulfillmentEvent"

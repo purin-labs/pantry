@@ -45,7 +45,7 @@ export type WhatsAppSendOutcome =
   | { readonly kind: "rejected"; readonly error: WhatsAppGraphError }
   | { readonly kind: "indeterminate"; readonly reason: string };
 
-export type WhatsAppDiscoveredPhoneNumber = {
+type WhatsAppDiscoveredPhoneNumber = {
   readonly phoneNumberId: WhatsAppPhoneNumberId;
   readonly displayPhoneNumber: E164PhoneNumber;
   readonly verifiedName: string;
@@ -121,7 +121,7 @@ export async function exchangeWhatsAppSignupCode(
  * evidence of the grant; a token that names no WABA is not a usable
  * connection and must not create one.
  */
-export async function inspectWhatsAppGrantedAssets(
+async function inspectWhatsAppGrantedAssets(
   input: Readonly<{
     appId: string;
     appSecret: string;

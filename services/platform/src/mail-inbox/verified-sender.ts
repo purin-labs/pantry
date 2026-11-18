@@ -10,7 +10,7 @@ import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
 import { digestCanonical } from "../policy/information-flow/digest";
 import type { FlowRecipient } from "../policy/information-flow/types";
 
-export type VerifiedSupplierEndpoint = Omit<
+type VerifiedSupplierEndpoint = Omit<
   VerifiedContactEndpoint,
   "target" | "endpoint"
 > &
@@ -30,7 +30,7 @@ export type VerifiedSupplierEndpoint = Omit<
  * is a known absence. A record the verification rests on that cannot be
  * interpreted is not: it leaves the sender unknown.
  */
-export type VerifiedMessageSender =
+type VerifiedMessageSender =
   | Readonly<{ kind: "supplier"; endpoint: VerifiedSupplierEndpoint }>
   | Readonly<{ kind: "none" | "unreadable"; endpoint?: never }>;
 

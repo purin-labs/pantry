@@ -34,7 +34,7 @@ import {
 } from "../actor-relocation-state";
 import { eraseUnregisteredActorState } from "../unregistered-actor-erasure";
 
-export interface PlacedActorOptions {
+interface PlacedActorOptions {
   /**
    * Whether the actor keeps an execution barrier: the export closes its
    * execution admission before the state is copied.

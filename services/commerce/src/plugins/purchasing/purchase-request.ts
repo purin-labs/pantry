@@ -15,17 +15,17 @@ import { parseAttributeDefinitionId } from "@seams/commerce-client";
 import type { CommerceDatabase } from "../../database.ts";
 
 /** Quantities on the queue are decimals with this scale. */
-export const PURCHASE_QUANTITY_SCALE = 6;
+const PURCHASE_QUANTITY_SCALE = 6;
 
 /** What the request binds: its item, place, unit and quantity. */
-export type PurchaseRequestTerms = Readonly<{
+type PurchaseRequestTerms = Readonly<{
   inventoryItemId: string;
   locationId: string;
   unit: string;
   required: number;
 }>;
 
-export type PurchaseRequestEvidence = Readonly<{
+type PurchaseRequestEvidence = Readonly<{
   /** Receipts that name the request, at PURCHASE_QUANTITY_SCALE. */
   received: number;
   required: number;
@@ -41,7 +41,7 @@ type StoredFieldRow = Readonly<{
 }>;
 
 /** The event that moves a request to `status`; none moves it back to review. */
-export function purchaseRequestEvent(
+function purchaseRequestEvent(
   status: PurchaseRequestStatus,
 ): "request" | "expect" | "run_late" | "receive_part" | "receive" | undefined {
   switch (status) {
@@ -125,7 +125,7 @@ export function receivedForRequest(
 }
 
 /** Scales a stock quantity to PURCHASE_QUANTITY_SCALE. */
-export function purchaseQuantity(amount: number, scale: number): number {
+function purchaseQuantity(amount: number, scale: number): number {
   if (
     !Number.isSafeInteger(amount) ||
     !Number.isSafeInteger(scale) ||

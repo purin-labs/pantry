@@ -24,7 +24,7 @@ type Segment = Readonly<{
 }>;
 
 /** A sentence of the draft with a detail that no record supports. */
-export type UnsourcedRun = Readonly<{
+type UnsourcedRun = Readonly<{
   key: string;
   start: number;
   end: number;
@@ -212,7 +212,7 @@ function uniqueNumbers(
   ].sort((left, right) => left - right);
 }
 
-export function sourceKey(record: MailReplySourceRecord): string {
+function sourceKey(record: MailReplySourceRecord): string {
   switch (record.kind) {
     case "order":
       return `order:${record.orderId}`;

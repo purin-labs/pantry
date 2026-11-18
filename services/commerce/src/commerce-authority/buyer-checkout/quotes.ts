@@ -255,10 +255,7 @@ export function shippingCheckoutLinesFromCart(
   return lines;
 }
 
-export function buyerCheckoutLineId(
-  checkoutIdentity: string,
-  index: number,
-): string {
+function buyerCheckoutLineId(checkoutIdentity: string, index: number): string {
   return `checkout_line_${checkoutIdentity}_${String(index + 1).padStart(4, "0")}`;
 }
 

@@ -9,7 +9,7 @@ import { eventStatement, readDevice, readGateway } from "./store";
  * and it calls these functions. A device holds at most one task, and only a
  * device that is ready can take one.
  */
-export type ReserveDeviceWorkResult =
+type ReserveDeviceWorkResult =
   Readonly<{ ok: true }> | Readonly<{ ok: false; code: "device_not_ready" }>;
 
 export async function reserveDeviceWork(

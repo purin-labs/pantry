@@ -7,13 +7,13 @@ import type {
   WallMaterialId,
 } from "../store-interior-design";
 
-export type PbrTextureSet = Readonly<{
+type PbrTextureSet = Readonly<{
   map: THREE.CanvasTexture | null;
   normalMap: THREE.CanvasTexture | null;
   roughnessMap: THREE.CanvasTexture | null;
 }>;
 
-export type PbrSurfaceRecipe = Readonly<{
+type PbrSurfaceRecipe = Readonly<{
   drawAlbedo: (ctx: CanvasRenderingContext2D, size: number) => void;
   drawHeight: (ctx: CanvasRenderingContext2D, size: number) => void;
   drawRoughness: (ctx: CanvasRenderingContext2D, size: number) => void;
@@ -259,7 +259,7 @@ function drawWoodGrainBlock(
   }
 }
 
-export function drawFloorPattern(
+function drawFloorPattern(
   materialId: FloorMaterialId,
   ctx: CanvasRenderingContext2D,
   size: number,
@@ -545,7 +545,7 @@ export function drawFloorPattern(
   }
 }
 
-export function drawFloorHeight(
+function drawFloorHeight(
   materialId: FloorMaterialId,
   ctx: CanvasRenderingContext2D,
   size: number,
@@ -753,7 +753,7 @@ export function drawFloorHeight(
   }
 }
 
-export function drawFloorRoughness(
+function drawFloorRoughness(
   materialId: FloorMaterialId,
   ctx: CanvasRenderingContext2D,
   size: number,
@@ -962,7 +962,7 @@ export function floorPbrRecipe(materialId: FloorMaterialId): PbrSurfaceRecipe {
   };
 }
 
-export function drawWetTilePattern(
+function drawWetTilePattern(
   kind: Exclude<FloorZoneKind, "main">,
   ctx: CanvasRenderingContext2D,
   size: number,
@@ -1062,7 +1062,7 @@ export function wetTilePbrRecipe(
   };
 }
 
-export function drawWallSurfacePattern(
+function drawWallSurfacePattern(
   wallMaterial: WallMaterialId,
   ctx: CanvasRenderingContext2D,
   size: number,
@@ -1323,7 +1323,7 @@ export function wallSurfacePbrRecipe(
   };
 }
 
-export function drawWainscotPattern(
+function drawWainscotPattern(
   wallMaterial: WallMaterialId,
   ctx: CanvasRenderingContext2D,
   size: number,
@@ -1491,10 +1491,7 @@ export function wainscotPbrRecipe(
   };
 }
 
-export function drawMarblePattern(
-  ctx: CanvasRenderingContext2D,
-  size: number,
-): void {
+function drawMarblePattern(ctx: CanvasRenderingContext2D, size: number): void {
   const k = size / 1024;
   ctx.fillStyle = "#f5f2eb";
   ctx.fillRect(0, 0, size, size);
@@ -1585,7 +1582,7 @@ export const MARBLE_PBR_RECIPE: PbrSurfaceRecipe = {
   normalStrength: 0.9,
 };
 
-export function drawBrushedSteelPattern(
+function drawBrushedSteelPattern(
   ctx: CanvasRenderingContext2D,
   size: number,
 ): void {
@@ -1651,7 +1648,7 @@ export const BRUSHED_STEEL_PBR_RECIPE: PbrSurfaceRecipe = {
   normalStrength: 0.85,
 };
 
-export function drawSidewalkPaverPattern(
+function drawSidewalkPaverPattern(
   ctx: CanvasRenderingContext2D,
   size: number,
 ): void {

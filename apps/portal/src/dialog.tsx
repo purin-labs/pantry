@@ -53,20 +53,6 @@ export function syncDialog(
 }
 
 /**
- * Like `syncDialog` from a layout effect, and says whether the dialog is on
- * screen: open, or still playing its exit. While it closes, the caller keeps
- * its last content, so the dialog does not empty as it fades.
- */
-export function useDialogPresence(
-  ref: React.RefObject<HTMLDialogElement | null>,
-  open: boolean,
-): boolean {
-  const [present, setPresent] = useDialogPresent(open);
-  React.useLayoutEffect(syncPresence.bind(null, ref, open, setPresent), [open]);
-  return present;
-}
-
-/**
  * True from the render that opens a dialog until its exit ends. The render
  * that closes it still keeps its content, so the exit starts from it.
  */
@@ -76,18 +62,6 @@ export function useDialogPresent(
   const [present, setPresent] = React.useState(open);
   if (open && !present) setPresent(true);
   return [open || present, setPresent];
-}
-
-function syncPresence(
-  ref: React.RefObject<HTMLDialogElement | null>,
-  open: boolean,
-  setPresent: React.Dispatch<React.SetStateAction<boolean>>,
-): void {
-  const dialog = ref.current;
-  if (dialog === null) return;
-  if (open) showDialog(dialog);
-  else if (dialog.open) closeDialog(dialog, setPresent.bind(null, false));
-  else setPresent(false);
 }
 
 /** The value from the last render while `open`: what a closing dialog shows. */

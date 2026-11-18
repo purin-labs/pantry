@@ -34,13 +34,13 @@ import {
   fr10WristIk,
 } from "@seams/production-simulation/kinematics/fr10";
 
-export type EspressoModel = "linea" | "eagle-one";
+type EspressoModel = "linea" | "eagle-one";
 export type EspressoCameraPreset = "station" | "group" | "overhead";
 
 type Vec3 = readonly [number, number, number];
 type Pose7 = readonly [number, number, number, number, number, number, number];
 
-export type EspressoLiveTelemetry = Readonly<{
+type EspressoLiveTelemetry = Readonly<{
   coffeeC: number;
   steamC: number;
   brewPressureBar: number;

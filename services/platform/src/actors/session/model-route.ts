@@ -185,7 +185,7 @@ export async function createEmbeddedHarnessModelRouteLease(input: {
   };
 }
 
-export type ChatGptSubscriptionObserver = {
+type ChatGptSubscriptionObserver = {
   readonly env: Env;
   readonly scope: OrganisationExecutionScope;
   readonly pin: { readonly revision: number; readonly generation: number };
@@ -200,7 +200,7 @@ export type ChatGptSubscriptionObserver = {
   readonly writes: { tail: Promise<void> };
 };
 
-export function observeChatGptSubscriptionResponse(
+function observeChatGptSubscriptionResponse(
   observer: ChatGptSubscriptionObserver,
   response: import("../embedded-harness").ChatGptModelResponse,
 ): void {
@@ -241,7 +241,7 @@ export function observeChatGptSubscriptionResponse(
     .catch(traceChatGptAllowanceFailure.bind(null, observer));
 }
 
-export function traceChatGptAllowanceFailure(
+function traceChatGptAllowanceFailure(
   observer: ChatGptSubscriptionObserver,
   error: unknown,
 ): void {
@@ -252,7 +252,7 @@ export function traceChatGptAllowanceFailure(
   });
 }
 
-export async function resolveEmbeddedSessionModelApiKey(
+async function resolveEmbeddedSessionModelApiKey(
   env: Env,
   authority: {
     readonly scope: OrganisationExecutionScope;
@@ -507,7 +507,7 @@ export function authorizedTransientModelLease(
   }
 }
 
-export async function authorizedTransientModelKey(
+async function authorizedTransientModelKey(
   resolve: () => Promise<string>,
   reauthorize: () => Promise<Result<null, Readonly<{ code: string }>>>,
 ): Promise<string> {

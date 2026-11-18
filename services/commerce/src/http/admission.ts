@@ -25,7 +25,7 @@ export const FOOD_SERVICE_ROUTES: ReadonlySet<CommerceRoute["kind"]> =
   ]);
 
 /** The route of each command that a merchant plugin can submit (Plan 77). */
-export const PLUGIN_COMMAND_ROUTES: Readonly<
+const PLUGIN_COMMAND_ROUTES: Readonly<
   Record<string, Exclude<CommerceRoute, BuyerRoute>["kind"]>
 > = {
   create_discount: "create_discount",

@@ -45,7 +45,7 @@ export type PayoutRecoveryProvider = SupplierPayoutProvider &
     ): Promise<SupplierPayoutEvidence | null>;
   }>;
 
-export type PayoutRecoveryReport = Readonly<{
+type PayoutRecoveryReport = Readonly<{
   examined: number;
   unknown: number;
   updated: number;

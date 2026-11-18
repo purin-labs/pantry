@@ -27,7 +27,7 @@ export const IMAGE_DRAG_TYPE = "application/x-satyr-board-image";
 
 export type ShopImage = Readonly<{ mediaId: string; altText: string; url: string | null }>;
 
-export type ShopImages = Readonly<{
+type ShopImages = Readonly<{
   /** Where the shop serves its media, ending in "/"; null with no shop. */
   mediaBase: string | null;
   images: readonly ShopImage[];

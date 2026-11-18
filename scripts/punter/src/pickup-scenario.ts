@@ -52,9 +52,9 @@ export type PunterCafePatisserieScenario = Readonly<{
   }>;
 }>;
 
-export type PunterPickupScenario = PunterCafePatisserieScenario;
+type PunterPickupScenario = PunterCafePatisserieScenario;
 
-export type PunterPickupScenarioInput = Readonly<{
+type PunterPickupScenarioInput = Readonly<{
   baseUrl: string;
   merchantId: string;
   storefrontId: string;
@@ -68,7 +68,7 @@ export type PunterPickupScenarioInput = Readonly<{
   }>;
 }>;
 
-export type PunterPickupEvidenceV1 = Readonly<{
+type PunterPickupEvidenceV1 = Readonly<{
   schemaVersion: "punter.pickup-evidence.v1";
   runId: string;
   merchantId: string;
@@ -94,7 +94,7 @@ type PunterCatalogMissing =
   | "sesame_latte_menu_entry"
   | "oat_milk_modifier";
 
-export type PunterPickupScenarioFailure =
+type PunterPickupScenarioFailure =
   | Readonly<{
       stage: "session" | "catalog" | "checkout" | "payment" | "order";
       kind: "client_error";
@@ -124,7 +124,7 @@ export type PunterPickupScenarioFailure =
     }>
   | Readonly<{ stage: "order"; kind: "commercial_snapshot_mismatch" }>;
 
-export type PunterPickupScenarioResult =
+type PunterPickupScenarioResult =
   | Readonly<{ ok: true; evidence: PunterPickupEvidenceV1 }>
   | Readonly<{ ok: false; error: PunterPickupScenarioFailure }>;
 

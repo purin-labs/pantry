@@ -137,7 +137,7 @@ export function renderCodexConnection(
   }
 }
 
-export type CodexAuthorizationAttempt = Variant<
+type CodexAuthorizationAttempt = Variant<
   OrganisationCodexConnection,
   "authorizing"
 >["attempt"];
@@ -146,7 +146,7 @@ export type CodexAuthorizationAttempt = Variant<
  * The device sign-in as three numbered steps. One action copies the code and
  * opens OpenAI together, so the usual path is one press and one paste.
  */
-export function CodexSignIn(props: {
+function CodexSignIn(props: {
   readonly attempt: CodexAuthorizationAttempt;
   readonly canConnect: boolean;
   readonly busy: boolean;
@@ -245,7 +245,7 @@ export function CodexSignIn(props: {
  * address bar and pastes it here. Connect already opened OpenAI in a new
  * tab; the link opens it again.
  */
-export function ChatGptPastedSignIn(props: {
+function ChatGptPastedSignIn(props: {
   readonly attempt: CodexAuthorizationAttempt;
   readonly canConnect: boolean;
   readonly busy: boolean;
@@ -350,7 +350,7 @@ export function ChatGptPastedSignIn(props: {
   );
 }
 
-export async function submitChatGptCallback(
+async function submitChatGptCallback(
   actions: IntegrationsPageActions,
   attemptId: string,
   event: React.FormEvent<HTMLFormElement>,
@@ -362,14 +362,14 @@ export async function submitChatGptCallback(
   await actions.completeCodexAuthorization(attemptId, address.trim());
 }
 
-export const CODEX_CODE_COPIED = "One-time code copied.";
+const CODEX_CODE_COPIED = "One-time code copied.";
 
-export function revealCodexSignIn(ref: React.RefObject<HTMLDivElement | null>): void {
+function revealCodexSignIn(ref: React.RefObject<HTMLDivElement | null>): void {
   ref.current?.scrollIntoView({ block: "nearest" });
 }
 
 /** "Copied" goes back to "Copy" after a moment, so a second copy reads true. */
-export function clearCodexCopyStatus(
+function clearCodexCopyStatus(
   copied: boolean,
   setCopyStatus: React.Dispatch<React.SetStateAction<string>>,
 ): () => void {
@@ -379,18 +379,18 @@ export function clearCodexCopyStatus(
 }
 
 /** The link opens OpenAI by itself; the copy runs beside it. */
-export function copyCodexCodeOnOpen(
+function copyCodexCodeOnOpen(
   code: string,
   setCopyStatus: React.Dispatch<React.SetStateAction<string>>,
 ): void {
   void copyCodexCode(code, setCopyStatus);
 }
 
-export function formatClockTime(value: number): string {
+function formatClockTime(value: number): string {
   return new Date(value).toLocaleTimeString(undefined, { timeStyle: "short" });
 }
 
-export function renderCodexConnectedActions(
+function renderCodexConnectedActions(
   props: Parameters<typeof InferenceIntegrationPanel>[0],
 ): React.ReactNode {
   const confirming = props.pendingConfirm === "codex_disconnect";
@@ -418,7 +418,7 @@ export function renderCodexConnectedActions(
   );
 }
 
-export function renderCodexAllowance(allowance: CodexAllowance): React.ReactNode {
+function renderCodexAllowance(allowance: CodexAllowance): React.ReactNode {
   if (allowance.kind === "not_reported") {
     return (
       <p className="field-hint">
@@ -468,13 +468,13 @@ export function renderCodexAllowance(allowance: CodexAllowance): React.ReactNode
 }
 
 /** The meter changes colour before the allowance runs out, not after. */
-export function codexAllowanceLevel(percent: number): string {
+function codexAllowanceLevel(percent: number): string {
   if (percent <= 10) return "is-critical";
   if (percent <= 25) return "is-low";
   return "is-healthy";
 }
 
-export function codexActionRequiredMessage(
+function codexActionRequiredMessage(
   connection: Variant<OrganisationCodexConnection, "action_required">,
 ): string {
   switch (connection.reason) {
@@ -493,7 +493,7 @@ export function codexActionRequiredMessage(
   }
 }
 
-export async function copyCodexCode(
+async function copyCodexCode(
   code: string,
   setCopyStatus: React.Dispatch<React.SetStateAction<string>>,
 ): Promise<void> {
@@ -505,21 +505,21 @@ export async function copyCodexCode(
   }
 }
 
-export async function cancelCodexFromPanel(
+async function cancelCodexFromPanel(
   actions: IntegrationsPageActions,
   attemptId: string,
 ): Promise<void> {
   await actions.cancelCodexAuthorization(attemptId);
 }
 
-export function formatCodexPlan(planType: string): string {
+function formatCodexPlan(planType: string): string {
   return planType.replaceAll("_", " ").replace(/\b\w/gu, uppercaseCharacter);
 }
 
-export function uppercaseCharacter(character: string): string {
+function uppercaseCharacter(character: string): string {
   return character.toUpperCase();
 }
 
-export function normalizeProviderTimestamp(value: number): number {
+function normalizeProviderTimestamp(value: number): number {
   return value < 1_000_000_000_000 ? value * 1_000 : value;
 }

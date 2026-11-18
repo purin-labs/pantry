@@ -23,7 +23,7 @@ export type GmailOAuthClientEnv = Pick<
   "GMAIL_OAUTH_CLIENT_ID" | "GMAIL_OAUTH_CLIENT_SECRET"
 >;
 
-export type GmailOAuthError =
+type GmailOAuthError =
   | { readonly code: "provider_configuration_missing" }
   | { readonly code: "provider_context_invalid" }
   | {
@@ -40,7 +40,7 @@ export type GmailOAuthError =
   | { readonly code: "provider_identity_unverified" }
   | { readonly code: "provider_credential_store_failed" };
 
-export type GoogleOAuthErrorCode =
+type GoogleOAuthErrorCode =
   | "invalid_grant"
   | "invalid_client"
   | "unauthorized_client"
@@ -60,7 +60,7 @@ export function gmailGrantRefused(error: GmailOAuthError): boolean {
   );
 }
 
-export type GmailOAuthConnection = {
+type GmailOAuthConnection = {
   readonly tokens: VaultOAuthTokens;
   readonly googleSubject: string;
   readonly email: string;

@@ -160,8 +160,8 @@ type OrganisationProjectionState = {
 };
 
 export type OnboardingProjection = OnboardingProjectionV1;
-export type OnboardingStepProjection = SharedOnboardingStepProjection;
-export type ActivationProjection = OnboardingActivation;
+type OnboardingStepProjection = SharedOnboardingStepProjection;
+type ActivationProjection = OnboardingActivation;
 type ActivationPhase = OnboardingActivationPhase;
 type ReadinessProjection = OnboardingReadiness;
 type ReadinessBlockerProjection = OnboardingReadinessBlocker;

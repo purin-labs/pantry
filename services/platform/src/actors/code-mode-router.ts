@@ -1,9 +1,9 @@
 import type { CodeModePlacement } from "./code-mode-budget";
 import { sha256Hex } from "@seams/std";
 
-export const CODE_MODE_ROUTER_REVISION = "code-mode-router-v1";
+const CODE_MODE_ROUTER_REVISION = "code-mode-router-v1";
 
-export type CodeModeRouteRequest = {
+type CodeModeRouteRequest = {
   readonly workloadProfile: "sequential_read";
   readonly invocation: "root";
   readonly effects: "none";
@@ -13,7 +13,7 @@ export type CodeModeRouteRequest = {
   readonly budget: "feasible";
 };
 
-export type CodeModeRouteDecision = {
+type CodeModeRouteDecision = {
   readonly kind: "selected";
   readonly routerRevision: typeof CODE_MODE_ROUTER_REVISION;
   readonly placement: CodeModePlacement;

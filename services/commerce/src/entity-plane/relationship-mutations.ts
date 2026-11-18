@@ -33,7 +33,7 @@ import {
 } from "@seams/commerce-contracts/commerce-relationship-references";
 import type { VariantBy } from "@seams/type-utils";
 
-export type RelationshipMutationHandlerOptions = Readonly<{
+type RelationshipMutationHandlerOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   settlement: EntityPlaneSettlement;

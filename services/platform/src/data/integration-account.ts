@@ -144,14 +144,14 @@ export type RetentionPolicy =
   | { readonly kind: "organisation_default" }
   | { readonly kind: "days"; readonly days: number };
 
-export type ProviderWebhookLifecycle =
+type ProviderWebhookLifecycle =
   | { readonly kind: "pending" }
   | { readonly kind: "live"; readonly lastVerifiedAt: number }
   | { readonly kind: "degraded"; readonly reasonCode: string }
   | { readonly kind: "disabled" }
   | { readonly kind: "revoked" };
 
-export type ProviderWebhook = {
+type ProviderWebhook = {
   readonly providerWebhookId: ProviderWebhookId;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -197,14 +197,14 @@ export type AccountLookupError =
     }
   | { readonly code: "integration_account_corrupt"; readonly field: string };
 
-export type DisabledIntegrationAccount = Omit<
+type DisabledIntegrationAccount = Omit<
   IntegrationAccount,
   "lifecycle"
 > & {
   readonly lifecycle: Variant<IntegrationAccountLifecycle, "disabled">;
 };
 
-export type ProviderCredentialMutation = "reconnect" | "rotate";
+type ProviderCredentialMutation = "reconnect" | "rotate";
 
 export function integrationAccountAllowsCredentialMutation(
   lifecycle: IntegrationAccountLifecycle,
@@ -248,27 +248,27 @@ export type IntegrationAccountMutation = {
   readonly identity: ControlMutationIdentity;
 };
 
-export type DisableIntegrationAccountError =
+type DisableIntegrationAccountError =
   | AccountLookupError
   | { readonly code: "configuration_version_conflict" }
   | { readonly code: "default_account_replacement_invalid" }
   | { readonly code: "default_account_target_incapable" };
 
-export type DisableIntegrationAccountResult = {
+type DisableIntegrationAccountResult = {
   readonly account: DisabledIntegrationAccount;
   readonly receiptId: string;
   readonly configurationVersion: number;
   readonly projectionRevision: number;
 };
 
-export type SwitchDefaultAccountError =
+type SwitchDefaultAccountError =
   | AccountLookupError
   | { readonly code: "configuration_version_conflict" }
   | { readonly code: "default_account_unchanged" }
   | { readonly code: "default_account_target_inactive" }
   | { readonly code: "default_account_target_incapable" };
 
-export type SwitchDefaultAccountResult = {
+type SwitchDefaultAccountResult = {
   readonly previousIntegrationAccountId: IntegrationAccountId | null;
   readonly nextIntegrationAccountId: IntegrationAccountId;
   readonly receiptId: string;
@@ -440,7 +440,7 @@ export async function createConnectedIntegration(
   };
 }
 
-export type AdditionalIntegrationAccountSeed = {
+type AdditionalIntegrationAccountSeed = {
   readonly organisationId: OrganisationId;
   readonly providerConnectionId: ProviderConnectionId;
   readonly provider: IntegrationProvider;
@@ -454,7 +454,7 @@ export type AdditionalIntegrationAccountSeed = {
   readonly now: number;
 };
 
-export type AttachIntegrationAccountError =
+type AttachIntegrationAccountError =
   | { readonly code: "provider_connection_not_found" }
   | { readonly code: "provider_connection_inactive" }
   | { readonly code: "provider_connection_scope_mismatch" }
@@ -1530,7 +1530,7 @@ export async function resolveIntegrationAccount(input: {
   return parseOptionalIntegrationAccount(row);
 }
 
-export async function resolveActiveIntegrationAccount(input: {
+async function resolveActiveIntegrationAccount(input: {
   readonly db: OrganisationQuerySource;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -1780,7 +1780,7 @@ function buildDisabledIntegrationAccount(
   };
 }
 
-export async function resolveIntegrationAccountByProviderIdentity(input: {
+async function resolveIntegrationAccountByProviderIdentity(input: {
   readonly db: OrganisationQuerySource;
   readonly organisationId: OrganisationId;
   readonly provider: IntegrationProvider;

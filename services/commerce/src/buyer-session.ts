@@ -45,10 +45,10 @@ export type BuyerSessionClaims = Readonly<{
   expiresAt: string;
 }>;
 
-export type BuyerSessionVerification =
+type BuyerSessionVerification =
   Readonly<{ ok: true; claims: BuyerSessionClaims }> | Readonly<{ ok: false }>;
 
-export type BuyerOrderRecoveryClaims = Readonly<{
+type BuyerOrderRecoveryClaims = Readonly<{
   version: 4;
   audience: "underclerk_buyer_order";
   sessionId: string;
@@ -62,11 +62,11 @@ export type BuyerOrderRecoveryClaims = Readonly<{
   expiresAt: string;
 }>;
 
-export type BuyerOrderRecoveryVerification =
+type BuyerOrderRecoveryVerification =
   | Readonly<{ ok: true; claims: BuyerOrderRecoveryClaims }>
   | Readonly<{ ok: false }>;
 
-export type BuyerSessionAuthorityOptions = Readonly<{
+type BuyerSessionAuthorityOptions = Readonly<{
   secret: string;
   now: () => string;
   newSessionId?: () => string;
@@ -79,7 +79,7 @@ const CUSTOMER_ACCESS_TOKEN_PREFIX = "underclerk_customer_v1";
 const CUSTOMER_ACCESS_LIFETIME_MS = 30 * 24 * 60 * 60 * 1_000;
 
 /** A signed-in customer, for one storefront, for thirty days. */
-export type CustomerAccessClaims = Readonly<{
+type CustomerAccessClaims = Readonly<{
   version: 2;
   audience: "underclerk_customer";
   merchantId: string;
@@ -90,7 +90,7 @@ export type CustomerAccessClaims = Readonly<{
   expiresAt: string;
 }>;
 
-export type DraftInvoiceClaims = Readonly<{
+type DraftInvoiceClaims = Readonly<{
   version: 2;
   audience: "underclerk_draft_invoice";
   merchantId: string;

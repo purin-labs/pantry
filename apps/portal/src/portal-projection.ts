@@ -4,7 +4,7 @@ import type { SetupFormDefaults } from "./features/integrations/settings-types";
 import type { Membership, OrganisationWorkspace, ReadinessBlocker } from "@seams/control-api/portal/portal-types";
 import { isPortalHandle } from "@seams/control-api/portal/portal-projection";
 
-export const LAST_USED_WORKSPACE_STORAGE_PREFIX = "satyr.portal.last-used-workspace:";
+const LAST_USED_WORKSPACE_STORAGE_PREFIX = "satyr.portal.last-used-workspace:";
 
 export function isConfigurationConflict(error: unknown): boolean {
   return (
@@ -52,11 +52,11 @@ export function rememberLastUsedWorkspace(
   }
 }
 
-export function lastUsedWorkspaceStorageKey(organisationHandle: string): string {
+function lastUsedWorkspaceStorageKey(organisationHandle: string): string {
   return `${LAST_USED_WORKSPACE_STORAGE_PREFIX}${organisationHandle}`;
 }
 
-export function connectedSlackAccounts(
+function connectedSlackAccounts(
   accounts: readonly IntegrationAccount[],
 ): readonly IntegrationAccount[] {
   const connected: IntegrationAccount[] = [];
@@ -68,7 +68,7 @@ export function connectedSlackAccounts(
   return connected;
 }
 
-export function isConnectedSlackAccount(account: IntegrationAccount): boolean {
+function isConnectedSlackAccount(account: IntegrationAccount): boolean {
   return (
     account.provider === "slack" &&
     account.lifecycle.kind !== "disabled" &&
@@ -170,6 +170,6 @@ export function needsReadinessEvaluation(
   );
 }
 
-export function isNotEvaluatedBlocker(blocker: ReadinessBlocker): boolean {
+function isNotEvaluatedBlocker(blocker: ReadinessBlocker): boolean {
   return blocker.code === "readiness_not_evaluated";
 }

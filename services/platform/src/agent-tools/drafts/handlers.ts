@@ -98,7 +98,7 @@ import type { SessionToolContext } from "../context";
  * A draft tool reads its product under a product read grant. When no grant
  * admits the read, a permission request may ask for that grant.
  */
-export function requestableProductRead(error: unknown): never {
+function requestableProductRead(error: unknown): never {
   if (
     error instanceof CommerceReadRequestError &&
     error.failure.code === "commerce_context_authority_denied"
@@ -108,7 +108,7 @@ export function requestableProductRead(error: unknown): never {
   throw error;
 }
 
-export function selectDescriptionDraftSourceGrant(
+function selectDescriptionDraftSourceGrant(
   lease: HarnessTurnLease,
   productId: string,
   input: Readonly<{
@@ -139,14 +139,14 @@ export function selectDescriptionDraftSourceGrant(
   });
 }
 
-export type PreparedWorkflowCanvasRead = Readonly<{
+type PreparedWorkflowCanvasRead = Readonly<{
   kind: "saved-run";
   snapshotId: string;
   label: FlowLabel;
   execution: SessionExecutionAdmission;
 }>;
 
-export async function prepareWorkflowCanvasRead(
+async function prepareWorkflowCanvasRead(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -224,7 +224,7 @@ export async function prepareWorkflowCanvasRead(
   };
 }
 
-export async function admitWorkflowCanvasObservation(
+async function admitWorkflowCanvasObservation(
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
   prepared: PreparedWorkflowCanvasRead,
@@ -425,7 +425,7 @@ export async function moveWorkflowCanvasForEmbeddedHarness(
   return result.value;
 }
 
-export async function authorizeWorkflowCanvasDisclosure(
+async function authorizeWorkflowCanvasDisclosure(
   env: Env,
   storage: DurableObjectStorage,
   organisationId: OrganisationId,
@@ -547,7 +547,7 @@ export async function readProductDescriptionDraftForEmbeddedHarness(
  * The product of the description draft that an owner connected to this
  * turn's Slack thread. The model may correct each refusal.
  */
-export async function connectedDraftProduct(
+async function connectedDraftProduct(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -583,7 +583,7 @@ export async function connectedDraftProduct(
 }
 
 /** A refusal the model can correct, or the generic failure. */
-export function draftReadFailure(productId: string, code: string): Error {
+function draftReadFailure(productId: string, code: string): Error {
   return code === "product_not_found"
     ? new DescriptionDraftRequestError(
         `No product has the id ${productId}. Use the shop's plain product id, without an "underclerk:" prefix, or pass productId null to read the draft connected to this Slack thread.`,
@@ -1334,13 +1334,11 @@ export async function editEmailDraftForEmbeddedHarness(
 }
 
 /** A thread link that the caller has already read and checked. */
-export function checkedDraftThread(
-  link: DraftThreadLink,
-): Promise<DraftThreadLink> {
+function checkedDraftThread(link: DraftThreadLink): Promise<DraftThreadLink> {
   return Promise.resolve(link);
 }
 
-export async function authorizeEmailDraftThreadAccess(
+async function authorizeEmailDraftThreadAccess(
   env: Env,
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
@@ -1417,7 +1415,7 @@ export async function authorizeEmailDraftThreadAccess(
   return { member, sharing };
 }
 
-export function authorizeDescriptionDraftDisclosure(
+function authorizeDescriptionDraftDisclosure(
   env: Env,
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
@@ -1452,7 +1450,7 @@ export function authorizeDescriptionDraftDisclosure(
   );
 }
 
-export async function readProductDescriptionDraftThread(
+async function readProductDescriptionDraftThread(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,

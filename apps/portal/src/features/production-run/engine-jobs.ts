@@ -41,14 +41,14 @@ export type {
  * at the next step boundary and keeps the worker.
  */
 
-export type BrowserPhysicsHandlers = Readonly<{
+type BrowserPhysicsHandlers = Readonly<{
   prepared(request: PhysicsRequest): Promise<boolean>;
   completed(outcome: BrowserPhysicsOutcome): void;
   failed(message: string): void;
   progress(progress: JobProgress): void;
 }>;
 
-export type AppliancePhysicsHandlers = Readonly<{
+type AppliancePhysicsHandlers = Readonly<{
   prepared(request: ApplianceRequest): Promise<boolean>;
   completed(result: ApplianceResult): void;
   failed(message: string): void;

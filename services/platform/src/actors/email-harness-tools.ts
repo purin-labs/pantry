@@ -13,9 +13,9 @@ import {
 import { parseOrganisationId } from "../ids";
 import { requireActiveOrganisationActor } from "./actor-router";
 import type { SerializedFlowBinding } from "../policy/information-flow";
-import {
-  type GmailAttachmentRef,
-  type GmailMessageContent,
+import type {
+  GmailAttachmentRef,
+  GmailMessageContent,
 } from "../mail/gmail-adapter";
 import type { Result } from "../result";
 import { digestCanonical } from "../policy";
@@ -57,7 +57,7 @@ export type EmailCaseManifest = {
 };
 
 /** One admitted message as a fixture supplies it, by its manifest identity. */
-export type EmailCaseFixture = (
+type EmailCaseFixture = (
   messageId: string,
 ) => Promise<Result<GmailMessageContent, { readonly code: string }>>;
 
@@ -70,7 +70,7 @@ export type EmailSizeBreach = {
   readonly limitBytes: number;
 };
 
-export type EmailHarnessToolHost = HarnessToolHost & {
+type EmailHarnessToolHost = HarnessToolHost & {
   breaches(): readonly EmailSizeBreach[];
   outcome(): EmailCueOutcome;
   commerceEvidence(): readonly EmailCommerceEvidence[];
@@ -110,7 +110,7 @@ export type EmailCueOutcome =
 export type EmailResponsePolicy =
   "cue_routed" | "draft_only" | "correction_learning";
 
-export const MAX_MEMORY_CANDIDATE_CHARS = 600;
+const MAX_MEMORY_CANDIDATE_CHARS = 600;
 
 /**
  * A message the agent wrote, in its own words, that the sender could send

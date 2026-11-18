@@ -48,7 +48,7 @@ import {
   type StoredConversation,
 } from "./store";
 
-export type SideCaseStartResult =
+type SideCaseStartResult =
   | Readonly<{
       kind: "started";
       proposal: SideCaseProposal;

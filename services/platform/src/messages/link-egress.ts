@@ -40,14 +40,14 @@ type Fetcher = (
   init?: RequestInit,
 ) => Promise<Response>;
 
-export type MessageLinkFetchResponse = {
+type MessageLinkFetchResponse = {
   readonly status: number;
   readonly contentType: string | null;
   readonly location: string | null;
   readonly body: Uint8Array;
 };
 
-export type MessageLinkFetchResponseError = {
+type MessageLinkFetchResponseError = {
   readonly kind: "invalid_response";
   readonly field: string;
 };

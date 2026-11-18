@@ -23,7 +23,6 @@ import {
   parseCreateModifierGroupRevisionCommand as parseCreateModifierGroupRevisionCommandRecord,
   parseCreatePreparationStationCommand as parseCreatePreparationStationCommandRecord,
   parseCreateRecipeRevisionCommand as parseCreateRecipeRevisionCommandRecord,
-  parseFoodServiceMenu as parseMenuRecord,
   parseFoodServicePreparationTicket as parsePreparationTicketRecord,
   parseFoodServiceRecipeRevision as parseRecipeRevisionRecord,
   parseManagePreparationTicketCommand as parseManagePreparationTicketCommandRecord,
@@ -262,10 +261,6 @@ export function parseFoodServiceObservation(
   value: unknown,
 ): CommerceFoodServiceObservationV1 {
   return decodeRecord(parseCommerceFoodServiceObservationV1Record, value);
-}
-
-export function parseMenu(value: unknown): Menu {
-  return decodeRecord(parseMenuRecord, value);
 }
 
 export function parseRecipeRevision(value: unknown): RecipeRevision {

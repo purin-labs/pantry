@@ -83,7 +83,7 @@ function revoker(
     : "operator";
 }
 
-export function issueApiKey(
+function issueApiKey(
   ctx: HttpRouteContext,
   request: Request,
   merchantId: string,

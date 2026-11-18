@@ -23,7 +23,7 @@ export const commerceSortDirectionSchema = Type.Enum([
   "ascending",
   "descending",
 ]);
-export const commerceNullPlacementSchema = Type.Literal("last");
+const commerceNullPlacementSchema = Type.Literal("last");
 export const commerceSortFieldSchema = Type.Union([
   OpenObject({ kind: Type.Literal("attribute"), attributeId }),
   OpenObject({ kind: Type.Literal("display_name") }),
@@ -34,7 +34,7 @@ export const commerceSortSchema = OpenObject({
   field: commerceSortFieldSchema,
   direction: commerceSortDirectionSchema,
 });
-export const commerceOrderingLeadingFieldSchema = commerceSortFieldSchema;
+const commerceOrderingLeadingFieldSchema = commerceSortFieldSchema;
 export const commerceOrderingLeadingKeySchema = OpenObject({
   field: commerceOrderingLeadingFieldSchema,
   direction: commerceSortDirectionSchema,

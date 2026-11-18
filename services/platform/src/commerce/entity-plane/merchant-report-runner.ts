@@ -20,7 +20,7 @@ import {
   type MerchantReportUnsupported,
 } from "./merchant-reports";
 
-export type MerchantReportRunInput = Readonly<{
+type MerchantReportRunInput = Readonly<{
   organisationId: string;
   merchantId: string;
   grants: readonly AccessGrant[];

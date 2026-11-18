@@ -6,7 +6,7 @@ import type { Env } from "../../env";
  * pass its engine rule. The Portal's text check (`keptVoiceText`) drops the
  * rest of the invented text, for every engine.
  */
-export const WORKERS_AI_WHISPER_MODEL = "@cf/openai/whisper-large-v3-turbo";
+const WORKERS_AI_WHISPER_MODEL = "@cf/openai/whisper-large-v3-turbo";
 /**
  * Whisper invents words on room noise when its prompt holds the shop's
  * vocabulary. The shop Mac drops such segments with the same two numbers

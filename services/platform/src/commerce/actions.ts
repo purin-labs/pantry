@@ -56,7 +56,7 @@ export function commerceActionProjectionTarget(
 }
 
 /** The finished outcome of a commerce action: the body that the caller records. */
-export type CommerceActionDone = Readonly<{ body: Record<string, unknown> }>;
+type CommerceActionDone = Readonly<{ body: Record<string, unknown> }>;
 
 /** Why a commerce action stopped before it finished, or that it is still pending. */
 export type CommerceActionFailure =
@@ -433,7 +433,7 @@ export async function executeCommerceAction(
   return { ok: true, value: { body: responseBody } };
 }
 
-export async function completeCommerceActionFollowUp(
+async function completeCommerceActionFollowUp(
   input: Readonly<{
     env: Env;
     entry: VariantBy<ActionLedgerEntry, "state", "confirmed" | "failed">;
@@ -463,7 +463,7 @@ export async function completeCommerceActionFollowUp(
 }
 
 /** Tells the Case that an approved change failed, so its card says so. */
-export async function reportCommerceExecutionFailure(
+async function reportCommerceExecutionFailure(
   input: Readonly<{
     env: Env;
     entry: VariantBy<ActionLedgerEntry, "state", "failed">;
@@ -492,7 +492,7 @@ export async function reportCommerceExecutionFailure(
   return followUp;
 }
 
-export function commerceOutcomeFollowUp(
+function commerceOutcomeFollowUp(
   result: CommerceCaseOutcomeResult,
 ): CommerceActionFollowUp {
   if (!result.ok) return { kind: "unavailable", code: result.error.code };
@@ -509,7 +509,7 @@ export function commerceOutcomeFollowUp(
   }
 }
 
-export async function scheduleCommerceProjectionRefresh(
+async function scheduleCommerceProjectionRefresh(
   input: Readonly<{
     env: Env;
     entry: ActionLedgerEntry;
@@ -534,7 +534,7 @@ export async function scheduleCommerceProjectionRefresh(
   }
 }
 
-export type CommerceCaseOutcomeDelivery =
+type CommerceCaseOutcomeDelivery =
   | {
       readonly kind: "delivered" | "already_settled";
       readonly caseRevision: number;
@@ -548,11 +548,11 @@ export type CommerceCaseOutcomeDelivery =
       readonly retryAt: number;
     };
 
-export type CommerceCaseOutcomeResult =
+type CommerceCaseOutcomeResult =
   | { readonly ok: true; readonly value: CommerceCaseOutcomeDelivery }
   | { readonly ok: false; readonly error: { readonly code: string } };
 
-export type DeliverCommerceOutcomeInput =
+type DeliverCommerceOutcomeInput =
   | {
       readonly kind: "provider_receipt";
       readonly env: Env;
@@ -687,7 +687,7 @@ export async function acceptAndDeliverCommerceOutcome(
   };
 }
 
-export function commerceCaseOutcome(input: DeliverCommerceOutcomeInput):
+function commerceCaseOutcome(input: DeliverCommerceOutcomeInput):
   | {
       readonly kind: "provider_receipt";
       readonly receipt: CommerceProviderReceipt;
@@ -715,10 +715,10 @@ export function commerceCaseOutcome(input: DeliverCommerceOutcomeInput):
   }
 }
 
-export type CommerceActionRecordDetails =
+type CommerceActionRecordDetails =
   CommerceActionPath | CommerceEntityPlaneActionPath;
 
-export type CommerceActionRecordAuthority =
+type CommerceActionRecordAuthority =
   | Variant<ActionLedgerEntry["action"]["authority"], "commerce_system">
   | {
       readonly kind: "integration_account";
@@ -762,7 +762,7 @@ export function commerceActionRecord(entry: ActionLedgerEntry): CommerceActionRe
   };
 }
 
-export function commerceActionAuthorityRecord(
+function commerceActionAuthorityRecord(
   entry: ActionLedgerEntry,
 ): CommerceActionRecordAuthority {
   switch (entry.action.authority.kind) {
@@ -780,7 +780,7 @@ export function commerceActionAuthorityRecord(
   }
 }
 
-export function commerceActionProviderResult(entry: ActionLedgerEntry): string | null {
+function commerceActionProviderResult(entry: ActionLedgerEntry): string | null {
   switch (entry.state) {
     case "confirmed":
     case "failed":
@@ -798,13 +798,13 @@ export function commerceActionProviderResult(entry: ActionLedgerEntry): string |
   }
 }
 
-export function commerceEntityPlaneActionRecord(
+function commerceEntityPlaneActionRecord(
   outcome: CommerceEntityPlaneExecutionOutcome,
 ): CommerceActionRecord {
   return commerceActionRecord(outcome.action);
 }
 
-export function parseProviderReceipt(value: string): unknown {
+function parseProviderReceipt(value: string): unknown {
   try {
     return JSON.parse(value);
   } catch {
@@ -812,7 +812,7 @@ export function parseProviderReceipt(value: string): unknown {
   }
 }
 
-export function parseStoredCommerceProviderReceipt(
+function parseStoredCommerceProviderReceipt(
   value: string,
 ): CommerceProviderReceipt | null {
   const parsed = parseCommerceProviderReceipt(parseProviderReceipt(value));

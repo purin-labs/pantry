@@ -85,7 +85,7 @@ const PHASE_INDEX: Readonly<Record<LattePhase, number>> = {
   failed: -1,
 };
 
-export class LattePhysicsView extends React.Component<ViewProps, ViewState> {
+class LattePhysicsView extends React.Component<ViewProps, ViewState> {
   state: ViewState = { error: null, camera: "station" };
   private readonly element = React.createRef<HTMLDivElement>();
   private readonly station = React.createRef<HTMLElement>();

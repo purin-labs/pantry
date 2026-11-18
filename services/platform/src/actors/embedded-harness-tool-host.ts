@@ -126,11 +126,6 @@ export type HarnessWorkspaceQueryResult =
       readonly truncated: boolean;
     };
 
-export type HarnessExecutionLease = {
-  readonly executionId: string;
-  readonly leaseId: string;
-};
-
 export type HarnessToolHostConstructionError =
   | {
       readonly code: "embedded_harness_tool_catalog_digest_mismatch";

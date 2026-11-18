@@ -33,7 +33,7 @@ import { resolveCustomConnectorRevision } from "./revisions";
 import { assertNever, isRecord, sha256Hex } from "@seams/std";
 import { executeReviewedConnectorOperation } from "./mcp";
 
-export type CustomConnectorWriteReceipt = Readonly<{
+type CustomConnectorWriteReceipt = Readonly<{
   readonly kind: "custom_connector_write_receipt";
   readonly providerEffectId: string;
   readonly organisationId: OrganisationId;
@@ -50,7 +50,7 @@ export type CustomConnectorWriteReceipt = Readonly<{
   readonly confirmedAt: number;
 }>;
 
-export type CustomConnectorWriteExecution =
+type CustomConnectorWriteExecution =
   | Readonly<{
       readonly kind: "confirmed";
       readonly receipt: CustomConnectorWriteReceipt;
@@ -64,14 +64,14 @@ export type CustomConnectorWriteExecution =
       readonly reason: string;
     }>;
 
-export type CustomConnectorWriteError =
+type CustomConnectorWriteError =
   | Readonly<{ readonly code: "custom_connector_write_stale" }>
   | Readonly<{
       readonly code: "custom_connector_write_invalid";
       readonly field: string;
     }>;
 
-export type CustomConnectorWritePreview =
+type CustomConnectorWritePreview =
   | Readonly<{
       kind: "available";
       accountDisplayName: string;

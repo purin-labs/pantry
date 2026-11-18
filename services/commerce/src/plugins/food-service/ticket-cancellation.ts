@@ -19,7 +19,7 @@ import {
   writeFoodServiceResource,
 } from "./food-service-store.ts";
 
-export type TicketCancellationPlan =
+type TicketCancellationPlan =
   | Readonly<{
       kind: "planned";
       tickets: readonly CommercePreparationTicketV1[];

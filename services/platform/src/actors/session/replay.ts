@@ -18,7 +18,7 @@ import type {
   SessionStateError,
 } from "./types";
 
-export async function writeSessionStreamRecord(
+async function writeSessionStreamRecord(
   fanout: SessionAgentFanout,
   record: SessionTurnStreamRecord,
 ): Promise<void> {
@@ -26,7 +26,7 @@ export async function writeSessionStreamRecord(
 }
 
 /** Write the records as one chunk, one line each. */
-export async function writeSessionStreamRecords(
+async function writeSessionStreamRecords(
   fanout: SessionAgentFanout,
   records: readonly SessionTurnStreamRecord[],
 ): Promise<void> {
@@ -50,16 +50,11 @@ export async function writeSessionStreamRecords(
   }
 }
 
-export function detachSessionFanout(
-  fanout: SessionAgentFanout,
-  error: unknown,
-): void {
+function detachSessionFanout(fanout: SessionAgentFanout, error: unknown): void {
   fanout.state = { kind: "detached", detail: errorMessage(error) };
 }
 
-export async function closeSessionFanout(
-  fanout: SessionAgentFanout,
-): Promise<void> {
+async function closeSessionFanout(fanout: SessionAgentFanout): Promise<void> {
   if (fanout.state.kind === "detached") {
     return;
   }
@@ -105,7 +100,7 @@ export function createSessionReplayResponse(
   };
 }
 
-export async function runSessionReplayStream(
+async function runSessionReplayStream(
   session: Pick<SessionDO, "sql" | "durableState">,
   input: SessionReplayInput,
   writer: WritableStreamDefaultWriter<Uint8Array>,
@@ -214,11 +209,11 @@ export async function runSessionReplayStream(
   }
 }
 
-export function sessionFanoutDetached(fanout: SessionAgentFanout): boolean {
+function sessionFanoutDetached(fanout: SessionAgentFanout): boolean {
   return fanout.state.kind === "detached";
 }
 
-export function traceSessionReplayMetrics(
+function traceSessionReplayMetrics(
   metrics: SessionReplayMetrics,
   outcome: string,
 ): void {

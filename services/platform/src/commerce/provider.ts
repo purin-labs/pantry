@@ -76,7 +76,7 @@ export interface CommerceDeliveryVerifier {
   ): Promise<boolean>;
 }
 
-export type CommerceEntityPlaneAdmission = Readonly<{
+type CommerceEntityPlaneAdmission = Readonly<{
   deliveryId: string;
   organisationId: string;
   merchantId: string;
@@ -85,7 +85,7 @@ export type CommerceEntityPlaneAdmission = Readonly<{
   observations: readonly CommerceEntityPlaneObservationV1[];
 }>;
 
-export type NormalizeCommerceDeliveryResult =
+type NormalizeCommerceDeliveryResult =
   | Readonly<{
       ok: true;
       kind: "aggregate";
@@ -105,7 +105,7 @@ export type NormalizeCommerceDeliveryResult =
         | "underclerk_delivery_mixed_observation_categories";
     }>;
 
-export type CommerceCatalogPublicationResult =
+type CommerceCatalogPublicationResult =
   | Readonly<{
       status: "applied" | "replayed";
       receipt: CommerceMutationReceiptV1;
@@ -113,7 +113,7 @@ export type CommerceCatalogPublicationResult =
   | Readonly<{ status: "rejected"; error: CommerceMutationErrorV1 }>
   | Readonly<{ status: "unavailable"; error: CommerceClientError }>;
 
-export type CommerceOrderCancellationResult =
+type CommerceOrderCancellationResult =
   | Readonly<{
       status: "applied" | "replayed";
       receipt: CommerceMutationReceiptV1;
@@ -121,7 +121,7 @@ export type CommerceOrderCancellationResult =
   | Readonly<{ status: "rejected"; error: CommerceMutationErrorV1 }>
   | Readonly<{ status: "unavailable"; error: CommerceClientError }>;
 
-export type CommerceProductDescriptionUpdateResult =
+type CommerceProductDescriptionUpdateResult =
   | Readonly<{
       status: "applied" | "replayed";
       receipt: CommerceMutationReceiptV1;
@@ -129,19 +129,19 @@ export type CommerceProductDescriptionUpdateResult =
   | Readonly<{ status: "rejected"; error: CommerceMutationErrorV1 }>
   | Readonly<{ status: "unavailable"; error: CommerceClientError }>;
 
-export type CommerceCancellationAuthorityError =
+type CommerceCancellationAuthorityError =
   | Readonly<{ code: "underclerk_unavailable"; cause: CommerceClientError }>
   | Readonly<{
       code: "underclerk_cancellation_authority_incomplete";
       field: string;
     }>;
 
-export type CommerceCancellationAuthorityResult = Result<
+type CommerceCancellationAuthorityResult = Result<
   CommerceCancellationAuthority,
   CommerceCancellationAuthorityError
 >;
 
-export type CommerceMutationReceiptReconciliation =
+type CommerceMutationReceiptReconciliation =
   | Readonly<{ kind: "committed"; receipt: CommerceMutationReceiptV1 }>
   | Readonly<{ kind: "absent" }>
   | Readonly<{ kind: "indeterminate" }>;

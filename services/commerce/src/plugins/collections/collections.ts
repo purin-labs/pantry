@@ -37,7 +37,7 @@ export type CollectionCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-export type CollectionAuthorityOptions = Readonly<{
+type CollectionAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => CollectionMerchantRow | undefined;
   readReplay: (

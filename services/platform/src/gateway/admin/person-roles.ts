@@ -48,7 +48,7 @@ export async function handleAdministerPersonRoles(
     : handleConfigurePersonRole(request, env);
 }
 
-export async function handleListPersonRoles(
+async function handleListPersonRoles(
   request: Request,
   env: Env,
 ): Promise<Response> {
@@ -89,7 +89,7 @@ export async function handleListPersonRoles(
   });
 }
 
-export async function handleConfigurePersonRole(
+async function handleConfigurePersonRole(
   request: Request,
   env: Env,
 ): Promise<Response> {
@@ -166,7 +166,7 @@ export async function handleConfigurePersonRole(
   return jsonResponse({ ok: true, result: configured.value });
 }
 
-export function personRoleAdminErrorResponse(error: PersonRoleAdminError): Response {
+function personRoleAdminErrorResponse(error: PersonRoleAdminError): Response {
   switch (error.code) {
     case "person_not_found":
       return notFound();

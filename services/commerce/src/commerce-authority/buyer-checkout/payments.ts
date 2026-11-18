@@ -41,7 +41,7 @@ export function buyerPaymentDisputeStatuses(
   return statuses;
 }
 
-export function buyerPaymentDisputeStatus(
+function buyerPaymentDisputeStatus(
   dispute: PaymentDispute,
 ): CommerceBuyerPaymentDisputeStatusV1 {
   switch (dispute.lifecycle.state) {

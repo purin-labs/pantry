@@ -62,7 +62,7 @@ import { ensureCreatedOrganisationActor } from "../control/organisation-runtime"
 import type { Variant } from "@seams/type-utils";
 import { isRecord } from "@seams/std";
 
-export type CommerceLabRoute =
+type CommerceLabRoute =
   | {
       readonly kind: "admin";
       readonly operation: "reset" | "seed" | "verify";
@@ -100,7 +100,7 @@ type ParsedCueLogIdentity = {
   readonly at: number;
 };
 
-export type ParsedCommerceProposalCue = ParsedCueLogIdentity &
+type ParsedCommerceProposalCue = ParsedCueLogIdentity &
   (
     | { readonly target: { readonly kind: "slack"; readonly slackTs: string } }
     | { readonly target: { readonly kind: "case"; readonly caseId: string } }
@@ -205,7 +205,7 @@ export async function handleCommerceLabRoute(
   }
 }
 
-export function buildCommerceLabSeedEnvelopes(input: {
+function buildCommerceLabSeedEnvelopes(input: {
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
   readonly labNamespace: string;

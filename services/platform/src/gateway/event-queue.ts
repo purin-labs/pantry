@@ -49,7 +49,7 @@ import {
   queueErrorField,
 } from "./support";
 
-export function scheduleRunObjective(
+function scheduleRunObjective(
   binding: ScheduleBinding,
   windowKey: string,
 ): string {
@@ -64,7 +64,7 @@ export function scheduleRunObjective(
  * its cadence. The Case stores it with the run's trigger, so only a reader of
  * that trigger sees it.
  */
-export function scheduleRunTitle(binding: ScheduleBinding): string {
+function scheduleRunTitle(binding: ScheduleBinding): string {
   const line =
     binding.instructionBody
       ?.split("\n")
@@ -74,7 +74,7 @@ export function scheduleRunTitle(binding: ScheduleBinding): string {
   return line.length > 120 ? `${line.slice(0, 119)}…` : line;
 }
 
-export async function handleAgentScheduleDispatchQueueMessage(
+async function handleAgentScheduleDispatchQueueMessage(
   message: Message<unknown>,
   env: Env,
   body: AgentScheduleDispatchQueueMessage,
@@ -232,7 +232,7 @@ export async function handleEventQueueMessage(
   }
 }
 
-export async function handleFileContextProjectionQueueMessage(
+async function handleFileContextProjectionQueueMessage(
   message: Message<unknown>,
   env: Env,
   command: FileProjectionCommand,
@@ -328,7 +328,7 @@ export async function handleFileContextProjectionQueueMessage(
   }
 }
 
-export function secondsUntilNextUtcDay(now: number): number {
+function secondsUntilNextUtcDay(now: number): number {
   const current = new Date(now);
   const next = Date.UTC(
     current.getUTCFullYear(),
@@ -338,7 +338,7 @@ export function secondsUntilNextUtcDay(now: number): number {
   return Math.max(1, Math.ceil((next - now) / 1_000));
 }
 
-export async function handleCaseContextProjectionQueueMessage(
+async function handleCaseContextProjectionQueueMessage(
   message: Message<unknown>,
   env: Env,
   body: ContextProjectionCommand,

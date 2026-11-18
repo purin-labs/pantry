@@ -21,9 +21,9 @@ import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
 
 const CUSTOM_CONNECTOR_PROJECTION_LIMIT = 100;
 
-export type CustomConnectorLifecycle = "draft" | "active" | "disabled";
+type CustomConnectorLifecycle = "draft" | "active" | "disabled";
 
-export type CustomConnectorSummary = Readonly<{
+type CustomConnectorSummary = Readonly<{
   readonly connectorId: CustomConnectorId;
   readonly lifecycle: CustomConnectorLifecycle;
   readonly headRevision: CustomConnectorRevision;
@@ -37,7 +37,7 @@ export type CustomConnectorSummary = Readonly<{
   readonly updatedAt: number;
 }>;
 
-export type CustomConnectorAccountSummary = Readonly<{
+type CustomConnectorAccountSummary = Readonly<{
   readonly integrationAccountId: IntegrationAccountId;
   readonly displayName: string;
   readonly lifecycle: "active" | "disabled";
@@ -46,13 +46,13 @@ export type CustomConnectorAccountSummary = Readonly<{
   readonly credentialGeneration: number;
 }>;
 
-export type CustomConnectorDetail = Readonly<{
+type CustomConnectorDetail = Readonly<{
   readonly summary: CustomConnectorSummary;
   readonly revisions: readonly CustomConnectorRevisionRecord[];
   readonly accounts: readonly CustomConnectorAccountSummary[];
 }>;
 
-export type CustomConnectorProjectionError =
+type CustomConnectorProjectionError =
   | { readonly code: "custom_connector_not_found" }
   | { readonly code: "custom_connector_projection_limit_exceeded" }
   | {

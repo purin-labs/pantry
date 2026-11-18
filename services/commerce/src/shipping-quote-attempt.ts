@@ -29,7 +29,7 @@ type ShippingQuoteAttemptBase = Readonly<{
   expiresAt: string;
 }>;
 
-export type ShippingQuoteAttempt =
+type ShippingQuoteAttempt =
   | (ShippingQuoteAttemptBase &
       Readonly<{
         state: "pending";
@@ -63,7 +63,7 @@ export type ShippingQuoteAttempt =
         resultKind?: never;
       }>);
 
-export type QuoteShippingWithAttemptInput = Readonly<{
+type QuoteShippingWithAttemptInput = Readonly<{
   database: CommerceDatabase;
   merchantId: string;
   storefrontId: string;
@@ -115,7 +115,7 @@ export function quoteShippingWithAttempt(
   }
 }
 
-export function readShippingQuoteAttempt(
+function readShippingQuoteAttempt(
   database: CommerceDatabase,
   merchantId: string,
   attemptId: string,

@@ -116,7 +116,7 @@ export type ActivateCheckoutProfile = Readonly<{
   activatedBy: string;
 }>;
 
-export type InstallPublishedCheckoutProfileTemplate = Readonly<{
+type InstallPublishedCheckoutProfileTemplate = Readonly<{
   merchantId: string;
   storefrontId: string;
   checkoutProfileId: string;

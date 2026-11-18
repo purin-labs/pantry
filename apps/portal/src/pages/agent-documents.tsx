@@ -13,7 +13,7 @@ export type AgentRevisionLoader = (
   target: AgentRevisionTarget,
 ) => Promise<readonly AgentDocumentRevision[]>;
 
-export type DiffLine = {
+type DiffLine = {
   readonly kind: "same" | "added" | "removed";
   readonly text: string;
 };
@@ -319,7 +319,7 @@ type RevisionHistoryState =
     }
   | { readonly kind: "failed" };
 
-export function RevisionHistory(props: {
+function RevisionHistory(props: {
   readonly target: AgentRevisionTarget;
   readonly load: AgentRevisionLoader;
   readonly currentRevision: number;

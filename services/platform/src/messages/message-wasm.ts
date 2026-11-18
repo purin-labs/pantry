@@ -21,7 +21,7 @@ import type { Result } from "../result";
  * the signature table has one authoritative definition, without moving the file
  * through the contract parser.
  */
-export type StoredMessageAttachmentCandidate = {
+type StoredMessageAttachmentCandidate = {
   readonly attachmentId: string;
   readonly displayName: string;
   readonly declaredMediaType: string | null;

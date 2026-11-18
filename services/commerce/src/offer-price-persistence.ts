@@ -24,7 +24,7 @@ type OfferPriceRow = Readonly<{
 }>;
 
 /** The Offer state a price change is decided against, re-read at execution. */
-export type CurrentOfferPrice = Readonly<{
+type CurrentOfferPrice = Readonly<{
   revision: number;
   priceMinor: number;
   currency: string;

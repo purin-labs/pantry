@@ -275,15 +275,13 @@ function invalidateHomePageRequest(requestRevision: HomeRequestRevision): void {
   requestRevision.current += 1;
 }
 
-export function refreshingPageContent(
-  content: HomePageContent,
-): HomePageContent {
+function refreshingPageContent(content: HomePageContent): HomePageContent {
   return content.kind === "ready"
     ? { ...content, updating: true }
     : { kind: "loading" };
 }
 
-export function homeFailureContent(
+function homeFailureContent(
   errorKind: ControlErrorKind | null,
 ): Variant<PageContent<HomeSnapshot>, "failed" | "unauthorized"> {
   if (errorKind === "forbidden") {

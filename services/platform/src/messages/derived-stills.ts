@@ -22,9 +22,9 @@ import { sha256Hex } from "@seams/std";
  * collector treats them as reachable exactly when their source is.
  */
 
-export const DERIVED_SEGMENT = "derived";
+const DERIVED_SEGMENT = "derived";
 
-export type DerivedStillsManifest = {
+type DerivedStillsManifest = {
   readonly schemaVersion: "plan37.derived-stills.v1";
   readonly sourceSha256: string;
   readonly policyRevision: string;

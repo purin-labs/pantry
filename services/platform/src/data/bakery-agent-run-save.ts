@@ -2,7 +2,7 @@
 
 type Database = Pick<D1Database, "prepare">;
 
-export type AgentProposalRow = Readonly<{
+type AgentProposalRow = Readonly<{
   effectJson: string;
   receiptJson: string;
   updatedAt: number;

@@ -6,7 +6,7 @@ const BYTES_PER_SECOND = SAMPLE_RATE * 2;
 export const VOICE_BODY_BYTE_LIMIT =
   VOICE_AUDIO_SECONDS_LIMIT * BYTES_PER_SECOND + 1024;
 
-export type VoiceWav =
+type VoiceWav =
   | Readonly<{ kind: "valid"; audioMilliseconds: number }>
   | Readonly<{ kind: "invalid" }>
   | Readonly<{ kind: "too_long" }>;

@@ -369,7 +369,7 @@ export function commitPreparedSessionCheckpoint(
   }
 }
 
-export function commitPreparedSessionCheckpointTransaction(
+function commitPreparedSessionCheckpointTransaction(
   storage: ActorTransactionStorage,
   prepared: PreparedHarnessCheckpoint,
   transition: CheckpointingStartedSessionCommit,
@@ -539,7 +539,7 @@ export function commitStartedSessionTransaction(
   };
 }
 
-export function sessionInformationFlowMatchesCommit(
+function sessionInformationFlowMatchesCommit(
   input: StartedSessionCommit,
 ): boolean {
   const lease = input.activatedRuntime.harnessLease;
@@ -557,7 +557,7 @@ export function sessionInformationFlowMatchesCommit(
   );
 }
 
-export function mapInformationFlowCommitError(
+function mapInformationFlowCommitError(
   error: import("../agent-session-information-flow").SessionInformationFlowError,
 ): ActorTransitionCommitError {
   switch (error.code) {
@@ -573,9 +573,7 @@ export function mapInformationFlowCommitError(
   }
 }
 
-export function sessionTurnContextMatchesCommit(
-  input: StartedSessionCommit,
-): boolean {
+function sessionTurnContextMatchesCommit(input: StartedSessionCommit): boolean {
   const acceptedInput = input.acceptedInput.event.body.input;
   const lease = input.activatedRuntime.harnessLease;
   const context = input.context;
@@ -589,7 +587,7 @@ export function sessionTurnContextMatchesCommit(
   );
 }
 
-export function acceptedInputCaseIdentityMatchesBundle(
+function acceptedInputCaseIdentityMatchesBundle(
   acceptedInput: AcceptedInputRef,
   bundle: StoredContextBundle,
 ): boolean {
@@ -599,7 +597,7 @@ export function acceptedInputCaseIdentityMatchesBundle(
   );
 }
 
-export function modelContextMatchesBundle(
+function modelContextMatchesBundle(
   modelContext: ModelContextBundle,
   bundle: StoredContextBundle,
 ): boolean {
@@ -609,7 +607,7 @@ export function modelContextMatchesBundle(
   );
 }
 
-export function persistSessionTurnContext(
+function persistSessionTurnContext(
   sql: SqlStorage,
   input: StartedSessionCommit,
 ): void {
@@ -709,14 +707,11 @@ export function recordTransientTurnContext(
 }
 
 /** A transient turn's attempts share this prefix; each adds its bundle digest. */
-export function transientTurnAttemptPrefix(turnId: string): string {
+function transientTurnAttemptPrefix(turnId: string): string {
   return `${turnId}#`;
 }
 
-export function transientTurnAttemptId(
-  turnId: string,
-  bundleDigest: string,
-): string {
+function transientTurnAttemptId(turnId: string, bundleDigest: string): string {
   return `${transientTurnAttemptPrefix(turnId)}${bundleDigest}`;
 }
 
@@ -726,7 +721,7 @@ export function transientTurnAttemptId(
  * revision the bundle admitted. In that case it is `limited` by
  * `prompt_bytes`, with the revisions the prompt did carry.
  */
-export type SessionTurnShownMemory =
+type SessionTurnShownMemory =
   | NonNullable<ContextBundle["memory"]>
   | Readonly<{
       kind: "limited";
@@ -735,7 +730,7 @@ export type SessionTurnShownMemory =
     }>;
 
 /** What one attempt at a turn recorded about Memory before its model call. */
-export type SessionTurnMemoryRecord = Readonly<{
+type SessionTurnMemoryRecord = Readonly<{
   bundleDigest: string;
   assembledAt: number;
   outcome: ContextBundle["memory"];
@@ -965,7 +960,7 @@ export function commitInitializedCaseSessionTransaction(
   return committed;
 }
 
-export function caseAssignmentBudgetMatches(
+function caseAssignmentBudgetMatches(
   account: CaseAssignment["budget"],
   assignment: CaseAssignment["budget"],
 ): boolean {
@@ -1001,9 +996,7 @@ export function parseStoredCaseAssignment(
   return isPersistedCaseAssignment(value) ? value : null;
 }
 
-export function isPersistedCaseAssignment(
-  value: unknown,
-): value is CaseAssignment {
+function isPersistedCaseAssignment(value: unknown): value is CaseAssignment {
   if (
     !isRecord(value) ||
     !isRecord(value.objective) ||
@@ -1056,7 +1049,7 @@ export function isPersistedCaseAssignment(
   );
 }
 
-export function isPersistedAuthorityPartition(
+function isPersistedAuthorityPartition(
   value: Record<string, unknown>,
 ): boolean {
   if (
@@ -1079,7 +1072,7 @@ export function isPersistedAuthorityPartition(
   return parseStoredAuthorityPartition(value).ok;
 }
 
-export function isPersistedContextEntry(value: unknown): boolean {
+function isPersistedContextEntry(value: unknown): boolean {
   if (
     !isRecord(value) ||
     !isNonEmptyString(value.entryId) ||
@@ -1311,7 +1304,7 @@ export function commitExecutionResumedSessionTransaction(
   return writeCanonicalTransition(sql, input, valid.value);
 }
 
-export function validateRecoverySessionTransition(
+function validateRecoverySessionTransition(
   sql: SqlStorage,
   input:
     | ExecutionRecoveryStartedSessionCommit
@@ -1504,7 +1497,7 @@ export function commitQuarantinedSessionTransaction(
   return committed;
 }
 
-export function commitCheckpointingStartedSessionTransaction(
+function commitCheckpointingStartedSessionTransaction(
   sql: SqlStorage,
   input: CheckpointingStartedSessionCommit,
 ): Result<ActorTransitionCommitResult, ActorTransitionCommitError> {
@@ -1541,7 +1534,7 @@ export function commitCheckpointingStartedSessionTransaction(
   return writeCanonicalTransition(sql, input, envelope.value);
 }
 
-export function commitCheckpointCommittedSessionTransaction(
+function commitCheckpointCommittedSessionTransaction(
   sql: SqlStorage,
   input: CheckpointCommittedSessionCommit,
 ): Result<ActorTransitionCommitResult, ActorTransitionCommitError> {
@@ -1577,7 +1570,7 @@ export function commitCheckpointCommittedSessionTransaction(
   return writeCanonicalTransition(sql, input, envelope.value);
 }
 
-export function commitCancellationStartedSessionTransaction(
+function commitCancellationStartedSessionTransaction(
   sql: SqlStorage,
   input: CancellationStartedSessionCommit,
 ): Result<ActorTransitionCommitResult, ActorTransitionCommitError> {
@@ -1611,7 +1604,7 @@ export function commitCancellationStartedSessionTransaction(
   return writeCanonicalTransition(sql, input, envelope.value);
 }
 
-export function commitCancellationResolvedSessionTransaction(
+function commitCancellationResolvedSessionTransaction(
   sql: SqlStorage,
   input: CancellationResolvedSessionCommit,
 ): Result<ActorTransitionCommitResult, ActorTransitionCommitError> {
@@ -1682,7 +1675,7 @@ export function commitCancellationResolvedSessionTransaction(
   return committed;
 }
 
-export function writeCanonicalTransition(
+function writeCanonicalTransition(
   sql: SqlStorage,
   input:
     | ExecutionRequestedSessionCommit
@@ -1709,7 +1702,7 @@ export function writeCanonicalTransition(
   return { ok: true, value: outcome };
 }
 
-export function encodeJournalEvent(
+function encodeJournalEvent(
   event: EventEnvelope<SessionTransition>,
 ): Result<
   string,
@@ -1722,7 +1715,7 @@ export function encodeJournalEvent(
     : { ok: false, error: { code: "journal_event_too_large", encodedBytes } };
 }
 
-export function writeInitializedSessionProjection(
+function writeInitializedSessionProjection(
   sql: SqlStorage,
   input: InitializedSessionCommit,
 ): void {
@@ -1743,7 +1736,7 @@ export function writeInitializedSessionProjection(
   );
 }
 
-export function isValidInitializedSessionTransition(
+function isValidInitializedSessionTransition(
   sql: SqlStorage,
   input: InitializedSessionCommit,
 ): boolean {
@@ -1778,7 +1771,7 @@ export function isValidInitializedSessionTransition(
   );
 }
 
-export function isValidAcceptedInputTransition(
+function isValidAcceptedInputTransition(
   sql: SqlStorage,
   input: AcceptedSessionInputCommit,
 ): boolean {
@@ -1810,7 +1803,7 @@ export function isValidAcceptedInputTransition(
   );
 }
 
-export function isValidRuntimeActivatedTransition(
+function isValidRuntimeActivatedTransition(
   sql: SqlStorage,
   input: RuntimeActivatedSessionCommit,
 ): boolean {

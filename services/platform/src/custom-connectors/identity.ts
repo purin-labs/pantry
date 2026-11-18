@@ -33,7 +33,7 @@ export type CustomConnectorRevisionIdentity = {
   readonly definitionDigest: CustomConnectorDefinitionDigest;
 };
 
-export type CustomConnectorIdentityParseError = {
+type CustomConnectorIdentityParseError = {
   readonly code: "invalid_custom_connector_identity";
   readonly field:
     | "connectorId"

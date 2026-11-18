@@ -101,7 +101,7 @@ const WHATSAPP_HARNESS_INSTRUCTIONS = [
   "prices, dates, or policies you were not given. If you cannot answer truthfully, request a handoff.",
 ].join(" ");
 
-export type WhatsAppCaseTurnInput = Readonly<{
+type WhatsAppCaseTurnInput = Readonly<{
   scope: OrganisationExecutionScope;
   connectorSql: SqlStorage;
   cipher: WhatsAppContentCipher;
@@ -125,7 +125,7 @@ export type WhatsAppCaseTurnInput = Readonly<{
   now: number;
 }>;
 
-export type WhatsAppCaseTurnOutcome =
+type WhatsAppCaseTurnOutcome =
   | {
       readonly kind: "proposed";
       readonly proposalId: string;
@@ -142,9 +142,9 @@ export type WhatsAppCaseTurnOutcome =
       readonly pendingNoticeKey: string | null;
     };
 
-export type WhatsAppCaseTurnError = { readonly code: string };
+type WhatsAppCaseTurnError = { readonly code: string };
 
-export type WhatsAppCustomerMessageDisposition =
+type WhatsAppCustomerMessageDisposition =
   | { readonly kind: "agent_reply_now"; readonly matchedTopic: string }
   | {
       readonly kind: "acknowledge_without_agent";
@@ -683,7 +683,7 @@ function releaseWhatsAppTurnReservation(
   }
 }
 
-export function decideWhatsAppCustomerMessage(
+function decideWhatsAppCustomerMessage(
   input: Readonly<{
     message: string;
     relevantMessageTopics: string;
@@ -719,7 +719,7 @@ export function decideWhatsAppCustomerMessage(
  * Whether the message names one of the topics. A one-word topic matches a whole
  * word only, so that "nut" does not match "minute". It fails toward a person.
  */
-export function messageNamesTopic(message: string, topics: string): boolean {
+function messageNamesTopic(message: string, topics: string): boolean {
   const normalized = normalizeCueText(message);
   const words = new Set(normalized.split(" ").filter(nonEmptyCueText));
   for (const topic of topics.split(/[\n,;]+/u).map(normalizeCueText)) {

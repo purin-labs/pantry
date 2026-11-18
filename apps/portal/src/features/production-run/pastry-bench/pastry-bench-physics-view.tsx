@@ -68,10 +68,7 @@ type ViewState = Readonly<{
 }>;
 
 /** Interactive Three.js MuJoCo 4.0.0 deformable pastry bench & Maruzen oven view. */
-export class PastryBenchPhysicsView extends React.Component<
-  ViewProps,
-  ViewState
-> {
+class PastryBenchPhysicsView extends React.Component<ViewProps, ViewState> {
   state: ViewState = {
     error: null,
     wireframe: true,

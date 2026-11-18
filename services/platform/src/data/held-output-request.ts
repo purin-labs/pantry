@@ -102,7 +102,7 @@ function fenceBindings(
   ];
 }
 
-export type HeldOutputRequestInsert = Pick<
+type HeldOutputRequestInsert = Pick<
   HeldOutputRequest,
   | "requestId"
   | "subject"

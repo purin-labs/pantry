@@ -10,12 +10,12 @@ import { assertNever, isRecord } from "@seams/std";
 import type { CommerceActivityResource, CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, SupplierCreation } from "@seams/control-api";
 import { type CommerceActivityResult, type CommerceListEntryPatchOutcome, parseCommerceActivityResponse, parseCommerceBoardPresenceEntry, parseCommerceListEntryPatchResponse } from "@seams/control-api/portal/entity-plane";
 
-export const TABLE_TRAVERSAL: CommerceTraversalLimits = {
+const TABLE_TRAVERSAL: CommerceTraversalLimits = {
   maxDepth: 0,
   resultLimit: 100,
 };
 
-export const DOSSIER_TRAVERSAL: CommerceTraversalLimits = {
+const DOSSIER_TRAVERSAL: CommerceTraversalLimits = {
   maxDepth: 2,
   resultLimit: 20,
 };
@@ -36,7 +36,7 @@ export type CommercePresenceTransport = (
   body: unknown,
 ) => Promise<unknown>;
 
-export type CommerceHomeGraphCountName =
+type CommerceHomeGraphCountName =
   | "home_open_customer_orders"
   | "home_payment_failures"
   | "home_delayed_shipments";
@@ -363,7 +363,7 @@ export async function updateCommerceBoardPresence(
   return entries;
 }
 
-export function ensureCommerceListEntryPatchOutcomeMatchesEntry(
+function ensureCommerceListEntryPatchOutcomeMatchesEntry(
   outcome: CommerceListEntryPatchOutcome,
   entry: CommerceListEntry,
 ): CommerceListEntryPatchOutcome {
@@ -394,11 +394,11 @@ export function ensureCommerceListEntryPatchOutcomeMatchesEntry(
   }
 }
 
-export function commerceListEntryPatchResourceKey(entry: CommerceListEntry): string {
+function commerceListEntryPatchResourceKey(entry: CommerceListEntry): string {
   return `commerce:list_entry:${String(entry.listId)}:${String(entry.entryId)}:${Number(entry.revision)}`;
 }
 
-export function commerceViewPresentationIntentKey(
+function commerceViewPresentationIntentKey(
   presentation: CommerceViewPresentation,
 ): string {
   return presentation.kind === "table"
@@ -406,7 +406,7 @@ export function commerceViewPresentationIntentKey(
     : `board:${String(presentation.configuration.laneAttributeId)}:${commerceBoardCardAttributeIntentKey(presentation.configuration.cardAttributeIds)}`;
 }
 
-export function commerceBoardCardAttributeIntentKey(
+function commerceBoardCardAttributeIntentKey(
   attributeIds: readonly AttributeDefinitionId[],
 ): string {
   const values: string[] = [];
@@ -414,7 +414,7 @@ export function commerceBoardCardAttributeIntentKey(
   return values.join(",");
 }
 
-export function buildCommerceListEntryStatusPatchCommand(
+function buildCommerceListEntryStatusPatchCommand(
   list: CommerceList,
   entry: CommerceListEntry,
   attributeValues: ListEntryAttributeValue[],
@@ -436,7 +436,7 @@ export function buildCommerceListEntryStatusPatchCommand(
   };
 }
 
-export function findListEntryAttributeDefinition(
+function findListEntryAttributeDefinition(
   list: CommerceList,
   attributeId: AttributeDefinitionId,
 ): ListEntryAttributeDefinition | undefined {
@@ -446,7 +446,7 @@ export function findListEntryAttributeDefinition(
   return undefined;
 }
 
-export function findStatusOption(
+function findStatusOption(
   definition: ListEntryAttributeDefinition,
   statusOptionId: string,
 ): AttributeOption | undefined {
@@ -457,7 +457,7 @@ export function findStatusOption(
   return undefined;
 }
 
-export function replaceListEntryStatus(
+function replaceListEntryStatus(
   entry: CommerceListEntry,
   definition: ListEntryAttributeDefinition,
   statusOption: AttributeOption,
@@ -498,7 +498,7 @@ export async function readCommerceHomeAggregations(
   ];
 }
 
-export async function readHomeGraphCounts(
+async function readHomeGraphCounts(
   organisationId: string,
   fetcher: CommerceGraphFetch,
 ): Promise<readonly CommerceHomeAggregation[]> {
@@ -532,7 +532,7 @@ export async function readHomeGraphCounts(
   return names.map((name, index) => namedHomeAggregation(name, answers[index]));
 }
 
-export async function readHomeStockCounts(
+async function readHomeStockCounts(
   organisationId: string,
   fetcher: CommerceGraphFetch,
 ): Promise<readonly CommerceHomeAggregation[]> {
@@ -559,11 +559,11 @@ export async function readHomeStockCounts(
   }
 }
 
-export function isSupplyRow(row: Readonly<{ kind: string }>): boolean {
+function isSupplyRow(row: Readonly<{ kind: string }>): boolean {
   return row.kind === "supply";
 }
 
-export function homeStockCount(
+function homeStockCount(
   name: CommerceHomeAggregationName,
   value: number,
 ): CommerceHomeAggregation {
@@ -729,7 +729,7 @@ export function homeCommerceAggregationQuery(
   }
 }
 
-export function systemEntityTypeId(
+function systemEntityTypeId(
   typeId: SystemCommerceEntityKind,
 ): CommerceEntityTypeId {
   return { origin: "system", typeId };
@@ -739,7 +739,7 @@ export function allFilter(): CommerceFilter {
   return { kind: "all" };
 }
 
-export function namedHomeAggregation(
+function namedHomeAggregation(
   name: CommerceHomeAggregationName,
   answer: unknown,
 ): CommerceHomeAggregation {
@@ -753,17 +753,17 @@ export function namedHomeAggregation(
     : homeAggregationUnavailable(name);
 }
 
-export function homeAggregationUnavailable(
+function homeAggregationUnavailable(
   name: CommerceHomeAggregationName,
 ): CommerceHomeAggregation {
   return { name, result: null, merchantRevision: null };
 }
 
-export function lifecycleFilter(value: "fulfilled" | "cancelled"): CommerceFilter {
+function lifecycleFilter(value: "fulfilled" | "cancelled"): CommerceFilter {
   return attributeFilter("lifecycle", { kind: "status", value });
 }
 
-export function attributeFilter(
+function attributeFilter(
   attributeId: string,
   value: Readonly<
     { kind: "boolean"; value: boolean } | { kind: "status"; value: string }

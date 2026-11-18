@@ -227,7 +227,7 @@ export function claimDelivery(
 
 // A retried queue message can have a new addressing time; the stored delivery
 // remains authoritative for sending and finalizing its original receipt.
-export function sameDeliveryIntent(
+function sameDeliveryIntent(
   stored: ConnectorDelivery,
   incoming: ConnectorDelivery,
 ): boolean {
@@ -344,7 +344,7 @@ export function inspectConnector(
   };
 }
 
-export function parseIngressRows(
+function parseIngressRows(
   rows: readonly JsonRow[],
 ): ConnectorIngressRecord[] | null {
   const ingresses: ConnectorIngressRecord[] = [];

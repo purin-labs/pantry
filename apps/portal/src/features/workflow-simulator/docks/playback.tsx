@@ -20,7 +20,6 @@ import {
   Check,
 } from "lucide-react";
 
-import { BatchDeadline } from "../results";
 import {
   batchAt,
   clock,
@@ -414,22 +413,6 @@ function renderWorkerTrack(
       selection={props.state.selection}
       onSelect={props.actions.select}
       onSeek={props.actions.seekInterval}
-    />
-  );
-}
-
-export function Deadline(
-  props: Readonly<{
-    run: Run;
-    batch: Batch;
-    actions: Pick<WorkflowSimulatorActions, "inspectInterval">;
-  }>,
-): React.ReactNode {
-  return (
-    <BatchDeadline
-      run={props.run}
-      batch={props.batch}
-      onInspect={props.actions.inspectInterval}
     />
   );
 }

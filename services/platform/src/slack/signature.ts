@@ -1,9 +1,9 @@
 import { bytesToHex } from "@seams/std";
 
-export type SlackSignatureVerification =
+type SlackSignatureVerification =
   { ok: true } | { ok: false; reason: SlackSignatureFailure };
 
-export type SlackSignatureFailure =
+type SlackSignatureFailure =
   "missing_header" | "bad_timestamp" | "expired" | "bad_signature";
 
 const SLACK_SIGNATURE_VERSION = "v0";

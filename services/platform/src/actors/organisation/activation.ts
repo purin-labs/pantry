@@ -180,7 +180,7 @@ export async function ensureActivationCueStep(
   }
 }
 
-export async function materializeCueSelection(
+async function materializeCueSelection(
   db: OrganisationDatabase,
   context: ActivationContext,
 ): Promise<void> {
@@ -239,7 +239,7 @@ export async function materializeCueSelection(
   }
 }
 
-export async function materializeCommerceCues(
+async function materializeCommerceCues(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   workspaceId: WorkspaceId,
@@ -322,7 +322,7 @@ export async function materializeCommerceCues(
   }
 }
 
-export async function materializeProactiveCues(
+async function materializeProactiveCues(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   workspaceId: WorkspaceId,
@@ -447,8 +447,6 @@ export function parseCafeCommerceAcceptanceFault(
   };
 }
 
-export function isNullableAcceptanceTimestamp(
-  raw: unknown,
-): raw is number | null {
+function isNullableAcceptanceTimestamp(raw: unknown): raw is number | null {
   return raw === null || isNonNegativeInteger(raw);
 }

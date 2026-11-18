@@ -57,7 +57,7 @@ import {
   revokeSlackOrganisationConnections,
 } from "../slack/organisation-routing";
 
-export type OnboardingReconciliationSubject =
+type OnboardingReconciliationSubject =
   | "open_attempts"
   | "credentials"
   | "accounts"
@@ -67,13 +67,13 @@ export type OnboardingReconciliationSubject =
   | "readiness"
   | "archived_organisation";
 
-export type OnboardingReconciliationSummary = {
+type OnboardingReconciliationSummary = {
   readonly organisationId: OrganisationId;
   readonly repairCount: number;
   readonly runs: readonly OnboardingReconciliationRun[];
 };
 
-export type OnboardingReconciliationRun =
+type OnboardingReconciliationRun =
   | {
       readonly kind: "completed";
       /** Null for a run that repaired nothing: it leaves no record. */
@@ -199,7 +199,7 @@ export async function reconcileOrganisationOnboarding(input: {
   };
 }
 
-export type OrganisationHarnessHistoryInventory = {
+type OrganisationHarnessHistoryInventory = {
   readonly schemaVersion: "organisation_harness_history_inventory.v1";
   readonly organisationId: OrganisationId;
   readonly inspectedAt: number;
@@ -216,7 +216,7 @@ export type OrganisationHarnessHistoryInventory = {
   readonly retainedObjectKeys: readonly string[];
 };
 
-export type OrganisationHarnessHistoryInventoryError =
+type OrganisationHarnessHistoryInventoryError =
   | { readonly code: "organisation_harness_history_inspection_failed" }
   | { readonly code: "organisation_harness_history_registry_changed" };
 
@@ -338,14 +338,14 @@ export async function inspectOrganisationHarnessHistory(input: {
   }
 }
 
-export type OrganisationHarnessErasureCounts = {
+type OrganisationHarnessErasureCounts = {
   readonly historyRows: number;
   readonly checkpointRows: number;
   readonly leaseRows: number;
   readonly deliveryRows: number;
 };
 
-export type OrganisationHarnessErasureSessionReceipt = {
+type OrganisationHarnessErasureSessionReceipt = {
   readonly receiptId: string;
   readonly registryId: ActorRegistryId;
   readonly sessionId: string;
@@ -356,7 +356,7 @@ export type OrganisationHarnessErasureSessionReceipt = {
   readonly failureCode: string | null;
 };
 
-export type OrganisationHarnessErasureReceipts = {
+type OrganisationHarnessErasureReceipts = {
   readonly schemaVersion: "organisation_harness_erasure_receipts.v1";
   readonly organisationId: OrganisationId;
   readonly status:
@@ -377,7 +377,7 @@ export type OrganisationHarnessErasureReceipts = {
   };
 };
 
-export type OrganisationHarnessErasureReceiptsError = {
+type OrganisationHarnessErasureReceiptsError = {
   readonly code: "organisation_harness_erasure_state_invalid";
 };
 

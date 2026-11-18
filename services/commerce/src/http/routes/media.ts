@@ -11,7 +11,7 @@ import { jsonResponse } from "../responses.ts";
 
 // The media commands. A new record names bytes the store must hold; the
 // last record of some bytes takes them out of the store after it commits.
-export async function mediaCommand(
+async function mediaCommand(
   ctx: HttpRouteContext,
   route: Readonly<{
     kind:

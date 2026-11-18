@@ -369,7 +369,7 @@ export function parseShopifyCommerceCatalogEnvelopeBody(input: {
   };
 }
 
-export function parseShopifyCommerceCatalogVariants(
+function parseShopifyCommerceCatalogVariants(
   raw: unknown,
   product: JsonObject,
 ): ShopifyCommerceCatalogEnvelope["product"]["variants"] | null {
@@ -408,7 +408,7 @@ export function parseShopifyCommerceCatalogVariants(
   return variants;
 }
 
-export function parseShopifyOrderCreated(
+function parseShopifyOrderCreated(
   body: JsonObject,
   organisationId: OrganisationId,
   integrationAccountId: IntegrationAccountId,
@@ -451,7 +451,7 @@ export function parseShopifyOrderCreated(
   };
 }
 
-export function parseShopifyInventoryUpdated(
+function parseShopifyInventoryUpdated(
   body: JsonObject,
   organisationId: OrganisationId,
   integrationAccountId: IntegrationAccountId,
@@ -502,10 +502,7 @@ export function parseShopifyWebhookBody(
   }
 }
 
-export function parseTriggeredAt(
-  value: string | null,
-  fallback: number,
-): number {
+function parseTriggeredAt(value: string | null, fallback: number): number {
   if (value === null) {
     return fallback;
   }
@@ -514,10 +511,7 @@ export function parseTriggeredAt(
   return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
-export function constantTimeBytesEqual(
-  left: Uint8Array,
-  right: Uint8Array,
-): boolean {
+function constantTimeBytesEqual(left: Uint8Array, right: Uint8Array): boolean {
   let difference = left.length ^ right.length;
   const length = Math.max(left.length, right.length);
 

@@ -62,7 +62,7 @@ async function readMailboxTurnMemory(
   }).read(request);
 }
 
-export type VerifiedSupplier =
+type VerifiedSupplier =
   | Readonly<{
       kind: "supplier";
       scope: MemoryApplicability;

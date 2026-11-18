@@ -15,7 +15,7 @@ import {
 import type { Result } from "../result";
 
 /** The immutable native binding, as this deployment stored it. */
-export type NativePantryAccountBinding = Omit<PantryAccountBinding, "feePolicy">;
+type NativePantryAccountBinding = Omit<PantryAccountBinding, "feePolicy">;
 
 /** Resolve the immutable native binding, then obtain the current explicit fee policy. */
 export async function resolvePantryAccountBinding(
@@ -73,7 +73,7 @@ export async function readNativePantryAccountBinding(
 }
 
 /** The account's current fee policy for the binding, which must name the same scope. */
-export async function confirmPantryAccountBinding(
+async function confirmPantryAccountBinding(
   client: AccountPlatformClient,
   native: NativePantryAccountBinding,
 ): Promise<Result<PantryAccountBinding, AccountPlatformError>> {

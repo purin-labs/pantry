@@ -58,7 +58,7 @@ import { eraseUnregisteredActorState } from "./unregistered-actor-erasure";
  */
 
 /** The socket close code that tells a gateway that its access has ended. */
-export const GATEWAY_REVOKED_CODE = 4403;
+const GATEWAY_REVOKED_CODE = 4403;
 const GATEWAY_REPLACED_CODE = 4001;
 const GATEWAY_INVALID_CODE = 1008;
 

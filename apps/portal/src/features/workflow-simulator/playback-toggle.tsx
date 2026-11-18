@@ -1,7 +1,7 @@
 import React from "react";
 import { Pause, Play } from "lucide-react";
 
-export type PlaybackToggleProps = {
+type PlaybackToggleProps = {
   readonly playing: boolean;
   readonly playLabel: string;
   readonly pauseLabel: string;

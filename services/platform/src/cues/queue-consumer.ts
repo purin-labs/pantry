@@ -44,7 +44,7 @@ export type CueSettlement<TContext> = (
   message: CueQueueMessage,
 ) => Promise<void>;
 
-export type CueQueueConsumerInput<TContext> = {
+type CueQueueConsumerInput<TContext> = {
   messages: readonly Message<unknown>[];
   kv: IgnoredCueKv;
   deliveryContext: TContext;

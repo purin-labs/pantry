@@ -49,7 +49,7 @@ export function inferenceRouteName(selection: OrganisationInferenceSelection): s
  * When Slack connects while this panel shows, the Connect button that had
  * the focus is gone. The focus moves to the channel step that replaced it.
  */
-export function focusChannelStepOnConnect(
+function focusChannelStepOnConnect(
   heading: React.RefObject<HTMLHeadingElement | null>,
   wasConnected: React.RefObject<boolean>,
   connected: boolean,
@@ -273,7 +273,7 @@ export function SlackSetup(props: {
 }
 
 /** The channels CafeOS posts in, one row each, or a quiet empty line. */
-export function SlackChannelList(props: {
+function SlackChannelList(props: {
   readonly connections: readonly SlackRoutingConnection[];
   readonly accounts: readonly IntegrationAccount[];
   readonly destinations: readonly SlackWorkspaceCatalog[];
@@ -310,7 +310,7 @@ export function SlackChannelList(props: {
 /* A Slack workspace that serves one organisation sends every DM there, so
    only a shared workspace asks each person where their DMs start. */
 
-export function SlackDirectMessages(props: {
+function SlackDirectMessages(props: {
   readonly connections: readonly SlackRoutingConnection[];
   readonly accounts: readonly IntegrationAccount[];
   readonly organisationName: string;
@@ -343,13 +343,13 @@ export function SlackDirectMessages(props: {
   );
 }
 
-export function isSharedActiveSlackConnection(
+function isSharedActiveSlackConnection(
   connection: SlackRoutingConnection,
 ): boolean {
   return connection.sharedWorkspace && connection.lifecycle === "active";
 }
 
-export function renderSlackDmSelection(
+function renderSlackDmSelection(
   accounts: readonly IntegrationAccount[],
   organisationName: string,
   nameWorkspace: boolean,
@@ -380,14 +380,14 @@ export function renderSlackDmSelection(
   );
 }
 
-export type SlackRoutingDefaultView = {
+type SlackRoutingDefaultView = {
   readonly key: string;
   readonly integrationAccountId: string;
   readonly workspaceId: string;
   readonly channelId: string;
 };
 
-export function slackRoutingDefaults(
+function slackRoutingDefaults(
   connection: SlackRoutingConnection,
 ): readonly SlackRoutingDefaultView[] {
   return connection.channelDefaults.map(
@@ -395,7 +395,7 @@ export function slackRoutingDefaults(
   );
 }
 
-export function buildSlackRoutingDefault(
+function buildSlackRoutingDefault(
   connection: SlackRoutingConnection,
   channelDefault: SlackRoutingConnection["channelDefaults"][number],
 ): SlackRoutingDefaultView {
@@ -408,7 +408,7 @@ export function buildSlackRoutingDefault(
 }
 
 /** A channel by its Slack name; the workspace shows only when there are several. */
-export function renderSlackRoutingDefault(
+function renderSlackRoutingDefault(
   accounts: readonly IntegrationAccount[],
   destinations: readonly SlackWorkspaceCatalog[],
   route: SlackRoutingDefaultView,
@@ -439,21 +439,21 @@ export function renderSlackRoutingDefault(
   );
 }
 
-export function resourceHasId(
+function resourceHasId(
   canonicalResourceId: string,
   resource: ProviderResource,
 ): boolean {
   return resource.canonicalResourceId === canonicalResourceId;
 }
 
-export function accountMatchesIntegrationId(
+function accountMatchesIntegrationId(
   integrationAccountId: string,
   account: IntegrationAccount,
 ): boolean {
   return account.integrationAccountId === integrationAccountId;
 }
 
-export function updateSlackWorkspace(
+function updateSlackWorkspace(
   setWorkspaceId: React.Dispatch<React.SetStateAction<string>>,
   workspaceId: string | null,
 ): void {
@@ -467,7 +467,7 @@ export function accountMatchesWorkspace(
   return account.providerAccountId === workspaceId;
 }
 
-export function catalogMatchesWorkspace(
+function catalogMatchesWorkspace(
   workspaceId: string,
   catalog: SlackWorkspaceCatalog,
 ): boolean {
@@ -537,7 +537,7 @@ export function renderSlackConnectAction(
   );
 }
 
-export function SlackSetupActivationLabel(activation: OnboardingActivation): string {
+function SlackSetupActivationLabel(activation: OnboardingActivation): string {
   switch (activation.kind) {
     case "running":
       return `Activation in progress: ${formatLifecycle(activation.phase)}…`;
@@ -624,7 +624,7 @@ export function renderApprovalAuthenticationReports(
   );
 }
 
-export function approvalAuthenticationMessage(
+function approvalAuthenticationMessage(
   branch: string,
   reason: string | null,
 ): string {
@@ -637,7 +637,7 @@ export function approvalAuthenticationMessage(
   return "A selected approval sign-in method is not ready yet.";
 }
 
-export function slackWorkspaceItems(
+function slackWorkspaceItems(
   accounts: readonly IntegrationAccount[],
 ): readonly { value: string; label: string }[] {
   if (accounts.length === 0)
@@ -648,7 +648,7 @@ export function slackWorkspaceItems(
   }));
 }
 
-export function renderSlackWorkspaceOptions(
+function renderSlackWorkspaceOptions(
   accounts: readonly IntegrationAccount[],
 ): React.ReactNode {
   if (accounts.length === 0)
@@ -656,7 +656,7 @@ export function renderSlackWorkspaceOptions(
   return accounts.map(renderSlackWorkspaceOption);
 }
 
-export function renderSlackWorkspaceOption(
+function renderSlackWorkspaceOption(
   account: IntegrationAccount,
 ): React.ReactNode {
   return (
@@ -669,13 +669,13 @@ export function renderSlackWorkspaceOption(
   );
 }
 
-export function destinationOptions(
+function destinationOptions(
   destinations: readonly ProviderResource[],
 ): readonly ComboboxOption[] {
   return destinations.map(destinationOption);
 }
 
-export function destinationOption(destination: ProviderResource): ComboboxOption {
+function destinationOption(destination: ProviderResource): ComboboxOption {
   return {
     value: destination.canonicalResourceId,
     label: destination.displayLabel,

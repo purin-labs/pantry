@@ -62,7 +62,7 @@ export type AttachmentCollectionError =
     };
 
 /** What the collector needs to know about one listed object. */
-export type ListedAttachmentObject = {
+type ListedAttachmentObject = {
   readonly key: string;
   readonly uploaded?: Date;
   readonly customMetadata?: Record<string, string>;

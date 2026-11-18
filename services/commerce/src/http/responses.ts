@@ -26,6 +26,6 @@ export function jsonResponse(status: number, body: unknown): Response {
   });
 }
 
-export function jsonReplacer(_key: string, value: unknown): unknown {
+function jsonReplacer(_key: string, value: unknown): unknown {
   return typeof value === "bigint" ? Number(value) : value;
 }

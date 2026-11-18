@@ -125,7 +125,7 @@ function memberUserId(member: { userId: UserId }): UserId {
   return member.userId;
 }
 
-export type ConversationDisclosure =
+type ConversationDisclosure =
   Readonly<{ kind: "allowed"; proof: DisclosureProof }> | ChatDisclosureFailure;
 
 export async function checkConversationDisclosure(

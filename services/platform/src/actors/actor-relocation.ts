@@ -269,7 +269,7 @@ type RegistryLifecycleSummaryBase = {
   readonly stateVersion: number;
 };
 
-export type RegistryLifecycleSummary =
+type RegistryLifecycleSummary =
   | (RegistryLifecycleSummaryBase & {
       readonly lifecycleStatus: "reserved";
       readonly activatedAt: null;
@@ -309,7 +309,7 @@ type RelocationInspectionItemBase = {
   readonly updatedAt: number;
 };
 
-export type ActorRelocationInspectionItem =
+type ActorRelocationInspectionItem =
   | (RelocationInspectionItemBase & {
       readonly status: "pending" | "exported";
       readonly target: null;
@@ -319,7 +319,7 @@ export type ActorRelocationInspectionItem =
       readonly target: RegistryLifecycleSummary;
     });
 
-export type ActorRelocationInspection = {
+type ActorRelocationInspection = {
   readonly relocation: ActorRelocation;
   readonly items: readonly ActorRelocationInspectionItem[];
   /** The operator receipts of the quarantined Actors that the move left out. */

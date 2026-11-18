@@ -35,7 +35,7 @@ export type WorkspaceExecutorTrustedUsage = {
   readonly gatewayDurationMs: number;
 };
 
-export type WorkspaceExecutorTransport = {
+type WorkspaceExecutorTransport = {
   containerFetch(
     input: string,
     init: RequestInit,
@@ -116,7 +116,7 @@ export function encodeWorkspaceExecutorEnvelope(
  * the local runtime cannot exercise is this call through a Durable Object
  * binding, because those are undefined under workerd in tests.
  */
-export async function dispatchWorkspaceAttachmentInspection(
+async function dispatchWorkspaceAttachmentInspection(
   container: WorkspaceExecutorTransport,
   request: WorkspaceExecutorInspectionRequest,
   attachment: Uint8Array,

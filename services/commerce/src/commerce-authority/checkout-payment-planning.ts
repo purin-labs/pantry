@@ -120,7 +120,7 @@ export type CheckoutPaymentStartPlan = Readonly<{
   paymentAttempt: CheckoutPaymentAttempt;
 }>;
 
-export type CheckoutPaymentStartPlanResult =
+type CheckoutPaymentStartPlanResult =
   | Readonly<{ kind: "planned"; value: CheckoutPaymentStartPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -128,7 +128,7 @@ export type CheckoutPaymentCapturePlan = Readonly<{
   paymentAttempt: CheckoutPaymentAttempt;
 }>;
 
-export type CheckoutPaymentCapturePlanResult =
+type CheckoutPaymentCapturePlanResult =
   | Readonly<{ kind: "planned"; value: CheckoutPaymentCapturePlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -185,7 +185,7 @@ export type CheckoutPlacementPlan = CheckoutPlacementCommon &
       }>
   );
 
-export type CheckoutPlacementPlanResult =
+type CheckoutPlacementPlanResult =
   | Readonly<{ kind: "planned"; value: CheckoutPlacementPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -208,7 +208,7 @@ export type CheckoutPaymentResolutionPlan =
       positions: readonly CommerceInventoryPositionV1[];
     }>;
 
-export type CheckoutPaymentResolutionPlanResult =
+type CheckoutPaymentResolutionPlanResult =
   | Readonly<{ kind: "planned"; value: CheckoutPaymentResolutionPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -218,7 +218,7 @@ export type CheckoutExpirationPlan = Readonly<{
   positions: readonly CommerceInventoryPositionV1[];
 }>;
 
-export type CheckoutExpirationPlanResult =
+type CheckoutExpirationPlanResult =
   | Readonly<{ kind: "planned"; value: CheckoutExpirationPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 

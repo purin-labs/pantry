@@ -181,7 +181,7 @@ type AttemptRow = {
 };
 
 /** The connection a Session pinned: its revision and profile generation. */
-export type ChatGptConnectionPin = Readonly<{
+type ChatGptConnectionPin = Readonly<{
   revision: number;
   generation: number;
 }>;

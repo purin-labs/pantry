@@ -55,12 +55,12 @@ import type {
 import { materializeCommerceRelationText } from "../../actors/commerce-query-schema";
 import type { Result } from "../../result";
 import { encodeCommerceCursor } from "../commerce-wasm";
-import {
-  type CommerceGraphSourceError,
-  type CommerceGraphSourceValue,
-  type CommerceGraphSourceResult,
-  type CommerceGraphSourceQueryOptions,
-  type CommerceGraphRelationshipStepResult,
+import type {
+  CommerceGraphSourceError,
+  CommerceGraphSourceValue,
+  CommerceGraphSourceResult,
+  CommerceGraphSourceQueryOptions,
+  CommerceGraphRelationshipStepResult,
 } from "./commerce-source";
 import { assertNever, errorMessage, isRecord } from "@seams/std";
 export type BlotterOrganisationReader = Pick<
@@ -88,7 +88,7 @@ export type BlotterQueryPlanResult = Result<
   CommerceGraphSourceError | BlotterQueryPlanError
 >;
 
-export type BlotterSourceOptions = Readonly<{
+type BlotterSourceOptions = Readonly<{
   organisationId: import("../../ids").OrganisationId;
   merchantId: string;
   integrationAccountId: import("../../ids").IntegrationAccountId;
@@ -101,14 +101,14 @@ export type BlotterQueryPlanInput = Readonly<{
   readonly plan: CommerceQueryPlan;
 }>;
 
-export type BlotterRelationshipStepInput = Readonly<{
+type BlotterRelationshipStepInput = Readonly<{
   readonly planRequest: CommerceGraphQueryPlanRequest;
   readonly plan: CommerceQueryPlan;
   readonly frontier: readonly CommerceEntityRef[];
   readonly remaining: number;
 }>;
 
-export type BlotterRelationshipStepResult = CommerceGraphRelationshipStepResult;
+type BlotterRelationshipStepResult = CommerceGraphRelationshipStepResult;
 
 type BlotterRecord = CommerceProjectionRecord;
 /** Reads retained provider facts without exposing the old presentation DTOs. */

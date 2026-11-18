@@ -224,7 +224,7 @@ export type ApiCaller =
       scopes: readonly CommerceApiScope[];
     }>;
 
-export type ApiAccessDecision =
+type ApiAccessDecision =
   | Readonly<{ kind: "allowed"; caller: ApiCaller }>
   | Readonly<{
       kind: "refused";
@@ -232,7 +232,7 @@ export type ApiAccessDecision =
       code: "unauthorized" | "app_not_installed" | "missing_scope";
     }>;
 
-export type ApiCredentialSummary = Readonly<{
+type ApiCredentialSummary = Readonly<{
   credentialId: string;
   kind: "api_key" | "app_installation";
   appId: string | null;

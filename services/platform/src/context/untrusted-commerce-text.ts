@@ -13,8 +13,7 @@
  */
 
 /** How much text one source may contribute, before an excerpt is taken. */
-export type UntrustedTextSource =
-  "display_name" | "description" | "note" | "message";
+type UntrustedTextSource = "display_name" | "description" | "note" | "message";
 
 const SOURCE_LIMITS: Readonly<Record<UntrustedTextSource, number>> = {
   display_name: 200,
@@ -23,7 +22,7 @@ const SOURCE_LIMITS: Readonly<Record<UntrustedTextSource, number>> = {
   message: 4_000,
 };
 
-export type NormalizedUntrustedText = Readonly<{
+type NormalizedUntrustedText = Readonly<{
   /** Safe to display and to place in a prompt as quoted evidence. */
   text: string;
   /** True when the source was longer than its limit and was cut. */

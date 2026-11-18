@@ -6,7 +6,7 @@ import {
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever } from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@seams/type-utils";
 import {
   commerceEntityRefSchema,
   parseCommerceEntityRef,
@@ -56,17 +56,17 @@ export const commerceRelationshipTraversalSubjectSchema = Type.Union([
     relationshipDefinition: relationshipDefinitionRefSchema,
   }),
 ]);
-export const entityByRefQueryPlanOperationSchema = OpenObject({
+const entityByRefQueryPlanOperationSchema = OpenObject({
   kind: Type.Literal("entity_by_ref"),
   reference: commerceEntityRefSchema,
   traversal: commerceTraversalLimitsSchema,
 });
-export const entityTypePageQueryPlanOperationSchema = OpenObject({
+const entityTypePageQueryPlanOperationSchema = OpenObject({
   kind: Type.Literal("entity_type_page"),
   entityTypeId: commerceEntityTypeIdSchema,
   traversal: commerceTraversalLimitsSchema,
 });
-export const searchQueryPlanOperationSchema = OpenObject({
+const searchQueryPlanOperationSchema = OpenObject({
   kind: Type.Literal("search"),
   entityTypeId: commerceEntityTypeIdSchema,
   traversal: commerceTraversalLimitsSchema,
@@ -77,21 +77,21 @@ export const relationshipTraversalQueryPlanOperationSchema = OpenObject({
   subject: commerceRelationshipTraversalSubjectSchema,
   traversal: commerceTraversalLimitsSchema,
 });
-export const commerceListPageQueryPlanOperationSchema = OpenObject({
+const commerceListPageQueryPlanOperationSchema = OpenObject({
   kind: Type.Literal("commerce_list_page"),
   listId: commerceListIdSchema,
 });
-export const savedCommerceViewQueryPlanOperationSchema = OpenObject({
+const savedCommerceViewQueryPlanOperationSchema = OpenObject({
   kind: Type.Literal("saved_commerce_view"),
   viewId: savedCommerceViewIdSchema,
   source: commerceSavedViewCapabilitySourceSchema,
 });
-export const aggregationQueryPlanOperationSchema = OpenObject({
+const aggregationQueryPlanOperationSchema = OpenObject({
   kind: Type.Literal("aggregation"),
   source: commerceAggregationSourceSchema,
   aggregation: commerceAggregationSchema,
 });
-export const commerceContextQueryPlanOperationSchema = OpenObject({
+const commerceContextQueryPlanOperationSchema = OpenObject({
   kind: Type.Literal("underclerk_context"),
   selection: commerceContextSelectionSchema,
   traversal: commerceTraversalLimitsSchema,

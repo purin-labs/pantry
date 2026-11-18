@@ -90,9 +90,9 @@ import { useDossierSurface } from "./dossier-surface";
 import { CrmIdentity, CrmTable, type CrmColumn } from "../../../ui";
 import type { CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, PermissionRequired } from "@seams/control-api";
 
-export type CommerceGraphPage = "products" | "orders" | "suppliers";
+type CommerceGraphPage = "products" | "orders" | "suppliers";
 
-export type CommerceEntityPlaneRouteProps = Readonly<{
+type CommerceEntityPlaneRouteProps = Readonly<{
   organisationId: string;
   page: CommerceGraphPage;
   resourceId: string | null;

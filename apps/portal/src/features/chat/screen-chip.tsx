@@ -80,7 +80,7 @@ function attaches(chat: ChipChat | null, screen: SurfaceOnScreenView): boolean {
   return attachesByDefault(chat, screen);
 }
 
-export type ScreenChipDecision = Readonly<{
+type ScreenChipDecision = Readonly<{
   screen: SurfaceOnScreenView | null;
   attached: boolean;
 }>;

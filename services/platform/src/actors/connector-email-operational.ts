@@ -124,9 +124,9 @@ export type OperationalEmailDispatchOutcome =
   | { readonly kind: "target_changed" }
   | { readonly kind: "send_indeterminate"; readonly rfcMessageId: string };
 
-export type OperationalEmailProposalError = Readonly<{ readonly code: string }>;
+type OperationalEmailProposalError = Readonly<{ readonly code: string }>;
 
-export type OperationalEmailProposalRequest = Readonly<{
+type OperationalEmailProposalRequest = Readonly<{
   readonly execution: SessionTurnExecution;
   readonly sql: SqlStorage;
   readonly env: Env;

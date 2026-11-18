@@ -338,7 +338,7 @@ export function isValidCancellationResolvedTransition(
   );
 }
 
-export function cancellationResolutionCommand(
+function cancellationResolutionCommand(
   resolution: CancellationResolvedTransition["resolution"],
 ): SessionCommand {
   switch (resolution.kind) {
@@ -368,7 +368,7 @@ export function cancellationResolutionCommand(
   }
 }
 
-export function cancellationResolutionState(
+function cancellationResolutionState(
   resolution: CancellationResolvedTransition["resolution"],
 ): CancellationResolvedSessionCommit["state"] {
   switch (resolution.kind) {

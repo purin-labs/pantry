@@ -139,7 +139,7 @@ export async function deliverMatchedCueSubscriptions(
   return { kind: "complete" };
 }
 
-export async function deliverMatchedCue(
+async function deliverMatchedCue(
   env: Env,
   scope: OrganisationExecutionScope,
   message: CueQueueMessage,
@@ -201,7 +201,7 @@ export async function deliverMatchedCue(
   }
 }
 
-export async function deliverClaimedCue(
+async function deliverClaimedCue(
   env: Env,
   scope: OrganisationExecutionScope,
   message: CueQueueMessage,
@@ -230,7 +230,7 @@ export async function deliverClaimedCue(
   );
 }
 
-export function isDirectInventoryCaseCue(event: NormalizedCueEvent): event is Extract<
+function isDirectInventoryCaseCue(event: NormalizedCueEvent): event is Extract<
   NormalizedCueEvent,
   {
     source: "commerce";
@@ -244,7 +244,7 @@ export function isDirectInventoryCaseCue(event: NormalizedCueEvent): event is Ex
   );
 }
 
-export async function deliverClaimedCueToCase(
+async function deliverClaimedCueToCase(
   env: Env,
   scope: OrganisationExecutionScope,
   message: CueQueueMessage,
@@ -402,7 +402,7 @@ export async function deliverClaimedCueToCase(
   return { kind: "complete" };
 }
 
-export async function resolveSavedSelectorCueMembership(
+async function resolveSavedSelectorCueMembership(
   env: Env,
   scope: OrganisationExecutionScope,
   input: SavedSelectorCueResolverInput,
@@ -531,7 +531,7 @@ export async function resolveSavedSelectorCueMembership(
   }
 }
 
-export function savedSelectorCapabilityMatches(
+function savedSelectorCapabilityMatches(
   input: SavedSelectorCueResolverInput,
   capabilities: CommerceEntityPlaneCapabilityMetadataResponse["capabilities"],
 ): boolean {
@@ -548,7 +548,7 @@ export function savedSelectorCapabilityMatches(
   );
 }
 
-export function savedSelectorObservationMatches(
+function savedSelectorObservationMatches(
   result: CommerceGraphQueryResult,
   observation: SavedSelectorCueResolverInput["observation"],
 ): boolean {
@@ -569,14 +569,14 @@ export function savedSelectorObservationMatches(
   }
 }
 
-export function entityContainsObservationRef(
+function entityContainsObservationRef(
   observationRef: CommerceEntityRef,
   entity: CommerceGraphQueryResult["entities"][number],
 ): boolean {
   return sameCommerceEntityRef(entity.reference, observationRef);
 }
 
-export function listEntryContainsObservation(
+function listEntryContainsObservation(
   observation: Variant<
     SavedSelectorCueResolverInput["observation"],
     "commerce_list_entry_changed"
@@ -589,7 +589,7 @@ export function listEntryContainsObservation(
   );
 }
 
-export function sameCommerceEntityRef(
+function sameCommerceEntityRef(
   left: CommerceEntityRef,
   right: CommerceEntityRef,
 ): boolean {
@@ -600,7 +600,7 @@ export function sameCommerceEntityRef(
   );
 }
 
-export function sameCommerceListEntryRef(
+function sameCommerceListEntryRef(
   left: CommerceListEntryRef,
   right: CommerceListEntryRef,
 ): boolean {
@@ -611,14 +611,14 @@ export function sameCommerceListEntryRef(
   );
 }
 
-export function savedSelectorResolverFailure(): Result<
+function savedSelectorResolverFailure(): Result<
   never,
   SavedSelectorCueResolverError
 > {
   return { ok: false, error: { code: "saved_selector_resolver_failed" } };
 }
 
-export async function resolveCueCaseDelivery(
+async function resolveCueCaseDelivery(
   env: Env,
   event: NormalizedCueEvent,
   subscription: TierOneCueSubscription,
@@ -659,7 +659,7 @@ export async function resolveCueCaseDelivery(
   };
 }
 
-export async function completeAndLogCaseCue(
+async function completeAndLogCaseCue(
   env: Env,
   scope: OrganisationExecutionScope,
   event: NormalizedCueEvent,
@@ -692,7 +692,7 @@ export async function completeAndLogCaseCue(
   });
 }
 
-export type CueDeliveryLogInput = {
+type CueDeliveryLogInput = {
   organisationId: OrganisationId;
   cueId: string;
   parentCueId: string;
@@ -712,7 +712,7 @@ export type CueDeliveryLogInput = {
     }
 );
 
-export async function writeCueLog(
+async function writeCueLog(
   db: OrganisationDatabase,
   input: CueDeliveryLogInput,
 ): Promise<void> {
@@ -751,7 +751,7 @@ export function cueLogIntegrationAccountId(
     : event.integrationAccountId;
 }
 
-export function cueDeliveryTarget(input: CueDeliveryLogInput): {
+function cueDeliveryTarget(input: CueDeliveryLogInput): {
   surfaceKind: "slack" | null;
   threadId: string | null;
 } {

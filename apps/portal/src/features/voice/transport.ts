@@ -37,11 +37,11 @@ const VOCABULARY_TIMEOUT_MS = 3_000;
 
 type MacGrant = NonNullable<VoiceGrant["mac"]>;
 
-export type TranscribeResult =
+type TranscribeResult =
   | Readonly<{ kind: "text"; text: string; heard: VoiceHeard }>
   | Readonly<{ kind: "refused"; code: VoiceRefusalCode }>;
 
-export type GrantRead = "ok" | "voice_disabled" | "unavailable";
+type GrantRead = "ok" | "voice_disabled" | "unavailable";
 
 function voicePath(organisationId: string, route: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/voice/${route}`;

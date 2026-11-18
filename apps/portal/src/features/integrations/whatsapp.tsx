@@ -26,7 +26,7 @@ export function InstalledAgentsWhatsAppPanel(
 }
 
 /** The agents that can be assigned now, for a list that names no other. */
-export function installedAgentOption(
+function installedAgentOption(
   option: MailboxInstallationOption,
 ): readonly WhatsAppInstallationOption[] {
   return option.kind === "ready"

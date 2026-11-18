@@ -161,16 +161,16 @@ export function providerCallbackFailurePage(
   });
 }
 
-export const CALLBACK_CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.8 12.6 4.8 4.8L19.2 6.6"/></svg>`;
+const CALLBACK_CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.8 12.6 4.8 4.8L19.2 6.6"/></svg>`;
 
-export const CALLBACK_LINK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 14.4 14.4 9.6"/><path d="M11.2 6.6 13 4.8a4.4 4.4 0 0 1 6.2 6.2l-1.8 1.8"/><path d="M12.8 17.4 11 19.2A4.4 4.4 0 0 1 4.8 13l1.8-1.8"/></svg>`;
+const CALLBACK_LINK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 14.4 14.4 9.6"/><path d="M11.2 6.6 13 4.8a4.4 4.4 0 0 1 6.2 6.2l-1.8 1.8"/><path d="M12.8 17.4 11 19.2A4.4 4.4 0 0 1 4.8 13l1.8-1.8"/></svg>`;
 
-export const CALLBACK_ALERT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.3h.01"/></svg>`;
+const CALLBACK_ALERT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.3h.01"/></svg>`;
 
 /* One small card, centred. The heading stays at reading size: this page is a
    two-second waypoint, not a destination that needs display type. */
 
-export const PROVIDER_CALLBACK_PAGE_STYLES = `
+const PROVIDER_CALLBACK_PAGE_STYLES = `
   :root {
     color-scheme: light;
     --cb-ground: #fdfcfc;
@@ -295,7 +295,7 @@ export const PROVIDER_CALLBACK_PAGE_STYLES = `
   }
 `;
 
-export function providerCallbackFailureDetail(reasonCode: string): string {
+function providerCallbackFailureDetail(reasonCode: string): string {
   switch (reasonCode) {
     case "provider_oauth_denied":
       return "Access was declined at the provider. You can try again whenever you are ready.";

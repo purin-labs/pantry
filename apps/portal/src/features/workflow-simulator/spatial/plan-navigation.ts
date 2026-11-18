@@ -38,7 +38,7 @@ type Gesture =
     }>;
 
 /** What navigation needs from the drawing it moves. */
-export type PlanNavigationTarget = Readonly<{
+type PlanNavigationTarget = Readonly<{
   size(): PlanSize;
   insets(): PlanInsets;
   /** The area fitted whenever the viewer has not navigated or framed equipment. */

@@ -22,7 +22,7 @@ export type OperationEdit = Readonly<{
   minutes: number;
 }>;
 
-export type OperationEditResult =
+type OperationEditResult =
   | Readonly<{ ok: true }>
   | Readonly<{
       ok: false;

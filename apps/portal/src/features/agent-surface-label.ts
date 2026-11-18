@@ -6,7 +6,7 @@ import "./agent-surface-label.css";
  * follows the element for 5 seconds, as a room holds an agent's label after
  * an edit (`AGENT_ACTIVITY_HOLD_MS`).
  */
-export const AGENT_LABEL_HOLD_MS = 5_000;
+const AGENT_LABEL_HOLD_MS = 5_000;
 
 type ShownLabel = {
   readonly overlay: HTMLElement;

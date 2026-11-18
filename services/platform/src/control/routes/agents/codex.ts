@@ -167,7 +167,7 @@ export async function handleCompleteOrganisationChatGptSignIn(
     : organisationCodexError(completed.error);
 }
 
-export function organisationCodexConnectionWire(
+function organisationCodexConnectionWire(
   connection: OrganisationCodexConnection,
 ): unknown {
   switch (connection.kind) {
@@ -210,7 +210,7 @@ export function organisationCodexConnectionWire(
   }
 }
 
-export function organisationCodexError(error: CodexConnectionError): Response {
+function organisationCodexError(error: CodexConnectionError): Response {
   switch (error.code) {
     case "organisation_placement_missing":
     case "organisation_placement_corrupt":

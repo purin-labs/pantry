@@ -29,7 +29,7 @@ import { customerBuyerAccountGateway } from "./http/routes/buyer-account.ts";
 import { handleBuyerRoute } from "./http/routes/buyer.ts";
 import { handleServiceRoute } from "./http/routes/service.ts";
 
-export type CommerceHttpApiOptions = Readonly<{
+type CommerceHttpApiOptions = Readonly<{
   authority: CommerceAuthority;
   buyerSessions: BuyerSessionAuthority;
   addressValidations?: ShippingAddressValidationService;

@@ -22,7 +22,7 @@ function chatPath(organisationId: string): string {
  * on screen. The answer only suggests: a hint tags the chip, and a question
  * on send offers the page. Only the person's click attaches it.
  */
-export type ScreenSuggestion = Readonly<{
+type ScreenSuggestion = Readonly<{
   organisationId: string;
   conversationId: string;
   surfaceSessionId: string;
@@ -58,7 +58,7 @@ export function useScreenSuggestion(): ScreenSuggestion | null {
   return React.useSyncExternalStore(subscribe, readSuggestion);
 }
 
-export type ScreenCheckTarget = Readonly<{
+type ScreenCheckTarget = Readonly<{
   organisationId: string;
   conversationId: string | null;
   surfaceSessionId: string | null;

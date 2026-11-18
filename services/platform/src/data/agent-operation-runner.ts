@@ -57,7 +57,7 @@ export function isPublishedResourceBoundaryError(
 }
 
 /** The operator and the authority that originated the command. */
-export type AgentOperationActor = Readonly<{
+type AgentOperationActor = Readonly<{
   userId: string;
   personId: string;
   role: ControlRole;

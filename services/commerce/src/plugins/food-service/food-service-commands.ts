@@ -60,7 +60,7 @@ export type FoodServiceMerchantRow = Readonly<{
   revision: number;
 }>;
 
-export type FoodServiceCommand =
+type FoodServiceCommand =
   | CreatePreparationStationCommand
   | CreateModifierGroupRevisionCommand
   | CreateRecipeRevisionCommand
@@ -69,7 +69,7 @@ export type FoodServiceCommand =
   | MarkSoldOutCommand
   | ManagePreparationTicketCommand;
 
-export type FoodServiceResourceCommand = Exclude<
+type FoodServiceResourceCommand = Exclude<
   FoodServiceCommand,
   ManagePreparationTicketCommand
 >;
@@ -123,7 +123,7 @@ export type FoodServiceCommitRequest =
       plan: PreparationTicketPlan;
     }>;
 
-export type FoodServiceCommandAuthorityOptions = Readonly<{
+type FoodServiceCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => FoodServiceMerchantRow | undefined;

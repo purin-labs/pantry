@@ -1,9 +1,9 @@
-import {
-  type CheckoutProfileReference,
-  type CheckoutStoredValue,
-  type CountryCode,
-  type DutyIncoterm,
-  type ShippingQuoteSnapshot,
+import type {
+  CheckoutProfileReference,
+  CheckoutStoredValue,
+  CountryCode,
+  DutyIncoterm,
+  ShippingQuoteSnapshot,
 } from "@seams/commerce-contracts";
 import {
   parseCreateBuyerCartCommandRecord,
@@ -56,9 +56,7 @@ export type PlaceCommerceBuyerStoredValueCheckoutV1 = WireStorefront.PlaceCommer
 export function parsePlaceBuyerStoredValueCheckoutCommand(value: unknown): PlaceCommerceBuyerStoredValueCheckoutV1 {
   return decodeRecord(parsePlaceBuyerStoredValueCheckoutCommandRecord, value);
 }
-import {
-  type CommerceShippingCountry,
-} from "./international-addresses.ts";
+import type { CommerceShippingCountry } from "./international-addresses.ts";
 import {
   parseBuyerCollectionPage,
   parseBuyerCollections,
@@ -80,9 +78,9 @@ import {
   type CommerceCustomerSignInChallengeV1,
   type VerifyCommerceCustomerSignInV1,
 } from "./customers.ts";
-import {
-  type CommerceEngineTimestamp,
-  type CommerceVariantV1,
+import type {
+  CommerceEngineTimestamp,
+  CommerceVariantV1,
 } from "./commerce-resources.ts";
 import {
   parseRejectedMutation,
@@ -107,7 +105,7 @@ export type CreateCommerceBuyerSessionV1 = WireStorefront.CreateCommerceBuyerSes
 
 export type CommerceBuyerSessionV4 = WireStorefront.CommerceBuyerSessionV4;
 
-export type CommerceDraftInvoiceCheckoutV1 = Readonly<{
+type CommerceDraftInvoiceCheckoutV1 = Readonly<{
   schemaVersion: "underclerk.draft-invoice-checkout.v1";
   session: Readonly<{ token: string; expiresAt: CommerceEngineTimestamp }>;
   checkout: CommerceBuyerQuotedCheckoutV1;
@@ -117,7 +115,7 @@ function parseDraftInvoiceCheckout(value: unknown): CommerceDraftInvoiceCheckout
   return decodeRecord(parseCommerceDraftInvoiceCheckoutV1Record, value);
 }
 
-export function parseOrderBalanceCheckout(value: unknown): CommerceOrderBalanceCheckoutV1 {
+function parseOrderBalanceCheckout(value: unknown): CommerceOrderBalanceCheckoutV1 {
   return decodeRecord(parseCommerceOrderBalanceCheckoutV1Record, value);
 }
 

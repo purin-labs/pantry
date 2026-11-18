@@ -27,14 +27,14 @@ import type { Result } from "../result";
  * The Inbox keeps one verification for each mailbox and address. A link to
  * another supplier is a new revision of it, which supersedes the earlier one.
  */
-export type SenderSupplierLinkState = Readonly<{
+type SenderSupplierLinkState = Readonly<{
   /** The supplier that new mail from the address is bound to, or null. */
   supplierId: string | null;
   /** The revision of the Inbox's verification for the address, 0 if none. */
   revision: number;
 }>;
 
-export type SenderSupplierLinkError = Readonly<{
+type SenderSupplierLinkError = Readonly<{
   code:
     | "mailbox_sender_link_changed"
     | "mailbox_sender_link_conflict"
@@ -42,7 +42,7 @@ export type SenderSupplierLinkError = Readonly<{
 }>;
 
 /** What the Portal Inbox action names as the evidence of each link. */
-export const SENDER_LINK_EVIDENCE = "portal:inbox:link_sender_to_supplier";
+const SENDER_LINK_EVIDENCE = "portal:inbox:link_sender_to_supplier";
 
 /** A sender address as a link names it, or null when it is not one. */
 export function senderLinkAddress(raw: string): string | null {
@@ -55,7 +55,7 @@ export function senderLinkAddress(raw: string): string | null {
 }
 
 /** The verification that the Inbox keeps for one sender of one mailbox. */
-export async function senderLinkVerificationId(
+async function senderLinkVerificationId(
   integrationAccountId: IntegrationAccountId,
   address: string,
 ): Promise<string> {

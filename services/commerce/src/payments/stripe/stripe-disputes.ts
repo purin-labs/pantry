@@ -5,7 +5,7 @@
 import { isRecord } from "@seams/std";
 import type { PaymentDisputeLifecycle } from "@seams/commerce-contracts";
 
-export type StripeDisputeObservation = Readonly<{
+type StripeDisputeObservation = Readonly<{
   eventId: string;
   accountId: string;
   providerDisputeReference: string;
@@ -27,9 +27,7 @@ type DisputeStatus =
   | "won"
   | "lost";
 
-export function isStripeDisputeEventType(
-  raw: unknown,
-): raw is DisputeEventType {
+function isStripeDisputeEventType(raw: unknown): raw is DisputeEventType {
   return (
     raw === "charge.dispute.created" ||
     raw === "charge.dispute.updated" ||

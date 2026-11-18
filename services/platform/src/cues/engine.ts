@@ -277,7 +277,7 @@ export type NormalizedCueEvent =
 export type CueSource = NormalizedCueEvent["source"];
 export type NormalizedCueEventType = NormalizedCueEvent["eventType"];
 
-export type CueDeliveryMode =
+type CueDeliveryMode =
   { kind: "immediate" } | { kind: "digest"; windowMs: number };
 
 export type CueQueueMessage = {
@@ -323,7 +323,7 @@ export type CueSnapshot = {
   createdAt: number;
 };
 
-export type CueBoundaryError =
+type CueBoundaryError =
   { code: "object_required" } | { code: "invalid_field"; field: string };
 
 type CueSubscriptionRow = {
@@ -699,7 +699,7 @@ type TierOneCueSubscriptionWriteInput = {
   maxPerHour: number;
 } & CueSubscriptionMatch;
 
-export async function writeTierOneCueSubscription(
+async function writeTierOneCueSubscription(
   input: TierOneCueSubscriptionWriteInput,
 ): Promise<void> {
   const existing = await input.db

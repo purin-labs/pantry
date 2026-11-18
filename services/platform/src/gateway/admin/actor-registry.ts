@@ -95,7 +95,7 @@ import {
   readPositiveSafeIntegerField,
 } from "../support";
 
-export type ActorRegistryAdminRequest =
+type ActorRegistryAdminRequest =
   | {
       readonly command: "bootstrap_organisation";
       readonly organisationId: OrganisationId;
@@ -150,12 +150,12 @@ export type ActorRegistryAdminRequest =
       readonly staleReservationAgeMs?: never;
     };
 
-export type ActorRegistryAdminRequestError = {
+type ActorRegistryAdminRequestError = {
   readonly code: "invalid_actor_registry_request";
   readonly field: string;
 };
 
-export type ActorSchemaAdvanceStub = Pick<
+type ActorSchemaAdvanceStub = Pick<
   DurableObjectStub<OrganisationDO>,
   "advanceActivationSchema"
 >;
@@ -221,7 +221,7 @@ export async function handleAdministerActorRegistry(
  * a registry does name is refused here; one whose Organisation still exists
  * refuses itself.
  */
-export async function eraseUnregisteredActorResponse(
+async function eraseUnregisteredActorResponse(
   env: Env,
   input: VariantBy<
     ActorRegistryAdminRequest,
@@ -308,7 +308,7 @@ export async function eraseUnregisteredActorResponse(
   });
 }
 
-export function registeredActorObjectId(
+function registeredActorObjectId(
   env: Env,
   entry: ActorRegistryEntry,
 ): string | null {
@@ -335,7 +335,7 @@ export function registeredActorObjectId(
   }
 }
 
-export function unregisteredActorStub(
+function unregisteredActorStub(
   env: Env,
   objectKind: UnregisteredActorKind,
   objectId: string,
@@ -395,7 +395,7 @@ export function unregisteredActorStub(
  * Empties the Connector of an Organisation whose purge is due or done. The
  * Connector decides whether it may be emptied; this only finds it.
  */
-export async function erasePurgedConnectorResponse(
+async function erasePurgedConnectorResponse(
   env: Env,
   input: VariantBy<
     ActorRegistryAdminRequest,
@@ -471,7 +471,7 @@ export async function erasePurgedConnectorResponse(
   });
 }
 
-export async function discardQuarantinedCaseResponse(
+async function discardQuarantinedCaseResponse(
   env: Env,
   input: VariantBy<
     ActorRegistryAdminRequest,
@@ -563,7 +563,7 @@ export async function discardQuarantinedCaseResponse(
   });
 }
 
-export async function recoverConnectorCaseWorkResponse(
+async function recoverConnectorCaseWorkResponse(
   env: Env,
   input: VariantBy<
     ActorRegistryAdminRequest,
@@ -597,7 +597,7 @@ export async function recoverConnectorCaseWorkResponse(
       );
 }
 
-export async function interruptActiveSessionResponse(
+async function interruptActiveSessionResponse(
   env: Env,
   input: VariantBy<ActorRegistryAdminRequest, "command", "interrupt_session">,
 ): Promise<Response> {
@@ -625,7 +625,7 @@ export async function interruptActiveSessionResponse(
       );
 }
 
-export async function bootstrapOrganisationActorRegistryResponse(
+async function bootstrapOrganisationActorRegistryResponse(
   env: Env,
   organisationId: OrganisationId,
 ): Promise<Response> {
@@ -693,7 +693,7 @@ export async function bootstrapOrganisationActorRegistryResponse(
     : actorRegistryReconciliationErrorResponse(inventory.error);
 }
 
-export type BootstrapOrganisationMetaRow = {
+type BootstrapOrganisationMetaRow = {
   readonly organisationId: unknown;
   readonly name: unknown;
   readonly plan: unknown;
@@ -701,7 +701,7 @@ export type BootstrapOrganisationMetaRow = {
   readonly createdAt: unknown;
 };
 
-export async function readBootstrapOrganisationMeta(
+async function readBootstrapOrganisationMeta(
   db: D1Database,
   organisationId: OrganisationId,
 ): Promise<OrganisationMetaInput | null> {
@@ -734,7 +734,7 @@ export async function readBootstrapOrganisationMeta(
   };
 }
 
-export async function advanceActorSchemaResponse(
+async function advanceActorSchemaResponse(
   env: Env,
   input: VariantBy<
     ActorRegistryAdminRequest,
@@ -861,7 +861,7 @@ export async function advanceActorSchemaResponse(
   });
 }
 
-export function actorSchemaAdvanceStub(
+function actorSchemaAdvanceStub(
   env: Env,
   entry: ActiveActorRegistryEntry,
 ): ActorSchemaAdvanceStub {
@@ -888,7 +888,7 @@ export function actorSchemaAdvanceStub(
   }
 }
 
-export async function reconcileReservedActorRegistryResponse(
+async function reconcileReservedActorRegistryResponse(
   env: Env,
   input: VariantBy<ActorRegistryAdminRequest, "command", "reconcile_reserved">,
 ): Promise<Response> {
@@ -916,7 +916,7 @@ export async function reconcileReservedActorRegistryResponse(
     : actorRegistryReconciliationErrorResponse(reconciled.error);
 }
 
-export function parseActorRegistryAdminRequest(
+function parseActorRegistryAdminRequest(
   body: JsonObject,
 ): Result<ActorRegistryAdminRequest, ActorRegistryAdminRequestError> {
   const command = readStringField(body, "command");
@@ -1120,7 +1120,7 @@ export function parseActorRegistryAdminRequest(
   return invalidActorRegistryAdminRequest("command");
 }
 
-export function invalidActorRegistryAdminRequest(
+function invalidActorRegistryAdminRequest(
   field: string,
 ): Result<never, ActorRegistryAdminRequestError> {
   return {
@@ -1129,7 +1129,7 @@ export function invalidActorRegistryAdminRequest(
   };
 }
 
-export async function inspectOrganisationActorRegistryResponse(
+async function inspectOrganisationActorRegistryResponse(
   request: Request,
   env: Env,
 ): Promise<Response> {
@@ -1285,7 +1285,7 @@ export async function inspectOrganisationActorRegistryResponse(
   });
 }
 
-export type ActorRegistryInspectionQuery =
+type ActorRegistryInspectionQuery =
   | {
       readonly kind: "organisation";
       readonly organisationId: OrganisationId;
@@ -1301,11 +1301,11 @@ export type ActorRegistryInspectionQuery =
       readonly sessionId: SessionId;
     };
 
-export type ActorRegistryInspectionQueryError = {
+type ActorRegistryInspectionQueryError = {
   readonly message: string;
 };
 
-export function parseActorRegistryInspectionQuery(
+function parseActorRegistryInspectionQuery(
   url: URL,
 ): Result<ActorRegistryInspectionQuery, ActorRegistryInspectionQueryError> {
   const organisationId = parseOrganisationId(
@@ -1358,7 +1358,7 @@ export function parseActorRegistryInspectionQuery(
   };
 }
 
-export function actorActivationIdentityForQuarantinedEntry(
+function actorActivationIdentityForQuarantinedEntry(
   entry: QuarantinedCaseActorRegistryEntry,
   requestedAt: number,
 ): ActorActivationIdentity {
@@ -1374,7 +1374,7 @@ export function actorActivationIdentityForQuarantinedEntry(
   };
 }
 
-export function findInspectableCaseInventoryEntry(
+function findInspectableCaseInventoryEntry(
   inventory: readonly ActorRegistryInventoryEntry[],
   caseId: CaseId,
 ): ActorRegistryInventoryEntry | undefined {
@@ -1391,7 +1391,7 @@ export function findInspectableCaseInventoryEntry(
   return undefined;
 }
 
-export function findQuarantinedCaseRegistryEntry(
+function findQuarantinedCaseRegistryEntry(
   entries: readonly ActorRegistryEntry[],
   registryId: ActorRegistryId,
   caseId: CaseId,
@@ -1404,7 +1404,7 @@ export function findQuarantinedCaseRegistryEntry(
   return undefined;
 }
 
-export function isQuarantinedCaseRegistryEntry(
+function isQuarantinedCaseRegistryEntry(
   candidate: ActorRegistryEntry,
   registryId: ActorRegistryId,
   caseId: CaseId,
@@ -1417,7 +1417,7 @@ export function isQuarantinedCaseRegistryEntry(
   );
 }
 
-export function sanitizeCaseBudgetActivationInspection(snapshot: CaseSnapshot) {
+function sanitizeCaseBudgetActivationInspection(snapshot: CaseSnapshot) {
   return {
     identity: snapshot.identity,
     revision: snapshot.revision,
@@ -1479,7 +1479,7 @@ export function sanitizeCaseBudgetActivationInspection(snapshot: CaseSnapshot) {
   };
 }
 
-export type ActiveSessionRegistryInspection =
+type ActiveSessionRegistryInspection =
   | {
       readonly kind: "inspected";
       readonly identity: VariantBy<
@@ -1507,7 +1507,7 @@ export type ActiveSessionRegistryInspection =
       readonly error: { readonly code: string };
     };
 
-export type ActiveSessionInventoryEntry = VariantBy<
+type ActiveSessionInventoryEntry = VariantBy<
   ActorRegistryInventoryEntry,
   "lifecycleStatus",
   "active"
@@ -1519,17 +1519,17 @@ export type ActiveSessionInventoryEntry = VariantBy<
   >;
 };
 
-export type RpcSessionInspectionResult = Awaited<
+type RpcSessionInspectionResult = Awaited<
   ReturnType<ImportedCanonicalSessionActorStub["inspectCanonicalSessionState"]>
 >;
 
-export type RpcSessionInspection = VariantBy<
+type RpcSessionInspection = VariantBy<
   RpcSessionInspectionResult,
   "ok",
   true
 >["value"];
 
-export async function inspectActiveSessionRegistryEntries(input: {
+async function inspectActiveSessionRegistryEntries(input: {
   readonly env: Env;
   readonly organisationId: OrganisationId;
   readonly inventory: readonly ActorRegistryInventoryEntry[];
@@ -1550,7 +1550,7 @@ export async function inspectActiveSessionRegistryEntries(input: {
   return inspections;
 }
 
-export function isActiveSessionInventoryEntry(
+function isActiveSessionInventoryEntry(
   entry: ActorRegistryInventoryEntry,
 ): entry is ActiveSessionInventoryEntry {
   return (
@@ -1559,7 +1559,7 @@ export function isActiveSessionInventoryEntry(
   );
 }
 
-export function findActiveSessionInventoryEntry(
+function findActiveSessionInventoryEntry(
   inventory: readonly ActorRegistryInventoryEntry[],
   sessionId: SessionId,
 ): ActiveSessionInventoryEntry | undefined {
@@ -1574,7 +1574,7 @@ export function findActiveSessionInventoryEntry(
   return undefined;
 }
 
-export async function inspectActiveSessionRegistryEntry(input: {
+async function inspectActiveSessionRegistryEntry(input: {
   readonly env: Env;
   readonly organisationId: OrganisationId;
   readonly entry: ActiveSessionInventoryEntry;
@@ -1627,7 +1627,7 @@ export async function inspectActiveSessionRegistryEntry(input: {
   };
 }
 
-export function unavailableSessionInspection(
+function unavailableSessionInspection(
   entry: ActiveSessionInventoryEntry,
   error: { readonly code: string },
 ): ActiveSessionRegistryInspection {
@@ -1639,7 +1639,7 @@ export function unavailableSessionInspection(
   };
 }
 
-export function sessionInspectionIdentityMatches(
+function sessionInspectionIdentityMatches(
   inspection: RpcSessionInspection,
   identity: VariantBy<
     ActorRegistryInventoryEntry["identity"],
@@ -1723,7 +1723,7 @@ export async function handleInspectRetainedVaultRootClosure(
     : retainedVaultRootClosureErrorResponse(closure.error);
 }
 
-export function actorNamespaces(env: Env): ActorNamespaces {
+function actorNamespaces(env: Env): ActorNamespaces {
   return {
     organisation: env.ORGANISATION,
     session: env.SESSION,
@@ -1732,7 +1732,7 @@ export function actorNamespaces(env: Env): ActorNamespaces {
   };
 }
 
-export function actorRegistryReconciliationErrorResponse(
+function actorRegistryReconciliationErrorResponse(
   error: ActorRegistryReconciliationError,
 ): Response {
   switch (error.code) {
@@ -1773,7 +1773,7 @@ export function actorRegistryReconciliationErrorResponse(
   }
 }
 
-export function actorActivationSchemaAdvanceErrorResponse(
+function actorActivationSchemaAdvanceErrorResponse(
   error: ActorActivationSchemaAdvanceError,
 ): Response {
   switch (error.code) {
@@ -1795,7 +1795,7 @@ export function actorActivationSchemaAdvanceErrorResponse(
   }
 }
 
-export function actorRegistrySchemaAdvanceErrorResponse(
+function actorRegistrySchemaAdvanceErrorResponse(
   error: ActorRegistrySchemaAdvanceError,
 ): Response {
   switch (error.code) {
@@ -1828,7 +1828,7 @@ export function actorRegistrySchemaAdvanceErrorResponse(
   }
 }
 
-export function activePolicyCredentialInspectionActorErrorResponse(
+function activePolicyCredentialInspectionActorErrorResponse(
   error: ActivePolicyCredentialInspectionActorError,
 ): Response {
   switch (error.code) {
@@ -1873,7 +1873,7 @@ export function activePolicyCredentialInspectionActorErrorResponse(
   }
 }
 
-export function activePolicyCredentialClosureErrorResponse(
+function activePolicyCredentialClosureErrorResponse(
   error: ActivePolicyCredentialClosureError,
 ): Response {
   switch (error.code) {
@@ -1894,7 +1894,7 @@ export function activePolicyCredentialClosureErrorResponse(
   }
 }
 
-export function retainedVaultRootClosureErrorResponse(
+function retainedVaultRootClosureErrorResponse(
   error: RetainedVaultRootClosureError,
 ): Response {
   switch (error.code) {

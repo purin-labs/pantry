@@ -18,20 +18,20 @@ export type GoogleOidcConfig = {
   readonly redirectUri: string;
 };
 
-export type GoogleOidcStart = {
+type GoogleOidcStart = {
   readonly state: string;
   readonly authorizationUrl: string;
   readonly expiresAt: number;
 };
 
-export type GoogleOidcAuthentication =
+type GoogleOidcAuthentication =
   | { readonly kind: "sign_in" }
   | {
       readonly kind: "approval_step_up";
       readonly challenge: ApprovalActionBinding;
     };
 
-export type GoogleApprovalGrant = {
+type GoogleApprovalGrant = {
   readonly stateHash: string;
   readonly userId: UserId;
   readonly challenge: ApprovalActionBinding;
@@ -42,7 +42,7 @@ export type GoogleOidcFetcher = (
   init?: RequestInit,
 ) => Promise<Response>;
 
-export type GoogleOidcError =
+type GoogleOidcError =
   | { readonly code: "oidc_state_missing" }
   | { readonly code: "oidc_state_expired" }
   | { readonly code: "oidc_state_consumed" }

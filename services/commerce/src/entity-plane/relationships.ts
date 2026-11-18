@@ -22,7 +22,6 @@ import {
   parseSystemEntityRef,
 } from "./parsers.ts";
 import {
-  entityTypeExists as entityTypeExistsInEntities,
   readCustomEntity,
   readMerchant,
   readSystemEntity,
@@ -548,14 +547,6 @@ export function findEntity(
   return reference.origin === "system"
     ? readSystemEntity(database, merchantId, reference, merchantRevision)
     : readCustomEntity(database, merchantId, reference, merchantRevision);
-}
-
-export function entityTypeExists(
-  database: CommerceDatabase,
-  merchantId: string,
-  typeId: CommerceEntityTypeId,
-): boolean {
-  return entityTypeExistsInEntities(database, merchantId, typeId);
 }
 
 function listCanonicalRelationships(

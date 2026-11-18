@@ -28,7 +28,7 @@ import {
   revokeDisabledSlackOrganisationConnection,
 } from "../slack/organisation-routing";
 
-export type RemoveIntegrationAccountError =
+type RemoveIntegrationAccountError =
   | { readonly code: "integration_account_not_found" }
   | { readonly code: "integration_account_not_disabled" }
   | { readonly code: "integration_account_is_default_for_provider" }
@@ -37,7 +37,7 @@ export type RemoveIntegrationAccountError =
   | { readonly code: "configuration_version_conflict" }
   | { readonly code: "provider_connection_corrupt" };
 
-export type RemoveIntegrationAccountResult = {
+type RemoveIntegrationAccountResult = {
   readonly receiptId: string;
   readonly configurationVersion: number;
   readonly projectionRevision: number;

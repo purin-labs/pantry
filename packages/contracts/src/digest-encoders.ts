@@ -1,4 +1,4 @@
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever } from "@seams/std";
 import type { HarnessCheckpointRecord } from "./types/HarnessCheckpointRecord.ts";
 import type { MessageAttachmentSource } from "./types/MessageAttachmentSource.ts";
 import type { TurnIdentity } from "./types/TurnIdentity.ts";
@@ -57,12 +57,6 @@ export function encodeHarnessCheckpointRecord(
   });
 }
 
-export async function harnessCheckpointId(
-  record: HarnessCheckpointRecord,
-): Promise<string> {
-  return `checkpoint_${await sha256Hex(encodeHarnessCheckpointRecord(record))}`;
-}
-
 function orderedTurn(turn: TurnIdentity): TurnIdentity {
   return {
     turnId: turn.turnId,
@@ -79,10 +73,6 @@ export function encodeUserMessageDigest(message: UserMessage): string {
     encoded += `\x1e${encodeMessagePart(part)}`;
   }
   return encoded;
-}
-
-export function digestUserMessage(message: UserMessage): Promise<string> {
-  return sha256Hex(encodeUserMessageDigest(message));
 }
 
 function encodeMessagePart(part: UserMessagePart): string {
@@ -116,7 +106,7 @@ function encodeMessagePart(part: UserMessagePart): string {
   }
 }
 
-export function messageAttachmentSourceIdentity(
+function messageAttachmentSourceIdentity(
   source: MessageAttachmentSource,
 ): string {
   switch (source.kind) {

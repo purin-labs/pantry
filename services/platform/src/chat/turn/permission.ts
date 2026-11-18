@@ -36,7 +36,7 @@ import {
 import { conversationStreamIdentity } from "./run";
 import { nextTimelineSequence } from "./timeline";
 
-export type ConversationPermissionOutcome =
+type ConversationPermissionOutcome =
   | {
       readonly kind: "decided";
       readonly decision: ChatPermissionDecision;
@@ -259,7 +259,7 @@ export async function settleConversationPermission(input: {
   return null;
 }
 
-export function lowerFirst(text: string): string {
+function lowerFirst(text: string): string {
   return text.charAt(0).toLowerCase() + text.slice(1);
 }
 
@@ -311,7 +311,7 @@ export async function chatPermissionRequest(
   };
 }
 
-export function chatPermissionAttempt(
+function chatPermissionAttempt(
   action: ChatModelAction,
 ): { readonly action: string; readonly object: string | null } | null {
   switch (action.kind) {

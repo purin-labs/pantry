@@ -15,10 +15,7 @@ export interface AlarmReconciler {
   nextDue(now: number): number | null;
 }
 
-export type AlarmStorage = Pick<
-  DurableObjectStorage,
-  "setAlarm" | "deleteAlarm"
->;
+type AlarmStorage = Pick<DurableObjectStorage, "setAlarm" | "deleteAlarm">;
 
 /** The earliest time that one of the reconcilers has work. */
 export function nextAlarmAt(
@@ -76,7 +73,7 @@ export async function armAlarmBy(
  * One step of an Actor's alarm (Refactor 15, S3). A step that throws does
  * not stop the steps after it.
  */
-export type AlarmStep = Readonly<{
+type AlarmStep = Readonly<{
   name: string;
   run: () => unknown;
 }>;
@@ -90,7 +87,7 @@ const ALARM_RETRY_MAX_MS = 15 * 60_000;
  * The wait before an alarm runs again after `failures` runs in a row with a
  * failed step: 15 s, then doubled, to at most 15 minutes.
  */
-export function alarmRetryDelay(failures: number): number {
+function alarmRetryDelay(failures: number): number {
   return Math.min(
     ALARM_RETRY_MAX_MS,
     ALARM_RETRY_FIRST_MS * 2 ** Math.max(0, Math.min(failures, 20) - 1),

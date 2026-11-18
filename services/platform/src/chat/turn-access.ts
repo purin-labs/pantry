@@ -496,7 +496,7 @@ function controlAuthorityUserId(authority: RequestAuthority): string | null {
   return authority.kind === "control" ? authority.userId : null;
 }
 
-export type AdmittedChatAudience = Readonly<{
+type AdmittedChatAudience = Readonly<{
   surface: "private" | "shared" | "workspace_canvas";
   conversationRevision: number;
   accessRevision: number;
@@ -522,7 +522,7 @@ export type AdmittedChatAudience = Readonly<{
       }>;
 }>;
 
-export function parseAdmittedChatAudience(
+function parseAdmittedChatAudience(
   serialized: unknown,
 ): AdmittedChatAudience | null {
   if (typeof serialized !== "string") return null;

@@ -102,7 +102,7 @@ export function upsertProjection(
   );
 }
 
-export function relationDisplayName(
+function relationDisplayName(
   projection: Record<string, unknown>,
   canonicalId: string,
 ): string {
@@ -447,14 +447,14 @@ export function deriveLowStockCueFacts(
   return facts;
 }
 
-export type AppliedDecreaseMovement = Readonly<{
+type AppliedDecreaseMovement = Readonly<{
   canonicalId: string;
   inventoryItemId: string;
   locationId: string;
   quantity: InventoryQuantity;
 }>;
 
-export function reconstructMovementResultingAvailable(
+function reconstructMovementResultingAvailable(
   finalAvailable: InventoryQuantity,
   movements: readonly AppliedDecreaseMovement[],
   movementIndex: number,
@@ -480,18 +480,18 @@ export function reconstructMovementResultingAvailable(
   return resulting;
 }
 
-export type InventoryQuantity = Readonly<{
+type InventoryQuantity = Readonly<{
   amount: number;
   scale: number;
   unit: string;
 }>;
 
-export type InventoryPositionRecord = Readonly<{
+type InventoryPositionRecord = Readonly<{
   canonicalId: string;
   body: Record<string, unknown>;
 }>;
 
-export type StockPolicyRecord = Readonly<{
+type StockPolicyRecord = Readonly<{
   stockPolicyId: string;
   revision: number;
   inventoryItemId: string;
@@ -500,7 +500,7 @@ export type StockPolicyRecord = Readonly<{
   lifecycle: string;
 }>;
 
-export function readPositionAvailable(
+function readPositionAvailable(
   position: InventoryPositionRecord,
 ): InventoryQuantity | null {
   const balance = isRecord(position.body.balance)
@@ -510,7 +510,7 @@ export function readPositionAvailable(
   return storedInventoryQuantity(balance.available);
 }
 
-export function readInventoryPositionForItemLocation(
+function readInventoryPositionForItemLocation(
   sql: SqlStorage,
   organisationId: OrganisationId,
   integrationAccountId: IntegrationAccountId,
@@ -537,7 +537,7 @@ export function readInventoryPositionForItemLocation(
   return body === null ? null : { canonicalId: row.canonicalId, body };
 }
 
-export function readStockPoliciesForItemLocation(
+function readStockPoliciesForItemLocation(
   sql: SqlStorage,
   organisationId: OrganisationId,
   integrationAccountId: IntegrationAccountId,
@@ -582,7 +582,7 @@ export function readStockPoliciesForItemLocation(
   return policies;
 }
 
-export function hasLowStockCueWithoutRecovery(
+function hasLowStockCueWithoutRecovery(
   sql: SqlStorage,
   organisationId: OrganisationId,
   policy: StockPolicyRecord,
@@ -635,7 +635,7 @@ export function hasLowStockCueWithoutRecovery(
   return recovery === undefined;
 }
 
-export function addInventoryQuantities(
+function addInventoryQuantities(
   left: InventoryQuantity,
   right: InventoryQuantity,
 ): InventoryQuantity | null {
@@ -652,7 +652,7 @@ export function addInventoryQuantities(
     : null;
 }
 
-export function compareInventoryQuantities(
+function compareInventoryQuantities(
   left: InventoryQuantity,
   right: InventoryQuantity,
 ): number | null {
@@ -663,14 +663,14 @@ export function compareInventoryQuantities(
   return leftAmount < rightAmount ? -1 : leftAmount > rightAmount ? 1 : 0;
 }
 
-export function isGreaterInventoryQuantity(
+function isGreaterInventoryQuantity(
   left: InventoryQuantity,
   right: InventoryQuantity,
 ): boolean {
   return compareInventoryQuantities(left, right) === 1;
 }
 
-export function isAtOrBelowInventoryQuantity(
+function isAtOrBelowInventoryQuantity(
   left: InventoryQuantity,
   right: InventoryQuantity,
 ): boolean {
@@ -678,7 +678,7 @@ export function isAtOrBelowInventoryQuantity(
   return comparison !== null && comparison <= 0;
 }
 
-export function readProjectionBody(
+function readProjectionBody(
   sql: SqlStorage,
   organisationId: OrganisationId,
   kind: CommerceProjectionKind,
@@ -688,7 +688,7 @@ export function readProjectionBody(
   return row === null ? null : projectionBody(row.projectionJson);
 }
 
-export function commerceCueEvent(
+function commerceCueEvent(
   input: ApplyCommerceDeliveryInput,
   providerDeliveryId: string,
   identity: ProjectionIdentity,

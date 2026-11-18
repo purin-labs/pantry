@@ -43,13 +43,13 @@ import {
 import type { CommerceSoldOutMarksV1 } from "@seams/commerce-client";
 import type { CommercePickupQueueV1 } from "@seams/commerce-client";
 
-export type SnapshotMerchantRow = Readonly<{
+type SnapshotMerchantRow = Readonly<{
   merchantId: string;
   organisationId: string;
   revision: number;
 }>;
 
-export type CommerceSnapshotReaderOptions = Readonly<{
+type CommerceSnapshotReaderOptions = Readonly<{
   database: CommerceDatabase;
   signer: Pick<CommerceSigner, "keyId" | "publicKeyB64">;
   readMerchant: (merchantId: string) => SnapshotMerchantRow | undefined;

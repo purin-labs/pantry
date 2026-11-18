@@ -108,9 +108,9 @@ import {
   parseJsonOrNull,
 } from "@seams/std";
 
-export type SegmentDecodeError = { code: "bad_path_encoding"; value: string };
+type SegmentDecodeError = { code: "bad_path_encoding"; value: string };
 
-export type RouteParamError =
+type RouteParamError =
   | SegmentDecodeError
   | { code: "invalid_organisation_id" }
   | { code: "invalid_surface_kind" }
@@ -134,7 +134,7 @@ export type HealthBody = {
   tracks: readonly Track[];
 };
 
-export type RuntimeSecret =
+type RuntimeSecret =
   { ok: true; value: string } | { ok: false; code: "missing_secret" };
 
 export const EVENT_QUEUE_RETRY_DELAY_SECONDS = 30;
@@ -580,12 +580,12 @@ export async function handleCommerceDeliveryQueueMessage(
   message.ack();
 }
 
-export type CommerceLabQueueRunResolution =
+type CommerceLabQueueRunResolution =
   | { readonly kind: "active" }
   | { readonly kind: "stale" }
   | { readonly kind: "retry"; readonly code: string };
 
-export async function resolveCommerceLabQueueRun(
+async function resolveCommerceLabQueueRun(
   db: OrganisationDatabase,
   body: CommerceDeliveryQueueMessage,
 ): Promise<CommerceLabQueueRunResolution> {
@@ -608,7 +608,7 @@ export async function resolveCommerceLabQueueRun(
   return { kind: "stale" };
 }
 
-export function retryCommerceQueueMessage(
+function retryCommerceQueueMessage(
   message: Message<unknown>,
   body: CommerceDeliveryQueueMessage,
   errorCode: string,
@@ -622,7 +622,7 @@ export function retryCommerceQueueMessage(
   message.retry({ delaySeconds: EVENT_QUEUE_RETRY_DELAY_SECONDS });
 }
 
-export async function rejectCommerceQueueMessage(input: {
+async function rejectCommerceQueueMessage(input: {
   readonly message: Message<unknown>;
   readonly scope: OrganisationExecutionScope;
   readonly body: CommerceDeliveryQueueMessage;
@@ -653,7 +653,7 @@ export async function rejectCommerceQueueMessage(input: {
   input.message.ack();
 }
 
-export function rawProviderDeliveryId(raw: unknown): string | null {
+function rawProviderDeliveryId(raw: unknown): string | null {
   if (
     typeof raw !== "object" ||
     raw === null ||
@@ -667,7 +667,7 @@ export function rawProviderDeliveryId(raw: unknown): string | null {
     : null;
 }
 
-export function commerceDeliveryEvidenceId(
+function commerceDeliveryEvidenceId(
   delivery: CanonicalCommerceDelivery,
 ): string | null {
   const observation = delivery.observations[0];
@@ -678,7 +678,7 @@ export function commerceDeliveryEvidenceId(
   return [identity.kind, identity.canonicalId, identity.revision].join(":");
 }
 
-export function commerceDeliveryAuthority(delivery: CanonicalCommerceDelivery): Result<
+function commerceDeliveryAuthority(delivery: CanonicalCommerceDelivery): Result<
   Readonly<{
     provider: "shopify" | "underclerk" | "lab";
     integrationAccountId: string;
@@ -721,7 +721,7 @@ export function commerceDeliveryAuthority(delivery: CanonicalCommerceDelivery): 
   };
 }
 
-export function commerceObservationProviderIdentity(
+function commerceObservationProviderIdentity(
   observation: CanonicalCommerceDelivery["observations"][number],
 ): Readonly<{
   provider: CommerceSource;
@@ -785,7 +785,7 @@ export function commerceObservationIdentity(
   }
 }
 
-export function commerceProjectionKindForResourceType(
+function commerceProjectionKindForResourceType(
   resourceType: CommerceResourceType,
 ): CommerceProjectionKind {
   switch (resourceType) {
@@ -880,7 +880,7 @@ export function actorResolutionErrorResponse(error: ActorResolutionError): Respo
   }
 }
 
-export type AdminConnectedIntegrationSeed = Omit<
+type AdminConnectedIntegrationSeed = Omit<
   ConnectedIntegrationSeed,
   | "organisationId"
   | "createdByUserId"
@@ -1137,7 +1137,7 @@ export function isLocalDebugRequest(request: Request): boolean {
   return isLocalHostname(url.hostname);
 }
 
-export function isLocalHostname(hostname: string): boolean {
+function isLocalHostname(hostname: string): boolean {
   return (
     hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]"
   );

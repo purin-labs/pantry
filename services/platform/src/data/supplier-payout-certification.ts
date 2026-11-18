@@ -26,7 +26,7 @@ export type SupplierPayoutRail = keyof typeof SUPPLIER_PAYOUT_ADAPTER_VERSIONS;
  * live run against the real account, with real money, proves the path that
  * actually pays a supplier.
  */
-export const PAYOUT_EVIDENCE_SOURCES = [
+const PAYOUT_EVIDENCE_SOURCES = [
   "deterministic_fixture",
   "provider_sandbox",
   "controlled_live",
@@ -74,7 +74,7 @@ export type SupplierPayoutCertification = Readonly<{
   certifiedAt: number;
 }>;
 
-export type PayoutCertificationError = Readonly<{
+type PayoutCertificationError = Readonly<{
   code:
     | "payout_certification_invalid"
     | "payout_certification_incomplete"
@@ -90,7 +90,7 @@ export type PayoutCertificationError = Readonly<{
  * against the actual account proves that; activating it on a fixture or a
  * sandbox packet would be certifying a simulation.
  */
-export function payoutEvidenceSupportsEnvironment(
+function payoutEvidenceSupportsEnvironment(
   source: PayoutEvidenceSource,
   environment: "development" | "production",
 ): boolean {

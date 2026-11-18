@@ -23,7 +23,7 @@ import {
   type CommerceCredential,
 } from "@seams/commerce-client";
 
-export const SATYR_UNDERCLERK_APP_ID = "satyr";
+const SATYR_UNDERCLERK_APP_ID = "satyr";
 
 /**
  * Whom a Platform client acts for: the operator (provisioning and payment

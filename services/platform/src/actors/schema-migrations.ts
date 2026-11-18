@@ -85,7 +85,7 @@ export function runSchemaMigrations(
   validateCurrentSchema(sql, plan, finalStep);
 }
 
-export function readSchemaVersion(sql: SqlStorage, key: string): number {
+function readSchemaVersion(sql: SqlStorage, key: string): number {
   createMigrationMetadata(sql);
   const rows = sql
     .exec<SchemaVersionRow>(

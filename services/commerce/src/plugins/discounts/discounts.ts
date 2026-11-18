@@ -26,7 +26,7 @@ export type DiscountCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-export type DiscountAuthorityOptions = Readonly<{
+type DiscountAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => DiscountMerchantRow | undefined;
   readReplay: (
@@ -58,7 +58,7 @@ export type CheckoutDiscountRequest = Readonly<{
 
 export type DiscountHold = Readonly<{ discountId: string; amountMinor: number }>;
 
-export type DiscountEvaluation =
+type DiscountEvaluation =
   | Readonly<{
       kind: "applied";
       /** The discount on each line, in the order of the lines given. */

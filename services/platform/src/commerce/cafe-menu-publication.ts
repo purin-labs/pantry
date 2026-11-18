@@ -20,7 +20,7 @@ type Cafe = Readonly<{ salesChannelId: string; locationId: string }>;
 export const CAFE_STOREFRONT_ID = "storefront_cafe";
 export const CAFE_MENU_ID = "menu_cafe_main";
 
-export type CafeMenuPlan =
+type CafeMenuPlan =
   | Readonly<{
       kind: "ready";
       menu: CafeMenuDefinition;

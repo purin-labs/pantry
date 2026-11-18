@@ -68,7 +68,7 @@ export const SLACK_INSTALL_SCOPES = [
   "im:history",
 ] as const;
 
-export type SlackOAuthAccessTokenResponse = {
+type SlackOAuthAccessTokenResponse = {
   ok?: unknown;
   access_token?: unknown;
   app_id?: unknown;
@@ -77,7 +77,7 @@ export type SlackOAuthAccessTokenResponse = {
   error?: unknown;
 };
 
-export type SlackOAuthInstall = {
+type SlackOAuthInstall = {
   appId: SlackAppId;
   teamId: WorkspaceId;
   teamName: string;
@@ -85,15 +85,15 @@ export type SlackOAuthInstall = {
   scopes: readonly string[];
 };
 
-export type SlackInstallLivenessStatus =
+type SlackInstallLivenessStatus =
   "receiving" | "silent" | "never_seen" | "inactive";
 
-export type SlackInstallLiveness = InstallLivenessRecord & {
+type SlackInstallLiveness = InstallLivenessRecord & {
   status: SlackInstallLivenessStatus;
   silenceMs: number | null;
 };
 
-export const SLACK_OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
+const SLACK_OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
 
 export async function handleSlackInstallStart(
   request: Request,
@@ -368,7 +368,7 @@ export async function handleSlackInstall(
   return jsonResponse({ ok: true, organisationInstall: record });
 }
 
-export function slackInstallAdmissionErrorResponse(
+function slackInstallAdmissionErrorResponse(
   error: SlackInstallOrganisationAdmissionError,
 ): Response {
   switch (error.code) {
@@ -437,7 +437,7 @@ export async function handleSlackInstallLiveness(
   });
 }
 
-export async function exchangeSlackOAuthCode(input: {
+async function exchangeSlackOAuthCode(input: {
   code: string;
   clientId: string;
   clientSecret: string;
@@ -465,7 +465,7 @@ export async function exchangeSlackOAuthCode(input: {
   }
 }
 
-export function parseSlackOAuthAccessTokenResponse(
+function parseSlackOAuthAccessTokenResponse(
   response: SlackOAuthAccessTokenResponse,
 ): Result<SlackOAuthInstall, string> {
   if (response.ok !== true) {
@@ -516,13 +516,13 @@ export function parseSlackOAuthAccessTokenResponse(
   };
 }
 
-export function slackApiError(error: unknown): string {
+function slackApiError(error: unknown): string {
   return typeof error === "string" && error.length > 0
     ? error
     : "slack_api_error";
 }
 
-export function slackOAuthScopes(raw: unknown): readonly string[] {
+function slackOAuthScopes(raw: unknown): readonly string[] {
   if (typeof raw !== "string" || raw.length === 0) {
     return [];
   }
@@ -530,7 +530,7 @@ export function slackOAuthScopes(raw: unknown): readonly string[] {
   return raw.split(",").map(trimString).filter(nonEmptyString);
 }
 
-export function slackAuthorizeUrl(input: {
+function slackAuthorizeUrl(input: {
   origin: string;
   clientId: string;
   state: string;
@@ -547,7 +547,7 @@ export function slackAuthorizeUrl(input: {
   return url.toString();
 }
 
-export async function createSlackOAuthState(input: {
+async function createSlackOAuthState(input: {
   secret: string;
   issuedAt: number;
   nonce: string;
@@ -558,7 +558,7 @@ export async function createSlackOAuthState(input: {
   return `${payload}.${signature}`;
 }
 
-export async function verifySlackOAuthState(input: {
+async function verifySlackOAuthState(input: {
   secret: string;
   state: string;
   now: number;
@@ -589,7 +589,7 @@ export async function verifySlackOAuthState(input: {
   return { ok: true, value: true };
 }
 
-export function parseSlackOAuthState(
+function parseSlackOAuthState(
   state: string,
 ): Result<{ issuedAt: number; payload: string; signature: string }, string> {
   const parts = state.split(".");
@@ -618,7 +618,7 @@ export function parseSlackOAuthState(
   };
 }
 
-export async function signSlackOAuthState(
+async function signSlackOAuthState(
   secret: string,
   payload: string,
 ): Promise<string> {
@@ -639,7 +639,7 @@ export async function signSlackOAuthState(
   return base64UrlEncode(new Uint8Array(signature));
 }
 
-export function timingSafeEqualString(left: string, right: string): boolean {
+function timingSafeEqualString(left: string, right: string): boolean {
   const leftBytes = new TextEncoder().encode(left);
   const rightBytes = new TextEncoder().encode(right);
 
@@ -656,7 +656,7 @@ export function timingSafeEqualString(left: string, right: string): boolean {
   return diff === 0;
 }
 
-export function base64UrlEncode(value: Uint8Array): string {
+function base64UrlEncode(value: Uint8Array): string {
   let binary = "";
 
   for (const byte of value) {
@@ -669,7 +669,7 @@ export function base64UrlEncode(value: Uint8Array): string {
     .replace(/=+$/g, "");
 }
 
-export function readStaleAfterMs(url: URL): number {
+function readStaleAfterMs(url: URL): number {
   const raw = url.searchParams.get("staleAfterMs");
 
   if (raw === null) {
@@ -685,7 +685,7 @@ export function readStaleAfterMs(url: URL): number {
   return value;
 }
 
-export function installLiveness(
+function installLiveness(
   install: InstallLivenessRecord,
   now: number,
   staleAfterMs: number,
@@ -702,7 +702,7 @@ export function installLiveness(
   };
 }
 
-export function installLivenessStatus(
+function installLivenessStatus(
   install: InstallLivenessRecord,
   silenceMs: number | null,
   staleAfterMs: number,
@@ -718,19 +718,19 @@ export function installLivenessStatus(
   return silenceMs > staleAfterMs ? "silent" : "receiving";
 }
 
-export function trimString(value: string): string {
+function trimString(value: string): string {
   return value.trim();
 }
 
-export function nonEmptyString(value: string): boolean {
+function nonEmptyString(value: string): boolean {
   return value.length > 0;
 }
 
-export function slackInstallRedirectUri(publicOrigin: string): string {
+function slackInstallRedirectUri(publicOrigin: string): string {
   return `${publicOrigin}${SLACK_INSTALL_REDIRECT_PATH}`;
 }
 
-export function slackBotTokenHandle(workspaceId: WorkspaceId): VaultHandle {
+function slackBotTokenHandle(workspaceId: WorkspaceId): VaultHandle {
   const parsed = parseVaultHandle(
     `vault:slack:bot:${workspaceId.toLowerCase()}:${crypto.randomUUID()}`,
   );

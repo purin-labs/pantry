@@ -85,7 +85,7 @@ export type KnowledgeLinks = Readonly<{
   onOpenSkills: () => void;
 }>;
 
-export type KnowledgeViewProps = MemoryReviewProps &
+type KnowledgeViewProps = MemoryReviewProps &
   KnowledgeLinks &
   Readonly<{
     memories: readonly MemoryView[];
@@ -157,7 +157,7 @@ function TeachPanel(props: { readonly teach: TeachLink }): React.ReactNode {
 }
 
 /** The name under which the "New" mark remembers one record. */
-export function knowledgeRowKey(
+function knowledgeRowKey(
   row: Pick<KnowledgeRow, "kind" | "id">,
 ): string {
   return `${row.kind}:${row.id}`;

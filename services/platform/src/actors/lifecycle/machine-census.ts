@@ -10,7 +10,7 @@ import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "../whatsapp-reply-proposal.mach
 import { EMAIL_REPLY_PROPOSAL_MACHINE } from "../../data/email-reply-proposal.machine";
 
 /** The machines whose state lives in an Actor's SQLite (Refactor 15, S5). */
-export const ACTOR_MACHINES: readonly MachineDefinition[] = [
+const ACTOR_MACHINES: readonly MachineDefinition[] = [
   CASE_APPROVAL_WAIT_MACHINE,
   CASE_ASSIGNMENT_MACHINE,
   CASE_OUTPUT_MACHINE,
@@ -48,7 +48,7 @@ export type MachineCensus = Readonly<{
 }>;
 
 /** The Actor's alarm and the time of the census. */
-export type CensusClock = Readonly<{ alarm: number | null; now: number }>;
+type CensusClock = Readonly<{ alarm: number | null; now: number }>;
 
 /** The census of an Actor's machines, read with its alarm and the time. */
 export async function actorMachineCensus(

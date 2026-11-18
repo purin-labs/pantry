@@ -605,7 +605,7 @@ function handledSender(
 }
 
 /** Initials on a quiet tone. The name next to it says who it is. */
-export function MailAvatar(
+function MailAvatar(
   props: Readonly<{ name: string; size?: "small" }>,
 ): React.ReactNode {
   return (
@@ -637,7 +637,7 @@ function avatarTone(name: string): (typeof AVATAR_TONES)[number] {
 }
 
 /** How long something waited, for a row: "12 min", "3 h", "2 days". */
-export function formatWaitedShort(waited: number): string {
+function formatWaitedShort(waited: number): string {
   const minutes = Math.max(0, Math.floor(waited / 60_000));
   if (minutes < 60) return `${Math.max(1, minutes)} min`;
   const hours = Math.floor(minutes / 60);

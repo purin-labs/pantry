@@ -142,7 +142,7 @@ export async function handleAdministerCodeModePlatformCutover(
     : codeModePlatformGovernorErrorResponse(controlled.error);
 }
 
-export function buildCodeModePlatformControlInput(input: {
+function buildCodeModePlatformControlInput(input: {
   readonly command: CodeModePlatformAdmissionControlInput["command"];
   readonly idempotencyKey: string;
   readonly reason: string;
@@ -160,7 +160,7 @@ export function buildCodeModePlatformControlInput(input: {
     : { ...identity, command: "open_admission" };
 }
 
-export function codeModePlatformGovernorErrorResponse(
+function codeModePlatformGovernorErrorResponse(
   error: CodeModePlatformGovernorError,
 ): Response {
   if (error.code === "invalid_code_mode_budget_input") {

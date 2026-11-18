@@ -66,7 +66,7 @@ type ConnectorSideCaseContext = Readonly<{
   identity: ConnectorIdentity;
 }>;
 
-export type SlackSideCaseProposalPost = Readonly<{
+type SlackSideCaseProposalPost = Readonly<{
   identity: ConnectorIdentity;
   proposalId: string;
   title: string;
@@ -125,7 +125,7 @@ export async function postSlackSideCaseProposal(
 }
 
 /** A click on Start, as the platform read it from a signed interaction. */
-export type SlackSideCaseStartRequest = Readonly<{
+type SlackSideCaseStartRequest = Readonly<{
   identity: ConnectorIdentity;
   proposalId: string;
   workspaceId: string;

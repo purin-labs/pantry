@@ -579,7 +579,7 @@ export type RecipeOverviewNode = Readonly<{
   y: number;
 }>;
 
-export type RecipeOverview = Readonly<{
+type RecipeOverview = Readonly<{
   nodes: readonly RecipeOverviewNode[];
   edges: readonly Readonly<{ from: string; to: string }>[];
 }>;

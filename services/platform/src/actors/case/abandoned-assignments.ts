@@ -14,14 +14,7 @@ import { resolveActiveSessionActorAtPlacement } from "../actor-router";
 import type { CaseDO } from "../case";
 import { logAbandonSkipped } from "./assignment-census";
 
-/**
- * The wait of a delivery that comes back to its own work: long enough that a
- * live delivery between its assignment and its turn's start has started the
- * turn, so the Session's answer covers it.
- */
-export const ABANDONED_ASSIGNMENT_GRACE_MS = 30_000;
-
-export type ActiveAssignment = Variant<
+type ActiveAssignment = Variant<
   CaseAssignmentLifecycle,
   "assigned" | "running"
 >;
@@ -30,9 +23,7 @@ export type ActiveAssignment = Variant<
  * The Session's proof that it runs no turn: the time of the read that showed
  * it, or null when it runs one or cannot say.
  */
-export type SessionQuiescenceProof = (
-  sessionId: string,
-) => Promise<number | null>;
+type SessionQuiescenceProof = (sessionId: string) => Promise<number | null>;
 
 /**
  * Asks the Session of an assignment if it runs a turn. A Session that was

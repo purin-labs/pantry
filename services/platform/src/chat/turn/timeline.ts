@@ -69,7 +69,7 @@ export function appendMessageTimelineEvents(
   return next;
 }
 
-export type ConversationModelUsage = Readonly<{
+type ConversationModelUsage = Readonly<{
   callsWithUsage: number;
   inputTokens: number;
   outputTokens: number;
@@ -128,11 +128,11 @@ export function appendModelUsageToLatestAssistant(
   ];
 }
 
-export function readMessageId(message: ChatMessage): string {
+function readMessageId(message: ChatMessage): string {
   return message.id;
 }
 
-export function timelineEventForMessage(
+function timelineEventForMessage(
   message: ChatMessage,
   sequence: number,
   requestId: string,
@@ -192,7 +192,7 @@ export function documentationTool(
   };
 }
 
-export function safeUrlHost(url: string): string {
+function safeUrlHost(url: string): string {
   try {
     return new URL(url).host;
   } catch {
@@ -329,7 +329,7 @@ export async function reconcileStoredBakerySurfaceTimeline(
   return current;
 }
 
-export function appendBakerySurfaceTimelineEvent(
+function appendBakerySurfaceTimelineEvent(
   timeline: readonly ChatTimelineEvent[],
   event: BakerySurfaceTimelineEvent,
   requestId: string,
@@ -412,7 +412,7 @@ export function chatActionFlowSink(
   }
 }
 
-export function customConnectorDraftSink(
+function customConnectorDraftSink(
   authority: Variant<RequestAuthority, "control">,
   resourceScope: string,
 ): FlowSink {

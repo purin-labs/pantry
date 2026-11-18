@@ -2,7 +2,7 @@ import React from "react";
 import { controlRead, controlWrite } from "../../control-client";
 import { parseSharedThreadResponse } from "@seams/control-api/portal/slack-thread";
 
-export type SharedThreadState =
+type SharedThreadState =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "ready"; threadUrl: string | null }>
   | Readonly<{ kind: "saving"; threadUrl: string | null }>
@@ -48,7 +48,7 @@ export function SlackThreadControl(props: Readonly<{
   </section>;
 }
 
-export function loadSharedThread(
+function loadSharedThread(
   path: string,
   setState: React.Dispatch<React.SetStateAction<SharedThreadState>>,
 ): () => void {
@@ -57,11 +57,11 @@ export function loadSharedThread(
   return cancelSharedThreadRead.bind(null, request);
 }
 
-export function cancelSharedThreadRead(request: { active: boolean }): void {
+function cancelSharedThreadRead(request: { active: boolean }): void {
   request.active = false;
 }
 
-export async function readSharedThread(
+async function readSharedThread(
   path: string,
   request: { active: boolean; setState: React.Dispatch<React.SetStateAction<SharedThreadState>> },
 ): Promise<void> {
@@ -79,7 +79,7 @@ export async function readSharedThread(
   }
 }
 
-export async function saveSharedThread(
+async function saveSharedThread(
   path: string,
   threadUrl: string | null,
   setState: React.Dispatch<React.SetStateAction<SharedThreadState>>,

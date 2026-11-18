@@ -407,10 +407,10 @@ export async function handleConfigureShopifyConnector(
   });
 }
 
-export type ShopifyWebhookProvisioning =
+type ShopifyWebhookProvisioning =
   { kind: "provider_api" } | { kind: "merchant_admin"; signingSecret: string };
 
-export type ShopifyWebhookProvisioningResult =
+type ShopifyWebhookProvisioningResult =
   | {
       kind: "provider_api";
       registration: ShopifyWebhookRegistration;
@@ -430,7 +430,7 @@ export type ShopifyWebhookProvisioningResult =
       signingSecret: string;
     };
 
-export function parseShopifyWebhookProvisioning(
+function parseShopifyWebhookProvisioning(
   body: JsonObject,
 ): Result<ShopifyWebhookProvisioning, FieldError> {
   const mode = readStringField(body, "provisioningMode");
@@ -468,7 +468,7 @@ export function parseShopifyWebhookProvisioning(
   }
 }
 
-export async function provisionShopifyWebhooks(input: {
+async function provisionShopifyWebhooks(input: {
   provisioning: ShopifyWebhookProvisioning;
   shopDomain: string;
   accessToken: string;
@@ -530,7 +530,7 @@ export async function provisionShopifyWebhooks(input: {
   }
 }
 
-export function traceShopifyConnectorConfigured(input: {
+function traceShopifyConnectorConfigured(input: {
   organisationId: string;
   shopDomain: string;
   endpointUrl: string;
@@ -721,7 +721,7 @@ export async function handleTriggerShopifyTestOrder(
   });
 }
 
-export function shopifyAuthErrorResponse(error: ShopifyAuthError): Response {
+function shopifyAuthErrorResponse(error: ShopifyAuthError): Response {
   switch (error.code) {
     case "shopify_client_credential_invalid":
       return errorResponse(
@@ -752,7 +752,7 @@ export function shopifyAuthErrorResponse(error: ShopifyAuthError): Response {
   }
 }
 
-export function shopifyRegistrationErrorResponse(
+function shopifyRegistrationErrorResponse(
   error: ShopifyWebhookRegistrationError,
 ): Response {
   switch (error.code) {
@@ -786,7 +786,7 @@ export function shopifyRegistrationErrorResponse(
   }
 }
 
-export function shopifyDevelopmentOrderTriggerErrorResponse(
+function shopifyDevelopmentOrderTriggerErrorResponse(
   error: ShopifyDevelopmentOrderTriggerError,
 ): Response {
   switch (error.code) {

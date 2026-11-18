@@ -41,17 +41,6 @@ export type BuyerAccountGateway = Readonly<{
   ) => Promise<BuyerAccountResult<BuyerSavedAddress>>;
 }>;
 
-export const unavailableBuyerAccountGateway: BuyerAccountGateway = {
-  identify: unavailableBuyerAccountResult,
-  resolveSavedAddress: unavailableBuyerAccountResult,
-};
-
-async function unavailableBuyerAccountResult(): Promise<
-  Readonly<{ kind: "unavailable" }>
-> {
-  return { kind: "unavailable" };
-}
-
 /**
  * A saved customer address as a shipping address, for the destinations
  * Commerce ships to: Japan needs a prefecture, Singapore has one locality,

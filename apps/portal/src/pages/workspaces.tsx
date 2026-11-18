@@ -79,7 +79,7 @@ export type WorkspaceSupportTools = {
   readonly archive: () => Promise<void>;
 };
 
-export type OrganisationsRouteProps = {
+type OrganisationsRouteProps = {
   readonly displayName: string;
   readonly membershipAvailability: ControlMembershipAvailability;
   readonly retryMemberships: () => void;
@@ -95,9 +95,7 @@ export type OrganisationsRouteProps = {
   readonly supportTools: WorkspaceSupportTools | null;
 };
 
-export type OrganisationsPageContent = PageContent<
-  readonly OrganisationListItem[]
->;
+type OrganisationsPageContent = PageContent<readonly OrganisationListItem[]>;
 type OrganisationsContentSetter = React.Dispatch<
   React.SetStateAction<OrganisationsPageContent>
 >;
@@ -232,7 +230,7 @@ function invalidateOrganisationsRequest(
   requestRevision.current += 1;
 }
 
-export function refreshingOrganisationsContent(
+function refreshingOrganisationsContent(
   content: OrganisationsPageContent,
 ): OrganisationsPageContent {
   return content.kind === "ready"

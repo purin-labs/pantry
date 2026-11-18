@@ -339,7 +339,7 @@ async function readCase(
 }
 
 /** One Case's summary from the nodes of its projection that one person read. */
-export function summariseCase(
+function summariseCase(
   ref: CaseExecutionCaseRef,
   nodes: readonly CaseExecutionNode[],
 ): CaseSummary {

@@ -15,7 +15,7 @@ import {
 } from "@seams/control-api/portal/mail-relationship";
 
 // Purchasing facts and unsaved text live only in this mounted conversation.
-export type State =
+type State =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "selecting"; suppliers: readonly MailSupplierCandidate[] }>
   | Readonly<{ kind: "reviewing"; preview: MailRelationshipPreview }>
@@ -23,7 +23,7 @@ export type State =
   | Readonly<{ kind: "rejecting" }>
   | Readonly<{ kind: "failed"; message: string }>;
 
-export type Props = Readonly<{
+type Props = Readonly<{
   organisationId: string;
   proposalId: string;
   onChanged: () => Promise<void>;
@@ -255,7 +255,7 @@ export class MailRelationshipCorrection extends React.Component<Props, State> {
   }
 }
 
-export function pendingMessage(
+function pendingMessage(
   kind: "loading" | "saving" | "rejecting",
 ): string {
   switch (kind) {
@@ -270,13 +270,13 @@ export function pendingMessage(
   }
 }
 
-export function supplierItem(
+function supplierItem(
   supplier: MailSupplierCandidate,
 ): Readonly<{ value: string; label: string }> {
   return { value: supplier.entryId, label: supplier.displayName };
 }
 
-export function renderSupplier(
+function renderSupplier(
   supplier: MailSupplierCandidate,
 ): React.ReactNode {
   return (
@@ -286,7 +286,7 @@ export function renderSupplier(
   );
 }
 
-export function renderFact(
+function renderFact(
   fact: Readonly<{ label: string; value: string }>,
 ): React.ReactNode {
   return (
@@ -297,7 +297,7 @@ export function renderFact(
   );
 }
 
-export async function relationshipRequest(
+async function relationshipRequest(
   props: Props,
   action: "relationship" | "correct" | "reject",
   body: unknown,
@@ -320,11 +320,11 @@ export async function relationshipRequest(
   return raw;
 }
 
-export function isCsrfCookie(value: string): boolean {
+function isCsrfCookie(value: string): boolean {
   return value.startsWith("satyr_control_csrf=");
 }
 
-export function relationshipProblem(code: unknown): string {
+function relationshipProblem(code: unknown): string {
   if (code === "email_relationship_save_unconfirmed")
     return "Gmail did not confirm this correction. The earlier reply is blocked from sending. Check Gmail, then reject this proposal.";
   if (
@@ -339,7 +339,7 @@ export function relationshipProblem(code: unknown): string {
   return "Purchasing correction is unavailable. Check mailbox access, purchasing access, and the proposal's state, then refresh work.";
 }
 
-export function problem(error: unknown): string {
+function problem(error: unknown): string {
   return error instanceof Error
     ? error.message
     : "Purchasing correction failed. Select Refresh, then try again.";

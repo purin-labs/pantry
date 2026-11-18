@@ -51,7 +51,7 @@ import type {
   OrganisationStateError,
 } from "./types";
 
-export const COMMERCE_BOARD_PRESENCE_TTL_MS = 30_000;
+const COMMERCE_BOARD_PRESENCE_TTL_MS = 30_000;
 
 export function validateActionOrganisation(
   sql: SqlStorage,
@@ -92,7 +92,7 @@ export function readCommerceBoardPresence(
   return entries;
 }
 
-export function compareCommerceBoardPresence(
+function compareCommerceBoardPresence(
   left: CommerceBoardPresenceEntry,
   right: CommerceBoardPresenceEntry,
 ): number {
@@ -177,7 +177,7 @@ export function readNextOrganisationAlarmAt(sql: SqlStorage): number | null {
   return Math.min(actionAt, codeModeAt);
 }
 
-export function requireOrganisationMetaId(sql: SqlStorage): OrganisationId {
+function requireOrganisationMetaId(sql: SqlStorage): OrganisationId {
   const organisation = readOrganisationMetaRow(sql);
   if (organisation === undefined) throw new Error("organisation_meta_missing");
   const organisationId = parseOrganisationId(organisation.organisation_id);
@@ -229,7 +229,7 @@ export function readOrganisationPolicyHead(
     .toArray()[0];
 }
 
-export function policyHeadFromRow(
+function policyHeadFromRow(
   row: OrganisationPolicyHeadRow,
 ): OrganisationPolicyHead {
   return {
@@ -283,7 +283,7 @@ export function activePolicyCredentialRefs(
   return { ok: true, value: refs };
 }
 
-export function compareActivePolicyCredentialRefs(
+function compareActivePolicyCredentialRefs(
   left: { readonly ruleId: string; readonly credentialRef: VaultHandle },
   right: { readonly ruleId: string; readonly credentialRef: VaultHandle },
 ): number {

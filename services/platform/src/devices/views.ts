@@ -29,7 +29,7 @@ const REVOKED_VISIBLE_MS = 7 * 24 * 60 * 60_000;
 /** A pending gateway whose code has long ended leaves the list after a day. */
 const PENDING_VISIBLE_MS = 24 * 60 * 60_000;
 
-export type KitchenDeviceViews = Readonly<{
+type KitchenDeviceViews = Readonly<{
   gateways: readonly GatewayDeviceView[];
   devices: readonly KitchenDeviceView[];
 }>;

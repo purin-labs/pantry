@@ -20,7 +20,7 @@ import { resolveActiveCaseActorAtPlacement } from "./actor-router";
  * active envelope and reaches the agent through the purpose-bound Case tools.
  */
 
-export type WhatsAppCaseAdmissionInput = Readonly<{
+type WhatsAppCaseAdmissionInput = Readonly<{
   scope: OrganisationExecutionScope;
   organisationId: string;
   integrationAccountId: string;
@@ -33,7 +33,7 @@ export type WhatsAppCaseAdmissionInput = Readonly<{
   receivedAt: number;
 }>;
 
-export type WhatsAppCaseAdmissionError = { readonly code: string };
+type WhatsAppCaseAdmissionError = { readonly code: string };
 
 export async function admitWhatsAppSupportCase(
   env: Env,

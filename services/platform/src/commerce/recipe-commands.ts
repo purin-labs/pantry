@@ -16,7 +16,7 @@ import { canonicalJson } from "@seams/std";
  * command and input checks. A save makes a new revision: earlier production
  * keeps the revision that it used.
  */
-export type RecipeContext = Readonly<{
+type RecipeContext = Readonly<{
   client: CommerceAdminClient;
   merchantId: string;
 }>;

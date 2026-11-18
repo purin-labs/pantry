@@ -1,6 +1,6 @@
 import { isRecord } from "@seams/std";
 
-export type ErrorBody = {
+type ErrorBody = {
   ok: false;
   error: {
     code: string;

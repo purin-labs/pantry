@@ -40,11 +40,11 @@ import { assertNever } from "@seams/std";
 export const ATTACHMENT_COLLECTION_INTERVAL_MS = 24 * 60 * 60 * 1_000;
 /** Younger objects are kept regardless: in-flight staging, a trigger being written. */
 export const ATTACHMENT_COLLECTION_GRACE_MS = 24 * 60 * 60 * 1_000;
-export const ATTACHMENT_COLLECTION_ORGANISATIONS_PER_PASS = 4;
+const ATTACHMENT_COLLECTION_ORGANISATIONS_PER_PASS = 4;
 
 const RECEIPT_ROOT = "attachment-collection";
 
-export type OrganisationAttachmentCollectionOutcome =
+type OrganisationAttachmentCollectionOutcome =
   | {
       readonly kind: "collected";
       readonly receipt: AttachmentCollectionReceipt;
@@ -68,14 +68,14 @@ export type OrganisationAttachmentCollectionOutcome =
     };
 
 /** What is written beside the organisation's attachments after each pass. */
-export type OrganisationAttachmentCollectionRecord = {
+type OrganisationAttachmentCollectionRecord = {
   readonly schemaVersion: "plan37.attachment-collection-pass.v1";
   readonly organisationId: OrganisationId;
   readonly collectedAt: number;
   readonly outcome: OrganisationAttachmentCollectionOutcome;
 };
 
-export type AttachmentCollectionNamespaces = Pick<Env, "CASE" | "SESSION">;
+type AttachmentCollectionNamespaces = Pick<Env, "CASE" | "SESSION">;
 
 export async function collectOrganisationAttachments(input: {
   readonly scope: OrganisationExecutionScope;

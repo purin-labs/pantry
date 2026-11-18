@@ -18,7 +18,7 @@ import type { CommerceDatabase } from "../database.ts";
 
 const LIST_LIMIT = 200;
 
-export type OpenedUnplacedCapture = Omit<
+type OpenedUnplacedCapture = Omit<
   CommerceUnplacedCaptureV1,
   "revision" | "lifecycle"
 >;

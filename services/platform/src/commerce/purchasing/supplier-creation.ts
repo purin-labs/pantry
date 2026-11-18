@@ -29,7 +29,7 @@ export type SupplierCreationError = Readonly<{
   detail: string | null;
 }>;
 
-export type SupplierCreationResult = Readonly<{
+type SupplierCreationResult = Readonly<{
   supplierId: string;
   entryId: string;
   merchantRevision: CommerceSnapshotRevision;
@@ -122,7 +122,7 @@ export type SupplierRegistrationError =
       detail?: never;
     }>;
 
-export type SupplierRegistration = Readonly<{
+type SupplierRegistration = Readonly<{
   supplier: SupplierCreationResult;
   reconciliation: CommercePurchasingReconcileResponse;
 }>;

@@ -15,7 +15,6 @@ import { isRecord } from "@seams/std";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 
-export const COMMERCE_ORDERS_FLOW_RESOURCE_SCOPE = "commerce:orders";
 export type SessionInformationFlowError =
   | Readonly<{
       readonly code: "session_information_flow_invalid";
@@ -29,24 +28,24 @@ export type SessionInformationFlowError =
       readonly evidenceDigest: string;
     }>;
 
-export type SessionInformationFlowLookup = Readonly<{
+type SessionInformationFlowLookup = Readonly<{
   readonly organisationId: string;
   readonly sessionId: string;
 }>;
 
-export type SessionInformationFlowTurnLookup = SessionInformationFlowLookup &
+type SessionInformationFlowTurnLookup = SessionInformationFlowLookup &
   Readonly<{
     readonly turnId: string;
   }>;
 
-export type SessionInformationFlowTurnBinding = Readonly<{
+type SessionInformationFlowTurnBinding = Readonly<{
   readonly turnId: string;
   readonly authorityPartitionDigest: string;
   readonly revision: number;
   readonly binding: FlowBinding;
 }>;
 
-export type SessionInformationFlowState = Readonly<{
+type SessionInformationFlowState = Readonly<{
   readonly context: InformationFlowContext;
   readonly observations: readonly ObservationEvidence[];
 }>;
@@ -62,7 +61,7 @@ export type SessionInformationFlowCommit = Readonly<{
   readonly committedAt: number;
 }>;
 
-export type PrepareSessionInformationFlowInput = Readonly<{
+type PrepareSessionInformationFlowInput = Readonly<{
   readonly sql: SqlStorage;
   readonly organisationId: string;
   readonly sessionId: string;
@@ -72,7 +71,7 @@ export type PrepareSessionInformationFlowInput = Readonly<{
   readonly contextBundle: Omit<ContextBundle, "memory">;
 }>;
 
-export type AdmitSessionInformationFlowObservationInput = Readonly<{
+type AdmitSessionInformationFlowObservationInput = Readonly<{
   readonly sql: SqlStorage;
   readonly transactionSync: <T>(callback: () => T) => T;
   readonly authorizeCommit: () => void | Promise<void>;

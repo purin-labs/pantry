@@ -284,7 +284,7 @@ export async function handleReadExternalRecords(
   return jsonResponse({ ok: true, result: result.value });
 }
 
-export function externalRecordsProvider(
+function externalRecordsProvider(
   provider: string,
 ): ExternalRecordsProvider | null {
   return provider === "airtable" || provider === "notion" ? provider : null;

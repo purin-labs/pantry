@@ -97,7 +97,7 @@ function fenceBindings(
   ];
 }
 
-export type AgentPermissionRequestInsert = Omit<
+type AgentPermissionRequestInsert = Omit<
   AgentPermissionRequest,
   "organisationId" | "status" | "decidedByUserId" | "decidedAt" | "releasedAt"
 >;

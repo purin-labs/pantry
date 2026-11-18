@@ -29,7 +29,7 @@ export type CanonicalTextTurnCompletionIdentity = {
   readonly acceptedAt: Timestamp;
 };
 
-export type CanonicalTextTurnCancellationIdentity = {
+type CanonicalTextTurnCancellationIdentity = {
   readonly cancellationId: string;
   readonly correlationId: string;
   readonly acceptedAt: Timestamp;

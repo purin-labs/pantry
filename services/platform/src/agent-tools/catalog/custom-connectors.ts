@@ -38,7 +38,7 @@ export function customConnectorToolDefinition(
   };
 }
 
-export function customConnectorSchemaToJsonSchema(
+function customConnectorSchemaToJsonSchema(
   schema: CustomConnectorSchema,
 ): JsonSchema {
   switch (schema.kind) {
@@ -88,14 +88,14 @@ export function customConnectorSchemaToJsonSchema(
   }
 }
 
-export function nullableJsonSchemaType(
+function nullableJsonSchemaType(
   type: "object" | "array" | "string" | "integer" | "number" | "boolean",
   nullable: boolean,
 ): string | readonly string[] {
   return nullable ? [type, "null"] : type;
 }
 
-export function customConnectorConstraintJsonSchema(
+function customConnectorConstraintJsonSchema(
   constraint: CustomConnectorScalarConstraint,
 ): JsonSchema {
   switch (constraint.kind) {

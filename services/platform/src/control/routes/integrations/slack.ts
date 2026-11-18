@@ -514,7 +514,7 @@ export async function handleDisconnectSlackInstallation(
   return controlJson(responseBody);
 }
 
-export function parseSlackChannelDefaultChange(input: {
+function parseSlackChannelDefaultChange(input: {
   readonly body: JsonRecord;
   readonly sourceOrganisationId: OrganisationId;
   readonly installationId: SlackChannelDefaultChange["installationId"];

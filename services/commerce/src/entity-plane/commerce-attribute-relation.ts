@@ -68,7 +68,7 @@ type AttributeOrderingRow = Readonly<{
   comparableBoolean: number | null;
 }>;
 
-export type CommerceAttributeRelationSubject = Readonly<{
+type CommerceAttributeRelationSubject = Readonly<{
   merchantId: string;
   subjectKind: "entity" | "list_entry";
   entityOrigin: "system" | "custom";

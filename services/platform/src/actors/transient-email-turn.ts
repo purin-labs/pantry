@@ -53,10 +53,9 @@ export type TransientEmailTurnSuccess = {
 
 export type TransientEmailTeardownOutcome = TransientTeardownOutcome;
 
-export type TransientEmailTurnInput = Omit<
-  TransientTurnInput<string>,
-  "complete"
-> & { readonly maxBodyChars: number };
+type TransientEmailTurnInput = Omit<TransientTurnInput<string>, "complete"> & {
+  readonly maxBodyChars: number;
+};
 
 export async function runTransientEmailTurn(
   input: TransientEmailTurnInput,

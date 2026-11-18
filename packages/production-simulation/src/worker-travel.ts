@@ -6,7 +6,7 @@ import type { ResourceDefinition, TravelRoute } from "./scenario.ts";
 import type { RunState } from "./state.ts";
 import { tickDuration, ZERO_DURATION, type TickDuration } from "./time.ts";
 
-export type UpdateWorkerTravelCommand = Extract<
+type UpdateWorkerTravelCommand = Extract<
   ControlCommand,
   { kind: "update-worker-travel" }
 >;

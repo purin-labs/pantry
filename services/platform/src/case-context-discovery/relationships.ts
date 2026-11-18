@@ -815,7 +815,7 @@ export function parseCaseContextCollectionReviewCommand(
   return null;
 }
 
-export function parseCaseContextCollectionScope(
+function parseCaseContextCollectionScope(
   raw: unknown,
   organisationId: OrganisationId,
 ): CaseContextCollectionScope | null {

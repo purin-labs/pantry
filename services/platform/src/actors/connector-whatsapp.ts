@@ -22,7 +22,7 @@ import {
  * digests, counters, and instants only.
  */
 
-export const WHATSAPP_SERVICE_WINDOW_MS = 24 * 3_600_000;
+const WHATSAPP_SERVICE_WINDOW_MS = 24 * 3_600_000;
 
 export type WhatsAppIngressLimits = {
   readonly maxActiveCases: number;
@@ -103,7 +103,7 @@ export type WhatsAppRuntimeSnapshot = {
   readonly disabledAt: number | null;
 };
 
-export type WhatsAppRuntimeError = { readonly code: string };
+type WhatsAppRuntimeError = { readonly code: string };
 
 type WhatsAppEnvelopeReadError = {
   readonly code: "connector_whatsapp_storage_corrupt";
@@ -118,7 +118,7 @@ export type WhatsAppOwnership =
       readonly reason: "operator_takeover" | "agent_handoff";
     };
 
-export type WhatsAppCaseRow = {
+type WhatsAppCaseRow = {
   readonly caseId: string;
   readonly customerWaId: string;
   readonly conversationWindowSequence: number;
@@ -135,7 +135,7 @@ export type WhatsAppCaseRow = {
   readonly closedAt: number | null;
 };
 
-export type WhatsAppEnvelopeEntry = {
+type WhatsAppEnvelopeEntry = {
   readonly sequence: number;
   readonly direction: "inbound" | "outbound";
   readonly providerMessageId: string;
@@ -395,7 +395,7 @@ export function disableWhatsAppRuntime(
 }
 
 /** Deletes every envelope entry and proposal body and closes open Cases. */
-export function purgeWhatsAppActiveContent(sql: SqlStorage, now: number): void {
+function purgeWhatsAppActiveContent(sql: SqlStorage, now: number): void {
   sql.exec("DELETE FROM connector_whatsapp_envelope");
   // A version that is being sent is revoked too: its attempt then finds the
   // row moved and records nothing, so no envelope comes back after the purge.
@@ -414,7 +414,7 @@ export function purgeWhatsAppActiveContent(sql: SqlStorage, now: number): void {
   );
 }
 
-export type WhatsAppPauseOutcome = {
+type WhatsAppPauseOutcome = {
   readonly kind: "paused" | "already_paused";
   /**
    * The receipt this pause is owed a notice for, or null when an identical
@@ -616,7 +616,7 @@ export function resumeWhatsAppRuntime(
     : { ok: true, value: snapshot };
 }
 
-export type WhatsAppAdmissionReservation =
+type WhatsAppAdmissionReservation =
   | {
       readonly kind: "ready";
       readonly caseId: string;
@@ -764,7 +764,7 @@ export function beginWhatsAppAdmission(
   };
 }
 
-export type WhatsAppAdmissionCommit =
+type WhatsAppAdmissionCommit =
   | { readonly kind: "committed"; readonly sequence: number }
   | { readonly kind: "duplicate" }
   | { readonly kind: "case_closed" };
@@ -942,7 +942,7 @@ export function appendWhatsAppEnvelopeEntry(
  * the oldest entries. Trimming is destructive on purpose: Pantry keeps only
  * what the open Case needs, and WhatsApp remains the durable message system.
  */
-export function trimWhatsAppEnvelope(
+function trimWhatsAppEnvelope(
   sql: SqlStorage,
   caseId: string,
   limits: WhatsAppIngressLimits,
@@ -1066,7 +1066,7 @@ export function readWhatsAppEnvelope(
   return { ok: true, value: entries };
 }
 
-export function deleteWhatsAppEnvelope(sql: SqlStorage, caseId: string): void {
+function deleteWhatsAppEnvelope(sql: SqlStorage, caseId: string): void {
   sql.exec("DELETE FROM connector_whatsapp_envelope WHERE case_id = ?", caseId);
   sql.exec(
     "UPDATE connector_whatsapp_case SET message_count = 0, byte_count = 0 WHERE case_id = ?",
@@ -1104,7 +1104,7 @@ export function readWhatsAppCase(
   return row === null ? null : parseCaseRow(row);
 }
 
-export function readOpenWhatsAppCaseForCustomer(
+function readOpenWhatsAppCaseForCustomer(
   sql: SqlStorage,
   customerWaId: string,
   now: number,
@@ -1216,7 +1216,7 @@ export function countWhatsAppAdmissionsSince(
   return Number(row?.admitted ?? 0);
 }
 
-export function nextWhatsAppConversationWindowSequence(
+function nextWhatsAppConversationWindowSequence(
   sql: SqlStorage,
   customerWaId: string,
 ): number {
@@ -1288,7 +1288,7 @@ export function nextWhatsAppSweepAt(sql: SqlStorage): number | null {
   return candidates.length === 0 ? null : Math.min(...candidates);
 }
 
-export type WhatsAppSweep = {
+type WhatsAppSweep = {
   readonly closedCaseIds: readonly string[];
   readonly recoveredProcessing: boolean;
 };
@@ -1363,7 +1363,7 @@ export function nextWhatsAppDebounceAt(sql: SqlStorage): number | null {
   return due === null ? null : Number(due);
 }
 
-export type WhatsAppDebounceClaim =
+type WhatsAppDebounceClaim =
   | {
       readonly kind: "due";
       readonly caseId: string;
@@ -1421,7 +1421,7 @@ export function claimDueWhatsAppCase(
  */
 export const WHATSAPP_MAX_TURN_ATTEMPTS = 3;
 
-export type WhatsAppRearm =
+type WhatsAppRearm =
   | {
       readonly kind: "rearmed";
       readonly attempts: number;
@@ -1694,13 +1694,13 @@ export function openWhatsAppProposals(
     .filter(isPresentProposal);
 }
 
-export type WhatsAppExpiry = {
+type WhatsAppExpiry = {
   readonly proposalId: string;
   readonly caseId: string;
   readonly noticeKey: string | null;
 };
 
-export type WhatsAppSendClaim =
+type WhatsAppSendClaim =
   | { readonly kind: "claimed"; readonly proposal: WhatsAppProposalRow }
   | { readonly kind: "already_sent"; readonly whatsappMessageId: string }
   | { readonly kind: "unavailable"; readonly state: WhatsAppProposalState };

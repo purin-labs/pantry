@@ -235,13 +235,13 @@ export async function publishContactVerification(
  * endpoint is ambiguous. `unreadable` means a record it rests on is in a state
  * this cannot interpret, which establishes nothing either way.
  */
-export type ContactVerificationStanding =
+type ContactVerificationStanding =
   | Readonly<{ kind: "verified"; endpoint: VerifiedContactEndpoint }>
   | Readonly<{ kind: "not_current"; endpoint?: never }>
   | Readonly<{ kind: "unreadable"; endpoint?: never }>;
 
 /** The most verified contacts of one mailbox that a list returns. */
-export const MAX_VERIFIED_CONTACTS = 50;
+const MAX_VERIFIED_CONTACTS = 50;
 
 /**
  * The contacts of one mailbox whose verification stands now, by address. A

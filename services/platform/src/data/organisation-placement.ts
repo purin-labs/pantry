@@ -33,7 +33,7 @@ export type OrganisationPlacementError =
       readonly organisationId: OrganisationId;
     };
 
-export declare const organisationPlacementFenceTokenBrand: unique symbol;
+declare const organisationPlacementFenceTokenBrand: unique symbol;
 
 export type OrganisationPlacementFenceToken = string & {
   readonly [organisationPlacementFenceTokenBrand]: "OrganisationPlacementFenceToken";
@@ -53,7 +53,7 @@ export type OrganisationPlacementMoveTarget =
       readonly residencyJurisdiction: ResidencyJurisdiction;
     };
 
-export type OrganisationPlacementMoveTargetBoundaryError = {
+type OrganisationPlacementMoveTargetBoundaryError = {
   readonly code: "invalid_organisation_placement_move_target";
   readonly path: string;
 };
@@ -119,7 +119,7 @@ export type PublishedOrganisationPlacementMove = {
   readonly target: VariantBy<OrganisationPlacementRecord, "status", "active">;
 };
 
-export type OrganisationPlacementRow = {
+type OrganisationPlacementRow = {
   placementKind: unknown;
   placementEpoch: unknown;
   placementCellId: unknown;
@@ -127,7 +127,7 @@ export type OrganisationPlacementRow = {
   residencyJurisdiction: unknown;
 };
 
-export type OrganisationPlacementRecordRow = OrganisationPlacementRow & {
+type OrganisationPlacementRecordRow = OrganisationPlacementRow & {
   fenceToken: unknown;
   status: unknown;
   createdAt: unknown;
@@ -368,7 +368,7 @@ export async function readPlacementByEpoch(
   return parsePlacementRecord(row, organisationId);
 }
 
-export function placementRecordSelect(): string {
+function placementRecordSelect(): string {
   return `SELECT
      placement_kind AS placementKind,
      placement_epoch AS placementEpoch,
@@ -385,7 +385,7 @@ export function placementRecordSelect(): string {
    FROM organisation_placement`;
 }
 
-export function parsePlacementRecord(
+function parsePlacementRecord(
   row: OrganisationPlacementRecordRow | null,
   organisationId: OrganisationId,
 ): Result<OrganisationPlacementRecord, OrganisationPlacementError> {
@@ -500,7 +500,7 @@ export function parseOrganisationPlacementFenceToken(
     : { ok: false, error: { code: "invalid_placement_fence" } };
 }
 
-export function invalidPlacementMoveTarget(
+function invalidPlacementMoveTarget(
   path: string,
 ): Result<never, OrganisationPlacementMoveTargetBoundaryError> {
   return {

@@ -72,7 +72,7 @@ import type { WorkspaceRouteSelection } from "./portal-routing";
 import type { WorkspaceDetailPage } from "./route";
 
 /** What a page needs from the workspace shell. */
-export type PageContext = Readonly<{
+type PageContext = Readonly<{
   state: Variant<PortalState, "workspace_detail">;
   canManage: boolean;
   routeSelection: WorkspaceRouteSelection;
@@ -82,7 +82,7 @@ export type PageContext = Readonly<{
   >;
 }>;
 
-export interface PageEntry {
+interface PageEntry {
   readonly render: (page: PageContext) => React.ReactNode;
 }
 

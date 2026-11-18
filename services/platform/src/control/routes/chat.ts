@@ -119,7 +119,7 @@ export async function handlePortalChat(
   }
 }
 
-export async function handlePortalChatRequest(
+async function handlePortalChatRequest(
   request: Request,
   env: Env,
   organisationIdRaw: string,
@@ -865,7 +865,7 @@ export async function handlePortalChatRequest(
   });
 }
 
-export function publicChatModel(
+function publicChatModel(
   selected: OrganisationModelRoute,
   workspace: OrganisationModelRoute,
 ): unknown {
@@ -883,7 +883,7 @@ export function publicChatModel(
   };
 }
 
-export function validateChatEffort(
+function validateChatEffort(
   route: OrganisationModelRoute,
   effort: ChatEffort | undefined,
 ): { readonly ok: true } | { readonly ok: false } {
@@ -896,7 +896,7 @@ export function validateChatEffort(
     : { ok: false };
 }
 
-export function chatDirectoryCursors(
+function chatDirectoryCursors(
   url: URL,
 ): import("../../chat/store").ChatDirectoryCursors | null {
   const activeRaw = url.searchParams.get("activeAfter");
@@ -917,17 +917,14 @@ export function chatDirectoryCursors(
 }
 
 /** A `<time>.<chat id>` cursor of the chat list. */
-export function timedCursor(raw: string): { at: number; id: string } | null {
+function timedCursor(raw: string): { at: number; id: string } | null {
   const match = /^(\d{1,16})\.([a-zA-Z0-9_-]{8,100})$/u.exec(raw);
   if (match?.[1] === undefined || match[2] === undefined) return null;
   const at = Number(match[1]);
   return Number.isSafeInteger(at) ? { at, id: match[2] } : null;
 }
 
-export function summaryHasId(
-  id: string,
-  summary: { readonly id: string },
-): boolean {
+function summaryHasId(id: string, summary: { readonly id: string }): boolean {
   return summary.id === id;
 }
 

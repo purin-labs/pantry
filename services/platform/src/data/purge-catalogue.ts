@@ -17,7 +17,7 @@
  * The purge runs the entries in this order, so a table comes before every
  * table that it refers to.
  */
-export type PurgeCatalogueEntry =
+type PurgeCatalogueEntry =
   | Readonly<{ table: string; action: "erase"; where?: string }>
   | Readonly<{
       table: string;

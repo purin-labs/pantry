@@ -678,7 +678,7 @@ function readAccessSubviewRoute(
       };
 }
 
-export function encodeResourceRouteSegment(resourceId: string): string {
+function encodeResourceRouteSegment(resourceId: string): string {
   return encodeURIComponent(encodeURIComponent(resourceId));
 }
 

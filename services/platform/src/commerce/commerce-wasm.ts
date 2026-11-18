@@ -9,9 +9,7 @@ import type {
   CommerceEntityPlaneCommand,
   CommerceGraphQuery,
   CommerceQueryPlan,
-  CommerceMutationReceiptV1,
   CommerceQueryPlanOutcome,
-  CommerceProjection,
 } from "@seams/contracts";
 import { parseCommerceCursorValue } from "@seams/commerce-client";
 import {
@@ -20,14 +18,12 @@ import {
 } from "@seams/commerce-contracts/cursor-payload";
 import { validateCommerceEntityPlaneCommandAuthority } from "@seams/commerce-contracts/entity-plane-command-authority";
 import { parseCommerceEntityPlaneCommand } from "@seams/commerce-contracts/entity-plane-commands";
-import { parseCommerceMutationReceipt } from "@seams/commerce-contracts/entity-plane-receipts";
 import { parseCommerceGraphQuery } from "@seams/commerce-contracts/graph-query";
 import { encodeCommerceCursor as encodeCommerceCursorTypescript } from "@seams/commerce-contracts/query-encoders";
 import { parseCommerceQueryPlan } from "@seams/commerce-contracts/query-plan";
 import { planCommerceGraphQuery as planCommerceGraphQueryTypescript } from "@seams/commerce-contracts/query-planner";
 import type { ContractDecodeResult } from "@seams/commerce-contracts/schema";
 import type { CommerceBoundaryResponse } from "@seams/commerce-contracts/commerce-boundary";
-import { deriveCueFacts as deriveCueFactsTypescript } from "@seams/commerce-contracts/cue-facts";
 import {
   deriveLabEventCueFacts as deriveLabEventCueFactsTypescript,
   normalizeLabEvent as normalizeLabEventTypescript,
@@ -85,17 +81,6 @@ export function assertCommerceQueryPlanWithLexicon(
   decideLexiconValue(parseCommerceQueryPlan, value, "CommerceQueryPlan");
 }
 
-/** Proves a cursor payload at the Platform boundary. */
-export function assertCommerceCursorPayloadWithLexicon(
-  value: unknown,
-): asserts value is CommerceCursorPayload {
-  decideLexiconValue(
-    parseCommerceCursorPayload,
-    value,
-    "CommerceCursorPayload",
-  );
-}
-
 /** Proves the command/authority binding before an Commerce RPC. */
 export function assertCommerceEntityPlaneCommandAuthorityWithLexicon(
   value: unknown,
@@ -104,17 +89,6 @@ export function assertCommerceEntityPlaneCommandAuthorityWithLexicon(
     validateCommerceEntityPlaneCommandAuthority,
     value,
     "CommerceEntityPlaneCommandAuthority",
-  );
-}
-
-/** Proves a persisted or RPC mutation receipt. */
-export function assertCommerceMutationReceiptWithLexicon(
-  value: unknown,
-): asserts value is CommerceMutationReceiptV1 {
-  decideLexiconValue(
-    parseCommerceMutationReceipt,
-    value,
-    "UnderclerkMutationReceipt",
   );
 }
 
@@ -184,28 +158,6 @@ export function deriveLabCommerceCueFacts(
     deriveLabEventCueFactsTypescript,
     bytes.value,
   );
-
-  if (!derived.ok) {
-    return derived;
-  }
-
-  const facts = parseCommerceCueFacts(derived.value);
-
-  return facts.ok
-    ? facts
-    : { ok: false, error: { code: "commerce_wasm_response_invalid" } };
-}
-
-export function deriveCanonicalCommerceCueFacts(
-  projection: CommerceProjection,
-): Result<readonly CommerceCueFact[], CommerceWasmError> {
-  const input = encodeJson(projection);
-
-  if (!input.ok) {
-    return input;
-  }
-
-  const derived = decideCommerceResponse(deriveCueFactsTypescript, input.value);
 
   if (!derived.ok) {
     return derived;
@@ -305,7 +257,7 @@ function isSupplierPayableResponse(value: unknown): value is SupplierPayable {
  * economics no longer digest to the seal it carries was approved for something
  * else, whatever else about it still validates.
  */
-export type SupplierPayoutPlanValidation = Readonly<{
+type SupplierPayoutPlanValidation = Readonly<{
   economicsDigest: string;
   matchesApproval: boolean;
 }>;

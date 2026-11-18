@@ -61,7 +61,7 @@ import {
   settingsEmailReviewBusy,
   settingsEmailReviewFeedback,
 } from "./gmail";
-import { type MailboxSetupRequest } from "./mailbox-actions";
+import type { MailboxSetupRequest } from "./mailbox-actions";
 import {
   GMAIL_VIEW_FOCUS_ID,
   integrationAccountBusy,
@@ -158,7 +158,7 @@ export function GmailConnectionSetup(props: {
   );
 }
 
-export function GmailRetentionDisclosure(): React.ReactNode {
+function GmailRetentionDisclosure(): React.ReactNode {
   return (
     <p>
       Seams does not keep message text, attachments or reply text. Gmail keeps
@@ -329,7 +329,7 @@ export function GmailMailboxDetail(props: {
   );
 }
 
-export function proposalBelongsToAccount(
+function proposalBelongsToAccount(
   integrationAccountId: string,
   proposal: { readonly integrationAccountId: string },
 ): boolean {
@@ -340,7 +340,7 @@ export function proposalBelongsToAccount(
  * The processing state of a full mailbox: the switch, and a banner when the
  * authorization or a limit holds processing back.
  */
-export function GmailMailboxProcessing(props: {
+function GmailMailboxProcessing(props: {
   readonly panel: GmailIntegrationPanelProps;
   readonly mailbox: AgentMailboxView;
   readonly busy: boolean;
@@ -388,7 +388,7 @@ export function GmailMailboxProcessing(props: {
  * that the mailbox still needs, so that one press is enough. Turning on
  * carries the limit values on screen. Turning off uses the disable action.
  */
-export function GmailProcessingSwitch(props: {
+function GmailProcessingSwitch(props: {
   readonly mailbox: AgentMailboxView;
   readonly busy: boolean;
   readonly limitsFormId: string;
@@ -486,7 +486,7 @@ export function GmailProcessingSwitch(props: {
  * Submits the limits form from the switch, which sits outside the form. A
  * closed Limits section cannot show which field is invalid, so it opens first.
  */
-export function submitMailboxLimitsForm(formId: string): void {
+function submitMailboxLimitsForm(formId: string): void {
   const form = document.getElementById(formId);
   if (!(form instanceof HTMLFormElement)) return;
   const section = form.closest("details");
@@ -501,7 +501,7 @@ export function submitMailboxLimitsForm(formId: string): void {
  * sits in the Connection section; as the deadline approaches, and once
  * processing has stopped, it is a banner in the mailbox's main view.
  */
-export function renderMailboxAuthorizationWarning(
+function renderMailboxAuthorizationWarning(
   mailbox: AgentMailboxView,
 ): React.ReactNode {
   const notice = mailboxAuthorizationNotice(mailbox, Date.now());
@@ -513,7 +513,7 @@ export function renderMailboxAuthorizationWarning(
   );
 }
 
-export function GmailPauseBanner(props: {
+function GmailPauseBanner(props: {
   readonly mailbox: AgentMailboxView;
   readonly paused: Variant<MailboxProcessingView, "paused">;
   readonly busy: boolean;
@@ -560,7 +560,7 @@ export function GmailPauseBanner(props: {
  * the mail, and where drafts go. A person who can change the mailbox sees
  * what is done and what the setup action still does.
  */
-export function GmailMailboxSetup(props: {
+function GmailMailboxSetup(props: {
   readonly panel: GmailIntegrationPanelProps;
   readonly mailbox: AgentMailboxView;
   readonly busy: boolean;
@@ -683,7 +683,7 @@ export function GmailMailboxSetup(props: {
 }
 
 /** One line of the setup: what it is, and if it is done. */
-export function MailboxSetupItem(props: {
+function MailboxSetupItem(props: {
   readonly met: boolean;
   readonly label: string;
 }): React.ReactNode {
@@ -707,7 +707,7 @@ export function MailboxSetupItem(props: {
  * agent that is not active yet can be chosen: the setup makes it active. A
  * workspace with no agent gets one from Pantry.
  */
-export function MailboxAgentChoice(props: {
+function MailboxAgentChoice(props: {
   readonly panel: GmailIntegrationPanelProps;
   readonly mailbox: AgentMailboxView;
   readonly plan: MailboxSetupPlan;
@@ -786,7 +786,7 @@ export function MailboxAgentChoice(props: {
   );
 }
 
-export function mailboxAgentOption(option: MailboxInstallationOption): {
+function mailboxAgentOption(option: MailboxInstallationOption): {
   value: string;
   label: string;
 } {
@@ -813,7 +813,7 @@ export function mailboxAgentOption(option: MailboxInstallationOption): {
  * submits this form to turn it on. While it is on, Save limits publishes the
  * policy again and processing stays on.
  */
-export function GmailLimitsSection(props: {
+function GmailLimitsSection(props: {
   readonly mailbox: AgentMailboxView;
   readonly busy: boolean;
   readonly formId: string;
@@ -938,13 +938,13 @@ export function GmailLimitsSection(props: {
   );
 }
 
-export const BYTES_PER_MEGABYTE = 1_048_576;
+const BYTES_PER_MEGABYTE = 1_048_576;
 
 /**
  * A size limit in megabytes. The policy stores bytes, so a hidden field carries
  * the value that the form submits.
  */
-export function MegabyteField(props: {
+function MegabyteField(props: {
   readonly label: string;
   readonly name: string;
   readonly bytes: number;
@@ -972,7 +972,7 @@ export function MegabyteField(props: {
   );
 }
 
-export function updateMegabytes(
+function updateMegabytes(
   setMegabytes: React.Dispatch<React.SetStateAction<string>>,
   event: React.ChangeEvent<HTMLInputElement>,
 ): void {
@@ -983,7 +983,7 @@ export function updateMegabytes(
  * The Gmail connection behind the mailbox: when its authorization ends, the
  * actions that repair it, and what the connection allows.
  */
-export function GmailConnectionSection(props: {
+function GmailConnectionSection(props: {
   readonly panel: GmailIntegrationPanelProps;
   readonly entry: GmailMailboxEntry;
   readonly commands: IntegrationAccountCommands | null;
@@ -1076,7 +1076,7 @@ export function GmailConnectionSection(props: {
  * confirms on a second click like every connection; revoke is destructive and
  * therefore confirms in place, naming every consequence before it runs.
  */
-export function GmailDangerSection(props: {
+function GmailDangerSection(props: {
   readonly address: string;
   readonly mailbox: AgentMailboxView | null;
   readonly commands: IntegrationAccountCommands | null;
@@ -1157,13 +1157,13 @@ export function GmailDangerSection(props: {
   );
 }
 
-export function startConfirmingMailboxRevoke(
+function startConfirmingMailboxRevoke(
   setConfirmingRevoke: (value: boolean) => void,
 ): void {
   setConfirmingRevoke(true);
 }
 
-export function stopConfirmingMailboxRevoke(
+function stopConfirmingMailboxRevoke(
   setConfirmingRevoke: (value: boolean) => void,
 ): void {
   setConfirmingRevoke(false);

@@ -21,10 +21,7 @@ import {
   assertCommerceEntityPlaneCommandWithLexicon,
   assertCommerceGraphQueryWithLexicon,
 } from "../commerce-wasm";
-import type {
-  CommerceActivityReadRequest,
-  CommerceActivityReadResult,
-} from "./activity";
+import type { CommerceActivityReadRequest } from "./activity";
 import {
   CommerceGraphReader,
   type CommerceGraphReadInput,
@@ -39,19 +36,19 @@ import type {
   CommerceBoardPresenceSelection,
 } from "@seams/control-api";
 
-export type CommerceGraphRouteError =
+type CommerceGraphRouteError =
   CommerceEntityPlaneError | CommerceGraphReaderError;
 
-export type CommerceActivityRouteRequest = CommerceActivityReadRequest;
+type CommerceActivityRouteRequest = CommerceActivityReadRequest;
 
-export type CommerceActivityRouteError =
+type CommerceActivityRouteError =
   | CommerceEntityPlaneError
   | Readonly<{
       code: "activity_source_unavailable";
       source: "blotter_history" | "action_ledger";
     }>;
 
-export type CommerceGraphChangesRequest = Readonly<{
+type CommerceGraphChangesRequest = Readonly<{
   after: CommerceSnapshotRevision;
   limit: number;
 }>;
@@ -67,13 +64,13 @@ export type SavedCommerceViewPresentationPatch = Readonly<{
   presentation: CommerceViewPresentation;
 }>;
 
-export type CommerceBoardPresenceRouteBody = Readonly<{
+type CommerceBoardPresenceRouteBody = Readonly<{
   resourceKey: string;
   selection: CommerceBoardPresenceSelection;
   dragPreview: CommerceBoardDragPreview;
 }>;
 
-export type CommerceGraphRouteInput = Readonly<{
+type CommerceGraphRouteInput = Readonly<{
   body: unknown;
   reader: CommerceGraphReader;
   authority: CommerceGraphReadAuthority;
@@ -278,13 +275,6 @@ export function parseCommerceActivityRouteBody(
     ? { ok: false, error: { code: "invalid_query" } }
     : { ok: true, value: { resource, limit } };
 }
-
-export type CommerceActivityRouteInput = Readonly<{
-  body: unknown;
-  read: (
-    request: CommerceActivityRouteRequest,
-  ) => Promise<Result<CommerceActivityReadResult, CommerceActivityRouteError>>;
-}>;
 
 function parseActivityResource(
   value: unknown,

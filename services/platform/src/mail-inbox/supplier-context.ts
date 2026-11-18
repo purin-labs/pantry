@@ -68,7 +68,7 @@ export type EmailCommerceEvidence = Readonly<{
   mailboxAuthority: MailboxAuthority;
 }>;
 
-export type ContextError = Readonly<{
+type ContextError = Readonly<{
   code:
     | "email_commerce_unavailable"
     | "email_commerce_changed"
@@ -76,7 +76,7 @@ export type ContextError = Readonly<{
 }>;
 
 /** The purchase request that one supplier read found, by identity. */
-export type EmailPurchaseRequestRead = Readonly<{
+type EmailPurchaseRequestRead = Readonly<{
   purchaseRequestId: string;
   supplierId: string;
   evidence: readonly EmailCommerceEvidence[];

@@ -306,7 +306,7 @@ export function parseAgentProfileSelection(
  * conversation does not run, and the turn is refused with
  * `pinned_agent_selection_changed`. The agent is used from a new conversation.
  */
-export type CaseTurnAgentProfileInput = Readonly<{
+type CaseTurnAgentProfileInput = Readonly<{
   caseId: string;
   assignmentId: string;
   /**
@@ -324,7 +324,7 @@ export type CaseTurnAgentProfileInput = Readonly<{
  * What a Case turn's agent profile resolves to, read without changing
  * anything. A first selection is not pinned yet: `pin` holds what to record.
  */
-export type CaseTurnAgentProfileRead =
+type CaseTurnAgentProfileRead =
   | {
       readonly kind: "settled";
       readonly resolution: CaseTurnAgentProfileResolution;

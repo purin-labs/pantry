@@ -52,7 +52,7 @@ export type MailResponseOwner = Readonly<{
       }>
   );
 export type InboxResponseOwner = Extract<MailResponseOwner, { kind: "inbox" }>;
-export type ReadyInboxResponseOwner = InboxResponseOwner &
+type ReadyInboxResponseOwner = InboxResponseOwner &
   Readonly<{ state: Readonly<{ kind: "ready" }> }>;
 
 export function createMailResponseSchema(sql: SqlStorage): void {

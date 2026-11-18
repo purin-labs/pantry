@@ -1,11 +1,11 @@
 export const COMMERCE_LAB_CATALOG_VERSION = "2026-08-09.1";
 
-export type CommerceLabMoney = {
+type CommerceLabMoney = {
   readonly amountMinor: number;
   readonly currency: "USD";
 };
 
-export type CommerceLabVariant = {
+type CommerceLabVariant = {
   readonly variantId: string;
   readonly sku: string;
   readonly title: string;
@@ -14,7 +14,7 @@ export type CommerceLabVariant = {
   readonly initialQuantity: number;
 };
 
-export type CommerceLabProduct = {
+type CommerceLabProduct = {
   readonly productId: string;
   readonly slug: string;
   readonly title: string;
@@ -23,19 +23,12 @@ export type CommerceLabProduct = {
   readonly variants: readonly CommerceLabVariant[];
 };
 
-export type CommerceLabCustomer = {
+type CommerceLabCustomer = {
   readonly customerId: string;
   readonly displayName: string;
   readonly email: string;
   readonly countryCode: "US" | "JP" | "GB";
   readonly postalRegion: string;
-};
-
-export type CommerceLabSeedCatalog = {
-  readonly catalogVersion: typeof COMMERCE_LAB_CATALOG_VERSION;
-  readonly locationId: "location_lab_main";
-  readonly products: readonly CommerceLabProduct[];
-  readonly customers: readonly CommerceLabCustomer[];
 };
 
 const PRODUCT_IMAGE_ROOT = "https://assets.example.invalid/satyr-commerce-lab";

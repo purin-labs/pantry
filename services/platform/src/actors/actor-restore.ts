@@ -96,7 +96,7 @@ type RestoreBase = {
   readonly createdAt: number;
 };
 
-export type ActorRestore =
+type ActorRestore =
   | (RestoreBase & {
       readonly status: "reserved";
       readonly frozenAt?: never;
@@ -154,7 +154,7 @@ type LiveActorRestore = Exclude<
 >;
 
 /** An abandoned restore and the recovery relocation that replaced its source. */
-export type ActorRestoreAbandonment = {
+type ActorRestoreAbandonment = {
   readonly restore: VariantBy<ActorRestore, "status", "abandoned">;
   readonly recovery: ActorRelocation;
 };
@@ -179,7 +179,7 @@ type ActorRestoreItem =
       readonly targetRegistryId: ActorRegistryId;
     });
 
-export type ActorRestoreInspection = {
+type ActorRestoreInspection = {
   readonly restore: ActorRestore;
   readonly manifest: ActorRestoreManifest;
   readonly items: readonly ActorRestoreItem[];

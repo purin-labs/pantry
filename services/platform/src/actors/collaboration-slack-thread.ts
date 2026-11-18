@@ -10,7 +10,7 @@ import type { Result } from "../result";
 import { resolveActiveCaseActor } from "./actor-router";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 
-export type CollaborationSlackThread = Readonly<{
+type CollaborationSlackThread = Readonly<{
   caseId: CaseId;
   integrationAccountId: IntegrationAccountId;
   conversationId: string;

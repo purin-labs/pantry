@@ -62,7 +62,7 @@ import {
   slackPayloadErrorResponse,
 } from "../gateway/support";
 
-export type SlackDurableAccept =
+type SlackDurableAccept =
   | { mode: "case_accepted" }
   | { mode: "supplier_payout_answered" }
   | { mode: "ignored"; reason: "ambient_message" | "stop_command_unsupported" }
@@ -78,7 +78,7 @@ export type SlackDurableAccept =
         | "command_not_permitted";
     };
 
-export type SlackDurableAcceptError = {
+type SlackDurableAcceptError = {
   code: "slack_event_not_durable";
   detail: string;
 };
@@ -213,7 +213,7 @@ export async function handleSlackEvents(
   }
 }
 
-export async function durablyAcceptSlackMessage(
+async function durablyAcceptSlackMessage(
   event: SlackMessageEvent,
   preparation: SlackEventAdmissionPreparation,
 ): Promise<Result<SlackDurableAccept, SlackDurableAcceptError>> {
@@ -227,7 +227,7 @@ export async function durablyAcceptSlackMessage(
   }
 }
 
-export function acceptStandardSlackMessage(
+function acceptStandardSlackMessage(
   event: SlackMessageEvent,
 ): Result<SlackDurableAccept, SlackDurableAcceptError> {
   return isSlackStopCommand({
@@ -245,7 +245,7 @@ export function acceptStandardSlackMessage(
  * One Slack Case message on its way to durable acceptance. The admission view
  * is known when this value exists. Acceptance can settle later.
  */
-export type SlackCaseIngressFlow = {
+type SlackCaseIngressFlow = {
   readonly admission: SlackCaseIngressAdmissionView;
   readonly slackCredential: PendingSlackIngressCredential | null;
   readonly accepted: Promise<
@@ -253,12 +253,12 @@ export type SlackCaseIngressFlow = {
   >;
 };
 
-export type UnadmittedSlackCaseIngress = Variant<
+type UnadmittedSlackCaseIngress = Variant<
   SlackCaseIngressAdmission,
   "identity_link_required" | "rejected" | "retry"
 >;
 
-export type SlackCaseIngressAdmissionView =
+type SlackCaseIngressAdmissionView =
   { readonly kind: "authorized" } | UnadmittedSlackCaseIngress;
 
 /**
@@ -267,7 +267,7 @@ export type SlackCaseIngressAdmissionView =
  * Connector, beside the organisation's records. Every other message, and every
  * answer the Worker gives itself, is decided here.
  */
-export async function resolveSlackCaseIngress(
+async function resolveSlackCaseIngress(
   env: Env,
   event: SlackMessageEvent,
   requestId: RequestId,
@@ -341,7 +341,7 @@ export async function resolveSlackCaseIngress(
  * null when no Connector serves the published placement, so the caller
  * decides the message and activates one.
  */
-export async function admitSlackCaseWorkInConnector(
+async function admitSlackCaseWorkInConnector(
   env: Env,
   event: SlackMessageEvent,
   requestId: RequestId,
@@ -407,7 +407,7 @@ export async function admitSlackCaseWorkInConnector(
   }
 }
 
-export function traceUnadmittedSlackCase(
+function traceUnadmittedSlackCase(
   requestId: RequestId,
   event: SlackMessageEvent,
   route: ResolvedSlackThreadRoute,
@@ -427,7 +427,7 @@ export function traceUnadmittedSlackCase(
   });
 }
 
-export function unadmittedSlackCaseDetail(
+function unadmittedSlackCaseDetail(
   admission: UnadmittedSlackCaseIngress,
 ): string {
   switch (admission.kind) {
@@ -442,7 +442,7 @@ export function unadmittedSlackCaseDetail(
   }
 }
 
-export function settledSlackCaseIngress(
+function settledSlackCaseIngress(
   admission: UnadmittedSlackCaseIngress,
   slackCredential: PendingSlackIngressCredential | null = null,
 ): SlackCaseIngressFlow {
@@ -453,7 +453,7 @@ export function settledSlackCaseIngress(
   };
 }
 
-export function unadmittedSlackDurableAccept(
+function unadmittedSlackDurableAccept(
   admission: UnadmittedSlackCaseIngress,
 ): Result<SlackDurableAccept, SlackDurableAcceptError> {
   switch (admission.kind) {
@@ -486,7 +486,7 @@ export function unadmittedSlackDurableAccept(
  * conversation's audience passes the conversation sink; otherwise the thread
  * gets the fixed refusal.
  */
-export async function answerSupplierPayoutQuery(
+async function answerSupplierPayoutQuery(
   env: Env,
   event: SlackMessageEvent,
   admission: AuthorizedSlackCaseIngress,
@@ -559,7 +559,7 @@ export async function answerSupplierPayoutQuery(
  * Accept a message the Worker decided. It activates the Connector when the
  * published placement has none yet.
  */
-export async function acceptSlackCaseCandidate(
+async function acceptSlackCaseCandidate(
   env: Env,
   event: SlackMessageEvent,
   requestId: RequestId,
@@ -641,7 +641,7 @@ export async function acceptSlackCaseCandidate(
   return { ok: true, value: { mode: "case_accepted" } };
 }
 
-export function shouldShowSlackIngressProgress(event: SlackMessageEvent): boolean {
+function shouldShowSlackIngressProgress(event: SlackMessageEvent): boolean {
   return (
     isSlackCaseRoutingCandidate(event) &&
     !isSlackStopCommand({
@@ -651,7 +651,7 @@ export function shouldShowSlackIngressProgress(event: SlackMessageEvent): boolea
   );
 }
 
-export async function showSlackIngressProgress(
+async function showSlackIngressProgress(
   env: Env,
   event: SlackMessageEvent,
   requestId: RequestId,
@@ -739,7 +739,7 @@ export async function showSlackIngressProgress(
   });
 }
 
-export async function showSlackRoutingSetupPrompt(
+async function showSlackRoutingSetupPrompt(
   env: Env,
   event: SlackMessageEvent,
   requestId: RequestId,
@@ -781,7 +781,7 @@ export async function showSlackRoutingSetupPrompt(
 }
 
 /** Tell one person, and nobody else, why the agent did not take the message. */
-export async function showSlackCommandRefusal(
+async function showSlackCommandRefusal(
   event: SlackMessageEvent,
   requestId: RequestId,
   pendingCredential: PendingSlackIngressCredential | null,
@@ -811,7 +811,7 @@ export async function showSlackCommandRefusal(
   }
 }
 
-export async function showSlackIdentityLinkPrompt(
+async function showSlackIdentityLinkPrompt(
   env: Env,
   event: SlackMessageEvent,
   requestId: RequestId,
@@ -880,7 +880,7 @@ export async function showSlackIdentityLinkPrompt(
   });
 }
 
-export async function postSlackEphemeralMessage(input: {
+async function postSlackEphemeralMessage(input: {
   readonly token: string;
   readonly channelId: SlackMessageEvent["channelId"];
   readonly externalUserId: SlackMessageEvent["author"];
@@ -917,7 +917,7 @@ export async function postSlackEphemeralMessage(input: {
   }
 }
 
-export function slackIngressProgressFailureDetail(
+function slackIngressProgressFailureDetail(
   admission: Variant<
     SlackCaseIngressAdmissionView,
     "authorized" | "rejected" | "retry"
@@ -938,7 +938,7 @@ export function slackIngressProgressFailureDetail(
   }
 }
 
-export type SlackEventAdmissionPreparation =
+type SlackEventAdmissionPreparation =
   | {
       readonly kind: "case_candidate";
       readonly ingress: Promise<SlackCaseIngressFlow>;
@@ -947,7 +947,7 @@ export type SlackEventAdmissionPreparation =
       readonly kind: "standard";
     };
 
-export function prepareSlackEventAdmission(
+function prepareSlackEventAdmission(
   env: Env,
   event: SlackMessageEvent,
   requestId: RequestId,

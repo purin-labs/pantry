@@ -48,7 +48,7 @@ export type CommerceMerchantBinding = Readonly<{
   updatedAt: number;
 }>;
 
-export type CommerceMerchantBindingError =
+type CommerceMerchantBindingError =
   | Readonly<{ code: "underclerk_binding_invalid"; field: string }>
   | Readonly<{ code: "underclerk_binding_not_found" }>
   | Readonly<{ code: "underclerk_binding_conflict" }>

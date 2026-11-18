@@ -64,7 +64,7 @@ export type ShopifyExecutionFailure = {
   message: string;
 };
 
-export type ShopifyExecutionError =
+type ShopifyExecutionError =
   | OrganisationExecutionScopeError
   | VaultResolveError
   | ProviderActionResolutionError
@@ -80,7 +80,7 @@ export type ShopifyWriteCredential = {
   shopDomain: string;
 };
 
-export type ShopifyOrderCancellationReconciliation =
+type ShopifyOrderCancellationReconciliation =
   | {
       kind: "cancelled";
       provider: "shopify";
@@ -99,7 +99,7 @@ export type ShopifyOrderCancellationReconciliation =
       reason: "transport_failure";
     };
 
-export type ShopifyOrderCancellationReconciliationError =
+type ShopifyOrderCancellationReconciliationError =
   | { code: "shopify_order_id_invalid" }
   | { code: "shopify_write_credential_invalid" }
   | { code: "shopify_reconciliation_response_invalid" };

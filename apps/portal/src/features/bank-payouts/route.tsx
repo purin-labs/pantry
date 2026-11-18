@@ -237,7 +237,7 @@ function total(payouts: readonly BankPayout[]): string | null {
   );
 }
 
-export function BankPayoutsLanes(props: {
+function BankPayoutsLanes(props: {
   readonly control: PeriodControl;
   readonly clock: number;
   readonly integrationsPath: string;

@@ -1,7 +1,6 @@
-import {
-  type CheckoutProfile,
-  type CheckoutProfileConfiguration,
-  type CheckoutProfileLifecycle,
+import type {
+  CheckoutProfile,
+  CheckoutProfileConfiguration,
 } from "@seams/commerce-contracts";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
@@ -15,7 +14,6 @@ import {
   parseCommerceCheckoutProfilesV1,
   parseCommerceCheckoutProfileStorefrontIdsV1,
   parseWireCheckoutProfile as parseCheckoutProfileRecord,
-  parseWireCheckoutProfileLifecycle as parseCheckoutProfileLifecycleRecord,
 } from "@seams/commerce-contracts/records/api-checkout-profile";
 
 export type CommerceCheckoutProfileActivationV1 = Readonly<{
@@ -133,10 +131,4 @@ export function parseActiveCheckoutProfile(
   raw: unknown,
 ): CommerceActiveCheckoutProfileV1 {
   return decodeRecord(parseCommerceActiveCheckoutProfileV1Record, raw);
-}
-
-export function parseCheckoutProfileLifecycle(
-  raw: unknown,
-): CheckoutProfileLifecycle {
-  return decodeRecord(parseCheckoutProfileLifecycleRecord, raw);
 }

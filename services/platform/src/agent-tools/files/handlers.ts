@@ -105,7 +105,7 @@ export async function readFileForEmbeddedHarness(
   return result;
 }
 
-export function authorizedFileToolCaseId(
+function authorizedFileToolCaseId(
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
   assignment: CaseAssignment,
@@ -121,7 +121,7 @@ export function authorizedFileToolCaseId(
   return caseId.value;
 }
 
-export function requireCurrentHarnessToolLease(
+function requireCurrentHarnessToolLease(
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
 ): void {
@@ -133,7 +133,7 @@ export function requireCurrentHarnessToolLease(
   }
 }
 
-export async function commitFileToolObservation(
+async function commitFileToolObservation(
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -160,7 +160,7 @@ export async function commitFileToolObservation(
   }
 }
 
-export async function fetchSessionFile(
+async function fetchSessionFile(
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -172,7 +172,7 @@ export async function fetchSessionFile(
   return fetch(input, init);
 }
 
-export async function storeSessionFileCredential(
+async function storeSessionFileCredential(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -216,7 +216,7 @@ export async function queryWorkspaceForEmbeddedHarness(
   }
 }
 
-export async function materializeWorkspaceForEmbeddedHarness(
+async function materializeWorkspaceForEmbeddedHarness(
   env: Env,
   persistence: AgentSessionPersistence,
   storage: DurableObjectStorage,
@@ -276,7 +276,7 @@ export async function materializeWorkspaceForEmbeddedHarness(
   return materialized.value;
 }
 
-export function workspaceReceiptForProcessingSession(
+function workspaceReceiptForProcessingSession(
   state: Variant<AgentSessionLifecycle, "processing">,
 ): WorkspaceRevisionReceipt {
   const resumePoint = state.state.resumePoint;
@@ -285,7 +285,7 @@ export function workspaceReceiptForProcessingSession(
     : resumePoint.checkpoint.workspaceRevisionReceipt;
 }
 
-export function readHarnessWorkspaceFile(
+function readHarnessWorkspaceFile(
   workspace: WorkspaceRevisionMaterialization,
   path: string,
 ): HarnessWorkspaceQueryResult {
@@ -305,7 +305,7 @@ export function readHarnessWorkspaceFile(
   throw new Error(`workspace file does not exist: ${path}`);
 }
 
-export function searchHarnessWorkspace(
+function searchHarnessWorkspace(
   workspace: WorkspaceRevisionMaterialization,
   query: string,
   limit: number,

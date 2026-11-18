@@ -12,8 +12,7 @@ import type { Result } from "../result";
  * audience, spends no budget, and changes no commerce fact. There is
  * deliberately no execute path here for an approval to reach.
  */
-export type CampaignBriefLifecycle =
-  "draft" | "accepted" | "dismissed" | "expired";
+type CampaignBriefLifecycle = "draft" | "accepted" | "dismissed" | "expired";
 
 /** One commerce record the campaign is about, at the revision Sous Chef observed. */
 export type CampaignBriefTarget = Readonly<{
@@ -29,7 +28,7 @@ export type CampaignMessageVariant = Readonly<{
   body: string;
 }>;
 
-export type CampaignBrief = Readonly<{
+type CampaignBrief = Readonly<{
   briefId: string;
   organisationId: OrganisationId;
   merchantId: string;
@@ -57,7 +56,7 @@ export type CampaignBrief = Readonly<{
   revision: number;
 }>;
 
-export type CampaignBriefError =
+type CampaignBriefError =
   | Readonly<{ code: "campaign_brief_authority_inactive" }>
   | Readonly<{ code: "campaign_brief_invalid"; field: string }>
   | Readonly<{ code: "campaign_brief_conflict"; field: string }>
@@ -232,7 +231,7 @@ export async function proposeCampaignBrief(
   return { ok: true, value: brief };
 }
 
-export type CampaignBriefDecision = "accepted" | "dismissed";
+type CampaignBriefDecision = "accepted" | "dismissed";
 
 /**
  * Records a person's decision on one brief.

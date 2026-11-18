@@ -181,7 +181,7 @@ export async function handleAgentOperations(
   return controlJson(responseBody, 201);
 }
 
-export function operationIdFor(
+function operationIdFor(
   kind: AgentOperationInput["kind"],
   requestHash: string,
 ): string {
@@ -227,7 +227,7 @@ export function agentOperationsErrorResponse(
   }
 }
 
-export function publishedResponsibilityScopeErrorResponse(
+function publishedResponsibilityScopeErrorResponse(
   error: PublishedResourceBoundaryError,
 ): Response {
   switch (error.code) {

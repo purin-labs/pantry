@@ -1,4 +1,4 @@
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever } from "@seams/std";
 import type { Money } from "./records/money.ts";
 import type { SupplierPayoutExecutionPlan } from "./records/supplier-payout-plan.ts";
 
@@ -74,12 +74,6 @@ export function encodeSupplierPayoutEconomics(
     offset += 8 + field.length;
   }
   return bytes;
-}
-
-export function supplierPayoutEconomicsDigest(
-  plan: SupplierPayoutExecutionPlan,
-): Promise<string> {
-  return sha256Hex(encodeSupplierPayoutEconomics(plan));
 }
 
 function encodeField(

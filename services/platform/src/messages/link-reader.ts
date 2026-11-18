@@ -26,7 +26,7 @@ export const MESSAGE_LINK_POLICY = {
   allowedPorts: [80, 443],
 } as const;
 
-export type MessageLinkRejection =
+type MessageLinkRejection =
   | { readonly code: "scheme_unsupported" }
   | { readonly code: "credentials_present" }
   | { readonly code: "port_not_allowed"; readonly port: number }
@@ -43,7 +43,7 @@ export type MessageLinkRejection =
   | { readonly code: "request_failed" }
   | { readonly code: "status_not_ok"; readonly status: number };
 
-export type MessageLinkContent =
+type MessageLinkContent =
   | {
       readonly kind: "text";
       readonly text: string;
@@ -55,7 +55,7 @@ export type MessageLinkContent =
    */
   | { readonly kind: "binary" };
 
-export type MessageLinkReceipt = {
+type MessageLinkReceipt = {
   /** Scheme, host, and port only. Never the path, query, or fragment. */
   readonly requestedOrigin: string;
   readonly finalOrigin: string;
@@ -67,7 +67,7 @@ export type MessageLinkReceipt = {
   readonly contentDigest: string;
 };
 
-export type MessageLinkRead = {
+type MessageLinkRead = {
   readonly content: MessageLinkContent;
   readonly receipt: MessageLinkReceipt;
 };
@@ -89,7 +89,7 @@ export type MessageLinkEgress = {
   ) => Promise<Response>;
 };
 
-export type MessageLinkReaderInput = {
+type MessageLinkReaderInput = {
   readonly url: string;
   readonly maxTextChars?: 32_768 | 65_536;
   /** Absent means refuse: there is no unpinned fallback. */

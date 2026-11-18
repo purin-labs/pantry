@@ -20,7 +20,7 @@ export type MerchantReportName =
   | "fulfillment_exceptions"
   | "product_sales";
 
-export const MERCHANT_REPORT_NAMES: readonly MerchantReportName[] = [
+const MERCHANT_REPORT_NAMES: readonly MerchantReportName[] = [
   "open_orders",
   "low_stock_exposure",
   "payment_failures",
@@ -66,7 +66,7 @@ export type MerchantReportUnsupported = Readonly<{
   dependency: string;
 }>;
 
-export type MerchantReportQueries = Readonly<{
+type MerchantReportQueries = Readonly<{
   kind: "supported";
   /** The headline aggregation. */
   headline: CommerceGraphQuery;
@@ -74,7 +74,7 @@ export type MerchantReportQueries = Readonly<{
   population: CommerceGraphQuery;
 }>;
 
-export type MerchantReportDefinition = Readonly<{
+type MerchantReportDefinition = Readonly<{
   name: MerchantReportName;
   /** Merchant-readable statement of what the number measures. */
   metric: string;

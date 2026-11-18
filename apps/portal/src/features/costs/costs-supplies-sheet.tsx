@@ -31,7 +31,7 @@ import {
 } from "./costs-sheet-presence";
 import { SupplyBadge } from "./costs-ui";
 
-export type SheetFocusedCell = Readonly<{
+type SheetFocusedCell = Readonly<{
   cellKey: string;
   raw: string;
   seed: string;

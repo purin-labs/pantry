@@ -8,7 +8,7 @@ import {
 import { recordingReplayView, recordingReplayStart } from "@seams/production-simulation/simulator/playback-state";
 import { physicsEvents } from "@seams/production-simulation/recipes/bakery/physics-playback";
 import { assertNever } from "@seams/std";
-export type PlaybackActionResult =
+type PlaybackActionResult =
   | Readonly<{ kind: "applied"; state: SimulatorState }>
   | Readonly<{ kind: "unavailable"; message: string }>;
 

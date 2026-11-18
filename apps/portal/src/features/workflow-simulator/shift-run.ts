@@ -19,7 +19,7 @@ import {
 export const SHIFT_RUN_NOTICE =
   "Both scenarios recalculated from 06:00. Playback reset. These inputs are local until you save a scenario copy.";
 
-export type ShiftRunResult =
+type ShiftRunResult =
   | Readonly<{ kind: "ready"; shift: SimulatorShift }>
   | Variant<SettingsResult, "invalid">;
 

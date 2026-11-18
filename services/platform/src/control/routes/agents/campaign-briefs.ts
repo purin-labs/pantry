@@ -118,7 +118,7 @@ export async function handleCampaignBriefDecision(
   return controlJson({ ok: true, briefId: briefIdRaw, decision: action });
 }
 
-export function parseCampaignBriefEdit(
+function parseCampaignBriefEdit(
   body: Readonly<Record<string, unknown>>,
 ): Result<
   Readonly<{

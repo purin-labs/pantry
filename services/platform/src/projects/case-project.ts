@@ -5,7 +5,7 @@ import type { CaseId, OrganisationId, UserId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 
-export type CaseProjectPlacement = Readonly<{
+type CaseProjectPlacement = Readonly<{
   organisationId: OrganisationId;
   caseId: CaseId;
   projectId: ProjectId;
@@ -14,7 +14,7 @@ export type CaseProjectPlacement = Readonly<{
 
 // Where a Case was admitted. A chat's Case is its member's to move; every
 // other Case stays bound to the source that admitted it.
-export type CaseOrigin =
+type CaseOrigin =
   | "portal_chat"
   | "canvas_chat"
   | "direct"
@@ -24,7 +24,7 @@ export type CaseOrigin =
   | "inbox_assistant"
   | "commerce_approval";
 
-export type CaseProjectError = Readonly<{
+type CaseProjectError = Readonly<{
   code: "default_project_unavailable" | "organisation_placement_conflict";
 }>;
 
@@ -111,10 +111,6 @@ export async function readDefaultProjectId(
     throw new Error("case_project_storage_invalid");
   return row.projectId;
 }
-
-// Parameters are the Organisation ID and the Project ID.
-export const DEFAULT_PROJECT_IS_SQL = `EXISTS (SELECT 1 FROM organisation_default_project d
-  WHERE d.organisation_id = ? AND d.project_id = ?)`;
 
 // Places the Case a member is about to create. Any active member may file
 // their own work in the default Project; another Project needs their access.

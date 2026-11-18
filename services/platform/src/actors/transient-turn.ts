@@ -41,7 +41,7 @@ const TRANSIENT_CLEANUP_MAX_WALL_MS = 5_000;
  * caller-supplied teardown.
  */
 
-export type TransientTurnError =
+type TransientTurnError =
   | {
       readonly code: "transient_turn_construction_failed";
       readonly detail: string;
@@ -68,7 +68,7 @@ export type TransientTurnError =
       readonly modelUsage: EmbeddedHarnessModelUsage;
     };
 
-export type TransientTurnSuccess<TValue> = {
+type TransientTurnSuccess<TValue> = {
   readonly value: TValue;
   readonly modelUsage: EmbeddedHarnessModelUsage;
 };

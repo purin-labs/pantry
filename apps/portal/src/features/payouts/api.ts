@@ -20,7 +20,7 @@ export type PayoutMutationTransport = (
 
 export type PayoutReadTransport = (path: string) => Promise<unknown>;
 
-export type PayoutExceptionPage = Readonly<{
+type PayoutExceptionPage = Readonly<{
   events: readonly PayoutAuditEvent[];
   nextCursor: number | null;
 }>;
@@ -153,6 +153,6 @@ export function needsOperator(payout: SupplierPayout): boolean {
   );
 }
 
-export function payoutsPath(organisationId: string): string {
+function payoutsPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/supplier-payouts`;
 }

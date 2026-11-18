@@ -110,7 +110,7 @@ export function failedConversation(
   });
 }
 
-export function interruptedConversationRecovery(
+function interruptedConversationRecovery(
   work: Conversation["work"],
   requestId: string,
 ): Extract<Conversation["work"], { kind: "failed" }>["recovery"] {

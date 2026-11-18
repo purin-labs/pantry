@@ -6,7 +6,7 @@ export type SessionTurnInputDigest = string & {
   readonly [sessionTurnInputDigestBrand]: "SessionTurnInputDigest";
 };
 
-export type SessionTurnInputDigestError = { code: "invalid_input_digest" };
+type SessionTurnInputDigestError = { code: "invalid_input_digest" };
 
 const SESSION_TURN_INPUT_DIGEST_PATTERN = /^[a-f0-9]{64}$/;
 

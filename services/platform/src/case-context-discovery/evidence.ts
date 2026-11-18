@@ -61,7 +61,7 @@ export type CaseContextCollectionProposalEvidence =
       >;
       flowBindingDigest: string;
     }>;
-export type CaseContextCollectionEvidenceError = Readonly<{
+type CaseContextCollectionEvidenceError = Readonly<{
   code:
     | "case_context_collection_evidence_invalid"
     | "case_context_collection_evidence_stale"

@@ -14,7 +14,7 @@ export const CASE_CONTEXT_DISCOVERY_JEV_MODEL = "jev-1.13.0";
 // Full pinned-model context reservation; no tokenizer estimate is treated as a hard bound.
 export const CASE_CONTEXT_DISCOVERY_INPUT_TOKEN_RESERVATION = 65_536;
 export const CASE_CONTEXT_DISCOVERY_QUESTION_REVISION = 1;
-export const MAX_CASE_CONTEXT_DISCOVERY_CANDIDATES = 5;
+const MAX_CASE_CONTEXT_DISCOVERY_CANDIDATES = 5;
 
 export type CaseContextCollectionRelationshipOutcome =
   "same_issue" | "related_reference" | "different_issue" | "uncertain";
@@ -250,7 +250,7 @@ function parseEvaluation(
   };
 }
 
-export function relationshipOutcome(
+function relationshipOutcome(
   value: unknown,
 ): value is CaseContextCollectionRelationshipOutcome {
   return (

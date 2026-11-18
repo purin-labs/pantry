@@ -247,7 +247,7 @@ export async function handleCommerceExportPreset(
   return controlJson(responseBody);
 }
 
-export function commerceExportPresetErrorResponse(
+function commerceExportPresetErrorResponse(
   error: CommerceExportPresetError,
 ): Response {
   switch (error.code) {
@@ -347,9 +347,9 @@ export async function handleCommerceGraph(
 }
 
 /** How many graph queries one request may send together. */
-export const COMMERCE_GRAPH_QUERIES_TOGETHER = 8;
+const COMMERCE_GRAPH_QUERIES_TOGETHER = 8;
 
-export function asGraphRouteBody(query: unknown): { readonly query: unknown } {
+function asGraphRouteBody(query: unknown): { readonly query: unknown } {
   return { query };
 }
 
@@ -660,7 +660,7 @@ export async function handleCommerceListEntryPatch(
   return controlJson(responseBody);
 }
 
-export type CommerceListEntryPatchApprovalResponse = Readonly<{
+type CommerceListEntryPatchApprovalResponse = Readonly<{
   ok: true;
   effect: "approval_requested";
   action: Readonly<{
@@ -678,7 +678,7 @@ export type CommerceListEntryPatchApprovalResponse = Readonly<{
   requestedAt: number;
 }>;
 
-export async function requestCommerceListEntryPatchApproval(
+async function requestCommerceListEntryPatchApproval(
   input: Readonly<{
     env: Env;
     execution: OrganisationExecutionScope;
@@ -962,14 +962,14 @@ export async function requestCommerceListEntryPatchApproval(
   };
 }
 
-export function commerceListEntryPatchResourceKey(
+function commerceListEntryPatchResourceKey(
   command: CommerceListEntryPatchCommand,
 ): string {
   const entry = command.command.target.entry;
   return `commerce:list_entry:${String(entry.listId)}:${String(entry.entryId)}:${Number(entry.revision)}`;
 }
 
-export function commerceListEntryPatchActionPath(
+function commerceListEntryPatchActionPath(
   command: CommerceListEntryPatchCommand,
 ): string {
   const entry = command.command.target.entry;
@@ -981,7 +981,7 @@ export function commerceListEntryPatchActionPath(
   return `/list-entries/${encodeURIComponent(String(entry.entryId))}/patch?${query.toString()}`;
 }
 
-export async function createMerchantEntityPlaneFlowBinding(
+async function createMerchantEntityPlaneFlowBinding(
   input: Readonly<{
     execution: OrganisationExecutionScope;
     requestAuthority: RequestAuthority;
@@ -1052,7 +1052,7 @@ export async function createMerchantEntityPlaneFlowBinding(
       };
 }
 
-export function commerceListEntryPatchErrorResponse(
+function commerceListEntryPatchErrorResponse(
   error: CommerceListEntryPatchError,
 ): Response {
   switch (error.code) {
@@ -1245,11 +1245,11 @@ export async function handleCommerceSavedViewPresentationPatch(
   return controlJson(responseBody);
 }
 
-export function commerceEntityCommandAuthorityExpiry(now: number): string {
+function commerceEntityCommandAuthorityExpiry(now: number): string {
   return new Date(now + 60_000).toISOString();
 }
 
-export function commerceSavedViewPresentationPatchErrorResponse(
+function commerceSavedViewPresentationPatchErrorResponse(
   error: SavedCommerceViewPresentationPatchError,
 ): Response {
   switch (error.code) {
@@ -1346,7 +1346,7 @@ export async function handleCommerceGraphActivity(
       );
 }
 
-export async function readCaseSnapshotForCommerceActivity(
+async function readCaseSnapshotForCommerceActivity(
   input: Readonly<{
     env: OrganisationPlacementBindings & Pick<Env, "CASE">;
     organisationId: OrganisationId;

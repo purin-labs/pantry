@@ -90,13 +90,13 @@ export type MemoryStoreCommand = Readonly<{
       }>
   );
 
-export type MemoryCommandError = Readonly<{ code: MemoryCommandErrorCode }>;
+type MemoryCommandError = Readonly<{ code: MemoryCommandErrorCode }>;
 
 /**
  * Who a command comes from, as its caller authenticated them. A person's
  * submission context arrives with the proposal, not with their identity.
  */
-export type MemoryPrincipal =
+type MemoryPrincipal =
   | Variant<MemoryAuthor, "agent">
   | Readonly<{ kind: "operator"; personId: string }>;
 
@@ -108,7 +108,7 @@ export type SerializedMemory = Readonly<{
     Readonly<{ flowLabel: ReturnType<typeof canonicalFlowLabel> }>)[];
 }>;
 
-export type MemoryReadError = Readonly<{
+type MemoryReadError = Readonly<{
   code: "memory_persisted_state_invalid";
 }>;
 
@@ -480,7 +480,7 @@ export async function restoreSerializedMemory(
   };
 }
 
-export function replayMemoryCommand(
+function replayMemoryCommand(
   input: Readonly<{
     sql: SqlStorage;
     organisationId: OrganisationId;

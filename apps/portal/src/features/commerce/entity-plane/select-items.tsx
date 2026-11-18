@@ -42,9 +42,7 @@ export function renderCommerceSelectParts(
   );
 }
 
-export function renderCommerceSelectItem(
-  item: CommerceSelectItem,
-): React.ReactNode {
+function renderCommerceSelectItem(item: CommerceSelectItem): React.ReactNode {
   return (
     <Select.Item key={item.value} value={item.value}>
       {item.label}

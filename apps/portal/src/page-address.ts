@@ -5,7 +5,7 @@ import type { To } from "react-router";
  * the router state, so the page stays the same while the chat is open and
  * closing the chat returns to it.
  */
-export type ChatRouteState = Readonly<{ chatReturnPath: string }>;
+type ChatRouteState = Readonly<{ chatReturnPath: string }>;
 
 type RouterLocation = Readonly<{
   pathname: string;

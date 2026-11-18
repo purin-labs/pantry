@@ -31,7 +31,7 @@ export type MediaCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-export type MediaAuthorityOptions = Readonly<{
+type MediaAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => MediaMerchantRow | undefined;
   readReplay: (

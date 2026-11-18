@@ -22,7 +22,7 @@ type PlacementMoveEvent = MachineEvent<typeof PLACEMENT_MOVE_MACHINE>;
 
 export type PlacementMoveKind = "relocation" | "restore";
 
-export type OpenPlacementMove = Readonly<{
+type OpenPlacementMove = Readonly<{
   kind: PlacementMoveKind;
   operationId: string;
 }>;
@@ -76,7 +76,7 @@ function openMoveOf(kind: PlacementMoveKind, organisation: string): string {
 }
 
 /** The open move of the Organisation, of either kind, or null. */
-export async function readOpenPlacementMove(
+async function readOpenPlacementMove(
   directory: GlobalQuerySource,
   organisationId: OrganisationId,
 ): Promise<OpenPlacementMove | null> {

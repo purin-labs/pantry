@@ -30,7 +30,7 @@ export function createConfigurationDraftActions(
   };
 }
 
-export async function configurationDraftMutation(
+async function configurationDraftMutation(
   path: string,
 ): Promise<ConfigurationDraftView> {
   const csrf = readCookie("satyr_control_csrf");
@@ -51,7 +51,7 @@ export async function configurationDraftMutation(
   return parseConfigurationDraft(raw.draft);
 }
 
-export function configurationRefusalText(code: unknown): string {
+function configurationRefusalText(code: unknown): string {
   switch (code) {
     case "operator_draft_expired":
       return "This change timed out. Ask the agent to set it up again.";

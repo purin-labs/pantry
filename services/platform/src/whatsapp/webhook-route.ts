@@ -108,12 +108,12 @@ export async function handleWhatsAppWebhook(
   return Response.json({ kind: "accepted" }, { status: 200 });
 }
 
-export type WhatsAppWebhookAdmission =
+type WhatsAppWebhookAdmission =
   | { readonly kind: "accepted" }
   | { readonly kind: "ignored"; readonly reason: string }
   | { readonly kind: "retry"; readonly reason: string };
 
-export async function admitWhatsAppWebhookEvent(
+async function admitWhatsAppWebhookEvent(
   input: Readonly<{
     env: Env;
     event: WhatsAppWebhookEvent;
@@ -186,7 +186,7 @@ export async function admitWhatsAppWebhookEvent(
     : { kind: "retry", reason: accepted.error.code };
 }
 
-export function whatsappAdmissionRequest(
+function whatsappAdmissionRequest(
   event: WhatsAppWebhookEvent,
 ): WhatsAppAdmissionRequest {
   switch (event.kind) {

@@ -66,13 +66,12 @@ import {
 /** How long one participant's mailbox check stays valid in memory. */
 const PARTICIPANT_CHECK_TTL_MS = 30_000;
 
-export type MailReplyDraftAgentRequest = Readonly<{ proposalId: string }>;
 export type MailReplyDraftAgentEditRequest = Readonly<{
   proposalId: string;
   oldText: string;
   newText: string;
 }>;
-export type MailReplyDraftSnapshot = Readonly<{
+type MailReplyDraftSnapshot = Readonly<{
   proposalId: string;
   integrationAccountId: string;
   body: string;
@@ -89,7 +88,7 @@ export type MailReplyDraftAgentEdit = Readonly<{
   deadlineAt: number;
 }>;
 /** What a save needs: the room's text and the version that it started from. */
-export type MailReplyDraftForSave =
+type MailReplyDraftForSave =
   | Readonly<{ kind: "none" }>
   | Readonly<{
       kind: "draft";
@@ -99,7 +98,7 @@ export type MailReplyDraftForSave =
       /** True when the saver alone wrote every change since the last save. */
       singleAuthor: boolean;
     }>;
-export type MailReplyDraftError = Readonly<{
+type MailReplyDraftError = Readonly<{
   code:
     | DraftFailureCode
     | "passage_conflict"
@@ -889,7 +888,7 @@ async function checkMailboxParticipant(
   }
 }
 
-export function createMailReplyDraftSchema(sql: SqlStorage): void {
+function createMailReplyDraftSchema(sql: SqlStorage): void {
   sql.exec(`CREATE TABLE IF NOT EXISTS mail_reply_draft (
     proposal_id TEXT PRIMARY KEY,
     integration_account_id TEXT NOT NULL,

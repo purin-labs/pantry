@@ -18,7 +18,7 @@ export const commerceQueryFingerprintSchema = Type.Unsafe<
 >(Type.String({ minLength: 64, maxLength: 64, pattern: "^[0-9a-fA-F]{64}$" }));
 export const commerceQuerySemanticsVersionSchema = Type.Literal("v1");
 export const commerceOrderingVersionSchema = Type.Literal("v1");
-export const commerceReadWatermarkKindSchema = Type.Enum([
+const commerceReadWatermarkKindSchema = Type.Enum([
   "underclerk_native",
   "provider_backed",
 ]);

@@ -8,7 +8,7 @@ type ShopifyAcceptanceOperation =
 
 const SHOPIFY_ACCEPTANCE_SKU = "SATYR-CK4-20260809";
 
-export type ShopifyDevelopmentOrderTrigger = {
+type ShopifyDevelopmentOrderTrigger = {
   kind: "development_order_submitted";
   provider: "shopify";
   shopDomain: string;

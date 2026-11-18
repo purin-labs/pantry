@@ -51,7 +51,7 @@ export {
   sessionActorStub,
 };
 
-export type ActorStub =
+type ActorStub =
   | DurableObjectStub<OrganisationDO>
   | DurableObjectStub<SessionDO>
   | DurableObjectStub<CaseDO>
@@ -74,7 +74,7 @@ export type ImportedCanonicalSessionActorStub = Pick<
   | "inspectCanonicalSessionState"
 >;
 
-export type ActivePolicyCredentialInspectionActorStub = Pick<
+type ActivePolicyCredentialInspectionActorStub = Pick<
   DurableObjectStub<OrganisationDO>,
   "inspectActivePolicyCredentials"
 >;
@@ -100,7 +100,7 @@ export type SessionActorRoute = {
   readonly placement: OrganisationPlacement;
 };
 
-export type ActiveCaseSessionActors = {
+type ActiveCaseSessionActors = {
   readonly caseActor: DurableObjectStub<CaseDO>;
   readonly caseRoute: SessionActorRoute;
   readonly sessionActor: DurableObjectStub<SessionDO>;
@@ -126,7 +126,7 @@ export type ActorRegistryPublication = {
   readonly activatedAt: number;
 };
 
-export class ActorResolutionFailure extends Error {
+class ActorResolutionFailure extends Error {
   constructor(readonly resolutionError: ActorResolutionError) {
     super(`actor resolution failed: ${resolutionError.code}`);
     this.name = "ActorResolutionFailure";
@@ -358,30 +358,6 @@ export async function findActiveOrganisationActorAtScope(input: {
   });
   return entry.ok
     ? organisationActorStub(
-        input.namespace,
-        entry.value.physicalObjectName,
-        entry.value.placement,
-      )
-    : null;
-}
-
-/**
- * The Connector counterpart of {@link findActiveCaseActorAtScope}, for a
- * read that must create nothing.
- */
-export async function findActiveConnectorActorAtScope(input: {
-  readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<ConnectorDO>;
-  readonly connectorId: ConnectorId;
-}): Promise<DurableObjectStub<ConnectorDO> | null> {
-  const entry = await readExactActiveActorRegistryEntry({
-    db: input.scope.database,
-    identity: connectorIdentity(input.scope.organisationId, input.connectorId),
-    placement: input.scope.placement,
-    schemaVersion: CONNECTOR_ACTOR_SCHEMA_VERSION,
-  });
-  return entry.ok
-    ? connectorActorStub(
         input.namespace,
         entry.value.physicalObjectName,
         entry.value.placement,

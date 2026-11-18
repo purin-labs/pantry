@@ -36,7 +36,7 @@ export const SLACK_SCOPES = [
   "im:history",
 ] as const;
 
-export type SlackProtocolError =
+type SlackProtocolError =
   | { readonly code: "provider_oauth_response_invalid" }
   | { readonly code: "provider_scope_missing" }
   | {
@@ -45,7 +45,7 @@ export type SlackProtocolError =
       readonly requestId: string | null;
     };
 
-export type SlackInstallation = {
+type SlackInstallation = {
   readonly token: string;
   readonly appId: SlackAppId;
   readonly teamId: WorkspaceId;

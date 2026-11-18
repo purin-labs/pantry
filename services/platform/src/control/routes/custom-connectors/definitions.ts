@@ -254,7 +254,7 @@ export async function handleRevisionAction(
   }
 }
 
-export async function validateRevision(
+async function validateRevision(
   env: Env,
   context: MutationContext,
   connectorId: CustomConnectorId,
@@ -283,7 +283,7 @@ export async function validateRevision(
   );
 }
 
-export async function approveRevision(
+async function approveRevision(
   env: Env,
   context: MutationContext,
   connectorId: CustomConnectorId,
@@ -317,7 +317,7 @@ export async function approveRevision(
   );
 }
 
-export async function rejectRevision(
+async function rejectRevision(
   env: Env,
   context: MutationContext,
   connectorId: CustomConnectorId,
@@ -357,7 +357,7 @@ export async function rejectRevision(
   );
 }
 
-export async function retireRevision(
+async function retireRevision(
   env: Env,
   context: MutationContext,
   connectorId: CustomConnectorId,
@@ -456,7 +456,7 @@ export async function handleConnectorLifecycle(
   );
 }
 
-export function parseApprovalReview(
+function parseApprovalReview(
   raw: unknown,
 ): CustomConnectorApprovalReview | null {
   if (
@@ -482,7 +482,7 @@ export function parseApprovalReview(
   return { origin: raw.origin, effects };
 }
 
-export function parseStringArray(raw: unknown): readonly string[] | null {
+function parseStringArray(raw: unknown): readonly string[] | null {
   if (!Array.isArray(raw)) return null;
   const values: string[] = [];
   for (const value of raw) {

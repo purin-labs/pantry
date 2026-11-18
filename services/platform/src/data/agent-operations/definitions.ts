@@ -157,7 +157,7 @@ export async function publishDefinitionRevision(
 }
 
 /** Ordered exact-match comparison of two skill sets. */
-export function skillRefsMatch(
+function skillRefsMatch(
   confirmed: readonly AgentSkillRef[],
   published: readonly AgentSkillRef[],
 ): boolean {

@@ -9,7 +9,7 @@ import {
 import { Type, type Static, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever } from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@seams/type-utils";
 import { authorityTargetSchemas } from "./command-authority.ts";
 import {
   attributeDefinitionSchema,
@@ -129,7 +129,7 @@ export const entityLifecycleCommandSchema = Type.Union([
     }),
   }),
 ]);
-export type EntityLifecycleCommand = StrictUnion<
+type EntityLifecycleCommand = StrictUnion<
   StaticDecode<typeof entityLifecycleCommandSchema>
 >;
 export type CustomCommerceEntityTypeDraft = Static<
@@ -199,7 +199,7 @@ function invalidText(field: string): ContractDecodeResult<never> {
 function mismatch(attributeId: string): ContractDecodeResult<never> {
   return cursorRefusal("attribute_definition_mismatch", { attributeId });
 }
-export function parseCustomCommerceEntityTypeDraft(
+function parseCustomCommerceEntityTypeDraft(
   input: unknown,
 ): ContractDecodeResult<CustomCommerceEntityTypeDraft> {
   const raw = parseContract(customDraftWire, input, invalidShape);
@@ -238,7 +238,7 @@ export function parseCustomCommerceEntityTypeDraft(
     },
   };
 }
-export function parseSystemEntityExtensionSchemaDraft(
+function parseSystemEntityExtensionSchemaDraft(
   input: unknown,
 ): ContractDecodeResult<SystemEntityExtensionSchemaDraft> {
   const raw = parseContract(extensionDraftWire, input, invalidShape);

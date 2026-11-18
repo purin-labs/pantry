@@ -25,7 +25,7 @@ export type SlackMessageError =
       operation?: never;
     };
 
-export type SlackThreadStatusError = {
+type SlackThreadStatusError = {
   readonly code: "slack_thread_status_failed";
   readonly detail: string;
 };

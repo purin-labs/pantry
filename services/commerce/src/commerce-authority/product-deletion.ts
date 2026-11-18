@@ -42,7 +42,7 @@ export type ProductDeletionPlan = Readonly<{
   retiredItems: readonly CommerceInventoryItemV1[];
 }>;
 
-export type ProductDeletionPlanResult =
+type ProductDeletionPlanResult =
   | Readonly<{ kind: "planned"; value: ProductDeletionPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 

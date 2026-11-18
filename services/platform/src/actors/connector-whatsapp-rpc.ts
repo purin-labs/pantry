@@ -120,7 +120,7 @@ export function parseWhatsAppReplyOrigin(
   return null;
 }
 
-export async function isWhatsAppReplyExecutionActive(
+async function isWhatsAppReplyExecutionActive(
   deps: WhatsAppReplyExecutionDeps,
 ): Promise<boolean> {
   if (!(await isActorExecutionActive(deps.storage.sql, deps.scope)))
@@ -147,7 +147,7 @@ export async function isWhatsAppReplyExecutionActive(
   }
 }
 
-export type WhatsAppRpcError = { readonly code: string };
+type WhatsAppRpcError = { readonly code: string };
 
 export type WhatsAppDisposalResult = {
   readonly kind: "disposed" | "proposal_missing";
@@ -560,7 +560,7 @@ async function projectDeliveryStatus(
  * Raises an item-scoped notice without stopping the number. Used where Plan 32
  * pauses one item rather than the account.
  */
-export async function notifyUnsupportedItem(
+async function notifyUnsupportedItem(
   deps: WhatsAppExecutionDeps,
   runtime: WhatsAppRuntimeSnapshot,
   reason: WhatsAppPauseReason,
@@ -582,7 +582,7 @@ export async function notifyUnsupportedItem(
  * first; the notice is best effort, and a failed delivery leaves the receipt
  * un-notified so the next pause on the same cause tries again.
  */
-export async function pauseAndNotify(
+async function pauseAndNotify(
   deps: WhatsAppExecutionDeps,
   runtime: WhatsAppRuntimeSnapshot,
   reason: WhatsAppPauseReason,

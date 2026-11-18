@@ -88,7 +88,7 @@ export function lastIntegrationsOverview(
   }
 }
 
-export function integrationsOverviewData(
+function integrationsOverviewData(
   snapshot: OrganisationSnapshot,
   commerceSystem: CommerceSystemView | null,
   codexConnection: OrganisationCodexConnection,
@@ -192,7 +192,7 @@ export async function readIntegrationDetail(
   }
 }
 
-export async function readOptionalCredentialInventory(
+async function readOptionalCredentialInventory(
   organisationId: string,
 ): Promise<IntegrationDetailRouteData["credentialInventory"]> {
   try {
@@ -202,7 +202,7 @@ export async function readOptionalCredentialInventory(
   }
 }
 
-export async function readOptionalSupportDiagnostics(
+async function readOptionalSupportDiagnostics(
   organisationId: string,
   supportReference: string | null,
 ): Promise<IntegrationDetailRouteData["supportDiagnostics"]> {
@@ -214,7 +214,7 @@ export async function readOptionalSupportDiagnostics(
   }
 }
 
-export function integrationUsesCredentialInventory(
+function integrationUsesCredentialInventory(
   integrationId: IntegrationDetailReadContext["integrationId"],
 ): boolean {
   return (
@@ -225,7 +225,7 @@ export function integrationUsesCredentialInventory(
   );
 }
 
-export function emptyIntegrationDetailRouteData(
+function emptyIntegrationDetailRouteData(
   credentialInventory: IntegrationDetailRouteData["credentialInventory"],
   supportDiagnostics: IntegrationDetailRouteData["supportDiagnostics"],
 ): IntegrationDetailRouteData {

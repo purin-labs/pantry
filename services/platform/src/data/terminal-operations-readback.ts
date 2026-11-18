@@ -19,7 +19,7 @@ import type { TerminalCounterReadback } from "@seams/control-api";
  * folded into it: a device Square has not heard from is a provider-time
  * collection failure, not a loss of authority.
  */
-export type TerminalOperationsReadback = Readonly<{
+type TerminalOperationsReadback = Readonly<{
   schemaVersion: "satyr.terminal-operations.v2";
   organisationId: OrganisationId;
   generatedAt: string;

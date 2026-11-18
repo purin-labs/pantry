@@ -264,7 +264,7 @@ export async function handlePortalChatRead(
   return controlJson({ read: result });
 }
 
-export function parseConversationMetadataAction(
+function parseConversationMetadataAction(
   raw: Readonly<Record<string, unknown>>,
 ): ConversationMetadataAction | null {
   if (
@@ -283,7 +283,7 @@ export function parseConversationMetadataAction(
   return null;
 }
 
-export function parseConversationRename(
+function parseConversationRename(
   raw: Readonly<Record<string, unknown>>,
 ): { readonly title: string; readonly expectedRevision: number } | null {
   if (
@@ -298,15 +298,15 @@ export function parseConversationRename(
   return { title: raw.title, expectedRevision: raw.expectedRevision };
 }
 
-export function isUnexpectedDraftField(key: string): boolean {
+function isUnexpectedDraftField(key: string): boolean {
   return key !== "draft" && key !== "expectedUpdatedAt";
 }
 
-export function isUnexpectedReadField(key: string): boolean {
+function isUnexpectedReadField(key: string): boolean {
   return key !== "sequence";
 }
 
-export function conversationDraftError(
+function conversationDraftError(
   result: Exclude<
     Awaited<ReturnType<typeof updateConversationDraft>>,
     { readonly ok: true }
@@ -347,7 +347,7 @@ export function conversationDraftError(
   }
 }
 
-export function conversationRenameError(
+function conversationRenameError(
   code:
     | "chat_not_found"
     | "chat_title_invalid"
@@ -378,7 +378,7 @@ export function conversationRenameError(
   }
 }
 
-export function conversationMetadataError(
+function conversationMetadataError(
   code:
     | "chat_not_found"
     | "chat_archived"

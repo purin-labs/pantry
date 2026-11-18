@@ -34,11 +34,11 @@ export type MailEvaluationInput = Readonly<{
   authority: Extract<RequestAuthority, { kind: "control" }>;
   sourcePin: string;
 }>;
-export type MailEvaluationResult = Readonly<{
+type MailEvaluationResult = Readonly<{
   classifications: readonly MailClassification[];
   contentDigest: string;
 }>;
-export type MailEvaluationError = Readonly<{ code: string }>;
+type MailEvaluationError = Readonly<{ code: string }>;
 const MAIL_USAGE_LIMITS = {
   maxEvaluations: 100,
   maxConcurrentEvaluations: 4,

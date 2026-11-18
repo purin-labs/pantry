@@ -55,7 +55,7 @@ import {
   jsonBodyErrorResponse,
 } from "../support";
 
-export type ActorRelocationAdminRequest =
+type ActorRelocationAdminRequest =
   | {
       readonly command: "waive_retention";
       readonly relocationId: ActorRelocationId;
@@ -93,7 +93,7 @@ export type ActorRelocationAdminRequest =
       readonly target?: never;
     };
 
-export type ActorRelocationAdminRequestError = {
+type ActorRelocationAdminRequestError = {
   readonly code: "invalid_actor_relocation_request";
   readonly field: string;
 };
@@ -203,7 +203,7 @@ export async function handleAdministerActorRelocation(
   }
 }
 
-export async function inspectActorRelocationResponse(
+async function inspectActorRelocationResponse(
   request: Request,
   env: Env,
 ): Promise<Response> {
@@ -228,7 +228,7 @@ export async function inspectActorRelocationResponse(
     : actorRelocationErrorResponse(inspected.error);
 }
 
-export function parseActorRelocationAdminRequest(
+function parseActorRelocationAdminRequest(
   body: JsonObject,
 ): Result<ActorRelocationAdminRequest, ActorRelocationAdminRequestError> {
   const command = readStringField(body, "command");
@@ -340,7 +340,7 @@ export function parseActorRelocationAdminRequest(
   return invalidActorRelocationAdminRequest("command");
 }
 
-export function invalidActorRelocationAdminRequest(
+function invalidActorRelocationAdminRequest(
   field: string,
 ): Result<never, ActorRelocationAdminRequestError> {
   return {
@@ -349,7 +349,7 @@ export function invalidActorRelocationAdminRequest(
   };
 }
 
-export function actorRelocationErrorResponse(error: ActorRelocationError): Response {
+function actorRelocationErrorResponse(error: ActorRelocationError): Response {
   switch (error.code) {
     case "relocation_receipt_rejected":
       return errorResponse(
@@ -462,7 +462,7 @@ export function actorRelocationErrorResponse(error: ActorRelocationError): Respo
   }
 }
 
-export type ActorRestoreAdminRequest =
+type ActorRestoreAdminRequest =
   | {
       readonly command: "prepare";
       readonly relocationId: ActorRelocationId;
@@ -485,7 +485,7 @@ export type ActorRestoreAdminRequest =
       readonly target?: never;
     };
 
-export type ActorRestoreAdminRequestError = {
+type ActorRestoreAdminRequestError = {
   readonly code: "invalid_actor_restore_request";
   readonly field: string;
 };
@@ -582,7 +582,7 @@ export async function handleAdministerActorRestore(
   }
 }
 
-export async function inspectActorRestoreResponse(
+async function inspectActorRestoreResponse(
   request: Request,
   env: Env,
 ): Promise<Response> {
@@ -608,7 +608,7 @@ export async function inspectActorRestoreResponse(
     : actorRestoreErrorResponse(inspected.error);
 }
 
-export async function parseActorRestoreAdminRequest(
+async function parseActorRestoreAdminRequest(
   body: JsonObject,
 ): Promise<Result<ActorRestoreAdminRequest, ActorRestoreAdminRequestError>> {
   const command = readStringField(body, "command");
@@ -690,7 +690,7 @@ export async function parseActorRestoreAdminRequest(
   return invalidActorRestoreAdminRequest("command");
 }
 
-export function invalidActorRestoreAdminRequest(
+function invalidActorRestoreAdminRequest(
   field: string,
 ): Result<never, ActorRestoreAdminRequestError> {
   return {
@@ -699,7 +699,7 @@ export function invalidActorRestoreAdminRequest(
   };
 }
 
-export function actorRestoreErrorResponse(error: ActorRestoreError): Response {
+function actorRestoreErrorResponse(error: ActorRestoreError): Response {
   switch (error.code) {
     case "relocation_receipt_rejected":
       return errorResponse(

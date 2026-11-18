@@ -19,7 +19,7 @@ export function invalidAuthorityRequest() {
     details: null,
   };
 }
-export type CommandAuthorizationInput = {
+type CommandAuthorizationInput = {
   authority: unknown;
   command: unknown;
   organisationId: string;

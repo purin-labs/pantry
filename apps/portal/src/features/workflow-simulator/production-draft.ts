@@ -74,7 +74,7 @@ export type ProductionDraftEdit =
   // Returns the draft to the applied run.
   | Readonly<{ kind: "discard" }>;
 
-export type ProductionDraftResult =
+type ProductionDraftResult =
   | Readonly<{ kind: "ready"; patch: Partial<ProductionSession> }>
   | Readonly<{ kind: "rejected"; message: string }>;
 

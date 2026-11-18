@@ -72,36 +72,6 @@ export function writeStorefront(
     );
 }
 
-/**
- * The active pickup storefront serving one Pantry location.
- *
- * A terminal belongs to a location, not to a storefront, so an in-person
- * checkout resolves its tax and lead-time policy this way rather than making
- * an operator name a storefront they never see. Exactly one active pickup
- * storefront may serve a location; anything else is ambiguous and returns
- * undefined rather than guessing.
- */
-export function readStorefrontForPickupLocation(
-  database: CommerceDatabase,
-  merchantId: string,
-  locationId: string,
-): Storefront | undefined {
-  const rows = database
-    .prepare(
-      `SELECT storefront_id AS storefrontId
-     FROM storefront
-     WHERE merchant_id = ?
-       AND json_extract(fulfillment_json, '$.kind') = 'pickup'
-       AND json_extract(fulfillment_json, '$.locationId') = ?
-       AND json_extract(lifecycle_json, '$.state') = 'active'`,
-    )
-    .all<Readonly<{ storefrontId: string }>>(merchantId, locationId);
-  const only = rows.length === 1 ? rows[0] : undefined;
-  return only === undefined
-    ? undefined
-    : readStorefront(database, merchantId, only.storefrontId);
-}
-
 export function readStorefront(
   database: CommerceDatabase,
   merchantId: string,
@@ -438,7 +408,7 @@ export function readCart(
   });
 }
 
-export type BuyerCartCommandReceipt = Readonly<{
+type BuyerCartCommandReceipt = Readonly<{
   operationKind: "create" | "replace";
   requestDigest: string;
   cart: Cart;
@@ -734,7 +704,7 @@ export function readCheckoutPaymentAttemptForCheckout(
  * revision 1 in an initial state; any other value is the machine event that
  * moves the stored allocation to `allocation` (Refactor 15, refactor 7).
  */
-export type InventoryAllocationWrite =
+type InventoryAllocationWrite =
   "open" | CommerceMachineEvent<"inventory_allocation">;
 
 /**

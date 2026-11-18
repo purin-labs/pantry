@@ -41,7 +41,7 @@ export type ReturnCommitRequest = Readonly<{
   restocks: readonly InventoryMovementPlan[];
 }>;
 
-export type ReturnCommandAuthorityOptions = Readonly<{
+type ReturnCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => ReturnMerchantRow | undefined;

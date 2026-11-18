@@ -28,7 +28,7 @@ export async function saveInferenceSelection(
   );
 }
 
-export function clearSubmittedInferenceSecret(form: HTMLFormElement): void {
+function clearSubmittedInferenceSecret(form: HTMLFormElement): void {
   for (const name of ["openAiApiKey", "anthropicApiKey"]) {
     const apiKeyInput = form.querySelector<HTMLInputElement>(
       `input[name="${name}"]`,
@@ -37,7 +37,7 @@ export function clearSubmittedInferenceSecret(form: HTMLFormElement): void {
   }
 }
 
-export function inferenceSelectionSuccessMessage(
+function inferenceSelectionSuccessMessage(
   selection: OrganisationInferenceSelection,
 ): string {
   switch (selection.kind) {

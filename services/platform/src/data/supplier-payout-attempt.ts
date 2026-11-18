@@ -12,7 +12,7 @@ import { PAYOUT_EVENT_ATTEMPT_MATCH } from "./supplier-payout-event-inbox";
  * payout is indistinguishable from one that never happened, and the safe
  * response to that ambiguity is the expensive one — never sending again.
  */
-export type SupplierPayoutAttemptRecord = Readonly<{
+type SupplierPayoutAttemptRecord = Readonly<{
   payoutId: string;
   attemptId: string;
   approvalDigest: string;

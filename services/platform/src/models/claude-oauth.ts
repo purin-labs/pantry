@@ -18,7 +18,7 @@ export type ClaudeTokens = Readonly<{
   expiresAt: number;
 }>;
 
-export type ClaudeOAuthError = Readonly<{
+type ClaudeOAuthError = Readonly<{
   code: "claude_oauth_code_invalid" | "claude_oauth_provider_unavailable";
 }>;
 

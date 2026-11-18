@@ -72,7 +72,7 @@ export type WhatsAppPhoneNumber = {
   readonly selectedAt: number | null;
 };
 
-export type WhatsAppSupportBinding = {
+type WhatsAppSupportBinding = {
   readonly supportBindingId: string;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -89,8 +89,8 @@ export type OperatorDestination = {
 };
 
 export type WhatsAppIngressOverflow = "pause_and_notify";
-export const WHATSAPP_RELEVANT_MESSAGE_TOPICS_MAX_CHARS = 2_000;
-export const WHATSAPP_AUTOMATIC_ACKNOWLEDGEMENT_MAX_CHARS = 1_000;
+const WHATSAPP_RELEVANT_MESSAGE_TOPICS_MAX_CHARS = 2_000;
+const WHATSAPP_AUTOMATIC_ACKNOWLEDGEMENT_MAX_CHARS = 1_000;
 
 export type WhatsAppIngressPolicy =
   | { readonly kind: "disabled_by_default"; readonly connectedAt: number }
@@ -228,32 +228,30 @@ export type WhatsAppReplyProposalProjection = {
 
 export type WhatsAppReplyAuthor = "agent" | "human";
 
-export type WhatsAppDeliveryStatusKind =
-  "sent" | "delivered" | "read" | "failed";
+type WhatsAppDeliveryStatusKind = "sent" | "delivered" | "read" | "failed";
 
-export type WhatsAppFieldError = {
+type WhatsAppFieldError = {
   readonly code: "missing_field" | "invalid_field";
   readonly field: string;
 };
 
-export type WhatsAppAccountError =
+type WhatsAppAccountError =
   | { readonly code: "whatsapp_phone_number_claimed" }
   | { readonly code: "whatsapp_account_missing" }
   | { readonly code: "whatsapp_account_write_failed" };
 
-export type WhatsAppSupportAssignmentError =
+type WhatsAppSupportAssignmentError =
   | { readonly code: "organisation_placement_conflict" }
   | { readonly code: "whatsapp_account_missing" }
   | { readonly code: "whatsapp_installation_inactive" }
   | { readonly code: "whatsapp_binding_write_failed" };
 
-export type WhatsAppPolicyPublishError =
+type WhatsAppPolicyPublishError =
   | { readonly code: "whatsapp_account_missing" }
   | { readonly code: "whatsapp_policy_publish_conflict" };
 
-export const WHATSAPP_SERVICE_WINDOW_MS = 24 * 3_600_000;
-export const WHATSAPP_MIN_DEBOUNCE_SECONDS = 10;
-export const WHATSAPP_MAX_DEBOUNCE_SECONDS = 30;
+const WHATSAPP_MIN_DEBOUNCE_SECONDS = 10;
+const WHATSAPP_MAX_DEBOUNCE_SECONDS = 30;
 
 const SHA256_HEX = /^[0-9a-f]{64}$/u;
 
@@ -366,7 +364,7 @@ export async function routeWhatsAppWebhookAccount(input: {
   };
 }
 
-export type WhatsAppWebhookRoute = {
+type WhatsAppWebhookRoute = {
   readonly organisationId: string;
   readonly integrationAccountId: string;
   readonly credentialGeneration: number;
@@ -544,7 +542,7 @@ export async function listWhatsAppPhoneNumberAccounts(input: {
   return rows.results.map(parseWhatsAppPhoneNumberRow).filter(isPresent);
 }
 
-export async function listWhatsAppAccountsForConnection(input: {
+async function listWhatsAppAccountsForConnection(input: {
   readonly db: OrganisationDatabase;
   readonly organisationId: OrganisationId;
   readonly providerConnectionId: ProviderConnectionId;
@@ -1397,7 +1395,7 @@ export type WhatsAppSendRefusal =
   | "case_missing"
   | "case_closed";
 
-export type WhatsAppSendAuthority =
+type WhatsAppSendAuthority =
   | {
       readonly kind: "authorized";
       readonly phoneNumberId: WhatsAppPhoneNumberId;
@@ -1517,7 +1515,7 @@ export async function readWhatsAppSendAuthority(input: {
   };
 }
 
-export type WhatsAppRevocation = {
+type WhatsAppRevocation = {
   readonly credentialGeneration: number;
   readonly accounts: readonly WhatsAppPhoneNumber[];
 };
@@ -1585,9 +1583,9 @@ export async function revokeWhatsAppConnection(input: {
  * of the database could enumerate. The band is enough to diagnose a limit
  * without being that lever.
  */
-export type WhatsAppBodySizeBucket = "tiny" | "small" | "medium" | "large";
+type WhatsAppBodySizeBucket = "tiny" | "small" | "medium" | "large";
 
-export function whatsAppBodySizeBucket(bytes: number): WhatsAppBodySizeBucket {
+function whatsAppBodySizeBucket(bytes: number): WhatsAppBodySizeBucket {
   if (bytes <= 64) return "tiny";
   if (bytes <= 512) return "small";
   if (bytes <= 2_048) return "medium";
@@ -2108,9 +2106,7 @@ function providerHealthColumns(health: WhatsAppProviderHealth): {
   }
 }
 
-export function parseOperatorDestination(
-  raw: unknown,
-): OperatorDestination | null {
+function parseOperatorDestination(raw: unknown): OperatorDestination | null {
   const value = typeof raw === "string" ? parseJsonOrNull(raw) : raw;
   return isRecord(value) &&
     value.kind === "organisation_communication_destination" &&
@@ -2119,7 +2115,7 @@ export function parseOperatorDestination(
     : null;
 }
 
-export function isProposalLifecycleKind(
+function isProposalLifecycleKind(
   raw: unknown,
 ): raw is WhatsAppReplyProposalLifecycle["kind"] {
   return (

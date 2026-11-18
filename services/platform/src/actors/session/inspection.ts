@@ -21,7 +21,7 @@ import type {
   SessionReservationInspection,
 } from "./types";
 
-export type SessionInspectionHeaderRow = Record<string, SqlStorageValue> & {
+type SessionInspectionHeaderRow = Record<string, SqlStorageValue> & {
   readonly organisation_id: string;
   readonly session_id: string;
   readonly lifecycle_kind: string;
@@ -61,7 +61,7 @@ export function readSessionInspectionHeader(
     : { ok: true, value: { lifecycleKind } };
 }
 
-export function parseSessionInspectionLifecycleKind(
+function parseSessionInspectionLifecycleKind(
   raw: string,
 ): AgentSessionLifecycle["kind"] | null {
   switch (raw) {
@@ -204,7 +204,7 @@ export async function inspectSessionCheckpoint(
       };
 }
 
-export function checkpointInspectionBase(checkpoint: {
+function checkpointInspectionBase(checkpoint: {
   readonly backendId: string;
   readonly blob: {
     readonly formatVersion: string;

@@ -47,7 +47,7 @@ export type ArchivedOrganisation = {
   readonly receiptId: string;
 };
 
-export type ArchiveOrganisationError =
+type ArchiveOrganisationError =
   | { readonly code: "organisation_not_found" }
   | { readonly code: "organisation_placement_conflict" }
   | { readonly code: "configuration_version_conflict" }
@@ -65,13 +65,13 @@ export type ArchiveAuthority =
       reasonCode: "legacy_cutover";
     }>;
 
-export type RestoreOrganisationMutation = ArchiveOrganisationMutation;
+type RestoreOrganisationMutation = ArchiveOrganisationMutation;
 
-export type RenameOrganisationMutation = ArchiveOrganisationMutation;
+type RenameOrganisationMutation = ArchiveOrganisationMutation;
 
-export type DeleteOrganisationMutation = ArchiveOrganisationMutation;
+type DeleteOrganisationMutation = ArchiveOrganisationMutation;
 
-export type RestoredOrganisation = {
+type RestoredOrganisation = {
   readonly organisationId: OrganisationId;
   readonly environment: OrganisationEnvironment;
   readonly configurationVersion: number;
@@ -79,7 +79,7 @@ export type RestoredOrganisation = {
   readonly receiptId: string;
 };
 
-export type RestoreOrganisationError =
+type RestoreOrganisationError =
   | { readonly code: "organisation_not_found" }
   | { readonly code: "organisation_placement_conflict" }
   | { readonly code: "configuration_version_conflict" }
@@ -89,12 +89,12 @@ export type RestoreOrganisationError =
     }
   | { readonly code: "organisation_purge_started" };
 
-export type RenameOrganisationError =
+type RenameOrganisationError =
   | { readonly code: "organisation_not_found" }
   | { readonly code: "organisation_placement_conflict" }
   | { readonly code: "configuration_version_conflict" };
 
-export type DeleteOrganisationError =
+type DeleteOrganisationError =
   | RenameOrganisationError
   | {
       readonly code: "organisation_lifecycle_conflict";

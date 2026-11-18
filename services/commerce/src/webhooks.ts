@@ -77,7 +77,7 @@ export type WebhookCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-export type WebhookAuthorityOptions = Readonly<{
+type WebhookAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => WebhookMerchantRow | undefined;
@@ -679,7 +679,7 @@ export class WebhookAuthority {
   }
 }
 
-export function webhookBody(
+function webhookBody(
   merchantId: string,
   event: CommerceEventV1,
 ): CommerceWebhookEventV1 {
@@ -703,7 +703,7 @@ function previousSecret(row: SubscriptionRow, now: string): string | null {
     : null;
 }
 
-export function webhookSignature(
+function webhookSignature(
   secret: string,
   timestamp: string,
   body: string,

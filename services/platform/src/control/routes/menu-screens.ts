@@ -410,7 +410,7 @@ export async function readMenuScreenFacts(
 }
 
 /** One entry of the published café menu, with the names that a buyer sees. */
-export type PublishedMenuEntryName = Readonly<{
+type PublishedMenuEntryName = Readonly<{
   menuEntryId: string;
   name: string;
   sectionId: string;

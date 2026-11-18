@@ -73,7 +73,7 @@ type ReplenishmentRequirement = Readonly<{
   supplierId: string;
 }>;
 
-export type PurchasingReplenishmentOptions = Readonly<{
+type PurchasingReplenishmentOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   commerceLists: CommerceLists;

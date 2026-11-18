@@ -8,7 +8,7 @@ import {
   type StatusChipStatus,
 } from "../../page-components";
 
-export type CustomConnectorCatalogState =
+type CustomConnectorCatalogState =
   | { readonly kind: "loading" }
   | { readonly kind: "failed"; readonly message: string }
   | {
@@ -260,7 +260,7 @@ function matchesCustomDirectory(
   );
 }
 
-export function connectorSearchMatches(
+function connectorSearchMatches(
   searchText: string,
   query: string,
 ): boolean {
@@ -317,7 +317,7 @@ function CustomConnectorMark(): React.ReactNode {
   );
 }
 
-export function connectorDirectoryHref(
+function connectorDirectoryHref(
   basePath: string,
   connectorId: string,
 ): string {

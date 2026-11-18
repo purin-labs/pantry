@@ -25,7 +25,7 @@ import {
 export const COMMERCE_LAB_INTEGRATION_ACCOUNT_ID =
   requireCommerceLabIntegrationAccountId();
 
-export type CommerceLabOrganisationMarker = {
+type CommerceLabOrganisationMarker = {
   readonly organisationId: OrganisationId;
   readonly labNamespace: string;
   readonly scenarioCatalogVersion: string;

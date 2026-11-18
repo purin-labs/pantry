@@ -29,7 +29,7 @@ import { MAX_EXPERIMENT_BYTES } from "@seams/production-simulation/recipes/baker
 import { verifyProductionSource } from "./workspace-runs-api.ts";
 import type { ProductionScenarioRead } from "./production-scenario-api.ts";
 
-export type ProductionFileWorkspace =
+type ProductionFileWorkspace =
   | Readonly<{ kind: "local" }>
   | Readonly<{
       kind: "connected";

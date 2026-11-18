@@ -18,7 +18,7 @@ import { controlError } from "./http";
 
 export const SESSION_COOKIE = "satyr_control_session";
 export const CSRF_COOKIE = "satyr_control_csrf";
-export const CSRF_HEADER = "x-satyr-csrf";
+const CSRF_HEADER = "x-satyr-csrf";
 export const APPROVAL_GRANT_COOKIE = "satyr_control_approval";
 
 export type AuthenticatedControlRequest = {

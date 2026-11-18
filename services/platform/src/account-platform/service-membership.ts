@@ -23,7 +23,7 @@ import { resolveLinkedPantryAccountUser } from "./identity";
 import type { OrganizationMembership as AccountMembership } from "@seams-internal/console-shared/accountPlatform";
 import type { AccountPlatformError, PantryAccountBinding } from "./types";
 
-export type AccountMembershipContext = Readonly<{
+type AccountMembershipContext = Readonly<{
   client: AccountPlatformClient;
   actor: AccountMembershipActor;
   nativeUserId: UserId;

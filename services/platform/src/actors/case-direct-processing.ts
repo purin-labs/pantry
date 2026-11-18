@@ -12,7 +12,7 @@ import {
   type OperatorExecutionOrigin,
 } from "../chat/turn-access";
 import type { ProjectSnapshot } from "@seams/control-api";
-import { type BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignmentLifecycle,
@@ -108,7 +108,7 @@ type DirectCaseResources = {
   readonly policy: PinnedSessionPolicy;
 };
 
-export type DirectCaseCommand = {
+type DirectCaseCommand = {
   readonly scope: OrganisationExecutionScope;
   readonly projectContext: ProjectSnapshot | null;
   readonly organisationId: OrganisationId;
@@ -151,13 +151,13 @@ export type DirectCaseCommandDelivery =
       readonly address: ConnectorAddress;
     };
 
-export type DirectCaseCommandResult = DirectCasePathResult & {
+type DirectCaseCommandResult = DirectCasePathResult & {
   readonly caseId: string;
   readonly sessionId: string;
   readonly assignmentId: string;
 };
 
-export type TwoSessionDirectCaseCommand = Omit<
+type TwoSessionDirectCaseCommand = Omit<
   DirectCaseCommand,
   "role" | "objective" | "surfaceContext" | "browserContext"
 > & {
@@ -198,13 +198,12 @@ function capDirectCasePolicyBudget(
   };
 }
 
-export type TwoSessionDirectCaseCommandResult =
-  DirectTwoSessionCasePathResult & {
-    readonly caseId: string;
-    readonly sessionIds: readonly [string, string];
-    readonly assignmentIds: readonly [string, string];
-    readonly combinedAssignmentId: string | null;
-  };
+type TwoSessionDirectCaseCommandResult = DirectTwoSessionCasePathResult & {
+  readonly caseId: string;
+  readonly sessionIds: readonly [string, string];
+  readonly assignmentIds: readonly [string, string];
+  readonly combinedAssignmentId: string | null;
+};
 
 export type DirectCaseCommandError =
   | Variant<CaseWalkingPathError, "budget_exhausted">

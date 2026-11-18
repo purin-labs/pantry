@@ -78,7 +78,7 @@ export type ActorRegistryInventoryEntry = ActorRegistryInventoryBase &
       }
   );
 
-export type ActorRegistryReconciliationOutcome =
+type ActorRegistryReconciliationOutcome =
   | {
       readonly kind: "skipped";
       readonly registryId: ActorRegistryId;
@@ -105,7 +105,7 @@ export type ActorRegistryReconciliationOutcome =
       readonly reason: "activation_conflict_during_orphan_repair";
     };
 
-export type ActorRegistryReconciliationReport = {
+type ActorRegistryReconciliationReport = {
   readonly organisationId: OrganisationId;
   readonly inspectedAt: number;
   readonly staleReservationAgeMs: number;

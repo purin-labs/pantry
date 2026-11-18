@@ -15,7 +15,7 @@ export type RequestedCapability = Readonly<{
 }>;
 
 /** A grant that a permission request asks to add. */
-export type RequestedGrant = Readonly<{
+type RequestedGrant = Readonly<{
   subjectRef: AccessSubjectRef;
   target: AccessGrantTargetSelection;
 }>;

@@ -12,7 +12,7 @@ export type UnregisteredActorKind =
   | "code_mode_governor"
   | "custom_connector_fetch";
 
-export type UnregisteredActorErasureError =
+type UnregisteredActorErasureError =
   { readonly code: "actor_owner_exists" } | { readonly code: "actor_in_use" };
 
 /** Where an Actor of any class records the Organisation it belongs to. */

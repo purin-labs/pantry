@@ -178,7 +178,7 @@ export type DisclosureDestination =
       proposal: ConversationAudienceProposal;
     }>;
 
-export type DisclosureState = Readonly<{
+type DisclosureState = Readonly<{
   organisationConfiguration:
     | Readonly<{ kind: "unconfigured" }>
     | Readonly<{ kind: "configured"; revision: number }>;

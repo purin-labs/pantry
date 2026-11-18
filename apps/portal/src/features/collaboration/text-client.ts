@@ -96,17 +96,17 @@ export type TextProtocolAdapter<Update, StateVector, PresenceSelection, Metadata
   invalidMessageCode: FailureCode;
 }>;
 
-export type Connection<FailureCode extends string> =
+type Connection<FailureCode extends string> =
   | Readonly<{ kind: "connecting" | "awaiting_sync" | "syncing" | "connected"; socket: WebSocket }>
   | Readonly<{ kind: "reconnecting"; timer: ReturnType<typeof setTimeout> }>
   | Readonly<{ kind: "failed"; code: FailureCode }>
   | Readonly<{ kind: "closed" }>;
 
-export type PendingUpdate<StateVector> =
+type PendingUpdate<StateVector> =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "sync" | "edit"; updateId: string; revision: number; stateVector: StateVector }>;
 
-export type Composition<Field extends string, Document, LocalSelection> =
+type Composition<Field extends string, Document, LocalSelection> =
   | Readonly<{ kind: "idle" }>
   | Readonly<{
       kind: "composing";
@@ -116,7 +116,7 @@ export type Composition<Field extends string, Document, LocalSelection> =
       selections: ReadonlyMap<Field, LocalSelection>;
     }>;
 
-export type NativeInput<Field extends string> =
+type NativeInput<Field extends string> =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "replacing"; field: Field; before: string; range: TextInputRange }>;
 
@@ -632,7 +632,7 @@ export class TextCollaborationClient<
   }
 }
 
-export function socketOf<FailureCode extends string>(connection: Connection<FailureCode>): WebSocket | null {
+function socketOf<FailureCode extends string>(connection: Connection<FailureCode>): WebSocket | null {
   switch (connection.kind) {
     case "connecting":
     case "awaiting_sync":

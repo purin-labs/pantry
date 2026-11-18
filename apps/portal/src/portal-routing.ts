@@ -37,7 +37,7 @@ export function commerceActionRefreshKey(action: CommerceActionRecord | null): s
   return action === null ? "none" : `${action.nonce}:${action.state}`;
 }
 
-export function mutationHasKind(
+function mutationHasKind(
   kind: OrganisationMutation["kind"],
   mutation: OrganisationMutation,
 ): boolean {

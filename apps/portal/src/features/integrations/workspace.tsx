@@ -133,7 +133,7 @@ export function WorkspaceSettingsPage(
   );
 }
 
-export function renderOrganisationMembers(
+function renderOrganisationMembers(
   members: readonly OrganisationMember[],
   changeRole: SettingsSelectHandler,
   remove: SettingsMouseHandler,
@@ -157,7 +157,7 @@ export function renderOrganisationMembers(
   );
 }
 
-export function renderOrganisationMember(
+function renderOrganisationMember(
   changeRole: SettingsSelectHandler,
   remove: SettingsMouseHandler,
   controls: {
@@ -223,7 +223,7 @@ export function renderOrganisationMember(
   );
 }
 
-export function renderOrganisationInvitations(
+function renderOrganisationInvitations(
   invitations: readonly OrganisationInvitation[],
   revoke: SettingsMouseHandler,
   mutations: MutationLedger,
@@ -244,7 +244,7 @@ export function renderOrganisationInvitations(
   );
 }
 
-export function renderOrganisationInvitationRow(
+function renderOrganisationInvitationRow(
   revoke: SettingsMouseHandler,
   controls: {
     readonly mutations: MutationLedger;
@@ -287,7 +287,7 @@ export function renderOrganisationInvitationRow(
   );
 }
 
-export function ArchiveConfirm(props: {
+function ArchiveConfirm(props: {
   readonly organisationName: string;
   readonly busy: boolean;
   readonly onArchive: () => Promise<void>;
@@ -385,32 +385,32 @@ export function ConfirmButton(props: {
   );
 }
 
-export function ConfirmedAction(
+function ConfirmedAction(
   action: SettingsMouseHandler,
   event: React.MouseEvent<HTMLButtonElement>,
 ): void {
   void action(event);
 }
 
-export function runConfirmedAction(
+function runConfirmedAction(
   action: SettingsMouseHandler,
   event: React.MouseEvent<HTMLButtonElement>,
 ): void {
   ConfirmedAction(action, event);
 }
 
-export function requestButtonConfirm(
+function requestButtonConfirm(
   request: (key: string) => void,
   key: string,
 ): void {
   request(key);
 }
 
-export function runArchive(action: () => Promise<void>): void {
+function runArchive(action: () => Promise<void>): void {
   void action();
 }
 
-export function renderRoleItem(
+function renderRoleItem(
   role: Readonly<{ value: string; label: string }>,
 ): React.ReactNode {
   return (
@@ -420,7 +420,7 @@ export function renderRoleItem(
   );
 }
 
-export function changeMemberRole(
+function changeMemberRole(
   changeRole: SettingsSelectHandler,
   userId: string,
   role: string | null,
@@ -428,20 +428,20 @@ export function changeMemberRole(
   if (role !== null) void changeRole(userId, role);
 }
 
-export function setArchiveConfirmOpen(
+function setArchiveConfirmOpen(
   setOpen: React.Dispatch<React.SetStateAction<boolean>>,
 ): void {
   setOpen(true);
 }
 
-export function setArchiveConfirmText(
+function setArchiveConfirmText(
   setTyped: React.Dispatch<React.SetStateAction<string>>,
   event: React.ChangeEvent<HTMLInputElement>,
 ): void {
   setTyped(event.currentTarget.value);
 }
 
-export function closeArchiveConfirm(
+function closeArchiveConfirm(
   setOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setTyped: React.Dispatch<React.SetStateAction<string>>,
   trigger: React.RefObject<HTMLButtonElement | null>,
@@ -451,7 +451,7 @@ export function closeArchiveConfirm(
   window.requestAnimationFrame(focusArchiveTrigger.bind(null, trigger));
 }
 
-export function focusArchiveTrigger(
+function focusArchiveTrigger(
   trigger: React.RefObject<HTMLButtonElement | null>,
 ): void {
   trigger.current?.focus();

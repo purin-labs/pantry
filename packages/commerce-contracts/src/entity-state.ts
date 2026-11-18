@@ -69,7 +69,7 @@ export const sourceProvenanceSchema = OpenObject({
   occurredAt: Type.String(),
   observedAt: Type.String(),
 });
-export type SourceProvenance = Static<typeof sourceProvenanceSchema>;
+type SourceProvenance = Static<typeof sourceProvenanceSchema>;
 
 export function parseCustomCommerceEntityState(
   input: unknown,

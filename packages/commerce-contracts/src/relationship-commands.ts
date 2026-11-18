@@ -24,7 +24,7 @@ import {
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever } from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@seams/type-utils";
 
 import {
   commerceEntityRefSchema,
@@ -41,7 +41,7 @@ import { cursorRefusal } from "./cursor-values.ts";
 
 const id = queryIdentitySchema<"RelationshipId">();
 
-export const systemRelationshipRefWireSchema = OpenObject({
+const systemRelationshipRefWireSchema = OpenObject({
   origin: Type.Literal("system"),
   relationshipId: Type.String(),
   definition: systemRelationshipDefinitionWireSchema,
@@ -95,7 +95,7 @@ export const relationshipReplacementTargetWire = OpenObject({
 export const customCommerceRelationshipDefinitionDraftSchema = StrictObject(
   customRelationshipDefinitionSchema.properties,
 );
-export const relationshipDefinitionDraftWire = StrictObject(
+const relationshipDefinitionDraftWire = StrictObject(
   customRelationshipDefinitionRecordWireSchema.properties,
 );
 export const customCommerceRelationshipDefinitionCreateTargetSchema =
@@ -155,7 +155,7 @@ export const relationshipLifecycleCommandSchema = Type.Union([
     }),
   }),
 ]);
-export type RelationshipLifecycleCommand = StrictUnion<
+type RelationshipLifecycleCommand = StrictUnion<
   Static<typeof relationshipLifecycleCommandSchema>
 >;
 const commandWire = Type.Union([
@@ -326,7 +326,7 @@ export function parseRelationshipLifecycleCommand(
   }
 }
 
-export function parseRelationshipDefinitionDraft(
+function parseRelationshipDefinitionDraft(
   input: unknown,
 ): ContractDecodeResult<CustomCommerceRelationshipDefinitionDraft> {
   const raw = parseContract(

@@ -39,7 +39,7 @@ import type {
 import type { Variant } from "@seams/type-utils";
 import { assertNever } from "@seams/std";
 
-export type CurrentSourceFlowLabelInput =
+type CurrentSourceFlowLabelInput =
   | Readonly<{
       kind: "saved_bakery_run";
       db: OrganisationDatabase;
@@ -765,7 +765,7 @@ function createFlowLabel(
  * Pantry's own records is not such a text. When a new read returns outside
  * text, add its capability here in the same change.
  */
-export const OUTSIDE_WRITTEN_READ_CAPABILITIES: ReadonlySet<string> = new Set([
+const OUTSIDE_WRITTEN_READ_CAPABILITIES: ReadonlySet<string> = new Set([
   CAPABILITY_KEYS.emailMailboxRead,
   CAPABILITY_KEYS.whatsappSupportRead,
 ]);

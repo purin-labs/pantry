@@ -45,7 +45,7 @@ export type CustomerCommitRequest = Readonly<{
   write: () => void;
 }>;
 
-export type CustomerAuthorityOptions = Readonly<{
+type CustomerAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   /** Absent when the Worker has no customer data secret: no accounts. */
   vault: CustomerVault | undefined;

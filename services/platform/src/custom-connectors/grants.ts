@@ -73,7 +73,7 @@ export type CustomConnectorWriteCatalogEntry = CustomConnectorCatalogEntry &
       }>;
   }>;
 
-export type CustomConnectorReadCatalogError =
+type CustomConnectorReadCatalogError =
   | { readonly code: "custom_connector_catalog_limit_exceeded" }
   | { readonly code: "custom_connector_catalog_collision" }
   | {

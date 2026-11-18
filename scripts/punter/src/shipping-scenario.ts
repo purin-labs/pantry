@@ -109,7 +109,7 @@ export type PunterOnlineCookieScenario = Readonly<{
   }>;
 }>;
 
-export type PunterShippingScenarioInput = Readonly<{
+type PunterShippingScenarioInput = Readonly<{
   baseUrl: string;
   merchantId: string;
   storefrontId: string;
@@ -123,7 +123,7 @@ export type PunterShippingScenarioInput = Readonly<{
   }>;
 }>;
 
-export type PunterShippingEvidenceV1 = Readonly<{
+type PunterShippingEvidenceV1 = Readonly<{
   schemaVersion: "punter.shipping-evidence.v1";
   runId: string;
   merchantId: string;
@@ -145,13 +145,13 @@ export type PunterShippingEvidenceV1 = Readonly<{
   statusProgression: readonly ShippingOrderState[];
 }>;
 
-export type ShippingOrderState = VariantBy<
+type ShippingOrderState = VariantBy<
   CommerceBuyerOrderV1,
   "fulfillment",
   "shipping"
 >["state"];
 
-export type PunterShippingScenarioFailure =
+type PunterShippingScenarioFailure =
   | Readonly<{
       stage: "session" | "catalog" | "checkout" | "payment" | "order";
       kind:
@@ -170,7 +170,7 @@ export type PunterShippingScenarioFailure =
       reconcileAfter: string;
     }>;
 
-export type PunterShippingScenarioResult =
+type PunterShippingScenarioResult =
   | Readonly<{ ok: true; evidence: PunterShippingEvidenceV1 }>
   | Readonly<{ ok: false; error: PunterShippingScenarioFailure }>;
 

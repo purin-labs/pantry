@@ -20,7 +20,7 @@ import type {
 import type { CommerceDatabase } from "../database.ts";
 import { readChannelShippingStorefront } from "../checkout-persistence.ts";
 
-export type ChannelPlacementShippingContext =
+type ChannelPlacementShippingContext =
   | Readonly<{
       kind: "shipping";
       shippingProfileId: string;
@@ -976,7 +976,7 @@ export function variantObservation(
   return { kind: "sellable_variant", resource };
 }
 
-export function offerObservation(
+function offerObservation(
   resource: CommerceResourcesV1["offers"][number],
 ): CommerceAggregateObservationV1 {
   return { kind: "offer", resource };

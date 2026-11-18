@@ -2,7 +2,7 @@ import type { SessionId, OrganisationId } from "../ids";
 import type { Result } from "../result";
 import { isNonNegativeInteger } from "@seams/std";
 
-export type SessionCutoverRuntime = {
+type SessionCutoverRuntime = {
   readonly persistence: "v28_canonical";
   readonly lifecycleKind:
     | "sleeping"
@@ -15,7 +15,7 @@ export type SessionCutoverRuntime = {
     | "terminal";
 };
 
-export type SessionCutoverWork = {
+type SessionCutoverWork = {
   readonly pendingTurns: number;
   readonly runningStreams: number;
   readonly incompleteStartSagas: number;

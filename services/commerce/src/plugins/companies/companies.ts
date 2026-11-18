@@ -30,7 +30,7 @@ export type CompanyCommitRequest = Readonly<{
   previousRevision: number | undefined;
 }>;
 
-export type CompanyAuthorityOptions = Readonly<{
+type CompanyAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => CompanyMerchantRow | undefined;
   readReplay: (
@@ -257,7 +257,7 @@ export function writeCompany(
       .run(merchantId, customerId, company.id);
 }
 
-export function readCompany(
+function readCompany(
   database: CommerceDatabase,
   merchantId: string,
   companyId: string,

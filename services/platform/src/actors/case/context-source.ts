@@ -157,7 +157,7 @@ export function inspectStoredCase(
   };
 }
 
-export function acceptedProposalIds(sql: SqlStorage): string[] {
+function acceptedProposalIds(sql: SqlStorage): string[] {
   return sql
     .exec<Pick<ProposalRow, "proposal_id">>(
       "SELECT proposal_id FROM case_proposal WHERE json_extract(acceptance_json, '$.disposition.kind') = 'accepted' ORDER BY proposal_id",
@@ -166,7 +166,7 @@ export function acceptedProposalIds(sql: SqlStorage): string[] {
     .map((row) => row.proposal_id);
 }
 
-export function acceptedCommerceProposalIds(sql: SqlStorage): string[] {
+function acceptedCommerceProposalIds(sql: SqlStorage): string[] {
   return sql
     .exec<{ proposal_id: string }>(
       "SELECT proposal_id FROM case_commerce_proposal WHERE json_extract(acceptance_json, '$.kind') = 'accepted' ORDER BY proposal_id",
@@ -203,7 +203,7 @@ export function readCommerceApproval(
   return row === null ? null : parseCaseCommerceApprovalRecordJson(row.payload);
 }
 
-export function readCommerceApprovals(
+function readCommerceApprovals(
   sql: SqlStorage,
 ): CaseCommerceApprovalRecord[] | null {
   const records = sql
@@ -333,7 +333,7 @@ export async function enqueueCaseContextProjection(
   return true;
 }
 
-export async function contextSourceFromJournalRow(
+async function contextSourceFromJournalRow(
   organisationId: OrganisationId,
   caseId: string,
   row: ContextJournalRow,
@@ -501,7 +501,7 @@ export function replayAuthorityForPartition(
   });
 }
 
-export function parseCaseContextReplayAuthority(
+function parseCaseContextReplayAuthority(
   value: string | null,
 ): CaseContextReplayAuthority | null {
   if (value === null) return null;
@@ -524,7 +524,7 @@ export function parseCaseContextReplayAuthority(
   }
 }
 
-export function replayAuthorityMatchesPartition(
+function replayAuthorityMatchesPartition(
   authority: CaseContextReplayAuthority,
   authorityPartitionDigest: string,
 ): boolean {
@@ -546,10 +546,7 @@ export async function contextSourceDigestMatches(
   );
 }
 
-export function contextVisibilityPlaceholder(
-  _value: string,
-  index: number,
-): string {
+function contextVisibilityPlaceholder(_value: string, index: number): string {
   return `?${index + 3}`;
 }
 
@@ -572,7 +569,7 @@ export function caseContentPreview(content: CaseContent): string {
   }
 }
 
-export function caseContentAuthoredText(message: UserMessage): string | null {
+function caseContentAuthoredText(message: UserMessage): string | null {
   const authored: string[] = [];
   for (const part of [message.firstPart, ...message.remainingParts]) {
     if (part.kind === "text") authored.push(part.text);
@@ -580,11 +577,11 @@ export function caseContentAuthoredText(message: UserMessage): string | null {
   return authored.length === 0 ? null : authored.join(" ");
 }
 
-export function assertNeverCaseContent(value: never): never {
+function assertNeverCaseContent(value: never): never {
   throw new Error(`Unhandled Case content: ${JSON.stringify(value)}`);
 }
 
-export function boundedContextExcerpt(content: CaseContent): string | null {
+function boundedContextExcerpt(content: CaseContent): string | null {
   // The model-visible excerpt renders the whole message. Authored text alone
   // would drop a file the author attached, so a later turn would have no way
   // to know it existed.
@@ -609,7 +606,7 @@ export function boundedContextExcerpt(content: CaseContent): string | null {
 }
 
 /** The same Rust rendering the turn prompt uses, so the two cannot disagree. */
-export function caseContentModelText(message: UserMessage): string | null {
+function caseContentModelText(message: UserMessage): string | null {
   const derived = deriveUserMessageViews(message);
 
   return derived.ok
@@ -714,7 +711,7 @@ export function readOutputLifecycle(
   return row === null ? null : parseOutputLifecycleJson(row.lifecycle_json);
 }
 
-export function readOutputLifecycles(
+function readOutputLifecycles(
   sql: SqlStorage,
 ): RawCaseOutputLifecycle[] | null {
   const values = sql
@@ -726,7 +723,7 @@ export function readOutputLifecycles(
     : values.filter(isPresent);
 }
 
-export async function restoreStoredFlowBinding(
+async function restoreStoredFlowBinding(
   raw: unknown,
 ): Promise<CaseResult<FlowBinding>> {
   const restored = await FlowBinding.restore(raw);
@@ -744,7 +741,7 @@ export async function restoreCaseOutput(
     : binding;
 }
 
-export function outputSourceMatchesWork(
+function outputSourceMatchesWork(
   output: RawCaseOutput,
   binding: FlowBinding,
 ): boolean {

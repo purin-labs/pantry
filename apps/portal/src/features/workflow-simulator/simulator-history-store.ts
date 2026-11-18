@@ -36,7 +36,7 @@ export type SimulatorHistorySnapshot = Readonly<{
   lastAction: SimulatorHistoryActionFeedback | null;
 }>;
 
-export type SimulatorHistoryStoreHooks = Readonly<{
+type SimulatorHistoryStoreHooks = Readonly<{
   hasCustomLayout: () => boolean;
   clearCustomLayout: () => void;
 }>;

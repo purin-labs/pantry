@@ -7,7 +7,7 @@ import type { BuiltInPluginId, PluginState } from "@seams/commerce-contracts";
 
 import type { CommerceDatabase } from "../database.ts";
 
-export type PluginStateRecord = Readonly<{
+type PluginStateRecord = Readonly<{
   state: PluginState;
   revision: number;
   settings: CommercePluginSettingsV1;

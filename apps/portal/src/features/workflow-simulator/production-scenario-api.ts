@@ -121,7 +121,7 @@ export async function readProductionScenario(
   return { kind: "ready", definition, procedure: source.procedure };
 }
 
-export type ProductionScenarioSave =
+type ProductionScenarioSave =
   | Readonly<{ kind: "verified"; definition: ProductionScenario }>
   | Readonly<{
       kind: "saved-readback-failed";

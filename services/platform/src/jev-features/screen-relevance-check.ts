@@ -34,17 +34,17 @@ import {
  * 0.46 or more, so hint at 0.30 sits in that gap and ask at 0.65 asks for
  * most page questions. A new labelled run tunes them again.
  */
-export const SCREEN_RELEVANCE_ASK = 0.65;
-export const SCREEN_RELEVANCE_HINT = 0.3;
+const SCREEN_RELEVANCE_ASK = 0.65;
+const SCREEN_RELEVANCE_HINT = 0.3;
 /** Plan 87 D13: offer a new chat when the page is off the chat's topic. */
-export const SCREEN_RELEVANCE_OFF_TOPIC = 0.3;
+const SCREEN_RELEVANCE_OFF_TOPIC = 0.3;
 
 /**
  * Daily limits of the relevance suggestion, under the monthly allowance of
  * Plan 88: at most 500 checks and $0.20 a day. One check sends at most
  * 8 KiB, so it reserves 8,192 input tokens, about $0.00035.
  */
-export const SCREEN_RELEVANCE_LIMITS: TypeSafeUsageLimits = Object.freeze({
+const SCREEN_RELEVANCE_LIMITS: TypeSafeUsageLimits = Object.freeze({
   maxEvaluations: 500,
   maxConcurrentEvaluations: 4,
   maxInputBytes: 500 * SCREEN_RELEVANCE_MAX_REQUEST_BYTES,
@@ -67,14 +67,14 @@ export type ScreenRelevanceCheckInput = Readonly<{
   label: SerializedFlowLabel;
 }>;
 
-export type ScreenRelevanceCheckResult = Readonly<{
+type ScreenRelevanceCheckResult = Readonly<{
   kind: ScreenRelevanceBand;
   offerNewChat: boolean;
   checkId: string | null;
 }>;
 
 /** Why no band came back. Each one leaves the attach rule of section 3 alone. */
-export type ScreenRelevanceCheckError = Readonly<{
+type ScreenRelevanceCheckError = Readonly<{
   code:
     | "switch_off"
     | "key_unavailable"
@@ -84,7 +84,7 @@ export type ScreenRelevanceCheckError = Readonly<{
     | "jev_failed";
 }>;
 
-export function screenRelevanceBand(
+function screenRelevanceBand(
   aboutScreen: number,
   fitsChat: number,
 ): Readonly<{ kind: ScreenRelevanceBand; offerNewChat: boolean }> {

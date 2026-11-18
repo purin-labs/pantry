@@ -64,7 +64,7 @@ const MAX_NAMES_PER_REQUEST = 8;
 const MAX_WARM_SLOTS = 4;
 const MAX_NAME_LENGTH = 512;
 
-export type ConversationResidencyRequest = {
+type ConversationResidencyRequest = {
   readonly organisationId: OrganisationId;
   readonly placement: OrganisationPlacement;
   readonly physicalObjectNames: readonly string[];
@@ -89,9 +89,6 @@ export type ConversationResidencyInspection = {
 };
 
 type ResidentKind = "connector" | "case" | "session";
-
-/** What a kept Actor offers: a call that does no work. */
-export type ResidentActor = { keepResident(): Promise<void> };
 
 export class ConversationResidencyActor extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {

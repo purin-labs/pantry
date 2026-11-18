@@ -14,7 +14,7 @@ type LoginView = Variant<VaultItemView, "website_login">;
 type ContactView = Variant<VaultItemView, "contact_profile">;
 
 export type FieldErrors = Readonly<Record<string, string>>;
-export type Checked<T> =
+type Checked<T> =
   | Readonly<{ ok: true; value: T }>
   | Readonly<{ ok: false; errors: FieldErrors }>;
 

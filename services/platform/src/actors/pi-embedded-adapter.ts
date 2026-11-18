@@ -16,8 +16,7 @@ import {
 
 export const PACKAGED_PI_CHECKPOINT_FORMAT = PI_DURABLE_CHECKPOINT_FORMAT;
 export const PACKAGED_PI_HARNESS_BUILD = PI_DURABLE_BUILD;
-export const PI_EMBEDDED_HARNESS_ADAPTER =
-  createPiDurableAdapter(PACKAGED_PI_MODEL);
+const PI_EMBEDDED_HARNESS_ADAPTER = createPiDurableAdapter(PACKAGED_PI_MODEL);
 /** Pantry's paid OpenRouter route: one adapter for each model it runs. */
 export const PI_PLATFORM_EMBEDDED_HARNESS_ADAPTERS: Readonly<
   Record<PlatformPiModel, EmbeddedHarnessAdapter>

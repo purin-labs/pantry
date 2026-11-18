@@ -19,11 +19,11 @@ import { readProfile } from "./checkout-profile-persistence.ts";
 import type { CommerceDatabase } from "./database.ts";
 import { assertNever } from "@seams/std";
 
-export type CheckoutProfileResolutionResult =
+type CheckoutProfileResolutionResult =
   | Readonly<{ kind: "resolved"; profile: CheckoutProfile }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type CheckoutProfileCartResolutionResult =
+type CheckoutProfileCartResolutionResult =
   | Readonly<{ kind: "resolved"; profile: CheckoutProfile }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 

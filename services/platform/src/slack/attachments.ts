@@ -50,7 +50,7 @@ export type AttachmentRejection =
   | { readonly code: "download_rejected"; readonly fileId: string };
 
 /** A transient failure. The Connector retries the exact batch. */
-export type AttachmentFailure =
+type AttachmentFailure =
   | { readonly code: "provider_unavailable"; readonly fileId: string | null }
   | { readonly code: "storage_unavailable"; readonly fileId: string | null };
 
@@ -58,7 +58,7 @@ export type AttachmentFailure =
  * One message's attachments are atomic for agent admission: either every file
  * is committed, or the agent sees none of them.
  */
-export type SlackAttachmentBatch =
+type SlackAttachmentBatch =
   | {
       readonly state: "committed";
       readonly attachments: readonly StoredMessageAttachment[];
@@ -66,7 +66,7 @@ export type SlackAttachmentBatch =
   | { readonly state: "retryable_failure"; readonly failure: AttachmentFailure }
   | { readonly state: "rejected"; readonly rejection: AttachmentRejection };
 
-export type SlackAttachmentBatchInput = {
+type SlackAttachmentBatchInput = {
   readonly bucket: R2Bucket;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;

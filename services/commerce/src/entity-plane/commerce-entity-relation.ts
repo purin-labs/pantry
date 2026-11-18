@@ -516,7 +516,7 @@ function relationOrderingValue(
   }
 }
 
-export function parseCommerceEntityRelationRow(
+function parseCommerceEntityRelationRow(
   row: RelationViewRow,
 ): CommerceEntityRelationRow {
   const merchantId = normalizedText(

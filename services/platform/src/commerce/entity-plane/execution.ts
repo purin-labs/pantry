@@ -70,7 +70,7 @@ type EntityPlaneActionGatePermit = Readonly<{
   readonly merchantBinding: CommerceMerchantBinding;
 }>;
 
-export type CommerceEntityPlaneCommandAuthorizationError = Readonly<{
+type CommerceEntityPlaneCommandAuthorizationError = Readonly<{
   readonly code:
     | "commerce_entity_plane_command_invalid"
     | "commerce_entity_plane_command_policy_denied"
@@ -84,7 +84,7 @@ export type CommerceEntityPlaneExecutionEnv = Readonly<{
   readonly UNDERCLERK_SERVICE_TOKEN?: string;
 }>;
 
-export type CommerceEntityPlaneExecutionError = Readonly<{
+type CommerceEntityPlaneExecutionError = Readonly<{
   readonly code:
     | "commerce_entity_plane_proposal_missing"
     | "commerce_entity_plane_proposal_conflict"

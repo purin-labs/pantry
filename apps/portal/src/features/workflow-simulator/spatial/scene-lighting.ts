@@ -21,7 +21,7 @@ const HDRI_SPOTS: ReadonlyArray<
 ];
 
 /** Synthesizes a HalfFloat equirectangular warm bakery HDRI light map for PMREM IBL. */
-export function createWarmBakeryHdriTexture(): THREE.DataTexture {
+function createWarmBakeryHdriTexture(): THREE.DataTexture {
   const width = 512;
   const height = 256;
   const data = new Uint16Array(width * height * 4);
@@ -181,7 +181,7 @@ export type BakeryLightingRig = Readonly<{
   dispose: () => void;
 }>;
 
-export type BakeryLightingOptions = Readonly<{
+type BakeryLightingOptions = Readonly<{
   shadowFrustumHalfSize?: number;
   exteriorShadowPlaneY?: number;
 }>;

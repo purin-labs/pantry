@@ -45,7 +45,7 @@ const fields = [
   { id: "needed_by", label: "Needed by", kind: { kind: "timestamp" } },
 ];
 
-export const PRODUCTION_DEMAND_LIST = parseCommerceList({
+const PRODUCTION_DEMAND_LIST = parseCommerceList({
   listId: "production_requests",
   entityTypeId: { origin: "system", typeId: "inventory_item" },
   name: "Production requests",

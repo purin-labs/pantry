@@ -67,44 +67,41 @@ export type EmailReplyProposalCreateRequest = ConnectorEmailIdentityRequest & {
   readonly chatContext: EmailChatContext;
 };
 
-export type EmailOperationalProposalCreateRequest =
-  ConnectorEmailIdentityRequest & {
-    readonly execution: SessionTurnExecution;
-    readonly integrationAccountId: string;
-    readonly caseId: string;
-    readonly proposalId: string;
-    readonly target: import("../../data/email-operational").EmailProposalTarget;
-    readonly subject: string;
-    readonly body: string;
-    readonly policyVersion: number;
-    readonly expiresAt: number;
-  };
+type EmailOperationalProposalCreateRequest = ConnectorEmailIdentityRequest & {
+  readonly execution: SessionTurnExecution;
+  readonly integrationAccountId: string;
+  readonly caseId: string;
+  readonly proposalId: string;
+  readonly target: import("../../data/email-operational").EmailProposalTarget;
+  readonly subject: string;
+  readonly body: string;
+  readonly policyVersion: number;
+  readonly expiresAt: number;
+};
 
-export type EmailOperationalProposalEditRequest =
-  ConnectorEmailIdentityRequest & {
-    readonly integrationAccountId: string;
-    readonly proposalId: string;
-    readonly subject: string;
-    readonly body: string;
-    readonly expectedVersion?: number;
-  };
+type EmailOperationalProposalEditRequest = ConnectorEmailIdentityRequest & {
+  readonly integrationAccountId: string;
+  readonly proposalId: string;
+  readonly subject: string;
+  readonly body: string;
+  readonly expectedVersion?: number;
+};
 
-export type EmailOperationalProposalRequest = ConnectorEmailIdentityRequest & {
+type EmailOperationalProposalRequest = ConnectorEmailIdentityRequest & {
   readonly integrationAccountId: string;
   readonly proposalId: string;
 };
 
-export type EmailOperationalAccountRequest = ConnectorEmailIdentityRequest & {
+type EmailOperationalAccountRequest = ConnectorEmailIdentityRequest & {
   readonly integrationAccountId: string;
 };
 
-export type EmailOperationalDispatchRequest =
-  EmailOperationalProposalRequest & {
-    readonly approvedVersion: number;
-    readonly approvedSnapshotDigest: string;
-  };
+type EmailOperationalDispatchRequest = EmailOperationalProposalRequest & {
+  readonly approvedVersion: number;
+  readonly approvedSnapshotDigest: string;
+};
 
-export function parseConnectorEmailIdentity(
+function parseConnectorEmailIdentity(
   value: unknown,
 ): ConnectorEmailIdentityRequest | null {
   const request = checked(whatsappIdentityRequestSchema, value);
@@ -399,7 +396,7 @@ export function parseEmailCheckRequest(value: unknown):
   };
 }
 
-export function parseEmailLimits(value: unknown): EmailIngressLimits | null {
+function parseEmailLimits(value: unknown): EmailIngressLimits | null {
   const limits = checked(emailLimitsSchema, value);
   return limits === null
     ? null

@@ -29,7 +29,7 @@ export type OfferPricePolicy =
 export const MAX_MOVEMENT_BPS = 10_000;
 const BPS_SCALE = 10_000;
 
-export type OfferPriceChangeRequest = Readonly<{
+type OfferPriceChangeRequest = Readonly<{
   offerId: string;
   /** The Offer revision the proposal was built against. */
   expectedOfferRevision: number;
@@ -39,7 +39,7 @@ export type OfferPriceChangeRequest = Readonly<{
   currency: string;
 }>;
 
-export type OfferPriceChangeRefusal = Readonly<{
+type OfferPriceChangeRefusal = Readonly<{
   code:
     | "offer_price_policy_disabled"
     | "offer_price_policy_stale"
@@ -67,7 +67,7 @@ export type OfferPriceChangeDecision = Readonly<{
   offerRevision: number;
 }>;
 
-export type OfferPriceChangeResult =
+type OfferPriceChangeResult =
   | Readonly<{ ok: true; decision: OfferPriceChangeDecision }>
   | Readonly<{ ok: false; refusal: OfferPriceChangeRefusal }>;
 
@@ -166,7 +166,7 @@ export function allowedPriceRange(
   };
 }
 
-export type OfferPricePolicyInvalid = Readonly<{
+type OfferPricePolicyInvalid = Readonly<{
   code: "offer_price_policy_invalid";
   field:
     | "referencePriceMinor"

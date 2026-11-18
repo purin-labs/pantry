@@ -1,15 +1,10 @@
 import type { Variant } from "@seams/type-utils";
 import { emit, held, type Draft } from "./engine-draft.ts";
 import { claimResource, releaseResource } from "./engine-resources.ts";
-import type { LocationId, TaskId } from "./identity.ts";
-import type { ResourceDefinition, TaskExecutor } from "./scenario.ts";
+import type { TaskId } from "./identity.ts";
+import type { TaskExecutor } from "./scenario.ts";
 import type { ResourceState, WorkerAssignment } from "./state.ts";
-import {
-  advance,
-  intervalContains,
-  type LogicalTime,
-  type TickDuration,
-} from "./time.ts";
+import { advance, intervalContains, type LogicalTime } from "./time.ts";
 import {
   activeWorkerRoutes,
   travelDurationFromRoutes,
@@ -23,14 +18,6 @@ export {
   validTravelRouteReplacement,
   validWorkerTravelReplacement,
 };
-
-export function travelDuration(
-  worker: Variant<ResourceDefinition, "worker">,
-  from: LocationId,
-  to: LocationId,
-): TickDuration | null {
-  return travelDurationFromRoutes(worker.travel, from, to);
-}
 
 /** Candidate order is policy. Travel distance never changes that order. */
 export function availableWorker(

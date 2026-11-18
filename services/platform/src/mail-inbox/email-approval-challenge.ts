@@ -47,7 +47,7 @@ export async function verifyEmailApprovalChallenge(
   );
 }
 
-export function emailApprovalChallengePayload(
+function emailApprovalChallengePayload(
   input: Readonly<{
     proposalId: string;
     version: number;
@@ -64,7 +64,7 @@ export function emailApprovalChallengePayload(
   });
 }
 
-export function emailApprovalKey(
+function emailApprovalKey(
   secret: string,
   usages: Array<"sign" | "verify">,
 ): Promise<CryptoKey> {
@@ -82,7 +82,7 @@ export function emailApprovalSecret(env: Env): string | null {
   return secret === undefined || secret.trim().length === 0 ? null : secret;
 }
 
-export function base64UrlBytes(bytes: Uint8Array): string {
+function base64UrlBytes(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) {
     binary += String.fromCharCode(byte);
@@ -93,7 +93,7 @@ export function base64UrlBytes(bytes: Uint8Array): string {
     .replaceAll("=", "");
 }
 
-export function decodeBase64UrlBytes(value: string): Uint8Array | null {
+function decodeBase64UrlBytes(value: string): Uint8Array | null {
   if (!/^[A-Za-z0-9_-]{1,512}$/u.test(value)) return null;
   try {
     const normalized = value.replaceAll("-", "+").replaceAll("_", "/");

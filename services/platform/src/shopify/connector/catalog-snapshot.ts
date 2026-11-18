@@ -75,7 +75,7 @@ export function parseInitialCatalogPage(input: {
   return { ok: true, value: { items, ...pageInfo.value } };
 }
 
-export function parseInitialCatalogProduct(input: {
+function parseInitialCatalogProduct(input: {
   readonly raw: unknown;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -214,7 +214,7 @@ export function parseInitialInventoryPage(input: {
   return { ok: true, value: { items, ...pageInfo.value } };
 }
 
-export function parseInitialInventoryItem(input: {
+function parseInitialInventoryItem(input: {
   readonly raw: unknown;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -251,7 +251,7 @@ export function parseInitialInventoryItem(input: {
   return { ok: true, value: levels };
 }
 
-export function parseInitialInventoryLevel(input: {
+function parseInitialInventoryLevel(input: {
   readonly raw: unknown;
   readonly inventoryItemId: string;
   readonly organisationId: OrganisationId;
@@ -358,7 +358,7 @@ export function parseInitialPublicationsPage(input: {
   return { ok: true, value: { items, ...pageInfo.value } };
 }
 
-export function parseInitialPublicationProduct(input: {
+function parseInitialPublicationProduct(input: {
   readonly raw: unknown;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -418,14 +418,14 @@ export function parseInitialPublicationProduct(input: {
   return { ok: true, value: items };
 }
 
-export type ShopifyPublicationVariant = {
+type ShopifyPublicationVariant = {
   readonly id: string;
   readonly sku: string;
   readonly price: string;
   readonly availableForSale: boolean;
 };
 
-export function parseInitialPublicationVariants(
+function parseInitialPublicationVariants(
   rawVariants: readonly unknown[],
 ): Result<readonly ShopifyPublicationVariant[], ShopifyInitialSyncError> {
   const variants: ShopifyPublicationVariant[] = [];
@@ -454,7 +454,7 @@ export function parseInitialPublicationVariants(
   return { ok: true, value: variants };
 }
 
-export function parseOnlineStorePublication(input: {
+function parseOnlineStorePublication(input: {
   readonly raw: unknown;
   readonly variants: readonly ShopifyPublicationVariant[];
   readonly currency: string;
@@ -554,7 +554,7 @@ export function parseOnlineStorePublication(input: {
   return { ok: true, value: [salesChannel, ...offers] };
 }
 
-export function createInitialShopifyOffer(input: {
+function createInitialShopifyOffer(input: {
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
   readonly observedAt: number;
@@ -605,7 +605,7 @@ export function createInitialShopifyResourceEnvelope(input: {
   };
 }
 
-export function publicationSyncInvalid(
+function publicationSyncInvalid(
   reason: string,
 ): Result<never, ShopifyInitialSyncError> {
   console.error("shopify.publication_snapshot_rejected", { reason });
@@ -673,7 +673,7 @@ export function parseInitialLocationsPage(input: {
   return { ok: true, value: { items, ...pageInfo.value } };
 }
 
-export function parseInitialLocation(input: {
+function parseInitialLocation(input: {
   readonly raw: unknown;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;

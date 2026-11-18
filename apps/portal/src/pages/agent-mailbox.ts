@@ -50,7 +50,7 @@ export const DEFAULT_MAILBOX_POLICY: Extract<
   maxAttachmentBytes: 5_242_880,
 };
 
-export type MailboxPolicyDraftParseResult =
+type MailboxPolicyDraftParseResult =
   | { readonly kind: "valid"; readonly policy: MailboxPolicyDraft }
   | { readonly kind: "invalid"; readonly message: string };
 
@@ -94,7 +94,7 @@ export function parseMailboxPolicyDraft(
  * before it is trusted; a limit is a policy boundary, not a suggestion.
  */
 
-export function readPolicyLimit(formData: FormData, name: string): number | null {
+function readPolicyLimit(formData: FormData, name: string): number | null {
   const raw = formData.get(name);
   if (typeof raw !== "string" || !/^[0-9]+$/u.test(raw.trim())) return null;
   const value = Number(raw.trim());
@@ -169,7 +169,7 @@ export function gmailMailboxStatus(
 }
 
 /** The pause reason in the few words that fit beside "Paused" on a chip. */
-export function gmailPauseReasonLabel(reason: MailboxPauseReasonView): string {
+function gmailPauseReasonLabel(reason: MailboxPauseReasonView): string {
   switch (reason.kind) {
     case "active_case_limit":
       return reason.observed === null
@@ -291,13 +291,13 @@ export function emailReplyLifecycleStatus(
  * renders inside that group as the follow-on step it always was.
  */
 
-export type MailboxAuthorizationNotice = {
+type MailboxAuthorizationNotice = {
   readonly tone: "info" | "warning" | "danger";
   readonly headline: string;
   readonly detail: string;
 };
 
-export const AUTHORIZATION_WARNING_MS = 48 * 60 * 60 * 1000;
+const AUTHORIZATION_WARNING_MS = 48 * 60 * 60 * 1000;
 
 /**
  * What to tell an operator about this mailbox's Gmail authorization.
@@ -359,7 +359,7 @@ export function mailboxAuthorizationNotice(
   };
 }
 
-export function formatRelativeDeadline(remainingMs: number): string {
+function formatRelativeDeadline(remainingMs: number): string {
   const hours = Math.floor(remainingMs / 3_600_000);
   if (hours < 1) return "within the hour";
   if (hours < 24) return `in ${hours} hour${hours === 1 ? "" : "s"}`;

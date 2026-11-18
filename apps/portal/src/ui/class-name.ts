@@ -1,6 +1,6 @@
 // A Base UI part takes a class name or a function of its state. withClass
 // puts the Portal class of a part in front of the class that a caller passes.
-export type ClassName<State> = string | ((state: State) => string | undefined);
+type ClassName<State> = string | ((state: State) => string | undefined);
 
 export function withClass<State>(
   base: string,

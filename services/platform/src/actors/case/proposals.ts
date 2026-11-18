@@ -532,7 +532,7 @@ export function waitForCommerceApproval(
   };
 }
 
-export function sameCommerceApprovalRequest(
+function sameCommerceApprovalRequest(
   left: WaitForCommerceApprovalRequest,
   right: WaitForCommerceApprovalRequest,
 ): boolean {
@@ -734,7 +734,7 @@ function endCommerceApprovalWait(
 }
 
 /** The Case state that a ledger entry shows for the wait on its action. */
-export function ledgerApprovalOutcome(
+function ledgerApprovalOutcome(
   entry: ActionLedgerEntry,
 ):
   | Readonly<{ kind: "waiting" }>
@@ -869,7 +869,7 @@ export function acceptCommerceOutcome(
   };
 }
 
-export function sameCommerceProposal(
+function sameCommerceProposal(
   left: CommerceCaseProposal,
   right: CommerceCaseProposal,
 ): boolean {

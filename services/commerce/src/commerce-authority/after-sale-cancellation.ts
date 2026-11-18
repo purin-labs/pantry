@@ -98,7 +98,7 @@ import {
   type RefundCeilings,
 } from "./order-changes.ts";
 
-export type AfterSaleMerchantRow = Readonly<{
+type AfterSaleMerchantRow = Readonly<{
   merchantId: string;
   organisationId: string;
   revision: number;
@@ -146,7 +146,7 @@ type RefundResolutionBase = Readonly<{
  * A refund that no payment provider makes: a stored-value payment returns
  * to its own account, and a refund to store credit goes to the customer.
  */
-export type StoredValueCreditTarget =
+type StoredValueCreditTarget =
   | Readonly<{ kind: "account"; accountId: string }>
   | Readonly<{ kind: "store_credit"; customerId: string; currency: string }>;
 
@@ -166,7 +166,7 @@ type CancellationPlanResult<Plan> =
   | Readonly<{ kind: "planned"; value: Plan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type AfterSaleCommandAuthorityOptions = Readonly<{
+type AfterSaleCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   paymentGateway: PaymentRefundGateway;
   now: () => string;
@@ -860,7 +860,7 @@ function refundReconciliationCommand(
   };
 }
 
-export function planCancellationReservation(
+function planCancellationReservation(
   database: CommerceDatabase,
   command: CancelCommerceOrderV1,
   resources: CommerceResourcesV1,
@@ -984,7 +984,7 @@ export function planCancellationReservation(
   };
 }
 
-export function planCancellationRefundRequest(
+function planCancellationRefundRequest(
   database: CommerceDatabase,
   command: CancelCommerceOrderV1,
   attempt: RefundAttempt,
@@ -1042,7 +1042,7 @@ export function planCancellationRefundRequest(
   };
 }
 
-export function planRefundReservation(
+function planRefundReservation(
   database: CommerceDatabase,
   command: RefundCommerceOrderV1,
   resources: CommerceResourcesV1,
@@ -1120,7 +1120,7 @@ export function planRefundReservation(
   };
 }
 
-export function planRefundRequest(
+function planRefundRequest(
   database: CommerceDatabase,
   command: RefundCommerceOrderV1,
   attempt: RefundAttempt,
@@ -1183,7 +1183,7 @@ export function planRefundRequest(
   };
 }
 
-export function planRefundResolution(
+function planRefundResolution(
   database: CommerceDatabase,
   command: RefundCommerceOrderV1,
   attempt: RefundAttempt,
@@ -1276,7 +1276,7 @@ export function planRefundResolution(
   }
 }
 
-export function planCancellationResolution(
+function planCancellationResolution(
   command: CancelCommerceOrderV1,
   attempt: RefundAttempt,
   providerResult: CommercePaymentRefundResultV1,

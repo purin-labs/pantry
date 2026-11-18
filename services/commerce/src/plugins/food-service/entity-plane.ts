@@ -16,7 +16,7 @@ export const FOOD_SERVICE_ENTITY_TYPES = [
   "preparation_station",
 ] as const;
 
-export type FoodServiceEntityType = (typeof FOOD_SERVICE_ENTITY_TYPES)[number];
+type FoodServiceEntityType = (typeof FOOD_SERVICE_ENTITY_TYPES)[number];
 
 /** Where an entity of a food-service type lives, for the entity plane. */
 export const FOOD_SERVICE_ENTITY_ROWS = {

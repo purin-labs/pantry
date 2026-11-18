@@ -37,7 +37,7 @@ const SUPPLIER_INVENTORY_ITEM_DEFINITION = parseRelationshipDefinition({
   revision: 1,
 });
 
-export const SUPPLIER_DIRECTORY = parseCommerceList({
+const SUPPLIER_DIRECTORY = parseCommerceList({
   listId: SUPPLIER_DIRECTORY_LIST_ID,
   entityTypeId: { origin: "custom", typeId: SUPPLIER_ENTITY_TYPE_ID },
   name: "Supplier Directory",
@@ -210,7 +210,7 @@ const REPLENISHMENT_QUEUE_VIEW = parseSavedCommerceView({
   revision: 1,
 });
 
-export const SUPPLY_COST_TERMS = parseCommerceList({
+const SUPPLY_COST_TERMS = parseCommerceList({
   listId: SUPPLY_COST_TERMS_LIST_ID,
   entityTypeId: { origin: "system", typeId: "inventory_item" },
   name: "Supply Cost Terms",

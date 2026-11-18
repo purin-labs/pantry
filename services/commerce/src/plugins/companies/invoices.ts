@@ -40,7 +40,7 @@ export type InvoiceCommitRequest = Readonly<{
   previousRevision: number;
 }>;
 
-export type InvoiceAuthorityOptions = Readonly<{
+type InvoiceAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => CompanyMerchantRow | undefined;
@@ -219,7 +219,7 @@ export class InvoiceAuthority {
   }
 }
 
-export function readInvoice(
+function readInvoice(
   database: CommerceDatabase,
   merchantId: string,
   invoiceId: string,

@@ -25,7 +25,7 @@ export const PDF_EXTRACTION_LIMITS = {
   minLegibleChars: 16,
 } as const;
 
-export type PdfExtractionFailure =
+type PdfExtractionFailure =
   | { readonly code: "not_a_pdf" }
   | { readonly code: "document_too_large" }
   | { readonly code: "no_extractable_text" }
@@ -373,7 +373,7 @@ function readHexString(
   return { value: characters.join(""), next: end + 1 };
 }
 
-export function normalizePdfText(value: string): string {
+function normalizePdfText(value: string): string {
   return value
     .replace(/ /gu, "")
     .replace(/[ \t]+/gu, " ")

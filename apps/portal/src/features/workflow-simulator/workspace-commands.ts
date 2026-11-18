@@ -17,12 +17,12 @@ import type { ProcedureRun } from "@seams/production-simulation/simulator/proced
 import { readScenario, type ScenarioRead } from "./scenario-api";
 import type { Variant } from "@seams/type-utils";
 
-export type WorkspaceCommandConnection = Readonly<{
+type WorkspaceCommandConnection = Readonly<{
   organisationId: string;
   mutate: CommerceMutationTransport;
 }>;
 
-export type ScenarioSaveResult =
+type ScenarioSaveResult =
   | Readonly<{
       kind: "verified";
       scenario: Variant<ScenarioRead, "ready">;
@@ -40,11 +40,11 @@ export type ScenarioSaveResult =
     }>
   | Readonly<{ kind: "failed-before-save"; message: string }>;
 
-export type ProcedureReadResult =
+type ProcedureReadResult =
   | Readonly<{ kind: "ready"; procedure: CompiledProcedure }>
   | Readonly<{ kind: "failed"; message: string }>;
 
-export type WorkspaceCommandDependencies = Readonly<{
+type WorkspaceCommandDependencies = Readonly<{
   fingerprint(revisionKey: string): Promise<string>;
   readProcedure(
     organisationId: string,
@@ -109,7 +109,7 @@ export async function saveScenarioCopy(
   );
 }
 
-export type ScenarioSaveOrigin =
+type ScenarioSaveOrigin =
   | Readonly<{ kind: "manual" }>
   | Readonly<{ kind: "agent_effect"; effectId: string }>;
 

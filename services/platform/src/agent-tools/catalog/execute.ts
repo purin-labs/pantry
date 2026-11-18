@@ -128,22 +128,20 @@ import {
   type WorkspaceQuery,
 } from "./types";
 
-export const MAX_CODE_MODE_OUTPUT_BYTES = 24 * 1024;
+const MAX_CODE_MODE_OUTPUT_BYTES = 24 * 1024;
 
-export const ENCODER = new TextEncoder();
-
-export const SHA256_PATTERN = /^[0-9a-f]{64}$/;
+const ENCODER = new TextEncoder();
 
 
-export const CAPABILITY_FAILURE_TEXT =
+const CAPABILITY_FAILURE_TEXT =
   "The capability could not complete this request. Authoritative data is unavailable; retry once without inferring a broader outage.";
 
-export class CommerceContextRequestError extends Error {}
+class CommerceContextRequestError extends Error {}
 
 /** A call that the run's tool-call budget refused: retrying cannot help. */
-export class CapabilityBudgetError extends Error {}
+class CapabilityBudgetError extends Error {}
 
-export const CAPABILITY_BUDGET_TEXT =
+const CAPABILITY_BUDGET_TEXT =
   "This conversation used its budget of tool calls, so this call did not run. Do not retry it or guess its result. Tell the person that the conversation reached its tool-call budget, and that an owner or admin can raise the budget under Access in the Portal.";
 
 /**
@@ -381,7 +379,7 @@ export type CatalogToolAuthority = Parameters<
  * cases. A missing handler fails first, then the arguments, then the
  * capability claim, so a refused call claims nothing.
  */
-export async function executeRegisteredTool(
+async function executeRegisteredTool(
   tool: RegisteredTool,
   authority: CatalogToolAuthority,
   execution: CatalogExecutionContext,
@@ -560,7 +558,7 @@ export async function executeDirectCatalogTool(
   }
 }
 
-export async function claimDirectCapability(
+async function claimDirectCapability(
   claimCapability: HarnessCapabilityClaim,
   callId: string,
   capability: HarnessCapabilityName,
@@ -578,7 +576,7 @@ export async function claimDirectCapability(
   return null;
 }
 
-export function failedToolOutput(detail: string): string {
+function failedToolOutput(detail: string): string {
   return JSON.stringify({
     output: boundedText(detail),
     success: false,
@@ -588,7 +586,7 @@ export function failedToolOutput(detail: string): string {
   });
 }
 
-export async function authorizedRead(
+async function authorizedRead(
   output: string,
   status: "succeeded" | "failed" = "succeeded",
 ): Promise<AuthorizedHarnessToolResult> {
@@ -601,7 +599,7 @@ export async function authorizedRead(
   };
 }
 
-export async function authorizedProviderEffect(
+async function authorizedProviderEffect(
   output: string,
   receiptId: string,
 ): Promise<AuthorizedHarnessToolResult> {
@@ -618,7 +616,7 @@ export async function authorizedProviderEffect(
   };
 }
 
-export async function authorizedSurfaceEffect(
+async function authorizedSurfaceEffect(
   output: string,
   receiptId: string,
   status: "succeeded" | "failed",
@@ -636,24 +634,7 @@ export async function authorizedSurfaceEffect(
   };
 }
 
-export async function authorizedCodeExecution(
-  output: string,
-  receiptId: string,
-): Promise<AuthorizedHarnessToolResult> {
-  const value = await inlineToolOutput(output);
-  return {
-    kind: "code_execution",
-    output: value,
-    authority: {
-      kind: "code_execution",
-      receiptId,
-      resultDigest: value.digest,
-    },
-    status: "succeeded",
-  };
-}
-
-export async function inlineToolOutput(
+async function inlineToolOutput(
   output: string,
 ): Promise<HarnessToolOutput> {
   return {
@@ -663,7 +644,7 @@ export async function inlineToolOutput(
   };
 }
 
-export function logicalToolOperationId(
+function logicalToolOperationId(
   execution: CatalogExecutionContext,
   callId: string,
 ): string {
@@ -673,7 +654,7 @@ export function logicalToolOperationId(
   ]);
 }
 
-export function parseEntityContextArgs(
+function parseEntityContextArgs(
   args: readonly unknown[],
 ): CommerceContextRequest {
   if (
@@ -740,7 +721,7 @@ function withRecordLifecycle(
   };
 }
 
-export function boundedOutput(value: unknown): string {
+function boundedOutput(value: unknown): string {
   let serialized: string;
   try {
     serialized = typeof value === "string" ? value : JSON.stringify(value);
@@ -750,7 +731,7 @@ export function boundedOutput(value: unknown): string {
   return boundedText(serialized ?? "null");
 }
 
-export function boundedText(value: string): string {
+function boundedText(value: string): string {
   const bytes = ENCODER.encode(value);
   if (bytes.byteLength <= MAX_CODE_MODE_OUTPUT_BYTES) {
     return value;
@@ -761,11 +742,7 @@ export function boundedText(value: string): string {
   return `${prefix}\n[output truncated from ${bytes.byteLength} bytes]`;
 }
 
-export function stringOrEmpty(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-export function logCapabilityFailure(
+function logCapabilityFailure(
   tool: HarnessToolDefinition["name"],
   callId: string,
   error: unknown,

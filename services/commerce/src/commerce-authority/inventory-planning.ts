@@ -20,7 +20,7 @@ import {
   readInventoryItem,
 } from "../inventory-persistence.ts";
 
-export type LotConsumptionPlanResult =
+type LotConsumptionPlanResult =
   | Readonly<{
       kind: "planned";
       allocation: Variant<
@@ -37,7 +37,7 @@ export function isAccountedPosition(
   return position.balance.kind === "accounted";
 }
 
-export type AccountedInventoryPosition = CommerceInventoryPositionV1 &
+type AccountedInventoryPosition = CommerceInventoryPositionV1 &
   Readonly<{
     balance: Variant<CommerceInventoryPositionV1["balance"], "accounted">;
   }>;
@@ -413,7 +413,7 @@ export function scaledAmount(
   return BigInt(quantity.amount) * 10n ** BigInt(scale - quantity.scale);
 }
 
-export function lotExpiredAt(
+function lotExpiredAt(
   lot: CommerceInventoryLotV1,
   occurredAt: string,
 ): boolean {

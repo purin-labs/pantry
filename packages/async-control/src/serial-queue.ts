@@ -1,18 +1,18 @@
-export type FailStopSerialQueue = {
+type FailStopSerialQueue = {
   readonly kind: "fail_stop";
   enqueue<TValue>(task: () => Promise<TValue>): Promise<TValue>;
   drain(): Promise<void>;
   close(): Promise<void>;
 };
 
-export type ContinueSerialQueue = {
+type ContinueSerialQueue = {
   readonly kind: "continue_after_failure";
   enqueue<TValue>(task: () => Promise<TValue>): Promise<TValue>;
   drain(): Promise<void>;
   close(): Promise<void>;
 };
 
-export type KeyedContinueSerialQueue<TKey> = {
+type KeyedContinueSerialQueue<TKey> = {
   readonly kind: "keyed_continue_after_failure";
   enqueue<TValue>(key: TKey, task: () => Promise<TValue>): Promise<TValue>;
   drain(): Promise<void>;

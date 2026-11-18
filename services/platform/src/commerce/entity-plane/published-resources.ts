@@ -34,12 +34,12 @@ import { commerceCanonicalResourceId } from "../provider";
 import type { Variant, VariantBy } from "@seams/type-utils";
 import { assertNever } from "@seams/std";
 
-export type PublishedResourceEnumeration = Variant<
+type PublishedResourceEnumeration = Variant<
   CommerceEntityPlanePublishedResourceMetadataResponse,
   "enumerated"
 >;
 
-export type PublishedResourceResolution = Variant<
+type PublishedResourceResolution = Variant<
   CommerceEntityPlanePublishedResourceMetadataResponse,
   "resolved"
 >;
@@ -59,13 +59,13 @@ export type PublishedResourceBoundaryError =
       readonly actual: number;
     }>;
 
-export type PublishedResourceClientConfig = Readonly<{
+type PublishedResourceClientConfig = Readonly<{
   readonly baseUrl: string;
   readonly serviceToken: CommerceCredential;
   readonly fetch: CommerceEntityPlaneFetch;
 }>;
 
-export type PublishedResourceClient = Pick<
+type PublishedResourceClient = Pick<
   CommerceEntityPlaneClient,
   "publishedResourceMetadata"
 >;
@@ -83,7 +83,7 @@ export function createPublishedResourceClient(
 type CommerceCommandTarget = Variant<AccessGrantTarget, "commerce_command">;
 type CommerceProviderTarget = Variant<AccessGrantTarget, "provider_resource">;
 
-export type PublishedCommerceTarget =
+type PublishedCommerceTarget =
   | Readonly<{
       kind: "list_entry";
       target: CommerceCommandTarget;

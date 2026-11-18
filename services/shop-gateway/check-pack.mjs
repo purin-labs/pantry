@@ -13,7 +13,7 @@ export const GATEWAY_TARGETS = [
 ];
 
 /** The targets that the packed install script cannot install. */
-export function missingGatewayBuilds(directory) {
+function missingGatewayBuilds(directory) {
   const script = join(directory, "install.sh");
   if (!existsSync(script)) return [...GATEWAY_TARGETS];
   const text = readFileSync(script, "utf8");

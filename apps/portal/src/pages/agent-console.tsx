@@ -57,7 +57,7 @@ import {
 import { assertNever } from "@seams/std";
 import type { AgentSkillRef } from "@seams/control-api";
 
-export type AgentsPageProps = {
+type AgentsPageProps = {
   readonly organisationId: string;
   readonly snapshot: AgentOperationsSnapshot;
   readonly submit: AgentOperationSubmitter;
@@ -906,7 +906,7 @@ function caseResultLabel(
   return "No results delivered yet";
 }
 
-export type OperationalAreasProps = Pick<
+type OperationalAreasProps = Pick<
   AgentsPageProps,
   "organisationId" | "snapshot" | "submit" | "mutation" | "canConfigure"
 >;

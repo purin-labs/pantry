@@ -101,11 +101,11 @@ export type ActivationReceipt = {
   readonly activatedAt: number;
 };
 
-export type ActivationStart =
+type ActivationStart =
   | { readonly kind: "run"; readonly context: ActivationContext }
   | { readonly kind: "completed"; readonly receipt: ActivationReceipt };
 
-export type ActivationError =
+type ActivationError =
   | {
       readonly code: "activation_readiness_stale";
       readonly detail: ActivationStaleDetail;
@@ -114,7 +114,7 @@ export type ActivationError =
   | { readonly code: "activation_attempt_corrupt" }
   | { readonly code: "activation_attempt_in_progress" };
 
-export type ActivationStaleDetail =
+type ActivationStaleDetail =
   | "readiness_assessment_missing"
   | "configuration_changed_since_assessment"
   | "client_configuration_stale"

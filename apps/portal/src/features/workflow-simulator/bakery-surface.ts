@@ -212,7 +212,7 @@ export type BakerySurfaceCommandOrigin =
 
 type SurfaceDigest = (value: string) => Promise<string>;
 
-export type BakeryWorkspaceRead = Readonly<{
+type BakeryWorkspaceRead = Readonly<{
   organisationId: string;
   read(path: string): Promise<unknown>;
   readAttachment(digest: string): BakeryExportFile;
@@ -484,7 +484,7 @@ export type PreparedBakerySurfaceCommand =
       proposal: BakerySurfaceEditProposalV1 | null;
     }>;
 
-export async function bakerySurfaceContext(
+async function bakerySurfaceContext(
   state: SimulatorState,
 ): Promise<BakerySurfaceContextV1> {
   const draft = await bakerySurfaceDraftReference(state);
@@ -2084,21 +2084,6 @@ function candidateWasAccepted(
         ? previous.workspace.production.data.plan
         : null)
   );
-}
-
-export async function applyBakerySurfaceCommand(
-  state: SimulatorState,
-  command: BakerySurfaceCommandV1,
-  digest: SurfaceDigest = sha256Hex,
-): Promise<BakerySurfaceCommandTransition> {
-  const prepared = await prepareBakerySurfaceCommand(state, command, digest);
-  if (prepared.kind === "rejected") return prepared;
-  return prepared.kind === "read" ||
-    prepared.kind === "saved_runs" ||
-    prepared.kind === "save_inspection" ||
-    prepared.kind === "scenario_inspection"
-    ? { kind: "applied", state }
-    : commitBakerySurfaceCommand(state, prepared, { kind: "local" });
 }
 
 export async function captureBakerySurface(

@@ -63,7 +63,7 @@ const MAIL_AREA = {
 /** The roles that turn a mailbox on. They also review its drafts. */
 const REVIEWER_ROLES = ["owner", "admin"] as const;
 
-export type MailboxSetupError = Readonly<{
+type MailboxSetupError = Readonly<{
   code:
     | "agent_mailbox_not_connected"
     | "mailbox_setup_agent_unavailable"

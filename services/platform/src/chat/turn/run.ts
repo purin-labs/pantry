@@ -112,7 +112,7 @@ import {
  * pauses with a permission request instead of failing; a resume runs the step
  * again under a new lease, so the denied completion is never delivered.
  */
-export class ConversationPermissionRequired extends Error {
+class ConversationPermissionRequired extends Error {
   constructor(
     readonly step: number,
     readonly permission: ChatPermissionRequest,
@@ -121,7 +121,7 @@ export class ConversationPermissionRequired extends Error {
   }
 }
 
-export const MAX_CONVERSATION_STEPS = 8;
+const MAX_CONVERSATION_STEPS = 8;
 
 export async function runConversation(
   controlSessionId: ControlSessionId,
@@ -759,7 +759,7 @@ export async function runConversation(
   throw new Error("chat_turn_unsettled");
 }
 
-export function traceConversationPreparation(
+function traceConversationPreparation(
   requestId: RequestId,
   scope: ConversationScope,
   phase: "authorization_and_setup",
@@ -774,12 +774,12 @@ export function traceConversationPreparation(
   });
 }
 
-export type PersistedConversationStep = {
+type PersistedConversationStep = {
   readonly conversation: Conversation;
   readonly revision: number;
 };
 
-export async function persistCompletedConversationStep(input: {
+async function persistCompletedConversationStep(input: {
   readonly placement: OrganisationExecutionScope;
   readonly env: Env;
   readonly scope: ConversationScope;
@@ -875,7 +875,7 @@ export async function conversationStreamIdentity(
     : { ok: false, error: derived.error.code };
 }
 
-export function conversationStepIdentity(
+function conversationStepIdentity(
   actorIdentity: string,
   lease: string,
   step: number,

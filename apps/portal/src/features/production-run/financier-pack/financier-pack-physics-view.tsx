@@ -79,10 +79,7 @@ const PHASE_INDEX: Readonly<Record<FinancierPackPhase, number>> = {
   failed: -1,
 };
 
-export class FinancierPackPhysicsView extends React.Component<
-  ViewProps,
-  ViewState
-> {
+class FinancierPackPhysicsView extends React.Component<ViewProps, ViewState> {
   state: ViewState = { error: null, camera: "station" };
   private readonly element = React.createRef<HTMLDivElement>();
   private readonly station = React.createRef<HTMLElement>();

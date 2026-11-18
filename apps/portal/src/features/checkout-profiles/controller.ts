@@ -52,7 +52,7 @@ export type SaveDraftCommand = Readonly<{
   draft: ProfileDraft;
 }>;
 
-export type CheckoutProfilesController = Readonly<{
+type CheckoutProfilesController = Readonly<{
   state: CheckoutProfilesState;
   context: CheckoutProfilesCommandContext;
   reload: () => void;

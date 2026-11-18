@@ -506,12 +506,12 @@ export function merchantDecisionMatchesAction(
   }
 }
 
-export function assertNeverDecision(value: never): false {
+function assertNeverDecision(value: never): false {
   void value;
   return false;
 }
 
-export function parseCommerceCaseProposal(
+function parseCommerceCaseProposal(
   value: unknown,
 ): CommerceCaseProposal | null {
   const envelope = checked(commerceCaseProposalSchema, value);
@@ -589,7 +589,7 @@ export function parseCommerceCaseProposal(
 
 // A merchant plugin lives in Pantry Commerce (Commerce); no source record
 // names its integration account, so the authority stands on its own.
-export function parsePluginCaseAuthority(
+function parsePluginCaseAuthority(
   value: unknown,
 ): CommerceCaseAuthority | null {
   const authority = checked(commerceSystemAuthoritySchema, value);
@@ -608,7 +608,7 @@ export function parsePluginCaseAuthority(
     : null;
 }
 
-export function parseCommerceCaseAuthority(
+function parseCommerceCaseAuthority(
   value: unknown,
   provenance: SourceProvenance,
 ): CommerceCaseAuthority | null {
@@ -640,7 +640,7 @@ export function parseCommerceCaseAuthority(
   };
 }
 
-export function parseCommerceProposalOrigin(
+function parseCommerceProposalOrigin(
   value: Record<string, unknown>,
 ): CommerceCaseProposal["origin"] | null {
   const origin = checked(commerceProposalOriginSchema, value);
@@ -682,7 +682,7 @@ export function parsePersistedCommerceProposalJson(
   }
 }
 
-export function parseCommerceEntityPlaneCaseProposal(
+function parseCommerceEntityPlaneCaseProposal(
   value: unknown,
 ): CommerceEntityPlaneCaseProposal | null {
   const envelope = checked(commerceEntityPlaneCaseProposalSchema, value);
@@ -746,7 +746,7 @@ export function parseAcceptDeliveryReceiptRequest(
   return receipt === null ? null : { outputId: request.outputId, receipt };
 }
 
-export type NoteRefusedEffectRequest = Readonly<{
+type NoteRefusedEffectRequest = Readonly<{
   requestId: string;
   organisationId: string;
   reason: CaseOutputDropReason;
@@ -815,7 +815,7 @@ export function parseAcceptCommerceOutcomeRequest(
       };
 }
 
-export function parseCommerceCaseOutcome(
+function parseCommerceCaseOutcome(
   value: unknown,
 ): AcceptCommerceOutcomeRequest["outcome"] | null {
   const outcome = checked(commerceCaseOutcomeSchema, value);
@@ -858,7 +858,7 @@ export function commerceOutcomeMatchesAction(
   }
 }
 
-export function assertNeverCommerceOutcome(value: never): false {
+function assertNeverCommerceOutcome(value: never): false {
   void value;
   return false;
 }

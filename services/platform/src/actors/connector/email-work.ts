@@ -122,7 +122,7 @@ export async function runEmailCaseContextDiscoveryWork(
   }
 }
 
-export async function ensureEmailCaseContextCollectionReceipts(
+async function ensureEmailCaseContextCollectionReceipts(
   input: Readonly<{
     scope: OrganisationExecutionScope;
     sql: SqlStorage;
@@ -153,7 +153,7 @@ export async function ensureEmailCaseContextCollectionReceipts(
   return { kind: "ready" };
 }
 
-export async function resolveEmailCaseContextCollectionAccess(
+async function resolveEmailCaseContextCollectionAccess(
   input: Readonly<{
     env: Env;
     sql: SqlStorage;
@@ -319,8 +319,4 @@ export async function projectOperationalEmailRecord(
     return invalid("connector_placement_conflict");
   settleOperationalEmailProjection(sql, record);
   return { ok: true, value: null };
-}
-
-export function integer(value: unknown): value is number {
-  return Number.isSafeInteger(value) && Number(value) >= 0;
 }

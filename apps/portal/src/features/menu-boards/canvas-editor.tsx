@@ -914,7 +914,7 @@ function stackable(elements: readonly MenuBoardElement[], selected: ReadonlySet<
  * their bounds, its gap the mean space between them, and each keeps its
  * size, in its order along the stack's direction.
  */
-export function stackFor(
+function stackFor(
   members: readonly MenuBoardElement[],
   rects: ReadonlyMap<string, MenuBoardRect>,
   direction: "vertical" | "horizontal",

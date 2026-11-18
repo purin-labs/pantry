@@ -166,7 +166,7 @@ function priceDetail(
 }
 
 /** "¥600", or "¥500 (was ¥600)" for a deal. */
-export function menuPriceText(side: MenuPriceSide): string {
+function menuPriceText(side: MenuPriceSide): string {
   const price = formatMoney(side.price.amountMinor, side.price.currency);
   return side.compareAtPrice === null
     ? price
@@ -276,7 +276,7 @@ function slackTime(at: number): string {
 }
 
 /** The controls under a card's text. */
-export type CommerceCardControls =
+type CommerceCardControls =
   | Readonly<{ kind: "decide"; nonce: string; portalUrl: string | null }>
   | Readonly<{ kind: "check_again"; nonce: string; portalUrl: string | null }>
   | Readonly<{ kind: "details"; label: string; portalUrl: string | null }>;

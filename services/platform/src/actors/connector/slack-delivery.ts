@@ -375,7 +375,7 @@ export async function deliverSlackOutput(
  * otherwise. A read that fails leaves the buttons out, and the card's text
  * still says where to decide.
  */
-export async function commerceCardDeliveryBlocks(
+async function commerceCardDeliveryBlocks(
   env: Env,
   scope: OrganisationExecutionScope,
   organisationId: OrganisationId,
@@ -420,7 +420,7 @@ export async function commerceCardDeliveryBlocks(
   });
 }
 
-export async function commerceCardPortalUrl(
+async function commerceCardPortalUrl(
   env: Env,
   scope: OrganisationExecutionScope,
   organisationId: OrganisationId,
@@ -440,7 +440,7 @@ export async function commerceCardPortalUrl(
 }
 
 /** The blocks of a permission card; null for every other delivery. */
-export async function permissionCardDeliveryBlocks(
+async function permissionCardDeliveryBlocks(
   env: Env,
   scope: OrganisationExecutionScope,
   organisationId: OrganisationId,
@@ -466,7 +466,7 @@ export async function permissionCardDeliveryBlocks(
 }
 
 /** The blocks of a held card or a budget card; null for other deliveries. */
-export async function noticeCardDeliveryBlocks(
+async function noticeCardDeliveryBlocks(
   env: Env,
   scope: OrganisationExecutionScope,
   organisationId: OrganisationId,
@@ -502,7 +502,7 @@ export async function noticeCardDeliveryBlocks(
   );
 }
 
-export async function deviceAlertDeliveryBlocks(
+async function deviceAlertDeliveryBlocks(
   env: Env,
   scope: OrganisationExecutionScope,
   organisationId: OrganisationId,
@@ -526,10 +526,7 @@ export async function deviceAlertDeliveryBlocks(
 }
 
 /** The message of the notice that this delivery updates, if any. */
-export function cardMessageTs(
-  sql: SqlStorage,
-  deliveryId: string,
-): string | null {
+function cardMessageTs(sql: SqlStorage, deliveryId: string): string | null {
   const nonce = commerceOutcomeNonce(deliveryId);
   const requestId = permissionDecisionRequestId(deliveryId);
   const noticeDeliveryId =
@@ -554,7 +551,7 @@ export function cardMessageTs(
  * Updates a commerce card. Null when the card is gone, for example when a
  * person deleted it, so that the outcome is posted as a new message.
  */
-export async function updateCommerceCard(
+async function updateCommerceCard(
   token: string,
   channelId: string,
   ts: string,
@@ -577,7 +574,7 @@ export async function updateCommerceCard(
     : response;
 }
 
-export function slackPostMessageBody(
+function slackPostMessageBody(
   address: Variant<ConnectorDelivery["address"], "slack" | "slack_channel">,
   channelId: string,
   textValue: string,
@@ -607,7 +604,7 @@ export function slackPostMessageBody(
   }
 }
 
-export async function parseSlackResponse(
+async function parseSlackResponse(
   response: Response,
 ): Promise<SlackDeliveryResponse> {
   let value: unknown;
@@ -632,7 +629,7 @@ export async function parseSlackResponse(
  * post: an outcome that may have applied can be posted again, unlike an
  * append to a stream.
  */
-export function retryableSlackError(reason: string): boolean {
+function retryableSlackError(reason: string): boolean {
   return (
     isAmbiguousSlackOutcome(reason) ||
     reason === "ratelimited" ||

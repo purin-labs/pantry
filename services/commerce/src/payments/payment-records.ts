@@ -28,7 +28,7 @@ type PaymentDisputeRow = Readonly<{
   disputeJson: string;
 }>;
 
-export type PaymentDisputeLifecycleAdvanceValidation =
+type PaymentDisputeLifecycleAdvanceValidation =
   | Readonly<{ kind: "accepted" }>
   | Readonly<{ kind: "terminal" }>
   | Readonly<{ kind: "timestamp_not_forward" }>;
@@ -141,7 +141,7 @@ export function readRefundCommand(
     : (JSON.parse(row.commandJson) as unknown);
 }
 
-export type PendingRefund = Readonly<{
+type PendingRefund = Readonly<{
   merchantId: string;
   refundAttemptId: string;
   reconcileAfter: string;

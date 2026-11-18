@@ -39,11 +39,11 @@ import type { CommerceSystemView, Membership, OperatorOrganisationCase, Organisa
 import type { PortalOrganisation, PortalState, Provider, SessionSnapshot } from "./portal-types";
 import { parseCommerceSystemIdentity, parseCommerceSystemResponse, parseOperatorOrganisationCase, parseOrganisationSnapshot, parseProviderResourcePage, parseSlackRoutingConnection, parseSupportDiagnostics, parseSupportRole } from "@seams/control-api/portal/portal-reads";
 
-export type ProviderStartResult = {
+type ProviderStartResult = {
   readonly authorizationUrl: string;
 };
 
-export type ConditionalOrganisationSnapshot =
+type ConditionalOrganisationSnapshot =
   | { readonly kind: "unchanged"; readonly etag: string }
   | {
       readonly kind: "changed";
@@ -276,7 +276,7 @@ export async function fetchSlackRouting(
   return raw.connections.map(parseSlackRoutingConnection);
 }
 
-export async function loadSlackWorkspaceCatalog(
+async function loadSlackWorkspaceCatalog(
   organisationId: string,
   account: IntegrationAccount,
 ): Promise<SlackWorkspaceCatalog> {
@@ -295,7 +295,7 @@ export async function loadSlackWorkspaceCatalog(
   }
 }
 
-export async function collectSlackDestinationPages(
+async function collectSlackDestinationPages(
   organisationId: string,
   account: IntegrationAccount,
 ): Promise<readonly ProviderResource[]> {
@@ -319,7 +319,7 @@ export async function collectSlackDestinationPages(
   throw new Error("Provider destination discovery exceeded its page limit.");
 }
 
-export function isActiveSlackAccount(account: IntegrationAccount): boolean {
+function isActiveSlackAccount(account: IntegrationAccount): boolean {
   return account.provider === "slack" && account.lifecycle.kind === "active";
 }
 
@@ -411,11 +411,11 @@ export async function deleteControlOrganisation(
   );
 }
 
-export function organisationControlPath(organisationId: string): string {
+function organisationControlPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}`;
 }
 
-export function requireOrganisationMutationSuccess(raw: unknown): void {
+function requireOrganisationMutationSuccess(raw: unknown): void {
   if (!isRecord(raw) || raw.kind !== "success")
     throw new Error(readApiError(raw));
 }
@@ -535,11 +535,11 @@ export async function publishExportCoordination(
   }
 }
 
-export type PantryCommerceDemoRequest = Readonly<{
+type PantryCommerceDemoRequest = Readonly<{
   readonly profile: "cafe_patisserie";
 }>;
 
-export function createPantryCommerceDemoRequest(): PantryCommerceDemoRequest {
+function createPantryCommerceDemoRequest(): PantryCommerceDemoRequest {
   return { profile: "cafe_patisserie" };
 }
 
@@ -665,4 +665,4 @@ export async function emitOnboardingStageViewed(
   ).catch(ignoreFailure);
 }
 
-export function ignoreFailure(): void {}
+function ignoreFailure(): void {}

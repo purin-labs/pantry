@@ -19,10 +19,10 @@ import type { MenuBoardElementPlacement } from "@seams/menu-board-crdt";
  * a fixed layout and the canvas. All values are board units.
  */
 
-export const SNAP_DISTANCE = 8;
-export const GRID = 8;
+const SNAP_DISTANCE = 8;
+const GRID = 8;
 
-export type Size = Readonly<{ width: number; height: number }>;
+type Size = Readonly<{ width: number; height: number }>;
 
 /** A guide line that a snap used: vertical at x, or horizontal at y. */
 export type Guide = Readonly<{ axis: "x" | "y"; at: number }>;
@@ -31,7 +31,7 @@ export type Handle = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 
 export const HANDLES: readonly Handle[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];
 
-export function canvasPlacement(element: MenuBoardElement): MenuBoardCanvasPlacement | null {
+function canvasPlacement(element: MenuBoardElement): MenuBoardCanvasPlacement | null {
   return element.placement.frameId === "canvas" ? element.placement : null;
 }
 

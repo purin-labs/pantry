@@ -589,7 +589,7 @@ type RecoverableSettlementProjection =
       readonly receiptId: string;
     };
 
-export type CodeModeWorkspaceCommitRecord =
+type CodeModeWorkspaceCommitRecord =
   | { readonly kind: "workspace_committed" }
   | { readonly kind: "already_settled" };
 
@@ -598,7 +598,7 @@ export type CodeModeSettlementStorage = ActorTransactionStorage & {
   setAlarm(scheduledTime: number | Date): Promise<void>;
 };
 
-export type CodeModeSettlementError =
+type CodeModeSettlementError =
   | { readonly code: "code_mode_settlement_invalid" }
   | {
       readonly code: "code_mode_settlement_indeterminate";

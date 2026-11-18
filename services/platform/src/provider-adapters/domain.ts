@@ -174,7 +174,7 @@ export type ProviderOnboardingAdapter<P extends ActiveIntegrationProvider> = {
   ) => boolean;
 };
 
-export type ProviderConnectionFamilyByProvider = {
+type ProviderConnectionFamilyByProvider = {
   readonly airtable: {
     readonly kind: "oauth_connection";
     readonly pkce: "required";
@@ -306,7 +306,7 @@ export type ProviderObservationRequest = {
   readonly fetcher: typeof fetch;
 };
 
-export function retryableProviderFailure(status: number): boolean {
+function retryableProviderFailure(status: number): boolean {
   return status === 408 || status === 425 || status === 429 || status >= 500;
 }
 

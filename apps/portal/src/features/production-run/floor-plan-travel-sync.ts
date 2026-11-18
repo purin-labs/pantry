@@ -27,7 +27,7 @@ import {
 } from "./floor-plan-shift-travel";
 import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
 
-export type FloorPlanTravelSyncHooks = Readonly<{
+type FloorPlanTravelSyncHooks = Readonly<{
   isMounted: () => boolean;
   isBeforeStart: () => boolean;
   onDirtyBeforeStart: () => void;
@@ -35,23 +35,23 @@ export type FloorPlanTravelSyncHooks = Readonly<{
   onFlushSettled: () => void;
 }>;
 
-export type FloorPlanTravelSyncOptions = Readonly<{
+type FloorPlanTravelSyncOptions = Readonly<{
   forceFirstWorker: boolean;
   expectedControlRevision?: number;
   label?: string;
 }>;
 
-export type FloorPlanTravelSyncResult = Readonly<{
+type FloorPlanTravelSyncResult = Readonly<{
   view: HostView;
   notice: string;
 }>;
 
-export type EquipmentPlacementControl = Extract<
+type EquipmentPlacementControl = Extract<
   BakeryProductionControl,
   { kind: "move-equipment" | "rotate-equipment" }
 >;
 
-export type EquipmentPlacementOutcome =
+type EquipmentPlacementOutcome =
   | Readonly<{ kind: "blocked"; notice: string }>
   | Readonly<{ kind: "placed"; label: string }>;
 

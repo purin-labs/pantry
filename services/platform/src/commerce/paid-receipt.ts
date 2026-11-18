@@ -226,7 +226,7 @@ export async function runScheduledPaidReceiptDelivery(
 }
 
 /** Tries the oldest due receipts of one Organisation again, up to one page. */
-export async function deliverDuePaidReceipts(
+async function deliverDuePaidReceipts(
   input: Readonly<{
     env: Env;
     scope: OrganisationExecutionScope;

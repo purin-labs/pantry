@@ -3,7 +3,7 @@ import { utf8ByteLength } from "@seams/std";
 
 import type { CommerceCursor } from "./query-pagination.ts";
 
-export const MAX_COMMERCE_CURSOR_LENGTH = 16 * 1024;
+const MAX_COMMERCE_CURSOR_LENGTH = 16 * 1024;
 
 /** Decode the transport only. The owning payload parser must admit the bytes. */
 export function decodeCommerceCursorBytes(

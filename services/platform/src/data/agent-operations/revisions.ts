@@ -7,7 +7,7 @@ import type {
 import { integer, positive, text } from "./input";
 import { jsonSkillRefs, jsonStrings } from "./rows";
 
-export const REVISION_HISTORY_LIMIT = 50;
+const REVISION_HISTORY_LIMIT = 50;
 
 /**
  * Newest-first revision history for one agent definition (plan 30 R6). At

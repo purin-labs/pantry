@@ -16,7 +16,7 @@ import {
   type CustomConnectorRevisionRecord,
 } from "./revisions";
 
-export type CustomConnectorLifecycleError = CustomConnectorRevisionError
+type CustomConnectorLifecycleError = CustomConnectorRevisionError
   | { readonly code: "custom_connector_lifecycle_conflict" }
   | { readonly code: "custom_connector_cleanup_required" }
   | { readonly code: "custom_connector_persistence_corrupt" };

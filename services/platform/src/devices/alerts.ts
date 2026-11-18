@@ -26,7 +26,7 @@ import {
  * receipt does.
  */
 
-export type DeviceAlertKind =
+type DeviceAlertKind =
   | "gateway_offline"
   | "task_connection_lost"
   | "task_device_fault"

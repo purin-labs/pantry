@@ -19,7 +19,7 @@ import {
 import type { Variant } from "@seams/type-utils";
 import { isRecord } from "@seams/std";
 
-export type SessionTurnStreamState =
+type SessionTurnStreamState =
   | {
       kind: "running";
       turnId: string;
@@ -57,7 +57,7 @@ export type SessionTurnStreamState =
       updatedAt: number;
     };
 
-export type SessionTurnReplay = {
+type SessionTurnReplay = {
   state: SessionTurnStreamState;
   envelopes: readonly AgentEventEnvelope[];
   caughtUp: boolean;

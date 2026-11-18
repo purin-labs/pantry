@@ -58,7 +58,7 @@ export type WhatsAppPanelActions = {
   readonly resume: (integrationAccountId: string) => Promise<void>;
 };
 
-export type WhatsAppInferenceSelection =
+type WhatsAppInferenceSelection =
   | { readonly kind: "claude_oauth" }
   | { readonly kind: "codex_subscription" }
   | { readonly kind: "satyr_platform" }
@@ -67,7 +67,7 @@ export type WhatsAppInferenceSelection =
 
 export type WhatsAppConnectionActionState = ProviderConnectionState;
 
-export type WhatsAppPanelProps = {
+type WhatsAppPanelProps = {
   readonly surface: WhatsAppSurface | undefined;
   readonly installations: readonly WhatsAppInstallationOption[] | undefined;
   readonly inferenceSelection: WhatsAppInferenceSelection;
@@ -309,7 +309,7 @@ export function whatsappAttemptFailureCopy(
  * boundary rather than a marketing retention label, and it names the
  * inference provider the organisation selected.
  */
-export function WhatsAppProcessingDisclosure(props: {
+function WhatsAppProcessingDisclosure(props: {
   readonly inferenceProvider: string;
 }): React.ReactNode {
   return (

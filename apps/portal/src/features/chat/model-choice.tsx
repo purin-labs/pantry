@@ -43,7 +43,7 @@ export function selectedEffortFromState(
   return selectedEffortFromData(data);
 }
 
-export function selectedEffortFromModel(
+function selectedEffortFromModel(
   data: ChatPageData,
   model: string,
 ): ChatEffort {

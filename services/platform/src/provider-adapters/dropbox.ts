@@ -21,12 +21,12 @@ export const DROPBOX_REQUIRED_SCOPES = [
   "files.content.read",
 ] as const;
 
-export type DropboxProtocolConfiguration = Readonly<{
+type DropboxProtocolConfiguration = Readonly<{
   readonly clientId: string;
   readonly clientSecret: string;
 }>;
 
-export type DropboxOAuthTokens = Readonly<{
+type DropboxOAuthTokens = Readonly<{
   readonly accessToken: string;
   readonly refreshToken: string;
   readonly expiresInSeconds: number;
@@ -34,7 +34,7 @@ export type DropboxOAuthTokens = Readonly<{
   readonly scopes: readonly string[];
 }>;
 
-export type DropboxAccountIdentity = Readonly<{
+type DropboxAccountIdentity = Readonly<{
   readonly accountId: string;
   readonly email: string;
   readonly displayName: string;
@@ -63,14 +63,14 @@ export type DropboxFolderMetadata = Readonly<{
 
 export type DropboxListEntry = DropboxFileMetadata | DropboxFolderMetadata;
 
-export type DropboxFolderPage = Readonly<{
+type DropboxFolderPage = Readonly<{
   readonly entries: readonly DropboxListEntry[];
   readonly changeCount: number;
   readonly cursor: string;
   readonly hasMore: boolean;
 }>;
 
-export type DropboxBoundedContent = Readonly<{
+type DropboxBoundedContent = Readonly<{
   readonly bytes: Uint8Array;
   readonly mediaType: string;
   readonly metadata: DropboxFileMetadata;

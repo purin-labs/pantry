@@ -123,7 +123,7 @@ export async function resolveCueAutomation(
  * definition does not already carry. The definition wins on conflict, because
  * its revision is the immutable record of what the agent was published to run.
  */
-export async function resolveAutomationSkillRefs(
+async function resolveAutomationSkillRefs(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   areaId: string,
@@ -154,7 +154,7 @@ export async function resolveAutomationSkillRefs(
   return merged;
 }
 
-export async function cueBindingMatchesEntityPlane(input: {
+async function cueBindingMatchesEntityPlane(input: {
   readonly db: OrganisationDatabase;
   readonly organisationId: OrganisationId;
   readonly scopeIds: readonly string[];
@@ -302,7 +302,7 @@ export function matchesEntityPlaneScope(
   }
 }
 
-export function savedSelectorMatchesEntityPlane(
+function savedSelectorMatchesEntityPlane(
   selector: Variant<AgentResponsibilityScope, "saved_selector">["selector"],
   observation: CommerceEntityPlaneCueEvent["payload"]["observation"],
 ): boolean {
@@ -363,7 +363,7 @@ export function savedSelectorMatchesEntityPlane(
   }
 }
 
-export function savedSelectorMatchesEntityType(
+function savedSelectorMatchesEntityType(
   typeId: Variant<AgentResponsibilityScope, "entity_type">["entityTypeId"],
   observation: CommerceEntityPlaneCueEvent["payload"]["observation"],
 ): boolean {

@@ -8,12 +8,6 @@ export function configuredValue(raw: string | undefined): string | null {
   return value.length === 0 ? null : value;
 }
 
-export function requiredConfiguration(raw: string | undefined): string {
-  const value = configuredValue(raw);
-  if (value === null) throw new Error("provider configuration missing");
-  return value;
-}
-
 export function exactScopeIsGranted(
   requiredScope: string,
   grantedScopes: ReadonlySet<string>,

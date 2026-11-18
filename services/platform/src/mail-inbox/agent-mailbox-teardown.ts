@@ -5,7 +5,7 @@ import { resolveEmailSenderAccount } from "../data/email-operational";
 import type { IntegrationAccountId } from "../ids";
 import { agentMailboxConnector } from "./agent-mailbox-connector";
 
-export type AgentMailboxTeardown =
+type AgentMailboxTeardown =
   | { readonly kind: "not_a_mailbox" }
   | { readonly kind: "connector_unavailable" }
   | {

@@ -38,7 +38,7 @@ import {
 } from "./agent-console-shared";
 import type { AgentSkillRef, ScheduleWeekday } from "@seams/control-api";
 
-export type AgentDetailProps = {
+type AgentDetailProps = {
   readonly snapshot: AgentOperationsSnapshot;
   readonly definition: AgentDefinition;
   readonly submit: AgentOperationSubmitter;

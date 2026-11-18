@@ -33,7 +33,7 @@ const ACTION_LINK = /[?&]commerceAction=([A-Za-z0-9_-]{1,128})/gu;
 const APPLY_AFTER_SIGN_IN_KEY = "satyr:commerce-apply-after-approval";
 
 /** The actions that an answer links to, each once, in order. */
-export function linkedCommerceActions(text: string): readonly string[] {
+function linkedCommerceActions(text: string): readonly string[] {
   return [...new Set([...text.matchAll(ACTION_LINK)].map((match) => match[1] ?? ""))].filter(
     (nonce) => nonce.length > 0,
   );

@@ -43,10 +43,10 @@ import {
 } from "@seams/production-simulation/simulator/selection";
 import { downloadBakeryFile } from "../file-download";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
-import {
-  type SimulatorConnection,
-  type SimulatorShift,
-  type WorkflowInputView,
+import type {
+  SimulatorConnection,
+  SimulatorShift,
+  WorkflowInputView,
 } from "../simulator-state";
 import { DockHeader, SegmentedControl, taskStatusLabel } from "./shared";
 import { CompleteRecipeTaskCatalog } from "../complete-recipe-task-catalog";
@@ -807,14 +807,6 @@ export function InputsDock(props: InputsProps): React.ReactNode {
       <InputsForm {...props} />
     </section>
   );
-}
-
-export function WorkflowStep(
-  props: WorkflowStepContext & {
-    readonly item: (typeof financierOperations)[number];
-  },
-): React.ReactNode {
-  return renderWorkflowStep(props, props.item);
 }
 
 function VitrineStockSummary(props: WorkflowProps): React.ReactNode {

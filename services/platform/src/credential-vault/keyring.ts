@@ -22,12 +22,12 @@ export type VaultKeyRing = {
   readonly readable: readonly [VaultRootBinding, ...VaultRootBinding[]];
 };
 
-export type VaultKeyRingCandidate = {
+type VaultKeyRingCandidate = {
   readonly activeVersion: unknown;
   readonly bindings: readonly VaultRootBindingCandidate[];
 };
 
-export type VaultRootBindingCandidate = {
+type VaultRootBindingCandidate = {
   readonly version: unknown;
   readonly root: unknown;
 };
@@ -53,7 +53,7 @@ export type VaultKeyRingError =
     }
   | { readonly code: "vault_root_invalid"; readonly version: VaultKeyVersion };
 
-export type VaultRootSelectionError =
+type VaultRootSelectionError =
   | { readonly code: "vault_key_version_invalid" }
   | {
       readonly code: "vault_root_version_unavailable";

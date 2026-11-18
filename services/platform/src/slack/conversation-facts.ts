@@ -30,7 +30,7 @@ const MEMBER_PAGES = 5;
  * channel, which needs no list, and for a conversation whose members Pantry
  * could not read.
  */
-export type SlackConversationFact = Readonly<{
+type SlackConversationFact = Readonly<{
   isPrivate: boolean;
   reachesOutside: boolean;
   memberIds: readonly string[] | null;

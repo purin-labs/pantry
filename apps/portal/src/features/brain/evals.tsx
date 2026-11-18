@@ -68,24 +68,24 @@ import { openCandidate } from "./model";
 import type { SeenRecords } from "./seen";
 import { SideDrawer } from "../../ui";
 
-export type EvalsContent =
+type EvalsContent =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>
   | Readonly<{ kind: "ready"; evals: readonly EvalView[] }>;
 
-export type EvalRunsContent =
+type EvalRunsContent =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>
   | Readonly<{ kind: "ready"; runs: readonly EvalRunView[] }>;
 
 /** What a person chose for the next run of one Eval. */
-export type EvalRunChoice = Readonly<{
+type EvalRunChoice = Readonly<{
   routes: readonly EvalRoute[];
   /** The Memory whose proposed version is compared, or "" for none. */
   candidateMemoryId: string;
 }>;
 
-export type EvalFeedback = Readonly<{
+type EvalFeedback = Readonly<{
   tone: "success" | "warning";
   message: string;
 }>;
@@ -93,7 +93,7 @@ export type EvalFeedback = Readonly<{
 type EvalDecision = "accept" | "reject" | "revoke";
 
 /** The scenarios that a person edits, for one Eval. */
-export type EvalEditing = Readonly<{
+type EvalEditing = Readonly<{
   evalId: string;
   drafts: readonly ScenarioDraft[];
   /** What a person must correct before the scenarios can be saved. */
@@ -101,7 +101,7 @@ export type EvalEditing = Readonly<{
 }>;
 
 /** Where the Evals view leads, and what the address selects in it. */
-export type EvalsLinks = Readonly<{
+type EvalsLinks = Readonly<{
   /** The Eval of the address. It can name one this person cannot read. */
   selectedEvalId: string | null;
   evalHref: (evalId: string | null) => string;
@@ -113,9 +113,9 @@ export type EvalsLinks = Readonly<{
   onSeen: (key: string, changedAt: number | null) => void;
 }>;
 
-export const EVAL_DETAIL_TITLE_ID = "brain-eval-detail-title";
+const EVAL_DETAIL_TITLE_ID = "brain-eval-detail-title";
 
-export type EvalsPanelViewProps = EvalsLinks &
+type EvalsPanelViewProps = EvalsLinks &
   Readonly<{
     editing: EvalEditing | null;
     senders: Readonly<Record<string, SenderChoices>>;
@@ -506,7 +506,7 @@ function candidateOf(
 }
 
 /** The panel without its data lifecycle, for previews. */
-export function EvalsPanelView(props: EvalsPanelViewProps): React.ReactNode {
+function EvalsPanelView(props: EvalsPanelViewProps): React.ReactNode {
   if (props.content.kind === "loading")
     return <PageSkeleton label="Loading evals" />;
   if (props.content.kind === "failed")

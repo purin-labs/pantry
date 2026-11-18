@@ -53,7 +53,7 @@ export type OperationalCaseContextDiscoverySourceRequest = Readonly<{
   candidates: readonly OperationalCaseContextDiscoveryEvidence[];
 }>;
 
-export type OperationalCaseContextDiscoveryResult = Readonly<{
+type OperationalCaseContextDiscoveryResult = Readonly<{
   receipt: TypeSafeEvaluationReceipt;
   decisions: readonly JevRelationshipDecision[];
   recorded: readonly Readonly<{

@@ -122,7 +122,7 @@ export function admitSteering(
   };
 }
 
-export type QueuedSteering =
+type QueuedSteering =
   | {
       readonly ok: true;
       /** "current": the message already left the queue, and nothing changes. */
@@ -334,10 +334,10 @@ export async function steerRunningConversation(input: {
   throw new Error("chat_steering_save_failed");
 }
 
-export const STEERING_SAVE_ATTEMPTS = 5;
+const STEERING_SAVE_ATTEMPTS = 5;
 
 /** A Session that cannot answer leaves the message to the cancel path. */
-export async function steerSession(
+async function steerSession(
   actor: Pick<SessionActor, "steerCanonicalEmbeddedHarnessTurn">,
   input: Parameters<SessionActor["steerCanonicalEmbeddedHarnessTurn"]>[0],
 ): Promise<
@@ -351,7 +351,7 @@ export async function steerSession(
   }
 }
 
-export type SessionActor = DurableObjectStub<SessionDO>;
+type SessionActor = DurableObjectStub<SessionDO>;
 
 /**
  * A message joins the running turn natively when it adds only text: it is
@@ -360,7 +360,7 @@ export type SessionActor = DurableObjectStub<SessionDO>;
  * carry none of them or the same ones; the Portal sends its browser binding
  * with every message.
  */
-export function steersNatively(
+function steersNatively(
   conversation: Conversation,
   command: Variant<ChatCommand, "steer" | "next">,
 ): boolean {
@@ -397,7 +397,7 @@ export function requestWasSteered(
   );
 }
 
-export function isUserChatMessage(
+function isUserChatMessage(
   message: ChatMessage,
 ): message is Variant<ChatMessage, "user"> {
   return message.kind === "user";
@@ -407,7 +407,7 @@ export function isUserChatMessage(
  * The message belongs to the request of the turn that it joined: that
  * request's history holds it. Its own request id is the event's id.
  */
-export function withSteeringMessage(
+function withSteeringMessage(
   conversation: Conversation,
   command: Variant<ChatCommand, "steer" | "next">,
   steeredRequestId: string,

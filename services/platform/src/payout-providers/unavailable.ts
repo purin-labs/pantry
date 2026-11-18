@@ -1,7 +1,7 @@
 import type { PayoutRecoveryProvider } from "../payouts/recovery";
 
 /** No provider contract is certified. This adapter supplies no delivery evidence. */
-export class UnavailableSupplierPayoutProvider implements PayoutRecoveryProvider {
+class UnavailableSupplierPayoutProvider implements PayoutRecoveryProvider {
   readonly rail: string;
 
   constructor(rail: string) {

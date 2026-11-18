@@ -1,7 +1,7 @@
 export type ExistingCustomConnectorSetupKind =
   "rotate_account" | "upgrade_account" | "resume_account";
 
-export type CustomConnectorSetupAccountLifecycle = Readonly<{
+type CustomConnectorSetupAccountLifecycle = Readonly<{
   readonly account: "active" | "degraded" | "reauth_required" | "disabled";
   readonly connection: "active" | "reauth_required" | "disabled";
   readonly binding: "active" | "disabled";

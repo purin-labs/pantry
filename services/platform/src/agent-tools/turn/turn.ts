@@ -11,13 +11,13 @@ import type {
 import { defineTool, jsonSchema } from "../define-tool";
 
 /** The longest statement that the agent may propose as one Memory. */
-export const MAX_MEMORY_PROPOSAL_CHARS = 600;
+const MAX_MEMORY_PROPOSAL_CHARS = 600;
 
 /** The longest note that a follow-up keeps. */
-export const MAX_FOLLOW_UP_NOTE_CHARS = 500;
+const MAX_FOLLOW_UP_NOTE_CHARS = 500;
 
 /** The latest follow-up: seven days. */
-export const MAX_FOLLOW_UP_MINUTES = 10_080;
+const MAX_FOLLOW_UP_MINUTES = 10_080;
 
 /**
  * The Memory proposal tool of a Portal chat turn. It is selected by the

@@ -14,11 +14,11 @@ export type SessionAgentEventInput = {
   envelope: AgentEventEnvelope;
 };
 
-export type SessionAgentEventPersistError =
+type SessionAgentEventPersistError =
   | { code: "invalid_persisted_state" }
   | { code: "stream_sequence_gap"; expected: number; received: number };
 
-export type AcceptedHarnessEventProjection = {
+type AcceptedHarnessEventProjection = {
   input: SessionAgentEventInput;
 };
 

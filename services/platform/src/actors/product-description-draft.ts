@@ -23,7 +23,7 @@ import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
 import type { Env } from "../env";
-import { type OrganisationId, type UserId } from "../ids";
+import type { OrganisationId, UserId } from "../ids";
 import type { Result } from "../result";
 import {
   readExactCommerceProjectionReference,
@@ -107,7 +107,7 @@ type DraftOperationError = Readonly<{
     | "operation_conflict"
     | "organisation_placement_conflict";
 }>;
-export type DraftAgentResult = Result<DraftAgentSnapshot, DraftOperationError>;
+type DraftAgentResult = Result<DraftAgentSnapshot, DraftOperationError>;
 type DraftRoomResult<T> = Result<T, Readonly<{ code: DraftFailureCode }>>;
 type DraftStoredState = Readonly<{
   document: ProductDescriptionDoc;
@@ -707,7 +707,7 @@ function draftPlacementConflict(): Result<
   return { ok: false, error: { code: "organisation_placement_conflict" } };
 }
 
-export function createProductDescriptionDraftSchema(sql: SqlStorage): void {
+function createProductDescriptionDraftSchema(sql: SqlStorage): void {
   sql.exec(`CREATE TABLE IF NOT EXISTS product_description_draft_thread (
     product_id TEXT PRIMARY KEY, case_id TEXT NOT NULL, integration_account_id TEXT NOT NULL,
     conversation_id TEXT NOT NULL, thread_url TEXT NOT NULL, approved_by TEXT NOT NULL,

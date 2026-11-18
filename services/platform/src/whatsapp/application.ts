@@ -1,21 +1,21 @@
 import type { Env } from "../env";
 import type { Result } from "../result";
 
-export type WhatsAppApplicationConfiguration = {
+type WhatsAppApplicationConfiguration = {
   readonly appId: string;
   readonly embeddedSignupConfigId: string;
 };
 
-export type WhatsAppEmbeddedSignupCredential = {
+type WhatsAppEmbeddedSignupCredential = {
   readonly appId: string;
   readonly appSecret: string;
 };
 
-export type WhatsAppApplicationError = {
+type WhatsAppApplicationError = {
   readonly code: "whatsapp_application_not_configured";
 };
 
-export type WhatsAppApplicationBindings = Pick<
+type WhatsAppApplicationBindings = Pick<
   Env,
   | "WHATSAPP_APP_ID"
   | "WHATSAPP_APP_SECRET"

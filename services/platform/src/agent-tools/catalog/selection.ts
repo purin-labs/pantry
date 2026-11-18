@@ -39,14 +39,13 @@ import type {
 
 export type JsonSchema = Readonly<Record<string, unknown>>;
 
-export type StaticHarnessToolName =
-  RegisteredToolName | "commerce_entity_context";
+type StaticHarnessToolName = RegisteredToolName | "commerce_entity_context";
 
-export type StaticHarnessToolDefinition = HarnessToolDefinition & {
+type StaticHarnessToolDefinition = HarnessToolDefinition & {
   readonly name: StaticHarnessToolName;
 };
 
-export const CATALOG_DEFINITIONS = [
+const CATALOG_DEFINITIONS = [
   // Refactor 10, step 1: defined in agent-tools/kitchen.
   ...registeredModelDefinitions(SAVED_RUN_TOOLS),
   // Refactor 10, step 1: defined in agent-tools/integrations.
@@ -214,7 +213,7 @@ export function harnessBaseCapabilities(): readonly HarnessCapabilityName[] {
   ]);
 }
 
-export function requireRegisteredTool(name: string): RegisteredTool {
+function requireRegisteredTool(name: string): RegisteredTool {
   const tool = registeredTool(name);
   if (tool === undefined) {
     throw new Error(`${name} is not registered`);
@@ -235,7 +234,7 @@ export function isSelectedCatalogToolName(
   return definitions.some(matchesToolName.bind(null, name));
 }
 
-export function matchesToolName(
+function matchesToolName(
   name: string,
   definition: HarnessToolDefinition,
 ): boolean {
@@ -288,14 +287,14 @@ export function selectCatalogDefinitions(
   return Object.freeze(definitions);
 }
 
-export function definitionAllowed(
+function definitionAllowed(
   allowed: ReadonlySet<HarnessCapabilityName>,
   definition: StaticHarnessToolDefinition,
 ): boolean {
   return allowed.has(definitionCapability(definition));
 }
 
-export function definitionCapability(
+function definitionCapability(
   definition: StaticHarnessToolDefinition,
 ): HarnessCapabilityName {
   const name = definition.name;
@@ -312,7 +311,7 @@ export function definitionCapability(
   }
 }
 
-export function normalizeCatalogSelection(
+function normalizeCatalogSelection(
   selection: HarnessCatalogSelection,
 ): Required<HarnessCatalogSelection> {
   return {

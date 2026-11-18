@@ -10,7 +10,7 @@ import {
   unexpected,
 } from "@seams/control-api/portal/payment-accounts";
 
-export function accountsPath(organisationId: string): string {
+function accountsPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/payment-accounts`;
 }
 

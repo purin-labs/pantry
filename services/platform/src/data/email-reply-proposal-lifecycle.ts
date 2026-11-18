@@ -50,7 +50,7 @@ const EVENT_INTO: Readonly<
   revoked: "revoke",
 };
 
-export type EmailReplyProposalMove =
+type EmailReplyProposalMove =
   | Readonly<{ kind: "moved" }>
   /** The proposal already rests in `to`; the write is a repeat. */
   | Readonly<{ kind: "repeat" }>

@@ -1,7 +1,7 @@
 import type { SceneFrame, SceneViewListener } from "./scene";
 import type { Selection } from "@seams/production-simulation/simulator/selection";
 
-export type ScenePort = Readonly<{
+type ScenePort = Readonly<{
   load(): Promise<void>;
   update(frame: SceneFrame): void;
   resetView(): void;
@@ -9,7 +9,7 @@ export type ScenePort = Readonly<{
 }>;
 
 /** `details` is a shell panel that hosts the floor plan's details. */
-export type SceneFactory = (
+type SceneFactory = (
   host: HTMLDivElement,
   frame: SceneFrame,
   select: (selection: Selection, focus: "inspector" | "unchanged") => void,
@@ -17,9 +17,9 @@ export type SceneFactory = (
   details?: HTMLElement,
 ) => ScenePort;
 
-export type SceneFactoryLoader = () => Promise<SceneFactory>;
+type SceneFactoryLoader = () => Promise<SceneFactory>;
 
-export type SceneStatusListener = (status: "ready" | "unavailable") => void;
+type SceneStatusListener = (status: "ready" | "unavailable") => void;
 
 export class SceneController {
   private readonly loadFactory: SceneFactoryLoader;

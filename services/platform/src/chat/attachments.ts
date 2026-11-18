@@ -21,7 +21,7 @@ import type { ConversationScope } from "./store";
 import { attachmentParts, type ChatAttachmentPart } from "./timeline";
 import { surfaceObservationField } from "./input-parts";
 
-export type ChatSubmission = {
+type ChatSubmission = {
   readonly command: ChatCommand;
   readonly files: readonly File[];
 };
@@ -104,7 +104,7 @@ class ChatUploadBodyLimit {
   }
 }
 
-export function chatAttachmentPointerKey(
+function chatAttachmentPointerKey(
   organisationId: OrganisationId,
   attachmentId: string,
 ): string {
@@ -174,7 +174,7 @@ function attachmentMediaType(attachment: StoredMessageAttachment): string {
   return attachment.descriptor.media.mediaType;
 }
 
-export async function readChatAttachment(
+async function readChatAttachment(
   bucket: R2Bucket,
   organisationId: OrganisationId,
   part: ChatAttachmentPart,
@@ -300,7 +300,7 @@ export function withChatAttachments(
   }
 }
 
-export function conversationAttachmentParts(
+function conversationAttachmentParts(
   conversation: import("./conversation").Conversation,
 ): readonly ChatAttachmentPart[] {
   const parts: ChatAttachmentPart[] = [];

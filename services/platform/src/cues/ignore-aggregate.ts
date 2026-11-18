@@ -87,7 +87,7 @@ export async function flushIgnoredCueBatch(
   }
 }
 
-export function ignoredCueAggregateKey(
+function ignoredCueAggregateKey(
   organisationId: OrganisationId,
   source: CueSource,
   eventType: NormalizedCueEventType,

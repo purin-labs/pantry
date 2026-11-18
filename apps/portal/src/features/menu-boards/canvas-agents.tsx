@@ -300,7 +300,7 @@ export function useAgentMotion(
   });
 }
 
-export const AGENT_MOVE_MS = 240;
+const AGENT_MOVE_MS = 240;
 
 function boxFrame(rect: MenuBoardRect): Keyframe {
   return { left: `${rect.x}px`, top: `${rect.y}px`, width: `${rect.width}px`, height: `${rect.height}px` };

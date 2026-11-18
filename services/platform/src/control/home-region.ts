@@ -12,7 +12,7 @@ import {
 } from "../placement";
 import type { Result } from "../result";
 
-export type OrganisationHomeRegionError =
+type OrganisationHomeRegionError =
   | { readonly code: "organisation_placement_configuration_invalid" }
   | { readonly code: "invalid_organisation_home_region" };
 
@@ -119,7 +119,7 @@ const CONTINENTS: Readonly<Record<Continent, true>> = {
  * Cloudflare describes the client of a request in `request.cf`. A request
  * from a test, a service binding or an anonymising network can lack it.
  */
-export function readRequestLocation(request: Request): RequestLocation {
+function readRequestLocation(request: Request): RequestLocation {
   const cf: unknown = request.cf;
   if (!isRecord(cf)) return { kind: "unknown" };
   const latitude = degrees(cf.latitude, 90);

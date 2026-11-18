@@ -86,10 +86,7 @@ const PHASE_INDEX: Readonly<Record<BlackSesameCobotPhase, number>> = {
   failed: -1,
 };
 
-export class BlackSesamePhysicsView extends React.Component<
-  ViewProps,
-  ViewState
-> {
+class BlackSesamePhysicsView extends React.Component<ViewProps, ViewState> {
   state: ViewState = { error: null, camera: "station" };
   private readonly element = React.createRef<HTMLDivElement>();
   private readonly station = React.createRef<HTMLElement>();

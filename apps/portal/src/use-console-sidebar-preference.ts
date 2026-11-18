@@ -2,7 +2,7 @@ import React from "react";
 
 const CONSOLE_SIDEBAR_STORAGE_KEY = "satyr:cafeos:sidebar-expanded";
 
-export type ConsoleSidebarPreference = {
+type ConsoleSidebarPreference = {
   readonly railExpanded: boolean;
   readonly toggleRail: () => void;
 };

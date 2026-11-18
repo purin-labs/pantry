@@ -610,7 +610,7 @@ export async function publishEvalRunResult(
 }
 
 /** One scenario of one Eval revision as a run reads it, with its label. */
-export type EvalRunFixture = Readonly<{
+type EvalRunFixture = Readonly<{
   subject: EvalContent["subject"];
   scenario: EvalContent["scenarios"][number];
   flowLabel: FlowLabel;
@@ -674,7 +674,7 @@ export async function readEvalRunFixture(
  * The Eval a person may inspect in full, or null. Null covers an Eval that
  * does not exist and one with anything hidden from them.
  */
-export async function readInspectableEval(
+async function readInspectableEval(
   env: Env,
   scope: ConversationScope,
   evalId: string,

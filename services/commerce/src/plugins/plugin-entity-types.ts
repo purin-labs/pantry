@@ -20,7 +20,7 @@ import {
 import { parseCustomEntityTypeDraft } from "../entity-plane/parsers.ts";
 
 /** The records of one type that a function reads, at most. */
-export const RECORDS_PER_TYPE = 200;
+const RECORDS_PER_TYPE = 200;
 
 const ATTRIBUTE_KINDS = {
   short_text: { kind: "short_text", maxLength: 300 },
@@ -31,7 +31,7 @@ const ATTRIBUTE_KINDS = {
 } as const;
 
 /** A type to publish at the installation, at its next revision. */
-export type PluginEntityTypeWrite = Readonly<{
+type PluginEntityTypeWrite = Readonly<{
   draft: CustomCommerceEntityTypeDraft;
 }>;
 
@@ -152,7 +152,7 @@ type RecordValueRow = Readonly<{
   timestampValue: string | null;
 }>;
 
-export type PluginRecord = Readonly<{
+type PluginRecord = Readonly<{
   entityId: string;
   displayName: string;
   values: Readonly<Record<string, string | number | boolean>>;

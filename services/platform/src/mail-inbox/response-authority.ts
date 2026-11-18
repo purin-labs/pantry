@@ -3,7 +3,7 @@ import { authorizeMailSource } from "./authorization";
 import { readMailHead } from "./store";
 import { readMailResponseOwner } from "./response-store";
 
-export type MailResponseScope = Readonly<{
+type MailResponseScope = Readonly<{
   organisationId: string;
   integrationAccountId: string;
   threadId: string;

@@ -147,7 +147,7 @@ function deliveryEvents(
   });
 }
 
-export function StockLanes(props: {
+function StockLanes(props: {
   readonly control: PeriodControl;
   readonly clock: number;
   readonly rows: readonly StockRow[];

@@ -102,7 +102,7 @@ export function planFootprint(
 }
 
 /** Andrew's monotone chain; collinear points are dropped. */
-export function convexHull(
+function convexHull(
   points: readonly (readonly [number, number])[],
 ): PlanPolygon {
   const sorted = [...points].sort(comparePoints);

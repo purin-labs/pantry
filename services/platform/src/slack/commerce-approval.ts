@@ -31,7 +31,7 @@ import {
 } from "./commerce-approval-card";
 
 /** A click on Approve or Decline, with the thread's Organisation and account. */
-export type CommerceApprovalClick = Readonly<{
+type CommerceApprovalClick = Readonly<{
   decision: "approve" | "decline";
   organisationId: OrganisationId;
   integrationAccountId: string;

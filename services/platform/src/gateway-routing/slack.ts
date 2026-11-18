@@ -2,7 +2,7 @@ import type { GatewaySlackRoute } from "./domain";
 
 export const SLACK_INSTALL_REDIRECT_PATH = "/slack/install";
 
-export const SLACK_INSTALL_START_PATH = "/slack/install/start";
+const SLACK_INSTALL_START_PATH = "/slack/install/start";
 
 /** Slack sends the clicks on Pantry's message buttons here (Plan 74). */
 export const SLACK_INTERACTIONS_PATH = "/slack/interactions";

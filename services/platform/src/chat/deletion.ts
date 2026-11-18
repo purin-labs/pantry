@@ -30,7 +30,7 @@ export type ChatDeletionCommand = Readonly<{
   operationId: string;
   expectedRevision: number;
 }>;
-export type ChatDeletionResult =
+type ChatDeletionResult =
   | Readonly<{ kind: "deleted"; conversationId: ConversationId }>
   | Readonly<{
       kind: "rejected";
@@ -623,7 +623,7 @@ function isObjectKey(raw: unknown): raw is string {
   return typeof raw === "string" && raw.length > 0;
 }
 
-export type PendingChatDeletion = Readonly<{
+type PendingChatDeletion = Readonly<{
   conversationId: ConversationId;
   title: string;
   operationId: string;

@@ -23,7 +23,7 @@ import type {
  * supplies the signed event and the directory route. The Connector reads every
  * organisation record the decision depends on.
  */
-export type ConnectorSlackIngressRequest = {
+type ConnectorSlackIngressRequest = {
   readonly identity: ConnectorIdentity;
   readonly requestId: RequestId;
   readonly receivedAt: number;

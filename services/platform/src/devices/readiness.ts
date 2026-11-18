@@ -64,7 +64,7 @@ export type DeviceWorkState =
       label: string;
     }>;
 
-export type DeviceReadinessFacts = Readonly<{
+type DeviceReadinessFacts = Readonly<{
   enrollment: DeviceEnrollmentState;
   connection: DeviceConnection;
   health: DeviceHealth;

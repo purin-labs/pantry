@@ -19,7 +19,7 @@ import type { Result } from "../result";
 
 export const MERCHANT_PLUGIN_INSTALL_VERB = "commerce.plugin.install";
 
-export type MerchantPluginSettingKind =
+type MerchantPluginSettingKind =
   "integer" | "text" | "boolean" | "text_list";
 
 export type MerchantPluginSettingProposal = Readonly<{
@@ -30,7 +30,7 @@ export type MerchantPluginSettingProposal = Readonly<{
 }>;
 
 /** The commands that a merchant plugin's handlers and actions may submit. */
-export const MERCHANT_PLUGIN_COMMANDS = [
+const MERCHANT_PLUGIN_COMMANDS = [
   "create_discount",
   "set_plugin_field_values",
   "credit_store_credit",

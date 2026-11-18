@@ -57,14 +57,14 @@ export function rejectCommerce(error: CommerceValidationError): never {
 }
 
 /** Rust `require_text`: non-blank and already trimmed. */
-export function requireText(value: string, field: string): string {
+function requireText(value: string, field: string): string {
   const trimmed = rustTrim(value);
   if (trimmed.length === 0 || value !== trimmed)
     rejectCommerce({ code: "invalid_identity", field });
   return value;
 }
 
-export function requireNonEmpty<T>(values: T[], field: string): T[] {
+function requireNonEmpty<T>(values: T[], field: string): T[] {
   if (values.length === 0) rejectCommerce({ code: "empty_collection", field });
   return values;
 }
@@ -98,7 +98,7 @@ function nanoseconds(value: string): bigint {
 }
 
 /** Rust `CommerceTimestamp` order: the derived order of its normalized text. */
-export function timestampBefore(left: string, right: string): boolean {
+function timestampBefore(left: string, right: string): boolean {
   return left < right;
 }
 
@@ -198,7 +198,7 @@ export function quantity(
   return { amount, scale, unit };
 }
 
-export function quantityAtMost(left: Quantity, right: Quantity): boolean {
+function quantityAtMost(left: Quantity, right: Quantity): boolean {
   if (left.unit !== right.unit) return false;
   const scale = Math.max(left.scale, right.scale);
   return (
@@ -311,7 +311,7 @@ export function contextDelivery(
   );
 }
 
-export function canonicalDelivery(
+function canonicalDelivery(
   providerDeliveryId: string,
   observations: CanonicalCommerceObservation[],
 ): CanonicalCommerceDelivery {
@@ -328,7 +328,7 @@ export function canonicalDelivery(
   return { schemaVersion: 1, providerDeliveryId, observations };
 }
 
-export function requireResourceType(
+function requireResourceType(
   provenance: SourceProvenance,
   expected: CommerceResourceType,
 ): void {
@@ -336,7 +336,7 @@ export function requireResourceType(
     rejectCommerce({ code: "resource_type_mismatch" });
 }
 
-export function projection(
+function projection(
   kind: CommerceProjection["kind"],
   value: unknown,
 ): CommerceProjection {
@@ -374,7 +374,7 @@ export function inventoryBalanceAccounted(
   return { kind: "accounted", onHand, allocated, available };
 }
 
-export function orderTotalsFromTotal(total: Money): OrderTotals {
+function orderTotalsFromTotal(total: Money): OrderTotals {
   const zero = money(0, total.currency);
   const values = [total, zero, zero, zero, zero, zero, zero, zero, total];
   if (values.some((value) => value.currency !== total.currency))
@@ -695,7 +695,7 @@ export function inventoryPosition(
 }
 
 /** Rust `OnlineShippingOrderLine`. */
-export type OnlineShippingOrderLine = Readonly<{
+type OnlineShippingOrderLine = Readonly<{
   id: string;
   variantId: string | null;
   sku: string;

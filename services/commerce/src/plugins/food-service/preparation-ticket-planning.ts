@@ -50,7 +50,7 @@ export type PreparationTicketPlan = Readonly<{
   lots: readonly CommerceInventoryLotV1[];
 }>;
 
-export type PreparationTicketPlanResult =
+type PreparationTicketPlanResult =
   | Readonly<{ kind: "planned"; value: PreparationTicketPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 

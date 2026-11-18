@@ -21,7 +21,7 @@ export type ComboboxOption = {
   readonly unavailable: boolean;
 };
 
-export type ComboboxProps = {
+type ComboboxProps = {
   readonly id: string;
   /** Field name the surrounding form reads the canonical value from. */
   readonly name: string;

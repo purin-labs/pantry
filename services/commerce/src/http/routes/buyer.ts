@@ -34,7 +34,7 @@ import {
   requestBuyerReturnRoute,
 } from "./buyer-orders.ts";
 
-export async function createBuyerSessionRoute(
+async function createBuyerSessionRoute(
   ctx: HttpRouteContext,
   request: Request,
   route: Extract<BuyerRoute, { kind: "create_buyer_session" }>,

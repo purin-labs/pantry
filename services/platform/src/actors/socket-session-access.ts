@@ -14,7 +14,7 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
  * that could not run is `unavailable`, not a refusal: the account check or a
  * read failed, and a later check can pass.
  */
-export type SocketSessionAccess =
+type SocketSessionAccess =
   | Readonly<{ kind: "member"; membership: ActiveOrganisationMembership }>
   | Readonly<{ kind: "refused" }>
   | Readonly<{ kind: "unavailable" }>;

@@ -19,7 +19,7 @@ type WorkMachine = typeof CONVERSATION_WORK_MACHINE;
  * The checks of the guarded moves. `now` dates the permission wait, and
  * `modelRouteAvailable` is what the caller read of the conversation's route.
  */
-export type ConversationTransitionFacts = Readonly<{
+type ConversationTransitionFacts = Readonly<{
   now: number;
   modelRouteAvailable: boolean;
 }>;

@@ -487,7 +487,7 @@ export type EmailProposalPreviewOutcome =
     }
   | { readonly kind: "expired" };
 
-export type EmailProposalError = { readonly code: string };
+type EmailProposalError = { readonly code: string };
 
 export type EmailReplyEditReceipt = Readonly<{
   version: number;
@@ -1794,7 +1794,7 @@ async function accountAddress(
   return row?.observedAddress ?? null;
 }
 
-export type EmailMaintenanceSummary = {
+type EmailMaintenanceSummary = {
   readonly ran: boolean;
   readonly disposedExpired: number;
   readonly resolvedSent: number;

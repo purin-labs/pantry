@@ -137,7 +137,7 @@ export function actorPlacementAdmissionMatchesIdentity(
   }
 }
 
-export function actorPlacementDirectoryAdmissionPredicate(
+function actorPlacementDirectoryAdmissionPredicate(
   admission: ActorPlacementAdmission,
 ): {
   readonly sql: string;

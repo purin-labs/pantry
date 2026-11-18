@@ -5,7 +5,7 @@ import { CanvasResize } from "../workflow-simulator/canvas-resize";
 import { disposePhysicsObject } from "../workflow-simulator/spatial/physics-model";
 
 /** The renderer setup of a recipe station. The simulator's lighting rig sets its own. */
-export type StationLook = Readonly<{
+type StationLook = Readonly<{
   exposure: number;
   /** The clear colour, or null for a transparent canvas. */
   background: number | null;
@@ -15,7 +15,7 @@ export type StationLook = Readonly<{
   outputColorSpace?: THREE.ColorSpace;
 }>;
 
-export type SceneHostOptions = Readonly<{
+type SceneHostOptions = Readonly<{
   /** The element that holds the canvas; the canvas follows its size. */
   view: HTMLElement;
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;

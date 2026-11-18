@@ -113,7 +113,7 @@ type DiscoveryStage =
   | "context_admission"
   | "observation";
 
-export type IntegrationDiscoveryError = Readonly<{
+type IntegrationDiscoveryError = Readonly<{
   code: "integration_discovery_unavailable";
   stage: DiscoveryStage;
 }>;

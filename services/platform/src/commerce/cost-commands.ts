@@ -45,7 +45,7 @@ const DAY_MS = 86_400_000;
 const QUANTITY_SCALE = 6;
 const SAVE_ATTEMPT_LIMIT = 4;
 
-export type CostReadError =
+type CostReadError =
   | Readonly<{ code: "underclerk_unavailable" }>
   | Readonly<{ code: "underclerk_scope_mismatch" }>;
 

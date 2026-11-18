@@ -17,7 +17,7 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import { loadOrganisationPolicyOrDefaultDeny } from "../policy-snapshot";
 import type { RequestAuthority } from "@seams/contracts";
 
-export type CommerceCaseOutputDelivery =
+type CommerceCaseOutputDelivery =
   | {
       readonly kind: "delivered" | "already_settled";
       readonly deliveryReceiptId: string;
@@ -27,7 +27,7 @@ export type CommerceCaseOutputDelivery =
   | { readonly kind: "held" };
 
 /** Who asked for the work that the output reports, as the ledger keeps it. */
-export type CommerceOutputAuthority = Readonly<{
+type CommerceOutputAuthority = Readonly<{
   organisationId: OrganisationId;
   /** The two parts of the accepted execution: a session and a turn or nonce. */
   sessionId: string;

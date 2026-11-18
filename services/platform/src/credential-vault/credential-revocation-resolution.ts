@@ -7,7 +7,7 @@ import type { VaultHandle, VaultResolveError, VaultSecret } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";
 import { resolveVaultHandle } from "./service";
 
-export type CredentialRevocationResolutionError =
+type CredentialRevocationResolutionError =
   VaultResolveError | { readonly code: "credential_revocation_scope_inactive" };
 
 export async function resolveCredentialRevocationSecret(

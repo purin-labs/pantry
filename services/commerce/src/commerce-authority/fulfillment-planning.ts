@@ -59,7 +59,7 @@ import { orderMatchesAccepted, readAcceptedOrder, type AcceptedOrder } from "./o
 import { orderBalance } from "../payments/position.ts";
 import { orderSubject, type GuardedMove } from "../plugins/machine-guards.ts";
 
-export type PickupReadyPlanResult =
+type PickupReadyPlanResult =
   | Readonly<{
       kind: "planned";
       fulfillment: CommerceFulfillmentV1;
@@ -77,7 +77,7 @@ export type PickupCompletionPlan = Readonly<{
   lots: readonly CommerceInventoryLotV1[];
 }>;
 
-export type PickupCompletionPlanResult =
+type PickupCompletionPlanResult =
   | Readonly<{ kind: "planned"; value: PickupCompletionPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -760,17 +760,17 @@ function pickupCompletionRelationshipError(
   return { code: "resource_relationship_invalid", field };
 }
 
-export type ShipmentLabelRatePlanResult =
+type ShipmentLabelRatePlanResult =
   | Readonly<{ kind: "planned"; request: ShippingLabelRateRequest }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type ShipmentShippingRouteAuthority = Readonly<{
+type ShipmentShippingRouteAuthority = Readonly<{
   routeBinding: ShippingRouteBinding;
   acceptedCarrierRate: ShippingQuoteSnapshot["carrierRate"];
   packagePlanDigest: string;
 }>;
 
-export type ShipmentShippingRouteResult =
+type ShipmentShippingRouteResult =
   | Readonly<{ kind: "resolved"; value: ShipmentShippingRouteAuthority }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -896,7 +896,7 @@ export type ShippingTrackingPlan = ShippingTrackingPlanCommon &
       }>
   );
 
-export type ShippingTrackingPlanResult =
+type ShippingTrackingPlanResult =
   | Readonly<{ kind: "planned"; value: ShippingTrackingPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -905,7 +905,7 @@ export type FulfillmentTrackingAttachmentPlan = Readonly<{
   fulfillment: Variant<CommerceFulfillmentV1, "shipping">;
 }>;
 
-export type FulfillmentTrackingAttachmentPlanResult =
+type FulfillmentTrackingAttachmentPlanResult =
   | Readonly<{ kind: "planned"; value: FulfillmentTrackingAttachmentPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 

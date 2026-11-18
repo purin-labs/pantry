@@ -9,23 +9,23 @@ import type { Result } from "../result";
 
 export type { PersonId } from "../ids";
 
-export type ApprovalRole = "approve";
-export type PersonRoleOperation = "grant" | "revoke";
+type ApprovalRole = "approve";
+type PersonRoleOperation = "grant" | "revoke";
 
 declare const personRoleAuditIdBrand: unique symbol;
 
-export type PersonRoleAuditId = string & {
+type PersonRoleAuditId = string & {
   readonly [personRoleAuditIdBrand]: "PersonRoleAuditId";
 };
 
-export type PersonRoleRecord = {
+type PersonRoleRecord = {
   organisationId: OrganisationId;
   personId: PersonId;
   displayName: string;
   roles: readonly ApprovalRole[];
 };
 
-export type ConfigurePersonRoleInput = {
+type ConfigurePersonRoleInput = {
   organisationId: OrganisationId;
   personId: PersonId;
   operation: PersonRoleOperation;
@@ -34,7 +34,7 @@ export type ConfigurePersonRoleInput = {
   now: number;
 };
 
-export type ConfigurePersonRoleResult = {
+type ConfigurePersonRoleResult = {
   kind: "configured";
   organisationId: OrganisationId;
   personId: PersonId;
@@ -46,12 +46,12 @@ export type ConfigurePersonRoleResult = {
 export type PersonRoleAdminError =
   { code: "person_not_found" } | { code: "invalid_person_record" };
 
-export type PersonAdminRow = {
+type PersonAdminRow = {
   personId: unknown;
   displayName: unknown;
 };
 
-export type PersonRoleRow = {
+type PersonRoleRow = {
   personId: unknown;
   role: unknown;
 };

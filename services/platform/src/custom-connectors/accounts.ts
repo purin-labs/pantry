@@ -56,7 +56,7 @@ export type ActiveCustomConnectorAccount = {
   readonly updatedAt: number;
 };
 
-export type CustomConnectorAccountCommitError =
+type CustomConnectorAccountCommitError =
   | { readonly code: "custom_connector_setup_conflict" }
   | { readonly code: "configuration_version_conflict" }
   | {

@@ -114,7 +114,7 @@ export const MERCHANT_AGENT_SKILL_NAMES: readonly MerchantAgentSkillName[] = [
   "marketing_campaigns",
 ];
 
-export type MerchantAgentSkill = Readonly<{
+type MerchantAgentSkill = Readonly<{
   name: MerchantAgentSkillName;
   title: string;
   markdownBody: string;

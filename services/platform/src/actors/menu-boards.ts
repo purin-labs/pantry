@@ -147,7 +147,7 @@ export type MenuBoardPublication = Result<
     }>
 >;
 
-export type MenuBoardCreation = Result<
+type MenuBoardCreation = Result<
   MenuBoardSummary,
   Readonly<{ code: "menu_board_limit" | "menu_board_unavailable" }>
 >;

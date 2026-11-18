@@ -37,14 +37,14 @@ export type SlackOperatorIdentity = Readonly<{
   role: ControlRole;
 }>;
 
-export type SlackConfigurationOutcome =
+type SlackConfigurationOutcome =
   /** Not a reply to a pending change; the ordinary agent turn should run. */
   | Readonly<{ kind: "not_a_configuration_reply" }>
   | Readonly<{ kind: "applied"; message: SlackConfigurationMessage }>
   | Readonly<{ kind: "cancelled"; message: SlackConfigurationMessage }>
   | Readonly<{ kind: "refused"; message: SlackConfigurationMessage }>;
 
-export type ResolveSlackConfigurationReplyInput = Readonly<{
+type ResolveSlackConfigurationReplyInput = Readonly<{
   db: OrganisationDatabase;
   /** Carrying out a confirmed command may reach past D1. */
   env: Env;

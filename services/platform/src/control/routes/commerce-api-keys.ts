@@ -37,7 +37,7 @@ export type CommerceApiKeyControlRoute =
       credentialIdRaw: string;
     }>;
 
-export type MerchantControlContext = Readonly<{
+type MerchantControlContext = Readonly<{
   merchantId: string;
   client: CommerceAdminClient;
 }>;

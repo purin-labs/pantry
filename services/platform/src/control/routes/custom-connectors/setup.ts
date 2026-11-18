@@ -176,7 +176,7 @@ export async function handleSetupAction(
   }
 }
 
-export async function attachCredential(
+async function attachCredential(
   env: Env,
   context: MutationContext,
   attemptId: CustomConnectorSetupAttemptId,
@@ -207,7 +207,7 @@ export async function attachCredential(
   );
 }
 
-export async function testCredential(
+async function testCredential(
   env: Env,
   context: MutationContext,
   attemptId: CustomConnectorSetupAttemptId,
@@ -244,7 +244,7 @@ export async function testCredential(
   });
 }
 
-export async function commitSetup(
+async function commitSetup(
   env: Env,
   context: MutationContext,
   attemptId: CustomConnectorSetupAttemptId,
@@ -285,7 +285,7 @@ export async function commitSetup(
   );
 }
 
-export async function cancelSetup(
+async function cancelSetup(
   env: Env,
   context: MutationContext,
   attemptId: CustomConnectorSetupAttemptId,
@@ -314,9 +314,7 @@ export async function cancelSetup(
   );
 }
 
-export function parseSetupTarget(
-  raw: unknown,
-): CustomConnectorSetupTarget | null {
+function parseSetupTarget(raw: unknown): CustomConnectorSetupTarget | null {
   if (!isRecord(raw) || typeof raw.kind !== "string") return null;
   if (raw.kind === "new_account") {
     return hasExactKeys(raw, ["environment", "kind"]) &&

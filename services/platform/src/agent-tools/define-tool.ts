@@ -50,7 +50,7 @@ export type ToolRerun =
   | { readonly kind: "none" };
 
 /** A tool that the turn offers by its origin, not by a capability grant. */
-export type TurnToolFlag = "memoryProposal" | "followUp" | "sideCaseProposal";
+type TurnToolFlag = "memoryProposal" | "followUp" | "sideCaseProposal";
 
 /**
  * When a turn offers the tool.
@@ -90,7 +90,7 @@ export type SurfaceToolCommandName =
   | PastryBenchViewCommandName;
 
 /** The identity of one call, for receipts and idempotent writes. */
-export type ToolCall = {
+type ToolCall = {
   readonly callId: string;
   /** Direct call or Code Mode, as the catalog runs it. */
   readonly execution: CatalogExecutionContext;
@@ -104,7 +104,7 @@ type ToolHandler<Request> = (
 ) => Promise<unknown>;
 
 /** The source of one tool: everything that the catalog knows about it. */
-export type ToolSpec<Name extends string, Input extends TSchema, Request> = {
+type ToolSpec<Name extends string, Input extends TSchema, Request> = {
   readonly name: Name;
   readonly description: string;
   /** The JSON schema that the model sees, and the structural check of a call. */

@@ -34,7 +34,7 @@ export type CustomConnectorFetchTransport = {
 };
 
 /** The class binding of the fetch container, as the Worker holds it. */
-export type CustomConnectorFetchBinding = {
+type CustomConnectorFetchBinding = {
   readonly getByName: (
     name: string,
     options?: { readonly locationHint?: OrganisationPlacement["locationHint"] },

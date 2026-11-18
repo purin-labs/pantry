@@ -124,7 +124,7 @@ type ApprovedCommerceActionEntry = VariantBy<
   "executing" | "indeterminate"
 >;
 
-export type CommerceEffectGatePermit =
+type CommerceEffectGatePermit =
   | Readonly<{
       kind: "lab";
       current: CommerceProjection;
@@ -146,7 +146,7 @@ export type CommerceEffectGatePermit =
       approval: ApprovedCommerceActionEntry["approval"];
     }>;
 
-export type CommerceProviderReconciliation =
+type CommerceProviderReconciliation =
   | Readonly<{
       kind: "settled";
       receipt:
@@ -158,7 +158,7 @@ export type CommerceProviderReconciliation =
     }>
   | Readonly<{ kind: "unresolved" }>;
 
-export type CommerceProviderOperation =
+type CommerceProviderOperation =
   | {
       readonly kind: "projection_delivery";
       readonly delivery: CanonicalCommerceDelivery;
@@ -370,7 +370,7 @@ function commerceActionPathCapability(
   }
 }
 
-export async function authorizeCommerceEffectGatePlan(
+async function authorizeCommerceEffectGatePlan(
   input: Readonly<{
     scope: OrganisationExecutionScope;
     action: ApprovedCommerceActionEntry;
@@ -1711,7 +1711,7 @@ async function applyApprovedOfferPrice(
 }
 
 /** What the approval card shows of a plugin's run over recent checkouts. */
-export type MerchantPluginActionPreview =
+type MerchantPluginActionPreview =
   | Readonly<{ kind: "no_checkout_function" }>
   | Readonly<{
       kind: "previewed";

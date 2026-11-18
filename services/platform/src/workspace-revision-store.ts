@@ -40,7 +40,7 @@ type WorkspaceRevisionMutation = {
   readonly committedAt: Timestamp;
 };
 
-export type WorkspaceRevisionFileCandidate = {
+type WorkspaceRevisionFileCandidate = {
   readonly path: string;
   readonly mediaType: string;
   readonly content: string;
@@ -71,7 +71,7 @@ export type WorkspaceRevisionAuthority =
       readonly authorizeCommit: () => Promise<boolean>;
     };
 
-export type WorkspaceRevisionCommitResult =
+type WorkspaceRevisionCommitResult =
   | { readonly kind: "committed"; readonly receipt: WorkspaceRevisionReceipt }
   | { readonly kind: "duplicate"; readonly receipt: WorkspaceRevisionReceipt };
 
@@ -142,7 +142,7 @@ export type WorkspaceRevisionManifestV1 = {
   readonly files: readonly WorkspaceRevisionManifestFileV1[];
 };
 
-export type WorkspaceRevisionManifestFileV1 = {
+type WorkspaceRevisionManifestFileV1 = {
   readonly path: string;
   readonly mediaType: string;
   readonly byteLength: number;

@@ -116,7 +116,7 @@ function payoutItem(
   };
 }
 
-export function PayoutLanes(props: {
+function PayoutLanes(props: {
   readonly control: PeriodControl;
   readonly clock: number;
   readonly organisationId: string;

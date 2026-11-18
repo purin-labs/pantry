@@ -12,7 +12,7 @@ export type OrganisationInferenceSelection =
   | { readonly kind: "organisation_anthropic_api_key" }
   | { readonly kind: "satyr_platform" };
 
-export type OrganisationInferenceSelectionSnapshot = {
+type OrganisationInferenceSelectionSnapshot = {
   readonly organisationId: OrganisationId;
   readonly selection: OrganisationInferenceSelection;
   /** The level that an owner or admin chose for Slack answers, if any. */
@@ -255,7 +255,7 @@ export async function selectOrganisationInferenceSelection(input: {
   };
 }
 
-export function defaultOrganisationInferenceSelection(): OrganisationInferenceSelection {
+function defaultOrganisationInferenceSelection(): OrganisationInferenceSelection {
   return { kind: "codex_subscription" };
 }
 

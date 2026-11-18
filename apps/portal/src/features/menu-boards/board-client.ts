@@ -75,7 +75,7 @@ export type MenuBoardPresenceView = MenuBoardParticipant & Readonly<{ isSelf: bo
  * What the room holds against the board on the screen: the same board at
  * `documentRevision`, a newer board that the screen now shows, or no answer.
  */
-export type MenuBoardShownCheck =
+type MenuBoardShownCheck =
   | Readonly<{ kind: "current"; documentRevision: number }>
   | Readonly<{ kind: "changed" }>
   | Readonly<{ kind: "unavailable" }>;

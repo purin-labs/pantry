@@ -24,7 +24,7 @@ import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderA
 import type { IntegrationAccount } from "@seams/control-api/portal/settings";
 import { ConfirmButton } from "./workspace";
 
-export type IntegrationAccountControls = {
+type IntegrationAccountControls = {
   readonly mutations: MutationLedger;
   readonly pendingAuthorization: PendingProviderAuthorization | null;
   readonly pendingConfirm: string | null;
@@ -82,7 +82,7 @@ export function compareIntegrationAccountUrgency(
     : byName;
 }
 
-export function integrationAccountUrgency(account: IntegrationAccount): number {
+function integrationAccountUrgency(account: IntegrationAccount): number {
   switch (account.lifecycle.kind) {
     case "revoked":
       return 0;
@@ -102,7 +102,7 @@ export function integrationAccountUrgency(account: IntegrationAccount): number {
   }
 }
 
-export function renderReadonlyIntegrationAccountRow(
+function renderReadonlyIntegrationAccountRow(
   account: IntegrationAccount,
   _index: number,
   accounts: readonly IntegrationAccount[],
@@ -124,7 +124,7 @@ export function renderReadonlyIntegrationAccountRow(
   );
 }
 
-export function renderIntegrationAccountRow(
+function renderIntegrationAccountRow(
   actions: IntegrationsPageActions,
   controls: IntegrationAccountControls,
   credentialInventory: CredentialInventory | null,
@@ -186,7 +186,7 @@ export function renderIntegrationAccountRow(
  * The dialog's title already names the app, so the card leads with the account.
  * "Default" only means something beside another account of the same app.
  */
-export function renderConnectionHead(
+function renderConnectionHead(
   account: IntegrationAccount,
   showDefault: boolean,
 ): React.ReactNode {
@@ -221,7 +221,7 @@ export function connectionNeedsAttention(account: IntegrationAccount): boolean {
   return connectionProblem(account) !== null;
 }
 
-export type ConnectionProblem = {
+type ConnectionProblem = {
   /** What went wrong, in the operator's words. */
   readonly cause: string;
   /** What stopped working while it stays broken. */
@@ -234,7 +234,7 @@ export type ConnectionProblem = {
  * codes we have not written copy for still get an honest generic sentence
  * rather than being dropped on the floor.
  */
-export function connectionProblem(
+function connectionProblem(
   account: IntegrationAccount,
 ): ConnectionProblem | null {
   const service = providerLabel(account.provider);
@@ -265,7 +265,7 @@ export function connectionProblem(
   }
 }
 
-export function connectionCause(service: string, reasonCode: string): string {
+function connectionCause(service: string, reasonCode: string): string {
   switch (reasonCode) {
     case "oauth_scope_revoked":
       return `${service} removed a permission Seams Pantry was given.`;
@@ -337,7 +337,7 @@ export function renderIntegrationAccountDetails(
  * Scopes are the provider's vocabulary. For the connections this page
  * onboards, the row says what the granted scope set lets Pantry do instead.
  */
-export function describeAccountAccess(account: IntegrationAccount): string {
+function describeAccountAccess(account: IntegrationAccount): string {
   switch (account.provider) {
     case "dropbox":
       return "Read the folders and files you share. Nothing is changed, moved or shared.";
@@ -611,14 +611,14 @@ export function CredentialRecoveryActions(props: {
   );
 }
 
-export type CredentialRotateFormState = {
+type CredentialRotateFormState = {
   readonly open: boolean;
   readonly pending: boolean;
   readonly secret: string;
   readonly outcome: CredentialActionOutcome | null;
 };
 
-export function CredentialRotateAction(props: {
+function CredentialRotateAction(props: {
   readonly account: IntegrationAccount;
   readonly record: CredentialAccountRecord;
   readonly busy: boolean;
@@ -687,7 +687,7 @@ export function CredentialRotateAction(props: {
   );
 }
 
-export function credentialSecretLabel(provider: string): string {
+function credentialSecretLabel(provider: string): string {
   switch (provider) {
     case "airtable":
       return "Airtable personal access token";
@@ -702,31 +702,31 @@ export function credentialSecretLabel(provider: string): string {
   }
 }
 
-export function openCredentialRotateForm(
+function openCredentialRotateForm(
   setState: React.Dispatch<React.SetStateAction<CredentialRotateFormState>>,
 ): void {
   setState(toOpenCredentialRotateForm);
 }
 
-export function toOpenCredentialRotateForm(
+function toOpenCredentialRotateForm(
   state: CredentialRotateFormState,
 ): CredentialRotateFormState {
   return { open: true, pending: false, secret: "", outcome: state.outcome };
 }
 
-export function closeCredentialRotateForm(
+function closeCredentialRotateForm(
   setState: React.Dispatch<React.SetStateAction<CredentialRotateFormState>>,
 ): void {
   setState(toClosedCredentialRotateForm);
 }
 
-export function toClosedCredentialRotateForm(
+function toClosedCredentialRotateForm(
   state: CredentialRotateFormState,
 ): CredentialRotateFormState {
   return { open: false, pending: false, secret: "", outcome: state.outcome };
 }
 
-export function changeCredentialRotateSecret(
+function changeCredentialRotateSecret(
   setState: React.Dispatch<React.SetStateAction<CredentialRotateFormState>>,
   event: React.ChangeEvent<HTMLInputElement>,
 ): void {
@@ -734,14 +734,14 @@ export function changeCredentialRotateSecret(
   setState(withCredentialRotateSecret.bind(null, secret));
 }
 
-export function withCredentialRotateSecret(
+function withCredentialRotateSecret(
   secret: string,
   state: CredentialRotateFormState,
 ): CredentialRotateFormState {
   return { ...state, secret };
 }
 
-export async function submitCredentialRotation(
+async function submitCredentialRotation(
   props: {
     readonly account: IntegrationAccount;
     readonly rotate: (
@@ -769,13 +769,13 @@ export async function submitCredentialRotation(
 }
 
 /** Clears the secret field before the request leaves, regardless of outcome. */
-export function beginCredentialRotateSubmit(
+function beginCredentialRotateSubmit(
   state: CredentialRotateFormState,
 ): CredentialRotateFormState {
   return { ...state, pending: true, secret: "" };
 }
 
-export function finishCredentialRotateSubmit(
+function finishCredentialRotateSubmit(
   outcome: CredentialActionOutcome,
   state: CredentialRotateFormState,
 ): CredentialRotateFormState {
@@ -790,7 +790,7 @@ export function finishCredentialRotateSubmit(
   };
 }
 
-export function renderCredentialRotateOutcome(
+function renderCredentialRotateOutcome(
   outcome: CredentialActionOutcome | null,
 ): React.ReactNode {
   if (outcome === null) return null;
@@ -814,7 +814,7 @@ export function renderCredentialRotateOutcome(
   }
 }
 
-export function formatCredentialRotationReceipt(
+function formatCredentialRotationReceipt(
   receipt: CredentialRotationReceipt | null,
 ): string {
   if (receipt === null) return "The new key is active.";
@@ -825,16 +825,16 @@ export function formatCredentialRotationReceipt(
   return `The new key is active. Generation ${receipt.activeGeneration} replaced generation ${receipt.previousGeneration}. ${activation} Receipt ${receipt.credentialRotationId}.`;
 }
 
-export type CredentialRevokeStage = "idle" | "confirm" | "replacement";
+type CredentialRevokeStage = "idle" | "confirm" | "replacement";
 
-export type CredentialRevokeState = {
+type CredentialRevokeState = {
   readonly stage: CredentialRevokeStage;
   readonly pending: boolean;
   readonly replacementId: string;
   readonly outcome: CredentialActionOutcome | null;
 };
 
-export function CredentialRevokeAction(props: {
+function CredentialRevokeAction(props: {
   readonly account: IntegrationAccount;
   readonly record: CredentialAccountRecord;
   readonly candidates: readonly IntegrationAccount[];
@@ -952,13 +952,13 @@ export function CredentialRevokeAction(props: {
   );
 }
 
-export function credentialReplacementItem(
+function credentialReplacementItem(
   account: IntegrationAccount,
 ): { value: string; label: string } {
   return { value: account.integrationAccountId, label: account.displayName };
 }
 
-export function renderCredentialReplacementOption(
+function renderCredentialReplacementOption(
   account: IntegrationAccount,
 ): React.ReactNode {
   return (
@@ -971,13 +971,13 @@ export function renderCredentialReplacementOption(
   );
 }
 
-export function requestCredentialRevoke(
+function requestCredentialRevoke(
   setState: React.Dispatch<React.SetStateAction<CredentialRevokeState>>,
 ): void {
   setState(toConfirmCredentialRevoke);
 }
 
-export function toConfirmCredentialRevoke(
+function toConfirmCredentialRevoke(
   state: CredentialRevokeState,
 ): CredentialRevokeState {
   return {
@@ -988,13 +988,13 @@ export function toConfirmCredentialRevoke(
   };
 }
 
-export function cancelCredentialRevoke(
+function cancelCredentialRevoke(
   setState: React.Dispatch<React.SetStateAction<CredentialRevokeState>>,
 ): void {
   setState(toIdleCredentialRevoke);
 }
 
-export function toIdleCredentialRevoke(
+function toIdleCredentialRevoke(
   state: CredentialRevokeState,
 ): CredentialRevokeState {
   return {
@@ -1005,7 +1005,7 @@ export function toIdleCredentialRevoke(
   };
 }
 
-export function changeCredentialReplacement(
+function changeCredentialReplacement(
   setState: React.Dispatch<React.SetStateAction<CredentialRevokeState>>,
   replacementId: string | null,
 ): void {
@@ -1013,14 +1013,14 @@ export function changeCredentialReplacement(
   setState(withCredentialReplacement.bind(null, replacementId));
 }
 
-export function withCredentialReplacement(
+function withCredentialReplacement(
   replacementId: string,
   state: CredentialRevokeState,
 ): CredentialRevokeState {
   return { ...state, replacementId };
 }
 
-export async function confirmCredentialRevoke(
+async function confirmCredentialRevoke(
   props: {
     readonly account: IntegrationAccount;
     readonly revoke: (
@@ -1042,13 +1042,13 @@ export async function confirmCredentialRevoke(
   setState(finishCredentialRevokeSubmit.bind(null, outcome));
 }
 
-export function beginCredentialRevokeSubmit(
+function beginCredentialRevokeSubmit(
   state: CredentialRevokeState,
 ): CredentialRevokeState {
   return { ...state, pending: true };
 }
 
-export function finishCredentialRevokeSubmit(
+function finishCredentialRevokeSubmit(
   outcome: CredentialActionOutcome,
   state: CredentialRevokeState,
 ): CredentialRevokeState {
@@ -1069,7 +1069,7 @@ export function finishCredentialRevokeSubmit(
   return { stage: "idle", pending: false, replacementId: "", outcome };
 }
 
-export function renderCredentialRevokeOutcome(
+function renderCredentialRevokeOutcome(
   outcome: CredentialActionOutcome | null,
 ): React.ReactNode {
   if (outcome === null) return null;
@@ -1093,7 +1093,7 @@ export function renderCredentialRevokeOutcome(
   }
 }
 
-export function formatCredentialRevocationReceipt(
+function formatCredentialRevocationReceipt(
   receipt: CredentialRevocationReceipt | null,
 ): string {
   if (receipt === null) return "The credential was revoked.";

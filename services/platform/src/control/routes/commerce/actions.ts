@@ -128,9 +128,9 @@ import {
 } from "../../../commerce/actions";
 import { commerceActionLedgerError } from "./support";
 
-export const APPROVAL_STEP_UP_MAX_AGE_MS = 10 * 60 * 1000;
+const APPROVAL_STEP_UP_MAX_AGE_MS = 10 * 60 * 1000;
 
-export function commerceActionProviderSupported(
+function commerceActionProviderSupported(
   source: CommerceSource,
   kind: CommerceActionRequest["kind"],
 ): boolean {
@@ -148,7 +148,7 @@ export function commerceActionProviderSupported(
   return false;
 }
 
-export function controlCommerceActionCapability(
+function controlCommerceActionCapability(
   integrationAccountId: IntegrationAccountId,
   resourceScope: string,
 ): ProviderCapabilityDefinition {
@@ -166,7 +166,7 @@ export function controlCommerceActionCapability(
  * capability switched off for the organisation, which the policy reports as a
  * capability outside its allowed tools.
  */
-export function proposePermissionMayBeOffered(
+function proposePermissionMayBeOffered(
   error: Readonly<{ code: string; detail?: string }>,
   required: ProviderCapabilityDefinition,
 ): boolean {
@@ -184,7 +184,7 @@ export function proposePermissionMayBeOffered(
  * prompt can only switch the capability on. Null when nothing that a prompt
  * can change would admit the proposal.
  */
-export async function commerceActionPermission(
+async function commerceActionPermission(
   env: Env,
   scope: OrganisationExecutionScope,
   personId: string,
@@ -231,7 +231,7 @@ export async function commerceActionPermission(
  * order by Commerce's own id. The local projection and the provider call
  * name it by its canonical id.
  */
-export async function withCanonicalOrderId(
+async function withCanonicalOrderId(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   body: Record<string, unknown>,
@@ -780,7 +780,7 @@ export async function handleCommerceActions(
   return controlJson(responseBody);
 }
 
-export async function proposePayoutAction(
+async function proposePayoutAction(
   input: Readonly<{
     request: Request;
     env: Env;
@@ -1044,7 +1044,7 @@ export async function proposePayoutAction(
   return controlJson(responseBody);
 }
 
-export async function attachMerchantActionDestination(input: {
+async function attachMerchantActionDestination(input: {
   readonly env: Env;
   readonly execution: OrganisationExecutionScope;
   readonly membership: ActiveOrganisationMembership;
@@ -1544,7 +1544,7 @@ export async function handleCommerceActionRejection(
   return controlJson(responseBody);
 }
 
-export function requireApprovalControlRole(
+function requireApprovalControlRole(
   role: ActiveOrganisationMembership["role"],
 ): "owner" | "admin" {
   switch (role) {
@@ -1751,7 +1751,7 @@ export async function handleCommerceActionExecution(
 }
 
 /** The HTTP answer for a commerce action that did not finish. */
-export function commerceActionFailureResponse(failure: CommerceActionFailure): Response {
+function commerceActionFailureResponse(failure: CommerceActionFailure): Response {
   switch (failure.kind) {
     case "case_unavailable":
       return controlError("commerce_action_case_unavailable", 503);
@@ -1781,7 +1781,7 @@ export function commerceActionFailureResponse(failure: CommerceActionFailure): R
   }
 }
 
-export function commerceActionErrorResponse(error: CommerceActionError): Response {
+function commerceActionErrorResponse(error: CommerceActionError): Response {
   switch (error.code) {
     case "commerce_action_invalid":
     case "commerce_action_path_invalid":
@@ -1816,7 +1816,7 @@ export function commerceActionErrorResponse(error: CommerceActionError): Respons
   }
 }
 
-export function commerceProviderExecutionErrorResponse(
+function commerceProviderExecutionErrorResponse(
   error: CommerceProviderExecutionError,
 ): Response {
   switch (error.code) {
@@ -1836,7 +1836,7 @@ export function commerceProviderExecutionErrorResponse(
   }
 }
 
-export function commerceEntityPlaneExecutionErrorResponse(error: {
+function commerceEntityPlaneExecutionErrorResponse(error: {
   readonly code: string;
 }): Response {
   switch (error.code) {
@@ -1860,6 +1860,6 @@ export function commerceEntityPlaneExecutionErrorResponse(error: {
   }
 }
 
-export function commerceActionProjectionError(code: string): Response {
+function commerceActionProjectionError(code: string): Response {
   return controlError(code, code === "commerce_projection_corrupt" ? 500 : 409);
 }

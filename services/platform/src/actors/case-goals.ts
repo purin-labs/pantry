@@ -29,12 +29,12 @@ export type GoalAdmissionRequest = Identity & {
   readonly sessionId: string;
   readonly expectedRevision: number;
 };
-export type GoalUsageRequest = Identity & {
+type GoalUsageRequest = Identity & {
   readonly operationId: string;
   readonly sessionId: string;
   readonly outcome: CaseGoalOperationOutcome;
 };
-export type GoalError = {
+type GoalError = {
   readonly code:
     | "goal_execution_running"
     | "goal_execution_closed"

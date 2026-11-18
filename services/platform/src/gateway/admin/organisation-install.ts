@@ -365,7 +365,7 @@ export async function handleCafeCommerceAcceptance(
   return jsonResponse({ ok: true, fault });
 }
 
-export async function readOnboardingAcceptanceEnvironment(
+async function readOnboardingAcceptanceEnvironment(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
 ): Promise<OrganisationEnvironment | null> {
@@ -380,7 +380,7 @@ export async function readOnboardingAcceptanceEnvironment(
     : null;
 }
 
-export function parseOrganisationInstallSeed(
+function parseOrganisationInstallSeed(
   body: JsonObject,
   now: number,
 ): Result<OrganisationInstallSeed, FieldError> {

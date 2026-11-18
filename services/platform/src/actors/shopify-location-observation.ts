@@ -35,7 +35,7 @@ const SHOPIFY_LOCATION_CLASSIFICATION_KINDS = exhaustiveList<LocationKind>()([
 type ShopifyLocationClassificationKind =
   (typeof SHOPIFY_LOCATION_CLASSIFICATION_KINDS)[number];
 
-export type ShopifyLocationObservationProjectionAuthority =
+type ShopifyLocationObservationProjectionAuthority =
   | Readonly<{ kind: "unselected" }>
   | Readonly<{
       kind: "selected";

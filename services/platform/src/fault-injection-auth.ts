@@ -1,4 +1,4 @@
-export type BearerAuthInput = {
+type BearerAuthInput = {
   authorization: string | null;
   configuredToken: string | undefined;
 };

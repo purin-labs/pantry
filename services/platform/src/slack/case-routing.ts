@@ -12,7 +12,7 @@ import {
 import type { Result } from "../result";
 import type { SlackMessageEvent } from "./events";
 
-export type SlackCaseRouteError = {
+type SlackCaseRouteError = {
   readonly code: "slack_case_identity_invalid";
 };
 

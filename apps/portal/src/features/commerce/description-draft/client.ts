@@ -13,14 +13,14 @@ import type { DraftPresenceView } from "./presence";
 import { assertNever } from "@seams/std";
 import { parseDescriptionServerMessage } from "@seams/control-api/portal/description-collaboration";
 
-export type DescriptionField = "description";
+type DescriptionField = "description";
 
-export type DescriptionTextView = TextCollaborationView<
+type DescriptionTextView = TextCollaborationView<
   DescriptionField,
   ProductDescriptionRoomMetadata
 >;
 
-export type DescriptionTextClient = TextCollaborationClient<
+type DescriptionTextClient = TextCollaborationClient<
   DescriptionField,
   ProductDescriptionDoc,
   ProductDescriptionUpdate,
@@ -31,7 +31,7 @@ export type DescriptionTextClient = TextCollaborationClient<
   DraftFailureCode
 >;
 
-export type Metadata = ProductDescriptionRoomMetadata &
+type Metadata = ProductDescriptionRoomMetadata &
   Readonly<{ access: "read" | "edit" }>;
 
 export type DraftInitialization =
@@ -49,7 +49,7 @@ export type DescriptionDraftView = Readonly<{
   | Readonly<{ kind: "failed"; message: string }>
 );
 
-export const DESCRIPTION_DOCUMENT: TextDocumentAdapter<
+const DESCRIPTION_DOCUMENT: TextDocumentAdapter<
   DescriptionField,
   ProductDescriptionDoc,
   ProductDescriptionUpdate,
@@ -74,7 +74,7 @@ export const DESCRIPTION_DOCUMENT: TextDocumentAdapter<
   destroy: destroyDescriptionDocument,
 };
 
-export const DESCRIPTION_PROTOCOL: TextProtocolAdapter<
+const DESCRIPTION_PROTOCOL: TextProtocolAdapter<
   ProductDescriptionUpdate,
   ProductDescriptionStateVector,
   ProductDescriptionPresenceSelection,
@@ -122,26 +122,26 @@ export class DescriptionDraftClient {
   }
 }
 
-export function createDescriptionDocument() {
+function createDescriptionDocument() {
   return ProductDescriptionDoc.create("");
 }
 
-export function cloneDescriptionDocument(document: ProductDescriptionDoc) {
+function cloneDescriptionDocument(document: ProductDescriptionDoc) {
   const state = document.state();
   return state.ok ? ProductDescriptionDoc.restore(state.value) : state;
 }
 
-export function readDescription(document: ProductDescriptionDoc): string {
+function readDescription(document: ProductDescriptionDoc): string {
   return document.read();
 }
 
-export function readDescriptionInputs(
+function readDescriptionInputs(
   textareas: Readonly<Record<DescriptionField, HTMLTextAreaElement>>,
 ): Readonly<Record<DescriptionField, string>> {
   return { description: textareas.description.value };
 }
 
-export function editDescription(
+function editDescription(
   document: ProductDescriptionDoc,
   _field: DescriptionField,
   next: string,
@@ -150,19 +150,19 @@ export function editDescription(
   return document.edit(next, range);
 }
 
-export function applyDescriptionUpdate(document: ProductDescriptionDoc, update: ProductDescriptionUpdate) {
+function applyDescriptionUpdate(document: ProductDescriptionDoc, update: ProductDescriptionUpdate) {
   return document.apply(update);
 }
 
-export function readDescriptionStateVector(document: ProductDescriptionDoc) {
+function readDescriptionStateVector(document: ProductDescriptionDoc) {
   return document.stateVector();
 }
 
-export function createDescriptionSyncUpdate(document: ProductDescriptionDoc, vector: ProductDescriptionStateVector) {
+function createDescriptionSyncUpdate(document: ProductDescriptionDoc, vector: ProductDescriptionStateVector) {
   return document.syncUpdate(vector);
 }
 
-export function captureDescriptionLocalSelection(
+function captureDescriptionLocalSelection(
   document: ProductDescriptionDoc,
   _field: DescriptionField,
   start: number,
@@ -172,11 +172,11 @@ export function captureDescriptionLocalSelection(
   return document.captureSelection(start, end, direction);
 }
 
-export function resolveDescriptionLocalSelection(document: ProductDescriptionDoc, selection: ProductDescriptionSelection) {
+function resolveDescriptionLocalSelection(document: ProductDescriptionDoc, selection: ProductDescriptionSelection) {
   return document.resolveSelection(selection);
 }
 
-export function captureDescriptionPresenceSelection(
+function captureDescriptionPresenceSelection(
   document: ProductDescriptionDoc,
   _field: DescriptionField,
   start: number,
@@ -186,7 +186,7 @@ export function captureDescriptionPresenceSelection(
   return document.capturePresenceSelection(start, end, direction);
 }
 
-export function resolveDescriptionPresenceSelection(
+function resolveDescriptionPresenceSelection(
   document: ProductDescriptionDoc,
   selection: ProductDescriptionPresenceSelection,
 ) {
@@ -194,11 +194,11 @@ export function resolveDescriptionPresenceSelection(
   return range === null ? null : { field: "description" as const, range };
 }
 
-export function destroyDescriptionDocument(document: ProductDescriptionDoc): void {
+function destroyDescriptionDocument(document: ProductDescriptionDoc): void {
   document.destroy();
 }
 
-export function encodeDescriptionClientMessage(
+function encodeDescriptionClientMessage(
   message: TextCollaborationClientMessage<
     ProductDescriptionUpdate,
     ProductDescriptionStateVector,
@@ -208,7 +208,7 @@ export function encodeDescriptionClientMessage(
   return encodeDraftClientMessage(message);
 }
 
-export function notifyDescriptionView(notify: (view: DescriptionDraftView) => void, view: DescriptionTextView): void {
+function notifyDescriptionView(notify: (view: DescriptionDraftView) => void, view: DescriptionTextView): void {
   const initialization: DraftInitialization = view.metadata === null
     ? { kind: "uninitialized" }
     : {
@@ -228,7 +228,7 @@ export function notifyDescriptionView(notify: (view: DescriptionDraftView) => vo
     : { ...base, kind: view.kind });
 }
 
-export function descriptionParticipant(participant: DescriptionTextView["participants"][number]): DraftPresenceView {
+function descriptionParticipant(participant: DescriptionTextView["participants"][number]): DraftPresenceView {
   return {
     sessionId: participant.sessionId,
     userId: participant.userId,
@@ -241,7 +241,7 @@ export function descriptionParticipant(participant: DescriptionTextView["partici
   };
 }
 
-export function draftFailureMessage(code: DraftFailureCode): string {
+function draftFailureMessage(code: DraftFailureCode): string {
   switch (code) {
     case "access_revoked":
       return "Editing access has ended. Copy any unsynced text before leaving this page.";

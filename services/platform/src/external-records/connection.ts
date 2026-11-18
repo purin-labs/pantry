@@ -16,7 +16,7 @@ import {
 } from "./records";
 import type { Result } from "../result";
 
-export type ExternalRecordsConnectionInput = Readonly<{
+type ExternalRecordsConnectionInput = Readonly<{
   env: Env;
   scope: OrganisationExecutionScope;
   environment: OrganisationEnvironment;
@@ -28,12 +28,12 @@ export type ExternalRecordsConnectionInput = Readonly<{
   fetcher: typeof fetch;
 }>;
 
-export type ExternalRecordsConnection = Readonly<{
+type ExternalRecordsConnection = Readonly<{
   account: ActiveIntegrationAccount;
   capabilities: readonly string[];
 }>;
 
-export type ExternalRecordsConnectionError =
+type ExternalRecordsConnectionError =
   | ExternalRecordsError
   | { readonly code: "external_records_base_required" }
   | { readonly code: "external_records_vault_handle_invalid" }

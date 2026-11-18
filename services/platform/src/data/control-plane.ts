@@ -152,7 +152,7 @@ export type OrganisationWorkspace = {
   readonly createdAt: number;
 };
 
-export type OrganisationMembership = ActiveOrganisationMembership & {
+type OrganisationMembership = ActiveOrganisationMembership & {
   readonly organisationHandle: OrganisationHandle;
   readonly workspaces: readonly [
     OrganisationWorkspace,
@@ -164,7 +164,7 @@ export type OrganisationMember = ActiveOrganisationMembership & {
   readonly displayName: string;
 };
 
-export type ControlAuthorization = {
+type ControlAuthorization = {
   readonly session: ActiveControlSession;
   readonly membership: ActiveOrganisationMembership;
 };
@@ -185,7 +185,7 @@ export type OrganisationBootstrapMutation = {
   readonly identity: ControlMutationIdentity;
 };
 
-export type OrganisationMembershipMutation = {
+type OrganisationMembershipMutation = {
   readonly boundary: Variant<
     ControlMutationBoundary,
     "configuration_versioned"
@@ -194,7 +194,7 @@ export type OrganisationMembershipMutation = {
   readonly identity: ControlMutationIdentity;
 };
 
-export type OrganisationMembershipMutationError =
+type OrganisationMembershipMutationError =
   | { readonly code: "organisation_membership_not_found" }
   | { readonly code: "organisation_final_owner_required" }
   | { readonly code: "configuration_version_conflict" }
@@ -210,7 +210,7 @@ export type ControlSessionError =
   | { readonly code: "control_session_corrupt" }
   | { readonly code: "control_session_rotation_conflict" };
 
-export type ControlAuthorizationError =
+type ControlAuthorizationError =
   | AccountEligibilityFailure
   | ControlSessionError
   | { readonly code: "csrf_invalid" }
@@ -765,7 +765,7 @@ export async function resolveOrganisationProvisioningActor(input: {
   return parsed.ok ? parsed.value : null;
 }
 
-export type OrganisationBootstrapError =
+type OrganisationBootstrapError =
   | OrganisationExecutionScopeError
   | { readonly code: "idempotency_key_conflict" }
   | { readonly code: "organisation_bootstrap_publication_pending" };
@@ -1245,7 +1245,7 @@ async function listRegionalControlMemberships(input: {
   return parseOrganisationMemberships(rows.results);
 }
 
-export interface EligibleControlMemberships {
+interface EligibleControlMemberships {
   readonly memberships: readonly OrganisationMembership[];
   readonly availability: ControlMembershipAvailability;
 }

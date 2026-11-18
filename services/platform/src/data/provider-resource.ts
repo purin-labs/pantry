@@ -24,7 +24,7 @@ export type DiscoveredProviderResource = {
   readonly resourceKind: string;
 };
 
-export type ProviderResourcePage = {
+type ProviderResourcePage = {
   readonly resources: readonly {
     readonly canonical_resource_id: string;
     readonly provider_resource_id: string;
@@ -38,12 +38,12 @@ export type ProviderResourcePage = {
   readonly snapshot_revision: string;
 };
 
-export type ProviderResourceError =
+type ProviderResourceError =
   | { readonly code: "integration_account_not_found" }
   | { readonly code: "provider_resource_cursor_invalid" }
   | { readonly code: "provider_resource_query_invalid" };
 
-export type ProviderResourceSnapshotMutation = {
+type ProviderResourceSnapshotMutation = {
   readonly boundary: Variant<
     ControlMutationBoundary,
     "configuration_versioned"
@@ -52,7 +52,7 @@ export type ProviderResourceSnapshotMutation = {
   readonly identity: ControlMutationIdentity;
 };
 
-export type ProviderResourceSnapshotRefreshInput = {
+type ProviderResourceSnapshotRefreshInput = {
   readonly db: OrganisationDatabase;
   readonly organisationId: OrganisationId;
   readonly integrationAccountId: IntegrationAccountId;
@@ -63,7 +63,7 @@ export type ProviderResourceSnapshotRefreshInput = {
   readonly now: number;
 };
 
-export type ProviderResourceSnapshotRefreshResult = {
+type ProviderResourceSnapshotRefreshResult = {
   readonly snapshotRevision: string;
   readonly resourceCount: number;
   readonly configurationVersion: number;
@@ -71,7 +71,7 @@ export type ProviderResourceSnapshotRefreshResult = {
   readonly receiptId: string;
 };
 
-export type ProviderResourceSnapshotRefreshError =
+type ProviderResourceSnapshotRefreshError =
   | { readonly code: "organisation_not_found" }
   | { readonly code: "configuration_version_conflict" };
 

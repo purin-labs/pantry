@@ -151,7 +151,7 @@ export function grantSubjectFromReferenceInput(
   }
 }
 
-export function subjectReferenceInputForVisibility(
+function subjectReferenceInputForVisibility(
   value: ContextVisibility,
 ): SubjectReferenceInput | null {
   switch (value.kind) {

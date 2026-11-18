@@ -17,10 +17,10 @@ import { traceLog, traceWarn } from "../observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 
-export type ProviderRevocationReason =
+type ProviderRevocationReason =
   "shopify_app_uninstalled" | "stripe_application_deauthorized";
 
-export type ProviderRevocationOutcome =
+type ProviderRevocationOutcome =
   | Readonly<{
       kind: "revoked";
       revocationId: string;
@@ -28,7 +28,7 @@ export type ProviderRevocationOutcome =
     }>
   | Readonly<{ kind: "already_revoked" }>;
 
-export type ProviderRevocationError = Readonly<{
+type ProviderRevocationError = Readonly<{
   code: "integration_account_not_found" | "provider_connection_not_found";
 }>;
 

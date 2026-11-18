@@ -12,7 +12,7 @@ import type {
  * The content of one user message, from a command or a stored message. The
  * Kitchen view travels inside `surfaceObservation` (Plan 87 phase 2).
  */
-export type ChatInputContent = Readonly<{
+type ChatInputContent = Readonly<{
   text: string;
   browserContext: BakeryBrowserContext;
   attachments: readonly ChatAttachmentPart[];

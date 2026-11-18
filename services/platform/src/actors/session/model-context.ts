@@ -154,13 +154,13 @@ export function projectModelContext(
   };
 }
 
-export function isProjectContextItem(
+function isProjectContextItem(
   item: import("../../context/assembly").ModelContextItem,
 ): boolean {
   return item.provenance.kind === "project_context";
 }
 
-export function isChatContextItem(
+function isChatContextItem(
   item: import("../../context/assembly").ModelContextItem,
 ): boolean {
   return item.provenance.kind !== "project_context";
@@ -173,7 +173,7 @@ export function projectWorkingHistory(
   return entries.map(projectWorkingEntry.bind(null, currentTurnId));
 }
 
-export function projectWorkingEntry(
+function projectWorkingEntry(
   currentTurnId: string,
   entry: HarnessHistoryEntry,
 ): HarnessHistoryEntry {
@@ -188,7 +188,7 @@ export function projectWorkingEntry(
   };
 }
 
-export function isChatHistoryContent(content: HarnessHistoryContent): boolean {
+function isChatHistoryContent(content: HarnessHistoryContent): boolean {
   return content.kind !== "project_context";
 }
 
@@ -247,9 +247,7 @@ export function hasSupersededProjectContext(
   return false;
 }
 
-export function isProjectHistoryContent(
-  content: HarnessHistoryContent,
-): boolean {
+function isProjectHistoryContent(content: HarnessHistoryContent): boolean {
   return content.kind === "project_context";
 }
 

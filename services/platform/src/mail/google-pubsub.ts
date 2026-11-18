@@ -18,13 +18,13 @@ const GOOGLE_ISSUERS = new Set([
 const CLOCK_SKEW_SECONDS = 60;
 const ENVELOPE_LIMIT = 64 * 1024;
 
-export type GooglePushVerificationError =
+type GooglePushVerificationError =
   | { readonly code: "pubsub_token_missing" }
   | { readonly code: "pubsub_token_invalid" }
   | { readonly code: "pubsub_identity_unverified" }
   | { readonly code: "pubsub_configuration_missing" };
 
-export type GmailPushHint = {
+type GmailPushHint = {
   readonly emailAddress: string;
   readonly historyId: string;
   readonly notificationId: string;

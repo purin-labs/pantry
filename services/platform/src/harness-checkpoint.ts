@@ -19,7 +19,7 @@ export const MAX_CHECKPOINT_PLAINTEXT_BYTES = 16 * 1024 * 1024;
 const MAX_CHECKPOINT_CIPHERTEXT_BYTES = MAX_CHECKPOINT_PLAINTEXT_BYTES + 64;
 const textEncoder = new TextEncoder();
 
-export type SealedHarnessCheckpointPayload = {
+type SealedHarnessCheckpointPayload = {
   body: Uint8Array;
   sha256: string;
 };

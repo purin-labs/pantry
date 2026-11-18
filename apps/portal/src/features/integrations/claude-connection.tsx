@@ -23,15 +23,15 @@ export type ClaudeConnectionState =
   | Readonly<{ kind: "failed"; message: string }>
   | Readonly<{ kind: "ready"; view: ClaudeConnectionView }>;
 
-export type State = ClaudeConnectionState;
+type State = ClaudeConnectionState;
 
-export type SetState = React.Dispatch<React.SetStateAction<State>>;
+type SetState = React.Dispatch<React.SetStateAction<State>>;
 
 /** The Claude sign-in window that this page opened, until the code arrives. */
-export type SignInWindow = React.RefObject<Window | null>;
+type SignInWindow = React.RefObject<Window | null>;
 
 /** The request in flight, so that only its control says so. */
-export type Busy = "start" | "connect" | "disconnect" | null;
+type Busy = "start" | "connect" | "disconnect" | null;
 
 /**
  * What the last request left for the operator to know.
@@ -39,13 +39,13 @@ export type Busy = "start" | "connect" | "disconnect" | null;
  * stays open. `ended`: the sign-in can no longer finish, because it expired
  * or because Claude did not confirm the code, which uses it up.
  */
-export type Notice =
+type Notice =
   | Readonly<{ kind: "invalid_code" }>
   | Readonly<{ kind: "ended"; reason: "expired" | "not_confirmed" }>
   | Readonly<{ kind: "failed"; message: string }>;
 
 /** The one stage of the sign-in that the panel shows. */
-export type Stage =
+type Stage =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "unreadable"; message: string }>
   | Readonly<{ kind: "start"; again: boolean }>
@@ -53,7 +53,7 @@ export type Stage =
   | Readonly<{ kind: "restart"; reason: "expired" | "not_confirmed" }>
   | Readonly<{ kind: "connected" }>;
 
-export type Controls = Readonly<{
+type Controls = Readonly<{
   organisationId: string;
   setState: SetState;
   setBusy: React.Dispatch<React.SetStateAction<Busy>>;
@@ -138,7 +138,7 @@ export function ClaudeConnectionPanel(
   );
 }
 
-export type StageContext = Readonly<{
+type StageContext = Readonly<{
   props: Parameters<typeof ClaudeConnectionPanel>[0];
   controls: Controls;
   busy: Busy;
@@ -148,11 +148,7 @@ export type StageContext = Readonly<{
   now: number;
 }>;
 
-export function signInStage(
-  state: State,
-  notice: Notice | null,
-  now: number,
-): Stage {
+function signInStage(state: State, notice: Notice | null, now: number): Stage {
   if (state.kind === "loading") return { kind: "loading" };
   if (state.kind === "failed")
     return { kind: "unreadable", message: state.message };
@@ -173,7 +169,7 @@ export function signInStage(
   }
 }
 
-export function stageStatus(stage: Stage): StatusChipStatus | null {
+function stageStatus(stage: Stage): StatusChipStatus | null {
   switch (stage.kind) {
     case "loading":
       return null;
@@ -198,7 +194,7 @@ export function stageStatus(stage: Stage): StatusChipStatus | null {
  * Two segments, sign in and paste the code, in the style of the Portal's
  * other stepped dialogs. A connected account needs no steps.
  */
-export function SignInSteps(
+function SignInSteps(
   props: Readonly<{ stage: Stage; notice: Notice | null }>,
 ): React.ReactNode {
   const states = signInStepStates(props.stage, props.notice);
@@ -211,9 +207,9 @@ export function SignInSteps(
   );
 }
 
-export type StepState = "done" | "current" | "next" | "failed" | "attention";
+type StepState = "done" | "current" | "next" | "failed" | "attention";
 
-export function signInStepStates(
+function signInStepStates(
   stage: Stage,
   notice: Notice | null,
 ): readonly [StepState, StepState] | null {
@@ -231,10 +227,7 @@ export function signInStepStates(
   }
 }
 
-export function renderSignInStep(
-  label: string,
-  state: StepState,
-): React.ReactNode {
+function renderSignInStep(label: string, state: StepState): React.ReactNode {
   return (
     <li
       key={label}
@@ -251,10 +244,7 @@ export function renderSignInStep(
   );
 }
 
-export function renderStage(
-  stage: Stage,
-  context: StageContext,
-): React.ReactNode {
+function renderStage(stage: Stage, context: StageContext): React.ReactNode {
   switch (stage.kind) {
     case "loading":
       return (
@@ -288,10 +278,7 @@ export function renderStage(
   }
 }
 
-export function renderIntro(
-  title: string,
-  lead: React.ReactNode,
-): React.ReactNode {
+function renderIntro(title: string, lead: React.ReactNode): React.ReactNode {
   return (
     <div className="claude-sign-in-intro" aria-live="polite">
       <h5 className="claude-sign-in-title">{title}</h5>
@@ -300,10 +287,7 @@ export function renderIntro(
   );
 }
 
-export function renderStart(
-  again: boolean,
-  context: StageContext,
-): React.ReactNode {
+function renderStart(again: boolean, context: StageContext): React.ReactNode {
   return (
     <>
       {renderIntro(
@@ -324,7 +308,7 @@ export function renderStart(
   );
 }
 
-export function renderStartButton(
+function renderStartButton(
   context: StageContext,
   label: string,
 ): React.ReactNode {
@@ -345,7 +329,7 @@ export function renderStartButton(
   );
 }
 
-export function renderDisconnectButton(context: StageContext): React.ReactNode {
+function renderDisconnectButton(context: StageContext): React.ReactNode {
   return (
     <button
       type="button"
@@ -359,7 +343,7 @@ export function renderDisconnectButton(context: StageContext): React.ReactNode {
   );
 }
 
-export function renderPaste(
+function renderPaste(
   authorization: ClaudeAuthorization,
   context: StageContext,
 ): React.ReactNode {
@@ -391,7 +375,7 @@ export function renderPaste(
  * cannot read, so the operator copies it from the sign-in window and pastes
  * it here.
  */
-export function ClaudeCodeForm(
+function ClaudeCodeForm(
   props: Readonly<{
     authorization: ClaudeAuthorization;
     context: StageContext;
@@ -473,7 +457,7 @@ export function ClaudeCodeForm(
   );
 }
 
-export function renderRestart(
+function renderRestart(
   reason: "expired" | "not_confirmed",
   context: StageContext,
 ): React.ReactNode {
@@ -498,7 +482,7 @@ export function renderRestart(
   );
 }
 
-export function renderConnected(context: StageContext): React.ReactNode {
+function renderConnected(context: StageContext): React.ReactNode {
   return (
     <>
       <p className="claude-sign-in-lead">
@@ -525,7 +509,7 @@ export function renderConnected(context: StageContext): React.ReactNode {
 }
 
 /** "Expires in 9 minutes.", rounded up, so the count never reads late. */
-export function expiryText(expiresAt: number, now: number): string {
+function expiryText(expiresAt: number, now: number): string {
   const left = expiresAt - now;
   if (left < 60_000) return "Expires in less than a minute.";
   const minutes = Math.ceil(left / 60_000);
@@ -533,13 +517,13 @@ export function expiryText(expiresAt: number, now: number): string {
 }
 
 /** The clock, read again every ten seconds while a sign-in waits. */
-export function useNow(active: boolean): number {
+function useNow(active: boolean): number {
   const [now, setNow] = React.useState(Date.now);
   React.useEffect(tickWhile.bind(null, active, setNow), [active]);
   return now;
 }
 
-export function tickWhile(
+function tickWhile(
   active: boolean,
   setNow: React.Dispatch<React.SetStateAction<number>>,
 ): () => void {
@@ -549,15 +533,13 @@ export function tickWhile(
   return window.clearInterval.bind(window, timer);
 }
 
-export function readClock(
-  setNow: React.Dispatch<React.SetStateAction<number>>,
-): void {
+function readClock(setNow: React.Dispatch<React.SetStateAction<number>>): void {
   setNow(Date.now());
 }
 
-export function noCleanup(): void {}
+function noCleanup(): void {}
 
-export function updateCode(
+function updateCode(
   controls: Controls,
   event: React.ChangeEvent<HTMLInputElement>,
 ): void {
@@ -565,7 +547,7 @@ export function updateCode(
   controls.setNotice(clearInvalidCode);
 }
 
-export function clearInvalidCode(notice: Notice | null): Notice | null {
+function clearInvalidCode(notice: Notice | null): Notice | null {
   return notice?.kind === "invalid_code" ? null : notice;
 }
 
@@ -573,7 +555,7 @@ export function clearInvalidCode(notice: Notice | null): Notice | null {
  * Opens the sign-in again in the same window. If the browser blocks the
  * window, the link opens Claude in a new tab instead.
  */
-export function openSignInWindow(
+function openSignInWindow(
   authorizationUrl: string,
   controls: Controls,
   event: React.MouseEvent<HTMLAnchorElement>,
@@ -590,7 +572,7 @@ export function openSignInWindow(
  * back to the front, the empty code field takes the focus, so a paste fills
  * it.
  */
-export function focusCodeOnReturn(
+function focusCodeOnReturn(
   codeInput: React.RefObject<HTMLInputElement | null>,
 ): () => void {
   const focus = focusEmptyCode.bind(null, codeInput);
@@ -598,31 +580,31 @@ export function focusCodeOnReturn(
   return window.removeEventListener.bind(window, "focus", focus);
 }
 
-export function focusEmptyCode(
+function focusEmptyCode(
   codeInput: React.RefObject<HTMLInputElement | null>,
 ): void {
   const input = codeInput.current;
   if (input !== null && !input.disabled && input.value === "") input.focus();
 }
 
-export function closeSignInWindow(signInWindow: SignInWindow): void {
+function closeSignInWindow(signInWindow: SignInWindow): void {
   const opened = signInWindow.current;
   signInWindow.current = null;
   if (opened !== null && !opened.closed) opened.close();
 }
 
-export function connectionPath(organisationId: string): string {
+function connectionPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/inference/claude`;
 }
 
 /** The control error code that the platform returned, if any. */
-export function controlErrorCode(error: unknown): unknown {
+function controlErrorCode(error: unknown): unknown {
   return error instanceof ControlApiError && isRecord(error.details)
     ? error.details.error
     : null;
 }
 
-export function loadConnection(
+function loadConnection(
   organisationId: string,
   setState: SetState,
 ): () => void {
@@ -631,18 +613,18 @@ export function loadConnection(
   return endLoad.bind(null, lifetime);
 }
 
-export function endLoad(lifetime: { active: boolean }): void {
+function endLoad(lifetime: { active: boolean }): void {
   lifetime.active = false;
 }
 
-export function retryRead(controls: Controls): void {
+function retryRead(controls: Controls): void {
   controls.setState({ kind: "loading" });
   void readConnection(controls.organisationId, controls.setState, {
     active: true,
   });
 }
 
-export async function readConnection(
+async function readConnection(
   organisationId: string,
   setState: SetState,
   lifetime: { active: boolean },
@@ -667,7 +649,7 @@ export async function readConnection(
  * await, or the browser blocks it as a popup that the user did not ask for.
  * While a sign-in is open, Pantry returns that same sign-in.
  */
-export async function startAuthorization(controls: Controls): Promise<void> {
+async function startAuthorization(controls: Controls): Promise<void> {
   closeSignInWindow(controls.signInWindow);
   const opened = openAuthorizationPopup();
   controls.signInWindow.current = opened;
@@ -700,7 +682,7 @@ export async function startAuthorization(controls: Controls): Promise<void> {
   }
 }
 
-export async function completeAuthorization(
+async function completeAuthorization(
   controls: Controls,
   attemptId: string,
   code: string,
@@ -732,7 +714,7 @@ export async function completeAuthorization(
   }
 }
 
-export function completionNotice(code: unknown): Notice {
+function completionNotice(code: unknown): Notice {
   switch (code) {
     case "claude_oauth_code_invalid":
       return { kind: "invalid_code" };
@@ -749,14 +731,14 @@ export function completionNotice(code: unknown): Notice {
 }
 
 /** Pantry ends the sign-in when it expired or when Claude refused the code. */
-export function endsAttempt(code: unknown): boolean {
+function endsAttempt(code: unknown): boolean {
   return (
     code === "claude_authorization_expired" ||
     code === "claude_oauth_provider_unavailable"
   );
 }
 
-export async function disconnect(controls: Controls): Promise<void> {
+async function disconnect(controls: Controls): Promise<void> {
   controls.setBusy("disconnect");
   controls.setNotice(null);
   try {
@@ -778,7 +760,7 @@ export async function disconnect(controls: Controls): Promise<void> {
   }
 }
 
-export function showAuthorization(
+function showAuthorization(
   authorization: ClaudeAuthorization,
   state: State,
 ): State {
@@ -793,14 +775,14 @@ export function showAuthorization(
     : state;
 }
 
-export function connectionView(connection: ClaudeConnection): State {
+function connectionView(connection: ClaudeConnection): State {
   return {
     kind: "ready",
     view: { connection, authorization: { kind: "idle" } },
   };
 }
 
-export function endAuthorization(state: State): State {
+function endAuthorization(state: State): State {
   return state.kind === "ready"
     ? {
         kind: "ready",

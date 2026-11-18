@@ -41,7 +41,7 @@ import {
 } from "./assembly/internal";
 import { createContextProjectionReader } from "./projection";
 
-export type PreparedTurnContext = {
+type PreparedTurnContext = {
   readonly turnAuthority: CompiledTurnAuthority;
   readonly context: ContextAssemblyResult;
 };

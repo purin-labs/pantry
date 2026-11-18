@@ -185,7 +185,7 @@ const useCases = [
   },
 ];
 
-export function H2WorkflowCanvas(): React.JSX.Element {
+function H2WorkflowCanvas(): React.JSX.Element {
   return (
     <div className="h2-flow">
       <div

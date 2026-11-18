@@ -872,7 +872,7 @@ async function buildActionRequestDraft(
  * changes the catalogue, a price, tracking or a plugin. An order cancellation
  * refunds money and a supplier payout sends it, so both keep the step-up.
  */
-export const SLACK_APPROVABLE_ACTION_KINDS: ReadonlySet<string> = new Set([
+const SLACK_APPROVABLE_ACTION_KINDS: ReadonlySet<string> = new Set([
   "publish_catalog_listing",
   "update_product_description",
   "attach_tracking",

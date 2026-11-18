@@ -270,7 +270,7 @@ export function parseInitialOrder(input: {
   };
 }
 
-export function parseInitialOrderResources(input: {
+function parseInitialOrderResources(input: {
   readonly raw: JsonObject;
   readonly orderId: string;
   readonly currency: string;
@@ -310,7 +310,7 @@ export function parseInitialOrderResources(input: {
   return { ok: true, value: resources };
 }
 
-export function parseInitialFulfillmentResources(input: {
+function parseInitialFulfillmentResources(input: {
   readonly raw: JsonObject;
   readonly orderId: string;
   readonly organisationId: OrganisationId;
@@ -337,7 +337,7 @@ export function parseInitialFulfillmentResources(input: {
   return { ok: true, value: resources };
 }
 
-export function parseInitialFulfillment(input: {
+function parseInitialFulfillment(input: {
   readonly raw: unknown;
   readonly orderId: string;
   readonly organisationId: OrganisationId;
@@ -447,7 +447,7 @@ export function parseInitialFulfillment(input: {
   return { ok: true, value: [fulfillment, shipmentEnvelope] };
 }
 
-export function parseInitialFulfillmentLineItems(
+function parseInitialFulfillmentLineItems(
   raw: readonly unknown[],
 ): Result<
   Array<{ readonly lineItemId: string; readonly quantity: number }>,
@@ -477,7 +477,7 @@ export function parseInitialFulfillmentLineItems(
     : initialOrdersInvalid();
 }
 
-export type ParsedInitialShipment = {
+type ParsedInitialShipment = {
   readonly resource: Variant<
     ShopifyResourceEnvelopeV202607["resource"],
     "shipment"
@@ -485,16 +485,16 @@ export type ParsedInitialShipment = {
   readonly carrierHandoffAt: string | null;
 };
 
-export type InitialTrackingEventKind = Exclude<
+type InitialTrackingEventKind = Exclude<
   ShopifyTrackingEventKindV202607,
   { readonly state: "returned" }
 >;
 
-export type InitialTrackingEvent = Omit<ShopifyTrackingEventV202607, "kind"> & {
+type InitialTrackingEvent = Omit<ShopifyTrackingEventV202607, "kind"> & {
   readonly kind: InitialTrackingEventKind;
 };
 
-export function parseInitialShipment(input: {
+function parseInitialShipment(input: {
   readonly raw: JsonObject;
   readonly orderId: string;
   readonly fulfillmentId: string;
@@ -560,7 +560,7 @@ export function parseInitialShipment(input: {
   };
 }
 
-export function parseInitialTrackingEvent(raw: unknown): Result<
+function parseInitialTrackingEvent(raw: unknown): Result<
   {
     readonly event: InitialTrackingEvent;
     readonly carrierHandoff: boolean;
@@ -600,7 +600,7 @@ export function parseInitialTrackingEvent(raw: unknown): Result<
   };
 }
 
-export function initialTrackingEventKind(
+function initialTrackingEventKind(
   rawStatus: string,
   message: string | null,
 ): InitialTrackingEventKind | null {
@@ -627,7 +627,7 @@ export function initialTrackingEventKind(
   }
 }
 
-export function shipmentLifecycleFromTrackingEvent(
+function shipmentLifecycleFromTrackingEvent(
   event: InitialTrackingEvent,
 ): ShopifyShipmentLifecycleV202607 {
   switch (event.kind.state) {
@@ -646,7 +646,7 @@ export function shipmentLifecycleFromTrackingEvent(
   }
 }
 
-export function initialFulfillmentLifecycle(input: {
+function initialFulfillmentLifecycle(input: {
   readonly status: string;
   readonly displayStatus: string | null;
   readonly createdAt: string;
@@ -726,13 +726,13 @@ export function initialFulfillmentLifecycle(input: {
   return null;
 }
 
-export function trackingEventLocation(raw: JsonObject): string | null {
+function trackingEventLocation(raw: JsonObject): string | null {
   const fields = [raw.address1, raw.city, raw.province, raw.country, raw.zip];
   const parts = fields.filter(isNonEmptyString);
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
-export function compareTrackingEvents(
+function compareTrackingEvents(
   left: ShopifyTrackingEventV202607,
   right: ShopifyTrackingEventV202607,
 ): number {
@@ -740,14 +740,14 @@ export function compareTrackingEvents(
   return timestamp === 0 ? left.id.localeCompare(right.id) : timestamp;
 }
 
-export function shopifyShipmentId(
+function shopifyShipmentId(
   fulfillmentId: string,
   trackingNumber: string,
 ): string {
   return `${fulfillmentId}/shipment/${encodeURIComponent(trackingNumber)}`;
 }
 
-export function initialOrdersInvalid(): Result<never, ShopifyInitialSyncError> {
+function initialOrdersInvalid(): Result<never, ShopifyInitialSyncError> {
   return {
     ok: false,
     error: {
@@ -757,7 +757,7 @@ export function initialOrdersInvalid(): Result<never, ShopifyInitialSyncError> {
   };
 }
 
-export function parseInitialPaymentResource(input: {
+function parseInitialPaymentResource(input: {
   readonly raw: unknown;
   readonly orderId: string;
   readonly fallbackCurrency: string;
@@ -837,7 +837,7 @@ export function parseInitialPaymentResource(input: {
   };
 }
 
-export function initialPaymentLifecycle(
+function initialPaymentLifecycle(
   rawKind: string,
   rawStatus: string,
   occurredAt: string,
@@ -871,7 +871,7 @@ export function initialPaymentLifecycle(
   return null;
 }
 
-export function shopifyGraphqlFulfillmentStatus(
+function shopifyGraphqlFulfillmentStatus(
   raw: unknown,
 ): ShopifyCommerceOrderEnvelope["order"]["fulfillmentStatus"] {
   switch (raw) {

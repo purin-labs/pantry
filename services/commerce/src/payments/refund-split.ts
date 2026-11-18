@@ -31,7 +31,7 @@ export type TenderRefundPart = Readonly<{
   allocation: RefundAllocation;
 }>;
 
-export type TenderRefundPlan =
+type TenderRefundPlan =
   | Readonly<{ kind: "planned"; parts: readonly TenderRefundPart[] }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -42,10 +42,7 @@ const TENDER_ORDER: Readonly<Record<TenderPosition["kind"], number>> = {
 };
 
 /** The refund attempt of the part that refunds `paymentId`. */
-export function tenderRefundAttemptId(
-  refundId: string,
-  paymentId: string,
-): string {
+function tenderRefundAttemptId(refundId: string, paymentId: string): string {
   return `${refundId}_${sha256(paymentId).slice(0, 16)}`;
 }
 

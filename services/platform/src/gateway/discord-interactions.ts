@@ -5,16 +5,16 @@ import type {
 import type { Result } from "../result";
 import { isRecord } from "@seams/std";
 
-export type DiscordPublicKey = Uint8Array & { readonly length: 32 };
+type DiscordPublicKey = Uint8Array & { readonly length: 32 };
 
-export type DiscordLinkCommand = {
+type DiscordLinkCommand = {
   applicationId: DiscordApplicationId;
   guildId: DiscordGuildId;
   userId: string;
   displayName: string;
 };
 
-export type DiscordInteraction =
+type DiscordInteraction =
   { kind: "ping" } | { kind: "link"; command: DiscordLinkCommand };
 
 export type DiscordInteractionError =

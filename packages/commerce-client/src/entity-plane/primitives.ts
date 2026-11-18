@@ -1,13 +1,7 @@
 import type {
-  AttributeDefinition,
   AttributeDefinitionId,
-  AttributeDefinitionKind,
-  AttributeDefinitionScope,
   AttributeDefinitionRevision,
-  AttributeOption,
   AttributeOptionId,
-  AttributeValue,
-  AttributeValueAssignment,
   CommerceCommandId,
   CommerceEntityRef,
   CommerceEntityRevision,
@@ -21,13 +15,7 @@ import type {
   CustomCommerceEntityRef,
   CustomCommerceEntityTypeId,
   CustomCommerceRelationshipRef,
-  CustomEntityTypeRevision,
-  DecimalValue,
-  ExternalResourceReference,
-  ListEntryAttributeDefinition,
   ListEntryAttributeValue,
-  MerchantOperatorReference,
-  MerchantExtensionSchemaRevision,
   PublishedCommerceSelectorId,
   PublishedCommerceSelectorRevision,
   RelationshipDefinitionId,
@@ -38,23 +26,16 @@ import type {
   RelationshipRevision,
   SavedCommerceViewId,
   SavedCommerceViewRevision,
-  SourceProvenance,
   SystemCommerceEntityKind,
   SystemCommerceEntityRef,
   SystemSchemaRevision,
 } from "@seams/commerce-contracts";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@seams/type-utils";
 import { exhaustiveList, isNormalizedText, isRecord } from "@seams/std";
 import {
-  parseAttributeOption as parseAttributeOptionRecord,
-  parseAttributeValue as parseAttributeValueRecord,
-  parseAttributeValueAssignment as parseAttributeValueAssignmentRecord,
   parseWireCustomCommerceRelationshipRef as parseCustomCommerceRelationshipRefRecord,
-  parseExternalResourceReference as parseExternalResourceReferenceRecord,
   parseListEntryAttributeValue as parseListEntryAttributeValueRecord,
-  parseMerchantOperatorReference as parseMerchantOperatorReferenceRecord,
 } from "@seams/commerce-contracts/records/entity-plane";
-import { parseSourceProvenance as parseSourceProvenanceRecord } from "@seams/commerce-contracts/records/provenance";
 import { decodeRecord } from "./record-decoding.ts";
 
 export const SYSTEM_KINDS = exhaustiveList<SystemCommerceEntityKind>()([
@@ -501,66 +482,7 @@ export function parseEntityTypeId(value: unknown): CommerceEntityTypeId {
       };
 }
 
-export function parseAttributeScope(
-  value: unknown,
-  field: string,
-): AttributeDefinitionScope {
-  const object = objectValue(value, field);
-  const kind = enumValue(object.kind, `${field}.kind`, [
-    "system",
-    "merchant_extension",
-    "custom",
-  ] as const);
-  switch (kind) {
-    case "system":
-      return {
-        kind,
-        entityTypeId: enumValue(
-          object.entityTypeId,
-          `${field}.entityTypeId`,
-          SYSTEM_KINDS,
-        ),
-        schemaRevision: brandRevision<SystemSchemaRevision>(
-          object.schemaRevision,
-          `${field}.schemaRevision`,
-        ),
-      };
-    case "merchant_extension":
-      return {
-        kind,
-        entityTypeId: enumValue(
-          object.entityTypeId,
-          `${field}.entityTypeId`,
-          SYSTEM_KINDS,
-        ),
-        schemaRevision: brandRevision<MerchantExtensionSchemaRevision>(
-          object.schemaRevision,
-          `${field}.schemaRevision`,
-        ),
-      };
-    case "custom":
-      return {
-        kind,
-        entityTypeId: brandText<CustomCommerceEntityTypeId>(
-          object.entityTypeId,
-          `${field}.entityTypeId`,
-        ),
-        typeRevision: brandRevision<CustomEntityTypeRevision>(
-          object.typeRevision,
-          `${field}.typeRevision`,
-        ),
-      };
-  }
-}
-
-export function sameEntityTypeId(
-  left: CommerceEntityTypeId,
-  right: CommerceEntityTypeId,
-): boolean {
-  return left.origin === right.origin && left.typeId === right.typeId;
-}
-
-export function parseRelationshipDefinitionRef(
+function parseRelationshipDefinitionRef(
   value: unknown,
 ): RelationshipDefinitionRef {
   const object = strictObjectValue(value, "relationshipDefinition", [
@@ -644,207 +566,10 @@ export function parseCustomCommerceRelationshipRef(
   return decodeRecord(parseCustomCommerceRelationshipRefRecord, value);
 }
 
-export function parseAttributeAssignment(
-  value: unknown,
-): AttributeValueAssignment {
-  return decodeRecord(parseAttributeValueAssignmentRecord, value);
-}
-
-export function parseListEntryAttributeDefinition(
-  value: unknown,
-): ListEntryAttributeDefinition {
-  const object = objectValue(value, "listEntryAttributeDefinition");
-  return {
-    attributeId: brandText<AttributeDefinitionId>(
-      object.attributeId,
-      "listEntryAttributeDefinition.attributeId",
-    ),
-    definition: parseAttributeDefinition(object.definition),
-  };
-}
-
 export function parseListEntryAttributeValue(
   value: unknown,
 ): ListEntryAttributeValue {
   return decodeRecord(parseListEntryAttributeValueRecord, value);
-}
-
-export function parseAttributeDefinition(value: unknown): AttributeDefinition {
-  const object = objectValue(value, "attributeDefinition");
-  return {
-    id: brandText<AttributeDefinitionId>(object.id, "attributeDefinition.id"),
-    scope: parseAttributeScope(object.scope, "attributeDefinition.scope"),
-    label: normalizedText(object.label, "attributeDefinition.label"),
-    helpText: nullable(object.helpText, (entry) =>
-      normalizedText(entry, "attributeDefinition.helpText"),
-    ),
-    required: booleanValue(object.required, "attributeDefinition.required"),
-    sensitivity: parseSensitivity(
-      object.sensitivity,
-      "attributeDefinition.sensitivity",
-    ),
-    kind: parseAttributeDefinitionKind(object.kind),
-    revision: brandRevision<AttributeDefinitionRevision>(
-      object.revision,
-      "attributeDefinition.revision",
-    ),
-  };
-}
-
-export function parseAttributeDefinitionKind(
-  value: unknown,
-): AttributeDefinitionKind {
-  const object = objectValue(value, "attributeDefinition.kind");
-  const kind = enumValue(object.kind, "attributeDefinition.kind.kind", [
-    "short_text",
-    "long_text",
-    "integer",
-    "decimal",
-    "boolean",
-    "date",
-    "timestamp",
-    "status",
-    "choice",
-    "money",
-    "merchant_operator_reference",
-    "external_resource_reference",
-  ] as const);
-  switch (kind) {
-    case "short_text":
-      return {
-        kind,
-        maxLength: boundedPositive(
-          object.maxLength,
-          "attributeDefinition.kind.maxLength",
-        ),
-      };
-    case "long_text":
-      return {
-        kind,
-        maxLength: boundedPositive(
-          object.maxLength,
-          "attributeDefinition.kind.maxLength",
-        ),
-      };
-    case "integer":
-      return {
-        kind,
-        minimum: nullable(object.minimum, (entry) =>
-          safeInteger(entry, "attributeDefinition.kind.minimum"),
-        ),
-        maximum: nullable(object.maximum, (entry) =>
-          safeInteger(entry, "attributeDefinition.kind.maximum"),
-        ),
-      };
-    case "decimal":
-      return {
-        kind,
-        scale: boundedPositive(object.scale, "attributeDefinition.kind.scale"),
-        minimum: nullable(object.minimum, (entry) =>
-          parseDecimal(entry, "attributeDefinition.kind.minimum"),
-        ),
-        maximum: nullable(object.maximum, (entry) =>
-          parseDecimal(entry, "attributeDefinition.kind.maximum"),
-        ),
-      };
-    case "boolean":
-    case "date":
-    case "timestamp":
-    case "merchant_operator_reference":
-    case "external_resource_reference":
-      return { kind };
-    case "status":
-      return {
-        kind,
-        options: arrayValue(
-          object.options,
-          "attributeDefinition.kind.options",
-        ).map(parseAttributeOption),
-      };
-    case "choice":
-      return {
-        kind,
-        options: arrayValue(
-          object.options,
-          "attributeDefinition.kind.options",
-        ).map(parseAttributeOption),
-        allowsMultiple: booleanValue(
-          object.allowsMultiple,
-          "attributeDefinition.kind.allowsMultiple",
-        ),
-      };
-    case "money":
-      return {
-        kind,
-        allowedCurrencies: arrayValue(
-          object.allowedCurrencies,
-          "attributeDefinition.kind.allowedCurrencies",
-        ).map((entry) =>
-          brandText<
-            Variant<
-              AttributeDefinitionKind,
-              "money"
-            >["allowedCurrencies"][number]
-          >(entry, "attributeDefinition.kind.allowedCurrencies[]"),
-        ),
-      };
-  }
-}
-
-export function parseAttributeOption(value: unknown): AttributeOption {
-  return decodeRecord(parseAttributeOptionRecord, value);
-}
-
-export function parseAttributeValue(value: unknown): AttributeValue {
-  return decodeRecord(parseAttributeValueRecord, value);
-}
-
-function parseDecimal(value: unknown, field: string): DecimalValue {
-  const object = objectValue(value, field);
-  return {
-    unscaled: safeInteger(object.unscaled, `${field}.unscaled`),
-    scale: safeInteger(object.scale, `${field}.scale`),
-  };
-}
-
-export function parseMoney(value: unknown) {
-  const object = objectValue(value, "money");
-  return {
-    amountMinor: safeInteger(object.amountMinor, "money.amountMinor"),
-    currency: parseCurrencyCode(object.currency),
-  };
-}
-
-export function parseCurrencyCode(
-  value: unknown,
-  field = "money.currency",
-): import("@seams/commerce-contracts").CurrencyCode {
-  const currency = normalizedText(value, field);
-  if (
-    currency.length !== 3 ||
-    !currency
-      .split("")
-      .every((character) => character >= "A" && character <= "Z")
-  ) {
-    throw new Error(`${field} must be an uppercase ISO currency code`);
-  }
-  return currency;
-}
-
-export function parseMerchantOperatorReference(
-  value: unknown,
-): MerchantOperatorReference {
-  return decodeRecord(parseMerchantOperatorReferenceRecord, value);
-}
-
-export function parseExternalResourceReference(
-  value: unknown,
-): ExternalResourceReference {
-  return decodeRecord(parseExternalResourceReferenceRecord, value);
-}
-
-export function parseProvenance(value: unknown): SourceProvenance {
-  return decodeRecord(parseSourceProvenanceRecord, value);
 }
 
 function parseRfc3339Timestamp(
@@ -913,15 +638,6 @@ export function requireUniqueValues(
     throw new Error(`${field} contains duplicate values`);
 }
 
-export function parseSensitivity(value: unknown, field: string) {
-  return enumValue(value, field, [
-    "public",
-    "internal",
-    "confidential",
-    "restricted",
-  ] as const);
-}
-
 export function booleanValue(value: unknown, field: string): boolean {
   if (typeof value !== "boolean") throw new Error(`${field} must be a boolean`);
   return value;
@@ -957,23 +673,6 @@ export function normalizedText(value: unknown, field: string): string {
   return value;
 }
 
-export function sha256Digest(value: unknown, field: string): string {
-  const digest = normalizedText(value, field);
-  if (!/^[a-f0-9]{64}$/u.test(digest))
-    throw new Error(`${field} must be a lowercase SHA-256 digest`);
-  return digest;
-}
-
-export function boundedText(
-  value: unknown,
-  field: string,
-  maximum: number,
-): string {
-  const text = normalizedText(value, field);
-  if (text.length > maximum) throw new Error(`${field} is too long`);
-  return text;
-}
-
 export function brandText<T extends string>(value: unknown, field: string): T {
   const text = normalizedText(value, field);
   if (!isTextBrand<T>(text))
@@ -985,13 +684,13 @@ function isTextBrand<T extends string>(value: string): value is T {
   return value.length > 0 && value === value.trim();
 }
 
-export function safeInteger(value: unknown, field: string): number {
+function safeInteger(value: unknown, field: string): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value))
     throw new Error(`${field} must be a safe integer`);
   return value;
 }
 
-export function boundedPositive(
+function boundedPositive(
   value: unknown,
   field: string,
   maximum = Number.MAX_SAFE_INTEGER,
@@ -1002,22 +701,7 @@ export function boundedPositive(
   return result;
 }
 
-export function boundedNonNegative(
-  value: unknown,
-  field: string,
-  maximum: number,
-): number {
-  const result = safeInteger(value, field);
-  if (result < 0 || result > maximum)
-    throw new Error(`${field} is out of bounds`);
-  return result;
-}
-
-export function positiveInteger(value: unknown, field: string): number {
-  return boundedPositive(value, field);
-}
-
-export function nonNegativeInteger(value: unknown, field: string): number {
+function nonNegativeInteger(value: unknown, field: string): number {
   const result = safeInteger(value, field);
   if (result < 0) throw new Error(`${field} must be non-negative`);
   return result;
@@ -1047,17 +731,8 @@ export function brandNonNegativeRevision<T extends number>(
   return revision;
 }
 
-export function isNonNegativeRevision<T extends number>(
-  value: number,
-): value is T {
+function isNonNegativeRevision<T extends number>(value: number): value is T {
   return Number.isSafeInteger(value) && value >= 0;
-}
-
-export function nullable<T>(
-  value: unknown,
-  parser: (value: unknown) => T,
-): T | null {
-  return value === null || value === undefined ? null : parser(value);
 }
 
 export function enumValue<const T extends string>(
@@ -1070,7 +745,7 @@ export function enumValue<const T extends string>(
   return text;
 }
 
-export function contains<T extends string>(
+function contains<T extends string>(
   values: readonly T[],
   value: string,
 ): value is T {

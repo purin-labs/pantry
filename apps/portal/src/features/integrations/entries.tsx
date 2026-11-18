@@ -88,7 +88,7 @@ export function buildIntegrationEntries(
   );
 }
 
-export function integrationEntries(
+function integrationEntries(
   props: IntegrationsPageProps,
   claudeState: ClaudeConnectionState,
   setClaudeState: React.Dispatch<React.SetStateAction<ClaudeConnectionState>>,
@@ -676,7 +676,7 @@ export function integrationEntries(
   ];
 }
 
-export function whatsappIntegrationStatus(
+function whatsappIntegrationStatus(
   configurationKnown: boolean | undefined,
   accounts: readonly IntegrationAccount[],
 ): IntegrationRailStatus | undefined {

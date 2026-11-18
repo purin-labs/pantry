@@ -24,7 +24,7 @@ export type IncrementalScreenState =
   | { kind: "held" }
   | { kind: "complete" };
 
-export type IncrementalScreenDecision =
+type IncrementalScreenDecision =
   | { action: "release"; text: string; state: IncrementalScreenState }
   | { action: "buffer"; state: IncrementalScreenState }
   | {

@@ -34,10 +34,10 @@ const applianceSample = (controller: string) =>
     controller: Type.Object({ kind: Type.Literal(controller) }),
   });
 
-export const EspressoApplianceSample = applianceSample("espresso");
-export const GrinderSample = applianceSample("motor");
+const EspressoApplianceSample = applianceSample("espresso");
+const GrinderSample = applianceSample("motor");
 
-export const EspressoSample = Type.Object({
+const EspressoSample = Type.Object({
   step: Count,
   appliance: EspressoApplianceSample,
   grinder: Type.Optional(GrinderSample),
@@ -61,7 +61,7 @@ const PourOverWater = Type.Object({
 });
 
 /** Arm, kettle, vessels, scale and water: every value the display reads. */
-export const PourOverSample = Type.Object({
+const PourOverSample = Type.Object({
   step: Count,
   joints: Vector(6),
   fingers: Vector(2),
@@ -158,7 +158,7 @@ const PourOverSegment = Type.Object({
 });
 
 const EspressoOutcome = Type.Object({ kind: Type.Literal("completed") });
-export const PourOverOutcome = Type.Union([
+const PourOverOutcome = Type.Union([
   Type.Object({
     kind: Type.Literal("completed"),
     measurements: Type.Object({}),
@@ -230,13 +230,13 @@ function stationReply(
   ]);
 }
 
-export const EspressoReply = stationReply(
+const EspressoReply = stationReply(
   EspressoSegment,
   EspressoRecording,
   EspressoOutcome,
   EspressoApplianceSample,
 );
-export const PourOverReply = stationReply(
+const PourOverReply = stationReply(
   PourOverSegment,
   PourOverRecording,
   PourOverOutcome,

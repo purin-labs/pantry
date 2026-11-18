@@ -151,7 +151,7 @@ type DecodedBudgetEvent = {
   readonly payload: BudgetEvent;
 };
 
-export type CreateSessionBudgetAccountInput = BudgetIdentity & {
+type CreateSessionBudgetAccountInput = BudgetIdentity & {
   readonly budget: SessionBudget;
 };
 
@@ -159,7 +159,7 @@ export type ReserveRunBudgetInput = RunBudgetIdentity & {
   readonly turnId: string;
 };
 
-export type AcceptRunModelUsageInput = RunBudgetIdentity & {
+type AcceptRunModelUsageInput = RunBudgetIdentity & {
   readonly usage: SessionBudgetUsage;
   /**
    * The run has already ended and its usage only needs recording; its time
@@ -168,27 +168,27 @@ export type AcceptRunModelUsageInput = RunBudgetIdentity & {
   readonly afterRunEnded?: boolean;
 };
 
-export type ClaimRunCapabilityInput = RunBudgetIdentity & {
+type ClaimRunCapabilityInput = RunBudgetIdentity & {
   readonly claimId: string;
 };
 
-export type SettleRunBudgetInput = RunBudgetIdentity & {
+type SettleRunBudgetInput = RunBudgetIdentity & {
   readonly usage: SessionBudgetUsage;
   readonly outcome: "succeeded" | "failed" | "cancelled";
 };
 
-export type MarkRunBudgetIndeterminateInput = RunBudgetIdentity & {
+type MarkRunBudgetIndeterminateInput = RunBudgetIdentity & {
   readonly reason: RunBudgetIndeterminateReason;
 };
 
-export type ReconcileRunBudgetInput = RunBudgetIdentity & {
+type ReconcileRunBudgetInput = RunBudgetIdentity & {
   readonly usage: SessionBudgetUsage;
   readonly outcome: "succeeded" | "failed" | "cancelled";
 };
 
-export type ReconcileExpiredRunBudgetInput = BudgetIdentity;
+type ReconcileExpiredRunBudgetInput = BudgetIdentity;
 
-export type CapabilityBudgetClaim =
+type CapabilityBudgetClaim =
   | {
       readonly kind: "accepted";
       readonly claimId: string;
@@ -230,7 +230,7 @@ type CheckpointBudgetGapRun =
       readonly indeterminate: boolean;
     };
 
-export type ValidateCheckpointBudgetGapInput = {
+type ValidateCheckpointBudgetGapInput = {
   readonly organisationId: string;
   readonly sessionId: string;
   readonly budgetRevision: string;

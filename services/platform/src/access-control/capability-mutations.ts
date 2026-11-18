@@ -41,14 +41,14 @@ type AccessControlMutationState = Readonly<{
   projectionRevision: number;
 }>;
 
-export type CapabilityPolicyMutationResult = Readonly<{
+type CapabilityPolicyMutationResult = Readonly<{
   policy: OrganisationCapabilityPolicy;
   environment: OrganisationEnvironment;
   configurationVersion: number;
   projectionRevision: number;
 }>;
 
-export type AccessDefaultsMutationResult = Readonly<{
+type AccessDefaultsMutationResult = Readonly<{
   environment: OrganisationEnvironment;
   configurationVersion: number;
   projectionRevision: number;

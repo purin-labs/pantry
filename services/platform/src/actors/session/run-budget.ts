@@ -51,7 +51,7 @@ export function acceptCanonicalRunModelUsage(
   );
 }
 
-export function acceptCanonicalRunModelUsageTransaction(
+function acceptCanonicalRunModelUsageTransaction(
   sql: SqlStorage,
   identity: CanonicalRunBudgetIdentity,
   totalTokens: number,
@@ -223,7 +223,7 @@ export function failCanonicalRunBudget(
   );
 }
 
-export function settleCanonicalRunBudgetTransaction(
+function settleCanonicalRunBudgetTransaction(
   sql: SqlStorage,
   identity: CanonicalRunBudgetIdentity,
   outcome: "succeeded" | "failed" | "cancelled",
@@ -294,7 +294,7 @@ export async function schedulePersistedRunBudgetDeadline(
   await armAlarmBy(storage, account.value.reservation.reservation.deadlineAt);
 }
 
-export function readPersistedBudgetIdentity(
+function readPersistedBudgetIdentity(
   sql: SqlStorage,
 ): { readonly organisationId: string; readonly sessionId: string } | null {
   const row = sql
@@ -323,7 +323,7 @@ export function readCurrentHarnessTurnLease(
   return parseHarnessTurnLeaseProjection(row?.lease_projection);
 }
 
-export function readHarnessHistoryWarningTraceContext(
+function readHarnessHistoryWarningTraceContext(
   sql: SqlStorage,
   turnId: string,
 ): { readonly requestId: RequestId; readonly organisationId: string } | null {

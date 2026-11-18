@@ -26,7 +26,7 @@ export type MarketCommitRequest = Readonly<{
   previousRevision: number | undefined;
 }>;
 
-export type MarketAuthorityOptions = Readonly<{
+type MarketAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => MarketMerchantRow | undefined;
   readReplay: (

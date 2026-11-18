@@ -25,7 +25,7 @@ export type PreparedWorkcell = Readonly<{
   plan: ProductionWorkcells;
   notice: string;
 }>;
-export type WorkcellPreparationResult =
+type WorkcellPreparationResult =
   | Readonly<{ kind: "ready"; prepared: PreparedWorkcell }>
   | Readonly<{ kind: "invalid"; message: string }>;
 

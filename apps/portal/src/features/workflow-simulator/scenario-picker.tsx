@@ -12,7 +12,7 @@ import {
 } from "./scenario-api";
 
 /** What a picker lists, and the words that it uses for it. */
-export type PickerKind = Readonly<{
+type PickerKind = Readonly<{
   entity: SavedEntityKind;
   id: string;
   singular: string;
@@ -21,7 +21,7 @@ export type PickerKind = Readonly<{
   empty: string;
 }>;
 
-export const SCENARIO_PICKER: PickerKind = {
+const SCENARIO_PICKER: PickerKind = {
   entity: SAVED_SCENARIOS,
   id: "scenario",
   singular: "scenario",

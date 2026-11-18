@@ -55,7 +55,7 @@ export async function customConnectorActionRecord(
   };
 }
 
-export function parseProviderResult(value: string): unknown {
+function parseProviderResult(value: string): unknown {
   try {
     return JSON.parse(value);
   } catch {

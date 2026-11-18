@@ -594,7 +594,7 @@ const TYPE_STEPS = [-1, 0, 1, 2, 3, 4, 5, 6, 7] as const;
  * any colour token, the muted text and the rules derive from the text and
  * background colours.
  */
-export function styleVariables(style: MenuBoardStyle | undefined): React.CSSProperties {
+function styleVariables(style: MenuBoardStyle | undefined): React.CSSProperties {
   const variables: Record<string, string> = {};
   if (style === undefined) return variables;
   const defaults = MENU_BOARD_STYLE_PRESETS.espresso.style;

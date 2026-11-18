@@ -13,7 +13,7 @@ export type SweepCheck =
   | Readonly<{ kind: "blocked"; angle: number }>
   | Readonly<{ kind: "unchecked"; angle?: never }>;
 
-export const doorOpeningAngle = (110 * Math.PI) / 180;
+const doorOpeningAngle = (110 * Math.PI) / 180;
 
 function rotation(sweep: DoorSweep, angle: number): THREE.Matrix4 {
   const { pivot } = sweep;

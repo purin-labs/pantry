@@ -38,7 +38,7 @@ export const ATTACHMENT_TEXT_LIMITS = {
   maxNormalizedChars: 32_768,
 } as const;
 
-export type AttachmentInspection =
+type AttachmentInspection =
   | {
       /**
        * Container facts read from the header. No frame was decoded and no
@@ -82,7 +82,7 @@ export type AttachmentInspection =
       readonly manifest: string;
     };
 
-export type AttachmentInspectionError =
+type AttachmentInspectionError =
   | { readonly code: "attachment_unavailable"; readonly attachmentId: string }
   | {
       readonly code: "attachment_integrity_failed";
@@ -110,7 +110,7 @@ const TEXTUAL_DOCUMENT_TYPES = new Set([
  * oversized case stays a stated limitation rather than silently becoming a
  * second allocation the budget never approved.
  */
-export type OversizedDocumentReader = (
+type OversizedDocumentReader = (
   attachment: StoredMessageAttachment,
   bytes: Uint8Array,
 ) => Promise<{ readonly text: string; readonly truncated: boolean } | null>;
@@ -130,7 +130,7 @@ export type DecodedVideoStill = {
  * codec limitation stays stated — `decoder_required`, naming the codec —
  * rather than silently taking an allocation the budget never approved.
  */
-export type VideoFrameDecoder = (
+type VideoFrameDecoder = (
   attachment: StoredMessageAttachment,
   bytes: Uint8Array,
 ) => Promise<readonly DecodedVideoStill[] | null>;

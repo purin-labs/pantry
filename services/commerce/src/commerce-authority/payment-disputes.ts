@@ -24,16 +24,16 @@ import { storedValuePaymentId } from "../plugins/stored-value/index.ts";
 import { listOrderChanges, readPaymentChange } from "./order-changes.ts";
 import { assertNever, errorMessage } from "@seams/std";
 
-export type PaymentDisputeCorrelation = Readonly<{
+type PaymentDisputeCorrelation = Readonly<{
   order: CommerceOrderV1;
   payment: CommercePaymentV1;
 }>;
 
-export type PaymentDisputeCorrelationResult =
+type PaymentDisputeCorrelationResult =
   | Readonly<{ kind: "resolved"; value: PaymentDisputeCorrelation }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type PaymentDisputeBuildResult =
+type PaymentDisputeBuildResult =
   | Readonly<{ kind: "resolved"; value: PaymentDispute }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -121,7 +121,7 @@ export function resolvePaymentDisputeCorrelation(
   return { kind: "resolved", value: { order, payment } };
 }
 
-export function rejectedPaymentDisputeCorrelation(
+function rejectedPaymentDisputeCorrelation(
   field: string,
 ): PaymentDisputeCorrelationResult {
   return {
@@ -130,7 +130,7 @@ export function rejectedPaymentDisputeCorrelation(
   };
 }
 
-export function findOrder(
+function findOrder(
   orders: readonly CommerceOrderV1[],
   orderId: string,
 ): CommerceOrderV1 | undefined {
@@ -140,7 +140,7 @@ export function findOrder(
   return undefined;
 }
 
-export function findOnlyPaymentForOrder(
+function findOnlyPaymentForOrder(
   payments: readonly CommercePaymentV1[],
   orderId: string,
 ): CommercePaymentV1 | undefined {
@@ -215,7 +215,7 @@ export function buildObservedPaymentDispute(
 }
 
 /** The dispute machine's event for the state that the provider reports. */
-export function disputeEvent(
+function disputeEvent(
   state: PaymentDispute["lifecycle"]["state"],
 ): CommerceMachineEvent<"payment_dispute"> {
   switch (state) {
@@ -230,13 +230,11 @@ export function disputeEvent(
   }
 }
 
-export function rejectedPaymentDisputeBuild(
-  field: string,
-): PaymentDisputeBuildResult {
+function rejectedPaymentDisputeBuild(field: string): PaymentDisputeBuildResult {
   return { kind: "rejected", error: { code: "invalid_command", field } };
 }
 
-export function paymentDisputeIdentityMatches(
+function paymentDisputeIdentityMatches(
   existing: PaymentDispute,
   disputeId: string,
   correlation: PaymentDisputeCorrelation,
@@ -254,7 +252,7 @@ export function paymentDisputeIdentityMatches(
   );
 }
 
-export function sameStringSequence(
+function sameStringSequence(
   left: readonly string[],
   right: readonly string[],
 ): boolean {

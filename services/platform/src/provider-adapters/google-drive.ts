@@ -25,19 +25,19 @@ export const GOOGLE_DRIVE_REQUIRED_SCOPES = [
   "https://www.googleapis.com/auth/drive.file",
 ] as const;
 
-export type GoogleDriveProtocolConfiguration = Readonly<{
+type GoogleDriveProtocolConfiguration = Readonly<{
   readonly clientId: string;
   readonly clientSecret: string;
 }>;
 
-export type GoogleDriveOAuthTokens = Readonly<{
+type GoogleDriveOAuthTokens = Readonly<{
   readonly accessToken: string;
   readonly refreshToken: string;
   readonly expiresInSeconds: number;
   readonly scopes: readonly string[];
 }>;
 
-export type GoogleDriveIdentity = Readonly<{
+type GoogleDriveIdentity = Readonly<{
   readonly permissionId: string;
   readonly email: string;
   readonly displayName: string;
@@ -64,13 +64,13 @@ export type GoogleDriveChange =
       readonly file: GoogleDriveFileMetadata;
     }>;
 
-export type GoogleDriveChangePage = Readonly<{
+type GoogleDriveChangePage = Readonly<{
   readonly changes: readonly GoogleDriveChange[];
   readonly nextPageToken: string | null;
   readonly newStartPageToken: string | null;
 }>;
 
-export type GoogleDriveBoundedContent = Readonly<{
+type GoogleDriveBoundedContent = Readonly<{
   readonly bytes: Uint8Array;
   readonly mediaType: string;
   readonly metadata: GoogleDriveFileMetadata;

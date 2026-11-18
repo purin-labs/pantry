@@ -47,7 +47,7 @@ import {
   saveMailReplyDraft,
 } from "../../../mail-inbox/mail-reply-drafts";
 
-export const EMAIL_REVIEW_QUEUE_LIMIT = 100;
+const EMAIL_REVIEW_QUEUE_LIMIT = 100;
 
 /**
  * The approval queue stores identifiers and lifecycle only. Recipients,

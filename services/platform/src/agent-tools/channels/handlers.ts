@@ -138,7 +138,7 @@ import type { SessionToolContext } from "../context";
  * for the `production_requests` list. When no grant admits the read, a
  * permission request may ask for that grant.
  */
-export function requestableProductionRead(error: unknown): never {
+function requestableProductionRead(error: unknown): never {
   if (
     error instanceof CommerceReadRequestError &&
     error.failure.code === "commerce_context_authority_denied"
@@ -148,7 +148,7 @@ export function requestableProductionRead(error: unknown): never {
   throw error;
 }
 
-export function productionRequestsQuery(locationId: string) {
+function productionRequestsQuery(locationId: string) {
   return parseCommerceGraphQuery({
     kind: "commerce_list_page",
     listId: "production_requests",
@@ -165,7 +165,7 @@ export function productionRequestsQuery(locationId: string) {
   });
 }
 
-export function selectProductionRequestsSourceGrant(
+function selectProductionRequestsSourceGrant(
   lease: HarnessTurnLease,
   locationId: string,
   input: Readonly<{
@@ -191,7 +191,7 @@ export function selectProductionRequestsSourceGrant(
   });
 }
 
-export type ProductionPlanSources = Readonly<{
+type ProductionPlanSources = Readonly<{
   prepared: PreparedCommerceRead;
   plan: HarnessProductionPlan;
   merchantRevision: number;
@@ -203,7 +203,7 @@ export type ProductionPlanSources = Readonly<{
  * carries the requests' label: a person who may read the requests may read
  * the plan.
  */
-export async function readProductionPlanSources(
+async function readProductionPlanSources(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -302,7 +302,7 @@ export async function readProductionPlanSources(
 }
 
 /** The exact decimal text of a quantity, without trailing zeros. */
-export function quantityText(
+function quantityText(
   quantity: Readonly<{ amount: number; scale: number }>,
 ): string {
   const digits = String(quantity.amount).padStart(quantity.scale + 1, "0");
@@ -455,23 +455,23 @@ export async function editProductionPlanForEmbeddedHarness(
   };
 }
 
-export const PLAN_DRAFT = "Production plan";
+const PLAN_DRAFT = "Production plan";
 
-export const PLAN_NOT_SHARED =
+const PLAN_NOT_SHARED =
   "This conversation is not shared with this location's plan. An owner or admin shares a Slack thread or a Project chat with the plan before an agent may change it from there.";
 
 /**
  * The refusal that the agent can explain to the person: the conversation is
  * not shared with the plan. It names no source. Other failures stay generic.
  */
-export function correctablePlanRefusal(error: unknown): never {
+function correctablePlanRefusal(error: unknown): never {
   if (error instanceof Error && error.message === PLAN_NOT_SHARED) {
     throw new ProductionPlanRequestError(error.message);
   }
   throw error;
 }
 
-export async function readProductionPlanShare(
+async function readProductionPlanShare(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -492,7 +492,7 @@ export async function readProductionPlanShare(
   return share.ok ? share.value : null;
 }
 
-export async function readProductionPlanThread(
+async function readProductionPlanThread(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -518,7 +518,7 @@ export async function readProductionPlanThread(
     : null;
 }
 
-export async function readProductionPlanChat(
+async function readProductionPlanChat(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -611,7 +611,7 @@ export async function searchEmailMailboxForEmbeddedHarness(
   return result;
 }
 
-export function emailMailboxMessageForHarness(
+function emailMailboxMessageForHarness(
   message: import("../../mail/gmail-adapter").GmailMessageContent,
 ): HarnessEmailMailboxSearchResult["messages"][number] {
   return {
@@ -625,7 +625,7 @@ export function emailMailboxMessageForHarness(
   };
 }
 
-export async function authorizeEmailMailboxRead(
+async function authorizeEmailMailboxRead(
   input: Readonly<{
     execution: SessionExecutionAdmission;
     lease: HarnessTurnLease;
@@ -713,7 +713,7 @@ export async function authorizeEmailMailboxRead(
   return { capability, inputLabel: inputLabel.value };
 }
 
-export async function commitEmailMailboxObservation(
+async function commitEmailMailboxObservation(
   input: Readonly<{
     storage: DurableObjectStorage;
     execution: SessionExecutionAdmission;
@@ -994,7 +994,7 @@ export async function editEmailReplyDraftForEmbeddedHarness(
  * every source and context record that the reply rests on. The draft then
  * adds no source to the Session beyond the mailbox.
  */
-export async function authorizeEmailReplyDraftChat(
+async function authorizeEmailReplyDraftChat(
   env: Env,
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
@@ -1069,7 +1069,7 @@ export async function authorizeEmailReplyDraftChat(
   return { connector: connector.value, identity, provenance };
 }
 
-export function chatCoversReply(
+function chatCoversReply(
   chat: Readonly<{
     chatSources: readonly EmailChatSource[];
     chatContext: EmailChatContext;
@@ -1104,7 +1104,7 @@ export function chatCoversReply(
 }
 
 /** The reply's mailbox account, when the reply belongs to the named mailbox. */
-export async function requireEmailReplyInMailbox(
+async function requireEmailReplyInMailbox(
   execution: SessionExecutionAdmission,
   request: HarnessEmailReplyDraftRead,
 ): Promise<IntegrationAccountId> {
@@ -1128,7 +1128,7 @@ export async function requireEmailReplyInMailbox(
   return integrationAccountId.value;
 }
 
-export async function commitEmailReplyDraftObservation(
+async function commitEmailReplyDraftObservation(
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -1581,7 +1581,7 @@ export async function proposeSlackMessageForEmbeddedHarness(
   };
 }
 
-export async function authorizeOperationalEmailInformationFlow(
+async function authorizeOperationalEmailInformationFlow(
   env: Env,
   execution: SessionExecutionAdmission,
   storage: DurableObjectStorage,
@@ -1607,7 +1607,7 @@ export async function authorizeOperationalEmailInformationFlow(
  * The turn's cumulative label may flow into this proposal tool's effect. The
  * effect still waits for a person, so approval is not yet satisfied.
  */
-export async function authorizeToolEffectInformationFlow(
+async function authorizeToolEffectInformationFlow(
   env: Env,
   execution: SessionExecutionAdmission,
   storage: DurableObjectStorage,
@@ -1664,7 +1664,7 @@ export async function authorizeToolEffectInformationFlow(
   }
 }
 
-export function readEmailMailboxCapability(
+function readEmailMailboxCapability(
   capabilityKeys: readonly string[],
   capabilityId:
     | typeof CAPABILITY_KEYS.emailMailboxRead
@@ -1686,7 +1686,7 @@ export function readEmailMailboxCapability(
   return null;
 }
 
-export type WhatsAppSupportConversationWindowRow = Readonly<{
+type WhatsAppSupportConversationWindowRow = Readonly<{
   readonly caseId: unknown;
   readonly conversationWindowSequence: unknown;
   readonly bindingRevision: unknown;
@@ -1695,7 +1695,7 @@ export type WhatsAppSupportConversationWindowRow = Readonly<{
   readonly serviceWindowExpiresAt: unknown;
 }>;
 
-export type WhatsAppSupportConversationWindow = Readonly<{
+type WhatsAppSupportConversationWindow = Readonly<{
   readonly integrationAccountId: IntegrationAccountId;
   readonly caseId: CaseId;
   readonly sourceRevision: number;
@@ -1703,17 +1703,17 @@ export type WhatsAppSupportConversationWindow = Readonly<{
   readonly serviceWindowExpiresAt: number;
 }>;
 
-export type WhatsAppSupportScope = Readonly<{
+type WhatsAppSupportScope = Readonly<{
   readonly capability: Variant<CapabilityDefinition, "provider_resource">;
   readonly inputLabel: FlowLabel;
   readonly conversationWindows: readonly WhatsAppSupportConversationWindow[];
 }>;
 
-export const WHATSAPP_DIRECTED_REPLY_MAX_CHARS = 4_000;
+const WHATSAPP_DIRECTED_REPLY_MAX_CHARS = 4_000;
 
-export const WHATSAPP_DIRECTED_REPLY_TTL_MS = 4 * 3_600_000;
+const WHATSAPP_DIRECTED_REPLY_TTL_MS = 4 * 3_600_000;
 
-export type ResolvedWhatsAppConnector = VariantBy<
+type ResolvedWhatsAppConnector = VariantBy<
   Awaited<ReturnType<typeof resolveActiveConnectorActorAtPlacement>>,
   "ok",
   true
@@ -1843,7 +1843,7 @@ export async function sendWhatsAppSupportReplyForEmbeddedHarness(
   };
 }
 
-export async function resolveWhatsAppReplyRequester(
+async function resolveWhatsAppReplyRequester(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   lease: HarnessTurnLease,
@@ -1874,7 +1874,7 @@ export async function resolveWhatsAppReplyRequester(
   return null;
 }
 
-export function hasWhatsAppReplyCapability(
+function hasWhatsAppReplyCapability(
   capabilityKeys: readonly string[],
   integrationAccountId: IntegrationAccountId,
 ): boolean {
@@ -1893,7 +1893,7 @@ export function hasWhatsAppReplyCapability(
   return false;
 }
 
-export async function editDirectedWhatsAppAgentProposal(
+async function editDirectedWhatsAppAgentProposal(
   connector: ResolvedWhatsAppConnector,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -1932,7 +1932,7 @@ export async function editDirectedWhatsAppAgentProposal(
   };
 }
 
-export async function composeDirectedWhatsAppHumanReply(
+async function composeDirectedWhatsAppHumanReply(
   connector: ResolvedWhatsAppConnector,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -2128,7 +2128,7 @@ export async function readWhatsAppSupportForEmbeddedHarness(
   return { scope: WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE, cases, truncated };
 }
 
-export function readWhatsAppSupportCapabilities(
+function readWhatsAppSupportCapabilities(
   capabilityKeys: readonly string[],
 ): readonly Variant<CapabilityDefinition, "provider_resource">[] {
   const capabilities = new Map<
@@ -2152,14 +2152,14 @@ export function readWhatsAppSupportCapabilities(
   return [...capabilities.values()].sort(compareWhatsAppSupportCapabilities);
 }
 
-export function compareWhatsAppSupportCapabilities(
+function compareWhatsAppSupportCapabilities(
   left: Variant<CapabilityDefinition, "provider_resource">,
   right: Variant<CapabilityDefinition, "provider_resource">,
 ): number {
   return left.integrationAccountId.localeCompare(right.integrationAccountId);
 }
 
-export async function readOpenWhatsAppSupportConversationWindows(
+async function readOpenWhatsAppSupportConversationWindows(
   input: Readonly<{
     readonly db: OrganisationDatabase;
     readonly organisationId: OrganisationId;
@@ -2215,7 +2215,7 @@ export async function readOpenWhatsAppSupportConversationWindows(
   return conversationWindows;
 }
 
-export function parseWhatsAppSupportConversationWindowRow(
+function parseWhatsAppSupportConversationWindowRow(
   integrationAccountId: IntegrationAccountId,
   row: WhatsAppSupportConversationWindowRow,
 ): WhatsAppSupportConversationWindow | null {
@@ -2247,7 +2247,7 @@ export function parseWhatsAppSupportConversationWindowRow(
   };
 }
 
-export function compareWhatsAppSupportConversationWindows(
+function compareWhatsAppSupportConversationWindows(
   left: WhatsAppSupportConversationWindow,
   right: WhatsAppSupportConversationWindow,
 ): number {
@@ -2256,7 +2256,7 @@ export function compareWhatsAppSupportConversationWindows(
   );
 }
 
-export async function readWhatsAppSupportCase(
+async function readWhatsAppSupportCase(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -2314,14 +2314,14 @@ export async function readWhatsAppSupportCase(
   };
 }
 
-export function matchesWhatsAppSupportAccount(
+function matchesWhatsAppSupportAccount(
   integrationAccountId: string,
   supportCase: HarnessWhatsAppSupportInbox["cases"][number],
 ): boolean {
   return supportCase.integrationAccountId === integrationAccountId;
 }
 
-export async function commitWhatsAppSupportObservation(
+async function commitWhatsAppSupportObservation(
   input: Readonly<{
     readonly storage: DurableObjectStorage;
     readonly execution: SessionExecutionAdmission;
@@ -2379,7 +2379,7 @@ export async function commitWhatsAppSupportObservation(
   }
 }
 
-export function latestWhatsAppSupportSourceRevision(
+function latestWhatsAppSupportSourceRevision(
   conversationWindows: readonly WhatsAppSupportConversationWindow[],
 ): number {
   let revision = 1;

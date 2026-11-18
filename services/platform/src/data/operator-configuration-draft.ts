@@ -119,7 +119,7 @@ export type DeviceDraftCommand =
       deviceName: string;
     }>;
 
-export type OperatorDraftError =
+type OperatorDraftError =
   | Readonly<{ code: "operator_draft_authority_inactive" }>
   | Readonly<{ code: "operator_draft_invalid"; field: string }>
   | Readonly<{ code: "operator_draft_not_found" }>
@@ -415,7 +415,7 @@ export async function listOperatorDraftsForCase(
   });
 }
 
-export type ConfirmOperatorDraftInput = Readonly<{
+type ConfirmOperatorDraftInput = Readonly<{
   db: OrganisationDatabase;
   /**
    * Needed because carrying out a command may reach past D1 — opening a Case
@@ -444,7 +444,7 @@ export type ConfirmOperatorDraftInput = Readonly<{
   now: number;
 }>;
 
-export type OperatorDraftReceipt = Readonly<{
+type OperatorDraftReceipt = Readonly<{
   draft: OperatorConfigurationDraft;
   snapshot: AgentOperationsSnapshot;
 }>;

@@ -1,6 +1,6 @@
 import type { PlaybackSnapshot, PlaybackUpdate } from "@seams/production-simulation/simulator/playback-state";
 
-export type FrameClock = Readonly<{
+type FrameClock = Readonly<{
   request(callback: FrameRequestCallback): number;
   cancel(frame: number): void;
 }>;

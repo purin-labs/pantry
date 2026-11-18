@@ -6,7 +6,7 @@ import type {
   CommerceVariantV1,
 } from "@seams/commerce-client";
 
-export const SATYR_ECOMMERCE_FIXTURE_TIMESTAMP = "2026-08-11T09:00:00Z";
+const SATYR_ECOMMERCE_FIXTURE_TIMESTAMP = "2026-08-11T09:00:00Z";
 
 type StorefrontDemoItem = Readonly<{
   slug: string;
@@ -17,7 +17,7 @@ type StorefrontDemoItem = Readonly<{
   available: number;
 }>;
 
-export const STOREFRONT_DEMO_MANIFEST = {
+const STOREFRONT_DEMO_MANIFEST = {
   schemaVersion: "satyr.storefront-demo-manifest.v1",
   profiles: {
     cafe_patisserie: {

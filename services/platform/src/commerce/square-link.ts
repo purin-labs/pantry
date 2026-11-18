@@ -29,7 +29,7 @@ export type SquareDelegation = Readonly<{
   providerAccountId: string;
 }>;
 
-export const SQUARE_DELEGATION_FORMAT = "underclerk_square_connection_v1";
+const SQUARE_DELEGATION_FORMAT = "underclerk_square_connection_v1";
 
 /** Square runs only for an organisation whose commerce system is Pantry's. */
 export async function resolveCommerceMerchant(
@@ -86,7 +86,7 @@ export function readSquareDelegation(
     : null;
 }
 
-export type SquareLinkOutcome =
+type SquareLinkOutcome =
   | Readonly<{ kind: "linked"; locations: number }>
   | Readonly<{ kind: "skipped"; reason: string }>;
 
@@ -139,7 +139,7 @@ export async function readCommerceSquareConnection(
 }
 
 /** The payment binding id of a Square location in Commerce. */
-export function squareBindingId(locationId: string): string {
+function squareBindingId(locationId: string): string {
   return `square_${locationId.replace(/[^A-Za-z0-9_-]/gu, "_")}`.slice(0, 128);
 }
 

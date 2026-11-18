@@ -15,7 +15,7 @@ const UNAVAILABLE =
 const SCREEN_RULE =
   "Use it only while the person's current message carries the Kitchen Pie Pastry Bench from their screen.";
 
-export const pastryBenchConfigure = defineTool({
+const pastryBenchConfigure = defineTool({
   name: "pastry_bench_configure",
   description: `Configure the Kitchen Pie Pastry Bench parameters or camera view on the person's screen (pieType, targetThicknessMm, crimpForceN, faultCheck, cameraPreset) and run the MuJoCo 4.0.0 3D volumetric dough press, 2D deformable flexcomp shell, and Maruzen MBCO-5E oven solver when recipe settings change. ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
@@ -87,7 +87,7 @@ export const pastryBenchConfigure = defineTool({
   readReceipt: readBakerySurfaceReceiptId,
 });
 
-export const pastryBenchPrepare = defineTool({
+const pastryBenchPrepare = defineTool({
   name: "pastry_bench_prepare",
   description: `Re-run the MuJoCo 4.0.0 deformable flexcomp shortcrust sheeting, puff-lid crimping, and Maruzen MBCO-5E oven bake simulation on the Kitchen Pie Pastry Bench on the person's screen and return the updated cavity drape, seal, and oven bake telemetry. ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object({}, { additionalProperties: false }),

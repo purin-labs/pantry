@@ -41,7 +41,7 @@ import {
   positiveIntegerOrNull,
 } from "@seams/std";
 
-export type AccessGrantRow = Readonly<{
+type AccessGrantRow = Readonly<{
   grantId: unknown;
   organisationId: unknown;
   subjectJson: unknown;
@@ -53,14 +53,14 @@ export type AccessGrantRow = Readonly<{
   changedAt: unknown;
 }>;
 
-export type AccessGrantParseError =
+type AccessGrantParseError =
   | { readonly code: "invalid_grant_row"; readonly field: string }
   | { readonly code: "invalid_grant_subject"; readonly field: string }
   | { readonly code: "invalid_grant_target"; readonly field: string }
   | { readonly code: "invalid_grant_provenance"; readonly field: string }
   | { readonly code: "invalid_grant_lifecycle"; readonly field: string };
 
-export type AccessGrantDataError =
+type AccessGrantDataError =
   | AccessGrantParseError
   | { readonly code: "access_grant_not_found" }
   | {
@@ -84,7 +84,7 @@ export type CreateAccessGrantInput = Readonly<{
   now: number;
 }>;
 
-export type ChangeAccessGrantInput = Readonly<{
+type ChangeAccessGrantInput = Readonly<{
   db: OrganisationDatabase;
   organisationId: OrganisationId;
   grantId: AccessGrant["grantId"];
@@ -93,13 +93,13 @@ export type ChangeAccessGrantInput = Readonly<{
   now: number;
 }>;
 
-export type ReadAccessGrantInput = Readonly<{
+type ReadAccessGrantInput = Readonly<{
   db: OrganisationDatabase;
   organisationId: OrganisationId;
   grantId: AccessGrant["grantId"];
 }>;
 
-export type ListAccessGrantsInput = Readonly<{
+type ListAccessGrantsInput = Readonly<{
   db: Pick<OrganisationDatabase, "prepare">;
   organisationId: OrganisationId;
   lifecycle?: AccessGrantLifecycle["kind"];

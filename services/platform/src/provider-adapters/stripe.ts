@@ -25,7 +25,7 @@ const STRIPE_CONNECT_EVENTS = [
   "account.application.deauthorized",
 ] as const;
 
-export type StripeProtocolError =
+type StripeProtocolError =
   | { readonly code: "provider_configuration_missing" }
   | { readonly code: "provider_oauth_response_invalid" }
   | { readonly code: "provider_account_ineligible" }
@@ -36,20 +36,20 @@ export type StripeProtocolError =
       readonly requestId: string | null;
     };
 
-export type StripeAuthorizationGrant = {
+type StripeAuthorizationGrant = {
   readonly accessToken: string;
   readonly accountId: string;
   readonly scope: string;
 };
 
-export type StripeAccountSummary = {
+type StripeAccountSummary = {
   readonly accountId: string;
   readonly country: string;
   readonly displayName: string;
   readonly activeCapabilities: readonly string[];
 };
 
-export type StripeWebhookConfiguration = {
+type StripeWebhookConfiguration = {
   readonly id: string;
   readonly secret: string;
 };

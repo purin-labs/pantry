@@ -281,7 +281,7 @@ export async function executeIntegrationsCommand(
   }
 }
 
-export async function connectShopify(
+async function connectShopify(
   context: IntegrationsRouteMutationContext,
   event: React.FormEvent<HTMLFormElement>,
 ): Promise<void> {
@@ -301,7 +301,7 @@ export async function connectShopify(
   );
 }
 
-export async function runCodexConnection(
+async function runCodexConnection(
   context: IntegrationsRouteMutationContext,
   command: Variant<IntegrationsCommand, "connect_codex" | "reconnect_codex">,
   successMessage: string,
@@ -343,7 +343,7 @@ export async function runCodexConnection(
   }
 }
 
-export async function connectStripe(
+async function connectStripe(
   context: IntegrationsRouteMutationContext,
 ): Promise<void> {
   await runProviderConnection(
@@ -353,7 +353,7 @@ export async function connectStripe(
   );
 }
 
-export async function connectSquare(
+async function connectSquare(
   context: IntegrationsRouteMutationContext,
 ): Promise<void> {
   await runProviderConnection(
@@ -363,7 +363,7 @@ export async function connectSquare(
   );
 }
 
-export async function connectSlack(
+async function connectSlack(
   context: IntegrationsRouteMutationContext,
 ): Promise<void> {
   await runProviderConnection(
@@ -373,7 +373,7 @@ export async function connectSlack(
   );
 }
 
-export async function selectSlackDmOrganisation(
+async function selectSlackDmOrganisation(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -394,7 +394,7 @@ export async function selectSlackDmOrganisation(
   );
 }
 
-export async function connectAirtable(
+async function connectAirtable(
   context: IntegrationsRouteMutationContext,
 ): Promise<void> {
   await runProviderConnection(
@@ -404,7 +404,7 @@ export async function connectAirtable(
   );
 }
 
-export async function connectNotion(
+async function connectNotion(
   context: IntegrationsRouteMutationContext,
 ): Promise<void> {
   await runProviderConnection(
@@ -414,7 +414,7 @@ export async function connectNotion(
   );
 }
 
-export function refreshIntegrationsOverview(
+function refreshIntegrationsOverview(
   context: IntegrationsRouteMutationContext,
 ): void {
   void loadIntegrationsRoute(
@@ -424,7 +424,7 @@ export function refreshIntegrationsOverview(
   );
 }
 
-export async function cancelCodexAuthorization(
+async function cancelCodexAuthorization(
   context: IntegrationsRouteMutationContext,
   attemptId: string,
 ): Promise<void> {
@@ -436,7 +436,7 @@ export async function cancelCodexAuthorization(
   );
 }
 
-export async function completeCodexAuthorization(
+async function completeCodexAuthorization(
   context: IntegrationsRouteMutationContext,
   attemptId: string,
   callbackUrl: string,
@@ -524,7 +524,7 @@ export async function startProviderConnection(
   }
 }
 
-export async function selectShopifyCommerce(
+async function selectShopifyCommerce(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -543,7 +543,7 @@ export async function selectShopifyCommerce(
   );
 }
 
-export async function disableIntegrationAccount(
+async function disableIntegrationAccount(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -558,21 +558,21 @@ export async function disableIntegrationAccount(
   );
 }
 
-export async function reconnectIntegrationAccount(
+async function reconnectIntegrationAccount(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
   await runExistingAccountFlow(context, event, "reconnect");
 }
 
-export async function rotateIntegrationAccount(
+async function rotateIntegrationAccount(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
   await runExistingAccountFlow(context, event, "rotate");
 }
 
-export async function runExistingAccountFlow(
+async function runExistingAccountFlow(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
   purpose: "reconnect" | "rotate",
@@ -622,7 +622,7 @@ export async function runExistingAccountFlow(
   }
 }
 
-export async function rotateAccountCredential(
+async function rotateAccountCredential(
   context: IntegrationsRouteMutationContext,
   integrationAccountId: string,
   replacementSecret: string,
@@ -636,7 +636,7 @@ export async function rotateAccountCredential(
   return outcome;
 }
 
-export async function revokeAccountCredential(
+async function revokeAccountCredential(
   context: IntegrationsRouteMutationContext,
   integrationAccountId: string,
   replacementIntegrationAccountId: string | null,
@@ -653,7 +653,7 @@ export async function revokeAccountCredential(
   );
 }
 
-export async function runCredentialCommand(
+async function runCredentialCommand(
   context: IntegrationsRouteMutationContext,
   integrationAccountId: string,
   command: Variant<
@@ -712,7 +712,7 @@ export async function runCredentialCommand(
   }
 }
 
-export async function setDefaultIntegrationAccount(
+async function setDefaultIntegrationAccount(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -724,7 +724,7 @@ export async function setDefaultIntegrationAccount(
   );
 }
 
-export async function refreshAccountResources(
+async function refreshAccountResources(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -736,7 +736,7 @@ export async function refreshAccountResources(
   );
 }
 
-export async function removeIntegrationAccount(
+async function removeIntegrationAccount(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -761,7 +761,7 @@ export async function removeIntegrationAccount(
   );
 }
 
-export async function runIntegrationAccountCommand(
+async function runIntegrationAccountCommand(
   context: IntegrationsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
   kind: IntegrationAccountCommandKind,
@@ -777,17 +777,17 @@ export async function runIntegrationAccountCommand(
   );
 }
 
-export type IntegrationAccountCommandKind =
+type IntegrationAccountCommandKind =
   "set_default_account" | "refresh_account_resources" | "remove_account";
 
-export function matchesIntegrationAccountId(
+function matchesIntegrationAccountId(
   integrationAccountId: string,
   account: IntegrationAccount,
 ): boolean {
   return account.integrationAccountId === integrationAccountId;
 }
 
-export function buildIntegrationAccountCommand(
+function buildIntegrationAccountCommand(
   kind: IntegrationAccountCommandKind,
   integrationAccountId: string,
 ): Variant<IntegrationsCommand, IntegrationAccountCommandKind> {
@@ -803,7 +803,7 @@ export function buildIntegrationAccountCommand(
   }
 }
 
-export async function activateIntegrationsWorkspace(
+async function activateIntegrationsWorkspace(
   context: IntegrationsRouteMutationContext,
 ): Promise<void> {
   const data = readyIntegrationsData(context.content);
@@ -820,7 +820,7 @@ export async function activateIntegrationsWorkspace(
   );
 }
 
-export async function saveIntegrationsSetup(
+async function saveIntegrationsSetup(
   context: IntegrationsRouteMutationContext,
   event: React.FormEvent<HTMLFormElement>,
 ): Promise<void> {
@@ -887,7 +887,7 @@ export async function saveIntegrationsSetup(
   }
 }
 
-export function createWorkspaceMutation(
+function createWorkspaceMutation(
   context: WorkspaceSettingsRouteMutationContext,
   command: WorkspaceSettingsCommand,
   mutation: OrganisationMutation,
@@ -896,7 +896,7 @@ export function createWorkspaceMutation(
   return runWorkspaceCommand(context, command, mutation, successMessage);
 }
 
-export async function runWorkspaceCommand(
+async function runWorkspaceCommand(
   context: WorkspaceSettingsRouteMutationContext,
   command: WorkspaceSettingsCommand,
   mutation: OrganisationMutation,
@@ -937,7 +937,7 @@ export async function runWorkspaceCommand(
   }
 }
 
-export async function changeWorkspaceMemberRole(
+async function changeWorkspaceMemberRole(
   context: WorkspaceSettingsRouteMutationContext,
   userId: string,
   value: string,
@@ -952,7 +952,7 @@ export async function changeWorkspaceMemberRole(
   );
 }
 
-export async function removeWorkspaceMember(
+async function removeWorkspaceMember(
   context: WorkspaceSettingsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -966,7 +966,7 @@ export async function removeWorkspaceMember(
   );
 }
 
-export async function revokeWorkspaceInvitation(
+async function revokeWorkspaceInvitation(
   context: WorkspaceSettingsRouteMutationContext,
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -980,7 +980,7 @@ export async function revokeWorkspaceInvitation(
   );
 }
 
-export async function inviteWorkspaceMember(
+async function inviteWorkspaceMember(
   context: WorkspaceSettingsRouteMutationContext,
   event: React.FormEvent<HTMLFormElement>,
 ): Promise<void> {
@@ -1003,7 +1003,7 @@ export async function inviteWorkspaceMember(
   );
 }
 
-export function beginSettingsMutation(
+function beginSettingsMutation(
   mutations: MutationLedger,
   setMutations: React.Dispatch<React.SetStateAction<MutationLedger>>,
   mutation: OrganisationMutation,
@@ -1014,14 +1014,14 @@ export function beginSettingsMutation(
   return true;
 }
 
-export function completeSettingsMutation(
+function completeSettingsMutation(
   setMutations: React.Dispatch<React.SetStateAction<MutationLedger>>,
   mutation: OrganisationMutation,
 ): void {
   setMutations(removeSettingsMutation.bind(null, mutation));
 }
 
-export function removeSettingsMutation(
+function removeSettingsMutation(
   mutation: OrganisationMutation,
   ledger: MutationLedger,
 ): MutationLedger {
@@ -1034,13 +1034,13 @@ export function readyIntegrationsData(
   return content.kind === "ready" ? content.data : null;
 }
 
-export function readyWorkspaceSettingsData(
+function readyWorkspaceSettingsData(
   content: SettingsRouteContent<WorkspaceSettingsRouteData>,
 ): WorkspaceSettingsRouteData | null {
   return content.kind === "ready" ? content.data : null;
 }
 
-export function setCommerceSyncProblem(
+function setCommerceSyncProblem(
   setContent: React.Dispatch<
     React.SetStateAction<SettingsRouteContent<IntegrationsRouteData>>
   >,
@@ -1049,7 +1049,7 @@ export function setCommerceSyncProblem(
   setContent(updateCommerceSyncProblem.bind(null, problem));
 }
 
-export function updateCommerceSyncProblem(
+function updateCommerceSyncProblem(
   problem: string,
   content: SettingsRouteContent<IntegrationsRouteData>,
 ): SettingsRouteContent<IntegrationsRouteData> {
@@ -1058,7 +1058,7 @@ export function updateCommerceSyncProblem(
     : content;
 }
 
-export function settingsMutationProblem(error: unknown): string {
+function settingsMutationProblem(error: unknown): string {
   return error instanceof ControlApiError
     ? error.message
     : "This change could not be saved. Try again.";
@@ -1077,7 +1077,7 @@ export function requestSettingsConfirm(
   );
 }
 
-export function clearPendingSettingsConfirm(
+function clearPendingSettingsConfirm(
   setPendingConfirm: React.Dispatch<React.SetStateAction<string | null>>,
   timer: SettingsConfirmTimer,
   key: string,
@@ -1086,14 +1086,14 @@ export function clearPendingSettingsConfirm(
   timer.current = null;
 }
 
-export function clearMatchingPendingConfirm(
+function clearMatchingPendingConfirm(
   key: string,
   current: string | null,
 ): string | null {
   return current === key ? null : current;
 }
 
-export function clearSettingsConfirmTimer(timer: SettingsConfirmTimer): void {
+function clearSettingsConfirmTimer(timer: SettingsConfirmTimer): void {
   if (timer.current !== null) window.clearTimeout(timer.current);
   timer.current = null;
 }

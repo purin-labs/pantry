@@ -279,7 +279,7 @@ export function parseCommerceProjectionRecord(
   }
 }
 
-export function projectionProvenance(projection: CommerceProjection) {
+function projectionProvenance(projection: CommerceProjection) {
   switch (projection.kind) {
     case "product":
     case "sellable_variant":
@@ -417,7 +417,7 @@ export function sameRevisionContent(
   );
 }
 
-export function revisionContent(
+function revisionContent(
   raw: string,
   kind: "upsert" | "delete",
 ): string | null {
@@ -548,7 +548,7 @@ export function verifyCommerceLabRun(
   };
 }
 
-export function actionHasApproval(row: LabActionRow): boolean {
+function actionHasApproval(row: LabActionRow): boolean {
   switch (row.state) {
     case "proposed":
     case "expired":
@@ -565,7 +565,7 @@ export function actionHasApproval(row: LabActionRow): boolean {
   }
 }
 
-export function actionReachedProvider(row: LabActionRow): boolean {
+function actionReachedProvider(row: LabActionRow): boolean {
   switch (row.state) {
     case "confirmed":
     case "failed":
@@ -582,7 +582,7 @@ export function actionReachedProvider(row: LabActionRow): boolean {
   }
 }
 
-export function actionNeedsIntervention(row: LabActionRow): boolean {
+function actionNeedsIntervention(row: LabActionRow): boolean {
   switch (row.state) {
     case "failed":
     case "indeterminate":
@@ -599,19 +599,19 @@ export function actionNeedsIntervention(row: LabActionRow): boolean {
   }
 }
 
-export function mapLabApprovalReceipt(row: LabActionRow): {
+function mapLabApprovalReceipt(row: LabActionRow): {
   readonly approvalId: string;
 } {
   return { approvalId: `action:${row.nonce}` };
 }
 
-export function mapLabInterventionReceipt(row: LabActionRow): {
+function mapLabInterventionReceipt(row: LabActionRow): {
   readonly interventionId: string;
 } {
   return { interventionId: `action:${row.nonce}` };
 }
 
-export function mapLabProviderEffectReceipt(row: LabActionRow): {
+function mapLabProviderEffectReceipt(row: LabActionRow): {
   readonly effectId: string;
   readonly actionId: string;
   readonly authorized: true;
@@ -623,7 +623,7 @@ export function mapLabProviderEffectReceipt(row: LabActionRow): {
   };
 }
 
-export function parseLabProjectionReceipt(
+function parseLabProjectionReceipt(
   row: ReceiptRow,
 ): CommerceLabProjectionReceipt {
   if (!isDisposition(row.disposition)) {
@@ -640,9 +640,7 @@ export function parseLabProjectionReceipt(
   };
 }
 
-export function mapLabCueReceipt(
-  cue: PendingCommerceCue,
-): CommerceLabCueReceipt {
+function mapLabCueReceipt(cue: PendingCommerceCue): CommerceLabCueReceipt {
   return {
     nativeId: cue.nativeId,
     eventType: cue.event.eventType,
@@ -652,7 +650,7 @@ export function mapLabCueReceipt(
   };
 }
 
-export function terminalProjectionIdentity(
+function terminalProjectionIdentity(
   row: ProjectionRow,
 ): CommerceLabTerminalProjectionIdentity {
   return {
@@ -663,19 +661,19 @@ export function terminalProjectionIdentity(
   };
 }
 
-export function isPendingLabCueReceipt(
+function isPendingLabCueReceipt(
   receipt: CommerceLabCueReceipt,
 ): receipt is CommerceLabCueReceipt & { readonly state: "pending" } {
   return receipt.state === "pending";
 }
 
-export function isEnqueuedLabCueReceipt(
+function isEnqueuedLabCueReceipt(
   receipt: CommerceLabCueReceipt,
 ): receipt is CommerceLabCueReceipt & { readonly state: "enqueued" } {
   return receipt.state === "enqueued";
 }
 
-export function sumDuplicateReceipt(
+function sumDuplicateReceipt(
   total: number,
   receipt: CommerceLabProjectionReceipt,
 ): number {
@@ -748,7 +746,7 @@ export function isProjectionKind(
   return false;
 }
 
-export function isDisposition(
+function isDisposition(
   value: unknown,
 ): value is CommerceObservationDisposition {
   return (

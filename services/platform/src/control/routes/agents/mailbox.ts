@@ -39,14 +39,14 @@ import { controlCausationId } from "../../mutation";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { assertNever, hasExactKeys, isRecord } from "@seams/std";
 import { readIntegrationAccountReasonCode } from "../../../data/integration-account-reads";
-import { type AgentMailboxRouteAction } from "../agents";
+import type { AgentMailboxRouteAction } from "../agents";
 import {
   agentMailboxConnector,
   emailLimitsFromPolicy,
 } from "../../../mail-inbox/agent-mailbox-connector";
 import { readAgentMailboxProjection } from "../../../mail-inbox/agent-mailbox-projection";
 
-export type AgentMailboxAction = AgentMailboxRouteAction;
+type AgentMailboxAction = AgentMailboxRouteAction;
 
 export async function handleAgentMailbox(
   request: Request,

@@ -373,7 +373,7 @@ export async function inspectCase(
  * pending. An older pending answer would only reach the conversation late,
  * beside newer answers.
  */
-export const UNDELIVERED_OUTPUT_TTL_MS = 24 * 60 * 60_000;
+const UNDELIVERED_OUTPUT_TTL_MS = 24 * 60 * 60_000;
 const UNDELIVERED_OUTPUT_PAGE = 32;
 
 const PENDING_OUTPUT_AGE = `FROM case_output AS output

@@ -26,7 +26,7 @@ export type PreparedRehearsalEdit = Readonly<{
   notice: string;
 }>;
 
-export type RehearsalEditResult =
+type RehearsalEditResult =
   | Readonly<{ kind: "ready"; edit: PreparedRehearsalEdit }>
   | Readonly<{ kind: "rejected"; message: string }>;
 
@@ -50,7 +50,7 @@ export async function prepareRehearsalEdit(
   };
 }
 
-export function trayEditNotice(edit: RehearsalEdit): string {
+function trayEditNotice(edit: RehearsalEdit): string {
   switch (edit.kind) {
     case "add":
       return "Loading, retrieval and racking are planned. Run in browser executes each step and carries its state forward.";

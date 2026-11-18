@@ -1,15 +1,15 @@
 import type { ChannelId } from "./ids";
 
-export type SensitiveEntityKind = "email" | "payment_card" | "credential";
+type SensitiveEntityKind = "email" | "payment_card" | "credential";
 
-export type SensitiveEntity = {
+type SensitiveEntity = {
   kind: SensitiveEntityKind;
   value: string;
   start: number;
   end: number;
 };
 
-export type OutputScreenDecision =
+type OutputScreenDecision =
   | { action: "allow" }
   | { action: "hold"; entities: readonly SensitiveEntity[] };
 

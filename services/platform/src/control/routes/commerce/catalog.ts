@@ -283,7 +283,7 @@ export async function handleCommerceOfferPricePolicy(
  * anything is sent to Commerce. The offer id comes from the path, so the
  * body only carries what the change itself is.
  */
-export function parseOfferPricePolicyCommand(
+function parseOfferPricePolicyCommand(
   method: string,
   offerId: string,
   body: Readonly<Record<string, unknown>>,
@@ -311,7 +311,7 @@ export function parseOfferPricePolicyCommand(
 }
 
 /** Maps one allowance outcome onto a response. */
-export function offerPriceAllowanceResponse(
+function offerPriceAllowanceResponse(
   result: Result<unknown, OfferPriceAllowanceError>,
 ): Response {
   if (result.ok) return controlJson({ ok: true, pricePolicy: result.value });
@@ -330,7 +330,7 @@ export function offerPriceAllowanceResponse(
   }
 }
 
-export function offerPricePolicyResponse(
+function offerPricePolicyResponse(
   result: CommerceClientResult<CommerceOfferPriceResultV1>,
 ): Response {
   if (!result.ok) return controlError("underclerk_unavailable", 503);
@@ -458,7 +458,7 @@ export async function handleCommercePublishedResources(
     : publishedResourceBoundaryErrorResponse(result.error);
 }
 
-export function publishedResourceBoundaryErrorResponse(
+function publishedResourceBoundaryErrorResponse(
   error: PublishedResourceBoundaryError,
 ): Response {
   switch (error.code) {

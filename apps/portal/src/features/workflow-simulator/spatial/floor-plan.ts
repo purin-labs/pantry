@@ -67,7 +67,7 @@ type PlanControl<Selection> = Readonly<{
   originalOutline: THREE.Box3Helper;
 }>;
 
-export type FloorPlanOptions<Selection> = Readonly<{
+type FloorPlanOptions<Selection> = Readonly<{
   layoutControls?: HTMLElement;
   pane?: SpatialPaneOptions;
   /**

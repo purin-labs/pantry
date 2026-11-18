@@ -15,7 +15,7 @@ export type EffectAction = Readonly<{
 }>;
 
 /** What the request stores: the digest that a pass must match, and the view. */
-export type HeldEffectActionRecord = Readonly<{
+type HeldEffectActionRecord = Readonly<{
   digest: string;
   action: HeldEffectAction;
 }>;

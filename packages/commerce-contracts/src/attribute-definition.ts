@@ -217,7 +217,7 @@ export function definitionMismatch(
 ): ContractDecodeResult<never> {
   return cursorRefusal("attribute_definition_mismatch", { attributeId });
 }
-export function sameScope(
+function sameScope(
   left: AttributeDefinition["scope"],
   right: AttributeDefinition["scope"],
 ): boolean {

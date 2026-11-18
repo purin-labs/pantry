@@ -4,9 +4,6 @@ import {
   parseActorRegistryId,
   readRegistryEntryById,
   type ActorRegistryEntry,
-  type ActorFenceToken,
-  type ActorIdentity,
-  type ActorRegistryId,
   type ActorActivationRequest,
   type ActorActivationIdentity,
   type ActorActivationResult,
@@ -316,20 +313,7 @@ export type ActorActivationInspection =
       readonly stateVersion: number;
     };
 
-export type ExactActorActivation = {
-  readonly registryId: ActorRegistryId;
-  readonly fenceToken: ActorFenceToken;
-  readonly stateVersion: number;
-  readonly schemaVersion: number;
-  readonly identity: ActorIdentity;
-  readonly physicalObjectName: string;
-};
-
-export type ExactActorActivationError =
-  | { readonly code: "activation_missing" }
-  | { readonly code: "activation_mismatch" };
-
-export type ActorActivationSql = {
+type ActorActivationSql = {
   exec<Row extends Record<string, SqlStorageValue>>(
     query: string,
     ...bindings: SqlStorageValue[]
@@ -504,26 +488,6 @@ export function inspectActorActivation(
     schemaVersion: current.schema_version,
     stateVersion: current.state_version,
   };
-}
-
-export function verifyExactActorActivation(
-  sql: ActorActivationSql,
-  expected: ExactActorActivation,
-): Result<null, ExactActorActivationError> {
-  const current = readActivation(sql);
-  if (current === undefined) {
-    return { ok: false, error: { code: "activation_missing" } };
-  }
-  return current.registry_id === expected.registryId &&
-    current.fence_token === expected.fenceToken &&
-    current.state_version === expected.stateVersion &&
-    current.schema_version === expected.schemaVersion &&
-    current.organisation_id === expected.identity.organisationId &&
-    current.object_kind === expected.identity.objectKind &&
-    current.logical_object_id === expected.identity.logicalObjectId &&
-    current.physical_object_name === expected.physicalObjectName
-    ? { ok: true, value: null }
-    : { ok: false, error: { code: "activation_mismatch" } };
 }
 
 function readActivation(sql: ActorActivationSql): ActivationRow | undefined {

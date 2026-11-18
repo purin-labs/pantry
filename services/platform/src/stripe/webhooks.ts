@@ -266,7 +266,7 @@ export async function handleStripeWebhook(
   return jsonResponse({ ok: true });
 }
 
-export async function selectStripeWebhookAccount(input: {
+async function selectStripeWebhookAccount(input: {
   readonly candidates: readonly StripeWebhookSecretCandidate[];
   readonly rawBody: string;
   readonly signatureHeader: string | null;
@@ -310,7 +310,7 @@ export async function selectStripeWebhookAccount(input: {
   };
 }
 
-export function stripeWebhookErrorResponse(error: StripeWebhookError): Response {
+function stripeWebhookErrorResponse(error: StripeWebhookError): Response {
   switch (error.code) {
     case "stripe_signature_missing":
     case "stripe_signature_invalid":

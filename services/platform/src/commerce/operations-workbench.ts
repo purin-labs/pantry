@@ -28,11 +28,11 @@ import type {
 const INBOX_PAGE_LIMIT = 100;
 const INBOX_RESULT_LIMIT = 500;
 
-export type TrackingBatchPreviewRequest = Readonly<{
+type TrackingBatchPreviewRequest = Readonly<{
   exceptionIds: readonly string[];
 }>;
 
-export type TrackingBatchPreviewError = Readonly<{
+type TrackingBatchPreviewError = Readonly<{
   code: "tracking_batch_invalid" | "tracking_batch_unavailable";
 }>;
 

@@ -12,7 +12,6 @@ import type {
   AttributeDefinitionKind,
   AttributeOption,
   AttributeValue,
-  CommerceListEntry,
   ListEntryAttributeDefinition,
 } from "@seams/contracts";
 
@@ -146,7 +145,7 @@ export function commerceStatusChip(
  * stages, replenishment lifecycle, priority). An unrecognised merchant-defined
  * option stays neutral rather than guessing a severity.
  */
-export function commerceStatusTone(optionId: string): StatusChipStatus["kind"] {
+function commerceStatusTone(optionId: string): StatusChipStatus["kind"] {
   switch (optionId) {
     case "delivered":
     case "received":
@@ -171,7 +170,7 @@ export function commerceStatusTone(optionId: string): StatusChipStatus["kind"] {
 }
 
 /** The label published for an option ID, or a humanized fallback. */
-export function optionLabel(
+function optionLabel(
   optionId: string,
   definition: AttributeDefinitionKind | undefined,
 ): string {
@@ -182,7 +181,7 @@ export function optionLabel(
 }
 
 /** The selectable options of a status or choice definition. */
-export function definitionOptions(
+function definitionOptions(
   definition: AttributeDefinitionKind | undefined,
 ): readonly AttributeOption[] {
   if (definition === undefined) return [];
@@ -288,23 +287,12 @@ export function commerceSourceLabel(source: string): string {
   }
 }
 
-/** The value a list entry holds for one attribute, if any. */
-export function listEntryValue(
-  entry: CommerceListEntry,
-  attributeId: string,
-): AttributeValue | undefined {
-  for (const attribute of entry.attributeValues) {
-    if (String(attribute.attributeId) === attributeId) return attribute.value;
-  }
-  return undefined;
-}
-
 /**
  * Dates arrive as calendar days (`2026-09-01`). Constructing them through the
  * Date parser would read them as UTC midnight and shift the day backwards for
  * any viewer west of Greenwich, so the parts are placed in local time.
  */
-export function formatCommerceDate(value: string): string {
+function formatCommerceDate(value: string): string {
   const parts = /^(\d{4})-(\d{2})-(\d{2})/u.exec(value);
   if (parts === null) return value;
   const local = new Date(
@@ -327,7 +315,7 @@ export function formatCommerceTimestamp(value: string): string {
  * and trailing zeros of the fixed scale are dropped: quantities read as "460",
  * not "460.000000".
  */
-export function formatDecimal(unscaled: number, scale: number): string {
+function formatDecimal(unscaled: number, scale: number): string {
   const exact = exactDecimalText(unscaled, scale);
   const separator = exact.indexOf(".");
   const fractionDigits = separator === -1 ? 0 : exact.length - separator - 1;
@@ -354,7 +342,7 @@ function exactDecimalText(unscaled: number, scale: number): string {
 }
 
 /** Counts arrive as bigint; Intl formats them without a lossy Number cast. */
-export function formatInteger(value: bigint): string {
+function formatInteger(value: bigint): string {
   return new Intl.NumberFormat().format(value);
 }
 
@@ -363,7 +351,7 @@ export function formatInteger(value: bigint): string {
  * — JPY has none, USD two, BHD three — so it is read from the currency itself
  * rather than assumed to be 100.
  */
-export function formatMoney(amountMinor: number, currency: string): string {
+function formatMoney(amountMinor: number, currency: string): string {
   const exponent = currencyExponent(currency);
   const major = amountMinor / 10 ** exponent;
   try {

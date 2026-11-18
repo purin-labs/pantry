@@ -120,7 +120,7 @@ export async function submitAgentConfigurationProposal(
   return { ok: true, value: parseConfigurationProposalRow(stored) };
 }
 
-export async function resolveProposalTarget(
+async function resolveProposalTarget(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   submission: ConfigurationProposalSubmission,
@@ -171,7 +171,7 @@ export async function resolveProposalTarget(
     : { ok: true, value: positive(skill.currentRevision) };
 }
 
-export async function readOpenConfigurationProposal(
+async function readOpenConfigurationProposal(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   proposalId: string,

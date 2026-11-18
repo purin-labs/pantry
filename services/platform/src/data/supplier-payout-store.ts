@@ -43,7 +43,7 @@ const UNRESOLVED_STATES: readonly SupplierPayoutStateKind[] = [
   "indeterminate",
 ];
 
-export type SupplierPayoutWriteResult =
+type SupplierPayoutWriteResult =
   | Readonly<{ ok: true; revision: number }>
   | Readonly<{
       ok: false;
@@ -233,7 +233,7 @@ export async function listSupplierPayoutsForSupplier(
 /** The payouts that one timeline read returns. */
 const MAX_DATED_PAYOUTS = 200;
 
-export type DatedSupplierPayout = SupplierPayoutRow &
+type DatedSupplierPayout = SupplierPayoutRow &
   Readonly<{ createdAt: number; updatedAt: number }>;
 
 /**

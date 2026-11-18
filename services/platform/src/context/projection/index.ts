@@ -88,11 +88,11 @@ export type ContextProjectionCommand = {
   readonly sourceRevision: ContextProjectionRevision;
 };
 
-export type ContextProjectionParseError =
+type ContextProjectionParseError =
   | { readonly code: "object_required" }
   | { readonly code: "invalid_field"; readonly field: string };
 
-export type ContextProjectionCommandError =
+type ContextProjectionCommandError =
   | ContextProjectionParseError
   | { readonly code: "storage_failure"; readonly retryable: true };
 
@@ -271,7 +271,7 @@ type ContextProjectionStatement = {
   all<TResult>(): Promise<{ readonly results: readonly TResult[] }>;
 };
 
-export type ContextProjectionDatabase = {
+type ContextProjectionDatabase = {
   prepare(query: string): ContextProjectionStatement;
 };
 
@@ -388,7 +388,7 @@ export function createContextProjectionReader(
   };
 }
 
-export async function readContextProjection(
+async function readContextProjection(
   db: ContextProjectionDatabase,
   input: Readonly<{
     readonly organisationId: OrganisationId;
@@ -399,50 +399,6 @@ export async function readContextProjection(
   const row = await readProjectionRow(db, input.organisationId, input.source);
   if (row === null || row.sourceRevision !== input.sourceRevision) return null;
   return projectionFromParsedRow(input.organisationId, row);
-}
-
-export async function restoreCaseProjectionAuthority(
-  db: ContextProjectionDatabase,
-  input: Readonly<{
-    organisationId: OrganisationId;
-    source: CaseContextSourceRef;
-    previousDigest: Sha256Digest;
-    restoredDigest: Sha256Digest;
-    now: number;
-  }>,
-): Promise<Result<null, { readonly code: "authority_conflict" }>> {
-  await db
-    .prepare(
-      `UPDATE context_projection
-     SET provenance_json = json_set(provenance_json,
-       '$.replayAuthority.authorityPartitionDigest', ?), updated_at = ?
-     WHERE organisation_id = ? AND source_kind = 'case_entry'
-       AND source_key = ?
-       AND json_extract(provenance_json, '$.kind') = 'case_entry'
-       AND json_extract(provenance_json, '$.replayAuthority.kind') = 'authority_partition'
-       AND json_extract(provenance_json, '$.replayAuthority.authorityPartitionDigest') = ?`,
-    )
-    .bind(
-      input.restoredDigest,
-      input.now,
-      input.organisationId,
-      sourceIdentityKey(input.source),
-      input.previousDigest,
-    )
-    .run();
-  const row = await db
-    .prepare(
-      `SELECT provenance_json FROM context_projection
-       WHERE organisation_id = ? AND source_kind = 'case_entry' AND source_key = ?`,
-    )
-    .bind(input.organisationId, sourceIdentityKey(input.source))
-    .first<{ provenance_json: unknown }>();
-  if (row === null) return { ok: true, value: null };
-  const authority = parseCaseProjectionProvenance(row.provenance_json);
-  return authority?.kind === "authority_partition" &&
-    authority.authorityPartitionDigest === input.restoredDigest
-    ? { ok: true, value: null }
-    : { ok: false, error: { code: "authority_conflict" } };
 }
 
 export async function searchContextProjections(

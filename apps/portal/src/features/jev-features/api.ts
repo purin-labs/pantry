@@ -11,7 +11,7 @@ import {
   controlRead,
 } from "../../control-client";
 
-export function jevFeaturesPath(organisationId: string): string {
+function jevFeaturesPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/jev-features`;
 }
 

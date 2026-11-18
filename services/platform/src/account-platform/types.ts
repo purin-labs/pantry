@@ -24,9 +24,6 @@ import {
   type FundsReservationV1,
   type ReserveFundsRequestV1,
   type MarkFundsIndeterminateRequestV1,
-  type SettleFundsRequestV1,
-  type ReleaseFundsRequestV1,
-  type ReconcileFundsRequestV1,
   type FundsTerminalDeliveryDataV1 as AccountTerminalDelivery,
   type SatyrFundingSelectionV1 as AccountExecutionFunding,
   type PlatformUsageEventDataV1,
@@ -102,18 +99,6 @@ export type AccountIndeterminateRequest = Pick<
   MarkFundsIndeterminateRequestV1,
   keyof MarkFundsIndeterminateRequestV1
 >;
-export type AccountSettleRequest = Pick<
-  SettleFundsRequestV1,
-  keyof SettleFundsRequestV1
->;
-export type AccountReleaseRequest = Pick<
-  ReleaseFundsRequestV1,
-  keyof ReleaseFundsRequestV1
->;
-export type AccountReconcileRequest = Pick<
-  ReconcileFundsRequestV1,
-  keyof ReconcileFundsRequestV1
->;
 /** One Pantry turn on the test meter. */
 export type AccountTurnUsageRequest = PlatformUsageEventDataV1 & PantryTurnUsageV1;
 /** One UTC hour of Jev input tokens for one feature (Plan 88). */
@@ -155,15 +140,6 @@ export function readAccountIdentityResolution(
 }
 export function accountUnavailable<T>(): Result<T, AccountPlatformError> {
   return { ok: false, error: { code: "authority_unavailable" } };
-}
-export function parseAccountFundsReservation(
-  input: unknown,
-): Result<AccountFundsReservation, AccountPlatformError> {
-  try {
-    return { ok: true, value: readAccountFundsReservation(input) };
-  } catch {
-    return accountUnavailable();
-  }
 }
 
 export function parsePantryAccountBinding(

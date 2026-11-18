@@ -14,7 +14,7 @@ import type { SlackSideCaseMessage } from "./side-cases";
 
 const SLACK_SIDE_CASE_CALL_TIMEOUT_MS = 5_000;
 
-export type SlackSideCaseCallError = Readonly<{ code: string }>;
+type SlackSideCaseCallError = Readonly<{ code: string }>;
 
 /** Post a message, in a thread or as a new root. It returns its timestamp. */
 export async function postSlackSideCaseMessage(

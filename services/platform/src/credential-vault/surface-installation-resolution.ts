@@ -113,7 +113,7 @@ export async function resolveActiveSlackThreadCredential(input: {
 }
 
 /** Where the bot credential of a Slack thread is kept. */
-export type SlackThreadCredentialRoute = {
+type SlackThreadCredentialRoute = {
   readonly credentialOrganisationId: OrganisationId;
   readonly botTokenRef: VaultHandle;
   readonly integrationAccountId: IntegrationAccountId;

@@ -304,7 +304,7 @@ function canonicalAttributeId(
   return definition.id;
 }
 
-export function sameEntityTypeId(
+function sameEntityTypeId(
   left: CommerceEntityTypeId,
   right: CommerceEntityTypeId,
 ): boolean {

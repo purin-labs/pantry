@@ -81,7 +81,7 @@ export type RunningConversation = Conversation & {
   readonly work: Variant<Conversation["work"], "running">;
 };
 
-export function isRunningConversation(
+function isRunningConversation(
   conversation: Conversation,
 ): conversation is RunningConversation {
   return conversation.work.kind === "running";
@@ -102,7 +102,7 @@ export type CancellingConversationExecution = Omit<
   "model"
 >;
 
-export type ActorConversationExecution = AdmittedConversationExecution & {
+type ActorConversationExecution = AdmittedConversationExecution & {
   readonly actorIdentity: string;
   readonly caseActor: ConversationCaseActor;
 };
@@ -202,7 +202,7 @@ export async function scheduleConversationExecution(
   await sessionPreparation;
 }
 
-export async function prepareScheduledConversationSession(
+async function prepareScheduledConversationSession(
   env: Env,
   placement: OrganisationExecutionScope,
   conversationId: ConversationId,
@@ -434,7 +434,7 @@ async function blockQueuedConversation(
   return saved.kind === "saved" ? blocked : null;
 }
 
-export async function finishAdmittedConversation(
+async function finishAdmittedConversation(
   input: ActorConversationExecution,
 ): Promise<void> {
   if (!isRunningConversation(input.conversation)) return;
@@ -454,7 +454,7 @@ export async function finishAdmittedConversation(
     console.error("portal_chat_background_failed", result.error.kind);
 }
 
-export async function finishSteeringConversation(
+async function finishSteeringConversation(
   input: ActorConversationExecution,
 ): Promise<{
   readonly conversation: Conversation;
@@ -546,7 +546,7 @@ export async function settleCancellingConversation(
   return { conversation: cancelled, revision: latest.revision + 1 };
 }
 
-export async function drainQueuedConversation(
+async function drainQueuedConversation(
   input: ActorConversationExecution,
   completed: Conversation,
 ): Promise<void> {
@@ -636,13 +636,13 @@ export async function drainQueuedConversation(
   }
 }
 
-export function nextPendingInput(
+function nextPendingInput(
   pending: readonly PendingChatInput[],
 ): PendingChatInput | undefined {
   return pending.find(pendingInputIsSteering) ?? pending[0];
 }
 
-export function pendingInputIsSteering(input: PendingChatInput): boolean {
+function pendingInputIsSteering(input: PendingChatInput): boolean {
   return input.mode === "steer";
 }
 

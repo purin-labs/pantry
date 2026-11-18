@@ -36,7 +36,7 @@ export function cents(minor: number): string {
 }
 
 /** The prompt shows at 80 % of the free use while paid use is off. */
-export function promptDue(view: JevFeaturesView): boolean {
+function promptDue(view: JevFeaturesView): boolean {
   const { allowance } = view;
   if (allowance === null || view.paidUse.enabled) return false;
   if (allowance.reached) return true;
@@ -107,7 +107,7 @@ export function pricedNote(priced: boolean | null): string | null {
 }
 
 /** "This month: $1.20 of $5.00", and the stop at the spending limit. */
-export function PaidUseMonth(props: {
+function PaidUseMonth(props: {
   readonly view: JevFeaturesView;
 }): React.ReactNode {
   const { paidUse, allowance } = props.view;

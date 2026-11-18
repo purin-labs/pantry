@@ -34,7 +34,7 @@ export type PaymentStep = Readonly<{
   follows: string | null;
 }>;
 
-export type PaymentLanesProps = Readonly<{
+type PaymentLanesProps = Readonly<{
   control: PeriodControl;
   now: number | null;
   steps: readonly PaymentStep[];

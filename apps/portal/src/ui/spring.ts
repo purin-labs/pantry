@@ -10,15 +10,8 @@ export type Spring = {
   readonly bounce: number;
 };
 
-// The CSS easings in packages/frontend-theme.css sample these same springs.
-export const springs = {
-  quick: { duration: 150, bounce: 0 },
-  smooth: { duration: 250, bounce: 0 },
-  glide: { duration: 300, bounce: 0.2 },
-} as const satisfies Record<string, Spring>;
-
 /** Progress from 0 toward 1, `elapsed` milliseconds after a step. */
-export function springStep(spring: Spring, elapsed: number): number {
+function springStep(spring: Spring, elapsed: number): number {
   if (elapsed <= 0) return 0;
   const omega = (2 * Math.PI) / spring.duration;
   const zeta = 1 - spring.bounce;
@@ -33,7 +26,7 @@ export function springStep(spring: Spring, elapsed: number): number {
 }
 
 /** Milliseconds until the response stays within 0.1% of its target. */
-export function springSettleTime(spring: Spring): number {
+function springSettleTime(spring: Spring): number {
   const omega = (2 * Math.PI) / spring.duration;
   const zeta = 1 - spring.bounce;
   // e^-u (1 + u) = 0.001 at u ≈ 9.23 for the critically damped response.

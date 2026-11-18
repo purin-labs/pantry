@@ -7,7 +7,7 @@ type TimedStep = readonly [startMs: number, durationMs: number, label: string];
 
 const MOST_STEPS = 120;
 
-export type ThreadReadTiming = Readonly<{
+type ThreadReadTiming = Readonly<{
   /** `env` with each database timed. The read uses it in place of `env`. */
   env: Env;
   finish(status: number): void;

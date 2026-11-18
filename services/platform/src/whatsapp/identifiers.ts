@@ -35,7 +35,7 @@ export type E164PhoneNumber = string & {
   readonly [e164PhoneNumberBrand]: "E164PhoneNumber";
 };
 
-export type MetaIdParseError = {
+type MetaIdParseError = {
   readonly code: "invalid_meta_identifier";
   readonly field: string;
 };

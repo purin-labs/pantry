@@ -215,7 +215,7 @@ export async function handleOrganisationInference(
   return controlJson(responseBody);
 }
 
-export type OrganisationInferenceMutation =
+type OrganisationInferenceMutation =
   | {
       readonly kind: "selection_only";
       readonly selection:
@@ -235,7 +235,7 @@ export type OrganisationInferenceMutation =
       readonly apiKey: AnthropicApiKey;
     };
 
-export function parseOrganisationInferenceMutation(
+function parseOrganisationInferenceMutation(
   body: JsonRecord,
 ): Result<
   OrganisationInferenceMutation,
@@ -290,7 +290,7 @@ export function parseOrganisationInferenceMutation(
   }
 }
 
-export function organisationInferenceSelectionError(
+function organisationInferenceSelectionError(
   error: OrganisationInferenceSelectionError,
 ): Response {
   switch (error.code) {

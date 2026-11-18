@@ -20,7 +20,7 @@ import { admitJevPaidCall } from "../../jev-features/paid-use";
 /** Plan 88 D3: $1.00 of TypeSafe cost on Pantry's key each UTC month. */
 export const JEV_MONTHLY_ALLOWANCE_MICROUSD = 1_000_000;
 /** Plan 88 D8: at most 5 Pantry-funded Jev requests a second for each Organisation. */
-export const JEV_REQUESTS_PER_SECOND = 5;
+const JEV_REQUESTS_PER_SECOND = 5;
 import { isRecord } from "@seams/std";
 
 export type TypeSafeUsageLimits = Readonly<{
@@ -115,7 +115,7 @@ export type TypeSafeEvaluationKey = Readonly<{
   requestDigest: string;
 }>;
 
-export type TypeSafeReservation = TypeSafeEvaluationKey &
+type TypeSafeReservation = TypeSafeEvaluationKey &
   Readonly<{
     policyRevision: number;
     inputBytes: number;

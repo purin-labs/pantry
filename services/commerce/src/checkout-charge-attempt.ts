@@ -51,7 +51,7 @@ type CarrierRateQuotedResult = Variant<
   "quoted"
 >;
 
-export type CheckoutChargeQuoteAttempt =
+type CheckoutChargeQuoteAttempt =
   | (ChargeQuoteAttemptBase &
       Readonly<{
         componentKind: "carrier_rate";
@@ -149,7 +149,7 @@ export type CheckoutChargeQuoteAttempt =
         result?: never;
       }>);
 
-export type DurableCheckoutChargeQuoteProviderInput = Readonly<{
+type DurableCheckoutChargeQuoteProviderInput = Readonly<{
   database: CommerceDatabase;
   merchantId: string;
   parentAttemptId: string;
@@ -161,7 +161,7 @@ export type DurableCheckoutChargeQuoteProviderInput = Readonly<{
   provider: CheckoutChargeQuoteProvider;
 }>;
 
-export type DurableCarrierRateQuoteProviderInput = Readonly<
+type DurableCarrierRateQuoteProviderInput = Readonly<
   Omit<DurableCheckoutChargeQuoteProviderInput, "provider"> &
     Readonly<{
       provider: CarrierRateQuoteProvider;
@@ -282,7 +282,7 @@ export class DurableCarrierRateQuoteProvider implements CarrierRateQuoteProvider
   }
 }
 
-export function readCheckoutChargeQuoteAttempt(
+function readCheckoutChargeQuoteAttempt(
   database: CommerceDatabase,
   merchantId: string,
   attemptId: string,

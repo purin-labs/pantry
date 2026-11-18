@@ -6,7 +6,7 @@ import {
   type LivingAssetTemplates,
 } from "./living-asset-loader";
 
-export type HumanWorkerPoseOptions = Readonly<{
+type HumanWorkerPoseOptions = Readonly<{
   facingYawRad: number;
   walking: boolean;
   working: boolean;

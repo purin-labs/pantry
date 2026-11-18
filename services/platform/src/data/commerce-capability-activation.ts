@@ -19,7 +19,7 @@ declare const capabilityActivationIdBrand: unique symbol;
 declare const capabilityContractRevisionBrand: unique symbol;
 declare const commerceLocationIdBrand: unique symbol;
 
-export type CapabilityActivationId = string & {
+type CapabilityActivationId = string & {
   readonly [capabilityActivationIdBrand]: "CapabilityActivationId";
 };
 
@@ -43,7 +43,7 @@ export type CapabilityScope =
   | Readonly<{ kind: "organisation" }>
   | Readonly<{ kind: "location"; locationId: CommerceLocationId }>;
 
-export type CapabilityAuthority = Readonly<{
+type CapabilityAuthority = Readonly<{
   kind: "satyr_commerce" | "shopify";
   integrationAccountId: IntegrationAccountId;
   commerceSystemRevision: CommerceSystemRevision;
@@ -86,26 +86,26 @@ export type CommerceCapabilityActivation =
         }>;
       }>);
 
-export type ConfigureCapabilityOutcome =
+type ConfigureCapabilityOutcome =
   | Readonly<{ kind: "configured"; activation: CommerceCapabilityActivation }>
   | Readonly<{
       kind: "already_configured";
       activation: CommerceCapabilityActivation;
     }>;
 
-export type ActivateCapabilityOutcome =
+type ActivateCapabilityOutcome =
   | Readonly<{ kind: "activated"; activation: CommerceCapabilityActivation }>
   | Readonly<{
       kind: "already_active";
       activation: CommerceCapabilityActivation;
     }>;
 
-export type InactivateCapabilityOutcome = Readonly<{
+type InactivateCapabilityOutcome = Readonly<{
   kind: "inactivated";
   activation: CommerceCapabilityActivation;
 }>;
 
-export type CommerceCapabilityAdmission =
+type CommerceCapabilityAdmission =
   | Readonly<{ kind: "implicit" }>
   | Readonly<{ kind: "activated"; activation: CommerceCapabilityActivation }>;
 

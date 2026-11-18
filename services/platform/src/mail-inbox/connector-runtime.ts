@@ -476,7 +476,7 @@ function commitObservation(
   writeMailHead(sql, head, now);
   deferMailObservation(sql, now);
 }
-export function samePublishedHead(
+function samePublishedHead(
   current: MailOrganizationHead | null,
   expected: MailOrganizationHead,
 ): boolean {

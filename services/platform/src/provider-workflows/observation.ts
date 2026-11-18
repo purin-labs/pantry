@@ -118,7 +118,7 @@ export async function observeShopifyConnection(
     : { kind: "healthy", evidenceCode: "provider_webhook_verified" };
 }
 
-export function observationUnsupported(): ProviderManifestEvidence {
+function observationUnsupported(): ProviderManifestEvidence {
   return { kind: "observation_unsupported" };
 }
 

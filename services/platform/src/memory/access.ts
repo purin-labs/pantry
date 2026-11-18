@@ -100,12 +100,12 @@ export type RecordScope = Readonly<{
  * these exactly: a skill the turn loaded, a commerce resource class it reads,
  * or the commerce entity it is about.
  */
-export type TurnMemorySubjects = Readonly<{
+type TurnMemorySubjects = Readonly<{
   applicability: readonly MemoryApplicability[];
 }>;
 
 /** One cited record as its owner recorded it. */
-export type CitedRecord = Readonly<{
+type CitedRecord = Readonly<{
   label: FlowLabel;
   contentKind: string;
   authorPersonId: string | null;
@@ -116,7 +116,7 @@ export type CitedRecord = Readonly<{
  * record: it is gone or no longer has the cited content. `unreadable` is a
  * failed lookup, which establishes nothing about the record.
  */
-export type CitedRecordError = Readonly<{
+type CitedRecordError = Readonly<{
   code: "invalid" | "missing" | "unreadable" | "unsupported";
 }>;
 
@@ -786,7 +786,7 @@ function viewerMayInspect(
 }
 
 /** What one reviewed revision carries that decides who may inspect it. */
-export type ReviewedRevision = Readonly<{
+type ReviewedRevision = Readonly<{
   flowLabel: FlowLabel;
   evidence: readonly MemoryEvidence[];
   dependsOn: readonly MemoryEvidence[];
@@ -1098,7 +1098,7 @@ export async function proposeMemoryFromCorrection(
 }
 
 /** The Case entry that holds a person's message, as a Memory cites it. */
-export type InstructionEvidence = Readonly<{
+type InstructionEvidence = Readonly<{
   kind: "operator_instruction";
   caseId: string;
   entryId: string;

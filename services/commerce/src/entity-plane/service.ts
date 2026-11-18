@@ -91,7 +91,7 @@ import { readEntityPlaneChanges } from "./entity-plane-changes.ts";
 import { EntityPlanePlannedReads } from "./planned-reads.ts";
 import { errorMessage, sameJson, sha256Hex } from "@seams/std";
 
-export type EntityPlaneServiceOptions = Readonly<{
+type EntityPlaneServiceOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   signer: CommerceSigner;

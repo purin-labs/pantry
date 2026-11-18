@@ -36,14 +36,14 @@ import {
 } from "@seams/std";
 import { type MenuDraftReview, parseMenuReview, parseMenuSnapshot } from "@seams/control-api/portal/content-studio-menu";
 
-export type MenuReviewState =
+type MenuReviewState =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "ready"; review: MenuDraftReview }>
   | Readonly<{ kind: "failed"; message: string }>;
 
 /** The products the café sells, for the item picker, and the live menu. */
-export type CafeMenuOptions =
+type CafeMenuOptions =
   | Readonly<{ kind: "loading" }>
   | Readonly<{
       kind: "ready";
@@ -56,13 +56,13 @@ export type CafeMenuOptions =
     }>
   | Readonly<{ kind: "failed" }>;
 
-export type ShopNameAddress = Readonly<{
+type ShopNameAddress = Readonly<{
   name: string | null;
   prefix: string;
   suffix: string;
 }>;
 
-export type ShopNameSaveState =
+type ShopNameSaveState =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "saving" }>
   | Readonly<{ kind: "saved" }>
@@ -75,13 +75,13 @@ export type CafeMenuProduct = Readonly<{
   image: Readonly<{ url: string; altText: string }> | null;
 }>;
 
-export type MenuPublishState =
+type MenuPublishState =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "publishing" }>
   | Readonly<{ kind: "published"; revision: number; entries: number }>
   | Readonly<{ kind: "failed"; message: string }>;
 
-export const INITIAL_MENU_VIEW: MenuDraftView = {
+const INITIAL_MENU_VIEW: MenuDraftView = {
   kind: "connecting",
   draft: { title: "Café menu", sections: [], items: [] },
   participants: [],
@@ -95,9 +95,9 @@ export const INITIAL_MENU_VIEW: MenuDraftView = {
  * The address names the open sheet as `?tab=items` or `?tab=screens`, as
  * the Menus tabs of before did.
  */
-export type MenuSheet = "items" | "screens";
+type MenuSheet = "items" | "screens";
 
-export const MENU_SHEETS: readonly Readonly<{ id: MenuSheet; label: string }>[] = [
+const MENU_SHEETS: readonly Readonly<{ id: MenuSheet; label: string }>[] = [
   { id: "items", label: "Menu items" },
   { id: "screens", label: "Screens" },
 ];
@@ -154,13 +154,13 @@ export function MenuDraftRoute(
   );
 }
 
-export function hasUnsyncedMenu(
+function hasUnsyncedMenu(
   client: React.RefObject<MenuDraftClient | null>,
 ): boolean {
   return client.current?.hasUnsyncedEdits() ?? false;
 }
 
-export function MenuDraftEditor(
+function MenuDraftEditor(
   props: Readonly<{
     organisationId: string;
     client: React.RefObject<MenuDraftClient | null>;
@@ -237,7 +237,7 @@ export function MenuDraftEditor(
   </section>;
 }
 
-export function MenuPublishPanel(props: Readonly<{
+function MenuPublishPanel(props: Readonly<{
   options: CafeMenuOptions;
   state: MenuPublishState;
   canPublish: boolean;
@@ -298,7 +298,7 @@ export function MenuPublishPanel(props: Readonly<{
  * code on the shop's screens and table cards; an earlier address keeps
  * opening the shop.
  */
-export function ShopNamePanel(props: Readonly<{
+function ShopNamePanel(props: Readonly<{
   organisationId: string;
   address: ShopNameAddress;
   setOptions: React.Dispatch<React.SetStateAction<CafeMenuOptions>>;
@@ -347,7 +347,7 @@ export function ShopNamePanel(props: Readonly<{
   </form>;
 }
 
-export async function saveShopName(
+async function saveShopName(
   organisationId: string,
   name: string,
   setState: React.Dispatch<React.SetStateAction<ShopNameSaveState>>,
@@ -375,7 +375,7 @@ export async function saveShopName(
   }
 }
 
-export function shopNameFailure(error: unknown): string {
+function shopNameFailure(error: unknown): string {
   switch (error) {
     case "shop_name_invalid":
       return "Use 3 to 30 lowercase letters, digits and single hyphens. Start with a letter.";
@@ -392,7 +392,7 @@ export function shopNameFailure(error: unknown): string {
   }
 }
 
-export function loadCafeMenuOptions(
+function loadCafeMenuOptions(
   organisationId: string,
   setOptions: React.Dispatch<React.SetStateAction<CafeMenuOptions>>,
 ): () => void {
@@ -410,7 +410,7 @@ export function loadCafeMenuOptions(
   };
 }
 
-export const HOUR_DAY_LABELS: Readonly<Record<MenuHourDay, string>> = {
+const HOUR_DAY_LABELS: Readonly<Record<MenuHourDay, string>> = {
   mon: "Mon",
   tue: "Tue",
   wed: "Wed",
@@ -421,7 +421,7 @@ export const HOUR_DAY_LABELS: Readonly<Record<MenuHourDay, string>> = {
 };
 
 /** All day, or repeating hours on the shop's clock. Each slot ends the day it starts. */
-export function MenuHoursEditor(props: Readonly<{
+function MenuHoursEditor(props: Readonly<{
   hours: MenuHours | null;
   setHours: (hours: MenuHours | null) => void;
 }>): React.ReactNode {
@@ -504,7 +504,7 @@ function productPhoto(value: unknown): CafeMenuProduct["image"] {
  * Publishes the saved draft revision that matches the menu on the screen,
  * so the shop shows what the person saw.
  */
-export async function publishCafeMenu(
+async function publishCafeMenu(
   organisationId: string,
   shown: MenuDraftSnapshot,
   setPublication: React.Dispatch<React.SetStateAction<MenuPublishState>>,
@@ -536,7 +536,7 @@ export async function publishCafeMenu(
   }
 }
 
-export async function readSavedMenu(
+async function readSavedMenu(
   organisationId: string,
 ): Promise<Readonly<{ revision: number; draft: MenuDraftSnapshot }> | null> {
   const raw = await controlRead(
@@ -548,7 +548,7 @@ export async function readSavedMenu(
   return draft === null ? null : { revision: raw.value.revision, draft };
 }
 
-export function publicationFailure(status: number, raw: unknown): string {
+function publicationFailure(status: number, raw: unknown): string {
   const error = isRecord(raw) ? raw.error : undefined;
   if (status === 403) return "Only an owner or an admin can publish the menu.";
   switch (error) {
@@ -569,15 +569,15 @@ export function publicationFailure(status: number, raw: unknown): string {
   }
 }
 
-export function isMenuText(value: unknown): value is string {
+function isMenuText(value: unknown): value is string {
   return typeof value === "string";
 }
 
-export function cafeMenuPublicationPath(organisationId: string): string {
+function cafeMenuPublicationPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/menu-publication`;
 }
 
-export function MenuReviewPanel(props: Readonly<{
+function MenuReviewPanel(props: Readonly<{
   state: MenuReviewState;
   canReview: boolean;
   onReview: () => void;
@@ -600,7 +600,7 @@ export function MenuReviewPanel(props: Readonly<{
   </div>;
 }
 
-export async function requestMenuReview(
+async function requestMenuReview(
   organisationId: string,
   setReview: React.Dispatch<React.SetStateAction<MenuReviewState>>,
 ): Promise<void> {
@@ -617,7 +617,7 @@ export async function requestMenuReview(
   }
 }
 
-export function renderMenuSection(
+function renderMenuSection(
   client: React.RefObject<MenuDraftClient | null>,
   draft: MenuDraftSnapshot,
   readOnly: boolean,
@@ -653,7 +653,7 @@ export function renderMenuSection(
   </div>;
 }
 
-export function renderMenuItem(
+function renderMenuItem(
   client: React.RefObject<MenuDraftClient | null>,
   draft: MenuDraftSnapshot,
   readOnly: boolean,
@@ -703,15 +703,15 @@ export function renderMenuItem(
   </article>;
 }
 
-export function menuSectionItem(section: MenuSection): { value: string; label: string } {
+function menuSectionItem(section: MenuSection): { value: string; label: string } {
   return { value: section.id, label: section.title };
 }
 
-export function renderMenuSectionOption(section: MenuSection): React.ReactNode {
+function renderMenuSectionOption(section: MenuSection): React.ReactNode {
   return <Select.Item key={section.id} value={section.id}>{section.title}</Select.Item>;
 }
 
-export function moveMenuItemToSection(
+function moveMenuItemToSection(
   client: React.RefObject<MenuDraftClient | null>,
   draft: MenuDraftSnapshot,
   item: MenuItem,
@@ -728,7 +728,7 @@ export function moveMenuItemToSection(
   }
 }
 
-export function connectMenuEditor(
+function connectMenuEditor(
   organisationId: string,
   surface: React.RefObject<HTMLElement | null>,
   clientRef: React.RefObject<MenuDraftClient | null>,
@@ -740,16 +740,16 @@ export function connectMenuEditor(
   return disconnectMenuEditor.bind(null, clientRef, client);
 }
 
-export function disconnectMenuEditor(ref: React.RefObject<MenuDraftClient | null>, client: MenuDraftClient): void {
+function disconnectMenuEditor(ref: React.RefObject<MenuDraftClient | null>, client: MenuDraftClient): void {
   ref.current = null;
   client.dispose();
 }
 
-export function renameMenu(client: React.RefObject<MenuDraftClient | null>, event: React.ChangeEvent<HTMLInputElement>): void {
+function renameMenu(client: React.RefObject<MenuDraftClient | null>, event: React.ChangeEvent<HTMLInputElement>): void {
   client.current?.rename(event.currentTarget.value);
 }
 
-export function addMenuSection(client: React.RefObject<MenuDraftClient | null>, draft: MenuDraftSnapshot): void {
+function addMenuSection(client: React.RefObject<MenuDraftClient | null>, draft: MenuDraftSnapshot): void {
   client.current?.addSection({
     id: `section_${crypto.randomUUID().replaceAll("-", "")}`,
     title: `Section ${draft.sections.length + 1}`,
@@ -757,16 +757,16 @@ export function addMenuSection(client: React.RefObject<MenuDraftClient | null>, 
   });
 }
 
-export function productItem(product: CafeMenuProduct): { value: string; label: string } {
+function productItem(product: CafeMenuProduct): { value: string; label: string } {
   return { value: product.productId, label: product.title };
 }
 
-export function renderMenuSelectItem(item: { value: string; label: string }): React.ReactNode {
+function renderMenuSelectItem(item: { value: string; label: string }): React.ReactNode {
   return <Select.Item key={item.value} value={item.value}>{item.label}</Select.Item>;
 }
 
 /** An item names a product that the café sells, so the menu can publish. */
-export function addMenuProduct(
+function addMenuProduct(
   client: React.RefObject<MenuDraftClient | null>,
   products: readonly CafeMenuProduct[],
   sectionId: string,
@@ -784,7 +784,7 @@ export function addMenuProduct(
   });
 }
 
-export function editMenuItemName(
+function editMenuItemName(
   client: React.RefObject<MenuDraftClient | null>,
   item: MenuItem,
   event: React.ChangeEvent<HTMLInputElement>,
@@ -792,7 +792,7 @@ export function editMenuItemName(
   client.current?.renameItem(item.id, event.currentTarget.value);
 }
 
-export function editMenuItemDescription(
+function editMenuItemDescription(
   client: React.RefObject<MenuDraftClient | null>,
   item: MenuItem,
   event: React.ChangeEvent<HTMLTextAreaElement>,
@@ -800,11 +800,11 @@ export function editMenuItemDescription(
   client.current?.describeItem(item.id, event.currentTarget.value);
 }
 
-export function deleteMenuItem(client: React.RefObject<MenuDraftClient | null>, itemId: string): void {
+function deleteMenuItem(client: React.RefObject<MenuDraftClient | null>, itemId: string): void {
   client.current?.deleteItem(itemId);
 }
 
-export function startMenuDrag(
+function startMenuDrag(
   client: React.RefObject<MenuDraftClient | null>,
   itemId: string,
   event: React.DragEvent<HTMLElement>,
@@ -814,12 +814,12 @@ export function startMenuDrag(
   client.current?.select({ kind: "item", itemId });
 }
 
-export function allowMenuDrop(event: React.DragEvent<HTMLElement>): void {
+function allowMenuDrop(event: React.DragEvent<HTMLElement>): void {
   event.preventDefault();
   event.dataTransfer.dropEffect = "move";
 }
 
-export function dropMenuItem(
+function dropMenuItem(
   client: React.RefObject<MenuDraftClient | null>,
   sectionId: string,
   order: number,
@@ -832,15 +832,15 @@ export function dropMenuItem(
   client.current?.select({ kind: "item", itemId });
 }
 
-export function selectMenuSection(client: React.RefObject<MenuDraftClient | null>, sectionId: string): void {
+function selectMenuSection(client: React.RefObject<MenuDraftClient | null>, sectionId: string): void {
   client.current?.select({ kind: "section", sectionId });
 }
 
-export function selectMenuItem(client: React.RefObject<MenuDraftClient | null>, itemId: string): void {
+function selectMenuItem(client: React.RefObject<MenuDraftClient | null>, itemId: string): void {
   client.current?.select({ kind: "item", itemId });
 }
 
-export function clearMenuSelection(
+function clearMenuSelection(
   client: React.RefObject<MenuDraftClient | null>,
   event: React.FocusEvent<HTMLElement>,
 ): void {
@@ -848,19 +848,19 @@ export function clearMenuSelection(
   client.current?.select(null);
 }
 
-export function menuItemInSection(sectionId: string, item: MenuItem): boolean {
+function menuItemInSection(sectionId: string, item: MenuItem): boolean {
   return item.placement.sectionId === sectionId;
 }
 
-export function menuPresenceViews(view: MenuDraftView): readonly DraftPresenceView[] {
+function menuPresenceViews(view: MenuDraftView): readonly DraftPresenceView[] {
   return view.participants.map(menuPresenceView);
 }
 
-export function menuPresenceView(participant: MenuDraftView["participants"][number]): DraftPresenceView {
+function menuPresenceView(participant: MenuDraftView["participants"][number]): DraftPresenceView {
   return { ...participant, selection: null };
 }
 
-export function menuConnectionLabel(view: MenuDraftView): string {
+function menuConnectionLabel(view: MenuDraftView): string {
   switch (view.kind) {
     case "connecting":
       return "Connecting";
@@ -877,14 +877,14 @@ export function menuConnectionLabel(view: MenuDraftView): string {
   }
 }
 
-export function requestFrozenReview(path: string): Promise<unknown> {
+function requestFrozenReview(path: string): Promise<unknown> {
   return controlWrite(path, "POST", {});
 }
 
 /** A read that Pantry refused with a JSON body reads as nothing; any other failure stays one. */
-export function refusedAsNull(error: unknown): null {
+function refusedAsNull(error: unknown): null {
   if (controlRefusal(error) !== null) return null;
   throw error;
 }
 
-export function noCleanup(): void {}
+function noCleanup(): void {}

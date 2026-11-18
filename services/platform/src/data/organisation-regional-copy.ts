@@ -38,7 +38,7 @@ type CopyProgress = {
   readonly digest: string;
   readonly verified: boolean;
 };
-export type RegionalCopyInput = {
+type RegionalCopyInput = {
   readonly directory: GlobalDatabase;
   readonly source: OrganisationDatabase;
   readonly target: D1Database;

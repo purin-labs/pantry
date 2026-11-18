@@ -12,7 +12,7 @@ function originParts(origin: ChatOrigin): readonly string[] {
 }
 
 /** "Kitchen › Costs & margins", with the record when there is one. */
-export function chatOriginLabel(origin: ChatOrigin): string {
+function chatOriginLabel(origin: ChatOrigin): string {
   return originParts(origin).join(" › ");
 }
 

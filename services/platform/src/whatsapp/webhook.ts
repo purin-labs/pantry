@@ -52,14 +52,14 @@ export type WhatsAppWebhookEvent =
       readonly failureCode: string | null;
     };
 
-export type WhatsAppWebhookParseError = {
+type WhatsAppWebhookParseError = {
   readonly code: "whatsapp_webhook_unparseable";
   readonly field: string;
 };
 
-export type WhatsAppWebhookChallenge = { readonly challenge: string };
+type WhatsAppWebhookChallenge = { readonly challenge: string };
 
-export type WhatsAppWebhookChallengeError = {
+type WhatsAppWebhookChallengeError = {
   readonly code:
     | "whatsapp_verify_token_missing"
     | "whatsapp_challenge_mode_invalid"
@@ -67,7 +67,7 @@ export type WhatsAppWebhookChallengeError = {
     | "whatsapp_challenge_missing";
 };
 
-export type WhatsAppSignatureError = {
+type WhatsAppSignatureError = {
   readonly code:
     | "whatsapp_app_secret_missing"
     | "whatsapp_signature_missing"

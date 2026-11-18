@@ -105,13 +105,13 @@ export async function authorizeCanonicalRunSources(
     : rejectedSourceAccess(stillAuthorized.error.code);
 }
 
-export function rejectedSourceAccess(
+function rejectedSourceAccess(
   detail: string,
 ): Result<never, { readonly detail: string }> {
   return { ok: false, error: { detail } };
 }
 
-export async function validateCapabilityClaimAuthority(input: {
+async function validateCapabilityClaimAuthority(input: {
   readonly executionScope: OrganisationExecutionScope;
   readonly identity: CanonicalRunBudgetIdentity;
   readonly lease: HarnessTurnLease;
@@ -248,12 +248,12 @@ export async function validateCapabilityClaimAuthority(input: {
   return rejectedCapabilityClaim("capability_outside_partition");
 }
 
-export type ProviderCapabilityScope = {
+type ProviderCapabilityScope = {
   readonly integrationAccountId: IntegrationAccountId;
   readonly resourceScope: string;
 };
 
-export function parseProviderCapabilityScope(
+function parseProviderCapabilityScope(
   capability: HarnessCapabilityClaimInput["capability"],
   scope: string,
 ): ProviderCapabilityScope | null {
@@ -269,7 +269,7 @@ export function parseProviderCapabilityScope(
   return { integrationAccountId: integrationAccountId.value, resourceScope };
 }
 
-export function parseFileCapabilityScope(
+function parseFileCapabilityScope(
   scope: string,
 ): Variant<CapabilityDefinition, "file_resource"> | null {
   const parsed = parseCapabilityKey(scope);
@@ -280,7 +280,7 @@ export function parseFileCapabilityScope(
     : null;
 }
 
-export function parseCustomConnectorCapabilityScope(
+function parseCustomConnectorCapabilityScope(
   capabilityId: "custom_connector.read" | "custom_connector.write",
   scope: string,
 ): Variant<CapabilityDefinition, "custom_connector_operation"> | null {
@@ -292,13 +292,13 @@ export function parseCustomConnectorCapabilityScope(
     : null;
 }
 
-export function isFileCapabilityScope(
+function isFileCapabilityScope(
   scope: ReturnType<typeof parseFileCapabilityScope>,
 ): scope is NonNullable<ReturnType<typeof parseFileCapabilityScope>> {
   return scope !== null;
 }
 
-export function isCustomConnectorCapabilityScope(
+function isCustomConnectorCapabilityScope(
   scope: ReturnType<typeof parseCustomConnectorCapabilityScope>,
 ): scope is NonNullable<
   ReturnType<typeof parseCustomConnectorCapabilityScope>
@@ -306,13 +306,13 @@ export function isCustomConnectorCapabilityScope(
   return scope !== null;
 }
 
-export function isProviderCapabilityScope(
+function isProviderCapabilityScope(
   scope: ProviderCapabilityScope | null,
 ): scope is ProviderCapabilityScope {
   return scope !== null;
 }
 
-export function platformCapabilityDefinition(
+function platformCapabilityDefinition(
   capabilityId: HarnessCapabilityClaimInput["capability"],
 ): {
   readonly kind: "platform_capability";
@@ -326,7 +326,7 @@ export function platformCapabilityDefinition(
   };
 }
 
-export function providerCapabilityDefinition(
+function providerCapabilityDefinition(
   capabilityId: string,
   integrationAccountId: IntegrationAccountId,
   resourceScope: string,
@@ -346,13 +346,13 @@ export function providerCapabilityDefinition(
   };
 }
 
-export function requiredCapabilityAuthorityDetail(
+function requiredCapabilityAuthorityDetail(
   error: CapabilityAuthorizationError,
 ): string {
   return error.code;
 }
 
-export function rejectedCapabilityClaim(detail: string): Result<
+function rejectedCapabilityClaim(detail: string): Result<
   never,
   {
     readonly code: "embedded_harness_capability_claim_rejected";

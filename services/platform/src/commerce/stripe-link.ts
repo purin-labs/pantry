@@ -11,7 +11,7 @@ import type { CommerceMerchant } from "./square-link";
 export const PRIMARY_ONLINE_PAYMENT_BINDING_ID =
   "payment_binding_primary_online";
 
-export type StripeLinkOutcome =
+type StripeLinkOutcome =
   | Readonly<{ kind: "linked"; state: string }>
   | Readonly<{ kind: "skipped"; reason: string }>;
 

@@ -247,7 +247,7 @@ export function matchIntegrationControlRoute(
     : { kind: "accounts", organisationIdRaw: accounts };
 }
 
-export type AccountRouteKind =
+type AccountRouteKind =
   | "revokeAccountCredential"
   | "rotateAccountCredentialSupplied"
   | "disableAccount"
@@ -282,7 +282,7 @@ export function account(
       };
 }
 
-export function organisation(pathname: string, suffix: string): string | null {
+function organisation(pathname: string, suffix: string): string | null {
   const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
   const result = new RegExp(
     `^/v1/control/organisations/([^/]+)/${escaped}$`,
@@ -291,7 +291,7 @@ export function organisation(pathname: string, suffix: string): string | null {
   return result?.[1] === undefined ? null : decodeURIComponent(result[1]);
 }
 
-export function two(
+function two(
   pathname: string,
   pattern: RegExp,
 ): Readonly<{ organisationIdRaw: string; valueRaw: string }> | null {
@@ -304,7 +304,7 @@ export function two(
       };
 }
 
-export function provider(value: string): OnboardingProvider {
+function provider(value: string): OnboardingProvider {
   switch (value) {
     case "airtable":
     case "dropbox":

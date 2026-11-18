@@ -274,7 +274,7 @@ export async function handleDiscordInteraction(
   );
 }
 
-export function parseDiscordJsonBody(
+function parseDiscordJsonBody(
   rawBody: string,
 ): Result<unknown, DiscordInteractionError> {
   try {
@@ -287,7 +287,7 @@ export function parseDiscordJsonBody(
   }
 }
 
-export function discordInteractionErrorResponse(
+function discordInteractionErrorResponse(
   error: DiscordInteractionError,
 ): Response {
   switch (error.code) {

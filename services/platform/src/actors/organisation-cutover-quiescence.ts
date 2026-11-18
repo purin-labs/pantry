@@ -2,7 +2,7 @@ import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
 import { isNonNegativeInteger } from "@seams/std";
 
-export type OrganisationCutoverBacklog = {
+type OrganisationCutoverBacklog = {
   readonly proposedActions: number;
   readonly approvalRequestedActions: number;
   readonly enqueuedCommerceCues: number;

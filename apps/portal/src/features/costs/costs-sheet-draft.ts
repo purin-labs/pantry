@@ -68,7 +68,7 @@ export type LotInvoiceRowDraft = Readonly<{
   invoiceTotalMajor: string;
 }>;
 
-export type HydratedPlanState = Readonly<{
+type HydratedPlanState = Readonly<{
   dailyLaborMinor: number;
   dailyRentMinor: number;
   dailyTargets: Readonly<Record<string, number>>;

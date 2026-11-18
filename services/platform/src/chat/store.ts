@@ -54,7 +54,7 @@ export type ConversationScope = {
 export type ConversationMetadata =
   ActiveConversationMetadata | ArchivedConversationMetadata;
 
-export type ConversationSummary = Readonly<{
+type ConversationSummary = Readonly<{
   id: ConversationId;
   title: string;
   revision: number;
@@ -75,7 +75,7 @@ export type ChatDirectoryCursors = Readonly<{
   active: { id: string; lastActivityAt: number } | null;
   archived: { id: string; archivedAt: number } | null;
 }>;
-export type ConversationDirectory = Readonly<{
+type ConversationDirectory = Readonly<{
   nextActiveCursor: string | null;
   nextArchivedCursor: string | null;
   active: readonly (Readonly<
@@ -137,7 +137,7 @@ export type ConversationMetadataAction =
   | { readonly kind: "archive"; readonly expectedRevision: number }
   | { readonly kind: "restore"; readonly expectedRevision: number };
 
-export type ConversationMetadataUpdate =
+type ConversationMetadataUpdate =
   | { readonly ok: true; readonly summary: ConversationSummary }
   | {
       readonly ok: false;
@@ -148,7 +148,7 @@ export type ConversationMetadataUpdate =
         | "chat_metadata_conflict";
     };
 
-export type ConversationDraftUpdate =
+type ConversationDraftUpdate =
   | {
       readonly ok: true;
       readonly revision: number;
@@ -168,7 +168,7 @@ export type ConversationDraftUpdate =
       readonly serverUpdatedAt?: number | null;
     };
 
-export type ConversationReadUpdate =
+type ConversationReadUpdate =
   | {
       readonly ok: true;
       readonly latestSequence: number;
@@ -183,7 +183,7 @@ export type ConversationReadUpdate =
         | "chat_capacity_reached";
     };
 
-export type ConversationRenameUpdate =
+type ConversationRenameUpdate =
   | { readonly ok: true; readonly summary: ConversationSummary }
   | {
       readonly ok: false;
@@ -333,7 +333,7 @@ export async function readConversationStatus(
   };
 }
 
-export type ConversationSaveOutcome =
+type ConversationSaveOutcome =
   | { readonly kind: "saved" }
   | { readonly kind: "conflict" }
   | {
@@ -343,8 +343,8 @@ export type ConversationSaveOutcome =
     };
 
 // Terminal metadata must still fit when a completed answer exceeds the budget.
-export const CONVERSATION_PROJECTION_BYTES = 960_000;
-export const CONVERSATION_STORAGE_BYTES = 1_000_000;
+const CONVERSATION_PROJECTION_BYTES = 960_000;
+const CONVERSATION_STORAGE_BYTES = 1_000_000;
 
 export async function saveConversation(
   execution: OrganisationExecutionScope,
@@ -818,10 +818,6 @@ export async function listVisibleChatTitles(
       titles.set(row.case_id, row.title);
   return titles;
 }
-
-export type ConversationSearch = {
-  readonly query: string;
-};
 
 export async function searchConversationDirectory(
   db: D1Database,
@@ -1317,7 +1313,7 @@ function parseOptionalTimestamp(raw: unknown): number | null {
   throw new Error("conversation_metadata_invalid");
 }
 
-export function normalizeConversationTitle(raw: string): string {
+function normalizeConversationTitle(raw: string): string {
   return raw.trim().replace(/\s+/gu, " ").toLocaleLowerCase().slice(0, 160);
 }
 

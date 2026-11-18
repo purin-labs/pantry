@@ -115,7 +115,7 @@ function commentFailure(code: unknown): string {
 }
 
 /** The open threads on each element. */
-export function openThreadsByElement(threads: readonly MenuBoardCommentThread[]): Map<string, number> {
+function openThreadsByElement(threads: readonly MenuBoardCommentThread[]): Map<string, number> {
   const counts = new Map<string, number>();
   for (const thread of threads)
     if (thread.resolvedAt === null) counts.set(thread.elementId, (counts.get(thread.elementId) ?? 0) + 1);

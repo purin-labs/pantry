@@ -22,7 +22,7 @@ import {
   type CommandRequest,
 } from "./receipt-outbox-settlement.ts";
 
-export type EntityMutationHandlerOptions = Readonly<{
+type EntityMutationHandlerOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   settlement: EntityPlaneSettlement;

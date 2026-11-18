@@ -43,14 +43,14 @@ export type WorkflowRevisionReceipt = Readonly<{
 }>;
 
 /** What an approved proposal adds to the receipt of its revision. */
-export type WorkflowRevisionOrigin = Readonly<{
+type WorkflowRevisionOrigin = Readonly<{
   proposalId: string;
   sessionId: string;
   turnId: string;
   operationId: string;
 }>;
 
-export type CurrentWorkflow = Readonly<{
+type CurrentWorkflow = Readonly<{
   document: BakeryWorkflowDocument;
   receipt: WorkflowRevisionReceipt;
 }>;
@@ -146,7 +146,7 @@ export async function storeWorkflowDocument(
   return digest;
 }
 
-export type AppliedWorkflowEntry = Readonly<{
+type AppliedWorkflowEntry = Readonly<{
   workflowId: string;
   recipe: string;
   title: string;
@@ -168,7 +168,7 @@ export async function listAppliedWorkflows(
   return rows.results ?? [];
 }
 
-export type WorkflowFindings = Readonly<{
+type WorkflowFindings = Readonly<{
   digest: string;
   ranAt: number;
   findings: readonly RunFinding[];
@@ -212,7 +212,7 @@ export async function readWorkflowFindings(
     : { digest, ranAt: stored.ranAt, findings };
 }
 
-export type ApplyWorkflowOutcome =
+type ApplyWorkflowOutcome =
   | Readonly<{ kind: "applied"; receipt: WorkflowRevisionReceipt }>
   | Readonly<{ kind: "invalid"; message: string }>
   | Readonly<{

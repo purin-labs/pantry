@@ -55,13 +55,13 @@ const CHECKPOINT_UPLOAD_CHUNK_BYTES = 1024 * 1024;
 // Completed messages occupy one logical row, including their JSON envelope.
 export const MAX_HARNESS_HISTORY_ENTRY_BYTES = MAX_DELIVERY_SEGMENT_BYTES;
 
-export const MAX_HARNESS_HISTORY_ENTRIES = 100_000;
+const MAX_HARNESS_HISTORY_ENTRIES = 100_000;
 
 export const MAX_HARNESS_HISTORY_BYTES = 256 * 1024 * 1024;
 
 export const MAX_HARNESS_HISTORY_MATERIALIZATION_BYTES = 16 * 1024 * 1024;
 
-export const HARNESS_HISTORY_WARNING_ENTRIES = Math.floor(
+const HARNESS_HISTORY_WARNING_ENTRIES = Math.floor(
   MAX_HARNESS_HISTORY_ENTRIES * 0.8,
 );
 
@@ -219,7 +219,7 @@ export type HarnessHistoryErasure = {
   readonly objectKeys: readonly string[];
 };
 
-export type StoredHarnessCheckpointInspection =
+type StoredHarnessCheckpointInspection =
   | { readonly kind: "missing" }
   | { readonly kind: "valid"; readonly checkpoint: HarnessCheckpointRecord }
   | {
@@ -227,7 +227,7 @@ export type StoredHarnessCheckpointInspection =
       readonly reason: "malformed_checkpoint";
     };
 
-export type HarnessCheckpointClassification =
+type HarnessCheckpointClassification =
   | {
       readonly kind: "compatible";
       readonly checkpoint: HarnessCheckpointRecord;

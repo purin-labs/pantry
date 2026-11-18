@@ -117,7 +117,7 @@ export type CollaborationRoomProtocol<
   ): string;
 }>;
 
-export type CollaborationRoomDocument<
+type CollaborationRoomDocument<
   Update,
   StateVector,
   FailureCode extends string,
@@ -206,7 +206,7 @@ type HeldAgentActivity = Readonly<{
 // model writes now, before the Session runs it. It lasts this long after its
 // last frame, so a stream that stops leaves no box on the board. The room
 // admits the agent again at most this often while a preview streams.
-export const AGENT_PREVIEW_LIFETIME_MS = 6_000;
+const AGENT_PREVIEW_LIFETIME_MS = 6_000;
 const AGENT_PREVIEW_ADMISSION_MS = 2_000;
 type AgentPreview = {
   readonly activity: CollaborationAgentActivity;
@@ -218,7 +218,7 @@ type AgentOperationRegistration =
   | Readonly<{ kind: "none" }>
   | Readonly<{ kind: "active"; key: string; entry: ActiveAgentOperation }>;
 
-export type CollaborationMutation<Update, Value, Error> = () => Result<
+type CollaborationMutation<Update, Value, Error> = () => Result<
   Readonly<{ value: Value; update: Update | null }>,
   Error
 >;

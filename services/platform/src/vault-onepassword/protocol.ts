@@ -26,9 +26,6 @@ export type OnePasswordOperation =
   | Readonly<{ op: "archive_item"; vaultId: string; itemId: string }>
   | Readonly<{ op: "read_secret"; vaultId: string; itemId: string }>;
 
-export type OnePasswordRequest = OnePasswordOperation &
-  Readonly<{ token: string }>;
-
 export type OnePasswordItemChange =
   | Readonly<{ kind: "edit_login"; label: string; origins: readonly string[] }>
   | Readonly<{ kind: "replace_sign_in"; username: string; password: string }>
@@ -71,9 +68,7 @@ const ERROR_CODES: Readonly<Record<OnePasswordErrorCode, true>> = {
   onepassword_unavailable: true,
 };
 
-export function isOnePasswordErrorCode(
-  raw: unknown,
-): raw is OnePasswordErrorCode {
+function isOnePasswordErrorCode(raw: unknown): raw is OnePasswordErrorCode {
   return typeof raw === "string" && Object.hasOwn(ERROR_CODES, raw);
 }
 

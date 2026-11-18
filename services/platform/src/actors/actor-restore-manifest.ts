@@ -133,46 +133,6 @@ export async function prepareActorRestoreManifest(input: {
   });
 }
 
-/** Build a recovery manifest from a coordinated backup without a relocation. */
-export async function prepareActorBackupRestoreManifest(input: {
-  readonly env: RestoreArchiveBindings;
-  readonly organisationId: OrganisationId;
-  readonly exportRefs: readonly ActorExportRef[];
-  readonly retiredActors: readonly RetiredActorRecord[];
-  readonly now: number;
-}): Promise<Result<ActorRestoreManifest, ActorRestoreManifestError>> {
-  const objects: ActorRestoreManifestObject[] = [];
-  let sourcePlacementEpoch: number | null = null;
-  for (const ref of input.exportRefs) {
-    const loaded = await loadActorExport({
-      bucket: input.env.ARCHIVE,
-      root: input.env.DATA_ENCRYPTION_ROOT,
-      ref,
-    });
-    if (!loaded.ok) return loaded;
-    const source = loaded.value.payload.source;
-    if (sourcePlacementEpoch === null)
-      sourcePlacementEpoch = source.placementEpoch;
-    if (
-      source.identity.organisationId !== input.organisationId ||
-      source.placementEpoch !== sourcePlacementEpoch ||
-      loaded.value.payload.alarmAt !== null
-    )
-      return { ok: false, error: { code: "restore_manifest_source_mismatch" } };
-    objects.push(manifestObjectFromEnvelope(loaded.value, ref));
-  }
-  if (sourcePlacementEpoch === null) return invalidManifest("objects");
-  objects.sort(compareManifestObjects);
-  const manifest = await createRestoreManifest({
-    organisationId: input.organisationId,
-    sourcePlacementEpoch,
-    createdAt: input.now,
-    objects,
-    retiredActors: input.retiredActors,
-  });
-  return manifest.ok ? parseActorRestoreManifest(manifest.value) : manifest;
-}
-
 export async function parseActorRestoreManifest(
   raw: unknown,
 ): Promise<Result<ActorRestoreManifest, ActorRestoreManifestError>> {

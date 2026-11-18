@@ -8,7 +8,7 @@ import {
 } from "./rack-layout";
 import { TrayLayoutPreview } from "./tray-layout-preview";
 
-export type RackLayoutActions = Readonly<{
+type RackLayoutActions = Readonly<{
   previewRackLayout(xMm: number, yMm: number): void;
   prepareRackLayout(xMm: number, yMm: number): Promise<void>;
   applyRackLayout(proposal: RackLayoutProposal): void;

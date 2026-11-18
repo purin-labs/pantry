@@ -71,7 +71,7 @@ import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
  * `no-store` and fetch from the Connector's encrypted envelope just in time.
  */
 
-export const WHATSAPP_MAX_REPLY_CHARS = 4_000;
+const WHATSAPP_MAX_REPLY_CHARS = 4_000;
 const WHATSAPP_QUEUE_LIMIT = 50;
 const WHATSAPP_HUMAN_REPLY_TTL_MS = 60 * 60_000;
 

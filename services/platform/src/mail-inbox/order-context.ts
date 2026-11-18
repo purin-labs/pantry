@@ -19,7 +19,7 @@ import {
 type MailboxAuthority = Extract<RequestAuthority, { kind: "agent_mailbox" }>;
 type CommerceEntity = CommerceGraphQueryResult["entities"][number];
 
-export type EmailOrderContextError = Readonly<{
+type EmailOrderContextError = Readonly<{
   code:
     | "email_commerce_unavailable"
     | "email_commerce_changed"
@@ -29,7 +29,7 @@ export type EmailOrderContextError = Readonly<{
 }>;
 
 /** One order that a mailbox turn read, by identity, with its read evidence. */
-export type EmailOrderRead = Readonly<{
+type EmailOrderRead = Readonly<{
   orderId: string;
   evidence: readonly EmailCommerceEvidence[];
 }>;

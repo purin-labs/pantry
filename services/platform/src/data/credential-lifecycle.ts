@@ -40,7 +40,7 @@ const CREDENTIAL_ROTATION_FAILURE_CODES = [
 export type CredentialRotationFailureCode =
   (typeof CREDENTIAL_ROTATION_FAILURE_CODES)[number];
 
-export type CredentialGenerationInventory = {
+type CredentialGenerationInventory = {
   readonly credentialGeneration: number;
   readonly lifecycle: "staged" | "active" | "superseded" | "revoked" | "failed";
   readonly failureCode: string | null;
@@ -59,14 +59,14 @@ export type CredentialGenerationInventory = {
     | { readonly status: "missing" };
 };
 
-export type CredentialWebhookInventory = {
+type CredentialWebhookInventory = {
   readonly lifecycle: "pending" | "live" | "degraded" | "disabled" | "revoked";
   readonly eventType: string;
   readonly credentialGeneration: number;
   readonly lastVerifiedAt: number | null;
 };
 
-export type CredentialRotationInventory = {
+type CredentialRotationInventory = {
   readonly credentialRotationId: string;
   readonly status: "pending_verification" | "verified" | "committed" | "failed";
   readonly expectedGeneration: number;
@@ -76,7 +76,7 @@ export type CredentialRotationInventory = {
   readonly committedAt: number | null;
 };
 
-export type CredentialRevocationInventory = {
+type CredentialRevocationInventory = {
   readonly state: "committed" | "policy_activated";
   readonly startedAt: number;
   readonly committedAt: number;
@@ -84,7 +84,7 @@ export type CredentialRevocationInventory = {
   readonly restrictionLatencyMs: number | null;
 };
 
-export type CredentialAccountInventory = {
+type CredentialAccountInventory = {
   readonly integrationAccountId: IntegrationAccountId;
   readonly provider: IntegrationAccount["provider"];
   readonly environment: IntegrationAccount["environment"];
@@ -107,7 +107,7 @@ export type CredentialAccountInventory = {
   readonly lastManifestObservationAt: number | null;
 };
 
-export type CredentialInventory = {
+type CredentialInventory = {
   readonly organisationId: OrganisationId;
   readonly accounts: readonly CredentialAccountInventory[];
 };
@@ -514,7 +514,7 @@ function findAccountRevocation(
   return null;
 }
 
-export type CredentialRevocationAuthorizationError =
+type CredentialRevocationAuthorizationError =
   | { readonly code: "integration_account_not_found" }
   | { readonly code: "integration_account_corrupt"; readonly field: string }
   | {
@@ -528,7 +528,7 @@ export type CredentialRevocationAuthorizationError =
   | { readonly code: "default_account_replacement_required" }
   | { readonly code: "default_account_replacement_invalid" };
 
-export type AuthorizedCredentialRevocation = {
+type AuthorizedCredentialRevocation = {
   readonly account: IntegrationAccount;
   readonly connection: ProviderConnection;
   readonly handle: VaultHandle;
@@ -804,7 +804,7 @@ function parseScopeList(value: string): readonly string[] | null {
   }
 }
 
-export type CredentialRotationBeginError =
+type CredentialRotationBeginError =
   | { readonly code: "integration_account_not_found" }
   | { readonly code: "integration_account_corrupt"; readonly field: string }
   | {

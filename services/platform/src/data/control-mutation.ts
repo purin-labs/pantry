@@ -33,7 +33,7 @@ export type UnversionedControlMutationBoundary = Variant<
   "unversioned"
 >;
 
-export type ControlMutationBoundaryError =
+type ControlMutationBoundaryError =
   | { readonly code: "idempotency_key_missing" }
   | { readonly code: "idempotency_key_invalid" }
   | { readonly code: "configuration_version_missing" }
@@ -65,7 +65,7 @@ export type ControlMutationReplay =
   | { readonly kind: "replay"; readonly receipt: StoredControlMutationReceipt }
   | { readonly kind: "conflict" };
 
-export type OnboardingAuditEvidence = {
+type OnboardingAuditEvidence = {
   readonly organisationId: OrganisationId;
   readonly environment: OrganisationEnvironment;
   readonly actorUserId: UserId;
@@ -200,7 +200,7 @@ type OnboardingEventAttributes = {
       };
 };
 
-export type OnboardingEventEvidence = {
+type OnboardingEventEvidence = {
   readonly [
     EventType in keyof OnboardingEventAttributes
   ]: OnboardingEventBase & {

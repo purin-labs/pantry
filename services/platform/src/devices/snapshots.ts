@@ -20,12 +20,12 @@ import {
  * The image stays in the Portal: it never reaches a model.
  */
 
-export const SNAPSHOT_RETENTION_MS = 7 * 24 * 60 * 60_000;
+const SNAPSHOT_RETENTION_MS = 7 * 24 * 60 * 60_000;
 /** A gateway has this long to send the image that Pantry asked for. */
-export const SNAPSHOT_UPLOAD_WINDOW_MS = 2 * 60_000;
+const SNAPSHOT_UPLOAD_WINDOW_MS = 2 * 60_000;
 export const SNAPSHOT_BYTE_LIMIT = 1024 * 1024;
 
-export type DeviceSnapshot = Readonly<{
+type DeviceSnapshot = Readonly<{
   snapshotId: string;
   deviceId: string;
   reason: "fault" | "request";
@@ -114,7 +114,7 @@ export async function setSnapshotsEnabled(
   ]);
 }
 
-export type SnapshotRequestResult =
+type SnapshotRequestResult =
   | Readonly<{ ok: true; snapshotId: string }>
   | Readonly<{
       ok: false;
@@ -131,7 +131,7 @@ type SendToGateway = (
 ) => Promise<boolean> | boolean;
 
 /** Asks one camera for one still image. Each request goes on the record. */
-export async function requestSnapshot(
+async function requestSnapshot(
   scope: OrganisationExecutionScope,
   input: Readonly<{
     device: DeviceRecord;

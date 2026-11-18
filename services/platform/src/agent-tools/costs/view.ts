@@ -30,7 +30,7 @@ const UNAVAILABLE =
 const SCREEN_RULE =
   "Use it only while the person's current message carries Costs & margins from their screen.";
 
-export const costsViewOpenTab = defineTool({
+const costsViewOpenTab = defineTool({
   name: "costs_view_open_tab",
   description: `Open a tab of Costs & margins on the person's screen: margins, weekly, actuals, forecast or supplies. ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
@@ -46,7 +46,7 @@ export const costsViewOpenTab = defineTool({
   readReceipt: readBakerySurfaceReceiptId,
 });
 
-export const costsViewFilterCategory = defineTool({
+const costsViewFilterCategory = defineTool({
   name: "costs_view_filter_category",
   description: `Filter the Costs & margins product tables by a category that the page shows, or by "all". ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
@@ -69,7 +69,7 @@ export const costsViewFilterCategory = defineTool({
   readReceipt: readBakerySurfaceReceiptId,
 });
 
-export const costsViewSelectProduct = defineTool({
+const costsViewSelectProduct = defineTool({
   name: "costs_view_select_product",
   description: `Show one product of Costs & margins on the person's screen: the page selects its row and the agent's label stays on it for 5 seconds. Give the product id that the page view lists. ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(

@@ -44,7 +44,7 @@ import {
   decodePathSegmentValue,
 } from "../gateway/support";
 
-export function isShopifyWebhookShopDomain(raw: string | null): raw is string {
+function isShopifyWebhookShopDomain(raw: string | null): raw is string {
   return raw !== null && /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(raw);
 }
 
@@ -371,7 +371,7 @@ async function revokeUninstalledShopifyAccount(
   return jsonResponse({ ok: true, revoked: outcome.value.kind === "revoked" });
 }
 
-export function shopifyWebhookErrorResponse(error: ShopifyWebhookError): Response {
+function shopifyWebhookErrorResponse(error: ShopifyWebhookError): Response {
   switch (error.code) {
     case "shopify_signature_missing":
     case "shopify_signature_invalid":

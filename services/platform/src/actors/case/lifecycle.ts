@@ -173,7 +173,7 @@ export function acceptCaseTrigger(
   return { ok: true, value: { kind: "accepted", revision: next } };
 }
 
-export type CaseSteeringInput = Readonly<{
+type CaseSteeringInput = Readonly<{
   caseId: string;
   assignmentId: string;
   inputId: string;

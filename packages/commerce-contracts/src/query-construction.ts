@@ -5,7 +5,7 @@ import type { CommerceQueryPlanOperation } from "./query-operation.ts";
 import type { CommerceFilter } from "./query-filter.ts";
 import type { CommerceOrderingIntent } from "./query-plan-parts.ts";
 import type { CommerceCursor } from "./query-pagination.ts";
-export type CommerceQueryConstruction = {
+type CommerceQueryConstruction = {
   operation: CommerceQueryPlanOperation;
   filter: CommerceFilter;
   intent: CommerceOrderingIntent;

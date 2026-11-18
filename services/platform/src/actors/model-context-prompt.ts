@@ -16,7 +16,7 @@ export const MEMORY_HEADING =
 
 type MemoryRef = Readonly<{ memoryId: string; revision: number }>;
 
-export type RenderedModelContext = Readonly<{
+type RenderedModelContext = Readonly<{
   text: string;
   /** The Memory revisions that reached the prompt. */
   memory: readonly MemoryRef[];

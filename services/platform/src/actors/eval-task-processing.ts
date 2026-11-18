@@ -111,7 +111,7 @@ const MAX_REPLY_BODY_CHARS = 20_000;
 /** How soon a task that waits on another turn or a lookup is tried again. */
 const RETRY_DELAY_MS = 30_000;
 
-export type EvalTaskInput = Readonly<{
+type EvalTaskInput = Readonly<{
   scope: OrganisationExecutionScope;
   connectorSql: SqlStorage;
   organisationId: string;

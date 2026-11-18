@@ -16,7 +16,7 @@ import {
   type VaultSecret,
 } from "../credential-vault";
 
-export type StripeExecutionError =
+type StripeExecutionError =
   | OrganisationExecutionScopeError
   | VaultResolveError
   | ProviderActionResolutionError

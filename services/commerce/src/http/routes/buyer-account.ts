@@ -22,7 +22,7 @@ import { jsonResponse } from "../responses.ts";
  * The storefront's organisation, when its active checkout profile lets
  * buyers sign in.
  */
-export function customerContext(
+function customerContext(
   ctx: HttpRouteContext,
   route: Readonly<{ merchantId: string; storefrontId: string }>,
 ): Readonly<{ organisationId: string }> | undefined {

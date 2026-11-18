@@ -216,7 +216,7 @@ function cellHolds(run: Run, cellId: CellId): readonly HoldSpan[] {
   return holds;
 }
 
-export function workerHolds(run: Run, id: HumanId): readonly HoldSpan[] {
+function workerHolds(run: Run, id: HumanId): readonly HoldSpan[] {
   const holds: HoldSpan[] = [];
   for (const failure of run.handlingFailures)
     if (failure.task.executor === id) holds.push(failureHold(run, failure));

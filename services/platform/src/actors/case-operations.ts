@@ -12,7 +12,7 @@ import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
 
-export type ActiveCaseOperationsView = {
+type ActiveCaseOperationsView = {
   readonly caseId: string;
   readonly pinnedOrganisationId: OrganisationId;
   readonly purpose: string;

@@ -547,7 +547,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
   }
 }
 
-export type OnlineSettlementState =
+type OnlineSettlementState =
   "placed" | "pending" | "declined" | "unplaced" | "not_found";
 
 /** The payments that one alarm pass settles; the rest wait for the next. */

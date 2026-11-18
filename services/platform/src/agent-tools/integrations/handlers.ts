@@ -60,7 +60,7 @@ import {
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
-export async function isCustomConnectorTurnActive(
+async function isCustomConnectorTurnActive(
   execution: SessionExecutionAdmission,
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
@@ -250,7 +250,7 @@ export async function listIntegrationsForEmbeddedHarness(
   return discovered.value;
 }
 
-export async function commitIntegrationDiscoveryObservation(
+async function commitIntegrationDiscoveryObservation(
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -277,7 +277,7 @@ export async function commitIntegrationDiscoveryObservation(
   }
 }
 
-export async function authorizeAirtableTool(
+async function authorizeAirtableTool(
   execution: SessionExecutionAdmission,
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
@@ -394,7 +394,7 @@ export async function readAirtableForHarness(
   return output;
 }
 
-export async function discoverAirtableForHarness(
+async function discoverAirtableForHarness(
   execution: SessionExecutionAdmission,
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
@@ -542,7 +542,7 @@ export async function writeAirtableForHarness(
   return { receiptId, result };
 }
 
-export async function claimAirtableWrite(
+async function claimAirtableWrite(
   receiptId: string,
   organisationId: OrganisationId,
   input: AirtableWriteInput,
@@ -562,7 +562,7 @@ export async function claimAirtableWrite(
   });
 }
 
-export async function commitAirtableObservation(
+async function commitAirtableObservation(
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,

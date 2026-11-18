@@ -38,7 +38,7 @@ function rgbCss(
  * from floured Normandy butter dough (`browning = 0`) through glossy egg-wash
  * (`glaze > 0`) to caramelized golden-amber Maillard puff crust (`browning = 1`).
  */
-export function drawPastryCrustCanvas(
+function drawPastryCrustCanvas(
   ctx: CanvasRenderingContext2D,
   browning: number,
   glaze: number,
@@ -317,7 +317,7 @@ export function isPieCarrierOrStore(carrier: string, store: string): boolean {
   );
 }
 
-export type PieCarrierLiveProgress = Readonly<{
+type PieCarrierLiveProgress = Readonly<{
   benchTaskId?: string | null;
   benchProgress?: number;
   scaleTaskId?: string | null;
@@ -342,9 +342,7 @@ function quantizeStep(value: number, step = 0.05): number {
  * Canonical 9×9 (81-vertex / 128-triangle) shortcrust base draped into a 12 cm
  * fluted pie tin cavity before puff-lid sealing (`line-tins` / `fill-pies`).
  */
-export function createCanonicalLinedCavityFlexMesh(
-  drapeScale = 1,
-): ApplianceFlexMesh {
+function createCanonicalLinedCavityFlexMesh(drapeScale = 1): ApplianceFlexMesh {
   const gridSide = 9;
   const spacing = 0.0175;
   const half = ((gridSide - 1) * spacing) / 2;

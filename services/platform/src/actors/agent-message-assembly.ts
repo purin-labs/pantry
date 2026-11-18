@@ -1,15 +1,15 @@
 import type { Result } from "../result";
 
-export type AgentMessageAssemblyState = {
+type AgentMessageAssemblyState = {
   readonly canonicalText: string;
   readonly currentMessageText: string;
 };
 
-export type AgentMessageAssemblyEvent =
+type AgentMessageAssemblyEvent =
   | { readonly kind: "delta"; readonly text: string }
   | { readonly kind: "completed"; readonly text: string };
 
-export type AgentMessageAssemblyUpdate = {
+type AgentMessageAssemblyUpdate = {
   readonly state: AgentMessageAssemblyState;
   readonly appendedText: string;
 };

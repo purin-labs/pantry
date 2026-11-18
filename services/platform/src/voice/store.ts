@@ -318,7 +318,7 @@ export async function recordVoiceMacHeartbeat(
     : DEFAULT_MAC_VOICE_ENGINE;
 }
 
-export type VoiceEngineChoiceResult = "chosen" | "not_found" | "unsupported";
+type VoiceEngineChoiceResult = "chosen" | "not_found" | "unsupported";
 
 /**
  * A manager chooses the engine of an enrolled Mac. The Mac takes the choice

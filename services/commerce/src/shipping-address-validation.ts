@@ -9,7 +9,7 @@ import type {
 import type { CommerceDatabase } from "./database.ts";
 import { assertNever, isNormalizedText, isRecord } from "@seams/std";
 
-export type AddressValidationProviderResult =
+type AddressValidationProviderResult =
   | Readonly<{
       state: "accepted";
       providerValidationReference: string;
@@ -43,7 +43,7 @@ export type AddressValidationProviderResult =
       reason?: never;
     }>;
 
-export type AddressValidationProvider = Readonly<{
+type AddressValidationProvider = Readonly<{
   providerAccountReference: string;
   validate: (
     input: Readonly<{
@@ -66,7 +66,7 @@ type AddressValidationAttemptBase = Readonly<{
   expiresAt: string;
 }>;
 
-export type AddressValidationAttempt = AddressValidationAttemptBase &
+type AddressValidationAttempt = AddressValidationAttemptBase &
   (
     | Readonly<{
         state: "accepted";
@@ -98,19 +98,19 @@ export type AddressValidationAttempt = AddressValidationAttemptBase &
       }>
   );
 
-export type AddressValidationServiceResult =
+type AddressValidationServiceResult =
   | Readonly<{
       kind: "resolved";
       value: CommerceBuyerShippingAddressValidationV1;
     }>
   | Readonly<{ kind: "idempotency_conflict" }>;
 
-export type AcceptedProvidedShippingAddress = Readonly<{
+type AcceptedProvidedShippingAddress = Readonly<{
   address: CommerceBuyerShippingAddressV1;
   addressValidationReference: string;
 }>;
 
-export type ShippingAddressValidationServiceOptions = Readonly<{
+type ShippingAddressValidationServiceOptions = Readonly<{
   database: CommerceDatabase;
   provider: AddressValidationProvider;
   now: () => string;

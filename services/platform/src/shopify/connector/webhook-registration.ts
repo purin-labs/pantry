@@ -13,14 +13,14 @@ import { validShopDomain } from "./values";
 
 export type ShopifyRegistrationOperation = "list" | "create" | "update";
 
-export type ShopifyWebhookSubscription = {
+type ShopifyWebhookSubscription = {
   subscriptionId: string;
   topic: ShopifyWebhookTopic;
   uri: string;
   format: "JSON" | "XML";
 };
 
-export const SHOPIFY_WEBHOOK_TOPICS = [
+const SHOPIFY_WEBHOOK_TOPICS = [
   "ORDERS_CREATE",
   "ORDERS_UPDATED",
   "INVENTORY_LEVELS_UPDATE",
@@ -29,7 +29,7 @@ export const SHOPIFY_WEBHOOK_TOPICS = [
   "PRODUCTS_UPDATE",
 ] as const satisfies readonly ShopifyWebhookTopic[];
 
-export const SHOPIFY_WEBHOOK_LOOKUP_QUERY = `
+const SHOPIFY_WEBHOOK_LOOKUP_QUERY = `
   query SatyrWebhookSubscriptions($topics: [WebhookSubscriptionTopic!]) {
     webhookSubscriptions(first: 100, topics: $topics) {
       nodes {
@@ -42,7 +42,7 @@ export const SHOPIFY_WEBHOOK_LOOKUP_QUERY = `
   }
 `;
 
-export const SHOPIFY_WEBHOOK_CREATE_MUTATION = `
+const SHOPIFY_WEBHOOK_CREATE_MUTATION = `
   mutation SatyrWebhookSubscriptionCreate(
     $topic: WebhookSubscriptionTopic!
     $webhookSubscription: WebhookSubscriptionInput!
@@ -64,7 +64,7 @@ export const SHOPIFY_WEBHOOK_CREATE_MUTATION = `
   }
 `;
 
-export const SHOPIFY_WEBHOOK_UPDATE_MUTATION = `
+const SHOPIFY_WEBHOOK_UPDATE_MUTATION = `
   mutation SatyrWebhookSubscriptionUpdate(
     $id: ID!
     $webhookSubscription: WebhookSubscriptionInput!
@@ -188,7 +188,7 @@ export async function registerShopifyWebhooks(input: {
   };
 }
 
-export function normalizeProtectedOrderRegistration<
+function normalizeProtectedOrderRegistration<
   TTopic extends "ORDERS_CREATE" | "ORDERS_UPDATED",
 >(
   registration: Result<
@@ -225,7 +225,7 @@ export function normalizeProtectedOrderRegistration<
   return registration;
 }
 
-export function isOptionalOrderWebhookRejection(
+function isOptionalOrderWebhookRejection(
   error: ShopifyWebhookRegistrationError,
 ): error is VariantBy<
   ShopifyWebhookRegistrationError,
@@ -238,7 +238,7 @@ export function isOptionalOrderWebhookRejection(
   );
 }
 
-export async function listShopifyWebhooks(input: {
+async function listShopifyWebhooks(input: {
   shopDomain: string;
   accessToken: string;
   endpointUrl: string;
@@ -260,9 +260,7 @@ export async function listShopifyWebhooks(input: {
   return parseShopifyWebhookList(response.value);
 }
 
-export async function configureShopifyWebhookTopic<
-  TTopic extends ShopifyWebhookTopic,
->(
+async function configureShopifyWebhookTopic<TTopic extends ShopifyWebhookTopic>(
   input: {
     shopDomain: string;
     accessToken: string;
@@ -321,9 +319,7 @@ export async function configureShopifyWebhookTopic<
   return updateShopifyWebhookTopic(input, current, topic);
 }
 
-export async function createShopifyWebhookTopic<
-  TTopic extends ShopifyWebhookTopic,
->(
+async function createShopifyWebhookTopic<TTopic extends ShopifyWebhookTopic>(
   input: {
     shopDomain: string;
     accessToken: string;
@@ -370,9 +366,7 @@ export async function createShopifyWebhookTopic<
     : subscription;
 }
 
-export async function updateShopifyWebhookTopic<
-  TTopic extends ShopifyWebhookTopic,
->(
+async function updateShopifyWebhookTopic<TTopic extends ShopifyWebhookTopic>(
   input: {
     shopDomain: string;
     accessToken: string;
@@ -420,7 +414,7 @@ export async function updateShopifyWebhookTopic<
     : subscription;
 }
 
-export function parseShopifyWebhookList(
+function parseShopifyWebhookList(
   raw: unknown,
 ): Result<
   readonly ShopifyWebhookSubscription[],
@@ -457,7 +451,7 @@ export function parseShopifyWebhookList(
   return { ok: true, value: subscriptions };
 }
 
-export function parseShopifyWebhookNode(
+function parseShopifyWebhookNode(
   raw: unknown,
 ): Result<ShopifyWebhookSubscription, ShopifyWebhookRegistrationError> {
   if (
@@ -484,7 +478,7 @@ export function parseShopifyWebhookNode(
   };
 }
 
-export function parseShopifyWebhookMutation(
+function parseShopifyWebhookMutation(
   raw: unknown,
   payloadField: "webhookSubscriptionCreate" | "webhookSubscriptionUpdate",
   operation: "create" | "update",
@@ -553,7 +547,7 @@ export function parseShopifyWebhookMutation(
   };
 }
 
-export function parseShopifyUserErrorMessages(
+function parseShopifyUserErrorMessages(
   raw: readonly unknown[],
 ): Result<readonly string[], ShopifyWebhookRegistrationError> {
   const messages: string[] = [];
@@ -577,7 +571,7 @@ export function parseShopifyUserErrorMessages(
   return { ok: true, value: messages };
 }
 
-export function matchingShopifySubscriptions(
+function matchingShopifySubscriptions(
   subscriptions: readonly ShopifyWebhookSubscription[],
   topic: ShopifyWebhookTopic,
   endpointUrl: string,
@@ -593,14 +587,14 @@ export function matchingShopifySubscriptions(
   return matches;
 }
 
-export function topicShopifySubscriptions(
+function topicShopifySubscriptions(
   subscriptions: readonly ShopifyWebhookSubscription[],
   topic: ShopifyWebhookTopic,
 ): readonly ShopifyWebhookSubscription[] {
   return subscriptions.filter((subscription) => subscription.topic === topic);
 }
 
-export function webhookSubscriptionInput(
+function webhookSubscriptionInput(
   endpointUrl: string,
   topic: ShopifyWebhookTopic,
 ): JsonObject {
@@ -611,7 +605,7 @@ export function webhookSubscriptionInput(
   };
 }
 
-export function validWebhookUri(raw: string): boolean {
+function validWebhookUri(raw: string): boolean {
   try {
     const parsed = new URL(raw);
     return parsed.protocol === "https:" && parsed.origin !== "null";
@@ -620,9 +614,7 @@ export function validWebhookUri(raw: string): boolean {
   }
 }
 
-export function isShopifyWebhookTopic(
-  raw: unknown,
-): raw is ShopifyWebhookTopic {
+function isShopifyWebhookTopic(raw: unknown): raw is ShopifyWebhookTopic {
   return (
     raw === "ORDERS_CREATE" ||
     raw === "ORDERS_UPDATED" ||
@@ -633,7 +625,7 @@ export function isShopifyWebhookTopic(
   );
 }
 
-export function shopifyWebhookName(topic: ShopifyWebhookTopic): string {
+function shopifyWebhookName(topic: ShopifyWebhookTopic): string {
   switch (topic) {
     case "ORDERS_CREATE":
       return "satyr-orders-create";
@@ -650,6 +642,6 @@ export function shopifyWebhookName(topic: ShopifyWebhookTopic): string {
   }
 }
 
-export function isShopifyWebhookFormat(raw: unknown): raw is "JSON" | "XML" {
+function isShopifyWebhookFormat(raw: unknown): raw is "JSON" | "XML" {
   return raw === "JSON" || raw === "XML";
 }

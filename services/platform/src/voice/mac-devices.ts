@@ -10,10 +10,10 @@ import type { OrganisationId } from "../ids";
 import { voiceMacHostname } from "./dns";
 import { listVoiceMacs, MAC_HEARTBEAT_FRESH_MS, type VoiceMac } from "./store";
 
-export type ShopMacDeviceView = Extract<DeviceView, { kind: "shop_mac" }>;
+type ShopMacDeviceView = Extract<DeviceView, { kind: "shop_mac" }>;
 
 /** A shop Mac as the Devices page and the agent's `device_read` see it. */
-export type ShopMacDevice = Readonly<{
+type ShopMacDevice = Readonly<{
   view: ShopMacDeviceView;
   /** The engine that a manager chose. The Mac changes to it after its download. */
   engineChoice: VoiceEngineId;

@@ -15,7 +15,7 @@ type ConversationDeliveryAuthority = Variant<
 >;
 
 /** A live request authority with the partition that it has now. */
-export type CurrentConversationAuthority = {
+type CurrentConversationAuthority = {
   readonly requestAuthority: RequestAuthority;
   readonly authorityPartition: Pick<AuthorityPartition, "digest">;
 };

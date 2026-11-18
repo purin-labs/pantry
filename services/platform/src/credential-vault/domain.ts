@@ -75,7 +75,6 @@ export type VaultSecret =
     };
 
 export type VaultOAuthTokens = Variant<VaultSecret, "oauth_tokens">;
-export type VaultWebsiteLogin = Variant<VaultSecret, "website_login">;
 
 export type VaultResolveError =
   | { readonly code: "vault_handle_unknown"; readonly handle: string }

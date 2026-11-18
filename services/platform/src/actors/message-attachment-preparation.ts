@@ -9,10 +9,10 @@ import type {
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
-import {
-  type WorkspaceExecutorInspectionInvocation,
-  type WorkspaceExecutorInspectionOperation,
-  type WorkspaceExecutorInspectionRequest,
+import type {
+  WorkspaceExecutorInspectionInvocation,
+  WorkspaceExecutorInspectionOperation,
+  WorkspaceExecutorInspectionRequest,
 } from "../workspace-executor-container";
 import { preflightHarnessTurnLease } from "./agent-session-harness-authority";
 import {
@@ -42,7 +42,7 @@ export type AttachmentPreparationLimit =
   | "source_too_large"
   | "preparation_deadline_exceeded";
 
-export type AttachmentPreparationOutcome =
+type AttachmentPreparationOutcome =
   | {
       readonly kind: "inspected";
       readonly operation: WorkspaceExecutorInspectionOperation;
@@ -53,7 +53,7 @@ export type AttachmentPreparationOutcome =
       readonly detail: string;
     };
 
-export type AttachmentPreparationError = {
+type AttachmentPreparationError = {
   readonly code: "attachment_preparation_state_conflict";
 };
 

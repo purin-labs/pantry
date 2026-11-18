@@ -5,19 +5,19 @@ import type { Chat } from "@seams/control-api/portal/chat";
  * How the composer submits a message: `send` starts a turn, `queue` waits for
  * the running turn as `next`, and `steer` goes into the running turn.
  */
-export type SubmissionLane = "send" | "queue" | "steer";
+type SubmissionLane = "send" | "queue" | "steer";
 
 /** One composer message on its way to the server, from the Enter to the answer. */
-export type Submission = Readonly<{
+type Submission = Readonly<{
   lane: SubmissionLane;
   text: string;
   attempt: number;
 }>;
 
 /** The submissions in flight, for each conversation. A lane holds one at a time. */
-export type Submissions = ReadonlyMap<ConversationId, readonly Submission[]>;
+type Submissions = ReadonlyMap<ConversationId, readonly Submission[]>;
 
-export type SubmissionEvent =
+type SubmissionEvent =
   | Readonly<{
       kind: "begin";
       conversationId: ConversationId;
@@ -31,7 +31,7 @@ export type SubmissionEvent =
       attempt: number;
     }>;
 
-export type SubmissionStep =
+type SubmissionStep =
   | Readonly<{ kind: "moved"; submissions: Submissions }>
   /** The same lane of this conversation still runs: the event changes nothing. */
   | Readonly<{ kind: "refused"; reason: "lane_busy" }>;
@@ -42,7 +42,7 @@ export type SubmissionStep =
  * in another chat. A second Enter in one lane before the first one has its
  * answer is refused, so it makes no second input id and no second copy.
  */
-export function submissionStep(
+function submissionStep(
   submissions: Submissions,
   event: SubmissionEvent,
 ): SubmissionStep {
@@ -70,7 +70,7 @@ export function submissionStep(
 }
 
 /** The proof that a submission began; `settle` takes it back. */
-export type SubmissionTicket = Readonly<{
+type SubmissionTicket = Readonly<{
   conversationId: ConversationId;
   attempt: number;
 }>;

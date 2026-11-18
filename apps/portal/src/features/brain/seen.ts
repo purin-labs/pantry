@@ -67,7 +67,7 @@ export function isNewRecord(
   );
 }
 
-export type SeenStore = Readonly<{
+type SeenStore = Readonly<{
   seen: SeenRecords;
   /** Records that a record is on screen with its change of `changedAt`. */
   markOpened: (key: string, changedAt: number | null) => void;

@@ -25,7 +25,7 @@ import {
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever, isRecord } from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@seams/type-utils";
 
 import {
   attributeValueSchema,
@@ -122,13 +122,13 @@ const common = {
   displayName: Type.String(),
   attributes: Type.Array(attributeValueAssignmentSchema),
 };
-export const systemCommerceEntitySchema = OpenObject({
+const systemCommerceEntitySchema = OpenObject({
   reference: systemCommerceEntityRefSchema,
   ...common,
   provenance: sourceProvenanceSchema,
   freshness: commerceFreshnessSchema,
 });
-export const customCommerceEntitySchema = OpenObject({
+const customCommerceEntitySchema = OpenObject({
   reference: customCommerceEntityRefSchema,
   ...common,
   typeRevision: revisionSchema<"CustomEntityTypeRevision">(),
@@ -152,7 +152,7 @@ export function isSystemCommerceEntity(
 ): entity is Extract<CommerceEntity, { reference: { origin: "system" } }> {
   return entity.reference.origin === "system";
 }
-export type EntityHeader =
+type EntityHeader =
   | {
       kind: "system";
       wire: Extract<EntityWire, { reference: { origin: "system" } }>;

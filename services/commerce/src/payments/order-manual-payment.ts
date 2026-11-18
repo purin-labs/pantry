@@ -40,7 +40,7 @@ import {
 import { writeManualTender, type ManualTender } from "./manual-tender.ts";
 import { orderBalance } from "./position.ts";
 
-export type OrderManualPaymentPlan = Readonly<{
+type OrderManualPaymentPlan = Readonly<{
   order: CommerceOrderV1;
   previousOrderRevision: number;
   payment: CommercePaymentV1;

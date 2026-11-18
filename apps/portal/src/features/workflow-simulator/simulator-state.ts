@@ -67,10 +67,10 @@ import {
   type ProductionReady,
   type ProductionSession,
 } from "./production-session.ts";
-import {
-  type ProductionProcedure,
-  type ProductionWorkcell,
-  type ProductionWorkcells,
+import type {
+  ProductionProcedure,
+  ProductionWorkcell,
+  ProductionWorkcells,
 } from "@seams/production-simulation/recipes/bakery/production-workcells";
 import type { BakerySurfaceEditProposalV1 } from "@seams/bakery-model/bakery-surface";
 import type {
@@ -458,7 +458,7 @@ export type SimulatorViewState = Readonly<{
 }>;
 
 /** View choices a person keeps between visits. */
-export type SimulatorViewPreferences = Pick<
+type SimulatorViewPreferences = Pick<
   SimulatorViewState,
   "labels" | "minimap"
 >;
@@ -567,7 +567,7 @@ export type SimulatorShellView = Readonly<{
   browserJob: SimulatorState["browserJob"];
 }>;
 
-export type SimulatorReplayAction =
+type SimulatorReplayAction =
   | Readonly<{ kind: "openRecording" }>
   | Readonly<{ kind: "closeRecording" }>
   | Readonly<{ kind: "recordingLoaded"; recording: PhysicsReplay }>
@@ -652,7 +652,7 @@ export type SimulatorExperimentAction =
       error: Variant<SettingsResult, "invalid">;
     }>;
 
-export type SimulatorWorkspaceAction =
+type SimulatorWorkspaceAction =
   | Readonly<{ kind: "operationStarted" }>
   | Readonly<{ kind: "operationFailed"; message: string }>
   | Readonly<{
@@ -738,7 +738,7 @@ export function normalRun(state: SimulatorState): Run {
     : state.run.shift.normal.schedule;
 }
 
-export function outageRun(state: SimulatorState): Run {
+function outageRun(state: SimulatorState): Run {
   return state.run.shift.kind === "sample"
     ? state.run.shift.outage
     : state.run.shift.outage.schedule;
@@ -2103,7 +2103,7 @@ export function applySimulatorViewAction(
  * The corner overview can show while the interface is up, the layout has room
  * and no panel covers the corner.
  */
-export function overviewAvailable(view: SimulatorViewState): boolean {
+function overviewAvailable(view: SimulatorViewState): boolean {
   return (
     view.chrome === "shown" && view.overviewFits && leavesCornerClear(view.dock)
   );

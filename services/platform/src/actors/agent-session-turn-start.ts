@@ -77,7 +77,7 @@ export function withNextRuntimeGeneration(
   };
 }
 
-export type CanonicalTextTurnStart = {
+type CanonicalTextTurnStart = {
   readonly acceptedInput: AcceptedSessionInputCommit;
   readonly activatedRuntime: RuntimeActivatedSessionCommit;
   readonly harnessLease: HarnessTurnLease;

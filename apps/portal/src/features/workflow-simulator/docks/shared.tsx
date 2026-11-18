@@ -17,7 +17,7 @@ export function taskStatusLabel(kind: TaskSnapshot["kind"]): string {
   }
 }
 
-export type SegmentedControlOption<T extends string> = Readonly<{
+type SegmentedControlOption<T extends string> = Readonly<{
   value: T;
   label: string;
   onSelect: () => void;

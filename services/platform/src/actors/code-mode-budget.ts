@@ -175,8 +175,7 @@ export type CodeModeLeaseRebindInput = {
   readonly now: number;
 };
 
-export type CodeModeLeaseRebindDecision =
-  "rebind" | "already_bound" | "conflict";
+type CodeModeLeaseRebindDecision = "rebind" | "already_bound" | "conflict";
 
 export type CodeModeOrganisationReconcileInput = {
   readonly requestId: RequestId;

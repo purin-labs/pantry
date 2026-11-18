@@ -24,7 +24,7 @@ import { isNonNegativeInteger, isRecord } from "@seams/std";
 import type { ActiveConversationMetadata, ArchivedConversationMetadata, ChatEffort } from "@seams/control-api";
 import { type Chat, type ChatConversationSummary, type ChatModelOption, type ChatWork, type PendingChatDeletion, parseChat, parseChatModelOptions, parseChatSummary, parseChatWork, parseDerivedThreads, parsePendingChatDeletions, parsePinnedConversations } from "@seams/control-api/portal/chat";
 
-export declare const document: Readonly<{ cookie: string }>;
+declare const document: Readonly<{ cookie: string }>;
 
 export class ChatAccessError extends Error {
   constructor(message: string) {
@@ -251,13 +251,13 @@ export async function readChat(
   };
 }
 
-export function requireSideCases(raw: unknown): readonly ChatSideCaseView[] {
+function requireSideCases(raw: unknown): readonly ChatSideCaseView[] {
   const views = parseChatSideCaseViews(raw);
   if (views === null) throw new Error("The server returned invalid side Cases.");
   return views;
 }
 
-export function requireSideCaseSource(raw: unknown): ChatSideCaseSource {
+function requireSideCaseSource(raw: unknown): ChatSideCaseSource {
   const source = parseChatSideCaseSource(raw);
   if (source === null)
     throw new Error("The server returned an invalid side Case source.");
@@ -478,38 +478,38 @@ export async function postChatCommand(
   return parseChat(raw.conversation);
 }
 
-export function chatPath(organisationId: string): string {
+function chatPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/chat`;
 }
 
-export function chatConversationPath(
+function chatConversationPath(
   organisationId: string,
   conversationId: ConversationId,
 ): string {
   return `${chatPath(organisationId)}/conversations/${encodeURIComponent(conversationId)}`;
 }
 
-export function chatDraftPath(organisationId: string, conversationId: ConversationId): string {
+function chatDraftPath(organisationId: string, conversationId: ConversationId): string {
   return `${chatConversationPath(organisationId, conversationId)}/draft`;
 }
 
-export function chatReadPath(organisationId: string, conversationId: ConversationId): string {
+function chatReadPath(organisationId: string, conversationId: ConversationId): string {
   return `${chatConversationPath(organisationId, conversationId)}/read`;
 }
 
-export function chatCancelPath(organisationId: string): string {
+function chatCancelPath(organisationId: string): string {
   return `${chatPath(organisationId)}/cancel`;
 }
 
 /** A chat request: a read without a method, a JSON write, or a message with files. */
-export type ChatRequestInit = Readonly<{
+type ChatRequestInit = Readonly<{
   method?: "DELETE" | "PATCH" | "POST" | "PUT";
   json?: unknown;
   form?: FormData;
   signal?: AbortSignal;
 }>;
 
-export async function chatRequest(
+async function chatRequest(
   path: string,
   init: ChatRequestInit = {},
 ): Promise<Record<string, unknown>> {
@@ -608,13 +608,13 @@ export async function mutateChatDirectory(
 export const UNFINISHED_WORK_MESSAGE =
   "This chat has a failed response or queued messages. Retry the response or remove the queued messages, then move it.";
 
-export function projectsPath(organisationId: string): string {
+function projectsPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/projects`;
 }
 
 // A general Project or Case command. A refusal comes back as a result, so
 // the caller can say why.
-export async function projectCommand(
+async function projectCommand(
   path: string,
   command: unknown,
 ): Promise<Record<string, unknown>> {
@@ -705,7 +705,7 @@ export async function moveCaseToProject(
   );
 }
 
-export function projectRejectionMessage(code: unknown): string {
+function projectRejectionMessage(code: unknown): string {
   switch (code) {
     case "project_is_default":
       return "This is the default project. Make another project the default before deleting it.";

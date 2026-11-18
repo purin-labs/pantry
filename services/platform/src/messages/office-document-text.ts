@@ -23,7 +23,7 @@ export const OFFICE_EXTRACTION_LIMITS = {
   maxEntries: 512,
 } as const;
 
-export type OfficeExtractionFailure =
+type OfficeExtractionFailure =
   | { readonly code: "not_an_archive" }
   | { readonly code: "archive_too_large" }
   | { readonly code: "document_entry_missing" }

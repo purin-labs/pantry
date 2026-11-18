@@ -19,31 +19,29 @@ export const JEV_PRICE = Object.freeze({
   rateUnits: 10_000_000,
   includedUnits: 23_809_523,
 });
-export const JEV_HOLD_MINOR = 5;
-export const JEV_DEFAULT_SPENDING_LIMIT_MINOR = 500;
-export const JEV_MAX_SPENDING_LIMIT_MINOR = 100_000;
+const JEV_HOLD_MINOR = 5;
+const JEV_DEFAULT_SPENDING_LIMIT_MINOR = 500;
 const HOUR_MS = 60 * 60 * 1_000;
 /** One cent of each hold covers the rounding of the month's charge. */
 const HOLD_TOKENS = Math.floor(
   ((JEV_HOLD_MINOR - 1) * JEV_PRICE.rateUnits) / JEV_PRICE.rateMinor,
 );
 
-export type JevPaidFeature =
+type JevPaidFeature =
   "mail_classification" | "related_cases" | "screen_relevance";
 
-export const JEV_FEATURE_OF_PURPOSE: Readonly<Record<string, JevPaidFeature>> =
-  {
-    mail_classification: "mail_classification",
-    case_context_discovery_relationship: "related_cases",
-    screen_relevance: "screen_relevance",
-  };
+const JEV_FEATURE_OF_PURPOSE: Readonly<Record<string, JevPaidFeature>> = {
+  mail_classification: "mail_classification",
+  case_context_discovery_relationship: "related_cases",
+  screen_relevance: "screen_relevance",
+};
 
-export type JevPaidUse = Readonly<{
+type JevPaidUse = Readonly<{
   enabled: boolean;
   spendingLimitMinor: number;
 }>;
 
-export type JevPaidRefusal =
+type JevPaidRefusal =
   "allowance_reached" | "spending_limit_reached" | "paid_use_unfunded";
 
 /** Called inside the owning Actor's synchronous schema transaction. */
@@ -118,7 +116,7 @@ export function jevMonthChargeMinor(tokens: number): number {
  * Input tokens on Pantry's key this UTC month: measured tokens for a settled
  * call, the reservation for a call with no measure.
  */
-export function readMonthlyPantryJevTokens(
+function readMonthlyPantryJevTokens(
   sql: SqlStorage,
   organisationId: OrganisationId,
   since: number,
@@ -306,7 +304,7 @@ export async function ensureJevPaidHold(
  * rule: an isolated test account (the turn test fee policy) uses the test
  * version; every other account uses the customer version.
  */
-export function jevPriceVersion(
+function jevPriceVersion(
   feePolicy: "customer_unpriced" | "isolated_e2e_completed_turn",
 ): string {
   return feePolicy === "isolated_e2e_completed_turn"

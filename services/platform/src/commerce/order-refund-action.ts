@@ -44,7 +44,7 @@ export type OrderRefundLineRequest = Readonly<{
   amountMinor: number | null;
 }>;
 
-export type OrderRefundPlan = Pick<
+type OrderRefundPlan = Pick<
   OrderRefundAction,
   | "paymentId"
   | "amountMinor"

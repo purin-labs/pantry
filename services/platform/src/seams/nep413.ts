@@ -5,7 +5,7 @@ declare const nearAccountIdBrand: unique symbol;
 declare const nearEd25519PublicKeyBrand: unique symbol;
 declare const seamsIdentityIdBrand: unique symbol;
 
-export type NearAccountId = string & {
+type NearAccountId = string & {
   readonly [nearAccountIdBrand]: "NearAccountId";
 };
 export type NearEd25519PublicKey = string & {
@@ -15,7 +15,7 @@ export type SeamsIdentityId = string & {
   readonly [seamsIdentityIdBrand]: "SeamsIdentityId";
 };
 
-export type Nep413Proof = {
+type Nep413Proof = {
   accountId: NearAccountId;
   publicKey: NearEd25519PublicKey;
   signature: string;
@@ -23,13 +23,13 @@ export type Nep413Proof = {
   state: string;
 };
 
-export type VerifiedSeamsIdentity = {
+type VerifiedSeamsIdentity = {
   id: SeamsIdentityId;
   accountId: NearAccountId;
   publicKey: NearEd25519PublicKey;
 };
 
-export type Nep413ProofError =
+type Nep413ProofError =
   | { code: "invalid_account_id" }
   | { code: "invalid_public_key" }
   | { code: "invalid_signature" }
@@ -37,7 +37,7 @@ export type Nep413ProofError =
   | { code: "invalid_state" }
   | { code: "signature_mismatch" };
 
-export type RawNep413Proof = {
+type RawNep413Proof = {
   accountId: unknown;
   publicKey: unknown;
   signature: unknown;

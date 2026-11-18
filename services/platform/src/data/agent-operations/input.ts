@@ -45,7 +45,7 @@ export function parseResponsibilityScopeInput(
     : invalid(areaId === null ? "areaId" : "scope");
 }
 
-export function parseResponsibilityRelationship(
+function parseResponsibilityRelationship(
   raw: unknown,
 ): CommerceRelationshipRef | null {
   try {
@@ -55,7 +55,7 @@ export function parseResponsibilityRelationship(
   }
 }
 
-export function parseResponsibilityListEntry(
+function parseResponsibilityListEntry(
   raw: unknown,
 ): CommerceListEntryRef | null {
   try {
@@ -91,7 +91,7 @@ export function parseResponsibilityListEntryJson(
   }
 }
 
-export function parseResponsibilityScope(
+function parseResponsibilityScope(
   raw: unknown,
 ): AgentResponsibilityScope | null {
   if (!isRecord(raw) || typeof raw.kind !== "string") {
@@ -211,7 +211,7 @@ export function parseSkillRevisionInput(
  * names one skill and the exact revision to run, so publication is the only
  * way to attach, replace, or remove a skill.
  */
-export function skillRefArray(raw: unknown): readonly AgentSkillRef[] | null {
+function skillRefArray(raw: unknown): readonly AgentSkillRef[] | null {
   if (!Array.isArray(raw) || raw.length > 32) {
     return null;
   }
@@ -588,7 +588,7 @@ export function parseBindingUpdateInput(
  * Optional trigger instruction body. Null (or absent) preserves the derived
  * objective; a present body must be a bounded non-empty string.
  */
-export function parseInstructionBody(
+function parseInstructionBody(
   raw: unknown,
 ): Result<string | null, AgentOperationsError> {
   if (raw === null || raw === undefined) {
@@ -598,7 +598,7 @@ export function parseInstructionBody(
   return body === null ? invalid("instructionBody") : { ok: true, value: body };
 }
 
-export function parseScheduleSpecInput(
+function parseScheduleSpecInput(
   raw: unknown,
 ): Result<ScheduleSpec, AgentOperationsError> {
   if (!isRecord(raw)) {
@@ -785,7 +785,7 @@ export function stringArray(
     : null;
 }
 
-export function nonEmptyStringArray(
+function nonEmptyStringArray(
   value: unknown,
   field: string,
   max: number,

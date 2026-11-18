@@ -46,12 +46,12 @@ export type DraftOrderCommitRequest = Readonly<{
 }>;
 
 /** The customer records that seal a draft's buyer. */
-export type DraftOrderBuyers = Readonly<{
+type DraftOrderBuyers = Readonly<{
   sealsBuyers: boolean;
   customerEmail: (merchantId: string, customerId: string) => string | null;
 }>;
 
-export type DraftOrderCommandAuthorityOptions = Readonly<{
+type DraftOrderCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => DraftOrderMerchantRow | undefined;
@@ -654,7 +654,7 @@ export class DraftOrderCommandAuthority {
   }
 }
 
-export function readDraftOrder(
+function readDraftOrder(
   database: CommerceDatabase,
   merchantId: string,
   draftOrderId: string,

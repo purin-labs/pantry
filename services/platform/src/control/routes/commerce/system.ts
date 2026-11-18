@@ -238,13 +238,13 @@ export async function handleCommerceSystem(
   return controlJson(responseBody);
 }
 
-export type ConfigureCommerceCapabilityRequest = Readonly<{
+type ConfigureCommerceCapabilityRequest = Readonly<{
   capability: CommerceCapability;
   scope: CapabilityScope;
   contractRevision: CapabilityContractRevision;
 }>;
 
-export type CommerceCapabilityActionRequest =
+type CommerceCapabilityActionRequest =
   | Readonly<{ kind: "activate"; expectedRevision: number }>
   | Readonly<{ kind: "inactivate"; expectedRevision: number; reason: string }>;
 
@@ -354,7 +354,7 @@ export async function handleCommerceCapabilities(
   return controlJson(responseBody);
 }
 
-export async function readCommerceCapabilities(
+async function readCommerceCapabilities(
   request: Request,
   env: Env,
   organisationIdRaw: string,
@@ -390,7 +390,7 @@ export async function readCommerceCapabilities(
     : capabilityActivationErrorResponse(activation.error);
 }
 
-export async function configureCapabilityFromRequest(
+async function configureCapabilityFromRequest(
   input: Readonly<{
     db: OrganisationDatabase;
     organisationId: OrganisationId;
@@ -425,7 +425,7 @@ export async function configureCapabilityFromRequest(
   });
 }
 
-export async function transitionCapabilityFromRequest(
+async function transitionCapabilityFromRequest(
   input: Readonly<{
     db: OrganisationDatabase;
     organisationId: OrganisationId;
@@ -473,7 +473,7 @@ export async function transitionCapabilityFromRequest(
   }
 }
 
-export function parseConfigureCapabilityRequest(
+function parseConfigureCapabilityRequest(
   body: JsonRecord,
 ): Result<ConfigureCommerceCapabilityRequest, CapabilityActivationError> {
   if (Object.keys(body).length !== 3) return capabilityInvalid("body");
@@ -494,7 +494,7 @@ export function parseConfigureCapabilityRequest(
     : capabilityInvalid("body");
 }
 
-export function parseCapabilityActionRequest(
+function parseCapabilityActionRequest(
   action: "activate" | "inactivate",
   body: JsonRecord,
 ): Result<CommerceCapabilityActionRequest, CapabilityActivationError> {
@@ -529,7 +529,7 @@ export function parseCapabilityActionRequest(
   }
 }
 
-export function capabilityMutationRoute(
+function capabilityMutationRoute(
   organisationId: OrganisationId,
   activationIdRaw: string | null,
   action: "activate" | "inactivate" | null,
@@ -540,7 +540,7 @@ export function capabilityMutationRoute(
     : `${base}/${activationIdRaw}/${action}`;
 }
 
-export function capabilityMutationOperation(
+function capabilityMutationOperation(
   action: "activate" | "inactivate" | null,
 ): string {
   switch (action) {
@@ -553,7 +553,7 @@ export function capabilityMutationOperation(
   }
 }
 
-export function capabilityActivationErrorResponse(
+function capabilityActivationErrorResponse(
   error: CapabilityActivationError,
 ): Response {
   switch (error.code) {
@@ -569,7 +569,7 @@ export function capabilityActivationErrorResponse(
   }
 }
 
-export function capabilityInvalid(
+function capabilityInvalid(
   field: string,
 ): Result<never, CapabilityActivationError> {
   return {
@@ -578,7 +578,7 @@ export function capabilityInvalid(
   };
 }
 
-export function commerceSystemSyncWire(sync: CommerceSystemSyncStatus): unknown {
+function commerceSystemSyncWire(sync: CommerceSystemSyncStatus): unknown {
   switch (sync.kind) {
     case "syncing":
       return {
@@ -691,7 +691,7 @@ export async function handleCommerceSystemSync(
   return controlJson(responseBody);
 }
 
-export function parseCommerceSystemSelectionBody(
+function parseCommerceSystemSelectionBody(
   body: JsonRecord,
 ): Result<
   CommerceSystemSelection,
@@ -737,7 +737,7 @@ export function parseCommerceSystemSelectionBody(
   }
 }
 
-export function commerceSystemWire(system: CommerceSystem): unknown {
+function commerceSystemWire(system: CommerceSystem): unknown {
   switch (system.kind) {
     case "satyr_commerce":
       return {
@@ -758,7 +758,7 @@ export function commerceSystemWire(system: CommerceSystem): unknown {
   }
 }
 
-export function commerceSystemErrorResponse(code: string): Response {
+function commerceSystemErrorResponse(code: string): Response {
   switch (code) {
     case "commerce_system_not_found":
       return controlError(code, 404);
@@ -928,11 +928,11 @@ export async function handlePantryCommerceDemo(
   return controlJson(responseBody);
 }
 
-export type PantryCommerceDemoRequest = Readonly<{
+type PantryCommerceDemoRequest = Readonly<{
   profile: CommerceDemoProfile;
 }>;
 
-export function parsePantryCommerceDemoRequest(
+function parsePantryCommerceDemoRequest(
   value: Readonly<Record<string, unknown>>,
 ): PantryCommerceDemoRequest | null {
   if (Object.keys(value).length !== 1) return null;
@@ -945,7 +945,7 @@ export function parsePantryCommerceDemoRequest(
   }
 }
 
-export function commerceDemoProvisionErrorResponse(
+function commerceDemoProvisionErrorResponse(
   error: CommerceClientError,
 ): Response {
   switch (error.kind) {
@@ -963,7 +963,7 @@ export function commerceDemoProvisionErrorResponse(
   }
 }
 
-export async function bindDemoCommerceMerchant(
+async function bindDemoCommerceMerchant(
   input: Readonly<{
     db: OrganisationDatabase;
     organisationId: OrganisationId;
@@ -1008,7 +1008,7 @@ export async function bindDemoCommerceMerchant(
   });
 }
 
-export function normalizedCommerceIdentity(
+function normalizedCommerceIdentity(
   value: unknown,
   prefix: string,
 ): string | null {
@@ -1019,7 +1019,7 @@ export function normalizedCommerceIdentity(
     : null;
 }
 
-export function decodeBase64Url(value: string): Uint8Array | null {
+function decodeBase64Url(value: string): Uint8Array | null {
   if (!/^[A-Za-z0-9_-]+$/u.test(value)) return null;
   try {
     const standard = value.replaceAll("-", "+").replaceAll("_", "/");
@@ -1032,7 +1032,7 @@ export function decodeBase64Url(value: string): Uint8Array | null {
   }
 }
 
-export function requireCapabilityActivationRouteId(raw: string | null): string {
+function requireCapabilityActivationRouteId(raw: string | null): string {
   if (raw === null)
     throw new Error("commerce capability activation route invariant failed");
   return raw;

@@ -21,7 +21,7 @@ export type ConsoleSidebarControl = {
   readonly onToggle: () => void;
 };
 
-export type ConsoleSidebarToggleProps = ConsoleSidebarControl & {
+type ConsoleSidebarToggleProps = ConsoleSidebarControl & {
   readonly placement: "rail" | "topbar";
 };
 
@@ -60,7 +60,7 @@ export type ConsoleSidebarResolvedLink = {
   readonly onClick: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 };
 
-export type ConsoleSidebarProps = {
+type ConsoleSidebarProps = {
   readonly id: string;
   readonly label: string;
   readonly state: ConsoleSidebarState;
@@ -71,55 +71,16 @@ export type ConsoleSidebarProps = {
   readonly footer: React.ReactNode;
 };
 
-export type UseConsoleSidebarControllerInput = {
+type UseConsoleSidebarControllerInput = {
   readonly sidebarId: string;
   readonly railExpanded: boolean;
   readonly onToggleRail: () => void;
 };
 
-export type UseConsoleSidebarControllerResult = {
+type UseConsoleSidebarControllerResult = {
   readonly control: ConsoleSidebarControl;
   readonly state: ConsoleSidebarState;
   readonly onNavigate: () => void;
-};
-
-export type ConsoleSidebarSwitcherItem =
-  | {
-      readonly kind: "choice";
-      readonly id: string;
-      readonly label: string;
-      readonly description: string | null;
-      readonly avatar: React.ReactNode;
-      readonly selected: boolean;
-      readonly availability: "available";
-      readonly onSelect: () => void;
-    }
-  | {
-      readonly kind: "choice";
-      readonly id: string;
-      readonly label: string;
-      readonly description: string | null;
-      readonly avatar: React.ReactNode;
-      readonly selected: false;
-      readonly availability: "disabled";
-      readonly onSelect?: never;
-    }
-  | {
-      readonly kind: "action";
-      readonly id: string;
-      readonly label: string;
-      readonly description: string | null;
-      readonly avatar: React.ReactNode;
-      readonly onSelect: () => void;
-    };
-
-export type ConsoleSidebarSwitcherProps = {
-  readonly label: string;
-  readonly currentLabel: string;
-  readonly currentAvatar: React.ReactNode;
-  readonly items: readonly ConsoleSidebarSwitcherItem[];
-  readonly collapsed: boolean;
-  readonly variant: "product" | "workspace";
 };
 
 function buildConsoleSidebarState(

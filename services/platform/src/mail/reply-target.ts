@@ -25,7 +25,7 @@ export type GmailReplyTarget = {
   readonly expiresAt: number;
 };
 
-export type GmailReplyTargetError =
+type GmailReplyTargetError =
   | { readonly code: "email_reply_recipient_unresolvable" }
   | { readonly code: "email_reply_target_invalid" };
 

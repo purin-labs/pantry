@@ -3,7 +3,7 @@
 
 type Database = Pick<D1Database, "prepare">;
 
-export type OnboardingRow = Readonly<{
+type OnboardingRow = Readonly<{
   environment: unknown;
   lifecycle: unknown;
   configurationVersion: unknown;

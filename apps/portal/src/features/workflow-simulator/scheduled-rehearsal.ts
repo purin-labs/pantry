@@ -35,7 +35,7 @@ import type { Variant } from "@seams/type-utils";
 // and the browser runner all see it: the step it awaits, the tray a layout
 // edit may move, and the review of one native result before acceptance.
 
-export type PendingSimulation = Readonly<{
+type PendingSimulation = Readonly<{
   operation: ExecutableProductionOperation;
   task: BrowserPhysicsTask;
   mode: BakerySimulationMode;
@@ -78,7 +78,7 @@ export function pendingOperationContext(
       };
 }
 
-export function simulationMode(input: WorkcellInput): BakerySimulationMode {
+function simulationMode(input: WorkcellInput): BakerySimulationMode {
   switch (input.kind) {
     case "transfer":
       return "transfer";
@@ -168,7 +168,7 @@ export function rehearsalSessionPatch(
 }
 
 // Rehearsal cards sit in rows by tray and columns by step.
-export function rehearsalPositions(
+function rehearsalPositions(
   plan: ProductionWorkcells,
   current: ProductionPresentation,
 ): ProductionPresentation {

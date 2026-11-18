@@ -108,7 +108,7 @@ type ActionIdentity = {
   commerceEffect: CommerceEntityPlaneEffect | null;
 };
 
-export type ActionExecutionLease = Readonly<{
+type ActionExecutionLease = Readonly<{
   leaseId: string;
   expiresAt: number;
 }>;

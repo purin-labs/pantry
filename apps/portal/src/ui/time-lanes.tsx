@@ -348,7 +348,7 @@ export function FitPeriod(props: {
   );
 }
 
-export function shiftDay(day: number, by: number): number {
+function shiftDay(day: number, by: number): number {
   const date = new Date(day);
   date.setDate(date.getDate() + by);
   return date.getTime();

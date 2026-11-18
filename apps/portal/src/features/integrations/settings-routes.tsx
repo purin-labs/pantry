@@ -301,7 +301,7 @@ export function IntegrationsRoute(
   );
 }
 
-export type MailboxSettingsRouteProps = IntegrationsRouteProps &
+type MailboxSettingsRouteProps = IntegrationsRouteProps &
   Readonly<{
     /** The Gmail connection whose settings the page shows. */
     accountId: string;

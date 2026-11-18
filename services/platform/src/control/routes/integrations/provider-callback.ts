@@ -73,7 +73,7 @@ export type ProviderCompletionTerminal =
   | { readonly kind: "failed"; readonly failureReasonCode: string }
   | { readonly kind: "expired"; readonly failureReasonCode: null };
 
-export function providerCompletionTerminal(
+function providerCompletionTerminal(
   state: ProviderAttemptStateWire,
 ): ProviderCompletionTerminal {
   switch (state.kind) {
@@ -95,12 +95,12 @@ export function providerCompletionTerminal(
   }
 }
 
-export type ProviderCallbackContext = {
+type ProviderCallbackContext = {
   readonly returnPath: string;
   readonly scope: OrganisationExecutionScope;
 };
 
-export type ProviderCallbackContextResult =
+type ProviderCallbackContextResult =
   | { readonly ok: true; readonly value: ProviderCallbackContext }
   | {
       readonly ok: false;
@@ -109,7 +109,7 @@ export type ProviderCallbackContextResult =
         | { readonly code: "provider_callback_state_corrupt" };
     };
 
-export async function readProviderCallbackContext(
+async function readProviderCallbackContext(
   env: Env,
   url: URL,
   provider: OnboardingProvider,
@@ -148,6 +148,6 @@ export async function readProviderCallbackContext(
   };
 }
 
-export function requirePublicOrigin(env: Env): string {
+function requirePublicOrigin(env: Env): string {
   return requireConfiguredPublicOrigin(env.SATYR_PUBLIC_ORIGIN);
 }

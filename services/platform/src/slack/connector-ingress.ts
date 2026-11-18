@@ -24,7 +24,7 @@ export type ConnectorSlackIngressBindings = OrganisationPlacementBindings &
  * that resolved beside it. An authorized decision and a decision that answers
  * the person use the credential. It never rejects.
  */
-export type ConnectorSlackDecision = {
+type ConnectorSlackDecision = {
   readonly outcome: ConnectorSlackIngressOutcome;
   readonly slackCredential: PendingSlackIngressCredential;
 };

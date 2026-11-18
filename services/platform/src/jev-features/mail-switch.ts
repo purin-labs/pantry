@@ -18,14 +18,14 @@ import {
  */
 const SWITCH_REVIEW_MS = 10 * 365 * 24 * 60 * 60 * 1_000;
 
-export type JevMailSource = Readonly<{
+type JevMailSource = Readonly<{
   integrationAccountId: IntegrationAccountId;
   displayName: string;
   sourcePin: string;
 }>;
 
 /** Each active Gmail mailbox that Jev can sort. */
-export async function listJevMailSources(
+async function listJevMailSources(
   input: Readonly<{ db: OrganisationDatabase; organisationId: OrganisationId }>,
 ): Promise<readonly JevMailSource[]> {
   const sources: JevMailSource[] = [];

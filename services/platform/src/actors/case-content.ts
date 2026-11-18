@@ -45,7 +45,7 @@ export function caseContentAttachments(
     : [];
 }
 
-export function userMessageAttachments(
+function userMessageAttachments(
   message: UserMessage,
 ): readonly StoredMessageAttachment[] {
   const attachments: StoredMessageAttachment[] = [];

@@ -7,7 +7,7 @@ export type SlackInstallationIdentity = {
   readonly appId: SlackAppId;
 };
 
-export type SlackInstallationIdentityError = {
+type SlackInstallationIdentityError = {
   readonly code: "slack_installation_identity_unconfigured";
 };
 

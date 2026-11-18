@@ -159,7 +159,7 @@ export function disableOfferPricePolicy(
   );
 }
 
-export type AdjustOfferPriceCommand = Readonly<{
+type AdjustOfferPriceCommand = Readonly<{
   merchantId: string;
   offerId: string;
   expectedOfferRevision: number;
@@ -236,7 +236,7 @@ export function adjustOfferPriceDecision(
   };
 }
 
-export type AdjustOfferPriceDecided = Readonly<{
+type AdjustOfferPriceDecided = Readonly<{
   decision: OfferPriceChangeDecision;
   offer: CommerceOfferV1;
 }>;

@@ -23,15 +23,15 @@ import { assertNever, encodeBase64Url } from "@seams/std";
 declare const identityLinkChallengeIdBrand: unique symbol;
 declare const identityLinkTokenBrand: unique symbol;
 
-export type IdentityLinkChallengeId = string & {
+type IdentityLinkChallengeId = string & {
   readonly [identityLinkChallengeIdBrand]: "IdentityLinkChallengeId";
 };
-export type IdentityLinkToken = string & {
+type IdentityLinkToken = string & {
   readonly [identityLinkTokenBrand]: "IdentityLinkToken";
 };
-export type IdentityVerificationMethod = "google" | "passkey" | "seams";
+type IdentityVerificationMethod = "google" | "passkey" | "seams";
 
-export type IdentityLinkChallenge = {
+type IdentityLinkChallenge = {
   readonly challengeId: IdentityLinkChallengeId;
   readonly organisationId: OrganisationId;
   readonly workspaceConnectionId: ProviderConnectionId;
@@ -40,11 +40,11 @@ export type IdentityLinkChallenge = {
   readonly expiresAt: number;
 };
 
-export type IssuedIdentityLink = IdentityLinkChallenge & {
+type IssuedIdentityLink = IdentityLinkChallenge & {
   readonly token: IdentityLinkToken;
 };
 
-export type ExternalIdentityLink = {
+type ExternalIdentityLink = {
   readonly kind: "slack";
   readonly userId: UserId;
   readonly organisationId: OrganisationId;
@@ -55,14 +55,14 @@ export type ExternalIdentityLink = {
   readonly verifiedBy: IdentityVerificationMethod;
 };
 
-export type IssueIdentityLinkError =
+type IssueIdentityLinkError =
   | { readonly code: "invalid_expiry" }
   | { readonly code: "slack_workspace_not_found" }
   | { readonly code: "identity_already_linked" }
   | { readonly code: "link_event_replayed" }
   | { readonly code: "link_issue_conflict" };
 
-export type IdentityLinkIssueSource =
+type IdentityLinkIssueSource =
   | { readonly kind: "admin"; readonly eventId?: never }
   | { readonly kind: "slack_event"; readonly eventId: SlackEventId };
 

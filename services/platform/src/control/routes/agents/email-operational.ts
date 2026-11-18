@@ -507,7 +507,7 @@ export async function handleEmailOperational(
   return controlJson(responseBody);
 }
 
-export function operationalProposalPreviewWire(preview: {
+function operationalProposalPreviewWire(preview: {
   readonly proposalId: string;
   readonly version: number;
   readonly caseId: string;
@@ -539,7 +539,7 @@ export function operationalProposalPreviewWire(preview: {
   };
 }
 
-export function validOperationalApprovalBody(
+function validOperationalApprovalBody(
   body: JsonRecord,
   selfTest: boolean,
 ): body is JsonRecord & {
@@ -568,9 +568,7 @@ export function validOperationalApprovalBody(
   );
 }
 
-export function validOperationalEditBody(
-  body: JsonRecord,
-): body is JsonRecord & {
+function validOperationalEditBody(body: JsonRecord): body is JsonRecord & {
   readonly subject: string;
   readonly body: string;
   readonly version?: number;
@@ -588,7 +586,7 @@ export function validOperationalEditBody(
   );
 }
 
-export function operationalControlError(code: string): Response {
+function operationalControlError(code: string): Response {
   if (code.includes("not_found") || code.includes("missing")) {
     return controlError(code, 404);
   }

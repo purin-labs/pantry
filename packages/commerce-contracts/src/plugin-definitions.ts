@@ -5,7 +5,7 @@ import type { PluginDefinition } from "./records/plugins.ts";
 const PLUGIN_ID = /^[a-z0-9_]{2,64}$/u;
 
 /** The problems of one definition, without the other plugins of its set. */
-export function pluginProblems(plugin: PluginDefinition): string[] {
+function pluginProblems(plugin: PluginDefinition): string[] {
   const id = plugin.pluginId;
   const problems: string[] = [];
   if (!PLUGIN_ID.test(id))

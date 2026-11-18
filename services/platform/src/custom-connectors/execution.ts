@@ -61,13 +61,13 @@ export type AuthorizedCustomConnectorRead = Readonly<{
   readonly flowDecisionDigest: string;
 }>;
 
-export type CustomConnectorReadResult = Readonly<{
+type CustomConnectorReadResult = Readonly<{
   readonly data: JsonValue;
   readonly classification: CommerceSensitivity;
   readonly sourceLabel: FlowLabel;
 }>;
 
-export type CustomConnectorReadError =
+type CustomConnectorReadError =
   | { readonly code: "custom_connector_read_invalid"; readonly field: string }
   | { readonly code: "custom_connector_read_stale" }
   | { readonly code: "custom_connector_flow_denied" }
@@ -85,8 +85,7 @@ export type CustomConnectorReadError =
       readonly reason: CustomConnectorTransportError["code"];
     };
 
-export type CustomConnectorReadTransport =
-  typeof executeCustomConnectorTransport;
+type CustomConnectorReadTransport = typeof executeCustomConnectorTransport;
 
 export async function authorizeCustomConnectorRead(input: {
   readonly db: OrganisationDatabase;

@@ -179,12 +179,12 @@ export async function readSlackSideCaseProposal(
   return raw === null ? null : parseSlackProposalRow(raw);
 }
 
-export type SlackSideCaseStarter = Readonly<{
+type SlackSideCaseStarter = Readonly<{
   userId: UserId;
   slackUserId: SlackUserId;
 }>;
 
-export type SlackSideCaseClaim =
+type SlackSideCaseClaim =
   | Readonly<{ ok: true; proposal: SlackSideCaseProposal }>
   | Readonly<{
       ok: false;
@@ -406,7 +406,7 @@ export function slackSideCaseLinkMessage(
 }
 
 /** Escapes the three characters that Slack reads as markup. */
-export function escapeSlackText(value: string): string {
+function escapeSlackText(value: string): string {
   return value
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")

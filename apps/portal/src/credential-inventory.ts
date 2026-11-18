@@ -25,7 +25,7 @@ export function findCredentialAccountRecord(
   );
 }
 
-export function matchesCredentialAccount(
+function matchesCredentialAccount(
   integrationAccountId: string,
   record: CredentialAccountRecord,
 ): boolean {

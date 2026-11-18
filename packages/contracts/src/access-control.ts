@@ -14,7 +14,7 @@ const u32 = Type.Integer({ minimum: 0, maximum: 0xffff_ffff });
 const u64 = Type.Integer({ minimum: 0, maximum: Number.MAX_SAFE_INTEGER });
 const strict = { additionalProperties: false } as const;
 
-export const workflowAuthorityKindSchema = Type.Literal("cue_subscription");
+const workflowAuthorityKindSchema = Type.Literal("cue_subscription");
 export const grantSubjectSchema = Type.Union([
   Type.Object(
     { kind: Type.Literal("organisation_role"), role: Type.String() },
@@ -183,7 +183,7 @@ export const accessGrantLifecycleSchema = Type.Union([
   ),
 ]);
 
-export const capabilityCategorySchema = Type.Union([
+const capabilityCategorySchema = Type.Union([
   Type.Literal("context"),
   Type.Literal("customer_data"),
   Type.Literal("external_data"),
@@ -191,12 +191,12 @@ export const capabilityCategorySchema = Type.Union([
   Type.Literal("agent_operations"),
   Type.Literal("payments"),
 ]);
-export const capabilityRiskSchema = Type.Union([
+const capabilityRiskSchema = Type.Union([
   Type.Literal("read"),
   Type.Literal("propose"),
   Type.Literal("external_effect"),
 ]);
-export const capabilityTargetKindSchema = Type.Union([
+const capabilityTargetKindSchema = Type.Union([
   Type.Literal("platform"),
   Type.Literal("provider_resource"),
   Type.Literal("file_resource"),
@@ -204,7 +204,7 @@ export const capabilityTargetKindSchema = Type.Union([
   Type.Literal("commerce_read"),
   Type.Literal("commerce_command"),
 ]);
-export const capabilityProviderSchema = Type.Union([
+const capabilityProviderSchema = Type.Union([
   Type.Literal("airtable"),
   Type.Literal("dropbox"),
   Type.Literal("gmail"),
@@ -218,11 +218,11 @@ export const capabilityProviderSchema = Type.Union([
   Type.Literal("whatsapp"),
   Type.Literal("wise"),
 ]);
-export const capabilityCommerceSystemSchema = Type.Union([
+const capabilityCommerceSystemSchema = Type.Union([
   Type.Literal("satyr_commerce"),
   Type.Literal("shopify"),
 ]);
-export const capabilityPolicyModesSchema = Type.Union([
+const capabilityPolicyModesSchema = Type.Union([
   Type.Literal("enabled_disabled"),
   Type.Literal("approval_required_disabled"),
   Type.Literal("enabled_approval_required_disabled"),

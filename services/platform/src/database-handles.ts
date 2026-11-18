@@ -61,14 +61,6 @@ export interface OrganisationDatabaseSession
 }
 
 /**
- * The global binding. The Worker's `Env.DB` already has this type; a test
- * that builds its own environment names its database here.
- */
-export function globalDatabase(binding: D1Database): GlobalDatabase {
-  return binding as GlobalDatabase;
-}
-
-/**
  * A regional binding that the placement profile selected for an
  * Organisation. Production code reaches it through
  * `OrganisationExecutionScope.database` or

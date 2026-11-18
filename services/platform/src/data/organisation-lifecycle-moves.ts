@@ -17,12 +17,12 @@ import { ORGANISATION_LIFECYCLE_MACHINE } from "./organisation-lifecycle.machine
 export type OrganisationLifecycleState = MachineState<
   typeof ORGANISATION_LIFECYCLE_MACHINE
 >;
-export type OrganisationLifecycleEvent = MachineEvent<
+type OrganisationLifecycleEvent = MachineEvent<
   typeof ORGANISATION_LIFECYCLE_MACHINE
 >;
 
 /** The states in which the Organisation is in use and takes provider changes. */
-export const LIVE_ORGANISATION_LIFECYCLES = [
+const LIVE_ORGANISATION_LIFECYCLES = [
   "configuring",
   "activating",
   "active",
@@ -70,7 +70,7 @@ export function lifecycleFenceOf(
  * True while the placement has the fence token and one of the fence's
  * placement states: `active`, unless the fence names others.
  */
-export function placementFenceGuard(fence: LifecycleFence): RowGuard {
+function placementFenceGuard(fence: LifecycleFence): RowGuard {
   const statuses = fence.placementStatuses ?? ["active"];
   if (statuses.length === 0) throw new Error("placement fence has no state");
   return {

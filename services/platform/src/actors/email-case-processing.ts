@@ -255,14 +255,14 @@ export type EmailThreadTurnInput = Readonly<{
  * it. `correctedReply` is the corrected body as Gmail holds it now. It
  * reaches the model with the turn's request and is stored nowhere.
  */
-export type EmailReplyCorrectionLesson = Readonly<{
+type EmailReplyCorrectionLesson = Readonly<{
   proposalId: string;
   version: number;
   bodyDigest: string;
   correctedReply: string;
 }>;
 
-export type EmailCorrectionLearningInput = Omit<
+type EmailCorrectionLearningInput = Omit<
   EmailThreadTurnInput,
   "responsePolicy" | "correction" | "claim"
 > &
@@ -279,7 +279,7 @@ type EmailCorrectionLearningRun = EmailCorrectionLearningInput &
   Readonly<{ responsePolicy: "correction_learning" }>;
 
 /** What a learning turn settled on. A candidate is not in use until a person accepts it. */
-export type EmailCorrectionLearningOutcome =
+type EmailCorrectionLearningOutcome =
   | Readonly<{
       kind: "learned";
       proposal: Readonly<{ memoryId: string; revision: number }> | null;
@@ -321,7 +321,7 @@ export type EmailThreadTurnOutcome =
       readonly acknowledgement?: never;
     };
 
-export type EmailThreadTurnError = { readonly code: string };
+type EmailThreadTurnError = { readonly code: string };
 
 export type MailDraftOrigin =
   | Readonly<{ kind: "mailbox"; execution?: never }>
@@ -1672,7 +1672,7 @@ async function finishAdoptedEmailReply(
  * The name of one attempt at a mail turn. `turnKey` names the turn on its
  * Case. The first attempt carries the turn's own name.
  */
-export function emailTurnAttemptKey(turnKey: string, attempt: number): string {
+function emailTurnAttemptKey(turnKey: string, attempt: number): string {
   return attempt <= 1 ? turnKey : `${turnKey}_attempt_${attempt}`;
 }
 

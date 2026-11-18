@@ -169,13 +169,13 @@ export function parseDelivery(value: unknown): ConnectorDelivery | null {
       };
 }
 
-export function parseConnectorAddress(
+function parseConnectorAddress(
   value: unknown,
 ): ConnectorDelivery["address"] | null {
   return parseConnectorAddressWire(value);
 }
 
-export function parseReceipt(value: unknown): ConnectorDeliveryReceipt | null {
+function parseReceipt(value: unknown): ConnectorDeliveryReceipt | null {
   const receipt = checked(connectorDeliveryReceiptSchema, value);
   return receipt === null
     ? null

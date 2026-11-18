@@ -73,7 +73,7 @@ const MAX_METADATA_FETCHES = 50;
 /** The oldest mail rescued from Spam that the evaluation admits. */
 const SPAM_RESCUE_MAX_AGE_MS = 72 * HOUR_MS;
 
-export type ConnectorEmailAccessError = {
+type ConnectorEmailAccessError = {
   readonly code: string;
   /**
    * True when the mailbox cannot recover without a human re-authorizing.
@@ -204,7 +204,7 @@ export async function resolveConnectorGmailAccess(
 /** The account's reason when Google refuses its sign-in (`invalid_grant`). */
 const GMAIL_GRANT_REFUSED_REASON = "provider_grant_refused";
 
-export type ConnectorEmailActivation = {
+type ConnectorEmailActivation = {
   readonly activationFloor: string;
   readonly watchExpiresAt: number;
 };
@@ -382,13 +382,13 @@ export async function stopConnectorEmailWatch(
   return { ok: true, value: null };
 }
 
-export type AdmittedEmailThreadSummary = {
+type AdmittedEmailThreadSummary = {
   readonly threadId: string;
   readonly caseId: string;
   readonly messageIds: readonly string[];
 };
 
-export type EmailEvaluationOutcome =
+type EmailEvaluationOutcome =
   | { readonly kind: "idle" }
   | {
       readonly kind: "evaluated";
@@ -674,7 +674,7 @@ export async function runConnectorEmailEvaluation(
   };
 }
 
-export type AdmittedEmailThread = {
+type AdmittedEmailThread = {
   readonly threadId: string;
   readonly caseId: string;
   readonly messageIds: readonly string[];
@@ -809,7 +809,7 @@ function caseIdForThread(
   );
 }
 
-export type MailboxBindingProjection = {
+type MailboxBindingProjection = {
   readonly mailboxBindingId: string;
   readonly currentRevision: number;
 };

@@ -2071,7 +2071,7 @@ export class CaseDO
   }
 }
 
-export function discardableQuarantinedCaseActivation(
+function discardableQuarantinedCaseActivation(
   activation: ActorActivationInspection,
   expectedSchemaVersion: number,
 ): boolean {
@@ -2086,7 +2086,7 @@ export function discardableQuarantinedCaseActivation(
   );
 }
 
-export function createCaseSchema(sql: SqlStorage): void {
+function createCaseSchema(sql: SqlStorage): void {
   createActorActivationSchema(sql);
   createActorExecutionBarrierSchema(sql);
   createActorImportSchema(sql);
@@ -2096,9 +2096,7 @@ export function createCaseSchema(sql: SqlStorage): void {
 }
 
 // The person whose accepted authority admitted an entry, when a person did.
-export function journalAuthorPersonId(
-  requestAuthorityJson: string,
-): string | null {
+function journalAuthorPersonId(requestAuthorityJson: string): string | null {
   const authority = parseStoredRequestAuthority(
     parseJsonOrNull(requestAuthorityJson),
   );

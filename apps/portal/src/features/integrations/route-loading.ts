@@ -35,7 +35,7 @@ export async function loadIntegrationsRoute(
   }
 }
 
-export function applyIntegrationsRouteRefreshFailure(
+function applyIntegrationsRouteRefreshFailure(
   error: unknown,
   unauthorizedMessage: string,
   content: SettingsRouteContent<IntegrationsRouteData>,
@@ -158,7 +158,7 @@ export function settingsRouteFailureContent<T>(
   };
 }
 
-export function settingsRouteProblem(error: unknown): string {
+function settingsRouteProblem(error: unknown): string {
   return error instanceof ControlApiError
     ? error.message
     : "Settings could not be loaded. Try again.";

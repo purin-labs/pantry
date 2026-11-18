@@ -9,14 +9,14 @@
 import type { CommerceDatabase } from "./database.ts";
 import { formatCursor, parseCursor } from "./event-feed.ts";
 
-export type CommerceFeedConsumerV1 = Readonly<{
+type CommerceFeedConsumerV1 = Readonly<{
   consumerId: string;
   cursor: string;
   /** Null until the consumer first moves its cursor. */
   updatedAt: string | null;
 }>;
 
-export type FeedConsumerResult =
+type FeedConsumerResult =
   | Readonly<{ kind: "ok"; value: CommerceFeedConsumerV1 }>
   | Readonly<{ kind: "error"; status: 404 | 409 | 422; message: string }>;
 

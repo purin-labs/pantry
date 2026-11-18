@@ -43,7 +43,7 @@ export function matchMailReplyDraftRoute(
   }
 }
 
-export function isMailReplyDraftProposalId(value: string): boolean {
+function isMailReplyDraftProposalId(value: string): boolean {
   return /^proposal_[A-Za-z0-9_:.-]{1,500}$/u.test(value);
 }
 

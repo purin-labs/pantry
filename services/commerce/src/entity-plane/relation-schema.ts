@@ -33,7 +33,7 @@ export function relationTableHasIndex(
 }
 
 /** One owner's rows in a table that Commerce derives from other tables. */
-export type DerivedRelationRows = Readonly<{
+type DerivedRelationRows = Readonly<{
   table: string;
   /** Every column of the table, in the order of each row's values. */
   columns: readonly string[];

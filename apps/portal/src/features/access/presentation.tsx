@@ -125,19 +125,3 @@ export function connectIntegrationHref(
     return `${integrationsPath}?integration=commerce`;
   return integrationsPath;
 }
-
-export function capabilityProvenanceLabel(
-  capability: AccessControlCapabilityView,
-): string {
-  switch (capability.provenance.kind) {
-    case "baseline":
-      return "Recommended default";
-    case "operator":
-      return "Operator decision";
-    case "integration_setup":
-      return "Integration setup";
-    case "cutover_enabled":
-    case "cutover_disabled":
-      return "Imported setting";
-  }
-}

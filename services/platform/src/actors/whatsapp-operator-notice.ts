@@ -28,12 +28,12 @@ import {
  * never assembled here, so a notice cannot become a second copy of a message.
  */
 
-export type WhatsAppNoticeOutcome =
+type WhatsAppNoticeOutcome =
   | { readonly kind: "delivered"; readonly channelId: string }
   | { readonly kind: "suppressed"; readonly reason: "already_notified" }
   | { readonly kind: "undeliverable"; readonly reason: string };
 
-export type WhatsAppNoticeError = { readonly code: string };
+type WhatsAppNoticeError = { readonly code: string };
 
 type CommunicationDestination = {
   readonly workspaceId: string;

@@ -18,7 +18,7 @@ import { readActiveCredentialAuthorizedAt } from "../data/integration-account-re
  * passes rather than a mailbox that quietly stops. Deployments without a
  * configured window report no expiry at all instead of inventing one.
  */
-export async function readMailboxAuthorizationWindow(
+async function readMailboxAuthorizationWindow(
   env: Env,
   scope: OrganisationExecutionScope,
   integrationAccountId: IntegrationAccountId,
@@ -89,7 +89,7 @@ export async function readAgentMailboxProjection(
  * a Connector that cannot be reached leaves the mailbox visible with
  * runtime null rather than failing the whole read.
  */
-export async function readAgentMailboxRuntime(
+async function readAgentMailboxRuntime(
   env: Env,
   scope: OrganisationExecutionScope,
   integrationAccountId: IntegrationAccountId,

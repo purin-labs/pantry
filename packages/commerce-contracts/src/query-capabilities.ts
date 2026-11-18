@@ -21,7 +21,7 @@ import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 import { cleanValue } from "./sorted-unions.ts";
 import { assertNever } from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@seams/type-utils";
 
 import {
   commerceFilterSchema,
@@ -54,19 +54,19 @@ export const commerceCapabilityMatrixSchema = OpenObject({
   sortableAttributeIds: capabilityIds,
   aggregation: commerceAggregationCapabilitySchema,
 });
-export const systemMappedSavedViewCapabilitySourceSchema = OpenObject({
+const systemMappedSavedViewCapabilitySourceSchema = OpenObject({
   kind: Type.Literal("system_mapped"),
   systemEntityKind: systemEntityTypeIdSchema.properties.typeId,
   systemSchemaRevision: revisionSchema<"SystemSchemaRevision">(),
   capability: commerceCapabilityMatrixSchema,
 });
-export const commerceCustomSavedViewCapabilitySourceSchema = OpenObject({
+const commerceCustomSavedViewCapabilitySourceSchema = OpenObject({
   kind: Type.Literal("underclerk_custom"),
   entityTypeId: queryIdentitySchema<"CustomCommerceEntityTypeId">(),
   publishedRevision: revisionSchema<"CustomEntityTypeRevision">(),
   capability: commerceCapabilityMatrixSchema,
 });
-export const commerceListSavedViewCapabilitySourceSchema = OpenObject({
+const commerceListSavedViewCapabilitySourceSchema = OpenObject({
   kind: Type.Literal("commerce_list"),
   listId: commerceListIdSchema,
   listRevision: revisionSchema<"CommerceListRevision">(),

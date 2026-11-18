@@ -125,7 +125,7 @@ export function sessionReachableAttachmentObjectKeys(
 }
 
 /** Link values are stored as written; anything else is treated as absent. */
-export function parseTurnLinks(raw: string): readonly string[] {
+function parseTurnLinks(raw: string): readonly string[] {
   try {
     const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed)
@@ -259,7 +259,7 @@ export async function materializeEmbeddedHarnessUserInput(input: {
   return { ok: true, value: content };
 }
 
-export function userInputHistoryContent(
+function userInputHistoryContent(
   input: EmbeddedHarnessUserInput,
 ): HarnessHistoryContent {
   if (input.kind === "project_context")
@@ -273,7 +273,7 @@ export function userInputHistoryContent(
 }
 
 /** The bytes that one group of attachments may hold in memory together. */
-export const CONCURRENT_PREPARATION_BYTES = 16 * 1024 * 1024;
+const CONCURRENT_PREPARATION_BYTES = 16 * 1024 * 1024;
 
 /**
  * The attachments of a message in groups that are prepared together. The
@@ -282,7 +282,7 @@ export const CONCURRENT_PREPARATION_BYTES = 16 * 1024 * 1024;
  * the executor is therefore a group of its own. The bytes of a group are
  * bounded, because a group holds them in memory at the same time.
  */
-export function attachmentPreparationGroups(
+function attachmentPreparationGroups(
   attachments: readonly StoredMessageAttachment[],
 ): StoredMessageAttachment[][] {
   const groups: StoredMessageAttachment[][] = [];
@@ -313,7 +313,7 @@ export function attachmentPreparationGroups(
   return groups;
 }
 
-export function materializeGroupedAttachment(
+function materializeGroupedAttachment(
   input: Omit<AttachmentPreparationContext, "attachment">,
   attachment: StoredMessageAttachment,
 ): ReturnType<typeof materializeAcceptedAttachment> {
@@ -329,7 +329,7 @@ export function materializeGroupedAttachment(
   });
 }
 
-export type AttachmentPreparationContext = {
+type AttachmentPreparationContext = {
   readonly execution: SessionExecutionAdmission;
   readonly env: Env;
   readonly storage: DurableObjectStorage;
@@ -381,7 +381,7 @@ export async function materializeAcceptedAttachment(
   });
 }
 
-export async function materializeVerifiedAttachment(
+async function materializeVerifiedAttachment(
   input: AttachmentPreparationContext,
   deadlineAt: number,
   attempt: MessagePreparationAttempt,
@@ -441,7 +441,7 @@ export function readPreparedInspection(
   });
 }
 
-export async function runPreparedExecutor(
+async function runPreparedExecutor(
   input: AttachmentPreparationContext,
   deadlineAt: number,
   attachment: StoredMessageAttachment,
@@ -510,7 +510,7 @@ export async function runPreparedExecutor(
   return prepared.value.operation;
 }
 
-export async function decodePreparedVideo(
+async function decodePreparedVideo(
   input: AttachmentPreparationContext,
   deadlineAt: number,
   attachment: StoredMessageAttachment,
@@ -533,7 +533,7 @@ export async function decodePreparedVideo(
   });
 }
 
-export function traceAttachmentExecutorRefusal(
+function traceAttachmentExecutorRefusal(
   input: AttachmentPreparationContext,
   attachment: StoredMessageAttachment,
   stage: "capability_claim" | "executor_preparation",
@@ -556,11 +556,11 @@ export function traceAttachmentExecutorRefusal(
   });
 }
 
-export function boundedPreparationDetail(detail: string): string {
+function boundedPreparationDetail(detail: string): string {
   return /^[a-zA-Z0-9_.:-]{1,120}$/u.test(detail) ? detail : "unclassified";
 }
 
-export async function readPreparedDocument(
+async function readPreparedDocument(
   input: AttachmentPreparationContext,
   deadlineAt: number,
   attachment: StoredMessageAttachment,
@@ -586,7 +586,7 @@ export async function readPreparedDocument(
  * described rather than interpreted, so the agent is never told a file was read
  * when it was not.
  */
-export async function harnessInputsForAttachment(input: {
+async function harnessInputsForAttachment(input: {
   readonly execution: SessionExecutionAdmission;
   readonly attempt: MessagePreparationAttempt;
   readonly env: Env;
@@ -706,7 +706,7 @@ export async function harnessInputsForAttachment(input: {
 }
 
 /** A one-line technical summary. No claim is made about content. */
-export function describeMediaMetadata(
+function describeMediaMetadata(
   metadata: MediaMetadata,
   frames: FrameSamplingOutcome | null,
   decodedStills: readonly DecodedVideoStill[] | null,
@@ -746,7 +746,7 @@ export function describeMediaMetadata(
 }
 
 /** Slices a sampled frame out of the verified source bytes. */
-export function frameBytesFor(
+function frameBytesFor(
   bytes: Uint8Array,
   frame: { readonly byteOffset: number; readonly byteLength: number },
 ): Uint8Array | null {
@@ -758,9 +758,7 @@ export function frameBytesFor(
 }
 
 /** One provenance-marked line per attachment, stating exactly what is known. */
-export function attachmentManifest(
-  attachment: StoredMessageAttachment,
-): string {
+function attachmentManifest(attachment: StoredMessageAttachment): string {
   const descriptor = attachment.descriptor;
   const identification =
     descriptor.media.kind === "signature_verified"

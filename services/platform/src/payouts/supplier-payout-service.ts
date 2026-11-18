@@ -36,7 +36,7 @@ import type { OrganisationId } from "../ids";
 import type { Variant } from "@seams/type-utils";
 import { assertNever, isRecord } from "@seams/std";
 
-export type PayoutProposalError =
+type PayoutProposalError =
   | "payable_not_found"
   | "payable_not_payable"
   | "destination_not_active"
@@ -45,7 +45,7 @@ export type PayoutProposalError =
   | "allocation_conflict"
   | "payout_exists";
 
-export type PayoutProposalResult =
+type PayoutProposalResult =
   | Readonly<{ ok: true; payout: SupplierPayoutRow }>
   | Readonly<{
       ok: false;
@@ -277,7 +277,7 @@ async function persistSupplierPayoutProposal(persistence: {
   return (writes[0]?.meta.changes ?? 0) === 1;
 }
 
-export type PayoutApprovalError =
+type PayoutApprovalError =
   | "payout_not_found"
   | "not_awaiting_approval"
   | "plan_invalid"
@@ -537,7 +537,7 @@ export async function submitSupplierPayout(
     : { ok: true, payout: reread };
 }
 
-export type PayoutFundingResumeError =
+type PayoutFundingResumeError =
   | "payout_not_found"
   | "not_funding_required"
   | "funding_identity_mismatch"

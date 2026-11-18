@@ -15,12 +15,12 @@ import type { StoredConversation } from "./store";
  * sender saw the page. A shared chat passes only for a page that every member
  * of the Organisation may open (`sharedChatMayCarry`).
  */
-export type ScreenAudience =
+type ScreenAudience =
   | Readonly<{ kind: "private" }>
   | Readonly<{ kind: "shared" }>
   | Readonly<{ kind: "workspace_canvas" }>;
 
-export type ScreenAdmission =
+type ScreenAdmission =
   | Readonly<{ kind: "admitted" }>
   | Readonly<{ kind: "withheld"; reason: "page_not_shared" | "canvas" }>;
 

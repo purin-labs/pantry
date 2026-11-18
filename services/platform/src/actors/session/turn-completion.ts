@@ -67,7 +67,7 @@ export function embeddedHarnessFailureDetail(
     : null;
 }
 
-export type EmbeddedHarnessCompletion = DeadlineOutcome<
+type EmbeddedHarnessCompletion = DeadlineOutcome<
   Awaited<ReturnType<EmbeddedHarnessActiveTurn["complete"]>>,
   Awaited<ReturnType<EmbeddedHarnessActiveTurn["cancel"]>>
 >;
@@ -101,10 +101,10 @@ export async function completeEmbeddedHarnessTurnWithinBudget(
   }
 }
 
-export const TURN_TIME_LIMIT_NOTICE =
+const TURN_TIME_LIMIT_NOTICE =
   "Sous Chef stopped this request at the time limit for one request. Ask again to continue, in smaller steps if you can.";
 
-export function startEmbeddedHarnessCompletion(
+function startEmbeddedHarnessCompletion(
   turn: EmbeddedHarnessActiveTurn,
 ): CancellableTask<
   Awaited<ReturnType<EmbeddedHarnessActiveTurn["complete"]>>,
@@ -117,7 +117,7 @@ export function startEmbeddedHarnessCompletion(
   });
 }
 
-export async function cancelEmbeddedHarnessCompletion(
+async function cancelEmbeddedHarnessCompletion(
   turn: EmbeddedHarnessActiveTurn,
   completion: ReturnType<EmbeddedHarnessActiveTurn["complete"]>,
   _reason: TaskCancellationReason,
@@ -201,7 +201,7 @@ export function startNoTransientTeardown(
   });
 }
 
-export function settledTransientTeardown(
+function settledTransientTeardown(
   completion: Promise<Result<null, { readonly detail: string }>>,
 ): Promise<Result<null, { readonly detail: string }>> {
   return completion;
@@ -230,7 +230,7 @@ export function startTransientWhatsAppSessionLifecycle(
   });
 }
 
-export async function cancelTransientWhatsAppSessionLifecycle(
+async function cancelTransientWhatsAppSessionLifecycle(
   completion: Promise<TransientWhatsAppTurnResult>,
   transient: TransientSessionExecution,
   _reason: TaskCancellationReason,

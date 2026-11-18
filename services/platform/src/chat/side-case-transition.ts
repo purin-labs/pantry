@@ -25,12 +25,12 @@ import { SIDE_CASE_MACHINE } from "./side-case.machine";
 /** A start that did not finish in ten minutes lets go of its proposal. */
 export const SIDE_CASE_START_LEASE_MS = 10 * 60 * 1000;
 
-export type SideCasePhase = MachineState<typeof SIDE_CASE_MACHINE>;
+type SideCasePhase = MachineState<typeof SIDE_CASE_MACHINE>;
 
-export type SideCaseSource = "portal_chat" | "slack_thread";
+type SideCaseSource = "portal_chat" | "slack_thread";
 
 /** The fields of a stored proposal that decide its phase. */
-export type SideCaseRecord = Readonly<{
+type SideCaseRecord = Readonly<{
   proposalId: string;
   status: "open" | "starting" | "started" | "dismissed";
   decidedByUserId: string | null;
@@ -38,7 +38,7 @@ export type SideCaseRecord = Readonly<{
   expiresAt: number;
 }>;
 
-export type SideCaseMove =
+type SideCaseMove =
   | Readonly<{
       event: "claim";
       userId: string;
@@ -53,7 +53,7 @@ export type SideCaseMove =
   | Readonly<{ event: "start" }>
   | Readonly<{ event: "dismiss"; userId: string }>;
 
-export type SideCaseTransitionError =
+type SideCaseTransitionError =
   | "side_case_transition_invalid"
   /** The row changed since the caller read it; read it again and decide. */
   | "side_case_transition_stale"

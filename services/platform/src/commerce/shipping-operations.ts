@@ -31,7 +31,7 @@ type ShippingOperationsBase = Readonly<{
   package: ShippingPackageSummary;
 }>;
 
-export type ShippingOperationsView =
+type ShippingOperationsView =
   | (ShippingOperationsBase &
       Readonly<{
         state: "ready";
@@ -92,7 +92,7 @@ export type ShippingOperationError =
       result: CommerceMutationResultV1;
     }>;
 
-export type ShippingOperationResult<T> =
+type ShippingOperationResult<T> =
   | Readonly<{ ok: true; value: T }>
   | Readonly<{ ok: false; error: ShippingOperationError }>;
 

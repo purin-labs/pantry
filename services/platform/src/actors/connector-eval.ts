@@ -27,7 +27,7 @@ import { isRecord, parseJsonOrNull } from "@seams/std";
  */
 
 /** How long a claimed task is held: one turn's wall time and a margin. */
-export const EVAL_TASK_LEASE_MS = 6 * 60_000;
+const EVAL_TASK_LEASE_MS = 6 * 60_000;
 /** The most tokens one task's turn may use. */
 export const EVAL_TASK_TOKEN_ALLOWANCE = 40_000;
 /** The most tokens every task of one run may use together. */
@@ -65,7 +65,7 @@ export type SettledEvalTask = Readonly<{
   flowLabel: unknown;
 }>;
 
-export type EvalRunAdmission =
+type EvalRunAdmission =
   | Readonly<{ kind: "admitted"; run: ConnectorEvalRun }>
   | Readonly<{ kind: "replayed"; run: ConnectorEvalRun }>
   | Readonly<{ kind: "command_conflict"; run?: never }>
@@ -224,10 +224,7 @@ export function admitEvalRun(
   return { kind: "admitted", run };
 }
 
-export function readEvalRun(
-  sql: SqlStorage,
-  runId: string,
-): ConnectorEvalRun | null {
+function readEvalRun(sql: SqlStorage, runId: string): ConnectorEvalRun | null {
   const row = sql
     .exec<RunRow>(
       `SELECT ${RUN_COLUMNS} FROM connector_eval_run WHERE run_id = ?`,

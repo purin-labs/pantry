@@ -3,7 +3,7 @@ import type { ModelRoute } from "@seams/contracts";
 import type { OrganisationId } from "../ids";
 import { isNonBlankString, isNonNegativeInteger } from "@seams/std";
 
-export type GmailInferenceEligibility =
+type GmailInferenceEligibility =
   | { readonly kind: "blocked" }
   | {
       readonly kind: "eligible";

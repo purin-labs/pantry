@@ -158,15 +158,6 @@ export type ChatTimelineEvent =
       readonly text: string;
     });
 
-export type ConversationTimelineState = {
-  readonly timeline: readonly ChatTimelineEvent[];
-  readonly pendingInputs: readonly PendingChatInput[];
-  readonly latestSequence: number;
-  readonly lastReadSequence: number;
-  readonly draftText: string;
-  readonly draftUpdatedAt: number | null;
-};
-
 export function buildUserTimelineEvent(input: {
   readonly eventId: string;
   readonly sequence: number;

@@ -26,7 +26,7 @@ export type ProductionCommitRequest = Readonly<{
   plan: ProductionBatchPlan;
 }>;
 
-export type ProductionCommandAuthorityOptions = Readonly<{
+type ProductionCommandAuthorityOptions = Readonly<{
   database: CommerceDatabase;
   readMerchant: (merchantId: string) => ProductionMerchantRow | undefined;
   readSnapshot: (

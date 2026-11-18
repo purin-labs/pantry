@@ -7,20 +7,20 @@ import type { ProductDescriptionActionTransport, ProductDescriptionSnapshot } fr
 import "./styles.css";
 import { type ProductDescriptionResponse, parseProductDescriptionResponse } from "@seams/control-api/portal/description-draft";
 
-export const DescriptionEditor = React.lazy(loadEditor);
+const DescriptionEditor = React.lazy(loadEditor);
 
-export function loadEditor() { return import("./editor"); }
+function loadEditor() { return import("./editor"); }
 
-export type ProductDescriptionSnapshotState =
+type ProductDescriptionSnapshotState =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "ready"; value: ProductDescriptionResponse }>
   | Readonly<{ kind: "failed"; message: string }>;
 
-export type DraftControlState =
+type DraftControlState =
   | Readonly<{ kind: "closed" }>
   | Readonly<{ kind: "open"; productRevision: number; snapshot: ProductDescriptionSnapshotState }>;
 
-export type ProductDescriptionLoad = {
+type ProductDescriptionLoad = {
   kind: "active" | "cancelled";
   organisationId: string;
   productId: string;
@@ -92,16 +92,16 @@ export function ProductDescriptionDraftControl(props: Readonly<{
   </section>;
 }
 
-export function openDescriptionEditor(productRevision: number, setState: React.Dispatch<React.SetStateAction<DraftControlState>>): void {
+function openDescriptionEditor(productRevision: number, setState: React.Dispatch<React.SetStateAction<DraftControlState>>): void {
   setState({ kind: "open", productRevision, snapshot: { kind: "loading" } });
 }
 
-export function retryProductDescription(state: DraftControlState, setState: React.Dispatch<React.SetStateAction<DraftControlState>>): void {
+function retryProductDescription(state: DraftControlState, setState: React.Dispatch<React.SetStateAction<DraftControlState>>): void {
   if (state.kind !== "open") return;
   setState({ kind: "open", productRevision: state.productRevision, snapshot: { kind: "loading" } });
 }
 
-export function loadProductDescriptionEffect(
+function loadProductDescriptionEffect(
   organisationId: string,
   productId: string,
   state: DraftControlState,
@@ -113,7 +113,7 @@ export function loadProductDescriptionEffect(
   return cancelProductDescriptionLoad.bind(null, request);
 }
 
-export async function loadProductDescription(request: ProductDescriptionLoad): Promise<void> {
+async function loadProductDescription(request: ProductDescriptionLoad): Promise<void> {
   try {
     const response = await controlRead(productDescriptionPath(request.organisationId, request.productId));
     const value = parseProductDescriptionResponse(response, request.productId);
@@ -123,11 +123,11 @@ export async function loadProductDescription(request: ProductDescriptionLoad): P
   }
 }
 
-export function cancelProductDescriptionLoad(request: ProductDescriptionLoad): void {
+function cancelProductDescriptionLoad(request: ProductDescriptionLoad): void {
   request.kind = "cancelled";
 }
 
-export function updateProductDescriptionSnapshot(
+function updateProductDescriptionSnapshot(
   value: ProductDescriptionResponse,
   state: DraftControlState,
 ): DraftControlState {
@@ -136,23 +136,23 @@ export function updateProductDescriptionSnapshot(
     : state;
 }
 
-export function failProductDescriptionSnapshot(message: string, state: DraftControlState): DraftControlState {
+function failProductDescriptionSnapshot(message: string, state: DraftControlState): DraftControlState {
   return state.kind === "open" && state.snapshot.kind === "loading"
     ? { kind: "open", productRevision: state.productRevision, snapshot: { kind: "failed", message } }
     : state;
 }
 
-export function productDescriptionPath(organisationId: string, productId: string): string {
+function productDescriptionPath(organisationId: string, productId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/products/${encodeURIComponent(productId)}/description-draft`;
 }
 
-export function currentProductSnapshot(state: ProductDescriptionSnapshotState): ProductDescriptionSnapshot | null {
+function currentProductSnapshot(state: ProductDescriptionSnapshotState): ProductDescriptionSnapshot | null {
   return state.kind === "ready"
     ? { productId: state.value.canonicalProductId, title: state.value.product.title, description: state.value.product.description, revision: state.value.product.revision }
     : null;
 }
 
-export function handleProductDescriptionAction(
+function handleProductDescriptionAction(
   setState: React.Dispatch<React.SetStateAction<DraftControlState>>,
   onActionProposed: ((action: CommerceActionRecord) => void) | undefined,
   action: CommerceActionRecord,
@@ -161,11 +161,11 @@ export function handleProductDescriptionAction(
   setState(refreshProductDescriptionSnapshot);
 }
 
-export function refreshProductDescription(setState: React.Dispatch<React.SetStateAction<DraftControlState>>): void {
+function refreshProductDescription(setState: React.Dispatch<React.SetStateAction<DraftControlState>>): void {
   setState(refreshProductDescriptionSnapshot);
 }
 
-export function refreshProductDescriptionOnSourceChange(
+function refreshProductDescriptionOnSourceChange(
   revision: number | undefined,
   previousRevision: React.MutableRefObject<number | null>,
   setState: React.Dispatch<React.SetStateAction<DraftControlState>>,
@@ -177,18 +177,18 @@ export function refreshProductDescriptionOnSourceChange(
   setState(refreshProductDescriptionSnapshot);
 }
 
-export function refreshProductDescriptionSnapshot(state: DraftControlState): DraftControlState {
+function refreshProductDescriptionSnapshot(state: DraftControlState): DraftControlState {
   return state.kind === "open"
     ? { kind: "open", productRevision: state.productRevision, snapshot: { kind: "loading" } }
     : state;
 }
 
-export function productDescriptionError(error: unknown): string {
+function productDescriptionError(error: unknown): string {
   if (error instanceof ControlApiError) return error.message;
   return "Unable to load the current product description. Try again.";
 }
 
-export function ProductDescriptionReference(props: Readonly<{
+function ProductDescriptionReference(props: Readonly<{
   state: ProductDescriptionSnapshotState;
   onRetry: () => void;
 }>): React.ReactNode {
@@ -210,4 +210,4 @@ export function ProductDescriptionReference(props: Readonly<{
   </aside>;
 }
 
-export function noCleanup(): void {}
+function noCleanup(): void {}

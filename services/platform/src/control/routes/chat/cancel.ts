@@ -170,9 +170,7 @@ export async function handlePortalChatCancel(
   });
 }
 
-export function isExactCancelBody(
-  raw: Readonly<Record<string, unknown>>,
-): raw is {
+function isExactCancelBody(raw: Readonly<Record<string, unknown>>): raw is {
   readonly conversationId: ConversationId;
   readonly requestId: string;
   readonly sessionId: string;

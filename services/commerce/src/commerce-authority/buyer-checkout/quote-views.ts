@@ -230,7 +230,7 @@ export function toBuyerQuotedShippingCheckout(
   };
 }
 
-export function toBuyerShippingCheckoutLines(
+function toBuyerShippingCheckoutLines(
   lines: VariantBy<Checkout["lifecycle"], "state", "quoted">["quote"]["lines"],
 ): CommerceBuyerQuotedShippingCheckoutV1["quote"]["lines"] | undefined {
   const result: Array<

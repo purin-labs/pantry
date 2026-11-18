@@ -87,11 +87,11 @@ export function companyPriceStage(
   });
 }
 
-export type StageResult<T> =
+type StageResult<T> =
   | Readonly<{ kind: "applied"; value: T }>
   | Readonly<{ kind: "rejected"; field: string }>;
 
-export type DiscountStage = Readonly<{
+type DiscountStage = Readonly<{
   /** The lines with each discount taken off its line total. */
   lines: readonly QuoteLine[];
   discountTotal: number;
@@ -166,7 +166,7 @@ export function discountStage(
   };
 }
 
-export type StoredValueStage = Readonly<{
+type StoredValueStage = Readonly<{
   tenders: readonly CheckoutStoredValueTender[];
   /** The quote's stored value part, when an account pays. */
   quote: CheckoutQuoteSnapshot["storedValue"];
@@ -280,7 +280,7 @@ export function checkoutValidationInput(
 }
 
 /** The quote as far as it is priced, for the hooks before validate. */
-export type HookQuote = Readonly<{
+type HookQuote = Readonly<{
   checkoutId: string;
   kind: "pickup" | "shipping";
   quotedAt: string;
@@ -289,7 +289,7 @@ export type HookQuote = Readonly<{
   variants: CommerceResourcesV1["variants"];
 }>;
 
-export type HookStageResult<T> =
+type HookStageResult<T> =
   | Readonly<{
       kind: "applied";
       value: T;

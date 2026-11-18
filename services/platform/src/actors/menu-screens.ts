@@ -32,7 +32,7 @@ const SCREEN_LIMIT = 40;
 /** A screen keeps at most this many sockets open, for a page opened twice. */
 const SOCKETS_PER_SCREEN = 3;
 
-export type MenuScreenRow = Readonly<{
+type MenuScreenRow = Readonly<{
   screenId: string;
   name: string;
   boardId: string;

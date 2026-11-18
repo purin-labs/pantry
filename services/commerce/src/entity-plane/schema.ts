@@ -3,7 +3,7 @@ import { initializeCommerceEntityRelation } from "./commerce-entity-relation.ts"
 import { initializeCommerceAttributeRelation } from "./commerce-attribute-relation.ts";
 import { initializeCommerceRelationshipRelation } from "./commerce-relationship-relation.ts";
 
-export const COMMERCE_LIST_ENTRY_SCHEMA = `
+const COMMERCE_LIST_ENTRY_SCHEMA = `
 CREATE TABLE IF NOT EXISTS commerce_list_entry (
   merchant_id TEXT NOT NULL,
   entry_id TEXT NOT NULL,
@@ -49,7 +49,7 @@ export const ENTITY_PLANE_CHANGE_SCHEMA = `CREATE TABLE IF NOT EXISTS entity_pla
 CREATE INDEX IF NOT EXISTS entity_plane_change_revision_idx
   ON entity_plane_change (merchant_id, merchant_revision);`;
 
-export const ENTITY_PLANE_SCHEMA = `
+const ENTITY_PLANE_SCHEMA = `
 CREATE TABLE IF NOT EXISTS custom_entity_type (
   merchant_id TEXT NOT NULL,
   entity_type_id TEXT NOT NULL,

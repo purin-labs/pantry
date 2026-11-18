@@ -55,7 +55,7 @@ export function encodeCapabilityKey(definition: CapabilityDefinition): string {
   }
 }
 
-export function encodeCustomConnectorCapabilityKey(
+function encodeCustomConnectorCapabilityKey(
   definition: CustomConnectorCapabilityDefinition,
 ): string {
   return [

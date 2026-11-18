@@ -269,7 +269,7 @@ type ProviderIngressOriginEnv = Pick<
   | "SATYR_PUBLIC_ORIGIN"
 >;
 
-export function providerPublicOrigin(env: ProviderPublicOriginEnv): string {
+function providerPublicOrigin(env: ProviderPublicOriginEnv): string {
   return requirePublicOrigin(
     env.SATYR_OAUTH_CALLBACK_ORIGIN ?? env.SATYR_PUBLIC_ORIGIN,
   );

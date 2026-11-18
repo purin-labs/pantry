@@ -2,7 +2,7 @@ import type { Result } from "../result";
 import type { VaultSecret } from "../credential-vault";
 import { isRecord } from "@seams/std";
 
-export type StripeFailedChargeTrigger = {
+type StripeFailedChargeTrigger = {
   kind: "charge_failed_triggered";
   provider: "stripe";
   errorCode: "card_declined";

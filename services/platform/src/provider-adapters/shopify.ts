@@ -19,7 +19,7 @@ const SHOPIFY_SCOPES = [
   "write_orders",
 ] as const;
 
-export type ShopifyProtocolError =
+type ShopifyProtocolError =
   | { readonly code: "provider_oauth_response_invalid" }
   | {
       readonly code: "provider_oauth_exchange_failed";
@@ -27,12 +27,12 @@ export type ShopifyProtocolError =
       readonly requestId: string | null;
     };
 
-export type ShopifyAuthorizationGrant = {
+type ShopifyAuthorizationGrant = {
   readonly accessToken: string;
   readonly scopes: readonly string[];
 };
 
-export type ShopifyIdentity = {
+type ShopifyIdentity = {
   readonly shopId: string;
   readonly myshopifyDomain: string;
   readonly displayName: string;

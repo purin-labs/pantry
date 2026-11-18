@@ -63,7 +63,7 @@ export type VoiceStatus =
     }>;
 
 /** The click on an approval card. It returns a sentence when it fails. */
-export type VoiceApproval = Readonly<{
+type VoiceApproval = Readonly<{
   conversationId: string;
   target: VoiceConfirmationTarget;
   phrase: string;

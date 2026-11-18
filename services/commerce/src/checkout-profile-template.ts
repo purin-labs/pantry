@@ -4,7 +4,7 @@ import type {
 } from "@seams/commerce-contracts";
 import { assertNever } from "@seams/std";
 
-export type CheckoutProfileTemplate = Readonly<{
+type CheckoutProfileTemplate = Readonly<{
   checkoutProfileId: string;
   name: string;
   configuration: CheckoutProfileConfiguration;

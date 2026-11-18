@@ -247,7 +247,7 @@ async function resolveAllowanceContext(
 }
 
 /** What one Offer's allowance currently is, beside the price it governs. */
-export type OfferPriceAllowanceState = Readonly<{
+type OfferPriceAllowanceState = Readonly<{
   policy: Readonly<{ kind: string; revision: number; maxMovementBps?: number }>;
   /** The prices that the allowance permits now, or null without one. */
   allowedRange: Readonly<{ minimumMinor: number; maximumMinor: number }> | null;

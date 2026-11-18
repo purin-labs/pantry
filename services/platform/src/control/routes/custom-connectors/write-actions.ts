@@ -75,7 +75,7 @@ export async function handleCustomConnectorWriteAction(
   return reconcileCustomConnectorWriteAction(request, env, route);
 }
 
-export async function readCustomConnectorWriteAction(
+async function readCustomConnectorWriteAction(
   request: Request,
   env: Env,
   route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
@@ -112,7 +112,7 @@ export async function readCustomConnectorWriteAction(
     : controlError("custom_connector_action_not_found", 404);
 }
 
-export async function approveCustomConnectorWriteAction(
+async function approveCustomConnectorWriteAction(
   request: Request,
   env: Env,
   route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
@@ -276,7 +276,7 @@ export async function approveCustomConnectorWriteAction(
   return controlJson(responseBody);
 }
 
-export async function executeCustomConnectorWriteAction(
+async function executeCustomConnectorWriteAction(
   request: Request,
   env: Env,
   route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
@@ -521,7 +521,7 @@ export async function executeCustomConnectorWriteAction(
   );
 }
 
-export async function reconcileCustomConnectorWriteAction(
+async function reconcileCustomConnectorWriteAction(
   request: Request,
   env: Env,
   route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
@@ -617,7 +617,7 @@ export async function reconcileCustomConnectorWriteAction(
   return controlJson(responseBody);
 }
 
-export type WriteMutationContext = Readonly<{
+type WriteMutationContext = Readonly<{
   executionScope: OrganisationExecutionScope;
   authorized: AuthorizedOrganisationRequest;
   identity: NonNullable<Awaited<ReturnType<typeof resolveUser>>>;
@@ -627,7 +627,7 @@ export type WriteMutationContext = Readonly<{
   body: JsonRecord;
 }>;
 
-export async function prepareWriteMutation(
+async function prepareWriteMutation(
   request: Request,
   env: Env,
   route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
@@ -698,7 +698,7 @@ export async function prepareWriteMutation(
   };
 }
 
-export async function recordWriteReceipt(
+async function recordWriteReceipt(
   request: Request,
   context: WriteMutationContext,
   responseBody: Readonly<Record<string, unknown>>,
@@ -715,7 +715,7 @@ export async function recordWriteReceipt(
   });
 }
 
-export function customActionLedgerError(code: string): Response {
+function customActionLedgerError(code: string): Response {
   if (code === "action_not_found")
     return controlError("custom_connector_action_not_found", 404);
   if (code === "action_expired")
@@ -725,13 +725,13 @@ export function customActionLedgerError(code: string): Response {
   return controlError(`custom_connector_${code}`, 409);
 }
 
-export function isActionNonce(value: string): boolean {
+function isActionNonce(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
     value,
   );
 }
 
-export async function authorizeWriteMutation(
+async function authorizeWriteMutation(
   request: Request,
   env: Env,
   context: WriteMutationContext,
@@ -757,7 +757,7 @@ export async function authorizeWriteMutation(
   return authority.ok && (await context.executionScope.isActive());
 }
 
-export async function authorizeRemoteConnectorWrite(
+async function authorizeRemoteConnectorWrite(
   request: Request,
   env: Env,
   context: WriteMutationContext,

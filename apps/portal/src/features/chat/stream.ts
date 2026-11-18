@@ -44,7 +44,7 @@ export async function readChatStream(input: {
   }
 }
 
-export function consumeLines(
+function consumeLines(
   text: string,
   accept: (record: ChatStreamRecord) => void,
 ): {
@@ -72,7 +72,7 @@ export function consumeLines(
   }
 }
 
-export async function streamResponseError(response: Response): Promise<Error> {
+async function streamResponseError(response: Response): Promise<Error> {
   try {
     const raw: unknown = await response.json();
     if (isRecord(raw) && typeof raw.message === "string")

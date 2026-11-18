@@ -46,12 +46,12 @@ export function parseDeliveryRows(rows: readonly DeliveryRow[]): {
   return { deliveries, receipts };
 }
 
-export type ConnectorWhatsAppIdentityRequest = {
+type ConnectorWhatsAppIdentityRequest = {
   readonly identity: ConnectorIdentity;
   readonly now: number;
 };
 
-export type WhatsAppAuthorityRequest = ConnectorWhatsAppIdentityRequest & {
+type WhatsAppAuthorityRequest = ConnectorWhatsAppIdentityRequest & {
   readonly policyVersion: number;
   readonly limits: WhatsAppIngressLimits;
   readonly supportBindingId: string;
@@ -74,7 +74,7 @@ export function parseWhatsAppIdentityRequest(
       };
 }
 
-export function parseWhatsAppLimits(
+function parseWhatsAppLimits(
   value: unknown,
 ): WhatsAppIngressLimits | null {
   const limits = checked(whatsappLimitsSchema, value);
@@ -91,7 +91,7 @@ export function parseWhatsAppLimits(
       };
 }
 
-export function parseWhatsAppAuthorityRequest(
+function parseWhatsAppAuthorityRequest(
   value: unknown,
 ): WhatsAppAuthorityRequest | null {
   const base = parseWhatsAppIdentityRequest(value);

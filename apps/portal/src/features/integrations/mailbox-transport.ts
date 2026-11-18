@@ -25,7 +25,7 @@ export function emailOperationalPath(
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/email-operational/${encodeURIComponent(proposalId)}`;
 }
 
-export type AgentMailboxSurface = {
+type AgentMailboxSurface = {
   readonly agentMailboxes: readonly AgentMailboxView[];
   readonly emailReplies: readonly EmailReplyQueueItem[];
   readonly emailOperational: readonly EmailOperationalQueueItem[];
@@ -91,14 +91,14 @@ export async function fetchAgentMailboxSurface(
   };
 }
 
-export function isFullMailboxGmailAccount(account: IntegrationAccount): boolean {
+function isFullMailboxGmailAccount(account: IntegrationAccount): boolean {
   return (
     account.provider === "gmail" &&
     account.capabilities.includes("mailbox.ingress")
   );
 }
 
-export async function fetchAgentMailboxView(
+async function fetchAgentMailboxView(
   organisationId: string,
   integrationAccountId: string,
 ): Promise<AgentMailboxView> {
@@ -107,7 +107,7 @@ export async function fetchAgentMailboxView(
   );
 }
 
-export async function fetchEmailReviewQueue(organisationId: string): Promise<
+async function fetchEmailReviewQueue(organisationId: string): Promise<
   Readonly<{
     readonly emailReplies: readonly EmailReplyQueueItem[];
     readonly emailOperational: readonly EmailOperationalQueueItem[];
@@ -126,7 +126,7 @@ export async function fetchEmailReviewQueue(organisationId: string): Promise<
   };
 }
 
-export function mailboxInstallationOptions(
+function mailboxInstallationOptions(
   operations: ReturnType<typeof parseAgentOperationsResponse>,
 ): readonly MailboxInstallationOption[] {
   const definitionLabels = new Map<string, string>();

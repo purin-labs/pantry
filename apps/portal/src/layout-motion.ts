@@ -6,7 +6,7 @@
 // the layout moves), "ready" (hidden, layout settled: the views resize now) and
 // "in" (fading back in over a finished resize). The attribute is absent at rest.
 export const LAYOUT_MOTION_ATTRIBUTE = "data-layout-motion";
-export const LAYOUT_MOTION_FADE_MS = 50;
+const LAYOUT_MOTION_FADE_MS = 50;
 const LAYOUT_MOTION_SETTLE_MS = 230;
 const LAYOUT_MOTION_RESIZE_MS = 40;
 const LAYOUT_MOTION_FADE_IN_MS = 90;

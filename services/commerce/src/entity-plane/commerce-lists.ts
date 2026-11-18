@@ -45,7 +45,7 @@ import {
 import { validateCommerceListEntryWithLexicon } from "./lexicon.ts";
 import type { PurchaseRequestPatchCheck } from "../plugins/built-in-ports.ts";
 
-export type StoredListRow = Readonly<{
+type StoredListRow = Readonly<{
   listId: string;
   entityTypeId: CommerceEntityTypeId;
   revision: number;
@@ -65,7 +65,7 @@ export type StoredListEntryRow = Readonly<{
   lifecycleState: "active" | "archived";
 }>;
 
-export type CommerceListsOptions = Readonly<{
+type CommerceListsOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   settlement: EntityPlaneSettlement;

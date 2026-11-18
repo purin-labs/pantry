@@ -17,7 +17,7 @@ import type { FactoryStationSource } from "../workflow-simulator/spatial/factory
 import { factoryStationsForScenario } from "./factory-places";
 import { MORNING_SHIFT_STATIONS } from "./morning-shift-appliances";
 
-export type WalkSpeedPreset = "standard" | "brisk" | "congested-aisle";
+type WalkSpeedPreset = "standard" | "brisk" | "congested-aisle";
 
 const WALK_SPEED_MPS: Readonly<Record<WalkSpeedPreset, number>> = {
   brisk: 1.5,
@@ -33,7 +33,7 @@ const STATION_SETTLE_SECONDS: Readonly<Record<WalkSpeedPreset, number>> = {
 
 const SAME_STATION_SIDESTEP_METERS = 1.1;
 
-export function stationStandPointOnFloorPlan(
+function stationStandPointOnFloorPlan(
   planId: BakeryFloorPlanId,
   station: FactoryStationSource,
 ): readonly [number, number] {
@@ -46,7 +46,7 @@ export function stationStandPointOnFloorPlan(
   return [pose.x + ox * cos + oz * sin, pose.z - ox * sin + oz * cos];
 }
 
-export function scenarioStationObstacleIds(
+function scenarioStationObstacleIds(
   stations: readonly FactoryStationSource[],
 ): readonly ApplianceId[] {
   const ids: ApplianceId[] = [

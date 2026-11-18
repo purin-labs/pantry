@@ -20,7 +20,7 @@ import {
 import { reconcileOrganisationActorRegistry } from "./actor-registry-reconciliation";
 
 /** A reservation is stale after one scheduled period with no activation. */
-export const ACTOR_RESERVATION_STALE_MS = 15 * 60_000;
+const ACTOR_RESERVATION_STALE_MS = 15 * 60_000;
 
 /** The Organisations that one run reconciles in each database. */
 const ORGANISATION_PAGE = 50;

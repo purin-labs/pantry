@@ -13,9 +13,9 @@ import type { Result } from "../result";
  */
 
 /** A board holds at most this many comments, replies included. */
-export const MENU_BOARD_COMMENT_LIMIT = 300;
+const MENU_BOARD_COMMENT_LIMIT = 300;
 /** A comment holds at most this many characters. */
-export const MENU_BOARD_COMMENT_TEXT_LIMIT = 1000;
+const MENU_BOARD_COMMENT_TEXT_LIMIT = 1000;
 
 export type MenuBoardCommentAuthor = Readonly<{
   kind: "person" | "agent";
@@ -66,7 +66,7 @@ export function createMenuBoardCommentSchema(sql: SqlStorage): void {
 }
 
 /** A comment text, normalized, or null when it is empty or too long. */
-export function menuBoardCommentText(text: string): string | null {
+function menuBoardCommentText(text: string): string | null {
   const normalized = normalizePlainText(text).trim();
   return normalized.length === 0 ||
     normalized.length > MENU_BOARD_COMMENT_TEXT_LIMIT

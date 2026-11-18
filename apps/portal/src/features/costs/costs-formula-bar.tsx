@@ -40,7 +40,7 @@ import {
 
 export type CostFormulaBarColumn = CostFormulaColumn | "taxFee";
 
-export const COLUMN_LABELS: Readonly<
+const COLUMN_LABELS: Readonly<
   Record<CostFormulaBarColumn, string>
 > = {
   units: "Units / d",
@@ -118,7 +118,7 @@ export function parseProductColumnFromCellKey(
   return null;
 }
 
-export function buildRowFormulaContext(
+function buildRowFormulaContext(
   row: CalculatedProductMargin,
   rowNumber1Based: number,
   assumptions: CostScenarioAssumptions,
@@ -264,7 +264,7 @@ export function isColumnOverridden(
   }
 }
 
-export type CellCommitOutcome =
+type CellCommitOutcome =
   | Readonly<{
       ok: true;
       changes: readonly CostsSheetCellChange[];

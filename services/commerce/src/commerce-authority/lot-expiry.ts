@@ -25,7 +25,7 @@ import { isAccountedPosition, scaledAmount } from "./inventory-planning.ts";
 /** At most this many write-offs in one pass; the next pass goes on. */
 const PASS_LIMIT = 100;
 
-export type LotExpiryOptions = Readonly<{
+type LotExpiryOptions = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   readMerchant: (merchantId: string) => InventoryMerchantRow | undefined;

@@ -23,7 +23,7 @@ import type { ConversationScope, StoredConversation } from "./store";
 /** The last answer of the chat that Jev reads, in characters. */
 const LAST_ANSWER_CHARACTERS = 1_000;
 
-export type ScreenRelevanceError = Readonly<{
+type ScreenRelevanceError = Readonly<{
   code: "screen_relevance_label_unavailable";
 }>;
 

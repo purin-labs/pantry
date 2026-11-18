@@ -63,7 +63,7 @@ type SquareLocationBinding = Readonly<{
   account: Readonly<{ providerAccountId: string; currency: string }>;
 }>;
 
-export type SquarePaymentAccountV1 = Readonly<{
+type SquarePaymentAccountV1 = Readonly<{
   provider: "square";
   paymentProviderBindingId: string;
   providerAccountId: string;
@@ -75,7 +75,7 @@ export type SquarePaymentAccountV1 = Readonly<{
   updatedAt: string;
 }>;
 
-export type SquareAccountResult<Value> = SquareResult<Value>;
+type SquareAccountResult<Value> = SquareResult<Value>;
 
 type AccountRow = Readonly<{
   paymentProviderBindingId: string;

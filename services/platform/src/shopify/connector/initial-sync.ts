@@ -28,7 +28,7 @@ import {
 import { parseInitialOrder, parseInitialOrdersPage } from "./order-snapshot";
 import { validShopDomain } from "./values";
 
-export const SHOPIFY_INITIAL_CATALOG_QUERY = `
+const SHOPIFY_INITIAL_CATALOG_QUERY = `
   query SatyrInitialCatalog($first: Int!, $after: String) {
     products(first: $first, after: $after) {
       nodes {
@@ -45,7 +45,7 @@ export const SHOPIFY_INITIAL_CATALOG_QUERY = `
   }
 `;
 
-export const SHOPIFY_INITIAL_ORDERS_QUERY = `
+const SHOPIFY_INITIAL_ORDERS_QUERY = `
   query SatyrInitialOrders($first: Int!, $after: String) {
     orders(first: $first, after: $after, sortKey: CREATED_AT, reverse: true) {
       nodes {
@@ -110,7 +110,7 @@ export const SHOPIFY_INITIAL_ORDERS_QUERY = `
   }
 `;
 
-export const SHOPIFY_ORDER_REFRESH_QUERY = `
+const SHOPIFY_ORDER_REFRESH_QUERY = `
   query SatyrOrderRefresh($id: ID!) {
     order(id: $id) {
       id
@@ -172,7 +172,7 @@ export const SHOPIFY_ORDER_REFRESH_QUERY = `
   }
 `;
 
-export const SHOPIFY_INITIAL_LOCATIONS_QUERY = `
+const SHOPIFY_INITIAL_LOCATIONS_QUERY = `
   query SatyrInitialLocations($first: Int!, $after: String) {
     locations(first: $first, after: $after, includeInactive: true, includeLegacy: true) {
       nodes {
@@ -186,7 +186,7 @@ export const SHOPIFY_INITIAL_LOCATIONS_QUERY = `
   }
 `;
 
-export const SHOPIFY_INITIAL_INVENTORY_QUERY = `
+const SHOPIFY_INITIAL_INVENTORY_QUERY = `
   query SatyrInitialInventory($first: Int!, $after: String) {
     inventoryItems(first: $first, after: $after) {
       nodes {
@@ -206,7 +206,7 @@ export const SHOPIFY_INITIAL_INVENTORY_QUERY = `
   }
 `;
 
-export const SHOPIFY_INITIAL_PUBLICATIONS_QUERY = `
+const SHOPIFY_INITIAL_PUBLICATIONS_QUERY = `
   query SatyrInitialPublications($first: Int!, $after: String) {
     products(first: $first, after: $after) {
       nodes {
@@ -393,7 +393,7 @@ export async function fetchShopifyOrderCommerceRefresh(input: {
   };
 }
 
-export async function fetchInitialInventory(input: {
+async function fetchInitialInventory(input: {
   readonly shopDomain: string;
   readonly accessToken: string;
   readonly organisationId: OrganisationId;
@@ -432,7 +432,7 @@ export async function fetchInitialInventory(input: {
   return initialInventoryInvalid();
 }
 
-export async function fetchInitialPublications(input: {
+async function fetchInitialPublications(input: {
   readonly shopDomain: string;
   readonly accessToken: string;
   readonly organisationId: OrganisationId;
@@ -514,7 +514,7 @@ export async function fetchInitialPublications(input: {
   };
 }
 
-export function compareShopifyResourceEnvelope(
+function compareShopifyResourceEnvelope(
   left: ShopifyResourceEnvelopeV202607,
   right: ShopifyResourceEnvelopeV202607,
 ): number {
@@ -523,7 +523,7 @@ export function compareShopifyResourceEnvelope(
   );
 }
 
-export async function fetchInitialLocations(input: {
+async function fetchInitialLocations(input: {
   readonly shopDomain: string;
   readonly accessToken: string;
   readonly organisationId: OrganisationId;
@@ -582,7 +582,7 @@ export async function fetchInitialLocations(input: {
   };
 }
 
-export async function fetchInitialCatalog(input: {
+async function fetchInitialCatalog(input: {
   readonly shopDomain: string;
   readonly accessToken: string;
   readonly organisationId: OrganisationId;
@@ -641,7 +641,7 @@ export async function fetchInitialCatalog(input: {
   };
 }
 
-export async function fetchInitialOrders(input: {
+async function fetchInitialOrders(input: {
   readonly shopDomain: string;
   readonly accessToken: string;
   readonly organisationId: OrganisationId;

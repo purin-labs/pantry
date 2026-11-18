@@ -8,7 +8,7 @@ import type { OrganisationId } from "../ids";
 import { readCommerceExceptionInbox } from "../commerce/operations-workbench";
 import type { CommerceExceptionInbox } from "@seams/control-api";
 
-export type AgentOperationsWithActivity = AgentOperationsSnapshot & {
+type AgentOperationsWithActivity = AgentOperationsSnapshot & {
   readonly actionLedger: readonly ActionLedgerActivity[];
   readonly commerceExceptions: CommerceExceptionInbox;
 };
@@ -37,7 +37,7 @@ export async function readAgentOperationsWithActivity(
   );
 }
 
-export async function readAgentOperationsWithActivityFromOrganisation(
+async function readAgentOperationsWithActivityFromOrganisation(
   env: Env,
   organisationId: OrganisationId,
   operations: AgentOperationsSnapshot,

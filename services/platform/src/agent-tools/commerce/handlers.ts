@@ -245,7 +245,7 @@ export async function prepareCommerceReadForEmbeddedHarness(
 }
 
 /** The commerce records one graph read returned, at the revisions it saw. */
-export function observedCommerceEntities(
+function observedCommerceEntities(
   result: import("@seams/contracts").CommerceGraphQueryResult,
   merchantId: string,
 ): readonly CommerceObservationEntity[] {
@@ -313,7 +313,7 @@ export async function readEntityContextForEmbeddedHarness(
   return read.value;
 }
 
-export function selectEntityContextSourceGrant(
+function selectEntityContextSourceGrant(
   lease: HarnessTurnLease,
   request: import("@seams/contracts").CommerceContextRequest,
   input: Readonly<{
@@ -339,7 +339,7 @@ export function selectEntityContextSourceGrant(
  * from a read of the record. When no grant admits that read, a permission
  * request may ask for that grant.
  */
-export function requestableRecordRead(
+function requestableRecordRead(
   request: import("@seams/contracts").CommerceContextRequest,
   error: unknown,
 ): never {
@@ -354,7 +354,7 @@ export function requestableRecordRead(
   throw error;
 }
 
-export function recordReadOfRequest(
+function recordReadOfRequest(
   request: import("@seams/contracts").CommerceContextRequest,
 ): RequestableEntityTypeRead | null {
   if (request.selection.kind === "entity_seeds") {
@@ -381,9 +381,7 @@ export function recordReadOfRequest(
 }
 
 /** The read that a page or seeds of this one record type may ask for. */
-export function recordReadOfType(
-  typeId: unknown,
-): RequestableEntityTypeRead | null {
+function recordReadOfType(typeId: unknown): RequestableEntityTypeRead | null {
   return typeId === "inventory_position" ||
     (isRequestableEntityTypeRead(typeId) && readNeedsPrivateChat(typeId))
     ? typeId
@@ -588,7 +586,7 @@ export async function markSoldOutForEmbeddedHarness(
 }
 
 /** The pickup board and the menu screens show the step now. */
-export async function signalShopScreens(
+async function signalShopScreens(
   env: Env,
   execution: SessionExecutionAdmission,
 ): Promise<void> {
@@ -604,7 +602,7 @@ export async function signalShopScreens(
 }
 
 /** What the agent reads about a move that did not happen, or null if it did. */
-export function orderQueueAdvanceRefusal(
+function orderQueueAdvanceRefusal(
   moved: OrderQueueAdvanceResult,
 ): string | null {
   if (moved.ok) {
@@ -628,7 +626,7 @@ export function orderQueueAdvanceRefusal(
   }
 }
 
-export function soldOutMarkRefusal(marked: SoldOutMarkResult): string | null {
+function soldOutMarkRefusal(marked: SoldOutMarkResult): string | null {
   if (marked.ok) {
     return null;
   }
@@ -738,7 +736,7 @@ export async function readMerchantReportForEmbeddedHarness(
  * entity type. Grant selection is expressed in context-request terms, so the
  * report asks the same question the context tool would.
  */
-export async function readProductSalesForEmbeddedHarness(
+async function readProductSalesForEmbeddedHarness(
   env: Env,
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
@@ -835,7 +833,7 @@ export async function readProductSalesForEmbeddedHarness(
  * after the read grant for stock positions passes, so the agent and the pages
  * count the same rows.
  */
-export async function readStockShortagesForEmbeddedHarness(
+async function readStockShortagesForEmbeddedHarness(
   env: Env,
   storage: DurableObjectStorage,
   execution: SessionExecutionAdmission,
@@ -916,7 +914,7 @@ export async function readStockShortagesForEmbeddedHarness(
   return value;
 }
 
-export function admittedBlotterReader(
+function admittedBlotterReader(
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   organisation: BlotterOrganisationReader,

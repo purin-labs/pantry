@@ -122,7 +122,7 @@ export function readDuplicateAcceptance(
   return duplicateOutcome(outcome.value);
 }
 
-export function duplicateOutcome(
+function duplicateOutcome(
   outcome: AcceptedActorCommand,
 ): Result<ActorTransitionCommitResult, ActorTransitionCommitError> {
   return {
@@ -241,7 +241,7 @@ export function writeExecutionRequest(
   );
 }
 
-export function parseAcceptedOutcome(
+function parseAcceptedOutcome(
   raw: string,
 ): Result<
   AcceptedActorCommand,
@@ -365,9 +365,7 @@ export function serializeContextBundle(bundle: StoredContextBundle): unknown {
   };
 }
 
-export function canonicalContextItem(
-  item: ContextBundle["items"][number],
-): unknown {
+function canonicalContextItem(item: ContextBundle["items"][number]): unknown {
   return {
     source: canonicalContextSource(item.source),
     provenance: item.provenance,
@@ -393,7 +391,7 @@ export function canonicalContextItem(
   };
 }
 
-export function canonicalContextSource(
+function canonicalContextSource(
   source: ContextBundle["items"][number]["source"],
 ): unknown {
   switch (source.kind) {
@@ -493,7 +491,7 @@ export async function parseContextBundle(
   return memory === null ? null : { ...historical, memory };
 }
 
-export function isMemoryItem(item: ContextBundle["items"][number]): boolean {
+function isMemoryItem(item: ContextBundle["items"][number]): boolean {
   return item.source.kind === "memory";
 }
 
@@ -501,7 +499,7 @@ export function isMemoryItem(item: ContextBundle["items"][number]): boolean {
  * The recorded Memory outcome. Its revisions must be exactly the bundle's
  * Memory items, so neither can be changed without the other.
  */
-export function parseContextMemoryOutcome(
+function parseContextMemoryOutcome(
   value: unknown,
   items: readonly ContextBundle["items"][number][],
 ): ContextBundle["memory"] | null {
@@ -545,7 +543,7 @@ export function parseContextMemoryOutcome(
   }
 }
 
-export async function parseContextItem(
+async function parseContextItem(
   value: unknown,
 ): Promise<ContextBundle["items"][number] | null> {
   if (
@@ -612,7 +610,7 @@ export async function parseContextItem(
   };
 }
 
-export function parseContextProvenance(
+function parseContextProvenance(
   value: unknown,
   source: ContextBundle["items"][number]["source"] | null,
 ): ContextBundle["items"][number]["provenance"] | null {
@@ -668,7 +666,7 @@ export function parseContextProvenance(
     : null;
 }
 
-export function parseContextSource(
+function parseContextSource(
   value: unknown,
 ): ContextBundle["items"][number]["source"] | null {
   if (!isRecord(value) || typeof value.kind !== "string") return null;
@@ -725,7 +723,7 @@ export function parseContextSource(
   }
 }
 
-export function observationSourceMatchesContextSource(
+function observationSourceMatchesContextSource(
   observationSource: ObservationEvidence["source"],
   contextSource: ContextBundle["items"][number]["source"],
   provenance: ContextBundle["items"][number]["provenance"],
@@ -762,7 +760,7 @@ export function observationSourceMatchesContextSource(
   }
 }
 
-export function parseContextFreshness(
+function parseContextFreshness(
   value: unknown,
 ): ContextBundle["items"][number]["freshness"] | null {
   if (!isRecord(value) || typeof value.kind !== "string") return null;
@@ -778,7 +776,7 @@ export function parseContextFreshness(
     : null;
 }
 
-export function parseContextRetrievalEvidence(
+function parseContextRetrievalEvidence(
   value: unknown,
 ): ContextBundle["items"][number]["retrievalEvidence"] | null {
   if (
@@ -803,7 +801,7 @@ export function parseContextRetrievalEvidence(
   };
 }
 
-export function parseContextDisposition(
+function parseContextDisposition(
   value: unknown,
 ): ContextBundle["disposition"] | null {
   if (!isRecord(value) || typeof value.kind !== "string") return null;
@@ -850,9 +848,7 @@ export function parseStoredTurnContext(raw: unknown): {
   return { bundle: raw, projectContext: null, memoryRendering: null };
 }
 
-export function parseMemoryRendering(
-  raw: unknown,
-): SessionTurnMemoryRendering | null {
+function parseMemoryRendering(raw: unknown): SessionTurnMemoryRendering | null {
   if (
     !isRecord(raw) ||
     !hasExactKeys(raw, ["revisions", "omittedForBytes"]) ||

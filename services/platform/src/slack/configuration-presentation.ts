@@ -20,7 +20,7 @@ import { assertNever } from "@seams/std";
  * Portal can submit but that nobody wrote a Slack action label for will not
  * compile, so the two surfaces cannot drift apart silently.
  */
-export type ConfigurationCommandPresentation = Readonly<{
+type ConfigurationCommandPresentation = Readonly<{
   /** What this change is, in the operator's terms. */
   summary: string;
   /** The button or reply that accepts it. Names the change, never "Confirm". */

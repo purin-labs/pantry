@@ -21,7 +21,7 @@ import type {
   SettingsRouteContent,
 } from "./settings-types";
 
-export type ProviderAuthorizationSurface =
+type ProviderAuthorizationSurface =
   | { readonly kind: "popup"; readonly popup: Window }
   | { readonly kind: "current_window"; readonly popup?: never };
 
@@ -78,7 +78,7 @@ export function trackProviderAuthorization(
   ref.current = authorization;
 }
 
-export type ProviderAuthorizationOutcome = "waiting" | "closed" | "returned";
+type ProviderAuthorizationOutcome = "waiting" | "closed" | "returned";
 
 /**
  * Reads where a consent popup stands without the provider's help. A closed
@@ -110,13 +110,13 @@ export function providerAuthorizationOutcome(
     : "waiting";
 }
 
-export const PROVIDER_AUTHORIZATION_POLL_MS = 500;
+const PROVIDER_AUTHORIZATION_POLL_MS = 500;
 
 // The completion handshake travels just before a popup closes itself; this
 // pause keeps a successful sign-in from reading as an interruption.
-export const PROVIDER_AUTHORIZATION_SETTLE_MS = 750;
+const PROVIDER_AUTHORIZATION_SETTLE_MS = 750;
 
-export type ProviderAuthorizationTimers = { poll: number; settle: number | null };
+type ProviderAuthorizationTimers = { poll: number; settle: number | null };
 
 export function beginProviderAuthorizationWatch(
   authorization: ProviderAuthorizationWatch | null,
@@ -162,7 +162,7 @@ export function beginProviderAuthorizationWatch(
   return stopProviderAuthorizationWatch.bind(null, timers);
 }
 
-export function stopProviderAuthorizationWatch(
+function stopProviderAuthorizationWatch(
   timers: ProviderAuthorizationTimers,
 ): void {
   window.clearInterval(timers.poll);
@@ -179,7 +179,7 @@ export function cancelProviderAuthorization(
   context.setFeedback(null);
 }
 
-export function pendingAuthorizationMutation(
+function pendingAuthorizationMutation(
   pending: PendingProviderAuthorization,
 ): OrganisationMutation {
   switch (pending.kind) {
@@ -248,13 +248,13 @@ export function beginCodexAuthorizationPolling(
   return stopSettingsInterval.bind(null, timer);
 }
 
-export type ProviderCompletionMessageBase = {
+type ProviderCompletionMessageBase = {
   readonly type: "satyr.provider-attempt.completed";
   readonly attempt_id: string;
   readonly provider: string | null;
 };
 
-export type ProviderCompletionMessage =
+type ProviderCompletionMessage =
   | (ProviderCompletionMessageBase & {
       readonly terminal_state: "connected" | "cancelled" | "expired";
       readonly failure_reason_code: null;
@@ -268,9 +268,9 @@ export type ProviderCompletionMessage =
 // provider consent pages are adopting Cross-Origin-Opener-Policy, which
 // severs window.opener once enforced. Must match the channel name in
 // services/platform/src/control/routes/integrations.ts.
-export const PROVIDER_ATTEMPT_CHANNEL = "satyr-provider-attempt";
+const PROVIDER_ATTEMPT_CHANNEL = "satyr-provider-attempt";
 
-export type ProviderCompletionContext = {
+type ProviderCompletionContext = {
   readonly props: IntegrationsRouteProps;
   readonly requestRevision: { current: number };
   readonly setContent: React.Dispatch<
@@ -326,7 +326,7 @@ export function beginProviderCompletionListener(
   );
 }
 
-export function removeProviderCompletionListener(
+function removeProviderCompletionListener(
   context: ProviderCompletionContext,
   windowListener: (event: MessageEvent<unknown>) => void,
   channelListener: (event: MessageEvent<unknown>) => void,
@@ -337,7 +337,7 @@ export function removeProviderCompletionListener(
   context.channel.close();
 }
 
-export function handleProviderCompletion(
+function handleProviderCompletion(
   context: ProviderCompletionContext,
   event: MessageEvent<unknown>,
 ): void {
@@ -353,7 +353,7 @@ export function handleProviderCompletion(
   processProviderCompletion(context, completion);
 }
 
-export function handleProviderChannelCompletion(
+function handleProviderChannelCompletion(
   context: ProviderCompletionContext,
   event: MessageEvent<unknown>,
 ): void {
@@ -363,7 +363,7 @@ export function handleProviderChannelCompletion(
   processProviderCompletion(context, completion);
 }
 
-export function providerCompletionAck(completion: ProviderCompletionMessage): {
+function providerCompletionAck(completion: ProviderCompletionMessage): {
   readonly type: "satyr.provider-attempt.ack";
   readonly attempt_id: string;
 } {
@@ -376,7 +376,7 @@ export function providerCompletionAck(completion: ProviderCompletionMessage): {
 // Acknowledged before the reload: the ack only means "the portal heard you",
 // and the popup should not stay open for the length of a data refresh. The
 // popup re-sends until acknowledged, so completions dedupe by attempt.
-export function processProviderCompletion(
+function processProviderCompletion(
   context: ProviderCompletionContext,
   completion: ProviderCompletionMessage,
 ): void {
@@ -437,7 +437,7 @@ export function processProviderCompletion(
   );
 }
 
-export function providerCompletionFailureMessage(
+function providerCompletionFailureMessage(
   completion: VariantBy<ProviderCompletionMessage, "terminal_state", "failed">,
 ): string {
   if (completion.provider === "whatsapp") {
@@ -456,14 +456,14 @@ export function providerCompletionFailureMessage(
   return `${providerCompletionProviderLabel(completion.provider, "Connection")} wasn’t connected. Review the provider window and try again.`;
 }
 
-export function providerCompletionProviderLabel(
+function providerCompletionProviderLabel(
   provider: string | null,
   fallback: string,
 ): string {
   return provider === null ? fallback : providerLabel(provider);
 }
 
-export function parseFileContextProvider(
+function parseFileContextProvider(
   provider: string | null,
 ): FileContextProvider | null {
   return provider === "dropbox" || provider === "google_drive"
@@ -471,7 +471,7 @@ export function parseFileContextProvider(
     : null;
 }
 
-export function parseProviderCompletionMessage(
+function parseProviderCompletionMessage(
   raw: unknown,
 ): ProviderCompletionMessage | null {
   if (
@@ -515,13 +515,13 @@ export function parseProviderCompletionMessage(
   }
 }
 
-export function isProviderAuthorizationWindow(
+function isProviderAuthorizationWindow(
   source: MessageEventSource | null,
 ): source is Window {
   return source !== null && "closed" in source;
 }
 
-export function pollCodexAuthorization(
+function pollCodexAuthorization(
   props: IntegrationsRouteProps,
   requestRevision: { current: number },
   setContent: React.Dispatch<
@@ -531,7 +531,7 @@ export function pollCodexAuthorization(
   void loadIntegrationsRoute(props, requestRevision, setContent);
 }
 
-export function stopSettingsInterval(timer: number): void {
+function stopSettingsInterval(timer: number): void {
   window.clearInterval(timer);
 }
 

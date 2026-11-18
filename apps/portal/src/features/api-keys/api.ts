@@ -43,12 +43,12 @@ export const GRANTABLE_SCOPES = Object.keys(
 ) as readonly GrantableScope[];
 
 /** A new key and its secret. The Platform answers the secret one time only. */
-export type IssuedCommerceApiKey = Readonly<{
+type IssuedCommerceApiKey = Readonly<{
   apiKey: CommerceApiKey;
   key: string | null;
 }>;
 
-export function keysPath(organisationId: string): string {
+function keysPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/api-keys`;
 }
 

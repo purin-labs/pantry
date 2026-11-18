@@ -1,6 +1,6 @@
 import type { Result } from "../result";
 
-export type ReplyStreamProjection =
+type ReplyStreamProjection =
   | { readonly kind: "pending" }
   | { readonly kind: "buffered_action" }
   | { readonly kind: "reply"; readonly text: string };

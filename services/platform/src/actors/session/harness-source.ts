@@ -250,14 +250,14 @@ export async function normalizeBakerySurfaceContext(
   return { ok: true, value: parsed.value };
 }
 
-export function embeddedHarnessAdapterSupportsModel(
+function embeddedHarnessAdapterSupportsModel(
   adapter: EmbeddedHarnessAdapter,
   model: string,
 ): boolean {
   return model === adapter.manifest.model;
 }
 
-export function selectRuntimeForHarnessCatalog(
+function selectRuntimeForHarnessCatalog(
   runtime: CanonicalEmbeddedHarnessRuntimeSource,
   currentCatalogDigest: string,
 ): CanonicalEmbeddedHarnessRuntimeSource {

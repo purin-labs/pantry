@@ -217,11 +217,11 @@ export type InPersonCheckoutPlan = Readonly<{
   pluginFailures?: readonly PluginFunctionFailure[];
 }>;
 
-export type InPersonCheckoutPlanResult =
+type InPersonCheckoutPlanResult =
   | Readonly<{ kind: "planned"; value: InPersonCheckoutPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type PickupCheckoutPlanResult =
+type PickupCheckoutPlanResult =
   | Readonly<{ kind: "planned"; value: PickupCheckoutPlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
@@ -2213,7 +2213,7 @@ export function storefrontPercentageTax(
   return total === undefined ? undefined : { tax, total };
 }
 
-export function percentageOfMinorUnits(
+function percentageOfMinorUnits(
   amountMinor: number,
   basisPoints: number,
 ): number | undefined {

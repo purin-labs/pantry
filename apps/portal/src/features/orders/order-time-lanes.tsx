@@ -44,7 +44,7 @@ function endOf(order: OrderTime, clock: number): number {
 }
 
 /** The time the order ran past its promise, or zero. */
-export function lateBy(order: OrderTime, clock: number): number {
+function lateBy(order: OrderTime, clock: number): number {
   if (order.expectedBy === null || order.stage === "cancelled") return 0;
   return Math.max(endOf(order, clock) - Date.parse(order.expectedBy), 0);
 }
@@ -135,7 +135,7 @@ function orderItem(
   };
 }
 
-export function OrderTimeLanes(props: {
+function OrderTimeLanes(props: {
   readonly control: PeriodControl;
   readonly clock: number;
   readonly orders: readonly OrderTime[];
@@ -225,7 +225,7 @@ export function OrderTimeLanes(props: {
 }
 
 /** The order times of a period. It reads when it opens and on each change. */
-export function OrderTimes(props: {
+function OrderTimes(props: {
   readonly organisationId: string;
   readonly onOpen: (orderId: string) => void;
 }): React.ReactNode {

@@ -33,7 +33,7 @@ export type ConversationSharingCommand = Readonly<{
   expectedRevision: number;
   expectedProjectAccessRevision: number;
 }>;
-export type ConversationSharingResult =
+type ConversationSharingResult =
   | ChatDisclosureFailure
   | Readonly<{ kind: "accepted"; revision: number }>
   | Readonly<{

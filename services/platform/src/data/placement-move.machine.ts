@@ -168,16 +168,3 @@ export const PLACEMENT_MOVE_MACHINE = {
   states: PLACEMENT_MOVE_STATES,
   transitions: PLACEMENT_MOVE_TRANSITIONS,
 } as const satisfies MachineDefinition;
-
-/** The same machine on the restore journal, `state_object_restore`. */
-export const PLACEMENT_RESTORE_MOVE_MACHINE = {
-  name: "placement_move_restore",
-  owner: "services/platform/src/data/placement-move.ts",
-  store: {
-    table: "state_object_restore",
-    key: "restore_id",
-    column: "status",
-  },
-  states: PLACEMENT_MOVE_STATES,
-  transitions: PLACEMENT_MOVE_TRANSITIONS,
-} as const satisfies MachineDefinition;

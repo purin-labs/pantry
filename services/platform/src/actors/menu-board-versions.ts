@@ -12,7 +12,7 @@ import type { UserId } from "../ids";
  * the change at once.
  */
 
-export type MenuBoardVersionKind =
+type MenuBoardVersionKind =
   | "created"
   | "named"
   | "published"
@@ -20,9 +20,9 @@ export type MenuBoardVersionKind =
   | "auto";
 
 /** A board keeps at most this many versions. */
-export const MENU_BOARD_VERSION_LIMIT = 40;
+const MENU_BOARD_VERSION_LIMIT = 40;
 /** An edit after this quiet time first saves the board as it was. */
-export const MENU_BOARD_AUTO_VERSION_MS = 10 * 60_000;
+const MENU_BOARD_AUTO_VERSION_MS = 10 * 60_000;
 export const MENU_BOARD_VERSION_LABEL_LIMIT = 80;
 
 export function createMenuBoardVersionSchema(sql: SqlStorage): void {
@@ -43,7 +43,7 @@ export function createMenuBoardVersionSchema(sql: SqlStorage): void {
   );
 }
 
-export type MenuBoardVersionInput = Readonly<{
+type MenuBoardVersionInput = Readonly<{
   boardId: string;
   versionId: string;
   kind: MenuBoardVersionKind;

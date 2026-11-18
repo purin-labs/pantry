@@ -25,7 +25,7 @@ import type { InventoryLotLifecycle } from "./records/commerce-records.ts";
 import type { PurchaseRequestStatus } from "./records/lifecycle-states.ts";
 import type { CommerceMachineDefinition } from "./state-machine.ts";
 
-export const CHECKOUT_PROFILE_MACHINE = {
+const CHECKOUT_PROFILE_MACHINE = {
   name: "checkout_profile",
   lifecycle: "CheckoutProfileLifecycle",
   stateType: "tagged",
@@ -92,7 +92,7 @@ export const CHECKOUT_PROFILE_MACHINE = {
   CheckoutProfileLifecycle["state"]
 >;
 
-export const DISCOUNT_MACHINE = {
+const DISCOUNT_MACHINE = {
   name: "discount",
   lifecycle: "DiscountStatus",
   stateType: "plain",
@@ -125,7 +125,7 @@ export const DISCOUNT_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<DiscountStatus>;
 
-export const CHECKOUT_MACHINE = {
+const CHECKOUT_MACHINE = {
   name: "checkout",
   lifecycle: "CheckoutLifecycle",
   stateType: "tagged",
@@ -223,7 +223,7 @@ export const CHECKOUT_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<CheckoutLifecycle["state"]>;
 
-export const PAYMENT_ATTEMPT_MACHINE = {
+const PAYMENT_ATTEMPT_MACHINE = {
   name: "payment_attempt",
   lifecycle: "CheckoutPaymentAttemptLifecycle",
   stateType: "tagged",
@@ -287,7 +287,7 @@ export const PAYMENT_ATTEMPT_MACHINE = {
   CheckoutPaymentAttemptLifecycle["state"]
 >;
 
-export const PAYMENT_MACHINE = {
+const PAYMENT_MACHINE = {
   name: "payment",
   lifecycle: "PaymentLifecycle",
   stateType: "tagged",
@@ -371,7 +371,7 @@ export const PAYMENT_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<PaymentLifecycle["state"]>;
 
-export const PAYMENT_DISPUTE_MACHINE = {
+const PAYMENT_DISPUTE_MACHINE = {
   name: "payment_dispute",
   lifecycle: "PaymentDisputeLifecycle",
   stateType: "tagged",
@@ -422,7 +422,7 @@ export const PAYMENT_DISPUTE_MACHINE = {
   PaymentDisputeLifecycle["state"]
 >;
 
-export const ORDER_MACHINE = {
+const ORDER_MACHINE = {
   name: "order",
   lifecycle: "OrderLifecycle",
   stateType: "tagged",
@@ -576,7 +576,7 @@ export const ORDER_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<OrderLifecycle["state"]>;
 
-export const DRAFT_ORDER_MACHINE = {
+const DRAFT_ORDER_MACHINE = {
   name: "draft_order",
   lifecycle: "DraftOrderState",
   stateType: "plain",
@@ -628,7 +628,7 @@ export const DRAFT_ORDER_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<DraftOrderState>;
 
-export const PICKUP_FULFILLMENT_MACHINE = {
+const PICKUP_FULFILLMENT_MACHINE = {
   name: "pickup_fulfillment",
   lifecycle: "PickupFulfillmentLifecycle",
   stateType: "tagged",
@@ -696,7 +696,7 @@ export const PICKUP_FULFILLMENT_MACHINE = {
   PickupFulfillmentLifecycle["state"]
 >;
 
-export const SHIPPING_FULFILLMENT_MACHINE = {
+const SHIPPING_FULFILLMENT_MACHINE = {
   name: "shipping_fulfillment",
   lifecycle: "ShippingFulfillmentLifecycle",
   stateType: "tagged",
@@ -746,7 +746,7 @@ export const SHIPPING_FULFILLMENT_MACHINE = {
   ShippingFulfillmentLifecycle["state"]
 >;
 
-export const SHIPMENT_MACHINE = {
+const SHIPMENT_MACHINE = {
   name: "shipment",
   lifecycle: "FirstPartyShipmentLifecycle",
   stateType: "tagged",
@@ -797,7 +797,7 @@ export const SHIPMENT_MACHINE = {
   FirstPartyShipmentLifecycle["state"]
 >;
 
-export const REFUND_ATTEMPT_MACHINE = {
+const REFUND_ATTEMPT_MACHINE = {
   name: "refund_attempt",
   lifecycle: "RefundAttemptLifecycle",
   stateType: "tagged",
@@ -874,7 +874,7 @@ export const REFUND_ATTEMPT_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<RefundAttemptLifecycle["state"]>;
 
-export const RETURN_MACHINE = {
+const RETURN_MACHINE = {
   name: "return",
   lifecycle: "ReturnState",
   stateType: "plain",
@@ -937,7 +937,7 @@ export const RETURN_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<ReturnState>;
 
-export const CUSTOMER_MACHINE = {
+const CUSTOMER_MACHINE = {
   name: "customer",
   lifecycle: "CustomerState",
   stateType: "plain",
@@ -967,7 +967,7 @@ export const CUSTOMER_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<CustomerState>;
 
-export const STORED_VALUE_ACCOUNT_MACHINE = {
+const STORED_VALUE_ACCOUNT_MACHINE = {
   name: "stored_value_account",
   lifecycle: "StoredValueAccountStatus",
   stateType: "plain",
@@ -1012,7 +1012,7 @@ export const STORED_VALUE_ACCOUNT_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<StoredValueAccountStatus>;
 
-export const WEBHOOK_SUBSCRIPTION_MACHINE = {
+const WEBHOOK_SUBSCRIPTION_MACHINE = {
   name: "webhook_subscription",
   lifecycle: "WebhookSubscriptionState",
   stateType: "plain",
@@ -1057,7 +1057,7 @@ export const WEBHOOK_SUBSCRIPTION_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<WebhookSubscriptionState>;
 
-export const PLUGIN_MACHINE = {
+const PLUGIN_MACHINE = {
   name: "plugin",
   lifecycle: "PluginState",
   stateType: "plain",
@@ -1109,7 +1109,7 @@ export const PLUGIN_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<PluginState>;
 
-export const UNPLACED_CAPTURE_MACHINE = {
+const UNPLACED_CAPTURE_MACHINE = {
   name: "unplaced_capture",
   lifecycle: "UnplacedCaptureLifecycle",
   stateType: "tagged",
@@ -1140,7 +1140,7 @@ export const UNPLACED_CAPTURE_MACHINE = {
   UnplacedCaptureLifecycle["state"]
 >;
 
-export const CREDENTIAL_MACHINE = {
+const CREDENTIAL_MACHINE = {
   name: "credential",
   lifecycle: "CredentialState",
   stateType: "plain",
@@ -1179,7 +1179,7 @@ export const CREDENTIAL_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<CredentialState>;
 
-export const PREPARATION_TICKET_MACHINE = {
+const PREPARATION_TICKET_MACHINE = {
   name: "preparation_ticket",
   lifecycle: "PreparationTicketLifecycle",
   stateType: "tagged",
@@ -1231,7 +1231,7 @@ export const PREPARATION_TICKET_MACHINE = {
   PreparationTicketLifecycle["state"]
 >;
 
-export const INVENTORY_ALLOCATION_MACHINE = {
+const INVENTORY_ALLOCATION_MACHINE = {
   name: "inventory_allocation",
   lifecycle: "InventoryAllocationLifecycle",
   stateType: "tagged",
@@ -1297,7 +1297,7 @@ export const INVENTORY_ALLOCATION_MACHINE = {
   InventoryAllocationLifecycle["state"]
 >;
 
-export const STOCK_LOT_MACHINE = {
+const STOCK_LOT_MACHINE = {
   name: "stock_lot",
   lifecycle: "InventoryLotLifecycle",
   stateType: "tagged",
@@ -1363,7 +1363,7 @@ export const STOCK_LOT_MACHINE = {
   ],
 } as const satisfies CommerceMachineDefinition<InventoryLotLifecycle["state"]>;
 
-export const PURCHASE_REQUEST_MACHINE = {
+const PURCHASE_REQUEST_MACHINE = {
   name: "purchase_request",
   lifecycle: "PurchaseRequestStatus",
   stateType: "plain",

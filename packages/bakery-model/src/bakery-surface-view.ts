@@ -53,7 +53,7 @@ export type BakeryWorkspaceViewAction = StrictUnion<
   | Readonly<{ kind: "setChrome"; chrome: BakeryShiftView["chrome"] }>
 >;
 
-export function shiftDock(raw: unknown): raw is BakeryShiftDock {
+function shiftDock(raw: unknown): raw is BakeryShiftDock {
   return (
     raw === "closed" ||
     raw === "workflow" ||

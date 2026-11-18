@@ -31,7 +31,7 @@ import {
   type PantryServiceTenantBinding,
 } from "./provisioning-boundary";
 
-export type PantryProvisionResult =
+type PantryProvisionResult =
   | Readonly<{ kind: "accepted"; value: PantryProvisionApplied }>
   | Readonly<{
       kind: "rejected";
@@ -45,7 +45,7 @@ export type PantryProvisionResult =
     }>;
 
 /** This evidence binds attachment to the existing native owner and tenant identity. */
-export async function pantryOrganisationAttachmentEvidence(
+async function pantryOrganisationAttachmentEvidence(
   nativeScope: PantryNativeScope,
   owner: Readonly<{ issuer: string; subject: string }>,
 ): Promise<Readonly<{ sourceRecordId: string; sourceDigest: string }>> {
@@ -467,7 +467,7 @@ async function findVerifiedNativeUser(
   return userId.ok ? resolveUser({ db: database, userId: userId.value }) : null;
 }
 
-export async function readProvisionReplay(
+async function readProvisionReplay(
   database: GlobalDatabase,
   operationId: string,
   digest: string,

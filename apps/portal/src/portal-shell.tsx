@@ -38,11 +38,11 @@ import type { Membership } from "@seams/control-api/portal/portal-types";
 import type { PortalOrganisation, PortalState } from "./portal-types";
 import "./portal-brand.css";
 
-export function reloadPortalPage(): void {
+function reloadPortalPage(): void {
   window.location.reload();
 }
 
-export function onboardingStepLabel(step: OnboardingStepProjection["step"]): string {
+function onboardingStepLabel(step: OnboardingStepProjection["step"]): string {
   switch (step) {
     case "workspace":
       return "Workspace";
@@ -61,7 +61,7 @@ export function onboardingStepLabel(step: OnboardingStepProjection["step"]): str
   }
 }
 
-export function onboardingStepHref(
+function onboardingStepHref(
   organisationHandle: string,
   workspaceHandle: string,
   step: OnboardingStepProjection["step"],
@@ -82,7 +82,7 @@ export function onboardingStepHref(
   }
 }
 
-export function googleSignInHref(): string {
+function googleSignInHref(): string {
   const returnTo = window.location.pathname + window.location.search;
   return (
     "/v1/control/auth/google/start?" +
@@ -139,7 +139,7 @@ export function SignIn(): React.ReactNode {
   );
 }
 
-export function GoogleMark(): React.ReactNode {
+function GoogleMark(): React.ReactNode {
   return (
     <svg className="google-mark" viewBox="0 0 18 18" aria-hidden="true">
       <path
@@ -333,7 +333,7 @@ export function renderRouteNotFound(
   );
 }
 
-export function renderNotFoundOrganisationSidebarFooter(
+function renderNotFoundOrganisationSidebarFooter(
   organisation: PortalOrganisation,
 ): React.ReactNode {
   return (
@@ -395,7 +395,7 @@ export function renderWorkspaceSidebarFooter(
   );
 }
 
-export function renderRailStep(
+function renderRailStep(
   organisationHandle: string,
   workspaceHandle: string,
   step: OnboardingStepProjection,
@@ -423,7 +423,7 @@ export async function loadOrganisationListItems(
   return organisations.map(toOrganisationListItem);
 }
 
-export function toOrganisationListItem(
+function toOrganisationListItem(
   item: PortalOrganisation,
 ): OrganisationListItem {
   return {

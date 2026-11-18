@@ -126,7 +126,7 @@ export type CommerceGraphSource = Readonly<{
   >;
 }>;
 
-export type CommerceSourceOptions = Readonly<{
+type CommerceSourceOptions = Readonly<{
   organisationId: string;
   merchantId: string;
   integrationAccountId: string;

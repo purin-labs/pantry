@@ -78,14 +78,14 @@ export type EmailDraftRead =
       observedAt: number;
       draft: EmailDraftSnapshot;
     }>;
-export type EmailDraftReview = Readonly<{
+type EmailDraftReview = Readonly<{
   reviewId: string;
   documentId: typeof EMAIL_DRAFT_ID;
   documentRevision: number;
   reviewedAt: number;
   draft: EmailDraftSnapshot;
 }>;
-export type EmailDraftSharedThread = Readonly<{
+type EmailDraftSharedThread = Readonly<{
   caseId: CaseId;
   integrationAccountId: IntegrationAccountId;
   conversationId: string;

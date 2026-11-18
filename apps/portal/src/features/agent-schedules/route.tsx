@@ -104,7 +104,7 @@ export function AgentSchedulesPanel(props: {
 }
 
 /** The agents with a schedule, and their runs and planned windows. */
-export function scheduleLanes(
+function scheduleLanes(
   snapshot: AgentOperationsSnapshot,
   day: ScheduleRunsDay,
   period: TimePeriod,

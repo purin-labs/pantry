@@ -64,7 +64,7 @@ export function decimalToMinorUnits(
   return Number.isSafeInteger(minor) ? minor : null;
 }
 
-export function currencyMinorDigits(currency: string): number {
+function currencyMinorDigits(currency: string): number {
   try {
     const digits = new Intl.NumberFormat("en-US", {
       style: "currency",

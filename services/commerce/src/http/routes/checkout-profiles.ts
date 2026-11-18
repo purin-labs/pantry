@@ -143,7 +143,7 @@ export async function handleCheckoutProfile(
   }
 }
 
-export function executeCheckoutProfileCommand(
+function executeCheckoutProfileCommand(
   authority: CommerceAuthority,
   route: Exclude<
     CheckoutProfileRoute,
@@ -216,7 +216,7 @@ export function executeCheckoutProfileCommand(
   }
 }
 
-export function checkoutProfileCommandResponse(
+function checkoutProfileCommandResponse(
   result: CheckoutProfileCommandResult<unknown>,
 ): Response {
   if (result.ok) return jsonResponse(200, result.value);
@@ -240,6 +240,6 @@ export function checkoutProfileCommandResponse(
   }
 }
 
-export function requireProfilePath(matches: boolean): void {
+function requireProfilePath(matches: boolean): void {
   if (!matches) throw new Error("Checkout profile path and command must match");
 }

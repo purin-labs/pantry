@@ -7,7 +7,7 @@ import { controlRead } from "../../control-client";
 import type { VariantBy } from "@seams/type-utils";
 import { type CheckoutProfileSummary, parseProfileMutation, parseProfileSummary, requireExactKeys, requireObject } from "@seams/control-api/portal/checkout-profiles";
 
-export type CheckoutProfileWithLifecycle<
+type CheckoutProfileWithLifecycle<
   TState extends CheckoutProfile["lifecycle"]["state"],
 > = Omit<CheckoutProfile, "lifecycle"> &
   Readonly<{
@@ -25,7 +25,7 @@ export type DraftCheckoutProfileSummary =
 export type PublishedCheckoutProfileSummary =
   CheckoutProfileSummaryWithLifecycle<"published">;
 
-export type RetiredCheckoutProfileSummary =
+type RetiredCheckoutProfileSummary =
   CheckoutProfileSummaryWithLifecycle<"retired">;
 
 export type CheckoutProfileCollection = Readonly<{
@@ -34,7 +34,7 @@ export type CheckoutProfileCollection = Readonly<{
   storefrontIds: readonly string[];
 }>;
 
-export type CheckoutProfileActivationResult = Readonly<{
+type CheckoutProfileActivationResult = Readonly<{
   profile: PublishedCheckoutProfileSummary;
   activation: CommerceCheckoutProfileActivationV1;
 }>;
@@ -186,7 +186,7 @@ export async function activateCheckoutProfile(
   return { profile: requirePublishedSummary(summary), activation };
 }
 
-export function requireDraftSummary(
+function requireDraftSummary(
   summary: CheckoutProfileSummary,
 ): DraftCheckoutProfileSummary {
   if (!isDraftSummary(summary)) {
@@ -195,7 +195,7 @@ export function requireDraftSummary(
   return summary;
 }
 
-export function requirePublishedSummary(
+function requirePublishedSummary(
   summary: CheckoutProfileSummary,
 ): PublishedCheckoutProfileSummary {
   if (!isPublishedSummary(summary)) {
@@ -204,7 +204,7 @@ export function requirePublishedSummary(
   return summary;
 }
 
-export function requireRetiredSummary(
+function requireRetiredSummary(
   summary: CheckoutProfileSummary,
 ): RetiredCheckoutProfileSummary {
   if (!isRetiredSummary(summary)) {
@@ -213,24 +213,24 @@ export function requireRetiredSummary(
   return summary;
 }
 
-export function isDraftSummary(
+function isDraftSummary(
   summary: CheckoutProfileSummary,
 ): summary is DraftCheckoutProfileSummary {
   return summary.profile.lifecycle.state === "draft";
 }
 
-export function isPublishedSummary(
+function isPublishedSummary(
   summary: CheckoutProfileSummary,
 ): summary is PublishedCheckoutProfileSummary {
   return summary.profile.lifecycle.state === "published";
 }
 
-export function isRetiredSummary(
+function isRetiredSummary(
   summary: CheckoutProfileSummary,
 ): summary is RetiredCheckoutProfileSummary {
   return summary.profile.lifecycle.state === "retired";
 }
 
-export function checkoutProfilesPath(organisationId: string): string {
+function checkoutProfilesPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/checkout-profiles`;
 }

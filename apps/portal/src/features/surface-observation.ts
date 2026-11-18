@@ -44,7 +44,7 @@ export type SurfaceCommandOutcome =
   Readonly<{ kind: "done" }> | Readonly<{ kind: "rejected"; message: string }>;
 
 /** What a page command did, for the receipt that the bridge sends. */
-export type PageCommandResult =
+type PageCommandResult =
   | Readonly<{ kind: "completed"; observation: SurfaceObservationV2 }>
   | Readonly<{ kind: "rejected"; message: string }>
   | Readonly<{ kind: "unavailable"; message: string }>;

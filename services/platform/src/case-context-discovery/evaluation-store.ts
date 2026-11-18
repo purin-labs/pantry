@@ -78,7 +78,7 @@ export function releaseUnissuedCaseContextDiscoveryEvaluation(
   );
 }
 
-export type CaseContextDiscoveryPolicyHead = Readonly<{
+type CaseContextDiscoveryPolicyHead = Readonly<{
   revision: number;
   policy: CaseContextDiscoveryPolicy;
 }>;

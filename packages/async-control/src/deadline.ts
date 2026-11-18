@@ -15,7 +15,7 @@ export type DeadlineOutcome<TValue, TCancellation> =
       readonly cancellation: TCancellation;
     };
 
-export type TaskDeadlineInput<TValue, TCancellation> = {
+type TaskDeadlineInput<TValue, TCancellation> = {
   readonly timeoutMs: number;
   readonly start: () => CancellableTask<TValue, TCancellation>;
 };

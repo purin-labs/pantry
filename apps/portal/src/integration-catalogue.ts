@@ -15,7 +15,7 @@ export type Provider = Extract<
   | "whatsapp"
 >;
 
-export type ProviderPresentation = {
+type ProviderPresentation = {
   readonly label: string;
   readonly description: string;
   readonly searchAliases: readonly string[];

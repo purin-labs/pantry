@@ -27,7 +27,7 @@ import {
 const REFRESH_BEFORE_MS = 24 * 60 * 60 * 1_000;
 
 /** The scopes that Commerce's own Square calls use. */
-export const SQUARE_SCOPES_IN_USE: readonly string[] = [
+const SQUARE_SCOPES_IN_USE: readonly string[] = [
   "DEVICE_CREDENTIAL_MANAGEMENT",
   "DEVICES_READ",
   "MERCHANT_PROFILE_READ",
@@ -51,7 +51,7 @@ export type SquareConnectionV1 = Readonly<{
   updatedAt: string;
 }>;
 
-export type SquareLocationV1 = Readonly<{
+type SquareLocationV1 = Readonly<{
   locationId: string;
   name: string;
   country: string;
@@ -60,14 +60,14 @@ export type SquareLocationV1 = Readonly<{
   cardPayments: boolean;
 }>;
 
-export type SquareDeviceV1 = Readonly<{
+type SquareDeviceV1 = Readonly<{
   deviceId: string;
   name: string;
   locationId: string | null;
   status: string;
 }>;
 
-export type SquareDeviceCodeV1 = Readonly<{
+type SquareDeviceCodeV1 = Readonly<{
   deviceCodeId: string;
   code: string;
   name: string;
@@ -81,7 +81,7 @@ export type SquareResult<Value> =
   | Readonly<{ kind: "ok"; value: Value }>
   | Readonly<{ kind: "error"; status: 404 | 409 | 422 | 503; message: string }>;
 
-export type SquareCredential = Readonly<{
+type SquareCredential = Readonly<{
   environment: SquareEnvironment;
   applicationId: string;
   providerAccountId: string;
@@ -735,7 +735,7 @@ export class SquareConnections {
 }
 
 /** A Square location as Square's location object describes it. */
-export function parseLocation(raw: unknown): SquareLocationV1 | undefined {
+function parseLocation(raw: unknown): SquareLocationV1 | undefined {
   if (
     !isRecord(raw) ||
     typeof raw.id !== "string" ||

@@ -43,7 +43,7 @@ import type {
 import { parseCommerceCursorValue } from "@seams/commerce-client";
 import { isRecord } from "@seams/std";
 
-export type LexiconBoundaryError = Readonly<{
+type LexiconBoundaryError = Readonly<{
   kind: "wasm_rejected" | "wasm_response_invalid";
   reason: string;
 }>;

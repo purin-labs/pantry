@@ -42,7 +42,7 @@ import type { SlackCommandRole } from "./ingress-admission";
  * needs a grant to the channel, as every other commerce read in a channel
  * does. The organisation must also have enabled payout reads.
  */
-export type SupplierPayoutReply =
+type SupplierPayoutReply =
   | Readonly<{ kind: "answer"; text: string }>
   /** No grant, policy or audience admits the figures; say so rather than answering. */
   | Readonly<{ kind: "not_permitted" }>;
