@@ -1037,18 +1037,6 @@ it(
 );
 
 it(
-  "drains frozen supplier reply preparation and recovers one review draft on the evicted target",
-  draftReplyPlacementJourney,
-  120_000,
-);
-
-it(
-  "fences supplier Case admission after an issued ensure and retries once on the evicted target",
-  draftAdmissionPlacementJourney,
-  120_000,
-);
-
-it(
   "atomically fences mail admission and workspace writes across relocation and evicted target recovery",
   draftWorkspacePlacementJourney,
   120_000,
@@ -1060,30 +1048,16 @@ it(
   120_000,
 );
 
-it.for(["assignment", "initialization", "begin"] as const)(
+it.for(["initialization", "begin"] as const)(
   "recovers supplier assignment preparation after freeze at %s and target eviction",
   { timeout: 120_000 },
   draftAssignmentPlacementJourney,
 );
 
 type MailboxPlacementBoundary =
-  | "watch_activation"
-  | "watch_renewal"
-  | "watch_reconnect"
-  | "watch_reset"
-  | "watch_stop"
-  | "watch_retry"
-  | "mailbox_search";
+  "watch_reset" | "watch_stop" | "watch_retry" | "mailbox_search";
 
-it.for([
-  "watch_activation",
-  "watch_renewal",
-  "watch_reconnect",
-  "watch_reset",
-  "watch_stop",
-  "watch_retry",
-  "mailbox_search",
-] as const)(
+it.for(["watch_reset", "watch_stop", "watch_retry", "mailbox_search"] as const)(
   "drains mailbox lifecycle %s across relocation and recovers durable watch state after eviction",
   { timeout: 120_000 },
   mailboxPlacementJourney,
@@ -1146,21 +1120,13 @@ async function verifyMailboxPlacement(
       ),
     );
   }
-  if (boundary === "watch_activation" || boundary === "watch_reset") {
+  if (boundary === "watch_reset") {
     network.use(
       http.get(
         "https://gmail.googleapis.com/gmail/v1/users/me/profile",
         freshMailboxProfile,
       ),
     );
-  }
-  if (boundary === "watch_activation") {
-    expect(
-      await input.connector.disableEmailProcessing({
-        identity: input.identity,
-        now: Date.now(),
-      }),
-    ).toEqual({ ok: true, value: null });
   }
   const work = runMailboxPlacementCommand(
     boundary,
@@ -1224,23 +1190,11 @@ async function verifyMailboxPlacement(
       });
     } else if (boundary === "watch_retry") {
       expect(frozen.cleanupAt).toBeTypeOf("number");
-    } else if (
-      boundary === "watch_activation" ||
-      boundary === "watch_renewal"
-    ) {
-      expect(frozen).toMatchObject({
-        runtime: { disabledAt: null, watchExpiresAt: provider.expiration },
-      });
     }
-    if (boundary === "watch_activation" || boundary === "watch_reset") {
+    if (boundary === "watch_reset") {
       expect(frozen.runtime).toMatchObject({
         activationFloor: "200",
         acceptedHistoryId: "200",
-      });
-    } else if (boundary === "watch_reconnect" || boundary === "watch_renewal") {
-      expect(frozen.runtime).toMatchObject({
-        activationFloor: runtime.activationFloor,
-        acceptedHistoryId: runtime.acceptedHistoryId,
       });
     }
     await relocation;
@@ -1322,13 +1276,7 @@ async function verifyMailboxPlacement(
     const expectedDeletes =
       boundary === "watch_stop" || boundary === "watch_retry" ? 1 : 0;
     expect(provider).toMatchObject({
-      starts:
-        boundary === "watch_activation" ||
-        boundary === "watch_renewal" ||
-        boundary === "watch_reconnect" ||
-        boundary === "watch_reset"
-          ? 1
-          : 0,
+      starts: boundary === "watch_reset" ? 1 : 0,
       stops: expectedStops,
       deletes: expectedDeletes,
     });
@@ -1367,23 +1315,13 @@ function runMailboxPlacementCommand(
 ) {
   const request = { identity: input.identity, now: Date.now() };
   switch (boundary) {
-    case "watch_activation":
-      return connector.activateEmailProcessing({
-        ...request,
-        integrationAccountId: runtime.integrationAccountId,
-        policyVersion: runtime.policyVersion,
-        limits: runtime.limits,
-      });
-    case "watch_renewal":
-      return connector.renewEmailWatch(request);
-    case "watch_reconnect":
     case "watch_reset":
       return connector.reconnectEmailProcessing({
         ...request,
         integrationAccountId: runtime.integrationAccountId,
         policyVersion: runtime.policyVersion,
         limits: runtime.limits,
-        resetCursor: boundary === "watch_reset",
+        resetCursor: true,
       });
     case "watch_stop":
     case "watch_retry":
@@ -1542,19 +1480,12 @@ function advanceWatchCleanupClock(
 }
 
 type ProposalPlacementBoundary =
-  | "review"
-  | "edit"
-  | "correction"
-  | "send_preflight"
-  | "send"
-  | "reconcile"
-  | "cleanup";
+  "review" | "edit" | "correction" | "send" | "reconcile" | "cleanup";
 
 it.for([
   "review",
   "edit",
   "correction",
-  "send_preflight",
   "send",
   "reconcile",
   "cleanup",
@@ -1575,14 +1506,6 @@ function draftOnlyJourney(context: TestContext): Promise<void> {
   return runDraftOnlyJourney("full", context);
 }
 
-function draftReplyPlacementJourney(context: TestContext): Promise<void> {
-  return runDraftOnlyJourney("placement", context);
-}
-
-function draftAdmissionPlacementJourney(context: TestContext): Promise<void> {
-  return runDraftOnlyJourney("admission", context);
-}
-
 function draftWorkspacePlacementJourney(context: TestContext): Promise<void> {
   return runDraftOnlyJourney("workspace", context);
 }
@@ -1592,7 +1515,7 @@ function draftExecutionPlacementJourney(context: TestContext): Promise<void> {
 }
 
 function draftAssignmentPlacementJourney(
-  boundary: "assignment" | "initialization" | "begin",
+  boundary: "initialization" | "begin",
   context: TestContext,
 ): Promise<void> {
   return runDraftOnlyJourney(boundary, context);
@@ -2025,7 +1948,7 @@ async function verifyProposalPlacement(
         input,
       );
       expect(resumed.ok).toBe(true);
-      if (boundary === "send" || boundary === "send_preflight") {
+      if (boundary === "send") {
         expect(resumed).toMatchObject({
           value: { kind: "sent", providerMessageId: "gmail_reviewed_receipt" },
         });
@@ -2039,7 +1962,6 @@ async function verifyProposalPlacement(
     }
     const expectedSends =
       boundary === "send" ||
-      boundary === "send_preflight" ||
       boundary === "reconcile" ||
       boundary === "correction"
         ? 1
@@ -2124,7 +2046,6 @@ function runProposalPlacementCommand(
           challenge: "fixture-verified-before-RPC",
         },
       });
-    case "send_preflight":
     case "send":
       return connector.dispatchReviewedEmailReply({
         identity: input.identity,
@@ -2164,7 +2085,6 @@ async function pausedProposalResponse(
   let response: Response;
   switch (boundary) {
     case "review":
-    case "send_preflight":
       response = draftOnlyGmailRead(input.model, request);
       break;
     case "edit":
@@ -2245,7 +2165,7 @@ function advanceProposalMaintenance(
 }
 
 async function verifyDraftAssignmentPlacement(
-  boundary: "assignment" | "initialization" | "begin",
+  boundary: "initialization" | "begin",
   input: Readonly<{
     connector: DurableObjectStub<
       import("../../src/actors/connector").ConnectorDO
@@ -2285,11 +2205,7 @@ async function verifyDraftAssignmentPlacement(
   else
     await runInDurableObject(
       caseActor.value,
-      pauseActorResponse.bind(
-        null,
-        pause,
-        boundary === "assignment" ? "assignSession" : "beginAssignment",
-      ),
+      pauseActorResponse.bind(null, pause, "beginAssignment"),
     );
   await runInDurableObject(input.connector, advanceObservationClock);
   const work = runDurableObjectAlarm(input.connector);
@@ -2343,10 +2259,7 @@ async function verifyDraftAssignmentPlacement(
     });
     expect(
       await runInDurableObject(session.value, inspectAssignmentInitialization),
-    ).toEqual({
-      parents: boundary === "assignment" ? 0 : 1,
-      initializations: boundary === "assignment" ? 0 : 1,
-    });
+    ).toEqual({ parents: 1, initializations: 1 });
     expect(
       await runInDurableObject(input.connector, inspectDraftOwner),
     ).toMatchObject({
@@ -2785,54 +2698,25 @@ async function verifyDraftReplyPlacement(
     connectorId: import("../../src/ids").ConnectorId;
     model: DraftModelFixture;
     context: TestContext;
-    boundary: "hydration" | "admission" | "workspace";
   }>,
 ): Promise<void> {
   const pause: DraftPreparationPause = { phase: "armed" };
-  const workspaceCommit =
-    input.boundary === "workspace"
-      ? await startPausedWorkspaceRevision(input.organisationId)
-      : null;
+  const workspaceCommit = await startPausedWorkspaceRevision(
+    input.organisationId,
+  );
   const head = await runInDurableObject(input.connector, readObservationHead);
   const caseId = parseCaseId(`case_gmail_${head.integrationAccountId}_t1`);
   if (!caseId.ok) throw new Error(caseId.error.code);
-  let sourceCase: DurableObjectStub<
-    import("../../src/actors/case").CaseDO
-  > | null = null;
-  if (input.boundary === "hydration") {
-    network.use(
-      http.get(
-        "https://gmail.googleapis.com/gmail/v1/users/me/*",
-        pausedDraftPreparation.bind(null, pause, input.organisationId, input.model),
-      ),
-    );
-  } else if (input.boundary === "admission") {
-    const resolved = await resolveActiveCaseActor({
-      env,
-      namespace: env.CASE,
-      organisationId: input.organisationId,
-      caseId: caseId.value,
-      now: Date.now(),
-    });
-    if (!resolved.ok) throw new Error(resolved.error.code);
-    sourceCase = resolved.value;
-    await runInDurableObject(
-      sourceCase,
-      pauseActorResponse.bind(null, pause, "ensure"),
-    );
-  } else {
-    await fixtureDatabase().prepare(
-      "DELETE FROM organisation_default_workspace WHERE organisation_id = ?",
-    )
-      .bind(input.organisationId)
-      .run();
-    if (workspaceCommit === null) throw new Error("Missing workspace pause");
-    pauseWorkspaceWriteBatch(
-      pause,
-      workspaceCommit.scope.database,
-      "INSERT OR IGNORE INTO organisation_workspace",
-    );
-  }
+  await fixtureDatabase().prepare(
+    "DELETE FROM organisation_default_workspace WHERE organisation_id = ?",
+  )
+    .bind(input.organisationId)
+    .run();
+  pauseWorkspaceWriteBatch(
+    pause,
+    workspaceCommit.scope.database,
+    "INSERT OR IGNORE INTO organisation_workspace",
+  );
   await runInDurableObject(input.connector, advanceObservationClock);
   const work = runDurableObjectAlarm(input.connector);
   let completion: Promise<unknown> | null = null;
@@ -2869,32 +2753,30 @@ async function verifyDraftReplyPlacement(
       .bind(started.value.relocationId)
       .first<{ total: number }>();
     expect(exported?.total).toBe(0);
-    if (workspaceCommit !== null) {
-      workspaceCommit.pause.phase = "released";
-      expect(await workspaceCommit.work).toMatchObject({
-        ok: false,
-        error: { code: "organisation_placement_conflict" },
-      });
-      await verifyFrozenMailAdmissionWrites(
-        workspaceCommit.scope,
-        head.integrationAccountId,
-        caseId.value,
-      );
-      expect(
-        await fixtureDatabase().prepare(
-          "SELECT COUNT(*) AS total FROM workspace_revision WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
-        )
-          .bind(input.organisationId)
-          .first(),
-      ).toMatchObject({ total: 0 });
-      expect(
-        await fixtureDatabase().prepare(
-          "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
-        )
-          .bind(input.organisationId)
-          .first(),
-      ).toMatchObject({ total: 0 });
-    }
+    workspaceCommit.pause.phase = "released";
+    expect(await workspaceCommit.work).toMatchObject({
+      ok: false,
+      error: { code: "organisation_placement_conflict" },
+    });
+    await verifyFrozenMailAdmissionWrites(
+      workspaceCommit.scope,
+      head.integrationAccountId,
+      caseId.value,
+    );
+    expect(
+      await fixtureDatabase().prepare(
+        "SELECT COUNT(*) AS total FROM workspace_revision WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
+      )
+        .bind(input.organisationId)
+        .first(),
+    ).toMatchObject({ total: 0 });
+    expect(
+      await fixtureDatabase().prepare(
+        "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
+      )
+        .bind(input.organisationId)
+        .first(),
+    ).toMatchObject({ total: 0 });
     pause.phase = "released";
     await work;
     expect(
@@ -2911,19 +2793,13 @@ async function verifyDraftReplyPlacement(
       .bind(input.organisationId)
       .first<{ total: number }>();
     expect(frozenCases?.total).toBe(0);
-    if (workspaceCommit !== null) {
-      expect(
-        await fixtureDatabase().prepare(
-          "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
-        )
-          .bind(input.organisationId)
-          .first(),
-      ).toMatchObject({ total: 0 });
-    }
-    if (sourceCase !== null)
-      expect(
-        await runInDurableObject(sourceCase, admittedMailTriggerCount),
-      ).toBe(0);
+    expect(
+      await fixtureDatabase().prepare(
+        "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
+      )
+        .bind(input.organisationId)
+        .first(),
+    ).toMatchObject({ total: 0 });
     expect(await completion).toMatchObject({
       ok: true,
       value: { status: "retained" },
@@ -2988,63 +2864,61 @@ async function verifyDraftReplyPlacement(
     await evictDurableObject(recovered.value);
     await runDurableObjectAlarm(recovered.value);
     expect(input.model.drafts).toBe(1);
-    if (workspaceCommit !== null) {
-      const targetScope = await requireMailFixtureScope(input.organisationId);
-      const prepared = await prepareWorkspaceRevisionMutation(
-        targetScope,
-        { kind: "placement" },
-        env.ARCHIVE,
-        workspaceCommit.proposal,
-      );
-      if (!prepared.ok) throw new Error(prepared.error.code);
-      expect(
-        await commitWorkspaceRevision(env.ARCHIVE, { ...prepared.value }),
-      ).toMatchObject({
-        ok: false,
-        error: { code: "workspace_revision_input_invalid" },
-      });
-      expect(
-        await commitWorkspaceRevision(env.ARCHIVE, prepared.value),
-      ).toMatchObject({ ok: true, value: { kind: "committed" } });
-      expect(
-        await commitWorkspaceRevision(env.ARCHIVE, prepared.value),
-      ).toMatchObject({ ok: true, value: { kind: "duplicate" } });
-      expect(
-        await commitWorkspaceRevision(env.ARCHIVE, workspaceCommit.prepared),
-      ).toMatchObject({
-        ok: false,
-        error: { code: "organisation_placement_conflict" },
-      });
-      await verifyFrozenMailAdmissionWrites(
-        workspaceCommit.scope,
-        head.integrationAccountId,
-        caseId.value,
-      );
-      expect(
-        await fixtureDatabase().prepare(
-          "SELECT COUNT(*) AS total FROM workspace_revision_receipt WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
-        )
-          .bind(input.organisationId)
-          .first(),
-      ).toMatchObject({ total: 1 });
-      expect(
-        await fixtureDatabase().prepare(
-          "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
-        )
-          .bind(input.organisationId)
-          .first(),
-      ).toMatchObject({ total: 1 });
-      expect(
-        await fixtureDatabase().prepare(
-          "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
-        )
-          .bind(input.organisationId)
-          .first(),
-      ).toMatchObject({ total: 1 });
-    }
+    const targetScope = await requireMailFixtureScope(input.organisationId);
+    const prepared = await prepareWorkspaceRevisionMutation(
+      targetScope,
+      { kind: "placement" },
+      env.ARCHIVE,
+      workspaceCommit.proposal,
+    );
+    if (!prepared.ok) throw new Error(prepared.error.code);
+    expect(
+      await commitWorkspaceRevision(env.ARCHIVE, { ...prepared.value }),
+    ).toMatchObject({
+      ok: false,
+      error: { code: "workspace_revision_input_invalid" },
+    });
+    expect(
+      await commitWorkspaceRevision(env.ARCHIVE, prepared.value),
+    ).toMatchObject({ ok: true, value: { kind: "committed" } });
+    expect(
+      await commitWorkspaceRevision(env.ARCHIVE, prepared.value),
+    ).toMatchObject({ ok: true, value: { kind: "duplicate" } });
+    expect(
+      await commitWorkspaceRevision(env.ARCHIVE, workspaceCommit.prepared),
+    ).toMatchObject({
+      ok: false,
+      error: { code: "organisation_placement_conflict" },
+    });
+    await verifyFrozenMailAdmissionWrites(
+      workspaceCommit.scope,
+      head.integrationAccountId,
+      caseId.value,
+    );
+    expect(
+      await fixtureDatabase().prepare(
+        "SELECT COUNT(*) AS total FROM workspace_revision_receipt WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
+      )
+        .bind(input.organisationId)
+        .first(),
+    ).toMatchObject({ total: 1 });
+    expect(
+      await fixtureDatabase().prepare(
+        "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
+      )
+        .bind(input.organisationId)
+        .first(),
+    ).toMatchObject({ total: 1 });
+    expect(
+      await fixtureDatabase().prepare(
+        "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
+      )
+        .bind(input.organisationId)
+        .first(),
+    ).toMatchObject({ total: 1 });
     Object.assign(input.context.task.meta, {
       supplierReplyPreparationPlacement: {
-        boundary: input.boundary,
+        boundary: "workspace",
         exportsWhilePaused: 0,
         frozenDrafts: 0,
         frozenCases: 0,
@@ -3053,17 +2927,15 @@ async function verifyDraftReplyPlacement(
         retiredSourceRejected: true,
         targetDraftsAfterEviction: 1,
         targetTriggers: 1,
-        atomicWorkspaceWrites: workspaceCommit !== null,
-        atomicEmailProjections: workspaceCommit !== null,
+        atomicWorkspaceWrites: true,
+        atomicEmailProjections: true,
         sends: 0,
       },
     });
   } finally {
     pause.phase = "released";
-    if (workspaceCommit !== null) {
-      workspaceCommit.pause.phase = "released";
-      await Promise.allSettled([workspaceCommit.work]);
-    }
+    workspaceCommit.pause.phase = "released";
+    await Promise.allSettled([workspaceCommit.work]);
     await Promise.allSettled(completion === null ? [work] : [work, completion]);
   }
 }
@@ -3201,8 +3073,7 @@ async function verifyFrozenMailAdmissionWrites(
 
 function pauseActorResponse(
   pause: DraftPreparationPause,
-  method:
-    "ensure" | "assignSession" | "initializeCaseSession" | "beginAssignment",
+  method: "initializeCaseSession" | "beginAssignment",
   actor: object,
 ): void {
   const original = Reflect.get(actor, method);
@@ -3255,31 +3126,6 @@ function draftPreparationPhase(
   return pause.phase;
 }
 
-async function pausedDraftPreparation(
-  pause: DraftPreparationPause,
-  organisationId: OrganisationId,
-  model: DraftModelFixture,
-  input: Parameters<HttpResponseResolver>[0],
-): Promise<Response> {
-  const url = new URL(input.request.url);
-  if (
-    pause.phase === "armed" &&
-    url.pathname.endsWith("/messages/m0") &&
-    url.searchParams.get("format") === "full"
-  ) {
-    const classification = await fixtureDatabase().prepare(
-      "SELECT 1 FROM mail_classification WHERE organisation_id = ? AND message_id = 'm0'",
-    )
-      .bind(organisationId)
-      .first();
-    if (classification !== null) {
-      pause.phase = "paused";
-      while (pause.phase === "paused") await scheduler.wait(5);
-    }
-  }
-  return draftOnlyGmailRead(model, input);
-}
-
 type DraftTurnFixture = Omit<
   EmailThreadTurnInput,
   "connectorSql" | "now" | "scope"
@@ -3300,11 +3146,8 @@ type DraftModelFixture = {
 async function runDraftOnlyJourney(
   scenario:
     | "full"
-    | "placement"
-    | "admission"
     | "workspace"
     | "execution"
-    | "assignment"
     | "initialization"
     | "begin"
     | ProposalPlacementBoundary
@@ -3622,19 +3465,12 @@ async function runDraftOnlyJourney(
     await runInDurableObject(connector.value, inspectDraftOwner),
   ).toMatchObject({ kind: "inbox", state: { kind: "classifying" } });
   if (
-    scenario === "assignment" ||
     scenario === "initialization" ||
     scenario === "begin" ||
     scenario === "execution" ||
-    scenario === "placement" ||
-    scenario === "admission" ||
     scenario === "workspace"
   ) {
-    if (
-      scenario === "assignment" ||
-      scenario === "initialization" ||
-      scenario === "begin"
-    ) {
+    if (scenario === "initialization" || scenario === "begin") {
       await verifyDraftAssignmentPlacement(scenario, {
         connector: connector.value,
         organisationId,
@@ -3663,12 +3499,6 @@ async function runDraftOnlyJourney(
       connectorId: connectorId.value,
       model,
       context: testContext,
-      boundary:
-        scenario === "workspace"
-          ? "workspace"
-          : scenario === "admission"
-            ? "admission"
-            : "hydration",
     });
     return;
   }
@@ -3717,9 +3547,6 @@ async function runDraftOnlyJourney(
       context: testContext,
     };
     if (
-      scenario === "watch_activation" ||
-      scenario === "watch_renewal" ||
-      scenario === "watch_reconnect" ||
       scenario === "watch_reset" ||
       scenario === "watch_stop" ||
       scenario === "watch_retry" ||
