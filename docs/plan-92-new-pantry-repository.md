@@ -338,10 +338,11 @@ only check of its own operation.
 | Origin journeys (`file`, `mail`, `airtable`, `case-proposal`, `message-link`, `action-mutation`) | `2d0f7e0` | 29 → 20 | 149 (24) | The credential decrypt points fold into the later commit point; `action-mutation-origin` keeps its 3 steps |
 | `whatsapp-placement`, `projects`, `checkpoint-restart` | `7795573` | 25 → 22 | 124 (11) | The support read 2 → 1, two Projects share freezes, checkpoint admission 6 → 4 |
 
-**Proof.** Each folded file passes in full: `mail-inbox` 41 tests (216
-seconds), `organisation-case-context-collection-placement` 14,
-`mail-operational-placement` 9, `portal-chat-finalization` 14,
-`remote-mcp` 10, the origin journeys 2 to 5 each, `whatsapp-placement` 11,
+**Proof.** Each folded file passes in full. After the further folds below:
+`mail-inbox` 37 tests (190 seconds),
+`organisation-case-context-collection-placement` 14,
+`mail-operational-placement` 9, `portal-chat-finalization` 13,
+`remote-mcp` 10, the origin journeys 2 to 5 each, `whatsapp-placement` 8,
 `projects` 7 and `checkpoint-restart` 4. The E2E type check is clean.
 
 **The estimate was wrong.** The proposal expected 149 cases to become 34 and
@@ -367,15 +368,29 @@ pauses at these points:
   request digest;
 - the supplier draft's frozen Gmail read and Case ensure.
 
-**Left for the owner.** Further folds would remove the only test of a
-separate product fence, so they did not happen:
-- `whatsapp-placement`: the edit and compose refusals into the credential
-  step, and the panel read with the preview read.
-- `projects`: the four operator edits (rename, pin, draft, read), and the
-  directory create with the move.
-- `mail-inbox`: the five Case context evidence causes that all end with
-  `case_context_collection_evidence_stale`.
-- `portal-chat-finalization`: the catalog commit with the saved-run commit.
+**Further folds.** The first fold kept each step that was the only test of a
+separate product check. The owner then said "do the further folds too" (19
+November 2026), and accepted the loss of those checks. Four commits remove
+543 lines and add 97, and 8 cases and 4 steps go:
+
+| Journey | Commit | Cases | Lines removed (added) | What went |
+|---|---|---|---|---|
+| `portal-chat-finalization` | `3f2879e` | 14 → 13 | 50 (3) | `catalog_commit` folds into `saved_commit`, whose commit crosses more checks |
+| `whatsapp-placement` | `550e1d0` | 11 → 8 | 210 (34) | The edit and compose commit steps fold into `credential`; the preview freeze folds into the panel freeze |
+| `projects` | `22cc1c2` | 7 → 7 | 174 (40) | The rename, draft and read freezes fold into the pin freeze; the move freeze folds into the create freeze |
+| `mail-inbox` | `7e5d1db` | 41 → 37 | 109 (20) | Five stale-evidence causes fold into `provider_erasure`, which passes every send check before the Gmail read |
+
+No case now covers these points:
+- a revocation at the integration catalog commit;
+- the revoked-origin refusal of a WhatsApp proposal edit or of a human
+  compose, and the WhatsApp preview read during a freeze;
+- a freeze of a chat rename, a draft save, a read advance or a chat move;
+- a stale reply after a relationship detach, a direct source erasure, a
+  contact verification revoke or a TypeSafe disconnect (unit tests and the
+  TypeSafe journeys still cover the revoke and the disconnect themselves).
+
+**Both folds together.** 14 journeys go from 170 fault cases to 122, and
+1,514 lines go and 304 come (net 1,210 fewer). No product code changed.
 
 ## Phase 2 results: duplicate code (19 November 2026)
 
