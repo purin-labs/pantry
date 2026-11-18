@@ -1,4 +1,3 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import {
   DEFAULT_FINANCIER_PACK_RECIPE,
@@ -7,6 +6,7 @@ import {
   type FinancierPackLoadPreset,
   type FinancierPackRecipeConfig,
 } from "@seams/production-simulation/recipes/financier-pack/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{
   prepared(recipe: FinancierPackRecipeConfig): void;
@@ -126,68 +126,42 @@ export class FinancierPackRecipeAuthor extends React.Component<Props, State> {
           packs {packed} financiers ({netG} g net) into a gold-ribbon patisserie
           gift box.
         </p>
-        <label>
-          Accepted baked financier load (Plan 61A mass balance)
-          <Select.Root
-            items={LOAD_PRESET_ITEMS}
-            value={this.state.loadPreset}
-            onValueChange={(value) => {
-              if (value === null) return;
-              const loadPreset =
-                value === "single-load-8" ? "single-load-8" : "two-accepted-16";
-              this.setState({
-                loadPreset,
-                boxStyle:
-                  loadPreset === "two-accepted-16"
-                    ? "atelier-15"
-                    : "patisserie-8",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{LOAD_PRESET_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Patisserie gift-box format
-          <Select.Root
-            items={BOX_STYLE_ITEMS}
-            value={this.state.boxStyle}
-            onValueChange={(value) => {
-              if (value === null) return;
-              const boxStyle =
-                value === "patisserie-8" ? "patisserie-8" : "atelier-15";
-              this.setState({ boxStyle });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{BOX_STYLE_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          10-minute internal crumb check sample (23.5 g piece)
-          <Select.Root
-            items={CRUMB_SAMPLE_PIECES_ITEMS}
-            value={String(this.state.crumbSamplePieces)}
-            onValueChange={(value) => {
-              if (value === null) return;
-              this.setState({
-                crumbSamplePieces: value === "0" ? 0 : 1,
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {CRUMB_SAMPLE_PIECES_ITEMS.map(renderItem)}
-            </Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Accepted baked financier load (Plan 61A mass balance)"
+          items={LOAD_PRESET_ITEMS}
+          value={this.state.loadPreset}
+          choose={(value) => {
+            const loadPreset =
+              value === "single-load-8" ? "single-load-8" : "two-accepted-16";
+            this.setState({
+              loadPreset,
+              boxStyle:
+                loadPreset === "two-accepted-16"
+                  ? "atelier-15"
+                  : "patisserie-8",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Patisserie gift-box format"
+          items={BOX_STYLE_ITEMS}
+          value={this.state.boxStyle}
+          choose={(value) => {
+            const boxStyle =
+              value === "patisserie-8" ? "patisserie-8" : "atelier-15";
+            this.setState({ boxStyle });
+          }}
+        />
+        <RecipeChoice
+          label="10-minute internal crumb check sample (23.5 g piece)"
+          items={CRUMB_SAMPLE_PIECES_ITEMS}
+          value={String(this.state.crumbSamplePieces)}
+          choose={(value) => {
+            this.setState({
+              crumbSamplePieces: value === "0" ? 0 : 1,
+            });
+          }}
+        />
         <label>
           Wire-grid cooling duration before packaging (minutes)
           <input
@@ -201,38 +175,20 @@ export class FinancierPackRecipeAuthor extends React.Component<Props, State> {
             }
           />
         </label>
-        <label>
-          Process check
-          <Select.Root
-            items={CHECK_ITEMS}
-            value={this.state.check}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                check:
-                  v === "warm-demould" || v === "underweight-box" ? v : "none",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{CHECK_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Process check"
+          items={CHECK_ITEMS}
+          value={this.state.check}
+          choose={(v) => {
+            this.setState({
+              check:
+                v === "warm-demould" || v === "underweight-box" ? v : "none",
+            });
+          }}
+        />
         <button type="submit">Prepare Financier pack station</button>
         <p role="status">{this.state.notice}</p>
       </form>
     );
   }
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
 }

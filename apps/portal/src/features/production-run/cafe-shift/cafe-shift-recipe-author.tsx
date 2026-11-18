@@ -1,4 +1,3 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import {
   DEFAULT_CAFE_SHIFT_RECIPE,
@@ -8,6 +7,7 @@ import {
   type CafeShiftRecipeConfig,
   type CafeShiftStaffing,
 } from "@seams/production-simulation/recipes/cafe-shift/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{
   prepared(recipe: CafeShiftRecipeConfig): void;
@@ -145,149 +145,89 @@ export class CafeShiftRecipeAuthor extends React.Component<Props, State> {
           Expected saleable output: <strong>{packedPieces}</strong> packed
           financiers ({(packedPieces * 23.5).toFixed(1)} g net) +{" "}
           <strong>1</strong> crumb sample (23.5 g)
-          {rejectedLoads > 0 ? " + 8 rejected financiers (188.0 g)" : ""} and{" "}
-          <strong>{servedEspressoG} g</strong> served espresso.
+          {rejectedLoads > 0
+            ? " + 8 rejected financiers (188.0 g)"
+            : ""} and <strong>{servedEspressoG} g</strong> served espresso.
         </p>
-        <label>
-          Espresso machine
-          <Select.Root
-            items={APPLIANCE_ITEMS}
-            value={this.state.appliance}
-            onValueChange={(value) => {
-              if (value === null) return;
-              this.setState({
-                appliance: value === "eagle-one" ? "eagle-one" : "linea",
-              });
-            }}
-          >
-            <Select.Trigger aria-label="Espresso machine">
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{APPLIANCE_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Single-dose coffee grinder
-          <Select.Root
-            items={GRINDER_ITEMS}
-            value={this.state.grinder}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                grinder:
-                  v === "option-o-lagom-casa" ||
-                  v === "timemore-bricks-01s" ||
-                  v === "fellow-opus-2"
-                    ? v
-                    : "miicoffee-df64-gen2",
-              });
-            }}
-          >
-            <Select.Trigger aria-label="Single-dose coffee grinder">
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{GRINDER_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Financier baking loads (Matsunaga 8P · 8 cavities/load)
-          <Select.Root
-            items={FINANCIER_LOAD_ITEMS}
-            value={String(effectiveLoads)}
-            onValueChange={(value) => {
-              if (value === null) return;
-              const v = Number(value);
-              this.setState({
-                financierLoads: v === 3 ? 3 : v === 2 ? 2 : 1,
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {FINANCIER_LOAD_ITEMS.map(renderItem)}
-            </Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Espresso orders (18.0 g dose → 36.0 g served shot)
-          <Select.Root
-            items={ESPRESSO_ORDERS_ITEMS}
-            value={String(this.state.espressoOrders)}
-            onValueChange={(value) => {
-              if (value === null) return;
-              this.setState({
-                espressoOrders: value === "4" ? 4 : 2,
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {ESPRESSO_ORDERS_ITEMS.map(renderItem)}
-            </Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Shift staffing (Plan 61E controlled comparison)
-          <Select.Root
-            items={STAFFING_ITEMS}
-            value={this.state.staffing}
-            onValueChange={(value) => {
-              if (value === null) return;
-              this.setState({
-                staffing:
-                  value === "single-worker" ? "single-worker" : "two-workers",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{STAFFING_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Quality &amp; recovery check
-          <Select.Root
-            items={CHECK_ITEMS}
-            value={this.state.check}
-            onValueChange={(v) => {
-              if (v === null) return;
-              const check: CafeShiftCheck =
-                v === "reject-second-load" || v === "interrupted-extraction"
+        <RecipeChoice
+          label="Espresso machine"
+          triggerLabel="Espresso machine"
+          items={APPLIANCE_ITEMS}
+          value={this.state.appliance}
+          choose={(value) => {
+            this.setState({
+              appliance: value === "eagle-one" ? "eagle-one" : "linea",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Single-dose coffee grinder"
+          triggerLabel="Single-dose coffee grinder"
+          items={GRINDER_ITEMS}
+          value={this.state.grinder}
+          choose={(v) => {
+            this.setState({
+              grinder:
+                v === "option-o-lagom-casa" ||
+                v === "timemore-bricks-01s" ||
+                v === "fellow-opus-2"
                   ? v
-                  : "none";
-              this.setState({
-                check,
-                financierLoads:
-                  check === "reject-second-load" &&
-                  this.state.financierLoads < 2
-                    ? 2
-                    : this.state.financierLoads,
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{CHECK_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+                  : "miicoffee-df64-gen2",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Financier baking loads (Matsunaga 8P · 8 cavities/load)"
+          items={FINANCIER_LOAD_ITEMS}
+          value={String(effectiveLoads)}
+          choose={(value) => {
+            const v = Number(value);
+            this.setState({
+              financierLoads: v === 3 ? 3 : v === 2 ? 2 : 1,
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Espresso orders (18.0 g dose → 36.0 g served shot)"
+          items={ESPRESSO_ORDERS_ITEMS}
+          value={String(this.state.espressoOrders)}
+          choose={(value) => {
+            this.setState({
+              espressoOrders: value === "4" ? 4 : 2,
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Shift staffing (Plan 61E controlled comparison)"
+          items={STAFFING_ITEMS}
+          value={this.state.staffing}
+          choose={(value) => {
+            this.setState({
+              staffing:
+                value === "single-worker" ? "single-worker" : "two-workers",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Quality & recovery check"
+          items={CHECK_ITEMS}
+          value={this.state.check}
+          choose={(v) => {
+            const check: CafeShiftCheck =
+              v === "reject-second-load" || v === "interrupted-extraction"
+                ? v
+                : "none";
+            this.setState({
+              check,
+              financierLoads:
+                check === "reject-second-load" && this.state.financierLoads < 2
+                  ? 2
+                  : this.state.financierLoads,
+            });
+          }}
+        />
         <button type="submit">Prepare combined café shift</button>
       </form>
     );
   }
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
 }

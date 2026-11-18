@@ -1,4 +1,3 @@
-import { Select } from "../../ui/select";
 import React from "react";
 import { gingerBlackTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/ginger-black-tea";
 import { prepareNativeRecipe } from "./oven-recipe-file";
@@ -6,6 +5,7 @@ import {
   prepareGingerBlackTeaRecipe,
   type OvenRunSource,
 } from "@seams/production-simulation/runs/oven-run-file";
+import { prepareRecipe, RecipeChoice } from "./shared/recipe-form";
 
 type PanStaging = "manual" | "fairino-fr10";
 type Props = Readonly<{ prepared(source: OvenRunSource): void }>;
@@ -62,24 +62,17 @@ export class GingerTeaRecipeAuthor extends React.Component<Props, State> {
     const input = gingerBlackTeaRecipeInput();
     input.tea = this.state.tea;
     input.steepSeconds = Number(this.state.steepSeconds);
-    try {
-      const result =
+    await prepareRecipe<OvenRunSource>(
+      {
+        mounted: () => this.mounted,
+        prepared: (source) => this.props.prepared(source),
+        failed: (notice) => this.setState({ activity: "editing", notice }),
+      },
+      () =>
         this.state.panStaging === "fairino-fr10"
-          ? await prepareNativeRecipe({ kind: "ginger-black-tea", input })
-          : await prepareGingerBlackTeaRecipe(input);
-      if (!this.mounted) return;
-      if (result.ok) this.props.prepared(result.value);
-      else this.setState({ activity: "editing", notice: result.error });
-    } catch (error) {
-      if (this.mounted)
-        this.setState({
-          activity: "editing",
-          notice:
-            error instanceof Error
-              ? error.message
-              : "The recipe could not be prepared.",
-        });
-    }
+          ? prepareNativeRecipe({ kind: "ginger-black-tea", input })
+          : prepareGingerBlackTeaRecipe(input),
+    );
   }
   render(): React.ReactNode {
     return (
@@ -102,25 +95,12 @@ export class GingerTeaRecipeAuthor extends React.Component<Props, State> {
         </p>
         <fieldset disabled={this.state.activity === "preparing"}>
           <legend>Extraction settings</legend>
-          <label>
-            Black tea type
-            <Select.Root
-              items={TEAS}
-              value={this.state.tea}
-              onValueChange={this.tea.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {TEAS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Black tea type"
+            items={TEAS}
+            value={this.state.tea}
+            choose={this.tea.bind(this)}
+          />
           <label>
             Tea steep seconds
             <input
@@ -132,25 +112,12 @@ export class GingerTeaRecipeAuthor extends React.Component<Props, State> {
               onChange={this.steep.bind(this)}
             />
           </label>
-          <label>
-            Clean pan staging
-            <Select.Root
-              items={PAN_STAGINGS}
-              value={this.state.panStaging}
-              onValueChange={this.changePanStaging.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {PAN_STAGINGS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Clean pan staging"
+            items={PAN_STAGINGS}
+            value={this.state.panStaging}
+            choose={this.changePanStaging.bind(this)}
+          />
           <button>Prepare ginger black tea</button>
         </fieldset>
         <p role="status">{this.state.notice}</p>

@@ -1,4 +1,3 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import {
   DEFAULT_FINANCIER_BAKE_RECIPE,
@@ -8,6 +7,7 @@ import {
   type FinancierMouldCount,
   type FinancierRackSlot,
 } from "@seams/production-simulation/recipes/financier-bake/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{
   prepared(recipe: FinancierBakeRecipeConfig): void;
@@ -156,113 +156,80 @@ export class FinancierBakeRecipeAuthor extends React.Component<Props, State> {
           {this.state.targetOvenTempC} °C before unloading onto the cooling wire
           grid.
         </p>
-        <label>
-          Tier 2 → Tier 3 handoff calibration preset
-          <Select.Root
-            items={HANDOFF_PRESET_ITEMS}
-            value={
-              this.state.check === "carrier-handoff-recovery"
-                ? "carrier-slip-recovery"
-                : this.state.check === "cell-2-restage-recovery"
-                  ? "cell-2-restage-recovery"
-                  : "nominal-handoff"
-            }
-            onValueChange={(preset) => {
-              if (preset === null) return;
-              if (preset === "carrier-slip-recovery") {
-                this.setState({
-                  mode: "convection",
-                  mouldCount: 2,
-                  rackSlot: 3,
-                  targetOvenTempC: "170",
-                  portionG: "25",
-                  check: "carrier-handoff-recovery",
-                  notice:
-                    "Loaded fault-recovery calibration preset: 14 mm carrier rail slip + FR10 datum re-seat (+45 s Tier 3 cell handoff buffer).",
-                });
-              } else if (preset === "cell-2-restage-recovery") {
-                this.setState({
-                  mode: "convection",
-                  mouldCount: 2,
-                  rackSlot: 3,
-                  targetOvenTempC: "170",
-                  portionG: "25",
-                  check: "cell-2-restage-recovery",
-                  notice:
-                    "Loaded fault-recovery calibration preset: 18 mm clamp hold + Cell 1 → Cell 2 failover restage (+60 s re-registration · 120 s hold release).",
-                });
-              } else {
-                this.setState({
-                  check: "none",
-                  notice:
-                    "Loaded nominal Tier 2 → Tier 3 handoff preset (0 mm carrier offset · direct cold-cell-1 transfer).",
-                });
-              }
-            }}
-          >
-            <Select.Trigger aria-label="Tier 2 to Tier 3 handoff calibration preset">
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {HANDOFF_PRESET_ITEMS.map(renderItem)}
-            </Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Maruzen MBCO-5E bake mode
-          <Select.Root
-            items={MODE_ITEMS}
-            value={this.state.mode}
-            onValueChange={(value) => {
-              if (value === null) return;
-              const mode =
-                value === "conventional" ? "conventional" : "convection";
+        <RecipeChoice
+          label="Tier 2 → Tier 3 handoff calibration preset"
+          triggerLabel="Tier 2 to Tier 3 handoff calibration preset"
+          items={HANDOFF_PRESET_ITEMS}
+          value={
+            this.state.check === "carrier-handoff-recovery"
+              ? "carrier-slip-recovery"
+              : this.state.check === "cell-2-restage-recovery"
+                ? "cell-2-restage-recovery"
+                : "nominal-handoff"
+          }
+          choose={(preset) => {
+            if (preset === "carrier-slip-recovery") {
               this.setState({
-                mode,
-                targetOvenTempC: mode === "convection" ? "170" : "180",
+                mode: "convection",
+                mouldCount: 2,
+                rackSlot: 3,
+                targetOvenTempC: "170",
+                portionG: "25",
+                check: "carrier-handoff-recovery",
+                notice:
+                  "Loaded fault-recovery calibration preset: 14 mm carrier rail slip + FR10 datum re-seat (+45 s Tier 3 cell handoff buffer).",
               });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{MODE_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Matsunaga 8-cavity mould load (220 × 300 mm · 35 cc/cavity)
-          <Select.Root
-            items={MOULD_COUNT_ITEMS}
-            value={String(this.state.mouldCount)}
-            onValueChange={(value) => {
-              if (value === null) return;
-              const v = Number(value);
-              this.setState({ mouldCount: v === 2 ? 2 : v === 3 ? 3 : 1 });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{MOULD_COUNT_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Maruzen MBCO-5E rack rail slot (88 mm pitch)
-          <Select.Root
-            items={RACK_SLOT_ITEMS}
-            value={String(this.state.rackSlot)}
-            onValueChange={(value) => {
-              if (value === null) return;
-              const v = Number(value);
-              this.setState({ rackSlot: v === 2 ? 2 : v === 4 ? 4 : 3 });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{RACK_SLOT_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+            } else if (preset === "cell-2-restage-recovery") {
+              this.setState({
+                mode: "convection",
+                mouldCount: 2,
+                rackSlot: 3,
+                targetOvenTempC: "170",
+                portionG: "25",
+                check: "cell-2-restage-recovery",
+                notice:
+                  "Loaded fault-recovery calibration preset: 18 mm clamp hold + Cell 1 → Cell 2 failover restage (+60 s re-registration · 120 s hold release).",
+              });
+            } else {
+              this.setState({
+                check: "none",
+                notice:
+                  "Loaded nominal Tier 2 → Tier 3 handoff preset (0 mm carrier offset · direct cold-cell-1 transfer).",
+              });
+            }
+          }}
+        />
+        <RecipeChoice
+          label="Maruzen MBCO-5E bake mode"
+          items={MODE_ITEMS}
+          value={this.state.mode}
+          choose={(value) => {
+            const mode =
+              value === "conventional" ? "conventional" : "convection";
+            this.setState({
+              mode,
+              targetOvenTempC: mode === "convection" ? "170" : "180",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Matsunaga 8-cavity mould load (220 × 300 mm · 35 cc/cavity)"
+          items={MOULD_COUNT_ITEMS}
+          value={String(this.state.mouldCount)}
+          choose={(value) => {
+            const v = Number(value);
+            this.setState({ mouldCount: v === 2 ? 2 : v === 3 ? 3 : 1 });
+          }}
+        />
+        <RecipeChoice
+          label="Maruzen MBCO-5E rack rail slot (88 mm pitch)"
+          items={RACK_SLOT_ITEMS}
+          value={String(this.state.rackSlot)}
+          choose={(value) => {
+            const v = Number(value);
+            this.setState({ rackSlot: v === 2 ? 2 : v === 4 ? 4 : 3 });
+          }}
+        />
         <label>
           Oven chamber setpoint (°C)
           <input
@@ -287,43 +254,25 @@ export class FinancierBakeRecipeAuthor extends React.Component<Props, State> {
             onChange={(e) => this.setState({ portionG: e.currentTarget.value })}
           />
         </label>
-        <label>
-          Process check
-          <Select.Root
-            items={CHECK_ITEMS}
-            value={this.state.check}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                check:
-                  v === "carrier-handoff-recovery" ||
-                  v === "cell-2-restage-recovery" ||
-                  v === "under-preheated" ||
-                  v === "over-baked"
-                    ? v
-                    : "none",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{CHECK_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Process check"
+          items={CHECK_ITEMS}
+          value={this.state.check}
+          choose={(v) => {
+            this.setState({
+              check:
+                v === "carrier-handoff-recovery" ||
+                v === "cell-2-restage-recovery" ||
+                v === "under-preheated" ||
+                v === "over-baked"
+                  ? v
+                  : "none",
+            });
+          }}
+        />
         <button type="submit">Prepare Financier bake station</button>
         <p role="status">{this.state.notice}</p>
       </form>
     );
   }
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
 }

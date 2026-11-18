@@ -1,4 +1,3 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import {
   DEFAULT_BLACK_SESAME_COBOT_RECIPE,
@@ -7,6 +6,7 @@ import {
   type BlackSesameHobModel,
   type BlackSesameRoastMode,
 } from "@seams/production-simulation/recipes/black-sesame/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{
   prepared(recipe: BlackSesameCobotRecipeConfig): void;
@@ -135,47 +135,31 @@ export class BlackSesameCobotRecipeAuthor extends React.Component<
             Number(this.state.milkPerDrinkG)}{" "}
           g heated drink in the Severin SM 3587 milk mixer.
         </p>
-        <label>
-          Induction slurry hob model
-          <Select.Root
-            items={HOB_ITEMS}
-            value={this.state.hob}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                hob:
-                  v === "vollrath" ||
-                  v === "panasonic-kz-ck1402" ||
-                  v === "rinnai-rsb-150pj"
-                    ? v
-                    : "maruzen",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{HOB_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Sesame roast mode
-          <Select.Root
-            items={ROAST_ITEMS}
-            value={this.state.roast}
-            onValueChange={(value) => {
-              if (value === null) return;
-              this.setState({
-                roast: value === "refresh" ? "refresh" : "skip",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{ROAST_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Induction slurry hob model"
+          items={HOB_ITEMS}
+          value={this.state.hob}
+          choose={(v) => {
+            this.setState({
+              hob:
+                v === "vollrath" ||
+                v === "panasonic-kz-ck1402" ||
+                v === "rinnai-rsb-150pj"
+                  ? v
+                  : "maruzen",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Sesame roast mode"
+          items={ROAST_ITEMS}
+          value={this.state.roast}
+          choose={(value) => {
+            this.setState({
+              roast: value === "refresh" ? "refresh" : "skip",
+            });
+          }}
+        />
         <label>
           Black sesame seed charge (g)
           <input
@@ -213,40 +197,22 @@ export class BlackSesameCobotRecipeAuthor extends React.Component<
             }
           />
         </label>
-        <label>
-          Process check
-          <Select.Root
-            items={CHECK_ITEMS}
-            value={this.state.check}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                check:
-                  v === "overweight-unreconciled" || v === "enclosure-interlock"
-                    ? v
-                    : "none",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{CHECK_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Process check"
+          items={CHECK_ITEMS}
+          value={this.state.check}
+          choose={(v) => {
+            this.setState({
+              check:
+                v === "overweight-unreconciled" || v === "enclosure-interlock"
+                  ? v
+                  : "none",
+            });
+          }}
+        />
         <button type="submit">Prepare Black Sesame Milk 3D station</button>
         <p role="status">{this.state.notice}</p>
       </form>
     );
   }
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
 }

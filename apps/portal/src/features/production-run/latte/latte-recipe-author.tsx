@@ -1,8 +1,11 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import type { EspressoMachine } from "@seams/bakery-model/bakery-physics";
 import { preloadEspressoVisual } from "../linea/espresso-scene";
-import type { LatteProcessCheck, LatteRecipeConfig } from "@seams/production-simulation/recipes/latte/model";
+import type {
+  LatteProcessCheck,
+  LatteRecipeConfig,
+} from "@seams/production-simulation/recipes/latte/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{ prepared(recipe: LatteRecipeConfig): void }>;
 const MACHINES = [
@@ -111,25 +114,12 @@ export class LatteRecipeAuthor extends React.Component<Props, State> {
           {this.state.targetMilkC} °C, and pours a Rosetta &amp; Heart pattern.
         </p>
         <fieldset>
-          <label>
-            Espresso machine{" "}
-            <Select.Root
-              items={MACHINES}
-              value={this.state.appliance}
-              onValueChange={this.changeMachine.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {MACHINES.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Espresso machine "
+            items={MACHINES}
+            value={this.state.appliance}
+            choose={this.changeMachine.bind(this)}
+          />
           <label>
             Chilled milk mass (g){" "}
             <input
@@ -152,25 +142,12 @@ export class LatteRecipeAuthor extends React.Component<Props, State> {
               onChange={this.changeTemp.bind(this)}
             />
           </label>
-          <label>
-            Process check{" "}
-            <Select.Root
-              items={CHECKS}
-              value={this.state.check}
-              onValueChange={this.changeCheck.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {CHECKS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Process check "
+            items={CHECKS}
+            value={this.state.check}
+            choose={this.changeCheck.bind(this)}
+          />
           <button type="submit">Prepare caffe latte</button>
         </fieldset>
         <p role="status">{this.state.notice}</p>

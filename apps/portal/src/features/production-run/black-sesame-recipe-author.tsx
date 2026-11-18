@@ -1,8 +1,11 @@
-import { Select } from "../../ui/select";
 import React from "react";
 import { blackSesameRecipeInput } from "@seams/production-simulation/recipes/bakery/black-sesame";
 import { prepareNativeRecipe } from "./oven-recipe-file";
-import { prepareBlackSesameRecipe, type OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import {
+  prepareBlackSesameRecipe,
+  type OvenRunSource,
+} from "@seams/production-simulation/runs/oven-run-file";
+import { prepareRecipe, RecipeChoice } from "./shared/recipe-form";
 
 type ColdHandling = "manual" | "fairino-fr10";
 type Props = Readonly<{ prepared(source: OvenRunSource): void }>;
@@ -64,24 +67,17 @@ export class BlackSesameRecipeAuthor extends React.Component<Props, State> {
       0,
       Number(this.state.secondBatchMinutes) * 60,
     ];
-    try {
-      const prepared =
+    await prepareRecipe<OvenRunSource>(
+      {
+        mounted: () => this.mounted,
+        prepared: (source) => this.props.prepared(source),
+        failed: (notice) => this.setState({ activity: "editing", notice }),
+      },
+      () =>
         this.state.coldHandling === "fairino-fr10"
-          ? await prepareNativeRecipe({ kind: "black-sesame", input })
-          : await prepareBlackSesameRecipe(input);
-      if (!this.mounted) return;
-      if (prepared.ok) this.props.prepared(prepared.value);
-      else this.setState({ activity: "editing", notice: prepared.error });
-    } catch (error) {
-      if (this.mounted)
-        this.setState({
-          activity: "editing",
-          notice:
-            error instanceof Error
-              ? error.message
-              : "The recipe could not be prepared.",
-        });
-    }
+          ? prepareNativeRecipe({ kind: "black-sesame", input })
+          : prepareBlackSesameRecipe(input),
+    );
   }
   render(): React.ReactNode {
     return (
@@ -133,35 +129,16 @@ export class BlackSesameRecipeAuthor extends React.Component<Props, State> {
             />
             Refresh the sesame roast
           </label>
-          <label>
-            Cold container carrier handling
-            <Select.Root
-              items={COLD_HANDLING_ITEMS}
-              value={this.state.coldHandling}
-              onValueChange={this.changeHandling.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {COLD_HANDLING_ITEMS.map(renderItem)}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Cold container carrier handling"
+            items={COLD_HANDLING_ITEMS}
+            value={this.state.coldHandling}
+            choose={this.changeHandling.bind(this)}
+          />
           <button>Prepare black sesame milk</button>
         </fieldset>
         <p role="status">{this.state.notice}</p>
       </form>
     );
   }
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
 }

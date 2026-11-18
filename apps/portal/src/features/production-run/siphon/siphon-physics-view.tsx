@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  RecipeAnimationNotice,
-  RecipeBackButton,
-  RecipeSplitDivider,
-  RunIcon,
-  type RecipeSurface,
-  RecipeSurfaceSwitch,
-  RecipeWorkflow,
-} from "../recipe-workflow";
+import { errorMessage } from "@seams/std";
 import {
   ORIGINAL_ANIMATION,
   warpedEngine,
@@ -16,7 +8,6 @@ import {
   type AnimationPlanBuilder,
   type RecipeEngine,
 } from "../recipe-clock";
-import { BakeryAppearanceControl } from "../../../preferences/appearance-controls";
 import {
   SIPHON_STATION_SETUP,
   SiphonSimulationEngine,
@@ -36,7 +27,14 @@ import {
 } from "../shared/playback-controller";
 import { Live, LiveText, useLive } from "../shared/live";
 import { LiveValue, type LiveSource } from "../shared/live-value";
-import { RecipeRunFooter, RecipeScrubber } from "../recipe-run-footer";
+import { RecipeScrubber } from "../recipe-run-footer";
+import { RecipeCameraBar } from "../shared/recipe-station";
+import {
+  RECIPE_WORKSPACE_VIEW,
+  RecipeRunControl,
+  RecipeWorkspaceLayout,
+  type RecipeWorkspaceView,
+} from "../shared/recipe-workspace";
 
 type ViewProps = Readonly<{
   setup: SiphonSetup;
@@ -91,6 +89,12 @@ const PHASE_ORDER: Readonly<Record<SiphonPhase, number>> = {
   failed: -1,
 };
 
+const CAMERAS: readonly (readonly [SiphonCameraPreset, string])[] = [
+  ["bench", "Bench view"],
+  ["chambers", "Chambers close-up"],
+  ["overhead", "Overhead stir"],
+];
+
 /** Interactive 3D Hario ECA-3-B Electric Coffee Syphon + FAIRINO FR10 view. */
 class SiphonPhysicsView extends React.Component<ViewProps, ViewState> {
   state: ViewState = { error: null, camera: "bench" };
@@ -112,10 +116,7 @@ class SiphonPhysicsView extends React.Component<ViewProps, ViewState> {
     } catch (error) {
       if (this.visual === visual)
         this.setState({
-          error:
-            error instanceof Error
-              ? error.message
-              : "The robot visual is unavailable.",
+          error: errorMessage(error, "The robot visual is unavailable."),
         });
     }
   }
@@ -154,29 +155,13 @@ class SiphonPhysicsView extends React.Component<ViewProps, ViewState> {
         className="siphon-station"
       >
         <div className="siphon-canvas" ref={this.element} />
-        <div
+        <RecipeCameraBar
           className="siphon-camera-bar"
-          role="group"
-          aria-label="Camera view"
-        >
-          <BakeryAppearanceControl />
-          {(
-            [
-              ["bench", "Bench view"],
-              ["chambers", "Chambers close-up"],
-              ["overhead", "Overhead stir"],
-            ] as const
-          ).map(([preset, label]) => (
-            <button
-              key={preset}
-              type="button"
-              aria-pressed={this.state.camera === preset}
-              onClick={this.selectCamera.bind(this, preset)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+          label="Camera view"
+          camera={this.state.camera}
+          cameras={CAMERAS}
+          select={this.selectCamera.bind(this)}
+        />
         {this.state.error !== null && <p role="status">{this.state.error}</p>}
         <SiphonStatus frames={this.props.frames} />
         <p className="siphon-note">
@@ -474,16 +459,13 @@ type WorkspaceProps = Readonly<{
   close(): void;
 }>;
 
-type WorkspacePanel = "scenario" | "results" | null;
 type WorkspaceStatus = "ready" | "running" | "paused" | "completed" | "blocked";
 
-type WorkspaceState = Readonly<{
-  surface: RecipeSurface;
-  status: WorkspaceStatus;
-  panel: WorkspacePanel;
-  timeline: boolean;
-  notice: string;
-}>;
+type WorkspaceState = RecipeWorkspaceView &
+  Readonly<{
+    status: WorkspaceStatus;
+    notice: string;
+  }>;
 
 type SiphonTimelineStage = Readonly<{
   id: string;
@@ -547,10 +529,8 @@ export class SiphonWorkspace extends React.Component<
     this.frames = new LiveValue(recipeFrames(this.engine.initialSample()));
     this.clock = recipeClock(this.frames);
     this.state = {
+      ...RECIPE_WORKSPACE_VIEW,
       status: "ready",
-      surface: "factory",
-      panel: null,
-      timeline: false,
       notice: `Prepared Hario ECA-3-B electric siphon station with ${props.recipe.waterG} g hot water, ${props.recipe.coffeeG} g medium-fine coffee and a ${props.recipe.steepSeconds} s steep.`,
     };
   }
@@ -622,18 +602,6 @@ export class SiphonWorkspace extends React.Component<
     });
   }
 
-  private togglePanel(panel: Exclude<WorkspacePanel, null>): void {
-    this.setState((prev) => ({
-      panel: prev.panel === panel ? null : panel,
-    }));
-  }
-
-  private toggleTimeline(): void {
-    this.setState((prev) => ({
-      timeline: !prev.timeline,
-    }));
-  }
-
   private animated(
     recipe: ConstructorParameters<typeof SiphonSimulationEngine>[0],
   ) {
@@ -673,48 +641,8 @@ export class SiphonWorkspace extends React.Component<
     this.frames.set({ sample: closest, samples: [closest], history });
   }
 
-  private primaryControl(): React.ReactNode {
-    const { status } = this.state;
-    if (status === "running") {
-      return (
-        <button className="factory-primary" onClick={this.pause.bind(this)}>
-          <RunIcon action="pause" />
-          Pause production run
-        </button>
-      );
-    }
-    if (status === "paused") {
-      return (
-        <button
-          className="factory-primary"
-          onClick={this.startOrResume.bind(this)}
-        >
-          <RunIcon action="start" />
-          Resume production run
-        </button>
-      );
-    }
-    if (status === "completed" || status === "blocked") {
-      return (
-        <button className="factory-primary" onClick={this.restart.bind(this)}>
-          <RunIcon action="again" />
-          Run again
-        </button>
-      );
-    }
-    return (
-      <button
-        className="factory-primary"
-        onClick={this.startOrResume.bind(this)}
-      >
-        <RunIcon action="start" />
-        Start production
-      </button>
-    );
-  }
-
   render(): React.ReactNode {
-    const { status, panel, timeline, notice } = this.state;
+    const { status, notice } = this.state;
     const { recipe } = this.props;
     const { frames, clock } = this;
     // The outcome arrives with a status change, so this render reads it.
@@ -722,82 +650,29 @@ export class SiphonWorkspace extends React.Component<
     const stages = warpedStages(siphonTimelineStages(recipe), this.animation);
     const horizon = stages.at(-1)?.endS ?? 170;
     return (
-      <section
-        className="production-workspace persistent-production"
-        data-surface={this.state.surface}
-        aria-label="Persistent production"
-        data-lifecycle={status === "running" ? "running" : "settled"}
-      >
-        <div
-          className="factory-main-canvas"
-          hidden={this.state.surface === "workflow"}
-        >
-          <RecipeAnimationNotice plan={this.animation} clock={clock} />
+      <RecipeWorkspaceLayout
+        view={this.state}
+        change={(view) => this.setState(view)}
+        close={this.props.close}
+        status={status}
+        clock={clock}
+        stages={stages}
+        seek={this.scrubToTime.bind(this)}
+        animation={this.animation}
+        scene={
           <SiphonPhysicsView setup={SIPHON_STATION_SETUP} frames={frames} />
-        </div>
-        <header className="factory-toolbar">
-          <RecipeBackButton close={this.props.close} />
-          <div className="factory-title">
-            <div>
-              <span>Factory simulation</span>
-              <h2>Hario ECA-3-B Electric Coffee Syphon · 3-cup vacuum brew</h2>
-            </div>
-          </div>
-          <nav aria-label="Factory workspace">
-            <RecipeSurfaceSwitch
-              value={this.state.surface}
-              select={(surface) => this.setState({ surface })}
-            />
-            <div
-              className="factory-panel-pills"
-              role="group"
-              aria-label="Detail panels"
-            >
-              <button
-                type="button"
-                aria-expanded={panel === "scenario"}
-                onClick={this.togglePanel.bind(this, "scenario")}
-              >
-                Scenario
-              </button>
-              <button
-                type="button"
-                aria-expanded={panel === "results"}
-                onClick={this.togglePanel.bind(this, "results")}
-              >
-                Results
-              </button>
-            </div>
-          </nav>
-        </header>
-        {outcome?.kind === "completed" && (
-          <button
-            className="factory-summary"
-            onClick={this.togglePanel.bind(this, "results")}
-          >
-            <strong>1</strong> siphon brew completed ·{" "}
-            {(outcome.beverageMg / 1000).toFixed(1)} g beverage yield
-          </button>
-        )}
-        <aside
-          className="production-panel factory-drawer"
-          aria-label="Factory details"
-          hidden={panel === null}
-        >
-          <div className="factory-drawer-heading">
-            <h3>
-              {panel === "results"
-                ? "Production results"
-                : "Scenario and run controls"}
-            </h3>
-            <button
-              type="button"
-              onClick={() => this.setState({ panel: null })}
-            >
-              Close details
-            </button>
-          </div>
-          <div hidden={panel !== "scenario"}>
+        }
+        title="Hario ECA-3-B Electric Coffee Syphon · 3-cup vacuum brew"
+        summary={
+          outcome?.kind === "completed" ? (
+            <>
+              <strong>1</strong> siphon brew completed ·{" "}
+              {(outcome.beverageMg / 1000).toFixed(1)} g beverage yield
+            </>
+          ) : null
+        }
+        scenario={
+          <>
             <p>
               Hario ECA-3-B Electric Coffee Syphon (360 mL) with its conical
               BL-ECA-3 lower server, cylindrical BU-ECA-3 upper bowl, F-103S
@@ -806,8 +681,10 @@ export class SiphonWorkspace extends React.Component<
               coffee and {recipe.steepSeconds} s immersion steep.
             </p>
             <p role="status">{notice}</p>
-          </div>
-          <div hidden={panel !== "results"}>
+          </>
+        }
+        results={
+          <>
             <h4>Measured siphon mass balance</h4>
             <dl>
               <dt>Clarified siphon beverage</dt>
@@ -861,38 +738,27 @@ export class SiphonWorkspace extends React.Component<
               <dt>Peak bulb pressure / Darcy vacuum</dt>
               <dd>104.8 kPa upflow / 96.1 kPa drawdown (-5.2 kPa vacuum)</dd>
             </dl>
-          </div>
-        </aside>
-        <div
-          className="factory-workflow-canvas"
-          hidden={this.state.surface === "factory"}
-        >
-          <RecipeWorkflow
-            planned={this.planned.bind(this)}
-            graph={{
-              kind: "siphon",
-              waterG: recipe.waterG,
-              coffeeG: recipe.coffeeG,
-              steepSeconds: recipe.steepSeconds,
-            }}
-            stages={stages}
-            clock={clock}
-            running={status === "running"}
-            prepared={status === "ready"}
-            outcome={outcome?.kind ?? null}
-            seek={this.scrubToTime.bind(this)}
-          />
-        </div>
-        <RecipeSplitDivider surface={this.state.surface} />
-        <RecipeRunFooter
-          clock={clock}
-          stages={stages}
-          horizonS={horizon}
-          completed={outcome?.kind === "completed"}
-          status={status}
-          control={
+          </>
+        }
+        graph={{
+          kind: "siphon",
+          waterG: recipe.waterG,
+          coffeeG: recipe.coffeeG,
+          steepSeconds: recipe.steepSeconds,
+        }}
+        planned={this.planned.bind(this)}
+        prepared={status === "ready"}
+        outcome={outcome?.kind ?? null}
+        footer={{
+          horizonS: horizon,
+          control: (
             <>
-              {this.primaryControl()}
+              <RecipeRunControl
+                status={status}
+                start={this.startOrResume.bind(this)}
+                pause={this.pause.bind(this)}
+                restart={this.restart.bind(this)}
+              />
               <Live source={frames} select={(f) => f.history.length > 1}>
                 {(scrubbable) =>
                   scrubbable && (
@@ -922,17 +788,14 @@ export class SiphonWorkspace extends React.Component<
                 }
               </Live>
             </>
-          }
-          after={
+          ),
+          after: (
             <span className="factory-save-status">
               Hario ECA-3-B · F-103S · FAIRINO FR10
             </span>
-          }
-          timeline={timeline}
-          toggleTimeline={this.toggleTimeline.bind(this)}
-          seek={this.scrubToTime.bind(this)}
-        />
-      </section>
+          ),
+        }}
+      />
     );
   }
 }

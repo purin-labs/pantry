@@ -1,5 +1,4 @@
 import React from "react";
-import { BakeryAppearanceControl } from "../../../preferences/appearance-controls";
 import { isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
 import {
   readCellRecordingDocument,
@@ -21,15 +20,12 @@ import {
 } from "./espresso-scene";
 import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
 import "../pour-over/pour-over.css";
+import { RecipeSampleStation } from "../shared/recipe-station";
 
 type Props = Readonly<{
   sample: ApplianceSample | null;
   samples?: readonly ApplianceSample[];
   appliance: EspressoMachine;
-}>;
-type State = Readonly<{
-  error: string | null;
-  camera: EspressoCameraPreset;
 }>;
 
 const ESPRESSO_STEPS = [
@@ -38,92 +34,34 @@ const ESPRESSO_STEPS = [
   { id: "serve", label: "Serve cup", detail: "Service mat" },
 ] as const;
 
-export class EspressoPhysicsView extends React.Component<Props, State> {
-  state: State = { error: null, camera: "station" };
-  private readonly element = React.createRef<HTMLDivElement>();
-  private visual: EspressoScene | null = null;
-  componentDidMount(): void {
-    const element = this.element.current;
-    if (element === null) return;
-    this.visual = new EspressoScene(element, this.props.appliance);
-    this.syncVisual();
-    void this.load(this.visual);
-  }
-  private async load(visual: EspressoScene): Promise<void> {
-    try {
-      await visual.load();
-      if (this.visual === visual) this.syncVisual();
-    } catch (error) {
-      if (this.visual === visual)
-        this.setState({
-          error:
-            error instanceof Error
-              ? error.message
-              : "The appliance visual is unavailable.",
-        });
-    }
-  }
-  componentDidUpdate(): void {
-    this.syncVisual();
-  }
-  private syncVisual(): void {
-    if (this.visual === null) return;
-    if (this.props.samples !== undefined && this.props.samples.length > 0) {
-      this.visual.setSamples(this.props.samples);
-      return;
-    }
-    if (this.props.sample !== null) this.visual.setFrame(this.props.sample);
-  }
-  private selectCamera(camera: EspressoCameraPreset): void {
-    this.setState({ camera });
-    this.visual?.setCameraPreset(camera);
-  }
-  componentWillUnmount(): void {
-    this.visual?.dispose();
-    this.visual = null;
-  }
-  render(): React.ReactNode {
-    const sample = this.props.sample;
-    return (
-      <section
-        aria-label="Accepted espresso machine state"
-        className="pour-over-station"
-      >
-        <div className="pour-over-canvas" ref={this.element} />
-        <div
-          className="pour-over-camera-bar"
-          role="group"
-          aria-label="Camera view"
-        >
-          <BakeryAppearanceControl />
-          {(
-            [
-              ["station", "Station view"],
-              ["group", "Group head close-up"],
-              ["overhead", "Overhead bar"],
-            ] as const
-          ).map(([preset, label]) => (
-            <button
-              key={preset}
-              type="button"
-              aria-pressed={this.state.camera === preset}
-              onClick={this.selectCamera.bind(this, preset)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {this.state.error !== null && <p role="status">{this.state.error}</p>}
-        {sample !== null && (
-          <EspressoStatus sample={sample} appliance={this.props.appliance} />
-        )}
-        <p className="pour-over-note">
-          Accepted Rust/MuJoCo state. Guided cup movement and beverage yield
-          remain uncalibrated.
-        </p>
-      </section>
-    );
-  }
+const CAMERAS: readonly (readonly [EspressoCameraPreset, string])[] = [
+  ["station", "Station view"],
+  ["group", "Group head close-up"],
+  ["overhead", "Overhead bar"],
+];
+
+export function EspressoPhysicsView(props: Props): React.ReactNode {
+  const { sample, appliance } = props;
+  return (
+    <RecipeSampleStation
+      sample={sample}
+      samples={props.samples}
+      scene={(element) => new EspressoScene(element, appliance)}
+      unavailable="The appliance visual is unavailable."
+      showAfterLoad
+      label="Accepted espresso machine state"
+      camera="station"
+      cameras={CAMERAS}
+    >
+      {sample !== null && (
+        <EspressoStatus sample={sample} appliance={appliance} />
+      )}
+      <p className="pour-over-note">
+        Accepted Rust/MuJoCo state. Guided cup movement and beverage yield
+        remain uncalibrated.
+      </p>
+    </RecipeSampleStation>
+  );
 }
 
 function EspressoStatus(

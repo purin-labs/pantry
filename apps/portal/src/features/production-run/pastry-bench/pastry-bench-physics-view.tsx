@@ -5,20 +5,12 @@ import {
   type PortalPageViewV1,
   type SurfacePageCommandV1,
 } from "@seams/control-api";
-import { Select } from "../../../ui/select";
-import { BakeryAppearanceControl } from "../../../preferences/appearance-controls";
+import { errorMessage } from "@seams/std";
 import {
   registerSurfaceView,
   type SurfaceCommandOutcome,
 } from "../../surface-observation";
-import {
-  RecipeBackButton,
-  RecipeSplitDivider,
-  RecipeSurfaceSwitch,
-  RecipeWorkflow,
-  RunIcon,
-  type RecipeSurface,
-} from "../recipe-workflow";
+import { RunIcon } from "../recipe-workflow";
 import {
   CRIMP_FORCE_ITEMS,
   FAULT_CHECK_ITEMS,
@@ -46,7 +38,13 @@ import {
   sameItems,
   type LiveSource,
 } from "../shared/live-value";
-import { RecipeRunFooter } from "../recipe-run-footer";
+import { RecipeChoice, RecipeScenarioForm } from "../shared/recipe-form";
+import { RecipeCameraBar } from "../shared/recipe-station";
+import {
+  RECIPE_WORKSPACE_VIEW,
+  RecipeWorkspaceLayout,
+  type RecipeWorkspaceView,
+} from "../shared/recipe-workspace";
 
 /** The pastry frame at the playback cursor. */
 type PastryLive = Readonly<{ frame: PastryBenchFrame }>;
@@ -66,6 +64,15 @@ type ViewState = Readonly<{
   error: string | null;
   wireframe: boolean;
 }>;
+
+const CAMERAS: readonly (readonly [PastryBenchCameraPreset, string])[] = [
+  ["bench", "Bench view"],
+  ["dough-block", "3D dough block"],
+  ["tin-cavity", "12 cm tin cavity"],
+  ["roller", "Rolling pin"],
+  ["overhead", "Overhead sheet"],
+  ["oven", "Maruzen oven"],
+];
 
 /** Interactive Three.js MuJoCo 4.0.0 deformable pastry bench & Maruzen oven view. */
 class PastryBenchPhysicsView extends React.Component<ViewProps, ViewState> {
@@ -94,10 +101,7 @@ class PastryBenchPhysicsView extends React.Component<ViewProps, ViewState> {
     } catch (error) {
       if (this.visual === visual) {
         this.setState({
-          error:
-            error instanceof Error
-              ? error.message
-              : "The pastry bench visual is unavailable.",
+          error: errorMessage(error, "The pastry bench visual is unavailable."),
         });
       }
     }
@@ -161,32 +165,14 @@ class PastryBenchPhysicsView extends React.Component<ViewProps, ViewState> {
         data-timeline-open={timelineOpen}
       >
         <div className="pastry-bench-canvas" ref={this.element} />
-        <div
+        <RecipeCameraBar
           className="pastry-bench-camera-bar"
-          role="group"
-          aria-label="Camera view"
+          label="Camera view"
+          camera={camera}
+          cameras={CAMERAS}
+          select={this.selectCamera.bind(this)}
+          target={(preset) => `pastry-bench:camera:${preset}`}
         >
-          <BakeryAppearanceControl />
-          {(
-            [
-              ["bench", "Bench view"],
-              ["dough-block", "3D dough block"],
-              ["tin-cavity", "12 cm tin cavity"],
-              ["roller", "Rolling pin"],
-              ["overhead", "Overhead sheet"],
-              ["oven", "Maruzen oven"],
-            ] as const
-          ).map(([preset, label]) => (
-            <button
-              key={preset}
-              type="button"
-              data-surface-target={`pastry-bench:camera:${preset}`}
-              aria-pressed={camera === preset}
-              onClick={this.selectCamera.bind(this, preset)}
-            >
-              {label}
-            </button>
-          ))}
           <button
             type="button"
             aria-pressed={this.state.wireframe}
@@ -194,7 +180,7 @@ class PastryBenchPhysicsView extends React.Component<ViewProps, ViewState> {
           >
             FEM mesh
           </button>
-        </div>
+        </RecipeCameraBar>
         {this.state.error !== null && <p role="status">{this.state.error}</p>}
         <div className="pastry-bench-status">
           {frames === null ? null : (
@@ -369,29 +355,25 @@ type WorkspaceProps = Readonly<{
   close(): void;
 }>;
 
-type WorkspaceState = Readonly<{
-  recipe: PastryBenchRecipeConfig;
-  camera: PastryBenchCameraPreset;
-  status: "loading" | "running" | "paused" | "completed" | "failed";
-  surface: RecipeSurface;
-  panel: "scenario" | "results" | null;
-  timeline: boolean;
-  run: PastryBenchCompletedRun | null;
-  error: string | null;
-  notice: string;
-}>;
+type WorkspaceState = RecipeWorkspaceView &
+  Readonly<{
+    recipe: PastryBenchRecipeConfig;
+    camera: PastryBenchCameraPreset;
+    status: "loading" | "running" | "paused" | "completed" | "failed";
+    run: PastryBenchCompletedRun | null;
+    error: string | null;
+    notice: string;
+  }>;
 
 export class PastryBenchWorkspace extends React.Component<
   WorkspaceProps,
   WorkspaceState
 > {
   state: WorkspaceState = {
+    ...RECIPE_WORKSPACE_VIEW,
     recipe: this.props.recipe,
     camera: "bench",
     status: "loading",
-    surface: "factory",
-    panel: null,
-    timeline: false,
     run: null,
     error: null,
     notice: "",
@@ -615,10 +597,7 @@ export class PastryBenchWorkspace extends React.Component<
       });
       return { kind: "done" };
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Pastry bench simulation failed.";
+      const message = errorMessage(error, "Pastry bench simulation failed.");
       if (token === this.runToken) {
         await new Promise<void>((resolve) => {
           this.setState(
@@ -684,14 +663,6 @@ export class PastryBenchWorkspace extends React.Component<
     this.setState({
       status: clamped >= run.totalDurationS ? "completed" : "paused",
     });
-  }
-
-  private togglePanel(next: "scenario" | "results"): void {
-    this.setState({ panel: this.state.panel === next ? null : next });
-  }
-
-  private toggleTimeline(): void {
-    this.setState({ timeline: !this.state.timeline });
   }
 
   private primaryControl(): React.ReactNode {
@@ -760,32 +731,22 @@ export class PastryBenchWorkspace extends React.Component<
   }
 
   render(): React.ReactNode {
-    const {
-      recipe,
-      camera,
-      status,
-      surface,
-      panel,
-      timeline,
-      run,
-      error,
-      notice,
-    } = this.state;
+    const { recipe, camera, status, timeline, run, error, notice } = this.state;
     const stages = run?.stages ?? [];
     const maxS = run?.totalDurationS ?? 8.8;
     const live = this.liveRun(run);
     const clock = live?.clock ?? this.idleClock(maxS);
 
     return (
-      <section
-        className="production-workspace persistent-production"
-        data-surface={surface}
-        aria-label="Persistent production"
-        data-lifecycle={
-          status === "running" || status === "loading" ? "running" : "settled"
-        }
-      >
-        <div className="factory-main-canvas" hidden={surface === "workflow"}>
+      <RecipeWorkspaceLayout
+        view={this.state}
+        change={(view) => this.setState(view)}
+        close={this.props.close}
+        status={status}
+        clock={clock}
+        stages={stages}
+        seek={this.seekTo.bind(this)}
+        scene={
           <PastryBenchPhysicsView
             frames={live?.frames ?? null}
             stages={stages}
@@ -797,214 +758,154 @@ export class PastryBenchWorkspace extends React.Component<
               this.setState({ camera: nextCamera })
             }
           />
-        </div>
-        <header className="factory-toolbar">
-          <RecipeBackButton close={this.props.close} />
-          <div className="factory-title">
-            <div>
-              <span>
-                Factory simulation · MuJoCo 4.0.0 flexcomp + Maruzen MBCO-5E
-              </span>
-              <h2>
-                Pie Pastry Bench ·{" "}
-                {run?.productTitle ?? "Deformable Shortcrust & Puff Lid"}
-              </h2>
-            </div>
-          </div>
-          <nav aria-label="Factory workspace">
-            <RecipeSurfaceSwitch
-              value={surface}
-              select={(nextSurface) => this.setState({ surface: nextSurface })}
-            />
-            <div
-              className="factory-panel-pills"
-              role="group"
-              aria-label="Detail panels"
-            >
-              <button
-                type="button"
-                data-surface-target="pastry-bench:controls"
-                aria-expanded={panel === "scenario"}
-                onClick={this.togglePanel.bind(this, "scenario")}
-              >
-                Scenario
-              </button>
-              <button
-                type="button"
-                aria-expanded={panel === "results"}
-                onClick={this.togglePanel.bind(this, "results")}
-              >
-                Results
-              </button>
-            </div>
-          </nav>
-        </header>
-        {run !== null && status === "completed" && (
-          <button
-            type="button"
-            className="factory-summary"
-            onClick={this.togglePanel.bind(this, "results")}
-          >
-            <strong>
-              {run.shortcrustTelemetry.cavityDrapeMm.toFixed(1)} mm
-            </strong>{" "}
-            shortcrust drape ·{" "}
-            <strong>{run.puffLidTelemetry.sealCoveragePct.toFixed(0)}%</strong>{" "}
-            crimp seal ·{" "}
-            <strong>+{run.ovenTelemetry.puffLiftMm.toFixed(1)} mm</strong>{" "}
-            Maruzen puff
-          </button>
-        )}
-        {error !== null && (
-          <p role="alert" className="factory-summary">
-            {error}
-          </p>
-        )}
-        <aside
-          className="production-panel factory-drawer"
-          aria-label="Factory details"
-          hidden={panel === null}
-        >
-          <div className="factory-drawer-heading">
-            <h3>
-              {panel === "results"
-                ? "MuJoCo 4.0.0 deformable shell & oven results"
-                : "Pastry bench scenario controls"}
-            </h3>
-            <button
-              type="button"
-              onClick={() => this.setState({ panel: null })}
-            >
-              Close details
-            </button>
-          </div>
-          <div hidden={panel !== "scenario"}>
-            <PastryBenchScenarioForm
-              recipe={recipe}
-              notice={notice}
-              apply={(next) => void this.executeRun(next, true)}
-            />
-          </div>
-          <div hidden={panel !== "results"}>
-            {run === null ? (
-              <p>Waiting for MuJoCo 4.0.0 solver output…</p>
-            ) : (
-              <>
-                <h4>
-                  3D shortcrust dough block (330 g · dim=3 tetrahedral flexcomp)
-                </h4>
-                <dl>
-                  <dt>Pressed slab height</dt>
-                  <dd>
-                    {run.doughBlockTelemetry.doughBlockHeightMm.toFixed(2)} mm
-                    (from 31.60 mm)
-                  </dd>
-                  <dt>Poisson lateral span</dt>
-                  <dd>
-                    {run.doughBlockTelemetry.doughBlockSpanMm.toFixed(2)} mm
-                    (from 73.60 mm)
-                  </dd>
-                  <dt>3D solid topology</dt>
-                  <dd>
-                    {run.doughBlockTelemetry.doughBlockVertexCount} vertices ·{" "}
-                    {run.doughBlockTelemetry.doughBlockTriangleCount} boundary
-                    triangles
-                  </dd>
-                </dl>
-                <h4>Shortcrust tin lining (330 g · 3 × 110 g shells)</h4>
-                <dl>
-                  <dt>Final cavity drape</dt>
-                  <dd>{run.shortcrustTelemetry.cavityDrapeMm.toFixed(2)} mm</dd>
-                  <dt>Rolled sheet gauge</dt>
-                  <dd>
-                    {run.shortcrustTelemetry.sheetThicknessMm.toFixed(2)} mm
-                  </dd>
-                  <dt>Rim contact coverage</dt>
-                  <dd>{run.shortcrustTelemetry.sealCoveragePct.toFixed(1)}%</dd>
-                  <dt>Roller mechanical work</dt>
-                  <dd>
-                    {run.shortcrustTelemetry.rollerWorkJoules.toFixed(2)} J
-                  </dd>
-                </dl>
-                <h4>Puff-pastry lid crimp (240 g · 3 × 80 g lids)</h4>
-                <dl>
-                  <dt>Lid drape depth</dt>
-                  <dd>{run.puffLidTelemetry.cavityDrapeMm.toFixed(2)} mm</dd>
-                  <dt>Fluted crimp force</dt>
-                  <dd>{run.puffLidTelemetry.rimCrimpForceN.toFixed(1)} N</dd>
-                  <dt>Steam-lock seal coverage</dt>
-                  <dd>{run.puffLidTelemetry.sealCoveragePct.toFixed(1)}%</dd>
-                  <dt>Flexcomp mesh topology</dt>
-                  <dd>
-                    {run.puffLidTelemetry.vertexCount} vertices ·{" "}
-                    {run.puffLidTelemetry.triangleCount} triangles
-                  </dd>
-                </dl>
-                <h4>Maruzen MBCO-5E convection bake (200 °C · middle rack)</h4>
-                <dl>
-                  <dt>Peak convection chamber</dt>
-                  <dd>{run.ovenTelemetry.peakChamberC.toFixed(1)} °C</dd>
-                  <dt>Puff-lamination dome lift</dt>
-                  <dd>+{run.ovenTelemetry.puffLiftMm.toFixed(2)} mm</dd>
-                  <dt>Maillard egg-wash crust</dt>
-                  <dd>{run.ovenTelemetry.finalBrowningPct.toFixed(1)}%</dd>
-                  <dt>Steam evaporation</dt>
-                  <dd>
-                    {run.ovenTelemetry.steamLossG.toFixed(1)} g (
-                    {run.ovenTelemetry.heaterInputKJ.toFixed(0)} kJ heater)
-                  </dd>
-                </dl>
-                {run.rejectedAttemptTelemetry !== null && (
-                  <>
-                    <h4>Injected unfloured fault &amp; recovery</h4>
-                    <dl>
-                      <dt>Unfloured attempt drape</dt>
-                      <dd>
-                        {run.rejectedAttemptTelemetry.cavityDrapeMm.toFixed(2)}{" "}
-                        mm (rejected by 14 mm gate)
-                      </dd>
-                      <dt>Recovered floured drape</dt>
-                      <dd>
-                        {run.shortcrustTelemetry.cavityDrapeMm.toFixed(2)} mm
-                        (passed)
-                      </dd>
-                    </dl>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </aside>
-        <div className="factory-workflow-canvas" hidden={surface === "factory"}>
-          <RecipeWorkflow
-            graph={{ kind: "savoury-pies", pie: recipe.pieType }}
-            stages={stages}
-            clock={clock}
-            running={status === "running"}
-            prepared={status === "paused" && this.time.get() === 0}
-            outcome={
-              status === "failed"
-                ? "failed"
-                : status === "completed"
-                  ? "completed"
-                  : null
-            }
-            seek={this.seekTo.bind(this)}
+        }
+        kicker="Factory simulation · MuJoCo 4.0.0 flexcomp + Maruzen MBCO-5E"
+        title={
+          <>
+            Pie Pastry Bench ·{" "}
+            {run?.productTitle ?? "Deformable Shortcrust & Puff Lid"}
+          </>
+        }
+        scenarioTarget="pastry-bench:controls"
+        summary={
+          run !== null && status === "completed" ? (
+            <>
+              <strong>
+                {run.shortcrustTelemetry.cavityDrapeMm.toFixed(1)} mm
+              </strong>{" "}
+              shortcrust drape ·{" "}
+              <strong>
+                {run.puffLidTelemetry.sealCoveragePct.toFixed(0)}%
+              </strong>{" "}
+              crimp seal ·{" "}
+              <strong>+{run.ovenTelemetry.puffLiftMm.toFixed(1)} mm</strong>{" "}
+              Maruzen puff
+            </>
+          ) : null
+        }
+        summaryType="button"
+        alert={
+          error !== null && (
+            <p role="alert" className="factory-summary">
+              {error}
+            </p>
+          )
+        }
+        headings={{
+          scenario: "Pastry bench scenario controls",
+          results: "MuJoCo 4.0.0 deformable shell & oven results",
+        }}
+        scenario={
+          <PastryBenchScenarioForm
+            recipe={recipe}
+            notice={notice}
+            apply={(next) => void this.executeRun(next, true)}
           />
-        </div>
-        <RecipeSplitDivider surface={surface} />
-        <RecipeRunFooter
-          clock={clock}
-          stages={stages}
-          horizonS={Math.max(0.1, maxS)}
-          completed={status === "completed"}
-          status={status}
-          control={
+        }
+        results={
+          run === null ? (
+            <p>Waiting for MuJoCo 4.0.0 solver output…</p>
+          ) : (
+            <>
+              <h4>
+                3D shortcrust dough block (330 g · dim=3 tetrahedral flexcomp)
+              </h4>
+              <dl>
+                <dt>Pressed slab height</dt>
+                <dd>
+                  {run.doughBlockTelemetry.doughBlockHeightMm.toFixed(2)} mm
+                  (from 31.60 mm)
+                </dd>
+                <dt>Poisson lateral span</dt>
+                <dd>
+                  {run.doughBlockTelemetry.doughBlockSpanMm.toFixed(2)} mm (from
+                  73.60 mm)
+                </dd>
+                <dt>3D solid topology</dt>
+                <dd>
+                  {run.doughBlockTelemetry.doughBlockVertexCount} vertices ·{" "}
+                  {run.doughBlockTelemetry.doughBlockTriangleCount} boundary
+                  triangles
+                </dd>
+              </dl>
+              <h4>Shortcrust tin lining (330 g · 3 × 110 g shells)</h4>
+              <dl>
+                <dt>Final cavity drape</dt>
+                <dd>{run.shortcrustTelemetry.cavityDrapeMm.toFixed(2)} mm</dd>
+                <dt>Rolled sheet gauge</dt>
+                <dd>
+                  {run.shortcrustTelemetry.sheetThicknessMm.toFixed(2)} mm
+                </dd>
+                <dt>Rim contact coverage</dt>
+                <dd>{run.shortcrustTelemetry.sealCoveragePct.toFixed(1)}%</dd>
+                <dt>Roller mechanical work</dt>
+                <dd>{run.shortcrustTelemetry.rollerWorkJoules.toFixed(2)} J</dd>
+              </dl>
+              <h4>Puff-pastry lid crimp (240 g · 3 × 80 g lids)</h4>
+              <dl>
+                <dt>Lid drape depth</dt>
+                <dd>{run.puffLidTelemetry.cavityDrapeMm.toFixed(2)} mm</dd>
+                <dt>Fluted crimp force</dt>
+                <dd>{run.puffLidTelemetry.rimCrimpForceN.toFixed(1)} N</dd>
+                <dt>Steam-lock seal coverage</dt>
+                <dd>{run.puffLidTelemetry.sealCoveragePct.toFixed(1)}%</dd>
+                <dt>Flexcomp mesh topology</dt>
+                <dd>
+                  {run.puffLidTelemetry.vertexCount} vertices ·{" "}
+                  {run.puffLidTelemetry.triangleCount} triangles
+                </dd>
+              </dl>
+              <h4>Maruzen MBCO-5E convection bake (200 °C · middle rack)</h4>
+              <dl>
+                <dt>Peak convection chamber</dt>
+                <dd>{run.ovenTelemetry.peakChamberC.toFixed(1)} °C</dd>
+                <dt>Puff-lamination dome lift</dt>
+                <dd>+{run.ovenTelemetry.puffLiftMm.toFixed(2)} mm</dd>
+                <dt>Maillard egg-wash crust</dt>
+                <dd>{run.ovenTelemetry.finalBrowningPct.toFixed(1)}%</dd>
+                <dt>Steam evaporation</dt>
+                <dd>
+                  {run.ovenTelemetry.steamLossG.toFixed(1)} g (
+                  {run.ovenTelemetry.heaterInputKJ.toFixed(0)} kJ heater)
+                </dd>
+              </dl>
+              {run.rejectedAttemptTelemetry !== null && (
+                <>
+                  <h4>Injected unfloured fault &amp; recovery</h4>
+                  <dl>
+                    <dt>Unfloured attempt drape</dt>
+                    <dd>
+                      {run.rejectedAttemptTelemetry.cavityDrapeMm.toFixed(2)} mm
+                      (rejected by 14 mm gate)
+                    </dd>
+                    <dt>Recovered floured drape</dt>
+                    <dd>
+                      {run.shortcrustTelemetry.cavityDrapeMm.toFixed(2)} mm
+                      (passed)
+                    </dd>
+                  </dl>
+                </>
+              )}
+            </>
+          )
+        }
+        graph={{ kind: "savoury-pies", pie: recipe.pieType }}
+        prepared={status === "paused" && this.time.get() === 0}
+        outcome={
+          status === "failed"
+            ? "failed"
+            : status === "completed"
+              ? "completed"
+              : null
+        }
+        footer={{
+          horizonS: Math.max(0.1, maxS),
+          control: (
             <div data-surface-target="pastry-bench:prepare">
               {this.primaryControl()}
             </div>
-          }
-          labels={{
+          ),
+          labels: {
             title: "Task timeline",
             scaleDigits: 1,
             header: (
@@ -1017,12 +918,9 @@ export class PastryBenchWorkspace extends React.Component<
             span: (stage) =>
               `${stage.startS.toFixed(1)}–${stage.endS.toFixed(1)} s`,
             minSpanPct: 3,
-          }}
-          timeline={timeline}
-          toggleTimeline={this.toggleTimeline.bind(this)}
-          seek={this.seekTo.bind(this)}
-        />
-      </section>
+          },
+        }}
+      />
     );
   }
 }
@@ -1044,99 +942,60 @@ function PastryBenchScenarioForm(props: {
   );
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
+    <RecipeScenarioForm
+      notice={props.notice}
+      submit="Run MuJoCo 4.0.0 flexcomp"
+      apply={() =>
         props.apply({
           pieType,
           targetThicknessMm: thickness,
           crimpForceN: crimpForce,
           faultCheck,
-        });
-      }}
+        })
+      }
     >
       <p>
         16 °C tempered marble pastry slab with stainless rolling pin, 12 cm
         fluted aluminium pie tin (28 mm cavity), and fluted rim crimping ring.
       </p>
-      <label>
-        Savoury pie variety
-        <Select.Root
-          items={PIE_TYPE_ITEMS}
-          value={pieType}
-          onValueChange={(v) => {
-            if (v === "steak-and-pepper" || v === "beef-bourguignon") {
-              setPieType(v);
-            }
-          }}
-        >
-          <Select.Trigger>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{PIE_TYPE_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Shortcrust target thickness
-        <Select.Root
-          items={THICKNESS_ITEMS}
-          value={thickness.toFixed(1)}
-          onValueChange={(v) => {
-            if (v === "2.5") setThickness(2.5);
-            else if (v === "3.5") setThickness(3.5);
-            else if (v === "3.0") setThickness(3.0);
-          }}
-        >
-          <Select.Trigger>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{THICKNESS_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Puff-pastry rim crimp force
-        <Select.Root
-          items={CRIMP_FORCE_ITEMS}
-          value={String(crimpForce)}
-          onValueChange={(v) => {
-            if (v === "36") setCrimpForce(36);
-            else if (v === "52") setCrimpForce(52);
-            else if (v === "42") setCrimpForce(42);
-          }}
-        >
-          <Select.Trigger>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{CRIMP_FORCE_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Process check
-        <Select.Root
-          items={FAULT_CHECK_ITEMS}
-          value={faultCheck}
-          onValueChange={(v) => {
-            if (v === "none" || v === "unfloured-bench") setFaultCheck(v);
-          }}
-        >
-          <Select.Trigger>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{FAULT_CHECK_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <button type="submit">Run MuJoCo 4.0.0 flexcomp</button>
-      <p role="status">{props.notice}</p>
-    </form>
-  );
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
+      <RecipeChoice
+        label="Savoury pie variety"
+        items={PIE_TYPE_ITEMS}
+        value={pieType}
+        choose={(v) => {
+          if (v === "steak-and-pepper" || v === "beef-bourguignon") {
+            setPieType(v);
+          }
+        }}
+      />
+      <RecipeChoice
+        label="Shortcrust target thickness"
+        items={THICKNESS_ITEMS}
+        value={thickness.toFixed(1)}
+        choose={(v) => {
+          if (v === "2.5") setThickness(2.5);
+          else if (v === "3.5") setThickness(3.5);
+          else if (v === "3.0") setThickness(3.0);
+        }}
+      />
+      <RecipeChoice
+        label="Puff-pastry rim crimp force"
+        items={CRIMP_FORCE_ITEMS}
+        value={String(crimpForce)}
+        choose={(v) => {
+          if (v === "36") setCrimpForce(36);
+          else if (v === "52") setCrimpForce(52);
+          else if (v === "42") setCrimpForce(42);
+        }}
+      />
+      <RecipeChoice
+        label="Process check"
+        items={FAULT_CHECK_ITEMS}
+        value={faultCheck}
+        choose={(v) => {
+          if (v === "none" || v === "unfloured-bench") setFaultCheck(v);
+        }}
+      />
+    </RecipeScenarioForm>
   );
 }

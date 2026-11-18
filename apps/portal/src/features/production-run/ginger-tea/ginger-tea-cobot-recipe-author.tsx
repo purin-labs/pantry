@@ -1,4 +1,3 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import {
   DEFAULT_GINGER_TEA_COBOT_RECIPE,
@@ -8,6 +7,7 @@ import {
   type GingerTeaLeaf,
   type GingerTeaWorkflowMode,
 } from "@seams/production-simulation/recipes/ginger-tea/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{
   prepared(recipe: GingerTeaCobotRecipeConfig): void;
@@ -120,92 +120,50 @@ export class GingerTeaCobotRecipeAuthor extends React.Component<Props, State> {
         </h3>
         <p>
           FAIRINO FR10 Cobot stages the clean 200 mm receiving saucepan in its
-          rigid 600 × 400 mm tray insert (`persistent-pan-staging/1`), weighs
-          15 g sliced ginger on the Ohaus Ranger 3000 scale, simmers ginger on
-          the Maruzen MIH-02C or Vollrath 59500P induction hob, executes either
-          Plan 61C heat-off steeping on the heatproof rest or Plan 61D two-pan
+          rigid 600 × 400 mm tray insert (`persistent-pan-staging/1`), weighs 15
+          g sliced ginger on the Ohaus Ranger 3000 scale, simmers ginger on the
+          Maruzen MIH-02C or Vollrath 59500P induction hob, executes either Plan
+          61C heat-off steeping on the heatproof rest or Plan 61D two-pan
           straining into `pan-b` with 180 g milk + 25 g sugar finishing to 78 °C
           (75–80 °C), and washes used utensils at the sink.
         </p>
-        <label>
-          Workflow mode (Plan 61C vs Plan 61D)
-          <Select.Root
-            items={MODES}
-            value={this.state.mode}
-            onValueChange={(value) => {
-              if (value === null) return;
-              this.setState({
-                mode: value === "black-tea" ? "black-tea" : "two-pan-milk-tea",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {MODES.map((item) => (
-                <Select.Item key={item.value} value={item.value}>
-                  {item.label}
-                </Select.Item>
-              ))}
-            </Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Induction hob model
-          <Select.Root
-            items={HOBS}
-            value={this.state.hob}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                hob:
-                  v === "vollrath" ||
-                  v === "panasonic-kz-ck1402" ||
-                  v === "rinnai-rsb-150pj"
-                    ? v
-                    : "maruzen",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {HOBS.map((item) => (
-                <Select.Item key={item.value} value={item.value}>
-                  {item.label}
-                </Select.Item>
-              ))}
-            </Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Tea leaf selection
-          <Select.Root
-            items={TEAS}
-            value={this.state.tea}
-            onValueChange={(value) => {
-              if (value === null) return;
-              const tea = value === "ctc" ? "ctc" : "assam";
-              this.setState({
-                tea,
-                steepSeconds: tea === "ctc" ? "120" : "180",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {TEAS.map((item) => (
-                <Select.Item key={item.value} value={item.value}>
-                  {item.label}
-                </Select.Item>
-              ))}
-            </Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Workflow mode (Plan 61C vs Plan 61D)"
+          items={MODES}
+          value={this.state.mode}
+          choose={(value) => {
+            this.setState({
+              mode: value === "black-tea" ? "black-tea" : "two-pan-milk-tea",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Induction hob model"
+          items={HOBS}
+          value={this.state.hob}
+          choose={(v) => {
+            this.setState({
+              hob:
+                v === "vollrath" ||
+                v === "panasonic-kz-ck1402" ||
+                v === "rinnai-rsb-150pj"
+                  ? v
+                  : "maruzen",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Tea leaf selection"
+          items={TEAS}
+          value={this.state.tea}
+          choose={(value) => {
+            const tea = value === "ctc" ? "ctc" : "assam";
+            this.setState({
+              tea,
+              steepSeconds: tea === "ctc" ? "120" : "180",
+            });
+          }}
+        />
         <label>
           Ginger simmer duration (s)
           <input
@@ -214,7 +172,9 @@ export class GingerTeaCobotRecipeAuthor extends React.Component<Props, State> {
             max={480}
             step={10}
             value={this.state.simmerSeconds}
-            onChange={(e) => this.setState({ simmerSeconds: e.currentTarget.value })}
+            onChange={(e) =>
+              this.setState({ simmerSeconds: e.currentTarget.value })
+            }
           />
         </label>
         <label>
@@ -225,7 +185,9 @@ export class GingerTeaCobotRecipeAuthor extends React.Component<Props, State> {
             max={240}
             step={10}
             value={this.state.steepSeconds}
-            onChange={(e) => this.setState({ steepSeconds: e.currentTarget.value })}
+            onChange={(e) =>
+              this.setState({ steepSeconds: e.currentTarget.value })
+            }
           />
         </label>
         <label className="checkbox-label">
@@ -238,33 +200,19 @@ export class GingerTeaCobotRecipeAuthor extends React.Component<Props, State> {
           />
           Start with one dirty pan requiring sink wash before extraction
         </label>
-        <label>
-          Process &amp; pan-staging check
-          <Select.Root
-            items={CHECKS}
-            value={this.state.check}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                check:
-                  v === "late-straining-hold" || v === "dropped-pan-recovery"
-                    ? v
-                    : "none",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {CHECKS.map((item) => (
-                <Select.Item key={item.value} value={item.value}>
-                  {item.label}
-                </Select.Item>
-              ))}
-            </Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Process & pan-staging check"
+          items={CHECKS}
+          value={this.state.check}
+          choose={(v) => {
+            this.setState({
+              check:
+                v === "late-straining-hold" || v === "dropped-pan-recovery"
+                  ? v
+                  : "none",
+            });
+          }}
+        />
         <button type="submit">Prepare Ginger Tea 3D station</button>
         <p role="status">{this.state.notice}</p>
       </form>

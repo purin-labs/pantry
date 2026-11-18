@@ -1,14 +1,4 @@
-import { Select } from "../../../ui/select";
 import React from "react";
-import {
-  RecipeAnimationNotice,
-  RecipeBackButton,
-  RecipeSplitDivider,
-  RunIcon,
-  type RecipeSurface,
-  RecipeSurfaceSwitch,
-  RecipeWorkflow,
-} from "../recipe-workflow";
 import {
   ORIGINAL_ANIMATION,
   modelTime,
@@ -18,7 +8,6 @@ import {
   type AnimationPlan,
   type AnimationPlanBuilder,
 } from "../recipe-clock";
-import { BakeryAppearanceControl } from "../../../preferences/appearance-controls";
 import {
   CafeShiftSimulationEngine,
   cafeShiftGrinderLabel,
@@ -33,10 +22,21 @@ import {
   type CafeShiftStaffing,
 } from "@seams/production-simulation/recipes/cafe-shift/model";
 import { CafeShiftScene, type CafeShiftCameraPreset } from "./cafe-shift-scene";
-import type { RecipeFrames } from "../shared/playback-controller";
+import { recipeFrames, type RecipeFrames } from "../shared/playback-controller";
 import { Live, LiveText } from "../shared/live";
 import { deriveLive, LiveValue, type LiveSource } from "../shared/live-value";
-import { RecipeRunFooter } from "../recipe-run-footer";
+import { RecipeChoice, RecipeScenarioForm } from "../shared/recipe-form";
+import {
+  RecipeStation,
+  RecipeStepPills,
+  type RecipeStep,
+} from "../shared/recipe-station";
+import {
+  RECIPE_WORKSPACE_VIEW,
+  RecipeRunControl,
+  RecipeWorkspaceLayout,
+  type RecipeWorkspaceView,
+} from "../shared/recipe-workspace";
 import "../oven-workspace.css";
 // The station readout uses the pour-over styles, so this view loads them itself.
 import "../pour-over/pour-over.css";
@@ -45,12 +45,7 @@ type ViewProps = Readonly<{
   frames: LiveSource<RecipeFrames<CafeShiftSample>>;
 }>;
 
-type ViewState = Readonly<{
-  error: string | null;
-  camera: CafeShiftCameraPreset;
-}>;
-
-const SHIFT_STEPS = [
+const SHIFT_STEPS: readonly RecipeStep[] = [
   {
     id: "batter-and-order-1",
     label: "1 · Batter",
@@ -71,7 +66,7 @@ const SHIFT_STEPS = [
     label: "4 · Demould & Pack",
     detail: "Sample & Seal",
   },
-] as const;
+];
 
 const PHASE_INDEX: Readonly<Record<CafeShiftPhase, number>> = {
   "batter-and-order-1": 0,
@@ -83,202 +78,97 @@ const PHASE_INDEX: Readonly<Record<CafeShiftPhase, number>> = {
   failed: -1,
 };
 
-class CafeShiftPhysicsView extends React.Component<ViewProps, ViewState> {
-  state: ViewState = { error: null, camera: "overview" };
-  private readonly element = React.createRef<HTMLDivElement>();
-  private readonly station = React.createRef<HTMLElement>();
-  private visual: CafeShiftScene | null = null;
-  private unsubscribe: (() => void) | null = null;
-
-  componentDidMount(): void {
-    const element = this.element.current;
-    if (element === null) return;
-    this.visual = new CafeShiftScene(element);
-    this.subscribe();
-    void this.load(this.visual);
-  }
-
-  private async load(visual: CafeShiftScene): Promise<void> {
-    try {
-      await visual.load();
-    } catch (error) {
-      if (this.visual === visual)
-        this.setState({
-          error:
-            error instanceof Error
-              ? error.message
-              : "The combined café shift workcell visual is unavailable.",
-        });
-    }
-  }
-
-  componentDidUpdate(prevProps: ViewProps): void {
-    if (prevProps.frames !== this.props.frames) this.subscribe();
-  }
-
-  /** The scene and the station attributes follow each frame outside React. */
-  private subscribe(): void {
-    this.unsubscribe?.();
-    this.unsubscribe = this.props.frames.subscribe(this.showFrames.bind(this));
-    this.showFrames(this.props.frames.get());
-  }
-
-  private showFrames(frames: RecipeFrames<CafeShiftSample>): void {
-    const station = this.station.current;
-    if (station !== null) {
-      station.setAttribute("data-cafe-shift-phase", frames.sample.phase);
-      station.setAttribute("data-cafe-shift-step", String(frames.sample.step));
-      station.setAttribute("data-cafe-shift-grinder", frames.sample.grinder);
-    }
-    if (frames.samples.length > 1) this.visual?.setSamples(frames.samples);
-    else this.visual?.setFrame(frames.sample);
-  }
-
-  private selectCamera(camera: CafeShiftCameraPreset): void {
-    this.setState({ camera });
-    this.visual?.setCameraPreset(camera);
-  }
-
-  componentWillUnmount(): void {
-    this.unsubscribe?.();
-    this.visual?.dispose();
-    this.visual = null;
-  }
-
-  render(): React.ReactNode {
-    const { frames } = this.props;
-    // The appliance belongs to the scenario: it changes with a new run.
-    const sample = frames.get().sample;
-    const machineLabel =
-      sample.appliance === "linea"
-        ? "La Marzocco Linea Classic S"
-        : "Victoria Arduino Eagle One";
-
-    return (
-      <section
-        aria-label="Accepted combined café shift state"
-        className="pour-over-station"
-        ref={this.station}
-      >
-        <div
-          ref={this.element}
-          className="pour-over-canvas"
-          role="img"
-          aria-label={`3D combined café shift workspace with Head Baker #1, Hobart HL200 mixer, Maruzen MIH-02C hob, Maruzen MBCO-5E oven, 16-level cooling rack, Ohaus Ranger 3000 scale, gold-ribbon gift box, Lead Barista #2, Hoshizaki IM-35P undercounter ice maker, and ${machineLabel}`}
+function CafeShiftPhysicsView(props: ViewProps): React.ReactNode {
+  const { frames } = props;
+  // The appliance belongs to the scenario: it changes with a new run.
+  const sample = frames.get().sample;
+  const machineLabel =
+    sample.appliance === "linea"
+      ? "La Marzocco Linea Classic S"
+      : "Victoria Arduino Eagle One";
+  const cameras: readonly (readonly [
+    CafeShiftCameraPreset,
+    React.ReactNode,
+  ])[] = [
+    ["overview", "Café shift overview"],
+    ["bakery", "Financier patisserie line"],
+    [
+      "espresso-bar",
+      <>
+        Espresso bar ({sample.appliance === "linea" ? "Linea" : "Eagle One"})
+      </>,
+    ],
+    ["packing", "Cooling rack & gift box"],
+  ];
+  return (
+    <RecipeStation
+      frames={frames}
+      scene={(element) => new CafeShiftScene(element)}
+      unavailable="The combined café shift workcell visual is unavailable."
+      attributes={(next) => ({
+        "data-cafe-shift-phase": next.phase,
+        "data-cafe-shift-step": String(next.step),
+        "data-cafe-shift-grinder": next.grinder,
+      })}
+      label="Accepted combined café shift state"
+      canvasLabel={`3D combined café shift workspace with Head Baker #1, Hobart HL200 mixer, Maruzen MIH-02C hob, Maruzen MBCO-5E oven, 16-level cooling rack, Ohaus Ranger 3000 scale, gold-ribbon gift box, Lead Barista #2, Hoshizaki IM-35P undercounter ice maker, and ${machineLabel}`}
+      camera="overview"
+      cameras={cameras}
+    >
+      <RecipeStepPills
+        frames={frames}
+        label="Café shift stages"
+        steps={() => SHIFT_STEPS}
+        index={(next) => PHASE_INDEX[next.phase]}
+      />
+      <dl>
+        <dt>Patisserie baker</dt>
+        <LiveText
+          as="dd"
+          source={frames}
+          text={({ sample }) => `${sample.bakerStatus}`}
         />
-        <div className="pour-over-camera-bar" role="group" aria-label="Camera">
-          <BakeryAppearanceControl />
-          <button
-            type="button"
-            aria-pressed={this.state.camera === "overview"}
-            onClick={this.selectCamera.bind(this, "overview")}
-          >
-            Café shift overview
-          </button>
-          <button
-            type="button"
-            aria-pressed={this.state.camera === "bakery"}
-            onClick={this.selectCamera.bind(this, "bakery")}
-          >
-            Financier patisserie line
-          </button>
-          <button
-            type="button"
-            aria-pressed={this.state.camera === "espresso-bar"}
-            onClick={this.selectCamera.bind(this, "espresso-bar")}
-          >
-            Espresso bar ({sample.appliance === "linea" ? "Linea" : "Eagle One"}
-            )
-          </button>
-          <button
-            type="button"
-            aria-pressed={this.state.camera === "packing"}
-            onClick={this.selectCamera.bind(this, "packing")}
-          >
-            Cooling rack &amp; gift box
-          </button>
-        </div>
-        <div className="pour-over-status">
-          <Live source={frames} select={(f) => f.sample.phase}>
-            {(phase) => (
-              <div
-                className="pour-over-steps"
-                style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}
-                aria-label="Café shift stages"
-              >
-                {SHIFT_STEPS.map((st, idx) => {
-                  const currentIdx = PHASE_INDEX[phase];
-                  const state =
-                    phase === "completed" || currentIdx > idx
-                      ? "done"
-                      : currentIdx === idx
-                        ? "active"
-                        : "pending";
-                  return (
-                    <div
-                      key={st.id}
-                      className="pour-over-step-pill"
-                      data-step-state={state}
-                    >
-                      <span>{st.label}</span>
-                      <strong>{st.detail}</strong>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </Live>
-          <dl>
-            <dt>Patisserie baker</dt>
-            <LiveText
-              as="dd"
-              source={frames}
-              text={({ sample }) => `${sample.bakerStatus}`}
-            />
-            <dt>Espresso barista</dt>
-            <LiveText
-              as="dd"
-              source={frames}
-              text={({ sample }) => `${sample.baristaStatus}`}
-            />
-            <dt>Espresso bar</dt>
-            <LiveText
-              as="dd"
-              source={frames}
-              text={({ sample }) =>
-                `${sample.servedEspressoG.toFixed(1)} g (${sample.servedOrders}/${sample.espressoOrders} cups) · ${sample.coffeeBoilerC.toFixed(0)} °C · ${sample.brewPressureBar.toFixed(1)} bar · ${cafeShiftGrinderLabel(sample.grinder)} (${sample.grinderRpm} RPM) · IM-35P ${sample.iceBinStockKg.toFixed(2)} kg ice (${sample.iceMakerPowerW} W)`
-              }
-            />
-            <dt>Financiers</dt>
-            <LiveText
-              as="dd"
-              source={frames}
-              text={({ sample }) =>
-                `${sample.packedFinanciers} packed (${sample.packedNetMassG.toFixed(1)} g) · ${sample.crumbSamplePieces} sample${
-                  sample.rejectedFinanciers > 0
-                    ? ` · ${sample.rejectedFinanciers} rejected`
-                    : ""
-                } · ${sample.retainedBatterG.toFixed(0)} g batter`
-              }
-            />
-            <dt>Shift clock</dt>
-            <LiveText
-              as="dd"
-              source={frames}
-              text={({ sample }) =>
-                `${sample.logicalClockS} s · ${
-                  sample.staffing === "two-workers"
-                    ? "2 Workers (0 s wait)"
-                    : `1 worker (${sample.workerContentionWaitS} s wait)`
-                }`
-              }
-            />
-          </dl>
-        </div>
-        {this.state.error !== null && <p role="alert">{this.state.error}</p>}
-      </section>
-    );
-  }
+        <dt>Espresso barista</dt>
+        <LiveText
+          as="dd"
+          source={frames}
+          text={({ sample }) => `${sample.baristaStatus}`}
+        />
+        <dt>Espresso bar</dt>
+        <LiveText
+          as="dd"
+          source={frames}
+          text={({ sample }) =>
+            `${sample.servedEspressoG.toFixed(1)} g (${sample.servedOrders}/${sample.espressoOrders} cups) · ${sample.coffeeBoilerC.toFixed(0)} °C · ${sample.brewPressureBar.toFixed(1)} bar · ${cafeShiftGrinderLabel(sample.grinder)} (${sample.grinderRpm} RPM) · IM-35P ${sample.iceBinStockKg.toFixed(2)} kg ice (${sample.iceMakerPowerW} W)`
+          }
+        />
+        <dt>Financiers</dt>
+        <LiveText
+          as="dd"
+          source={frames}
+          text={({ sample }) =>
+            `${sample.packedFinanciers} packed (${sample.packedNetMassG.toFixed(1)} g) · ${sample.crumbSamplePieces} sample${
+              sample.rejectedFinanciers > 0
+                ? ` · ${sample.rejectedFinanciers} rejected`
+                : ""
+            } · ${sample.retainedBatterG.toFixed(0)} g batter`
+          }
+        />
+        <dt>Shift clock</dt>
+        <LiveText
+          as="dd"
+          source={frames}
+          text={({ sample }) =>
+            `${sample.logicalClockS} s · ${
+              sample.staffing === "two-workers"
+                ? "2 Workers (0 s wait)"
+                : `1 worker (${sample.workerContentionWaitS} s wait)`
+            }`
+          }
+        />
+      </dl>
+    </RecipeStation>
+  );
 }
 
 type WorkspaceProps = Readonly<{
@@ -289,16 +179,36 @@ type WorkspaceProps = Readonly<{
   ): void;
 }>;
 
-type WorkspaceState = Readonly<{
-  surface: RecipeSurface;
-  config: CafeShiftRecipeConfig;
-  status: "ready" | "running" | "paused" | "completed" | "blocked";
-  panel: "scenario" | "results" | null;
-  timeline: boolean;
-  outcome: CafeShiftOutcome | null;
-  completedRuns: readonly Extract<CafeShiftOutcome, { kind: "completed" }>[];
-  notice: string;
-}>;
+type CompletedShift = Extract<CafeShiftOutcome, { kind: "completed" }>;
+
+/** The completed runs with this outcome, once for each scenario. */
+function withCompletedRun(
+  runs: readonly CompletedShift[],
+  outcome: CafeShiftOutcome | null,
+): readonly CompletedShift[] {
+  return outcome !== null &&
+    outcome.kind === "completed" &&
+    !runs.some(
+      (r) =>
+        r.appliance === outcome.appliance &&
+        r.grinder === outcome.grinder &&
+        r.staffing === outcome.staffing &&
+        r.financierLoads === outcome.financierLoads &&
+        r.espressoOrders === outcome.espressoOrders &&
+        r.check === outcome.check,
+    )
+    ? [...runs, outcome]
+    : runs;
+}
+
+type WorkspaceState = RecipeWorkspaceView &
+  Readonly<{
+    config: CafeShiftRecipeConfig;
+    status: "ready" | "running" | "paused" | "completed" | "blocked";
+    outcome: CafeShiftOutcome | null;
+    completedRuns: readonly CompletedShift[];
+    notice: string;
+  }>;
 
 export class CafeShiftWorkspace extends React.Component<
   WorkspaceProps,
@@ -315,13 +225,11 @@ export class CafeShiftWorkspace extends React.Component<
   constructor(props: WorkspaceProps) {
     super(props);
     this.engine = new CafeShiftSimulationEngine(props.recipe);
-    this.frames = new LiveValue(cafeFrames(this.resetRun()));
+    this.frames = new LiveValue(recipeFrames(this.resetRun()));
     this.state = {
+      ...RECIPE_WORKSPACE_VIEW,
       config: this.engine.config,
       status: "ready",
-      surface: "factory",
-      panel: null,
-      timeline: false,
       outcome: null,
       completedRuns: [],
       notice: "",
@@ -339,16 +247,6 @@ export class CafeShiftWorkspace extends React.Component<
     }
   }
 
-  private togglePanel(target: "scenario" | "results"): void {
-    this.setState((s) => ({
-      panel: s.panel === target ? null : target,
-    }));
-  }
-
-  private toggleTimeline(): void {
-    this.setState((s) => ({ timeline: !s.timeline }));
-  }
-
   private startOrResume(): void {
     if (this.state.status === "running") return;
     this.setState({ status: "running", notice: "" });
@@ -364,7 +262,7 @@ export class CafeShiftWorkspace extends React.Component<
 
   private restart(): void {
     this.stopTimer();
-    this.frames.set(cafeFrames(this.resetRun()));
+    this.frames.set(recipeFrames(this.resetRun()));
     this.setState({
       status: "running",
       outcome: null,
@@ -390,19 +288,7 @@ export class CafeShiftWorkspace extends React.Component<
       this.setState((prev) => ({
         status: outcome.kind === "completed" ? "completed" : "blocked",
         outcome,
-        completedRuns:
-          outcome.kind === "completed" &&
-          !prev.completedRuns.some(
-            (r) =>
-              r.appliance === outcome.appliance &&
-              r.grinder === outcome.grinder &&
-              r.staffing === outcome.staffing &&
-              r.financierLoads === outcome.financierLoads &&
-              r.espressoOrders === outcome.espressoOrders &&
-              r.check === outcome.check,
-          )
-            ? [...prev.completedRuns, outcome]
-            : prev.completedRuns,
+        completedRuns: withCompletedRun(prev.completedRuns, outcome),
       }));
     }
   }
@@ -419,24 +305,11 @@ export class CafeShiftWorkspace extends React.Component<
       guard += 1;
     }
     const outcome = this.engine.outcome;
-    this.frames.set(cafeFrames(latest));
+    this.frames.set(recipeFrames(latest));
     this.setState((prev) => ({
       status: outcome?.kind === "completed" ? "completed" : "blocked",
       outcome,
-      completedRuns:
-        outcome !== null &&
-        outcome.kind === "completed" &&
-        !prev.completedRuns.some(
-          (r) =>
-            r.appliance === outcome.appliance &&
-            r.grinder === outcome.grinder &&
-            r.staffing === outcome.staffing &&
-            r.financierLoads === outcome.financierLoads &&
-            r.espressoOrders === outcome.espressoOrders &&
-            r.check === outcome.check,
-        )
-          ? [...prev.completedRuns, outcome]
-          : prev.completedRuns,
+      completedRuns: withCompletedRun(prev.completedRuns, outcome),
     }));
   }
 
@@ -469,7 +342,7 @@ export class CafeShiftWorkspace extends React.Component<
   private planned(build: AnimationPlanBuilder): void {
     this.stopTimer();
     this.animation = build(cafeShiftTimelineStages(this.engine.config));
-    this.frames.set(cafeFrames(this.resetRun()));
+    this.frames.set(recipeFrames(this.resetRun()));
     this.setState({
       status: "ready",
       outcome: null,
@@ -479,7 +352,7 @@ export class CafeShiftWorkspace extends React.Component<
   private scrubToTime(targetS: number): void {
     this.stopTimer();
     const sample = this.seekRun(targetS);
-    this.frames.set(cafeFrames(sample));
+    this.frames.set(recipeFrames(sample));
     const outcome = this.engine.outcome;
     this.setState({
       status:
@@ -498,7 +371,7 @@ export class CafeShiftWorkspace extends React.Component<
     this.stopTimer();
     this.animation = ORIGINAL_ANIMATION;
     this.engine = new CafeShiftSimulationEngine(next);
-    this.frames.set(cafeFrames(this.resetRun()));
+    this.frames.set(recipeFrames(this.resetRun()));
     this.setState({
       config: this.engine.config,
       status: "ready",
@@ -507,49 +380,8 @@ export class CafeShiftWorkspace extends React.Component<
     });
   }
 
-  private primaryControl(): React.ReactNode {
-    const { status } = this.state;
-    if (status === "running") {
-      return (
-        <button className="factory-primary" onClick={this.pause.bind(this)}>
-          <RunIcon action="pause" />
-          Pause production
-        </button>
-      );
-    }
-    if (status === "paused") {
-      return (
-        <button
-          className="factory-primary"
-          onClick={this.startOrResume.bind(this)}
-        >
-          <RunIcon action="start" />
-          Resume production run
-        </button>
-      );
-    }
-    if (status === "completed" || status === "blocked") {
-      return (
-        <button className="factory-primary" onClick={this.restart.bind(this)}>
-          <RunIcon action="again" />
-          Run again
-        </button>
-      );
-    }
-    return (
-      <button
-        className="factory-primary"
-        onClick={this.startOrResume.bind(this)}
-      >
-        <RunIcon action="start" />
-        Start production
-      </button>
-    );
-  }
-
   render(): React.ReactNode {
-    const { config, status, panel, timeline, outcome, completedRuns, notice } =
-      this.state;
+    const { config, status, outcome, completedRuns, notice } = this.state;
     const { frames } = this;
     const stages = warpedStages(
       cafeShiftTimelineStages(config),
@@ -566,107 +398,56 @@ export class CafeShiftWorkspace extends React.Component<
         : "Victoria Arduino Eagle One";
 
     return (
-      <section
-        className="production-workspace persistent-production"
-        data-surface={this.state.surface}
-        aria-label="Persistent production"
-        data-lifecycle={status === "running" ? "running" : "settled"}
-      >
-        <div
-          className="factory-main-canvas"
-          hidden={this.state.surface === "workflow"}
-        >
-          <RecipeAnimationNotice plan={this.animation} clock={clock} />
-          <CafeShiftPhysicsView frames={frames} />
-        </div>
-        <header className="factory-toolbar">
-          <RecipeBackButton close={this.props.close} />
-          <div className="factory-title">
-            <div>
-              <span>Tier 3 · Plan 61E Combined Café Shift</span>
-              <h2>
-                Financiers ({config.financierLoads} load
-                {config.financierLoads > 1 ? "s" : ""}) &amp; Espresso (
-                {config.espressoOrders} orders · {machineTitle})
-              </h2>
-            </div>
-          </div>
-          <nav aria-label="Factory workspace">
-            <RecipeSurfaceSwitch
-              value={this.state.surface}
-              select={(surface) => this.setState({ surface })}
-            />
-            <div
-              className="factory-panel-pills"
-              role="group"
-              aria-label="Detail panels"
-            >
-              <button
-                type="button"
-                aria-expanded={panel === "scenario"}
-                onClick={this.togglePanel.bind(this, "scenario")}
-              >
-                Scenario
-              </button>
-              <button
-                type="button"
-                aria-expanded={panel === "results"}
-                onClick={this.togglePanel.bind(this, "results")}
-              >
-                Results
-              </button>
-              <button
-                type="button"
-                onClick={this.completeImmediately.bind(this)}
-              >
-                Complete shift
-              </button>
-            </div>
-          </nav>
-        </header>
-
-        {outcome?.kind === "completed" && (
-          <button
-            className="factory-summary"
-            onClick={this.togglePanel.bind(this, "results")}
-          >
-            <strong>{outcome.servedEspressoG.toFixed(1)} g espresso</strong> ·{" "}
-            <strong>{outcome.packedFinanciers} packed financiers</strong> (
-            {outcome.packedNetMassG.toFixed(1)} g net ·{" "}
-            {outcome.crumbSampleMassG.toFixed(1)} g sample
-            {outcome.rejectedFinanciers > 0
-              ? ` · ${outcome.rejectedFinanciers} rejected`
-              : ""}{" "}
-            · {outcome.logicalClockS} s clock)
+      <RecipeWorkspaceLayout
+        view={this.state}
+        change={(view) => this.setState(view)}
+        close={this.props.close}
+        status={status}
+        clock={clock}
+        stages={stages}
+        seek={this.scrubToTime.bind(this)}
+        animation={this.animation}
+        scene={<CafeShiftPhysicsView frames={frames} />}
+        kicker="Tier 3 · Plan 61E Combined Café Shift"
+        title={
+          <>
+            Financiers ({config.financierLoads} load
+            {config.financierLoads > 1 ? "s" : ""}) &amp; Espresso (
+            {config.espressoOrders} orders · {machineTitle})
+          </>
+        }
+        pills={
+          <button type="button" onClick={this.completeImmediately.bind(this)}>
+            Complete shift
           </button>
-        )}
-
-        <aside
-          className="production-panel factory-drawer"
-          aria-label="Factory details"
-          hidden={panel === null}
-        >
-          <div className="factory-drawer-heading">
-            <h3>
-              {panel === "results"
-                ? "Plan 61E café shift results"
-                : "Scenario and staffing controls"}
-            </h3>
-            <button
-              type="button"
-              onClick={() => this.setState({ panel: null })}
-            >
-              Close details
-            </button>
-          </div>
-          <div hidden={panel !== "scenario"}>
-            <CafeShiftScenarioForm
-              recipe={config}
-              notice={notice}
-              apply={this.applyScenario.bind(this)}
-            />
-          </div>
-          <div hidden={panel !== "results"}>
+        }
+        summary={
+          outcome?.kind === "completed" ? (
+            <>
+              <strong>{outcome.servedEspressoG.toFixed(1)} g espresso</strong> ·{" "}
+              <strong>{outcome.packedFinanciers} packed financiers</strong> (
+              {outcome.packedNetMassG.toFixed(1)} g net ·{" "}
+              {outcome.crumbSampleMassG.toFixed(1)} g sample
+              {outcome.rejectedFinanciers > 0
+                ? ` · ${outcome.rejectedFinanciers} rejected`
+                : ""}{" "}
+              · {outcome.logicalClockS} s clock)
+            </>
+          ) : null
+        }
+        headings={{
+          scenario: "Scenario and staffing controls",
+          results: "Plan 61E café shift results",
+        }}
+        scenario={
+          <CafeShiftScenarioForm
+            recipe={config}
+            notice={notice}
+            apply={this.applyScenario.bind(this)}
+          />
+        }
+        results={
+          <>
             <h4>Plan 61E Combined Café Shift Ledger</h4>
             <dl>
               <dt>Served espresso</dt>
@@ -771,52 +552,39 @@ export class CafeShiftWorkspace extends React.Component<
                 </ul>
               </section>
             )}
-          </div>
-        </aside>
-
-        <div
-          className="factory-workflow-canvas"
-          hidden={this.state.surface === "factory"}
-        >
-          <RecipeWorkflow
-            planned={this.planned.bind(this)}
-            graph={{
-              kind: "cafe-shift",
-              appliance: config.appliance,
-              financierLoads: config.financierLoads,
-              espressoOrders: config.espressoOrders,
-            }}
-            stages={stages}
-            clock={clock}
-            running={status === "running"}
-            prepared={status === "ready"}
-            outcome={outcome?.kind ?? null}
-            seek={this.scrubToTime.bind(this)}
-          />
-        </div>
-        <RecipeSplitDivider surface={this.state.surface} />
-        <RecipeRunFooter
-          clock={clock}
-          stages={stages}
-          horizonS={maxRecordedS}
-          completed={outcome?.kind === "completed"}
-          status={status}
-          control={this.primaryControl()}
-          actions={
-            <>
-              {outcome?.kind === "completed" &&
-                this.props.applyToSchedule !== undefined && (
-                  <button
-                    type="button"
-                    className="factory-primary"
-                    onClick={() => this.props.applyToSchedule?.(outcome)}
-                  >
-                    Apply to Tier 3 schedule
-                  </button>
-                )}
-            </>
-          }
-          labels={{
+          </>
+        }
+        graph={{
+          kind: "cafe-shift",
+          appliance: config.appliance,
+          financierLoads: config.financierLoads,
+          espressoOrders: config.espressoOrders,
+        }}
+        planned={this.planned.bind(this)}
+        prepared={status === "ready"}
+        outcome={outcome?.kind ?? null}
+        footer={{
+          horizonS: maxRecordedS,
+          control: (
+            <RecipeRunControl
+              status={status}
+              start={this.startOrResume.bind(this)}
+              pause={this.pause.bind(this)}
+              restart={this.restart.bind(this)}
+              pauseLabel="Pause production"
+            />
+          ),
+          actions: outcome?.kind === "completed" &&
+            this.props.applyToSchedule !== undefined && (
+              <button
+                type="button"
+                className="factory-primary"
+                onClick={() => this.props.applyToSchedule?.(outcome)}
+              >
+                Apply to Tier 3 schedule
+              </button>
+            ),
+          labels: {
             title: "Café shift timeline",
             scaleDigits: 1,
             header: (
@@ -834,12 +602,9 @@ export class CafeShiftWorkspace extends React.Component<
             span: (stage) =>
               `${stage.startS.toFixed(0)}–${stage.endS.toFixed(0)} s`,
             minSpanPct: 1.5,
-          }}
-          timeline={timeline}
-          toggleTimeline={this.toggleTimeline.bind(this)}
-          seek={this.scrubToTime.bind(this)}
-        />
-      </section>
+          },
+        }}
+      />
     );
   }
 }
@@ -919,10 +684,10 @@ function CafeShiftScenarioForm(props: {
   }, [props.recipe]);
 
   return (
-    <form
-      aria-label="Cafe shift scenario controls"
-      onSubmit={(e) => {
-        e.preventDefault();
+    <RecipeScenarioForm
+      label="Cafe shift scenario controls"
+      notice={props.notice}
+      apply={() =>
         props.apply({
           appliance,
           grinder,
@@ -933,143 +698,83 @@ function CafeShiftScenarioForm(props: {
           espressoOrders,
           staffing,
           check,
-        });
-      }}
+        })
+      }
     >
       <p>
         Head Baker #1 operates the Financier patisserie line while Lead Barista
         #2 operates the preheated espresso bar under one shared logical clock.
       </p>
-      <label>
-        Espresso machine
-        <Select.Root
-          items={APPLIANCE_ITEMS}
-          value={appliance}
-          onValueChange={(value) => {
-            if (value === null) return;
-            setAppliance(value === "eagle-one" ? "eagle-one" : "linea");
-          }}
-        >
-          <Select.Trigger aria-label="Espresso machine">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{APPLIANCE_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Single-dose grinder
-        <Select.Root
-          items={GRINDER_ITEMS}
-          value={grinder}
-          onValueChange={(v) => {
-            if (v === null) return;
-            setGrinder(
-              v === "option-o-lagom-casa" ||
-                v === "timemore-bricks-01s" ||
-                v === "fellow-opus-2"
-                ? v
-                : "miicoffee-df64-gen2",
-            );
-          }}
-        >
-          <Select.Trigger aria-label="Single-dose grinder">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{GRINDER_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Financier loads
-        <Select.Root
-          items={FINANCIER_LOAD_ITEMS}
-          value={String(financierLoads)}
-          onValueChange={(value) => {
-            if (value === null) return;
-            const v = Number(value);
-            setFinancierLoads(v === 3 ? 3 : v === 2 ? 2 : 1);
-          }}
-        >
-          <Select.Trigger aria-label="Financier loads">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{FINANCIER_LOAD_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Espresso orders
-        <Select.Root
-          items={ESPRESSO_ORDERS_ITEMS}
-          value={String(espressoOrders)}
-          onValueChange={(value) => {
-            if (value === null) return;
-            setEspressoOrders(value === "4" ? 4 : 2);
-          }}
-        >
-          <Select.Trigger aria-label="Espresso orders">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{ESPRESSO_ORDERS_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Shift staffing
-        <Select.Root
-          items={STAFFING_ITEMS}
-          value={staffing}
-          onValueChange={(value) => {
-            if (value === null) return;
-            setStaffing(
-              value === "single-worker" ? "single-worker" : "two-workers",
-            );
-          }}
-        >
-          <Select.Trigger aria-label="Shift staffing">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{STAFFING_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <label>
-        Quality &amp; fault journey
-        <Select.Root
-          items={CHECK_ITEMS}
-          value={check}
-          onValueChange={(v) => {
-            if (v === null) return;
-            const nextCheck: CafeShiftCheck =
-              v === "reject-second-load" || v === "interrupted-extraction"
-                ? v
-                : "none";
-            setCheck(nextCheck);
-            if (nextCheck === "reject-second-load" && financierLoads < 2) {
-              setFinancierLoads(2);
-            }
-          }}
-        >
-          <Select.Trigger aria-label="Quality and fault journey">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{CHECK_ITEMS.map(renderItem)}</Select.Popup>
-        </Select.Root>
-      </label>
-      <button type="submit">Apply scenario</button>
-      <p role="status">{props.notice}</p>
-    </form>
+      <RecipeChoice
+        label="Espresso machine"
+        triggerLabel="Espresso machine"
+        items={APPLIANCE_ITEMS}
+        value={appliance}
+        choose={(value) =>
+          setAppliance(value === "eagle-one" ? "eagle-one" : "linea")
+        }
+      />
+      <RecipeChoice
+        label="Single-dose grinder"
+        triggerLabel="Single-dose grinder"
+        items={GRINDER_ITEMS}
+        value={grinder}
+        choose={(value) =>
+          setGrinder(
+            value === "option-o-lagom-casa" ||
+              value === "timemore-bricks-01s" ||
+              value === "fellow-opus-2"
+              ? value
+              : "miicoffee-df64-gen2",
+          )
+        }
+      />
+      <RecipeChoice
+        label="Financier loads"
+        triggerLabel="Financier loads"
+        items={FINANCIER_LOAD_ITEMS}
+        value={String(financierLoads)}
+        choose={(value) => {
+          const v = Number(value);
+          setFinancierLoads(v === 3 ? 3 : v === 2 ? 2 : 1);
+        }}
+      />
+      <RecipeChoice
+        label="Espresso orders"
+        triggerLabel="Espresso orders"
+        items={ESPRESSO_ORDERS_ITEMS}
+        value={String(espressoOrders)}
+        choose={(value) => setEspressoOrders(value === "4" ? 4 : 2)}
+      />
+      <RecipeChoice
+        label="Shift staffing"
+        triggerLabel="Shift staffing"
+        items={STAFFING_ITEMS}
+        value={staffing}
+        choose={(value) =>
+          setStaffing(
+            value === "single-worker" ? "single-worker" : "two-workers",
+          )
+        }
+      />
+      <RecipeChoice
+        label="Quality & fault journey"
+        triggerLabel="Quality and fault journey"
+        items={CHECK_ITEMS}
+        value={check}
+        choose={(value) => {
+          const nextCheck: CafeShiftCheck =
+            value === "reject-second-load" || value === "interrupted-extraction"
+              ? value
+              : "none";
+          setCheck(nextCheck);
+          if (nextCheck === "reject-second-load" && financierLoads < 2) {
+            setFinancierLoads(2);
+          }
+        }}
+      />
+    </RecipeScenarioForm>
   );
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
-}
-
-function cafeFrames(sample: CafeShiftSample): RecipeFrames<CafeShiftSample> {
-  return { sample, samples: [sample], history: [sample] };
 }
 
 function logicalClock({ sample }: RecipeFrames<CafeShiftSample>): string {

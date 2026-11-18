@@ -1,5 +1,4 @@
 import React from "react";
-import { Select } from "../../../ui/select";
 import type { PieType } from "@seams/production-simulation/recipes/bakery/pie";
 import {
   CRIMP_FORCE_ITEMS,
@@ -10,6 +9,7 @@ import {
   type PastryBenchFaultCheck,
   type PastryBenchRecipeConfig,
 } from "./pastry-bench-model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{
   prepared(recipe: PastryBenchRecipeConfig): void;
@@ -57,86 +57,48 @@ export class PastryBenchRecipeAuthor extends React.Component<Props, State> {
           tins (28 mm cavity depth), and crimps 240 g of 6 °C laminated puff
           pastry at {this.state.crimpForceN} N.
         </p>
-        <label>
-          Savoury pie variety
-          <Select.Root
-            items={PIE_TYPE_ITEMS}
-            value={this.state.pieType}
-            onValueChange={(v) => {
-              if (v === "steak-and-pepper" || v === "beef-bourguignon") {
-                this.setState({ pieType: v });
-              }
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{PIE_TYPE_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Target shortcrust sheet thickness
-          <Select.Root
-            items={THICKNESS_ITEMS}
-            value={this.state.targetThicknessMm.toFixed(1)}
-            onValueChange={(v) => {
-              if (v === "2.5") this.setState({ targetThicknessMm: 2.5 });
-              else if (v === "3.5") this.setState({ targetThicknessMm: 3.5 });
-              else if (v === "3.0") this.setState({ targetThicknessMm: 3.0 });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{THICKNESS_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Fluted rim crimp force
-          <Select.Root
-            items={CRIMP_FORCE_ITEMS}
-            value={String(this.state.crimpForceN)}
-            onValueChange={(v) => {
-              if (v === "36") this.setState({ crimpForceN: 36 });
-              else if (v === "52") this.setState({ crimpForceN: 52 });
-              else if (v === "42") this.setState({ crimpForceN: 42 });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{CRIMP_FORCE_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Process check
-          <Select.Root
-            items={FAULT_CHECK_ITEMS}
-            value={this.state.faultCheck}
-            onValueChange={(v) => {
-              if (v === "none" || v === "unfloured-bench") {
-                this.setState({ faultCheck: v });
-              }
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{FAULT_CHECK_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Savoury pie variety"
+          items={PIE_TYPE_ITEMS}
+          value={this.state.pieType}
+          choose={(v) => {
+            if (v === "steak-and-pepper" || v === "beef-bourguignon") {
+              this.setState({ pieType: v });
+            }
+          }}
+        />
+        <RecipeChoice
+          label="Target shortcrust sheet thickness"
+          items={THICKNESS_ITEMS}
+          value={this.state.targetThicknessMm.toFixed(1)}
+          choose={(v) => {
+            if (v === "2.5") this.setState({ targetThicknessMm: 2.5 });
+            else if (v === "3.5") this.setState({ targetThicknessMm: 3.5 });
+            else if (v === "3.0") this.setState({ targetThicknessMm: 3.0 });
+          }}
+        />
+        <RecipeChoice
+          label="Fluted rim crimp force"
+          items={CRIMP_FORCE_ITEMS}
+          value={String(this.state.crimpForceN)}
+          choose={(v) => {
+            if (v === "36") this.setState({ crimpForceN: 36 });
+            else if (v === "52") this.setState({ crimpForceN: 52 });
+            else if (v === "42") this.setState({ crimpForceN: 42 });
+          }}
+        />
+        <RecipeChoice
+          label="Process check"
+          items={FAULT_CHECK_ITEMS}
+          value={this.state.faultCheck}
+          choose={(v) => {
+            if (v === "none" || v === "unfloured-bench") {
+              this.setState({ faultCheck: v });
+            }
+          }}
+        />
         <button type="submit">Prepare pastry bench</button>
       </form>
     );
   }
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
 }

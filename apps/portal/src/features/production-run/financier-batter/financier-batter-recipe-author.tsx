@@ -1,4 +1,3 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import {
   DEFAULT_FINANCIER_BATTER_RECIPE,
@@ -7,6 +6,7 @@ import {
   type FinancierHobModel,
   type FinancierMixerTool,
 } from "@seams/production-simulation/recipes/financier-batter/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{
   prepared(recipe: FinancierBatterRecipeConfig): void;
@@ -107,47 +107,31 @@ export class FinancierBatterRecipeAuthor extends React.Component<Props, State> {
           sifted almond-sugar tant-pour-tant and 181 g egg whites into the
           Hobart HL200 20 qt planetary mixer, and folds a 726 g golden batter.
         </p>
-        <label>
-          Induction hob model
-          <Select.Root
-            items={HOB_ITEMS}
-            value={this.state.hob}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                hob:
-                  v === "vollrath" ||
-                  v === "panasonic-kz-ck1402" ||
-                  v === "rinnai-rsb-150pj"
-                    ? v
-                    : "maruzen",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{HOB_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
-        <label>
-          Hobart HL200 20 qt agitator
-          <Select.Root
-            items={TOOL_ITEMS}
-            value={this.state.tool}
-            onValueChange={(value) => {
-              if (value === null) return;
-              this.setState({
-                tool: value === "whip" ? "whip" : "beater",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{TOOL_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Induction hob model"
+          items={HOB_ITEMS}
+          value={this.state.hob}
+          choose={(v) => {
+            this.setState({
+              hob:
+                v === "vollrath" ||
+                v === "panasonic-kz-ck1402" ||
+                v === "rinnai-rsb-150pj"
+                  ? v
+                  : "maruzen",
+            });
+          }}
+        />
+        <RecipeChoice
+          label="Hobart HL200 20 qt agitator"
+          items={TOOL_ITEMS}
+          value={this.state.tool}
+          choose={(value) => {
+            this.setState({
+              tool: value === "whip" ? "whip" : "beater",
+            });
+          }}
+        />
         <label>
           Raw dairy butter charge (g)
           <input
@@ -172,38 +156,20 @@ export class FinancierBatterRecipeAuthor extends React.Component<Props, State> {
             }
           />
         </label>
-        <label>
-          Process check
-          <Select.Root
-            items={CHECK_ITEMS}
-            value={this.state.check}
-            onValueChange={(v) => {
-              if (v === null) return;
-              this.setState({
-                check:
-                  v === "burnt-butter" || v === "guard-interlock" ? v : "none",
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>{CHECK_ITEMS.map(renderItem)}</Select.Popup>
-          </Select.Root>
-        </label>
+        <RecipeChoice
+          label="Process check"
+          items={CHECK_ITEMS}
+          value={this.state.check}
+          choose={(v) => {
+            this.setState({
+              check:
+                v === "burnt-butter" || v === "guard-interlock" ? v : "none",
+            });
+          }}
+        />
         <button type="submit">Prepare Financier batter station</button>
         <p role="status">{this.state.notice}</p>
       </form>
     );
   }
-}
-
-function renderItem(
-  item: Readonly<{ value: string; label: string }>,
-): React.ReactNode {
-  return (
-    <Select.Item key={item.value} value={item.value}>
-      {item.label}
-    </Select.Item>
-  );
 }

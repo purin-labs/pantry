@@ -1,9 +1,9 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import type { EspressoMachine } from "@seams/bakery-model/bakery-physics";
 import { prepareNativeRecipe } from "../oven-recipe-file";
 import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
 import { preloadEspressoVisual } from "./espresso-scene";
+import { prepareRecipe, RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{ prepared(source: OvenRunSource): void }>;
 const MACHINES = [
@@ -47,29 +47,25 @@ export class EspressoRecipeAuthor extends React.Component<Props, State> {
       kind: "preparing",
       notice: "Preparing the espresso station…",
     });
-    try {
-      const espresso = {
-        revision: 1,
-        orders: Number(this.state.orders),
-        appliance: this.state.appliance,
-      };
-      const result = await prepareNativeRecipe({
-        kind: "espresso" as const,
-        input: espresso,
-      });
-      if (!this.mounted) return;
-      if (result.ok) this.props.prepared(result.value);
-      else this.setState({ kind: "editing", notice: result.error });
-    } catch (error) {
-      if (this.mounted)
-        this.setState({
-          kind: "editing",
-          notice:
-            error instanceof Error
-              ? error.message
-              : "The espresso station could not open.",
+    await prepareRecipe<OvenRunSource>(
+      {
+        mounted: () => this.mounted,
+        prepared: (source) => this.props.prepared(source),
+        failed: (notice) => this.setState({ kind: "editing", notice }),
+      },
+      () => {
+        const espresso = {
+          revision: 1,
+          orders: Number(this.state.orders),
+          appliance: this.state.appliance,
+        };
+        return prepareNativeRecipe({
+          kind: "espresso" as const,
+          input: espresso,
         });
-    }
+      },
+      "The espresso station could not open.",
+    );
   }
   render(): React.ReactNode {
     return (
@@ -91,25 +87,12 @@ export class EspressoRecipeAuthor extends React.Component<Props, State> {
           in the knock-box across multi-cup runs.
         </p>
         <fieldset disabled={this.state.kind === "preparing"}>
-          <label>
-            Espresso machine{" "}
-            <Select.Root
-              items={MACHINES}
-              value={this.state.appliance}
-              onValueChange={this.machine.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {MACHINES.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Espresso machine "
+            items={MACHINES}
+            value={this.state.appliance}
+            choose={this.machine.bind(this)}
+          />
           <label>
             Espresso orders{" "}
             <input

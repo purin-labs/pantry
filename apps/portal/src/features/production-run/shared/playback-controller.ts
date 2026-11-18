@@ -17,7 +17,7 @@ type RecipeRunOutcome =
   | Readonly<{ kind: "completed" }>
   | Readonly<{ kind: "failed"; reason: string }>;
 
-type RecipeRunSample = Readonly<{
+export type RecipeRunSample = Readonly<{
   timeS: number;
   outcome: RecipeRunOutcome | null;
 }>;

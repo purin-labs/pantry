@@ -1,8 +1,8 @@
-import { Select } from "../../../ui/select";
 import React from "react";
 import { preloadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
 import { preparePourOverRecipe } from "../oven-recipe-file";
 import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{ prepared(source: OvenRunSource): void }>;
 type Check = "none" | "reduced-drainage" | "lost-grip";
@@ -89,25 +89,12 @@ export class PourOverRecipeAuthor extends React.Component<Props, State> {
               onChange={this.water.bind(this)}
             />
           </label>
-          <label>
-            Process check{" "}
-            <Select.Root
-              items={CHECKS}
-              value={this.state.check}
-              onValueChange={this.check.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {CHECKS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Process check "
+            items={CHECKS}
+            value={this.state.check}
+            choose={this.check.bind(this)}
+          />
           <button type="submit">Prepare pour-over</button>
         </fieldset>
         <p role="status">{this.state.notice}</p>

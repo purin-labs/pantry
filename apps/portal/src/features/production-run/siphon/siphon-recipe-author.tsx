@@ -1,6 +1,9 @@
-import { Select } from "../../../ui/select";
 import React from "react";
-import type { SiphonProcessCheck, SiphonRecipeConfig } from "@seams/production-simulation/recipes/siphon/model";
+import type {
+  SiphonProcessCheck,
+  SiphonRecipeConfig,
+} from "@seams/production-simulation/recipes/siphon/model";
+import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{ prepared(recipe: SiphonRecipeConfig): void }>;
 const CHECKS = [
@@ -136,25 +139,12 @@ export class SiphonRecipeAuthor extends React.Component<Props, State> {
               onChange={this.changeSteep.bind(this)}
             />
           </label>
-          <label>
-            Process check{" "}
-            <Select.Root
-              items={CHECKS}
-              value={this.state.check}
-              onValueChange={this.changeCheck.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {CHECKS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Process check "
+            items={CHECKS}
+            value={this.state.check}
+            choose={this.changeCheck.bind(this)}
+          />
           <button type="submit">Prepare siphon coffee</button>
         </fieldset>
         <p role="status">{this.state.notice}</p>

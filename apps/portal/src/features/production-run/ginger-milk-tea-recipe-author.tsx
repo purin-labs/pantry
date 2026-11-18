@@ -1,9 +1,9 @@
-import { Select } from "../../ui/select";
 import React from "react";
 import { gingerMilkTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/ginger-milk-tea";
 import { mixedTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/mixed-tea";
 import { prepareNativeRecipe } from "./oven-recipe-file";
 import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import { prepareRecipe, RecipeChoice } from "./shared/recipe-form";
 
 type Props = Readonly<{ prepared(source: OvenRunSource): void }>;
 const RECIPES = [
@@ -49,24 +49,18 @@ export class GingerMilkTeaRecipeAuthor extends React.Component<Props, State> {
     input.simmerSeconds = Number(this.state.simmerSeconds);
     const mixed = mixedTeaRecipeInput();
     mixed.milkTea.simmerSeconds = input.simmerSeconds;
-    try {
-      const result = await prepareNativeRecipe({
-        kind: this.state.recipe,
-        input: this.state.recipe === "mixed-tea" ? mixed : input,
-      });
-      if (!this.mounted) return;
-      if (result.ok) this.props.prepared(result.value);
-      else this.setState({ activity: "editing", notice: result.error });
-    } catch (error) {
-      if (this.mounted)
-        this.setState({
-          activity: "editing",
-          notice:
-            error instanceof Error
-              ? error.message
-              : "The recipe could not be prepared.",
-        });
-    }
+    await prepareRecipe<OvenRunSource>(
+      {
+        mounted: () => this.mounted,
+        prepared: (source) => this.props.prepared(source),
+        failed: (notice) => this.setState({ activity: "editing", notice }),
+      },
+      () =>
+        prepareNativeRecipe({
+          kind: this.state.recipe,
+          input: this.state.recipe === "mixed-tea" ? mixed : input,
+        }),
+    );
   }
   render(): React.ReactNode {
     return (
@@ -98,25 +92,12 @@ export class GingerMilkTeaRecipeAuthor extends React.Component<Props, State> {
         </p>
         <fieldset disabled={this.state.activity === "preparing"}>
           <legend>Milk tea settings</legend>
-          <label>
-            Tea orders
-            <Select.Root
-              items={RECIPES}
-              value={this.state.recipe}
-              onValueChange={this.recipe.bind(this)}
-            >
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                {RECIPES.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <RecipeChoice
+            label="Tea orders"
+            items={RECIPES}
+            value={this.state.recipe}
+            choose={this.recipe.bind(this)}
+          />
           <p>
             Mixed orders share the same two pans, hob, strainer, scale and
             worker. Black tea also uses a serving receiver.

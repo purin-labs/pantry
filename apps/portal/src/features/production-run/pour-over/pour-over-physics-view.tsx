@@ -1,7 +1,9 @@
 import React from "react";
-import { BakeryAppearanceControl } from "../../../preferences/appearance-controls";
 import { assertNever } from "@seams/std";
-import type { PourOverDeviation, PourOverSample } from "@seams/production-simulation/recipes/pour-over/sample";
+import type {
+  PourOverDeviation,
+  PourOverSample,
+} from "@seams/production-simulation/recipes/pour-over/sample";
 import {
   PourOverScene,
   type PourOverCameraPreset,
@@ -9,15 +11,12 @@ import {
 } from "./pour-over-scene";
 import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
 import "./pour-over.css";
+import { RecipeSampleStation } from "../shared/recipe-station";
 
 type Props = Readonly<{
   setup: PourOverSetup;
   sample: PourOverSample | null;
   samples?: readonly PourOverSample[];
-}>;
-type State = Readonly<{
-  error: string | null;
-  camera: PourOverCameraPreset;
 }>;
 
 const POUR_STEPS = [
@@ -27,97 +26,40 @@ const POUR_STEPS = [
   { pour: 4, label: "Pour 4", targetG: 350 },
 ] as const;
 
-/** Accepted station samples only: it has no reference to the execution worker. */
-export class PourOverPhysicsView extends React.Component<Props, State> {
-  state: State = { error: null, camera: "bench" };
-  private readonly element = React.createRef<HTMLDivElement>();
-  private visual: PourOverScene | null = null;
+const CAMERAS: readonly (readonly [PourOverCameraPreset, string])[] = [
+  ["bench", "Bench view"],
+  ["closeup", "Dripper close-up"],
+  ["overhead", "Overhead spiral"],
+];
 
-  componentDidMount(): void {
-    const element = this.element.current;
-    if (element === null) return;
-    this.visual = new PourOverScene(element, this.props.setup);
-    this.syncVisual();
-    void this.load(this.visual);
-  }
-  private async load(visual: PourOverScene): Promise<void> {
-    try {
-      await visual.load();
-    } catch (error) {
-      if (this.visual === visual)
-        this.setState({
-          error:
-            error instanceof Error
-              ? error.message
-              : "The robot visual is unavailable.",
-        });
-    }
-  }
-  componentDidUpdate(): void {
-    this.syncVisual();
-  }
-  private syncVisual(): void {
-    if (this.visual === null) return;
-    if (this.props.samples !== undefined && this.props.samples.length > 0) {
-      this.visual.setSamples(this.props.samples);
-      return;
-    }
-    if (this.props.sample !== null) this.visual.setFrame(this.props.sample);
-  }
-  private selectCamera(camera: PourOverCameraPreset): void {
-    this.setState({ camera });
-    this.visual?.setCameraPreset(camera);
-  }
-  componentWillUnmount(): void {
-    this.visual?.dispose();
-    this.visual = null;
-  }
-  render(): React.ReactNode {
-    const sample = this.props.sample;
-    return (
-      <section
-        aria-label="Accepted pour-over station state"
-        className="pour-over-station"
-        data-pour-over-phase={sample?.control.phase}
-        data-pour-over-step={sample?.step}
-      >
-        <div className="pour-over-canvas" ref={this.element} />
-        <div
-          className="pour-over-camera-bar"
-          role="group"
-          aria-label="Camera view"
-        >
-          <BakeryAppearanceControl />
-          {(
-            [
-              ["bench", "Bench view"],
-              ["closeup", "Dripper close-up"],
-              ["overhead", "Overhead spiral"],
-            ] as const
-          ).map(([preset, label]) => (
-            <button
-              key={preset}
-              type="button"
-              aria-pressed={this.state.camera === preset}
-              onClick={this.selectCamera.bind(this, preset)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {this.state.error !== null && <p role="status">{this.state.error}</p>}
-        {sample === null ? (
-          <p>Waiting for an accepted station sample.</p>
-        ) : (
-          <PourOverStatus sample={sample} />
-        )}
-        <p className="pour-over-note">
-          Accepted Rust/MuJoCo state with the declared water model. The display
-          draws recorded samples; it does not infer water transfer.
-        </p>
-      </section>
-    );
-  }
+/** Accepted station samples only: it has no reference to the execution worker. */
+export function PourOverPhysicsView(props: Props): React.ReactNode {
+  const { sample, setup } = props;
+  return (
+    <RecipeSampleStation
+      sample={sample}
+      samples={props.samples}
+      scene={(element) => new PourOverScene(element, setup)}
+      unavailable="The robot visual is unavailable."
+      label="Accepted pour-over station state"
+      attributes={{
+        "data-pour-over-phase": sample?.control.phase,
+        "data-pour-over-step": sample?.step,
+      }}
+      camera="bench"
+      cameras={CAMERAS}
+    >
+      {sample === null ? (
+        <p>Waiting for an accepted station sample.</p>
+      ) : (
+        <PourOverStatus sample={sample} />
+      )}
+      <p className="pour-over-note">
+        Accepted Rust/MuJoCo state with the declared water model. The display
+        draws recorded samples; it does not infer water transfer.
+      </p>
+    </RecipeSampleStation>
+  );
 }
 
 function PourOverStatus(props: Readonly<{ sample: PourOverSample }>) {
@@ -139,7 +81,8 @@ function PourOverStatus(props: Readonly<{ sample: PourOverSample }>) {
             (control.nextTargetG === null &&
               control.brewS !== null &&
               activePourIndex === null) ||
-            (control.nextTargetG !== null && control.nextTargetG > item.targetG);
+            (control.nextTargetG !== null &&
+              control.nextTargetG > item.targetG);
           const active = activePourIndex === item.pour;
           const state = active ? "active" : done ? "done" : "pending";
           return (
