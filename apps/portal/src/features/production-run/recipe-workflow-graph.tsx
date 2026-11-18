@@ -36,7 +36,6 @@ import {
   NODE_WIDTH,
 } from "@seams/bakery-workflow/layout";
 import {
-  DRAFT_BOUNDS,
   DRAFT_LABEL_LIMIT,
   WorkflowDraftDoc,
   draftNodeId,
@@ -87,6 +86,7 @@ import {
   type RecipeGraphSource,
   type RecipeSource,
 } from "./recipe-graph";
+import { clampPosition, freePosition, hasEdge } from "./draft-placement";
 import { taskSpans, type Span } from "./oven-task-views";
 import { seconds } from "./oven-logistics";
 import {
@@ -2740,54 +2740,8 @@ function graphNodeMatches(id: string, node: RecipeGraphNode): boolean {
   return node.id === id;
 }
 
-function hasEdge(
-  snapshot: DraftSnapshot,
-  workflow: string,
-  from: string,
-  to: string,
-): boolean {
-  for (const edge of snapshot.edges)
-    if (edge.workflow === workflow && edge.from === from && edge.to === to)
-      return true;
-  return false;
-}
-
 function problemIsAt(id: string, problem: DraftProblem): boolean {
   return problem.node === id;
-}
-
-function clampPosition(
-  x: number,
-  y: number,
-): Readonly<{ x: number; y: number }> {
-  return {
-    x: Math.min(Math.max(DRAFT_BOUNDS.minX, x), DRAFT_BOUNDS.maxX),
-    y: Math.min(Math.max(DRAFT_BOUNDS.minY, y), DRAFT_BOUNDS.maxY),
-  };
-}
-
-/** One rank on from the step it follows and a row down, or below everything. */
-function freePosition(
-  snapshot: DraftSnapshot,
-  origin: Readonly<{ x: number; y: number }> | null | undefined,
-): Readonly<{ x: number; y: number }> {
-  const taken = Object.values(snapshot.positions);
-  let bottom = 0;
-  for (const position of taken) bottom = Math.max(bottom, position.y);
-  const start = origin ?? { x: 0, y: bottom };
-  const x =
-    start.x + (origin === null || origin === undefined ? 0 : NODE_COLUMN);
-  let y = start.y + NODE_ROW;
-  while (taken.some(isAt.bind(null, x, y))) y += NODE_ROW;
-  return clampPosition(x, y);
-}
-
-function isAt(
-  x: number,
-  y: number,
-  position: Readonly<{ x: number; y: number }>,
-): boolean {
-  return position.x === x && position.y === y;
 }
 
 function removedLabel(item: Readonly<{ label: string }>): string {
