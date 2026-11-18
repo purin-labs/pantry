@@ -66,9 +66,11 @@ export {
   type SyncClientMessage,
   type SyncDocumentRevision,
   type SyncFailureCode,
+  type SyncMessageFields,
   type SyncParsed,
   type SyncProtocolSpec,
   type SyncRoomFailureCode,
   type SyncRoomMetadata,
+  type SyncServerExtension,
   type SyncServerMessage,
 } from "./sync-protocol";
