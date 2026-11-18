@@ -8,6 +8,7 @@ import {
   readWorkerEnvironment,
   validateWorkerOrigins,
 } from "../worker-environment.mjs";
+import { isRecord } from "../../packages/std/src/index.ts";
 
 const SLACK_API_BASE = "https://slack.com/api";
 const DEFAULT_MANIFEST_PATH = "scripts/slack/pantry-dev-manifest.json";
@@ -184,7 +185,7 @@ async function loadManifest(path) {
   const raw = await readFile(path, "utf8");
   const parsed = JSON.parse(raw);
 
-  if (!isObject(parsed)) {
+  if (!isRecord(parsed)) {
     throw new Error("manifest root must be a JSON object");
   }
 
@@ -222,33 +223,33 @@ function prepareManifest(manifest, args) {
 }
 
 function ensureManifestShape(manifest) {
-  if (!isObject(manifest.display_information)) {
+  if (!isRecord(manifest.display_information)) {
     manifest.display_information = {};
   }
 
-  if (!isObject(manifest.features)) {
+  if (!isRecord(manifest.features)) {
     manifest.features = {};
   }
 
-  if (!isObject(manifest.features.bot_user)) {
+  if (!isRecord(manifest.features.bot_user)) {
     manifest.features.bot_user = {};
   }
 
-  if (!isObject(manifest.settings)) {
+  if (!isRecord(manifest.settings)) {
     manifest.settings = {};
   }
 
-  if (!isObject(manifest.settings.event_subscriptions)) {
+  if (!isRecord(manifest.settings.event_subscriptions)) {
     manifest.settings.event_subscriptions = {};
   }
 }
 
 function ensureOAuthShape(manifest) {
-  if (!isObject(manifest.oauth_config)) {
+  if (!isRecord(manifest.oauth_config)) {
     manifest.oauth_config = {};
   }
 
-  if (!isObject(manifest.oauth_config.scopes)) {
+  if (!isRecord(manifest.oauth_config.scopes)) {
     manifest.oauth_config.scopes = {};
   }
 
@@ -322,7 +323,7 @@ function parseSlackResponse(response, raw) {
     };
   }
 
-  if (!isObject(parsed)) {
+  if (!isRecord(parsed)) {
     return {
       ok: false,
       error: "non_object_response",
@@ -353,7 +354,7 @@ function printUpdatedApp(updated, appId) {
 
 async function persistCreatedApp(created, envPath) {
   if (envPath === null) return;
-  const credentials = isObject(created.credentials) ? created.credentials : {};
+  const credentials = isRecord(created.credentials) ? created.credentials : {};
   await upsertLocalEnv(envPath, {
     SLACK_APP_ID: requiredResponseString(created, "app_id"),
     SLACK_CLIENT_ID: requiredResponseString(credentials, "client_id"),
@@ -394,7 +395,7 @@ function failWithSlackError(message, response) {
 function redactSlackResponse(response) {
   const copy = structuredClone(response);
 
-  if (isObject(copy.credentials)) {
+  if (isRecord(copy.credentials)) {
     copy.credentials = {
       ...copy.credentials,
       client_secret: redactString(copy.credentials.client_secret),
@@ -424,10 +425,6 @@ function requiredResponseString(record, key) {
   if (value.length === 0)
     throw new Error(`Slack app creation returned no ${key}`);
   return value;
-}
-
-function isObject(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function printUsageAndExit(code) {
