@@ -59,9 +59,9 @@
       "dir": "two-cell",
       "status": "passes",
       "lastRun": {
-        "seconds": 54.5,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 48.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -77,9 +77,9 @@
       "dir": "batch-cycles",
       "status": "passes",
       "lastRun": {
-        "seconds": 10.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 8.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -95,9 +95,9 @@
       "dir": "oven-native",
       "status": "passes",
       "lastRun": {
-        "seconds": 12.7,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 10.8,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -116,9 +116,9 @@
       "dir": "oven-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 12.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 10.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -134,9 +134,9 @@
       "dir": "oven-engine",
       "status": "passes",
       "lastRun": {
-        "seconds": 37.5,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 31.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -152,9 +152,9 @@
       "dir": "financier",
       "status": "passes",
       "lastRun": {
-        "seconds": 6.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 5.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -170,9 +170,9 @@
       "dir": "schedule-layout",
       "status": "passes",
       "lastRun": {
-        "seconds": 3.7,
-        "date": "2026-11-17",
-        "commit": "3c3c91031"
+        "seconds": 2.8,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -188,9 +188,9 @@
       "dir": "native-financier",
       "status": "passes",
       "lastRun": {
-        "seconds": 104.9,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 84.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -206,9 +206,9 @@
       "dir": "oven-financier",
       "status": "passes",
       "lastRun": {
-        "seconds": 146.3,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 119.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -224,9 +224,9 @@
       "dir": "authoring",
       "status": "passes",
       "lastRun": {
-        "seconds": 0.9,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 0.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -242,9 +242,9 @@
       "dir": "material",
       "status": "passes",
       "lastRun": {
-        "seconds": 2,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 1.8,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -260,9 +260,9 @@
       "dir": "recovery-native",
       "status": "passes",
       "lastRun": {
-        "seconds": 4.6,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 3.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -281,9 +281,9 @@
       "dir": "recovery-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 4.4,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 4.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -299,9 +299,9 @@
       "dir": "robot-limits",
       "status": "passes",
       "lastRun": {
-        "seconds": 9.8,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 8.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -317,9 +317,9 @@
       "dir": "loads",
       "status": "passes",
       "lastRun": {
-        "seconds": 3.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 2.9,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -335,9 +335,9 @@
       "sharesOutputOf": "ur5e-payload-envelope",
       "status": "passes",
       "lastRun": {
-        "seconds": 72.5,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 63.9,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -354,9 +354,9 @@
       "sharesOutputOf": "ur5e-payload-envelope",
       "status": "passes",
       "lastRun": {
-        "seconds": 12.6,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 11.2,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -372,9 +372,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 11.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 9.9,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -390,9 +390,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 136.8,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 106.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -407,9 +407,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 7.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 6.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -424,9 +424,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 181.7,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 153.4,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -441,9 +441,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 8.5,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 6.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -458,9 +458,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 13.9,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 10.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -475,9 +475,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.7,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 0.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -492,9 +492,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 4.5,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 3.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -509,9 +509,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 11.9,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 9.3,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -526,9 +526,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 13.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 10.2,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -543,9 +543,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 10.8,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 8.4,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -560,9 +560,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 21.4,
+        "seconds": 20.7,
         "date": "2026-11-19",
-        "commit": "d710619eb"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -577,9 +577,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.6,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 0.4,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -594,9 +594,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 18.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 14.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -611,9 +611,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 29.8,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 26.4,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -628,9 +628,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 1.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 0.9,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -645,9 +645,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 9.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 7.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -662,9 +662,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 192.3,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 163.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -679,9 +679,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 127.9,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 116.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -696,9 +696,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 254.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 238.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -714,9 +714,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 156.9,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 134.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -732,9 +732,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 1101.9,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 983.3,
+        "date": "2026-11-19",
+        "commit": "95f5514c8"
       }
     },
     {
@@ -749,9 +749,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 13,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 11.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -766,9 +766,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 124.6,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 105.9,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -783,9 +783,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 230.1,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 220.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -801,9 +801,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 581.4,
+        "seconds": 545.4,
         "date": "2026-11-19",
-        "commit": "b50d5aff6"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -824,7 +824,7 @@
       "lastRun": {
         "seconds": 0.9,
         "date": "2026-11-19",
-        "commit": "b50d5aff6"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -840,9 +840,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 99.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 84.2,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -859,9 +859,9 @@
       "sharesOutputOf": "recurring-recovery",
       "status": "passes",
       "lastRun": {
-        "seconds": 76.5,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 66.4,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -877,9 +877,9 @@
       "sharesOutputOf": "recurring-recovery",
       "status": "passes",
       "lastRun": {
-        "seconds": 0.2,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 0.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -898,9 +898,9 @@
       "status": "passes",
       "notes": "The step 11 runtime prepares the two cells, so that file-execution saves under the step 11 execution bundle and resumes on the pinned one. Change the runtime at each engine release.",
       "lastRun": {
-        "seconds": 0.3,
-        "date": "2026-11-17",
-        "commit": "550f199c4"
+        "seconds": 0.2,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -921,9 +921,9 @@
       "status": "passes",
       "notes": "Release A is the execution bundle of the step 11 runtime that steps 12 to 15A pin; release B adds the pinned execution bundle (step 9). The journey needs a different engine file in B. Change both at each engine release. The step 11 bundles are outside git after the move of step 9B: fetch them first (node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics).",
       "lastRun": {
-        "seconds": 152,
-        "date": "2026-11-17",
-        "commit": "550f199c4"
+        "seconds": 139.2,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -938,9 +938,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 289.7,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 262.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -955,9 +955,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 57.2,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 52.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -972,9 +972,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 233.8,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 206.8,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -989,9 +989,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 55,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 48.3,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1008,7 +1008,7 @@
       "lastRun": {
         "seconds": 3.2,
         "date": "2026-11-19",
-        "commit": "2743ce0ab"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1024,8 +1024,8 @@
       "status": "passes",
       "lastRun": {
         "seconds": 0.4,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1040,9 +1040,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 1.3,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 1.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1057,9 +1057,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 0,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1092,9 +1092,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 4.4,
+        "seconds": 4.2,
         "date": "2026-11-19",
-        "commit": "d46b154b7"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1109,9 +1109,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 11.6,
+        "seconds": 11,
         "date": "2026-11-19",
-        "commit": "fec8124c5"
+        "commit": "2e48dac6e"
       },
       "notes": "Needs MUJOCO_DIR (the native SDK)."
     },
@@ -1127,9 +1127,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 12.3,
+        "seconds": 12,
         "date": "2026-11-19",
-        "commit": "b50d5aff6"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1145,9 +1145,9 @@
       "status": "passes",
       "notes": "Needs MUJOCO_DIR, because it runs cargo build.",
       "lastRun": {
-        "seconds": 62.5,
+        "seconds": 63.1,
         "date": "2026-11-19",
-        "commit": "2743ce0ab"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1164,7 +1164,7 @@
       "lastRun": {
         "seconds": 4.7,
         "date": "2026-11-19",
-        "commit": "2743ce0ab"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1181,7 +1181,7 @@
       "lastRun": {
         "seconds": 5.5,
         "date": "2026-11-19",
-        "commit": "2743ce0ab"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1196,9 +1196,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 17.5,
+        "seconds": 17.1,
         "date": "2026-11-19",
-        "commit": "b1505e14f"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1209,13 +1209,14 @@
       "owner": "Plan 42E",
       "run": {
         "tool": "browser",
-        "url": "/workflow-preview.html"
+        "url": "/workflow-preview.html",
+        "timeoutMs": 900000
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 149.7,
+        "seconds": 153.9,
         "date": "2026-11-19",
-        "commit": "dfd3e6bff"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1232,9 +1233,9 @@
       "status": "passes",
       "dir": "chat",
       "lastRun": {
-        "seconds": 826.2,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 147.4,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1249,9 +1250,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 11.2,
+        "seconds": 11.7,
         "date": "2026-11-19",
-        "commit": "2f66206e0"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1266,9 +1267,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 13.5,
+        "seconds": 13.1,
         "date": "2026-11-19",
-        "commit": "d3c2d7932"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1283,9 +1284,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 17.4,
+        "seconds": 15.9,
         "date": "2026-11-19",
-        "commit": "6bade56e3"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1302,9 +1303,9 @@
       "status": "passes",
       "dir": "presets",
       "lastRun": {
-        "seconds": 204.1,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 18.3,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1320,9 +1321,9 @@
       "status": "passes",
       "dir": "comparison",
       "lastRun": {
-        "seconds": 116.4,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 23.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1337,9 +1338,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 18,
-        "date": "2026-11-17",
-        "commit": "cefdcf4cc"
+        "seconds": 28.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1354,9 +1355,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 13,
-        "date": "2026-11-17",
-        "commit": "cefdcf4cc"
+        "seconds": 15.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1374,9 +1375,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 16.3,
+        "seconds": 15.9,
         "date": "2026-11-19",
-        "commit": "fec8124c5"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1391,9 +1392,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 28.6,
+        "seconds": 16.4,
         "date": "2026-11-19",
-        "commit": "078b14d4d"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1409,9 +1410,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 14.8,
+        "seconds": 14,
         "date": "2026-11-19",
-        "commit": "078b14d4d"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1427,9 +1428,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 20.2,
+        "seconds": 11.5,
         "date": "2026-11-19",
-        "commit": "078b14d4d"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1445,9 +1446,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 13.2,
+        "seconds": 12.2,
         "date": "2026-11-19",
-        "commit": "d46b154b7"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1462,9 +1463,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 11.7,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 14,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1479,9 +1480,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 15.8,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 17.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1496,9 +1497,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.6,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 0.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1517,9 +1518,9 @@
       "status": "passes",
       "dir": "concurrency",
       "lastRun": {
-        "seconds": 1,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 1.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1534,9 +1535,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.7,
+        "seconds": 0.6,
         "date": "2026-11-19",
-        "commit": "6bade56e3"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1551,9 +1552,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.6,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 0.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1568,9 +1569,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 6.7,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1588,9 +1589,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.5,
+        "seconds": 0.4,
         "date": "2026-11-19",
-        "commit": "078b14d4d"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1607,7 +1608,7 @@
       "lastRun": {
         "seconds": 0.5,
         "date": "2026-11-19",
-        "commit": "d46b154b7"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1623,9 +1624,9 @@
       "status": "passes",
       "dir": "production-run",
       "lastRun": {
-        "seconds": 29.5,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 28,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1642,9 +1643,9 @@
       "dir": "financier-browser",
       "status": "passes",
       "lastRun": {
-        "seconds": 12.9,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 13.4,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1660,8 +1661,8 @@
       "status": "passes",
       "lastRun": {
         "seconds": 0.2,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1677,9 +1678,9 @@
       "dir": "native-financier-browser",
       "status": "passes",
       "lastRun": {
-        "seconds": 106,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 102,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1697,9 +1698,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 0.2,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 0.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1716,9 +1717,9 @@
       "dir": "oven-financier-browser",
       "status": "passes",
       "lastRun": {
-        "seconds": 40.6,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 40.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1736,9 +1737,9 @@
       "status": "passes",
       "dir": "oven-workspace-browser",
       "lastRun": {
-        "seconds": 981.6,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 204.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1764,9 +1765,9 @@
       "status": "passes",
       "dir": "oven-authoring-browser",
       "lastRun": {
-        "seconds": 305.8,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 61.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1782,9 +1783,9 @@
       "dir": "oven-browser",
       "status": "passes",
       "lastRun": {
-        "seconds": 31.1,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 31.6,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1800,8 +1801,8 @@
       "status": "passes",
       "lastRun": {
         "seconds": 0.1,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1818,9 +1819,9 @@
       "dir": "batch-recovery-browser",
       "status": "passes",
       "lastRun": {
-        "seconds": 11.6,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 12.8,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1836,9 +1837,9 @@
       "status": "passes",
       "dir": "recovery-browser",
       "lastRun": {
-        "seconds": 14.6,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 14.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1854,8 +1855,8 @@
       "status": "passes",
       "lastRun": {
         "seconds": 0.3,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1872,9 +1873,9 @@
       "status": "passes",
       "dir": "factory-workspace",
       "lastRun": {
-        "seconds": 465.1,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 159.2,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1891,9 +1892,9 @@
       "status": "passes",
       "dir": "persistent-chat",
       "lastRun": {
-        "seconds": 285.8,
-        "date": "2026-11-18",
-        "commit": "69a67f517"
+        "seconds": 34.1,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1908,9 +1909,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 81.4,
+        "seconds": 82.1,
         "date": "2026-11-19",
-        "commit": "b50d5aff6"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1925,9 +1926,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 25.9,
+        "seconds": 25.7,
         "date": "2026-11-19",
-        "commit": "b50d5aff6"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1942,9 +1943,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 10.9,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 13.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1959,9 +1960,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 19.5,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 15.9,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1978,7 +1979,7 @@
       "lastRun": {
         "seconds": 12.7,
         "date": "2026-11-19",
-        "commit": "67ee2330d"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -1993,9 +1994,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 30.3,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 31.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2012,9 +2013,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 22,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 24.7,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2029,9 +2030,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 33.3,
+        "seconds": 34.6,
         "date": "2026-11-19",
-        "commit": "c2bace148"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2046,9 +2047,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 23.1,
+        "seconds": 23.4,
         "date": "2026-11-19",
-        "commit": "e6c03901f"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2063,9 +2064,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 28.2,
+        "seconds": 27.4,
         "date": "2026-11-19",
-        "commit": "d710619eb"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2089,9 +2090,9 @@
       "status": "passes",
       "notes": "Needs PANTRY_ACCOUNT_WORKER_ARTIFACT, the built shared account Worker. The runner starts serve-archive-acceptance.mjs on port 8840.",
       "lastRun": {
-        "seconds": 55.9,
+        "seconds": 51.6,
         "date": "2026-11-19",
-        "commit": "67ee2330d"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2106,9 +2107,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 33.2,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 29.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2124,9 +2125,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 109.3,
+        "seconds": 108.9,
         "date": "2026-11-19",
-        "commit": "dfd3e6bff"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2141,9 +2142,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 65.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 64.3,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2158,9 +2159,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 67.5,
+        "seconds": 67,
         "date": "2026-11-19",
-        "commit": "d710619eb"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2175,9 +2176,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 107.6,
+        "seconds": 108.9,
         "date": "2026-11-19",
-        "commit": "a92f2f9aa"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2193,9 +2194,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 161.4,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 160.9,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2211,9 +2212,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 265,
-        "date": "2026-11-17",
-        "commit": "cefdcf4cc"
+        "seconds": 48.2,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2237,9 +2238,9 @@
       "status": "passes",
       "notes": "Needs PANTRY_ACCOUNT_WORKER_ARTIFACT, the built shared account Worker. The runner starts serve-archive-acceptance.mjs on port 8840.",
       "lastRun": {
-        "seconds": 20.4,
+        "seconds": 20,
         "date": "2026-11-19",
-        "commit": "67ee2330d"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2254,9 +2255,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 39.1,
+        "seconds": 38.4,
         "date": "2026-11-19",
-        "commit": "d710619eb"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2272,9 +2273,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 9.4,
+        "seconds": 9.3,
         "date": "2026-11-19",
-        "commit": "a3cab6029"
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2289,9 +2290,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 17.6,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 19.3,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2307,9 +2308,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 49.1,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 50.3,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2324,9 +2325,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 47,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 48,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     },
     {
@@ -2342,9 +2343,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 145.8,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 146.5,
+        "date": "2026-11-19",
+        "commit": "2e48dac6e"
       }
     }
   ]
