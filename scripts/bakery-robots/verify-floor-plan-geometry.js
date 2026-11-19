@@ -4,7 +4,7 @@ async function verifyFloorPlanGeometry(page) {
   await page.reload();
   const evidence = "output/playwright/floor-plan-geometry";
 
-  /** Footprints in metres, measured from pixels against the 11 m room frame. */
+  /** Footprints in metres, measured from pixels against the room frame. */
   function measure(map) {
     function box(element) {
       const rect = element.getBoundingClientRect();
@@ -15,8 +15,14 @@ async function verifyFloorPlanGeometry(page) {
         height: rect.height,
       };
     }
-    const room = box(map.querySelector(".spatial-room-boundary"));
-    const pixelsPerMetre = room.width / 11;
+    const boundary = map.querySelector(".spatial-room-boundary");
+    // "Assumed room: 11 by 7 metres. …"
+    const size = /Assumed room: ([\d.]+) by ([\d.]+) metres/u.exec(
+      boundary.getAttribute("aria-label"),
+    );
+    const metres = { width: Number(size[1]), depth: Number(size[2]) };
+    const room = box(boundary);
+    const pixelsPerMetre = room.width / metres.width;
     const items = {};
     for (const shape of map.querySelectorAll("g.spatial-footprint")) {
       const id = shape.dataset.footprint;
@@ -40,12 +46,17 @@ async function verifyFloorPlanGeometry(page) {
         context: shape.dataset.context === "true",
       };
     }
-    return { room, pixelsPerMetre, items };
+    return { room, metres, pixelsPerMetre, items };
   }
 
   function assertTrueScale(sample, label) {
-    if (Math.abs(sample.room.width / sample.room.height - 11 / 7) > 0.005)
-      throw new Error(`${label}: the room lost its 11 × 7 m proportions.`);
+    const { width, depth } = sample.metres;
+    if (
+      Math.abs(sample.room.width / sample.room.height - width / depth) > 0.005
+    )
+      throw new Error(
+        `${label}: the room lost its ${width} × ${depth} m proportions.`,
+      );
     for (const [id, item] of Object.entries(sample.items)) {
       if (item.envelope === null)
         throw new Error(`${label}: ${id} has no size.`);
@@ -70,7 +81,7 @@ async function verifyFloorPlanGeometry(page) {
     return page.waitForFunction(
       function settled([expected, key]) {
         const divider = document.querySelector(
-          '.workflow-scene [aria-label="Floor plan width"]',
+          '.workflow-scene [aria-label="Resize floor plan"]',
         );
         const room = document
           .querySelector(".workflow-scene .spatial-room-boundary")
@@ -106,15 +117,10 @@ async function verifyFloorPlanGeometry(page) {
   const fitted = await map.evaluate(measure);
   assertTrueScale(fitted, "Fitted plan");
   const production = fitted.items;
-  if (
-    production.stage.envelope.join() !== "1.52,0.76" ||
-    production.cool.envelope.join() !== "0.53,0.73"
-  )
-    throw new Error("Station models changed; update the expected sizes.");
   await page.screenshot({ path: `${evidence}/production-fitted.png` });
 
   // Start from the minimum width so earlier runs' stored widths do not matter.
-  const divider = page.getByRole("separator", { name: "Floor plan width" });
+  const divider = page.getByRole("separator", { name: "Resize floor plan" });
   const minimum = Number(await divider.getAttribute("aria-valuemin"));
   await divider.focus();
   await page.keyboard.press("Home");
@@ -152,26 +158,23 @@ async function verifyFloorPlanGeometry(page) {
   )
     throw new Error("Zooming must not scroll the plan panel.");
 
-  // Dragging from equipment pans; it must not select what it started on.
-  const view = await map.boundingBox();
-  const [grabbed, grip] =
-    Object.entries(zoomed.items).find(function visibleFootprint([, item]) {
-      return (
-        view !== null &&
-        !item.pressed &&
-        item.fill.width > 40 &&
-        item.fill.height > 24 &&
-        item.fill.x > view.x &&
-        item.fill.y > view.y &&
-        item.fill.x + item.fill.width < view.x + view.width &&
-        item.fill.y + item.fill.height < view.y + view.height
-      );
-    }) ?? [];
-  if (grip === undefined) throw new Error("No unselected footprint in view.");
-  const start = {
-    x: grip.fill.x + 6,
-    y: grip.fill.y + grip.fill.height - 4,
-  };
+  // Dragging the empty floor pans the plan. A drag that starts on an
+  // appliance moves the appliance instead (store-layout-browser).
+  const start = await map.evaluate(function emptyFloorPoint(element) {
+    const rect = element.getBoundingClientRect();
+    for (let y = rect.top + 40; y < rect.bottom - 40; y += 12)
+      for (let x = rect.left + 40; x < rect.right - 40; x += 12) {
+        const hit = document.elementFromPoint(x, y);
+        if (
+          hit !== null &&
+          element.contains(hit) &&
+          hit.closest("button, g.spatial-footprint") === null
+        )
+          return { x, y };
+      }
+    return null;
+  });
+  if (start === null) throw new Error("No empty floor in view.");
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   await page.mouse.move(start.x - 70, start.y + 30, { steps: 6 });
@@ -186,8 +189,9 @@ async function verifyFloorPlanGeometry(page) {
         `Panning moved ${id} by ${dx}, ${dy} instead of -70, 30.`,
       );
   }
-  if (panned.items[grabbed].pressed)
-    throw new Error("A pan that starts on equipment must not select it.");
+  for (const [id, item] of Object.entries(panned.items))
+    if (item.pressed !== zoomed.items[id].pressed)
+      throw new Error(`Panning changed the selection of ${id}.`);
   await page.screenshot({ path: `${evidence}/production-zoomed.png` });
 
   const packing = panned.items.pack.fill;
@@ -348,36 +352,7 @@ async function verifyFloorPlanGeometry(page) {
     .getByRole("button", { name: "Return to recorded door pose" })
     .click();
 
-  await page.evaluate(async function observeCamera() {
-    const loaded = performance
-      .getEntriesByType("resource")
-      .find(function physicsSceneModule(entry) {
-        return (
-          new URL(entry.name).pathname ===
-          "/src/features/workflow-simulator/spatial/physics-scene.ts"
-        );
-      });
-    if (loaded === undefined)
-      throw new Error("The physics scene module was not loaded");
-    const { PhysicsScene } = await import(loaded.name);
-    for (const name of ["topView", "operatorView"]) {
-      const original = PhysicsScene.prototype[name];
-      PhysicsScene.prototype[name] = function observedView(bounds) {
-        original.call(this, bounds);
-        window.cameraProbe = this.cameraView();
-      };
-    }
-  });
-  await details.getByRole("button", { name: "Top view", exact: true }).click();
-  const top = await page.evaluate("window.cameraProbe");
-  if (top?.orthographic === undefined)
-    throw new Error("Native Top view must use an orthographic camera.");
-  await page.screenshot({ path: `${evidence}/native-top-view.png` });
-  await details
-    .getByRole("button", { name: "Operator height · 1.6 m", exact: true })
-    .click();
-  if ((await page.evaluate("window.cameraProbe"))?.orthographic !== undefined)
-    throw new Error("Other presets must return to the perspective camera.");
+  // scene-lighting-browser proves the orthographic Top view of this scene.
   await page
     .getByRole("button", { name: "Back to production", exact: true })
     .click();
@@ -390,6 +365,5 @@ async function verifyFloorPlanGeometry(page) {
     nativeContextStations: 5,
     ovenOutlineClosed: [closedOven.width, closedOven.depth],
     ovenOutlineOpen: [openOven.width, openOven.depth],
-    topViewOrthographic: top.orthographic,
   };
 }

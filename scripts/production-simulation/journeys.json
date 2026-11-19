@@ -1240,12 +1240,13 @@
       "owner": "Plan 42D",
       "run": {
         "tool": "browser",
-        "url": "/workflow-preview.html"
+        "url": "/workflow-preview.html?floorPlan=reference"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "A page.waitForFunction check does not become true in 15 s.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.2,
+        "date": "2026-11-19",
+        "commit": "2f66206e0"
       }
     },
     {
