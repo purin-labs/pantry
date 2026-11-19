@@ -1258,10 +1258,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Inputs' button is on the page but cannot take a click (tabindex -1) for 8 s. The journey's path to it is out of date.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 13.5,
+        "date": "2026-11-19",
+        "commit": "d3c2d7932"
       }
     },
     {

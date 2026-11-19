@@ -15,13 +15,11 @@ async function verifyOperatingDefaults(page) {
     exact: true,
   });
   if (await sidebar.isVisible()) await sidebar.click();
-  const inputs = page.getByRole("button", { name: "Inputs", exact: true });
-  if ((await inputs.getAttribute("aria-expanded")) !== "true")
-    await inputs.click();
+  await openSimulatorInputs(page);
   await page
     .getByRole("button", { name: "Normal morning", exact: true })
     .click();
-  const initialFinish = await page.getByText(/^Finish ~/).innerText();
+  const initialFinish = await simulatorFinish(page);
   if (
     (await page
       .getByRole("spinbutton", { name: "Workers", exact: true })
@@ -36,12 +34,12 @@ async function verifyOperatingDefaults(page) {
   if ((await cooling.inputValue()) !== "20")
     throw new Error("Missing post-demould cooling default");
   await cooling.fill("30");
-  if ((await page.getByText(/^Finish ~/).innerText()) !== initialFinish)
+  if ((await simulatorFinish(page)) !== initialFinish)
     throw new Error("Editing a draft changed the applied schedule");
   await page
     .getByRole("button", { name: "Apply changes", exact: true })
     .click();
-  const longerCoolingFinish = await page.getByText(/^Finish ~/).innerText();
+  const longerCoolingFinish = await simulatorFinish(page);
   if (longerCoolingFinish === initialFinish)
     throw new Error("Cooling edit did not delay packing");
   await openRealShiftData();
@@ -55,7 +53,7 @@ async function verifyOperatingDefaults(page) {
       .click(),
   ]);
   await download.saveAs(
-    "output/playwright/plan42-operating-defaults/downloaded-template.json",
+    `${globalThis.bakeryEvidence}/downloaded-template.json`,
   );
   const importer = page.getByLabel("Import measured shift JSON", {
     exact: true,
@@ -69,31 +67,26 @@ async function verifyOperatingDefaults(page) {
   await page
     .getByRole("button", { name: "Put suggested values in draft", exact: true })
     .click();
-  await inputs.click();
+  await openSimulatorInputs(page);
   if ((await cooling.inputValue()) !== "20")
     throw new Error("Measured cooling did not enter the draft");
-  if ((await page.getByText(/^Finish ~/).innerText()) !== longerCoolingFinish)
+  if ((await simulatorFinish(page)) !== longerCoolingFinish)
     throw new Error("Import bypassed Apply");
   await page
     .getByRole("button", { name: "Apply changes", exact: true })
     .click();
-  const importedFinish = await page.getByText(/^Finish ~/).innerText();
+  const importedFinish = await simulatorFinish(page);
   await page.screenshot({
     path: "output/playwright/plan42-operating-defaults/intake.png",
   });
   await openRealShiftData();
-  for (const filename of [
-    "old-observations.json",
-    "overlapping-cooling.json",
-  ]) {
-    await importer.setInputFiles(
-      `output/playwright/plan42-operating-defaults/${filename}`,
-    );
+  for (const rejected of await rejectedObservations(page)) {
+    await importer.setInputFiles(rejected);
     await page.getByRole("alert").waitFor();
-    if ((await page.getByText(/^Finish ~/).innerText()) !== importedFinish)
+    if ((await simulatorFinish(page)) !== importedFinish)
       throw new Error("Rejected observations replaced the applied schedule");
   }
-  await inputs.click();
+  await openSimulatorInputs(page);
   await page.getByRole("button", { name: "One worker", exact: true }).click();
   if (
     (await page
@@ -101,7 +94,7 @@ async function verifyOperatingDefaults(page) {
       .inputValue()) !== "1"
   )
     throw new Error("One-worker comparison is missing");
-  const oneWorkerFinish = await page.getByText(/^Finish ~/).innerText();
+  const oneWorkerFinish = await simulatorFinish(page);
   await page
     .getByRole("button", { name: "Normal morning", exact: true })
     .click();
@@ -113,7 +106,15 @@ async function verifyOperatingDefaults(page) {
   await page.screenshot({
     path: "output/playwright/plan42-operating-defaults/workflow.png",
   });
+  // On a phone the simulator fits the screen: no sideways scroll.
+  await page.setViewportSize({ width: 390, height: 844 });
+  const overflow = await page.evaluate(
+    "document.documentElement.scrollWidth - document.documentElement.clientWidth",
+  );
+  if (overflow > 0)
+    throw new Error(`The page scrolls sideways at 390 px by ${overflow} px`);
   return {
+    result: "passed",
     initialFinish,
     longerCoolingFinish,
     importedFinish,
@@ -122,7 +123,27 @@ async function verifyOperatingDefaults(page) {
     draftIsolation: true,
     coolingPhaseVisible: true,
     invalidObservationsPreserveRun: true,
-    template:
-      "output/playwright/plan42-operating-defaults/downloaded-template.json",
+    phoneFitsWithoutSidewaysScroll: true,
+    template: `${globalThis.bakeryEvidence}/downloaded-template.json`,
   };
+}
+
+// Two observation files that the import refuses, made from the committed
+// synthetic shift: an old schema version, and cooling that starts before
+// the unload ends.
+async function rejectedObservations(page) {
+  const fixture = `${new URL(page.url()).origin}/@fs${checkoutRoot()}/apps/portal/src/features/workflow-simulator/fixtures/measured-shift-synthetic.json`;
+  const shift = await (await page.request.get(fixture)).json();
+  const old = { ...shift, schemaVersion: 1 };
+  const overlapping = structuredClone(shift);
+  const first = overlapping.batches[0].intervals;
+  first.cool.start = first.unload.end - 10;
+  return [
+    ["old-observations.json", old],
+    ["overlapping-cooling.json", overlapping],
+  ].map(([name, value]) => ({
+    name,
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(value)),
+  }));
 }

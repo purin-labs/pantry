@@ -130,6 +130,36 @@ async function editInputs(page) {
     .click();
 }
 
+// The simulator's Inputs dock is the Inputs tab of its Details panel. The
+// "Inputs" button of the top bar is a 1-pixel screen-reader alias.
+async function openSimulatorInputs(page) {
+  const dock = page.locator("#workflow-dock-inputs");
+  if (await dock.isVisible()) return;
+  const details = page.locator("#workflow-toggle-inspector");
+  if ((await details.getAttribute("aria-expanded")) !== "true")
+    await details.click();
+  await page
+    .locator("#workflow-dock-inspector")
+    .getByRole("tab", { name: "Inputs", exact: true })
+    .click();
+  await dock.waitFor();
+}
+
+// The label of the More menu states the run's finish: "Finish ~07:42 · 0
+// unfinished".
+async function simulatorFinish(page) {
+  await page.locator("#workflow-more").click();
+  const menu = page.getByRole("menu", {
+    name: "More simulator tools",
+    exact: true,
+  });
+  const text = await menu.locator(".workflow-more-summary").innerText();
+  await page.keyboard.press("Escape");
+  // A click during the close animation does not open the menu again.
+  await menu.waitFor({ state: "detached" });
+  return text;
+}
+
 async function pressHiddenAlias(locator) {
   await locator.focus();
   await locator.press("Enter");
