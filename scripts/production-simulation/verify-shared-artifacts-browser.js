@@ -1,26 +1,21 @@
 async function verifySharedArtifactsBrowser(page) {
-  const setup = await page.request.get("http://127.0.0.1:8840/fixture/setup");
+  const setup = await page.request.get(`${ARCHIVE_ORIGIN}/fixture/setup`);
   if (!setup.ok())
     throw new Error("Start the isolated archive acceptance runtime.");
   const fixture = await setup.json();
   globalThis.archiveFault = "upload";
   globalThis.archiveRequests = [];
-  await page.route(
-    "**/v1/control/organisations/**/bakery/runs**",
-    forwardArchiveRequest,
-  );
-  await page.route("**/src/dev/workflow-preview.tsx", archiveStyles);
+  // Every control request goes to the archive runtime, not to the dev
+  // server's /v1 proxy.
+  await page.route(isControlRequest, forwardArchiveRequest);
+  await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await page.reload();
-  await mountArchive(page, fixture, 0);
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.getByRole("button", { name: "Recipes", exact: true }).click();
-  const source =
-    "/@fs/Users/pta/Dev/lowerarchy/satyr/services/platform/tests/fixtures/bakery-persistent-failure.json";
+  await openArchive(page, fixture, 0);
+  const source = `/@fs${checkoutRoot()}/services/platform/tests/fixtures/bakery-persistent-failure.json`;
   const file = await page.request.get(new URL(source, page.url()).href);
   await page
-    .getByLabel("Open recipe, oven route or saved production run", {
-      exact: true,
-    })
+    .getByLabel(/^Open recipe, oven route or saved production run/)
     .setInputFiles({
       name: "failed-native-factory.json",
       mimeType: "application/json",
@@ -29,10 +24,11 @@ async function verifySharedArtifactsBrowser(page) {
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
+  await openRecovery(page);
   await page
-    .getByRole("region", { name: "Physical recovery controls", exact: true })
-    .waitFor();
-  await page.getByText("Shared production runs", { exact: true }).click();
+    .getByRole("group", { name: "Detail panels", exact: true })
+    .getByRole("button", { name: "Save", exact: true })
+    .click();
   const shared = page.getByRole("region", {
     name: "Workspace saved runs",
     exact: true,
@@ -86,9 +82,11 @@ async function verifySharedArtifactsBrowser(page) {
   if (uploadedDigests.size !== repeatedUploads.length)
     throw new Error("Retry uploaded an already retained artifact.");
   await page.reload();
-  await mountArchive(page, fixture, 1);
-  await page.getByRole("button", { name: "Recipes", exact: true }).click();
-  await page.getByText("Shared production runs", { exact: true }).click();
+  await openArchive(page, fixture, 1);
+  await page
+    .locator(".production-panel")
+    .getByRole("button", { name: /^Shared production runs/u })
+    .click();
   await page
     .getByRole("button", {
       name: "Open Native archive with interrupted upload",
@@ -98,10 +96,7 @@ async function verifySharedArtifactsBrowser(page) {
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
-  const recovery = page.getByRole("region", {
-    name: "Physical recovery controls",
-    exact: true,
-  });
+  const recovery = await openRecovery(page);
   await recovery
     .getByText("Review recovery for tray-orders#0/transfer", { exact: true })
     .waitFor();
@@ -123,6 +118,16 @@ async function verifySharedArtifactsBrowser(page) {
   };
 }
 
+/** A blocked run shows a Review button, which opens the recovery controls. */
+async function openRecovery(page) {
+  await page.getByRole("button", { name: /· Review$/u }).click();
+  const controls = page.getByRole("region", {
+    name: "Physical recovery controls",
+    exact: true,
+  });
+  await controls.waitFor();
+  return controls;
+}
 function isPublication(request) {
   return request.method === "POST" && request.path.endsWith("/bakery/runs");
 }
@@ -141,7 +146,7 @@ async function forwardArchiveRequest(route) {
     path: url.pathname,
   });
   const response = await route.fetch({
-    url: `http://127.0.0.1:8840${url.pathname}${url.search}`,
+    url: `${ARCHIVE_ORIGIN}${url.pathname}${url.search}`,
   });
   const upload =
     request.method() === "POST" && url.pathname.includes("/artifacts/");
@@ -160,56 +165,18 @@ async function forwardArchiveRequest(route) {
   } else await route.fulfill({ response });
 }
 
-async function archiveStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
-}
-async function mountArchive(page, fixture, user) {
-  await page.addScriptTag({
-    content: `${archiveMutation.toString()}\nwindow.archiveMutation = archiveMutation;`,
-  });
-  await page.evaluate(mountArchiveWorkspace, {
+/**
+ * Signs in person `user` of the fixture, mounts the workspace simulator of
+ * its Organisation and shows the production catalog.
+ */
+async function openArchive(page, fixture, user) {
+  await installRecipeMutation(page, archiveMutation);
+  await page.evaluate(signInToArchive, fixture.sessions[user]);
+  await page.evaluate(mountWorkflowSimulator, {
+    kind: "workspace",
     organisationId: fixture.organisationId,
-    session: fixture.sessions[user],
+    canManage: true,
   });
-}
-async function archiveMutation(path, body) {
-  const { responseJson } = await import("/src/control-client.ts");
-  return responseJson(
-    await fetch(path, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        "content-type": "application/json",
-        "x-satyr-csrf": window.archiveCsrf,
-      },
-      body: JSON.stringify(body),
-    }),
-  );
-}
-async function mountArchiveWorkspace(fixture) {
-  document.cookie = `satyr_control_session=${fixture.session.token}; Path=/; SameSite=Lax`;
-  document.cookie = `satyr_control_csrf=${fixture.session.csrfToken}; Path=/; SameSite=Lax`;
-  window.archiveCsrf = fixture.session.csrfToken;
-  const { default: React } = await import("/@id/react");
-  const { default: ReactDOM } = await import("/@id/react-dom/client");
-  const { MemoryRouter } = await import("/@id/react-router");
-  const { default: Route } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  ReactDOM.createRoot(document.getElementById("root")).render(
-    React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(Route, {
-        connection: {
-          kind: "workspace",
-          organisationId: fixture.organisationId,
-          canManage: true,
-          mutate: window.archiveMutation,
-        },
-      }),
-    ),
-  );
+  await openMultiBatchProduction(page);
+  await showProductionCatalog(page);
 }

@@ -385,3 +385,46 @@ async function saveRecipeCopy(path, body) {
   }
   return response.json();
 }
+
+// The shared archive journeys (Plan 70 J3) send every control request to
+// serve-archive-acceptance.mjs, not to the dev server's /v1 proxy.
+const ARCHIVE_ORIGIN = "http://127.0.0.1:8840";
+function isControlRequest(url) {
+  return url.pathname.startsWith("/v1/");
+}
+async function forwardToArchive(route) {
+  const url = new URL(route.request().url());
+  await route.fulfill({
+    response: await route.fetch({
+      url: `${ARCHIVE_ORIGIN}${url.pathname}${url.search}`,
+    }),
+  });
+}
+
+// Page code: signs in one person of the archive fixture.
+function signInToArchive(session) {
+  document.cookie = `satyr_control_session=${session.token}; Path=/; SameSite=Lax`;
+  document.cookie = `satyr_control_csrf=${session.csrfToken}; Path=/; SameSite=Lax`;
+  window.archiveCsrf = session.csrfToken;
+}
+
+// Page code: the workspace's control write and read, with the CSRF token of
+// the person whom signInToArchive signed in.
+async function archiveMutation(path, body) {
+  const { responseJson } = await import("/src/control-client.ts");
+  return responseJson(
+    await fetch(path, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "content-type": "application/json",
+        "x-satyr-csrf": window.archiveCsrf,
+      },
+      body: JSON.stringify(body),
+    }),
+  );
+}
+async function archiveRead(path) {
+  const { responseJson } = await import("/src/control-client.ts");
+  return responseJson(await fetch(path, { credentials: "same-origin" }));
+}
