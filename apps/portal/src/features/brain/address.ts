@@ -158,9 +158,21 @@ export function brainAddressSearch(
   return text.length === 0 ? "" : `?${text}`;
 }
 
-/** The path of the page that holds a view, beside the page that is open. */
+/** The Portal pages that hold Brain views; `brain` is the old address. */
+const BRAIN_PAGE_SEGMENTS: ReadonlySet<string> = new Set([
+  "brain",
+  "knowledge",
+  "agents",
+]);
+
+/**
+ * The path of the page that holds a view, beside the page that is open. A
+ * page outside the Portal pages, such as the Brain preview, holds every view
+ * at its own path.
+ */
 function brainSectionPath(pathname: string, view: BrainView): string {
   const slash = pathname.lastIndexOf("/");
+  if (!BRAIN_PAGE_SEGMENTS.has(pathname.slice(slash + 1))) return pathname;
   return `${pathname.slice(0, slash + 1)}${SECTION_OF_VIEW[view]}`;
 }
 

@@ -973,6 +973,10 @@ function PreviewApp(): React.ReactNode {
   const summary = useBrainSummary(organisationId);
   const toReview = summary === null ? 0 : brainItemsToReview(summary);
   const location = useLocation();
+  const section =
+    new URLSearchParams(location.search).get("view") === "activity"
+      ? "agents"
+      : "knowledge";
   const navigate = useNavigate();
   const chatOpen =
     liveOrganisationId === null && location.pathname === CHAT_PATH;
@@ -1038,12 +1042,11 @@ function PreviewApp(): React.ReactNode {
         description="Review what the agents have learned and decide what they may use."
       />
       <BrainRoute
-        // Activity is the second tab of the Agents page, not of Knowledge.
-        section={
-          new URLSearchParams(window.location.search).get("view") === "activity"
-            ? "agents"
-            : "knowledge"
-        }
+        // Activity is the second tab of the Agents page, not of Knowledge. The
+        // Portal shows each section as its own page, so a change of section
+        // mounts the route again with the address of the new page.
+        key={section}
+        section={section}
         skills={<p>The Skills view opens here.</p>}
         organisationId={organisationId}
         canManage={scenario !== "viewer"}
