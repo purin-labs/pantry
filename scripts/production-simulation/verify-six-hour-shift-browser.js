@@ -1,20 +1,21 @@
-// Run with Playwright CLI's run-code command against the Portal dev server.
-// The native acceptance journey must finish first. This harness uses actual
-// Portal components and retained execution evidence. It mocks no product result.
-async function verifySixHourShiftBrowser(
-  page,
-  options = {
-    evidenceDirectory:
-      "output/acceptance/plan-61E/six-hour-measured-intake-20261102",
-    screenshotDirectory: "output/playwright/six-hour-measured-intake-20261102",
-  },
-) {
+// The Portal shift author and results on the output of six-hour-shift. This
+// harness uses actual Portal components and retained execution evidence. It
+// mocks no product result. The row opens the page with
+// ?evidence=/@fs/<six-hour-shift>.
+async function verifySixHourShiftBrowser(page) {
+  const evidenceUrl = new URL(page.url()).searchParams.get("evidence");
+  const options = {
+    evidenceDirectory: evidenceUrl.replace(/^\/@fs/u, ""),
+    screenshotDirectory: globalThis.bakeryEvidence,
+  };
+  const base = new URL(page.url()).origin;
+  const expected = await expectedResults(page, `${base}${evidenceUrl}`);
   await page.route("**/six-hour-acceptance", serveShiftHarness);
   await page.route(
     "**/six-hour-evidence/*",
     serveShiftEvidence.bind(null, options.evidenceDirectory),
   );
-  await page.goto("http://127.0.0.1:3103/six-hour-acceptance");
+  await page.goto(`${base}/six-hour-acceptance`);
   await page.setViewportSize({ width: 1440, height: 1100 });
   await page.evaluate(mountShiftAuthor);
   await chooseOption(page, page.getByLabel("Shift scope"), {
@@ -102,7 +103,7 @@ async function verifySixHourShiftBrowser(
     '[data-metric="barista-utilization-percent"]',
   );
   if (
-    !(await barista.textContent()).includes("17.17") ||
+    !(await barista.textContent()).includes(expected.baristaShare) ||
     !(await barista.textContent()).includes("Outside assumed range")
   )
     throw new Error("The Portal hid the observed utilization result");
@@ -132,12 +133,14 @@ async function verifySixHourShiftBrowser(
   );
   await measuredSpan.waitFor();
   if (
-    !(await measuredSpan.textContent()).includes("-2 min 24 s") ||
+    !(await measuredSpan.textContent()).includes(expected.spanError) ||
     !(await evidence.textContent()).includes(
       "Assumed timings / Uncalibrated (single-shift comparison; separate fitting and validation runs required)",
     )
   ) {
-    throw new Error("Measured 6-hour comparison omitted error or calibration limit");
+    throw new Error(
+      "Measured 6-hour comparison omitted error or calibration limit",
+    );
   }
   await measuredSpan.scrollIntoViewIfNeeded();
   await page.locator(".oven-logistics-scroll").screenshot({
@@ -162,8 +165,43 @@ async function verifySixHourShiftBrowser(
     sixHourHorizon: sixHour.limits.horizon,
     oneWaveHorizon: oneWave.limits.horizon,
     morningHorizon: morning.limits.horizon,
-    measuredShiftSpanError: "-2 min 24 s",
+    baristaShare: expected.baristaShare,
+    measuredShiftSpanError: expected.spanError,
   };
+
+  // The values that six-hour-shift computed, as the Results panel shows them:
+  // a share with two decimals, and a signed error in minutes and seconds.
+  async function expectedResults(page, evidence) {
+    const read = async (name) =>
+      (await page.request.get(`${evidence}/${name}`)).json();
+    const report = await read("shift-report.json");
+    const comparison = await read("measured-six-hour-comparison.json");
+    const barista = findMetric(report, "barista-utilization-percent");
+    const span = comparison.metrics.find(
+      (metric) => metric.id === "shift-span-seconds",
+    ).signedError;
+    const total = Math.round(Math.abs(span));
+    return {
+      baristaShare: barista.measurement.value.toFixed(2),
+      spanError: `${span < 0 ? "-" : "+"}${Math.floor(total / 60)} min ${total % 60} s`,
+    };
+  }
+
+  function findMetric(value, id) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = findMetric(item, id);
+        if (found !== null) return found;
+      }
+    } else if (value !== null && typeof value === "object") {
+      if (value.id === id && "measurement" in value) return value;
+      for (const item of Object.values(value)) {
+        const found = findMetric(item, id);
+        if (found !== null) return found;
+      }
+    }
+    return null;
+  }
 
   async function serveShiftHarness(route) {
     await route.fulfill({

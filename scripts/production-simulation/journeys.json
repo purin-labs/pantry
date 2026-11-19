@@ -2245,12 +2245,14 @@
       "owner": "Plan 61E",
       "run": {
         "tool": "browser",
-        "url": "/workflow-preview.html"
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:six-hour-shift}",
+        "prerequisites": ["{out:six-hour-shift}/report.json"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The file has no 'async function verify…(page)' entry, so browser-acceptance.mjs cannot run it. It also reads the Plan 61E output of 2026-11-02 from a fixed path.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 9.4,
+        "date": "2026-11-19",
+        "commit": "a3cab6029"
       }
     },
     {
