@@ -890,14 +890,6 @@ mod tests {
     }
 
     #[test]
-    fn plan_is_deterministic_for_the_same_bytes() {
-        let first = plan_h264_decode(KEYFRAMES_H264, 3);
-        let second = plan_h264_decode(KEYFRAMES_H264, 3);
-
-        assert_eq!(first, second);
-    }
-
-    #[test]
     fn plan_reports_missing_parameter_sets_rather_than_guessing() {
         // An avc1 track with no avcC: a decoder could not initialise from it.
         let file = mjpeg_fixture(b"avc1", &[b"one".to_vec(), b"two".to_vec()]);

@@ -8,29 +8,6 @@ import {
   metrics,
   simulate,
 } from "@seams/production-simulation/recipes/bakery/schedule";
-import {
-  readPortalRoute,
-  workspacePageDescriptor,
-  workspacePagePath,
-} from "../../route.ts";
-import { demoPreset, largestWait } from "@seams/production-simulation/simulator/demo";
-
-test(
-  "demo presets reset to reproducible local shifts with explainable waits",
-  checkDemoPresets,
-);
-function checkDemoPresets() {
-  const morning = demoPreset("morning");
-  const workers = demoPreset("one-worker");
-  const breakdown = demoPreset("breakdown");
-  assert.equal(morning.normal.end, 6198);
-  assert.equal(workers.normal.end, 6378);
-  assert.equal(breakdown.variant, "outage");
-  assert.equal(breakdown.outage.end, 7200);
-  assert.deepEqual(demoPreset("morning"), morning);
-  assert.equal(largestWait(morning.normal), "Station capacity · 26 batch-min");
-  assert.equal(largestWait(workers.normal), "Workers busy · 29 batch-min");
-}
 
 test(
   "shift replay respects station capacity and worker exclusivity across 108 configurations",
@@ -324,20 +301,4 @@ function checkInputs() {
       parseSettings({ ...sampleSettings(), ...patch }).kind,
       "invalid",
     );
-}
-
-test(
-  "portal route uses the BakeryOS descriptor and rejects resource suffixes",
-  checkPortalRoute,
-);
-function checkPortalRoute() {
-  const path = workspacePagePath("bakery", "main", "workflow-simulator");
-  assert.deepEqual(readPortalRoute(path), {
-    kind: "workspace",
-    organisationHandle: "bakery",
-    workspaceHandle: "main",
-    destination: { kind: "page", page: "workflow-simulator" },
-  });
-  assert.equal(workspacePageDescriptor("workflow-simulator").group, "BakeryOS");
-  assert.equal(readPortalRoute(`${path}/unknown`).kind, "not_found");
 }

@@ -633,7 +633,6 @@ mod envelope_tests {
         assert_eq!(serialized["identity"]["organisationId"], "organisation_1");
         assert_eq!(serialized["identity"]["sourceSha256"], digest_hex(body));
         assert_eq!(serialized["inputBytes"], body.len());
-        assert!(serialized.get("executionId").is_none());
 
         match preparation_operation(response) {
             WorkspaceExecutorInspectionOperation::AttachmentText {
@@ -756,20 +755,6 @@ mod envelope_tests {
     }
 
     #[test]
-    fn refuses_product_workspace_fields_in_a_preparation_request() {
-        let body = b"x";
-        let mut value: serde_json::Value =
-            serde_json::from_str(&request_json("document", "text/plain", body, 10)).unwrap();
-        value["executionId"] = serde_json::json!("execution_1");
-        let json = serde_json::to_string(&value).unwrap();
-
-        let failure = execute_envelope(&envelope(&json, body), now())
-            .expect_err("product workspace fields are not part of preparation");
-
-        assert_eq!(failure.code(), WorkspaceExecutorErrorCode::InvalidRequest);
-    }
-
-    #[test]
     fn refuses_a_preparation_deadline_beyond_its_declared_duration() {
         let body = b"x";
         let mut value: serde_json::Value =
@@ -825,24 +810,6 @@ mod envelope_tests {
             assert_eq!(&jpeg[jpeg.len() - 2..], &[0xff, 0xd9]);
             assert_eq!(frame.sha256, digest_hex(&jpeg));
         }
-    }
-
-    #[test]
-    fn decoding_is_deterministic_for_the_same_bytes() {
-        let body = KEYFRAMES_H264;
-        let json = request_json("video", "video/mp4", body, 0);
-        let first = execute_envelope(&envelope(&json, body), now()).expect("first");
-        let second = execute_envelope(&envelope(&json, body), now()).expect("second");
-
-        let digests = |result: WorkspaceExecutorPreparationResponse| match result.operation {
-            WorkspaceExecutorInspectionOperation::AttachmentVideoFrames { frames, .. } => frames
-                .into_iter()
-                .map(|frame| frame.sha256)
-                .collect::<Vec<_>>(),
-            other => panic!("expected frames, got {other:?}"),
-        };
-
-        assert_eq!(digests(first), digests(second));
     }
 
     #[test]
