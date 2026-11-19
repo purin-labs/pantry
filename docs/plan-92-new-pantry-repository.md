@@ -444,7 +444,11 @@ no call, and the reply never shows) fail the same way on `origin/dev`
 `f14a6fe`. The Portal unit test
 `schedule.test.mjs` fails because `packages/control-api` imports relative
 paths without `.ts` (for example `./surface-observation` in
-`surface-command.ts`), which `node --test` refuses.
+`surface-command.ts`), which `node --test` refuses. Later commits fixed all
+four: `3424f12` (a scrub shows the stages at the scrubbed time again),
+`89facfb` and `38c684c` (the runner serves the built Portal), `c9fd14e`
+(fixture Workers refuse Commerce calls by default) and `fea24f8` (`.ts`
+imports in `control-api`).
 
 **Kept, with the reason.**
 - The Commerce digest branches in `ledger.ts`: their JSON key order is part
@@ -455,10 +459,20 @@ paths without `.ts` (for example `./surface-observation` in
   `refundOrderTenders`), the siphon, café shift and pastry engines, the TV
   player socket (another protocol), the Python-run `run-code` journeys (no
   prelude), and small pairs under 20 lines.
-- `showOnEachUpdate` in five recipe views keeps a probable old bug (the
-  scene shows the last frame batch again on each render); a separate change
-  can remove it.
 
-**Left for later.** `messages/derived-stills.ts` keeps a throwing copy of
-`decodeBase64`, and the generated action registry keeps its own `isRecord`
-(the lint skips generated code).
+**Done after the merges.**
+- `messages/derived-stills.ts` decodes with the `decodeBase64` of
+  `@seams/std`. A frame that does not decode fails with
+  `derived_still_integrity_failed`, as a frame with a wrong digest does.
+- The generated action registry imports `isRecord` and `assertNever` from
+  `@seams/std`, and the helper lint now reads generated sources. Fix a
+  finding there in its generator.
+- `showOnEachUpdate` is removed. In five recipe views (black sesame, ginger
+  tea, financier batter, bake and pack), each render sent the last frame
+  batch again, so each camera click replayed that batch from its first
+  frame. A probe on `recipe-playback-preview.html` counted 4 replays for 4
+  clicks after a completed financier pack run before the change, and none
+  after it. Each of the five scenes applies its stored frame when it loads,
+  so no view needs the re-send. `RecipeSampleStation` still sends its
+  samples on each update, but the pour-over and espresso scenes ignore a
+  batch that does not move forward.
