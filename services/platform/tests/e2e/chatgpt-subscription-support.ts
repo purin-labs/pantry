@@ -45,9 +45,13 @@ import { network } from "./network";
  * (Plan 73).
  */
 
-export const CHATGPT_ACCOUNT_ID = "acct_e2e_chatgpt";
+const CHATGPT_ACCOUNT_ID = "acct_e2e_chatgpt";
 const DEVICE_AUTH_ID = "deviceauth_e2e";
 const USER_CODE = "E2E-CODE";
+/** How long each access token of the Codex sign-in lives. */
+const CODEX_ACCESS_TOKEN_LIFETIME_SECONDS = 3_600;
+/** The share of the weekly allowance that the backend reports as used. */
+const CODEX_USED_PERCENT = 25;
 
 export type ChatGptModelRequest = {
   readonly headers: Readonly<Record<string, string>>;
@@ -64,44 +68,15 @@ export type ChatGptAnswer =
       readonly callId: string;
     };
 
-export type ChatGptTokenRequest = Readonly<Record<string, string>>;
+type ChatGptTokenRequest = Readonly<Record<string, string>>;
 
 export class FakeChatGpt {
   readonly modelRequests: ChatGptModelRequest[] = [];
-  readonly tokenRequests: ChatGptTokenRequest[] = [];
-  readonly usageReads: string[] = [];
-  /** The path of each request that did not come through its exit. */
-  readonly directRequests: string[] = [];
-  /**
-   * The path of each chatgpt.com request that came through the model exit
-   * Worker. chatgpt.com refuses requests from a Worker (Plan 75).
-   */
-  readonly workerRequests: string[] = [];
   /** Answers the model request at `index` of all model requests. */
   answer: (
     request: ChatGptModelRequest,
     index: number,
   ) => ChatGptAnswer | Promise<ChatGptAnswer> = textAnswer.bind(null, "Done.");
-  /** How long each access token that it issues lives. */
-  accessTokenLifetimeSeconds = 3_600;
-  /** Whether a refresh is refused, as after a sign-out at OpenAI. */
-  refuseRefresh = false;
-  /** A refresh answers after this resolves. */
-  refreshGate: Promise<void> = Promise.resolve();
-  /**
-   * The next this many model requests get a Cloudflare challenge page, as
-   * chatgpt.com answers a client that its bot check refuses.
-   */
-  modelChallenges = 0;
-  challengedRequests = 0;
-  /**
-   * Whether each allowance read gets a Cloudflare challenge page, as
-   * chatgpt.com answered each read from the exit Worker on 2026-10-19.
-   */
-  challengeUsageReads = false;
-  usedPercent = 25;
-  limitReached = false;
-  hasCredits = true;
   approved = false;
   readonly #accessTokens = new Map<string, number>();
   readonly #refreshTokens = new Set<string>();
@@ -145,7 +120,6 @@ export class FakeChatGpt {
     return (info) => {
       if (info.request.headers.has(MODEL_EXIT_EGRESS_HEADER))
         return resolver.call(this, info);
-      this.directRequests.push(new URL(info.request.url).pathname);
       return HttpResponse.json(
         {
           error: {
@@ -176,7 +150,6 @@ export class FakeChatGpt {
         return resolver.call(this, info);
       if (!info.request.headers.has(MODEL_EXIT_EGRESS_HEADER))
         return outsideTheContainer(info);
-      this.workerRequests.push(new URL(info.request.url).pathname);
       return new HttpResponse(
         "<html><head><title>Attention Required!</title></head><body>Sorry, you have been blocked</body></html>",
         {
@@ -190,10 +163,6 @@ export class FakeChatGpt {
   /** The person enters the code at OpenAI and approves the sign-in. */
   approve(): void {
     this.approved = true;
-  }
-
-  refreshCount(): number {
-    return this.tokenRequests.filter(isRefresh).length;
   }
 
   modelRequestCount(): number {
@@ -251,7 +220,6 @@ export class FakeChatGpt {
         new TextDecoder().decode(await request.arrayBuffer()),
       ).entries(),
     );
-    this.tokenRequests.push(form);
     if (form.client_id !== "app_EMoamEEZ73f0CkXaXp7hrann")
       return HttpResponse.json({ error: "invalid_client" }, { status: 401 });
     if (form.grant_type === "authorization_code") {
@@ -263,10 +231,8 @@ export class FakeChatGpt {
     }
     if (form.grant_type !== "refresh_token")
       return HttpResponse.json({ error: "unsupported" }, { status: 400 });
-    await this.refreshGate;
     // OpenAI rotates refresh tokens: each one works once.
     if (
-      this.refuseRefresh ||
       form.refresh_token === undefined ||
       !this.#refreshTokens.delete(form.refresh_token)
     )
@@ -281,11 +247,6 @@ export class FakeChatGpt {
     request,
   }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
     const headers = Object.fromEntries(request.headers.entries());
-    if (this.modelChallenges > 0) {
-      this.modelChallenges -= 1;
-      this.challengedRequests += 1;
-      return challengePage();
-    }
     if (!this.accepts(headers.authorization))
       return HttpResponse.json(
         { error: { code: "token_expired", message: "token expired" } },
@@ -300,17 +261,6 @@ export class FakeChatGpt {
     if (!isRecord(body)) throw new Error("Codex request body is invalid");
     const recorded = { headers, body };
     const index = this.modelRequests.push(recorded) - 1;
-    if (this.limitReached)
-      return HttpResponse.json(
-        {
-          error: {
-            type: "usage_limit_reached",
-            message: "The usage limit has been reached",
-            plan_type: "pro",
-          },
-        },
-        { status: 429, headers: this.allowanceHeaders() },
-      );
     const answer = await this.answer(recorded, index);
     const id = `resp_e2e_${String(index + 1)}`;
     return new HttpResponse(
@@ -326,16 +276,14 @@ export class FakeChatGpt {
 
   private readUsage({ request }: Parameters<HttpResponseResolver>[0]) {
     const authorization = request.headers.get("authorization") ?? undefined;
-    this.usageReads.push(authorization ?? "");
-    if (this.challengeUsageReads) return challengePage();
     if (!this.accepts(authorization))
       return HttpResponse.json({ detail: "Unauthorized" }, { status: 401 });
     return HttpResponse.json({
       plan_type: "pro",
       rate_limit: {
-        limit_reached: this.limitReached,
+        limit_reached: false,
         primary_window: {
-          used_percent: this.usedPercent,
+          used_percent: CODEX_USED_PERCENT,
           limit_window_seconds: 604_800,
           reset_after_seconds: 3_600,
           reset_at: Math.floor(Date.now() / 1_000) + 3_600,
@@ -343,7 +291,7 @@ export class FakeChatGpt {
         secondary_window: null,
       },
       credits: {
-        has_credits: this.hasCredits,
+        has_credits: true,
         unlimited: false,
         overage_limit_reached: false,
       },
@@ -354,7 +302,7 @@ export class FakeChatGpt {
     return {
       "x-codex-plan-type": "pro",
       "x-codex-active-limit": "premium",
-      "x-codex-primary-used-percent": String(this.usedPercent),
+      "x-codex-primary-used-percent": String(CODEX_USED_PERCENT),
       "x-codex-primary-window-minutes": "10080",
       "x-codex-primary-reset-at": String(
         Math.floor(Date.now() / 1_000) + 3_600,
@@ -363,7 +311,7 @@ export class FakeChatGpt {
       "x-codex-secondary-used-percent": "0",
       "x-codex-secondary-window-minutes": "0",
       "x-codex-secondary-reset-at": "",
-      "x-codex-credits-has-credits": this.hasCredits ? "True" : "False",
+      "x-codex-credits-has-credits": "True",
       "x-codex-credits-unlimited": "False",
       "x-codex-turn-state": "opaque-e2e",
     };
@@ -371,7 +319,7 @@ export class FakeChatGpt {
 
   private issueTokens(): Record<string, unknown> {
     this.#issued += 1;
-    const expiresAt = Date.now() + this.accessTokenLifetimeSeconds * 1_000;
+    const expiresAt = Date.now() + CODEX_ACCESS_TOKEN_LIFETIME_SECONDS * 1_000;
     const accessToken = jwt({
       exp: Math.floor(expiresAt / 1_000),
       issued: this.#issued,
@@ -393,23 +341,9 @@ export class FakeChatGpt {
       }),
       access_token: accessToken,
       refresh_token: refreshToken,
-      expires_in: this.accessTokenLifetimeSeconds,
+      expires_in: CODEX_ACCESS_TOKEN_LIFETIME_SECONDS,
     };
   }
-}
-
-/** The page that Cloudflare's bot check answers in place of chatgpt.com. */
-function challengePage(): Response {
-  return new HttpResponse(
-    "<!DOCTYPE html><html><head><title>Just a moment...</title></head></html>",
-    {
-      status: 403,
-      headers: {
-        "content-type": "text/html; charset=UTF-8",
-        "cf-mitigated": "challenge",
-      },
-    },
-  );
 }
 
 export function textAnswer(text: string): ChatGptAnswer {

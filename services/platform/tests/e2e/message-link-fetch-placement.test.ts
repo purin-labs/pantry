@@ -57,8 +57,6 @@ const ANSWER = "The carrier API takes a bearer token.";
 const LINK = "https://supplier.example.net/schedule";
 const LINK_TEXT = "Supplier schedule: Friday delivery at 09:00.";
 const LINK_STABLE_IDENTITY = "link-fetch-placement:message-with-link";
-/** The one object of the class before each region had its own. */
-const EARLIER_NAME = "public-links";
 
 it(
   "reads a page for a Portal chat and a link of a message through the link-fetch Actor of the organisation's region, and the operator's erase refuses that Actor only",
@@ -258,29 +256,22 @@ async function linkFetchPlacementJourney({ task }: TestContext): Promise<void> {
   const linkRead = linkFetch.addressed.slice(documentationRead.length);
 
   // Each request went to one Actor: the one of the Organisation's region,
-  // asked for in that region. The earlier object got no request.
+  // asked for in that region.
   const names = [...new Set(linkFetch.addressed.map(addressedName))];
   expect(documentationRead).toHaveLength(2);
   expect(linkRead).toHaveLength(1);
   expect(names).toHaveLength(1);
   const name = names[0];
   if (name === undefined) throw new Error("No Actor was addressed");
-  expect(name).not.toBe(EARLIER_NAME);
   expect(name).toContain(placement.locationHint);
   expect([...new Set(linkFetch.addressed.map(addressedHint))]).toEqual([
     placement.locationHint,
   ]);
 
-  // The operator's erase refuses the Actor that the read used. It does not
-  // refuse the earlier object: that erase reaches the Actor, which only a
-  // runtime with containers can build.
+  // The operator's erase refuses the Actor that the read used.
   const addressedObject = await erase(
     "message_link_fetch",
     env.MESSAGE_LINK_FETCH.idFromName(name).toString(),
-  );
-  const earlierObject = await erase(
-    "message_link_fetch",
-    env.MESSAGE_LINK_FETCH.idFromName(EARLIER_NAME).toString(),
   );
   const objectOfAnotherClass = await erase(
     "message_link_fetch",
@@ -291,10 +282,6 @@ async function linkFetchPlacementJourney({ task }: TestContext): Promise<void> {
     status: 404,
     code: "actor_not_found",
   });
-  expect(["actor_registered", "actor_not_found"]).not.toContain(
-    earlierObject.code,
-  );
-  expect(earlierObject.status).not.toBe(200);
 
   task.meta.messageLinkFetchPlacement = {
     organisationLocationHint: placement.locationHint,
@@ -309,8 +296,6 @@ async function linkFetchPlacementJourney({ task }: TestContext): Promise<void> {
     erase: {
       addressedObject,
       objectOfAnotherClass,
-      // No refusal of the route. The local runtime cannot build the Actor.
-      earlierObject,
     },
   };
 }

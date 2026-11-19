@@ -45,9 +45,6 @@ test and any fixture that exists only for the obsolete behavior.
   nothing. `e2e/write-meter.ts` counts the writes and names the D1 statement
   that wrote. Run the journey after a change to a cron, an alarm, a poll or a
   Durable Object constructor. It needs the account Worker.
-- `e2e/purged-organisation.test.ts` follows a purge that a Connector blocks:
-  the operator's erase, the purge that then completes, and the scheduled run
-  that no longer lists the Organisation.
 - `e2e/unregistered-actors.test.ts` covers the operator's erase of an Actor by
   its object identifier: what is erased, and the two refusals that protect a
   registered Actor and one whose Organisation exists.
@@ -103,20 +100,9 @@ test and any fixture that exists only for the obsolete behavior.
   to the dead-letter queue: the Organisation's alarm ends it as a failed
   delivery, the cutover no longer waits for it, and a replay delivers
   nothing twice (Refactor 15).
-- `e2e/case-assignment-wake.test.ts` gives a stopped command's Case the
-  state that a release before the abandon wakeup left: a `running`
-  assignment with no wakeup. When the Case wakes, it sets the wakeup, which
-  ends the assignment as abandoned with no new command (Refactor 15). It
-  needs the account Worker.
-- `e2e/session-quarantine-end.test.ts` gives two stopped commands the
-  quarantine that a release before Refactor 15 wrote for an interrupted
-  turn. When the Sessions and then the Cases wake, the clean Session ends as
-  failed and its Case ends the assignment as abandoned; the Session with an
-  effect whose result is unknown stays quarantined, and its assignment stays
-  `running`. Before they wake, the Session census counts that effect by its
-  kind, reason and age, and the clean Session has no such entry. A second
-  journey quarantines two Sessions with a Code Mode settlement that the
-  Organisation refuses while a call is in flight. A day later, the Session
+- `e2e/session-quarantine-end.test.ts` quarantines two Sessions with a Code
+  Mode settlement that the Organisation refuses while a call is in flight.
+  A day later, the Session
   whose reservation expired settles it from that record and ends, and its Case
   abandons the assignment; the Session whose reservation moved to another
   lease stays quarantined.

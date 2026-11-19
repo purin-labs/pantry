@@ -8,7 +8,6 @@ import {
   newConversationId,
   newProjectId,
   type ConversationId,
-  type PortalPageViewV1,
   type SurfaceObservationV2,
 } from "@seams/control-api";
 import { isRecord } from "@seams/std";
@@ -32,14 +31,21 @@ declare module "vitest" {
 }
 
 /** The Costs & margins page with a spoil rate that the owner has not saved. */
-const COSTS_PAGE: PortalPageViewV1 = {
-  kind: "portal-page-view",
-  schemaVersion: 1,
-  page: "costs",
+const COSTS_OBSERVATION: SurfaceObservationV2 = {
+  kind: "surface-observation",
+  schemaVersion: 2,
+  surface: "costs",
+  area: "BakeryOS",
+  instance: {
+    browserInstanceId: "browser-j3",
+    surfaceSessionId: "costs-session",
+    epoch: 0,
+  },
   title: "Costs & margins",
-  path: "/costs",
+  path: "/portal/nuki/shop/costs",
+  record: null,
   capturedAt: 1_793_000_000_000,
-  sections: [
+  view: [
     {
       title: "Page state",
       facts: [
@@ -66,24 +72,6 @@ const COSTS_PAGE: PortalPageViewV1 = {
       },
     },
   ],
-};
-
-/** The same page as an observation of the v2 envelope (Plan 87). */
-const COSTS_OBSERVATION: SurfaceObservationV2 = {
-  kind: "surface-observation",
-  schemaVersion: 2,
-  surface: "costs",
-  area: "BakeryOS",
-  instance: {
-    browserInstanceId: "browser-j3",
-    surfaceSessionId: "costs-session",
-    epoch: 0,
-  },
-  title: "Costs & margins",
-  path: "/portal/nuki/shop/costs",
-  record: null,
-  capturedAt: 1_793_000_000_000,
-  view: COSTS_PAGE.sections,
   state: null,
   commands: [],
   sources: [],
@@ -104,9 +92,9 @@ const ORDER_OBSERVATION: SurfaceObservationV2 = {
  * Plan 87 J3. The page on the sender's screen reaches the model only when
  * every reader of the chat may open it. A private chat carries any page. A
  * chat shared with a Project carries Costs & margins, which every member may
- * open, and leaves Orders out. A tab that loaded the Portal before Plan 87
- * still sends a v1 page view, and an observation that breaks the contract
- * refuses the message.
+ * open, and leaves Orders out. The chat keeps the page where it started:
+ * a later message from another page does not move it. An observation that
+ * breaks the contract refuses the message.
  */
 it(
   "gives the chat agent the page on screen only when the chat's readers may open it",
@@ -123,13 +111,19 @@ it(
     const conversationId = newConversationId();
     await createConversation(author, conversationId, route);
 
-    // An old tab sends the v1 page view; the private chat carries it.
-    const oldTab = await send(author, paths.chat, conversationId, route.model, {
-      label: "costs",
-      text: "What spoil rate do I have on screen?",
-      page: { pageView: COSTS_PAGE },
-    });
-    expect(oldTab.status, await oldTab.clone().text()).toBe(200);
+    // The private chat carries the page on screen.
+    const privateCosts = await send(
+      author,
+      paths.chat,
+      conversationId,
+      route.model,
+      {
+        label: "costs",
+        text: "What spoil rate do I have on screen?",
+        surfaceObservation: COSTS_OBSERVATION,
+      },
+    );
+    expect(privateCosts.status, await privateCosts.clone().text()).toBe(200);
     await finished(author, conversationId);
     const privateInput = latestUserInput(requests);
     expect(privateInput).toContain("Portal page on the operator's screen");
@@ -145,7 +139,7 @@ it(
       {
         label: "bad",
         text: "And now?",
-        page: { surfaceObservation: { ...COSTS_OBSERVATION, path: "costs" } },
+        surfaceObservation: { ...COSTS_OBSERVATION, path: "costs" },
       },
     );
     expect(malformed.status).toBe(422);
@@ -159,7 +153,7 @@ it(
     const sharedCosts = await send(author, paths.chat, shared, route.model, {
       label: "shared-costs",
       text: "What spoil rate is on my screen now?",
-      page: { surfaceObservation: COSTS_OBSERVATION },
+      surfaceObservation: COSTS_OBSERVATION,
     });
     expect(sharedCosts.status, await sharedCosts.clone().text()).toBe(200);
     await finished(author, shared);
@@ -170,12 +164,14 @@ it(
     const sharedOrder = await send(author, paths.chat, shared, route.model, {
       label: "shared-order",
       text: "Why is this order held?",
-      page: { surfaceObservation: ORDER_OBSERVATION },
+      surfaceObservation: ORDER_OBSERVATION,
     });
     expect(sharedOrder.status, await sharedOrder.clone().text()).toBe(200);
     await finished(author, shared);
     const sharedOrderInput = latestUserInput(requests);
     expect(sharedOrderInput).toContain("Why is this order held?");
+    // The chat started on Costs & margins, and the agent still reads that.
+    expect(sharedOrderInput).toContain("This chat started on Costs & margins");
     expect(sharedOrderInput).toContain(
       "The current request carries no page from the operator's screen",
     );
@@ -192,7 +188,6 @@ it(
     ).not.toContain("surface_observation");
 
     task.meta.chatPageView = {
-      oldTabPageView: COSTS_PAGE,
       privateChatModelInput: privateInput,
       malformedStatus: malformed.status,
       sharedChatCostsModelInput: sharedCostsInput,
@@ -251,7 +246,7 @@ function send(
   message: Readonly<{
     label: string;
     text: string;
-    page?: Readonly<{ pageView: unknown } | { surfaceObservation: unknown }>;
+    surfaceObservation?: unknown;
   }>,
 ): Promise<Response> {
   return post(author, chatPath, {
@@ -260,9 +255,10 @@ function send(
     requestId: `request_${conversationId}_${message.label}`,
     model,
     text: message.text,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
-    ...message.page,
+    ...(message.surfaceObservation === undefined
+      ? {}
+      : { surfaceObservation: message.surfaceObservation }),
   });
 }
 

@@ -5,7 +5,6 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { resolveProviderManifestCredential } from "../../src/credential-vault";
-import { storeOrganisationPlacementVaultSecret } from "../../src/credential-vault/service";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import {
   parseIntegrationAccountId,
@@ -14,7 +13,6 @@ import {
 } from "../../src/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
-import { reconcileProviderManifestObservations } from "../../src/provider-lifecycle/observation";
 import { createCommerceClient } from "../../src/commerce/outbox-worker";
 import {
   commerceClient,
@@ -43,12 +41,7 @@ const CAFE = "LSQUARECAFE01";
 const BACK_OFFICE = "LSQUAREBACK01";
 const DEVICE = "device:995CS397A6475287";
 const COUNTER = "location_cafe";
-const TOKENS = [
-  "sq-access-1",
-  "sq-refresh-1",
-  "sq-legacy-access",
-  "sq-legacy-refresh",
-];
+const TOKENS = ["sq-access-1", "sq-refresh-1"];
 
 it(
   "connects Square in Underclerk, pairs a Terminal, sells and refunds at the counter, and keeps no Square token in Satyr",
@@ -63,10 +56,8 @@ it(
  * that holds the connection. The owner pairs the café's Terminal through
  * Commerce, a barista sells a cookie that the Terminal takes, Commerce's
  * own alarm reads the Terminal and places the order, and the owner refunds
- * it. A connection from before this step still has tokens in Pantry's vault:
- * the next provider check hands them to Commerce and keeps only the
- * delegation. When the owner removes the Square account, Commerce revokes
- * the tokens at Square. Square is a fake that only answers.
+ * it. When the owner removes the Square account, Commerce revokes the tokens
+ * at Square. Square is a fake that only answers.
  */
 async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
   const square = new FakeSquare();
@@ -214,44 +205,11 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
         .refundState,
     ).toBe("completed");
 
-    // 5. A connection from before step 4: Pantry's vault still holds tokens.
-    //    The provider check hands them to Commerce once.
-    const organisation = requireOrganisation(organisationId);
-    const scope = await executionScope(organisation);
-    const handle = await credentialHandle(organisationId, account);
-    const legacy = await storeOrganisationPlacementVaultSecret({
-      scope,
-      keys: env,
-      handle,
-      secret: {
-        kind: "oauth_tokens",
-        accessToken: "sq-legacy-access",
-        refreshToken: "sq-legacy-refresh",
-        expiry: { kind: "expires", expiresAt: Date.now() + 20 * 86_400_000 },
-      },
-      now: Date.now(),
-    });
-    expect(legacy.ok).toBe(true);
-    await reconcileProviderManifestObservations({
-      env,
-      organisationId: organisation,
-      now: Date.now(),
-      fetcher: fetch,
-    });
-    const afterHandOver = await pantryCredential(organisationId, account);
-    expect({
-      handedTokenUsed: square.sellerReads.includes("sq-legacy-access"),
-      credential: afterHandOver,
-    }).toEqual({
-      handedTokenUsed: true,
-      credential: afterConnect,
-    });
-
-    // 6. No Square token is anywhere in Pantry's database.
+    // 5. No Square token is anywhere in Pantry's database.
     const tokenRows = await rowsHolding(TOKENS);
     expect(tokenRows).toEqual([]);
 
-    // 7. The owner removes the Square account; Commerce revokes at Square.
+    // 6. The owner removes the Square account; Commerce revokes at Square.
     const configurationVersion = async () =>
       String(
         (
@@ -295,7 +253,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
     expect(removed.status, await removed.clone().text()).toBe(200);
     await reconcileProviderAccountCleanup({
       env,
-      organisationId: organisation,
+      organisationId: requireOrganisation(organisationId),
       now: Date.now() + 60_000,
       fetcher: fetch,
     });
@@ -321,7 +279,6 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       counterSale: sale.state,
       terminalCheckouts: square.terminalCheckouts.length,
       refund: "completed",
-      legacyHandOver: { handedTokenUsed: true, credential: "delegation" },
       squareTokenRowsInSatyr: tokenRows.length,
       removal: { revocations: square.revocations.length, connection: 404 },
     };
@@ -334,9 +291,8 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
 class FakeSquare {
   readonly exchanges: Record<string, unknown>[] = [];
   readonly revocations: Record<string, unknown>[] = [];
-  readonly sellerReads: string[] = [];
   readonly terminalCheckouts: Record<string, unknown>[] = [];
-  #tokens = new Set(["sq-legacy-access"]);
+  #tokens = new Set<string>();
   #paired = false;
   #checkout: Record<string, unknown> | undefined;
   #checkoutReads = 0;
@@ -380,12 +336,10 @@ class FakeSquare {
     const bearer = request.headers.get("authorization")?.replace(/^Bearer /u, "");
     if (bearer === undefined || !this.#tokens.has(bearer))
       return HttpResponse.json({ errors: [{ code: "UNAUTHORIZED" }] }, { status: 401 });
-    if (path === "/v2/merchants/me") {
-      this.sellerReads.push(bearer);
+    if (path === "/v2/merchants/me")
       return HttpResponse.json({
         merchant: { id: SELLER, business_name: "Satyr Café", country: "JP", currency: "JPY" },
       });
-    }
     if (path === "/v2/locations")
       return HttpResponse.json({ locations: [location(CAFE, true), location(BACK_OFFICE, false)] });
     if (path.startsWith("/v2/locations/")) {
@@ -629,8 +583,8 @@ async function credentialHandle(organisationId: string, account: string) {
     .first<{ handle: string }>();
   if (row === null) throw new Error("No Square connection");
   return row.handle as Parameters<
-    typeof storeOrganisationPlacementVaultSecret
-  >[0]["handle"];
+    typeof resolveProviderManifestCredential
+  >[0]["credentialRef"];
 }
 
 /** What Pantry's vault holds for the Square connection. */

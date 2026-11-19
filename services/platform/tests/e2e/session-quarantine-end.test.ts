@@ -4,14 +4,12 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
-import { recoverInterruptedSessionInTransaction } from "../../src/actors/actor-journal/transactions";
-import { discardHarnessTurnContinuation } from "../../src/actors/agent-session-continuation";
 import { failSessionTurnStream } from "../../src/actors/agent-session-turn-stream";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { deriveCodeModeLeaseBinding } from "../../src/actors/code-mode-execution-record";
 import { OrganisationDO } from "../../src/actors/organisation";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { newRequestId, type CaseId, type SessionId } from "../../src/ids";
+import { newRequestId } from "../../src/ids";
 import {
   preparePortalChatJourney,
   assignmentStates,
@@ -34,31 +32,6 @@ import {
 } from "./slack-journey-support";
 
 /**
- * An old quarantine from an interrupted turn ends, and its assignment with it.
- *
- * Before Refactor 15, a process loss in the middle of a turn quarantined the
- * Session as `effect_indeterminate`, and only termination could end that
- * quarantine. Nothing terminated it, so the Session never proved that it ran
- * no turn, and its Case kept the assignment `running` for ever. The census
- * of 2026-11-07 found 16 such assignments.
- *
- * Two commands stop under their model requests, and each Session gets the
- * quarantine that the older release wrote. The second Session also holds an
- * effect whose result nobody knows. Each Case gets an old `running`
- * assignment with no wakeup, and every process ends. When the Sessions and
- * then the Cases wake, the first Session ends as failed and its Case ends the
- * assignment as abandoned. The second Session keeps its quarantine, because
- * its effect may have happened, and its assignment stays `running`. Before
- * the Sessions wake, the Session census names the kind of that effect and
- * why its result is unknown, so an operator can choose how to settle it.
- */
-it(
-  "ends an old interrupted-turn quarantine unless an effect result is unknown",
-  oldQuarantineJourney,
-  120_000,
-);
-
-/**
  * An old refused Code Mode settlement settles from the Organisation's record,
  * and its quarantine ends (Refactor 15).
  *
@@ -79,8 +52,6 @@ it(
   180_000,
 );
 
-const ENDED_KEY = "session_quarantine_end_clean";
-const KEPT_KEY = "session_quarantine_end_effect";
 const INSTRUCTION = "Count the open supplier orders.";
 
 /** Each model request waits while the phase is `held`. */
@@ -88,74 +59,6 @@ type Model = {
   readonly requests: unknown[];
   phase: "held" | "released";
 };
-
-async function oldQuarantineJourney(test: TestContext): Promise<void> {
-  const { session } = await preparePortalChatJourney();
-  const model: Model = { requests: [], phase: "held" };
-  test.onTestFinished(() => {
-    model.phase = "released";
-  });
-  network.use(
-    http.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      answerModel.bind(null, model),
-    ),
-  );
-
-  const ended = await stopUnderQuarantine(session, model, ENDED_KEY, 1, false);
-  const kept = await stopUnderQuarantine(session, model, KEPT_KEY, 2, true);
-  model.phase = "released";
-
-  // The census names both old assignments before anything wakes, and the
-  // kind of the effect that keeps the second Session quarantined.
-  expect(await staleAssignmentCount()).toBe(2);
-  expect(await unknownEffects(ended.sessionId)).toBeUndefined();
-  expect(await unknownEffects(kept.sessionId)).toEqual({
-    "code_mode_execution.v1:process_lost:lt_1d": 1,
-  });
-  for (const caseId of [ended.caseId, kept.caseId])
-    await runInDurableObject(await caseOf(caseId), loseProcess).catch(
-      ignoreLostProcess,
-    );
-
-  // The Sessions wake, and then the Cases. The first Case's wakeup ends its
-  // assignment as abandoned.
-  for (const sessionId of [ended.sessionId, kept.sessionId])
-    await (await sessionOf(sessionId)).ping();
-  await expect
-    .poll(
-      async () => {
-        const woken = await caseOf(ended.caseId);
-        await runDurableObjectAlarm(woken);
-        return assignmentStates(woken);
-      },
-      { timeout: 20_000, interval: 250 },
-    )
-    .toEqual(["settled:abandoned"]);
-
-  // The second Case runs its wakeup too, and keeps its assignment.
-  const keptCase = await caseOf(kept.caseId);
-  await expect
-    .poll(() => runDurableObjectAlarm(keptCase), {
-      timeout: 10_000,
-      interval: 250,
-    })
-    .toBe(true);
-  expect(await assignmentStates(keptCase)).toEqual(["running"]);
-
-  // The census counts only the assignment of the Session whose effect is
-  // unknown.
-  expect(await staleAssignmentCount()).toBe(1);
-  expect(model.requests).toHaveLength(2);
-
-  Object.assign(test.task.meta, {
-    sessionQuarantineEnd: {
-      endedAssignment: "settled:abandoned",
-      keptAssignment: "running",
-      staleAfter: 1,
-    },
-  });
-}
 
 const SETTLED_KEY = "session_quarantine_settlement_expired";
 const UNDECIDED_KEY = "session_quarantine_settlement_moved";
@@ -406,98 +309,6 @@ async function ageRefusedSettlement(
     "UPDATE actor_outbox SET updated_at = updated_at - ? WHERE state_kind = 'indeterminate'",
     2 * DAY_MS,
   );
-}
-
-/**
- * Starts a command, holds its model request, and leaves its Session and Case
- * as the older release did: a quarantined Session whose process is lost, and
- * an old `running` assignment in a Case with no wakeup.
- */
-async function stopUnderQuarantine(
-  session: IssuedControlSession,
-  model: Model,
-  key: string,
-  requestCount: number,
-  unknownEffect: boolean,
-): Promise<{ readonly sessionId: SessionId; readonly caseId: CaseId }> {
-  const response = dispatchCommand(session, key, INSTRUCTION).then(
-    (answer) => answer.status,
-    () => "lost" as const,
-  );
-  await expect
-    .poll(() => model.requests.length, { timeout: 30_000 })
-    .toBe(requestCount);
-  const identities = await deriveDirectCaseIdentities(
-    `${ORGANISATION_ID}:api:${SLACK_ACTOR_USER_ID}:${key}`,
-  );
-  if (!identities.ok) throw new Error(identities.error.code);
-  const sessionActor = await sessionOf(identities.value.sessionId);
-  await runInDurableObject(
-    sessionActor,
-    unknownEffect ? quarantineWithUnknownEffect : quarantineAsOlderRelease,
-  );
-  await runInDurableObject(sessionActor, loseProcess).catch(ignoreLostProcess);
-  const caseActor = await caseOf(identities.value.caseId);
-  await expect
-    .poll(() => assignmentStates(caseActor), { timeout: 10_000 })
-    .toEqual(["running"]);
-  await runInDurableObject(caseActor, leaveOldAssignment);
-  // The held model request ends with the lost process, so the command does
-  // not answer.
-  void response;
-  return {
-    sessionId: identities.value.sessionId,
-    caseId: identities.value.caseId,
-  };
-}
-
-async function answerModel(
-  model: Model,
-  { request }: Parameters<HttpResponseResolver>[0],
-): Promise<Response> {
-  model.requests.push(await request.json());
-  while (model.phase === "held") await scheduler.wait(5);
-  return openRouterText(
-    JSON.stringify({ kind: "reply", text: "There are three open orders." }),
-    `quarantine_answer_${model.requests.length}`,
-  );
-}
-
-/**
- * The recovery of the older release: the interrupted turn quarantines the
- * Session.
- */
-function quarantineAsOlderRelease(
-  _actor: unknown,
-  state: DurableObjectState,
-): void {
-  state.storage.transactionSync(() => {
-    recoverInterruptedSessionInTransaction(state.storage.sql, Date.now());
-    discardHarnessTurnContinuation(state.storage.sql);
-  });
-}
-
-/** The same quarantine, with an effect whose result nobody knows. */
-function quarantineWithUnknownEffect(
-  _actor: unknown,
-  state: DurableObjectState,
-): void {
-  const organisation = state.storage.sql
-    .exec<{ organisation_id: string }>(
-      "SELECT organisation_id FROM session_meta LIMIT 1",
-    )
-    .one().organisation_id;
-  state.storage.sql.exec(
-    `INSERT INTO actor_outbox (
-       effect_id, organisation_id, originating_event_id, request_envelope,
-       state_kind, state_projection, updated_at
-     ) VALUES ('execution-unknown', ?, 'event-unknown', ?, 'indeterminate', ?, ?)`,
-    organisation,
-    JSON.stringify({ kind: "code_mode_execution.v1" }),
-    JSON.stringify({ kind: "indeterminate", reason: "process_lost" }),
-    Date.now(),
-  );
-  quarantineAsOlderRelease(_actor, state);
 }
 
 /** The old active assignments that the admin census route counts. */

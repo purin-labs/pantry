@@ -1,7 +1,6 @@
 // Plan 87 J4: the Kitchen sends its current view on the v2 screen
 // envelope. The view is the observation's state, the server makes the view
-// that the model reads, a message keeps one screen part, and a chat stored
-// with an old Kitchen part still opens and continues.
+// that the model reads, and a message keeps one screen part.
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import {
@@ -10,17 +9,11 @@ import {
   type ConversationId,
   type SurfaceObservationV2,
 } from "@seams/control-api";
-import type {
-  BakerySurfaceAttachmentV1,
-  BakerySurfaceContextV1,
-} from "@seams/bakery-model/bakery-surface";
+import type { BakerySurfaceContextV1 } from "@seams/bakery-model/bakery-surface";
 import { isRecord } from "@seams/std";
-import { env } from "cloudflare:workers";
 
 import { captureBakerySurface } from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
 import { initialSimulatorState } from "../../../../apps/portal/src/features/workflow-simulator/simulator-state";
-import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { answers } from "./chat-permission-support";
 import {
   createConversation,
   installMemoryFixture,
@@ -49,14 +42,11 @@ const BROWSER = "browser-j4";
  * Kitchen's current view, captured by the Portal's own Kitchen code. The
  * model reads the Kitchen view and a short page summary that the server
  * made from that state. A state that names another surface session is
- * refused. A tab that loaded the Portal before phase 2 still sends its
- * Kitchen view in the old key, and it joins the page's observation. A chat
- * stored with an old Kitchen part opens, names the page, and continues. A
- * chat shared with a Project leaves the Kitchen out, as every page that not
- * every member may open.
+ * refused. A chat shared with a Project leaves the Kitchen out, as every
+ * page that not every member may open.
  */
 it(
-  "carries the Kitchen view on the v2 screen envelope, and reads old Kitchen parts as v2",
+  "carries the Kitchen view on the v2 screen envelope",
   { timeout: 300_000 },
   async ({ task }: TestContext): Promise<void> => {
     const { author, reviewer, route, paths } = await installMemoryFixture();
@@ -148,65 +138,6 @@ it(
     );
     expect(notKitchen.status).toBe(422);
 
-    // A tab that loaded the Portal before phase 2.
-    const oldTab = await send(author, paths.chat, privateChat, route.model, {
-      label: "old-tab",
-      text: "Which run is open in the Kitchen?",
-      surfaceObservation: {
-        ...kitchenObservation(context, privateChat),
-        state: null,
-      },
-      surfaceContext: kitchen,
-    });
-    expect(oldTab.status, await oldTab.clone().text()).toBe(200);
-    await finished(author, privateChat);
-    const oldTabInput = latestUserInput(requests);
-    expect(oldTabInput).toContain(context.surfaceSessionId);
-    expect(oldTabInput).toContain("Kitchen view");
-    const oldTabParts = await latestUserParts(author, privateChat);
-    expect(screenPartKinds(oldTabParts)).toEqual(["surface_observation"]);
-    expect(oldTabParts.find(isObservationPart)?.observation.state).toEqual(
-      context,
-    );
-
-    // A chat stored before phase 2, with its Kitchen view in its own part.
-    const storedChat = newConversationId();
-    await createConversation(author, storedChat, route);
-    const first = await send(author, paths.chat, storedChat, route.model, {
-      label: "stored",
-      text: "Look at my Kitchen.",
-      surfaceObservation: kitchenObservation(context, storedChat),
-    });
-    expect(first.status, await first.clone().text()).toBe(200);
-    await finished(author, storedChat);
-    await storeAsBeforePhaseTwo(author, storedChat, kitchen);
-    const reopened = await readChat(author, paths.chat, storedChat);
-    expect(userScreenParts(reopened)).toEqual([
-      {
-        kind: "screen",
-        area: "BakeryOS",
-        title: "Workflow simulator",
-        record: null,
-      },
-    ]);
-    const reopenedParts = await latestUserParts(author, storedChat);
-    expect(screenPartKinds(reopenedParts)).toEqual(["surface_observation"]);
-    expect(reopenedParts.find(isObservationPart)?.observation.state).toEqual(
-      context,
-    );
-    const continued = await send(author, paths.chat, storedChat, route.model, {
-      label: "continued",
-      text: "And what comes next?",
-    });
-    expect(continued.status, await continued.clone().text()).toBe(200);
-    await finished(author, storedChat);
-    const continuedInput = latestUserInput(requests);
-    expect(continuedInput).toContain("And what comes next?");
-    expect(continuedInput).toContain(
-      "The current request carries no page from the operator's screen",
-    );
-    expect(await answers(author, storedChat)).toHaveLength(2);
-
     // A chat shared with a Project: the Kitchen is not on the shared list.
     const shared = await sharedConversation(
       author,
@@ -235,9 +166,6 @@ it(
       storedPrivateObservation: storedObservation?.observation ?? null,
       mismatchedSessionStatus: mismatched.status,
       notKitchenStateStatus: notKitchen.status,
-      oldTabModelInput: oldTabInput,
-      reopenedScreenParts: userScreenParts(reopened),
-      continuedModelInput: continuedInput,
       sharedChatModelInput: sharedInput,
     };
   },
@@ -267,58 +195,6 @@ function kitchenObservation(
     commands: [],
     sources: [],
   };
-}
-
-/**
- * Rewrites the stored chat as a server before phase 2 kept it: the Kitchen
- * view in a `surface` part of its own, and no screen observation.
- */
-async function storeAsBeforePhaseTwo(
-  author: Member,
-  conversationId: ConversationId,
-  kitchen: BakerySurfaceAttachmentV1,
-): Promise<void> {
-  const scope = await requireOrganisationExecutionScope(
-    env,
-    author.organisationId,
-  );
-  const row = await scope.database
-    .prepare(
-      "SELECT state_json FROM portal_conversation WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
-    )
-    .bind(author.organisationId, author.userId, conversationId)
-    .first<{ state_json: string }>();
-  if (row === null) throw new Error("The stored chat is missing");
-  const state: unknown = JSON.parse(row.state_json);
-  if (!isRecord(state) || !Array.isArray(state.timeline))
-    throw new Error("The stored chat has no timeline");
-  const timeline = state.timeline.map(function oldParts(event: unknown) {
-    if (
-      !isRecord(event) ||
-      event.kind !== "user" ||
-      !Array.isArray(event.parts)
-    )
-      return event;
-    return {
-      ...event,
-      parts: event.parts.flatMap((part: unknown) =>
-        isRecord(part) && part.kind === "surface_observation"
-          ? [{ kind: "surface", surface: kitchen }]
-          : [part],
-      ),
-    };
-  });
-  await scope.database
-    .prepare(
-      "UPDATE portal_conversation SET state_json = ? WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
-    )
-    .bind(
-      JSON.stringify({ ...state, timeline }),
-      author.organisationId,
-      author.userId,
-      conversationId,
-    )
-    .run();
 }
 
 /** A new chat of the owner, shared with a Project that has a viewer. */
@@ -371,7 +247,6 @@ function send(
     label: string;
     text: string;
     surfaceObservation?: unknown;
-    surfaceContext?: BakerySurfaceAttachmentV1;
   }>,
 ): Promise<Response> {
   return post(author, chatPath, {
@@ -387,9 +262,6 @@ function send(
     ...(message.surfaceObservation === undefined
       ? {}
       : { surfaceObservation: message.surfaceObservation }),
-    ...(message.surfaceContext === undefined
-      ? {}
-      : { surfaceContext: message.surfaceContext }),
   });
 }
 
