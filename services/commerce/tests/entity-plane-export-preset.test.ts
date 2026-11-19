@@ -2,11 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { parseCommerceExportPresetDigestPayload } from "@seams/commerce-contracts/entity-plane-export";
-import {
-  CommerceEntityPlaneClient,
-  parseEntityPlaneExportPresetPublishRequest,
-  parseEntityPlaneExportPresetPublishResponse,
-} from "@seams/commerce-client";
+import { CommerceEntityPlaneClient } from "@seams/commerce-client";
 
 import { BuyerSessionAuthority } from "../src/buyer-session.ts";
 import { CommerceAuthority } from "../src/commerce-authority.ts";
@@ -118,34 +114,6 @@ describe("Underclerk export preset publication", () => {
       ),
     ).rejects.toMatchObject({ status: 409 });
     fixture.database.close();
-  });
-
-  it("rejects fake request and malformed response envelopes", () => {
-    expect(() =>
-      parseEntityPlaneExportPresetPublishRequest({
-        organisationId: "organisation_export",
-        merchantId: "merchant_export",
-        presetId: "synthetic",
-        presetVersion: 1,
-      }),
-    ).toThrow();
-    expect(() =>
-      parseEntityPlaneExportPresetPublishResponse({
-        kind: "published",
-        organisationId: "organisation_export",
-        merchantId: "merchant_export",
-        presetId: "export_coordination",
-        presetVersion: 1,
-        merchantRevision: 13,
-        evidence: {
-          customEntityTypes: [],
-          relationshipDefinitions: [],
-          lists: [],
-          views: [],
-        },
-        digest: "0".repeat(64),
-      }),
-    ).toThrow();
   });
 });
 

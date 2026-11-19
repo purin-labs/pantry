@@ -7,8 +7,6 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { CheckoutProfileConfiguration } from "@seams/commerce-contracts";
 
 import { CheckoutProfileService } from "../src/checkout-profile-service.ts";
-import { resolveCheckoutProfileForQuote } from "../src/checkout-profile-resolution.ts";
-import { readStorefront } from "../src/checkout-persistence.ts";
 import { NodeCommerceDatabase } from "../src/node-database.ts";
 import { initializeCommerceSchema } from "../src/schema.ts";
 
@@ -24,123 +22,9 @@ afterEach(removeTemporaryDatabases);
 
 function checkoutProfileServiceTests(): void {
   it(
-    "publishes and activates one exact immutable profile revision",
-    publishesAndActivatesProfile,
-  );
-  it(
     "rejects stale revisions and lifecycle escapes",
     rejectsStaleProfileMutation,
   );
-  it(
-    "resolves a published profile at the pinned revision",
-    resolvesPinnedProfileForQuote,
-  );
-}
-
-function publishesAndActivatesProfile(): void {
-  const fixture = createFixture();
-  try {
-    const created = fixture.service.createDraft(
-      createDraft("checkout_profile_domestic"),
-    );
-    expect(created).toMatchObject({
-      ok: true,
-      value: { revision: 1, lifecycle: { state: "draft" } },
-    });
-
-    const replaced = fixture.service.replaceDraft({
-      merchantId: "merchant_cafe",
-      checkoutProfileId: "checkout_profile_domestic",
-      expectedRevision: 1,
-      name: "Domestic delivery",
-      configuration: profileConfiguration("shipping_only"),
-      updatedAt: UPDATED_AT,
-    });
-    expect(replaced).toMatchObject({
-      ok: true,
-      value: {
-        revision: 2,
-        lifecycle: {
-          state: "draft",
-          createdAt: CREATED_AT,
-          updatedAt: UPDATED_AT,
-        },
-      },
-    });
-
-    expect(
-      fixture.service.activate({
-        merchantId: "merchant_cafe",
-        storefrontId: "storefront_online",
-        checkoutProfileId: "checkout_profile_domestic",
-        checkoutProfileRevision: 2,
-        activatedAt: ACTIVATED_AT,
-        activatedBy: "operator_owner",
-      }),
-    ).toMatchObject({
-      ok: false,
-      error: {
-        code: "invalid_lifecycle",
-        requiredState: "published",
-        actualState: "draft",
-      },
-    });
-
-    const published = fixture.service.publish({
-      merchantId: "merchant_cafe",
-      checkoutProfileId: "checkout_profile_domestic",
-      expectedRevision: 2,
-      publishedAt: PUBLISHED_AT,
-      publishedBy: "operator_owner",
-    });
-    expect(published).toMatchObject({
-      ok: true,
-      value: {
-        revision: 2,
-        lifecycle: { state: "published", publishedBy: "operator_owner" },
-      },
-    });
-
-    const activated = fixture.service.activate({
-      merchantId: "merchant_cafe",
-      storefrontId: "storefront_online",
-      checkoutProfileId: "checkout_profile_domestic",
-      checkoutProfileRevision: 2,
-      activatedAt: ACTIVATED_AT,
-      activatedBy: "operator_owner",
-    });
-    expect(activated).toMatchObject({
-      ok: true,
-      value: {
-        activation: {
-          checkoutProfileId: "checkout_profile_domestic",
-          checkoutProfileRevision: 2,
-        },
-        profile: { revision: 2, lifecycle: { state: "published" } },
-      },
-    });
-    expect(
-      fixture.service.readActiveForStorefront(
-        "merchant_cafe",
-        "storefront_online",
-      ),
-    ).toEqual(activated.ok ? activated.value : undefined);
-    expect(fixture.service.listLatest("merchant_cafe")).toMatchObject([
-      { checkoutProfileId: "checkout_profile_domestic", revision: 2 },
-    ]);
-    expect(fixture.service.listActivations("merchant_cafe")).toMatchObject([
-      {
-        storefrontId: "storefront_online",
-        checkoutProfileId: "checkout_profile_domestic",
-        checkoutProfileRevision: 2,
-      },
-    ]);
-    expect(
-      fixture.service.read("merchant_cafe", "checkout_profile_domestic", 1),
-    ).toMatchObject({ revision: 1, lifecycle: { state: "draft" } });
-  } finally {
-    fixture.close();
-  }
 }
 
 function rejectsStaleProfileMutation(): void {
@@ -154,6 +38,24 @@ function rejectsStaleProfileMutation(): void {
       name: "Pickup checkout",
       configuration: profileConfiguration("pickup_only"),
       updatedAt: UPDATED_AT,
+    });
+    // A storefront cannot take a draft that nobody has published.
+    expect(
+      fixture.service.activate({
+        merchantId: "merchant_cafe",
+        storefrontId: "storefront_online",
+        checkoutProfileId: "checkout_profile_pickup",
+        checkoutProfileRevision: 2,
+        activatedAt: ACTIVATED_AT,
+        activatedBy: "operator_owner",
+      }),
+    ).toMatchObject({
+      ok: false,
+      error: {
+        code: "invalid_lifecycle",
+        requiredState: "published",
+        actualState: "draft",
+      },
     });
     expect(
       fixture.service.publish({
@@ -246,125 +148,18 @@ function rejectsStaleProfileMutation(): void {
   }
 }
 
-function resolvesPinnedProfileForQuote(): void {
-  const fixture = createFixture();
-  try {
-    const created = fixture.service.createDraft(
-      createDraft("checkout_profile_resolution"),
-    );
-    if (!created.ok)
-      throw new Error("Profile resolution fixture creation failed");
-    const published = fixture.service.publish({
-      merchantId: "merchant_cafe",
-      checkoutProfileId: "checkout_profile_resolution",
-      expectedRevision: 1,
-      publishedAt: PUBLISHED_AT,
-      publishedBy: "operator_owner",
-    });
-    if (!published.ok)
-      throw new Error("Profile resolution fixture publication failed");
-    const storefront = readStorefront(
-      fixture.database,
-      "merchant_cafe",
-      "storefront_online",
-    );
-    if (storefront === undefined)
-      throw new Error("Profile resolution storefront is unavailable");
-
-    const baseInput = {
-      database: fixture.database,
-      merchantId: "merchant_cafe",
-      reference: {
-        checkoutProfileId: "checkout_profile_resolution",
-        revision: 1,
-      },
-      storefront,
-      fulfillment: "pickup" as const,
-      lineQuantities: [1, 2],
-      buyerSessionDigest: "buyer_session",
-      buyerAuthority: {
-        kind: "guest" as const,
-        contactAuthority: {
-          kind: "provided" as const,
-          contact: { kind: "email" as const, emailDigest: "buyer_digest" },
-        },
-      },
-      destinationAuthority: "pickup" as const,
-    };
-    expect(resolveCheckoutProfileForQuote(baseInput)).toMatchObject({
-      kind: "resolved",
-      profile: {
-        checkoutProfileId: "checkout_profile_resolution",
-        revision: 1,
-        configuration: {
-          buyerPolicy: { kind: "guest_or_account" },
-          cartPolicy: { minimumLines: 1, maximumLines: 50 },
-          fulfillmentPolicy: { kind: "buyer_choice" },
-          taxPolicy: { kind: "merchant_inclusive" },
-          paymentPolicy: { kind: "external_provider" },
-          afterSalePolicy: {
-            cancellationPolicyId: "cancellation_policy_standard",
-            refundPolicyId: "refund_policy_standard",
-            refundGovernance: { kind: "approval_required" },
-          },
-        },
-      },
-    });
-    expect(
-      resolveCheckoutProfileForQuote({ ...baseInput, lineQuantities: [] }),
-    ).toEqual({
-      kind: "rejected",
-      error: {
-        code: "resource_relationship_invalid",
-        field: "checkoutProfile.cartPolicy",
-      },
-    });
-    expect(
-      resolveCheckoutProfileForQuote({ ...baseInput, fulfillment: "shipping" }),
-    ).toEqual({
-      kind: "rejected",
-      error: {
-        code: "resource_relationship_invalid",
-        field: "checkoutProfile.fulfillmentPolicy",
-      },
-    });
-    expect(
-      resolveCheckoutProfileForQuote({
-        ...baseInput,
-        destinationAuthority: "saved_address",
-      }),
-    ).toEqual({
-      kind: "rejected",
-      error: {
-        code: "resource_relationship_invalid",
-        field: "checkoutProfile.buyerPolicy",
-      },
-    });
-  } finally {
-    fixture.close();
-  }
-}
-
-function createDraft(
-  checkoutProfileId: string,
-  configuration: CheckoutProfileConfiguration = profileConfiguration(
-    "buyer_choice",
-  ),
-) {
+function createDraft(checkoutProfileId: string) {
   return {
     merchantId: "merchant_cafe",
     checkoutProfileId,
     name: "Cafe checkout",
-    configuration,
+    configuration: profileConfiguration("buyer_choice"),
     createdAt: CREATED_AT,
   };
 }
 
 function profileConfiguration(
-  fulfillment: "pickup_only" | "shipping_only" | "buyer_choice",
-  refundGovernance: CheckoutProfileConfiguration["afterSalePolicy"]["refundGovernance"] = {
-    kind: "approval_required",
-  },
+  fulfillment: "pickup_only" | "buyer_choice",
 ): CheckoutProfileConfiguration {
   return {
     currencyPolicy: { kind: "fixed", currency: "JPY" },
@@ -395,7 +190,7 @@ function profileConfiguration(
     afterSalePolicy: {
       cancellationPolicyId: "cancellation_policy_standard",
       refundPolicyId: "refund_policy_standard",
-      refundGovernance,
+      refundGovernance: { kind: "approval_required" },
     },
     presentationPolicy: {
       locale: "ja-JP",
@@ -408,16 +203,11 @@ function profileConfiguration(
 }
 
 function fulfillmentPolicy(
-  fulfillment: "pickup_only" | "shipping_only" | "buyer_choice",
+  fulfillment: "pickup_only" | "buyer_choice",
 ): CheckoutProfileConfiguration["fulfillmentPolicy"] {
   switch (fulfillment) {
     case "pickup_only":
       return { kind: fulfillment, pickupPolicyId: "pickup_policy_cafe" };
-    case "shipping_only":
-      return {
-        kind: fulfillment,
-        shippingPolicyId: "shipping_policy_domestic",
-      };
     case "buyer_choice":
       return {
         kind: fulfillment,

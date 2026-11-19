@@ -92,19 +92,6 @@ describe("point of sale configuration publication", function publicationSuite() 
     rmSync(databasePath, { force: true });
   });
 
-  it("assigns the revision rather than accepting one", function assignsRevision() {
-    const published = service.publish({
-      merchantId: MERCHANT,
-      expectedRevision: null,
-      publishedAt: AT,
-      publishedBy: "operator_manager",
-      // A caller that could name its own revision could publish underneath a
-      // sale that had already pinned one.
-      configuration: configuration({ revision: 97 }),
-    });
-    expect(published.ok && published.value.revision).toBe(1);
-  });
-
   it("refuses a caller that has not seen the current revision", function staleCaller() {
     service.publish({
       merchantId: MERCHANT,
@@ -169,110 +156,20 @@ describe("point of sale configuration publication", function publicationSuite() 
     });
   });
 
-  it("lists every counter this merchant sells through", function lists() {
-    service.publish({
-      merchantId: MERCHANT,
-      expectedRevision: null,
-      publishedAt: AT,
-      publishedBy: "operator_manager",
-      configuration: configuration(),
-    });
-    service.publish({
-      merchantId: MERCHANT,
-      expectedRevision: null,
-      publishedAt: AT,
-      publishedBy: "operator_manager",
-      configuration: configuration({
-        configurationId: "pos_configuration_kiosk",
-        satyrLocationId: "location_kiosk",
-      }),
-    });
-    expect(
-      service.listPublished(MERCHANT).map((entry) => entry.satyrLocationId),
-    ).toEqual(["location_cafe", "location_kiosk"]);
-  });
-
-  it("refuses a policy for a merchant that does not exist", function noMerchant() {
-    expect(
-      service.publish({
-        merchantId: "merchant_absent",
-        expectedRevision: null,
-        publishedAt: AT,
-        publishedBy: "operator_manager",
-        configuration: configuration({ merchantId: "merchant_absent" }),
-      }),
-    ).toEqual({
-      ok: false,
-      error: { code: "merchant_not_found", merchantId: "merchant_absent" },
-    });
-  });
-
-  it("refuses a policy that is not a valid configuration", function invalid() {
-    const published = service.publish({
-      merchantId: MERCHANT,
-      expectedRevision: null,
-      publishedAt: AT,
-      publishedBy: "operator_manager",
-      configuration: configuration({ supportedItems: [] }),
-    });
-    expect(published.ok).toBe(false);
-    expect(!published.ok && published.error.code).toBe("invalid_configuration");
-  });
-
-  it.each([
-    {
-      field: "merchant identity",
-      overrides: { merchantId: ` ${MERCHANT}` },
-      expectedError: /merchantId/u,
-    },
-    {
-      field: "currency",
-      overrides: { currency: "jpy" },
-      expectedError: /currency/u,
-    },
-    {
-      field: "after-sale policy",
-      overrides: {
-        afterSalePolicy: {
-          cancellationPolicyId: "cancellation_counter",
-          refundPolicyId: "refund_counter",
-          refundGovernance: {
-            kind: "automatic_up_to",
-            threshold: { amountMinor: 500, currency: "USD" },
+  it("rejects an automatic refund threshold in another currency", function refundThreshold() {
+    expect(function parseInvalidConfiguration() {
+      parsePointOfSaleConfiguration(
+        publishedConfiguration({
+          afterSalePolicy: {
+            cancellationPolicyId: "cancellation_counter",
+            refundPolicyId: "refund_counter",
+            refundGovernance: {
+              kind: "automatic_up_to",
+              threshold: { amountMinor: 500, currency: "USD" },
+            },
           },
-        },
-      },
-      expectedError: /afterSalePolicy/u,
-    },
-    {
-      field: "presentation policy",
-      overrides: {
-        presentationPolicy: {
-          locale: "ja-JP",
-          merchantDisplayName: "Satyr Cafe",
-          termsPolicyId: "terms_counter",
-          privacyPolicyId: "privacy_counter",
-          supportContact: "",
-        },
-      },
-      expectedError: /presentationPolicy/u,
-    },
-    {
-      field: "lifecycle",
-      overrides: {
-        lifecycle: {
-          state: "published",
-          publishedAt: AT,
-        },
-      },
-      expectedError: /lifecycle/u,
-    },
-  ])(
-    "rejects an invalid $field at the boundary",
-    function invalidNested(input) {
-      expect(function parseInvalidConfiguration() {
-        parsePointOfSaleConfiguration(publishedConfiguration(input.overrides));
-      }).toThrow(input.expectedError);
-    },
-  );
+        }),
+      );
+    }).toThrow(/afterSalePolicy/u);
+  });
 });

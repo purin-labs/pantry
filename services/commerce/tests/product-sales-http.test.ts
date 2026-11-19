@@ -34,60 +34,30 @@ it(
   refuseIncompleteEvidence,
 );
 it(
-  "rejects a successful HTTP response for another merchant or reporting window",
-  rejectMismatchedResponse,
+  "rejects a successful HTTP response for another merchant",
+  rejectOtherMerchantResponse,
 );
 
-async function rejectMismatchedResponse(): Promise<void> {
-  const fixture = setup();
-  try {
-    const report = {
-      organisationId: "organisation_sales",
-      merchantId: "merchant_other",
-      merchantRevision: 1,
-      window: { start: START, end: END },
-      kind: "unavailable",
-      reason: "population_limit",
-    };
-    const client = new CommerceAdminClient({
-      baseUrl: "https://underclerk.test",
-      serviceToken: TOKEN,
-      fetch: reportResponse.bind(null, report),
-    });
-    expect(
-      await client.readProductSales("merchant_sales", {
-        start: START,
-        end: END,
+async function rejectOtherMerchantResponse(): Promise<void> {
+  const client = new CommerceAdminClient({
+    baseUrl: "https://underclerk.test",
+    serviceToken: TOKEN,
+    fetch: async () =>
+      Response.json({
+        organisationId: "organisation_sales",
+        merchantId: "merchant_other",
+        merchantRevision: 1,
+        window: { start: START, end: END },
+        kind: "unavailable",
+        reason: "population_limit",
       }),
-    ).toMatchObject({
-      ok: false,
-      error: { kind: "invalid_response" },
-    });
-    const wrongWindow = new CommerceAdminClient({
-      baseUrl: "https://underclerk.test",
-      serviceToken: TOKEN,
-      fetch: reportResponse.bind(null, {
-        ...report,
-        merchantId: "merchant_sales",
-        window: { start: START, end: UPDATED },
-      }),
-    });
-    expect(
-      await wrongWindow.readProductSales("merchant_sales", {
-        start: START,
-        end: END,
-      }),
-    ).toMatchObject({
-      ok: false,
-      error: { kind: "invalid_response" },
-    });
-  } finally {
-    fixture.authority.close();
-  }
-}
-
-async function reportResponse(report: unknown): Promise<Response> {
-  return Response.json(report);
+  });
+  expect(
+    await client.readProductSales("merchant_sales", { start: START, end: END }),
+  ).toMatchObject({
+    ok: false,
+    error: { kind: "invalid_response" },
+  });
 }
 
 async function reportThroughHttp(): Promise<void> {

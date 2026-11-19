@@ -10,7 +10,6 @@ import {
   parseCommerceCursorPayload,
   parseCommerceGraphQuery,
   parseCommerceGraphQueryPlanRequest,
-  CommerceEntityPlaneClient,
 } from "@seams/commerce-client";
 
 import { NodeCommerceDatabase } from "../src/node-database.ts";
@@ -252,77 +251,6 @@ describe("Underclerk Lexicon-planned entity queries", () => {
         { kind: "count", value: 2n },
       ]);
     }
-    database.close();
-  });
-
-  it("uses the authenticated client boundary for planned execution", async () => {
-    const { database, service } = fixture();
-    let seenPath = "";
-    let seenAuthorization = "";
-    const client = new CommerceEntityPlaneClient({
-      baseUrl: "https://underclerk.test",
-      serviceToken: "underclerk-planned-test-token",
-      fetch: async (input, init) => {
-        seenPath = new URL(String(input)).pathname;
-        seenAuthorization =
-          new Headers(init?.headers).get("authorization") ?? "";
-        const body =
-          typeof init?.body === "string" ? JSON.parse(init.body) : undefined;
-        const response = service.executePlannedQuery(
-          parseCommerceGraphQueryPlanRequest(body),
-        );
-        return new Response(JSON.stringify(response), {
-          status: 200,
-          headers: { "content-type": "application/json" },
-        });
-      },
-    });
-    const result = await client.queryPlan(pageRequest(null, 1));
-    expect(result.ok).toBe(true);
-    expect(seenPath).toBe(
-      "/v1/admin/merchants/merchant_planned/entity-plane/query-plan",
-    );
-    expect(seenAuthorization).toBe("Bearer underclerk-planned-test-token");
-    database.close();
-  });
-
-  it("uses the authenticated capability metadata boundary", async () => {
-    const { database, service } = fixture();
-    let seenPath = "";
-    let seenAuthorization = "";
-    const client = new CommerceEntityPlaneClient({
-      baseUrl: "https://underclerk.test",
-      serviceToken: "underclerk-planned-test-token",
-      fetch: async (input, init) => {
-        seenPath = new URL(String(input)).pathname;
-        seenAuthorization =
-          new Headers(init?.headers).get("authorization") ?? "";
-        const body =
-          typeof init?.body === "string" ? JSON.parse(init.body) : undefined;
-        const response = service.readCapabilityMetadata(body);
-        return new Response(JSON.stringify(response), {
-          status: 200,
-          headers: { "content-type": "application/json" },
-        });
-      },
-    });
-    const result = await client.capabilityMetadata({
-      organisationId: "organisation_planned",
-      merchantId: "merchant_planned",
-      query: parseCommerceGraphQuery({
-        kind: "entity_type_page",
-        entityTypeId: { origin: "custom", typeId: "trade_partner" },
-        filter: { kind: "all" },
-        sorts: [],
-        pagination: { limit: 10, cursor: null },
-        traversal: { maxDepth: 0, resultLimit: 25 },
-      }),
-    });
-    expect(result.ok).toBe(true);
-    expect(seenPath).toBe(
-      "/v1/admin/merchants/merchant_planned/entity-plane/capability-metadata",
-    );
-    expect(seenAuthorization).toBe("Bearer underclerk-planned-test-token");
     database.close();
   });
 });

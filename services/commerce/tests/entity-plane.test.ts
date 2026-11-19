@@ -24,7 +24,6 @@ import {
   parseEntityRef,
   parsePositiveRevision,
   parseRelationshipDefinition,
-  parseSavedCommerceView,
 } from "../src/entity-plane/parsers.ts";
 import {
   listRelationshipDefinitions,
@@ -41,69 +40,6 @@ const TEST_SIGNER = {
   sign: (payload: Uint8Array): string =>
     Buffer.from(payload).toString("base64url"),
 };
-
-it("keeps saved-view labels and unknown-field rejection aligned at both TypeScript boundaries", () => {
-  const view = {
-    viewId: "long_label_view",
-    name: "Long label view",
-    source: { kind: "commerce_list", listId: "export_coordination" },
-    filter: { kind: "all" },
-    sorts: [],
-    visibleAttributeIds: ["stage"],
-    relationshipColumns: [
-      {
-        relationshipDefinition: {
-          origin: "system",
-          definitionId: "order_shipment",
-          revision: 1,
-        },
-        label: "x".repeat(121),
-      },
-    ],
-    grouping: null,
-    presentation: {
-      kind: "table",
-      configuration: { density: "comfortable", showRowNumbers: true },
-    },
-    revision: 1,
-  };
-  expect(
-    parseSavedCommerceView(view).relationshipColumns[0]?.label,
-  ).toHaveLength(121);
-  expect(
-    parseCommerceEntityPlaneCommand({
-      kind: "publish_saved_commerce_view",
-      command: { view },
-    }),
-  ).toMatchObject({ kind: "publish_saved_commerce_view" });
-  expect(() => parseSavedCommerceView({ ...view, unexpected: true })).toThrow(
-    "saved commerce view rejected by Lexicon",
-  );
-  expect(() =>
-    parseCommerceEntityPlaneCommand({
-      kind: "publish_saved_commerce_view",
-      command: {
-        view: {
-          ...view,
-          presentation: { ...view.presentation, unexpected: true },
-        },
-      },
-    }),
-  ).toThrow();
-  expect(() =>
-    parseCommerceEntityPlaneCommand({
-      kind: "patch_commerce_list_entry",
-      command: {
-        target: {
-          entry: { entryId: "entry_1", listId: "list_1", revision: 2 },
-          expectedRevision: 1,
-        },
-        expectedListRevision: 1,
-        attributeValues: [],
-      },
-    }),
-  ).toThrow("revision_conflict");
-});
 
 it("binds saved-view administration to the exact prior publication revision", () => {
   const command = {

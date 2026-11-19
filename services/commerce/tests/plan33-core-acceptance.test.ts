@@ -47,6 +47,11 @@ import {
   createJapanShippingGateway,
 } from "../src/plugins/japan-export/index.ts";
 import { NodeCommerceDatabase } from "../src/node-database.ts";
+import type {
+  CheckoutProviderCapabilityHealth,
+  CheckoutProviderCapabilityHealthProvider,
+  CheckoutProviderCapabilityHealthRequest,
+} from "../src/regional-shipping.ts";
 import {
   DeterministicPaymentGateway,
   type MerchantPaymentReconciliationCommand,
@@ -97,6 +102,18 @@ class Plan33PaymentGateway extends DeterministicPaymentGateway {
   ): Promise<CommercePaymentCaptureResultV1> {
     this.reconcileCalls += 1;
     return this.#reconcileResult ?? super.reconcile(request);
+  }
+}
+
+class Plan33CarrierHealth implements CheckoutProviderCapabilityHealthProvider {
+  unavailableCapability: string | undefined;
+
+  readHealth(
+    request: CheckoutProviderCapabilityHealthRequest,
+  ): CheckoutProviderCapabilityHealth {
+    return request.capabilityReference === this.unavailableCapability
+      ? { state: "unavailable" }
+      : { state: "ready" };
   }
 }
 
@@ -560,11 +577,45 @@ it(
 async function plan33ShippingAcceptance(): Promise<void> {
   const fixture = createShippingFixture();
   try {
-    await configureShippingBase(fixture.admin);
-    await configurePlan23FlavoredCatalog(fixture.admin, {
-      organisationId: ORGANISATION_ID,
-      merchantId: MERCHANT_ID,
+    await createShippingItems(fixture.admin);
+    // A parcel needs a carton: a storefront that consumes no packaging is
+    // refused.
+    const storefrontCommand = baseShippingStorefrontCommand(2);
+    const withoutCarton: ConfigureCommerceShippingStorefrontV1 = {
+      ...storefrontCommand,
+      idempotencyKey: "plan33_shipping_storefront_without_carton",
+      consumptionPlan: {
+        ...storefrontCommand.consumptionPlan,
+        mode: {
+          kind: "direct",
+          components: [
+            {
+              inventoryItemId: "inventory_cookie_box_6",
+              quantity: { amount: 1, scale: 0, unit: "each" },
+            },
+          ],
+          commitOn: "fulfillment_completed",
+        },
+      },
+    };
+    expect(
+      await fixture.admin.configureShippingStorefront(
+        clientInput(withoutCarton),
+      ),
+    ).toEqual({
+      ok: true,
+      value: {
+        outcome: "rejected",
+        error: {
+          code: "resource_relationship_invalid",
+          field: "consumptionPlan.packaging",
+        },
+      },
     });
+    await requireAppliedMutation(
+      fixture.admin.configureShippingStorefront(clientInput(storefrontCommand)),
+      "shipping storefront",
+    );
 
     const session = await fixture.storefront.createSession(
       MERCHANT_ID,
@@ -575,6 +626,25 @@ async function plan33ShippingAcceptance(): Promise<void> {
       },
     );
     if (!session.ok) throw new Error(JSON.stringify(session.error));
+    // The box is listed, but it does not sell before its stock arrives.
+    const emptyCatalog = await fixture.storefront.readCatalog(
+      MERCHANT_ID,
+      SHIPPING_STOREFRONT_ID,
+      session.value.token,
+    );
+    if (!emptyCatalog.ok) throw new Error(JSON.stringify(emptyCatalog.error));
+    expect(emptyCatalog.value.listings).toEqual([
+      expect.objectContaining({
+        variantId: "variant_cookie_box_6",
+        availability: "unavailable",
+      }),
+    ]);
+
+    await receiveShippingStock(fixture.admin);
+    await configurePlan23FlavoredCatalog(fixture.admin, {
+      organisationId: ORGANISATION_ID,
+      merchantId: MERCHANT_ID,
+    });
     const catalog = await fixture.storefront.readCatalog(
       MERCHANT_ID,
       SHIPPING_STOREFRONT_ID,
@@ -583,6 +653,10 @@ async function plan33ShippingAcceptance(): Promise<void> {
     if (!catalog.ok) throw new Error(JSON.stringify(catalog.error));
     expect(catalog.value.listings).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({
+          variantId: "variant_cookie_box_6",
+          availability: "available",
+        }),
         expect.objectContaining({
           variantId: SHIPPING_MATCHA_VARIANT_ID,
           availability: "available",
@@ -727,26 +801,123 @@ async function plan33ShippingAcceptance(): Promise<void> {
       "plan33_domestic",
     );
 
+    // The buyer types a double space, and validation proposes a correction.
+    const singaporeEnteredAddress: CommerceBuyerShippingAddressV1 = {
+      countryCode: "SG",
+      recipientName: "Plan 33 Export Buyer",
+      addressLine1: "1  Raffles Quay",
+      locality: "Singapore",
+      postalCode: "018956",
+    };
     const singaporeInitialAddress = await validateShippingAddress(
       fixture.storefront,
       session.value.token,
-      {
-        countryCode: "SG",
-        recipientName: "Plan 33 Export Buyer",
-        addressLine1: "1 Raffles Quay",
-        locality: "Singapore",
-        postalCode: "018956",
-      },
+      singaporeEnteredAddress,
       "plan33_singapore_initial_address",
     );
+    expect(singaporeInitialAddress).toMatchObject({
+      address: { addressLine1: "1 Raffles Quay" },
+      acceptance: { kind: "accepted_correction" },
+    });
+    const validationAttempts = fixture.database
+      .prepare(
+        "SELECT attempt_json AS attemptJson FROM address_validation_attempt WHERE merchant_id = ?",
+      )
+      .all<Readonly<{ attemptJson: string }>>(MERCHANT_ID);
+    expect(validationAttempts).toHaveLength(3);
+    for (const attempt of validationAttempts) {
+      expect(attempt.attemptJson).not.toMatch(
+        /Plan 33|Marunouchi|100-0005|Raffles Quay|018956/u,
+      );
+    }
+    const singaporeLines = [
+      { variantId: SHIPPING_MATCHA_VARIANT_ID, quantity: 1 },
+      { variantId: SHIPPING_TARO_VARIANT_ID, quantity: 1 },
+    ];
+    // An accepted correction does not cover the address as it was entered.
+    expect(
+      await createShippingCheckoutFromLines(
+        fixture.storefront,
+        session.value.token,
+        "plan33_singapore_checkout_uncorrected",
+        singaporeLines,
+        "ems_test",
+        { ...singaporeInitialAddress, address: singaporeEnteredAddress },
+      ),
+    ).toMatchObject({
+      ok: false,
+      error: {
+        kind: "http",
+        status: 409,
+        message: "Shipping address acceptance is unavailable",
+      },
+    });
+    // While the EMS carrier is down, the Singapore services ask the buyer to
+    // try again later, and a Singapore checkout gets no quote.
+    fixture.carrierHealth.unavailableCapability =
+      "carrier_rate_japan_post_ems_test";
+    expect(
+      await fixture.storefront.readCatalog(
+        MERCHANT_ID,
+        SHIPPING_STOREFRONT_ID,
+        session.value.token,
+      ),
+    ).toMatchObject({
+      ok: true,
+      value: {
+        storefront: {
+          shippingServices: [
+            {
+              destinationCountry: "JP",
+              availability: { state: "available" },
+            },
+            {
+              destinationCountry: "JP",
+              availability: { state: "available" },
+            },
+            {
+              destinationCountry: "SG",
+              availability: {
+                state: "temporarily_unavailable",
+                recovery: "try_again_later",
+              },
+            },
+            {
+              destinationCountry: "SG",
+              availability: {
+                state: "temporarily_unavailable",
+                recovery: "try_again_later",
+              },
+            },
+          ],
+        },
+      },
+    });
+    expect(
+      await createShippingCheckoutFromLines(
+        fixture.storefront,
+        session.value.token,
+        "plan33_singapore_checkout_carrier_down",
+        singaporeLines,
+        "ems_test",
+        singaporeInitialAddress,
+      ),
+    ).toMatchObject({
+      ok: false,
+      error: {
+        kind: "rejected",
+        error: {
+          code: "resource_relationship_invalid",
+          field: "buyerCheckout.shippingServiceAvailability",
+        },
+      },
+    });
+    fixture.carrierHealth.unavailableCapability = undefined;
     const singaporeInitial = await createShippingCheckoutFromLines(
       fixture.storefront,
       session.value.token,
       "plan33_singapore_checkout",
-      [
-        { variantId: SHIPPING_MATCHA_VARIANT_ID, quantity: 1 },
-        { variantId: SHIPPING_TARO_VARIANT_ID, quantity: 1 },
-      ],
+      singaporeLines,
       "ems_test",
       singaporeInitialAddress,
     );
@@ -1212,6 +1383,7 @@ type ShippingFixture = Readonly<{
   admin: CommerceAdminClient;
   storefront: CommerceStorefrontClient;
   paymentGateway: Plan33PaymentGateway;
+  carrierHealth: Plan33CarrierHealth;
   close: () => void;
 }>;
 
@@ -1311,8 +1483,17 @@ async function configureShippingBase(
   admin: CommerceAdminClient,
   storefront: (
     expectedMerchantRevision: number,
-  ) => ConfigureCommerceShippingStorefrontV1 = baseShippingStorefrontCommand,
+  ) => ConfigureCommerceShippingStorefrontV1,
 ): Promise<void> {
+  await createShippingItems(admin);
+  await requireAppliedMutation(
+    admin.configureShippingStorefront(clientInput(storefront(2))),
+    "shipping storefront",
+  );
+  await receiveShippingStock(admin);
+}
+
+async function createShippingItems(admin: CommerceAdminClient): Promise<void> {
   const provisioned = await admin.provisionMerchant({
     schemaVersion: "underclerk.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
@@ -1332,10 +1513,9 @@ async function configureShippingBase(
     ),
     "shipping carton item",
   );
-  await requireAppliedMutation(
-    admin.configureShippingStorefront(clientInput(storefront(2))),
-    "shipping storefront",
-  );
+}
+
+async function receiveShippingStock(admin: CommerceAdminClient): Promise<void> {
   await requireAppliedMutation(
     admin.openInventoryPosition(
       clientInput(shippingInventoryPositionCommand(3, "cookie_box")),
@@ -1609,6 +1789,7 @@ function createShippingFixture(
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, SHIPPING_NOW);
   const paymentGateway = new Plan33PaymentGateway(() => SHIPPING_NOW);
+  const carrierHealth = new Plan33CarrierHealth();
   const authority = new CommerceAuthority({
     database,
     signer: new Plan33Signer(),
@@ -1618,6 +1799,7 @@ function createShippingFixture(
     ...(options.shipping
       ? { shipping: createJapanExportShipping(SHIPPING_SIGNING_KEY) }
       : {}),
+    checkoutCapabilityHealthProvider: carrierHealth,
   });
   const api = new CommerceHttpApi({
     authority,
@@ -1647,6 +1829,7 @@ function createShippingFixture(
     admin,
     storefront,
     paymentGateway,
+    carrierHealth,
     close: () => {
       authority.close();
       removeDatabase(databasePath);

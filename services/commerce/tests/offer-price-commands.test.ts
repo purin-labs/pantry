@@ -64,6 +64,23 @@ describe("governed Offer price changes", () => {
         minimumMinor: 900,
         maximumMinor: 1_100,
       });
+      // An allowance above 100% is refused before it is stored.
+      expect(
+        setOfferPricePolicy({
+          database,
+          merchantId: MERCHANT,
+          offerId: OFFER,
+          expectedRevision: 1,
+          maxMovementBps: 10_001,
+          occurredAt: AT,
+        }),
+      ).toEqual({
+        ok: false,
+        refusal: {
+          code: "offer_price_policy_invalid",
+          field: "maxMovementBps",
+        },
+      });
     });
   });
 
@@ -123,16 +140,53 @@ describe("governed Offer price changes", () => {
       expect(applyPrice(database, { proposedPriceMinor: 950 }).outcome).toBe(
         "applied",
       );
-      // Small against the new current price of 950, but past the allowance
-      // measured from the 1,000 the owner approved.
+      // Small against the new current price of 950, but one minor unit past
+      // the allowance measured from the 1,000 the owner approved.
       expect(
         refusal(
           applyPrice(database, {
-            proposedPriceMinor: 890,
+            proposedPriceMinor: 899,
             expectedOfferRevision: 2,
           }),
         ),
       ).toBe("offerPrice.offer_price_movement_exceeded");
+      // A price exactly at either end of the allowance passes.
+      expect(
+        applyPrice(database, {
+          proposedPriceMinor: 900,
+          expectedOfferRevision: 2,
+        }).outcome,
+      ).toBe("applied");
+      expect(
+        refusal(
+          applyPrice(database, {
+            proposedPriceMinor: 1_101,
+            expectedOfferRevision: 3,
+          }),
+        ),
+      ).toBe("offerPrice.offer_price_movement_exceeded");
+      expect(
+        applyPrice(database, {
+          proposedPriceMinor: 1_100,
+          expectedOfferRevision: 3,
+        }).outcome,
+      ).toBe("applied");
+      // The allowance admits no other currency and no price of zero.
+      expect(
+        refusal(
+          applyPrice(database, {
+            proposedPriceMinor: 1_050,
+            expectedOfferRevision: 4,
+            currency: "USD",
+          }),
+        ),
+      ).toBe("offerPrice.offer_price_policy_currency_mismatch");
+      expect(
+        applyPrice(database, {
+          proposedPriceMinor: 0,
+          expectedOfferRevision: 4,
+        }).outcome,
+      ).toBe("rejected");
     });
   });
 

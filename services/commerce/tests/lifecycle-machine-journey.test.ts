@@ -48,7 +48,7 @@ const NOT_REACHED: Readonly<Record<string, string>> = {
   "shipping_fulfillment * *":
     "plan33-core-acceptance.test.ts and saved-address-journey.test.ts hand shipping orders to the carrier",
   "shipment * *":
-    "plan33-core-acceptance.test.ts and commerce-authority.test.ts buy labels and record carrier scans",
+    "plan33-core-acceptance.test.ts buys labels and records carrier scans",
   "webhook_subscription * *":
     "webhook-lifecycle-journey.test.ts fails, restarts and rotates subscriptions and probes a restart of an active one",
   "return received exchange":
