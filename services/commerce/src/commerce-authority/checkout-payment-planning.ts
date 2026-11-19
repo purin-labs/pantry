@@ -474,6 +474,15 @@ export function planCheckoutPaymentCapture(
           state: capture.to,
           providerPaymentReference: command.providerPaymentReference,
           capturedAt: command.capturedAt,
+          ...(command.paymentMethod === undefined
+            ? {}
+            : { paymentMethod: command.paymentMethod }),
+          ...(command.tenderBrand === undefined
+            ? {}
+            : { tenderBrand: command.tenderBrand }),
+          ...(command.providerRefundable === undefined
+            ? {}
+            : { providerRefundable: command.providerRefundable }),
         },
       }),
     },

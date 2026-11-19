@@ -237,6 +237,7 @@ export async function handleServiceRoute(
     case "complete_pickup":
     case "cancel_order":
     case "refund_order":
+    case "record_counter_manual_cash_refund":
     case "resolve_checkout_payment":
     case "expire_checkout":
     case "create_preparation_station":

@@ -104,6 +104,7 @@ export {
 } from "./terminal-assignment.ts";
 export type { TerminalTarget } from "./records/terminal.ts";
 export type { CheckoutSource } from "./records/commerce-records.ts";
+export type { InPersonPaymentMethod } from "./records/commerce-records.ts";
 export type { SupplierDestinationRail } from "./records/supplier-destination.ts";
 export type { SupplierDestinationRevision } from "./records/supplier-destination.ts";
 export type { SupplierDestinationState } from "./records/supplier-destination.ts";

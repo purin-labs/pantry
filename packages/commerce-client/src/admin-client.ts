@@ -29,6 +29,7 @@ import {
   parseTenderRefund,
   type CancelCommerceOrderV1,
   type RefundCommerceOrderTendersV1,
+  type RecordCommerceCounterManualCashRefundV1,
   type RefundCommerceOrderV1,
   type CommerceTenderRefundV1,
 } from "./after-sale.ts";
@@ -2083,6 +2084,17 @@ export class CommerceAdminClient {
   ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
     return this.#command(
       `/v1/admin/merchants/${encodeURIComponent(command.merchantId)}/orders/${encodeURIComponent(command.orderId)}/refunds`,
+      "POST",
+      command,
+      ["orderId"],
+    );
+  }
+
+  async recordCounterManualCashRefund(
+    command: CommerceCommandInput<RecordCommerceCounterManualCashRefundV1>,
+  ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
+    return this.#command(
+      `/v1/admin/merchants/${encodeURIComponent(command.merchantId)}/orders/${encodeURIComponent(command.orderId)}/manual-cash-refunds`,
       "POST",
       command,
       ["orderId"],

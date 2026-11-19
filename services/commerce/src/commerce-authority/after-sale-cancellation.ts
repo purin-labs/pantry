@@ -3,6 +3,7 @@ import { paymentAwaitsInvoice } from "../plugins/companies/index.ts";
 import {
   checkoutProfileOf,
   parseCancelOrderCommand,
+  parseRecordCounterManualCashRefundCommand,
   parseRefundOrderCommand,
   parseFulfillment,
   parseInventoryAllocation,
@@ -11,6 +12,7 @@ import {
   parseRefundAttempt,
   parseRefundOrderTendersCommand,
   type CancelCommerceOrderV1,
+  type RecordCommerceCounterManualCashRefundV1,
   type RefundCommerceOrderTendersV1,
   type RefundCommerceOrderV1,
   type CommerceTenderRefundPartV1,
@@ -120,6 +122,8 @@ type CancellationResolutionBase = Readonly<{
   refundAttempt: RefundAttempt;
   /** Where a refund with no payment provider credits its money. */
   storedValueCredit?: StoredValueCreditTarget;
+  /** True when cash was handed back at the counter for a non-provider-refundable capture. */
+  manualCashRefund?: boolean;
 }>;
 
 export type CancellationResolutionPlan = CancellationResolutionBase &
@@ -141,6 +145,8 @@ type RefundResolutionBase = Readonly<{
   refundAttempt: RefundAttempt;
   /** Where a refund with no payment provider credits its money. */
   storedValueCredit?: StoredValueCreditTarget;
+  /** True when cash was handed back at the counter for a non-provider-refundable capture. */
+  manualCashRefund?: boolean;
 }>;
 
 /**
@@ -160,7 +166,11 @@ export type RefundResolutionPlan = RefundResolutionBase &
       }>
   );
 
-type AfterSaleMutationCommand = CancelCommerceOrderV1 | RefundCommerceOrderV1;
+export type RefundCommand =
+  | RefundCommerceOrderV1
+  | RecordCommerceCounterManualCashRefundV1;
+
+type AfterSaleMutationCommand = CancelCommerceOrderV1 | RefundCommand;
 
 type CancellationPlanResult<Plan> =
   | Readonly<{ kind: "planned"; value: Plan }>
@@ -188,13 +198,13 @@ type AfterSaleCommandAuthorityOptions =
         plan: CancellationResolutionPlan,
       ) => CommerceMutationResultV1;
       reserveRefund: (
-        command: RefundCommerceOrderV1,
+        command: RefundCommand,
         merchant: MerchantRow,
         plan: RefundReservationPlan,
         commandDigest: string,
       ) => void;
       resolveRefund: (
-        command: RefundCommerceOrderV1,
+        command: RefundCommand,
         merchant: MerchantRow,
         plan: RefundResolutionPlan,
       ) => CommerceMutationResultV1;
@@ -445,6 +455,63 @@ export class AfterSaleCommandAuthority {
         ? resolution.value
         : { ...resolution.value, storedValueCredit: credit },
     );
+  }
+
+  /**
+   * Records a counter cash refund for a non-provider-refundable electronic
+   * capture (such as Japan FeliCa) without calling the payment provider's
+   * Refunds API, preserving exact provider bank payouts while accounting for
+   * cash drawer outflow.
+   */
+  recordCounterManualCashRefund(rawCommand: unknown): CommerceMutationResultV1 {
+    const start = beginMerchantCommand(
+      this.#options,
+      rawCommand,
+      parseRecordCounterManualCashRefundCommand,
+    );
+    if (start.kind !== "ready") {
+      return start.result;
+    }
+    const { command, merchant } = start;
+    const digest = this.#options.commandDigest(command);
+    const stored = readRefundAttempt(
+      this.#options.database,
+      command.merchantId,
+      command.refundAttemptId,
+    );
+    const attempt =
+      stored === undefined
+        ? this.#reserveNewRefund(command, merchant, digest)
+        : this.#resumeRefund(command, stored, digest);
+    if (isMutationResult(attempt)) return attempt;
+    const executionResult = internalRefundResult(
+      "manual_cash",
+      attempt,
+      this.#options.now(),
+    );
+    const currentMerchant = this.#options.readMerchant(command.merchantId);
+    if (currentMerchant === undefined) {
+      throw new Error("Refund merchant disappeared before resolution");
+    }
+    const currentSnapshot = this.#options.readSnapshot(command.merchantId);
+    if (currentSnapshot === undefined) {
+      throw new Error("Refund snapshot disappeared before resolution");
+    }
+    const resolution = planRefundResolution(
+      this.#options.database,
+      command,
+      attempt,
+      executionResult,
+      currentSnapshot.resources,
+      this.#options.now(),
+    );
+    if (resolution.kind === "rejected") {
+      return this.#options.rejected(resolution.error);
+    }
+    return this.#options.resolveRefund(command, currentMerchant, {
+      ...resolution.value,
+      manualCashRefund: true,
+    });
   }
 
   /**
@@ -739,7 +806,7 @@ export class AfterSaleCommandAuthority {
   }
 
   #reserveNewRefund(
-    command: RefundCommerceOrderV1,
+    command: RefundCommand,
     merchant: MerchantRow,
     digest: string,
   ): RefundAttempt | CommerceMutationResultV1 {
@@ -775,7 +842,7 @@ export class AfterSaleCommandAuthority {
   }
 
   #resumeRefund(
-    command: RefundCommerceOrderV1,
+    command: RefundCommand,
     stored: StoredRefundAttempt,
     digest: string,
   ): RefundAttempt | CommerceMutationResultV1 {
@@ -1011,7 +1078,7 @@ function planCancellationRefundRequest(
 
 function planRefundReservation(
   database: CommerceDatabase,
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   resources: CommerceResourcesV1,
 ): CancellationPlanResult<RefundReservationPlan> {
   const order = findResource(resources.orders, command.orderId);
@@ -1059,11 +1126,35 @@ function planRefundReservation(
     !paymentIsRefundable(database, command.merchantId, order, payment) ||
     !orderIsAccepted(database, command.merchantId, order) ||
     // Store credit takes the place of a card refund, not of stored value.
-    (command.destination === "store_credit" &&
+    (command.schemaVersion === "underclerk.refund-order.v1" &&
+      command.destination === "store_credit" &&
       storedValueRedemption(database, command.merchantId, payment.id) !==
         undefined)
   ) {
     return cancellationRejected("refund.checkoutPayment");
+  }
+  const capturedContext = readCapturedCheckoutContext(
+    database,
+    command.merchantId,
+    order,
+    payment,
+  );
+  if (command.schemaVersion === "underclerk.refund-order.v1") {
+    if (
+      command.destination !== "store_credit" &&
+      capturedContext?.paymentAttempt.lifecycle.providerRefundable === false
+    ) {
+      return cancellationRejected("payment.providerRefundable");
+    }
+  } else {
+    const manual = readManualTender(database, command.merchantId, payment.id);
+    if (
+      order.origin.kind !== "point_of_sale" ||
+      (capturedContext?.paymentAttempt.lifecycle.providerRefundable !== false &&
+        manual?.method !== "cash")
+    ) {
+      return cancellationRejected("payment.manualCashRefund");
+    }
   }
   if (
     !refundFits(
@@ -1089,7 +1180,7 @@ function planRefundReservation(
 
 function planRefundRequest(
   database: CommerceDatabase,
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   attempt: RefundAttempt,
   resources: CommerceResourcesV1,
 ): CancellationPlanResult<MerchantPaymentRefundCommand> {
@@ -1152,7 +1243,7 @@ function planRefundRequest(
 
 function planRefundResolution(
   database: CommerceDatabase,
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   attempt: RefundAttempt,
   providerResult: CommercePaymentRefundResultV1,
   resources: CommerceResourcesV1,
@@ -1371,7 +1462,7 @@ function revisionError(
 }
 
 function firstRefundRevisionError(
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   order: CommerceOrderV1 | undefined,
   payment: CommercePaymentV1 | undefined,
 ): CommerceMutationErrorV1 | undefined {
@@ -1392,7 +1483,7 @@ function firstRefundRevisionError(
 }
 
 function refundRelationshipsAreValid(
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   order: CommerceOrderV1,
   payment: CommercePaymentV1,
 ): boolean {
@@ -1727,7 +1818,7 @@ function paymentIsRefundable(
  * of a manual payment that staff return in cash or by bank transfer.
  */
 function internalRefundResult(
-  tender: "stored_value" | "manual",
+  tender: "stored_value" | "manual" | "manual_cash",
   attempt: RefundAttempt,
   refundedAt: string,
 ): CommercePaymentRefundResultV1 {
@@ -1961,7 +2052,7 @@ function cancelledOrder(
 }
 
 function pendingRefundOrder(
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   order: CommerceOrderV1,
   attempt: RefundAttempt,
 ): CommerceOrderV1 {
@@ -2052,7 +2143,7 @@ function reservedCancellationMatches(
 }
 
 function reservedRefundMatches(
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   order: CommerceOrderV1,
   payment: CommercePaymentV1,
   attempt: RefundAttempt,
@@ -2196,7 +2287,7 @@ function buildRequestedRefundAttempt(
 }
 
 function buildRequestedOrderRefundAttempt(
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   order: CommerceOrderV1,
   payment: CommercePaymentV1,
 ): RefundAttempt {

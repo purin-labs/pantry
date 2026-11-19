@@ -115,3 +115,52 @@ function manualTender(row: ManualTenderRow): ManualTender {
     throw new Error(`Bank transfer ${row.paymentId} has no reference`);
   return { ...common, method: "bank_transfer", reference: row.reference };
 }
+
+export type ManualCashRefund = Readonly<{
+  refundAttemptId: string;
+  orderId: string;
+  paymentId: string;
+  amountMinor: number;
+  currency: string;
+  recordedAt: string;
+}>;
+
+export function writeManualCashRefund(
+  database: CommerceDatabase,
+  merchantId: string,
+  refund: ManualCashRefund,
+): void {
+  database
+    .prepare(
+      `INSERT INTO manual_cash_refund (
+         merchant_id, refund_attempt_id, order_id, payment_id,
+         amount_minor, currency, recorded_at
+       ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(
+      merchantId,
+      refund.refundAttemptId,
+      refund.orderId,
+      refund.paymentId,
+      refund.amountMinor,
+      refund.currency,
+      refund.recordedAt,
+    );
+}
+
+export function listManualCashRefundsForOrder(
+  database: CommerceDatabase,
+  merchantId: string,
+  orderId: string,
+): readonly ManualCashRefund[] {
+  return database
+    .prepare(
+      `SELECT refund_attempt_id AS refundAttemptId, order_id AS orderId,
+              payment_id AS paymentId, amount_minor AS amountMinor,
+              currency, recorded_at AS recordedAt
+       FROM manual_cash_refund
+       WHERE merchant_id = ? AND order_id = ?
+       ORDER BY recorded_at, refund_attempt_id`,
+    )
+    .all<ManualCashRefund>(merchantId, orderId);
+}

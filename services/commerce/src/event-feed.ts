@@ -62,6 +62,7 @@ const COMMAND_EVENTS: Readonly<Partial<Record<CommandKind, string>>> = {
   resolve_checkout_payment: "checkout.payment_resolved",
   expire_checkout: "checkout.expired",
   cancel_order: "order.cancelled",
+  record_counter_manual_cash_refund: "refund.succeeded",
   mark_pickup_ready: "fulfillment.ready",
   complete_pickup: "fulfillment.completed",
   purchase_shipping_label: "fulfillment.label_purchased",

@@ -125,6 +125,9 @@ export abstract class PaymentFamily extends CheckoutFamily {
         idempotencyKey: command.idempotencyKey,
         money: paymentAttempt.binding.amount,
         paymentBinding: command.paymentBinding,
+        ...(command.paymentMethod === undefined
+          ? {}
+          : { paymentMethod: command.paymentMethod }),
         expiresAt: checkout.lifecycle.quote.expiresAt,
         receiptSummary: {
           merchantName: merchantDisplayName,
@@ -254,6 +257,15 @@ export abstract class PaymentFamily extends CheckoutFamily {
         paymentAttemptRevision: sale.paymentAttempt.revision,
         providerPaymentReference: provider.providerPaymentReference,
         capturedAt: provider.capturedAt,
+        ...(provider.paymentMethod === undefined
+          ? {}
+          : { paymentMethod: provider.paymentMethod }),
+        ...(provider.tenderBrand === undefined
+          ? {}
+          : { tenderBrand: provider.tenderBrand }),
+        ...(provider.providerRefundable === undefined
+          ? {}
+          : { providerRefundable: provider.providerRefundable }),
       });
       requireSuccessfulCounterSaleMutation(
         recorded,

@@ -18,6 +18,7 @@ import type {
 } from "@seams/commerce-client";
 import type {
   InPersonPaymentBinding,
+  InPersonPaymentMethod,
   OnlinePaymentBinding,
 } from "@seams/commerce-contracts";
 import { isRecord } from "@seams/std";
@@ -565,12 +566,14 @@ export class SquarePaymentGateway implements PaymentProvider {
     const raw = paid.body.payment;
     const tip =
       isRecord(raw) && isRecord(raw.tip_money) ? raw.tip_money.amount : 0;
+    const tenderEvidence =
+      isRecord(raw) ? verifySquareTerminalTender(row.paymentMethod, raw) : undefined;
     if (
       payment === undefined ||
       !isRecord(raw) ||
+      tenderEvidence === undefined ||
       payment.id !== paymentId ||
       payment.status !== "COMPLETED" ||
-      raw.source_type !== "CARD" ||
       raw.location_id !== binding.locationId ||
       payment.amountMinor !== request.money.amountMinor ||
       payment.currency !== request.money.currency ||
@@ -582,6 +585,9 @@ export class SquarePaymentGateway implements PaymentProvider {
       kind: "captured",
       providerPaymentReference: payment.id,
       capturedAt: this.#now(),
+      paymentMethod: row.paymentMethod,
+      tenderBrand: tenderEvidence.tenderBrand,
+      providerRefundable: tenderEvidence.providerRefundable,
     };
   }
 
@@ -840,6 +846,7 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
     );
     if (credential === undefined)
       return this.#unavailable("payment_credential_unavailable");
+    const paymentMethod: InPersonPaymentMethod = request.paymentMethod ?? "card";
     const response = await this.#accounts.api.request(
       credential.environment,
       credential.accessToken,
@@ -861,6 +868,7 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
             request.paymentAttemptId,
           ),
           note: `${request.receiptSummary.merchantName.slice(0, 200)} (${request.receiptSummary.lineCount})`,
+          payment_type: squareTerminalPaymentType(paymentMethod),
           device_options: {
             device_id: binding.deviceId,
             // A tip would make the collected total differ from the quote.
@@ -893,14 +901,15 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
       .prepare(
         `INSERT OR IGNORE INTO square_terminal_checkout (
            merchant_id, payment_attempt_id, payment_provider_binding_id,
-           checkout_id, created_at
-         ) VALUES (?, ?, ?, ?, ?)`,
+           checkout_id, payment_method, created_at
+         ) VALUES (?, ?, ?, ?, ?, ?)`,
       )
       .run(
         request.merchantId,
         request.paymentAttemptId,
         bindingId,
         checkout.id,
+        paymentMethod,
         this.#now(),
       );
     return {
@@ -931,6 +940,7 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
 type TerminalCheckoutRow = Readonly<{
   paymentProviderBindingId: string;
   checkoutId: string;
+  paymentMethod: InPersonPaymentMethod;
 }>;
 
 function readTerminalCheckout(
@@ -940,10 +950,72 @@ function readTerminalCheckout(
 ): TerminalCheckoutRow | undefined {
   return database
     .prepare(
-      `SELECT payment_provider_binding_id AS paymentProviderBindingId, checkout_id AS checkoutId
+      `SELECT payment_provider_binding_id AS paymentProviderBindingId,
+              checkout_id AS checkoutId,
+              payment_method AS paymentMethod
        FROM square_terminal_checkout WHERE merchant_id = ? AND payment_attempt_id = ?`,
     )
     .get<TerminalCheckoutRow>(merchantId, paymentAttemptId);
+}
+
+function squareTerminalPaymentType(
+  method: InPersonPaymentMethod,
+): "CARD_PRESENT" | "FELICA_ALL" | "QR_CODE" {
+  switch (method) {
+    case "card":
+      return "CARD_PRESENT";
+    case "felica":
+      return "FELICA_ALL";
+    case "qr_code":
+      return "QR_CODE";
+  }
+}
+
+function verifySquareTerminalTender(
+  method: InPersonPaymentMethod,
+  raw: Readonly<Record<string, unknown>>,
+): Readonly<{ tenderBrand: string; providerRefundable: boolean }> | undefined {
+  switch (method) {
+    case "card": {
+      if (raw.source_type !== "CARD") return undefined;
+      const cardDetails = isRecord(raw.card_details)
+        ? raw.card_details
+        : undefined;
+      const card =
+        cardDetails !== undefined && isRecord(cardDetails.card)
+          ? cardDetails.card
+          : undefined;
+      const brand =
+        card !== undefined &&
+        typeof card.card_brand === "string" &&
+        card.card_brand.trim().length > 0
+          ? card.card_brand.trim()
+          : "CARD";
+      return { tenderBrand: brand, providerRefundable: true };
+    }
+    case "felica": {
+      if (raw.source_type !== "FELICA" || !isRecord(raw.felica_details)) {
+        return undefined;
+      }
+      const brand =
+        typeof raw.felica_details.brand === "string" &&
+        raw.felica_details.brand.trim().length > 0
+          ? raw.felica_details.brand.trim()
+          : "FELICA";
+      return { tenderBrand: brand, providerRefundable: false };
+    }
+    case "qr_code": {
+      if (raw.source_type !== "WALLET" || !isRecord(raw.wallet_details)) {
+        return undefined;
+      }
+      const brand =
+        typeof raw.wallet_details.brand === "string" &&
+        raw.wallet_details.brand.trim().length > 0
+          ? raw.wallet_details.brand.trim()
+          : "WALLET";
+      return { tenderBrand: brand, providerRefundable: true };
+    }
+  }
 }
 
 // A location takes payments only while its account is the connected one.

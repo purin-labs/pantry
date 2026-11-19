@@ -2248,6 +2248,13 @@ export type CheckoutPaymentBinding = Static<
   typeof checkoutPaymentBindingSchema
 >;
 
+export const inPersonPaymentMethodSchema = Type.Union([
+  Type.Literal("card"),
+  Type.Literal("felica"),
+  Type.Literal("qr_code"),
+]);
+export type InPersonPaymentMethod = Static<typeof inPersonPaymentMethodSchema>;
+
 export const checkoutPaymentAttemptLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("pending"),
@@ -2262,6 +2269,9 @@ export const checkoutPaymentAttemptLifecycleSchema = Type.Union([
     state: Type.Literal("captured"),
     providerPaymentReference: recordTextSchema,
     capturedAt: utcTimestampSchema,
+    paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
+    tenderBrand: Type.Optional(recordTextSchema),
+    providerRefundable: Type.Optional(Type.Boolean()),
   }),
   OpenObject({
     state: Type.Literal("declined"),

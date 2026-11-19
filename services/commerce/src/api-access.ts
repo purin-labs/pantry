@@ -142,6 +142,7 @@ const ADMIN_ROUTE_ACCESS: Readonly<
   edit_order: "orders:write",
   cancel_order: "orders:write",
   refund_order: "orders:write",
+  record_counter_manual_cash_refund: "orders:write",
   refund_order_tenders: "orders:write",
   mark_pickup_ready: "orders:write",
   complete_pickup: "orders:write",

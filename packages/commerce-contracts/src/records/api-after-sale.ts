@@ -170,6 +170,30 @@ export type RefundCommerceOrderV1 = Static<
   typeof refundCommerceOrderV1Schema
 >;
 
+export const recordCounterManualCashRefundV1Schema = Type.Refine(
+  ReadonlyStrictObject({
+    schemaVersion: Type.Literal("underclerk.record-counter-manual-cash-refund.v1"),
+    merchantId: text,
+    expectedMerchantRevision: NonNegativeInteger,
+    idempotencyKey: text,
+    requestedAt: timestampSchema,
+    orderId: text,
+    orderRevision: PositiveInteger,
+    paymentId: text,
+    paymentRevision: PositiveInteger,
+    refundAttemptId: text,
+    refundPolicyId: text,
+    amount: positiveMoneySchema,
+    allocation: wireRefundAllocationSchema,
+    reason: boundedTextSchema(512),
+  }),
+  allocationMatchesAmount,
+  allocationMismatch,
+);
+export type RecordCommerceCounterManualCashRefundV1 = Static<
+  typeof recordCounterManualCashRefundV1Schema
+>;
+
 const tenderSchema = ReadonlyStrictObject({
   paymentId: text,
   amount: positiveMoneySchema,
@@ -316,6 +340,9 @@ export const parseRefundCommerceOrderTendersV1 = wireRecordParser(
 );
 export const parseRefundCommerceOrderV1 = wireRecordParser(
   refundCommerceOrderV1Schema,
+);
+export const parseRecordCounterManualCashRefundV1 = wireRecordParser(
+  recordCounterManualCashRefundV1Schema,
 );
 export const parseCommerceTenderRefundV1 = wireRecordParser(
   commerceTenderRefundV1Schema,

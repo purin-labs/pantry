@@ -618,6 +618,7 @@ const CORE_COMMAND_KINDS = [
   "place_stored_value_checkout",
   "cancel_order",
   "refund_order",
+  "record_counter_manual_cash_refund",
   "mark_pickup_ready",
   "complete_pickup",
   "resolve_checkout_payment",

@@ -51,6 +51,7 @@ export {
 } from "./payment-session.ts";
 export {
   parseCancelOrderCommand,
+  parseRecordCounterManualCashRefundCommand,
   parseRefundOrderCommand,
   parseRefundOrderTendersCommand,
   parseRefundAttempt,
@@ -58,6 +59,7 @@ export {
 } from "./after-sale.ts";
 export type {
   CancelCommerceOrderV1,
+  RecordCommerceCounterManualCashRefundV1,
   RefundCommerceOrderTendersV1,
   RefundCommerceOrderV1,
   CommerceTenderRefundPartV1,

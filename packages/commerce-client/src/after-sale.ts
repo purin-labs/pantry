@@ -11,6 +11,7 @@ import {
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   parseCancelCommerceOrderV1 as parseCancelCommerceOrderV1Record,
+  parseRecordCounterManualCashRefundV1 as parseRecordCounterManualCashRefundV1Record,
   parseRefundCommerceOrderTendersV1 as parseRefundCommerceOrderTendersV1Record,
   parseRefundCommerceOrderV1 as parseRefundCommerceOrderV1Record,
   parseCommerceTenderRefundV1 as parseCommerceTenderRefundV1Record,
@@ -53,6 +54,23 @@ export type RefundCommerceOrderV1 = Readonly<{
    * order's customer as store credit, with no payment provider refund.
    */
   destination?: "store_credit";
+}>;
+
+export type RecordCommerceCounterManualCashRefundV1 = Readonly<{
+  schemaVersion: "underclerk.record-counter-manual-cash-refund.v1";
+  merchantId: string;
+  expectedMerchantRevision: number;
+  idempotencyKey: string;
+  requestedAt: string;
+  orderId: string;
+  orderRevision: number;
+  paymentId: string;
+  paymentRevision: number;
+  refundAttemptId: string;
+  refundPolicyId: string;
+  amount: Money;
+  allocation: RefundAllocation;
+  reason: string;
 }>;
 
 /**
@@ -116,6 +134,12 @@ export function parseCancelOrderCommand(raw: unknown): CancelCommerceOrderV1 {
 
 export function parseRefundOrderCommand(raw: unknown): RefundCommerceOrderV1 {
   return decodeRecord(parseRefundCommerceOrderV1Record, raw);
+}
+
+export function parseRecordCounterManualCashRefundCommand(
+  raw: unknown,
+): RecordCommerceCounterManualCashRefundV1 {
+  return decodeRecord(parseRecordCounterManualCashRefundV1Record, raw);
 }
 
 export function parseRefundAttempt(raw: unknown): RefundAttempt {

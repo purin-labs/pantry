@@ -18,6 +18,7 @@ import {
 import {
   checkoutPaymentAttemptSchema,
   checkoutSchema,
+  inPersonPaymentMethodSchema,
   inventoryConsumptionPlanSchema,
   quantityUnitSchema,
   shippingProfileSchema,
@@ -111,6 +112,9 @@ export const paymentCaptureResultSchema = Type.Union([
     kind: Type.Literal("captured"),
     providerPaymentReference: text,
     capturedAt: timestamp,
+    paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
+    tenderBrand: Type.Optional(text),
+    providerRefundable: Type.Optional(Type.Boolean()),
   }),
   ReadonlyOpenObject({
     schemaVersion: paymentCaptureVersion,
@@ -425,6 +429,7 @@ export const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
     ),
     ...checkoutPaymentFields,
     paymentBinding: wireInPersonPaymentBindingSchema,
+    paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
   },
 );
 
@@ -454,6 +459,9 @@ export const recordCheckoutPaymentCaptureCommandSchema = ReadonlyOpenObject({
   ...paymentAttemptFields,
   providerPaymentReference: text,
   capturedAt: timestamp,
+  paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
+  tenderBrand: Type.Optional(text),
+  providerRefundable: Type.Optional(Type.Boolean()),
 });
 
 export const placePaidCheckoutCommandSchema = ReadonlyOpenObject({

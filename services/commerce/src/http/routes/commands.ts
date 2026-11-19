@@ -39,6 +39,7 @@ export async function merchantCommandRoute(
     | "complete_pickup"
     | "cancel_order"
     | "refund_order"
+    | "record_counter_manual_cash_refund"
     | "resolve_checkout_payment"
     | "expire_checkout"
     | "create_preparation_station"
@@ -83,7 +84,9 @@ export async function merchantCommandRoute(
       (!hasOrderId(body.value, route.orderId) ||
         !hasFulfillmentId(body.value, route.fulfillmentId))) ||
     (route.kind === "cancel_order" && !hasOrderId(body.value, route.orderId)) ||
-    (route.kind === "refund_order" && !hasOrderId(body.value, route.orderId)) ||
+    ((route.kind === "refund_order" ||
+      route.kind === "record_counter_manual_cash_refund") &&
+      !hasOrderId(body.value, route.orderId)) ||
     (route.kind === "resolve_checkout_payment" &&
       (!hasCheckoutId(body.value, route.checkoutId) ||
         !hasPaymentAttemptId(body.value, route.paymentAttemptId))) ||
@@ -144,6 +147,11 @@ export async function merchantCommandRoute(
                                       ? await ctx.authority.refundOrder(
                                           body.value,
                                         )
+                                      : route.kind ===
+                                          "record_counter_manual_cash_refund"
+                                        ? ctx.authority.recordCounterManualCashRefund(
+                                            body.value,
+                                          )
                                       : route.kind ===
                                           "resolve_checkout_payment"
                                         ? ctx.authority.resolveCheckoutPayment(

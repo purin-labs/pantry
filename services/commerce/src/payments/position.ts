@@ -11,7 +11,10 @@ import type { RefundAttempt } from "@seams/commerce-contracts";
 import { listRefundAttemptsForOrder } from "./payment-records.ts";
 import type { CommerceDatabase } from "../database.ts";
 import { storedValueRedemption } from "../plugins/stored-value/index.ts";
-import { readManualTender } from "./manual-tender.ts";
+import {
+  listManualCashRefundsForOrder,
+  readManualTender,
+} from "./manual-tender.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;
 
@@ -30,6 +33,8 @@ export type TenderPosition = Readonly<{
   reserved: Money;
   /** What a new refund can still take. */
   refundable: Money;
+  /** Cash handed back at the counter for non-provider-refundable captures (e.g. FeliCa). */
+  manualCashRefunded: Money;
 }>;
 
 /**
@@ -72,7 +77,14 @@ export function tenderPosition(
         break;
     }
   }
-  settled = Math.max(settled, succeeded);
+  const manualCashRefunded = listManualCashRefundsForOrder(
+    database,
+    merchantId,
+    orderId,
+  )
+    .filter((entry) => entry.paymentId === payment.id)
+    .reduce((sum, entry) => safeMoneySum(sum, entry.amountMinor), 0);
+  settled = Math.max(settled, succeeded, manualCashRefunded);
   const refundable =
     payment.amount.amountMinor - safeMoneySum(settled, reserved);
   if (refundable < 0) return undefined;
@@ -88,6 +100,7 @@ export function tenderPosition(
     settled: { amountMinor: settled, currency },
     reserved: { amountMinor: reserved, currency },
     refundable: { amountMinor: refundable, currency },
+    manualCashRefunded: { amountMinor: manualCashRefunded, currency },
   };
 }
 

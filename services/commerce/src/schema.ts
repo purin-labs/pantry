@@ -867,6 +867,9 @@ CREATE TABLE IF NOT EXISTS square_terminal_checkout (
   payment_attempt_id TEXT NOT NULL,
   payment_provider_binding_id TEXT NOT NULL,
   checkout_id TEXT NOT NULL,
+  payment_method TEXT NOT NULL DEFAULT 'card' CHECK (
+    payment_method IN ('card', 'felica', 'qr_code')
+  ),
   created_at TEXT NOT NULL,
   PRIMARY KEY (merchant_id, payment_attempt_id)
 ) STRICT;`;
@@ -1558,6 +1561,18 @@ CREATE TABLE IF NOT EXISTS manual_tender (
 ) STRICT;
 CREATE INDEX IF NOT EXISTS manual_tender_order
   ON manual_tender (merchant_id, order_id);
+CREATE TABLE IF NOT EXISTS manual_cash_refund (
+  merchant_id TEXT NOT NULL,
+  refund_attempt_id TEXT NOT NULL,
+  order_id TEXT NOT NULL,
+  payment_id TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor > 0),
+  currency TEXT NOT NULL,
+  recorded_at TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, refund_attempt_id)
+) STRICT;
+CREATE INDEX IF NOT EXISTS manual_cash_refund_order
+  ON manual_cash_refund (merchant_id, order_id);
 `;
 
 // A merchant's state of each plugin that it changed (Plan 77 step 3, schema
@@ -1991,6 +2006,23 @@ FROM manual_tender_v90 ORDER BY rowid;
 DROP TABLE manual_tender_v90;
 CREATE INDEX manual_tender_order
   ON manual_tender (merchant_id, order_id);
+
+CREATE TABLE IF NOT EXISTS manual_cash_refund (
+  merchant_id TEXT NOT NULL,
+  refund_attempt_id TEXT NOT NULL,
+  order_id TEXT NOT NULL,
+  payment_id TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor > 0),
+  currency TEXT NOT NULL,
+  recorded_at TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, refund_attempt_id)
+) STRICT;
+CREATE INDEX IF NOT EXISTS manual_cash_refund_order
+  ON manual_cash_refund (merchant_id, order_id);
+
+ALTER TABLE square_terminal_checkout ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'card' CHECK (
+  payment_method IN ('card', 'felica', 'qr_code')
+);
 `;
 
 function applySchemaV91(database: CommerceDatabase, appliedAt: string): void {

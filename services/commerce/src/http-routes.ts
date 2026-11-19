@@ -448,6 +448,11 @@ export type CommerceRoute =
       orderId: string;
     }>
   | Readonly<{
+      kind: "record_counter_manual_cash_refund";
+      merchantId: string;
+      orderId: string;
+    }>
+  | Readonly<{
       kind: "refund_order_tenders";
       merchantId: string;
       orderId: string;
@@ -1233,6 +1238,12 @@ const CORE_ROUTES: readonly RouteDefinition<CommerceRoute>[] = [
     "/v1/admin/merchants/:merchantId/orders/:orderId/refunds",
     "refund_order",
     "underclerk.refund-order.v1",
+  ),
+  route(
+    "POST",
+    "/v1/admin/merchants/:merchantId/orders/:orderId/manual-cash-refunds",
+    "record_counter_manual_cash_refund",
+    "underclerk.record-counter-manual-cash-refund.v1",
   ),
   route(
     "POST",

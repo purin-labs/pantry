@@ -31,7 +31,6 @@ import {
   type AttachFulfillmentTrackingCommand,
   type RecordShippingTrackingCommand,
   type CancelCommerceOrderV1,
-  type RefundCommerceOrderV1,
 } from "@seams/commerce-client";
 import type {
   Checkout,
@@ -98,6 +97,7 @@ import {
   refundReservation,
   refundResolutionMutation,
 } from "../after-sale-mutations.ts";
+import type { RefundCommand } from "../after-sale-cancellation.ts";
 import { CommerceLedger, type MerchantRow } from "../ledger.ts";
 import type { CommerceSigner } from "../contracts.ts";
 import type {
@@ -932,7 +932,7 @@ export abstract class CommerceAuthorityBase {
   }
 
   protected reserveRefund(
-    command: RefundCommerceOrderV1,
+    command: RefundCommand,
     merchant: MerchantRow,
     plan: RefundReservationPlan,
     digest: string,
@@ -941,7 +941,7 @@ export abstract class CommerceAuthorityBase {
   }
 
   protected resolveRefund(
-    command: RefundCommerceOrderV1,
+    command: RefundCommand,
     merchant: MerchantRow,
     plan: RefundResolutionPlan,
   ): CommerceMutationResultV1 {
