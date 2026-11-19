@@ -1,4 +1,12 @@
 async function verifySpatialEvents(page) {
+  // The row opens the page with ?evidence=/@fs/<browser-linkage>, whose
+  // table-to-rack blocked case is a recorded fit failure.
+  const blockedRecording = `${new URL(page.url()).searchParams
+    .get("evidence")
+    .replace(
+      /^\/@fs/u,
+      "",
+    )}/4-table-to-rack-blocked-0.002/native-recording.json`;
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.reload();
   await openRecordingViewer(page);
@@ -13,7 +21,7 @@ async function verifySpatialEvents(page) {
   if (!(await filesTab.isVisible())) await setup.click();
   await filesTab.click();
   const file = page.getByLabel("Recording file (.json)");
-  await file.setInputFiles("output/playwright/plan42d-blocked-recording.json");
+  await file.setInputFiles(blockedRecording);
   await setup.click();
   const rehearsal = page.locator(".physics-replay");
   if (!(await rehearsal.locator(".spatial-floor-plan").isVisible())) {
@@ -52,6 +60,51 @@ async function verifySpatialEvents(page) {
   await page.screenshot({
     path: "output/playwright/plan42d-recorded-event.png",
   });
+
+  // On a phone the plan and the 3D view swap without losing the pair.
+  const scene = rehearsal.locator(".spatial-scene-viewport");
+  await page.setViewportSize({ width: 390, height: 844 });
+  const collapseSidebar = page.getByRole("button", {
+    name: "Collapse sidebar",
+    exact: true,
+  });
+  if (await collapseSidebar.isVisible()) await collapseSidebar.click();
+  if (await scene.isVisible())
+    throw new Error("A narrow floor plan must hide the 3D view.");
+  await rehearsal.getByRole("button", { name: "3D view", exact: true }).click();
+  if ((await plan.isVisible()) || !(await scene.isVisible()))
+    throw new Error("The 3D switch must swap the views.");
+  await rehearsal
+    .getByRole("button", { name: "Floor plan", exact: true })
+    .click();
+  if (
+    (await plan
+      .locator('.spatial-floor-map button[aria-pressed="true"]')
+      .count()) !== 2
+  )
+    throw new Error("Switching views must keep the inspected pair.");
+  await page.screenshot({ path: "output/playwright/plan42d-phone-plan.png" });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  // A nominal recording clears the fit failure of the one before.
+  await setup.click();
+  await file.setInputFiles(
+    "apps/portal/src/features/workflow-simulator/fixtures/physics-recording-v2.json",
+  );
+  await setup.click();
+  if (!(await plan.isVisible()))
+    await rehearsal
+      .getByRole("button", { name: "Floor plan", exact: true })
+      .click();
+  await details
+    .getByText("No confirmed conflicts · Checks limited", { exact: true })
+    .waitFor();
+  if (
+    (await plan
+      .locator(".spatial-floor-map button[data-fit=blocked]")
+      .count()) !== 0
+  )
+    throw new Error("Replacing a recording kept stale warnings.");
 
   await setup.click();
   await file.setInputFiles(
@@ -146,7 +199,8 @@ async function verifySpatialEvents(page) {
   await rehearsal
     .locator(".physics-floor-plan-only .spatial-floor-plan")
     .waitFor();
-  await plan.getByRole("button", { name: "Source table", exact: true }).focus();
+  // An item's name ends with its fit state, such as "Source table: blocked".
+  await plan.getByRole("button", { name: /^Source table\b/u }).focus();
   await page.keyboard.press("Enter");
   await details.locator(".spatial-dimensions p").first().waitFor();
   if ((await position.inputValue()) !== pausedTime)
@@ -168,6 +222,8 @@ async function verifySpatialEvents(page) {
     result: "passed",
     recordedEventTime: eventTime,
     pairedFindingSelection: true,
+    phoneSwapKeepsPair: true,
+    replacedRecordingClearsWarnings: true,
     doorPreviewChangesGeometry: true,
     doorPreviewPreservesCursor: true,
     recordedFootprintRestored: true,

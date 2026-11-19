@@ -65,10 +65,6 @@ async function main() {
       journey,
       ...values.prerequisite.map(resolvePrerequisite),
     ];
-    if (journey.endsWith("/verify-spatial-events.js"))
-      prerequisites.push(
-        resolve(root, "output/playwright/plan42d-blocked-recording.json"),
-      );
     for (const path of prerequisites) {
       if (!existsSync(path)) throw new Error(`Missing prerequisite: ${path}`);
     }
@@ -78,9 +74,6 @@ async function main() {
     if (!response.ok)
       throw new Error(`Target returned HTTP ${response.status}`);
     mkdirSync(options.env.PWTEST_DAEMON_SESSION_DIR, { recursive: true });
-    mkdirSync(resolve(root, "output/playwright/plan42f-tray-layout-drag"), {
-      recursive: true,
-    });
     run("open", ["about:blank"]);
     if (values.mode === "fallback")
       run("run-code", [

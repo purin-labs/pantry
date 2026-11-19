@@ -1108,9 +1108,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 63.7,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 11.6,
+        "date": "2026-11-19",
+        "commit": "fec8124c5"
       },
       "notes": "Needs MUJOCO_DIR (the native SDK)."
     },
@@ -1358,29 +1358,16 @@
       "owner": "Plan 42D",
       "run": {
         "tool": "browser",
-        "url": "/workflow-preview.html",
-        "prerequisites": ["output/playwright/plan42d-blocked-recording.json"]
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:browser-linkage}",
+        "prerequisites": [
+          "{out:browser-linkage}/4-table-to-rack-blocked-0.002/native-recording.json"
+        ]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "Its prerequisite output/playwright/plan42d-blocked-recording.json is missing; no journey in the index writes it.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
-      "id": "spatial-inspection-browser",
-      "file": "scripts/bakery-robots/verify-spatial-inspection.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 42D",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "The floor plan image 'Assumed room: 11 by 7 metres' does not become visible in 30 s. The journey's path to it is out of date.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 16.3,
+        "date": "2026-11-19",
+        "commit": "fec8124c5"
       }
     },
     {
