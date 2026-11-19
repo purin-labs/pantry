@@ -34,7 +34,7 @@ async function verifyFactoryCanvasBrowser(page) {
   const pausedAt = await clock.textContent();
   if (Number(pausedAt) <= 0)
     throw new Error("The native factory did not advance.");
-  await workspace.getByRole("button", { name: "Split", exact: true }).click();
+  await workspace.getByRole("tab", { name: "Split", exact: true }).click();
   await workspace
     .locator('.factory-pane[data-camera="floor"][data-scene="ready"]')
     .waitFor();
@@ -103,7 +103,7 @@ async function verifyFactoryCanvasBrowser(page) {
     .getByRole("button", { name: "Timeline", exact: true })
     .click();
   await workspace.getByRole("button", { name: "Factory", exact: true }).click();
-  await workspace.getByRole("button", { name: "3D view", exact: true }).click();
+  await workspace.getByRole("tab", { name: "3D view", exact: true }).click();
   await page.screenshot({ path: "output/playwright/p70-canvas-desktop.png" });
   await workspace.getByRole("button", { name: "Save", exact: true }).click();
   const downloadEvent = page.waitForEvent("download");
@@ -111,21 +111,20 @@ async function verifyFactoryCanvasBrowser(page) {
     .getByRole("button", { name: "Download save file", exact: true })
     .click();
   const download = await downloadEvent;
-  await download.saveAs("output/playwright/p70-canvas-saved-run.json");
+  const saved = `${globalThis.bakeryEvidence}/p70-canvas-saved-run.json`;
+  await download.saveAs(saved);
   await workspace
     .getByRole("button", { name: "Close details", exact: true })
     .click();
-  await workspace.getByRole("button", { name: "Split", exact: true }).click();
+  await workspace.getByRole("tab", { name: "Split", exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await workspace
-    .getByRole("button", { name: "Split", exact: true })
+    .getByRole("tab", { name: "Split", exact: true })
     .waitFor({ state: "hidden" });
   if ((await workspace.locator(".factory-pane canvas").count()) !== 1)
     throw new Error("Small screens retained two cramped canvases.");
   await page.screenshot({ path: "output/playwright/p70-canvas-mobile.png" });
-  await workspace
-    .getByRole("button", { name: "Floor plan", exact: true })
-    .click();
+  await workspace.getByRole("tab", { name: "Floor plan", exact: true }).click();
   await workspace
     .locator('.factory-pane[data-camera="floor"][data-scene="ready"]')
     .waitFor();
@@ -158,7 +157,7 @@ async function verifyFactoryCanvasBrowser(page) {
     .getByRole("button", { name: "Close details", exact: true })
     .click();
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await workspace.getByRole("button", { name: "3D view", exact: true }).click();
+  await workspace.getByRole("tab", { name: "3D view", exact: true }).click();
   await workspace
     .getByRole("button", { name: "Resume production run", exact: true })
     .click();
@@ -180,10 +179,8 @@ async function verifyFactoryCanvasBrowser(page) {
   await page.reload();
   await page.getByRole("button", { name: "Recipes", exact: true }).click();
   await page
-    .getByLabel("Open recipe, oven route or saved production run", {
-      exact: true,
-    })
-    .setInputFiles("output/playwright/p70-canvas-saved-run.json");
+    .getByLabel(/^Open recipe, oven route or saved production run/u)
+    .setInputFiles(saved);
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
@@ -197,7 +194,7 @@ async function verifyFactoryCanvasBrowser(page) {
   const restoredAt = await clock.textContent();
   if (Number(restoredAt) < Number(pausedAt))
     throw new Error("The fresh worker lost saved progress.");
-  await workspace.getByRole("button", { name: "Split", exact: true }).click();
+  await workspace.getByRole("tab", { name: "Split", exact: true }).click();
   await workspace
     .locator('.factory-pane[data-camera="floor"][data-scene="ready"]')
     .waitFor();
@@ -211,6 +208,6 @@ async function verifyFactoryCanvasBrowser(page) {
     taskId,
     splitCanvases: 2,
     mobileCanvases: 1,
-    save: "output/playwright/p70-canvas-saved-run.json",
+    save: saved,
   };
 }

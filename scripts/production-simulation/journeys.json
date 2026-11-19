@@ -2017,10 +2017,11 @@
         "tool": "browser",
         "url": "/factory-acceptance.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Split' button of the 'Persistent production' region does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
-        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 33.3,
+        "date": "2026-11-19",
+        "commit": "c2bace148"
       }
     },
     {
