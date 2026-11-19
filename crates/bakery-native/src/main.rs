@@ -314,7 +314,7 @@ mod cli {
             !cycle || cli.pause_after.is_none(),
             "Pause individual load/unload commands; cycle runs both continuously"
         );
-        let loaded = if cycle {
+        let mut loaded = if cycle {
             Some(Loaded::Cycle(destination))
         } else if loading {
             Some(Loaded::Handoff)
@@ -448,6 +448,10 @@ mod cli {
                 };
                 let expected = Binding::new(binding.request.clone(), binding.completion)?;
                 loading = binding.completion == Completion::LoadingHandoff;
+                // A paused `load` finishes as `load` does: with its handoff.
+                if loading {
+                    loaded = Some(Loaded::Handoff);
+                }
                 let prefix = Artifact::read_checkpoint(&checkpoint, &expected)?;
                 (binding.request, Some(prefix))
             }
