@@ -323,6 +323,87 @@ one passes, 21 fail with a recorded reason. The index now holds 102 passing,
 deletion, by the rule in `AGENTS.md`: keep it only if its outcome still
 matters.
 
+Done on 19 November 2026: every row passes. Of the 50 rows that did not
+pass, 25 were repaired and 25 were deleted, and one row was added
+(`tray-layout-drag-fallback-browser`). The index holds 128 journeys, all
+passing; each commit message names the cover of a deleted row. A full run
+of every tier on the same day passed all 128 rows (`arm-python` in a
+checkout outside the main clone: a worktree nested in it cannot build
+`bakery-native`). The run also showed that `oven-authoring-browser` passed
+only with a fixture server started by hand; its row now starts the server
+(`run.server` may name `tool: "tsx"`).
+
+- Deleted, because a passing journey proves the same outcome: the Plan 42F
+  rows `device-browser`, `ingredient-editor-browser` and `-artifacts`,
+  `native-import-browser` and `-artifacts`, `production-browser` and
+  `-artifacts`, `rehearsal-browser` and `-artifacts`; the Plan 42D row
+  `spatial-inspection-browser` (two of its checks moved into
+  `spatial-events-browser`); the Plan 61 and 70 rows `bakery-shift-browser`,
+  `factory-overview-browser`, `ginger-tea-browser`,
+  `material-history-browser`, `physical-recovery-browser`,
+  `recording-pages-evidence` and `recording-pages-browser`,
+  `recurring-logistics-browser` and `recurring-artifacts`.
+- Deleted, because the outcome no longer matters or its input is gone:
+  `financier-decision-browser` (its form is gone; the recurring financier
+  code that no route could open went with it), `hosted-deployment-artifacts`
+  (a manual hosted run), `recording-equivalence` (no journey wrote its
+  inputs), `container-recovery` (a Docker image that no product path uses),
+  `isaac-lab-import` (NVIDIA Newton) and `browser-chain-artifacts` (files of
+  the old multi-tray engine).
+- Repaired: `test-models`, `native-cli` (without the frozen Python
+  recordings of the port to Rust, which it no longer needed),
+  `timeout-recovery`, `ur5e-rack`, `cell-robot-bindings`,
+  `automatic-context-browser`, `chat-production-browser`,
+  `floor-plan-geometry-browser`, `operating-defaults-browser`,
+  `recording-rehearsal-browser`, `rehearsal-faults-browser` and
+  `-artifacts`, `spatial-events-browser`, `ur5e-rack-browser` and
+  `-artifacts`, `tray-layout-drag-artifacts`, `artifact-import-browser`,
+  `ginger-milk-tea-browser`, `pour-over-browser`, `recipe-split-browser`,
+  `siphon-browser`, `six-hour-shift-browser`, `factory-canvas-browser`,
+  `factory-controls-browser` and `morning-shift-browser`. Most followed
+  moved Portal controls through the shared prelude; the others now read
+  their inputs from the output of the journey that writes them.
+
+The journeys found seven product faults, each fixed in its own commit:
+
+1. `bakery-native resume` of a paused `load` wrote a plain recording, not
+   the loading handoff, so an interrupted oven loading could not continue.
+   It also caused the 20 GB run of `cell-robot-bindings`: a failed
+   `deepEqual` of two recordings of several MB made Node build a diff of
+   many GB. That journey now compares the native files by their bytes.
+2. The simulator's "More simulator tools" menu, the only entry to
+   Scenarios, Compare, the robot rehearsal examples and the shift finish
+   time, had a 1-pixel trigger that a mouse could not hit and the Tab key
+   skipped. It is a normal top-bar button now.
+3. Without WebGL, a compact floor plan (the rack placement preview, a
+   phone) showed its inspection card over the map, and the rack under it
+   could not take a drag.
+4. The recording viewer's plan measured a station differently from the
+   simulator's plan, so the oven was 1.10 × 0.93 m in one and 1.10 × 0.85 m
+   in the other. Both now measure the same footprint.
+5. The factory toolbar ended 5 px under the Portal's top-end actions in the
+   Split view.
+6. The Factory view placed its canvas bar at a fixed 76 px for a one-row
+   toolbar; the toolbar now has two rows and covered the Floor plan, 3D
+   view and Split tabs. The bars now follow the measured toolbar.
+7. The recurring financier comparison could never show: no route made its
+   scenario. Its code is removed.
+
+Open, for the owner (not changed here):
+- A destination out of reach is refused with `actuator-limit` (FR10) or
+  `joint-speed` (UR5e rack), not `unreachable`, since the limit checks of
+  Refactor 16 step 7. A person sees a load or speed fault for a reach
+  problem. The journeys expect the current reasons.
+- The FR10 cannot hold the tray in every start pose of the combined cell,
+  so its rack cycle stops at step 0; the UR5e, CR10 and CRX-10iA complete
+  it. The combined-cell journeys use the UR5e.
+- Other native journeys (`native-cli`, `ur5e-rack`) still compare whole
+  recordings with `deepEqual`; a future mismatch there can use many GB of
+  memory before it fails.
+- `rehearsal-conversion.ts` still converts files of the previous
+  multi-tray engine. It is also the Portal's current file opener, so its
+  old-format branch needs a separate look.
+
 **Product exports that only deleted tests used.** I did not change them,
 because the duplicate-code workstream owns product code; that workstream
 removed them (see "Phase 2 results: duplicate code"):
