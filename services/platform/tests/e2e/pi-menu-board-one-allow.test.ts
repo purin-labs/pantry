@@ -54,13 +54,13 @@ const NAMES = {
 } as const;
 
 type Step = (body: Record<string, unknown>) => Response;
-type Script = { steps: Step[]; outputs: string[]; calls: number };
+type Script = { steps: Step[]; outputs: string[]; prompts: string[]; calls: number };
 
 it(
   "lets one Allow cover the later board edits of the same request, and asks again for a later request",
   { timeout: 300_000 },
   async ({ task }: TestContext): Promise<void> => {
-    const script: Script = { steps: [], outputs: [], calls: 0 };
+    const script: Script = { steps: [], outputs: [], prompts: [], calls: 0 };
     const journey = await installBoardJourney("one-allow", (body) =>
       respond(script, body),
     );
@@ -137,6 +137,9 @@ it(
         .toBe("PR_PERMISSION");
       expect(script.outputs.at(-1)).toContain(HELD);
       expect(textOf(ownerPeer, TEXT_ID)).toBe(BEFORE);
+      // The model saw the selection only through the page view.
+      expect(script.prompts[0]).toContain("Selected elements");
+      expect(script.prompts[0]).toContain(TEXT_ID);
       const firstHeld = await pending(journey.owner);
       expect(firstHeld).toHaveLength(1);
       expect(firstHeld[0]).toMatchObject({
@@ -236,6 +239,7 @@ function respond(script: Script, body: Record<string, unknown>): Response {
   script.calls += 1;
   const last = toolOutput(body);
   if (last.length > 0) script.outputs.push(last);
+  script.prompts.push(JSON.stringify(body.messages ?? []));
   // The board tools come through the tool search, as with a real model.
   if (!JSON.stringify(body.tools ?? []).includes('"menu_board_edit"'))
     return openRouterToolCall(

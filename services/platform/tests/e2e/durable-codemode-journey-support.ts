@@ -351,10 +351,6 @@ export function lastToolText(
   throw new Error("Missing tool result");
 }
 
-export function requestedModel(body: Record<string, unknown>): unknown {
-  return body.model;
-}
-
 export function serialized(body: Record<string, unknown>): string {
   return JSON.stringify(body);
 }

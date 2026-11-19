@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
@@ -12,8 +11,6 @@ import { MODEL_EXIT_EGRESS_HEADER } from "./model-exit-network";
 import { network } from "./network";
 import {
   installDiscoveryActorFixture,
-  openRouterText,
-  openRouterToolCall,
   slackSimulator,
   threadAnswers,
 } from "./slack-journey-support";
@@ -25,67 +22,47 @@ import {
  * answer only after the provider's SDK accepts it, and the Anthropic and
  * OpenAI SDKs throw on a refusal first. Without its own report of the
  * refusal, the Session would hold a model call with no known usage and
- * block the thread.
+ * block the thread. `slack-provider-failure.test.ts` proves the same
+ * outcome on the Pantry-funded OpenRouter route.
  */
 it(
   "answers the next message of a Slack thread after Anthropic refuses the organisation's API key at the rate limit",
-  refusalSlackJourney.bind(null, "anthropic"),
+  refusalSlackJourney,
   120_000,
 );
 
-/** The same refusal on the Pantry-funded OpenRouter route of the fixture. */
-it(
-  "answers the next message of a Slack thread after OpenRouter refuses Satyr's platform key at the rate limit",
-  refusalSlackJourney.bind(null, "openrouter"),
-  120_000,
-);
-
-type RefusingRoute = "anthropic" | "openrouter";
-
-const THREADS: Readonly<
-  Record<RefusingRoute, { readonly root: string; readonly reply: string }>
-> = {
-  anthropic: { root: "1787501300.000001", reply: "1787501300.000002" },
-  openrouter: { root: "1787501400.000001", reply: "1787501400.000002" },
-};
+const THREAD_ROOT = "1787501300.000001";
+const THREAD_REPLY = "1787501300.000002";
 const ORGANISATION_ANTHROPIC_KEY =
   "sk-ant-api03-e2e-organisation-anthropic-0001";
 const ANSWER = "Two integrations answer here.";
 
-async function refusalSlackJourney(
-  route: RefusingRoute,
-  test: TestContext,
-): Promise<void> {
+async function refusalSlackJourney(test: TestContext): Promise<void> {
   await installDiscoveryActorFixture();
-  const provider =
-    route === "anthropic"
-      ? new FakeAnthropicApi(ORGANISATION_ANTHROPIC_KEY)
-      : new FakeOpenRouter();
+  const provider = new FakeAnthropicApi(ORGANISATION_ANTHROPIC_KEY);
   provider.install();
   const slack = slackSimulator();
   network.use(slack.handler);
   // The Slack fixture starts on the Pantry-funded OpenRouter route.
-  if (route === "anthropic")
-    await connectAnthropicApiKey(ORGANISATION_ANTHROPIC_KEY);
+  await connectAnthropicApiKey(ORGANISATION_ANTHROPIC_KEY);
 
-  const thread = THREADS[route].root;
   provider.rateLimitRefusals = 1;
-  expect(await sendMention(`Ev_${route}_LIMITED`, thread)).toBe(
+  expect(await sendMention("Ev_anthropic_LIMITED", THREAD_ROOT)).toBe(
     "case_accepted",
   );
   await expect
-    .poll(threadAnswers.bind(null, slack.messages, thread), {
+    .poll(threadAnswers.bind(null, slack.messages, THREAD_ROOT), {
       timeout: 30_000,
     })
     .toHaveLength(1);
-  const limitNotice = threadAnswers(slack.messages, thread);
+  const limitNotice = threadAnswers(slack.messages, THREAD_ROOT);
   expect(provider.refusedRequests).toBe(1);
   expect(provider.modelRequests).toHaveLength(0);
   expect(
-    await sendReply(`Ev_${route}_LIMITED_AGAIN`, THREADS[route].reply, thread),
+    await sendReply("Ev_anthropic_LIMITED_AGAIN", THREAD_REPLY, THREAD_ROOT),
   ).toBe("case_accepted");
   await expect
-    .poll(threadAnswers.bind(null, slack.messages, thread), {
+    .poll(threadAnswers.bind(null, slack.messages, THREAD_ROOT), {
       timeout: 30_000,
     })
     .toEqual([...limitNotice, ANSWER]);
@@ -99,25 +76,15 @@ async function refusalSlackJourney(
 
   Object.assign(test.task.meta, {
     providerRefusalSlack: {
-      route,
+      route: "anthropic",
       refusedRequests: provider.refusedRequests,
       modelRequests: requests.map((body) => ({
         model: body.model,
         toolOutput: provider.toolOutput(body) !== null,
       })),
-      answers: threadAnswers(slack.messages, thread),
+      answers: threadAnswers(slack.messages, THREAD_ROOT),
     },
   });
-}
-
-/** What both fake providers record and how a journey steers them. */
-interface FakeModelApi {
-  readonly modelRequests: readonly Record<string, unknown>[];
-  /** The next this many model requests are refused at the rate limit. */
-  rateLimitRefusals: number;
-  refusedRequests: number;
-  install(): void;
-  toolOutput(body: Record<string, unknown>): string | null;
 }
 
 /**
@@ -127,8 +94,9 @@ interface FakeModelApi {
  * not issue, and it refuses each request that did not leave through the
  * model exit Worker, as Anthropic refuses a region that it does not serve.
  */
-class FakeAnthropicApi implements FakeModelApi {
+class FakeAnthropicApi {
   readonly modelRequests: Record<string, unknown>[] = [];
+  /** The next this many model requests are refused at the rate limit. */
   rateLimitRefusals = 0;
   refusedRequests = 0;
 
@@ -238,65 +206,4 @@ function anthropicError(
     },
     { status, headers },
   );
-}
-
-/**
- * A fake OpenRouter Chat Completions API for Pantry's platform key. It only
- * records each request and answers it: a tool call to the integration list
- * first, then a text answer. Like OpenRouter, it refuses a key that it did
- * not issue.
- */
-class FakeOpenRouter implements FakeModelApi {
-  readonly modelRequests: Record<string, unknown>[] = [];
-  rateLimitRefusals = 0;
-  refusedRequests = 0;
-
-  install(): void {
-    network.use(
-      http.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        this.respond.bind(this),
-      ),
-    );
-  }
-
-  toolOutput(body: Record<string, unknown>): string | null {
-    const messages = Array.isArray(body.messages) ? body.messages : [];
-    const output = messages.findLast(
-      (message: unknown) => isRecord(message) && message.role === "tool",
-    );
-    return isRecord(output) ? JSON.stringify(output.content) : null;
-  }
-
-  private async respond({
-    request,
-  }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
-    if (
-      request.headers.get("authorization") !==
-      `Bearer ${String(env.OPENROUTER_API_KEY)}`
-    )
-      return HttpResponse.json(
-        { error: { code: 401, message: "No auth credentials found" } },
-        { status: 401 },
-      );
-    if (this.rateLimitRefusals > 0) {
-      this.rateLimitRefusals -= 1;
-      this.refusedRequests += 1;
-      return HttpResponse.json(
-        {
-          error: {
-            code: 429,
-            message: "Rate limit exceeded: limit_rpm/moonshotai/kimi-k3",
-          },
-        },
-        { status: 429 },
-      );
-    }
-    const body: unknown = await request.json();
-    if (!isRecord(body)) throw new Error("OpenRouter request body is invalid");
-    const id = `chatcmpl_e2e_refusal_${String(this.modelRequests.push(body))}`;
-    return this.toolOutput(body) === null
-      ? openRouterToolCall("integration_list", {}, `tool_${id}`)
-      : openRouterText(ANSWER, id);
-  }
 }

@@ -2333,8 +2333,9 @@ A file labeled for another machine is refused. Machine filters grant no addition
 The appliance page's organisation query selects a scope and grants no authority.
 Every save requires current admin access; reads require current viewer access.
 A shared file passes Rust checkpoint inspection before it replaces the local run.
-The `e2e/linea-shared-run.test.ts` journey covers immutable retry, viewer reads,
-foreign refusal, viewer write refusal and revoked reads. These snapshots do not
+The `e2e/bakery-runs.test.ts` and `e2e/bakery-run-artifacts.test.ts` journeys
+cover immutable retry, viewer reads, foreign refusal, viewer write refusal and
+revoked reads for these routes. These snapshots do not
 create a canvas room or physical execution authority.
 
 Workflow canvas routes require current organisation membership. The OrganisationActor loads
