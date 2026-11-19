@@ -102,7 +102,6 @@ function BlackSesamePhysicsView(
         "data-black-sesame-phase": sample.phase,
         "data-black-sesame-step": String(sample.step),
       })}
-      showOnEachUpdate
       label="Accepted black sesame milk station state"
       canvasLabel="3D Black Sesame Milk workcell with FAIRINO FR10 Cobot, Waring WSG60 spice grinder, Maruzen MIH-02C induction hob, Vitamix The Quiet One blender, Ohaus Ranger 3000 scale, Hoshizaki RT-120SNJ refrigerator, and Severin SM 3587 milk mixer"
       camera="station"

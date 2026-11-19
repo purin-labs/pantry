@@ -65,11 +65,6 @@ type StationProps<Sample, Preset extends string> = Readonly<{
   unavailable: string;
   /** The station's data attributes, written on each frame. */
   attributes(sample: Sample): Readonly<Record<string, string>>;
-  /**
-   * Shows the current frames again on each render of the workspace, not only
-   * when the frames or the scene change.
-   */
-  showOnEachUpdate?: boolean;
   label: string;
   canvasLabel: string;
   camera: Preset;
@@ -127,11 +122,7 @@ export class RecipeStation<
         void this.load(this.visual);
       }
     }
-    if (
-      this.props.showOnEachUpdate === true ||
-      rebuilt ||
-      prevProps.frames !== this.props.frames
-    ) {
+    if (rebuilt || prevProps.frames !== this.props.frames) {
       this.subscribe();
     }
   }

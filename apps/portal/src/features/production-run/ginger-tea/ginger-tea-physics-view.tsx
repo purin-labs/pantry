@@ -87,7 +87,6 @@ function GingerTeaPhysicsView(
         "data-ginger-tea-phase": sample.phase,
         "data-ginger-tea-step": String(sample.step),
       })}
-      showOnEachUpdate
       label="Accepted ginger tea station state"
       canvasLabel="3D Ginger Tea and Two-Pan Ginger Milk Tea workcell with FAIRINO FR10 Cobot, rigid pan-staging insert, wash sink, Ohaus Ranger 3000 scale, Maruzen MIH-02C induction hob, heatproof rest, and fine mesh strainer"
       camera="station"

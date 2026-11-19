@@ -89,7 +89,6 @@ function FinancierBakePhysicsView(
         "data-financier-bake-phase": sample.phase,
         "data-financier-bake-step": String(sample.step),
       })}
-      showOnEachUpdate
       label="Accepted financier bake station state"
       canvasLabel="3D Financier bake workcell with FAIRINO FR10 Cobot, Ohaus Ranger 3000 scale, Matsunaga 8-cavity silicone-coated financier mould, 600 by 400 mm carrier tray, and Maruzen MBCO-5E 5-tray convection oven"
       camera="station"

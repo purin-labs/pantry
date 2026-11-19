@@ -87,7 +87,6 @@ function FinancierPackPhysicsView(
         "data-financier-pack-phase": sample.phase,
         "data-financier-pack-step": String(sample.step),
       })}
-      showOnEachUpdate
       label="Accepted financier pack station state"
       canvasLabel="3D Financier cooling, demoulding and gift-box packing workcell with FAIRINO FR10 Cobot, 16-level cooling rack, wire cooling grid, Matsunaga 8P mould, porcelain crumb-check plate, and Ohaus Ranger 3000 scale"
       camera="station"

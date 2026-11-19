@@ -104,7 +104,6 @@ function FinancierBatterPhysicsView(
         "data-financier-batter-phase": sample.phase,
         "data-financier-batter-step": String(sample.step),
       })}
-      showOnEachUpdate
       label="Accepted financier batter station state"
       canvasLabel="3D Financier batter workcell with FAIRINO FR10 Cobot, Ohaus Ranger 3000 scale, Maruzen MIH-02C induction hob, and Hobart HL200 20 qt planetary mixer"
       camera="station"
