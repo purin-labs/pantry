@@ -560,9 +560,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 25.2,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 21.4,
+        "date": "2026-11-19",
+        "commit": "d710619eb"
       }
     },
     {
@@ -2041,10 +2041,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html?evidence=/@fs/{abs:ginger-milk-tea}"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. The shared prelude simulator-navigation.js replaces such clicks, but this file does not use it.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 28.2,
+        "date": "2026-11-19",
+        "commit": "d710619eb"
       }
     },
     {
@@ -2134,10 +2135,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Kettle water (g)' field of the 'Pour-over recipe' form does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
-        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 67.5,
+        "date": "2026-11-19",
+        "commit": "d710619eb"
       }
     },
     {
@@ -2228,10 +2230,11 @@
         "tool": "browser",
         "url": "/factory-acceptance.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The page has no 'Switch workflow' button.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 39.1,
+        "date": "2026-11-19",
+        "commit": "d710619eb"
       }
     },
     {

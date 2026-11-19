@@ -6,10 +6,8 @@ async function verifyGingerMilkTeaBrowser(page) {
   await page.reload();
   await page.evaluate(mountWorkflowSimulator, { kind: "preview" });
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.getByRole("button", { name: "Recipes", exact: true }).click();
-  await page
-    .getByText("Individual recipes and logistics examples", { exact: true })
-    .click();
+  // The tea card holds the ginger tea, black tea and mixed tea forms.
+  await openWorkflowCard(page, /^Ginger Black Tea & Two-Pan Milk Tea/);
   await page
     .getByLabel("Milk tea ginger simmer seconds", { exact: true })
     .fill("360");
@@ -28,6 +26,8 @@ async function verifyGingerMilkTeaBrowser(page) {
   await page
     .getByRole("button", { name: "Start production", exact: true })
     .click();
+  // Inspections show in the Inspector detail panel.
+  await openFactoryPanel(page, "Inspector");
   await page
     .locator(
       '[data-inspection-task="tea-batches#0/inspect-strained-tea"][data-inspection-state="pending"]',
@@ -41,7 +41,8 @@ async function verifyGingerMilkTeaBrowser(page) {
     .locator(
       '[data-task="milk-tea-batches#0/stage-pan-b"][data-kind="executing"]',
     )
-    .waitFor({ timeout: 120000 });
+    // The task row is in the closed timeline; its state is what counts.
+    .waitFor({ state: "attached", timeout: 120000 });
   await page
     .getByRole("button", { name: "Pause production run", exact: true })
     .click();
@@ -61,9 +62,7 @@ async function verifyGingerMilkTeaBrowser(page) {
     .screenshot({ path: "pan-staging-paused.png" });
   await backToRecipes(page);
   await page
-    .getByLabel("Open recipe, oven route or saved production run", {
-      exact: true,
-    })
+    .getByLabel(/^Open recipe, oven route or saved production run/u)
     .setInputFiles({
       name: "paused-pan-staging.json",
       mimeType: "application/json",
@@ -92,9 +91,7 @@ async function verifyGingerMilkTeaBrowser(page) {
   );
   if (!partial.ok()) throw new Error("The held tea save is missing.");
   await page
-    .getByLabel("Open recipe, oven route or saved production run", {
-      exact: true,
-    })
+    .getByLabel(/^Open recipe, oven route or saved production run/u)
     .setInputFiles({
       name: "late-held.json",
       mimeType: "application/json",
@@ -132,6 +129,8 @@ async function verifyGingerMilkTeaBrowser(page) {
   await page.getByRole("button", { name: "Accept", exact: true }).click();
   await completed(page);
   const continued = await download(page, "continued-completed");
+  // The task table of the Logistics panel shows the skipped milk finish.
+  await openFactoryPanel(page, "Logistics");
   await page.getByText("skipped", { exact: true }).first().waitFor();
   const result = await page.evaluate(compareRecipeRuns, {
     authored,
@@ -157,6 +156,7 @@ function isFirstStagingTask(task) {
   return task.id === "milk-tea-batches#0/stage-pan-b";
 }
 async function pendingReview(page, batch) {
+  await openFactoryPanel(page, "Inspector");
   await page
     .locator(
       `[data-inspection-task="milk-tea-batches#${batch}/inspect-strained-tea"][data-inspection-state="pending"]`,
@@ -170,11 +170,7 @@ async function completed(page) {
     .waitFor({ timeout: 120000 });
 }
 async function download(page, name) {
-  const event = page.waitForEvent("download");
-  await page
-    .getByRole("button", { name: "Save production run", exact: true })
-    .click();
-  const file = await event;
+  const file = await downloadFactorySave(page);
   const path = `${globalThis.bakeryEvidence}/${name}.json`;
   await file.saveAs(path);
   return await page.evaluate(readDownloadedRun, path);

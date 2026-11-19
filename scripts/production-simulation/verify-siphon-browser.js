@@ -185,14 +185,8 @@ async function readSiphonValues(page) {
     phase: await station.getAttribute("data-siphon-phase"),
     step: Number(await station.getAttribute("data-siphon-step")),
     stage: await station.locator("[data-siphon-stage]").textContent(),
-    pressureKPa: await read(
-      "[data-siphon-pressure]",
-      "data-siphon-pressure",
-    ),
-    beverageG: await read(
-      "[data-siphon-beverage]",
-      "data-siphon-beverage",
-    ),
+    pressureKPa: await read("[data-siphon-pressure]", "data-siphon-pressure"),
+    beverageG: await read("[data-siphon-beverage]", "data-siphon-beverage"),
     tdsPct: await read("[data-siphon-tds]", "data-siphon-tds"),
   };
 }
@@ -203,31 +197,8 @@ async function openSiphonRecipeForm(page) {
     exact: true,
   });
   if (await form.isVisible()) return;
-  const recipesButton = page.getByRole("button", {
-    name: "Recipes",
-    exact: true,
-  });
-  const switchWorkflow = page.getByRole("button", {
-    name: /Switch workflow/i,
-  });
-  await recipesButton
-    .or(switchWorkflow)
-    .or(form)
-    .first()
-    .waitFor({ state: "visible", timeout: 15000 });
-  if (await form.isVisible()) return;
-  if (await recipesButton.isVisible()) {
-    await recipesButton.click();
-  }
-  if (!(await form.isVisible())) {
-    await switchWorkflow.waitFor({ state: "visible", timeout: 15000 });
-    await switchWorkflow.click();
-    const siphonButton = page
-      .getByRole("button", { name: /Siphon coffee physics/i })
-      .first();
-    await siphonButton.waitFor({ state: "visible", timeout: 15000 });
-    await siphonButton.click();
-  }
+  // The Workflow panel's catalog card opens the recipe form.
+  await openWorkflowCard(page, /^Siphon coffee physics/);
   await form.waitFor({ state: "visible", timeout: 15000 });
 }
 

@@ -10,7 +10,7 @@ async function verifyPourOverBrowser(page) {
   await page.route("**/src/dev/workflow-preview.tsx", servePourOverStyles);
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);
-  await page.getByRole("button", { name: "Recipes", exact: true }).click();
+  await openWorkflowCard(page, /^Pour-over station/);
   const author = page.getByRole("form", {
     name: "Pour-over recipe",
     exact: true,
@@ -98,7 +98,7 @@ async function verifyPourOverBrowser(page) {
   const checked = await page.evaluate(checkBrew, file);
 
   await openWorkspace(page);
-  await page.getByRole("button", { name: "Recipes", exact: true }).click();
+  await openWorkflowCard(page, /^Pour-over station/);
   await chooseOption(page, author.getByLabel("Process check"), {
     label: "Lose the kettle grip in pour 2",
   });
@@ -182,8 +182,7 @@ async function saveShared(page, name) {
 
 async function reopenShared(page, name) {
   await openWorkspace(page);
-  await page.getByRole("button", { name: "Recipes", exact: true }).click();
-  await page.getByText("Shared production runs", { exact: true }).click();
+  await openWorkflowCard(page, /^Shared production runs/);
   await page.getByRole("button", { name: `Open ${name}`, exact: true }).click();
   await page.getByRole("heading", { name, exact: true }).waitFor();
   if (
