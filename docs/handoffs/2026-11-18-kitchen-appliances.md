@@ -1,10 +1,10 @@
 # Handoff: Kitchen appliances, 3D stations and appliance preview, 18 November 2026
 
-This file records the state of [Plan 60A](../plan-60A-bakery-equipment-models.md), the 24-appliance Portal inspector and the 3D station bindings in `~/Dev/purin-io/pantry` after the [Plan 92](../plan-92-new-pantry-repository.md) cutover.
+This file records the state of [Plan 60A](../plan-60A-bakery-equipment-models.md), the 24-appliance Portal inspector and the 3D station bindings in `~/Dev/purin-labs/pantry` after the [Plan 92](../plan-92-new-pantry-repository.md) cutover.
 
 ## Result
 
-All 24 Kitchen and Café appliances pass Blender 5.2 visual checks, MuJoCo 3.x and 4.0 physics checks, `pnpm portal:build`, all 25 `@seams/portal` Node 24 tests, and the five Kitchen 3D browser journeys in `~/Dev/purin-io/pantry`. Only physical shop calibration waits.
+All 24 Kitchen and Café appliances pass Blender 5.2 visual checks, MuJoCo 3.x and 4.0 physics checks, `pnpm portal:build`, all 25 `@seams/portal` Node 24 tests, and the five Kitchen 3D browser journeys in `~/Dev/purin-labs/pantry`. Only physical shop calibration waits.
 
 ## What is in `pantry`
 

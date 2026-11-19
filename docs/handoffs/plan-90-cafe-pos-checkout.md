@@ -1,7 +1,7 @@
 # Handoff — Plan 90: Café Counter Register and POS Payment Adapters
 
 Date: 19 November 2026
-Target repository: `/Users/pta/Dev/purin-io/pantry` (`seams-tech/pantry`, moving to `purin-io/pantry`)
+Target repository: `/Users/pta/Dev/purin-labs/pantry` (`seams-tech/pantry`, moving to `purin-labs/pantry`)
 Owning plan: [`docs/plan-90-cafe-pos-checkout.md`](../plan-90-cafe-pos-checkout.md) (already committed in `pantry`)
 Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`docs/plan-33D-square-release-acceptance.md`](../plan-33D-square-release-acceptance.md), [`docs/plan-40B-collaborative-menu-editor.md`](../plan-40B-collaborative-menu-editor.md), [`docs/plan-80-underclerk-multi-tenant-backend.md`](../plan-80-underclerk-multi-tenant-backend.md), [`docs/plan-85-device-fleet-page.md`](../plan-85-device-fleet-page.md), [`docs/plan-91-seams-atelier-rename.md`](../plan-91-seams-atelier-rename.md), and [`docs/plan-92-new-pantry-repository.md`](../plan-92-new-pantry-repository.md).
 
@@ -14,7 +14,7 @@ Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`d
   - Built-in checkout display name: **Seams Checkout**; agent display name: **Sous Chef**.
   - `docs/plan-90-cafe-pos-checkout.md` keeps its pre-codemod path names per the Plan 91 rule (*"Plans and evidence keep the old names. Do not rewrite them."*). Translate old plan paths to the `pantry` paths in the table below when implementing.
 
-| Old name in Plan 90 text | Current path / package in `purin-io/pantry` |
+| Old name in Plan 90 text | Current path / package in `purin-labs/pantry` |
 | --- | --- |
 | `services/underclerk/` | `services/commerce/` (`@seams/commerce-worker`) |
 | `services/underclerk/docs/spec.md` | `services/commerce/docs/spec.md` (`pnpm lint:commerce-spec`) |
@@ -37,7 +37,7 @@ Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`d
 3. **Physical Square Terminal and live location (blocks Phase 3C / Plan 33D only):** Enable live card/FeliCa/QR payments on the Japan Square location and purchase one Japan Square Terminal to run the live certification packet.
 4. **Star `MCP31LB` printer and `mJ-Drawer` (blocks Phase 5 only):** Optional hardware slice over `crates/shop-gateway`; browser receipt print (`window.print()`) and QR receipts cover Phases 1–4.
 
-## Implementation tasks for `/Users/pta/Dev/purin-io/pantry`
+## Implementation tasks for `/Users/pta/Dev/purin-labs/pantry`
 
 ### Task 1 — Phase 1: Commerce counter menu, modifiers, and cash tender (4–5 days)
 

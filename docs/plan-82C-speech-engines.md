@@ -643,7 +643,7 @@ it for later". The rest of Phase 3 needs a shop, so it waits:
 Until then, D5 stays not decided, and its default holds: Whisper is the default for new Macs, and
 the shop Mac stays on Whisper. A manager can still choose Qwen3-ASR for a Mac in the voice dialog.
 The tools, the owner's speech session `2026-11-16-1912` and the bench stay as they are. Git
-ignores the session, so it was copied from the old checkouts to the clone `~/Dev/lowerarchy/pantry` (now `~/Dev/purin-io/pantry`)
+ignores the session, so it was copied from the old checkouts to the clone `~/Dev/lowerarchy/pantry` (now `~/Dev/purin-labs/pantry`)
 on 2026-11-18. To resume,
 record the room session, then run `phrase-bench.py human .cache/human/2026-11-16-1912:-room
 .cache/human/<room session>` and record the result here. If the owner records new speech in the
