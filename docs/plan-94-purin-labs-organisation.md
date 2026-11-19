@@ -1,9 +1,9 @@
 # Plan 94 — Pantry moves to the GitHub organisation `purin-labs`
 
 Status: 19 November 2026. The repository is `purin-labs/pantry`, the folder
-move is done and the old `satyr` repository is archived (see "Done"). Open:
-the old local clone, `pantry-history`, the first CI run and the legacy names
-(see "Steps").
+move is done, the old `satyr` repository is archived and the old clone is
+deleted (see "Done"). Open: the GitHub Apps, the first CI run and the
+group B legacy names (see "Steps").
 
 The owner decided on 19 November 2026:
 
@@ -151,29 +151,38 @@ Checked, so that nothing is lost:
 - The session handoffs of `.artifacts/handoffs` are copied to the
   git-ignored `.claude/handoffs` of the pantry clone.
 
-Still in the old clone, and lost when it goes:
+The old clone is deleted (19 November 2026, owner: "Yes delete and keep
+empty folder"):
 
-- 68 GB in all: `output/` (35 GB of acceptance and journey results, none
-  of it in pantry), `.artifacts/` (2.4 GB of journey logs), `node_modules`
-  and build output.
-- Two stashes: "plan55c candidate" (8 October) and "p32-whatsapp-message-read"
-  (2 September). Plan 55 is closed and WhatsApp is blocked.
-- Dev servers of old sessions still run from it (started on 9, 13 and 16
-  November).
+- Before the delete, 16 MB of small files that existed only there went to
+  the git-ignored `.claude/handoffs/satyr-artifacts` of the pantry clone:
+  the JFEX 2026 notes, the Plan 87 handoff, the stale journey inputs of
+  6 November, the Plan 61E Wasm reports and the untracked `scripts/plan-52`.
+- 76 dev server processes (node, workerd, esbuild) and the clone's own Caddy
+  (`~/Dev/lowerarchy/satyr/Caddyfile`, ports 3001 to 3005) were stopped by
+  PID. They were started by old sessions between 3 and 17 November. The
+  seams-site Caddy runs on.
+- Deleted: 64 GB, with `output/` (35 GB of old results), `.artifacts/`
+  (2.4 GB of journey captures), `docs/evidence/plan-55c` (276 MB, never
+  committed), the two stashes "plan55c candidate" and
+  "p32-whatsapp-message-read", two detached worktrees and the build output.
+- Kept: the empty folder `~/Dev/lowerarchy/satyr` with
+  `.claude/settings.local.json` and `.claude/launch.json`. Five Claude
+  sessions that are not Pantry work (an external drive, a Dropbox move,
+  course links, a hover translation app, a pastry syllabus) use the folder
+  as their working folder.
 
 ## Steps
 
-1. **The owner: delete the old clone** `~/Dev/lowerarchy/satyr` (decision 5).
-   Stop the old dev servers first.
-2. **The owner: the GitHub Apps.** Check the apps on `seams-tech`
+1. **The owner: the GitHub Apps.** Check the apps on `seams-tech`
    (Settings → GitHub Apps) and install the ones that Pantry needs on
    `purin-labs`.
-3. **Run Pantry CI once** in the new organisation: add the label `run-ci` to
+2. **Run Pantry CI once** in the new organisation: add the label `run-ci` to
    pull request #1 (`gh api repos/purin-labs/pantry/issues/1/labels`). It
    uses the free minutes of `purin-labs`.
-4. **The legacy `satyr` names in the code:**
-   [Plan 93](plan-93-clean-cutover.md), "Legacy names on dev".
-5. **The Portal shop footer** links to `https://github.com/seams-tech`
+3. **The legacy `satyr` names in the code:** group A is done; group B
+   waits for [Plan 93](plan-93-clean-cutover.md) step 2.
+4. **The Portal shop footer** links to `https://github.com/seams-tech`
    (`apps/portal/src/features/ecommerce/footer.tsx`). Change it with the
    brand rename.
 
@@ -194,12 +203,11 @@ keeps `seams-wallet`, `seams-monorepo` and the `@seams` scope.
    links stay valid. A later transfer keeps them valid too (redirect).
 4. **The npm organisation `purin-io`:** delete it, or keep it unused.
    Default: keep it until you decide.
-5. **Delete the old clone `~/Dev/lowerarchy/satyr` (68 GB).** Default: wait
-   for your yes. Its commits, secrets and handoffs are safe in pantry. Its
-   35 GB of old results and its two stashes go.
+5. **Delete the old clone `~/Dev/lowerarchy/satyr`.** Decided and done on
+   19 November 2026: contents deleted, empty folder kept.
 
 ## Cost
 
-- Done: the transfer, the remotes, the secrets and the handoffs.
-- Open: the apps (the owner, about 5 minutes), one CI run, and the delete of
-  the old clone.
+- Done: the transfer, the remotes, the secrets, the handoffs and the delete
+  of the old clone.
+- Open: the apps (the owner, about 5 minutes) and one CI run.
