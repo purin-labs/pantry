@@ -6,12 +6,12 @@
 // panel opens the rehearsal, the production and the recipe authors from its
 // catalog cards, and Details → Inputs opens the tray and scenario editor.
 //
-// Scenarios, Compare and the recording examples (Robot rehearsal) have no
-// visible control: their only entry is the "More simulator tools" menu, whose
-// trigger is a 1-pixel screen-reader alias (tabIndex -1) that a pointer click
-// cannot hit. The same is true of "Back to examples". For those, the journey
-// takes the keyboard path of a screen-reader user: focus the alias and press
-// Enter, then choose the menu item.
+// Scenarios, Compare and the recording examples (Robot rehearsal) are items of
+// the "More" menu of the simulator's top bar. "Back to examples" is a
+// 1-pixel screen-reader alias (tabIndex -1) of a production opened from an
+// example; a person leaves through "← Back" in the Workflow panel. For that
+// alias, the journey takes the keyboard path of a screen-reader user: focus
+// it and press Enter.
 
 // The bakery scene loads after the page. Under SwiftShader its load blocks the
 // page for about 50 seconds, and a click in that time fails. A person waits
@@ -137,7 +137,7 @@ async function pressHiddenAlias(locator) {
 
 async function chooseMoreSimulatorTool(page, item) {
   await waitForBakeryScene(page);
-  await pressHiddenAlias(page.locator("#workflow-more"));
+  await page.locator("#workflow-more").click();
   await page
     .getByRole("menu", { name: "More simulator tools", exact: true })
     .getByRole("menuitem", { name: item, exact: true })

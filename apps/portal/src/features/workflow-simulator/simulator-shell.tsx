@@ -363,8 +363,6 @@ export class WorkflowSimulatorShell extends React.Component<Props, ShellState> {
                 <button
                   id="workflow-more"
                   type="button"
-                  className="production-sr-alias"
-                  tabIndex={-1}
                   aria-label="More simulator tools"
                   title="More simulator tools"
                 >
