@@ -10,7 +10,6 @@ import type {
   SessionId,
   OrganisationId,
 } from "../../ids";
-import type { VaultHandle } from "../../credential-vault/domain";
 import type {
   OrganisationPolicyPlacement,
   OrganisationPolicySnapshot,
@@ -173,21 +172,6 @@ export type OrganisationCutoverCueSettlementInput = {
 export type OrganisationCutoverCueSettlementError = {
   readonly code: "organisation_cutover_cue_mismatch";
 };
-
-export type OrganisationActivePolicyCredentialInspection =
-  | {
-      readonly kind: "no_active_policy";
-      readonly organisationId: OrganisationId;
-    }
-  | {
-      readonly kind: "active_policy";
-      readonly organisationId: OrganisationId;
-      readonly activeVersion: number;
-      readonly credentialRefs: readonly {
-        readonly ruleId: string;
-        readonly credentialRef: VaultHandle;
-      }[];
-    };
 
 export type CodeModeOrganisationActorError =
   | CodeModeBudgetError

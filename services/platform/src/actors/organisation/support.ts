@@ -17,15 +17,7 @@ import {
   newRequestId,
   type OrganisationId,
 } from "../../ids";
-import {
-  parseVaultHandle,
-  type VaultHandle,
-} from "../../credential-vault/domain";
 import { traceWarn } from "../../observability";
-import {
-  parseOrganisationPolicySnapshot,
-  type OrganisationPolicySnapshot,
-} from "../../policy-snapshot";
 import type { Result } from "../../result";
 import {
   ACTION_EXECUTION_LEASE_DURATION_MS,
@@ -37,7 +29,6 @@ import {
   type ActorExportError,
 } from "../actor-export";
 import { readNextCodeModeOrganisationAlarmAt } from "../code-mode-budget";
-import type { VariantBy } from "@seams/type-utils";
 import { errorMessage } from "@seams/std";
 import type { CommerceBoardPresenceEntry } from "@seams/control-api";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
@@ -238,59 +229,6 @@ function policyHeadFromRow(
     digest: row.digest,
     activatedAt: row.activated_at,
   };
-}
-
-export function parseStoredOrganisationPolicy(
-  raw: string,
-): Result<
-  OrganisationPolicySnapshot,
-  VariantBy<OrganisationStateError, "code", "invalid_policy_snapshot">
-> {
-  let value: unknown;
-
-  try {
-    value = JSON.parse(raw);
-  } catch {
-    return { ok: false, error: { code: "invalid_policy_snapshot" } };
-  }
-
-  const parsed = parseOrganisationPolicySnapshot(value);
-  return parsed.ok
-    ? { ok: true, value: parsed.value }
-    : { ok: false, error: { code: "invalid_policy_snapshot" } };
-}
-
-export function activePolicyCredentialRefs(
-  snapshot: OrganisationPolicySnapshot,
-): Result<
-  readonly { readonly ruleId: string; readonly credentialRef: VaultHandle }[],
-  VariantBy<OrganisationStateError, "code", "invalid_policy_snapshot">
-> {
-  const refs: {
-    readonly ruleId: string;
-    readonly credentialRef: VaultHandle;
-  }[] = [];
-
-  for (const injection of snapshot.egress.injections) {
-    const credentialRef = parseVaultHandle(injection.credentialRef);
-    if (!credentialRef.ok) {
-      return { ok: false, error: { code: "invalid_policy_snapshot" } };
-    }
-    refs.push({ ruleId: injection.ruleId, credentialRef: credentialRef.value });
-  }
-
-  refs.sort(compareActivePolicyCredentialRefs);
-  return { ok: true, value: refs };
-}
-
-function compareActivePolicyCredentialRefs(
-  left: { readonly ruleId: string; readonly credentialRef: VaultHandle },
-  right: { readonly ruleId: string; readonly credentialRef: VaultHandle },
-): number {
-  return (
-    left.ruleId.localeCompare(right.ruleId) ||
-    left.credentialRef.localeCompare(right.credentialRef)
-  );
 }
 
 export function existingPolicyActivation(

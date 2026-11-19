@@ -93,21 +93,17 @@ import {
 } from "./case-context-collection";
 import { schemaTransaction } from "./schema";
 import {
-  activePolicyCredentialRefs,
   existingPolicyActivation,
   organisationPlacementConflict,
-  parseStoredOrganisationPolicy,
   readOrganisationMetaRow,
   readOrganisationPolicyHead,
   validateActionOrganisation,
 } from "./support";
 import type {
   OrganisationActivatePolicyInput,
-  OrganisationActivePolicyCredentialInspection,
   OrganisationPolicyActivation,
   OrganisationPolicyActivationError,
   OrganisationPolicyHead,
-  OrganisationStateError,
 } from "./types";
 import { OrganisationActorBase } from "./organisation-actor-base";
 
@@ -1355,59 +1351,6 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
     });
     await this.rearm();
     return result;
-  }
-
-  async inspectActivePolicyCredentials(input: {
-    readonly organisationId: OrganisationId;
-  }): Promise<
-    Result<OrganisationActivePolicyCredentialInspection, OrganisationStateError>
-  > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      input.organisationId,
-    );
-
-    if (!organisation.ok) {
-      return organisation;
-    }
-
-    const head = readOrganisationPolicyHead(this.ctx.storage.sql);
-    if (head === undefined) {
-      return {
-        ok: true,
-        value: {
-          kind: "no_active_policy",
-          organisationId: input.organisationId,
-        },
-      };
-    }
-
-    const snapshot = parseStoredOrganisationPolicy(head.body);
-    if (!snapshot.ok) {
-      return snapshot;
-    }
-    if (
-      head.organisation_id !== input.organisationId ||
-      snapshot.value.version !== head.active_version ||
-      (await sha256Hex(head.body)) !== head.digest
-    ) {
-      return { ok: false, error: { code: "invalid_policy_snapshot" } };
-    }
-
-    const credentialRefs = activePolicyCredentialRefs(snapshot.value);
-    if (!credentialRefs.ok) {
-      return credentialRefs;
-    }
-
-    return {
-      ok: true,
-      value: {
-        kind: "active_policy",
-        organisationId: input.organisationId,
-        activeVersion: head.active_version,
-        credentialRefs: credentialRefs.value,
-      },
-    };
   }
 
   async activatePolicy(

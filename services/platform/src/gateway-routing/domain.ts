@@ -20,7 +20,6 @@ export type GatewayAdminRoute =
   | Readonly<{ kind: "administerCodeModePlatformCutover" }>
   | Readonly<{ kind: "administerActorRegistry" }>
   | Readonly<{ kind: "machineCensus" }>
-  | Readonly<{ kind: "inspectActivePolicyCredentialClosure" }>
   | Readonly<{ kind: "inspectRetainedVaultRootClosure" }>
   | Readonly<{ kind: "administerActorRelocation" }>
   | Readonly<{ kind: "administerActorRestore" }>

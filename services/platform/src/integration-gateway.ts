@@ -36,7 +36,6 @@ import { handleDeviceGatewayRequest } from "./devices/gateway-routes";
 import { assertNever } from "@seams/std";
 import {
   handleAdministerActorRegistry,
-  handleInspectActivePolicyCredentialClosure,
   handleInspectRetainedVaultRootClosure,
 } from "./gateway/admin/actor-registry";
 import {
@@ -243,8 +242,6 @@ async function handleRequest(
         return handleAdministerActorRegistry(request, env);
       case "machineCensus":
         return handleMachineCensus(request, env);
-      case "inspectActivePolicyCredentialClosure":
-        return handleInspectActivePolicyCredentialClosure(request, env);
       case "inspectRetainedVaultRootClosure":
         return handleInspectRetainedVaultRootClosure(request, env);
       case "administerActorRelocation":

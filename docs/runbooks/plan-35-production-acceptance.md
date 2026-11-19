@@ -63,19 +63,12 @@ pnpm --filter @seams/platform test -- \
 pnpm portal:build
 ```
 
-Run the authenticated production closure audit without printing secret values:
-
-```bash
-set -a
-source .env.local
-set +a
-WRANGLER_LOG_PATH=/tmp/plan35-credential-closure.log \
-  pnpm --filter @seams/platform audit:credential-closure:remote
-```
-
-Require a `passed` receipt, the expected organisation cohort, zero D1 findings, zero
-active-policy failures, and zero retained-root findings. Record the full JSON
-receipt in the production evidence document.
+The one-time authenticated production closure audit is complete, with this
+runbook. Plan 92 removed its command (`audit:credential-closure:remote`) and the
+`/v1/admin/active-policy-credential-closure` route. The code stays in
+`seams-tech/pantry-history`. To check retained Vault roots now, use
+`GET /v1/admin/vault-root-closure` as the
+[Vault operations runbook](./vault-operations.md) describes.
 
 The pre-cutover command now returns `cutover_target_table_exists` in production.
 That result protects against replay and is expected. Any additional blocker is

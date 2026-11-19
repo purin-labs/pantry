@@ -1,9 +1,6 @@
 import type { GatewayAdminRoute } from "./domain";
 
 const ADMIN_ROUTES: Readonly<Record<string, GatewayAdminRoute>> = {
-  "/v1/admin/active-policy-credential-closure": {
-    kind: "inspectActivePolicyCredentialClosure",
-  },
   "/v1/admin/code-mode-platform-cutover": {
     kind: "administerCodeModePlatformCutover",
   },

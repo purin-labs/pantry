@@ -9,8 +9,6 @@
     "check:test-types": "tsrs -p tsconfig.tests.json && tsrs -p tsconfig.e2e.json",
     "actions:generate": "node --experimental-strip-types scripts/generate-actions.ts",
     "actions:check": "node --experimental-strip-types scripts/generate-actions.ts --check",
-    "audit:credential-closure": "pnpm exec esbuild scripts/audit-credential-closure.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-audit-credential-closure.mjs --log-level=warning && node /tmp/satyr-audit-credential-closure.mjs",
-    "audit:credential-closure:remote": "pnpm exec esbuild scripts/audit-credential-closure.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-audit-credential-closure.mjs --log-level=warning && node /tmp/satyr-audit-credential-closure.mjs --remote",
     "test": "vitest run",
     "test:e2e": "pnpm contracts:media && vitest run --config vitest.e2e.config.ts",
     "test:migrations": "vitest run tests/d1-schema.test.ts",

@@ -74,14 +74,6 @@ export type ImportedCanonicalSessionActorStub = Pick<
   | "inspectCanonicalSessionState"
 >;
 
-type ActivePolicyCredentialInspectionActorStub = Pick<
-  DurableObjectStub<OrganisationDO>,
-  "inspectActivePolicyCredentials"
->;
-
-export type ActivePolicyCredentialInspectionActorError =
-  OrganisationExecutionScopeError | ExactActiveActorRegistryError;
-
 export type ActorNamespaces = {
   readonly organisation: DurableObjectNamespace<OrganisationDO>;
   readonly session: DurableObjectNamespace<SessionDO>;
@@ -448,33 +440,6 @@ export function importedCanonicalSessionActorStub(input: {
     input.physicalObjectName,
     input.placement,
   );
-}
-
-export async function resolveActivePolicyCredentialInspectionActor(input: {
-  readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<OrganisationDO>;
-}): Promise<
-  Result<
-    ActivePolicyCredentialInspectionActorStub,
-    ActivePolicyCredentialInspectionActorError
-  >
-> {
-  const entry = await readExactActiveActorRegistryEntry({
-    db: input.scope.database,
-    identity: organisationIdentity(input.scope.organisationId),
-    placement: input.scope.placement,
-    schemaVersion: ORGANISATION_ACTOR_SCHEMA_VERSION,
-  });
-  return entry.ok
-    ? {
-        ok: true,
-        value: organisationActorStub(
-          input.namespace,
-          entry.value.physicalObjectName,
-          entry.value.placement,
-        ),
-      }
-    : entry;
 }
 
 export function resolveActiveCaseActor(input: {

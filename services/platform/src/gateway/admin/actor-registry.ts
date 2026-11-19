@@ -45,11 +45,9 @@ import {
   importedCanonicalSessionActorStub,
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActor,
-  resolveActivePolicyCredentialInspectionActor,
   resolveImportedCanonicalSessionActor,
   organisationActorStub,
   sessionActorStub,
-  type ActivePolicyCredentialInspectionActorError,
   type ActorNamespaces,
   type ImportedCanonicalSessionActorStub,
 } from "../../actors/actor-router";
@@ -74,10 +72,6 @@ import {
 } from "../../ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
 import type { Result } from "../../result";
-import {
-  inspectActivePolicyCredentialClosure,
-  type ActivePolicyCredentialClosureError,
-} from "../../credential-vault/active-policy-closure";
 import {
   inspectRetainedVaultRootClosure,
   type RetainedVaultRootClosureError,
@@ -1653,56 +1647,6 @@ function sessionInspectionIdentityMatches(
   );
 }
 
-export async function handleInspectActivePolicyCredentialClosure(
-  request: Request,
-  env: Env,
-): Promise<Response> {
-  if (!isAuthorizedOrganisationAdminRequest(request, env)) {
-    return notFound();
-  }
-
-  if (request.method !== "GET") {
-    return methodNotAllowed(["GET"]);
-  }
-
-  const organisationId = parseOrganisationId(
-    new URL(request.url).searchParams.get("organisationId") ?? "",
-  );
-  if (!organisationId.ok) {
-    return errorResponse("invalid_field", "organisationId is invalid.", 422);
-  }
-
-  const execution = await OrganisationExecutionScope.resolve(
-    env,
-    organisationId.value,
-  );
-  if (!execution.ok) {
-    return errorResponse(
-      execution.error.code,
-      "The organisation region is unavailable.",
-      503,
-    );
-  }
-  const organisation = await resolveActivePolicyCredentialInspectionActor({
-    scope: execution.value,
-    namespace: env.ORGANISATION,
-  });
-  if (!organisation.ok) {
-    return activePolicyCredentialInspectionActorErrorResponse(
-      organisation.error,
-    );
-  }
-
-  const closure = await inspectActivePolicyCredentialClosure({
-    db: execution.value.database,
-    organisation: organisation.value,
-    organisationId: organisationId.value,
-  });
-  return closure.ok
-    ? jsonResponse({ ok: true, closure: closure.value })
-    : activePolicyCredentialClosureErrorResponse(closure.error);
-}
-
 export async function handleInspectRetainedVaultRootClosure(
   request: Request,
   env: Env,
@@ -1821,72 +1765,6 @@ function actorRegistrySchemaAdvanceErrorResponse(
       return errorResponse(
         error.code,
         "Organisation Actor registry entry is invalid.",
-        500,
-      );
-    default:
-      return assertNever(error);
-  }
-}
-
-function activePolicyCredentialInspectionActorErrorResponse(
-  error: ActivePolicyCredentialInspectionActorError,
-): Response {
-  switch (error.code) {
-    case "invalid_organisation_placement":
-    case "organisation_placement_conflict":
-    case "organisation_cell_unavailable":
-      return errorResponse(
-        error.code,
-        "Regional placement is unavailable.",
-        503,
-      );
-    case "organisation_placement_missing":
-    case "registry_entry_missing":
-      return errorResponse(
-        error.code,
-        "Active Organisation Actor was not found.",
-        404,
-      );
-    case "registry_entry_not_active":
-    case "registry_schema_mismatch":
-      return errorResponse(
-        error.code,
-        "Active Organisation Actor is unavailable.",
-        409,
-      );
-    case "organisation_placement_immutable":
-    case "organisation_placement_move_conflict":
-      return errorResponse(
-        error.code,
-        "Organisation placement conflicts with inspection.",
-        409,
-      );
-    case "organisation_placement_corrupt":
-    case "registry_entry_corrupt":
-      return errorResponse(
-        error.code,
-        "Active Organisation Actor state is invalid.",
-        500,
-      );
-    default:
-      return assertNever(error);
-  }
-}
-
-function activePolicyCredentialClosureErrorResponse(
-  error: ActivePolicyCredentialClosureError,
-): Response {
-  switch (error.code) {
-    case "organisation_not_initialized":
-    case "organisation_mismatch":
-    case "organisation_capacity_exceeded":
-    case "policy_version_stale":
-    case "policy_version_conflict":
-    case "invalid_policy_snapshot":
-    case "active_policy_closure_data_invalid":
-      return errorResponse(
-        error.code,
-        "Active policy credential state is invalid.",
         500,
       );
     default:
