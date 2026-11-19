@@ -653,6 +653,8 @@ payouts stay by the owner's decision of 18 November.
   warning rows are gone. A Session that passes its history warning level
   now only writes the `session.harness_history_budget_warning` trace line,
   with no call to the Organisation Actor and no Durable Object row. The
-  Organisation Actor drops the old table when it starts.
+  Organisation Actor drops the old table when it starts. Released on
+  19 November 2026 at about 15:20 UTC (`satyr-edge` `e20bdbde`, Platform
+  only, from `dev` `7df7e60`); rollback target `f518b9a6`.
 - `DeviceFleetActor.clearTerminalResultUnknown` has no caller. Plan 90
   decides if an operator action needs it.
