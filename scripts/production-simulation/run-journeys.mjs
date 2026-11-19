@@ -27,12 +27,17 @@
 //
 // Placeholders in a command: {out} is the journey's directory, {out:ID} the
 // directory of journey ID (which then runs first), {abs:ID} its absolute path
-// (for a /@fs/ evidence URL), {runtime} the pinned browser runtime directory.
+// (for a /@fs/ evidence URL), {runtime} the pinned browser runtime directory,
+// {base} the --base-url.
 //
 // A browser journey with run.portal "built" runs on the built Portal, as the
 // Workers static assets serve it, and not on --base-url: the first such
 // journey of a run builds the Portal (pnpm portal:build) and serves
 // apps/portal/dist with serve-portal-assets.mjs on a free port.
+//
+// A journey with run.server { args, ready } needs a fixture server of its
+// own: the runner starts `node args` (log journey-logs/<id>-server.log),
+// waits until GET ready answers, runs the journey, and then stops the server.
 //
 // CI runs its journeys through this index: set ci in the headless step and
 // set ci-browser in the browser step of .github/workflows/pantry.yml, so the
@@ -54,12 +59,15 @@ import {
 } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { setTimeout as delay } from "node:timers/promises";
 import { parseArgs } from "node:util";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const INDEX = "scripts/production-simulation/journeys.json";
 const WORKFLOW = ".github/workflows/pantry.yml";
 const BROWSER_LIMIT_MS = 600000;
+// A fixture server (run.server) starts Workers and loads a schema first.
+const SERVER_START_MS = 180000;
 // The CI runner is up to about 3 times slower than a Mac; see the header.
 const BROWSER_LIMIT_FACTOR = 4;
 const JOURNEY_FOLDERS = [
@@ -263,6 +271,7 @@ function expand(text, journey) {
   return text
     .replaceAll("{out}", relative(root, directoryOf(journey)))
     .replaceAll("{runtime}", runtime)
+    .replaceAll("{base}", values["base-url"])
     .replace(/\{out:([a-z0-9-]+)\}/gu, (_, id) =>
       relative(root, directoryOf(byId.get(id))),
     )
@@ -315,18 +324,18 @@ async function runJourney(journey) {
     };
   }
   let origin = values["base-url"];
-  if (journey.run.portal === "built") {
-    try {
-      origin = await builtPortal();
-    } catch (error) {
-      console.error(`journeys: ${journey.id}: ${error.message}`);
-      return {
-        id: journey.id,
-        file: journey.file,
-        result: "failed",
-        reason: error.message,
-      };
-    }
+  let server;
+  try {
+    if (journey.run.portal === "built") origin = await builtPortal();
+    if (journey.run.server !== undefined) server = await startServer(journey);
+  } catch (error) {
+    console.error(`journeys: ${journey.id}: ${error.message}`);
+    return {
+      id: journey.id,
+      file: journey.file,
+      result: "failed",
+      reason: error.message,
+    };
   }
   if (journey.run.mkdir === true) mkdirSync(directory, { recursive: true });
   const [program, args] = command(journey, origin);
@@ -389,6 +398,7 @@ async function runJourney(journey) {
       done(code ?? (signal === null ? 1 : 128));
     });
   });
+  await server?.stop();
   await Promise.all(
     [log, sink]
       .filter(Boolean)
@@ -461,6 +471,66 @@ async function serveBuiltPortal() {
   });
 }
 
+// The fixture server of one journey; see run.server in the header.
+async function startServer(journey) {
+  const { args, ready } = journey.run.server;
+  if (await answers(ready))
+    throw new Error(
+      `${ready} answers before its server starts; stop the other server`,
+    );
+  const serverLog = join(logs, `${journey.id}-server.log`);
+  const expanded = args.map((arg) => expand(arg, journey));
+  console.log(
+    `\njourneys: start the server of ${journey.id}: node ${expanded.join(" ")} > ${relative(root, serverLog)}`,
+  );
+  const fd = openSync(serverLog, "w");
+  const server = spawn(process.execPath, expanded, {
+    cwd: root,
+    stdio: ["ignore", fd, fd],
+  });
+  closeSync(fd);
+  let exitCode = null;
+  const exited = new Promise((done) =>
+    server.on("exit", (code) => {
+      exitCode = code ?? 1;
+      done();
+    }),
+  );
+  process.on("exit", () => {
+    if (exitCode === null) server.kill("SIGKILL");
+  });
+  async function stop() {
+    if (exitCode !== null) return;
+    server.kill("SIGTERM");
+    await Promise.race([exited, delay(10000)]);
+    if (exitCode === null) server.kill("SIGKILL");
+    await exited;
+  }
+  const deadline = Date.now() + SERVER_START_MS;
+  while (!(await answers(ready))) {
+    if (exitCode !== null)
+      throw new Error(
+        `its server stopped (exit ${exitCode}); read ${relative(root, serverLog)}`,
+      );
+    if (Date.now() > deadline) {
+      await stop();
+      throw new Error(
+        `its server did not answer ${ready} in ${SERVER_START_MS / 1000} s; read ${relative(root, serverLog)}`,
+      );
+    }
+    await delay(500);
+  }
+  return { stop };
+}
+
+async function answers(url) {
+  try {
+    return (await fetch(url, { signal: AbortSignal.timeout(2000) })).ok;
+  } catch {
+    return false;
+  }
+}
+
 // Read the index again: another run can have recorded its times meanwhile.
 function record(results) {
   const date = started.toLocaleDateString("sv-SE"); // YYYY-MM-DD, local time
@@ -508,6 +578,14 @@ function checkIndex(strict) {
       (journey.run.tool !== "browser" || journey.run.portal !== "built")
     )
       found.push(`${where}: run.portal is "built", for a browser journey`);
+    const server = journey.run?.server;
+    if (
+      server !== undefined &&
+      (!Array.isArray(server.args) ||
+        !server.args.every((arg) => typeof arg === "string") ||
+        typeof server.ready !== "string")
+    )
+      found.push(`${where}: run.server gives args (strings) and a ready URL`);
     if (!STATUSES.includes(journey.status))
       found.push(`${where}: status is one of ${STATUSES.join(", ")}`);
     if (!strict) continue;
