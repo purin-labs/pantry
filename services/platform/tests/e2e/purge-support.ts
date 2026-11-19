@@ -42,14 +42,18 @@ export async function purgeOwner(
 export async function purgeOrganisation(
   owner: PurgeOwner | PurgeSubject,
 ): Promise<void> {
-  const subject =
-    "client" in owner
-      ? {
-          organisationId: owner.organisationId,
-          userId: owner.client.identity.userId,
-        }
-      : owner;
-  await archiveAsOwner(subject);
+  await archiveAsOwner(owner);
+  await purgeArchivedOrganisation(owner);
+}
+
+/**
+ * The scheduled cleanup revokes the archived Organisation's credentials, the
+ * owner deletes it, and the scheduled run purges it.
+ */
+export async function purgeArchivedOrganisation(
+  owner: PurgeOwner | PurgeSubject,
+): Promise<void> {
+  const subject = purgeSubject(owner);
   await runScheduledOnboardingReconciliation(env, Date.now());
   await deleteAsOwner(subject);
   await runScheduledOnboardingReconciliation(env, Date.now() + 1_000);
@@ -58,7 +62,10 @@ export async function purgeOrganisation(
 }
 
 /** The owner archives the Organisation. */
-export async function archiveAsOwner(subject: PurgeSubject): Promise<void> {
+export async function archiveAsOwner(
+  owner: PurgeOwner | PurgeSubject,
+): Promise<void> {
+  const subject = purgeSubject(owner);
   const archived = await archiveOrganisation({
     identityDatabase: env.DB,
     execution: await requireOrganisationExecutionScope(
@@ -74,8 +81,17 @@ export async function archiveAsOwner(subject: PurgeSubject): Promise<void> {
   if (!archived.ok) throw new Error(archived.error.code);
 }
 
+function purgeSubject(owner: PurgeOwner | PurgeSubject): PurgeSubject {
+  return "client" in owner
+    ? {
+        organisationId: owner.organisationId,
+        userId: owner.client.identity.userId,
+      }
+    : owner;
+}
+
 /** The owner deletes the archived Organisation. */
-export async function deleteAsOwner(subject: PurgeSubject): Promise<void> {
+async function deleteAsOwner(subject: PurgeSubject): Promise<void> {
   const removed = await deleteArchivedOrganisation({
     directory: env.DB,
     execution: await requireOrganisationExecutionScope(

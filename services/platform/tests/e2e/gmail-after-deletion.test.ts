@@ -4,26 +4,22 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@seams/std";
 
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { registerEmailSenderAccount } from "../../src/data/email-operational";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
-import {
-  archiveOrganisation,
-  deleteArchivedOrganisation,
-  type ArchiveOrganisationMutation,
-} from "../../src/data/organisation-lifecycle";
-import type { OrganisationId } from "../../src/ids";
-import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
-import { configurationVersion, readHeaders } from "./purge-support";
-import { googleIdToken } from "./gmail-mailbox-support";
 import {
-  attachSharedAccountNativeOrganisation,
-  type SharedAccountNativeClient,
-} from "./shared-account-platform-fixture";
+  archiveAsOwner,
+  configurationVersion,
+  purgeArchivedOrganisation,
+  purgeOrganisation,
+  readHeaders,
+  type PurgeOwner,
+} from "./purge-support";
+import { googleIdToken } from "./gmail-mailbox-support";
+import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -37,10 +33,7 @@ const GOOGLE_SUBJECT = "google-subject-after-deletion";
 const GRANTED_SCOPES =
   "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/userinfo.email openid";
 
-type Owner = Readonly<{
-  client: SharedAccountNativeClient;
-  organisationId: OrganisationId;
-}>;
+type Owner = PurgeOwner;
 
 type Attempt = Readonly<{
   terminalState: string;
@@ -72,7 +65,7 @@ async function gmailAfterDeletionJourney({ task }: TestContext) {
   // The Organisation that its owner deleted first gave up the account.
   const first = await nativeOwner("first");
   await holdGoogleAccount(first);
-  await purge(first);
+  await purgeOrganisation(first);
   expect(await heldIdentities(first)).toEqual([]);
 
   // The next one can hold the same account. Its purge must not collide with
@@ -94,14 +87,14 @@ async function gmailAfterDeletionJourney({ task }: TestContext) {
   );
 
   // An archived Organisation can still be restored, so it holds the account.
-  await archive(second);
+  await archiveAsOwner(second);
   const refusedWhileArchived = await connectGmail(fresh, "refused-archived");
   expect(refusedWhileArchived.failureReason).toBe(
     "provider_account_already_claimed",
   );
 
   // Deleted and purged, it holds nothing, and it keeps no address.
-  await purgeArchived(second);
+  await purgeArchivedOrganisation(second);
   expect(await heldIdentities(second)).toEqual([]);
 
   const connected = await connectGmail(fresh, "connected");
@@ -181,19 +174,6 @@ async function holdGoogleAccount(owner: Owner): Promise<void> {
   if (!mailbox.ok) throw new Error(mailbox.error.code);
 }
 
-async function purge(owner: Owner): Promise<void> {
-  await archive(owner);
-  await purgeArchived(owner);
-}
-
-async function purgeArchived(owner: Owner): Promise<void> {
-  await runScheduledOnboardingReconciliation(env, Date.now());
-  await deleteArchived(owner);
-  await runScheduledOnboardingReconciliation(env, Date.now() + 1_000);
-  await runScheduledOnboardingReconciliation(env, Date.now() + 900_000);
-  expect(await cleanupStatus(owner)).toBe("purged");
-}
-
 async function connectGmail(owner: Owner, label: string): Promise<Attempt> {
   const started = await exports.default.fetch(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${owner.organisationId}/providers/gmail/start`,
@@ -226,49 +206,6 @@ async function connectGmail(owner: Owner, label: string): Promise<Attempt> {
     );
   if (report === null) throw new Error("The window reports no result");
   return { terminalState: report[1] ?? "", failureReason: report[2] ?? null };
-}
-
-async function archive(owner: Owner): Promise<void> {
-  const archived = await archiveOrganisation({
-    identityDatabase: env.DB,
-    execution: await requireOrganisationExecutionScope(
-      env,
-      owner.organisationId,
-    ),
-    actorUserId: owner.client.identity.userId,
-    authority: { kind: "organisation_owner" },
-    reasonCode: "merchant_archived",
-    now: Date.now(),
-    mutation: await lifecycleMutation(owner, "archive"),
-  });
-  if (!archived.ok) throw new Error(archived.error.code);
-}
-
-async function deleteArchived(owner: Owner): Promise<void> {
-  const removed = await deleteArchivedOrganisation({
-    directory: env.DB,
-    execution: await requireOrganisationExecutionScope(
-      env,
-      owner.organisationId,
-    ),
-    actorUserId: owner.client.identity.userId,
-    now: Date.now(),
-    mutation: await lifecycleMutation(owner, "delete"),
-  });
-  if (!removed.ok) throw new Error(removed.error.code);
-}
-
-async function cleanupStatus(owner: Owner): Promise<unknown> {
-  const scope = await requireOrganisationExecutionScope(
-    env,
-    owner.organisationId,
-  );
-  return scope.database
-    .prepare(
-      "SELECT status FROM organisation_archive_cleanup WHERE organisation_id = ?",
-    )
-    .bind(owner.organisationId)
-    .first("status");
 }
 
 /** The rows of an Organisation that still name the Google account. */
@@ -304,34 +241,6 @@ async function mailboxes(owner: Owner): Promise<readonly unknown[]> {
   return rows.results.map(function address(row) {
     return row.address;
   });
-}
-
-async function lifecycleMutation(
-  owner: Owner,
-  operation: "archive" | "delete",
-): Promise<ArchiveOrganisationMutation> {
-  const key = `gmail-after-deletion-${owner.organisationId}-${operation}`;
-  return {
-    boundary: {
-      kind: "configuration_versioned",
-      idempotencyKey: key,
-      requestHash: `${key}-request`,
-      expectedConfigurationVersion: await configurationVersion(
-        owner.organisationId,
-      ),
-    },
-    scope: {
-      userId: owner.client.identity.userId,
-      organisationScope: owner.organisationId,
-      route: `/v1/control/organisations/${owner.organisationId}${operation === "archive" ? "/archive" : ""}`,
-      operation: `organisation.${operation}`,
-    },
-    identity: newControlMutationIdentity({
-      portalSubjectHash: "gmail-after-deletion-owner",
-      causationId: key,
-      now: Date.now(),
-    }),
-  };
 }
 
 function mutationHeaders(
