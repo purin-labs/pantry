@@ -22,15 +22,6 @@ import {
   EMAIL_UPDATE_LIMIT,
 } from "./limits.ts";
 
-export {
-  EMAIL_AGGREGATE_LIMIT,
-  EMAIL_BODY_LIMIT,
-  EMAIL_PREVIEW_LIMIT,
-  EMAIL_STATE_LIMIT,
-  EMAIL_STATE_VECTOR_LIMIT,
-  EMAIL_SUBJECT_LIMIT,
-  EMAIL_UPDATE_LIMIT,
-} from "./limits.ts";
 
 export const EMAIL_DRAFT_SCHEMA = "email_draft_crdt.v1";
 

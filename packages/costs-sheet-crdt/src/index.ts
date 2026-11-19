@@ -7,8 +7,6 @@ import {
   COSTS_SHEET_UPDATE_LIMIT,
 } from "./limits.ts";
 export {
-  COSTS_SHEET_CELL_LIMIT,
-  COSTS_SHEET_STATE_LIMIT,
   COSTS_SHEET_STATE_VECTOR_LIMIT,
   COSTS_SHEET_UPDATE_LIMIT,
 } from "./limits.ts";

@@ -4,7 +4,6 @@ export {
   type ParsedYjsEncoding,
   type YjsEncodingFailure,
   type YjsEncodingKind,
-  type YjsEncodingLimits,
   type YjsEncodingResult,
 } from "./yjs-encoding.ts";
 export {
@@ -47,30 +46,20 @@ export {
   type TextInputRange,
 } from "./plain-text.ts";
 export {
-  COLLABORATION_AGENT_ACTION_BYTES,
   COLLABORATION_AGENT_DRAFT_TEXT_LIMIT,
   COLLABORATION_AGENT_ACTION_ELEMENTS,
   COLLABORATION_AGENT_COLOR_KEYS,
   isCollaborationAgentAction,
-  isCollaborationAgentActivities,
   type CollaborationAgent,
   type CollaborationAgentAction,
-  type CollaborationAgentActionKind,
   type CollaborationAgentActivity,
   type CollaborationAgentColorKey,
-  type CollaborationAgentRect,
 } from "./agent-presence.ts";
 export {
   createSyncProtocol,
   everyCode,
   type SyncClientMessage,
-  type SyncDocumentRevision,
   type SyncFailureCode,
   type SyncMessageFields,
-  type SyncParsed,
-  type SyncProtocolSpec,
-  type SyncRoomFailureCode,
-  type SyncRoomMetadata,
-  type SyncServerExtension,
   type SyncServerMessage,
 } from "./sync-protocol.ts";
