@@ -200,6 +200,7 @@ describe("Plan 90 counter register & GMO stera LAN gateway integration", () => {
         paymentMethod: "felica",
         tenderBrand: "SUICA",
         providerRefundable: false,
+        reasonCode: null,
       },
       3_000,
     );
@@ -317,7 +318,9 @@ describe("Plan 90 counter register & GMO stera LAN gateway integration", () => {
       authorizedBakerySurfaceCommands({
         kind: "control",
         organisationId: ORG_ID,
+        requesterPersonId: "person_operator",
         userId: "user_operator",
+        membershipRevision: 1,
         role: "operator",
       }),
     ).toEqual([...REGISTER_VIEW_COMMANDS]);
@@ -325,7 +328,9 @@ describe("Plan 90 counter register & GMO stera LAN gateway integration", () => {
       authorizedBakerySurfaceCommands({
         kind: "control",
         organisationId: ORG_ID,
+        requesterPersonId: "person_viewer",
         userId: "user_viewer",
+        membershipRevision: 1,
         role: "viewer",
       }),
     ).toEqual([]);
