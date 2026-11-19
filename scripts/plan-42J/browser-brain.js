@@ -5,7 +5,9 @@ async (page) => {
   // the reply review route. The agent proposes a memory from that correction.
   // The owner reviews it on the Brain page and accepts it. The supplier writes
   // again and the next reply uses the accepted revision. A second
-  // administrator, who may not read that mailbox, sees none of it.
+  // administrator, who holds no grant on that mailbox, sees the same records:
+  // Plan 27C makes agent mailboxes, Memory, Cases and Projects internal, so
+  // every member of the Organisation reads them.
   //
   // Setup: POST /test/setup. Gmail and the model provider are simulated.
   const WORKER = "http://127.0.0.1:8842";
@@ -208,10 +210,11 @@ async (page) => {
         .waitFor();
       return target;
     }
-    // A view of the Brain page. Each tab is a link, so its address opens it.
+    // A view of the Knowledge page. Each tab is a link, so its address opens
+    // it. Activity is a page of its own (Agents), with no tab.
     tab(target, name) {
       return target
-        .getByRole("navigation", { name: "Brain views" })
+        .getByRole("navigation", { name: "Knowledge views" })
         .getByRole("link", { name, exact: true });
     }
     // The row of one memory. An eval can carry the same words in its title,
@@ -231,7 +234,7 @@ async (page) => {
     // rows, and a row opens its record in place of the list.
     // The row is opened from the keyboard, as a person with no pointer does.
     async openEval(target) {
-      await this.tab(target, "Evals").click();
+      await this.tab(target, "Tests").click();
       const row = target
         .getByRole("list", { name: "Evals", exact: true })
         .getByRole("link")
@@ -403,48 +406,42 @@ async (page) => {
         ownerStatus,
       );
 
-      // 4. A second administrator may not read that mailbox. Their Brain page
-      // is empty, and a decision on the candidate is refused as if it did
-      // not exist.
+      // 4. A second administrator holds no grant on that mailbox. Plan 27C
+      // makes an agent mailbox and Memory internal, so this administrator
+      // reads the same candidate, count and Overview as the owner.
       const other = await this.peer("Other");
-      const hidden = await this.memories(other);
+      const shared = await this.memories(other);
       this.check(
-        "the other administrator's list is empty",
-        hidden.status === 200 && hidden.body.memories.length === 0,
-        hidden,
+        "the other administrator reads the same candidate",
+        shared.status === 200 &&
+          shared.body.memories.length === 1 &&
+          shared.body.memories[0].memoryId === candidate.memoryId,
+        shared,
       );
       await this.openBrain(other);
-      await other.getByText("Nothing to review", { exact: true }).waitFor();
-      this.check(
-        "the other administrator's Brain page shows no memory",
-        (await other.getByText(LEARNED_FACT, { exact: true }).count()) === 0,
-        null,
-      );
+      await this.row(other, LEARNED_FACT).first().waitFor();
       const otherSummary = await this.summary(other);
-      const otherEntry = await this.brainEntry(other);
+      await other
+        .getByRole("link", { name: "Knowledge, 2 to review", exact: true })
+        .waitFor();
       this.check(
-        "the other administrator's navigation counts nothing",
-        otherSummary.status === 200 &&
-          otherSummary.body ===
-            '{"ok":true,"summary":{"memoriesToReview":0,"evalsToReview":0}}' &&
-          otherEntry === "Knowledge",
-        { otherSummary, otherEntry },
+        "the other administrator's navigation counts the same items",
+        otherSummary.status === 200 && otherSummary.body === ownerSummary.body,
+        otherSummary,
       );
       const otherStatus = await other.locator("#brain-status-line").innerText();
       this.check(
-        "the other administrator's Overview says that nothing waits",
-        otherStatus === "Nothing waits for you." &&
-          (await other.locator(".brain-status-latest").count()) === 0,
+        "the other administrator's Overview says the same",
+        otherStatus === ownerStatus.line,
         otherStatus,
       );
-      await this.capture(other, "other-administrator-empty");
-      // The Knowledge view lists four kinds. The owner reads the memory and
-      // the eval. The other administrator reads neither, and both read the
-      // same agents, which the Agents page owns.
+      await this.capture(other, "other-administrator-shared");
+      // The Knowledge view lists four kinds. Both administrators read the
+      // memory, the eval and the same agents, which the Agents page owns.
       await this.tab(this.owner, "Knowledge").click();
       await this.row(this.owner, LEARNED_FACT).first().waitFor();
       await this.tab(other, "Knowledge").click();
-      await other.getByText("No memories yet", { exact: true }).waitFor();
+      await this.row(other, LEARNED_FACT).first().waitFor();
       const ownerRail = await this.rail(this.owner);
       const otherRail = await this.rail(other);
       this.check(
@@ -452,28 +449,12 @@ async (page) => {
         ownerRail.length === 4 &&
           ownerRail[0] === "Memory, 1 record" &&
           ownerRail[1] === "Evals, 1 record" &&
-          otherRail[0] === "Memory, 0 records" &&
-          otherRail[1] === "Evals, 0 records" &&
-          ownerRail[2] === otherRail[2] &&
-          ownerRail[3] === otherRail[3],
+          JSON.stringify(otherRail) === JSON.stringify(ownerRail),
         { ownerRail, otherRail },
       );
       await this.capture(this.owner, "owner-knowledge");
       await this.capture(other, "other-admin-knowledge");
       await this.tab(this.owner, "Overview").click();
-      const refused = await this.send(other, "/memories/commands", {
-        commandId: `memory_other_${Date.now()}`,
-        expectedRevision: candidate.headRevision,
-        kind: "accept",
-        memoryId: candidate.memoryId,
-        revision: 1,
-      });
-      const refusal = await refused.json();
-      this.check(
-        "the other administrator cannot accept it",
-        refused.status() === 404 && refusal.error === "memory_unavailable",
-        { status: refused.status(), body: refusal },
-      );
 
       // 5. The owner opens it from the Overview and accepts it. The row
       // opens the memory beside the Knowledge list, and the address names
@@ -526,11 +507,12 @@ async (page) => {
         await this.brainEntry(this.owner),
       );
       await this.capture(this.owner, "owner-memory-in-use");
-      const stillHidden = await this.memories(other);
+      const otherAccepted = await this.memories(other);
       this.check(
-        "the accepted memory stays hidden from the other administrator",
-        stillHidden.body.memories.length === 0,
-        stillHidden,
+        "the other administrator reads the accepted revision",
+        otherAccepted.status === 200 &&
+          otherAccepted.body.memories[0]?.revisions[0]?.kind === "accepted",
+        otherAccepted,
       );
 
       // 6. The supplier writes again. The reply to that message uses the
@@ -563,9 +545,10 @@ async (page) => {
         .find((request) => request.prompt.includes("order_thread_two")).prompt;
       this.check(
         "the model was shown the accepted statement with its request",
+        // Each line cites its memory, so a reply can name what it used.
         freshPrompt.startsWith(
-          "Accepted organizational memory (reviewed facts and preferences):\n- " +
-            LEARNED_FACT,
+          "Accepted organizational memory (reviewed facts and preferences):\n" +
+            `- [memory:${candidate.memoryId}] ${LEARNED_FACT}`,
         ),
         { prompt: freshPrompt },
       );
@@ -855,8 +838,10 @@ async (page) => {
         },
       );
 
-      // The memory changed while the owner was on the Evals view. Its row
-      // says so until the owner opens the record.
+      // Activity is a page of its own; Back returns to the eval on the
+      // Knowledge page. The memory changed while the owner was on the Evals
+      // view. Its row says so until the owner opens the record.
+      await this.owner.goBack();
       await this.tab(this.owner, "Knowledge").click();
       const changed = this.row(this.owner, PROPOSED_FACT).first();
       await changed.waitFor();
@@ -894,8 +879,8 @@ async (page) => {
 
       // The Learning view counts the loop from the same records: one
       // correction, two versions of the memory, one eval run, three
-      // decisions, and what is in use. The second administrator reads none
-      // of those records, so their flow holds zeros and their log is empty.
+      // decisions, and what is in use. The second administrator reads the
+      // same records, so their flow and their log are the same.
       const flowCards = async (target) => {
         await this.tab(target, "Learning").click();
         const flow = target.getByRole("group", {
@@ -918,10 +903,12 @@ async (page) => {
       };
       const learned = await flowCards(this.owner);
       await this.capture(this.owner, "owner-learning");
-      const unlearned = await flowCards(other);
+      // The second administrator's page last loaded in step 4; it opens again.
+      await this.openBrain(other);
+      const otherLearned = await flowCards(other);
       await this.capture(other, "other-admin-learning");
       this.check(
-        "the learning flow counts the loop, and holds zeros for a person who reads nothing",
+        "the learning flow counts the loop, and every member reads the same flow",
         learned.cards["Corrections of email replies"] === "1 record" &&
           learned.cards["Memories proposed"] === "2 versions" &&
           learned.cards["Eval runs"] === "1 run" &&
@@ -929,13 +916,8 @@ async (page) => {
           learned.cards["Memories in use"] === "1 memory" &&
           learned.cards["Evals in use"] === "1 eval" &&
           learned.log >= 6 &&
-          unlearned.cards["Memories proposed"] === "0 versions" &&
-          unlearned.cards["Eval runs"] === "0 runs" &&
-          unlearned.cards["Decisions"] === "0 decisions" &&
-          unlearned.cards["Memories in use"] === "0 memories" &&
-          unlearned.cards["Evals in use"] === "0 evals" &&
-          unlearned.log === 0,
-        { learned, unlearned },
+          JSON.stringify(otherLearned) === JSON.stringify(learned),
+        { learned, otherLearned },
       );
       // A line of the log opens its record.
       await this.owner.locator(".brain-log-row").first().click();
@@ -1079,19 +1061,27 @@ async (page) => {
         afterClose,
       );
 
-      // 11. The other administrator sees no eval and no run.
+      // 11. The other administrator reads the same eval and its runs.
       await this.openBrain(other);
-      await this.tab(other, "Evals").click();
-      await other.getByText("No evals yet", { exact: true }).waitFor();
+      await this.tab(other, "Tests").click();
+      await other
+        .locator(`[id="brain-row-evals-${proposedEval.evalId}"]`)
+        .waitFor();
       await this.capture(other, "other-admin-evals");
-      const hiddenRuns = await this.read(
+      const ownerRuns = await this.read(
+        this.owner,
+        `/evals/${proposedEval.evalId}/runs`,
+      );
+      const otherRuns = await this.read(
         other,
         `/evals/${proposedEval.evalId}/runs`,
       );
       this.check(
-        "the other administrator reads no run of the eval",
-        hiddenRuns.status === 404,
-        hiddenRuns,
+        "the other administrator reads the same runs of the eval",
+        ownerRuns.status === 200 &&
+          otherRuns.status === 200 &&
+          JSON.stringify(otherRuns.body) === JSON.stringify(ownerRuns.body),
+        { ownerRuns, otherRuns },
       );
 
       // 12. The owner opens the execution of the Case the memory came from,
@@ -1260,12 +1250,20 @@ async (page) => {
       );
 
       // 14. The other administrator is not a member of the Case's Project.
-      // Their list is empty, and the Case answers as a missing one.
-      await this.openBrain(other);
-      await this.tab(other, "Activity").click();
-      await other.getByText("No Cases to show", { exact: true }).waitFor();
+      // A Project groups work and hides none of it (Plan 27C), so their list
+      // holds the Case and they read the same execution. A Case that does
+      // not exist still answers as a missing one.
+      await other.goto(
+        `${PORTAL}/brain-preview.html?organisation=${this.fixtures.organisationId}&view=activity`,
+      );
+      await other.locator(".brain-activity").first().waitFor();
+      const otherCases = await this.read(other, "/case-executions");
       await this.capture(other, "other-admin-activity");
-      const hiddenCase = await this.read(
+      const ownerCase = await this.read(
+        this.owner,
+        `/cases/${sourceCaseId}/execution`,
+      );
+      const otherCase = await this.read(
         other,
         `/cases/${sourceCaseId}/execution`,
       );
@@ -1274,10 +1272,14 @@ async (page) => {
         "/cases/case_that_does_not_exist/execution",
       );
       this.check(
-        "the other administrator reads no execution of the Case",
-        hiddenCase.status === 404 &&
-          JSON.stringify(hiddenCase.body) === JSON.stringify(missingCase.body),
-        { hiddenCase, missingCase },
+        "the other administrator reads the Case and its execution",
+        otherCases.status === 200 &&
+          otherCases.body.cases.some((entry) => entry.caseId === sourceCaseId) &&
+          ownerCase.status === 200 &&
+          otherCase.status === 200 &&
+          JSON.stringify(otherCase.body) === JSON.stringify(ownerCase.body) &&
+          missingCase.status === 404,
+        { otherCases, otherCase, missingCase },
       );
 
       // The Context view leads to the pages that own the inspection of Case
@@ -1317,6 +1319,7 @@ async (page) => {
                 "Context discovery",
                 "/portal/preview/cafe/integrations?integration=typesafe",
               ],
+              ["On screen", "/portal/preview/cafe/access/data-flow#on-screen"],
             ]) &&
           contextReads.length === 0,
         { contextPages, contextReads },
@@ -1602,11 +1605,12 @@ async (page) => {
       this.check(
         "one table holds four scenarios on two models, and a model that ran nothing states its reason one time",
         JSON.stringify(several.rows) ===
+          // Each chip states its verdict and how many attempts passed.
           JSON.stringify([
-            ["Passed", "Passed", ...noRun],
-            ["Failed", "Passed", ...noRun],
-            ["Passed", "Passed", ...noRun],
-            ["Passed", "Passed", ...noRun],
+            ["Passed · 2 of 2", "Passed · 2 of 2", ...noRun],
+            ["Failed · 0 of 1", "Passed · 1 of 1", ...noRun],
+            ["Passed · 1 of 1", "Passed · 1 of 1", ...noRun],
+            ["Passed · 2 of 2", "Passed · 2 of 2", ...noRun],
           ]) &&
           several.notes === 0 &&
           several.summary.filter((line) => line.startsWith("Your OpenAI key."))
@@ -1704,9 +1708,18 @@ async (page) => {
   try {
     return await journey.run();
   } catch (error) {
+    // The owner's page at the failure shows what the step waited for.
+    const failureCapture = await journey
+      .capture(journey.owner, "failure-owner")
+      .then(
+        () => "failure-owner.png",
+        (captureError) => String(captureError),
+      );
     return {
       result: "failed",
       error: String(error),
+      failureCapture,
+      failureUrl: journey.owner.url(),
       checks: journey.checks,
       captures: journey.captures,
     };
