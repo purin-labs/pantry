@@ -128,6 +128,16 @@ function prepare(robot, cell, batchId) {
   };
 }
 
+// Native outputs are deterministic files, so equal results have equal bytes.
+// A failed deepEqual of two recordings of several MB builds a diff of many GB
+// (this journey once grew to 20 GB of memory before macOS stopped it).
+function assertSameFile(actual, expected, message) {
+  assert.ok(
+    readFileSync(actual.path).equals(readFileSync(expected.path)),
+    message,
+  );
+}
+
 function nativeResult(name, args) {
   const path = join(output, `${name}.json`);
   execFileSync(binary, ["--output", path, ...args], { timeout: 120000 });
@@ -163,7 +173,11 @@ function verifyOvenCycle(robot, cell) {
     "resume",
     paused.path,
   ]);
-  assert.deepEqual(resumed.value, loaded.value);
+  assertSameFile(
+    resumed,
+    loaded,
+    `${robot} ${cell}: the resumed loading differs from the uninterrupted one`,
+  );
   const extracting = nativeResult(
     `${robot}-${cell}-oven-extracted-checkpoint`,
     ["--pause-after", "extract_oven", "unload", loaded.path],
@@ -172,7 +186,11 @@ function verifyOvenCycle(robot, cell) {
     "resume",
     extracting.path,
   ]);
-  assert.deepEqual(returned.value, cycle.value);
+  assertSameFile(
+    returned,
+    cycle,
+    `${robot} ${cell}: the resumed retrieval differs from the uninterrupted cycle`,
+  );
   const closedRequest = nativeResult(`${robot}-${cell}-oven-closed-request`, [
     "prepare",
     "--robot",

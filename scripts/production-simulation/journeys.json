@@ -1124,10 +1124,11 @@
         "tool": "tsx",
         "args": ["{out}"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The process grows to about 20 GB of resident memory, and macOS stops it (exit 137) after about 90 s. It wrote the oven cycle files of the first arm before it stopped.",
-        "proof": "exit 137 at a30c096a8, three runs on 2026-11-17; /usr/bin/time -l gave a maximum resident set size of 19,971,309,568 bytes"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 12.3,
+        "date": "2026-11-19",
+        "commit": "b50d5aff6"
       }
     },
     {
