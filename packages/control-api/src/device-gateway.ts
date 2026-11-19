@@ -38,9 +38,27 @@ export const deviceKindSchema = Type.Union([
   Type.Literal("servo"),
   Type.Literal("relay"),
   Type.Literal("camera"),
+  Type.Literal("payment_terminal"),
   Type.Literal("other"),
 ]);
 export type DeviceHardwareKind = Static<typeof deviceKindSchema>;
+
+export const terminalPaymentMethodSchema = Type.Union([
+  Type.Literal("card"),
+  Type.Literal("felica"),
+  Type.Literal("qr_code"),
+]);
+export type TerminalPaymentMethod = Static<typeof terminalPaymentMethodSchema>;
+
+export const terminalCollectionOutcomeSchema = Type.Union([
+  Type.Literal("captured"),
+  Type.Literal("declined"),
+  Type.Literal("cancelled"),
+  Type.Literal("indeterminate"),
+]);
+export type TerminalCollectionOutcome = Static<
+  typeof terminalCollectionOutcomeSchema
+>;
 
 export const deviceHealthSchema = Type.Union([
   Type.Literal("ok"),
@@ -143,6 +161,21 @@ export const gatewayMessageSchema = Type.Union([
     },
     strict,
   ),
+  Type.Object(
+    {
+      type: Type.Literal("terminal_result"),
+      requestId: shortText,
+      sourceKey,
+      paymentAttemptId: shortText,
+      outcome: terminalCollectionOutcomeSchema,
+      providerPaymentReference: Type.Union([Type.Null(), shortText]),
+      paymentMethod: Type.Union([Type.Null(), terminalPaymentMethodSchema]),
+      tenderBrand: Type.Union([Type.Null(), shortText]),
+      providerRefundable: Type.Union([Type.Null(), Type.Boolean()]),
+      reasonCode: Type.Union([Type.Null(), shortText]),
+    },
+    strict,
+  ),
 ]);
 export type GatewayMessage = Static<typeof gatewayMessageSchema>;
 
@@ -179,6 +212,37 @@ export const platformGatewayMessageSchema = Type.Union([
       type: Type.Literal("refused"),
       reason: Type.Literal("unknown_device"),
       sourceKey,
+    },
+    strict,
+  ),
+  Type.Object(
+    {
+      type: Type.Literal("terminal_collect"),
+      requestId: shortText,
+      sourceKey,
+      paymentAttemptId: shortText,
+      amountMinor: Type.Integer({ minimum: 1 }),
+      currency: Type.String({ pattern: "^[A-Z]{3}$" }),
+      paymentMethod: terminalPaymentMethodSchema,
+      expiresAt: shortText,
+    },
+    strict,
+  ),
+  Type.Object(
+    {
+      type: Type.Literal("terminal_cancel"),
+      requestId: shortText,
+      sourceKey,
+      paymentAttemptId: shortText,
+    },
+    strict,
+  ),
+  Type.Object(
+    {
+      type: Type.Literal("terminal_inquire"),
+      requestId: shortText,
+      sourceKey,
+      paymentAttemptId: shortText,
     },
     strict,
   ),

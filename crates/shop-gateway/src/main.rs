@@ -9,6 +9,8 @@
 //! Plan 24 adds a typed adapter for each physical device. Today `--simulate`
 //! reads devices from a file, so that the whole path runs before any hardware.
 
+mod terminal;
+
 use std::fs;
 use std::io::ErrorKind;
 use std::net::TcpStream;
@@ -51,6 +53,9 @@ struct Simulation {
     sample_seconds: Option<u64>,
     /// A JPEG file that a simulated camera sends when Satyr asks for a snapshot.
     snapshot_file: Option<PathBuf>,
+    /// Simulated LAN payment terminal outcomes (Plan 90 Phase 4A).
+    #[serde(default)]
+    terminal_outcomes: Vec<terminal::SimulatedTerminalRule>,
 }
 
 #[derive(Deserialize)]
@@ -169,10 +174,11 @@ fn run(args: &[String]) -> Result<(), String> {
         }
         None => Simulation::default(),
     };
+    let mut journal = terminal::TerminalJournal::load(&folder)?;
     let mut wait = Duration::from_secs(1);
     loop {
         let started = Instant::now();
-        match connect_and_serve(url.trim(), credential.trim(), &simulation) {
+        match connect_and_serve(url.trim(), credential.trim(), &simulation, &mut journal) {
             RunEnd::Revoked => {
                 println!("Seams Pantry ended this gateway's access. It will not connect again.");
                 return Ok(());
@@ -195,7 +201,12 @@ fn socket_url(url: &str) -> String {
     format!("{base}/v1/device-gateways/socket")
 }
 
-fn connect_and_serve(url: &str, credential: &str, simulation: &Simulation) -> RunEnd {
+fn connect_and_serve(
+    url: &str,
+    credential: &str,
+    simulation: &Simulation,
+    journal: &mut terminal::TerminalJournal,
+) -> RunEnd {
     let mut request = match socket_url(url).into_client_request() {
         Ok(request) => request,
         Err(error) => return RunEnd::Dropped(error.to_string()),
@@ -216,7 +227,7 @@ fn connect_and_serve(url: &str, credential: &str, simulation: &Simulation) -> Ru
         return RunEnd::Dropped(error);
     }
     println!("Connected to Seams Pantry.");
-    serve(&mut socket, simulation, url, credential)
+    serve(&mut socket, simulation, journal, url, credential)
 }
 
 fn set_read_tick(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>) -> Result<(), String> {
@@ -239,6 +250,7 @@ fn send(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>, message: &Value) -> R
 fn serve(
     socket: &mut WebSocket<MaybeTlsStream<TcpStream>>,
     simulation: &Simulation,
+    journal: &mut terminal::TerminalJournal,
     url: &str,
     credential: &str,
 ) -> RunEnd {
@@ -293,10 +305,12 @@ fn serve(
             }
         }
         match socket.read() {
-            Ok(Message::Text(text)) => match answer(socket, text.as_str(), simulation, url, credential) {
-                Ok(welcome) => welcomed = welcomed || welcome,
-                Err(error) => return RunEnd::Dropped(error),
-            },
+            Ok(Message::Text(text)) => {
+                match answer(socket, text.as_str(), simulation, journal, url, credential) {
+                    Ok(welcome) => welcomed = welcomed || welcome,
+                    Err(error) => return RunEnd::Dropped(error),
+                }
+            }
             Ok(Message::Close(frame)) => {
                 let code = frame.as_ref().map(|close| close.code);
                 if code == Some(CloseCode::from(REVOKED_CODE)) {
@@ -318,6 +332,7 @@ fn answer(
     socket: &mut WebSocket<MaybeTlsStream<TcpStream>>,
     text: &str,
     simulation: &Simulation,
+    journal: &mut terminal::TerminalJournal,
     url: &str,
     credential: &str,
 ) -> Result<bool, String> {
@@ -346,6 +361,27 @@ fn answer(
                 socket,
                 &json!({ "type": "ack", "requestId": request, "outcome": outcome }),
             )?;
+            Ok(false)
+        }
+        Some("terminal_collect") => {
+            match journal.handle_collect(&message, &simulation.terminal_outcomes)? {
+                terminal::TerminalAction::SendResult(result) => {
+                    send(socket, &result)?;
+                    Ok(false)
+                }
+                terminal::TerminalAction::SimulateSocketDrop => {
+                    Err("simulated mid-flight socket drop".to_string())
+                }
+            }
+        }
+        Some("terminal_cancel") => {
+            let result = journal.handle_cancel(&message)?;
+            send(socket, &result)?;
+            Ok(false)
+        }
+        Some("terminal_inquire") => {
+            let result = journal.handle_inquire(&message)?;
+            send(socket, &result)?;
             Ok(false)
         }
         Some("refused") => {

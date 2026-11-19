@@ -310,7 +310,10 @@ class TestInPersonCollectionGateway implements InPersonCollectionGateway {
       session: {
         kind: "server_terminal_checkout",
         providerCheckoutReference: `terminal_checkout_${request.paymentAttemptId}`,
-        deviceId: request.paymentBinding.deviceId,
+        deviceId:
+          request.paymentBinding.provider === "square_terminal"
+            ? request.paymentBinding.deviceId
+            : request.paymentBinding.deviceSourceKey,
         expiresAt: request.expiresAt,
       },
     };

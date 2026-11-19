@@ -360,6 +360,8 @@ export function hardwareLabel(device: KitchenDeviceView): string {
       return "Relay";
     case "camera":
       return "Camera";
+    case "payment_terminal":
+      return "Payment terminal";
     case "other":
       return "Device";
     default:

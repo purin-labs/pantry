@@ -531,7 +531,7 @@ CREATE TABLE checkout_payment_attempt (
   payment_provider TEXT NOT NULL CHECK (
     payment_provider IN (
       'stripe_online', 'gmo_pg_online', 'square_online',
-      'square_terminal'
+      'square_terminal', 'gmo_stera'
     )
   ),
   provider_request_id TEXT NOT NULL,
@@ -2023,6 +2023,49 @@ CREATE INDEX IF NOT EXISTS manual_cash_refund_order
 ALTER TABLE square_terminal_checkout ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'card' CHECK (
   payment_method IN ('card', 'felica', 'qr_code')
 );
+
+ALTER TABLE checkout_payment_attempt RENAME TO checkout_payment_attempt_v90;
+DROP INDEX IF EXISTS checkout_payment_attempt_state;
+CREATE TABLE checkout_payment_attempt (
+  merchant_id TEXT NOT NULL,
+  payment_attempt_id TEXT NOT NULL,
+  checkout_id TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision > 0),
+  checkout_revision INTEGER NOT NULL CHECK (checkout_revision > 0),
+  quote_digest TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor >= 0),
+  currency TEXT NOT NULL,
+  payment_provider TEXT NOT NULL CHECK (
+    payment_provider IN (
+      'stripe_online', 'gmo_pg_online', 'square_online',
+      'square_terminal', 'gmo_stera'
+    )
+  ),
+  provider_request_id TEXT NOT NULL,
+  idempotency_key TEXT NOT NULL,
+  lifecycle_state TEXT NOT NULL CHECK (
+    lifecycle_state IN ('pending', 'processing', 'captured', 'declined', 'indeterminate')
+  ),
+  payment_attempt_json TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, payment_attempt_id),
+  UNIQUE (merchant_id, provider_request_id),
+  UNIQUE (merchant_id, idempotency_key),
+  FOREIGN KEY (merchant_id, checkout_id)
+    REFERENCES buyer_checkout (merchant_id, checkout_id) ON DELETE RESTRICT
+) STRICT;
+INSERT INTO checkout_payment_attempt (
+  merchant_id, payment_attempt_id, checkout_id, revision, checkout_revision,
+  quote_digest, amount_minor, currency, payment_provider, provider_request_id,
+  idempotency_key, lifecycle_state, payment_attempt_json
+)
+SELECT
+  merchant_id, payment_attempt_id, checkout_id, revision, checkout_revision,
+  quote_digest, amount_minor, currency, payment_provider, provider_request_id,
+  idempotency_key, lifecycle_state, payment_attempt_json
+FROM checkout_payment_attempt_v90 ORDER BY rowid;
+DROP TABLE checkout_payment_attempt_v90;
+CREATE INDEX checkout_payment_attempt_state
+  ON checkout_payment_attempt (merchant_id, lifecycle_state);
 `;
 
 function applySchemaV91(database: CommerceDatabase, appliedAt: string): void {

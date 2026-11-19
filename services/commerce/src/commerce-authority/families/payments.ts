@@ -108,6 +108,21 @@ export abstract class PaymentFamily extends CheckoutFamily {
         field: "inPersonCheckoutPayment.checkoutConfiguration",
       });
     }
+    if (command.paymentBinding.provider === "gmo_stera") {
+      return {
+        schemaVersion: "underclerk.in-person-checkout-payment-collection.v1",
+        outcome: "ready",
+        mutationOutcome: started.outcome,
+        receipt: started.receipt,
+        paymentAttemptId: command.paymentAttemptId,
+        session: {
+          kind: "gateway_terminal_checkout",
+          gatewayId: command.paymentBinding.gatewayId,
+          deviceSourceKey: command.paymentBinding.deviceSourceKey,
+          expiresAt: checkout.lifecycle.quote.expiresAt,
+        },
+      };
+    }
     const gateway = this.inPersonCollectionGateway;
     if (gateway === undefined) {
       return unavailableInPersonCheckoutCollection(

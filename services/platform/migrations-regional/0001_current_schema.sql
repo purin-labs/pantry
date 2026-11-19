@@ -3170,17 +3170,18 @@ CREATE TABLE cafe_terminal_assignment (
   satyr_location_id TEXT NOT NULL CHECK (length(satyr_location_id) BETWEEN 1 AND 255),
   provider_location_id TEXT NOT NULL CHECK (length(provider_location_id) BETWEEN 1 AND 255),
   device_id TEXT NOT NULL CHECK (length(device_id) BETWEEN 1 AND 255),
-  target_kind TEXT NOT NULL CHECK (target_kind IN ('sandbox_simulated', 'paired_physical')),
+  target_kind TEXT NOT NULL CHECK (target_kind IN ('sandbox_simulated', 'paired_physical', 'lan_gateway_device')),
   environment TEXT NOT NULL CHECK (environment IN ('development', 'production')),
   revision INTEGER NOT NULL CHECK (revision > 0),
   state TEXT NOT NULL CHECK (state IN ('active', 'retired')),
   assignment_json TEXT NOT NULL CHECK (json_valid(assignment_json)),
   recorded_at INTEGER NOT NULL CHECK (recorded_at >= 0),
   PRIMARY KEY (organisation_id, assignment_id, revision),
-  -- A simulated target belongs to development, a paired device to production.
+  -- A simulated target belongs to development, a paired device to production, and a LAN gateway device to either.
   CHECK (
     (target_kind = 'sandbox_simulated' AND environment = 'development') OR
-    (target_kind = 'paired_physical' AND environment = 'production')
+    (target_kind = 'paired_physical' AND environment = 'production') OR
+    (target_kind = 'lan_gateway_device')
   )
 );
 -- One counter sells through one terminal at a time.
@@ -4524,7 +4525,7 @@ CREATE TABLE device_enrollment (
   gateway_id TEXT NOT NULL REFERENCES device_gateway (gateway_id),
   source_key TEXT NOT NULL CHECK (length(source_key) BETWEEN 1 AND 120),
   name TEXT NOT NULL CHECK (length(name) BETWEEN 1 AND 120),
-  device_kind TEXT NOT NULL CHECK (device_kind IN ('cobot', 'appliance', 'servo', 'relay', 'camera', 'other')),
+  device_kind TEXT NOT NULL CHECK (device_kind IN ('cobot', 'appliance', 'servo', 'relay', 'camera', 'payment_terminal', 'other')),
   model TEXT NOT NULL,
   serial TEXT,
   firmware_version TEXT,

@@ -832,6 +832,9 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
     request: MerchantInPersonCollectionCommand,
   ): Promise<CommerceInPersonCollectionResultV1> {
     const binding = request.paymentBinding;
+    if (binding.provider !== "square_terminal") {
+      return this.#unavailable("payment_authority_unavailable");
+    }
     const bindingId = this.#accounts.bindingIdFor(request.merchantId, binding);
     if (bindingId === undefined)
       return this.#unavailable("payment_authority_unavailable");

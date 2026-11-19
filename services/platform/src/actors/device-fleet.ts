@@ -46,6 +46,18 @@ import {
   type DeviceCommandKind,
 } from "./device-command";
 import { runDeviceFleetSchemaMigrations } from "./device-fleet-schema";
+import {
+  clearTerminalResultUnknown,
+  deleteGatewayTerminalCollections,
+  markGatewayCollectionsUnknown,
+  openUnknownTerminalCollections,
+  readTerminalCollection,
+  recordTerminalResult,
+  reserveTerminalCollection,
+  type StartTerminalCollectionInput,
+  type StartTerminalCollectionResult,
+  type TerminalCollectionRecord,
+} from "./device-fleet-terminal";
 import { acceptSocket, closeSocket, openSockets } from "./hibernatable-sockets";
 import { eraseUnregisteredActorState } from "./unregistered-actor-erasure";
 
@@ -276,6 +288,104 @@ export class DeviceFleetActor extends DurableObject<Env> {
       closeSocket(socket, GATEWAY_REVOKED_CODE, "gateway_revoked");
     this.#sql.exec("DELETE FROM device_sample WHERE gateway_id = ?", gatewayId);
     deleteGatewayCommands(this.#sql, gatewayId);
+    deleteGatewayTerminalCollections(this.#sql, gatewayId);
+  }
+
+  /** Reserves exclusive collection ownership on one LAN payment terminal and dispatches `terminal_collect`. */
+  startTerminalCollection(
+    input: StartTerminalCollectionInput,
+  ): StartTerminalCollectionResult {
+    const sockets = this.#gatewaySockets(input.gatewayId);
+    if (sockets.length === 0) {
+      return {
+        ok: false,
+        reason: "gateway_offline",
+        active: readTerminalCollection(
+          this.#sql,
+          input.gatewayId,
+          input.sourceKey,
+        ),
+      };
+    }
+    const now = Date.now();
+    const reserved = reserveTerminalCollection(this.#sql, input, now);
+    if (!reserved.ok) return reserved;
+    const sent = this.sendToGateway(input.gatewayId, {
+      type: "terminal_collect",
+      requestId: reserved.record.requestId,
+      sourceKey: input.sourceKey,
+      paymentAttemptId: input.paymentAttemptId,
+      amountMinor: input.amountMinor,
+      currency: input.currency,
+      paymentMethod: input.paymentMethod,
+      expiresAt: input.expiresAt,
+    });
+    if (!sent) {
+      markGatewayCollectionsUnknown(this.#sql, input.gatewayId, now);
+      return {
+        ok: false,
+        reason: "gateway_offline",
+        active: readTerminalCollection(
+          this.#sql,
+          input.gatewayId,
+          input.sourceKey,
+        ),
+      };
+    }
+    return reserved;
+  }
+
+  cancelTerminalCollection(
+    input: Readonly<{
+      gatewayId: string;
+      sourceKey: string;
+      requestId: string;
+      paymentAttemptId: string;
+    }>,
+  ): boolean {
+    return this.sendToGateway(input.gatewayId, {
+      type: "terminal_cancel",
+      requestId: input.requestId,
+      sourceKey: input.sourceKey,
+      paymentAttemptId: input.paymentAttemptId,
+    });
+  }
+
+  inquireTerminalCollection(
+    input: Readonly<{
+      gatewayId: string;
+      sourceKey: string;
+      requestId: string;
+      paymentAttemptId: string;
+    }>,
+  ): boolean {
+    return this.sendToGateway(input.gatewayId, {
+      type: "terminal_inquire",
+      requestId: input.requestId,
+      sourceKey: input.sourceKey,
+      paymentAttemptId: input.paymentAttemptId,
+    });
+  }
+
+  readTerminalCollection(
+    gatewayId: string,
+    sourceKey: string,
+  ): TerminalCollectionRecord | null {
+    return readTerminalCollection(this.#sql, gatewayId, sourceKey);
+  }
+
+  clearTerminalResultUnknown(
+    gatewayId: string,
+    sourceKey: string,
+    paymentAttemptId: string,
+  ): boolean {
+    return clearTerminalResultUnknown(
+      this.#sql,
+      gatewayId,
+      sourceKey,
+      paymentAttemptId,
+      Date.now(),
+    );
   }
 
   /** A task began or changed on one of this gateway's devices. */
@@ -341,6 +451,17 @@ export class DeviceFleetActor extends DurableObject<Env> {
         });
         this.#send(socket, { type: "welcome", gatewayId });
         this.#sendOpenCommands(socket, gatewayId, now);
+        for (const unknown of openUnknownTerminalCollections(
+          this.#sql,
+          gatewayId,
+        )) {
+          this.#send(socket, {
+            type: "terminal_inquire",
+            requestId: `inquire_${unknown.requestId}`,
+            sourceKey: unknown.sourceKey,
+            paymentAttemptId: unknown.paymentAttemptId,
+          });
+        }
         await this.#applyHealth(scope, socket, gatewayId, message.health, now);
         this.#remember(gatewayId, now);
         await this.#announce(
@@ -365,6 +486,9 @@ export class DeviceFleetActor extends DurableObject<Env> {
         return;
       case "ack":
         await this.#applyAck(scope, gatewayId, message, now);
+        return;
+      case "terminal_result":
+        recordTerminalResult(this.#sql, gatewayId, message, now);
         return;
     }
   }
@@ -516,7 +640,8 @@ export class DeviceFleetActor extends DurableObject<Env> {
     const scope = await this.#scope();
     if (scope === null) return;
     const replaced = this.#gatewaySockets(attachment.gatewayId).length > 0;
-    if (!replaced)
+    if (!replaced) {
+      markGatewayCollectionsUnknown(this.#sql, attachment.gatewayId, now);
       await this.#announce(
         scope,
         {
@@ -526,6 +651,7 @@ export class DeviceFleetActor extends DurableObject<Env> {
         },
         now,
       );
+    }
     await this.#armAlarm(now, scope);
   }
 

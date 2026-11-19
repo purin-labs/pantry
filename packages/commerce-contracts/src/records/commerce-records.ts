@@ -2216,13 +2216,34 @@ export type SquareTerminalTransport = Static<
   typeof squareTerminalTransportSchema
 >;
 
-export const inPersonPaymentBindingSchema = StrictObject({
-  provider: Type.Literal("square_terminal"),
-  account: paymentAccountRecordSchema,
-  locationId: identityTextSchema,
-  deviceId: identityTextSchema,
-  transport: squareTerminalTransportSchema,
-});
+export const gmoSteraTransportSchema = Type.Literal("lan_gateway");
+export type GmoSteraTransport = Static<typeof gmoSteraTransportSchema>;
+
+export const inPersonTerminalTransportSchema = Type.Union([
+  squareTerminalTransportSchema,
+  gmoSteraTransportSchema,
+]);
+export type InPersonTerminalTransport = Static<
+  typeof inPersonTerminalTransportSchema
+>;
+
+export const inPersonPaymentBindingSchema = Type.Union([
+  StrictObject({
+    provider: Type.Literal("square_terminal"),
+    account: paymentAccountRecordSchema,
+    locationId: identityTextSchema,
+    deviceId: identityTextSchema,
+    transport: squareTerminalTransportSchema,
+  }),
+  StrictObject({
+    provider: Type.Literal("gmo_stera"),
+    account: paymentAccountRecordSchema,
+    locationId: identityTextSchema,
+    gatewayId: identityTextSchema,
+    deviceSourceKey: identityTextSchema,
+    transport: gmoSteraTransportSchema,
+  }),
+]);
 export type InPersonPaymentBinding = Static<
   typeof inPersonPaymentBindingSchema
 >;

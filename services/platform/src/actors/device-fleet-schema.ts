@@ -1,4 +1,5 @@
 import { deviceCommandSchemaStatements } from "./device-command";
+import { terminalCollectionSchemaStatements } from "./device-fleet-terminal";
 import {
   assertRequiredColumns,
   assertTableExists,
@@ -47,7 +48,7 @@ const DEVICE_FLEET_V1_TABLES = [
 
 const DEVICE_FLEET_SCHEMA_PLAN: SchemaMigrationPlan = {
   key: "device_fleet",
-  currentVersion: 2,
+  currentVersion: 3,
   preservedTables: DEVICE_FLEET_V1_TABLES,
   baseline: {
     version: 1,
@@ -75,6 +76,29 @@ const DEVICE_FLEET_SCHEMA_PLAN: SchemaMigrationPlan = {
           "created_at",
           "sent_at",
           "acked_at",
+        ]);
+      },
+    },
+    {
+      version: 3,
+      apply: (sql) => {
+        for (const statement of terminalCollectionSchemaStatements())
+          sql.exec(statement);
+      },
+      validate: (sql) => {
+        validateV1(sql);
+        assertRequiredColumns(sql, "terminal_collection", [
+          "gateway_id",
+          "source_key",
+          "request_id",
+          "payment_attempt_id",
+          "checkout_id",
+          "amount_minor",
+          "currency",
+          "payment_method",
+          "state",
+          "expires_at",
+          "updated_at",
         ]);
       },
     },

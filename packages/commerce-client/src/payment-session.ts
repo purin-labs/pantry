@@ -61,12 +61,19 @@ export type CommercePaymentSessionResultV1 =
       retryAfter: string;
     }>;
 
-export type CommerceInPersonCollectionSessionV1 = Readonly<{
-  kind: "server_terminal_checkout";
-  providerCheckoutReference: string;
-  deviceId: string;
-  expiresAt: string;
-}>;
+export type CommerceInPersonCollectionSessionV1 =
+  | Readonly<{
+      kind: "server_terminal_checkout";
+      providerCheckoutReference: string;
+      deviceId: string;
+      expiresAt: string;
+    }>
+  | Readonly<{
+      kind: "gateway_terminal_checkout";
+      gatewayId: string;
+      deviceSourceKey: string;
+      expiresAt: string;
+    }>;
 
 export type CommerceInPersonCollectionResultV1 =
   | Readonly<{

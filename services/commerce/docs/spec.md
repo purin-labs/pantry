@@ -584,7 +584,7 @@ Shopify: Shopify Payments, payment apps and disputes. Status: **Partial**.
 
 - A checkout profile's payment policy names a provider binding:
   `stripe_online`, `square_online` or `gmo_pg_online` online, and
-  `square_terminal` in person.
+  `square_terminal` or `gmo_stera` (`lan_gateway` via the shop gateway) in person.
 - Stripe runs inside Commerce. A merchant connects a Stripe account that
   is connected to the platform, or opens Stripe's hosted onboarding.
   Commerce makes the PaymentIntent on the connected account with the

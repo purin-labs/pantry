@@ -2062,10 +2062,13 @@ function placementTerminalId(
     return null;
   }
   const binding = paymentAttempt.binding.paymentBinding;
-  if (binding.provider !== "square_terminal") {
-    throw new Error(
-      "point_of_sale placement requires an in-person payment binding",
-    );
+  if (binding.provider === "square_terminal") {
+    return binding.deviceId;
   }
-  return binding.deviceId;
+  if (binding.provider === "gmo_stera") {
+    return `${binding.gatewayId}:${binding.deviceSourceKey}`;
+  }
+  throw new Error(
+    "point_of_sale placement requires an in-person payment binding",
+  );
 }
