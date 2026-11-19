@@ -71,7 +71,7 @@ it(
   120_000,
 );
 
-const PARENT_REQUEST = "<@U0SATYR> check tomorrow's croissant order";
+const PARENT_REQUEST = "<@U0PANTRY> check tomorrow's croissant order";
 const TITLE = "Check the oven 2 temperature probe";
 const BRIEF =
   "Oven 2 baked 40 degrees below its set point in three bakes today. Compare the probe reading with the bake log and tell the bakers if the probe must be replaced.";

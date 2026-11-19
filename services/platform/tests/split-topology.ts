@@ -36,7 +36,7 @@ export type SplitOrganisation = {
   readonly cookie: string;
 };
 
-const SPLIT_PUBLIC_ORIGIN = "https://satyr.example";
+const SPLIT_PUBLIC_ORIGIN = "https://pantry.example";
 const SPLIT_CELL = {
   kind: "affinity",
   placementCellId: "split-wnam",

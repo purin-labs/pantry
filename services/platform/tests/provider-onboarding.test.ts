@@ -29,7 +29,7 @@ import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv } from "./worker-fakes";
 
 const NOW = 1_784_390_000_000;
-const SCOPE_ORIGIN = "https://satyr.example.test";
+const SCOPE_ORIGIN = "https://pantry.example.test";
 const SCOPE_ENV = {
   PANTRY_PUBLIC_ORIGIN: SCOPE_ORIGIN,
   PANTRY_DEPLOYMENT_PROFILE: "local",

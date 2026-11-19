@@ -225,7 +225,7 @@ def main() -> None:
         require(status == 200, f"resume: {body}")
         step("the gateway answers a pause")
 
-        # 7. The gateway dies. Satyr cannot hear its devices, and it says unknown.
+        # 7. The gateway dies. Pantry cannot hear its devices, and it says unknown.
         gateway.kill()
         gateway.wait()
         lost = wait_for("an unknown cobot", lambda: (lambda d: d if d["connection"]["state"] == "unknown" else None)(named("Tray cobot")), 20)

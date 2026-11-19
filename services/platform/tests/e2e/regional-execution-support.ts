@@ -228,7 +228,7 @@ export async function regionalCallback(status: number): Promise<void> {
   for (const byte of digest) signature += byte.toString(16).padStart(2, "0");
   const context = createExecutionContext();
   const response = await gateway.fetch(
-    new Request("https://satyr.test/hook/whatsapp", {
+    new Request("https://pantry.test/hook/whatsapp", {
       method: "POST",
       headers: {
         "content-type": "application/json",

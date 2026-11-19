@@ -49,7 +49,7 @@ function counter(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
-    satyrLocationId: "satyr_location_1",
+    satyrLocationId: "pantry_location_1",
     blockedReason: null,
     assignment: assignment(),
     credentialHealth: "active",
@@ -119,7 +119,7 @@ describe("Portal terminal-operations boundary", function terminalBoundarySuite()
       body,
       intent,
     ) => {
-      expect(path).toBe(`${PATH}/satyr_location_1/retirement`);
+      expect(path).toBe(`${PATH}/pantry_location_1/retirement`);
       expect(method).toBe("POST");
       expect(body).toEqual({});
       expect(intent).toBe("terminal-retire:terminal_assignment_1:2");

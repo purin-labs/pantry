@@ -49,7 +49,7 @@ async function goalThreadJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_PAIR_GOAL",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> goal status",
+    text: "<@U0PANTRY> goal status",
   });
   await expect
     .poll(countOf.bind(null, recorded.delivered), { timeout: 15_000 })

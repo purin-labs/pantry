@@ -13,7 +13,7 @@
     // The built account Worker of the acceptance tests. The provider process
     // runs it, binds it as ACCOUNT_PLATFORM and adds the two keys of each run.
     "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "shared-account-satyr-e2e",
-    "ACCOUNT_PLATFORM_PROVISION_TOKEN": "shared-account-e2e-satyr-provision",
+    "ACCOUNT_PLATFORM_PROVISION_TOKEN": "shared-account-e2e-pantry-provision",
     "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-shared-account-e2e",
     "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "https://account.shared-account.invalid",
     "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://satyr.shared-account.invalid",

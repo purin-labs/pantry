@@ -53,7 +53,7 @@ it("changes a product description only after an owner approves the exact text", 
     "app_mention",
     "EvPiDescription",
     ROOT_TS,
-    "<@U0SATYR> Update the cookie box description.",
+    "<@U0PANTRY> Update the cookie box description.",
   );
   await expect
     .poll(() => slack.messages.map((message) => message.text).join("\n"), {

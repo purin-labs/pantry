@@ -78,7 +78,7 @@ async function ingressWorkerJourney(test: TestContext): Promise<void> {
       eventId: "Ev55E_IN_FORGED",
       messageTs: ROOT_TS,
       threadTs: ROOT_TS,
-      text: "<@U0SATYR> open this case",
+      text: "<@U0PANTRY> open this case",
     }),
   );
   forged.headers.set("x-slack-signature", `v0=${"0".repeat(64)}`);
@@ -93,7 +93,7 @@ async function ingressWorkerJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_IN_ROOT",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> open this case",
+    text: "<@U0PANTRY> open this case",
   });
   expect(root).toEqual(accepted("platform"));
   await expect.poll(slack.messageCount, { timeout: 30_000 }).toBe(1);
@@ -126,7 +126,7 @@ async function ingressWorkerJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_IN_SECOND",
     messageTs: SECOND_ROOT_TS,
     threadTs: SECOND_ROOT_TS,
-    text: "<@U0SATYR> open a second case",
+    text: "<@U0PANTRY> open a second case",
   });
   expect(secondRoot).toEqual(accepted("ingress"));
   await expect.poll(slack.messageCount, { timeout: 30_000 }).toBe(3);
@@ -193,7 +193,7 @@ async function ingressWorkerJourney(test: TestContext): Promise<void> {
         eventId: "Ev55E_IN_STRANGER",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> hello",
+        text: "<@U0PANTRY> hello",
       }),
     ),
   );
@@ -203,7 +203,7 @@ async function ingressWorkerJourney(test: TestContext): Promise<void> {
   );
   expect(await challenge.json()).toEqual({ challenge: "c-55e" });
   // Another path of the platform is not served through this Worker.
-  const health = await ingress.fetch(new Request("http://satyr.test/health"));
+  const health = await ingress.fetch(new Request("http://pantry.test/health"));
   expect(health.status).toBe(404);
   // The forged request, the root, the refusal, the stop command, the
   // unknown workspace and the challenge.

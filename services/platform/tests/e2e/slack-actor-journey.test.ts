@@ -39,7 +39,7 @@ async function acceptsSlackActorJourney(context: TestContext): Promise<void> {
     eventId: "Ev0E2EROOT",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> acknowledge this case",
+    text: "<@U0PANTRY> acknowledge this case",
   });
   const root = await exports.default.fetch(
     await signedSlackRequest(rootEnvelope),

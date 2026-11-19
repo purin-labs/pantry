@@ -62,7 +62,7 @@ it("explains denied commerce authority through composition and a direct read wit
     "app_mention",
     "EvPiCommerceDenied",
     ROOT_TS,
-    "<@U0SATYR> Read failed payments and open orders, and explain any missing access.",
+    "<@U0PANTRY> Read failed payments and open orders, and explain any missing access.",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 15_000 }).toBe(1);
   expect(requests).toHaveLength(4);
@@ -179,7 +179,7 @@ it("restores a Pi listing proposal and one approved effect after response loss a
     "app_mention",
     "EvPiListing",
     ROOT_TS,
-    "<@U0SATYR> Read the prepared cookie catalog and propose publishing its listing for approval.",
+    "<@U0PANTRY> Read the prepared cookie catalog and propose publishing its listing for approval.",
   );
   // The approval notice and the agent's reply. This workspace has no Portal
   // handles, so the notice names the place without a link.

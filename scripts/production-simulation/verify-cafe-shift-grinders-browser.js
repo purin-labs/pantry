@@ -248,7 +248,7 @@ async function portalControlRequest(route) {
         ok: true,
         identity: {
           userId,
-          email: "pta@satyr.test",
+          email: "pta@pantry.test",
           displayName: "Pta",
         },
         supportRole: null,

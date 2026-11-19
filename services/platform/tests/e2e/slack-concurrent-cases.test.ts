@@ -65,7 +65,7 @@ async function concurrentCasesJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_CONCURRENT_ALPHA_1",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: `<@U0SATYR> ${TURNS.alphaFirst.marker}`,
+    text: `<@U0PANTRY> ${TURNS.alphaFirst.marker}`,
   });
   await expect
     .poll(startedTurns.bind(null, model), { timeout: 15_000 })
@@ -77,7 +77,7 @@ async function concurrentCasesJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_CONCURRENT_BRAVO",
     messageTs: BRAVO_TS,
     threadTs: BRAVO_TS,
-    text: `<@U0SATYR> ${TURNS.bravo.marker}`,
+    text: `<@U0PANTRY> ${TURNS.bravo.marker}`,
   });
   await expect
     .poll(deliveredReplies.bind(null, delivered), { timeout: 15_000 })

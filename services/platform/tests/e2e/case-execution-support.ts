@@ -1127,7 +1127,7 @@ export async function storedContent(
 }
 
 /**
- * Writes `count` settled and uncertain Satyr Kitchen effects of a Session,
+ * Writes `count` settled and uncertain Kitchen effects of a Session,
  * whose request recovery cannot read.
  */
 export function seedDamagedSurfaceEffects(

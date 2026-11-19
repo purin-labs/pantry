@@ -18,7 +18,7 @@ import {
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
-const ORIGIN = "https://satyr.example";
+const ORIGIN = "https://pantry.example";
 
 describe("operator harness erasure routes", () => {
   it("requires the support administrator role", async () => {

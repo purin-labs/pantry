@@ -33,7 +33,7 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
   it("keeps admin routes hidden without the configured bearer", async function adminAuth() {
     const response = await handleCommerceLabRoute(
       new Request(
-        "https://satyr.test/v1/admin/commerce-lab/organisation_lab/reset",
+        "https://pantry.test/v1/admin/commerce-lab/organisation_lab/reset",
         {
           method: "POST",
         },
@@ -52,7 +52,7 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
   it("rejects unsigned ingress before organisation state is read", async function ingressSignature() {
     const response = await handleCommerceLabRoute(
       new Request(
-        "https://satyr.test/v1/hooks/commerce-lab/organisation_lab/events",
+        "https://pantry.test/v1/hooks/commerce-lab/organisation_lab/events",
         { method: "POST", body: "{}" },
       ),
       testEnv(),
@@ -134,7 +134,7 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
 
     const scenarioResponse = await handleCommerceLabRoute(
       new Request(
-        `https://satyr.test/v1/admin/commerce-lab/${organisationId}/scenarios/payment-failed`,
+        `https://pantry.test/v1/admin/commerce-lab/${organisationId}/scenarios/payment-failed`,
         {
           method: "POST",
           headers: {
@@ -195,7 +195,7 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
 
     const response = await handleCommerceLabRoute(
       new Request(
-        `https://satyr.test/v1/hooks/commerce-lab/${organisationId}/events`,
+        `https://pantry.test/v1/hooks/commerce-lab/${organisationId}/events`,
         {
           method: "POST",
           headers: {
@@ -231,7 +231,7 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
   it("returns method fencing before any admin state mutation", async function methodFence() {
     const response = await handleCommerceLabRoute(
       new Request(
-        "https://satyr.test/v1/admin/commerce-lab/organisation_lab/reset",
+        "https://pantry.test/v1/admin/commerce-lab/organisation_lab/reset",
         {
           method: "GET",
           headers: { authorization: `Bearer ${ADMIN_TOKEN}` },
@@ -455,7 +455,7 @@ function commerceScenarioRequest(
   idempotencyKey: string,
 ): Request {
   return new Request(
-    `https://satyr.test/v1/admin/commerce-lab/${organisationId}/scenarios/${scenarioId}`,
+    `https://pantry.test/v1/admin/commerce-lab/${organisationId}/scenarios/${scenarioId}`,
     {
       method: "POST",
       headers: {

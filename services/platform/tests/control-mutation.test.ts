@@ -108,7 +108,7 @@ describe("control mutation receipts", () => {
 });
 
 function mutationRequest(idempotencyKey: string): Request {
-  return new Request("https://satyr.example/v1/control/organisations", {
+  return new Request("https://pantry.example/v1/control/organisations", {
     method: "POST",
     headers: { "idempotency-key": idempotencyKey },
   });

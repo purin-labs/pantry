@@ -290,7 +290,7 @@ async function sendMessage(
     eventId: `EvGoal_${id}`,
     messageTs: ts,
     threadTs: root,
-    text: "<@U0SATYR> Review the bakery inventory.",
+    text: "<@U0PANTRY> Review the bakery inventory.",
   });
   expect(
     (await exports.default.fetch(await signedSlackRequest(body))).status,

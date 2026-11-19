@@ -256,7 +256,7 @@ async function connect(backend: Backend): Promise<void> {
     grant: {
       kind: "authorization_code",
       code: "code-from-the-cafe",
-      redirectUri: "https://satyr.example/callback",
+      redirectUri: "https://pantry.example/callback",
     },
   });
   await send("payment-accounts/square", {

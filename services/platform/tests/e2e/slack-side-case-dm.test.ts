@@ -84,7 +84,7 @@ async function slackSideCaseDmJourney(test: TestContext): Promise<void> {
         eventId: "Ev74_SIDE_CASE_DM_ROOT",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> what is on the bake list for Tuesday?",
+        text: "<@U0PANTRY> what is on the bake list for Tuesday?",
       }),
     ),
   );

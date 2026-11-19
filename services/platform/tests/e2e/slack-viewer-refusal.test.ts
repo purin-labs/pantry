@@ -41,7 +41,7 @@ async function viewerRefusalJourney(test: TestContext): Promise<void> {
     eventId: "EvViewer_WORKER",
     messageTs: "1787500200.000001",
     threadTs: "1787500200.000001",
-    text: "<@U0SATYR> what sold today?",
+    text: "<@U0PANTRY> what sold today?",
   });
   expect(firstMention).toEqual({ status: 200, durableMode: "rejected" });
   await expect.poll(slack.refusalCount, { timeout: 15_000 }).toBe(1);
@@ -58,7 +58,7 @@ async function viewerRefusalJourney(test: TestContext): Promise<void> {
     eventId: "EvViewer_OPEN",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> open this case",
+    text: "<@U0PANTRY> open this case",
   });
   expect(opened).toEqual({ status: 200, durableMode: "case_accepted" });
   await expect.poll(slack.messageCount, { timeout: 15_000 }).toBe(1);
@@ -70,7 +70,7 @@ async function viewerRefusalJourney(test: TestContext): Promise<void> {
     eventId: "EvViewer_CONNECTOR",
     messageTs: "1787500000.000002",
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> one more thing",
+    text: "<@U0PANTRY> one more thing",
   });
   expect(threadMention).toEqual({ status: 200, durableMode: "rejected" });
   await expect.poll(slack.refusalCount, { timeout: 15_000 }).toBe(2);

@@ -57,7 +57,7 @@ async function turnCompletionJourney(test: TestContext): Promise<void> {
         eventId: "Ev0E2EFINALIZEFIRST",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> summarise this case",
+        text: "<@U0PANTRY> summarise this case",
       }),
     ),
   );

@@ -226,7 +226,7 @@ async function sendSlack(
         eventId,
         messageTs,
         threadTs: ROOT_TS,
-        text: messageTs === ROOT_TS ? `<@U0SATYR> ${text}` : text,
+        text: messageTs === ROOT_TS ? `<@U0PANTRY> ${text}` : text,
       }),
     ),
   );

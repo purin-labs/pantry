@@ -351,7 +351,7 @@ async function mention(
         eventId,
         messageTs,
         threadTs,
-        text: "<@U0SATYR> how does the morning bake run?",
+        text: "<@U0PANTRY> how does the morning bake run?",
       }),
     ),
   );

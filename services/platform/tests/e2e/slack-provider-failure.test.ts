@@ -49,7 +49,7 @@ async function acceptsProviderFailureAndAnsweredRetry(
     eventId: "Ev0E2EPROVIDERFAILURE",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> inspect this case",
+    text: "<@U0PANTRY> inspect this case",
   });
   const admitted = await exports.default.fetch(
     await signedSlackRequest(envelope),

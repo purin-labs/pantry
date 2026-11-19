@@ -25,7 +25,7 @@ import {
 } from "./worker-fakes";
 
 const ADMIN_TOKEN = "identity-link-authority-admin-token";
-const ORIGIN = "https://satyr.example";
+const ORIGIN = "https://pantry.example";
 const WORKSPACE_ID = "T0IDENTITYLINK";
 
 describe("provider-neutral identity linking", identityLinkSuite);

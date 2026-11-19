@@ -284,7 +284,7 @@ async function ask(
         eventId,
         messageTs,
         threadTs,
-        text: `<@U0SATYR> ${question}`,
+        text: `<@U0PANTRY> ${question}`,
       }),
     ),
   );

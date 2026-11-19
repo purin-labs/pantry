@@ -60,7 +60,7 @@ function KitchenChatPreview(props: {
         }}
         organisation={{
           organisationHandle: "kitchen",
-          name: "Satyr Kitchen acceptance",
+          name: "Kitchen acceptance",
           choices: [],
         }}
         workspace={{
@@ -79,7 +79,7 @@ function KitchenChatPreview(props: {
           content: (
             <ChatPage
               context={{
-                organisation: "Satyr Kitchen acceptance",
+                organisation: "Kitchen acceptance",
                 workspace: "Cafe operations",
                 area: descriptor.group,
                 view: descriptor.navigationLabel,

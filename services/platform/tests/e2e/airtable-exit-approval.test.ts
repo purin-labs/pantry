@@ -136,7 +136,7 @@ async function airtableExit({ task }: TestContext): Promise<void> {
         eventId: "EvAIRTABLE_EXIT",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> add order 481 to the order base",
+        text: "<@U0PANTRY> add order 481 to the order base",
       }),
     ),
   );

@@ -51,7 +51,7 @@ async function censusAgesJourney(test: TestContext): Promise<void> {
         eventId: "EvR15CensusAges",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> how many trays does the proofer hold tonight?",
+        text: "<@U0PANTRY> how many trays does the proofer hold tonight?",
       }),
     ),
   );

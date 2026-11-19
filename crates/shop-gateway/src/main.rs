@@ -1,4 +1,4 @@
-//! The Satyr shop gateway (Plan 85): a small program on a computer in the shop.
+//! The Pantry shop gateway (Plan 85): a small program on a computer in the shop.
 //!
 //! It enrolls once with a one-time code, then dials out and holds one socket to
 //! the Platform. The shop opens no port, and the Platform never calls it. Only
@@ -51,7 +51,7 @@ struct Simulation {
     /// Seconds between heartbeats and between samples, for a short journey.
     heartbeat_seconds: Option<u64>,
     sample_seconds: Option<u64>,
-    /// A JPEG file that a simulated camera sends when Satyr asks for a snapshot.
+    /// A JPEG file that a simulated camera sends when Pantry asks for a snapshot.
     snapshot_file: Option<PathBuf>,
     /// Simulated LAN payment terminal outcomes (Plan 90 Phase 4A).
     #[serde(default)]

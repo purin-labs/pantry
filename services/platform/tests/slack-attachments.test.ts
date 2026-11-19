@@ -513,7 +513,7 @@ function slackEvent(
         type: "app_mention",
         channel: "C0BGCHANNEL",
         user: "U0BGUSER",
-        text: "<@U0BGSATYR> inspect this",
+        text: "<@U0BGPANTRY> inspect this",
         ts: "1780000000.000001",
         event_ts: "1780000000.000001",
         files: [
@@ -547,7 +547,7 @@ function slackEventWithoutFiles(): SlackMessageEvent {
         type: "app_mention",
         channel: "C0BGCHANNEL",
         user: "U0BGUSER",
-        text: "<@U0BGSATYR> inspect this",
+        text: "<@U0BGPANTRY> inspect this",
         ts: "1780000000.000001",
         event_ts: "1780000000.000001",
       },

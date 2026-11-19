@@ -81,7 +81,7 @@ import {
 
 const BRIEF = "CONNECTED_FORK_BRIEF: proofing capacity is twelve trays.";
 const SOURCE_TEXT =
-  "<@U0SATYR> retain these bakery files as historical context.";
+  "<@U0PANTRY> retain these bakery files as historical context.";
 const SOURCE_RESPONSE = "The connected bakery files are accepted.";
 const SOURCE_ID = requiredConversationId(
   "conv_00000000-0000-4000-8000-0000000042a1",

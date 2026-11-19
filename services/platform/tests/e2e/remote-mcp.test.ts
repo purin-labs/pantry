@@ -1111,7 +1111,7 @@ it("reads a reviewed connector through the Slack Actor after discovery outlives 
           eventId: "EvDelayedConnectorRead",
           messageTs: ROOT_TS,
           threadTs: ROOT_TS,
-          text: "<@U0SATYR> Discover the reviewed supplier inventory and read it.",
+          text: "<@U0PANTRY> Discover the reviewed supplier inventory and read it.",
         }),
       ),
     );

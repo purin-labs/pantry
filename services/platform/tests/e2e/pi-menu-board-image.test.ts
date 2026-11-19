@@ -84,7 +84,7 @@ it(
     const ownerPeer = await BoardPeer.open(`${BASE}/menu-boards/${script.boardId}/socket`, journey.owner);
     try {
       // Sous Chef places the image and sets it to fit inside its rect.
-      await sendListingMessage("app_mention", "EvImageBoard", ROOT_TS, "<@U0SATYR> Put the morning bake photo on the Window board.");
+      await sendListingMessage("app_mention", "EvImageBoard", ROOT_TS, "<@U0PANTRY> Put the morning bake photo on the Window board.");
       await expect.poll(delivered.bind(null, journey.slack), { timeout: 45_000 }).toContain("IM_DONE");
       await expect
         .poll(() => ownerPeer.read().elements.map(imageView), { timeout: 10_000 })
@@ -117,7 +117,7 @@ it(
       expect(other.status).toBe(404);
       task.meta.menuBoardImage = {
         substituted: ["model provider (deterministic OpenRouter transport)", "Slack (signed events)"],
-        real: ["Satyr Worker, the board room, the media routes and the screen media route", "Underclerk fixture Worker with its R2 store", "screen feed"],
+        real: ["Pantry Worker, the board room, the media routes and the screen media route", "Underclerk fixture Worker with its R2 store", "screen feed"],
         viewerUpload: { status: refused.status, body: JSON.parse(refusal) as unknown },
         library: library.filter((image) => image.altText === ALT).map((image) => ({ altText: image.altText, url: image.url !== null })),
         board: ownerPeer.read().elements.map((element) => ({ ...imageView(element), mediaId: "media_…" })),

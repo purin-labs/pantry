@@ -56,7 +56,7 @@ async function followUpArgumentsJourney(test: TestContext): Promise<void> {
         eventId: "Ev_FOLLOW_UP_ARGUMENTS",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> check the croissant dough in 40 minutes",
+        text: "<@U0PANTRY> check the croissant dough in 40 minutes",
       }),
     ),
   );

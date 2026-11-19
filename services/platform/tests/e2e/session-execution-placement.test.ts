@@ -237,7 +237,7 @@ async function sendSlack(eventId: string, timestamp: string): Promise<void> {
         eventId,
         messageTs: timestamp,
         threadTs: timestamp,
-        text: "<@U0SATYR> List connected integrations.",
+        text: "<@U0PANTRY> List connected integrations.",
       }),
     ),
   );

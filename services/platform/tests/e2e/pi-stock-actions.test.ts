@@ -110,7 +110,7 @@ it("changes stock and purchasing only after an owner approves the exact change",
         "app_mention",
         `Ev${marker}`,
         ts,
-        `<@U0SATYR> ${text}`,
+        `<@U0PANTRY> ${text}`,
         ts,
       );
       await expect

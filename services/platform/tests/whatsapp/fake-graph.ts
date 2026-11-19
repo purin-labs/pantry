@@ -21,7 +21,7 @@ export type FakeSendOutcome =
   | { readonly kind: "server_error"; readonly status: number }
   | { readonly kind: "network_failure" }
   | { readonly kind: "timeout" }
-  /** A 200 that carries no message id: accepted by HTTP, unprovable by Satyr. */
+  /** A 200 that carries no message id: accepted by HTTP, unprovable by Pantry. */
   | { readonly kind: "ambiguous_body" };
 
 export type FakeGraphOptions = {

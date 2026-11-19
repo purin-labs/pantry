@@ -57,7 +57,7 @@ it("preserves the exact canonical message across actor eviction", async () => {
         eventId: "Ev0E2ERESTORE",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> read this",
+        text: "<@U0PANTRY> read this",
         files: [
           {
             id: "F0E2ERESTORE",

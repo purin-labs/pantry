@@ -32,7 +32,7 @@ import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../src/mail/gmail-authorization";
 
 const NOW = 1_784_016_325_277;
-const ORIGIN = "https://satyr.example";
+const ORIGIN = "https://pantry.example";
 const PROPOSAL = "proposal_case_gmail_g_t9_m4";
 const CASE_ID = "case_gmail_g_t9";
 const THREAD = "t9";

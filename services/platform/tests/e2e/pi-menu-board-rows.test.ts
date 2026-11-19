@@ -77,7 +77,7 @@ it(
       "app_mention",
       "EvRowsMenu",
       ROOT_TS,
-      "<@U0SATYR> Put the taro milk tea under Drinks and the sesame financier under Pastries.",
+      "<@U0PANTRY> Put the taro milk tea under Drinks and the sesame financier under Pastries.",
     );
     await expect
       .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
@@ -189,7 +189,7 @@ it(
           "Slack (signed events)",
         ],
         real: [
-          "Satyr Worker and the board room",
+          "Pantry Worker and the board room",
           "Underclerk fixture Worker",
           "screen feed",
         ],

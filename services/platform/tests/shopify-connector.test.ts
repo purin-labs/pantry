@@ -96,7 +96,7 @@ describe("Shopify cue webhook boundary", function shopifyCueWebhookSuite() {
 
 async function fetchesOrderRefresh(): Promise<void> {
   const refreshed = await fetchShopifyOrderCommerceRefresh({
-    shopDomain: "satyr-test.myshopify.com",
+    shopDomain: "pantry-test.myshopify.com",
     accessToken: "shopify-test-token-42",
     organisationId: requireOrganisationId(),
     integrationAccountId: requireIntegrationAccountId(),
@@ -126,7 +126,7 @@ async function registersShopifyWebhooks(): Promise<void> {
   const endpointUrl =
     "https://example.test/hook/shopify/organisation_T0BGQSSG45N";
   const registration = await registerShopifyWebhooks({
-    shopDomain: "satyr-test.myshopify.com",
+    shopDomain: "pantry-test.myshopify.com",
     accessToken: "shopify-test-token-42",
     endpointUrl,
     fetcher: shopifyWebhookFetcher,
@@ -184,7 +184,7 @@ async function registersShopifyWebhooks(): Promise<void> {
   });
   expect(capturedShopifyRequests).toHaveLength(6);
   expect(createRequest?.url).toBe(
-    "https://satyr-test.myshopify.com/admin/api/2026-07/graphql.json",
+    "https://pantry-test.myshopify.com/admin/api/2026-07/graphql.json",
   );
   expect(createRequest?.method).toBe("POST");
   expect(createRequest?.body).toMatchObject({
@@ -205,7 +205,7 @@ async function registersInventoryWithoutProtectedOrders(): Promise<void> {
   const endpointUrl =
     "https://example.test/hook/shopify/organisation_T0BGQSSG45N";
   const registration = await registerShopifyWebhooks({
-    shopDomain: "satyr-test.myshopify.com",
+    shopDomain: "pantry-test.myshopify.com",
     accessToken: "shopify-test-token-42",
     endpointUrl,
     fetcher: shopifyProtectedOrderFetcher,
@@ -263,7 +263,7 @@ async function updatesStaleShopifyWebhook(): Promise<void> {
   const endpointUrl =
     "https://example.test/hook/shopify/organisation_T0BGQSSG45N";
   const registration = await registerShopifyWebhooks({
-    shopDomain: "satyr-test.myshopify.com",
+    shopDomain: "pantry-test.myshopify.com",
     accessToken: "shopify-test-token-42",
     endpointUrl,
     fetcher: shopifyStaleWebhookFetcher,
@@ -671,7 +671,7 @@ function normalizesShopifyCommerceResources(): void {
 async function fetchesInitialCommerce(): Promise<void> {
   capturedShopifyFetcherReceiver = null;
   const snapshot = await fetchShopifyInitialCommerce({
-    shopDomain: "satyr-test.myshopify.com",
+    shopDomain: "pantry-test.myshopify.com",
     accessToken: "shopify-test-token-42",
     organisationId: requireOrganisationId(),
     integrationAccountId: requireIntegrationAccountId(),
@@ -803,7 +803,7 @@ async function fetchesInitialCommerce(): Promise<void> {
 async function skipsInitialLocationsWithoutScope(): Promise<void> {
   capturedShopifyRequests = [];
   const snapshot = await fetchShopifyInitialCommerce({
-    shopDomain: "satyr-test.myshopify.com",
+    shopDomain: "pantry-test.myshopify.com",
     accessToken: "shopify-test-token-42",
     organisationId: requireOrganisationId(),
     integrationAccountId: requireIntegrationAccountId(),
@@ -892,7 +892,7 @@ function shopifyHeaders(topic: string, webhookId: string) {
   return {
     topic,
     webhookId,
-    shopDomain: "satyr-test.myshopify.com",
+    shopDomain: "pantry-test.myshopify.com",
     triggeredAt: "2026-07-13T00:00:00Z",
   };
 }
@@ -1085,7 +1085,7 @@ async function shopifyInitialSyncFetcher(
   capturedShopifyFetcherReceiver = this;
   const url = input instanceof Request ? input.url : String(input);
   expect(url).toBe(
-    "https://satyr-test.myshopify.com/admin/api/2026-07/graphql.json",
+    "https://pantry-test.myshopify.com/admin/api/2026-07/graphql.json",
   );
   const body = parseCapturedShopifyBody(init?.body);
   expect(body.variables).toMatchObject({ first: 100, after: null });
@@ -1393,7 +1393,7 @@ async function shopifyOrderRefreshFetcher(
 ): Promise<Response> {
   const url = input instanceof Request ? input.url : String(input);
   expect(url).toBe(
-    "https://satyr-test.myshopify.com/admin/api/2026-07/graphql.json",
+    "https://pantry-test.myshopify.com/admin/api/2026-07/graphql.json",
   );
   const body = parseCapturedShopifyBody(init?.body);
   expect(body.variables).toEqual({ id: "gid://shopify/Order/42" });

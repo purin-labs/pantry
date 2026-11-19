@@ -75,7 +75,7 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_counter_sale";
 const MERCHANT_ID = "merchant_counter_sale";
-const BASE = `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/counter-sales`;
+const BASE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/counter-sales`;
 const DIGEST = `quote_${"ab".repeat(32)}`;
 
 let db: SingleDatabase;
@@ -139,7 +139,7 @@ function counterRequest(url: string, body: Record<string, unknown>): Request {
   return new Request(url, {
     method: "POST",
     headers: {
-      origin: "https://satyr.example",
+      origin: "https://pantry.example",
       cookie:
         "satyr_control_session=session-counter; satyr_control_csrf=csrf-counter",
       "x-satyr-csrf": "csrf-counter",
@@ -231,7 +231,7 @@ function placedSnapshot(
 
 function env(): UnitTestEnv {
   return platformEnv({
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
     DB: db,
   });
 }

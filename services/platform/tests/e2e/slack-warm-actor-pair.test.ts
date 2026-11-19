@@ -316,7 +316,7 @@ async function acceptSlack(
         eventId,
         messageTs,
         threadTs,
-        text: root ? "<@U0SATYR> open this thread" : "continue this thread",
+        text: root ? "<@U0PANTRY> open this thread" : "continue this thread",
       }),
     ),
   );

@@ -880,7 +880,7 @@ function acceptRoot(): Promise<void> {
     eventId: "Ev55E_ARCHIVE_ROOT",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: `<@U0SATYR> ${ROOT_PROMPT}`,
+    text: `<@U0PANTRY> ${ROOT_PROMPT}`,
   });
 }
 

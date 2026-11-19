@@ -239,7 +239,7 @@ async function sendMessage(
     eventId: `EvNativeGoal_${id}`,
     messageTs: ts,
     threadTs: ROOT_TS,
-    text: `<@U0SATYR> ${text}`,
+    text: `<@U0PANTRY> ${text}`,
   });
   expect(
     (await exports.default.fetch(await signedSlackRequest(body))).status,

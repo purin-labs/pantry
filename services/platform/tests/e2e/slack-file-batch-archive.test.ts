@@ -67,7 +67,7 @@ it("stores and prepares the three files of one Slack message together", async ({
         eventId: "Ev0E2EBATCH",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> what do these say",
+        text: "<@U0PANTRY> what do these say",
         files: sources.map((source) => ({
           id: source.id,
           name: source.name,

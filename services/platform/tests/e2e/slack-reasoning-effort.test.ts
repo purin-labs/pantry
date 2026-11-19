@@ -177,7 +177,7 @@ async function sendSlack(
         eventId,
         messageTs,
         threadTs,
-        text: mention ? "<@U0SATYR> How is the croissant dough?" : "And now?",
+        text: mention ? "<@U0PANTRY> How is the croissant dough?" : "And now?",
       }),
     ),
   );

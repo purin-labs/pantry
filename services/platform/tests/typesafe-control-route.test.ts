@@ -17,7 +17,7 @@ vi.mock("../src/actors/actor-router", () => ({
 import { handleControlRequest } from "../src/control-router";
 
 const URL =
-  "https://satyr.example/v1/control/organisations/organisation_typesafe/integrations/typesafe";
+  "https://pantry.example/v1/control/organisations/organisation_typesafe/integrations/typesafe";
 const ENV = {} as UnitTestEnv;
 
 describe("organisation TypeSafe control route", suite);

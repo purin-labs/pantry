@@ -68,7 +68,7 @@ export async function askInSlack(eventId: string): Promise<void> {
         eventId,
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> how does the morning bake run?",
+        text: "<@U0PANTRY> how does the morning bake run?",
       }),
     ),
   );

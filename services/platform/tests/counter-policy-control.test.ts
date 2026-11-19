@@ -56,7 +56,7 @@ import { parseOrganisationId } from "../src/ids";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_counter_policy";
-const ROUTE = `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/counter-policies`;
+const ROUTE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/counter-policies`;
 const MERCHANT_ID = "merchant_counter_policy";
 
 function policy(
@@ -99,7 +99,7 @@ function publicationRequest(body: Record<string, unknown>): Request {
   return new Request(ROUTE, {
     method: "POST",
     headers: {
-      origin: "https://satyr.example",
+      origin: "https://pantry.example",
       cookie:
         "satyr_control_session=session-counter; satyr_control_csrf=csrf-counter",
       "x-satyr-csrf": "csrf-counter",
@@ -111,7 +111,7 @@ function publicationRequest(body: Record<string, unknown>): Request {
 }
 
 function env(): UnitTestEnv {
-  return platformEnv({ PANTRY_PUBLIC_ORIGIN: "https://satyr.example" });
+  return platformEnv({ PANTRY_PUBLIC_ORIGIN: "https://pantry.example" });
 }
 
 describe("counter policy control routes", function counterPolicySuite() {

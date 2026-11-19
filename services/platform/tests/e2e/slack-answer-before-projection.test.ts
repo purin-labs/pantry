@@ -61,7 +61,7 @@ async function answerBeforeProjection(test: TestContext): Promise<void> {
         eventId: "Ev55E_PROJECTION",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> open this case",
+        text: "<@U0PANTRY> open this case",
       }),
     ),
   );

@@ -129,7 +129,7 @@ function testSourceBounds(): void {
 
 async function testUnauthorized(): Promise<void> {
   const request = new Request(
-    "https://satyr.example/v1/control/organisations/organisation_1/access-control/explain",
+    "https://pantry.example/v1/control/organisations/organisation_1/access-control/explain",
     {
       method: "POST",
       body: JSON.stringify({}),

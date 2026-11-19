@@ -154,7 +154,7 @@ it(
         "app_mention",
         "EvCommentsUrk",
         ROOT_TS,
-        "<@U0SATYR> Please handle the open comment on the Counter board.",
+        "<@U0PANTRY> Please handle the open comment on the Counter board.",
       );
       await expect
         .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
@@ -211,7 +211,7 @@ it(
           "Slack (signed events)",
         ],
         real: [
-          "Satyr Worker, the board room and its comment store",
+          "Pantry Worker, the board room and its comment store",
           "Underclerk fixture Worker",
           "screen feed",
         ],

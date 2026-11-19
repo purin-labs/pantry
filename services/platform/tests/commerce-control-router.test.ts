@@ -212,11 +212,11 @@ describe("commerce action approval route", () => {
 
     const response = await handleControlRequest(
       new Request(
-        `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/actions/00000000-0000-4000-8000-000000000001/approval`,
+        `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/actions/00000000-0000-4000-8000-000000000001/approval`,
         {
           method: "POST",
           headers: {
-            origin: "https://satyr.example",
+            origin: "https://pantry.example",
             cookie:
               "satyr_control_session=session-console; satyr_control_csrf=csrf-console",
             "x-satyr-csrf": "csrf-console",
@@ -499,11 +499,11 @@ function configurePendingDescriptionAction(state: "signed" | "indeterminate") {
 
 function descriptionExecutionRequest(): Request {
   return new Request(
-    `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/actions/00000000-0000-4000-8000-000000000040/execute`,
+    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/actions/00000000-0000-4000-8000-000000000040/execute`,
     {
       method: "POST",
       headers: {
-        origin: "https://satyr.example",
+        origin: "https://pantry.example",
         cookie:
           "satyr_control_session=session-console; satyr_control_csrf=csrf-console",
         "x-satyr-csrf": "csrf-console",
@@ -518,7 +518,7 @@ describe("Google OIDC callback state binding", () => {
   it("rejects a callback without the browser state cookie", async () => {
     const response = await handleControlRequest(
       new Request(
-        "https://satyr.example/v1/control/auth/google/callback?state=state-1&code=code-1",
+        "https://pantry.example/v1/control/auth/google/callback?state=state-1&code=code-1",
       ),
       googleCallbackEnv(),
     );
@@ -533,7 +533,7 @@ describe("Google OIDC callback state binding", () => {
   it("rejects a callback whose browser state cookie does not match", async () => {
     const response = await handleControlRequest(
       new Request(
-        "https://satyr.example/v1/control/auth/google/callback?state=state-1&code=code-1",
+        "https://pantry.example/v1/control/auth/google/callback?state=state-1&code=code-1",
         {
           headers: { cookie: "satyr_control_oidc_state=state-2" },
         },
@@ -713,7 +713,7 @@ describe("commerce control query routes", () => {
       }
     }
     const unauthorized = await handleControlRequest(
-      new Request(`https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/home`),
+      new Request(`https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/home`),
       env,
     );
     expect(unauthorized.status).toBe(401);
@@ -846,18 +846,18 @@ function configureCommerceControlSession(): { readonly env: UnitTestEnv } {
 }
 
 function authenticatedRequest(path: string): Request {
-  return new Request(`https://satyr.example${path}`, {
+  return new Request(`https://pantry.example${path}`, {
     headers: { cookie: "satyr_control_session=session-console" },
   });
 }
 
 function commerceSystemSyncRequest(): Request {
   return new Request(
-    `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce-system/sync`,
+    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce-system/sync`,
     {
       method: "POST",
       headers: {
-        origin: "https://satyr.example",
+        origin: "https://pantry.example",
         cookie:
           "satyr_control_session=session-console; satyr_control_csrf=csrf-console",
         "x-satyr-csrf": "csrf-console",
@@ -895,7 +895,7 @@ function routeEnv(): UnitTestEnv {
       placementCellId: "test",
       locationHint: "wnam",
     }),
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
     PANTRY_DEPLOYMENT_PROFILE: "local",
     SLACK_APP_ID: "A_COMMERCE_CONSOLE",
   });
@@ -929,14 +929,14 @@ function homeProjection() {
 function approvalRouteEnv(): UnitTestEnv {
   return platformEnv({
     ...routeEnv(),
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
   });
 }
 
 function googleCallbackEnv(): UnitTestEnv {
   return platformEnv({
     DB: {},
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
     GOOGLE_OIDC_CLIENT_ID: "google-client-id",
     GOOGLE_OIDC_CLIENT_SECRET: "google-client-secret",
   });

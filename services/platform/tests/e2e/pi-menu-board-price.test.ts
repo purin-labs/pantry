@@ -92,7 +92,7 @@ it(
       "app_mention",
       "EvBoardItem",
       ROOT_TS,
-      "<@U0SATYR> Put the taro milk tea on the menu.",
+      "<@U0PANTRY> Put the taro milk tea on the menu.",
     );
     await expect
       .poll(delivered.bind(null, slack), { timeout: 30_000 })
@@ -237,7 +237,7 @@ it(
         "model provider (deterministic OpenRouter transport)",
         "Slack (signed events, interaction payloads and response URLs)",
       ],
-      real: ["Satyr Worker", "Underclerk fixture Worker", "screen feed"],
+      real: ["Pantry Worker", "Underclerk fixture Worker", "screen feed"],
       toolOutputs: script.outputs,
       card: { text: card.text, buttons: cardButtons(card) },
       record: record.details,

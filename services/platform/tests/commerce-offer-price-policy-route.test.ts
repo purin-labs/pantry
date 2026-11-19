@@ -42,7 +42,7 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 const ORGANISATION_ID = "organisation_price_policy";
 const MERCHANT_ID = "merchant_cafe";
 const OFFER_PATH = "underclerk%3Amerchant_cafe%3Aoffer_coffee";
-const ROUTE = `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/offers/${OFFER_PATH}/price-policy`;
+const ROUTE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/offers/${OFFER_PATH}/price-policy`;
 
 describe("Offer price policy control route", () => {
   beforeEach(() => {
@@ -115,7 +115,7 @@ function write(
     method,
     headers: {
       cookie: COOKIE,
-      origin: "https://satyr.example",
+      origin: "https://pantry.example",
       "x-satyr-csrf": "csrf-price",
       "content-type": "application/json",
       "idempotency-key": idempotencyKey,
@@ -187,6 +187,6 @@ function routeEnv(): UnitTestEnv {
       prepare: vi.fn().mockReturnValue({ bind }),
       withSession: vi.fn().mockReturnThis(),
     },
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
   });
 }

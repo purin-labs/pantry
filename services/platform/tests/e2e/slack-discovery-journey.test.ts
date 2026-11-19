@@ -39,7 +39,7 @@ it("carries governed integration discovery and granted file context only to the 
         eventId: "Ev0E2EDISCOVERY",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> What integrations are connected?",
+        text: "<@U0PANTRY> What integrations are connected?",
       }),
     ),
   );
@@ -111,7 +111,7 @@ it("carries governed integration discovery and granted file context only to the 
         eventId: "Ev0E2EOTHERWORKSPACE",
         messageTs: "1787500000.000010",
         threadTs: "1787500000.000010",
-        text: "<@U0SATYR> What integrations are connected?",
+        text: "<@U0PANTRY> What integrations are connected?",
       }),
     ),
   );
@@ -131,7 +131,7 @@ it("carries governed integration discovery and granted file context only to the 
         eventId: "Ev0E2EREVOKEDPERSON",
         messageTs: "1787500000.000011",
         threadTs: "1787500000.000011",
-        text: "<@U0SATYR> What integrations are connected?",
+        text: "<@U0PANTRY> What integrations are connected?",
       }),
     ),
   );

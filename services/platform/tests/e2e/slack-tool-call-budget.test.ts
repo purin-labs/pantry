@@ -71,7 +71,7 @@ async function toolCallBudgetJourney({ task }: TestContext): Promise<void> {
     "app_mention",
     "EvToolBudget",
     ROOT_TS,
-    "<@U0SATYR> What does the cookie box cost?",
+    "<@U0PANTRY> What does the cookie box cost?",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 60_000 }).toBe(1);
   expect(model.scriptOutput).toContain("used its budget of tool calls");
@@ -89,7 +89,7 @@ async function toolCallBudgetJourney({ task }: TestContext): Promise<void> {
     "message",
     "EvToolBudgetAgain",
     "1787500000.000900",
-    "<@U0SATYR> and the box of six?",
+    "<@U0PANTRY> and the box of six?",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 60_000 }).toBe(2);
   expect(slack.messages.map(textOf)).toEqual([

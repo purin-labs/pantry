@@ -1514,7 +1514,7 @@ export async function postMention(
         eventId,
         messageTs: ts,
         threadTs: ts,
-        text: `<@U0SATYR> ${question}`,
+        text: `<@U0PANTRY> ${question}`,
       }),
     ),
   );
@@ -1573,7 +1573,7 @@ export async function signedSlackRequest(
     key,
     new TextEncoder().encode(`v0:${timestamp}:${rawBody}`),
   );
-  return new Request("http://satyr.test/slack/events", {
+  return new Request("http://pantry.test/slack/events", {
     method: "POST",
     headers: {
       "content-type": "application/json",

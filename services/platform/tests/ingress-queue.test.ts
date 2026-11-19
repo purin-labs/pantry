@@ -56,7 +56,7 @@ describe("ingress queue boundary", function ingressQueueSuite() {
       receivedAt: 100,
       organisationId: requiredOrganisationId(),
       integrationAccountId: requiredIntegrationAccountId(),
-      shopDomain: "satyr-test.myshopify.com",
+      shopDomain: "pantry-test.myshopify.com",
       webhookId: "webhook_order_42",
       target: { kind: "order", orderGid: "gid://shopify/Order/42" },
     });

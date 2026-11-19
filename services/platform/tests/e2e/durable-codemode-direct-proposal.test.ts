@@ -31,7 +31,7 @@ it("keeps a turn stopped, when a direct proposal of the model was in flight at t
   const journey = await startScriptTurn(test, {
     eventId: "EvDurableCodemodeDirectProposal",
     install: installListingWithOpenLedgerCalls.bind(null, test, ledgerCalls),
-    text: "<@U0SATYR> Read the prepared cookie listing and propose its publication.",
+    text: "<@U0PANTRY> Read the prepared cookie listing and propose its publication.",
     replies: [
       {
         tool: "tool_search",

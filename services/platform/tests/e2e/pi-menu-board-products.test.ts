@@ -68,7 +68,7 @@ it(
 
     // Turn 1: Sous Chef puts taro milk tea on the menu. The owner publishes the
     // menu, makes a blank board and pairs a TV.
-    await sendListingMessage("app_mention", "EvProductsMenu", ROOT_TS, "<@U0SATYR> Put the taro milk tea under Drinks.");
+    await sendListingMessage("app_mention", "EvProductsMenu", ROOT_TS, "<@U0PANTRY> Put the taro milk tea under Drinks.");
     await expect.poll(delivered.bind(null, journey.slack), { timeout: 45_000 }).toContain("PD_MENU_READY");
     const published = await send(`${BASE}/commerce/menu-publication`, journey.owner, "POST", {
       documentRevision: await menuRevision(journey.owner),
@@ -139,7 +139,7 @@ it(
       }
       task.meta.menuBoardProducts = {
         substituted: ["model provider (deterministic OpenRouter transport)", "Slack (signed events)"],
-        real: ["Satyr Worker, the board room and the menu draft", "Underclerk fixture Worker", "screen feed"],
+        real: ["Pantry Worker, the board room and the menu draft", "Underclerk fixture Worker", "screen feed"],
         viewerAdd: refused,
         board: ownerPeer.read().elements.map((element) => ({ kind: element.kind, look: lookOf(element), placement: element.placement })),
         release: { releaseRevision: release, look: lookOf(screen.release?.elements[0]), priced: entry !== undefined },

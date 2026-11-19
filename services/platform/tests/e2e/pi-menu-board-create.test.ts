@@ -81,7 +81,7 @@ it(
       "app_mention",
       "EvCreateUrk",
       ROOT_TS,
-      "<@U0SATYR> Make a Matcha menu board for the portrait TV in the window. Call it Window.",
+      "<@U0PANTRY> Make a Matcha menu board for the portrait TV in the window. Call it Window.",
     );
     await expect
       .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
@@ -103,7 +103,7 @@ it(
           "model provider (deterministic OpenRouter transport)",
           "Slack (signed events)",
         ],
-        real: ["Satyr Worker, the board store and its room", "Underclerk fixture Worker"],
+        real: ["Pantry Worker, the board store and its room", "Underclerk fixture Worker"],
         refused: { viewer: viewer.status, designOnFixedLayout: fixed.status },
         blank: { layout: blank.layout, elements: blank.elements.length },
         nightMarket: night.elements.map((element) => element.kind),

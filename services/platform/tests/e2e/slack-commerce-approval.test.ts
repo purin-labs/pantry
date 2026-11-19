@@ -173,7 +173,7 @@ async function proposeInSlack(eventId: string, reply?: string) {
     "app_mention",
     eventId,
     ROOT_TS,
-    "<@U0SATYR> Read the prepared cookie catalog and propose publishing its listing for approval.",
+    "<@U0PANTRY> Read the prepared cookie catalog and propose publishing its listing for approval.",
   );
   await expect
     .poll(slack.visibleMessageCount, { timeout: 30_000 })
@@ -520,7 +520,7 @@ async function lostCaseUpdateJourney({ task }: TestContext): Promise<void> {
     "app_mention",
     "EvLostCaseUpdateReply",
     "1787500000.000900",
-    "<@U0SATYR> Read the catalog again.",
+    "<@U0PANTRY> Read the catalog again.",
   );
   await expect
     .poll(slack.visibleMessageCount, { timeout: 30_000 })

@@ -8,7 +8,7 @@ describe("Slack email review notice", () => {
     const notice = buildSlackEmailReviewNotice({
       review: operationalReview("awaiting_approval"),
       portalUrl:
-        "https://satyr.example/portal/acme/cafe-operations/integrations#email-review-proposal_operational_1",
+        "https://pantry.example/portal/acme/cafe-operations/integrations#email-review-proposal_operational_1",
     });
 
     expect(notice).toEqual({
@@ -17,7 +17,7 @@ describe("Slack email review notice", () => {
         "*Email review required*",
         "Operational email · Version 3 · Awaiting approval",
         "Sender, recipient, subject, and message content are available only in the authenticated Portal.",
-        "<https://satyr.example/portal/acme/cafe-operations/integrations#email-review-proposal_operational_1|Review in Portal>",
+        "<https://pantry.example/portal/acme/cafe-operations/integrations#email-review-proposal_operational_1|Review in Portal>",
       ].join("\n"),
     });
     expect(notice?.text).not.toContain("supplier_1");
@@ -27,7 +27,7 @@ describe("Slack email review notice", () => {
   it("labels Gmail replies without exposing message data", () => {
     const notice = buildSlackEmailReviewNotice({
       review: gmailReplyReview(),
-      portalUrl: "https://satyr.example/review",
+      portalUrl: "https://pantry.example/review",
     });
 
     expect(notice?.text).toContain("Gmail reply · Version 2");
@@ -38,7 +38,7 @@ describe("Slack email review notice", () => {
     expect(
       buildSlackEmailReviewNotice({
         review: operationalReview("sent"),
-        portalUrl: "https://satyr.example/review",
+        portalUrl: "https://pantry.example/review",
       }),
     ).toBeNull();
   });

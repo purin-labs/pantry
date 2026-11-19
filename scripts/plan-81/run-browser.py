@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Satyr Kitchen run journey (Plan 81) against an isolated local Worker and D1.
+"""Run the Kitchen run journey (Plan 81) against an isolated local Worker and D1.
 
 The model provider is simulated by kitchen-provider.mjs, which also starts
 the Worker. The account authority is the built account Worker of the

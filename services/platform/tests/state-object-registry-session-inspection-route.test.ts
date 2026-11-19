@@ -113,7 +113,7 @@ async function discardsQuarantinedCase(): Promise<void> {
   };
 
   const stale = await gateway.fetch(
-    new Request("https://satyr.test/v1/admin/state-object-registry", {
+    new Request("https://pantry.test/v1/admin/state-object-registry", {
       method: "POST",
       headers: {
         authorization: `Bearer ${ADMIN_TOKEN}`,
@@ -130,7 +130,7 @@ async function discardsQuarantinedCase(): Promise<void> {
   });
 
   const response = await gateway.fetch(
-    new Request("https://satyr.test/v1/admin/state-object-registry", {
+    new Request("https://pantry.test/v1/admin/state-object-registry", {
       method: "POST",
       headers: {
         authorization: `Bearer ${ADMIN_TOKEN}`,
@@ -158,7 +158,7 @@ async function discardsQuarantinedCase(): Promise<void> {
 async function recoversConnectorCaseWork(): Promise<void> {
   const fixture = await routeFixture();
   const response = await gateway.fetch(
-    new Request("https://satyr.test/v1/admin/state-object-registry", {
+    new Request("https://pantry.test/v1/admin/state-object-registry", {
       method: "POST",
       headers: {
         authorization: `Bearer ${ADMIN_TOKEN}`,
@@ -185,7 +185,7 @@ async function recoversConnectorCaseWork(): Promise<void> {
 async function interruptsActiveSession(): Promise<void> {
   const fixture = await routeFixture();
   const response = await gateway.fetch(
-    new Request("https://satyr.test/v1/admin/state-object-registry", {
+    new Request("https://pantry.test/v1/admin/state-object-registry", {
       method: "POST",
       headers: {
         authorization: `Bearer ${ADMIN_TOKEN}`,
@@ -211,7 +211,7 @@ async function interruptsActiveSession(): Promise<void> {
 
 async function inspectsCaseSettlement(): Promise<void> {
   const fixture = await routeFixture();
-  const route = `https://satyr.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&caseId=${fixture.caseId}`;
+  const route = `https://pantry.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&caseId=${fixture.caseId}`;
   const response = await gateway.fetch(
     new Request(route, { headers: { authorization: `Bearer ${ADMIN_TOKEN}` } }),
     fixture.env,
@@ -296,7 +296,7 @@ async function inspectsQuarantinedCaseActivation(): Promise<void> {
     const before = await readCaseRegistryState(fixture);
     const response = await gateway.fetch(
       new Request(
-        `https://satyr.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&caseId=${fixture.caseId}`,
+        `https://pantry.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&caseId=${fixture.caseId}`,
         { headers: { authorization: `Bearer ${ADMIN_TOKEN}` } },
       ),
       fixture.env,
@@ -325,7 +325,7 @@ async function inspectsQuarantinedCaseActivation(): Promise<void> {
 
 async function inspectsActiveSession(): Promise<void> {
   const fixture = await routeFixture();
-  const route = `https://satyr.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}`;
+  const route = `https://pantry.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}`;
   const unauthorized = await gateway.fetch(
     new Request(route),
     fixture.env,
@@ -420,7 +420,7 @@ async function inspectsScopedActiveSession(): Promise<void> {
   if (!secondActivated.ok)
     throw new Error("second session actor activation fixture failed");
 
-  const route = `https://satyr.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&sessionId=${fixture.sessionId}`;
+  const route = `https://pantry.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&sessionId=${fixture.sessionId}`;
   const response = await gateway.fetch(
     new Request(route, { headers: { authorization: `Bearer ${ADMIN_TOKEN}` } }),
     fixture.env,
@@ -447,7 +447,7 @@ async function rejectsInvalidSessionInspectionSelector(): Promise<void> {
   const headers = { authorization: `Bearer ${ADMIN_TOKEN}` };
   const malformed = await gateway.fetch(
     new Request(
-      `https://satyr.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&sessionId=!invalid`,
+      `https://pantry.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&sessionId=!invalid`,
       { headers },
     ),
     fixture.env,
@@ -457,7 +457,7 @@ async function rejectsInvalidSessionInspectionSelector(): Promise<void> {
 
   const conflicting = await gateway.fetch(
     new Request(
-      `https://satyr.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&caseId=${fixture.caseId}&sessionId=${fixture.sessionId}`,
+      `https://pantry.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&caseId=${fixture.caseId}&sessionId=${fixture.sessionId}`,
       { headers },
     ),
     fixture.env,
@@ -467,7 +467,7 @@ async function rejectsInvalidSessionInspectionSelector(): Promise<void> {
 
   const absent = await gateway.fetch(
     new Request(
-      `https://satyr.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&sessionId=session_missing`,
+      `https://pantry.test/v1/admin/state-object-registry?organisationId=${fixture.organisationId}&sessionId=session_missing`,
       { headers },
     ),
     fixture.env,

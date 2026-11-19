@@ -60,7 +60,7 @@ async function oldRowsWakeJourney(test: TestContext): Promise<void> {
         eventId: "EvR15OldRowsWake",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> how much butter is in the walk-in?",
+        text: "<@U0PANTRY> how much butter is in the walk-in?",
       }),
     ),
   );

@@ -352,7 +352,7 @@ async function mention(
         eventId,
         messageTs,
         threadTs,
-        text: "<@U0SATYR> draft a message about the flour price",
+        text: "<@U0PANTRY> draft a message about the flour price",
       }),
     ),
   );

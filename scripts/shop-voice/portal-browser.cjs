@@ -811,7 +811,7 @@ async function spokenDrafts(browser, input, chatUrl) {
   const slack = {
     proposalId: "draft_slack_voice",
     version: 1,
-    workspaceName: "Satyr Kitchen",
+    workspaceName: "Kitchen",
     channelId: null,
     channelName: null,
     channelHint: "general",

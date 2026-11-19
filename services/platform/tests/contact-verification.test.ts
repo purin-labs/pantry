@@ -509,7 +509,7 @@ async function controlsPublication(): Promise<void> {
     now: f.now,
     ttlMs: 60_000,
   });
-  const url = `https://satyr.example/v1/control/organisations/${f.organisationId}/contact-endpoint-verifications`;
+  const url = `https://pantry.example/v1/control/organisations/${f.organisationId}/contact-endpoint-verifications`;
   expect(matchAgentControlRoute(new URL(url).pathname)).toEqual({
     kind: "contactEndpointVerification",
     organisationIdRaw: f.organisationId,
@@ -518,7 +518,7 @@ async function controlsPublication(): Promise<void> {
     {
       DB: f.db,
       PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+      PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
     } as UnitTestEnv,
     {
       organisationId: f.organisationId,
@@ -528,7 +528,7 @@ async function controlsPublication(): Promise<void> {
   );
   const env = account.env;
   const headers = {
-    origin: "https://satyr.example",
+    origin: "https://pantry.example",
     "content-type": "application/json",
     cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
     "x-satyr-csrf": session.csrfToken,

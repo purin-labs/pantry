@@ -69,7 +69,7 @@ async function slackSteeringJourney(test: TestContext): Promise<void> {
   await sendSlack(
     ROOT_EVENT,
     ROOT_TS,
-    "<@U0SATYR> check our next supplier deliveries",
+    "<@U0PANTRY> check our next supplier deliveries",
   );
   await model.firstStarted.promise;
   const connector = await connectorOf(fixture.connectorId);

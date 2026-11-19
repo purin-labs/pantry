@@ -104,7 +104,7 @@ it("refunds an order only after an owner approves the exact money", async () => 
       "app_mention",
       "EvPiRefundFirst",
       ROOT_TS,
-      "<@U0SATYR> The sesame cookie was burnt. Refund it.",
+      "<@U0PANTRY> The sesame cookie was burnt. Refund it.",
     );
     await expect
       .poll(delivered.bind(null, slack), { timeout: 20_000 })
@@ -163,7 +163,7 @@ it("refunds an order only after an owner approves the exact money", async () => 
       "app_mention",
       "EvPiRefundRest",
       LATER_THREAD,
-      "<@U0SATYR> Refund the rest of the order.",
+      "<@U0PANTRY> Refund the rest of the order.",
       LATER_THREAD,
     );
     await expect

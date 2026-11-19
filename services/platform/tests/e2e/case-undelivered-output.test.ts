@@ -50,7 +50,7 @@ async function undeliveredOutputJourney(test: TestContext): Promise<void> {
         eventId: "EvR15UndeliveredOutput",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> check tomorrow's croissant order",
+        text: "<@U0PANTRY> check tomorrow's croissant order",
       }),
     ),
   );

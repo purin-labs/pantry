@@ -15,7 +15,7 @@ export type MailboxSetupAgentChoice =
   | Readonly<{ kind: "automatic" }>
   | Readonly<{ kind: "installation"; installationId: string }>
   | Readonly<{ kind: "definition"; agentDefinitionId: string }>
-  /** The mail agent that Satyr creates for a workspace. */
+  /** The mail agent that Pantry creates for a workspace. */
   | Readonly<{ kind: "new" }>;
 
 /** The agent the plan settled on. It is never `automatic`. */
@@ -37,9 +37,9 @@ export type MailboxSetupRequirementId =
   | "reply_drafts"
   /** The agent may read the Case of an email thread. */
   | "agent_context"
-  /** Owners and admins may read the mailbox and its drafts in Satyr. */
+  /** Owners and admins may read the mailbox and its drafts in Pantry. */
   | "review"
-  /** Satyr has approved the workspace's model for mailbox content. */
+  /** Pantry has approved the workspace's model for mailbox content. */
   | "model";
 
 export const MAILBOX_SETUP_REQUIREMENTS: readonly MailboxSetupRequirementId[] =

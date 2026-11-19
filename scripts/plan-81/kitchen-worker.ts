@@ -107,7 +107,7 @@ async function seed(env: Env) {
   const now = Date.now();
   const { organisationId, owner, other, member } = await admittedOrganisation(
     env,
-    "Satyr Kitchen acceptance",
+    "Kitchen acceptance",
     { name: "Member", role: "operator" },
   );
   if (member === undefined) throw new Error("The fixture has no member");
@@ -153,7 +153,7 @@ async function seed(env: Env) {
   });
   await organisation.ensureOrganisation({
     organisationId,
-    name: "Satyr Kitchen acceptance",
+    name: "Kitchen acceptance",
     plan: "beta",
     status: "active",
     createdAt: now,

@@ -70,7 +70,7 @@ async function connectorAdmissionJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_ROOT",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> open this case",
+    text: "<@U0PANTRY> open this case",
   });
   expect(root).toEqual({ status: 200, durableMode: "case_accepted" });
   await expect.poll(slack.messageCount, { timeout: 15_000 }).toBe(1);
@@ -132,7 +132,7 @@ async function connectorAdmissionJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_OTHER_ROOT",
     messageTs: "1787500100.000001",
     threadTs: "1787500100.000001",
-    text: "<@U0SATYR> open a second case",
+    text: "<@U0PANTRY> open a second case",
   });
   expect(secondThread).toEqual({ status: 200, durableMode: "case_accepted" });
   await expect.poll(slack.messageCount, { timeout: 15_000 }).toBe(3);
@@ -209,7 +209,7 @@ async function frozenAdmissionJourney(test: TestContext): Promise<void> {
     eventId: "Ev55E_RACE_ROOT",
     messageTs: ROOT_TS,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> open this case",
+    text: "<@U0PANTRY> open this case",
   });
   expect(root).toEqual({ status: 200, durableMode: "case_accepted" });
   await expect.poll(slack.messageCount, { timeout: 15_000 }).toBe(1);

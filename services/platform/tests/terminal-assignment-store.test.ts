@@ -32,7 +32,7 @@ function assignment(
     assignmentId: "terminal_assignment_1",
     organisationId: ORGANISATION,
     merchantId: "merchant_1",
-    satyrLocationId: "satyr_location_1",
+    satyrLocationId: "pantry_location_1",
     account: {
       integrationAccountId: "integration_square",
       providerAccountId: "merchant_square",
@@ -70,7 +70,7 @@ describe("terminal assignment store", function assignmentStoreSuite() {
     const active = await readActiveTerminalAssignment(
       db,
       ORGANISATION,
-      "satyr_location_1",
+      "pantry_location_1",
     );
     expect(active.ok && active.value.target).toEqual({
       kind: "paired_physical",
@@ -83,7 +83,7 @@ describe("terminal assignment store", function assignmentStoreSuite() {
       await readActiveTerminalAssignment(
         db,
         ORGANISATION,
-        "satyr_location_other",
+        "pantry_location_other",
       ),
     ).toEqual({
       ok: false,
@@ -111,7 +111,7 @@ describe("terminal assignment store", function assignmentStoreSuite() {
     const active = await readActiveTerminalAssignment(
       db,
       ORGANISATION,
-      "satyr_location_1",
+      "pantry_location_1",
     );
     expect(active.ok && active.value.assignmentId).toBe(
       "terminal_assignment_2",
@@ -190,7 +190,7 @@ describe("terminal assignment store", function assignmentStoreSuite() {
       }),
     ).toBe(true);
     expect(
-      await readActiveTerminalAssignment(db, ORGANISATION, "satyr_location_1"),
+      await readActiveTerminalAssignment(db, ORGANISATION, "pantry_location_1"),
     ).toEqual({
       ok: false,
       error: { code: "terminal_assignment_not_found" },

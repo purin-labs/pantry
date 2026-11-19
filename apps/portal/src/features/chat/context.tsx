@@ -255,7 +255,7 @@ function bakeryContextDescription(context: ChatBakeryContext): string {
     case "excluded":
       return "Kitchen context excluded from your next message";
     default:
-      return assertNever(context, "Unknown Satyr Kitchen attachment state");
+      return assertNever(context, "Unknown Kitchen attachment state");
   }
 }
 

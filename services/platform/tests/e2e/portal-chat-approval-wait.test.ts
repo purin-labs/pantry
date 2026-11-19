@@ -134,7 +134,7 @@ async function approvalWaitJourney({ task }: TestContext): Promise<void> {
     portalChatApprovalWait: {
       substituted: ["model provider (deterministic OpenRouter transport)"],
       real: [
-        "Satyr Worker",
+        "Pantry Worker",
         "Case Actor",
         "action ledger",
         "Underclerk fixture",

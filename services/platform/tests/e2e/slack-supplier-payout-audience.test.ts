@@ -156,7 +156,7 @@ async function askForPayouts(
         eventId,
         messageTs: ts,
         threadTs: ts,
-        text: "<@U0SATYR> show supplier payouts",
+        text: "<@U0PANTRY> show supplier payouts",
       }),
     ),
   );

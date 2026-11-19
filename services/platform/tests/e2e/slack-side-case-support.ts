@@ -138,7 +138,7 @@ export function sideCaseSlack(): {
 }
 
 export function slackPermalink(channel: string, ts: string): string {
-  return `https://e2e-satyr.slack.test/archives/${channel}/p${ts.replace(".", "")}`;
+  return `https://e2e-pantry.slack.test/archives/${channel}/p${ts.replace(".", "")}`;
 }
 
 function isPostOrStream(call: SlackCall): boolean {
@@ -233,7 +233,7 @@ export async function signedButtonClick(
   const payload = {
     type: "block_actions",
     api_app_id: "A12345678",
-    team: { id: WORKSPACE_ID, domain: "e2e-satyr" },
+    team: { id: WORKSPACE_ID, domain: "e2e-pantry" },
     user: { id: input.user, team_id: WORKSPACE_ID },
     channel: { id: input.channel },
     container: {
@@ -275,7 +275,7 @@ export async function signedButtonClick(
     key,
     new TextEncoder().encode(`v0:${timestamp}:${rawBody}`),
   );
-  return new Request("http://satyr.test/slack/interactions", {
+  return new Request("http://pantry.test/slack/interactions", {
     method: "POST",
     headers: {
       "content-type": "application/x-www-form-urlencoded",

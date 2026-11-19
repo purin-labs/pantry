@@ -118,31 +118,50 @@ fresh, so a table or column with an old name can change too.
 
 ### Legacy names on dev (`3371386`, 19 November 2026)
 
-The word `satyr` is on 2,704 lines in 853 files outside `docs/` and the
+The word `satyr` was on 2,704 lines in 853 files outside `docs/` and the
 Markdown files. Plan 92 already removed the unused and duplicate code, so
 these are names, not dead code. They fall into two groups.
 
-**Group A: no effect on production or on stored data (about 1,100 lines).**
-A codemod can change them at any time, in one commit:
+**Group A: names that no deployed Worker, stored row, signed value or
+other repository knows.** Done on 19 November 2026, with
+`scripts/rename/plan-93-test-names.mjs`: 330 lines in 172 files.
 
-| Kind | Examples | Lines |
+| Kind | Old | New |
 |---|---|---|
-| Test and fixture values | `https://satyr.example`, `@U0SATYR`, `shared_satyr_app`, `satyr.test`, `satyr-test.myshopify.com` | about 500 |
-| Identifiers and comments | `SatyrX` and `satyrX` names (358 lines), the word "Satyr" in comments and test titles (239) | about 600 |
-| Brand files | 32 files named `satyr-mark-*` and `satyr-horn-mark-*`, with their references | — |
+| Reserved test hosts | `satyr.example`, `satyr.test`, `satyr-test.myshopify.com`, `e2e-satyr` | `pantry.example`, `pantry.test`, `pantry-test.myshopify.com`, `e2e-pantry` |
+| Slack fixture user ids | `U0SATYR`, `U0BGSATYR` | `U0PANTRY`, `U0BGPANTRY` |
+| Fixture location ids | `satyr_location_1` and three more | `pantry_location_1` |
+| Phrases | "Satyr Kitchen", "Satyr Worker" | "Kitchen", "Pantry Worker" |
+| The word "Satyr" in code comments | "Satyr" | "Pantry" |
 
-**Group B: wire, stored and deployed names (about 1,600 lines).** A change
-breaks the data and the sessions of the stack that runs today. They change
-in step 2, for the new stack:
+The first estimate for group A was about 1,100 lines. A check of each of the
+678 distinct names showed that most of the rest are not safe now:
+
+- An identifier such as `satyrLocationId` is a field of a stored record and
+  of the contract between the Platform and Underclerk.
+- A value such as `satyr_email_body_v1` or `satyr_harness_history_chain_v1`
+  is the domain of a stored hash.
+- A name such as `SatyrProvisionEnvelopeV1` or `shared-account-satyr-e2e`
+  is also in seams-monorepo (the Console).
+- A GraphQL operation name such as `SatyrOrderCancel` goes to Shopify.
+- The brand files `satyr-mark-*` are public URLs of the Worker.
+- "Satyr Commerce", "Satyr Vault" and the wake phrase "Hey Satyr" wait for
+  the brand names and for a new wake model.
+
+**Group B: all other names (2,356 lines in 745 files after group A).** A
+change breaks the data and the sessions of the stack that runs today, or it
+needs a change in another repository. They change in step 2, for the new
+stack:
 
 | Kind | Examples | Lines |
 |---|---|---|
 | Cookie, CSRF and headers | `satyr_control_session`, `satyr_control_csrf`, `x-satyr-csrf`, `x-satyr-configuration-version` | about 430 |
-| Provider and platform ids | `satyr_commerce`, `satyr_platform` | about 300 |
-| Contract fields and event kinds | `satyrLocationId`, `satyr_location_id`, `satyr.checkout.*`, `satyr.counter-sale.v1`, `urn:satyr` | about 250 |
+| Provider and platform ids | `satyr_commerce`, `satyr_platform`, `shared_satyr_app` | about 370 |
+| Contract fields, event kinds and hash domains | `satyrLocationId`, `satyr_location_id`, `satyr.checkout.*`, `satyr.counter-sale.v1`, `urn:satyr` | about 450 |
 | Deployed names | Workers, queues, D1 and R2 names | 148 |
 | Shop Mac | `sh.seams.satyr.*`, `~/.satyr-voice`, `hey_satyr` | 55 |
-| `SATYR_*` variables that are left | `SATYR_COMMERCE`, `SATYR_ECOMMERCE_FIXTURE_TIMESTAMP` | 63 |
+| `SATYR_*` constants | `SATYR_COMMERCE`, `SATYR_ECOMMERCE_FIXTURE_TIMESTAMP` | 63 |
+| Identifiers, test harness names, brand files and display text | `SatyrProvisionEnvelopeV1`, `satyr-plan40-browser`, `satyr-mark-dark-64.png`, "Satyr Commerce" | the rest |
 
 Not changed by any codemod: the pinned Kitchen physics bundles under
 `apps/portal/public/bakery-physics` hold the build path
@@ -296,7 +315,7 @@ One branch, from a freeze of dev:
 
 - A codemod for the names in "Names in the code and on the wire" and for
   group B of "Legacy names on dev", in pantry and in seams-monorepo
-  (Console). Group A can land before this step, as its own commit. It also removes code that exists only for
+  (Console). Group A is done. It also removes code that exists only for
   old names: fallbacks, aliases, the glossary rows and the old-name notes in
   AGENTS.md.
 - New Wrangler files: new Worker, storage, container and secret names,

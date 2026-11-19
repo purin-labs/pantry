@@ -96,7 +96,7 @@ describe("checkout profile control routes", () => {
   it("rejects mixed activation fields before calling Underclerk", async () => {
     const response = await handleControlRequest(
       new Request(
-        `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/storefronts/${STOREFRONT_ID}/checkout-profile-activation`,
+        `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/storefronts/${STOREFRONT_ID}/checkout-profile-activation`,
         {
           method: "PUT",
           headers: { "content-type": "application/json" },
@@ -187,16 +187,16 @@ async function configureCheckoutControlMocks(): Promise<void> {
 }
 
 function checkoutControlEnv(): UnitTestEnv {
-  return platformEnv({ PANTRY_PUBLIC_ORIGIN: "https://satyr.example" });
+  return platformEnv({ PANTRY_PUBLIC_ORIGIN: "https://pantry.example" });
 }
 
 function activationRequest(): Request {
   return new Request(
-    `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/storefronts/${STOREFRONT_ID}/checkout-profile-activation`,
+    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/storefronts/${STOREFRONT_ID}/checkout-profile-activation`,
     {
       method: "PUT",
       headers: {
-        origin: "https://satyr.example",
+        origin: "https://pantry.example",
         cookie:
           "satyr_control_session=session-checkout; satyr_control_csrf=csrf-checkout",
         "x-satyr-csrf": "csrf-checkout",

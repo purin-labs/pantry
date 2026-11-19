@@ -110,7 +110,7 @@ async function slackCaseTitle({ task }: TestContext): Promise<void> {
       }),
     ),
     http.get("https://slack.com/api/conversations.members", () =>
-      HttpResponse.json({ ok: true, members: [SLACK_AUTHOR, "U0SATYR"] }),
+      HttpResponse.json({ ok: true, members: [SLACK_AUTHOR, "U0PANTRY"] }),
     ),
   );
   const response = await exports.default.fetch(
@@ -123,7 +123,7 @@ async function slackCaseTitle({ task }: TestContext): Promise<void> {
         eventId: "Ev_SLACK_CASE_TITLE",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: `<@U0SATYR> ${FIRST_LINE}\nThe forecast says 132 for Friday.`,
+        text: `<@U0PANTRY> ${FIRST_LINE}\nThe forecast says 132 for Friday.`,
       }),
     ),
   );
@@ -189,7 +189,7 @@ async function slackCaseTitle({ task }: TestContext): Promise<void> {
         eventId: "Ev_SLACK_CASE_TITLE_DM",
         messageTs: "1787500002.000001",
         threadTs: "1787500002.000001",
-        text: "<@U0SATYR> Keep this between us.",
+        text: "<@U0PANTRY> Keep this between us.",
       }),
     ),
   );

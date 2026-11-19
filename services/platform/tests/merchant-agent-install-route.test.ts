@@ -44,7 +44,7 @@ import { handleControlRequest } from "../src/control-router";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_urk_route";
-const ROUTE = `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/agents/urk`;
+const ROUTE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/agents/urk`;
 const COOKIE = "satyr_control_session=session-urk; satyr_control_csrf=csrf-urk";
 const ROLE_RANK = { viewer: 1, operator: 2, admin: 3, owner: 4 } as const;
 
@@ -88,7 +88,7 @@ function installRequest(): Request {
     method: "POST",
     headers: {
       cookie: COOKIE,
-      origin: "https://satyr.example",
+      origin: "https://pantry.example",
       "x-satyr-csrf": "csrf-urk",
       "content-type": "application/json",
       "idempotency-key": "install-urk-once",
@@ -145,6 +145,6 @@ function routeEnv(): UnitTestEnv {
   return platformEnv({
     PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: { prepare: vi.fn().mockReturnValue({ bind }), withSession: vi.fn().mockReturnThis() },
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
   });
 }

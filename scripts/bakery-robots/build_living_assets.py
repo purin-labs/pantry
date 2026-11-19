@@ -1,4 +1,4 @@
-"""Build rigged GLB models for Satyr Kitchen human workers, visitors, and botanical planters.
+"""Build rigged GLB models for Kitchen human workers, visitors, and botanical planters.
 
 Run with Blender:
   /Applications/Blender.app/Contents/MacOS/Blender --background --python scripts/bakery-robots/build_living_assets.py

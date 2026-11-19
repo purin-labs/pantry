@@ -61,7 +61,7 @@ it("carries a file-only Slack reply to an addressed receipt", async () => {
         eventId: "Ev0E2EFILEROOT",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> opening this case",
+        text: "<@U0PANTRY> opening this case",
       }),
     ),
   );
@@ -177,7 +177,7 @@ it("carries a mixed text, link, and multi-file Slack message", async () => {
         eventId: "Ev0E2EMIXED",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> price this against <https://example.com/spec|the spec>",
+        text: "<@U0PANTRY> price this against <https://example.com/spec|the spec>",
         files: [
           {
             id: "F0E2EIMG",
@@ -262,7 +262,7 @@ it("refuses an oversized batch without running the agent on partial input", asyn
         eventId: "Ev0E2EOVERSIZED",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> read these",
+        text: "<@U0PANTRY> read these",
         files: [
           {
             id: "F0E2EOK",
@@ -328,7 +328,7 @@ it("carries a link-only Slack reply without fetching the link", async () => {
         eventId: "Ev0E2ELINKROOT",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> opening this case",
+        text: "<@U0PANTRY> opening this case",
       }),
     ),
   );
@@ -399,7 +399,7 @@ it("delivers extracted document text to the model", async () => {
         eventId: "Ev0E2EDOCX",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> what does this say",
+        text: "<@U0PANTRY> what does this say",
         files: [
           {
             id: "F0E2EDOCX",
@@ -477,7 +477,7 @@ it("waits for attachment preparation before starting the model", async () => {
         eventId: "Ev0E2EPREPORDER",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> prepare this",
+        text: "<@U0PANTRY> prepare this",
         files: [
           {
             id: "F0E2EPREP",
@@ -549,7 +549,7 @@ it("describes audio and video by technical facts without interpreting them", asy
         eventId: "Ev0E2EMEDIA",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> here is the line",
+        text: "<@U0PANTRY> here is the line",
         files: [
           {
             id: "F0E2EWAV",
@@ -624,7 +624,7 @@ it("returns the original receipt for a duplicate delivery", async () => {
     eventId: "Ev0E2EDUPLICATE",
     messageTs: rootTs,
     threadTs: rootTs,
-    text: "<@U0SATYR> read this",
+    text: "<@U0PANTRY> read this",
     files: [
       {
         id: "F0E2EDUP",
@@ -699,7 +699,7 @@ it("retries the exact batch after a transient download failure", async () => {
         eventId: "Ev0E2ERETRY",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> read this",
+        text: "<@U0PANTRY> read this",
         files: [
           {
             id: "F0E2ERETRY",
@@ -772,7 +772,7 @@ it("reports an expired attachment instead of describing it as read", async () =>
         eventId: "Ev0E2EEXPIREROOT",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> read this",
+        text: "<@U0PANTRY> read this",
         files: [
           {
             id: "F0E2EEXPIRE",
@@ -860,7 +860,7 @@ it("cancels an in-flight turn without stranding staged bytes", async () => {
         eventId: "Ev0E2ECANCELROOT",
         messageTs: rootTs,
         threadTs: rootTs,
-        text: "<@U0SATYR> read this",
+        text: "<@U0PANTRY> read this",
         files: [
           {
             id: "F0E2ECANCEL",
@@ -884,7 +884,7 @@ it("cancels an in-flight turn without stranding staged bytes", async () => {
         eventId: "Ev0E2ECANCELSTOP",
         messageTs: "1787610000.000002",
         threadTs: rootTs,
-        text: "<@U0SATYR> stop",
+        text: "<@U0PANTRY> stop",
       }),
     ),
   );

@@ -77,7 +77,7 @@ async function steerParkLossJourney(test: TestContext): Promise<void> {
   await sendSlack(
     ROOT_EVENT,
     ROOT_TS,
-    "<@U0SATYR> check our next supplier deliveries",
+    "<@U0PANTRY> check our next supplier deliveries",
   );
   await expect.poll(() => journey.model, { timeout: 30_000 }).toBe("held");
   const connector = await actorOf("connector", fixture.connectorId);

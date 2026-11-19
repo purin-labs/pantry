@@ -163,7 +163,7 @@ export function parseSlackSideCaseStartRequest(
 export type SlackSideCaseStartRefusal =
   /** No proposal of this thread has this id, or it is not in this channel. */
   | "side_case_unavailable"
-  /** The clicker is not a member who may give Satyr work in this channel. */
+  /** The clicker is not a member who may give Pantry work in this channel. */
   | "side_case_starter_not_permitted"
   /** The proposal's label may not reach this channel for this person now. */
   | "side_case_not_permitted"

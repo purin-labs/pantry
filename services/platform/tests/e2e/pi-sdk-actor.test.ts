@@ -55,7 +55,7 @@ it("restores native discovery and Code Mode store across Actor eviction after de
     "app_mention",
     "EvPiSdkRoot",
     ROOT_TS,
-    "<@U0SATYR> Read granted integration metadata in parallel and retain a compact summary.",
+    "<@U0PANTRY> Read granted integration metadata in parallel and retain a compact summary.",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 50_000 }).toBe(1);
 
@@ -124,7 +124,7 @@ it("withholds a native composition summary after its read grant is revoked", asy
     "app_mention",
     "EvPiSdkRestrictedDelivery",
     ROOT_TS,
-    "<@U0SATYR> Read the granted metadata and return a compact summary.",
+    "<@U0PANTRY> Read the granted metadata and return a compact summary.",
   );
   const connectorRow = await fixtureDatabase()
     .prepare(
@@ -214,7 +214,7 @@ it("settles an exhausted native composition through the Actor budget boundary", 
     "app_mention",
     "EvPiSdkBudget",
     ROOT_TS,
-    "<@U0SATYR> Exercise the accepted read budget.",
+    "<@U0PANTRY> Exercise the accepted read budget.",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 15_000 }).toBe(1);
   expect(requests).toHaveLength(3);
@@ -265,7 +265,7 @@ it("recovers from SDK validation and parallel admission failures without leaking
     "app_mention",
     "EvPiSdkParallelFailure",
     ROOT_TS,
-    "<@U0SATYR> Recover from an invalid discovery request and an over-budget parallel read, then use a direct read.",
+    "<@U0PANTRY> Recover from an invalid discovery request and an over-budget parallel read, then use a direct read.",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 15_000 }).toBe(1);
   expect(requests).toHaveLength(6);
@@ -439,7 +439,7 @@ async function frozenSessionSettlementJourney(
     "app_mention",
     "EvPiFrozenSettlement",
     ROOT_TS,
-    "<@U0SATYR> Read integration metadata once.",
+    "<@U0PANTRY> Read integration metadata once.",
   );
   await expect
     .poll(readIndeterminateSdkExecution, { timeout: 20_000 })

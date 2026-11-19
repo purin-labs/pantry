@@ -156,7 +156,7 @@ it(
       task.meta.menuBoardPrompt = {
         substituted: ["model provider (deterministic OpenRouter transport)"],
         real: [
-          "Satyr Worker, the Portal chat route and the board room",
+          "Pantry Worker, the Portal chat route and the board room",
           "the Portal's own board page view",
         ],
         pageView: JSON.parse(redactIds(JSON.stringify({ ...pageView, capturedAt: 0 }))) as unknown,

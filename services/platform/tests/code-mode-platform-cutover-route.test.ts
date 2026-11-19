@@ -8,7 +8,7 @@ import {
   type UnitTestEnv,
 } from "./worker-fakes";
 
-const ROUTE = "https://satyr.test/v1/admin/code-mode-platform-cutover";
+const ROUTE = "https://pantry.test/v1/admin/code-mode-platform-cutover";
 const ADMIN_TOKEN = "code-mode-cutover-admin-token-value";
 
 describe("Code Mode platform cutover route", codeModePlatformCutoverRouteSuite);

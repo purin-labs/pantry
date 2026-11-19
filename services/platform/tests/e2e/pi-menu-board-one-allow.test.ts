@@ -212,7 +212,7 @@ it(
       task.meta.menuBoardOneAllow = {
         substituted: ["model provider (deterministic OpenRouter transport)"],
         real: [
-          "Satyr Worker, the Portal chat route, the exit check and the board room",
+          "Pantry Worker, the Portal chat route, the exit check and the board room",
           "the Portal's own board page view",
         ],
         firstRequest: { held: true, boardText: BEFORE },

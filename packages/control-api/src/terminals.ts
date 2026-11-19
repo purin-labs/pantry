@@ -12,7 +12,7 @@ export type CounterSaleState =
   /** Presented on the terminal; the provider has not answered. */
   | "collecting"
   /**
-   * Satyr does not know whether the provider took the money. This is not a
+   * Pantry does not know whether the provider took the money. This is not a
    * failure — it is the absence of an answer, and the only safe response is to
    * reconcile the original attempt rather than start another.
    */

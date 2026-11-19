@@ -25,7 +25,7 @@ const NOW = 1_783_987_896_426;
 const CONFIG = {
   clientId: "google-client-id",
   clientSecret: "google-client-secret",
-  redirectUri: "https://satyr.example/v1/control/auth/google/callback",
+  redirectUri: "https://pantry.example/v1/control/auth/google/callback",
 } as const;
 
 describe("Google control OIDC", () => {

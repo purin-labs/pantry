@@ -1446,7 +1446,7 @@ export async function parseRehearsalWorkcells(
     const raw = object(JSON.parse(text));
     if (typeof raw.fingerprint !== "string")
       return rejected(
-        "Choose a version 1, 2 or 3 Satyr Kitchen rehearsal file.",
+        "Choose a version 1, 2 or 3 Kitchen rehearsal file.",
       );
     return await restoreRehearsal(raw, raw.fingerprint);
   } catch (error) {
@@ -1769,7 +1769,7 @@ async function restoreRehearsal(
       raw.trays.length > 16
     )
       return rejected(
-        "Choose a version 1, 2 or 3 Satyr Kitchen rehearsal file.",
+        "Choose a version 1, 2 or 3 Kitchen rehearsal file.",
       );
     const faults =
       raw.schemaVersion === 1 ? NO_FAULTS : parseRunFaults(raw.faults);

@@ -37,7 +37,7 @@ const WORKERS = new Map([
   [
     "platform",
     {
-      label: "the Satyr Worker",
+      label: "the Pantry Worker",
       config: "services/platform/wrangler.jsonc",
       secrets: SUPPORTED_SECRETS,
       mayGenerate: true,

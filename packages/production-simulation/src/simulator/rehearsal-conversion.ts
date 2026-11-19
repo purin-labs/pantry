@@ -73,7 +73,7 @@ export async function openRehearsalDocument(
       case "bakery-workcell-experiment":
         return await convertExperiment(text, settings);
       default:
-        return rejected("Choose a Satyr Kitchen rehearsal file.");
+        return rejected("Choose a Kitchen rehearsal file.");
     }
   } catch (error) {
     return rejected(

@@ -57,7 +57,7 @@ import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_terminal_control";
-const ROUTE = `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce/terminal-operations`;
+const ROUTE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/terminal-operations`;
 const ADAPTER = "square_terminal@2026-08-19";
 
 let db: SingleDatabase;
@@ -135,7 +135,7 @@ describe("terminal operations control routes", function terminalControlSuite() {
         schemaVersion: "satyr.terminal-operations.v2",
         counters: [
           {
-            satyrLocationId: "satyr_location_1",
+            satyrLocationId: "pantry_location_1",
             blockedReason: null,
             paymentsLinked: false,
             assignment: { deviceId: "device_1", revision: 1 },
@@ -185,10 +185,10 @@ describe("terminal operations control routes", function terminalControlSuite() {
 });
 
 function retirementRequest(): Request {
-  return new Request(`${ROUTE}/satyr_location_1/retirement`, {
+  return new Request(`${ROUTE}/pantry_location_1/retirement`, {
     method: "POST",
     headers: {
-      origin: "https://satyr.example",
+      origin: "https://pantry.example",
       cookie:
         "satyr_control_session=session-terminal; satyr_control_csrf=csrf-terminal",
       "x-satyr-csrf": "csrf-terminal",
@@ -201,7 +201,7 @@ function retirementRequest(): Request {
 
 function env(): UnitTestEnv {
   return platformEnv({
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
     DB: db,
     PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
@@ -214,7 +214,7 @@ function assignment(
     assignmentId: "terminal_assignment_1",
     organisationId: ORGANISATION_ID,
     merchantId: "merchant_1",
-    satyrLocationId: "satyr_location_1",
+    satyrLocationId: "pantry_location_1",
     account: {
       integrationAccountId: "integration_square",
       providerAccountId: "merchant_square",

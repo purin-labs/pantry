@@ -1125,7 +1125,7 @@ async function sendIntegrationQuestion(
         threadTs,
         text:
           eventType === "app_mention"
-            ? "<@U0SATYR> Which integrations are connected?"
+            ? "<@U0PANTRY> Which integrations are connected?"
             : "Try again, please.",
       }),
     ),

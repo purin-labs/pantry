@@ -349,7 +349,7 @@ function rootMention() {
         type: "app_mention",
         channel: "C0LATENCY",
         user: "U0LATENCY",
-        text: "<@U0SATYR> respond",
+        text: "<@U0PANTRY> respond",
         ts: "1785810000.000001",
         event_ts: "1785810000.000001",
       },

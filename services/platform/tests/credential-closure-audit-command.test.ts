@@ -7,7 +7,7 @@ import {
 
 const ORGANISATION_ID = "organisation_command_test";
 const LOCAL_ORIGIN = "http://127.0.0.1:8787";
-const REMOTE_ORIGIN = "https://satyr.example.com";
+const REMOTE_ORIGIN = "https://pantry.example.com";
 const ADMIN_TOKEN = "organisation-admin-secret";
 
 describe("credential closure audit command", credentialClosureCommandSuite);

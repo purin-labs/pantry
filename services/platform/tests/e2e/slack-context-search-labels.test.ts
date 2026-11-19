@@ -84,7 +84,7 @@ async function searchedLabels(test: TestContext): Promise<void> {
       eventId: "Ev55E_LABEL_A1",
       messageTs: ROOT_TS,
       threadTs: ROOT_TS,
-      text: "<@U0SATYR> the pastry collection code is AMBER-OTTER-7391",
+      text: "<@U0PANTRY> the pastry collection code is AMBER-OTTER-7391",
     });
     await turn(posts, {
       eventType: "message",
@@ -117,7 +117,7 @@ async function searchedLabels(test: TestContext): Promise<void> {
       eventId: "Ev55E_LABEL_B1",
       messageTs: OTHER_ROOT_TS,
       threadTs: OTHER_ROOT_TS,
-      text: "<@U0SATYR> what is the pastry collection code?",
+      text: "<@U0PANTRY> what is the pastry collection code?",
     });
     const before = searchedFrom(firstCaseId, bundles.at(-1));
     expect(before.length).toBe(firstThread.length);

@@ -120,7 +120,7 @@ export async function startScriptTurn(
     "app_mention",
     options.eventId,
     ROOT_TS,
-    options.text ?? "<@U0SATYR> Read the granted integration metadata twice.",
+    options.text ?? "<@U0PANTRY> Read the granted integration metadata twice.",
   );
   await waitForStop(completion, options.completions);
   await waitForStop(settlement, options.settlements);

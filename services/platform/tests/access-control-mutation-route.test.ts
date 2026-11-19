@@ -192,7 +192,7 @@ function prepareMocks(): void {
 
 function mutationRequest(suffix: string, body: unknown): Request {
   return new Request(
-    `https://satyr.example/v1/control/organisations/${ORGANISATION_ID_RAW}/${suffix}`,
+    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID_RAW}/${suffix}`,
     {
       method: "POST",
       headers: {
@@ -200,7 +200,7 @@ function mutationRequest(suffix: string, body: unknown): Request {
         cookie:
           "satyr_control_session=access-mutation; satyr_control_csrf=csrf-token",
         "x-satyr-csrf": "csrf-token",
-        origin: "https://satyr.example",
+        origin: "https://pantry.example",
         "idempotency-key": "access-mutation-request-1",
       },
       body: JSON.stringify(body),
@@ -234,7 +234,7 @@ function routeEnv(): Readonly<{
     value: platformEnv({
       DB: db,
       POLICY_KV: {},
-      PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+      PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
       PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
         databaseBinding: "DB",
         kind: "affinity",

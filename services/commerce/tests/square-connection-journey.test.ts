@@ -31,7 +31,7 @@ const SELLER = "MLCAFESELLER";
 const CAFE = "LCAFEFRONT";
 const BACK_OFFICE = "LBACKOFFICE";
 const DEVICE = "DEVICE_TERMINAL_1";
-const CALLBACK = "https://satyr.example/v1/control/providers/square/callback";
+const CALLBACK = "https://pantry.example/v1/control/providers/square/callback";
 const DAY = 86_400_000;
 const PAYMENT_EVENTS = [
   "checkout.created",

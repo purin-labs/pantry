@@ -32,7 +32,7 @@ import {
  * quarantined, one page for each pass, and then reads none of them again.
  */
 it(
-  "quarantines damaged Satyr Kitchen effects so that Session recovery stops reading them",
+  "quarantines damaged Kitchen effects so that Session recovery stops reading them",
   damagedSurfaceEffectJourney,
   60_000,
 );
@@ -55,7 +55,7 @@ async function damagedSurfaceEffectJourney(test: TestContext): Promise<void> {
         eventId: "EvR15SurfaceQuarantine",
         messageTs: ROOT_TS,
         threadTs: ROOT_TS,
-        text: "<@U0SATYR> check tomorrow's croissant order",
+        text: "<@U0PANTRY> check tomorrow's croissant order",
       }),
     ),
   );

@@ -140,7 +140,7 @@ type ScriptState = {
 };
 
 it(
-  "controls the Satyr Kitchen Pie Pastry Bench for an authorized owner and refuses a viewer or missing screen",
+  "controls the Kitchen Pie Pastry Bench for an authorized owner and refuses a viewer or missing screen",
   { timeout: 240_000 },
   async ({ task }: TestContext): Promise<void> => {
     const { author, viewer, route, paths } = await installMemoryFixture();
@@ -389,7 +389,7 @@ async function scriptedPastryModel(
     if (isRecord(last) && last.role === "tool" && lastCallName === "tool_search") {
       script.toolResults.push(JSON.stringify(last.content));
       return openRouterText(
-        "I do not have permission to control the Satyr Kitchen Pastry Bench.",
+        "I do not have permission to control the Kitchen Pastry Bench.",
         `pastry_viewer_reply_${script.requests.length}`,
       );
     }
@@ -407,7 +407,7 @@ async function scriptedPastryModel(
   if (isRecord(last) && last.role === "tool" && lastCallName === targetTool) {
     script.toolResults.push(JSON.stringify(last.content));
     return openRouterText(
-      "Updated the Satyr Kitchen Pie Pastry Bench.",
+      "Updated the Kitchen Pie Pastry Bench.",
       `pastry_reply_${script.requests.length}`,
     );
   }

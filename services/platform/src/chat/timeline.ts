@@ -56,7 +56,7 @@ export type ChatInputPart =
     }
   /**
    * The page on the sender's screen when the message was sent (Plan 87). A
-   * message keeps one; the Satyr Kitchen view is its `state` (phase 2).
+   * message keeps one; the Kitchen view is its `state` (phase 2).
    */
   | {
       readonly kind: "surface_observation";

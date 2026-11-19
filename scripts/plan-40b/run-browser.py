@@ -3,7 +3,7 @@
 
 The Portal is built and served with `vite preview`, so that the page runs
 with its service worker as in production. The browser answers the screen API
-and the signal socket with the shapes that the Satyr Worker answers in the
+and the signal socket with the shapes that the Pantry Worker answers in the
 E2E journey `services/platform/tests/e2e/menu-board-screen.test.ts`; that
 journey proves the server side. This one proves the player: pairing,
 playing, a signal, the saved copy offline, a restart with no network, the
@@ -99,7 +99,7 @@ def main() -> None:
         output = runner.run_cli(args.cli, session, ["run-code", journey], "journey")
         evidence = {
             "page": "built Portal /tv with its service worker (vite preview)",
-            "server": "the browser answers the screen API with the Satyr Worker's shapes",
+            "server": "the browser answers the screen API with the Pantry Worker's shapes",
             "journey": runner.result_json(output),
         }
         if evidence["journey"].get("result") != "passed":

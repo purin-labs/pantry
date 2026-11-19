@@ -2855,7 +2855,7 @@ function surfaceToolCommand(
     tool.selection.command === "configure_pastry_bench" ||
     tool.selection.command === "prepare_pastry_bench"
   ) {
-    throw new Error(`${tool.name} is not a Satyr Kitchen tool`);
+    throw new Error(`${tool.name} is not a Kitchen tool`);
   }
   return tool.selection.command;
 }

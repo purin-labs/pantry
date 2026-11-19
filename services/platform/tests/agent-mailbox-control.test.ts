@@ -24,7 +24,7 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 
 const NOW = 1_784_016_325_277;
-const ORIGIN = "https://satyr.example";
+const ORIGIN = "https://pantry.example";
 
 describe("agent mailbox control routes", agentMailboxControlSuite);
 

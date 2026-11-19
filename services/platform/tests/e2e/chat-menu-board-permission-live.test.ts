@@ -106,7 +106,7 @@ it.skipIf(env.OPENROUTER_API_KEY === "openrouter-e2e-key")(
 
     task.meta.menuBoardPermissionLive = {
       substituted: [],
-      real: ["Satyr Worker and the Portal chat routes", "OpenRouter with Satyr's production model"],
+      real: ["Pantry Worker and the Portal chat routes", "OpenRouter with Satyr's production model"],
       models: [...new Set(calls.map((call) => call.model))],
       requests: requests.map((request) => ({ action: request.action, items: request.items })),
       toolsCalled: calls.flatMap((call) => call.called),

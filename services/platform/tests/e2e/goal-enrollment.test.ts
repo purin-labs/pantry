@@ -163,7 +163,7 @@ async function sendMessage(id: string, ts: string): Promise<void> {
     eventId: `EvEnrollment_${id}`,
     messageTs: ts,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> Review stock.",
+    text: "<@U0PANTRY> Review stock.",
   });
   expect(
     (await exports.default.fetch(await signedSlackRequest(body))).status,

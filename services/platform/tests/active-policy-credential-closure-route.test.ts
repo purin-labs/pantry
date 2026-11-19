@@ -40,7 +40,7 @@ describe("active policy credential closure route", function closureRouteSuite() 
 
 async function protectsAndInspectsRoute(): Promise<void> {
   const fixture = await routeFixture();
-  const route = `https://satyr.test/v1/admin/active-policy-credential-closure?organisationId=${fixture.organisationId}`;
+  const route = `https://pantry.test/v1/admin/active-policy-credential-closure?organisationId=${fixture.organisationId}`;
   const unauthorized = await gateway.fetch(
     new Request(route),
     fixture.env,
@@ -56,7 +56,7 @@ async function protectsAndInspectsRoute(): Promise<void> {
   );
   const invalidOrganisation = await gateway.fetch(
     new Request(
-      "https://satyr.test/v1/admin/active-policy-credential-closure?organisationId=",
+      "https://pantry.test/v1/admin/active-policy-credential-closure?organisationId=",
       {
         headers: { authorization: `Bearer ${fixture.adminToken}` },
       },

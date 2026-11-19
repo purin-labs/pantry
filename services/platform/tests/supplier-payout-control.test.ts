@@ -47,14 +47,14 @@ import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
 
 const ORGANISATION_ID = "organisation_payout_control";
-const BASE = `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce`;
+const BASE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce`;
 
 let db: SingleDatabase;
 let database: DatabaseSync;
 
 function env(): UnitTestEnv {
   return platformEnv({
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
     DB: db,
   });
 }
@@ -67,7 +67,7 @@ function mutation(
   return new Request(url, {
     method: "POST",
     headers: {
-      origin: "https://satyr.example",
+      origin: "https://pantry.example",
       cookie:
         "satyr_control_session=session-payout; satyr_control_csrf=csrf-payout",
       "x-satyr-csrf": "csrf-payout",

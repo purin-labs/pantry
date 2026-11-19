@@ -107,7 +107,7 @@ async function offerPriceChangeJourney({ task }: TestContext): Promise<void> {
     "app_mention",
     "EvPriceAsk",
     ROOT_TS,
-    "<@U0SATYR> Raise the cookie box to ¥2,600.",
+    "<@U0PANTRY> Raise the cookie box to ¥2,600.",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 60_000 }).toBe(2);
   const texts = slack.messages.map(textOf);
@@ -180,7 +180,7 @@ async function offerPriceChangeJourney({ task }: TestContext): Promise<void> {
     "message",
     "EvPriceAgain",
     "1787500000.000900",
-    "<@U0SATYR> What does the cookie box cost now?",
+    "<@U0PANTRY> What does the cookie box cost now?",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 60_000 }).toBe(3);
   expect(slack.messages.map(textOf).slice(2)).toEqual([

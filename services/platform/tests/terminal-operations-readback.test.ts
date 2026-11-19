@@ -28,7 +28,7 @@ function assignment(
     assignmentId: "terminal_assignment_1",
     organisationId: ORGANISATION,
     merchantId: "merchant_1",
-    satyrLocationId: "satyr_location_1",
+    satyrLocationId: "pantry_location_1",
     account: {
       integrationAccountId: "integration_square",
       providerAccountId: "merchant_square",
@@ -293,7 +293,7 @@ describe("terminal operations readback", function readbackSuite() {
       organisationId: ORGANISATION,
       assignment: assignment({
         assignmentId: "terminal_assignment_2",
-        satyrLocationId: "satyr_location_2",
+        satyrLocationId: "pantry_location_2",
       }),
       now: 1,
     });
@@ -309,7 +309,7 @@ describe("terminal operations readback", function readbackSuite() {
       linkedLocationIds: new Set(),
     });
     expect(operations.counters).toHaveLength(1);
-    expect(operations.counters[0]?.satyrLocationId).toBe("satyr_location_1");
+    expect(operations.counters[0]?.satyrLocationId).toBe("pantry_location_1");
     expect(operations.unreadableAssignments).toBe(1);
   });
 

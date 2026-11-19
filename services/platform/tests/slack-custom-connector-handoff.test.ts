@@ -8,7 +8,7 @@ describe("Slack custom connector setup handoff", () => {
       customConnectorSetupHandoff({
         text: "Create a custom connector for this service",
         mayConfigure: false,
-        portalUrl: "https://satyr.example/ignored",
+        portalUrl: "https://pantry.example/ignored",
       }),
     ).toBe(
       "You can view connector setup, but an owner or admin must create and connect a custom API.",
@@ -20,7 +20,7 @@ describe("Slack custom connector setup handoff", () => {
       customConnectorSetupHandoff({
         text: "Summarize the API errors from yesterday",
         mayConfigure: true,
-        portalUrl: "https://satyr.example/ignored",
+        portalUrl: "https://pantry.example/ignored",
       }),
     ).toBeNull();
   });

@@ -1253,7 +1253,7 @@ function slackEnvelope(): Record<string, unknown> {
       type: "app_mention",
       channel: CHANNEL_ID,
       user: USER_ID,
-      text: "<@U0SATYR> prove actor recovery",
+      text: "<@U0PANTRY> prove actor recovery",
       ts: ROOT_TS,
       thread_ts: ROOT_TS,
       event_ts: ROOT_TS,

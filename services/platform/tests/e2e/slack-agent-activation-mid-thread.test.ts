@@ -207,7 +207,7 @@ async function runTurn(
         eventId,
         messageTs,
         threadTs,
-        text: messageTs === threadTs ? `<@U0SATYR> ${text}` : text,
+        text: messageTs === threadTs ? `<@U0PANTRY> ${text}` : text,
       }),
     ),
   );

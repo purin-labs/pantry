@@ -447,7 +447,7 @@ function subjectOptionRows(count: number): readonly Record<string, unknown>[] {
 
 function authenticatedRequest(suffix: string): Request {
   return new Request(
-    `https://satyr.example/v1/control/organisations/${ORGANISATION_ID_RAW}/${suffix}`,
+    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID_RAW}/${suffix}`,
     {
       headers: { cookie: "satyr_control_session=access-control-read" },
     },
@@ -483,7 +483,7 @@ function routeEnv(
   return platformEnv({
     PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: { prepare, withSession: vi.fn().mockReturnThis() },
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
   });
 }
 

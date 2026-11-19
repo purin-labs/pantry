@@ -66,7 +66,7 @@ it(
 );
 
 const QUESTION =
-  "<@U0SATYR> Publish the prepared cookie box listing for approval.";
+  "<@U0PANTRY> Publish the prepared cookie box listing for approval.";
 const ASKED = "I asked an owner to let me propose commerce changes.";
 const ALLOWED_NOTICE =
   "An owner or admin allowed the permission. Sous Chef continues the request now.";

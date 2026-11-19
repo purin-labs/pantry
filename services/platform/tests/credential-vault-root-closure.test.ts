@@ -335,7 +335,7 @@ async function exposesProtectedRoute(): Promise<void> {
     ...keys,
     ORGANISATION_ADMIN_TOKEN: adminToken,
   });
-  const route = "https://satyr.test/v1/admin/vault-root-closure";
+  const route = "https://pantry.test/v1/admin/vault-root-closure";
 
   const unauthorized = await gateway.fetch(
     new Request(route),

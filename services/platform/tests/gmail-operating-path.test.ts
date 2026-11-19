@@ -18,7 +18,7 @@ import { requireVaultHandle } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { testExecutionContext, type UnitTestEnv } from "./worker-fakes";
 
-const AUDIENCE = "https://satyr.example/hook/email/google";
+const AUDIENCE = "https://pantry.example/hook/email/google";
 const SERVICE_ACCOUNT = "gmail-push@satyr-project.iam.gserviceaccount.com";
 const ADDRESS = "support@example.com";
 
@@ -381,7 +381,7 @@ async function createFixture(slug: string): Promise<Fixture> {
     const base: Record<string, unknown> = {
       DB: db,
       PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+      PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
       GMAIL_PUBSUB_AUDIENCE: AUDIENCE,
       GMAIL_PUBSUB_SERVICE_ACCOUNT: SERVICE_ACCOUNT,
       EVENT_Q: {

@@ -32,7 +32,7 @@ async function exchangeAirtableCode(): Promise<void> {
     env: ENV,
     provider: "airtable",
     code: "airtable-code",
-    redirectUri: "https://satyr.example/v1/control/providers/airtable/callback",
+    redirectUri: "https://pantry.example/v1/control/providers/airtable/callback",
     pkceVerifier: "pkce-verifier",
     now: NOW,
     fetcher: airtableExchangeFetcher,
@@ -53,7 +53,7 @@ async function exchangeNotionCode(): Promise<void> {
     env: ENV,
     provider: "notion",
     code: "notion-code",
-    redirectUri: "https://satyr.example/v1/control/providers/notion/callback",
+    redirectUri: "https://pantry.example/v1/control/providers/notion/callback",
     pkceVerifier: null,
     now: NOW,
     fetcher: notionExchangeFetcher,
@@ -74,7 +74,7 @@ async function rejectMissingPkce(): Promise<void> {
     env: ENV,
     provider: "airtable",
     code: "airtable-code",
-    redirectUri: "https://satyr.example/v1/control/providers/airtable/callback",
+    redirectUri: "https://pantry.example/v1/control/providers/airtable/callback",
     pkceVerifier: null,
     now: NOW,
     fetcher: unexpectedFetcher,
@@ -94,7 +94,7 @@ async function airtableExchangeFetcher(
     `Basic ${btoa("airtable-client:airtable-secret")}`,
   );
   expect(await normalized.text()).toBe(
-    "grant_type=authorization_code&code=airtable-code&redirect_uri=https%3A%2F%2Fsatyr.example%2Fv1%2Fcontrol%2Fproviders%2Fairtable%2Fcallback&code_verifier=pkce-verifier",
+    "grant_type=authorization_code&code=airtable-code&redirect_uri=https%3A%2F%2Fpantry.example%2Fv1%2Fcontrol%2Fproviders%2Fairtable%2Fcallback&code_verifier=pkce-verifier",
   );
   return Response.json({
     access_token: "airtable-access",
@@ -115,7 +115,7 @@ async function notionExchangeFetcher(
   expect(await normalized.json()).toEqual({
     grant_type: "authorization_code",
     code: "notion-code",
-    redirect_uri: "https://satyr.example/v1/control/providers/notion/callback",
+    redirect_uri: "https://pantry.example/v1/control/providers/notion/callback",
   });
   return Response.json({
     access_token: "notion-access",

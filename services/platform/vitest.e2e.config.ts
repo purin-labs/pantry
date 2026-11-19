@@ -357,7 +357,7 @@ function sharedAccountPlatformTestRuntime() {
       .update(artifactBytes)
       .digest("hex"),
     ACCOUNT_PLATFORM_DEPLOYMENT_ID: "shared-account-satyr-e2e",
-    ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-satyr-provision",
+    ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-pantry-provision",
     ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK: JSON.stringify(
       provision.publicKey.export({ format: "jwk" }),
     ),
@@ -372,7 +372,7 @@ function sharedAccountPlatformTestRuntime() {
     ACCOUNT_PLATFORM_ASSERTION_AUDIENCE: ACCOUNT_PLATFORM_TEST_ORIGIN,
     GOOGLE_OIDC_CLIENT_ID: "shared-account-satyr-e2e",
     TEST_ACCOUNT_PLATFORM_BASE_URL: ACCOUNT_PLATFORM_TEST_ORIGIN,
-    TEST_ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-satyr-provision",
+    TEST_ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-pantry-provision",
   });
   serviceBindings.ACCOUNT_PLATFORM = { name: ACCOUNT_PLATFORM_TEST_WORKER };
   serviceBindings.ACCOUNT_PLATFORM_FIXTURE = {

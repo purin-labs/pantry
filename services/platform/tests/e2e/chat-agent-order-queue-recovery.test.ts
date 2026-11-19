@@ -139,7 +139,7 @@ it(
       "app_mention",
       "EvOrderQueueLost",
       "1710000900.000100",
-      "<@U0SATYR> The buyer has the order. Hand it over.",
+      "<@U0PANTRY> The buyer has the order. Hand it over.",
       "1710000900.000100",
     );
     await expect.poll(() => signals.length, { timeout: 30_000 }).toBe(1);
@@ -208,7 +208,7 @@ it(
       "app_mention",
       "EvOrderQueueDemoted",
       "1710000950.000100",
-      "<@U0SATYR> Start the order.",
+      "<@U0PANTRY> Start the order.",
       "1710000950.000100",
     );
     await expect

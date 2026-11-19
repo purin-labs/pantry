@@ -70,7 +70,7 @@ it(
 
     // Turn 1: Sous Chef puts the image on the board. Its archive is refused while
     // the TV shows the board.
-    await sendListingMessage("app_mention", "EvArchiveOne", ROOT_TS, "<@U0SATYR> Put the window bake photo on the Window board, then archive the board.");
+    await sendListingMessage("app_mention", "EvArchiveOne", ROOT_TS, "<@U0PANTRY> Put the window bake photo on the Window board, then archive the board.");
     await expect.poll(delivered.bind(null, journey.slack), { timeout: 45_000 }).toContain("IA_ON_SCREEN");
     expect(script.outputs.at(-1)).toContain("A screen shows this board");
     expect((await boardList(journey.owner)).boards).toEqual(["Window"]);
@@ -141,7 +141,7 @@ it(
 
     task.meta.menuBoardArchive = {
       substituted: ["model provider (deterministic OpenRouter transport)", "Slack (signed events)"],
-      real: ["Satyr Worker, the Organisation Actor's boards and screens, the media routes", "Underclerk fixture Worker with its R2 store"],
+      real: ["Pantry Worker, the Organisation Actor's boards and screens, the media routes", "Underclerk fixture Worker with its R2 store"],
       agentOnScreen: redactIds(script.outputs.find((text) => text.includes("A screen shows this board")) ?? ""),
       agentArchived: redactIds(script.outputs.find((text) => text.includes('"archived":true')) ?? "")
         .replace(/"archivedAt":\d+/gu, '"archivedAt":…'),

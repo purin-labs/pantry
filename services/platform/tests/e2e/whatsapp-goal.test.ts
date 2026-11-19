@@ -324,7 +324,7 @@ async function sendBootstrap(id: string, ts: string): Promise<void> {
     eventId: `EvWaGoal_${id}`,
     messageTs: ts,
     threadTs: ROOT_TS,
-    text: "<@U0SATYR> Prepare support.",
+    text: "<@U0PANTRY> Prepare support.",
   });
   expect(
     (await exports.default.fetch(await signedSlackRequest(body))).status,

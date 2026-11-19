@@ -7,7 +7,7 @@ import {
 } from "../src/mail/google-pubsub";
 
 const NOW = 1_784_016_325_277;
-const AUDIENCE = "https://satyr.example/hook/email/google";
+const AUDIENCE = "https://pantry.example/hook/email/google";
 const SERVICE_ACCOUNT = "gmail-push@satyr-project.iam.gserviceaccount.com";
 
 describe("google pubsub push boundary", googlePubsubSuite);

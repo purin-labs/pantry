@@ -121,7 +121,7 @@ describe("Slack event boundary", function slackEventBoundarySuite() {
           channel: "C0BGSHARED",
           user: "U0BGEXTERNAL",
           user_team: "T0BGEXTERNAL",
-          text: "<@U0BGSATYR> inspect this shared channel",
+          text: "<@U0BGPANTRY> inspect this shared channel",
           ts: "1780000000.000004",
           event_ts: "1780000000.000004",
         },
@@ -148,7 +148,7 @@ describe("Slack event boundary", function slackEventBoundarySuite() {
           type: "app_mention",
           channel: "C0BG0P4JF25",
           user: "U0BGUSER",
-          text: "<@U0BGSATYR> inspect this image",
+          text: "<@U0BGPANTRY> inspect this image",
           ts: "1780000000.000005",
           event_ts: "1780000000.000005",
           files: [
@@ -477,7 +477,7 @@ describe("Slack event boundary", function slackEventBoundarySuite() {
           eventEnvelope({
             ...base,
             type: "app_mention",
-            text: "<@U0BGSATYR> look",
+            text: "<@U0BGPANTRY> look",
             files: [
               {
                 id: "F0BGA",
@@ -497,7 +497,7 @@ describe("Slack event boundary", function slackEventBoundarySuite() {
           eventEnvelope({
             ...base,
             type: "app_mention",
-            text: "<@U0BGSATYR> look",
+            text: "<@U0BGPANTRY> look",
             files: [{ id: "F0BGA", file_access: "check_file_info" }],
           }),
         ),

@@ -250,7 +250,7 @@ async function sendTurn(
         threadTs,
         text:
           messageTs === threadTs
-            ? "<@U0SATYR> open this case"
+            ? "<@U0PANTRY> open this case"
             : "continue in the same case",
       }),
     ),

@@ -24,7 +24,7 @@ const CLIENT_ENV: GmailOAuthClientEnv = {
   GMAIL_OAUTH_CLIENT_SECRET: "gmail-secret",
 };
 const REDIRECT_URI =
-  "https://satyr.example/v1/control/providers/gmail/callback";
+  "https://pantry.example/v1/control/providers/gmail/callback";
 
 describe("gmail OAuth", gmailOAuthSuite);
 

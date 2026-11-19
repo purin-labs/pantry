@@ -163,7 +163,7 @@ it("installs an agent-written merchant plugin only after an owner approves each 
     "app_mention",
     "EvPiPluginFirst",
     ROOT_TS,
-    "<@U0SATYR> A whole cake needs 48 hours' notice for pickup. Set that up for approval.",
+    "<@U0PANTRY> A whole cake needs 48 hours' notice for pickup. Set that up for approval.",
   );
   // The notice and the agent's reply.
   await expect.poll(slack.visibleMessageCount, { timeout: 15_000 }).toBe(2);

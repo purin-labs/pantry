@@ -159,7 +159,7 @@ async function acceptsOrderAttention(context: TestContext): Promise<void> {
     turns,
     "brief",
     1,
-    `<@U0SATYR> Agent Urk: Which orders need my attention because of unresolved failed payments or delays? Group repeated failures by order, check later captures and completion, read all four source types and follow all pages. ${OUTPUT_SHAPE}`,
+    `<@U0PANTRY> Agent Urk: Which orders need my attention because of unresolved failed payments or delays? Group repeated failures by order, check later captures and completion, read all four source types and follow all pages. ${OUTPUT_SHAPE}`,
   );
   expect(issueIdentities(brief)).toEqual([
     "order_attention_delayed:delay",

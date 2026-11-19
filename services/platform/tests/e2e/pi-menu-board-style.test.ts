@@ -108,7 +108,7 @@ it(
         "app_mention",
         "EvStyleScale",
         ROOT_TS,
-        "<@U0SATYR> Make the headings on the Drinks board stand out more: use a stronger type scale.",
+        "<@U0PANTRY> Make the headings on the Drinks board stand out more: use a stronger type scale.",
       );
       await expect
         .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
@@ -144,7 +144,7 @@ it(
           "model provider (deterministic OpenRouter transport)",
           "Slack (signed events)",
         ],
-        real: ["Satyr Worker and the board room", "screen feed"],
+        real: ["Pantry Worker and the board room", "screen feed"],
         firstReleaseHasStyle: false,
         // Yjs keeps one of two writes of one token; which one depends on
         // the replicas' random client IDs, so the evidence names no winner.

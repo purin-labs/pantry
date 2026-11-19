@@ -56,7 +56,7 @@ const BROWSER = "browser-j4";
  * every member may open.
  */
 it(
-  "carries the Satyr Kitchen view on the v2 screen envelope, and reads old Kitchen parts as v2",
+  "carries the Kitchen view on the v2 screen envelope, and reads old Kitchen parts as v2",
   { timeout: 300_000 },
   async ({ task }: TestContext): Promise<void> => {
     const { author, reviewer, route, paths } = await installMemoryFixture();

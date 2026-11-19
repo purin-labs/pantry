@@ -407,7 +407,7 @@ async function resumeAuthorizationTest(): Promise<void> {
   const env: ProviderOAuthStartEnv = {
     PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: db,
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example.test",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example.test",
     SLACK_CLIENT_ID: "slack-client-id",
     SLACK_CLIENT_SECRET: "slack-client-secret",
   };
@@ -461,8 +461,8 @@ async function resumeAuthorizationTest(): Promise<void> {
         PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
         DB: db,
-        PANTRY_OAUTH_CALLBACK_ORIGIN: "https://oauth.satyr.example.test",
-        PANTRY_PUBLIC_ORIGIN: "https://satyr.example.test",
+        PANTRY_OAUTH_CALLBACK_ORIGIN: "https://oauth.pantry.example.test",
+        PANTRY_PUBLIC_ORIGIN: "https://pantry.example.test",
         AIRTABLE_OAUTH_CLIENT_ID: "airtable-client-id",
         AIRTABLE_OAUTH_CLIENT_SECRET: "airtable-client-secret",
       },
@@ -473,7 +473,7 @@ async function resumeAuthorizationTest(): Promise<void> {
   expect(airtableAuthorizationUrl.origin).toBe("https://airtable.com");
   expect(airtableAuthorizationUrl.pathname).toBe("/oauth2/v1/authorize");
   expect(airtableAuthorizationUrl.searchParams.get("redirect_uri")).toBe(
-    "https://oauth.satyr.example.test/v1/control/providers/airtable/callback",
+    "https://oauth.pantry.example.test/v1/control/providers/airtable/callback",
   );
   expect(airtableAuthorizationUrl.searchParams.get("scope")).toBe(
     "data.records:read data.records:write schema.bases:read schema.bases:write data.recordComments:read data.recordComments:write webhook:manage",

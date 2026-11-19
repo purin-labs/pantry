@@ -51,7 +51,7 @@ async function main() {
 
   assertChildResult(result);
   await removeLocalEnvValues(envPath, [secretName]);
-  console.log(`Deleted ${secretName} from the Satyr Worker and .env.local.`);
+  console.log(`Deleted ${secretName} from the Pantry Worker and .env.local.`);
 }
 
 function assertChildResult(result) {

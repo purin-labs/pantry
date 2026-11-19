@@ -2,7 +2,7 @@
 //! admits and returns.
 //!
 //! The executor is a separate container with its own boundary, so it owns these
-//! definitions instead of depending on the Satyr or Underclerk Rust contract
+//! definitions instead of depending on the Pantry or Underclerk Rust contract
 //! crates. The serde shape and the validation rules match the TypeScript
 //! contracts in `packages/contracts/src` and `packages/commerce-contracts/src`;
 //! the wire schemas in `packages/contracts/src/workspace-executor.ts` are the

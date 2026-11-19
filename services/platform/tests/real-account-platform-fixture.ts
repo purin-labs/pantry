@@ -69,7 +69,7 @@ export async function connectRealAccountPlatform(
     ...env,
     ACCOUNT_PLATFORM: transport,
     ACCOUNT_PLATFORM_DEPLOYMENT_ID: "shared-account-satyr-e2e",
-    ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-satyr-provision",
+    ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-pantry-provision",
     ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK: JSON.stringify(
       provisionKeys.publicKey.export({ format: "jwk" }),
     ),
@@ -133,7 +133,7 @@ export async function connectRealAccountPlatform(
     new Request(`${NATIVE_ORIGIN}/account-platform/v1/provision`, {
       method: "POST",
       headers: {
-        authorization: "Bearer shared-account-e2e-satyr-provision",
+        authorization: "Bearer shared-account-e2e-pantry-provision",
         "content-type": "application/json",
       },
       body: JSON.stringify(setup.provisionEnvelopes.primary),

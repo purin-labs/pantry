@@ -92,7 +92,7 @@ it(
         "app_mention",
         "EvStacksMake",
         ROOT_TS,
-        "<@U0SATYR> Stack the soup and the bread texts on the Specials board.",
+        "<@U0PANTRY> Stack the soup and the bread texts on the Specials board.",
       );
       await expect
         .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
@@ -218,7 +218,7 @@ it(
           "Slack (signed events)",
         ],
         real: [
-          "Satyr Worker and the board room",
+          "Pantry Worker and the board room",
           "Underclerk fixture Worker",
           "screen feed",
         ],

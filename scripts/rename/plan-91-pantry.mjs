@@ -17,6 +17,7 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { isBinary, isExcluded as isCommonExcluded, trackedFiles } from "./tree.mjs";
 
 const args = process.argv.slice(2);
 const WRITE = args.includes("--write");
@@ -24,19 +25,8 @@ const reportArg = args.indexOf("--report");
 const REPORT_PATH = reportArg >= 0 ? args[reportArg + 1] : null;
 const SELF = "scripts/rename/plan-91-pantry.mjs";
 
-/** Paths that keep their "atelier" text and their names: plans, evidence and recorded data. */
-const EXCLUDED_PATHS = [
-  /^docs\//,
-  /^assets\//,
-  /^output\//,
-  /^crates\/bakery-native\//,
-  /(^|\/)evidence\//,
-  /(^|\/)migrations[^/]*\//,
-  /\.sql$/,
-  /(^|\/)pnpm-lock\.yaml$/,
-  /(^|\/)Cargo\.lock$/,
-  new RegExp(`^${SELF.replace(/[.]/g, "\\.")}$`),
-];
+/** Paths that keep their "atelier" text and their names: plans, evidence and recorded data (tree.mjs), and this file. */
+const isExcluded = (file) => file === SELF || isCommonExcluded(file);
 
 /** Paths excluded even from the SATYR_* -> PANTRY_* environment variable pass. */
 const ENV_EXCLUDED_PATHS = [
@@ -135,10 +125,8 @@ const ENV_VAR_RENAMES = [
   ["SATYR_WORKER_URL", "PANTRY_WORKER_URL"],
 ];
 
-const isExcluded = (file) => EXCLUDED_PATHS.some((pattern) => pattern.test(file));
 const isEnvExcluded = (file) =>
   ENV_EXCLUDED_PATHS.some((pattern) => pattern.test(file));
-const isBinary = (file) => /\.(png|jpe?g|gif|webp|ico|glb|gltf|bin|data|wasm|onnx|pdf|zip|gz|mp3|mp4|wav|woff2?|ttf|otf|mjb|stl|obj|npz|npy)$/i.test(file);
 
 function renameText(text, envOnly = false) {
   const masks = [];
@@ -158,10 +146,7 @@ function renameText(text, envOnly = false) {
   return masked.replace(/\u0000(\d+)\u0000/g, (_, index) => masks[Number(index)]);
 }
 
-const tracked = execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" })
-  .split("\0")
-  .filter(Boolean)
-  .filter((file) => fs.existsSync(file) && fs.statSync(file).isFile());
+const tracked = trackedFiles();
 
 const changes = [];
 const moves = [];

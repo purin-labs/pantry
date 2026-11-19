@@ -269,7 +269,7 @@ it(
       "app_mention",
       "EvOrderChannel",
       "1710000900.000100",
-      "<@U0SATYR> How many open customer orders do we have?",
+      "<@U0PANTRY> How many open customer orders do we have?",
       "1710000900.000100",
     );
     await expect

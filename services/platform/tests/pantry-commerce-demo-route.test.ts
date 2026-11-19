@@ -259,12 +259,12 @@ function prepareAuthorizedControlMocks(): void {
 
 function demoRequest(profile: string, idempotencyKey: string): Request {
   return new Request(
-    `https://satyr.example/v1/control/organisations/${ORGANISATION_ID}/commerce-system/satyr-commerce/demo`,
+    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce-system/satyr-commerce/demo`,
     {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        origin: "https://satyr.example",
+        origin: "https://pantry.example",
         cookie:
           "satyr_control_session=session-demo; satyr_control_csrf=csrf-demo",
         "x-satyr-csrf": "csrf-demo",
@@ -300,7 +300,7 @@ function demoRouteEnv(
     DATA_ENCRYPTION_ROOT: {
       get: vi.fn(async () => Buffer.alloc(32, 17).toString("base64")),
     },
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
   });
 }
 

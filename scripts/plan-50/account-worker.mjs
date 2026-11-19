@@ -74,7 +74,7 @@ export async function accountAuthorityRuntime(directory) {
     serviceBindings: { ACCOUNT_PLATFORM: ACCOUNT_WORKER },
     bindings: {
       ACCOUNT_PLATFORM_DEPLOYMENT_ID: "shared-account-satyr-e2e",
-      ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-satyr-provision",
+      ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-pantry-provision",
       ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK: JSON.stringify(
         keys.provisionPublic,
       ),

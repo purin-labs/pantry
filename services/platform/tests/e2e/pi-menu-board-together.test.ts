@@ -111,7 +111,7 @@ it(
       "app_mention",
       "EvTogetherItems",
       ROOT_TS,
-      "<@U0SATYR> Put the taro milk tea and the matcha tea on the menu.",
+      "<@U0PANTRY> Put the taro milk tea and the matcha tea on the menu.",
     );
     await expect
       .poll(delivered.bind(null, slack), { timeout: 30_000 })
@@ -277,7 +277,7 @@ it(
           "Slack (signed events, interaction payloads and response URLs)",
         ],
         real: [
-          "Satyr Worker and the board room",
+          "Pantry Worker and the board room",
           "Underclerk fixture Worker",
           "screen feed",
         ],

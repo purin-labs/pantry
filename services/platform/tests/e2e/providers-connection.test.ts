@@ -34,7 +34,7 @@ const GMAIL_GRANTED_SCOPES =
 const WHATSAPP_APP_ID = "1000000000000001";
 const WHATSAPP_WABA_ID = "4000000000000004";
 const WHATSAPP_PHONE_NUMBER_ID = "5000000000000005";
-const SHOP_DOMAIN = "satyr-e2e.myshopify.com";
+const SHOP_DOMAIN = "pantry-e2e.myshopify.com";
 const SHOPIFY_CLIENT_SECRET = "shopify-e2e-secret";
 const SLACK_SCOPES = [
   "app_mentions:read",

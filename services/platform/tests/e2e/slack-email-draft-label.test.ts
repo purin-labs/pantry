@@ -311,7 +311,7 @@ async function postMention(
         eventId,
         messageTs: ts,
         threadTs: ROOT_TS,
-        text: `<@U0SATYR> ${question}`,
+        text: `<@U0PANTRY> ${question}`,
       }),
     ),
   );

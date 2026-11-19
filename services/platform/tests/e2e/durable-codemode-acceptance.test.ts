@@ -70,7 +70,7 @@ it("finishes a script of parallel reads and one proposal across two losses of it
   const journey = await startScriptTurn(test, {
     eventId: "EvDurableCodemodeAcceptance",
     install: installListingAuthority,
-    text: "<@U0SATYR> Read the prepared cookie listing and propose its publication.",
+    text: "<@U0PANTRY> Read the prepared cookie listing and propose its publication.",
     completions: ["pass", "pass", "pass", "never", "pass", "never"],
     replies: [
       DISCOVER_READ,

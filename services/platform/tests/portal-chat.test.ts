@@ -1369,7 +1369,7 @@ describe("persistent portal chat", function chatSuite() {
         60,
       );
     mocks.generate.mockResolvedValueOnce(
-      completed({ kind: "reply", text: "I inspected Satyr Kitchen." }),
+      completed({ kind: "reply", text: "I inspected Kitchen." }),
     );
 
     if (pendingExecution === null)

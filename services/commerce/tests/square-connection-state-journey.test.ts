@@ -169,7 +169,7 @@ async function connect(backend: Backend, code: string): Promise<void> {
     grant: {
       kind: "authorization_code",
       code,
-      redirectUri: "https://satyr.example/callback",
+      redirectUri: "https://pantry.example/callback",
     },
   });
   if (answer.status !== 200)

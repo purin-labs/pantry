@@ -51,7 +51,7 @@ let database: DatabaseSync;
 
 function env(): UnitTestEnv {
   return platformEnv({
-    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
     DB: db,
   });
 }
@@ -94,7 +94,7 @@ function executionInput(
   overrides: Partial<Parameters<typeof executeApprovedSupplierPayout>[0]> = {},
 ): Parameters<typeof executeApprovedSupplierPayout>[0] {
   return {
-    request: new Request("https://satyr.example/x", { method: "POST" }),
+    request: new Request("https://pantry.example/x", { method: "POST" }),
     env: env(),
     authorized: authorized(),
     identity: {

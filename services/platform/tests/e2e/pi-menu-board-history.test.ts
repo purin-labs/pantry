@@ -196,7 +196,7 @@ it(
         "app_mention",
         "EvHistoryUrk",
         ROOT_TS,
-        "<@U0SATYR> Undo the restore on the Counter board, then name that version Lunch plan.",
+        "<@U0PANTRY> Undo the restore on the Counter board, then name that version Lunch plan.",
       );
       await expect
         .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
@@ -221,7 +221,7 @@ it(
           "Slack (signed events)",
         ],
         real: [
-          "Satyr Worker, the board room and its version store",
+          "Pantry Worker, the board room and its version store",
           "Underclerk fixture Worker",
           "screen feed",
         ],

@@ -139,7 +139,7 @@ it("publishes an agent's menu only after an owner approves that exact menu", asy
     "app_mention",
     "EvPiMenuFirst",
     ROOT_TS,
-    "<@U0SATYR> Call the menu Autumn menu, put the sesame cookie on it and set it up to publish.",
+    "<@U0PANTRY> Call the menu Autumn menu, put the sesame cookie on it and set it up to publish.",
   );
   await expect.poll(slack.visibleMessageCount, { timeout: 20_000 }).toBe(2);
   const draft = await readDraft(session);
@@ -186,7 +186,7 @@ it("publishes an agent's menu only after an owner approves that exact menu", asy
     "app_mention",
     "EvPiMenuLater",
     LATER_THREAD,
-    "<@U0SATYR> Add the ginger milk tea to the menu too.",
+    "<@U0PANTRY> Add the ginger milk tea to the menu too.",
     LATER_THREAD,
   );
   await expect
@@ -305,7 +305,7 @@ it("asks a person before content of a private channel enters the shared menu", a
     "app_mention",
     "EvPiMenuPrivate",
     ROOT_TS,
-    "<@U0SATYR> Call the menu Secret menu.",
+    "<@U0PANTRY> Call the menu Secret menu.",
   );
   await expect
     .poll(delivered.bind(null, slack), { timeout: 20_000 })

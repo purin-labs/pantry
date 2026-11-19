@@ -15,7 +15,7 @@ const identifiedWithoutCustomer: PointOfSaleBuyer = {
 
 const posWithStorefront: CheckoutSource = {
   kind: "point_of_sale",
-  satyrLocationId: "satyr_location_fixture",
+  satyrLocationId: "pantry_location_fixture",
   operatorIdentity: "operator_fixture",
   terminalAssignmentRevision: 1,
   buyer: { kind: "anonymous" },
@@ -25,7 +25,7 @@ const posWithStorefront: CheckoutSource = {
 
 const posWithBuyerSession: CheckoutSource = {
   kind: "point_of_sale",
-  satyrLocationId: "satyr_location_fixture",
+  satyrLocationId: "pantry_location_fixture",
   operatorIdentity: "operator_fixture",
   terminalAssignmentRevision: 1,
   buyer: { kind: "anonymous" },
@@ -39,13 +39,13 @@ const onlineWithLocation: CheckoutSource = {
   buyerSessionDigest: "ab".repeat(32),
   buyerContact,
   // @ts-expect-error An online Checkout has no Pantry location or terminal.
-  satyrLocationId: "satyr_location_fixture",
+  satyrLocationId: "pantry_location_fixture",
 };
 
 // @ts-expect-error An in-person Checkout binds an exact terminal assignment revision.
 const posWithoutAssignmentRevision: CheckoutSource = {
   kind: "point_of_sale",
-  satyrLocationId: "satyr_location_fixture",
+  satyrLocationId: "pantry_location_fixture",
   operatorIdentity: "operator_fixture",
   buyer: { kind: "anonymous" },
 };
@@ -53,7 +53,7 @@ const posWithoutAssignmentRevision: CheckoutSource = {
 // @ts-expect-error An in-person Checkout records the operator who took payment.
 const posWithoutOperator: CheckoutSource = {
   kind: "point_of_sale",
-  satyrLocationId: "satyr_location_fixture",
+  satyrLocationId: "pantry_location_fixture",
   terminalAssignmentRevision: 1,
   buyer: { kind: "anonymous" },
 };

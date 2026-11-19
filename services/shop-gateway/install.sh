@@ -1,5 +1,5 @@
 #!/bin/sh
-# Installs the Satyr shop gateway on this computer (Plan 85). The Portal shows the command:
+# Installs the Pantry shop gateway on this computer (Plan 85). The Portal shows the command:
 #   curl -fsSL <origin>/shop-gateway/install.sh | sh -s -- --url <origin> \
 #     --organisation <id> --gateway <id> --code <one-time code>
 # It needs no administrator on a Mac. On Linux, run it as root to install a system service.
