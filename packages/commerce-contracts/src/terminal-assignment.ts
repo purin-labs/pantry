@@ -1,7 +1,9 @@
 import type { CommerceMerchantId } from "./records/identifiers.ts";
 import type { InPersonPaymentBinding } from "./commerce-domain";
-import type { PaymentEnvironment } from "./records/commerce-records.ts";
-import type { SquareTerminalTransport } from "./records/commerce-records.ts";
+import type {
+  InPersonTerminalTransport,
+  PaymentEnvironment,
+} from "./records/commerce-records.ts";
 import type { TerminalAssignment } from "./records/terminal.ts";
 import type { TerminalAssignmentState } from "./records/terminal.ts";
 import type { TerminalDeviceHealth } from "./records/terminal.ts";
@@ -95,8 +97,15 @@ export function parseTerminalAssignment(
   }
   const transport = readEnum(raw.transport, "terminalAssignment.transport", [
     "server_terminal",
-  ] satisfies readonly SquareTerminalTransport[]);
+    "lan_gateway",
+  ] satisfies readonly InPersonTerminalTransport[]);
   if (!transport.ok) return transport;
+  if (
+    (target.value.kind === "lan_gateway_device") !==
+    (transport.value === "lan_gateway")
+  ) {
+    return invalid("terminalAssignment.transport");
+  }
   const adapterVersion = readText(
     raw.adapterVersion,
     "terminalAssignment.adapterVersion",
@@ -134,6 +143,7 @@ export function parseTerminalTarget(raw: unknown): ParseResult<TerminalTarget> {
   const kind = readEnum(raw.kind, "terminalAssignment.target.kind", [
     "sandbox_simulated",
     "paired_physical",
+    "lan_gateway_device",
   ] as const);
   if (!kind.ok) return kind;
   if (kind.value === "sandbox_simulated") {
@@ -153,6 +163,30 @@ export function parseTerminalTarget(raw: unknown): ParseResult<TerminalTarget> {
           },
         }
       : testDeviceId;
+  }
+  if (kind.value === "lan_gateway_device") {
+    if (!hasExactKeys(raw, ["kind", "gatewayId", "deviceSourceKey"])) {
+      return invalid("terminalAssignment.target");
+    }
+    const gatewayId = readText(
+      raw.gatewayId,
+      "terminalAssignment.target.gatewayId",
+    );
+    if (!gatewayId.ok) return gatewayId;
+    const deviceSourceKey = readText(
+      raw.deviceSourceKey,
+      "terminalAssignment.target.deviceSourceKey",
+    );
+    return deviceSourceKey.ok
+      ? {
+          ok: true,
+          value: {
+            kind: "lan_gateway_device",
+            gatewayId: gatewayId.value,
+            deviceSourceKey: deviceSourceKey.value,
+          },
+        }
+      : deviceSourceKey;
   }
   if (!hasExactKeys(raw, ["kind", "providerDeviceId"])) {
     return invalid("terminalAssignment.target");
@@ -498,6 +532,22 @@ export function terminalAssignmentPaymentBinding(
       },
     };
   }
+  if (
+    assignment.target.kind === "lan_gateway_device" &&
+    assignment.transport === "lan_gateway"
+  ) {
+    return {
+      ok: true,
+      value: {
+        provider: "gmo_stera",
+        account: assignment.account,
+        locationId: assignment.providerLocationId,
+        gatewayId: assignment.target.gatewayId,
+        deviceSourceKey: assignment.target.deviceSourceKey,
+        transport: "lan_gateway",
+      },
+    };
+  }
   return {
     ok: true,
     value: {
@@ -505,7 +555,7 @@ export function terminalAssignmentPaymentBinding(
       account: assignment.account,
       locationId: assignment.providerLocationId,
       deviceId: terminalTargetDeviceId(assignment.target),
-      transport: assignment.transport,
+      transport: "server_terminal",
     },
   };
 }
@@ -536,9 +586,14 @@ export function acceptTerminalPaymentObservation(
 
 /** The device identifier the provider expects on a collection request. */
 export function terminalTargetDeviceId(target: TerminalTarget): string {
-  return target.kind === "sandbox_simulated"
-    ? target.testDeviceId
-    : target.providerDeviceId;
+  switch (target.kind) {
+    case "sandbox_simulated":
+      return target.testDeviceId;
+    case "paired_physical":
+      return target.providerDeviceId;
+    case "lan_gateway_device":
+      return `${target.gatewayId}:${target.deviceSourceKey}`;
+  }
 }
 
 /**
@@ -548,7 +603,9 @@ export function terminalTargetDeviceId(target: TerminalTarget): string {
 export function terminalTargetHealthIsObservable(
   target: TerminalTarget,
 ): boolean {
-  return target.kind === "paired_physical";
+  return (
+    target.kind === "paired_physical" || target.kind === "lan_gateway_device"
+  );
 }
 
 /**
@@ -589,6 +646,7 @@ function targetPermitsEnvironment(
   target: TerminalTarget,
   environment: PaymentEnvironment,
 ): boolean {
+  if (target.kind === "lan_gateway_device") return true;
   return target.kind === "sandbox_simulated"
     ? environment === "development"
     : environment === "production";

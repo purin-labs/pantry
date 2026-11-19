@@ -1,8 +1,10 @@
 import type { HarnessToolDefinition } from "./catalog/types";
 import { COSTS_VIEW_TOOLS } from "./costs/view";
 import { PASTRY_BENCH_VIEW_TOOLS } from "./kitchen/pastry-bench";
+import { REGISTER_VIEW_TOOLS } from "./commerce/register-view";
 import { modelToolDefinition, type RegisteredTool } from "./define-tool";
 import {
+  counterSaleRead,
   orderQueueAdvance,
   orderQueueRead,
   soldOutMark,
@@ -103,6 +105,7 @@ export const COMMERCE_TOOLS = [
   supplierCreate,
   recipeWorkflowRead,
   recipeWorkflowProposal,
+  counterSaleRead,
 ] as const;
 
 /** The tools that the catalog lists where the device tools were. */
@@ -197,6 +200,7 @@ export const SURFACE_TOOLS = [
   ...SURFACE_TOOL_LIST,
   ...COSTS_VIEW_TOOLS,
   ...PASTRY_BENCH_VIEW_TOOLS,
+  ...REGISTER_VIEW_TOOLS,
 ];
 
 export const TOOLS = [

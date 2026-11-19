@@ -29,6 +29,7 @@ import {
   parseTenderRefund,
   type CancelCommerceOrderV1,
   type RefundCommerceOrderTendersV1,
+  type RecordCommerceCounterManualCashRefundV1,
   type RefundCommerceOrderV1,
   type CommerceTenderRefundV1,
 } from "./after-sale.ts";
@@ -307,6 +308,7 @@ import {
   parseReceiveInventoryCommandRecord,
   parseReconcileInventoryCommandRecord,
   parseRecordCheckoutPaymentCaptureCommandRecord,
+  parseRecordCounterCashPaymentCommandRecord,
   parseResolveCheckoutPaymentCommandRecord,
   parseCommerceSquarePaymentAccountV1Record,
   parseCommerceStripePaymentAccountV1Record,
@@ -481,6 +483,10 @@ export type PublishCommercePointOfSaleConfigurationV1 = WireAdmin.PublishCommerc
 export type BeginCommerceCheckoutPaymentV1 = WireAdmin.BeginCommerceCheckoutPaymentV1;
 
 export type CollectCommerceInPersonCheckoutPaymentV1 = WireAdmin.CollectCommerceInPersonCheckoutPaymentV1;
+
+export type RecordCommerceCounterCashPaymentV1 = WireAdmin.RecordCommerceCounterCashPaymentV1;
+
+export type CommerceCounterCashTenderV1 = WireAdmin.CommerceCounterCashTenderV1;
 
 export type CommerceInPersonCheckoutPaymentCollectionV1 =
   | Readonly<{
@@ -1848,6 +1854,17 @@ export class CommerceAdminClient {
     );
   }
 
+  async recordCounterCashPayment(
+    command: CommerceCommandInput<RecordCommerceCounterCashPaymentV1>,
+  ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
+    return this.#command(
+      `/v1/admin/merchants/${encodeURIComponent(command.merchantId)}/counter-sales/${encodeURIComponent(command.checkoutId)}/cash-payment`,
+      "POST",
+      command,
+      ["checkoutId"],
+    );
+  }
+
   async recordCheckoutPaymentCapture(
     command: CommerceCommandInput<RecordCommerceCheckoutPaymentCaptureV1>,
   ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
@@ -2067,6 +2084,17 @@ export class CommerceAdminClient {
   ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
     return this.#command(
       `/v1/admin/merchants/${encodeURIComponent(command.merchantId)}/orders/${encodeURIComponent(command.orderId)}/refunds`,
+      "POST",
+      command,
+      ["orderId"],
+    );
+  }
+
+  async recordCounterManualCashRefund(
+    command: CommerceCommandInput<RecordCommerceCounterManualCashRefundV1>,
+  ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
+    return this.#command(
+      `/v1/admin/merchants/${encodeURIComponent(command.merchantId)}/orders/${encodeURIComponent(command.orderId)}/manual-cash-refunds`,
       "POST",
       command,
       ["orderId"],
@@ -2762,6 +2790,10 @@ export function parseBeginCheckoutPaymentCommand(value: unknown): BeginCommerceC
 
 export function parseCollectInPersonCheckoutPaymentCommand(value: unknown): CollectCommerceInPersonCheckoutPaymentV1 {
   return decodeRecord(parseCollectInPersonCheckoutPaymentCommandRecord, value);
+}
+
+export function parseRecordCounterCashPaymentCommand(value: unknown): RecordCommerceCounterCashPaymentV1 {
+  return decodeRecord(parseRecordCounterCashPaymentCommandRecord, value);
 }
 
 export function parseInPersonCheckoutPaymentCollection(

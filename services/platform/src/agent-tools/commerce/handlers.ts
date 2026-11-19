@@ -1,6 +1,8 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
 import { isSystemCommerceEntity } from "@seams/contracts";
 import type {
+  CounterSaleReadRequest,
+  CounterSaleToolRead,
   OrderQueueAdvanceRequest,
   OrderQueueToolRead,
   PaymentsReadRequest,
@@ -37,6 +39,7 @@ import {
   presentPayments,
   type PaymentsToolRead,
 } from "../../commerce/payments-read";
+import { readCounterSaleView } from "../../commerce/counter-register";
 import {
   PRODUCT_SALES_SOURCE_TYPES,
   readBoundProductSales,
@@ -416,6 +419,70 @@ export async function readOrderQueueForEmbeddedHarness(
     value,
     Number(queue.value.merchantRevision),
     "order queue",
+  );
+  return value;
+}
+
+export async function readCounterSaleForEmbeddedHarness(
+  context: SessionToolContext,
+  request: CounterSaleReadRequest,
+): Promise<CounterSaleToolRead> {
+  const { env, storage, execution, lease, assignment } = context;
+  const work = await prepareStaffPageWork(
+    env,
+    execution,
+    lease,
+    assignment,
+    "order",
+    "counter sale",
+  );
+  await requireSessionExecution(execution, lease);
+  const loaded = await readCounterSaleView(
+    {
+      env,
+      scope: execution.scope,
+      organisationId: execution.scope.organisationId,
+      merchantId: work.context.merchantId,
+      client: work.context.client,
+    },
+    request.checkoutId,
+  );
+  await requireSessionExecution(execution, lease);
+  if (!loaded.ok) {
+    throw new Error("counter sale unavailable");
+  }
+  const view = loaded.value;
+  const value: CounterSaleToolRead = {
+    checkoutId: view.checkoutId,
+    satyrLocationId: view.satyrLocationId,
+    state: view.state,
+    collectable: view.collectable,
+    orderId: view.orderId,
+    pickupCode: view.pickupCode ?? null,
+    paymentMethod: view.paymentMethod ?? null,
+    tenderBrand: view.tenderBrand ?? null,
+    providerRefundable: view.providerRefundable ?? null,
+    amountMinor: view.quote?.amount.amountMinor ?? null,
+    currency: view.quote?.amount.currency ?? null,
+    cashReceivedMinor: view.manualTender?.cashReceivedMinor ?? null,
+    changeDueMinor: view.manualTender?.changeDueMinor ?? null,
+    afterSale:
+      view.afterSale === null
+        ? null
+        : {
+            orderState: view.afterSale.order.state,
+            paymentState: view.afterSale.payment.state,
+            fulfillmentState: view.afterSale.fulfillment.state,
+            refundState: view.afterSale.refundState,
+          },
+  };
+  await admitCommerceReadObservation(
+    storage,
+    lease,
+    work.prepared,
+    value,
+    view.revision,
+    "counter sale",
   );
   return value;
 }

@@ -16,9 +16,11 @@ import { updateInventoryPosition } from "../inventory-persistence.ts";
 import {
   type CancellationReservationPlan,
   type CancellationResolutionPlan,
+  type RefundCommand,
   type RefundReservationPlan,
   type RefundResolutionPlan,
 } from "./after-sale-cancellation.ts";
+import { writeManualCashRefund } from "../payments/manual-tender.ts";
 import { refundAttemptMoney } from "../payments/position.ts";
 import {
   fulfillmentObservation,
@@ -28,7 +30,6 @@ import {
 } from "./observations.ts";
 import {
   type CancelCommerceOrderV1,
-  type RefundCommerceOrderV1,
 } from "@seams/commerce-client";
 import type { CustomerAuthority } from "../plugins/customers/index.ts";
 import { creditStoredValueRefund } from "../plugins/stored-value/index.ts";
@@ -97,7 +98,7 @@ export function cancellationReservation(
 }
 
 export function refundReservation(
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   merchant: MerchantRow,
   plan: RefundReservationPlan,
   digest: string,
@@ -145,7 +146,7 @@ export function cancellationResolutionMutation(
 }
 
 export function refundResolutionMutation(
-  command: RefundCommerceOrderV1,
+  command: RefundCommand,
   merchant: MerchantRow,
   plan: RefundResolutionPlan,
   committedAt: string,
@@ -157,18 +158,23 @@ export function refundResolutionMutation(
     plan,
     committedAt,
     customers,
-    "refund_order",
+    command.schemaVersion === "underclerk.record-counter-manual-cash-refund.v1"
+      ? "record_counter_manual_cash_refund"
+      : "refund_order",
     "Successful refund plan lost terminal evidence",
   );
 }
 
 function refundResolution(
-  command: CancelCommerceOrderV1 | RefundCommerceOrderV1,
+  command: CancelCommerceOrderV1 | RefundCommand,
   merchant: MerchantRow,
   plan: CancellationResolutionPlan | RefundResolutionPlan,
   committedAt: string,
   customers: CustomerAuthority,
-  commandKind: "cancel_order" | "refund_order",
+  commandKind:
+    | "cancel_order"
+    | "refund_order"
+    | "record_counter_manual_cash_refund",
   lostEvidence: string,
 ): CommerceMutation {
   return {
@@ -219,6 +225,17 @@ function refundResolution(
               at: committedAt,
             },
           );
+        }
+        if (plan.manualCashRefund === true) {
+          const money = refundAttemptMoney(plan.refundAttempt);
+          writeManualCashRefund(database, command.merchantId, {
+            refundAttemptId: plan.refundAttempt.refundAttemptId,
+            orderId: plan.refundAttempt.orderId,
+            paymentId: plan.refundAttempt.paymentId,
+            amountMinor: money.amountMinor,
+            currency: money.currency,
+            recordedAt: committedAt,
+          });
         }
         customers.notifyRefundIssued(
           command.merchantId,

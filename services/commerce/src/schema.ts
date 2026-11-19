@@ -14,7 +14,7 @@ import { MEDIA_SCHEMA } from "./plugins/media/index.ts";
 import { STORED_VALUE_SCHEMA } from "./plugins/stored-value/index.ts";
 import { FOOD_SERVICE_SCHEMA } from "./plugins/food-service/index.ts";
 
-const SCHEMA_VERSION = 90;
+const SCHEMA_VERSION = 91;
 
 // Schema 86: a delivery whose event was archived is `gone` (Refactor 15).
 // SQLite cannot change a CHECK, so the delivery table is rebuilt with its
@@ -496,7 +496,6 @@ CREATE TABLE buyer_checkout (
       AND checkout_profile_id IS NULL AND checkout_profile_revision IS NULL
       AND pos_configuration_revision IS NOT NULL
       AND satyr_location_id IS NOT NULL AND operator_identity IS NOT NULL
-      AND terminal_assignment_revision IS NOT NULL
       AND point_of_sale_buyer_kind IS NOT NULL
       AND (
         (point_of_sale_buyer_kind = 'anonymous' AND point_of_sale_customer_id IS NULL)
@@ -532,7 +531,7 @@ CREATE TABLE checkout_payment_attempt (
   payment_provider TEXT NOT NULL CHECK (
     payment_provider IN (
       'stripe_online', 'gmo_pg_online', 'square_online',
-      'square_terminal'
+      'square_terminal', 'gmo_stera'
     )
   ),
   provider_request_id TEXT NOT NULL,
@@ -868,6 +867,9 @@ CREATE TABLE IF NOT EXISTS square_terminal_checkout (
   payment_attempt_id TEXT NOT NULL,
   payment_provider_binding_id TEXT NOT NULL,
   checkout_id TEXT NOT NULL,
+  payment_method TEXT NOT NULL DEFAULT 'card' CHECK (
+    payment_method IN ('card', 'felica', 'qr_code')
+  ),
   created_at TEXT NOT NULL,
   PRIMARY KEY (merchant_id, payment_attempt_id)
 ) STRICT;`;
@@ -1513,9 +1515,10 @@ CREATE TABLE IF NOT EXISTS refund_command (
 
 
 // Money that staff took outside a payment provider (Plan 77 step 2, schema
-// 69): cash, or a bank transfer with its reference. Each row is the tender of
-// one captured payment; a refund of that payment needs no provider.
-const MANUAL_TENDER_SCHEMA = `
+// 69; extended with counter cash tendered/change in Plan 90, schema 91): cash,
+// or a bank transfer with its reference. Each row is the tender of one
+// captured payment; a refund of that payment needs no provider.
+const MANUAL_TENDER_SCHEMA_V69 = `
 CREATE TABLE IF NOT EXISTS manual_tender (
   merchant_id TEXT NOT NULL,
   payment_id TEXT NOT NULL,
@@ -1530,6 +1533,46 @@ CREATE TABLE IF NOT EXISTS manual_tender (
 ) STRICT;
 CREATE INDEX IF NOT EXISTS manual_tender_order
   ON manual_tender (merchant_id, order_id);
+`;
+
+const MANUAL_TENDER_SCHEMA = `
+CREATE TABLE IF NOT EXISTS manual_tender (
+  merchant_id TEXT NOT NULL,
+  payment_id TEXT NOT NULL,
+  order_id TEXT NOT NULL,
+  method TEXT NOT NULL CHECK (method IN ('cash', 'bank_transfer')),
+  reference TEXT,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor > 0),
+  currency TEXT NOT NULL,
+  cash_received_minor INTEGER CHECK (
+    cash_received_minor IS NULL OR cash_received_minor >= amount_minor
+  ),
+  change_due_minor INTEGER CHECK (
+    change_due_minor IS NULL OR change_due_minor >= 0
+  ),
+  recorded_at TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, payment_id),
+  CHECK ((method = 'bank_transfer') = (reference IS NOT NULL)),
+  CHECK ((cash_received_minor IS NULL) = (change_due_minor IS NULL)),
+  CHECK (
+    cash_received_minor IS NULL OR
+    (method = 'cash' AND cash_received_minor - amount_minor = change_due_minor)
+  )
+) STRICT;
+CREATE INDEX IF NOT EXISTS manual_tender_order
+  ON manual_tender (merchant_id, order_id);
+CREATE TABLE IF NOT EXISTS manual_cash_refund (
+  merchant_id TEXT NOT NULL,
+  refund_attempt_id TEXT NOT NULL,
+  order_id TEXT NOT NULL,
+  payment_id TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor > 0),
+  currency TEXT NOT NULL,
+  recorded_at TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, refund_attempt_id)
+) STRICT;
+CREATE INDEX IF NOT EXISTS manual_cash_refund_order
+  ON manual_cash_refund (merchant_id, order_id);
 `;
 
 // A merchant's state of each plugin that it changed (Plan 77 step 3, schema
@@ -1712,32 +1755,38 @@ export function initializeCommerceSchema(
     );
   } else if (row.version >= 66 && row.version < SCHEMA_VERSION) {
     const from = row.version;
-    database.transaction(() => {
-      if (from < 67) applySchemaV67(database, appliedAt);
-      if (from < 68) applySchemaV68(database, appliedAt);
-      if (from < 69) applySchemaV69(database, appliedAt);
-      if (from < 70) applySchemaV70(database, appliedAt);
-      if (from < 71) applySchemaV71(database, appliedAt);
-      if (from < 72) applySchemaV72(database, appliedAt);
-      if (from < 73) applySchemaV73(database, appliedAt);
-      if (from < 74) applySchemaV74(database, appliedAt);
-      if (from < 75) applySchemaV75(database, appliedAt);
-      if (from < 76) applySchemaV76(database, appliedAt);
-      if (from < 77) applySchemaV77(database, appliedAt);
-      if (from < 78) applySchemaV78(database, appliedAt);
-      if (from < 79) applySchemaV79(database, appliedAt);
-      if (from < 80) applySchemaV80(database, appliedAt);
-      if (from < 81) applySchemaV81(database, appliedAt);
-      if (from < 82) applySchemaV82(database, appliedAt);
-      if (from < 83) applySchemaV83(database, appliedAt);
-      if (from < 84) applySchemaV84(database, appliedAt);
-      if (from < 85) applySchemaV85(database, appliedAt);
-      if (from < 86) applySchemaV86(database, appliedAt);
-      if (from < 87) applySchemaV87(database, appliedAt);
-      if (from < 88) applySchemaV88(database, appliedAt);
-      if (from < 89) applySchemaV89(database, appliedAt);
-      applySchemaV90(database, appliedAt);
-    });
+    if (from < 91) database.exec("PRAGMA foreign_keys = OFF");
+    try {
+      database.transaction(() => {
+        if (from < 67) applySchemaV67(database, appliedAt);
+        if (from < 68) applySchemaV68(database, appliedAt);
+        if (from < 69) applySchemaV69(database, appliedAt);
+        if (from < 70) applySchemaV70(database, appliedAt);
+        if (from < 71) applySchemaV71(database, appliedAt);
+        if (from < 72) applySchemaV72(database, appliedAt);
+        if (from < 73) applySchemaV73(database, appliedAt);
+        if (from < 74) applySchemaV74(database, appliedAt);
+        if (from < 75) applySchemaV75(database, appliedAt);
+        if (from < 76) applySchemaV76(database, appliedAt);
+        if (from < 77) applySchemaV77(database, appliedAt);
+        if (from < 78) applySchemaV78(database, appliedAt);
+        if (from < 79) applySchemaV79(database, appliedAt);
+        if (from < 80) applySchemaV80(database, appliedAt);
+        if (from < 81) applySchemaV81(database, appliedAt);
+        if (from < 82) applySchemaV82(database, appliedAt);
+        if (from < 83) applySchemaV83(database, appliedAt);
+        if (from < 84) applySchemaV84(database, appliedAt);
+        if (from < 85) applySchemaV85(database, appliedAt);
+        if (from < 86) applySchemaV86(database, appliedAt);
+        if (from < 87) applySchemaV87(database, appliedAt);
+        if (from < 88) applySchemaV88(database, appliedAt);
+        if (from < 89) applySchemaV89(database, appliedAt);
+        if (from < 90) applySchemaV90(database, appliedAt);
+        applySchemaV91(database, appliedAt);
+      });
+    } finally {
+      if (from < 91) database.exec("PRAGMA foreign_keys = ON");
+    }
   } else if (row.version !== SCHEMA_VERSION) {
     throw new Error(`Unsupported Underclerk schema version: ${row.version}`);
   }
@@ -1797,6 +1846,235 @@ function applySchemaV87(database: CommerceDatabase, appliedAt: string): void {
     .run(87, appliedAt);
 }
 
+// Schema 91 (Plan 90 Phase 1): cash-enabled counters can open a point_of_sale
+// checkout with terminal_assignment_revision IS NULL, and manual_tender records
+// cash_received_minor / change_due_minor for counter cash sales. Frozen DDL.
+const SCHEMA_V91_MIGRATION = `
+ALTER TABLE buyer_checkout RENAME TO buyer_checkout_v90;
+DROP INDEX IF EXISTS buyer_checkout_session;
+DROP INDEX IF EXISTS buyer_checkout_payment_pending;
+DROP TRIGGER IF EXISTS buyer_checkout_profile_insert;
+DROP TRIGGER IF EXISTS buyer_checkout_profile_immutable;
+CREATE TABLE buyer_checkout (
+  merchant_id TEXT NOT NULL,
+  checkout_id TEXT NOT NULL,
+  source_kind TEXT NOT NULL CHECK (source_kind IN ('online', 'point_of_sale')),
+  storefront_id TEXT,
+  cart_id TEXT,
+  buyer_session_digest TEXT CHECK (
+    buyer_session_digest IS NULL OR (
+      length(buyer_session_digest) = 64 AND
+      buyer_session_digest NOT GLOB '*[^0-9a-f]*'
+    )
+  ),
+  satyr_location_id TEXT,
+  operator_identity TEXT,
+  terminal_assignment_revision INTEGER CHECK (
+    terminal_assignment_revision IS NULL OR terminal_assignment_revision > 0
+  ),
+  point_of_sale_buyer_kind TEXT CHECK (
+    point_of_sale_buyer_kind IS NULL OR
+    point_of_sale_buyer_kind IN ('anonymous', 'identified_customer')
+  ),
+  point_of_sale_customer_id TEXT,
+  checkout_profile_id TEXT,
+  checkout_profile_revision INTEGER CHECK (
+    checkout_profile_revision IS NULL OR checkout_profile_revision > 0
+  ),
+  pos_configuration_revision INTEGER CHECK (
+    pos_configuration_revision IS NULL OR pos_configuration_revision > 0
+  ),
+  revision INTEGER NOT NULL CHECK (revision > 0),
+  lifecycle_state TEXT NOT NULL CHECK (
+    lifecycle_state IN ('quoted', 'payment_pending', 'accepted', 'expired')
+  ),
+  quote_digest TEXT NOT NULL,
+  checkout_json TEXT NOT NULL,
+  CHECK (
+    (source_kind = 'online'
+      AND storefront_id IS NOT NULL AND cart_id IS NOT NULL
+      AND buyer_session_digest IS NOT NULL
+      AND checkout_profile_id IS NOT NULL
+      AND checkout_profile_revision IS NOT NULL
+      AND pos_configuration_revision IS NULL
+      AND satyr_location_id IS NULL AND operator_identity IS NULL
+      AND terminal_assignment_revision IS NULL
+      AND point_of_sale_buyer_kind IS NULL AND point_of_sale_customer_id IS NULL)
+    OR
+    (source_kind = 'point_of_sale'
+      AND storefront_id IS NULL AND cart_id IS NULL
+      AND buyer_session_digest IS NULL
+      AND checkout_profile_id IS NULL AND checkout_profile_revision IS NULL
+      AND pos_configuration_revision IS NOT NULL
+      AND satyr_location_id IS NOT NULL AND operator_identity IS NOT NULL
+      AND point_of_sale_buyer_kind IS NOT NULL
+      AND (
+        (point_of_sale_buyer_kind = 'anonymous' AND point_of_sale_customer_id IS NULL)
+        OR
+        (point_of_sale_buyer_kind = 'identified_customer'
+          AND point_of_sale_customer_id IS NOT NULL)
+      ))
+  ),
+  PRIMARY KEY (merchant_id, checkout_id),
+  UNIQUE (merchant_id, cart_id),
+  FOREIGN KEY (merchant_id, storefront_id)
+    REFERENCES storefront (merchant_id, storefront_id) ON DELETE RESTRICT,
+  FOREIGN KEY (merchant_id, cart_id)
+    REFERENCES buyer_cart (merchant_id, cart_id) ON DELETE RESTRICT,
+  FOREIGN KEY (merchant_id, cart_id, buyer_session_digest)
+    REFERENCES buyer_cart (merchant_id, cart_id, buyer_session_digest) ON DELETE RESTRICT,
+  FOREIGN KEY (merchant_id, checkout_profile_id, checkout_profile_revision)
+    REFERENCES checkout_profile_revision (merchant_id, checkout_profile_id, revision)
+    ON DELETE RESTRICT
+) STRICT;
+INSERT INTO buyer_checkout (
+  merchant_id, checkout_id, source_kind, storefront_id, cart_id,
+  buyer_session_digest, satyr_location_id, operator_identity,
+  terminal_assignment_revision, point_of_sale_buyer_kind,
+  point_of_sale_customer_id, checkout_profile_id,
+  checkout_profile_revision, pos_configuration_revision, revision,
+  lifecycle_state, quote_digest, checkout_json
+)
+SELECT
+  merchant_id, checkout_id, source_kind, storefront_id, cart_id,
+  buyer_session_digest, satyr_location_id, operator_identity,
+  terminal_assignment_revision, point_of_sale_buyer_kind,
+  point_of_sale_customer_id, checkout_profile_id,
+  checkout_profile_revision, pos_configuration_revision, revision,
+  lifecycle_state, quote_digest, checkout_json
+FROM buyer_checkout_v90 ORDER BY rowid;
+DROP TABLE buyer_checkout_v90;
+CREATE INDEX buyer_checkout_session
+  ON buyer_checkout (merchant_id, buyer_session_digest)
+  WHERE buyer_session_digest IS NOT NULL;
+CREATE INDEX buyer_checkout_payment_pending
+  ON buyer_checkout (merchant_id, checkout_id)
+  WHERE lifecycle_state = 'payment_pending';
+CREATE TRIGGER IF NOT EXISTS buyer_checkout_profile_insert
+BEFORE INSERT ON buyer_checkout
+WHEN NEW.source_kind = 'online' AND NOT EXISTS (
+  SELECT 1 FROM buyer_cart
+  WHERE merchant_id = NEW.merchant_id
+    AND cart_id = NEW.cart_id
+    AND checkout_profile_id = NEW.checkout_profile_id
+    AND checkout_profile_revision = NEW.checkout_profile_revision
+)
+BEGIN
+  SELECT RAISE(ABORT, 'checkout profile must match cart');
+END;
+CREATE TRIGGER IF NOT EXISTS buyer_checkout_profile_immutable
+BEFORE UPDATE OF checkout_profile_id, checkout_profile_revision ON buyer_checkout
+WHEN OLD.checkout_profile_id IS NOT NEW.checkout_profile_id
+  OR OLD.checkout_profile_revision IS NOT NEW.checkout_profile_revision
+BEGIN
+  SELECT RAISE(ABORT, 'checkout profile cannot change');
+END;
+
+ALTER TABLE manual_tender RENAME TO manual_tender_v90;
+DROP INDEX IF EXISTS manual_tender_order;
+CREATE TABLE manual_tender (
+  merchant_id TEXT NOT NULL,
+  payment_id TEXT NOT NULL,
+  order_id TEXT NOT NULL,
+  method TEXT NOT NULL CHECK (method IN ('cash', 'bank_transfer')),
+  reference TEXT,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor > 0),
+  currency TEXT NOT NULL,
+  cash_received_minor INTEGER CHECK (
+    cash_received_minor IS NULL OR cash_received_minor >= amount_minor
+  ),
+  change_due_minor INTEGER CHECK (
+    change_due_minor IS NULL OR change_due_minor >= 0
+  ),
+  recorded_at TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, payment_id),
+  CHECK ((method = 'bank_transfer') = (reference IS NOT NULL)),
+  CHECK ((cash_received_minor IS NULL) = (change_due_minor IS NULL)),
+  CHECK (
+    cash_received_minor IS NULL OR
+    (method = 'cash' AND cash_received_minor - amount_minor = change_due_minor)
+  )
+) STRICT;
+INSERT INTO manual_tender (
+  merchant_id, payment_id, order_id, method, reference, amount_minor,
+  currency, cash_received_minor, change_due_minor, recorded_at
+)
+SELECT
+  merchant_id, payment_id, order_id, method, reference, amount_minor,
+  currency, NULL, NULL, recorded_at
+FROM manual_tender_v90 ORDER BY rowid;
+DROP TABLE manual_tender_v90;
+CREATE INDEX manual_tender_order
+  ON manual_tender (merchant_id, order_id);
+
+CREATE TABLE IF NOT EXISTS manual_cash_refund (
+  merchant_id TEXT NOT NULL,
+  refund_attempt_id TEXT NOT NULL,
+  order_id TEXT NOT NULL,
+  payment_id TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor > 0),
+  currency TEXT NOT NULL,
+  recorded_at TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, refund_attempt_id)
+) STRICT;
+CREATE INDEX IF NOT EXISTS manual_cash_refund_order
+  ON manual_cash_refund (merchant_id, order_id);
+
+ALTER TABLE square_terminal_checkout ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'card' CHECK (
+  payment_method IN ('card', 'felica', 'qr_code')
+);
+
+ALTER TABLE checkout_payment_attempt RENAME TO checkout_payment_attempt_v90;
+DROP INDEX IF EXISTS checkout_payment_attempt_state;
+CREATE TABLE checkout_payment_attempt (
+  merchant_id TEXT NOT NULL,
+  payment_attempt_id TEXT NOT NULL,
+  checkout_id TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision > 0),
+  checkout_revision INTEGER NOT NULL CHECK (checkout_revision > 0),
+  quote_digest TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL CHECK (amount_minor >= 0),
+  currency TEXT NOT NULL,
+  payment_provider TEXT NOT NULL CHECK (
+    payment_provider IN (
+      'stripe_online', 'gmo_pg_online', 'square_online',
+      'square_terminal', 'gmo_stera'
+    )
+  ),
+  provider_request_id TEXT NOT NULL,
+  idempotency_key TEXT NOT NULL,
+  lifecycle_state TEXT NOT NULL CHECK (
+    lifecycle_state IN ('pending', 'processing', 'captured', 'declined', 'indeterminate')
+  ),
+  payment_attempt_json TEXT NOT NULL,
+  PRIMARY KEY (merchant_id, payment_attempt_id),
+  UNIQUE (merchant_id, provider_request_id),
+  UNIQUE (merchant_id, idempotency_key),
+  FOREIGN KEY (merchant_id, checkout_id)
+    REFERENCES buyer_checkout (merchant_id, checkout_id) ON DELETE RESTRICT
+) STRICT;
+INSERT INTO checkout_payment_attempt (
+  merchant_id, payment_attempt_id, checkout_id, revision, checkout_revision,
+  quote_digest, amount_minor, currency, payment_provider, provider_request_id,
+  idempotency_key, lifecycle_state, payment_attempt_json
+)
+SELECT
+  merchant_id, payment_attempt_id, checkout_id, revision, checkout_revision,
+  quote_digest, amount_minor, currency, payment_provider, provider_request_id,
+  idempotency_key, lifecycle_state, payment_attempt_json
+FROM checkout_payment_attempt_v90 ORDER BY rowid;
+DROP TABLE checkout_payment_attempt_v90;
+CREATE INDEX checkout_payment_attempt_state
+  ON checkout_payment_attempt (merchant_id, lifecycle_state);
+`;
+
+function applySchemaV91(database: CommerceDatabase, appliedAt: string): void {
+  database.exec(SCHEMA_V91_MIGRATION);
+  database
+    .prepare("INSERT INTO schema_migration (version, applied_at) VALUES (?, ?)")
+    .run(91, appliedAt);
+}
+
 function applySchemaV90(database: CommerceDatabase, appliedAt: string): void {
   database.exec(STOCK_LOT_EXPIRY_INDEX_V90);
   database
@@ -1854,7 +2132,7 @@ function applySchemaV68(database: CommerceDatabase, appliedAt: string): void {
 }
 
 function applySchemaV69(database: CommerceDatabase, appliedAt: string): void {
-  database.exec(MANUAL_TENDER_SCHEMA);
+  database.exec(MANUAL_TENDER_SCHEMA_V69);
   database
     .prepare("INSERT INTO schema_migration (version, applied_at) VALUES (?, ?)")
     .run(69, appliedAt);

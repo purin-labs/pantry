@@ -10,11 +10,13 @@ import {
   type CommerceInventoryMovementV1,
   type CommerceInventoryPositionV1,
   type CommerceMutationErrorV1,
+  type CommerceOrderOriginV1,
   type CommercePreparationTicketV1,
 } from "@seams/commerce-client";
 import { merchantOwner } from "./merchant-owner.ts";
 import {
   commerceTransition,
+  type Checkout,
   type InventoryAllocation,
   type InventoryRequirement,
 } from "@seams/commerce-contracts";
@@ -102,7 +104,7 @@ export function planPreparationTicketCreate(
   const prepare = commerceTransition("order", order.lifecycle, "prepare");
   if (!prepare.allowed) return { kind: "rejected", error: prepare.refusal };
   if (
-    order.origin.kind !== "online" ||
+    (order.origin.kind !== "online" && order.origin.kind !== "point_of_sale") ||
     !timestampAtOrBefore(prepare.from.since, command.requestedAt)
   ) {
     return preparationTicketRejected("preparationTicket.order.lifecycle");
@@ -115,7 +117,7 @@ export function planPreparationTicketCreate(
   if (
     checkout?.lifecycle.state !== "accepted" ||
     checkout.lifecycle.orderId !== order.id ||
-    !checkoutOrderProfileMatches(order.origin, checkoutProfileOf(checkout)) ||
+    !checkoutMatchesPreparationOrder(order.origin, checkout) ||
     checkout.checkoutId !== order.origin.checkoutId ||
     !timestampAtOrBefore(checkout.lifecycle.acceptedAt, command.requestedAt) ||
     !timestampAtOrBefore(pickupPrepare.from.requestedAt, command.requestedAt)
@@ -277,7 +279,10 @@ export function planPreparationTicketComplete(
   const fulfillment = resources.fulfillments.find(
     (candidate) => candidate.id === ticket.fulfillmentId,
   );
-  if (order === undefined || order.origin.kind !== "online") {
+  if (
+    order === undefined ||
+    (order.origin.kind !== "online" && order.origin.kind !== "point_of_sale")
+  ) {
     return preparationTicketRejected("preparationTicket.order.lifecycle");
   }
   const prepareMove = commerceTransition("order", order.lifecycle, "prepare");
@@ -305,7 +310,7 @@ export function planPreparationTicketComplete(
   );
   if (
     checkout?.lifecycle.state !== "accepted" ||
-    !checkoutOrderProfileMatches(order.origin, checkoutProfileOf(checkout)) ||
+    !checkoutMatchesPreparationOrder(order.origin, checkout) ||
     checkout.lifecycle.orderId !== order.id
   ) {
     return preparationTicketRejected("preparationTicket.checkout");
@@ -563,6 +568,22 @@ function allocationBelongsToOrderLine(
     case "held":
       return false;
   }
+}
+
+function checkoutMatchesPreparationOrder(
+  origin: CommerceOrderOriginV1,
+  checkout: Checkout,
+): boolean {
+  if (origin.kind === "online") {
+    return checkoutOrderProfileMatches(origin, checkoutProfileOf(checkout));
+  }
+  if (origin.kind === "point_of_sale") {
+    return (
+      checkout.source.kind === "point_of_sale" &&
+      checkout.source.satyrLocationId === origin.locationId
+    );
+  }
+  return false;
 }
 
 function preparationTicketRejected(field: string): PreparationTicketPlanResult {

@@ -18,6 +18,7 @@ import {
 import {
   checkoutPaymentAttemptSchema,
   checkoutSchema,
+  inPersonPaymentMethodSchema,
   inventoryConsumptionPlanSchema,
   quantityUnitSchema,
   shippingProfileSchema,
@@ -89,9 +90,17 @@ const domainPaymentAttemptSchema = Type.Unsafe<CheckoutPaymentAttempt>(
 );
 const domainStorefrontSchema = Type.Unsafe<Storefront>(storefrontSchema);
 
+export const counterCashTenderSchema = ReadonlyStrictObject({
+  method: Type.Literal("cash"),
+  cashReceivedMinor: NonNegativeInteger,
+  changeDueMinor: NonNegativeInteger,
+  recordedAt: timestamp,
+});
+
 export const counterSaleSchema = ReadonlyStrictObject({
   checkout: domainCheckoutSchema,
   paymentAttempt: Type.Union([domainPaymentAttemptSchema, Type.Null()]),
+  manualTender: Type.Optional(counterCashTenderSchema),
 });
 
 const paymentCaptureVersion = Type.Literal(
@@ -103,6 +112,9 @@ export const paymentCaptureResultSchema = Type.Union([
     kind: Type.Literal("captured"),
     providerPaymentReference: text,
     capturedAt: timestamp,
+    paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
+    tenderBrand: Type.Optional(text),
+    providerRefundable: Type.Optional(Type.Boolean()),
   }),
   ReadonlyOpenObject({
     schemaVersion: paymentCaptureVersion,
@@ -385,7 +397,7 @@ export const createInPersonCheckoutCommandSchema = ReadonlyStrictObject({
   satyrLocationId: text,
   posConfigurationRevision: PositiveInteger,
   operatorIdentity: text,
-  terminalAssignmentRevision: PositiveInteger,
+  terminalAssignmentRevision: Type.Union([PositiveInteger, Type.Null()]),
   buyer: wirePointOfSaleBuyerSchema,
   checkoutId: text,
   lines: checkoutLines,
@@ -417,8 +429,21 @@ export const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
     ),
     ...checkoutPaymentFields,
     paymentBinding: wireInPersonPaymentBindingSchema,
+    paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
   },
 );
+
+export const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
+  schemaVersion: Type.Literal("underclerk.record-counter-cash-payment.v1"),
+  ...commandContext,
+  checkoutId: text,
+  checkoutRevision: PositiveInteger,
+  quoteDigest: text,
+  orderId: text,
+  paymentId: text,
+  fulfillmentId: text,
+  cashReceived: wireMoneySchema,
+});
 
 const paymentAttemptFields = {
   ...commandContext,
@@ -434,6 +459,9 @@ export const recordCheckoutPaymentCaptureCommandSchema = ReadonlyOpenObject({
   ...paymentAttemptFields,
   providerPaymentReference: text,
   capturedAt: timestamp,
+  paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
+  tenderBrand: Type.Optional(text),
+  providerRefundable: Type.Optional(Type.Boolean()),
 });
 
 export const placePaidCheckoutCommandSchema = ReadonlyOpenObject({
@@ -945,6 +973,9 @@ export const parseBeginCheckoutPaymentCommandRecord = wireRecordParser(
 );
 export const parseCollectInPersonCheckoutPaymentCommandRecord =
   wireRecordParser(collectInPersonCheckoutPaymentCommandSchema);
+export const parseRecordCounterCashPaymentCommandRecord = wireRecordParser(
+  recordCounterCashPaymentCommandSchema,
+);
 export const parseRecordCheckoutPaymentCaptureCommandRecord = wireRecordParser(
   recordCheckoutPaymentCaptureCommandSchema,
 );
@@ -1056,6 +1087,12 @@ export type BeginCommerceCheckoutPaymentV1 = Static<
 >;
 export type CollectCommerceInPersonCheckoutPaymentV1 = Static<
   typeof collectInPersonCheckoutPaymentCommandSchema
+>;
+export type RecordCommerceCounterCashPaymentV1 = Static<
+  typeof recordCounterCashPaymentCommandSchema
+>;
+export type CommerceCounterCashTenderV1 = Static<
+  typeof counterCashTenderSchema
 >;
 export type RecordCommerceCheckoutPaymentCaptureV1 = Static<
   typeof recordCheckoutPaymentCaptureCommandSchema

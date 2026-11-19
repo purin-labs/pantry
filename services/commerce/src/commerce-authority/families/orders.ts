@@ -202,6 +202,10 @@ export abstract class OrderFamily extends InventoryFamily {
     return this.afterSaleCommands.refundOrder(rawCommand);
   }
 
+  recordCounterManualCashRefund(rawCommand: unknown): CommerceMutationResultV1 {
+    return this.afterSaleCommands.recordCounterManualCashRefund(rawCommand);
+  }
+
   async refundOrderTenders(
     rawCommand: unknown,
   ): Promise<CommerceTenderRefundV1> {

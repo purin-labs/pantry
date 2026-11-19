@@ -12,7 +12,6 @@ import {
 import { checkoutProfileReferenceSchema } from "./checkout-profile.ts";
 import {
   hasUniqueValues,
-  identityTextSchema,
   marketCurrencySchema,
   marketRateSchema,
   nonNegativeMoneySchema,
@@ -28,7 +27,6 @@ import {
   utcTimestampSchema,
 } from "./fields.ts";
 import {
-  integrationAccountIdSchema,
   menuEntryIdSchema,
   menuIdSchema,
   menuSectionIdSchema,
@@ -42,7 +40,41 @@ import {
   resourceIdSchema,
   shipmentEntityIdSchema,
 } from "./identifiers.ts";
-import { currencyCodeSchema, moneySchema } from "./money.ts";
+import { moneySchema } from "./money.ts";
+import {
+  checkoutPaymentProviderBindingSchema,
+  gmoPgOnlineCollectionSchema,
+  inPersonPaymentBindingSchema,
+  inPersonPaymentMethodSchema,
+  onlinePaymentBindingSchema,
+  paymentEnvironmentSchema,
+  paymentProviderAccountBindingSchema,
+  stripeOnlineCollectionSchema,
+} from "./payment-bindings.ts";
+export {
+  checkoutPaymentProviderBindingSchema,
+  gmoPgOnlineCollectionSchema,
+  gmoSteraTransportSchema,
+  inPersonPaymentBindingSchema,
+  inPersonPaymentMethodSchema,
+  inPersonTerminalTransportSchema,
+  onlinePaymentBindingSchema,
+  paymentEnvironmentSchema,
+  paymentProviderAccountBindingSchema,
+  squareTerminalTransportSchema,
+  stripeOnlineCollectionSchema,
+  type CheckoutPaymentProviderBinding,
+  type GmoPgOnlineCollection,
+  type GmoSteraTransport,
+  type InPersonPaymentBinding,
+  type InPersonPaymentMethod,
+  type InPersonTerminalTransport,
+  type OnlinePaymentBinding,
+  type PaymentEnvironment,
+  type PaymentProviderAccountBinding,
+  type SquareTerminalTransport,
+  type StripeOnlineCollection,
+} from "./payment-bindings.ts";
 import { preparationTicketLifecycleSchema } from "./preparation-ticket-lifecycle.ts";
 export * from "./preparation-ticket-lifecycle.ts";
 import {
@@ -449,7 +481,7 @@ export const orderOriginSchema = Type.Union([
     salesChannelId: resourceIdSchema,
     locationId: resourceIdSchema,
     checkoutId: resourceIdSchema,
-    terminalId: Type.String(),
+    terminalId: Type.Union([Type.String(), Type.Null()]),
     receiptNumber: Type.String(),
   }),
   OpenObject({
@@ -1800,7 +1832,7 @@ export const checkoutSourceSchema = Type.Union([
     satyrLocationId: recordTextSchema,
     posConfigurationRevision: PositiveInteger,
     operatorIdentity: recordTextSchema,
-    terminalAssignmentRevision: PositiveInteger,
+    terminalAssignmentRevision: Type.Union([PositiveInteger, Type.Null()]),
     buyer: pointOfSaleBuyerSchema,
   }),
 ]);
@@ -2144,97 +2176,6 @@ export const checkoutSchema = StrictObject({
 });
 export type Checkout = Static<typeof checkoutSchema>;
 
-export const paymentEnvironmentSchema = Type.Union([
-  Type.Literal("development"),
-  Type.Literal("production"),
-]);
-export type PaymentEnvironment = Static<typeof paymentEnvironmentSchema>;
-
-export const paymentProviderAccountBindingSchema = OpenObject({
-  integrationAccountId: integrationAccountIdSchema,
-  providerAccountId: Type.String(),
-  environment: paymentEnvironmentSchema,
-  capabilityRevision: SafeInteger,
-  country: countryCodeSchema,
-  currency: currencyCodeSchema,
-});
-export type PaymentProviderAccountBinding = Static<
-  typeof paymentProviderAccountBindingSchema
->;
-
-/** The provider account of a checkout payment (`parsePaymentProviderAccountBinding`). */
-const paymentAccountRecordSchema = StrictObject({
-  integrationAccountId: identityTextSchema,
-  providerAccountId: identityTextSchema,
-  environment: paymentEnvironmentSchema,
-  capabilityRevision: PositiveInteger,
-  country: countryCodeTextSchema,
-  currency: currencyCodeTextSchema,
-});
-
-export const stripeOnlineCollectionSchema = Type.Union([
-  Type.Literal("embedded_tokenization"),
-  Type.Literal("hosted_redirect"),
-]);
-export type StripeOnlineCollection = Static<
-  typeof stripeOnlineCollectionSchema
->;
-
-export const gmoPgOnlineCollectionSchema = Type.Union([
-  Type.Literal("embedded_tokenization"),
-  Type.Literal("hosted_redirect"),
-]);
-export type GmoPgOnlineCollection = Static<typeof gmoPgOnlineCollectionSchema>;
-
-export const onlinePaymentBindingSchema = Type.Union([
-  StrictObject({
-    provider: Type.Literal("stripe_online"),
-    account: paymentAccountRecordSchema,
-    collection: stripeOnlineCollectionSchema,
-  }),
-  StrictObject({
-    provider: Type.Literal("gmo_pg_online"),
-    account: paymentAccountRecordSchema,
-    collection: gmoPgOnlineCollectionSchema,
-  }),
-  StrictObject({
-    provider: Type.Literal("square_online"),
-    account: paymentAccountRecordSchema,
-    applicationId: identityTextSchema,
-    locationId: identityTextSchema,
-  }),
-]);
-export type OnlinePaymentBinding = Static<typeof onlinePaymentBindingSchema>;
-
-/**
- * Square Terminal connected mode. Plan 33C ships server-controlled
- * collection only; a POS-app handoff is a different ceremony and would need
- * its own measured slice.
- */
-export const squareTerminalTransportSchema = Type.Literal("server_terminal");
-export type SquareTerminalTransport = Static<
-  typeof squareTerminalTransportSchema
->;
-
-export const inPersonPaymentBindingSchema = StrictObject({
-  provider: Type.Literal("square_terminal"),
-  account: paymentAccountRecordSchema,
-  locationId: identityTextSchema,
-  deviceId: identityTextSchema,
-  transport: squareTerminalTransportSchema,
-});
-export type InPersonPaymentBinding = Static<
-  typeof inPersonPaymentBindingSchema
->;
-
-export const checkoutPaymentProviderBindingSchema = Type.Union([
-  onlinePaymentBindingSchema,
-  inPersonPaymentBindingSchema,
-]);
-export type CheckoutPaymentProviderBinding = Static<
-  typeof checkoutPaymentProviderBindingSchema
->;
-
 export const checkoutPaymentBindingSchema = StrictObject({
   checkoutId: recordTextSchema,
   checkoutRevision: PositiveInteger,
@@ -2262,6 +2203,9 @@ export const checkoutPaymentAttemptLifecycleSchema = Type.Union([
     state: Type.Literal("captured"),
     providerPaymentReference: recordTextSchema,
     capturedAt: utcTimestampSchema,
+    paymentMethod: Type.Optional(inPersonPaymentMethodSchema),
+    tenderBrand: Type.Optional(recordTextSchema),
+    providerRefundable: Type.Optional(Type.Boolean()),
   }),
   OpenObject({
     state: Type.Literal("declined"),

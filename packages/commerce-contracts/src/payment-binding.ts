@@ -3,9 +3,12 @@ import type {
   InPersonPaymentBinding,
   OnlinePaymentBinding,
 } from "./commerce-domain";
-import type { PaymentEnvironment } from "./records/commerce-records.ts";
-import type { PaymentProviderAccountBinding } from "./records/commerce-records.ts";
-import type { SquareTerminalTransport } from "./records/commerce-records.ts";
+import type {
+  GmoSteraTransport,
+  PaymentEnvironment,
+  PaymentProviderAccountBinding,
+  SquareTerminalTransport,
+} from "./records/commerce-records.ts";
 import { hasExactKeys, isRecord } from "@seams/std";
 
 const IDENTITY_MAX_LENGTH = 255;
@@ -33,6 +36,7 @@ export function parseCheckoutPaymentProviderBinding(
     case "square_online":
       return parseOnlinePaymentBinding(raw);
     case "square_terminal":
+    case "gmo_stera":
       return parseInPersonPaymentBinding(raw);
     default:
       return invalidBinding("binding.provider");
@@ -136,21 +140,21 @@ export function parseInPersonPaymentBinding(
   if (!account.ok) return account;
   const locationId = readText(raw.locationId, "binding.locationId");
   if (!locationId.ok) return locationId;
-  const deviceId = readText(raw.deviceId, "binding.deviceId");
-  if (!deviceId.ok) return deviceId;
-  if (
-    !hasExactKeys(raw, [
-      "provider",
-      "account",
-      "locationId",
-      "deviceId",
-      "transport",
-    ])
-  ) {
-    return invalidBinding("binding");
-  }
   switch (provider.value) {
     case "square_terminal": {
+      if (
+        !hasExactKeys(raw, [
+          "provider",
+          "account",
+          "locationId",
+          "deviceId",
+          "transport",
+        ])
+      ) {
+        return invalidBinding("binding");
+      }
+      const deviceId = readText(raw.deviceId, "binding.deviceId");
+      if (!deviceId.ok) return deviceId;
       const transport = readEnum(raw.transport, "binding.transport", [
         "server_terminal",
       ] satisfies readonly SquareTerminalTransport[]);
@@ -162,6 +166,43 @@ export function parseInPersonPaymentBinding(
               account: account.value,
               locationId: locationId.value,
               deviceId: deviceId.value,
+              transport: transport.value,
+            },
+          }
+        : transport;
+    }
+    case "gmo_stera": {
+      if (
+        !hasExactKeys(raw, [
+          "provider",
+          "account",
+          "locationId",
+          "gatewayId",
+          "deviceSourceKey",
+          "transport",
+        ])
+      ) {
+        return invalidBinding("binding");
+      }
+      const gatewayId = readText(raw.gatewayId, "binding.gatewayId");
+      if (!gatewayId.ok) return gatewayId;
+      const deviceSourceKey = readText(
+        raw.deviceSourceKey,
+        "binding.deviceSourceKey",
+      );
+      if (!deviceSourceKey.ok) return deviceSourceKey;
+      const transport = readEnum(raw.transport, "binding.transport", [
+        "lan_gateway",
+      ] satisfies readonly GmoSteraTransport[]);
+      return transport.ok
+        ? {
+            ok: true,
+            value: {
+              provider: provider.value,
+              account: account.value,
+              locationId: locationId.value,
+              gatewayId: gatewayId.value,
+              deviceSourceKey: deviceSourceKey.value,
               transport: transport.value,
             },
           }

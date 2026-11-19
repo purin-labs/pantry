@@ -623,13 +623,17 @@ export function handleCommerceControlRoute(
     case "commerceMenuPublication":
     case "commerceShopName":
       return handleCommerceMenuPublicationControlRoute(request, env, route);
+    case "counterRegister":
     case "counterSales":
     case "counterSale":
+    case "counterSaleCash":
     case "counterSaleCollection":
+    case "counterSaleCancel":
     case "counterSaleReconciliation":
     case "counterSalePickupReady":
     case "counterSaleHandover":
     case "counterSaleRefund":
+    case "counterSaleManualCashRefund":
       return handleCounterSaleControlRoute(request, env, route);
     case "failedPayments":
       return handleFailedPaymentsControlRoute(request, env, route);

@@ -787,14 +787,19 @@ export async function requireLiveBakeryAuthority(
   organisationId: OrganisationId,
   lease: HarnessTurnLease,
   accountAccess: import("../../account-platform/access").AccountPlatformAccess,
+  options?: Readonly<{ allowOperator?: boolean }>,
 ): Promise<void> {
   const current = preflightHarnessTurnLease(storage, lease, Date.now());
+  const roleAllowed =
+    lease.requestAuthority.kind === "control" &&
+    (lease.requestAuthority.role === "admin" ||
+      lease.requestAuthority.role === "owner" ||
+      (options?.allowOperator === true &&
+        lease.requestAuthority.role === "operator"));
   if (
     !current.ok ||
     lease.requestAuthority.organisationId !== organisationId ||
-    lease.requestAuthority.kind !== "control" ||
-    (lease.requestAuthority.role !== "admin" &&
-      lease.requestAuthority.role !== "owner")
+    !roleAllowed
   ) {
     throw new Error("BakeryOS authority is unavailable");
   }

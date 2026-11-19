@@ -1,5 +1,15 @@
 import type { CounterSaleState } from "../index.ts";
+import {
+  isCounterRegisterPaymentMethod,
+  type CounterRegisterPaymentMethod,
+} from "../counter-register.ts";
 import { exhaustiveList, hasExactKeys } from "@seams/std";
+
+export type CounterSaleManualTender = Readonly<{
+  cashReceivedMinor: number | null;
+  changeDueMinor: number | null;
+  currency: string;
+}>;
 
 export type CounterSale = Readonly<{
   checkoutId: string;
@@ -20,6 +30,11 @@ export type CounterSale = Readonly<{
   }> | null;
   orderId: string | null;
   capturedPaymentReference: string | null;
+  pickupCode?: string | null;
+  paymentMethod?: CounterRegisterPaymentMethod | null;
+  tenderBrand?: string | null;
+  providerRefundable?: boolean | null;
+  manualTender?: CounterSaleManualTender | null;
   afterSale: Readonly<{
     order: Readonly<{ id: string; revision: number; state: string }>;
     payment: Readonly<{ id: string; revision: number; state: string }>;
@@ -27,6 +42,29 @@ export type CounterSale = Readonly<{
     refundState: "none" | "pending" | "completed" | "failed";
   }> | null;
 }>;
+
+const REQUIRED_SALE_KEYS = [
+  "schemaVersion",
+  "checkoutId",
+  "satyrLocationId",
+  "revision",
+  "state",
+  "collectable",
+  "recoverable",
+  "quote",
+  "orderId",
+  "capturedPaymentReference",
+  "afterSale",
+] as const;
+
+const ALLOWED_SALE_KEYS: ReadonlySet<string> = new Set([
+  ...REQUIRED_SALE_KEYS,
+  "pickupCode",
+  "paymentMethod",
+  "tenderBrand",
+  "providerRefundable",
+  "manualTender",
+]);
 
 const SALE_STATES = exhaustiveList<CounterSaleState>()([
   "awaiting_collection",
@@ -47,23 +85,16 @@ export function parseEnvelope(raw: unknown): CounterSale {
 
 function parseSale(raw: unknown): CounterSale {
   const object = requireObject(raw, "counter sale");
-  requireExactKeys(
-    object,
-    [
-      "schemaVersion",
-      "checkoutId",
-      "satyrLocationId",
-      "revision",
-      "state",
-      "collectable",
-      "recoverable",
-      "quote",
-      "orderId",
-      "capturedPaymentReference",
-      "afterSale",
-    ],
-    "counter sale",
-  );
+  for (const key of REQUIRED_SALE_KEYS) {
+    if (!(key in object)) {
+      throw new Error("counter sale fields are invalid.");
+    }
+  }
+  for (const key of Object.keys(object)) {
+    if (!ALLOWED_SALE_KEYS.has(key)) {
+      throw new Error("counter sale fields are invalid.");
+    }
+  }
   if (object.schemaVersion !== "satyr.counter-sale.v1") {
     throw new Error(
       "This sale is reported in a version this portal cannot read.",
@@ -84,6 +115,46 @@ function parseSale(raw: unknown): CounterSale {
   ) {
     throw new Error("Counter sale is invalid.");
   }
+  const optionalFields: {
+    pickupCode?: string | null;
+    paymentMethod?: CounterRegisterPaymentMethod | null;
+    tenderBrand?: string | null;
+    providerRefundable?: boolean | null;
+    manualTender?: CounterSaleManualTender | null;
+  } = {};
+  if ("pickupCode" in object) {
+    optionalFields.pickupCode = nullableText(object.pickupCode, "pickupCode");
+  }
+  if ("paymentMethod" in object) {
+    if (
+      object.paymentMethod !== null &&
+      !isCounterRegisterPaymentMethod(object.paymentMethod)
+    ) {
+      throw new Error("Counter sale payment method is invalid.");
+    }
+    optionalFields.paymentMethod = object.paymentMethod;
+  }
+  if ("tenderBrand" in object) {
+    optionalFields.tenderBrand = nullableText(
+      object.tenderBrand,
+      "tenderBrand",
+    );
+  }
+  if ("providerRefundable" in object) {
+    if (
+      object.providerRefundable !== null &&
+      typeof object.providerRefundable !== "boolean"
+    ) {
+      throw new Error("Counter sale providerRefundable is invalid.");
+    }
+    optionalFields.providerRefundable = object.providerRefundable;
+  }
+  if ("manualTender" in object) {
+    optionalFields.manualTender =
+      object.manualTender === null
+        ? null
+        : parseManualTender(object.manualTender);
+  }
   return {
     checkoutId: object.checkoutId,
     satyrLocationId: object.satyrLocationId,
@@ -98,7 +169,35 @@ function parseSale(raw: unknown): CounterSale {
       object.capturedPaymentReference,
       "capturedPaymentReference",
     ),
+    ...optionalFields,
     afterSale: parseAfterSale(object.afterSale),
+  };
+}
+
+function parseManualTender(raw: unknown): CounterSaleManualTender {
+  const object = requireObject(raw, "counter sale manual tender");
+  requireExactKeys(
+    object,
+    ["cashReceivedMinor", "changeDueMinor", "currency"],
+    "counter sale manual tender",
+  );
+  if (
+    (object.cashReceivedMinor !== null &&
+      !Number.isSafeInteger(object.cashReceivedMinor)) ||
+    (object.changeDueMinor !== null &&
+      !Number.isSafeInteger(object.changeDueMinor)) ||
+    typeof object.currency !== "string"
+  ) {
+    throw new Error("Counter sale manual tender is invalid.");
+  }
+  return {
+    cashReceivedMinor:
+      object.cashReceivedMinor === null
+        ? null
+        : Number(object.cashReceivedMinor),
+    changeDueMinor:
+      object.changeDueMinor === null ? null : Number(object.changeDueMinor),
+    currency: object.currency,
   };
 }
 

@@ -51,6 +51,7 @@ export {
 } from "./payment-session.ts";
 export {
   parseCancelOrderCommand,
+  parseRecordCounterManualCashRefundCommand,
   parseRefundOrderCommand,
   parseRefundOrderTendersCommand,
   parseRefundAttempt,
@@ -58,6 +59,7 @@ export {
 } from "./after-sale.ts";
 export type {
   CancelCommerceOrderV1,
+  RecordCommerceCounterManualCashRefundV1,
   RefundCommerceOrderTendersV1,
   RefundCommerceOrderV1,
   CommerceTenderRefundPartV1,
@@ -256,6 +258,8 @@ export {
   parseCheckoutPaymentAttempt,
   parseInventoryAllocation,
   parsePointOfSaleConfiguration,
+  pointOfSaleCatalogScope,
+  pointOfSaleCashEnabled,
   pointOfSaleConfigurationIsSellable,
   pointOfSaleQuantityCeiling,
   parseShippingQuoteSnapshot,
@@ -349,6 +353,7 @@ export {
   parseCreateInPersonCheckoutCommand,
   parseBeginCheckoutPaymentCommand,
   parseCollectInPersonCheckoutPaymentCommand,
+  parseRecordCounterCashPaymentCommand,
   parseInPersonCheckoutPaymentCollection,
   parseRecordCheckoutPaymentCaptureCommand,
   parsePlacePaidCheckoutCommand,
@@ -389,6 +394,8 @@ export {
   type PublishCommercePointOfSaleConfigurationV1,
   type BeginCommerceCheckoutPaymentV1,
   type CollectCommerceInPersonCheckoutPaymentV1,
+  type RecordCommerceCounterCashPaymentV1,
+  type CommerceCounterCashTenderV1,
   type CommerceInPersonCheckoutPaymentCollectionV1,
   type RecordCommerceCheckoutPaymentCaptureV1,
   type PlaceCommercePaidCheckoutV1,

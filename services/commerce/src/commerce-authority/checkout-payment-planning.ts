@@ -6,11 +6,13 @@ import {
   parseOrder,
   parsePayment,
   parseShipment,
+  pointOfSaleCashEnabled,
   type BeginCommerceCheckoutPaymentV1,
   type CollectCommerceInPersonCheckoutPaymentV1,
   type ExpireCommerceCheckoutV1,
   type PlaceCommercePaidCheckoutV1,
   type RecordCommerceCheckoutPaymentCaptureV1,
+  type RecordCommerceCounterCashPaymentV1,
   type ResolveCommerceCheckoutPaymentV1,
   type CommerceResourcesV1,
   type CommerceFulfillmentV1,
@@ -94,6 +96,7 @@ export type PlaceCommerceStoredValueCheckoutV1 = Readonly<{
 export type PaidPlacementCommand =
   | PlaceCommercePaidCheckoutV1
   | PlaceCommerceStoredValueCheckoutV1
+  | RecordCommerceCounterCashPaymentV1
   | MarkCommerceDraftOrderPaidV1
   | PlaceCommerceDraftOrderOnTermsV1;
 
@@ -159,6 +162,8 @@ type PlacementTender =
   | Readonly<{
       kind: "manual";
       tender: MarkCommerceDraftOrderPaidV1["tender"];
+      cashReceivedMinor?: number;
+      changeDueMinor?: number;
     }>
   | Readonly<{ kind: "invoice"; invoiceId: string; terms: PlacementTerms }>;
 
@@ -469,6 +474,15 @@ export function planCheckoutPaymentCapture(
           state: capture.to,
           providerPaymentReference: command.providerPaymentReference,
           capturedAt: command.capturedAt,
+          ...(command.paymentMethod === undefined
+            ? {}
+            : { paymentMethod: command.paymentMethod }),
+          ...(command.tenderBrand === undefined
+            ? {}
+            : { tenderBrand: command.tenderBrand }),
+          ...(command.providerRefundable === undefined
+            ? {}
+            : { providerRefundable: command.providerRefundable }),
         },
       }),
     },
@@ -691,6 +705,136 @@ export function planManualCheckoutPlacement(
   );
 }
 
+/**
+ * Places a quoted `point_of_sale` counter checkout paid in cash, recording the
+ * tendered cash and exact change due as one idempotent transaction.
+ */
+export function planCounterCashPlacement(
+  database: CommerceDatabase,
+  command: RecordCommerceCounterCashPaymentV1,
+  checkout: Checkout | undefined,
+  currentOfferRevision: (offerId: string) => number | undefined,
+): CheckoutPlacementPlanResult {
+  if (checkout === undefined) {
+    return {
+      kind: "rejected",
+      error: {
+        code: "resource_not_found",
+        kind: "checkout",
+        id: command.checkoutId,
+      },
+    };
+  }
+  if (checkout.source.kind !== "point_of_sale") {
+    return placementRejected("checkout.source");
+  }
+  const revisionError = checkCheckoutRevision(
+    "checkout",
+    command.checkoutId,
+    command.checkoutRevision,
+    checkout.revision,
+  );
+  if (revisionError !== undefined) return { kind: "rejected", error: revisionError };
+  const place = commerceTransition(
+    "checkout",
+    checkout.lifecycle,
+    "place_manually",
+  );
+  if (!place.allowed) return { kind: "rejected", error: place.refusal };
+  const quote = place.from.quote;
+  if (
+    quote.quoteDigest !== command.quoteDigest ||
+    quote.quoteDigest !== checkoutQuoteDigest(quote)
+  ) {
+    return {
+      kind: "rejected",
+      error: {
+        code: "checkout_quote_mismatch",
+        checkoutId: checkout.checkoutId,
+      },
+    };
+  }
+  if (Date.parse(command.requestedAt) >= Date.parse(quote.expiresAt)) {
+    return {
+      kind: "rejected",
+      error: {
+        code: "checkout_quote_expired",
+        checkoutId: checkout.checkoutId,
+        expiresAt: quote.expiresAt,
+      },
+    };
+  }
+  if (quote.storedValue !== undefined) {
+    return placementRejected("checkout.storedValue");
+  }
+  if (quote.fulfillment.kind !== "pickup") {
+    return placementRejected("checkout.fulfillment");
+  }
+  const configuration = readPointOfSaleConfigurationForCheckout(
+    database,
+    command.merchantId,
+    checkout.source.satyrLocationId,
+    checkout.source.posConfigurationRevision,
+  );
+  if (configuration === undefined || !pointOfSaleCashEnabled(configuration)) {
+    return placementRejected("pointOfSaleConfiguration.cashEnabled");
+  }
+  if (
+    quote.lines.some(
+      (line) =>
+        line.title === undefined ||
+        (line.priceOverride === undefined &&
+          line.source.kind !== "order_balance" &&
+          currentOfferRevision(line.source.offerId) !==
+            line.source.offerRevision),
+    )
+  ) {
+    return {
+      kind: "rejected",
+      error: {
+        code: "checkout_refresh_required",
+        checkoutId: checkout.checkoutId,
+      },
+    };
+  }
+  const due = amountDue(quote);
+  if (due.amountMinor <= 0) return placementRejected("checkout.payment");
+  if (
+    command.cashReceived.currency !== due.currency ||
+    command.cashReceived.amountMinor < due.amountMinor
+  ) {
+    return placementRejected("cashReceived");
+  }
+  const changeDueMinor = command.cashReceived.amountMinor - due.amountMinor;
+  const buyer: CommerceBuyerV1 =
+    checkout.source.buyer.kind === "anonymous"
+      ? { kind: "guest" }
+      : {
+          kind: "identified",
+          customerReference: checkout.source.buyer.customerId,
+        };
+  return planOrderPlacement(
+    database,
+    {
+      merchantId: command.merchantId,
+      checkoutId: checkout.checkoutId,
+      requestedAt: command.requestedAt,
+      orderId: command.orderId,
+      paymentId: command.paymentId,
+      fulfillmentId: command.fulfillmentId,
+      buyer,
+      placement: { kind: "pickup" },
+    },
+    checkout,
+    {
+      kind: "manual",
+      tender: { method: "cash" },
+      cashReceivedMinor: command.cashReceived.amountMinor,
+      changeDueMinor,
+    },
+  );
+}
+
 // The order, its payments, fulfilment and stock of a checkout that is paid:
 // by a captured card payment or a manual tender for what was due, and by each
 // stored-value tender of its quote.
@@ -842,6 +986,13 @@ function planOrderPlacement(
         orderId: command.orderId,
         amountMinor: due.amountMinor,
         currency: due.currency,
+        ...(paid.cashReceivedMinor !== undefined &&
+        paid.changeDueMinor !== undefined
+          ? {
+              cashReceivedMinor: paid.cashReceivedMinor,
+              changeDueMinor: paid.changeDueMinor,
+            }
+          : {}),
         recordedAt: command.requestedAt,
       };
       break;
@@ -1906,12 +2057,18 @@ function placementOrderOrigin(
 
 function placementTerminalId(
   paymentAttempt: CheckoutPaymentAttempt | undefined,
-): string {
-  const binding = paymentAttempt?.binding.paymentBinding;
-  if (binding?.provider !== "square_terminal") {
-    throw new Error(
-      "point_of_sale placement requires an in-person payment binding",
-    );
+): string | null {
+  if (paymentAttempt === undefined) {
+    return null;
   }
-  return binding.deviceId;
+  const binding = paymentAttempt.binding.paymentBinding;
+  if (binding.provider === "square_terminal") {
+    return binding.deviceId;
+  }
+  if (binding.provider === "gmo_stera") {
+    return `${binding.gatewayId}:${binding.deviceSourceKey}`;
+  }
+  throw new Error(
+    "point_of_sale placement requires an in-person payment binding",
+  );
 }

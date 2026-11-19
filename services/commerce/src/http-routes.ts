@@ -408,6 +408,11 @@ export type CommerceRoute =
       checkoutId: string;
     }>
   | Readonly<{
+      kind: "record_counter_cash_payment";
+      merchantId: string;
+      checkoutId: string;
+    }>
+  | Readonly<{
       kind: "record_checkout_payment_capture";
       merchantId: string;
       checkoutId: string;
@@ -439,6 +444,11 @@ export type CommerceRoute =
     }>
   | Readonly<{
       kind: "refund_order";
+      merchantId: string;
+      orderId: string;
+    }>
+  | Readonly<{
+      kind: "record_counter_manual_cash_refund";
       merchantId: string;
       orderId: string;
     }>
@@ -1184,6 +1194,12 @@ const CORE_ROUTES: readonly RouteDefinition<CommerceRoute>[] = [
   ),
   route(
     "POST",
+    "/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment",
+    "record_counter_cash_payment",
+    "underclerk.record-counter-cash-payment.v1",
+  ),
+  route(
+    "POST",
     "/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/captures",
     "record_checkout_payment_capture",
     "underclerk.record-checkout-payment-capture.v1",
@@ -1222,6 +1238,12 @@ const CORE_ROUTES: readonly RouteDefinition<CommerceRoute>[] = [
     "/v1/admin/merchants/:merchantId/orders/:orderId/refunds",
     "refund_order",
     "underclerk.refund-order.v1",
+  ),
+  route(
+    "POST",
+    "/v1/admin/merchants/:merchantId/orders/:orderId/manual-cash-refunds",
+    "record_counter_manual_cash_refund",
+    "underclerk.record-counter-manual-cash-refund.v1",
   ),
   route(
     "POST",

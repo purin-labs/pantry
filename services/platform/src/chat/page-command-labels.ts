@@ -1,5 +1,6 @@
 import {
   COSTS_SURFACE,
+  REGISTER_SURFACE,
   type PageViewCommand,
   type SurfacePageCommandV1,
 } from "@seams/control-api";
@@ -9,7 +10,9 @@ import {
  * commands change only the view, so the chat shows them as reads.
  */
 export function pageCommandDestination(command: SurfacePageCommandV1): string {
-  return command.surface === COSTS_SURFACE ? "Costs & margins" : "Kitchen";
+  if (command.surface === COSTS_SURFACE) return "Costs & margins";
+  if (command.surface === REGISTER_SURFACE) return "Café Register";
+  return "Kitchen";
 }
 
 export function pageCommandAction(command: SurfacePageCommandV1): string {
@@ -30,6 +33,10 @@ const PAGE_ACTIONS: Readonly<Record<PageViewCommand["name"], string>> = {
   select_product: "Select product",
   configure_pastry_bench: "Configure pie pastry bench",
   prepare_pastry_bench: "Run pie pastry bench simulation",
+  register_add_item: "Stage item in Register basket",
+  register_update_line: "Update Register basket quantity",
+  register_remove_line: "Remove line from Register basket",
+  register_clear_basket: "Clear Register basket",
 };
 
 const TAB_NAMES = {
@@ -62,5 +69,13 @@ function pageObject(command: PageViewCommand): string {
     }
     case "prepare_pastry_bench":
       return "MuJoCo 4.0.0 3D dough press, deformable shortcrust, puff lid & Maruzen oven";
+    case "register_add_item":
+      return `${command.menuEntryId} × ${command.quantity ?? 1}`;
+    case "register_update_line":
+      return `${command.lineKey} → ${command.quantity}`;
+    case "register_remove_line":
+      return command.lineKey;
+    case "register_clear_basket":
+      return "All staged items";
   }
 }

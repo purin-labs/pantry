@@ -104,6 +104,7 @@ export {
 } from "./terminal-assignment.ts";
 export type { TerminalTarget } from "./records/terminal.ts";
 export type { CheckoutSource } from "./records/commerce-records.ts";
+export type { InPersonPaymentMethod } from "./records/commerce-records.ts";
 export type { SupplierDestinationRail } from "./records/supplier-destination.ts";
 export type { SupplierDestinationRevision } from "./records/supplier-destination.ts";
 export type { SupplierDestinationState } from "./records/supplier-destination.ts";
@@ -126,7 +127,10 @@ export type { PayoutRecoveryAction } from "./records/supplier-payout.ts";
 export type { SupplierPayoutState } from "./records/supplier-payout.ts";
 export type { WiseFundingMode } from "./records/supplier-payout.ts";
 export type { PointOfSaleBuyer } from "./records/commerce-records.ts";
-export type { PointOfSaleConfiguration } from "./records/point-of-sale-configuration.ts";
+export type {
+  PointOfSaleCatalogScope,
+  PointOfSaleConfiguration,
+} from "./records/point-of-sale-configuration.ts";
 export type { PointOfSaleItemPolicy } from "./records/point-of-sale-configuration.ts";
 export type { TerminalAssignment } from "./records/terminal.ts";
 export type { TerminalAssignmentState } from "./records/terminal.ts";

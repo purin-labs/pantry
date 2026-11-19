@@ -1,0 +1,355 @@
+.register-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 420px);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .register-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.register-catalog,
+.register-ticket {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.register-ticket {
+  position: sticky;
+  top: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.register-header-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.register-status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.register-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle, var(--surface));
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.register-pill[data-tone="ready"] {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.register-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.register-tab {
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.register-tab[aria-selected="true"] {
+  background: var(--text);
+  color: var(--surface);
+  border-color: var(--text);
+}
+
+.register-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 12px;
+}
+
+.register-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 112px;
+  padding: 14px;
+  text-align: left;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.register-tile:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.register-tile:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.register-tile-title {
+  font-weight: 600;
+  font-size: 0.96rem;
+  line-height: 1.3;
+}
+
+.register-tile-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.register-tile-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.register-sold-out-badge {
+  font-size: 0.74rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--danger-soft, rgba(180, 35, 24, 0.12));
+  color: var(--danger, #b42318);
+  font-weight: 600;
+}
+
+.register-basket-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.register-basket-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.register-basket-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.register-basket-mods {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.register-basket-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.register-qty-btn {
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.register-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+}
+
+.register-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+}
+
+.register-total-grand {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.register-total-tax {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.register-tender-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.register-quick-row,
+.register-method-row,
+.register-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.register-quick-btn,
+.register-method-btn {
+  flex: 1 1 auto;
+  min-height: 40px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.register-method-btn[aria-pressed="true"],
+.register-quick-btn[aria-pressed="true"] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
+}
+
+.register-primary-btn {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  background: var(--text);
+  color: var(--surface);
+  font-weight: 600;
+  font-size: 0.96rem;
+  cursor: pointer;
+}
+
+.register-primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.register-secondary-btn {
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.register-cash-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.register-change-preview {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface-subtle, rgba(0, 0, 0, 0.04));
+  font-variant-numeric: tabular-nums;
+}
+
+.register-pickup-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--accent);
+  background: var(--surface);
+}
+
+.register-pickup-code {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.register-error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--danger-soft, rgba(180, 35, 24, 0.1));
+  color: var(--danger, #b42318);
+  font-size: 0.88rem;
+}
+
+.register-modifier-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.register-modifier-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+@media print {
+  .register-catalog,
+  .register-action-row,
+  nav,
+  aside,
+  header {
+    display: none !important;
+  }
+
+  .register-layout {
+    display: block;
+  }
+
+  .register-ticket {
+    border: none;
+    padding: 0;
+  }
+}

@@ -19,7 +19,6 @@ import type {
   TerminalOperationsView,
 } from "@seams/control-api/portal/terminals";
 import { CounterSaleRoute } from "./counter-sale-route";
-import { openCounterSale } from "./counter-sale-api";
 import "./styles.css";
 import type {
   TerminalConfigurationRequest,
@@ -54,7 +53,7 @@ export function TerminalOperationsPanel(
   const [busy, setBusy] = React.useState<string | null>(null);
   const [confirming, setConfirming] =
     React.useState<TerminalCounterReadback | null>(null);
-  const [activeCheckoutId, setActiveCheckoutId] = React.useState<string | null>(
+  const [activeCheckoutId] = React.useState<string | null>(
     readCounterSaleFromLocation,
   );
 
@@ -114,15 +113,9 @@ export function TerminalOperationsPanel(
           }),
         )}
       </ul>
-      {props.canManage ? (
-        <CounterSaleOpenForm
-          organisationId={props.organisationId}
-          configuration={state.view.configuration}
-          counters={operations.counters}
-          mutate={props.mutate}
-          setCheckoutId={showCounterSale.bind(null, setActiveCheckoutId)}
-        />
-      ) : null}
+      <p className="terminal-panel-note">
+        Ring up counter sales from Café › Register.
+      </p>
       {props.canManage ? (
         <details
           className="terminal-settings"
@@ -406,16 +399,6 @@ function readCounterSaleFromLocation(): string | null {
     "counterSale",
   );
   return checkoutId === null || checkoutId.length === 0 ? null : checkoutId;
-}
-
-function showCounterSale(
-  setCheckoutId: (checkoutId: string) => void,
-  checkoutId: string,
-): void {
-  const url = new URL(window.location.href);
-  url.searchParams.set("counterSale", checkoutId);
-  window.history.replaceState(window.history.state, "", url);
-  setCheckoutId(checkoutId);
 }
 
 function TerminalSetup(
@@ -894,223 +877,6 @@ function parseTerminalSelection(
           providerLocationId,
           testDeviceId,
         }
-      : null;
-  } catch {
-    return null;
-  }
-}
-
-type CounterItemOption = Readonly<{
-  value: string;
-  label: string;
-  maxQuantity: number;
-}>;
-
-function CounterSaleOpenForm(
-  props: Readonly<{
-    organisationId: string;
-    configuration: TerminalConfiguration;
-    counters: readonly TerminalCounterReadback[];
-    mutate: TerminalMutationTransport;
-    setCheckoutId: (checkoutId: string) => void;
-  }>,
-): React.ReactNode {
-  const [busy, setBusy] = React.useState(false);
-  if (props.configuration.kind !== "ready") return null;
-  const items = counterItemOptions(props.configuration, props.counters);
-  if (items.length === 0) return null;
-  return (
-    <form
-      className="terminal-setup terminal-sale-form"
-      onSubmit={submitCounterSale.bind(null, props, setBusy)}
-    >
-      <div className="terminal-setup-heading">
-        <h3>Ring up a counter sale</h3>
-        <p>
-          Seams Checkout prices the item under the published counter policy
-          before presenting payment.
-        </p>
-      </div>
-      <div className="terminal-setup-fields">
-        <label>
-          <span>First item</span>
-          <TerminalSelect
-            name="counterItem"
-            items={items}
-            disabled={busy}
-            required
-          />
-        </label>
-        <label>
-          <span>Quantity</span>
-          <input
-            name="quantity"
-            type="number"
-            min="1"
-            defaultValue="1"
-            disabled={busy}
-            required
-          />
-        </label>
-        <label>
-          <span>Second item</span>
-          <TerminalSelect
-            name="counterItem2"
-            items={[{ value: "", label: "No second item" }, ...items]}
-            disabled={busy}
-          />
-        </label>
-        <label>
-          <span>Quantity</span>
-          <input
-            aria-label="Second item quantity"
-            name="quantity2"
-            type="number"
-            min="1"
-            defaultValue="1"
-            disabled={busy}
-          />
-        </label>
-      </div>
-      <button type="submit" className="terminal-row-action" disabled={busy}>
-        {busy ? "Ringing up…" : "Ring up sale"}
-      </button>
-    </form>
-  );
-}
-
-function counterItemOptions(
-  configuration: ReadyTerminalConfiguration,
-  counters: readonly TerminalCounterReadback[],
-): readonly CounterItemOption[] {
-  const options: CounterItemOption[] = [];
-  for (const location of configuration.satyrLocations) {
-    if (!hasReadyCounter(counters, location.satyrLocationId)) continue;
-    for (const item of location.supportedItems) {
-      options.push({
-        value: counterItemValue(
-          location.satyrLocationId,
-          item.variantId,
-          item.maxQuantityPerLine,
-        ),
-        label: `${item.variantId} · ${location.satyrLocationId}`,
-        maxQuantity: item.maxQuantityPerLine,
-      });
-    }
-  }
-  return options;
-}
-
-function hasReadyCounter(
-  counters: readonly TerminalCounterReadback[],
-  pantryLocationId: string,
-): boolean {
-  for (const counter of counters) {
-    if (
-      counter.satyrLocationId === pantryLocationId &&
-      counter.blockedReason === null
-    )
-      return true;
-  }
-  return false;
-}
-
-function counterItemValue(
-  pantryLocationId: string,
-  variantId: string,
-  maxQuantity: number,
-): string {
-  return `${encodeURIComponent(pantryLocationId)}|${encodeURIComponent(variantId)}|${maxQuantity}`;
-}
-
-async function submitCounterSale(
-  props: Readonly<{
-    organisationId: string;
-    configuration: TerminalConfiguration;
-    counters: readonly TerminalCounterReadback[];
-    mutate: TerminalMutationTransport;
-    setCheckoutId: (checkoutId: string) => void;
-  }>,
-  setBusy: (busy: boolean) => void,
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<void> {
-  event.preventDefault();
-  const selection = parseCounterSaleSelection(
-    new FormData(event.currentTarget),
-  );
-  if (selection === null) {
-    toast.error("Choose a counter item and valid quantity.");
-    return;
-  }
-  setBusy(true);
-  try {
-    const sale = await openCounterSale(
-      props.organisationId,
-      selection,
-      props.mutate,
-    );
-    props.setCheckoutId(sale.checkoutId);
-    toast.success("Counter sale is ready for payment.");
-  } catch (cause) {
-    toast.error(
-      cause instanceof Error
-        ? cause.message
-        : "The counter sale could not be opened.",
-    );
-  } finally {
-    setBusy(false);
-  }
-}
-
-function parseCounterSaleSelection(form: FormData): Readonly<{
-  satyrLocationId: string;
-  lines: readonly Readonly<{ variantId: string; quantity: number }>[];
-}> | null {
-  const first = parseCounterSaleLine(
-    form.get("counterItem"),
-    form.get("quantity"),
-  );
-  if (first === null) return null;
-  const secondItem = form.get("counterItem2");
-  if (secondItem === "") {
-    return { satyrLocationId: first.satyrLocationId, lines: [first.line] };
-  }
-  const second = parseCounterSaleLine(secondItem, form.get("quantity2"));
-  if (second === null || second.satyrLocationId !== first.satyrLocationId)
-    return null;
-  return {
-    satyrLocationId: first.satyrLocationId,
-    lines: [first.line, second.line],
-  };
-}
-
-function parseCounterSaleLine(
-  counterItem: FormDataEntryValue | null,
-  rawQuantity: FormDataEntryValue | null,
-): Readonly<{
-  satyrLocationId: string;
-  line: Readonly<{ variantId: string; quantity: number }>;
-}> | null {
-  if (typeof counterItem !== "string" || typeof rawQuantity !== "string")
-    return null;
-  const fields = counterItem.split("|");
-  const quantity = Number(rawQuantity);
-  const maxQuantity = Number(fields[2]);
-  if (
-    fields.length !== 3 ||
-    fields[0] === undefined ||
-    fields[1] === undefined ||
-    !Number.isSafeInteger(quantity) ||
-    quantity < 1 ||
-    !Number.isSafeInteger(maxQuantity) ||
-    quantity > maxQuantity
-  )
-    return null;
-  try {
-    const pantryLocationId = decodeURIComponent(fields[0]);
-    const variantId = decodeURIComponent(fields[1]);
-    return pantryLocationId.length > 0 && variantId.length > 0
-      ? { satyrLocationId: pantryLocationId, line: { variantId, quantity } }
       : null;
   } catch {
     return null;

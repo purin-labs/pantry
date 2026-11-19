@@ -511,13 +511,17 @@ export async function handleControlRequest(
     case "commerceStripeOnboarding":
     case "commerceMenuPublication":
     case "commerceShopName":
+    case "counterRegister":
     case "counterSales":
     case "counterSale":
+    case "counterSaleCash":
     case "counterSaleCollection":
+    case "counterSaleCancel":
     case "counterSaleReconciliation":
     case "counterSalePickupReady":
     case "counterSaleHandover":
     case "counterSaleRefund":
+    case "counterSaleManualCashRefund":
     case "failedPayments":
     case "commercePayments":
     case "bankPayouts":

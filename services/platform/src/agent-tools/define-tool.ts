@@ -5,6 +5,8 @@ import type {
   CostsViewCommandName,
   KITCHEN_SURFACE,
   PastryBenchViewCommandName,
+  REGISTER_SURFACE,
+  RegisterViewCommandName,
 } from "@seams/control-api";
 import { Value } from "typebox/value";
 import type {
@@ -82,13 +84,20 @@ export type ToolSelection =
       /** A Portal page with view commands (Plan 87 phase 4). */
       readonly surface: typeof COSTS_SURFACE;
       readonly command: CostsViewCommandName;
+    }
+  | {
+      readonly kind: "surface";
+      /** Café › Register basket staging commands (Plan 90). */
+      readonly surface: typeof REGISTER_SURFACE;
+      readonly command: RegisterViewCommandName;
     };
 
-/** A command that a surface tool sends: a Kitchen, Pastry Bench or Costs command. */
+/** A command that a surface tool sends: a Kitchen, Pastry Bench, Costs or Register command. */
 export type SurfaceToolCommandName =
   | BakerySurfaceToolCommandName
   | CostsViewCommandName
-  | PastryBenchViewCommandName;
+  | PastryBenchViewCommandName
+  | RegisterViewCommandName;
 
 /** The identity of one call, for receipts and idempotent writes. */
 type ToolCall = {

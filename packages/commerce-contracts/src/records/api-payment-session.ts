@@ -140,14 +140,20 @@ export type CommercePaymentSessionResultV1 = Static<
   typeof commercePaymentSessionResultV1Schema
 >;
 
-export const commerceInPersonCollectionSessionV1Schema = ReadonlyStrictObject(
-  {
+export const commerceInPersonCollectionSessionV1Schema = Type.Union([
+  ReadonlyStrictObject({
     kind: Type.Literal("server_terminal_checkout"),
     providerCheckoutReference: text,
     deviceId: text,
     expiresAt: timestampSchema,
-  },
-);
+  }),
+  ReadonlyStrictObject({
+    kind: Type.Literal("gateway_terminal_checkout"),
+    gatewayId: text,
+    deviceSourceKey: text,
+    expiresAt: timestampSchema,
+  }),
+]);
 export type CommerceInPersonCollectionSessionV1 = Static<
   typeof commerceInPersonCollectionSessionV1Schema
 >;

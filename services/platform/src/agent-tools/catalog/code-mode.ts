@@ -102,6 +102,7 @@ import type {
   MessageAttachmentInspectResult,
   MessageLinkRead,
   MessageLinkReadResult,
+  CounterSaleReadTool,
   OrderQueueAdvanceTool,
   OrderQueueReadTool,
   OrderRefundProposal,
@@ -294,6 +295,7 @@ export async function createCatalogHarnessCodeMode(input: {
   readonly proposeOrderRefund?: OrderRefundProposal;
   readonly proposeStockAction?: StockActionProposal;
   readonly readOrderQueue?: OrderQueueReadTool;
+  readonly readCounterSale?: CounterSaleReadTool;
   readonly readPayments?: PaymentsReadTool;
   readonly advanceOrderQueue?: OrderQueueAdvanceTool;
   readonly readSoldOut?: SoldOutReadTool;
@@ -441,6 +443,7 @@ export async function createCatalogHarnessCodeMode(input: {
     proposeOrderRefund: input.proposeOrderRefund,
     proposeStockAction: input.proposeStockAction,
     readOrderQueue: input.readOrderQueue,
+    readCounterSale: input.readCounterSale,
     readPayments: input.readPayments,
     advanceOrderQueue: input.advanceOrderQueue,
     readSoldOut: input.readSoldOut,

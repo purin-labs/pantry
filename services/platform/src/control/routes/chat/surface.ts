@@ -22,7 +22,7 @@ export async function handlePortalChatSurfaceEffects(
     request,
     env,
     organisationIdRaw,
-    "admin",
+    "operator",
     false,
   );
   if (!authorized.ok) return authorized.response;
@@ -58,7 +58,7 @@ export async function handlePortalChatSurfaceReceipt(
     request,
     env,
     organisationIdRaw,
-    "admin",
+    "operator",
     true,
   );
   if (!authorized.ok) return authorized.response;

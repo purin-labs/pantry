@@ -32,6 +32,7 @@ import {
   type ReconcileCommerceInventoryV1,
   type RecordShippingTrackingCommand,
   type RecordCommerceCheckoutPaymentCaptureV1,
+  type RecordCommerceCounterManualCashRefundV1,
   type RefundCommerceOrderV1,
   type ResolveCommerceCheckoutPaymentV1,
   type CommerceWebhookSubscriptionCommandV1,
@@ -122,7 +123,8 @@ type MutationCommand =
   | AttachFulfillmentTrackingCommand
   | RecordShippingTrackingCommand
   | CancelCommerceOrderV1
-  | RefundCommerceOrderV1;
+  | RefundCommerceOrderV1
+  | RecordCommerceCounterManualCashRefundV1;
 
 /** A command that carries its own idempotency key. */
 type CommittedCommand = MutationCommand & Readonly<{ idempotencyKey: string }>;

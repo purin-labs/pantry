@@ -71,7 +71,7 @@ export type TerminalCounterReadback = Readonly<{
     capabilityRevision: number;
     capabilityCurrent: boolean;
     providerLocationId: string;
-    targetKind: "sandbox_simulated" | "paired_physical";
+    targetKind: "sandbox_simulated" | "paired_physical" | "lan_gateway_device";
     deviceId: string;
     adapterVersion: string;
     environment: "development" | "production";

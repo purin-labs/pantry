@@ -1,4 +1,8 @@
-import { controlRead } from "../../control-client";
+import { controlMutation, controlRead } from "../../control-client";
+import type {
+  CounterRegisterPaymentMethod,
+  CounterRegisterSnapshot,
+} from "@seams/control-api";
 import {
   type CounterSale,
   parseEnvelope,
@@ -38,6 +42,7 @@ export async function collectCounterSale(
   sale: CounterSale,
   amount: Readonly<{ amountMinor: number; currency: string }>,
   mutate: CounterSaleMutationTransport,
+  paymentMethod?: CounterRegisterPaymentMethod,
 ): Promise<void> {
   if (sale.quote === null)
     throw new Error("This sale has no quote to collect.");
@@ -49,6 +54,7 @@ export async function collectCounterSale(
       checkoutRevision: sale.quote.checkoutRevision,
       quoteDigest: sale.quote.quoteDigest,
       amount,
+      ...(paymentMethod === undefined ? {} : { paymentMethod }),
     },
     // The intent binds the collection to this exact quote: a re-presented sale
     // whose quote has moved is a different attempt, not a retry of this one.
@@ -56,15 +62,147 @@ export async function collectCounterSale(
   );
   const envelope = requireObject(raw, "counter sale collection response");
   if (envelope.ok !== true) {
-    throw new Error("Square Terminal could not present this payment.");
+    throw new Error("The payment terminal could not present this payment.");
   }
   const collection = requireObject(
     envelope.collection,
     "counter sale collection",
   );
   if (collection.outcome !== "ready") {
-    throw new Error("Square Terminal could not present this payment.");
+    throw new Error("The payment terminal could not present this payment.");
   }
+}
+
+export async function readCounterRegister(
+  organisationId: string,
+  locationId?: string,
+  read: CounterSaleReadTransport = controlRead,
+): Promise<CounterRegisterSnapshot> {
+  const query =
+    locationId !== undefined && locationId.length > 0
+      ? `?locationId=${encodeURIComponent(locationId)}`
+      : "";
+  const raw = await read(
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/counter-register${query}`,
+  );
+  const envelope = requireObject(raw, "counter register response");
+  if (envelope.ok !== true || typeof envelope.register !== "object" || envelope.register === null) {
+    throw new Error("The counter register could not be read.");
+  }
+  return envelope.register as CounterRegisterSnapshot;
+}
+
+export async function openRegisterMenuSale(
+  organisationId: string,
+  request: Readonly<{
+    satyrLocationId: string;
+    tenderMode: "terminal" | "cash";
+    lines: readonly Readonly<{
+      menuId: string;
+      menuEntryId: string;
+      modifierOptionIds: readonly string[];
+      quantity: number;
+    }>[];
+  }>,
+  mutate: CounterSaleMutationTransport = defaultCounterSaleMutate,
+  read: CounterSaleReadTransport = controlRead,
+): Promise<CounterSale> {
+  const checkoutId = `checkout_counter_${crypto.randomUUID()}`;
+  const lines = request.lines.map((line) => {
+    const lineId = `line_${crypto.randomUUID()}`;
+    return {
+      cartLineId: `cart_${lineId}`,
+      checkoutLineId: lineId,
+      source: {
+        kind: "menu" as const,
+        menuId: line.menuId,
+        menuEntryId: line.menuEntryId,
+        modifierOptionIds: [...line.modifierOptionIds],
+      },
+      quantity: { amount: line.quantity, scale: 0, unit: "each" as const },
+    };
+  });
+  const raw = await mutate(
+    counterSalesPath(organisationId),
+    "POST",
+    {
+      satyrLocationId: request.satyrLocationId,
+      checkoutId,
+      tenderMode: request.tenderMode,
+      lines,
+    },
+    `counter-open:${checkoutId}`,
+  );
+  const envelope = requireObject(raw, "counter sale open response");
+  requireExactKeys(envelope, ["ok", "counterSale"], "counter sale open response");
+  const result = requireObject(envelope.counterSale, "counter sale open result");
+  if (envelope.ok !== true || result.outcome !== "applied") {
+    throw new Error("The counter sale could not be opened.");
+  }
+  return readCounterSale(organisationId, checkoutId, read);
+}
+
+export async function recordCounterSaleCash(
+  organisationId: string,
+  sale: CounterSale,
+  cashReceived: Readonly<{ amountMinor: number; currency: string }>,
+  mutate: CounterSaleMutationTransport = defaultCounterSaleMutate,
+): Promise<CounterSale> {
+  if (sale.quote === null) {
+    throw new Error("This sale has no quote to settle in cash.");
+  }
+  const raw = await mutate(
+    `${counterSalesPath(organisationId)}/${encodeURIComponent(sale.checkoutId)}/cash`,
+    "POST",
+    {
+      checkoutRevision: sale.quote.checkoutRevision,
+      quoteDigest: sale.quote.quoteDigest,
+      cashReceived,
+    },
+    `counter-cash:${sale.checkoutId}:${sale.quote.quoteDigest}`,
+  );
+  return parseEnvelope(raw);
+}
+
+export async function cancelCounterSaleCollection(
+  organisationId: string,
+  checkoutId: string,
+  mutate: CounterSaleMutationTransport = defaultCounterSaleMutate,
+): Promise<CounterSale> {
+  const raw = await mutate(
+    `${counterSalesPath(organisationId)}/${encodeURIComponent(checkoutId)}/cancel`,
+    "POST",
+    {},
+    `counter-cancel:${checkoutId}:${crypto.randomUUID()}`,
+  );
+  return parseEnvelope(raw);
+}
+
+export async function manualCashRefundCounterSale(
+  organisationId: string,
+  checkoutId: string,
+  mutate: CounterSaleMutationTransport = defaultCounterSaleMutate,
+  reason?: string,
+): Promise<CounterSale> {
+  const raw = await mutate(
+    `${counterSalesPath(organisationId)}/${encodeURIComponent(checkoutId)}/manual-cash-refund`,
+    "POST",
+    reason === undefined ? {} : { reason },
+    `counter-manual-cash-refund:${checkoutId}`,
+  );
+  return parseEnvelope(raw);
+}
+
+export function defaultCounterSaleMutate(
+  path: string,
+  method: "POST",
+  body: unknown,
+  intent: string,
+): Promise<unknown> {
+  return controlMutation(path, method, body, undefined, {
+    kind: "prepared",
+    idempotencyKey: intent,
+  });
 }
 
 export async function reconcileCounterSale(

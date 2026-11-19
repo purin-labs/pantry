@@ -131,3 +131,27 @@ export const soldOutMark = defineTool({
       ? undefined
       : (request, call) => markSoldOut(request, call.operationId),
 });
+
+export const counterSaleRead = defineTool({
+  name: "counter_sale_read",
+  description:
+    "Read one counter sale from Café › Register by checkoutId: its state, quote total, pickup code, payment method, cash change, and fulfillment stage. Read-only: agents cannot charge terminals, accept cash, kick drawers, or issue unapproved refunds.",
+  input: Type.Object(
+    {
+      checkoutId: Type.String({ pattern: ID_PATTERN }),
+    },
+    { additionalProperties: false },
+  ),
+  decode: (input) => ({ checkoutId: input.checkoutId }),
+  effect: "read",
+  rerun: { kind: "any_caller", reason: "A read changes nothing." },
+  selection: {
+    kind: "capability",
+    capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
+  },
+  unavailable: "counter sale read is unavailable",
+  handler: ({ readCounterSale }) =>
+    readCounterSale === undefined
+      ? undefined
+      : (request) => readCounterSale(request),
+});

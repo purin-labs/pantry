@@ -2,6 +2,7 @@ import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   COSTS_VIEW_COMMANDS,
   PASTRY_BENCH_VIEW_COMMANDS,
+  REGISTER_VIEW_COMMANDS,
 } from "@seams/control-api";
 import {
   createTransientGoalExecution,
@@ -271,14 +272,19 @@ export async function reauthorizeTransientEmail(
 export function authorizedBakerySurfaceCommands(
   authority: HarnessTurnLease["requestAuthority"],
 ): readonly import("../../agent-tools/define-tool").SurfaceToolCommandName[] {
-  return authority.kind === "control" &&
-    (authority.role === "admin" || authority.role === "owner")
-    ? [
-        ...installedBakerySurfaceCommands(),
-        ...COSTS_VIEW_COMMANDS,
-        ...PASTRY_BENCH_VIEW_COMMANDS,
-      ]
-    : [];
+  if (authority.kind !== "control") return [];
+  if (authority.role === "admin" || authority.role === "owner") {
+    return [
+      ...installedBakerySurfaceCommands(),
+      ...COSTS_VIEW_COMMANDS,
+      ...PASTRY_BENCH_VIEW_COMMANDS,
+      ...REGISTER_VIEW_COMMANDS,
+    ];
+  }
+  if (authority.role === "operator") {
+    return [...REGISTER_VIEW_COMMANDS];
+  }
+  return [];
 }
 
 export function projectItemForSnapshot(

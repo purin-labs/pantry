@@ -584,7 +584,7 @@ Shopify: Shopify Payments, payment apps and disputes. Status: **Partial**.
 
 - A checkout profile's payment policy names a provider binding:
   `stripe_online`, `square_online` or `gmo_pg_online` online, and
-  `square_terminal` in person.
+  `square_terminal` or `gmo_stera` (`lan_gateway` via the shop gateway) in person.
 - Stripe runs inside Commerce. A merchant connects a Stripe account that
   is connected to the platform, or opens Stripe's hosted onboarding.
   Commerce makes the PaymentIntent on the connected account with the
@@ -705,11 +705,38 @@ Shopify: Shopify Payments, payment apps and disputes. Status: **Partial**.
   collect. The `payments:record` routes let an app that runs its own
   provider record captures, resolutions and disputes; an API key cannot
   hold that scope.
+- A counter policy (`point_of_sale_configuration`, section 4) names its
+  `catalogScope` (`supported_items` or `{ kind: "published_menu", menuId,
+  maxQuantityPerLine }`) and whether `cashEnabled` is active. When
+  `published_menu` is active, `create_in_person_checkout` accepts menu lines
+  and modifiers through the same menu, serving-hours, sold-out and recipe-lot
+  checks as online pickup. A cash-enabled counter may open an in-person
+  checkout with `terminalAssignmentRevision: null`.
+- `record_counter_cash_payment` (`POST
+  /v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment`,
+  `orders:write`) settles a quoted cash-enabled counter checkout: it verifies
+  `cashReceived >= amountDue`, records `manual_tender` (`method: "cash"`,
+  `cashReceivedMinor`, `changeDueMinor`), places the `point_of_sale` order
+  with `terminalId: null`, opens pickup fulfillment and emits `order.created`.
 - Manual tender: staff record cash, or a bank transfer with its reference,
-  when they mark a draft order as paid (section 13). The payment is captured
-  at once, and its `manual_tender` row names the method. A refund of a
-  manual payment asks no provider: Commerce resolves it in the same
-  request, and staff return the money in the same way.
+  when they mark a draft order as paid (section 13) or settle a counter cash
+  sale. The payment is captured at once, and its `manual_tender` row names
+  the method. A refund of a manual payment asks no provider: Commerce
+  resolves it in the same request, and staff return the money in the same way.
+- Square Terminal in-person collection accepts `paymentMethod: "card" |
+  "felica" | "qr_code"` (default `"card"`), sending `CARD_PRESENT`,
+  `FELICA_ALL` or `QR_CODE` to Square `/v2/terminals/checkouts`. Reconciliation
+  verifies `GET /v2/payments/:id` tender evidence (`CARD`, `FELICA` with
+  `felica_details`, or `WALLET` with `wallet_details`), stores the verified
+  `tenderBrand` on the captured attempt, and marks `providerRefundable: false`
+  on FeliCa captures.
+- `record_counter_manual_cash_refund` (`POST
+  /v1/admin/merchants/:merchantId/orders/:orderId/manual-cash-refunds`,
+  `orders:write`) refunds a non-provider-refundable counter capture (such as
+  FeliCa) in cash without calling the provider's Refunds API, recording a
+  `manual_cash_refund` outflow and emitting `refund.succeeded` while preserving
+  provider payout figures. Normal `refund_order` refuses provider dispatch when
+  `providerRefundable: false`.
 - Every amount that a payment paid, settled, reserved or can still refund
   comes from one payment position (`src/payments/position.ts`), for each
   tender: card, stored value or manual.
@@ -726,7 +753,11 @@ is a staff item; fake Stripe),
 `square-connection-journey.test.ts` (connection, pairing, alarm-read
 Terminal sale, one refresh, revoke; fake Square),
 `square-journey.test.ts` (real Square sandbox, online and Terminal; it
-skips without a token).
+skips without a token), `counter-register-cash-journey.test.ts` (counter menu,
+modifiers, sold-out refusal, included tax, cash tender with change, stock
+deduction and idempotent cash refund), `square-japan-tenders-journey.test.ts`
+(Square Terminal `CARD_PRESENT`, `FELICA_ALL`, `QR_CODE`, FeliCa manual cash
+refund and cancel-to-cash switch).
 
 ## 13. Orders, draft orders and order edits
 
@@ -1497,6 +1528,7 @@ route table.
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts`                                                           | `create_pickup_checkout`                   | orders:write       | `underclerk.create-pickup-checkout.v1`             | §11     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts`                              | `begin_checkout_payment`                   | orders:write       | `underclerk.begin-checkout-payment.v1`             | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/in-person-collections`        | `collect_in_person_checkout_payment`       | orders:write       | `underclerk.collect-in-person-checkout-payment.v1` | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment`                                     | `record_counter_cash_payment`              | orders:write       | `underclerk.record-counter-cash-payment.v1`        | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/captures`   | `record_checkout_payment_capture`          | payments:record    | `underclerk.record-checkout-payment-capture.v1`    | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/payment-dispute-observations`                                               | `observe_payment_dispute`                  | payments:record    |                                                    | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/placements` | `place_paid_checkout`                      | orders:write       | `underclerk.place-paid-checkout.v1`                | §13     |
@@ -1504,6 +1536,7 @@ route table.
 | `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/pickup-fulfillments/:fulfillmentId/complete`                | `complete_pickup`                          | orders:write       | `underclerk.complete-pickup.v1`                    | §14     |
 | `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/cancellations`                                              | `cancel_order`                             | orders:write       | `underclerk.cancel-order.v1`                       | §15     |
 | `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/refunds`                                                    | `refund_order`                             | orders:write       | `underclerk.refund-order.v1`                       | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/manual-cash-refunds`                                        | `record_counter_manual_cash_refund`        | orders:write       | `underclerk.record-counter-manual-cash-refund.v1`  | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/tender-refunds`                                             | `refund_order_tenders`                     | orders:write       | `underclerk.refund-order-tenders.v1`               | §15     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/resolution` | `resolve_checkout_payment`                 | payments:record    | `underclerk.resolve-checkout-payment.v1`           | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/expiration`                                    | `expire_checkout`                          | orders:write       | `underclerk.expire-checkout.v1`                    | §11     |
@@ -1631,89 +1664,91 @@ The kind of each event comes from the command that made it.
 
 <!-- underclerk-spec:events:start -->
 
-| Event kind                            | Command kind                      | Section |
-| ------------------------------------- | --------------------------------- | ------- |
-| `checkout.created`                    | `create_in_person_checkout`       | §11     |
-| `checkout.created`                    | `create_pickup_checkout`          | §11     |
-| `checkout.created`                    | `create_shipping_checkout`        | §11     |
-| `checkout.created`                    | `open_order_balance`              | §13     |
-| `checkout.expired`                    | `expire_checkout`                 | §11     |
-| `checkout.payment_resolved`           | `resolve_checkout_payment`        | §12     |
-| `checkout.payment_started`            | `begin_checkout_payment`          | §12     |
-| `collection.created`                  | `create_collection`               | §6      |
-| `collection.deleted`                  | `delete_collection`               | §6      |
-| `collection.updated`                  | `update_collection`               | §6      |
-| `company.created`                     | `create_company`                  | §16     |
-| `company.updated`                     | `update_company`                  | §16     |
-| `customer.created`                    | `create_customer`                 | §16     |
-| `customer.erased`                     | `erase_customer`                  | §16     |
-| `customer.updated`                    | `update_customer`                 | §16     |
-| `discount.created`                    | `create_discount`                 | §10     |
-| `discount.updated`                    | `deactivate_discount`             | §10     |
-| `dispute.updated`                     | `observe_payment_dispute`         | §12     |
-| `draft_order.cancelled`               | `cancel_draft_order`              | §13     |
-| `draft_order.created`                 | `create_draft_order`              | §13     |
-| `draft_order.invoiced`                | `send_draft_invoice`              | §13     |
-| `draft_order.updated`                 | `update_draft_order`              | §13     |
-| `fulfillment.completed`               | `complete_pickup`                 | §14     |
-| `fulfillment.label_purchased`         | `purchase_shipping_label`         | §14     |
-| `fulfillment.ready`                   | `mark_pickup_ready`               | §14     |
-| `gift_card.created`                   | `issue_gift_card`                 | §17     |
-| `inventory_item.created`              | `create_inventory_item`           | §8      |
-| `inventory.updated`                   | `open_inventory_position`         | §8      |
-| `inventory.updated`                   | `receive_inventory`               | §8      |
-| `inventory.updated`                   | `reconcile_inventory`             | §8      |
-| `invoice.overdue`                     | `mark_invoice_overdue`            | §16     |
-| `invoice.paid`                        | `record_invoice_payment`          | §16     |
-| `location.created`                    | `create_location`                 | §4      |
-| `market.created`                      | `create_market`                   | §9      |
-| `market.updated`                      | `update_market`                   | §9      |
-| `media.created`                       | `create_media`                    | §5      |
-| `media.deleted`                       | `delete_media`                    | §5      |
-| `media.updated`                       | `update_media`                    | §5      |
-| `offer.updated`                       | `adjust_offer_price`              | §5      |
-| `offer.updated`                       | `update_offer`                    | §5      |
-| `order.cancelled`                     | `cancel_order`                    | §15     |
-| `order.created`                       | `mark_draft_order_paid`           | §13     |
-| `order.created`                       | `place_draft_order_on_terms`      | §16     |
-| `order.created`                       | `place_paid_checkout`             | §13     |
-| `order.created`                       | `place_stored_value_checkout`     | §17     |
-| `order.edited`                        | `edit_order`                      | §13     |
-| `order.exchanged`                     | `exchange_order_lines`            | §15     |
-| `order.paid`                          | `place_paid_checkout`             | §13     |
-| `order.paid`                          | `record_order_manual_payment`     | §13     |
-| `payment.captured`                    | `record_checkout_payment_capture` | §12     |
-| `plugin.action_run`                   | `run_plugin_action`               | §21     |
-| `plugin.configured`                   | `configure_plugin`                | §21     |
-| `plugin.fields_updated`               | `set_plugin_field_values`         | §21     |
-| `plugin.function_failed`              | `report_plugin_function_failure`  | §21     |
-| `plugin.installed`                    | `install_merchant_plugin`         | §21     |
-| `plugin.paused`                       | `pause_failing_plugin`            | §21     |
-| `plugin.paused`                       | `pause_plugin`                    | §21     |
-| `plugin.removed`                      | `remove_plugin`                   | §21     |
-| `plugin.resumed`                      | `resume_plugin`                   | §21     |
-| `product.deleted`                     | `delete_product`                  | §5      |
-| `product.listed`                      | `place_channel_listing`           | §5      |
-| `product.media_updated`               | `set_product_media`               | §5      |
-| `product.published`                   | `publish_catalog_listing`         | §5      |
-| `product.updated`                     | `update_product`                  | §5      |
-| `product.updated`                     | `update_product_description`      | §5      |
-| `refund.succeeded`                    | `refund_order`                    | §15     |
-| `refund.updated`                      | `refund_order`                    | §15     |
-| `return.authorized`                   | `authorize_return`                | §15     |
-| `return.closed`                       | `close_return`                    | §15     |
-| `return.received`                     | `receive_return`                  | §15     |
-| `return.requested`                    | `request_return`                  | §15     |
-| `shipment.updated`                    | `attach_fulfillment_tracking`     | §14     |
-| `shipment.updated`                    | `record_shipping_tracking`        | §14     |
-| `store_credit.credited`               | `credit_store_credit`             | §17     |
-| `stored_value_account.disabled`       | `disable_stored_value_account`    | §17     |
-| `storefront.updated`                  | `update_storefront_tax`           | §4      |
-| `variant.updated`                     | `update_variant`                  | §5      |
-| `webhook_subscription.created`        | `create_webhook_subscription`     | §18     |
-| `webhook_subscription.deleted`        | `delete_webhook_subscription`     | §18     |
-| `webhook_subscription.restarted`      | `restart_webhook_subscription`    | §18     |
-| `webhook_subscription.secret_rotated` | `rotate_webhook_secret`           | §18     |
+| Event kind                            | Command kind                        | Section |
+| ------------------------------------- | ----------------------------------- | ------- |
+| `checkout.created`                    | `create_in_person_checkout`         | §11     |
+| `checkout.created`                    | `create_pickup_checkout`            | §11     |
+| `checkout.created`                    | `create_shipping_checkout`          | §11     |
+| `checkout.created`                    | `open_order_balance`                | §13     |
+| `checkout.expired`                    | `expire_checkout`                   | §11     |
+| `checkout.payment_resolved`           | `resolve_checkout_payment`          | §12     |
+| `checkout.payment_started`            | `begin_checkout_payment`            | §12     |
+| `collection.created`                  | `create_collection`                 | §6      |
+| `collection.deleted`                  | `delete_collection`                 | §6      |
+| `collection.updated`                  | `update_collection`                 | §6      |
+| `company.created`                     | `create_company`                    | §16     |
+| `company.updated`                     | `update_company`                    | §16     |
+| `customer.created`                    | `create_customer`                   | §16     |
+| `customer.erased`                     | `erase_customer`                    | §16     |
+| `customer.updated`                    | `update_customer`                   | §16     |
+| `discount.created`                    | `create_discount`                   | §10     |
+| `discount.updated`                    | `deactivate_discount`               | §10     |
+| `dispute.updated`                     | `observe_payment_dispute`           | §12     |
+| `draft_order.cancelled`               | `cancel_draft_order`                | §13     |
+| `draft_order.created`                 | `create_draft_order`                | §13     |
+| `draft_order.invoiced`                | `send_draft_invoice`                | §13     |
+| `draft_order.updated`                 | `update_draft_order`                | §13     |
+| `fulfillment.completed`               | `complete_pickup`                   | §14     |
+| `fulfillment.label_purchased`         | `purchase_shipping_label`           | §14     |
+| `fulfillment.ready`                   | `mark_pickup_ready`                 | §14     |
+| `gift_card.created`                   | `issue_gift_card`                   | §17     |
+| `inventory_item.created`              | `create_inventory_item`             | §8      |
+| `inventory.updated`                   | `open_inventory_position`           | §8      |
+| `inventory.updated`                   | `receive_inventory`                 | §8      |
+| `inventory.updated`                   | `reconcile_inventory`               | §8      |
+| `invoice.overdue`                     | `mark_invoice_overdue`              | §16     |
+| `invoice.paid`                        | `record_invoice_payment`            | §16     |
+| `location.created`                    | `create_location`                   | §4      |
+| `market.created`                      | `create_market`                     | §9      |
+| `market.updated`                      | `update_market`                     | §9      |
+| `media.created`                       | `create_media`                      | §5      |
+| `media.deleted`                       | `delete_media`                      | §5      |
+| `media.updated`                       | `update_media`                      | §5      |
+| `offer.updated`                       | `adjust_offer_price`                | §5      |
+| `offer.updated`                       | `update_offer`                      | §5      |
+| `order.cancelled`                     | `cancel_order`                      | §15     |
+| `order.created`                       | `mark_draft_order_paid`             | §13     |
+| `order.created`                       | `place_draft_order_on_terms`        | §16     |
+| `order.created`                       | `place_paid_checkout`               | §13     |
+| `order.created`                       | `place_stored_value_checkout`       | §17     |
+| `order.created`                       | `record_counter_cash_payment`       | §12     |
+| `order.edited`                        | `edit_order`                        | §13     |
+| `order.exchanged`                     | `exchange_order_lines`              | §15     |
+| `order.paid`                          | `place_paid_checkout`               | §13     |
+| `order.paid`                          | `record_order_manual_payment`       | §13     |
+| `payment.captured`                    | `record_checkout_payment_capture`   | §12     |
+| `plugin.action_run`                   | `run_plugin_action`                 | §21     |
+| `plugin.configured`                   | `configure_plugin`                  | §21     |
+| `plugin.fields_updated`               | `set_plugin_field_values`           | §21     |
+| `plugin.function_failed`              | `report_plugin_function_failure`    | §21     |
+| `plugin.installed`                    | `install_merchant_plugin`           | §21     |
+| `plugin.paused`                       | `pause_failing_plugin`              | §21     |
+| `plugin.paused`                       | `pause_plugin`                      | §21     |
+| `plugin.removed`                      | `remove_plugin`                     | §21     |
+| `plugin.resumed`                      | `resume_plugin`                     | §21     |
+| `product.deleted`                     | `delete_product`                    | §5      |
+| `product.listed`                      | `place_channel_listing`             | §5      |
+| `product.media_updated`               | `set_product_media`                 | §5      |
+| `product.published`                   | `publish_catalog_listing`           | §5      |
+| `product.updated`                     | `update_product`                    | §5      |
+| `product.updated`                     | `update_product_description`        | §5      |
+| `refund.succeeded`                    | `record_counter_manual_cash_refund` | §12     |
+| `refund.succeeded`                    | `refund_order`                      | §15     |
+| `refund.updated`                      | `refund_order`                      | §15     |
+| `return.authorized`                   | `authorize_return`                  | §15     |
+| `return.closed`                       | `close_return`                      | §15     |
+| `return.received`                     | `receive_return`                    | §15     |
+| `return.requested`                    | `request_return`                    | §15     |
+| `shipment.updated`                    | `attach_fulfillment_tracking`       | §14     |
+| `shipment.updated`                    | `record_shipping_tracking`          | §14     |
+| `store_credit.credited`               | `credit_store_credit`               | §17     |
+| `stored_value_account.disabled`       | `disable_stored_value_account`      | §17     |
+| `storefront.updated`                  | `update_storefront_tax`             | §4      |
+| `variant.updated`                     | `update_variant`                    | §5      |
+| `webhook_subscription.created`        | `create_webhook_subscription`       | §18     |
+| `webhook_subscription.deleted`        | `delete_webhook_subscription`       | §18     |
+| `webhook_subscription.restarted`      | `restart_webhook_subscription`      | §18     |
+| `webhook_subscription.secret_rotated` | `rotate_webhook_secret`             | §18     |
 
 <!-- underclerk-spec:events:end -->
 

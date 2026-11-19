@@ -22,6 +22,8 @@ import {
   type CommercePickupCheckoutSelectionV1,
   type CommerceQuantityV1,
   checkoutOnlineSource,
+  pointOfSaleCashEnabled,
+  pointOfSaleCatalogScope,
   pointOfSaleConfigurationIsSellable,
   pointOfSaleQuantityCeiling,
   type CreateCommerceInPersonCheckoutV1,
@@ -985,6 +987,12 @@ export function planInPersonCheckout(
   if (configuration.satyrLocationId !== command.satyrLocationId) {
     return checkoutPlanRejected("pointOfSaleConfiguration.satyrLocationId");
   }
+  if (
+    command.terminalAssignmentRevision === null &&
+    !pointOfSaleCashEnabled(configuration)
+  ) {
+    return checkoutPlanRejected("pointOfSaleConfiguration.cashEnabled");
+  }
   // Provider-quoted tax has no local rate to apply at a counter.
   const tax = configuration.tax;
   if (tax.kind !== "percentage") {
@@ -1065,23 +1073,36 @@ function planPointOfSaleQuote(
     configuration.quoteTtlSeconds,
   );
   if (expiresAt === undefined) return checkoutPlanRejected("checkout.policy");
+  const catalogScope = pointOfSaleCatalogScope(configuration);
   let subtotal = 0;
   for (const line of command.lines) {
-    // The counter sells only what its published policy lists, up to the
-    // published per-line ceiling.
-    if (line.source.kind !== "catalog") {
-      return checkoutPlanRejected("pointOfSaleConfiguration.supportedItems");
-    }
-    const ceiling = pointOfSaleQuantityCeiling(
-      configuration,
-      line.source.variantId,
-    );
-    if (
-      ceiling === undefined ||
-      line.quantity.amount <= 0 ||
-      line.quantity.amount > ceiling
-    ) {
-      return checkoutPlanRejected("pointOfSaleConfiguration.supportedItems");
+    // The counter sells only what its published policy permits: either its
+    // explicit `supportedItems` list or the published menu named by
+    // `catalogScope`, up to the published per-line quantity ceiling.
+    if (catalogScope.kind === "supported_items") {
+      if (line.source.kind !== "catalog") {
+        return checkoutPlanRejected("pointOfSaleConfiguration.supportedItems");
+      }
+      const ceiling = pointOfSaleQuantityCeiling(
+        configuration,
+        line.source.variantId,
+      );
+      if (
+        ceiling === undefined ||
+        line.quantity.amount <= 0 ||
+        line.quantity.amount > ceiling
+      ) {
+        return checkoutPlanRejected("pointOfSaleConfiguration.supportedItems");
+      }
+    } else {
+      if (
+        line.source.kind !== "menu" ||
+        line.source.menuId !== catalogScope.menuId ||
+        line.quantity.amount <= 0 ||
+        line.quantity.amount > catalogScope.maxQuantityPerLine
+      ) {
+        return checkoutPlanRejected("pointOfSaleConfiguration.catalogScope");
+      }
     }
     const selection = resolveCheckoutSelection(
       database,
@@ -1196,13 +1217,10 @@ function planPointOfSaleQuote(
     discounted.value.discountTotal + pluginDiscount.value.discountTotal;
   const discountedLines = [...pluginDiscount.value.lines];
   subtotal -= discountTotal;
-  const taxAmount = percentageOfMinorUnits(
-    subtotal,
-    configuration.tax.basisPoints,
-  );
-  if (taxAmount === undefined) return checkoutPlanRejected("checkout.tax");
-  const total = safeAdd(subtotal, taxAmount);
-  if (total === undefined) return checkoutPlanRejected("checkout.total");
+  const taxed = storefrontPercentageTax(subtotal, configuration.tax);
+  if (taxed === undefined) return checkoutPlanRejected("checkout.tax");
+  const taxAmount = taxed.tax;
+  const total = taxed.total;
   const proposedReadyAt = timestampAfterSeconds(
     command.requestedAt,
     configuration.pickupReadyLeadTimeSeconds,
@@ -1250,6 +1268,9 @@ function planPointOfSaleQuote(
         ...(discountTotal === 0
           ? {}
           : { discount: { amountMinor: discountTotal, currency } }),
+        ...(configuration.tax.inclusion === "included"
+          ? { taxIncluded: true as const }
+          : {}),
       },
       fulfillment: {
         kind: "pickup",

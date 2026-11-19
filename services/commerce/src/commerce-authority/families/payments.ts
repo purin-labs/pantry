@@ -108,6 +108,21 @@ export abstract class PaymentFamily extends CheckoutFamily {
         field: "inPersonCheckoutPayment.checkoutConfiguration",
       });
     }
+    if (command.paymentBinding.provider === "gmo_stera") {
+      return {
+        schemaVersion: "underclerk.in-person-checkout-payment-collection.v1",
+        outcome: "ready",
+        mutationOutcome: started.outcome,
+        receipt: started.receipt,
+        paymentAttemptId: command.paymentAttemptId,
+        session: {
+          kind: "gateway_terminal_checkout",
+          gatewayId: command.paymentBinding.gatewayId,
+          deviceSourceKey: command.paymentBinding.deviceSourceKey,
+          expiresAt: checkout.lifecycle.quote.expiresAt,
+        },
+      };
+    }
     const gateway = this.inPersonCollectionGateway;
     if (gateway === undefined) {
       return unavailableInPersonCheckoutCollection(
@@ -125,6 +140,9 @@ export abstract class PaymentFamily extends CheckoutFamily {
         idempotencyKey: command.idempotencyKey,
         money: paymentAttempt.binding.amount,
         paymentBinding: command.paymentBinding,
+        ...(command.paymentMethod === undefined
+          ? {}
+          : { paymentMethod: command.paymentMethod }),
         expiresAt: checkout.lifecycle.quote.expiresAt,
         receiptSummary: {
           merchantName: merchantDisplayName,
@@ -254,6 +272,15 @@ export abstract class PaymentFamily extends CheckoutFamily {
         paymentAttemptRevision: sale.paymentAttempt.revision,
         providerPaymentReference: provider.providerPaymentReference,
         capturedAt: provider.capturedAt,
+        ...(provider.paymentMethod === undefined
+          ? {}
+          : { paymentMethod: provider.paymentMethod }),
+        ...(provider.tenderBrand === undefined
+          ? {}
+          : { tenderBrand: provider.tenderBrand }),
+        ...(provider.providerRefundable === undefined
+          ? {}
+          : { providerRefundable: provider.providerRefundable }),
       });
       requireSuccessfulCounterSaleMutation(
         recorded,

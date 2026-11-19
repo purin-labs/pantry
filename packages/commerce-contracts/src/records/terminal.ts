@@ -3,8 +3,8 @@
 import { Type, type Static } from "typebox";
 import { OpenObject, SafeInteger, recordParser } from "../schema.ts";
 import {
+  inPersonTerminalTransportSchema,
   paymentProviderAccountBindingSchema,
-  squareTerminalTransportSchema,
 } from "./commerce-records.ts";
 import {
   commerceMerchantIdSchema,
@@ -27,6 +27,11 @@ export const terminalTargetSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("paired_physical"),
     providerDeviceId: resourceIdSchema,
+  }),
+  OpenObject({
+    kind: Type.Literal("lan_gateway_device"),
+    gatewayId: resourceIdSchema,
+    deviceSourceKey: resourceIdSchema,
   }),
 ]);
 export type TerminalTarget = Static<typeof terminalTargetSchema>;
@@ -70,7 +75,7 @@ export const terminalAssignmentSchema = OpenObject({
   account: paymentProviderAccountBindingSchema,
   providerLocationId: resourceIdSchema,
   target: terminalTargetSchema,
-  transport: squareTerminalTransportSchema,
+  transport: inPersonTerminalTransportSchema,
   adapterVersion: Type.String(),
   revision: SafeInteger,
   state: terminalAssignmentStateSchema,

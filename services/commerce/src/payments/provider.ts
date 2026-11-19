@@ -8,6 +8,7 @@ import type {
 import type {
   CheckoutPaymentProviderBinding,
   InPersonPaymentBinding,
+  InPersonPaymentMethod,
   OnlinePaymentBinding,
 } from "@seams/commerce-contracts";
 import type { VariantBy } from "@seams/type-utils";
@@ -45,6 +46,7 @@ export type MerchantInPersonCollectionCommand = Readonly<{
   idempotencyKey: string;
   money: Readonly<{ amountMinor: number; currency: string }>;
   paymentBinding: InPersonPaymentBinding;
+  paymentMethod?: InPersonPaymentMethod;
   expiresAt: string;
   receiptSummary: Readonly<{
     merchantName: string;

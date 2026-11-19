@@ -9,7 +9,7 @@
     "apps/portal/src/features/workflow-simulator/production-workspace.tsx": 5185,
     "apps/storefront/src/storefront.tsx": 9334,
     "packages/bakery-model/src/bakery-surface.ts": 4991,
-    "packages/commerce-contracts/src/records/commerce-records.ts": 3309,
+    "packages/commerce-contracts/src/records/commerce-records.ts": 3253,
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3819,
     "packages/production-simulation/src/recipes/bakery/schedule.ts": 4510,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5293

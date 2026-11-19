@@ -10,6 +10,7 @@ import { KITCHEN_SURFACE } from "./surface-observation.ts";
  * never lands on a page that the person opened later.
  */
 export const COSTS_SURFACE = "costs";
+export const REGISTER_SURFACE = "register";
 
 export const COSTS_TABS = [
   "margins",
@@ -49,13 +50,23 @@ export const PASTRY_BENCH_VIEW_COMMANDS = [
   "prepare_pastry_bench",
 ] as const;
 
+/** The view commands of Café › Register (Plan 90): basket staging only, zero money movement. */
+export const REGISTER_VIEW_COMMANDS = [
+  "register_add_item",
+  "register_update_line",
+  "register_remove_line",
+  "register_clear_basket",
+] as const;
+
 export type CostsViewCommandName = (typeof COSTS_VIEW_COMMANDS)[number];
 export type CostsTab = (typeof COSTS_TABS)[number];
 export type PastryBenchViewCommandName =
   (typeof PASTRY_BENCH_VIEW_COMMANDS)[number];
+export type RegisterViewCommandName = (typeof REGISTER_VIEW_COMMANDS)[number];
 export type PageViewCommandName =
   | CostsViewCommandName
-  | PastryBenchViewCommandName;
+  | PastryBenchViewCommandName
+  | RegisterViewCommandName;
 
 const identifier = Type.String({ minLength: 1, maxLength: 200 });
 
@@ -115,6 +126,29 @@ export const pastryBenchViewCommandSchema = Type.Union([
   }),
 ]);
 
+export const registerViewCommandSchema = Type.Union([
+  Type.Object({
+    name: Type.Literal("register_add_item"),
+    menuEntryId: identifier,
+    modifierOptionIds: Type.Optional(
+      Type.Array(identifier, { maxItems: 20 }),
+    ),
+    quantity: Type.Optional(Type.Integer({ minimum: 1, maximum: 99 })),
+  }),
+  Type.Object({
+    name: Type.Literal("register_update_line"),
+    lineKey: identifier,
+    quantity: Type.Integer({ minimum: 1, maximum: 99 }),
+  }),
+  Type.Object({
+    name: Type.Literal("register_remove_line"),
+    lineKey: identifier,
+  }),
+  Type.Object({
+    name: Type.Literal("register_clear_basket"),
+  }),
+]);
+
 const pageCommandBindingSchema = Type.Object({
   browserInstanceId: Type.String({ minLength: 1, maxLength: 160 }),
   conversationId: Type.String({ minLength: 1, maxLength: 160 }),
@@ -150,11 +184,24 @@ export const surfacePageCommandSchema = Type.Union([
     /** The name that the label on the page shows, such as the agent's name. */
     agentLabel: Type.String({ minLength: 1, maxLength: 60 }),
   }),
+  Type.Object({
+    kind: Type.Literal("page_command"),
+    schemaVersion: Type.Literal(1),
+    surface: Type.Literal(REGISTER_SURFACE),
+    binding: pageCommandBindingSchema,
+    target: pageCommandTargetSchema,
+    command: registerViewCommandSchema,
+    agentLabel: Type.String({ minLength: 1, maxLength: 60 }),
+  }),
 ]);
 
 export type CostsViewCommand = Static<typeof costsViewCommandSchema>;
 export type PastryBenchViewCommand = Static<typeof pastryBenchViewCommandSchema>;
-export type PageViewCommand = CostsViewCommand | PastryBenchViewCommand;
+export type RegisterViewCommand = Static<typeof registerViewCommandSchema>;
+export type PageViewCommand =
+  | CostsViewCommand
+  | PastryBenchViewCommand
+  | RegisterViewCommand;
 export type SurfacePageCommandV1 = Static<typeof surfacePageCommandSchema>;
 
 const decodeSurfacePageCommand = recordParser(surfacePageCommandSchema);
@@ -169,6 +216,7 @@ export function parseSurfacePageCommand(
 const PAGE_VIEW_COMMAND_SET: ReadonlySet<string> = new Set<string>([
   ...COSTS_VIEW_COMMANDS,
   ...PASTRY_BENCH_VIEW_COMMANDS,
+  ...REGISTER_VIEW_COMMANDS,
 ]);
 
 export function isPageViewCommandName(
@@ -179,7 +227,7 @@ export function isPageViewCommandName(
 
 export function pageViewCommandSurface(
   command: PageViewCommand,
-): typeof COSTS_SURFACE | typeof KITCHEN_SURFACE {
+): typeof COSTS_SURFACE | typeof KITCHEN_SURFACE | typeof REGISTER_SURFACE {
   switch (command.name) {
     case "open_tab":
     case "filter_category":
@@ -188,6 +236,11 @@ export function pageViewCommandSurface(
     case "configure_pastry_bench":
     case "prepare_pastry_bench":
       return KITCHEN_SURFACE;
+    case "register_add_item":
+    case "register_update_line":
+    case "register_remove_line":
+    case "register_clear_basket":
+      return REGISTER_SURFACE;
   }
 }
 
@@ -213,5 +266,12 @@ export function surfaceCommandTarget(command: PageViewCommand): string {
         : "pastry-bench:controls";
     case "prepare_pastry_bench":
       return "pastry-bench:prepare";
+    case "register_add_item":
+      return `register:item:${command.menuEntryId}`;
+    case "register_update_line":
+    case "register_remove_line":
+      return `register:line:${command.lineKey}`;
+    case "register_clear_basket":
+      return "register:basket";
   }
 }

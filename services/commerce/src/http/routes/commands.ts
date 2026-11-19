@@ -31,6 +31,7 @@ export async function merchantCommandRoute(
     | "create_pickup_checkout"
     | "begin_checkout_payment"
     | "collect_in_person_checkout_payment"
+    | "record_counter_cash_payment"
     | "record_checkout_payment_capture"
     | "observe_payment_dispute"
     | "place_paid_checkout"
@@ -38,6 +39,7 @@ export async function merchantCommandRoute(
     | "complete_pickup"
     | "cancel_order"
     | "refund_order"
+    | "record_counter_manual_cash_refund"
     | "resolve_checkout_payment"
     | "expire_checkout"
     | "create_preparation_station"
@@ -68,7 +70,8 @@ export async function merchantCommandRoute(
     (route.kind === "update_product_description" &&
       !hasProductId(body.value, route.productId)) ||
     ((route.kind === "begin_checkout_payment" ||
-      route.kind === "collect_in_person_checkout_payment") &&
+      route.kind === "collect_in_person_checkout_payment" ||
+      route.kind === "record_counter_cash_payment") &&
       !hasCheckoutId(body.value, route.checkoutId)) ||
     ((route.kind === "record_checkout_payment_capture" ||
       route.kind === "place_paid_checkout") &&
@@ -81,7 +84,9 @@ export async function merchantCommandRoute(
       (!hasOrderId(body.value, route.orderId) ||
         !hasFulfillmentId(body.value, route.fulfillmentId))) ||
     (route.kind === "cancel_order" && !hasOrderId(body.value, route.orderId)) ||
-    (route.kind === "refund_order" && !hasOrderId(body.value, route.orderId)) ||
+    ((route.kind === "refund_order" ||
+      route.kind === "record_counter_manual_cash_refund") &&
+      !hasOrderId(body.value, route.orderId)) ||
     (route.kind === "resolve_checkout_payment" &&
       (!hasCheckoutId(body.value, route.checkoutId) ||
         !hasPaymentAttemptId(body.value, route.paymentAttemptId))) ||
@@ -120,6 +125,8 @@ export async function merchantCommandRoute(
                         ? await ctx.authority.collectInPersonCheckoutPayment(
                             body.value,
                           )
+                        : route.kind === "record_counter_cash_payment"
+                          ? ctx.authority.recordCounterCashPayment(body.value)
                         : route.kind === "record_checkout_payment_capture"
                           ? ctx.authority.recordCheckoutPaymentCapture(
                               body.value,
@@ -140,6 +147,11 @@ export async function merchantCommandRoute(
                                       ? await ctx.authority.refundOrder(
                                           body.value,
                                         )
+                                      : route.kind ===
+                                          "record_counter_manual_cash_refund"
+                                        ? ctx.authority.recordCounterManualCashRefund(
+                                            body.value,
+                                          )
                                       : route.kind ===
                                           "resolve_checkout_payment"
                                         ? ctx.authority.resolveCheckoutPayment(
