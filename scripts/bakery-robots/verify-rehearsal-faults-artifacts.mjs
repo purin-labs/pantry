@@ -21,7 +21,7 @@ const evidence = resolve(
   process.argv[2] ?? join(root, "output/playwright/plan42f-rehearsal-faults"),
 );
 const expected = {
-  outage: { resource: "fr10-1", start: 60, end: 400 },
+  outage: { resource: "fr10-2", start: 60, end: 400 },
   failure: { bakeryTaskId: "batch:B:handoff:1-stage", afterSeconds: 10 },
   recovery: { bakeryTaskId: "batch:B:handoff:1-stage", seconds: 60 },
 };
@@ -53,7 +53,7 @@ function spans(run) {
 }
 
 const authored = await open("authored");
-assert.equal(authored.raw.schemaVersion, 2);
+assert.equal(authored.raw.kind, "bakery-rehearsal-run");
 assert.deepEqual(authored.raw.faults, expected);
 assert.deepEqual(authored.plan.faults, expected);
 
@@ -75,14 +75,22 @@ assert.equal(failure.task.id, "batch:B:handoff:1-stage");
 assert.equal(failure.failedAt, failure.task.start + 10);
 assert.equal(failure.recoveredAt, failure.failedAt + 60);
 // No work that needs the arm starts during its outage; running work finishes.
+// Each tray runs in its own cell, so only the trays on the cell 2 arm count.
+const arms = new Map(
+  final.plan.operations.map((operation) => [
+    operation.id.split(":")[1],
+    operation.attempt.input.bindings.arm,
+  ]),
+);
 for (const task of run.intervals)
   if (
+    arms.get(task.batch) === expected.outage.resource &&
     (task.kind === "native" ||
       (task.kind === "handoff" && task.phase === "stage")) &&
-    task.start >= 60 &&
-    task.start < 400
+    task.start >= expected.outage.start &&
+    task.start < expected.outage.end
   )
-    assert.fail(`${task.id} started during the FR10 arm outage`);
+    assert.fail(`${task.id} started during the robot arm outage`);
 const stageC = run.intervals.find(
   (task) => task.id === "batch:C:handoff:1-stage",
 );

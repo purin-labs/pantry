@@ -59,11 +59,12 @@ async function verifyRehearsalFaultsBrowser(page) {
   if (same !== "Same outcome as the baseline.")
     throw new Error(`A fresh baseline must match: ${same}`);
 
-  // The arm is out from 60 s to 400 s: running work finishes, new work waits.
+  // Tray B's arm (cell 2) is out from 60 s to 400 s: its staging, which
+  // started at 41 s, finishes; its transfer, due at 71 s, waits.
   await chooseOption(page, faultField(page, "Unavailable resource"), {
-    label: "FR10 arm",
+    label: "Robot arm · Cell 2",
   });
-  await faultNotice(page, "FR10 arm outage applied.");
+  await faultNotice(page, "Robot arm · Cell 2 outage applied.");
   await faultTime(page, "Unavailable from (s)", 60, "Outage window changed.");
   await faultTime(page, "Available again (s)", 400, "Outage window changed.");
   const outage = await comparison(page).textContent();
@@ -75,8 +76,10 @@ async function verifyRehearsalFaultsBrowser(page) {
     label: "Tray B staging",
   });
   await faultNotice(page, "Failure injected.");
+  // The failed staging holds Baker 1, who also clears tray A, so both trays
+  // stay unfinished until a recovery releases the baker.
   const failed = await comparison(page).textContent();
-  if (!/1 more unfinished tray\. 1 more failed task\./.test(failed))
+  if (!/2 more unfinished trays\. 1 more failed task\./.test(failed))
     throw new Error(`The failure must be compared: ${failed}`);
   await chooseOption(page, faultField(page, "Assumed recovery"), {
     label: "Tray B staging",
@@ -138,8 +141,9 @@ async function verifyRehearsalFaultsBrowser(page) {
     comparisons: { outage, failed, pinned },
     checks: [
       "a pinned baseline starts equal to the current run",
-      "an FR10 arm outage delays the run against the baseline",
+      "an outage of tray B's robot arm delays the run against the baseline",
       "an injected staging failure is compared as one more failed task",
+      "the failed staging holds the shared baker, so tray A waits too",
       "an assumed recovery releases the cell so a browser chain runs",
       "the browser run stops at the recovered failure without executing it",
       "faults save and reopen with the rehearsal",

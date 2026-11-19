@@ -1288,10 +1288,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The open select shows no 'FR10 arm' option in 30 s. The journey's path to it is out of date.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 17.4,
+        "date": "2026-11-19",
+        "commit": "6bade56e3"
       }
     },
     {
@@ -1513,10 +1514,11 @@
         "tool": "tsx",
         "args": ["{out:rehearsal-faults-browser}"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the output of rehearsal-faults-browser, which fails.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.7,
+        "date": "2026-11-19",
+        "commit": "6bade56e3"
       }
     },
     {
