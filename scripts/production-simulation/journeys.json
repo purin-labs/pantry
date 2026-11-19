@@ -2156,10 +2156,11 @@
         "tool": "browser",
         "url": "/factory-acceptance.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The PortalFrame top-right controls overlap the factory toolbar in Split mode.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 107.6,
+        "date": "2026-11-19",
+        "commit": "a92f2f9aa"
       }
     },
     {
