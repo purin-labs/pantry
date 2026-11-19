@@ -1981,22 +1981,6 @@
       }
     },
     {
-      "id": "bakery-shift-browser",
-      "file": "scripts/production-simulation/verify-bakery-shift-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 61E",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Shared production runs' control does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
-        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
-      }
-    },
-    {
       "id": "black-sesame-browser",
       "file": "scripts/production-simulation/verify-black-sesame-browser.js",
       "tier": "browser",
@@ -2116,22 +2100,6 @@
       }
     },
     {
-      "id": "factory-overview-browser",
-      "file": "scripts/production-simulation/verify-factory-overview-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 70D",
-      "run": {
-        "tool": "browser",
-        "url": "/factory-acceptance.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the Plan 70 J2 campaign by an absolute path in the main checkout. That output (j2-recurring-campaign-2026-10-11-r2) is gone.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
-      }
-    },
-    {
       "id": "financier-decision-browser",
       "file": "scripts/production-simulation/verify-financier-decision-browser.js",
       "tier": "browser",
@@ -2156,22 +2124,6 @@
       "run": {
         "tool": "browser",
         "url": "/workflow-preview.html?evidence=/@fs/{abs:ginger-milk-tea}"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. The shared prelude simulator-navigation.js replaces such clicks, but this file does not use it.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
-      }
-    },
-    {
-      "id": "ginger-tea-browser",
-      "file": "scripts/production-simulation/verify-ginger-tea-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 61C",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html?evidence=/@fs/{abs:ginger-tea}"
       },
       "status": "fails",
       "failure": {
@@ -2223,22 +2175,6 @@
       }
     },
     {
-      "id": "material-history-browser",
-      "file": "scripts/production-simulation/verify-material-history-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 70E",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. The shared prelude simulator-navigation.js replaces such clicks, but this file does not use it.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
-      }
-    },
-    {
       "id": "morning-shift-browser",
       "file": "scripts/production-simulation/verify-morning-shift-browser.js",
       "tier": "browser",
@@ -2270,22 +2206,6 @@
         "seconds": 65.1,
         "date": "2026-11-17",
         "commit": "a30c096a8"
-      }
-    },
-    {
-      "id": "physical-recovery-browser",
-      "file": "scripts/production-simulation/verify-physical-recovery-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 70A",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html?evidence=/@fs/{abs:recovery-wasm}"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Open recipe, oven route or saved production run' input does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date. Also, no journey writes its input reference-failure-file.json (only this file names it, since 4aa5061bb).",
-        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
       }
     },
     {
@@ -2354,73 +2274,6 @@
         "seconds": 265,
         "date": "2026-11-17",
         "commit": "cefdcf4cc"
-      }
-    },
-    {
-      "id": "recording-pages-evidence",
-      "file": "scripts/production-simulation/prepare-recording-pages-evidence.mjs",
-      "tier": "browser",
-      "backend": "none",
-      "owner": "Plan 70E",
-      "run": {
-        "tool": "node",
-        "args": ["{out:recurring-logistics}/stress-one-slot/reference", "{out}"]
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "No recorded operation of the recurring route has more than 65,536 records now, and the journey needs one that crosses pack boundaries. All three cases (stress-one-slot, stress-two-slots, balanced-baseline) fail.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
-      }
-    },
-    {
-      "id": "recording-pages-browser",
-      "file": "scripts/production-simulation/verify-recording-pages-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 70E",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html?evidence=/@fs/{abs:recording-pages-evidence}"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the evidence of recording-pages-evidence, which fails.",
-        "proof": "recording-pages-evidence fails"
-      }
-    },
-    {
-      "id": "recurring-logistics-browser",
-      "file": "scripts/production-simulation/verify-recurring-logistics-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 70C",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html?evidence=/@fs/{abs:recurring-logistics}"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "page.waitForFunction did not finish in 30 s. It failed in one run at a load average near 15; a second run was stopped because the disk had no room for the 2.2 GB recurring-logistics output, so a slow page is not ruled out.",
-        "proof": "fails at a30c096a8 (one run on 2026-11-17)"
-      }
-    },
-    {
-      "id": "recurring-artifacts",
-      "file": "scripts/production-simulation/verify-recurring-artifacts.mjs",
-      "tier": "browser",
-      "backend": "none",
-      "owner": "Plan 70C",
-      "run": {
-        "tool": "tsx",
-        "args": [
-          "{out:recurring-logistics-browser}",
-          "{out:recurring-logistics}/balanced-baseline"
-        ]
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the download of recurring-logistics-browser, which fails.",
-        "proof": "recurring-logistics-browser fails"
       }
     },
     {

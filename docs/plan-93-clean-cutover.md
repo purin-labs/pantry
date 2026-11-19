@@ -153,6 +153,8 @@ Found on the way: `scripts/production-simulation/verify-factory-overview-browser
 (in the journey index) reads
 `/Users/pta/Dev/lowerarchy/satyr/output/acceptance/plan-70/j2-recurring-campaign-2026-10-11-r2`.
 That folder does not exist on this machine, so the journey cannot pass.
+Plan 92 deleted the journey on 19 November 2026: two-cell-workspace-browser
+and recurring-logistics prove its outcome.
 
 ### Stale Pantry resources (delete them)
 
