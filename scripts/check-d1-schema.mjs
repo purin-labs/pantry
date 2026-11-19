@@ -6,7 +6,7 @@
 // production before it uploads the Worker, and `pnpm backend` runs it against
 // the local databases before the Workers start.
 //
-//   node scripts/check-d1-schema.mjs <platform|commerce> <local|staging|production>
+//   node scripts/check-d1-schema.mjs <platform|commerce> <local|production>
 //
 // It also fails when an Organisation lacks the policy row of a catalogue
 // capability (see capability-policy-rows.mjs); the Access read breaks then.

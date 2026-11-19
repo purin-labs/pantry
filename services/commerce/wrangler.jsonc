@@ -52,33 +52,6 @@
       // Simulated by `wrangler dev`; no bucket of this name exists.
       "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "underclerk-local" }],
     },
-    "staging": {
-      "name": "underclerk-staging",
-      "vars": {
-        "PANTRY_DEPLOYMENT_PROFILE": "staging",
-        "UNDERCLERK_SIGNING_KEY_ID": "key_underclerk_staging_v1",
-      },
-      "secrets": {
-        "required": [
-          "UNDERCLERK_SERVICE_TOKEN",
-          "UNDERCLERK_BUYER_SESSION_SECRET",
-          "UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64",
-          "JAPAN_CARRIER_SIGNING_KEY",
-        ],
-      },
-      "durable_objects": {
-        "bindings": [
-          {
-            "name": "UNDERCLERK_MERCHANT",
-            "class_name": "UnderclerkMerchantDO",
-          },
-          {
-            "name": "UNDERCLERK_SHOP_NAME",
-            "class_name": "UnderclerkShopNameDO",
-          },
-        ],
-      },
-    },
     "production": {
       "name": "underclerk",
       "vars": {

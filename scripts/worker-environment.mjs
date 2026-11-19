@@ -16,12 +16,8 @@ export function readWorkerEnvironment(service, environment) {
     service !== "underclerk"
   )
     throw new Error("Unknown Worker service");
-  if (
-    environment !== "local" &&
-    environment !== "staging" &&
-    environment !== "production"
-  ) {
-    throw new Error("Select local, staging or production");
+  if (environment !== "local" && environment !== "production") {
+    throw new Error("Select local or production");
   }
   const directory = service === "platform" ? "platform" : "commerce";
   const config = unstable_readConfig({
@@ -29,10 +25,8 @@ export function readWorkerEnvironment(service, environment) {
     env: environment,
   });
   const serviceName = service === "platform" ? "satyr-edge" : "underclerk";
-  const expectedName =
-    environment === "staging" ? `${serviceName}-staging` : serviceName;
   if (
-    config.name !== expectedName ||
+    config.name !== serviceName ||
     config.vars.PANTRY_DEPLOYMENT_PROFILE !== environment
   ) {
     throw new Error(
@@ -124,7 +118,6 @@ const CODE_MODE_SANDBOX_CONFIG =
   "services/platform/wrangler.code-mode-sandbox.jsonc";
 const CODE_MODE_SANDBOX_NAMES = {
   local: "satyr-code-mode-sandbox-local",
-  staging: "satyr-code-mode-sandbox-staging",
   production: "satyr-code-mode-sandbox",
 };
 /**
@@ -219,7 +212,6 @@ const CODE_MODE_SANDBOX_FORBIDDEN_BINDINGS = [
 const MODEL_EXIT_CONFIG = "services/platform/wrangler.model-exit.jsonc";
 const MODEL_EXIT_NAMES = {
   local: "satyr-model-exit-local",
-  staging: "satyr-model-exit-staging",
   production: "satyr-model-exit",
 };
 /** The data centre closest to AWS Tokyo. Never Smart Placement. */
@@ -285,7 +277,6 @@ const VAULT_ONEPASSWORD_CONFIG =
   "services/platform/wrangler.vault-onepassword.jsonc";
 const VAULT_ONEPASSWORD_NAMES = {
   local: "satyr-vault-onepassword-local",
-  staging: "satyr-vault-onepassword-staging",
   production: "satyr-vault-onepassword",
 };
 
@@ -340,7 +331,6 @@ export function readVaultOnePasswordEnvironment(environment) {
 const CHATGPT_EXIT_CONFIG = "services/platform/wrangler.chatgpt-exit.jsonc";
 const CHATGPT_EXIT_NAMES = {
   local: "satyr-chatgpt-exit-local",
-  staging: "satyr-chatgpt-exit-staging",
   production: "satyr-chatgpt-exit",
 };
 

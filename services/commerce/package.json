@@ -15,8 +15,7 @@
     "set:shop-name": "node --experimental-strip-types --env-file-if-exists=../../.env.local scripts/set-shop-name.ts",
     "seed:cafe": "pnpm rebuild:plan22-phase3-cafe",
     "dev": "node ../../scripts/run-worker.mjs underclerk dev local",
-    "deploy": "node ../../scripts/run-worker.mjs underclerk deploy production",
-    "deploy:staging": "node ../../scripts/run-worker.mjs underclerk deploy staging"
+    "deploy": "node ../../scripts/run-worker.mjs underclerk deploy production"
   },
   "dependencies": {
     "@seams/std": "workspace:*",

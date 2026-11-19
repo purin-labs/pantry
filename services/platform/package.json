@@ -18,7 +18,6 @@
     "test:commerce-lab": "vitest run tests/commerce-lab tests/commerce-entity-plane-route.test.ts tests/ingress-queue.test.ts tests/cue-engine.test.ts",
     "test:m6-recovery": "vitest run tests/fault-injection-auth.test.ts tests/session-turn-stream.test.ts",
     "deploy": "pnpm --filter @seams/async-control build && pnpm contracts:media && bash ../shop-gateway/build.sh && pnpm --filter @seams/portal build && pnpm d1:schema:remote:check && pnpm slack-ingress:check && pnpm model-exit:check && pnpm chatgpt-exit:check && pnpm vault-onepassword:check && pnpm code-mode-sandbox:deploy && pnpm model-exit:deploy && pnpm chatgpt-exit:deploy && pnpm vault-onepassword:deploy && node ../../scripts/run-worker.mjs platform deploy production && pnpm slack-ingress:deploy",
-    "deploy:staging": "pnpm --filter @seams/async-control build && pnpm contracts:media && pnpm --filter @seams/portal build && node ../../scripts/run-worker.mjs platform schema staging && node ../../scripts/code-mode-sandbox-worker.mjs deploy staging && node ../../scripts/model-exit-worker.mjs deploy staging && node ../../scripts/chatgpt-exit-worker.mjs deploy staging && node ../../scripts/vault-onepassword-worker.mjs deploy staging && node ../../scripts/run-worker.mjs platform deploy staging",
     "code-mode-sandbox:check": "node ../../scripts/code-mode-sandbox-worker.mjs check",
     "code-mode-sandbox:deploy": "node ../../scripts/code-mode-sandbox-worker.mjs deploy",
     "model-exit:check": "node ../../scripts/model-exit-worker.mjs check",

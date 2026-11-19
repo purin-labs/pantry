@@ -43,7 +43,7 @@ for (const origin of [platformOrigin, commerceOrigin]) {
 
 const rejectedTargets = [];
 for (const args of [
-  ["platform", "dev", "staging"],
+  ["platform", "dev", "production"],
   ["platform", "deploy", "local"],
   ["platform", "dev", "local", "--remote"],
 ]) {

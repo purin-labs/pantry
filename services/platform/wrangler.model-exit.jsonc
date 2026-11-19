@@ -35,10 +35,6 @@
       "name": "satyr-model-exit-local",
       "vars": { "PANTRY_DEPLOYMENT_PROFILE": "local" },
     },
-    "staging": {
-      "name": "satyr-model-exit-staging",
-      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "staging" },
-    },
     "production": {
       "name": "satyr-model-exit",
       "vars": { "PANTRY_DEPLOYMENT_PROFILE": "production" },

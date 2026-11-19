@@ -102,18 +102,21 @@ must continue to expose only the Square webhook path. It does not provide portal
 or OAuth callback access. Other provider ingress is not certified through this
 Square-only hostname.
 
-## Production and staging
+## Production
 
 The package deployment commands explicitly select `production`, retaining
 `satyr-edge` and `underclerk` and their existing resource identities. Production
-origins must be HTTPS and cannot be loopback. No deployment has been performed.
+origins must be HTTPS and cannot be loopback.
 Production container application names are pinned explicitly; Wrangler would
 otherwise append `-production` to their previously generated names.
 
-Staging has no configured isolated resources. The launcher rejects it before
-invoking Wrangler. Provisioning decisions must cover Worker names, databases,
-storage, queues, service bindings, root keys, application secrets, origins, and
-provider allowlists. No staging resource aliases production.
+There is no staging environment. Its Workers, databases, bucket, KV namespace,
+queues and containers were deleted on 19 November 2026
+([Plan 93](../plan-93-clean-cutover.md), step 1), and the launcher accepts only
+`local` and `production`. A new staging stack needs its own plan: Worker
+names, databases, storage, queues, service bindings, root keys, application
+secrets, origins and provider allowlists. No staging resource may alias
+production.
 
 Direct Wrangler commands must select an environment explicitly. Secret upload
 and deletion helpers require `--env production`; they do not choose a default.

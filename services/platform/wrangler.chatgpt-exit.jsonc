@@ -57,29 +57,6 @@
         ],
       },
     },
-    "staging": {
-      "name": "satyr-chatgpt-exit-staging",
-      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "staging" },
-      "containers": [
-        {
-          "class_name": "ChatGptExitContainer",
-          "image": "../chatgpt-exit/Dockerfile",
-          "image_build_context": "../..",
-          "instance_type": "lite",
-          "max_instances": 1,
-          "constraints": { "regions": ["APAC"] },
-          "name": "satyr-chatgpt-exit-container-staging",
-        },
-      ],
-      "durable_objects": {
-        "bindings": [
-          {
-            "name": "CHATGPT_EXIT_CONTAINER",
-            "class_name": "ChatGptExitContainer",
-          },
-        ],
-      },
-    },
     "production": {
       "name": "satyr-chatgpt-exit",
       "vars": { "PANTRY_DEPLOYMENT_PROFILE": "production" },

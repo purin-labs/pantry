@@ -26,7 +26,7 @@ if (operation === "dev" && environment !== "local") {
   throw new Error("Development requires local");
 }
 if (operation === "deploy" && environment === "local") {
-  throw new Error("Deployment requires staging or production");
+  throw new Error("Deployment requires production");
 }
 if (operation !== "dev" && extra.some(isContainerOption)) {
   throw new Error("Container availability is a local development option");
@@ -73,8 +73,8 @@ switch (operation) {
     ];
     break;
   case "migrate":
-    if (environment === "production") {
-      throw new Error("Migrations require local or staging");
+    if (environment !== "local") {
+      throw new Error("Migrations require local");
     }
     commands = config.d1_databases.map(databaseMigrationCommand);
     break;

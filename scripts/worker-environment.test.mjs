@@ -21,12 +21,12 @@ test("local startup requires its own secrets file; unavailable targets fail", fu
       /required .dev.vars.local is missing/u,
     );
     assert.throws(
-      readWorkerEnvironment.bind(null, "platform", "preview"),
-      /Select local, staging or production/u,
+      readWorkerEnvironment.bind(null, "platform", "staging"),
+      /Select local or production/u,
     );
     assert.throws(
       readWorkerEnvironment.bind(null, "platform", undefined),
-      /Select local, staging or production/u,
+      /Select local or production/u,
     );
     const production = readWorkerEnvironment("platform", "production");
     assert.throws(

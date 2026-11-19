@@ -1,6 +1,7 @@
 # Plan 93 — Clean cutover to new Workers and infrastructure
 
-Status: draft, 19 November 2026. Nothing is done.
+Status: draft, 19 November 2026. Step 1 is done (see "Step 1 results").
+Steps 0 and 2 to 7 are open.
 
 - The owner asked for a Worker rename ("Plan a Worker rename").
 - Then the owner chose a clean cutover with the brand rename: "don't worry
@@ -216,6 +217,39 @@ namespace, the queues and the staging DNS record. Then delete
 Remove the `staging` environments from the Wrangler files in the same
 change.
 
+#### Step 1 results (19 November 2026)
+
+The owner said "Yes, delete them". I deleted, with Wrangler:
+
+- The consumers of `satyr-staging-events`, `satyr-staging-cues` and
+  `satyr-thread-files`.
+- The Workers `satyr-edge-staging`, `satyr-code-mode-sandbox-staging` and
+  `underclerk-staging`, with their Durable Objects. The custom domain
+  `staging.satyr.seams.sh` went with `satyr-edge-staging`: it has no DNS
+  answer now.
+- The four staging container applications.
+- The bucket `satyr-staging-archive-apac` (28 objects, 11.6 kB, emptied
+  through a local remote binding, with no deployed Worker), the D1 databases
+  `satyr-staging-global-apac` and `satyr-staging-organisation-apac`, the KV
+  namespace `satyr-staging-policy`, and the queues `satyr-staging-events`,
+  `satyr-staging-cues`, `satyr-staging-event-dlq`, `satyr-staging-cue-dlq`,
+  `satyr-thread-files` and `satyr-thread-file-dlq`.
+
+Checks after the deletion: no resource with a staging or thread-file name
+is left; the live versions of `satyr-edge`, `underclerk` and
+`satyr-slack-ingress` did not change; `satyr-edge` is still the producer and
+consumer of `satyr-events` and `satyr-cues`; the Portal answers 200.
+
+The code change removes the `staging` environment from the six Wrangler
+files, the two `deploy:staging` scripts, the launcher
+(`scripts/worker-environment.mjs`, `scripts/run-worker.mjs`), the isolate
+location read, the staging runbook and the environment runbook text. The
+launcher now accepts only `local` and `production`.
+
+Left in place: the Secrets Store secrets `satyr-staging-data-encryption-root-v1`
+and `satyr-staging-vault-root-v1`. They were not on the approved list. Step 5
+deletes them with the other old secrets.
+
 ### 2. The code change
 
 One branch, from a freeze of dev:
@@ -315,8 +349,8 @@ removes the staging crons.
    (production holds only test accounts).
 2. **The new names.** Default: the tables above. Rule: each Pantry resource
    starts with `pantry-`, and storage ends with its region (`-apac`).
-3. **Delete the stale Pantry resources now (step 1).** Default: yes. Cost:
-   about one hour. It stops about 3,000 staging writes a day.
+3. **Delete the stale Pantry resources now (step 1).** Decided and done on
+   19 November 2026.
 4. **No staging stack after the cutover.** Default: none until a plan needs
    one.
 5. **Stale resources of other projects.** Default: keep them until you say

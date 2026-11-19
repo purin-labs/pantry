@@ -37,8 +37,7 @@ export function startIsolateLocationRead(
   if (
     location !== null ||
     reading !== null ||
-    (env.PANTRY_DEPLOYMENT_PROFILE !== "staging" &&
-      env.PANTRY_DEPLOYMENT_PROFILE !== "production")
+    env.PANTRY_DEPLOYMENT_PROFILE !== "production"
   ) {
     return;
   }
@@ -57,8 +56,7 @@ export async function readIsolateLocation(env: {
 }): Promise<string | null> {
   if (
     location === null &&
-    (env.PANTRY_DEPLOYMENT_PROFILE === "staging" ||
-      env.PANTRY_DEPLOYMENT_PROFILE === "production")
+    env.PANTRY_DEPLOYMENT_PROFILE === "production"
   ) {
     const current = (reading ??= readLocation());
     if (!(await settlesWithin(current, WAIT_LIMIT_MS)) && reading === current) {

@@ -26,17 +26,6 @@
         "bindings": [{ "name": "SANDBOX", "class_name": "CodeModeSandbox" }],
       },
     },
-    "staging": {
-      "name": "satyr-code-mode-sandbox-staging",
-      "durable_objects": {
-        "bindings": [
-          {
-            "name": "SANDBOX",
-            "class_name": "CodeModeSandbox",
-          },
-        ],
-      },
-    },
     "production": {
       "name": "satyr-code-mode-sandbox",
       "durable_objects": {
