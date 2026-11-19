@@ -2112,10 +2112,11 @@
         "url": "/workflow-preview.html",
         "timeoutMs": 1200000
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It expects 11 synchronized Morning Shift appliances; the Portal shows 12.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 109.3,
+        "date": "2026-11-19",
+        "commit": "dfd3e6bff"
       }
     },
     {

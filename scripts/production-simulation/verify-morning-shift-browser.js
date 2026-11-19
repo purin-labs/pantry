@@ -480,9 +480,11 @@ async function verifyMorningShiftBrowser(page) {
     throw new Error(
       `Expected 3 cobot scene labels (${expectedCells.join(", ")}), got ${JSON.stringify(sceneCells)}`,
     );
-  if (appliances.length !== 11)
+  // The full morning shift also makes two pies, so the Marble Pie Pastry
+  // Bench is the twelfth synchronized appliance.
+  if (appliances.length !== 12)
     throw new Error(
-      `Expected 11 synchronized Morning Shift appliances, got ${appliances.length}`,
+      `Expected 12 synchronized Morning Shift appliances, got ${appliances.length}`,
     );
   await page
     .getByLabel("Live accepted physics", { exact: true })
