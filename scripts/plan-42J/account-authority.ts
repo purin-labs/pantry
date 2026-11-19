@@ -15,6 +15,7 @@ import {
   issueControlSession,
   upsertUser,
   type ActiveControlSession,
+  type ControlRole,
   type User,
 } from "../../services/platform/src/data/control-plane";
 import type { Env } from "../../services/platform/src/env";
@@ -218,11 +219,73 @@ export function fixturePeople(subjectPrefix: string, label: string) {
     return response;
   }
 
+  /**
+   * One active Organisation `name` with Pantry's model route. "Owner" creates
+   * it and "Other" is its administrator; `member`, when given, has `role`.
+   * The account authority admits each of them, and `label` names the
+   * activation.
+   */
+  async function admittedOrganisation(
+    env: Env,
+    name: string,
+    member?: Readonly<{ name: string; role: ControlRole }>,
+  ) {
+    const now = Date.now();
+    const owner = await fixtureUser(env, "Owner");
+    const other = await fixtureUser(env, "Other");
+    const memberUser =
+      member === undefined ? undefined : await fixtureUser(env, member.name);
+    const organisationId = await fixtureOrganisation(env, owner, name);
+    const roles: { user: User; name: string; role: ControlRole }[] = [
+      { user: other, name: "Other", role: "admin" },
+    ];
+    if (member !== undefined && memberUser !== undefined)
+      roles.push({ user: memberUser, name: member.name, role: member.role });
+    await env.DB.batch([
+      env.DB.prepare(
+        "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = ?, activated_at = ?, updated_at = ? WHERE organisation_id = ?",
+      ).bind(label, now, now, organisationId),
+      ...roles.flatMap((person) => {
+        const personId = `person_${crypto.randomUUID()}`;
+        return [
+          env.DB.prepare(
+            "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, ?)",
+          ).bind(organisationId, personId, person.name),
+          env.DB.prepare(
+            "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at) VALUES (?, ?, ?, ?, 'active', ?)",
+          ).bind(
+            organisationId,
+            person.user.userId,
+            personId,
+            person.role,
+            now,
+          ),
+        ];
+      }),
+      env.DB.prepare(
+        "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+      ).bind(organisationId, owner.userId, now),
+    ]);
+    const ownerPerson = await fixturePerson(env, organisationId, owner);
+    await attachToAccountAuthority(env, {
+      organisationId,
+      owner: ownerPerson,
+      administrator: await fixturePerson(env, organisationId, other),
+      member:
+        memberUser === undefined
+          ? undefined
+          : await fixturePerson(env, organisationId, memberUser),
+      auxiliary: auxiliaryOwner.bind(null, env),
+    });
+    return { organisationId, owner, other, member: memberUser, ownerPerson };
+  }
+
   return {
     fixtureUser,
     fixtureOrganisation,
     fixturePerson,
     auxiliaryOwner,
+    admittedOrganisation,
     login,
   };
 }

@@ -14,10 +14,7 @@ import { OrganisationExecutionScope } from "../../services/platform/src/organisa
 import type { Env } from "../../services/platform/src/env";
 import type { OrganisationId } from "../../services/platform/src/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../services/platform/src/policy-snapshot";
-import {
-  attachToAccountAuthority,
-  fixturePeople,
-} from "../plan-42J/account-authority";
+import { fixturePeople } from "../plan-42J/account-authority";
 
 export {
   OrganisationDO,
@@ -28,13 +25,10 @@ export {
 } from "../../services/platform/src/integration-gateway";
 
 const names = ["Owner", "Other"] as const;
-const {
-  fixtureUser,
-  fixtureOrganisation,
-  fixturePerson,
-  auxiliaryOwner,
-  login,
-} = fixturePeople("side-case-", "plan74-browser");
+const { fixtureUser, admittedOrganisation, login } = fixturePeople(
+  "side-case-",
+  "plan74-browser",
+);
 
 export default {
   queue(batch: MessageBatch<unknown>, env: Env): Promise<void> {
@@ -81,7 +75,8 @@ async function propose(env: Env, raw: unknown): Promise<Response> {
     )
     .bind(input.organisationId)
     .first<{ workflowId: string }>();
-  if (row === null) return Response.json({ error: "no workflow" }, { status: 404 });
+  if (row === null)
+    return Response.json({ error: "no workflow" }, { status: 404 });
   const current = await readCurrentWorkflow(
     env,
     scope.database,
@@ -136,34 +131,10 @@ async function propose(env: Env, raw: unknown): Promise<Response> {
  */
 async function seed(env: Env) {
   const now = Date.now();
-  const owner = await fixtureUser(env, "Owner");
-  const other = await fixtureUser(env, "Other");
-  const organisationId = await fixtureOrganisation(
+  const { organisationId, owner, other } = await admittedOrganisation(
     env,
-    owner,
     "Side Case acceptance",
   );
-  const otherPersonId = `person_${crypto.randomUUID()}`;
-  await env.DB.batch([
-    env.DB.prepare(
-      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'plan74-browser', activated_at = ?, updated_at = ? WHERE organisation_id = ?",
-    ).bind(now, now, organisationId),
-    env.DB.prepare(
-      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, 'Other')",
-    ).bind(organisationId, otherPersonId),
-    env.DB.prepare(
-      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at) VALUES (?, ?, ?, 'admin', 'active', ?)",
-    ).bind(organisationId, other.userId, otherPersonId, now),
-    env.DB.prepare(
-      "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
-    ).bind(organisationId, owner.userId, now),
-  ]);
-  await attachToAccountAuthority(env, {
-    organisationId,
-    owner: await fixturePerson(env, organisationId, owner),
-    administrator: await fixturePerson(env, organisationId, other),
-    auxiliary: auxiliaryOwner.bind(null, env),
-  });
   const granted = await createAccessGrant({
     db: env.DB,
     organisationId,

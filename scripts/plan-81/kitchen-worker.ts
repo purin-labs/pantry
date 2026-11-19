@@ -12,10 +12,7 @@ import { bakeryRunSnapshotPrefix } from "../../services/platform/src/commerce/ba
 import { createAccessGrant } from "../../services/platform/src/data/access-grants";
 import type { Env } from "../../services/platform/src/env";
 import { compilePublishAndActivateOrganisationPolicy } from "../../services/platform/src/policy-snapshot";
-import {
-  attachToAccountAuthority,
-  fixturePeople,
-} from "../plan-42J/account-authority";
+import { fixturePeople } from "../plan-42J/account-authority";
 
 export {
   OrganisationDO,
@@ -26,13 +23,10 @@ export {
 } from "../../services/platform/src/integration-gateway";
 
 const names = ["Owner", "Other", "Member"] as const;
-const {
-  fixtureUser,
-  fixtureOrganisation,
-  fixturePerson,
-  auxiliaryOwner,
-  login,
-} = fixturePeople("kitchen-", "plan81-browser");
+const { admittedOrganisation, login } = fixturePeople(
+  "kitchen-",
+  "plan81-browser",
+);
 
 export default {
   queue(batch: MessageBatch<unknown>, env: Env): Promise<void> {
@@ -111,43 +105,12 @@ async function seedMenu(env: Env) {
  */
 async function seed(env: Env) {
   const now = Date.now();
-  const owner = await fixtureUser(env, "Owner");
-  const other = await fixtureUser(env, "Other");
-  const member = await fixtureUser(env, "Member");
-  const organisationId = await fixtureOrganisation(
+  const { organisationId, owner, other, member } = await admittedOrganisation(
     env,
-    owner,
     "Satyr Kitchen acceptance",
+    { name: "Member", role: "operator" },
   );
-  const otherPersonId = `person_${crypto.randomUUID()}`;
-  const memberPersonId = `person_${crypto.randomUUID()}`;
-  await env.DB.batch([
-    env.DB.prepare(
-      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'plan81-browser', activated_at = ?, updated_at = ? WHERE organisation_id = ?",
-    ).bind(now, now, organisationId),
-    env.DB.prepare(
-      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, 'Other')",
-    ).bind(organisationId, otherPersonId),
-    env.DB.prepare(
-      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at) VALUES (?, ?, ?, 'admin', 'active', ?)",
-    ).bind(organisationId, other.userId, otherPersonId, now),
-    env.DB.prepare(
-      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, 'Member')",
-    ).bind(organisationId, memberPersonId),
-    env.DB.prepare(
-      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at) VALUES (?, ?, ?, 'operator', 'active', ?)",
-    ).bind(organisationId, member.userId, memberPersonId, now),
-    env.DB.prepare(
-      "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
-    ).bind(organisationId, owner.userId, now),
-  ]);
-  await attachToAccountAuthority(env, {
-    organisationId,
-    owner: await fixturePerson(env, organisationId, owner),
-    administrator: await fixturePerson(env, organisationId, other),
-    member: await fixturePerson(env, organisationId, member),
-    auxiliary: auxiliaryOwner.bind(null, env),
-  });
+  if (member === undefined) throw new Error("The fixture has no member");
   for (const [grantId, role] of [
     ["grant_kitchen_context", "owner"],
     ["grant_kitchen_context_operator", "operator"],
