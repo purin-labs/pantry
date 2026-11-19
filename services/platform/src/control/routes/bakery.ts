@@ -2,11 +2,6 @@ import { pantryCommerceAccess } from "../../commerce/app-access";
 import { CommerceEntityPlaneClient } from "@seams/commerce-client";
 import { createFinancierSample } from "../../commerce/bakery/sample";
 import {
-  parseOvenAssignmentEdit,
-  saveOvenAssignment,
-  type OvenAssignmentEdit,
-} from "../../commerce/bakery/assignment";
-import {
   parseOperationEdit,
   saveOperationDuration,
   type OperationEdit,
@@ -41,11 +36,10 @@ import { recordCommerceMutationReceipt } from "../mutation-receipt";
 import { assertNever } from "@seams/std";
 
 export type BakeryAction =
-  "sample" | "operation" | "scenario" | "production-scenario" | "assignment";
+  "sample" | "operation" | "scenario" | "production-scenario";
 type BakeryMutation =
   | Readonly<{ kind: "sample" }>
   | Readonly<{ kind: "operation"; edit: OperationEdit }>
-  | Readonly<{ kind: "assignment"; edit: OvenAssignmentEdit }>
   | Readonly<{ kind: "scenario"; copy: ScenarioCopy }>
   | Readonly<{ kind: "production-scenario"; copy: ProductionScenario }>;
 
@@ -181,13 +175,6 @@ export async function handleBakeryControl(
           edit: mutation.edit,
         });
         break;
-      case "assignment":
-        result = await saveOvenAssignment({
-          ...input,
-          commandId: boundary.idempotencyKey,
-          edit: mutation.edit,
-        });
-        break;
       case "production-scenario":
         result = await saveProductionScenario({
           ...input,
@@ -287,10 +274,6 @@ function parseBakeryMutation(
     case "operation": {
       const edit = parseOperationEdit(body);
       return edit === null ? null : { kind: "operation", edit };
-    }
-    case "assignment": {
-      const edit = parseOvenAssignmentEdit(body);
-      return edit === null ? null : { kind: "assignment", edit };
     }
     case "scenario": {
       const copy = parseScenarioCopy(body);

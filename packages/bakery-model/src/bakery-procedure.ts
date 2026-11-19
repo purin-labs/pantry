@@ -34,7 +34,7 @@ export async function readBakeryProcedure(
     : compileBakeryGraph(result.graph, reference, assumptions);
 }
 
-export async function readBakeryProcedureGraph(
+async function readBakeryProcedureGraph(
   readGraph: (query: CommerceGraphQuery) => Promise<CommerceGraphQueryResult>,
   reference: CustomCommerceEntityRef,
 ): Promise<

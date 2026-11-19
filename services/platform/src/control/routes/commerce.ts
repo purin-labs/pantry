@@ -262,13 +262,6 @@ export function matchCommerceControlRoute(
       organisationIdRaw: bakeryProductionScenario,
       action: "production-scenario",
     };
-  const bakeryAssignment = organisation(pathname, "commerce/bakery/assignment");
-  if (bakeryAssignment !== null)
-    return {
-      kind: "commerceBakery",
-      organisationIdRaw: bakeryAssignment,
-      action: "assignment",
-    };
   if (bakeryScenario !== null)
     return {
       kind: "commerceBakery",

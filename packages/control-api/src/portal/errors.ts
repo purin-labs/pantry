@@ -18,7 +18,6 @@ export type ControlErrorKind =
   | "inventory_receipt_duplicate"
   | "inventory_receipt_invalid"
   | "inventory_count_shortage"
-  | "bakery_assignment_invalid"
   | "bakery_run_not_found"
   | "bakery_scenario_stale"
   | "bakery_workflow_stale"
@@ -143,8 +142,6 @@ function controlErrorKind(code: string | null): ControlErrorKind {
       return "inventory_count_shortage";
     case "inventory_receipt_invalid":
       return "inventory_receipt_invalid";
-    case "bakery_assignment_invalid":
-      return "bakery_assignment_invalid";
     case "bakery_run_not_found":
       return "bakery_run_not_found";
     case "bakery_scenario_stale":
@@ -297,8 +294,6 @@ function controlErrorMessage(kind: ControlErrorKind): string {
       return "This receipt line is already recorded. Close the dialog and review the updated stock.";
     case "inventory_receipt_invalid":
       return "Review the receipt quantity, lot and expiry before recording the delivery.";
-    case "bakery_assignment_invalid":
-      return "Choose an active bakery oven with capacity for this batch.";
     case "bakery_run_not_found":
       return "This saved run could not be found.";
     case "bakery_scenario_stale":
