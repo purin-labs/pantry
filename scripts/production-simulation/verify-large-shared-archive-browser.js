@@ -1,8 +1,9 @@
 async function verifyLargeSharedArchiveBrowser(page) {
-  const setup = await page.request.get("http://127.0.0.1:8840/fixture/setup");
+  const setup = await page.request.get(`${ARCHIVE_ORIGIN}/fixture/setup`);
   if (!setup.ok())
     throw new Error("Start the isolated archive acceptance runtime.");
   const fixture = await setup.json();
+  await page.route(isControlRequest, forwardToArchive);
   const connection = await page.context().newCDPSession(page);
   const memory = {
     active: true,
@@ -13,15 +14,17 @@ async function verifyLargeSharedArchiveBrowser(page) {
   const measuring = measureArchiveMemory(connection, memory);
   try {
     await page.addScriptTag({
-      content: `${largeArchiveRead.toString()}\n${largeArchiveWrite.toString()}`,
+      content: `${archiveRead.toString()}\n${archiveMutation.toString()}`,
     });
+    await page.evaluate(signInToArchive, fixture.sessions[0]);
     const published = await page.evaluate(publishLargeArchive, fixture);
     await connection.send("HeapProfiler.collectGarbage");
     const publishedHeap = await connection.send("Runtime.getHeapUsage");
     await page.reload();
     await page.addScriptTag({
-      content: `${largeArchiveRead.toString()}\n${largeArchiveWrite.toString()}`,
+      content: `${archiveRead.toString()}\n${archiveMutation.toString()}`,
     });
+    await page.evaluate(signInToArchive, fixture.sessions[1]);
     const reopened = await page.evaluate(reopenLargeArchive, {
       fixture,
       published,
@@ -74,28 +77,7 @@ async function measureArchiveMemory(connection, memory) {
 function archiveMemoryDelay(resolve) {
   setTimeout(resolve, 50);
 }
-async function largeArchiveRead(path) {
-  const { responseJson } = await import("/src/control-client.ts");
-  return responseJson(await fetch(path, { credentials: "same-origin" }));
-}
-async function largeArchiveWrite(path, body) {
-  const { responseJson } = await import("/src/control-client.ts");
-  return responseJson(
-    await fetch(path, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        "content-type": "application/json",
-        "x-satyr-csrf": window.archiveCsrf,
-      },
-      body: JSON.stringify(body),
-    }),
-  );
-}
 async function publishLargeArchive(fixture) {
-  document.cookie = `satyr_control_session=${fixture.sessions[0].token}; Path=/; SameSite=Lax`;
-  document.cookie = `satyr_control_csrf=${fixture.sessions[0].csrfToken}; Path=/; SameSite=Lax`;
-  window.archiveCsrf = fixture.sessions[0].csrfToken;
   const { readOvenRunFile } =
     await import("/src/features/production-run/oven-recipe-file.ts");
   const { preparePersistentWorkspaceRun, savePreparedWorkspaceRun } =
@@ -116,9 +98,9 @@ async function publishLargeArchive(fixture) {
   const started = performance.now();
   const saved = await savePreparedWorkspaceRun(
     fixture.organisationId,
-    largeArchiveWrite,
+    archiveMutation,
     prepared,
-    largeArchiveRead,
+    archiveRead,
   );
   if (saved.kind !== "verified") throw new Error(JSON.stringify(saved));
   let artifactBytes = 0;
@@ -137,16 +119,13 @@ async function publishLargeArchive(fixture) {
   };
 }
 async function reopenLargeArchive({ fixture, published }) {
-  document.cookie = `satyr_control_session=${fixture.sessions[1].token}; Path=/; SameSite=Lax`;
-  document.cookie = `satyr_control_csrf=${fixture.sessions[1].csrfToken}; Path=/; SameSite=Lax`;
-  window.archiveCsrf = fixture.sessions[1].csrfToken;
   const { openPersistentWorkspaceRun } =
     await import("/src/features/workflow-simulator/shared-production-run.ts");
   const started = performance.now();
   const opened = await openPersistentWorkspaceRun(
     fixture.organisationId,
     published.id,
-    largeArchiveRead,
+    archiveRead,
   );
   if (
     opened.save.document.state.position.time !== published.time ||
