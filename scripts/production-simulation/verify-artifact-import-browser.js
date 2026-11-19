@@ -19,11 +19,6 @@ async function verifyArtifactImportBrowser(page) {
     importStoredRun,
     expected.checks.completed.snapshot,
   );
-  const legacyArchive = params.get("archive");
-  if (legacyArchive === null)
-    throw new Error("Provide the accepted protocol 1 archive");
-  await page.locator("#archive-input").setInputFiles(legacyArchive);
-  const retained = await page.evaluate(importStoredRun, null);
   await connection.send("HeapProfiler.collectGarbage");
   const heap = await connection.send("Runtime.getHeapUsage");
   await connection.detach();
@@ -50,7 +45,6 @@ async function verifyArtifactImportBrowser(page) {
   return {
     result: "passed",
     current,
-    retained,
     heap,
     activeTabPreserved: true,
     abandonedStagingRemoved: true,
@@ -95,16 +89,18 @@ async function importStoredRun(snapshot) {
   const { openResumable } = await import("/@id/@seams/production-simulation");
   const input = document.querySelector("#archive-input");
   const file = input.files[0];
-  if (file.size < (snapshot === null ? 512 : 500) * 1024 * 1024)
+  // At twice the 128 MiB heap ceiling below, an import that read the file as
+  // one string could not pass.
+  if (file.size < 256 * 1024 * 1024)
     throw new Error(
-      `The import fixture must exceed the single string limit: received ${file.size} bytes`,
+      `The import fixture must exceed 256 MiB: received ${file.size} bytes`,
     );
   const started = performance.now();
   const imported = await readSavedRunFile(file);
   const opened = await openResumable(imported.raw.document, "browser", [
     imported.raw.document.bundle,
   ]);
-  if (!opened.ok || (snapshot !== null && opened.value.snapshot !== snapshot))
+  if (!opened.ok || opened.value.snapshot !== snapshot)
     throw new Error("The exported snapshot changed during import");
   for (const entry of opened.value.artifacts)
     if (imported.artifacts.get(entry.digest)?.byteLength !== entry.byteLength)

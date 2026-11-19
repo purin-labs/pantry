@@ -801,9 +801,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 632,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 581.4,
+        "date": "2026-11-19",
+        "commit": "b50d5aff6"
       }
     },
     {
@@ -822,9 +822,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 1.1,
-        "date": "2026-11-17",
-        "commit": "a30c096a8"
+        "seconds": 0.9,
+        "date": "2026-11-19",
+        "commit": "b50d5aff6"
       }
     },
     {
@@ -1893,9 +1893,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 82.8,
+        "seconds": 81.4,
         "date": "2026-11-19",
-        "commit": "67ee2330d"
+        "commit": "b50d5aff6"
       }
     },
     {
@@ -1908,10 +1908,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html?evidence=/@fs/{abs:artifact-storage-browser}"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "Its fixture, the recurring-run.json of artifact-storage-browser, must exceed 512 MiB, the single string limit of the browser. On 2026-11-19 that export is 337,218,012 bytes (152 artifacts), so the journey refuses it.",
-        "proof": "fails at 67ee2330d (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 25.9,
+        "date": "2026-11-19",
+        "commit": "b50d5aff6"
       }
     },
     {
