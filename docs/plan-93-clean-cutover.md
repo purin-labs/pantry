@@ -370,6 +370,22 @@ possible after this step.
   first), `POLICY_KV`, the queues, the old Secrets Store secrets, the old R2
   token for CI, and `shop.seams.tokyo`.
 - The Console records of the old organisations (seams-monorepo).
+- The old Kitchen physics bundles. A saved run resumes only on the bundle
+  that made it, so each release of the old stack must hold every old bundle
+  (Refactor 16: "Never remove a bundle that a saved run can name"). This
+  step deletes every saved run, so no saved run can name an old bundle after
+  it. In one commit, keep the pinned runtime bundle, its execution bundle and
+  each bundle that a test or a fixture names, and delete the rest:
+  - in git: the runtime bundles `31da6f43…` and `419afa85…` (57 MB) and
+    their execution bundles;
+  - in R2: the 22 runtime bundles and 69 execution bundles that
+    `repo-binaries.json` names (about 660 MB), in the bucket that holds them
+    at that time;
+  - the entries of the deleted bundles in `BAKERY_APPLIANCE_BUILDS`
+    (`browser-physics-asset.ts`).
+
+  `pnpm lint:physics-bundle` and `scripts/check-physics-dist.mjs` must pass.
+  The files stay in the git history of the import commit.
 
 ### 6. Clean the records
 
