@@ -1,6 +1,6 @@
 // The mutations of media, markets, discounts, collections, webhook
 // subscriptions, customers and plugins, as the ledger commits them.
-import type { CommerceMediaCommandV1 } from "@seams/commerce-client";
+import type { CommerceMediaCommandV1 } from "@purin-labs/commerce-client";
 import { type WebhookCommitRequest } from "../webhooks.ts";
 import { type CollectionCommitRequest } from "../plugins/collections/index.ts";
 import { type CustomerCommitRequest } from "../plugins/customers/index.ts";

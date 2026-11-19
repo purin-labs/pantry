@@ -2,7 +2,7 @@ import type {
   CaseExecutionEdgeBasis,
   CaseExecutionLimitation,
   OpenCaseExecutionNode,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   CaseAssignmentRecord,
   CaseExecutionCaseRecords,

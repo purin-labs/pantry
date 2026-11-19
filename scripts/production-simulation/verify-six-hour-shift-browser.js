@@ -259,7 +259,7 @@ async function verifySixHourShiftBrowser(page) {
     const { ProductionResults } =
       await import("/src/features/production-run/production-results.tsx");
     const { reportBakeryShift } =
-      await import("/@id/@seams/production-simulation/recipes/bakery/shift-report");
+      await import("/@id/@purin-labs/production-simulation/recipes/bakery/shift-report");
     const shift = reportBakeryShift(
       scenario,
       view.logistics,

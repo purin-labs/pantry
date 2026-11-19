@@ -29,13 +29,13 @@ import type {
   SystemCommerceEntityKind,
   SystemCommerceEntityRef,
   SystemSchemaRevision,
-} from "@seams/commerce-contracts";
-import type { VariantBy } from "@seams/type-utils";
-import { exhaustiveList, isNormalizedText, isRecord } from "@seams/std";
+} from "@purin-labs/commerce-contracts";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { exhaustiveList, isNormalizedText, isRecord } from "@purin-labs/std";
 import {
   parseWireCustomCommerceRelationshipRef as parseCustomCommerceRelationshipRefRecord,
   parseListEntryAttributeValue as parseListEntryAttributeValueRecord,
-} from "@seams/commerce-contracts/records/entity-plane";
+} from "@purin-labs/commerce-contracts/records/entity-plane";
 import { decodeRecord } from "./record-decoding.ts";
 
 export const SYSTEM_KINDS = exhaustiveList<SystemCommerceEntityKind>()([

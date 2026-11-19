@@ -4,7 +4,7 @@ import {
   type BankPayout,
   type BankPayoutSource,
   type BankPayoutsWindow,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";

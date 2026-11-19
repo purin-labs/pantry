@@ -4,8 +4,8 @@ import {
   isCompletedLoading,
   type PhysicsSequence,
   type PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
-import { MAX_RUN_FILE_BYTES } from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { MAX_RUN_FILE_BYTES } from "@purin-labs/bakery-model/bakery-run-snapshot";
 
 // Saved rehearsal runs, including earlier single and multi-tray formats, open
 // in Multi-tray rehearsal, which converts earlier formats.

@@ -1,8 +1,8 @@
-import { splitWallByWindows } from "@seams/production-simulation/floor/architecture";
+import { splitWallByWindows } from "@purin-labs/production-simulation/floor/architecture";
 import * as THREE from "three";
-import { BAKERY_FLOOR_PLANS, type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import { BAKERY_FLOOR_PLANS, type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import { type FloorPlanWorkspace } from "../floor-plan-workspace";
-import type { ApplianceId } from "@seams/production-simulation/floor/appliance-catalogue";
+import type { ApplianceId } from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import {
   getStoreInteriorDesign,
   type StoreInteriorDesign,

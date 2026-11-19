@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /**
  * The shop's open pickups (Plan 40B phase 3). Staff work through them in the

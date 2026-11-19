@@ -2,7 +2,7 @@
 import type {
   CommerceAggregateObservationV1,
   CommerceResourcesV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export function inventoryPositionObservation(
   resource: CommerceResourcesV1["inventoryPositions"][number],

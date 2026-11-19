@@ -2,7 +2,7 @@ import {
   parseSessionTurnExecution,
   type SessionTurnExecution,
 } from "../../chat/turn-access";
-import type { ConnectorIdentity } from "@seams/contracts";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
   parseIntegrationAccountId,
   parseRequestId,
@@ -46,7 +46,7 @@ import {
   emailRevocationFieldsSchema,
   textFieldSchema,
   whatsappIdentityRequestSchema,
-} from "@seams/contracts/connector-rpc";
+} from "@purin-labs/contracts/connector-rpc";
 import type {
   ConnectorEmailIdentityRequest,
   EmailMailboxRevocationRequest,

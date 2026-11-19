@@ -20,9 +20,9 @@ import type {
 } from "../provider-lifecycle/domain";
 import type { Result } from "../result";
 import type { ActiveCapabilityId } from "../authorization/capability-catalogue";
-import type { IntegrationDiscoveryDataClass } from "@seams/contracts";
+import type { IntegrationDiscoveryDataClass } from "@purin-labs/contracts";
 import type { GmailAuthorizationProduct } from "../mail/gmail-authorization";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { MailIntegrationProvider, MailProviderAdapter } from "./mail";
 
 export type ActiveIntegrationProvider = Extract<

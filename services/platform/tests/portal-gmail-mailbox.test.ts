@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { emailReplyIsOpenable, emailReplyLifecycleLabel, emailReplyLifecycleStatus, gmailMailboxStatus, gmailMailboxSummary, gmailPauseCopy, mailboxAuthorizationNotice, parseMailboxPolicyDraft } from "../../../apps/portal/src/pages/agent-mailbox";
-import type { AgentMailboxView, MailboxPauseReasonView } from "@seams/control-api/portal/agent-mailbox";
+import type { AgentMailboxView, MailboxPauseReasonView } from "@purin-labs/control-api/portal/agent-mailbox";
 
 const NOW = 1_784_016_325_277;
 

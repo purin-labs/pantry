@@ -1,5 +1,5 @@
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { defineTool, jsonSchema } from "../define-tool";
 
 export const messageAttachmentInspect = defineTool({

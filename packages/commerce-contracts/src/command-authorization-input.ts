@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { Type } from "typebox";
 import {
   StrictObject,

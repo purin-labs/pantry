@@ -14,10 +14,10 @@ import {
   type ChatPlacement,
   type Project,
   type ProjectDirectory,
-} from "@seams/control-api";
-import { assertNever, canonicalJson, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import type { ConversationScope } from "./store";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type ConversationPlacementRow = Readonly<{
   project_id: unknown;

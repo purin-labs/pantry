@@ -4,15 +4,15 @@ import {
   type AdmissionProblem,
   type CompiledScenario,
   type Sha256Hex,
-} from "@seams/production-simulation";
-import { canonicalJson, sha256Hex } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import {
   DRAFT_BOUNDS,
   draftNodeId,
   type DraftEdge,
   type DraftNode,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft-shape";
+} from "@purin-labs/workflow-canvas-crdt/draft-shape";
 import {
   lowerWorkflowDocument,
   parseWorkflowDocument,
@@ -20,7 +20,7 @@ import {
   type StepBody,
 } from "./index.ts";
 import { BAND_GAP, layoutGraph, NODE_ROW, placeGraph } from "./layout.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** A document's shared draft starts as this. */
 export function draftSeed(document: BakeryWorkflowDocument): DraftSnapshot {

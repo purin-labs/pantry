@@ -2,11 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "../styles.css";
 import { configurationDraftInserts } from "../features/chat/configuration-draft-cards";
-import type { ConfigurationDraftView } from "@seams/control-api/portal/configuration-drafts";
+import type { ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";
 import { commerceActionTitle } from "../features/governed-actions/commerce";
 import { OrderRefundDetails } from "../features/governed-actions/order-refund-details";
 import { StockOperationCard } from "../features/governed-actions/stock-operation-details";
-import type { StockOperationView } from "@seams/control-api/portal/stock-operation";
+import type { StockOperationView } from "@purin-labs/control-api/portal/stock-operation";
 
 // The refund and stock approval cards and the chat's setup card, with sample
 // facts. The server's records run in tests/e2e/pi-commerce-actions.test.ts and

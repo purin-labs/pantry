@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../database-handles";
-import type { ProviderFileRevision } from "@seams/contracts";
+import type { ProviderFileRevision } from "@purin-labs/contracts";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { fileProjectionFence } from "./authority-sql";
 
@@ -21,7 +21,7 @@ import {
   type FileProjectionCommand,
 } from "./domain";
 import { reserveFileExtractionBudget } from "./persistence";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 const FILE_SEGMENT_CHARS = 4_096;
 

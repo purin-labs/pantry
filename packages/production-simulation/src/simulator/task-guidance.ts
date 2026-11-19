@@ -2,7 +2,7 @@ import type { ActiveWorkcellView } from "./workcell-view.ts";
 import type { WorkcellTask } from "../recipes/bakery/workcell-attempt.ts";
 import type { WorkcellResourceId } from "../recipes/bakery/workcell-input.ts";
 import { COLD_CELL } from "../recipes/bakery/workcell-instances.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 // A rack cycle loads and unloads Maruzen shelf 3 before racking.
 const SHELF = COLD_CELL.skills["table-to-oven"].destination;

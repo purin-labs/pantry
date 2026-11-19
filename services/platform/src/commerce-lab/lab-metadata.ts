@@ -14,13 +14,13 @@ import {
   type ExpectedCommerceSlackEffect,
   type CommerceLabScenarioId,
 } from "./scenarios";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonNegativeInteger,
   isRecord,
   isString,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export const COMMERCE_LAB_INTEGRATION_ACCOUNT_ID =
   requireCommerceLabIntegrationAccountId();

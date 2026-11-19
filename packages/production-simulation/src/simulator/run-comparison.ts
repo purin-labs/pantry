@@ -1,4 +1,4 @@
-import type { BakeryRunSummary } from "@seams/bakery-model/bakery-surface";
+import type { BakeryRunSummary } from "@purin-labs/bakery-model/bakery-surface";
 import {
   metrics,
   type Run,

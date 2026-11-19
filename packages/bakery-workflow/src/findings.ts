@@ -1,5 +1,5 @@
-import type { CompiledScenario, HostView } from "@seams/production-simulation";
-import { hasExactKeys, isRecord } from "@seams/std";
+import type { CompiledScenario, HostView } from "@purin-labs/production-simulation";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 /**
  * Plan 84: what went wrong in one accepted run, from the engine's own view. A

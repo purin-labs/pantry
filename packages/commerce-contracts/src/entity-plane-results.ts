@@ -5,8 +5,8 @@ import {
   type ContractDecodeResult,
 } from "./schema.ts";
 import { Type, type StaticDecode } from "typebox";
-import { assertNever } from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import { type StrictUnion } from "@purin-labs/type-utils";
 import { commerceIntegerSchema } from "./cursor-values.ts";
 import {
   commerceMutationReceiptV1Schema,

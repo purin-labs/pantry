@@ -3,8 +3,8 @@ import {
   isConversationId,
   type ChatGoalSupport,
   type ChatGoalView,
-} from "@seams/control-api";
-import { hasExactKeys, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { resolveActiveCaseActor } from "../../actors/actor-router";
 import { parseGoalCommandRequest } from "../../actors/case-goals";
 import {

@@ -2,7 +2,7 @@
 // seeded by seed-local-commerce.ts at a fixed clock, with the deterministic
 // payment gateway as the only provider fake. Staff use the admin client and
 // buyers the storefront client, both through the HTTP API.
-import type { OnlinePaymentBinding } from "@seams/commerce-contracts";
+import type { OnlinePaymentBinding } from "@purin-labs/commerce-contracts";
 import {
   createHash,
   createPrivateKey,
@@ -22,7 +22,7 @@ import {
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
   type CommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { ApiAccess } from "../src/api-access.ts";
 import { handleMcpRequest, mcpMerchantId } from "../src/mcp-server.ts";

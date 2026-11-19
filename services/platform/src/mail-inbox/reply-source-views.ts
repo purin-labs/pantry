@@ -1,13 +1,13 @@
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   MailReplySource,
   MailReplySourceRecord,
   MemoryKind,
   MemoryView,
-} from "@seams/control-api";
-import { assertNever, sameJson } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
-import { REPLENISHMENT_QUEUE_LIST_ID } from "@seams/commerce-client";
+} from "@purin-labs/control-api";
+import { assertNever, sameJson } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { REPLENISHMENT_QUEUE_LIST_ID } from "@purin-labs/commerce-client";
 import type { Env } from "../env";
 import { readMemoryViews, type ShownMemoryRevision } from "../memory/access";
 import type { Result } from "../result";

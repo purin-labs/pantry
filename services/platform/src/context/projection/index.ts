@@ -5,7 +5,7 @@ import type {
   CaseContent,
   UserMessage,
   FileContextProvider,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { FlowLabel, type SerializedFlowLabel } from "../../policy";
 import {
   encodeContextVisibility,
@@ -14,7 +14,7 @@ import {
 import type { ContextVisibility } from "../../authorization/access-grants/types";
 import { ACTIVE_FILE_GRANT_VISIBILITY_SQL } from "../files/authority-sql";
 import { deriveUserMessageViews } from "../../messages/message-wasm";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   isNonBlankString,
   isRecord,
@@ -22,7 +22,7 @@ import {
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type { ContextVisibility } from "../../authorization/access-grants/types";
 

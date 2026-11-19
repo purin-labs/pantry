@@ -1,4 +1,4 @@
-import { COMMERCE_API_SCOPES } from "@seams/commerce-client";
+import { COMMERCE_API_SCOPES } from "@purin-labs/commerce-client";
 import {
   TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,
   TEST_ORGANISATION_PLACEMENT_PROFILE,

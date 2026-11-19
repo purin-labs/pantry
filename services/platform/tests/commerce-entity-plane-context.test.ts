@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { isSystemCommerceEntity } from "@seams/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/contracts";
 
 import {
   CommerceEntityPlaneClient,
@@ -7,14 +7,14 @@ import {
   parseCommerceGraphQueryPlanRequest,
   parseCommerceGraphResponse,
   type CommerceEntityPlaneFetch,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CommerceEntity,
   CommerceEntityRef,
   CommerceGraphQueryResult,
   CommerceRelationship,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { assembleCommerceContext } from "../src/context/assembly/commerce";
 import { buildSavedSelectorCommerceReadAuthority } from "../src/commerce/entity-plane/authority";
@@ -31,7 +31,7 @@ import {
 } from "../src/data/commerce-merchant-binding";
 import { parseOrganisationId as parsePlatformOrganisationId } from "../src/ids";
 import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const ORGANISATION_ID = "organisation_phase4_context";
 const MERCHANT_ID = "merchant_phase4_context";

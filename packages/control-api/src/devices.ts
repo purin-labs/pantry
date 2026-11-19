@@ -9,7 +9,7 @@ import {
   deviceHealthSchema,
   deviceKindSchema,
 } from "./device-gateway.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The Devices page (Plan 85): one list of the devices in the shop. Each kind

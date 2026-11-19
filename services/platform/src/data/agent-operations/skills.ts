@@ -1,8 +1,8 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId } from "../../ids";
-import type { Variant } from "@seams/type-utils";
-import { sha256Hex } from "@seams/std";
-import type { AgentSkillRef } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import { sha256Hex } from "@purin-labs/std";
+import type { AgentSkillRef } from "@purin-labs/control-api";
 import type { AgentOperationCommand } from "../agent-operations";
 import { AgentOperationFailure, commitWithTrailing } from "./failure";
 import { positive } from "./input";

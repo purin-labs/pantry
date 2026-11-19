@@ -5,7 +5,7 @@ import type {
   MessageAttachmentPreparationReceipt,
   MessageAttachmentPreparationState,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { newRequestId } from "../ids";
 import { validateMessageAttachmentPreparationReceipt } from "../messages/message-wasm";
@@ -20,8 +20,8 @@ import {
   completeMessagePreparation,
   readMessagePreparation,
 } from "./message-preparation-store";
-import type { Variant } from "@seams/type-utils";
-import { isRecord, sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 
 const MESSAGE_PREPARATION_HANDLER_REVISION = "message-preparation.v1";
 export const MESSAGE_PREPARATION_LIMITS: MessageAttachmentPreparationLimits = {

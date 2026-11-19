@@ -11,7 +11,7 @@ import {
   CommerceAdminClient,
   commerceAppInstallationToken,
   type CommerceClientResult,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { ApiAccess } from "../src/api-access.ts";

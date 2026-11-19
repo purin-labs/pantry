@@ -10,7 +10,7 @@ import type {
   SessionTransition,
   Timestamp,
   TurnLeaseGeneration,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
 import type { Result } from "../result";
@@ -18,7 +18,7 @@ import type {
   AcceptedSessionInputCommit,
   RuntimeActivatedSessionCommit,
 } from "./actor-journal";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type CanonicalTextTurnOrigin =
   | {

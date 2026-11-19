@@ -2,7 +2,7 @@ import { Select } from "../../ui/select";
 import React from "react";
 
 import type { CheckoutProfileCollection } from "./api";
-import type { CheckoutProfileSummary } from "@seams/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
 import {
   activeStorefrontIds,
   isDraftProfileSummary,
@@ -14,7 +14,7 @@ import {
   type ProfileDraft,
   type Readiness,
 } from "./model";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type ProfileLifecycleAction = Variant<
   CheckoutProfilesAction,

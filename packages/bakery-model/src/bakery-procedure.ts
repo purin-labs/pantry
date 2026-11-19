@@ -17,11 +17,11 @@ import type {
   CustomCommerceEntityRef,
   CustomCommerceRelationship,
   CustomCommerceRelationshipRef,
-} from "@seams/contracts";
-import type { CommerceGraphQuery } from "@seams/contracts";
-import { isCustomCommerceEntity } from "@seams/contracts";
-import { parseCommerceGraphQuery } from "@seams/commerce-client";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { CommerceGraphQuery } from "@purin-labs/contracts";
+import { isCustomCommerceEntity } from "@purin-labs/contracts";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function readBakeryProcedure(
   readGraph: (query: CommerceGraphQuery) => Promise<CommerceGraphQueryResult>,

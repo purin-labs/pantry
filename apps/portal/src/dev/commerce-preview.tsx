@@ -22,17 +22,17 @@ import { Toaster } from "sonner";
 import type {
   CheckoutProfileConfiguration,
   CommerceResourceType,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import "../styles.css";
 import { CheckoutProfilesRoute } from "../features/checkout-profiles/route";
 import { CommerceEntityPlaneRoute } from "../features/commerce/entity-plane/route";
 import { SupplierPayoutsPanel } from "../features/payouts/route";
 import { CounterSaleRoute } from "../features/terminals/counter-sale-route";
-import type { CounterSale } from "@seams/control-api/portal/counter-sale";
+import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import { UNAVAILABLE_ACCESS } from "./unavailable-access";
 import type { PayoutReadAccess } from "../features/payouts/read-permission";
-import type { SupplierPayout } from "@seams/control-api/portal/payouts";
+import type { SupplierPayout } from "@purin-labs/control-api/portal/payouts";
 import type { OfferPriceAllowanceTransport } from "../features/commerce/price-allowance";
 import type { CommerceOperationsTransport } from "../features/commerce/operations";
 
@@ -1421,7 +1421,7 @@ function backToPreviewCollection(
 }
 
 async function mount(): Promise<void> {
-  const validators = await import("@seams/commerce-contracts/browser-validators");
+  const validators = await import("@purin-labs/commerce-contracts/browser-validators");
   await validators.initializeBrowserValidators();
   const container = document.getElementById("root");
   if (container === null) return;

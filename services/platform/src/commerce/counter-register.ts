@@ -2,7 +2,7 @@ import {
   terminalAssignmentPaymentBinding,
   terminalTargetDeviceId,
   type TerminalAssignment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   CommerceAdminClient,
   CommerceClientError,
@@ -14,7 +14,7 @@ import type {
   CommercePickupFulfillmentV1,
   CommerceSoldOutMarksV1,
   CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CounterRegisterMenu,
   CounterRegisterMenuEntry,
@@ -24,8 +24,8 @@ import type {
   CounterRegisterPolicy,
   CounterRegisterSnapshot,
   CounterRegisterTerminal,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import { deviceFleetStub } from "../actors/device-fleet";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";

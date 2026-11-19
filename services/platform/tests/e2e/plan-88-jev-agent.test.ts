@@ -9,9 +9,9 @@ import { expect, it } from "vitest";
 import {
   parseJevFeaturesView,
   type JevFeaturesView,
-} from "@seams/control-api/portal/jev-features";
-import { newConversationId, type ConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api/portal/jev-features";
+import { newConversationId, type ConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import {
   ask,

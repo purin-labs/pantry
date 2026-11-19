@@ -29,8 +29,8 @@ import {
   type ActorExportError,
 } from "../actor-export";
 import { readNextCodeModeOrganisationAlarmAt } from "../code-mode-budget";
-import { errorMessage } from "@seams/std";
-import type { CommerceBoardPresenceEntry } from "@seams/control-api";
+import { errorMessage } from "@purin-labs/std";
+import type { CommerceBoardPresenceEntry } from "@purin-labs/control-api";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import type {
   CodeModeOrganisationActorError,

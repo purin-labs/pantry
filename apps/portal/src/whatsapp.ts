@@ -1,4 +1,4 @@
-import type { WhatsAppPolicyDraft } from "@seams/control-api/portal/whatsapp";
+import type { WhatsAppPolicyDraft } from "@purin-labs/control-api/portal/whatsapp";
 
 const WHATSAPP_DEFAULT_RELEVANT_MESSAGE_TOPICS =
   "Seams Pantry, café automation, café and bakery operations, orders, menus, opening hours, and integrations.";

@@ -30,7 +30,7 @@ import {
 } from "./observations.ts";
 import {
   type CancelCommerceOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CustomerAuthority } from "../plugins/customers/index.ts";
 import { creditStoredValueRefund } from "../plugins/stored-value/index.ts";
 import {

@@ -24,7 +24,7 @@ import {
   parseOrganisationId,
 } from "../../ids";
 import { traceLog } from "../../observability";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,

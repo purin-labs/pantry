@@ -1,4 +1,4 @@
-import { SLACK_BOT_NAME } from "@seams/control-api";
+import { SLACK_BOT_NAME } from "@purin-labs/control-api";
 
 export function identityServiceErrorMessage(
   code = "identity_request_failed",

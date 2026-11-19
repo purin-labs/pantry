@@ -9,9 +9,9 @@
 // release names that route and a TV loads the same bytes with no session.
 import { exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import type { MenuBoardElement } from "@seams/menu-board-crdt";
+import type { MenuBoardElement } from "@purin-labs/menu-board-crdt";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { closeSocket } from "./hibernatable-socket-support";
 import {
   BASE,

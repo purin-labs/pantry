@@ -2,7 +2,7 @@ import type {
   CaseContent,
   RequestAuthority,
   SessionProposal,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   CaseContextReplayAuthority,
   ContextVisibility,
@@ -10,7 +10,7 @@ import type {
 import { FlowBinding, FlowLabel } from "../../policy";
 import type { SerializedFlowBinding } from "../../policy";
 import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   caseContentPreview,
   contextVisibilityKey,
@@ -25,7 +25,7 @@ import {
 import {
   machineTransition,
   type MachineEvent,
-} from "@seams/std/state-machine";
+} from "@purin-labs/std/state-machine";
 import { writeActorTransition } from "../lifecycle/state-transition";
 import { retainContextProjection } from "./lifecycle";
 import { CASE_OUTPUT_MACHINE } from "./output.machine";

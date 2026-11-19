@@ -1,16 +1,16 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { commerceCommandInput } from "@seams/commerce-client";
+import { commerceCommandInput } from "@purin-labs/commerce-client";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
-import { parseInventory, type Quantity } from "@seams/contracts";
+import { isRecord } from "@purin-labs/std";
+import { parseInventory, type Quantity } from "@purin-labs/contracts";
 import {
   parseInventoryReceiptContext,
   parseInventoryProductionContext,
   parseProductionDemand,
   type InventoryReceiptContext,
   type InventoryProductionCreation,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
@@ -20,7 +20,7 @@ import {
   type CommerceStockSnapshot,
   type CommerceMutationResultV1,
   type CommerceClientResult,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { Env } from "../../src/env";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
@@ -1547,7 +1547,7 @@ async function verifyPurchasePagination(
   }
 }
 function closedPurchaseAttribute(
-  attribute: import("@seams/contracts").ListEntryAttributeValue,
+  attribute: import("@purin-labs/contracts").ListEntryAttributeValue,
 ): unknown {
   switch (String(attribute.attributeId)) {
     case "status":

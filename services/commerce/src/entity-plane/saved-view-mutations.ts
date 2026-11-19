@@ -2,7 +2,7 @@ import type {
   CommerceCommandResult,
   SavedCommerceViewId,
   SavedCommerceViewRevision,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import { entityTypeExists } from "./entities.ts";
 import { CommerceLists } from "./commerce-lists.ts";

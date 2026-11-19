@@ -1,11 +1,11 @@
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   draftNodeId,
   type DraftChangeSet,
   type DraftEdge,
   type DraftNode,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft-shape";
+} from "@purin-labs/workflow-canvas-crdt/draft-shape";
 import {
   draftSeed,
   edgeKey,

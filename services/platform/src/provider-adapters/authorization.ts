@@ -1,4 +1,4 @@
-import { encodeBase64Url, isRecord } from "@seams/std";
+import { encodeBase64Url, isRecord } from "@purin-labs/std";
 
 export const SHORT_PROVIDER_STATE_TTL_MS = 10 * 60 * 1_000;
 export const STRIPE_PROVIDER_STATE_TTL_MS = 2 * 60 * 60 * 1_000;

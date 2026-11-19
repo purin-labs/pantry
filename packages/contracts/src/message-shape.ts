@@ -1,4 +1,4 @@
-import { hasLoneSurrogate, isRecord } from "@seams/std";
+import { hasLoneSurrogate, isRecord } from "@purin-labs/std";
 import type { Static, TSchema } from "typebox";
 import { Value } from "typebox/value";
 

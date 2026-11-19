@@ -1,12 +1,12 @@
 import { signalChat } from "../../../chat/signals";
-import { isConversationId } from "@seams/control-api";
-import { parseBakeryBrowserBinding } from "@seams/bakery-model/bakery-context";
+import { isConversationId } from "@purin-labs/control-api";
+import { parseBakeryBrowserBinding } from "@purin-labs/bakery-model/bakery-context";
 import type { Env } from "../../../env";
 import { parseSessionId } from "../../../ids";
 import { resolveActiveSessionActor } from "../../../actors/actor-router";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import { parseBakerySurfaceReceipt } from "@seams/bakery-model/bakery-surface";
+import { parseBakerySurfaceReceipt } from "@purin-labs/bakery-model/bakery-surface";
 import {
   listPendingBakerySurfaceEffects,
   readBakerySurfaceDeliveryTarget,

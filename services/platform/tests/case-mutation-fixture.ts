@@ -1,5 +1,5 @@
 import type { UnitTestEnv } from "./worker-fakes";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { ActorRecoveryAdmission } from "../src/actors/actor-activation";
 import { createAgentOperationsDatabase } from "./agent-operations-database";
 import { requireOrganisationId } from "./test-ids";

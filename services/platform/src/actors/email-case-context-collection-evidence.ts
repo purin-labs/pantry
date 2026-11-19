@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "../database-handles";
 import { runtimeFetch } from "../runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Env } from "../env";
 import {
   parseOrganisationId,
@@ -36,7 +36,7 @@ import {
   digestFlowBinding,
   type SerializedFlowBinding,
 } from "../policy/information-flow";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
 import {
@@ -44,7 +44,7 @@ import {
   type GmailMessageContent,
 } from "../mail/gmail-adapter";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type MailboxAuthority = Variant<RequestAuthority, "agent_mailbox">;
 type EvidenceError = Readonly<{ code: string }>;

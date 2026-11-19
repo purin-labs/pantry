@@ -1,6 +1,6 @@
 import type { Env } from "../../env";
 import type { OnboardingProvider } from "../../provider-lifecycle/domain";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   handleAccounts,
   handleDefaultAccount,

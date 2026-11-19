@@ -1,9 +1,9 @@
-import type { PhysicsSceneReplay } from "@seams/production-simulation/recipes/bakery/physics-playback";
+import type { PhysicsSceneReplay } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import { PhysicsInspection, type PhysicsFrame } from "./physics-inspection";
 import * as THREE from "three";
 import type { PhysicsModel } from "./physics-model";
 import type { FloorPlan } from "./floor-plan";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
 import { RehearsalBakery } from "./rehearsal-bakery";
 
 /** CPU geometry remains inspectable when WebGL cannot initialize or is lost. */

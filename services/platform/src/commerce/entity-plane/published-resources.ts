@@ -8,7 +8,7 @@ import {
   type CommerceCredential,
   type CommerceEntityPlaneFetch,
   type CommerceEntityPlanePublishedResourceMetadataResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   AccessTargetRef,
   CommerceCursor,
@@ -17,8 +17,8 @@ import type {
   CommerceList,
   CommerceListEntry,
   CommerceRelationshipRef,
-} from "@seams/contracts";
-import { sameCommerceRelationshipRef } from "@seams/commerce-contracts/commerce-relationship-references";
+} from "@purin-labs/contracts";
+import { sameCommerceRelationshipRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 
 import type { AccessGrantTarget } from "../../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
@@ -31,8 +31,8 @@ import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { opaqueAccessTargetReference } from "../../access-control/references";
 import { commerceCanonicalResourceId } from "../provider";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type PublishedResourceEnumeration = Variant<
   CommerceEntityPlanePublishedResourceMetadataResponse,

@@ -1,7 +1,7 @@
 import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { restoreSessionTurnContext } from "../../src/actors/actor-journal";
 import { SessionDO } from "../../src/actors/agent-session";

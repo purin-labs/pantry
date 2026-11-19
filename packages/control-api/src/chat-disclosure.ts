@@ -1,4 +1,4 @@
-import { assertNever, hasExactKeys, isRecord } from "@seams/std";
+import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 
 export type ChatDisclosureReason =
   | "source_policy_denied"

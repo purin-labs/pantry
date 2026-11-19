@@ -10,7 +10,7 @@
 // or with the release that adds the capability.
 //
 //   node scripts/capability-policy-backfill-sql.mjs > backfill.sql
-//   pnpm --filter @seams/platform exec wrangler d1 execute <binding> --env <env> --file backfill.sql
+//   pnpm --filter @purin-labs/platform exec wrangler d1 execute <binding> --env <env> --file backfill.sql
 import { catalogueValues } from "./capability-policy-rows.mjs";
 
 const MIGRATION_ID = "capability-policy-catalogue-backfill";

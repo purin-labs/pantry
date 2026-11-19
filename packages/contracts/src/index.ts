@@ -23,11 +23,11 @@ export type { CaseBinding } from "./types/CaseBinding";
 export type { CaseContent } from "./types/CaseContent";
 export { type CaseContributionSource } from "./case-output.ts";
 export type { CaseContextEntryRef } from "./types/CaseContextEntryRef";
-export type CaseEvidenceDependency = import("@seams/type-utils").StrictUnion<
+export type CaseEvidenceDependency = import("@purin-labs/type-utils").StrictUnion<
   import("./types/CaseEvidenceDependency").CaseEvidenceDependency
 >;
 export type { CaseContextCollectionEvidenceRef } from "./types/CaseContextCollectionEvidenceRef";
-export type MailboxReplyScope = import("@seams/type-utils").StrictUnion<
+export type MailboxReplyScope = import("@purin-labs/type-utils").StrictUnion<
   import("./types/MailboxReplyScope").MailboxReplyScope
 >;
 export type { CaseIdentity } from "./types/CaseIdentity";
@@ -160,7 +160,7 @@ export type { AccessDecisionExplanation } from "./types/AccessDecisionExplanatio
 export type { AccessDecisionQuestion } from "./types/AccessDecisionQuestion";
 export type { AccessGrantLifecycle } from "./access-control.ts";
 import type { AccessGrantTarget as GeneratedAccessGrantTarget } from "./types/AccessGrantTarget";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 export type AccessGrantTarget =
   | Exclude<
       GeneratedAccessGrantTarget,
@@ -170,7 +170,7 @@ export type AccessGrantTarget =
       scope: CommerceReadGrantScope;
     })
   | (Omit<Variant<GeneratedAccessGrantTarget, "commerce_command">, "scope"> & {
-      scope: import("@seams/commerce-contracts").CommerceAuthorityScope;
+      scope: import("@purin-labs/commerce-contracts").CommerceAuthorityScope;
     });
 export type { AccessSubjectRef } from "./types/AccessSubjectRef";
 export type { AccessTargetRef } from "./types/AccessTargetRef";
@@ -183,7 +183,7 @@ export type { CapabilityProviderDependency } from "./access-control.ts";
 export type { CapabilityRef } from "./types/CapabilityRef";
 export type { CaseRef } from "./types/CaseRef";
 export type CommerceReadGrantScope = Variant<
-  import("@seams/commerce-contracts").CommerceAuthorityScope,
+  import("@purin-labs/commerce-contracts").CommerceAuthorityScope,
   "entity_type" | "commerce_list" | "saved_selector"
 >;
 export type { EffectiveGrantRef } from "./types/EffectiveGrantRef";
@@ -241,6 +241,6 @@ export type {
 
 export { parseCaseGoal, parseCaseGoalSnapshot } from "./goal.ts";
 
-export * from "@seams/commerce-contracts";
+export * from "@purin-labs/commerce-contracts";
 
 export type { MediaMetadata, FrameSamplingOutcome } from "./media-inspect.ts";

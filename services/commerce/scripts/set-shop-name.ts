@@ -1,12 +1,12 @@
 // Sets a storefront's shop name (Plan 40B phase 2), so that its QR order page
 // opens at `<name>.menu.<domain>`. Without --name it reads the current name.
 //
-//   pnpm --filter @seams/commerce-worker set:shop-name --merchant <merchant_id> \
+//   pnpm --filter @purin-labs/commerce-worker set:shop-name --merchant <merchant_id> \
 //     [--storefront storefront_cafe] [--name <name>]
 //
 // UNDERCLERK_BASE_URL and UNDERCLERK_SERVICE_TOKEN name the Commerce. The
 // script prints Commerce's answer as JSON; a refused name exits with 2.
-import { CommerceAdminClient } from "@seams/commerce-client";
+import { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 const usage =
   "Usage: set:shop-name --merchant <merchant_id> [--storefront <storefront_id>] [--name <name>]";

@@ -58,13 +58,13 @@ import {
   type RecordCommerceCheckoutPaymentCaptureV1,
   type ResolveCommerceCheckoutPaymentV1,
   type CommerceInventoryPositionV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   type Checkout,
   type CheckoutPaymentAttempt,
   type InventoryAllocation,
   type PaymentDispute,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceMutation, MerchantRow } from "./ledger.ts";
 
 export function inPersonCheckoutMutation(

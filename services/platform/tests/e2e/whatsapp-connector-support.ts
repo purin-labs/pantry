@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
-import type { ConnectorIdentity } from "@seams/contracts";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,

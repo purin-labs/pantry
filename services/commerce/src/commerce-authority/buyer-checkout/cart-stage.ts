@@ -6,8 +6,8 @@ import {
   type CommerceBuyerCartV1,
   type CommerceMutationErrorV1,
   parseCart,
-} from "@seams/commerce-client";
-import { type Cart } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import { type Cart } from "@purin-labs/commerce-contracts";
 import { buyerSessionDigest } from "../../buyer-session.ts";
 import {
   readBuyerCartCommandReceipt,

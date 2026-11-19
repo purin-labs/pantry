@@ -49,7 +49,7 @@ import {
   sqlStorage,
   type TestSqlStorage,
 } from "./sqlite-storage";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import { d1Database, readMigration } from "./sqlite-d1";
 
 describe("actor restore", function actorRestoreSuite() {

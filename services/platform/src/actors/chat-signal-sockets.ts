@@ -3,8 +3,8 @@ import {
   CHAT_SIGNAL,
   SURFACE_EFFECT_SIGNAL,
   type ChatSignal,
-} from "@seams/control-api";
-import { assertNever, isNonNegativeInteger, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 import { visibleConversationsSql } from "../chat/conversation-access";
 import type { ChatSignalTarget } from "../chat/signals";

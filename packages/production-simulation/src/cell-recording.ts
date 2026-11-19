@@ -1,5 +1,5 @@
-import { sha256Hex } from "@seams/std";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import { sha256Hex } from "@purin-labs/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import * as d from "./document-values.ts";
 import type {
   BoundaryId,

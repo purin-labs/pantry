@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /**
  * One steering input of a Session's turn (Plan 71; Refactor 15, refactor 3).

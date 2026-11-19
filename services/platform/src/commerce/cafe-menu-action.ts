@@ -2,8 +2,8 @@
 // action path carries the exact Commerce menu and the names on the approval
 // card, so an approval signs what goes live. Draft edits after the proposal
 // stay in the draft for a later publication.
-import { isRecord } from "@seams/std";
-import { parsePublishMenuCommand } from "@seams/commerce-client";
+import { isRecord } from "@purin-labs/std";
+import { parsePublishMenuCommand } from "@purin-labs/commerce-client";
 
 import type { Result } from "../result";
 import { CAFE_MENU_ID, type CafeMenuDefinition } from "./cafe-menu-publication";

@@ -1,7 +1,7 @@
 import { RequestDeadline } from "../request-deadline";
 import type { ChannelId } from "../ids";
 import type { Result } from "../result";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 
 const SLACK_THREAD_STATUS_TIMEOUT_MS = 2_000;
 

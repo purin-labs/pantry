@@ -1,4 +1,4 @@
-import type { MenuBoardVersionSummary } from "@seams/control-api";
+import type { MenuBoardVersionSummary } from "@purin-labs/control-api";
 
 import type { UserId } from "../ids";
 

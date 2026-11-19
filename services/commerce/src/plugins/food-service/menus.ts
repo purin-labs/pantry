@@ -8,7 +8,7 @@ import type {
   CommerceBuyerModifierGroupV1,
   CommerceResourcesV1,
   CommerceOfferV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   FoodServicePreparation,
   InventoryConsumptionPlan,
@@ -17,7 +17,7 @@ import type {
   ModifierGroupRevision,
   ModifierSelectionSnapshot,
   Quantity,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { readConsumptionPlan } from "../../checkout-persistence.ts";
 import {

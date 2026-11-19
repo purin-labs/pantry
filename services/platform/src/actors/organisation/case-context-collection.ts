@@ -34,8 +34,8 @@ import type {
   OperationalCaseContextDiscoverySourceRequest,
 } from "../../case-context-discovery/operational-evaluation";
 import { identifier } from "../../case-context-discovery/policy";
-import { assertNever, isRecord } from "@seams/std";
-import type { CaseContextCollectionReviewCommand } from "@seams/control-api";
+import { assertNever, isRecord } from "@purin-labs/std";
+import type { CaseContextCollectionReviewCommand } from "@purin-labs/control-api";
 import { organisationPlacementConflict } from "./support";
 
 export function parseOperationalCaseContextDiscoverySourceRequest(

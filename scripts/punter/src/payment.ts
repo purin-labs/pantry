@@ -3,9 +3,9 @@ import {
   type CommerceBuyerPaymentResultV1,
   type CommerceBuyerPaymentSessionV1,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type ReadyPaymentSession = VariantBy<
   CommerceBuyerPaymentSessionV1,

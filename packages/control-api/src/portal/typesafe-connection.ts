@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type Connection =
   | Readonly<{ kind: "disconnected"; revision: number }>

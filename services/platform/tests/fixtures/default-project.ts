@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../src/database-handles";
-import type { ProjectId } from "@seams/control-api";
+import type { ProjectId } from "@purin-labs/control-api";
 import type { OrganisationId } from "../../src/ids";
 import { readDefaultProjectId } from "../../src/projects/case-project";
 import {

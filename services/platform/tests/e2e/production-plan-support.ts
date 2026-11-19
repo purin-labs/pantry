@@ -2,22 +2,22 @@
 // Portal's routes, and one person's socket on a location's shared plan.
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
-import { isRecord } from "@seams/std";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
+import { isRecord } from "@purin-labs/std";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
 import {
   parseInventoryProductionContext,
   parseProductionDemand,
   type InventoryProductionRequest,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   ProductionPlanDoc,
   type ProductionPlanUpdate,
-} from "@seams/production-plan-crdt";
+} from "@purin-labs/production-plan-crdt";
 import {
   encodePlanClientMessage,
   parsePlanServerMessage,
   type PlanServerMessage,
-} from "@seams/production-plan-crdt/protocol";
+} from "@purin-labs/production-plan-crdt/protocol";
 import {
   CommerceAdminClient,
   CommerceEntityPlaneClient,
@@ -26,7 +26,7 @@ import {
   parseProductionRequestFields,
   productionRequestAttributes,
   type CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { commerceClient, commerceHeaders } from "./commerce-support";
 import { closeSocket } from "./hibernatable-socket-support";
 import { openRouterToolCall } from "./slack-journey-support";

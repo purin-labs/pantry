@@ -10,7 +10,7 @@ with Meta account access can supply.
 Run it with the ordinary suite:
 
 ```bash
-pnpm --filter @seams/platform exec vitest run tests/whatsapp-webhook.test.ts tests/whatsapp-connector.test.ts tests/whatsapp-send.test.ts tests/whatsapp-persistence.test.ts tests/whatsapp-harness-tools.test.ts tests/whatsapp-retention.test.ts tests/whatsapp-gateway.test.ts tests/whatsapp-provider.test.ts tests/whatsapp-lifecycle.test.ts tests/whatsapp-operator-notice.test.ts
+pnpm --filter @purin-labs/platform exec vitest run tests/whatsapp-webhook.test.ts tests/whatsapp-connector.test.ts tests/whatsapp-send.test.ts tests/whatsapp-persistence.test.ts tests/whatsapp-harness-tools.test.ts tests/whatsapp-retention.test.ts tests/whatsapp-gateway.test.ts tests/whatsapp-provider.test.ts tests/whatsapp-lifecycle.test.ts tests/whatsapp-operator-notice.test.ts
 ```
 
 What it contains:

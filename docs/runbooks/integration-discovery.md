@@ -120,16 +120,16 @@ before changing policy code.
 ## Focused verification commands
 
 ```bash
-pnpm --filter @seams/platform exec vitest run \
+pnpm --filter @purin-labs/platform exec vitest run \
   tests/integration-discovery.test.ts \
   tests/current-source-flow-label.test.ts
 
-pnpm --filter @seams/platform exec vitest run \
+pnpm --filter @purin-labs/platform exec vitest run \
   --config vitest.e2e.config.ts \
   tests/e2e/slack-actor-journey.test.ts
 
-pnpm --filter @seams/platform check:types
-pnpm --filter @seams/platform check:test-types
+pnpm --filter @purin-labs/platform check:types
+pnpm --filter @purin-labs/platform check:test-types
 git diff --check
 ```
 

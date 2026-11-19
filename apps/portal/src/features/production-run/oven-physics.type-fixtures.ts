@@ -1,7 +1,7 @@
-import type { PersistentPhysicsScene } from "@seams/bakery-model/bakery-physics";
-import type { OvenLiveFrame } from "@seams/production-simulation/runs/oven-live-physics";
-import type { OvenRecordings, RecordingArchive } from "@seams/production-simulation/runs/oven-recordings";
-import type { OvenSave } from "@seams/production-simulation/runs/oven-run-file";
+import type { PersistentPhysicsScene } from "@purin-labs/bakery-model/bakery-physics";
+import type { OvenLiveFrame } from "@purin-labs/production-simulation/runs/oven-live-physics";
+import type { OvenRecordings, RecordingArchive } from "@purin-labs/production-simulation/runs/oven-recordings";
+import type { OvenSave } from "@purin-labs/production-simulation/runs/oven-run-file";
 
 declare const idle: Extract<OvenLiveFrame, { purpose: "idle" }>;
 declare const idleWithoutContacts: Omit<typeof idle, "contacts">;
@@ -39,7 +39,7 @@ export const missingArtifactReader: RecordingArchive = {
   document: save.document,
 };
 
-declare const espressoCell: import("@seams/bakery-model/bakery-physics").PersistentEspressoCell;
+declare const espressoCell: import("@purin-labs/bakery-model/bakery-physics").PersistentEspressoCell;
 // @ts-expect-error An espresso fixture cannot acquire robot configuration through a spread.
-export const espressoWithRobot: import("@seams/bakery-model/bakery-physics").PersistentCell =
+export const espressoWithRobot: import("@purin-labs/bakery-model/bakery-physics").PersistentCell =
   { ...espressoCell, robot: "fairino-fr10" };

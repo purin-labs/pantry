@@ -1,4 +1,4 @@
-import { assertNever, rustTrim } from "@seams/std";
+import { assertNever, rustTrim } from "@purin-labs/std";
 import {
   type BoundaryContext,
   commerceTimestamp,

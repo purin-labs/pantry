@@ -10,7 +10,7 @@ import {
   machineTransition,
   type MachineEvent,
   type MachineState,
-} from "@seams/std/state-machine";
+} from "@purin-labs/std/state-machine";
 
 import type { EmailReplyProposalLifecycle } from "./email-mailbox";
 import { EMAIL_REPLY_PROPOSAL_MACHINE } from "./email-reply-proposal.machine";

@@ -1,9 +1,9 @@
-import { chatThreadActivity } from "@seams/control-api";
+import { chatThreadActivity } from "@purin-labs/control-api";
 import { ConversationSharingDialog, type ConversationSharingIntent } from "./conversation-sharing";
 import { ProjectSharing } from "./project-sharing";
-import { isProjectId } from "@seams/control-api";
-import { newProjectId } from "@seams/control-api";
-import type { ConversationId, ProjectId } from "@seams/control-api";
+import { isProjectId } from "@purin-labs/control-api";
+import { newProjectId } from "@purin-labs/control-api";
+import type { ConversationId, ProjectId } from "@purin-labs/control-api";
 import React from "react";
 import {
   Archive,
@@ -31,13 +31,13 @@ import type {
   ProjectContent,
   ProjectDirectory,
   ProjectReference,
-} from "@seams/control-api";
-import { projectReferenceIdentity } from "@seams/control-api";
-import { assertNever, errorMessage } from "@seams/std";
+} from "@purin-labs/control-api";
+import { projectReferenceIdentity } from "@purin-labs/control-api";
+import { assertNever, errorMessage } from "@purin-labs/std";
 import { ActionMenu } from "../../ui/action-menu";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import { mutateChatDirectory, mutateProject, permanentlyDeleteChat, updateChatConversation, readProjectReferences, readChat, type ChatPageData } from "./api";
-import type { Chat, ChatConversationSummary, PendingChatDeletion } from "@seams/control-api/portal/chat";
+import type { Chat, ChatConversationSummary, PendingChatDeletion } from "@purin-labs/control-api/portal/chat";
 import { ThreadTitle } from "./thread-title";
 import { ChatOriginLine } from "./origin-chips";
 import "./organizer.css";

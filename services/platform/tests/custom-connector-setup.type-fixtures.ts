@@ -3,7 +3,7 @@ import type {
   CustomConnectorSetupTarget,
 } from "../src/custom-connectors";
 import { parseIntegrationAccountId } from "../src/ids";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 type AwaitingCredentialAttempt = VariantBy<
   CustomConnectorSetupAttempt,

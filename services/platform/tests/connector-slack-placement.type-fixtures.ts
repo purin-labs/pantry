@@ -1,4 +1,4 @@
-import type { ConnectorDeliveryReceipt } from "@seams/contracts";
+import type { ConnectorDeliveryReceipt } from "@purin-labs/contracts";
 import {
   checkPreparedConnectorDelivery,
   streamConnectorCaseTurn,

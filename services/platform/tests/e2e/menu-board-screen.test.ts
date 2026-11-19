@@ -10,22 +10,22 @@ import {
   parseMenuScreenPairingState,
   parseMenuScreenSummaries,
   type MenuScreenFeed,
-} from "@seams/control-api";
-import { MenuBoardDoc, type MenuBoardUpdate } from "@seams/menu-board-crdt";
+} from "@purin-labs/control-api";
+import { MenuBoardDoc, type MenuBoardUpdate } from "@purin-labs/menu-board-crdt";
 import {
   encodeMenuBoardClientMessage,
   parseMenuBoardServerMessage,
-} from "@seams/menu-board-crdt/protocol";
-import { MenuDraftDoc, type MenuDraftUpdate } from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-board-crdt/protocol";
+import { MenuDraftDoc, type MenuDraftUpdate } from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftClientMessage,
   parseMenuDraftServerMessage,
-} from "@seams/menu-draft-crdt/protocol";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/menu-draft-crdt/protocol";
+import { isRecord } from "@purin-labs/std";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";

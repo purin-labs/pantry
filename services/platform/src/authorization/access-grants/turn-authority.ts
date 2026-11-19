@@ -9,7 +9,7 @@ import type {
   AuthorityPartitionKey,
   RequestAuthority,
   Sha256Digest,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { listAccessGrants } from "../../data/access-grants";
 import type { OrganisationId } from "../../ids";
@@ -41,8 +41,8 @@ import {
   isRecord,
   positiveIntegerOrNull,
   sha256Hex,
-} from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 export const CONTEXT_CASE_READ_CAPABILITY = CAPABILITY_KEYS.contextCaseRead;
 export const CASE_CONTEXT_COLLECTION_METADATA_READ_CAPABILITY =
@@ -1007,7 +1007,7 @@ async function digestCanonical(value: unknown): Promise<Sha256Digest> {
 
 function parseMailboxReplyScope(
   raw: unknown,
-): import("@seams/contracts").MailboxReplyScope | null {
+): import("@purin-labs/contracts").MailboxReplyScope | null {
   if (raw === undefined) return { kind: "source_only" };
   if (!isRecord(raw)) return null;
   if (raw.kind === "source_only" && Object.keys(raw).length === 1)
@@ -1031,7 +1031,7 @@ function parseMailboxReplyScope(
 export async function bindMailboxCaseContextCollectionAuthority(
   authority: CompiledTurnAuthority,
   scope: Variant<
-    import("@seams/contracts").MailboxReplyScope,
+    import("@purin-labs/contracts").MailboxReplyScope,
     "case_context_collection_evidence"
   >,
 ): Promise<Result<CompiledTurnAuthority, TurnAuthorityCompileError>> {

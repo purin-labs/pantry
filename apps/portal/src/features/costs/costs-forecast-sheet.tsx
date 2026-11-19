@@ -6,7 +6,7 @@ import type {
   ForecastDemandCurve,
   ForecastSupplierTerms,
   ForecastWeekColumn,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   FORECAST_CAPEX_MINOR_CELL_KEY,
   FORECAST_EXTRA_SHIFT_THRESHOLD_PCT_CELL_KEY,
@@ -14,7 +14,7 @@ import {
   FORECAST_OPENING_CASH_CELL_KEY,
   forecastReadonlySelectionKey,
   forecastWeekIndexCellKey,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import { formatMoneyMinor } from "../../formatting";
 import { CrmTable, Select, type CrmColumn } from "../../ui";
 import { minorToMajorString } from "./costs-sheet-draft";

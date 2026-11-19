@@ -42,7 +42,7 @@ import {
   type SlackChannelDefaultChange,
 } from "../../../slack/organisation-routing";
 import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
-import { isPositiveInteger, isRecord } from "@seams/std";
+import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   prepareSlackDmSelectionAuditEvent,
   prepareSlackInstallationDisconnectAuditEvent,

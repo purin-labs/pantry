@@ -1,10 +1,10 @@
 import {
   parseWorkflowCanvasSource,
   type WorkflowCanvasSource,
-} from "@seams/bakery-model/bakery-canvas-source";
-import { CanvasMove } from "@seams/workflow-canvas-crdt";
-import type { CanvasMoveOutcome } from "@seams/workflow-canvas-crdt/move";
-import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery-canvas-source";
+import { CanvasMove } from "@purin-labs/workflow-canvas-crdt";
+import type { CanvasMoveOutcome } from "@purin-labs/workflow-canvas-crdt/move";
+import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 import type { WorkflowCanvasRead } from "./workflow-canvas";
 import type { CatalogExecutionContext } from "../agent-tools/catalog/execute";
 

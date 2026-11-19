@@ -1,6 +1,6 @@
 import React from "react";
 import { MousePointer2 } from "lucide-react";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
 import "./agent-cursors.css";
 
 type Props = Readonly<{

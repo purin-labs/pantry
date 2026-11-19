@@ -3,8 +3,8 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * A read-only projection of what the runtime recorded while it worked on one

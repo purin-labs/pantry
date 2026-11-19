@@ -2,7 +2,7 @@ import type {
   StockOperationDetails,
   StockOperationView,
   StockQuantity,
-} from "@seams/control-api/portal/stock-operation";
+} from "@purin-labs/control-api/portal/stock-operation";
 
 function amount(value: StockQuantity): string {
   return `${(value.amount / 10 ** value.scale).toLocaleString("en", {

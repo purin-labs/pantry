@@ -8,8 +8,8 @@ import {
   type ConversationId,
   type ProjectCaseEntry,
   type ProjectId,
-} from "@seams/control-api";
-import { canonicalJson, isPositiveInteger, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { canonicalJson, isPositiveInteger, sha256Hex } from "@purin-labs/std";
 import { holdsAdmittedWork } from "../chat/conversation";
 import { authorizeConversation } from "../chat/conversation-access";
 import {
@@ -20,7 +20,7 @@ import type { CaseId, UserId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { authorizeProject, type ProjectAccessScope } from "./access";
 import { readDefaultProjectId } from "./case-project";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const ACTIVE_PLACEMENT = `EXISTS (SELECT 1 FROM organisation_placement
   WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ?

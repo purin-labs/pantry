@@ -3,8 +3,8 @@ import {
   type CommerceBuyerQuotedCheckoutV1,
   type CommerceBuyerQuotedShippingCheckoutV1,
   checkoutOnlineSource,
-} from "@seams/commerce-client";
-import type { Checkout } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { Checkout } from "@purin-labs/commerce-contracts";
 import { buyerSessionDigest } from "../../buyer-session.ts";
 import {
   readCart,

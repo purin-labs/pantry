@@ -12,7 +12,7 @@ import {
   type CommerceOfferV1,
   type CommerceProductV1,
   type CommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { listConsumptionPlansForVariant } from "../checkout-persistence.ts";
 import type { CommerceDatabase } from "../database.ts";

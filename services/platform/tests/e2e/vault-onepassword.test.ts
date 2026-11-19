@@ -4,7 +4,7 @@ import {
   parseVaultEventList,
   parseVaultItemList,
   parseVaultStoreResult,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import type { OrganisationId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

@@ -7,7 +7,7 @@ import {
   parseEntityPlaneCommand,
   parseCommerceGraphQueryPlanRequest,
   parseEntityPlaneRelationshipTraversalStepRequest,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   BASE_URL,
   SERVICE_TOKEN,

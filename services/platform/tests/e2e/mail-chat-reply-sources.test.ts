@@ -8,8 +8,8 @@ import {
   newProjectId,
   parseMailReplySources,
   type MemoryCommand,
-} from "@seams/control-api";
-import { assertNever, encodeBase64Url, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, encodeBase64Url, isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   readEmailProposalChatContext,
@@ -630,7 +630,7 @@ async function chatReplySourcesJourney({ task }: TestContext): Promise<void> {
   // The JSON reporter writes this record, so a run leaves its evidence.
   task.meta.chatReplySources = {
     repeat:
-      "PANTRY_ACCOUNT_WORKER_ARTIFACT=<seams>/.artifacts/shared-account-platform/account-worker/index.mjs pnpm --filter @seams/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-chat-reply-sources.test.ts --reporter=json --outputFile=<file>",
+      "PANTRY_ACCOUNT_WORKER_ARTIFACT=<seams>/.artifacts/shared-account-platform/account-worker/index.mjs pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-chat-reply-sources.test.ts --reporter=json --outputFile=<file>",
     route: route.model,
     proposalId,
     citationsMade: 2,

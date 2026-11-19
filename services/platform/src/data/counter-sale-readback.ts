@@ -1,12 +1,12 @@
 import {
   commercePickupCode,
   type CommerceCounterCashTenderV1,
-} from "@seams/commerce-client";
-import type { Checkout, CheckoutPaymentAttempt } from "@seams/contracts";
+} from "@purin-labs/commerce-client";
+import type { Checkout, CheckoutPaymentAttempt } from "@purin-labs/contracts";
 import type {
   CounterRegisterPaymentMethod,
   CounterSaleState,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export type CounterSaleReadback = Readonly<{
   schemaVersion: "satyr.counter-sale.v1";

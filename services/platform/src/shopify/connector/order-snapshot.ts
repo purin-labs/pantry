@@ -5,12 +5,12 @@ import type {
   ShopifyShipmentLifecycleV202607,
   ShopifyTrackingEventKindV202607,
   ShopifyTrackingEventV202607,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { JsonObject } from "../../http";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
-import type { Variant } from "@seams/type-utils";
-import { isNonEmptyString, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isNonEmptyString, isRecord } from "@purin-labs/std";
 import type {
   ShopifyCommerceOrderEnvelope,
   ShopifyInitialSyncError,

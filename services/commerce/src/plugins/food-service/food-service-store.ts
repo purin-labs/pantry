@@ -11,7 +11,7 @@ import {
   type CommerceMerchantSnapshotV1,
   type CommerceMutationErrorV1,
   type CommercePreparationTicketV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   Menu,
   ModifierGroupRevision,
@@ -20,7 +20,7 @@ import type {
   Quantity,
   RecipeRevision,
   StockPolicy,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../../database.ts";
 import { menuScheduleIsValid } from "./menu-schedule.ts";
 import { readConsumptionPlan } from "../../checkout-persistence.ts";

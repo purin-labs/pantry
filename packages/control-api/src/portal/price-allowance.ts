@@ -1,4 +1,4 @@
-import { isNonEmptyString, isPositiveInteger, isRecord } from "@seams/std";
+import { isNonEmptyString, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 /**
  * One listed Offer, as the priced-offers route reports it.

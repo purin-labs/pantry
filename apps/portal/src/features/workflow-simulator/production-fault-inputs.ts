@@ -2,7 +2,7 @@ import {
   OUTAGE_WORKCELL_RESOURCES,
   handlingTaskId,
   type OutageResource,
-} from "@seams/production-simulation/recipes/bakery/run-faults";
+} from "@purin-labs/production-simulation/recipes/bakery/run-faults";
 
 // The fault inputs of the production workspace: an absent resource, a failed
 // handling task and a time in whole seconds, read from their form values.

@@ -2,8 +2,8 @@ import type { OrganisationDatabase } from "../database-handles";
 import type { AccountPlatformAccess } from "../account-platform/access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
-import type { RequestAuthority } from "@seams/contracts";
-import { canonicalJson, sha256Hex } from "@seams/std";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import {
   readChatControlAuthority,
   resolveNativeChatAudience,
@@ -27,12 +27,12 @@ import {
   type ProjectId,
   type ProjectSnapshot,
   type ProjectReferenceObservation,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { Env } from "../env";
 import type { ProjectAccessScope } from "./access";
 import { readProject } from "./records";
 import { observeProjectReference } from "./references";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type ProjectSnapshotPlacement = Readonly<{
   projectId: ProjectId;
@@ -200,7 +200,7 @@ async function projectObservationItem(
   caseId: string,
   snapshotDigest: string,
   text: string,
-  admission: import("@seams/control-api").ProjectContextAdmission,
+  admission: import("@purin-labs/control-api").ProjectContextAdmission,
 ): Promise<Result<ContextItem, ProjectObservationError>> {
   const inputLabel = await FlowLabel.restore(
     JSON.parse(admission.flowLabelJson),

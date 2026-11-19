@@ -3,7 +3,7 @@ import {
   mailWorkReplyCanPreview,
   type MailInboxResult,
   type MailInboxWork,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
@@ -16,8 +16,8 @@ import {
 import type { Env } from "../env";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";
-import type { RequestAuthority } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 type ThreadWorkInput = Readonly<{
   organisationId: OrganisationId;

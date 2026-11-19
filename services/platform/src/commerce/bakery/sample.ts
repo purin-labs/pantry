@@ -1,12 +1,12 @@
 import {
   financierOperations,
   sampleSettings,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import {
   parseCommerceSnapshotRevision,
   parseEntityPlaneCommand,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export const FINANCIER_SAMPLE_ID = "financier-finishing-cooling-sample";
 

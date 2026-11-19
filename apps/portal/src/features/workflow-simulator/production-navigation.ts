@@ -1,13 +1,13 @@
-import { assertNever } from "@seams/std";
-import type { BakerySurfaceCommandV1 } from "@seams/bakery-model/bakery-surface";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { BakerySurfaceCommandV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import type { ProductionReady } from "./production-session.ts";
-import type { ProductionWorkcell } from "@seams/production-simulation/recipes/bakery/production-workcells";
+import type { ProductionWorkcell } from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import {
   stations,
   type Run,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import type { Selection } from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type { Selection } from "@purin-labs/production-simulation/simulator/selection";
 
 export type ProductionNavigation = Readonly<{
   from: ProductionReady;

@@ -20,8 +20,8 @@ API. What the code does today:
 - There is no referral attribution and no creator commission code.
 
 Commerce owns commerce transactions. Its contracts live in
-`packages/commerce-contracts` (`@seams/commerce-contracts`) and its typed client
-in `packages/commerce-client` (`@seams/commerce-client`). Commerce
+`packages/commerce-contracts` (`@purin-labs/commerce-contracts`) and its typed client
+in `packages/commerce-client` (`@purin-labs/commerce-client`). Commerce
 depends on no Pantry package, and `pnpm lint:runtime-boundary` refuses a new
 crossing. Platform hosts Sous Chef and the Commerce Read Layer, and Punter runs
 independent buyer acceptance journeys from `scripts/punter`.
@@ -50,7 +50,7 @@ states. See [docs/plan.md](docs/plan.md).
   coverage
 - `tests/fixture-worker/` — the fixture Worker that client suites, such as
   Pantry Platform's, run as a built artifact
-  (`pnpm --filter @seams/commerce-worker build:fixture-worker`): the production
+  (`pnpm --filter @purin-labs/commerce-worker build:fixture-worker`): the production
   Worker with a deterministic payment gateway, an optional fixed clock and
   named seed scenarios
 - `docs/` — plan

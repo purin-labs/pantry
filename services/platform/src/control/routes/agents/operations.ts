@@ -18,7 +18,7 @@ import { admitUserMutation } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * Operator-initiated manual agent run (plan 30 phase 4). Follows the

@@ -11,7 +11,7 @@ import {
 } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
-import { isRecord, assertNever } from "@seams/std";
+import { isRecord, assertNever } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,

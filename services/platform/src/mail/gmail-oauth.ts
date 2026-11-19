@@ -8,7 +8,7 @@ import {
   type VaultHandle,
   type VaultOAuthTokens,
 } from "../credential-vault";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_ISSUERS = new Set([

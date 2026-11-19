@@ -1,8 +1,8 @@
 import type {
   CaseExecutionNode,
   CaseExecutionNodeKind,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import type { CaseExecution } from "./execution-model";
 

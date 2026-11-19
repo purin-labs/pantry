@@ -3,7 +3,7 @@ import type {
   CapabilityCommerceSystem,
   CapabilityDefinition,
   OnboardingControlRole,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { AccessGrant } from "../authorization/access-grants/types";
 import {
@@ -48,8 +48,8 @@ import {
   opaqueContextVisibilityReference,
   opaqueInformationSourceReference,
 } from "./references";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isPositiveInteger } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isPositiveInteger } from "@purin-labs/std";
 
 type AccessControlOrganisationRow = Readonly<{
   organisationId: unknown;

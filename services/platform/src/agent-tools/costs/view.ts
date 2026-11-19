@@ -4,7 +4,7 @@ import {
   COSTS_TABS,
   type CostsViewCommand,
   type PageViewCommand,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { defineTool } from "../define-tool";
 import { readBakerySurfaceReceiptId } from "../bakery/surface";
 

@@ -1,5 +1,5 @@
 import type { Result } from "../result";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 /**
  * A bounded reader for public HTTP(S) links carried by a user message.

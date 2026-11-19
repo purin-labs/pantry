@@ -6,19 +6,19 @@ import {
   parseExecutionManifest,
   type ResumableDocument,
   type RetainedFile,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import {
   parseRunSnapshot,
   type RunSnapshot,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   hasExactKeys,
   isRecord,
   parseJsonOrNull,
   sha256Hex,
   sameJson,
-} from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { Env } from "../../env";
 import type { OrganisationId } from "../../ids";
 import { bakeryRunSnapshotPrefix } from "../../commerce/bakery/saved-runs";

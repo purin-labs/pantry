@@ -3,12 +3,12 @@ import { expect, it, type TestContext } from "vitest";
 import {
   ProductDescriptionDoc,
   type ProductDescriptionUpdate,
-} from "@seams/product-description-crdt";
+} from "@purin-labs/product-description-crdt";
 import {
   encodeDraftClientMessage,
   parseDraftServerMessage,
   type DraftServerMessage,
-} from "@seams/product-description-crdt/protocol";
+} from "@purin-labs/product-description-crdt/protocol";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { opaqueSubjectReference } from "../../src/access-control/references";

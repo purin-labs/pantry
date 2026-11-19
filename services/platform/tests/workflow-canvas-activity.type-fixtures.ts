@@ -1,4 +1,4 @@
-import type { CollaborationAgentActivity } from "@seams/collaboration";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
 
 // @ts-expect-error An active operation requires an authenticated agent identity.
 const missingAgent: CollaborationAgentActivity = { operationId: "move", target: "pack" };

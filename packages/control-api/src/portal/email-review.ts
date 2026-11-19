@@ -17,7 +17,7 @@ import {
   isSha256Hex,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type EmailReviewQueue = Readonly<{
   replies: readonly EmailReplyQueueItem[];

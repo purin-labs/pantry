@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { parseSettings, sampleSettings } from "@seams/bakery-model/bakery";
+import { parseSettings, sampleSettings } from "@purin-labs/bakery-model/bakery";
 import {
   simulate,
   simulateSteps,
@@ -8,8 +8,8 @@ import {
   taskAt,
   workerAt,
   workerTasks,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import { operationTask, operationWait } from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { operationTask, operationWait } from "@purin-labs/production-simulation/simulator/selection";
 
 function settings(changes) {
   const result = parseSettings({ ...sampleSettings(), ...changes });

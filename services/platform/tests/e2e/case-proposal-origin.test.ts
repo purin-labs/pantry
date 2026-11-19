@@ -2,7 +2,7 @@ import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { evictDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   installSlackActorFixture,
   ORGANISATION_ID,

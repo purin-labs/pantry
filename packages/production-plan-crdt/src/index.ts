@@ -1,4 +1,4 @@
-import { parseYjsEncoding, type ParsedYjsEncoding } from "@seams/collaboration";
+import { parseYjsEncoding, type ParsedYjsEncoding } from "@purin-labs/collaboration";
 import * as Y from "yjs";
 import {
   PLAN_LINE_LIMIT,

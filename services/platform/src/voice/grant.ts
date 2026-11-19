@@ -1,5 +1,5 @@
-import type { VoiceGrantClaims } from "@seams/control-api";
-import { encodeBase64Url } from "@seams/std";
+import type { VoiceGrantClaims } from "@purin-labs/control-api";
+import { encodeBase64Url } from "@purin-labs/std";
 
 const textEncoder = new TextEncoder();
 

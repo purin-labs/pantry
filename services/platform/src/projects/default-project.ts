@@ -2,9 +2,9 @@ import {
   parseProjectId,
   type ProjectId,
   type ProjectRole,
-} from "@seams/control-api";
-import type { OnboardingControlRole } from "@seams/contracts";
-import { assertNever, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import type { OnboardingControlRole } from "@purin-labs/contracts";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { OrganisationQuerySource } from "../data/query-source";
 import type { OrganisationId, UserId } from "../ids";
 

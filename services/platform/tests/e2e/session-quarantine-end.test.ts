@@ -2,7 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { failSessionTurnStream } from "../../src/actors/agent-session-turn-stream";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";

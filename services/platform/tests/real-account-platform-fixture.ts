@@ -3,7 +3,7 @@ import { createHash, generateKeyPairSync, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { pathToFileURL } from "node:url";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { OrganisationId } from "../src/ids";
 import {
   issueControlSession,

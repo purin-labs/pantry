@@ -1,6 +1,6 @@
-import type { ApplianceVisual } from "@seams/production-simulation/simulator/appliance-runtime";
+import type { ApplianceVisual } from "@purin-labs/production-simulation/simulator/appliance-runtime";
 import * as THREE from "three";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import {
   loadVisual,
   preloadVisual,
@@ -12,12 +12,12 @@ import {
 import {
   LINEA_GLB_SHA256,
   EAGLE_GLB_SHA256,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { SceneHost } from "../scene-host";
 import type {
   ApplianceDisplay,
   ApplianceSample,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import {
   applyRecordedAppliancePose,
@@ -33,7 +33,7 @@ import eagleUrl from "../../../../../../assets/bakery-mujoco/victoria-arduino-ea
 import {
   fr10ToolKinematics,
   fr10WristIk,
-} from "@seams/production-simulation/kinematics/fr10";
+} from "@purin-labs/production-simulation/kinematics/fr10";
 import {
   fr10Arm,
   fr10Pivots,

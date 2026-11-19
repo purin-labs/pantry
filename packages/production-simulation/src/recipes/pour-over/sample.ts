@@ -1,9 +1,9 @@
-import { hasExactKeys, isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
+import { hasExactKeys, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import {
   readCellRecordingDocument,
   type PhysicsView,
 } from "../../index.ts";
-import type { PersistentPourOverCell } from "@seams/bakery-model/bakery-physics";
+import type { PersistentPourOverCell } from "@purin-labs/bakery-model/bakery-physics";
 
 /** A pose in MuJoCo order: position, then a WXYZ quaternion. */
 export type StationPose = readonly [

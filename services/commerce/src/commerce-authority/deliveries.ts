@@ -3,7 +3,7 @@ import {
   type AcknowledgeCommerceDeliveryV1,
   type CommerceDeliveryV1,
   type CommerceDeliveryAcknowledgementV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export type StoredDeliveryRow = Readonly<{ deliveryJson: string }>;
 

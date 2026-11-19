@@ -1,5 +1,5 @@
-import type { Variant } from "@seams/type-utils";
-import { isPositiveInteger } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isPositiveInteger } from "@purin-labs/std";
 
 /**
  * The revisioned price policy that bounds automated Offer price changes.

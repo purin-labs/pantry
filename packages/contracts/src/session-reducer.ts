@@ -1,6 +1,6 @@
 import { Type, type TSchema } from "typebox";
-import { isRecord, sameJson, sha256HexSync, utf8ByteLength } from "@seams/std";
-import { StrictObject } from "@seams/commerce-contracts/schema";
+import { isRecord, sameJson, sha256HexSync, utf8ByteLength } from "@purin-labs/std";
+import { StrictObject } from "@purin-labs/commerce-contracts/schema";
 import { encodeHarnessCheckpointRecord } from "./digest-encoders.ts";
 import { encodeModelRoute } from "./model-route.ts";
 import {
@@ -27,7 +27,7 @@ import {
   type TurnLifecycle,
   type WorkspaceRevisionReceipt,
 } from "./session-schemas.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 // The Plan 78 port of the Rust session reducer (actor.rs) and its JSON
 // boundary (actor/serialized.rs). Each function takes the decoded request and

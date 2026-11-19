@@ -39,7 +39,7 @@ import {
 } from "../../ids";
 import { parseInitialOrganisationPlacement } from "../../placement";
 import type { Result } from "../../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   fieldErrorResponse,
   isAuthorizedFaultInjectionRequest,

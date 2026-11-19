@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { parseCommerceExportPresetDigestPayload } from "@seams/commerce-contracts/entity-plane-export";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
+import { parseCommerceExportPresetDigestPayload } from "@purin-labs/commerce-contracts/entity-plane-export";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { BuyerSessionAuthority } from "../src/buyer-session.ts";
 import { CommerceAuthority } from "../src/commerce-authority.ts";

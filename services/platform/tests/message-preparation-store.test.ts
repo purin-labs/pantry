@@ -7,7 +7,7 @@ import type {
   MessageAttachmentPreparationReceipt,
   MessageAttachmentPreparationState,
   OrganisationAttachmentObjectKey,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, test } from "vitest";
 
 import {
@@ -22,7 +22,7 @@ import {
   sqlStorage,
   TestSqlStorage,
 } from "./sqlite-storage";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const ORGANISATION = "organisation_preparation";
 const SESSION = "session_preparation";

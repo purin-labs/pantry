@@ -4,7 +4,7 @@ import type {
   SupplierPayable,
   SupplierPayoutExecutionPlan,
   SupplierPayoutState,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   advanceSupplierPayout,
@@ -33,8 +33,8 @@ import {
 } from "./executor";
 import { listSupplierPayoutAttempts } from "../data/supplier-payout-attempt";
 import type { OrganisationId } from "../ids";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 type PayoutProposalError =
   | "payable_not_found"

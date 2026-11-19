@@ -1,7 +1,7 @@
 import type { ChannelId, WorkspaceId } from "../ids";
 import type { Result } from "../result";
 import { isAmbiguousSlackOutcome, slackRetryAt } from "./messages";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 
 /**
  * Slack's streaming methods for an answer in a thread: start a message, append

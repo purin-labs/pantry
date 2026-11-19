@@ -1,4 +1,4 @@
-import { parseJson } from "@seams/std";
+import { parseJson } from "@purin-labs/std";
 import type { CellTransport } from "./cell-adapter.ts";
 
 /**

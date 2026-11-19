@@ -6,7 +6,7 @@ import {
   DEFAULT_APPEARANCE,
   type AppearancePreferences,
   type PortalPalette,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { useUserPreferences } from "./context";
 import type { UserPreferenceOwner } from "./owner";
 import { usePortalTheme } from "../use-portal-theme";

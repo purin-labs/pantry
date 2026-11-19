@@ -3,13 +3,13 @@ import {
   parsePhysicsReplay,
   type PhysicsLayout,
   type PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { PhysicsSceneHost } from "./spatial/physics-scene-host";
 import type { FitFinding } from "./spatial/floor-plan-geometry";
 import type { RackLayoutPresentation } from "./spatial/physics-inspection";
 import { rackOffset, type RackLayoutReview } from "./rack-layout";
 import { readExample } from "./rehearsal-examples";
-import { COLD_CELL } from "@seams/production-simulation/recipes/bakery/workcell-instances";
+import { COLD_CELL } from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 
 const RACK = COLD_CELL.skills["table-to-rack"];
 

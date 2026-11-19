@@ -5,9 +5,9 @@ import type {
 } from "../../cues/engine";
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
-import type { Variant } from "@seams/type-utils";
-import { sameJson } from "@seams/std";
-import type { AgentSkillRef } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import { sameJson } from "@purin-labs/std";
+import type { AgentSkillRef } from "@purin-labs/control-api";
 import type {
   AgentResponsibilityScope,
   CueAutomationResolution,

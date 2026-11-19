@@ -4,7 +4,7 @@ import {
   isRecord,
   isSha256Hex,
   parseJson,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   MAX_REPLY_CITATIONS,
   type EmailChatContext,

@@ -2,11 +2,11 @@ import {
   MAX_ARTIFACTS,
   MAX_REFERENCED_BYTES,
   type Sha256Hex,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import {
   MAX_ENCODED_ARTIFACT_BYTES,
   RunArtifactFile,
-} from "@seams/production-simulation/runs/run-artifact-file";
+} from "@purin-labs/production-simulation/runs/run-artifact-file";
 
 // The browser releases this lock when the page closes or crashes. A later page
 // removes abandoned staging directories without touching another active tab.

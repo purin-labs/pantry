@@ -68,20 +68,20 @@ import {
   parseSimulationOutput,
   type BakerySimulationOutput,
 } from "./bakery-simulation-output.ts";
-import type { StrictUnion, Variant, VariantBy } from "@seams/type-utils";
+import type { StrictUnion, Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   parseSurfaceObservation,
   parseSurfacePageCommand,
   type SurfaceObservationV2,
   type SurfacePageCommandV1,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   hasExactKeys,
   isNonNegativeInteger,
   isRecord,
   sha256Hex,
   sha256HexSync,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 const MAX_CONTEXT_BYTES = 16 * 1024;
 const MAX_EFFECT_BYTES = 20 * 1024;

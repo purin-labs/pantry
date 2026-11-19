@@ -9,12 +9,12 @@ import { expect, it, type TestContext } from "vitest";
 import {
   parseRecipeCollection,
   type RecipeCollection,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import {
   parseListEntryReadRequest,
   CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { accessControlPath } from "./access-route-support";
 import {

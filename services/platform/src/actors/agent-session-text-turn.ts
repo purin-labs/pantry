@@ -6,7 +6,7 @@ import type {
   SessionTransition,
   Timestamp,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
 import type { Result } from "../result";
@@ -16,8 +16,8 @@ import type {
   CancellationResolvedSessionCommit,
   ActiveLeaseCancellationStartedSessionCommit,
 } from "./actor-journal";
-import type { Variant } from "@seams/type-utils";
-import { sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { sha256Hex } from "@purin-labs/std";
 
 export type CanonicalTextTurnTransitionError = {
   readonly code: "canonical_text_turn_transition_invalid";

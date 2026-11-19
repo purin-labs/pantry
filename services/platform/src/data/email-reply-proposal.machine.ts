@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /**
  * One version of an email reply proposal (Refactor 15). The Case owns the

@@ -6,13 +6,13 @@
 import {
   commerceTransition,
   type CommerceInvalidTransition,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseResolveCommerceUnplacedCaptureV1,
   parseCommerceUnplacedCaptureV1,
   type CommerceUnplacedCaptureV1,
   type CommerceUnplacedCapturesV1,
-} from "@seams/commerce-contracts/records/api-unplaced-captures";
+} from "@purin-labs/commerce-contracts/records/api-unplaced-captures";
 
 import type { CommerceDatabase } from "../database.ts";
 

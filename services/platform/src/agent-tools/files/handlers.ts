@@ -3,7 +3,7 @@ import type {
   CaseAssignment,
   HarnessTurnLease,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import { parseCaseId, type CaseId } from "../../ids";
 import {
@@ -38,8 +38,8 @@ import {
 } from "../../context/files";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import { audiencesForAdmission } from "../../policy";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import type { SessionToolContext } from "../context";
 
 export function emailAttachmentForHarness(

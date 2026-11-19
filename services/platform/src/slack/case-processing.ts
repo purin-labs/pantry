@@ -8,7 +8,7 @@ import type {
   ConnectorIdentity,
   ConnectorIngress,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   findActiveCaseRouteAtScope,
@@ -43,7 +43,7 @@ import {
   readOrganisationDefaultWorkspacePortalAddress,
 } from "../data/organisation-workspace";
 import type { Env } from "../env";
-import type { SessionBudgetDimension } from "@seams/contracts";
+import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import { budgetNoticeDeliveryId, budgetStopNoticeText } from "./budget-notice";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { samePlacement } from "../data/organisation-placement";
@@ -89,8 +89,8 @@ import {
   type EmailReviewProjection,
 } from "../data/email-review";
 import { buildSlackEmailReviewNotice } from "./email-review-notice";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const WITHHELD_DELIVERY =
   "connector_delivery_rejected:connector_stream_withheld";

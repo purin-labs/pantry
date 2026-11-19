@@ -1,5 +1,5 @@
-import { hasExactKeys } from "@seams/std";
-import { isChatEffort, type ChatEffort } from "@seams/control-api";
+import { hasExactKeys } from "@purin-labs/std";
+import { isChatEffort, type ChatEffort } from "@purin-labs/control-api";
 
 import type { Env } from "../../env";
 import {

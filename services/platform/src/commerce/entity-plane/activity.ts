@@ -4,8 +4,8 @@ import type {
   MerchantRevision,
   CommerceEntityPlaneDeliveryId,
   CommerceMutationReceiptOutcome,
-} from "@seams/contracts";
-import { sameRelationshipDefinitionRef } from "@seams/commerce-contracts/commerce-relationship-references";
+} from "@purin-labs/contracts";
+import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import { parseCommerceProviderReceipt } from "../action-model";
 import { assertCommerceGraphQueryWithLexicon } from "../commerce-wasm";
 import type {
@@ -18,12 +18,12 @@ import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import type { CommerceProjectionHistoryEntry } from "../../actors/commerce-projection";
 import { projectionKindForEntityType } from "./blotter-source";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   CommerceActivityResource,
   CommerceActivitySourceName,
   CommerceProviderReceipt,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export type CommerceActivityEvent =
   | Readonly<{

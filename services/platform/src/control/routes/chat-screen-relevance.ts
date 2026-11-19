@@ -11,8 +11,8 @@ import {
   isScreenRelevanceChoice,
   parseScreenRelevanceRequest,
   screenRelevanceObservation,
-} from "@seams/control-api";
-import { hasExactKeys } from "@seams/std";
+} from "@purin-labs/control-api";
+import { hasExactKeys } from "@purin-labs/std";
 import { authorizeConversation } from "../../chat/conversation-access";
 import {
   checkScreenRelevance,

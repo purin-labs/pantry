@@ -1,7 +1,7 @@
 import type { SimulatorState } from "./simulator-state";
-import type { ProductionScenario } from "@seams/bakery-model/bakery-production-scenario";
-import type { PhysicsReplay } from "@seams/bakery-model/bakery-physics";
-import type { ProductionWorkcells } from "@seams/production-simulation/recipes/bakery/production-workcells";
+import type { ProductionScenario } from "@purin-labs/bakery-model/bakery-production-scenario";
+import type { PhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
+import type { ProductionWorkcells } from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import type {
   ProductionData,
   ProductionDraftIdentity,

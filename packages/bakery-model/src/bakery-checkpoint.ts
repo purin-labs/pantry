@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /**
  * The engine writes each checkpoint in one envelope (Refactor 16, step 6D):

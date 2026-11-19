@@ -6,8 +6,8 @@ import type {
   CommerceBankPayoutsV1,
   CommerceBankPayoutSourceV1,
   CommerceBankPayoutV1,
-} from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 
 import type { CommerceDatabase } from "../database.ts";
 import type { SquareConnectionV1 } from "./square/square-connection.ts";

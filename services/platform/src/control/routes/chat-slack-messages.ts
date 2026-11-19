@@ -5,11 +5,11 @@
  * conversation that holds its Case, so a person who cannot open the chat
  * cannot see or act on its drafts.
  */
-import { SLACK_APP_NAME, SLACK_BOT_NAME } from "@seams/control-api";
+import { SLACK_APP_NAME, SLACK_BOT_NAME } from "@purin-labs/control-api";
 import type { GlobalDatabase } from "../../database-handles";
 import { signalChat } from "../../chat/signals";
-import { isConversationId } from "@seams/control-api";
-import { assertNever, hasExactKeys } from "@seams/std";
+import { isConversationId } from "@purin-labs/control-api";
+import { assertNever, hasExactKeys } from "@purin-labs/std";
 import { resolveActiveConnectorActorAtPlacement } from "../../actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing";
 import { conversationCaseIdentity } from "../../chat/conversation-access";

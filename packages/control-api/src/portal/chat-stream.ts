@@ -1,5 +1,5 @@
-import type { PortalChatStreamRecord as ChatStreamRecord } from "@seams/contracts";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import type { PortalChatStreamRecord as ChatStreamRecord } from "@purin-labs/contracts";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 export function parseChatStreamRecord(raw: unknown): ChatStreamRecord {
   if (

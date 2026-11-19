@@ -5,9 +5,9 @@ import {
   parseMailReplyDocument,
   renderMailReplyHtml,
   renderMailReplyText,
-} from "@seams/control-api";
-import { BODY_LIMIT } from "@seams/mail-reply-crdt";
-import { decodeCanonicalBase64, isNonBlankString } from "@seams/std";
+} from "@purin-labs/control-api";
+import { BODY_LIMIT } from "@purin-labs/mail-reply-crdt";
+import { decodeCanonicalBase64, isNonBlankString } from "@purin-labs/std";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
 import { readEmailMailboxAccount } from "../../data/email-mailbox";
 import { listEmailReviewProjections } from "../../data/email-review";

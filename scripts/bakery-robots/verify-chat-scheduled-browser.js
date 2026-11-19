@@ -25,9 +25,9 @@ async function verifyScheduledChatParity(page) {
     const { bakerySurfaceForOrganisation } =
       await import("/src/features/bakery-surface-registry.ts");
     const { createBakerySurfaceEffect } =
-      await import("/@id/@seams/bakery-model/bakery-surface");
+      await import("/@id/@purin-labs/bakery-model/bakery-surface");
     const { parseRunSnapshot } =
-      await import("/@id/@seams/bakery-model/bakery-run-snapshot");
+      await import("/@id/@purin-labs/bakery-model/bakery-run-snapshot");
     const fixture = {
       effects: [],
       receipts: [],
@@ -962,11 +962,11 @@ async function twoColdTrays() {
     compileRehearsalWorkcells,
     exportRehearsalWorkcells,
   } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/production-workcells");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/production-workcells");
   const { readBundledExample } =
     await import("/src/features/workflow-simulator/bundled-example.ts");
   const { compileWorkcellInput } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/workcell-input");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/workcell-input");
   const saved = await parseRehearsalWorkcells(
     JSON.stringify(window.chatParityAcceptance.writes[0].document),
   );
@@ -1102,11 +1102,11 @@ async function verifyTwoCells(page, run, capture, simulateAndAccept, evidence) {
 
 async function inspectTwoCellRun(text) {
   const { parseRehearsalWorkcells, exportRehearsalWorkcells } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/production-workcells");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/production-workcells");
   const { simulateProduction } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/schedule");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/schedule");
   const { acceptProductionRecording, editRehearsalWorkcells } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/production-workcells");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/production-workcells");
   const parsed = await parseRehearsalWorkcells(text);
   if (parsed.kind !== "ready") throw new Error(JSON.stringify(parsed));
   const plan = parsed.plan;
@@ -1273,7 +1273,7 @@ async function inspectHumanTransfer({ text, portalSource }) {
     `${portalSource}/human-cell-transfer.ts`
   );
   const { parsePhysicsReplay } =
-    await import("/@id/@seams/bakery-model/bakery-physics");
+    await import("/@id/@purin-labs/bakery-model/bakery-physics");
   const { buildLiveScheduleSpatialLayout } =
     await import("/src/features/workflow-simulator/bakery-appliance-layout.ts");
   const layout = buildLiveScheduleSpatialLayout();

@@ -1,10 +1,10 @@
-import type { StationId } from "@seams/bakery-model/bakery";
+import type { StationId } from "@purin-labs/bakery-model/bakery";
 import {
   outageAt,
   type OvenCycle,
   type Run,
 } from "../recipes/bakery/schedule.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 export type EquipmentAllocation = Readonly<{
   batches: readonly string[];
   capacity: Readonly<{

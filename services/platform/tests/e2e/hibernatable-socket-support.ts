@@ -2,7 +2,7 @@
 // hibernatable sockets (collaboration rooms and chat signals).
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
-import { COLLABORATION_PING, COLLABORATION_PONG } from "@seams/collaboration";
+import { COLLABORATION_PING, COLLABORATION_PONG } from "@purin-labs/collaboration";
 
 import type { OrganisationDO } from "../../src/actors/organisation";
 import {

@@ -1,4 +1,4 @@
-import { readEspressoRun } from "@seams/bakery-model/espresso-rehearsal-file";
+import { readEspressoRun } from "@purin-labs/bakery-model/espresso-rehearsal-file";
 import {
   isRunSnapshotId,
   parseRunSnapshot,
@@ -8,7 +8,7 @@ import {
   type RunSnapshotPage,
   type RunSnapshotKind,
   type RunSnapshotSummary,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api";
 import { ControlApiError } from "../../control-client.ts";
 import {
@@ -17,30 +17,30 @@ import {
   parseProductionWorkcells,
   parseRehearsalWorkcells,
   type ProductionWorkcells,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import {
   openRehearsalDocument,
   type RehearsalConversion,
-} from "@seams/production-simulation/simulator/rehearsal-conversion";
-import type { Settings } from "@seams/bakery-model/bakery";
+} from "@purin-labs/production-simulation/simulator/rehearsal-conversion";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
 import type { ProductionScenarioRead } from "./production-scenario-api";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
-import { assertNever, isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
+import { assertNever, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import {
   readOvenSave,
   savedCellDefinitions,
   type OvenSave,
   type OvenRunSource,
-} from "@seams/production-simulation/runs/oven-run-file";
-import { RunArtifactFile } from "@seams/production-simulation/runs/run-artifact-file";
+} from "@purin-labs/production-simulation/runs/oven-run-file";
+import { RunArtifactFile } from "@purin-labs/production-simulation/runs/run-artifact-file";
 import {
   openResumable,
   parseExecutionBundle,
   type ResumableDocument,
-} from "@seams/production-simulation";
-import type { StrictUnion, Variant } from "@seams/type-utils";
-import { visitSharedArtifacts } from "@seams/production-simulation/simulator/shared-artifact-batches";
-import { parseApplianceWorkflow } from "@seams/bakery-model/bakery-appliance-workflow";
+} from "@purin-labs/production-simulation";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
+import { visitSharedArtifacts } from "@purin-labs/production-simulation/simulator/shared-artifact-batches";
+import { parseApplianceWorkflow } from "@purin-labs/bakery-model/bakery-appliance-workflow";
 
 type Read = (path: string) => Promise<unknown>;
 

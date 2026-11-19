@@ -7,10 +7,10 @@ import {
   SCREEN_RELEVANCE_PAUSE_MS,
   type ScreenRelevanceChoice,
   type ScreenRelevanceView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { controlMutation } from "../../control-client";
 import { captureSurfaceObservation } from "../surface-observation";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 // The chat routes, without an import of `./api`, which imports this module.
 function chatPath(organisationId: string): string {

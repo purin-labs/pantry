@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { DirectCaseCommandError } from "../actors/case-direct-processing";
 import type { RequestId } from "../ids";
 import { traceWarn } from "../observability";

@@ -1,4 +1,4 @@
-import type { StoredMessageAttachment, UserMessage } from "@seams/contracts";
+import type { StoredMessageAttachment, UserMessage } from "@purin-labs/contracts";
 
 import { attachmentManifestLine } from "../messages/attachment-inspection";
 import type { Result } from "../result";
@@ -7,7 +7,7 @@ import {
   type MessageLinkEgress,
 } from "../messages/link-reader";
 import type { EmbeddedHarnessUserInput } from "./embedded-harness";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type AttachmentInspectionToolInput = {
   readonly attachments: readonly StoredMessageAttachment[];

@@ -7,8 +7,8 @@ function ovenEngineReady() {
 }
 async function ovenEngineBrowser() {
   const { coldCellJourneyAdapter, coldCellJourneySnapshot } =
-    await import("/@id/@seams/production-simulation/recipes/cold-cell-journey");
-  const { canonicalJson } = await import("/@id/@seams/std");
+    await import("/@id/@purin-labs/production-simulation/recipes/cold-cell-journey");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const api = window.productionRunPreview;
   const prepared = await api.openExecutionWorker(null);
   if (!prepared.ok) throw new Error(JSON.stringify(prepared.error));

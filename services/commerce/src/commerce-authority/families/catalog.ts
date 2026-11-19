@@ -7,12 +7,12 @@ import {
   type CommerceCollectionV1,
   parseAdjustOfferPriceCommand,
   type AdjustCommerceOfferPriceV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   ShippingProfile,
   Storefront,
   VariantShippingSpecification,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { offerPriceMutation } from "../catalog-mutations.ts";
 import { rejected, validateMerchant } from "../ledger.ts";
 import {

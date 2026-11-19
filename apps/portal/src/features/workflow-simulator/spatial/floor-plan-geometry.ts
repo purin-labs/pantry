@@ -3,7 +3,7 @@ import { OBB } from "three/addons/math/OBB.js";
 import type {
   PhysicsReplay,
   PhysicsMotion,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 
 export type RecordedFitEvent = Readonly<{
   recording: PhysicsReplay;

@@ -1,4 +1,4 @@
-import { isNonEmptyString, isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonEmptyString, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 type ProductDescriptionResponseProduct = Readonly<{
   productId: string;

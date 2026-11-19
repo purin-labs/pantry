@@ -1,7 +1,7 @@
 // "Sold out today" (Plan 40B phase 3): staff mark a drink that has no stock
 // count. The mark belongs to one variant at one location, so that it holds on
 // every menu of that shop, and it ends by itself at the shop's next midnight.
-import type { CommerceSoldOutMarksV1 } from "@seams/commerce-client";
+import type { CommerceSoldOutMarksV1 } from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../../database.ts";
 

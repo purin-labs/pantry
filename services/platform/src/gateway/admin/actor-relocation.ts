@@ -3,7 +3,7 @@ import {
   type RelocationMailReceipt,
 } from "../../actors/actor-relocation-mail";
 import { parseCommerceProviderReceipt } from "../../commerce/action-model";
-import type { CommerceProviderReceipt } from "@seams/control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import {
   readStringField,
   readOrganisationIdField,
@@ -49,7 +49,7 @@ import {
 } from "../../http";
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   isAuthorizedOrganisationAdminRequest,
   jsonBodyErrorResponse,

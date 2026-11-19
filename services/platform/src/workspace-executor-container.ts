@@ -5,11 +5,11 @@ import type {
   WorkspaceExecutorDecodedFrame,
   WorkspaceExecutorInspectionOperation,
   WorkspaceExecutorInspectionResponse,
-} from "@seams/contracts/workspace-executor";
+} from "@purin-labs/contracts/workspace-executor";
 
 import type { Env } from "./env";
 import type { Result } from "./result";
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 const WORKSPACE_EXECUTOR_PORT = 8080;
 const WORKSPACE_EXECUTOR_TIMEOUT_MS = 30_000;
@@ -20,7 +20,7 @@ export type {
   WorkspaceExecutorDecodedFrame,
   WorkspaceExecutorInspectionOperation,
   WorkspaceExecutorInspectionResponse,
-} from "@seams/contracts/workspace-executor";
+} from "@purin-labs/contracts/workspace-executor";
 
 export type WorkspaceExecutorContainerError =
   | { readonly kind: "deadline_exceeded" }

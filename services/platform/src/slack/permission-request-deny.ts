@@ -1,4 +1,4 @@
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 
 import { resolveSlackApprover } from "../actors/action-mutation-execution";
 import {

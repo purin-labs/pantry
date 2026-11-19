@@ -5,8 +5,8 @@ import {
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
-} from "@seams/collaboration";
-import { isPositiveInteger, isRecord } from "@seams/std";
+} from "@purin-labs/collaboration";
+import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   isPlanRequestId,
   parseProductionPlanStateVector,

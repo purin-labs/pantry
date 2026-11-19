@@ -1,4 +1,4 @@
-import type { CheckoutSource, PointOfSaleBuyer } from "@seams/contracts";
+import type { CheckoutSource, PointOfSaleBuyer } from "@purin-labs/contracts";
 
 const buyerContact = { kind: "email", emailDigest: "cd".repeat(32) } as const;
 

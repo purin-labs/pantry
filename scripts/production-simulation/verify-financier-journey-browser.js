@@ -39,8 +39,8 @@ async function financierPreparationBrowserCase({
   bundle: initialBundle,
 }) {
   const { compileFinancierPreparation } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/financier");
-  const { canonicalJson } = await import("/@id/@seams/std");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/financier");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const input = {
     revision: 1,
     evidence: "assumed",
@@ -170,12 +170,12 @@ async function financierBrowserCase({
   bundle: initialBundle,
 }) {
   const { compileFinancier } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/financier");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/financier");
   const { simulateSteps, resolveAuthoredFinancierRun } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/schedule");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/schedule");
   const { sampleSettings, parseSettings } =
-    await import("/@id/@seams/bakery-model/bakery");
-  const { canonicalJson } = await import("/@id/@seams/std");
+    await import("/@id/@purin-labs/bakery-model/bakery");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   let overrides = { horizonMinutes: 240 };
   if (authored)
     overrides = { workerCount: 2, rackTrays: 6, horizonMinutes: 240 };
@@ -382,8 +382,8 @@ async function financierRecipeBrowserCase({ name, bundle: initialBundle }) {
   if (evidence === null)
     throw new Error("Provide the headless recipe evidence URL");
   const { compileFinancierRecipe } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/financier");
-  const { canonicalJson, sha256Hex } = await import("/@id/@seams/std");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/financier");
+  const { canonicalJson, sha256Hex } = await import("/@id/@purin-labs/std");
   const inputResponse = await fetch(`${evidence}/${name}-input.json`);
   const baselineResponse = await fetch(`${evidence}/${name}-baseline.json`);
   const reportResponse = await fetch(`${evidence}/report.json`);

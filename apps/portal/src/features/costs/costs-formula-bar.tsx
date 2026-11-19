@@ -14,7 +14,7 @@ import {
   type CostFormulaRowContext,
   type CostScenarioAssumptions,
   type CostsOverview,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   productCogsCellKey,
   productDailyCellKey,
@@ -25,7 +25,7 @@ import {
   productUnitNetSelectionKey,
   productWasteCellKey,
   type CostsSheetCellChange,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import {
   changesForDailyUnits,
   changesForProductCogsMinor,

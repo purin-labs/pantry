@@ -13,9 +13,9 @@
 // private read between two edits). The label check that asks again for it
 // is in `passUse` (src/actors/harness-follow-up.ts).
 import { expect, it, type TestContext } from "vitest";
-import { newConversationId, type PortalPageViewV1 } from "@seams/control-api";
-import { isRecord } from "@seams/std";
-import { encodeMenuBoardClientMessage, parseMenuBoardServerMessage } from "@seams/menu-board-crdt/protocol";
+import { newConversationId, type PortalPageViewV1 } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
+import { encodeMenuBoardClientMessage, parseMenuBoardServerMessage } from "@purin-labs/menu-board-crdt/protocol";
 import { boardPageView } from "../../../../apps/portal/src/features/menu-boards/board-page-view";
 import { closeSocket } from "./hibernatable-socket-support";
 import {

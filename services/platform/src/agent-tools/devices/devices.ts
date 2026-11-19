@@ -1,4 +1,4 @@
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   DevicePauseRequest,
   DeviceProposeRequest,

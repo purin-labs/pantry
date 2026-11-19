@@ -5,7 +5,7 @@ import {
   parseCommerceGraphQuery,
   parseCommerceSnapshotRevision,
   parseListEntryReadRequest,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   createSupplier,

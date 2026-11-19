@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { HarnessCheckpointRecord } from "./types/HarnessCheckpointRecord.ts";
 import type { MessageAttachmentSource } from "./types/MessageAttachmentSource.ts";
 import type { TurnIdentity } from "./types/TurnIdentity.ts";

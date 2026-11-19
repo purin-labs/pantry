@@ -15,7 +15,7 @@ import type {
   CaseContent,
   CaseAssignment,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 vi.mock(
   "../src/policy/information-flow/source-labels",
@@ -27,7 +27,7 @@ vi.mock(
       createCurrentSourceFlowLabel: async function createFixtureSourceLabel(
         input: Readonly<{
           readonly kind: string;
-          readonly authority: import("@seams/contracts").RequestAuthority;
+          readonly authority: import("@purin-labs/contracts").RequestAuthority;
         }>,
       ) {
         if (input.kind !== "ingress") {
@@ -113,8 +113,8 @@ import {
   type SerializedFlowBinding,
 } from "../src/policy";
 import { authorityPartitionKey } from "../src/authorization/access-grants/turn-authority";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const PLAN15_REQUEST_AUTHORITY = fixtureControlRequestAuthority({
@@ -2321,7 +2321,7 @@ function requiredOrganisationId() {
 
 async function merchantInputAuthorityPartition(
   requestAuthority: Variant<
-    import("@seams/contracts").RequestAuthority,
+    import("@purin-labs/contracts").RequestAuthority,
     "control"
   >,
 ) {

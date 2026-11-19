@@ -11,7 +11,7 @@ import type {
   CommerceRelationship,
   SourceProvenance,
   SystemCommerceEntityRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Result } from "../../result";
 import type { CommerceSystem } from "../../data/organisation-commerce-system";
 import type { CommerceWasmError } from "../commerce-wasm";
@@ -36,8 +36,8 @@ import type {
   CommerceGraphRelationshipStepInput,
   CommerceGraphRelationshipStepResult,
 } from "./commerce-source";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const SQLITE_TEXT_ENCODER = new TextEncoder();
 
@@ -102,7 +102,7 @@ export type CommerceGraphCommerceSource = CommerceGraphQuerySource &
       Result<CommerceGraphCapabilityMetadata, CommerceGraphSourceError>
     >;
     queryPlanned: (
-      request: import("@seams/contracts").CommerceGraphQueryPlanRequest,
+      request: import("@purin-labs/contracts").CommerceGraphQueryPlanRequest,
     ) => Promise<CommerceGraphPlannedSourceResult>;
     readRelationshipStep?: (
       input: CommerceGraphRelationshipStepInput,

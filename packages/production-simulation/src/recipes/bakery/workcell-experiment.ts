@@ -4,8 +4,8 @@ import {
   parsePhysicsRequest,
   parsePhysicsCyclePlan,
   parsePhysicsRackPlan,
-} from "@seams/bakery-model/bakery-physics";
-import { MAX_RUN_FILE_BYTES } from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { MAX_RUN_FILE_BYTES } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   compileWorkcellInput,
   compileCycleInput,
@@ -23,8 +23,8 @@ import {
   type WorkcellEvidence,
   type LoadingEvidence,
 } from "./workcell-attempt.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const validated: unique symbol = Symbol("validated workcell experiment");
 export const MAX_EXPERIMENT_BYTES = MAX_RUN_FILE_BYTES;

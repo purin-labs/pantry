@@ -1,4 +1,4 @@
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { CheckpointCommittedSessionCommit } from "../src/actors/actor-journal";
 import { buildTextTurnCheckpointCommittedCommit } from "../src/actors/agent-session-text-turn";
 import { uploadHarnessCheckpoint } from "../src/actors/agent-session-harness-checkpoint";

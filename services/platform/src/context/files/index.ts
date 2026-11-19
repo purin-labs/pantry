@@ -1,4 +1,4 @@
-export type { FileResourceDiscoveryEntry } from "@seams/control-api";
+export type { FileResourceDiscoveryEntry } from "@purin-labs/control-api";
 
 export {
   FILE_DAILY_SOURCE_BYTE_BUDGET,

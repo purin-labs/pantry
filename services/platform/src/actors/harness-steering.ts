@@ -4,13 +4,13 @@ import type {
   RequestAuthority,
   UserMessage,
   UserMessagePart,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   assertNever,
   canonicalJson,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 /**
  * The steering inputs of a Session's turns (Plan 71). A steering input is a

@@ -57,7 +57,7 @@ import {
 } from "./route";
 import { useBrainItemsToReview } from "./brain-summary";
 import { useRequestsToDecide } from "./permission-requests-summary";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import "./features/access/permission-requests-drawer.css";
 import "./portal-brand.css";
 
@@ -81,11 +81,11 @@ import { runLayoutMotion } from "./layout-motion";
 import { DashboardNavigation } from "./dashboard-navigation";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { useConsoleSidebarPreference } from "./use-console-sidebar-preference";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { ConsoleToolsProvider } from "./console-tools";
 import type { ToolbarItem } from "./ui/overflow-toolbar";
 import { HoverLabel } from "./ui/hover-label";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const DOCS_ORIGIN = (
   import.meta.env.VITE_DOCS_ORIGIN || "http://docs.localhost:3005"

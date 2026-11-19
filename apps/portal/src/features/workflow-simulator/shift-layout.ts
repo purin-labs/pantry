@@ -3,19 +3,19 @@ import type {
   BakerySurfaceEquipment,
   BakerySurfaceOpening,
   BakerySurfaceShiftLayout,
-} from "@seams/bakery-model/bakery-surface";
-import { BAKERY_FLOOR_PLANS, type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+} from "@purin-labs/bakery-model/bakery-surface";
+import { BAKERY_FLOOR_PLANS, type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   doorOpening,
   isDoorOpen,
   openingId,
   windowOpening,
-} from "@seams/production-simulation/floor/openings";
+} from "@purin-labs/production-simulation/floor/openings";
 import {
   APPLIANCE_FOOTPRINTS,
   REHEARSAL_APPLIANCE_IDS,
   type ApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import { getStoreInteriorDesign } from "./store-interior-design";
 
 // The appliances, openings, interior palette and undo history on the open floor

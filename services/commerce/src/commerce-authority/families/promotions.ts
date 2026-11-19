@@ -4,7 +4,7 @@ import {
   type CommerceGiftCardBalanceV1,
   type CommerceStoredValueAccountV1,
   type CommerceStoredValueLiabilityV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { CustomerFamily } from "./customers.ts";
 
 /**

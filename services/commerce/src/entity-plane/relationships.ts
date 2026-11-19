@@ -11,7 +11,7 @@ import type {
   RelationshipId,
   RelationshipRevision,
   SystemCommerceEntityRef,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   parseEntityRef,
@@ -27,13 +27,13 @@ import {
   readSystemEntity,
 } from "./entities.ts";
 import { validateCommerceRelationshipWithLexicon } from "./lexicon.ts";
-import { relationshipDefinitionReference } from "@seams/commerce-contracts/commerce-relationship-references";
+import { relationshipDefinitionReference } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import {
   FOOD_SERVICE_ENTITY_ROWS,
   readShipmentProductionBatches,
 } from "../plugins/food-service/index.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever, parseJson } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever, parseJson } from "@purin-labs/std";
 type SystemRelationship = VariantBy<CommerceRelationship, "origin", "system">;
 type CustomRelationship = VariantBy<CommerceRelationship, "origin", "custom">;
 type SystemKind = SystemCommerceEntityRef["typeId"];

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { formatRelativeTime } from "./formatting";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * The pieces every provider onboarding card shares: the one primary action

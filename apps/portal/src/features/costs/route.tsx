@@ -24,7 +24,7 @@ import {
   type PlanVsActualVarianceDriver,
   type SupplyCostItem,
   type SupplyLotCost,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   FORECAST_CAPEX_MINOR_CELL_KEY,
   FORECAST_EXTRA_SHIFT_THRESHOLD_PCT_CELL_KEY,
@@ -37,7 +37,7 @@ import {
   productFormulaCellKey,
   type CostsSheetCellChange,
   type CostsSheetTab,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import { controlRead, forgetControlReads } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";
 import { PageSkeleton, RecoverableError } from "../../page-components";
@@ -77,7 +77,7 @@ import {
 } from "./costs-sheet-grid";
 import { CostsPageViewSource } from "./costs-page-view";
 import { costsViewCommandState } from "./costs-view-commands";
-import type { CostsViewCommand } from "@seams/control-api";
+import type { CostsViewCommand } from "@purin-labs/control-api";
 import type { SurfaceCommandOutcome } from "../surface-observation";
 import {
   CostsSheetClient,
@@ -118,7 +118,7 @@ import {
 } from "./costs-sheet-presence";
 import { CostsAssumptionsPopover, CostsKpiStrip, ProductOrb } from "./costs-ui";
 import "./styles.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
   organisationId: string;

@@ -6,9 +6,9 @@ import { Select } from "../../ui/select";
  * is sent until a person selects Send on it.
  */
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { ProviderTile } from "../../page-components";
-import type { EmailOperationalPreviewResult, EmailOperationalQueueItem, EmailReplyPreviewResult, EmailReplyQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import type { EmailOperationalPreviewResult, EmailOperationalQueueItem, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import {
   DraftMessageCard,
   type DraftMessageField,
@@ -16,7 +16,7 @@ import {
   type DraftMessageStatus,
 } from "../../ui";
 import type { EmailReviewActions } from "../email-review/api";
-import type { EmailReviewQueue } from "@seams/control-api/portal/email-review";
+import type { EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
 import {
   ClaimSummary,
   ClaimTrace,
@@ -30,9 +30,9 @@ import {
   type MailSourceLinks,
 } from "../mail-inbox/draft-sources";
 import type { ChatTimelineInsert } from "./activity";
-import type { SlackChannelView, SlackDraftView } from "@seams/control-api/portal/slack-drafts";
+import type { SlackChannelView, SlackDraftView } from "@purin-labs/control-api/portal/slack-drafts";
 import type { SlackDraftActions } from "./slack-drafts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type EmailDraft =
   | { readonly kind: "reply"; readonly item: EmailReplyQueueItem }

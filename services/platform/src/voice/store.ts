@@ -8,8 +8,8 @@ import {
   VOICE_REQUEST_WINDOW_MS,
   type VoiceMacHeartbeat,
   type VoiceMacView,
-} from "@seams/control-api";
-import { encodeBase64Url, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { readOrganisationCapabilityPolicy } from "../data/capability-policy";

@@ -1,7 +1,7 @@
 import type {
   HarnessCheckpointRecord,
   HarnessHistoryEntry,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, test } from "vitest";
 
 import { classifyHarnessCheckpoint } from "../src/actors/agent-session-harness-authority";

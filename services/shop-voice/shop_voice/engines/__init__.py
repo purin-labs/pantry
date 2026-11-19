@@ -1,7 +1,7 @@
 """The speech engines of the shop Mac (Plan 82C): one module for each engine, behind one interface.
 
 An engine is one model with its own settings and its own noise rule. Its `hear` returns the text after
-that rule; the Portal's text check (`keptVoiceText` in @seams/control-api) drops the rest of what an
+that rule; the Portal's text check (`keptVoiceText` in @purin-labs/control-api) drops the rest of what an
 engine invents on noise, for every engine. The ids are those of the catalogue in
 `packages/control-api/src/voice-engines.ts`.
 """

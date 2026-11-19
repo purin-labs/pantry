@@ -2,7 +2,7 @@ import type { EngineJobs } from "../production-run/engine-jobs";
 import type {
   BakeryWorkspaceViewAction,
   BakeryRecordingCameraView,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { WorkspaceCameraView } from "./simulator-state";
 import React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -29,7 +29,7 @@ import {
   clock,
   metrics,
   type Run,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import type { WorkflowSimulatorActionGroups } from "./simulator-actions";
 import {
   type SimulatorConnection,

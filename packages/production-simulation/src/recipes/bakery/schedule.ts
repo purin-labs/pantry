@@ -1,22 +1,22 @@
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
 import { HUMAN_CELL_TRANSFER } from "./human-cell-transfer.ts";
 import {
   parseProductionManualTasks,
   validProductionWorkflow,
   type ProductionManualTask,
   type ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import { err, ok, type Result } from "../../result.ts";
 import {
   financierOperations,
   type StationId,
   type Operation,
   type Settings,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import type {
   PhysicsOutcome,
   PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import type {
   ProductionWorkcells,
   ProductionWorkcell,
@@ -46,8 +46,8 @@ import {
   type WorkcellResource,
   type WorkcellResourceId,
 } from "./workcell-input.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import {
   along,
   route,

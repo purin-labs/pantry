@@ -3,13 +3,13 @@ import type {
   CommerceBuyerCheckoutIdentityV1,
   CommerceCheckoutBuyerAuthorityV1,
   CommerceMutationErrorV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   Cart,
   Checkout,
   CheckoutFulfillmentQuoteSnapshot,
   Storefront,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { protectBuyerContact } from "../../buyer-contact.ts";
 import type { CheckoutTaxHealthBinding } from "../../regional-shipping.ts";
 import type {
@@ -17,7 +17,7 @@ import type {
   BuyerShippingCheckoutCommand,
 } from "../checkout-planning.ts";
 import { sha256 } from "../checkout-shared.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { buyerCartMatchesClaims } from "./carts.ts";
 import { retainedBuyerContactAuthority } from "./placements.ts";
 import type {

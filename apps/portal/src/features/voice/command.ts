@@ -5,8 +5,8 @@ import {
   VOICE_ENGINES,
   type VoiceEngineId,
   type VoiceRefusalCode,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 const SAMPLE_RATE = 16_000;
 

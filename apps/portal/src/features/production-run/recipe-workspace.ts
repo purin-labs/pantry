@@ -1,14 +1,14 @@
 import {
   parseWorkflowDocument,
   type BakeryWorkflowDocument,
-} from "@seams/bakery-workflow";
-import type { ProposalChangeSummary } from "@seams/bakery-workflow/changes";
+} from "@purin-labs/bakery-workflow";
+import type { ProposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
 import {
   parseRunFindings,
   type RunFinding,
-} from "@seams/bakery-workflow/findings";
-import { canonicalJson, isRecord, sha256Hex } from "@seams/std";
-import type { CompiledScenario } from "@seams/production-simulation";
+} from "@purin-labs/bakery-workflow/findings";
+import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
+import type { CompiledScenario } from "@purin-labs/production-simulation";
 import React from "react";
 import { controlRead, ControlApiError } from "../../control-client";
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api";

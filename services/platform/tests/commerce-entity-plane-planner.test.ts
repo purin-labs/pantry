@@ -3,7 +3,7 @@ import {
   parseCommerceGraphQuery,
   parseEntityPlaneCapabilityMetadataResponse,
   parseCommerceSnapshotRevision,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { planSafeCommerceQuery } from "../src/commerce/entity-plane/planner";
 

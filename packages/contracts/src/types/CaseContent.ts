@@ -1,6 +1,6 @@
 import type { ArtifactRef } from "./ArtifactRef";
-import type { CommerceEntityPlaneProposal } from "@seams/commerce-contracts";
-import type { SourceProvenance } from "@seams/commerce-contracts";
+import type { CommerceEntityPlaneProposal } from "@purin-labs/commerce-contracts";
+import type { SourceProvenance } from "@purin-labs/commerce-contracts";
 import type { UserMessage } from "./UserMessage";
 
 export type CaseContent =

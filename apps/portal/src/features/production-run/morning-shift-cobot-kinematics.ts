@@ -2,9 +2,9 @@ import type {
   CompiledScenario,
   LogisticsView,
   TaskView,
-} from "@seams/production-simulation";
-import type { OvenLiveFrame } from "@seams/production-simulation/runs/oven-live-physics";
-import { fr10WristIk } from "@seams/production-simulation/kinematics/fr10";
+} from "@purin-labs/production-simulation";
+import type { OvenLiveFrame } from "@purin-labs/production-simulation/runs/oven-live-physics";
+import { fr10WristIk } from "@purin-labs/production-simulation/kinematics/fr10";
 import type { SynchronizedCobotTransferState } from "./morning-shift-appliances";
 
 export type BaseCobotTransferEntry = Omit<

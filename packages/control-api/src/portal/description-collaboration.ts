@@ -2,15 +2,15 @@ import type {
   ProductDescriptionPresenceSelection,
   ProductDescriptionStateVector,
   ProductDescriptionUpdate,
-} from "@seams/product-description-crdt";
+} from "@purin-labs/product-description-crdt";
 import {
   parseDraftServerMessage,
   type DraftFailureCode,
   type DraftServerMessage,
   type ProductDescriptionRoomMetadata,
-} from "@seams/product-description-crdt/protocol";
+} from "@purin-labs/product-description-crdt/protocol";
 import type { TextCollaborationServerMessage } from "./text-collaboration.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export function parseDescriptionServerMessage(frame: unknown) {
   const parsed = parseDraftServerMessage(frame);

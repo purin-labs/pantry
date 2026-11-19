@@ -13,7 +13,7 @@ import {
   runInDurableObject,
   waitOnExecutionContext,
 } from "cloudflare:test";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import type { Env } from "../../src/env";
 import gateway from "../../src/integration-gateway";

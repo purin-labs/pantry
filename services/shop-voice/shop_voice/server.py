@@ -1,7 +1,7 @@
 """POST /transcriptions, POST /speech and GET /health over HTTPS, from the Portal's origin only.
 
 No audio goes to disk. No transcript or answer goes to a log or to the Platform: only the Portal
-receives it. The shapes are in @seams/control-api: voiceMacHealthSchema, voiceTranscriptionSchema
+receives it. The shapes are in @purin-labs/control-api: voiceMacHealthSchema, voiceTranscriptionSchema
 and voiceMacRefusalSchema. A spoken answer is a WAV file. The health and transcription answers name
 the speech engine (Plan 82C).
 """

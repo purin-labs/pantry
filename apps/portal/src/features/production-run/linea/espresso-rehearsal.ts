@@ -1,6 +1,6 @@
-import { applianceVisual } from "@seams/production-simulation/simulator/appliance-runtime";
+import { applianceVisual } from "@purin-labs/production-simulation/simulator/appliance-runtime";
 import { EspressoScene } from "./espresso-scene";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   controlRead,
   controlMutation,
@@ -20,7 +20,7 @@ import {
   prepareEspressoRun,
   type EspressoTelemetry,
   type SavedEspressoRun,
-} from "@seams/bakery-model/espresso-rehearsal-file";
+} from "@purin-labs/bakery-model/espresso-rehearsal-file";
 import {
   freshApplianceRequest,
   type ApplianceAction,
@@ -29,7 +29,7 @@ import {
   type EspressoGroup,
   type EspressoOutlet,
   type EspressoDoseSlot,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import { EngineJobs, type JobProgress } from "../engine-jobs";
 import "./linea-rehearsal.css";
 

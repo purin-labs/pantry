@@ -1,4 +1,4 @@
-import { isPositiveInteger, isRecord } from "@seams/std";
+import { isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type AiBudgetLimits = Readonly<{
   maxTokens: number;

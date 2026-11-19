@@ -21,7 +21,7 @@ import {
   parsePricedOffers,
   type OfferPriceAllowanceView,
   type PricedOffer,
-} from "@seams/control-api/portal/price-allowance";
+} from "@purin-labs/control-api/portal/price-allowance";
 
 const ORGANISATION = "organisation_price_allowance";
 

@@ -1,4 +1,4 @@
-import type { CaseBinding } from "@seams/contracts";
+import type { CaseBinding } from "@purin-labs/contracts";
 import type { Env } from "../env";
 import {
   parseCaseId,

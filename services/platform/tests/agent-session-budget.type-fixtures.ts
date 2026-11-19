@@ -1,4 +1,4 @@
-import type { RunBudgetReservationState } from "@seams/contracts";
+import type { RunBudgetReservationState } from "@purin-labs/contracts";
 
 // @ts-expect-error Indeterminate reservations must preserve the reason for uncertainty.
 const invalidIndeterminateReservation: RunBudgetReservationState = {

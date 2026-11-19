@@ -12,7 +12,7 @@ import { env, exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import {

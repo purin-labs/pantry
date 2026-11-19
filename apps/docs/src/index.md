@@ -67,11 +67,11 @@ corepack enable
 pnpm install
 cargo check --workspace
 pnpm portal:build
-pnpm --filter @seams/docs dev
+pnpm --filter @purin-labs/docs dev
 ```
 
 The docs site runs at `http://docs.localhost:3005`. To start the platform and its
-local resources, use `pnpm --filter @seams/platform dev` in another terminal. The
+local resources, use `pnpm --filter @purin-labs/platform dev` in another terminal. The
 full local surface is described in [Local development](/operate/local-development).
 
 ## Current product boundary

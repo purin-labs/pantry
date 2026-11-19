@@ -1,13 +1,13 @@
-import { parseSettings, type Settings } from "@seams/bakery-model/bakery";
+import { parseSettings, type Settings } from "@purin-labs/bakery-model/bakery";
 import {
   parsePhysicsReplay,
   type PhysicsRackSequence,
   type PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import type {
   BakeryRehearsalExample,
   BakeryRehearsalPreset,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import {
   acceptProductionRecording,
   compileRehearsalWorkcells,

@@ -4,17 +4,17 @@ import type {
   Settings,
   SettingsField,
   StationId,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import type React from "react";
-import type { PhysicsReplay } from "@seams/bakery-model/bakery-physics";
-import type { RecordingNavigation } from "@seams/production-simulation/simulator/playback-state";
+import type { PhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
+import type { RecordingNavigation } from "@purin-labs/production-simulation/simulator/playback-state";
 
-import type { DemoPreset } from "@seams/production-simulation/simulator/demo";
+import type { DemoPreset } from "@purin-labs/production-simulation/simulator/demo";
 import type {
   Interval,
   ScheduleVariant,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import type { Selection } from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type { Selection } from "@purin-labs/production-simulation/simulator/selection";
 import type { SceneLabelMode } from "./simulator-state";
 import type { SimulatorDock as Dock } from "./simulator-state";
 

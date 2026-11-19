@@ -1,7 +1,7 @@
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 import type { ContextVisibility } from "../../authorization/access-grants/types";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 export function sourceReaderForAuthority(
   authority: RequestAuthority,
 ): ContextVisibility {

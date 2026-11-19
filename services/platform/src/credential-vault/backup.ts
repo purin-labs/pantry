@@ -21,7 +21,7 @@ import type { Result } from "../result";
 import type { VaultHandle, VaultResolveError } from "./domain";
 import type { CredentialVaultBindings, VaultKeyVersion } from "./keyring";
 import { resolveVaultHandle } from "./service";
-import { isRecord, isString, sha256Hex } from "@seams/std";
+import { isRecord, isString, sha256Hex } from "@purin-labs/std";
 
 export const VAULT_BACKUP_SCHEMA_VERSION = "satyr.vault-backup.v1";
 

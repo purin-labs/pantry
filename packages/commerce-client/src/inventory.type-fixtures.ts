@@ -1,6 +1,6 @@
 import type { ReconcileCommerceInventoryV1 } from "./admin-client.ts";
 import type { CommerceInventoryReceiptPurchase } from "./commerce-resources.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const count: Variant<ReconcileCommerceInventoryV1["change"], "count">;
 

@@ -9,9 +9,9 @@ import {
   type OrganisationPlacement,
 } from "../placement";
 import type { Result } from "../result";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import type { QuerySource } from "./query-source";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 export const ORGANISATION_RELOCATION_PUBLICATION_BUDGET_MS = 5 * 60 * 1_000;
 

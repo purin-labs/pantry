@@ -13,17 +13,17 @@ import type {
   CommerceReadWatermark,
   SystemCommerceEntityKind,
   SourceProvenance,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   CommerceEntityPlaneClient,
   parseCommerceGraphQuery,
   parseCommerceSnapshotRevision,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { createCommerceProjectionSchema } from "../src/actors/commerce-projection";
 import { OrganisationDO } from "../src/actors/organisation";
 import { materializeCommerceRelationText } from "../src/actors/commerce-query-schema";
-import { compileCommerceQuerySql } from "@seams/commerce-query-sqlite";
+import { compileCommerceQuerySql } from "@purin-labs/commerce-query-sqlite";
 import {
   NORMALIZED_CONFORMANCE_CASES,
   NORMALIZED_CONFORMANCE_EDGES,
@@ -32,7 +32,7 @@ import {
   NORMALIZED_CONFORMANCE_ROWS,
   normalizedConformancePlanInput,
   type NormalizedConformanceRow,
-} from "@seams/commerce-query-sqlite/normalized-conformance";
+} from "@purin-labs/commerce-query-sqlite/normalized-conformance";
 import { buildSavedSelectorCommerceReadAuthority } from "../src/commerce/entity-plane/authority";
 import {
   BlotterSource,

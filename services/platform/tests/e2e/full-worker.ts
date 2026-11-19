@@ -1,10 +1,10 @@
-import { isRecord } from "@seams/std";
-import { createCancellableTask } from "@seams/async-control/cancellable-task";
-import { runTaskBeforeDeadline } from "@seams/async-control/deadline";
+import { isRecord } from "@purin-labs/std";
+import { createCancellableTask } from "@purin-labs/async-control/cancellable-task";
+import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
 import { seedMerchantFixture } from "./merchant-fixture";
 import { restoreSessionTurnContext } from "../../src/actors/actor-journal";
 import { DurableObject } from "cloudflare:workers";
-import { newConversationId } from "@seams/control-api";
+import { newConversationId } from "@purin-labs/control-api";
 import gateway from "../../src/integration-gateway";
 import type { Env } from "../../src/env";
 import { CaseDO } from "../../src/actors/case";

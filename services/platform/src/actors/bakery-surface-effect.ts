@@ -2,10 +2,10 @@ import type { OrganisationDatabase } from "../database-handles";
 import {
   isRehearsalChange,
   quarterTurnDegrees,
-} from "@seams/bakery-model/bakery-surface";
-import { canonicalJson, assertNever } from "@seams/std";
-import type { SurfacePageCommandV1 } from "@seams/control-api";
-import type { HarnessTurnLease } from "@seams/contracts";
+} from "@purin-labs/bakery-model/bakery-surface";
+import { canonicalJson, assertNever } from "@purin-labs/std";
+import type { SurfacePageCommandV1 } from "@purin-labs/control-api";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
   createBakerySurfaceEffect,
   bakeryEffectDeliveryTarget,
@@ -26,14 +26,14 @@ import {
   type BakeryRehearsalEdit,
   type BakeryStoreInteriorAction,
   type BakerySurfaceStoreInterior,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { newRequestId, type OrganisationId } from "../ids";
 import {
   parsePersistedHarnessTurnLease,
   preflightHarnessTurnLease,
   preflightHarnessTurnLeaseInTransaction,
 } from "./agent-session-harness-authority";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   hasExactKeys,
   isNonEmptyString,
@@ -41,7 +41,7 @@ import {
   parseJsonOrNull,
   sameJson,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
 import { traceWarn } from "../observability";
 
@@ -578,7 +578,7 @@ export async function listPendingBakerySurfaceEffects(input: {
   readonly db: OrganisationDatabase;
   readonly organisationId: OrganisationId;
   readonly userId: string;
-  readonly browserBinding: import("@seams/bakery-model/bakery-context").BakeryBrowserBinding;
+  readonly browserBinding: import("@purin-labs/bakery-model/bakery-context").BakeryBrowserBinding;
   readonly now?: number;
 }): Promise<readonly PendingBakerySurfaceEffect[]> {
   const now = input.now ?? Date.now();

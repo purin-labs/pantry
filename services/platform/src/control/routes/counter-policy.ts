@@ -1,4 +1,4 @@
-import type { CommerceClientError } from "@seams/commerce-client";
+import type { CommerceClientError } from "@purin-labs/commerce-client";
 
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";
@@ -11,7 +11,7 @@ import {
   type JsonRecord,
 } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The policy a counter sells under.

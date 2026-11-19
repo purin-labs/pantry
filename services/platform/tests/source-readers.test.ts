@@ -1,8 +1,8 @@
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import { sourceReaderForAuthority } from "../src/policy/information-flow/source-readers";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 describe("information-flow source readers", function sourceReaderSuite() {
   it("binds direct and control ingress to the exact requester", function exactPersonReaders() {

@@ -4,7 +4,7 @@ import type {
   LabCatalogOptionV1,
   LabEventEnvelopeV1,
   LabEventV1,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   COMMERCE_LAB_CATALOG_VERSION,
@@ -59,8 +59,8 @@ import {
 } from "../ids";
 import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
 import { ensureCreatedOrganisationActor } from "../control/organisation-runtime";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 
 type CommerceLabRoute =
   | {

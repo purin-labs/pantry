@@ -7,16 +7,16 @@ import type {
   CommerceQueryPlanOutcome,
   CommerceReadWatermark,
   SystemCommerceEntityKind,
-} from "@seams/contracts";
-import { parseCommerceMerchantId } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import { parseCommerceMerchantId } from "@purin-labs/commerce-client";
 
 import {
   planCommerceGraphQuery,
   type CommerceWasmError,
 } from "../commerce-wasm";
 import type { Result } from "../../result";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type CommerceSafeQueryError = Readonly<{
   code: "commerce_query_surface_unsupported";

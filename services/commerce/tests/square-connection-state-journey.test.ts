@@ -9,7 +9,7 @@
 // removal, and no later call sends the dead token. Set
 // SQUARE_CONNECTION_STATE_ARTIFACT_DIR to keep the evidence; it repeats byte
 // for byte.
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { expect, it } from "vitest";
 
 import {

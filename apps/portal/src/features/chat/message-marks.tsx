@@ -1,8 +1,8 @@
 import React from "react";
-import type { ChatTimelineView } from "@seams/control-api/portal/chat";
+import type { ChatTimelineView } from "@purin-labs/control-api/portal/chat";
 import { VoiceMessageMark } from "../voice/control";
 import "./screen-chip.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type UserEvent = Variant<ChatTimelineView, "user">;
 

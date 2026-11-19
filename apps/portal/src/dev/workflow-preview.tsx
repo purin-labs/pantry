@@ -1,4 +1,4 @@
-import { isUserId } from "@seams/control-api";
+import { isUserId } from "@purin-labs/control-api";
 import { UserPreferencesProvider } from "../preferences/context";
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -16,7 +16,7 @@ import WorkflowSimulatorRoute from "../features/workflow-simulator/route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
 import { UNAVAILABLE_ACCESS } from "./unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
-import { showPhysicsEvidence } from "@seams/production-simulation/runs/physics-evidence";
+import { showPhysicsEvidence } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "../styles.css";
 import "./workflow-preview.css";
 

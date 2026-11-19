@@ -1,4 +1,4 @@
-import type { CheckoutProfileConfiguration } from "@seams/contracts";
+import type { CheckoutProfileConfiguration } from "@purin-labs/contracts";
 import { CreditCard, ShoppingBag, Truck, UserRound } from "lucide-react";
 import React from "react";
 import { refundGovernanceDescription } from "./model";

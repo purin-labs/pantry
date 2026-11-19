@@ -1,8 +1,8 @@
 import {
   COSTS_VIEW_COMMANDS,
   type CostsViewCommand,
-} from "@seams/control-api";
-import type { CostsSheetTab } from "@seams/costs-sheet-crdt";
+} from "@purin-labs/control-api";
+import type { CostsSheetTab } from "@purin-labs/costs-sheet-crdt";
 
 /**
  * The agent's view commands on Costs & margins (Plan 87 phase 4). Each one

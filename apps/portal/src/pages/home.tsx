@@ -1,16 +1,16 @@
 import React from "react";
 import { Link } from "react-router";
 
-import type { HomeSnapshot } from "@seams/control-api/portal/home";
+import type { HomeSnapshot } from "@purin-labs/control-api/portal/home";
 import { isHomeDestination } from "../home";
-import { parseHomeResponse } from "@seams/control-api/portal/home";
+import { parseHomeResponse } from "@purin-labs/control-api/portal/home";
 import {
   ControlApiError,
   controlRead,
   lastControlRead,
 } from "../control-client";
 import { homePath } from "../control-paths";
-import type { ControlErrorKind } from "@seams/control-api/portal/errors";
+import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
 import type { PageContent } from "../page-content";
 import {
   EmptyState,
@@ -23,15 +23,15 @@ import {
   readCommerceHomeAggregations,
   type CommerceHomeAggregation,
 } from "../features/commerce";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import type {
   HomeAttentionItem,
   HomeAvailableAction,
   HomeBlocker,
   HomeDestination,
   HomeSourceObservation,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export function HomePage(props: {
   readonly organisationId: string;

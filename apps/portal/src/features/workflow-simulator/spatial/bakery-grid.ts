@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { bakeryGrid } from "@seams/production-simulation/floor/bakery-room";
+import { bakeryGrid } from "@purin-labs/production-simulation/floor/bakery-room";
 
 export function createBakeryGrid(): THREE.GridHelper {
   const size = 12;

@@ -7,15 +7,15 @@ import {
   resolveApplianceRotation,
   type ResolvedApplianceMove,
   type Box2D,
-} from "@seams/production-simulation/floor/collisions";
+} from "@purin-labs/production-simulation/floor/collisions";
 import {
   doorOpening,
   doorObstacleBoxes,
   doorThresholdWaypoints,
   isDoorOpen,
-} from "@seams/production-simulation/floor/openings";
+} from "@purin-labs/production-simulation/floor/openings";
 import { floorPlanWorkspace } from "./floor-plan-workspace";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   distance,
   staffRoleProfileFor,
@@ -23,8 +23,8 @@ import {
   type KitchenZoneId,
   type ScheduleSpatialLayout,
   type Station,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import { BAKERY_FLOOR_PLANS, type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { BAKERY_FLOOR_PLANS, type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import type { FactoryStationSource } from "./spatial/factory-stations";
 
 type StationId = Station["id"];
@@ -35,7 +35,7 @@ import {
   isApplianceId,
   type ApplianceId,
   type AppliancePose,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 
 const HALF_PI = Math.PI / 2;
 

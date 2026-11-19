@@ -186,7 +186,7 @@ shop devices, with gateway enrollment, health, alerts and device access, and it
 gives Plan 24 its enrollment record. A shop gateway dials out from
 `crates/shop-gateway`; `DeviceFleetActor` holds its socket.
 [Plan 86](docs/plan-86-bakery-costs-and-margins.md) owns Costs & margins in
-Kitchen: one shared workbook (`@seams/costs-sheet-crdt`) for supplier
+Kitchen: one shared workbook (`@purin-labs/costs-sheet-crdt`) for supplier
 pack prices, 7-day volume tiers, lot costs from purchase invoices (`FIFO` and
 weighted average), weekday and weekend demand, fixed overhead, two-way `fx`
 formulas and product margins, with live multiplayer and chat agent tools.
@@ -242,7 +242,7 @@ name in a plan or in a stored value, use this table to find the new name.
 
 | Old name                                                   | New display name                                                                        | The old name stays in                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ---------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Satyr, the product                                         | Seams Pantry, then Pantry                                                               | Code until the codemod: `satyr` and `Satyr*` identifiers, `@seams/*` packages, `.satyr-*` CSS classes, the `satyr-edge` package name. Deployed: the Workers `satyr-edge`, `satyr-model-exit`, `satyr-chatgpt-exit`, `satyr-code-mode-sandbox` and `satyr-vault-onepassword`, the R2 bucket `satyr-repo-binaries-apac`, the launchd label `sh.seams.satyr.*` (`SATYR_*` variables are now `PANTRY_*`). Wire: the cookie `satyr_control_session`, the `satyr:*` keys, the `x-satyr-*` headers |
+| Satyr, the product                                         | Seams Pantry, then Pantry                                                               | Code until the codemod: `satyr` and `Satyr*` identifiers, `@purin-labs/*` packages, `.satyr-*` CSS classes, the `satyr-edge` package name. Deployed: the Workers `satyr-edge`, `satyr-model-exit`, `satyr-chatgpt-exit`, `satyr-code-mode-sandbox` and `satyr-vault-onepassword`, the R2 bucket `satyr-repo-binaries-apac`, the launchd label `sh.seams.satyr.*` (`SATYR_*` variables are now `PANTRY_*`). Wire: the cookie `satyr_control_session`, the `satyr:*` keys, the `x-satyr-*` headers |
 | Satyr, the company, the maker or the party that keeps data | Seams                                                                                   | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Satyr, the agent                                           | Sous Chef                                                                               | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Satyr Agents                                               | Seams Pantry                                                                            | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -250,7 +250,7 @@ name in a plan or in a stored value, use this table to find the new name.
 | Satyr Kitchen, BakeryOS                                    | Kitchen; "Kitchen in Seams Pantry" where the product is needed                          | Wire: the value `"BakeryOS"` and `area: "BakeryOS"`. Code name after the codemod: `kitchen`                                                                                                                                                                                                                                                                                                                                                                                 |
 | AgentCommerce                                              | Commerce, the switcher area                                                             | Wire: the value `"AgentCommerce"`. Code name after the codemod: `commerce`                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Satyr Commerce                                             | Seams Checkout                                                                          | Wire: the provider id `satyr_commerce`. Code name after the codemod: `builtInCommerce`                                                                                                                                                                                                                                                                                                                                                                                      |
-| Underclerk                                                 | No display name: "the commerce engine", or Seams Checkout for the built-in checkout     | Code until the codemod: `services/commerce`, `@seams/commerce-contracts`, `@seams/commerce-client`, `pnpm lint:commerce-spec`. Deployed: the Worker `underclerk` and the `Underclerk*DO` classes. Wire: the event kinds `underclerk.*.v1`                                                                                                                                                                                                                                   |
+| Underclerk                                                 | No display name: "the commerce engine", or Seams Checkout for the built-in checkout     | Code until the codemod: `services/commerce`, `@purin-labs/commerce-contracts`, `@purin-labs/commerce-client`, `pnpm lint:commerce-spec`. Deployed: the Worker `underclerk` and the `Underclerk*DO` classes. Wire: the event kinds `underclerk.*.v1`                                                                                                                                                                                                                                   |
 | Urk                                                        | Sous Chef                                                                               | Code until the codemod: `urk-*.ts` and `URK_*` (then `merchant-agent-*` and `MERCHANT_AGENT_*`). Stored agent rows with the name "Urk" change one time to "Sous Chef"                                                                                                                                                                                                                                                                                                       |
 | Satyr Vault                                                | Seams Vault                                                                             | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Satyr identity, Satyr's AI, Jev from Satyr                 | Seams Pay (payment approvals only), Seams AI, Jev from Seams                            | Plan file names                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -301,7 +301,7 @@ KV write and each R2 write.
   changes, and it fails above the budget in the file. To raise a budget line,
   write its reason and its cost beside it. Run the journey after a change to a
   cron, an alarm, a poll or a Durable Object constructor:
-  `pnpm --filter @seams/platform test:e2e tests/e2e/idle-tenant-cost.test.ts`
+  `pnpm --filter @purin-labs/platform test:e2e tests/e2e/idle-tenant-cost.test.ts`
 - Delete a test Worker and its Durable Objects when the test ends. Forgotten
   load-test Workers were a third of the Durable Object bill in November 2026.
 - To measure production, read `rowsWritten` in the GraphQL Analytics datasets
@@ -333,9 +333,9 @@ Satyr’s production runtime is Cloudflare-native:
   host. Never patch `globalThis.fetch`. The OpenRouter route stays direct.
 - `crates/workspace-executor` and `services/workspace-executor` provide the
   on-demand heavy execution boundary.
-- `packages/commerce-contracts` (`@seams/commerce-contracts`) owns the
+- `packages/commerce-contracts` (`@purin-labs/commerce-contracts`) owns the
   provider-neutral commerce contracts as TypeBox schemas and their parsers.
-  `packages/contracts` (`@seams/contracts`) owns Satyr's contracts and
+  `packages/contracts` (`@purin-labs/contracts`) owns Satyr's contracts and
   re-exports the commerce ones.
 
 The deployed Worker remains named `satyr-edge` so its production hostname and
@@ -345,7 +345,7 @@ OAuth callbacks remain stable. “Platform” is the source ownership boundary.
 
 Underclerk owns commerce transactions in `services/commerce`. Its contracts
 live in `packages/commerce-contracts` and its typed client in
-`packages/commerce-client` (`@seams/commerce-client`). Underclerk code
+`packages/commerce-client` (`@purin-labs/commerce-client`). Underclerk code
 imports no Satyr package, and Satyr code reaches Underclerk only through those
 packages or the built Worker; `pnpm lint:runtime-boundary` refuses a new
 crossing. Platform code in `actors/`, `slack/` and `chat/` imports no
@@ -426,11 +426,10 @@ Contracts are TypeBox 1.x schemas with `Value` checks (Plan 78); no contract
 remains in Rust. Add each new contract type or lifecycle to its owning
 TypeScript package. See `docs/plan-78-contracts-in-typescript.md`.
 See [`docs/commerce-monorepo.md`](docs/commerce-monorepo.md). Reach for the
-shared helpers before writing a local copy: `@seams/std` for value guards,
-`assertNever`, encoding, SHA-256 and canonical JSON; `@seams/type-utils`
-for `Variant`, `VariantBy` and `StrictUnion`; `@seams/control-api` for shapes
-the portal and the platform exchange. Satyr code may keep the `@seams/std` and
-`@seams/type-utils` names, which re-export the same helpers.
+shared helpers before writing a local copy: `@purin-labs/std` for value guards,
+`assertNever`, encoding, SHA-256 and canonical JSON; `@purin-labs/type-utils`
+for `Variant`, `VariantBy` and `StrictUnion`; `@purin-labs/control-api` for shapes
+the portal and the platform exchange.
 
 Source-derived model and user-visible content must use the established live
 authorization and IFC boundaries, including titles, previews, errors and replay.
@@ -480,13 +479,13 @@ pnpm portal:build
 Run the Worker locally:
 
 ```bash
-pnpm --filter @seams/platform dev
+pnpm --filter @purin-labs/platform dev
 ```
 
 Apply local D1 migrations when a change requires persistence:
 
 ```bash
-pnpm --filter @seams/platform d1:migrate:local
+pnpm --filter @purin-labs/platform d1:migrate:local
 ```
 
 ## Testing
@@ -532,9 +531,9 @@ What makes a test worth keeping:
 Run the narrowest relevant checks first:
 
 ```bash
-pnpm --filter @seams/platform check:types
-pnpm --filter @seams/platform check:test-types
-pnpm --filter @seams/platform test
+pnpm --filter @purin-labs/platform check:types
+pnpm --filter @purin-labs/platform check:test-types
+pnpm --filter @purin-labs/platform test
 pnpm check:packages
 pnpm test:units
 pnpm portal:build
@@ -546,7 +545,7 @@ git diff --check
 the storefront. `pnpm test:units` runs the Platform unit suite, the Portal,
 storefront and package suites and the Worker environment test. CI runs both.
 In a new worktree, `pnpm test:units` needs the R2 files, `pnpm
-async-control:build`, `pnpm --filter @seams/platform contracts:media` and
+async-control:build`, `pnpm --filter @purin-labs/platform contracts:media` and
 `PANTRY_ACCOUNT_WORKER_ARTIFACT`, the path of the built account Worker.
 
 Before a release that changes Slack ingress, model routes or Slack delivery,
@@ -554,19 +553,19 @@ run the live Slack journey against the deployed Worker. It needs a human user
 token, the channel and the app user ID (see the script header):
 
 ```bash
-pnpm --filter @seams/platform slack:live-reply
+pnpm --filter @purin-labs/platform slack:live-reply
 ```
 
 Onboarding and lifecycle changes must include:
 
 ```bash
-pnpm --filter @seams/platform test:onboarding-closure
+pnpm --filter @purin-labs/platform test:onboarding-closure
 ```
 
 Commerce lifecycle changes must include:
 
 ```bash
-pnpm --filter @seams/platform test:commerce-lab
+pnpm --filter @purin-labs/platform test:commerce-lab
 pnpm lab:reset
 pnpm lab:seed
 pnpm lab:scenario
@@ -594,7 +593,7 @@ Production deploys use the platform package, after the fetch of the R2 files
 
 ```bash
 node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics
-pnpm --filter @seams/platform run deploy
+pnpm --filter @purin-labs/platform run deploy
 ```
 
 That command builds the contracts and portal. It then deploys six Workers in
@@ -632,7 +631,7 @@ the two baselines. A change to a global or
 regional baseline ships with a patch script in `services/platform/scripts/`
 that names each table, index or trigger that it adds, alters or removes;
 `pnpm lint:d1-patch` refuses a change without one. Apply the patch to each
-bound database before the release. `pnpm --filter @seams/platform d1:schema:remote:check`
+bound database before the release. `pnpm --filter @purin-labs/platform d1:schema:remote:check`
 (and `node scripts/run-worker.mjs platform schema local`) compares every bound
 database with its baseline and names what is missing. The same check fails when an
 Organisation lacks a policy row for a catalogue capability: apply

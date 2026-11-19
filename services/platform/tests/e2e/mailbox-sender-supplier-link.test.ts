@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
-import { encodeBase64Url, isRecord } from "@seams/std";
+import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import { resolveActiveCaseActor } from "../../src/actors/actor-router";
 import { nextEmailCorrectionLearningAt } from "../../src/actors/connector-email";
 import { parseCaseId, type OrganisationId } from "../../src/ids";

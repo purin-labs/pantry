@@ -14,7 +14,7 @@ import {
   workspaceAccessSubviewPath,
   workspacePagePath,
 } from "../../route";
-import type { WhatsAppPolicyDraft, WhatsAppSurface } from "@seams/control-api/portal/whatsapp";
+import type { WhatsAppPolicyDraft, WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppPanelActions } from "../../pages/whatsapp";
 import { MutationLedger } from "../../mutation-state";
 import {
@@ -23,7 +23,7 @@ import {
   type IntegrationRouteSelection,
 } from "./model";
 import { ConnectConsentDialog } from "./connect-consent-dialog";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   type GmailIntegrationPanelProps,
   gmailMailboxEntries,
@@ -79,7 +79,7 @@ import type {
 } from "./settings-types";
 import { providerAttemptDiagnostics } from "./setup";
 import { WorkspaceSettingsPage } from "./workspace";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 // The platform tests import these through this JSX module.
 export { autoSyncCommerce } from "./commerce-system";

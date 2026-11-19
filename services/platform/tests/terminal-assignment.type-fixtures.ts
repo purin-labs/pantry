@@ -3,7 +3,7 @@ import type {
   TerminalPairingAttemptState,
   TerminalPaymentObservation,
   TerminalTarget,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 const account = {
   integrationAccountId: "integration_square_fixture",

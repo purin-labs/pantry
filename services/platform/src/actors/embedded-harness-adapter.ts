@@ -1,5 +1,5 @@
 import type { EmbeddedHarnessAdapter } from "./embedded-harness";
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import {
   isOrganisationAnthropicModel,
   isOrganisationCodexModel,

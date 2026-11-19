@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /**
  * The reads that a permission request can include: every record of a system

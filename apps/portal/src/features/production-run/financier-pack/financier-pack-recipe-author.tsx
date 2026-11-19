@@ -5,7 +5,7 @@ import {
   type FinancierPackCheck,
   type FinancierPackLoadPreset,
   type FinancierPackRecipeConfig,
-} from "@seams/production-simulation/recipes/financier-pack/model";
+} from "@purin-labs/production-simulation/recipes/financier-pack/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{

@@ -1,4 +1,4 @@
-import { sameJson } from "@seams/std";
+import { sameJson } from "@purin-labs/std";
 import { sameSlot, slotAfter } from "./engine-carriers.ts";
 import { freeze, held, thaw, type Draft } from "./engine-draft.ts";
 import { advanceRun, completionFits } from "./engine.ts";

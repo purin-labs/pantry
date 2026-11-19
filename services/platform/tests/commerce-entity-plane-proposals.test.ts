@@ -4,7 +4,7 @@ import {
   parseCommerceEntityPlaneEffect,
   parseCommerceEntityPlaneProposal,
 } from "../src/commerce/entity-plane/proposals";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type ProposalKind =
   | "patch_custom_entity"

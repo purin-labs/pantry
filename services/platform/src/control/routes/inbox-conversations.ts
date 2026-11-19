@@ -4,7 +4,7 @@ import {
   type InboxConversations,
   type InboxUnansweredThread,
   type InboxWhatsAppConversation,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
 import {
   readEmailMailboxAccount,

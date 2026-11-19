@@ -1,4 +1,4 @@
-import { isUserId } from "@seams/control-api";
+import { isUserId } from "@purin-labs/control-api";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router";

@@ -34,7 +34,7 @@ The local suites exercise the adapter and authority invariants without provider
 credentials:
 
 ```bash
-pnpm --filter @seams/platform exec vitest run \
+pnpm --filter @purin-labs/platform exec vitest run \
   tests/payment-adapters.test.ts \
   tests/cafe-payment-service.test.ts \
   tests/cafe-in-person-payment-service.test.ts \
@@ -65,7 +65,7 @@ same ID when recovering an interrupted run. Every request is restricted to the
 Square sandbox origin, and the account must contain an active Japan/JPY location.
 
 ```sh
-pnpm --filter @seams/platform exec esbuild ../../scripts/lab/square-terminal-sandbox.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-square-sandbox.mjs
+pnpm --filter @purin-labs/platform exec esbuild ../../scripts/lab/square-terminal-sandbox.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-square-sandbox.mjs
 node --env-file=.env.local /tmp/satyr-square-sandbox.mjs your-run-id
 ```
 

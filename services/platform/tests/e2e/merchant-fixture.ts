@@ -1,4 +1,4 @@
-import { CommerceAdminClient } from "@seams/commerce-client";
+import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import type { Env } from "../../src/env";
 import type { OrganisationId, UserId } from "../../src/ids";
 import {

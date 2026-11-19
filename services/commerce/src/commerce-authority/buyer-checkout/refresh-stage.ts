@@ -6,14 +6,14 @@ import {
   type CommerceInventoryPositionV1,
   type CommerceMutationErrorV1,
   checkoutOnlineSource,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type Cart,
   type Checkout,
   type InventoryAllocation,
   type Storefront,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { buyerSessionDigest } from "../../buyer-session.ts";
 import {
   readCart,

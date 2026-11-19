@@ -33,7 +33,7 @@ import type {
   OrganisationBootstrapReservation,
   OrganisationEnvironment,
 } from "../control-plane";
-import { assertNever, isNonNegativeInteger } from "@seams/std";
+import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 import {
   abandonedMoveRecoversSql,
   preparePlacementMovePublication,

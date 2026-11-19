@@ -6,7 +6,7 @@ import type {
   DeviceList,
   DeviceSnapshotList,
   KitchenDeviceView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import "../styles.css";
 import { DevicesRoute } from "../features/devices/route";
 

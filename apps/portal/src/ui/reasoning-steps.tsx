@@ -1,7 +1,7 @@
 import React from "react";
 import { Check, Circle, CircleAlert, Pause, X } from "lucide-react";
 import "./agent-components.css";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   Trace,
   TraceCollapsible,

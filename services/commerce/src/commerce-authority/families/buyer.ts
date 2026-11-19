@@ -7,7 +7,7 @@ import {
   type CommerceBuyerQuotedShippingCheckoutV1,
   type ReconcileCommerceBuyerPaymentV1,
   type CommerceBuyerOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { BuyerCheckoutAuthority } from "../buyer-checkout.ts";
 import type {
   BuyerCartMutation,
@@ -23,7 +23,7 @@ import type {
   BuyerShippingCheckoutCreation,
   BuyerStorefrontContext,
 } from "../buyer-checkout/types.ts";
-import type { CommerceUnplacedCapturesV1 } from "@seams/commerce-contracts/records/api-unplaced-captures";
+import type { CommerceUnplacedCapturesV1 } from "@purin-labs/commerce-contracts/records/api-unplaced-captures";
 import {
   listUnplacedCaptures,
   resolveUnplacedCapture,

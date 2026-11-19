@@ -24,8 +24,8 @@ import {
 } from "../organisation-execution-scope";
 import { parseOrganisationPlacement } from "../placement";
 import { parseOrganisationId } from "../ids";
-import { assertNever } from "@seams/std";
-import type { StrictUnion, VariantBy } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion, VariantBy } from "@purin-labs/type-utils";
 import type { Result } from "../result";
 
 type ActivationRow = Record<string, SqlStorageValue> & {

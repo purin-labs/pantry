@@ -1,4 +1,4 @@
-import type { BakeryFloorPlanSpec } from "@seams/production-simulation/floor/bakery-room";
+import type { BakeryFloorPlanSpec } from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   doorOpening,
   windowOpening,
@@ -7,7 +7,7 @@ import {
   windowSashGeometry,
   windowSashRotation,
   type FloorPlanOpening,
-} from "@seams/production-simulation/floor/openings";
+} from "@purin-labs/production-simulation/floor/openings";
 import type { FloorPlanWorkspace } from "../floor-plan-workspace";
 
 type OpeningElement = Readonly<{

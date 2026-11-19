@@ -6,14 +6,14 @@ import {
   parseReplaceCheckoutProfileDraftCommand,
   parseRetireCheckoutProfileCommand,
   type PublishCommercePointOfSaleConfigurationV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { CommerceAuthority } from "../../commerce-authority.ts";
 import type {
   CheckoutProfileRoute,
   PointOfSaleConfigurationRoute,
 } from "../../http-routes.ts";
 import type { CheckoutProfileCommandResult } from "../../checkout-profile-service.ts";
-import { assertNever, errorMessage } from "@seams/std";
+import { assertNever, errorMessage } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";

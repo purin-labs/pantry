@@ -11,7 +11,7 @@ import {
   CommerceAdminClient,
   type CommerceClientResult,
   type CommercePluginPreviewV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

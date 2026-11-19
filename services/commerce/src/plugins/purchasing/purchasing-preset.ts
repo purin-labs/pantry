@@ -16,7 +16,7 @@ import {
   SUPPLIERS_VIEW_ID,
   SUPPLY_COST_TERMS_LIST_ID,
   SUPPLY_COST_TERMS_VIEW_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export {
   REPLENISHMENT_QUEUE_LIST_ID,

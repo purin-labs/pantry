@@ -18,7 +18,7 @@ import {
   type ContractRejection,
 } from "./schema.ts";
 import { Type, type Static } from "typebox";
-import { canonicalJson } from "@seams/std";
+import { canonicalJson } from "@purin-labs/std";
 
 import {
   commerceListSchema,

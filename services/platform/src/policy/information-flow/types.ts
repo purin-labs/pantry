@@ -1,7 +1,7 @@
-import type { RequestAuthority, ViolationAction } from "@seams/contracts";
+import type { RequestAuthority, ViolationAction } from "@purin-labs/contracts";
 
 import type { ContextVisibility } from "../../authorization/access-grants/types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type FlowPolicyOwner =
   | Readonly<{ readonly kind: "platform" }>
@@ -106,12 +106,12 @@ export type NativeChatFlowSource =
   | Readonly<{
       kind: "project";
       organisationId: import("../../ids").OrganisationId;
-      projectId: import("@seams/control-api").ProjectId;
+      projectId: import("@purin-labs/control-api").ProjectId;
     }>
   | Readonly<{
       kind: "chat_conversation";
       organisationId: import("../../ids").OrganisationId;
-      conversationId: import("@seams/control-api").ConversationId;
+      conversationId: import("@purin-labs/control-api").ConversationId;
     }>;
 
 export type FlowSource =
@@ -164,7 +164,7 @@ export type SerializedFlowBinding = Readonly<{
 export type ContextAdmissionSubject =
   | Readonly<{
       kind: "native_chat";
-      requestAuthority: import("@seams/type-utils").Variant<
+      requestAuthority: import("@purin-labs/type-utils").Variant<
         RequestAuthority,
         "control"
       >;

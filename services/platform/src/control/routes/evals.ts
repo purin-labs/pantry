@@ -11,7 +11,7 @@ import {
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type EvalRoute = Readonly<{
   kind: "evals";

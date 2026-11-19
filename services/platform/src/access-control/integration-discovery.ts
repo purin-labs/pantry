@@ -12,7 +12,7 @@ import type {
   IntegrationDiscoveryProvider,
   IntegrationDiscoveryView,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import { authorizeCapabilityUse } from "../authorization/access-grants/turn-authority";
@@ -54,7 +54,7 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 const DISCOVERY_LIMIT = 50;
 const ACCOUNT_REF_PATTERN = /^integration_ref_[0-9a-f]{64}$/u;
 export type IntegrationAccountReference = `integration_ref_${string}`;

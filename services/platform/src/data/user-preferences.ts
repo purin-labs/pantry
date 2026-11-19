@@ -8,8 +8,8 @@ import {
   type UserId,
   type UserPreferenceDocument,
   type UserPreferenceEdit,
-} from "@seams/control-api";
-import { canonicalJson } from "@seams/std";
+} from "@purin-labs/control-api";
+import { canonicalJson } from "@purin-labs/std";
 
 export class PreferenceStorageError extends Error {
   constructor(

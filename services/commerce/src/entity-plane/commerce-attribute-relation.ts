@@ -5,12 +5,12 @@ import type {
   CommerceEntityRef,
   CommerceOrderingValue,
   SystemCommerceEntityRef,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   CURRENCY_MINOR_UNITS,
   parseFoodServiceObservation,
   parsePayment,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase, CommerceSqlValue } from "../database.ts";
 import { storedValue, type StoredAttributeRow } from "./entities.ts";
 import {
@@ -31,7 +31,7 @@ import {
   foodServiceLatestRevision,
   readLatestFoodServiceResourceJson,
 } from "../plugins/food-service/index.ts";
-import { assertNever, isRecord, parseJson } from "@seams/std";
+import { assertNever, isRecord, parseJson } from "@purin-labs/std";
 import { allowedPriceRange } from "../commerce-authority/offer-pricing.ts";
 
 const ATTRIBUTE_RELATION_SCHEMA_VERSION = 7;

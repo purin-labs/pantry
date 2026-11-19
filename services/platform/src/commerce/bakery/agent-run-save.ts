@@ -4,9 +4,9 @@ import {
   parseRunSnapshot,
   parseRunSnapshotSummary,
   type RunSnapshotSummary,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 import type { OrganisationId } from "../../ids";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 export type AgentRunSaveVerification =
   | Readonly<{ kind: "none" }>

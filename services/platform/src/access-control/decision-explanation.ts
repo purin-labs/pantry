@@ -9,7 +9,7 @@ import type {
   FlowDestinationRef,
   InformationSourceRef,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type {
   AccessGrant,
@@ -66,8 +66,8 @@ import {
   type CaseReferenceError,
   type SubjectReferenceInput,
 } from "./references";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isPositiveInteger } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isPositiveInteger } from "@purin-labs/std";
 
 const SUBJECT_RESOLUTION_LIMIT = 1_000;
 

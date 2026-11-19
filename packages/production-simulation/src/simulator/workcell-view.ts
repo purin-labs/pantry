@@ -7,7 +7,7 @@ import {
   type WorkcellTask,
   type ActiveAttempt,
 } from "../recipes/bakery/workcell-attempt.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type WorkcellCursor =
   | Readonly<{ kind: "awaiting"; time: number; end?: never }>

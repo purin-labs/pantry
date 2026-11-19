@@ -1,11 +1,11 @@
 import type {
   CommerceCommandResult,
   CommerceEntityPlaneError,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceCommandResult,
   parseCommerceEntityPlaneError as parseContractError,
-} from "@seams/commerce-contracts/entity-plane-results";
+} from "@purin-labs/commerce-contracts/entity-plane-results";
 import { decodeRecord } from "./record-decoding.ts";
 
 export function parseEntityPlaneCommandResult(

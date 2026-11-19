@@ -1,4 +1,4 @@
-import { isRecord, sameJson } from "@seams/std";
+import { isRecord, sameJson } from "@purin-labs/std";
 import { parseNativeCell, type NativeCell } from "../../native/cell-adapter.ts";
 import { err, ok, type Result } from "../../result.ts";
 import type { ProductionWorkcells } from "./production-workcells.ts";

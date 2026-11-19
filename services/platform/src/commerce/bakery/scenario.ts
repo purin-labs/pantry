@@ -3,17 +3,17 @@ import {
   parseCommerceSnapshotRevision,
   parseEntityPlaneCommand,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
-import { bakeryFingerprint, fields } from "@seams/bakery-model/bakery";
+} from "@purin-labs/commerce-client";
+import { bakeryFingerprint, fields } from "@purin-labs/bakery-model/bakery";
 import {
   readBakeryProcedure,
   type ProcedureResult,
-} from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery-procedure";
 import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
-} from "@seams/contracts";
-import type { ScenarioCopy } from "@seams/bakery-model/bakery-scenario";
+} from "@purin-labs/contracts";
+import type { ScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
 import { entityType, type CommandStep } from "./sample";
 
 export async function saveScenarioCopy(

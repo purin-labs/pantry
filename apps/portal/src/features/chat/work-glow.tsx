@@ -1,7 +1,7 @@
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { VoiceBeam } from "voice-glow";
-import type { ChatWork } from "@seams/control-api/portal/chat";
+import type { ChatWork } from "@purin-labs/control-api/portal/chat";
 import type { ChatStreamState } from "./delivery";
 import "./work-glow.css";
 

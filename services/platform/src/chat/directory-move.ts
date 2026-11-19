@@ -3,7 +3,7 @@ import {
   type ChatDirectoryCommand,
   type ChatDirectoryResult,
   type ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { UserId } from "../ids";
 import { prepareChatDirectoryInitialization } from "./projects";
@@ -16,7 +16,7 @@ import {
 } from "./conversation-access";
 import { authorizeProject } from "../projects/access";
 import { readDefaultProjectId } from "../projects/case-project";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type MoveCommand = Variant<ChatDirectoryCommand, "move_chat">;
 

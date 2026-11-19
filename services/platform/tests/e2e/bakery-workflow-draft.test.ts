@@ -4,18 +4,18 @@ import { fixtureDatabase } from "./organisation-database";
 import {
   importScenario,
   type BakeryWorkflowDocument,
-} from "@seams/bakery-workflow";
+} from "@purin-labs/bakery-workflow";
 import {
   compileDraft,
   draftSeed,
   newStepNode,
-} from "@seams/bakery-workflow/draft";
+} from "@purin-labs/bakery-workflow/draft";
 import { compileLatte } from "../../../../packages/production-simulation/src/recipes/bakery/latte";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   DraftEncoding,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft";
+} from "@purin-labs/workflow-canvas-crdt/draft";
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import * as Y from "yjs";

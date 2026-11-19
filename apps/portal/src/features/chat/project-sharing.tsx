@@ -1,5 +1,5 @@
 import { Select } from "../../ui/select";
-import { parseChatDisclosureFailure, chatDisclosureMessage } from "@seams/control-api";
+import { parseChatDisclosureFailure, chatDisclosureMessage } from "@purin-labs/control-api";
 import React from "react";
 import { LockKeyhole, Users } from "lucide-react";
 import {
@@ -13,8 +13,8 @@ import {
   type ProjectMember,
   type ProjectRole,
   type UserId,
-} from "@seams/control-api";
-import { errorMessage, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import { controlRead, controlWrite, readCookie, refusedBody } from "../../control-client";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import "./project-sharing.css";

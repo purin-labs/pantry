@@ -1,6 +1,6 @@
-import type { CheckoutProfile } from "@seams/contracts";
+import type { CheckoutProfile } from "@purin-labs/contracts";
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export function ProfileState(props: {
   readonly state: CheckoutProfile["lifecycle"]["state"];

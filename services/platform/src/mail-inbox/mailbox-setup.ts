@@ -6,9 +6,9 @@ import type {
   MailboxSetupPlan,
   MailboxSetupRequirement,
   MailboxSetupRequirementId,
-} from "@seams/control-api";
-import { MAILBOX_SETUP_REQUIREMENTS } from "@seams/control-api";
-import type { CapabilityMode } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import { MAILBOX_SETUP_REQUIREMENTS } from "@purin-labs/control-api";
+import type { CapabilityMode } from "@purin-labs/contracts";
 
 import { readAccessControlView } from "../access-control/read-model";
 import { opaqueSubjectReference } from "../access-control/references";

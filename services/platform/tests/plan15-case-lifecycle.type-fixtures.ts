@@ -4,7 +4,7 @@ import type {
   CaseAssignmentStart,
   CaseOutput,
   CaseOutputLifecycle,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { CaseContributionSource } from "../src/actors/case/types";
 
 declare const assignment: CaseAssignment;

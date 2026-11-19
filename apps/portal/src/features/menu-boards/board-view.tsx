@@ -8,7 +8,7 @@ import type {
   MenuScreenFacts,
   MenuScreenPhoto,
   MenuScreenPickup,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   MENU_BOARD_LAYOUTS,
   MENU_BOARD_SCREEN_SIZES,
@@ -23,8 +23,8 @@ import {
   type MenuBoardItemRow,
   type MenuBoardScreenShape,
   type MenuBoardStyle,
-} from "@seams/menu-board-crdt/board";
-import type { MenuDraftSnapshot } from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-board-crdt/board";
+import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 import "./board-view.css";
 
 /**

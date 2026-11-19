@@ -17,8 +17,8 @@
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
-import { isRecord } from "@seams/std";
-import { CommerceStorefrontClient } from "@seams/commerce-client";
+import { isRecord } from "@purin-labs/std";
+import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "../../src/data/control-plane";

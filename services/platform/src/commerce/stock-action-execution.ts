@@ -10,8 +10,8 @@ import {
   commerceCommandInput,
   type CommerceAdminClient,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
-import type { CommerceCommandResult } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { CommerceCommandResult } from "@purin-labs/commerce-contracts";
 
 import {
   commerceListEntryPatchCommand,

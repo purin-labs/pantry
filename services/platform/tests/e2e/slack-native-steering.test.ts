@@ -1,7 +1,7 @@
 import { runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { network } from "./network";
 import {

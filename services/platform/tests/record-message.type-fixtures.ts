@@ -2,7 +2,7 @@ import type {
   CaseContent,
   SourceProvenance,
   UserMessage,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 export function recordMessageTypeChecks(
   message: UserMessage,

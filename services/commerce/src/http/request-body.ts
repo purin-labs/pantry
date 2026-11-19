@@ -1,4 +1,4 @@
-import type { CommerceDemoProfile } from "@seams/commerce-client";
+import type { CommerceDemoProfile } from "@purin-labs/commerce-client";
 import { jsonResponse } from "./responses.ts";
 
 type JsonBodyResult =

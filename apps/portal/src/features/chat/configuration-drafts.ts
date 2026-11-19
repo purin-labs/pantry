@@ -1,12 +1,12 @@
-import type { ConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import type { ConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import {
   ControlApiError,
   controlRefusal,
   controlWrite,
   readCookie,
 } from "../../control-client";
-import { type ConfigurationDraftView, parseConfigurationDraft } from "@seams/control-api/portal/configuration-drafts";
+import { type ConfigurationDraftView, parseConfigurationDraft } from "@purin-labs/control-api/portal/configuration-drafts";
 
 export type ConfigurationDraftActions = Readonly<{
   confirm: (draft: ConfigurationDraftView) => Promise<ConfigurationDraftView>;

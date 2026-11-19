@@ -1,7 +1,7 @@
 import React from "react";
-import type { CaseTimelineCase, ScheduleRunsDay } from "@seams/control-api";
+import type { CaseTimelineCase, ScheduleRunsDay } from "@purin-labs/control-api";
 
-import { parseAgentOperationsResponse, type AgentOperationsSnapshot, type ScheduleBinding } from "@seams/control-api/portal/agent-operations";
+import { parseAgentOperationsResponse, type AgentOperationsSnapshot, type ScheduleBinding } from "@purin-labs/control-api/portal/agent-operations";
 import type { AgentOperationsTransport } from "../../agent-operations";
 import { scheduleTriggerLabel } from "../../pages/agent-console";
 import {

@@ -1,5 +1,5 @@
-import { sha256Hex } from "@seams/std";
-import type { CollaborationAgent } from "@seams/collaboration";
+import { sha256Hex } from "@purin-labs/std";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import {
   ProductDescriptionDoc,
@@ -9,7 +9,7 @@ import {
   type ProductDescriptionPresenceSelection,
   type ProductDescriptionStateVector,
   type ProductDescriptionUpdate,
-} from "@seams/product-description-crdt";
+} from "@purin-labs/product-description-crdt";
 import {
   encodeDraftServerMessage,
   parseDraftClientMessage,
@@ -17,7 +17,7 @@ import {
   type DraftClientMessage,
   type DraftFailureCode,
   type ProductDescriptionRoomMetadata,
-} from "@seams/product-description-crdt/protocol";
+} from "@purin-labs/product-description-crdt/protocol";
 import { listOrganisationMembers, resolveUser } from "../data/control-plane";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
@@ -47,7 +47,7 @@ import {
   type CollaborationSocketRoom,
 } from "./collaboration-room";
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
-import { assertNever, hasExactKeys } from "@seams/std";
+import { assertNever, hasExactKeys } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 

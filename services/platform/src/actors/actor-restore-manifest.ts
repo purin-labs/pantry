@@ -27,7 +27,7 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type ActorRestoreCounts = {
   readonly tableCount: number;

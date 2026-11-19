@@ -8,7 +8,7 @@ import type {
   CommerceQueryPlan,
   CommerceSnapshotRevision,
   OrganisationId,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseListEntryReadRequest,
   type CommerceListEntryReadResult,
@@ -30,7 +30,7 @@ import {
   type CommercePurchasingPresetPublishResponse,
   type CommercePurchasingReconcileRequest,
   type CommercePurchasingReconcileResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import type { CommerceSigner } from "../commerce-authority/contracts.ts";
 import {
@@ -91,7 +91,7 @@ import { CommerceLists } from "./commerce-lists.ts";
 import { SavedViewMutations } from "./saved-view-mutations.ts";
 import { readEntityPlaneChanges } from "./entity-plane-changes.ts";
 import { EntityPlanePlannedReads } from "./planned-reads.ts";
-import { errorMessage, sameJson, sha256Hex } from "@seams/std";
+import { errorMessage, sameJson, sha256Hex } from "@purin-labs/std";
 
 type EntityPlaneServiceOptions = Readonly<{
   database: CommerceDatabase;
@@ -759,7 +759,7 @@ export class EntityPlaneService {
 
   listRelationshipDefinitions(
     merchantId: string,
-  ): readonly import("@seams/commerce-contracts").RelationshipDefinition[] {
+  ): readonly import("@purin-labs/commerce-contracts").RelationshipDefinition[] {
     return listRelationshipDefinitions(this.#database, merchantId);
   }
 }

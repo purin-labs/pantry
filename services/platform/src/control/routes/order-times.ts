@@ -1,4 +1,4 @@
-import type { OrderTimesWindow } from "@seams/control-api";
+import type { OrderTimesWindow } from "@purin-labs/control-api";
 
 import type { Env } from "../../env";
 import { resolveMerchantControlContext } from "../commerce-merchant";

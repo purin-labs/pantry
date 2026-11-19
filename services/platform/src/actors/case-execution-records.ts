@@ -3,7 +3,7 @@ import {
   isPositiveInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   ExecutionLabelTable,
   MAX_EXECUTION_ASSIGNMENTS,

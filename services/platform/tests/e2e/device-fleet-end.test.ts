@@ -2,7 +2,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { deviceFleetStub } from "../../src/actors/device-fleet";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";

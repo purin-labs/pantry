@@ -1,5 +1,5 @@
-import type { HarnessTurnLease } from "@seams/contracts";
-import { assertNever } from "@seams/std";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
 
 import { acceptedExecutionAccountAuthority } from "../account-platform/access";
 import { readAdmittedChatInput } from "../chat/turn-access";

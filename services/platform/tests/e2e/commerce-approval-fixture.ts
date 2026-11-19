@@ -1,5 +1,5 @@
 import type { GlobalDatabase } from "../../src/database-handles";
-import { encodeBase64Url } from "@seams/std";
+import { encodeBase64Url } from "@purin-labs/std";
 import {
   digestApprovalAction,
   type ApprovalActionBinding,

@@ -9,7 +9,7 @@ import {
   Settings,
   Settings2,
 } from "lucide-react";
-import type { MailOrganizationView } from "@seams/control-api";
+import type { MailOrganizationView } from "@purin-labs/control-api";
 import {
   mailProcessingView,
   type MailProcessingState,

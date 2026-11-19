@@ -1,5 +1,5 @@
 import { setStorage } from "./engine-storage.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { emit, held, type Draft, type WorkflowTask } from "./engine-draft.ts";
 import {
   boundaryId,

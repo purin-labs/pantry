@@ -17,7 +17,7 @@ vi.mock(
       createCurrentSourceFlowLabel: async function createFixtureSourceLabel(
         input: Readonly<{
           readonly kind: string;
-          readonly authority: import("@seams/contracts").RequestAuthority;
+          readonly authority: import("@purin-labs/contracts").RequestAuthority;
         }>,
       ) {
         if (input.kind !== "ingress") {
@@ -46,7 +46,7 @@ import { digestCanonical } from "../src/policy";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { fixtureControlRequestAuthority } from "./fixtures/plan25-turn";
 import { authorityPartitionKey } from "../src/authorization/access-grants/turn-authority";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { requireCaseId, requireOrganisationId } from "./test-ids";
 import { platformEnv } from "./worker-fakes";
 
@@ -611,7 +611,7 @@ class TestStorage {
 
 async function merchantInputAuthorityPartition(
   requestAuthority: Variant<
-    import("@seams/contracts").RequestAuthority,
+    import("@purin-labs/contracts").RequestAuthority,
     "control"
   >,
 ) {

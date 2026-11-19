@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import { isIanaTimezone } from "@seams/control-api";
+import { isIanaTimezone } from "@purin-labs/control-api";
 import type { SoldOutMarkRequest } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import {

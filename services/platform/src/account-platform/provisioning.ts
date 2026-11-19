@@ -1,5 +1,5 @@
 import type { GlobalDatabase } from "../database-handles";
-import { canonicalJson, sha256Hex } from "@seams/std";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import {
   bootstrapOrganisation,
   resolveUser,
@@ -30,7 +30,7 @@ import {
   type PantryProvisionOwnerMapping,
   type PantryServiceTenantBinding,
 } from "./provisioning-boundary";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type PantryProvisionResult =
   | Readonly<{ kind: "accepted"; value: PantryProvisionApplied }>

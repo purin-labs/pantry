@@ -1,14 +1,14 @@
 import type {
   AuthorizedHarnessToolResult,
   HarnessToolOutput,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { digestCanonical } from "../policy";
 import type {
   HarnessToolDefinition,
   HarnessToolHost,
 } from "./embedded-harness";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The complete WhatsApp agent authority: read the exact admitted Case, return

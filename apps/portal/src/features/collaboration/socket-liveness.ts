@@ -3,7 +3,7 @@ import {
   COLLABORATION_PING_INTERVAL_MS,
   COLLABORATION_PONG,
   COLLABORATION_PONG_TIMEOUT_MS,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 
 /**
  * Pings a collaboration socket and reports a connection that stopped

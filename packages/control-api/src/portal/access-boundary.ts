@@ -3,15 +3,15 @@ import type {
   AccessGrantLifecycle,
   CapabilityMode,
   CapabilityPolicyProvenance,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   decodeAccessGrantLifecycle,
   decodeCapabilityDefinition,
-} from "@seams/contracts/browser-validators";
+} from "@purin-labs/contracts/browser-validators";
 import type {
   AccessDecodeError,
   AccessDecodeResult,
-} from "@seams/contracts/browser-validators";
+} from "@purin-labs/contracts/browser-validators";
 
 import type {
   AccessBoundaryName,
@@ -27,14 +27,14 @@ import type {
   AccessOptionsPage,
   AccessRequesterRole,
 } from "./access-models.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { AccessControlAvailability } from "../index.ts";
 
 type JsonRecord = Record<string, unknown>;

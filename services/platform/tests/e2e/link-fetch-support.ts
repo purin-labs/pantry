@@ -3,7 +3,7 @@
 // link-fetch binding of an Actor, and the operator's erase of a fetch Actor.
 import { env, exports } from "cloudflare:workers";
 import { HttpResponse, type HttpResponseResolver } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const REGISTRY_ROUTE = "https://localhost/v1/admin/state-object-registry";
 

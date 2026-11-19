@@ -22,14 +22,14 @@ import {
   type CommercePaymentV1,
   type CommerceFirstPartyShipmentV1,
   orderOriginCheckoutId,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type CommerceInvalidTransition,
   type InventoryAllocation,
   type ShippingQuoteSnapshot,
   type ShippingRouteBinding,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   listInventoryLots,
@@ -54,7 +54,7 @@ import {
   sha256,
 } from "./checkout-shared.ts";
 import type { ShippingLabelRateRequest } from "../shipping-gateway.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { orderMatchesAccepted, readAcceptedOrder, type AcceptedOrder } from "./order-changes.ts";
 import { orderBalance } from "../payments/position.ts";
 import { orderSubject, type GuardedMove } from "../plugins/machine-guards.ts";

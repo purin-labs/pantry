@@ -1,8 +1,8 @@
 import {
   parseCommerceDemoProfile,
   type CommerceDemoProfile,
-} from "@seams/commerce-client";
-import type { BuiltInPluginId } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { BuiltInPluginId } from "@purin-labs/commerce-contracts";
 
 import {
   decodePathSegment,
@@ -70,7 +70,7 @@ import {
   COMPANIES_ROUTES,
   type CompaniesRoute,
 } from "./plugins/companies/index.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type CheckoutProfileRoute =
   | Readonly<{ kind: "list_checkout_profiles"; merchantId: string }>

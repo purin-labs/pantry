@@ -25,9 +25,9 @@ import {
   readAccountOnboardingOptions,
   readAccountOnboardingResult,
   type AccountOnboardingRequest,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { ActiveControlSession, User } from "../data/control-plane";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   readOrganizationInvitationV1 as readAccountInvitation,
   readAccountMembershipListV1 as readAccountMembershipList,
@@ -47,7 +47,7 @@ import {
   decodeBase64,
   encodeBase64Url,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { standardBase64 } from "../lenient-base64";
 import type { Result } from "../result";
 import type { AccountAdmissionAction, AccountUserAuthority } from "./access";

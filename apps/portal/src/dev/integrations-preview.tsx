@@ -34,7 +34,7 @@
  * An approved Slack window adds the Slack workspace and its channels to the
  * reads that follow; `&setup=1` shows the setup steps that start it.
  */
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useSearchParams } from "react-router";
@@ -45,22 +45,22 @@ import { installClaudeConnectionPreview } from "./claude-connection-preview";
 import { installVaultIntegrationPreview } from "./vault-integration-preview";
 import { installCustomConnectorPreview } from "./custom-connector-preview";
 import { MutationLedger, type MutationProvider } from "../mutation-state";
-import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { IntegrationsPage } from "../features/integrations/integrations-page";
 import {
   IntegrationsRoute,
   MailboxSettingsRoute,
 } from "../features/integrations/settings-routes";
-import type { IntegrationAccount, SupportDiagnostics } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 import type { IntegrationsCommand, IntegrationsCommandResult, IntegrationsPageActions, IntegrationsPageProps, IntegrationDetailRouteData, IntegrationsRouteData, IntegrationsRouteTransport, SettingsMutationFeedback } from "../features/integrations/settings-types";
 import type { WhatsAppPanelActions } from "../pages/whatsapp";
 import type {
   MailboxSetupAgent,
   MailboxSetupAgentChoice,
   MailboxSetupPlan,
-} from "@seams/control-api";
-import type { WhatsAppAccountView } from "@seams/control-api/portal/whatsapp";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import type { WhatsAppAccountView } from "@purin-labs/control-api/portal/whatsapp";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Scenario =
   | "empty"

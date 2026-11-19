@@ -4,8 +4,8 @@ import {
   isCostsSheetCellKey,
   type CostsSheetCell,
   type CostsSheetCellChange,
-} from "@seams/costs-sheet-crdt";
-import { hasExactKeys, isRecord } from "@seams/std";
+} from "@purin-labs/costs-sheet-crdt";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   normalizeCostForecastPlan,
   type ActualsWindowDays,
@@ -27,7 +27,7 @@ import {
   type SupplyCostItem,
   type SupplyLotCost,
   type WeekUnits,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import type { StaffPageToolReceipt } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";

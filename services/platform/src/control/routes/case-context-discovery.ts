@@ -6,7 +6,7 @@ import { parseCaseContextCollectionReviewCommand } from "../../case-context-disc
 import type {
   CaseContextCollectionMetadataView,
   UserId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { identifier } from "../../case-context-discovery/policy";
 import type { Env } from "../../env";
 import { authorizeConfiguredBearer } from "../../fault-injection-auth";
@@ -19,7 +19,7 @@ import {
 import { authorizeOrganisationRequest } from "../authorization";
 import { handleCaseScreenObservationsRoute } from "./case-screen-observations";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { Result } from "../../result";
 
 const CASE_CONTEXT_COLLECTION_OPERATOR_ID = "operator_organisation_admin";

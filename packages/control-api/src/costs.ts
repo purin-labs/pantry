@@ -1,6 +1,6 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@seams/commerce-contracts/schema";
-import { recipeRevisionResourceSchema } from "@seams/commerce-contracts/records/api-food-service";
+import { recordParser } from "@purin-labs/commerce-contracts/schema";
+import { recipeRevisionResourceSchema } from "@purin-labs/commerce-contracts/records/api-food-service";
 import {
   evaluateCostFormula,
   isCostFormulaColumn,

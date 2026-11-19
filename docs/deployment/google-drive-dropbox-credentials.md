@@ -254,15 +254,15 @@ Enter secrets interactively so they do not appear in shell history.
 Current production, which is Wrangler's default environment:
 
 ```bash
-pnpm --filter @seams/platform exec wrangler secret put DROPBOX_OAUTH_CLIENT_SECRET
-pnpm --filter @seams/platform exec wrangler secret put GDRIVE_OAUTH_CLIENT_SECRET
+pnpm --filter @purin-labs/platform exec wrangler secret put DROPBOX_OAUTH_CLIENT_SECRET
+pnpm --filter @purin-labs/platform exec wrangler secret put GDRIVE_OAUTH_CLIENT_SECRET
 ```
 
 Staging, after `env.staging` and its isolated resources exist:
 
 ```bash
-pnpm --filter @seams/platform exec wrangler secret put DROPBOX_OAUTH_CLIENT_SECRET --env staging
-pnpm --filter @seams/platform exec wrangler secret put GDRIVE_OAUTH_CLIENT_SECRET --env staging
+pnpm --filter @purin-labs/platform exec wrangler secret put DROPBOX_OAUTH_CLIENT_SECRET --env staging
+pnpm --filter @purin-labs/platform exec wrangler secret put GDRIVE_OAUTH_CLIENT_SECRET --env staging
 ```
 
 Once an integration is intentionally enabled in an environment, include its
@@ -272,8 +272,8 @@ closed if the secret is absent.
 List configured secret names without reading their values:
 
 ```bash
-pnpm --filter @seams/platform exec wrangler secret list
-pnpm --filter @seams/platform exec wrangler secret list --env staging
+pnpm --filter @purin-labs/platform exec wrangler secret list
+pnpm --filter @purin-labs/platform exec wrangler secret list --env staging
 ```
 
 ## Deployment preflight
@@ -286,14 +286,14 @@ pnpm --filter @seams/platform exec wrangler secret list --env staging
 3. Run the migration and integration checks:
 
    ```bash
-   pnpm --filter @seams/platform test:migrations
-   pnpm --filter @seams/platform d1:schema:remote:check
-   pnpm --filter @seams/platform exec vitest run \
+   pnpm --filter @purin-labs/platform test:migrations
+   pnpm --filter @purin-labs/platform d1:schema:remote:check
+   pnpm --filter @purin-labs/platform exec vitest run \
      tests/dropbox-provider-adapter.test.ts \
      tests/dropbox-file-context-webhook.test.ts \
      tests/google-drive-provider-adapter.test.ts \
      tests/provider-callback-authority.test.ts
-   pnpm --filter @seams/platform check:types
+   pnpm --filter @purin-labs/platform check:types
    pnpm portal:build
    ```
 

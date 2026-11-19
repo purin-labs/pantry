@@ -12,7 +12,7 @@ import {
 } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,

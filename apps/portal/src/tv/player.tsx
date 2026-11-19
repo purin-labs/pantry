@@ -2,7 +2,7 @@ import React from "react";
 import {
   COLLABORATION_PING,
   COLLABORATION_PING_INTERVAL_MS,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   MENU_SCREEN_SOCKET_PROTOCOL,
   parseMenuScreenFeed,
@@ -13,8 +13,8 @@ import {
   type MenuScreenFeed,
   type MenuScreenPairing,
   type MenuScreenPickup,
-} from "@seams/control-api";
-import { backoffDelay } from "@seams/std";
+} from "@purin-labs/control-api";
+import { backoffDelay } from "@purin-labs/std";
 import { webSocketUrl } from "../features/collaboration/document-client";
 import { ScaledBoard } from "../features/menu-boards/board-view";
 

@@ -1,5 +1,5 @@
-import type { PortalPageViewSection, PortalPageViewV1 } from "@seams/control-api";
-import type { MenuBoardElement, MenuBoardSnapshot } from "@seams/menu-board-crdt/board";
+import type { PortalPageViewSection, PortalPageViewV1 } from "@purin-labs/control-api";
+import type { MenuBoardElement, MenuBoardSnapshot } from "@purin-labs/menu-board-crdt/board";
 
 /**
  * Menus › Boards as the chat sees it (Plan 40B phase 5, slice 9): the open

@@ -1,8 +1,8 @@
-import type { StoredMessageAttachment } from "@seams/contracts";
+import type { StoredMessageAttachment } from "@purin-labs/contracts";
 
 import type { DecodedVideoStill } from "./attachment-inspection";
 import type { WorkspaceExecutorDecodedFrame } from "../workspace-executor-container";
-import { decodeBase64, sha256Hex } from "@seams/std";
+import { decodeBase64, sha256Hex } from "@purin-labs/std";
 
 /**
  * Decoded stills as durable, content-addressed derived objects.

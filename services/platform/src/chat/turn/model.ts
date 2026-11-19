@@ -4,7 +4,7 @@ import {
   type OrganisationModelRoute,
 } from "../../models/route";
 import type { Conversation } from "../conversation";
-import type { ChatEffort } from "@seams/control-api";
+import type { ChatEffort } from "@purin-labs/control-api";
 
 // The same default as the Portal composer: medium, "Balanced", when offered.
 export function defaultChatEffort(route: OrganisationModelRoute): ChatEffort {

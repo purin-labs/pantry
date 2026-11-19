@@ -130,6 +130,10 @@ and cleaning up the legacy code from satyr". So only `pantry` moved.
   `~/Dev/purin-io` is gone, so the pnpm links were installed again.
 - `seams-tech/satyr` is archived again. It stays in `seams-tech`, with
   `pantry-history` (decision 3).
+- All 27 workspace packages in `purin-labs/pantry` are renamed from
+  `@seams/*` to `@purin-labs/*` (`scripts/rename/plan-94-package-scope.mjs`),
+  and `pnpm-lock.yaml` is regenerated. The vendored Seams Console package
+  `@seams-internal/console-shared` stays in its Seams scope.
 
 ### The old `satyr` repository and clone (19 November 2026)
 

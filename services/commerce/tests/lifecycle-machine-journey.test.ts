@@ -13,8 +13,8 @@ import {
   type CommerceAdminClient,
   type CommerceDraftOrderLineV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
-import type { CommerceMachineName } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { CommerceMachineName } from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import {

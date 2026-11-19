@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { isFailedPaymentStep, type FailedPaymentStep } from "./failed-payments.ts";
 

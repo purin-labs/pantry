@@ -7,13 +7,13 @@
 import type {
   CommercePluginActionV1,
   CommercePluginHandlerV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   parsePluginRunOutput,
   type PluginRunOutput,
   type PluginRunOutputCommand,
-} from "@seams/commerce-contracts/records/plugin-outputs";
+} from "@purin-labs/commerce-contracts/records/plugin-outputs";
 
 import { sha256 } from "../commerce-authority/checkout-shared.ts";
 import type { CommerceDatabase } from "../database.ts";

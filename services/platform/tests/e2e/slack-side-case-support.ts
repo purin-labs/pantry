@@ -2,7 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse } from "msw";
 import { expect } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import {
   handleSlackIngress,

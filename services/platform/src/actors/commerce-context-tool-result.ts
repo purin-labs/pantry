@@ -1,11 +1,11 @@
 import { Type, type Static } from "typebox";
-import { isSystemCommerceEntity } from "@seams/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/contracts";
 import type {
   HarnessToolOutput,
   CommerceGraphQueryResult,
-} from "@seams/contracts";
-import type { StrictUnion } from "@seams/type-utils";
-import { assertNever, sha256Hex } from "@seams/std";
+} from "@purin-labs/contracts";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 
 const revision = Type.Integer({ minimum: 0 });
 const integerText = Type.String({ pattern: "^-?[0-9]+$" });
@@ -329,7 +329,7 @@ function entityJson(
 }
 
 function attributeJson(
-  value: import("@seams/contracts").AttributeValueAssignment,
+  value: import("@purin-labs/contracts").AttributeValueAssignment,
 ): Static<typeof attribute> {
   return {
     attributeId: value.attributeId,
@@ -341,7 +341,7 @@ function attributeJson(
 }
 
 function attributeValueJson(
-  value: import("@seams/contracts").AttributeValue,
+  value: import("@purin-labs/contracts").AttributeValue,
 ): Static<typeof attributeValue> {
   switch (value.kind) {
     case "integer":
@@ -394,14 +394,14 @@ function aggregationJson(
   }
 }
 
-function groupJson(group: import("@seams/contracts").CommerceAggregationGroup) {
+function groupJson(group: import("@purin-labs/contracts").CommerceAggregationGroup) {
   return {
     value: attributeValueJson(group.value),
     count: group.count.toString(),
   };
 }
 
-function bucketJson(bucket: import("@seams/contracts").CommerceAgeBucket) {
+function bucketJson(bucket: import("@purin-labs/contracts").CommerceAgeBucket) {
   return {
     minimumAgeDays: bucket.minimumAgeDays,
     maximumAgeDays: bucket.maximumAgeDays,

@@ -1,5 +1,5 @@
 import type { OutboxSigningMigrationBatch } from "./outbox-signing-migration.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const continuation: Variant<
   OutboxSigningMigrationBatch,

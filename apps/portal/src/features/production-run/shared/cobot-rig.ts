@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
 import {
   fr10GripperKinematics,
   fr10Links,
@@ -8,7 +8,7 @@ import {
   type JointVector,
   type Pose7,
   type Vec3,
-} from "@seams/production-simulation/kinematics/fr10";
+} from "@purin-labs/production-simulation/kinematics/fr10";
 import { enableSceneShadows, lerpVec3 } from "../appliance-sample-three";
 
 /** One revolute joint of the FR10 visual. */

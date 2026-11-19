@@ -1,4 +1,4 @@
-import type { SurfaceKind } from "@seams/contracts";
+import type { SurfaceKind } from "@purin-labs/contracts";
 import type { JsonObject } from "./http";
 import {
   parseChannelId,
@@ -11,7 +11,7 @@ import {
   type WorkspaceId,
 } from "./ids";
 import type { Result } from "./result";
-import { exhaustiveList } from "@seams/std";
+import { exhaustiveList } from "@purin-labs/std";
 
 export type InstallModel = "unlisted" | "marketplace" | "custom";
 

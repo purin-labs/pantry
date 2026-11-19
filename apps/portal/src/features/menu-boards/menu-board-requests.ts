@@ -2,8 +2,8 @@ import type {
   MenuDraftSnapshot,
   MenuItem,
   MenuSection,
-} from "@seams/menu-draft-crdt";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@seams/std";
+} from "@purin-labs/menu-draft-crdt";
+import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 import { controlRead } from "../../control-client";
 
 /** A control route of the Organisation, such as `menu-boards`. */

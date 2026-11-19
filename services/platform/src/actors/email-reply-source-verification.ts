@@ -1,4 +1,4 @@
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { readSessionTurnMemoryRecords } from "./actor-journal/transactions";
 import type { SessionTurnContextLookup } from "./actor-journal";
 import type { EmailCueOutcome } from "./email-harness-tools";

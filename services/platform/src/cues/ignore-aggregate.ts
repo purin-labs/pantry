@@ -4,7 +4,7 @@ import type {
   NormalizedCueEventType,
 } from "./engine";
 import type { OrganisationId } from "../ids";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type IgnoredCueSample = {
   nativeId: string;

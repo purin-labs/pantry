@@ -1,4 +1,4 @@
-import { VOICE_VOCABULARY_TERM_LIMIT } from "@seams/control-api";
+import { VOICE_VOCABULARY_TERM_LIMIT } from "@purin-labs/control-api";
 
 import {
   CAFE_MENU_ID,

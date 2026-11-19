@@ -4,9 +4,9 @@ import {
   parseMailRuleSet,
   type MailRuleSet,
   type MailRule,
-} from "@seams/control-api";
-import type { RequestAuthority } from "@seams/contracts";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 import { parseStoredRequestAuthority } from "../request-authority";
 import {
   parseIntegrationAccountId,
@@ -14,7 +14,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type MailObservation =
   | Readonly<{

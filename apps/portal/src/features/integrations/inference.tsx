@@ -10,15 +10,15 @@ import {
   type ProviderTileName,
   type StatusChipStatus,
 } from "../../page-components";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { renderCodexConnection } from "./codex";
-import { parseInferenceSelection } from "@seams/control-api/portal/inference";
+import { parseInferenceSelection } from "@purin-labs/control-api/portal/inference";
 import {
   mutationFeedbackMessage,
   renderMutationFeedback,
 } from "./settings-support";
 import type { IntegrationsPageActions, SettingsMutationFeedback } from "./settings-types";
-import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@seams/control-api/portal/settings";
+import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 
 export function InferenceIntegrationPanel(props: {
   readonly claudeState: ClaudeConnectionState;

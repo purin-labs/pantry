@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonEmptyString, isRecord } from "@seams/std";
+import { hasExactKeys, isNonEmptyString, isRecord } from "@purin-labs/std";
 import type { BakerySurfaceToolCommandName } from "./bakery-surface.ts";
 
 export type BakeryBrowserBinding = Readonly<{

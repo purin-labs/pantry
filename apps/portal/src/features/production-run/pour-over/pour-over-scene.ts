@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { isRecord } from "@seams/std";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
-import type { PersistentPourOverCell } from "@seams/bakery-model/bakery-physics";
+import { isRecord } from "@purin-labs/std";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
+import type { PersistentPourOverCell } from "@purin-labs/bakery-model/bakery-physics";
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { SceneHost } from "../scene-host";
@@ -14,7 +14,7 @@ import { fr10Pivots } from "../shared/cobot-rig";
 import type {
   PourOverSample,
   StationPose,
-} from "@seams/production-simulation/recipes/pour-over/sample";
+} from "@purin-labs/production-simulation/recipes/pour-over/sample";
 
 /** The station geometry the runtime packaged with this cell's model. */
 export type PourOverSetup = Readonly<{

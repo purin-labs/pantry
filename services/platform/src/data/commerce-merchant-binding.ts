@@ -7,7 +7,7 @@ import {
 } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationEnvironment } from "./control-plane";
-import { decodeBase64Url, encodeBase64Url } from "@seams/std";
+import { decodeBase64Url, encodeBase64Url } from "@purin-labs/std";
 
 declare const commerceBindingIdBrand: unique symbol;
 declare const commerceMerchantIdBrand: unique symbol;

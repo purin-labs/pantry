@@ -1,7 +1,7 @@
 import {
   isAgentPermissionListRead,
   type AgentPermissionListRead,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { parseCommerceGraphQuery as parseCommerceGraphQueryResult } from "../../commerce/entity-plane/routes";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { ensurePantryAccountAutomationGrant } from "../../account-platform/automation";
@@ -13,8 +13,8 @@ import type {
   CapabilityMode,
   CapabilityRef,
   CommerceEntityTypeId,
-} from "@seams/contracts";
-import { parseEntityTypeId } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import { parseEntityTypeId } from "@purin-labs/commerce-client";
 
 import {
   applyVersionedAccessDefaults,
@@ -91,13 +91,13 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../http";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { readOnboardingRow } from "../../data/organisation-onboarding-row";
 
 export type AccessControlMutationRoute =

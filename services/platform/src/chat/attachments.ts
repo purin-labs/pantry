@@ -1,11 +1,11 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import type { OrganisationId } from "../ids";
-import type { StoredMessageAttachment, UserMessage } from "@seams/contracts";
-import { assertNever, sha256Hex } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import type { StoredMessageAttachment, UserMessage } from "@purin-labs/contracts";
+import { assertNever, sha256Hex } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { readJsonRecord } from "../control/http";
-import { MESSAGE_ATTACHMENT_POLICY } from "@seams/control-api";
+import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
 import {
   buildStoredMessageAttachment,
   deriveUserMessageViews,

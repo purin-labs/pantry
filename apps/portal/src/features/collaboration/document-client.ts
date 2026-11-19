@@ -4,8 +4,8 @@ import {
   type CollaborationParticipant,
   type CollaborationPointerPosition,
   type SyncClientMessage,
-} from "@seams/collaboration";
-import { assertNever, backoffDelay } from "@seams/std";
+} from "@purin-labs/collaboration";
+import { assertNever, backoffDelay } from "@purin-labs/std";
 import { SocketLiveness } from "./socket-liveness";
 
 /**

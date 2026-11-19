@@ -7,7 +7,7 @@ import type {
   MerchantRevision,
   CommerceMutationReceiptV1,
   CommerceEntityPlaneObservationV1,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CommerceAggregateObservationV1,
   CommerceObservationV1,
@@ -19,7 +19,7 @@ import type {
   CommerceEntityPlaneCommandRequest,
   CommerceEntityPlaneSystemExtensionResponse,
 } from "./parsers.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 declare const snapshotRevision: CommerceSnapshotRevision;
 declare const merchantRevision: MerchantRevision;

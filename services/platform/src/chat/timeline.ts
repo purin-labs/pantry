@@ -3,23 +3,23 @@ import {
   isVoiceEngineId,
   type ChatTranscriptionPath,
   type VoiceEngineId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parsePortalPageView,
   parseSurfaceObservation,
   surfaceObservationFromPageView,
   type SurfaceObservationV2,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   restoreStoredProjectSnapshot,
   type ProjectSnapshot,
   parseChatContextDetails,
   type ChatContextDetails,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseBakeryBrowserContext,
   type BakeryBrowserContext,
-} from "@seams/bakery-model/bakery-context";
+} from "@purin-labs/bakery-model/bakery-context";
 import type { JsonRecord } from "../control/http";
 import type { Result } from "../result";
 import type { ConnectorCardTarget as ConversationCardTarget } from "./conversation";
@@ -27,8 +27,8 @@ import { parseCustomConnectorId } from "../custom-connectors/identity";
 import {
   parseBakerySurfaceAttachment,
   type BakerySurfaceAttachmentV1,
-} from "@seams/bakery-model/bakery-surface";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery-surface";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import { withOldKitchenAttachment } from "./kitchen-observation";
 import {
   type ChatApproval,
@@ -38,8 +38,8 @@ import {
   type ChatToolView,
   type ChatTurnUsage,
   parseChatQuestion,
-} from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 export type ConnectorCardTarget = ConversationCardTarget;
 
 /** The provider-neutral content that can be accepted into a conversation. */

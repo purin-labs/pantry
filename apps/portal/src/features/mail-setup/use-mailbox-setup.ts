@@ -3,7 +3,7 @@ import {
   encodeMailboxSetupAgentChoice,
   type MailboxSetupAgentChoice,
   type MailboxSetupPlan,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import type { MailboxSetupState } from "./model";
 

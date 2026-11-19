@@ -10,8 +10,8 @@ import {
   type UpdateCommerceProductV1,
   type UpdateCommerceStorefrontTaxV1,
   type UpdateCommerceVariantV1,
-} from "@seams/commerce-client";
-import type { Storefront } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { Storefront } from "@purin-labs/commerce-contracts";
 
 import { findResource } from "./checkout-shared.ts";
 

@@ -1,4 +1,4 @@
-import type { PlaybackSnapshot, PlaybackUpdate } from "@seams/production-simulation/simulator/playback-state";
+import type { PlaybackSnapshot, PlaybackUpdate } from "@purin-labs/production-simulation/simulator/playback-state";
 
 type FrameClock = Readonly<{
   request(callback: FrameRequestCallback): number;

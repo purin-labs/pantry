@@ -1,7 +1,7 @@
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import type { Result } from "../result";
-import { backoffDelay, isRecord } from "@seams/std";
+import { backoffDelay, isRecord } from "@purin-labs/std";
 import type { SchemaTransaction } from "./schema-migrations";
 import {
   advanceWhatsAppProposal,

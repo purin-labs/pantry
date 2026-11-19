@@ -12,7 +12,7 @@ import {
   type CommerceMutationResultV1,
   type CommerceProductMediaV1,
   type CommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { listProducts, listVariants } from "../../commerce-persistence.ts";
 import type { CommerceDatabase } from "../../database.ts";

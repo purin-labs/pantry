@@ -5,14 +5,14 @@ import {
   type MailRelationshipLookup,
   type MailRelationshipPreview,
   type MailSupplierCandidate,
-} from "@seams/control-api";
-import { isRecord, assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord, assertNever } from "@purin-labs/std";
 import { controlWrite } from "../../control-client";
 import { mailAnswer } from "./api";
 import {
   parseRelationshipPreview,
   parseSuppliers,
-} from "@seams/control-api/portal/mail-relationship";
+} from "@purin-labs/control-api/portal/mail-relationship";
 
 // Purchasing facts and unsaved text live only in this mounted conversation.
 type State =

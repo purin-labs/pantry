@@ -1,5 +1,5 @@
-import { parseInventory, type InventoryData } from "@seams/contracts";
-import { MEDIA_CONTENT_TYPES, MEDIA_MAX_BYTES } from "@seams/commerce-client";
+import { parseInventory, type InventoryData } from "@purin-labs/contracts";
+import { MEDIA_CONTENT_TYPES, MEDIA_MAX_BYTES } from "@purin-labs/commerce-client";
 import { ArrowLeft, ArrowRight, ImagePlus, Trash2 } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";

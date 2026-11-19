@@ -8,9 +8,9 @@ import {
   newConversationId,
   type ConversationId,
   type SurfaceObservationV2,
-} from "@seams/control-api";
-import { createBakerySurfaceReceipt } from "@seams/bakery-model/bakery-surface";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { createBakerySurfaceReceipt } from "@purin-labs/bakery-model/bakery-surface";
+import { isRecord } from "@purin-labs/std";
 import { env } from "cloudflare:workers";
 
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

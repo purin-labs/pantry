@@ -1,4 +1,4 @@
-import type { CommerceInventoryItemV1 } from "@seams/commerce-client";
+import type { CommerceInventoryItemV1 } from "@purin-labs/commerce-client";
 
 export function inventoryItemWithId(
   id: string,

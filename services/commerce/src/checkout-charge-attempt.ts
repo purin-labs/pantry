@@ -6,7 +6,7 @@ import type {
   DutyQuoteSnapshot,
   EstimatedDeliverySnapshot,
   TaxQuoteSnapshot,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type {
   CarrierRateQuoteProvider,
@@ -27,8 +27,8 @@ import {
   taxQuoteInputDigest,
 } from "./checkout-charge-provider.ts";
 import type { CommerceDatabase } from "./database.ts";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { hasExactKeys, isNormalizedText, isRecord } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { hasExactKeys, isNormalizedText, isRecord } from "@purin-labs/std";
 
 type ChargeQuoteAttemptBase = Readonly<{
   attemptId: string;

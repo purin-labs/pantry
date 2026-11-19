@@ -15,9 +15,9 @@ import {
   MutationLedger,
   type OrganisationMutation,
 } from "./mutation-state";
-import type { CommerceActionRecord } from "@seams/control-api/portal/commerce-actions";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type WorkspaceRouteSelection = {
   readonly organisationId: string;

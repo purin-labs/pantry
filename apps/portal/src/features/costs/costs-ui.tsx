@@ -3,7 +3,7 @@ import { SlidersHorizontal } from "lucide-react";
 import type {
   BakeryCostCalculation,
   CostValuationBasis,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { ProjectedCostsSheet } from "./costs-sheet-draft";
 
 type CostAssumptions = ProjectedCostsSheet["assumptions"];
@@ -15,7 +15,7 @@ import {
   SCENARIO_INCLUDED_TAX_CELL_KEY,
   SCENARIO_LOT_COST_BASIS_CELL_KEY,
   SCENARIO_PREP_REJECT_CELL_KEY,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import {
   formatMoneyMinor,
   formatSignedMoneyRounded as formatSignedMoney,

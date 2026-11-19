@@ -9,12 +9,12 @@ import {
   type FinancierBatterSample,
   type FinancierHobModel,
   type FinancierMixerTool,
-} from "@seams/production-simulation/recipes/financier-batter/model";
+} from "@purin-labs/production-simulation/recipes/financier-batter/model";
 import {
   FinancierBatterScene,
   type FinancierBatterCameraPreset,
 } from "./financier-batter-scene";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "../oven-workspace.css";
 // The station readout uses the pour-over styles, so this view loads them itself.
 import "../pour-over/pour-over.css";
@@ -39,7 +39,7 @@ import {
   type RecipeRun,
   type RecipeRunView,
 } from "../shared/recipe-workspace";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const BATTER_STEPS: readonly RecipeStep[] = [
   {

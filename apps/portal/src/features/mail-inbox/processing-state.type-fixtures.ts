@@ -1,6 +1,6 @@
-import type { MailOrganizationView } from "@seams/control-api";
+import type { MailOrganizationView } from "@purin-labs/control-api";
 import type { MailProcessingState } from "./processing-state";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const view: MailOrganizationView;
 declare const ready: Variant<MailProcessingState, "ready">;

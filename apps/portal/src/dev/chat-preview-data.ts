@@ -1,4 +1,4 @@
-import { isUserId, isConversationId, parseConversationId, parseProjectId, type ConversationId, type Project, type ProjectId } from "@seams/control-api";
+import { isUserId, isConversationId, parseConversationId, parseProjectId, type ConversationId, type Project, type ProjectId } from "@purin-labs/control-api";
 import type { ChatStreamRecord } from "../features/chat/stream";
 import {
   draftsPreviewEnabled,
@@ -412,7 +412,7 @@ function permissionPauseScenario(): boolean {
   );
 }
 
-function permissionPauseWork(): import("@seams/control-api/portal/chat").ChatWork {
+function permissionPauseWork(): import("@purin-labs/control-api/portal/chat").ChatWork {
   return {
     kind: "awaiting_permission",
     requestId: "preview_request",
@@ -443,7 +443,7 @@ function failedStreamScenario(id: ConversationId | null): boolean {
 
 function previewFailedTurn(
   id: ConversationId | null,
-): import("@seams/control-api/portal/chat").ChatTimelineView[] {
+): import("@purin-labs/control-api/portal/chat").ChatTimelineView[] {
   if (!failedStreamScenario(id) || failedPreviewWork().kind !== "failed")
     return [];
   return [
@@ -458,7 +458,7 @@ function previewFailedTurn(
   ];
 }
 
-function failedPreviewWork(): import("@seams/control-api/portal/chat").ChatWork {
+function failedPreviewWork(): import("@purin-labs/control-api/portal/chat").ChatWork {
   if (previewFailureAt !== null && Date.now() >= previewFailureAt)
     return {
       kind: "failed",
@@ -550,7 +550,7 @@ function previewStreamDelta(text: string, index: number): ChatStreamRecord {
   return { kind: "assistant_text_delta", sequence: index + 1, text };
 }
 
-function previewStreamAnswer(): import("@seams/control-api/portal/chat").ChatTimelineView[] {
+function previewStreamAnswer(): import("@purin-labs/control-api/portal/chat").ChatTimelineView[] {
   if (!previewStreamComplete) return [];
   return [
     {
@@ -573,7 +573,7 @@ function resolvePreviewDelay(resolve: () => void): void {
   window.setTimeout(resolve, 600);
 }
 import type { ChatPageData } from "../features/chat/api";
-import type { ChatModelCapabilities, ChatToolView } from "@seams/control-api";
+import type { ChatModelCapabilities, ChatToolView } from "@purin-labs/control-api";
 const previewTool: ChatToolView = {
   toolCallId: "preview-documentation",
   action: "Read shipping documentation",
@@ -692,7 +692,7 @@ function recordFreshPreviewTurn(id: ConversationId, text: string, requestId: str
   sessionStorage.setItem("chat-preview-fresh", JSON.stringify(chats));
 }
 
-function freshPreviewTimeline(turns: readonly FreshPreviewTurn[]): import("@seams/control-api/portal/chat").ChatTimelineView[] {
+function freshPreviewTimeline(turns: readonly FreshPreviewTurn[]): import("@purin-labs/control-api/portal/chat").ChatTimelineView[] {
   return turns.flatMap((turn, index) => [
     {
       kind: "user" as const,
@@ -776,7 +776,7 @@ async function previewDraftSave(init: RequestInit): Promise<Response> {
   return Response.json({ draft: { revision: 1, draft, updatedAt: Date.now() } });
 }
 
-function previewRegeneratedAnswer(): import("@seams/control-api/portal/chat").ChatTimelineView[] {
+function previewRegeneratedAnswer(): import("@purin-labs/control-api/portal/chat").ChatTimelineView[] {
   const text = sessionStorage.getItem("chat-preview-regenerate");
   const requestId = sessionStorage.getItem("chat-preview-request-id");
   if (questionScenario() || text === null || requestId === null) return [];
@@ -835,7 +835,7 @@ async function previewQuestionSend(
   return previewFetch(url);
 }
 
-function previewQuestionAnswer(): import("@seams/control-api/portal/chat").ChatTimelineView[] {
+function previewQuestionAnswer(): import("@purin-labs/control-api/portal/chat").ChatTimelineView[] {
   const text = sessionStorage.getItem("chat-preview-question-answer");
   if (!questionScenario() || text === null) return [];
   return [
@@ -970,7 +970,7 @@ function chatPreviewResponse(
   });
 }
 function sidebarPreviewSummary<
-  T extends import("@seams/control-api/portal/chat").ChatConversationSummary,
+  T extends import("@purin-labs/control-api/portal/chat").ChatConversationSummary,
 >(summary: T): T {
   const working =
     summary.id.endsWith("0002") &&
@@ -985,7 +985,7 @@ function sidebarPreviewSummary<
 }
 
 function previewTimelineTransport(
-  event: import("@seams/control-api/portal/chat").ChatTimelineView,
+  event: import("@purin-labs/control-api/portal/chat").ChatTimelineView,
 ) {
   return event.kind === "user"
     ? {
@@ -995,7 +995,7 @@ function previewTimelineTransport(
     : event;
 }
 
-function previewPendingInputTransport(input: import("@seams/control-api/portal/chat").ChatPendingInput) {
+function previewPendingInputTransport(input: import("@purin-labs/control-api/portal/chat").ChatPendingInput) {
   return { inputId: input.inputId, requestId: input.requestId, mode: input.mode, acceptedAt: input.acceptedAt, parts: [{ kind: "text", text: input.text }] };
 }
 

@@ -19,10 +19,10 @@ change, then proves the full path with durable evidence.
 
 | Change                       | First check                                        |
 | ---------------------------- | -------------------------------------------------- |
-| TypeScript platform code     | `pnpm --filter @seams/platform check:types`             |
-| Test-only TypeScript changes | `pnpm --filter @seams/platform check:test-types`        |
-| Onboarding or lifecycle      | `pnpm --filter @seams/platform test:onboarding-closure` |
-| Commerce lifecycle           | `pnpm --filter @seams/platform test:commerce-lab`       |
+| TypeScript platform code     | `pnpm --filter @purin-labs/platform check:types`             |
+| Test-only TypeScript changes | `pnpm --filter @purin-labs/platform check:test-types`        |
+| Onboarding or lifecycle      | `pnpm --filter @purin-labs/platform test:onboarding-closure` |
+| Commerce lifecycle           | `pnpm --filter @purin-labs/platform test:commerce-lab`       |
 | Portal behavior              | `pnpm portal:build`                                |
 | Rust crates                  | `cargo test --workspace`                           |
 

@@ -4,8 +4,8 @@ import type {
   CollaborationAgentAction,
   CollaborationAgentActivity,
   CollaborationAgentColorKey,
-} from "@seams/collaboration";
-import type { MenuBoardElement, MenuBoardRect } from "@seams/menu-board-crdt/board";
+} from "@purin-labs/collaboration";
+import type { MenuBoardElement, MenuBoardRect } from "@purin-labs/menu-board-crdt/board";
 import "./canvas-agents.css";
 
 /**

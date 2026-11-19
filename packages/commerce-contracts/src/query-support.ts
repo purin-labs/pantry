@@ -1,4 +1,4 @@
-import { assertNever, canonicalJsonByCodePoint } from "@seams/std";
+import { assertNever, canonicalJsonByCodePoint } from "@purin-labs/std";
 import type { CommerceEntityRef } from "./entity-reference.ts";
 import type {
   CommerceGraphQuery,

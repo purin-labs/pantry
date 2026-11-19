@@ -1,16 +1,16 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Env } from "../env";
-import { parseMailReplyEdit } from "@seams/control-api";
+import { parseMailReplyEdit } from "@purin-labs/control-api";
 import type { Result } from "../result";
 import type { EmailReplyProposalProjection } from "../data/email-mailbox";
 import { newRequestId, type OrganisationId, type UserId } from "../ids";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { traceWarn } from "../observability";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { AgentMailboxConnectorHandle } from "./agent-mailbox-connector";
 import { emailApprovalChallenge } from "./email-approval-challenge";
 import { recordEmailReplyRevision } from "./email-reply-lifecycle";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** Plan 40D: the Organisation Actor that holds a reply's shared draft. */
 export async function mailReplyDraftActor(

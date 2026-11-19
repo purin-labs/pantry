@@ -1,5 +1,5 @@
-import type { CommerceAuthorityScope } from "@seams/commerce-contracts";
-import type { CommerceMutationTarget } from "@seams/commerce-contracts";
+import type { CommerceAuthorityScope } from "@purin-labs/commerce-contracts";
+import type { CommerceMutationTarget } from "@purin-labs/commerce-contracts";
 import type { CommerceReadGrantScope } from "./CommerceReadGrantScope";
 import type { FileResourceScope } from "./FileResourceScope";
 

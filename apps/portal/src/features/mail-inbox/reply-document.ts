@@ -8,7 +8,7 @@ import {
   type MailReplyListItem,
   type MailReplyRun,
   type MailReplySize,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /**
  * Reads the reply editor's content as a reply document. Only the formats that

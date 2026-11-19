@@ -1,4 +1,4 @@
-import { CLOUD_VOICE_ENGINE } from "@seams/control-api";
+import { CLOUD_VOICE_ENGINE } from "@purin-labs/control-api";
 
 import type { Env } from "../env";
 import { hearWithWorkersAiWhisper } from "./engines/workers-ai-whisper";

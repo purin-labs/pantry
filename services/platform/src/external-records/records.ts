@@ -1,6 +1,6 @@
 import { runtimeFetch } from "../runtime-fetch";
 import type { Result } from "../result";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 const NOTION_API_VERSION = "2026-03-11";
 const MAX_PROVIDER_RESPONSE_BYTES = 512 * 1024;

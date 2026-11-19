@@ -2,9 +2,9 @@
 // requests (Plan 81 slice 6). The proposal freezes what the card shows in the
 // action path, so an approval signs that exact change. Commerce checks the
 // revisions at commit.
-import { isRecord } from "@seams/std";
-import type { Quantity } from "@seams/contracts";
-import type { ListEntryAttributeValue } from "@seams/commerce-contracts";
+import { isRecord } from "@purin-labs/std";
+import type { Quantity } from "@purin-labs/contracts";
+import type { ListEntryAttributeValue } from "@purin-labs/commerce-contracts";
 
 import type { Result } from "../result";
 

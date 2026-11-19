@@ -365,7 +365,7 @@ async function checkLiveOvenPhysics(path) {
     const pack = JSON.parse(artifact.content.slice(0, newline));
     if (pack.kind !== "recording-pack") continue;
     const { readRecordingPack } =
-      await import("/@id/@seams/production-simulation");
+      await import("/@id/@purin-labs/production-simulation");
     const decoded = readRecordingPack(artifact.content);
     if (!decoded.ok) throw new Error("Invalid recording pack");
     for (const record of decoded.value.records) {
@@ -428,7 +428,7 @@ async function checkLiveRecordingBoundaries(evidence) {
   const records = await (
     await fetch(`${evidence}/live-observations.json`)
   ).json();
-  const { readPhysicsView } = await import("/@id/@seams/production-simulation");
+  const { readPhysicsView } = await import("/@id/@purin-labs/production-simulation");
   const { parsePersistentCell } = await import(
     `/@fs${window.satyrCheckout}/packages/bakery-model/src/bakery-physics.ts`
   );
@@ -927,7 +927,7 @@ function ovenCompleted() {
 }
 
 async function compareOvenDownloads(paths) {
-  const { canonicalJson } = await import("/@id/@seams/std");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const baseline = await (
     await fetch(`${paths.evidence}/baseline.json`)
   ).json();
@@ -1125,7 +1125,7 @@ async function checkOvenPhysicsSample({ path, task, endpoint }) {
     const header = JSON.parse(artifact.content.slice(0, newline));
     if (header.kind !== "recording-pack") continue;
     const { readRecordingPack } =
-      await import("/@id/@seams/production-simulation");
+      await import("/@id/@purin-labs/production-simulation");
     const decoded = readRecordingPack(artifact.content);
     if (!decoded.ok) throw new Error("Invalid recording pack");
     for (const item of decoded.value.records) {
@@ -1310,7 +1310,7 @@ async function cellInspectionTargets(path) {
     const pack = JSON.parse(artifact.content.slice(0, newline));
     if (pack.kind !== "recording-pack") continue;
     const { readRecordingPack } =
-      await import("/@id/@seams/production-simulation");
+      await import("/@id/@purin-labs/production-simulation");
     const decoded = readRecordingPack(artifact.content);
     if (!decoded.ok) throw new Error("Invalid recording pack");
     for (const record of decoded.value.records) {
@@ -1561,7 +1561,7 @@ async function checkIndexedRecordingAccess(paths) {
       break;
     }
   const { readRecordingPack } =
-    await import("/@id/@seams/production-simulation");
+    await import("/@id/@purin-labs/production-simulation");
   const decoded = readRecordingPack(content.content);
   if (!decoded.ok) throw new Error("The fixture pack cannot be decoded.");
   const header = {

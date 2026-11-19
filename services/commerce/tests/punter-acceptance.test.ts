@@ -32,7 +32,7 @@ import {
   type CommerceClientResult,
   type CommerceResourcesV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { BuyerSessionAuthority } from "../src/buyer-session.ts";
@@ -51,7 +51,7 @@ import {
   LOCAL_COMMERCE_MERCHANT,
   seedLocalCommerce,
 } from "../scripts/seed-local-commerce.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const NOW = "2026-08-14T10:00:00.000Z";
 const SERVICE_TOKEN = "punter_acceptance_service_token";

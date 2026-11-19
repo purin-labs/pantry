@@ -1,6 +1,6 @@
 import { OpenObject, StrictObject } from "./schema.ts";
 import { Type, type Static } from "typebox";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 // These Rust records accept extra input fields. Keep that boundary behavior
 // until the complete query parser performs its existing normalization.

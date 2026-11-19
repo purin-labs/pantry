@@ -1,4 +1,4 @@
-import type { CustomConnectorAction, CustomConnectorRevisionView, CustomConnectorSetupAttempt } from "@seams/control-api/portal/custom-connectors";
+import type { CustomConnectorAction, CustomConnectorRevisionView, CustomConnectorSetupAttempt } from "@purin-labs/control-api/portal/custom-connectors";
 import type { CustomConnectorDetail } from "../features/integrations/custom-connector-api";
 
 const NOW = Date.parse("2026-09-13T09:00:00Z");

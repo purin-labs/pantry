@@ -7,12 +7,12 @@ import type {
   CommerceAuthorityScope,
   CommerceEntityAuthority,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceEntityPlaneCommand,
   parseCommerceGraphQuery,
   parseEntityPlaneCommand,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -32,7 +32,7 @@ import {
   listAccessGrants,
 } from "../src/data/access-grants";
 import { d1Database } from "./sqlite-d1";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { requireOrganisationId } from "./test-ids";
 
 const baselineSql = singleDatabaseSchema();

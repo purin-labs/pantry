@@ -22,7 +22,7 @@ import {
   Maximize2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import "./prompt-toast.css";
 
 export type PromptToastTone =

@@ -28,7 +28,7 @@ import {
 import {
   assertNever,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   createActiveAdminIntegration,
   fieldErrorResponse,

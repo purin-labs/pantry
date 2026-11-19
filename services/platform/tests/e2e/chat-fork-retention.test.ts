@@ -2,7 +2,7 @@ import { requireOrganisationExecutionScope } from "../organisation-execution-fix
 import { fixtureDatabase } from "./organisation-database";
 import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import { parseOrganisationId, parseIntegrationAccountId } from "../../src/ids";
 import { acquireSlackAttachmentBatch } from "../../src/slack/attachments";
 import { parseSlackEnvelope } from "../../src/slack/events";

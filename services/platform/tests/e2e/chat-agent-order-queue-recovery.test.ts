@@ -6,7 +6,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { OrganisationDO } from "../../src/actors/organisation";
 import { advanceOrderQueueEntry } from "../../src/commerce/order-queue-commands";

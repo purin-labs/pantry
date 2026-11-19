@@ -1,5 +1,5 @@
-import type { Quantity, QuantityUnit } from "@seams/contracts";
-import { assertNever } from "@seams/std";
+import type { Quantity, QuantityUnit } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
 import { err, ok, type Result } from "./result.ts";
 
 declare const quantityBrand: unique symbol;

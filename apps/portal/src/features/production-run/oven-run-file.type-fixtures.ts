@@ -1,9 +1,9 @@
-import type { CompiledScenario } from "@seams/production-simulation";
-import type { OvenDefinition, OvenRunSource, OvenSave } from "@seams/production-simulation/runs/oven-run-file";
-import type { PersistentOvenCell } from "@seams/bakery-model/bakery-physics";
-import type { PersistentPanCell } from "@seams/bakery-model/bakery-physics";
-import type { PersistentRackCell } from "@seams/bakery-model/bakery-physics";
-import type { ExecutionBundle } from "@seams/production-simulation";
+import type { CompiledScenario } from "@purin-labs/production-simulation";
+import type { OvenDefinition, OvenRunSource, OvenSave } from "@purin-labs/production-simulation/runs/oven-run-file";
+import type { PersistentOvenCell } from "@purin-labs/bakery-model/bakery-physics";
+import type { PersistentPanCell } from "@purin-labs/bakery-model/bakery-physics";
+import type { PersistentRackCell } from "@purin-labs/bakery-model/bakery-physics";
+import type { ExecutionBundle } from "@purin-labs/production-simulation";
 
 declare const definition: OvenDefinition;
 declare const scenario: CompiledScenario;

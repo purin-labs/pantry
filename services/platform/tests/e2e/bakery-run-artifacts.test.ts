@@ -1,8 +1,8 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect, it } from "vitest";
-import { isRecord, sha256Hex } from "@seams/std";
-import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import {
   attachSharedAccountNativeOrganisation,

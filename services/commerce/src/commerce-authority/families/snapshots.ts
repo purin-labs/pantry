@@ -14,8 +14,8 @@ import {
   type CommerceOrderTimesV1,
   type CommercePickupQueueV1,
   type CommerceCounterCashTenderV1,
-} from "@seams/commerce-client";
-import type { Checkout, CheckoutPaymentAttempt } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { Checkout, CheckoutPaymentAttempt } from "@purin-labs/commerce-contracts";
 import type { FailedPaymentsWindow } from "../../payments/failed-payments.ts";
 import { readManualTender } from "../../payments/manual-tender.ts";
 import {

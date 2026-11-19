@@ -1,4 +1,4 @@
-import type { AuthorizedHarnessToolResult, ModelRoute } from "@seams/contracts";
+import type { AuthorizedHarnessToolResult, ModelRoute } from "@purin-labs/contracts";
 import type {
   ActiveEmbeddedHarnessBackendId,
   EmbeddedHarnessBackendId,

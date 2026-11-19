@@ -20,9 +20,9 @@ import {
   type ControlMutationReceiptScope,
 } from "./control-mutation";
 import type { OrganisationEnvironment } from "./control-plane";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   prepareOrganisationLifecycleMove,
   type OrganisationLifecycleState as LifecycleMachineState,

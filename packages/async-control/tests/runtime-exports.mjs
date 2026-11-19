@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createCancellableTask } from "@seams/async-control/cancellable-task";
-import { runTaskBeforeDeadline } from "@seams/async-control/deadline";
-import { createContinueSerialQueue } from "@seams/async-control/serial-queue";
+import { createCancellableTask } from "@purin-labs/async-control/cancellable-task";
+import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
+import { createContinueSerialQueue } from "@purin-labs/async-control/serial-queue";
 
 test("compiled package subpaths load in Node", compiledExportsLoadTest);
 

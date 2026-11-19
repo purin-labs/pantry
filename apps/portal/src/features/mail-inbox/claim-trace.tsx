@@ -1,5 +1,5 @@
 import React from "react";
-import type { MailReplySource } from "@seams/control-api";
+import type { MailReplySource } from "@purin-labs/control-api";
 import {
   recordHref,
   recordLinkLabel,

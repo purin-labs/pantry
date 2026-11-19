@@ -9,8 +9,8 @@
  * transitions cannot shift the computed local date.
  */
 
-import { assertNever, exhaustiveList } from "@seams/std";
-import type { ScheduleSpec, ScheduleWeekday } from "@seams/control-api";
+import { assertNever, exhaustiveList } from "@purin-labs/std";
+import type { ScheduleSpec, ScheduleWeekday } from "@purin-labs/control-api";
 
 const WEEKDAYS = exhaustiveList<ScheduleWeekday>()([
   "mon",

@@ -1,7 +1,7 @@
 import { parseCaseId } from "../../ids";
 import type { Result } from "../../result";
 import type { ContextVisibility } from "./types";
-import { assertNever, isRecord, positiveIntegerOrNull } from "@seams/std";
+import { assertNever, isRecord, positiveIntegerOrNull } from "@purin-labs/std";
 
 export type ContextVisibilityParseError = {
   readonly code: "invalid_context_visibility";

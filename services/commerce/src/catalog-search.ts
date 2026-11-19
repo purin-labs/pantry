@@ -8,7 +8,7 @@ import type {
   CommerceBuyerCatalogListingV1,
   CommerceBuyerCatalogSearchV1,
   CommerceBuyerCatalogV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 const CATALOG_SEARCH_DEFAULT_LIMIT = 20;
 const CATALOG_SEARCH_MAXIMUM_LIMIT = 50;

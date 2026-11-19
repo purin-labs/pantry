@@ -30,7 +30,7 @@ import type { ContractDecodeResult } from "./schema.ts";
 
 export type { ContractDecodeError, ContractDecodeResult } from "./schema.ts";
 import { parseSavedCommerceView } from "./view-records.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export class LexiconValidationError extends TypeError {
   readonly code: string;

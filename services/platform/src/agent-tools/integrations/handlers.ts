@@ -7,7 +7,7 @@ import {
 } from "../../actors/airtable-tool-input";
 import { callAirtableApi } from "../../integrations/airtable-api";
 import { resolveAirtableAccountToken } from "../../external-records/oauth";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import {
   parseCaseId,
@@ -49,7 +49,7 @@ import { listAccessGrants } from "../../data/access-grants";
 import { selectActiveGrants } from "../../authorization/access-grants/compiler";
 import type { EffectiveGrantSet } from "../../authorization/access-grants";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   type EmailMailboxReadScope,
   evaluateHarnessFlowSink,
@@ -208,7 +208,7 @@ export async function readCustomConnectorForEmbeddedHarness(
 export async function listIntegrationsForEmbeddedHarness(
   context: SessionToolContext,
   request: HarnessIntegrationListRequest,
-): Promise<import("@seams/contracts").IntegrationDiscoveryView> {
+): Promise<import("@purin-labs/contracts").IntegrationDiscoveryView> {
   const { storage, execution, lease, assignment } = context;
   const organisationId = execution.scope.organisationId;
   await requireSessionExecution(execution, lease);

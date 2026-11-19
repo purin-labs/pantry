@@ -1,8 +1,8 @@
-import type { ShopifyResourceEnvelopeV202607 } from "@seams/contracts";
+import type { ShopifyResourceEnvelopeV202607 } from "@purin-labs/contracts";
 import type { JsonObject } from "../../http";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type {
   ShopifyCommerceCatalogEnvelope,
   ShopifyCommerceInventoryLevelEnvelope,

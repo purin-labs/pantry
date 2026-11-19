@@ -4,8 +4,8 @@ import type {
   PhysicsReplay,
   PhysicsOutcome,
   PersistentPhysicsMotion,
-} from "@seams/bakery-model/bakery-physics";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { assertNever } from "@purin-labs/std";
 import type { WorkcellTaskId } from "./workcell-input.ts";
 import {
   COLD_CELL,

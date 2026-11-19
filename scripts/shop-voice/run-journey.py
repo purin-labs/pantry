@@ -285,7 +285,7 @@ def main() -> None:
                        check=True, capture_output=True)
         config = ROOT / "scripts/shop-voice/wrangler.jsonc"
         persistence = work / "worker"
-        wrangler = ["pnpm", "--filter", "@seams/platform", "exec", "wrangler"]
+        wrangler = ["pnpm", "--filter", "@purin-labs/platform", "exec", "wrangler"]
         with (ARTIFACTS / "schema.log").open("w") as log:
             subprocess.run([*wrangler, "d1", "execute", "DB", "--config", str(config), "--local", "--persist-to", str(persistence),
                             "--file", str(single_database_schema_file())],

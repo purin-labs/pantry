@@ -1,5 +1,5 @@
 import type { Result } from "../result";
-import type { ChatModelCapabilities } from "@seams/control-api";
+import type { ChatModelCapabilities } from "@purin-labs/control-api";
 
 const TEXT_TOOLS_CAPABILITIES: ChatModelCapabilities = {
   input: { text: true, images: true, documents: false },

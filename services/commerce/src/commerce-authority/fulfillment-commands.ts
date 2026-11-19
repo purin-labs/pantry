@@ -18,11 +18,11 @@ import {
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
   type CommerceFirstPartyShipmentV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type ShipmentLabelRateSnapshot,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import { digestOfCommand, type MerchantRow } from "./ledger.ts";
 import {

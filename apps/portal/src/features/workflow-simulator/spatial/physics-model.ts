@@ -1,7 +1,7 @@
-import type { PhysicsSceneReplay } from "@seams/production-simulation/recipes/bakery/physics-playback";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
+import type { PhysicsSceneReplay } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
 import * as THREE from "three";
-import type { WorkcellResourceId } from "@seams/production-simulation/recipes/bakery/workcell-input";
+import type { WorkcellResourceId } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
 import type {
   PhysicsPose,
   PhysicsSample,
@@ -9,24 +9,24 @@ import type {
   PhysicsEvent,
   PhysicsLayout,
   PersistentPhysicsMotion,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   sceneLegAt,
   physicsLegAt,
   sceneDuration,
-} from "@seams/production-simulation/recipes/bakery/physics-playback";
+} from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import {
   modelBoxes,
   planFootprint,
   type FloorPlanItem,
   type FitFinding,
 } from "./floor-plan-geometry.ts";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
-import { workcellResource } from "@seams/production-simulation/recipes/bakery/workcell-input";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
+import { workcellResource } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
 import {
   COLD_CELL,
   instanceForFixture,
-} from "@seams/production-simulation/recipes/bakery/workcell-instances";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 import {
   checkDoorSweep,
   doorSweepBounds,

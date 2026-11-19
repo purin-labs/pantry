@@ -63,7 +63,7 @@ import type { RefundDutyAllocation } from "./records/identifiers.ts";
 import type { RefundLineAllocation } from "./records/identifiers.ts";
 import type { RefundReason as GeneratedRefundReason } from "./records/after-sale.ts";
 import type { RefundTaxAllocation } from "./records/identifiers.ts";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 export type { BuyerContactPolicy };
 export type ProtectedBuyerContact = StrictUnion<GeneratedProtectedBuyerContact>;

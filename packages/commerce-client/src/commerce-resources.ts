@@ -24,10 +24,10 @@ import {
   type StockPolicy,
   type Storefront,
   type VariantShippingSpecification,
-} from "@seams/commerce-contracts";
-import { parseCommerceStockSnapshotV1Record } from "@seams/commerce-contracts/records/api-stock";
-import { exhaustiveList } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts";
+import { parseCommerceStockSnapshotV1Record } from "@purin-labs/commerce-contracts/records/api-stock";
+import { exhaustiveList } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { type CommerceFoodServiceSnapshotV1 } from "./food-service.ts";
 import { requireBoundedText, requireEnum } from "./wire-readers.ts";
 import {
@@ -42,14 +42,14 @@ import {
   parseShippingQuoteSnapshot as parseShippingQuoteSnapshotRecord,
   parseStorefront as parseStorefrontRecord,
   parseVariantShippingSpecification as parseVariantShippingSpecificationRecord,
-} from "@seams/commerce-contracts/records/commerce-records";
+} from "@purin-labs/commerce-contracts/records/commerce-records";
 import {
   carrierServiceRecordSchema,
   checkoutProfileRecordReferenceSchema,
   estimatedDeliverySnapshotSchema,
   parsePackagePlanSnapshot as parsePackagePlanSnapshotRecord,
-} from "@seams/commerce-contracts/records/commerce-records";
-import { parsePointOfSaleConfiguration as parsePointOfSaleConfigurationRecord } from "@seams/commerce-contracts/records/point-of-sale-configuration";
+} from "@purin-labs/commerce-contracts/records/commerce-records";
+import { parsePointOfSaleConfiguration as parsePointOfSaleConfigurationRecord } from "@purin-labs/commerce-contracts/records/point-of-sale-configuration";
 import {
   compareAtPriceParser,
   fieldRecordParser,
@@ -74,16 +74,16 @@ import {
   parseCommerceVariantMediaV1 as parseCommerceVariantMediaV1Record,
   parseCommerceVariantOptionV1 as parseCommerceVariantOptionV1Record,
   parseCommerceVariantV1 as parseCommerceVariantV1Record,
-} from "@seams/commerce-contracts/records/api-resources";
+} from "@purin-labs/commerce-contracts/records/api-resources";
 import {
   wireInventoryLotExpirySchema,
   wireMoneySchema,
   wireProtectedBuyerContactSchema,
   wireQuantitySchema,
-} from "@seams/commerce-contracts/records/api-common";
+} from "@purin-labs/commerce-contracts/records/api-common";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
-import type * as ApiResources from "@seams/commerce-contracts/records/api-resources";
-import type * as ApiResourcesB from "@seams/commerce-contracts/records/api-common";
+import type * as ApiResources from "@purin-labs/commerce-contracts/records/api-resources";
+import type * as ApiResourcesB from "@purin-labs/commerce-contracts/records/api-common";
 
 const QUANTITY_UNITS = exhaustiveList<QuantityUnit>()([
   "each",

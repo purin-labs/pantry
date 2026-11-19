@@ -1,16 +1,16 @@
-import type { EmailOperationalPreviewResult, EmailReplyPreviewResult } from "@seams/control-api/portal/agent-mailbox";
-import type { MailReplyEdit } from "@seams/control-api";
+import type { EmailOperationalPreviewResult, EmailReplyPreviewResult } from "@purin-labs/control-api/portal/agent-mailbox";
+import type { MailReplyEdit } from "@purin-labs/control-api";
 import {
   ControlApiError,
   controlRead,
   controlWrite,
   readCookie,
 } from "../../control-client";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   parseEmailOperationalPreviewResponse,
   parseEmailReplyPreviewResponse,
-} from "@seams/control-api/portal/email-review";
+} from "@purin-labs/control-api/portal/email-review";
 
 export type EmailReviewActions = Readonly<{
   loadEmailReply: (proposalId: string) => Promise<EmailReplyPreviewResult>;

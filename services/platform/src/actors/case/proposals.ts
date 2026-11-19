@@ -1,6 +1,6 @@
-import type { CaseContent, CaseLifecycle } from "@seams/contracts";
-import { assertNever } from "@seams/std";
-import { machineTransition } from "@seams/std/state-machine";
+import type { CaseContent, CaseLifecycle } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
+import { machineTransition } from "@purin-labs/std/state-machine";
 import type { MerchantActionDecision } from "../../approval-authentication";
 import type { ActionLedgerEntry } from "../action-ledger";
 import { writeActorTransition } from "../lifecycle/state-transition";
@@ -8,7 +8,7 @@ import { CASE_APPROVAL_WAIT_MACHINE } from "./approval-wait.machine";
 import { authorityPartitionKeyMatchesRequest } from "../../authorization/access-grants/turn-authority";
 import { FlowBinding } from "../../policy";
 import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { commerceApprovalNoticeDeliveryId } from "../../slack/commerce-approval-card";
 import {
   bindingMatchesAssignmentTurn,

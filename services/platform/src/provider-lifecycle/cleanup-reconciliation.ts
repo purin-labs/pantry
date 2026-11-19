@@ -32,8 +32,8 @@ import type {
   ProviderCleanupReason,
   ProviderManualActionInstruction,
 } from "../provider-adapters/domain";
-import type { Variant } from "@seams/type-utils";
-import { backoffDelay, isString } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { backoffDelay, isString } from "@purin-labs/std";
 
 type ProviderCleanupEnvironment = ProviderCleanupBindings &
   CredentialVaultBindings &

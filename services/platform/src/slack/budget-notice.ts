@@ -1,4 +1,4 @@
-import type { SessionBudgetDimension } from "@seams/contracts";
+import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import type { Env } from "../env";
 import { requirePublicOrigin } from "../public-origin";
 import { noticeCardBlocks } from "./notice-card";

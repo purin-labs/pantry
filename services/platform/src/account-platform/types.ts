@@ -32,7 +32,7 @@ import {
   type PlatformUsageReceiptV1 as AccountUsageReceipt,
 } from "@seams-internal/console-shared/accountPlatform";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export {
   accountObject,

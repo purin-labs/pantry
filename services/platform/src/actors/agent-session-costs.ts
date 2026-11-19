@@ -20,8 +20,8 @@ import {
   productWasteCellKey,
   supplyFieldCellKey,
   type CostsSheetCell,
-} from "@seams/costs-sheet-crdt";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
+} from "@purin-labs/costs-sheet-crdt";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import {
   COST_FORMULA_COLUMNS,
   calculateBakery12WeekForecast,
@@ -30,9 +30,9 @@ import {
   defaultCostAssumptions,
   type CostForecastPlan,
   type CostUnit,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
-import type { CommerceAdminClient } from "@seams/commerce-client";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import type { CatalogExecutionContext } from "../agent-tools/catalog/execute";
 import {
   StaffPageRequestError,

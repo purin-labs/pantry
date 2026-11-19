@@ -1,6 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
-import type { TaskSnapshot } from "@seams/production-simulation/recipes/bakery/schedule";
+import type { TaskSnapshot } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 
 export function taskStatusLabel(kind: TaskSnapshot["kind"]): string {
   switch (kind) {

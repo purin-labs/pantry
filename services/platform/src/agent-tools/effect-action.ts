@@ -1,5 +1,5 @@
-import type { HeldEffectAction } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import type { HeldEffectAction } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
 import { digestCanonical } from "../policy/information-flow";

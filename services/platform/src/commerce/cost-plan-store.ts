@@ -11,11 +11,11 @@ import {
   type OrganisationCostPlan,
   type ProductCostPlanEntry,
   type SupplyLotInvoiceCost,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   commerceCommandInput,
   type CommerceAdminClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 type PlanHeaderRow = Readonly<{
   revision: number;

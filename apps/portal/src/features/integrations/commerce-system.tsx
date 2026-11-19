@@ -3,7 +3,7 @@ import {
   StatusChip,
   formatRelativeTime,
 } from "../../page-components";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   CommerceSystem,
   CommerceSystemSync,

@@ -2,7 +2,7 @@ import {
   parseChatSignal,
   SURFACE_EFFECT_SIGNAL,
   type ChatSignal,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { SocketLiveness } from "../collaboration/socket-liveness";
 import {
   announceSurfaceEffect,

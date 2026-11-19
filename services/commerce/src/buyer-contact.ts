@@ -3,8 +3,8 @@ import { createHash } from "node:crypto";
 import type {
   CommerceBuyerContactV1,
   CommerceProtectedBuyerContactV1,
-} from "@seams/commerce-client";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { assertNever } from "@purin-labs/std";
 
 export function protectBuyerContact(
   input: Readonly<{

@@ -1,11 +1,11 @@
-import { isMenuScreenCode, type MenuScreenSummary } from "@seams/control-api";
+import { isMenuScreenCode, type MenuScreenSummary } from "@purin-labs/control-api";
 import {
   isMenuBoardLayout,
   isMenuBoardStart,
   isMenuBoardText,
   menuBoardStartFits,
-} from "@seams/menu-board-crdt/board";
-import { encodeBase64Url } from "@seams/std";
+} from "@purin-labs/menu-board-crdt/board";
+import { encodeBase64Url } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type {
   MenuBoardCommand,
@@ -27,7 +27,7 @@ import {
   claimScreenPairing,
   readOpenScreenPairing,
 } from "../../data/screen-pairing";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The Portal's routes for menu boards and screens (Plan 40B phase 1):

@@ -11,7 +11,7 @@ import {
   armAlarmAfterFailedSteps,
   runAlarmSteps,
 } from "./lifecycle/actor-alarm";
-import type { CollaborationAgent } from "@seams/collaboration";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { screenMediaBase } from "../commerce/cafe-media";
 import {
   CHAT_SIGNAL_SOCKET_HANDLER,
@@ -35,9 +35,9 @@ import {
   SURFACE_EFFECT_SIGNAL,
   isConversationId,
   type ChatSignal,
-} from "@seams/control-api";
-import { workflowCanvasDocumentId } from "@seams/bakery-model/bakery-canvas-source";
-import type { WorkflowCanvasSource } from "@seams/bakery-model/bakery-canvas-source";
+} from "@purin-labs/control-api";
+import { workflowCanvasDocumentId } from "@purin-labs/bakery-model/bakery-canvas-source";
+import type { WorkflowCanvasSource } from "@purin-labs/bakery-model/bakery-canvas-source";
 import { savedBakeryRunArchiveKeys } from "../commerce/bakery/saved-runs";
 import {
   reconcileFrozenOrganisationReceipt,
@@ -109,7 +109,7 @@ import { WorkflowCanvasRooms } from "./workflow-canvas-rooms";
 import type {
   DraftChangeSet,
   DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft-shape";
+} from "@purin-labs/workflow-canvas-crdt/draft-shape";
 import { WorkflowDraftRooms } from "./workflow-draft";
 import {
   collaborationSocketRoute,
@@ -131,7 +131,7 @@ import type { ControlSessionId, UserId } from "../ids";
 import {
   CanvasAgentRequest,
   CanvasMoveRequest,
-} from "@seams/workflow-canvas-crdt/move";
+} from "@purin-labs/workflow-canvas-crdt/move";
 import {
   authorizeWorkflowCanvasRequest,
   matchWorkflowCanvasRoute,
@@ -166,8 +166,8 @@ import type { CaseExecutionEffectRecords } from "../case-execution/records";
 import { readCaseEffectRecords } from "./organisation-execution-records";
 import { type AcceptedMemoryCursor } from "../memory/store";
 import { cleanupTypeSafeCredentials } from "../integrations/typesafe/connection";
-import { assertNever, errorMessage } from "@seams/std";
-import type { CommerceBoardPresenceEntry } from "@seams/control-api";
+import { assertNever, errorMessage } from "@purin-labs/std";
+import type { CommerceBoardPresenceEntry } from "@purin-labs/control-api";
 import { expireOrganisationLeases } from "./organisation/activation";
 import { deliverCaseContextCollectionInvalidations } from "./organisation/case-context-collection";
 import { createOrganisationSchema } from "./organisation/schema";

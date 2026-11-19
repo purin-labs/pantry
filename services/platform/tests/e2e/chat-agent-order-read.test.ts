@@ -5,7 +5,7 @@
 import { env } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { lastCalledTool } from "./chat-permission-support";

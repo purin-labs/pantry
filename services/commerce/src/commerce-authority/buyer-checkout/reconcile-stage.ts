@@ -1,5 +1,5 @@
-import { type ReconcileCommerceBuyerPaymentV1 } from "@seams/commerce-client";
-import { isOnlinePaymentBinding } from "@seams/commerce-contracts";
+import { type ReconcileCommerceBuyerPaymentV1 } from "@purin-labs/commerce-client";
+import { isOnlinePaymentBinding } from "@purin-labs/commerce-contracts";
 import {
   readCheckout,
   readCheckoutPaymentAttempt,

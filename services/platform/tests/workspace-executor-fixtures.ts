@@ -1,4 +1,4 @@
-import type { AttachmentId } from "@seams/contracts";
+import type { AttachmentId } from "@purin-labs/contracts";
 
 import { buildStoredMessageAttachment } from "../src/messages/message-wasm";
 

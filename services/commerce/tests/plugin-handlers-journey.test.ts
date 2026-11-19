@@ -15,8 +15,8 @@ import {
   type CommercePluginHandlerV1,
   type CommercePluginSettingsV1,
   type CommerceStorefrontClient,
-} from "@seams/commerce-client";
-import type { PluginDefinition } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { PluginDefinition } from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import {

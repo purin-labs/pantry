@@ -12,7 +12,7 @@ import {
   CommerceEntityPlaneClient,
   commerceExportPresetDigestPayload,
   parseEntityPlaneExportPresetPublishResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   parseCommerceExportPresetPublishRequest,

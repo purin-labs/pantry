@@ -1,6 +1,6 @@
-import type { StrictUnion } from "@seams/type-utils";
-import { canonicalJson, sha256Hex } from "@seams/std";
-import type { HostIdentity, HostView } from "@seams/production-simulation";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
+import type { HostIdentity, HostView } from "@purin-labs/production-simulation";
 import {
   createBakerySurfaceAttachment,
   type BakeryPersistentSurface,
@@ -12,7 +12,7 @@ import {
   type BakerySurfaceCommandResultV1,
   type BakerySurfaceEffectV1,
   type ExecutableBakerySurfaceEffectV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import {
   bakerySurfaceEffectIsPending,
   bakerySurfaceConversationId,
@@ -26,7 +26,7 @@ import {
 import {
   APPLIANCE_FOOTPRINTS,
   isApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 
 type ExecutionOwner = Readonly<{
   kind: "execution";

@@ -6,14 +6,14 @@ import {
   type ProjectCommand,
   type ProjectCommandResult,
   type ProjectId,
-} from "@seams/control-api";
-import type { OnboardingControlRole } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { OnboardingControlRole } from "@purin-labs/contracts";
 import {
   assertNever,
   canonicalJson,
   isPositiveInteger,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { Env } from "../env";
 import type { OrganisationId, UserId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -25,7 +25,7 @@ import {
 import { prepareReturnPrivateChatsToDefault } from "./case-project";
 import { VISIBLE_PROJECTS, parseProjectRecord, readProject } from "./records";
 import { observeProjectReference } from "./references";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const ACTIVE_PLACEMENT = `EXISTS (SELECT 1 FROM organisation_placement
   WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ?

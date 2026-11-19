@@ -5,8 +5,8 @@ import {
   type CommerceBuyerPaymentResultV1,
   checkoutOnlineSource,
   type PlaceCommerceBuyerStoredValueCheckoutV1,
-} from "@seams/commerce-client";
-import { type PaymentDispute } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import { type PaymentDispute } from "@purin-labs/commerce-contracts";
 import { buyerSessionDigest } from "../../buyer-session.ts";
 import {
   readCheckout,
@@ -27,7 +27,7 @@ import {
   findResource,
   sameMoney,
 } from "../checkout-shared.ts";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import { balanceCheckoutOrder, readPaymentChange } from "../order-changes.ts";
 import { storedValuePaymentId } from "../../plugins/stored-value/index.ts";
 import {

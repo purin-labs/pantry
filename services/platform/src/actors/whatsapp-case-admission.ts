@@ -11,7 +11,7 @@ import {
 import { buildWhatsAppSupportAuthority } from "../request-authority";
 import type { Result } from "../result";
 import { resolveActiveCaseActorAtPlacement } from "./actor-router";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 /**
  * System-origin WhatsApp Case admission. One support conversationWindow maps to one

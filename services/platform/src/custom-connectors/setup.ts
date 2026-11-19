@@ -1668,5 +1668,5 @@ import {
   basicApiKeyFromVault,
   basicApiKeyVaultSecret,
 } from "./basic-authentication";
-import type { VariantBy } from "@seams/type-utils";
-import { isPositiveInteger, isSha256Hex } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isPositiveInteger, isSha256Hex } from "@purin-labs/std";

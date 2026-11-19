@@ -3,7 +3,7 @@ import {
   isRecord,
   parseJsonOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { strFromU8, strToU8 } from "fflate";
 import type { PhysicsResult, PhysicsResultStore } from "./result-cache.ts";
 

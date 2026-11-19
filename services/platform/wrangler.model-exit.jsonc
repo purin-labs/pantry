@@ -11,7 +11,7 @@
   // It has no route, no credential and no binding except its profile
   // variable. The Platform Worker reaches it through the service binding
   // MODEL_EXIT. Deploy this Worker before the platform Worker that binds it.
-  // `pnpm --filter @seams/platform model-exit:check` checks this profile.
+  // `pnpm --filter @purin-labs/platform model-exit:check` checks this profile.
   "main": "src/model-exit/worker.ts",
   "compatibility_date": "2026-07-07",
   "workers_dev": false,

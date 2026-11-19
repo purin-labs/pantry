@@ -11,7 +11,7 @@ import type {
   EventEnvelope,
   SessionCommand,
   SessionTransition,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { validateCanonicalSessionAdvance } from "../../actor-wasm";
 import { parseStoredAuthorityPartition } from "../../authorization/access-grants/turn-authority";
 import type { Result } from "../../result";
@@ -49,14 +49,14 @@ import {
   type ContextBundle,
   type ModelContextBundle,
 } from "../../context/assembly";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
   canonicalJson,
   hasExactKeys,
   isNonEmptyString,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   type AcceptedActorCommand,
   type AcceptedSessionInputCommit,

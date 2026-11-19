@@ -5,8 +5,8 @@
 // the TV. `pi-menu-board-together` proves that people and Sous Chef converge
 // and that a viewer's change is refused.
 import { expect, it, type TestContext } from "vitest";
-import type { MenuBoardStyle } from "@seams/menu-board-crdt";
-import { isRecord } from "@seams/std";
+import type { MenuBoardStyle } from "@purin-labs/menu-board-crdt";
+import { isRecord } from "@purin-labs/std";
 import { closeSocket } from "./hibernatable-socket-support";
 import {
   BASE,

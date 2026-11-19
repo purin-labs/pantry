@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type { AccountPlatformAccess } from "../account-platform/access";
 import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
-import type { CommerceSensitivity, RequestAuthority } from "@seams/contracts";
+import type { CommerceSensitivity, RequestAuthority } from "@purin-labs/contracts";
 
 import type { EffectiveGrantSet } from "../authorization/access-grants";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
@@ -47,7 +47,7 @@ import {
   encodeBase64Url,
   isRecord,
   isSha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 const authorizedReadBrand: unique symbol = Symbol(
   "AuthorizedCustomConnectorRead",

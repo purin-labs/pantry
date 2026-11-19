@@ -1,4 +1,4 @@
-import type { Settings, StationId } from "@seams/bakery-model/bakery";
+import type { Settings, StationId } from "@purin-labs/bakery-model/bakery";
 
 // The bakery stations and the walks between them. A floor layout moves the
 // stations and plans the walks; each run takes its layout as an input and

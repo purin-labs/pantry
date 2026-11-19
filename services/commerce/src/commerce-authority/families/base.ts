@@ -31,14 +31,14 @@ import {
   type AttachFulfillmentTrackingCommand,
   type RecordShippingTrackingCommand,
   type CancelCommerceOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   Checkout,
   CheckoutPaymentAttempt,
   InventoryAllocation,
   PaymentDispute,
   ShipmentLabelRateSnapshot,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../../database.ts";
 import { CheckoutProfileService } from "../../checkout-profile-service.ts";
 import { PointOfSaleConfigurationService } from "../../point-of-sale-configuration-service.ts";
@@ -207,7 +207,7 @@ import {
   type RefundReservationPlan,
   type RefundResolutionPlan,
 } from "../after-sale-cancellation.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * The commerce authority's state, which the class assigns, and the commits of every command family (Refactor 14).

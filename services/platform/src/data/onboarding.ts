@@ -8,7 +8,7 @@ import {
   type OrganisationLifecycleState,
 } from "./organisation-lifecycle-moves";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { ApprovalAuthenticationReadiness } from "@seams/contracts";
+import type { ApprovalAuthenticationReadiness } from "@purin-labs/contracts";
 import {
   newSetupSnapshotId,
   parseChannelId,
@@ -39,10 +39,10 @@ import {
   slackConversationBaselineGrantId,
   type CapabilityPolicyAdmission,
 } from "./capability-policy";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
-import { isRecord, sha256Hex } from "@seams/std";
-import type { CuePresetId } from "@seams/control-api";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import type { CuePresetId } from "@purin-labs/control-api";
 
 export type CapabilityProfile = "read_and_propose" | "approved_provider_writes";
 export type PolicyTemplateId = "commerce_operator";

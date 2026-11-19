@@ -3,14 +3,14 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import type { Result } from "../result";
 import { VISIBLE_CONVERSATIONS_SQL } from "./conversation-access";
 import { authorizeConversation } from "./conversation-access";
-import { isConversationId, isUserId, type UserId } from "@seams/control-api";
-import type { ConversationId } from "@seams/control-api";
+import { isConversationId, isUserId, type UserId } from "@purin-labs/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import {
   assertNever,
   isNonNegativeInteger,
   isRecord,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import {
   resolveActiveCaseActor,

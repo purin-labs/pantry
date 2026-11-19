@@ -2,7 +2,7 @@ import * as THREE from "three";
 import type {
   ApplianceFlexMesh,
   ApplianceSample,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import maruzenHobUrl from "../../../../../assets/bakery-mujoco/maruzen-mih-02c/maruzen-mih-02c.glb?url";
 import vollrathHobUrl from "../../../../../assets/bakery-mujoco/vollrath-59500p/vollrath-59500p.glb?url";
 import panasonicHobUrl from "../../../../../assets/bakery-mujoco/panasonic-kz-ck1402/panasonic-kz-ck1402.glb?url";

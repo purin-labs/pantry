@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseCommerceCommandId,
   CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { patchPublishedCommerceListEntry } from "../src/commerce/entity-plane/list-entry-mutations";
 import { parseCommerceListEntryPatchRouteBody } from "../src/commerce/entity-plane/routes";

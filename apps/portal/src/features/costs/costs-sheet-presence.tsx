@@ -3,8 +3,8 @@ import { MousePointer2, Sparkles } from "lucide-react";
 import {
   COLLABORATION_POINTER_IDLE_MS,
   type CollaborationAgentActivity,
-} from "@seams/collaboration";
-import type { CostsSheetTab } from "@seams/costs-sheet-crdt";
+} from "@purin-labs/collaboration";
+import type { CostsSheetTab } from "@purin-labs/costs-sheet-crdt";
 import type { CostsSheetPresence, CostsSheetView } from "./costs-sheet-client";
 
 const FIGMA_PRESENCE_PALETTE = [

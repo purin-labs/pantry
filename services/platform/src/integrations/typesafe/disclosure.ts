@@ -18,7 +18,7 @@ import {
   type JevError,
 } from "./system-one-client";
 import { parseSystemOneJson } from "./response-json";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 export type TypeSafeDisclosureDenied = Readonly<{
   code: "typesafe_disclosure_denied";
   decision: Exclude<FlowLabelDecision, { kind: "allow" }>;

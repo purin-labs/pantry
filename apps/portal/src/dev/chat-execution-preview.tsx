@@ -4,8 +4,8 @@ import type {
   CaseExecutionNodeDetail,
   CaseExecutionPage,
   OpenCaseExecutionNode,
-} from "@seams/control-api";
-import type { ChatWork, ChatTimelineView } from "@seams/control-api/portal/chat";
+} from "@purin-labs/control-api";
+import type { ChatWork, ChatTimelineView } from "@purin-labs/control-api/portal/chat";
 
 let pageReads = 0;
 let revoked = false;

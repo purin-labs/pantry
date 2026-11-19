@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { EvalView, MemoryView } from "@seams/control-api";
+import type { EvalView, MemoryView } from "@purin-labs/control-api";
 
 import { isPrimaryNavigationClick } from "../../console-sidebar";
 import { formatAbsoluteTime, formatRelativeTime } from "../../formatting";

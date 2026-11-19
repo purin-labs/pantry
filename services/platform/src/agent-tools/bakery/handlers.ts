@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../database-handles";
-import { SURFACE_EFFECT_SIGNAL } from "@seams/control-api";
+import { SURFACE_EFFECT_SIGNAL } from "@purin-labs/control-api";
 import { signalChat } from "../../chat/signals";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
@@ -9,12 +9,12 @@ import {
   type SavedBakeryRunQuery,
   type SavedBakeryRunResult,
 } from "../../commerce/bakery/saved-runs";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   BakerySurfaceAttachmentV1,
   BakerySurfaceCommandV1,
-} from "@seams/bakery-model/bakery-surface";
-import type { HarnessTurnLease } from "@seams/contracts";
+} from "@purin-labs/bakery-model/bakery-surface";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import { parseUserId, type RequestId, type OrganisationId } from "../../ids";
 import { traceLog } from "../../observability";
@@ -43,7 +43,7 @@ import {
   ObservationEvidence,
 } from "../../policy";
 import { digestCanonical } from "../../policy";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { requireLiveBakeryReadAuthority } from "../session-support";
 
 // The composer chip was off on the Kitchen page when the person sent the
@@ -728,7 +728,7 @@ function bakerySurfaceCommand(
 
 async function dispatchBakeryContextPreparation(
   authority: Parameters<typeof executeBakerySurfaceForHarness>[0],
-  requiredCommand: import("@seams/bakery-model/bakery-surface").BakerySurfaceToolCommandName,
+  requiredCommand: import("@purin-labs/bakery-model/bakery-surface").BakerySurfaceToolCommandName,
   callId: string,
 ): Promise<
   import("../../actors/bakery-surface-effect").BakerySurfaceEffectDispatch

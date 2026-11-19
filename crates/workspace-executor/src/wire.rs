@@ -1,4 +1,4 @@
-// Generated from TypeScript JSON Schema. Run pnpm --filter @seams/contracts executor:generate.
+// Generated from TypeScript JSON Schema. Run pnpm --filter @purin-labs/contracts executor:generate.
 
 pub const PREPARATION_REQUEST_SCHEMA_VERSION: &str = "workspace_executor_preparation.v1";
 

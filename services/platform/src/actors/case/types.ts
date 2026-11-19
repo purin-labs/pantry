@@ -18,8 +18,8 @@ import type {
   RequestAuthority,
   SessionProposal,
   StoredMessageAttachment,
-} from "@seams/contracts";
-import type { SourceProvenance } from "@seams/contracts";
+} from "@purin-labs/contracts";
+import type { SourceProvenance } from "@purin-labs/contracts";
 import type { IntegrationAccountId } from "../../ids";
 import type { EmailReplyProposalLifecycle } from "../../data/email-mailbox";
 import type { EmailProposalTarget } from "../../data/email-operational";
@@ -32,8 +32,8 @@ import type {
 import type { CaseContextReplayAuthority } from "../../context/projection";
 import { FlowBinding } from "../../policy";
 import type { SerializedFlowBinding } from "../../policy";
-import type { Variant } from "@seams/type-utils";
-import type { CommerceProviderReceipt } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 
 export type CaseGmailReplyProposal = {
   readonly evidence: import("../../case-context-discovery/evidence").CaseContextCollectionProposalEvidence;

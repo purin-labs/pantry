@@ -4,14 +4,14 @@ import {
   type ProcedureOperation,
   type ProcedureResult,
   type ProcedureSnapshot,
-} from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery-procedure";
 import {
   type Settings,
   type SettingsResult,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import type { Process, Run, TaskSnapshot, TaskEvent } from "./schedule.ts";
-import type { ScenarioCopy } from "@seams/bakery-model/bakery-scenario";
-import type { Variant } from "@seams/type-utils";
+import type { ScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
+import type { Variant } from "@purin-labs/type-utils";
 import type { FinancierRunInput, ResolvedRunInput } from "./schedule.ts";
 import { compileFinancier, compileProductionFinancier } from "./financier.ts";
 import type { ProductionWorkcells } from "./production-workcells.ts";

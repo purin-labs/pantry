@@ -1,6 +1,6 @@
 // The stock movements of kitchen work: ingredients that a preparation ticket
 // uses, and the inputs and output of a production batch.
-import type { CommerceInventoryMovementV1 } from "@seams/commerce-client";
+import type { CommerceInventoryMovementV1 } from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../../database.ts";
 import { writeCommerceEntityRelationText } from "../../entity-plane/relation-text.ts";

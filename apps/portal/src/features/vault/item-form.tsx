@@ -5,8 +5,8 @@ import {
   VAULT_ORIGIN_LIMIT,
   type VaultContact,
   type VaultItemView,
-} from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 
 import { Select } from "../../ui";
 

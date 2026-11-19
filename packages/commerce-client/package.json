@@ -1,5 +1,5 @@
 {
-  "name": "@seams/commerce-client",
+  "name": "@purin-labs/commerce-client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,9 +15,9 @@
     "check:types": "tsrs --noEmit"
   },
   "dependencies": {
-    "@seams/std": "workspace:*",
-    "@seams/type-utils": "workspace:*",
-    "@seams/commerce-contracts": "workspace:*"
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*"
   },
   "devDependencies": {
     "tsrs": "0.18.0-ts7.1.0-dev.20260929"

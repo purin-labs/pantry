@@ -7,11 +7,11 @@ import {
   physicsCellOf,
   type PhysicsReplay,
   type PhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
-import { parseRobotModel } from "@seams/bakery-model/bakery-robots";
-import { parseNativeContinuation } from "@seams/production-simulation/recipes/bakery/native-continuation";
-import { isRecord, sha256Hex } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { parseRobotModel } from "@purin-labs/bakery-model/bakery-robots";
+import { parseNativeContinuation } from "@purin-labs/production-simulation/recipes/bakery/native-continuation";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The one-shot jobs of the engine worker (Refactor 16, step 5): a robot

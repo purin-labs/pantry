@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { AdmittedScenario } from "./admission.ts";
 import type {
   CommandReceipt,

@@ -1,5 +1,5 @@
 import type { Result } from "../result";
-import { decodeBase64, encodeBase64 } from "@seams/std";
+import { decodeBase64, encodeBase64 } from "@purin-labs/std";
 
 /**
  * Application encryption for the temporary WhatsApp active envelope and

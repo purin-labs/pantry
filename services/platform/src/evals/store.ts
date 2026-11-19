@@ -6,7 +6,7 @@ import {
   parseEvalRevisionView,
   parseEvalRunResult,
   parseMemoryRevisionState,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   EvalAuthor,
   EvalCommandErrorCode,
@@ -16,7 +16,7 @@ import type {
   EvalRevisionView,
   EvalRunResult,
   MemoryDecision,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   assertNever,
   hasExactKeys,
@@ -24,8 +24,8 @@ import {
   isRecord,
   parseJsonOrNull,
   sameJson,
-} from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import type { CountRow } from "../actors/sql-rows";

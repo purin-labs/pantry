@@ -1,15 +1,15 @@
 import { floorPlanWorkspace } from "../floor-plan-workspace";
 import * as THREE from "three";
-import { bakeryRoom, type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import { bakeryRoom, type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 
 import type { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
-import type { StationId } from "@seams/bakery-model/bakery";
+import type { StationId } from "@purin-labs/bakery-model/bakery";
 import { sceneLabel } from "../scene-labels";
 import { loadBakeryStation, stationFootprintModel } from "../bakery-assets";
 import { disposePhysicsObject } from "./physics-model";
-import { stations } from "@seams/production-simulation/recipes/bakery/schedule";
+import { stations } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { bindOvenVisual, updateOvenVisual } from "../oven-visual";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
 import { planFootprint, type FloorPlanItem } from "./floor-plan-geometry";
 import { createFloorPlanShell, type FloorPlanShell } from "./floor-plan-shell";
 import { enableShadowMeshes } from "./scene-lighting";
@@ -20,8 +20,8 @@ import {
 import {
   APPLIANCE_FOOTPRINTS,
   STORE_DECOR_IDS,
-} from "@seams/production-simulation/floor/appliance-catalogue";
-import { getApplianceBox } from "@seams/production-simulation/floor/collisions";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
+import { getApplianceBox } from "@purin-labs/production-simulation/floor/collisions";
 
 // The bakery around the robot cell: assumed stations for orientation. Robot
 // work comes from native recordings; production timing is in the production

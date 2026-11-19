@@ -16,7 +16,7 @@ import { GlideHighlight } from "../../../ui/glide-highlight";
 import type { SceneLabelMode } from "../simulator-state";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type { SceneControlsView } from "../simulator-state";
-import { BAKERY_FLOOR_PLANS, BAKERY_FLOOR_PLAN_ORDER } from "@seams/production-simulation/floor/bakery-room";
+import { BAKERY_FLOOR_PLANS, BAKERY_FLOOR_PLAN_ORDER } from "@purin-labs/production-simulation/floor/bakery-room";
 
 import { StoreInteriorDesignControl } from "./store-interior-control";
 

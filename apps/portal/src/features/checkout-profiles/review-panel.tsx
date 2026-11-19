@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { ReviewAction } from "./model";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export function ReviewPanel(props: {
   readonly review: ReviewAction;

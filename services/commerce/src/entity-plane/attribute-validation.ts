@@ -7,7 +7,7 @@ import type {
   CommerceList,
   ListEntryAttributeDefinition,
   ListEntryAttributeValue,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 export function validateEntityAttributes(
   definitions: readonly AttributeDefinition[],

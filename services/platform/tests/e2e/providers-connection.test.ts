@@ -13,7 +13,7 @@ import { network } from "./network";
 import { commerceWorkspace } from "./commerce-support";
 import { controlReadHeaders } from "./hibernatable-socket-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
-import { assertNever, bytesToHex, isRecord } from "@seams/std";
+import { assertNever, bytesToHex, isRecord } from "@purin-labs/std";
 
 const PUBLIC_ORIGIN = "https://localhost";
 const AIRTABLE_BASE_ID = "appE2EBASE01";

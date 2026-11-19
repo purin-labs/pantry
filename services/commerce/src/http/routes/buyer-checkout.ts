@@ -7,17 +7,17 @@ import {
   parsePlaceBuyerStoredValueCheckoutCommand,
   parseRefreshBuyerPickupCheckoutCommand,
   parseRefreshBuyerShippingCheckoutCommand,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { BuyerSessionClaims } from "../../buyer-session.ts";
 import type { BuyerPaymentResult } from "../../commerce-authority.ts";
 import type { BuyerRoute } from "../../http-routes.ts";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import { verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
 import { resolveShippingDestination } from "./buyer-cart.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function createBuyerCheckoutRoute(
   ctx: HttpRouteContext,

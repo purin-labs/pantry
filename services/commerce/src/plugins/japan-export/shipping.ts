@@ -8,15 +8,15 @@ import type {
   DutyIncoterm,
   ShippingRouteBinding,
   ShippingQuoteSnapshot,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   COMMERCE_EUROPEAN_UNION_COUNTRIES,
   type CommerceBuyerShippingAddressV1,
   type CommerceInternationalShippingAddressV1,
   type CommerceShippingCountry,
-} from "@seams/commerce-client";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 import {
   carrierRateQuoteInputDigest,

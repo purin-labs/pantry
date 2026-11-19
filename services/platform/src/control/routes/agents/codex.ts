@@ -11,7 +11,7 @@ import {
 import { parseCodexAuthorizationAttemptId } from "../../../ids";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../../http";
-import { assertNever, hasExactKeys } from "@seams/std";
+import { assertNever, hasExactKeys } from "@purin-labs/std";
 
 export async function handleOrganisationCodex(
   request: Request,

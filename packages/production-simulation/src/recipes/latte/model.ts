@@ -1,4 +1,4 @@
-import type { EspressoMachine } from "@seams/bakery-model/bakery-physics";
+import type { EspressoMachine } from "@purin-labs/bakery-model/bakery-physics";
 
 export type LatteProcessCheck =
   | "none"

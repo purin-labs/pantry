@@ -6,8 +6,8 @@ import {
   type CaseExecutionEdge,
   type CaseExecutionLimitation,
   type CaseExecutionNodeDetail,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { ControlApiError } from "./control-client";
 
 type ExecutionTransport = Readonly<{

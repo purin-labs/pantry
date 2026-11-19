@@ -1,4 +1,4 @@
-import { DEFAULT_CHAT_PREFERENCES } from "@seams/control-api";
+import { DEFAULT_CHAT_PREFERENCES } from "@purin-labs/control-api";
 import { useUserPreferences } from "../../preferences/context";
 import type { UserPreferenceOwner } from "../../preferences/owner";
 import React from "react";

@@ -9,8 +9,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import type { CommerceAdminClient } from "@seams/commerce-client";
-import type { PluginDefinition } from "@seams/commerce-contracts";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
+import type { PluginDefinition } from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import {

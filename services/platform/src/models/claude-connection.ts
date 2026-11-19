@@ -1,6 +1,6 @@
-import { isRecord } from "@seams/std";
-import type { ModelRoute } from "@seams/contracts";
-import type { VariantBy } from "@seams/type-utils";
+import { isRecord } from "@purin-labs/std";
+import type { ModelRoute } from "@purin-labs/contracts";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
@@ -29,8 +29,8 @@ import type {
   ClaudeConnection,
   ClaudeAuthorization,
   ClaudeAuthorizationState,
-} from "@seams/control-api";
-export type { ClaudeConnection, ClaudeAuthorization } from "@seams/control-api";
+} from "@purin-labs/control-api";
+export type { ClaudeConnection, ClaudeAuthorization } from "@purin-labs/control-api";
 
 /**
  * `keys` holds the vault roots and the model exit Worker, which sends each

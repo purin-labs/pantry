@@ -6,8 +6,8 @@ import {
   type EvalReplyOutcome,
   type EvalScenario,
   type EvalSenderChoice,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * The scenarios of one Eval while a person edits them. Saving makes a new

@@ -1,5 +1,5 @@
 import type { CountRow } from "./sql-rows";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 
 export type SchemaMigrationStep = {
   version: number;

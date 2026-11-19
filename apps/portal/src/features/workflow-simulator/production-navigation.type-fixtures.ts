@@ -1,8 +1,8 @@
 import type { ProductionNavigation } from "./production-navigation.ts";
 import type { ProductionReady } from "./production-session.ts";
-import type { ProductionWorkcell } from "@seams/production-simulation/recipes/bakery/production-workcells";
+import type { ProductionWorkcell } from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import type { BakeryWorkspaceAction } from "./simulator-state.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const from: ProductionReady;
 declare const operation: ProductionWorkcell;

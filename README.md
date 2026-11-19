@@ -216,9 +216,9 @@ Native journeys receive only the built Worker path and record its SHA-256 digest
 The workflow needs no additional access token or repository variables.
 
 ```bash
-pnpm --filter @seams/platform check:types
-pnpm --filter @seams/platform check:test-types
-pnpm --filter @seams/platform test
+pnpm --filter @purin-labs/platform check:types
+pnpm --filter @purin-labs/platform check:test-types
+pnpm --filter @purin-labs/platform test
 pnpm underclerk:check
 pnpm underclerk:test
 pnpm portal:build
@@ -237,7 +237,7 @@ desktop or file-sync path.
 ## Deployment
 
 ```bash
-pnpm --filter @seams/platform run deploy
+pnpm --filter @purin-labs/platform run deploy
 ```
 
 The deploy command builds the media Wasm and portal assets and validates the

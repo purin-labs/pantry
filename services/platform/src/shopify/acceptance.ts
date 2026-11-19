@@ -1,5 +1,5 @@
 import type { Result } from "../result";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const SHOPIFY_ADMIN_API_VERSION = "2026-07";
 

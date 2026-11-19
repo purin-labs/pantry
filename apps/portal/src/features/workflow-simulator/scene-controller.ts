@@ -1,5 +1,5 @@
 import type { SceneFrame, SceneViewListener } from "./scene";
-import type { Selection } from "@seams/production-simulation/simulator/selection";
+import type { Selection } from "@purin-labs/production-simulation/simulator/selection";
 
 type ScenePort = Readonly<{
   load(): Promise<void>;

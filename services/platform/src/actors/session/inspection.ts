@@ -1,4 +1,4 @@
-import type { AgentSessionLifecycle } from "@seams/contracts";
+import type { AgentSessionLifecycle } from "@purin-labs/contracts";
 import type { SessionId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import {
@@ -12,7 +12,7 @@ import {
   readSessionBudgetAccount,
   type SessionBudgetError,
 } from "../agent-session-budget";
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import type {
   SessionBudgetInspection,
   SessionCheckpointInspection,

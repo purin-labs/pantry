@@ -5,11 +5,11 @@
 // later version with other attributes publishes the type's next revision, and
 // each record keeps the revision that it was written at. Removing the plugin
 // keeps the type and its records.
-import type { CommercePluginEntityTypeV1 } from "@seams/commerce-client";
+import type { CommercePluginEntityTypeV1 } from "@purin-labs/commerce-client";
 import type {
   CustomCommerceEntityTypeDraft,
   CustomCommerceEntityTypeId,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../database.ts";
 import {

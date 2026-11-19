@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { StorageId } from "./identity.ts";
 import type { ReportingInterval } from "./results.ts";
 import type { RunState } from "./state.ts";

@@ -1,4 +1,4 @@
-import type { CommerceSensitivity } from "@seams/contracts";
+import type { CommerceSensitivity } from "@purin-labs/contracts";
 import type { JsonRecord } from "../control/http";
 import {
   digestCanonical,
@@ -15,7 +15,7 @@ import {
   isNonNegativeInteger,
   isRecord,
   isSha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { isCommerceSensitivity } from "../commerce/sensitivity";
 
 export type JsonPrimitive = string | number | boolean | null;

@@ -1,6 +1,6 @@
 import React from "react";
 import { MousePointer2 } from "lucide-react";
-import { POINTER_IDLE_MS, type DraftPointer } from "@seams/product-description-crdt/protocol";
+import { POINTER_IDLE_MS, type DraftPointer } from "@purin-labs/product-description-crdt/protocol";
 import "./styles.css";
 
 export type DraftPresenceView = Readonly<{

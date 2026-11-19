@@ -1,11 +1,11 @@
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   parseListEntryReadRequest,
   parseProductionRequestFields,
   productionRequestAttributes,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import {

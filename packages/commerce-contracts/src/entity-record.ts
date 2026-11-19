@@ -24,8 +24,8 @@ import {
 } from "./entity-wire.ts";
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever, isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 import {
   attributeValueSchema,

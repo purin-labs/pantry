@@ -1,9 +1,9 @@
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { runIntegrationsCommand } from "./page-actions";
 import type { IntegrationsRouteMutationContext } from "./settings-types";
-import type { OrganisationInferenceSelection } from "@seams/control-api/portal/settings";
-import { parseInferenceSelectionCommand } from "@seams/control-api/portal/inference";
+import type { OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
+import { parseInferenceSelectionCommand } from "@purin-labs/control-api/portal/inference";
 
 export async function saveInferenceSelection(
   context: IntegrationsRouteMutationContext,

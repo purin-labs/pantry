@@ -1,9 +1,9 @@
-import { SLACK_APP_NAME } from "@seams/control-api";
+import { SLACK_APP_NAME } from "@purin-labs/control-api";
 import { Select } from "../../ui/select";
 import type {
   FirstOperationalTask,
   OnboardingActivation,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import React from "react";
 import { Link } from "react-router";
 import {
@@ -14,7 +14,7 @@ import { workspacePagePath } from "../../route";
 import { MutationLedger } from "../../mutation-state";
 import { ProviderConnectAction } from "../../provider-onboarding";
 import { formatLifecycle } from "../../formatting";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   mutationBlocked,
   providerConnectionBusy,
@@ -25,7 +25,7 @@ import {
   setupFieldHasError,
   setupFormHasError,
 } from "./settings-support";
-import type { IntegrationAccount, OrganisationInferenceSelection, ProviderResource, SlackRoutingConnection } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount, OrganisationInferenceSelection, ProviderResource, SlackRoutingConnection } from "@purin-labs/control-api/portal/settings";
 import type { IntegrationsPageActions, IntegrationsPageProps, SettingsMutationFeedback, SetupFeedback, SetupFormDefaults, SlackWorkspaceCatalog } from "./settings-types";
 
 export function inferenceRouteName(selection: OrganisationInferenceSelection): string {

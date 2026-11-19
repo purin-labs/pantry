@@ -39,7 +39,7 @@ import type {
   CommerceGraphQueryPlanRequest,
   CommerceGraphQueryResult,
   CommerceSnapshotRevision,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CommerceEntityPlaneRelationshipTraversalStepRequest,
   CommerceEntityPlaneRelationshipTraversalStepResponse,
@@ -60,7 +60,7 @@ import {
   type CommerceListEntryReadRequest,
   type CommerceListEntryReadResult,
 } from "./resources.ts";
-import { errorMessage, isNormalizedText, isRecord } from "@seams/std";
+import { errorMessage, isNormalizedText, isRecord } from "@purin-labs/std";
 
 export type CommerceEntityPlaneFetch = (
   input: string | URL | Request,

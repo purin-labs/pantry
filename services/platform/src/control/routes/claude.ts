@@ -1,4 +1,4 @@
-import { hasExactKeys } from "@seams/std";
+import { hasExactKeys } from "@purin-labs/std";
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import {

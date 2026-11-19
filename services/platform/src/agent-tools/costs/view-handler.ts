@@ -7,9 +7,9 @@ import {
   type PageViewCommand,
   type SurfaceObservationV2,
   type SurfacePageCommandV1,
-} from "@seams/control-api";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
-import type { HarnessTurnLease } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "../../database-handles";
 import { parseUserId, type OrganisationId } from "../../ids";
 import type { AccountPlatformAccess } from "../../account-platform/access";

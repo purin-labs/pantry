@@ -3,14 +3,14 @@ import type {
   CommerceCursor,
   CommerceGraphQueryPlanRequest,
   CustomEntityTypeRevision,
-} from "@seams/commerce-contracts";
-import { encodeCommerceCursor } from "@seams/commerce-contracts/query-encoders";
-import { decodeCommerceCursor } from "@seams/commerce-contracts/cursor-payload";
+} from "@purin-labs/commerce-contracts";
+import { encodeCommerceCursor } from "@purin-labs/commerce-contracts/query-encoders";
+import { decodeCommerceCursor } from "@purin-labs/commerce-contracts/cursor-payload";
 import {
   parseCommerceCursorPayload,
   parseCommerceGraphQuery,
   parseCommerceGraphQueryPlanRequest,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { NodeCommerceDatabase } from "../src/node-database.ts";
 import { initializeCommerceSchema } from "../src/schema.ts";

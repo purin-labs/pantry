@@ -1,6 +1,6 @@
 import { exports } from "cloudflare:workers";
 import { expect } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { commerceHeaders } from "./commerce-support";
 import { ORGANISATION_ID } from "./slack-journey-support";

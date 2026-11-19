@@ -1,5 +1,5 @@
 import type { Result } from "../result";
-import { decodeCanonicalBase64 } from "@seams/std";
+import { decodeCanonicalBase64 } from "@purin-labs/std";
 
 declare const nearAccountIdBrand: unique symbol;
 declare const nearEd25519PublicKeyBrand: unique symbol;

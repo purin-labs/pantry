@@ -2,7 +2,7 @@
 // write (Plan 27C, Plan 89).
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";

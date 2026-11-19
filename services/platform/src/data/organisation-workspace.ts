@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { WorkspaceRevisionReceipt } from "@seams/contracts";
+import type { WorkspaceRevisionReceipt } from "@purin-labs/contracts";
 
 import {
   parseOrganisationHandle,

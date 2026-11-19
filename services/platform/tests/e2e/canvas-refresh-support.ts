@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject } from "cloudflare:test";
 import { expect } from "vitest";
 import { http } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { network } from "./network";
 import { ORGANISATION_ID, openRouterText } from "./slack-journey-support";
 import { commerceHeaders } from "./commerce-support";

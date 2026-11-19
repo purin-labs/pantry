@@ -2,7 +2,7 @@ import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { parseScheduleRunsDay, type ScheduleRunsDay } from "@seams/control-api";
+import { parseScheduleRunsDay, type ScheduleRunsDay } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";

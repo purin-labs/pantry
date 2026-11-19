@@ -1,4 +1,4 @@
-import { isNonNegativeInteger } from "@seams/std";
+import { isNonNegativeInteger } from "@purin-labs/std";
 import { err, ok, type Result } from "./result.ts";
 
 declare const logicalTimeBrand: unique symbol;

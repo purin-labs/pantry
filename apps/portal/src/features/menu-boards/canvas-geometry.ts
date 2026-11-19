@@ -10,8 +10,8 @@ import {
   type MenuBoardFramePlacement,
   type MenuBoardLayout,
   type MenuBoardRect,
-} from "@seams/menu-board-crdt/board";
-import type { MenuBoardElementPlacement } from "@seams/menu-board-crdt";
+} from "@purin-labs/menu-board-crdt/board";
+import type { MenuBoardElementPlacement } from "@purin-labs/menu-board-crdt";
 
 /**
  * The geometry of the free canvas editor (Plan 40B phase 5): snapping with

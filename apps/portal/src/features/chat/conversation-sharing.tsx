@@ -6,12 +6,12 @@ import {
   type Project,
   type ProjectMember,
   type ChatInsertion,
-} from "@seams/control-api";
-import { errorMessage, isNonNegativeInteger, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { errorMessage, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import { controlRead, controlWrite, readCookie, refusedBody } from "../../control-client";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import { readChat, mutateChatDirectory, UNFINISHED_WORK_MESSAGE } from "./api";
-import type { ChatConversationSummary } from "@seams/control-api/portal/chat";
+import type { ChatConversationSummary } from "@purin-labs/control-api/portal/chat";
 import "./project-sharing.css";
 
 export type ConversationSharingIntent = Readonly<{

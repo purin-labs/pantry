@@ -1,10 +1,10 @@
-import type { Settings } from "@seams/bakery-model/bakery";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
 import {
   exportPhysicsRequest,
   parsePhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery-physics";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
+import { isRecord } from "@purin-labs/std";
 import type {
   ProductionPending,
   ProductionSession,
@@ -17,15 +17,15 @@ import {
   parseProductionWorkcells,
   successorSkills,
   type RehearsalTray,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import { prepareWorkspaceRunReview } from "./workspace-run-review.ts";
 import { productionDraftSource } from "./production-draft.ts";
-import { openRehearsalDocument } from "@seams/production-simulation/simulator/rehearsal-conversion";
-import { rehearsalSettings } from "@seams/production-simulation/simulator/rehearsal-presets";
-import { parseNativeContinuation } from "@seams/production-simulation/recipes/bakery/native-continuation";
-import { compileWorkcellInput } from "@seams/production-simulation/recipes/bakery/workcell-input";
-import { parseRehearsalFile } from "@seams/production-simulation/simulator/rehearsal-file";
-import { MAX_EXPERIMENT_BYTES } from "@seams/production-simulation/recipes/bakery/workcell-experiment";
+import { openRehearsalDocument } from "@purin-labs/production-simulation/simulator/rehearsal-conversion";
+import { rehearsalSettings } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
+import { parseNativeContinuation } from "@purin-labs/production-simulation/recipes/bakery/native-continuation";
+import { compileWorkcellInput } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
+import { parseRehearsalFile } from "@purin-labs/production-simulation/simulator/rehearsal-file";
+import { MAX_EXPERIMENT_BYTES } from "@purin-labs/production-simulation/recipes/bakery/workcell-experiment";
 import { verifyProductionSource } from "./workspace-runs-api.ts";
 import type { ProductionScenarioRead } from "./production-scenario-api.ts";
 

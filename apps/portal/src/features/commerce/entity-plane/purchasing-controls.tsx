@@ -1,7 +1,7 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
-import type { CommerceEntity, CommerceListEntry } from "@seams/contracts";
+import type { CommerceEntity, CommerceListEntry } from "@purin-labs/contracts";
 
 import { Notice } from "../../../page-components";
 import { SideDrawer } from "../../../ui";
@@ -25,7 +25,7 @@ import {
   supplierIdFromName,
   type PermissionRequired,
   type SupplierCreation,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,

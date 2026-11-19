@@ -16,7 +16,7 @@
 import {
   machineTransition,
   type MachineState,
-} from "@seams/std/state-machine";
+} from "@purin-labs/std/state-machine";
 
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";

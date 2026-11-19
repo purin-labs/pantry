@@ -1,5 +1,5 @@
 import type { Result } from "../result";
-import { isSha256Hex } from "@seams/std";
+import { isSha256Hex } from "@purin-labs/std";
 
 declare const customConnectorIdBrand: unique symbol;
 declare const customConnectorRevisionBrand: unique symbol;

@@ -6,13 +6,13 @@ import {
   type MenuBoardLayout,
   parseMenuBoardStyle,
   type MenuBoardStyle,
-} from "@seams/menu-board-crdt/board";
+} from "@purin-labs/menu-board-crdt/board";
 import {
   hasExactKeys,
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 /**
  * Menu boards and the screens that play them (Plan 40B phase 1). The Portal

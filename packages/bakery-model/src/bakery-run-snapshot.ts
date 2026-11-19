@@ -1,6 +1,6 @@
 import { readEspressoRun } from "./espresso-rehearsal-file.ts";
 import { MAX_RECORDING_BYTES } from "./bakery-physics.ts";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { parseApplianceWorkflow } from "./bakery-appliance-workflow.ts";
 
 export const MAX_RUN_FILE_BYTES = MAX_RECORDING_BYTES + 65536;

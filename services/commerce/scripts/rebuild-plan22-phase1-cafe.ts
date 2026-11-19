@@ -2,7 +2,7 @@ import {
   CommerceAdminClient,
   type CommerceClientResult,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   clientFailure,
   isMainModule,

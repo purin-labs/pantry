@@ -17,7 +17,7 @@ import {
   type CustomConnectorRevisionRecord,
 } from "./revisions";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
-import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
+import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 
 const CUSTOM_CONNECTOR_PROJECTION_LIMIT = 100;
 

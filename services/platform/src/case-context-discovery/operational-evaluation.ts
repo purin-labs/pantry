@@ -12,7 +12,7 @@ import {
   type JevRelationshipDecision,
 } from "./jev";
 import type { FlowLabel } from "../policy/information-flow/labels";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   readCaseContextDiscoveryPolicy,
   fetchCaseContextDiscoveryEvaluation,
@@ -33,7 +33,7 @@ import {
   type CaseContextCollectionScope,
   type CaseContextCollectionSelection,
 } from "./relationships";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export type OperationalCaseContextDiscoveryEvidence = Readonly<{
   selection: CaseContextCollectionSelection;

@@ -1,13 +1,13 @@
 import React from "react";
 
-import type { AgentDocumentRevision, AgentOperationKind, AgentRevisionTarget } from "@seams/control-api/portal/agent-operations";
+import type { AgentDocumentRevision, AgentOperationKind, AgentRevisionTarget } from "@purin-labs/control-api/portal/agent-operations";
 import { Notice, RecoverableError } from "../page-components";
 import {
   MutationFeedback,
   type AgentOperationMutationState,
   type AgentOperationSubmitter,
 } from "./agent-console-shared";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type AgentRevisionLoader = (
   target: AgentRevisionTarget,

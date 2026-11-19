@@ -12,11 +12,11 @@ import { runInDurableObject, evictDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
 import { McpClient, StreamableHttpTransport } from "@earendil-works/pi-mcp";
-import { assertNever, isRecord, encodeBase64, sha256Hex } from "@seams/std";
+import { assertNever, isRecord, encodeBase64, sha256Hex } from "@purin-labs/std";
 import type {
   AuthorityPartition,
   AuthorizedHarnessToolResult,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   authorizeCapabilityUse,
   compileTurnAuthority,

@@ -1,6 +1,6 @@
 import type { SingleDatabase } from "../src/database-handles";
 import { createHash } from "node:crypto";
-import type { AuthorityPartition, RequestAuthority } from "@seams/contracts";
+import type { AuthorityPartition, RequestAuthority } from "@purin-labs/contracts";
 import { issueControlSession, upsertUser } from "../src/data/control-plane";
 import { createAccessGrant } from "../src/data/access-grants";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";

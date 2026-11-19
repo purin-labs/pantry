@@ -1,23 +1,23 @@
-import type { FirstOperationalTask, OnboardingActivation, OrganisationOnboardingLifecycle } from "@seams/contracts";
+import type { FirstOperationalTask, OnboardingActivation, OrganisationOnboardingLifecycle } from "@purin-labs/contracts";
 import React from "react";
-import type { ControlErrorKind } from "@seams/control-api/portal/errors";
-import type { CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@seams/control-api/portal/credential-inventory";
+import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
+import type { CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
 import type { PageContent } from "../../page-content";
-import type { WhatsAppSurface } from "@seams/control-api/portal/whatsapp";
+import type { WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppPanelActions } from "../../pages/whatsapp";
 import {
   MutationLedger,
   type MutationProvider,
   type OrganisationMutation,
 } from "../../mutation-state";
-import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import type { MailboxInstallationOption, MailboxPolicyDraft } from "../../pages/agent-mailbox";
 import type { IntegrationRouteId } from "./model";
 import type { EmailReviewActions } from "../email-review/api";
-import type { Variant } from "@seams/type-utils";
-import type { MailboxSetupAgentChoice, MailboxSetupPlan } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import type { MailboxSetupAgentChoice, MailboxSetupPlan } from "@purin-labs/control-api";
 import type { MailboxSetupRequest } from "./mailbox-actions";
-import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, OrganisationInvitation, OrganisationMember, ProviderResource, ReadinessAssessment, SelectInferenceCommand, SetupSelection, SlackRoutingConnection, SupportDiagnostics } from "@seams/control-api/portal/settings";
+import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, OrganisationInvitation, OrganisationMember, ProviderResource, ReadinessAssessment, SelectInferenceCommand, SetupSelection, SlackRoutingConnection, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 
 export type OrganisationLifecycle = OrganisationOnboardingLifecycle["kind"];
 

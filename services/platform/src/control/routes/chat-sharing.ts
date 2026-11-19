@@ -4,8 +4,8 @@ import {
   readConversationStatus,
   reconcileRevokedConversationRun,
 } from "../../chat/store";
-import { isProjectId, isConversationId } from "@seams/control-api";
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
+import { isProjectId, isConversationId } from "@purin-labs/control-api";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import type { Env } from "../../env";
 import { authorizeConversation } from "../../chat/conversation-access";
 import {

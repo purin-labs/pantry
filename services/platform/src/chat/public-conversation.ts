@@ -12,7 +12,7 @@ import {
   type ChatTimelineEvent,
 } from "./timeline";
 import type { ConversationMetadata } from "./store";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { conversationOrigin } from "./origin";
 
 function visibleMessage(message: ChatMessage): boolean {

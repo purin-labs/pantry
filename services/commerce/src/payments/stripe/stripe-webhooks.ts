@@ -7,7 +7,7 @@
 // reads that PaymentIntent to find the merchant.
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { parseStripeDisputeEvent } from "./stripe-disputes.ts";
 

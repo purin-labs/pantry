@@ -1,6 +1,6 @@
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { deriveCodeModeLeaseBinding } from "../../src/actors/code-mode-execution-record";
 import { ActorSqliteDatabase } from "../../src/actors/pi-durable-database";
 import {

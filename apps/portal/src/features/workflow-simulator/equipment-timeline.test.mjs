@@ -1,15 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { parseSettings, sampleSettings } from "@seams/bakery-model/bakery";
+import { parseSettings, sampleSettings } from "@purin-labs/bakery-model/bakery";
 import {
   simulate,
   stations,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   equipmentAt,
   equipmentTimeline,
   equipmentSummary,
-} from "@seams/production-simulation/simulator/equipment-timeline";
+} from "@purin-labs/production-simulation/simulator/equipment-timeline";
 
 function simulateSettings(changes = {}, variant = "normal") {
   const parsed = parseSettings({ ...sampleSettings(), ...changes });

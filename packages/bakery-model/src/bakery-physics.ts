@@ -1,6 +1,6 @@
 import { ROBOTS, parseRobotModel, type RobotModel } from "./bakery-robots.ts";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever, sha256Hex } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import {
   parseOperationMargins,
   type OperationMargins,

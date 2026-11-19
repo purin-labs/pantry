@@ -10,7 +10,7 @@ import {
   commercePickupCode,
   type CommerceOrderTimeV1,
   type CommerceOrderTimesV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { readCheckout } from "../checkout-persistence.ts";
 import type { CommerceDatabase } from "../database.ts";
 

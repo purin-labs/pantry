@@ -3,7 +3,7 @@
 // product fields (automated). Membership is stored; a catalog change updates
 // the members of every automated collection in the same transaction.
 import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
-import { parseCreateCommerceCollectionV1 as parseCreateCommerceCollectionV1Record, parseDeleteCommerceCollectionV1 as parseDeleteCommerceCollectionV1Record, parseCommerceBuyerCollectionPageV1 as parseCommerceBuyerCollectionPageV1Record, parseCommerceBuyerCollectionsV1 as parseCommerceBuyerCollectionsV1Record, parseCommerceCollectionV1 as parseCommerceCollectionV1Record, parseUpdateCommerceCollectionV1 as parseUpdateCommerceCollectionV1Record, parseCommerceCollectionsV1 as parseCommerceCollectionsV1Record } from "@seams/commerce-contracts/records/api-collections";
+import { parseCreateCommerceCollectionV1 as parseCreateCommerceCollectionV1Record, parseDeleteCommerceCollectionV1 as parseDeleteCommerceCollectionV1Record, parseCommerceBuyerCollectionPageV1 as parseCommerceBuyerCollectionPageV1Record, parseCommerceBuyerCollectionsV1 as parseCommerceBuyerCollectionsV1Record, parseCommerceCollectionV1 as parseCommerceCollectionV1Record, parseUpdateCommerceCollectionV1 as parseUpdateCommerceCollectionV1Record, parseCommerceCollectionsV1 as parseCommerceCollectionsV1Record } from "@purin-labs/commerce-contracts/records/api-collections";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;

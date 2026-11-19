@@ -10,8 +10,8 @@ import type {
 } from "../data/operator-configuration-draft";
 import type { OfferPriceAllowanceCommand } from "../data/offer-price-allowance";
 import { presentJevDraftCommand } from "../jev-features/agent-draft";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * How one configuration command is presented to an operator.

@@ -93,7 +93,7 @@ import {
   matchSupplierPayoutControlRoute,
   type SupplierPayoutControlRoute,
 } from "./supplier-payouts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   handleCommerceActionApproval,
   handleCommerceActionExecution,

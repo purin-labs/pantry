@@ -9,7 +9,7 @@ import type {
   CommerceDraftInvoiceV1,
   CommerceMutationResultV1,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

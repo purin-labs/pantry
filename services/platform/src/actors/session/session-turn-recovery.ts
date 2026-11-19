@@ -35,8 +35,8 @@ import {
   readHarnessHistory,
   readUnpublishedHarnessCheckpoint,
 } from "../agent-session-harness-authority";
-import type { HarnessHistoryEntry, HarnessTurnLease } from "@seams/contracts";
-import { isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
+import type { HarnessHistoryEntry, HarnessTurnLease } from "@purin-labs/contracts";
+import { isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import {
   canonicalRunBudgetIdentity,
   settleControlledRunCancellation,

@@ -5,15 +5,15 @@
 // and fields on products, variants and customers. The action path carries the whole definition, so the approval signs
 // exactly the code and the settings that Commerce will run, and the version
 // and installation revision that the proposal read.
-import type { PluginDefinition } from "@seams/contracts";
-import { isRecord } from "@seams/std";
+import type { PluginDefinition } from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 import type {
   CommercePluginActionV1,
   CommercePluginEntityTypeV1,
   CommercePluginFieldV1,
   CommercePluginHandlerV1,
   CommercePluginSettingsV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { Result } from "../result";
 

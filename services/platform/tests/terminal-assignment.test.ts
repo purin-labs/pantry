@@ -1,4 +1,4 @@
-import type { TerminalAssignment } from "@seams/contracts";
+import type { TerminalAssignment } from "@purin-labs/contracts";
 import {
   acceptTerminalDeviceHealth,
   parseTerminalPairingAttempt,
@@ -8,7 +8,7 @@ import {
   parseTerminalPaymentObservation,
   terminalAssignmentPaymentBinding,
   terminalObservationPaymentId,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 const ADAPTER_VERSION = "square_terminal@2026-08-19";

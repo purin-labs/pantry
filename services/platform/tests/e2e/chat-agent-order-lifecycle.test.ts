@@ -12,8 +12,8 @@ import {
   parseOrderQueueEntries,
   type OrderQueueAction,
   type OrderQueueEntry,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import { placeCafeOrder, publishCafeMenu } from "./cafe-order-support";
 import {

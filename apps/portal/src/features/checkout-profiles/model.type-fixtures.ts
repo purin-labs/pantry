@@ -1,4 +1,4 @@
-import type { CheckoutProfileSummary } from "@seams/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
 import type { CreateDraftCommand, SaveDraftCommand } from "./controller";
 import type {
   CheckoutProfilesReadyState,

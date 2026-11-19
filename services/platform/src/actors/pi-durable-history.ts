@@ -3,8 +3,8 @@ import type {
   HarnessHistoryEntry,
   HarnessHistoryContent,
   AcceptedInputRef,
-} from "@seams/contracts";
-import { isRecord, canonicalJson } from "@seams/std";
+} from "@purin-labs/contracts";
+import { isRecord, canonicalJson } from "@purin-labs/std";
 import { materializeAssistantHistoryContent } from "./pi-history-adapter";
 import { parseHarnessHistoryEntry } from "./harness-history";
 

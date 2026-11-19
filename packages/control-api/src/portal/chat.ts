@@ -35,8 +35,8 @@ import {
   parseAuthoredConnector,
   type ConnectorAuthoringResult,
 } from "./custom-connectors.ts";
-import type { Variant } from "@seams/type-utils";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import {
   type ActiveConversationMetadata,
   type ArchivedConversationMetadata,

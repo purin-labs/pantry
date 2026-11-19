@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@seams/commerce-contracts/schema";
+import { recordParser } from "@purin-labs/commerce-contracts/schema";
 import {
   surfaceObservationSchema,
   type SurfaceObservationV2,

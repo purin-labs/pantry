@@ -7,7 +7,7 @@ import {
 } from "./schema.ts";
 import { Type, type Static, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
-import { compareCodePoints } from "@seams/std";
+import { compareCodePoints } from "@purin-labs/std";
 import {
   attributeDefinitionSchema,
   parseAttributeDefinition,

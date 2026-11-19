@@ -72,13 +72,13 @@ import {
 } from "./actor-restore-manifest";
 import type { ActorNamespaces } from "./actor-router";
 import { quiescePlacementExecution } from "./portal-chat-cleanup";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
   isNonEmptyString,
   isNonNegativeInteger,
   isPositiveInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 declare const actorRestoreIdBrand: unique symbol;
 

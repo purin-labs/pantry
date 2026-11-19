@@ -1,5 +1,5 @@
 import React from "react";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import { Select } from "../../../ui/select";
 
 type Choice<Value extends string> = Readonly<{ value: Value; label: string }>;

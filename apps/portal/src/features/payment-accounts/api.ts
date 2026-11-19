@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   ControlApiError,
   controlMutation,
@@ -8,7 +8,7 @@ import {
   type StripePaymentAccount,
   parseStripeAccount,
   unexpected,
-} from "@seams/control-api/portal/payment-accounts";
+} from "@purin-labs/control-api/portal/payment-accounts";
 
 function accountsPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/payment-accounts`;

@@ -2,7 +2,7 @@ import { readConversationExecution } from "../chat/execution";
 import { readCommerceApproval, readMeta } from "./case/context-source";
 import { parseLifecycle } from "./case/record-parsers";
 import { traceWarn } from "../observability";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import { newRequestId } from "../ids";
 import { nextAlarmAt, type AlarmReconciler } from "./lifecycle/actor-alarm";
 import { nextUndeliveredOutputAt } from "./case/outputs";

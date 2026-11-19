@@ -3,7 +3,7 @@
  * in flight; server state remains authoritative after the operation settles.
  */
 
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type MutationProvider =
   | "airtable"

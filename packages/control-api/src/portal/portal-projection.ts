@@ -10,7 +10,7 @@ import type {
   OnboardingStepProjection,
   OnboardingWebhookHealth,
   OrganisationOnboardingLifecycle,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   ApprovalAuthenticationReport,
   CapabilityProfile,
@@ -21,14 +21,14 @@ import type {
   OrganisationInvitation,
   OrganisationMember,
 } from "./settings.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   exhaustiveList,
   isNonEmptyString,
   isRecord,
   isString,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { parseOrganisationEnvironment } from "./organisation-environment.ts";
 import type {
   IntegrationLifecycleKind,

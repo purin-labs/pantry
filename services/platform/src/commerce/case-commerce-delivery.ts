@@ -15,7 +15,7 @@ import { parseConnectorId, type OrganisationId } from "../ids";
 import { resolveOrganisationModelRoute } from "../models/route";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { loadOrganisationPolicyOrDefaultDeny } from "../policy-snapshot";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 type CommerceCaseOutputDelivery =
   | {

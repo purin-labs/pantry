@@ -1,16 +1,16 @@
 import {
   compileCafeShift,
   parseCafeShiftRecipe,
-} from "@seams/production-simulation/recipes/bakery/cafe-shift";
+} from "@purin-labs/production-simulation/recipes/bakery/cafe-shift";
 import {
   compileEspresso,
   parseEspressoRecipe,
-} from "@seams/production-simulation/recipes/bakery/espresso";
+} from "@purin-labs/production-simulation/recipes/bakery/espresso";
 import {
   compilePourOver,
   parsePourOverRecipe,
-} from "@seams/production-simulation/recipes/bakery/pour-over";
-import { parseNativeCell } from "@seams/production-simulation/native/cell-adapter";
+} from "@purin-labs/production-simulation/recipes/bakery/pour-over";
+import { parseNativeCell } from "@purin-labs/production-simulation/native/cell-adapter";
 import {
   MAX_DOCUMENT_BYTES,
   MAX_REFERENCED_BYTES,
@@ -18,21 +18,21 @@ import {
   ok,
   type Result,
   type CompiledScenario,
-} from "@seams/production-simulation";
-import { assertNever, isRecord, parseJsonOrNull } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { assertNever, isRecord, parseJsonOrNull } from "@purin-labs/std";
 import {
   parsePersistentCell,
   type PersistentPanCell,
-} from "@seams/bakery-model/bakery-physics";
-import { parseProductionScenario } from "@seams/bakery-model/bakery-production-scenario";
-import { compileGingerBlackTeaRecipe } from "@seams/production-simulation/recipes/bakery/ginger-black-tea";
-import { compileGingerMilkTeaRecipe } from "@seams/production-simulation/recipes/bakery/ginger-milk-tea";
-import { compileMixedTeaRecipe } from "@seams/production-simulation/recipes/bakery/mixed-tea";
-import { compileBakeryShift } from "@seams/production-simulation/recipes/bakery/bakery-shift";
-import { compileFinancierRecipe } from "@seams/production-simulation/recipes/bakery/financier";
-import { compileBlackSesameRecipe } from "@seams/production-simulation/recipes/bakery/black-sesame";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { parseProductionScenario } from "@purin-labs/bakery-model/bakery-production-scenario";
+import { compileGingerBlackTeaRecipe } from "@purin-labs/production-simulation/recipes/bakery/ginger-black-tea";
+import { compileGingerMilkTeaRecipe } from "@purin-labs/production-simulation/recipes/bakery/ginger-milk-tea";
+import { compileMixedTeaRecipe } from "@purin-labs/production-simulation/recipes/bakery/mixed-tea";
+import { compileBakeryShift } from "@purin-labs/production-simulation/recipes/bakery/bakery-shift";
+import { compileFinancierRecipe } from "@purin-labs/production-simulation/recipes/bakery/financier";
+import { compileBlackSesameRecipe } from "@purin-labs/production-simulation/recipes/bakery/black-sesame";
 import { openExecutionWorker } from "./execution-client";
-import { readSavedRunFile } from "@seams/production-simulation/runs/run-file-reader";
+import { readSavedRunFile } from "@purin-labs/production-simulation/runs/run-file-reader";
 import {
   readOvenSave,
   prepareOvenDefinition,
@@ -40,8 +40,8 @@ import {
   prepareBlackSesameRecipe,
   prepareGingerBlackTeaRecipe,
   type OvenRunSource,
-} from "@seams/production-simulation/runs/oven-run-file";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/production-simulation/runs/oven-run-file";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** A file contains either the shared definition or the host's saved reply. */
 export async function readOvenRunFile(

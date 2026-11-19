@@ -2,25 +2,25 @@ import {
   parseApplianceResult,
   type ApplianceRequest,
   type ApplianceResult,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import {
   MAX_RECORDING_BYTES,
   MAX_REQUEST_BYTES,
   parsePhysicsRequest,
   type PhysicsReplay,
   type PhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   parseNativeContinuation,
   type NativeContinuation,
-} from "@seams/production-simulation/recipes/bakery/native-continuation";
-import { applianceRuntime } from "@seams/production-simulation/simulator/appliance-runtime";
+} from "@purin-labs/production-simulation/recipes/bakery/native-continuation";
+import { applianceRuntime } from "@purin-labs/production-simulation/simulator/appliance-runtime";
 import type {
   BrowserPhysicsMode,
   BrowserPhysicsOutcome,
   BrowserPhysicsTask,
-} from "@seams/production-simulation/simulator/browser-physics-task";
-import { errorMessage, isRecord } from "@seams/std";
+} from "@purin-labs/production-simulation/simulator/browser-physics-task";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import { openExecutionWorker, type ExecutionWorker } from "./execution-client";
 import type { JobProgress } from "./job-progress";
 
@@ -30,7 +30,7 @@ export type {
   BrowserPhysicsMode,
   BrowserPhysicsOutcome,
   BrowserPhysicsTask,
-} from "@seams/production-simulation/simulator/browser-physics-task";
+} from "@purin-labs/production-simulation/simulator/browser-physics-task";
 
 /**
  * The one-shot physics jobs of a page (Refactor 16, step 5): "Run in

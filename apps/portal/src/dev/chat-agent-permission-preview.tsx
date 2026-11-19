@@ -9,9 +9,9 @@ import {
   newConversationId,
   type AgentPermissionRequestView,
   type ChatPermissionRequest,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { ChatPermissionPrompt } from "../features/chat/permission-prompt";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 
 const ORGANISATION_ID = "organisation_preview";
 const OWNER_REQUEST = "a".repeat(32);

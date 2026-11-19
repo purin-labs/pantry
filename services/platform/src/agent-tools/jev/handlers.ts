@@ -1,4 +1,4 @@
-import type { JevFeaturesView } from "@seams/control-api/portal/jev-features";
+import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-features";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import { requireSessionExecution } from "../../actors/session-execution-admission";

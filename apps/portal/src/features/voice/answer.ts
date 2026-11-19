@@ -1,4 +1,4 @@
-import type { Chat } from "@seams/control-api/portal/chat";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
 
 import type { ChatStreamState } from "../chat/delivery";
 import { finishedSentences, spokenAnswer } from "./command";

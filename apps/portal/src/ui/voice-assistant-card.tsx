@@ -1,5 +1,5 @@
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { VoiceBeam, type VoiceBeamLevel } from "voice-glow";
 import "./voice-assistant-card.css";
 

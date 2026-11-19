@@ -17,7 +17,7 @@ import type {
 import type { CheckpointRef } from "./physics.ts";
 import type { Interval, LogicalTime, TickDuration } from "./time.ts";
 import type { Provenance, TravelRoute } from "./scenario.ts";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 export type RecoveryRequest = Readonly<{
   task: TaskId;

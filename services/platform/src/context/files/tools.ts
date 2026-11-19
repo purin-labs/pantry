@@ -3,7 +3,7 @@ import type {
   FileContextProvider,
   ProviderFileRevision,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { encodeContextVisibility } from "../../authorization/access-grants/visibility";
 import type {
@@ -40,7 +40,7 @@ import { ProviderFileProjectionSourceReader } from "./provider-source";
 import type { FileProviderCredentialStore } from "../../provider-workflows/file-context-credential";
 import { normalizeFileText, segmentFileText } from "./projection";
 import { ACTIVE_FILE_GRANT_VISIBILITY_SQL } from "./authority-sql";
-import { isPositiveInteger, sha256Hex, canonicalJson } from "@seams/std";
+import { isPositiveInteger, sha256Hex, canonicalJson } from "@purin-labs/std";
 
 const FILE_SEARCH_QUERY_MAX_CHARS = 256;
 const FILE_SEARCH_MAX_RESULTS = 20;

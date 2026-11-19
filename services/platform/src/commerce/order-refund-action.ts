@@ -2,11 +2,11 @@
 // freezes the payment, the amount and how it spreads over the order, so that
 // an approval signs exact money. Commerce refuses the refund if the order
 // changed after the proposal, or if the amount is more than it can return.
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type {
   CommerceOrderV1,
   CommercePaymentV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { Result } from "../result";
 

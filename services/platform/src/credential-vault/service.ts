@@ -5,7 +5,7 @@ import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
 } from "../organisation-execution-scope";
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { SessionExecutionAdmission } from "../actors/session-execution-admission";
 import type { Result } from "../result";
 import {
@@ -31,7 +31,7 @@ import {
   type VaultCiphertext,
 } from "./crypto";
 import type { OrganisationQuerySource } from "../data/query-source";
-import { assertNever, isNonNegativeInteger, isRecord } from "@seams/std";
+import { assertNever, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 type VaultAlgorithm = "AES-GCM-256";
 

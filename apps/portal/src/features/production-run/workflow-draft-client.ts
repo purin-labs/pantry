@@ -1,15 +1,15 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   DraftEncoding,
   WorkflowDraftDoc,
-} from "@seams/workflow-canvas-crdt/draft";
+} from "@purin-labs/workflow-canvas-crdt/draft";
 import {
   encodeDraftClientMessage,
   parseDraftServerMessage,
   type DraftClientMessage,
   type DraftParticipant,
   type DraftServerMessage,
-} from "@seams/workflow-canvas-crdt/draft-protocol";
+} from "@purin-labs/workflow-canvas-crdt/draft-protocol";
 import {
   DocumentSocket,
   webSocketUrl,

@@ -3,15 +3,15 @@ import type {
   ProjectId,
   UserId,
   ProjectAccessCommand,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   canonicalJson,
   sha256Hex,
   hasExactKeys,
   isRecord,
   isNonNegativeInteger,
-} from "@seams/std";
-import { isConversationId, isUserId } from "@seams/control-api";
+} from "@purin-labs/std";
+import { isConversationId, isUserId } from "@purin-labs/control-api";
 import type { ConversationScope } from "./store";
 import { authorizeProject, listProjectMembers } from "../projects/access";
 import { listOrganisationMembers } from "../data/control-plane";
@@ -19,7 +19,7 @@ import { readProject } from "../projects/records";
 import { listAccessGrants } from "../data/access-grants";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import { authorizeConversation } from "./conversation-access";
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import type { ConversationSharingCommand } from "./conversation-sharing";
 
 export class ProjectAudienceProposal {

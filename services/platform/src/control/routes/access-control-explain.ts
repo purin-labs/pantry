@@ -7,7 +7,7 @@ import type {
   CaseRef,
   FlowDestinationRef,
   InformationSourceRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { explainAccessDecision } from "../../access-control/decision-explanation";
 import type { Env } from "../../env";
@@ -20,7 +20,7 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../http";
-import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 const MAX_SOURCE_REFERENCES = 20;
 
 export type AccessControlExplainRoute = Readonly<{

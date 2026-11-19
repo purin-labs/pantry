@@ -7,7 +7,7 @@ import {
   schedulingHistory,
   type SchedulingHistoryView,
 } from "./scheduling-history.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   DestinationId,
   ProductId,

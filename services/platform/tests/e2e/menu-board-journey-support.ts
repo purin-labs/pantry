@@ -11,24 +11,24 @@ import {
   parseMenuScreenPairingState,
   parseMenuScreenSignal,
   type MenuScreenFeed,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   MenuBoardDoc,
   type MenuBoardCrdtResult,
   type MenuBoardSnapshot,
   type MenuBoardUpdate,
-} from "@seams/menu-board-crdt";
+} from "@purin-labs/menu-board-crdt";
 import {
   encodeMenuBoardClientMessage,
   parseMenuBoardServerMessage,
   type MenuBoardServerMessage,
-} from "@seams/menu-board-crdt/protocol";
-import { MenuDraftDoc } from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-board-crdt/protocol";
+import { MenuDraftDoc } from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftClientMessage,
   parseMenuDraftServerMessage,
-} from "@seams/menu-draft-crdt/protocol";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/menu-draft-crdt/protocol";
+import { isRecord } from "@purin-labs/std";
 import { http, HttpResponse } from "msw";
 import { enableCapability } from "./access-route-support";
 import { commerceClient } from "./commerce-support";

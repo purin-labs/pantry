@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { StoredMessageAttachment } from "@seams/contracts";
+import type { StoredMessageAttachment } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -9,7 +9,7 @@ import {
   persistDerivedStills,
   readDerivedStills,
 } from "../src/messages/derived-stills";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 const ORGANISATION = "organisation_derived";
 const POLICY = "plan37.frames.v1";

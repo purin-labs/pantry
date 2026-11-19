@@ -5,7 +5,7 @@ import {
   newProjectId,
   type UserId,
   type ChatGoalCommand,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { expect, it, type TestContext } from "vitest";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { ORGANISATION_ID } from "./slack-journey-support";

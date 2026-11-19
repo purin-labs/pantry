@@ -1,7 +1,7 @@
 import type {
   PermissionRequired,
   PermissionRequiredGrantTarget,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { opaqueSubjectReference } from "../access-control/references";
 import {
   capabilityDefinitionById,

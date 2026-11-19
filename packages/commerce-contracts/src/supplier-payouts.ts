@@ -1,4 +1,4 @@
-import { assertNever, rustTrim, sha256HexSync } from "@seams/std";
+import { assertNever, rustTrim, sha256HexSync } from "@purin-labs/std";
 import {
   CommerceRejection,
   commerceTimestamp,

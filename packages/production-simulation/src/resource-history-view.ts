@@ -1,5 +1,5 @@
-import { isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { isRecord } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import * as d from "./document-values.ts";
 import type { ResourceInterval, ResourceUsage } from "./results.ts";
 

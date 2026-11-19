@@ -3,9 +3,9 @@ import {
   openAuthoredCellWorker as openAuthoredWorker,
   type ExecutionWorker,
 } from "../features/production-run/execution-client";
-import type { ExecutionBundle } from "@seams/production-simulation";
-import type { PersistentCell } from "@seams/bakery-model/bakery-physics";
-import { isRecord } from "@seams/std";
+import type { ExecutionBundle } from "@purin-labs/production-simulation";
+import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
+import { isRecord } from "@purin-labs/std";
 
 export type { ExecutionWorker };
 

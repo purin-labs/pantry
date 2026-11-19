@@ -1,5 +1,5 @@
 import React from "react";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   controlRead,
   controlSecretMutation,
@@ -8,7 +8,7 @@ import {
 import {
   type Configuration,
   parseConfiguration,
-} from "@seams/control-api/portal/typesafe-connection";
+} from "@purin-labs/control-api/portal/typesafe-connection";
 
 export type TypeSafeConnectionState =
   | Readonly<{ kind: "loading" }>

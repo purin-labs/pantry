@@ -1,4 +1,4 @@
-import type { Selection, WorkcellSelection } from "@seams/production-simulation/simulator/selection";
+import type { Selection, WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
 
 const task: Selection = { kind: "task", id: "batch:A:process:bake" };
 const worker: Selection = { kind: "resource", id: "human-1" };

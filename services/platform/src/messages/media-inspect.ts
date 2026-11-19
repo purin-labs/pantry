@@ -1,13 +1,13 @@
-import type { FrameSamplingOutcome, MediaMetadata } from "@seams/contracts";
+import type { FrameSamplingOutcome, MediaMetadata } from "@purin-labs/contracts";
 import {
   parseFrameSamplingOutcome,
   parseMediaMetadata,
-} from "@seams/contracts/media-inspect";
+} from "@purin-labs/contracts/media-inspect";
 import {
   initSync,
   inspectMediaMetadata as inspect,
   sampleVideoFrames as sample,
-} from "@seams/contracts/media-wasm";
+} from "@purin-labs/contracts/media-wasm";
 import mediaWasm from "../../../../packages/contracts/media-wasm-pkg/media_inspect_bg.wasm?module";
 
 const decoder = new TextDecoder();

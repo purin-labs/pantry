@@ -15,19 +15,19 @@ import {
   parseSoldOutItems,
   type MenuScreenPickup,
   type OrderQueueEntry,
-} from "@seams/control-api";
-import { MenuDraftDoc, type MenuDraftUpdate } from "@seams/menu-draft-crdt";
+} from "@purin-labs/control-api";
+import { MenuDraftDoc, type MenuDraftUpdate } from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftClientMessage,
   parseMenuDraftServerMessage,
-} from "@seams/menu-draft-crdt/protocol";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/menu-draft-crdt/protocol";
+import { isRecord } from "@purin-labs/std";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
   commercePickupCode,
   type CommerceBuyerCartLineV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";

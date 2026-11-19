@@ -1,5 +1,5 @@
-import { hasExactKeys, isRecord } from "@seams/std";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import type { CaseGoalValue as Goal } from "./record-schemas.ts";
 import type { CaseGoalStateValue as State } from "./record-schemas.ts";
 import type { CaseGoalSnapshotValue as Snapshot } from "./record-schemas.ts";

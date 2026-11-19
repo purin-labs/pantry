@@ -12,7 +12,7 @@ import {
 } from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
 import { readScenario } from "../../../../apps/portal/src/features/workflow-simulator/scenario-api";
 import { readProductionScenario } from "../../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   editRehearsalWorkcells,
   type ProductionWorkcells,
@@ -20,9 +20,9 @@ import {
 import {
   rehearsalFromRecording,
   rehearsalSettings,
-} from "@seams/production-simulation/simulator/rehearsal-presets";
+} from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import ovenCycle from "../../../../assets/bakery-mujoco/fr10-workcell/recordings/oven-cycle.json";
-import { parsePhysicsReplay } from "@seams/bakery-model/bakery-physics";
+import { parsePhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import {
   savePreparedAgentWorkspaceRun,
   savePreparedWorkspaceRun,
@@ -37,15 +37,15 @@ import {
   financierRecipeInput,
 } from "../../../../packages/production-simulation/src/recipes/bakery/financier";
 import { createExecutionHost } from "../../../../packages/production-simulation/src/execution-host";
-import { readOvenSave } from "@seams/production-simulation/runs/oven-run-file";
-import { PRODUCTION_EXECUTION_MANIFEST } from "@seams/production-simulation/execution-manifest";
+import { readOvenSave } from "@purin-labs/production-simulation/runs/oven-run-file";
+import { PRODUCTION_EXECUTION_MANIFEST } from "@purin-labs/production-simulation/execution-manifest";
 import {
   parseBakerySurfaceReceipt,
   createBakerySurfaceAttachment,
   createBakerySurfaceEffect,
   createBakerySurfaceReceipt,
   type BakerySurfaceContextV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { env, exports } from "cloudflare:workers";
 import {
   connectCommerceFixture,
@@ -69,34 +69,34 @@ import { readLatestAgentScenarioSave } from "../../src/commerce/bakery/agent-sce
 import {
   agentScenarioSaveManifest,
   type AgentScenarioSavePayload,
-} from "@seams/bakery-model/bakery-agent-scenario-save";
+} from "@purin-labs/bakery-model/bakery-agent-scenario-save";
 import {
   bakeryFingerprint,
   sampleSettings,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import {
   readBakeryProcedure,
   type ProcedureOperation,
-} from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parseCommerceGraphQuery,
   CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
-import type { CommerceGraphQuery } from "@seams/contracts";
+} from "@purin-labs/commerce-client";
+import type { CommerceGraphQuery } from "@purin-labs/contracts";
 import { FINANCIER_SAMPLE_ID } from "../../src/commerce/bakery/sample";
 import { customEntityRef } from "../../../../apps/portal/src/features/commerce/entity-plane/api";
-import { parseScenarioCopy } from "@seams/bakery-model/bakery-scenario";
+import { parseScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
 import {
   parseProductionScenario,
   productionAssignmentId,
   productionDefinitionFingerprint,
   type ProductionAssignment,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import {
   parseRunSnapshot,
   parseRunSnapshotSummary,
   MAX_RUN_SNAPSHOT_BYTES,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 
 it(
   "saves immutable private snapshots with real organisation authorization, CSRF, pagination and retry safety",

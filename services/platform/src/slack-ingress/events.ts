@@ -50,11 +50,11 @@ import {
 import { buildAdmittedSlackCaseCommand } from "../slack/case-command";
 import { verifySlackSignature } from "../slack/signature";
 import { resolveActiveSlackPhysicalInstallationCredential } from "../credential-vault";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   handleSlackInstallationRevoked,
   identityLinkBrowserUrl,

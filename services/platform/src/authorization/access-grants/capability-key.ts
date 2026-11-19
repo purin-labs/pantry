@@ -2,8 +2,8 @@ import type { Result } from "../../result";
 import type {
   FileResourceGrantTarget,
   FileResourceScope,
-} from "@seams/contracts";
-import { hasExactKeys, isNonBlankString, isRecord } from "@seams/std";
+} from "@purin-labs/contracts";
+import { hasExactKeys, isNonBlankString, isRecord } from "@purin-labs/std";
 
 export type PlatformCapabilityDefinition = Readonly<{
   readonly kind: "platform_capability";

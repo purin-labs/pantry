@@ -10,9 +10,9 @@ import {
 } from "./overview";
 
 import { customConnectorCollectionPath, customConnectorActionPath, customConnectorPath, customConnectorRevisionPath, customConnectorSetupCollectionPath, customConnectorSetupPath, mutateCustomConnector, mutateCustomConnectorAction, readCustomConnectorCatalog, readCustomConnectorAction, readCustomConnectorDetail, readCustomConnectorSetup, type CustomConnectorDetail, type CustomConnectorRevisionAction } from "./custom-connector-api";
-import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@seams/control-api/portal/custom-connectors";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, errorMessage, isRecord } from "@seams/std";
+import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
 
 type Loadable<Value> =
   | { readonly kind: "loading" }

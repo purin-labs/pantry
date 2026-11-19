@@ -12,8 +12,8 @@ import type {
   FileContextProvider,
   FileResourceScope,
   OnboardingControlRole,
-} from "@seams/contracts";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { ControlErrorKind } from "./errors.ts";
 import type {
   AccessControlAvailability,

@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonBlankString, isRecord } from "@seams/std";
+import { hasExactKeys, isNonBlankString, isRecord } from "@purin-labs/std";
 
 /**
  * What a connected mailbox still needs before its agent writes a reply, and

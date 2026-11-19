@@ -1,6 +1,6 @@
 import { controlMutation, controlRead } from "../../control-client";
-import { isRecord } from "@seams/std";
-import { type CustomConnectorAccountView, type CustomConnectorAction, type CustomConnectorMutationResult, type CustomConnectorRevisionView, type CustomConnectorSetupAttempt, type CustomConnectorSummary, parseAccount, parseAction, parseAttempt, parseMutationResult, parseRevision, parseSummary } from "@seams/control-api/portal/custom-connectors";
+import { isRecord } from "@purin-labs/std";
+import { type CustomConnectorAccountView, type CustomConnectorAction, type CustomConnectorMutationResult, type CustomConnectorRevisionView, type CustomConnectorSetupAttempt, type CustomConnectorSummary, parseAccount, parseAction, parseAttempt, parseMutationResult, parseRevision, parseSummary } from "@purin-labs/control-api/portal/custom-connectors";
 
 export type CustomConnectorDetail = Readonly<{
   summary: CustomConnectorSummary;

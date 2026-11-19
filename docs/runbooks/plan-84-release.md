@@ -11,7 +11,7 @@ until each regional database matches its baseline.
 1. Apply the patch to each regional database:
 
    ```bash
-   pnpm --filter @seams/platform exec wrangler d1 execute <binding> --env production --remote --file scripts/bakery-workflow-d1-patch.sql
+   pnpm --filter @purin-labs/platform exec wrangler d1 execute <binding> --env production --remote --file scripts/bakery-workflow-d1-patch.sql
    ```
 
 2. Add the capability rows for `commerce.recipe_workflow.read` and
@@ -22,13 +22,13 @@ until each regional database matches its baseline.
    ```
 
    ```bash
-   pnpm --filter @seams/platform exec wrangler d1 execute <binding> --env production --remote --file /tmp/backfill.sql
+   pnpm --filter @purin-labs/platform exec wrangler d1 execute <binding> --env production --remote --file /tmp/backfill.sql
    ```
 
 3. Check each database:
 
    ```bash
-   pnpm --filter @seams/platform d1:schema:remote:check
+   pnpm --filter @purin-labs/platform d1:schema:remote:check
    ```
 
 ## After the deploy: Journey J8

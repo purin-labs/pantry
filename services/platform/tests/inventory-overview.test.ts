@@ -1,10 +1,10 @@
 import { expect, it } from "vitest";
-import { parseInventory } from "@seams/contracts";
-import type { InventoryConsumptionPlan } from "@seams/contracts";
+import { parseInventory } from "@purin-labs/contracts";
+import type { InventoryConsumptionPlan } from "@purin-labs/contracts";
 import type {
   CommerceInventoryItemV1,
   CommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   saleOffers,
   connectedStockOverview,
@@ -14,7 +14,7 @@ import {
 import type {
   CommerceOfferV1,
   CommerceSalesChannelV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 it(
   "uses ecommerce offers rather than inventory ingredients to select sale products",

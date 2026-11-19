@@ -1,4 +1,4 @@
-import { isRecord, assertNever } from "@seams/std";
+import { isRecord, assertNever } from "@purin-labs/std";
 import { mailIdentifier, mailRevision } from "./mail-organization.ts";
 
 export type MailWorkCaseState =

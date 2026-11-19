@@ -38,7 +38,7 @@ import { selectActiveGrants } from "../../authorization/access-grants/compiler";
 import { evaluateFlowLabelSink } from "../../policy";
 import { supplierPayoutLabel } from "../../payouts/supplier-payout-access";
 import { mailControlAuthority } from "./mail-inbox";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The operator surface for money leaving the merchant.

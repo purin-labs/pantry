@@ -1,4 +1,4 @@
-import { sameJson } from "@seams/std";
+import { sameJson } from "@purin-labs/std";
 import { emit, held, type Draft } from "./engine-draft.ts";
 import type { StorageState } from "./state.ts";
 import type { LogicalTime } from "./time.ts";

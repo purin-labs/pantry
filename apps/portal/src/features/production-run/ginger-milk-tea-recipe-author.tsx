@@ -1,8 +1,8 @@
 import React from "react";
-import { gingerMilkTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/ginger-milk-tea";
-import { mixedTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/mixed-tea";
+import { gingerMilkTeaRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/ginger-milk-tea";
+import { mixedTeaRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/mixed-tea";
 import { prepareNativeRecipe } from "./oven-recipe-file";
-import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import type { OvenRunSource } from "@purin-labs/production-simulation/runs/oven-run-file";
 import { prepareRecipe, RecipeChoice } from "./shared/recipe-form";
 
 type Props = Readonly<{ prepared(source: OvenRunSource): void }>;

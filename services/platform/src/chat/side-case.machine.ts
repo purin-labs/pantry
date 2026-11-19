@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /**
  * One side Case proposal of a Portal chat or a Slack thread (Plan 74,

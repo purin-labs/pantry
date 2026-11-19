@@ -1,4 +1,4 @@
-import { hasRustControl, rustTrim, utf8ByteLength } from "@seams/std";
+import { hasRustControl, rustTrim, utf8ByteLength } from "@purin-labs/std";
 import { Type, type Static } from "typebox";
 import {
   attachmentIdSchema,

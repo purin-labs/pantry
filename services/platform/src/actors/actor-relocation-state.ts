@@ -3,7 +3,7 @@ import {
   assertNever,
   isNonEmptyString,
   isNonNegativeInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { Env } from "../env";
 import type { Result } from "../result";
 import type { ActorFenceToken } from "./actor-registry";
@@ -14,7 +14,7 @@ import {
   type ActorExportSource,
 } from "./actor-export";
 import { eraseActorContentSql } from "./portal-chat-cleanup";
-import type { CommerceProviderReceipt } from "@seams/control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import { readActionResult } from "./action-ledger";
 import { reconcileCommerceProviderReceipt } from "../commerce/action-model";
 import { FlowBinding, digestFlowBinding } from "../policy/information-flow";

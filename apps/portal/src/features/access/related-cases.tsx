@@ -4,8 +4,8 @@ import type {
   CaseContextCollectionMetadataView,
   CaseContextCollectionRelationshipDecision,
   CaseContextCollectionRelationshipView,
-} from "@seams/control-api";
-import type { AccessControlOption, AccessRouteTransport } from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api";
+import type { AccessControlOption, AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 
 type Props = Readonly<{
   organisationId: string;

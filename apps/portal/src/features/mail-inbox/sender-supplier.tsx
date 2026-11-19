@@ -1,6 +1,6 @@
 import { Select } from "../../ui/select";
 import React from "react";
-import type { MailSenderLink } from "@seams/control-api";
+import type { MailSenderLink } from "@purin-labs/control-api";
 import {
   linkMailSender,
   readMailSenderLink,

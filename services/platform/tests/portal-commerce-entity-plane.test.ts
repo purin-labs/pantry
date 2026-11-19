@@ -5,11 +5,11 @@ import React from "../../../apps/portal/node_modules/react";
 import { renderToStaticMarkup } from "../../../apps/portal/node_modules/react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-import { parseCommerceEntityPlaneCommand } from "@seams/commerce-client";
+import { parseCommerceEntityPlaneCommand } from "@purin-labs/commerce-client";
 import type {
   CommerceBoardViewConfiguration,
   CommerceList,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   buildCommerceBoardModel,
@@ -22,7 +22,7 @@ import {
   readPublishedCommerceResources,
 } from "../../../apps/portal/src/features/commerce";
 import { updateCommerceBoardPresence } from "../../../apps/portal/src/features/commerce/entity-plane/api";
-import { parseCommerceListEntryPatchResponse } from "@seams/control-api/portal/entity-plane";
+import { parseCommerceListEntryPatchResponse } from "@purin-labs/control-api/portal/entity-plane";
 import {
   OrderCancellationControl,
   proposeOrderCancellation,

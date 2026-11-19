@@ -1,6 +1,6 @@
-import type { MailOrganizationView } from "@seams/control-api";
-import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { MailOrganizationView } from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 export type MailProcessingState = StrictUnion<
   | Readonly<{ kind: "loading" }>

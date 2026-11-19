@@ -5,7 +5,7 @@ import type {
   FileGrantAdmission,
   FileResourceScope,
   ProviderFileCursor,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { encodeContextVisibility } from "../../authorization/access-grants/visibility";
 import { readAccessGrant } from "../../data/access-grants";
@@ -60,7 +60,7 @@ import {
   upsertFileResourceSource,
   type FileResourceSourceFact,
 } from "./persistence";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const FILE_RECONCILIATION_INTERVAL_MS = 60 * 60 * 1_000;
 const FILE_RECONCILIATION_LEASE_MS = 2 * 60 * 1_000;

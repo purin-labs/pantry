@@ -1,5 +1,5 @@
 import type { PhysicsSceneLife } from "./physics-scene-host";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const factory: Variant<PhysicsSceneLife, "factory">;
 declare const recording: Variant<PhysicsSceneLife, "ready" | "loading-assets">;

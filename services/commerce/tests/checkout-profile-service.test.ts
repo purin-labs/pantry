@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
-import type { CheckoutProfileConfiguration } from "@seams/commerce-contracts";
+import type { CheckoutProfileConfiguration } from "@purin-labs/commerce-contracts";
 
 import { CheckoutProfileService } from "../src/checkout-profile-service.ts";
 import { NodeCommerceDatabase } from "../src/node-database.ts";

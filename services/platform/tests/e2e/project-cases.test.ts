@@ -6,7 +6,7 @@ import {
   newProjectId,
   type ProjectId,
   type UserId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
 import { parseSessionId } from "../../src/ids";
 import { readConversation, saveConversation } from "../../src/chat/store";

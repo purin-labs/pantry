@@ -51,7 +51,7 @@ import {
 } from "./control-mutation";
 import { ensureCurrentReadiness } from "./onboarding";
 import { expireProviderAttemptIfDue } from "./provider-attempt";
-import { assertNever, isNonNegativeInteger } from "@seams/std";
+import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,

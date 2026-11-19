@@ -24,11 +24,11 @@ import {
   type MemoryCommand,
   type MemoryContent,
   parseMailReplySources,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseEntityRef,
   SUPPLIER_ENTITY_TYPE_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { readSessionTurnMemoryRecords } from "../../src/actors/actor-journal/transactions";
 import { createMailboxTurnMemoryReader } from "../../src/memory/mailbox-turn";
 import {
@@ -109,7 +109,7 @@ import {
 } from "../../src/policy/information-flow";
 import type { CaseContextCollectionEffectAttempt } from "../../src/case-context-discovery/evidence";
 import { sourceReaderForAuthority } from "../../src/policy/information-flow/source-readers";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   previewEmailProposal,
   dispatchEmailReply,
@@ -170,14 +170,14 @@ import {
   type MailRule,
   type MailInboxCommand,
   type MailInboxResult,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   assertNever,
   isRecord,
   encodeBase64,
   encodeBase64Url,
   decodeBase64,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { network } from "./network";
 import {
   bootstrapOrganisation,
@@ -272,7 +272,7 @@ import {
   digestEmailBody,
   digestEmailSnapshot,
 } from "../../src/mail/reply-target";
-import type { CaseAssignment } from "@seams/contracts";
+import type { CaseAssignment } from "@purin-labs/contracts";
 import type { CaseGmailReplyProposal } from "../../src/actors/case/types";
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
@@ -1545,7 +1545,7 @@ type ProposalPlacementCommand =
     }>
   | Readonly<{
       kind: "correction";
-      correction: import("@seams/control-api").MailReplyCorrection;
+      correction: import("@purin-labs/control-api").MailReplyCorrection;
       snapshot?: never;
     }>;
 
@@ -8556,7 +8556,7 @@ function seedAssistantDecision(
     organisationId: OrganisationId;
     accountId: import("../../src/ids").IntegrationAccountId;
     authority: Extract<
-      import("@seams/contracts").RequestAuthority,
+      import("@purin-labs/contracts").RequestAuthority,
       { kind: "control" }
     >;
     sourcePin: string;
@@ -13109,7 +13109,7 @@ async function verifyReplySources(
   Object.assign(input.context.task.meta, {
     inboxReplySources: {
       repeat:
-        "pnpm --filter @seams/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-inbox.test.ts -t 'shows the order and the Memory that a reply draft cites' --reporter=json --outputFile=<file>",
+        "pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-inbox.test.ts -t 'shows the order and the Memory that a reply draft cites' --reporter=json --outputFile=<file>",
       proposalId,
       citationsMade: 7,
       kept: kept.outcome,

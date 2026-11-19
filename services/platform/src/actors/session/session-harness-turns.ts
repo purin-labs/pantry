@@ -59,9 +59,9 @@ import {
   turnMayRequestPermission,
   turnMayScheduleFollowUp,
 } from "../harness-follow-up";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
-import type { BakerySurfaceAttachmentV1 } from "@seams/bakery-model/bakery-surface";
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { parseSessionId, type RequestId, type OrganisationId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
 import { verifyWorkspaceRevisionReceipt } from "../../workspace-revision-store";
@@ -136,7 +136,7 @@ import {
   type CapabilityAuthorizationRequest,
   CONTEXT_CASE_READ_CAPABILITY,
 } from "../../authorization/access-grants/turn-authority";
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import { failSessionTurnStream } from "../agent-session-turn-stream";
 import {
   buildCanonicalTextTurnStart,
@@ -151,7 +151,7 @@ import {
   readSessionInformationFlow,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
 } from "../agent-session-information-flow";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   announceSurfaceEffect,
   executeBakerySurfaceForHarness,

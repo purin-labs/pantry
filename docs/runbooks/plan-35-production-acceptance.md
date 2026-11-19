@@ -54,9 +54,9 @@ acceptance and cleanup window; it cannot recreate writes that preceded it.
 Run the access-control checks from the exact revision under test:
 
 ```bash
-pnpm --filter @seams/platform check:types
-pnpm --filter @seams/platform check:test-types
-pnpm --filter @seams/platform test -- \
+pnpm --filter @purin-labs/platform check:types
+pnpm --filter @purin-labs/platform check:test-types
+pnpm --filter @purin-labs/platform test -- \
   access-control-grant-mutation.test.ts \
   access-control-read-route.test.ts \
   capability-policy.test.ts

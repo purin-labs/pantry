@@ -1,25 +1,25 @@
-import type { CollaborationAgent } from "@seams/collaboration";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
 import type { CollaborationMutationOrigin } from "./collaboration-room";
 import {
   parseWorkflowCanvasSource,
   workflowCanvasDocumentId,
   type WorkflowCanvasSource,
-} from "@seams/bakery-model/bakery-canvas-source";
+} from "@purin-labs/bakery-model/bakery-canvas-source";
 import {
   type CanvasEncoding,
   WorkflowCanvasDoc,
-} from "@seams/workflow-canvas-crdt";
+} from "@purin-labs/workflow-canvas-crdt";
 import {
   CanvasMoveRequest,
   CanvasAgentRequest,
   type CanvasMoveOrigin,
-} from "@seams/workflow-canvas-crdt/move";
+} from "@purin-labs/workflow-canvas-crdt/move";
 import {
   encodeCanvasServerMessage,
   type CanvasProtocolFailureCode,
   type CanvasRoomMetadata,
   type CanvasSelection,
-} from "@seams/workflow-canvas-crdt/protocol";
+} from "@purin-labs/workflow-canvas-crdt/protocol";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
 import { listOrganisationMembers, resolveUser } from "../data/control-plane";

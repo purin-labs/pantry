@@ -1,11 +1,11 @@
 import { paddedStandardBase64, standardBase64 } from "../lenient-base64";
 import { RequestDeadline } from "../request-deadline";
 import type { Result } from "../result";
-import { decodeBase64, isRecord } from "@seams/std";
+import { decodeBase64, isRecord } from "@purin-labs/std";
 import type {
   MailInboxMessage,
   MailInboxThreadMessage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /**
  * Stateless trusted Gmail adapter. Every call takes an already resolved

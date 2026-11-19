@@ -1,7 +1,7 @@
 import type {
   CaseEvidenceDependency,
   MailboxReplyScope,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   CaseContextCollectionEvidenceDependency,
   CaseContextCollectionEffectFence,

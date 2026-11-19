@@ -8,7 +8,7 @@ import {
   type OrganisationId,
 } from "../ids";
 import type { Result } from "../result";
-import { isSha256Hex } from "@seams/std";
+import { isSha256Hex } from "@purin-labs/std";
 
 export type OperationalEmailTarget =
   | Readonly<{

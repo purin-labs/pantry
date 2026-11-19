@@ -13,7 +13,7 @@ import {
   type CommerceAdminClient,
   type CommerceMutationResultV1,
   type CommerceProductMediaItemV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import type { MediaStore, StoredMedia } from "../src/plugins/media/index.ts";

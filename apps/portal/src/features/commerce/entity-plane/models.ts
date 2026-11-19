@@ -16,14 +16,14 @@ import type {
   CommerceViewPresentation,
   SavedCommerceView,
   ListEntryAttributeValue,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type {
   CommerceCollectionSelection,
   CommercePublishedResourceMetadata,
 } from "./api";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type CommerceEntityTableRow = Readonly<{
   entity: CommerceEntity;

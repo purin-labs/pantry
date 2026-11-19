@@ -8,15 +8,15 @@
  */
 import React from "react";
 import { GitBranch, LoaderCircle } from "lucide-react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   ChatSideCaseState,
   ChatSideCaseView,
   ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { ChatTimelineInsert } from "./activity";
-import type { ChatTimelineView } from "@seams/control-api/portal/chat";
-import { sideCaseHereRequestId } from "@seams/control-api";
+import type { ChatTimelineView } from "@purin-labs/control-api/portal/chat";
+import { sideCaseHereRequestId } from "@purin-labs/control-api";
 import type { SideCaseActions } from "./side-cases";
 import "../../ui/draft-message-card.css";
 import "./side-case-card.css";

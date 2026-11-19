@@ -1,5 +1,5 @@
 import type { CodeModePlacement } from "./code-mode-budget";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 const CODE_MODE_ROUTER_REVISION = "code-mode-router-v1";
 

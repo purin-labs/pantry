@@ -5,11 +5,11 @@ import {
   parseRecipeCollection,
   type RecipeCollection,
   type RecipeWrite,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   CommerceAdminClient,
   type CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceClient,
   commerceWorkspace,

@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../database-handles";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
 import { listAccessGrants } from "../../data/access-grants";

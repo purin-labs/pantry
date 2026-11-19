@@ -4,7 +4,7 @@ import {
   type ContractDecodeResult,
 } from "./schema.ts";
 import { Type, type Static, type StaticDecode } from "typebox";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import {
   entityLifecycleCommandSchema,
   parseEntityLifecycleCommand,

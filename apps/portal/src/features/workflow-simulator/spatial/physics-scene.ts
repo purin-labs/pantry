@@ -1,9 +1,9 @@
-import type { PhysicsSceneReplay } from "@seams/production-simulation/recipes/bakery/physics-playback";
+import type { PhysicsSceneReplay } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import { createBakeryGrid } from "./bakery-grid";
 import {
   sceneLegAt,
   physicsLegAt,
-} from "@seams/production-simulation/recipes/bakery/physics-playback";
+} from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import {
   PhysicsInspection,
   type PhysicsFrame,
@@ -19,7 +19,7 @@ import {
   loadWorkcellVisuals,
 } from "./physics-workcell-visuals";
 import { PhysicsModel, disposePhysicsObject } from "./physics-model";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
 import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
 import { RehearsalBakery } from "./rehearsal-bakery";
 import { floorPlanWorkspace } from "../floor-plan-workspace";
@@ -28,9 +28,9 @@ import {
   type BakeryLightingRig,
 } from "./scene-lighting";
 import { sceneLabel, arrangeLabels } from "../scene-labels";
-import { robotCellPosition } from "@seams/production-simulation/simulator/rehearsal-spatial";
+import { robotCellPosition } from "@purin-labs/production-simulation/simulator/rehearsal-spatial";
 import { FloorPlan } from "./floor-plan";
-import { COLD_CELL } from "@seams/production-simulation/recipes/bakery/workcell-instances";
+import { COLD_CELL } from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 import type { RecordedFitEvent } from "./floor-plan-geometry";
 
 // The Robot cell's instances, by their role in its two skills.

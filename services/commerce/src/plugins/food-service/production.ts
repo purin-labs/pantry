@@ -3,7 +3,7 @@ import { merchantOwner } from "./merchant-owner.ts";
 import {
   productionQuantityUnscaled,
   type ProductionRequestFields,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { createHash } from "node:crypto";
 
 import {
@@ -15,8 +15,8 @@ import {
   type CommerceInventoryMovementV1,
   type CommerceInventoryPositionV1,
   type CommerceMutationErrorV1,
-} from "@seams/commerce-client";
-import type { ProductionBatch } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { ProductionBatch } from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../../database.ts";
 import { foodProvenance, readRecipeRevision } from "./food-service-store.ts";

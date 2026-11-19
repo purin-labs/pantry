@@ -1,6 +1,6 @@
 // The discounts built-in plugin (Plan 77 step 3). Code outside this
 // directory reaches the plugin only through this file.
-import type { CommerceDiscountCommandV1 } from "@seams/commerce-client";
+import type { CommerceDiscountCommandV1 } from "@purin-labs/commerce-client";
 
 export * from "./discounts.ts";
 export { DISCOUNT_SCHEMA } from "./schema.ts";

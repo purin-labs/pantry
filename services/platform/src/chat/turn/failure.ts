@@ -1,6 +1,6 @@
 import type { UserId } from "../../ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import type { Env } from "../../env";
 import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
 import {
@@ -14,9 +14,9 @@ import {
   type ConversationScope,
   type StoredConversation,
 } from "../store";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { nextTimelineSequence } from "./timeline";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function reconcileFailedConversationTurn(
   env: Env,

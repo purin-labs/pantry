@@ -1,5 +1,5 @@
 import { SLACK_NO_LINK_PREVIEW } from "../slack/messages";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import type { SqlStorage } from "@cloudflare/workers-types";

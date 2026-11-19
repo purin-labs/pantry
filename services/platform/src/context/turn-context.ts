@@ -4,7 +4,7 @@ import type {
   AccountUserAuthority,
   AccountAdmissionAction,
 } from "../account-platform/access";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 import {
   compileTurnAuthority,

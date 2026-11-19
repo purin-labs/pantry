@@ -1,4 +1,4 @@
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 
 import type { Env } from "../env";
 import { newRequestId, parseSessionId, type OrganisationId } from "../ids";
@@ -16,7 +16,7 @@ import {
 } from "./code-mode-budget";
 import { codeModePlatformGovernor } from "./code-mode-platform-governor-stub";
 import type { HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const CLEANUP_MARGIN_MS = 5_000;
 

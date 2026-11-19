@@ -1,4 +1,4 @@
-import type { ShippingRouteBinding } from "@seams/commerce-contracts";
+import type { ShippingRouteBinding } from "@purin-labs/commerce-contracts";
 import type { CommerceBuyerShippingServiceV1 } from "./index.ts";
 
 // @ts-expect-error Singapore routes require an exact duty capability binding.

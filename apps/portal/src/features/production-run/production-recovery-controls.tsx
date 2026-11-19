@@ -5,8 +5,8 @@ import type {
   HostView,
   RecoveryView,
   CompiledScenario,
-} from "@seams/production-simulation";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+} from "@purin-labs/production-simulation";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import { seconds } from "./oven-logistics";
 
 export type ReviewedRecovery = Variant<HostRequest, "recover" | "recover-with-worker"> &

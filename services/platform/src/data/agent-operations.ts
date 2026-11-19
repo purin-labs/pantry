@@ -3,14 +3,14 @@ import type { CommerceEntityPlaneCueEvent } from "../cues/engine";
 import type {
   CommerceListEntryRef,
   CommerceRelationshipRef,
-} from "@seams/contracts";
-import type { CommerceEntityPlanePublishedResourceMetadataResponse } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import type { CommerceEntityPlanePublishedResourceMetadataResponse } from "@purin-labs/commerce-client";
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
-import type { AgentSkillRef, ScheduleSpec } from "@seams/control-api";
-import type { AgentOperationCommand as ApiAgentOperationCommand } from "@seams/control-api/portal/agent-operations";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
+import type { AgentSkillRef, ScheduleSpec } from "@purin-labs/control-api";
+import type { AgentOperationCommand as ApiAgentOperationCommand } from "@purin-labs/control-api/portal/agent-operations";
 import {
   createArea,
   publishResponsibilityScope,
@@ -90,7 +90,7 @@ import {
   publishSkillRevision,
 } from "./agent-operations/skills";
 
-export type { ScheduleSpec, ScheduleWeekday } from "@seams/control-api";
+export type { ScheduleSpec, ScheduleWeekday } from "@purin-labs/control-api";
 
 export type AgentLifecycle = "active" | "archived";
 
@@ -125,7 +125,7 @@ export type AgentResponsibilityScope =
       readonly selector: {
         readonly selectorId: string;
         readonly revision: number;
-        readonly query: import("@seams/contracts").CommerceGraphQuery;
+        readonly query: import("@purin-labs/contracts").CommerceGraphQuery;
       };
     };
 
@@ -389,7 +389,7 @@ export type AgentOperationsSnapshot = {
 
 /**
  * The agent operation commands that the Portal sends
- * (`@seams/control-api`), with the responsibility scope as Platform reads it:
+ * (`@purin-labs/control-api`), with the responsibility scope as Platform reads it:
  * plain ids and any graph query, where the Portal type carries branded ids.
  */
 export type AgentOperationInput =

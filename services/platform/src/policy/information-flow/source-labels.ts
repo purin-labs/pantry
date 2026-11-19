@@ -1,9 +1,9 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import { parseControlRole } from "../../data/control-plane";
-import { isUserId } from "@seams/control-api";
+import { isUserId } from "@purin-labs/control-api";
 import { authorizeProject } from "../../projects/access";
 import { authorizeConversation } from "../../chat/conversation-access";
-import type { CapabilityDefinition, RequestAuthority } from "@seams/contracts";
+import type { CapabilityDefinition, RequestAuthority } from "@purin-labs/contracts";
 
 import {
   CAPABILITY_CATALOGUE,
@@ -36,8 +36,8 @@ import type {
   FlowWriter,
   IntegrationResourceFlowSource,
 } from "./types";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type CurrentSourceFlowLabelInput =
   | Readonly<{

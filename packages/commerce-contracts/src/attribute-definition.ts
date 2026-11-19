@@ -9,7 +9,7 @@ import { attributeDefinitionWireSchema } from "./entity-wire.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 import { cleanValue } from "./sorted-unions.ts";
-import { assertNever, codePointCount, isRecord } from "@seams/std";
+import { assertNever, codePointCount, isRecord } from "@purin-labs/std";
 import {
   attributeDefinitionScopeSchema,
   commerceSensitivitySchema,

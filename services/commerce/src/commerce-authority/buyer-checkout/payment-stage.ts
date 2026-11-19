@@ -6,11 +6,11 @@ import {
   type CommerceBuyerV1,
   type CommerceMutationErrorV1,
   type CommercePaymentCaptureResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   isOnlinePaymentBinding,
   type CheckoutPaymentAttempt,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   readCheckout,
   readCheckoutPaymentAttempt,

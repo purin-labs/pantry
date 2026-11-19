@@ -12,10 +12,10 @@ import {
   type CommerceMerchantSnapshotV1,
   type CommerceMutationResultV1,
   type CommerceQuantityV1,
-} from "@seams/commerce-client";
-import type { InventoryConsumptionPlan } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { InventoryConsumptionPlan } from "@purin-labs/commerce-contracts";
 import { hasCommerceResources } from "../../demo-fixtures.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 import {
   findResource,

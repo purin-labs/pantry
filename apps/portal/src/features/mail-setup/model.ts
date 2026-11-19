@@ -2,7 +2,7 @@ import type {
   MailboxSetupAgent,
   MailboxSetupPlan,
   MailboxSetupRequirementId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /** What the page knows of a mailbox's setup. */
 export type MailboxSetupState =

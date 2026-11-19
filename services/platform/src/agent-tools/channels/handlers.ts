@@ -14,7 +14,7 @@ import {
   slackMessageBodyDigest,
 } from "../../data/slack-message-proposal";
 import type { EmailProposalTarget } from "../../data/email-operational";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import {
   parseCaseId,
@@ -109,10 +109,10 @@ import {
   CommerceReadRequestError,
   readNamedCommerceQuery,
 } from "../../context/assembly/commerce";
-import { parseProductionRequestFields } from "@seams/commerce-client";
+import { parseProductionRequestFields } from "@purin-labs/commerce-client";
 import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import {
   type DraftThreadLink,
   type EmailMailboxReadScope,

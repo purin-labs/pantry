@@ -10,10 +10,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { EvalView, MemoryView } from "@seams/control-api";
-import { assertNever } from "@seams/std";
+import type { EvalView, MemoryView } from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
-import type { AgentDefinition, Skill } from "@seams/control-api/portal/agent-operations";
+import type { AgentDefinition, Skill } from "@purin-labs/control-api/portal/agent-operations";
 import { isPrimaryNavigationClick } from "../../console-sidebar";
 import { formatAbsoluteTime, formatRelativeTime } from "../../formatting";
 import { EmptyState, StatusChip } from "../../page-components";

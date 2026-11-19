@@ -7,7 +7,7 @@ import {
 } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { reconcileSessionGoalUsage } from "../../src/actors/session-goal-usage";
 import { readSessionBudgetAccount } from "../../src/actors/agent-session-budget";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";

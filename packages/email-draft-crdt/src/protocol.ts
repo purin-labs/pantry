@@ -11,7 +11,7 @@ import {
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   isEmailDraftField,
   parseEmailDraftStateVector,
@@ -21,7 +21,7 @@ import {
   type EmailDraftStateVector,
   type EmailDraftUpdate,
 } from "./index.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export const EMAIL_DRAFT_PROTOCOL = "email_draft_sync.v2";
 export const FRAME_LIMIT = COLLABORATION_FRAME_LIMIT;

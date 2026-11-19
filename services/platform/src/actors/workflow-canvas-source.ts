@@ -1,19 +1,19 @@
-import { CanvasLayout } from "@seams/workflow-canvas-crdt";
+import { CanvasLayout } from "@purin-labs/workflow-canvas-crdt";
 import type { Env } from "../env";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
-import type { WorkflowCanvasSource } from "@seams/bakery-model/bakery-canvas-source";
+import type { WorkflowCanvasSource } from "@purin-labs/bakery-model/bakery-canvas-source";
 import {
   parseRunSnapshot,
   MAX_RUN_SNAPSHOT_BYTES,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   parseApplianceWorkflow,
   applianceCanvasObjects,
-} from "@seams/bakery-model/bakery-appliance-workflow";
+} from "@purin-labs/bakery-model/bakery-appliance-workflow";
 import { bakeryRunSnapshotPrefix } from "../commerce/bakery/saved-runs";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 type CanvasSource = Readonly<{
   layout: CanvasLayout;

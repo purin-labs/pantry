@@ -1,6 +1,6 @@
 import React from "react";
-import { assertNever } from "@seams/std";
-import type { MailInboxThreadMessage } from "@seams/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { MailInboxThreadMessage } from "@purin-labs/control-api";
 
 /**
  * The fixed text that the mailbox sends when a reply waits for review. The

@@ -1,16 +1,16 @@
-import type { Settings } from "@seams/bakery-model/bakery";
-import type { ProductionAssignment } from "@seams/bakery-model/bakery-production-scenario";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
+import type { ProductionAssignment } from "@purin-labs/bakery-model/bakery-production-scenario";
 import {
   describe,
   humanResource,
   type Interval,
   type Run,
   type Wait,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   buildFinancierHandoffRecovery,
   type FinancierHandoffRecoveryPreset,
-} from "@seams/production-simulation/recipes/financier-bake/model";
+} from "@purin-labs/production-simulation/recipes/financier-bake/model";
 import { defaultAssignments } from "./production-draft";
 
 export type BatchWaitSummary = Readonly<{

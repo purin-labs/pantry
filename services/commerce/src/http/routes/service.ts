@@ -4,7 +4,7 @@ import {
   type BuyerRoute,
   type CommerceRoute,
 } from "../../http-routes.ts";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import { jsonResponse } from "../responses.ts";
 import {

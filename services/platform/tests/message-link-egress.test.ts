@@ -15,7 +15,7 @@ import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
 } from "../src/placement";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 describe("worker message link egress", function egressSuite() {
   it("resolves A and AAAA records over DNS-over-HTTPS without starting the container", async function resolvesBoth() {

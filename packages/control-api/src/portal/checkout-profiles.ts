@@ -1,6 +1,6 @@
-import type { CheckoutProfile } from "@seams/contracts";
-import { parseCheckoutProfile } from "@seams/commerce-client";
-import { hasExactKeys, isRecord } from "@seams/std";
+import type { CheckoutProfile } from "@purin-labs/contracts";
+import { parseCheckoutProfile } from "@purin-labs/commerce-client";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 export type CheckoutProfileSummary = Readonly<{
   profile: CheckoutProfile;

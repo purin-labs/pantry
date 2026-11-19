@@ -1,4 +1,4 @@
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 declare const fixtureConversation: ConversationId;
 import type {
   ChatMessage,
@@ -112,7 +112,7 @@ const missingFlow: Variant<DirectCasePathResult, "completed"> = {
 void missingFlow;
 
 import type { ChatModelAction } from "../src/chat/conversation";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 declare const questionAction: Variant<ChatModelAction, "question">;
 // @ts-expect-error Question actions cannot carry an alternative plain-text reply through a spread.
 const questionWithReply: ChatModelAction = { ...questionAction, text: "Reply" };

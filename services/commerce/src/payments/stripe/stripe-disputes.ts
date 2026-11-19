@@ -2,8 +2,8 @@
 // 76 phase 3). The Worker uses the event to find the merchant; the merchant's
 // object parses the same event again and records the dispute against the
 // payment attempt whose PaymentIntent it names.
-import { isRecord } from "@seams/std";
-import type { PaymentDisputeLifecycle } from "@seams/commerce-contracts";
+import { isRecord } from "@purin-labs/std";
+import type { PaymentDisputeLifecycle } from "@purin-labs/commerce-contracts";
 
 type StripeDisputeObservation = Readonly<{
   eventId: string;

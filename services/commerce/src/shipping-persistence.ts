@@ -1,8 +1,8 @@
 import {
   parseShipmentLabelRate,
   type CommerceShipmentLabelAttemptV1,
-} from "@seams/commerce-client";
-import type { ShipmentLabelRateSnapshot } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { ShipmentLabelRateSnapshot } from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "./database.ts";
 

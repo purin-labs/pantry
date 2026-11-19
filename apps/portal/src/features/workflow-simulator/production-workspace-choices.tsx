@@ -1,5 +1,5 @@
 import React from "react";
-import { REHEARSAL_PRESETS } from "@seams/production-simulation/simulator/rehearsal-presets";
+import { REHEARSAL_PRESETS } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import { Select } from "../../ui/select";
 
 // The items of the production workspace selects. production-workspace.tsx is

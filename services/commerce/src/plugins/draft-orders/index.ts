@@ -1,6 +1,6 @@
 // The draft-orders built-in plugin (Plan 77 step 3). Code outside this
 // directory reaches the plugin only through this file.
-import type { CommerceDraftOrderCommandV1 } from "@seams/commerce-client";
+import type { CommerceDraftOrderCommandV1 } from "@purin-labs/commerce-client";
 
 export * from "./draft-orders.ts";
 export { DRAFT_ORDER_SCHEMA } from "./schema.ts";

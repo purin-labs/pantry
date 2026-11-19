@@ -297,7 +297,7 @@ async function persistentChatCapture() {
 async function persistentChatEnqueue(input) {
   const context = await persistentChatCapture();
   const { createBakerySurfaceEffect } =
-    await import("/@id/@seams/bakery-model/bakery-surface");
+    await import("/@id/@purin-labs/bakery-model/bakery-surface");
   const effect = await createBakerySurfaceEffect({
     effectId: `surface_effect_${crypto.randomUUID().replaceAll("-", "")}aaaaaaaa`,
     dispatchId: crypto.randomUUID(),

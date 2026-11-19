@@ -2,10 +2,10 @@ import {
   parseCheckoutProfileConfiguration,
   type CheckoutProfile,
   type CheckoutProfileLifecycle,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "./database.ts";
-import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type CheckoutProfileActivation = Readonly<{
   merchantId: string;

@@ -1,4 +1,4 @@
-import type { MachineStore } from "@seams/std/state-machine";
+import type { MachineStore } from "@purin-labs/std/state-machine";
 
 type SqlValue = string | number | null;
 

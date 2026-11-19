@@ -3,9 +3,9 @@ import {
   type DeviceKind,
   type DeviceView,
   type KitchenDeviceView,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** How a device's facts read on the Devices page. */
 

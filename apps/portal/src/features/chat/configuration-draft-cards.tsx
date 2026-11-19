@@ -5,11 +5,11 @@
  */
 import React from "react";
 import { SlidersHorizontal } from "lucide-react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { VoiceApprovalLine } from "../voice/approvals";
 import type { ChatTimelineInsert } from "./activity";
 import type { ConfigurationDraftActions } from "./configuration-drafts";
-import type { ConfigurationDraftView } from "@seams/control-api/portal/configuration-drafts";
+import type { ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";
 import "../../ui/draft-message-card.css";
 import "./side-case-card.css";
 

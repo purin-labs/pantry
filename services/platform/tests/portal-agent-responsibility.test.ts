@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { parseEntityPlanePublishedResourceMetadataResponse } from "@seams/commerce-client";
-import { parseAgentOperationForm, parseAgentOperationsResponse } from "@seams/control-api/portal/agent-operations";
+import { parseEntityPlanePublishedResourceMetadataResponse } from "@purin-labs/commerce-client";
+import { parseAgentOperationForm, parseAgentOperationsResponse } from "@purin-labs/control-api/portal/agent-operations";
 
 describe("portal agent responsibility-scope boundary", () => {
   it("parses and displays every published responsibility-scope branch", () => {

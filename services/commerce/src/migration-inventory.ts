@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import type { CommerceMigrationInventoryV2 } from "@seams/commerce-client";
+import type { CommerceMigrationInventoryV2 } from "@purin-labs/commerce-client";
 
 import { requireIdentity } from "./commerce-authority/command-guards.ts";
 import type { MerchantRow } from "./commerce-authority/ledger.ts";

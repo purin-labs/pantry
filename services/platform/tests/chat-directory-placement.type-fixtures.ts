@@ -1,7 +1,7 @@
 import { mutateChatDirectory } from "../src/chat/projects";
 import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
 import type { ConversationScope } from "../src/chat/store";
-import type { ChatDirectoryCommand } from "@seams/control-api";
+import type { ChatDirectoryCommand } from "@purin-labs/control-api";
 
 declare const placement: OrganisationExecutionScope;
 declare const conversation: ConversationScope;

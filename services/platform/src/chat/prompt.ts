@@ -2,8 +2,8 @@ import { AGENT_OLD_NAMES_NOTE } from "../agent-old-names";
 import { currentProjectSnapshot } from "./project-context-binding";
 import { connectorDefinitionInstructions } from "../custom-connectors/authoring";
 import { timelineVisibleMessages, type Conversation } from "./conversation";
-import type { BakerySurfaceAttachmentV1 } from "@seams/bakery-model/bakery-surface";
-import type { SurfaceObservationV2 } from "@seams/control-api";
+import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { SurfaceObservationV2 } from "@purin-labs/control-api";
 import { promptObservation, screenContextLine } from "./screen-prompt";
 import { conversationOrigin } from "./origin";
 

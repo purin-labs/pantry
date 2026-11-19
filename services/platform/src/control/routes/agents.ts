@@ -16,8 +16,8 @@ import {
   type WhatsAppCaseAction,
   type WhatsAppReplyAction,
 } from "../../whatsapp/control";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import {
   handleCampaignBriefDecision,
   handleCampaignBriefQueue,

@@ -5,8 +5,8 @@ import type {
   QueueView,
   ResourceView,
   TaskView,
-} from "@seams/production-simulation";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { assertNever } from "@purin-labs/std";
 import type React from "react";
 
 export type TaskSelection = Readonly<{

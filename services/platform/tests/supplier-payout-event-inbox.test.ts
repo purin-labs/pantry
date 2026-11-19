@@ -9,7 +9,7 @@ import {
 } from "../src/data/supplier-payout-event-inbox";
 import { parseOrganisationId } from "../src/ids";
 import { d1Database } from "./sqlite-d1";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 const parsed = parseOrganisationId("organisation_inbox");
 if (!parsed.ok) throw new Error("invalid organisation");

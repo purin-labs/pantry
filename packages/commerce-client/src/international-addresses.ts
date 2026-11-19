@@ -6,7 +6,7 @@
 import {
   COMMERCE_POSTAL_CODES,
   parseInternationalShippingAddressOf,
-} from "@seams/commerce-contracts/records/api-international-addresses";
+} from "@purin-labs/commerce-contracts/records/api-international-addresses";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 export const COMMERCE_EUROPEAN_UNION_COUNTRIES = [

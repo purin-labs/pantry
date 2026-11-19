@@ -1,6 +1,6 @@
-import type { FileContextProvider } from "@seams/contracts";
-import { assertNever } from "@seams/std";
-import { surfaceAreaTitle } from "@seams/control-api";
+import type { FileContextProvider } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
+import { surfaceAreaTitle } from "@purin-labs/control-api";
 
 export type WorkspaceDetailPage =
   | "overview"

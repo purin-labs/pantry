@@ -8,7 +8,7 @@ import {
   type CommerceNotificationV1,
   type CommerceMarketV1,
   type CommerceCompanyV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   CustomerAuthority,
   type SignInVerification,

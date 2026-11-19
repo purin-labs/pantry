@@ -1,8 +1,8 @@
-import { isNonNegativeInteger, isRecord, parseJsonOrNull } from "@seams/std";
+import { isNonNegativeInteger, isRecord, parseJsonOrNull } from "@purin-labs/std";
 import type {
   CaseExecutionToolAuthority,
   CaseExecutionTurnMemory,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   ExecutionLabelTable,
   MAX_EXECUTION_STORED_TEXT,

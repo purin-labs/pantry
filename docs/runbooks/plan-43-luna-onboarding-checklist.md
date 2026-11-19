@@ -196,10 +196,10 @@ the run note.
 
 ```sh
 pnpm test:environments
-pnpm --filter @seams/platform test:onboarding-closure
-pnpm --filter @seams/platform check:types
-pnpm --filter @seams/platform check:test-types
-pnpm --filter @seams/platform test:e2e
+pnpm --filter @purin-labs/platform test:onboarding-closure
+pnpm --filter @purin-labs/platform check:types
+pnpm --filter @purin-labs/platform check:test-types
+pnpm --filter @purin-labs/platform test:e2e
 pnpm portal:build
 git diff --check
 ```

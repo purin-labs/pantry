@@ -1,5 +1,5 @@
-import type { PhysicsSceneReplay } from "@seams/production-simulation/recipes/bakery/physics-playback";
-import type { BakeryRecordingCameraView } from "@seams/bakery-model/bakery-surface";
+import type { PhysicsSceneReplay } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
+import type { BakeryRecordingCameraView } from "@purin-labs/bakery-model/bakery-surface";
 import * as THREE from "three";
 import type { PhysicsScene } from "./physics-scene";
 import type {
@@ -9,9 +9,9 @@ import type {
 import { PhysicsFloorPlan } from "./physics-floor-plan";
 import { FloorPlan } from "./floor-plan";
 import type { RecordedFitEvent } from "./floor-plan-geometry";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
-import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 type Options = Readonly<{
   fallback: "floor-plan" | "message";

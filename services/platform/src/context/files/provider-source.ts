@@ -29,7 +29,7 @@ import type {
   FileProjectionSourceError,
   FileProjectionSourceReader,
 } from "./projection";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export class ProviderFileProjectionSourceReader implements FileProjectionSourceReader {
   readonly #env: Env;

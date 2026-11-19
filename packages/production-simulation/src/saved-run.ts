@@ -1,5 +1,5 @@
-import { canonicalJson, isRecord, sameJson, sha256Hex } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import { canonicalJson, isRecord, sameJson, sha256Hex } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { admitScenario } from "./admission.ts";
 import * as d from "./document-values.ts";
 import { parseExecutionBundle } from "./execution-bundle.ts";

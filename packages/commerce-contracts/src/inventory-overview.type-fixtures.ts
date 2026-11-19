@@ -1,5 +1,5 @@
 import type { StockRow } from "./inventory-overview";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const supply: Variant<StockRow, "supply">;
 declare const product: Variant<StockRow, "product">;

@@ -1,5 +1,5 @@
 import type { PreparedWorkspaceRun } from "./workspace-runs-api";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const inline: Variant<PreparedWorkspaceRun, "inline">;
 declare const artifacts: Variant<PreparedWorkspaceRun, "artifacts">;

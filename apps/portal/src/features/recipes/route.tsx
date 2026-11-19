@@ -1,14 +1,14 @@
 import React from "react";
 import { Link, useBlocker } from "react-router";
 import { DraftLeaveDialog } from "../collaboration/draft-leave-dialog";
-import type { RecipeRevision } from "@seams/contracts";
+import type { RecipeRevision } from "@purin-labs/contracts";
 import {
   calculateBakeryCostsAndMargins,
   parseCostsOverview,
   parseRecipeCollection,
   type CalculatedRecipeCost,
   type RecipeCollection,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";
 import { costsPath } from "../costs/api";
@@ -21,7 +21,7 @@ import {
 import { PageSkeleton, RecoverableError } from "../../page-components";
 import { RecipeEditor } from "./editor";
 import "./styles.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
   organisationId: string;

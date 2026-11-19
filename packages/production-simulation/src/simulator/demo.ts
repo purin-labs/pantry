@@ -2,7 +2,7 @@ import {
   parseSettings,
   sampleSettings,
   type StationId,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import {
   machineAt,
   simulate,
@@ -12,7 +12,7 @@ import {
   type ScheduleVariant,
   type Wait,
 } from "../recipes/bakery/schedule.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 export function machineSummary(run: Run, id: StationId, time: number): string {
   const status = machineAt(run, id, time);
   const batches = status.occupants.length

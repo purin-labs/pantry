@@ -8,8 +8,8 @@ import {
   type ProjectAccess,
   type ProjectPermission,
   type ProjectRole,
-} from "@seams/control-api";
-import type { ProjectId, UserId } from "@seams/control-api";
+} from "@purin-labs/control-api";
+import type { ProjectId, UserId } from "@purin-labs/control-api";
 import type { OrganisationId } from "../ids";
 
 export type ProjectAccessScope = Readonly<{
@@ -131,7 +131,7 @@ export async function listProjectCandidates(
   db: OrganisationDatabase,
   scope: ProjectAccessScope,
   projectId: ProjectId,
-): Promise<readonly import("@seams/control-api").ProjectCandidate[]> {
+): Promise<readonly import("@purin-labs/control-api").ProjectCandidate[]> {
   const authorized = await authorizeProject(
     db,
     scope,
@@ -151,7 +151,7 @@ export async function listProjectCandidates(
     )
     .bind(scope.organisationId, scope.userId, projectId)
     .all<{ user_id: unknown; display_name: unknown }>();
-  const candidates: import("@seams/control-api").ProjectCandidate[] = [];
+  const candidates: import("@purin-labs/control-api").ProjectCandidate[] = [];
   for (const row of rows.results) {
     if (!isUserId(row.user_id) || typeof row.display_name !== "string")
       throw new Error("project_candidate_invalid");

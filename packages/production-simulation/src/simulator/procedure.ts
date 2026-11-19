@@ -1,8 +1,8 @@
 import type {
   CompiledProcedure,
   ProcedureOperation,
-} from "@seams/bakery-model/bakery-procedure";
-import type { Operation } from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery-procedure";
+import type { Operation } from "@purin-labs/bakery-model/bakery";
 import {
   simulate,
   type Run,

@@ -3,7 +3,7 @@ import type {
   HarnessCheckpointRecord,
   HarnessTurnLease,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, test } from "vitest";
 
 import {
@@ -11,7 +11,7 @@ import {
   buildTextTurnCheckpointingCommit,
 } from "../src/actors/agent-session-text-turn";
 import { TEST_HARNESS_LEASE_AUTHORITY } from "./fixtures/plan25-turn";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const DIGEST = "d".repeat(64);
 const MODEL_ROUTE_DIGEST =

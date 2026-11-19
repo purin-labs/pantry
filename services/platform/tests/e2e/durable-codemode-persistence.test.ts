@@ -1,7 +1,7 @@
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it } from "vitest";
-import { isRecord } from "@seams/std";
-import type { AuthorizedHarnessToolResult } from "@seams/contracts";
+import { isRecord } from "@purin-labs/std";
+import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
 import type { HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "../../src/agent-tools/catalog/types";
 import { network } from "./network";
 import {

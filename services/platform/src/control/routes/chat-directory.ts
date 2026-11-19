@@ -1,7 +1,7 @@
 import { signalChat } from "../../chat/signals";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { isConversationId, isProjectId } from "@seams/control-api";
-import { parseChatDirectoryCommand } from "@seams/control-api";
+import { isConversationId, isProjectId } from "@purin-labs/control-api";
+import { parseChatDirectoryCommand } from "@purin-labs/control-api";
 import {
   mutateChatDirectory,
   readAuthorizedProjectDirectory,

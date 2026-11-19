@@ -1,6 +1,6 @@
 // This built-in plugin's routes (Plan 77 step 3). The core's route table
 // takes them from the plugin's index.ts.
-import type { CommerceApiScope } from "@seams/commerce-client";
+import type { CommerceApiScope } from "@purin-labs/commerce-client";
 
 import { routeFor, type RouteDefinition } from "../../route-definitions.ts";
 

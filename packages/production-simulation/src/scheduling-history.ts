@@ -1,6 +1,6 @@
-import { assertNever, sameJson } from "@seams/std";
+import { assertNever, sameJson } from "@purin-labs/std";
 import { executionWork } from "./scenario.ts";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { AcceptedEvent } from "./events.ts";
 import { compareOrder } from "./events.ts";
 import { held, thaw, taskDefinition } from "./engine-draft.ts";

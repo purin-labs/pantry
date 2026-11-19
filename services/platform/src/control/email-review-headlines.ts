@@ -3,8 +3,8 @@ import {
   EMAIL_REPLY_SUBJECT_MAX,
   type EmailReplyHeadline,
   type MailInboxMessage,
-} from "@seams/control-api";
-import type { RequestAuthority } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
 import type { EmailReviewProjection } from "../data/email-review";
 import type { Env } from "../env";
@@ -17,7 +17,7 @@ import {
   type AuthorizedOrganisationRequest,
 } from "./authorization";
 import { mailControlAuthority } from "./routes/mail-inbox";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The most threads that one read of the queue names. Each costs a Gmail

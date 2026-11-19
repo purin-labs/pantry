@@ -1,6 +1,6 @@
 import type React from "react";
-import { assertNever } from "@seams/std";
-import type { HostView } from "@seams/production-simulation/execution-entry";
+import { assertNever } from "@purin-labs/std";
+import type { HostView } from "@purin-labs/production-simulation/execution-entry";
 import { ProductionActivityTrace } from "./production-activity-trace";
 
 type Props = Readonly<{

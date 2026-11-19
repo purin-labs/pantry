@@ -1,5 +1,5 @@
 // Commerce's state machines (Plan 77 step 1). This file is the source
-// (Plan 78); `pnpm --filter @seams/commerce-contracts commerce-data:check` checks it.
+// (Plan 78); `pnpm --filter @purin-labs/commerce-contracts commerce-data:check` checks it.
 import type { CheckoutLifecycle } from "./records/commerce-records.ts";
 import type { CheckoutPaymentAttemptLifecycle } from "./records/commerce-records.ts";
 import type { CheckoutProfileLifecycle } from "./records/checkout-profile.ts";

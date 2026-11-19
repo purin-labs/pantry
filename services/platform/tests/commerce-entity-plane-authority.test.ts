@@ -4,7 +4,7 @@ import {
   parseCommerceGraphResponse,
   parseCommerceSnapshotRevision,
   parseEntityPlaneCapabilityMetadataResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   buildSavedSelectorCommerceReadAuthority,
@@ -37,9 +37,9 @@ import type {
   CommerceSensitivity,
   MerchantExtensionSchemaRevision,
   CommerceSnapshotRevision,
-} from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { requireOrganisationId } from "./test-ids";
 
 describe("commerce entity-plane authority", () => {

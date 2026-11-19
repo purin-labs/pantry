@@ -1,7 +1,7 @@
 import React from "react";
 
-import type { CommerceActionDetails } from "@seams/control-api/portal/commerce-actions";
-import type { Variant } from "@seams/type-utils";
+import type { CommerceActionDetails } from "@purin-labs/control-api/portal/commerce-actions";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The exact menu that goes live, by section, with what changes. */
 export function CafeMenuPublicationDetails(input: {

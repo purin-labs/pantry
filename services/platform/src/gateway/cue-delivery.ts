@@ -5,9 +5,9 @@ import type {
   CommerceEntityRef,
   CommerceGraphQueryResult,
   CommerceListEntryRef,
-} from "@seams/contracts";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
-import type { CommerceEntityPlaneCapabilityMetadataResponse } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
+import type { CommerceEntityPlaneCapabilityMetadataResponse } from "@purin-labs/commerce-client";
 import {
   renderCueProposal,
   type CueQueueMessage,
@@ -46,8 +46,8 @@ import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plan
 import { BlotterSource } from "../commerce/entity-plane/blotter-source";
 import { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
 import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,
   composeTriggerInstruction,

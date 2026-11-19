@@ -39,8 +39,8 @@ import {
   SqliteStorage,
   type SqliteExecutor,
 } from "@earendil-works/pi-durable/storage/sqlite";
-import { createCancellableTask } from "@seams/async-control/cancellable-task";
-import { canonicalJson, errorMessage, sha256Hex, isRecord } from "@seams/std";
+import { createCancellableTask } from "@purin-labs/async-control/cancellable-task";
+import { canonicalJson, errorMessage, sha256Hex, isRecord } from "@purin-labs/std";
 import type {
   AgentEvent,
   AcceptedHarnessEventCursor,
@@ -48,7 +48,7 @@ import type {
   HarnessHistoryContent,
   HarnessHistoryEntry,
   EmbeddedHarnessModelUsage,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { newRequestId } from "../ids";
 import { traceLog } from "../observability";
 import type { Result } from "../result";

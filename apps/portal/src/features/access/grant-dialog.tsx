@@ -3,9 +3,9 @@ import React from "react";
 import type {
   CommerceEntityTypeId,
   SystemCommerceEntityKind,
-} from "@seams/contracts";
-import type { StrictUnion } from "@seams/type-utils";
-import { parseEntityTypeId, SYSTEM_KINDS } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { parseEntityTypeId, SYSTEM_KINDS } from "@purin-labs/commerce-client";
 import {
   CustomOperationPicker,
   type CustomConnectorAccessHandoff,
@@ -32,7 +32,7 @@ import type {
   AccessControlOption,
   FileResourceAccount,
   FileResourceSelection,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 import {
   categoryLabel,
   connectIntegrationHref,

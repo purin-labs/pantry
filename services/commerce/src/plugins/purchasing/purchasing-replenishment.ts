@@ -6,19 +6,19 @@ import type {
   CommerceList,
   CommerceListEntry,
   ListEntryAttributeValue,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseAttributeOptionId,
   parseCommerceCommandId,
   parseFoodServiceObservation,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   readInventoryItem,
   readInventoryPositionForItemLocation,
   listInventoryLots,
 } from "../../inventory-persistence.ts";
 import { usableInventoryQuantity } from "../../commerce-authority/inventory-planning.ts";
-import type { CommerceInventoryLotV1 } from "@seams/commerce-client";
+import type { CommerceInventoryLotV1 } from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../../database.ts";
 import type { PurchasingReconciliationResult } from "../built-in-ports.ts";
 import {

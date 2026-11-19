@@ -1,6 +1,6 @@
 // Square's HTTP API as Commerce calls it: one version for every call,
 // and answers sorted into success, refusal and unavailability.
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const SQUARE_API_VERSION = "2026-08-19";
 

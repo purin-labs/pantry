@@ -2,8 +2,8 @@ import React from "react";
 import {
   parseMenuBoardVersions,
   type MenuBoardVersionSummary,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";
 import { controlPath } from "./menu-board-requests";
 import "./board-history.css";

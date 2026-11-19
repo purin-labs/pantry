@@ -8,14 +8,14 @@ import {
   parseRunSnapshot,
   parseRunSnapshotSummary,
   type RunSnapshotSummary,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   parseBakerySurfaceEffect,
   parseBakerySurfaceReceipt,
   verifyBakerySurfaceAttachment,
   verifyBakerySurfaceEffect,
   verifyBakerySurfaceReceipt,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { Env } from "../../env";
 import type { OrganisationId } from "../../ids";
 import { authorizeOrganisationRequest } from "../authorization";
@@ -25,7 +25,7 @@ import {
   controlJson,
   readBoundedJsonRecord,
 } from "../http";
-import { hasExactKeys } from "@seams/std";
+import { hasExactKeys } from "@purin-labs/std";
 import { artifactPublicationReady } from "./bakery-run-artifacts";
 import {
   insertAgentRunSaveApproval,

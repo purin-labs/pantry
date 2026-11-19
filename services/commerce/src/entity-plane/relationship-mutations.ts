@@ -9,7 +9,7 @@ import type {
   RelationshipDefinitionRef,
   RelationshipRevision,
   CommerceEntityPlaneObservationV1,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import { parsePositiveRevision } from "./parsers.ts";
 import {
@@ -30,8 +30,8 @@ import {
 import {
   relationshipDefinitionReference,
   sameRelationshipDefinitionRef,
-} from "@seams/commerce-contracts/commerce-relationship-references";
-import type { VariantBy } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts/commerce-relationship-references";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 type RelationshipMutationHandlerOptions = Readonly<{
   database: CommerceDatabase;
@@ -350,7 +350,7 @@ function applyRelationshipReplacement(
 }
 
 function relationshipObservation(
-  observationId: import("@seams/commerce-contracts").CommerceCommandId,
+  observationId: import("@purin-labs/commerce-contracts").CommerceCommandId,
   relationship: CommerceRelationship,
   definition: RelationshipDefinition,
   merchantRevision: MerchantRevision,
@@ -385,7 +385,7 @@ function sameEntityRef(
 }
 
 function customRelationshipReference(
-  relationshipId: import("@seams/commerce-contracts").RelationshipId,
+  relationshipId: import("@purin-labs/commerce-contracts").RelationshipId,
   definition: VariantBy<RelationshipDefinitionRef, "origin", "custom">,
   revision: RelationshipRevision,
 ): CustomCommerceRelationshipRef {

@@ -8,12 +8,12 @@ import {
   type CommerceLotAllocationV1,
   type CommerceMutationErrorV1,
   type CommerceQuantityV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type InventoryAllocation,
-} from "@seams/commerce-contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import type { CommerceDatabase } from "../database.ts";
 import {
   listUsableInventoryLots,

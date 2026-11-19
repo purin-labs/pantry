@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiArchive from "@seams/commerce-contracts/records/api-archive";
+import type * as apiArchive from "@purin-labs/commerce-contracts/records/api-archive";
 import type {
   CommerceArchiveFileV1,
   CommerceArchiveLocationV1,

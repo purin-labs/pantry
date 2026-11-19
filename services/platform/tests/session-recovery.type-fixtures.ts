@@ -3,7 +3,7 @@ import type {
   RecoveringSession,
   SessionRecoveryAction,
   SessionRecoveryEvidence,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { buildSessionExecutionResume } from "../src/actors/agent-session-recovery";
 
 declare const recovering: RecoveringSession;

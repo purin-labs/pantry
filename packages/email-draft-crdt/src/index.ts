@@ -10,7 +10,7 @@ import {
   type TextPresenceSelection,
   type TextSelectionDirection,
   type TextSelectionRange,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import * as Y from "yjs";
 import {
   EMAIL_AGGREGATE_LIMIT,

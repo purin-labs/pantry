@@ -1,7 +1,7 @@
 import type {
   GatewayMessage,
   TerminalPaymentMethod,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /**
  * Per-terminal exclusive collection state inside DeviceFleetActor (Plan 90 D7).

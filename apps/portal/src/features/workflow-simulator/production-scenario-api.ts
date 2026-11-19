@@ -1,4 +1,4 @@
-import { bakeryFingerprint, fields } from "@seams/bakery-model/bakery";
+import { bakeryFingerprint, fields } from "@purin-labs/bakery-model/bakery";
 import {
   parseProductionScenario,
   productionAssignmentId,
@@ -6,10 +6,10 @@ import {
   productionScenarioFromGraph,
   productionSettingsMatchProcedure,
   type ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
-import type { CustomCommerceEntity } from "@seams/contracts";
-import { parseCommerceGraphQuery } from "@seams/commerce-client";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
+import type { CustomCommerceEntity } from "@purin-labs/contracts";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import {
   customEntityRef,
   readCommerceGraph,
@@ -17,7 +17,7 @@ import {
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api.ts";
 import { readProcedure } from "./procedure-api.ts";
 import { scenarioSaveRejection } from "./workspace-commands.ts";
-import { isRecord, sameJson } from "@seams/std";
+import { isRecord, sameJson } from "@purin-labs/std";
 
 export type ProductionScenarioRead =
   | Readonly<{

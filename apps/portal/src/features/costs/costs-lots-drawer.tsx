@@ -9,11 +9,11 @@ import {
   type SupplyCostItem,
   type SupplyLotCost,
   type SupplyLotInvoiceCost,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   lotInvoiceFieldCellKey,
   supplyFieldCellKey,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import { formatMoneyMinor, formatSignedMoneyRounded } from "../../formatting";
 import { SideDrawer } from "../../ui";
 import { formatCostQuantity } from "./api";

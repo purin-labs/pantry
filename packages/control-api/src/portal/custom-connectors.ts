@@ -1,6 +1,6 @@
-import type { Variant } from "@seams/type-utils";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@seams/std";
-import type { ActionState } from "@seams/contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
+import type { ActionState } from "@purin-labs/contracts";
 
 export type CustomConnectorSummary = Readonly<{
   connectorId: string;

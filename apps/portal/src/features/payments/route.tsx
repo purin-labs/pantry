@@ -2,7 +2,7 @@ import React from "react";
 import {
   parsePaymentsDay,
   type PaymentStep as Payment,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";

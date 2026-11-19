@@ -2,7 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import type { CaseTimelineCase } from "@seams/control-api";
+import type { CaseTimelineCase } from "@purin-labs/control-api";
 
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../../src/data/access-grants";

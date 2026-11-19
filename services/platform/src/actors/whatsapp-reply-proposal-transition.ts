@@ -16,7 +16,7 @@ import {
   type MachineGuard,
   type MachineGuardChecks,
   type MachineState,
-} from "@seams/std/state-machine";
+} from "@purin-labs/std/state-machine";
 
 import type { Result } from "../result";
 import { writeActorTransition } from "./lifecycle/state-transition";

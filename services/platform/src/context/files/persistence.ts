@@ -7,7 +7,7 @@ import type {
   FileGrantSyncState,
   ProviderFileCursor,
   ProviderFileRevision,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   parseOrganisationId,
@@ -25,7 +25,7 @@ import {
   parseProviderFileCursor,
   type FileProjectionCommand,
 } from "./domain";
-import { isPositiveInteger } from "@seams/std";
+import { isPositiveInteger } from "@purin-labs/std";
 
 type FileGrantSyncRow = Readonly<{
   state: unknown;

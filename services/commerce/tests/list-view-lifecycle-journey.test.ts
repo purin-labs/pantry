@@ -14,8 +14,8 @@ import {
   parseEntityPlanePublishedResourceMetadataRequest,
   parseEntityPlaneSystemExtensionRequest,
   parseListEntryReadRequest,
-} from "@seams/commerce-client";
-import { parseCommerceEntityPlaneObservation } from "@seams/commerce-contracts/entity-plane-observations";
+} from "@purin-labs/commerce-client";
+import { parseCommerceEntityPlaneObservation } from "@purin-labs/commerce-contracts/entity-plane-observations";
 import type { CommerceDatabase } from "../src/database.ts";
 import {
   BASE_URL,

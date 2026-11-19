@@ -1,4 +1,4 @@
-import type { OnboardingSelectedResource } from "@seams/contracts";
+import type { OnboardingSelectedResource } from "@purin-labs/contracts";
 import React from "react";
 import {
   formatRelativeTime,
@@ -14,10 +14,10 @@ import {
 import type { ProviderConnectionState } from "../../provider-onboarding";
 import { formatLifecycle } from "../../formatting";
 import type { Provider } from "../../integration-catalogue";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { loadOnePasswordIntegrationPanel } from "./integrations-page";
-import type { CapabilityProfile, ControlRole, IntegrationAccount, IntegrationLifecycle, OrganisationInvitation, OrganisationMember, SetupSelection } from "@seams/control-api/portal/settings";
+import type { CapabilityProfile, ControlRole, IntegrationAccount, IntegrationLifecycle, OrganisationInvitation, OrganisationMember, SetupSelection } from "@purin-labs/control-api/portal/settings";
 import type { PendingProviderAuthorization, SettingsMouseHandler, SettingsMutationFeedback, SetupFeedback, SetupFormDefaults } from "./settings-types";
 
 export const OnePasswordIntegrationPanel = React.lazy(loadOnePasswordIntegrationPanel);

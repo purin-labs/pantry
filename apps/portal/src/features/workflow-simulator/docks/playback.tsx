@@ -39,15 +39,15 @@ import {
   type Batch,
   type HumanResource,
   type Run,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import { selectionContext } from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { selectionContext } from "@purin-labs/production-simulation/simulator/selection";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type { PlaybackView } from "../simulator-state";
 import { TimelineTrack, WorkerTimelineTrack } from "../timeline";
 import { EquipmentLanes } from "../equipment-lanes";
-import { equipmentAt, equipmentSummary } from "@seams/production-simulation/simulator/equipment-timeline";
+import { equipmentAt, equipmentSummary } from "@purin-labs/production-simulation/simulator/equipment-timeline";
 import { SegmentedControl } from "./shared";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type PlaybackState = Pick<
   PlaybackView,

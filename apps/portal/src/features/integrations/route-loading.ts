@@ -1,6 +1,6 @@
 import React from "react";
 import { ControlApiError } from "../../control-client";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type {
   IntegrationsRouteData,
   IntegrationsRouteProps,

@@ -1,7 +1,7 @@
 /* Each theme defines palette shades and semantic color roles for both
    appearances. Select one with data-pantry-theme on <html>; without the
    attribute, slate-coral applies. data-portal-theme selects the appearance.
-   The account palette preference (PORTAL_PALETTES in @seams/control-api)
+   The account palette preference (PORTAL_PALETTES in @purin-labs/control-api)
    lists the themes that people can choose. */
 @import "./frontend-themes/slate-coral.css";
 @import "./frontend-themes/espresso.css";

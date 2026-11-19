@@ -1,5 +1,5 @@
-import type { RequestAuthority } from "@seams/contracts";
-import { sha256Hex } from "@seams/std";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { sha256Hex } from "@purin-labs/std";
 
 import {
   insertHeldOutputRequest,
@@ -10,7 +10,7 @@ import { newRequestId, parseOrganisationId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { heldOutputNoticeText } from "../slack/held-output-notice";
 import type { CaseOutput } from "./case/types";
-import type { ConnectorIdentity } from "@seams/contracts";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { ConnectorDO } from "./connector";
 import type { CaseDO } from "./case";
 import { traceWarn } from "../observability";

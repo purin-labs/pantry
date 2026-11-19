@@ -2,9 +2,9 @@ import {
   COLLABORATION_AGENT_ACTION_ELEMENTS,
   COLLABORATION_AGENT_DRAFT_TEXT_LIMIT,
   type CollaborationAgentAction,
-} from "@seams/collaboration";
-import type { MenuBoardRect } from "@seams/menu-board-crdt/board";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/collaboration";
+import type { MenuBoardRect } from "@purin-labs/menu-board-crdt/board";
+import { assertNever } from "@purin-labs/std";
 import type { MenuBoardEdit } from "./menu-boards";
 
 /**

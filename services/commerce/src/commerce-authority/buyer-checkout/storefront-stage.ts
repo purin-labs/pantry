@@ -1,7 +1,7 @@
 import {
   type CommerceBuyerCatalogListingV1,
   type CommerceBuyerCatalogV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { readStorefront } from "../../checkout-persistence.ts";
 import {
   listOffers,

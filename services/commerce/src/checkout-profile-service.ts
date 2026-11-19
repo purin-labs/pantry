@@ -5,7 +5,7 @@ import {
   type CheckoutProfileConfiguration,
   type CheckoutProfileLifecycle,
   type CommerceInvalidTransition,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "./database.ts";
 import {
@@ -25,7 +25,7 @@ import {
   type ActiveStorefrontCheckoutProfile,
   type CheckoutProfileActivation,
 } from "./checkout-profile-persistence.ts";
-import { isPositiveInteger } from "@seams/std";
+import { isPositiveInteger } from "@purin-labs/std";
 
 export type {
   ActiveStorefrontCheckoutProfile,

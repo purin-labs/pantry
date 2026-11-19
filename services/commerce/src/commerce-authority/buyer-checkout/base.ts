@@ -2,7 +2,7 @@ import {
   type CommerceBuyerCheckoutIdentityV1,
   normalizeCustomerEmail,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   type BuyerPickupCheckoutCommand,
   type BuyerShippingCheckoutCommand,

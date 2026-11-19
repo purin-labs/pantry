@@ -9,7 +9,7 @@ import type { OperationalEmailTarget } from "../data/email-operational";
 import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
 import { digestCanonical } from "../policy/information-flow/digest";
 import type { FlowRecipient } from "../policy/information-flow/types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type VerifiedSupplierEndpoint = Omit<
   VerifiedContactEndpoint,

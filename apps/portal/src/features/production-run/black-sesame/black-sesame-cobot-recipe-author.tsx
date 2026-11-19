@@ -5,7 +5,7 @@ import {
   type BlackSesameCobotRecipeConfig,
   type BlackSesameHobModel,
   type BlackSesameRoastMode,
-} from "@seams/production-simulation/recipes/black-sesame/model";
+} from "@purin-labs/production-simulation/recipes/black-sesame/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{

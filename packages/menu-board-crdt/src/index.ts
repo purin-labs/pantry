@@ -2,7 +2,7 @@ import {
   normalizePlainText,
   parseYjsEncoding,
   type ParsedYjsEncoding,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import * as Y from "yjs";
 
 import {

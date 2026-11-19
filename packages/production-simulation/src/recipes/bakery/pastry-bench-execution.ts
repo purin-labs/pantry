@@ -1,9 +1,9 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type {
   ApplianceAction,
   ApplianceBatch,
   ApplianceResult,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 
 export type PastryBenchDeformationTelemetry = Readonly<{
   taskMode: "press-dough-block" | "sheet-shortcrust" | "drape-puff-lid";

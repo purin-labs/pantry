@@ -1,12 +1,12 @@
 import type React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   CarrierStoreView,
   CompiledScenario,
   HostView,
   ResourceView,
   TaskView,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import { seconds, type TaskSelection } from "./oven-logistics";
 
 type Props = TaskSelection &

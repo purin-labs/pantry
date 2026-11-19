@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /** The price of a menu item on one side of a change, as the boards show it. */
 export type MenuPriceSideDetails = Readonly<{

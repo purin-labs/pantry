@@ -1,13 +1,13 @@
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import { fixtureDatabase } from "./organisation-database";
-import { newConversationId, type ConversationId } from "@seams/control-api";
-import type { CaseGoalCommand } from "@seams/contracts";
-import { isRecord } from "@seams/std";
+import { newConversationId, type ConversationId } from "@purin-labs/control-api";
+import type { CaseGoalCommand } from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 import {
   parseBakerySurfaceEffect,
   type BakerySurfaceEffectV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { readOrganisationCodexConnection } from "../../src/models/codex-connection";
 import {
   issueControlSession,

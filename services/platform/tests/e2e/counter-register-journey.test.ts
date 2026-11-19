@@ -3,16 +3,16 @@ import { expect, it } from "vitest";
 import {
   CommerceAdminClient,
   type CommerceClientResult,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   REGISTER_VIEW_COMMANDS,
   parseOrderQueueEntries,
   type CounterRegisterSnapshot,
   type PlatformGatewayMessage,
-} from "@seams/control-api";
-import { parseEnvelope as parseCounterSaleEnvelope } from "@seams/control-api/portal/counter-sale";
-import { parseTerminalAssignment } from "@seams/contracts";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { parseEnvelope as parseCounterSaleEnvelope } from "@purin-labs/control-api/portal/counter-sale";
+import { parseTerminalAssignment } from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { activateTerminalAssignment } from "../../src/data/terminal-assignment-store";

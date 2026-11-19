@@ -6,8 +6,8 @@
 // may hand over tokens that the same application issued instead of a code.
 // The connection keeps the scopes that Square granted and why it stopped
 // working (`SQUARE_CONNECTION_MACHINE`); `#move` is its one writer.
-import { isRecord } from "@seams/std";
-import { machineTransition } from "@seams/std/state-machine";
+import { isRecord } from "@purin-labs/std";
+import { machineTransition } from "@purin-labs/std/state-machine";
 
 import type { CommerceDatabase } from "../../database.ts";
 import type { CustomerVault } from "../../plugins/customers/index.ts";

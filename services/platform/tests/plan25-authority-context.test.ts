@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath, URL as NodeUrl } from "node:url";
 
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -22,7 +22,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../src/ids";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type Plan25AuthorityFixture = {
   readonly organisationId: OrganisationId;

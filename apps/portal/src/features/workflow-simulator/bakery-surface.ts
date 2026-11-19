@@ -1,4 +1,4 @@
-import { HUMAN_CELL_TRANSFER } from "@seams/production-simulation/recipes/bakery/human-cell-transfer";
+import { HUMAN_CELL_TRANSFER } from "@purin-labs/production-simulation/recipes/bakery/human-cell-transfer";
 import {
   prepareProductionFile,
   exportProductionFile,
@@ -8,7 +8,7 @@ import type { ProductionPending } from "./production-session.ts";
 import type { ScenarioRead } from "./scenario-api.ts";
 import { sameScenarioCopy } from "./workspace-commands.ts";
 import { sameDefinition } from "./production-scenario-api.ts";
-import type { RunSnapshotPage } from "@seams/bakery-model/bakery-run-snapshot";
+import type { RunSnapshotPage } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   prepareProductionNavigation,
   type ProductionNavigation,
@@ -18,17 +18,17 @@ import {
   prepareProductionReplacement,
   type PreparedProductionReplacement,
 } from "./production-draft.ts";
-import { isRehearsalChange } from "@seams/bakery-model/bakery-surface";
+import { isRehearsalChange } from "@purin-labs/bakery-model/bakery-surface";
 import {
   prepareRehearsalReview,
   type PreparedRehearsalReview,
 } from "./rehearsal-edits.ts";
-import { summarizeRun } from "@seams/production-simulation/simulator/run-comparison";
-import type { BakeryRunComparison } from "@seams/bakery-model/bakery-surface";
+import { summarizeRun } from "@purin-labs/production-simulation/simulator/run-comparison";
+import type { BakeryRunComparison } from "@purin-labs/bakery-model/bakery-surface";
 import {
   NO_FAULTS,
   parseRunFaults,
-} from "@seams/production-simulation/recipes/bakery/run-faults";
+} from "@purin-labs/production-simulation/recipes/bakery/run-faults";
 import { applyPlaybackAction, playbackAvailable } from "./playback-actions.ts";
 import {
   canPrepareWorkcell,
@@ -49,7 +49,7 @@ import type {
   BakeryFileManifest,
   BakerySurfaceRackLayout,
   BakerySurfaceTrayLayout,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import {
   acceptProductionCandidate,
   layoutTray,
@@ -64,7 +64,7 @@ import {
   type ProductionWorkcell,
   type ProductionWorkcells,
   type RehearsalEdit,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import type {
   ProductionReady,
   ProductionSession,
@@ -80,7 +80,7 @@ import {
   productionAssignmentId,
   type ProductionAssignment,
   type ProductionManualTask,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import {
   prepareRehearsalEdit,
   trayChainEdit,
@@ -89,7 +89,7 @@ import {
 import {
   type CellId,
   resourceInstance,
-} from "@seams/production-simulation/recipes/bakery/workcell-instances";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 import {
   createBakerySurfaceAttachment,
   type BakerySurfaceAttachmentV1,
@@ -117,7 +117,7 @@ import {
   type BakerySurfaceSummary,
   type BakerySurfaceTaskDetail,
   type BakeryRecordingAcceptanceReference,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import {
   currentRecordingAcceptanceReference,
   resolveRecordingAcceptanceReference,
@@ -125,30 +125,30 @@ import {
 import type {
   PhysicsReplay,
   PhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   physicsResources,
   physicsTasks,
-} from "@seams/production-simulation/recipes/bakery/physics-playback";
+} from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import {
   prepareRecordingNavigation,
   recordingHasDoor,
   type RecordingDocument,
   type RecordingNavigation,
-} from "@seams/production-simulation/simulator/playback-state";
+} from "@purin-labs/production-simulation/simulator/playback-state";
 import {
   fields,
   parseSettings,
   type Settings,
   type SettingsField,
-} from "@seams/bakery-model/bakery";
-import { parseProcedureAssumptions } from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery";
+import { parseProcedureAssumptions } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   metrics,
   simulate,
   type Run,
   type BakeryTask,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   activeRun,
   canReviewRehearsal,
@@ -171,7 +171,7 @@ import {
   shiftInputEditable,
   SHIFT_RUN_NOTICE,
 } from "./shift-run.ts";
-import { selectionContext, type Selection } from "@seams/production-simulation/simulator/selection";
+import { selectionContext, type Selection } from "@purin-labs/production-simulation/simulator/selection";
 import {
   verifyStoredWorkspaceRun,
   readWorkspaceRuns,
@@ -180,7 +180,7 @@ import {
   openProductionWorkspaceRun,
   type PreparedWorkspaceRun,
 } from "./workspace-runs-api.ts";
-import { rehearsalSettings } from "@seams/production-simulation/simulator/rehearsal-presets";
+import { rehearsalSettings } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import {
   prepareWorkspaceRunReview,
   workspaceRunReviewSummary,
@@ -188,19 +188,19 @@ import {
 } from "./workspace-run-review.ts";
 import { canOpenWorkspaceRun, shiftProcedure } from "./simulator-state.ts";
 import type { ProductionScenarioRead } from "./production-scenario-api";
-import { bakeryFingerprint } from "@seams/bakery-model/bakery";
-import { parseScenarioCopy } from "@seams/bakery-model/bakery-scenario";
+import { bakeryFingerprint } from "@purin-labs/bakery-model/bakery";
+import { parseScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
 import {
   parseProductionScenario,
   productionDefinitionFingerprint,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import {
   agentScenarioSaveManifest,
   type AgentScenarioSavePayload,
   type AgentScenarioSaveManifest,
-} from "@seams/bakery-model/bakery-agent-scenario-save";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, canonicalJson, sha256Hex } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery-agent-scenario-save";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
 export type BakerySurfaceCommandTransition =
   | Readonly<{ kind: "applied"; state: SimulatorState }>

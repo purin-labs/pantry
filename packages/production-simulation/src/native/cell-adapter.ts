@@ -3,9 +3,9 @@ import {
   isNonNegativeInteger,
   isRecord,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { normalizeQuantity } from "../quantity.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type {
   AdvanceResult,
   ExecutionAdapter,

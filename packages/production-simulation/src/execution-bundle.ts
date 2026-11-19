@@ -5,7 +5,7 @@ import {
   isPositiveInteger,
   isRecord,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { parseSha256Hex, type Sha256Hex } from "./identity.ts";
 import {
   resumeSupport,
@@ -14,7 +14,7 @@ import {
   type ResumeSupport,
 } from "./physics.ts";
 import { err, ok, type Result } from "./result.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * A retained execution bundle: the engine and adapter build, and the

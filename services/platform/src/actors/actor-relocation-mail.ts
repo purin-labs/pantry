@@ -4,7 +4,7 @@ import {
   isNonEmptyString,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   parseConnectorId,
   parseIntegrationAccountId,

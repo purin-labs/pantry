@@ -1,9 +1,9 @@
-import { isNormalizedText, isPositiveInteger, isRecord } from "@seams/std";
+import { isNormalizedText, isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   commerceCommandInput,
   type CommerceClientResult,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { Env } from "../../env";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {

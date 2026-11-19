@@ -1,10 +1,10 @@
-import { COMMERCE_ENTITY_ATTRIBUTE_RELATION } from "@seams/commerce-query-sqlite";
-import { normalizeCommerceUnicodeV1 } from "@seams/commerce-contracts/unicode";
+import { COMMERCE_ENTITY_ATTRIBUTE_RELATION } from "@purin-labs/commerce-query-sqlite";
+import { normalizeCommerceUnicodeV1 } from "@purin-labs/commerce-contracts/unicode";
 import type {
   CommerceSensitivity,
   SystemCommerceEntityKind,
   SystemRelationshipDefinitionKind,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   runSchemaMigrations,
   type SchemaTransaction,
@@ -14,7 +14,7 @@ import {
   execSchemaStatements,
 } from "./commerce-schema-baseline";
 import type { Result } from "../result";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 import { isCommerceSensitivity } from "../commerce/sensitivity";
 const COMMERCE_RELATIONSHIP_INDEX_TABLE =
   "commerce_relationship_relation_index";

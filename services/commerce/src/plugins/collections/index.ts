@@ -1,6 +1,6 @@
 // The collections built-in plugin (Plan 77 step 3). Code outside this
 // directory reaches the plugin only through this file.
-import type { CommerceCollectionCommandV1 } from "@seams/commerce-client";
+import type { CommerceCollectionCommandV1 } from "@purin-labs/commerce-client";
 
 export * from "./collections.ts";
 export { COLLECTION_SCHEMA } from "./schema.ts";

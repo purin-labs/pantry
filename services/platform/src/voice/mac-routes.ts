@@ -6,7 +6,7 @@ import {
   type VoiceMacEnrollResponse,
   type VoiceMacHeartbeatAnswer,
   type VoiceVocabulary,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlError, controlJson } from "../control/http";
 import type { Env } from "../env";

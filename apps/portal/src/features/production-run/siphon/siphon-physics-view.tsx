@@ -1,5 +1,5 @@
 import React from "react";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import {
   ORIGINAL_ANIMATION,
   warpedEngine,
@@ -15,9 +15,9 @@ import {
   type SiphonRecipeConfig,
   type SiphonSample,
   type SiphonSetup,
-} from "@seams/production-simulation/recipes/siphon/model";
+} from "@purin-labs/production-simulation/recipes/siphon/model";
 import { SiphonScene, type SiphonCameraPreset } from "./siphon-scene";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "../oven-workspace.css";
 import "./siphon.css";
 import {

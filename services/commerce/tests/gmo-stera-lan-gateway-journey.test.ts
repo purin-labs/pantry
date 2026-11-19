@@ -8,11 +8,11 @@ import type {
   CommerceCounterSaleV1,
   CommerceOrderV1,
   CommercePaymentV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   InPersonPaymentBinding,
   InPersonPaymentMethod,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import {

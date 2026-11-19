@@ -6,10 +6,10 @@ import {
   NORMALIZED_CONFORMANCE_LIFECYCLE_IDS,
   NORMALIZED_CONFORMANCE_ROWS,
   normalizedConformancePlanInput,
-} from "@seams/commerce-query-sqlite/normalized-conformance";
-import { parseCommerceGraphQuery } from "@seams/commerce-client";
-import type { CommerceQueryPlan } from "@seams/commerce-contracts";
-import { planCommerceGraphQuery } from "@seams/commerce-contracts/query-planner";
+} from "@purin-labs/commerce-query-sqlite/normalized-conformance";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
+import type { CommerceQueryPlan } from "@purin-labs/commerce-contracts";
+import { planCommerceGraphQuery } from "@purin-labs/commerce-contracts/query-planner";
 import { expect, it } from "vitest";
 
 import { initializeCommerceEntityRelation, readValidatedPlan } from "../src/entity-plane/commerce-entity-relation.ts";

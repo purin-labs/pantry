@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /**
  * A menu board (Plan 40B): a layout of frames, and elements that sit in those

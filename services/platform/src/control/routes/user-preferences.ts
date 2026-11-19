@@ -1,10 +1,10 @@
-import { hasExactKeys } from "@seams/std";
+import { hasExactKeys } from "@purin-labs/std";
 import {
   isPreferenceArea,
   isUserId,
   MAX_PREFERENCE_BYTES,
   parsePreferenceEdit,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   PreferenceStorageError,
   readUserPreferences,

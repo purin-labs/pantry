@@ -4,7 +4,7 @@ import { catalogSearchRequest, searchCatalog } from "../../catalog-search.ts";
 import { verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 // Serves an image only while this storefront's catalog shows it, so the
 // images of a draft or archived product stay private.

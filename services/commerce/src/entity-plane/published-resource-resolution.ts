@@ -10,14 +10,14 @@ import type {
   SavedCommerceView,
   SavedCommerceViewId,
   OrganisationId,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CommerceEntityPlaneExportPresetEvidence,
   CommerceEntityPlanePublishedResource,
   CommerceEntityPlanePublishedResourceMetadataRequest,
   CommerceEntityPlanePublishedResourceMetadataResponse,
   CommerceEntityPlanePublishedResourceReference,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import {
   listCustomEntityTypes,
@@ -38,7 +38,7 @@ import {
 import { EXPORT_COORDINATION_PRESET } from "./presets.ts";
 import { readExactCommerceRelationship } from "./commerce-relationship-relation.ts";
 import { listRelationshipDefinitions } from "./relationships.ts";
-import { sameJson } from "@seams/std";
+import { sameJson } from "@purin-labs/std";
 
 type StoredListEntryRow = Readonly<{
   entryId: string;

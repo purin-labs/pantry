@@ -12,7 +12,7 @@ import type {
   SavedCommerceViewRevision,
   SystemCommerceEntityRef,
   SystemSchemaRevision,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   parseCommerceList,
@@ -26,7 +26,7 @@ import { canonicalSystemAttributeDefinitions } from "./commerce-attribute-relati
 import {
   relationshipDefinitionReference,
   sameRelationshipDefinitionRef,
-} from "@seams/commerce-contracts/commerce-relationship-references";
+} from "@purin-labs/commerce-contracts/commerce-relationship-references";
 
 export function savedViewPlanContext(
   database: CommerceDatabase,

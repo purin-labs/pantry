@@ -3,10 +3,10 @@ import {
   type CommerceBuyerCheckoutPaymentProgressV1,
   type CommerceBuyerQuotedCheckoutV1,
   type CommerceBuyerQuotedShippingCheckoutV1,
-} from "@seams/commerce-client";
-import type { Checkout, CheckoutPaymentAttempt } from "@seams/commerce-contracts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import type { Checkout, CheckoutPaymentAttempt } from "@purin-labs/commerce-contracts";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export function toBuyerRecoverableQuote(
   checkout: Checkout,

@@ -43,7 +43,7 @@ import {
   fixtureProviderActionAuthority,
 } from "./fixtures/plan25-turn";
 import { parseCommerceEntityPlaneEffect } from "../src/commerce/entity-plane/proposals";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   requireCaseId,
   requireIntegrationAccountId,

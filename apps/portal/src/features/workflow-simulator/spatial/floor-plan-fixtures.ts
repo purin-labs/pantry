@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import { assertNever } from "@seams/std";
-import type { AppliancePose } from "@seams/production-simulation/floor/appliance-catalogue";
-import type { BakeryFloorPlanSpec } from "@seams/production-simulation/floor/bakery-room";
-import { doorAngle } from "@seams/production-simulation/floor/openings";
+import { assertNever } from "@purin-labs/std";
+import type { AppliancePose } from "@purin-labs/production-simulation/floor/appliance-catalogue";
+import type { BakeryFloorPlanSpec } from "@purin-labs/production-simulation/floor/bakery-room";
+import { doorAngle } from "@purin-labs/production-simulation/floor/openings";
 import type { LightingStyleId } from "../store-interior-design";
 import {
   FloorPlanTextures,

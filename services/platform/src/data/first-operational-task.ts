@@ -1,4 +1,4 @@
-import type { FirstOperationalTask } from "@seams/contracts";
+import type { FirstOperationalTask } from "@purin-labs/contracts";
 
 import {
   parseOrganisationId,

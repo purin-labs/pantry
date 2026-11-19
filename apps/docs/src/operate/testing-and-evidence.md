@@ -12,9 +12,9 @@ receipt, provider observation, and terminal disposition that were checked.
 ## Repository checks
 
 ```bash
-pnpm --filter @seams/platform check:types
-pnpm --filter @seams/platform check:test-types
-pnpm --filter @seams/platform test
+pnpm --filter @purin-labs/platform check:types
+pnpm --filter @purin-labs/platform check:test-types
+pnpm --filter @purin-labs/platform test
 pnpm portal:build
 cargo test --workspace
 git diff --check
@@ -28,13 +28,13 @@ belongs at the end of a cross-boundary change.
 Onboarding and lifecycle work must include:
 
 ```bash
-pnpm --filter @seams/platform test:onboarding-closure
+pnpm --filter @purin-labs/platform test:onboarding-closure
 ```
 
 Commerce lifecycle work must include:
 
 ```bash
-pnpm --filter @seams/platform test:commerce-lab
+pnpm --filter @purin-labs/platform test:commerce-lab
 pnpm lab:reset
 pnpm lab:seed
 pnpm lab:scenario

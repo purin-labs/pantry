@@ -4,15 +4,15 @@ import type {
   BakerySurfaceEffectV1,
   ExecutableBakerySurfaceEffectV1,
   BakerySurfaceReceiptV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import {
   createBakerySurfaceReceipt,
   isExecutableBakerySurfaceEffect,
   parseBakerySurfaceReceipt,
   verifyBakerySurfaceEffect,
   verifyBakerySurfaceReceipt,
-} from "@seams/bakery-model/bakery-surface";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery-surface";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 export type MountedBakerySurface = Readonly<{
   organisationId: string;

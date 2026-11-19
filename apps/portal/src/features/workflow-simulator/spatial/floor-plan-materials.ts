@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { assertNever } from "@seams/std";
-import type { FloorZoneKind } from "@seams/production-simulation/floor/bakery-room";
+import { assertNever } from "@purin-labs/std";
+import type { FloorZoneKind } from "@purin-labs/production-simulation/floor/bakery-room";
 import type {
   FixtureFinishId,
   FloorMaterialId,

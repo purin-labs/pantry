@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonBlankString, isRecord } from "@seams/std";
+import { hasExactKeys, isNonBlankString, isRecord } from "@purin-labs/std";
 
 /**
  * The supplier that one sender address of one mailbox is linked to.

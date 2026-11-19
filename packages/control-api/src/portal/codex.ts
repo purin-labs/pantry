@@ -4,8 +4,8 @@ import type {
   OrganisationCodexConnection,
   OrganisationInferenceSelection,
 } from "./settings.ts";
-import type { Variant } from "@seams/type-utils";
-import { isRecord, positiveIntegerOrNull } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord, positiveIntegerOrNull } from "@purin-labs/std";
 
 export function parseOrganisationInferenceSelectionResponse(
   raw: unknown,

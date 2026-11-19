@@ -12,8 +12,8 @@
 import { env } from "cloudflare:workers";
 import { bypass, http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { newConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import { newConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import { answers, ask, pausedRequest, resumeChat } from "./chat-permission-support";
 import { createConversation, installMemoryFixture, postJson, workKind } from "./memory-support";

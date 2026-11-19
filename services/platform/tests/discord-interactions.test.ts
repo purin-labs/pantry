@@ -11,7 +11,7 @@ import {
   parseDiscordPublicKey,
   verifyDiscordInteractionSignature,
 } from "../src/gateway/discord-interactions";
-import { bytesToHex } from "@seams/std";
+import { bytesToHex } from "@purin-labs/std";
 
 describe("Discord interactions boundary", function discordInteractionSuite() {
   it("parses the explicit /satyr link command", function parsesLinkCommand() {

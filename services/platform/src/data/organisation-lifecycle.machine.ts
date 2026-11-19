@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /**
  * The lifecycle of an Organisation (Refactor 15, refactor 5). The state is

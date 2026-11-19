@@ -1,23 +1,23 @@
-import { checkoutProfileOf } from "@seams/commerce-client";
+import { checkoutProfileOf } from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type CheckoutProfile,
   type CheckoutProfileConfiguration,
   type CheckoutProfileReference,
   type Storefront,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CommerceBuyerContactAuthorityV1,
   CommerceCheckoutBuyerAuthorityV1,
   CommerceMutationErrorV1,
   CommerceProtectedBuyerContactV1,
-} from "@seams/commerce-client";
-import { checkoutOnlineSource } from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
+import { checkoutOnlineSource } from "@purin-labs/commerce-client";
 
 import { readCheckout } from "./checkout-persistence.ts";
 import { readProfile } from "./checkout-profile-persistence.ts";
 import type { CommerceDatabase } from "./database.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type CheckoutProfileResolutionResult =
   | Readonly<{ kind: "resolved"; profile: CheckoutProfile }>

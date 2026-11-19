@@ -10,7 +10,7 @@ import {
   type CounterSaleMutationTransport,
   type CounterSaleReadTransport,
 } from "../../../apps/portal/src/features/terminals/counter-sale-api";
-import type { CounterSale } from "@seams/control-api/portal/counter-sale";
+import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 
 const ORGANISATION = "organisation_1";
 const CHECKOUT = "checkout_counter_1";

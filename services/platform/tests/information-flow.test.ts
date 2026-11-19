@@ -1,6 +1,6 @@
 import { organisationAuthzFromPolicy } from "../src/policy/information-flow";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -17,7 +17,7 @@ import {
   joinFlowLabels,
   ObservationEvidence,
 } from "../src/policy";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const directAuthority: Variant<RequestAuthority, "direct_conversation"> = {
   kind: "direct_conversation",

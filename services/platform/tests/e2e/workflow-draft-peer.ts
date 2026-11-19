@@ -3,12 +3,12 @@ import {
   DraftEncoding,
   WorkflowDraftDoc,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft";
+} from "@purin-labs/workflow-canvas-crdt/draft";
 import {
   encodeDraftClientMessage,
   parseDraftServerMessage,
   type DraftServerMessage,
-} from "@seams/workflow-canvas-crdt/draft-protocol";
+} from "@purin-labs/workflow-canvas-crdt/draft-protocol";
 import { commerceHeaders } from "./commerce-support";
 import type { SharedAccountNativeClient } from "./shared-account-platform-fixture";
 

@@ -1,7 +1,7 @@
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
 import { organisationDatabase } from "./organisation-database";
-import { isRecord } from "@seams/std";
-import { COMMERCE_API_SCOPES } from "@seams/commerce-client";
+import { isRecord } from "@purin-labs/std";
+import { COMMERCE_API_SCOPES } from "@purin-labs/commerce-client";
 import { env } from "cloudflare:workers";
 import {
   issueControlSession,

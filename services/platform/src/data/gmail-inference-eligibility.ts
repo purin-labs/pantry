@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import type { OrganisationId } from "../ids";
-import { isNonBlankString, isNonNegativeInteger } from "@seams/std";
+import { isNonBlankString, isNonNegativeInteger } from "@purin-labs/std";
 
 type GmailInferenceEligibility =
   | { readonly kind: "blocked" }

@@ -1,5 +1,5 @@
 import React from "react";
-import type { ActiveAttempt } from "@seams/production-simulation/recipes/bakery/workcell-attempt";
+import type { ActiveAttempt } from "@purin-labs/production-simulation/recipes/bakery/workcell-attempt";
 import {
   rackOffset,
   supportsRackLayout,

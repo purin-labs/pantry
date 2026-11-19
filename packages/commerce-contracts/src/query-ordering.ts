@@ -7,9 +7,9 @@ import {
 } from "./schema.ts";
 import { trimmedIdentityTextSchema } from "./identity-text.ts";
 import { Type, type Static } from "typebox";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { AttributeDefinitionId } from "./records/identifiers.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 import type { TLocalizedValidationError } from "typebox/error";
 

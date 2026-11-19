@@ -4,11 +4,11 @@ import { env } from "cloudflare:workers";
 import { evictDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { COLLABORATION_PONG } from "@seams/collaboration";
-import { parseChatSignal } from "@seams/control-api";
-import { isRecord, sha256Hex } from "@seams/std";
-import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
-import { parseCanvasServerMessage } from "@seams/workflow-canvas-crdt/protocol";
+import { COLLABORATION_PONG } from "@purin-labs/collaboration";
+import { parseChatSignal } from "@purin-labs/control-api";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
+import { parseCanvasServerMessage } from "@purin-labs/workflow-canvas-crdt/protocol";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";

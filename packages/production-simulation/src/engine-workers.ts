@@ -1,4 +1,4 @@
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { emit, held, type Draft } from "./engine-draft.ts";
 import { claimResource, releaseResource } from "./engine-resources.ts";
 import type { TaskId } from "./identity.ts";

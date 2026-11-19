@@ -1,10 +1,10 @@
 import {
   StrictObject,
   NonNegativeInteger as generation,
-} from "@seams/commerce-contracts/schema";
+} from "@purin-labs/commerce-contracts/schema";
 import { Type, type Static } from "typebox";
-import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 export const modelRouteSchema = Type.Union([
   StrictObject({

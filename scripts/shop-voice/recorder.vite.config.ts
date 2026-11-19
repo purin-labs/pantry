@@ -10,7 +10,7 @@ import portalConfig from "../../apps/portal/vite.config";
 // from source, on 127.0.0.1 only. Each session goes to .cache/human/<session>/,
 // which git ignores, and the recordings leave this Mac in no other way.
 //
-//   pnpm --filter @seams/portal exec vite --config ../../scripts/shop-voice/recorder.vite.config.ts
+//   pnpm --filter @purin-labs/portal exec vite --config ../../scripts/shop-voice/recorder.vite.config.ts
 //   open http://127.0.0.1:3185/voice-recorder.html
 //
 // The prompts come from `phrase-bench.py prompts`, which the bench reads too.

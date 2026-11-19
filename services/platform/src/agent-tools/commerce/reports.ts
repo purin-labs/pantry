@@ -1,6 +1,6 @@
 import { isMerchantReportName } from "../../commerce/entity-plane/merchant-reports";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type { HarnessMerchantReportRequest } from "../catalog/types";
 import { defineTool, jsonSchema } from "../define-tool";
 

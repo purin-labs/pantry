@@ -4,13 +4,13 @@ import type {
   StoredMessageAttachment,
   UserMessage,
   UserMessageViews,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   buildStoredMessageAttachment as buildStoredMessageAttachmentTypescript,
   deriveUserMessageViews as deriveUserMessageViewsTypescript,
   parseStoredMessageAttachment as parseStoredMessageAttachmentTypescript,
-} from "@seams/contracts/message";
-import { parseMessageAttachmentPreparationState as parsePreparationTypescript } from "@seams/contracts/attachment-preparation";
+} from "@purin-labs/contracts/message";
+import { parseMessageAttachmentPreparationState as parsePreparationTypescript } from "@purin-labs/contracts/attachment-preparation";
 import type { Result } from "../result";
 
 /**

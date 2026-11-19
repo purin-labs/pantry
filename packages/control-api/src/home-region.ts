@@ -1,4 +1,4 @@
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 /**
  * The region that holds an organisation's data and runs its agents. A person

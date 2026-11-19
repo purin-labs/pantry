@@ -1,5 +1,5 @@
 import { runtimeFetch } from "../runtime-fetch";
-import { assertNever, isRecord, hasExactKeys } from "@seams/std";
+import { assertNever, isRecord, hasExactKeys } from "@purin-labs/std";
 import {
   authorizeSessionTurnExecution,
   parseSessionTurnExecution,
@@ -78,8 +78,8 @@ import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
 } from "./whatsapp-active-content";
-import type { Variant } from "@seams/type-utils";
-import type { WhatsAppCasePanelEntry } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import type { WhatsAppCasePanelEntry } from "@purin-labs/control-api";
 
 /**
  * The Connector's WhatsApp request surface. Webhook admission runs

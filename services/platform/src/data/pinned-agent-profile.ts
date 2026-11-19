@@ -7,8 +7,8 @@ import {
   readCaseAssignmentPin,
   recordCaseAssignmentPin,
 } from "./agent-operations/case-assignment-pins";
-import type { AgentSkillRef } from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+import type { AgentSkillRef } from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 /**
  * One skill body an agent runs this turn, read at the exact revision its
  * definition revision pinned.

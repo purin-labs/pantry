@@ -7,7 +7,7 @@ import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
 import type {
   CanonicalCommerceDelivery,
   CommerceProjection,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   buildCommerceLabDelivery,
@@ -49,7 +49,7 @@ import {
 } from "../shopify/action-execution";
 import type { ShopifyExecutionReceipt } from "../shopify/action-execution";
 import type { Result } from "../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
@@ -76,13 +76,13 @@ import {
   FlowBinding,
   type FlowDecision,
 } from "../policy";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import type { CommerceMutationErrorV1 } from "@seams/commerce-client";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import type { CommerceMutationErrorV1 } from "@purin-labs/commerce-client";
 import type {
   CommerceLabProviderReceipt,
   CommerceShopifyProviderReceipt,
   CommerceEngineProviderReceipt,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   MERCHANT_PLUGIN_INSTALL_VERB,
   merchantPluginInstallation,

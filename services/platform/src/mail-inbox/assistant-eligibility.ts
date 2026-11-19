@@ -5,11 +5,11 @@ import {
   resolveOrganisationModelRoute,
 } from "../models/route";
 import type { Env } from "../env";
-import type { MailAssistantStatus } from "@seams/control-api";
+import type { MailAssistantStatus } from "@purin-labs/control-api";
 import type { MailOrganizationActorInput } from "./commands";
 import { authorizeMailSource } from "./authorization";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type MailAssistantAuthority = Readonly<{
   modelRoute: OrganisationModelRoute;

@@ -10,8 +10,8 @@
 // Square, and the next Terminal sale cannot start. Square is a fake that
 // only answers. Set SQUARE_CONNECTION_ARTIFACT_DIR to keep the evidence; it
 // repeats byte for byte for the same commit.
-import type { CommerceCounterSaleV1 } from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+import type { CommerceCounterSaleV1 } from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 import { expect, it } from "vitest";
 
 import {

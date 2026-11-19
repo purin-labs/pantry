@@ -10,7 +10,7 @@ import type {
   FinancierBatterSample,
   FinancierHobModel,
   FinancierMixerTool,
-} from "@seams/production-simulation/recipes/financier-batter/model";
+} from "@purin-labs/production-simulation/recipes/financier-batter/model";
 import {
   addPatisserieBench,
   enableSceneShadows as enableShadows,

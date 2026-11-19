@@ -1,4 +1,4 @@
-import type { StoredMessageAttachment } from "@seams/contracts";
+import type { StoredMessageAttachment } from "@purin-labs/contracts";
 
 import { validateStoredMessageAttachment } from "./message-wasm";
 import type { Result } from "../result";

@@ -3,7 +3,7 @@ import React from "react";
 import {
   parseAgentPermissionRequestList,
   type AgentPermissionRequestList,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlRead, forgetWithControlReads } from "./control-client";
 import { permissionRequestsPath } from "./control-paths";

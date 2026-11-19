@@ -1,4 +1,4 @@
-import { canonicalJson, isRecord } from "@seams/std";
+import { canonicalJson, isRecord } from "@purin-labs/std";
 import {
   CURRENT_SQLITE_SCHEMA_VERSION,
   SQLITE_MIGRATIONS,

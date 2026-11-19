@@ -16,7 +16,7 @@ import {
   readAgentOperations,
   type AgentOperationsError,
 } from "./agent-operations";
-import type { AgentSkillRef } from "@seams/control-api";
+import type { AgentSkillRef } from "@purin-labs/control-api";
 /**
  * The capability Sous Chef requests and must be granted to read commerce records.
  * Reports and entity context share it, so one grant covers both read tools.

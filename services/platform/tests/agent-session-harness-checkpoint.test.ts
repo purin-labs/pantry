@@ -6,7 +6,7 @@ import type {
   ProcessingSession,
   SessionBudgetAccount,
   TurnIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, test } from "vitest";
 
 import {
@@ -35,7 +35,7 @@ import {
   TEST_HARNESS_LEASE_AUTHORITY,
 } from "./fixtures/plan25-turn";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   requireRequestId,
   requireSessionTurnInputDigest,
@@ -630,7 +630,7 @@ async function checkpointBytes(
 }
 
 function checkpointInput(
-  historyCursor: import("@seams/contracts").HarnessHistoryCursor,
+  historyCursor: import("@purin-labs/contracts").HarnessHistoryCursor,
   identity = DEFAULT_FIXTURE_IDENTITY,
 ) {
   const lease = harnessLease(identity);

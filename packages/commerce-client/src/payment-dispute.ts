@@ -2,12 +2,12 @@ import type {
   Money,
   PaymentDispute,
   PaymentDisputeLifecycle,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   parseObserveCommercePaymentDisputeV1 as parseObserveCommercePaymentDisputeV1Record,
   parseWirePaymentDispute as parsePaymentDisputeRecord,
-} from "@seams/commerce-contracts/records/api-payment-dispute";
+} from "@purin-labs/commerce-contracts/records/api-payment-dispute";
 
 export type ObserveCommercePaymentDisputeV1 = Readonly<{
   schemaVersion: "underclerk.observe-payment-dispute.v1";

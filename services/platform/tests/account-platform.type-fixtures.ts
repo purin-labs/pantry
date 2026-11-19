@@ -82,7 +82,7 @@ export const constructedRevocation: AccountServiceGrantRevocation = {
 };
 
 // @ts-expect-error Membership availability accepts only the explicit wire states.
-export const invalidMembershipAvailability: import("@seams/control-api").ControlMembershipAvailability =
+export const invalidMembershipAvailability: import("@purin-labs/control-api").ControlMembershipAvailability =
   "unknown";
 
 // Verify the installed artifact's state constraints, rather than a local copy.

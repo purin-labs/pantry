@@ -4,7 +4,7 @@ import {
   terminalTargetDeviceId,
   type TerminalAssignment,
   type TerminalRetirementReason,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";

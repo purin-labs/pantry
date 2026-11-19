@@ -7,14 +7,14 @@ import {
   type MenuItemPlacement,
   type MenuPresenceSelection,
   type MenuSection,
-} from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftClientMessage,
   parseMenuDraftServerMessage,
   type MenuDraftFailureCode,
   type MenuRoomMetadata,
-} from "@seams/menu-draft-crdt/protocol";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/menu-draft-crdt/protocol";
+import { assertNever } from "@purin-labs/std";
 import {
   DocumentClient,
   webSocketUrl,

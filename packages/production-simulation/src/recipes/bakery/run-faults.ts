@@ -1,11 +1,11 @@
-import type { Settings } from "@seams/bakery-model/bakery";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
 import type { WorkcellResourceId } from "./workcell-input.ts";
 import {
   RESOURCE_INSTANCES,
   resourceInstance,
   type ResourceInstance,
 } from "./workcell-instances.ts";
-import { hasExactKeys } from "@seams/std";
+import { hasExactKeys } from "@purin-labs/std";
 
 // Assumptions compared against a pinned baseline. An outage postpones new
 // dispatches that need its resource; running work continues. An injected

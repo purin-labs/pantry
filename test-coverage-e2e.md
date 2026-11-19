@@ -53,27 +53,27 @@ Follow the repository's required checks when shared lifecycle types change.
 Run the Platform E2E suite with:
 
 ```bash
-pnpm --filter @seams/platform test:e2e
+pnpm --filter @purin-labs/platform test:e2e
 ```
 
 For a focused journey after building the media module:
 
 ```bash
-pnpm --filter @seams/platform contracts:media
-pnpm --filter @seams/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/bakery-runs.test.ts
+pnpm --filter @purin-labs/platform contracts:media
+pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/bakery-runs.test.ts
 ```
 
 Onboarding or lifecycle changes also require:
 
 ```bash
-pnpm --filter @seams/platform test:onboarding-closure
+pnpm --filter @purin-labs/platform test:onboarding-closure
 ```
 
 Commerce lifecycle changes require the existing lab sequence. Confirm the selected
 local lab environment before resetting its data:
 
 ```bash
-pnpm --filter @seams/platform test:commerce-lab
+pnpm --filter @purin-labs/platform test:commerce-lab
 pnpm lab:reset
 pnpm lab:seed
 pnpm lab:scenario

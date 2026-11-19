@@ -3,7 +3,7 @@ import {
   isCounterRegisterPaymentMethod,
   type CounterRegisterPaymentMethod,
 } from "../counter-register.ts";
-import { exhaustiveList, hasExactKeys } from "@seams/std";
+import { exhaustiveList, hasExactKeys } from "@purin-labs/std";
 
 export type CounterSaleManualTender = Readonly<{
   cashReceivedMinor: number | null;

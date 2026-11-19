@@ -3,7 +3,7 @@ import React from "react";
 import { CircleAlert } from "lucide-react";
 import { Link } from "react-router";
 
-import type { AccessControlCapabilityView, AccessControlView } from "@seams/control-api/portal/access-models";
+import type { AccessControlCapabilityView, AccessControlView } from "@purin-labs/control-api/portal/access-models";
 import {
   availabilityLabel,
   categoryLabel,

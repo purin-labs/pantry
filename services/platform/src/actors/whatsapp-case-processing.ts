@@ -1,7 +1,7 @@
 import { acceptedExecutionAccountAuthority } from "../account-platform/access";
 import { turnMemoryReaderWithoutSubjects } from "../memory/access";
 import type { SqlStorage } from "@cloudflare/workers-types";
-import type { WhatsAppAgentMode } from "@seams/control-api";
+import type { WhatsAppAgentMode } from "@purin-labs/control-api";
 
 import {
   projectWhatsAppReplyProposal,
@@ -66,8 +66,8 @@ import {
 import { invalidateOpenWhatsAppProposal } from "./connector-whatsapp-proposal";
 import type { WhatsAppContentCipher } from "./whatsapp-active-content";
 import type { WhatsAppCaseMessage } from "./whatsapp-harness-tools";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const DEFAULT_TURN_TOKEN_ALLOWANCE = 60_000;
 const TURN_MAX_WALL_MS = 3 * 60 * 1_000;
@@ -879,7 +879,7 @@ async function recordHandoff(
   input: WhatsAppCaseTurnInput,
   caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"],
   prepared: {
-    readonly assignment: import("@seams/contracts").CaseAssignment;
+    readonly assignment: import("@purin-labs/contracts").CaseAssignment;
     readonly startId: string;
   },
   reason: string,

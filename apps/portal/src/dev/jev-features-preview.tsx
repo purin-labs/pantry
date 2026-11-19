@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes } from "react-router";
-import type { JevFeaturesView } from "@seams/control-api/portal/jev-features";
+import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-features";
 import "../styles.css";
 import { BillingRoute } from "../features/billing/route";
 import { JevFeaturesRoute } from "../features/jev-features/route";

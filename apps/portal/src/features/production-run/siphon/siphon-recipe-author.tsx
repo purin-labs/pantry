@@ -2,7 +2,7 @@ import React from "react";
 import type {
   SiphonProcessCheck,
   SiphonRecipeConfig,
-} from "@seams/production-simulation/recipes/siphon/model";
+} from "@purin-labs/production-simulation/recipes/siphon/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{ prepared(recipe: SiphonRecipeConfig): void }>;

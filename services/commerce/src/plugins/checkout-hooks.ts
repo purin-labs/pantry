@@ -13,8 +13,8 @@
 //
 // An output that does not have this shape is a failure: the function is
 // skipped, or the checkout is refused when the function is required.
-import type { CommerceMutationErrorV1 } from "@seams/commerce-client";
-import type { CheckoutPluginRun } from "@seams/commerce-contracts";
+import type { CommerceMutationErrorV1 } from "@purin-labs/commerce-client";
+import type { CheckoutPluginRun } from "@purin-labs/commerce-contracts";
 
 import { sha256 } from "../commerce-authority/checkout-shared.ts";
 import type { CommerceDatabase } from "../database.ts";
@@ -159,4 +159,4 @@ export {
   type LinePrice,
   type PluginDiscount,
   type TenderRefusal,
-} from "@seams/commerce-contracts/records/plugin-outputs";
+} from "@purin-labs/commerce-contracts/records/plugin-outputs";

@@ -7,8 +7,8 @@ import {
   TriangleAlert,
   ArrowUpRight,
 } from "lucide-react";
-import type { HostView, TaskView } from "@seams/production-simulation";
-import { assertNever } from "@seams/std";
+import type { HostView, TaskView } from "@purin-labs/production-simulation";
+import { assertNever } from "@purin-labs/std";
 import {
   Trace,
   TraceCollapsible,

@@ -1,10 +1,10 @@
-import type { CheckoutProfile } from "@seams/contracts";
+import type { CheckoutProfile } from "@purin-labs/contracts";
 import React from "react";
 import { Link } from "react-router";
 import { PageSkeleton, RecoverableError } from "../../page-components";
 
 import type { CheckoutProfileMutationTransport } from "./api";
-import type { CheckoutProfileSummary } from "@seams/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
 import {
   confirmReview,
   handleCreateSubmit,
@@ -31,7 +31,7 @@ import { ProfileLifecycle } from "./profile-lifecycle";
 import { ProfileState } from "./profile-state";
 import { ReviewPanel } from "./review-panel";
 import "./styles.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export function CheckoutProfilesRoute(props: {
   readonly organisationId: string;

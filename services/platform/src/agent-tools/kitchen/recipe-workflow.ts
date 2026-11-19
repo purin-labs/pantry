@@ -1,6 +1,6 @@
-import { parseWorkflowChanges } from "@seams/bakery-workflow/changes";
+import { parseWorkflowChanges } from "@purin-labs/bakery-workflow/changes";
 import { ProposalArgumentError } from "../../agent-tools/define-tool";
-import { hasExactKeys, isRecord, isString } from "@seams/std";
+import { hasExactKeys, isRecord, isString } from "@purin-labs/std";
 import type {
   RecipeWorkflowProposeRequest,
   RecipeWorkflowReadRequest,

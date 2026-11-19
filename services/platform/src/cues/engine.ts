@@ -7,11 +7,11 @@ import type {
   CueEvent,
   PublishedCommerceSelector,
   SurfaceRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseEntityPlaneObservation,
   type CommerceEntityPlaneObservationV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   parseChannelId,
@@ -29,7 +29,7 @@ import {
 } from "../ids";
 import type { JsonObject } from "../http";
 import type { Result } from "../result";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
   canonicalJson,
@@ -37,7 +37,7 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 type StripeCueEventBase = Omit<
   CueEvent,

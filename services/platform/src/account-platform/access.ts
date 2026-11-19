@@ -7,7 +7,7 @@ import {
   acknowledgeAccountAccessRevision,
   type NativeAccountAccessFence,
 } from "./access-revision";
-import { assertNever, canonicalJson } from "@seams/std";
+import { assertNever, canonicalJson } from "@purin-labs/std";
 import {
   parseControlSessionId,
   parseUserId,
@@ -22,12 +22,12 @@ import {
   resolveLinkedPantryAccountUser,
 } from "./identity";
 import type { AccountPlatformError } from "./types";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type { UserId } from "../ids";
 import type { ConversationScope } from "../chat/store";
 import type { ActiveControlSession } from "../data/control-plane";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type { AccountAdmissionAction, AccountUserAuthority };
 

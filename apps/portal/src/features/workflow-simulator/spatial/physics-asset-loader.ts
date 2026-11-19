@@ -1,4 +1,4 @@
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import type * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { enableShadowMeshes } from "./scene-lighting";

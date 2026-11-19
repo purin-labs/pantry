@@ -16,15 +16,15 @@ import {
   type MenuBoardStateVector,
   type MenuBoardStyleChanges,
   type MenuBoardUpdate,
-} from "@seams/menu-board-crdt";
+} from "@purin-labs/menu-board-crdt";
 import {
   encodeMenuBoardClientMessage,
   parseMenuBoardServerMessage,
   type MenuBoardFailureCode,
   type MenuBoardRoomMetadata,
-} from "@seams/menu-board-crdt/protocol";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/menu-board-crdt/protocol";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
+import { assertNever } from "@purin-labs/std";
 import {
   DocumentClient,
   webSocketUrl,

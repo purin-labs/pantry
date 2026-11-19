@@ -4,6 +4,6 @@
 // merchant plugin handlers) has no actor.
 import { AsyncLocalStorage } from "node:async_hooks";
 
-import type { CommerceMutationActorV1 } from "@seams/commerce-client";
+import type { CommerceMutationActorV1 } from "@purin-labs/commerce-client";
 
 export const commandActor = new AsyncLocalStorage<CommerceMutationActorV1>();

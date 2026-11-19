@@ -8,14 +8,14 @@ import {
   type PhysicsView,
   type RunState,
 } from "../index.ts";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   isRecord,
   isNonNegativeInteger,
   parseJsonOrNull,
   sha256Hex,
   assertNever,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { nativeIdentity } from "../native/cell-adapter.ts";
 import {
   parsePersistentPhysicsScene,
@@ -24,8 +24,8 @@ import {
   type PersistentPhysicsScene,
   type PersistentPhysicsMotion,
   type PhysicsSample,
-} from "@seams/bakery-model/bakery-physics";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/bakery-model/bakery-physics";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 type Frame = Readonly<{ cell: string; committedAt: number; at: number }>;
 export type OvenSlot = StrictUnion<

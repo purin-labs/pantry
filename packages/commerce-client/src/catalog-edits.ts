@@ -9,10 +9,10 @@ import {
   type CommerceVariantV1,
   type CommerceResourcesV1,
 } from "./commerce-resources.ts";
-import type { StorefrontTaxConfiguration } from "@seams/commerce-contracts";
-import type { Menu } from "@seams/commerce-contracts/records/commerce-records";
-import { parseUpdateCommerceStorefrontTaxV1 as parseUpdateCommerceStorefrontTaxV1Record } from "@seams/commerce-contracts/records/api-catalog-edits";
-import { parseDeleteCommerceProductV1 as parseDeleteCommerceProductV1Record, parseUpdateCommerceOfferV1 as parseUpdateCommerceOfferV1Record, parseUpdateCommerceProductV1 as parseUpdateCommerceProductV1Record, parseUpdateCommerceVariantV1 as parseUpdateCommerceVariantV1Record } from "@seams/commerce-contracts/records/api-catalog-edits";
+import type { StorefrontTaxConfiguration } from "@purin-labs/commerce-contracts";
+import type { Menu } from "@purin-labs/commerce-contracts/records/commerce-records";
+import { parseUpdateCommerceStorefrontTaxV1 as parseUpdateCommerceStorefrontTaxV1Record } from "@purin-labs/commerce-contracts/records/api-catalog-edits";
+import { parseDeleteCommerceProductV1 as parseDeleteCommerceProductV1Record, parseUpdateCommerceOfferV1 as parseUpdateCommerceOfferV1Record, parseUpdateCommerceProductV1 as parseUpdateCommerceProductV1Record, parseUpdateCommerceVariantV1 as parseUpdateCommerceVariantV1Record } from "@purin-labs/commerce-contracts/records/api-catalog-edits";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type CatalogEditBase = Readonly<{

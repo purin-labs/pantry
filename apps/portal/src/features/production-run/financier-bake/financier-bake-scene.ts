@@ -10,7 +10,7 @@ import {
 } from "../../workflow-simulator/oven-visual";
 import maruzenOvenUrl from "../../../../../../assets/bakery-mujoco/maruzen-mbco-4me/maruzen-mbco-4me.glb?url";
 import ohausScaleUrl from "../../../../../../assets/bakery-mujoco/ohaus-ranger-3000/ohaus-r31pe6.glb?url";
-import type { FinancierBakeSample } from "@seams/production-simulation/recipes/financier-bake/model";
+import type { FinancierBakeSample } from "@purin-labs/production-simulation/recipes/financier-bake/model";
 import {
   addPatisserieBench,
   enableSceneShadows as enableShadows,

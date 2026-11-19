@@ -1,8 +1,8 @@
 import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { parseHeldOutputView } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import { parseHeldOutputView } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import {
   issueControlSession,

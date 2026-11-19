@@ -10,7 +10,7 @@ import { Users } from "lucide-react";
 import type {
   AccessControlOption,
   AccessRouteTransport,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 import { workspaceParty } from "../access/agent-permission-request";
 import {
   accessErrorMessage,

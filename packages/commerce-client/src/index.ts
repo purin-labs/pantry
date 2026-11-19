@@ -876,34 +876,34 @@ export {
   type CommerceShopNameV1,
   type CommerceStorefrontShopNameChangeV1,
   type CommerceStorefrontShopNameV1,
-} from "@seams/commerce-contracts/records/api-shop-names";
+} from "@purin-labs/commerce-contracts/records/api-shop-names";
 export {
   commercePickupCode,
   commercePickupTicketId,
   type CommercePickupQueueEntryV1,
   type CommercePickupQueueV1,
-} from "@seams/commerce-contracts/records/api-pickup-queue";
+} from "@purin-labs/commerce-contracts/records/api-pickup-queue";
 export {
   parseCommerceFailedPaymentsV1,
   type CommerceFailedPaymentStepV1,
   type CommerceFailedPaymentsV1,
-} from "@seams/commerce-contracts/records/api-failed-payments";
+} from "@purin-labs/commerce-contracts/records/api-failed-payments";
 export {
   parseCommercePaymentsV1,
   type CommercePaymentStepV1,
   type CommercePaymentsV1,
-} from "@seams/commerce-contracts/records/api-payments";
+} from "@purin-labs/commerce-contracts/records/api-payments";
 export {
   parseCommerceOrderTimesV1,
   type CommerceOrderTimeV1,
   type CommerceOrderTimesV1,
-} from "@seams/commerce-contracts/records/api-order-times";
+} from "@purin-labs/commerce-contracts/records/api-order-times";
 export {
   parseCommerceBankPayoutsV1,
   type CommerceBankPayoutSourceV1,
   type CommerceBankPayoutV1,
   type CommerceBankPayoutsV1,
-} from "@seams/commerce-contracts/records/api-bank-payouts";
+} from "@purin-labs/commerce-contracts/records/api-bank-payouts";
 
 export {
   PATISSERIE_ITEMS,

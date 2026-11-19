@@ -2,8 +2,8 @@ import React from "react";
 
 import { formatMoneyMinorEnglish as money } from "../../formatting";
 
-import type { CommerceActionDetails } from "@seams/control-api/portal/commerce-actions";
-import type { Variant } from "@seams/type-utils";
+import type { CommerceActionDetails } from "@purin-labs/control-api/portal/commerce-actions";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The exact money that goes back, and where it comes from on the order. */
 export function OrderRefundDetails(input: {

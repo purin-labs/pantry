@@ -1,6 +1,6 @@
 import type { Result } from "../../result";
 import { postSystemOne, type JevError } from "./system-one-client";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 const PROBE_MODEL = "jev-1.13.0";
 const PROBE_BODY = JSON.stringify({

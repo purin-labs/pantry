@@ -14,16 +14,16 @@
 // refused. An app installed again after its revocation gets a random nonce
 // (Refactor 15, refactor 11), so its new token differs from the revoked one;
 // only the install answer shows it.
-import { encodeBase64Url, sha256Hex } from "@seams/std";
+import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 import {
   COMMERCE_API_SCOPES,
   type CommerceApiScope,
-} from "@seams/commerce-contracts/records/api-access";
+} from "@purin-labs/commerce-contracts/records/api-access";
 
 export {
   COMMERCE_API_SCOPES,
   type CommerceApiScope,
-} from "@seams/commerce-contracts/records/api-access";
+} from "@purin-labs/commerce-contracts/records/api-access";
 
 export const COMMERCE_API_KEY_PREFIX = "uck";
 export const COMMERCE_APP_TOKEN_PREFIX = "uca";

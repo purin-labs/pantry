@@ -5,7 +5,7 @@ import {
   type CommerceActionRequest,
 } from "../../commerce/action-model";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   parseMerchantPluginDraft,
   type MerchantPluginDraft,

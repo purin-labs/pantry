@@ -9,8 +9,8 @@ import {
   isConversationId,
   sideCaseHereRequestId,
   type ChatSideCaseView,
-} from "@seams/control-api";
-import { MESSAGE_ATTACHMENT_POLICY, type ConversationId, type ProjectId, type VoiceHeard } from "@seams/control-api";
+} from "@purin-labs/control-api";
+import { MESSAGE_ATTACHMENT_POLICY, type ConversationId, type ProjectId, type VoiceHeard } from "@purin-labs/control-api";
 import { publishChatAgentRequest } from "./agent-request";
 import {
   clearSubmittedDraft,
@@ -22,7 +22,7 @@ import {
   withoutOutgoing,
 } from "./submission";
 import { captureBakeryBrowserContext } from "../bakery-browser-context";
-import { type BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+import { type BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import {
   QuestionCard,
   StreamingText,
@@ -73,7 +73,7 @@ import { ChatWorkGlow } from "./work-glow";
 import { ChatSelectedFile } from "./selected-file";
 import { ChatPermissionPrompt } from "./permission-prompt";
 import { ChatHeldStepPrompt } from "../access/chat-held-step-prompt";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   Archive,
   Check,
@@ -116,7 +116,7 @@ import {
 } from "../integrations/custom-connector-api";
 import { createProjectChat, forkChatThread, makeDefaultProject, cancelChat, ChatDraftConflictError, ChatNotRunningError, ChatAccessError, markChatRead, rateChatResponse, readChat, saveChatDraft, updateChatConversation, type ChatPageData } from "./api";
 import { sendChat } from "./screen-send";
-import type { Chat, ChatConversationSummary, ChatMessage, ChatModelOption, ChatTimelineView, ChatAttachmentView } from "@seams/control-api/portal/chat";
+import type { Chat, ChatConversationSummary, ChatMessage, ChatModelOption, ChatTimelineView, ChatAttachmentView } from "@purin-labs/control-api/portal/chat";
 import {
   ChatDelivery,
   type ChatStreamState,
@@ -137,14 +137,14 @@ import { configurationDraftInserts } from "./configuration-draft-cards";
 import { createSideCaseActions } from "./side-cases";
 import { sideCaseInserts } from "./side-case-cards"; import { chatCommerceActionCards, withoutCommerceActionLinks } from "../governed-actions/chat-commerce-action-card";
 import "./styles.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type {
   ChatEffort,
   ChatTurnUsage,
   Project,
   ProjectReference,
-} from "@seams/control-api";
-import { errorMessage } from "@seams/std";
+} from "@purin-labs/control-api";
+import { errorMessage } from "@purin-labs/std";
 import {
   chooseSupportedEffort,
   modelName,
@@ -2356,7 +2356,7 @@ export class ChatPage extends React.Component<Props, State> {
     requestAnimationFrame(focusBranchPoint.bind(null, messageId));
   }
   private renderDerivedThread(
-    thread: import("@seams/control-api").ChatDerivedThread,
+    thread: import("@purin-labs/control-api").ChatDerivedThread,
   ): React.ReactNode {
     return (
       <li key={thread.id}>

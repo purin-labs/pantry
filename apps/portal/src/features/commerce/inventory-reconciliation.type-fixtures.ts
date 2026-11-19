@@ -1,7 +1,7 @@
-import type { InventoryReceiptContext } from "@seams/control-api";
+import type { InventoryReceiptContext } from "@purin-labs/control-api";
 import type { ReconciliationState } from "./inventory-reconciliation";
 import type { ReconciliationSubmission } from "./inventory-reconciliation-submission";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const context: InventoryReceiptContext;
 declare const submission: ReconciliationSubmission;

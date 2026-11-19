@@ -1,16 +1,16 @@
-import { isRecord, sha256Hex } from "@seams/std";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 import {
   exchangeNow,
   type CellModule,
-} from "@seams/production-simulation/native/wasm-transport";
+} from "@purin-labs/production-simulation/native/wasm-transport";
 import {
   mountPack,
   type PackFileSystem,
-} from "@seams/production-simulation/native/model-packs";
+} from "@purin-labs/production-simulation/native/model-packs";
 import type {
   ApplianceRuntimeBundle,
   RuntimeFile,
-} from "@seams/production-simulation/simulator/appliance-runtime";
+} from "@purin-labs/production-simulation/simulator/appliance-runtime";
 
 /**
  * One appliance request on a retained older runtime bundle (Plan 70B): a

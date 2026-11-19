@@ -2,7 +2,7 @@ import {
   OrganisationExecutionScope,
   type OrganisationExecutionScopeError,
 } from "../organisation-execution-scope";
-import type { CanonicalAction } from "@seams/contracts";
+import type { CanonicalAction } from "@purin-labs/contracts";
 
 import type { Env } from "../env";
 import {
@@ -33,8 +33,8 @@ import {
   type VaultResolveError,
   type VaultSecret,
 } from "../credential-vault";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord, isString } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord, isString } from "@purin-labs/std";
 
 export type ShopifyExecutionReceipt =
   | {

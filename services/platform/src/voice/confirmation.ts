@@ -8,7 +8,7 @@ import {
   type VoiceConfirmationCheck,
   type VoiceConfirmationReceipts,
   type VoiceConfirmationTarget,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import type { OrganisationId, UserId } from "../ids";
 

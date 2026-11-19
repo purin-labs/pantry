@@ -3,8 +3,8 @@ import {
   type ChatSignal,
   type ConversationId,
   type UserId,
-} from "@seams/control-api";
-import { errorMessage } from "@seams/std";
+} from "@purin-labs/control-api";
+import { errorMessage } from "@purin-labs/std";
 import { waitUntil } from "cloudflare:workers";
 
 import { actorPhysicalName } from "../actors/actor-registry";

@@ -13,7 +13,7 @@ import {
 } from "../ids";
 import { scheduleFileReconciliationHint } from "../context/files";
 import { verifyDropboxWebhookSignature } from "../provider-adapters/dropbox";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export async function handleDropboxWebhook(
   request: Request,

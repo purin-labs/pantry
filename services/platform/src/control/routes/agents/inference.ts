@@ -29,7 +29,7 @@ import {
   type JsonRecord,
 } from "../../http";
 import { activationModelRouteError } from "../../onboarding-runtime";
-import { assertNever, hasExactKeys } from "@seams/std";
+import { assertNever, hasExactKeys } from "@purin-labs/std";
 import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
 
 export async function handleOrganisationInference(

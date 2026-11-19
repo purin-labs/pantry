@@ -25,7 +25,7 @@ import {
   InformationFlowContext,
   joinFlowLabels,
 } from "../policy/information-flow";
-import type { RequestAuthority, SessionProposal } from "@seams/contracts";
+import type { RequestAuthority, SessionProposal } from "@purin-labs/contracts";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import {
   deriveGmailReplyTarget,
@@ -44,7 +44,7 @@ import {
   isSessionMailExecutionActive,
 } from "../mail-inbox/execution";
 import type { SessionTurnExecution } from "../chat/turn-access";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   prepareEmailCaseContextCollectionDependency,
   recordEmailProposalFlow,
@@ -166,7 +166,7 @@ import type {
   EmailSizeBreach,
   EmailResponsePolicy,
 } from "./email-harness-tools";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const DEFAULT_TURN_TOKEN_ALLOWANCE = 100_000;
 const TURN_MAX_WALL_MS = 5 * 60 * 1_000;
@@ -1142,7 +1142,7 @@ type EmailReplyTurnSettlement = Readonly<{
       "acceptEmailProposal" | "transitionEmailProposal"
     >;
   prepared: Readonly<{
-    assignment: import("@seams/contracts").CaseAssignment;
+    assignment: import("@purin-labs/contracts").CaseAssignment;
     startId: string;
   }>;
   organisationId: OrganisationId;
@@ -1720,7 +1720,7 @@ async function settleCorrectionLearning(
       typeof settleTransientEmailAssignment
     >[0]["caseActor"];
     prepared: Readonly<{
-      assignment: import("@seams/contracts").CaseAssignment;
+      assignment: import("@purin-labs/contracts").CaseAssignment;
       startId: string;
     }>;
     organisationId: OrganisationId;
@@ -1918,7 +1918,7 @@ function isEmailTurnActive(
 async function failFrozenEmailAssignment(
   caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"],
   prepared: Readonly<{
-    assignment: import("@seams/contracts").CaseAssignment;
+    assignment: import("@purin-labs/contracts").CaseAssignment;
     startId: string;
   }>,
 ): Promise<Result<never, EmailThreadTurnError>> {
@@ -1940,7 +1940,7 @@ async function completeEmailAssignment(
       typeof settleTransientEmailAssignment
     >[0]["caseActor"];
     prepared: Readonly<{
-      assignment: import("@seams/contracts").CaseAssignment;
+      assignment: import("@purin-labs/contracts").CaseAssignment;
       startId: string;
     }>;
     organisationId: OrganisationId;
@@ -2708,7 +2708,7 @@ async function failWithContentBreach(
   input: EmailThreadTurnInput | EmailCorrectionLearningRun,
   caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"],
   prepared: {
-    readonly assignment: import("@seams/contracts").CaseAssignment;
+    readonly assignment: import("@purin-labs/contracts").CaseAssignment;
     readonly startId: string;
   },
   breaches: readonly EmailSizeBreach[],

@@ -1,6 +1,6 @@
 // The customers built-in plugin (Plan 77 step 3). Code outside this
 // directory reaches the plugin only through this file.
-import type { CommerceCustomerCommandV1 } from "@seams/commerce-client";
+import type { CommerceCustomerCommandV1 } from "@purin-labs/commerce-client";
 
 export * from "./customers.ts";
 export * from "./customer-vault.ts";

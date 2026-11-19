@@ -1,5 +1,5 @@
-import type { CommerceSensitivity } from "@seams/contracts";
-import { exhaustiveList } from "@seams/std";
+import type { CommerceSensitivity } from "@purin-labs/contracts";
+import { exhaustiveList } from "@purin-labs/std";
 
 /** Every commerce sensitivity, from least to most restricted. */
 export const COMMERCE_SENSITIVITIES = exhaustiveList<CommerceSensitivity>()([

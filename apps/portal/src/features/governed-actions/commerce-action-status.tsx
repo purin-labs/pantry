@@ -1,19 +1,19 @@
-import type { CommerceProviderReceipt } from "@seams/control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import React from "react";
 import { CommerceActionTrace } from "./commerce-trace";
 import { CafeMenuPublicationDetails } from "./cafe-menu-details";
 import { MenuPriceChangeDetails } from "./menu-price-card";
 import { OrderRefundDetails } from "./order-refund-details";
 import { StockOperationCard } from "./stock-operation-details";
-import type { CommerceActionDetails, MerchantPluginSettingDetails, CommerceActionRecord, MerchantPluginPreview } from "@seams/control-api/portal/commerce-actions";
+import type { CommerceActionDetails, MerchantPluginSettingDetails, CommerceActionRecord, MerchantPluginPreview } from "@purin-labs/control-api/portal/commerce-actions";
 import { formatCommerceActionAmount, formatOfferPrice, commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { runAsync } from "../../pages/agent-console-shared";
 import {
   commerceSourceLabel,
   formatCommerceTimestamp,
 } from "../commerce/entity-plane/presentation";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export function CommerceActionStatus(input: {
   readonly action: CommerceActionRecord;

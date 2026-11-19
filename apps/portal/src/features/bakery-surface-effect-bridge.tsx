@@ -8,7 +8,7 @@ import {
   type BakerySurfaceEffectV1,
   type BakerySurfaceReceiptV1,
   type PageCommandEffectV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { runPageCommand } from "./surface-observation";
 import {
   bakerySurfaceForOrganisation,
@@ -21,8 +21,8 @@ import {
   subscribeSurfaceEffects,
   surfaceSignalsLive,
 } from "./surface-effect-signals";
-import type { Variant } from "@seams/type-utils";
-import { errorMessage, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import {
   ControlApiError,
   controlRead,

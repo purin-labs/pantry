@@ -3,7 +3,7 @@ import type {
   CapabilityMode,
   CapabilityPolicyModes,
   OrganisationCapabilityPolicy,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   CAPABILITY_CATALOGUE,
@@ -27,7 +27,7 @@ import {
   type ControlMutationIdentity,
   type UnversionedControlMutationBoundary,
 } from "../data/control-mutation";
-import { assertNever, errorMessage, isPositiveInteger } from "@seams/std";
+import { assertNever, errorMessage, isPositiveInteger } from "@purin-labs/std";
 
 type AccessControlMutationStateRow = Readonly<{
   environment: unknown;

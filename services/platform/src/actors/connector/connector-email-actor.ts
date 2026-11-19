@@ -28,8 +28,8 @@ import {
   type MailClassifiedPageInput,
   type MailDecisionInput,
 } from "../../mail-inbox/commands";
-import type { MailOrganizationCommand } from "@seams/control-api";
-import type { ConnectorIdentity } from "@seams/contracts";
+import type { MailOrganizationCommand } from "@purin-labs/control-api";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -105,7 +105,7 @@ import {
   type OperationalEmailProposalOutcome,
   type OperationalEmailProposalRecord,
 } from "../connector-email-operational";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { armConnectorAlarm } from "./alarm";
 import {
   emailMessageExceedsLimit,
@@ -153,7 +153,7 @@ import {
 } from "./whatsapp-parsers";
 import type { ConnectorDO } from "../connector";
 import { ConnectorEvals } from "./connector-evals";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Email processing for the Connector: the mailbox, reply turns, operational proposals, correction learning and Case context discovery.
@@ -1256,10 +1256,10 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       Readonly<{
         proposalId: string;
         authority: Variant<
-          import("@seams/contracts").RequestAuthority,
+          import("@purin-labs/contracts").RequestAuthority,
           "control"
         >;
-        edit: import("@seams/control-api").MailReplyEdit;
+        edit: import("@purin-labs/control-api").MailReplyEdit;
         /** Plan 40D: `shared` for a body that several authors wrote. */
         attribution?: "single_editor" | "shared";
       }>,
@@ -1370,10 +1370,10 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       Readonly<{
         proposalId: string;
         authority: Variant<
-          import("@seams/contracts").RequestAuthority,
+          import("@purin-labs/contracts").RequestAuthority,
           "control"
         >;
-        lookup: import("@seams/control-api").MailRelationshipLookup;
+        lookup: import("@purin-labs/control-api").MailRelationshipLookup;
       }>,
   ): Promise<ConnectorResult<EmailRelationshipPreview>> {
     return this.trackExecution(
@@ -1416,10 +1416,10 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       Readonly<{
         proposalId: string;
         authority: Variant<
-          import("@seams/contracts").RequestAuthority,
+          import("@purin-labs/contracts").RequestAuthority,
           "control"
         >;
-        correction: import("@seams/control-api").MailReplyCorrection;
+        correction: import("@purin-labs/control-api").MailReplyCorrection;
       }>,
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
     return this.trackExecution(

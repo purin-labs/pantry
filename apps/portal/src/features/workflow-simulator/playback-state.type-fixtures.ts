@@ -1,7 +1,7 @@
 import type {
   PhysicsRecording,
   PhysicsSequence,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   loadPhysicsReplay,
   navigateRecording,
@@ -10,9 +10,9 @@ import {
   type RecordingSource,
   type RecordingDocument,
   type RecordingNavigation,
-} from "@seams/production-simulation/simulator/playback-state";
-import type { TransferInput } from "@seams/production-simulation/recipes/bakery/workcell-input";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/production-simulation/simulator/playback-state";
+import type { TransferInput } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const recording: PhysicsRecording;
 declare const activeRecording: Variant<PlaybackSession, "recording">;

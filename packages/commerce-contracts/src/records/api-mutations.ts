@@ -4,7 +4,7 @@
 // drop the rest.
 import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { boundedTextSchema } from "./fields.ts";
 import {
   wireLocationSchema,

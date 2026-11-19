@@ -3,30 +3,30 @@ import {
   parseIngredientLoad,
   sameIngredientLoad,
   type IngredientLoad,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   assessRobotLoad,
   robotLoadLabel,
   UR5E_PAYLOAD_SOURCE,
   type RobotLoadAssessment,
-} from "@seams/bakery-model/bakery-load-assessment";
+} from "@purin-labs/bakery-model/bakery-load-assessment";
 import {
   ROBOT_IDS,
   ROBOTS,
   parseRobotModel,
   type RobotModel,
-} from "@seams/bakery-model/bakery-robots";
+} from "@purin-labs/bakery-model/bakery-robots";
 import type {
   PhysicsRecording,
   PhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { EngineJobs } from "../production-run/engine-jobs";
 import { jobStepLabel, type JobProgress } from "../production-run/job-progress";
 import { downloadBakeryFile } from "./file-download";
 import { RobotLimits } from "./robot-limits";
-import { summarizeMargins } from "@seams/bakery-model/bakery-margins";
+import { summarizeMargins } from "@purin-labs/bakery-model/bakery-margins";
 
 type Task = "table-to-rack" | "table-to-oven";
 type Scenario = "nominal" | "blocked" | "unreachable";

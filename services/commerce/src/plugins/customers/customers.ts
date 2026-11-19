@@ -15,12 +15,12 @@ import {
   type CommerceNotificationV1,
   type CommerceOrderV1,
   type CommerceShipmentV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   commerceTransition,
   type CommerceMachineEvent,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { readRefundAttempt } from "../../payments/payment-records.ts";
 import { listOrders, listShipments } from "../../commerce-persistence.ts";

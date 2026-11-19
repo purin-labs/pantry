@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /** Settings › AI features › Jev (Plan 88 section 2). */
 export type JevFeature =

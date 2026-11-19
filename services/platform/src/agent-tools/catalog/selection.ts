@@ -1,5 +1,5 @@
 import { BAKERY_DIRECT_CALL_GUIDANCE } from "../bakery/surface";
-import { isPageViewCommandName } from "@seams/control-api";
+import { isPageViewCommandName } from "@purin-labs/control-api";
 import { modelToolDefinition, type RegisteredTool } from "../define-tool";
 import {
   CHANNEL_TOOLS,
@@ -22,7 +22,7 @@ import {
 } from "../registry";
 import { COMMERCE_SENSITIVITIES } from "../../commerce/sensitivity";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   customConnectorCatalogPin,
   customConnectorToolDefinition,

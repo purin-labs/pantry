@@ -6,9 +6,9 @@ import {
   newConversationId,
   newProjectId,
   type ConversationId,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
-import type { CaseTimelineCase } from "@seams/control-api";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
+import type { CaseTimelineCase } from "@purin-labs/control-api";
 
 import { saveConversation } from "../../src/chat/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

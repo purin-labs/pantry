@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { PendingCommerceApproval } from "./portal-types";
 
 const PENDING_COMMERCE_APPROVAL_STORAGE_KEY = "satyr:commerce-approval";

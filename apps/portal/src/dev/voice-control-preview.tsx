@@ -1,10 +1,10 @@
-import type { VoiceMacView } from "@seams/control-api";
+import type { VoiceMacView } from "@purin-labs/control-api";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import type {
   AccessControlView,
   AccessRouteTransport,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 import { VoiceControl } from "../features/voice/control";
 import type { VoiceSession, VoiceStatus } from "../features/voice/session";
 import { usePortalTheme } from "../use-portal-theme";

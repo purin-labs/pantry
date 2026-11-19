@@ -1,5 +1,5 @@
 import React from "react";
-import type { MarginSummary } from "@seams/bakery-model/bakery-margins";
+import type { MarginSummary } from "@purin-labs/bakery-model/bakery-margins";
 import "./robot-limits.css";
 
 /**

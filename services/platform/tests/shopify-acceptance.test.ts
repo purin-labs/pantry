@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { triggerShopifyDevelopmentOrder } from "../src/shopify/acceptance";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type CapturedShopifyAcceptanceRequest = {
   body: Record<string, unknown>;

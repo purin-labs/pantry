@@ -1,4 +1,4 @@
-import type { PaymentsDay } from "@seams/control-api";
+import type { PaymentsDay } from "@purin-labs/control-api";
 
 import type { Env } from "../../env";
 import { resolveMerchantControlContext } from "../commerce-merchant";

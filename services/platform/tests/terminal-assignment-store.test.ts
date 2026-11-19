@@ -9,7 +9,7 @@ import {
   parseTerminalAssignment,
   terminalAssignmentPaymentBinding,
   type TerminalAssignment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {

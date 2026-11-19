@@ -1,5 +1,5 @@
 import type { TextPresenceSelection } from "./text-selection.ts";
-import { decodeBase64Url, isRecord } from "@seams/std";
+import { decodeBase64Url, isRecord } from "@purin-labs/std";
 export const COLLABORATION_FRAME_LIMIT = 384 * 1024;
 export const COLLABORATION_SOCKET_LIMIT = 20;
 // The Actor's runtime answers this text frame without waking the Actor, so a

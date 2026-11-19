@@ -3,8 +3,8 @@ import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { bypass, http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
-import { CommerceAdminClient } from "@seams/commerce-client";
+import { isRecord } from "@purin-labs/std";
+import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { network } from "./network";
 import { connectCommerceFixture } from "./commerce-support";
 import {

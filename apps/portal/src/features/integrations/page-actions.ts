@@ -10,8 +10,8 @@ import {
   reloadEmailReplyDraft,
   saveEmailReplyDraft,
 } from "../email-review/api";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { saveInferenceSelection } from "./inference-actions";
 import {
   approveEmailOperational,
@@ -57,7 +57,7 @@ import {
   readCuePresetId,
 } from "./settings-support";
 import type { CredentialActionOutcome, IntegrationsCommand, IntegrationsPageActions, IntegrationsRouteData, IntegrationsRouteMutationContext, IntegrationsRouteProps, PendingProviderConnection, ProviderConnectionCommand, SettingsConfirmTimer, SettingsMutationFeedback, SettingsRouteContent, WorkspaceSettingsCommand, WorkspaceSettingsPageActions, WorkspaceSettingsRouteData, WorkspaceSettingsRouteMutationContext } from "./settings-types";
-import type { IntegrationAccount } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 
 export function createIntegrationsPageActions(
   context: IntegrationsRouteMutationContext,

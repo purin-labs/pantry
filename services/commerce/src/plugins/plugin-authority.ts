@@ -37,13 +37,13 @@ import {
   type CommercePluginSettingsV1,
   type RunCommercePluginActionV1,
   type SetCommercePluginFieldValuesV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   BUILT_IN_PLUGINS,
   commerceTransition,
   type PluginDefinition,
   type PluginState,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   listRecentCheckoutIds,

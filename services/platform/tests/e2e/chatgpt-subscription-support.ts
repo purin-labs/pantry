@@ -3,7 +3,7 @@ import { zstdDecompressSync } from "node:zlib";
 import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect } from "vitest";
-import { encodeBase64Url, isRecord } from "@seams/std";
+import { encodeBase64Url, isRecord } from "@purin-labs/std";
 
 import {
   completeOrganisationChatGptSignIn,

@@ -1,6 +1,6 @@
-import { assertNever, isNonBlankString, isRecord } from "@seams/std";
-import type { HomeDestination } from "@seams/control-api";
-import { isDestinationKind } from "@seams/control-api/portal/home";
+import { assertNever, isNonBlankString, isRecord } from "@purin-labs/std";
+import type { HomeDestination } from "@purin-labs/control-api";
+import { isDestinationKind } from "@purin-labs/control-api/portal/home";
 
 export function isHomeDestination(value: unknown): value is HomeDestination {
   if (!isRecord(value) || !isDestinationKind(value.kind)) {

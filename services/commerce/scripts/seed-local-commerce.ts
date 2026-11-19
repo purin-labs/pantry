@@ -4,7 +4,7 @@ import {
   type PublishMenuCommand,
   type CommerceCommandInput,
   type CommerceMerchantSnapshotV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { configurePhase4Shipping } from "./configure-plan22-phase4-shipping.ts";
 import {

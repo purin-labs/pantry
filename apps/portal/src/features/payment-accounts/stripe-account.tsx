@@ -6,7 +6,7 @@ import {
   readStripePaymentAccounts,
   startStripeOnboarding,
 } from "./api";
-import type { StripePaymentAccount } from "@seams/control-api/portal/payment-accounts";
+import type { StripePaymentAccount } from "@purin-labs/control-api/portal/payment-accounts";
 
 /** Countries where Stripe accepts a new business, nearest market first. */
 const ONBOARDING_COUNTRIES: readonly Readonly<{

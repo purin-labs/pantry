@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export type StockStatus =
   "uncounted" | "out" | "low" | "healthy" | "unconfigured";

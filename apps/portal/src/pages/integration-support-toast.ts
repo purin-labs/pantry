@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
 import { providerLabel } from "../integration-catalogue";
-import type { SupportDiagnostics } from "@seams/control-api/portal/settings";
+import type { SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 
 /**
  * Every integration dialog reads the organisation's newest open support

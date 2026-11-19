@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiCheckoutProfile from "@seams/commerce-contracts/records/api-checkout-profile";
+import type * as apiCheckoutProfile from "@purin-labs/commerce-contracts/records/api-checkout-profile";
 import type {
   ActivateCommerceCheckoutProfileV1,
   CreateCommerceCheckoutProfileDraftV1,

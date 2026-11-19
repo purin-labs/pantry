@@ -3,7 +3,7 @@ import type {
   AuthorizedHarnessToolResult,
   HarnessToolOutput,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Env } from "../env";
 import {
@@ -24,8 +24,8 @@ import type {
   HarnessToolDefinition,
   HarnessToolHost,
 } from "./embedded-harness";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
 import {
   EmailSupplierContext,
   validateEmailCommerceEvidence,

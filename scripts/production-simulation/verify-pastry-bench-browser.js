@@ -166,7 +166,7 @@ async function verifyPieFactoryStations() {
     { MORNING_SHIFT_STATIONS, synchronizeMorningShiftAppliances },
     { FactoryStations },
   ] = await Promise.all([
-    import("/@id/@seams/production-simulation/recipes/bakery/pie"),
+    import("/@id/@purin-labs/production-simulation/recipes/bakery/pie"),
     import("/src/features/production-run/factory-places.ts"),
     import("/src/features/production-run/morning-shift-appliances.ts"),
     import("/src/features/workflow-simulator/spatial/factory-stations.ts"),

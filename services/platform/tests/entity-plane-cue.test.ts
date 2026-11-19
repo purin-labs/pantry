@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import {
   parseCommerceGraphQuery,
   parseEntityPlaneObservation,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceEntityPlaneCueSelectors,
   createCommerceEntityPlaneCueEvents,

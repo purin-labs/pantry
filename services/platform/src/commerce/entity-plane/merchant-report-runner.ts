@@ -2,7 +2,7 @@ import type {
   CommerceGraphQueryResult,
   CommerceSensitivity,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import {

@@ -11,8 +11,8 @@ import { openaiProvider } from "@earendil-works/pi-ai/providers/openai";
 import { anthropicProvider } from "@earendil-works/pi-ai/providers/anthropic";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { openaiCodexProvider } from "@earendil-works/pi-ai/providers/openai-codex";
-import { assertNever } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import type { Result } from "../result";
 import { runtimeFetch } from "../runtime-fetch";
 import {

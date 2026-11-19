@@ -5,8 +5,8 @@
  * Response. A route keeps the order of the steps where the order decides
  * which error a request gets.
  */
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 import { resolveUser, type User } from "../../data/control-plane";
 import {
   hashPortalSubject,

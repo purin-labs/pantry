@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { expect } from "vitest";
 import { exports } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { createAccessGrant } from "../../src/data/access-grants";
 import {

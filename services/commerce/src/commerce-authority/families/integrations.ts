@@ -3,7 +3,7 @@ import {
   type CommercePluginListV1,
   type CommercePluginPreviewV1,
   type CommerceWebhookSubscriptionV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   PluginAuthority,
   HANDLER_RUNS,

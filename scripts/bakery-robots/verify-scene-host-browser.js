@@ -117,13 +117,13 @@ async function verifySceneHost(page) {
     const { RecordingCandidatePreview } =
       await import("/src/features/workflow-simulator/recording-candidate-preview.tsx");
     const { compileWorkcellInput } =
-      await import("/@id/@seams/production-simulation/recipes/bakery/workcell-input");
+      await import("/@id/@purin-labs/production-simulation/recipes/bakery/workcell-input");
     const { reserveWorkcell, settleWorkcell } =
-      await import("/@id/@seams/production-simulation/recipes/bakery/workcell-attempt");
+      await import("/@id/@purin-labs/production-simulation/recipes/bakery/workcell-attempt");
     const { productionMaterialBinding } =
-      await import("/@id/@seams/production-simulation/recipes/bakery/production-material");
+      await import("/@id/@purin-labs/production-simulation/recipes/bakery/production-material");
     const { parsePhysicsReplay } =
-      await import("/@id/@seams/bakery-model/bakery-physics");
+      await import("/@id/@purin-labs/bakery-model/bakery-physics");
     const originalContext = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function unavailableContext(
       kind,

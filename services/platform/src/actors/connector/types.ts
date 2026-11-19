@@ -4,7 +4,7 @@ import type {
   ConnectorIdentity,
   ConnectorIngress,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { EmailRuntimeSnapshot } from "../connector-email";
 import type { GmailMessageContent } from "../../mail/gmail-adapter";
 import type { EmailProposalDraftRecord } from "../email-case-processing";

@@ -4,7 +4,7 @@ import type { Result } from "../result";
 import type { CredentialVaultBindings } from "./keyring";
 import type { VaultHandle, VaultSecret, VaultStoreError } from "./domain";
 import { revokeVaultSecret, storeVaultSecret } from "./service";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type ExternalVaultSource = {
   readonly kind: "onepassword";

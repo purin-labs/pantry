@@ -37,7 +37,7 @@ import {
   readProjectDirectory,
 } from "../../src/chat/projects";
 import { mutateProject } from "../../src/projects/commands";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   parseChatPlacement,
   parseProjectCommand,
@@ -48,7 +48,7 @@ import {
   type ConversationId,
   parseConversationId,
   newUserId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { requireProjectId } from "../test-ids";
 import {
   installSlackActorFixture,

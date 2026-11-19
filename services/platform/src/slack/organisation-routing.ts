@@ -34,8 +34,8 @@ import {
 } from "../placement";
 import type { Result } from "../result";
 import { parseSlackUserId, type SlackUserId } from "./events";
-import type { Variant } from "@seams/type-utils";
-import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 
 type SlackInstallationSeed = {
   readonly installationId: SlackInstallationId;

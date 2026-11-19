@@ -12,9 +12,9 @@ import {
   type EvalRunResult,
   type EvalTaskKey,
   type EvalTaskResult,
-} from "@seams/control-api";
-import { isRecord, parseJsonOrNull } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The eval runs of one mailbox agent while they are in progress.

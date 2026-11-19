@@ -1,8 +1,8 @@
 import { ControlApiError } from "./control-client";
-import type { CapabilityProfile, ControlRole, IntegrationAccount, ReadinessAssessment, SetupSelection } from "@seams/control-api/portal/settings";
+import type { CapabilityProfile, ControlRole, IntegrationAccount, ReadinessAssessment, SetupSelection } from "@purin-labs/control-api/portal/settings";
 import type { SetupFormDefaults } from "./features/integrations/settings-types";
-import type { Membership, OrganisationWorkspace, ReadinessBlocker } from "@seams/control-api/portal/portal-types";
-import { isPortalHandle } from "@seams/control-api/portal/portal-projection";
+import type { Membership, OrganisationWorkspace, ReadinessBlocker } from "@purin-labs/control-api/portal/portal-types";
+import { isPortalHandle } from "@purin-labs/control-api/portal/portal-projection";
 
 const LAST_USED_WORKSPACE_STORAGE_PREFIX = "satyr.portal.last-used-workspace:";
 

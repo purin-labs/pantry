@@ -1,4 +1,4 @@
-import type { InventoryProductionRequest } from "@seams/control-api";
+import type { InventoryProductionRequest } from "@purin-labs/control-api";
 
 const request: InventoryProductionRequest = {
   id: "request",

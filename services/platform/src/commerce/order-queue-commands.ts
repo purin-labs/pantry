@@ -2,14 +2,14 @@ import type {
   OrderQueueAction,
   OrderQueueEntry,
   SoldOutItem,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   CommerceAdminClient,
   CommerceClientResult,
   CommerceMutationResultV1,
   CommercePickupQueueEntryV1,
   CommerceSoldOutMarksV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 /**
  * The commands of the staff order queue and "sold out today" (Plan 40B phase

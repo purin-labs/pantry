@@ -1,4 +1,4 @@
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import { isConversationId, type ConversationId } from "./ids.ts";
 
 /**

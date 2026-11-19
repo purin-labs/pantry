@@ -1,4 +1,4 @@
-import type { AgentPermissionEntityTypeRead } from "@seams/control-api";
+import type { AgentPermissionEntityTypeRead } from "@purin-labs/control-api";
 import type { EntityTypeReadAudience } from "./access-grants/entity-type-reads";
 import {
   CAPABILITY_KEYS,

@@ -3,10 +3,10 @@ import React from "react";
 import { PROCEDURE_PICKER, ScenarioPicker } from "../scenario-picker";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type { ScenarioView, SimulatorConnection } from "../simulator-state";
-import type { Run } from "@seams/production-simulation/recipes/bakery/schedule";
+import type { Run } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { DockHeader } from "./shared";
 import { MeasuredShiftImport } from "./measured-shift-import";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type ScenarioState = Pick<
   ScenarioView,

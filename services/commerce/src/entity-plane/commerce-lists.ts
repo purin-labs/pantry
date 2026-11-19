@@ -1,4 +1,4 @@
-import type { ProductionRequestFields } from "@seams/commerce-client";
+import type { ProductionRequestFields } from "@purin-labs/commerce-client";
 import type {
   CommerceCommandResult,
   CommerceEntityPlaneError,
@@ -12,7 +12,7 @@ import type {
   ListEntryAttributeValue,
   MerchantRevision,
   CommerceEntityPlaneObservationV1,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   entityTypeExists,
@@ -722,7 +722,7 @@ function listEntryReference(
 }
 
 function listEntryObservation(
-  observationId: import("@seams/commerce-contracts").CommerceCommandId,
+  observationId: import("@purin-labs/commerce-contracts").CommerceCommandId,
   entry: CommerceListEntryRef,
   entityRef: CommerceEntityRef,
   merchantRevision: MerchantRevision,

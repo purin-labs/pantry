@@ -45,8 +45,8 @@ import {
   parseControlRole,
   type OrganisationEnvironment,
 } from "../data/control-plane";
-import type { Variant } from "@seams/type-utils";
-import { isPositiveInteger } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isPositiveInteger } from "@purin-labs/std";
 
 export type SlackIngressCredential =
   | { readonly kind: "ready"; readonly token: string }

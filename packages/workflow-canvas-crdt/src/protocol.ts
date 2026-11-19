@@ -10,8 +10,8 @@ import {
   type SyncFailureCode,
   type SyncMessageFields,
   type SyncServerMessage,
-} from "@seams/collaboration";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/collaboration";
+import { isRecord } from "@purin-labs/std";
 import {
   CANVAS_ENCODING_LIMITS,
   CanvasEncoding,

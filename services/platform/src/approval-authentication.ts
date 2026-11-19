@@ -10,14 +10,14 @@ import {
 } from "./ids";
 import type { Result } from "./result";
 import type { NearEd25519PublicKey, SeamsIdentityId } from "./seams/nep413";
-import type { CanonicalAction } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { CanonicalAction } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonNegativeInteger,
   isRecord,
   isSha256Hex,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 declare const approvalProofDigestBrand: unique symbol;
 

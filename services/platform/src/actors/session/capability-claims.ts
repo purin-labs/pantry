@@ -1,6 +1,6 @@
 import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
@@ -21,7 +21,7 @@ import {
   type CapabilityDefinition,
 } from "../../authorization/access-grants/capability-key";
 import { parseStoredRequestAuthority } from "../../request-authority";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { CanonicalRunBudgetIdentity } from "./types";
 
 export async function claimCanonicalRunCapability(

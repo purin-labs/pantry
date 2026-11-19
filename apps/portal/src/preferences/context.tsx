@@ -1,6 +1,6 @@
 import React from "react";
 import { toast } from "sonner";
-import type { PreferenceArea, UserId } from "@seams/control-api";
+import type { PreferenceArea, UserId } from "@purin-labs/control-api";
 import { UserPreferenceOwner } from "./owner";
 
 export const UserPreferencesContext =

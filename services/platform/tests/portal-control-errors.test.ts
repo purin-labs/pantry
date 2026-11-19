@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   controlApiProblemMessage,
   parseControlApiProblem,
-} from "@seams/control-api/portal/errors";
-import { parseAgentOperationsResponse } from "@seams/control-api/portal/agent-operations";
+} from "@purin-labs/control-api/portal/errors";
+import { parseAgentOperationsResponse } from "@purin-labs/control-api/portal/agent-operations";
 
 describe("portal control error boundary", () => {
   it("recognizes the exact saved-run missing response", () => {

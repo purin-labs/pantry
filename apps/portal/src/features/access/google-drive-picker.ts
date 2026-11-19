@@ -2,8 +2,8 @@ import {
   settleGoogleDrivePicker,
   type GooglePickerCallbackRuntime,
 } from "./file-resource-boundary";
-import type { GoogleDrivePickedFile, GoogleDrivePickerConfig } from "@seams/control-api/portal/access-models";
-import { isRecord } from "@seams/std";
+import type { GoogleDrivePickedFile, GoogleDrivePickerConfig } from "@purin-labs/control-api/portal/access-models";
+import { isRecord } from "@purin-labs/std";
 
 const GOOGLE_IDENTITY_SCRIPT = "https://accounts.google.com/gsi/client";
 const GOOGLE_API_SCRIPT = "https://apis.google.com/js/api.js";

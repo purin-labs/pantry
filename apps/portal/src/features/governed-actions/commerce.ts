@@ -1,6 +1,6 @@
-import type { ActionLedgerActivity } from "@seams/control-api/portal/agent-operations";
-import { assertNever } from "@seams/std";
-import type { CommerceActionAmount, CommerceActionRecord } from "@seams/control-api/portal/commerce-actions";
+import type { ActionLedgerActivity } from "@purin-labs/control-api/portal/agent-operations";
+import { assertNever } from "@purin-labs/std";
+import type { CommerceActionAmount, CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
 
 /**
  * Renders a minor-unit price for a reader deciding whether to approve it.

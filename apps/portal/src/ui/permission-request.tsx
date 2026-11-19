@@ -10,7 +10,7 @@ import {
   Minus,
   X,
 } from "lucide-react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   cancelDialog,
   closeDialog,
@@ -37,7 +37,7 @@ import {
   type PromptToastView,
 } from "./prompt-toast";
 import "./permission-request.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type PermissionRequestParty = {
   readonly name: string;

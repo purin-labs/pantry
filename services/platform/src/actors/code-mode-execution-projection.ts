@@ -1,7 +1,7 @@
 import { parseOrganisationId, type OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type { HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /**
  * The counters of one admitted Code Mode execution. The Session keeps them

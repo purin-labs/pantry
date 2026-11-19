@@ -1,14 +1,14 @@
 import React from "react";
 import { Select } from "../../ui/select";
-import type { GrinderModel } from "@seams/production-simulation/native/cell-adapter";
+import type { GrinderModel } from "@purin-labs/production-simulation/native/cell-adapter";
 import {
   morningShiftRecipeInput,
   sixHourShiftRecipeInput,
   type BakeryShiftOptions,
   type BakeryServiceShiftInput,
-} from "@seams/production-simulation/recipes/bakery/bakery-shift";
+} from "@purin-labs/production-simulation/recipes/bakery/bakery-shift";
 import { prepareNativeRecipe } from "./oven-recipe-file";
-import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import type { OvenRunSource } from "@purin-labs/production-simulation/runs/oven-run-file";
 import { buildShiftFloorPlanTravel } from "./floor-plan-shift-travel";
 import { floorPlanWorkspace } from "../workflow-simulator/floor-plan-workspace";
 

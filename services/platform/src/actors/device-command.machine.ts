@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /**
  * One pause or resume that Pantry sends to a shop gateway for one device

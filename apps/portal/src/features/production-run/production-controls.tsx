@@ -3,8 +3,8 @@ import type {
   ArrivalView,
   DrainStatus,
   HostView,
-} from "@seams/production-simulation";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { assertNever } from "@purin-labs/std";
 import { seconds } from "./oven-logistics";
 
 type Props = Readonly<{

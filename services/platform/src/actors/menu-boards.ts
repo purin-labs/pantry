@@ -5,7 +5,7 @@ import type {
   MenuBoardReleaseItem,
   MenuBoardReleaseSection,
   MenuBoardSummary,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   MENU_BOARD_DEFAULT_CONSTRAINTS,
   MENU_BOARD_LAYOUTS,
@@ -42,7 +42,7 @@ import {
   type MenuBoardStyleToken,
   type MenuBoardStateVector,
   type MenuBoardUpdate,
-} from "@seams/menu-board-crdt";
+} from "@purin-labs/menu-board-crdt";
 import {
   encodeMenuBoardServerMessage,
   FRAME_LIMIT,
@@ -50,15 +50,15 @@ import {
   type MenuBoardClientMessage,
   type MenuBoardFailureCode,
   type MenuBoardRoomMetadata,
-} from "@seams/menu-board-crdt/protocol";
+} from "@purin-labs/menu-board-crdt/protocol";
 import {
   isCollaborationAgentAction,
   type CollaborationAgent,
   type CollaborationAgentAction,
   type CollaborationAgentActivity,
-} from "@seams/collaboration";
-import type { MenuDraftSnapshot } from "@seams/menu-draft-crdt";
-import { assertNever, canonicalJson, sha256Hex } from "@seams/std";
+} from "@purin-labs/collaboration";
+import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
+import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
 import type { SessionTurnExecution } from "../chat/turn-access";
 
@@ -108,7 +108,7 @@ import {
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
 } from "./collaboration-room";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The menu boards of an Organisation (Plan 40B phase 1). Each board is a

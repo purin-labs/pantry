@@ -16,8 +16,8 @@ import {
 } from "../../src/data/control-mutation";
 import { storeVaultSecret, type VaultHandle } from "../../src/credential-vault";
 import type { OrganisationId } from "../../src/ids";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever, bytesToHex, encodeBase64 } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever, bytesToHex, encodeBase64 } from "@purin-labs/std";
 import { requireVaultHandle } from "../test-ids";
 import { requiredPlacement } from "./slack-journey-support";
 

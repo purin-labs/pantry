@@ -1,24 +1,24 @@
 import React from "react";
-import { isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
+import { isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import {
   readCellRecordingDocument,
   type PhysicsView,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import {
   parseApplianceSample,
   type ApplianceSample,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import {
   espressoVisualHash,
   type EspressoMachine,
   type PersistentEspressoCell,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   EspressoScene,
   parseEspressoLiveTelemetry,
   type EspressoCameraPreset,
 } from "./espresso-scene";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "../pour-over/pour-over.css";
 import { RecipeSampleStation } from "../shared/recipe-station";
 

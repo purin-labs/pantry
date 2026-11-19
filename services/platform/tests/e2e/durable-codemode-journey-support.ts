@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { SessionDO } from "../../src/actors/agent-session";
 import { readImportedCanonicalSession } from "../../src/actors/agent-session-canonical";
 import { codeModePlatformGovernor } from "../../src/actors/code-mode-platform-governor-stub";

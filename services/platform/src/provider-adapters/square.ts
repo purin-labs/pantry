@@ -16,7 +16,7 @@ import type {
   CommerceMerchant,
 } from "../commerce/square-link";
 import { createCommerceClient } from "../commerce/outbox-worker";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "revoke_square_access_in_square" as const;
 

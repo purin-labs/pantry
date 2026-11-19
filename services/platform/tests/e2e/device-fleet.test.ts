@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 import {
   parseDeviceActivity,
   type DeviceAlertSetting,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { deviceFleetStub } from "../../src/actors/device-fleet";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";

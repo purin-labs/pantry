@@ -7,7 +7,7 @@ import {
   type CustomConnectorTransportRequest,
 } from "../src/custom-connectors/egress";
 import { parseOrganisationId } from "../src/ids";
-import { encodeBase64, isRecord } from "@seams/std";
+import { encodeBase64, isRecord } from "@purin-labs/std";
 
 const TEST_SECRET = "fixture-secret-93fa8f7821";
 

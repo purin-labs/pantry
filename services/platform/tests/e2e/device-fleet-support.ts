@@ -9,8 +9,8 @@ import {
   type GatewayMessage,
   type KitchenDeviceView,
   type PlatformGatewayMessage,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { commerceHeaders } from "./commerce-support";

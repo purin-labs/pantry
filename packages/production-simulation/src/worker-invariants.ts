@@ -1,6 +1,6 @@
-import { sameJson } from "@seams/std";
+import { sameJson } from "@purin-labs/std";
 import { executionWork } from "./scenario.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { InvalidDocument, requireValue } from "./document-values.ts";
 import type { AcceptedEvent } from "./events.ts";
 import type { CommandId, TaskId } from "./identity.ts";

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import type { StationId } from "@seams/bakery-model/bakery";
+import type { StationId } from "@purin-labs/bakery-model/bakery";
 import tableUrl from "../production-run/models/prep-table-steel.glb?url";
 import mapleUrl from "../production-run/models/prep-table-maple.glb?url";
 import ovenUrl from "../../../../../assets/bakery-mujoco/maruzen-mbco-4me/maruzen-mbco-4me.glb?url";
@@ -14,7 +14,7 @@ import starPrinterUrl from "../../../../../assets/bakery-mujoco/star-mcp31lb/sta
 import starDrawerUrl from "../../../../../assets/bakery-mujoco/star-mjd36m/star-mjd36m.glb?url";
 import { disposePhysicsObject } from "./spatial/physics-model";
 import { ensureLivingAssetsLoaded } from "./spatial/living-asset-loader";
-import type { stations } from "@seams/production-simulation/recipes/bakery/schedule";
+import type { stations } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 
 const urls: Record<StationId, string> = {
   stage: tableUrl,

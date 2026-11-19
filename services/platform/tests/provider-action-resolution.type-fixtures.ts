@@ -6,7 +6,7 @@ import type {
 import type { ActionLedgerEntry } from "../src/actors/action-ledger";
 // @ts-expect-error Generic plaintext resolution is private to the Vault module.
 import { resolveVaultHandle } from "../src/credential-vault";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 declare const authorizedAction: AuthorizedProviderAction;
 declare const proposedLedgerAction: VariantBy<

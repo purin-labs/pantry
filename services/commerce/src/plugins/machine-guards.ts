@@ -9,7 +9,7 @@ import type {
   CommerceFulfillmentV1,
   CommerceMutationErrorV1,
   CommerceOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
 import { runHook } from "./checkout-hooks.ts";

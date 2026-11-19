@@ -1,8 +1,8 @@
-import type { ResolvedApplianceMove } from "@seams/production-simulation/floor/collisions";
+import type { ResolvedApplianceMove } from "@purin-labs/production-simulation/floor/collisions";
 import {
   doorSweepIntersectsBox,
   findFloorPlanOpening,
-} from "@seams/production-simulation/floor/openings";
+} from "@purin-labs/production-simulation/floor/openings";
 import {
   buildOpeningElements,
   updateOpeningElements,
@@ -30,10 +30,10 @@ import {
   type PlanPoint,
   type PlanRect,
   type PlanSize,
-} from "@seams/production-simulation/floor/plan-view";
+} from "@purin-labs/production-simulation/floor/plan-view";
 import { PlanNavigation } from "./plan-navigation";
 import { icon } from "./icons";
-import { BAKERY_FLOOR_PLANS, bakeryGrid, bakeryRoom } from "@seams/production-simulation/floor/bakery-room";
+import { BAKERY_FLOOR_PLANS, bakeryGrid, bakeryRoom } from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   moveApplianceWithCollisions,
   rotateApplianceWithCollisions,
@@ -44,7 +44,7 @@ import {
   REHEARSAL_APPLIANCE_IDS,
   isApplianceId,
   type ApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import "./floor-plan.css";
 
 type PlanControl<Selection> = Readonly<{

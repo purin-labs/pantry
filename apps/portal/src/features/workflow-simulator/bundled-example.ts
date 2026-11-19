@@ -1,8 +1,8 @@
 import {
   parsePhysicsReplay,
   type PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
-import type { ReadExample } from "@seams/production-simulation/simulator/rehearsal-presets";
+} from "@purin-labs/bakery-model/bakery-physics";
+import type { ReadExample } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 
 import { readExample } from "./rehearsal-examples.ts";
 

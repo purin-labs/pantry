@@ -7,7 +7,7 @@ import {
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
 } from "./domain";
-import { bytesToHex, isRecord } from "@seams/std";
+import { bytesToHex, isRecord } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "remove_shopify_app_in_shopify" as const;
 const SHOPIFY_SCOPES = [

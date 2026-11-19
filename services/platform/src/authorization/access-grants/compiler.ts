@@ -4,7 +4,7 @@ import type {
   CommerceEntityAuthority,
   CommerceMutationTarget,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
@@ -16,8 +16,8 @@ import {
   type PlatformCapabilityDefinition,
   type ProviderCapabilityDefinition,
 } from "./capability-key";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type ImmutableCapabilityDefinition = CapabilityDefinition;
 export type PlatformCapability = PlatformCapabilityDefinition;

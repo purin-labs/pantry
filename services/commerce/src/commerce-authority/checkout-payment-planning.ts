@@ -29,7 +29,7 @@ import {
   type PlaceCommerceDraftOrderOnTermsV1,
   type CommerceCompanyInvoiceV1,
   type CommercePaymentCaptureResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type Checkout,
@@ -38,7 +38,7 @@ import {
   type CheckoutPaymentAttemptLifecycle,
   type CheckoutQuoteSnapshot,
   type InventoryAllocation,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../database.ts";
 import { readPointOfSaleConfigurationForCheckout } from "../point-of-sale-configuration-persistence.ts";
@@ -68,8 +68,8 @@ import { orderWithAddedPayment } from "./order-changes.ts";
 import { storedValuePaymentId } from "../plugins/stored-value/index.ts";
 import type { ManualTender } from "../payments/manual-tender.ts";
 import { termsInvoice } from "../plugins/companies/index.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * Places a quoted online checkout that gift cards and store credit pay in

@@ -1,16 +1,16 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   COMMERCE_API_SCOPES,
   CommerceAdminClient,
   type CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import {
   commerceClient,

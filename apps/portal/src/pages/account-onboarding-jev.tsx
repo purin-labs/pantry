@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import type { JevFeature } from "@seams/control-api/portal/jev-features";
+import type { JevFeature } from "@purin-labs/control-api/portal/jev-features";
 import {
   changeJevFeature,
   jevFeatureErrorMessage,

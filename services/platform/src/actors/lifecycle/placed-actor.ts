@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 
 import type { Env } from "../../env";
 import { startIsolateLocationRead } from "../../isolate-location";

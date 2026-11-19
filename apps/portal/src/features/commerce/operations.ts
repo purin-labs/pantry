@@ -1,4 +1,4 @@
-import type { TrackingBatchAction } from "@seams/control-api";
+import type { TrackingBatchAction } from "@purin-labs/control-api";
 
 export type OrderCancellationAction = Readonly<{
   kind: "cancel_order";

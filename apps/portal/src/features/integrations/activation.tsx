@@ -2,13 +2,13 @@ import type { ClaudeConnectionState } from "./claude-connection";
 import type {
   FirstOperationalTask,
   OnboardingActivation,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import React from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import { workspacePagePath } from "../../route";
 import { MutationLedger } from "../../mutation-state";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   BLOCKER_COPY,
   isActiveIntegrationAccount,
@@ -16,7 +16,7 @@ import {
   mutationBlocked,
 } from "./settings-support";
 import type { CommerceSystem, SetupFormDefaults } from "./settings-types";
-import type { IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, ReadinessAssessment } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, ReadinessAssessment } from "@purin-labs/control-api/portal/settings";
 import {
   accountMatchesWorkspace,
   renderActivationProjection,

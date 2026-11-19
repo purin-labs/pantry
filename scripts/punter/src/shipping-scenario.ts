@@ -8,7 +8,7 @@ import {
   type CommerceBuyerShippingAddressV1,
   type CommerceBuyerShippingAddressAcceptanceV1,
   type CommerceFetch,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   collectAndReconcilePayment,
@@ -16,8 +16,8 @@ import {
   replayAndReconcilePayment,
   type PunterPaymentSessionIdentity,
 } from "./payment.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type PunterMoney = Readonly<{ amountMinor: number; currency: string }>;
 type PlacedPayment = VariantBy<

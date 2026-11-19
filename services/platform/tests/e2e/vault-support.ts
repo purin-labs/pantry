@@ -1,7 +1,7 @@
 // Reads that the Vault journeys share: an item of a Vault answer, the fake
 // 1Password service, and a login's handle and the secret it resolves to.
 import { env } from "cloudflare:workers";
-import { parseVaultItemResult, type VaultItemView } from "@seams/control-api";
+import { parseVaultItemResult, type VaultItemView } from "@purin-labs/control-api";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
 import { resolveVaultHandle } from "../../src/credential-vault/service";
 import type { OrganisationId } from "../../src/ids";

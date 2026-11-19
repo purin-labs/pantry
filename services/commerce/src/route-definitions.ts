@@ -2,7 +2,7 @@
 // list their routes with `routeFor<TheirRoutes>()`; the core's route table
 // joins them. A route's fields are exactly its path parameters, which the
 // type checks.
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type RouteMethod = "DELETE" | "GET" | "POST" | "PUT";
 

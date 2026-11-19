@@ -57,7 +57,7 @@ async function stageArtifactLifetime(mode) {
   if (mode === "create") {
     const { RunArtifactStore } =
       await import("/src/features/production-run/run-artifact-store.ts");
-    const { sha256Hex } = await import("/@id/@seams/std");
+    const { sha256Hex } = await import("/@id/@purin-labs/std");
     const store = await RunArtifactStore.create();
     const digest = await sha256Hex(new TextEncoder().encode(content));
     await store.retain(digest, new Blob([JSON.stringify({ digest, content })]));
@@ -81,12 +81,12 @@ function addArchiveInput() {
 
 async function importStoredRun(snapshot) {
   const { readSavedRunFile } =
-    await import("/@id/@seams/production-simulation/runs/run-file-reader");
+    await import("/@id/@purin-labs/production-simulation/runs/run-file-reader");
   const { RunArtifactStore } =
     await import("/src/features/production-run/run-artifact-store.ts");
   const { OvenRecordings } =
-    await import("/@id/@seams/production-simulation/runs/oven-recordings");
-  const { openResumable } = await import("/@id/@seams/production-simulation");
+    await import("/@id/@purin-labs/production-simulation/runs/oven-recordings");
+  const { openResumable } = await import("/@id/@purin-labs/production-simulation");
   const input = document.querySelector("#archive-input");
   const file = input.files[0];
   // At twice the 128 MiB heap ceiling below, an import that read the file as

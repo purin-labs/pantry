@@ -4,8 +4,8 @@
  * routes for their cards. Send, Edit and Discard change this page's copy
  * only, until a reload.
  */
-import type { SlackDraftView } from "@seams/control-api/portal/slack-drafts";
-import { sleep } from "@seams/std";
+import type { SlackDraftView } from "@purin-labs/control-api/portal/slack-drafts";
+import { sleep } from "@purin-labs/std";
 
 const DIGEST = "a".repeat(64);
 const params = new URLSearchParams(window.location.search);

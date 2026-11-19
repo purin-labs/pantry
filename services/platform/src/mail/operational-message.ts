@@ -1,6 +1,6 @@
 /** Builds the one-recipient, plain-text message used by the send-only path. */
 
-import { encodeBase64, encodeBase64Url } from "@seams/std";
+import { encodeBase64, encodeBase64Url } from "@purin-labs/std";
 
 export function buildOperationalEmailRaw(
   input: Readonly<{

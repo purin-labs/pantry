@@ -27,7 +27,7 @@ import type {
   ProviderOAuthAttempt,
   ProviderOnboardingError,
 } from "./domain";
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 export async function completeProviderOAuth(input: {
   readonly env: Env;

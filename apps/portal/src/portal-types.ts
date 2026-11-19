@@ -1,14 +1,14 @@
-import type { ControlMembershipAvailability } from "@seams/control-api";
-import type { FirstOperationalTask, OnboardingActivation, OnboardingNextAction, OnboardingProvider, OnboardingStepProjection } from "@seams/contracts";
+import type { ControlMembershipAvailability } from "@purin-labs/control-api";
+import type { FirstOperationalTask, OnboardingActivation, OnboardingNextAction, OnboardingProvider, OnboardingStepProjection } from "@purin-labs/contracts";
 import type { WorkspaceDetailPage } from "./route";
 import type { OrganisationChoice } from "./shell";
 import {
   MutationLedger,
   type OrganisationMutation,
 } from "./mutation-state";
-import type { IntegrationAccount, ReadinessAssessment, SetupSelection } from "@seams/control-api/portal/settings";
-import type { CommerceActionRecord } from "@seams/control-api/portal/commerce-actions";
-import type { CommerceSystemView, Membership, OperatorOrganisationCase, OrganisationSummary, OrganisationWorkspace, SupportRole, User } from "@seams/control-api/portal/portal-types";
+import type { IntegrationAccount, ReadinessAssessment, SetupSelection } from "@purin-labs/control-api/portal/settings";
+import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import type { CommerceSystemView, Membership, OperatorOrganisationCase, OrganisationSummary, OrganisationWorkspace, SupportRole, User } from "@purin-labs/control-api/portal/portal-types";
 
 export type Provider = Extract<
   OnboardingProvider,

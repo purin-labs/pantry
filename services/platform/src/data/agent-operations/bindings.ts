@@ -4,7 +4,7 @@ import {
   computeScheduleWindowKey,
   scheduleTimeKey,
 } from "../../schedules/window";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { AgentOperationCommand } from "../agent-operations";
 import { requireActiveArea, requirePublishedScopes } from "./areas";
 import { requireActiveInstallation } from "./definitions";

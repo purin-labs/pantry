@@ -4,9 +4,9 @@ import {
   type Operation,
   type Settings,
   type SettingsField,
-} from "@seams/bakery-model/bakery";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 
 const phases = [
   "stage",

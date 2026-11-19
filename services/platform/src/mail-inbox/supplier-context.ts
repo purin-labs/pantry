@@ -6,15 +6,15 @@ import type {
   CommerceGraphQueryResult,
   AttributeValue,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   CommerceEntityPlaneClient,
   SUPPLIER_DIRECTORY_LIST_ID,
   SUPPLIER_ENTITY_TYPE_ID,
   REPLENISHMENT_QUEUE_LIST_ID,
   parseCommerceGraphQuery,
-} from "@seams/commerce-client";
-import { assertNever, isPositiveInteger, isRecord, isSha256Hex } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { assertNever, isPositiveInteger, isRecord, isSha256Hex } from "@purin-labs/std";
 import type { Env } from "../env";
 import { parseOrganisationId, type OrganisationId } from "../ids";
 import { listAccessGrants } from "../data/access-grants";
@@ -54,8 +54,8 @@ import type { Result } from "../result";
 import type {
   MailRelationshipLookup,
   MailSupplierCandidate,
-} from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 
 type MailboxAuthority = Variant<RequestAuthority, "agent_mailbox">;
 export type EmailCommerceEvidence = Readonly<{

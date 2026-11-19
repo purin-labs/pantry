@@ -5,11 +5,11 @@ import type {
   CommerceOrderingValue,
   CommerceQueryPlan,
   CommerceQueryPlanErrorCapability,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   compileCommerceQuerySql,
   type CommerceSqliteBinding,
-} from "@seams/commerce-query-sqlite";
+} from "@purin-labs/commerce-query-sqlite";
 
 import type { CommerceDatabase, CommerceSqlValue } from "../database.ts";
 import { parseEntityRef, parsePositiveRevision } from "./parsers.ts";
@@ -19,8 +19,8 @@ import {
   normalizeRelationSql as normalizeSql,
   relationTableHasIndex,
 } from "./relation-schema.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isNormalizedText } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isNormalizedText } from "@purin-labs/std";
 
 const COMMERCE_ENTITY_RELATION_SCHEMA_VERSION = 7;
 const COMMERCE_LIST_ENTRY_RELATION_SCHEMA_VERSION = 1;

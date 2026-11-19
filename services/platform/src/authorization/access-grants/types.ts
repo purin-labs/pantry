@@ -6,8 +6,8 @@ import type {
   GrantProvenance as ContractGrantProvenance,
   GrantSubject as ContractGrantSubject,
   WorkflowAuthorityKind as ContractWorkflowAuthorityKind,
-} from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type WorkflowAuthorityKind = ContractWorkflowAuthorityKind;
 export type GrantSubject = Readonly<ContractGrantSubject>;

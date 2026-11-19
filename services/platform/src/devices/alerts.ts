@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { DeviceAlertSetting, DeviceConnection } from "@seams/control-api";
-import type { ConnectorDelivery } from "@seams/contracts";
+import type { DeviceAlertSetting, DeviceConnection } from "@purin-labs/control-api";
+import type { ConnectorDelivery } from "@purin-labs/contracts";
 
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import type { Env } from "../env";

@@ -13,7 +13,7 @@ import {
   Zap,
 } from "lucide-react";
 
-import type { AgentPublishedResourceMetadata, AgentDefinition, AgentInstallation, AgentOperationsSnapshot, CueBinding, ScheduleBinding, OperationalArea, Skill } from "@seams/control-api/portal/agent-operations";
+import type { AgentPublishedResourceMetadata, AgentDefinition, AgentInstallation, AgentOperationsSnapshot, CueBinding, ScheduleBinding, OperationalArea, Skill } from "@purin-labs/control-api/portal/agent-operations";
 import { readPublishedCommerceResources } from "../features/commerce/entity-plane/api";
 import {
   EmptyState,
@@ -54,8 +54,8 @@ import {
   starterTemplateById,
   type AgentStarterTemplate,
 } from "./agent-templates";
-import { assertNever } from "@seams/std";
-import type { AgentSkillRef } from "@seams/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { AgentSkillRef } from "@purin-labs/control-api";
 
 type AgentsPageProps = {
   readonly organisationId: string;

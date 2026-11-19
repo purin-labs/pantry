@@ -9,11 +9,11 @@ import type {
   CommercePaymentCaptureResultV1,
   CommercePaymentRefundResultV1,
   CommercePaymentSessionResultV1,
-} from "@seams/commerce-client";
-import { CURRENCY_MINOR_UNITS } from "@seams/commerce-client";
-import type { OnlinePaymentBinding } from "@seams/commerce-contracts";
-import { isRecord } from "@seams/std";
-import type { VariantBy } from "@seams/type-utils";
+} from "@purin-labs/commerce-client";
+import { CURRENCY_MINOR_UNITS } from "@purin-labs/commerce-client";
+import type { OnlinePaymentBinding } from "@purin-labs/commerce-contracts";
+import { isRecord } from "@purin-labs/std";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 import type { CommerceDatabase } from "../../database.ts";
 import type {

@@ -1,4 +1,4 @@
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import type {
   AttemptId,
   BoundaryId,

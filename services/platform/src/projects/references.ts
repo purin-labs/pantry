@@ -1,5 +1,5 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { parseSystemEntityRef } from "@seams/commerce-client";
+import { parseSystemEntityRef } from "@purin-labs/commerce-client";
 import { listAccessGrants } from "../data/access-grants";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
@@ -31,8 +31,8 @@ import {
   type ProjectReference,
   type ConversationId,
   type ProjectReferenceObservation,
-} from "@seams/control-api";
-import { assertNever, canonicalJson, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { resolveActiveCaseActor } from "../actors/actor-router";
 import {
@@ -46,7 +46,7 @@ import {
   VISIBLE_CONVERSATIONS_SQL,
 } from "../chat/conversation-access";
 import { parseConversationActorIdentity } from "../chat/conversation-actor-identity";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function searchProjectReferences(
   env: Env,

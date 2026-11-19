@@ -11,8 +11,8 @@ import {
   bindOperatorTurnAccess,
   type OperatorExecutionOrigin,
 } from "../chat/turn-access";
-import type { ProjectSnapshot } from "@seams/control-api";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+import type { ProjectSnapshot } from "@purin-labs/control-api";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignmentLifecycle,
@@ -23,7 +23,7 @@ import type {
   EventPrincipal,
   RequestAuthority,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   parseAssignmentId,
@@ -76,9 +76,9 @@ import {
   prepareTurnContext,
 } from "../context/turn-context";
 import type { PinnedAgentProfile } from "../data/pinned-agent-profile";
-import type { BakerySurfaceAttachmentV1 } from "@seams/bakery-model/bakery-surface";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { traceLog } from "../observability";
 import type { SessionDO } from "./agent-session";
 import {

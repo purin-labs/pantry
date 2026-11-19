@@ -7,8 +7,8 @@ import {
   type OrganisationId,
 } from "../ids";
 import type { Result } from "../result";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@seams/std";
-import type { CodeModeExecutionOutcome } from "@seams/contracts";
+import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
+import type { CodeModeExecutionOutcome } from "@purin-labs/contracts";
 
 const EXECUTION_ID_PATTERN = /^cmx-[a-zA-Z0-9_-]{1,120}$/;
 const OPAQUE_ID_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,191}$/;

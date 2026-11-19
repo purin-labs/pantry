@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { expect, it } from "vitest";
-import type { CommerceMutationReceiptV1 } from "@seams/commerce-contracts";
+import type { CommerceMutationReceiptV1 } from "@purin-labs/commerce-contracts";
 import {
   parseCommerceDelivery,
   parseCommerceEntityPlaneCommand,
@@ -12,7 +12,7 @@ import {
   parseEntityPlaneCommandResult,
   parseEntityPlaneSystemExtensionResponse,
   parseSavedCommerceViewRevision,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { NodeCommerceDatabase } from "../src/node-database.ts";
 import { initializeCommerceSchema } from "../src/schema.ts";

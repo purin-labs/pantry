@@ -1,4 +1,4 @@
-import { canonicalJson, sha256Hex } from "@seams/std";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import type { RecipeAdapter, ValueProblem } from "../adapters.ts";
 import { authoredId, parseId, parseSha256Hex } from "../identity.ts";
 import { normalizeQuantity } from "../quantity.ts";

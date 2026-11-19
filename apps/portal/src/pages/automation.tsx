@@ -1,21 +1,21 @@
 import React from "react";
 import { toast } from "sonner";
 
-import type { AgentOperationCommand, AgentOperationFormContext, AgentOperationKind, AgentOperationsSnapshot, ActionLedgerActivity } from "@seams/control-api/portal/agent-operations";
+import type { AgentOperationCommand, AgentOperationFormContext, AgentOperationKind, AgentOperationsSnapshot, ActionLedgerActivity } from "@purin-labs/control-api/portal/agent-operations";
 import type { AgentOperationsTransport } from "../agent-operations";
-import type { AgentDocumentRevision, AgentRevisionTarget } from "@seams/control-api/portal/agent-operations";
+import type { AgentDocumentRevision, AgentRevisionTarget } from "@purin-labs/control-api/portal/agent-operations";
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "../agent-operations";
-import { parseAgentOperationsResponse, parseAgentRevisionsResponse, parseAgentOperationForm as parseOperationForm } from "@seams/control-api/portal/agent-operations";
+import { parseAgentOperationsResponse, parseAgentRevisionsResponse, parseAgentOperationForm as parseOperationForm } from "@purin-labs/control-api/portal/agent-operations";
 import { commerceActionTitle, commerceActionStateLabel, formatCommerceActionAmount } from "../features/governed-actions/commerce";
-import { parseCommerceActionRecordResponse } from "@seams/control-api/portal/commerce-actions";
-import { parseTrackingBatchPreviewResponse } from "@seams/control-api/portal/commerce-operations";
+import { parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
+import { parseTrackingBatchPreviewResponse } from "@purin-labs/control-api/portal/commerce-operations";
 import type { CommerceOperationsTransport } from "../features/commerce/operations";
 import { ControlApiError } from "../control-client";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
 } from "../features/access/permission-required-prompt";
-import type { ControlErrorKind } from "@seams/control-api/portal/errors";
+import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
 import type { PageContent } from "../page-content";
 import {
   EmptyState,
@@ -45,16 +45,16 @@ import {
   type AgentOperationStep,
   type AgentOperationSubmitter,
 } from "./agent-console-shared";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import type {
   MissingTrackingException,
   PermissionRequired,
   TrackingActionTarget,
   TrackingBatchPreview,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
-export type { AgentOperationKind } from "@seams/control-api/portal/agent-operations";
+export type { AgentOperationKind } from "@purin-labs/control-api/portal/agent-operations";
 export type { AgentOperationsTransport } from "../agent-operations";
 export type {
   AgentOperationMutationState,

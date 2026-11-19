@@ -11,7 +11,7 @@ import type {
   CommercePluginFieldValuesV1,
   CommercePluginSettingValueV1,
   CommercePluginSettingsV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   BUILT_IN_PLUGIN_IDS,
   type CheckoutPluginRun,
@@ -19,9 +19,9 @@ import {
   type PluginFunction,
   type PluginLimits,
   type PluginState,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
-import { parseValidationOutput } from "@seams/commerce-contracts/records/plugin-outputs";
+import { parseValidationOutput } from "@purin-labs/commerce-contracts/records/plugin-outputs";
 
 import { sha256 } from "../commerce-authority/checkout-shared.ts";
 import type { CommerceDatabase } from "../database.ts";

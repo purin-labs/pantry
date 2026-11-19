@@ -1,5 +1,5 @@
 import React from "react";
-import type { VaultItemList } from "@seams/control-api";
+import type { VaultItemList } from "@purin-labs/control-api";
 
 import { VAULT_TRANSPORT, vaultErrorMessage, type VaultTransport } from "./api";
 import {

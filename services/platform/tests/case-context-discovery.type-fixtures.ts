@@ -1,7 +1,7 @@
 import type {
   CaseContextCollectionRelationshipDecision,
   CaseContextCollectionReviewCommand,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   ContactEndpoint,
   ContactVerificationCommand,
@@ -10,7 +10,7 @@ import type {
   CaseContextCollectionRelationship,
   CaseContextCollectionScope,
 } from "../src/case-context-discovery/relationships";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const scope: CaseContextCollectionScope;
 declare const attached: Variant<CaseContextCollectionRelationship, "attached">;

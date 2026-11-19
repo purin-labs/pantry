@@ -3,7 +3,7 @@ import {
   parseAirtableWriteArgs,
 } from "../../actors/airtable-tool-input";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { HarnessIntegrationListRequest } from "../catalog/types";
 import { defineTool, jsonSchema } from "../define-tool";
 

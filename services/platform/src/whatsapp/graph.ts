@@ -13,7 +13,7 @@ import {
   type WhatsAppMessageId,
   type WhatsAppPhoneNumberId,
 } from "./identifiers";
-import { isNonEmptyString, isRecord } from "@seams/std";
+import { isNonEmptyString, isRecord } from "@purin-labs/std";
 
 /**
  * The only place Pantry talks to Meta. Every call takes an explicit `fetcher`

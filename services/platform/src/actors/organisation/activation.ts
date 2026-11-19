@@ -28,7 +28,7 @@ import { expireDueActionExecutions } from "../action-ledger";
 import { expireCodeModeOrganisationReservations } from "../code-mode-budget";
 import { expireAbandonedCueClaims } from "../cue-delivery";
 import type { OrganisationCutoverQuiescence } from "../organisation-cutover-quiescence";
-import { isNonNegativeInteger } from "@seams/std";
+import { isNonNegativeInteger } from "@purin-labs/std";
 import type { OrganisationDO } from "../organisation";
 import type {
   ActivationExecutionFailure,

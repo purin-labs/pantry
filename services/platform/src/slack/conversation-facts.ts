@@ -17,8 +17,8 @@ import {
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { resolveActiveSlackPhysicalInstallationCredential } from "../credential-vault/surface-installation-resolution";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
-import type { RequestAuthority } from "@seams/contracts";
-import { isRecord } from "@seams/std";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 
 /** What Slack says about one conversation, read at most once in this time. */
 const FACT_MAX_AGE_MS = 5 * 60 * 1000;

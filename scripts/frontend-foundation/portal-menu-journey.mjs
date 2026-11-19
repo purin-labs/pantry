@@ -1,9 +1,9 @@
-import { MenuDraftDoc } from "@seams/menu-draft-crdt";
+import { MenuDraftDoc } from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftServerMessage,
   parseMenuDraftClientMessage,
-} from "@seams/menu-draft-crdt/protocol";
-import { COLLABORATION_PING, COLLABORATION_PONG } from "@seams/collaboration";
+} from "@purin-labs/menu-draft-crdt/protocol";
+import { COLLABORATION_PING, COLLABORATION_PONG } from "@purin-labs/collaboration";
 import { chooseOption } from "../lib/browser-journey.mjs";
 
 // Bundle like portal-account-setup-journey.mjs, then run in the browser CLI.

@@ -1,4 +1,4 @@
-import type { OnboardingStepProjection } from "@seams/contracts";
+import type { OnboardingStepProjection } from "@purin-labs/contracts";
 import React from "react";
 import {
   Link,
@@ -25,8 +25,8 @@ import {
   type OrganisationListItem,
   type WorkspaceSupportTools,
 } from "./pages/workspaces";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { formatLifecycle } from "./portal-projection";
 import {
   loadPortalOrganisations,
@@ -34,7 +34,7 @@ import {
   toWorkspaceChoice,
 } from "./portal-reads";
 import { workspaceRouteSelection } from "./portal-routing";
-import type { Membership } from "@seams/control-api/portal/portal-types";
+import type { Membership } from "@purin-labs/control-api/portal/portal-types";
 import type { PortalOrganisation, PortalState } from "./portal-types";
 import "./portal-brand.css";
 

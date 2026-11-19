@@ -7,13 +7,13 @@ import {
   disclosureStateFenceBindings,
   type DisclosureProof,
 } from "./disclosure-evidence";
-import type { ChatDisclosureFailure } from "@seams/control-api";
+import type { ChatDisclosureFailure } from "@purin-labs/control-api";
 import {
   isConversationId,
   type ProjectId,
   type ConversationId,
-} from "@seams/control-api";
-import { canonicalJson, isNonNegativeInteger, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { canonicalJson, isNonNegativeInteger, sha256Hex } from "@purin-labs/std";
 import type { Env } from "../env";
 import type { ConversationScope } from "./store";
 import { readConversation } from "./store";
@@ -273,7 +273,7 @@ export async function checkProjectHistoryDisclosure(
   execution: OrganisationExecutionScope,
   scope: ConversationScope,
   projectId: ProjectId,
-  audience: readonly import("@seams/control-api").UserId[],
+  audience: readonly import("@purin-labs/control-api").UserId[],
   destination: import("./disclosure-evidence").DisclosureDestination,
 ): Promise<
   | Readonly<{
@@ -340,8 +340,8 @@ export async function checkProjectHistoryDisclosure(
 }
 
 function memberUserId(member: {
-  userId: import("@seams/control-api").UserId;
-}): import("@seams/control-api").UserId {
+  userId: import("@purin-labs/control-api").UserId;
+}): import("@purin-labs/control-api").UserId {
   return member.userId;
 }
 

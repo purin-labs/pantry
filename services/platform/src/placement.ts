@@ -1,5 +1,5 @@
 import type { Result } from "./result";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 declare const placementCellIdBrand: unique symbol;
 declare const placementEpochBrand: unique symbol;

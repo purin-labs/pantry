@@ -1,7 +1,7 @@
 import { Select } from "../../ui/select";
 import React from "react";
 
-import type { EvalSenderChoice } from "@seams/control-api";
+import type { EvalSenderChoice } from "@purin-labs/control-api";
 
 import { Notice } from "../../page-components";
 import {

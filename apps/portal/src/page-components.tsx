@@ -102,7 +102,7 @@ export function TechnicalDetails(props: {
 }
 
 import type { StatusChipStatus } from "./status-chip";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type { StatusChipStatus } from "./status-chip";
 

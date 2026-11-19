@@ -8,7 +8,7 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
-import type { SurfaceKind } from "@seams/contracts";
+import type { SurfaceKind } from "@purin-labs/contracts";
 
 import type { InstallModel } from "../boundary";
 import {
@@ -43,7 +43,7 @@ import {
 } from "./shared-rows/placement-row";
 import type { OrganisationQuerySource } from "./query-source";
 import { baseProjectId, prepareBaseProject } from "../projects/default-project";
-import { assertNever, isString } from "@seams/std";
+import { assertNever, isString } from "@purin-labs/std";
 import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
 import {
   liveOrganisationGuard,

@@ -12,8 +12,8 @@ import {
   type CaseExecutionNodeKind,
   type CaseTimelineDay,
   type OpenCaseExecutionNode,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { expect } from "vitest";
 import type { CaseSnapshot } from "../../src/actors/case/types";
 import type { IssuedControlSession } from "../../src/data/control-plane";

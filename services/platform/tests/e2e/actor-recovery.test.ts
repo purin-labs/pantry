@@ -38,7 +38,7 @@ import {
   signedSlackRequest,
   slackPostFields,
 } from "./slack-journey-support";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import {
   requireSessionId,
   requireOrganisationId,

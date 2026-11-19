@@ -1,12 +1,12 @@
-import { assertNever, isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import {
   MAX_RUN_SNAPSHOT_BYTES,
   isRunSnapshotId,
   parseRunSnapshot,
   parseRunSnapshotSummary,
   type RunSnapshotSummary,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 import type { OrganisationId } from "../../ids";
 
 export type SavedBakeryRunQuery = StrictUnion<

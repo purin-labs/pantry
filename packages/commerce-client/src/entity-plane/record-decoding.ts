@@ -1,7 +1,7 @@
 import {
   ContractRefusalError,
   type ContractDecodeResult,
-} from "@seams/commerce-contracts/schema";
+} from "@purin-labs/commerce-contracts/schema";
 
 /** The value of a record schema parser; a refusal throws its contract error. */
 export function decodeRecord<T>(

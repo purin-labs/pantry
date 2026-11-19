@@ -1,9 +1,9 @@
 import { Select } from "../../ui/select";
-import type { CheckoutProfileConfiguration } from "@seams/contracts";
+import type { CheckoutProfileConfiguration } from "@purin-labs/contracts";
 import React from "react";
 
 import { formatMoneyMinor } from "../../formatting";
-import type { CheckoutProfileSummary } from "@seams/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
 import {
   automaticRefundThresholdReady,
   refundGovernanceDescription,
@@ -12,7 +12,7 @@ import {
   type ProfileDraft,
   type Readiness,
 } from "./model";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type RefundGovernance =
   CheckoutProfileConfiguration["afterSalePolicy"]["refundGovernance"];

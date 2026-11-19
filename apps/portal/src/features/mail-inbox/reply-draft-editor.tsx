@@ -1,7 +1,7 @@
 import React from "react";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
-import { assertNever } from "@seams/std";
-import { BODY_LIMIT } from "@seams/mail-reply-crdt";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
+import { assertNever } from "@purin-labs/std";
+import { BODY_LIMIT } from "@purin-labs/mail-reply-crdt";
 import { AgentCursors } from "../collaboration/agent-cursors";
 import {
   DraftParticipants,

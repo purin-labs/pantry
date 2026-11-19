@@ -17,7 +17,7 @@ import {
   type ControlMutationIdentity,
   type UnversionedControlMutationBoundary,
 } from "../data/control-mutation";
-import { errorMessage, isPositiveInteger } from "@seams/std";
+import { errorMessage, isPositiveInteger } from "@purin-labs/std";
 
 type AccessControlMutationStateRow = Readonly<{
   environment: unknown;

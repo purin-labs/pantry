@@ -1,4 +1,4 @@
-import { backoffDelay, canonicalJson, sha256Hex } from "@seams/std";
+import { backoffDelay, canonicalJson, sha256Hex } from "@purin-labs/std";
 import { createAccountPlatformClient } from "../account-platform/client";
 import { resolvePantryAccountBinding } from "../account-platform/binding";
 import type { AccountPlatformBindings } from "../account-platform/config";

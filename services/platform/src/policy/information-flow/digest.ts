@@ -1,4 +1,4 @@
-import { isRecord, sha256Hex } from "@seams/std";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 
 export async function digestCanonical(value: unknown): Promise<string> {
   return sha256Hex(serializeCanonical(value));
@@ -6,7 +6,7 @@ export async function digestCanonical(value: unknown): Promise<string> {
 
 /**
  * Sorted-key `JSON.stringify`, the serialization behind persisted flow digests.
- * It is not @seams/std's canonicalJson: it honours `toJSON` (flow bindings and
+ * It is not @purin-labs/std's canonicalJson: it honours `toJSON` (flow bindings and
  * contexts are Wasm classes), writes integer-like keys in ascending numeric
  * order, writes non-finite numbers as null and rejects bigints. Changing any of
  * these would change digests already stored in receipts and ledgers.

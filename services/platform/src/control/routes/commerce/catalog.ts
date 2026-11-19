@@ -24,7 +24,7 @@ import {
 import type {
   CommerceClientResult,
   CommerceOfferPriceResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   parseTrackingBatchPreviewRequest,
   previewTrackingBatch,

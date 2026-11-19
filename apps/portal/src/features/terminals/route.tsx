@@ -17,14 +17,14 @@ import type {
   TerminalConfiguration,
   ReadyTerminalConfiguration,
   TerminalOperationsView,
-} from "@seams/control-api/portal/terminals";
+} from "@purin-labs/control-api/portal/terminals";
 import { CounterSaleRoute } from "./counter-sale-route";
 import "./styles.css";
 import type {
   TerminalConfigurationRequest,
   TerminalCounterReadback,
   TerminalPairingReadback,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 type TerminalState =
   | Readonly<{ kind: "loading" }>

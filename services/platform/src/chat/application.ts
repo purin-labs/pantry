@@ -10,7 +10,7 @@ import {
   authorizeConversation,
   conversationCaseIdentity,
 } from "./conversation-access";
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import {
   projectSnapshotFromParts,
   bindConversationProjectSnapshot,
@@ -49,8 +49,8 @@ import {
   saveConversation,
   type ConversationScope,
 } from "./store";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import {
   admitTurn,
   pendingInputText,

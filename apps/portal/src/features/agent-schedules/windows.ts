@@ -1,4 +1,4 @@
-import type { ScheduleSpec, ScheduleWeekday } from "@seams/control-api";
+import type { ScheduleSpec, ScheduleWeekday } from "@purin-labs/control-api";
 
 // When a schedule's windows open, as the dispatcher keys them: an hourly
 // schedule at its minute of each UTC hour, a daily or weekly one at its time

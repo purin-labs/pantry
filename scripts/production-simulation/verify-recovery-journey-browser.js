@@ -29,7 +29,7 @@ function reuseRecoveryDefinition(definition) {
 }
 
 async function recoveryHistory(events) {
-  const { canonicalJson } = await import("/@id/@seams/std");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const history = [];
   for (const event of events) {
     if (event.kind === "command-admitted") continue;
@@ -44,7 +44,7 @@ function recoveryControlFocused(button) {
 }
 
 async function recoveryWorld(run) {
-  const { canonicalJson } = await import("/@id/@seams/std");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const { identity, commands, events, position, ...world } = run;
   return canonicalJson({ ...world, time: position.time });
 }

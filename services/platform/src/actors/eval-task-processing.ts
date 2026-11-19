@@ -6,12 +6,12 @@ import {
   type EvalTaskOutcome,
   type EvalTaskPins,
   type EvalUnavailableReason,
-} from "@seams/control-api";
-import type { SessionProposal } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { SessionProposal } from "@purin-labs/contracts";
 import {
   parseEntityRef,
   SUPPLIER_ENTITY_TYPE_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   BACKGROUND_MEMORY_DEADLINE_MS,

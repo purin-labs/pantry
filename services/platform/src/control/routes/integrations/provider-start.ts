@@ -42,7 +42,7 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
 import { account } from "../integrations";
 import { providerContextForExistingAccount } from "../../../provider-lifecycle/existing-account-context";

@@ -2,7 +2,7 @@ import type {
   ConnectorDelivery,
   ConnectorDeliveryReceipt,
   ConnectorIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { IntegrationAccountId } from "../../ids";
 import type { WhatsAppIngressLimits } from "../connector-whatsapp";
 import {
@@ -25,8 +25,8 @@ import {
   whatsappLimitsSchema,
   whatsappResolutionSchema,
   whatsappResumeFieldsSchema,
-} from "@seams/contracts/connector-rpc";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/contracts/connector-rpc";
+import { isRecord } from "@purin-labs/std";
 import { parseDelivery, parseDeliveryState } from "./ingress-parsers";
 import type { DeliveryRow } from "./types";
 

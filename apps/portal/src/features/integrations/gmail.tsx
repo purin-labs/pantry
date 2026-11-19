@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router";
-import type { CredentialInventory } from "@seams/control-api/portal/credential-inventory";
+import type { CredentialInventory } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   EmptyState,
   ProviderTile,
@@ -13,11 +13,11 @@ import {
 } from "../../mutation-state";
 import type { ProviderAttemptDiagnostics } from "../../provider-onboarding";
 import { emailReplyIsOpenable, gmailMailboxStatus, gmailMailboxSummary, type MailboxInstallationOption } from "../../pages/agent-mailbox";
-import type { AgentMailboxView, EmailReplyQueueItem, EmailOperationalQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import type { AgentMailboxView, EmailReplyQueueItem, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { PROVIDER_PRESENTATION } from "../../integration-catalogue";
 import { ConnectionDialog } from "./connection-dialog";
 import type { EmailReviewMutation } from "../email-review/review";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { matchesRequestedIntegrationAccountId } from "./integrations-page";
 import {
   GmailConnectionSetup,
@@ -33,7 +33,7 @@ import {
   mutationFeedbackMessage,
   providerConnectionState,
 } from "./settings-support";
-import type { IntegrationAccount, OrganisationInferenceSelection } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import type { IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
 
 export type GmailIntegrationPanelProps = {

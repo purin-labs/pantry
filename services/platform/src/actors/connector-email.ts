@@ -7,7 +7,7 @@ import {
 } from "../data/email-mailbox";
 import { compareGmailHistoryIds } from "../mail/gmail-adapter";
 import type { Result } from "../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { createMailOrganizationSchema } from "../mail-inbox/store";
 import { createEmailCommerceSchema } from "../mail-inbox/supplier-context";
 import {

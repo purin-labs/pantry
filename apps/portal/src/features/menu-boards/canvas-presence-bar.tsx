@@ -1,7 +1,7 @@
 import React from "react";
 import { Crosshair, Sparkles, Square } from "lucide-react";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
-import type { MenuBoardRect } from "@seams/menu-board-crdt/board";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
+import type { MenuBoardRect } from "@purin-labs/menu-board-crdt/board";
 import type { MenuBoardPresenceView } from "./board-client";
 import type { CanvasAgentMark } from "./canvas-agents";
 import "./canvas-presence-bar.css";

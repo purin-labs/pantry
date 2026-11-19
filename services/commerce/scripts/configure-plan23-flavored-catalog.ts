@@ -1,11 +1,11 @@
-import type { CommerceCommandInput } from "@seams/commerce-client";
+import type { CommerceCommandInput } from "@purin-labs/commerce-client";
 import {
   CommerceAdminClient,
   type CreateCommerceInventoryItemV1,
   type OpenCommerceInventoryPositionV1,
   type PlaceCommerceChannelListingV1,
   type ReceiveCommerceInventoryV3,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   applyAtRevision,
   clientFailure,

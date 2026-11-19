@@ -1,5 +1,5 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import {
   parseSupplierCreation,

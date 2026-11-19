@@ -1,8 +1,8 @@
-import type { AgentSessionLifecycle, SessionCommand } from "@seams/contracts";
+import type { AgentSessionLifecycle, SessionCommand } from "@purin-labs/contracts";
 import { validateCanonicalSessionAdvance } from "../../actor-wasm";
 import { readCanonicalSessionProjection } from "../agent-session-canonical";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import type {
   CancellationResolvedSessionCommit,
   CancellationResolvedTransition,

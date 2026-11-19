@@ -1,15 +1,15 @@
 import type {
   PhysicsRecording,
   PhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import type {
   WaitingAttempt,
   CompletedAttempt,
   ReservationResult,
   SettlementResult,
-} from "@seams/production-simulation/recipes/bakery/workcell-attempt";
-import { reserveWorkcell } from "@seams/production-simulation/recipes/bakery/workcell-attempt";
-import { loadWorkcellReplay, type PlaybackSession } from "@seams/production-simulation/simulator/playback-state";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-attempt";
+import { reserveWorkcell } from "@purin-labs/production-simulation/recipes/bakery/workcell-attempt";
+import { loadWorkcellReplay, type PlaybackSession } from "@purin-labs/production-simulation/simulator/playback-state";
 
 declare const pending: WaitingAttempt;
 declare const completed: CompletedAttempt;

@@ -1,5 +1,5 @@
 import { COLD_CELL, type CapabilityBinding } from "./workcell-instances.ts";
-import type { PhysicsRequest } from "@seams/bakery-model/bakery-physics";
+import type { PhysicsRequest } from "@purin-labs/bakery-model/bakery-physics";
 import {
   compileWorkcellInput,
   type CycleInput,
@@ -7,7 +7,7 @@ import {
   type WorkcellInput,
   type WorkcellInputResult,
 } from "./workcell-input.ts";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 declare const input: WorkcellInput;
 declare const rackInput: Extract<

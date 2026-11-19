@@ -1,5 +1,5 @@
-import type { RequestAuthority } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 import type { RequestId } from "../ids";
 import {

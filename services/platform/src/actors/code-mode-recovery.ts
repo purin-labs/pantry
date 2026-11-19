@@ -1,6 +1,6 @@
-import type { SessionRecoveryAction, TurnLifecycle } from "@seams/contracts";
-import { parseJsonOrNull } from "@seams/std";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { SessionRecoveryAction, TurnLifecycle } from "@purin-labs/contracts";
+import { parseJsonOrNull } from "@purin-labs/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import type { CodeModeLeaseBinding } from "./code-mode-budget";
 import { readCodeModeExecution } from "./code-mode-execution-record";
 import {

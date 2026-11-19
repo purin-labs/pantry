@@ -5,8 +5,8 @@ import { measureCanvasRefresh } from "./canvas-refresh-support";
 import {
   parseCanvasServerMessage,
   type CanvasServerMessage,
-} from "@seams/workflow-canvas-crdt/protocol";
-import { parseChat } from "@seams/control-api/portal/chat";
+} from "@purin-labs/workflow-canvas-crdt/protocol";
+import { parseChat } from "@purin-labs/control-api/portal/chat";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
 import { env, exports } from "cloudflare:workers";
@@ -14,8 +14,8 @@ import { runInDurableObject } from "cloudflare:test";
 import { OrganisationDO } from "../../src/actors/organisation";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord, sha256Hex } from "@seams/std";
-import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   issueControlSession,

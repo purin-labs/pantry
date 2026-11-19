@@ -14,7 +14,7 @@ import {
   type VoiceMacList,
   type VoiceTranscription,
   type VoiceVocabulary,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import {
   authorizeOrganisationRequest,

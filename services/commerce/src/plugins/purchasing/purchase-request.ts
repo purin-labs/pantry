@@ -8,9 +8,9 @@ import type {
   CommerceEntityPlaneError,
   ListEntryAttributeValue,
   PurchaseRequestStatus,
-} from "@seams/commerce-contracts";
-import { commerceTransition } from "@seams/commerce-contracts";
-import { parseAttributeDefinitionId } from "@seams/commerce-client";
+} from "@purin-labs/commerce-contracts";
+import { commerceTransition } from "@purin-labs/commerce-contracts";
+import { parseAttributeDefinitionId } from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../../database.ts";
 

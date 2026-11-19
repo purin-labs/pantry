@@ -7,7 +7,7 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
 } from "../organisation-execution-scope";
-import type { OnboardingProvider, SurfaceKind } from "@seams/contracts";
+import type { OnboardingProvider, SurfaceKind } from "@purin-labs/contracts";
 
 import type { InstallModel } from "../boundary";
 import type { OrganisationEnvironment } from "./control-plane";
@@ -44,9 +44,9 @@ import {
   type GmailAuthorizationProduct,
   type ProviderAuthorizationProduct,
 } from "../mail/gmail-authorization";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
-import { assertNever, isPositiveInteger, isRecord, isString } from "@seams/std";
+import { assertNever, isPositiveInteger, isRecord, isString } from "@purin-labs/std";
 
 export type IntegrationProvider = OnboardingProvider;
 

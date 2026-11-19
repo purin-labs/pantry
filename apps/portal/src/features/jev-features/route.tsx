@@ -5,7 +5,7 @@ import type {
   JevFeatureCommand,
   JevFeaturesView,
   JevRelatedCasesMode,
-} from "@seams/control-api/portal/jev-features";
+} from "@purin-labs/control-api/portal/jev-features";
 import { Select } from "../../ui";
 import { Switch } from "../../ui/toggle-switch";
 import { changeJevFeature, jevFeatureErrorMessage, readJevFeatures } from "./api";

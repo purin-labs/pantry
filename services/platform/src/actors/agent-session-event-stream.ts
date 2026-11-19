@@ -1,4 +1,4 @@
-import type { AgentEventEnvelope } from "@seams/contracts";
+import type { AgentEventEnvelope } from "@purin-labs/contracts";
 
 import type { RequestId, OrganisationId } from "../ids";
 import type { Result } from "../result";

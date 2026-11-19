@@ -1,5 +1,5 @@
-import type { StrictUnion } from "@seams/type-utils";
-import { canonicalJson, isRecord } from "@seams/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { canonicalJson, isRecord } from "@purin-labs/std";
 import { checkpointBody } from "./bakery-checkpoint.ts";
 
 // Generated from assets/bakery-mujoco/appliances.json, as are the cases of

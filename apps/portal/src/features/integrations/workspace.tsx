@@ -2,7 +2,7 @@ import { Select } from "../../ui/select";
 import React from "react";
 import { MutationLedger } from "../../mutation-state";
 import { ArchiveConfirm } from "./archive-confirm";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   formatControlRole,
   isInvitationMutation,
@@ -12,7 +12,7 @@ import {
   mutationBlocked,
   renderMutationFeedback,
 } from "./settings-support";
-import type { OrganisationInvitation, OrganisationMember } from "@seams/control-api/portal/settings";
+import type { OrganisationInvitation, OrganisationMember } from "@purin-labs/control-api/portal/settings";
 import type { SettingsMouseHandler, SettingsMutationFeedback, SettingsSelectHandler, WorkspaceSettingsPageProps } from "./settings-types";
 
 const INVITE_ROLES = [

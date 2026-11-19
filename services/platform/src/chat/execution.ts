@@ -1,4 +1,4 @@
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import {
   parseUserId,
   parseControlSessionId,
@@ -6,7 +6,7 @@ import {
   type ControlSessionId,
 } from "../ids";
 import type { ConversationScope } from "./store";
-import { isConversationId } from "@seams/control-api";
+import { isConversationId } from "@purin-labs/control-api";
 
 export type ConversationExecution = {
   readonly scope: ConversationScope;

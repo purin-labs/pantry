@@ -1,4 +1,4 @@
-import { exhaustiveList } from "@seams/std";
+import { exhaustiveList } from "@purin-labs/std";
 import type { CommerceProjectionKind } from "../commerce-projection";
 
 export const PROJECTION_KINDS = exhaustiveList<CommerceProjectionKind>()([

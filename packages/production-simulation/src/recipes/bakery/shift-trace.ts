@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import { logisticsView, type LogisticsView } from "../../logistics-view.ts";
 import type { RunState } from "../../state.ts";
 

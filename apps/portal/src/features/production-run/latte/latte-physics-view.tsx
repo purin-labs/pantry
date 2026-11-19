@@ -5,9 +5,9 @@ import {
   type LattePhase,
   type LatteRecipeConfig,
   type LatteSample,
-} from "@seams/production-simulation/recipes/latte/model";
+} from "@purin-labs/production-simulation/recipes/latte/model";
 import { LatteScene, type LatteCameraPreset } from "./latte-scene";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "../oven-workspace.css";
 // The station readout uses the pour-over styles, so this view loads them itself.
 import "../pour-over/pour-over.css";

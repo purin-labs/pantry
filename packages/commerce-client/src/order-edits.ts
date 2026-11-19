@@ -6,7 +6,7 @@ import {
   type CommerceManualTenderV1,
 } from "./draft-orders.ts";
 import type { CommerceBuyerQuotedCheckoutV1 } from "./storefront-client.ts";
-import { parseEditCommerceOrderV1 as parseEditCommerceOrderV1Record, parseExchangeCommerceOrderLinesV1 as parseExchangeCommerceOrderLinesV1Record, parseOpenCommerceBuyerOrderBalanceV1 as parseOpenCommerceBuyerOrderBalanceV1Record, parseRecordCommerceOrderManualPaymentV1 as parseRecordCommerceOrderManualPaymentV1Record, parseCommerceOrderChangeV1 as parseCommerceOrderChangeV1Record, parseCommerceOrderChangesV1 as parseCommerceOrderChangesV1Record } from "@seams/commerce-contracts/records/api-order-edits";
+import { parseEditCommerceOrderV1 as parseEditCommerceOrderV1Record, parseExchangeCommerceOrderLinesV1 as parseExchangeCommerceOrderLinesV1Record, parseOpenCommerceBuyerOrderBalanceV1 as parseOpenCommerceBuyerOrderBalanceV1Record, parseRecordCommerceOrderManualPaymentV1 as parseRecordCommerceOrderManualPaymentV1Record, parseCommerceOrderChangeV1 as parseCommerceOrderChangeV1Record, parseCommerceOrderChangesV1 as parseCommerceOrderChangesV1Record } from "@purin-labs/commerce-contracts/records/api-order-edits";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;

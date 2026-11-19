@@ -29,7 +29,7 @@ import {
   parseCustomConnectorSetupAccountLifecycle,
   type ExistingCustomConnectorSetupKind,
 } from "./setup-target";
-import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
+import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 
 export type ActiveCustomConnectorAccount = {
   readonly source: {

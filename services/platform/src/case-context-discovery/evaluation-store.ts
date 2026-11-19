@@ -30,8 +30,8 @@ import {
   type TypeSafeUsageError,
   type TypeSafeUsageMeasurement,
 } from "../integrations/typesafe/evaluation-ledger";
-import { assertNever } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type CaseContextDiscoveryEvaluationDispatch =
   Readonly<{ kind: "unissued" }> | Readonly<{ kind: "issued" }>;

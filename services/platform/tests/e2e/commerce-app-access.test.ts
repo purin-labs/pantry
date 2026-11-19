@@ -1,10 +1,10 @@
 import { env } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   COMMERCE_API_SCOPES,
   parseListEntryReadRequest,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { createCommerceEntityPlaneClient } from "../../src/commerce/outbox-worker";
 import {
   commerceClient,

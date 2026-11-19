@@ -1,10 +1,10 @@
-import type { CaseAssignment } from "@seams/contracts";
+import type { CaseAssignment } from "@purin-labs/contracts";
 import {
   COLLABORATION_AGENT_COLOR_KEYS,
   isShortProtocolText,
   type CollaborationAgent,
   type CollaborationAgentColorKey,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import { merchantAgentAgentId } from "../data/merchant-agent-preset";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 

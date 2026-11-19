@@ -1,28 +1,28 @@
 import type {
   CommerceEntityPlanePlannedQueryResponse,
   CommerceEntityPlaneRelationshipTraversalStepResponse,
-} from "@seams/commerce-contracts/entity-plane-query-results";
+} from "@purin-labs/commerce-contracts/entity-plane-query-results";
 export type {
   CommerceEntityPlanePlannedQueryResponse,
   CommerceEntityPlaneRelationshipTraversalStepResponse,
-} from "@seams/commerce-contracts/entity-plane-query-results";
+} from "@purin-labs/commerce-contracts/entity-plane-query-results";
 import type {
   CommerceEntityPlanePublishedResourceMetadataRequest,
   CommerceEntityPlanePublishedResourceMetadataResponse,
-} from "@seams/commerce-contracts/entity-plane-metadata";
+} from "@purin-labs/commerce-contracts/entity-plane-metadata";
 export type {
   CommerceEntityPlanePublishedResourceReference,
   CommerceEntityPlanePublishedResourceMetadataRequest,
   CommerceEntityPlanePublishedResource,
   CommerceEntityPlanePublishedResourceMetadataResponse,
-} from "@seams/commerce-contracts/entity-plane-metadata";
+} from "@purin-labs/commerce-contracts/entity-plane-metadata";
 import type {
   CommerceEntityPlaneChanges,
   CommerceEntityPlaneSystemExtensionRequest,
   CommerceEntityPlaneSystemExtensionResponse,
   CommerceListEntryReadRequest,
   CommerceListEntryReadResult,
-} from "@seams/commerce-contracts/entity-plane-resources";
+} from "@purin-labs/commerce-contracts/entity-plane-resources";
 export type {
   CommerceEntityPlaneChangeResource,
   CommerceEntityPlaneChange,
@@ -32,7 +32,7 @@ export type {
   CommerceEntityPlaneSystemExtensionResponse,
   CommerceListEntryReadRequest,
   CommerceListEntryReadResult,
-} from "@seams/commerce-contracts/entity-plane-resources";
+} from "@purin-labs/commerce-contracts/entity-plane-resources";
 import type {
   AttributeDefinitionId,
   CommerceEntityType,
@@ -44,11 +44,11 @@ import type {
   CommerceRelationship,
   CommerceViewPresentation,
   SavedCommerceView,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   validateCommerceRelationshipShape,
   validateSavedCommerceView,
-} from "@seams/commerce-contracts/browser-validators";
+} from "@purin-labs/commerce-contracts/browser-validators";
 
 import {
   requireUniqueValues,
@@ -60,23 +60,23 @@ import {
   brandRevision,
   enumValue,
 } from "./primitives.ts";
-import * as metadataContracts from "@seams/commerce-contracts/entity-plane-metadata";
-import * as resourceContracts from "@seams/commerce-contracts/entity-plane-resources";
-import * as entityTypeContracts from "@seams/commerce-contracts/entity-type";
+import * as metadataContracts from "@purin-labs/commerce-contracts/entity-plane-metadata";
+import * as resourceContracts from "@purin-labs/commerce-contracts/entity-plane-resources";
+import * as entityTypeContracts from "@purin-labs/commerce-contracts/entity-type";
 import { decodeRecord } from "./record-decoding.ts";
-import * as queryResultContracts from "@seams/commerce-contracts/entity-plane-query-results";
-import * as exportContracts from "@seams/commerce-contracts/entity-plane-export";
+import * as queryResultContracts from "@purin-labs/commerce-contracts/entity-plane-query-results";
+import * as exportContracts from "@purin-labs/commerce-contracts/entity-plane-export";
 import type {
   CommerceEntityPlaneExportPresetPublishRequest,
   CommerceEntityPlaneExportPresetPublishResponse,
-} from "@seams/commerce-contracts/entity-plane-export";
+} from "@purin-labs/commerce-contracts/entity-plane-export";
 export {
   EXPORT_COORDINATION_PRESET_ID,
   EXPORT_COORDINATION_PRESET_VERSION,
   type CommerceEntityPlaneExportPresetPublishRequest,
   type CommerceEntityPlaneExportPresetEvidence,
   type CommerceEntityPlaneExportPresetPublishResponse,
-} from "@seams/commerce-contracts/entity-plane-export";
+} from "@purin-labs/commerce-contracts/entity-plane-export";
 
 export function parseEntityPlaneExportPresetPublishRequest(
   value: unknown,

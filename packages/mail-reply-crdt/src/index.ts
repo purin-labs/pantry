@@ -10,7 +10,7 @@ import {
   type TextInputRange,
   type TextPresenceSelection,
   type TextSelectionDirection,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import * as Y from "yjs";
 import {
   BODY_LIMIT,
@@ -19,7 +19,7 @@ import {
   STATE_VECTOR_LIMIT,
 } from "./limits.ts";
 export { BODY_LIMIT, STATE_LIMIT } from "./limits.ts";
-export { RelativeTextSelection as MailReplySelection } from "@seams/collaboration";
+export { RelativeTextSelection as MailReplySelection } from "@purin-labs/collaboration";
 
 export const MAIL_REPLY_SCHEMA = "mail_reply_crdt.v1";
 

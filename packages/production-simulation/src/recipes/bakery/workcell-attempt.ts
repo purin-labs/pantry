@@ -1,12 +1,12 @@
 import { coldCell } from "./workcell-instances.ts";
-import { isCompletedLoading } from "@seams/bakery-model/bakery-physics";
+import { isCompletedLoading } from "@purin-labs/bakery-model/bakery-physics";
 import type {
   PhysicsRecording,
   PhysicsReplay,
   PhysicsSequence,
   PhysicsOutcome,
   PhysicsRackSequence,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import type {
   WorkcellInput,
   WorkcellResource,
@@ -16,8 +16,8 @@ import type {
   RackCycleInput,
 } from "./workcell-input.ts";
 import { physicsDuration, physicsOutcome } from "./physics-playback.ts";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const lifecycle: unique symbol = Symbol("workcell attempt lifecycle");
 export type WorkcellResourceStatus =

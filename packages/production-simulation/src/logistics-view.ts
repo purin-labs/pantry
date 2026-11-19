@@ -1,5 +1,5 @@
-import { assertNever, isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import * as d from "./document-values.ts";
 import type { Blocker, RunState, TaskState, TaskSubject } from "./state.ts";
 import { readBlocker } from "./blocker-document.ts";

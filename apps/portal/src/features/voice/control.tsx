@@ -7,7 +7,7 @@ import {
   type VoiceEngineId,
   type VoiceMacEnrollmentStart,
   type VoiceMacView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   ArrowLeft,
   AudioLines,
@@ -32,7 +32,7 @@ import {
   Select,
   type PermissionRequestDecision,
 } from "../../ui";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   enableCapabilities,
   mayEnableEvery,

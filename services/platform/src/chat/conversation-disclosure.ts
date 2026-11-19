@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { assertNever, canonicalJson, sha256Hex } from "@seams/std";
+import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import {
   readDisclosureState,
   sameDisclosureState,
@@ -8,7 +8,7 @@ import {
   type DisclosureProof,
   type DisclosureDestination,
 } from "./disclosure-evidence";
-import type { ChatDisclosureFailure } from "@seams/control-api";
+import type { ChatDisclosureFailure } from "@purin-labs/control-api";
 import {
   decideChatFlowDelivery,
   evaluateChatFlowLabelSink,
@@ -19,7 +19,7 @@ import {
   labelAllowsAudiences,
   type FlowLabel,
 } from "../policy/information-flow";
-import type { ConversationId, UserId } from "@seams/control-api";
+import type { ConversationId, UserId } from "@purin-labs/control-api";
 import { listProjectMembers } from "../projects/access";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import {
@@ -48,7 +48,7 @@ import {
   authorizeSideCaseAccess,
   readSideCaseOriginForCase,
 } from "./side-cases";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Whether every current reader of a conversation may be shown content under

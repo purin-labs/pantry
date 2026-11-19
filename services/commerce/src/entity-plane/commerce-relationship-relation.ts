@@ -8,12 +8,12 @@ import type {
   RelationshipRevision,
   SourceProvenance,
   SystemRelationshipDefinitionKind,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   compileCommerceRelationshipTraversalStepSql,
   type CommerceSqliteBinding,
   type CommerceSqliteRelationshipTraversalPlan,
-} from "@seams/commerce-query-sqlite";
+} from "@purin-labs/commerce-query-sqlite";
 import type { CommerceDatabase, CommerceSqlValue } from "../database.ts";
 import {
   parseEntityRef,
@@ -32,7 +32,7 @@ import { refreshCommerceAttributeRelation } from "./commerce-attribute-relation.
 import {
   relationshipDefinitionReference,
   sameRelationshipDefinitionRef,
-} from "@seams/commerce-contracts/commerce-relationship-references";
+} from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import {
   assertExactRelationColumns,
   explainUsesIndex,
@@ -41,8 +41,8 @@ import {
   syncDerivedRelationRows,
 } from "./relation-schema.ts";
 import { latestFoodServiceResources } from "../plugins/food-service/index.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { isNormalizedText } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isNormalizedText } from "@purin-labs/std";
 
 const RELATION_SCHEMA_VERSION = 7;
 

@@ -9,7 +9,7 @@ import {
   encodeBase64,
   hasExactKeys,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 const DOH_ENDPOINT = "https://cloudflare-dns.com/dns-query";
 const DOH_TIMEOUT_MS = 5_000;

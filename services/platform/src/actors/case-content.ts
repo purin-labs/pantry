@@ -2,10 +2,10 @@ import type {
   CaseContent,
   StoredMessageAttachment,
   UserMessage,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { deriveUserMessageViews } from "../messages/message-wasm";
 import { parseSourceProvenance } from "../commerce/source-provenance";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export function parseMessageCaseContent(
   value: unknown,

@@ -1,11 +1,11 @@
-import type { CaseAssignmentLifecycle, CaseLifecycle } from "@seams/contracts";
+import type { CaseAssignmentLifecycle, CaseLifecycle } from "@purin-labs/contracts";
 import type {
   MailWorkAssignment,
   MailWorkCaseState,
   MailWorkReply,
   MailWorkReplyState,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 import type { CaseGmailReplyProposal } from "../actors/case/types";
 import type { EmailReplyProposalLifecycle } from "../data/email-mailbox";
 

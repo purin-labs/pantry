@@ -9,7 +9,7 @@ import { DatabaseSync } from "node:sqlite";
 import {
   parseTerminalAssignment,
   type TerminalAssignment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const terminalControlMocks = vi.hoisted(() => ({

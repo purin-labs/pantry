@@ -14,8 +14,8 @@ import { runMailOrganization } from "../../mail-inbox/connector-runtime";
 import {
   createContinueSerialQueue,
   createKeyedContinueSerialQueue,
-} from "@seams/async-control/serial-queue";
-import type { ConnectorIdentity } from "@seams/contracts";
+} from "@purin-labs/async-control/serial-queue";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import { readWhatsAppIngressPolicy } from "../../data/whatsapp";
 import {
   newRequestId,

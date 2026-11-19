@@ -1,5 +1,5 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
-import type { CommerceListEntry } from "@seams/contracts";
+import type { CommerceListEntry } from "@purin-labs/contracts";
 import {
   parseInventoryProductionCreation,
   parseInventoryProductionTransition,
@@ -7,8 +7,8 @@ import {
   type InventoryProductionTransition,
   type InventoryProductionContext,
   type InventoryProductionRequest,
-} from "@seams/control-api";
-import { isNormalizedText, isPositiveInteger } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isNormalizedText, isPositiveInteger } from "@purin-labs/std";
 import {
   parseCommerceGraphQuery,
   parseProductionRequestFields,
@@ -16,7 +16,7 @@ import {
   parseListEntryReadRequest,
   CommerceEntityPlaneClient,
   type CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { Env } from "../../env";
 import {
   commerceListEntryPatchCommand,
@@ -29,7 +29,7 @@ import {
   resolveInventoryMutation,
   type InventoryControlMutation,
 } from "./inventory-control";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type ProductionAction =
   | Readonly<{ kind: "setup" }>

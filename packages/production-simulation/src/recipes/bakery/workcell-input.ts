@@ -2,7 +2,7 @@ import type {
   PhysicsRequest,
   PhysicsCyclePlan,
   PhysicsRackPlan,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 
 import {
   COLD_CELL,
@@ -13,8 +13,8 @@ import {
   type ResourceInstance,
   type ResourceInstanceId,
 } from "./workcell-instances.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const compiled: unique symbol = Symbol("compiled cold-tray input");
 

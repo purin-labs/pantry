@@ -1,7 +1,7 @@
-import type { BakeryRunOpenReview } from "@seams/bakery-model/bakery-surface";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+import type { BakeryRunOpenReview } from "@purin-labs/bakery-model/bakery-surface";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import type { ProductionReady, ProductionSession } from "./production-session";
-import type { ProductionWorkcells } from "@seams/production-simulation/recipes/bakery/production-workcells";
+import type { ProductionWorkcells } from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import {
   acceptedProductionResults,
   appliedRunPatch,
@@ -14,7 +14,7 @@ import {
   rehearsalSessionPatch,
 } from "./scheduled-rehearsal.ts";
 import type { SavedWorkspaceRun } from "./workspace-runs-api";
-import type { ScheduleSpatialLayout } from "@seams/production-simulation/recipes/bakery/schedule";
+import type { ScheduleSpatialLayout } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 
 const reviewedRun: unique symbol = Symbol("reviewed workspace run");
 

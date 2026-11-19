@@ -2,31 +2,31 @@ import {
   importScenario,
   type BakeryWorkflowDocument,
   type WorkflowEdge,
-} from "@seams/bakery-workflow";
-import { stepExecutorKind } from "@seams/bakery-workflow/draft";
-import { placeGraph } from "@seams/bakery-workflow/layout";
-import type { CompiledScenario } from "@seams/production-simulation";
-import type { PersistentCell } from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-workflow";
+import { stepExecutorKind } from "@purin-labs/bakery-workflow/draft";
+import { placeGraph } from "@purin-labs/bakery-workflow/layout";
+import type { CompiledScenario } from "@purin-labs/production-simulation";
+import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import {
   draftNodeId,
   type DraftNode,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft";
-import { err, ok, type Result } from "@seams/production-simulation";
-import { blackSesameRecipeInput } from "@seams/production-simulation/recipes/bakery/black-sesame";
-import { financierRecipeInput } from "@seams/production-simulation/recipes/bakery/financier";
-import { gingerBlackTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/ginger-black-tea";
-import { gingerMilkTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/ginger-milk-tea";
-import { compileLatte } from "@seams/production-simulation/recipes/bakery/latte";
+} from "@purin-labs/workflow-canvas-crdt/draft";
+import { err, ok, type Result } from "@purin-labs/production-simulation";
+import { blackSesameRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/black-sesame";
+import { financierRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/financier";
+import { gingerBlackTeaRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/ginger-black-tea";
+import { gingerMilkTeaRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/ginger-milk-tea";
+import { compileLatte } from "@purin-labs/production-simulation/recipes/bakery/latte";
 import {
   compilePieRecipe,
   PIE_PRODUCTS,
   pieRecipeInput,
   type PieType,
-} from "@seams/production-simulation/recipes/bakery/pie";
-import { compileSiphon } from "@seams/production-simulation/recipes/bakery/siphon";
-import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/production-simulation/recipes/bakery/pie";
+import { compileSiphon } from "@purin-labs/production-simulation/recipes/bakery/siphon";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import { prepareNativeRecipe } from "./oven-recipe-file";
 
 /** Which recipe a recipe simulation shows. */

@@ -1,5 +1,5 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import { createFinancierSample } from "../../commerce/bakery/sample";
 import {
   parseOperationEdit,
@@ -13,15 +13,15 @@ import {
   readCompletedAgentScenarioSave,
   settleAgentScenarioSave,
 } from "../../commerce/bakery/agent-scenario-save";
-import type { AgentScenarioSavePayload } from "@seams/bakery-model/bakery-agent-scenario-save";
+import type { AgentScenarioSavePayload } from "@purin-labs/bakery-model/bakery-agent-scenario-save";
 import {
   parseProductionScenario,
   type ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import {
   parseScenarioCopy,
   type ScenarioCopy,
-} from "@seams/bakery-model/bakery-scenario";
+} from "@purin-labs/bakery-model/bakery-scenario";
 import type { Env } from "../../env";
 import {
   controlMutationScope,
@@ -33,7 +33,7 @@ import { resolveMerchantBinding } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type BakeryAction =
   "sample" | "operation" | "scenario" | "production-scenario";

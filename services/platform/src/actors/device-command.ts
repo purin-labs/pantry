@@ -1,4 +1,4 @@
-import { machineTransition } from "@seams/std/state-machine";
+import { machineTransition } from "@purin-labs/std/state-machine";
 
 import { DEVICE_COMMAND_MACHINE } from "./device-command.machine";
 import { writeActorTransition } from "./lifecycle/state-transition";

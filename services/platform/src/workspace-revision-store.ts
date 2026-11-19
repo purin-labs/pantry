@@ -8,11 +8,11 @@ import type {
   WorkspaceId,
   WorkspaceRevision,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Result } from "./result";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord, sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "./organisation-execution-scope";
 import { parseOrganisationId, type OrganisationId } from "./ids";
 

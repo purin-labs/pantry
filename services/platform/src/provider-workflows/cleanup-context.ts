@@ -2,7 +2,7 @@ import type { OrganisationDatabaseSession } from "../database-handles";
 import type { VaultHandle } from "../credential-vault";
 import type { ProviderCleanupByProvider } from "../provider-adapters/domain";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export type ProviderCleanupBaseInput<
   P extends keyof ProviderCleanupByProvider,

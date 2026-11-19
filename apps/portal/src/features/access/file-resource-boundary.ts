@@ -1,5 +1,5 @@
-import type { GoogleDrivePickedFile } from "@seams/control-api/portal/access-models";
-import { bounded, record } from "@seams/control-api/portal/file-resources";
+import type { GoogleDrivePickedFile } from "@purin-labs/control-api/portal/access-models";
+import { bounded, record } from "@purin-labs/control-api/portal/file-resources";
 
 export type GooglePickerCallbackRuntime = Readonly<{
   Action: Readonly<{ PICKED: string; CANCEL: string; ERROR: string }>;

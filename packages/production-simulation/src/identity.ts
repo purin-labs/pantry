@@ -1,4 +1,4 @@
-import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
+import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import { err, ok, type Result } from "./result.ts";
 
 declare const idBrand: unique symbol;

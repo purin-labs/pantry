@@ -3,7 +3,7 @@
 import type {
   CommerceBuyerQuotedShippingCheckoutV1,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { merchantId, required } from "./journey-support.ts";
 

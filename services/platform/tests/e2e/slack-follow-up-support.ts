@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import {
   listPlacementActorRegistryEntries,

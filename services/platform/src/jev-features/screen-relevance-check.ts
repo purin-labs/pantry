@@ -1,6 +1,6 @@
-import type { RequestAuthority } from "@seams/contracts";
-import type { ScreenRelevanceBand } from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { ScreenRelevanceBand } from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 import type { AccountPlatformBindings } from "../account-platform/config";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import { newRequestId, type OrganisationId } from "../ids";

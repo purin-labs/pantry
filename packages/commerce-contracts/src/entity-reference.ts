@@ -5,8 +5,8 @@ import {
   type ContractRejection,
 } from "./schema.ts";
 import { Type, type Static } from "typebox";
-import type { StrictUnion } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 import { Value } from "typebox/value";
 
 import { trimmedIdentityTextSchema } from "./identity-text.ts";

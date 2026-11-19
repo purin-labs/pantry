@@ -28,7 +28,7 @@ import type {
   MailInboxWork,
   MailWorkAssignment,
   MailWorkReply,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   mailWorkCaseState,
   mailWorkAssignment,
@@ -53,7 +53,7 @@ import { reachableAttachmentObjectKeys } from "../messages/attachment-reachabili
 import type {
   CaseGoalSnapshot,
   CaseAssignmentLifecycle,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Env } from "../env";
 import { requireActiveOrganisationActor } from "./actor-router";
 import {
@@ -106,7 +106,7 @@ import {
 } from "../policy";
 import type { SerializedFlowBinding } from "../policy";
 import { sourceReaderForAuthority } from "../policy/information-flow/source-readers";
-import { errorMessage, isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
+import { errorMessage, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import { PlacedActor } from "./lifecycle/placed-actor";
 import {
   armAlarmBy,
@@ -238,7 +238,7 @@ import type {
   ProposalRow,
   QuarantinedCaseDiscardResult,
 } from "./case/types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** What a Case did with the ledger entry of the action that it waits on. */
 type CommerceApprovalSync = Readonly<{

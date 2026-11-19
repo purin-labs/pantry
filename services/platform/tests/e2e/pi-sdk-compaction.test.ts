@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   RecordingBoundary,
   sdkInput,

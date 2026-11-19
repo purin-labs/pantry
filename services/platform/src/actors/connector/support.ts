@@ -1,4 +1,4 @@
-import type { ConnectorIdentity } from "@seams/contracts";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { RequestId, SessionId } from "../../ids";
 import { slackAuthoredText } from "../../slack/events";
 import { traceWarn } from "../../observability";

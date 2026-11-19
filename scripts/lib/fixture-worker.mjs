@@ -31,7 +31,7 @@ export function prepareFixtureState({ config, persistence, log }) {
   const wrangler = (args) =>
     execFileSync(
       "pnpm",
-      ["--filter", "@seams/platform", "exec", "wrangler", ...args],
+      ["--filter", "@purin-labs/platform", "exec", "wrangler", ...args],
       { cwd: root, stdio: ["ignore", fd, fd] },
     );
   try {
@@ -76,7 +76,7 @@ const BUILT_PACKAGES = [
   ["packages/async-control/dist/deadline.js", "pnpm async-control:build"],
   [
     "packages/contracts/media-wasm-pkg/media_inspect.js",
-    "pnpm --filter @seams/contracts media:build",
+    "pnpm --filter @purin-labs/contracts media:build",
   ],
 ];
 

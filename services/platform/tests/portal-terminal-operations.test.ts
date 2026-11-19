@@ -6,7 +6,7 @@ import {
   type TerminalMutationTransport,
   type TerminalReadTransport,
 } from "../../../apps/portal/src/features/terminals/api";
-import type { TerminalCounterReadback } from "@seams/control-api";
+import type { TerminalCounterReadback } from "@purin-labs/control-api";
 
 const ORGANISATION = "organisation_1";
 const PATH = `/v1/control/organisations/${ORGANISATION}/commerce/terminal-operations`;

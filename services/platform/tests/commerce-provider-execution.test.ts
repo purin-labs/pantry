@@ -2,7 +2,7 @@ import { requireOrganisationId, requireIntegrationAccountId } from "./test-ids";
 /// <reference types="@cloudflare/workers-types" />
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { CommerceProjection, RequestAuthority } from "@seams/contracts";
+import type { CommerceProjection, RequestAuthority } from "@purin-labs/contracts";
 
 const accountMocks = vi.hoisted(() => ({
   resolveActiveProviderAccountContext: vi.fn(),
@@ -96,7 +96,7 @@ import {
   type FlowAudience,
   type SerializedFlowBinding,
 } from "../src/policy";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 
 const NOW = Date.parse("2026-08-04T00:00:00.000Z");
 

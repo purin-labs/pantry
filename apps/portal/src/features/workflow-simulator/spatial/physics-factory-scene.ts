@@ -1,9 +1,9 @@
-import type { FloorPlanOpening } from "@seams/production-simulation/floor/openings";
+import type { FloorPlanOpening } from "@purin-labs/production-simulation/floor/openings";
 import { pickFloorPlanOpening } from "./floor-plan-openings-3d";
 import { floorPlanWorkspace } from "../floor-plan-workspace";
-import type { StrictUnion, Variant } from "@seams/type-utils";
-import type { LogisticsView } from "@seams/production-simulation";
-import type { PersistentPhysicsMotion } from "@seams/bakery-model/bakery-physics";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
+import type { LogisticsView } from "@purin-labs/production-simulation";
+import type { PersistentPhysicsMotion } from "@purin-labs/bakery-model/bakery-physics";
 import * as THREE from "three";
 import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
@@ -34,19 +34,19 @@ import type {
   SynchronizedApplianceState,
   SynchronizedCobotTransferState,
 } from "../../production-run/morning-shift-appliances";
-import { type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import { type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   moveApplianceWithCollisions,
   rotateApplianceWithCollisions,
   setApplianceRotationWithCollisions,
 } from "../bakery-appliance-layout";
-import { getApplianceBox } from "@seams/production-simulation/floor/collisions";
+import { getApplianceBox } from "@purin-labs/production-simulation/floor/collisions";
 import {
   APPLIANCE_FOOTPRINTS,
   STORE_DECOR_IDS,
   isApplianceId,
   type ApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import { createFloorPlanShell, type FloorPlanShell } from "./floor-plan-shell";
 import {
   getStoreInteriorDesign,

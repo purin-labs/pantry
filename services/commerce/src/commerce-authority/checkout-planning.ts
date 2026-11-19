@@ -1,4 +1,4 @@
-import { selectInventoryConsumptionPlan } from "@seams/commerce-contracts";
+import { selectInventoryConsumptionPlan } from "@purin-labs/commerce-contracts";
 import {
   convertPrice,
   parseCart,
@@ -27,7 +27,7 @@ import {
   pointOfSaleConfigurationIsSellable,
   pointOfSaleQuantityCeiling,
   type CreateCommerceInPersonCheckoutV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   PointOfSaleConfiguration,
   Cart,
@@ -45,7 +45,7 @@ import type {
   Money,
   ShippingRouteBinding,
   Storefront,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   checkoutQuoteDigest,
@@ -97,8 +97,8 @@ import {
 } from "./checkout-pipeline.ts";
 import { pluginActive } from "../plugins/plugin-state.ts";
 import { MERCHANT_TAX_AUTHORITY_REFERENCE } from "../checkout-charge-provider.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type BuyerPickupCheckoutCommand = Readonly<{
   schemaVersion: "underclerk.submit-buyer-pickup-cart.v1";

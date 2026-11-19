@@ -3,7 +3,7 @@ import {
   acceptedExecutionAccountAuthority,
   type AccountPlatformAccess,
 } from "../account-platform/access";
-import type { HarnessTurnLease, RequestAuthority } from "@seams/contracts";
+import type { HarnessTurnLease, RequestAuthority } from "@purin-labs/contracts";
 import {
   isProjectId,
   isConversationId,
@@ -11,14 +11,14 @@ import {
   type ConversationId,
   type ProjectId,
   type UserId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   assertNever,
   hasExactKeys,
   isRecord,
   isNonBlankString,
   isNonNegativeInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { ControlSessionId, SessionId, OrganisationId } from "../ids";
 import { resolveControlSessionById } from "../data/control-plane";
 import type { ConversationScope } from "./store";
@@ -33,7 +33,7 @@ import {
   parseSessionId,
   parseOrganisationId,
 } from "../ids";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   parseStoredRequestAuthority,

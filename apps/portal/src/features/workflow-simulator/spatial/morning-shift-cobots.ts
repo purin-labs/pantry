@@ -2,7 +2,7 @@ import { floorPlanWorkspace } from "../floor-plan-workspace";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { SynchronizedCobotTransferState } from "../../production-run/morning-shift-appliances";
-import { type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import { type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 
 import {
   buildArticulatedHumanWorker,

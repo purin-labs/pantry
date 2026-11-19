@@ -82,14 +82,14 @@ import {
   hasExactKeys,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { readOnboardingRow } from "../../data/organisation-onboarding-row";
 import {
   prepareServiceInvitationRole,
   readServiceInvitationRole,
   serviceInvitationRoleExists,
 } from "../../data/service-invitation-role";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type OnboardingControlRoute =
   | Readonly<{ kind: "accountOnboarding" }>

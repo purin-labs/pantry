@@ -1,4 +1,4 @@
-import type { AgentOperationCommand, AgentOperationsSnapshot, AgentRevisionTarget } from "@seams/control-api/portal/agent-operations";
+import type { AgentOperationCommand, AgentOperationsSnapshot, AgentRevisionTarget } from "@purin-labs/control-api/portal/agent-operations";
 
 export const EMPTY_AGENT_OPERATIONS_SNAPSHOT: AgentOperationsSnapshot = {
   areas: [],

@@ -7,7 +7,7 @@ import type {
   RelationshipDefinitionRevision,
   SystemRelationshipDefinitionRef,
 } from "./index.ts";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 export function relationshipDefinitionReference(
   definition: VariantBy<RelationshipDefinition, "origin", "custom">,

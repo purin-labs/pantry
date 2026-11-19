@@ -4,13 +4,13 @@ import {
   type CommerceOrderV1,
   type ProductSalesWindow,
   type ProductSalesReport,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 export type {
   ProductSalesWindow,
   ProductSalesReport,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type ReportedSales = Variant<ProductSalesReport, "reported">;
 type SalesGroup = ReportedSales["groups"][number];

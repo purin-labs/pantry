@@ -24,7 +24,7 @@ import {
   isPositiveInteger,
   isRecord,
   isSha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export class ObservationEvidence {
   readonly source: FlowSource;

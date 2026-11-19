@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { parseCommerceExceptionInbox, parseTrackingBatchPreviewResponse } from "@seams/control-api/portal/commerce-operations";
-import type { MissingTrackingException } from "@seams/control-api";
+import { parseCommerceExceptionInbox, parseTrackingBatchPreviewResponse } from "@purin-labs/control-api/portal/commerce-operations";
+import type { MissingTrackingException } from "@purin-labs/control-api";
 
 const BATCH_ID = `tracking_batch_${"a".repeat(64)}`;
 

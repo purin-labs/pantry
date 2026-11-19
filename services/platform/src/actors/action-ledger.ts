@@ -3,7 +3,7 @@ import type {
   CanonicalAction,
   CommerceEntityPlaneEffect,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   parseCaseId,
@@ -40,8 +40,8 @@ import type { SerializedFlowBinding } from "../policy";
 import { flowBindingMatchesIdentity } from "../policy";
 import { parseCommerceEntityPlaneEffect } from "../commerce/entity-plane/proposals";
 import { slackMayApproveAction } from "../commerce/action-model";
-import type { VariantBy } from "@seams/type-utils";
-import { isNonNegativeInteger, isRecord, isSha256Hex } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isNonNegativeInteger, isRecord, isSha256Hex } from "@purin-labs/std";
 
 export type CanonicalActionDraft = {
   host: string;

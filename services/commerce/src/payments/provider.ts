@@ -4,14 +4,14 @@ import type {
   CommercePaymentRefundResultV1,
   CommercePaymentSessionResultV1,
   CommercePaymentCaptureResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CheckoutPaymentProviderBinding,
   InPersonPaymentBinding,
   InPersonPaymentMethod,
   OnlinePaymentBinding,
-} from "@seams/commerce-contracts";
-import type { VariantBy } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 type MerchantPaymentRequestBase<
   TBinding extends CheckoutPaymentProviderBinding,

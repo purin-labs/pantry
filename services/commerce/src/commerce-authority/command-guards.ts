@@ -1,5 +1,5 @@
-import type { CommerceMutationErrorV1 } from "@seams/commerce-client";
-import { errorMessage } from "@seams/std";
+import type { CommerceMutationErrorV1 } from "@purin-labs/commerce-client";
+import { errorMessage } from "@purin-labs/std";
 
 export function invalidCommand(error: unknown): CommerceMutationErrorV1 {
   return { code: "invalid_command", field: errorMessage(error) };

@@ -1,7 +1,7 @@
 import {
   parseJevFeatureCommand,
   type JevFeatureCommand,
-} from "@seams/control-api/portal/jev-features";
+} from "@purin-labs/control-api/portal/jev-features";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { ProposalArgumentError, defineTool, jsonSchema } from "../define-tool";
 

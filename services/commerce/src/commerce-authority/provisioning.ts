@@ -14,7 +14,7 @@ import {
   type CommerceMerchantSnapshotV1,
   type CommerceMutationResultV1,
   type CommerceQuantityV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { isMerchantId } from "../merchant-id.ts";
 import type { CommerceDatabase } from "../database.ts";
 import type { FoodServiceExtension } from "../plugins/built-in-ports.ts";

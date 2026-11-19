@@ -1,6 +1,6 @@
-import { parseCommerceGraphResponse } from "@seams/commerce-client";
-import type { CommerceGraphQueryResult } from "@seams/contracts";
-import { isRecord } from "@seams/std";
+import { parseCommerceGraphResponse } from "@purin-labs/commerce-client";
+import type { CommerceGraphQueryResult } from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 
 export type CommercePresentationParseError = Readonly<{
   kind: "invalid_response";

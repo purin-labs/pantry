@@ -11,7 +11,7 @@ import type {
   SessionCommand,
   TurnLifecycle,
 } from "./index";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 // @ts-expect-error Direct conversation authority requires the resolved organisation role.
 const invalidDirectRequestAuthority: RequestAuthority = {

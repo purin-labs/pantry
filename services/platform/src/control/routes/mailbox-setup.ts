@@ -1,4 +1,4 @@
-import { parseMailboxSetupAgentChoice } from "@seams/control-api";
+import { parseMailboxSetupAgentChoice } from "@purin-labs/control-api";
 
 import type { Env } from "../../env";
 import { parseIntegrationAccountId } from "../../ids";

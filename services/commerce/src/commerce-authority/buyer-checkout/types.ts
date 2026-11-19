@@ -14,8 +14,8 @@ import type {
   CommerceMerchantSnapshotV1,
   CommerceMutationErrorV1,
   CommerceMutationResultV1,
-} from "@seams/commerce-client";
-import type { Storefront } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { Storefront } from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../../database.ts";
 import type { BuyerSessionClaims } from "../../buyer-session.ts";
 import type { PaymentGateway } from "../../payments/provider.ts";
@@ -30,7 +30,7 @@ import type {
   BuyerShippingDestinationAuthority,
   PickupCheckoutPlan,
 } from "../checkout-planning.ts";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import type { CheckoutBuyer } from "../../plugins/customers/index.ts";
 
 export type BuyerMerchantRow = Readonly<{

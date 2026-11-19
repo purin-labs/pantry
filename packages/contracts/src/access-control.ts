@@ -1,10 +1,10 @@
 import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
-import { commerceAuthorityScopeWireSchema } from "@seams/commerce-contracts/authority-scope";
-import { commerceMutationTargetWireSchema } from "@seams/commerce-contracts/entity-plane-receipts";
-import { parseCommerceGraphQuery } from "@seams/commerce-contracts/graph-query";
-import { systemEntityTypeIdSchema } from "@seams/commerce-contracts/query-parts";
-import { hasLoneSurrogate, isRecord } from "@seams/std";
+import { commerceAuthorityScopeWireSchema } from "@purin-labs/commerce-contracts/authority-scope";
+import { commerceMutationTargetWireSchema } from "@purin-labs/commerce-contracts/entity-plane-receipts";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-contracts/graph-query";
+import { systemEntityTypeIdSchema } from "@purin-labs/commerce-contracts/query-parts";
+import { hasLoneSurrogate, isRecord } from "@purin-labs/std";
 
 // Plan 78: TypeScript port of access_control.rs. Rust validates these values
 // with serde alone, so each schema is the derived serde shape: every listed

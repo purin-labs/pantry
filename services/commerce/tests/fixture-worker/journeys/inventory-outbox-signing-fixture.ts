@@ -1,9 +1,9 @@
 import { createPublicKey, verify } from "node:crypto";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   parseCommerceDelivery,
   commerceDeliverySignaturePayload,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { migrateOutboxSignatures } from "../../../src/entity-plane/outbox-signing-migration.ts";
 import type { CommerceSigner } from "../../../src/commerce-authority/contracts.ts";
 import type { CommerceDatabase } from "../../../src/database.ts";

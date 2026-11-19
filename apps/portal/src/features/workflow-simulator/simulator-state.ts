@@ -3,7 +3,7 @@ import type {
   BakeryWorkspaceViewAction,
   BakeryRecordingCameraView,
   BakeryShiftDock,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { ProductionNavigation } from "./production-navigation.ts";
 import {
   workspaceRunReviewCurrent,
@@ -17,40 +17,40 @@ import {
   type PreparedProductionReplacement,
 } from "./production-draft.ts";
 import type { PreparedRehearsalReview } from "./rehearsal-edits.ts";
-import { summarizeRun, type RunSummary } from "@seams/production-simulation/simulator/run-comparison";
+import { summarizeRun, type RunSummary } from "@purin-labs/production-simulation/simulator/run-comparison";
 export type SceneLabelMode = "auto" | "all" | "off";
-import { sessionPlaybackSnapshot } from "@seams/production-simulation/simulator/playback-state";
-import type { PlaybackSnapshot } from "@seams/production-simulation/simulator/playback-state";
+import { sessionPlaybackSnapshot } from "@purin-labs/production-simulation/simulator/playback-state";
+import type { PlaybackSnapshot } from "@purin-labs/production-simulation/simulator/playback-state";
 import {
   sampleSettings,
   type Settings,
   type SettingsField,
   type SettingsResult,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 
-import { runProcedure, type ProcedureRun } from "@seams/production-simulation/simulator/procedure";
+import { runProcedure, type ProcedureRun } from "@purin-labs/production-simulation/simulator/procedure";
 import {
   simulate,
   simulateProduction,
   type Run,
   type ScheduleSpatialLayout,
   type ScheduleVariant,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   selectionExists,
   selectionForRun,
   type Selection,
-} from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/simulator/selection";
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api";
 import type {
   RunSnapshotKind,
   RunSnapshotSummary,
-} from "@seams/bakery-model/bakery-run-snapshot";
+} from "@purin-labs/bakery-model/bakery-run-snapshot";
 import type {
   PreparedWorkspaceRun,
   WorkspaceRunSave,
 } from "./workspace-runs-api.ts";
-import type { PhysicsReplay } from "@seams/bakery-model/bakery-physics";
+import type { PhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import { rehearsalSessionPatch } from "./scheduled-rehearsal.ts";
 import type { PreparedRehearsalEdit } from "./rehearsal-edits.ts";
 import {
@@ -71,12 +71,12 @@ import type {
   ProductionProcedure,
   ProductionWorkcell,
   ProductionWorkcells,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
-import type { BakerySurfaceEditProposalV1 } from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
+import type { BakerySurfaceEditProposalV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type {
   AgentScenarioSaveManifest,
   AgentScenarioSavePayload,
-} from "@seams/bakery-model/bakery-agent-scenario-save";
+} from "@purin-labs/bakery-model/bakery-agent-scenario-save";
 import {
   changePlaybackSpeed,
   closePhysicsReplay,
@@ -94,9 +94,9 @@ import {
   type PlaybackSession,
   type RecordingReplayView,
   type ReplayState,
-} from "@seams/production-simulation/simulator/playback-state";
-import type { Variant, StrictUnion } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation/simulator/playback-state";
+import type { Variant, StrictUnion } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type BakeryWorkspaceIdentity = Readonly<{
   surfaceSessionId: string;

@@ -1,6 +1,6 @@
 import { Select } from "../ui/select";
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { ReasoningSteps, type ReasoningStep } from "../ui/reasoning-steps";
 import "./chat-activity-preview.css";
 

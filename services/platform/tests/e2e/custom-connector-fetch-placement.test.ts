@@ -1,7 +1,7 @@
 import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import { installMemoryFixture, type Member } from "./memory-support";

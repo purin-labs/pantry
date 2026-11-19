@@ -13,7 +13,7 @@ import {
 } from "./email-operational";
 import { resolveActiveProviderAccountContext } from "./integration-account";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "./commerce-merchant-binding";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 export type ContactEndpoint =
   | Readonly<{ channel: "gmail"; address: string; waId?: never }>

@@ -1,14 +1,14 @@
 import type { ControlMutationIntent } from "../../../control-client";
-import { parseCommerceGraphQuery, parseCommerceViewPresentation, parseEntityPlaneCommandResult, parseEntityPlaneChanges, parseEntityPlanePublishedResourceMetadataResponse, parsePurchasingPresetPublishResponse, parsePurchasingReconcileResponse, purchaseRequestAttributeValues, REPLENISHMENT_QUEUE_LIST_ID, type PurchaseRequestUpdate, type CommerceEntityPlaneChanges, type CommerceEntityPlanePublishedResourceMetadataResponse } from "@seams/commerce-client";
-import type { AttributeDefinitionId, AttributeOption, CommerceAggregationResult, CommerceEntityPlaneCommand, CommerceEntityRef, CommerceEntityTypeId, CommerceFilter, CommerceGraphQuery, CommerceGraphQueryResult, CommerceList, CommerceListEntry, CommerceListId, CommercePagination, CommerceSnapshotRevision, CommerceTraversalLimits, CommerceViewPresentation, CustomCommerceEntityRef, ListEntryAttributeDefinition, ListEntryAttributeValue, SavedCommerceView, SavedCommerceViewId, SystemCommerceEntityKind, CommerceMutationReceiptV1 } from "@seams/contracts";
-import { parseInventory } from "@seams/contracts";
+import { parseCommerceGraphQuery, parseCommerceViewPresentation, parseEntityPlaneCommandResult, parseEntityPlaneChanges, parseEntityPlanePublishedResourceMetadataResponse, parsePurchasingPresetPublishResponse, parsePurchasingReconcileResponse, purchaseRequestAttributeValues, REPLENISHMENT_QUEUE_LIST_ID, type PurchaseRequestUpdate, type CommerceEntityPlaneChanges, type CommerceEntityPlanePublishedResourceMetadataResponse } from "@purin-labs/commerce-client";
+import type { AttributeDefinitionId, AttributeOption, CommerceAggregationResult, CommerceEntityPlaneCommand, CommerceEntityRef, CommerceEntityTypeId, CommerceFilter, CommerceGraphQuery, CommerceGraphQueryResult, CommerceList, CommerceListEntry, CommerceListId, CommercePagination, CommerceSnapshotRevision, CommerceTraversalLimits, CommerceViewPresentation, CustomCommerceEntityRef, ListEntryAttributeDefinition, ListEntryAttributeValue, SavedCommerceView, SavedCommerceViewId, SystemCommerceEntityKind, CommerceMutationReceiptV1 } from "@purin-labs/contracts";
+import { parseInventory } from "@purin-labs/contracts";
 import { responseJson } from "../../../control-client";
 import { needsReorder } from "../stock-status";
-import { parseCommerceGraphQueryResult } from "@seams/control-api/portal/entity-plane-boundary";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
-import type { CommerceActivityResource, CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, SupplierCreation } from "@seams/control-api";
-import { type CommerceActivityResult, type CommerceListEntryPatchOutcome, parseCommerceActivityResponse, parseCommerceBoardPresenceEntry, parseCommerceListEntryPatchResponse } from "@seams/control-api/portal/entity-plane";
+import { parseCommerceGraphQueryResult } from "@purin-labs/control-api/portal/entity-plane-boundary";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
+import type { CommerceActivityResource, CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, SupplierCreation } from "@purin-labs/control-api";
+import { type CommerceActivityResult, type CommerceListEntryPatchOutcome, parseCommerceActivityResponse, parseCommerceBoardPresenceEntry, parseCommerceListEntryPatchResponse } from "@purin-labs/control-api/portal/entity-plane";
 
 const TABLE_TRAVERSAL: CommerceTraversalLimits = {
   maxDepth: 0,

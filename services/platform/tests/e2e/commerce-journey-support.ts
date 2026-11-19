@@ -2,7 +2,7 @@
 // API, the trust of a shop's signed deliveries, and the headers of a
 // configuration change.
 import { env } from "cloudflare:workers";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { fixtureDatabase } from "./organisation-database";
 

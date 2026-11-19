@@ -1,4 +1,4 @@
-import type { ListEntryAttributeValue, Quantity } from "@seams/commerce-contracts";
+import type { ListEntryAttributeValue, Quantity } from "@purin-labs/commerce-contracts";
 import { parseQuantity } from "./commerce-resources.ts";
 import { parseListEntryAttributeValue } from "./entity-plane/primitives.ts";
 

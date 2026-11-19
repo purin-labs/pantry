@@ -6,7 +6,7 @@ import {
   type FinancierBakeRecipeConfig,
   type FinancierMouldCount,
   type FinancierRackSlot,
-} from "@seams/production-simulation/recipes/financier-bake/model";
+} from "@purin-labs/production-simulation/recipes/financier-bake/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{

@@ -3,14 +3,14 @@ import type {
   CommerceEntityRevision,
   CommerceSnapshotRevision,
   CustomCommerceEntityRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceEntityRevision,
   parseCommerceGraphQuery,
   parseCommerceSnapshotRevision,
   parseEntityPlaneCommand,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 const validated: unique symbol = Symbol("bakery operation edit");
 

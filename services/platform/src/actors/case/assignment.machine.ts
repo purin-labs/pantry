@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /** An assignment that nothing has moved for this long may be abandoned. */
 export const ASSIGNMENT_ABANDON_AFTER_MS = 30 * 60_000;

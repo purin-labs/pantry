@@ -1,7 +1,7 @@
 import {
   applyPreferenceEdit,
   defaultPreferenceDocument,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /** Uses the existing browser fixture for session, membership, and workspace data. */
 export async function runAccountSetupJourney(page, options) {

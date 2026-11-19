@@ -9,7 +9,7 @@ import {
   MEDIA_MAX_BYTES,
   type CommerceMediaContentType,
   type CommerceMediaUploadV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export type StoredMedia = Readonly<{
   size: number;

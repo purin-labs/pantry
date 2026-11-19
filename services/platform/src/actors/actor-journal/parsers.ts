@@ -3,12 +3,12 @@ import {
   encodeCodeModeExecutionRecord,
 } from "../code-mode-execution-record";
 import { parseFlowSource } from "../../policy/information-flow/oac";
-import { parseProjectSnapshot, type ProjectSnapshot } from "@seams/control-api";
+import { parseProjectSnapshot, type ProjectSnapshot } from "@purin-labs/control-api";
 import type {
   AcceptedInputRef,
   EventEnvelope,
   SessionTransition,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Result } from "../../result";
 import { readCanonicalSessionProjection } from "../agent-session-canonical";
 import {
@@ -20,8 +20,8 @@ import {
   memoryObservationRecordId,
   type ContextBundle,
 } from "../../context/assembly";
-import type { VariantBy } from "@seams/type-utils";
-import { hasExactKeys, isNonEmptyString, isRecord } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { hasExactKeys, isNonEmptyString, isRecord } from "@purin-labs/std";
 import type {
   AcceptedActorCommand,
   AcceptedInputLookup,

@@ -5,7 +5,7 @@ import type { MailDraftDecision } from "./conversation";
 import { formatListDate, formatMailDate, senderParts } from "./thread";
 import React from "react";
 import { toast } from "sonner";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { forgetWithControlReads } from "../../control-client";
 import { mailRuleLabel } from "./rule-label";
 import type {
@@ -15,7 +15,7 @@ import type {
   MailInboxThreadMessage,
   MailClassifiedFilter,
   MailDecision,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { MailOrganizationPanel } from "./organization";
 import {
   mailProcessingView,
@@ -25,7 +25,7 @@ import {
 import { MailProcessingMenu } from "./processing-menu";
 import { formatMailCheckTime, MailStatusMenu } from "./status-menu";
 import { MailboxTurnOnSheet } from "./turn-on-sheet";
-import type { MailOrganizationView } from "@seams/control-api";
+import type { MailOrganizationView } from "@purin-labs/control-api";
 import {
   checkMailAgent,
   readInbox,
@@ -35,7 +35,7 @@ import {
   type InboxWhatsAppSource,
   type MailboxCheck,
 } from "./api";
-import type { MailAgentState } from "@seams/control-api/portal/mail-agent";
+import type { MailAgentState } from "@purin-labs/control-api/portal/mail-agent";
 import { InboxAgentSheet } from "./agent-sheet";
 import { WhatsAppConversation } from "./whatsapp-conversation";
 import { PermissionRequiredPrompt } from "../access/permission-required-prompt";
@@ -54,13 +54,13 @@ import {
   type MailDraftItem,
 } from "./agent";
 import { emailReplyIsOpenable } from "../../pages/agent-mailbox";
-import type { EmailReplyQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import {
   whatsappConversationTab,
   type InboxTab,
   type InboxUnansweredThread,
   type InboxWhatsAppConversation,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   Bot,
   Check,
@@ -1118,7 +1118,7 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
   };
 
   private assistantRule = (
-    rule: import("@seams/control-api").MailRule,
+    rule: import("@purin-labs/control-api").MailRule,
   ): void => {
     this.organizationPanel.current?.reviewSuggestedRule(rule);
   };
@@ -1242,7 +1242,7 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
     }
   };
   private renderCorrection = (
-    result: import("@seams/control-api").MailClassification,
+    result: import("@purin-labs/control-api").MailClassification,
   ): React.ReactNode => {
     if (this.state.thread.kind !== "ready") return null;
     let subject: string | null = null;
@@ -1330,7 +1330,7 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
     );
   }
   private renderCategoryFilter = (
-    rule: import("@seams/control-api").MailRule,
+    rule: import("@purin-labs/control-api").MailRule,
   ): React.ReactNode => {
     if (rule.kind !== "categorize") return null;
     return (
@@ -2571,7 +2571,7 @@ function messageForError(error: unknown): string {
 
 function classifiesOneOf(
   messages: readonly MailInboxThreadMessage[],
-  result: import("@seams/control-api").MailClassification,
+  result: import("@purin-labs/control-api").MailClassification,
 ): boolean {
   for (const message of messages)
     if (message.messageId === result.messageId) return true;

@@ -1,5 +1,5 @@
-import { draftSeed } from "@seams/bakery-workflow/draft";
-import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
+import { draftSeed } from "@purin-labs/bakery-workflow/draft";
+import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   DRAFT_ENCODING_LIMITS,
   DraftEncoding,
@@ -7,7 +7,7 @@ import {
   WorkflowDraftDoc,
   type DraftChangeSet,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft";
+} from "@purin-labs/workflow-canvas-crdt/draft";
 import {
   FRAME_LIMIT,
   encodeDraftServerMessage,
@@ -15,8 +15,8 @@ import {
   type DraftProtocolFailureCode,
   type DraftRoomMetadata,
   type DraftSelection,
-} from "@seams/workflow-canvas-crdt/draft-protocol";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/workflow-canvas-crdt/draft-protocol";
+import { assertNever } from "@purin-labs/std";
 import {
   isBakeryWorkflowId,
   readCurrentWorkflow,

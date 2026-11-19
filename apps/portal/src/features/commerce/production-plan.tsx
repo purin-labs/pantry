@@ -4,10 +4,10 @@ import {
   PRODUCTION_PLAN_ACCEPT_LIMIT,
   type InventoryProductionPlanOutcome,
   type InventoryProductionRequest,
-} from "@seams/control-api";
-import { isPlanQuantity } from "@seams/production-plan-crdt";
-import type { Quantity } from "@seams/contracts";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isPlanQuantity } from "@purin-labs/production-plan-crdt";
+import type { Quantity } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
 import {
   ControlApiError,
   controlMutation,
@@ -23,7 +23,7 @@ import "./inventory.css";
 import {
   type PlanSharing,
   parseSharing,
-} from "@seams/control-api/portal/production-plan-sharing";
+} from "@purin-labs/control-api/portal/production-plan-sharing";
 
 /**
  * Plan 40D: the shared plan of one location. Each request that waits for

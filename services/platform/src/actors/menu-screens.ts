@@ -2,8 +2,8 @@ import {
   MENU_SCREEN_SIGNAL,
   MENU_SCREEN_SOCKET_PROTOCOL,
   type MenuScreenSummary,
-} from "@seams/control-api";
-import { isNonNegativeInteger, isRecord, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isNonNegativeInteger, isRecord, sha256Hex } from "@purin-labs/std";
 
 import { controlError } from "../control/http";
 import type { UserId } from "../ids";

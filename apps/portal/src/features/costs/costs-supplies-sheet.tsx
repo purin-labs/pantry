@@ -3,8 +3,8 @@ import type {
   CalculatedSupplyUsage,
   CostUnit,
   SupplyCostItem,
-} from "@seams/control-api";
-import { supplyFieldCellKey } from "@seams/costs-sheet-crdt";
+} from "@purin-labs/control-api";
+import { supplyFieldCellKey } from "@purin-labs/costs-sheet-crdt";
 import { formatMoneyMinor } from "../../formatting";
 import { CrmTable, CrmTag, Select, type CrmColumn } from "../../ui";
 import { compatibleUnitsForBase, formatCostQuantity } from "./api";

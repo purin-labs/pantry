@@ -2,8 +2,8 @@ import type {
   LogisticsView,
   TaskDependencyView,
   TaskView,
-} from "@seams/production-simulation";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { assertNever } from "@purin-labs/std";
 import type React from "react";
 import {
   seconds,
@@ -11,7 +11,7 @@ import {
   SelectedOvenTask,
   type TaskSelection,
 } from "./oven-logistics";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = TaskSelection &
   Readonly<{

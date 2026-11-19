@@ -2,8 +2,8 @@ import type {
   MenuDraftSnapshot,
   MenuItem,
   MenuSection,
-} from "@seams/menu-draft-crdt";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@seams/std";
+} from "@purin-labs/menu-draft-crdt";
+import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type MenuDraftReview = Readonly<{
   reviewId: string;

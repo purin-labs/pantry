@@ -2,7 +2,7 @@ import React from "react";
 import type {
   CounterRegisterMenuEntry,
   CounterRegisterModifierGroup,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { SideDrawer } from "../../ui";
 
 export type ModifierDrawerSelection = Readonly<{

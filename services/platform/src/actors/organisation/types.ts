@@ -3,7 +3,7 @@ import type {
   CommerceQueryPlanErrorCapability,
   CommerceReadWatermark,
   SystemCommerceEntityRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   IntegrationAccountId,
   RequestId,
@@ -23,7 +23,7 @@ import type { CodeModeBudgetError } from "../code-mode-budget";
 import type {
   CommerceBoardDragPreview,
   CommerceBoardPresenceSelection,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export type OrganisationPing = {
   ok: true;

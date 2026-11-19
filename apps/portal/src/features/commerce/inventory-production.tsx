@@ -10,10 +10,10 @@ import {
   type InventoryProductionContext,
   type InventoryProductionRecipe,
   type InventoryProductionRequest,
-} from "@seams/control-api";
-import { assertNever, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, isRecord } from "@purin-labs/std";
 import { StatusChip, type StatusChipStatus } from "../../page-components";
-import type { Quantity } from "@seams/contracts";
+import type { Quantity } from "@purin-labs/contracts";
 import { ControlApiError, controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import {
@@ -39,7 +39,7 @@ import {
   neededByDateInput,
   neededByTimestamp,
 } from "./needed-by";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
   userId: string;

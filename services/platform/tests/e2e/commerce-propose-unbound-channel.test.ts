@@ -1,6 +1,6 @@
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { commerceCanonicalResourceId } from "../../src/commerce/provider";
 import { commerceHeaders } from "./commerce-support";

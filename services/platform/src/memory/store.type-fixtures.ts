@@ -1,4 +1,4 @@
-import type { MemoryRevisionView } from "@seams/control-api";
+import type { MemoryRevisionView } from "@purin-labs/control-api";
 
 import type { FlowLabel } from "../policy/information-flow";
 import type { MemoryRevision, MemoryStoreCommand } from "./store";

@@ -8,8 +8,8 @@ import type {
   ModelContextSourceKind,
   Sha256Digest,
 } from "./types";
-import type { RequestAuthority } from "@seams/contracts";
-import { sha256Hex } from "@seams/std";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { sha256Hex } from "@purin-labs/std";
 import type { CaseContextReplayAuthority } from "../projection";
 
 export type {
@@ -50,7 +50,7 @@ import type {
   ObservationEvidence,
   SerializedFlowLabel,
 } from "../../policy";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 export {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,

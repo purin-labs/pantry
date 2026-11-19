@@ -2,7 +2,7 @@
 // order lines; staff authorize or reject each line, receive the items with a
 // disposition for each line, and close the return with the refund they made.
 import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
-import { parseAuthorizeCommerceReturnV1 as parseAuthorizeCommerceReturnV1Record, parseCloseCommerceReturnV1 as parseCloseCommerceReturnV1Record, parseReceiveCommerceReturnV1 as parseReceiveCommerceReturnV1Record, parseRequestCommerceBuyerReturnV1 as parseRequestCommerceBuyerReturnV1Record, parseRequestCommerceReturnV1 as parseRequestCommerceReturnV1Record, parseCommerceReturnV1 as parseCommerceReturnV1Record, parseCommerceReturnsV1 as parseCommerceReturnsV1Record } from "@seams/commerce-contracts/records/api-returns";
+import { parseAuthorizeCommerceReturnV1 as parseAuthorizeCommerceReturnV1Record, parseCloseCommerceReturnV1 as parseCloseCommerceReturnV1Record, parseReceiveCommerceReturnV1 as parseReceiveCommerceReturnV1Record, parseRequestCommerceBuyerReturnV1 as parseRequestCommerceBuyerReturnV1Record, parseRequestCommerceReturnV1 as parseRequestCommerceReturnV1Record, parseCommerceReturnV1 as parseCommerceReturnV1Record, parseCommerceReturnsV1 as parseCommerceReturnsV1Record } from "@purin-labs/commerce-contracts/records/api-returns";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 export const RETURN_DISPOSITIONS = [

@@ -3,12 +3,12 @@ import type {
   EmbeddedHarnessModelUsage,
   HarnessTurnLease,
   TurnIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   createCancellableTask,
   type CancellableTask,
   type TaskCancellationReason,
-} from "@seams/async-control/cancellable-task";
+} from "@purin-labs/async-control/cancellable-task";
 import { describe, expect, it } from "vitest";
 
 import type {

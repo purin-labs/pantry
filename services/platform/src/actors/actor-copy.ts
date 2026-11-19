@@ -23,7 +23,7 @@ import {
   actorStubForRegistryEntry,
   type ActorNamespaces,
 } from "./actor-router";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import { newRequestId } from "../ids";
 import { traceLog } from "../observability";
 

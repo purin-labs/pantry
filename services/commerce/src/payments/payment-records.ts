@@ -2,14 +2,14 @@ import type {
   PaymentDispute,
   PaymentDisputeLifecycle,
   RefundAttempt,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parsePaymentDispute,
   parseRefundAttempt,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type RefundAttemptRow = Readonly<{
   commandDigest: string;

@@ -8,7 +8,7 @@ import {
   type CommerceCounterSaleV1,
   type CommerceMutationResultV1,
   type ObserveCommercePaymentDisputeV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { readPointOfSaleConfigurationForCheckout } from "../../point-of-sale-configuration-persistence.ts";
 import { rejected, sha256, validateMerchant } from "../ledger.ts";
 import { parseStripeDisputeEvent } from "../../payments/stripe/stripe-disputes.ts";

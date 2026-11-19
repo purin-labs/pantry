@@ -4,7 +4,7 @@ import {
   type CommerceFoodServiceSnapshotV1,
   type CommerceMerchantSnapshotV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../../database.ts";
 import type { MerchantRow } from "../../commerce-authority/ledger.ts";
 import {

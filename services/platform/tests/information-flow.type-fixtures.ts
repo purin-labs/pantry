@@ -46,8 +46,8 @@ import type {
   ChatDisclosureFailure,
   ProjectLayer,
   ProjectReferenceObservation,
-} from "@seams/control-api";
-import type { RequestAuthority } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 function permitEscapeHatches(
   permit: AuthorizedContextRead,
@@ -110,8 +110,8 @@ new DisclosureProof({});
 
 function nativeIdentityEscapeHatches(
   organisationId: import("../src/ids").OrganisationId,
-  projectId: import("@seams/control-api").ProjectId,
-  conversationId: import("@seams/control-api").ConversationId,
+  projectId: import("@purin-labs/control-api").ProjectId,
+  conversationId: import("@purin-labs/control-api").ConversationId,
 ): void {
   const raw: import("../src/policy/information-flow").FlowAudience = {
     kind: "project",

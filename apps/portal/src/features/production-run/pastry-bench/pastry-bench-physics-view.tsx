@@ -4,8 +4,8 @@ import {
   PASTRY_BENCH_VIEW_COMMANDS,
   type PortalPageViewV1,
   type SurfacePageCommandV1,
-} from "@seams/control-api";
-import { errorMessage } from "@seams/std";
+} from "@purin-labs/control-api";
+import { errorMessage } from "@purin-labs/std";
 import {
   registerSurfaceView,
   type SurfaceCommandOutcome,

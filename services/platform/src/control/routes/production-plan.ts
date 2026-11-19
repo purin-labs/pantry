@@ -1,11 +1,11 @@
-import type { CommerceCommandResult, Quantity } from "@seams/contracts";
+import type { CommerceCommandResult, Quantity } from "@purin-labs/contracts";
 import {
   parseInventoryProductionPlanAcceptance,
   parseInventoryQuantityText,
   type InventoryProductionPlanAcceptance,
   type InventoryProductionPlanLine,
   type InventoryProductionPlanOutcome,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseEntityPlaneCommand,
   parseListEntryReadRequest,
@@ -13,7 +13,7 @@ import {
   productionRequestAttributes,
   type ProductionRequestFields,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { Env } from "../../env";
 import { newRequestId } from "../../ids";
@@ -30,7 +30,7 @@ import {
   type ProductionPlanRoute,
   authorizeProductionPlanSocket,
 } from "../admission/production-plan";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function handleProductionPlanRoute(
   request: Request,

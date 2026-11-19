@@ -1,4 +1,4 @@
-import { type PaymentEnvironment } from "@seams/commerce-contracts";
+import { type PaymentEnvironment } from "@purin-labs/commerce-contracts";
 import {
   parseCreateCommerceBuyerPaymentSessionV1 as parseCreateCommerceBuyerPaymentSessionV1Record,
   parseReconcileCommerceBuyerPaymentV1 as parseReconcileCommerceBuyerPaymentV1Record,
@@ -6,7 +6,7 @@ import {
   parseCommerceInPersonCollectionResultV1 as parseCommerceInPersonCollectionResultV1Record,
   parseCommercePaymentRefundResultV1 as parseCommercePaymentRefundResultV1Record,
   parseCommercePaymentSessionResultV1 as parseCommercePaymentSessionResultV1Record,
-} from "@seams/commerce-contracts/records/api-payment-session";
+} from "@purin-labs/commerce-contracts/records/api-payment-session";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 export type CommercePaymentMoneyV1 = Readonly<{

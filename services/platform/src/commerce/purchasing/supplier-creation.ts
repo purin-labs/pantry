@@ -3,7 +3,7 @@ import type {
   CommerceCommandResult,
   CommerceSnapshotRevision,
   CommerceMutationReceiptV1,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseEntityPlaneCommand,
   parseCommerceSnapshotRevision,
@@ -12,7 +12,7 @@ import {
   SUPPLIER_INVENTORY_ITEM_DEFINITION_ID,
   CommerceEntityPlaneClient,
   type CommercePurchasingReconcileResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { registerSupplierOperationalEmailContact } from "../../data/email-operational";
 import { createCommerceOutboxReconcileQueueMessage } from "../../ingress-queue";
@@ -22,7 +22,7 @@ import {
   type OrganisationId,
 } from "../../ids";
 import type { Result } from "../../result";
-import type { SupplierCreation } from "@seams/control-api";
+import type { SupplierCreation } from "@purin-labs/control-api";
 
 export type SupplierCreationError = Readonly<{
   code: "invalid" | "purchasing_inactive" | "command_rejected" | "unavailable";

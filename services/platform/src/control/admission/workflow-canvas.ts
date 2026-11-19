@@ -1,7 +1,7 @@
 import {
   parseWorkflowCanvasSource,
   type WorkflowCanvasSource,
-} from "@seams/bakery-model/bakery-canvas-source";
+} from "@purin-labs/bakery-model/bakery-canvas-source";
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import { authorizeOrganisationRequest } from "../authorization";

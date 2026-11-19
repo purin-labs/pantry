@@ -2,7 +2,7 @@ import { Type } from "typebox";
 import {
   REGISTER_SURFACE,
   type RegisterViewCommand,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { defineTool, noArguments } from "../define-tool";
 import { readBakerySurfaceReceiptId } from "../bakery/surface";
 import type { HarnessCostsViewExecute } from "../costs/view";

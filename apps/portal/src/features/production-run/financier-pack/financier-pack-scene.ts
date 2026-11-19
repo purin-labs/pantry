@@ -5,7 +5,7 @@ import { SceneHost } from "../scene-host";
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
 import ohausScaleUrl from "../../../../../../assets/bakery-mujoco/ohaus-ranger-3000/ohaus-r31pe6.glb?url";
 import coolingRackUrl from "../models/cooling-rack-16.glb?url";
-import type { FinancierPackSample } from "@seams/production-simulation/recipes/financier-pack/model";
+import type { FinancierPackSample } from "@purin-labs/production-simulation/recipes/financier-pack/model";
 import {
   addPatisserieBench,
   enableSceneShadows as enableShadows,

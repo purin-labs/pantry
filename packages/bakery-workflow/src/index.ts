@@ -5,8 +5,8 @@ import type {
   TaskKey,
   WorkflowDefinition,
   WorkflowId,
-} from "@seams/production-simulation";
-import { readScenario } from "@seams/production-simulation/scenario-document";
+} from "@purin-labs/production-simulation";
+import { readScenario } from "@purin-labs/production-simulation/scenario-document";
 import { Type } from "typebox";
 import { Value } from "typebox/value";
 

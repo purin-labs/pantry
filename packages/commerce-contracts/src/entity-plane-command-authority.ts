@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { parseCommandAuthorizationInput } from "./command-authorization-input.ts";
 import { parseCommerceEntityAuthority } from "./command-authority.ts";
 import { validateEntityCommandAuthority } from "./entity-command-authority.ts";

@@ -2,7 +2,7 @@ import {
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
 } from "../organisation-execution-scope";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import {
   parseOrganisationId,
   type ConnectorId,

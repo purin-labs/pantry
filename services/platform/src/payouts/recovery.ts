@@ -7,7 +7,7 @@ import type {
   PayoutIndeterminateOperation,
   SupplierPayoutExecutionPlan,
   SupplierPayoutState,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { readOrganisationEnvironment } from "../control/organisation-runtime";
 import {
   createSupplierPayoutAttemptStore,
@@ -34,8 +34,8 @@ import {
 } from "./executor";
 import { resolveSupplierPayoutProvider } from "../payout-providers/unavailable";
 import { reconcilePayoutInbox } from "./reconciliation";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 
 export type PayoutRecoveryProvider = SupplierPayoutProvider &
   Readonly<{

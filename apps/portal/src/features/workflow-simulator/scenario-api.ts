@@ -1,9 +1,9 @@
-import { bakeryFingerprint, fields } from "@seams/bakery-model/bakery";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+import { bakeryFingerprint, fields } from "@purin-labs/bakery-model/bakery";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   scenarioFromEntity,
   type ScenarioCopy,
-} from "@seams/bakery-model/bakery-scenario";
+} from "@purin-labs/bakery-model/bakery-scenario";
 import {
   customEntityRef,
   readCommerceGraph,
@@ -11,13 +11,13 @@ import {
   type CommerceGraphFetch,
 } from "../commerce/entity-plane/api";
 import { readProcedure } from "./procedure-api";
-import { parseCommerceGraphQuery } from "@seams/commerce-client";
-import { isCustomCommerceEntity } from "@seams/contracts";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
+import { isCustomCommerceEntity } from "@purin-labs/contracts";
 import type {
   CommerceCursor,
   CommerceEntityType,
   CustomCommerceEntityRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 export type ScenarioChoice = Readonly<{
   reference: CustomCommerceEntityRef;

@@ -2,7 +2,7 @@ import type {
   UserMessage,
   UserMessagePart,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   deriveUserMessageViews,
@@ -15,7 +15,7 @@ import type {
   SlackFileCandidate,
   SlackMessageEvent,
 } from "./events";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * Assembles the canonical message for one Slack delivery.

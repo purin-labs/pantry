@@ -9,12 +9,12 @@ import { resolveOrganisationCommerceMerchantBinding } from "../data/commerce-mer
 import type { OrganisationId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { createCommerceClient } from "./outbox-worker";
-import { commerceCommandInput, type CommerceAdminClient } from "@seams/commerce-client";
+import { commerceCommandInput, type CommerceAdminClient } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { Result } from "../result";
 import type { MenuBoardCommand, MenuBoardCommandReply } from "../actors/menu-board-commands";
 import { CAFE_STOREFRONT_ID } from "./cafe-menu-publication";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The café storefront's media address for a merchant, ending in "/". */
 export function cafeMediaBaseFor(

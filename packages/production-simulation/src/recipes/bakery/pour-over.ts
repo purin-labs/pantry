@@ -1,4 +1,4 @@
-import { canonicalJson, sha256Hex } from "@seams/std";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import * as d from "../../document-values.ts";
 import { authoredId } from "../../identity.ts";
 import type {

@@ -3,10 +3,10 @@ import {
   lowerWorkflowDocument,
   parseWorkflowDocument,
   type BakeryWorkflowDocument,
-} from "@seams/bakery-workflow";
-import { parseRunFindings, type RunFinding } from "@seams/bakery-workflow/findings";
-import { admitScenario } from "@seams/production-simulation";
-import { canonicalJson, isRecord, sha256Hex } from "@seams/std";
+} from "@purin-labs/bakery-workflow";
+import { parseRunFindings, type RunFinding } from "@purin-labs/bakery-workflow/findings";
+import { admitScenario } from "@purin-labs/production-simulation";
+import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
 import type { Env } from "../../env";
 import type { OrganisationId, UserId } from "../../ids";
 

@@ -1,5 +1,5 @@
 import { jobStepLabel } from "../production-run/job-progress";
-import type { ScheduleSpatialLayout } from "@seams/production-simulation/recipes/bakery/schedule";
+import type { ScheduleSpatialLayout } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import * as Views from "./workspace-views";
 import { Select } from "../../ui/select";
 import { EspressoRecipeAuthor } from "../production-run/linea/espresso-recipe-author";
@@ -14,33 +14,33 @@ import {
   type FinancierBakeOutcome,
   type FinancierBakeRecipeConfig,
   type FinancierHandoffRecoveryPreset,
-} from "@seams/production-simulation/recipes/financier-bake/model";
+} from "@purin-labs/production-simulation/recipes/financier-bake/model";
 import { FinancierBatterRecipeAuthor } from "../production-run/financier-batter/financier-batter-recipe-author";
 import type {
   FinancierBatterOutcome,
   FinancierBatterRecipeConfig,
-} from "@seams/production-simulation/recipes/financier-batter/model";
+} from "@purin-labs/production-simulation/recipes/financier-batter/model";
 import { FinancierPackRecipeAuthor } from "../production-run/financier-pack/financier-pack-recipe-author";
 import type {
   FinancierPackOutcome,
   FinancierPackRecipeConfig,
-} from "@seams/production-simulation/recipes/financier-pack/model";
+} from "@purin-labs/production-simulation/recipes/financier-pack/model";
 import { CafeShiftRecipeAuthor } from "../production-run/cafe-shift/cafe-shift-recipe-author";
 import type {
   CafeShiftOutcome,
   CafeShiftRecipeConfig,
-} from "@seams/production-simulation/recipes/cafe-shift/model";
+} from "@purin-labs/production-simulation/recipes/cafe-shift/model";
 import { BakeryShiftAuthor } from "../production-run/bakery-shift-author";
 import { ColdCellRouteAuthor } from "../production-run/cold-cell-route-author";
 import { BlackSesameRecipeAuthor } from "../production-run/black-sesame-recipe-author";
 import { BlackSesameCobotRecipeAuthor } from "../production-run/black-sesame/black-sesame-cobot-recipe-author";
-import type { BlackSesameCobotRecipeConfig } from "@seams/production-simulation/recipes/black-sesame/model";
+import type { BlackSesameCobotRecipeConfig } from "@purin-labs/production-simulation/recipes/black-sesame/model";
 import { GingerTeaRecipeAuthor } from "../production-run/ginger-tea-recipe-author";
 import { GingerMilkTeaRecipeAuthor } from "../production-run/ginger-milk-tea-recipe-author";
 import { GingerTeaCobotRecipeAuthor } from "../production-run/ginger-tea/ginger-tea-cobot-recipe-author";
-import type { GingerTeaCobotRecipeConfig } from "@seams/production-simulation/recipes/ginger-tea/model";
+import type { GingerTeaCobotRecipeConfig } from "@purin-labs/production-simulation/recipes/ginger-tea/model";
 import { LatteRecipeAuthor } from "../production-run/latte/latte-recipe-author";
-import type { LatteRecipeConfig } from "@seams/production-simulation/recipes/latte/model";
+import type { LatteRecipeConfig } from "@purin-labs/production-simulation/recipes/latte/model";
 import { PourOverRecipeAuthor } from "../production-run/pour-over/pour-over-recipe-author";
 import { PastryBenchRecipeAuthor } from "../production-run/pastry-bench/pastry-bench-recipe-author";
 import type { PastryBenchRecipeConfig } from "../production-run/pastry-bench/pastry-bench-model";
@@ -56,13 +56,13 @@ import {
   type BatchWaitSummary,
 } from "./production-workspace-helpers";
 import { SiphonRecipeAuthor } from "../production-run/siphon/siphon-recipe-author";
-import type { SiphonRecipeConfig } from "@seams/production-simulation/recipes/siphon/model";
+import type { SiphonRecipeConfig } from "@purin-labs/production-simulation/recipes/siphon/model";
 import { readOvenRunFile } from "../production-run/oven-recipe-file";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
 import {
   HUMAN_CELL_TRANSFER,
   supportsHumanCellTransfer,
-} from "@seams/production-simulation/recipes/bakery/human-cell-transfer";
+} from "@purin-labs/production-simulation/recipes/bakery/human-cell-transfer";
 import { downloadBakeryFile } from "./file-download";
 import {
   FactoryComparison,
@@ -76,14 +76,14 @@ import { OvenRouteAuthor } from "../production-run/oven-route-author";
 import {
   prepareOvenDefinition,
   type OvenRunSource,
-} from "@seams/production-simulation/runs/oven-run-file";
+} from "@purin-labs/production-simulation/runs/oven-run-file";
 import {
   prepareProductionFile,
   exportProductionFile,
   type BakeryExportKind,
 } from "./production-files";
 import { type WorkspaceRunReview } from "./workspace-run-review";
-import type { BakeryWorkspaceViewAction } from "@seams/bakery-model/bakery-surface";
+import type { BakeryWorkspaceViewAction } from "@purin-labs/bakery-model/bakery-surface";
 import type { WorkspaceCameraView } from "./simulator-state";
 import { prepareProductionNavigation } from "./production-navigation";
 import {
@@ -92,9 +92,9 @@ import {
   prepareProductionReplacement,
   acceptedProductionResults,
 } from "./production-draft";
-import type { BakeryProductionReplacementSource } from "@seams/bakery-model/bakery-surface";
+import type { BakeryProductionReplacementSource } from "@purin-labs/bakery-model/bakery-surface";
 import { prepareRehearsalReview } from "./rehearsal-edits";
-import type { BakeryRehearsalChange } from "@seams/bakery-model/bakery-surface";
+import type { BakeryRehearsalChange } from "@purin-labs/bakery-model/bakery-surface";
 import React from "react";
 import {
   PlaybackScrubber,
@@ -105,14 +105,14 @@ import {
 import {
   productionMaterialAt,
   type ProductionMaterialState,
-} from "@seams/production-simulation/recipes/bakery/production-material";
-import type { Settings } from "@seams/bakery-model/bakery";
+} from "@purin-labs/production-simulation/recipes/bakery/production-material";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
 import {
   bakeryFingerprint,
   fields,
   parseSettings,
-} from "@seams/bakery-model/bakery";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parseProductionScenario,
   productionAssignmentId,
@@ -121,19 +121,19 @@ import {
   type ProductionTaskChoice,
   type ProductionManualTask,
   type ProductionAssignment,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import {
   parsePhysicsReplay,
   parseIngredientLoad,
   type PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   attachProductionScenario,
   type PlannedProductionWorkcell,
   type ProductionWorkcells,
   type ProductionWorkcell,
   type RehearsalEdit,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import {
   prepareRehearsalEdit,
   trayChainEdit,
@@ -158,7 +158,7 @@ import {
   type Interval,
   type NativeBakeryTask,
   type Batch,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { SceneController } from "./scene-controller";
 import type { RecordingReplayActions } from "./simulator-actions";
 import {
@@ -170,8 +170,8 @@ import {
   selectionForInterval,
   selectionContext,
   type Selection,
-} from "@seams/production-simulation/simulator/selection";
-import { MAX_EXPERIMENT_BYTES } from "@seams/production-simulation/recipes/bakery/workcell-experiment";
+} from "@purin-labs/production-simulation/simulator/selection";
+import { MAX_EXPERIMENT_BYTES } from "@purin-labs/production-simulation/recipes/bakery/workcell-experiment";
 import "./production-workspace.css";
 import type {
   AgentRunSaveProposal,
@@ -180,7 +180,7 @@ import type {
   SimulatorState,
   WorkspaceRunSaveStatus,
 } from "./simulator-state";
-import { nextProductionExecution } from "@seams/production-simulation/simulator/production-execution";
+import { nextProductionExecution } from "@purin-labs/production-simulation/simulator/production-execution";
 import type {
   FinancierPreset,
   ProductionDraftIdentity as DraftIdentity,
@@ -212,7 +212,7 @@ import {
   coldCell,
   parseCellId,
   resourceInstance,
-} from "@seams/production-simulation/recipes/bakery/workcell-instances";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 import { RackLayoutEditor } from "./rack-layout-editor";
 import {
   ANY_BAKER,
@@ -243,7 +243,7 @@ import {
   rehearsalSettings,
   type ReadExample,
   type RehearsalPreset,
-} from "@seams/production-simulation/simulator/rehearsal-presets";
+} from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import {
   NO_FAULTS,
   OUTAGE_WORKCELL_RESOURCES,
@@ -251,15 +251,15 @@ import {
   outageResourceName,
   type OutageResource,
   type RunFaults,
-} from "@seams/production-simulation/recipes/bakery/run-faults";
+} from "@purin-labs/production-simulation/recipes/bakery/run-faults";
 import {
   compareRuns,
   duration,
   summarizeRun,
   type RunSummary,
-} from "@seams/production-simulation/simulator/run-comparison";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, errorMessage } from "@seams/std";
+} from "@purin-labs/production-simulation/simulator/run-comparison";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, errorMessage } from "@purin-labs/std";
 
 type Props = Readonly<{
   cameraView: WorkspaceCameraView;
@@ -5137,7 +5137,7 @@ function reservedCellNames(
 }
 
 function cellRobotLabel(
-  cell: import("@seams/production-simulation/recipes/bakery/production-workcells").CellRobot,
+  cell: import("@purin-labs/production-simulation/recipes/bakery/production-workcells").CellRobot,
 ): string {
   switch (cell.kind) {
     case "unused":

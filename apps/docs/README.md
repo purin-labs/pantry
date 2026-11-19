@@ -9,16 +9,16 @@ guide.
 ## Local checks
 
 ```bash
-pnpm --filter @seams/docs type-check
-pnpm --filter @seams/docs check:links
-pnpm --filter @seams/docs check:fences
-pnpm --filter @seams/docs build
+pnpm --filter @purin-labs/docs type-check
+pnpm --filter @purin-labs/docs check:links
+pnpm --filter @purin-labs/docs check:fences
+pnpm --filter @purin-labs/docs build
 ```
 
 Run the site locally with:
 
 ```bash
-pnpm --filter @seams/docs dev
+pnpm --filter @purin-labs/docs dev
 ```
 
 The site is available at `http://docs.localhost:3005`.

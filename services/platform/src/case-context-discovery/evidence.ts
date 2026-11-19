@@ -1,4 +1,4 @@
-import { isRecord, isSha256Hex, parseJsonOrNull } from "@seams/std";
+import { isRecord, isSha256Hex, parseJsonOrNull } from "@purin-labs/std";
 import type { OrganisationId } from "../ids";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
@@ -16,7 +16,7 @@ import {
   type CaseContextCollectionSelection,
   type CaseContextCollection,
 } from "./relationships";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type CaseContextCollectionEvidenceSelection = Readonly<{
   relationshipId: string | null;
@@ -54,7 +54,7 @@ export type CaseContextCollectionProposalEvidence =
   | Readonly<{
       kind: "case_context_collection_evidence";
       dependency: Variant<
-        import("@seams/contracts").CaseEvidenceDependency,
+        import("@purin-labs/contracts").CaseEvidenceDependency,
         "case_context_collection_evidence"
       >;
       flowBindingDigest: string;
@@ -634,7 +634,7 @@ function stale(): Result<never, CaseContextCollectionEvidenceError> {
 
 export async function caseContextCollectionEvidenceDependency(
   dependency: CaseContextCollectionEvidenceDependency,
-): Promise<import("@seams/contracts").CaseEvidenceDependency> {
+): Promise<import("@purin-labs/contracts").CaseEvidenceDependency> {
   if (dependency.kind === "source_only") return { kind: "source_only" };
   return {
     kind: "case_context_collection_evidence",
@@ -648,7 +648,7 @@ export async function caseContextCollectionEvidenceDependency(
 }
 function caseEvidenceSelection(
   selection: CaseContextCollectionEvidenceSelection,
-): import("@seams/contracts").CaseContextCollectionEvidenceRef {
+): import("@purin-labs/contracts").CaseContextCollectionEvidenceRef {
   return {
     caseId: selection.source.caseId,
     integrationAccountId: selection.source.integrationAccountId,
@@ -663,7 +663,7 @@ function caseEvidenceSelection(
 
 export function parseCaseEvidenceDependency(
   raw: unknown,
-): import("@seams/contracts").CaseEvidenceDependency | null {
+): import("@purin-labs/contracts").CaseEvidenceDependency | null {
   if (raw === undefined) return { kind: "source_only" };
   if (!isRecord(raw)) return null;
   if (raw.kind === "source_only" && Object.keys(raw).length === 1)
@@ -681,7 +681,7 @@ export function parseCaseEvidenceDependency(
     raw.selections.length > 21
   )
     return null;
-  const selections: import("@seams/contracts").CaseContextCollectionEvidenceRef[] =
+  const selections: import("@purin-labs/contracts").CaseContextCollectionEvidenceRef[] =
     [];
   const seen = new Set<string>();
   let anchors = 0;

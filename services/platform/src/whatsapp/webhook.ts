@@ -11,7 +11,7 @@ import {
   type WhatsAppMessageId,
   type WhatsAppPhoneNumberId,
 } from "./identifiers";
-import { bytesToHex, isRecord } from "@seams/std";
+import { bytesToHex, isRecord } from "@purin-labs/std";
 
 /**
  * The Meta Cloud API webhook boundary. Raw provider JSON is parsed exactly

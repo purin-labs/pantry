@@ -4,8 +4,8 @@ import {
   parseEntityPlaneCommand,
   productionRequestAttributes,
   type ProductionRequestFields,
-} from "@seams/commerce-client";
-import type { ListEntryAttributeValue } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { ListEntryAttributeValue } from "@purin-labs/commerce-contracts";
 
 type CommandScope = Readonly<{
   organisationId: string;

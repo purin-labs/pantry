@@ -1,7 +1,7 @@
 import React from "react";
 import { Tooltip } from "@base-ui/react/tooltip";
 import DashboardSidebarToggleIcon from "./dashboard-sidebar-toggle-icon";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 const CONSOLE_SIDEBAR_COMPACT_QUERY = "(max-width: 1160px)";
 

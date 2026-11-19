@@ -6,7 +6,7 @@ import type {
 } from "./types";
 import type { MailResponseOwner } from "./response-store";
 import { startInboxResponse } from "./response-store";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const expired = { kind: "history_expired" } as const;
 // @ts-expect-error Expired history cannot retain a usable cursor through a spread.

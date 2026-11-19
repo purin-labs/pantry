@@ -9,20 +9,20 @@ import {
   type HostView,
   type RecoveryView,
   type ExecutionBundle,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import {
   coldCellJourneyAdapter,
   coldCellJourneySnapshot,
-} from "@seams/production-simulation/recipes/cold-cell-journey";
-import type { StrictUnion } from "@seams/type-utils";
-import { isRecord, sha256Hex } from "@seams/std";
-import { checkpointBody } from "@seams/bakery-model/bakery-checkpoint";
+} from "@purin-labs/production-simulation/recipes/cold-cell-journey";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import { checkpointBody } from "@purin-labs/bakery-model/bakery-checkpoint";
 import {
   openExecutionWorker,
   openAuthoredCellWorker,
   type ExecutionWorker,
 } from "./collecting-execution-worker";
-import { PRODUCTION_EXECUTION_MANIFEST } from "@seams/production-simulation/execution-manifest";
+import { PRODUCTION_EXECUTION_MANIFEST } from "@purin-labs/production-simulation/execution-manifest";
 import "./production-run-preview.css";
 
 /**

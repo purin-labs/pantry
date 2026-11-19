@@ -1,6 +1,6 @@
-import type { CustomCommerceEntity } from "@seams/contracts";
+import type { CustomCommerceEntity } from "@purin-labs/contracts";
 import { fields, parseSettings, type Settings } from "./bakery.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const parsed: unique symbol = Symbol("validated scenario copy");
 

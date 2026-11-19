@@ -1,7 +1,7 @@
 import type {
   MailboxSetupAgentChoice,
   MailboxSetupPlan,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   controlRead,
   controlSignal,
@@ -16,7 +16,7 @@ import type {
   WhatsAppRouteTransport,
   WorkspaceSettingsRouteTransport,
 } from "./features/integrations/settings-types";
-import { type CommerceActionRecord, parseCommerceActionRecordResponse } from "@seams/control-api/portal/commerce-actions";
+import { type CommerceActionRecord, parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
 import type { CommerceOperationsTransport } from "./features/commerce/operations";
 import type { AgentOperationsTransport } from "./pages/automation";
 import { createAccessRouteTransport } from "./features/access/api";

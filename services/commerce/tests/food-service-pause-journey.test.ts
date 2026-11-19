@@ -5,8 +5,8 @@
 // after a resume the latte is on the menu again and sells. Set
 // FOOD_SERVICE_PAUSE_ARTIFACT_DIR to keep the run's evidence; the file
 // repeats byte for byte for the same commit.
-import type { RecipeRevision } from "@seams/commerce-contracts";
-import type { CommerceAdminClient } from "@seams/commerce-client";
+import type { RecipeRevision } from "@purin-labs/commerce-contracts";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

@@ -6,11 +6,11 @@ import { join } from "node:path";
 import type {
   CheckoutProfileConfiguration,
   OnlinePaymentBinding,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { BuyerSessionAuthority } from "../src/buyer-session.ts";

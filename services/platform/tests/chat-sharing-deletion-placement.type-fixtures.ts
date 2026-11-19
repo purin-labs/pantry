@@ -12,12 +12,12 @@ import type {
   ProjectAccessCommand,
   ProjectId,
   ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { ConversationScope } from "../src/chat/store";
 import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
 import { forkChat, type ChatForkCommand } from "../src/chat/forks";
-import type { RequestAuthority } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const env: UnitTestEnv;
 declare const identity: ConversationScope;

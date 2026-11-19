@@ -3,9 +3,9 @@ import {
   parseInventoryProductionTransition,
   type InventoryProductionCreation,
   type InventoryProductionTransition,
-} from "@seams/control-api";
-import { isNormalizedText, isRecord } from "@seams/std";
-import { parseEntityPlaneCommandResult } from "@seams/commerce-client";
+} from "@purin-labs/control-api";
+import { isNormalizedText, isRecord } from "@purin-labs/std";
+import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
 import { ControlApiError } from "../../control-client";
 
 type ProductionBody =

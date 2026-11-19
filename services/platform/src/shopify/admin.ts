@@ -56,7 +56,7 @@ import {
   parseVaultHandle,
   storeVaultSecret,
 } from "../credential-vault";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   createActiveAdminIntegration,
   fieldErrorResponse,

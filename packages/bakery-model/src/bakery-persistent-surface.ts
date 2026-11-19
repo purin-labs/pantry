@@ -3,8 +3,8 @@ import {
   isNonNegativeInteger,
   isRecord,
   isSha256Hex,
-} from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 /** Every command names one live continuation and its reviewed control state. */
 export type BakeryProductionTarget = Readonly<{

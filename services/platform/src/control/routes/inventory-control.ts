@@ -15,7 +15,7 @@ import {
 } from "../authorization";
 import { controlError, controlJson } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import type { CommerceAdminClient } from "@seams/commerce-client";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 export type InventoryControlAccess = Readonly<{
   authorized: AuthorizedOrganisationRequest;

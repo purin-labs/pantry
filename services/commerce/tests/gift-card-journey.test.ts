@@ -19,7 +19,7 @@ import {
   type CommerceGiftCardBalanceV1,
   type CommerceMutationResultV1,
   type CommerceStorefrontClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { FakeStripe } from "./fake-stripe.ts";

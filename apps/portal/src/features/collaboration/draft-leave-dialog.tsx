@@ -1,6 +1,6 @@
 import React from "react";
 import type { Blocker } from "react-router";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import { syncDialog, cancelDialog } from "../../dialog";
 
 export function DraftLeaveDialog(

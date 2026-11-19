@@ -1,4 +1,4 @@
-import { exhaustiveList, hasExactKeys, isNonNegativeInteger } from "@seams/std";
+import { exhaustiveList, hasExactKeys, isNonNegativeInteger } from "@purin-labs/std";
 import type { SupplierPayoutStateKind } from "../index.ts";
 
 const PAYOUT_STATES = exhaustiveList<SupplierPayoutStateKind>()([

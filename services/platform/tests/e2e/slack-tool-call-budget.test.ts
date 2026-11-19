@@ -1,7 +1,7 @@
 import { exports } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { accessControlPath, mutationHeaders } from "./access-route-support";
 import { commerceHeaders } from "./commerce-support";

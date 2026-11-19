@@ -1,7 +1,7 @@
 import {
   ROBOTS,
   type RobotModel,
-} from "@seams/bakery-model/bakery-robots";
+} from "@purin-labs/bakery-model/bakery-robots";
 import {
   HUMAN_CELL_TRANSFER,
   parseHumanCellTransfer,
@@ -19,14 +19,14 @@ import {
   fields,
   parseSettings,
   type Settings,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import {
   parsePhysicsReplay,
   sameIngredientLoad,
   parsePhysicsRequest,
   type PhysicsReplay,
   type IngredientLoad,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   reserveWorkcell,
   settleWorkcell,
@@ -64,14 +64,14 @@ import {
   type ProductionManualTask,
   type ProductionAssignment,
   type ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import {
   exportWorkcellExperiment,
   parseWorkcellExperiment,
   MAX_EXPERIMENT_BYTES,
 } from "./workcell-experiment.ts";
-import type { Variant } from "@seams/type-utils";
-import { hasExactKeys, isString, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { hasExactKeys, isString, isRecord } from "@purin-labs/std";
 
 const validated: unique symbol = Symbol("compiled production workcells");
 export type ProductionSource =

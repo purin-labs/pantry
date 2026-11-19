@@ -4,7 +4,7 @@
 import {
   machineProblems,
   type MachineExit,
-} from "@seams/std/state-machine";
+} from "@purin-labs/std/state-machine";
 
 import { COMMERCE_MACHINES } from "./commerce-machines.ts";
 
@@ -173,7 +173,7 @@ export function readCommerceInvalidTransition(
  * exists, a terminal state leads only to itself, no transition touches an
  * external state, every other state can be reached from an initial state,
  * and one state and one event lead to one target. The rules are the shared
- * ones of `@seams/std/state-machine` (Refactor 15, S1).
+ * ones of `@purin-labs/std/state-machine` (Refactor 15, S1).
  */
 export function commerceMachineProblems(
   machine: CommerceMachineDefinition<string>,

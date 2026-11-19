@@ -3,8 +3,8 @@
  * before the call ends. It reads only the arguments, so the Plan 40B
  * real-route measurement script runs the same code outside the Worker.
  */
-import { COLLABORATION_AGENT_DRAFT_TEXT_LIMIT } from "@seams/collaboration";
-import type { MenuBoardRect } from "@seams/menu-board-crdt/board";
+import { COLLABORATION_AGENT_DRAFT_TEXT_LIMIT } from "@purin-labs/collaboration";
+import type { MenuBoardRect } from "@purin-labs/menu-board-crdt/board";
 import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
 
 const DRAFT_KINDS: ReadonlySet<string> = new Set([

@@ -1,7 +1,7 @@
 import { floorPlanWorkspace } from "../floor-plan-workspace";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import type { CarrierStoreView } from "@seams/production-simulation";
+import type { CarrierStoreView } from "@purin-labs/production-simulation";
 import tableUrl from "../../production-run/models/prep-table-steel.glb?url";
 import mapleUrl from "../../production-run/models/prep-table-maple.glb?url";
 import rackUrl from "../../production-run/models/cooling-rack-16.glb?url";
@@ -30,12 +30,12 @@ import starPrinterUrl from "../../../../../../assets/bakery-mujoco/star-mcp31lb/
 import starDrawerUrl from "../../../../../../assets/bakery-mujoco/star-mjd36m/star-mjd36m.glb?url";
 import pastryBenchUrl from "../../../../../../assets/bakery-mujoco/pastry-bench/pastry-bench.glb?url";
 import type { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   computeFacilityUtilityTelemetry,
   type SynchronizedApplianceState,
 } from "../../production-run/morning-shift-appliances";
-import { type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import { type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   getOutfittedFactoryStations,
   interpolateRoomWalk,
@@ -45,7 +45,7 @@ import {
   APPLIANCE_FOOTPRINTS,
   STORE_DECOR_IDS,
   isApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import { createPosedHumanWorkerGroup } from "./human-worker-figure";
 import { buildContactShadowPad } from "./floor-plan-fixtures";
 import { ensureLivingAssetsLoaded } from "./living-asset-loader";

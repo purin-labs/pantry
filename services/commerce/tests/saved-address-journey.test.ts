@@ -16,8 +16,8 @@ import type {
   CommerceBuyerCatalogV1,
   CommerceCustomerAddressInputV1,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
-import type { ShippingRouteBinding } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { ShippingRouteBinding } from "@purin-labs/commerce-contracts";
 
 import { createJapanShippingGateway } from "../src/plugins/japan-export/index.ts";
 import { expect, it } from "vitest";

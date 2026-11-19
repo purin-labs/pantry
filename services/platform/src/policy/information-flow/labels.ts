@@ -1,6 +1,6 @@
 import type { ContextVisibility as AuthorityVisibility } from "../../authorization/access-grants/types";
 import { parseContextVisibility as parseAuthorityVisibility } from "../../authorization/access-grants/visibility";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 import { parseFlowReader as parseContextVisibility } from "./readers";
 import type { FlowAudience as ContextVisibility } from "./types";
@@ -19,7 +19,7 @@ import type {
   SerializedFlowPolicy,
   SerializedFlowReader,
 } from "./types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
@@ -27,7 +27,7 @@ import {
   isPositiveInteger,
   isRecord,
   isSha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export class FlowLabel {
   readonly policies: readonly CanonicalFlowPolicy[];

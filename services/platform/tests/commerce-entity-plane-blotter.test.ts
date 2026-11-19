@@ -8,12 +8,12 @@ import type {
   CommerceQueryPlan,
   SystemCommerceEntityKind,
   SystemCommerceEntityRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceGraphQueryPlanRequest,
   parseCommerceSnapshotRevision,
   parseSystemSchemaRevision,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { BlotterSource } from "../src/commerce/entity-plane/blotter-source";
 import {
   buildCommerceGraphQueryPlanRequest,
@@ -28,7 +28,7 @@ import type {
 } from "../src/actors/commerce-projection";
 import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
 import type { CommerceRelationshipRelationRow } from "../src/actors/commerce-query-schema";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 
 describe("commerce entity-plane Blotter source", () => {
@@ -522,7 +522,7 @@ function requiredRelationshipFrontier(
 function requiredPlannedPage(
   organisationId: ReturnType<typeof requireOrganisationId>,
   merchantId: string,
-  typeId: import("@seams/contracts").SystemCommerceEntityKind,
+  typeId: import("@purin-labs/contracts").SystemCommerceEntityKind,
 ): { plan: CommerceQueryPlan; planRequest: CommerceGraphQueryPlanRequest } {
   const query = parseCommerceGraphQuery({
     kind: "entity_type_page",

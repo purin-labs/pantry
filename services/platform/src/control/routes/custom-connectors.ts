@@ -27,7 +27,7 @@ import {
   type SideCaseAction,
 } from "./chat-side-cases";
 import { handlePortalChatScreenRelevance } from "./chat-screen-relevance";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   handleConnectorLifecycle,
   handleCreate,

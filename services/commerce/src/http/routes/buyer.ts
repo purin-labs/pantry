@@ -1,6 +1,6 @@
-import { parseCreateBuyerSessionCommand } from "@seams/commerce-client";
+import { parseCreateBuyerSessionCommand } from "@purin-labs/commerce-client";
 import type { BuyerRoute } from "../../http-routes.ts";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
@@ -33,7 +33,7 @@ import {
   readBuyerOrderRoute,
   requestBuyerReturnRoute,
 } from "./buyer-orders.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 async function createBuyerSessionRoute(
   ctx: HttpRouteContext,

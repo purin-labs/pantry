@@ -3,7 +3,7 @@ import type {
   InventoryDeliveries,
   InventoryDelivery,
   InventoryReceiptContext,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseReceiveInventoryCommand,
   parseReconcileInventoryCommand,
@@ -13,7 +13,7 @@ import {
   type ReconcileCommerceInventoryV1,
   type ReceiveCommerceInventoryV3,
   type CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { inventoryQuantity } from "../../commerce/inventory-overview";
 import type { Env } from "../../env";
 import { controlError, controlJson, readJsonRecord } from "../http";
@@ -400,7 +400,7 @@ async function readPurchases(
   return { kind: "ready", entries };
 }
 function purchaseAttribute(
-  attribute: import("@seams/contracts").ListEntryAttributeValue,
+  attribute: import("@purin-labs/contracts").ListEntryAttributeValue,
 ): [string, string] {
   const value = attribute.value;
   switch (value.kind) {

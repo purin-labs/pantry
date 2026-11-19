@@ -2,7 +2,7 @@ import { runtimeFetch } from "../runtime-fetch";
 import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
-import type { MailRule } from "@seams/control-api";
+import type { MailRule } from "@purin-labs/control-api";
 import { readAgentMailboxBinding } from "../data/email-mailbox";
 import { admitEmailThreadCase } from "../actors/email-case-admission";
 import { processEmailThreadTurn } from "../actors/email-case-processing";

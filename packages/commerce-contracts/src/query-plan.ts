@@ -6,7 +6,7 @@ import {
 } from "./schema.ts";
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 import { invalidShape, queryRefusal } from "./query-parts.ts";
 import {

@@ -8,7 +8,7 @@ import type { TypeSafeInferenceSink } from "../policy/information-flow/types";
 import type { SerializedFlowLabel } from "../policy/information-flow/types";
 import type { FlowLabel } from "../policy/information-flow/labels";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 export const CASE_CONTEXT_DISCOVERY_JEV_MODEL = "jev-1.13.0";
 // Full pinned-model context reservation; no tokenizer estimate is treated as a hard bound.

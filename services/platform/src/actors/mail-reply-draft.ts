@@ -1,8 +1,8 @@
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import {
   normalizePlainText,
   type CollaborationAgent,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   MailReplyDoc,
   MAIL_REPLY_SCHEMA,
@@ -12,7 +12,7 @@ import {
   type MailReplyPresenceSelection,
   type MailReplyStateVector,
   type MailReplyUpdate,
-} from "@seams/mail-reply-crdt";
+} from "@purin-labs/mail-reply-crdt";
 import {
   encodeDraftServerMessage,
   parseDraftClientMessage,
@@ -20,7 +20,7 @@ import {
   type DraftClientMessage,
   type DraftFailureCode,
   type MailReplyRoomMetadata,
-} from "@seams/mail-reply-crdt/protocol";
+} from "@purin-labs/mail-reply-crdt/protocol";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";

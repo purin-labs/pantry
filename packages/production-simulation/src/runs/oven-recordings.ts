@@ -11,8 +11,8 @@ import {
   isRecord,
   parseJsonOrNull,
   sha256Hex,
-} from "@seams/std";
-import type { PersistentPhysicsScene } from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/std";
+import type { PersistentPhysicsScene } from "@purin-labs/bakery-model/bakery-physics";
 import {
   ovenOperation,
   readOvenLiveFrame,
@@ -20,7 +20,7 @@ import {
 } from "./oven-live-physics.ts";
 import { readOvenPlayback, type OvenPlayback } from "./oven-playback.ts";
 import type { OvenSave } from "./oven-run-file.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** Bounds resident record metadata, independently of the total archive size. */
 export const MAX_OVEN_RECORDING_INDEX_ENTRIES = 65_536;

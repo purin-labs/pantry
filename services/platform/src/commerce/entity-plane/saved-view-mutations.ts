@@ -6,11 +6,11 @@ import type {
   SavedCommerceView,
   SavedCommerceViewRevision,
   CommerceMutationReceiptV1,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseSavedCommerceViewRevision,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { Result } from "../../result";
 import {
@@ -18,7 +18,7 @@ import {
   type PublishedResourceBoundaryError,
 } from "./published-resources";
 import type { SavedCommerceViewPresentationPatch } from "./routes";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type SavedViewMutationClient = Pick<
   CommerceEntityPlaneClient,

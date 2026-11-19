@@ -1,11 +1,11 @@
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   readAccountOnboardingRequest,
   readAccountOnboardingResult,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { SESSION_COOKIE, CSRF_COOKIE } from "../../src/control/authorization";
 import { readPantryProvisionEnvelope } from "../../src/account-platform/provisioning-boundary";
 import { commerceWorkspace } from "./commerce-support";

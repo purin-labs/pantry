@@ -4,8 +4,8 @@ import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
 import { requireConnectorId } from "../test-ids";
-import type { ConnectorDelivery } from "@seams/contracts";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import type { ConnectorDelivery } from "@purin-labs/contracts";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import { network } from "./network";
 import {

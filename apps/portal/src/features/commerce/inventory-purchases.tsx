@@ -4,8 +4,8 @@ import { controlRead } from "../../control-client";
 import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
-} from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
   organisationId: string;

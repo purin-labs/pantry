@@ -1,13 +1,13 @@
 import React from "react";
 import { Notice, StatusChip, formatRelativeTime } from "../../page-components";
 import { formatAbsoluteTime } from "../../formatting";
-import type { EmailReplyMemory } from "@seams/control-api/portal/agent-mailbox";
+import type { EmailReplyMemory } from "@purin-labs/control-api/portal/agent-mailbox";
 import { emailReplyIsOpenable, emailReplyLifecycleStatus } from "../../pages/agent-mailbox";
-import type { EmailOperationalPreviewResult, EmailOperationalQueueItem, EmailReplyPreviewResult, EmailReplyQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import type { EmailOperationalPreviewResult, EmailOperationalQueueItem, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import type { EmailReviewActions } from "./api";
-import type { EmailReviewQueue } from "@seams/control-api/portal/email-review";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type EmailReviewMutation =
   | Readonly<{

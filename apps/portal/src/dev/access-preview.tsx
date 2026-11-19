@@ -20,7 +20,7 @@ import type {
   CaseContextCollectionMetadataView,
   CaseContextCollectionRelationshipDecision,
   CaseContextCollectionRelationshipView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import "../styles.css";
 import { installCustomConnectorPreview } from "./custom-connector-preview";
@@ -30,7 +30,7 @@ import { WorkspaceLayout } from "../shell";
 import type {
   AiBudgetLimits,
   AiBudgetView,
-} from "@seams/control-api/portal/ai-budget";
+} from "@purin-labs/control-api/portal/ai-budget";
 import type {
   AccessControlGrantView,
   AccessControlOption,
@@ -43,9 +43,9 @@ import type {
   AccessRouteTransport,
   AccessSubview,
   DropboxResourcePage,
-} from "@seams/control-api/portal/access-models";
-import type { CapabilityDefinition } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api/portal/access-models";
+import type { CapabilityDefinition } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Scenario = "fresh" | "populated" | "viewer" | "empty";
 

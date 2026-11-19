@@ -1,7 +1,7 @@
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type { VaultKeyVersion } from "./keyring";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const vaultHandleBrand: unique symbol = Symbol("VaultHandle");
 const VAULT_HANDLE_PATTERN = /^vault:[a-z0-9][a-z0-9:_-]*$/;

@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { isNonEmptyString, isRecord } from "@seams/std";
+import { isNonEmptyString, isRecord } from "@purin-labs/std";
 import {
   parseSessionId,
   parseOrganisationId,

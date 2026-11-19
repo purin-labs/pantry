@@ -14,11 +14,11 @@ import {
   type CommerceStoredValueAccountV1,
   type CommerceStoredValueCommandV1,
   type CommerceStoredValueLiabilityV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type CheckoutStoredValueTender,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../../database.ts";
 import { customerIsActive } from "../customers/index.ts";

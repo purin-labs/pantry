@@ -1,7 +1,7 @@
 import type { JsonObject } from "../../http";
 import type { Result } from "../../result";
-import type { VariantBy } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 import type {
   ShopifyWebhookRegistration,
   ShopifyWebhookRegistrationError,

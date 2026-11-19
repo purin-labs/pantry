@@ -1,5 +1,5 @@
-import type { PermissionRequired } from "@seams/control-api";
-import type { RequestAuthority } from "@seams/contracts";
+import type { PermissionRequired } from "@purin-labs/control-api";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import {
   CAPABILITY_KEYS,
@@ -14,7 +14,7 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import { validateNativeRequestAuthority } from "../request-authority";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Whether one person may read the customer text of one WhatsApp number in the

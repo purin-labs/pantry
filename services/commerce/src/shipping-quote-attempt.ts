@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
-import type { ShippingQuoteSnapshot } from "@seams/commerce-contracts";
-import { parseShippingQuoteSnapshot } from "@seams/commerce-client";
+import type { ShippingQuoteSnapshot } from "@purin-labs/commerce-contracts";
+import { parseShippingQuoteSnapshot } from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "./database.ts";
 import {
@@ -13,8 +13,8 @@ import type {
   ShippingQuoteRequest,
   ShippingQuoteResult,
 } from "./regional-shipping.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { hasExactKeys, isNormalizedText, isRecord } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { hasExactKeys, isNormalizedText, isRecord } from "@purin-labs/std";
 
 type ShippingQuoteAttemptBase = Readonly<{
   attemptId: string;

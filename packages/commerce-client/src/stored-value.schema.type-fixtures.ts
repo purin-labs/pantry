@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiStoredValue from "@seams/commerce-contracts/records/api-stored-value";
+import type * as apiStoredValue from "@purin-labs/commerce-contracts/records/api-stored-value";
 import type {
   CreditCommerceStoreCreditV1,
   DisableCommerceStoredValueAccountV1,

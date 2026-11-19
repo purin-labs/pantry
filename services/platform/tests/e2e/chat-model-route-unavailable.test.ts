@@ -1,5 +1,5 @@
 import { expect, it, type TestContext } from "vitest";
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 
 import {
   readOrganisationInferenceSelection,

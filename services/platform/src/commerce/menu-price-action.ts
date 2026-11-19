@@ -4,7 +4,7 @@
 // page reads it live. The path carries the price before and after, so the
 // card shows both and the approval signs exactly that change. A deal is the
 // new price with the earlier price kept as the offer's compare-at price.
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import type { Result } from "../result";
 

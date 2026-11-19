@@ -1,4 +1,4 @@
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { ActorFenceToken } from "./actor-registry";

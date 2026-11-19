@@ -6,8 +6,8 @@
 //   packages and npm packages. It never imports a Pantry package or a file in
 //   another workspace directory.
 // - Code outside Commerce uses Commerce only through its public packages
-//   (@seams/commerce-contracts, @seams/commerce-client,
-//   @seams/commerce-query-sqlite) or the built Worker. It never imports
+//   (@purin-labs/commerce-contracts, @purin-labs/commerce-client,
+//   @purin-labs/commerce-query-sqlite) or the built Worker. It never imports
 //   the Worker's or the storefront's source.
 // - A built-in plugin keeps its code in services/commerce/src/plugins/<id>/
 //   (Plan 77 step 3). Code outside that directory, tests included, imports
@@ -159,7 +159,7 @@ function checkSource(file) {
         if (!allowedFromCommerce(target, neutral))
           report(file, line, specifier, `imports ${target}, outside ${commerceEngine ? "Underclerk" : "the neutral packages"}`);
       } else if (within(target, COMMERCE_RUNTIME_DIRECTORIES)) {
-        report(file, line, specifier, `imports Underclerk source ${target}; use @seams/commerce-client or the built Worker`);
+        report(file, line, specifier, `imports Underclerk source ${target}; use @purin-labs/commerce-client or the built Worker`);
       }
       continue;
     }
@@ -169,7 +169,7 @@ function checkSource(file) {
       report(file, line, specifier, `imports ${name}, a package outside Underclerk`);
     else if (neutral && !neutralPackages.has(name)) report(file, line, specifier, `imports ${name} from a neutral package`);
     else if (!commerceEngine && runtimePackages.has(name))
-      report(file, line, specifier, `imports ${name}, Underclerk's runtime source; use @seams/commerce-client or the built Worker`);
+      report(file, line, specifier, `imports ${name}, Underclerk's runtime source; use @purin-labs/commerce-client or the built Worker`);
   }
   if (within(file, [PLATFORM_ROUTES]))
     for (const match of text.matchAll(/\.prepare\(/g))

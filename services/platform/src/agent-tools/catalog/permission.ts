@@ -10,7 +10,7 @@ import {
   type RequestableCapability,
   type RequestableEntityTypeRead,
 } from "../../authorization/requestable-capabilities";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type { CatalogExecutionContext } from "./execute";
 import type { HarnessCapabilityName, HarnessToolDefinition } from "./types";
 

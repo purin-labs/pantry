@@ -1,5 +1,5 @@
 import { SLACK_NO_LINK_PREVIEW } from "./messages";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 
 import { RequestDeadline } from "../request-deadline";
 import type { Result } from "../result";

@@ -1,5 +1,5 @@
 import { isConversationId, type ConversationId } from "./ids.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { isSideCaseProposalId } from "./chat-side-cases.ts";
 
 export type ChatThreadLineage =

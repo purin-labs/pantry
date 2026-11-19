@@ -8,10 +8,10 @@ import {
   parseConversationId,
   type ConversationId,
   type UserId,
-} from "@seams/control-api";
-import type { RequestAuthority } from "@seams/contracts";
-import { canonicalJson, sha256Hex } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import type { Env } from "../env";
 import type { ControlSessionId } from "../ids";

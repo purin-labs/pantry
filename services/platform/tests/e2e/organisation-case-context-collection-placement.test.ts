@@ -9,7 +9,7 @@ import {
   runInDurableObject,
   runDurableObjectAlarm,
 } from "cloudflare:test";
-import { assertNever, encodeBase64Url } from "@seams/std";
+import { assertNever, encodeBase64Url } from "@purin-labs/std";
 import { http, HttpResponse } from "msw";
 import { network } from "./network";
 import { expect, it, vi, type TestContext } from "vitest";

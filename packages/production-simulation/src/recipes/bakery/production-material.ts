@@ -6,13 +6,13 @@ import type {
   PhysicsGeometry,
   PhysicsPose,
   PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { rackBindings, type WorkcellInput } from "./workcell-input.ts";
 import { workcellAt } from "./workcell-attempt.ts";
 import { continuationPrefix, type Run, type Handoff } from "./schedule.ts";
 import type { ProductionWorkcell } from "./production-workcells.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type ProductionMaterialBinding = Readonly<{
   profile: "mbco-cold-proxy-v1";

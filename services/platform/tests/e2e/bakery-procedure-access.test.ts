@@ -6,7 +6,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import type { AccessGrant } from "../../src/authorization/access-grants/types";
 import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
-import { parseCommerceGraphQuery } from "@seams/commerce-client";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import {
   commerceClient,
   commerceWorkspace,

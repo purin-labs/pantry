@@ -7,11 +7,11 @@ import { exports } from "cloudflare:workers";
 import {
   importScenario,
   type BakeryWorkflowDocument,
-} from "@seams/bakery-workflow";
-import { draftSeed } from "@seams/bakery-workflow/draft";
+} from "@purin-labs/bakery-workflow";
+import { draftSeed } from "@purin-labs/bakery-workflow/draft";
 import { compileLatte } from "../../../../packages/production-simulation/src/recipes/bakery/latte";
-import { newConversationId, type ConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import { newConversationId, type ConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it } from "vitest";
 

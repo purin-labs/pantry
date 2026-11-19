@@ -2,9 +2,9 @@ import { createHash } from "node:crypto";
 import {
   parseOpenBuyerOrderBalanceCommand,
   parseRequestBuyerReturnCommand,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { BuyerRoute } from "../../http-routes.ts";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import {
   verifyDraftInvoiceAccess,
   verifyOrderRecoveryAccess,
@@ -12,7 +12,7 @@ import {
 import type { HttpRouteContext } from "../context.ts";
 import { bearerToken, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function openDraftInvoiceRoute(
   ctx: HttpRouteContext,

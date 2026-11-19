@@ -1,8 +1,8 @@
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   SIDE_CASE_BRIEF_MAX_LENGTH,
   SIDE_CASE_TITLE_MAX_LENGTH,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   HarnessFollowUpRequest,
   HarnessMemoryProposalRequest,

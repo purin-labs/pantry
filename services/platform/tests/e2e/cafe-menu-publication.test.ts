@@ -1,16 +1,16 @@
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
-import { MenuDraftDoc, type MenuDraftUpdate } from "@seams/menu-draft-crdt";
+} from "@purin-labs/commerce-client";
+import { MenuDraftDoc, type MenuDraftUpdate } from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftClientMessage,
   parseMenuDraftServerMessage,
   type MenuDraftServerMessage,
-} from "@seams/menu-draft-crdt/protocol";
+} from "@purin-labs/menu-draft-crdt/protocol";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";

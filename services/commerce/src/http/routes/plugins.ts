@@ -1,10 +1,10 @@
 import type { BuyerRoute, CommerceRoute } from "../../http-routes.ts";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import { refuseCommandScopes } from "../admission.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { hasMerchantId, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function listPluginsRoute(
   ctx: HttpRouteContext,

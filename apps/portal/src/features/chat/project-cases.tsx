@@ -7,8 +7,8 @@ import {
   type Project,
   type ProjectCaseEntry,
   type ProjectId,
-} from "@seams/control-api";
-import { assertNever, errorMessage } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, errorMessage } from "@purin-labs/std";
 import { moveCaseToProject, readProjectCases } from "./api";
 
 type Props = Readonly<{

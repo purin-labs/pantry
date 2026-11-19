@@ -19,7 +19,7 @@ import type {
   SystemSchemaRevision,
   MerchantExtensionSchemaRevision,
   CustomCommerceEntityTypeDraft,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   parseAttributeAssignment,
@@ -46,8 +46,8 @@ import {
   FOOD_SERVICE_ENTITY_TYPES,
   foodServiceLatestRevision,
 } from "../plugins/food-service/index.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { isRecord, parseJson } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isRecord, parseJson } from "@purin-labs/std";
 
 type SystemKind = SystemCommerceEntityRef["typeId"];
 type EntityState = "active" | "archived";

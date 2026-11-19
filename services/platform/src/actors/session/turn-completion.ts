@@ -3,11 +3,11 @@ import {
   createCancellableTask,
   type CancellableTask,
   type TaskCancellationReason,
-} from "@seams/async-control/cancellable-task";
+} from "@purin-labs/async-control/cancellable-task";
 import {
   runTaskBeforeDeadline,
   type DeadlineOutcome,
-} from "@seams/async-control/deadline";
+} from "@purin-labs/async-control/deadline";
 import type { Result } from "../../result";
 import { SessionExecutionAdmission } from "../session-execution-admission";
 import { commitPreparedSessionCheckpoint } from "../actor-journal/transactions";

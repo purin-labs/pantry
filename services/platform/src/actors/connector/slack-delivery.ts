@@ -1,5 +1,5 @@
 import { SLACK_STREAM_TEXT_LIMIT } from "../../slack/stream";
-import type { ConnectorDelivery } from "@seams/contracts";
+import type { ConnectorDelivery } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import {
   readSlackThreadCredentialRoute,
@@ -61,8 +61,8 @@ import {
   slackRetryAt,
   SLACK_NO_LINK_PREVIEW,
 } from "../../slack/messages";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isNonBlankString, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isNonBlankString, isRecord } from "@purin-labs/std";
 import { parseDeliveryState } from "./ingress-parsers";
 import {
   type ConnectorDeliveryRequest,

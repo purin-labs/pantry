@@ -249,7 +249,7 @@ function runSecretsStoreCommand(args) {
     "pnpm",
     [
       "--filter",
-      "@seams/platform",
+      "@purin-labs/platform",
       "exec",
       "wrangler",
       "secrets-store",

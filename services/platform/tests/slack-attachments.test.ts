@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MESSAGE_ATTACHMENT_POLICY } from "@seams/control-api";
+import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
 import { acquireSlackAttachmentBatch } from "../src/slack/attachments";
 import {
   parseSlackEnvelope,

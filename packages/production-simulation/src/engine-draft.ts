@@ -40,7 +40,7 @@ import type {
   WorkflowInstanceState,
 } from "./state.ts";
 import { advance, repeat, type LogicalTime } from "./time.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * One advance works on a draft: the run's records keyed by identity. Records

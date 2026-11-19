@@ -3,7 +3,7 @@ import {
   MAX_CASE_EXECUTION_CONTENT_LENGTH,
   MAX_CASE_EXECUTION_PAGE,
   parseCaseExecutionNode,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   CaseExecutionCaseRef,
   CaseExecutionContent,
@@ -13,15 +13,15 @@ import type {
   CaseExecutionNodeDetail,
   CaseExecutionPage,
   OpenCaseExecutionNode,
-} from "@seams/control-api";
-import { isConversationId } from "@seams/control-api";
+} from "@purin-labs/control-api";
+import { isConversationId } from "@purin-labs/control-api";
 import {
   decodeBase64Url,
   isNonNegativeInteger,
   isRecord,
   isSha256Hex,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 import {
   findActiveCaseActorAtScope,

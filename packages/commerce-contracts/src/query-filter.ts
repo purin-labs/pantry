@@ -8,8 +8,8 @@ import {
 } from "./schema.ts";
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever, codePointCount, isRecord } from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+import { assertNever, codePointCount, isRecord } from "@purin-labs/std";
+import { type StrictUnion } from "@purin-labs/type-utils";
 import {
   attributeValueSchema,
   parseAttributeValue,

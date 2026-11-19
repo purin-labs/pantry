@@ -17,12 +17,12 @@ import {
   resumeActorRestore,
 } from "../../src/actors/actor-restore";
 import { prepareActorRestoreManifest } from "../../src/actors/actor-restore-manifest";
-import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
+import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   bakeryRunSnapshotPrefix,
   savedBakeryRunArchiveKeys,
 } from "../../src/commerce/bakery/saved-runs";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   workspaceRevisionArchiveKeys,
   verifyWorkspaceRevisionReceipt,

@@ -1,10 +1,10 @@
 import type { BuyerRoute, CommerceRoute } from "../../http-routes.ts";
 import type { SquareResult } from "../../payments/square/square-connection.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** A merchant's Square connection and what it reads (Plan 80 step 4). */
 export async function squareConnectionRoute(

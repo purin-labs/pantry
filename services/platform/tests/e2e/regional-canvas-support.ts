@@ -2,8 +2,8 @@ import interrupted from "../../../../assets/bakery-mujoco/combined-bakery/rust-e
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import { http } from "msw";
-import { isRecord, sha256Hex } from "@seams/std";
-import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { network } from "./network";
 import { openRouterText } from "./slack-journey-support";
 import { commerceHeaders } from "./commerce-support";

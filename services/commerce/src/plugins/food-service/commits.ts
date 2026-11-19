@@ -1,7 +1,7 @@
 // The mutations of the kitchen commands, as the core commits them: the
 // observations of the signed delivery, the receipt's resource, and the rows
 // that the commit transaction writes.
-import type { CommerceAggregateObservationV1 } from "@seams/commerce-client";
+import type { CommerceAggregateObservationV1 } from "@purin-labs/commerce-client";
 
 import {
   foodServiceObservation,
@@ -28,7 +28,7 @@ import {
 import { writeSoldOutMark } from "./sold-out-marks.ts";
 import type { FoodServiceCommitRequest } from "./food-service-commands.ts";
 import type { ProductionCommitRequest } from "./production-commands.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export function foodServiceMutation(
   request: FoodServiceCommitRequest | ProductionCommitRequest,

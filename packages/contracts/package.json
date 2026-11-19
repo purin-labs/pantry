@@ -1,5 +1,5 @@
 {
-  "name": "@seams/contracts",
+  "name": "@purin-labs/contracts",
   "version": "0.1.0",
   "private": true,
   "sideEffects": false,
@@ -31,9 +31,9 @@
     "media:build": "pnpm executor:check && wasm-pack build ../../crates/media-inspect --target web --release --out-dir ../../packages/contracts/media-wasm-pkg"
   },
   "dependencies": {
-    "@seams/std": "workspace:*",
-    "@seams/type-utils": "workspace:*",
-    "@seams/commerce-contracts": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

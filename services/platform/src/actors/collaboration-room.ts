@@ -1,9 +1,9 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   authorizeSessionTurnExecution,
   type SessionTurnExecution,
 } from "../chat/turn-access";
-import { createContinueSerialQueue } from "@seams/async-control/serial-queue";
+import { createContinueSerialQueue } from "@purin-labs/async-control/serial-queue";
 import {
   COLLABORATION_SOCKET_LIMIT,
   type CollaborationAgentActivity,
@@ -14,8 +14,8 @@ import {
   type CollaborationPointerPosition,
   type CollaborationPresenceState,
   type EncodedValue,
-} from "@seams/collaboration";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+} from "@purin-labs/collaboration";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import {
   listOrganisationMembers,

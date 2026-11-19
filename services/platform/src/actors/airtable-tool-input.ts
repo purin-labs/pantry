@@ -1,5 +1,5 @@
 import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export type AirtableReadRequest = Readonly<{
   baseId: string;

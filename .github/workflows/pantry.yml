@@ -81,7 +81,7 @@ jobs:
         run: pnpm async-control:check
 
       - name: Commerce machines and plugins check
-        run: pnpm --filter @seams/commerce-contracts commerce-data:check
+        run: pnpm --filter @purin-labs/commerce-contracts commerce-data:check
 
       - name: Install pinned wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
@@ -117,10 +117,10 @@ jobs:
           node scripts/check-d1-patch.mjs --base "origin/${{ github.base_ref }}"
 
       - name: Edge TypeScript check
-        run: pnpm --filter @seams/platform check:types
+        run: pnpm --filter @purin-labs/platform check:types
 
       - name: Edge test TypeScript check
-        run: pnpm --filter @seams/platform check:test-types
+        run: pnpm --filter @purin-labs/platform check:test-types
 
       - name: Unit suites
         # The Platform unit suite, the Portal, storefront and package suites and
@@ -133,10 +133,10 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
         run: |
-          pnpm --filter @seams/platform contracts:media
+          pnpm --filter @purin-labs/platform contracts:media
           edge_failed=0
           for edge_shard in 1 2 3 4; do
-            if ! pnpm --filter @seams/platform exec vitest run --config vitest.e2e.config.ts --shard="$edge_shard/4"; then
+            if ! pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts --shard="$edge_shard/4"; then
               edge_failed=1
             fi
           done
@@ -215,8 +215,8 @@ jobs:
         run: |
           node scripts/bakery-robots/install-native-sdk.mjs "$MUJOCO_DIR"
           cargo build --locked --release --manifest-path crates/bakery-native/Cargo.toml
-          pnpm --filter @seams/contracts media:build
-          pnpm --filter @seams/production-simulation check:types
+          pnpm --filter @purin-labs/contracts media:build
+          pnpm --filter @purin-labs/production-simulation check:types
           node --input-type=module <<'JS'
           import { execFileSync } from "node:child_process";
           import { BAKERY_BROWSER_BUNDLE } from "./packages/production-simulation/src/simulator/browser-physics-asset.ts";
@@ -227,8 +227,8 @@ jobs:
           ], { stdio: "inherit" });
           JS
           pnpm portal:build
-          pnpm --filter @seams/commerce-client check:types
-          pnpm --filter @seams/bakery-model check:types
+          pnpm --filter @purin-labs/commerce-client check:types
+          pnpm --filter @purin-labs/bakery-model check:types
 
       # scripts/production-simulation/journeys.json lists every journey; its set
       # "ci" holds the headless journeys of this job, in this order. The runner
@@ -239,7 +239,7 @@ jobs:
 
       - name: Verify browser comparison, chat edits and saved runs
         run: |
-          pnpm --filter @seams/portal dev --host 127.0.0.1 --port 5194 --strictPort > output/bakery-ci/vite.log 2>&1 &
+          pnpm --filter @purin-labs/portal dev --host 127.0.0.1 --port 5194 --strictPort > output/bakery-ci/vite.log 2>&1 &
           bakery_vite_pid=$!
           output/bakery-ci/tools/node_modules/.bin/tsx scripts/production-simulation/serve-oven-authoring.mjs output/bakery-ci/oven-authoring-storage > output/bakery-ci/oven-authoring-storage.log 2>&1 &
           bakery_authoring_pid=$!

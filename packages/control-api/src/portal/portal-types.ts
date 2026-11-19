@@ -6,7 +6,7 @@ import type {
   OnboardingNextAction,
   OnboardingStepProjection,
   OrganisationOnboardingLifecycle,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   CapabilityProfile,
   ControlRole,

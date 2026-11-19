@@ -3,7 +3,7 @@ import {
   REGISTER_SURFACE,
   type PageViewCommand,
   type SurfacePageCommandV1,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /**
  * How a chat names an agent command on a Portal page (Plan 87 phase 4). The

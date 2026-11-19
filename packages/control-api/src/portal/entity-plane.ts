@@ -4,16 +4,16 @@ import {
   parseCustomCommerceRelationshipRef,
   parseCommerceEntityPlaneCommand,
   parseEntityPlaneCommandResult,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   ActionState,
   CommerceEntityPlaneEffect,
   CommerceEntityRef,
   CommerceMutationReceiptV1,
-} from "@seams/contracts";
-import { sameRelationshipDefinitionRef } from "@seams/commerce-contracts/commerce-relationship-references";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+} from "@purin-labs/contracts";
+import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
 import type {
   CommerceActivityResource,
   CommerceActivitySourceName,

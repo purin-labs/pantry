@@ -7,7 +7,7 @@ import type {
   CommerceMerchantSnapshotV1,
   CommerceMutationErrorV1,
   CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { MerchantRow } from "./ledger.ts";
 

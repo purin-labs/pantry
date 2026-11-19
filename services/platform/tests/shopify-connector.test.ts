@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type {
   CanonicalCommerceObservation,
   CommerceProjection,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   createCueQueueMessage,
@@ -35,7 +35,7 @@ import {
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
 } from "../src/commerce/commerce-wasm";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type CapturedShopifyRequest = {
   url: string;

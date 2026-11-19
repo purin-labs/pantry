@@ -2,7 +2,7 @@ import type {
   BakeryProductionControl,
   BakeryProductionTarget,
   BakeryPersistentSurface,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 
 // @ts-expect-error Every target requires the exact continuation and host.
 const incompleteTarget: BakeryProductionTarget = {
@@ -32,8 +32,8 @@ const incompleteSurface: BakeryPersistentSurface = {
 };
 void [incompleteTarget, mixedControl, spreadControl, incompleteSurface];
 
-import type { BakeryProductionSnapshotSurface } from "@seams/bakery-model/bakery-surface";
-import type { Variant } from "@seams/type-utils";
+import type { BakeryProductionSnapshotSurface } from "@purin-labs/bakery-model/bakery-surface";
+import type { Variant } from "@purin-labs/type-utils";
 declare const savedEvidence: BakeryProductionSnapshotSurface;
 declare const executionTarget: BakeryProductionTarget;
 const activeSnapshot: BakeryProductionSnapshotSurface = {

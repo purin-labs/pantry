@@ -5,7 +5,7 @@ import {
   type saveChatDraft,
   type readChat,
 } from "../../../apps/portal/src/features/chat/api";
-import type { Chat } from "@seams/control-api/portal/chat";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
 // @ts-expect-error The portal build type-checks JSX separately from platform tests.
 import { ChatPage } from "../../../apps/portal/src/features/chat/route";
 

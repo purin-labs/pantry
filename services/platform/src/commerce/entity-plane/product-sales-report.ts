@@ -1,11 +1,11 @@
 import type {
   CommerceGraphQuery,
   SystemCommerceEntityKind,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   ProductSalesReport,
   CommerceAdminClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { parseCommerceGraphQuery } from "./routes";
 
 export type MerchantProductSalesResult = Readonly<{

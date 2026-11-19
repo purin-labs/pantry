@@ -1,4 +1,4 @@
-import type { ConnectorDeliveryReceipt } from "@seams/contracts";
+import type { ConnectorDeliveryReceipt } from "@purin-labs/contracts";
 import {
   fixtureDatabase,
   organisationDatabase,
@@ -42,7 +42,7 @@ import {
 } from "../../src/ids";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 export const SLACK_SIGNING_SECRET = "slack-signing-e2e-secret";
 export const ORGANISATION_ID = requiredOrganisationId(

@@ -4,9 +4,9 @@ import {
   MAX_CASE_TIMELINE_WINDOW,
   isConversationId,
   type ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { readConversationCaseId } from "../../chat/conversation-access";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 import {
   listCaseExecutionCases,

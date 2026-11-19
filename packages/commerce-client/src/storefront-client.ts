@@ -4,7 +4,7 @@ import type {
   CountryCode,
   DutyIncoterm,
   ShippingQuoteSnapshot,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCreateBuyerCartCommandRecord,
   parseCreateBuyerPickupCheckoutCommandRecord,
@@ -16,7 +16,7 @@ import {
   parseReplaceBuyerCartCommandRecord,
   parseCommerceBuyerSessionV4Record,
   parseValidateBuyerShippingAddressCommandRecord,
-} from "@seams/commerce-contracts/records/api-storefront";
+} from "@purin-labs/commerce-contracts/records/api-storefront";
 import {
   parseCommerceBuyerCartV1 as parseCommerceBuyerCartV1Record,
   parseCommerceBuyerCatalogSearchV1 as parseCommerceBuyerCatalogSearchV1Record,
@@ -29,14 +29,14 @@ import {
   parseCommerceBuyerShippingAddressValidationV1 as parseCommerceBuyerShippingAddressValidationV1Record,
   parseCommerceDraftInvoiceCheckoutV1 as parseCommerceDraftInvoiceCheckoutV1Record,
   parseCommerceOrderBalanceCheckoutV1 as parseCommerceOrderBalanceCheckoutV1Record,
-} from "@seams/commerce-contracts/records/api-storefront-responses";
+} from "@purin-labs/commerce-contracts/records/api-storefront-responses";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   parseCommerceShopNameV1,
   type CommerceShopNameV1,
-} from "@seams/commerce-contracts/records/api-shop-names";
-import { errorMessage } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts/records/api-shop-names";
+import { errorMessage } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   parseRequestBuyerReturnCommand,
   parseReturn,
@@ -99,7 +99,7 @@ import {
   requireText,
   responseMessage,
 } from "./wire-readers.ts";
-import type * as WireStorefront from "@seams/commerce-contracts/records/api-storefront";
+import type * as WireStorefront from "@purin-labs/commerce-contracts/records/api-storefront";
 
 export type CreateCommerceBuyerSessionV1 = WireStorefront.CreateCommerceBuyerSessionV1;
 

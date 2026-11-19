@@ -12,7 +12,7 @@ import {
   type MenuBoardItemRow,
   type MenuBoardStyle,
   type MenuBoardTypeRatio,
-} from "@seams/menu-board-crdt/board";
+} from "@purin-labs/menu-board-crdt/board";
 import type { MenuBoardClient } from "./board-client";
 import { boardColors } from "./board-view";
 import "./board-style-panel.css";

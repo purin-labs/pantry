@@ -8,7 +8,7 @@ import {
   type CommerceEventResourceV1,
   type CommerceEventV1,
   type CommerceMutationReceiptV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "./database.ts";
 import { COLLECTIONS_COMMAND_EVENTS } from "./plugins/collections/index.ts";

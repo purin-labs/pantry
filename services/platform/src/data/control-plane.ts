@@ -6,7 +6,7 @@ import {
 } from "./shared-rows/placement-row";
 import { prepareBootstrapReceiptPublication } from "./shared-rows/mutation-receipt";
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { ControlMembershipAvailability } from "@seams/control-api";
+import type { ControlMembershipAvailability } from "@purin-labs/control-api";
 import { AccountServiceGrantRevocation } from "../account-platform/service-membership";
 import type {
   AccountPlatformAccess,
@@ -58,7 +58,7 @@ import {
   type ControlMutationReceiptScope,
 } from "./control-mutation";
 import { prepareReadAndProposeAccessDefaults } from "./capability-policy";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type {
   OrganisationQuerySource,
   GlobalQuerySource,
@@ -70,8 +70,8 @@ import {
   prepareProjectMembershipRevocation,
 } from "../projects/default-project";
 import { prepareReturnPrivateChatsToDefault } from "../projects/case-project";
-import type { OnboardingControlRole } from "@seams/contracts";
-import { encodeBase64Url, isPositiveInteger, isRecord } from "@seams/std";
+import type { OnboardingControlRole } from "@purin-labs/contracts";
+import { encodeBase64Url, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type ControlRole = OnboardingControlRole;
 export type AssignableControlRole = Exclude<ControlRole, "owner">;

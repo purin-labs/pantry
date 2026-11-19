@@ -1,5 +1,5 @@
 import type { Result } from "./result";
-import { decodeBase64, sha256Hex } from "@seams/std";
+import { decodeBase64, sha256Hex } from "@purin-labs/std";
 
 export type HarnessCheckpointError =
   | { code: "checkpoint_invalid" }

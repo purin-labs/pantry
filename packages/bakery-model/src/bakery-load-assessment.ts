@@ -1,5 +1,5 @@
-import type { StrictUnion } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import tooling from "../../../assets/bakery-robots/universal-robots-ur5e/tooling/mass-properties.json" with { type: "json" };
 import {
   PHYSICS_ASSETS_SHA256,

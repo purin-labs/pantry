@@ -1,4 +1,4 @@
-import { bytesToHex } from "@seams/std";
+import { bytesToHex } from "@purin-labs/std";
 
 type SlackSignatureVerification =
   { ok: true } | { ok: false; reason: SlackSignatureFailure };

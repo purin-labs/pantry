@@ -3,7 +3,7 @@ import {
   parseSha256Hex,
   type Sha256Hex,
 } from "../index.ts";
-import { isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
+import { isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 
 /** JSON framing is bounded separately from the artifact's decoded UTF-8 bytes. */
 export const MAX_ENCODED_ARTIFACT_BYTES = MAX_ARTIFACT_BYTES * 2 + 1024;

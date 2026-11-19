@@ -2,7 +2,7 @@ import type {
   DropboxResourcePage,
   GoogleDrivePickerConfig,
 } from "./access-models.ts";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type { FileResourceDiscoveryEntry } from "../index.ts";
 
 export function parseDropboxResourcePage(raw: unknown): DropboxResourcePage {

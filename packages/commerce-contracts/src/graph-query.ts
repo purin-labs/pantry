@@ -12,7 +12,7 @@ import {
 } from "./query-wire.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever, codePointCount } from "@seams/std";
+import { assertNever, codePointCount } from "@purin-labs/std";
 import {
   selectorIdSchema,
   selectorRevisionSchema,

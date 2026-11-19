@@ -30,7 +30,7 @@
 import { randomUUID } from "node:crypto";
 import { Buffer } from "node:buffer";
 import { readFile, writeFile } from "node:fs/promises";
-import { isRecord, sleep } from "@seams/std";
+import { isRecord, sleep } from "@purin-labs/std";
 
 type CanaryCase = {
   readonly name: string;

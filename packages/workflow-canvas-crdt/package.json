@@ -1,5 +1,5 @@
 {
-  "name": "@seams/workflow-canvas-crdt",
+  "name": "@purin-labs/workflow-canvas-crdt",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "check:types": "tsrs --noEmit"
   },
   "dependencies": {
-    "@seams/collaboration": "workspace:*",
-    "@seams/std": "workspace:*",
+    "@purin-labs/collaboration": "workspace:*",
+    "@purin-labs/std": "workspace:*",
     "yjs": "13.6.32"
   },
   "devDependencies": {

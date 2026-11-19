@@ -3,7 +3,7 @@ import type {
   CommerceListEntry,
   ListEntryAttributeDefinition,
   ListEntryAttributeValue,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { parseCommerceTimestamp } from "./entity-plane/index.ts";
 
 export type PurchaseRequestUpdate = Readonly<{

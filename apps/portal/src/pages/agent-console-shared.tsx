@@ -1,14 +1,14 @@
 import React from "react";
 
-import type { AgentConfigurationProposal, AgentDefinition, AgentInstallation, AgentOperationCommand, AgentOperationFormContext, AgentOperationKind, AgentOperationsSnapshot, CueBinding, OperationalArea, Skill, ScheduleBinding } from "@seams/control-api/portal/agent-operations";
+import type { AgentConfigurationProposal, AgentDefinition, AgentInstallation, AgentOperationCommand, AgentOperationFormContext, AgentOperationKind, AgentOperationsSnapshot, CueBinding, OperationalArea, Skill, ScheduleBinding } from "@purin-labs/control-api/portal/agent-operations";
 import {
   Notice,
   RecoverableError,
   type StatusChipStatus,
 } from "../page-components";
 import { humanizeIdentifier } from "../formatting";
-import { assertNever } from "@seams/std";
-import type { AgentSkillRef } from "@seams/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { AgentSkillRef } from "@purin-labs/control-api";
 
 export type AgentOperationMutationState =
   | { readonly kind: "idle" }

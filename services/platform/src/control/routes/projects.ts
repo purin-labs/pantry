@@ -4,7 +4,7 @@ import {
   parseCaseProjectCommand,
   parseProjectCommand,
   projectReferenceIdentity,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { Env } from "../../env";
 import { parseCaseId } from "../../ids";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";

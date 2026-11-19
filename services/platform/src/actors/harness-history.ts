@@ -14,7 +14,7 @@ import type {
   HarnessToolOutput,
   Sha256Digest,
   TurnIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { parseStoredAttachment } from "../messages/stored-attachment";
 import {
@@ -26,13 +26,13 @@ import {
   isSha256Hex,
   nonNegativeIntegerOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type {
   HarnessHistoryContent,
   HarnessHistoryCursor,
   HarnessHistoryEntry,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 export type HarnessHistoryAcceptance =
   | { readonly kind: "advanced"; readonly cursor: HarnessHistoryCursor }

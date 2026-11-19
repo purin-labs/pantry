@@ -7,9 +7,9 @@
 // on an element that staff remove stays readable as off the board, and its
 // author deletes it. The next release carries no comment.
 import { expect, it, type TestContext } from "vitest";
-import type { MenuBoardCommentThread } from "@seams/control-api";
-import type { MenuBoardElement } from "@seams/menu-board-crdt";
-import { isRecord } from "@seams/std";
+import type { MenuBoardCommentThread } from "@purin-labs/control-api";
+import type { MenuBoardElement } from "@purin-labs/menu-board-crdt";
+import { isRecord } from "@purin-labs/std";
 import { closeSocket } from "./hibernatable-socket-support";
 import {
   BASE,

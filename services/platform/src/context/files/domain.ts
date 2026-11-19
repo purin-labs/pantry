@@ -4,7 +4,7 @@ import type {
   FileResourceScope,
   ProviderFileCursor,
   ProviderFileRevision,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   parseIntegrationAccountId,
@@ -18,7 +18,7 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export const FILE_PROJECTION_COMMAND_TYPE =
   "context.file_projection.v1" as const;

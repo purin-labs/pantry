@@ -7,7 +7,7 @@ import type {
   CaseExecutionNode,
   CaseExecutionNodeDetail,
   CaseExecutionPage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 const AT = 1_791_620_000_000;
 const MINUTE = 60_000;

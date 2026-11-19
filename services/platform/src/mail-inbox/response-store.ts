@@ -2,11 +2,11 @@ import {
   mailIdentifier,
   mailRevision,
   type MailMatch,
-} from "@seams/control-api";
-import { assertNever, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, isRecord } from "@purin-labs/std";
 import { compareGmailHistoryIds } from "../mail/gmail-adapter";
 import type { MailOrganizationHead } from "./types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type InboxResponseState =
   | Readonly<{

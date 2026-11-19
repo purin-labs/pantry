@@ -1,5 +1,5 @@
-import type { Variant } from "@seams/type-utils";
-import { hasExactKeys, isNonNegativeInteger } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { hasExactKeys, isNonNegativeInteger } from "@purin-labs/std";
 import type {
   TerminalBlockedReason,
   TerminalCounterReadback,

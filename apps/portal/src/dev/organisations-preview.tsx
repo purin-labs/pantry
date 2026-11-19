@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router";
 import type {
   AccountOnboardingOptions,
   AccountOnboardingRequest,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import "../styles.css";
 import {
   OrganisationsRoute,

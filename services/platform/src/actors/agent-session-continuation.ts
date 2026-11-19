@@ -1,4 +1,4 @@
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   assertTableExists,
   runSchemaMigrations,
@@ -7,7 +7,7 @@ import {
 import {
   parseBakeryBrowserContext,
   type BakeryBrowserContext,
-} from "@seams/bakery-model/bakery-context";
+} from "@purin-labs/bakery-model/bakery-context";
 import {
   parseRequestId,
   parseOrganisationId,

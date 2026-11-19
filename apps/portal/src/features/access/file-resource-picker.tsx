@@ -1,14 +1,14 @@
 import { Select } from "../../ui/select";
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 import type {
   DropboxResourcePage,
   FileResourceAccount,
   FileResourceSelection,
   GoogleDrivePickedFile,
-} from "@seams/control-api/portal/access-models";
-import type { FileResourceDiscoveryEntry } from "@seams/control-api";
+} from "@purin-labs/control-api/portal/access-models";
+import type { FileResourceDiscoveryEntry } from "@purin-labs/control-api";
 export type FileResourcePickerTransport = Readonly<{
   discoverDropbox: (
     input: Readonly<{

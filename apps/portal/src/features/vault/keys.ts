@@ -1,6 +1,6 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
-import type { CredentialAccountRecord } from "@seams/control-api/portal/credential-inventory";
+import type { CredentialAccountRecord } from "@purin-labs/control-api/portal/credential-inventory";
 import { providerLabel } from "../../integration-catalogue";
 import type { IntegrationRouteId } from "../integrations/model";
 

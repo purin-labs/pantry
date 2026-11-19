@@ -1,8 +1,8 @@
-import { NODE_COLUMN, NODE_ROW } from "@seams/bakery-workflow/layout";
+import { NODE_COLUMN, NODE_ROW } from "@purin-labs/bakery-workflow/layout";
 import {
   DRAFT_BOUNDS,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft";
+} from "@purin-labs/workflow-canvas-crdt/draft";
 
 /** Where the workflow draft canvas places a step. */
 

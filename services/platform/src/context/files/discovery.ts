@@ -2,7 +2,7 @@ import type { DropboxListEntry } from "../../provider-adapters/dropbox";
 import { listDropboxFolder } from "../../provider-adapters/dropbox";
 import type { Result } from "../../result";
 import type { FileProviderAccess } from "../../provider-workflows/file-context-credential";
-import type { FileResourceDiscoveryEntry } from "@seams/control-api";
+import type { FileResourceDiscoveryEntry } from "@purin-labs/control-api";
 
 const FILE_DISCOVERY_PAGE_SIZE = 100;
 const FILE_DISCOVERY_QUERY_MAX_CHARS = 256;

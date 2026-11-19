@@ -22,7 +22,7 @@ import { resolvePantryAccountBinding } from "./binding";
 import { resolveLinkedPantryAccountUser } from "./identity";
 import type { OrganizationMembership as AccountMembership } from "@seams-internal/console-shared/accountPlatform";
 import type { AccountPlatformError, PantryAccountBinding } from "./types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type AccountMembershipContext = Readonly<{
   client: AccountPlatformClient;

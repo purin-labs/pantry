@@ -14,9 +14,9 @@ import {
   type CommerceReturnCommandV1,
   type CommerceReturnLineV1,
   type CommerceReturnV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
-import { commerceTransition } from "@seams/commerce-contracts";
+import { commerceTransition } from "@purin-labs/commerce-contracts";
 import { listRefundAttemptsForOrder } from "../../payments/payment-records.ts";
 import type { CommerceDatabase } from "../../database.ts";
 import type { ReceiptPurchaseCheck } from "../built-in-ports.ts";

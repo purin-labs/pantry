@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId } from "../../ids";
 import { publishedResourceEvidenceMatchesScope } from "../../commerce/entity-plane/published-resources";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { AgentOperationCommand } from "../agent-operations";
 import { AgentOperationFailure, commitWithTrailing } from "./failure";
 import { responsibilityScopeColumns } from "./rows";

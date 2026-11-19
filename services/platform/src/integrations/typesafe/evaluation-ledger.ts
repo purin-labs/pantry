@@ -21,7 +21,7 @@ import { admitJevPaidCall } from "../../jev-features/paid-use";
 export const JEV_MONTHLY_ALLOWANCE_MICROUSD = 1_000_000;
 /** Plan 88 D8: at most 5 Pantry-funded Jev requests a second for each Organisation. */
 const JEV_REQUESTS_PER_SECOND = 5;
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export type TypeSafeUsageLimits = Readonly<{
   maxEvaluations: number;

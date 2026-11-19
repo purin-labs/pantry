@@ -1,5 +1,5 @@
-import type { OrganisationHomeRegions } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import type { OrganisationHomeRegions } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
 import {

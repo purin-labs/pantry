@@ -8,7 +8,7 @@ function batchRecoveryReady() {
 async function batchRecoveryBrowser() {
   const evidence = new URL(location.href).searchParams.get("evidence");
   if (evidence === null) throw new Error("Provide the headless evidence URL");
-  const { canonicalJson } = await import("/@id/@seams/std");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const api = window.productionRunPreview;
   const results = [];
   for (const [name, expectedFile] of [

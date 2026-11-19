@@ -4,13 +4,13 @@ import {
   CanvasLayout,
   WORKFLOW_CANVAS_SCHEMA,
   WorkflowCanvasDoc,
-} from "@seams/workflow-canvas-crdt";
+} from "@purin-labs/workflow-canvas-crdt";
 import {
   CanvasMoveRequest,
   type CanvasMoveOutcome,
   type CanvasMoveReceipt,
   type CanvasMoveOrigin,
-} from "@seams/workflow-canvas-crdt/move";
+} from "@purin-labs/workflow-canvas-crdt/move";
 import {
   encodeCanvasServerMessage,
   parseCanvasClientMessage,
@@ -19,13 +19,13 @@ import {
   type CanvasRoomMetadata,
   type CanvasSelection,
   type CanvasLastChange,
-} from "@seams/workflow-canvas-crdt/protocol";
+} from "@purin-labs/workflow-canvas-crdt/protocol";
 import {
   assertNever,
   isPositiveInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { UserId } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";

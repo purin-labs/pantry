@@ -9,7 +9,7 @@ import {
   type ChatSideCaseView,
   type ChatSideCaseState,
   type ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 const SOURCE = previewId("conv_00000000-0000-0000-0000-000000000001");
 const STARTED = previewId("conv_00000000-0000-0000-0000-000000000004");

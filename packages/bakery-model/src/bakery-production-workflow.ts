@@ -3,7 +3,7 @@ import type {
   ProductionAssignment,
   ProductionRoute,
 } from "./bakery-production-scenario.ts";
-import { isString } from "@seams/std";
+import { isString } from "@purin-labs/std";
 
 export type ProductionManualTask = Readonly<{
   bakeryTaskId: string;

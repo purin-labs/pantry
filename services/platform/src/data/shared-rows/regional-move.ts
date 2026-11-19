@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { Result } from "../../result";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   readPlacementByEpoch,
   samePlacement,

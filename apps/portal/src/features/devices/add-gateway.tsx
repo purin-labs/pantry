@@ -3,7 +3,7 @@ import {
   DEVICE_STATIONS,
   type DeviceList,
   type KitchenDeviceView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { cancelDialog, syncDialog } from "../../dialog";
 import { Select } from "../../ui/select";
@@ -12,7 +12,7 @@ import {
   startGateway,
   type GatewayStartResult,
 } from "./requests";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const STATION_ITEMS = DEVICE_STATIONS.map((station) => ({
   value: station.stationId,

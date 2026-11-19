@@ -1,4 +1,4 @@
-import { isNonNegativeInteger, isRecord, isString } from "@seams/std";
+import { isNonNegativeInteger, isRecord, isString } from "@purin-labs/std";
 
 type CredentialGenerationLifecycle =
   "staged" | "active" | "superseded" | "revoked" | "failed";

@@ -1,7 +1,7 @@
 import type {
   ShopifyFulfillmentStatusV202607,
   ShopifyResourceEnvelopeV202607,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { VaultResolveError } from "../credential-vault";
 import type { ShopifyRegistrationOperation } from "./connector/webhook-registration";

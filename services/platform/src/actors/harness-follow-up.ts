@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { HarnessTurnLease } from "@seams/contracts";
-import { assertNever, canonicalJson, sha256Hex } from "@seams/std";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
+import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
 import { acceptedExecutionAccountAuthority } from "../account-platform/access";
 import type { Env } from "../env";

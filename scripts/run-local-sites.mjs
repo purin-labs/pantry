@@ -28,7 +28,7 @@ const sites = runLocalProcesses(
       command: "pnpm",
       args: [
         "--filter",
-        "@seams/storefront",
+        "@purin-labs/storefront",
         "dev",
         "--host",
         "127.0.0.1",
@@ -45,7 +45,7 @@ const sites = runLocalProcesses(
       command: "pnpm",
       args: [
         "--filter",
-        "@seams/portal",
+        "@purin-labs/portal",
         "dev",
         "--host",
         "127.0.0.1",

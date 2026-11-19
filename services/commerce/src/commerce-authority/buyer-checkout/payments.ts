@@ -4,16 +4,16 @@ import {
   type CommerceOrderV1,
   type CommercePaymentV1,
   checkoutOnlineSource,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   Checkout,
   CheckoutPaymentAttempt,
   PaymentDispute,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { buyerSessionDigest } from "../../buyer-session.ts";
 import { sha256 } from "../checkout-shared.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { placedPaymentMatches } from "./placements.ts";
 
 export function buyerPaymentDisputeStatuses(

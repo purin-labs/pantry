@@ -1,7 +1,7 @@
 import { env, exports } from "cloudflare:workers";
-import { parseOrderQueueEntries } from "@seams/control-api";
-import { isRecord } from "@seams/std";
-import { commercePickupCode } from "@seams/commerce-client";
+import { parseOrderQueueEntries } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
+import { commercePickupCode } from "@purin-labs/commerce-client";
 import { expect, it, type TestContext } from "vitest";
 
 import type { IssuedControlSession } from "../../src/data/control-plane";

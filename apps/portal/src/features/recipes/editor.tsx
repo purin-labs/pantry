@@ -1,7 +1,7 @@
-import { isRecord } from "@seams/std";
-import { parseMutationResult } from "@seams/commerce-client";
+import { isRecord } from "@purin-labs/std";
+import { parseMutationResult } from "@purin-labs/commerce-client";
 import React from "react";
-import type { RecipeRevision } from "@seams/contracts";
+import type { RecipeRevision } from "@purin-labs/contracts";
 import {
   parseInventoryQuantityText,
   parseRecipeCollection,
@@ -9,7 +9,7 @@ import {
   type RecipeCollection,
   type RecipeItem,
   type RecipeWrite,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { controlRead, ControlApiError } from "../../control-client";
 import { Select } from "../../ui/select";
 import {

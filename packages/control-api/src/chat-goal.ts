@@ -1,6 +1,6 @@
-import { isRecord } from "@seams/std";
-import { parseCaseGoalSnapshot } from "@seams/contracts";
-import type { CaseGoalCommand, CaseGoalSnapshot } from "@seams/contracts";
+import { isRecord } from "@purin-labs/std";
+import { parseCaseGoalSnapshot } from "@purin-labs/contracts";
+import type { CaseGoalCommand, CaseGoalSnapshot } from "@purin-labs/contracts";
 
 export type ChatGoalCommand = Readonly<{
   commandId: string;

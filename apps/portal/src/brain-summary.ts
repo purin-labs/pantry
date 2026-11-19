@@ -4,7 +4,7 @@ import {
   brainItemsToReview,
   parseBrainSummaryResponse,
   type BrainSummary,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlRead, forgetWithControlReads } from "./control-client";
 import { brainSummaryPath } from "./control-paths";

@@ -17,7 +17,7 @@ import type {
   CommerceEventV1,
   CommerceOrderV1,
   CommercePaymentV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { stripeWebhook } from "../src/worker.ts";

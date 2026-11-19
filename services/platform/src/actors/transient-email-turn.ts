@@ -1,5 +1,5 @@
-import type { EmbeddedHarnessModelUsage } from "@seams/contracts";
-import { assertNever } from "@seams/std";
+import type { EmbeddedHarnessModelUsage } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
 
 import type { Result } from "../result";
 import {

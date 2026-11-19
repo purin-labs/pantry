@@ -7,8 +7,8 @@ import {
   organisationAuthzFromPolicy,
 } from "../src/policy/information-flow";
 import type { ContextVisibility } from "../src/authorization/access-grants/types";
-import type { RequestAuthority } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * A file read through `inspect_message_attachment` becomes part of the

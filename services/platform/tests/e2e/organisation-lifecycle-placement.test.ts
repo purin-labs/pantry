@@ -6,7 +6,7 @@ import {
 import { organisationDatabase, fixtureDatabase, onboardFixtureOrganisation } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, vi } from "vitest";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { parseUserId, type UserId, type OrganisationId } from "../../src/ids";
 import {
   issueControlSession,

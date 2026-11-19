@@ -2,8 +2,8 @@ import type {
   MailboxSetupAgentChoice,
   MailboxSetupPlan,
   MailboxSetupRequirement,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import { ControlApiError } from "../../control-client";
 import type { MailboxPolicyDraft } from "../../pages/agent-mailbox";

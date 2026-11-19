@@ -11,9 +11,9 @@ import {
   type CommerceOrderExchangeV1,
   type CommerceOrderPaymentChangeV1,
   type CommerceOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
-import type { Checkout } from "@seams/commerce-contracts";
+import type { Checkout } from "@purin-labs/commerce-contracts";
 
 import { readCheckout } from "../checkout-persistence.ts";
 import { writeOrder } from "../commerce-persistence.ts";

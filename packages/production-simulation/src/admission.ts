@@ -3,8 +3,8 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   sha256Hex,
-} from "@seams/std";
-import type { Variant, VariantBy } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { checkBatches } from "./batch-admission.ts";
 import { executionWork, outputCeiling } from "./scenario.ts";
 import { checkDependencies } from "./dependencies.ts";

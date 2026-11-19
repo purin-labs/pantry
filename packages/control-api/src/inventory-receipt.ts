@@ -2,8 +2,8 @@ import type {
   InventoryTrackingPolicy,
   QuantityUnit,
   Quantity,
-} from "@seams/contracts";
-import { isPositiveInteger, isRecord } from "@seams/std";
+} from "@purin-labs/contracts";
+import { isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type InventoryReceiptContext = Readonly<{
   merchantRevision: number;

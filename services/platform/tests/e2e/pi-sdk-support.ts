@@ -6,11 +6,11 @@ import { ensureInitialOrganisationPlacement } from "../../src/data/shared-rows/p
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { env } from "cloudflare:workers";
 import { expect } from "vitest";
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import type {
   AuthorizedHarnessToolResult,
   HarnessTurnLease,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   AcceptHarnessEventInput,
   AppendHarnessHistoryInput,

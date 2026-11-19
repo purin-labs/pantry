@@ -1,5 +1,5 @@
 import React from "react";
-import type { PieType } from "@seams/production-simulation/recipes/bakery/pie";
+import type { PieType } from "@purin-labs/production-simulation/recipes/bakery/pie";
 import {
   CRIMP_FORCE_ITEMS,
   DEFAULT_PASTRY_BENCH_RECIPE,

@@ -1,4 +1,4 @@
-import { assertNever, sha256HexSync } from "@seams/std";
+import { assertNever, sha256HexSync } from "@purin-labs/std";
 import type { AttributeFilter } from "./records/entity-plane.ts";
 import type { AttributeValue } from "./attribute-value.ts";
 import type { CommerceAggregation } from "./graph-query-schema.ts";

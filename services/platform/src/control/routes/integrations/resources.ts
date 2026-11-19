@@ -33,7 +33,7 @@ import {
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { account } from "../integrations";
 import { authorizeAccountRequest } from "./account-request";
 import { providerErrorStatus } from "./provider-start";

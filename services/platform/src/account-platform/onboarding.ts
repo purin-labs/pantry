@@ -1,4 +1,4 @@
-import { readAccountOnboardingRequest } from "@seams/control-api";
+import { readAccountOnboardingRequest } from "@purin-labs/control-api";
 import type { Env } from "../env";
 import {
   authenticateControlMutation,

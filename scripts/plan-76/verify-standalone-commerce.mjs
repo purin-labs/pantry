@@ -35,7 +35,7 @@ const evidence = {
 
 // 1. Dependency graph.
 const graph = JSON.parse(
-  execFileSync("pnpm", ["list", "--filter", "@seams/commerce-worker", "--filter", "@seams/storefront", "--depth", "Infinity", "--json"], {
+  execFileSync("pnpm", ["list", "--filter", "@purin-labs/commerce-worker", "--filter", "@purin-labs/storefront", "--depth", "Infinity", "--json"], {
     cwd: root,
     encoding: "utf8",
     maxBuffer: 64 * 1024 * 1024,
@@ -110,7 +110,7 @@ const check = spawnSync(process.execPath, ["scripts/check-runtime-boundary.mjs"]
 const probe = join(worker, "src/boundary-probe.ts");
 let refusal;
 try {
-  writeFileSync(probe, 'import { isRecord } from "@seams/std";\n\nexport const boundaryProbe = isRecord;\n');
+  writeFileSync(probe, 'import { isRecord } from "@purin-labs/std";\n\nexport const boundaryProbe = isRecord;\n');
   refusal = spawnSync(process.execPath, ["scripts/check-runtime-boundary.mjs"], { cwd: root, encoding: "utf8" });
 } finally {
   rmSync(probe, { force: true });
@@ -120,14 +120,14 @@ evidence.boundaryCheck = {
   summary: check.stdout.trim(),
   deliberateCrossing: {
     file: "services/commerce/src/boundary-probe.ts",
-    import: "@seams/std",
+    import: "@purin-labs/std",
     status: refusal.status,
     refusal: refusal.stderr.trim(),
   },
   passed:
     check.status === 0 &&
     refusal.status === 1 &&
-    refusal.stderr.includes("services/commerce/src/boundary-probe.ts:1 imports @seams/std"),
+    refusal.stderr.includes("services/commerce/src/boundary-probe.ts:1 imports @purin-labs/std"),
 };
 
 // 4. The Commerce suite.

@@ -9,7 +9,7 @@ import {
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   MENU_BOARD_MAX_COORDINATE,
   MENU_BOARD_MOVING_LIMIT,
@@ -24,7 +24,7 @@ import {
   type MenuBoardUpdate,
   type MenuBoardPresenceSelection,
 } from "./index.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export const MENU_BOARD_PROTOCOL = "menu_board_sync.v1";
 // A full snapshot and its state vector travel together as base64 in one frame.

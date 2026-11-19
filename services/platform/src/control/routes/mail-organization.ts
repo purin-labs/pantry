@@ -1,7 +1,7 @@
 import {
   parseMailOrganizationCommand,
   parseMailClassificationSelection,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import { mailControlAuthority } from "./mail-inbox";

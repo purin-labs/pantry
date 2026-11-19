@@ -10,7 +10,7 @@ import {
   SqliteObservation,
   type SqliteObservationSnapshot,
 } from "./sqlite-observation";
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { SessionDO } from "../../src/actors/agent-session";
 import { preflightHarnessTurnLeaseInTransaction } from "../../src/actors/agent-session-harness-authority";
 import { closeActorExecutionAdmission } from "../../src/actors/actor-execution-quiescence";

@@ -4,11 +4,11 @@ import {
   randomUUID,
   timingSafeEqual,
 } from "node:crypto";
-import type { CheckoutProfileReference } from "@seams/commerce-contracts";
+import type { CheckoutProfileReference } from "@purin-labs/commerce-contracts";
 import type {
   CommerceBuyerContactV1,
   CommerceProtectedBuyerContactV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { protectBuyerContact } from "./buyer-contact.ts";
 import {
@@ -16,7 +16,7 @@ import {
   hasExactKeys,
   isNormalizedText,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type BuyerSessionIdentity =
   | Readonly<{

@@ -9,7 +9,7 @@ import type {
   PublishedCommerceSelectorId,
   PublishedCommerceSelectorRevision,
   SavedCommerceView,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   EXPORT_COORDINATION_PRESET_ID,
   EXPORT_COORDINATION_PRESET_VERSION,
@@ -20,7 +20,7 @@ import {
   type CommerceEntityPlaneExportPresetPublishRequest,
   type CommerceEntityPlaneExportPresetPublishResponse,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceReadGrantScope } from "../authorization/access-grants/types";
 import {
@@ -40,14 +40,14 @@ import {
   capabilityPolicyAdmission,
   type CapabilityPolicyAdmission,
 } from "./capability-policy";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   isRecord,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 const EXPORT_AREA_ID = "area_export_coordination_v1";
 const EXPORT_SKILL_ID = "skill_export_coordination_v1";

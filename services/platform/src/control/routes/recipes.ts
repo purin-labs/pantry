@@ -1,5 +1,5 @@
-import { parseRecipeWrite } from "@seams/control-api";
-import type { RecipeRevision } from "@seams/contracts";
+import { parseRecipeWrite } from "@purin-labs/control-api";
+import type { RecipeRevision } from "@purin-labs/contracts";
 import { recipeCollectionOf } from "../../commerce/recipe-commands";
 import type { Env } from "../../env";
 import { controlError, controlJson, readJsonRecord } from "../http";

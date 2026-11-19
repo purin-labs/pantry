@@ -8,7 +8,7 @@ import {
   parseMailReplyEdit,
   parseMailReplyCorrection,
   parseMailRelationshipLookup,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { readEmailReplyProposalProjection } from "../../../data/email-mailbox";
 import { listEmailReviewProjections } from "../../../data/email-review";
 import { emailReviewQueueItemWire } from "../../email-review";
@@ -23,7 +23,7 @@ import {
   readBoundedJsonRecord,
 } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
-import { hasExactKeys, isPositiveInteger } from "@seams/std";
+import { hasExactKeys, isPositiveInteger } from "@purin-labs/std";
 import { agentMailboxConnector } from "../../../mail-inbox/agent-mailbox-connector";
 import {
   emailApprovalChallenge,

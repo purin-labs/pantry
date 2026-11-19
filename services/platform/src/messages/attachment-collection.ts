@@ -19,7 +19,7 @@ import {
   type AttachmentCollectionUncertainReceipt,
 } from "./attachment-reachability";
 import { traceWarn } from "../observability";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 /**
  * The scheduled attachment collection pass.
  *

@@ -8,7 +8,7 @@ import type {
   SessionIdentity,
   VerifiedSessionCheckpoint,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { validateCanonicalSessionRestore } from "../actor-wasm";
 import { parseSessionModelRoute } from "../policy-snapshot";
@@ -18,14 +18,14 @@ import {
   CANONICAL_SESSION_SCHEMA_VERSION,
   type AgentSessionPersistence,
 } from "./agent-session-schema";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonNegativeInteger,
   hasExactKeys,
   isRecord,
   positiveIntegerOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type ImportedCanonicalSessionLifecycle = AgentSessionLifecycle;
 

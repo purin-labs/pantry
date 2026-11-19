@@ -1,12 +1,12 @@
 import {
   isCounterRegisterPaymentMethod,
   type CounterRegisterPaymentMethod,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   CommerceClientError,
   CommercePickupCheckoutLineV1,
-} from "@seams/commerce-client";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-client";
+import type { Variant } from "@purin-labs/type-utils";
 
 import {
   cancelCounterSaleCollection,

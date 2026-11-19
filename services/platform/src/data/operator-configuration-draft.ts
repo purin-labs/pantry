@@ -13,8 +13,8 @@ import type { Env } from "../env";
 import { roleMayConfigure, type ControlRole } from "./control-plane";
 import type { ControlSessionId, OrganisationId, UserId } from "../ids";
 import { runAgentOperation } from "./agent-operation-runner";
-import { parseProposalChangeSummary } from "@seams/bakery-workflow/changes";
-import { parseRunFindings } from "@seams/bakery-workflow/findings";
+import { parseProposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
+import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import {
   applyApprovedWorkflowChange,
   type WorkflowChangeCommand,
@@ -43,7 +43,7 @@ import {
   type AgentOperationsError,
   type AgentOperationsSnapshot,
 } from "./agent-operations";
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 /**
  * A configuration change an operator asked for, stored before it is shown.
  *

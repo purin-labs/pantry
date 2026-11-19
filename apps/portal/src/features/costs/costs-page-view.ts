@@ -9,15 +9,15 @@ import type {
   PortalPageViewV1,
   ProductPlanVsActualRow,
   SupplyCostItem,
-} from "@seams/control-api";
-import type { CostsSheetTab } from "@seams/costs-sheet-crdt";
+} from "@purin-labs/control-api";
+import type { CostsSheetTab } from "@purin-labs/costs-sheet-crdt";
 import { formatMoneyMinor } from "../../formatting";
 import {
   registerSurfaceView,
   type SurfaceCommandOutcome,
   type SurfaceViewSource,
 } from "../surface-observation";
-import type { CostsViewCommand } from "@seams/control-api";
+import type { CostsViewCommand } from "@purin-labs/control-api";
 import { COSTS_COMMANDS } from "./costs-view-commands";
 import { formatCostQuantity } from "./api";
 import type { PresetId, ProjectedCostsSheet } from "./costs-sheet-draft";

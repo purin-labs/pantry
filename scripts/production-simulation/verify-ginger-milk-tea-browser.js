@@ -181,7 +181,7 @@ async function readDownloadedRun(filePath) {
   return response.json();
 }
 async function compareRecipeRuns({ authored, continued, evidence }) {
-  const { canonicalJson } = await import("/@id/@seams/std");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const expected = (
     await (await fetch(`${evidence}/mixed-restored.json`)).json()
   ).run;

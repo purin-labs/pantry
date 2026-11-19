@@ -1,14 +1,14 @@
-import type { CompiledScenario } from "@seams/production-simulation";
+import type { CompiledScenario } from "@purin-labs/production-simulation";
 import type { FactoryStationSource } from "../workflow-simulator/spatial/factory-stations";
 import { MORNING_SHIFT_STATIONS } from "./morning-shift-appliances";
 import {
   FINANCIER_FLAVOUR_PRODUCTS,
   financierFlavourOf,
-} from "@seams/production-simulation/recipes/bakery/financier-flavours";
+} from "@purin-labs/production-simulation/recipes/bakery/financier-flavours";
 import {
   PIE_PRODUCTS,
   pieTypeOf,
-} from "@seams/production-simulation/recipes/bakery/pie-products";
+} from "@purin-labs/production-simulation/recipes/bakery/pie-products";
 
 /**
  * Operator names for the places, equipment and steps of the recurring

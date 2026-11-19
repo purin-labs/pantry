@@ -58,8 +58,8 @@ import { resolveWhatsAppApplicationConfiguration } from "./application";
 import { resolveWhatsAppOrganisationCredential } from "./credential";
 import { unsubscribeWhatsAppApp } from "./graph";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
-import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 /**
  * The WhatsApp operator control plane: connect-time account inspection, agent

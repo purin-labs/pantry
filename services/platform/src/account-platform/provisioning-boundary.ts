@@ -26,7 +26,7 @@ import {
   encodeBase64Url,
   isRecord,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { Env } from "../env";
 import { accountObject, accountText } from "./types";
 

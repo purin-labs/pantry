@@ -1,9 +1,9 @@
-import type { ProjectSnapshot } from "@seams/control-api";
+import type { ProjectSnapshot } from "@purin-labs/control-api";
 import type {
   AcceptedInputRef,
   Sha256Digest,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { ModelContextBundle } from "../context/assembly";
 import type { StoredContextBundle } from "./actor-journal";

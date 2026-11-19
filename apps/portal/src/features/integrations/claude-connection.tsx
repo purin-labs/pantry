@@ -1,5 +1,5 @@
 import React from "react";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   ControlApiError,
   controlMutation,
@@ -15,8 +15,8 @@ import {
   type ClaudeConnection,
   type ClaudeAuthorization,
   type ClaudeConnectionView,
-} from "@seams/control-api";
-import { parseConnection } from "@seams/control-api/portal/claude-connection";
+} from "@purin-labs/control-api";
+import { parseConnection } from "@purin-labs/control-api/portal/claude-connection";
 
 export type ClaudeConnectionState =
   | Readonly<{ kind: "loading" }>

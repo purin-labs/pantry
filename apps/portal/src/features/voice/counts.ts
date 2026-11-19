@@ -10,8 +10,8 @@ import {
   type ChatTranscriptionPath,
   type VoiceEngineId,
   type VoiceHeard,
-} from "@seams/control-api";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import { readStored, writeStored } from "./setting";
 

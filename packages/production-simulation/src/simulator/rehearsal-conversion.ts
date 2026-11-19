@@ -1,8 +1,8 @@
-import type { Settings } from "@seams/bakery-model/bakery";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
 import {
   parsePhysicsCyclePlan,
   type PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   acceptProductionRecording,
   bindProductionSuccessor,
@@ -26,8 +26,8 @@ import {
   NATIVE_CHAIN,
   type WorkcellInput,
 } from "../recipes/bakery/workcell-input.ts";
-import type { Variant } from "@seams/type-utils";
-import { isRecord, isString } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord, isString } from "@purin-labs/std";
 
 // Earlier rehearsal files convert at the import boundary. Evidence replays
 // through the same acceptance and binding as a live run. Anything the one

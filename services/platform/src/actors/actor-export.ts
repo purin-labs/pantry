@@ -23,7 +23,7 @@ import {
   isNonEmptyString,
   isNonNegativeInteger,
   isPositiveInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 declare const actorExportIdBrand: unique symbol;
 

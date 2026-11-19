@@ -9,9 +9,9 @@ import {
   type GingerTeaHobModel,
   type GingerTeaLeaf,
   type GingerTeaWorkflowMode,
-} from "@seams/production-simulation/recipes/ginger-tea/model";
+} from "@purin-labs/production-simulation/recipes/ginger-tea/model";
 import { GingerTeaScene, type GingerTeaCameraPreset } from "./ginger-tea-scene";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "../oven-workspace.css";
 // The station readout uses the pour-over styles, so this view loads them itself.
 import "../pour-over/pour-over.css";

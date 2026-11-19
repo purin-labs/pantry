@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   type BoundaryContext,
   availableQuantity,

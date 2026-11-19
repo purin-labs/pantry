@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { parseConversationId, parseProjectId } from "@seams/control-api";
+import { parseConversationId, parseProjectId } from "@purin-labs/control-api";
 import { parseSessionTurnInputDigest } from "../src/actors/agent-session-turn-input-digest";
 import { parseVaultHandle } from "../src/credential-vault";
 import {

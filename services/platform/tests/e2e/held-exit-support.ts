@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject } from "cloudflare:test";
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { admitSessionInformationFlowObservation } from "../../src/actors/agent-session-information-flow";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";

@@ -46,7 +46,7 @@ import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { d1Database } from "./sqlite-d1";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 describe("verified contact endpoint boundary", suite);
 

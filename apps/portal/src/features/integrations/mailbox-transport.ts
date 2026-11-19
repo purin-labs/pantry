@@ -1,11 +1,11 @@
 import { controlRead } from "../../control-client";
-import { parseAgentOperationsResponse } from "@seams/control-api/portal/agent-operations";
-import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import { parseAgentOperationsResponse } from "@purin-labs/control-api/portal/agent-operations";
+import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import type { MailboxInstallationOption } from "../../pages/agent-mailbox";
-import type { IntegrationAccount } from "@seams/control-api/portal/settings";
-import { parseEmailOperationalPreviewResponse, parseEmailReplyPreviewResponse, parseEmailReviewQueue } from "@seams/control-api/portal/email-review";
-import { isRecord } from "@seams/std";
-import { parseAgentMailboxResponse } from "@seams/control-api/portal/mailbox";
+import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
+import { parseEmailOperationalPreviewResponse, parseEmailReplyPreviewResponse, parseEmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
+import { isRecord } from "@purin-labs/std";
+import { parseAgentMailboxResponse } from "@purin-labs/control-api/portal/mailbox";
 
 export function agentMailboxPath(
   organisationId: string,

@@ -1,5 +1,5 @@
-import { parseRunFindings } from "@seams/bakery-workflow/findings";
-import { isRecord } from "@seams/std";
+import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
+import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import { listOpenWorkflowProposals } from "../../commerce/bakery/workflow-proposals";
 import {

@@ -11,7 +11,7 @@ import type {
   MarkSoldOutCommand,
   ManagePreparationTicketCommand,
   CompleteProductionBatchCommand,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { FoodServiceExtension } from "../built-in-ports.ts";
 import { CafeScenarioProvisioning } from "./cafe-scenario.ts";
 import { foodServiceMutation } from "./commits.ts";

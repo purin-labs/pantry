@@ -9,8 +9,8 @@ import { type StorageHistoryView } from "./storage-history.ts";
 import { readStorageHistory } from "./storage-history-view.ts";
 import { type SchedulingHistoryView } from "./scheduling-history.ts";
 import { readSchedulingHistory } from "./scheduling-history-document.ts";
-import { isRecord } from "@seams/std";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import { isRecord } from "@purin-labs/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import * as d from "./document-values.ts";
 import { err, ok } from "./result.ts";
 import {

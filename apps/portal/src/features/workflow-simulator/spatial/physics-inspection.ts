@@ -1,18 +1,18 @@
-import type { PhysicsSceneReplay } from "@seams/production-simulation/recipes/bakery/physics-playback";
+import type { PhysicsSceneReplay } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import type { FitFinding } from "./floor-plan-geometry";
-import type { WorkcellView } from "@seams/production-simulation/simulator/workcell-view";
+import type { WorkcellView } from "@purin-labs/production-simulation/simulator/workcell-view";
 import type {
   PhysicsLayout,
   PersistentPhysicsMotion,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { PhysicsModel, disposePhysicsObject } from "./physics-model";
 import { TaskSpatialGuide } from "./task-spatial-guide";
 import { DoorInspection } from "./door-inspection";
 import type { FloorPlan } from "./floor-plan";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
-import { robotCellPosition } from "@seams/production-simulation/simulator/rehearsal-spatial";
-import { sceneLegAt } from "@seams/production-simulation/recipes/bakery/physics-playback";
-import { COLD_CELL } from "@seams/production-simulation/recipes/bakery/workcell-instances";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
+import { robotCellPosition } from "@purin-labs/production-simulation/simulator/rehearsal-spatial";
+import { sceneLegAt } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
+import { COLD_CELL } from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 import ovenUrl from "../../../../../../assets/bakery-mujoco/maruzen-mbco-5e/maruzen-mbco-5e.glb?url";
 
 export type RackLayoutPresentation = Readonly<{

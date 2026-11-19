@@ -26,7 +26,7 @@ the Portal. `AGENTS.md` (Deployment) gives the order of the six Workers.
 4. Deploy:
 
    ```bash
-   pnpm --filter @seams/platform run deploy
+   pnpm --filter @purin-labs/platform run deploy
    ```
 
 ## Guards before the upload

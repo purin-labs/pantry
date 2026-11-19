@@ -5,16 +5,16 @@ import {
   type MailReplySelection,
   type MailReplyStateVector,
   type MailReplyUpdate,
-} from "@seams/mail-reply-crdt";
-import { encodeDraftClientMessage, type DraftFailureCode, type MailReplyRoomMetadata } from "@seams/mail-reply-crdt/protocol";
+} from "@purin-labs/mail-reply-crdt";
+import { encodeDraftClientMessage, type DraftFailureCode, type MailReplyRoomMetadata } from "@purin-labs/mail-reply-crdt/protocol";
 import type {
   CollaborationAgentActivity,
   TextSelectionDirection,
-} from "@seams/collaboration";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/collaboration";
+import { assertNever } from "@purin-labs/std";
 import { TextCollaborationClient, type TextCollaborationClientMessage, type TextCollaborationView, type TextDocumentAdapter, type TextProtocolAdapter } from "../collaboration/text-client";
 import type { DraftPresenceView } from "../commerce/description-draft/presence";
-import { parseReplyServerMessage } from "@seams/control-api/portal/reply-draft";
+import { parseReplyServerMessage } from "@purin-labs/control-api/portal/reply-draft";
 
 /**
  * Plan 40D: the shared draft of one Inbox reply. People and agents edit the

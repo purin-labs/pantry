@@ -61,60 +61,60 @@ importers:
       '@base-ui/react':
         specifier: ^1.8.0
         version: 1.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@purin-labs/bakery-model':
+        specifier: workspace:*
+        version: link:../../packages/bakery-model
+      '@purin-labs/bakery-workflow':
+        specifier: workspace:*
+        version: link:../../packages/bakery-workflow
+      '@purin-labs/collaboration':
+        specifier: workspace:*
+        version: link:../../packages/collaboration
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../packages/commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../../packages/commerce-contracts
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/costs-sheet-crdt':
+        specifier: workspace:*
+        version: link:../../packages/costs-sheet-crdt
+      '@purin-labs/mail-reply-crdt':
+        specifier: workspace:*
+        version: link:../../packages/mail-reply-crdt
+      '@purin-labs/menu-board-crdt':
+        specifier: workspace:*
+        version: link:../../packages/menu-board-crdt
+      '@purin-labs/menu-draft-crdt':
+        specifier: workspace:*
+        version: link:../../packages/menu-draft-crdt
+      '@purin-labs/product-description-crdt':
+        specifier: workspace:*
+        version: link:../../packages/product-description-crdt
+      '@purin-labs/production-plan-crdt':
+        specifier: workspace:*
+        version: link:../../packages/production-plan-crdt
+      '@purin-labs/production-simulation':
+        specifier: workspace:*
+        version: link:../../packages/production-simulation
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+      '@purin-labs/workflow-canvas-crdt':
+        specifier: workspace:*
+        version: link:../../packages/workflow-canvas-crdt
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.24
         version: 2.1.24(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@seams/bakery-model':
-        specifier: workspace:*
-        version: link:../../packages/bakery-model
-      '@seams/bakery-workflow':
-        specifier: workspace:*
-        version: link:../../packages/bakery-workflow
-      '@seams/collaboration':
-        specifier: workspace:*
-        version: link:../../packages/collaboration
-      '@seams/commerce-client':
-        specifier: workspace:*
-        version: link:../../packages/commerce-client
-      '@seams/commerce-contracts':
-        specifier: workspace:*
-        version: link:../../packages/commerce-contracts
-      '@seams/contracts':
-        specifier: workspace:*
-        version: link:../../packages/contracts
-      '@seams/control-api':
-        specifier: workspace:*
-        version: link:../../packages/control-api
-      '@seams/costs-sheet-crdt':
-        specifier: workspace:*
-        version: link:../../packages/costs-sheet-crdt
-      '@seams/mail-reply-crdt':
-        specifier: workspace:*
-        version: link:../../packages/mail-reply-crdt
-      '@seams/menu-board-crdt':
-        specifier: workspace:*
-        version: link:../../packages/menu-board-crdt
-      '@seams/menu-draft-crdt':
-        specifier: workspace:*
-        version: link:../../packages/menu-draft-crdt
-      '@seams/product-description-crdt':
-        specifier: workspace:*
-        version: link:../../packages/product-description-crdt
-      '@seams/production-plan-crdt':
-        specifier: workspace:*
-        version: link:../../packages/production-plan-crdt
-      '@seams/production-simulation':
-        specifier: workspace:*
-        version: link:../../packages/production-simulation
-      '@seams/std':
-        specifier: workspace:*
-        version: link:../../packages/std
-      '@seams/type-utils':
-        specifier: workspace:*
-        version: link:../../packages/type-utils
-      '@seams/workflow-canvas-crdt':
-        specifier: workspace:*
-        version: link:../../packages/workflow-canvas-crdt
       lucide-react:
         specifier: ^0.542.0
         version: 0.542.0(react@19.2.7)
@@ -161,13 +161,13 @@ importers:
 
   apps/storefront:
     dependencies:
-      '@seams/commerce-client':
+      '@purin-labs/commerce-client':
         specifier: workspace:*
         version: link:../../packages/commerce-client
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../../packages/type-utils
       qrcode-generator:
@@ -207,22 +207,22 @@ importers:
 
   packages/bakery-model:
     dependencies:
-      '@seams/commerce-client':
+      '@purin-labs/commerce-client':
         specifier: workspace:*
         version: link:../commerce-client
-      '@seams/contracts':
+      '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@seams/control-api':
+      '@purin-labs/control-api':
         specifier: workspace:*
         version: link:../control-api
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../type-utils
-      '@seams/workflow-canvas-crdt':
+      '@purin-labs/workflow-canvas-crdt':
         specifier: workspace:*
         version: link:../workflow-canvas-crdt
       typebox:
@@ -235,16 +235,16 @@ importers:
 
   packages/bakery-workflow:
     dependencies:
-      '@seams/production-simulation':
+      '@purin-labs/production-simulation':
         specifier: workspace:*
         version: link:../production-simulation
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../type-utils
-      '@seams/workflow-canvas-crdt':
+      '@purin-labs/workflow-canvas-crdt':
         specifier: workspace:*
         version: link:../workflow-canvas-crdt
       typebox:
@@ -257,7 +257,7 @@ importers:
 
   packages/collaboration:
     dependencies:
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -273,13 +273,13 @@ importers:
 
   packages/commerce-client:
     dependencies:
-      '@seams/commerce-contracts':
+      '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../type-utils
     devDependencies:
@@ -289,10 +289,10 @@ importers:
 
   packages/commerce-contracts:
     dependencies:
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../type-utils
       typebox:
@@ -305,17 +305,17 @@ importers:
 
   packages/commerce-query-sqlite:
     dependencies:
-      '@seams/commerce-contracts':
+      '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../type-utils
     devDependencies:
-      '@seams/commerce-client':
+      '@purin-labs/commerce-client':
         specifier: workspace:*
         version: link:../commerce-client
       tsrs:
@@ -327,13 +327,13 @@ importers:
 
   packages/contracts:
     dependencies:
-      '@seams/commerce-contracts':
+      '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../type-utils
       typebox:
@@ -346,39 +346,39 @@ importers:
 
   packages/control-api:
     dependencies:
+      '@purin-labs/collaboration':
+        specifier: workspace:*
+        version: link:../collaboration
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../commerce-contracts
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@purin-labs/mail-reply-crdt':
+        specifier: workspace:*
+        version: link:../mail-reply-crdt
+      '@purin-labs/menu-board-crdt':
+        specifier: workspace:*
+        version: link:../menu-board-crdt
+      '@purin-labs/menu-draft-crdt':
+        specifier: workspace:*
+        version: link:../menu-draft-crdt
+      '@purin-labs/product-description-crdt':
+        specifier: workspace:*
+        version: link:../product-description-crdt
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../std
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../type-utils
       '@seams-internal/console-shared':
         specifier: file:../../vendor/seams/seams-internal-console-shared-0.1.3-ebed186cf39a.tgz
         version: file:vendor/seams/seams-internal-console-shared-0.1.3-ebed186cf39a.tgz
-      '@seams/collaboration':
-        specifier: workspace:*
-        version: link:../collaboration
-      '@seams/commerce-client':
-        specifier: workspace:*
-        version: link:../commerce-client
-      '@seams/commerce-contracts':
-        specifier: workspace:*
-        version: link:../commerce-contracts
-      '@seams/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@seams/mail-reply-crdt':
-        specifier: workspace:*
-        version: link:../mail-reply-crdt
-      '@seams/menu-board-crdt':
-        specifier: workspace:*
-        version: link:../menu-board-crdt
-      '@seams/menu-draft-crdt':
-        specifier: workspace:*
-        version: link:../menu-draft-crdt
-      '@seams/product-description-crdt':
-        specifier: workspace:*
-        version: link:../product-description-crdt
-      '@seams/std':
-        specifier: workspace:*
-        version: link:../std
-      '@seams/type-utils':
-        specifier: workspace:*
-        version: link:../type-utils
       typebox:
         specifier: 1.3.27
         version: 1.3.27
@@ -389,10 +389,10 @@ importers:
 
   packages/costs-sheet-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -405,10 +405,10 @@ importers:
 
   packages/email-draft-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -424,10 +424,10 @@ importers:
 
   packages/mail-reply-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -440,10 +440,10 @@ importers:
 
   packages/menu-board-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -456,10 +456,10 @@ importers:
 
   packages/menu-draft-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -475,10 +475,10 @@ importers:
 
   packages/product-description-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -494,10 +494,10 @@ importers:
 
   packages/production-plan-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -510,16 +510,16 @@ importers:
 
   packages/production-simulation:
     dependencies:
-      '@seams/bakery-model':
+      '@purin-labs/bakery-model':
         specifier: workspace:*
         version: link:../bakery-model
-      '@seams/contracts':
+      '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../type-utils
       fflate:
@@ -550,10 +550,10 @@ importers:
 
   packages/workflow-canvas-crdt:
     dependencies:
-      '@seams/collaboration':
+      '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
       yjs:
@@ -566,13 +566,13 @@ importers:
 
   scripts/punter:
     dependencies:
-      '@seams/commerce-client':
+      '@purin-labs/commerce-client':
         specifier: workspace:*
         version: link:../../packages/commerce-client
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../../packages/type-utils
     devDependencies:
@@ -588,19 +588,19 @@ importers:
 
   services/commerce:
     dependencies:
-      '@seams/commerce-client':
+      '@purin-labs/commerce-client':
         specifier: workspace:*
         version: link:../../packages/commerce-client
-      '@seams/commerce-contracts':
+      '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../../packages/commerce-contracts
-      '@seams/commerce-query-sqlite':
+      '@purin-labs/commerce-query-sqlite':
         specifier: workspace:*
         version: link:../../packages/commerce-query-sqlite
-      '@seams/std':
+      '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
-      '@seams/type-utils':
+      '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../../packages/type-utils
       quickjs-wasi:
@@ -649,69 +649,69 @@ importers:
       '@earendil-works/pi-schema':
         specifier: 1.5.0
         version: 1.5.0
+      '@purin-labs/async-control':
+        specifier: workspace:*
+        version: link:../../packages/async-control
+      '@purin-labs/bakery-model':
+        specifier: workspace:*
+        version: link:../../packages/bakery-model
+      '@purin-labs/bakery-workflow':
+        specifier: workspace:*
+        version: link:../../packages/bakery-workflow
+      '@purin-labs/collaboration':
+        specifier: workspace:*
+        version: link:../../packages/collaboration
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../packages/commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../../packages/commerce-contracts
+      '@purin-labs/commerce-query-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/commerce-query-sqlite
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/costs-sheet-crdt':
+        specifier: workspace:*
+        version: link:../../packages/costs-sheet-crdt
+      '@purin-labs/email-draft-crdt':
+        specifier: workspace:*
+        version: link:../../packages/email-draft-crdt
+      '@purin-labs/mail-reply-crdt':
+        specifier: workspace:*
+        version: link:../../packages/mail-reply-crdt
+      '@purin-labs/menu-board-crdt':
+        specifier: workspace:*
+        version: link:../../packages/menu-board-crdt
+      '@purin-labs/menu-draft-crdt':
+        specifier: workspace:*
+        version: link:../../packages/menu-draft-crdt
+      '@purin-labs/product-description-crdt':
+        specifier: workspace:*
+        version: link:../../packages/product-description-crdt
+      '@purin-labs/production-plan-crdt':
+        specifier: workspace:*
+        version: link:../../packages/production-plan-crdt
+      '@purin-labs/production-simulation':
+        specifier: workspace:*
+        version: link:../../packages/production-simulation
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+      '@purin-labs/workflow-canvas-crdt':
+        specifier: workspace:*
+        version: link:../../packages/workflow-canvas-crdt
       '@seams-internal/console-shared':
         specifier: file:../../vendor/seams/seams-internal-console-shared-0.1.3-ebed186cf39a.tgz
         version: file:vendor/seams/seams-internal-console-shared-0.1.3-ebed186cf39a.tgz
-      '@seams/async-control':
-        specifier: workspace:*
-        version: link:../../packages/async-control
-      '@seams/bakery-model':
-        specifier: workspace:*
-        version: link:../../packages/bakery-model
-      '@seams/bakery-workflow':
-        specifier: workspace:*
-        version: link:../../packages/bakery-workflow
-      '@seams/collaboration':
-        specifier: workspace:*
-        version: link:../../packages/collaboration
-      '@seams/commerce-client':
-        specifier: workspace:*
-        version: link:../../packages/commerce-client
-      '@seams/commerce-contracts':
-        specifier: workspace:*
-        version: link:../../packages/commerce-contracts
-      '@seams/commerce-query-sqlite':
-        specifier: workspace:*
-        version: link:../../packages/commerce-query-sqlite
-      '@seams/contracts':
-        specifier: workspace:*
-        version: link:../../packages/contracts
-      '@seams/control-api':
-        specifier: workspace:*
-        version: link:../../packages/control-api
-      '@seams/costs-sheet-crdt':
-        specifier: workspace:*
-        version: link:../../packages/costs-sheet-crdt
-      '@seams/email-draft-crdt':
-        specifier: workspace:*
-        version: link:../../packages/email-draft-crdt
-      '@seams/mail-reply-crdt':
-        specifier: workspace:*
-        version: link:../../packages/mail-reply-crdt
-      '@seams/menu-board-crdt':
-        specifier: workspace:*
-        version: link:../../packages/menu-board-crdt
-      '@seams/menu-draft-crdt':
-        specifier: workspace:*
-        version: link:../../packages/menu-draft-crdt
-      '@seams/product-description-crdt':
-        specifier: workspace:*
-        version: link:../../packages/product-description-crdt
-      '@seams/production-plan-crdt':
-        specifier: workspace:*
-        version: link:../../packages/production-plan-crdt
-      '@seams/production-simulation':
-        specifier: workspace:*
-        version: link:../../packages/production-simulation
-      '@seams/std':
-        specifier: workspace:*
-        version: link:../../packages/std
-      '@seams/type-utils':
-        specifier: workspace:*
-        version: link:../../packages/type-utils
-      '@seams/workflow-canvas-crdt':
-        specifier: workspace:*
-        version: link:../../packages/workflow-canvas-crdt
       typebox:
         specifier: 1.3.27
         version: 1.3.27

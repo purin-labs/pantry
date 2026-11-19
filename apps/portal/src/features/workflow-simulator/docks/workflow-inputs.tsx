@@ -1,5 +1,5 @@
-import { scenarioAssumptionFields } from "@seams/bakery-model/bakery-procedure";
-import { fields, financierOperations } from "@seams/bakery-model/bakery";
+import { scenarioAssumptionFields } from "@purin-labs/bakery-model/bakery-procedure";
+import { fields, financierOperations } from "@purin-labs/bakery-model/bakery";
 import React from "react";
 import { Select } from "../../../ui/select";
 
@@ -36,11 +36,11 @@ import {
   type CafeBeverageRecipeId,
   type Run,
   type VitrineOrderChannel,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   operationTask,
   selectionContext,
-} from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/simulator/selection";
 import { downloadBakeryFile } from "../file-download";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type {

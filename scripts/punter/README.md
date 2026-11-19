@@ -38,7 +38,7 @@ PUNTER_UNDERCLERK_BASE_URL=https://underclerk.example \
 PUNTER_MERCHANT_ID=merchant_cafe \
 PUNTER_STOREFRONT_ID=storefront_cafe \
 PUNTER_RUN_ID=acceptance_001 \
-pnpm --filter @seams/punter scenario:pickup
+pnpm --filter @purin-labs/punter scenario:pickup
 ```
 
 The command uses only signed buyer sessions and public catalog, checkout, quote
@@ -58,7 +58,7 @@ PUNTER_UNDERCLERK_BASE_URL=https://underclerk.example \
 PUNTER_MERCHANT_ID=merchant_plan22_demo \
 PUNTER_STOREFRONT_ID=storefront_cookie_online \
 PUNTER_RUN_ID=shipping_acceptance_001 \
-pnpm --filter @seams/punter scenario:shipping
+pnpm --filter @purin-labs/punter scenario:shipping
 ```
 
 This runner uses only the public session, catalog, shipping-checkout, quote
@@ -83,7 +83,7 @@ that backend and its run IDs. The other scenarios describe controlled API
 responses and do not match a real backend.
 
 ```bash
-PUNTER_ACCEPTANCE_ARTIFACT_DIR="$PWD/output/acceptance/refactor-7/punter-real-backend" pnpm --filter @seams/commerce-worker exec vitest run tests/punter-acceptance.test.ts
+PUNTER_ACCEPTANCE_ARTIFACT_DIR="$PWD/output/acceptance/refactor-7/punter-real-backend" pnpm --filter @purin-labs/commerce-worker exec vitest run tests/punter-acceptance.test.ts
 ```
 
 Each run writes Punter's evidence, the staff actions with their mutation

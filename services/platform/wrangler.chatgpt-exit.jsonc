@@ -8,7 +8,7 @@
   //
   // It has no route and no credential. Deploy this Worker before the
   // platform Worker that binds it.
-  // `pnpm --filter @seams/platform chatgpt-exit:check` checks this profile.
+  // `pnpm --filter @purin-labs/platform chatgpt-exit:check` checks this profile.
   "main": "src/chatgpt-exit/worker.ts",
   "compatibility_date": "2026-07-07",
   "workers_dev": false,

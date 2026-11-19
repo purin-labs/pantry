@@ -2,7 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { parseTerminalAssignment } from "@seams/contracts";
+import { parseTerminalAssignment } from "@purin-labs/contracts";
 
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { createOrganisationExecutionFixture } from "./organisation-execution-fixture";

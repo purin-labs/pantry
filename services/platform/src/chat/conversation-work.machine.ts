@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /** How long a chat waits for a person's permission (Refactor 15, decision 5). */
 export const PERMISSION_WAIT_MS = 24 * 60 * 60_000;

@@ -4,16 +4,16 @@ import {
   orderOriginCheckoutId,
   type CommerceProductV1,
   type CommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CommerceMutationErrorV1,
   CommerceOrderOriginV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CheckoutQuoteSnapshot,
   CheckoutProfileReference,
-} from "@seams/commerce-contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 export function checkCheckoutRevision(
   kind: string,

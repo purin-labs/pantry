@@ -34,7 +34,7 @@ import {
   localAddressValidationProvider,
   ShippingAddressValidationService,
 } from "./shipping-address-validation.ts";
-import { errorMessage, isNormalizedText, isRecord } from "@seams/std";
+import { errorMessage, isNormalizedText, isRecord } from "@purin-labs/std";
 import {
   CloudflareEmailGateway,
   type CloudflareEmailBinding,
@@ -57,7 +57,7 @@ import { SquareApi } from "./payments/square/square-api.ts";
 import { SquareConnections } from "./payments/square/square-connection.ts";
 import { CustomerVault } from "./plugins/customers/index.ts";
 import { verifiedStripeNotification } from "./payments/stripe/stripe-webhooks.ts";
-import type { CommerceApiScope } from "@seams/commerce-client";
+import type { CommerceApiScope } from "@purin-labs/commerce-client";
 import { R2ArchiveStore, type R2BucketLike } from "./archive.ts";
 import { R2MediaStore, type R2MediaBucket } from "./plugins/media/index.ts";
 import {

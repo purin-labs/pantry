@@ -4,10 +4,10 @@ import type {
   ConnectorDeliveryReceipt,
   ConnectorIdentity,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { parseStoredAttachmentList } from "../../messages/stored-attachment";
 import type { PurgedConnectorErasureRequest } from "../organisation-archive-cleanup";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   checked,
   connectorDeliveryReceiptSchema,
@@ -17,8 +17,8 @@ import {
   connectorIngressRequestSchema,
   connectorIngressSchema,
   parseConnectorAddressWire,
-} from "@seams/contracts/connector-rpc";
-import { parseJsonOrNull } from "@seams/std";
+} from "@purin-labs/contracts/connector-rpc";
+import { parseJsonOrNull } from "@purin-labs/std";
 import { invalid, parseIngressContent } from "./ingress-content";
 import type {
   ConnectorDeliveryRequest,

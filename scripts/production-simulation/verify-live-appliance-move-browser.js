@@ -434,7 +434,7 @@ async function mountLiveMoveApp(paceDriveMs) {
     import("/@id/react-router"),
     import("/src/features/workflow-simulator/route.tsx"),
     import("/src/features/bakery-surface-effect-bridge.tsx"),
-    import("/@id/@seams/bakery-model/bakery-surface"),
+    import("/@id/@purin-labs/bakery-model/bakery-surface"),
     import("/src/features/bakery-surface-registry.ts"),
     import("/src/features/workflow-simulator/floor-plan-workspace.ts"),
     import("/src/features/workflow-simulator/bakery-appliance-layout.ts"),

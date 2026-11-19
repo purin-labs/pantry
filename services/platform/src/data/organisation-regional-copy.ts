@@ -8,7 +8,7 @@ import {
 import { prepareRetiredCellOrganisationRow } from "./shared-rows/organisation-row";
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import type { Result } from "../result";
-import { encodeBase64, isRecord } from "@seams/std";
+import { encodeBase64, isRecord } from "@purin-labs/std";
 import type { ActorRelocationId } from "../actors/actor-relocation";
 import type { OrganisationId } from "../ids";
 import type {

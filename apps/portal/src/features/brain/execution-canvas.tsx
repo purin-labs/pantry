@@ -12,8 +12,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { CaseExecutionNode } from "@seams/control-api";
-import { assertNever } from "@seams/std";
+import type { CaseExecutionNode } from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import type { StatusChipStatus } from "../../status-chip";
 import {

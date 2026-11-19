@@ -60,7 +60,7 @@ import type { FoodServiceCommands } from "./plugins/built-in-ports.ts";
 import { foodServiceExtension } from "./plugins/food-service/index.ts";
 import { purchasingExtension } from "./plugins/purchasing/index.ts";
 import { AfterSaleCommandAuthority } from "./commerce-authority/after-sale-cancellation.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { CommerceAuthorityOptions } from "./commerce-authority/authority-options.ts";
 import { invalidCommand } from "./commerce-authority/command-guards.ts";
 import { BuyerFamily } from "./commerce-authority/families/buyer.ts";

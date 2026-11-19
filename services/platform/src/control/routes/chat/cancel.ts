@@ -1,4 +1,4 @@
-import { isConversationId, type ConversationId } from "@seams/control-api";
+import { isConversationId, type ConversationId } from "@purin-labs/control-api";
 import type { Env } from "../../../env";
 import { parseRequestId, parseSessionId } from "../../../ids";
 import { resolveOrganisationModelRoute } from "../../../models/route";

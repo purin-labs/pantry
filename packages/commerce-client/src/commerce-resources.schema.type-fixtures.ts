@@ -4,8 +4,8 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiResources from "@seams/commerce-contracts/records/api-resources";
-import type * as apiResourcesB from "@seams/commerce-contracts/records/api-common";
+import type * as apiResources from "@purin-labs/commerce-contracts/records/api-resources";
+import type * as apiResourcesB from "@purin-labs/commerce-contracts/records/api-common";
 import type * as client from "./commerce-resources.ts";
 import type { CommerceOrderMarketV1 } from "./markets.ts";
 export type CommerceProductV1Parity = Assert<

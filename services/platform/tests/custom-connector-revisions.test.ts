@@ -18,7 +18,7 @@ import {
   type JsonObject,
 } from "../src/custom-connectors";
 import { d1Database } from "./sqlite-d1";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { requireUserId, requireOrganisationId } from "./test-ids";
 
 const baselineSql = singleDatabaseSchema();

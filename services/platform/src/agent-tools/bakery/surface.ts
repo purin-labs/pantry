@@ -1,10 +1,10 @@
-import { parseBakeryProductionControl } from "@seams/bakery-model/bakery-surface";
+import { parseBakeryProductionControl } from "@purin-labs/bakery-model/bakery-surface";
 import {
   isBakeryFloorPlanResetAction,
   normalizeYawDegrees,
   parseBakeryFileAction,
   parseBakeryStoreInteriorAction,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import {
   parseBakerySurfaceCommand,
   parseBakeryPlaybackAction,
@@ -15,12 +15,12 @@ import {
   parseScenarioSaveManifest,
   parseRecordingAcceptanceReference,
   type BakerySurfaceToolCommandName,
-} from "@seams/bakery-model/bakery-surface";
-import { parseRunSnapshotSummary } from "@seams/bakery-model/bakery-run-snapshot";
-import { KITCHEN_SURFACE } from "@seams/control-api";
+} from "@purin-labs/bakery-model/bakery-surface";
+import { parseRunSnapshotSummary } from "@purin-labs/bakery-model/bakery-run-snapshot";
+import { KITCHEN_SURFACE } from "@purin-labs/control-api";
 import type { AgentRunSaveVerification } from "../../commerce/bakery/agent-run-save";
 import type { AgentScenarioSaveResult } from "../../commerce/bakery/agent-scenario-save";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   HarnessBakerySurfaceToolRequest,
   HarnessBakerySurfaceToolResult,

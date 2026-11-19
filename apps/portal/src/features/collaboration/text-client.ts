@@ -6,8 +6,8 @@ import type {
   TextInputRange,
   TextSelectionDirection,
   TextSelectionRange,
-} from "@seams/collaboration";
-import type { TextCollaborationServerMessage } from "@seams/control-api/portal/text-collaboration";
+} from "@purin-labs/collaboration";
+import type { TextCollaborationServerMessage } from "@purin-labs/control-api/portal/text-collaboration";
 import {
   DocumentClient,
   type DocumentConnection,

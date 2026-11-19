@@ -21,8 +21,8 @@ import {
 import { traceWarn } from "../observability";
 import type { DiscoveredProviderResource } from "../data/provider-resource";
 import type { Result } from "../result";
-import type { VariantBy } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "remove_slack_app_in_slack" as const;
 export const SLACK_SCOPES = [

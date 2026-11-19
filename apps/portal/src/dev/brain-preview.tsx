@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, useLocation, useNavigate } from "react-router";
-import { parseEntityRef } from "@seams/commerce-client";
+import { parseEntityRef } from "@purin-labs/commerce-client";
 import "../styles.css";
 import {
   brainItemsToReview,
@@ -19,7 +19,7 @@ import {
   type MemoryContent,
   type MemoryRevisionView,
   type MemoryView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import {
   ControlApiError,
@@ -27,7 +27,7 @@ import {
   controlRead,
 } from "../control-client";
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "../agent-operations";
-import type { AgentOperationsSnapshot } from "@seams/control-api/portal/agent-operations";
+import type { AgentOperationsSnapshot } from "@purin-labs/control-api/portal/agent-operations";
 import { useBrainSummary } from "../brain-summary";
 import type { BrainTransport } from "../features/brain/api";
 import {

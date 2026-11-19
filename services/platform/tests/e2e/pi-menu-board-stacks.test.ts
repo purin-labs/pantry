@@ -14,8 +14,8 @@ import {
   type MenuBoardElement,
   type MenuBoardRect,
   type MenuBoardSnapshot,
-} from "@seams/menu-board-crdt";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/menu-board-crdt";
+import { isRecord } from "@purin-labs/std";
 import { closeSocket } from "./hibernatable-socket-support";
 import {
   BASE,

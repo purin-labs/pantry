@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonBlankString, isRecord } from "@seams/std";
+import { hasExactKeys, isNonBlankString, isRecord } from "@purin-labs/std";
 
 /** The longest sender name that a queue item carries. */
 export const EMAIL_REPLY_SENDER_NAME_MAX = 200;

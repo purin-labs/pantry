@@ -1,6 +1,6 @@
 import { functionScope } from "./plugins/function-runtime.ts";
 import { commandActor } from "./command-actor.ts";
-import type { CommerceFetch } from "@seams/commerce-client";
+import type { CommerceFetch } from "@purin-labs/commerce-client";
 import { CommerceAuthority } from "./commerce-authority.ts";
 import type { NotificationGateway } from "./notification-gateway.ts";
 import type { WebhookSender } from "./webhooks.ts";

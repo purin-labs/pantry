@@ -16,7 +16,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type AccountCapability = Variant<CapabilityDefinition, "provider_resource"> & {
   readonly integrationAccountId: IntegrationAccountId;

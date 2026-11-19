@@ -1,24 +1,24 @@
-import { parseCommerceEntityPlaneCommand } from "@seams/commerce-contracts/entity-plane-commands";
-import { validateCommerceEntityPlaneCommandAuthority } from "@seams/commerce-contracts/entity-plane-command-authority";
+import { parseCommerceEntityPlaneCommand } from "@purin-labs/commerce-contracts/entity-plane-commands";
+import { validateCommerceEntityPlaneCommandAuthority } from "@purin-labs/commerce-contracts/entity-plane-command-authority";
 import {
   parseCommerceList,
   parseCommerceListEntry,
-} from "@seams/commerce-contracts/list-records";
-import { parseSavedCommerceView } from "@seams/commerce-contracts/view-records";
-import { parseCommerceMutationReceipt } from "@seams/commerce-contracts/entity-plane-receipts";
-import type { ContractDecodeResult } from "@seams/commerce-contracts/schema";
-import { parseCommerceEntityAuthority } from "@seams/commerce-contracts/command-authority";
+} from "@purin-labs/commerce-contracts/list-records";
+import { parseSavedCommerceView } from "@purin-labs/commerce-contracts/view-records";
+import { parseCommerceMutationReceipt } from "@purin-labs/commerce-contracts/entity-plane-receipts";
+import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
+import { parseCommerceEntityAuthority } from "@purin-labs/commerce-contracts/command-authority";
 import {
   parseRelationshipDefinition,
   parseCommerceRelationship,
-} from "@seams/commerce-contracts/relationships";
-import { planCommerceGraphQuery } from "@seams/commerce-contracts/query-planner";
-import { parseCommerceCursorPayload } from "@seams/commerce-contracts/cursor-payload";
-import { encodeCommerceCursor } from "@seams/commerce-contracts/query-encoders";
-import { parseCommerceQueryPlan } from "@seams/commerce-contracts/query-plan";
-import { normalizeCommerceUnicodeV1 } from "@seams/commerce-contracts/unicode";
-import { parseCommerceGraphQuery } from "@seams/commerce-contracts/graph-query";
-import { parseCommerceEntity } from "@seams/commerce-contracts/entity-definition";
+} from "@purin-labs/commerce-contracts/relationships";
+import { planCommerceGraphQuery } from "@purin-labs/commerce-contracts/query-planner";
+import { parseCommerceCursorPayload } from "@purin-labs/commerce-contracts/cursor-payload";
+import { encodeCommerceCursor } from "@purin-labs/commerce-contracts/query-encoders";
+import { parseCommerceQueryPlan } from "@purin-labs/commerce-contracts/query-plan";
+import { normalizeCommerceUnicodeV1 } from "@purin-labs/commerce-contracts/unicode";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-contracts/graph-query";
+import { parseCommerceEntity } from "@purin-labs/commerce-contracts/entity-definition";
 import type {
   AttributeDefinition,
   CommerceCursorPayload,
@@ -39,9 +39,9 @@ import type {
   CommerceGraphQueryPlanRequest,
   CommerceQueryPlanOutcome,
   CommerceMutationReceiptV1,
-} from "@seams/commerce-contracts";
-import { parseCommerceCursorValue } from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-contracts";
+import { parseCommerceCursorValue } from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 
 type LexiconBoundaryError = Readonly<{
   kind: "wasm_rejected" | "wasm_response_invalid";

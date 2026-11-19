@@ -7,7 +7,7 @@ import type {
   Timestamp,
 } from "../projection";
 import type { FlowLabel, ObservationEvidence } from "../../policy";
-import type { FileContextProvider } from "@seams/contracts";
+import type { FileContextProvider } from "@purin-labs/contracts";
 
 export type {
   ContextVisibility,

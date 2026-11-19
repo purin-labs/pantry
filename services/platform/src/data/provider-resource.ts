@@ -10,9 +10,9 @@ import {
   type ControlMutationReceiptScope,
 } from "./control-mutation";
 import type { ConnectionProvider } from "./provider-attempt";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
-import { isPositiveInteger } from "@seams/std";
+import { isPositiveInteger } from "@purin-labs/std";
 
 export type DiscoveredProviderResource = {
   readonly canonicalResourceId: string;

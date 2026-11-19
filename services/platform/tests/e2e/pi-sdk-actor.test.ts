@@ -4,7 +4,7 @@ import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { readLatestHarnessCheckpoint } from "../../src/actors/agent-session-harness-authority";
 import {
   PACKAGED_PI_CHECKPOINT_FORMAT,

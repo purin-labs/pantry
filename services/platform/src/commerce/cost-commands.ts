@@ -17,11 +17,11 @@ import {
   type SupplyCostWrite,
   type SupplyLotCost,
   type SupplyLotInvoiceCost,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   selectInventoryConsumptionPlan,
   type ProductPhotos,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceGraphQuery,
   parseCommerceSnapshotRevision,
@@ -30,7 +30,7 @@ import {
   type CommerceAdminClient,
   type CommerceEntityPlaneClient,
   type CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   emptyOrganisationCostPlan,
   readOrganisationCostPlan,
@@ -564,7 +564,7 @@ async function loadSupplyCostRawEntries(
   | Readonly<{ ok: false }>
 > {
   const entries: RawListEntry[] = [];
-  let cursor: import("@seams/contracts").CommerceCursor | null = null;
+  let cursor: import("@purin-labs/contracts").CommerceCursor | null = null;
   for (let page = 0; page < 20; page += 1) {
     const query = parseCommerceGraphQuery({
       kind: "commerce_list_page",

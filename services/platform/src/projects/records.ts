@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { parseProject, type Project, type ProjectId } from "@seams/control-api";
+import { parseProject, type Project, type ProjectId } from "@purin-labs/control-api";
 import type { ProjectAccessScope } from "./access";
 
 type ProjectRow = Readonly<{

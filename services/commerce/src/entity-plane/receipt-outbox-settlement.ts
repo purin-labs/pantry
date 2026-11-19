@@ -9,12 +9,12 @@ import type {
   CommerceMutationReceiptSignature,
   CommerceMutationReceiptSigner,
   CommerceMutationReceiptV1,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   commerceDeliverySignaturePayload,
   parseEntityPlaneObservation,
   type CommerceDeliveryV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceSigner } from "../commerce-authority/contracts.ts";
 import type { CommerceDatabase } from "../database.ts";
 import type {
@@ -25,7 +25,7 @@ import type {
 import { parsePositiveRevision, parsePositiveText } from "./parsers.ts";
 import { refreshCommerceRelationshipRelation } from "./commerce-relationship-relation.ts";
 import { validateCommerceMutationReceiptWithLexicon } from "./lexicon.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type EntityPlaneMutationRequest = Omit<
   EntityPlaneCommandRequest,

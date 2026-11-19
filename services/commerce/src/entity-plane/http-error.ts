@@ -1,4 +1,4 @@
-import type { CommerceEntityPlaneError } from "@seams/commerce-contracts";
+import type { CommerceEntityPlaneError } from "@purin-labs/commerce-contracts";
 
 export class EntityPlaneHttpError extends Error {
   readonly status: number;

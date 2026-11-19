@@ -2,7 +2,7 @@ import type {
   Money,
   RefundAllocation,
   RefundAttempt,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   type CommerceMutationErrorV1,
@@ -16,7 +16,7 @@ import {
   parseRefundCommerceOrderV1 as parseRefundCommerceOrderV1Record,
   parseCommerceTenderRefundV1 as parseCommerceTenderRefundV1Record,
   parseWireRefundAttempt as parseRefundAttemptRecord,
-} from "@seams/commerce-contracts/records/api-after-sale";
+} from "@purin-labs/commerce-contracts/records/api-after-sale";
 
 export type CancelCommerceOrderV1 = Readonly<{
   schemaVersion: "underclerk.cancel-order.v1";

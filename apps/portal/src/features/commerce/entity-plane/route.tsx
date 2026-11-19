@@ -30,14 +30,14 @@ import type {
   CommerceViewPresentation,
   ListEntryAttributeDefinition,
   SourceProvenance,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   REPLENISHMENT_QUEUE_LIST_ID,
   REPLENISHMENT_QUEUE_VIEW_ID,
   SUPPLIER_DIRECTORY_LIST_ID,
   SUPPLIER_ENTITY_TYPE_ID,
   SUPPLIERS_VIEW_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { ControlApiError } from "../../../control-client";
 import {
@@ -74,7 +74,7 @@ import {
   type CommerceEntityDossierModel,
 } from "./models";
 import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "./api";
-import type { CommerceListEntryPatchApprovalAction, CommerceActivityResult } from "@seams/control-api/portal/entity-plane";
+import type { CommerceListEntryPatchApprovalAction, CommerceActivityResult } from "@purin-labs/control-api/portal/entity-plane";
 import {
   PurchaseRequestCardEditor,
   PurchasingControls,
@@ -83,12 +83,12 @@ import type {
   CommerceOperationsTransport,
   OrderCancellationAction,
 } from "../operations";
-import { parseCommerceActionRecordResponse, type CommerceActionRecord } from "@seams/control-api/portal/commerce-actions";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import { parseCommerceActionRecordResponse, type CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { useDossierSurface } from "./dossier-surface";
 import { CrmIdentity, CrmTable, type CrmColumn } from "../../../ui";
-import type { CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, PermissionRequired } from "@seams/control-api";
+import type { CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, PermissionRequired } from "@purin-labs/control-api";
 
 type CommerceGraphPage = "products" | "orders" | "suppliers";
 

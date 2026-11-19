@@ -3,7 +3,7 @@
 import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";

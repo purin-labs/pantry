@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { EmptyState } from "./empty-state";
 import "./task-list.css";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type TaskState =
   | {

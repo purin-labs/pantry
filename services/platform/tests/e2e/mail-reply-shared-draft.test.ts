@@ -3,15 +3,15 @@ import { fixtureDatabase } from "./organisation-database";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
-import { newConversationId, newProjectId } from "@seams/control-api";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
-import { encodeBase64Url, isRecord } from "@seams/std";
-import { MailReplyDoc, type MailReplyUpdate } from "@seams/mail-reply-crdt";
+import { newConversationId, newProjectId } from "@purin-labs/control-api";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
+import { encodeBase64Url, isRecord } from "@purin-labs/std";
+import { MailReplyDoc, type MailReplyUpdate } from "@purin-labs/mail-reply-crdt";
 import {
   encodeDraftClientMessage,
   parseDraftServerMessage,
   type DraftServerMessage,
-} from "@seams/mail-reply-crdt/protocol";
+} from "@purin-labs/mail-reply-crdt/protocol";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   CAPABILITY_KEYS,
@@ -41,7 +41,7 @@ import {
   workKind,
   type Member,
 } from "./memory-support";
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import { readEmailProposalChatContext } from "../../src/actors/email-proposal-sources";
 import { CollaborationRoom } from "../../src/actors/collaboration-room";
 import { ConnectorEmail } from "../../src/actors/connector/connector-email-actor";

@@ -3,7 +3,7 @@ import {
   isNonBlankString,
   isNonNegativeInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type {
   HomeAttentionItem,
   HomeAvailableAction,
@@ -12,7 +12,7 @@ import type {
   HomeSourceObservation,
   HomeTodayFact,
 } from "../index.ts";
-import type { OnboardingControlRole } from "@seams/contracts";
+import type { OnboardingControlRole } from "@purin-labs/contracts";
 
 export type HomeSnapshot = {
   readonly schemaVersion: "satyr.cafeos.home.v1";

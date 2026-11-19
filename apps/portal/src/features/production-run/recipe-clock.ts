@@ -1,9 +1,9 @@
-import { stepSeconds, workflowDiff } from "@seams/bakery-workflow/draft";
+import { stepSeconds, workflowDiff } from "@purin-labs/bakery-workflow/draft";
 import {
   draftNodeId,
   type DraftNode,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft";
+} from "@purin-labs/workflow-canvas-crdt/draft";
 import type { StageBinding } from "./recipe-graph";
 
 /**

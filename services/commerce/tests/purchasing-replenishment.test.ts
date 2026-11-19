@@ -5,7 +5,7 @@ import {
   parseCommerceEntityPlaneCommand,
   parseEntityPlaneCommand,
   parseListEntryReadRequest,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { BuyerSessionAuthority } from "../src/buyer-session.ts";
 import { CommerceAuthority } from "../src/commerce-authority.ts";
@@ -16,7 +16,7 @@ import { writeCommerceEntityRelationText } from "../src/entity-plane/relation-te
 import { NodeCommerceDatabase } from "../src/node-database.ts";
 import { DeterministicPaymentGateway } from "../src/payments/provider.ts";
 import { initializeCommerceSchema } from "../src/schema.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const NOW = "2026-08-29T00:00:00.000Z";
 const MERCHANT_ID = "merchant_purchasing";

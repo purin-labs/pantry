@@ -28,8 +28,8 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, hasExactKeys, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   type CustomConnectorControlRoute,
   parseRevisionSegment,

@@ -8,7 +8,7 @@ import {
   isRecord,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   parseProjectedActivation,
   parseProjectedFirstTask,

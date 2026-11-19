@@ -6,7 +6,7 @@ import {
   NonNegativeInteger as count,
 } from "./schema.ts";
 import { Type, type Static } from "typebox";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import { javascriptTrimmedTextSchema } from "./identity-text.ts";
 import { commerceSnapshotRevisionSchema } from "./query-metadata.ts";
 

@@ -4,7 +4,7 @@ import type {
   CommerceOfferV1,
   CommerceProductV1,
   CommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 const SATYR_ECOMMERCE_FIXTURE_TIMESTAMP = "2026-08-11T09:00:00Z";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import type { ChatOrigin } from "@seams/control-api";
+import type { ChatOrigin } from "@purin-labs/control-api";
 import { navigationGroupTitle } from "../../route";
 import "./origin-chips.css";
 

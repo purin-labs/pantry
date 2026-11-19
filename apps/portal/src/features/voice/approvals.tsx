@@ -8,7 +8,7 @@ import {
   parseVoiceConfirmation,
   type VoiceConfirmation,
   type VoiceConfirmationTarget,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { Mic } from "lucide-react";
 import React from "react";
 

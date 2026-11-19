@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { seedLocalCommerce } from "../scripts/seed-local-commerce.ts";
 import { BASE_URL, NOW, merchantId } from "./journey-support.ts";

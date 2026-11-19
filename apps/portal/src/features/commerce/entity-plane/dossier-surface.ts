@@ -1,5 +1,5 @@
-import type { SurfaceSource } from "@seams/control-api";
-import type { CommerceEntity } from "@seams/contracts";
+import type { SurfaceSource } from "@purin-labs/control-api";
+import type { CommerceEntity } from "@purin-labs/contracts";
 import {
   pageSurfaceRecord,
   useSurfaceRecord,

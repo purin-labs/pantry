@@ -4,7 +4,7 @@ import type {
   HarnessTurnLease,
   SessionBudgetAccount,
   SessionBudgetUsage,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { parseRequestId, type RequestId } from "../../ids";
 import { traceWarn } from "../../observability";
 import type { Result } from "../../result";

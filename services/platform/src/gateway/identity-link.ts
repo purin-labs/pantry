@@ -28,7 +28,7 @@ import {
 import { newRequestId } from "../ids";
 import { traceLog } from "../observability";
 import { parseSlackUserId } from "../slack/events";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   decodePathSegment,
   fieldErrorResponse,

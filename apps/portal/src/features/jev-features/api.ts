@@ -1,10 +1,10 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   type JevFeatureCommand,
   type JevFeaturesView,
   type JevPaidUseCommand,
   parseJevFeaturesView,
-} from "@seams/control-api/portal/jev-features";
+} from "@purin-labs/control-api/portal/jev-features";
 import {
   ControlApiError,
   controlMutation,

@@ -1,6 +1,6 @@
-import type { ConnectorIdentity } from "@seams/contracts";
-import { isNonBlankString, isPositiveInteger, isRecord } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
+import { isNonBlankString, isPositiveInteger, isRecord } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 import {
   parseCaseId,

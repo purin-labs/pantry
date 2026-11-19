@@ -1,8 +1,8 @@
 import type {
   PayoutIndeterminateOperation,
   SupplierPayoutExecutionPlan,
-} from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** Funding acknowledgement is not evidence of delivery to the supplier. */
 export type PayoutProviderOutcome =

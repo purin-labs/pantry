@@ -1,4 +1,4 @@
-import { bytesToHex } from "@seams/std";
+import { bytesToHex } from "@purin-labs/std";
 
 type CommerceLabSignatureFailure =
   | { code: "commerce_lab_signature_missing" }

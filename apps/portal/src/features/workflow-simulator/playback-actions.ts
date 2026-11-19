@@ -1,13 +1,13 @@
-import type { BakeryPlaybackAction } from "@seams/bakery-model/bakery-surface";
+import type { BakeryPlaybackAction } from "@purin-labs/bakery-model/bakery-surface";
 import {
   activeRun,
   applySimulatorReplayAction,
   simulatorPlaybackSnapshot,
   type SimulatorState,
 } from "./simulator-state.ts";
-import { recordingReplayView, recordingReplayStart } from "@seams/production-simulation/simulator/playback-state";
-import { physicsEvents } from "@seams/production-simulation/recipes/bakery/physics-playback";
-import { assertNever } from "@seams/std";
+import { recordingReplayView, recordingReplayStart } from "@purin-labs/production-simulation/simulator/playback-state";
+import { physicsEvents } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
+import { assertNever } from "@purin-labs/std";
 type PlaybackActionResult =
   | Readonly<{ kind: "applied"; state: SimulatorState }>
   | Readonly<{ kind: "unavailable"; message: string }>;

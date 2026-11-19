@@ -1,4 +1,4 @@
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import type { ScenarioCopy } from "./bakery-scenario.ts";
 import type { ProductionScenario } from "./bakery-production-scenario.ts";
 

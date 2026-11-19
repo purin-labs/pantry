@@ -1,4 +1,4 @@
-import type { ControlMembershipAvailability } from "@seams/control-api";
+import type { ControlMembershipAvailability } from "@purin-labs/control-api";
 import React from "react";
 import {
   Archive,
@@ -14,7 +14,7 @@ import type {
   OnboardingControlRole,
   OnboardingEnvironment,
   OrganisationOnboardingLifecycle,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { ControlApiError } from "../control-client";
 import { ArchiveConfirm } from "../features/integrations/archive-confirm";
 import {
@@ -29,7 +29,7 @@ import { organisationPath, workspacePagePath } from "../route";
 import { PortalFrame } from "../shell";
 import { AgentModal } from "./agent-modal";
 import { AccountSetup, type AccountSetupListing } from "./account-onboarding";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type OrganisationWorkspaceListItem = {
   readonly workspaceId: string;

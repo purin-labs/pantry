@@ -1,8 +1,8 @@
-import type { ProviderFileRevision } from "@seams/contracts";
+import type { ProviderFileRevision } from "@purin-labs/contracts";
 
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
-import { isNonBlankString, isPositiveInteger, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isNonBlankString, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 const GOOGLE_AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";

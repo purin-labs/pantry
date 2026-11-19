@@ -1,6 +1,6 @@
 import type { Result } from "../result";
 import type { VaultSecret } from "../credential-vault";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type StripeFailedChargeTrigger = {
   kind: "charge_failed_triggered";

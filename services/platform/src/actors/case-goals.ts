@@ -1,21 +1,21 @@
 import {
   parseCaseGoal as parseGoal,
   parseCaseGoalSnapshot as parseSnapshot,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type {
   CaseGoal,
   CaseGoalCommand,
   CaseGoalOperationOutcome,
   CaseGoalSnapshot,
   CaseGoalState,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   assertNever,
   canonicalJson,
   hasExactKeys,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { Result } from "../result";
 
 type Identity = { readonly organisationId: string; readonly caseId: string };

@@ -5,7 +5,7 @@ import {
   type CommerceFoodServiceSnapshotV1,
   type CommerceMerchantSnapshotV1,
   type CommercePreparationTicketV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import { requireIdentity } from "./command-guards.ts";
 import type { CommerceSigner } from "./contracts.ts";
@@ -32,17 +32,17 @@ import {
 import type {
   CommerceFailedPaymentsV1,
   CommercePaymentsV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { readOrderTimes, type OrderTimesWindow } from "./order-times.ts";
-import type { CommerceOrderTimesV1 } from "@seams/commerce-client";
+import type { CommerceOrderTimesV1 } from "@purin-labs/commerce-client";
 import {
   readPickupQueue,
   readSoldOutMarks,
   readPreparationTicket,
   readFoodServiceResources,
 } from "../plugins/food-service/index.ts";
-import type { CommerceSoldOutMarksV1 } from "@seams/commerce-client";
-import type { CommercePickupQueueV1 } from "@seams/commerce-client";
+import type { CommerceSoldOutMarksV1 } from "@purin-labs/commerce-client";
+import type { CommercePickupQueueV1 } from "@purin-labs/commerce-client";
 
 type SnapshotMerchantRow = Readonly<{
   merchantId: string;

@@ -4,8 +4,8 @@ import type {
   CommerceBuyerCatalogV1,
   CommerceBuyerCartLineV1,
   CommerceBuyerCartV1,
-} from "@seams/commerce-client";
-import type { Cart, Storefront } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { Cart, Storefront } from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../../database.ts";
 import { buyerSessionDigest } from "../../buyer-session.ts";
 import {
@@ -18,7 +18,7 @@ import type {
 } from "../../regional-shipping.ts";
 import { readShippingProfile as readCatalogShippingProfile } from "../catalog.ts";
 import { sha256 } from "../checkout-shared.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { buyerShippingTaxHealthBinding } from "./quotes.ts";
 import type { BuyerCartMutation, BuyerCheckoutProfileClaims } from "./types.ts";
 

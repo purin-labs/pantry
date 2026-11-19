@@ -10,7 +10,7 @@ import {
   type PlanRect,
   type PlanSize,
   type PlanView,
-} from "@seams/production-simulation/floor/plan-view";
+} from "@purin-labs/production-simulation/floor/plan-view";
 
 type Gesture =
   | Readonly<{ kind: "idle" }>

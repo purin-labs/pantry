@@ -22,7 +22,7 @@ import type {
   SessionProposal,
   SessionProposalDisposition,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceActionRequest,
   type CommerceActionRequest,
@@ -32,12 +32,12 @@ import { parseStoredAuthorityPartition } from "../../authorization/access-grants
 import { parseStoredRequestAuthority } from "../../request-authority";
 import { FlowLabel } from "../../policy";
 import { parseCommerceEntityPlaneProposal } from "../../commerce/entity-plane/proposals";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   checked,
   connectorDeliverySchema,
   parseConnectorAddressWire,
-} from "@seams/contracts/connector-rpc";
+} from "@purin-labs/contracts/connector-rpc";
 import {
   assignmentLifecycleSchema,
   assignmentStartSchema,
@@ -63,8 +63,8 @@ import {
   proposedEntrySchema,
   sessionProposalSchema,
   terminalDispositionSchema,
-} from "@seams/contracts/case-rpc";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/contracts/case-rpc";
+import { isRecord } from "@purin-labs/std";
 import { flowLabelForAuthority } from "./context-source";
 import {
   type CaseContributionSource,

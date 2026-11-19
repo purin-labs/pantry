@@ -1,4 +1,4 @@
-import type { CredentialAccountRecord, CredentialInventory } from "@seams/control-api/portal/credential-inventory";
+import type { CredentialAccountRecord, CredentialInventory } from "@purin-labs/control-api/portal/credential-inventory";
 
 /** Supplying a replacement secret is only offered for API-key connections. */
 export function credentialRotationSupported(

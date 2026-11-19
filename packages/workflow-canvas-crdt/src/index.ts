@@ -4,8 +4,8 @@ import {
   type ParsedYjsEncoding,
   type YjsEncodingFailure,
   type YjsEncodingKind,
-} from "@seams/collaboration";
-import { hasExactKeys, isRecord } from "@seams/std";
+} from "@purin-labs/collaboration";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 export const WORKFLOW_CANVAS_SCHEMA = "workflow_canvas_crdt.v1";
 export const CANVAS_BOUNDS = Object.freeze({

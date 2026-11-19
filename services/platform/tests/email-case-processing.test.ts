@@ -123,7 +123,7 @@ import {
   FlowBinding,
   InformationFlowContext,
 } from "../src/policy/information-flow";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const NOW = 1_784_016_325_277;
 const ORGANISATION = "organisation_email_turn";

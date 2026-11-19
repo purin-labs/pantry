@@ -43,14 +43,14 @@ Apply production D1 migrations explicitly before deploying a Worker that
 depends on them:
 
 ```bash
-pnpm --filter @seams/platform exec wrangler d1 migrations apply satyr --remote
-pnpm --filter @seams/platform run deploy
+pnpm --filter @purin-labs/platform exec wrangler d1 migrations apply satyr --remote
+pnpm --filter @purin-labs/platform run deploy
 ```
 
 Local development uses the repository command:
 
 ```bash
-pnpm --filter @seams/platform d1:migrate:local
+pnpm --filter @purin-labs/platform d1:migrate:local
 ```
 
 The Vault boundary rejects an unknown active version, a missing active binding,

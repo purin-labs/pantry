@@ -1,7 +1,7 @@
 import React from "react";
 import { Check, Command, CornerDownLeft, LoaderCircle } from "lucide-react";
 import "./agent-components.css";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type QuestionOption = {
   readonly id: string;

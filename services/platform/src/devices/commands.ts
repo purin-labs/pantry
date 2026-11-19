@@ -1,4 +1,4 @@
-import type { DeviceStationId } from "@seams/control-api";
+import type { DeviceStationId } from "@purin-labs/control-api";
 
 import { deviceFleetStub } from "../actors/device-fleet";
 import type { ControlRole } from "../data/control-plane";

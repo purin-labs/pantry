@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { CommerceQueryPlan } from "@seams/commerce-contracts";
-import { planCommerceGraphQuery } from "@seams/commerce-contracts/query-planner";
-import type { ContractDecodeResult } from "@seams/commerce-contracts/schema";
+import type { CommerceQueryPlan } from "@purin-labs/commerce-contracts";
+import { planCommerceGraphQuery } from "@purin-labs/commerce-contracts/query-planner";
+import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
 import { compileCommerceQuerySql } from "../src/index";
-import { parseCommerceQueryPlanOutcome } from "@seams/commerce-client";
+import { parseCommerceQueryPlanOutcome } from "@purin-labs/commerce-client";
 
 describe("commerce SQLite query compiler", () => {
   it("rejects Commerce List count search plans defensively", () => {

@@ -1,5 +1,5 @@
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
-import { parseMailAssistantCommand } from "@seams/control-api";
+import { parseMailAssistantCommand } from "@purin-labs/control-api";
 import type { Env } from "../../env";
 import {
   parseOrganisationId,

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   CommerceAdminClient,
   type ProductSalesReport,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { AccessGrant } from "../src/authorization/access-grants/types";
 import { selectNamedCommerceQuerySourceGrant } from "../src/context/assembly/commerce";
 import {

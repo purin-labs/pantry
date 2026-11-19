@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { RequestAuthority } from "@seams/contracts";
-import { canonicalJson, sha256Hex } from "@seams/std";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import { ObservationEvidence } from "../policy/information-flow";
 import {
   digestContextBundle,

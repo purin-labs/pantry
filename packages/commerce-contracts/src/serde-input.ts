@@ -1,4 +1,4 @@
-import { hasLoneSurrogate, isRecord } from "@seams/std";
+import { hasLoneSurrogate, isRecord } from "@purin-labs/std";
 
 /**
  * Plan 78: reads a JSON value with the rules of a serde derive, for ports of

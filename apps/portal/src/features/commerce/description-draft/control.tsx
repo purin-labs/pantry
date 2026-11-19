@@ -1,11 +1,11 @@
 import React from "react";
-import type { CommerceEntity } from "@seams/contracts";
+import type { CommerceEntity } from "@purin-labs/contracts";
 import { ControlApiError, controlRead } from "../../../control-client";
-import type { CommerceActionRecord } from "@seams/control-api/portal/commerce-actions";
+import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
 import { SlackThreadControl } from "../../collaboration/slack-thread-control";
 import type { ProductDescriptionActionTransport, ProductDescriptionSnapshot } from "./editor";
 import "./styles.css";
-import { type ProductDescriptionResponse, parseProductDescriptionResponse } from "@seams/control-api/portal/description-draft";
+import { type ProductDescriptionResponse, parseProductDescriptionResponse } from "@purin-labs/control-api/portal/description-draft";
 
 const DescriptionEditor = React.lazy(loadEditor);
 

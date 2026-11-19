@@ -5,7 +5,7 @@ import {
   parseMemoryContent,
   parseMemoryRevisionState,
   parseMemoryRevisionView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   MemoryAuthor,
   MemoryCommandErrorCode,
@@ -14,17 +14,17 @@ import type {
   MemoryDecision,
   MemoryRevisionState,
   MemoryRevisionView,
-} from "@seams/control-api";
-import type { CommerceEntityRef } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { CommerceEntityRef } from "@purin-labs/contracts";
 import {
   assertNever,
   canonicalJson,
   isPositiveInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
-import type { Variant } from "@seams/type-utils";
-import { parseEntityRef } from "@seams/commerce-client";
+} from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { parseEntityRef } from "@purin-labs/commerce-client";
 
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import type { CountRow } from "../actors/sql-rows";

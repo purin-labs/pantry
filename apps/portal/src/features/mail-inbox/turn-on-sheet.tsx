@@ -1,5 +1,5 @@
 import React from "react";
-import type { MailboxSetupAgentChoice } from "@seams/control-api";
+import type { MailboxSetupAgentChoice } from "@purin-labs/control-api";
 
 import { controlMutation, controlRead } from "../../control-client";
 import { ProviderTile } from "../../page-components";

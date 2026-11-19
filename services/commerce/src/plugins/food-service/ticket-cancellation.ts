@@ -5,11 +5,11 @@ import {
   parsePreparationTicket,
   type CommerceAggregateObservationV1,
   type CommercePreparationTicketV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type CommerceInvalidTransition,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../../database.ts";
 import { projectFoodServiceEntity } from "../../entity-plane/food-service-integration.ts";

@@ -1,4 +1,4 @@
-import { isConversationId } from "@seams/control-api";
+import { isConversationId } from "@purin-labs/control-api";
 import type { Env } from "../../../env";
 import { buildControlAuthority } from "../../../request-authority";
 import { readActiveOrganisationMembershipRevision } from "../../../data/control-plane";

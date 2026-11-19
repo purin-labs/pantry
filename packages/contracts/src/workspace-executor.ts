@@ -6,10 +6,10 @@ import {
   type ContractDecodeResult,
   type ContractRejection,
   NonNegativeInteger as unsignedInteger,
-} from "@seams/commerce-contracts/schema";
+} from "@purin-labs/commerce-contracts/schema";
 import { Type, type Static } from "typebox";
 import type { TLocalizedValidationError } from "typebox/error";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { AttachmentId } from "./types/AttachmentId";
 
 const unsigned32 = Type.Integer({ minimum: 0, maximum: 0xffffffff });

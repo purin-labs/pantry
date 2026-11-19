@@ -1,5 +1,5 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { ProjectSnapshot } from "@seams/control-api";
+import type { ProjectSnapshot } from "@purin-labs/control-api";
 import type { Env } from "../env";
 import {
   prepareProjectSnapshot,

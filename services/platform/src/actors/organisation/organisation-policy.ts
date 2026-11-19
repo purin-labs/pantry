@@ -59,7 +59,7 @@ import {
   parseJevFeatureCommand,
   parseJevPaidUseCommand,
   type JevFeaturesView,
-} from "@seams/control-api/portal/jev-features";
+} from "@purin-labs/control-api/portal/jev-features";
 import {
   disableJevMailClassification,
   enableJevMailClassification,
@@ -83,7 +83,7 @@ import {
 } from "../../jev-features/paid-use";
 import { resolvePantryAccountBinding } from "../../account-platform/binding";
 import { listIntegrationAccounts } from "../../data/integration-account";
-import { assertNever, errorMessage, isRecord, sha256Hex } from "@seams/std";
+import { assertNever, errorMessage, isRecord, sha256Hex } from "@purin-labs/std";
 import {
   caseContextCollectionReviewDecision,
   caseContextCollectionSourceAccess,

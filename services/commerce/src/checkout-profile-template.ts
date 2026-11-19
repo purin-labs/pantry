@@ -1,8 +1,8 @@
 import type {
   CheckoutProfileConfiguration,
   Storefront,
-} from "@seams/commerce-contracts";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/commerce-contracts";
+import { assertNever } from "@purin-labs/std";
 
 type CheckoutProfileTemplate = Readonly<{
   checkoutProfileId: string;

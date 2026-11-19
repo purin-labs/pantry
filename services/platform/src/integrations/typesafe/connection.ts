@@ -16,7 +16,7 @@ import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { validJevApiKey, type JevError } from "./system-one-client";
 import { probeTypeSafeConnection } from "./connection-probe";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type Connection =
   | Readonly<{

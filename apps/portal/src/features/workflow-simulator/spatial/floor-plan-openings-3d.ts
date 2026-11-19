@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { BakeryFloorPlanSpec } from "@seams/production-simulation/floor/bakery-room";
+import type { BakeryFloorPlanSpec } from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   doorOpening,
   windowOpening,
@@ -8,10 +8,10 @@ import {
   windowSashGeometry,
   windowSashRotation,
   type FloorPlanOpening,
-} from "@seams/production-simulation/floor/openings";
+} from "@purin-labs/production-simulation/floor/openings";
 import type { FloorPlanWorkspace } from "../floor-plan-workspace";
 import { enableShadowMeshes } from "./scene-lighting";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type OpeningVisual =
   | Readonly<{

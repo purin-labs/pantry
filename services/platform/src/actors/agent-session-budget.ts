@@ -1,4 +1,4 @@
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type {
   RunBudgetIndeterminateReason,
   RunBudgetReservation,
@@ -10,17 +10,17 @@ import type {
   SessionBudgetExhaustion,
   SessionBudgetUsage,
   Sha256Digest,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
   isNonNegativeInteger,
   isRecord,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 const NONE_RESERVATION: RunBudgetReservationState = { kind: "none" };
 const ZERO_USAGE: SessionBudgetUsage = {

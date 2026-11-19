@@ -13,7 +13,7 @@ import {
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import type { Result } from "../result";
-import { isRecord, isString } from "@seams/std";
+import { isRecord, isString } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "revoke_stripe_access_in_stripe" as const;
 const STRIPE_SCOPES = ["read_write"] as const;

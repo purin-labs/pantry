@@ -1,4 +1,4 @@
-import { parseProductSalesReport as parseProductSalesReportRecord } from "@seams/commerce-contracts/records/api-product-sales";
+import { parseProductSalesReport as parseProductSalesReportRecord } from "@purin-labs/commerce-contracts/records/api-product-sales";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 export type ProductSalesWindow = Readonly<{ start: string; end: string }>;
 export type ProductSalesLine = Readonly<{

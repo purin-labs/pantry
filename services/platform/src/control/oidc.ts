@@ -9,8 +9,8 @@ import {
   type ApprovalActionBinding,
 } from "../approval-authentication";
 import type { Result } from "../result";
-import type { VariantBy } from "@seams/type-utils";
-import { decodeBase64Url, encodeBase64Url, isRecord } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { decodeBase64Url, encodeBase64Url, isRecord } from "@purin-labs/std";
 import { paddedStandardBase64 } from "../lenient-base64";
 
 export type GoogleOidcConfig = {

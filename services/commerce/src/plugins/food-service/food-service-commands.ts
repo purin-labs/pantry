@@ -16,7 +16,7 @@ import {
   type CommerceFoodServiceSnapshotV1,
   type CommerceMerchantSnapshotV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { merchantOwner } from "./merchant-owner.ts";
 import type {
   Menu,
@@ -24,7 +24,7 @@ import type {
   PreparationStation,
   RecipeRevision,
   StockPolicy,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../../database.ts";
 import type { MerchantRow } from "../../commerce-authority/ledger.ts";
 import {
@@ -53,7 +53,7 @@ import {
   planPreparationTicketStart,
   type PreparationTicketPlan,
 } from "./preparation-ticket-planning.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { isKnownTimeZone, nextLocalMidnight } from "./menu-schedule.ts";
 import {
   readSoldOutMarkRevision,

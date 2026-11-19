@@ -25,8 +25,8 @@ import {
   type CommerceArchiveRunV1,
   type CommerceEventV1,
   type CommerceOrderRecordV1,
-} from "@seams/commerce-client";
-import { canonicalJson } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { canonicalJson } from "@purin-labs/std";
 
 import type { CommerceDatabase, CommerceSqlValue } from "./database.ts";
 import { parseCursor, readEventPage } from "./event-feed.ts";

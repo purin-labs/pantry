@@ -7,8 +7,8 @@ import {
   hasExactKeys,
   isNonNegativeInteger,
   isRecord,
-} from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 // A chat's Project is its Case's Project. The revision is that association's.
 export type ChatPlacement = Readonly<{

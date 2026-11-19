@@ -1,4 +1,4 @@
-import type { JevAllowance } from "@seams/control-api/portal/jev-features";
+import type { JevAllowance } from "@purin-labs/control-api/portal/jev-features";
 import type { OrganisationId } from "../ids";
 import { currentTypeSafeAuthority } from "../integrations/typesafe/authority";
 import {

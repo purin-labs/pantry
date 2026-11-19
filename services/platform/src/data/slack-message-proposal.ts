@@ -3,7 +3,7 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
-import { isNonNegativeInteger, sha256Hex } from "@seams/std";
+import { isNonNegativeInteger, sha256Hex } from "@purin-labs/std";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 

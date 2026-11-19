@@ -1,13 +1,13 @@
 import React from "react";
-import type { Settings } from "@seams/bakery-model/bakery";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
 import {
   parseMeasuredShift,
   recommendMeasuredSettings,
   type MeasuredShift,
   type MeasuredValue,
-} from "@seams/production-simulation/simulator/measured-shift";
-import type { Run } from "@seams/production-simulation/recipes/bakery/schedule";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation/simulator/measured-shift";
+import type { Run } from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { assertNever } from "@purin-labs/std";
 const MAX_MEASUREMENT_BYTES = 1024 * 1024;
 
 type Props = Readonly<{

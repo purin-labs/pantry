@@ -11,15 +11,15 @@ import type {
   CommerceOrderingLeadingKey,
   CommerceOrderingValue,
   RelationshipFilter,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   COMMERCE_ENTITY_ATTRIBUTE_RELATION,
   COMMERCE_ENTITY_RELATION,
   COMMERCE_LIST_ENTRY_RELATION,
   COMMERCE_RELATIONSHIP_RELATION,
 } from "./relations.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type CommerceSqliteBinding = string | number | bigint | null;
 

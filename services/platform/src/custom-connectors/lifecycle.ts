@@ -15,7 +15,7 @@ import {
   type CustomConnectorRevisionError,
   type CustomConnectorRevisionRecord,
 } from "./revisions";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type CustomConnectorLifecycleError = CustomConnectorRevisionError
   | { readonly code: "custom_connector_lifecycle_conflict" }

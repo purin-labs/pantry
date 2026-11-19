@@ -2,7 +2,7 @@ import {
   parseAgentPermissionDecision,
   type HeldOutputSummary,
   type HeldOutputView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { authenticatedAccountConversationScope } from "../../account-platform/access";
 import { resolveActiveCaseActorAtPlacement } from "../../actors/actor-router";

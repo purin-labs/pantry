@@ -1,4 +1,4 @@
-import type { BrowserPhysicsTask } from "@seams/production-simulation/simulator/browser-physics-task";
+import type { BrowserPhysicsTask } from "@purin-labs/production-simulation/simulator/browser-physics-task";
 import type {
   PreparedRecordingAcceptance,
   RecordingAcceptanceTarget,
@@ -7,11 +7,11 @@ import type {
   ProductionStart,
   ProductionSource,
   ProductionWorkcells,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import type {
   ProductionAssignment,
   ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import type {
   NativeBakeryTask,
   NativeHold,
@@ -20,10 +20,10 @@ import type {
   WorkcellCapability,
   TaskEvent,
   TaskSnapshot,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import type { WaitingAttempt } from "@seams/production-simulation/recipes/bakery/workcell-attempt";
-import type { ProductionMaterialState } from "@seams/production-simulation/recipes/bakery/production-material";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type { WaitingAttempt } from "@purin-labs/production-simulation/recipes/bakery/workcell-attempt";
+import type { ProductionMaterialState } from "@purin-labs/production-simulation/recipes/bakery/production-material";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const plan: ProductionWorkcells;
 declare const scenario: ProductionScenario;
@@ -207,27 +207,27 @@ const { cellRobots: omittedCells, ...withoutCells } = plan;
 // @ts-expect-error Every compiled run requires an explicit robot assignment for each cell.
 const missingCellRobots: ProductionWorkcells = withoutCells;
 // @ts-expect-error An unused cell cannot contain a robot.
-const unusedRobot: import("@seams/production-simulation/recipes/bakery/production-workcells").CellRobot =
+const unusedRobot: import("@purin-labs/production-simulation/recipes/bakery/production-workcells").CellRobot =
   {
     kind: "unused",
     robot: plan.operations[0]!.attempt.input.request.robot,
   };
 // @ts-expect-error An assigned cell must name its robot.
-const unnamedRobot: import("@seams/production-simulation/recipes/bakery/production-workcells").CellRobot =
+const unnamedRobot: import("@purin-labs/production-simulation/recipes/bakery/production-workcells").CellRobot =
   {
     kind: "assigned",
   };
 void [omittedCells, missingCellRobots, unusedRobot, unnamedRobot];
 
 // Ingredient edits carry a complete load through the same rehearsal edit boundary.
-const incompleteIngredientEdit: import("@seams/production-simulation/recipes/bakery/production-workcells").RehearsalEdit =
+const incompleteIngredientEdit: import("@purin-labs/production-simulation/recipes/bakery/production-workcells").RehearsalEdit =
   {
     kind: "ingredients",
     batchId: "A",
     // @ts-expect-error Position is required when changing ingredient mass.
     ingredients: { massKg: 1 },
   };
-const mixedIngredientEdit: import("@seams/production-simulation/recipes/bakery/production-workcells").RehearsalEdit =
+const mixedIngredientEdit: import("@purin-labs/production-simulation/recipes/bakery/production-workcells").RehearsalEdit =
   {
     kind: "ingredients",
     batchId: "A",

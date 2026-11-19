@@ -1,7 +1,7 @@
 import React from "react";
-import type { EspressoMachine } from "@seams/bakery-model/bakery-physics";
+import type { EspressoMachine } from "@purin-labs/bakery-model/bakery-physics";
 import { prepareNativeRecipe } from "../oven-recipe-file";
-import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import type { OvenRunSource } from "@purin-labs/production-simulation/runs/oven-run-file";
 import { preloadEspressoVisual } from "./espresso-scene";
 import { prepareRecipe, RecipeChoice } from "../shared/recipe-form";
 

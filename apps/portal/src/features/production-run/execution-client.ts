@@ -8,12 +8,12 @@ import {
   type ExecutionManifest,
   type ManifestProblem,
   type ResolveProblem,
-} from "@seams/production-simulation";
-import { isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
-import { PRODUCTION_EXECUTION_MANIFEST } from "@seams/production-simulation/execution-manifest";
-import type { PersistentCell } from "@seams/bakery-model/bakery-physics";
-import { MAX_ENCODED_ARTIFACT_BYTES } from "@seams/production-simulation/runs/run-artifact-file";
-import { MODEL_INDEX_FILE } from "@seams/production-simulation/native/model-packs";
+} from "@purin-labs/production-simulation";
+import { isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
+import { PRODUCTION_EXECUTION_MANIFEST } from "@purin-labs/production-simulation/execution-manifest";
+import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
+import { MAX_ENCODED_ARTIFACT_BYTES } from "@purin-labs/production-simulation/runs/run-artifact-file";
+import { MODEL_INDEX_FILE } from "@purin-labs/production-simulation/native/model-packs";
 
 /**
  * The Portal's side of a production execution. It finds the retained bundle

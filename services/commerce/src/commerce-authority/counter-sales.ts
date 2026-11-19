@@ -3,7 +3,7 @@ import type {
   CommerceCounterSaleV1,
   CommerceMutationErrorV1,
   CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 /** How often a new Square Terminal checkout is read while the buyer pays. */
 export const TERMINAL_POLL_SECONDS = 5;

@@ -1,5 +1,5 @@
-import { errorMessage } from "@seams/std";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import { errorMessage } from "@purin-labs/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import { newRequestId } from "../ids";
 import type { Result } from "../result";
 import type {

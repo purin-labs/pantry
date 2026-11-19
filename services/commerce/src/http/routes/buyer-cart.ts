@@ -3,7 +3,7 @@ import {
   parseReplaceBuyerCartCommand,
   parseValidateBuyerShippingAddressCommand,
   type CommerceBuyerShippingDestinationV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { BuyerRoute } from "../../http-routes.ts";
 import {
   buyerSessionDigest,
@@ -12,12 +12,12 @@ import {
 import type { BuyerAccountGateway } from "../../buyer-account.ts";
 import type { BuyerShippingDestinationAuthority } from "../../commerce-authority/checkout-planning.ts";
 import { ShippingAddressValidationService } from "../../shipping-address-validation.ts";
-import { assertNever, errorMessage } from "@seams/std";
+import { assertNever, errorMessage } from "@purin-labs/std";
 import { buyerSessionClaims, verifyBuyerAccess } from "../buyer-access.ts";
 import type { HttpRouteContext } from "../context.ts";
 import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function buyerCartRoute(
   ctx: HttpRouteContext,

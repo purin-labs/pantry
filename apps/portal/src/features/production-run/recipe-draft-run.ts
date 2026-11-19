@@ -2,14 +2,14 @@ import {
   lateOrders,
   runFindings,
   type RunFinding,
-} from "@seams/bakery-workflow/findings";
+} from "@purin-labs/bakery-workflow/findings";
 import type {
   CompiledScenario,
   HostView,
   LogisticsView,
-} from "@seams/production-simulation";
-import { isRecord } from "@seams/std";
-import type { PersistentCell } from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/production-simulation";
+import { isRecord } from "@purin-labs/std";
+import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import { openExecutionWorker, type ExecutionWorker } from "./execution-client";
 
 export type DraftRunResult = Readonly<{

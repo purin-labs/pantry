@@ -31,7 +31,7 @@ import {
   readActiveOrganisationMembershipRevision,
   type ControlRole,
 } from "./control-plane";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OperatorExecutionOrigin } from "../chat/turn-access";
 
 /**

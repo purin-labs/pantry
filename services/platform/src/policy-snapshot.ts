@@ -10,7 +10,7 @@ import type {
   EgressPolicy,
   InjectionMode,
   ModelRoute,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { newRequestId, type OrganisationId } from "./ids";
 import { traceWarn } from "./observability";
@@ -24,7 +24,7 @@ import {
   isRecord,
   positiveIntegerOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type OrganisationPolicySnapshot = {
   version: number;

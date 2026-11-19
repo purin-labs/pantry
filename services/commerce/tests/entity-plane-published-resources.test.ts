@@ -5,7 +5,7 @@ import {
   parseEntityPlanePublishedResourceMetadataRequest,
   parseEntityPlanePublishedResourceMetadataResponse,
   parsePublishedCommerceSelector,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { NodeCommerceDatabase } from "../src/node-database.ts";
 import { initializeCommerceSchema } from "../src/schema.ts";

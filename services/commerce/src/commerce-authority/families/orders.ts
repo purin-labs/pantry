@@ -7,7 +7,7 @@ import {
   type CommerceCompanyInvoiceV1,
   type CommerceDraftOrderViewV1,
   type CommerceDraftOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { rejected } from "../ledger.ts";
 import { beginSnapshotCommand } from "../merchant-command.ts";
 import { FulfillmentCommandAuthority } from "../fulfillment-commands.ts";

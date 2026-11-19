@@ -1,4 +1,4 @@
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { withoutBatchMember } from "./engine-batches.ts";
 import type { DomainEvent } from "./events.ts";
 

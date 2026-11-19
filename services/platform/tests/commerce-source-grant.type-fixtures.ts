@@ -1,4 +1,4 @@
-import type { AccessGrantTargetSelection } from "@seams/control-api/portal/access-models";
+import type { AccessGrantTargetSelection } from "@purin-labs/control-api/portal/access-models";
 
 const paymentRead = {
   kind: "commerce_entity_type",

@@ -5,10 +5,10 @@ import {
   type PermissionRequestDecision,
   type PermissionRequestItem,
 } from "../../ui";
-import type { AiBudgetLimits, AiBudgetView } from "@seams/control-api/portal/ai-budget";
+import type { AiBudgetLimits, AiBudgetView } from "@purin-labs/control-api/portal/ai-budget";
 import { workspaceParty } from "./agent-permission-request";
 import { AGENT_NAME } from "../../agent-name";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 
 type Props = Readonly<{
   organisationId: string;

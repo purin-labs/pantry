@@ -3,7 +3,7 @@ import {
   COSTS_VIEW_COMMANDS,
   PASTRY_BENCH_VIEW_COMMANDS,
   REGISTER_VIEW_COMMANDS,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   createTransientGoalExecution,
   type GoalUsageContext,
@@ -16,7 +16,7 @@ import type {
   SessionIdentity,
   SessionContract,
   HarnessTurnLease,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import { parseSessionId, type OrganisationId } from "../../ids";
 import type { Result } from "../../result";
@@ -223,7 +223,7 @@ export function transientModelAdmissionError(
 }
 
 export async function rejectMailAssistantTool(): Promise<
-  import("@seams/contracts").AuthorizedHarnessToolResult
+  import("@purin-labs/contracts").AuthorizedHarnessToolResult
 > {
   const text = "Inbox assistance has no action or code tools.";
   const digest = await digestCanonical({ text });

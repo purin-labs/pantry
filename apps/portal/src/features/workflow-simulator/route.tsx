@@ -2,54 +2,54 @@ import { floorPlanWorkspace } from "./floor-plan-workspace";
 import { UserPreferencesContext } from "../../preferences/context";
 import { downloadBakeryFile } from "./file-download";
 import { type BakeryExportFile } from "./production-files";
-import { MAX_EXPERIMENT_BYTES } from "@seams/production-simulation/recipes/bakery/workcell-experiment";
-import type { BakeryWorkspaceViewAction } from "@seams/bakery-model/bakery-surface";
+import { MAX_EXPERIMENT_BYTES } from "@purin-labs/production-simulation/recipes/bakery/workcell-experiment";
+import type { BakeryWorkspaceViewAction } from "@purin-labs/bakery-model/bakery-surface";
 import { controlRead } from "../../control-client";
 import { readProductionScenario } from "./production-scenario-api";
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import {
   BrowserProductionRun,
   type ProductionStepResult,
 } from "./browser-production-run";
 import { pendingSimulation } from "./scheduled-rehearsal";
-import type { ProductionWorkcells } from "@seams/production-simulation/recipes/bakery/production-workcells";
+import type { ProductionWorkcells } from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import {
   applyWorkcellPreparation,
   canPrepareWorkcell,
   type PreparedWorkcell,
 } from "./workcell-preparation";
-import { rehearsalFromRecording, rehearsalSettings } from "@seams/production-simulation/simulator/rehearsal-presets";
+import { rehearsalFromRecording, rehearsalSettings } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import { applyPlaybackAction } from "./playback-actions";
-import type { BakeryPlaybackAction } from "@seams/bakery-model/bakery-surface";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+import type { BakeryPlaybackAction } from "@purin-labs/bakery-model/bakery-surface";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   type Settings,
   type SettingsField,
   type Operation,
   type StationId,
-} from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery";
 import {
   demoPreset,
   type DemoPreset,
-} from "@seams/production-simulation/simulator/demo";
+} from "@purin-labs/production-simulation/simulator/demo";
 import { shiftFloorPlanLayout } from "./shift-layout";
 import { runShiftInputs, SHIFT_RUN_NOTICE } from "./shift-run";
 import { readScenario } from "./scenario-api.ts";
 import React from "react";
-import type { PhysicsReplay } from "@seams/bakery-model/bakery-physics";
+import type { PhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import type {
   BakerySurfaceCommandResultV1,
   RejectedBakerySurfaceCommandResultV1,
   BakerySurfaceCommandV1,
   BakerySurfaceEffectV1,
   ExecutableBakerySurfaceEffectV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { EngineJobs, type JobProgress } from "../production-run/engine-jobs";
 import {
   recordingReplayView,
   workflowReplay,
   type RecordingNavigation,
-} from "@seams/production-simulation/simulator/playback-state";
+} from "@purin-labs/production-simulation/simulator/playback-state";
 import {
   VITRINE_RUSH_PRESETS,
   getActiveVitrineRushPreset,
@@ -58,7 +58,7 @@ import {
   subscribeVitrineRushPreset,
   type Interval,
   type ScheduleVariant,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   buildLiveScheduleSpatialLayout,
   getLiveStationWalkLegs,
@@ -66,12 +66,12 @@ import {
   rotateApplianceWithCollisions,
   setApplianceRotationWithCollisions,
 } from "./bakery-appliance-layout";
-import { BAKERY_FLOOR_PLAN_ORDER } from "@seams/production-simulation/floor/bakery-room";
-import { findFloorPlanOpening } from "@seams/production-simulation/floor/openings";
+import { BAKERY_FLOOR_PLAN_ORDER } from "@purin-labs/production-simulation/floor/bakery-room";
+import { findFloorPlanOpening } from "@purin-labs/production-simulation/floor/openings";
 import {
   REHEARSAL_APPLIANCE_IDS,
   isApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import {
   applyStoreInteriorPreset,
   subscribeStoreInteriorDesign,
@@ -85,7 +85,7 @@ import {
   operationTask,
   selectionForInterval,
   type Selection,
-} from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/simulator/selection";
 import { PlaybackTimeContext, SimulatorPlayback } from "./simulator-playback";
 import {
   focusChromeRestore,
@@ -96,8 +96,8 @@ import {
   shortcutTarget,
   undoRedoTarget,
 } from "./simulator-chrome";
-import type { PlaybackUpdate } from "@seams/production-simulation/simulator/playback-state";
-import type { Run } from "@seams/production-simulation/recipes/bakery/schedule";
+import type { PlaybackUpdate } from "@purin-labs/production-simulation/simulator/playback-state";
+import type { Run } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { SceneController } from "./scene-controller";
 import {
   activeRun,
@@ -132,7 +132,7 @@ import {
 } from "./workspace-commands";
 import { savePreparedProductionScenario } from "./production-scenario-api";
 import { WorkflowSimulatorShell } from "./simulator-shell";
-import { measuredSettingFields } from "@seams/production-simulation/simulator/measured-shift";
+import { measuredSettingFields } from "@purin-labs/production-simulation/simulator/measured-shift";
 import type { WorkflowSimulatorActionGroups } from "./simulator-actions";
 import {
   bakerySurfaceCommandSucceeded,
@@ -158,7 +158,7 @@ import { bakerySurfaceEffectIsPending } from "../bakery-surface-effect-bridge";
 import { simulationResult } from "./simulation-result";
 
 import "./styles.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = {
   readonly connection: SimulatorConnection;

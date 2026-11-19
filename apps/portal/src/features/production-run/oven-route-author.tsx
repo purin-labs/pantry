@@ -1,13 +1,13 @@
 import { Select } from "../../ui/select";
 import React from "react";
-import { assertNever, isRecord } from "@seams/std";
-import type { StrictUnion, VariantBy } from "@seams/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
+import type { StrictUnion, VariantBy } from "@purin-labs/type-utils";
 import {
   bakeryFingerprint,
   parseSettings,
-} from "@seams/bakery-model/bakery";
-import { parsePersistentCell } from "@seams/bakery-model/bakery-physics";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery";
+import { parsePersistentCell } from "@purin-labs/bakery-model/bakery-physics";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parseProductionManualTasks,
   parseProductionScenario,
@@ -16,11 +16,11 @@ import {
   validProductionWorkflow,
   type ProductionManualTask,
   type ProductionTaskChoice,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import type { SimulatorConnection } from "../workflow-simulator/simulator-state";
 import { saveProductionScenario } from "../workflow-simulator/production-scenario-api";
 import { openExecutionWorker, type ExecutionWorker } from "./execution-client";
-import { prepareOvenDefinition, type OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import { prepareOvenDefinition, type OvenRunSource } from "@purin-labs/production-simulation/runs/oven-run-file";
 
 type DefinitionSource = VariantBy<OvenRunSource, "kind", "definition">;
 type Choice = Readonly<{ value: string; label: string }>;

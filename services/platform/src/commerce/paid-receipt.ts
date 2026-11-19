@@ -15,12 +15,12 @@ import {
   machineTransition,
   type MachineEvent,
   type MachineState,
-} from "@seams/std/state-machine";
+} from "@purin-labs/std/state-machine";
 import type {
   CanonicalCommerceDelivery,
   ConnectorDelivery,
-} from "@seams/contracts";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import type { ConnectorDO } from "../actors/connector";

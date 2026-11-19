@@ -1,8 +1,8 @@
 import { Select } from "../../ui/select";
 import React from "react";
 import { readCustomConnectorCatalog, readCustomConnectorDetail, type CustomConnectorDetail } from "../integrations/custom-connector-api";
-import type { CustomConnectorSummary } from "@seams/control-api/portal/custom-connectors";
-import { isRecord } from "@seams/std";
+import type { CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
+import { isRecord } from "@purin-labs/std";
 
 export type CustomConnectorAccessHandoff = Readonly<{
   connectorId: string;

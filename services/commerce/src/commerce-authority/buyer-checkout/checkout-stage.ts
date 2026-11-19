@@ -7,8 +7,8 @@ import {
 import type {
   CommerceDraftOrderV1,
   CommerceMutationErrorV1,
-} from "@seams/commerce-client";
-import type { Cart } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { Cart } from "@purin-labs/commerce-contracts";
 import { sha256, timestampBefore } from "../checkout-shared.ts";
 import { buyerIdentityRejected } from "./placements.ts";
 import {

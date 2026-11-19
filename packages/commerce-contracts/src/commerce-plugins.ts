@@ -1,5 +1,5 @@
 // Commerce's built-in plugins (Plan 77 step 3). This file is the source
-// (Plan 78); `pnpm --filter @seams/commerce-contracts commerce-data:check` checks it.
+// (Plan 78); `pnpm --filter @purin-labs/commerce-contracts commerce-data:check` checks it.
 import type { PluginDefinition } from "./records/plugins.ts";
 
 export const BUILT_IN_PLUGIN_IDS = [

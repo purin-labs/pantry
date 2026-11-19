@@ -1,9 +1,9 @@
-import { assertNever } from "@seams/std";
-import type { PhysicsReplay } from "@seams/bakery-model/bakery-physics";
+import { assertNever } from "@purin-labs/std";
+import type { PhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import {
   summarizeMargins,
   type OperationMarginSummaries,
-} from "@seams/bakery-model/bakery-margins";
+} from "@purin-labs/bakery-model/bakery-margins";
 
 /**
  * What a browser simulation tells the agent (`simulate_workcell`): the

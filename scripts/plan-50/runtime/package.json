@@ -1,5 +1,5 @@
 {
-  "name": "@seams/plan50-experiment",
+  "name": "@purin-labs/plan50-experiment",
   "private": true,
   "type": "module",
   "dependencies": {

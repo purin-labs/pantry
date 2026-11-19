@@ -2,7 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { HttpResponse, http } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { resolveProviderManifestCredential } from "../../src/credential-vault";
 import type { IssuedControlSession } from "../../src/data/control-plane";

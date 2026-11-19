@@ -4,7 +4,7 @@ import type {
   ArtifactRef,
   ErrorSource,
   Outcome,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseRequestId,
   parseOrganisationId,
@@ -16,8 +16,8 @@ import {
   parseSessionTurnInputDigest,
   type SessionTurnInputDigest,
 } from "./agent-session-turn-input-digest";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 
 type SessionTurnStreamState =
   | {

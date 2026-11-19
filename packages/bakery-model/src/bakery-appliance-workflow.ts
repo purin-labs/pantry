@@ -1,6 +1,6 @@
-import { CanvasLayout } from "@seams/workflow-canvas-crdt";
-import { assertNever, isRecord, hasExactKeys } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { CanvasLayout } from "@purin-labs/workflow-canvas-crdt";
+import { assertNever, isRecord, hasExactKeys } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import {
   freshApplianceRequest,
   parseApplianceResult,

@@ -1,5 +1,5 @@
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 export type ContactShape = Readonly<{ geometry: string; body: string }>;
 export type ContactPair = Readonly<{

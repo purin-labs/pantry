@@ -1,4 +1,4 @@
-import type { PhysicsRequest } from "@seams/bakery-model/bakery-physics";
+import type { PhysicsRequest } from "@purin-labs/bakery-model/bakery-physics";
 import type {
   BrowserPhysicsOutcome,
   EngineJobs,
@@ -7,22 +7,22 @@ import type {
 import {
   nextProductionExecution,
   type ExecutableProductionOperation,
-} from "@seams/production-simulation/simulator/production-execution";
+} from "@purin-labs/production-simulation/simulator/production-execution";
 import {
   acceptProductionRecording,
   bindProductionSuccessor,
   replaceProductionRequest,
   type ProductionWorkcells,
   type ProductionWorkcellsResult,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import {
   simulateProduction,
   type ScheduleSpatialLayout,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   compileNativeCycleInput,
   compileWorkcellInput,
-} from "@seams/production-simulation/recipes/bakery/workcell-input";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
 
 type Physics = Pick<EngineJobs, "execute" | "stop" | "running">;
 type Handlers = Readonly<{

@@ -5,8 +5,8 @@ import type {
   SessionRecoveryAction,
   AcceptedHarnessEventCursor,
   TurnLifecycle,
-} from "@seams/contracts";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+} from "@purin-labs/contracts";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { readImportedCanonicalSession } from "./agent-session-canonical";
 import { parsePersistedHarnessTurnLease } from "./agent-session-harness-authority";
 import {
@@ -35,7 +35,7 @@ import {
 } from "./agent-session-budget";
 import { readPiUsage } from "./pi-durable-usage";
 import type { Env } from "../env";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import { traceWarn } from "../observability";
 import { deriveCodeModeLeaseBinding } from "./code-mode-execution-record";
 import {

@@ -7,7 +7,7 @@
 // counter still sells for pickup. After a resume, Mei pays. Set
 // JAPAN_EXPORT_PAUSE_ARTIFACT_DIR to keep the run's evidence; the file
 // repeats byte for byte for the same commit.
-import type { CommerceAdminClient } from "@seams/commerce-client";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

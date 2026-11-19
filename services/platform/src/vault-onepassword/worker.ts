@@ -5,7 +5,7 @@
 import sdkCore from "../../.generated/vault-onepassword/core_bg.wasm";
 
 import type * as sdkTypes from "@1password/sdk";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   handleOnePasswordOperation,
   parseOnePasswordRequest,

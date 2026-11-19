@@ -1,4 +1,4 @@
-import { isRecord, parseJson, sha256Hex } from "@seams/std";
+import { isRecord, parseJson, sha256Hex } from "@purin-labs/std";
 import type { CellTransport } from "./cell-adapter.ts";
 import type { TextCellTransport } from "./wasm-transport.ts";
 

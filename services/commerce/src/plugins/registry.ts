@@ -1,14 +1,14 @@
 // The built-in plugins (Plan 77 step 3): their definitions come from
-// BUILT_IN_PLUGINS in @seams/commerce-contracts, and their routes from each
+// BUILT_IN_PLUGINS in @purin-labs/commerce-contracts, and their routes from each
 // plugin's routes.ts. Each route belongs to the core or to one plugin; a
 // plugin whose definition does not name exactly the routes it defines stops
 // Commerce at start.
-import type { CommercePluginSettingsV1 } from "@seams/commerce-client";
+import type { CommercePluginSettingsV1 } from "@purin-labs/commerce-client";
 import {
   BUILT_IN_PLUGINS,
   type BuiltInPluginId,
   type PluginDefinition,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { PLUGIN_ROUTES } from "../http-routes.ts";
 import { settingMatches } from "./merchant-plugins.ts";

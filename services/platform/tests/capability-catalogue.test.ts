@@ -1,4 +1,4 @@
-import type { CapabilityDefinition } from "@seams/contracts";
+import type { CapabilityDefinition } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import { ACTION_REGISTRY } from "../action-registry/registry";

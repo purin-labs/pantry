@@ -16,7 +16,7 @@ import type {
   AccessControlSourcePolicyView,
   AccessControlSubjectView,
   AccessControlView,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 import { Fact, StatusIcon } from "./presentation";
 
 export type DataFlowCheck =

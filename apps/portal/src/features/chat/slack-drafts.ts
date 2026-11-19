@@ -1,12 +1,12 @@
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import {
   ControlApiError,
   controlRead,
   controlWrite,
   readCookie,
 } from "../../control-client";
-import { isRecord } from "@seams/std";
-import { type SlackChannelView, type SlackDraftView, parseChannel, parseSlackDraft } from "@seams/control-api/portal/slack-drafts";
+import { isRecord } from "@purin-labs/std";
+import { type SlackChannelView, type SlackDraftView, parseChannel, parseSlackDraft } from "@purin-labs/control-api/portal/slack-drafts";
 
 export type SlackDraftActions = Readonly<{
   read: (

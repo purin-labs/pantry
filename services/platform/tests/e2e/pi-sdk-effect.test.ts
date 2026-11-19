@@ -4,7 +4,7 @@ import { env } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,

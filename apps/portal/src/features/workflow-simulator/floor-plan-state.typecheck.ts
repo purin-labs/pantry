@@ -1,8 +1,8 @@
-import type { ApplianceId, AppliancePose } from "@seams/production-simulation/floor/appliance-catalogue";
-import type { ResolvedApplianceMove } from "@seams/production-simulation/floor/collisions";
-import type { FloorPlanOpening } from "@seams/production-simulation/floor/openings";
+import type { ApplianceId, AppliancePose } from "@purin-labs/production-simulation/floor/appliance-catalogue";
+import type { ResolvedApplianceMove } from "@purin-labs/production-simulation/floor/collisions";
+import type { FloorPlanOpening } from "@purin-labs/production-simulation/floor/openings";
 import type { SceneGesture } from "./scene";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** Compile-only checks for invalid identities and mixed domain branches. */
 export function floorPlanTypeChecks(

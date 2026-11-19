@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { isBakerySurfaceHarnessToolName } from "../agent-tools/bakery/surface";
 import { registeredTool } from "../agent-tools/registry";
 

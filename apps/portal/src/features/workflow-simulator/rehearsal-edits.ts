@@ -1,20 +1,20 @@
 import type {
   BakeryRehearsalChange,
   BakeryRehearsalReview,
-} from "@seams/bakery-model/bakery-surface";
-import { rehearsalPreset, presetName } from "@seams/production-simulation/simulator/rehearsal-presets";
+} from "@purin-labs/bakery-model/bakery-surface";
+import { rehearsalPreset, presetName } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import {
   parsePhysicsRequest,
   workcellModelHash,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { readBundledExample } from "./bundled-example.ts";
 import {
   editRehearsalWorkcells,
   type ProductionWorkcells,
   type RehearsalEdit,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
-import type { ReadExample } from "@seams/production-simulation/simulator/rehearsal-presets";
-import { compileWorkcellInput } from "@seams/production-simulation/recipes/bakery/workcell-input";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
+import type { ReadExample } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
+import { compileWorkcellInput } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
 
 // Tray edits of a multi-tray rehearsal. Edit trays and chat both prepare an
 // edit here from the plan in view; the workspace's rehearsalEdited action then

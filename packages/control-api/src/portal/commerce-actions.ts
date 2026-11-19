@@ -2,22 +2,22 @@ import {
   parseStockOperationDetails,
   type StockOperationDetails,
 } from "./stock-operation.ts";
-import { DESCRIPTION_LIMIT } from "@seams/product-description-crdt/limits";
-import type { Variant } from "@seams/type-utils";
+import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt/limits";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type {
   CommerceActionFollowUp,
   CommerceProviderReceipt,
   CommerceShopifyProviderReceipt,
   CommerceEngineProviderReceipt,
 } from "../index.ts";
-import type { ActionState } from "@seams/contracts";
+import type { ActionState } from "@purin-labs/contracts";
 import {
   parseMenuPriceDetails,
   type MenuPriceDetails,

@@ -10,7 +10,7 @@ import {
   isRecord,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export function parseAgentMailboxResponse(raw: unknown): AgentMailboxView {
   if (!isRecord(raw) || raw.ok !== true || !isRecord(raw.mailbox)) {

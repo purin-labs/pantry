@@ -1,6 +1,6 @@
 import React from "react";
-import type { CollaborationAgentColorKey } from "@seams/collaboration";
-import type { MenuBoardRect } from "@seams/menu-board-crdt/board";
+import type { CollaborationAgentColorKey } from "@purin-labs/collaboration";
+import type { MenuBoardRect } from "@purin-labs/menu-board-crdt/board";
 import type { BoardSize } from "./board-view";
 import "./canvas-rulers.css";
 

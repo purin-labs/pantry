@@ -1,4 +1,4 @@
-import type { MachineStore } from "@seams/std/state-machine";
+import type { MachineStore } from "@purin-labs/std/state-machine";
 
 const COLUMN_NAME = /^[a-z_][a-z0-9_]*$/u;
 

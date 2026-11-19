@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { sessionActorStub } from "../../src/actors/actor-router";
 import {

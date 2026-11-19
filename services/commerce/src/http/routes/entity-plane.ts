@@ -7,14 +7,14 @@ import {
   parseEntityPlaneExportPresetPublishRequest,
   parsePurchasingPresetPublishRequest,
   parsePurchasingReconcileRequest,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceRoute } from "../../http-routes.ts";
 import {
   parseEntityPlaneQueryRequest,
   parseSnapshotRevision,
 } from "../../entity-plane/parsers.ts";
-import type { Variant } from "@seams/type-utils";
-import { errorMessage } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { errorMessage } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import {
   hasMerchantId,

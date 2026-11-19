@@ -84,9 +84,9 @@ async function verifyContactInspectionBrowser(page) {
 async function readContactReference(source) {
   const saved = await (await fetch(source)).json();
   const { readRecordingPack } =
-    await import("/@id/@seams/production-simulation");
+    await import("/@id/@purin-labs/production-simulation");
   const { nativeIdentity } =
-    await import("/@id/@seams/production-simulation/native/cell-adapter");
+    await import("/@id/@purin-labs/production-simulation/native/cell-adapter");
   let attempt = null;
   for (const task of saved.document.state.tasks)
     if (task.id === "tray-orders#0/transfer")

@@ -5,14 +5,14 @@ import type {
 import {
   parseChatSummary,
   type ChatConversationSummary,
-} from "@seams/control-api/portal/chat";
+} from "@purin-labs/control-api/portal/chat";
 import {
   organisationDatabase,
   fixtureDatabase,
   onboardFixtureOrganisation,
 } from "./organisation-database";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   newSlackOrganisationConnectionId,
   parseSessionId,
@@ -59,7 +59,7 @@ import {
   newConversationId,
   type ConversationId,
   type UserId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";

@@ -1,22 +1,22 @@
 import { readExample } from "./rehearsal-examples.ts";
-import type { PhysicsReplay } from "@seams/bakery-model/bakery-physics";
-import type { BakeryWorkcellPreparation } from "@seams/bakery-model/bakery-surface";
+import type { PhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
+import type { BakeryWorkcellPreparation } from "@purin-labs/bakery-model/bakery-surface";
 import {
   activeRun,
   applyBakeryWorkspaceAction,
   applySimulatorReplayAction,
   type SimulatorState,
 } from "./simulator-state.ts";
-import { recordingReplayView } from "@seams/production-simulation/simulator/playback-state";
-import { parseRehearsalFile } from "@seams/production-simulation/simulator/rehearsal-file";
+import { recordingReplayView } from "@purin-labs/production-simulation/simulator/playback-state";
+import { parseRehearsalFile } from "@purin-labs/production-simulation/simulator/rehearsal-file";
 import {
   editRehearsalWorkcells,
   type ProductionWorkcells,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import {
   rehearsalFromRecording,
   rehearsalSettings,
-} from "@seams/production-simulation/simulator/rehearsal-presets";
+} from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 
 // Chat preparation opens a one-tray rehearsal on the production scheduler.
 // The tray keeps its request but starts without results, so simulate_workcell

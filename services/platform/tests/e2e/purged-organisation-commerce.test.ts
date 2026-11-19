@@ -1,8 +1,8 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
-import { commerceAppInstallationToken } from "@seams/commerce-client";
+import { isRecord } from "@purin-labs/std";
+import { commerceAppInstallationToken } from "@purin-labs/commerce-client";
 
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import type { UserId } from "../../src/ids";

@@ -7,8 +7,8 @@ import {
   parseMailboxSetupPlan,
   type MailboxSetupAgentChoice,
   type MailboxSetupPlan,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { acceptedExecutionAccountAuthority } from "../../src/account-platform/access";
 import { compileTurnAuthority } from "../../src/authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";

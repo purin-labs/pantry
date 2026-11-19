@@ -1,4 +1,4 @@
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 
 import { resolveActiveCaseActor } from "../actors/actor-router";
 import type { Env } from "../env";

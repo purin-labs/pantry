@@ -2,8 +2,8 @@ import type { AccessGrantTarget, CommerceReadGrantScope } from "./index.ts";
 import type {
   CommerceGraphQuery,
   PublishedCommerceSelector,
-} from "@seams/commerce-contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts";
+import type { Variant } from "@purin-labs/type-utils";
 declare const selector: PublishedCommerceSelector;
 declare const context: Variant<CommerceGraphQuery, "underclerk_context">;
 const invalidScope: CommerceReadGrantScope = {

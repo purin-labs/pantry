@@ -1,7 +1,7 @@
 import { Select } from "../../ui/select";
 import React from "react";
-import type { HostRequest, HostView } from "@seams/production-simulation";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { HostRequest, HostView } from "@purin-labs/production-simulation";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import { seconds } from "./oven-logistics";
 
 export type ReviewedScenarioControl = Variant<

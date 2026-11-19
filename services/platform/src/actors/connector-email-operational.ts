@@ -45,7 +45,7 @@ import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
 } from "../authorization/capability-catalogue";
-import { isNonNegativeInteger, isSha256Hex, sha256Hex } from "@seams/std";
+import { isNonNegativeInteger, isSha256Hex, sha256Hex } from "@purin-labs/std";
 
 const OPERATIONAL_EMAIL_PROJECTION_BATCH_SIZE = 100;
 const OPERATIONAL_EMAIL_PROJECTION_RETRY_MS = 60_000;

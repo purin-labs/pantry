@@ -11,7 +11,7 @@ import type {
   CaseGoalOperationOutcome,
   CaseGoalSnapshot,
   CaseGoalState,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 // @ts-expect-error A pause command cannot also change its budget.
 const mixedCommand: CaseGoalCommand = { kind: "pause", tokenBudget: 100 };

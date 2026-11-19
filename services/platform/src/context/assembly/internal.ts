@@ -25,7 +25,7 @@ import {
   ObservationEvidence,
 } from "../../policy";
 import type { FlowRecipient } from "../../policy/information-flow/types";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   CanonicalContextSourceRef,
   ContextBundle,

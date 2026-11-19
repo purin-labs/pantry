@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { Money } from "./records/money.ts";
 import type { SupplierPayoutExecutionPlan } from "./records/supplier-payout-plan.ts";
 

@@ -5,8 +5,8 @@ import {
   parseMenuScreenSummaries,
   type MenuBoardSummary,
   type MenuScreenSummary,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import { Select } from "../../ui/select";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";

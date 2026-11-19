@@ -5,7 +5,7 @@ import type {
   UserPreferenceDocument,
   UserPreferenceEdit,
   AppearanceOverride,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   OrganisationId,
   WorkspaceId,

@@ -1,7 +1,7 @@
 // The archive (Plan 76A step 5). Finished orders and old events move from
 // the merchant DO to files in R2 that never change. An order reads the same
 // from either place; the record says which.
-import type { RefundAttempt } from "@seams/commerce-contracts";
+import type { RefundAttempt } from "@purin-labs/commerce-contracts";
 
 import {
   type CommerceFulfillmentV1,
@@ -11,7 +11,7 @@ import {
 } from "./commerce-resources.ts";
 import { type CommerceOrderChangeV1 } from "./order-edits.ts";
 import { type CommerceReturnV1 } from "./returns.ts";
-import { parseCommerceArchiveRunV1 as parseCommerceArchiveRunV1Record, parseCommerceOrderRecordV1 as parseCommerceOrderRecordV1Record } from "@seams/commerce-contracts/records/api-archive";
+import { parseCommerceArchiveRunV1 as parseCommerceArchiveRunV1Record, parseCommerceOrderRecordV1 as parseCommerceOrderRecordV1Record } from "@purin-labs/commerce-contracts/records/api-archive";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 export type CommerceArchiveLocationV1 = Readonly<{

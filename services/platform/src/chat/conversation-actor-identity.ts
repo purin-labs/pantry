@@ -1,5 +1,5 @@
-import type { ConversationId } from "@seams/control-api";
-import { isNonEmptyString } from "@seams/std";
+import type { ConversationId } from "@purin-labs/control-api";
+import { isNonEmptyString } from "@purin-labs/std";
 import { deriveStableCaseId } from "../case-identity";
 import type { CaseId } from "../ids";
 import type { ConversationScope } from "./store";

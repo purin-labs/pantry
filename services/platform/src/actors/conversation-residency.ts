@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 import type { Env } from "../env";
 import {

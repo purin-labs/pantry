@@ -1,15 +1,15 @@
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   PourOverDeviation,
   PourOverSample,
-} from "@seams/production-simulation/recipes/pour-over/sample";
+} from "@purin-labs/production-simulation/recipes/pour-over/sample";
 import {
   PourOverScene,
   type PourOverCameraPreset,
   type PourOverSetup,
 } from "./pour-over-scene";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "./pour-over.css";
 import { RecipeSampleStation } from "../shared/recipe-station";
 

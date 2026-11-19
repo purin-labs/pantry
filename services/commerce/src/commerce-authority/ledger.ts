@@ -47,9 +47,9 @@ import {
   type UpdateCommerceProductV1,
   type DeleteCommerceProductV1,
   type UpdateCommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { createHash } from "node:crypto";
-import { canonicalJson } from "@seams/std";
+import { canonicalJson } from "@purin-labs/std";
 
 import { commandPrincipal } from "../plugins/command-principal.ts";
 import { commandActor } from "../command-actor.ts";
@@ -64,7 +64,7 @@ import {
   type CommerceMutationErrorV1,
   type CommerceMutationReceiptV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
 import { invalidCommand } from "./command-guards.ts";

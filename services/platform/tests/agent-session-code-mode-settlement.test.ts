@@ -4,7 +4,7 @@ import type { UnitTestEnv } from "./worker-fakes";
 import type {
   CodeModeExecutionReceipt,
   HarnessTurnLease,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, test } from "vitest";
 
 import {

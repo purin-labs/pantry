@@ -1,4 +1,4 @@
-import type { RunSnapshotPage } from "@seams/bakery-model/bakery-run-snapshot";
+import type { RunSnapshotPage } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import React from "react";
 import { controlRead } from "../../control-client";
 import type {
@@ -7,7 +7,7 @@ import type {
   WorkspaceRunSaveStatus,
   AgentRunSaveProposal,
 } from "./simulator-state";
-import type { RunSnapshotSummary } from "@seams/bakery-model/bakery-run-snapshot";
+import type { RunSnapshotSummary } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   prepareProductionWorkspaceRun,
   prepareRehearsalRunWorkspace,
@@ -17,11 +17,11 @@ import {
   verifyStoredWorkspaceRun,
   type PreparedWorkspaceRun,
 } from "./workspace-runs-api";
-import type { ProductionWorkcells } from "@seams/production-simulation/recipes/bakery/production-workcells";
-import type { RunSnapshotKind } from "@seams/bakery-model/bakery-run-snapshot";
+import type { ProductionWorkcells } from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
+import type { RunSnapshotKind } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { readProductionScenario } from "./production-scenario-api";
-import type { StrictUnion, Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type PersistentSaveSource = Readonly<{
   identity: string;

@@ -6,10 +6,10 @@ import {
   newConversationId,
   VOICE_DEVICE_HEADER,
   VOICE_REQUEST_LIMIT,
-} from "@seams/control-api";
-import { encodeBase64Url, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { encodeBase64Url, isRecord } from "@purin-labs/std";
 
-import { CommerceAdminClient } from "@seams/commerce-client";
+import { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";

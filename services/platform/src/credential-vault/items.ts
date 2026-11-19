@@ -5,8 +5,8 @@ import {
   type VaultItemCommand,
   type VaultItemCreate,
   type VaultItemView,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import {
   organisationPlacementPredicate,

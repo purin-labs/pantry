@@ -1,7 +1,7 @@
 import React from "react";
 import { Check } from "lucide-react";
-import type { ChatEffort } from "@seams/control-api";
-import type { Chat } from "@seams/control-api/portal/chat";
+import type { ChatEffort } from "@purin-labs/control-api";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
 import type { ChatPageData } from "./api";
 import { effortDescription, effortLabel } from "./effort-labels";
 

@@ -29,7 +29,7 @@ import {
   type GmailInboxEntry,
   type GmailMessageMetadata,
 } from "../mail/gmail-adapter";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   gmailGrantRefused,
   resolveGmailAccessToken,

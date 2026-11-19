@@ -2,7 +2,7 @@ import type {
   AttributeDefinition,
   CommerceCommandResult,
   SystemCommerceEntityRef,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   createSystemExtensionSchema as createSystemExtensionSchemaRow,

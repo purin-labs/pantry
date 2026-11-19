@@ -1,4 +1,4 @@
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import type { ChatPageData } from "./api";
 
 /** The chat page as the route holds it. */

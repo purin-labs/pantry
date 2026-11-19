@@ -5,7 +5,7 @@ import {
   isNonNegativeInteger,
   isRecord,
   isSha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type ChatThreadActivity = "idle" | "working" | "approval" | "failed";
 

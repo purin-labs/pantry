@@ -1,4 +1,4 @@
-import type { Operation, StationId } from "@seams/bakery-model/bakery";
+import type { Operation, StationId } from "@purin-labs/bakery-model/bakery";
 import {
   batchAt,
   type Batch,
@@ -14,7 +14,7 @@ import type {
   WorkcellTaskId,
   WorkcellResourceId,
 } from "../recipes/bakery/workcell-input.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type Selection =
   | Readonly<{ kind: "batch"; id: string }>

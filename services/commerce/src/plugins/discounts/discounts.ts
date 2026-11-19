@@ -6,9 +6,9 @@ import {
   type CommerceDiscountV1,
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
-import { commerceTransition } from "@seams/commerce-contracts";
+import { commerceTransition } from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../../database.ts";
 import type { MerchantRow } from "../../commerce-authority/ledger.ts";

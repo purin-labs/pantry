@@ -1,4 +1,4 @@
-import type { CommerceAdminClient } from "@seams/commerce-client";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 import { normalizeUntrustedCommerceText } from "../../context/untrusted-commerce-text";
 import { connectedStockOverview } from "../inventory-overview";
@@ -7,7 +7,7 @@ import {
   type MerchantReportRecord,
   type MerchantReportResult,
 } from "./merchant-reports";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The record type whose read grant covers the stock shortage report. */
 export const STOCK_SHORTAGE_SOURCE_TYPE = "inventory_position";

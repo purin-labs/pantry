@@ -22,7 +22,7 @@ import {
   type ProfileDraft,
   type ReviewAction,
 } from "./model";
-import { assertNever, errorMessage } from "@seams/std";
+import { assertNever, errorMessage } from "@purin-labs/std";
 
 type CheckoutProfilesDispatch = React.Dispatch<CheckoutProfilesAction>;
 

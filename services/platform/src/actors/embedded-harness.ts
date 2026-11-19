@@ -12,12 +12,12 @@ import type {
   SessionId,
   StoredMessageAttachment,
   Timestamp,
-} from "@seams/contracts";
-import type { CancellableTask } from "@seams/async-control/cancellable-task";
+} from "@purin-labs/contracts";
+import type { CancellableTask } from "@purin-labs/async-control/cancellable-task";
 export type {
   EmbeddedHarnessBackendId,
   EmbeddedHarnessModelUsage,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Result } from "../result";
 import type {

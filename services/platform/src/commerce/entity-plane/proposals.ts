@@ -3,12 +3,12 @@ import type {
   CommerceEntityPlaneProposal,
   CommerceEntityPlaneCommand,
   CommerceMutationReceiptV1,
-} from "@seams/contracts";
-import { sameRelationshipDefinitionRef } from "@seams/commerce-contracts/commerce-relationship-references";
+} from "@purin-labs/contracts";
+import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import { assertCommerceEntityPlaneCommandWithLexicon } from "../commerce-wasm";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
-import { parseRecordedCommerceEntityPlaneEffect } from "@seams/commerce-contracts/entity-plane-effects";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
+import { parseRecordedCommerceEntityPlaneEffect } from "@purin-labs/commerce-contracts/entity-plane-effects";
 
 type RecordValue = Record<string, unknown>;
 type PatchCustomEntityProposal = Variant<

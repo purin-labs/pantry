@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 
 const labState = vi.hoisted(createLabState);
 
-vi.mock("@seams/commerce-contracts/lab-normalizer", labNormalizerMockFactory);
+vi.mock("@purin-labs/commerce-contracts/lab-normalizer", labNormalizerMockFactory);
 
 import {
   commerceLabRunReadyForCompletion,
@@ -20,7 +20,7 @@ import {
   parseCommerceCueFacts,
 } from "../../src/actors/commerce-projection";
 import { d1Database } from "../sqlite-d1";
-import { bytesToHex } from "@seams/std";
+import { bytesToHex } from "@purin-labs/std";
 import { requireOrganisationId } from "../test-ids";
 import { createMigratedDatabase } from "../sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "../worker-fakes";

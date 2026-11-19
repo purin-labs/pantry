@@ -1,4 +1,4 @@
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import type { OrganisationId } from "../src/ids";
 import type { CaseExecutionRoute } from "../src/control/routes/case-execution";
 

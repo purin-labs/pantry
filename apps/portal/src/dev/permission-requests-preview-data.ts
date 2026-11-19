@@ -8,7 +8,7 @@ import type {
   AgentPermissionRequestView,
   HeldOutputSummary,
   HeldOutputView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 const CHAT_REQUEST = "c".repeat(32);
 const SLACK_REQUEST = "d".repeat(32);

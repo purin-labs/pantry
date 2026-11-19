@@ -1,5 +1,5 @@
-import { isProjectId, type ProjectId } from "@seams/control-api";
-import { isPositiveInteger } from "@seams/std";
+import { isProjectId, type ProjectId } from "@purin-labs/control-api";
+import { isPositiveInteger } from "@purin-labs/std";
 import type { OrganisationQuerySource } from "../data/query-source";
 import type { CaseId, OrganisationId, UserId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";

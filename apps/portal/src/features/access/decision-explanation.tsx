@@ -1,7 +1,7 @@
 import React from "react";
 import { CircleAlert, CircleCheck, ShieldAlert, X } from "lucide-react";
 
-import type { AccessExplainResult } from "@seams/control-api/portal/access-models";
+import type { AccessExplainResult } from "@purin-labs/control-api/portal/access-models";
 import { modeLabel } from "./presentation";
 
 export function ExplanationPanel(

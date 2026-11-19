@@ -3,7 +3,7 @@ import type {
   MaterialStorageHistoryView,
   MaterialStorageUsage,
   MaterialStorageInterval,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import { seconds, type TaskSelection } from "./oven-logistics";
 
 type Props = TaskSelection & Readonly<{ view: MaterialStorageHistoryView }>;

@@ -1,4 +1,4 @@
-import { selectInventoryConsumptionPlan } from "@seams/contracts";
+import { selectInventoryConsumptionPlan } from "@purin-labs/contracts";
 import type {
   InventoryData,
   ProductDeleteBlock,
@@ -7,14 +7,14 @@ import type {
   StockStatus,
   StockPolicy,
   Quantity,
-} from "@seams/contracts";
-import { productDeleteBlock } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import { productDeleteBlock } from "@purin-labs/commerce-client";
 import type {
   CommerceResourcesV1,
   CommerceMediaLibraryV1,
   CommerceInventoryPositionV1,
   CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export function inventoryQuantity(quantity: Quantity): string {
   const units = {

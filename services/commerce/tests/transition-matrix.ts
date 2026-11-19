@@ -4,11 +4,11 @@
 // event) with the reason. Every cell that the journey does not probe must
 // match one pattern, and every pattern must match a cell that it does not
 // probe.
-import type { CommerceMutationResultV1 } from "@seams/commerce-client";
+import type { CommerceMutationResultV1 } from "@purin-labs/commerce-client";
 import {
   COMMERCE_MACHINES,
   type CommerceMachineName,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { expect } from "vitest";
 
 export type MachineAnswer = Readonly<{

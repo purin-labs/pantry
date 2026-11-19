@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import * as d from "./document-values.ts";
 import type { CarrierId } from "./identity.ts";
 import type { StorageState } from "./state.ts";

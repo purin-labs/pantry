@@ -16,7 +16,7 @@ import {
   seedPatisserieSupplyCosts,
   type PatisserieItem,
   type PatisserieMenuSetupResult,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { isMainModule } from "./merchant-script.ts";
 
 export {

@@ -1,4 +1,4 @@
-import { newConversationId } from "@seams/control-api";
+import { newConversationId } from "@purin-labs/control-api";
 import { readConversation, saveConversation } from "../../src/chat/store";
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";

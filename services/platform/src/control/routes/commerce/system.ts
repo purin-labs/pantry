@@ -6,7 +6,7 @@ import type {
   CommerceClientError,
   CommerceDemoProfile,
   CommerceMerchantSnapshotV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceSystemSyncStatus } from "../../../actors/commerce-projection";
 import { readCommerceSystemSyncStatus } from "../../../commerce/system-readiness";
 import {
@@ -68,7 +68,7 @@ import {
   ensureCreatedOrganisationActor,
   readOrganisationEnvironment,
 } from "../../organisation-runtime";
-import { assertNever, decodeBase64Url } from "@seams/std";
+import { assertNever, decodeBase64Url } from "@purin-labs/std";
 
 export async function handleCommerceSystem(
   request: Request,

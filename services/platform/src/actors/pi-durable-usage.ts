@@ -1,8 +1,8 @@
 import type {
   EmbeddedHarnessModelUsage,
   HarnessTurnLease,
-} from "@seams/contracts";
-import { parseJsonOrNull } from "@seams/std";
+} from "@purin-labs/contracts";
+import { parseJsonOrNull } from "@purin-labs/std";
 import { parseModelUsage } from "./harness-history";
 
 export function createPiUsageSchema(sql: SqlStorage): void {

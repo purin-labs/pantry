@@ -26,8 +26,8 @@ import {
   type WhatsAppPolicyDraft,
   type WhatsAppPolicyView,
   type WhatsAppRuntimeView,
-} from "@seams/control-api/portal/whatsapp";
-import type { WhatsAppProviderHealth } from "@seams/control-api";
+} from "@purin-labs/control-api/portal/whatsapp";
+import type { WhatsAppProviderHealth } from "@purin-labs/control-api";
 /**
  * The WhatsApp setup: connect a number, assign an agent and publish the ingress
  * policy. Conversations and reply approvals are in the Inbox (Plan 83), so this

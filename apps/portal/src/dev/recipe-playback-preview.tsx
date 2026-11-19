@@ -1,10 +1,10 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { DEFAULT_BLACK_SESAME_COBOT_RECIPE } from "@seams/production-simulation/recipes/black-sesame/model";
-import { DEFAULT_FINANCIER_BAKE_RECIPE } from "@seams/production-simulation/recipes/financier-bake/model";
-import { DEFAULT_FINANCIER_BATTER_RECIPE } from "@seams/production-simulation/recipes/financier-batter/model";
-import { DEFAULT_FINANCIER_PACK_RECIPE } from "@seams/production-simulation/recipes/financier-pack/model";
-import { DEFAULT_GINGER_TEA_COBOT_RECIPE } from "@seams/production-simulation/recipes/ginger-tea/model";
+import { DEFAULT_BLACK_SESAME_COBOT_RECIPE } from "@purin-labs/production-simulation/recipes/black-sesame/model";
+import { DEFAULT_FINANCIER_BAKE_RECIPE } from "@purin-labs/production-simulation/recipes/financier-bake/model";
+import { DEFAULT_FINANCIER_BATTER_RECIPE } from "@purin-labs/production-simulation/recipes/financier-batter/model";
+import { DEFAULT_FINANCIER_PACK_RECIPE } from "@purin-labs/production-simulation/recipes/financier-pack/model";
+import { DEFAULT_GINGER_TEA_COBOT_RECIPE } from "@purin-labs/production-simulation/recipes/ginger-tea/model";
 import { BlackSesameWorkspace } from "../features/production-run/black-sesame/black-sesame-physics-view";
 import { FinancierBakeWorkspace } from "../features/production-run/financier-bake/financier-bake-physics-view";
 import { FinancierBatterWorkspace } from "../features/production-run/financier-batter/financier-batter-physics-view";

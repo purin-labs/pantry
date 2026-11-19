@@ -18,7 +18,7 @@ import {
   type OrganisationPlacement,
 } from "../placement";
 import type { Result } from "../result";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   actorPlacementAdmissionPredicate,
   actorPlacementAdmissionMatchesIdentity,
@@ -29,7 +29,7 @@ import {
   assertNever,
   isNonNegativeInteger,
   isPositiveInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 type RegistryTokenParseError = {
   readonly code: "invalid_registry_token";

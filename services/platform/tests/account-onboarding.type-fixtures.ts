@@ -1,7 +1,7 @@
 import type {
   AccountOnboardingSelection,
   AccountOnboardingResult,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 // @ts-expect-error Existing projects cannot also request account creation.
 const mixed: AccountOnboardingSelection = {

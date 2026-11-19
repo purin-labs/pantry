@@ -46,7 +46,7 @@ import type {
   InventoryConsumptionRequirementEntityId,
   ModifierGroupRevisionEntityId,
   PreparationStationEntityId,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CommercePrincipalId,
   CommerceSource,
@@ -55,7 +55,7 @@ import type {
   Money,
   CommerceSnapshotRevision,
   SourceProvenance,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   EntityPlaneChangeRequest,
   EntityPlaneCommandRequest,
@@ -69,8 +69,8 @@ import {
   validateRelationshipDefinitionWithLexicon,
   validateSavedCommerceViewWithLexicon,
 } from "./lexicon.ts";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { exhaustiveList, isNormalizedText, isRecord } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { exhaustiveList, isNormalizedText, isRecord } from "@purin-labs/std";
 
 type BoundaryRecord = { readonly [key: string]: unknown };
 type SystemCommerceEntityKind = SystemCommerceEntityRef["typeId"];

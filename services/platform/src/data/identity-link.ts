@@ -18,7 +18,7 @@ import {
   type SlackEventId,
   type SlackUserId,
 } from "../slack/events";
-import { assertNever, encodeBase64Url, sha256Hex } from "@seams/std";
+import { assertNever, encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 declare const identityLinkChallengeIdBrand: unique symbol;
 declare const identityLinkTokenBrand: unique symbol;

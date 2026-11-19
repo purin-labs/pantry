@@ -1,5 +1,5 @@
 import React from "react";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import { BakeryAppearanceControl } from "../../../preferences/appearance-controls";
 import type { RecipeFrames } from "./playback-controller";
 import { Live, LiveText, useLive } from "./live";

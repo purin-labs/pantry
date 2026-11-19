@@ -9,7 +9,7 @@ import {
   type FinancierPackPhase,
   type FinancierPackRecipeConfig,
   type FinancierPackSample,
-} from "@seams/production-simulation/recipes/financier-pack/model";
+} from "@purin-labs/production-simulation/recipes/financier-pack/model";
 import {
   FinancierPackScene,
   type FinancierPackCameraPreset,
@@ -33,7 +33,7 @@ import {
   type RecipeRun,
   type RecipeRunView,
 } from "../shared/recipe-workspace";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const PACK_STEPS: readonly RecipeStep[] = [
   {

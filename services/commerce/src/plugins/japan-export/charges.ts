@@ -1,5 +1,5 @@
 // Test tax and duty rules for shipping from Japan (Plan 76 phase 5).
-import type { DutyIncoterm } from "@seams/commerce-contracts";
+import type { DutyIncoterm } from "@purin-labs/commerce-contracts";
 
 import {
   allocateJpyAcrossCheckoutLines,
@@ -16,12 +16,12 @@ import {
   type TaxQuoteProviderRequest,
   type TaxQuoteProviderResult,
 } from "../../checkout-charge-provider.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever, isNormalizedText } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever, isNormalizedText } from "@purin-labs/std";
 import {
   COMMERCE_EUROPEAN_UNION_COUNTRIES,
   type CommerceShippingCountry,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 type JpyMoney = Readonly<{ amountMinor: number; currency: "JPY" }>;
 

@@ -1,16 +1,16 @@
 import {
   compileProcedure,
   parseProcedureAssumptions,
-} from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery-procedure";
 import {
   bakeryFingerprint,
   sampleSettings,
-} from "@seams/bakery-model/bakery";
-import { parseScenarioCopy } from "@seams/bakery-model/bakery-scenario";
+} from "@purin-labs/bakery-model/bakery";
+import { parseScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { operationForRun, runProcedure } from "@seams/production-simulation/simulator/procedure";
-import { simulate } from "@seams/production-simulation/recipes/bakery/schedule";
+import { operationForRun, runProcedure } from "@purin-labs/production-simulation/simulator/procedure";
+import { simulate } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 
 function entity(typeId, entityId, values) {
   const attributes = [];

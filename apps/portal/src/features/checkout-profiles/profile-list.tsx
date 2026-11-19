@@ -7,7 +7,7 @@ import {
   type CheckoutProfilesReadyState,
 } from "./model";
 import { ProfileState } from "./profile-state";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type ProfileListAction = Variant<
   CheckoutProfilesAction,

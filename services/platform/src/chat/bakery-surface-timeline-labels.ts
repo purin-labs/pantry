@@ -2,15 +2,15 @@
 import {
   isRehearsalChange,
   type BakeryStoreInteriorAction,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type {
   BakeryProductionEdit,
   BakeryRehearsalEdit,
   BakerySurfaceEditOperation,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { type BakerySurfaceTimelineEvent } from "../actors/bakery-surface-effect";
-import { assertNever } from "@seams/std";
-import type { ChatReceiptReference, ChatToolView } from "@seams/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { ChatReceiptReference, ChatToolView } from "@purin-labs/control-api";
 import {
   pageCommandAction,
   pageCommandDestination,

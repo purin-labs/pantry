@@ -12,7 +12,7 @@ import {
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   parseProductDescriptionUpdate,
   parseProductDescriptionStateVector,
@@ -21,7 +21,7 @@ import {
   type ProductDescriptionCrdtError,
   type ProductDescriptionPresenceSelection,
 } from "./index.ts";
-import { isPositiveInteger } from "@seams/std";
+import { isPositiveInteger } from "@purin-labs/std";
 
 export const DESCRIPTION_PROTOCOL = "product_description_sync.v2";
 export const FRAME_LIMIT = COLLABORATION_FRAME_LIMIT;

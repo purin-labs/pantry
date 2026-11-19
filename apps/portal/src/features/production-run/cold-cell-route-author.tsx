@@ -3,19 +3,19 @@ import React from "react";
 import {
   recurringColdCellScenario,
   type ColdCellComparison,
-} from "@seams/production-simulation/recipes/recurring-cold-cell";
-import { parseNativeCell } from "@seams/production-simulation/native/cell-adapter";
+} from "@purin-labs/production-simulation/recipes/recurring-cold-cell";
+import { parseNativeCell } from "@purin-labs/production-simulation/native/cell-adapter";
 import {
   authoredId,
   type PhysicalCellDefinition,
-} from "@seams/production-simulation";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { isRecord } from "@purin-labs/std";
 import {
   parsePersistentCell,
   type PersistentRackCell,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { openExecutionWorker, type ExecutionWorker } from "./execution-client";
-import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import type { OvenRunSource } from "@purin-labs/production-simulation/runs/oven-run-file";
 
 const CASES: readonly Readonly<{
   id: string;

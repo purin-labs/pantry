@@ -1,7 +1,7 @@
 import { Select } from "../../ui/select";
 import React from "react";
 import { PlaybackCursor } from "./playback-cursor";
-import type { StationId } from "@seams/bakery-model/bakery";
+import type { StationId } from "@purin-labs/bakery-model/bakery";
 import {
   clock,
   getActiveVitrineChannelFilter,
@@ -16,14 +16,14 @@ import {
   type Run,
   type Station,
   type VitrineStockSnapshot,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import type { Selection } from "@seams/production-simulation/simulator/selection";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type { Selection } from "@purin-labs/production-simulation/simulator/selection";
 import {
   equipmentAt,
   equipmentSummary,
   equipmentTimeline,
   type EquipmentSpan,
-} from "@seams/production-simulation/simulator/equipment-timeline";
+} from "@purin-labs/production-simulation/simulator/equipment-timeline";
 import "./equipment-lanes.css";
 
 type Props = Readonly<{

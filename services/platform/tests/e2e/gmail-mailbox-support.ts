@@ -1,7 +1,7 @@
 import { env, exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { expect } from "vitest";
-import { decodeBase64, isRecord } from "@seams/std";
+import { decodeBase64, isRecord } from "@purin-labs/std";
 import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {

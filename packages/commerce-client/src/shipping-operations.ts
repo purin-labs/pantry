@@ -1,7 +1,7 @@
 import type {
   ShipmentLabelAttempt,
   ShipmentLabelRateSnapshot,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   parseAttachFulfillmentTrackingCommand as parseAttachFulfillmentTrackingCommandRecord,
@@ -11,7 +11,7 @@ import {
   parseShipmentLabelRateResult as parseShipmentLabelRateResultRecord,
   parseWireShipmentLabelAttempt as parseShipmentLabelAttemptRecord,
   parseWireShipmentLabelRate as parseShipmentLabelRateSnapshotRecord,
-} from "@seams/commerce-contracts/records/api-shipping-operations";
+} from "@purin-labs/commerce-contracts/records/api-shipping-operations";
 
 export type QuoteShipmentLabelRateCommand = Readonly<{
   schemaVersion: "underclerk.quote-shipment-label-rate.v1";

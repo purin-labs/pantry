@@ -2,15 +2,15 @@ import { floorPlanWorkspace } from "../workflow-simulator/floor-plan-workspace";
 import {
   isApplianceId,
   type ApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import React from "react";
 import { BakeryAppearanceControl } from "../../preferences/appearance-controls";
 import { SegmentedControl } from "../workflow-simulator/docks/shared";
-import type { LogisticsView } from "@seams/production-simulation";
-import type { PersistentPhysicsScene } from "@seams/bakery-model/bakery-physics";
+import type { LogisticsView } from "@purin-labs/production-simulation";
+import type { PersistentPhysicsScene } from "@purin-labs/bakery-model/bakery-physics";
 import { PhysicsSceneHost } from "../workflow-simulator/spatial/physics-scene-host";
 import type { FactorySceneSource } from "../workflow-simulator/spatial/physics-factory-scene";
-import { ovenFrameMotion, type OvenLiveFrame } from "@seams/production-simulation/runs/oven-live-physics";
+import { ovenFrameMotion, type OvenLiveFrame } from "@purin-labs/production-simulation/runs/oven-live-physics";
 import type { FactoryStationSource } from "../workflow-simulator/spatial/factory-stations";
 import {
   computeFacilityUtilityTelemetry,
@@ -21,7 +21,7 @@ import {
 import {
   BAKERY_FLOOR_PLANS,
   type BakeryFloorPlanId,
-} from "@seams/production-simulation/floor/bakery-room";
+} from "@purin-labs/production-simulation/floor/bakery-room";
 import { rotateApplianceWithCollisions } from "../workflow-simulator/bakery-appliance-layout";
 import { SimulatorHistoryControls } from "../workflow-simulator/docks/history-controls";
 import { StoreInteriorDesignControl } from "../workflow-simulator/docks/store-interior-control";

@@ -1,5 +1,5 @@
-import { sha256Hex } from "@seams/std";
-import type { CollaborationAgent } from "@seams/collaboration";
+import { sha256Hex } from "@purin-labs/std";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import {
   EMAIL_DRAFT_SCHEMA,
@@ -11,7 +11,7 @@ import {
   type EmailDraftSnapshot,
   type EmailDraftStateVector,
   type EmailDraftUpdate,
-} from "@seams/email-draft-crdt";
+} from "@purin-labs/email-draft-crdt";
 import {
   encodeEmailDraftServerMessage,
   FRAME_LIMIT,
@@ -19,7 +19,7 @@ import {
   type EmailDraftClientMessage,
   type EmailDraftFailureCode,
   type EmailDraftRoomMetadata,
-} from "@seams/email-draft-crdt/protocol";
+} from "@purin-labs/email-draft-crdt/protocol";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError, readJsonRecord } from "../control/http";
 import { listOrganisationMembers, resolveUser } from "../data/control-plane";
@@ -42,8 +42,8 @@ import {
   type CollaborationSocketRoom,
 } from "./collaboration-room";
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, hasExactKeys, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 

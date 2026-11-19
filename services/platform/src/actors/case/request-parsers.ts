@@ -1,8 +1,8 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { ActionMutationExecution } from "../action-mutation-execution";
 import { parseSourceProvenance } from "../../commerce/source-provenance";
-import type { RequestAuthority } from "@seams/contracts";
-import type { SourceProvenance } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { SourceProvenance } from "@purin-labs/contracts";
 import { parseIntegrationAccountId } from "../../ids";
 import { parseEmailReplyProposalLifecycle } from "../../data/email-mailbox";
 import { parseEmailProposalTarget } from "../../data/email-operational";
@@ -26,8 +26,8 @@ import {
   ObservationEvidence,
 } from "../../policy";
 import { parseCommerceEntityPlaneProposal } from "../../commerce/entity-plane/proposals";
-import type { Variant } from "@seams/type-utils";
-import { checked } from "@seams/contracts/connector-rpc";
+import type { Variant } from "@purin-labs/type-utils";
+import { checked } from "@purin-labs/contracts/connector-rpc";
 import {
   abandonAssignmentRequestSchema,
   acceptCommerceOutcomeRequestSchema,
@@ -49,8 +49,8 @@ import {
   resolveCommerceApprovalRequestSchema,
   settleAssignmentRequestSchema,
   waitForCommerceApprovalRequestSchema,
-} from "@seams/contracts/case-rpc";
-import { assertNever, isNonBlankString, isRecord } from "@seams/std";
+} from "@purin-labs/contracts/case-rpc";
+import { assertNever, isNonBlankString, isRecord } from "@purin-labs/std";
 import { flowLabelForAuthority } from "./context-source";
 import {
   equal,

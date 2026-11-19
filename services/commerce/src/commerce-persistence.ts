@@ -17,13 +17,13 @@ import {
   type CommerceSalesChannelV1,
   type CommerceShipmentV1,
   type CommerceVariantV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "./database.ts";
 import { writeCommerceEntityRelationText } from "./entity-plane/relation-text.ts";
 import { refreshCommerceRelationshipRelation } from "./entity-plane/commerce-relationship-relation.ts";
 import { refreshCommerceAttributeRelation } from "./entity-plane/commerce-attribute-relation.ts";
-import { parseJson } from "@seams/std";
+import { parseJson } from "@purin-labs/std";
 
 type LocationRow = Readonly<{
   id: string;

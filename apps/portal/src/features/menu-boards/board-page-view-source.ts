@@ -1,4 +1,4 @@
-import type { PortalPageViewV1 } from "@seams/control-api";
+import type { PortalPageViewV1 } from "@purin-labs/control-api";
 import { registerSurfaceView, type SurfaceViewSource } from "../surface-observation";
 import { boardPageView, type BoardPageSnapshot } from "./board-page-view";
 

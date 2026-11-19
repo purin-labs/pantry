@@ -14,7 +14,7 @@ import {
   type CommerceMerchantSnapshotV1,
   type CommerceMigrationInventoryV2,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
 import type { ReceiptPurchaseCheck } from "../plugins/built-in-ports.ts";

@@ -9,7 +9,7 @@ import {
   type DeviceSampleReport,
   type GatewayMessage,
   type PlatformGatewayMessage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import {
   deliverDeviceAlerts,

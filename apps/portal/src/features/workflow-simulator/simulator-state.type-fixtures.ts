@@ -10,12 +10,12 @@ import type {
 import type {
   AgentScenarioSaveManifest,
   AgentScenarioSavePayload,
-} from "@seams/bakery-model/bakery-agent-scenario-save";
-import type { ReplayState } from "@seams/production-simulation/simulator/playback-state";
+} from "@purin-labs/bakery-model/bakery-agent-scenario-save";
+import type { ReplayState } from "@purin-labs/production-simulation/simulator/playback-state";
 import type { RecordingAcceptanceReference } from "./recording-acceptance";
-import type { RunSnapshotSummary } from "@seams/bakery-model/bakery-run-snapshot";
+import type { RunSnapshotSummary } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import type { PreparedWorkspaceRun } from "./workspace-runs-api";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const mutate: Variant<SimulatorConnection, "workspace">["mutate"];
 declare const sampleShift: Variant<

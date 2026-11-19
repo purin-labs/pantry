@@ -1,9 +1,9 @@
 import React from "react";
-import type { CaseScreenObservationView } from "@seams/control-api";
+import type { CaseScreenObservationView } from "@purin-labs/control-api";
 import type {
   AccessControlOption,
   AccessRouteTransport,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 import { navigationGroupTitle } from "../../route";
 import { Select } from "../../ui/select";
 import "./case-screen-observations.css";

@@ -1,8 +1,8 @@
-import type { CommerceMutationActorV1 } from "@seams/commerce-client";
+import type { CommerceMutationActorV1 } from "@purin-labs/commerce-client";
 import type { BuyerRoute, CommerceRoute } from "../http-routes.ts";
 import { adminRouteAccess, sameSecret } from "../api-access.ts";
 import { CLOSED_MERCHANT_REFUSED_ROUTES } from "../merchant-closure.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { HttpRouteContext } from "./context.ts";
 import {
   SERVER_COMMAND_FIELDS,

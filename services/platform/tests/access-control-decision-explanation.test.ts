@@ -10,7 +10,7 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 import type {
   CapabilityMode,
   OrganisationCapabilityPolicy,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AccessGrant } from "../src/authorization/access-grants/types";

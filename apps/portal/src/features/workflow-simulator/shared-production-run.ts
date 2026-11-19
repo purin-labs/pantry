@@ -1,16 +1,16 @@
 import {
   readOvenSave,
   type OvenRunSource,
-} from "@seams/production-simulation/runs/oven-run-file";
+} from "@purin-labs/production-simulation/runs/oven-run-file";
 import { RunArtifactStore } from "../production-run/run-artifact-store";
-import { visitSharedArtifacts } from "@seams/production-simulation/simulator/shared-artifact-batches";
-import type { ResumableDocument } from "@seams/production-simulation";
+import { visitSharedArtifacts } from "@purin-labs/production-simulation/simulator/shared-artifact-batches";
+import type { ResumableDocument } from "@purin-labs/production-simulation";
 import {
   readExactWorkspaceRun,
   parsePersistentSnapshot,
   readSharedRunArtifact,
 } from "./workspace-runs-api";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** Opening a shared run retains verified files in browser storage for a fresh worker. */
 export async function openPersistentWorkspaceRun(

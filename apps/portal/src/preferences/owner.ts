@@ -5,15 +5,15 @@ import {
   type UserId,
   type UserPreferenceDocument,
   type UserPreferenceEdit,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import {
   ControlApiError,
   controlRead,
   controlWrite,
   readCookie,
 } from "../control-client";
-import { parsePreferenceResponse } from "@seams/control-api/portal/preferences";
+import { parsePreferenceResponse } from "@purin-labs/control-api/portal/preferences";
 
 export type PendingEdit = Readonly<{
   edit: UserPreferenceEdit;

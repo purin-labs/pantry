@@ -5,8 +5,8 @@ import {
   type PortalPageViewV1,
   type RegisterViewCommand,
   type SurfacePageCommandV1,
-} from "@seams/control-api";
-import type { CounterSale } from "@seams/control-api/portal/counter-sale";
+} from "@purin-labs/control-api";
+import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import {
   registerSurfaceView,
   type SurfaceCommandOutcome,

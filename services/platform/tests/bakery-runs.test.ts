@@ -3,7 +3,7 @@ import {
   handleBakeryRunRoute,
   matchBakeryRunRoute,
 } from "../src/control/routes/bakery-runs";
-import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
+import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { platformEnv } from "./worker-fakes";
 
 const mocks = vi.hoisted(createMocks);

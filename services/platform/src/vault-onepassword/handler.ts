@@ -5,8 +5,8 @@ import {
   type VaultContact,
   type VaultItemCreate,
   type VaultItemView,
-} from "@seams/control-api";
-import { assertNever, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 import type {
   OnePasswordErrorCode,

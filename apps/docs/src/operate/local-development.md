@@ -17,13 +17,13 @@ Build the portal and start the docs app:
 
 ```bash
 pnpm portal:build
-pnpm --filter @seams/docs dev
+pnpm --filter @purin-labs/docs dev
 ```
 
 Start the platform Worker in another terminal:
 
 ```bash
-pnpm --filter @seams/platform dev
+pnpm --filter @purin-labs/platform dev
 ```
 
 The docs app runs at `http://docs.localhost:3005`. The portal is available through
@@ -34,7 +34,7 @@ the local site setup described in the repository README.
 When a commerce change needs a durable local authority and lab:
 
 ```bash
-pnpm --filter @seams/platform d1:migrate:local
+pnpm --filter @purin-labs/platform d1:migrate:local
 pnpm lab:reset
 pnpm lab:seed
 pnpm lab:scenario
@@ -63,8 +63,8 @@ access. Ctrl+C stops Caddy and releases those ports.
 For content or theme changes, use the shorter loop:
 
 ```bash
-pnpm --filter @seams/docs type-check
-pnpm --filter @seams/docs check:links
-pnpm --filter @seams/docs check:fences
-pnpm --filter @seams/docs build
+pnpm --filter @purin-labs/docs type-check
+pnpm --filter @purin-labs/docs check:links
+pnpm --filter @purin-labs/docs check:fences
+pnpm --filter @purin-labs/docs build
 ```

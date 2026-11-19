@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@seams/commerce-contracts/schema";
+import { recordParser } from "@purin-labs/commerce-contracts/schema";
 import {
   portalPageViewSectionSchema,
   type PortalPageViewV1,
@@ -68,7 +68,7 @@ export const surfaceInstanceSchema = Type.Object({
 /**
  * The typed state of a page with commands. Its `kind` names the state type,
  * and the package that owns the surface parses the rest: the Kitchen
- * state is a `BakerySurfaceContextV1` (`@seams/bakery-model`). A record
+ * state is a `BakerySurfaceContextV1` (`@purin-labs/bakery-model`). A record
  * schema keeps every field, so the owner's parser sees the whole state.
  */
 export const surfaceStateSchema = Type.Record(Type.String(), Type.Unknown());

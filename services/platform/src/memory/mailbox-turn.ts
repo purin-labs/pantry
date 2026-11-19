@@ -1,8 +1,8 @@
-import type { MemoryApplicability } from "@seams/control-api";
+import type { MemoryApplicability } from "@purin-labs/control-api";
 import {
   parseEntityRef,
   SUPPLIER_ENTITY_TYPE_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type {
   TurnMemoryRead,

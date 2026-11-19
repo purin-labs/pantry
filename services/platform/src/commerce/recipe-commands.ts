@@ -2,13 +2,13 @@ import {
   parseRecipeWrite,
   type RecipeCollection,
   type RecipeItem,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   CommerceAdminClient,
   CommerceStockSnapshot,
-} from "@seams/commerce-client";
-import type { RecipeRevision } from "@seams/contracts";
-import { canonicalJson } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import type { RecipeRevision } from "@purin-labs/contracts";
+import { canonicalJson } from "@purin-labs/std";
 
 /**
  * The recipe library (Kitchen › Recipes). A person's page and the Portal

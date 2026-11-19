@@ -3,7 +3,7 @@ import {
   resolveCollaborationAgent,
 } from "../../actors/collaboration-agent";
 import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
-import { workflowCanvasDocumentId } from "@seams/bakery-model/bakery-canvas-source";
+import { workflowCanvasDocumentId } from "@purin-labs/bakery-model/bakery-canvas-source";
 import type {
   WorkflowCanvasReadRequest,
   WorkflowCanvasMoveRequest,
@@ -34,7 +34,7 @@ import {
 import { readCafeImages } from "../../commerce/cafe-media";
 import { readPublishedCafeMenu } from "../../control/routes/menu-screens";
 import { buildControlAuthority } from "../../request-authority";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import { newRequestId, type OrganisationId } from "../../ids";
 import { traceWarn } from "../../observability";
@@ -72,12 +72,12 @@ import {
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { CommerceReadRequestError } from "../../context/assembly/commerce";
 import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import {
   MENU_BOARD_LAYOUTS,
   MENU_BOARD_SCREEN_SIZES,
   menuBoardCanvasRects,
-} from "@seams/menu-board-crdt/board";
+} from "@purin-labs/menu-board-crdt/board";
 import {
   type DraftThreadLink,
   type PreparedCommerceRead,

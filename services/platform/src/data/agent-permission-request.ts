@@ -2,10 +2,10 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
-import type { RequestAuthority } from "@seams/contracts";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import { parseStoredRequestAuthority } from "../request-authority";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {

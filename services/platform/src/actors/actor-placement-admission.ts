@@ -1,5 +1,5 @@
-import { assertNever } from "@seams/std";
-import type { StrictUnion, VariantBy } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion, VariantBy } from "@purin-labs/type-utils";
 import {
   resolveActiveOrganisationPlacementRecord,
   samePlacement,

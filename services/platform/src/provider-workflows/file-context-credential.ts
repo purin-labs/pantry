@@ -20,8 +20,8 @@ import {
   refreshGoogleDriveAccessToken,
 } from "../provider-adapters/google-drive";
 import type { Result } from "../result";
-import type { VariantBy } from "@seams/type-utils";
-import type { FileContextProvider } from "@seams/contracts";
+import type { VariantBy } from "@purin-labs/type-utils";
+import type { FileContextProvider } from "@purin-labs/contracts";
 
 type FileProvider = FileContextProvider;
 

@@ -1,6 +1,6 @@
 import { signalChat } from "../../chat/signals";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { isProjectId, parseProjectAccessCommand } from "@seams/control-api";
+import { isProjectId, parseProjectAccessCommand } from "@purin-labs/control-api";
 import type { Env } from "../../env";
 import {
   authorizeProject,

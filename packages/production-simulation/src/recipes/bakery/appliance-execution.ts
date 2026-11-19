@@ -1,4 +1,4 @@
-import { canonicalJson, isRecord, parseJsonOrNull, sha256Hex } from "@seams/std";
+import { canonicalJson, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import { strFromU8, strToU8 } from "fflate";
 import { exchangeNow, type CellModule } from "../../native/wasm-transport.ts";
 import {
@@ -11,8 +11,8 @@ import {
   type ApplianceName,
   type ApplianceRequest,
   type ApplianceResult,
-} from "@seams/bakery-model/bakery-appliance-protocol";
-import { checkpointBody } from "@seams/bakery-model/bakery-checkpoint";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
+import { checkpointBody } from "@purin-labs/bakery-model/bakery-checkpoint";
 import type { CompiledScenario, TaskDefinition } from "../../scenario.ts";
 import type { RunState } from "../../state.ts";
 import {

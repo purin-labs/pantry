@@ -11,8 +11,8 @@ import {
   isPositiveInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
-import type { CommerceObservationDisposition } from "@seams/control-api";
+} from "@purin-labs/std";
+import type { CommerceObservationDisposition } from "@purin-labs/control-api";
 import type {
   ApplyCommerceDeliveryInput,
   CommerceCueFactForProjection,

@@ -1,7 +1,7 @@
 import React from "react";
 import { preloadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
 import { preparePourOverRecipe } from "../oven-recipe-file";
-import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
+import type { OvenRunSource } from "@purin-labs/production-simulation/runs/oven-run-file";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{ prepared(source: OvenRunSource): void }>;

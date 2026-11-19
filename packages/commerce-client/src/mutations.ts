@@ -1,5 +1,5 @@
-import type { Variant } from "@seams/type-utils";
-import type { CommerceInvalidTransition } from "@seams/commerce-contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import type { CommerceInvalidTransition } from "@purin-labs/commerce-contracts";
 import type {
   CommerceQuantityUnit,
   CommerceFulfillmentV1,
@@ -31,9 +31,9 @@ import {
   parseCommerceMutationErrorV1 as parseCommerceMutationErrorV1Record,
   parseCommerceMutationReceiptV1 as parseCommerceMutationReceiptV1Record,
   parseCommerceMutationResultV1 as parseCommerceMutationResultV1Record,
-} from "@seams/commerce-contracts/records/api-mutations";
+} from "@purin-labs/commerce-contracts/records/api-mutations";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
-import type * as contracts from "@seams/commerce-contracts/records/api-mutations";
+import type * as contracts from "@purin-labs/commerce-contracts/records/api-mutations";
 
 /** Who sent the request of a receipt (Plan 80 step 3). */
 export type CommerceMutationActorV1 = contracts.CommerceMutationActorV1;

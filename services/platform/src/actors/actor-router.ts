@@ -38,7 +38,7 @@ import type { OrganisationDO } from "./organisation";
 import type { CaseId, ConnectorId, SessionId, OrganisationId } from "../ids";
 import type { OrganisationPlacement } from "../placement";
 import type { Result } from "../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   actorExecutionAdmission,
   type ActorPlacementAdmission,

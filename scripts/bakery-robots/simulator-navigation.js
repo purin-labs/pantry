@@ -46,7 +46,7 @@ function productionSceneLoaded() {
   );
 }
 
-// The Portal imports @seams/production-simulation as /@fs/<checkout>/... and
+// The Portal imports @purin-labs/production-simulation as /@fs/<checkout>/... and
 // keeps state in some of its modules (the live floor plan's walk routes, the
 // evidence views). A journey that reads or sets that state imports the same
 // module instance through this path, not through /@id/.

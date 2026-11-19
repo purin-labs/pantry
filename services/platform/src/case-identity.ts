@@ -1,4 +1,4 @@
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import { parseCaseId, type CaseId } from "./ids";
 
 // The Case one stable identity always resolves to, and the digest its session

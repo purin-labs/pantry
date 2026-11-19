@@ -1,4 +1,4 @@
-import { VOICE_AUDIO_SECONDS_LIMIT } from "@seams/control-api";
+import { VOICE_AUDIO_SECONDS_LIMIT } from "@purin-labs/control-api";
 
 const SAMPLE_RATE = 16_000;
 const BYTES_PER_SECOND = SAMPLE_RATE * 2;

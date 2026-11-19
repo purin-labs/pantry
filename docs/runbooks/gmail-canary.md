@@ -92,7 +92,7 @@ permission.
    secret yourself so it never lands in the repo:
 
 ```text
-pnpm --filter @seams/platform exec wrangler secret put GMAIL_OAUTH_CLIENT_SECRET
+pnpm --filter @purin-labs/platform exec wrangler secret put GMAIL_OAUTH_CLIENT_SECRET
 ```
 
 5. `GMAIL_OAUTH_PILOT_EXPIRY_DAYS` is already set to `7` so the console

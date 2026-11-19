@@ -30,7 +30,7 @@ import {
   sqlStorage,
   type TestSqlStorage,
 } from "./sqlite-storage";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import type { CountRow } from "../src/actors/sql-rows";
 
 describe("actor export", function actorExportSuite() {

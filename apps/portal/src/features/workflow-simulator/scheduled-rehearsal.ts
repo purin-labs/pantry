@@ -1,14 +1,14 @@
-import { physicsOutcome } from "@seams/production-simulation/recipes/bakery/physics-playback";
+import { physicsOutcome } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import type {
   BakerySimulationMode,
   BakerySurfacePendingOperation,
-} from "@seams/bakery-model/bakery-surface";
-import type { ProductionPresentation } from "@seams/bakery-model/bakery-production-scenario";
-import type { BrowserPhysicsTask } from "@seams/production-simulation/simulator/browser-physics-task";
+} from "@purin-labs/bakery-model/bakery-surface";
+import type { ProductionPresentation } from "@purin-labs/bakery-model/bakery-production-scenario";
+import type { BrowserPhysicsTask } from "@purin-labs/production-simulation/simulator/browser-physics-task";
 import {
   nextProductionExecution,
   type ExecutableProductionOperation,
-} from "@seams/production-simulation/simulator/production-execution";
+} from "@purin-labs/production-simulation/simulator/production-execution";
 import type {
   ProductionPending,
   ProductionReady,
@@ -21,15 +21,15 @@ import {
   type ProductionWorkcell,
   type ProductionWorkcells,
   type ProductionWorkcellsResult,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import { supportsRackLayout } from "./rack-layout.ts";
 import {
   simulateProduction,
   type Run,
   type ScheduleSpatialLayout,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import type { WorkcellInput } from "@seams/production-simulation/recipes/bakery/workcell-input";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type { WorkcellInput } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
+import type { Variant } from "@purin-labs/type-utils";
 
 // A rehearsal on the production scheduler, as the workspace, chat commands
 // and the browser runner all see it: the step it awaits, the tray a layout

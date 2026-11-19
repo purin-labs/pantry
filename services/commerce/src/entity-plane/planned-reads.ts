@@ -26,15 +26,15 @@ import type {
   CommerceSnapshotRevision,
   RelationshipDefinitionRef,
   OrganisationId,
-} from "@seams/commerce-contracts";
-import type { CommerceSqliteRelationshipTraversalPlan } from "@seams/commerce-query-sqlite";
+} from "@purin-labs/commerce-contracts";
+import type { CommerceSqliteRelationshipTraversalPlan } from "@purin-labs/commerce-query-sqlite";
 import type {
   CommerceEntityPlaneCapabilityMetadataRequest,
   CommerceEntityPlaneCapabilityMetadataResponse,
   CommerceEntityPlanePlannedQueryResponse,
   CommerceEntityPlaneRelationshipTraversalStepRequest,
   CommerceEntityPlaneRelationshipTraversalStepResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import {
   readCustomEntity,
@@ -74,9 +74,9 @@ import {
 import {
   relationshipDefinitionReference,
   sameRelationshipDefinitionRef,
-} from "@seams/commerce-contracts/commerce-relationship-references";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, canonicalJson, sameJson } from "@seams/std";
+} from "@purin-labs/commerce-contracts/commerce-relationship-references";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, canonicalJson, sameJson } from "@purin-labs/std";
 
 type EntityPlanePlannedReadsOptions = Readonly<{
   database: CommerceDatabase;

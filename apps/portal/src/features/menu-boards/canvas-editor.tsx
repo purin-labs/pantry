@@ -27,13 +27,13 @@ import {
   type MenuBoardScreenShape,
   type MenuBoardSnapshot,
   type MenuBoardVerticalConstraint,
-} from "@seams/menu-board-crdt/board";
+} from "@purin-labs/menu-board-crdt/board";
 import {
   MENU_BOARD_MOVING_LIMIT,
   type MenuBoardElementPlacement,
   type MenuBoardPresenceSelection,
-} from "@seams/menu-board-crdt";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
+} from "@purin-labs/menu-board-crdt";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
 import type { MenuBoardClient, MenuBoardPresenceView } from "./board-client";
 import {
   CanvasAgents,

@@ -1,5 +1,5 @@
-import { isRecord, parseJsonOrNull } from "@seams/std";
-import type { CodexAllowance } from "@seams/control-api";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
+import type { CodexAllowance } from "@purin-labs/control-api";
 import { jwtClaims } from "../lenient-base64";
 import type { Result } from "../result";
 import { RequestDeadline } from "../request-deadline";

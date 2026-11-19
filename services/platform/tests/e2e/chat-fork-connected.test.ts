@@ -15,7 +15,7 @@ import {
   readWorkspaceAiBudget,
 } from "../../src/data/workspace-ai-budget";
 import { readPortalChatAttachmentKeys } from "../../src/chat/attachments";
-import { parseChat, type ChatTimelineView, type ChatAttachmentView } from "@seams/control-api/portal/chat";
+import { parseChat, type ChatTimelineView, type ChatAttachmentView } from "@purin-labs/control-api/portal/chat";
 import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import {
   type ActorRelocationId,
@@ -28,19 +28,19 @@ import {
   startActorRestore,
   resumeActorRestore,
 } from "../../src/actors/actor-restore";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, vi } from "vitest";
-import { decodeBase64, isRecord } from "@seams/std";
-import { parseConversationId } from "@seams/control-api";
-import { MenuDraftDoc, type MenuDraftUpdate } from "@seams/menu-draft-crdt";
+import { decodeBase64, isRecord } from "@purin-labs/std";
+import { parseConversationId } from "@purin-labs/control-api";
+import { MenuDraftDoc, type MenuDraftUpdate } from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftClientMessage,
   parseMenuDraftServerMessage,
   type MenuDraftServerMessage,
-} from "@seams/menu-draft-crdt/protocol";
+} from "@purin-labs/menu-draft-crdt/protocol";
 import { parseSessionId, parseUserId, type UserId } from "../../src/ids";
 import {
   issueControlSession,

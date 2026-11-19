@@ -1,4 +1,4 @@
-import { parseControlMembershipAvailability } from "@seams/control-api";
+import { parseControlMembershipAvailability } from "@purin-labs/control-api";
 import {
   controlRead,
   offerControlRead,
@@ -13,7 +13,7 @@ import type {
   OnboardingNextAction,
   OnboardingStepProjection,
   OrganisationOnboardingLifecycle,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   initialFileAccessPath,
   workspacePagePath,
@@ -23,7 +23,7 @@ import type {
   WorkspaceChoice,
 } from "./shell";
 import type { OrganisationListItem } from "./pages/workspaces";
-import type { SlackRoutingConnection, IntegrationAccount, ProviderResource, ReadinessAssessment, SetupSelection, SupportDiagnostics, OrganisationInvitation, OrganisationMember } from "@seams/control-api/portal/settings";
+import type { SlackRoutingConnection, IntegrationAccount, ProviderResource, ReadinessAssessment, SetupSelection, SupportDiagnostics, OrganisationInvitation, OrganisationMember } from "@purin-labs/control-api/portal/settings";
 import type { SlackWorkspaceCatalog } from "./features/integrations/settings-types";
 import {
   commerceSystemPath,
@@ -32,12 +32,12 @@ import {
 import { rememberOrganisationId } from "./early-reads";
 import { offerPriceAllowanceTransport } from "./features/commerce/price-allowance";
 import type { OfferPriceAllowanceInteraction } from "./features/commerce/entity-plane/route";
-import { isRecord } from "@seams/std";
-import { parseMemberships, parseOrganisationInvitation, parseOrganisationMember, parseReadiness, parseUser } from "@seams/control-api/portal/portal-projection";
-import { readApiError } from "@seams/control-api/portal/api-error";
-import type { CommerceSystemView, Membership, OperatorOrganisationCase, OrganisationSnapshot, OrganisationWorkspace } from "@seams/control-api/portal/portal-types";
+import { isRecord } from "@purin-labs/std";
+import { parseMemberships, parseOrganisationInvitation, parseOrganisationMember, parseReadiness, parseUser } from "@purin-labs/control-api/portal/portal-projection";
+import { readApiError } from "@purin-labs/control-api/portal/api-error";
+import type { CommerceSystemView, Membership, OperatorOrganisationCase, OrganisationSnapshot, OrganisationWorkspace } from "@purin-labs/control-api/portal/portal-types";
 import type { PortalOrganisation, PortalState, Provider, SessionSnapshot } from "./portal-types";
-import { parseCommerceSystemIdentity, parseCommerceSystemResponse, parseOperatorOrganisationCase, parseOrganisationSnapshot, parseProviderResourcePage, parseSlackRoutingConnection, parseSupportDiagnostics, parseSupportRole } from "@seams/control-api/portal/portal-reads";
+import { parseCommerceSystemIdentity, parseCommerceSystemResponse, parseOperatorOrganisationCase, parseOrganisationSnapshot, parseProviderResourcePage, parseSlackRoutingConnection, parseSupportDiagnostics, parseSupportRole } from "@purin-labs/control-api/portal/portal-reads";
 
 type ProviderStartResult = {
   readonly authorizationUrl: string;

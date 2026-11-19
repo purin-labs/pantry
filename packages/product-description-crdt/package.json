@@ -1,5 +1,5 @@
 {
-  "name": "@seams/product-description-crdt",
+  "name": "@purin-labs/product-description-crdt",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,8 +13,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@seams/collaboration": "workspace:*",
-    "@seams/std": "workspace:*",
+    "@purin-labs/collaboration": "workspace:*",
+    "@purin-labs/std": "workspace:*",
     "yjs": "13.6.32"
   },
   "devDependencies": {

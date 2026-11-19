@@ -10,11 +10,11 @@ import {
   parseJsonOrNull,
   sha256Hex,
   canonicalJson,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   parsePersistentPhysicsMotion,
   type PersistentPhysicsScene,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import type { OvenSave } from "./oven-run-file.ts";
 import { ovenOperation, type OvenLiveFrame } from "./oven-live-physics.ts";
 

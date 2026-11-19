@@ -22,15 +22,15 @@ import {
   type ChatSideCaseView,
   type ConversationId,
   type UserId,
-} from "@seams/control-api";
-import type { HarnessTurnLease, RequestAuthority } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { HarnessTurnLease, RequestAuthority } from "@purin-labs/contracts";
 import {
   canonicalJson,
   isNonNegativeInteger,
   isString,
   sha256Hex,
-} from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import type { AccountPlatformAccess } from "../account-platform/access";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";

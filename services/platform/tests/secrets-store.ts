@@ -1,4 +1,4 @@
-import { encodeBase64 } from "@seams/std";
+import { encodeBase64 } from "@purin-labs/std";
 
 /** A Secrets Store binding that returns a fixed value. */
 export class TestSecretsStoreSecret {

@@ -1,4 +1,4 @@
-import type { BankPayoutsWindow } from "@seams/control-api";
+import type { BankPayoutsWindow } from "@purin-labs/control-api";
 
 import type { Env } from "../../env";
 import { resolveMerchantControlContext } from "../commerce-merchant";

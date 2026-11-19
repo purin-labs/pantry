@@ -4,7 +4,7 @@ import {
   type ScreenRelevanceCheckInput,
 } from "../../jev-features/screen-relevance-check";
 import { decideScreenRelevanceRecord } from "../../jev-features/screen-relevance";
-import type { ScreenRelevanceChoice } from "@seams/control-api";
+import type { ScreenRelevanceChoice } from "@purin-labs/control-api";
 import {
   JEV_MAIL_RESERVATION_MICROUSD,
   jevFreeUseCovers,
@@ -71,7 +71,7 @@ import {
 import { cleanupTypeSafeCredentials } from "../../integrations/typesafe/connection";
 import { resolveTypeSafeCredential } from "../../integrations/typesafe/authority";
 import { identifier, integerIn } from "../../case-context-discovery/policy";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import { PlacedActor } from "../lifecycle/placed-actor";
 import { rearmActorAlarm } from "../lifecycle/actor-alarm";
 import { organisationAlarmReconcilers } from "../organisation-alarm";

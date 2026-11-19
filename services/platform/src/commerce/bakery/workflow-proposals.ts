@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../database-handles";
-import { compileDraft, draftSeed } from "@seams/bakery-workflow/draft";
+import { compileDraft, draftSeed } from "@purin-labs/bakery-workflow/draft";
 import {
   applyWorkflowChanges,
   proposalChangeSummary,
@@ -7,8 +7,8 @@ import {
   proposalOverlap,
   type ProposalChangeSummary,
   type WorkflowChange,
-} from "@seams/bakery-workflow/changes";
-import type { RunFinding } from "@seams/bakery-workflow/findings";
+} from "@purin-labs/bakery-workflow/changes";
+import type { RunFinding } from "@purin-labs/bakery-workflow/findings";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { Env } from "../../env";
 import type { ControlSessionId, OrganisationId, UserId } from "../../ids";

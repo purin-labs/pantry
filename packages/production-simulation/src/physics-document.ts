@@ -215,4 +215,4 @@ export function origin(raw: unknown): P.DispatchOrigin {
       throw new d.InvalidDocument();
   }
 }
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";

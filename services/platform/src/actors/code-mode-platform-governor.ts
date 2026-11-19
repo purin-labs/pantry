@@ -35,7 +35,7 @@ import {
   type WorkspaceExecutorAllocationReserveInput,
   type WorkspaceExecutorAllocationSettleInput,
 } from "./code-mode-budget";
-import { isNonNegativeInteger, isPositiveInteger } from "@seams/std";
+import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 
 const MAX_CONCURRENT_EXECUTIONS = 8;
 const DAILY_COST_LIMIT_MICROS = 100_000_000;

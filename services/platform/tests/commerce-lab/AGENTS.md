@@ -38,6 +38,6 @@ copy, or provider-specific implementation details.
 Run this folder with:
 
 ```bash
-pnpm --filter @seams/platform exec vitest run tests/commerce-lab
-pnpm --filter @seams/platform check:test-types
+pnpm --filter @purin-labs/platform exec vitest run tests/commerce-lab
+pnpm --filter @purin-labs/platform check:test-types
 ```

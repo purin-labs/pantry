@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /** A Stripe account that takes the shop's online payments in Commerce. */
 export type StripePaymentAccount = Readonly<{

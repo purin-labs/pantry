@@ -12,7 +12,7 @@ import {
   type SurfaceObservationV2,
   type SurfaceRecord,
   type SurfaceSource,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { pageAddress } from "../page-address";
 import { showAgentLabel } from "./agent-surface-label";
 import {

@@ -10,7 +10,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export function emailLimitsFromPolicy(
   policy: Variant<MailboxIngressPolicy, "enabled">,

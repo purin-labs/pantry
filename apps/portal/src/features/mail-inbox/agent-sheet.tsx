@@ -1,19 +1,19 @@
 import React from "react";
-import { WHATSAPP_DEFAULT_ALWAYS_WAIT_TOPICS } from "@seams/control-api";
-import type { WhatsAppAgentMode } from "@seams/control-api";
+import { WHATSAPP_DEFAULT_ALWAYS_WAIT_TOPICS } from "@purin-labs/control-api";
+import type { WhatsAppAgentMode } from "@purin-labs/control-api";
 import { Check } from "lucide-react";
 import { controlMutation, controlRead } from "../../control-client";
 import {
   parseWhatsAppSurface,
   type WhatsAppAccountView,
-} from "@seams/control-api/portal/whatsapp";
+} from "@purin-labs/control-api/portal/whatsapp";
 import {
   whatsappAccountActionPath,
   whatsappAccountsPath,
 } from "../../whatsapp";
 import { ConnectionDialog } from "../integrations/connection-dialog";
 import { disableMailAgent } from "./api";
-import type { MailAgentState } from "@seams/control-api/portal/mail-agent";
+import type { MailAgentState } from "@purin-labs/control-api/portal/mail-agent";
 
 type Channel = "email" | "whatsapp";
 type Props = Readonly<{

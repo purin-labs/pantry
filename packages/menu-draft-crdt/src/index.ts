@@ -4,7 +4,7 @@ import {
   parseYjsEncoding,
   splicePlainText,
   type ParsedYjsEncoding,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import * as Y from "yjs";
 
 export const MENU_DRAFT_SCHEMA = "menu_draft_crdt.v2";

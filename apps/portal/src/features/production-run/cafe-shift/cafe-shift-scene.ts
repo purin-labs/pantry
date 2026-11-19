@@ -3,7 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {
   LINEA_GLB_SHA256,
   EAGLE_GLB_SHA256,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { loadVisual } from "../../workflow-simulator/spatial/physics-asset-loader";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { SceneHost } from "../scene-host";
@@ -41,7 +41,7 @@ import type {
   CafeShiftAppliance,
   CafeShiftGrinder,
   CafeShiftSample,
-} from "@seams/production-simulation/recipes/cafe-shift/model";
+} from "@purin-labs/production-simulation/recipes/cafe-shift/model";
 
 export type CafeShiftCameraPreset =
   "overview" | "bakery" | "espresso-bar" | "packing";

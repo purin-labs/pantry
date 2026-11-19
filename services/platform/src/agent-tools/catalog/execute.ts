@@ -26,17 +26,17 @@ import type {
   AirtableReadInput,
   AirtableWriteInput,
 } from "../../actors/airtable-tool-input";
-import type { CommerceContextRequest } from "@seams/contracts";
+import type { CommerceContextRequest } from "@purin-labs/contracts";
 import { CommerceReadRequestError } from "../../context/assembly/commerce";
 import type {
   AuthorizedHarnessToolResult,
   HarnessToolOutput,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { MenuDraftRequestError } from "../../actors/menu-draft";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { CustomConnectorCatalogEntry } from "../../custom-connectors";
-import { errorMessage, isRecord, sha256Hex } from "@seams/std";
+import { errorMessage, isRecord, sha256Hex } from "@purin-labs/std";
 import {
   findCustomConnectorOperation,
   isReadEntry,

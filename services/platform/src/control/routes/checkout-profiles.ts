@@ -2,12 +2,12 @@ import {
   parseCheckoutProfileConfiguration,
   type CheckoutProfile,
   type CheckoutProfileConfiguration,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   type CommerceActiveCheckoutProfileV1,
   type CommerceAdminClient,
   type CommerceClientError,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { Env } from "../../env";
 import type {
@@ -33,8 +33,8 @@ import {
   type JsonRecord,
 } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import type { Variant } from "@seams/type-utils";
-import { hasExactKeys, sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { hasExactKeys, sha256Hex } from "@purin-labs/std";
 
 export type CheckoutProfileControlRoute =
   | Readonly<{ kind: "checkoutProfiles"; organisationIdRaw: string }>

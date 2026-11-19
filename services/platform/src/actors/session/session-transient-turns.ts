@@ -4,20 +4,20 @@ import type { HarnessToolHost } from "../embedded-harness";
 import {
   parseMailAssistantResult,
   type MailAssistantResult,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import {
   decideAutomaticContextAdmission,
   FlowLabel as StoredFlowLabel,
 } from "../../policy/information-flow";
 import { recordTransientTurnContext } from "../actor-journal/transactions";
-import { runTaskBeforeDeadline } from "@seams/async-control/deadline";
+import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
 import type {
   AcceptedInputRef,
   SessionIdentity,
   SessionContract,
   HarnessTurnLease,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { parseSessionId, newRequestId } from "../../ids";
 import { traceWarn } from "../../observability";
 import type { Result } from "../../result";

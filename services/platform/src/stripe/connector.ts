@@ -14,7 +14,7 @@ import {
   resolveProviderWebhookCredential,
   type VaultResolveError,
 } from "../credential-vault";
-import { bytesToHex, errorMessage, isRecord } from "@seams/std";
+import { bytesToHex, errorMessage, isRecord } from "@purin-labs/std";
 
 export type StripeWebhookError =
   | { code: "stripe_connector_missing" }

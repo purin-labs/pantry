@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { CanonicalAction } from "@seams/contracts";
+import type { CanonicalAction } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

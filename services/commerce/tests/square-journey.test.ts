@@ -20,8 +20,8 @@ import type {
   CommerceAdminClient,
   CommerceBuyerPaymentResultV1,
   CommercePaymentClientConfirmationV1,
-} from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 import { expect, it } from "vitest";
 
 import { SquareApi } from "../src/payments/square/square-api.ts";

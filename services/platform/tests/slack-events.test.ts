@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { parseSlackEnvelope, type SlackEnvelope } from "../src/slack/events";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 describe("Slack event boundary", function slackEventBoundarySuite() {
   it("parses app uninstall and bot-token revocation as installation events", function parsesInstallationRevocation() {

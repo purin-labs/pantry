@@ -20,7 +20,7 @@ import type {
   CommerceInventoryPositionV1,
   CommercePickupQueueEntryV1,
   CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

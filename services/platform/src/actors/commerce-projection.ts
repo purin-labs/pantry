@@ -3,7 +3,7 @@ import type {
   CommerceCueFact,
   CommerceProjection,
   CommerceSource,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { CommerceCueEvent } from "../cues/engine";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";
@@ -21,13 +21,13 @@ import {
   createCommerceQuerySchema,
   rebuildCommerceRelationshipRelationsForOwner,
 } from "./commerce-query-schema";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonNegativeInteger,
   isPositiveInteger,
   parseJsonOrNull,
-} from "@seams/std";
-import type { CommerceObservationDisposition } from "@seams/control-api";
+} from "@purin-labs/std";
+import type { CommerceObservationDisposition } from "@purin-labs/control-api";
 import {
   advanceCommerceProjectionWatermark,
   deleteProjection,

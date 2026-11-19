@@ -1,7 +1,7 @@
-import type { CaseGoalOperationOutcome } from "@seams/contracts";
-import type { StrictUnion } from "@seams/type-utils";
+import type { CaseGoalOperationOutcome } from "@purin-labs/contracts";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { Result } from "../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type GoalModelCallTicket = {
   readonly operationId: string;

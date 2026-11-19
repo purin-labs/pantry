@@ -6,7 +6,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { QuickJS } from "quickjs-wasi";
 
-import type { PluginLimits } from "@seams/commerce-contracts";
+import type { PluginLimits } from "@purin-labs/commerce-contracts";
 
 export type FunctionFailureReason =
   "threw" | "budget" | "memory" | "invalid_output" | "unavailable";

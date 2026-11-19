@@ -1,6 +1,6 @@
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import type { OrganisationId } from "../../src/ids";

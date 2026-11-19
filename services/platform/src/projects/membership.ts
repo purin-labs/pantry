@@ -4,8 +4,8 @@ import {
   validStoredDisclosureState,
   verifyStoredDisclosureProof,
 } from "../chat/disclosure-evidence";
-import { isRecord, hasExactKeys } from "@seams/std";
-import { isProjectId, isUserId } from "@seams/control-api";
+import { isRecord, hasExactKeys } from "@purin-labs/std";
+import { isProjectId, isUserId } from "@purin-labs/control-api";
 import {
   DISCLOSURE_STATE_FENCE_SQL,
   disclosureStateFenceBindings,
@@ -14,7 +14,7 @@ import {
   type DisclosureProof,
   ProjectAudienceProposal,
 } from "../chat/disclosure-evidence";
-import type { ChatDisclosureFailure } from "@seams/control-api";
+import type { ChatDisclosureFailure } from "@purin-labs/control-api";
 import { checkProjectHistoryDisclosure } from "../chat/conversation-sharing";
 import { listProjectMembers } from "./access";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
@@ -23,13 +23,13 @@ import type {
   ProjectId,
   ProjectRole,
   UserId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   assertNever,
   canonicalJson,
   isNonNegativeInteger,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { Env } from "../env";
 import { authorizeProject, type ProjectAccessScope } from "./access";
 import { prepareReturnPrivateChatsToDefault } from "./case-project";

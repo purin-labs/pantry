@@ -2,7 +2,7 @@
 
 import type { SingleDatabase } from "../src/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
   bakeryEffectDeliveryTarget,
   createBakerySurfaceAttachment,
@@ -10,7 +10,7 @@ import {
   createBakerySurfaceReceipt,
   type BakerySurfaceEffectV1,
   type BakerySurfaceCommandV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

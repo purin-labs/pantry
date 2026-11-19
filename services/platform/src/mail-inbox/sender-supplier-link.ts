@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 import {
   listCurrentEndpointVerificationIds,
@@ -14,7 +14,7 @@ import {
 } from "../data/email-operational";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * A sender of one mailbox that a person links to a supplier from the Inbox.

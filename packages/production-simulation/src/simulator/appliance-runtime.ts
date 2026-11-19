@@ -1,9 +1,9 @@
-import { isRecord } from "@seams/std";
-import { checkpointBody } from "@seams/bakery-model/bakery-checkpoint";
+import { isRecord } from "@purin-labs/std";
+import { checkpointBody } from "@purin-labs/bakery-model/bakery-checkpoint";
 import type {
   ApplianceRequest,
   ApplianceResult,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import {
   BAKERY_APPLIANCE_BUILDS,
   BAKERY_BROWSER_BUNDLE,

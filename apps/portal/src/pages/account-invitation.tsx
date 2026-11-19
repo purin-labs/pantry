@@ -1,7 +1,7 @@
 import React from "react";
 import { controlMutation } from "../control-client";
 import { PortalFrame } from "../shell";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type Invitation = Readonly<{
   organisationId: string;

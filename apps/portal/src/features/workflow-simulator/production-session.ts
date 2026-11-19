@@ -1,25 +1,25 @@
-import type { BakeryProductionPanel } from "@seams/bakery-model/bakery-surface";
+import type { BakeryProductionPanel } from "@purin-labs/bakery-model/bakery-surface";
 import type { PreparedProductionReplacement } from "./production-draft";
 import type { PreparedRehearsalReview } from "./rehearsal-edits";
 import type { WorkspaceRunReview } from "./workspace-run-review";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import type {
   ProductionAssignment,
   ProductionManualTask,
   ProductionPresentation,
   ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
-import type { PhysicsReplay } from "@seams/bakery-model/bakery-physics";
-import type { NativeContinuation } from "@seams/production-simulation/recipes/bakery/native-continuation";
-import type { PlaybackUpdate } from "@seams/production-simulation/simulator/playback-state";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
+import type { PhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
+import type { NativeContinuation } from "@purin-labs/production-simulation/recipes/bakery/native-continuation";
+import type { PlaybackUpdate } from "@purin-labs/production-simulation/simulator/playback-state";
 import type {
   ProductionProcedure,
   ProductionWorkcells,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
 import type { RackLayoutReview } from "./rack-layout";
-import type { RunSummary } from "@seams/production-simulation/simulator/run-comparison";
-import type { Run } from "@seams/production-simulation/recipes/bakery/schedule";
-import type { Selection } from "@seams/production-simulation/simulator/selection";
+import type { RunSummary } from "@purin-labs/production-simulation/simulator/run-comparison";
+import type { Run } from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type { Selection } from "@purin-labs/production-simulation/simulator/selection";
 
 export type ProductionReady = Readonly<{
   kind: "ready";

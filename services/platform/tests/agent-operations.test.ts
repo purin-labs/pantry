@@ -6,7 +6,7 @@ import {
   parseCommerceGraphQuery,
   parseEntityPlaneObservation,
   parseEntityPlanePublishedResourceMetadataResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import {
   applyAgentOperation,
@@ -28,7 +28,7 @@ import {
   proposalFixtureAuthority,
 } from "./agent-operations-database";
 import { requireOrganisationId } from "./test-ids";
-import { parseAgentOperationForm } from "@seams/control-api/portal/agent-operations";
+import { parseAgentOperationForm } from "@purin-labs/control-api/portal/agent-operations";
 
 const ORGANISATION = requireOrganisationId("organisation_plan16_operations");
 

@@ -10,8 +10,8 @@ import {
   parsePayment,
   parseSalesChannel,
   parseShipment,
-} from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 import { createPrivateKey, createPublicKey, sign as signPayload } from "node:crypto";
 
 import {

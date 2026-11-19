@@ -7,7 +7,7 @@ import {
 } from "./control-mutation";
 import type { OrganisationEnvironment } from "./control-plane";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { SessionBudget } from "@seams/contracts";
+import type { SessionBudget } from "@purin-labs/contracts";
 import type { OrganisationId, UserId } from "../ids";
 import type { Result } from "../result";
 

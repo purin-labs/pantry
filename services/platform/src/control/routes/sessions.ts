@@ -34,7 +34,7 @@ import {
 } from "../authorization";
 import { googleConfig } from "../google-oidc-config";
 import { controlError, controlHeaders, controlJson } from "../http";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import { resolvePantryAccountBinding } from "../../account-platform/binding";
 import {

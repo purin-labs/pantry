@@ -22,7 +22,7 @@ import {
   productSpoilCellKey,
   productWasteCellKey,
   supplyFieldCellKey,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import {
   backSolveDailyUnitsForNetDay,
   backSolveGrossPriceMinorForMargin,
@@ -39,8 +39,8 @@ import {
   type CostsOverview,
   type CostsSheetWrite,
   type ProductCostPlanEntry,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import {
   PATISSERIE_ITEMS,
   PATISSERIE_SUPPLIES,
@@ -49,7 +49,7 @@ import {
   configurePatisserieMenu,
   includeStorefrontTax,
   patisserieRecipeId,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { accessControlPath } from "./access-route-support";
 import { publishCafeMenu } from "./cafe-order-support";

@@ -4,7 +4,7 @@
 import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { advanceOrderQueueEntry } from "../../src/commerce/order-queue-commands";
 import { googleConfig } from "../../src/control/google-oidc-config";

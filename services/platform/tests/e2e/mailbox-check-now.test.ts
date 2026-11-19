@@ -2,7 +2,7 @@ import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";

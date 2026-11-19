@@ -1,8 +1,8 @@
 import type { Env } from "../env";
 import { holdCaseOutput } from "./case-output-hold";
-import type { Outcome } from "@seams/contracts";
-import type { ProjectSnapshot } from "@seams/control-api";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+import type { Outcome } from "@purin-labs/contracts";
+import type { ProjectSnapshot } from "@purin-labs/control-api";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignment,
@@ -19,7 +19,7 @@ import type {
   SessionProposal,
   StoredMessageAttachment,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { caseContentAttachments, caseContentInstruction } from "./case-content";
 import { userMessageLinks } from "./message-tools";
@@ -77,14 +77,14 @@ import {
 } from "../data/pinned-agent-profile";
 import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../context/assembly";
-import type { BakerySurfaceAttachmentV1 } from "@seams/bakery-model/bakery-surface";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   isPositiveInteger,
   sameJson,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type CaseWalkingConnector = Pick<
   ConnectorDO,
@@ -487,7 +487,7 @@ export type TransientEmailAssignmentInput = {
   readonly env: Env;
   readonly scope: OrganisationExecutionScope;
   readonly connectorSql: SqlStorage;
-  readonly evidenceDependency: import("@seams/contracts").CaseEvidenceDependency;
+  readonly evidenceDependency: import("@purin-labs/contracts").CaseEvidenceDependency;
   readonly pinnedAgent: PinnedAgentProfile | null;
   readonly caseActor: CaseWalkingCase;
   readonly session: CaseWalkingSession &

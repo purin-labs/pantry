@@ -1,5 +1,5 @@
-import { assertNever } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { boundCarrier } from "./engine-carriers.ts";
 import {
   emit,

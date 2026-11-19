@@ -1,5 +1,5 @@
 import React from "react";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   parseMailOrganizationView,
   parseMailClassifications,
@@ -7,7 +7,7 @@ import {
   type MailClassification,
   type MailRule,
   type MailInboxMessage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { mailOrganizationRequest } from "./api";
 import { mailRuleLabel } from "./rule-label";
 
@@ -217,7 +217,7 @@ export class MailOrganizationPanel extends React.Component<Props, State> {
   private consent = (event: React.ChangeEvent<HTMLInputElement>): void =>
     this.setState({ consent: event.target.checked });
   private act = async (
-    command: import("@seams/control-api").MailOrganizationCommand,
+    command: import("@purin-labs/control-api").MailOrganizationCommand,
     notice: string,
   ): Promise<void> => {
     if (this.state.processing.kind !== "ready" || this.commandRequest !== null)

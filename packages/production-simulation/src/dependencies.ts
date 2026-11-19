@@ -1,4 +1,4 @@
-import { isNonNegativeInteger } from "@seams/std";
+import { isNonNegativeInteger } from "@purin-labs/std";
 import type { AdmissionProblem } from "./admission.ts";
 import { taskId, workflowInstanceId, type TaskId } from "./identity.ts";
 import type {

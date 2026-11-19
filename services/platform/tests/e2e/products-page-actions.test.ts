@@ -4,12 +4,12 @@
 import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, vi, type TestContext } from "vitest";
-import { parseInventory, type InventoryData } from "@seams/contracts";
+import { parseInventory, type InventoryData } from "@purin-labs/contracts";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
   type CommerceClientResult,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { placeCafeOrder, publishCafeMenu } from "./cafe-order-support";

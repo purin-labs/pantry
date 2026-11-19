@@ -17,7 +17,7 @@ import {
   productSpoilCellKey,
   productWasteCellKey,
   supplyFieldCellKey,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import {
   COST_FORMULA_COLUMNS,
   parseCostsSheetWrite,
@@ -26,8 +26,8 @@ import {
   type CostUnit,
   type CostsSheetWrite,
   type CostsSheetWriteResult,
-} from "@seams/control-api";
-import type { CommerceStockSnapshot } from "@seams/commerce-client";
+} from "@purin-labs/control-api";
+import type { CommerceStockSnapshot } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import {
   readCostsOverview,

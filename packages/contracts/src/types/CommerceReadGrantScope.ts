@@ -1,6 +1,6 @@
-import type { CommerceEntityTypeId } from "@seams/commerce-contracts";
-import type { CommerceListId } from "@seams/commerce-contracts";
-import type { PublishedCommerceSelector } from "@seams/commerce-contracts";
+import type { CommerceEntityTypeId } from "@purin-labs/commerce-contracts";
+import type { CommerceListId } from "@purin-labs/commerce-contracts";
+import type { PublishedCommerceSelector } from "@purin-labs/commerce-contracts";
 
 export type CommerceReadGrantScope =
   | { kind: "entity_type"; entityTypeId: CommerceEntityTypeId }

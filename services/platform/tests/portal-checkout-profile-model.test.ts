@@ -1,14 +1,14 @@
 import type {
   CheckoutProfile,
   CheckoutProfileConfiguration,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import type {
   CheckoutProfileCollection,
   DraftCheckoutProfileSummary,
 } from "../../../apps/portal/src/features/checkout-profiles/api";
-import type { CheckoutProfileSummary } from "@seams/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
 import { handleSaveSubmit } from "../../../apps/portal/src/features/checkout-profiles/controller";
 import {
   activeReview,
@@ -24,7 +24,7 @@ import {
   type CheckoutProfilesAction,
   type CheckoutProfilesState,
 } from "../../../apps/portal/src/features/checkout-profiles/model";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
 

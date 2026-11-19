@@ -1,6 +1,6 @@
 import type { RackLayoutDraft, RackLayoutProposal } from "./rack-layout";
-import type { TransferInput } from "@seams/production-simulation/recipes/bakery/workcell-input";
-import type { Variant } from "@seams/type-utils";
+import type { TransferInput } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const blocked: Variant<RackLayoutProposal, "blocked">;
 declare const input: TransferInput;

@@ -4,7 +4,7 @@
  * The person who asked confirms it on a card, through the same store that a
  * Slack reply uses, so one draft applies one time on either surface.
  */
-import { isConversationId } from "@seams/control-api";
+import { isConversationId } from "@purin-labs/control-api";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { ConversationScope } from "../../chat/store";
 import {

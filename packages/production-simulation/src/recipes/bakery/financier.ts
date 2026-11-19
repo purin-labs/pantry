@@ -1,4 +1,4 @@
-import { canonicalJson, sha256Hex } from "@seams/std";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 export { compileFinancierPreparation } from "./financier-preparation.ts";
 export type { FinancierPreparationProblem } from "./financier-preparation.ts";
 export {
@@ -9,14 +9,14 @@ export type {
   FinancierRecipeProblem,
   FinancierRecipeWaveOptions,
 } from "./financier-production.ts";
-import type { StationId } from "@seams/bakery-model/bakery";
+import type { StationId } from "@purin-labs/bakery-model/bakery";
 import {
   productionTaskChoices,
   productionDefinitionFingerprint,
   type ProductionManualTask,
   type ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
-import type { VariantBy } from "@seams/type-utils";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   authoredId,
   parseSha256Hex,

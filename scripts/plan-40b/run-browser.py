@@ -76,7 +76,7 @@ def main() -> None:
     dist = artifacts / "portal-dist"
     with (artifacts / "build.log").open("w") as log:
         subprocess.run(
-            ["pnpm", "--filter", "@seams/portal", "exec", "vite", "build",
+            ["pnpm", "--filter", "@purin-labs/portal", "exec", "vite", "build",
              "--outDir", str(dist), "--emptyOutDir"],
             cwd=ROOT, check=True, stdout=log, stderr=subprocess.STDOUT,
         )
@@ -84,7 +84,7 @@ def main() -> None:
     opened = False
     with (artifacts / "preview.log").open("w") as log:
         preview = subprocess.Popen(
-            ["pnpm", "--filter", "@seams/portal", "exec", "vite", "preview",
+            ["pnpm", "--filter", "@purin-labs/portal", "exec", "vite", "preview",
              "--outDir", str(dist), "--host", "127.0.0.1", "--port", "3140",
              "--strictPort"],
             cwd=ROOT, start_new_session=True, stdout=log, stderr=subprocess.STDOUT,

@@ -1,12 +1,12 @@
 import { controlRead } from "../../control-client";
 import type { IntegrationsCommandResult } from "./settings-types";
-import type { SelectInferenceCommand, OrganisationCodexConnection, OrganisationInferenceSelection } from "@seams/control-api/portal/settings";
+import type { SelectInferenceCommand, OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import {
   codexConnectionPath,
   inferencePath,
 } from "../../control-paths";
-import { parseCredentialInventoryResponse, type CredentialInventory } from "@seams/control-api/portal/credential-inventory";
-import { parseOrganisationCodexConnectionResponse, parseOrganisationInferenceSelectionResponse } from "@seams/control-api/portal/codex";
+import { parseCredentialInventoryResponse, type CredentialInventory } from "@purin-labs/control-api/portal/credential-inventory";
+import { parseOrganisationCodexConnectionResponse, parseOrganisationInferenceSelectionResponse } from "@purin-labs/control-api/portal/codex";
 
 export function codexAuthorizationResult(raw: unknown): IntegrationsCommandResult {
   const connection = parseOrganisationCodexConnectionResponse(raw);

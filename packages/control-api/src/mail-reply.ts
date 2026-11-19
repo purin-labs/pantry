@@ -1,4 +1,4 @@
-import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type MailReplyEdit = Readonly<{
   version: number;

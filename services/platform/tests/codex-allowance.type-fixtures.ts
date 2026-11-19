@@ -1,4 +1,4 @@
-import type { CodexAllowance } from "@seams/control-api";
+import type { CodexAllowance } from "@purin-labs/control-api";
 
 const percentages = {
   usedPercent: 100,

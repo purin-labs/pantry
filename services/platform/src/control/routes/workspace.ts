@@ -10,8 +10,8 @@ import type { OrganisationExecutionScope } from "../../organisation-execution-sc
 import { readCommerceActionLedger } from "../agent-operation-activity";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import type {
   HomeAttentionItem,
   HomeAvailableAction,
@@ -19,7 +19,7 @@ import type {
   HomeDestination,
   HomeSourceObservation,
   HomeTodayFact,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export type WorkspaceControlRoute = Readonly<{
   kind: "home";

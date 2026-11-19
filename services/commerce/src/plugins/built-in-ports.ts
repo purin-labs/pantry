@@ -6,7 +6,7 @@ import type {
   CommerceCommandResult,
   CommerceEntityPlaneError,
   ListEntryAttributeValue,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CompleteProductionBatchCommand,
   ConfigureStockPolicyCommand,
@@ -28,7 +28,7 @@ import type {
   CommerceMutationErrorV1,
   CommerceMutationReceiptV1,
   CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import type { CommerceLists } from "../entity-plane/commerce-lists.ts";
 import type { EntityPlanePresetBundle } from "../entity-plane/presets.ts";

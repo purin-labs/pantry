@@ -1,4 +1,4 @@
-import type { CommerceAdminClient } from "@seams/commerce-client";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { createCommerceClient } from "../commerce/outbox-worker";
 import {
   resolveOrganisationCommerceMerchantBinding,

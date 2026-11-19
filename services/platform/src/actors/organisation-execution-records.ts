@@ -1,5 +1,5 @@
-import { isNonNegativeInteger, isRecord, parseJsonOrNull } from "@seams/std";
-import type { CaseExecutionEffectState } from "@seams/control-api";
+import { isNonNegativeInteger, isRecord, parseJsonOrNull } from "@purin-labs/std";
+import type { CaseExecutionEffectState } from "@purin-labs/control-api";
 import type {
   CaseExecutionEffectRecord,
   CaseExecutionEffectRecords,

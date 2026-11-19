@@ -1,6 +1,6 @@
 import React from "react";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
-import type { AiBudgetView } from "@seams/control-api/portal/ai-budget";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
+import type { AiBudgetView } from "@purin-labs/control-api/portal/ai-budget";
 
 type Props = Readonly<{
   organisationId: string;

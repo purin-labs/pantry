@@ -14,7 +14,7 @@ import {
   parseAgentPermissionRequestView,
   type AgentPermissionDecision,
   type AgentPermissionRequestView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   ControlApiError,
   controlMutation,
@@ -25,7 +25,7 @@ import {
   PantryMark,
   type PermissionRequestDecision,
 } from "../../ui";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import { createGrants, enableCapabilities } from "./permission-enable";
 import { AGENT_NAME } from "../../agent-name";
 

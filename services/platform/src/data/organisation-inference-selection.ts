@@ -2,8 +2,8 @@ import type { OrganisationDatabase } from "../database-handles";
 import type { OrganisationId, UserId } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationQuerySource } from "./query-source";
-import { isRecord } from "@seams/std";
-import { isChatEffort, type ChatEffort } from "@seams/control-api";
+import { isRecord } from "@purin-labs/std";
+import { isChatEffort, type ChatEffort } from "@purin-labs/control-api";
 
 export type OrganisationInferenceSelection =
   | { readonly kind: "claude_oauth" }

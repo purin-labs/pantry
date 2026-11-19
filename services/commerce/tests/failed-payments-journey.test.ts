@@ -4,7 +4,7 @@
 // in the end. The payments read also lists a payment that no decline came before.
 // Only the provider's answer is a stand-in; the attempts, the checkouts and the
 // read are the product's. Set FAILED_PAYMENTS_ARTIFACT_DIR to keep the evidence.
-import { commercePickupCode } from "@seams/commerce-client";
+import { commercePickupCode } from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

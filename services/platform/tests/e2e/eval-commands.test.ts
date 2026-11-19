@@ -8,8 +8,8 @@ import {
   type EvalContent,
   type EvalScenario,
   type EvalView,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import {
   brainSummary,
   controlPaths,

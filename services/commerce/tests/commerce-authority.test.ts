@@ -35,7 +35,7 @@ import {
   parseShipment,
   parseCreateBuyerShippingCheckoutCommand,
   commerceDeliverySignaturePayload,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { CommerceAuthority } from "../src/commerce-authority.ts";
@@ -91,7 +91,7 @@ import {
   writeSalesChannel,
   writeShipment,
 } from "../src/commerce-persistence.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 const JAPAN_EXPORT = createJapanExportShipping(
   "commerce-authority-carrier-signing-key",

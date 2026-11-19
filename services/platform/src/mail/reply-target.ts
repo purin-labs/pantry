@@ -1,7 +1,7 @@
 import type { GmailMessageHeaders } from "./gmail-adapter";
 import { extractMailbox } from "./gmail-adapter";
 import type { Result } from "../result";
-import { encodeBase64, encodeBase64Url, sha256Hex } from "@seams/std";
+import { encodeBase64, encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 /**
  * The trusted, frozen reply target. The mailbox Connector derives it from

@@ -1,21 +1,21 @@
-import type { CollaborationPointerPosition } from "@seams/collaboration";
+import type { CollaborationPointerPosition } from "@purin-labs/collaboration";
 import {
   CostsSheetDoc,
   type CostsSheetCellChange,
   type CostsSheetSelection,
   type CostsSheetUpdate,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import {
   encodeCostsSheetClientMessage,
   parseCostsSheetServerMessage,
   type CostsSheetParticipant,
   type CostsSheetServerMessage,
-} from "@seams/costs-sheet-crdt/protocol";
+} from "@purin-labs/costs-sheet-crdt/protocol";
 import { closeSocket } from "./hibernatable-socket-support";
 
 /**
  * One member's hibernatable WebSocket replica on an Organisation's shared
- * Costs & margins workbook (`@seams/costs-sheet-crdt`).
+ * Costs & margins workbook (`@purin-labs/costs-sheet-crdt`).
  */
 export class CostsSheetRoomClient {
   readonly doc = CostsSheetDoc.create();

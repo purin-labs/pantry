@@ -6,7 +6,7 @@ import {
   type GingerTeaHobModel,
   type GingerTeaLeaf,
   type GingerTeaWorkflowMode,
-} from "@seams/production-simulation/recipes/ginger-tea/model";
+} from "@purin-labs/production-simulation/recipes/ginger-tea/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{

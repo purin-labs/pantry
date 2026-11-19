@@ -11,7 +11,7 @@ import type {
   SessionIdentity,
   Sha256Digest,
   Timestamp,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   validateCanonicalHarnessCheckpointRestore,
@@ -46,9 +46,9 @@ import type {
   ActiveEmbeddedHarnessBackendId,
   EmbeddedHarnessManifest,
 } from "./embedded-harness";
-import type { HarnessHistoryCursor } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
-import { errorMessage, sha256Hex } from "@seams/std";
+import type { HarnessHistoryCursor } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import { errorMessage, sha256Hex } from "@purin-labs/std";
 
 const CHECKPOINT_METADATA_FORMAT = "satyr-actor-checkpoint-v1";
 

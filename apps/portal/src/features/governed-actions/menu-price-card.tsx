@@ -4,7 +4,7 @@ import { formatMenuPrice, menuPriceChangeKind } from "./menu-price-details";
 import type {
   MenuPriceDetails,
   MenuPriceSideDetails,
-} from "@seams/control-api/portal/menu-price-details";
+} from "@purin-labs/control-api/portal/menu-price-details";
 
 function PriceSide(input: {
   readonly side: MenuPriceSideDetails;

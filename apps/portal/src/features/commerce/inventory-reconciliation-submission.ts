@@ -1,10 +1,10 @@
-import { isNormalizedText, isPositiveInteger, isRecord } from "@seams/std";
+import { isNormalizedText, isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   parseInventoryReconciliationChange,
   parseInventoryReconciliationTarget,
   parseMutationResult,
   type ReconcileCommerceInventoryV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { ControlApiError } from "../../control-client";
 
 export type ReconciliationScope = Readonly<{

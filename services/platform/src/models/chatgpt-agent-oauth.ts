@@ -1,4 +1,4 @@
-import { encodeBase64Url, isRecord, parseJsonOrNull } from "@seams/std";
+import { encodeBase64Url, isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { jwtClaims } from "../lenient-base64";
 import { pkceChallenge } from "../provider-adapters/authorization";
 import type { Result } from "../result";

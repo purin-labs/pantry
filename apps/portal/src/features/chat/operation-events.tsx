@@ -1,6 +1,6 @@
 import React from "react";
-import type { ChatApproval, ChatReceiptReference } from "@seams/control-api";
-import { assertNever } from "@seams/std";
+import type { ChatApproval, ChatReceiptReference } from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 import { Clock, ShieldCheck } from "lucide-react";
 import {
   Trace,

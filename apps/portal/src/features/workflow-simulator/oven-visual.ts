@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import type { MachineState } from "@seams/production-simulation/recipes/bakery/schedule";
-import { assertNever } from "@seams/std";
+import type { MachineState } from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { assertNever } from "@purin-labs/std";
 type Readout = {
   readonly material: THREE.MeshStandardMaterial;
   readonly color: THREE.Color;

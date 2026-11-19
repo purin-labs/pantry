@@ -7,7 +7,7 @@
 import { IsArray, IsIntersect, IsObject, IsUnion, type TSchema } from "typebox";
 import { Value } from "typebox/value";
 import { cleanValue } from "./sorted-unions.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type Schema = TSchema & Readonly<Record<string, unknown>>;
 

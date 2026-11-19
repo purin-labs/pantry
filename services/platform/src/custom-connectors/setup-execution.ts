@@ -9,7 +9,7 @@ import type {
   CustomConnectorIdentityTestRequest,
   CustomConnectorIdentityTestResult,
 } from "./setup";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { buildCustomConnectorOperationRequest } from "./execution";
 import { executeReviewedConnectorOperation } from "./mcp";
 

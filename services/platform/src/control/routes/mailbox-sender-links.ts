@@ -1,12 +1,12 @@
 import {
   parseMailSenderLinkRequest,
   type MailSenderLink,
-} from "@seams/control-api";
-import { sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { sha256Hex } from "@purin-labs/std";
 import {
   parseCommerceGraphQuery,
   SUPPLIER_ENTITY_TYPE_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { readEmailMailboxAccount } from "../../data/email-mailbox";

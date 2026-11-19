@@ -10,7 +10,7 @@ import type {
   IntegrationDiscoveryView,
   CommerceContextRequest,
   CommerceGraphQueryResult,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Env } from "../env";
 import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
@@ -99,7 +99,7 @@ import type {
 import type { MerchantReportResult } from "../commerce/entity-plane/merchant-reports";
 import { createHarnessCodeModeAdmission } from "./code-mode-admission";
 import type { HarnessToolHost } from "./embedded-harness";
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { CustomConnectorCatalogEntry } from "../custom-connectors";
 import type { SurfaceToolCommandName } from "../agent-tools/define-tool";
 

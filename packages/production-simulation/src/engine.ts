@@ -1,4 +1,4 @@
-import { assertNever, sameJson } from "@seams/std";
+import { assertNever, sameJson } from "@purin-labs/std";
 import { inspectionDecision, ruleOutcome } from "./inspections.ts";
 import { executionWork, outputCeiling } from "./scenario.ts";
 import { taskWaits } from "./scheduling-history.ts";
@@ -112,7 +112,7 @@ import {
   tickDuration,
   type LogicalTime,
 } from "./time.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The production engine: one owner of logical time, task lifecycle, resource

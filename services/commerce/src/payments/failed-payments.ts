@@ -11,7 +11,7 @@ import {
   type CommerceFailedPaymentsV1,
   type CommerceFailedPaymentStepV1,
   type CommercePaymentsV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { readCheckout } from "../checkout-persistence.ts";
 import type { CommerceDatabase } from "../database.ts";
 

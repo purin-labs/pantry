@@ -6,13 +6,13 @@ import {
   parseControlSessionId,
   parseUserId,
 } from "../ids";
-import type { HarnessTurnLease } from "@seams/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
   assertNever,
   hasExactKeys,
   isRecord,
   isNonNegativeInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   authorizeSessionTurnExecution,
   parseSessionTurnExecution,
@@ -27,7 +27,7 @@ import {
 import type { Env } from "../env";
 import type { ControlSessionId, OrganisationId, UserId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type CapturedActionPlacement = Readonly<{
   organisationId: OrganisationId;

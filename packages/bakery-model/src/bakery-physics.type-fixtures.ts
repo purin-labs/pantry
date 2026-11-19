@@ -10,7 +10,7 @@ import type {
   PersistentPhysicsMotion,
   PersistentPhysicsScene,
 } from "./bakery-physics.ts";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 // @ts-expect-error A failure cannot carry success evidence.
 const mixed: PhysicsOutcome = {

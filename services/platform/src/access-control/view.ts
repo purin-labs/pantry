@@ -6,7 +6,7 @@ import type {
   GrantProvenance,
   GrantSubject,
   OrganisationCapabilityPolicy,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type {
   AccessGrant,
@@ -22,16 +22,16 @@ import type {
 import { FlowLabel } from "../policy";
 import type { Result } from "../result";
 import type { ControlRole } from "../data/control-plane";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   isNonNegativeInteger,
   isPositiveInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type {
   AccessControlAvailability,
   AccessControlBoundedPage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export const ACCESS_CONTROL_PAGE_LIMIT = 100;
 

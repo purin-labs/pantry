@@ -8,7 +8,7 @@ import {
   type SessionTurnStreamError,
   type SessionTurnStreamRecord,
 } from "../agent-session-turn-stream";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import type { SessionDO } from "../agent-session";
 import { SESSION_REPLAY_MAX_POLL_MS, SESSION_REPLAY_POLL_MS } from "./support";
 import type {

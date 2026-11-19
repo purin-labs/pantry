@@ -8,8 +8,8 @@ import type {
   CommerceMutationErrorV1,
   CommerceOrderV1,
   CommercePaymentV1,
-} from "@seams/commerce-client";
-import type { RefundAllocation } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { RefundAllocation } from "@purin-labs/commerce-contracts";
 
 import { listRefundAttemptsForOrder } from "./payment-records.ts";
 import { sha256 } from "../commerce-authority/checkout-shared.ts";

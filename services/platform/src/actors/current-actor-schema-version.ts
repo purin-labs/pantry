@@ -1,5 +1,5 @@
 import type { ActorIdentity } from "./actor-registry";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "./agent-session-schema";
 import {
   CASE_ACTOR_SCHEMA_VERSION,

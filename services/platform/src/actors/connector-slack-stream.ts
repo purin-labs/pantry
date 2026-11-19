@@ -2,7 +2,7 @@ import type {
   ConnectorDelivery,
   ConnectorDeliveryReceipt,
   ConnectorIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { resolveActiveSlackThreadCredential } from "../credential-vault";
 import type { Env } from "../env";
@@ -59,14 +59,14 @@ import {
 } from "./agent-session-turn-stream";
 import { isRegisteredActorName } from "./actor-registry";
 import type { SessionActorRoute } from "./actor-router";
-import type { StrictUnion, Variant, VariantBy } from "@seams/type-utils";
+import type { StrictUnion, Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
   isNonBlankString,
   isNonNegativeInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type ConnectorCaseTurnStreamInput = {
   readonly identity: ConnectorIdentity;

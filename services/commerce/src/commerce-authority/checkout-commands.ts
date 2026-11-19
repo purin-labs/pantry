@@ -27,7 +27,7 @@ import {
   type CommerceMerchantSnapshotV1,
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import type { FoodServiceExtension } from "../plugins/built-in-ports.ts";
 import type { RegionalShipping } from "../regional-shipping.ts";
@@ -48,7 +48,7 @@ import {
   type InPersonCheckoutPlan,
   type PickupCheckoutPlan,
 } from "./checkout-planning.ts";
-import type { Cart, Storefront } from "@seams/commerce-contracts";
+import type { Cart, Storefront } from "@purin-labs/commerce-contracts";
 import type { MerchantRow } from "./ledger.ts";
 import {
   admitMerchantCommand,

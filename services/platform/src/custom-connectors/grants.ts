@@ -29,7 +29,7 @@ import {
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 import { resolveActiveCustomConnectorAccount } from "./accounts";
 import { resolveCustomConnectorRevision } from "./revisions";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type CustomConnectorCatalogEntry = Readonly<{
   readonly toolName: string;

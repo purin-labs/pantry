@@ -50,8 +50,8 @@ import {
   type JsonRecord,
 } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
-import type { Variant } from "@seams/type-utils";
-import { hasExactKeys } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { hasExactKeys } from "@purin-labs/std";
 import type { CustomConnectorControlRoute } from "../custom-connectors";
 import { customError, requireAdminRole } from "./mutation";
 import {

@@ -12,7 +12,7 @@ import {
 } from "../../permission-requests-summary";
 import { AgentPermissionRequestPrompt } from "./agent-permission-request";
 import { HeldOutputPrompt } from "./held-output-prompt";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import { PermissionRequestRows } from "./permission-request-queue";
 import "./permission-requests-drawer.css";
 

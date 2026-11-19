@@ -1,7 +1,7 @@
 import type {
   ScreenRelevanceBand,
   ScreenRelevanceChoice,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { OrganisationId } from "../ids";
 
 /**

@@ -3,17 +3,17 @@ import {
   contactsAtStep,
   type ContactPair,
   type ContactObservation,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import React from "react";
 import { PhysicsSceneHost } from "../workflow-simulator/spatial/physics-scene-host";
 import { seconds } from "./oven-logistics";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import {
   ovenFrameLabel,
   ovenFrameMotion,
   ovenSampleTime,
   type OvenLiveFrame,
-} from "@seams/production-simulation/runs/oven-live-physics";
+} from "@purin-labs/production-simulation/runs/oven-live-physics";
 
 type Props = Readonly<{
   kind: "inspection" | "live" | "observation";

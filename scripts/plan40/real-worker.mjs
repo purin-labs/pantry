@@ -45,7 +45,7 @@ try {
   await initializeDatabase(generatedConfig);
   workerProcess = spawn(
     "pnpm",
-    ["--filter", "@seams/platform", "exec", "wrangler", "dev", "--local", "--config", generatedConfig,
+    ["--filter", "@purin-labs/platform", "exec", "wrangler", "dev", "--local", "--config", generatedConfig,
       "--persist-to", stateDirectory, "--port", String(port), "--inspector-port", String(inspectorPort),
       "--enable-containers=false", "--ip", "127.0.0.1"],
     { cwd: repositoryRoot, stdio: "inherit", env: { ...process.env, CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false" } },
@@ -123,7 +123,7 @@ async function writeCommerceEnvironment(outfile) {
 async function initializeDatabase(configPath) {
   const result = spawnSync(
     "pnpm",
-    ["--filter", "@seams/platform", "exec", "wrangler", "d1", "execute", "satyr-plan40-browser", "--local",
+    ["--filter", "@purin-labs/platform", "exec", "wrangler", "d1", "execute", "satyr-plan40-browser", "--local",
       "--file", join(singleDatabaseMigrations(), "0001_current_schema.sql"),
       "--persist-to", stateDirectory, "--config", configPath],
     { cwd: repositoryRoot, stdio: "inherit", env: { ...process.env, CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false" } },

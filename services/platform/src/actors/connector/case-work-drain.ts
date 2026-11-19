@@ -36,7 +36,7 @@ import {
 } from "../../slack/case-processing";
 import type { OngoingCaseWalkingConnector } from "../case-walking-path";
 import { setSlackThreadStatus } from "../../slack/messages";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import { scheduleCaseWorkAlarm } from "./alarm";
 import { steerAnswerLost } from "./steer-fault";
 import {
@@ -50,7 +50,7 @@ import {
   type SessionStub,
   replyMaySteer,
 } from "./support";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export class ConnectorCaseWorkDrain {
   /** The Cases that have a message in flight. */

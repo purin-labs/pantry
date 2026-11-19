@@ -4,10 +4,10 @@ import type {
   CommerceBuyerShippingAddressAcceptanceV1,
   CommerceBuyerShippingAddressV1,
   CommerceBuyerShippingAddressValidationV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "./database.ts";
-import { assertNever, isNormalizedText, isRecord } from "@seams/std";
+import { assertNever, isNormalizedText, isRecord } from "@purin-labs/std";
 
 type AddressValidationProviderResult =
   | Readonly<{

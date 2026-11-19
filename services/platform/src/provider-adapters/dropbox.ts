@@ -1,14 +1,14 @@
-import type { ProviderFileRevision } from "@seams/contracts";
+import type { ProviderFileRevision } from "@purin-labs/contracts";
 
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonBlankString,
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 const DROPBOX_AUTHORIZE_URL = "https://www.dropbox.com/oauth2/authorize";
 const DROPBOX_TOKEN_URL = "https://api.dropboxapi.com/oauth2/token";

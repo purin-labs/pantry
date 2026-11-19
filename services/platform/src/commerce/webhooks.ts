@@ -6,8 +6,8 @@
 // waits for the five-minute read and a forged one is refused before it costs
 // a read.
 import type { OrganisationDatabase } from "../database-handles";
-import type { CommerceAdminClient } from "@seams/commerce-client";
-import { decodeBase64, encodeBase64, isRecord } from "@seams/std";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
+import { decodeBase64, encodeBase64, isRecord } from "@purin-labs/std";
 
 import type { CommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import type { Env } from "../env";

@@ -2,11 +2,11 @@ import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { evictDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
-import type { MemoryCommand, MemoryContent } from "@seams/control-api";
+import type { MemoryCommand, MemoryContent } from "@purin-labs/control-api";
 import {
   parseEntityRef,
   SUPPLIER_ENTITY_TYPE_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   installSlackActorFixture,
   ORGANISATION_ID,

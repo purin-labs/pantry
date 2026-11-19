@@ -415,7 +415,7 @@ function installTwoCellObserver() {
 }
 async function checkTwoCellRestore() {
   const { canonicalJson } =
-    window.factoryAcceptance ?? (await import("/@id/@seams/std"));
+    window.factoryAcceptance ?? (await import("/@id/@purin-labs/std"));
   const before = window.twoCellPausedView;
   const after = window.twoCellRestoredView;
   if (!before || !after) throw new Error("Missing restored worker reply.");

@@ -274,7 +274,7 @@ intended.
 For activation or readiness changes:
 
 ```bash
-pnpm --filter @seams/platform exec vitest run \
+pnpm --filter @purin-labs/platform exec vitest run \
   tests/onboarding-activation.test.ts \
   tests/onboarding/safety.test.ts \
   tests/onboarding-projection.test.ts
@@ -283,14 +283,14 @@ pnpm --filter @seams/platform exec vitest run \
 For the onboarding lifecycle closure gate:
 
 ```bash
-pnpm --filter @seams/platform test:onboarding-closure
-pnpm --filter @seams/platform check:test-types
+pnpm --filter @purin-labs/platform test:onboarding-closure
+pnpm --filter @purin-labs/platform check:test-types
 ```
 
 Run the full edge suite when changing shared domain types, boundary parsers,
 schemas, migrations, control routing, generated artifacts, or configuration:
 
 ```bash
-pnpm --filter @seams/platform test
-pnpm --filter @seams/platform check:types
+pnpm --filter @purin-labs/platform test
+pnpm --filter @purin-labs/platform check:types
 ```

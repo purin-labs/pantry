@@ -1,10 +1,10 @@
 {
-  "name": "@seams/commerce-worker",
+  "name": "@purin-labs/commerce-worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build:storefront": "pnpm --filter @seams/storefront build",
+    "build:storefront": "pnpm --filter @purin-labs/storefront build",
     "build:fixture-worker": "node scripts/build-fixture-worker.mjs",
     "check:types": "tsrs --noEmit",
     "test": "vitest run",
@@ -18,11 +18,11 @@
     "deploy": "node ../../scripts/run-worker.mjs underclerk deploy production"
   },
   "dependencies": {
-    "@seams/std": "workspace:*",
-    "@seams/type-utils": "workspace:*",
-    "@seams/commerce-client": "workspace:*",
-    "@seams/commerce-query-sqlite": "workspace:*",
-    "@seams/commerce-contracts": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/commerce-query-sqlite": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
     "quickjs-wasi": "3.6.2"
   },
   "devDependencies": {

@@ -1,14 +1,14 @@
 import {
   MEDIA_MAX_BYTES,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { mediaObjectKey, storeMediaUpload } from "../../plugins/media/index.ts";
 import type { BuyerRoute, CommerceRoute } from "../../http-routes.ts";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import { hasMerchantId, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 // The media commands. A new record names bytes the store must hold; the
 // last record of some bytes takes them out of the store after it commits.

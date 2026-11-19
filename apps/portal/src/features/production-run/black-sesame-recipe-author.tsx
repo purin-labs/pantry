@@ -1,10 +1,10 @@
 import React from "react";
-import { blackSesameRecipeInput } from "@seams/production-simulation/recipes/bakery/black-sesame";
+import { blackSesameRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/black-sesame";
 import { prepareNativeRecipe } from "./oven-recipe-file";
 import {
   prepareBlackSesameRecipe,
   type OvenRunSource,
-} from "@seams/production-simulation/runs/oven-run-file";
+} from "@purin-labs/production-simulation/runs/oven-run-file";
 import { prepareRecipe, RecipeChoice } from "./shared/recipe-form";
 
 type ColdHandling = "manual" | "fairino-fr10";

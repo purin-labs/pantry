@@ -1,4 +1,4 @@
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 export type ControlErrorKind =
   | "account_setup_blocked"

@@ -1,4 +1,4 @@
-import type { HarnessTurnLease, TurnIdentity } from "@seams/contracts";
+import type { HarnessTurnLease, TurnIdentity } from "@purin-labs/contracts";
 import { newRequestId, type RequestId, type OrganisationId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
 import type {

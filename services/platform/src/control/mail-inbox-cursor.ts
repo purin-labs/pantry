@@ -1,4 +1,4 @@
-import { decodeBase64, encodeBase64, isRecord } from "@seams/std";
+import { decodeBase64, encodeBase64, isRecord } from "@purin-labs/std";
 
 type CursorBinding = Readonly<{
   sessionToken: string;

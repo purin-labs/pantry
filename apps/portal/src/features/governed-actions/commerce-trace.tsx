@@ -6,7 +6,7 @@ import {
   ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   Trace,
   TraceCollapsible,
@@ -18,7 +18,7 @@ import {
   TraceDescription,
   type TraceStatus,
 } from "../../ui/trace";
-import type { CommerceActionRecord } from "@seams/control-api/portal/commerce-actions";
+import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
 import "../../ui/operations-trace.css";
 
 type Props = Readonly<{

@@ -7,12 +7,12 @@ import type {
   ShippingQuoteSnapshot,
   ShippingRouteBinding,
   VariantShippingSpecification,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CommerceBuyerShippingAddressV1,
   CommerceShippingCountry,
-} from "@seams/commerce-client";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-client";
+import type { Variant } from "@purin-labs/type-utils";
 
 import type { CarrierRateQuoteProvider } from "./checkout-carrier-rate-provider.ts";
 import type {

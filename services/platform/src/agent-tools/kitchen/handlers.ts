@@ -1,17 +1,17 @@
-import type { BakeryWorkflowDocument } from "@seams/bakery-workflow";
+import type { BakeryWorkflowDocument } from "@purin-labs/bakery-workflow";
 import {
   draftSeed,
   stepExecutorKind,
   stepSeconds,
   stepWorkers,
-} from "@seams/bakery-workflow/draft";
+} from "@purin-labs/bakery-workflow/draft";
 import { listOpenWorkflowProposals } from "../../commerce/bakery/workflow-proposals";
 import {
   listAppliedWorkflows,
   readCurrentWorkflow,
   readWorkflowFindings,
 } from "../../commerce/bakery/workflow-revisions";
-import { supplierIdFromName } from "@seams/control-api";
+import { supplierIdFromName } from "@purin-labs/control-api";
 import {
   StaffPageRequestError,
   RecipeWorkflowRequestError,
@@ -50,7 +50,7 @@ import {
   CommerceReadRequestError,
   readNamedCommerceQuery,
 } from "../../context/assembly/commerce";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   admitCommerceReadObservation,
   currentTurnFlowLabel,

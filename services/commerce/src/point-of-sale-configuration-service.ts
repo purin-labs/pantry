@@ -1,5 +1,5 @@
-import { parsePointOfSaleConfiguration } from "@seams/commerce-client";
-import type { PointOfSaleConfiguration } from "@seams/commerce-contracts";
+import { parsePointOfSaleConfiguration } from "@purin-labs/commerce-client";
+import type { PointOfSaleConfiguration } from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "./database.ts";
 import {

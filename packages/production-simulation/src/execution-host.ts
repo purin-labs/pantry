@@ -4,7 +4,7 @@ import {
   isPositiveInteger,
   isRecord,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { ExecutionAdapter } from "./adapters.ts";
 import { admitScenario } from "./admission.ts";
 import { InvalidDocument } from "./document-values.ts";

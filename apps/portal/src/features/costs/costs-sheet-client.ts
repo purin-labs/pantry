@@ -6,16 +6,16 @@ import {
   type CostsSheetStateVector,
   type CostsSheetTab,
   type CostsSheetUpdate,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import {
   encodeCostsSheetClientMessage,
   parseCostsSheetServerMessage,
   type CostsSheetFailureCode,
   type CostsSheetRoomMetadata,
-} from "@seams/costs-sheet-crdt/protocol";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
-import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/costs-sheet-crdt/protocol";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import {
   DocumentClient,
   webSocketUrl,

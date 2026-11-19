@@ -1,11 +1,11 @@
-import type { SupplierPayoutExecutionPlan } from "@seams/contracts";
+import type { SupplierPayoutExecutionPlan } from "@purin-labs/contracts";
 import {
   assertSupplierPayoutPlanWithLexicon,
   validateSupplierPayoutPlanWithLexicon,
 } from "../commerce/commerce-wasm";
 import type { OrganisationId } from "../ids";
 import type { SupplierPayoutRow } from "./supplier-payout-store";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export function payoutPlanMatchesRow(
   plan: SupplierPayoutExecutionPlan,

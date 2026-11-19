@@ -5,7 +5,7 @@ import type {
 import {
   WHATSAPP_DEFAULT_ALWAYS_WAIT_TOPICS,
   type WhatsAppAgentMode,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { listOrganisationActorRegistryEntries } from "../actors/actor-registry";
 import { connectorActorStub } from "../actors/actor-router";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -47,8 +47,8 @@ import {
   isRecord,
   parseJsonOrNull,
   positiveIntegerOrNull,
-} from "@seams/std";
-import type { WhatsAppProviderHealth } from "@seams/control-api";
+} from "@purin-labs/std";
+import type { WhatsAppProviderHealth } from "@purin-labs/control-api";
 
 /**
  * Durable WhatsApp metadata. Every row here holds identifiers, digests,

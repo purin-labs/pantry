@@ -6,7 +6,7 @@
 // buyer who waits until the slot ends is refused. Set
 // SOLD_OUT_SLOTS_ARTIFACT_DIR to keep the run's evidence; the file repeats byte
 // for byte for the same commit.
-import type { CommerceAdminClient } from "@seams/commerce-client";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

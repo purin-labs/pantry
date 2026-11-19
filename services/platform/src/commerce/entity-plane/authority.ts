@@ -1,5 +1,5 @@
-import { timestampNanoseconds } from "@seams/commerce-contracts/commerce-timestamp";
-import { isSystemCommerceEntity } from "@seams/contracts";
+import { timestampNanoseconds } from "@purin-labs/commerce-contracts/commerce-timestamp";
+import { isSystemCommerceEntity } from "@purin-labs/contracts";
 import type {
   CommerceCommandAuthorityContext,
   CommerceAuthorityScope,
@@ -18,9 +18,9 @@ import type {
   SavedCommerceViewId,
   SavedCommerceViewRevision,
   SystemCommerceEntityKind,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { commerceBlotterSystemAttributeIds } from "../../actors/commerce-query-schema";
-import { sameRelationshipDefinitionRef } from "@seams/commerce-contracts/commerce-relationship-references";
+import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import {
   parseCommerceCommandId,
   parseCommerceMerchantId,
@@ -28,10 +28,10 @@ import {
   parseCommerceTimestamp,
   parsePublishedCommerceSelectorId,
   parsePublishedCommerceSelectorRevision,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { Result } from "../../result";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { isCommerceSensitivity, sensitivityAtMost } from "../sensitivity";
 
 export type CommerceGraphReadAuthority = PantryCommerceReadAuthority;
@@ -297,10 +297,10 @@ function filterUsesDeclaredSystemAttributesOnly(
 }
 
 export function filterCommerceGraphSensitivity(
-  result: import("@seams/contracts").CommerceGraphQueryResult,
+  result: import("@purin-labs/contracts").CommerceGraphQueryResult,
   authority: CommerceGraphReadAuthority,
   allowedAttributeIds?: readonly string[],
-): import("@seams/contracts").CommerceGraphQueryResult {
+): import("@purin-labs/contracts").CommerceGraphQueryResult {
   const ceiling = authority.context.sensitivityCeiling;
   const allowed =
     allowedAttributeIds === undefined ? null : new Set(allowedAttributeIds);
@@ -371,7 +371,7 @@ function entityKey(reference: CommerceEntityRef): string {
 }
 
 function relationshipSensitivity(
-  relationship: import("@seams/contracts").CommerceRelationship,
+  relationship: import("@purin-labs/contracts").CommerceRelationship,
 ): CommerceSensitivity | null {
   if (relationship.origin === "custom") {
     return relationship.definition.origin === "custom"
@@ -444,7 +444,7 @@ function entityFreshnessKeys(entity: CommerceEntity): string[] {
   return [freshnessKey(entity.freshness)];
 }
 function provenanceKey(
-  value: import("@seams/contracts").SourceProvenance,
+  value: import("@purin-labs/contracts").SourceProvenance,
 ): string {
   return `${value.organisationId}:${value.source}:${value.resourceType}:${value.resourceId}:${value.revision}`;
 }

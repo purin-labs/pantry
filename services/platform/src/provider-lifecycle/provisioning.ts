@@ -37,7 +37,7 @@ import type {
   ProviderOAuthAttempt,
   ProviderOnboardingError,
 } from "../provider-lifecycle/domain";
-import { encodeBase64Url } from "@seams/std";
+import { encodeBase64Url } from "@purin-labs/std";
 
 export async function advanceProviderPhase(
   input: CompleteProviderInput,

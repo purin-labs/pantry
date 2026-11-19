@@ -1,4 +1,4 @@
-import { assertNever, sameJson } from "@seams/std";
+import { assertNever, sameJson } from "@purin-labs/std";
 import { requireValue } from "./document-values.ts";
 import {
   instanceLotId,

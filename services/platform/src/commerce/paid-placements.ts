@@ -2,8 +2,8 @@ import type {
   CanonicalCommerceDelivery,
   CommerceProjection,
   ConnectorDelivery,
-} from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 import type { ChannelId, WorkspaceId } from "../ids";
 

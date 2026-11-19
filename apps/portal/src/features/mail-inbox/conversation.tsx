@@ -1,6 +1,6 @@
 import React from "react";
-import { assertNever } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   takesNoReplies,
   type MailInboxThreadMessage,
@@ -11,10 +11,10 @@ import {
   type MailWorkCaseState,
   type MailWorkReply,
   type MailWorkReplyState,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { formatAbsoluteTime } from "../../formatting";
 import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "../../pages/agent-mailbox";
-import type { EmailReplyPreviewResult } from "@seams/control-api/portal/agent-mailbox";
+import type { EmailReplyPreviewResult } from "@purin-labs/control-api/portal/agent-mailbox";
 import {
   createEmailReviewActions,
   EmailReplyDraftStaleError,

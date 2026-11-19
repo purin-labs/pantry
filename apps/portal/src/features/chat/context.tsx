@@ -1,7 +1,7 @@
 import React from "react";
 import { Popover } from "@base-ui/react/popover";
 import { Box, ChevronDown, ShieldCheck, X } from "lucide-react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   navigationGroupTitle,
   type WorkspaceNavigationGroupName,
@@ -11,12 +11,12 @@ import type {
   ProjectDirectory,
   ProjectSnapshot,
   ChatContextDetails,
-} from "@seams/control-api";
-import type { Chat } from "@seams/control-api/portal/chat";
+} from "@purin-labs/control-api";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
 import { bakerySurfaceForOrganisation } from "../bakery-surface-registry";
 import { useScreenChipDecision } from "./screen-chip";
-import { KITCHEN_SURFACE } from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+import { KITCHEN_SURFACE } from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type ChatWorkspaceContext = Readonly<{
   organisation: string;

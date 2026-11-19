@@ -5,11 +5,11 @@ import type {
   VaultEventKind,
   VaultItemView,
   VaultStoreView,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import type { VaultTransport } from "./api";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The vaults that a token reaches, when the person must choose one. */
 export type OnePasswordVaultChoice = Readonly<{

@@ -1,5 +1,5 @@
 import type { CommerceDatabase } from "../database";
-import type { CommerceOfferV1 } from "@seams/commerce-client";
+import type { CommerceOfferV1 } from "@purin-labs/commerce-client";
 
 import {
   readCurrentOfferPrice,

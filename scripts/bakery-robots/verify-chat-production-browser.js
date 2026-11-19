@@ -25,7 +25,7 @@ async function verifyProductionChatParity(page) {
     const { bakerySurfaceForOrganisation } =
       await import("/src/features/bakery-surface-registry.ts");
     const { createBakerySurfaceEffect } =
-      await import("/@id/@seams/bakery-model/bakery-surface");
+      await import("/@id/@purin-labs/bakery-model/bakery-surface");
     const fixture = {
       effects: [],
       receipts: [],
@@ -1756,8 +1756,8 @@ async function captureSavedProduction(page, run, evidence) {
 
 async function installSavedRun(file) {
   const { parseRunSnapshot } =
-    await import("/@id/@seams/bakery-model/bakery-run-snapshot");
-  const { sha256Hex } = await import("/@id/@seams/std");
+    await import("/@id/@purin-labs/bakery-model/bakery-run-snapshot");
+  const { sha256Hex } = await import("/@id/@purin-labs/std");
   const body = {
     name: "Completed browser production",
     document: JSON.parse(file),

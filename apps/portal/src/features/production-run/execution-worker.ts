@@ -18,14 +18,14 @@ import {
   type PackFileSystem,
   type PhysicsResultStore,
   type RetainedFile,
-} from "@seams/production-simulation/execution-entry";
-import { assertNever, isRecord, parseJson, sha256Hex } from "@seams/std";
+} from "@purin-labs/production-simulation/execution-entry";
+import { assertNever, isRecord, parseJson, sha256Hex } from "@purin-labs/std";
 import createBakeryModule from "bakery-runtime-module";
 import {
   parsePersistentCell,
   type PersistentCell,
-} from "@seams/bakery-model/bakery-physics";
-import { checkpointBody } from "@seams/bakery-model/bakery-checkpoint";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { checkpointBody } from "@purin-labs/bakery-model/bakery-checkpoint";
 import { workerResultStore } from "./opfs-result-files";
 import { EnginePrograms } from "./engine-programs";
 
@@ -36,7 +36,7 @@ import { EnginePrograms } from "./engine-programs";
  *
  * The module also exports the engine, for a host that is not a worker.
  */
-export * from "@seams/production-simulation/execution-entry";
+export * from "@purin-labs/production-simulation/execution-entry";
 
 type Runtime = CellModule &
   Readonly<{

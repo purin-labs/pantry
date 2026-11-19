@@ -1,4 +1,4 @@
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { RecipeSaveRequest } from "../catalog/types";
 import type { RecipeDraft } from "../../commerce/recipe-commands";

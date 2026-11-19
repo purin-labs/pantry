@@ -5,9 +5,9 @@ import {
   type MenuScreenPairing,
   type MenuScreenPairingState,
   type MenuScreenPickup,
-} from "@seams/control-api";
-import { encodeBase64Url, sha256Hex } from "@seams/std";
-import { CommerceStorefrontClient } from "@seams/commerce-client";
+} from "@purin-labs/control-api";
+import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
+import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { MenuBoardCommandReply } from "../../actors/menu-board-commands";

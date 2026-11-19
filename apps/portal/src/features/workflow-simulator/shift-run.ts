@@ -1,13 +1,13 @@
 import {
   parseProcedureAssumptions,
   scenarioAssumptionFields,
-} from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parseSettings,
   type SettingsField,
   type SettingsResult,
-} from "@seams/bakery-model/bakery";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/bakery-model/bakery";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   normalRun,
   procedureShift,

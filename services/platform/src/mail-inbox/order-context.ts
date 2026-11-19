@@ -2,9 +2,9 @@ import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
   RequestAuthority,
-} from "@seams/contracts";
-import { parseCommerceGraphQuery } from "@seams/commerce-client";
-import { isRecord, sameJson } from "@seams/std";
+} from "@purin-labs/contracts";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
+import { isRecord, sameJson } from "@purin-labs/std";
 import type { Env } from "../env";
 import type { GmailMessageContent } from "../mail/gmail-adapter";
 import type { Result } from "../result";
@@ -15,7 +15,7 @@ import {
   validateEmailCommerceEvidence,
   type EmailCommerceEvidence,
 } from "./supplier-context";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type MailboxAuthority = Variant<RequestAuthority, "agent_mailbox">;
 type CommerceEntity = CommerceGraphQueryResult["entities"][number];

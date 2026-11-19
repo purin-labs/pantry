@@ -8,7 +8,7 @@
 import {
   parseCommerceMerchantClosureV1Record,
   type CommerceMerchantClosureV1,
-} from "@seams/commerce-contracts/records/api-access";
+} from "@purin-labs/commerce-contracts/records/api-access";
 
 import type { ApiAccess } from "./api-access.ts";
 import type { CommerceDatabase } from "./database.ts";

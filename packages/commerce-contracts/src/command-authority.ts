@@ -39,8 +39,8 @@ import {
   assertNever,
   canonicalJsonByCodePoint,
   isRecord,
-} from "@seams/std";
-import { type StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/std";
+import { type StrictUnion } from "@purin-labs/type-utils";
 import {
   commerceCommandAuthorityContextSchema,
   commerceAuthorityContextWireSchema,

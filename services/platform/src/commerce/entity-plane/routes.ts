@@ -5,7 +5,7 @@ import {
   parseSavedCommerceViewRevision,
   parseCommerceSnapshotRevision,
   parseCustomCommerceRelationshipRef,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CommerceEntityPlaneCommand,
   CommerceEntityPlaneError,
@@ -15,7 +15,7 @@ import type {
   CommerceViewPresentation,
   SavedCommerceViewId,
   SavedCommerceViewRevision,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Result } from "../../result";
 import {
   assertCommerceEntityPlaneCommandWithLexicon,
@@ -28,13 +28,13 @@ import {
   type CommerceGraphReaderError,
 } from "./graph-reader";
 import type { CommerceGraphReadAuthority } from "./authority";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 import type {
   CommerceActivityResource,
   CommerceBoardDragPreview,
   CommerceBoardPresenceSelection,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 type CommerceGraphRouteError =
   CommerceEntityPlaneError | CommerceGraphReaderError;

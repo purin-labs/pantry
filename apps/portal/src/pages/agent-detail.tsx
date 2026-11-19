@@ -1,7 +1,7 @@
 import { Select } from "../ui/select";
 import React from "react";
 
-import type { AgentConfigurationProposal, AgentDefinition, AgentInstallation, AgentOperationsSnapshot, CueBinding, OperationalArea, Skill, ScheduleBinding } from "@seams/control-api/portal/agent-operations";
+import type { AgentConfigurationProposal, AgentDefinition, AgentInstallation, AgentOperationsSnapshot, CueBinding, OperationalArea, Skill, ScheduleBinding } from "@purin-labs/control-api/portal/agent-operations";
 import { StatusChip, TechnicalDetails } from "../page-components";
 import { SideDrawer } from "../ui";
 import {
@@ -36,7 +36,7 @@ import {
   type AgentOperationStep,
   type AgentOperationSubmitter,
 } from "./agent-console-shared";
-import type { AgentSkillRef, ScheduleWeekday } from "@seams/control-api";
+import type { AgentSkillRef, ScheduleWeekday } from "@purin-labs/control-api";
 
 type AgentDetailProps = {
   readonly snapshot: AgentOperationsSnapshot;

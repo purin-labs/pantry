@@ -37,7 +37,7 @@ import {
 } from "../src/data/onboarding-support";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireWorkspaceId, requireChannelId } from "./test-ids";
 import { resolveActiveOrganisationPlacementRecord } from "../src/data/organisation-placement";

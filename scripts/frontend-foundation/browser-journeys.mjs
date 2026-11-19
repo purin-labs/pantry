@@ -71,7 +71,7 @@ async function main() {
       "pnpm",
       [
         "--filter",
-        "@seams/platform",
+        "@purin-labs/platform",
         "exec",
         "esbuild",
         join(

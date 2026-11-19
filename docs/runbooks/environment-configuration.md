@@ -70,7 +70,7 @@ Docker absence also leaves that operating path available.
 
 Startup never seeds, resets, or
 silently migrates existing acceptance data. Apply an intentional migration with
-`pnpm --filter @seams/platform d1:migrate:local`.
+`pnpm --filter @purin-labs/platform d1:migrate:local`.
 
 The launcher requires the environment-specific secret file and disables dotenv
 fallback. Avoid `--env-file`: Wrangler's native `--env local` file selection
@@ -132,9 +132,9 @@ production ingress overrides. Direct configuration-token helper calls require
 
 ```sh
 pnpm test:environments
-pnpm --filter @seams/platform test:onboarding-closure
-pnpm --filter @seams/platform check:types
-pnpm --filter @seams/platform check:test-types
+pnpm --filter @purin-labs/platform test:onboarding-closure
+pnpm --filter @purin-labs/platform check:types
+pnpm --filter @purin-labs/platform check:test-types
 pnpm portal:build
 # With pnpm backend running, before pnpm slack:ingress starts on port 3111:
 node scripts/environment-acceptance.mjs local output/environment-acceptance.json

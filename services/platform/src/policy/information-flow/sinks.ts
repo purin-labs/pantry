@@ -23,7 +23,7 @@ import type {
   FlowSink,
   ToolEffectSink,
 } from "./types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   decideOrganisationToolEffect,
   readCurrentOrganisationAuthz,

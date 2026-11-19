@@ -3,16 +3,16 @@ import {
   type ProductionPlanSelection,
   type ProductionPlanStateVector,
   type ProductionPlanUpdate,
-} from "@seams/production-plan-crdt";
+} from "@purin-labs/production-plan-crdt";
 import {
   encodePlanClientMessage,
   parsePlanServerMessage,
   type PlanFailureCode,
   type PlanRoomMetadata,
-} from "@seams/production-plan-crdt/protocol";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
-import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/production-plan-crdt/protocol";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import {
   DocumentClient,
   webSocketUrl,

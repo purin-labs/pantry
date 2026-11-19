@@ -1,8 +1,8 @@
 // Plan 78 step 2: each wire schema type equals the client type that its
 // hand-written reader returns, for the types that commerce-resources.ts and
 // mutations.ts still declare.
-import type * as Admin from "@seams/commerce-contracts/records/api-admin";
-import type * as Resources from "@seams/commerce-contracts/records/api-common";
+import type * as Admin from "@purin-labs/commerce-contracts/records/api-admin";
+import type * as Resources from "@purin-labs/commerce-contracts/records/api-common";
 import type * as ClientResources from "./commerce-resources.ts";
 import type { CommerceMigrationInventoryV2 } from "./mutations.ts";
 type Equal<A, B> =

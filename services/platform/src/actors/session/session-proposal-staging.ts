@@ -9,8 +9,8 @@ import {
   type RecipeWorkflowProposeRequest,
   type DeviceProposeRequest,
 } from "../../agent-tools/catalog/types";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
-import type { JevFeatureCommand } from "@seams/control-api/portal/jev-features";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
+import type { JevFeatureCommand } from "@purin-labs/control-api/portal/jev-features";
 import { parseCaseId, parseSessionId } from "../../ids";
 import {
   requireActiveOrganisationActor,
@@ -44,7 +44,7 @@ import {
   presentConfigurationCommand,
   previewCode,
 } from "../../slack/configuration-presentation";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import { liveDeviceMember } from "../../agent-tools/session-support";
 import { bindAllowanceReference } from "./model-route";
 import { OPERATOR_DRAFT_TTL_MS } from "./support";

@@ -4,7 +4,7 @@ import {
   parseTerminalAssignment,
   type PointOfSaleConfiguration,
   type TerminalAssignment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";
@@ -35,13 +35,13 @@ import {
 import type {
   CommerceClientError,
   CommerceSquareDeviceCodeV1,
-} from "@seams/commerce-client";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-client";
+import type { Variant } from "@purin-labs/type-utils";
 import type {
   TerminalConfigurationRequest,
   TerminalPairingReadback,
   TerminalPairingRequest,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /** The adapter version that a Square Terminal assignment records. */
 const SQUARE_TERMINAL_ADAPTER_VERSION = "square_terminal@2026-08-19";

@@ -2,9 +2,9 @@ import {
   chatOriginFromObservation,
   parseChatOrigin,
   type ChatOrigin,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { ChatTimelineEvent } from "./timeline";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Where a chat started (Plan 87): the page that its first message carried.

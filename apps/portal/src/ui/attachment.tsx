@@ -8,7 +8,7 @@ import {
   CircleAlert,
 } from "lucide-react";
 import "./agent-components.css";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type AttachmentState =
   | {

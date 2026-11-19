@@ -26,7 +26,7 @@ import {
   readPayoutsInWindow,
   supplierPayoutAuditPath,
 } from "./api";
-import type { DatedSupplierPayout } from "@seams/control-api/portal/payouts";
+import type { DatedSupplierPayout } from "@purin-labs/control-api/portal/payouts";
 
 // Money paid to suppliers over time: a bar from when each payout was proposed to
 // its last change, or to now while its outcome is still open. Payouts are few,

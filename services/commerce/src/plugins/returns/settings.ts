@@ -1,6 +1,6 @@
 // The returns plugin's settings (Plan 77 step 3): how many days after
 // fulfilment a buyer may still ask for a return.
-import type { CommercePluginSettingsV1 } from "@seams/commerce-client";
+import type { CommercePluginSettingsV1 } from "@purin-labs/commerce-client";
 
 import type { BuiltInPluginSettings } from "../plugin-state.ts";
 

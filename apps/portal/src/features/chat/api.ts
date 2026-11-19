@@ -1,7 +1,7 @@
-import { parseSlackDrafts, type SlackDraftView } from "@seams/control-api/portal/slack-drafts";
-import { parseConfigurationDrafts, type ConfigurationDraftView } from "@seams/control-api/portal/configuration-drafts";
-import type { ChatPermissionDecision } from "@seams/control-api";
-import type { ChatInputMode, SurfaceObservationV2 } from "@seams/control-api";
+import { parseSlackDrafts, type SlackDraftView } from "@purin-labs/control-api/portal/slack-drafts";
+import { parseConfigurationDrafts, type ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";
+import type { ChatPermissionDecision } from "@purin-labs/control-api";
+import type { ChatInputMode, SurfaceObservationV2 } from "@purin-labs/control-api";
 import {
   ControlApiError,
   controlRead,
@@ -9,21 +9,21 @@ import {
   controlWrite,
   readCookie,
 } from "../../control-client";
-import { isConversationId } from "@seams/control-api";
-import type { ConversationId, ProjectId } from "@seams/control-api";
-import type { ChatDerivedThread } from "@seams/control-api";
+import { isConversationId } from "@purin-labs/control-api";
+import type { ConversationId, ProjectId } from "@purin-labs/control-api";
+import type { ChatDerivedThread } from "@purin-labs/control-api";
 import {
   parseChatSideCaseSource,
   parseChatSideCaseViews,
   type ChatSideCaseSource,
   type ChatSideCaseView,
-} from "@seams/control-api";
-import { parseProjectDirectory, parseProjectContent, type ProjectReference, type ProjectDirectory, parseProjectCaseEntries, parseProjectCatalogue, type ChatDirectoryCommand, type ProjectCaseEntry, type ProjectCommand } from "@seams/control-api";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
-import { parseEmailReviewQueue, type EmailReviewQueue } from "@seams/control-api/portal/email-review";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
-import type { ActiveConversationMetadata, ArchivedConversationMetadata, ChatEffort } from "@seams/control-api";
-import { type Chat, type ChatConversationSummary, type ChatModelOption, type ChatWork, type PendingChatDeletion, parseChat, parseChatModelOptions, parseChatSummary, parseChatWork, parseDerivedThreads, parsePendingChatDeletions, parsePinnedConversations } from "@seams/control-api/portal/chat";
+} from "@purin-labs/control-api";
+import { parseProjectDirectory, parseProjectContent, type ProjectReference, type ProjectDirectory, parseProjectCaseEntries, parseProjectCatalogue, type ChatDirectoryCommand, type ProjectCaseEntry, type ProjectCommand } from "@purin-labs/control-api";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import { parseEmailReviewQueue, type EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
+import type { ActiveConversationMetadata, ArchivedConversationMetadata, ChatEffort } from "@purin-labs/control-api";
+import { type Chat, type ChatConversationSummary, type ChatModelOption, type ChatWork, type PendingChatDeletion, parseChat, parseChatModelOptions, parseChatSummary, parseChatWork, parseDerivedThreads, parsePendingChatDeletions, parsePinnedConversations } from "@purin-labs/control-api/portal/chat";
 
 declare const document: Readonly<{ cookie: string }>;
 

@@ -1,11 +1,11 @@
-import { HUMAN_CELL_TRANSFER } from "@seams/production-simulation/recipes/bakery/human-cell-transfer";
+import { HUMAN_CELL_TRANSFER } from "@purin-labs/production-simulation/recipes/bakery/human-cell-transfer";
 import {
   resourceInstance,
   type CellId,
-} from "@seams/production-simulation/recipes/bakery/workcell-instances";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 import React from "react";
 import { PlaybackCursor } from "./playback-cursor";
-import { batchTimeline } from "@seams/production-simulation/simulator/demo";
+import { batchTimeline } from "@purin-labs/production-simulation/simulator/demo";
 import {
   clock,
   describe,
@@ -18,14 +18,14 @@ import {
   type HumanResource,
   type Interval,
   type Run,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import { outageResourceName } from "@seams/production-simulation/recipes/bakery/run-faults";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { outageResourceName } from "@purin-labs/production-simulation/recipes/bakery/run-faults";
 import {
   intervalSelected,
   selectionContext,
   type Selection,
-} from "@seams/production-simulation/simulator/selection";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation/simulator/selection";
+import { assertNever } from "@purin-labs/std";
 
 type TrackProps = {
   readonly run: Run;

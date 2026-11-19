@@ -5,12 +5,12 @@ import {
   type ApplianceFlexMesh,
   type ApplianceRequest,
   type ApplianceSample,
-} from "@seams/bakery-model/bakery-appliance-protocol";
-import { ovenBakeActions } from "@seams/production-simulation/recipes/bakery/appliance-execution";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
+import { ovenBakeActions } from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
 import {
   PIE_PRODUCTS,
   type PieType,
-} from "@seams/production-simulation/recipes/bakery/pie";
+} from "@purin-labs/production-simulation/recipes/bakery/pie";
 import {
   buildPastryUnflouredFaultActions,
   buildPastryUnflouredRestoreActions,
@@ -19,9 +19,9 @@ import {
   pastryPressDoughActions,
   pastrySheetActions,
   type PastryBenchDeformationTelemetry,
-} from "@seams/production-simulation/recipes/bakery/pastry-bench-execution";
-import type { MachineState } from "@seams/production-simulation/recipes/bakery/schedule";
-import { isRecord, sha256Hex } from "@seams/std";
+} from "@purin-labs/production-simulation/recipes/bakery/pastry-bench-execution";
+import type { MachineState } from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 import { openExecutionWorker, type ExecutionWorker } from "../execution-client";
 import { interpolateApplianceSample } from "../appliance-sample-three";
 

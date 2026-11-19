@@ -1,6 +1,6 @@
-import type { SourceProvenance } from "@seams/contracts";
+import type { SourceProvenance } from "@purin-labs/contracts";
 import { parseOrganisationId, parseIntegrationAccountId } from "../ids";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export function parseSourceProvenance(value: unknown): SourceProvenance | null {
   if (

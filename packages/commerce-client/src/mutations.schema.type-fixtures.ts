@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiMutations from "@seams/commerce-contracts/records/api-mutations";
+import type * as apiMutations from "@purin-labs/commerce-contracts/records/api-mutations";
 import type {
   AcknowledgeCommerceDeliveryV1,
   CommerceAggregateObservationV1,

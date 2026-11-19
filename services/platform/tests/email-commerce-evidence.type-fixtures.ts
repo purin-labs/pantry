@@ -1,7 +1,7 @@
 import type { UnitTestEnv } from "./worker-fakes";
 import type { EmailCommerceEvidence } from "../src/mail-inbox/supplier-context";
 import { EmailSupplierContext } from "../src/mail-inbox/supplier-context";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 const receipt = {
   integrationAccountId: "integration_purchasing",

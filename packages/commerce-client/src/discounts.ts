@@ -7,7 +7,7 @@ import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
 import {
   requireString,
 } from "./wire-readers.ts";
-import { parseCreateCommerceDiscountV1 as parseCreateCommerceDiscountV1Record, parseDeactivateCommerceDiscountV1 as parseDeactivateCommerceDiscountV1Record, parseCommerceDiscountV1 as parseCommerceDiscountV1Record, parseCommerceDiscountsV1 as parseCommerceDiscountsV1Record } from "@seams/commerce-contracts/records/api-discounts";
+import { parseCreateCommerceDiscountV1 as parseCreateCommerceDiscountV1Record, parseDeactivateCommerceDiscountV1 as parseDeactivateCommerceDiscountV1Record, parseCommerceDiscountV1 as parseCommerceDiscountV1Record, parseCommerceDiscountsV1 as parseCommerceDiscountsV1Record } from "@purin-labs/commerce-contracts/records/api-discounts";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;

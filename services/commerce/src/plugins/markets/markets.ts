@@ -7,7 +7,7 @@ import {
   type CommerceMarketV1,
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { listVariants } from "../../commerce-persistence.ts";
 import { readStorefront } from "../../checkout-persistence.ts";

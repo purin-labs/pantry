@@ -1,8 +1,8 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect, it, vi, type TestContext } from "vitest";
-import { assertNever } from "@seams/std";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
+import { assertNever } from "@purin-labs/std";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import {
   parseUserId,
   type UserId,

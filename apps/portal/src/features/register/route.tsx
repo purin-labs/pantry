@@ -5,8 +5,8 @@ import type {
   CounterRegisterPaymentMethod,
   CounterRegisterSnapshot,
   RegisterViewCommand,
-} from "@seams/control-api";
-import type { CounterSale } from "@seams/control-api/portal/counter-sale";
+} from "@purin-labs/control-api";
+import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import { EmptyState, useLatestRead } from "../../ui";
 import {
   cancelCounterSaleCollection,

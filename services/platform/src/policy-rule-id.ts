@@ -1,4 +1,4 @@
-import { canonicalJson, encodeBase64Url } from "@seams/std";
+import { canonicalJson, encodeBase64Url } from "@purin-labs/std";
 
 type CredentialPolicyRuleSource = {
   provider: string;

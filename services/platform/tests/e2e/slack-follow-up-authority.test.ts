@@ -2,7 +2,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { SLACK_FOLLOW_UP_TEXT } from "../../src/actors/connector-case-work";
 import { enableCapability } from "./access-route-support";

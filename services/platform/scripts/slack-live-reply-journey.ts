@@ -16,12 +16,12 @@
  *   SLACK_LIVE_USER_TOKEN=xoxp-... \
  *   SLACK_LIVE_CHANNEL=C0123456789 \
  *   SLACK_APP_USER_ID=U0SATYRBOT \
- *   pnpm --filter @seams/platform slack:live-reply
+ *   pnpm --filter @purin-labs/platform slack:live-reply
  */
 
 import { randomUUID } from "node:crypto";
 import { writeFile } from "node:fs/promises";
-import { isRecord, sleep } from "@seams/std";
+import { isRecord, sleep } from "@purin-labs/std";
 
 const SLACK_API = "https://slack.com/api";
 const REPLY_TIMEOUT_MS = 180_000;

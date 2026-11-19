@@ -1,4 +1,4 @@
-import type { CommerceOfferV1 } from "@seams/commerce-client";
+import type { CommerceOfferV1 } from "@purin-labs/commerce-client";
 
 import { listOffers } from "./commerce-persistence";
 import type { CommerceDatabase } from "./database";

@@ -4,9 +4,9 @@ import type {
   MenuBoardRelease,
   MenuBoardSummary,
   MenuScreenSummary,
-} from "@seams/control-api";
-import type { MenuBoardLayout, MenuBoardStart } from "@seams/menu-board-crdt";
-import type { MenuDraftSnapshot } from "@seams/menu-draft-crdt";
+} from "@purin-labs/control-api";
+import type { MenuBoardLayout, MenuBoardStart } from "@purin-labs/menu-board-crdt";
+import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 
 import type { ControlSessionId, UserId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";

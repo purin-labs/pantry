@@ -1,8 +1,8 @@
 import React from "react";
 import type { OrganisationMutation } from "../../mutation-state";
 import { parseMailboxPolicyDraft, type MailboxPolicyDraft } from "../../pages/agent-mailbox";
-import type { EmailReplyPreviewResult, EmailOperationalPreviewResult } from "@seams/control-api/portal/agent-mailbox";
-import type { MailboxSetupAgent } from "@seams/control-api";
+import type { EmailReplyPreviewResult, EmailOperationalPreviewResult } from "@purin-labs/control-api/portal/agent-mailbox";
+import type { MailboxSetupAgent } from "@purin-labs/control-api";
 import {
   runIntegrationsCommand,
   runProviderConnection,

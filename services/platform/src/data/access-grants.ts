@@ -12,13 +12,13 @@ import type {
   CommerceAuthorityScope,
   CommerceMutationTarget,
   CommerceRelationshipRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { parseFileResourceScope } from "../authorization/access-grants/capability-key";
 import {
   parseCommerceEntityPlaneCommand,
   parseCommerceGraphQuery,
   parseCommerceRelationshipRef,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { supersedeUnadmittedFileProjectionsStatement } from "../context/files/persistence";
 import {
@@ -39,7 +39,7 @@ import {
   isRecord,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 type AccessGrantRow = Readonly<{
   grantId: unknown;

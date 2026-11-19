@@ -1,5 +1,5 @@
-import type { CustomConnectorSetupAttempt, CustomConnectorWritePreview } from "@seams/control-api/portal/custom-connectors";
-import type { AccessGrantTargetSelection } from "@seams/control-api/portal/access-models";
+import type { CustomConnectorSetupAttempt, CustomConnectorWritePreview } from "@purin-labs/control-api/portal/custom-connectors";
+import type { AccessGrantTargetSelection } from "@purin-labs/control-api/portal/access-models";
 
 // @ts-expect-error An existing account setup requires its current binding revision.
 const missingBinding: CustomConnectorSetupAttempt["target"] = {

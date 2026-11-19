@@ -152,7 +152,7 @@ import { handleControlRequest } from "../src/control-router";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../src/commerce-lab/lab-metadata";
 import { parseOrganisationId } from "../src/ids";
 import { fixtureFlowBinding } from "./fixtures/plan25-turn";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_commerce_console";

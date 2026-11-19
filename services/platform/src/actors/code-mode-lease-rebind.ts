@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { Env } from "../env";
 import { newRequestId, type OrganisationId } from "../ids";
 import { requireActiveOrganisationActorAtPlacement } from "./actor-router";

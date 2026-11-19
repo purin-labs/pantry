@@ -1,17 +1,17 @@
 import { expect, it, type TestContext } from "vitest";
-import { isCustomCommerceEntity } from "@seams/contracts";
+import { isCustomCommerceEntity } from "@purin-labs/contracts";
 import {
   parseCommerceGraphQuery,
   parseCommerceSnapshotRevision,
   parseEntityPlaneCommand,
   CommerceAdminClient,
   CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
   CustomCommerceEntityRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   createFinancierSample,
   entityType,
@@ -22,25 +22,25 @@ import {
   saveOperationDuration,
 } from "../src/commerce/bakery/operation";
 import { commerceGraphResponseBody } from "../src/commerce/entity-plane/routes";
-import { parseCommerceGraphQueryResult } from "@seams/control-api/portal/entity-plane-boundary";
+import { parseCommerceGraphQueryResult } from "@purin-labs/control-api/portal/entity-plane-boundary";
 import {
   bakeryFingerprint,
   fields,
   sampleSettings,
   parseSettings,
-} from "@seams/bakery-model/bakery";
-import { parsePersistentCell } from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery";
+import { parsePersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import pinnedOvenCell from "./fixtures/persistent-oven-cell.json";
 import { compileSavedOvenFinancier } from "../../../packages/production-simulation/src/recipes/bakery/financier.ts";
 import {
   compileBakeryGraph,
   readBakeryProcedure,
   type CompiledProcedure,
-} from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parseScenarioCopy,
   scenarioFromEntity,
-} from "@seams/bakery-model/bakery-scenario";
+} from "@purin-labs/bakery-model/bakery-scenario";
 import { saveScenarioCopy } from "../src/commerce/bakery/scenario";
 import {
   parseProductionScenario,
@@ -48,7 +48,7 @@ import {
   productionScenarioFromGraph,
   type ProductionAssignment,
   type ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import { saveProductionScenario } from "../src/commerce/bakery/production-scenario";
 import {
   startCommerceWorker,
@@ -1131,7 +1131,7 @@ async function readChangedProcedureGraph(
   return graph;
 }
 function isScenario(
-  entity: import("@seams/contracts").CommerceEntity,
+  entity: import("@purin-labs/contracts").CommerceEntity,
 ): boolean {
   return (
     entity.reference.origin === "custom" &&
@@ -1139,7 +1139,7 @@ function isScenario(
   );
 }
 function isBake(
-  operation: import("@seams/bakery-model/bakery-procedure").ProcedureOperation,
+  operation: import("@purin-labs/bakery-model/bakery-procedure").ProcedureOperation,
 ): boolean {
   return operation.operation === "bake";
 }

@@ -2,7 +2,7 @@ import type {
   MailRelationshipPreview,
   MailSupplierCandidate,
 } from "../index.ts";
-import { isRecord, isPositiveInteger } from "@seams/std";
+import { isRecord, isPositiveInteger } from "@purin-labs/std";
 
 export function parseSuppliers(raw: unknown): readonly MailSupplierCandidate[] {
   if (!Array.isArray(raw) || raw.length > 20)

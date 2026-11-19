@@ -4,7 +4,7 @@ import type {
   CustomCommerceRelationshipRef,
   MerchantRevision,
   RelationshipRevision,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import type {
   EntityPlaneChange,
@@ -24,8 +24,8 @@ import {
   parsePositiveText,
 } from "./parsers.ts";
 import { readMerchant } from "./entities.ts";
-import { customRelationshipDefinitionReference } from "@seams/commerce-contracts/commerce-relationship-references";
-import { isRecord } from "@seams/std";
+import { customRelationshipDefinitionReference } from "@purin-labs/commerce-contracts/commerce-relationship-references";
+import { isRecord } from "@purin-labs/std";
 
 type StoredChangeRow = Readonly<{
   changeId: string;

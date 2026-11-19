@@ -1,4 +1,4 @@
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
 import type { StationPose } from "../pour-over/sample.ts";
 import {
   fr10Links,

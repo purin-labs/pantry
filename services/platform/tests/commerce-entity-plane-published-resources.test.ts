@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseCommerceRelationshipRef } from "@seams/commerce-client";
+import { parseCommerceRelationshipRef } from "@purin-labs/commerce-client";
 
 import {
   createPublishedResourceClient,

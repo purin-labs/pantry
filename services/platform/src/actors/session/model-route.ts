@@ -3,7 +3,7 @@ import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type {
   HarnessTurnLease,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import { newRequestId, type SessionId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
@@ -17,7 +17,7 @@ import {
 } from "../session-execution-admission";
 import { createWorkerMessageLinkEgress } from "../../messages/link-egress";
 import type { EmbeddedHarnessModelRouteLease } from "../embedded-harness";
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import {
   readOrganisationChatGptSignIn,
   recordOrganisationChatGptResponse,
@@ -34,7 +34,7 @@ import {
   ObservationEvidence,
 } from "../../policy";
 import { readOfferPriceAllowanceView } from "../../data/offer-price-allowance";
-import { assertNever, errorMessage } from "@seams/std";
+import { assertNever, errorMessage } from "@purin-labs/std";
 
 /**
  * The lease reads the placement fence once, here. Its key resolver reads the

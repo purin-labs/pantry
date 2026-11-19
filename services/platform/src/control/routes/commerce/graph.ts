@@ -5,11 +5,11 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import type { Result } from "../../../result";
-import type { CommerceGraphQuery, RequestAuthority } from "@seams/contracts";
+import type { CommerceGraphQuery, RequestAuthority } from "@purin-labs/contracts";
 import {
   parseCommerceCommandId,
   CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   resolveActiveCaseActor,
   resolveActiveCaseActorAtPlacement,
@@ -100,7 +100,7 @@ import {
   controlCommerceSensitivityCeiling,
   openControlCommerceGraph,
 } from "../../commerce-graph";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   capabilitySwitchedOffRefusal,
   commerceActionLedgerError,

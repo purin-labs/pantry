@@ -1,4 +1,4 @@
-import type { FileContextProvider } from "@seams/contracts";
+import type { FileContextProvider } from "@purin-labs/contracts";
 import React from "react";
 import { toast } from "sonner";
 import { EmptyState } from "../../page-components";
@@ -17,7 +17,7 @@ import {
   mutationFeedbackMessage,
   providerConnectionState,
 } from "./settings-support";
-import type { IntegrationAccount, SupportDiagnostics } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 import type { IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
 
 /**

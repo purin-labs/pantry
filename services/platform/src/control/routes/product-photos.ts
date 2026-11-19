@@ -1,4 +1,4 @@
-import { isNormalizedText, sha256Hex } from "@seams/std";
+import { isNormalizedText, sha256Hex } from "@purin-labs/std";
 import {
   MEDIA_CONTENT_TYPES,
   MEDIA_MAX_BYTES,
@@ -8,7 +8,7 @@ import {
   type CommerceMediaLibraryV1,
   type CommerceMutationResultV1,
   type CommerceProductMediaV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { controlMediaBase, deleteCafeImage } from "../../commerce/cafe-media";
 import type { Env } from "../../env";
 import { controlError, controlJson, readJsonRecord } from "../http";

@@ -2,7 +2,7 @@ import React from "react";
 import {
   parseVaultStoreSummary,
   type VaultStoreSummary,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlRead } from "../../control-client";
 import { vaultStorePath } from "../../control-paths";

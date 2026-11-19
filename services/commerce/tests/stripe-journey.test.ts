@@ -15,7 +15,7 @@
 // repeats byte for byte, because it holds no Stripe ids.
 import { createHmac } from "node:crypto";
 
-import { CommerceAdminClient } from "@seams/commerce-client";
+import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { StripeApi } from "../src/payments/stripe/stripe-payments.ts";

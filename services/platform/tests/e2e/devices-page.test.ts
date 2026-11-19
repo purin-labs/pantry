@@ -7,12 +7,12 @@ import {
   parseMenuScreenPairing,
   type DeviceList,
   type DeviceView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseTerminalAssignment,
   type TerminalAssignment,
-} from "@seams/contracts";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";

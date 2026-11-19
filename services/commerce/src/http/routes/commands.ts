@@ -1,6 +1,6 @@
-import { parsePurchasingPresetPublishRequest } from "@seams/commerce-client";
+import { parsePurchasingPresetPublishRequest } from "@purin-labs/commerce-client";
 import type { BuyerRoute, CommerceRoute } from "../../http-routes.ts";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import { FOOD_SERVICE_ROUTES } from "../admission.ts";
 import type { HttpRouteContext } from "../context.ts";
 import {
@@ -14,7 +14,7 @@ import {
   readJsonBody,
 } from "../request-body.ts";
 import { entityPlaneErrorResponse, jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function merchantCommandRoute(
   ctx: HttpRouteContext,

@@ -15,7 +15,7 @@ import type { TerminalPaymentObservation } from "./records/terminal.ts";
 import type { TerminalRetirementReason } from "./records/terminal.ts";
 import type { TerminalTarget } from "./records/terminal.ts";
 import { parsePaymentProviderAccountBinding } from "./payment-binding.ts";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 const IDENTITY_MAX_LENGTH = 255;
 const CURRENCY_PATTERN = /^[A-Z]{3}$/u;

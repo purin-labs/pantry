@@ -1,4 +1,4 @@
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import type { ClaudeConnection } from "../src/models/claude-connection";
 
 const claude: ModelRoute = {

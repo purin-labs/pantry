@@ -5,7 +5,7 @@ import {
   type SchedulingHistoryView,
   type WaitInterval,
   type Blocker,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import type React from "react";
 import {
   blockerDescription,

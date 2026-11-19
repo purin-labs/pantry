@@ -2,19 +2,19 @@ import React from "react";
 import type {
   PhysicsOutcome,
   PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { PlaybackController } from "./playback-controller";
-import type { PlaybackSnapshot, PlaybackUpdate } from "@seams/production-simulation/simulator/playback-state";
+import type { PlaybackSnapshot, PlaybackUpdate } from "@purin-labs/production-simulation/simulator/playback-state";
 import {
   physicsDuration,
   physicsLegAt,
   physicsOutcome,
-} from "@seams/production-simulation/recipes/bakery/physics-playback";
+} from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import { PhysicsSceneHost } from "./spatial/physics-scene-host";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
 import type { RecordedFitEvent } from "./spatial/floor-plan-geometry";
 import "./recording-candidate-preview.css";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type Props = Readonly<{ recording: PhysicsReplay }>;
 type State = Readonly<{

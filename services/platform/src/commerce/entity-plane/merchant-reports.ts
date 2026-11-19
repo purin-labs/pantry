@@ -2,10 +2,10 @@ import type {
   CommerceFilter,
   CommerceGraphQuery,
   SystemCommerceEntityKind,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { assertCommerceGraphQueryWithLexicon } from "../commerce-wasm";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 /**
  * The named merchant reports the daily brief is built from.
  *

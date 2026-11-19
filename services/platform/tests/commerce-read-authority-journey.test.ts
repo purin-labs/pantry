@@ -5,8 +5,8 @@ import {
   CommerceAdminClient,
   CommerceEntityPlaneClient,
   parseCommerceGraphQuery,
-} from "@seams/commerce-client";
-import { parsePantryCommerceReadAuthority } from "@seams/commerce-contracts/read-authority";
+} from "@purin-labs/commerce-client";
+import { parsePantryCommerceReadAuthority } from "@purin-labs/commerce-contracts/read-authority";
 import {
   createFinancierSample,
   FINANCIER_SAMPLE_ID,

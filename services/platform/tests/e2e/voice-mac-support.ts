@@ -3,7 +3,7 @@
 // journey that checks the records keeps its own recording stand-in.
 import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { PUBLIC_ORIGIN } from "./hibernatable-socket-support";
 import { network } from "./network";

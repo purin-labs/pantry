@@ -13,7 +13,7 @@ import {
   type CommerceSystemRevision,
 } from "./organisation-commerce-system";
 import type { OrganisationQuerySource } from "./query-source";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 declare const capabilityActivationIdBrand: unique symbol;
 declare const capabilityContractRevisionBrand: unique symbol;

@@ -9,8 +9,8 @@ import {
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { decodeChecked } from "./sorted-unions.ts";
-import { assertNever, isRecord, isString } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever, isRecord, isString } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 import {
   commerceIntegerSchema,

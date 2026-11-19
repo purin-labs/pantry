@@ -9,7 +9,7 @@ import type {
   PaymentProviderAccountBinding,
   SquareTerminalTransport,
 } from "./records/commerce-records.ts";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 const IDENTITY_MAX_LENGTH = 255;
 const COUNTRY_PATTERN = /^[A-Z]{2}$/u;

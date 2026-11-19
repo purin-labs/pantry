@@ -1,6 +1,6 @@
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
-import { assertNever, isNonNegativeInteger } from "@seams/std";
+import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 
 type OrganisationCutoverBacklog = {
   readonly proposedActions: number;

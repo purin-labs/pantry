@@ -8,8 +8,8 @@ import type {
   CaseExecutionNodeKind,
   CaseExecutionTurnMemory,
   OpenCaseExecutionNode,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import type { StatusChipStatus } from "../../status-chip";
 

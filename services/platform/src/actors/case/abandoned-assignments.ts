@@ -1,5 +1,5 @@
-import type { CaseAssignmentLifecycle } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { CaseAssignmentLifecycle } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import type { Env } from "../../env";
 import {
   newRequestId,

@@ -1,6 +1,6 @@
 import { OpenObject, PositiveInteger } from "./schema.ts";
 import { Type, type StaticDecode } from "typebox";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import { commerceEntityRefSchema } from "./entity-reference.ts";
 import {
   commerceFilterSchema,

@@ -1,6 +1,6 @@
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import { readChatStatus } from "./api";
-import type { ChatWork } from "@seams/control-api/portal/chat";
+import type { ChatWork } from "@purin-labs/control-api/portal/chat";
 import { readChatStream, type ChatStreamRecord } from "./stream";
 
 export type ChatStreamState =

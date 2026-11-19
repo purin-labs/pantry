@@ -1,4 +1,4 @@
-import type { CommerceCueFact, CommerceProjection } from "@seams/contracts";
+import type { CommerceCueFact, CommerceProjection } from "@purin-labs/contracts";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { assertRequiredColumns } from "../schema-migrations";
@@ -8,7 +8,7 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   type AppliedCommerceObservationResult,
   type CommerceProjectionError,

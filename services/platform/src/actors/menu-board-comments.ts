@@ -1,5 +1,5 @@
-import type { MenuBoardCommentThread } from "@seams/control-api";
-import { normalizePlainText } from "@seams/collaboration";
+import type { MenuBoardCommentThread } from "@purin-labs/control-api";
+import { normalizePlainText } from "@purin-labs/collaboration";
 
 import type { UserId } from "../ids";
 import type { Result } from "../result";

@@ -1,7 +1,7 @@
 import type {
   ChatPermissionItem,
   ChatPermissionRequest,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { readAgentPermissionRequest } from "../data/agent-permission-request";
 import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
 import type { OrganisationDatabase } from "../database-handles";

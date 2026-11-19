@@ -4,10 +4,10 @@ import {
   ResponseIndicator,
   type ReasoningStep,
 } from "../../ui";
-import type { ChatTimelineView, ChatWork } from "@seams/control-api/portal/chat";
+import type { ChatTimelineView, ChatWork } from "@purin-labs/control-api/portal/chat";
 import type { ChatStreamState } from "./delivery";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type ToolEvent = Variant<ChatTimelineView, "tool_started" | "tool_settled">;
 

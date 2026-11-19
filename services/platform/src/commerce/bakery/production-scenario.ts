@@ -3,20 +3,20 @@ import {
   parseCommerceSnapshotRevision,
   parseEntityPlaneCommand,
   type CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
-import { bakeryFingerprint, fields } from "@seams/bakery-model/bakery";
+} from "@purin-labs/commerce-client";
+import { bakeryFingerprint, fields } from "@purin-labs/bakery-model/bakery";
 import {
   productionAssignmentId,
   productionDefinitionFingerprint,
   productionSettingsMatchProcedure,
   type ProductionAssignment,
   type ProductionScenario,
-} from "@seams/bakery-model/bakery-production-scenario";
-import { readBakeryProcedure } from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
+import { readBakeryProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { entityType, type CommandStep } from "./sample";
 
 const scenarioType = "bakery_production_scenario";

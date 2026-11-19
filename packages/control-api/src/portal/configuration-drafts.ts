@@ -1,4 +1,4 @@
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /** A setup change or a price allowance that the agent staged in this chat. */
 export type ConfigurationDraftView = Readonly<{

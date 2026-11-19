@@ -1,7 +1,7 @@
 import type {
   CollaborationAgentActivity,
   CollaborationParticipant,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 
 export type TextCollaborationServerMessage<
   Update,

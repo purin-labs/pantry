@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // The Portal's own voice code for the benches (Plan 82C): esbuild bundles
-// `features/voice/command.ts` with `@seams/control-api`, so a bench scores with
+// `features/voice/command.ts` with `@purin-labs/control-api`, so a bench scores with
 // the shipped rules and keeps no copy of them.
 //
 // As a module: `const voice = await loadPortalVoice()`.
@@ -23,7 +23,7 @@ export async function loadPortalVoice() {
   const bundle = await build({
     stdin: {
       contents: `export * from "./src/features/voice/command.ts";
-export { keptVoiceText, normalizeVoicePhrase, voiceMacDeadlineMs } from "@seams/control-api";`,
+export { keptVoiceText, normalizeVoicePhrase, voiceMacDeadlineMs } from "@purin-labs/control-api";`,
       resolveDir: portal,
       loader: "ts",
     },

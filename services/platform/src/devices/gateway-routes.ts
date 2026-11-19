@@ -1,7 +1,7 @@
 import {
   parseDeviceGatewayEnrollRequest,
   type DeviceGatewayEnrollResponse,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { deviceFleetStub } from "../actors/device-fleet";
 import { controlError, controlJson } from "../control/http";

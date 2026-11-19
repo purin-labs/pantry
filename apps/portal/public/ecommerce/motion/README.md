@@ -26,7 +26,7 @@ so disposal, offscreen suspension, and motion preferences stay local.
 
 ## Repeatable browser review
 
-1. Run `pnpm --filter @seams/portal dev` and open `/ecommerce` on port 3103.
+1. Run `pnpm --filter @purin-labs/portal dev` and open `/ecommerce` on port 3103.
 2. Scroll through all three figures. Confirm that each renders without sliders
    or development controls. Move across the terrain and oven bays.
 3. Hover over a packed box after it clears the press. Confirm that the conveyor

@@ -1,10 +1,10 @@
 import React from "react";
-import type { EspressoMachine } from "@seams/bakery-model/bakery-physics";
+import type { EspressoMachine } from "@purin-labs/bakery-model/bakery-physics";
 import { preloadEspressoVisual } from "../linea/espresso-scene";
 import type {
   LatteProcessCheck,
   LatteRecipeConfig,
-} from "@seams/production-simulation/recipes/latte/model";
+} from "@purin-labs/production-simulation/recipes/latte/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{ prepared(recipe: LatteRecipeConfig): void }>;

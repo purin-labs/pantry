@@ -4,7 +4,7 @@ import type {
   CaseTimelineCase,
   CaseTimelineDay,
   CaseTimelineOutcomeKind,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { TimeLanesFrame, TimeLanesNote } from "../../ui/time-lanes-frame";
 import {

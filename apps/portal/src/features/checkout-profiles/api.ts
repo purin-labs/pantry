@@ -1,11 +1,11 @@
 import type {
   CheckoutProfile,
   CheckoutProfileConfiguration,
-} from "@seams/contracts";
-import { parseCheckoutProfileActivations, parseStorefrontIds, type CommerceCheckoutProfileActivationV1 } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import { parseCheckoutProfileActivations, parseStorefrontIds, type CommerceCheckoutProfileActivationV1 } from "@purin-labs/commerce-client";
 import { controlRead } from "../../control-client";
-import type { VariantBy } from "@seams/type-utils";
-import { type CheckoutProfileSummary, parseProfileMutation, parseProfileSummary, requireExactKeys, requireObject } from "@seams/control-api/portal/checkout-profiles";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { type CheckoutProfileSummary, parseProfileMutation, parseProfileSummary, requireExactKeys, requireObject } from "@purin-labs/control-api/portal/checkout-profiles";
 
 type CheckoutProfileWithLifecycle<
   TState extends CheckoutProfile["lifecycle"]["state"],

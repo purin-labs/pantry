@@ -12,7 +12,7 @@ import {
   type InventoryMovementPlan,
   inventoryMovementObservations,
 } from "./inventory.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   type CreateCommerceInventoryItemV1,
   type OpenCommerceInventoryPositionV1,
@@ -20,7 +20,7 @@ import {
   type ReconcileCommerceInventoryV1,
   type CommerceInventoryItemV1,
   type CommerceInventoryPositionV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceMutation, MerchantRow } from "./ledger.ts";
 
 export function inventoryItemMutation(

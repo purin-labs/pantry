@@ -15,8 +15,8 @@ import {
   parseActorRegistryId,
   type ActorRegistryEntry,
 } from "./actor-registry";
-import type { VariantBy } from "@seams/type-utils";
-import { isNonEmptyString, isNonNegativeInteger } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isNonEmptyString, isNonNegativeInteger } from "@purin-labs/std";
 
 type QuarantinedRegistryEntry = VariantBy<
   ActorRegistryEntry,

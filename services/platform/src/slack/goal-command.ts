@@ -1,5 +1,5 @@
-import type { CaseGoalCommand, CaseGoalSnapshot } from "@seams/contracts";
-import { assertNever } from "@seams/std";
+import type { CaseGoalCommand, CaseGoalSnapshot } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
 import { parseCaseGoalCommand } from "../actors/case-goals";
 
 export type SlackGoalCommand =

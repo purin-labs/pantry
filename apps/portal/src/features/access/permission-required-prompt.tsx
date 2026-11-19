@@ -10,7 +10,7 @@ import { UserRound } from "lucide-react";
 import {
   parsePermissionRequiredProblem,
   type PermissionRequired,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   ControlApiError,
   controlMutation,
@@ -22,7 +22,7 @@ import {
   type PermissionRequestDecision,
 } from "../../ui";
 import { createAccessRouteTransport } from "./api";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   createGrants,
   enableCapabilities,

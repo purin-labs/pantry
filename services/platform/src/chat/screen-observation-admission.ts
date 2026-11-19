@@ -1,7 +1,7 @@
 import {
   sharedChatMayCarry,
   type SurfaceObservationV2,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   timelineVisibleMessages,
   type ChatCommand,

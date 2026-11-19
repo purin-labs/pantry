@@ -12,7 +12,7 @@ import {
   parseIntegrationAccountId,
   type OrganisationId,
 } from "../ids";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export async function syncEmailProposalLifecycle(
   input: Readonly<{

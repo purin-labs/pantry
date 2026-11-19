@@ -1,7 +1,7 @@
 import { requireConversationId } from "./test-ids";
 import { afterEach, expect, it, vi } from "vitest";
 import { readChat } from "../../../apps/portal/src/features/chat/api";
-import { parseChatStreamRecord } from "@seams/control-api/portal/chat-stream";
+import { parseChatStreamRecord } from "@purin-labs/control-api/portal/chat-stream";
 import { readChatStream, type ChatStreamRecord } from "../../../apps/portal/src/features/chat/stream";
 
 afterEach(restoreGlobals);

@@ -1,7 +1,7 @@
 {
   // The standalone demo shop on Commerce (Plan 40B, decision 8), and the
   // QR order pages at `<shop name>.<MENU_HOST_SUFFIX>` (Plan 40B phase 2).
-  // Deploy with `pnpm --filter @seams/storefront deploy:seams-shop`.
+  // Deploy with `pnpm --filter @purin-labs/storefront deploy:seams-shop`.
   // The order page domain is not chosen yet, so no route sends an order page
   // host here. Its route needs a proxied wildcard DNS record and a
   // certificate that covers the wildcard.

@@ -5,7 +5,7 @@ import {
 } from "../harness-steering";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
-import type { AcceptedInputRef, HarnessTurnLease } from "@seams/contracts";
+import type { AcceptedInputRef, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import {
   parseCaseId,
@@ -44,8 +44,8 @@ import {
   type PortalChatErasure,
 } from "../portal-chat-cleanup";
 import type { ActorExportError } from "../actor-export";
-import type { Variant } from "@seams/type-utils";
-import { errorMessage } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { errorMessage } from "@purin-labs/std";
 import { PlacedActor } from "../lifecycle/placed-actor";
 import { deferredExecutionRelease } from "./replay";
 import {

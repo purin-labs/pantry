@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiPaymentDispute from "@seams/commerce-contracts/records/api-payment-dispute";
+import type * as apiPaymentDispute from "@purin-labs/commerce-contracts/records/api-payment-dispute";
 import type { ObserveCommercePaymentDisputeV1 } from "./payment-dispute.ts";
 export type ObserveCommercePaymentDisputeV1Parity = Assert<
   Equal<

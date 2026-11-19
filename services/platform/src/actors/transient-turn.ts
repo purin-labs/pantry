@@ -1,10 +1,10 @@
-import type { EmbeddedHarnessModelUsage, TurnIdentity } from "@seams/contracts";
+import type { EmbeddedHarnessModelUsage, TurnIdentity } from "@purin-labs/contracts";
 import {
   createCancellableTask,
   type CancellableTask,
   type TaskCancellationReason,
-} from "@seams/async-control/cancellable-task";
-import { runTaskBeforeDeadline } from "@seams/async-control/deadline";
+} from "@purin-labs/async-control/cancellable-task";
+import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
 
 import type { Result } from "../result";
 import type {

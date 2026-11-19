@@ -6,7 +6,7 @@ import {
   type DeviceKind,
   type DeviceList,
   type DeviceView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { cancelDialog, syncDialog } from "../../dialog";
 import {

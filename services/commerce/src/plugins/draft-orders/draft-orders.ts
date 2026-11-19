@@ -16,9 +16,9 @@ import {
   type CommerceMerchantSnapshotV1,
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
-import { commerceTransition } from "@seams/commerce-contracts";
+import { commerceTransition } from "@purin-labs/commerce-contracts";
 
 import { readCheckout, readStorefront } from "../../checkout-persistence.ts";
 import { readOfferRevision } from "../../commerce-persistence.ts";

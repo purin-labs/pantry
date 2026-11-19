@@ -11,8 +11,8 @@ import { clientInput } from "./command-input.ts";
 import type {
   CreateCommerceInPersonCheckoutV1,
   CommerceAdminClient,
-} from "@seams/commerce-client";
-import type { Checkout, PluginDefinition } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { Checkout, PluginDefinition } from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import {

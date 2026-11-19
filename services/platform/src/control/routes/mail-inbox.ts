@@ -1,6 +1,6 @@
 import { runtimeFetch } from "../../runtime-fetch";
 import { PROVIDER_ADAPTERS } from "../../provider-adapters/catalogue";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   authorizeMailSource,
   mailboxAwaitsReconnect,
@@ -14,7 +14,7 @@ import {
   type MailClassifiedFilter,
   type MailOrganizationView,
   parseMailOrganizationView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { readActiveOrganisationMembershipRevision } from "../../data/control-plane";
 import { listIntegrationAccounts } from "../../data/integration-account";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
@@ -33,7 +33,7 @@ import {
 } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import { openMailInboxCursor, sealMailInboxCursor } from "../mail-inbox-cursor";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type MailInboxRoute = Readonly<{
   kind: "mailInbox";

@@ -1,7 +1,7 @@
 import type {
   BakeryPlaybackAction,
   BakeryWorkcellPreparation,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 
 const seek = { kind: "seek", seconds: 90 } satisfies BakeryPlaybackAction;
 const speed = { kind: "speed", speed: 2 } satisfies BakeryPlaybackAction;

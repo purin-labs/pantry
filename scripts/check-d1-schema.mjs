@@ -59,7 +59,7 @@ for (const database of databases) {
     console.error(
       `EMPTY   ${database.binding} (${database.database_name}) has no schema.` +
         (environment === "local"
-          ? " Run: pnpm --filter @seams/platform d1:migrate:local"
+          ? " Run: pnpm --filter @purin-labs/platform d1:migrate:local"
           : ""),
     );
     continue;

@@ -8,8 +8,8 @@ import type {
   MailAssistantResult,
   MailAssistantStatus,
   MailDecision,
-} from "@seams/control-api";
-import type { SessionProposal } from "@seams/contracts";
+} from "@purin-labs/control-api";
+import type { SessionProposal } from "@purin-labs/contracts";
 import type { Env } from "../env";
 import type { Result } from "../result";
 import {
@@ -60,7 +60,7 @@ import {
 import { readDecision } from "./reads";
 import { mailClassificationEvidence } from "./evidence";
 import { bindOperatorTurnAccess } from "../chat/turn-access";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type MailAssistantActorInput = MailOrganizationActorInput &
   Readonly<{

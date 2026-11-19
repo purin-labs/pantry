@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiEvents from "@seams/commerce-contracts/records/api-events";
+import type * as apiEvents from "@purin-labs/commerce-contracts/records/api-events";
 import type {
   CreateCommerceWebhookSubscriptionV1,
   DeleteCommerceWebhookSubscriptionV1,

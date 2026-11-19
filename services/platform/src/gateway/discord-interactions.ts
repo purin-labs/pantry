@@ -3,7 +3,7 @@ import type {
   DiscordGuildId,
 } from "../data/discord-install";
 import type { Result } from "../result";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type DiscordPublicKey = Uint8Array & { readonly length: 32 };
 

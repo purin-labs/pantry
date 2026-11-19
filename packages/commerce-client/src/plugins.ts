@@ -6,7 +6,7 @@ import type {
   CheckoutStage,
   PluginDefinition,
   PluginState,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { type CommerceEngineTimestamp } from "./commerce-resources.ts";
 import { type CommerceMutationErrorV1 } from "./mutations.ts";
@@ -28,7 +28,7 @@ import {
   parseWirePluginDefinition,
   parseWirePluginFields,
   parseWirePluginHandlers,
-} from "@seams/commerce-contracts/records/api-plugins";
+} from "@purin-labs/commerce-contracts/records/api-plugins";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;

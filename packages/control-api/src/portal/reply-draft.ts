@@ -2,14 +2,14 @@ import type {
   MailReplyPresenceSelection,
   MailReplyStateVector,
   MailReplyUpdate,
-} from "@seams/mail-reply-crdt";
+} from "@purin-labs/mail-reply-crdt";
 import {
   parseDraftServerMessage,
   type DraftFailureCode,
   type DraftServerMessage,
   type MailReplyRoomMetadata,
-} from "@seams/mail-reply-crdt/protocol";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/mail-reply-crdt/protocol";
+import { assertNever } from "@purin-labs/std";
 import type { TextCollaborationServerMessage } from "./text-collaboration.ts";
 
 export function parseReplyServerMessage(frame: unknown) {

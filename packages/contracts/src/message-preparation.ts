@@ -1,5 +1,5 @@
 import type { MessageAttachmentPreparationStateValue as GeneratedMessageAttachmentPreparationState } from "./attachment-preparation.ts";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 /**
  * Keeps pending and completed preparation fields exclusive for object-literal

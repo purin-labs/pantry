@@ -4,8 +4,8 @@ import {
   isPositiveInteger,
   isRecord,
   sameJson,
-} from "@seams/std";
-import type { CommerceEntityRef } from "@seams/contracts";
+} from "@purin-labs/std";
+import type { CommerceEntityRef } from "@purin-labs/contracts";
 
 /** One exact Memory revision. Turns, evals and receipts cite this pair. */
 export type MemoryRevisionRef = Readonly<{

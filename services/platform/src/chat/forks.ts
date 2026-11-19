@@ -7,23 +7,23 @@ import {
   conversationCaseIdentity,
 } from "./conversation-access";
 import { initialConversationCaseIdentity } from "./conversation-actor-identity";
-import { parseConversationId, isConversationId } from "@seams/control-api";
-import type { ConversationId } from "@seams/control-api";
+import { parseConversationId, isConversationId } from "@purin-labs/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import {
   compileTurnAuthority,
   CONTEXT_CASE_READ_CAPABILITY,
 } from "../authorization/access-grants/turn-authority";
-import { canonicalJson, sha256Hex, isRecord } from "@seams/std";
-import type { HarnessTurnLease } from "@seams/contracts";
+import { canonicalJson, sha256Hex, isRecord } from "@purin-labs/std";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { resolveActiveSessionActor } from "../actors/actor-router";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
 import type { Env } from "../env";
 import { parseSessionId, type OrganisationId, type UserId } from "../ids";
 import { FlowBinding, ObservationEvidence } from "../policy/information-flow";
-import type { RequestAuthority } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   normalizeConversationTimeline,
   parseConversation,
@@ -800,14 +800,14 @@ export async function listDerivedChats(
   scope: ConversationScope,
   sourceId: ConversationId,
   authority: Variant<RequestAuthority, "control">,
-): Promise<readonly import("@seams/control-api").ChatDerivedThread[]> {
+): Promise<readonly import("@purin-labs/control-api").ChatDerivedThread[]> {
   const rows = await placement.database
     .prepare(
       `SELECT c.conversation_id AS id, json_extract(c.state_json, '$.title') AS title, f.source_message_id AS sourceMessageId FROM portal_chat_fork f JOIN portal_conversation c ON c.organisation_id = f.organisation_id AND c.user_id = f.user_id AND c.conversation_id = f.destination_conversation_id WHERE f.organisation_id = ? AND f.user_id = ? AND f.source_conversation_id = ? AND f.status = 'ready' AND NOT EXISTS (SELECT 1 FROM portal_chat_deletion d WHERE d.organisation_id = c.organisation_id AND d.conversation_id = c.conversation_id) ORDER BY c.updated_at DESC LIMIT 50`,
     )
     .bind(scope.organisationId, scope.userId, sourceId)
     .all<{ id: string; title: string; sourceMessageId: string }>();
-  const visible: import("@seams/control-api").ChatDerivedThread[] = [];
+  const visible: import("@purin-labs/control-api").ChatDerivedThread[] = [];
   for (const row of rows.results) {
     if (!isConversationId(row.id)) throw new Error("chat_fork_storage_invalid");
     const stored = await readConversation(placement.database, scope, row.id);

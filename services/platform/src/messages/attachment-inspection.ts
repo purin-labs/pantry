@@ -2,7 +2,7 @@ import type {
   FrameSamplingOutcome,
   MediaMetadata,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { inspectMediaMetadata, sampleVideoFrames } from "./media-inspect";
 import {
@@ -12,8 +12,8 @@ import {
 import { extractPdfText } from "./pdf-document-text";
 import type { Result } from "../result";
 import { readDerivedStills } from "./derived-stills";
-import type { Variant } from "@seams/type-utils";
-import { sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { sha256Hex } from "@purin-labs/std";
 
 /**
  * Bounded inspection of one admitted attachment.

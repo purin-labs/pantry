@@ -2,7 +2,7 @@ import type { Result } from "../result";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import type { TypeSafeUsageLimits } from "../integrations/typesafe/evaluation-ledger";
 import { parseTypeSafeUsageLimits } from "../integrations/typesafe/evaluation-ledger";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   sameTypeSafeAuthority,
   type TypeSafeAuthority,

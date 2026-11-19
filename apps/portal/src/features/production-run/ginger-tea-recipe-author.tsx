@@ -1,10 +1,10 @@
 import React from "react";
-import { gingerBlackTeaRecipeInput } from "@seams/production-simulation/recipes/bakery/ginger-black-tea";
+import { gingerBlackTeaRecipeInput } from "@purin-labs/production-simulation/recipes/bakery/ginger-black-tea";
 import { prepareNativeRecipe } from "./oven-recipe-file";
 import {
   prepareGingerBlackTeaRecipe,
   type OvenRunSource,
-} from "@seams/production-simulation/runs/oven-run-file";
+} from "@purin-labs/production-simulation/runs/oven-run-file";
 import { prepareRecipe, RecipeChoice } from "./shared/recipe-form";
 
 type PanStaging = "manual" | "fairino-fr10";

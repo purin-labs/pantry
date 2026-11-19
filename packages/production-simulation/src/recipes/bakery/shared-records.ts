@@ -1,4 +1,4 @@
-import { canonicalJson } from "@seams/std";
+import { canonicalJson } from "@purin-labs/std";
 
 /** A shared physical resource or product must have one consistent definition. */
 export function sharedRecipeRecords<T extends Readonly<{ id: string }>>(

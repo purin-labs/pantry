@@ -4,14 +4,14 @@ import type {
   TerminalCounterReadback,
   TerminalPairingReadback,
   TerminalPairingRequest,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   type TerminalOperations,
   type TerminalOperationsView,
   parseOperationsEnvelope,
   parseOperationsOnlyEnvelope,
   parsePairingEnvelope,
-} from "@seams/control-api/portal/terminals";
+} from "@purin-labs/control-api/portal/terminals";
 
 export type TerminalMutationTransport = (
   path: string,

@@ -1,12 +1,12 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   parseMailClassifications,
   type MailClassification,
   type MailRule,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
 import type { Env } from "../env";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
@@ -23,7 +23,7 @@ import { JevMailRequest } from "./jev";
 import { mailClassificationEvidence } from "./evidence";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type MailEvaluationInput = Readonly<{
   organisationId: OrganisationId;

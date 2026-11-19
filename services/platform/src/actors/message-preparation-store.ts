@@ -2,15 +2,15 @@ import type {
   MessageAttachmentPreparationIdentity,
   MessageAttachmentPreparationReceipt,
   MessageAttachmentPreparationState,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   validateMessageAttachmentPreparationReceipt,
   validateMessageAttachmentPreparationState,
 } from "../messages/message-wasm";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 type MessagePreparationPending = Variant<
   MessageAttachmentPreparationState,

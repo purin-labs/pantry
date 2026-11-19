@@ -9,7 +9,7 @@ import type {
   BakerySurfaceCommandV1,
   BakerySurfaceContextV1,
 } from "./bakery-surface.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare function acceptWorkspaceView(action: BakeryWorkspaceViewAction): void;
 acceptWorkspaceView({ kind: "setCamera", camera: "overhead" });

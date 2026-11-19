@@ -4,11 +4,11 @@ import {
 } from "../action-mutation-execution";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
-import type { CommerceProjection } from "@seams/contracts";
+import type { CommerceProjection } from "@purin-labs/contracts";
 import {
   compileCommerceRelationshipTraversalStepSql,
   compileCommerceQuerySql,
-} from "@seams/commerce-query-sqlite";
+} from "@purin-labs/commerce-query-sqlite";
 import {
   beginOnboardingActivation,
   checkpointActivationStep,
@@ -157,8 +157,8 @@ import {
   flowBindingMatchesIdentity,
   FlowBinding,
 } from "../../policy";
-import { errorMessage } from "@seams/std";
-import type { CommerceProviderReceipt } from "@seams/control-api";
+import { errorMessage } from "@purin-labs/std";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import {
   CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY,
   activationExecutionFailure,

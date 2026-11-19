@@ -4,7 +4,7 @@ import type {
   MessageAttachmentPreparationIdentity,
   MessageAttachmentPreparationLimits,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
@@ -25,8 +25,8 @@ import {
   settleAttachmentPreparationAllocation,
   type AttachmentPreparationWorkspaceExecutorAllocation,
 } from "./workspace-execution-allocation";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 
 /**
  * The executor branch is a pre-model operation. Its lease and allocation are

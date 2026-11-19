@@ -26,7 +26,7 @@ import type {
   FirstPartyShipmentLifecycle,
   ShipmentPackage,
   SourceProvenance,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { CommerceCancellationAuthority } from "./action-model";
 import type { Result } from "../result";
 import {
@@ -61,9 +61,9 @@ import {
   type CommerceProductionBatchV1,
   type CommerceStockPolicyV1,
   parseShipmentEntityId,
-} from "@seams/commerce-client";
-import type { Variant } from "@seams/type-utils";
-import { decodeBase64Url, isPositiveInteger } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import type { Variant } from "@purin-labs/type-utils";
+import { decodeBase64Url, isPositiveInteger } from "@purin-labs/std";
 
 export interface CommerceDeliveryVerifier {
   verify(

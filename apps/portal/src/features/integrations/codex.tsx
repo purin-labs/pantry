@@ -1,16 +1,16 @@
 import React from "react";
 import { formatRelativeTime } from "../../page-components";
 import { formatAbsoluteTime } from "../../formatting";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
-import type { CodexAllowance } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { CodexAllowance } from "@purin-labs/control-api";
 import {
   InferenceIntegrationPanel,
   codexPanelHeading,
 } from "./inference";
 import { emptySettingsCleanup } from "./provider-authorization";
 import type { IntegrationsPageActions } from "./settings-types";
-import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@seams/control-api/portal/settings";
+import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 
 export function renderCodexConnection(
   props: Parameters<typeof InferenceIntegrationPanel>[0],

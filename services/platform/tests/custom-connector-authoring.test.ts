@@ -14,7 +14,7 @@ import {
 } from "../src/custom-connectors/basic-authentication";
 import type { MessageLinkEgress } from "../src/messages/link-reader";
 import type { JsonRecord } from "../src/control/http";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 const documents: readonly ConnectorDocumentation[] = [
   {
     url: "https://docs.easypost.com/markdown/docs/users.md",

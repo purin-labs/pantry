@@ -6,11 +6,11 @@ import {
   CommerceEntityPlaneClient,
   parseEntityPlaneCommand,
   parseCommerceGraphQuery,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CommerceEntity,
   CommerceEntityPlaneEffect,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   createFinancierSample,
   FINANCIER_SAMPLE_ID,

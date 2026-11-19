@@ -1,7 +1,7 @@
 import type {
   CheckoutProfile,
   PointOfSaleConfiguration,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   type ActivateCheckoutProfile,
   type ActiveStorefrontCheckoutProfile,

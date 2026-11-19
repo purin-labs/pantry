@@ -9,9 +9,9 @@ function ovenFinancierReady() {
 async function ovenFinancierBrowser() {
   const evidence = new URL(location.href).searchParams.get("evidence");
   if (evidence === null) throw new Error("Provide the headless evidence URL");
-  const { canonicalJson } = await import("/@id/@seams/std");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const { compileSavedOvenFinancier } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/financier");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/financier");
   const inputResponse = await fetch(`${evidence}/input.json`);
   const reportResponse = await fetch(`${evidence}/report.json`);
   const baselineResponse = await fetch(`${evidence}/baseline.json`);
@@ -21,7 +21,7 @@ async function ovenFinancierBrowser() {
   const expectedReport = await reportResponse.json();
   const baseline = await baselineResponse.json();
   const { parseProductionScenario } =
-    await import("/@id/@seams/bakery-model/bakery-production-scenario");
+    await import("/@id/@purin-labs/bakery-model/bakery-production-scenario");
   const definitionResponse = await fetch(`${evidence}/shared-definition.json`);
   if (!definitionResponse.ok) throw new Error("Missing shared definition");
   const definition = parseProductionScenario(await definitionResponse.json());

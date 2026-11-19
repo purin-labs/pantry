@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { ModelRoute } from "@seams/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";

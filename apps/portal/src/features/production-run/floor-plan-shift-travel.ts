@@ -2,16 +2,16 @@ import {
   durationFromSeconds,
   type CompiledScenario,
   type TravelRoute,
-} from "@seams/production-simulation";
-import { shiftTravel } from "@seams/production-simulation/recipes/bakery/bakery-shift";
+} from "@purin-labs/production-simulation";
+import { shiftTravel } from "@purin-labs/production-simulation/recipes/bakery/bakery-shift";
 import {
   APPLIANCE_FOOTPRINTS,
   STORE_DECOR_IDS,
   isApplianceId,
   type ApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import { computeRoomWalkDistanceMeters } from "../workflow-simulator/bakery-appliance-layout";
-import type { BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import type { BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import { floorPlanWorkspace } from "../workflow-simulator/floor-plan-workspace";
 import type { FactoryStationSource } from "../workflow-simulator/spatial/factory-stations";
 import { factoryStationsForScenario } from "./factory-places";

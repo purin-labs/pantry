@@ -1,4 +1,4 @@
-import type { CommerceClientError } from "@seams/commerce-client";
+import type { CommerceClientError } from "@purin-labs/commerce-client";
 
 import type { Env } from "../../env";
 import { resolveMerchantControlContext } from "../commerce-merchant";

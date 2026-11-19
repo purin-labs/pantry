@@ -1,4 +1,4 @@
-import { assertNever, canonicalJsonByCodePoint } from "@seams/std";
+import { assertNever, canonicalJsonByCodePoint } from "@purin-labs/std";
 import { parseCommandAuthorizationInput } from "./command-authorization-input.ts";
 import { parseCommerceEntityAuthority } from "./command-authority.ts";
 import { parseEntityLifecycleCommand } from "./entity-commands.ts";

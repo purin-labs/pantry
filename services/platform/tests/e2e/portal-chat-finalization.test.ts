@@ -5,7 +5,7 @@ import {
   isConversationId,
   parseChatSignal,
   SURFACE_EFFECT_SIGNAL,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { openSocket } from "./hibernatable-socket-support";
 import { parseStoredAttachment } from "../../src/messages/stored-attachment";
 import {
@@ -15,7 +15,7 @@ import {
 import {
   parseProjectReference,
   type ProjectSnapshot,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { currentProjectSnapshot } from "../../src/chat/project-context-binding";
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
 import { requireDefaultProjectId } from "../fixtures/default-project";
@@ -25,14 +25,14 @@ import { readProjectDirectory } from "../../src/chat/projects";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
 import { connectCommerceFixture } from "./commerce-support";
-import { CommerceAdminClient } from "@seams/commerce-client";
+import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { commerceCanonicalResourceId } from "../../src/commerce/provider";
-import { sampleSettings } from "@seams/bakery-model/bakery";
+import { sampleSettings } from "@purin-labs/bakery-model/bakery";
 import {
   rehearsalFromRecording,
   rehearsalSettings,
-} from "@seams/production-simulation/simulator/rehearsal-presets";
-import { isRecord, sha256Hex } from "@seams/std";
+} from "@purin-labs/production-simulation/simulator/rehearsal-presets";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 import { prepareRehearsalRunWorkspace } from "../../../../apps/portal/src/features/workflow-simulator/workspace-runs-api";
 import { responseJson } from "../../../../apps/portal/src/control-client";
 import { timelineVisibleMessages } from "../../src/chat/conversation";
@@ -51,7 +51,7 @@ import {
 } from "../../../../apps/portal/src/features/workflow-simulator/simulator-state";
 import { applyPlaybackAction } from "../../../../apps/portal/src/features/workflow-simulator/playback-actions";
 import ovenCycle from "../../../../assets/bakery-mujoco/fr10-workcell/recordings/oven-cycle.json";
-import { parsePhysicsReplay } from "@seams/bakery-model/bakery-physics";
+import { parsePhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import {
   parseBakerySurfaceAttachment,
   createBakerySurfaceAttachment,
@@ -62,7 +62,7 @@ import {
   type BakerySurfaceAttachmentV1,
   type BakerySurfaceEffectV1,
   type BakerySurfaceReceiptV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import { env, exports } from "cloudflare:workers";
 import {
   evictDurableObject,

@@ -4,7 +4,7 @@ import type {
   CommerceListEntryRef,
   CommerceRelationshipRef,
   PublishedCommerceSelector,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceEntityPlaneCommand,
   parseCommerceGraphQuery,
@@ -13,14 +13,14 @@ import {
   parsePublishedCommerceSelector,
   parseEntityPlaneCommandResult,
   type CommerceEntityPlanePublishedResourceMetadataResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   parseCommerceActionAmount,
   type CommerceActionRecord,
 } from "./commerce-actions.ts";
 import { parseCommerceExceptionInbox } from "./commerce-operations.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord, isString } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord, isString } from "@purin-labs/std";
 import type {
   AgentSkillRef,
   CommerceExceptionInbox,

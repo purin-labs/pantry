@@ -3,8 +3,8 @@ import type {
   CompiledScenario,
   HostView,
   WaitInterval,
-} from "@seams/production-simulation";
-import { canonicalJson } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { canonicalJson } from "@purin-labs/std";
 import { downloadBakeryFile } from "../workflow-simulator/file-download";
 
 /** Compact, read-only results. Recording packs and host histories stay with the run. */

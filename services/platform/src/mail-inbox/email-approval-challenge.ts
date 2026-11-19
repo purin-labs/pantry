@@ -1,4 +1,4 @@
-import { decodeBase64Url, encodeBase64Url } from "@seams/std";
+import { decodeBase64Url, encodeBase64Url } from "@purin-labs/std";
 import type { Env } from "../env";
 import { digestCanonical } from "../policy/information-flow/digest";
 

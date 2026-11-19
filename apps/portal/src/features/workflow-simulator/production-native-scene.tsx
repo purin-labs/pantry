@@ -1,11 +1,11 @@
 import type { WorkspaceCameraView } from "./simulator-state";
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
-import { physicsOutcome } from "@seams/production-simulation/recipes/bakery/physics-playback";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
+import { physicsOutcome } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import React from "react";
 import {
   continuationPrefix,
   type NativeBakeryTask,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { PhysicsSceneHost } from "./spatial/physics-scene-host";
 import { PlaybackTimeContext } from "./simulator-playback";
 import { LiveText } from "../production-run/shared/live";
@@ -15,8 +15,8 @@ import {
   loadWorkcellReplay,
   seekActivePlayback,
   recordingReplayView,
-} from "@seams/production-simulation/simulator/playback-state";
-import { workcellView } from "@seams/production-simulation/simulator/workcell-view";
+} from "@purin-labs/production-simulation/simulator/playback-state";
+import { workcellView } from "@purin-labs/production-simulation/simulator/workcell-view";
 
 type Props = Readonly<{
   cameraView: WorkspaceCameraView;

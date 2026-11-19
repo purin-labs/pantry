@@ -6,13 +6,13 @@ import type {
   GrantSubject,
   RequestAuthority,
   CommerceContextRequest,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceGraphQuery,
   parseCommerceGraphResponse,
   CommerceAdminClient,
   CommerceEntityPlaneClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { catalogHarnessToolCatalogDigest } from "../src/agent-tools/catalog/selection";
 import { createCatalogHarnessCodeMode } from "../src/agent-tools/catalog/code-mode";
@@ -31,7 +31,7 @@ import {
   parseCommerceEngineMerchantId,
 } from "../src/data/commerce-merchant-binding";
 import { parseOrganisationId } from "../src/ids";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   startCommerceWorker,
   type CommerceWorker,
@@ -958,7 +958,7 @@ function required<T>(
   return result.value;
 }
 function readToolResult(
-  result: import("@seams/contracts").AuthorizedHarnessToolResult,
+  result: import("@purin-labs/contracts").AuthorizedHarnessToolResult,
 ): unknown {
   if (
     result.output.kind !== "inline" ||

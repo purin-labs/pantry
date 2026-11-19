@@ -1,10 +1,10 @@
-import type { CheckoutProfile } from "@seams/contracts";
+import type { CheckoutProfile } from "@purin-labs/contracts";
 
 import type { CheckoutProfileCollection, DraftCheckoutProfileSummary, PublishedCheckoutProfileSummary } from "./api";
-import type { CheckoutProfileSummary } from "@seams/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
 import { formatMoneyMinor } from "../../formatting";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 export type { DraftCheckoutProfileSummary, PublishedCheckoutProfileSummary } from "./api";
 

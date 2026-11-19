@@ -18,8 +18,8 @@ import {
   parseEntityPlaneCommand,
   type CommerceAdminClient,
   type CommercePluginEntityTypeV1,
-} from "@seams/commerce-client";
-import type { PluginDefinition } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { PluginDefinition } from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import {

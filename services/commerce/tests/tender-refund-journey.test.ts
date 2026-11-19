@@ -10,7 +10,7 @@ import {
   type RefundCommerceOrderTendersV1,
   type CommerceAdminClient,
   type CommerceTenderRefundV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

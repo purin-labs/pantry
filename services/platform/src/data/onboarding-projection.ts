@@ -17,7 +17,7 @@ import type {
   OnboardingSupportReference,
   OnboardingWebhookHealth,
   OrganisationOnboardingLifecycle as SharedOrganisationOnboardingLifecycle,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { parseOrganisationId, type OrganisationId } from "../ids";
 import type {
@@ -42,9 +42,9 @@ import {
   type ReadinessBlocker,
   type SetupSelection,
 } from "./onboarding";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type OnboardingProjectionRow = {
   readonly organisationId: unknown;

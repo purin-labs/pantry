@@ -1,4 +1,4 @@
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 type CapabilityRef = Readonly<{
   capabilityId: string;

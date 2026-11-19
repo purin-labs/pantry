@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../src/database-handles";
-import { decodeBase64, encodeBase64Url, isRecord } from "@seams/std";
+import { decodeBase64, encodeBase64Url, isRecord } from "@purin-labs/std";
 import { organisationDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
@@ -19,7 +19,7 @@ import { storeFilePlacementCredential } from "../../src/provider-workflows/file-
 import type {
   ModelRoute,
   OrganisationCapabilityPolicy,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import {
@@ -37,7 +37,7 @@ import {
   newConversationId,
   type ConversationId,
   type ProjectId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   accountInteger,
   accountObject,

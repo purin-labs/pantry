@@ -7,13 +7,13 @@
 // hooks (step 4) run next to the stages: lines after pricing, discount after
 // the code discounts, tenders before stored value, delivery when the ready
 // time or the shipping quote is known, and validate on the priced quote.
-import type { CommerceResourcesV1 } from "@seams/commerce-client";
-import type { CommerceMutationErrorV1 } from "@seams/commerce-client";
+import type { CommerceResourcesV1 } from "@purin-labs/commerce-client";
+import type { CommerceMutationErrorV1 } from "@purin-labs/commerce-client";
 import type {
   CheckoutPluginRun,
   CheckoutQuoteSnapshot,
   CheckoutStoredValueTender,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../database.ts";
 import {

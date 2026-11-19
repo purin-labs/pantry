@@ -5,7 +5,7 @@ import { createOrganisationExecutionFixture } from "./organisation-execution-fix
 import type {
   CheckoutProfile,
   CheckoutProfileConfiguration,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const checkoutControlMocks = vi.hoisted(() => ({

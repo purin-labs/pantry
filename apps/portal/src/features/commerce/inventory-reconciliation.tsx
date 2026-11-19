@@ -3,15 +3,15 @@ import React from "react";
 import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseMutationResult,
   type ReconcileCommerceInventoryV1,
-} from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 import { controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
-import { parseInventoryQuantityText as inventoryQuantityInput } from "@seams/control-api";
+import { parseInventoryQuantityText as inventoryQuantityInput } from "@purin-labs/control-api";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 import {
   StockDialogCancel,

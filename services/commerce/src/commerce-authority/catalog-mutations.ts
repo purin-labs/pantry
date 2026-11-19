@@ -1,7 +1,7 @@
 // The mutations of the catalog commands: locations, listings, storefronts,
 // channel placements and catalog edits, as the ledger commits them.
 import { commitOfferPriceChange } from "../offer-price-persistence";
-import { type AdjustCommerceOfferPriceV1 } from "@seams/commerce-client";
+import { type AdjustCommerceOfferPriceV1 } from "@purin-labs/commerce-client";
 import {
   writeConsumptionPlan,
   writeStorefront,
@@ -30,7 +30,7 @@ import {
 } from "./catalog.ts";
 import { CollectionAuthority } from "../plugins/collections/index.ts";
 import { offerObservation } from "./observations.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   type ConfigureCommercePickupStorefrontV1,
   type ConfigureCommerceShippingStorefrontV1,
@@ -41,8 +41,8 @@ import {
   type CommerceOfferV1,
   type CommerceProductV1,
   type UpdateCommerceProductDescriptionV1,
-} from "@seams/commerce-client";
-import { type Storefront } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import { type Storefront } from "@purin-labs/commerce-contracts";
 import type { CommerceMutation, MerchantRow } from "./ledger.ts";
 
 export function locationMutation(

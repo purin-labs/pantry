@@ -1,7 +1,7 @@
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
-import { assertNever } from "@seams/std";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
+import { assertNever } from "@purin-labs/std";
 
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 import { acceptedExecutionAccountAuthority } from "../account-platform/access";
 import { authorizeConversation } from "../chat/conversation-access";

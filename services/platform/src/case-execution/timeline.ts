@@ -10,9 +10,9 @@ import {
   type OpenCaseExecutionNode,
   type ScheduleRun,
   type ScheduleRunsDay,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
-import { assertNever, parseJsonOrNull } from "@seams/std";
+import { assertNever, parseJsonOrNull } from "@purin-labs/std";
 
 import type { AccountConversationScope as ConversationScope } from "../account-platform/access";
 import { listVisibleChatTitles } from "../chat/store";
@@ -29,7 +29,7 @@ import {
   readCaseExecutionPage,
   type CaseExecutionReadError,
 } from "./access";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The Cases one timeline read summarises. Each costs a projection read. */
 const MAX_TIMELINE_CASES = 30;

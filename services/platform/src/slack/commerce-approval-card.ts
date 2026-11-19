@@ -24,7 +24,7 @@ import {
 } from "../commerce/menu-price-action";
 import type { Env } from "../env";
 import { requirePublicOrigin } from "../public-origin";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 const NOTICE_DELIVERY_PREFIX = "delivery_commerce_notice_";
 const OUTCOME_DELIVERY_PREFIX = "delivery_commerce_";

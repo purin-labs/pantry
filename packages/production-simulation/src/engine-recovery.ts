@@ -1,5 +1,5 @@
 import { setStorage } from "./engine-storage.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { rejectRecoveredBatchMember } from "./engine-batches.ts";
 import type { CommandRejection, ControlCommand } from "./commands.ts";
 import { claimResource, releaseTaskResources } from "./engine-resources.ts";

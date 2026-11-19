@@ -2,7 +2,7 @@ import type {
   ShipmentLabelRateSnapshot,
   ShippingQuoteSnapshot,
   ShippingRouteBinding,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 type ShippingRouteAuthority = Readonly<{
   routeBinding: ShippingRouteBinding;

@@ -8,16 +8,16 @@ import {
   type CostsSheetSelection,
   type CostsSheetStateVector,
   type CostsSheetUpdate,
-} from "@seams/costs-sheet-crdt";
+} from "@purin-labs/costs-sheet-crdt";
 import {
   encodeCostsSheetServerMessage,
   FRAME_LIMIT,
   parseCostsSheetClientMessage,
   type CostsSheetFailureCode,
   type CostsSheetRoomMetadata,
-} from "@seams/costs-sheet-crdt/protocol";
-import type { CollaborationAgent } from "@seams/collaboration";
-import { assertNever, sha256Hex } from "@seams/std";
+} from "@purin-labs/costs-sheet-crdt/protocol";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";

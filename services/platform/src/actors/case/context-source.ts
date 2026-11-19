@@ -7,7 +7,7 @@ import type {
   CaseContent,
   RequestAuthority,
   UserMessage,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import {
   parseCaseId,
@@ -50,7 +50,7 @@ import {
   isRecord,
   isSha256Hex,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   equal,
   invalid,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Attachment, InlineCitations, type CitationSource } from "../../ui";
-import type { ChatSource } from "@seams/control-api";
+import type { ChatSource } from "@purin-labs/control-api";
 import { Globe, ArrowUpRight } from "lucide-react";
 import {
   Trace,

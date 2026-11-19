@@ -10,11 +10,11 @@ import {
   type CommerceInventoryPositionV1,
   type CommerceLotAllocationV1,
   type CommerceQuantityUnit,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "./database.ts";
 import { writeCommerceEntityRelationText } from "./entity-plane/relation-text.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type InventoryItemRow = Readonly<{
   inventoryItemId: string;

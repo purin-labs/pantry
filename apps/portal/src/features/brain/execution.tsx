@@ -17,8 +17,8 @@ import type {
   CaseExecutionLimitation,
   CaseExecutionNode,
   CaseExecutionNodeDetail,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import { formatAbsoluteTime } from "../../formatting";
 import {

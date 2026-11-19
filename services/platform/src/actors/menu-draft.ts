@@ -8,7 +8,7 @@ import {
   type MenuDraftStateVector,
   type MenuDraftUpdate,
   type MenuPresenceSelection,
-} from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftServerMessage,
   FRAME_LIMIT,
@@ -16,9 +16,9 @@ import {
   type MenuDraftClientMessage,
   type MenuDraftFailureCode,
   type MenuRoomMetadata,
-} from "@seams/menu-draft-crdt/protocol";
+} from "@purin-labs/menu-draft-crdt/protocol";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import type { CollaborationAgent } from "@seams/collaboration";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import { controlError } from "../control/http";
 import { resolveUser } from "../data/control-plane";
@@ -32,7 +32,7 @@ import {
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
 } from "./collaboration-room";
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 

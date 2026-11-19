@@ -9,11 +9,11 @@
 // oversell. A request that the snapshot cannot answer, such as a signed-in
 // customer's session or a token for another storefront revision, goes to the
 // merchant object, which decides as before.
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   parseCreateBuyerSessionCommand,
   type CommerceBuyerCatalogV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { BuyerSessionAuthority } from "./buyer-session.ts";
 import { catalogSearchRequest, searchCatalog } from "./catalog-search.ts";

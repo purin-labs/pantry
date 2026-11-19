@@ -1,9 +1,9 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   controlApiProblemMessage,
   parseControlApiProblem,
   type ControlErrorKind,
-} from "@seams/control-api/portal/errors";
+} from "@purin-labs/control-api/portal/errors";
 
 export type ControlMutationIntent =
   string | Readonly<{ kind: "prepared"; idempotencyKey: string }>;

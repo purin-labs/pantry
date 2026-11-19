@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /**
  * What waits for one person's decision in the Brain. Each number counts

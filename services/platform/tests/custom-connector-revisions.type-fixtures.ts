@@ -2,7 +2,7 @@ import type {
   CustomConnectorRevisionRecord,
   ParsedCustomConnectorDefinition,
 } from "../src/custom-connectors";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 type DraftRevision = VariantBy<
   CustomConnectorRevisionRecord,

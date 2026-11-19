@@ -6,11 +6,11 @@ import {
   parseCommerceSnapshotRevision,
   parseSystemSchemaRevision,
   type CommerceEntityPlaneFetch,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CommerceEntityRef,
   CommerceReadWatermark,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
 import {
   buildCommerceGraphQueryPlanRequest,

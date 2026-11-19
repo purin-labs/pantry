@@ -1,11 +1,11 @@
-import type { ConversationId } from "@seams/control-api";
-import type { PortalChatStreamRecord as ChatStreamRecord } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
-import { isRecord, parseJsonOrNull } from "@seams/std";
-import { parseChatStreamRecord } from "@seams/control-api/portal/chat-stream";
+import type { ConversationId } from "@purin-labs/control-api";
+import type { PortalChatStreamRecord as ChatStreamRecord } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
+import { parseChatStreamRecord } from "@purin-labs/control-api/portal/chat-stream";
 import { controlStream } from "../../control-client";
 
-export type { PortalChatStreamRecord as ChatStreamRecord } from "@seams/contracts";
+export type { PortalChatStreamRecord as ChatStreamRecord } from "@purin-labs/contracts";
 
 export async function readChatStream(input: {
   readonly organisationId: string;

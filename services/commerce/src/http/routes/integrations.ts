@@ -1,7 +1,7 @@
 import type { BuyerRoute, CommerceRoute } from "../../http-routes.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { ApiAccess, CredentialCommandResult } from "../../api-access.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import { hasMerchantId, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";

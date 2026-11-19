@@ -19,7 +19,7 @@ import {
   type JsonRecord,
 } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
-import { hasExactKeys, isPositiveInteger } from "@seams/std";
+import { hasExactKeys, isPositiveInteger } from "@purin-labs/std";
 import { agentMailboxConnector } from "../../../mail-inbox/agent-mailbox-connector";
 import {
   emailApprovalChallenge,

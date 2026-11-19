@@ -1,6 +1,6 @@
 import { paddedStandardBase64 } from "../lenient-base64";
 import type { Result } from "../result";
-import { decodeBase64, isRecord, parseJsonOrNull } from "@seams/std";
+import { decodeBase64, isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 /**
  * Google Cloud Pub/Sub push authentication. Push requests carry a

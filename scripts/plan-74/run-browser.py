@@ -85,7 +85,7 @@ def main() -> None:
     session = "plan74-" + run_id
     persistence = ROOT / "tmp" / ("plan74-browser-" + run_id)
     config = ROOT / "scripts/plan-74/wrangler.jsonc"
-    wrangler = ["pnpm", "--filter", "@seams/platform", "exec", "wrangler"]
+    wrangler = ["pnpm", "--filter", "@purin-labs/platform", "exec", "wrangler"]
     spec = importlib.util.spec_from_file_location(
         "browser_runner", ROOT / "scripts/plan-53/run-browser.py"
     )
@@ -129,7 +129,7 @@ def main() -> None:
             )
         processes.append(backend)
         portal_command = [
-            "pnpm", "--filter", "@seams/portal", "exec", "vite", "--config",
+            "pnpm", "--filter", "@purin-labs/portal", "exec", "vite", "--config",
             str(ROOT / "scripts/plan-74/vite.config.ts"),
         ]
         with (artifacts / "portal.log").open("w") as log:

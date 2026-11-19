@@ -1,4 +1,4 @@
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 
 const BROWSER_KEY = "satyr:bakery-browser-instance";
 let identity: Promise<string> | null = null;

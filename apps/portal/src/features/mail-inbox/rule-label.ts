@@ -1,5 +1,5 @@
-import type { MailRule } from "@seams/control-api";
-import { assertNever } from "@seams/std";
+import type { MailRule } from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 export function mailRuleLabel(rule: MailRule): string {
   switch (rule.kind) {

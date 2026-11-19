@@ -21,15 +21,15 @@ import {
   type ProviderConnectionState,
 } from "../../provider-onboarding";
 import { DEFAULT_MAILBOX_POLICY, mailboxAuthorizationNotice, gmailPauseCopy, type MailboxInstallationOption } from "../../pages/agent-mailbox";
-import type { AgentMailboxView, MailboxProcessingView } from "@seams/control-api/portal/agent-mailbox";
+import type { AgentMailboxView, MailboxProcessingView } from "@purin-labs/control-api/portal/agent-mailbox";
 import { ConsentPoint } from "./connect-consent-dialog";
 import { EmailReviewSurface } from "../email-review/review";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   encodeMailboxSetupAgentChoice,
   parseMailboxSetupAgentChoice,
   type MailboxSetupPlan,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   ACCESS_REQUIREMENTS,
   actionHint,
@@ -70,7 +70,7 @@ import {
   renderMutationFeedback,
 } from "./settings-support";
 import type { IntegrationsPageActions } from "./settings-types";
-import type { OrganisationInferenceSelection } from "@seams/control-api/portal/settings";
+import type { OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import { inferenceRouteName } from "./slack";
 
 /**

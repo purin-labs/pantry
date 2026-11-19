@@ -3,8 +3,8 @@ import {
   isRecord,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
-} from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 /** Why the mailbox agent stopped, as far as the Inbox names it. */
 export type MailAgentPause = StrictUnion<

@@ -4,7 +4,7 @@ import {
   StreamableHttpTransport,
   type Tool,
 } from "@earendil-works/pi-mcp";
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 import { digestCanonical } from "../policy/information-flow/digest";
 import type { Result } from "../result";
 import {
@@ -16,7 +16,7 @@ import {
   type CustomConnectorFetchNamespace,
 } from "./egress";
 import type { JsonObject } from "./definition";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type ReviewedConnectorOperationRequest =
   | (Variant<CustomConnectorOperationRequest, "get" | "post_json"> & {

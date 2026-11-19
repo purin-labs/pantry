@@ -4,8 +4,8 @@ import {
   parseCommerceActionExecutionResponse,
   parseCommerceActionRecordResponse,
   type CommerceActionRecord,
-} from "@seams/control-api/portal/commerce-actions";
-import { parseCommerceApprovalResponse } from "@seams/control-api/portal/portal-reads";
+} from "@purin-labs/control-api/portal/commerce-actions";
+import { parseCommerceApprovalResponse } from "@purin-labs/control-api/portal/portal-reads";
 import { ControlApiError, controlMutation, controlRead } from "../../control-client";
 import {
   clearPendingCommerceApproval,

@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiFoodService from "@seams/commerce-contracts/records/api-food-service";
+import type * as apiFoodService from "@purin-labs/commerce-contracts/records/api-food-service";
 import type {
   QuantityInput,
   CompleteProductionBatchCommand,

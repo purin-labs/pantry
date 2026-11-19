@@ -25,7 +25,7 @@ import {
   type StripeWebhookError,
 } from "./connector";
 import type { Result } from "../result";
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 import { revokeAccountRemovedAtProvider } from "../provider-lifecycle/provider-revocation";
 import {
   decodePathSegmentValue,

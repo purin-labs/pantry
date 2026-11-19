@@ -1,5 +1,5 @@
 import React from "react";
-import { batchTimeline, duration, finishDifference, largestWait } from "@seams/production-simulation/simulator/demo";
+import { batchTimeline, duration, finishDifference, largestWait } from "@purin-labs/production-simulation/simulator/demo";
 import {
   clock,
   describe,
@@ -10,7 +10,7 @@ import {
   type Batch,
   type Interval,
   type Run,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { downloadBakeryFile } from "./file-download";
 
 type ComparisonProps = {

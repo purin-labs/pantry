@@ -1,20 +1,20 @@
 import type {
   BakeryProductionReplacement,
   BakeryProductionReplacementSource,
-} from "@seams/bakery-model/bakery-surface";
-import type { ScheduleSpatialLayout } from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/bakery-model/bakery-surface";
+import type { ScheduleSpatialLayout } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   bakeryFingerprint,
   parseSettings,
   fields,
   type Settings,
-} from "@seams/bakery-model/bakery";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parsePhysicsRequest,
   workcellModelHash,
   type PhysicsReplay,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   productionAssignmentId,
   productionInitialPresentation,
@@ -25,7 +25,7 @@ import {
   type ProductionPresentation,
   type ProductionScenario,
   type ProductionTaskChoice,
-} from "@seams/bakery-model/bakery-production-scenario";
+} from "@purin-labs/bakery-model/bakery-production-scenario";
 import { readBundledExample } from "./bundled-example.ts";
 import type {
   ProductionDraftIdentity,
@@ -37,13 +37,13 @@ import {
   compileProductionWorkcells,
   type ProductionWorkcell,
   type ProductionWorkcells,
-} from "@seams/production-simulation/recipes/bakery/production-workcells";
-import type { ReadExample } from "@seams/production-simulation/simulator/rehearsal-presets";
+} from "@purin-labs/production-simulation/recipes/bakery/production-workcells";
+import type { ReadExample } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import { readyProduction } from "./scheduled-rehearsal.ts";
 import {
   compileWorkcellInput,
   type TransferInput,
-} from "@seams/production-simulation/recipes/bakery/workcell-input";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
 
 // Financier production authoring. Edit production and chat both change the
 // draft through editProductionDraft and compile it with

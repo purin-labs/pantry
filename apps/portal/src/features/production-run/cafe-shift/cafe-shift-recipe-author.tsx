@@ -6,7 +6,7 @@ import {
   type CafeShiftGrinder,
   type CafeShiftRecipeConfig,
   type CafeShiftStaffing,
-} from "@seams/production-simulation/recipes/cafe-shift/model";
+} from "@purin-labs/production-simulation/recipes/cafe-shift/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{

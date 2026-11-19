@@ -9,8 +9,8 @@ import {
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { decodeChecked } from "./sorted-unions.ts";
-import { assertNever } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 import { validTimestamp } from "./commerce-timestamp.ts";
 export { validTimestamp } from "./commerce-timestamp.ts";

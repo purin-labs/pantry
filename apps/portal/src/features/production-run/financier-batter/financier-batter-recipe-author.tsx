@@ -5,7 +5,7 @@ import {
   type FinancierBatterRecipeConfig,
   type FinancierHobModel,
   type FinancierMixerTool,
-} from "@seams/production-simulation/recipes/financier-batter/model";
+} from "@purin-labs/production-simulation/recipes/financier-batter/model";
 import { RecipeChoice } from "../shared/recipe-form";
 
 type Props = Readonly<{

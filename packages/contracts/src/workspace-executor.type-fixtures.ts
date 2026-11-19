@@ -1,7 +1,7 @@
 import type { FrameSamplingOutcome } from "./media-inspect.ts";
 import type { WorkspaceExecutorInspectionOperation } from "./workspace-executor.ts";
-import type { ContractDecodeResult } from "@seams/commerce-contracts/schema";
-import type { Variant } from "@seams/type-utils";
+import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const decodedFrames: Variant<FrameSamplingOutcome, "sampled">;
 declare const sourceSha256: string;

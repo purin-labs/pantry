@@ -1,5 +1,5 @@
-import { isSideCaseProposalId } from "@seams/control-api";
-import { errorMessage, isRecord, parseJsonOrNull } from "@seams/std";
+import { isSideCaseProposalId } from "@purin-labs/control-api";
+import { errorMessage, isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import type { SlackSideCaseStartRefusal } from "../actors/connector-side-case";

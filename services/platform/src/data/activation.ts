@@ -6,7 +6,7 @@ import {
 import type {
   FirstOperationalTask,
   OnboardingActivationPhase,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   newActivationAttemptId,
@@ -41,8 +41,8 @@ import {
   prepareFirstOperationalTask,
   readFirstOperationalTask,
 } from "./first-operational-task";
-import type { Variant } from "@seams/type-utils";
-import { positiveIntegerOrNull } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { positiveIntegerOrNull } from "@purin-labs/std";
 
 export type ActivationStep =
   "readiness" | "placement" | "policy" | "cues" | "accounts" | "publish";

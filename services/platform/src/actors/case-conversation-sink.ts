@@ -1,5 +1,5 @@
-import type { AuthorityPartition, RequestAuthority } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { AuthorityPartition, RequestAuthority } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 
 import type { Env } from "../env";
 import { decideFlowSink, type FlowBinding } from "../policy";

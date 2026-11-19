@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 import {
   parseDeviceActivity,
   type KitchenDeviceView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";

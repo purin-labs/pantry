@@ -1,4 +1,4 @@
-import { hasExactKeys, isNonNegativeInteger, isRecord } from "@seams/std";
+import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /**
  * The failed payments of a day, with the retries that followed them. A decline

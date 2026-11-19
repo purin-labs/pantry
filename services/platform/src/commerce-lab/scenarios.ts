@@ -5,12 +5,12 @@ import type {
   LabShipmentV1,
   LabTrackingEventKindV1,
   LabTrackingEventV1,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Result } from "../result";
 import { COMMERCE_LAB_CATALOG_VERSION, COMMERCE_LAB_PRODUCTS } from "./catalog";
-import type { VariantBy } from "@seams/type-utils";
-import { exhaustiveList } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { exhaustiveList } from "@purin-labs/std";
 
 export const COMMERCE_LAB_SCENARIO_VERSION = 1 as const;
 

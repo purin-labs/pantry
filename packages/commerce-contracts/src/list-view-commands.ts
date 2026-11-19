@@ -7,8 +7,8 @@ import {
 } from "./schema.ts";
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever } from "@seams/std";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   authorityTargetSchemas,
   authorityTargetWireSchemas,

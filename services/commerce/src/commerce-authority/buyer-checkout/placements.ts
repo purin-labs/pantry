@@ -7,12 +7,12 @@ import type {
   CommerceMutationErrorV1,
   CommerceOrderV1,
   CommercePaymentV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   Checkout,
   CheckoutPaymentAttempt,
   CheckoutProfileReference,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { refundAttemptMoney } from "../../payments/position.ts";
 import type { StoredRefundAttempt } from "../../payments/payment-records.ts";
 import {
@@ -22,7 +22,7 @@ import {
 } from "../checkout-shared.ts";
 import { refundAdjustmentId } from "../after-sale-cancellation.ts";
 import { storedValuePaymentId } from "../../plugins/stored-value/index.ts";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { BuyerCheckoutProfileClaims } from "./types.ts";
 
 export function onlyBuyerOrder(

@@ -1,6 +1,6 @@
-import type { RequestAuthority } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
-import { canonicalJson } from "@seams/std";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import { canonicalJson } from "@purin-labs/std";
 import type { OrganisationId } from "../../ids";
 import type { FlowAudience } from "./types";
 

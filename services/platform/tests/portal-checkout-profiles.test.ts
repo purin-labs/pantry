@@ -1,4 +1,4 @@
-import type { CheckoutProfileConfiguration } from "@seams/contracts";
+import type { CheckoutProfileConfiguration } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

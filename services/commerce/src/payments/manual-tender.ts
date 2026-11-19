@@ -2,7 +2,7 @@
 // the counter, or a bank transfer with the reference on the statement. The
 // tender belongs to one captured payment. Commerce resolves a refund of
 // that payment itself, and staff return the money the same way.
-import type { CommerceManualTenderV1 } from "@seams/commerce-client";
+import type { CommerceManualTenderV1 } from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
 

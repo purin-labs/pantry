@@ -1,5 +1,5 @@
-import type { StrictUnion } from "@seams/type-utils";
-import type { FloorPlanOpening } from "@seams/production-simulation/floor/openings";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import type { FloorPlanOpening } from "@purin-labs/production-simulation/floor/openings";
 import { pickFloorPlanOpening } from "./spatial/floor-plan-openings-3d";
 import { floorPlanWorkspace } from "./floor-plan-workspace";
 import { createBakeryGrid, updateBakeryGrid } from "./spatial/bakery-grid";
@@ -9,7 +9,7 @@ import {
   poseArticulatedHumanWorker,
   type ArticulatedHumanWorker,
 } from "./spatial/human-worker-figure";
-import { type StationId } from "@seams/bakery-model/bakery";
+import { type StationId } from "@purin-labs/bakery-model/bakery";
 import * as THREE from "three";
 import type { SceneLabelMode } from "./simulator-state";
 import { CanvasResize } from "./canvas-resize";
@@ -18,8 +18,8 @@ import {
   layoutMotionActive,
   layoutMotionResizing,
 } from "../../layout-motion";
-import { machineAttention, machineSummary } from "@seams/production-simulation/simulator/demo";
-import { selectionContext, type Selection } from "@seams/production-simulation/simulator/selection";
+import { machineAttention, machineSummary } from "@purin-labs/production-simulation/simulator/demo";
+import { selectionContext, type Selection } from "@purin-labs/production-simulation/simulator/selection";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import {
@@ -34,7 +34,7 @@ import {
   type BakeryLightingRig,
 } from "./spatial/scene-lighting";
 import { FloorPlan } from "./spatial/floor-plan";
-import { bakeryRoom, type BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import { bakeryRoom, type BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   getApplianceHandoffPoint,
   getApplianceLocalHandoffPoint,
@@ -49,14 +49,14 @@ import {
   rotateApplianceWithCollisions,
   setApplianceRotationWithCollisions,
 } from "./bakery-appliance-layout";
-import { getApplianceBox } from "@seams/production-simulation/floor/collisions";
+import { getApplianceBox } from "@purin-labs/production-simulation/floor/collisions";
 import {
   APPLIANCE_FOOTPRINTS,
   REHEARSAL_APPLIANCE_IDS,
   STORE_DECOR_IDS,
   isApplianceId,
   type ApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import {
   createFloorPlanShell,
   type FloorPlanShell,
@@ -97,8 +97,8 @@ import {
   type VitrineCustomerOrder,
   vitrineStockAt,
   workName,
-} from "@seams/production-simulation/recipes/bakery/schedule";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import { assertNever } from "@purin-labs/std";
 export type SceneGesture = StrictUnion<
   | { kind: "idle" }
   | {

@@ -9,7 +9,7 @@ import {
   CommerceEntityPlaneClient,
   parseCommerceGraphQuery,
   type CommerceAdminClient,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

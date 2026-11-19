@@ -9,11 +9,11 @@ import {
   type CarrierRateQuoteProviderRequest,
   type CarrierRateQuoteProviderResult,
 } from "../../checkout-carrier-rate-provider.ts";
-import { isNormalizedText } from "@seams/std";
+import { isNormalizedText } from "@purin-labs/std";
 import {
   COMMERCE_EUROPEAN_UNION_COUNTRIES,
   type CommerceShippingCountry,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 type JapanCarrierRate = Readonly<{
   providerAccountReference: string;

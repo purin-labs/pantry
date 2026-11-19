@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
-import { trayHandoff, taskWait, waitLabel } from "@seams/production-simulation/simulator/task-guidance";
-import type { WorkcellView } from "@seams/production-simulation/simulator/workcell-view";
-import { workcellStatusLabel } from "@seams/production-simulation/simulator/workcell-view";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
-import type { WorkcellResourceId } from "@seams/production-simulation/recipes/bakery/workcell-input";
-import { workcellResource } from "@seams/production-simulation/recipes/bakery/workcell-input";
+import { trayHandoff, taskWait, waitLabel } from "@purin-labs/production-simulation/simulator/task-guidance";
+import type { WorkcellView } from "@purin-labs/production-simulation/simulator/workcell-view";
+import { workcellStatusLabel } from "@purin-labs/production-simulation/simulator/workcell-view";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
+import type { WorkcellResourceId } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
+import { workcellResource } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
 import type { PhysicsModel } from "./physics-model";
 
 /** One task/resource mapping supplies scene pins and their keyboard list. */

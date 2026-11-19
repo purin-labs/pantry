@@ -1,4 +1,4 @@
-import type { BakeryRehearsalExample } from "@seams/bakery-model/bakery-surface";
+import type { BakeryRehearsalExample } from "@purin-labs/bakery-model/bakery-surface";
 import exampleUrl from "../../../../../assets/bakery-mujoco/fr10-workcell/recordings/nominal.json?url";
 import ovenExampleUrl from "../../../../../assets/bakery-mujoco/fr10-workcell/recordings/oven-loading.json?url";
 import cycleExampleUrl from "../../../../../assets/bakery-mujoco/fr10-workcell/recordings/oven-cycle.json?url";

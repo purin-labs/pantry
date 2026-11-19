@@ -53,7 +53,7 @@ import {
   createBakerySurfaceAttachment,
   createBakerySurfaceEffect,
   createBakerySurfaceReceipt,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 
 const mocks = vi.hoisted(function chatMocks() {
   return {

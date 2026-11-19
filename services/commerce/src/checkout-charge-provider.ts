@@ -7,8 +7,8 @@ import type {
   DutyQuoteSnapshot,
   InternationalDutyIncoterm,
   TaxQuoteSnapshot,
-} from "@seams/commerce-contracts";
-import type { CommerceShippingCountry } from "@seams/commerce-client";
+} from "@purin-labs/commerce-contracts";
+import type { CommerceShippingCountry } from "@purin-labs/commerce-client";
 
 type JpyMoney = Readonly<{ amountMinor: number; currency: "JPY" }>;
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Plus, X } from "lucide-react";
-import type { Chat } from "@seams/control-api/portal/chat";
-import { sharedChatMayCarry } from "@seams/control-api";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
+import { sharedChatMayCarry } from "@purin-labs/control-api";
 import {
   surfaceOnScreenView,
   useSurfaceOnScreenView,

@@ -32,7 +32,7 @@ import {
   isMenuBoardProductLook,
   MENU_BOARD_PRODUCT_LOOKS,
   type MenuBoardProductLook,
-} from "@seams/menu-board-crdt";
+} from "@purin-labs/menu-board-crdt";
 import type { MenuBoardArchiveRequest, MenuBoardCreateRequest } from "../catalog/types";
 import type {
   MenuBoardEdit,
@@ -41,13 +41,13 @@ import type {
   MenuBoardStackSettings,
 } from "../../actors/menu-boards";
 import type { MenuPriceProposalRequest } from "../../actors/harness-commerce-proposal";
-import { assertNever, hasExactKeys, isRecord } from "@seams/std";
+import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   parseWorkflowCanvasMoveArgs,
   parseWorkflowCanvasReadArgs,
 } from "../../actors/workflow-canvas-tools";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { CANVAS_BOUNDS } from "@seams/workflow-canvas-crdt";
+import { CANVAS_BOUNDS } from "@purin-labs/workflow-canvas-crdt";
 import { defineTool, jsonSchema } from "../define-tool";
 
 const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_:-]{1,256}$/;

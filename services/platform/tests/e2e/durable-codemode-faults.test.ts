@@ -1,6 +1,6 @@
 import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   DISCOVER_INTEGRATION_LIST,
   controlSandbox,

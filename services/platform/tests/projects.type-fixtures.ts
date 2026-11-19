@@ -1,11 +1,11 @@
-import type { ConversationId, ProjectId } from "@seams/control-api";
+import type { ConversationId, ProjectId } from "@purin-labs/control-api";
 declare const fixtureProject: ProjectId;
 declare const fixtureConversation: ConversationId;
 import type {
   ChatPlacement,
   ChatDestination,
   ChatInsertion,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 // @ts-expect-error A chat placement names its Project.
 const missingProject: ChatPlacement = { membershipRevision: 1, position: 0 };
 // @ts-expect-error No placement stands outside a Project.
@@ -23,7 +23,7 @@ void fixtureProject;
 import type {
   ProjectLayer,
   ProjectReferenceObservation,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 // @ts-expect-error A project layer requires its content and membership revisions.
 const missingLayer: ProjectLayer = { kind: "project", projectId: fixtureProject };
 const inherited = {

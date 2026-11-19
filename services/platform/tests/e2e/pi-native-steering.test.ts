@@ -13,7 +13,7 @@ import type {
   EmbeddedHarnessUserInput,
 } from "../../src/actors/embedded-harness";
 import { toHistoryContent } from "../../src/actors/pi-user-input";
-import type { UserMessage } from "@seams/contracts";
+import type { UserMessage } from "@purin-labs/contracts";
 import { RecordingBoundary, sdkInput } from "./pi-sdk-support";
 import { openRouterText } from "./slack-journey-support";
 import { network } from "./network";

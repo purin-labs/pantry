@@ -7,7 +7,7 @@ import {
 } from "typebox";
 import { HasCodec, Value } from "typebox/value";
 import type { TLocalizedValidationError } from "typebox/error";
-import { canonicalJsonByCodePoint, sha256Hex } from "@seams/std";
+import { canonicalJsonByCodePoint, sha256Hex } from "@purin-labs/std";
 import {
   cleanCheckedRecord,
   fillRecordDefaults,

@@ -4,18 +4,18 @@ import {
   type CompiledScenario,
   type HostView,
   type TravelRoute,
-} from "@seams/production-simulation";
-import { isRecord } from "@seams/std";
-import type { BakeryProductionControl } from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/production-simulation";
+import { isRecord } from "@purin-labs/std";
+import type { BakeryProductionControl } from "@purin-labs/bakery-model/bakery-surface";
 import {
   APPLIANCE_FOOTPRINTS,
   isApplianceId,
-} from "@seams/production-simulation/floor/appliance-catalogue";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import {
   moveApplianceWithCollisions,
   rotateApplianceWithCollisions,
 } from "../workflow-simulator/bakery-appliance-layout";
-import type { BakeryFloorPlanId } from "@seams/production-simulation/floor/bakery-room";
+import type { BakeryFloorPlanId } from "@purin-labs/production-simulation/floor/bakery-room";
 import { floorPlanWorkspace } from "../workflow-simulator/floor-plan-workspace";
 import type { ExecutionWorker } from "./execution-client";
 import { factoryStationsForScenario } from "./factory-places";
@@ -25,8 +25,8 @@ import {
   sameTravelDurations,
   scenarioPeerApplianceIds,
 } from "./floor-plan-shift-travel";
-import type { OvenRunSource } from "@seams/production-simulation/runs/oven-run-file";
-import type { Variant } from "@seams/type-utils";
+import type { OvenRunSource } from "@purin-labs/production-simulation/runs/oven-run-file";
+import type { Variant } from "@purin-labs/type-utils";
 
 type FloorPlanTravelSyncHooks = Readonly<{
   isMounted: () => boolean;

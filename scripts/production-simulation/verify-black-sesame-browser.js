@@ -90,7 +90,7 @@ async function download(page, name) {
   return path;
 }
 async function compareRecipeRuns({ authored, continued, evidence }) {
-  const { canonicalJson } = await import("/@id/@seams/std");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const first = (await (await fetch(`/@fs/${authored}`)).json()).document.state;
   const next = (await (await fetch(`/@fs/${continued}`)).json()).document.state;
   const expected = (await (await fetch(`${evidence}/completed.json`)).json())

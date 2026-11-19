@@ -11,7 +11,7 @@ import {
   InformationFlowContext,
   ObservationEvidence,
 } from "../policy";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 

@@ -38,7 +38,7 @@ import {
   applyFileProjectionCommand,
   type FileProjectionCommand,
 } from "../context/files";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,
   handleCommerceDeliveryQueueMessage,

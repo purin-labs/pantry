@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import recording from "../../../assets/bakery-mujoco/fr10-workcell/recordings/nominal.json";
-import { parsePhysicsReplay } from "@seams/bakery-model/bakery-physics";
-import { sampleSettings } from "@seams/bakery-model/bakery";
+import { parsePhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
+import { sampleSettings } from "@purin-labs/bakery-model/bakery";
 import { WorkspaceRunsPanel } from "../../../apps/portal/src/features/workflow-simulator/workspace-runs-panel";
 import { ControlApiError } from "../../../apps/portal/src/control-client";
 import { editRehearsalWorkcells } from "../../../packages/production-simulation/src/recipes/bakery/production-workcells.ts";
 import {
   rehearsalFromRecording,
   rehearsalSettings,
-} from "@seams/production-simulation/simulator/rehearsal-presets";
+} from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import {
   initialSimulatorState,
   applyBakeryWorkspaceAction,

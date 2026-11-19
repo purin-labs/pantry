@@ -22,7 +22,7 @@ import {
   readProviderCleanupContext,
 } from "../provider-adapters/catalogue";
 import { fileAccountErasureStatements } from "../context/files";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,

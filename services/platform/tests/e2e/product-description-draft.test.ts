@@ -7,12 +7,12 @@ import {
   ProductDescriptionDoc,
   type ProductDescriptionUpdate,
   type ProductDescriptionStateVector,
-} from "@seams/product-description-crdt";
+} from "@purin-labs/product-description-crdt";
 import {
   encodeDraftClientMessage,
   parseDraftServerMessage,
   type DraftServerMessage,
-} from "@seams/product-description-crdt/protocol";
+} from "@purin-labs/product-description-crdt/protocol";
 import {
   bootstrapOrganisation,
   issueControlSession,
@@ -29,7 +29,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { commerceCanonicalResourceId } from "../../src/commerce/provider";
 import type { OrganisationId } from "../../src/ids";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { requiredPlacement } from "./slack-journey-support";
 

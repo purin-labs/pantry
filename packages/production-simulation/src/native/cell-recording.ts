@@ -1,5 +1,5 @@
 import { readOperationContacts } from "../physics-contacts.ts";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import type { Sha256Hex } from "../identity.ts";
 import type { CarrierSlot, CellRecording, CheckpointRef } from "../physics.ts";
 import { stepCount, type StepCount } from "../time.ts";

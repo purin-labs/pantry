@@ -3,14 +3,14 @@ import type {
   HarnessCheckpointRecord,
   SessionCommand,
   SessionTransition,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   advanceSessionCommand as advanceSessionCommandTypescript,
   restoreSession as restoreSessionTypescript,
   validateHarnessCheckpointRestoreRecord as validateHarnessCheckpointRestoreRecordTypescript,
-} from "@seams/contracts/session-reducer";
+} from "@purin-labs/contracts/session-reducer";
 import type { Result } from "./result";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const ADVANCE_SCHEMA = "satyr.actor.advance-session-command.v1";
 const RESTORE_SCHEMA = "satyr.actor.restore-session.v1";

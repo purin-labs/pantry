@@ -9,8 +9,8 @@ import { expect, it } from "vitest";
 import {
   parseJevFeaturesView,
   type JevFeaturesView,
-} from "@seams/control-api/portal/jev-features";
-import { encodeBase64Url, isRecord } from "@seams/std";
+} from "@purin-labs/control-api/portal/jev-features";
+import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { typeSafeMonth } from "../../src/integrations/typesafe/usage-store";
 import {

@@ -1,6 +1,6 @@
 import { signalChat } from "../../../chat/signals";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import { isConversationId, isProjectIdentifier } from "@seams/control-api";
+import { isConversationId, isProjectIdentifier } from "@purin-labs/control-api";
 import { forkChat } from "../../../chat/forks";
 import {
   parseResponseFeedback,

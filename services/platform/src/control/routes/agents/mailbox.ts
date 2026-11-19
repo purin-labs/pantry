@@ -32,7 +32,7 @@ import {
 } from "../../http";
 import { readInstallationPins } from "../../installation-pins";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
-import { assertNever, hasExactKeys, isRecord } from "@seams/std";
+import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import { readIntegrationAccountReasonCode } from "../../../data/integration-account-reads";
 import type { AgentMailboxRouteAction } from "../agents";
 import {

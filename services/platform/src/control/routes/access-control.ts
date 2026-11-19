@@ -38,9 +38,9 @@ import {
   handleAccessControlExplainRoute,
   type AccessControlExplainRoute,
 } from "./access-control-explain";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isPositiveInteger } from "@seams/std";
-import type { OnboardingControlRole } from "@seams/contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isPositiveInteger } from "@purin-labs/std";
+import type { OnboardingControlRole } from "@purin-labs/contracts";
 import {
   readIntegrationOptionRows,
   readSubjectOptionRows,

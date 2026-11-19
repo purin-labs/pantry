@@ -4,14 +4,14 @@ import type {
   PhysicsReplay,
   PhysicsSequence,
   PhysicsRackSequence,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   physicsDuration,
   physicsLegAt,
   physicsResources,
   physicsTasks,
 } from "../recipes/bakery/physics-playback.ts";
-import type { BakerySurfaceCommandV1 } from "@seams/bakery-model/bakery-surface";
+import type { BakerySurfaceCommandV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { WorkcellSelection } from "./selection.ts";
 export type PlaybackSnapshot = Readonly<{
   time: number;
@@ -34,8 +34,8 @@ import type {
   HeldAttempt,
   AwaitingReturnAttempt,
 } from "../recipes/bakery/workcell-attempt.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const sessionState: unique symbol = Symbol("simulator playback session");
 const navigationState: unique symbol = Symbol("resolved recording navigation");

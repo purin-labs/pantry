@@ -9,7 +9,7 @@ import {
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   MENU_STATE_VECTOR_LIMIT,
   MENU_UPDATE_LIMIT,
@@ -20,7 +20,7 @@ import {
   type MenuDraftUpdate,
   type MenuPresenceSelection,
 } from "./index.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export const MENU_DRAFT_PROTOCOL = "menu_draft_sync.v3";
 // A full snapshot and its state vector travel together as base64 in one frame.

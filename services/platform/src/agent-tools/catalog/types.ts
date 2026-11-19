@@ -1,8 +1,8 @@
 import type { OrderRefundLineRequest } from "../../commerce/order-refund-action";
-import type { MenuBoardLayout, MenuBoardStart } from "@seams/menu-board-crdt";
+import type { MenuBoardLayout, MenuBoardStart } from "@purin-labs/menu-board-crdt";
 import type { StockProposalRequest } from "../../commerce/stock-action-plan";
-import type { WorkflowChange } from "@seams/bakery-workflow/changes";
-import type { BakeryProductionControl } from "@seams/bakery-model/bakery-surface";
+import type { WorkflowChange } from "@purin-labs/bakery-workflow/changes";
+import type { BakeryProductionControl } from "@purin-labs/bakery-model/bakery-surface";
 import type { SUPPLIER_CREATE_FIELDS } from "../kitchen/suppliers";
 import type { EmailReplyCitation } from "../../mail-inbox/reply-sources";
 import type {
@@ -10,7 +10,7 @@ import type {
   OrderQueueEntry,
   RecipeItem,
   SoldOutItem,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   CostsPlanSaveRequest,
   CostsPlanSaveTool,
@@ -29,7 +29,7 @@ import type {
 import type {
   JevFeatureCommand,
   JevFeaturesView,
-} from "@seams/control-api/portal/jev-features";
+} from "@purin-labs/control-api/portal/jev-features";
 import type { SoldOutMark } from "../../commerce/order-queue-commands";
 import type { PaymentsToolRead } from "../../commerce/payments-read";
 import type { RecipeDraft } from "../../commerce/recipe-commands";
@@ -37,7 +37,7 @@ import type {
   BakeryFileAction,
   BakeryFloorPlanResetAction,
   BakeryStoreInteriorAction,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { HarnessNativeCodeMode } from "../../actors/embedded-harness";
 import type { IntegrationAccountReference } from "../../access-control/integration-discovery";
 import type { CommerceActionRequest } from "../../commerce/action-model";
@@ -46,9 +46,9 @@ import type {
   IntegrationDiscoveryView,
   CommerceContextRequest,
   CommerceGraphQueryResult,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Result } from "../../result";
-import type { AuthorizedHarnessToolResult } from "@seams/contracts";
+import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
 import type {
   BakeryWorkspaceViewAction,
   BakeryProductionPanel,
@@ -61,7 +61,7 @@ import type {
   BakeryRecordingAcceptanceReference,
   BakeryRehearsalEdit,
   BakeryProductionEdit,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { AgentRunSaveVerification } from "../../commerce/bakery/agent-run-save";
 import type { AgentScenarioSaveResult } from "../../commerce/bakery/agent-scenario-save";
 import type {

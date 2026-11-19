@@ -27,7 +27,7 @@ import type {
   SystemCommerceRelationship,
   SystemSchemaRevision,
   SystemRelationshipDefinitionKind,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseAttributeDefinitionRevision,
   parseAttributeDefinitionId,
@@ -40,7 +40,7 @@ import {
   parseRelationshipRevision,
   parseSystemEntityRef,
   parseSystemSchemaRevision,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceQueryPlanReadError, OrganisationStateError } from "../../actors/organisation/types";
 import type { OrganisationDO } from "../../actors/organisation";
 import {
@@ -62,7 +62,7 @@ import type {
   CommerceGraphSourceQueryOptions,
   CommerceGraphRelationshipStepResult,
 } from "./commerce-source";
-import { assertNever, errorMessage, isRecord } from "@seams/std";
+import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
 export type BlotterOrganisationReader = Pick<
   OrganisationDO,
   | "readCommerceQueryPlan"
@@ -79,8 +79,8 @@ export type BlotterQueryPlanError =
     }>
   | Readonly<{
       readonly code: "query_stale";
-      readonly expected: import("@seams/contracts").CommerceReadWatermark;
-      readonly received: import("@seams/contracts").CommerceReadWatermark;
+      readonly expected: import("@purin-labs/contracts").CommerceReadWatermark;
+      readonly received: import("@purin-labs/contracts").CommerceReadWatermark;
     }>;
 
 export type BlotterQueryPlanResult = Result<
@@ -181,7 +181,7 @@ export class BlotterSource {
 
   async readSnapshotRevision(): Promise<
     Result<
-      import("@seams/contracts").CommerceSnapshotRevision,
+      import("@purin-labs/contracts").CommerceSnapshotRevision,
       CommerceGraphSourceError
     >
   > {

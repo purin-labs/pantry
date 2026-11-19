@@ -48,8 +48,8 @@ import type {
   AccessRouteTransport,
   AccessSubview,
   FileResourceAccount,
-} from "@seams/control-api/portal/access-models";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api/portal/access-models";
+import { assertNever } from "@purin-labs/std";
 import { AgentPermissionRequestPrompt } from "./agent-permission-request";
 import { HeldOutputPrompt } from "./held-output-prompt";
 import { PermissionRequestQueue } from "./permission-request-queue";

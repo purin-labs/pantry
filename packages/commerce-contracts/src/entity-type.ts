@@ -12,7 +12,7 @@ import {
 } from "./schema.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
-import { type StrictUnion } from "@seams/type-utils";
+import { type StrictUnion } from "@purin-labs/type-utils";
 import { revisionSchema } from "./entity-record.ts";
 
 import { cursorRefusal } from "./cursor-values.ts";

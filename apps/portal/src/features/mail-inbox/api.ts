@@ -12,12 +12,12 @@ import {
   type MailInboxResult,
   type MailSenderLink,
   type MailSenderLinkRequest,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import {
   SUPPLIER_DIRECTORY_LIST_ID,
   SUPPLIER_ENTITY_TYPE_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   ControlApiError,
   controlMutation,
@@ -25,8 +25,8 @@ import {
   controlSignal,
   controlWrite,
 } from "../../control-client";
-import { parseEmailReviewQueue } from "@seams/control-api/portal/email-review";
-import type { EmailReplyQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import { parseEmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
+import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import {
   commerceCollectionQuery,
   readCommerceGraph,
@@ -34,7 +34,7 @@ import {
 import {
   type MailAgentState,
   parseMailAgentState,
-} from "@seams/control-api/portal/mail-agent";
+} from "@purin-labs/control-api/portal/mail-agent";
 
 export async function readMailAgent(
   organisationId: string,
@@ -353,7 +353,7 @@ export async function mailOrganizationRequest(
   organisationId: string,
   accountId: string,
   command:
-    | import("@seams/control-api").MailOrganizationCommand
+    | import("@purin-labs/control-api").MailOrganizationCommand
     | Readonly<{ kind: "read"; messageIds: readonly string[] }>,
   signal: AbortSignal,
 ): Promise<unknown> {
@@ -397,7 +397,7 @@ export async function mailOrganizationRequest(
 export async function mailAssistantRequest(
   organisationId: string,
   accountId: string,
-  command: import("@seams/control-api").MailAssistantCommand | null,
+  command: import("@purin-labs/control-api").MailAssistantCommand | null,
   signal: AbortSignal,
 ): Promise<unknown> {
   if (command !== null) requireSession();

@@ -8,9 +8,9 @@ import {
   newProjectId,
   type ConversationId,
   type SurfaceObservationV2,
-} from "@seams/control-api";
-import type { BakerySurfaceContextV1 } from "@seams/bakery-model/bakery-surface";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import type { BakerySurfaceContextV1 } from "@purin-labs/bakery-model/bakery-surface";
+import { isRecord } from "@purin-labs/std";
 
 import { captureBakerySurface } from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
 import { initialSimulatorState } from "../../../../apps/portal/src/features/workflow-simulator/simulator-state";

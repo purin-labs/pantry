@@ -16,7 +16,7 @@ import {
 import type {
   PayoutAuditEvent,
   SupplierPayout,
-} from "@seams/control-api/portal/payouts";
+} from "@purin-labs/control-api/portal/payouts";
 import {
   PayoutReadPermission,
   type PayoutReadAccess,

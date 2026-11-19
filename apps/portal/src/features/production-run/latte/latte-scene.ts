@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {
   LINEA_GLB_SHA256,
   EAGLE_GLB_SHA256,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { loadVisual } from "../../workflow-simulator/spatial/physics-asset-loader";
 import { disposePhysicsObject } from "../../workflow-simulator/spatial/physics-model";
 import { loadRobotVisual } from "../../workflow-simulator/spatial/physics-robot-visual";
@@ -10,8 +10,8 @@ import { preloadEspressoVisual } from "../linea/espresso-scene";
 import { SceneHost } from "../scene-host";
 import modelUrl from "../../../../../../assets/bakery-mujoco/la-marzocco-linea-classic-s-2g/la-marzocco-linea-classic-s-2g.glb?url";
 import eagleUrl from "../../../../../../assets/bakery-mujoco/victoria-arduino-eagle-one-2g/victoria-arduino-eagle-one-2g.glb?url";
-import type { LatteSample } from "@seams/production-simulation/recipes/latte/model";
-import { fr10PlanarIk } from "@seams/production-simulation/kinematics/fr10";
+import type { LatteSample } from "@purin-labs/production-simulation/recipes/latte/model";
+import { fr10PlanarIk } from "@purin-labs/production-simulation/kinematics/fr10";
 import {
   baristaCounter,
   enableSceneShadows as enableShadows,

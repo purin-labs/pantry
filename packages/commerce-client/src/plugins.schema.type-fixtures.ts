@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiPlugins from "@seams/commerce-contracts/records/api-plugins";
+import type * as apiPlugins from "@purin-labs/commerce-contracts/records/api-plugins";
 import type {
   CommercePluginSettingValueV1,
   CommercePluginSettingsV1,

@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { SessionDO } from "../../src/actors/agent-session";
 import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";

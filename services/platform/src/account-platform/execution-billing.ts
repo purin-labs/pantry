@@ -2,8 +2,8 @@ import type {
   HarnessCheckpointRecord,
   HarnessTurnLease,
   ModelRoute,
-} from "@seams/contracts";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   canonicalJson,
@@ -12,7 +12,7 @@ import {
   isRecord,
   parseJsonOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { Env } from "../env";
 import type { Result } from "../result";
 import { preflightHarnessTurnLeaseInTransaction } from "../actors/agent-session-harness-authority";

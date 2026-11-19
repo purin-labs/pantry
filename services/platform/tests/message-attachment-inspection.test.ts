@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { StoredMessageAttachment } from "@seams/contracts";
+import type { StoredMessageAttachment } from "@purin-labs/contracts";
 import { readFileSync } from "node:fs";
 import { fileURLToPath, URL as NodeUrl } from "node:url";
 
@@ -13,7 +13,7 @@ import {
 } from "../src/messages/attachment-inspection";
 import { persistDerivedStills } from "../src/messages/derived-stills";
 import { h264Fixture, waveHeader } from "./media-fixtures";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 
 const ORGANISATION = "organisation_fixture";
 

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { beforeEach, afterEach, describe, expect, it } from "vitest";
-import { parsePointOfSaleConfiguration } from "@seams/commerce-client";
+import { parsePointOfSaleConfiguration } from "@purin-labs/commerce-client";
 
 import { NodeCommerceDatabase } from "../src/node-database.ts";
 import { PointOfSaleConfigurationService } from "../src/point-of-sale-configuration-service.ts";

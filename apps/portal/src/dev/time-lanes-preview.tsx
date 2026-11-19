@@ -11,9 +11,9 @@ import {
   type PaymentStep,
 } from "../features/payments/payment-lanes";
 import { nowIn, startOfDay, usePeriod, useWiderWhenEmpty } from "../ui";
-import type { CaseTimelineCase, ScheduleRunsDay } from "@seams/control-api";
+import type { CaseTimelineCase, ScheduleRunsDay } from "@purin-labs/control-api";
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "../agent-operations";
-import type { AgentOperationsSnapshot } from "@seams/control-api/portal/agent-operations";
+import type { AgentOperationsSnapshot } from "@purin-labs/control-api/portal/agent-operations";
 import { AgentSchedulesPanel } from "../features/agent-schedules/route";
 import type { BrainTransport } from "../features/brain/api";
 

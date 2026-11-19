@@ -1,6 +1,6 @@
 import { expect } from "vitest";
-import type { ConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import type { ConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import {
   post,

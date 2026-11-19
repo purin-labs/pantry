@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "../database-handles";
 import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
 import { acceptedExecutionAccountAuthority } from "../account-platform/access";
 import { evaluateChatFlowLabelSink } from "../chat/information-flow";
-import { isConversationId, isProjectId } from "@seams/control-api";
+import { isConversationId, isProjectId } from "@purin-labs/control-api";
 import { validateLiveRequestAuthority } from "../request-authority";
 import {
   exitApprovalPassReady,
@@ -23,8 +23,8 @@ import {
   toolEffectAsksAfterOutsideText,
 } from "../policy/information-flow";
 import { buildControlAuthority } from "../request-authority";
-import { SUPPLIER_DIRECTORY_LIST_ID } from "@seams/commerce-client";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
+import { SUPPLIER_DIRECTORY_LIST_ID } from "@purin-labs/commerce-client";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../env";
 import {
   parseCaseId,
@@ -81,8 +81,8 @@ import { heldEffectCoversRequest } from "../data/held-output-request";
 import { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
 import { CommerceReadRequestError } from "../context/assembly/commerce";
 import { selectNamedCommerceQuerySourceGrant } from "../context/assembly";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { prepareCommerceReadForEmbeddedHarness } from "./commerce/handlers";
 
 /**
@@ -813,7 +813,7 @@ export async function passSharedDraftExit(
 
 export function selectMerchantReportSourceGrant(
   lease: HarnessTurnLease,
-  typeId: import("@seams/contracts").SystemCommerceEntityKind,
+  typeId: import("@purin-labs/contracts").SystemCommerceEntityKind,
   allowedSensitivity: "internal" | "restricted",
   input: Readonly<{
     organisationId: string;

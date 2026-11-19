@@ -2,7 +2,7 @@ import {
   isCommerceApiScope,
   type CommerceApiScope,
   type CommerceClientError,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";
@@ -16,7 +16,7 @@ import {
 } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The API keys of an organisation's merchant (Plan 80 step 3): an owner or

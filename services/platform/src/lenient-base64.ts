@@ -1,10 +1,10 @@
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 /**
  * Base64 from providers and configuration can use either alphabet and can
  * carry `=` padding: Gmail and Pub/Sub send padded base64. These helpers keep
  * that input valid for `atob` and `decodeBase64`. A value that Pantry encodes
- * itself goes through the strict `decodeBase64Url` from @seams/std instead.
+ * itself goes through the strict `decodeBase64Url` from @purin-labs/std instead.
  */
 
 /** `value` with the URL-safe `-` and `_` written as `+` and `/`. */

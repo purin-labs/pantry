@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { parseMessageCaseContent } from "../case-content";
 import type { ConnectorIngressContent } from "./ingress-parsers";
 import type { ConnectorResult } from "./types";

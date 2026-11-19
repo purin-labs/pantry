@@ -1,8 +1,8 @@
 import {
   readBakeryProcedure,
   type ProcedureResult,
-} from "@seams/bakery-model/bakery-procedure";
-import type { Settings } from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery-procedure";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
 import {
   customEntityRef,
   readCommerceGraph,

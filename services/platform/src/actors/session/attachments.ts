@@ -1,4 +1,4 @@
-import { verifyProjectSnapshot } from "@seams/control-api";
+import { verifyProjectSnapshot } from "@purin-labs/control-api";
 import { digestStoredContextBundle } from "../actor-journal";
 import type {
   FrameSamplingOutcome,
@@ -7,7 +7,7 @@ import type {
   CaseAssignment,
   HarnessTurnLease,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import { newRequestId, type OrganisationId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
@@ -58,8 +58,8 @@ import {
 } from "../agent-session-budget";
 import { authorityPartitionKey } from "../../authorization/access-grants/turn-authority";
 import { parseStoredRequestAuthority } from "../../request-authority";
-import type { Variant } from "@seams/type-utils";
-import { encodeBase64 } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { encodeBase64 } from "@purin-labs/std";
 import { claimCanonicalRunCapability } from "./capability-claims";
 import {
   modelContextWithoutProject,

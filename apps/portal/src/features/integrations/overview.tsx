@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronRight, Plus, Search } from "lucide-react";
-import type { CustomConnectorSummary } from "@seams/control-api/portal/custom-connectors";
+import type { CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
 import {
   ProviderTile,
   StatusChip,

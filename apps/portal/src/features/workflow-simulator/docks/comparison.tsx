@@ -1,7 +1,7 @@
 import React from "react";
 
 import { RunComparison } from "../results";
-import type { Run } from "@seams/production-simulation/recipes/bakery/schedule";
+import type { Run } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type { ComparisonView } from "../simulator-state";
 import { DockHeader, SegmentedControl } from "./shared";

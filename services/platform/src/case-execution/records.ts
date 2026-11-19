@@ -5,7 +5,7 @@ import type {
   CaseExecutionProposalState,
   CaseExecutionToolAuthority,
   CaseExecutionTurnMemory,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /**
  * The execution records one Actor holds for a Case, as that Actor reads them.

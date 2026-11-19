@@ -8,8 +8,8 @@ import {
   type AccountOnboardingOptions,
   type AccountOnboardingOrganization,
   type AccountOnboardingRequest,
-} from "@seams/control-api";
-import { assertNever, errorMessage, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
 import {
   ControlApiError,
   controlMutation,

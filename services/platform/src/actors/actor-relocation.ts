@@ -30,7 +30,7 @@ import {
 } from "./actor-relocation-exclusion";
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import type { RelocationMailReceipt } from "./actor-relocation-mail";
-import type { CommerceProviderReceipt } from "@seams/control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { RelocationReceiptError } from "./actor-relocation-state";
 import {
   regionalCopyTables,
@@ -104,13 +104,13 @@ import {
 } from "./actor-router";
 import { currentActorSchemaVersion } from "./current-actor-schema-version";
 import { quiescePlacementExecution } from "./portal-chat-cleanup";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
   isNonEmptyString,
   isNonNegativeInteger,
   isPositiveInteger,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export const ACTOR_RELOCATION_RETENTION_MS = 7 * 24 * 60 * 60 * 1_000;
 

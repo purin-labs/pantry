@@ -11,7 +11,7 @@
  * `quarantined`. A start of either kind refuses while a move of the other
  * kind is open, in the same statement that inserts the row.
  */
-import type { MachineEvent } from "@seams/std/state-machine";
+import type { MachineEvent } from "@purin-labs/std/state-machine";
 
 import type { GlobalDatabase } from "../database-handles";
 import type { OrganisationId } from "../ids";

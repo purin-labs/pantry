@@ -1,5 +1,5 @@
-import type { Quantity } from "@seams/contracts";
-import { isPositiveInteger, isRecord } from "@seams/std";
+import type { Quantity } from "@purin-labs/contracts";
+import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import { parseInventoryQuantity } from "./inventory-receipt.ts";
 
 export type InventoryProductionRecipe = Readonly<{

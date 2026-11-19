@@ -1,6 +1,6 @@
 import React from "react";
 import { toast } from "sonner";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { formatMoneyMinor } from "../../formatting";
 import { PageSkeleton, RecoverableError } from "../../page-components";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
@@ -15,7 +15,7 @@ import {
   refundCounterSale,
   type CounterSaleMutationTransport,
 } from "./counter-sale-api";
-import type { CounterSale } from "@seams/control-api/portal/counter-sale";
+import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import "./styles.css";
 
 type SaleState =

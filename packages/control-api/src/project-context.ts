@@ -6,7 +6,7 @@ import {
   isRecord,
   canonicalJson,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import {
   parseProjectContent,
   parseProjectReference,

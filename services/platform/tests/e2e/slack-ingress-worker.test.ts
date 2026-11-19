@@ -2,7 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import type { ConnectorDO } from "../../src/actors/connector";
 import {

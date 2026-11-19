@@ -2,7 +2,7 @@ import type { CommerceDatabase } from "../../../src/database.ts";
 import type { EntityPlaneService } from "../../../src/entity-plane/service.ts";
 import { writeCommerceEntityRelationText } from "../../../src/entity-plane/relation-text.ts";
 import { refreshCommerceAttributeRelation } from "../../../src/entity-plane/commerce-attribute-relation.ts";
-import { parseOrder, parseSalesChannel } from "@seams/commerce-client";
+import { parseOrder, parseSalesChannel } from "@purin-labs/commerce-client";
 import {
   writeOrder,
   writeSalesChannel,

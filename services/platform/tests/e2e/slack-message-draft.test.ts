@@ -1,10 +1,10 @@
-import { SLACK_APP_NAME } from "@seams/control-api";
+import { SLACK_APP_NAME } from "@purin-labs/control-api";
 import { env, exports } from "cloudflare:workers";
 import { organisationDatabase, fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { newConversationId, type ConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import { newConversationId, type ConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { storeVaultSecret } from "../../src/credential-vault";
 import { createAccessGrant } from "../../src/data/access-grants";

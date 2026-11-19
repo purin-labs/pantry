@@ -1,7 +1,7 @@
 // What the hand-run merchant scripts share: the command line (the
 // organisation and the merchant, and the Commerce Worker's address and
 // service token from the environment) and the checks of a client answer.
-import type { CommerceMutationResultV1 } from "@seams/commerce-client";
+import type { CommerceMutationResultV1 } from "@purin-labs/commerce-client";
 import { pathToFileURL } from "node:url";
 
 export type MerchantScriptArguments = Readonly<{

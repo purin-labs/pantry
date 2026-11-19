@@ -3,7 +3,7 @@ import {
   calculateBakeryCostsAndMargins,
   parseCostsOverview,
   type CalculatedProductMargin,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseInventory,
   type ArchivedProduct,
@@ -11,7 +11,7 @@ import {
   type StockStatus,
   type StockRow,
   type StockLot,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import React from "react";
 import { Link } from "react-router";
 import { controlRead } from "../../control-client";
@@ -24,7 +24,7 @@ import {
   type CrmColumn,
   type CrmRowAction,
 } from "../../ui";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { formatMoneyMinor } from "../../formatting";
 import "./inventory.css";
 import { needsReorder } from "./stock-status";

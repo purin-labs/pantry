@@ -4,8 +4,8 @@ import type {
   CommerceOrder,
   Fulfillment,
   Offer,
-} from "@seams/contracts";
-import { DESCRIPTION_LIMIT } from "@seams/product-description-crdt/limits";
+} from "@purin-labs/contracts";
+import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt/limits";
 
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../commerce-lab/lab-metadata";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
@@ -58,7 +58,7 @@ import {
   type ActionLedgerEntry,
   type ActionLedgerError,
 } from "../actors/action-ledger";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   hasExactKeys,
   isPositiveInteger,
@@ -66,13 +66,13 @@ import {
   isSha256Hex,
   positiveIntegerOrNull,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type {
   CommerceLabProviderReceipt,
   CommerceProviderReceipt,
   CommerceShopifyProviderReceipt,
   CommerceProviderResource,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export function isCommerceActionNonce(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(

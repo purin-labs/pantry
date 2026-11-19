@@ -9,7 +9,7 @@ import {
   pendingInputSurfaceContext,
 } from "../input-parts";
 import { initialConversationCaseIdentity } from "../conversation-actor-identity";
-import { canonicalJson } from "@seams/std";
+import { canonicalJson } from "@purin-labs/std";
 import {
   browserContextFromParts,
   addPendingChatInput,
@@ -23,7 +23,7 @@ import {
 } from "../conversation";
 import type { OrganisationModelRoute } from "../../models/route";
 import type { ConversationScope, StoredConversation } from "../store";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { defaultChatEffort } from "./model";
 import { conversationStreamIdentity } from "./run";
 import { pendingInputHasRequestId } from "./steering";

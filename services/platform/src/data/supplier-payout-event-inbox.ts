@@ -5,7 +5,7 @@ import {
 } from "../commerce/commerce-wasm";
 import type { OrganisationId } from "../ids";
 import type { SupplierPayoutRail } from "./supplier-payout-certification";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type PayoutEvidenceContext = Readonly<{
   providerEventId: string;

@@ -6,7 +6,7 @@ import {
   rustTrim,
   sha256HexSync,
   utf8ByteLength,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { Type, type Static } from "typebox";
 import { encodeUserMessageDigest } from "./digest-encoders.ts";
 import {

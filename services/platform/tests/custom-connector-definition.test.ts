@@ -11,7 +11,7 @@ import {
   parseCustomConnectorId,
   parseCustomConnectorRevision,
 } from "../src/custom-connectors";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 describe("custom connector definition v1", function definitionSuite() {
   it("accepts two unrelated REST definitions through the same parser", async function acceptsRestDefinitions() {

@@ -1,4 +1,4 @@
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import type { TextCellTransport } from "./wasm-transport.ts";
 
 /**

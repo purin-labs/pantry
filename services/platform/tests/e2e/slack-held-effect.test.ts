@@ -2,7 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {

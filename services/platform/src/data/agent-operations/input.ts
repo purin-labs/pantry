@@ -2,19 +2,19 @@ import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import type {
   CommerceListEntryRef,
   CommerceRelationshipRef,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceListEntryRef,
   parseCommerceRelationshipRef,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { Result } from "../../result";
 import {
   isScheduleWeekday,
   isTimeOfDay,
   isValidTimeZone,
 } from "../../schedules/window";
-import { isRecord, positiveIntegerOrNull } from "@seams/std";
-import type { AgentSkillRef, ScheduleSpec } from "@seams/control-api";
+import { isRecord, positiveIntegerOrNull } from "@purin-labs/std";
+import type { AgentSkillRef, ScheduleSpec } from "@purin-labs/control-api";
 import type {
   AgentOperationInput,
   AgentOperationsError,

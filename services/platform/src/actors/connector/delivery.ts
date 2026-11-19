@@ -1,4 +1,4 @@
-import type { ConnectorDelivery, ConnectorIdentity } from "@seams/contracts";
+import type { ConnectorDelivery, ConnectorIdentity } from "@purin-labs/contracts";
 import {
   createSlackCaseCommand,
   type SlackCaseCommand,
@@ -11,7 +11,7 @@ import {
 } from "../connector-case-work";
 import { completeConnectorSlackDelivery } from "../connector-slack-stream";
 import { processScheduledSlackCaseMessage } from "../../slack/case-processing";
-import { parseJsonOrNull } from "@seams/std";
+import { parseJsonOrNull } from "@purin-labs/std";
 import {
   ensureConnectorIdentity,
   parseDelivery,

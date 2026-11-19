@@ -11,8 +11,8 @@ import {
   newProjectId,
   type ConversationId,
   type SurfaceObservationV2,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import {
   createConversation,

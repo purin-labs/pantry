@@ -14,7 +14,7 @@ release that moves the governor.
 ## Deployment order
 
 ```bash
-pnpm --filter @seams/platform run deploy
+pnpm --filter @purin-labs/platform run deploy
 ```
 
 The command runs its builds and checks first. It then deploys in this order:
@@ -27,13 +27,13 @@ The command runs its builds and checks first. It then deploys in this order:
 
 The sandbox and the exit Worker deploy first because the Platform Worker
 names them. A failed deployment of either stops the command before the
-Platform Worker changes. `pnpm --filter @seams/platform model-exit:check` checks
+Platform Worker changes. `pnpm --filter @purin-labs/platform model-exit:check` checks
 the exit Worker's profile and script before any deployment.
 
 Run the sandbox check alone with:
 
 ```bash
-pnpm --filter @seams/platform code-mode-sandbox:check
+pnpm --filter @purin-labs/platform code-mode-sandbox:check
 ```
 
 The check builds the Worker and reads both profiles. It fails when:
@@ -45,7 +45,7 @@ The check builds the Worker and reads both profiles. It fails when:
 - `limits.cpu_ms` is below the time that the interrupt budget needs; or
 - the script holds a Wasm module other than QuickJS.
 
-Local development (`pnpm --filter @seams/platform dev`) runs the Platform, sandbox
+Local development (`pnpm --filter @purin-labs/platform dev`) runs the Platform, sandbox
 and model exit Workers in one process. The start-up table of Wrangler marks the binding `[not connected]`.
 The binding works: the table is printed before the second Worker starts.
 

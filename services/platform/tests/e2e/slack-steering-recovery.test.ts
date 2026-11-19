@@ -2,7 +2,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { env } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
 import { connectorActorStub } from "../../src/actors/actor-router";

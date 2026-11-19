@@ -7,7 +7,7 @@ import {
   parseInventoryAllocation,
   parseInventoryConsumptionPlan,
   parseStorefront,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   COMMERCE_MACHINES,
   commerceTransition,
@@ -18,11 +18,11 @@ import {
   type InventoryAllocation,
   type InventoryConsumptionPlan,
   type Storefront,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "./database.ts";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever, parseJson } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever, parseJson } from "@purin-labs/std";
 
 type StoredJsonRow = Readonly<{ storedJson: string }>;
 type InventoryPositionIdentityRow = Readonly<{ inventoryPositionId: string }>;

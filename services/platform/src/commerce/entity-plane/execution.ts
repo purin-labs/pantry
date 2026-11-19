@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../database-handles";
-import type { CommerceCommandAuthorityContext } from "@seams/commerce-contracts/relationship-authority";
+import type { CommerceCommandAuthorityContext } from "@purin-labs/commerce-contracts/relationship-authority";
 import { pantryCommerceAccess } from "../app-access";
 import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
@@ -14,7 +14,7 @@ import type {
   CommerceMutationTarget,
   RequestAuthority,
   CommerceMutationReceiptV1,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   CommerceEntityPlaneClient,
   parseCommerceCommandId,
@@ -23,8 +23,8 @@ import {
   parseRelationshipRevision,
   parseCommerceTimestamp,
   parseCommerceSnapshotRevision,
-} from "@seams/commerce-client";
-import type { CommerceEntityPlaneFetch } from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
+import type { CommerceEntityPlaneFetch } from "@purin-labs/commerce-client";
 
 import type { Result } from "../../result";
 import type { OrganisationId } from "../../ids";
@@ -56,8 +56,8 @@ import {
   buildCommerceEntityPlaneEffect,
   commandFromCommerceEntityPlaneProposal,
 } from "./proposals";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type EntityPlaneAction = ActionLedgerEntry;
 type ApprovedEntityPlaneAction = VariantBy<

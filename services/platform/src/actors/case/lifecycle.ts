@@ -11,12 +11,12 @@ import type {
   CaseBinding,
   CaseContent,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { parseStoredRequestAuthority } from "../../request-authority";
 import { FlowBinding, FlowLabel } from "../../policy";
 import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
-import type { Variant } from "@seams/type-utils";
-import { isNonBlankString, isRecord, parseJsonOrNull } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isNonBlankString, isRecord, parseJsonOrNull } from "@purin-labs/std";
 import {
   acceptedProposalBelongsTo,
   assignmentMatches,
@@ -29,7 +29,7 @@ import {
   replayAuthorityForFlowBinding,
   triggerAuthorityMatchesSource,
 } from "./context-source";
-import { machineTransition } from "@seams/std/state-machine";
+import { machineTransition } from "@purin-labs/std/state-machine";
 import { writeActorTransition } from "../lifecycle/state-transition";
 import { CASE_ASSIGNMENT_MACHINE } from "./assignment.machine";
 import {

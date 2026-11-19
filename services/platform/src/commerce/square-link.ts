@@ -7,8 +7,8 @@ import type {
   CommerceAdminClient,
   CommerceClientError,
   CommerceSquareConnectionV1,
-} from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 
 import type { VaultSecret } from "../credential-vault/domain";
 import { resolveOrganisationCommerceSystem } from "../data/organisation-commerce-system";

@@ -1,19 +1,19 @@
 import React from "react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type {
   InboxUnansweredThread,
   InboxWhatsAppConversation,
   MailInboxMessage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { Check, MessageCircle } from "lucide-react";
 import { formatListDate, formatMailDate, senderParts } from "./thread";
 import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "../../pages/agent-mailbox";
-import type { EmailReplyQueueItem } from "@seams/control-api/portal/agent-mailbox";
+import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { readMailAgent, resumeMailAgent } from "./api";
 import type {
   MailAgentPause,
   MailAgentState,
-} from "@seams/control-api/portal/mail-agent";
+} from "@purin-labs/control-api/portal/mail-agent";
 
 type StripProps = Readonly<{
   organisationId: string;

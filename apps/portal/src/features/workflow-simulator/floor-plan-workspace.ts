@@ -1,13 +1,13 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   restoreVitrineDemandSnapshot,
   subscribeVitrineDemandHistory,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import {
   BAKERY_FLOOR_PLANS,
   BAKERY_FLOOR_PLAN_ORDER,
   type BakeryFloorPlanId,
-} from "@seams/production-simulation/floor/bakery-room";
+} from "@purin-labs/production-simulation/floor/bakery-room";
 import {
   APPLIANCE_FOOTPRINTS,
   DEFAULT_ROOM_APPLIANCE_LAYOUTS,
@@ -15,14 +15,14 @@ import {
   isApplianceId,
   type ApplianceId,
   type AppliancePose,
-} from "@seams/production-simulation/floor/appliance-catalogue";
-import { getApplianceBox, type Box2D } from "@seams/production-simulation/floor/collisions";
+} from "@purin-labs/production-simulation/floor/appliance-catalogue";
+import { getApplianceBox, type Box2D } from "@purin-labs/production-simulation/floor/collisions";
 import {
   findFloorPlanOpening,
   maxUnobstructedDoorProgress,
   openingId,
   type FloorPlanOpening,
-} from "@seams/production-simulation/floor/openings";
+} from "@purin-labs/production-simulation/floor/openings";
 import {
   SimulatorHistoryStore,
   useSimulatorHistoryStore,

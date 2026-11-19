@@ -15,7 +15,7 @@ import {
   type VaultHandle,
   type VaultOAuthTokens,
 } from "../credential-vault";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const NOTION_API_VERSION = "2026-03-11";
 const TOKEN_RESPONSE_LIMIT = 64 * 1024;

@@ -6,7 +6,7 @@
   // passes every other request to the platform Worker.
   //
   // The values that it shares with the production profile of wrangler.jsonc
-  // must be equal. `pnpm --filter @seams/platform slack-ingress:deploy` refuses a
+  // must be equal. `pnpm --filter @purin-labs/platform slack-ingress:deploy` refuses a
   // deployment when they differ, and when the script holds platform code.
   "main": "src/slack-ingress/worker.ts",
   "compatibility_date": "2026-07-07",

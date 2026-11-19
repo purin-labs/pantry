@@ -7,7 +7,7 @@ import type { Env } from "../env";
 import { parseCaseId, type CaseId, type OrganisationId } from "../ids";
 import { digestCanonical } from "../policy";
 import type { Result } from "../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 export type SubjectReferenceInput = Readonly<{
   kind:
     | "organisation_role"

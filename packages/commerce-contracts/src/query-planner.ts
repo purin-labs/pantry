@@ -8,8 +8,8 @@ import {
 import { commerceGraphQueryWireSchema } from "./query-wire.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever, canonicalJsonByCodePoint } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever, canonicalJsonByCodePoint } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import {
   commerceGraphQuerySchema,
   type CommerceGraphQuery,

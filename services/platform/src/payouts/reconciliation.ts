@@ -15,7 +15,7 @@ import {
 } from "../data/supplier-payout-plan";
 import { readSupplierPayout } from "../data/supplier-payout-store";
 import type { OrganisationId } from "../ids";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type PayoutEventResult = "applied" | "waiting" | "conflict" | "retry";
 

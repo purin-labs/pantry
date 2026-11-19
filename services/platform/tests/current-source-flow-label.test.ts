@@ -1,5 +1,5 @@
 import type { SingleDatabase } from "../src/database-handles";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
@@ -8,7 +8,7 @@ import {
   integrationResourceScopeForGrant,
 } from "../src/policy";
 import { d1Database } from "./sqlite-d1";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { requireOrganisationId } from "./test-ids";
 
 const ORGANISATION_ID = requireOrganisationId("organisation_source_policy");

@@ -4,8 +4,8 @@ import type {
   CommerceCursor,
   CommerceEntity,
   CommerceGraphQuery,
-} from "@seams/contracts";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { assertCommerceGraphQueryWithLexicon } from "./commerce-wasm";
 import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
@@ -17,13 +17,13 @@ import { commerceCanonicalResourceId } from "./provider";
 import { buildSavedSelectorCommerceReadAuthority } from "./entity-plane/authority";
 import { CommerceGraphReader } from "./entity-plane/graph-reader";
 import { CommerceEngineSource } from "./entity-plane/commerce-source";
-import { isRecord, sha256Hex } from "@seams/std";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 import type {
   CommerceExceptionInbox,
   MissingTrackingException,
   TrackingBatchPreview,
   TrackingBatchPreviewItem,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 const INBOX_PAGE_LIMIT = 100;
 const INBOX_RESULT_LIMIT = 500;

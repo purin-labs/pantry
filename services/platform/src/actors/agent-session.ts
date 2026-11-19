@@ -34,19 +34,19 @@ import type {
 import { reconcileSessionGoalUsage } from "./session-goal-usage";
 import { assertCompletedHistory } from "../chat/fork-history";
 import { discardHarnessTurnContinuation } from "./agent-session-continuation";
-import type { ChatContextDetails } from "@seams/control-api";
+import type { ChatContextDetails } from "@purin-labs/control-api";
 import {
   canEraseArchivedHarnessHistory,
   type HarnessHistoryErasureRequest,
   type OrganisationArchiveCleanupError,
 } from "./organisation-archive-cleanup";
 import { readAcceptedCheckpointFinalization } from "./agent-session-finalization";
-import type { BakerySurfaceReceiptV1 } from "@seams/bakery-model/bakery-surface";
+import type { BakerySurfaceReceiptV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type {
   AcceptedInputRef,
   HarnessCheckpointRecord,
   HarnessTurnLease,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { ActorActivationRequest } from "./actor-registry";
 import type { Env } from "../env";
 import {
@@ -148,7 +148,7 @@ import {
   readSessionInformationFlow,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
 } from "./agent-session-information-flow";
-import { sameJson, sha256Hex } from "@seams/std";
+import { sameJson, sha256Hex } from "@purin-labs/std";
 import type { ActorImportSqlMigration } from "./actor-export";
 import { type PlacedActorExportSource } from "./lifecycle/placed-actor";
 import { sessionReachableAttachmentObjectKeys } from "./session/attachments";

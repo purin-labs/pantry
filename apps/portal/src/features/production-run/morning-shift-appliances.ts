@@ -3,16 +3,16 @@ import type {
   LogisticsView,
   TaskDefinition,
   TaskView,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import {
   morningShiftApplianceTask,
-} from "@seams/production-simulation/recipes/bakery/bakery-shift";
+} from "@purin-labs/production-simulation/recipes/bakery/bakery-shift";
 import type {
   ApplianceCategory,
   RecipeApplianceTaskBinding,
-} from "@seams/production-simulation/recipes/bakery/appliance-execution";
+} from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
 import type { FactoryStationSource } from "../workflow-simulator/spatial/factory-stations";
-import type { OvenLiveFrame } from "@seams/production-simulation/runs/oven-live-physics";
+import type { OvenLiveFrame } from "@purin-labs/production-simulation/runs/oven-live-physics";
 import {
   appendBeverageCobotCells,
   computeCobotKinematicsAndDynamics,

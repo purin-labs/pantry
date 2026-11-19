@@ -3,7 +3,7 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { createEmbeddedHarnessModelRouteLease } from "../../src/actors/session/model-route";
 import { resolveClaudeAccessToken } from "../../src/models/claude-connection";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";

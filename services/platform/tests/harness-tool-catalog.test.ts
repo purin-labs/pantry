@@ -1,10 +1,10 @@
-import type { HarnessToolOutput } from "@seams/contracts";
+import type { HarnessToolOutput } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
-import type { AuthorizedHarnessToolResult } from "@seams/contracts";
+import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
 import {
   parseCommerceGraphQuery,
   parseCommerceGraphResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { catalogHarnessToolCatalogDigest } from "../src/agent-tools/catalog/selection";
 import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "../src/agent-tools/catalog/code-mode";
@@ -319,7 +319,7 @@ function recordBakerySurfaceTool(
   callId: string,
 ): Promise<{
   readonly receiptId: string;
-  readonly receipt: import("@seams/bakery-model/bakery-surface").BakerySurfaceReceiptV1;
+  readonly receipt: import("@purin-labs/bakery-model/bakery-surface").BakerySurfaceReceiptV1;
   readonly saveVerification: { readonly kind: "none" };
   readonly scenarioSaveResult: { readonly kind: "none" };
 }> {
@@ -943,7 +943,7 @@ async function rejectsCatalogMismatch(): Promise<void> {
   });
 }
 
-function fixtureContextRequest(): import("@seams/contracts").CommerceContextRequest {
+function fixtureContextRequest(): import("@purin-labs/contracts").CommerceContextRequest {
   const parsed = parseCommerceGraphQuery({
     kind: "underclerk_context",
     selection: {
@@ -1000,7 +1000,7 @@ function rejectInternalEntityContext(): Promise<never> {
 
 function readEntityContext(
   _request: unknown,
-): Promise<import("@seams/contracts").CommerceGraphQueryResult> {
+): Promise<import("@purin-labs/contracts").CommerceGraphQueryResult> {
   return Promise.resolve(
     parseCommerceGraphResponse({
       merchantRevision: 1,
@@ -1017,7 +1017,7 @@ function readEntityContext(
 
 function listIntegrations(
   request: import("../src/agent-tools/catalog/types").HarnessIntegrationListRequest,
-): Promise<import("@seams/contracts").IntegrationDiscoveryView> {
+): Promise<import("@purin-labs/contracts").IntegrationDiscoveryView> {
   if (request.kind !== "list")
     throw new Error("integration list request invalid");
   return Promise.resolve({

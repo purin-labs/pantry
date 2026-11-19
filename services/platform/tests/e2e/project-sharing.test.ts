@@ -7,7 +7,7 @@ import {
 } from "./organisation-database";
 import { ensureInitialOrganisationPlacement } from "../../src/data/shared-rows/placement-row";
 import { parseOrganisationPlacementProfile } from "../../src/placement";
-import { newConversationId } from "@seams/control-api";
+import { newConversationId } from "@purin-labs/control-api";
 import { parseSessionId } from "../../src/ids";
 import type { Conversation } from "../../src/chat/conversation";
 import { readConversation, saveConversation } from "../../src/chat/store";
@@ -25,7 +25,7 @@ import {
 } from "../../src/chat/turn-access";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { newProjectId, type UserId } from "@seams/control-api";
+import { newProjectId, type UserId } from "@purin-labs/control-api";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";

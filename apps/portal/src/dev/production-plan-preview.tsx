@@ -4,18 +4,18 @@ import {
   COLLABORATION_PING,
   COLLABORATION_PONG,
   type CollaborationParticipant,
-} from "@seams/collaboration";
-import type { InventoryProductionRequest } from "@seams/control-api";
+} from "@purin-labs/collaboration";
+import type { InventoryProductionRequest } from "@purin-labs/control-api";
 import {
   ProductionPlanDoc,
   type ProductionPlanSelection,
-} from "@seams/production-plan-crdt";
+} from "@purin-labs/production-plan-crdt";
 import {
   encodePlanServerMessage,
   parsePlanClientMessage,
   type PlanServerMessage,
-} from "@seams/production-plan-crdt/protocol";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/production-plan-crdt/protocol";
+import { isRecord } from "@purin-labs/std";
 import { ProductionPlanPanel } from "../features/commerce/production-plan";
 import { usePortalTheme } from "../use-portal-theme";
 import "../styles.css";

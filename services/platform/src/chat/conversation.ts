@@ -8,8 +8,8 @@ import {
   parseSurfaceObservation,
   surfaceObservationFromPageView,
   type SurfaceObservationV2,
-} from "@seams/control-api";
-import type { ChatOrigin } from "@seams/control-api";
+} from "@purin-labs/control-api";
+import type { ChatOrigin } from "@purin-labs/control-api";
 import { chatOrigin, chatOriginField } from "./origin";
 import {
   admitKitchenState,
@@ -20,9 +20,9 @@ import {
 import {
   isConversationId,
   parseChatPermissionRequest,
-} from "@seams/control-api";
-import type { ChatPermissionRequest, ConversationId } from "@seams/control-api";
-import { parseChatInputMode, type ChatInputMode } from "@seams/control-api";
+} from "@purin-labs/control-api";
+import type { ChatPermissionRequest, ConversationId } from "@purin-labs/control-api";
+import { parseChatInputMode, type ChatInputMode } from "@purin-labs/control-api";
 import {
   parseChatThreadLineage,
   parseChatHistoryBindings,
@@ -32,8 +32,8 @@ import {
 import {
   parseBakeryBrowserContext,
   type BakeryBrowserContext,
-} from "@seams/bakery-model/bakery-context";
-import type { ModelRoute } from "@seams/contracts";
+} from "@purin-labs/bakery-model/bakery-context";
+import type { ModelRoute } from "@purin-labs/contracts";
 import { parseSessionModelRoute } from "../policy-snapshot";
 import type { JsonRecord } from "../control/http";
 import type { ConnectorDocumentation } from "../custom-connectors/authoring";
@@ -53,14 +53,14 @@ import {
 import {
   parseBakerySurfaceAttachment,
   type BakerySurfaceAttachmentV1,
-} from "@seams/bakery-model/bakery-surface";
-import type { Variant } from "@seams/type-utils";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+} from "@purin-labs/bakery-model/bakery-surface";
+import type { Variant } from "@purin-labs/type-utils";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import {
   type ChatEffort,
   type ChatQuestion,
   parseChatQuestion,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 export type ConnectorCardTarget =
   | {
       readonly kind: "new";

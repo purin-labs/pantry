@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiProductionRequest from "@seams/commerce-contracts/records/api-production-request";
+import type * as apiProductionRequest from "@purin-labs/commerce-contracts/records/api-production-request";
 import type { ProductionRequestFields } from "./production-request.ts";
 export type ProductionRequestFieldsParity = Assert<
   Equal<ProductionRequestFields, apiProductionRequest.ProductionRequestFields>

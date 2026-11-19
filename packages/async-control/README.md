@@ -1,4 +1,4 @@
-# `@seams/async-control`
+# `@purin-labs/async-control`
 
 Small, dependency-free ownership primitives shared by Lowerarchy TypeScript
 runtimes. The package preserves each consumer's existing domain `Result`
@@ -7,10 +7,10 @@ types and supplies only lifecycle mechanics.
 ## Build and verify
 
 ```sh
-pnpm --filter @seams/async-control build
-pnpm --filter @seams/async-control check:types
-pnpm --filter @seams/async-control test
-pnpm --filter @seams/async-control test:exports
+pnpm --filter @purin-labs/async-control build
+pnpm --filter @purin-labs/async-control check:types
+pnpm --filter @purin-labs/async-control test
+pnpm --filter @purin-labs/async-control test:exports
 ```
 
 The root workspace consumes the package through `workspace:*`. The root
@@ -22,7 +22,7 @@ To compile a root consumer directly, build the shared package first:
 
 ```sh
 pnpm async-control:build
-pnpm --filter @seams/platform check:types
+pnpm --filter @purin-labs/platform check:types
 ```
 
 ## Choosing a primitive

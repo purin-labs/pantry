@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@seams/commerce-contracts/schema";
+import { recordParser } from "@purin-labs/commerce-contracts/schema";
 
 /**
  * Comments pinned to a board's elements (Plan 40B phase 5, slice 6), as

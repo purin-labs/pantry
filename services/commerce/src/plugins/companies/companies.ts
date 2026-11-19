@@ -11,7 +11,7 @@ import {
   type CommerceCompanyV1,
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { listVariants } from "../../commerce-persistence.ts";
 import type { CommerceDatabase } from "../../database.ts";

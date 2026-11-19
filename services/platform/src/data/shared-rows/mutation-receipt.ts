@@ -6,7 +6,7 @@
  * and is restored with its Organisation's rows (organisation-row.ts holds the
  * rules of the regional copy). See docs/refactor-12.md.
  */
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type {
   ControlMutationBoundary,

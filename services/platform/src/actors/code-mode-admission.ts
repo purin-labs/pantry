@@ -8,7 +8,7 @@ import type {
   SessionTransition,
   WorkspaceExecutorUsage,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
 import type { Env } from "../env";
@@ -53,8 +53,8 @@ import {
   readCodeModeExecution,
   type CodeModeExecutionRecord,
 } from "./code-mode-execution-record";
-import type { Variant } from "@seams/type-utils";
-import { sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { sha256Hex } from "@purin-labs/std";
 
 const CLEANUP_MARGIN_MS = 5_000;
 const EMPTY_REQUIREMENTS_DIGEST =

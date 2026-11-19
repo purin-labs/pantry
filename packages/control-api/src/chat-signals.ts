@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /** Something that the chat page shows changed. */
 export const CHAT_SIGNAL = "chat_changed";

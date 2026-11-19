@@ -7,8 +7,8 @@ import {
 } from "./disclosure-evidence";
 import { readProject } from "../projects/records";
 import { parseOrganisationId } from "../ids";
-import type { RequestAuthority } from "@seams/contracts";
-import { isUserId } from "@seams/control-api";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { isUserId } from "@purin-labs/control-api";
 import {
   listOrganisationMembers,
   readActiveOrganisationMembershipRevision,
@@ -31,7 +31,7 @@ import { decideFlowSink } from "../policy";
 import { authorizeProject } from "../projects/access";
 import { authorizeConversation } from "./conversation-access";
 import type { ConversationScope } from "./store";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   createNativeChatAudience,
   type NativeChatAudience,

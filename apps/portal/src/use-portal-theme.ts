@@ -5,7 +5,7 @@ import {
   resolveSurfaceAppearance,
   type AppearancePreferences,
   type PortalPalette,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { useUserPreferences } from "./preferences/context";
 import type { UserPreferenceOwner } from "./preferences/owner";
 

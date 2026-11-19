@@ -3,7 +3,7 @@ import {
   hasExactKeys,
   isNonNegativeInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { isProjectId, isUserId, type ProjectId, type UserId } from "./ids.ts";
 
 export type ProjectRole = "owner" | "editor" | "viewer";

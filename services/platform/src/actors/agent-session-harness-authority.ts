@@ -17,7 +17,7 @@ import type {
   Sha256Digest,
   Timestamp,
   TurnIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { Result } from "../result";
 import { MAX_CHECKPOINT_PLAINTEXT_BYTES } from "../harness-checkpoint";
@@ -37,7 +37,7 @@ import {
   prepareAcceptedHarnessEventProjection,
 } from "./agent-session-event-stream";
 import type { ActiveEmbeddedHarnessBackendId } from "./embedded-harness";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
@@ -45,7 +45,7 @@ import {
   isPositiveInteger,
   isRecord,
   nonNegativeIntegerOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export const MAX_DELIVERY_SEGMENT_BYTES = 1024 * 1024;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;

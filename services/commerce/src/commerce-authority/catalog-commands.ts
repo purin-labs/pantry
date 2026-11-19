@@ -29,7 +29,7 @@ import {
   type CommerceMutationErrorV1,
   type CommerceMutationResultV1,
   type CommerceOfferV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import type { CommerceDatabase } from "../database.ts";
 import {

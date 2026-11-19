@@ -11,8 +11,8 @@ import {
   type DeviceHealthReport,
   type DeviceStationId,
   type FoundDevice,
-} from "@seams/control-api";
-import { encodeBase64Url, sha256Hex } from "@seams/std";
+} from "@purin-labs/control-api";
+import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 import type { OrganisationId } from "../ids";
 import type { DeviceEnrollmentState, DeviceWorkState } from "./readiness";

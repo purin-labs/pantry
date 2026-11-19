@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { parseClaudeConnection, type ClaudeConnection } from "../index.ts";
 
 export function parseConnection(raw: unknown): ClaudeConnection {

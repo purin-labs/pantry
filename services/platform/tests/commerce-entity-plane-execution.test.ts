@@ -1,8 +1,8 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { describe, expect, it, vi } from "vitest";
-import { parseEntityPlaneCommandResult } from "@seams/commerce-client";
-import type { CommerceMutationReceiptV1 } from "@seams/contracts";
+import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
+import type { CommerceMutationReceiptV1 } from "@purin-labs/contracts";
 import type { CommerceEntityPlaneCaseProposal } from "../src/actors/case/types";
 import type { ActionLedgerEntry } from "../src/actors/action-ledger";
 import { parseApprovalEvidence } from "../src/approval-authentication";
@@ -28,7 +28,7 @@ import {
   InformationFlowContext,
 } from "../src/policy/information-flow";
 import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   requireCaseId,
   requireIntegrationAccountId,

@@ -29,7 +29,7 @@ import {
   type CommercePaymentV1,
   type CommercePreparationTicketV1,
   orderOriginCheckoutId,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { planOrderTicketCancellation } from "../plugins/food-service/index.ts";
 import {
   commerceTransition,
@@ -42,7 +42,7 @@ import {
   type RefundAttempt,
   type RefundAttemptLifecycle,
   type RefundAllocation,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   refundAttemptMoney,
@@ -86,10 +86,10 @@ import {
   sha256,
   timestampAtOrBefore,
 } from "./checkout-shared.ts";
-import { errorMessage, isRecord } from "@seams/std";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import { storedValueRedemption } from "../plugins/stored-value/index.ts";
 import { readManualTender } from "../payments/manual-tender.ts";
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type { MerchantRow } from "./ledger.ts";
 import {
   beginMerchantCommand,

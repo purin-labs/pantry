@@ -4,12 +4,12 @@ import {
   parseInventoryReceiptContext,
   parseInventoryQuantityText,
   type InventoryReceiptContext,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseMutationResult,
   type CommerceInventoryLotInputV1,
-} from "@seams/commerce-client";
-import { errorMessage, isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { errorMessage, isRecord } from "@purin-labs/std";
 import { controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import type { CommerceMutationTransport } from "./entity-plane/api";
@@ -19,7 +19,7 @@ import {
   StockDialogDone,
   StockDialogRetry,
 } from "./stock-dialog";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
   organisationId: string;
@@ -507,7 +507,7 @@ function purchaseOption(entry: PurchaseEntry) {
 function receiptPurchase(
   context: InventoryReceiptContext,
   form: FormData,
-): import("@seams/commerce-client").CommerceInventoryReceiptPurchase {
+): import("@purin-labs/commerce-client").CommerceInventoryReceiptPurchase {
   const id = form.get("purchase");
   if (id === "" || id === null) {
     return { kind: "unlinked" };

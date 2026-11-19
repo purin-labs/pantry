@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { AccessControlOption } from "@seams/control-api/portal/access-models";
+import type { AccessControlOption } from "@purin-labs/control-api/portal/access-models";
 import { Select } from "../../ui/select";
 
 export { cancelDialog, DialogHeading, syncDialog } from "../../dialog";

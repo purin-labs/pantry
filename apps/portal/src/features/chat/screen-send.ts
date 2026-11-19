@@ -2,14 +2,14 @@ import {
   KITCHEN_SURFACE,
   parseSurfaceObservation,
   type SurfaceObservationV2,
-} from "@seams/control-api";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
-import { errorMessage } from "@seams/std";
+} from "@purin-labs/control-api";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import { errorMessage } from "@purin-labs/std";
 import { bakerySurfaceForOrganisation } from "../bakery-surface-registry";
 import { captureSurfaceObservation } from "../surface-observation";
 import { takeScreenChipDecision } from "./screen-chip";
 import { settleScreenSuggestion } from "./screen-relevance";
-import type { Chat } from "@seams/control-api/portal/chat";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
 import { postChatCommand, type ChatCommand } from "./api";
 
 type ScreenCommand = Readonly<{

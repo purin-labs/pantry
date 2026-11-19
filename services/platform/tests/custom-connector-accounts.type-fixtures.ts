@@ -4,7 +4,7 @@ import type {
   CustomConnectorSetupAttempt,
 } from "../src/custom-connectors";
 import type { VaultHandle } from "../src/credential-vault";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 declare const attempt: VariantBy<
   CustomConnectorSetupAttempt,

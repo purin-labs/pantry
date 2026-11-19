@@ -11,9 +11,9 @@ import {
   type MemoryCommand,
   type MemoryView,
   type UserId,
-} from "@seams/control-api";
-import type { ModelRoute } from "@seams/contracts";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import type { ModelRoute } from "@purin-labs/contracts";
+import { isRecord } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,

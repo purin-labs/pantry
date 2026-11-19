@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router";
-import { parseOrderTimes, type OrderTime } from "@seams/control-api";
+import { parseOrderTimes, type OrderTime } from "@purin-labs/control-api";
 
 import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";

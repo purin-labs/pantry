@@ -1,5 +1,5 @@
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
-import type { WorkcellCursor } from "@seams/production-simulation/simulator/workcell-view";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
+import type { WorkcellCursor } from "@purin-labs/production-simulation/simulator/workcell-view";
 
 const invalidResource: WorkcellSelection = {
   kind: "resource",

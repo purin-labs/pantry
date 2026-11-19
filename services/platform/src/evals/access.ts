@@ -1,4 +1,4 @@
-import { parseEvalCommand, parseEvalRunCommand } from "@seams/control-api";
+import { parseEvalCommand, parseEvalRunCommand } from "@purin-labs/control-api";
 import type {
   EvalCommandErrorCode,
   EvalCommandReceipt,
@@ -11,9 +11,9 @@ import type {
   EvalRunView,
   EvalView,
   MemoryEvidence,
-} from "@seams/control-api";
-import { assertNever, sameJson } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import { assertNever, sameJson } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 import {
   requireActiveOrganisationActorAtPlacement,

@@ -1,5 +1,5 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
-import { isSystemCommerceEntity } from "@seams/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/contracts";
 import type {
   CounterSaleReadRequest,
   CounterSaleToolRead,
@@ -10,8 +10,8 @@ import type {
   SoldOutMarkRequest,
   SoldOutToolRead,
 } from "../catalog/types";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
-import type { CaseAssignment, HarnessTurnLease } from "@seams/contracts";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import type { Result } from "../../result";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
@@ -76,7 +76,7 @@ import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
 } from "../../context/assembly";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   type PreparedCommerceRead,
   admitCommerceReadObservation,
@@ -249,7 +249,7 @@ export async function prepareCommerceReadForEmbeddedHarness(
 
 /** The commerce records one graph read returned, at the revisions it saw. */
 function observedCommerceEntities(
-  result: import("@seams/contracts").CommerceGraphQueryResult,
+  result: import("@purin-labs/contracts").CommerceGraphQueryResult,
   merchantId: string,
 ): readonly CommerceObservationEntity[] {
   const observed: CommerceObservationEntity[] = [];
@@ -279,8 +279,8 @@ function observedCommerceEntities(
 
 export async function readEntityContextForEmbeddedHarness(
   context: SessionToolContext,
-  request: import("@seams/contracts").CommerceContextRequest,
-): Promise<import("@seams/contracts").CommerceGraphQueryResult> {
+  request: import("@purin-labs/contracts").CommerceContextRequest,
+): Promise<import("@purin-labs/contracts").CommerceGraphQueryResult> {
   const { env, storage, execution, lease, assignment } = context;
   const prepared = await prepareCommerceReadForEmbeddedHarness(
     env,
@@ -318,7 +318,7 @@ export async function readEntityContextForEmbeddedHarness(
 
 function selectEntityContextSourceGrant(
   lease: HarnessTurnLease,
-  request: import("@seams/contracts").CommerceContextRequest,
+  request: import("@purin-labs/contracts").CommerceContextRequest,
   input: Readonly<{
     organisationId: string;
     merchantId: string;
@@ -343,7 +343,7 @@ function selectEntityContextSourceGrant(
  * request may ask for that grant.
  */
 function requestableRecordRead(
-  request: import("@seams/contracts").CommerceContextRequest,
+  request: import("@purin-labs/contracts").CommerceContextRequest,
   error: unknown,
 ): never {
   const read = recordReadOfRequest(request);
@@ -358,7 +358,7 @@ function requestableRecordRead(
 }
 
 function recordReadOfRequest(
-  request: import("@seams/contracts").CommerceContextRequest,
+  request: import("@purin-labs/contracts").CommerceContextRequest,
 ): RequestableEntityTypeRead | null {
   if (request.selection.kind === "entity_seeds") {
     const typeId = request.selection.seeds[0]?.typeId;

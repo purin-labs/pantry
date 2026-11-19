@@ -1,10 +1,10 @@
-import type { ChatContextDetails } from "@seams/control-api";
+import type { ChatContextDetails } from "@purin-labs/control-api";
 import type {
   AcceptedInputRef,
   HarnessHistoryEntry,
   HarnessTurnLease,
   TurnIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Result } from "../../result";
 import {
   preflightHarnessTurnLease,
@@ -17,8 +17,8 @@ import type {
 } from "../harness-history";
 import type { EmbeddedHarnessSource } from "../embedded-harness";
 import { ObservationEvidence } from "../../policy";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { materializedHarnessHistory } from "./harness-source";
 import type { FreshLineageHistoryError } from "./types";
 

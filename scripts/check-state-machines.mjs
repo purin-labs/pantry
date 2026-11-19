@@ -72,7 +72,7 @@ for (const path of machineFiles) {
 }
 
 // Commerce's commerce machines keep their own table rules
-// (`pnpm --filter @seams/commerce-contracts commerce-data:check`); a due exit
+// (`pnpm --filter @purin-labs/commerce-contracts commerce-data:check`); a due exit
 // there must still name a pass that the alarm runs.
 for (const machine of Object.values(COMMERCE_MACHINES))
   for (const [state, definition] of Object.entries(machine.states))

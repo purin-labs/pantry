@@ -33,9 +33,9 @@ import {
   type CommercePaymentPublicSessionV1,
   CURRENCY_MINOR_UNITS,
   commercePickupCode,
-} from "@seams/commerce-client";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
 import {
   CartDrawer,
   PATISSERIE_PRODUCTS,

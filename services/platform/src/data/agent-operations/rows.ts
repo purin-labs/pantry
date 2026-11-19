@@ -5,8 +5,8 @@ import {
   isTimeOfDay,
   isValidTimeZone,
 } from "../../schedules/window";
-import { isRecord } from "@seams/std";
-import type { AgentSkillRef, ScheduleSpec } from "@seams/control-api";
+import { isRecord } from "@purin-labs/std";
+import type { AgentSkillRef, ScheduleSpec } from "@purin-labs/control-api";
 import type {
   AgentConfigurationProposal,
   AgentDefinition,

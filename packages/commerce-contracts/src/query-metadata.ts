@@ -6,8 +6,8 @@ import {
   type ContractRejection,
 } from "./schema.ts";
 import { Type, type Static } from "typebox";
-import type { StrictUnion } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import type { TLocalizedValidationError } from "typebox/error";
 
 export const commerceSnapshotRevisionSchema = Type.Unsafe<

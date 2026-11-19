@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { GrinderModel } from "../../native/cell-adapter.ts";
 import type { TravelRoute } from "../../scenario.ts";
 import type { CarryoverMiseEnPlaceLot } from "./mise-en-place.ts";

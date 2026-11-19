@@ -1,9 +1,9 @@
 import { createPublicKey, verify } from "node:crypto";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   parseCommerceDelivery,
   commerceDeliverySignaturePayload,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import type { CommerceSigner } from "../commerce-authority/contracts.ts";
 import { rewindFeedConsumers } from "../feed-consumers.ts";

@@ -1,5 +1,5 @@
 {
-  "name": "@seams/punter",
+  "name": "@purin-labs/punter",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,9 +9,9 @@
     "scenario:shipping": "node --experimental-strip-types src/shipping-cli.ts"
   },
   "dependencies": {
-    "@seams/std": "workspace:*",
-    "@seams/type-utils": "workspace:*",
-    "@seams/commerce-client": "workspace:*"
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

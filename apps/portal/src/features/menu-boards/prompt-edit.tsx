@@ -1,11 +1,11 @@
 import React from "react";
-import { newConversationId, type ConversationId } from "@seams/control-api";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
+import { newConversationId, type ConversationId } from "@purin-labs/control-api";
+import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
 import {
   menuBoardElementProps,
   type MenuBoardElement,
   type MenuBoardSnapshot,
-} from "@seams/menu-board-crdt/board";
+} from "@purin-labs/menu-board-crdt/board";
 import { captureBakeryBrowserContext } from "../bakery-browser-context";
 import { readChat } from "../chat/api";
 import { sendChat } from "../chat/screen-send";
@@ -13,7 +13,7 @@ import { controlAnswer, controlRead, controlWrite } from "../../control-client";
 import { controlPath } from "./menu-board-requests";
 import type { MenuBoardClient } from "./board-client";
 import "./prompt-edit.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Prompt to edit (Plan 40B phase 5, slice 9): the person selects elements

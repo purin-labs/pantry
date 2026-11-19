@@ -1,5 +1,5 @@
 import type { EmailReviewProjection } from "../data/email-review";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type SlackEmailReviewNotice = Readonly<{
   deliveryId: string;

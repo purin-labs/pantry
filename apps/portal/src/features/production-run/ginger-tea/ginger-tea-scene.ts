@@ -8,7 +8,7 @@ import washSinkUrl from "../models/wash-sink.glb?url";
 import type {
   GingerTeaCobotSample,
   GingerTeaHobModel,
-} from "@seams/production-simulation/recipes/ginger-tea/model";
+} from "@purin-labs/production-simulation/recipes/ginger-tea/model";
 import {
   addWorkcellBench,
   addWorkcellLights,

@@ -6,8 +6,8 @@ import { renderToStaticMarkup } from "../../../apps/portal/node_modules/react-do
 import { describe, expect, it } from "vitest";
 
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "../../../apps/portal/src/agent-operations";
-import { parseAgentOperationForm, parseAgentOperationsResponse, type AgentOperationsSnapshot } from "@seams/control-api/portal/agent-operations";
-import { parseCommerceActionRecordResponse } from "@seams/control-api/portal/commerce-actions";
+import { parseAgentOperationForm, parseAgentOperationsResponse, type AgentOperationsSnapshot } from "@purin-labs/control-api/portal/agent-operations";
+import { parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
 import type { CommerceOperationsTransport } from "../../../apps/portal/src/features/commerce/operations";
 import {
   AgentOperationsRouteView,
@@ -16,7 +16,7 @@ import {
 } from "../../../apps/portal/src/pages/automation";
 // @ts-expect-error Platform's test tsconfig intentionally excludes JSX; the portal build type-checks this module separately.
 import { diffLines } from "../../../apps/portal/src/pages/agent-documents";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const ORGANISATION_ID = "organisation_cafe";
 const TRANSPORT: AgentOperationsTransport = {

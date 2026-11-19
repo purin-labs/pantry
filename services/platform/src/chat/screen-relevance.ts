@@ -1,12 +1,12 @@
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   ChatOrigin,
   ScreenRelevanceRequest,
   ScreenRelevanceView,
-} from "@seams/control-api";
-import { surfaceAreaTitle } from "@seams/control-api";
-import { bytesToHex } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import { surfaceAreaTitle } from "@purin-labs/control-api";
+import { bytesToHex } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { requireActiveOrganisationActorAtScope } from "../actors/actor-router";
 import type { Env } from "../env";
 import type { ScreenRelevanceState } from "../jev-features/screen-relevance-jev";
@@ -151,7 +151,7 @@ export async function recordScreenRelevanceChoice(
     placement: OrganisationExecutionScope;
     scope: ConversationScope;
     checkId: string;
-    choice: import("@seams/control-api").ScreenRelevanceChoice;
+    choice: import("@purin-labs/control-api").ScreenRelevanceChoice;
   }>,
 ): Promise<
   Result<null, Readonly<{ code: "screen_relevance_check_not_found" }>>

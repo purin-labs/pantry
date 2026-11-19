@@ -1,9 +1,9 @@
 import type { UserId } from "../../ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { sha256Hex, assertNever } from "@seams/std";
-import type { ChatContextDetails } from "@seams/control-api";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
-import type { BakerySurfaceAttachmentV1 } from "@seams/bakery-model/bakery-surface";
+import { sha256Hex, assertNever } from "@purin-labs/std";
+import type { ChatContextDetails } from "@purin-labs/control-api";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { Env } from "../../env";
 import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
 import {
@@ -21,7 +21,7 @@ import {
   type StoredConversation,
 } from "../store";
 import type { BakerySurfaceTimelineEvent } from "../../actors/bakery-surface-effect";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { timelineEventHasId } from "./admission";
 import { nextTimelineSequence } from "./timeline";
 

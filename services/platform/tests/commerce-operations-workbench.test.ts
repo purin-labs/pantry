@@ -1,5 +1,5 @@
-import { parseCommerceGraphResponse } from "@seams/commerce-client";
-import type { CommerceEntity, CommerceFreshness } from "@seams/contracts";
+import { parseCommerceGraphResponse } from "@purin-labs/commerce-client";
+import type { CommerceEntity, CommerceFreshness } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -7,7 +7,7 @@ import {
   parseTrackingBatchPreviewRequest,
   previewTrackingBatch,
 } from "../src/commerce/operations-workbench";
-import type { CommerceExceptionInbox } from "@seams/control-api";
+import type { CommerceExceptionInbox } from "@purin-labs/control-api";
 
 const OBSERVED_AT = "2026-08-29T00:00:00.000Z";
 const EXPECTED_BY = "2026-08-30T03:00:00.000Z";

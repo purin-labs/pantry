@@ -3,14 +3,14 @@ import {
   compareMeasuredSixHourShift,
   compareShiftMetric,
   parseMeasuredSixHourShift,
-} from "@seams/production-simulation/recipes/bakery/shift-report";
+} from "@purin-labs/production-simulation/recipes/bakery/shift-report";
 import React from "react";
 import type {
   ProductionReport,
   OrderResult,
   ReportedQuantity,
   StockBalance,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import type {
   ShiftReport,
   ShiftHour,
@@ -18,11 +18,11 @@ import type {
   Measurement,
   MeasuredSixHourShift,
   MeasuredSixHourMetricComparison,
-} from "@seams/production-simulation/recipes/bakery/shift-report";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation/recipes/bakery/shift-report";
+import { assertNever } from "@purin-labs/std";
 import { downloadBakeryFile } from "../workflow-simulator/file-download";
 import { seconds } from "./oven-logistics";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const MAX_SIX_HOUR_MEASUREMENT_BYTES = 1024 * 1024;
 

@@ -2,7 +2,7 @@ import { exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { HttpResponse, http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { network } from "./network";
 import { connectorOf } from "./slack-follow-up-support";

@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type { OrganisationId } from "../ids";
-import type { SupplierPayoutStateKind } from "@seams/control-api";
+import type { SupplierPayoutStateKind } from "@purin-labs/control-api";
 
 /**
  * The canonical supplier payout.

@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { newProjectId } from "@seams/control-api";
+import { newProjectId } from "@purin-labs/control-api";
 import {
   evictDurableObject,
   runDurableObjectAlarm,
@@ -8,7 +8,7 @@ import {
 } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
-import { encodeBase64, isRecord } from "@seams/std";
+import { encodeBase64, isRecord } from "@purin-labs/std";
 import { parsePantryAccountBinding } from "../../src/account-platform/types";
 import { parseRequestId } from "../../src/ids";
 import { createAccountPlatformClient } from "../../src/account-platform/client";

@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { CommerceStorefrontClient } from "@seams/commerce-client";
+import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 
 import {
   CAFE_STOREFRONT_ID,

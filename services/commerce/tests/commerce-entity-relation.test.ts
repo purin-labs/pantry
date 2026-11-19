@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import type {
   CommerceCursorBoundary,
   CommerceQueryPlan,
-} from "@seams/commerce-contracts";
-import { compileCommerceQuerySql } from "@seams/commerce-query-sqlite";
-import { planCommerceGraphQuery } from "@seams/commerce-contracts/query-planner";
-import { encodeCommerceCursor } from "@seams/commerce-contracts/query-encoders";
-import { parseCommerceCursorPayload } from "@seams/commerce-contracts/cursor-payload";
-import type { ContractDecodeResult } from "@seams/commerce-contracts/schema";
-import { parseCommerceQueryPlanOutcome } from "@seams/commerce-client";
+} from "@purin-labs/commerce-contracts";
+import { compileCommerceQuerySql } from "@purin-labs/commerce-query-sqlite";
+import { planCommerceGraphQuery } from "@purin-labs/commerce-contracts/query-planner";
+import { encodeCommerceCursor } from "@purin-labs/commerce-contracts/query-encoders";
+import { parseCommerceCursorPayload } from "@purin-labs/commerce-contracts/cursor-payload";
+import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
+import { parseCommerceQueryPlanOutcome } from "@purin-labs/commerce-client";
 
 import { NodeCommerceDatabase } from "../src/node-database.ts";
 import { initializeCommerceSchema } from "../src/schema.ts";

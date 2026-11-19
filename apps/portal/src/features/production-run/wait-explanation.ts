@@ -6,8 +6,8 @@ import type {
   TaskDefinition,
   TaskView,
   WorkflowDefinition,
-} from "@seams/production-simulation";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/production-simulation";
+import { assertNever } from "@purin-labs/std";
 import {
   carrierNoun,
   clock,
@@ -15,7 +15,7 @@ import {
   placeLabel,
   taskLabel,
 } from "./factory-places";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Logistics = Variant<LogisticsView, "available">;
 

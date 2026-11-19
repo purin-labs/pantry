@@ -1,10 +1,10 @@
 import React from "react";
-import type { StockRow } from "@seams/contracts";
+import type { StockRow } from "@purin-labs/contracts";
 import {
   parseInventoryDeliveries,
   type InventoryDeliveries,
   type InventoryDelivery,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlRead } from "../../control-client";
 import { PageSkeleton, RecoverableError } from "../../page-components";
@@ -22,7 +22,7 @@ import {
   type TimeLanesItem,
   type TimeLanesSection,
 } from "../../ui";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 // What expires and what arrives: each lot on its expiry date and each open
 // purchase on its delivery date. The rows are the ones the page's search,

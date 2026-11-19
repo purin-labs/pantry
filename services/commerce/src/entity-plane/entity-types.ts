@@ -1,4 +1,4 @@
-import type { CommerceSnapshotRevision } from "@seams/commerce-contracts";
+import type { CommerceSnapshotRevision } from "@purin-labs/commerce-contracts";
 import type {
   CommerceEntityPlaneChange,
   CommerceEntityPlaneChangeResource,
@@ -7,7 +7,7 @@ import type {
   CommerceEntityPlaneQueryRequest,
   CommerceEntityPlaneSystemExtensionRequest,
   CommerceEntityPlaneSystemExtensionResponse,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export type {
   AttributeDefinition,
@@ -51,7 +51,7 @@ export type {
   SavedCommerceViewId,
   SavedCommerceViewRevision,
   CommerceMutationReceiptV1,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 /** The route owns merchant binding; request wire shapes remain client-owned. */
 export type EntityPlaneQueryRequest = CommerceEntityPlaneQueryRequest;

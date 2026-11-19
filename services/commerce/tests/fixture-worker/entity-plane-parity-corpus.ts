@@ -4,9 +4,9 @@
 // entities, two custom relationships and three export list entries. The rows
 // are written directly, as the parity test always did, because no public
 // route creates hand-made relation rows with exact ids and timestamps.
-import { NORMALIZED_CONFORMANCE_ROWS } from "@seams/commerce-query-sqlite/normalized-conformance";
-import { parseRelationshipId } from "@seams/commerce-client";
-import type { CustomEntityTypeRevision } from "@seams/commerce-contracts";
+import { NORMALIZED_CONFORMANCE_ROWS } from "@purin-labs/commerce-query-sqlite/normalized-conformance";
+import { parseRelationshipId } from "@purin-labs/commerce-client";
+import type { CustomEntityTypeRevision } from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../../src/database.ts";
 import { initializeCommerceEntityRelation } from "../../src/entity-plane/commerce-entity-relation.ts";

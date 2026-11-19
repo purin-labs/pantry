@@ -7,8 +7,8 @@ import {
   newProjectId,
   sideCaseHereRequestId,
   type ConversationId,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import { saveConversation } from "../../src/chat/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../database-handles";
-import type { Outcome, RequestAuthority } from "@seams/contracts";
+import type { Outcome, RequestAuthority } from "@purin-labs/contracts";
 import type { UserId } from "../../ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { chatInputParts } from "../input-parts";
@@ -8,7 +8,7 @@ import type {
   ChatReceiptReference,
   ChatToolView,
   ChatTurnUsage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   bakerySurfaceTimelineResult,
   bakerySurfaceTimelineTool,
@@ -42,8 +42,8 @@ import {
   listBakerySurfaceTimelineEvents,
   type BakerySurfaceTimelineEvent,
 } from "../../actors/bakery-surface-effect";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { timelineEventHasId } from "./admission";
 import { appendConfirmedBrowserContext } from "./context";
 

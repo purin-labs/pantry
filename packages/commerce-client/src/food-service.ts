@@ -15,7 +15,7 @@ import type {
   ShipmentEntityId,
   StockPolicy,
   QuantityUnit,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   parseCompleteProductionBatchCommand as parseCompleteProductionBatchCommandRecord,
@@ -34,7 +34,7 @@ import {
   parseShipmentEntityId as parseShipmentEntityIdRecord,
   parseCommerceFoodServiceObservationV1 as parseCommerceFoodServiceObservationV1Record,
   parseCommerceFoodServiceSnapshotV1 as parseCommerceFoodServiceSnapshotV1Record,
-} from "@seams/commerce-contracts/records/api-food-service";
+} from "@purin-labs/commerce-contracts/records/api-food-service";
 export type CommerceFoodServiceResourcesV1 = Readonly<{
   menus: readonly Menu[];
   modifierGroupRevisions: readonly ModifierGroupRevision[];

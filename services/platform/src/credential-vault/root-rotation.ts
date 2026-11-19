@@ -16,8 +16,8 @@ import {
   type VaultKeyVersion,
   type VaultRootBinding,
 } from "./keyring";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isNonNegativeInteger } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 
 const vaultRootRotationIdBrand: unique symbol = Symbol("VaultRootRotationId");
 const vaultRotationBatchLimitBrand: unique symbol = Symbol(

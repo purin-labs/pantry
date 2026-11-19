@@ -1,15 +1,15 @@
 import { AgentCursors } from "../../collaboration/agent-cursors";
 import React from "react";
 import { useBlocker, type Blocker } from "react-router";
-import { DESCRIPTION_LIMIT } from "@seams/product-description-crdt";
+import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt";
 import { DescriptionDraftClient, type DescriptionDraftView } from "./client";
 import { DraftParticipants, DraftPresenceOverlay, DraftMousePointers } from "./presence";
 import { cancelDialog, syncDialog } from "../../../dialog";
-import type { CommerceActionRecord } from "@seams/control-api/portal/commerce-actions";
-import type { VariantBy } from "@seams/type-utils";
-import type { PermissionRequired } from "@seams/control-api";
+import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import type { VariantBy } from "@purin-labs/type-utils";
+import type { PermissionRequired } from "@purin-labs/control-api";
 import { PermissionRequiredPrompt, permissionRequiredOf } from "../../access/permission-required-prompt";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type ProductDescriptionSnapshot = Readonly<{
   productId: string;

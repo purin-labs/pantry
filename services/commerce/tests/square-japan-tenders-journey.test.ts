@@ -8,12 +8,12 @@ import type {
   CommerceCounterSaleV1,
   CommerceOrderV1,
   CommercePaymentV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   InPersonPaymentBinding,
   InPersonPaymentMethod,
-} from "@seams/commerce-contracts";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-contracts";
+import { isRecord } from "@purin-labs/std";
 import { expect, it } from "vitest";
 
 import {

@@ -1,4 +1,4 @@
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 import type { JsonObject } from "./http";
 import { parsePersonId, type PersonId } from "./data/person-authz";
@@ -42,8 +42,8 @@ import {
   parseSlackUserId,
   type SlackMessageEvent,
 } from "./slack/events";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { isRecord } from "@purin-labs/std";
 
 export type SlackCaseEventEnvelope = {
   requestId: RequestId;

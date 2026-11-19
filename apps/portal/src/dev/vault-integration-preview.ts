@@ -1,4 +1,4 @@
-import type { VaultEvent, VaultStoreView } from "@seams/control-api";
+import type { VaultEvent, VaultStoreView } from "@purin-labs/control-api";
 
 /**
  * The Vault store routes for the integrations preview (Plan 79). The token

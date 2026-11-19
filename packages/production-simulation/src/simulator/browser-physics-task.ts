@@ -1,10 +1,10 @@
-import type { RobotModel } from "@seams/bakery-model/bakery-robots";
+import type { RobotModel } from "@purin-labs/bakery-model/bakery-robots";
 import type { NativeContinuation } from "../recipes/bakery/native-continuation.ts";
 import type {
   PhysicsReplay,
   IngredientLoad,
   PhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 
 // What one browser MuJoCo job runs and returns. Kept apart from the worker
 // host so schedulers and tests can name tasks without a DOM.

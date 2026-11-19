@@ -22,11 +22,11 @@ import {
   type MemoryCommand,
   type MemoryCommandReceipt,
   type MemoryView,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
-import { parseEntityRef } from "@seams/commerce-client";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
+import { parseEntityRef } from "@purin-labs/commerce-client";
 
-import { parseAgentOperationsResponse, type AgentDefinition, type Skill } from "@seams/control-api/portal/agent-operations";
+import { parseAgentOperationsResponse, type AgentDefinition, type Skill } from "@purin-labs/control-api/portal/agent-operations";
 import { ControlApiError, lastControlRead } from "../../control-client";
 import { evalsPath, memoriesPath } from "../../control-paths";
 

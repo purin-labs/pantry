@@ -25,23 +25,23 @@ import {
   type DraftCompilation,
   type DraftProblem,
   type WorkflowDiff,
-} from "@seams/bakery-workflow/draft";
-import { proposalChangeSummary } from "@seams/bakery-workflow/changes";
-import type { RunFinding } from "@seams/bakery-workflow/findings";
-import type { TaskView } from "@seams/production-simulation";
+} from "@purin-labs/bakery-workflow/draft";
+import { proposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
+import type { RunFinding } from "@purin-labs/bakery-workflow/findings";
+import type { TaskView } from "@purin-labs/production-simulation";
 import {
   NODE_COLUMN,
   NODE_HEIGHT,
   NODE_ROW,
   NODE_WIDTH,
-} from "@seams/bakery-workflow/layout";
+} from "@purin-labs/bakery-workflow/layout";
 import {
   DRAFT_LABEL_LIMIT,
   WorkflowDraftDoc,
   draftNodeId,
   type DraftNode,
   type DraftSnapshot,
-} from "@seams/workflow-canvas-crdt/draft";
+} from "@purin-labs/workflow-canvas-crdt/draft";
 import {
   ArrowUp,
   Bot,
@@ -107,7 +107,7 @@ import {
   type DraftConnectionView,
 } from "./workflow-draft-client";
 import "./recipe-workflow-graph.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** A larger recipe opens on one workflow. The whole of it can still show. */
 const LARGE_RECIPE_STEPS = 64;

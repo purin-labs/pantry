@@ -24,7 +24,7 @@ import type {
   AccessControlGrantView,
   AccessControlSubjectView,
   AccessControlView,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 import {
   buildAccessSystems,
   levelLabel,

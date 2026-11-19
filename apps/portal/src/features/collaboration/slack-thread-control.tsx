@@ -1,6 +1,6 @@
 import React from "react";
 import { controlRead, controlWrite } from "../../control-client";
-import { parseSharedThreadResponse } from "@seams/control-api/portal/slack-thread";
+import { parseSharedThreadResponse } from "@purin-labs/control-api/portal/slack-thread";
 
 type SharedThreadState =
   | Readonly<{ kind: "loading" }>

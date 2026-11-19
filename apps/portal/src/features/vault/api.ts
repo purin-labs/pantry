@@ -10,8 +10,8 @@ import {
   type VaultItemResult,
   type VaultStoreCommand,
   type VaultStoreResult,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import {
   ControlApiError,
@@ -25,7 +25,7 @@ import {
   vaultItemsPath,
   vaultStorePath,
 } from "../../control-paths";
-import { parseCredentialInventoryResponse } from "@seams/control-api/portal/credential-inventory";
+import { parseCredentialInventoryResponse } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   keysOfInferenceSelection,
   keysOfInventory,

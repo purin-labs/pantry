@@ -1,4 +1,4 @@
-import type { IntegrationDiscoveryView } from "@seams/contracts";
+import type { IntegrationDiscoveryView } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 import { parseIntegrationDiscoveryView } from "../src/access-control/integration-discovery";
 import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 // Fails when a module keeps its own copy of a shared helper:
-// - a local function or const with the name of an @seams/std export. One name
+// - a local function or const with the name of an @purin-labs/std export. One name
 //   keeps one meaning: a local definition with a shared name is either a copy
 //   (import it instead) or behaves differently (rename it);
 // - a renamed copy: a local function with the form of a shared helper under
 //   another name (see FORMS), or an inline backoff formula;
-// - `Extract<U, { kind: K }>`, which @seams/type-utils names `Variant<U, K>`.
+// - `Extract<U, { kind: K }>`, which @purin-labs/type-utils names `Variant<U, K>`.
 // It reads TypeScript and JavaScript. The name rule covers tests too; the
 // other rules cover product code (TESTS lists the test paths).
 // `--list` prints every finding and the count for each helper, and exits 0.
@@ -103,21 +103,21 @@ for (const file of files) {
     for (const { name, fn } of definitions(statement)) {
       const key = `${file}#${name.text}`;
       if (shared.has(name.text)) {
-        report(name, key, name.text, `defines ${name.text}; import it from @seams/std or give a different behaviour a different name`);
+        report(name, key, name.text, `defines ${name.text}; import it from @purin-labs/std or give a different behaviour a different name`);
         continue;
       }
       if (!fn || !product) continue;
       const form = FORMS.find(({ test }) => test(fn));
-      if (form) report(name, key, form.helper, `${name.text} is a copy of ${form.helper}; import it from @seams/std`);
+      if (form) report(name, key, form.helper, `${name.text} is a copy of ${form.helper}; import it from @purin-labs/std`);
     }
   }
   if (!product) continue;
   visit(source, (node) => {
     if (isBackoffFormula(node)) {
       const line = source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1;
-      report(node, `${file}#backoff@${line}`, "backoffDelay", "is a backoff formula; use backoffDelay from @seams/std");
+      report(node, `${file}#backoff@${line}`, "backoffDelay", "is a backoff formula; use backoffDelay from @purin-labs/std");
     } else if (isExtractByKind(node)) {
-      report(node, `${file}#Extract`, "Variant", "uses Extract<U, { kind: K }>; use Variant<U, K> from @seams/type-utils");
+      report(node, `${file}#Extract`, "Variant", "uses Extract<U, { kind: K }>; use Variant<U, K> from @purin-labs/type-utils");
     }
   });
 }

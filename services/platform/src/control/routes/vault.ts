@@ -2,8 +2,8 @@ import {
   parseVaultItemCommand,
   parseVaultItemCreate,
   parseVaultStoreCommand,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import {
   commandVaultStoreItem,
@@ -20,7 +20,7 @@ import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Settings → Vault (Plan 79): website logins and contact profiles, kept in

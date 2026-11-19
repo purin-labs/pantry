@@ -66,7 +66,7 @@ import {
   PRODUCT_DESCRIPTION_ACTION_TRANSPORT,
   WORKSPACE_SETTINGS_ROUTE_TRANSPORT,
 } from "./portal-transports";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { ControlPortalApp } from "./portal";
 import type { PortalState } from "./portal-types";
 import type { WorkspaceRouteSelection } from "./portal-routing";

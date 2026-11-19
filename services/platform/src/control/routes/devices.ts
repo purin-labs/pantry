@@ -14,7 +14,7 @@ import {
   type DeviceStationId,
   type DeviceView,
   type MenuScreenSummary,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { deviceFleetStub, type DeviceSample } from "../../actors/device-fleet";
 import { roleMayConfigure, roleMayOperate } from "../../data/control-plane";

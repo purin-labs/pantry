@@ -29,7 +29,7 @@ import {
   type OrganisationId,
 } from "../src/ids";
 import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   bindOperatorTurnAccess,
   type SessionTurnExecution,

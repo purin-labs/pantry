@@ -7,10 +7,10 @@ import {
   type MailAssistantCommand,
   type MailRule,
   type MailDecision,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { mailAssistantRequest } from "./api";
 import { mailRuleLabel } from "./rule-label";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
   organisationId: string;

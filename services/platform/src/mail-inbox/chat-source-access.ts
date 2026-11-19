@@ -1,5 +1,5 @@
-import type { RequestAuthority } from "@seams/contracts";
-import { isProjectId, isUserId } from "@seams/control-api";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { isProjectId, isUserId } from "@purin-labs/control-api";
 import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import { listAccessGrants } from "../data/access-grants";
 import type { Env } from "../env";
@@ -15,7 +15,7 @@ import { authorizeProject } from "../projects/access";
 import { validateLiveRequestAuthority } from "../request-authority";
 import type { Result } from "../result";
 import type { EmailChatContext, EmailChatSource } from "./reply-sources";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The resource scope of every commerce grant (`integrationResourceScopeForGrant`). */
 const COMMERCE_READ_SCOPE_PREFIX = "commerce_read:";

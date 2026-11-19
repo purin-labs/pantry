@@ -15,14 +15,14 @@ import type {
   CommercePaymentCaptureResultV1,
   CommercePaymentRefundResultV1,
   CommercePaymentSessionResultV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   InPersonPaymentBinding,
   InPersonPaymentMethod,
   OnlinePaymentBinding,
-} from "@seams/commerce-contracts";
-import { isRecord } from "@seams/std";
-import type { VariantBy } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts";
+import { isRecord } from "@purin-labs/std";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 import type { CommerceDatabase } from "../../database.ts";
 import type {

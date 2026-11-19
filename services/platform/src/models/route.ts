@@ -1,7 +1,7 @@
 import { readClaudeConnection } from "./claude-connection";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { ModelRoute } from "@seams/contracts";
-import type { ChatEffort, ChatModelCapabilities } from "@seams/control-api";
+import type { ModelRoute } from "@purin-labs/contracts";
+import type { ChatEffort, ChatModelCapabilities } from "@purin-labs/control-api";
 
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
@@ -28,8 +28,8 @@ import {
   ORGANISATION_ANTHROPIC_MODEL_OPTIONS,
   ORGANISATION_CODEX_MODEL_OPTIONS,
 } from "./catalog";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever, sha256Hex } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 
 export const ORGANISATION_CODEX_MODEL = DEFAULT_ORGANISATION_CODEX_MODEL;
 

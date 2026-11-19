@@ -10,10 +10,10 @@ import {
   type CommerceApiCredentialsV1,
   type CommerceIssuedApiKeyV1,
   type CommerceMerchantClosureV1,
-} from "@seams/commerce-contracts/records/api-access";
+} from "@purin-labs/commerce-contracts/records/api-access";
 import {
   parseCommerceInPersonCheckoutPaymentCollectionV1 as parseCommerceInPersonCheckoutPaymentCollectionV1Record,
-} from "@seams/commerce-contracts/records/api-payment-session";
+} from "@purin-labs/commerce-contracts/records/api-payment-session";
 import {
   commerceBearerToken,
   type CommerceApiScope,
@@ -22,9 +22,9 @@ import {
 import {
   type CheckoutProfile,
   type PointOfSaleConfiguration,
-} from "@seams/commerce-contracts";
-import { errorMessage } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/commerce-contracts";
+import { errorMessage } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   parseTenderRefund,
   type CancelCommerceOrderV1,
@@ -52,27 +52,27 @@ import {
   parseCommerceStorefrontShopNameV1,
   type CommerceStorefrontShopNameChangeV1,
   type CommerceStorefrontShopNameV1,
-} from "@seams/commerce-contracts/records/api-shop-names";
+} from "@purin-labs/commerce-contracts/records/api-shop-names";
 import {
   parseCommerceFailedPaymentsV1,
   type CommerceFailedPaymentsV1,
-} from "@seams/commerce-contracts/records/api-failed-payments";
+} from "@purin-labs/commerce-contracts/records/api-failed-payments";
 import {
   parseCommercePaymentsV1,
   type CommercePaymentsV1,
-} from "@seams/commerce-contracts/records/api-payments";
+} from "@purin-labs/commerce-contracts/records/api-payments";
 import {
   parseCommerceOrderTimesV1,
   type CommerceOrderTimesV1,
-} from "@seams/commerce-contracts/records/api-order-times";
+} from "@purin-labs/commerce-contracts/records/api-order-times";
 import {
   parseCommerceBankPayoutsV1,
   type CommerceBankPayoutsV1,
-} from "@seams/commerce-contracts/records/api-bank-payouts";
+} from "@purin-labs/commerce-contracts/records/api-bank-payouts";
 import {
   parseCommercePickupQueueV1,
   type CommercePickupQueueV1,
-} from "@seams/commerce-contracts/records/api-pickup-queue";
+} from "@purin-labs/commerce-contracts/records/api-pickup-queue";
 import {
   parseMerchantSnapshot,
   parsePointOfSaleConfiguration,
@@ -319,8 +319,8 @@ import {
   parseCommerceSquareDevicesV1Record,
   parseCommerceSquareDeviceCodeV1Record,
   parseUpdateProductDescriptionCommandRecord,
-} from "@seams/commerce-contracts/records/api-admin";
-import type * as WireAdmin from "@seams/commerce-contracts/records/api-admin";
+} from "@purin-labs/commerce-contracts/records/api-admin";
+import type * as WireAdmin from "@purin-labs/commerce-contracts/records/api-admin";
 
 /**
  * Lets a location of the merchant's connected Square account take payments

@@ -7,7 +7,7 @@ import {
   parseMenuHours,
   type MenuHourDay,
   type MenuHours,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { useBlocker, useLocation, useNavigate } from "react-router";
 import { pageAddress, pageLink } from "../../page-address";
 import { controlRead, controlRefusal, controlWrite } from "../../control-client";
@@ -18,7 +18,7 @@ import {
   type MenuDraftSnapshot,
   type MenuItem,
   type MenuSection,
-} from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-draft-crdt";
 import {
   DraftMousePointers,
   DraftParticipants,
@@ -33,8 +33,8 @@ import {
   isNonNegativeInteger,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
-import { type MenuDraftReview, parseMenuReview, parseMenuSnapshot } from "@seams/control-api/portal/content-studio-menu";
+} from "@purin-labs/std";
+import { type MenuDraftReview, parseMenuReview, parseMenuSnapshot } from "@purin-labs/control-api/portal/content-studio-menu";
 
 type MenuReviewState =
   | Readonly<{ kind: "idle" }>

@@ -1,4 +1,4 @@
-import type { Variant, VariantBy } from "@seams/type-utils";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type {
   CommerceEntityType,
   CommerceList,

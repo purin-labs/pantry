@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiPaymentSession from "@seams/commerce-contracts/records/api-payment-session";
+import type * as apiPaymentSession from "@purin-labs/commerce-contracts/records/api-payment-session";
 import type {
   CreateCommerceBuyerPaymentSessionV1,
   CommercePaymentClientConfirmationV1,

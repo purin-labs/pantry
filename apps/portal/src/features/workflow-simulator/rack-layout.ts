@@ -6,15 +6,15 @@ import {
   parsePhysicsRequest,
   rackLayoutHash,
   type PhysicsLayout,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import setup from "../../../../../assets/bakery-mujoco/fr10-workcell/native/fairino-fr10/table-to-rack-nominal.json" with { type: "json" };
 import {
   compileWorkcellInput,
   type TransferInput,
-} from "@seams/production-simulation/recipes/bakery/workcell-input";
-import { COLD_CELL } from "@seams/production-simulation/recipes/bakery/workcell-instances";
-import type { ActiveAttempt } from "@seams/production-simulation/recipes/bakery/workcell-attempt";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
+import { COLD_CELL } from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
+import type { ActiveAttempt } from "@purin-labs/production-simulation/recipes/bakery/workcell-attempt";
+import type { Variant } from "@purin-labs/type-utils";
 
 // The rack translation moves the table-to-rack destination of the Robot cell.
 const RACK = COLD_CELL.skills["table-to-rack"];

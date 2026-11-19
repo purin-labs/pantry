@@ -7,9 +7,9 @@ import type {
   VaultItemResult,
   VaultItemView,
   VaultStoreView,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 
 import { cancelDialog, syncDialog } from "../../dialog";
 import { EmptyState, SideDrawer } from "../../ui";

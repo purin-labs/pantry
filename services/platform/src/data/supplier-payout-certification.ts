@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type { OrganisationId } from "../ids";
-import { isNonEmptyString, isNonNegativeInteger } from "@seams/std";
+import { isNonEmptyString, isNonNegativeInteger } from "@purin-labs/std";
 
 /**
  * Evidence that one payout rail actually works, for one exact account.

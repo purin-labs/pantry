@@ -1,7 +1,7 @@
 import {
   isConversationId,
   parseChatPermissionDecision,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { Env } from "../../../env";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
@@ -9,7 +9,7 @@ import { isChatId } from "../../../chat/conversation";
 import type { ConversationScope } from "../../../chat/store";
 import { scheduleConversationExecution } from "../../../chat/application";
 import { decideConversationPermission } from "../../../chat/turn/permission";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { publicConversation } from "../../../chat/public-conversation";
 import { chatError } from "./errors";
 

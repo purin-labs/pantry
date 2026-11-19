@@ -1,4 +1,4 @@
-import { isPlanQuantity } from "@seams/production-plan-crdt";
+import { isPlanQuantity } from "@purin-labs/production-plan-crdt";
 import { parseReplyCitations } from "../../mail-inbox/reply-sources";
 import { parseIntegrationAccountReference } from "../../access-control/integration-discovery";
 import { parseIntegrationAccountId } from "../../ids";
@@ -7,7 +7,7 @@ import {
   parseEmailSelfTestRequest,
   validEmailSelfTestContent,
 } from "../../data/email-self-test";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   HarnessEmailMailboxSearch,
   HarnessEmailOperationalPropose,

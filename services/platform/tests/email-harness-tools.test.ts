@@ -12,7 +12,7 @@ vi.mock("../src/actors/connector-email-evaluation", async (importOriginal) => ({
   resolveConnectorGmailAccess: accessMocks.resolveConnectorGmailAccess,
 }));
 
-import type { AuthorizedHarnessToolResult } from "@seams/contracts";
+import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
 
 import {
   createEmailHarnessToolHost,

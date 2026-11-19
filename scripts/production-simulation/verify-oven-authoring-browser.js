@@ -161,7 +161,7 @@ async function forwardAuthorRequest(route) {
 }
 async function mountAuthorWorkspace(organisationId) {
   const { initializeBrowserValidators } =
-    await import("/@id/@seams/commerce-contracts/browser-validators");
+    await import("/@id/@purin-labs/commerce-contracts/browser-validators");
   await initializeBrowserValidators();
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
@@ -212,7 +212,7 @@ function authorRunCompleted() {
 
 async function inspectAuthorResult({ finalPath, storage, id }) {
   const { parseProductionScenario } =
-    await import("/@id/@seams/bakery-model/bakery-production-scenario");
+    await import("/@id/@purin-labs/bakery-model/bakery-production-scenario");
   if (storage.writes.length !== 1)
     throw new Error("The UI must create exactly one immutable scenario.");
   const definition = parseProductionScenario(storage.writes[0]);

@@ -3,11 +3,11 @@ import type {
   ApplianceProgram,
   ApplianceRequest,
   ApplianceResult,
-} from "@seams/bakery-model/bakery-appliance-protocol";
+} from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import type {
   ApplianceOperation,
   ApplianceOperationState,
-} from "@seams/bakery-model/bakery-appliance-workflow";
+} from "@purin-labs/bakery-model/bakery-appliance-workflow";
 
 export function applianceStateFixtures(
   operation: ApplianceOperation,

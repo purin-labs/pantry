@@ -10,7 +10,7 @@ import {
   type AgentPermissionDecision,
   type HeldEffectAction,
   type HeldOutputView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   ControlApiError,
   controlMutation,

@@ -7,7 +7,7 @@ import type {
   HarnessTurnLease,
   ProcessingSession,
   TurnIdentity,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, test } from "vitest";
 import {
   acceptHarnessEvent,
@@ -33,7 +33,7 @@ import {
   readSessionTurnReplay,
 } from "../src/actors/agent-session-turn-stream";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   requireRequestId,
   requireSessionTurnInputDigest,

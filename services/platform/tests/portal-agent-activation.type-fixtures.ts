@@ -1,4 +1,4 @@
-import type { AgentOperationCommand } from "@seams/control-api/portal/agent-operations";
+import type { AgentOperationCommand } from "@purin-labs/control-api/portal/agent-operations";
 
 type Activation = Extract<
   AgentOperationCommand,

@@ -8,12 +8,12 @@ import {
   type BlackSesameCobotSample,
   type BlackSesameHobModel,
   type BlackSesameRoastMode,
-} from "@seams/production-simulation/recipes/black-sesame/model";
+} from "@purin-labs/production-simulation/recipes/black-sesame/model";
 import {
   BlackSesameScene,
   type BlackSesameCameraPreset,
 } from "./black-sesame-scene";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import "../oven-workspace.css";
 // The station readout uses the pour-over styles, so this view loads them itself.
 import "../pour-over/pour-over.css";

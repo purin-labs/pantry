@@ -8,7 +8,7 @@ import {
   parseBakerySurfaceAttachment,
   verifyBakerySurfaceAttachment,
   type BakerySurfaceAttachmentV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type {
   AcceptedHarnessEventCursor,
   AcceptedInputRef,
@@ -20,7 +20,7 @@ import type {
   SessionBudgetAccount,
   TurnIdentity,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import {
@@ -48,8 +48,8 @@ import {
   compileCustomConnectorCatalog,
   type CustomConnectorCatalogEntry,
 } from "../../custom-connectors";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, errorMessage, sha256Hex } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, errorMessage, sha256Hex } from "@purin-labs/std";
 import {
   endsOnAnswer,
   freshLineageSource,
@@ -630,7 +630,7 @@ export function textTurnHarnessCheckpointInput(input: {
   manifest: EmbeddedHarnessAdapter["manifest"];
   lease: HarnessTurnLease;
   cursor: AcceptedHarnessEventCursor;
-  historyCursor: import("@seams/contracts").HarnessHistoryCursor;
+  historyCursor: import("@purin-labs/contracts").HarnessHistoryCursor;
   checkpoint: ArrayBuffer;
   budgetAccount: SessionBudgetAccount;
   budgetAccountDigest: string;

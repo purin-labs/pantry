@@ -1,5 +1,5 @@
-import { hasExactKeys, isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 // The camera, dock and label settings of the Kitchen view, and the
 // parsers of their wire values. Moved from bakery-surface.ts (file-size

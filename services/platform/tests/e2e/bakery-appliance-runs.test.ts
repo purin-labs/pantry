@@ -5,14 +5,14 @@ import {
   parseCanvasServerMessage,
   encodeCanvasClientMessage,
   type CanvasServerMessage,
-} from "@seams/workflow-canvas-crdt/protocol";
-import { WorkflowCanvasDoc, CanvasEncoding } from "@seams/workflow-canvas-crdt";
+} from "@purin-labs/workflow-canvas-crdt/protocol";
+import { WorkflowCanvasDoc, CanvasEncoding } from "@purin-labs/workflow-canvas-crdt";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
-import { isRecord, sha256Hex } from "@seams/std";
-import { parseApplianceWorkflow } from "@seams/bakery-model/bakery-appliance-workflow";
-import { parseRunSnapshot } from "@seams/bakery-model/bakery-run-snapshot";
+import { isRecord, sha256Hex } from "@purin-labs/std";
+import { parseApplianceWorkflow } from "@purin-labs/bakery-model/bakery-appliance-workflow";
+import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import interrupted from "../../../../assets/bakery-mujoco/combined-bakery/rust-evidence/shared-run-interrupted.json";
 import {
   commerceClient,

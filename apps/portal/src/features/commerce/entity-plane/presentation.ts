@@ -13,11 +13,11 @@ import type {
   AttributeOption,
   AttributeValue,
   ListEntryAttributeDefinition,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { formatAbsoluteTime, humanizeIdentifier } from "../../../formatting";
 import type { StatusChipStatus } from "../../../status-chip";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 /** Rendered when an attribute carries no value for this record. */
 export const COMMERCE_VALUE_ABSENT = "—";

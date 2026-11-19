@@ -2,7 +2,7 @@ import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import { armConnectorAlarm } from "../../src/actors/connector/alarm";

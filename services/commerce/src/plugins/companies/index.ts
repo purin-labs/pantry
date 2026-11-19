@@ -1,6 +1,6 @@
 // The companies built-in plugin (Plan 76 phase 8 slice 2). Code outside
 // this directory reaches the plugin only through this file.
-import type { CommerceCompanyCommandV1 } from "@seams/commerce-client";
+import type { CommerceCompanyCommandV1 } from "@purin-labs/commerce-client";
 import type { InvoiceCommand } from "./invoices.ts";
 
 export * from "./companies.ts";

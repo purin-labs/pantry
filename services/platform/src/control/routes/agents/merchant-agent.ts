@@ -10,7 +10,7 @@ import {
 } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import type { AgentSkillRef } from "@seams/control-api";
+import type { AgentSkillRef } from "@purin-labs/control-api";
 import { agentOperationsErrorResponse } from "./operations";
 
 /**

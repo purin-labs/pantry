@@ -4,7 +4,7 @@ import {
   createAccountPlatformAccess,
   type AccountPlatformAccess,
 } from "./account-platform/access";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   resolveActiveOrganisationPlacementRecord,
   samePlacement,

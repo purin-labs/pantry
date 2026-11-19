@@ -1,4 +1,4 @@
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -21,7 +21,7 @@ import type { OrganisationDatabase } from "../database-handles";
 import { validateNativeRequestAuthority } from "../request-authority";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 export async function authorizeMailSource(
   env: OrganisationPlacementBindings,
   authority: Variant<RequestAuthority, "control">,

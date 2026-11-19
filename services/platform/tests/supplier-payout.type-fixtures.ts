@@ -8,8 +8,8 @@ import type {
   SupplierPayoutExecutionPlan,
   SupplierPayoutProviderBinding,
   SupplierPayoutState,
-} from "@seams/contracts";
-import type { VariantBy } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 const money = { amountMinor: 10_000, currency: "JPY" };
 

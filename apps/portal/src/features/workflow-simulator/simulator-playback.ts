@@ -2,8 +2,8 @@ import React from "react";
 import type {
   PlaybackSnapshot,
   PlaybackUpdate,
-} from "@seams/production-simulation/simulator/playback-state";
-import type { Run } from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/simulator/playback-state";
+import type { Run } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { PlaybackController } from "./playback-controller";
 import {
   LiveValue,

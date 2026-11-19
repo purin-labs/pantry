@@ -3,7 +3,7 @@ import {
   agentScenarioSaveManifest,
   type AgentScenarioSaveManifest,
   type AgentScenarioSavePayload,
-} from "@seams/bakery-model/bakery-agent-scenario-save";
+} from "@purin-labs/bakery-model/bakery-agent-scenario-save";
 import {
   parseBakerySurfaceEffect,
   parseBakerySurfaceReceipt,
@@ -11,9 +11,9 @@ import {
   verifyBakerySurfaceAttachment,
   verifyBakerySurfaceEffect,
   verifyBakerySurfaceReceipt,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { OrganisationId } from "../../ids";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const PROPOSAL_TTL_MS = 15 * 60_000;
 

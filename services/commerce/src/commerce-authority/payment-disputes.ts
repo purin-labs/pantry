@@ -6,12 +6,12 @@ import {
   type CommerceOrderV1,
   type CommercePaymentV1,
   orderOriginCheckoutId,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type CommerceMachineEvent,
   type PaymentDispute,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import { sha256 } from "./ledger.ts";
 import { validatePaymentDisputeLifecycleAdvance } from "../payments/payment-records.ts";
@@ -22,7 +22,7 @@ import {
 import { amountDue, sameMoney } from "./checkout-shared.ts";
 import { storedValuePaymentId } from "../plugins/stored-value/index.ts";
 import { listOrderChanges, readPaymentChange } from "./order-changes.ts";
-import { assertNever, errorMessage } from "@seams/std";
+import { assertNever, errorMessage } from "@purin-labs/std";
 
 type PaymentDisputeCorrelation = Readonly<{
   order: CommerceOrderV1;

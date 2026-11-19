@@ -2,9 +2,9 @@ import React from "react";
 import {
   parseMenuBoardCommentThreads,
   type MenuBoardCommentThread,
-} from "@seams/control-api";
-import type { MenuBoardElement } from "@seams/menu-board-crdt/board";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import type { MenuBoardElement } from "@purin-labs/menu-board-crdt/board";
+import { isRecord } from "@purin-labs/std";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";
 import { controlPath } from "./menu-board-requests";
 import "./board-comments.css";

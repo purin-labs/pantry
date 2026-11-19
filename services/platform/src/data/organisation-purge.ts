@@ -15,7 +15,7 @@ import type {
   OrganisationDatabaseSession,
 } from "../database-handles";
 import type { OrganisationId } from "../ids";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { hashOpaqueSecret } from "./control-plane";
 import {
   prepareOrganisationLifecycleMove,

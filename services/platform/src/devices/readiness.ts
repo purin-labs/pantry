@@ -4,8 +4,8 @@ import {
   type DeviceConnection,
   type DeviceHealth,
   type DeviceReadiness,
-} from "@seams/control-api";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/control-api";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The one answer to "can this device take the next task?" (Plan 85). The

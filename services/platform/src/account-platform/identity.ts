@@ -1,4 +1,4 @@
-import { canonicalJson, sha256Hex } from "@seams/std";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import type { UserId } from "../ids";
 import type { Result } from "../result";
 import { resolveUser } from "../data/control-plane";

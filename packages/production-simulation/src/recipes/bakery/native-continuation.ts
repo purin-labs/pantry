@@ -6,8 +6,8 @@ import {
   isCompletedLoading,
   type PhysicsReplay,
   type PhysicsSequence,
-} from "@seams/bakery-model/bakery-physics";
-import { bakeryFingerprint } from "@seams/bakery-model/bakery";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { bakeryFingerprint } from "@purin-labs/bakery-model/bakery";
 import {
   compileCycleInput,
   compileRackCycleInput,

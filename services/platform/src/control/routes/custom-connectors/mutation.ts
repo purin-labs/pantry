@@ -14,7 +14,7 @@ import {
   type AuthorizedOrganisationRequest,
 } from "../../authorization";
 import { controlError, controlJson, type JsonRecord } from "../../http";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   prepareConfigurationVersionAdvance,
   prepareConfigurationVersionFence,

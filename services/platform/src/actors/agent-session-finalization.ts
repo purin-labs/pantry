@@ -1,8 +1,8 @@
 import type {
   AgentSessionLifecycle,
   HarnessCheckpointRecord,
-} from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import { parseOrganisationId } from "../ids";
 import type { Result } from "../result";
 import { readImportedCanonicalSession } from "./agent-session-canonical";

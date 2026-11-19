@@ -1,10 +1,10 @@
-import { parseCaseScreenObservationsResponse } from "@seams/control-api";
+import { parseCaseScreenObservationsResponse } from "@purin-labs/control-api";
 import { ControlApiError } from "../../control-client";
 import {
   parseAiBudgetView,
   type AiBudgetLimits,
   type AiBudgetView,
-} from "@seams/control-api/portal/ai-budget";
+} from "@purin-labs/control-api/portal/ai-budget";
 import type {
   AccessControlView,
   AccessExplainResult,
@@ -12,19 +12,19 @@ import type {
   AccessResult,
   AccessOptionsPage,
   AccessRouteTransport,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 import {
   parseAccessControlResponse,
   parseAccessExplanationResponse,
   parseAccessOptionsResponse,
-} from "@seams/control-api/portal/access-boundary";
-import { parseDropboxResourcePage, parseGoogleDrivePickerConfig } from "@seams/control-api/portal/file-resources";
-import type { GoogleDrivePickedFile, GoogleDrivePickerConfig } from "@seams/control-api/portal/access-models";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api/portal/access-boundary";
+import { parseDropboxResourcePage, parseGoogleDrivePickerConfig } from "@purin-labs/control-api/portal/file-resources";
+import type { GoogleDrivePickedFile, GoogleDrivePickerConfig } from "@purin-labs/control-api/portal/access-models";
+import { assertNever } from "@purin-labs/std";
 import {
   parseCaseContextCollectionMetadataResponse,
   type CaseContextCollectionReviewCommand,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 type ControlRead = (path: string) => Promise<unknown>;
 type ControlMutation = (

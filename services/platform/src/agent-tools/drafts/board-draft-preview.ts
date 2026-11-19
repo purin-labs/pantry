@@ -1,4 +1,4 @@
-import type { CollaborationAgent } from "@seams/collaboration";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { resolveCanvasCollaborationAgent } from "../../actors/collaboration-agent";
 import type {
   HarnessToolArgumentObserver,

@@ -4,8 +4,8 @@ import type {
   AccessError,
   AccessGrantTargetSelection,
   AccessRouteTransport,
-} from "@seams/control-api/portal/access-models";
-import type { AccessSubjectRef } from "@seams/contracts";
+} from "@purin-labs/control-api/portal/access-models";
+import type { AccessSubjectRef } from "@purin-labs/contracts";
 
 /** A capability that a permission request asks to turn on. */
 export type RequestedCapability = Readonly<{

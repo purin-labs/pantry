@@ -44,7 +44,7 @@ const cast = transfer as CycleInput;
 void [mixed, partial, uncompiled, wrongDestination, premature, cast];
 
 import type { AwaitingReturnAttempt } from "./workcell-attempt.ts";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 declare const prefix: AwaitingReturnAttempt;
 const prematureSettlement: AwaitingReturnAttempt = {
   ...prefix,

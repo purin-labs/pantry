@@ -1,13 +1,13 @@
 import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
 import { reconcilePantryExecutionBilling } from "../../account-platform/execution-billing";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
-import type { Outcome } from "@seams/contracts";
+import type { Outcome } from "@purin-labs/contracts";
 import { validateLiveRequestAuthority } from "../../request-authority";
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
 import type {
   HarnessCheckpointRecord,
   HarnessTurnLease,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseSessionId,
   newRequestId,

@@ -13,11 +13,11 @@ import {
   compileSavedOvenFinancier,
   compileFinancierRecipe,
 } from "../recipes/bakery/financier.ts";
-import { isRecord, parseJsonOrNull } from "@seams/std";
+import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { RunArtifactFile } from "./run-artifact-file.ts";
 import { compileBlackSesameRecipe } from "../recipes/bakery/black-sesame.ts";
 import { compileGingerBlackTeaRecipe } from "../recipes/bakery/ginger-black-tea.ts";
-import type { StrictUnion, Variant, VariantBy } from "@seams/type-utils";
+import type { StrictUnion, Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   parsePersistentCell,
   type PersistentCell,
@@ -25,9 +25,9 @@ import {
   type PersistentEspressoCell,
   type PersistentPourOverCell,
   type PersistentRackCell,
-} from "@seams/bakery-model/bakery-physics";
-import { type ProductionScenario } from "@seams/bakery-model/bakery-production-scenario";
-import { checkpointBody } from "@seams/bakery-model/bakery-checkpoint";
+} from "@purin-labs/bakery-model/bakery-physics";
+import { type ProductionScenario } from "@purin-labs/bakery-model/bakery-production-scenario";
+import { checkpointBody } from "@purin-labs/bakery-model/bakery-checkpoint";
 
 export type OvenDefinition = VariantBy<
   ProductionScenario,

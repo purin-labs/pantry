@@ -5,7 +5,7 @@ import { providerLabel } from "../../integration-catalogue";
 import type {
   AccessControlCapabilityView,
   AccessControlGrantView,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 
 export function Fact(
   props: Readonly<{ label: string; value: string }>,

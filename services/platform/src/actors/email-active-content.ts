@@ -1,7 +1,7 @@
 import type { SecretsStoreSecret } from "@cloudflare/workers-types";
 
 import type { Result } from "../result";
-import { decodeBase64, encodeBase64 } from "@seams/std";
+import { decodeBase64, encodeBase64 } from "@purin-labs/std";
 
 /**
  * Short-lived application encryption for send-only operational proposals.

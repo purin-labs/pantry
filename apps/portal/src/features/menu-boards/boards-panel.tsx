@@ -6,7 +6,7 @@ import {
   parseMenuScreenFacts,
   type MenuBoardSummary,
   type MenuScreenFacts,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   MENU_BOARD_DEFAULT_CONSTRAINTS,
   MENU_BOARD_ITEM_ROWS,
@@ -23,9 +23,9 @@ import {
   type MenuBoardProductLook,
   type MenuBoardRect,
   type MenuBoardStyle,
-} from "@seams/menu-board-crdt/board";
-import type { MenuDraftSnapshot } from "@seams/menu-draft-crdt";
-import { isPositiveInteger, isRecord } from "@seams/std";
+} from "@purin-labs/menu-board-crdt/board";
+import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
+import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import { Select } from "../../ui/select";
 import { MenuBoardClient, type MenuBoardView } from "./board-client";
 import { SAMPLE_PICKUP, ScaledBoard, draftBoardContent } from "./board-view";

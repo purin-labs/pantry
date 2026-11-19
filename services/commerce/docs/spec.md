@@ -71,7 +71,7 @@ refusal to `invalid_date`.
    (`src/commerce-authority/ledger.ts`). A refund reservation commits a
    delivery with no receipt; its resolution records the receipt.
 4. **Money.** Amounts are integers in minor units with an ISO 4217 code
-   (`CURRENCY_MINOR_UNITS` in `@seams/commerce-client`). A cart, a checkout and
+   (`CURRENCY_MINOR_UNITS` in `@purin-labs/commerce-client`). A cart, a checkout and
    an order have one currency. A conversion uses a stored rate with its time
    and source.
 5. **Accepted records do not change in place.** A placed order keeps its
@@ -87,10 +87,10 @@ refusal to `invalid_date`.
    blocks a new path is refused with a clear error.
 8. **Contracts first.** Record and command types live in
    `packages/commerce-contracts` (TypeBox schemas and their parsers)
-   and `packages/commerce-client` (`@seams/commerce-client`, the
+   and `packages/commerce-client` (`@purin-labs/commerce-client`, the
    parsers). There is no second hand-made copy.
 9. **Boundary.** Commerce imports no Pantry package. Pantry reaches
-   Commerce only through `@seams/commerce-contracts`, `@seams/commerce-client` or
+   Commerce only through `@purin-labs/commerce-contracts`, `@purin-labs/commerce-client` or
    the built Worker. Commerce's source names Cloudflare runtime APIs only
    in its adapter files (`worker.ts`, `durable-object-database.ts`,
    `catalog-snapshots.ts`), so that another host stays possible. Both rules
@@ -1146,7 +1146,7 @@ Plugins ([Plan 77](../../../docs/plan-77-underclerk-modular-core.md) step 3):
   contributions (routes, checkout pipeline steps, entity types, settings,
   functions) and limits. `src/commerce-plugins.ts` lists the built-in
   plugins. A route that two plugins own, an unknown dependency or a circular
-  one fails `pnpm --filter @seams/commerce-contracts commerce-data:check`;
+  one fails `pnpm --filter @purin-labs/commerce-contracts commerce-data:check`;
   a plugin route that the route table does not have stops Commerce at
   start.
 - Built-in plugins: collections, media, markets, discounts, customers,

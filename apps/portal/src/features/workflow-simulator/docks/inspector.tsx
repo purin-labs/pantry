@@ -1,7 +1,7 @@
 import React from "react";
 import { Select } from "../../../ui/select";
 
-import { batchTimeline, duration, machineSummary } from "@seams/production-simulation/simulator/demo";
+import { batchTimeline, duration, machineSummary } from "@purin-labs/production-simulation/simulator/demo";
 import { finishLabel } from "../results";
 import {
   CAFE_BEVERAGE_ROTATION,
@@ -56,10 +56,10 @@ import {
   type VitrineCustomerOrder,
   type VitrineOrderChannel,
   type VitrineRefillWave,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { getLiveStationWalkLegs } from "../bakery-appliance-layout";
 import { downloadBakeryFile } from "../file-download";
-import { selectionContext } from "@seams/production-simulation/simulator/selection";
+import { selectionContext } from "@purin-labs/production-simulation/simulator/selection";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type { InspectorView, SimulatorConnection } from "../simulator-state";
 import { DockHeader, SegmentedControl, taskStatusLabel } from "./shared";

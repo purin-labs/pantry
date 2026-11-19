@@ -1,6 +1,6 @@
 import React from "react";
 import * as Menu from "@radix-ui/react-dropdown-menu";
-import type { MailInboxThreadMessage } from "@seams/control-api";
+import type { MailInboxThreadMessage } from "@purin-labs/control-api";
 import {
   ChevronDown,
   ChevronUp,

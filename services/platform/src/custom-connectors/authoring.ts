@@ -5,7 +5,7 @@ import {
 } from "../messages/link-reader";
 import { parseCustomConnectorDefinition } from "./definition";
 import type { Result } from "../result";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export type ConnectorDocumentation = {
   readonly url: string;

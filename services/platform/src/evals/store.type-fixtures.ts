@@ -1,4 +1,4 @@
-import type { EvalContent, EvalRevisionView } from "@seams/control-api";
+import type { EvalContent, EvalRevisionView } from "@purin-labs/control-api";
 
 import type { FlowLabel } from "../policy/information-flow";
 import type { EvalRevision, EvalStoreCommand } from "./store";

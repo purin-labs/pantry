@@ -5,7 +5,7 @@ import type {
   CustomCommerceEntityRef,
   MerchantRevision,
   CommerceEntityPlaneObservationV1,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../database.ts";
 import {
   archiveCustomEntity,
@@ -240,7 +240,7 @@ export class EntityMutationHandler {
 }
 
 function customEntityObservation(
-  observationId: import("@seams/commerce-contracts").CommerceCommandId,
+  observationId: import("@purin-labs/commerce-contracts").CommerceCommandId,
   entityRef: CustomCommerceEntityRef,
   revision: CommerceEntityRevision,
   merchantRevision: MerchantRevision,

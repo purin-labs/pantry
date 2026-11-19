@@ -14,14 +14,14 @@
 //
 // The operator token stays for the routes that only the operator may call:
 // merchant provisioning and the payment authorities.
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   COMMERCE_API_SCOPES,
   COMMERCE_APP_TOKEN_PREFIX,
   commerceAppInstallationToken,
   type CommerceAdminClient,
   type CommerceCredential,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 const SATYR_UNDERCLERK_APP_ID = "satyr";
 

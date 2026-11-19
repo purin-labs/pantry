@@ -1,5 +1,5 @@
 import { formatMoneyMinorEnglish } from "../../formatting";
-import type { MenuPriceDetails } from "@seams/control-api/portal/menu-price-details";
+import type { MenuPriceDetails } from "@purin-labs/control-api/portal/menu-price-details";
 
 /** Whether the change sets a deal, ends one, or changes only the price. */
 export function menuPriceChangeKind(

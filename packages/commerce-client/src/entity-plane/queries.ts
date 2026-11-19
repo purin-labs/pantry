@@ -3,13 +3,13 @@ import type {
   CommerceEntityPlaneCapabilityMetadataRequest,
   CommerceEntityPlaneCapabilityMetadataResponse,
   CommerceEntityPlaneRelationshipTraversalStepRequest,
-} from "@seams/commerce-contracts/entity-plane-queries";
+} from "@purin-labs/commerce-contracts/entity-plane-queries";
 export type {
   CommerceEntityPlaneQueryRequest,
   CommerceEntityPlaneCapabilityMetadataRequest,
   CommerceEntityPlaneCapabilityMetadataResponse,
   CommerceEntityPlaneRelationshipTraversalStepRequest,
-} from "@seams/commerce-contracts/entity-plane-queries";
+} from "@purin-labs/commerce-contracts/entity-plane-queries";
 import type {
   CommerceCursor,
   CommerceCursorPayload,
@@ -17,13 +17,13 @@ import type {
   CommerceGraphQueryPlanRequest,
   CommerceQueryPlanOutcome,
   PublishedCommerceSelector,
-} from "@seams/commerce-contracts";
-import { parsePublishedCommerceSelector as parseSelectorContract } from "@seams/commerce-contracts/graph-query";
+} from "@purin-labs/commerce-contracts";
+import { parsePublishedCommerceSelector as parseSelectorContract } from "@purin-labs/commerce-contracts/graph-query";
 import { decodeRecord } from "./record-decoding.ts";
-import * as queryContracts from "@seams/commerce-contracts/entity-plane-queries";
-import * as plannerContracts from "@seams/commerce-contracts/query-planner";
-import { parseCommerceGraphQuery as parseQueryContract } from "@seams/commerce-contracts/graph-query";
-import { parseCommerceCursorPayload as parseCursorContract } from "@seams/commerce-contracts/cursor-payload";
+import * as queryContracts from "@purin-labs/commerce-contracts/entity-plane-queries";
+import * as plannerContracts from "@purin-labs/commerce-contracts/query-planner";
+import { parseCommerceGraphQuery as parseQueryContract } from "@purin-labs/commerce-contracts/graph-query";
+import { parseCommerceCursorPayload as parseCursorContract } from "@purin-labs/commerce-contracts/cursor-payload";
 
 import { brandText } from "./primitives.ts";
 export function parseEntityPlaneQueryRequest(

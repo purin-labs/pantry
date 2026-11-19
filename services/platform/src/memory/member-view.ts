@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 import { authorizeConversation } from "../chat/conversation-access";
 import type { FlowLabel } from "../policy/information-flow";
@@ -9,7 +9,7 @@ import type {
   FlowPolicyOwner,
 } from "../policy/information-flow/types";
 import type { MemoryViewer } from "./access";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The member that a view is for, with what is needed to judge a reader. */
 export type MemberViewer = Pick<

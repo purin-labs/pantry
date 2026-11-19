@@ -2,7 +2,7 @@ import type * as THREE from "three";
 import {
   ROBOTS,
   type RobotModel,
-} from "@seams/bakery-model/bakery-robots";
+} from "@purin-labs/bakery-model/bakery-robots";
 import { loadVisual, preloadVisual } from "./physics-asset-loader";
 import fr10Url from "../../../../../../assets/bakery-robots/fairino-fr10/robot.glb?url";
 import fr5Url from "../../../../../../assets/bakery-robots/fairino-fr5/robot.glb?url";

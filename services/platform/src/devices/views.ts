@@ -4,7 +4,7 @@ import {
   type DeviceStationId,
   type GatewayDeviceView,
   type KitchenDeviceView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { deviceFleetStub } from "../actors/device-fleet";
 import type { Env } from "../env";

@@ -7,7 +7,7 @@ import {
 } from "./link-reader";
 import type { OrganisationPlacement } from "../placement";
 import type { Result } from "../result";
-import { decodeCanonicalBase64, hasExactKeys, isRecord } from "@seams/std";
+import { decodeCanonicalBase64, hasExactKeys, isRecord } from "@purin-labs/std";
 
 /** Cloudflare's resolver, reached over DoH so no ambient DNS config applies. */
 const DOH_ENDPOINT = "https://cloudflare-dns.com/dns-query";

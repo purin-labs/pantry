@@ -1,6 +1,6 @@
-import { hasExactKeys, isRecord } from "@seams/std";
-import { bakeryFingerprint } from "@seams/bakery-model/bakery";
-import { parsePhysicsRequest } from "@seams/bakery-model/bakery-physics";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
+import { bakeryFingerprint } from "@purin-labs/bakery-model/bakery";
+import { parsePhysicsRequest } from "@purin-labs/bakery-model/bakery-physics";
 import { validateProductionMaterial } from "./production-material.ts";
 import type { CompletedAttempt } from "./workcell-attempt.ts";
 import { compileWorkcellInput, type WorkcellInput } from "./workcell-input.ts";

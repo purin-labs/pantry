@@ -4,7 +4,7 @@ import {
   type CommerceBuyerContactV1,
   type CommerceBuyerShippingAddressV1,
   type CommerceCustomerAddressV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export type BuyerAccountIdentity = Readonly<{
   protectedCustomerReference: string;

@@ -10,8 +10,8 @@ import {
   type CommerceShopNameV1,
   type CommerceStorefrontShopNameChangeV1,
   type CommerceStorefrontShopNameV1,
-} from "@seams/commerce-contracts/records/api-shop-names";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-contracts/records/api-shop-names";
+import { isRecord } from "@purin-labs/std";
 
 /** What one name object keeps. */
 export type ShopNameOwner = Readonly<{

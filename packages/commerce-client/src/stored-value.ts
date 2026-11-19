@@ -5,8 +5,8 @@
 // and its last four characters. Store credit belongs to one customer. A
 // checkout holds what it will take, the placed order redeems the hold, and a
 // refund of a stored-value payment returns the amount to its account.
-import { parseCommerceStoredValueAccountsV1 } from "@seams/commerce-contracts/records/api-stored-value";
-import type { CheckoutStoredValue } from "@seams/commerce-contracts";
+import { parseCommerceStoredValueAccountsV1 } from "@purin-labs/commerce-contracts/records/api-stored-value";
+import type { CheckoutStoredValue } from "@purin-labs/commerce-contracts";
 
 import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
 import { requireString } from "./wire-readers.ts";
@@ -18,7 +18,7 @@ import {
   parseCommerceGiftCardBalanceV1 as parseCommerceGiftCardBalanceV1Record,
   parseCommerceStoredValueAccountV1 as parseCommerceStoredValueAccountV1Record,
   parseCommerceStoredValueLiabilityV1 as parseCommerceStoredValueLiabilityV1Record,
-} from "@seams/commerce-contracts/records/api-stored-value";
+} from "@purin-labs/commerce-contracts/records/api-stored-value";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;

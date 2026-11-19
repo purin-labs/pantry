@@ -1,5 +1,5 @@
 import { compile, type CoercingValidator } from "@earendil-works/pi-schema";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const validators = new WeakMap<object, CoercingValidator>();
 

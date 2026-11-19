@@ -2,13 +2,13 @@ import type {
   CommerceEntityRef,
   CommerceEntityPlaneError,
   ListEntryAttributeValue,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseAttributeDefinitionId,
   parseProductionRequestFields,
   parseRecipeRevision,
   type ProductionRequestFields,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { CommerceDatabase } from "../database.ts";
 import {
   readInventoryItem,

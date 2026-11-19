@@ -14,7 +14,7 @@ import type {
   SavedAddressPolicy,
 } from "./commerce-domain";
 import type { Money } from "./records/money.ts";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 const IDENTITY_MAX_LENGTH = 255;
 const CURRENCY_PATTERN = /^[A-Z]{3}$/u;

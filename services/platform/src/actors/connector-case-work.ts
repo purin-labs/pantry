@@ -1,5 +1,5 @@
-import { isSideCaseProposalId } from "@seams/control-api";
-import type { ConnectorIdentity } from "@seams/contracts";
+import { isSideCaseProposalId } from "@purin-labs/control-api";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 
 import {
   parseConnectorId,
@@ -22,7 +22,7 @@ import {
   isPositiveInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type ConnectorCaseWorkRequest = {
   readonly identity: ConnectorIdentity;

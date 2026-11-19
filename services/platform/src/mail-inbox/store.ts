@@ -5,10 +5,10 @@ import {
   mailRevision,
   type MailClassification,
   type MailMatch,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { MailOrganizationHead, MailWork } from "./types";
 import { parseMailOrganizationHead } from "./types";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import type { IntegrationAccountId } from "../ids";
 import {
   createMailResponseSchema,

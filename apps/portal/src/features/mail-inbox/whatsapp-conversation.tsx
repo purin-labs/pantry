@@ -1,7 +1,7 @@
 import React from "react";
 import * as Menu from "@radix-ui/react-dropdown-menu";
-import type { InboxWhatsAppConversation } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import type { InboxWhatsAppConversation } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import { Archive, Bot, MoreHorizontal, UserRound } from "lucide-react";
 import {
   ControlApiError,
@@ -14,7 +14,7 @@ import {
   parseWhatsAppReplyPreview,
   type WhatsAppCaseView,
   type WhatsAppReplyPreview,
-} from "@seams/control-api/portal/whatsapp";
+} from "@purin-labs/control-api/portal/whatsapp";
 import { whatsappCasePath, whatsappReplyPath } from "../../whatsapp";
 import {
   PermissionRequiredPrompt,

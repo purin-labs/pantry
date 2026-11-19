@@ -2,7 +2,7 @@ import {
   isNonNegativeInteger,
   isRecord,
   positiveIntegerOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 /** A Slack message that the agent drafted in this conversation. */
 export type SlackDraftView = Readonly<{

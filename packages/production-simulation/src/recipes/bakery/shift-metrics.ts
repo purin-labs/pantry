@@ -1,5 +1,5 @@
-import { isRecord } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { isRecord } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { LogisticsView, TaskView } from "../../logistics-view.ts";
 import type { ProductionReport } from "../../production-view.ts";
 import type { ResourceHistoryView } from "../../resource-history-view.ts";

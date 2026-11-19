@@ -4,9 +4,9 @@ import type { ConversationExecution } from "./execution";
 import {
   chatThreadActivity,
   type ChatThreadActivity,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { isProjectRole, type ProjectRole } from "@seams/control-api";
+import { isProjectRole, type ProjectRole } from "@purin-labs/control-api";
 import { VISIBLE_CONVERSATIONS_SQL } from "./conversation-access";
 import {
   conversationCaseId,
@@ -14,9 +14,9 @@ import {
   parseConversationActorIdentity,
 } from "./conversation-actor-identity";
 import { prepareMemberCaseProject } from "../projects/case-project";
-import { isConversationId } from "@seams/control-api";
-import { isNonNegativeInteger } from "@seams/std";
-import type { ChatOrigin, ConversationId } from "@seams/control-api";
+import { isConversationId } from "@purin-labs/control-api";
+import { isNonNegativeInteger } from "@purin-labs/std";
+import type { ChatOrigin, ConversationId } from "@purin-labs/control-api";
 import { signalChat } from "./signals";
 import {
   PERMISSION_EXPIRED_MESSAGE,
@@ -39,7 +39,7 @@ import type {
   ArchivedConversationMetadata,
   ChatPlacement,
   ChatDestination,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   prepareChatDirectoryInitialization,
   parseConversationPlacement,

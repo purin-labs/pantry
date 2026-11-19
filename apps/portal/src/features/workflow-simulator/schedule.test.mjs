@@ -1,4 +1,4 @@
-import { parseSettings, sampleSettings } from "@seams/bakery-model/bakery";
+import { parseSettings, sampleSettings } from "@purin-labs/bakery-model/bakery";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
@@ -7,7 +7,7 @@ import {
   machineAt,
   metrics,
   simulate,
-} from "@seams/production-simulation/recipes/bakery/schedule";
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
 
 test(
   "shift replay respects station capacity and worker exclusivity across 108 configurations",

@@ -5,16 +5,16 @@ import {
   type ProductDescriptionSelection,
   type ProductDescriptionStateVector,
   type ProductDescriptionUpdate,
-} from "@seams/product-description-crdt";
+} from "@purin-labs/product-description-crdt";
 import {
   encodeDraftClientMessage,
   type DraftFailureCode,
   type ProductDescriptionRoomMetadata,
-} from "@seams/product-description-crdt/protocol";
+} from "@purin-labs/product-description-crdt/protocol";
 import type {
   CollaborationAgentActivity,
   TextSelectionDirection,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   TextCollaborationClient,
   type TextCollaborationClientMessage,
@@ -24,8 +24,8 @@ import {
 } from "../../collaboration/text-client";
 import { webSocketUrl } from "../../collaboration/document-client";
 import type { DraftPresenceView } from "./presence";
-import { assertNever } from "@seams/std";
-import { parseDescriptionServerMessage } from "@seams/control-api/portal/description-collaboration";
+import { assertNever } from "@purin-labs/std";
+import { parseDescriptionServerMessage } from "@purin-labs/control-api/portal/description-collaboration";
 
 type DescriptionField = "description";
 

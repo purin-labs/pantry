@@ -1,4 +1,4 @@
-# Commerce client (`@seams/commerce-client`)
+# Commerce client (`@purin-labs/commerce-client`)
 
 This package is the versioned client for Commerce's admin, storefront and
 entity-plane APIs. It depends on no Pantry package, and
@@ -10,7 +10,7 @@ complete signed receipt envelope and convert every raw response into the
 authoritative contract types once at the boundary.
 
 Commerce owns receipt and rejection semantics. `packages/commerce-contracts`
-(`@seams/commerce-contracts`) owns graph-query planning and cursor validation.
+(`@purin-labs/commerce-contracts`) owns graph-query planning and cursor validation.
 Clients such as Pantry pin this supported major version and do not maintain
 local copies of either contract.
 

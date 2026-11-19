@@ -1,7 +1,7 @@
 import type {
   LocationKind,
   ShopifyResourceEnvelopeV202607,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   normalizeShopifyCommerceResourceDelivery,
@@ -22,8 +22,8 @@ import {
   type CommerceProjectionError,
   type CommerceSystemStorageAuthority,
 } from "./commerce-projection";
-import type { VariantBy } from "@seams/type-utils";
-import { exhaustiveList, isRecord } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { exhaustiveList, isRecord } from "@purin-labs/std";
 
 const SHOPIFY_LOCATION_CLASSIFICATION_KINDS = exhaustiveList<LocationKind>()([
   "store",

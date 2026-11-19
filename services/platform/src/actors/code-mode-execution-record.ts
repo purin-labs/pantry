@@ -4,8 +4,8 @@ import {
   isRecord,
   parseJsonOrNull,
   sha256Hex,
-} from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import { parseOrganisationId, type OrganisationId } from "../ids";
 import type {
   CodeModeLeaseBinding,

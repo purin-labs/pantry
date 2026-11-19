@@ -13,7 +13,7 @@ import {
 import "./agent-components.css";
 import "./action-menu.css";
 import { GlideHighlight } from "./glide-highlight";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 export type ResponseRating = "good" | "bad" | null;
 export type ResponseActionResult =

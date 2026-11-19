@@ -10,8 +10,8 @@ import {
   type MenuBoardRect,
   type MenuBoardStart,
   MENU_BOARD_DESIGNS,
-} from "@seams/menu-board-crdt";
-import type { MenuDraftSnapshot } from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-board-crdt";
+import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 
 /**
  * The elements of a new board (Plan 40B): a heading, one section list for

@@ -1,9 +1,9 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@seams/commerce-contracts/schema";
+import { recordParser } from "@purin-labs/commerce-contracts/schema";
 import {
   recipeRevisionInputSchema,
   recipeRevisionResourceSchema,
-} from "@seams/commerce-contracts/records/api-food-service";
+} from "@purin-labs/commerce-contracts/records/api-food-service";
 
 const text = Type.String({ minLength: 1 });
 const revision = Type.Integer({ minimum: 1 });

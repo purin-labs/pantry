@@ -3,7 +3,7 @@ import {
   parseRequestCustomerSignInCommand,
   parseSaveCustomerAddressCommand,
   parseVerifyCustomerSignInCommand,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { CommerceAuthority } from "../../commerce-authority.ts";
 import type { BuyerRoute } from "../../http-routes.ts";
 import { BuyerSessionAuthority } from "../../buyer-session.ts";
@@ -13,11 +13,11 @@ import {
   savedAddressForShipping,
 } from "../../buyer-account.ts";
 import { ShippingAddressValidationService } from "../../shipping-address-validation.ts";
-import { errorMessage } from "@seams/std";
+import { errorMessage } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
 import { bearerToken, readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * The storefront's organisation, when its active checkout profile lets

@@ -1,13 +1,13 @@
 import type {
   CaseContextCollectionRelationshipDecision,
   CaseContextCollectionReviewCommand,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { OrganisationId } from "../ids";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import type { Result } from "../result";
 import type { CaseContextCollectionRelationshipOutcome } from "./jev";
 import { identifier, integerIn } from "./policy";
-import { assertNever, isRecord, parseJsonOrNull } from "@seams/std";
+import { assertNever, isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 export type CaseContextCollectionScope = Readonly<{
   organisationId: OrganisationId;

@@ -1,10 +1,10 @@
 // Local WebSocket adapter for the production Inbox shared-draft client.
-import { MailReplyDoc } from "@seams/mail-reply-crdt";
+import { MailReplyDoc } from "@purin-labs/mail-reply-crdt";
 import {
   encodeDraftServerMessage,
   parseDraftClientMessage,
-} from "@seams/mail-reply-crdt/protocol";
-import { COLLABORATION_PING, COLLABORATION_PONG } from "@seams/collaboration";
+} from "@purin-labs/mail-reply-crdt/protocol";
+import { COLLABORATION_PING, COLLABORATION_PONG } from "@purin-labs/collaboration";
 
 const INITIAL_BODY =
   "Hi Mika,\n\nPlease confirm Friday arrival and the quantity. We need to check the impact on our pastry orders.\n\nCafeOS";

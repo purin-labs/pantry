@@ -6,13 +6,13 @@ import type {
   RequestAuthority,
   PantryCommerceReadAuthority,
   CommerceContextRequest,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceCommandId,
   parseCommerceMerchantId,
   parseCommercePrincipalId,
   parseCommerceTimestamp,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type { Result } from "../../result";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import {

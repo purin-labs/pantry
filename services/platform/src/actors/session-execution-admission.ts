@@ -1,5 +1,5 @@
 import type { GlobalDatabase } from "../database-handles";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
 import type { SessionId, OrganisationId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -14,7 +14,7 @@ import { parseSessionId } from "../ids";
 import type {
   HarnessTurnLease,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   authorizeChatHarnessLease,
   authorizeSessionTurnExecution,

@@ -1,4 +1,4 @@
-import type { OnboardingProvider } from "@seams/contracts";
+import type { OnboardingProvider } from "@purin-labs/contracts";
 import type { ProviderTileName } from "./page-components";
 
 export type Provider = Extract<

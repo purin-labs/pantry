@@ -4,7 +4,7 @@ import {
   isNonNegativeInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { deflateSync, inflateSync, strFromU8, strToU8 } from "fflate";
 import { parseSha256Hex, type Sha256Hex } from "./identity.ts";
 import { err, ok, type Result } from "./result.ts";

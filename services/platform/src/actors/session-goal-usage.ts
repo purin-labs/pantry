@@ -3,13 +3,13 @@ import type {
   CaseGoalOperationOutcome,
   CaseGoalSnapshot,
   HarnessTurnLease,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   assertNever,
   canonicalJson,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { parseCaseId, parseOrganisationId, type RequestId } from "../ids";
 import type { Result } from "../result";
 import type { Env } from "../env";
@@ -37,7 +37,7 @@ import type {
   GoalModelStop,
 } from "./goal-model-calls";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type GoalUsageContext = {
   readonly env: Env;

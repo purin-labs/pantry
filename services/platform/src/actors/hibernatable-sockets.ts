@@ -2,8 +2,8 @@ import {
   COLLABORATION_PING,
   COLLABORATION_PONG,
   COLLABORATION_PRESENCE_EXPIRY_MS,
-} from "@seams/collaboration";
-import { sha256Hex } from "@seams/std";
+} from "@purin-labs/collaboration";
+import { sha256Hex } from "@purin-labs/std";
 
 /**
  * Sockets that an Actor accepts through the hibernation API.

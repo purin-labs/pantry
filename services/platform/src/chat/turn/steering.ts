@@ -32,7 +32,7 @@ import {
   type ConversationScope,
   type StoredConversation,
 } from "../store";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   type Admission,
   messageHasId,

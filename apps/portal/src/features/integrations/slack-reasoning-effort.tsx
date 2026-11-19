@@ -1,10 +1,10 @@
 import React from "react";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   isChatEffort,
   parseSlackReasoningEffortView,
   type ChatEffort,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlMutation, controlRead } from "../../control-client";
 import { inferencePath } from "../../control-paths";

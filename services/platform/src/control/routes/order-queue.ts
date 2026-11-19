@@ -1,4 +1,4 @@
-import { isOrderQueueAction } from "@seams/control-api";
+import { isOrderQueueAction } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import {
@@ -11,7 +11,7 @@ import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** The staff order queue on the page (Plan 40B phase 3). */
 export type OrderQueueControlRoute =

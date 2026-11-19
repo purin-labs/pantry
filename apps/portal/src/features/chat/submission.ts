@@ -1,5 +1,5 @@
-import type { ConversationId } from "@seams/control-api";
-import type { Chat } from "@seams/control-api/portal/chat";
+import type { ConversationId } from "@purin-labs/control-api";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
 
 /**
  * How the composer submits a message: `send` starts a turn, `queue` waits for

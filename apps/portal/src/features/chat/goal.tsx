@@ -5,8 +5,8 @@ import {
   type ChatGoalView,
   type ChatGoalCommand,
   type ConversationId,
-} from "@seams/control-api";
-import { errorMessage } from "@seams/std";
+} from "@purin-labs/control-api";
+import { errorMessage } from "@purin-labs/std";
 import { controlRead, controlWrite, readCookie } from "../../control-client";
 import { syncDialog, cancelDialog } from "../../dialog";
 import "./goal.css";

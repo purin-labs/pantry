@@ -1,6 +1,6 @@
 import { pantryCommerceAccess } from "../commerce/app-access";
-import type { CommerceGraphQuery, CommerceSensitivity } from "@seams/contracts";
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
+import type { CommerceGraphQuery, CommerceSensitivity } from "@purin-labs/contracts";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";

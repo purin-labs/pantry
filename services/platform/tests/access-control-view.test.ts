@@ -3,7 +3,7 @@
 import type {
   CapabilityDefinition,
   OrganisationCapabilityPolicy,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

@@ -8,7 +8,7 @@
 // connection without the permission, and a sales read that fails is read on the
 // next read. Set BANK_PAYOUTS_ARTIFACT_DIR to keep the evidence; it repeats byte
 // for byte.
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { expect, it } from "vitest";
 
 import { FakeStripe } from "./fake-stripe.ts";

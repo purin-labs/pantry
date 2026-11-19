@@ -46,7 +46,7 @@ import {
   renderShopifyCommerceChoice,
   whatsappConnectionActionState,
 } from "./settings-support";
-import type { IntegrationAccount } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import type { IntegrationsPageProps } from "./settings-types";
 import {
   FileStorageIntegrationPanel,

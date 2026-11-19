@@ -2,7 +2,7 @@ import { workspaceCanvasLabelAllowsReaders } from "./conversation-disclosure";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { decideChatFlowDelivery } from "./information-flow";
 import { authorizeConversation } from "./conversation-access";
-import type { ConversationId } from "@seams/control-api";
+import type { ConversationId } from "@purin-labs/control-api";
 import { applyAgentMessageAssemblyEvent } from "../actors/agent-message-assembly";
 import { resolveActiveSessionActorAtPlacement } from "../actors/actor-router";
 import type { SessionDO } from "../actors/agent-session";
@@ -11,7 +11,7 @@ import {
   type SessionTurnStreamRecord,
 } from "../actors/agent-session-turn-stream";
 import type { Env } from "../env";
-import type { AgentEvent, RequestAuthority } from "@seams/contracts";
+import type { AgentEvent, RequestAuthority } from "@purin-labs/contracts";
 import { FlowBinding } from "../policy/information-flow";
 import { conversationTimeline, type ConversationStream } from "./conversation";
 import type { ConversationScope } from "./store";
@@ -22,14 +22,14 @@ import {
 } from "./store";
 import { projectReplyStreamText } from "./reply-stream-projector";
 
-import type { PortalChatStreamRecord } from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+import type { PortalChatStreamRecord } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   backoffDelay,
   errorMessage,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { parseRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import { authorizeSessionTurnOrigin } from "./turn-access";

@@ -15,7 +15,7 @@ import {
   type EvalTaskResult,
   type EvalView,
   type MemoryView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { refreshBrainSummary } from "../../brain-summary";
 import { isPrimaryNavigationClick } from "../../console-sidebar";

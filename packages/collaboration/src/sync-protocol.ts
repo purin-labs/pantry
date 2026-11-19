@@ -1,4 +1,4 @@
-import { assertNever, isPositiveInteger, isRecord } from "@seams/std";
+import { assertNever, isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   isCollaborationAgentActivities,
   type CollaborationAgentActivity,

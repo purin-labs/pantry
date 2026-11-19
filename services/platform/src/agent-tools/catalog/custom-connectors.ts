@@ -7,7 +7,7 @@ import type {
   CustomConnectorScalarConstraint,
   CustomConnectorSchema,
 } from "../../custom-connectors";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { JsonSchema } from "./selection";
 import type { HarnessToolDefinition } from "./types";
 

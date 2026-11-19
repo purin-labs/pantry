@@ -4,7 +4,7 @@ import { DatabaseSync } from "node:sqlite";
 import type {
   HarnessTurnLease,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
@@ -27,7 +27,7 @@ import {
   sqlStorage,
   TestSqlStorage,
 } from "./sqlite-storage";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const mocks = vi.hoisted(function createMocks() {
   return { preflight: vi.fn() };

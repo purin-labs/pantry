@@ -21,7 +21,7 @@ import {
   payoutSourceReference,
 } from "../../data/supplier-payout-plan";
 import type { CommerceActionPath } from "../../commerce/action-model";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Executing an approved supplier payout through the governed action path.

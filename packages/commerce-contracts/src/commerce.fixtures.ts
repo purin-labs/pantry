@@ -81,7 +81,7 @@ import type {
   SystemEntityExtensionSchemaDraft,
   SystemEntityExtensionSchemaCommandTarget,
 } from "./commerce-entity-plane";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const stockedFoodServicePreparation: FoodServicePreparation = {
   kind: "stocked_inventory",

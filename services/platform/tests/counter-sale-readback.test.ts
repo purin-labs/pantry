@@ -1,4 +1,4 @@
-import type { Checkout, CheckoutPaymentAttempt } from "@seams/contracts";
+import type { Checkout, CheckoutPaymentAttempt } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import { readCounterSale } from "../src/data/counter-sale-readback";

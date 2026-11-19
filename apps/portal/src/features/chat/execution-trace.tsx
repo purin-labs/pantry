@@ -13,8 +13,8 @@ import type {
   CaseExecutionNodeDetail,
   OpenCaseExecutionNode,
   ConversationId,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 import { controlRead } from "../../control-client";
 import {
   readChatExecution,
@@ -40,7 +40,7 @@ import {
   TraceDescription,
   type TraceStatus,
 } from "../../ui/trace";
-import type { ChatWork } from "@seams/control-api/portal/chat";
+import type { ChatWork } from "@purin-labs/control-api/portal/chat";
 import "./execution-trace.css";
 
 const transport = { read: controlRead };

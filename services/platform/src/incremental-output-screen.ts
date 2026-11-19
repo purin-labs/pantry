@@ -5,8 +5,8 @@ import {
   isSlackDirectMessage,
   trailingInternalModelProtocolStart,
 } from "./redaction";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 /**
  * Screens a streamed answer part by part before it reaches a Slack thread. It

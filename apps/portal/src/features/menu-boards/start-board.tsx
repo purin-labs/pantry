@@ -6,8 +6,8 @@ import {
   type MenuBoardDesign,
   type MenuBoardLayout,
   type MenuBoardStart,
-} from "@seams/menu-board-crdt/board";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/menu-board-crdt/board";
+import { isRecord } from "@purin-labs/std";
 import { controlAnswer, controlWrite } from "../../control-client";
 import { controlPath } from "./menu-board-requests";
 import "./start-board.css";

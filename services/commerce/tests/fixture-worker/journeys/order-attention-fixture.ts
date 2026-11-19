@@ -6,7 +6,7 @@ import {
   parseLocation,
   parseSalesChannel,
   type CommerceOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   writeOrder,
   writePayment,

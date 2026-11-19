@@ -6,7 +6,7 @@ import type { AgentOperationsSnapshot } from "../data/agent-operations";
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import { readCommerceExceptionInbox } from "../commerce/operations-workbench";
-import type { CommerceExceptionInbox } from "@seams/control-api";
+import type { CommerceExceptionInbox } from "@purin-labs/control-api";
 
 type AgentOperationsWithActivity = AgentOperationsSnapshot & {
   readonly actionLedger: readonly ActionLedgerActivity[];

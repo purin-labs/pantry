@@ -11,12 +11,12 @@ import type {
   CommerceReadWatermark,
   CustomCommerceEntityTypeId,
   SystemCommerceEntityKind,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceGraphQueryPlanRequest,
   parseEntityPlaneCapabilityMetadataResponse,
   parseCommerceSnapshotRevision,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { OrganisationDO } from "../src/actors/organisation";
 import {
   materializeCommerceRelationText,
@@ -30,8 +30,8 @@ import {
 import { parseCommerceGraphQuery } from "../src/commerce/entity-plane/routes";
 import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 
 describe("OrganisationActor normalized commerce relation", () => {
@@ -597,11 +597,11 @@ function requiredPlannedRelationship(
   organisationId: ReturnType<typeof requireOrganisationId>,
   merchantId: string,
   query: Variant<
-    import("@seams/contracts").CommerceGraphQuery,
+    import("@purin-labs/contracts").CommerceGraphQuery,
     "relationship_traversal"
   >,
 ): {
-  plan: import("@seams/contracts").CommerceQueryPlan;
+  plan: import("@purin-labs/contracts").CommerceQueryPlan;
   planRequest: ReturnType<typeof parseCommerceGraphQueryPlanRequest>;
 } {
   const request = parseCommerceGraphQueryPlanRequest({

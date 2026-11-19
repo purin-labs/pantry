@@ -1,9 +1,9 @@
 import React from "react";
 import * as Menu from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronDown, RefreshCw, Settings } from "lucide-react";
-import type { MailInboxAccount } from "@seams/control-api";
-import { assertNever } from "@seams/std";
-import type { MailAgentState } from "@seams/control-api/portal/mail-agent";
+import type { MailInboxAccount } from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
+import type { MailAgentState } from "@purin-labs/control-api/portal/mail-agent";
 import { GlideHighlight } from "../../ui/glide-highlight";
 import "../../ui/action-menu.css";
 

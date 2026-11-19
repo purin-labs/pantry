@@ -1,7 +1,7 @@
 // B2B companies (Plan 76 phase 8 slice 3). A company groups customers who
 // buy for a business, and gives them its own price for some variants at
 // pickup and shipping checkouts. Staff can place a draft order for its buyer
-// on the company's invoice terms, and record the bank transfer later. The schemas in `@seams/commerce-contracts` are
+// on the company's invoice terms, and record the bank transfer later. The schemas in `@purin-labs/commerce-contracts` are
 // the only source of these records (Plan 78).
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
@@ -13,7 +13,7 @@ import {
   parseCommerceCompanyInvoicesV1,
   parseCommerceCompanyV1,
   parseUpdateCommerceCompanyV1,
-} from "@seams/commerce-contracts/records/api-companies";
+} from "@purin-labs/commerce-contracts/records/api-companies";
 
 export type {
   CreateCommerceCompanyV1,
@@ -26,7 +26,7 @@ export type {
   CommerceCompanyPricesV1,
   CommerceCompanyV1,
   UpdateCommerceCompanyV1,
-} from "@seams/commerce-contracts/records/api-companies";
+} from "@purin-labs/commerce-contracts/records/api-companies";
 
 export function parseCompany(value: unknown) {
   return decodeRecord(parseCommerceCompanyV1, value);

@@ -80,7 +80,7 @@ import {
   type ProviderStartContext,
   type ProviderStartContextByProvider,
 } from "./domain";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 export const PROVIDER_ADAPTERS = {
   airtable: {

@@ -6,8 +6,8 @@ import {
 import { relationshipDefinitionWireSchema } from "./query-wire.ts";
 import { Type, type Static, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever, codePointCount } from "@seams/std";
-import type { StrictUnion } from "@seams/type-utils";
+import { assertNever, codePointCount } from "@purin-labs/std";
+import type { StrictUnion } from "@purin-labs/type-utils";
 
 import {
   attributeDefinitionIdSchema,

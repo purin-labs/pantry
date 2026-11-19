@@ -1,4 +1,4 @@
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { AgentSessionLifecycle as GeneratedLifecycle } from "./types/AgentSessionLifecycle";
 import type { RecoveringSession as GeneratedRecovery } from "./types/RecoveringSession";
 import type { SessionCommand as GeneratedCommand } from "./types/SessionCommand";

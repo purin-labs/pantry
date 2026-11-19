@@ -2,9 +2,9 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import type { UserId, OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationEnvironment } from "./control-plane";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
-import { isRecord, sha256Hex } from "@seams/std";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 import { prepareOrganisationControlMutationReceipt as prepareOrganisationReceipt } from "./shared-rows/mutation-receipt";
 
 export {

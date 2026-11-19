@@ -6,7 +6,7 @@ import {
   parseOrder,
   type CommerceOrderLineItemV1,
   type CommerceOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { BuyerSessionAuthority } from "../src/buyer-session.ts";
 import { CommerceAuthority } from "../src/commerce-authority.ts";
 import {

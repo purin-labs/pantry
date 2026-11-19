@@ -1,5 +1,5 @@
 import { History } from "lucide-react";
-import { reportBakeryShift } from "@seams/production-simulation/recipes/bakery/shift-report";
+import { reportBakeryShift } from "@purin-labs/production-simulation/recipes/bakery/shift-report";
 import { Select } from "../../ui/select";
 import {
   EspressoPhysicsView,
@@ -7,17 +7,17 @@ import {
   readEspressoSamples,
 } from "./linea/espresso-physics-view";
 import { initialEspressoSample } from "./linea/espresso-scene";
-import type { ApplianceSample } from "@seams/bakery-model/bakery-appliance-protocol";
+import type { ApplianceSample } from "@purin-labs/bakery-model/bakery-appliance-protocol";
 import type {
   PersistentEspressoCell,
   PersistentPourOverCell,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import { PourOverPhysicsView } from "./pour-over/pour-over-physics-view";
 import {
   readPourOverObservation,
   readPourOverSamples,
   type PourOverSample,
-} from "@seams/production-simulation/recipes/pour-over/sample";
+} from "@purin-labs/production-simulation/recipes/pour-over/sample";
 import {
   INITIAL_POUR_OVER_SETUP,
   initialPourOverSample,
@@ -29,8 +29,8 @@ import {
   PersistentProductionSurface,
   productionControlDescription,
 } from "./persistent-production-surface";
-import type { BakeryProductionControl } from "@seams/bakery-model/bakery-surface";
-import type { HostIdentity } from "@seams/production-simulation";
+import type { BakeryProductionControl } from "@purin-labs/bakery-model/bakery-surface";
+import type { HostIdentity } from "@purin-labs/production-simulation";
 import { ProductionResults } from "./production-results";
 import { ProductionControls } from "./production-controls";
 import {
@@ -42,7 +42,7 @@ import {
   type ReviewedScenarioControl,
 } from "./production-scenario-controls";
 import React from "react";
-import { teaStrainTiming } from "@seams/production-simulation/recipes/bakery/tea-process";
+import { teaStrainTiming } from "@purin-labs/production-simulation/recipes/bakery/tea-process";
 import {
   parseHostView,
   parseObservationView,
@@ -51,9 +51,9 @@ import {
   TICK_MICROSECONDS,
   type HostView,
   type InspectionView,
-} from "@seams/production-simulation";
-import { assertNever, isRecord } from "@seams/std";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+} from "@purin-labs/production-simulation";
+import { assertNever, isRecord } from "@purin-labs/std";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   openAuthoredCellWorker,
   openExecutionWorker,
@@ -65,7 +65,7 @@ import {
   ovenCheckpointContents,
   type ArtifactContent,
   type OvenRunSource,
-} from "@seams/production-simulation/runs/oven-run-file";
+} from "@purin-labs/production-simulation/runs/oven-run-file";
 import { downloadBakeryFile } from "../workflow-simulator/file-download";
 import { FactoryOverview } from "./factory-overview";
 import {
@@ -78,7 +78,7 @@ import { OvenStorageHistory } from "./oven-storage-history";
 import { MaterialStorageHistory } from "./material-storage-history";
 import { OvenResourceHistory } from "./oven-resource-history";
 import { OvenSchedulingHistory } from "./oven-scheduling-history";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 import { OvenTaskViews } from "./oven-task-views";
 import type { RecipeGraphSource } from "./recipe-graph";
 import { RecipeWorkflowGraph } from "./recipe-workflow-graph";
@@ -86,18 +86,18 @@ import { OvenPhysicsView } from "./oven-physics-view";
 import {
   OvenRecordings,
   ovenRecordingArchive,
-} from "@seams/production-simulation/runs/oven-recordings";
+} from "@purin-labs/production-simulation/runs/oven-recordings";
 import {
   readOvenScene,
   readOvenLiveFrame,
   type OvenLiveFrame,
   withOvenCommittedAt,
   ovenOperation,
-} from "@seams/production-simulation/runs/oven-live-physics";
+} from "@purin-labs/production-simulation/runs/oven-live-physics";
 import type {
   PersistentPhysicsScene,
   PersistentCell,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   RecipeBackButton,
   RecipeSplitDivider,

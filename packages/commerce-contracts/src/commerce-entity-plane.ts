@@ -147,7 +147,7 @@ import type { CommerceMutationReceiptSigningEnvelopeV1 as GeneratedCommerceMutat
 import type { CommerceMutationReceiptV1 as GeneratedCommerceMutationReceiptV1 } from "./entity-plane-receipts.ts";
 import type { CommerceEntityPlaneError as GeneratedCommerceEntityPlaneError } from "./entity-plane-results.ts";
 import type { VisibleRelationshipColumn as GeneratedVisibleRelationshipColumn } from "./view-records.ts";
-import type { StrictUnion, Variant } from "@seams/type-utils";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 
 export type { CommerceEntityRef } from "./entity-reference.ts";
 export type { SystemCommerceEntityRef } from "./entity-reference.ts";

@@ -1,5 +1,5 @@
-import { ROBOTS } from "@seams/bakery-model/bakery-robots";
-import type { ScheduleSpatialLayout } from "@seams/production-simulation/recipes/bakery/schedule";
+import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
+import type { ScheduleSpatialLayout } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import { BakeryAppearanceControl } from "../../preferences/appearance-controls";
 import { SegmentedControl } from "./docks/shared";
 import { RobotComparison } from "./robot-comparison";
@@ -7,7 +7,7 @@ import type { EngineJobs } from "../production-run/engine-jobs";
 import type {
   BakeryWorkspaceViewAction,
   BakeryRecordingCameraView,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { WorkspaceCameraView } from "./simulator-state";
 import type { PhysicsFrame } from "./spatial/physics-inspection";
 import { PhysicsSceneHost } from "./spatial/physics-scene-host";
@@ -15,9 +15,9 @@ import React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { GlideHighlight } from "../../ui/glide-highlight";
 import { PlaybackToggle } from "./playback-toggle";
-import type { Settings } from "@seams/bakery-model/bakery";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
-import { MAX_RUN_FILE_BYTES } from "@seams/bakery-model/bakery-run-snapshot";
+import type { Settings } from "@purin-labs/bakery-model/bakery";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
+import { MAX_RUN_FILE_BYTES } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   ArrowLeft,
   ArrowRight,
@@ -31,7 +31,7 @@ import type {
   PhysicsOutcome,
   PhysicsReplay as PhysicsReplayData,
   PhysicsRequest,
-} from "@seams/bakery-model/bakery-physics";
+} from "@purin-labs/bakery-model/bakery-physics";
 import {
   recordingDuration as duration,
   recordingReplayStart,
@@ -43,7 +43,7 @@ import {
   type ReplayState,
   type RecordingSource,
   type RecordingReplayView,
-} from "@seams/production-simulation/simulator/playback-state";
+} from "@purin-labs/production-simulation/simulator/playback-state";
 import type {
   BrowserRunActions,
   RecordingReplayActions,
@@ -57,16 +57,16 @@ import {
   physicsTasks,
   type RecordedTransfer,
   type PhysicsReplayEvent,
-} from "@seams/production-simulation/recipes/bakery/physics-playback";
+} from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import type { RecordedFitEvent } from "./spatial/floor-plan-geometry";
-import type { WorkcellSelection } from "@seams/production-simulation/simulator/selection";
+import type { WorkcellSelection } from "@purin-labs/production-simulation/simulator/selection";
 import type {
   BakeryWorkspaceAction,
   BakeryWorkspaceState,
   SimulatorState,
   SimulatorConnection,
 } from "./simulator-state";
-import { SAVED_RUN_MESSAGE, parseRehearsalFile } from "@seams/production-simulation/simulator/rehearsal-file";
+import { SAVED_RUN_MESSAGE, parseRehearsalFile } from "@purin-labs/production-simulation/simulator/rehearsal-file";
 import { readExample } from "./rehearsal-examples";
 import "./physics-replay.css";
 import {
@@ -75,8 +75,8 @@ import {
 } from "./production-workspace";
 import type { ProductionSession } from "./production-session";
 import type { PreparedRehearsalEdit } from "./rehearsal-edits";
-import type { Variant } from "@seams/type-utils";
-import { physicsEvidenceVisible } from "@seams/production-simulation/runs/physics-evidence";
+import type { Variant } from "@purin-labs/type-utils";
+import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/physics-evidence";
 
 type Progress =
   | Readonly<{ kind: "idle" }>

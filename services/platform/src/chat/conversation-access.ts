@@ -8,8 +8,8 @@ import {
   type ProjectRole,
   type ConversationId,
   type UserId,
-} from "@seams/control-api";
-import { isNonNegativeInteger } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isNonNegativeInteger } from "@purin-labs/std";
 import type { ConversationScope } from "./store";
 import { parseConversationActorIdentity } from "./conversation-actor-identity";
 import { parseCaseId, type CaseId } from "../ids";

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import type { ApplianceFlexMesh } from "@seams/bakery-model/bakery-appliance-protocol";
+import type { ApplianceFlexMesh } from "@purin-labs/bakery-model/bakery-appliance-protocol";
 
 export type DeformablePastryBufferState = {
   vertexCount: number;

@@ -1,6 +1,6 @@
 import { handleAccountPlatformRequest } from "./account-platform/routes";
 import { runScheduledPayoutReconciliation } from "./payouts/recovery";
-import type { Track } from "@seams/contracts";
+import type { Track } from "@purin-labs/contracts";
 import { handleControlRequest } from "./control-router";
 import type { GatewayRoute } from "./gateway-routing/domain";
 import { matchGatewayRoute } from "./gateway-routing/match";
@@ -33,7 +33,7 @@ import { handleCommerceWebhook } from "./commerce/webhooks";
 import { handleMenuScreenRequest } from "./control/routes/menu-screens";
 import { handleVoiceMacRequest } from "./voice/mac-routes";
 import { handleDeviceGatewayRequest } from "./devices/gateway-routes";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   handleAdministerActorRegistry,
   handleInspectRetainedVaultRootClosure,

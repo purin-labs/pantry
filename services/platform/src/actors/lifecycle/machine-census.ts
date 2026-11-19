@@ -1,4 +1,4 @@
-import type { MachineDefinition } from "@seams/std/state-machine";
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 import { CASE_APPROVAL_WAIT_MACHINE } from "../case/approval-wait.machine";
 import { CASE_ASSIGNMENT_MACHINE } from "../case/assignment.machine";

@@ -1,4 +1,4 @@
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { ControlCommand } from "./commands.ts";
 import type { AcceptedEvent } from "./events.ts";
 import type { CommandId, LocationId, ResourceId } from "./identity.ts";

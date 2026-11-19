@@ -1,11 +1,11 @@
-import { isRecord } from "@seams/std";
-import type { CommerceApiScope } from "@seams/commerce-client";
+import { isRecord } from "@purin-labs/std";
+import type { CommerceApiScope } from "@purin-labs/commerce-client";
 import {
   ControlApiError,
   controlMutation,
   controlRead,
 } from "../../control-client";
-import { type CommerceApiKey, parseKey, unexpected } from "@seams/control-api/portal/api-keys";
+import { type CommerceApiKey, parseKey, unexpected } from "@purin-labs/control-api/portal/api-keys";
 
 /** Scopes that no API key may hold; Commerce refuses them for a key. */
 export type KeyForbiddenScope = "payments:record" | "credentials:write";

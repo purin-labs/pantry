@@ -1,5 +1,5 @@
 import { pkceChallenge } from "../provider-adapters/authorization";
-import { encodeBase64Url, isRecord } from "@seams/std";
+import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import type { Result } from "../result";
 import { RequestDeadline } from "../request-deadline";
 

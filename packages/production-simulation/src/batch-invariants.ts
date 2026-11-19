@@ -1,5 +1,5 @@
-import { assertNever, sameJson } from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+import { assertNever, sameJson } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { requireValue } from "./document-values.ts";
 import {
   batchDuration,

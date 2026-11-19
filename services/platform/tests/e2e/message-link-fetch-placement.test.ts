@@ -3,8 +3,8 @@ import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { newConversationId, type ConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import { newConversationId, type ConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,

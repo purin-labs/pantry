@@ -1,15 +1,15 @@
 import { openAuthorizationPopup } from "./authorization-popup";
-import type { FileContextProvider } from "@seams/contracts";
+import type { FileContextProvider } from "@purin-labs/contracts";
 import React from "react";
 import { toast } from "sonner";
 import { initialFileAccessPath } from "../../route";
 import type { OrganisationMutation } from "../../mutation-state";
 import { providerLabel } from "../../integration-catalogue";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { loadIntegrationsRoute } from "./route-loading";
 import type {
   IntegrationsRouteData,

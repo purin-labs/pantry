@@ -1,4 +1,4 @@
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { CommerceGraphQuery } from "./graph-query-schema.ts";
 import type { CommerceQueryCapabilityProfile } from "./query-capabilities.ts";
 import type { CommerceQueryPlanOperation } from "./query-operation.ts";

@@ -24,7 +24,7 @@ import {
   type CommerceOrderV1,
   type CommercePickupFulfillmentV1,
   type CommerceReturnV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   commerceTransition,
   type Cart,
@@ -32,7 +32,7 @@ import {
   type InventoryAllocation,
   type InventoryAllocationOrderCommitPoint,
   type InventoryRequirement,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { buyerSessionDigest } from "../buyer-session.ts";
 import type { BuyerCheckoutProfileClaims } from "./buyer-checkout/types.ts";

@@ -25,11 +25,11 @@ import {
   type RecordShippingTrackingCommand,
   type ReceiveCommerceInventoryV3,
   checkoutOnlineSource,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import type {
   CheckoutProfileConfiguration,
   ShippingRouteBinding,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import { BuyerSessionAuthority } from "../src/buyer-session.ts";
@@ -59,8 +59,8 @@ import {
 import { initializeCommerceSchema } from "../src/schema.ts";
 import { createLocalShippingAddressValidationService } from "../src/shipping-address-validation.ts";
 import { configurePlan23FlavoredCatalog } from "../scripts/configure-plan23-flavored-catalog.ts";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 const NOW = "2026-08-31T09:30:00.000Z";
 const SHIPPING_NOW = "2026-08-14T10:00:00.000Z";

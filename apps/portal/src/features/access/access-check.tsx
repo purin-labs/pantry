@@ -6,7 +6,7 @@ import { findOption, optionItem, renderOption } from "./dialog-elements";
 import type {
   AccessControlOption,
   AccessControlSourcePolicyView,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 
 /**
  * Answers the common data-flow question in place: may this shared data, used

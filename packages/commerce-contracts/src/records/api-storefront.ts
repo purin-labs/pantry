@@ -18,7 +18,7 @@ import {
   ReadonlyStrictObject,
   wireRecordParser,
 } from "./wire-objects.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const text = normalizedTextSchema;
 

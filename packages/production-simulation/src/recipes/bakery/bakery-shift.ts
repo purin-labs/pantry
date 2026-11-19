@@ -1,6 +1,6 @@
 import { bakeryShiftDemand } from "./shift-demand.ts";
-import { assertNever, isRecord } from "@seams/std";
-import { parsePersistentCell } from "@seams/bakery-model/bakery-physics";
+import { assertNever, isRecord } from "@purin-labs/std";
+import { parsePersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import * as d from "../../document-values.ts";
 import { authoredId, type ResourceId, type StorageId } from "../../identity.ts";
 import { addQuantity, normalizeQuantity } from "../../quantity.ts";
@@ -1549,7 +1549,7 @@ import { blackSesameApplianceTask } from "./black-sesame-milk.ts";
 import { financierApplianceTask } from "./financier.ts";
 import { pieApplianceTask } from "./pie.ts";
 import { teaApplianceTask } from "./tea.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export {
   defaultMorningShiftFaultInjections,

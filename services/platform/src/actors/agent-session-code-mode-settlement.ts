@@ -4,7 +4,7 @@ import type {
   EventEnvelope,
   HarnessTurnLease,
   SessionTransition,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
 import type { Env } from "../env";
@@ -66,8 +66,8 @@ import {
   frozenRelocationReceiptGate,
   type RelocationReceiptError,
 } from "./actor-relocation-state";
-import type { Variant } from "@seams/type-utils";
-import { canonicalJson, isRecord, nonNegativeIntegerOrNull } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { canonicalJson, isRecord, nonNegativeIntegerOrNull } from "@purin-labs/std";
 import type {
   HarnessCodeModeExecutionLease,
   HarnessCodeModeExecutionOutcome,

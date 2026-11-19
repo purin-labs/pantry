@@ -3,8 +3,8 @@ import {
   type VaultContact,
   type VaultItemCreate,
   type VaultItemView,
-} from "@seams/control-api";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 /**
  * The protocol between the Platform and the 1Password store Worker

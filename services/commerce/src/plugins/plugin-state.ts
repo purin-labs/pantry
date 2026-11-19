@@ -2,8 +2,8 @@
 // is active at revision 1 with no settings; a change writes the row with the
 // next revision. A built-in plugin's settings (schema 79) are what staff set;
 // the plugin gives a default for each one that they did not.
-import type { CommercePluginSettingsV1 } from "@seams/commerce-client";
-import type { BuiltInPluginId, PluginState } from "@seams/commerce-contracts";
+import type { CommercePluginSettingsV1 } from "@purin-labs/commerce-client";
+import type { BuiltInPluginId, PluginState } from "@purin-labs/commerce-contracts";
 
 import type { CommerceDatabase } from "../database.ts";
 

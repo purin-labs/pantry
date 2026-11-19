@@ -3,7 +3,7 @@ import {
   assessRobotLoad,
   type RobotLoadAssessment,
 } from "./bakery-load-assessment.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 declare const request: PhysicsRequest;
 void assessRobotLoad(request);

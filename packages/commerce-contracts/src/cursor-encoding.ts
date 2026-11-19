@@ -1,5 +1,5 @@
 import { contractRefusal, type ContractDecodeResult } from "./schema.ts";
-import { utf8ByteLength } from "@seams/std";
+import { utf8ByteLength } from "@purin-labs/std";
 
 import type { CommerceCursor } from "./query-pagination.ts";
 

@@ -8,7 +8,7 @@
  * move that `ORGANISATION_LIFECYCLE_MACHINE` does not allow is a programmer
  * error, so it throws.
  */
-import type { MachineEvent, MachineState } from "@seams/std/state-machine";
+import type { MachineEvent, MachineState } from "@purin-labs/std/state-machine";
 import type { OrganisationId } from "../ids";
 import type { OrganisationQuerySource } from "./query-source";
 import type { RowGuard } from "./shared-rows/organisation-row";

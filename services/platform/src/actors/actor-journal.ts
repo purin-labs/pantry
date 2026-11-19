@@ -3,7 +3,7 @@ import {
   restoreStoredProjectSnapshot,
   verifyProjectSnapshot,
   type ProjectSnapshot,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type {
   AcceptedInputRef,
   AgentSessionLifecycle,
@@ -17,7 +17,7 @@ import type {
   SessionTransition,
   Sha256Digest,
   StoredMessageAttachment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Result } from "../result";
 import type { CodeModeOrganisationReserveInput } from "./code-mode-budget";
 import type { SessionBudgetError } from "./agent-session-budget";
@@ -33,8 +33,8 @@ import {
   type ContextBundle,
   type ModelContextBundle,
 } from "../context/assembly";
-import type { Variant } from "@seams/type-utils";
-import { hasExactKeys, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   CompositeCommitAbort,
   JournalTransitionAbort,

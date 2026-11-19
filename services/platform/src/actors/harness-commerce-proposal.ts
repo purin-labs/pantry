@@ -9,13 +9,13 @@ import type {
   CommerceProjection,
   CommerceSource,
   SourceProvenance,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   assertNever,
   sha256Hex,
-} from "@seams/std";
-import type { CommerceOrderV1 } from "@seams/commerce-client";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { CommerceOrderV1 } from "@purin-labs/commerce-client";
+import type { Variant } from "@purin-labs/type-utils";
 import type { Env } from "../env";
 import type { Result } from "../result";
 import {

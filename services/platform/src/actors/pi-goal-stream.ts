@@ -9,7 +9,7 @@ import type {
   GoalModelCallControl,
   GoalModelCallTicket,
 } from "./goal-model-calls";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import type { PiModelResponse } from "./pi-model-transport";
 import { errorStatusWithoutTokens } from "./pi-durable-stream";
 

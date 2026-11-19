@@ -12,7 +12,7 @@ import {
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
-} from "@seams/collaboration";
+} from "@purin-labs/collaboration";
 import {
   parseMailReplyUpdate,
   parseMailReplyStateVector,
@@ -21,7 +21,7 @@ import {
   type MailReplyCrdtError,
   type MailReplyPresenceSelection,
 } from "./index.ts";
-import { isPositiveInteger } from "@seams/std";
+import { isPositiveInteger } from "@purin-labs/std";
 
 export const MAIL_REPLY_PROTOCOL = "mail_reply_sync.v1";
 export const FRAME_LIMIT = COLLABORATION_FRAME_LIMIT;

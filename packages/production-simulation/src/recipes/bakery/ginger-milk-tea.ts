@@ -1,8 +1,8 @@
-import { canonicalJson, sha256Hex } from "@seams/std";
+import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import * as d from "../../document-values.ts";
 import { authoredId, type Sha256Hex } from "../../identity.ts";
 import { err, ok, type Result } from "../../result.ts";
-import { parsePersistentCell } from "@seams/bakery-model/bakery-physics";
+import { parsePersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import {
   DISPATCH_POLICY,
   MAX_EVENT_CAP,

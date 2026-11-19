@@ -12,8 +12,8 @@ import type {
   PhysicsCyclePlan,
   PhysicsRackPlan,
   PhysicsRackSequence,
-} from "@seams/bakery-model/bakery-physics";
-import type { Variant, VariantBy } from "@seams/type-utils";
+} from "@purin-labs/bakery-model/bakery-physics";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 
 declare const input: WorkcellInput;
 declare const recording: PhysicsRecording;

@@ -4,18 +4,18 @@ import {
   fields,
   sampleSettings,
   type Settings,
-} from "@seams/bakery-model/bakery";
-import type { CompiledProcedure } from "@seams/bakery-model/bakery-procedure";
+} from "@purin-labs/bakery-model/bakery";
+import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parseScenarioCopy,
   type ScenarioCopy,
-} from "@seams/bakery-model/bakery-scenario";
+} from "@purin-labs/bakery-model/bakery-scenario";
 
 import { ControlApiError } from "../../control-client.ts";
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api";
-import type { ProcedureRun } from "@seams/production-simulation/simulator/procedure";
+import type { ProcedureRun } from "@purin-labs/production-simulation/simulator/procedure";
 import { readScenario, type ScenarioRead } from "./scenario-api";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type WorkspaceCommandConnection = Readonly<{
   organisationId: string;

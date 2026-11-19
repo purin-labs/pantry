@@ -1,5 +1,5 @@
 {
-  "name": "@seams/production-simulation",
+  "name": "@purin-labs/production-simulation",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -57,10 +57,10 @@
     "check:types": "tsrs --noEmit && tsrs --project tsconfig.recipes.json --noEmit"
   },
   "dependencies": {
-    "@seams/bakery-model": "workspace:*",
-    "@seams/contracts": "workspace:*",
-    "@seams/std": "workspace:*",
-    "@seams/type-utils": "workspace:*",
+    "@purin-labs/bakery-model": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
     "fflate": "0.8.3",
     "typebox": "1.3.27"
   },

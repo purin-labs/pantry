@@ -4,7 +4,7 @@ import {
   tieredResultStore,
   type PhysicsResultStore,
   type ResultFiles,
-} from "@seams/production-simulation/execution-entry";
+} from "@purin-labs/production-simulation/execution-entry";
 
 /**
  * The physics result cache of one execution worker (Refactor 16, step 4):

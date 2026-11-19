@@ -2,7 +2,7 @@ import type { SingleDatabase } from "../src/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, afterEach, describe, expect, it } from "vitest";
-import type { SupplierPayable } from "@seams/contracts";
+import type { SupplierPayable } from "@purin-labs/contracts";
 import { d1Database } from "./sqlite-d1";
 import { payoutPlan } from "./supplier-payout-fixtures";
 import { parseOrganisationId } from "../src/ids";
@@ -26,7 +26,7 @@ import {
 } from "../src/payouts/recovery";
 import { reconcilePayoutInbox } from "../src/payouts/reconciliation";
 import { readSupplierPayout } from "../src/data/supplier-payout-store";
-import type { VariantBy } from "@seams/type-utils";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 const parsedOrganisation = parseOrganisationId("organisation_recovery");
 if (!parsedOrganisation.ok) throw new Error("invalid fixture organisation");

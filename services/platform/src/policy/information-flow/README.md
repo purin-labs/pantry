@@ -171,7 +171,7 @@ is read, so no background job runs. A schedule belongs to the whole Organisation
 A screen observation (Plan 87) is the sender's own input, as the message text
 is: the person saw the page, and the composer chip sent it. A private chat
 carries any page. A shared chat carries only a page that every member may open
-(`sharedChatMayCarry` in `@seams/control-api`), because its reply reaches the
+(`sharedChatMayCarry` in `@purin-labs/control-api`), because its reply reaches the
 other readers. `chat/screen-observation-admission.ts` applies the rule when the
 message is sent, so a withheld page is not stored, and again at turn time. The
 conversation response sends only the page name of a message, never its view.

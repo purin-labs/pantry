@@ -1,6 +1,6 @@
-import type { MailMatch, MailRule } from "@seams/control-api";
-import { mailMatch } from "@seams/control-api";
-import { isRecord, isNonNegativeInteger } from "@seams/std";
+import type { MailMatch, MailRule } from "@purin-labs/control-api";
+import { mailMatch } from "@purin-labs/control-api";
+import { isRecord, isNonNegativeInteger } from "@purin-labs/std";
 import {
   TypeSafeDisclosure,
   type TypeSafeDisclosureDenied,

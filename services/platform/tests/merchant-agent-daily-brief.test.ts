@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { CommerceEntityPlaneClient } from "@seams/commerce-client";
-import type { RequestAuthority } from "@seams/contracts";
+import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";

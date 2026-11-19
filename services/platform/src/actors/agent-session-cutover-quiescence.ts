@@ -1,6 +1,6 @@
 import type { SessionId, OrganisationId } from "../ids";
 import type { Result } from "../result";
-import { assertNever, isNonNegativeInteger } from "@seams/std";
+import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 
 type SessionCutoverRuntime = {
   readonly persistence: "v28_canonical";

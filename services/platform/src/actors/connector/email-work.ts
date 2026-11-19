@@ -34,7 +34,7 @@ import {
   type OperationalEmailProposalRecord,
 } from "../connector-email-operational";
 import type { Result } from "../../result";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { armConnectorAlarm } from "./alarm";
 import { type EmailCaseContextCollectionAccess, invalid } from "./support";
 import type { ConnectorResult } from "./types";

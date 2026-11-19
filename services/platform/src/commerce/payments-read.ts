@@ -1,4 +1,4 @@
-import type { PaymentStep } from "@seams/control-api";
+import type { PaymentStep } from "@purin-labs/control-api";
 
 /** A local month is at most 31 days and one hour. */
 const MAX_WINDOW_MS = 32 * 24 * 60 * 60 * 1000;

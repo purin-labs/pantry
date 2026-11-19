@@ -6,7 +6,7 @@ import {
   runInDurableObject,
 } from "cloudflare:test";
 import { expect, it } from "vitest";
-import { COLLABORATION_PONG } from "@seams/collaboration";
+import { COLLABORATION_PONG } from "@purin-labs/collaboration";
 import {
   CHAT_SIGNAL,
   newConversationId,
@@ -14,7 +14,7 @@ import {
   parseChatSignal,
   type ChatSignal,
   type ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";

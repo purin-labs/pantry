@@ -1,7 +1,7 @@
 import { env, exports } from "cloudflare:workers";
 import { HttpResponse, http } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";

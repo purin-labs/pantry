@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 export type JsonRecord = Record<string, unknown>;
 
 export async function readBoundedJsonRecord(

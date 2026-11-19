@@ -66,7 +66,7 @@ def main() -> None:
                        check=True, capture_output=True)
         config = ROOT / "scripts/shop-voice/wrangler.jsonc"
         persistence = work / "worker"
-        wrangler = ["pnpm", "--filter", "@seams/platform", "exec", "wrangler"]
+        wrangler = ["pnpm", "--filter", "@purin-labs/platform", "exec", "wrangler"]
         with (ARTIFACTS / "safari-schema.log").open("w") as log:
             subprocess.run([*wrangler, "d1", "execute", "DB", "--config", str(config), "--local", "--persist-to", str(persistence),
                             "--file", str(single_database_schema_file())],
@@ -81,7 +81,7 @@ def main() -> None:
                                        env={**os.environ, "SHOP_VOICE_PUBLIC_ORIGIN": PORTAL},
                                        cwd=ROOT, start_new_session=True, stdout=log, stderr=subprocess.STDOUT)
         with (ARTIFACTS / "safari-vite.log").open("w") as log:
-            portal = subprocess.Popen(["pnpm", "--filter", "@seams/portal", "exec", "vite", "--config",
+            portal = subprocess.Popen(["pnpm", "--filter", "@purin-labs/portal", "exec", "vite", "--config",
                                        str(ROOT / "scripts/shop-voice/vite.config.ts")],
                                       env={**os.environ, "SHOP_VOICE_SAFARI": "1"},
                                       cwd=ROOT, start_new_session=True, stdout=log, stderr=subprocess.STDOUT)

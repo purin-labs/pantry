@@ -3,7 +3,7 @@ import {
   hasExactKeys,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { isUserId, type UserId } from "./ids.ts";
 
 export type PreferenceArea = "appearance" | "chat" | "bakeryos";

@@ -2,7 +2,7 @@ import type {
   StorageHistoryView,
   StorageInterval,
   StorageUsage,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import type React from "react";
 import { seconds, type TaskSelection } from "./oven-logistics";
 

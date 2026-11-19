@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { HttpResponse, http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-case-work";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";

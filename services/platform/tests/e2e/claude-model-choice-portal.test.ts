@@ -1,7 +1,7 @@
 import { exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { preparePortalChatJourney } from "./chat-journey-support";

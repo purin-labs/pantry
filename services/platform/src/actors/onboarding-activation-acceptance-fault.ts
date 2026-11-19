@@ -1,7 +1,7 @@
 import { parseRequestId, type RequestId } from "../ids";
 import type { Result } from "../result";
-import type { VariantBy } from "@seams/type-utils";
-import { isNonNegativeInteger } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isNonNegativeInteger } from "@purin-labs/std";
 
 const ONBOARDING_ACTIVATION_ACCEPTANCE_FAULT_KEY =
   "acceptance:onboarding-activation-fault:v1";

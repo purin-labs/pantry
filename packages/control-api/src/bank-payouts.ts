@@ -1,4 +1,4 @@
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /**
  * The money that Stripe and Square send to the shop's bank: how much, the day

@@ -3,7 +3,7 @@
 import type {
   CommerceReturnCommandV1,
   ExchangeCommerceOrderLinesV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 export * from "./returns.ts";
 export { ORDER_RETURN_SCHEMA } from "./schema.ts";

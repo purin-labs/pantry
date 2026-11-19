@@ -8,8 +8,8 @@ import type {
   OnboardingProvider,
   OnboardingSelectedResource,
   OnboardingWebhookHealth,
-} from "@seams/contracts";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import type { CodexAllowance } from "../index.ts";
 
 export type OrganisationCodexConnection =

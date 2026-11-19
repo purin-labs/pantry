@@ -3,7 +3,7 @@ import {
   type ChatTranscriptionPath,
   type VoiceConfirmationTarget,
   type VoiceHeard,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { controlAnswer, controlWrite } from "../../control-client";
 import {

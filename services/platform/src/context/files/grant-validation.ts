@@ -14,7 +14,7 @@ import {
   storeFilePlacementCredential,
 } from "../../provider-workflows/file-context-credential";
 import type { Result } from "../../result";
-import type { FileContextProvider } from "@seams/contracts";
+import type { FileContextProvider } from "@purin-labs/contracts";
 
 export type FileGrantValidationError = Readonly<{
   readonly code:

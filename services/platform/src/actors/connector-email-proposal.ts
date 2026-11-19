@@ -43,12 +43,12 @@ import { extractMailbox } from "../mail/gmail-adapter";
 import type { Env } from "../env";
 import type { GmailDraft } from "../mail/gmail-adapter";
 import type { Result } from "../result";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   MailReplyEdit,
   MailReplyCorrection,
   MailRelationshipLookup,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { authorizeMailSource } from "../mail-inbox/authorization";
 import {
   claimEmailMaintenancePass,
@@ -87,7 +87,7 @@ import {
   settleEmailRelationshipVerification,
   type EmailRelationshipRead,
 } from "../mail-inbox/supplier-context";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type EmailRelationshipPreview =
   | Variant<EmailRelationshipRead, "suppliers">

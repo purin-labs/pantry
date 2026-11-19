@@ -7,7 +7,7 @@ import type {
   CommerceSource,
   SurfaceKind,
   Track,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseSurfaceKind,
   type FieldError,
@@ -102,11 +102,11 @@ import { reconcileCommerceOutbox } from "../commerce/outbox-worker";
 import type {
   Variant,
   VariantBy,
-} from "@seams/type-utils";
+} from "@purin-labs/type-utils";
 import {
   assertNever,
   parseJsonOrNull,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 type SegmentDecodeError = { code: "bad_path_encoding"; value: string };
 

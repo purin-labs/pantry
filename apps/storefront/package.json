@@ -1,5 +1,5 @@
 {
-  "name": "@seams/storefront",
+  "name": "@purin-labs/storefront",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,9 +12,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@seams/std": "workspace:*",
-    "@seams/type-utils": "workspace:*",
-    "@seams/commerce-client": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
     "qrcode-generator": "^2.0.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"

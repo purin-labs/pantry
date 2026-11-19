@@ -14,7 +14,7 @@ import type {
 } from "../../../provider-lifecycle/domain";
 import { requirePublicOrigin as requireConfiguredPublicOrigin } from "../../../public-origin";
 import { controlError } from "../../http";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { readProviderAuthorizationState } from "../../../data/provider-authorization-state";
 import {
   providerCallbackFailurePage,

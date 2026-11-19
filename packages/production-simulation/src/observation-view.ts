@@ -1,6 +1,6 @@
 import type { MaterialStorageHistoryView } from "./material-history.ts";
 import { readMaterialStorageHistory } from "./material-history-view.ts";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import * as d from "./document-values.ts";
 import { err, ok } from "./result.ts";
 import type { RunState } from "./state.ts";
@@ -28,7 +28,7 @@ import { readStorageHistory } from "./storage-history-view.ts";
 import type { StorageHistoryView } from "./storage-history.ts";
 import { readSchedulingHistory } from "./scheduling-history-document.ts";
 import type { SchedulingHistoryView } from "./scheduling-history.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /** Inspection has no execution identity, status or command authority. */
 export type ObservationView = Readonly<{

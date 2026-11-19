@@ -1,4 +1,4 @@
-import type { AccessControlAvailability } from "@seams/control-api";
+import type { AccessControlAvailability } from "@purin-labs/control-api";
 
 import {
   providerLabel,
@@ -9,7 +9,7 @@ import type {
   AccessControlGrantView,
   AccessControlSubjectView,
   AccessControlView,
-} from "@seams/control-api/portal/access-models";
+} from "@purin-labs/control-api/portal/access-models";
 
 /**
  * The strongest thing a recipient can do in one system, derived from its

@@ -1,5 +1,5 @@
 import { Type, type Static, type TSchema } from "typebox";
-import type { BakerySurfaceToolCommandName } from "@seams/bakery-model/bakery-surface";
+import type { BakerySurfaceToolCommandName } from "@purin-labs/bakery-model/bakery-surface";
 import type {
   COSTS_SURFACE,
   CostsViewCommandName,
@@ -7,7 +7,7 @@ import type {
   PastryBenchViewCommandName,
   REGISTER_SURFACE,
   RegisterViewCommandName,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { Value } from "typebox/value";
 import type {
   CatalogExecutionContext,
@@ -17,7 +17,7 @@ import type {
   HarnessCapabilityName,
   HarnessToolDefinition,
 } from "./catalog/types";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 /**
  * A tool argument that the agent can correct: the message names the field and

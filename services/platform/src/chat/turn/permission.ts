@@ -13,7 +13,7 @@ import type {
   ChatPermissionItem,
   ChatPermissionRequest,
   ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { FlowDecision, FlowSink } from "../../policy/information-flow";
 import { capabilityDefinitionById } from "../../authorization/capability-catalogue";
 import {

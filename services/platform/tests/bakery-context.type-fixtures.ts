@@ -1,12 +1,12 @@
 import type {
   BakeryBrowserContext,
   BakeryContextPreparationCommand,
-} from "@seams/bakery-model/bakery-context";
+} from "@purin-labs/bakery-model/bakery-context";
 import type {
   BakerySurfaceEffectOutcomeV1,
   ExecutableBakerySurfaceEffectV1,
   BakerySurfaceAttachmentV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 import type { EmbeddedHarnessSource } from "../src/actors/embedded-harness";
 
 declare const surface: BakerySurfaceAttachmentV1;

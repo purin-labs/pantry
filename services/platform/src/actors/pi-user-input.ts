@@ -1,6 +1,6 @@
-import type { HarnessHistoryContent } from "@seams/contracts";
+import type { HarnessHistoryContent } from "@purin-labs/contracts";
 import type { ImageContent } from "@earendil-works/pi-ai";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import type { Result } from "../result";
 import type {
   EmbeddedHarnessUserInput,

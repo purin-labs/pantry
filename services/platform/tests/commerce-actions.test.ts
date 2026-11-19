@@ -1,7 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { describe, expect, it } from "vitest";
-import type { CommerceProjection } from "@seams/contracts";
+import type { CommerceProjection } from "@purin-labs/contracts";
 
 import {
   buildCommerceActionDraft,
@@ -47,8 +47,8 @@ import {
   fixtureFlowBinding,
   fixtureProviderActionAuthority,
 } from "./fixtures/plan25-turn";
-import type { Variant } from "@seams/type-utils";
-import type { CommerceEngineProviderReceipt } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import type { CommerceEngineProviderReceipt } from "@purin-labs/control-api";
 
 const ORGANISATION_ID = "organisation_commerce_actions";
 const OBSERVED_AT = "2026-08-04T00:00:00.000Z";

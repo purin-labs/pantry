@@ -2,8 +2,8 @@ import {
   parseOrder,
   parseSalesChannel,
   type CommerceOrderV1,
-} from "@seams/commerce-client";
-import type { AttributeDefinition } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { AttributeDefinition } from "@purin-labs/commerce-contracts";
 import {
   writeOrder,
   writeSalesChannel,

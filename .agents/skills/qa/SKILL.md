@@ -37,7 +37,7 @@ Use authenticated controls and the current pinned inference route. Missing
 funding authority must fail that route. Preserve information-flow restrictions
 through the final destination and replay.
 
-Run `pnpm --filter @seams/platform test:e2e` for the Platform E2E suite. Lifecycle
+Run `pnpm --filter @purin-labs/platform test:e2e` for the Platform E2E suite. Lifecycle
 changes also require `test:onboarding-closure`. Commerce lifecycle changes
 require `test:commerce-lab` and the lab reset, seed, scenario, and verify sequence
 listed in the repository guide. Confirm the selected local lab before resetting it.

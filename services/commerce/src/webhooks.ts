@@ -18,9 +18,9 @@ import {
   type CommerceWebhookEventV1,
   type CommerceWebhookSubscriptionCommandV1,
   type CommerceWebhookSubscriptionV1,
-} from "@seams/commerce-client";
-import { commerceTransition } from "@seams/commerce-contracts";
-import { canonicalJson } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { commerceTransition } from "@purin-labs/commerce-contracts";
+import { canonicalJson } from "@purin-labs/std";
 
 import type { MerchantRow } from "./commerce-authority/ledger.ts";
 import {

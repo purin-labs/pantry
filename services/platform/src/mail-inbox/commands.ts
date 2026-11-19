@@ -1,13 +1,13 @@
 import { runtimeFetch } from "../runtime-fetch";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   MailOrganizationCommand,
   MailOrganizationView,
   MailClassifiedFilter,
   MailRule,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import type { IntegrationAccountId, OrganisationId, ConnectorId } from "../ids";
 import type { Result } from "../result";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
@@ -34,7 +34,7 @@ import {
   writeMailHead,
 } from "./store";
 import type { MailOrganizationHead } from "./types";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type MailOrganizationActorInput = Readonly<{
   identity: Readonly<{

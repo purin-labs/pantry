@@ -230,7 +230,7 @@ import {
   matchWorkspaceControlRoute,
   type WorkspaceControlRoute,
 } from "./control/routes/workspace";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 
 type ControlRoute =
   | ChatGoalRoute

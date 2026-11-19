@@ -4,7 +4,7 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import type { Result } from "../../../result";
-import type { CaseBinding, CommerceSource } from "@seams/contracts";
+import type { CaseBinding, CommerceSource } from "@purin-labs/contracts";
 import {
   resolveActiveCaseActor,
   requireActiveOrganisationActor,
@@ -34,7 +34,7 @@ import {
   type CommerceActionRequest,
 } from "../../../commerce/action-model";
 import { listPublishedCommerceTargets } from "../../../commerce/entity-plane/published-resources";
-import type { PermissionRequired } from "@seams/control-api";
+import type { PermissionRequired } from "@purin-labs/control-api";
 import { CAPABILITY_KEYS } from "../../../authorization/capability-catalogue";
 import {
   permissionRequiredResponse,
@@ -112,8 +112,8 @@ import { googleConfig } from "../../google-oidc-config";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { readOrganisationEnvironment } from "../../organisation-runtime";
 import { executeApprovedSupplierPayout } from "../supplier-payout-execution";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import {
   type CommerceActionFailure,
   acceptAndDeliverCommerceOutcome,

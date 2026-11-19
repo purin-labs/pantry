@@ -1,5 +1,5 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { CaseContextCollectionMetadataView } from "@seams/control-api";
+import type { CaseContextCollectionMetadataView } from "@purin-labs/control-api";
 import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveCaseActorAtPlacement,

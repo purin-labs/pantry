@@ -1,4 +1,4 @@
-import type { ChatEffort } from "@seams/control-api";
+import type { ChatEffort } from "@purin-labs/control-api";
 
 /** The names of the reasoning efforts in Portal chat and for Slack answers. */
 export function effortLabel(effort: ChatEffort): string {

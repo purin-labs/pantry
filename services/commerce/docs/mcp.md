@@ -55,5 +55,5 @@ new buyer and a new checkout.
 ## Payment
 
 No tool pays. Your site pays a checkout with the buyer session token, through
-the buyer routes of `@seams/commerce-client` (`createPaymentSession`, then
+the buyer routes of `@purin-labs/commerce-client` (`createPaymentSession`, then
 `reconcilePayment`), as a browser does.

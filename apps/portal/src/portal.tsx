@@ -61,10 +61,10 @@ import {
   startShellReads,
   startWorkspacePageReads,
 } from "./early-reads";
-import { type CommerceActionRecord, parseCommerceActionRecordResponse, parseMerchantPluginPreviewResponse, type MerchantPluginPreview, parseCommerceActionExecutionResponse } from "@seams/control-api/portal/commerce-actions";
+import { type CommerceActionRecord, parseCommerceActionRecordResponse, parseMerchantPluginPreviewResponse, type MerchantPluginPreview, parseCommerceActionExecutionResponse } from "@purin-labs/control-api/portal/commerce-actions";
 import { BakerySurfaceEffectBridge } from "./features/bakery-surface-effect-bridge";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 import { CommerceActionStatus } from "./features/governed-actions/commerce-action-status";
 import { fetchCodexUsagePercent } from "./features/integrations/codex-transport";
 import { signInForApproval } from "./approval-sign-in-popup";
@@ -89,7 +89,7 @@ import {
   selectPreferredWorkspace,
 } from "./portal-projection";
 import { archiveOwnerlessLegacyOrganisation, currentOrganisationLifecycle, emitOnboardingStageViewed, fetchCommerceSystem, fetchControlSession, fetchOperatorOrganisationCase, fetchOrganisationSnapshotIfChanged, fetchReadiness, fetchShellOrganisationSnapshot, loadOrganisationChoices, loadPortalOrganisation, loadPortalOrganisations, organisationProjectionEtag, projectionStage, toWorkspaceChoice } from "./portal-reads";
-import { parseCommerceApprovalResponse } from "@seams/control-api/portal/portal-reads";
+import { parseCommerceApprovalResponse } from "@purin-labs/control-api/portal/portal-reads";
 import {
   type WorkspaceRouteSelection,
   brainMemoryPath,
@@ -112,7 +112,7 @@ import {
   ACCESS_ROUTE_TRANSPORT,
   ORGANISATION_ACTIONS,
 } from "./portal-transports";
-import type { Membership, OrganisationSnapshot, OrganisationWorkspace } from "@seams/control-api/portal/portal-types";
+import type { Membership, OrganisationSnapshot, OrganisationWorkspace } from "@purin-labs/control-api/portal/portal-types";
 import type { PortalState, SessionSnapshot } from "./portal-types";
 import { PAGES } from "./pages";
 

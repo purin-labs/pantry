@@ -20,7 +20,7 @@ import {
   type CafeShiftRecipeConfig,
   type CafeShiftSample,
   type CafeShiftStaffing,
-} from "@seams/production-simulation/recipes/cafe-shift/model";
+} from "@purin-labs/production-simulation/recipes/cafe-shift/model";
 import { CafeShiftScene, type CafeShiftCameraPreset } from "./cafe-shift-scene";
 import { recipeFrames, type RecipeFrames } from "../shared/playback-controller";
 import { Live, LiveText } from "../shared/live";
@@ -40,7 +40,7 @@ import {
 import "../oven-workspace.css";
 // The station readout uses the pour-over styles, so this view loads them itself.
 import "../pour-over/pour-over.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type ViewProps = Readonly<{
   frames: LiveSource<RecipeFrames<CafeShiftSample>>;

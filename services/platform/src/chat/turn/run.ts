@@ -18,7 +18,7 @@ import { authorizeConversation } from "../conversation-access";
 import type {
   ChatPermissionRequest,
   ChatReceiptReference,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { bindCompletedChatHistory } from "../forks";
 import { currentProjectSnapshot } from "../project-context-binding";
 import { resolveCustomConnectorDetail } from "../../custom-connectors/projection";
@@ -65,7 +65,7 @@ import {
 } from "../store";
 import { conversationPrompt, workspaceCanvasPrompt } from "../prompt";
 import { readLatestBakerySurfaceOfRequests } from "../../actors/bakery-surface-effect";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   type ConversationExecutionFailure,
   type RunningConversation,

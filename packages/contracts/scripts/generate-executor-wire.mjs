@@ -135,7 +135,7 @@ for (const [constant, schema] of [
 for (const [name, schema] of definitions)
   declarations.push(declaration(name, schema));
 const rust =
-  "// Generated from TypeScript JSON Schema. Run pnpm --filter @seams/contracts executor:generate.\n\n" +
+  "// Generated from TypeScript JSON Schema. Run pnpm --filter @purin-labs/contracts executor:generate.\n\n" +
   declarations.join("\n\n") +
   "\n";
 const formatted = execFileSync("rustfmt", ["--edition", "2024"], {
@@ -154,7 +154,7 @@ if (process.argv.includes("--check")) {
     (await readFile(jsonPath, "utf8")) !== json
   ) {
     throw new Error(
-      "Executor wire types are stale. Run pnpm --filter @seams/contracts executor:generate",
+      "Executor wire types are stale. Run pnpm --filter @purin-labs/contracts executor:generate",
     );
   }
 } else {

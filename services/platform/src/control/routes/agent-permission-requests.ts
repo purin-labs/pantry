@@ -4,7 +4,7 @@ import {
   type AgentPermissionRequestList,
   type AgentPermissionRequestItem,
   type AgentPermissionRequestView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { opaqueSubjectReference } from "../../access-control/references";
 import {
   entityTypeReadAudiences,

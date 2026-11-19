@@ -1,7 +1,7 @@
 import type {
   ReceiveCommerceInventoryV3,
   CommerceMutationErrorV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { checkInventoryRevision } from "../../commerce-authority/inventory.ts";
 import type { CommerceDatabase } from "../../database.ts";
 import { readPurchaseRequest, receivedForRequest } from "./purchase-request.ts";

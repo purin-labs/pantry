@@ -6,7 +6,7 @@ import {
   type ProductionPlanSelection,
   type ProductionPlanStateVector,
   type ProductionPlanUpdate,
-} from "@seams/production-plan-crdt";
+} from "@purin-labs/production-plan-crdt";
 import {
   encodePlanServerMessage,
   FRAME_LIMIT,
@@ -14,15 +14,15 @@ import {
   type PlanClientMessage,
   type PlanFailureCode,
   type PlanRoomMetadata,
-} from "@seams/production-plan-crdt/protocol";
-import type { CollaborationAgent } from "@seams/collaboration";
-import { assertNever, sha256Hex } from "@seams/std";
+} from "@purin-labs/production-plan-crdt/protocol";
+import type { CollaborationAgent } from "@purin-labs/collaboration";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
 import { listOrganisationMembers, resolveUser } from "../data/control-plane";
-import { isConversationId } from "@seams/control-api";
-import { hasExactKeys } from "@seams/std";
+import { isConversationId } from "@purin-labs/control-api";
+import { hasExactKeys } from "@purin-labs/std";
 import {
   authorizeConversation,
   readConversationCaseId,

@@ -8,16 +8,16 @@ function nativeFinancierReady() {
 
 async function nativeFinancierBrowser() {
   const { compileProductionFinancier } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/financier");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/financier");
   const { compileProductionWorkcells } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/production-workcells");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/production-workcells");
   const { compileWorkcellInput } =
-    await import("/@id/@seams/production-simulation/recipes/bakery/workcell-input");
+    await import("/@id/@purin-labs/production-simulation/recipes/bakery/workcell-input");
   const { parsePhysicsRequest } =
-    await import("/@id/@seams/bakery-model/bakery-physics");
+    await import("/@id/@purin-labs/bakery-model/bakery-physics");
   const { parseSettings, sampleSettings } =
-    await import("/@id/@seams/bakery-model/bakery");
-  const { canonicalJson } = await import("/@id/@seams/std");
+    await import("/@id/@purin-labs/bakery-model/bakery");
+  const { canonicalJson } = await import("/@id/@purin-labs/std");
   const api = window.productionRunPreview;
   const prepared = await api.openExecutionWorker(null);
   if (!prepared.ok) throw new Error(JSON.stringify(prepared.error));

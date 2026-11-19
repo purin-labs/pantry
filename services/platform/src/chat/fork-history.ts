@@ -1,10 +1,10 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { canonicalJson, isRecord, sha256Hex } from "@seams/std";
+import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
 import type {
   ModelRoute,
   StoredMessageAttachment,
   HarnessHistoryContent,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { parseSessionModelRoute } from "../policy-snapshot";
 import { parseSessionId } from "../ids";
 import {
@@ -17,11 +17,11 @@ import {
   type SerializedFlowBinding,
 } from "../policy/information-flow";
 
-export type { ChatThreadLineage } from "@seams/control-api";
+export type { ChatThreadLineage } from "@purin-labs/control-api";
 import {
   parseChatThreadLineage as parseLineage,
   type ChatThreadLineage,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 export type ChatHistoryBinding = Readonly<{
   requestId: string;

@@ -10,7 +10,7 @@ import type {
   AgentPermissionRequestList,
   AgentPermissionRequestSummary,
   HeldOutputSummary,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { usePermissionRequests } from "../../permission-requests-summary";
 
 type Props = Readonly<{

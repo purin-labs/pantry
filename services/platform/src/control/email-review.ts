@@ -1,9 +1,9 @@
 import type { EmailReviewProjection } from "../data/email-review";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import {
   emailReplyHeadlineWire,
   type EmailReplyHeadline,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 export function emailReviewQueueWire(
   review: EmailReviewProjection,
 ): Record<string, unknown> {

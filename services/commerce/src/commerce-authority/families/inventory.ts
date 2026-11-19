@@ -8,7 +8,7 @@ import type {
   CommerceInventoryLotV1,
   CommerceInventoryMovementV1,
   CommerceStockSnapshot,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { inventoryItemWithId } from "../inventory-items.ts";
 import { IntegrationFamily } from "./integrations.ts";
 

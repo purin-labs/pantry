@@ -4,7 +4,7 @@ type Equal<A, B> =
     ? true
     : false;
 type Assert<T extends true> = T;
-import type * as apiMedia from "@seams/commerce-contracts/records/api-media";
+import type * as apiMedia from "@purin-labs/commerce-contracts/records/api-media";
 import type {
   CreateCommerceMediaV1,
   DeleteCommerceMediaV1,

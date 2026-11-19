@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronDown, LoaderCircle, ShieldCheck } from "lucide-react";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import "./draft-message-card.css";
 
 export type DraftMessageField = {

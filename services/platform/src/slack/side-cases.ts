@@ -17,9 +17,9 @@ import {
   isSideCaseProposalId,
   isUserId,
   type UserId,
-} from "@seams/control-api";
-import type { HarnessTurnLease } from "@seams/contracts";
-import { isNonNegativeInteger, isString } from "@seams/std";
+} from "@purin-labs/control-api";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
+import { isNonNegativeInteger, isString } from "@purin-labs/std";
 
 import { decideStoredFlowConversationSink } from "../actors/case-conversation-sink";
 import {

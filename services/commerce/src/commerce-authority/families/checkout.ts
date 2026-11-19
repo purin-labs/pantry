@@ -1,4 +1,4 @@
-import { type CommerceMutationResultV1 } from "@seams/commerce-client";
+import { type CommerceMutationResultV1 } from "@purin-labs/commerce-client";
 import type { PlaceCommerceStoredValueCheckoutV1 } from "../checkout-payment-planning.ts";
 import { CheckoutProfileFamily } from "./checkout-profiles.ts";
 

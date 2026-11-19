@@ -1,6 +1,6 @@
 import { parseIntegrationAccountId } from "../../ids";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   HarnessFileRead,
   HarnessFileSearch,

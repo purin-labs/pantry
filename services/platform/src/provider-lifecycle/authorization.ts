@@ -26,7 +26,7 @@ import type {
   ProviderOnboardingError,
   ProviderOAuthStartEnv,
 } from "./domain";
-import { encodeBase64Url } from "@seams/std";
+import { encodeBase64Url } from "@purin-labs/std";
 export type { ProviderOAuthStartEnv } from "./domain";
 
 type ProviderAuthorizationMutationFence = Pick<

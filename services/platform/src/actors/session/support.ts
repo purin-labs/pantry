@@ -1,10 +1,10 @@
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
-import type { BakerySurfaceAttachmentV1 } from "@seams/bakery-model/bakery-surface";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type {
   HarnessTurnLease,
   StoredMessageAttachment,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import type { RequestId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";

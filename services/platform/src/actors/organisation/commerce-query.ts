@@ -1,12 +1,12 @@
 import type {
   CommerceQueryPlan,
   CommerceGraphQueryPlanRequest,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   parseCommerceGraphQueryPlanRequest,
   parseCommerceSnapshotRevision,
-} from "@seams/commerce-client";
-import type { CommerceSqliteRelationshipTraversalPlan } from "@seams/commerce-query-sqlite";
+} from "@purin-labs/commerce-client";
+import type { CommerceSqliteRelationshipTraversalPlan } from "@purin-labs/commerce-query-sqlite";
 import type { Result } from "../../result";
 import type { CommerceProjectionKind } from "../commerce-projection";
 import {
@@ -100,7 +100,7 @@ export function validateOrganisationCommercePlan(
 }
 
 // Plans carry i64 attribute values as bigints, which may exceed the JSON-safe
-// range @seams/std's sameJson enforces, so they compare as decimal text.
+// range @purin-labs/std's sameJson enforces, so they compare as decimal text.
 function samePlan(left: CommerceQueryPlan, right: CommerceQueryPlan): boolean {
   return planText(left) === planText(right);
 }

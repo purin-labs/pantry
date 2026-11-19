@@ -1,11 +1,11 @@
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import {
   readAccountOnboardingOptions,
   readAccountOnboardingRequest,
   readAccountOnboardingResult,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { createAccountPlatformClient } from "../../src/account-platform/client";
 import { registerPantryOnboardingIdentity } from "../../src/account-platform/identity";
 import { runAccountInstanceRelease } from "../../src/account-platform/instance-release";

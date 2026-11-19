@@ -2,7 +2,7 @@ import type React from "react";
 import type {
   CompiledScenario,
   LogisticsView,
-} from "@seams/production-simulation";
+} from "@purin-labs/production-simulation";
 import {
   carrierNoun,
   financierStation,
@@ -23,7 +23,7 @@ import {
   type SynchronizedApplianceState,
   type SynchronizedCobotTransferState,
 } from "./morning-shift-appliances";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Logistics = Variant<LogisticsView, "available">;
 

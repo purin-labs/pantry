@@ -1,8 +1,8 @@
-import { parseMenuHours } from "@seams/control-api";
+import { parseMenuHours } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { Env } from "../../env";
-import { sha256Hex } from "@seams/std";
+import { sha256Hex } from "@purin-labs/std";
 import { resolveMerchantControlContext } from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";

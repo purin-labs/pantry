@@ -8,7 +8,7 @@ import type {
   VaultItemResult,
   VaultItemView,
   VaultStoreView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import { ControlApiError } from "../control-client";
 import type { VaultTransport } from "../features/vault/api";

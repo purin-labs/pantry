@@ -4,7 +4,7 @@ import type {
   ExternalVaultRead,
   ExternalVaultReadError,
 } from "./external-import";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 export type OnePasswordItemLocator = {
   readonly vaultId: string;

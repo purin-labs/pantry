@@ -9,9 +9,9 @@ import {
   type MemoryCommand,
   type MemoryRevisionView,
   type MemoryView,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
-import type { AgentDefinition, Skill } from "@seams/control-api/portal/agent-operations";
+import type { AgentDefinition, Skill } from "@purin-labs/control-api/portal/agent-operations";
 import { refreshBrainSummary, useBrainSummary } from "../../brain-summary";
 import { isPrimaryNavigationClick } from "../../console-sidebar";
 import { Notice, PageSkeleton, RecoverableError } from "../../page-components";

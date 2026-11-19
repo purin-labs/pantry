@@ -7,7 +7,7 @@
 // and cannot make a checkout; no key, a buyer session, another shop's key or
 // a revoked key opens nothing. Set MCP_SERVER_ARTIFACT_DIR to keep the run's
 // evidence; the file repeats byte for byte for the same commit.
-import { CommerceAdminClient } from "@seams/commerce-client";
+import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import {

@@ -33,8 +33,8 @@ import {
   isPositiveInteger,
   isRecord,
   parseJsonOrNull,
-} from "@seams/std";
-import type { CodexAllowance } from "@seams/control-api";
+} from "@purin-labs/std";
+import type { CodexAllowance } from "@purin-labs/control-api";
 import {
   chatGptAccessTokenExpiry,
   chatGptAllowanceFromHeaders,

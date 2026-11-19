@@ -4,11 +4,11 @@ import {
   newProjectId,
   type MemoryCommand,
   type MemoryContent,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   parseEntityRef,
   SUPPLIER_ENTITY_TYPE_ID,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import {
   brainSummary,
   caseEntry,

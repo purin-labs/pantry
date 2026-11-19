@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHomeResponse } from "@seams/control-api/portal/home";
+import { parseHomeResponse } from "@purin-labs/control-api/portal/home";
 
 const OBSERVED_AT = "2026-07-26T00:00:00.000Z";
 

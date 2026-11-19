@@ -1,6 +1,6 @@
-import { isSideCaseProposalId, isUserId } from "@seams/control-api";
-import type { ConnectorIdentity } from "@seams/contracts";
-import { isNonBlankString, isRecord } from "@seams/std";
+import { isSideCaseProposalId, isUserId } from "@purin-labs/control-api";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
+import { isNonBlankString, isRecord } from "@purin-labs/std";
 
 import { resolveActiveSlackThreadCredential } from "../credential-vault";
 import { parsePersonId } from "../data/person-authz";

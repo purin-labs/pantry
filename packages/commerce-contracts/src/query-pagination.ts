@@ -8,7 +8,7 @@ import {
 import { trimmedIdentityTextSchema } from "./identity-text.ts";
 import { Type, type Static } from "typebox";
 import type { TLocalizedValidationError } from "typebox/error";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 // Cursor identity validation is separate from decoding its versioned payload.
 // Pagination applies the identity rule; the query planner decodes the payload.

@@ -5,7 +5,7 @@ import {
   type FloorPlanWindow,
 } from "./bakery-room.ts";
 import type { Box2D } from "./collisions.ts";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type FloorPlanOpening =
   | Readonly<{

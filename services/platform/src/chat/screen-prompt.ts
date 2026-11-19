@@ -2,7 +2,7 @@ import type {
   ChatOrigin,
   SurfaceObservationV2,
   SurfaceRecord,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 /**
  * Two facts for the model (Plan 87): where the chat started, which is a

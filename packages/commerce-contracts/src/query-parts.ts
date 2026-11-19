@@ -8,7 +8,7 @@ import {
 } from "./schema.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 import { trimmedIdentityTextSchema } from "./identity-text.ts";
 import { systemCommerceEntityRefSchema } from "./entity-reference.ts";

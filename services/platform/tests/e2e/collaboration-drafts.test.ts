@@ -12,23 +12,23 @@ import {
   EmailDraftDoc,
   type EmailDraftStateVector,
   type EmailDraftUpdate,
-} from "@seams/email-draft-crdt";
+} from "@purin-labs/email-draft-crdt";
 import {
   encodeEmailDraftClientMessage,
   parseEmailDraftServerMessage,
   type EmailDraftServerMessage,
-} from "@seams/email-draft-crdt/protocol";
+} from "@purin-labs/email-draft-crdt/protocol";
 import {
   MenuDraftDoc,
   type MenuDraftStateVector,
   type MenuDraftUpdate,
-} from "@seams/menu-draft-crdt";
+} from "@purin-labs/menu-draft-crdt";
 import {
   encodeMenuDraftClientMessage,
   parseMenuDraftServerMessage,
   type MenuDraftParticipant,
   type MenuDraftServerMessage,
-} from "@seams/menu-draft-crdt/protocol";
+} from "@purin-labs/menu-draft-crdt/protocol";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
@@ -52,7 +52,7 @@ import {
   type ControlClient,
 } from "./hibernatable-socket-support";
 import { requiredPlacement } from "./slack-journey-support";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 const TEST_PLACEMENT = requiredPlacement();
 
@@ -1111,19 +1111,19 @@ function successfulEmailEdit(
   return result.ok;
 }
 function agentName(
-  activity: import("@seams/collaboration").CollaborationAgentActivity,
+  activity: import("@purin-labs/collaboration").CollaborationAgentActivity,
 ): string {
   return activity.agent.displayName;
 }
 function agentCount(
-  agents: readonly import("@seams/collaboration").CollaborationAgentActivity[],
+  agents: readonly import("@purin-labs/collaboration").CollaborationAgentActivity[],
 ): number {
   return agents.length;
 }
 
 class EmailAgentObserver {
   invalidFrames = 0;
-  readonly frames: (readonly import("@seams/collaboration").CollaborationAgentActivity[])[] =
+  readonly frames: (readonly import("@purin-labs/collaboration").CollaborationAgentActivity[])[] =
     [];
   readonly receive = this.message.bind(this);
   constructor(readonly socket: WebSocket) {

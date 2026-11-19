@@ -4,10 +4,10 @@ import type {
   MemoryEvidence,
   MemoryRevisionState,
   MemoryView,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
-import { evalConfigurationVerdict } from "@seams/control-api";
+import { evalConfigurationVerdict } from "@purin-labs/control-api";
 
 import { acceptedEval, isRunInProgress } from "./evals-model";
 import { acceptedRevision, evidenceLabel } from "./model";

@@ -1,4 +1,4 @@
-import type { SurfaceKind } from "@seams/contracts";
+import type { SurfaceKind } from "@purin-labs/contracts";
 
 import type { JsonObject } from "../http";
 import {
@@ -14,8 +14,8 @@ import {
   type WorkspaceId,
 } from "../ids";
 import type { Result } from "../result";
-import type { VariantBy } from "@seams/type-utils";
-import { isNonEmptyString, isRecord } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { isNonEmptyString, isRecord } from "@purin-labs/std";
 
 declare const slackEventIdBrand: unique symbol;
 declare const slackUserIdBrand: unique symbol;

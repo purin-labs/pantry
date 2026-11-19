@@ -4,7 +4,7 @@ import type {
   HarnessHistoryContent,
   HarnessHistoryEntry,
   HarnessToolOutput,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import { renderHarnessHistoryContent } from "./harness-history";
 import type {
   AssistantMessage,
@@ -19,8 +19,8 @@ import type {
   ToolResultMessage,
   Usage,
 } from "@earendil-works/pi-ai";
-import type { Variant } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+import type { Variant } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 type PiMaterializedHistory = {
   readonly systemPrompt: string;

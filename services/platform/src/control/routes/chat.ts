@@ -3,7 +3,7 @@ import {
   MESSAGE_ATTACHMENT_POLICY,
   isConversationId,
   type ChatEffort,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   readChatSubmission,
   retainChatFiles,
@@ -49,7 +49,7 @@ import {
   clearSubmittedConversationDraft,
   type ConversationScope,
 } from "../../chat/store";
-import { verifyBakerySurfaceAttachment } from "@seams/bakery-model/bakery-surface";
+import { verifyBakerySurfaceAttachment } from "@purin-labs/bakery-model/bakery-surface";
 import { readConversationSlackDrafts } from "./chat-slack-messages";
 import { readConversationConfigurationDrafts } from "./chat-configuration-drafts";
 import { authorizeSideCaseChatRead } from "../../chat/side-cases";

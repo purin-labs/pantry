@@ -1,5 +1,5 @@
 import { controlRead } from "../../control-client";
-import { isNonNegativeInteger } from "@seams/std";
+import { isNonNegativeInteger } from "@purin-labs/std";
 import {
   type DatedSupplierPayout,
   type PayoutAuditEvent,
@@ -9,7 +9,7 @@ import {
   parsePayouts,
   requireExactKeys,
   requireObject,
-} from "@seams/control-api/portal/payouts";
+} from "@purin-labs/control-api/portal/payouts";
 
 export type PayoutMutationTransport = (
   path: string,

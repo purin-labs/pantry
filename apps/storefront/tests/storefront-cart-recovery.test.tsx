@@ -3,8 +3,8 @@ import type {
   CommerceBuyerOrderV1,
   CommerceBuyerPaymentDisputeStatusV1,
   CommerceBuyerSessionV4,
-} from "@seams/commerce-client";
-import { parseCommerceBuyerSessionV4 } from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
+import { parseCommerceBuyerSessionV4 } from "@purin-labs/commerce-client";
 
 import {
   parseStoredCheckoutRecovery,
@@ -14,7 +14,7 @@ import {
   StorefrontApp,
   storefrontConfiguration,
 } from "../src/storefront.tsx";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 const SESSION_TOKEN = "buyer_session_recovery_token";
 const OPERATION_ID = "storefront_recovery_operation";

@@ -2,13 +2,13 @@ import { controlMutation, controlRead } from "../../control-client";
 import type {
   CounterRegisterPaymentMethod,
   CounterRegisterSnapshot,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   type CounterSale,
   parseEnvelope,
   requireExactKeys,
   requireObject,
-} from "@seams/control-api/portal/counter-sale";
+} from "@purin-labs/control-api/portal/counter-sale";
 
 export type CounterSaleMutationTransport = (
   path: string,

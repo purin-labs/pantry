@@ -69,7 +69,7 @@ that its Connector accepts, and forwards every other request to the platform
 Worker. `CODE_MODE_SANDBOX` binds the class of a separate Worker by
 `script_name`; the deploy command deploys it first. That Worker holds no
 credential, database, storage or outbound binding, and
-`pnpm --filter @seams/platform code-mode-sandbox:check` fails if it gains one. If
+`pnpm --filter @purin-labs/platform code-mode-sandbox:check` fails if it gains one. If
 the binding is missing, a Pi script fails before admission.
 
 Durable Object classes are declared in the `exports` map of `wrangler.jsonc`.

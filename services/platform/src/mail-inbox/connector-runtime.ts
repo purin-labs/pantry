@@ -7,7 +7,7 @@ import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
 import type {
   MailOrganizationView,
   MailClassification,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   requireActiveOrganisationActor,
   requireActiveOrganisationActorAtPlacement,

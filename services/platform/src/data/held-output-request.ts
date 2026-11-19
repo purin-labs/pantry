@@ -2,12 +2,12 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
-import type { RequestAuthority } from "@seams/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   parseHeldEffectAction,
   type HeldEffectAction,
-} from "@seams/control-api";
-import { isNonNegativeInteger, isRecord } from "@seams/std";
+} from "@purin-labs/control-api";
+import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { parseStoredRequestAuthority } from "../request-authority";

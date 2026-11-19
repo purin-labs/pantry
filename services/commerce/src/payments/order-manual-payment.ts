@@ -14,8 +14,8 @@ import {
   type CommerceOrderPaymentChangeV1,
   type CommerceOrderV1,
   type CommercePaymentV1,
-} from "@seams/commerce-client";
-import { commerceTransition } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import { commerceTransition } from "@purin-labs/commerce-contracts";
 
 import { writePayment } from "../commerce-persistence.ts";
 import type { CommerceDatabase } from "../database.ts";

@@ -3,7 +3,7 @@ import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import { resolveOrganisationModelRoute } from "../models/route";
 import type { OrganisationModelRouteError } from "../models/route";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 export async function runtimeAdmissionStatus(
   env: Env,
   organisationId: OrganisationId,

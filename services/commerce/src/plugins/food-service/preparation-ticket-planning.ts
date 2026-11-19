@@ -12,14 +12,14 @@ import {
   type CommerceMutationErrorV1,
   type CommerceOrderOriginV1,
   type CommercePreparationTicketV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { merchantOwner } from "./merchant-owner.ts";
 import {
   commerceTransition,
   type Checkout,
   type InventoryAllocation,
   type InventoryRequirement,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceDatabase } from "../../database.ts";
 import {
   readCheckout,

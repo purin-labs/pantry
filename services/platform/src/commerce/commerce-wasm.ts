@@ -10,43 +10,43 @@ import type {
   CommerceGraphQuery,
   CommerceQueryPlan,
   CommerceQueryPlanOutcome,
-} from "@seams/contracts";
-import { parseCommerceCursorValue } from "@seams/commerce-client";
+} from "@purin-labs/contracts";
+import { parseCommerceCursorValue } from "@purin-labs/commerce-client";
 import {
   decodeCommerceCursor as decodeCommerceCursorTypescript,
   parseCommerceCursorPayload,
-} from "@seams/commerce-contracts/cursor-payload";
-import { validateCommerceEntityPlaneCommandAuthority } from "@seams/commerce-contracts/entity-plane-command-authority";
-import { parseCommerceEntityPlaneCommand } from "@seams/commerce-contracts/entity-plane-commands";
-import { parseCommerceGraphQuery } from "@seams/commerce-contracts/graph-query";
-import { encodeCommerceCursor as encodeCommerceCursorTypescript } from "@seams/commerce-contracts/query-encoders";
-import { parseCommerceQueryPlan } from "@seams/commerce-contracts/query-plan";
-import { planCommerceGraphQuery as planCommerceGraphQueryTypescript } from "@seams/commerce-contracts/query-planner";
-import type { ContractDecodeResult } from "@seams/commerce-contracts/schema";
-import type { CommerceBoundaryResponse } from "@seams/commerce-contracts/commerce-boundary";
+} from "@purin-labs/commerce-contracts/cursor-payload";
+import { validateCommerceEntityPlaneCommandAuthority } from "@purin-labs/commerce-contracts/entity-plane-command-authority";
+import { parseCommerceEntityPlaneCommand } from "@purin-labs/commerce-contracts/entity-plane-commands";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-contracts/graph-query";
+import { encodeCommerceCursor as encodeCommerceCursorTypescript } from "@purin-labs/commerce-contracts/query-encoders";
+import { parseCommerceQueryPlan } from "@purin-labs/commerce-contracts/query-plan";
+import { planCommerceGraphQuery as planCommerceGraphQueryTypescript } from "@purin-labs/commerce-contracts/query-planner";
+import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
+import type { CommerceBoundaryResponse } from "@purin-labs/commerce-contracts/commerce-boundary";
 import {
   deriveLabEventCueFacts as deriveLabEventCueFactsTypescript,
   normalizeLabEvent as normalizeLabEventTypescript,
-} from "@seams/commerce-contracts/lab-normalizer";
+} from "@purin-labs/commerce-contracts/lab-normalizer";
 import {
   normalizeShopifyCatalog as normalizeShopifyCatalogTypescript,
   normalizeShopifyInventory as normalizeShopifyInventoryTypescript,
   normalizeShopifyOrder as normalizeShopifyOrderTypescript,
   normalizeShopifyResource as normalizeShopifyResourceTypescript,
-} from "@seams/commerce-contracts/shopify-normalizer";
+} from "@purin-labs/commerce-contracts/shopify-normalizer";
 import {
   applySupplierPayableCommand as applySupplierPayableCommandTypescript,
   reconcileSupplierPayout as reconcileSupplierPayoutTypescript,
   validateSupplierPayoutObservation as validateSupplierPayoutObservationTypescript,
   validateSupplierPayoutPlan as validateSupplierPayoutPlanTypescript,
-} from "@seams/commerce-contracts/supplier-payouts";
+} from "@purin-labs/commerce-contracts/supplier-payouts";
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,
 } from "../actors/commerce-projection";
 import type { Result } from "../result";
-import type { Variant, VariantBy } from "@seams/type-utils";
-import { assertNever, isRecord } from "@seams/std";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { assertNever, isRecord } from "@purin-labs/std";
 
 export type CommerceWasmError =
   | { readonly code: "commerce_wasm_input_invalid" }

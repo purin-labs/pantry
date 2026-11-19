@@ -1,12 +1,12 @@
-import type { CommerceEntityPlaneCommandRequest } from "@seams/commerce-contracts/entity-plane-commands";
-export type { CommerceEntityPlaneCommandRequest } from "@seams/commerce-contracts/entity-plane-commands";
+import type { CommerceEntityPlaneCommandRequest } from "@purin-labs/commerce-contracts/entity-plane-commands";
+export type { CommerceEntityPlaneCommandRequest } from "@purin-labs/commerce-contracts/entity-plane-commands";
 import type {
   CommerceEntityAuthority,
   CommerceEntityPlaneCommand,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { parseCommerceTimestamp } from "./primitives.ts";
-import * as commandContracts from "@seams/commerce-contracts/entity-plane-commands";
-import { parseCommerceEntityAuthority as parseAuthorityContract } from "@seams/commerce-contracts/command-authority";
+import * as commandContracts from "@purin-labs/commerce-contracts/entity-plane-commands";
+import { parseCommerceEntityAuthority as parseAuthorityContract } from "@purin-labs/commerce-contracts/command-authority";
 import { decodeRecord } from "./record-decoding.ts";
 
 export function parseEntityPlaneCommand(

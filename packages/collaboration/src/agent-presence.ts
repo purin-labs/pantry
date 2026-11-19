@@ -1,4 +1,4 @@
-import { hasExactKeys, isRecord } from "@seams/std";
+import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { isShortProtocolText, COLLABORATION_SOCKET_LIMIT } from "./wire.ts";
 
 /**

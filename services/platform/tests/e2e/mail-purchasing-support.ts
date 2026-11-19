@@ -5,7 +5,7 @@ import type { OrganisationId, IntegrationAccountId } from "../../src/ids";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import { parseCommerceGraphQuery } from "@seams/commerce-client";
+import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 
 export async function seedPurchasingContext(
   organisationId: OrganisationId,

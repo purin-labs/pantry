@@ -15,7 +15,7 @@ import type {
   InPersonPaymentBinding,
   OnlinePaymentBinding,
   Storefront,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,
@@ -30,7 +30,7 @@ import {
   type CommerceMutationResultV1,
   type CommerceInventoryMovementV1,
   type RefundCommerceOrderV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 import { expect, it } from "vitest";
 
 import { CommerceAuthority } from "../src/commerce-authority.ts";
@@ -80,8 +80,8 @@ import type {
   CommercePaymentCaptureResultV1,
   CommercePaymentRefundResultV1,
   CommercePaymentSessionResultV1,
-} from "@seams/commerce-client";
-import type { Variant, VariantBy } from "@seams/type-utils";
+} from "@purin-labs/commerce-client";
+import type { Variant, VariantBy } from "@purin-labs/type-utils";
 
 const AT = "2026-08-14T09:30:00.000Z";
 const READY_AT = "2026-08-14T09:45:00.000Z";

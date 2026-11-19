@@ -1,6 +1,6 @@
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { Env } from "../../env";
-import type { CanonicalCommerceDelivery } from "@seams/contracts";
+import type { CanonicalCommerceDelivery } from "@purin-labs/contracts";
 import { listLiveProviderWebhookContexts } from "../../data/integration-account";
 import type { JsonObject } from "../../http";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
@@ -11,7 +11,7 @@ import type {
   ShopifyOrderCreatedCueEvent,
 } from "../../cues/engine";
 import { resolveProviderWebhookCredential } from "../../credential-vault";
-import { decodeBase64, isRecord } from "@seams/std";
+import { decodeBase64, isRecord } from "@purin-labs/std";
 import type {
   ShopifyCommerceCatalogEnvelope,
   ShopifyCommerceInventoryLevelEnvelope,

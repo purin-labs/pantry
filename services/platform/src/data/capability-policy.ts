@@ -4,7 +4,7 @@ import type {
   CapabilityPolicyModes,
   CapabilityPolicyProvenance,
   OrganisationCapabilityPolicy,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import {
   CAPABILITY_CATALOGUE,
@@ -16,7 +16,7 @@ import type { ChannelId, IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { InitialOrganisationPlacement } from "../placement";
-import type { StrictUnion } from "@seams/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
 import {
   assertNever,
@@ -26,7 +26,7 @@ import {
   isPositiveInteger,
   isRecord,
   sha256Hex,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 const BASELINE_PROFILE = "read_and_propose";
 const BASELINE_PROFILE_VERSION = 1;

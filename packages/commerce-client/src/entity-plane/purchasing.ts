@@ -3,13 +3,13 @@ import type {
   CommercePurchasingPresetPublishResponse,
   CommercePurchasingReconcileRequest,
   CommercePurchasingReconcileResponse,
-} from "@seams/commerce-contracts/entity-plane-purchasing";
+} from "@purin-labs/commerce-contracts/entity-plane-purchasing";
 export type {
   CommercePurchasingPresetPublishRequest,
   CommercePurchasingPresetPublishResponse,
   CommercePurchasingReconcileRequest,
   CommercePurchasingReconcileResponse,
-} from "@seams/commerce-contracts/entity-plane-purchasing";
+} from "@purin-labs/commerce-contracts/entity-plane-purchasing";
 export {
   SUPPLIER_DIRECTORY_LIST_ID,
   SUPPLIER_ENTITY_TYPE_ID,
@@ -19,8 +19,8 @@ export {
   SUPPLIERS_VIEW_ID,
   REPLENISHMENT_QUEUE_VIEW_ID,
   SUPPLY_COST_TERMS_VIEW_ID,
-} from "@seams/commerce-contracts/entity-plane-purchasing";
-import * as purchasingContracts from "@seams/commerce-contracts/entity-plane-purchasing";
+} from "@purin-labs/commerce-contracts/entity-plane-purchasing";
+import * as purchasingContracts from "@purin-labs/commerce-contracts/entity-plane-purchasing";
 import { decodeRecord } from "./record-decoding.ts";
 
 export function parsePurchasingPresetPublishRequest(

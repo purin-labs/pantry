@@ -8,7 +8,7 @@ import type {
   ConnectorId,
   PrincipalId,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { GrantSubject } from "../authorization/access-grants/types";
 import {
@@ -25,13 +25,13 @@ import {
   type WorkspaceId,
 } from "../ids";
 import type { Result } from "../result";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 
 export type {
   GrantSubject,

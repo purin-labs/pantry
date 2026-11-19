@@ -1,8 +1,8 @@
 import { formatAbsoluteTime, formatLifecycle } from "../formatting";
 import type { StatusChipStatus } from "../status-chip";
-import { assertNever } from "@seams/std";
-import type { AgentMailboxView, MailboxPauseReasonView } from "@seams/control-api/portal/agent-mailbox";
-import type { Variant } from "@seams/type-utils";
+import { assertNever } from "@purin-labs/std";
+import type { AgentMailboxView, MailboxPauseReasonView } from "@purin-labs/control-api/portal/agent-mailbox";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * An agent in a mailbox's list. A mailbox can be assigned to an agent that is

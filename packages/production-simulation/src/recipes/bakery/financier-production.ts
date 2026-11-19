@@ -1,5 +1,5 @@
-import { canonicalJson, isRecord, sha256Hex } from "@seams/std";
-import { parsePersistentCell } from "@seams/bakery-model/bakery-physics";
+import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
+import { parsePersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import * as d from "../../document-values.ts";
 import {
   authoredId,

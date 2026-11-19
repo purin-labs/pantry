@@ -1,7 +1,7 @@
 import type {
   CapabilityDefinition,
   CapabilityProviderDependency,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 export const CAPABILITY_KEYS = {
   airtableApiRead: "airtable.api.read",

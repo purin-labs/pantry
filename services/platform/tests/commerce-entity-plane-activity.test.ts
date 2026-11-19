@@ -5,7 +5,7 @@ import {
   readCommerceActivity,
 } from "../src/commerce/entity-plane/activity";
 import { parseCommerceEntityPlaneEffect } from "../src/commerce/entity-plane/proposals";
-import type { CommerceActivityResource } from "@seams/control-api";
+import type { CommerceActivityResource } from "@purin-labs/control-api";
 import { requireOrganisationId } from "./test-ids";
 
 describe("commerce entity-plane activity", () => {

@@ -2,7 +2,7 @@ import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type { VaultHandle } from "./domain";
 import type { VaultKeyVersion } from "./keyring";
-import { decodeBase64, encodeBase64 } from "@seams/std";
+import { decodeBase64, encodeBase64 } from "@purin-labs/std";
 
 export type VaultCiphertext = {
   readonly nonceB64: string;

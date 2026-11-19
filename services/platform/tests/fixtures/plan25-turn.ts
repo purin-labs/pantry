@@ -4,7 +4,7 @@ import type {
   AuthorityPartition,
   HarnessTurnLease,
   RequestAuthority,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { CompiledTurnAuthority } from "../../src/authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../../src/context/assembly";
@@ -19,7 +19,7 @@ import {
   type SessionId,
   type OrganisationId,
 } from "../../src/ids";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   createAccountPlatformAccess,
   acceptedExecutionAccountAuthority,

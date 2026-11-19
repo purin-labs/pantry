@@ -32,9 +32,9 @@ import {
   commerceAppInstallationToken,
   commerceAppTokenMessage,
   type CommerceApiScope,
-} from "@seams/commerce-client";
-import { commerceTransition } from "@seams/commerce-contracts";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { commerceTransition } from "@purin-labs/commerce-contracts";
+import { isRecord } from "@purin-labs/std";
 
 import type { CommerceDatabase } from "./database.ts";
 import type { BuyerRoute, CommerceRoute } from "./http-routes.ts";

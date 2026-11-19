@@ -3,10 +3,10 @@ import { Copy, KeySquare, Plus } from "lucide-react";
 
 import { EmptyState, SideDrawer } from "../../ui";
 import { apiKeyErrorMessage, GRANTABLE_SCOPE_LABELS, GRANTABLE_SCOPES, issueCommerceApiKey, readCommerceApiKeys, revokeCommerceApiKey, type GrantableScope } from "./api";
-import type { CommerceApiKey } from "@seams/control-api/portal/api-keys";
+import type { CommerceApiKey } from "@purin-labs/control-api/portal/api-keys";
 import "../vault/styles.css";
 import "./styles.css";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Commerce API keys (Plan 80 step 3): an owner or admin gives the shop's own

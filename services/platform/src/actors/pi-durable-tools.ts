@@ -17,7 +17,7 @@ import type {
 import type {
   AuthorizedHarnessToolResult,
   CodeModeExecutionOutcome,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import {
   AgentDoc,
   NestedCallDoc,
@@ -42,8 +42,8 @@ import {
   isString,
   parseJsonOrNull,
   sha256Hex,
-} from "@seams/std";
-import type { Variant } from "@seams/type-utils";
+} from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import { CodeModeAdmissionFrozenError } from "../agent-tools/catalog/types";
 import { PERMISSION_REQUEST_TOOL_NAME } from "../agent-tools/catalog/permission";
 import { MAX_CODE_MODE_SOURCE_BYTES } from "../agent-tools/catalog/code-mode";

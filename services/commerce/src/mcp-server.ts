@@ -16,8 +16,8 @@ import {
   CommerceStorefrontClient,
   type CommerceApiScope,
   type CommerceClientResult,
-} from "@seams/commerce-client";
-import { isRecord } from "@seams/std";
+} from "@purin-labs/commerce-client";
+import { isRecord } from "@purin-labs/std";
 
 import type { ApiAccess, ApiCaller } from "./api-access.ts";
 
@@ -33,7 +33,7 @@ const INSTRUCTIONS =
   "the live prices, create_checkout to make a pickup checkout as a guest " +
   "buyer, and read_order for the state of an order. A site pays a checkout " +
   "with the buyer session token that create_checkout returns, through the " +
-  "storefront routes of @seams/commerce-client.";
+  "storefront routes of @purin-labs/commerce-client.";
 
 type Dispatch = (request: Request) => Promise<Response>;
 

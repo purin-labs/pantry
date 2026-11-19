@@ -6,12 +6,12 @@ import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
 import {
   requireText,
 } from "./wire-readers.ts";
-import { parseCreateCommerceMarketV1 as parseCreateCommerceMarketV1Record, parseCommerceMarketV1 as parseCommerceMarketV1Record, parseUpdateCommerceMarketV1 as parseUpdateCommerceMarketV1Record, parseCommerceMarketsV1 as parseCommerceMarketsV1Record, parseCommerceOrderMarketV1 as parseCommerceOrderMarketV1Record } from "@seams/commerce-contracts/records/api-markets";
+import { parseCreateCommerceMarketV1 as parseCreateCommerceMarketV1Record, parseCommerceMarketV1 as parseCommerceMarketV1Record, parseUpdateCommerceMarketV1 as parseUpdateCommerceMarketV1Record, parseCommerceMarketsV1 as parseCommerceMarketsV1Record, parseCommerceOrderMarketV1 as parseCommerceOrderMarketV1Record } from "@purin-labs/commerce-contracts/records/api-markets";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   CURRENCY_MINOR_UNITS,
   convertMarketAmount,
-} from "@seams/commerce-contracts/records/commerce-fields";
+} from "@purin-labs/commerce-contracts/records/commerce-fields";
 
 export { CURRENCY_MINOR_UNITS };
 

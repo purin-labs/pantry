@@ -3,7 +3,7 @@ import {
   MAX_DOCUMENT_BYTES,
   MAX_REFERENCED_BYTES,
 } from "../index.ts";
-import { parseJsonOrNull } from "@seams/std";
+import { parseJsonOrNull } from "@purin-labs/std";
 import {
   MAX_ENCODED_ARTIFACT_BYTES,
   RunArtifactFile,

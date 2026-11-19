@@ -1,7 +1,7 @@
 import type {
   CheckoutProfile,
   CheckoutProfileConfiguration,
-} from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-contracts";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   parseActivateCommerceCheckoutProfileV1 as parseActivateCommerceCheckoutProfileV1Record,
@@ -14,7 +14,7 @@ import {
   parseCommerceCheckoutProfilesV1,
   parseCommerceCheckoutProfileStorefrontIdsV1,
   parseWireCheckoutProfile as parseCheckoutProfileRecord,
-} from "@seams/commerce-contracts/records/api-checkout-profile";
+} from "@purin-labs/commerce-contracts/records/api-checkout-profile";
 
 export type CommerceCheckoutProfileActivationV1 = Readonly<{
   merchantId: string;

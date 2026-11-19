@@ -1,4 +1,4 @@
-import type { StoredMessageAttachment } from "@seams/contracts";
+import type { StoredMessageAttachment } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

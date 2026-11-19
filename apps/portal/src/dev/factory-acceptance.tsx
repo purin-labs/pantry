@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router";
-import { canonicalJson } from "@seams/std";
+import { canonicalJson } from "@purin-labs/std";
 import WorkflowSimulatorRoute from "../features/workflow-simulator/route";
 import "../styles.css";
 

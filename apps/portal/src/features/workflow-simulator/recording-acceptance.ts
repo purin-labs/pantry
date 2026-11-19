@@ -1,9 +1,9 @@
-import type { BakeryRecordingAcceptanceReference } from "@seams/bakery-model/bakery-surface";
+import type { BakeryRecordingAcceptanceReference } from "@purin-labs/bakery-model/bakery-surface";
 import type {
   RecordingAcceptanceTarget,
   SimulatorState,
 } from "./simulator-state.ts";
-import { assertNever, sha256Hex } from "@seams/std";
+import { assertNever, sha256Hex } from "@purin-labs/std";
 
 export type RecordingAcceptanceReference = BakeryRecordingAcceptanceReference;
 

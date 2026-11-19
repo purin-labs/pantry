@@ -1,5 +1,5 @@
 {
-  "name": "@seams/commerce-query-sqlite",
+  "name": "@purin-labs/commerce-query-sqlite",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -20,12 +20,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@seams/std": "workspace:*",
-    "@seams/type-utils": "workspace:*",
-    "@seams/commerce-contracts": "workspace:*"
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*"
   },
   "devDependencies": {
-    "@seams/commerce-client": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
     "tsrs": "0.18.0-ts7.1.0-dev.20260929",
     "vitest": "4.1.9"
   }

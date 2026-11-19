@@ -2,14 +2,14 @@ import type {
   DeviceConnection,
   DeviceView,
   VoiceEngineId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 
 import type { OrganisationDatabase } from "../database-handles";
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import { voiceMacHostname } from "./dns";
 import { listVoiceMacs, MAC_HEARTBEAT_FRESH_MS, type VoiceMac } from "./store";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 type ShopMacDeviceView = Variant<DeviceView, "shop_mac">;
 

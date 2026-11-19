@@ -15,8 +15,8 @@ import {
   actorStubForRegistryEntry,
   type ActorNamespaces,
 } from "./actor-router";
-import type { VariantBy } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
+import type { VariantBy } from "@purin-labs/type-utils";
+import { assertNever } from "@purin-labs/std";
 
 type ReservedRegistryEntry = VariantBy<
   ActorRegistryEntry,

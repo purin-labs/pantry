@@ -5,7 +5,7 @@
  * any pasted `code#state` value then connects. Paste `expired#…` or
  * `refused#…` to see the sign-in end. Nothing is saved.
  */
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 
 type PreviewConnection =
   | Readonly<{ kind: "disconnected" }>

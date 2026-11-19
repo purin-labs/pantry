@@ -33,7 +33,7 @@ async function mountMailInbox(page) {
     );
     // The Portal starts its commerce validators before any page, as here.
     const { initializeBrowserValidators } =
-      await import("/@id/@seams/commerce-contracts/browser-validators");
+      await import("/@id/@purin-labs/commerce-contracts/browser-validators");
     await initializeBrowserValidators();
     const originalFetch = window.fetch.bind(window);
     document.cookie = "satyr_control_csrf=inbox-fixture; path=/";

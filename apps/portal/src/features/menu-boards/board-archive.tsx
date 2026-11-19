@@ -1,6 +1,6 @@
 import React from "react";
 import { Archive, ArchiveRestore } from "lucide-react";
-import { isRecord } from "@seams/std";
+import { isRecord } from "@purin-labs/std";
 import { controlAnswer, controlWrite } from "../../control-client";
 import { controlPath } from "./menu-board-requests";
 import "./board-archive.css";

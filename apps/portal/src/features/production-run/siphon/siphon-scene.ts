@@ -8,12 +8,12 @@ import {
   studioLights,
 } from "../appliance-sample-three";
 import { fr10Pivots } from "../shared/cobot-rig";
-import type { StationPose } from "@seams/production-simulation/recipes/pour-over/sample";
+import type { StationPose } from "@purin-labs/production-simulation/recipes/pour-over/sample";
 import type {
   SiphonBody,
   SiphonSample,
   SiphonSetup,
-} from "@seams/production-simulation/recipes/siphon/model";
+} from "@purin-labs/production-simulation/recipes/siphon/model";
 
 export type SiphonCameraPreset = "bench" | "chambers" | "overhead";
 

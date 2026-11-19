@@ -1,8 +1,8 @@
-import { SLACK_BOT_NAME } from "@seams/control-api";
+import { SLACK_BOT_NAME } from "@purin-labs/control-api";
 import React from "react";
 
 import { identityServiceErrorMessage } from "./identity-copy";
-import { assertNever, isRecord } from "@seams/std";
+import { assertNever, isRecord } from "@purin-labs/std";
 import { readCookie } from "./control-client";
 
 type Invitation = {

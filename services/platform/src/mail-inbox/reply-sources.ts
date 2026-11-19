@@ -1,4 +1,4 @@
-import { assertNever, isRecord, sha256Hex } from "@seams/std";
+import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 import type { EmailCommerceEvidence } from "./supplier-context";
 
 /** The most citations that one draft may carry. More are dropped. */

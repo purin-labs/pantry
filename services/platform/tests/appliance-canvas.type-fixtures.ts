@@ -1,7 +1,7 @@
 import type {
   ApplianceOperationState,
   ApplianceOperation,
-} from "@seams/bakery-model/bakery-appliance-workflow";
+} from "@purin-labs/bakery-model/bakery-appliance-workflow";
 
 declare const operation: ApplianceOperation;
 // @ts-expect-error An accepted operation requires its validated recording and times.
@@ -16,8 +16,8 @@ export const pendingTime: ApplianceOperationState = {
   start: 0,
 };
 
-import type { ChatConversationAccess } from "@seams/control-api";
-declare const userId: import("@seams/control-api").UserId;
+import type { ChatConversationAccess } from "@purin-labs/control-api";
+declare const userId: import("@purin-labs/control-api").UserId;
 // @ts-expect-error Workspace chats require a bound canvas identity.
 export const missingCanvasChat: ChatConversationAccess = {
   kind: "workspace_canvas",
@@ -37,7 +37,7 @@ export const spreadWorkspaceChat: ChatConversationAccess = {
 };
 
 import type { CanvasChatSelection } from "../src/chat/workspace-canvas";
-declare const conversationId: import("@seams/control-api").ConversationId;
+declare const conversationId: import("@purin-labs/control-api").ConversationId;
 // @ts-expect-error Historical reads require an exact conversation identity.
 export const missingHistoryIdentity: CanvasChatSelection = { kind: "history" };
 // @ts-expect-error Current and historical selection cannot be combined.

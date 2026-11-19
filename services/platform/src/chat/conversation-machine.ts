@@ -1,7 +1,7 @@
 import {
   machineTransition,
   type MachineTransitionResult,
-} from "@seams/std/state-machine";
+} from "@purin-labs/std/state-machine";
 import {
   conversationTimeline,
   normalizeConversationTimeline,

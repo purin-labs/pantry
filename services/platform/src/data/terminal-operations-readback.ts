@@ -4,12 +4,12 @@ import {
   terminalTargetDeviceId,
   terminalTargetHealthIsObservable,
   type TerminalAssignment,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 
 import type { OrganisationId } from "../ids";
 import { listActiveTerminalAssignments } from "./terminal-assignment-store";
-import type { Variant } from "@seams/type-utils";
-import type { TerminalCounterReadback } from "@seams/control-api";
+import type { Variant } from "@purin-labs/type-utils";
+import type { TerminalCounterReadback } from "@purin-labs/control-api";
 /**
  * What an operator needs in order to answer "can this counter take a payment
  * right now, and if not, why".

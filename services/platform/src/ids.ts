@@ -1,4 +1,4 @@
-export { parseUserId, newUserId, type UserId } from "@seams/control-api/ids";
+export { parseUserId, newUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "./result";
 
 declare const organisationIdBrand: unique symbol;

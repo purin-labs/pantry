@@ -5,8 +5,8 @@
 import type {
   CommerceAdminClient,
   CommerceCounterSaleV1,
-} from "@seams/commerce-client";
-import type { InPersonPaymentBinding } from "@seams/commerce-contracts";
+} from "@purin-labs/commerce-client";
+import type { InPersonPaymentBinding } from "@purin-labs/commerce-contracts";
 
 import {
   CHANNEL,

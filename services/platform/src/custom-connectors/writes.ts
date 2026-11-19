@@ -30,7 +30,7 @@ import {
   parseCustomConnectorRevision,
 } from "./identity";
 import { resolveCustomConnectorRevision } from "./revisions";
-import { assertNever, isRecord, sha256Hex } from "@seams/std";
+import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 import { executeReviewedConnectorOperation } from "./mcp";
 
 type CustomConnectorWriteReceipt = Readonly<{

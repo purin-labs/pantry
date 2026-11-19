@@ -1,7 +1,7 @@
 import {
   parseJevFeatureCommand,
   type JevFeatureCommand,
-} from "@seams/control-api/portal/jev-features";
+} from "@purin-labs/control-api/portal/jev-features";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";

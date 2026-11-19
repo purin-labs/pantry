@@ -1,6 +1,6 @@
 // The stored-value built-in plugin (Plan 77 step 3). Code outside this
 // directory reaches the plugin only through this file.
-import type { CommerceStoredValueCommandV1 } from "@seams/commerce-client";
+import type { CommerceStoredValueCommandV1 } from "@purin-labs/commerce-client";
 
 export * from "./stored-value.ts";
 export { STORED_VALUE_SCHEMA } from "./schema.ts";

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import { formatOfferPrice } from "../governed-actions/commerce";
-import { isRecord } from "@seams/std";
-import { type OfferPriceAllowanceView, type PricedOffer, parseOfferPriceAllowanceView, parsePricedOffers } from "@seams/control-api/portal/price-allowance";
+import { isRecord } from "@purin-labs/std";
+import { type OfferPriceAllowanceView, type PricedOffer, parseOfferPriceAllowanceView, parsePricedOffers } from "@purin-labs/control-api/portal/price-allowance";
 
 type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 

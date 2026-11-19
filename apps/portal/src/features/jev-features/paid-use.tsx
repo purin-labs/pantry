@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import type {
   JevAllowance,
   JevFeaturesView,
-} from "@seams/control-api/portal/jev-features";
+} from "@purin-labs/control-api/portal/jev-features";
 import { Switch } from "../../ui/toggle-switch";
 import { changeJevPaidUse, jevFeatureErrorMessage } from "./api";
 

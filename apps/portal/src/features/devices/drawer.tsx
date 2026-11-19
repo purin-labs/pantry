@@ -6,8 +6,8 @@ import {
   type DeviceActivity,
   type DeviceView,
   type KitchenDeviceView,
-} from "@seams/control-api";
-import { assertNever } from "@seams/std";
+} from "@purin-labs/control-api";
+import { assertNever } from "@purin-labs/std";
 
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import { Select } from "../../ui/select";

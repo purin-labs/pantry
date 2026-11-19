@@ -1,4 +1,4 @@
-import { isNonEmptyString, isRecord, positiveIntegerOrNull } from "@seams/std";
+import { isNonEmptyString, isRecord, positiveIntegerOrNull } from "@purin-labs/std";
 import type {
   WhatsAppAgentMode,
   WhatsAppCasePanelEntry,

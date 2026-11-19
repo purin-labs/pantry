@@ -10,23 +10,23 @@ import {
   setUpMailbox,
 } from "../mail-setup/turn-on";
 import type { IntegrationDetailReadContext, IntegrationDetailRouteData, IntegrationsCommand, IntegrationsCommandResult, IntegrationsRouteData, WorkspaceSettingsCommand, WorkspaceSettingsRouteData, WorkspaceSettingsCommandResult } from "./settings-types";
-import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@seams/control-api/portal/settings";
+import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import {
   codexConnectionPath,
   commerceSystemPath,
   inferencePath,
   organisationRecordPath,
 } from "../../control-paths";
-import { parseWhatsAppSurface, type WhatsAppSurface } from "@seams/control-api/portal/whatsapp";
+import { parseWhatsAppSurface, type WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import { whatsappAccountActionPath, whatsappAccountsPath } from "../../whatsapp";
-import { parseCredentialRotationReceiptResponse, parseCredentialRevocationReceiptResponse } from "@seams/control-api/portal/credential-inventory";
+import { parseCredentialRotationReceiptResponse, parseCredentialRevocationReceiptResponse } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   assertNever,
   isNonEmptyString,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import { codexAuthorizationResult, fetchCredentialInventory, fetchOrganisationCodexConnection, fetchOrganisationInferenceSelection, isOrganisationApiKeyInferenceCommand } from "./codex-transport";
-import { parseOrganisationCodexConnectionResponse, parseOrganisationInferenceSelectionResponse } from "@seams/control-api/portal/codex";
+import { parseOrganisationCodexConnectionResponse, parseOrganisationInferenceSelectionResponse } from "@purin-labs/control-api/portal/codex";
 import {
   agentMailboxPath,
   emailOperationalPath,
@@ -35,9 +35,9 @@ import {
 } from "./mailbox-transport";
 import { setupFormDefaults } from "../../portal-projection";
 import { beginExistingProviderConnection, beginProviderConnection, bindSetupChannel, fetchCommerceSystem, fetchOrganisationInvitations, fetchOrganisationMembers, fetchOrganisationSnapshot, fetchSlackDestinations, fetchSlackRouting, fetchSupportDiagnostics, provisionPantryCommerceDemo, publishExportCoordination, queueCommerceSystemSync, readConfigurationVersionFromMutation, selectShopifyCommerceSystem } from "../../portal-reads";
-import { parseCommerceSystemResponse, parseOrganisationSnapshot } from "@seams/control-api/portal/portal-reads";
+import { parseCommerceSystemResponse, parseOrganisationSnapshot } from "@purin-labs/control-api/portal/portal-reads";
 import { MAILBOX_SETUP_TRANSPORT } from "../../portal-support";
-import type { CommerceSystemView, OrganisationSnapshot } from "@seams/control-api/portal/portal-types";
+import type { CommerceSystemView, OrganisationSnapshot } from "@purin-labs/control-api/portal/portal-types";
 
 export async function readIntegrationsOverview(
   organisationId: string,

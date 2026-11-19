@@ -3,7 +3,7 @@
 // and set each product's ordered media, for all its variants or some of
 // them. The buyer catalog lists the media of the products it shows.
 import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
-import { parseCreateCommerceMediaV1 as parseCreateCommerceMediaV1Record, parseDeleteCommerceMediaV1 as parseDeleteCommerceMediaV1Record, parseSetCommerceProductMediaV1 as parseSetCommerceProductMediaV1Record, parseCommerceMediaLibraryV1 as parseCommerceMediaLibraryV1Record, parseCommerceMediaUploadV1 as parseCommerceMediaUploadV1Record, parseCommerceMediaV1 as parseCommerceMediaV1Record, parseCommerceProductMediaV1 as parseCommerceProductMediaV1Record, parseUpdateCommerceMediaV1 as parseUpdateCommerceMediaV1Record } from "@seams/commerce-contracts/records/api-media";
+import { parseCreateCommerceMediaV1 as parseCreateCommerceMediaV1Record, parseDeleteCommerceMediaV1 as parseDeleteCommerceMediaV1Record, parseSetCommerceProductMediaV1 as parseSetCommerceProductMediaV1Record, parseCommerceMediaLibraryV1 as parseCommerceMediaLibraryV1Record, parseCommerceMediaUploadV1 as parseCommerceMediaUploadV1Record, parseCommerceMediaV1 as parseCommerceMediaV1Record, parseCommerceProductMediaV1 as parseCommerceProductMediaV1Record, parseUpdateCommerceMediaV1 as parseUpdateCommerceMediaV1Record } from "@purin-labs/commerce-contracts/records/api-media";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 /** The image types Commerce keeps; SVG is refused because it can carry script. */

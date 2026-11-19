@@ -4,13 +4,13 @@ import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
 } from "../organisation-execution-scope";
-import type { CanonicalCommerceDelivery } from "@seams/contracts";
+import type { CanonicalCommerceDelivery } from "@purin-labs/contracts";
 import {
   CommerceAdminClient,
   CommerceEntityPlaneClient,
   type CommerceClientResult,
   type CommerceReceivedDeliveryV1,
-} from "@seams/commerce-client";
+} from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
 import type { PendingCommerceCue } from "../actors/commerce-projection";
@@ -42,7 +42,7 @@ import {
   normalizeCommerceEngineDelivery,
 } from "./provider";
 import { recordPaidReceipts } from "./paid-receipt";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { CUE_CLAIM_ABANDONED_AFTER_MS } from "../actors/cue-delivery";
 
 /**

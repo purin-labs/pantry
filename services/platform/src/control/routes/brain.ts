@@ -1,5 +1,5 @@
 import { authenticatedAccountConversationScope } from "../../account-platform/access";
-import { EMPTY_BRAIN_SUMMARY, type BrainSummary } from "@seams/control-api";
+import { EMPTY_BRAIN_SUMMARY, type BrainSummary } from "@purin-labs/control-api";
 
 import { roleMayConfigure } from "../../data/control-plane";
 import type { Env } from "../../env";

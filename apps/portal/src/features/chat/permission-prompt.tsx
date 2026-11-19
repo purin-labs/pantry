@@ -11,13 +11,13 @@ import type {
   ChatPermissionDecision,
   ChatPermissionRequest,
   ConversationId,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import {
   PermissionRequestDialog,
   PantryMark,
   type PermissionRequestDecision,
 } from "../../ui";
-import type { AccessRouteTransport } from "@seams/control-api/portal/access-models";
+import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   AgentPermissionRequestPrompt,
   type ChatRun,
@@ -28,8 +28,8 @@ import {
 } from "../access/permission-enable";
 import { decideChatPermission } from "./api";
 import { AGENT_NAME } from "../../agent-name";
-import type { Chat } from "@seams/control-api/portal/chat";
-import type { Variant } from "@seams/type-utils";
+import type { Chat } from "@purin-labs/control-api/portal/chat";
+import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
   organisationId: string;

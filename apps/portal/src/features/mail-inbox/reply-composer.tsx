@@ -26,7 +26,7 @@ import {
   Trash2,
   Underline,
 } from "lucide-react";
-import { encodeBase64 } from "@seams/std";
+import { encodeBase64 } from "@purin-labs/std";
 import {
   MAIL_REPLY_ATTACHMENT_BYTES,
   MAIL_REPLY_ATTACHMENT_COUNT,
@@ -37,7 +37,7 @@ import {
   renderMailReplyText,
   type MailReplyColor,
   type MailReplyDocument,
-} from "@seams/control-api";
+} from "@purin-labs/control-api";
 import { GlideHighlight } from "../../ui/glide-highlight";
 import { HoverLabel } from "../../ui/hover-label";
 import "../../ui/action-menu.css";

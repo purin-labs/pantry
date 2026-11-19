@@ -25,13 +25,13 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   hasExactKeys,
   isPositiveInteger,
   isRecord,
-} from "@seams/std";
+} from "@purin-labs/std";
 import type { CustomConnectorControlRoute } from "../custom-connectors";
 import {
   type MutationContext,

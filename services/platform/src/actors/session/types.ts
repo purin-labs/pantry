@@ -1,6 +1,6 @@
 import type { SteeringRequester } from "../harness-steering";
 import type { PantryExecutionBillingError } from "../../account-platform/execution-billing";
-import type { Outcome } from "@seams/contracts";
+import type { Outcome } from "@purin-labs/contracts";
 import type { HarnessTurnContinuation } from "../agent-session-continuation";
 import type { LiveRequestAuthorityValidationError } from "../../request-authority";
 import type { MailOrganizationActorInput } from "../../mail-inbox/commands";
@@ -11,7 +11,7 @@ import type {
   HarnessCheckpointRecord,
   SessionBudgetUsage,
   WorkspaceRevisionReceipt,
-} from "@seams/contracts";
+} from "@purin-labs/contracts";
 import type { RequestId, SessionId, OrganisationId } from "../../ids";
 import type { WorkspaceRevisionStoreError } from "../../workspace-revision-store";
 import type { Result } from "../../result";
@@ -57,7 +57,7 @@ import type { SessionTurnStreamError } from "../agent-session-turn-stream";
 import type { CanonicalTextTurnStartError } from "../agent-session-turn-start";
 import type { CaseConversationSinkRefusal } from "../case-conversation-sink";
 import type { SerializedFlowBinding } from "../../policy";
-import type { Variant } from "@seams/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 
 export type TransientEmailTurnRequest = {
   readonly evidenceDependency: import("../../case-context-discovery/evidence").CaseContextCollectionEvidenceDependency;
@@ -70,7 +70,7 @@ export type TransientEmailTurnRequest = {
   readonly contentDigest: string;
   readonly workspaceRevision: string;
   readonly contextBundleDigest: string;
-  readonly requestAuthority: import("@seams/contracts").RequestAuthority;
+  readonly requestAuthority: import("@purin-labs/contracts").RequestAuthority;
   readonly authorityPartitionDigest: string;
   readonly harnessInstructions: string;
   readonly turnPrompt: string;
@@ -154,7 +154,7 @@ export type TransientWhatsAppTurnRequest = {
   readonly contentDigest: string;
   readonly workspaceRevision: string;
   readonly contextBundleDigest: string;
-  readonly requestAuthority: import("@seams/contracts").RequestAuthority;
+  readonly requestAuthority: import("@purin-labs/contracts").RequestAuthority;
   readonly authorityPartitionDigest: string;
   readonly harnessInstructions: string;
   readonly turnPrompt: string;

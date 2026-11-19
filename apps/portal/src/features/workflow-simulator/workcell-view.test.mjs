@@ -2,21 +2,21 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import * as THREE from "three";
-import { parsePhysicsRecording } from "@seams/bakery-model/bakery-physics";
+import { parsePhysicsRecording } from "@purin-labs/bakery-model/bakery-physics";
 import { PhysicsModel } from "./spatial/physics-model.ts";
-import { compileWorkcellInput } from "@seams/production-simulation/recipes/bakery/workcell-input";
+import { compileWorkcellInput } from "@purin-labs/production-simulation/recipes/bakery/workcell-input";
 import {
   reserveWorkcell,
   settleWorkcell,
   workcellAt,
-} from "@seams/production-simulation/recipes/bakery/workcell-attempt";
-import { workcellView } from "@seams/production-simulation/simulator/workcell-view";
+} from "@purin-labs/production-simulation/recipes/bakery/workcell-attempt";
+import { workcellView } from "@purin-labs/production-simulation/simulator/workcell-view";
 import {
   initialPlaybackSession,
   loadWorkcellReplay,
   recordingReplayView,
   seekActivePlayback,
-} from "@seams/production-simulation/simulator/playback-state";
+} from "@purin-labs/production-simulation/simulator/playback-state";
 
 const raw = JSON.parse(
   readFileSync(

@@ -5,13 +5,13 @@ import {
   type PortalPageViewFact,
   type PortalPageViewSection,
   type SurfaceObservationV2,
-} from "@seams/control-api";
-import type { BakeryBrowserContext } from "@seams/bakery-model/bakery-context";
+} from "@purin-labs/control-api";
+import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import {
   bakerySurfaceAttachmentFromState,
   type BakerySurfaceAttachmentV1,
   type BakerySurfaceContextV1,
-} from "@seams/bakery-model/bakery-surface";
+} from "@purin-labs/bakery-model/bakery-surface";
 
 /**
  * The Kitchen behind the v2 screen observation (Plan 87 phase 2). The

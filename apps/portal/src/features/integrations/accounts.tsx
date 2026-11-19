@@ -1,14 +1,14 @@
 import { Select } from "../../ui/select";
 import React from "react";
 import { credentialRotationSupported, findCredentialAccountRecord } from "../../credential-inventory";
-import type { CredentialAccountRecord, CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@seams/control-api/portal/credential-inventory";
+import type { CredentialAccountRecord, CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
 import { StatusChip } from "../../page-components";
 import { MutationLedger } from "../../mutation-state";
 import {
   providerDisconnectedConsequence,
   providerLabel,
 } from "../../integration-catalogue";
-import { assertNever } from "@seams/std";
+import { assertNever } from "@purin-labs/std";
 import { authorizationServiceName } from "./provider-authorization";
 import {
   awaitingAccountAuthorization,
@@ -21,7 +21,7 @@ import {
   renderMutationFeedback,
 } from "./settings-support";
 import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
-import type { IntegrationAccount } from "@seams/control-api/portal/settings";
+import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import { ConfirmButton } from "./workspace";
 
 type IntegrationAccountControls = {

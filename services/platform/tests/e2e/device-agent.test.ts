@@ -6,8 +6,8 @@
 import { exports } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { parseDeviceActivity, type ConversationId } from "@seams/control-api";
-import { isRecord } from "@seams/std";
+import { parseDeviceActivity, type ConversationId } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 
 import {
   lastCalledTool,
