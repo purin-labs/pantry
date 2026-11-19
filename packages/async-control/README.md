@@ -8,7 +8,7 @@ types and supplies only lifecycle mechanics.
 
 ```sh
 pnpm --filter @seams/async-control build
-pnpm --filter @seams/async-control typecheck
+pnpm --filter @seams/async-control check:types
 pnpm --filter @seams/async-control test
 pnpm --filter @seams/async-control test:exports
 ```

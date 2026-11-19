@@ -86,10 +86,9 @@ jobs:
       - name: Install pinned wasm-pack
         run: cargo install wasm-pack --version 0.13.1 --locked
 
-      - name: Contracts TypeScript check
-        run: |
-          pnpm --filter @seams/commerce-contracts check:types
-          pnpm --filter @seams/contracts check:types
+      - name: Package TypeScript checks
+        # Every shared package, Punter and the storefront, with the contracts.
+        run: pnpm check:packages
 
       - name: Runtime boundary between Pantry and Commerce
         run: pnpm lint:runtime-boundary
@@ -122,6 +121,13 @@ jobs:
 
       - name: Edge test TypeScript check
         run: pnpm --filter @seams/platform check:test-types
+
+      - name: Unit suites
+        # The Platform unit suite, the Portal, storefront and package suites and
+        # the Worker environment test (about one minute). It needs the R2 files,
+        # the async-control build, the media build of the Edge TypeScript check
+        # and the account Worker of the steps above.
+        run: pnpm test:units
 
       - name: Edge end-to-end journeys
         env:

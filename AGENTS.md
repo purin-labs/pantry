@@ -529,10 +529,19 @@ Run the narrowest relevant checks first:
 pnpm --filter @seams/platform check:types
 pnpm --filter @seams/platform check:test-types
 pnpm --filter @seams/platform test
+pnpm check:packages
+pnpm test:units
 pnpm portal:build
 cargo test --workspace
 git diff --check
 ```
+
+`pnpm check:packages` runs the type check of each shared package, Punter and
+the storefront. `pnpm test:units` runs the Platform unit suite, the Portal,
+storefront and package suites and the Worker environment test. CI runs both.
+In a new worktree, `pnpm test:units` needs the R2 files, `pnpm
+async-control:build`, `pnpm --filter @seams/platform contracts:media` and
+`PANTRY_ACCOUNT_WORKER_ARTIFACT`, the path of the built account Worker.
 
 Before a release that changes Slack ingress, model routes or Slack delivery,
 run the live Slack journey against the deployed Worker. It needs a human user

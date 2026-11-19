@@ -8,6 +8,7 @@
     "build:seams-shop": "tsrs --noEmit && VITE_SHOP_MERCHANT_ID=merchant_satyr_b43a32c5_f5ff_4ad8_9536_2cdee9dd2958 vite build",
     "deploy:seams-shop": "pnpm build:seams-shop && pnpm --dir ../../services/commerce exec wrangler deploy --config ../../apps/storefront/wrangler.jsonc",
     "dev": "vite",
+    "check:types": "tsrs --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

@@ -25,7 +25,7 @@
     "build": "tsrs -p tsconfig.build.json",
     "test": "vitest run",
     "test:exports": "pnpm build && node --test tests/runtime-exports.mjs",
-    "typecheck": "tsrs --noEmit"
+    "check:types": "tsrs --noEmit"
   },
   "devDependencies": {
     "tsrs": "0.18.0-ts7.1.0-dev.20260929",
