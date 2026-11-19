@@ -7,7 +7,7 @@
     "apps/portal/src/features/production-run/recipe-workflow-graph.tsx": 3008,
     "apps/portal/src/features/workflow-simulator/bakery-surface.ts": 3893,
     "apps/portal/src/features/workflow-simulator/production-workspace.tsx": 5185,
-    "apps/storefront/src/storefront.tsx": 9335,
+    "apps/storefront/src/storefront.tsx": 9334,
     "packages/bakery-model/src/bakery-surface.ts": 4991,
     "packages/commerce-contracts/src/records/commerce-records.ts": 3309,
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3819,

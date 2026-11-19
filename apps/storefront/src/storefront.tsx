@@ -1367,7 +1367,7 @@ export class StorefrontApp extends React.Component<
             kind: "failed",
             failure: {
               kind: "storefront",
-              message: buyerError(order.error.message),
+              message: buyerClientError(order.error),
             },
           });
         }
@@ -1486,7 +1486,7 @@ export class StorefrontApp extends React.Component<
         kind: "failed",
         failure: {
           kind: "storefront",
-          message: buyerError(session.error.message),
+          message: buyerClientError(session.error),
         },
       });
       return;
@@ -1501,7 +1501,7 @@ export class StorefrontApp extends React.Component<
         kind: "failed",
         failure: {
           kind: "storefront",
-          message: buyerError(catalog.error.message),
+          message: buyerClientError(catalog.error),
         },
       });
       return;
@@ -1568,7 +1568,7 @@ export class StorefrontApp extends React.Component<
         clearStoredCheckoutContext(config.storefrontId);
         return { kind: "new_session" };
       }
-      return { kind: "failed", message: buyerError(catalog.error.message) };
+      return { kind: "failed", message: buyerClientError(catalog.error) };
     }
     if (
       catalog.value.storefront.storefrontId !== config.storefrontId ||
@@ -1612,7 +1612,7 @@ export class StorefrontApp extends React.Component<
       if (!recoveredCart.ok && !isMissingBuyerCart(recoveredCart.error)) {
         return {
           kind: "failed",
-          message: buyerError(recoveredCart.error.message),
+          message: buyerClientError(recoveredCart.error),
         };
       }
       if (recoveredCart.ok) {
@@ -1681,7 +1681,7 @@ export class StorefrontApp extends React.Component<
         clearStoredCheckoutContext(config.storefrontId);
         return { kind: "new_session" };
       }
-      return { kind: "failed", message: buyerError(checkout.error.message) };
+      return { kind: "failed", message: buyerClientError(checkout.error) };
     }
     const quote = checkout.value.checkout;
     if (quote.checkoutId !== cart.checkoutId) {
@@ -1786,7 +1786,7 @@ export class StorefrontApp extends React.Component<
           ? { kind: "recovered_pickup_quote", context, quote }
           : { kind: "recovered_shipping_quote", context, quote };
       }
-      return { kind: "failed", message: buyerError(result.error.message) };
+      return { kind: "failed", message: buyerClientError(result.error) };
     }
     if (result.value.state === "unavailable") {
       return {
@@ -2202,7 +2202,7 @@ export class StorefrontApp extends React.Component<
         ...current,
         feedback: {
           kind: "error",
-          message: buyerCheckoutError(result.error),
+          message: buyerClientError(result.error),
         },
       });
       return;
@@ -2371,7 +2371,7 @@ export class StorefrontApp extends React.Component<
         continuation: { kind: "new" },
         feedback: {
           kind: "error",
-          message: buyerCheckoutError(result.error),
+          message: buyerClientError(result.error),
         },
       });
       return;
@@ -2430,7 +2430,7 @@ export class StorefrontApp extends React.Component<
             },
           );
     if (!result.ok)
-      return { ok: false, message: buyerError(result.error.message) };
+      return { ok: false, message: buyerClientError(result.error) };
     const cart = activeCartForSession(
       result.value,
       context.session,
@@ -2527,7 +2527,7 @@ export class StorefrontApp extends React.Component<
     if (!result.ok) {
       this.restoreShippingCatalog(context, continuation, {
         kind: "error",
-        message: buyerError(result.error.message),
+        message: buyerClientError(result.error),
       });
       return;
     }
@@ -2869,7 +2869,7 @@ export class StorefrontApp extends React.Component<
         this.restoreExpiredQuote(context);
         return undefined;
       }
-      this.restoreQuoteWithError(context, buyerError(result.error.message));
+      this.restoreQuoteWithError(context, buyerClientError(result.error));
       return undefined;
     }
     if (result.value.state === "unavailable") {
@@ -2960,7 +2960,7 @@ export class StorefrontApp extends React.Component<
         this.restoreExpiredQuote(context);
         return undefined;
       }
-      this.restoreQuoteWithError(context, buyerError(result.error.message));
+      this.restoreQuoteWithError(context, buyerClientError(result.error));
       return undefined;
     }
     switch (result.value.state) {
@@ -3064,7 +3064,7 @@ export class StorefrontApp extends React.Component<
         context,
         result.ok
           ? "The order response did not match this storefront."
-          : buyerError(result.error.message),
+          : buyerClientError(result.error),
       );
       return;
     }
@@ -3167,7 +3167,7 @@ export class StorefrontApp extends React.Component<
     if (!result.ok) {
       this.setState({
         ...current,
-        feedback: { kind: "error", message: buyerError(result.error.message) },
+        feedback: { kind: "error", message: buyerClientError(result.error) },
       });
       return;
     }
@@ -9310,14 +9310,13 @@ function statusMessage(state: StorefrontState): string {
   }
 }
 
-function buyerError(message: string): string {
-  return message.length === 0
+/** An unreadable reply shows a fixed sentence, not the parser's reason. */
+function buyerClientError(error: CommerceClientError): string {
+  if (error.kind === "invalid_response")
+    return "The store's reply could not be read. Try again.";
+  return error.message.length === 0
     ? "Something went wrong. Try again."
-    : `${message} Try again.`;
-}
-
-function buyerCheckoutError(error: CommerceClientError): string {
-  return buyerError(error.message);
+    : `${error.message} Try again.`;
 }
 
 function shippingCheckoutError(error: CommerceClientError): string {
@@ -9325,7 +9324,7 @@ function shippingCheckoutError(error: CommerceClientError): string {
     error.error.code === "resource_relationship_invalid" &&
     error.error.field === "buyerCheckout.shippingServiceAvailability"
     ? "Delivery is temporarily unavailable. Try again later."
-    : buyerError(error.message);
+    : buyerClientError(error);
 }
 
 function isQuoteExpiredError(error: CommerceClientError): boolean {

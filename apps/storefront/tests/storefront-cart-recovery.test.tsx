@@ -1087,7 +1087,7 @@ it("rejects a recovered quote with fields outside the public response union", as
     const app = new StorefrontApp({ config });
     expect(await app.recoverBuyerContext(config)).toMatchObject({
       kind: "failed",
-      message: expect.stringContaining("fields are invalid"),
+      message: "The store's reply could not be read. Try again.",
     });
     checkoutHasExtraField = false;
     checkoutProgress = {
@@ -1096,7 +1096,7 @@ it("rejects a recovered quote with fields outside the public response union", as
     };
     expect(await app.recoverBuyerContext(config)).toMatchObject({
       kind: "failed",
-      message: expect.stringContaining("fields are invalid"),
+      message: "The store's reply could not be read. Try again.",
     });
   } finally {
     checkoutHasExtraField = false;
