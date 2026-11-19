@@ -1316,22 +1316,6 @@
       }
     },
     {
-      "id": "device-browser",
-      "file": "scripts/bakery-robots/verify-device-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Inputs' button is on the page but cannot take a click (tabindex -1) for 30 s. The journey's path to it is out of date.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
       "id": "floor-plan-geometry-browser",
       "file": "scripts/bakery-robots/verify-floor-plan-geometry.js",
       "tier": "browser",
@@ -1344,38 +1328,6 @@
       "status": "fails",
       "failure": {
         "reason": "A page.waitForFunction check does not become true in 15 s.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
-      "id": "ingredient-editor-browser",
-      "file": "scripts/bakery-robots/verify-ingredient-editor-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads output/playwright/ur5e-ingredients-workflow-verified/completed.json, which no journey in the index writes.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
-      "id": "native-import-browser",
-      "file": "scripts/bakery-robots/verify-native-import-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads loading-request.json from its own output folder, which no step of the journey writes.",
         "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
@@ -1396,22 +1348,6 @@
       }
     },
     {
-      "id": "production-browser",
-      "file": "scripts/bakery-robots/verify-production-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "The file has no 'async function verify…(page)' entry, so browser-acceptance.mjs cannot run it.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
       "id": "recording-rehearsal-browser",
       "file": "scripts/bakery-robots/verify-recording-rehearsal-browser.js",
       "tier": "browser",
@@ -1424,22 +1360,6 @@
       "status": "fails",
       "failure": {
         "reason": "It reads output/playwright/plan42f-tray-layout-drag/applied.json, which no journey in the index writes.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
-      "id": "rehearsal-browser",
-      "file": "scripts/bakery-robots/verify-rehearsal-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Tray E' fieldset of the production panel shows no details element in 30 s. The journey's path to it is out of date.",
         "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
@@ -1666,70 +1586,6 @@
         "seconds": 1,
         "date": "2026-11-18",
         "commit": "69a67f517"
-      }
-    },
-    {
-      "id": "ingredient-editor-artifacts",
-      "file": "scripts/bakery-robots/verify-ingredient-editor-artifacts.mjs",
-      "tier": "browser",
-      "backend": "none",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "tsx",
-        "args": ["{out:ingredient-editor-browser}"]
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the output of ingredient-editor-browser, which fails.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
-      "id": "native-import-artifacts",
-      "file": "scripts/bakery-robots/verify-native-import-artifacts.mjs",
-      "tier": "browser",
-      "backend": "none",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "tsx",
-        "args": ["{out:native-import-browser}"]
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the output of native-import-browser, which fails.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
-      "id": "production-browser-artifacts",
-      "file": "scripts/bakery-robots/verify-production-browser-artifacts.mjs",
-      "tier": "browser",
-      "backend": "none",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "tsx",
-        "args": ["{out:production-browser}"]
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the output of production-browser, which fails.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
-      "id": "rehearsal-browser-artifacts",
-      "file": "scripts/bakery-robots/verify-rehearsal-browser-artifacts.mjs",
-      "tier": "browser",
-      "backend": "none",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "tsx",
-        "args": ["{out:rehearsal-browser}"]
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the output of rehearsal-browser, which fails.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
