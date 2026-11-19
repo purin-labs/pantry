@@ -1,17 +1,15 @@
 async function verifyContactInspectionBrowser(page) {
-  await page.route("**/src/dev/workflow-preview.tsx", contactStyles);
+  await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await openPhysicsEvidence(page);
-  const source =
-    "/@fs/Users/pta/Dev/lowerarchy/satyr/services/platform/tests/fixtures/bakery-persistent-failure.json";
+  const source = `/@fs${checkoutRoot()}/services/platform/tests/fixtures/bakery-persistent-failure.json`;
   const reference = await page.evaluate(readContactReference, source);
-  await page.evaluate(mountContactWorkspace);
+  await page.evaluate(showPortalPhysicsEvidence, portalSimulationSource());
+  await page.evaluate(mountWorkflowSimulator, { kind: "preview" });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.getByRole("button", { name: "Recipes", exact: true }).click();
   const file = await page.request.get(new URL(source, page.url()).href);
   await page
-    .getByLabel("Open recipe, oven route or saved production run", {
-      exact: true,
-    })
+    .getByLabel(/^Open recipe, oven route or saved production run/)
     .setInputFiles({
       name: "failed-native-factory.json",
       mimeType: "application/json",
@@ -20,8 +18,10 @@ async function verifyContactInspectionBrowser(page) {
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
+  await showFactoryWorkflow(page);
   await page.locator('[data-graph-task="tray-orders#0/transfer"]').waitFor();
   await page.locator('[data-graph-task="tray-orders#0/transfer"]').click();
+  await openPhysicsDetails(page);
   await page
     .getByRole("button", { name: "Inspect selected physics", exact: true })
     .click();
@@ -67,12 +67,8 @@ async function verifyContactInspectionBrowser(page) {
   const observed = await page
     .getByLabel("Simulation seconds", { exact: true })
     .textContent();
-  const saved = page.waitForEvent("download");
-  await page
-    .getByRole("button", { name: "Save production run", exact: true })
-    .click();
   await (
-    await saved
+    await downloadFactorySave(page)
   ).saveAs(`${globalThis.bakeryEvidence}/inspected-failed-world.json`);
   return {
     result: "passed",
@@ -84,26 +80,6 @@ async function verifyContactInspectionBrowser(page) {
     overlaysCleared: true,
     source,
   };
-}
-async function contactStyles(route) {
-  await route.fulfill({
-    contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
-  });
-}
-async function mountContactWorkspace() {
-  const { default: React } = await import("/@id/react");
-  const { default: ReactDOM } = await import("/@id/react-dom/client");
-  const { MemoryRouter } = await import("/@id/react-router");
-  const { default: Route } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  ReactDOM.createRoot(document.getElementById("root")).render(
-    React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(Route, { connection: { kind: "preview" } }),
-    ),
-  );
 }
 async function readContactReference(source) {
   const saved = await (await fetch(source)).json();

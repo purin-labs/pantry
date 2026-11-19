@@ -2182,10 +2182,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html?evidence"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It fetches its fixture by the absolute path of the main checkout (/Users/pta/Dev/lowerarchy/satyr/...). Vite in any other checkout answers with HTML.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 12.7,
+        "date": "2026-11-19",
+        "commit": "67ee2330d"
       }
     },
     {

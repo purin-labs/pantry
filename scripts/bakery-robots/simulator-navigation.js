@@ -339,6 +339,17 @@ async function previewStyles(route) {
   });
 }
 
+// Page code: physics diagnostics show only after showPhysicsEvidence(), which
+// the workflow preview calls for ?evidence. A journey that replaces the
+// preview entry (previewStyles) calls this before it mounts the simulator,
+// with portalSimulationSource().
+async function showPortalPhysicsEvidence(simulationSource) {
+  const { showPhysicsEvidence } = await import(
+    `${simulationSource}/runs/physics-evidence.ts`
+  );
+  showPhysicsEvidence();
+}
+
 // Page code: mounts the Portal's workflow simulator route with `connection`
 // ({ kind: "preview" }, { kind: "standalone" } or a "workspace"). A workspace
 // saves through window.saveRecipeCopy, which installRecipeMutation sets.
