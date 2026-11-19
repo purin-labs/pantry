@@ -5,7 +5,7 @@ import { bakeryRoom, type BakeryFloorPlanId } from "@seams/production-simulation
 import type { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 import type { StationId } from "@seams/bakery-model/bakery";
 import { sceneLabel } from "../scene-labels";
-import { loadBakeryStation } from "../bakery-assets";
+import { loadBakeryStation, stationFootprintModel } from "../bakery-assets";
 import { disposePhysicsObject } from "./physics-model";
 import { stations } from "@seams/production-simulation/recipes/bakery/schedule";
 import { bindOvenVisual, updateOvenVisual } from "../oven-visual";
@@ -158,11 +158,12 @@ export class RehearsalBakery {
     for (const station of stations) {
       const object = this.objects.get(station.id);
       if (object === undefined) continue;
+      const footprint = stationFootprintModel(object);
       items.push({
         id: `context:${station.id}`,
         label: station.label,
-        bounds: new THREE.Box3().setFromObject(object),
-        footprint: planFootprint([object]),
+        bounds: new THREE.Box3().setFromObject(footprint),
+        footprint: planFootprint([footprint]),
         selection: null,
         context: true,
         geometry: { kind: "visual-only" },

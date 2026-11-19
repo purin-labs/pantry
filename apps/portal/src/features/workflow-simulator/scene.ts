@@ -28,7 +28,7 @@ import {
   setLabelContent,
   type LabelSwatch,
 } from "./scene-labels";
-import { loadBakeryStation } from "./bakery-assets";
+import { loadBakeryStation, stationFootprintModel } from "./bakery-assets";
 import {
   setupBakeryLightingAndPost,
   type BakeryLightingRig,
@@ -1121,8 +1121,7 @@ export class BakeryScene {
       const id = item.id;
       const model = this.stationModels.get(id);
       if (model === undefined) continue;
-      const footprintModel =
-        model.getObjectByName("station_footprint") ?? model;
+      const footprintModel = stationFootprintModel(model);
       items.push({
         id,
         label: stationLabel(id),

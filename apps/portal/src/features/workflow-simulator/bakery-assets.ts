@@ -214,6 +214,17 @@ function buildGiftBoxPackingStation(): THREE.Group {
   return group;
 }
 
+const STATION_FOOTPRINT = "station_footprint";
+
+/**
+ * The part of a loaded station that its floor plan footprint measures. The
+ * 3D view and the recording plan both draw this part, so that one station has
+ * one size in every plan.
+ */
+export function stationFootprintModel(station: THREE.Object3D): THREE.Object3D {
+  return station.getObjectByName(STATION_FOOTPRINT) ?? station;
+}
+
 export async function loadBakeryStation(
   item: (typeof stations)[number],
 ): Promise<THREE.Group> {
@@ -223,7 +234,7 @@ export async function loadBakeryStation(
     const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
     const loader = new GLTFLoader();
     const footprintGroup = new THREE.Group();
-    footprintGroup.name = "station_footprint";
+    footprintGroup.name = STATION_FOOTPRINT;
     if (item.id === "bake") {
       const table = await loader.loadAsync(tableUrl);
       table.scene.position.set(0, 0, 0);
