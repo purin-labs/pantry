@@ -2,7 +2,7 @@ import type { StoredMessageAttachment } from "@seams/contracts";
 
 import type { DecodedVideoStill } from "./attachment-inspection";
 import type { WorkspaceExecutorDecodedFrame } from "../workspace-executor-container";
-import { sha256Hex } from "@seams/std";
+import { decodeBase64, sha256Hex } from "@seams/std";
 
 /**
  * Decoded stills as durable, content-addressed derived objects.
@@ -83,12 +83,12 @@ export async function persistDerivedStills(input: {
   const manifestFrames: DerivedStillsManifest["frames"][number][] = [];
 
   for (const [index, frame] of input.frames.entries()) {
-    const bytes = base64ToBytes(frame.jpegBase64);
+    const bytes = decodeBase64(frame.jpegBase64);
 
     // The executor named a digest; the bytes must still hash to it here, or
     // the frame is not written. A derived object never carries a claim its
     // bytes do not prove.
-    if ((await sha256Hex(bytes)) !== frame.sha256) {
+    if (bytes === null || (await sha256Hex(bytes)) !== frame.sha256) {
       throw new Error("derived_still_integrity_failed");
     }
 
@@ -231,15 +231,4 @@ function isManifest(value: unknown): value is DerivedStillsManifest {
       );
     })
   );
-}
-
-function base64ToBytes(encoded: string): Uint8Array {
-  const binary = atob(encoded);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-
-  return bytes;
 }
