@@ -38,6 +38,7 @@
 // A journey with run.server { args, ready } needs a fixture server of its
 // own: the runner starts `node args` (log journey-logs/<id>-server.log),
 // waits until GET ready answers, runs the journey, and then stops the server.
+// A server that loads TypeScript sources gives tool "tsx" (the --tsx command).
 //
 // CI runs its journeys through this index: set ci in the headless step and
 // set ci-browser in the browser step of .github/workflows/pantry.yml, so the
@@ -468,18 +469,19 @@ async function serveBuiltPortal() {
 
 // The fixture server of one journey; see run.server in the header.
 async function startServer(journey) {
-  const { args, ready } = journey.run.server;
+  const { args, ready, tool = "node" } = journey.run.server;
   if (await answers(ready))
     throw new Error(
       `${ready} answers before its server starts; stop the other server`,
     );
   const serverLog = join(logs, `${journey.id}-server.log`);
   const expanded = args.map((arg) => expand(arg, journey));
+  const command = tool === "tsx" ? tools.tsx : process.execPath;
   console.log(
-    `\njourneys: start the server of ${journey.id}: node ${expanded.join(" ")} > ${relative(root, serverLog)}`,
+    `\njourneys: start the server of ${journey.id}: ${tool} ${expanded.join(" ")} > ${relative(root, serverLog)}`,
   );
   const fd = openSync(serverLog, "w");
-  const server = spawn(process.execPath, expanded, {
+  const server = spawn(command, expanded, {
     cwd: root,
     stdio: ["ignore", fd, fd],
   });
@@ -578,9 +580,12 @@ function checkIndex(strict) {
       server !== undefined &&
       (!Array.isArray(server.args) ||
         !server.args.every((arg) => typeof arg === "string") ||
-        typeof server.ready !== "string")
+        typeof server.ready !== "string" ||
+        (server.tool !== undefined && !["node", "tsx"].includes(server.tool)))
     )
-      found.push(`${where}: run.server gives args (strings) and a ready URL`);
+      found.push(
+        `${where}: run.server gives args (strings), a ready URL and maybe tool node or tsx`,
+      );
     if (!STATUSES.includes(journey.status))
       found.push(`${where}: status is one of ${STATUSES.join(", ")}`);
     if (!strict) continue;

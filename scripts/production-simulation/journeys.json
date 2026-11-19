@@ -1750,7 +1750,16 @@
       "run": {
         "tool": "browser",
         "url": "/workflow-preview.html?fixture=http://127.0.0.1:5197",
-        "timeoutMs": 1500000
+        "timeoutMs": 1500000,
+        "server": {
+          "tool": "tsx",
+          "args": [
+            "scripts/production-simulation/serve-oven-authoring.mjs",
+            "{out}/fixture-storage",
+            "5197"
+          ],
+          "ready": "http://127.0.0.1:5197/fixture.json"
+        }
       },
       "status": "passes",
       "dir": "oven-authoring-browser",
