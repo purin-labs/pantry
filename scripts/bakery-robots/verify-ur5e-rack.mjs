@@ -45,6 +45,9 @@ for (const phase of ["lift", "transfer", "release"]) {
   assert.deepEqual(resumed.value, cycle.value);
   checkpoints.push(phase);
 }
+// Near the edge of its reach the arm swings a joint past its rated speed
+// before inverse kinematics fails, so the speed check (Refactor 16 step 7)
+// refuses the rack that is out of reach with "joint-speed".
 const rejected = {};
 for (const cell of ["blocked-rack", "unreachable-rack"]) {
   const input = prepare(`${cell}-request`, cell);
@@ -54,7 +57,7 @@ for (const cell of ["blocked-rack", "unreachable-rack"]) {
   assert.equal(result.value.racking.outcome.kind, "failed");
   assert.equal(
     result.value.racking.outcome.reason,
-    cell === "blocked-rack" ? "destination-blocked" : "unreachable",
+    cell === "blocked-rack" ? "destination-blocked" : "joint-speed",
   );
   rejected[cell] = result.value.racking.outcome;
 }
