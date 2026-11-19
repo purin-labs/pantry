@@ -1,9 +1,12 @@
 // Shared scheduler → Wasm loading/retrieval/racking → saved run → Three.js playback.
-const rackEvidence = "output/playwright/ur5e-ingredients-workflow-verified";
-const rackPlan =
-  "output/bakery-robots/ur5e-ingredients-scheduler-final/before-loading.json";
+// The plan is the UR5e chain that authored-continuation saved before loading;
+// the row opens the page with ?evidence=/@fs/<authored-continuation>.
+const rackEvidence = globalThis.bakeryEvidence;
 
 async function verifyUr5eRackBrowser(page) {
+  const rackPlan = `${new URL(page.url()).searchParams
+    .get("evidence")
+    .replace(/^\/@fs/u, "")}/before-loading.json`;
   await page.setViewportSize({ width: 1600, height: 1100 });
   await openRobotRehearsal(page);
   await editInputs(page);

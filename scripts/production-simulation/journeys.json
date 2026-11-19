@@ -1091,9 +1091,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 5,
-        "date": "2026-11-17",
-        "commit": "7cf65aa77"
+        "seconds": 4.4,
+        "date": "2026-11-19",
+        "commit": "d46b154b7"
       }
     },
     {
@@ -1444,12 +1444,14 @@
       "owner": "Plan 42B",
       "run": {
         "tool": "browser",
-        "url": "/workflow-preview.html"
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:authored-continuation}",
+        "prerequisites": ["{out:authored-continuation}/before-loading.json"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads output/bakery-robots/ur5e-ingredients-scheduler-final/before-loading.json, which no journey in the index writes.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 13.2,
+        "date": "2026-11-19",
+        "commit": "d46b154b7"
       }
     },
     {
@@ -1603,12 +1605,13 @@
       "owner": "Plan 42B",
       "run": {
         "tool": "tsx",
-        "args": ["{out:ur5e-rack-browser}", "{out:ur5e-rack}"]
+        "args": ["{out:ur5e-rack-browser}", "{out:authored-continuation}"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads the output of ur5e-rack-browser, which fails.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.5,
+        "date": "2026-11-19",
+        "commit": "d46b154b7"
       }
     },
     {
