@@ -1189,10 +1189,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Departing page draft' field does not become visible in 30 s. The journey's path to it is out of date.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 17.5,
+        "date": "2026-11-19",
+        "commit": "b1505e14f"
       }
     },
     {

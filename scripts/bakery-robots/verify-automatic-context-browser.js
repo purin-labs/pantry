@@ -264,23 +264,33 @@ async function mountAutomaticContext() {
         return Response.json({ ok: true, snapshots: [], nextCursor: null });
       return original(input, init);
     },
+    // As listPendingBakerySurfaceEffects does: a preparation goes to the
+    // browser and conversation it names, and the later effects of the request
+    // go to the browser that prepared Kitchen for that conversation.
     matchesDelivery(url, pending) {
       const command = pending.effect.command;
-      return command.kind === "prepare_context"
-        ? command.binding.browserInstanceId ===
-            url.searchParams.get("browserInstanceId") &&
-            command.binding.conversationId ===
-              url.searchParams.get("conversationId")
-        : command.target.surfaceSessionId ===
-            url.searchParams.get("surfaceSessionId");
+      const binding =
+        command.kind === "prepare_context"
+          ? command.binding
+          : {
+              browserInstanceId: this.browserInstanceId,
+              conversationId: "chat_automatic_browser",
+            };
+      return (
+        binding.browserInstanceId ===
+          url.searchParams.get("browserInstanceId") &&
+        binding.conversationId === url.searchParams.get("conversationId")
+      );
     },
     keepPending(effectId, pending) {
       return pending.effect.effectId !== effectId;
     },
   };
   window.automaticContextAcceptance = fixture;
+  // Chrome does not show a cookie with Path=/workflow-preview.html to this
+  // page, whose document began at /@vite/client; the dev origin is a test one.
   document.cookie =
-    "satyr_control_csrf=automatic-fixture; Path=/workflow-preview.html; SameSite=Strict";
+    "satyr_control_csrf=automatic-fixture; Path=/; SameSite=Strict";
   window.fetch = fixture.transport.bind(fixture, window.fetch.bind(window));
   document.getElementById("root").remove();
   const host = document.createElement("div");
@@ -295,9 +305,14 @@ async function mountAutomaticContext() {
     }
     render() {
       const timeline = fixture.contexts.map(this.contextEvent);
+      // The fields that ChatContextChip reads; the chat parser gives an
+      // unplaced chat placement null.
       const chat = {
+        conversationId: "chat_automatic_browser",
         work: { kind: "running", requestId: "automatic_request" },
         timeline,
+        placement: null,
+        projectContext: null,
       };
       return React.createElement(
         MemoryRouter,
@@ -359,8 +374,8 @@ async function mountAutomaticContext() {
                 area: "CafeOS",
                 view: "Purchasing",
               },
-              bakery: "included",
               conversation: chat,
+              projects: null,
             }),
             React.createElement(
               "label",
