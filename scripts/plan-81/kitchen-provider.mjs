@@ -64,9 +64,9 @@ const REVIEW_ANSWER =
 const LAYOUT_ANSWER =
   "I selected Cooling, turned the cooling rack a quarter turn and opened the oven-outage comparison.";
 const FLOOR_PLAN =
-  "Switch the floor plan to Kinshicho, apply the Parisian Noix interior, open the rear corridor door, move the cooling rack to (100, -200) mm at 45 degrees and undo that angle.";
+  "Switch the floor plan to Kinshicho, apply the Parisian Noix interior, open the toilet door, move the cooling rack to (100, -200) mm at 45 degrees and undo that angle.";
 const FLOOR_PLAN_ANSWER =
-  "I switched to Kinshicho, applied the Parisian Noix interior, opened the rear corridor door, moved the cooling rack to (100, -200) mm, turned it to 45 degrees and undid the angle.";
+  "I switched to Kinshicho, applied the Parisian Noix interior, opened the toilet door, moved the cooling rack to (100, -200) mm, turned it to 45 degrees and undid the angle.";
 const FLOOR_PLAN_RESET = "Reset the floor plan to its initial layout.";
 const FLOOR_PLAN_RESET_ANSWER = "I reset the floor plan to its initial layout.";
 const MEMBER_FLOOR_PLAN = "As a member, switch the floor plan to Kinshicho.";
@@ -834,7 +834,7 @@ const SCRIPTS = [
     steps: [
       {
         tool: "bakery_surface_select_floor_plan",
-        args: () => ({ floorPlan: "kinshicho-61146" }),
+        args: () => ({ floorPlan: "kinshicho-6992842011" }),
       },
       {
         tool: "bakery_surface_configure_interior",
@@ -844,7 +844,7 @@ const SCRIPTS = [
       },
       {
         tool: "bakery_surface_toggle_opening",
-        args: () => ({ openingId: "door:door-corridor-access", open: true }),
+        args: () => ({ openingId: "door:door-toilet", open: true }),
       },
       {
         tool: "bakery_surface_move_equipment",

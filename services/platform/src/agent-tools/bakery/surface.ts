@@ -1605,7 +1605,7 @@ export const surfaceMoveEquipment = defineTool({
 export const surfaceToggleOpening = defineTool({
   name: "bakery_surface_toggle_opening",
   description:
-    "Open or close a door or window on the attached Kitchen floor plan. openingId is an id from layout.openings in the attached shift (for example 'door:door-corridor-access'). Walk routes and the shift schedule recalculate from the updated door state.",
+    "Open or close a door or window on the attached Kitchen floor plan. openingId is an id from layout.openings in the attached shift (for example 'door:door-toilet'). Walk routes and the shift schedule recalculate from the updated door state.",
   input: jsonSchema({
     type: "object",
     properties: {
@@ -1639,7 +1639,7 @@ export const surfaceToggleOpening = defineTool({
 export const surfaceSelectFloorPlan = defineTool({
   name: "bakery_surface_select_floor_plan",
   description:
-    "Switch the active room floor plan in the attached Kitchen shift ('asakusabashi-t101940', 'kinshicho-61146', 'machiya-sun-reve', 'hongo-8257562' or 'reference'). Walk times and the shift schedule recalculate for the selected room.",
+    "Switch the active room floor plan in the attached Kitchen shift ('asakusabashi-t101940', 'kinshicho-6992842011', 'machiya-sun-reve', 'hongo-8257562' or 'reference'). Walk times and the shift schedule recalculate for the selected room.",
   input: jsonSchema({
     type: "object",
     properties: {
@@ -1647,7 +1647,7 @@ export const surfaceSelectFloorPlan = defineTool({
         type: "string",
         enum: [
           "asakusabashi-t101940",
-          "kinshicho-61146",
+          "kinshicho-6992842011",
           "machiya-sun-reve",
           "hongo-8257562",
           "reference",
@@ -2444,7 +2444,7 @@ export function parseBakerySurfaceToolRequest(
       typeof input.floorPlan !== "string" ||
       ![
         "asakusabashi-t101940",
-        "kinshicho-61146",
+        "kinshicho-6992842011",
         "machiya-sun-reve",
         "hongo-8257562",
         "reference",

@@ -3585,7 +3585,7 @@ function floorPlanCoordinateMm(value: unknown): value is number {
 
 const FLOOR_PLAN_IDS: ReadonlySet<unknown> = new Set([
   "asakusabashi-t101940",
-  "kinshicho-61146",
+  "kinshicho-6992842011",
   "machiya-sun-reve",
   "hongo-8257562",
   "reference",
