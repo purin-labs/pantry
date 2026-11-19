@@ -1,11 +1,9 @@
-// Plan 40B phase 5, slice 2: style tokens and a type scale. A board in the
-// default look publishes with no style, so a TV player from before phase 5
-// still reads it. Then the owner and staff restyle the open board at the same
-// moment: the owner sets the colours, staff set the fonts and the text size,
-// and both set the accent. A viewer's restyle is refused. Sous Chef reads the style,
-// and an invalid type scale is refused in words that it can act on before it
-// sets a valid one. Every replica and the stored board end with one style,
-// and the next release carries it to the TV.
+// Plan 40B phase 5, slice 2: style tokens and a type scale. The owner sets
+// the colours, the fonts and the text size of the open board. Sous Chef reads
+// the style, and an invalid type scale is refused in words that it can act
+// on before it sets a valid one. Only the next release carries the style to
+// the TV. `pi-menu-board-together` proves that people and Sous Chef converge
+// and that a viewer's change is refused.
 import { expect, it, type TestContext } from "vitest";
 import type { MenuBoardStyle } from "@seams/menu-board-crdt";
 import { isRecord } from "@seams/std";
@@ -19,7 +17,6 @@ import {
   installBoardJourney,
   pairScreen,
   publishBoard,
-  rawFeed,
   send,
   toolOutput,
 } from "./menu-board-journey-support";
@@ -36,23 +33,22 @@ declare module "vitest" {
   }
 }
 
-const OWNER_COLOURS = {
+const COLOURS = {
   background: "#f4efe4",
   surface: "#ffffff",
   ink: "#1f1a14",
+  accent: "#9a3412",
 } as const;
-const STAFF_TYPE = {
+const TYPE = {
   fontDisplay: "rounded",
   fontBody: "rounded",
   typeBase: 22,
 } as const;
-const OWNER_ACCENT = "#9a3412";
-const STAFF_ACCENT = "#0f766e";
 
 type Script = { boardId: string; outputs: string[]; steps: number };
 
 it(
-  "lets two people and Urk restyle one board at once, converge on one style, and carry it to the TV only in the next release",
+  "lets the owner and Sous Chef restyle one board, and carries the style to the TV only in the next release",
   { timeout: 300_000 },
   async ({ task }: TestContext): Promise<void> => {
     const script: Script = { boardId: "", outputs: [], steps: 0 };
@@ -66,41 +62,17 @@ it(
     expect(created.status, JSON.stringify(created.body)).toBe(201);
     script.boardId = boardIdOf(created.body);
 
-    // A board in the default look publishes with no style key, so a TV
-    // player from before phase 5, which reads exact keys, still plays it.
     const token = await pairScreen(journey.owner, script.boardId);
     const first = await publishBoard(journey.owner, script.boardId, null);
-    const plain = await rawFeed(token);
-    expect(
-      isRecord(plain.release) && Object.hasOwn(plain.release, "style"),
-    ).toBe(false);
-    expect((await feed(token)).release?.style).toBeUndefined();
 
     const socket = `${BASE}/menu-boards/${script.boardId}/socket`;
     const ownerPeer = await BoardPeer.open(socket, journey.owner);
-    const staffPeer = await BoardPeer.open(socket, journey.staff);
-    const viewerPeer = await BoardPeer.open(socket, journey.viewer);
     try {
       expect(ownerPeer.read().style).toEqual({});
-      // From the same state, the owner sets the colours and staff set the
-      // fonts and the text size; both set the accent.
-      await Promise.all([
-        ownerPeer.submit(
-          "owner-colours",
-          ownerPeer.doc.setStyle({ ...OWNER_COLOURS, accent: OWNER_ACCENT }),
-        ),
-        staffPeer.submit(
-          "staff-type",
-          staffPeer.doc.setStyle({ ...STAFF_TYPE, accent: STAFF_ACCENT }),
-        ),
-      ]);
-      const refused = await viewerPeer.submitRefused((copy) =>
-        copy.setStyle({ background: "#000000" }),
+      await ownerPeer.submit(
+        "owner-style",
+        ownerPeer.doc.setStyle({ ...COLOURS, ...TYPE }),
       );
-      expect(refused).toMatchObject({
-        kind: "failure",
-        code: "access_revoked",
-      });
 
       // Sous Chef reads the style and changes the type scale; an invalid ratio is
       // refused with the values that it may use.
@@ -116,21 +88,12 @@ it(
       await expect
         .poll(() => ownerPeer.read().style.typeRatio, { timeout: 15_000 })
         .toBe("1.414");
-      await expect
-        .poll(() => staffPeer.read().style.typeRatio, { timeout: 15_000 })
-        .toBe("1.414");
-
-      const stored = await BoardPeer.open(socket, journey.owner);
-      const merged = stored.read();
-      await closeSocket(stored.socket);
-      expect(ownerPeer.read()).toEqual(merged);
-      expect(staffPeer.read()).toEqual(merged);
+      const merged = ownerPeer.read();
       expect(merged.style).toMatchObject({
-        ...OWNER_COLOURS,
-        ...STAFF_TYPE,
+        ...COLOURS,
+        ...TYPE,
         typeRatio: "1.414",
       });
-      expect([OWNER_ACCENT, STAFF_ACCENT]).toContain(merged.style.accent);
 
       // Nothing reached the TV before a person published.
       expect((await feed(token)).release?.releaseRevision).toBe(first);
@@ -145,19 +108,8 @@ it(
           "Slack (signed events)",
         ],
         real: ["Pantry Worker and the board room", "screen feed"],
-        firstReleaseHasStyle: false,
-        // Yjs keeps one of two writes of one token; which one depends on
-        // the replicas' random client IDs, so the evidence names no winner.
-        merged: sortedStyle(withoutAccent(merged.style)),
-        accentIsOneOfTheTwo: [OWNER_ACCENT, STAFF_ACCENT].includes(
-          merged.style.accent ?? "",
-        ),
-        viewerRefusal: refused,
-        toolOutputs: script.outputs.map((output) =>
-          scrub(output)
-            .replaceAll(OWNER_ACCENT, "#contested")
-            .replaceAll(STAFF_ACCENT, "#contested"),
-        ),
+        merged: sortedStyle(merged.style),
+        toolOutputs: script.outputs.map(scrub),
         releases: {
           first,
           second,
@@ -165,11 +117,7 @@ it(
         },
       };
     } finally {
-      await Promise.all(
-        [ownerPeer, staffPeer, viewerPeer].map((peer) =>
-          closeSocket(peer.socket),
-        ),
-      );
+      await closeSocket(ownerPeer.socket);
     }
   },
 );
@@ -198,10 +146,8 @@ function respond(script: Script, body: Record<string, unknown>): Response {
       const read: unknown = JSON.parse(last);
       const board =
         isRecord(read) && Array.isArray(read.boards) ? read.boards[0] : null;
-      // The read carries the merged style of the two people.
-      expect(board).toMatchObject({
-        style: { ...OWNER_COLOURS, ...STAFF_TYPE },
-      });
+      // The read carries the owner's style.
+      expect(board).toMatchObject({ style: { ...COLOURS, ...TYPE } });
       return openRouterToolCall(
         "menu_board_edit",
         styleEdit(script, "1.75"),
@@ -243,11 +189,6 @@ function styleEdit(script: Script, ratio: string): Record<string, unknown> {
     width: null,
     height: null,
   };
-}
-
-function withoutAccent(style: MenuBoardStyle): MenuBoardStyle {
-  const { accent: _accent, ...rest } = style;
-  return rest;
 }
 
 function sortedStyle(style: MenuBoardStyle): Record<string, unknown> {

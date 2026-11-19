@@ -1,7 +1,4 @@
-import type {
-  CollaborationAgentActivity,
-  CollaborationPointerPosition,
-} from "@seams/collaboration";
+import type { CollaborationPointerPosition } from "@seams/collaboration";
 import {
   CostsSheetDoc,
   type CostsSheetCellChange,
@@ -23,9 +20,7 @@ import { closeSocket } from "./hibernatable-socket-support";
 export class CostsSheetRoomClient {
   readonly doc = CostsSheetDoc.create();
   readonly failures: string[] = [];
-  readonly agentFrames: (readonly CollaborationAgentActivity[])[] = [];
   participants: readonly CostsSheetParticipant[] = [];
-  agents: readonly CollaborationAgentActivity[] = [];
   sessionId: string | null = null;
   private readonly receive = this.onMessage.bind(this);
 
@@ -150,8 +145,6 @@ export class CostsSheetRoomClient {
         return;
       case "presence_changed":
         this.participants = message.participants;
-        this.agents = message.agents;
-        this.agentFrames.push(message.agents);
         return;
       case "update_accepted":
         return;

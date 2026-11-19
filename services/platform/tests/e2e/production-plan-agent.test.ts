@@ -2,7 +2,6 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import {
   newConversationId,
-  newProjectId,
   parseInventoryProductionPlanResult,
 } from "@seams/control-api";
 import { isRecord } from "@seams/std";
@@ -24,6 +23,7 @@ import {
   workKind,
 } from "./memory-support";
 import { network } from "./network";
+import { fixtureDatabase } from "./organisation-database";
 import { allowAsPortal, readRequest } from "./permission-request-support";
 import {
   LOCATION,
@@ -47,25 +47,30 @@ declare module "vitest" {
 }
 
 /**
- * Plan 40D Phase B2. The owner shares a Project chat with the café's plan;
- * a private chat cannot be shared. The owner asks that chat to plan the café's
- * production. Nobody may read production requests yet, so the agent asks for
- * that read and for the plan edit in one prompt. Every role sees the shared
- * plan, so the prompt asks for the read for each role. While the chat waits, an
- * administrator changes a third line in the shared plan. The owner allows the
- * prompt; the agent reads the plan and changes two lines, and the
+ * Plan 40D Phase B2, in the order an owner meets it. The owner asks a new,
+ * private chat to plan the café's production. Nobody may read production
+ * requests yet, so the agent asks for that read and for the plan edit in one
+ * prompt. Every role sees the shared plan, so the prompt asks for the read for
+ * each role. While the chat waits, an administrator changes a third line in
+ * the shared plan. The owner allows the prompt; the agent reads the plan, and
+ * its edit is refused, because the chat is not shared with the plan. A private
+ * chat cannot be shared with the plan, so the owner shares the chat in the
+ * Base Project and then with the plan, and asks again. The chat's private first
+ * turn may not keep it from the plan: the agent changes two lines, and the
  * administrator's page shows the agent's named cursor on each line. The owner
  * then accepts the plan, and Commerce holds every planned quantity.
  */
 it(
-  "lets a Portal chat agent ask to read production requests, plan two lines with its named cursor while a person plans a third, and the owner accepts the result",
+  "lets a Portal chat agent ask to read production requests, refuses its edit while the chat is private, then plans two lines with its named cursor while a person plans a third, and the owner accepts the result",
   { timeout: 240_000 },
   productionPlanAgentJourney,
 );
 
 const MERCHANT_ID = "merchant_bakery_c3_plan_agent";
 const QUESTION = `Plan today's production for ${LOCATION}.`;
+const AGAIN = "The chat is shared with the plan now. Please plan it again.";
 const ASKED = "I asked for permission to plan production.";
+const REFUSED = "This chat is not shared with the plan, so I changed nothing.";
 const ANSWER = "I planned two lines. Review the plan and accept it.";
 
 type Recorded = {
@@ -129,60 +134,9 @@ async function productionPlanAgentJourney({
   const conversationId = newConversationId();
   await createConversation(author, conversationId, route);
 
-  // 0. The owner shares the chat with the plan. A private chat names only
-  //    its person, so the plan refuses it until the chat is in a shared
-  //    Project with the administrator.
-  const sharePath = `/v1/control/organisations/${author.organisationId}/commerce/inventory/production-plan/${LOCATION}/share`;
-  const privateShare = await postJson(author, sharePath, { conversationId });
-  expect(privateShare).toMatchObject({
-    status: 409,
-    body: { error: "production_plan_chat_private" },
-  });
-  const projectId = newProjectId();
-  const created = await postJson(author, paths.projects, {
-    kind: "create_project",
-    operationId: crypto.randomUUID(),
-    projectId,
-    content: { name: "Café plan", brief: "", references: [] },
-  });
-  expect(created.status, JSON.stringify(created.body)).toBe(200);
-  const projectShared = await postJson(
-    author,
-    `${paths.projects}/${projectId}/access`,
-    {
-      kind: "share_project",
-      operationId: crypto.randomUUID(),
-      expectedAccessRevision: 0,
-      members: [{ userId: reviewer.userId, role: "editor" }],
-    },
-  );
-  expect(projectShared.body, JSON.stringify(projectShared.body)).toMatchObject({
-    kind: "accepted",
-  });
-  const stored = await storedConversation(author, conversationId);
-  const chatShared = await postJson(
-    author,
-    `${paths.chat}/conversations/${conversationId}/access`,
-    {
-      kind: "share_conversation",
-      operationId: crypto.randomUUID(),
-      expectedRevision: stored?.revision,
-      projectId,
-      expectedProjectAccessRevision: 1,
-    },
-  );
-  expect(chatShared.body, JSON.stringify(chatShared.body)).toMatchObject({
-    kind: "accepted",
-  });
-  const planShared = await postJson(author, sharePath, { conversationId });
-  expect(planShared).toMatchObject({
-    status: 200,
-    body: { sharing: { kind: "portal_chat", conversationId } },
-  });
-
   await ask(author, paths.chat, conversationId, route.model, QUESTION, "plan");
 
-  // 1. The agent asks for the read and the edit in one prompt.
+  // 1. The private chat asks for the read and the edit in one prompt.
   const pause = await pausedRequest(author, paths.chat, conversationId);
   const request = await readRequest(
     author.organisationId,
@@ -192,54 +146,25 @@ async function productionPlanAgentJourney({
   expect(request).toMatchObject({ status: "pending", origin: "portal_chat" });
   expect(request.items).toEqual(
     expect.arrayContaining([
-      expect.objectContaining({
-        itemId: "commerce.entity.read:production_requests:owner",
-        label: "Read production requests",
-        granted: false,
-        grant: expect.objectContaining({
-          subjectLabel: "Owners",
-          target: expect.objectContaining({
-            kind: "commerce_list",
-            listId: "production_requests",
+      ...[
+        ["owner", "Owners"],
+        ["admin", "Admins"],
+        ["operator", "Operators"],
+        ["viewer", "Viewers"],
+      ].map(([role, subjectLabel]) =>
+        expect.objectContaining({
+          itemId: `commerce.entity.read:production_requests:${role}`,
+          label: "Read production requests",
+          granted: false,
+          grant: expect.objectContaining({
+            subjectLabel,
+            target: expect.objectContaining({
+              kind: "commerce_list",
+              listId: "production_requests",
+            }),
           }),
         }),
-      }),
-      expect.objectContaining({
-        itemId: "commerce.entity.read:production_requests:admin",
-        label: "Read production requests",
-        granted: false,
-        grant: expect.objectContaining({
-          subjectLabel: "Admins",
-          target: expect.objectContaining({
-            kind: "commerce_list",
-            listId: "production_requests",
-          }),
-        }),
-      }),
-      expect.objectContaining({
-        itemId: "commerce.entity.read:production_requests:operator",
-        label: "Read production requests",
-        granted: false,
-        grant: expect.objectContaining({
-          subjectLabel: "Operators",
-          target: expect.objectContaining({
-            kind: "commerce_list",
-            listId: "production_requests",
-          }),
-        }),
-      }),
-      expect.objectContaining({
-        itemId: "commerce.entity.read:production_requests:viewer",
-        label: "Read production requests",
-        granted: false,
-        grant: expect.objectContaining({
-          subjectLabel: "Viewers",
-          target: expect.objectContaining({
-            kind: "commerce_list",
-            listId: "production_requests",
-          }),
-        }),
-      }),
+      ),
       expect.objectContaining({
         capabilityId: "commerce.production_plan.edit",
         granted: false,
@@ -250,7 +175,8 @@ async function productionPlanAgentJourney({
   // 2. While the chat waits, the administrator plans the third line.
   await page.submit("person-third", page.set(third, "40"));
 
-  // 3. The owner allows it in place; the agent reads the plan and edits it.
+  // 3. The owner allows it in place. The private chat reads the plan, but
+  //    its edit is refused.
   const allowed = await allowAsPortal(
     author.organisationId,
     author.session,
@@ -267,7 +193,6 @@ async function productionPlanAgentJourney({
   await expect
     .poll(workKind.bind(null, author, conversationId), { timeout: 60_000 })
     .toBe("ready");
-  expect(await answers(author, conversationId)).toEqual([ANSWER]);
   // The agent saw the person's line and the requests' quantities.
   expect(recorded.planRead).toContain(third);
   // Each line names its product, so the agent can match it to orders.
@@ -275,11 +200,64 @@ async function productionPlanAgentJourney({
   expect(recorded.planRead.replaceAll("\\", "")).toContain(
     '"plannedQuantity":"40"',
   );
+  expect(recorded.editOutputs[0]).toContain(
+    "not shared with this location's plan",
+  );
+  expect(await page.lines()).toEqual({ [third]: "40" });
+
+  // 4. The owner shares the chat with the plan. A private chat names only
+  //    its person, so the plan refuses it until the chat is in a Project.
+  //    The owner shares the chat in the workspace's Base Project, whose
+  //    readers may read the chat's private first turn.
+  const sharePath = `/v1/control/organisations/${author.organisationId}/commerce/inventory/production-plan/${LOCATION}/share`;
+  const privateShare = await postJson(author, sharePath, { conversationId });
+  expect(privateShare).toMatchObject({
+    status: 409,
+    body: { error: "production_plan_chat_private" },
+  });
+  const base = await fixtureDatabase()
+    .prepare(
+      `SELECT project.project_id AS projectId, project.access_revision AS accessRevision
+       FROM organisation_default_project AS d
+       JOIN project ON project.organisation_id = d.organisation_id
+        AND project.project_id = d.project_id
+      WHERE d.organisation_id = ?`,
+    )
+    .bind(author.organisationId)
+    .first<{ projectId: string; accessRevision: number }>();
+  if (base === null) throw new Error("Base Project missing");
+  const stored = await storedConversation(author, conversationId);
+  const chatShared = await postJson(
+    author,
+    `${paths.chat}/conversations/${conversationId}/access`,
+    {
+      kind: "share_conversation",
+      operationId: crypto.randomUUID(),
+      expectedRevision: stored?.revision,
+      projectId: base.projectId,
+      expectedProjectAccessRevision: base.accessRevision,
+    },
+  );
+  expect(chatShared.body, JSON.stringify(chatShared.body)).toMatchObject({
+    kind: "accepted",
+  });
+  const planShared = await postJson(author, sharePath, { conversationId });
+  expect(planShared).toMatchObject({
+    status: 200,
+    body: { sharing: { kind: "portal_chat", conversationId } },
+  });
+
+  // 5. The owner asks again in the same chat. The agent changes two lines,
+  //    and the administrator's page shows its named cursor on each line.
+  await ask(author, paths.chat, conversationId, route.model, AGAIN, "again");
+  await expect
+    .poll(workKind.bind(null, author, conversationId), { timeout: 60_000 })
+    .toBe("ready");
+  expect(await answers(author, conversationId)).toEqual([REFUSED, ANSWER]);
   const planned = { [first]: "48", [second]: "36", [third]: "40" };
   await expect
     .poll(() => page.lines(), { message: recorded.editOutputs.join("\n") })
     .toEqual(planned);
-  // The page showed the agent's named cursor on each line it changed.
   const targets = page.agentFrames.flatMap((frame) =>
     frame.map((activity) => activity.target),
   );
@@ -288,7 +266,7 @@ async function productionPlanAgentJourney({
     .poll(() => page.agentFrames.at(-1), { timeout: 15_000 })
     .toEqual([]);
 
-  // 4. The owner accepts the plan that the page shows.
+  // 6. The owner accepts the plan that the page shows.
   const accepted = parseInventoryProductionPlanResult(
     await shop.write(planPath("accept"), {
       kind: "accept_plan",
@@ -317,6 +295,7 @@ async function productionPlanAgentJourney({
     privateChatShare: privateShare,
     planShare: planShared.body,
     permissionRequest: request,
+    privateEdit: recorded.editOutputs[0],
     toolsAtTurnStart: recorded.turns,
     agentEdits: recorded.edits,
     personLine: { [third]: "40" },
@@ -331,6 +310,7 @@ async function productionPlanAgentJourney({
 /**
  * Answers each model request from the conversation so far. The first turn
  * asks for what the turn lacks; after the owner allows it, the agent reads
+ * the plan and tries one line. After the owner asks again, the agent reads
  * the plan, changes two lines and answers.
  */
 async function replyToModel(
@@ -382,7 +362,12 @@ async function replyToModel(
       return editLine(recorded, edits[0], "48", id);
     case "production_plan_edit":
       recorded.editOutputs.push(output);
-      return recorded.edits.length === 1
+      if (recorded.editOutputs.length === 1)
+        return openRouterText(
+          JSON.stringify({ kind: "reply", text: REFUSED }),
+          id,
+        );
+      return recorded.editOutputs.length === 2
         ? editLine(recorded, edits[1], "36", id)
         : openRouterText(JSON.stringify({ kind: "reply", text: ANSWER }), id);
     default:

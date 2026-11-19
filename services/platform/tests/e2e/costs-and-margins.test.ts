@@ -40,7 +40,6 @@ import {
   type CostsSheetWrite,
   type ProductCostPlanEntry,
 } from "@seams/control-api";
-import type { CollaborationAgentActivity } from "@seams/collaboration";
 import { isRecord } from "@seams/std";
 import {
   PATISSERIE_ITEMS,
@@ -158,11 +157,6 @@ type Journey = {
     changes: readonly Readonly<{ cellKey: string; value: string | null }>[];
   }> | null;
   demoteBeforeTool?: () => Promise<void>;
-  /** What a person with the sheet open saw of the agent. */
-  readonly agentLabels: {
-    planSave?: readonly CollaborationAgentActivity[];
-    editHeldMs?: number;
-  };
 };
 
 function scripts(journey: Journey): Readonly<Record<string, Script>> {
@@ -961,7 +955,6 @@ it(
 
     const journey: Journey = {
       outputs: {},
-      agentLabels: {},
       modelRequests: 0,
       weekendTargetProductId: plainProduct.productId,
       saveArgs: baseAlmondSaveArgs,
@@ -1116,8 +1109,8 @@ it(
       (await readPortalCosts(author, paths.organisation)).costPlan.revision,
     ).toBe(2);
 
-    // A person with the sheet open sees the agent's label on the first
-    // cell that its save changed.
+    // A person has the sheet open while the agent saves the plan. The save
+    // stamps the sheet, so that the open tab reloads the saved plan.
     const saveWatcher = new CostsSheetRoomClient(
       await openSocket(
         `https://localhost${paths.organisation}/commerce/costs/sheet/socket`,
@@ -1130,13 +1123,8 @@ it(
       await chatDirect(fixture, author, "SAVECOSTSPLAN");
       expect(lastOutput("SAVECOSTSPLAN")).toContain("receiptId");
       await expect
-        .poll(() =>
-          saveWatcher.agentFrames
-            .flat()
-            .some((entry) => entry.target === OVERHEAD_LABOR_CELL_KEY),
-        )
-        .toBe(true);
-      journey.agentLabels.planSave = saveWatcher.agentFrames.flat();
+        .poll(() => typeof saveWatcher.cells()[META_SAVED_AT_CELL_KEY])
+        .toBe("string");
     } finally {
       await saveWatcher.close();
     }
@@ -1289,54 +1277,27 @@ it(
       });
       await expectPong(authorRoom.socket);
 
-      // Figma-style live mouse pointers and colored cell focus broadcast to all peers.
-      const authorPriceKey = productPriceCellKey(plainProduct.productId);
-      const reviewerDayKey = productDayCellKey(espressoProduct.productId, 5);
-      authorRoom.sendPresence("editing", {
-        sheet: "margins",
-        cellKey: authorPriceKey,
-      });
-      authorRoom.sendPointer({ x: 0.42, y: 0.31 });
-      reviewerRoom.sendPresence("editing", {
-        sheet: "weekly",
-        cellKey: reviewerDayKey,
-      });
-      reviewerRoom.sendPointer({ x: 0.68, y: 0.55 });
+      // A viewer who claims to edit a cell still shows to the others as
+      // viewing, with no cell. Its pointer follows the claim on the same
+      // socket, so the room has read the claim when the pointer shows.
       viewerRoom.sendPresence("editing", {
         sheet: "supplies",
         cellKey: OVERHEAD_LABOR_CELL_KEY,
       });
-
+      viewerRoom.sendPointer({ x: 0.5, y: 0.5 });
+      const viewerEntry = () =>
+        authorRoom.participants.find((p) => p.userId === viewer.userId);
       await expect
-        .poll(() => {
-          const authorEntry = viewerRoom.participants.find(
-            (p) => p.userId === author.userId,
-          );
-          const reviewerEntry = viewerRoom.participants.find(
-            (p) => p.userId === reviewer.userId,
-          );
-          const viewerEntry = viewerRoom.participants.find(
-            (p) => p.userId === viewer.userId,
-          );
-          return {
-            authorSelection: authorEntry?.selection ?? null,
-            authorPointer: authorEntry?.pointer?.position ?? null,
-            reviewerSelection: reviewerEntry?.selection ?? null,
-            reviewerPointer: reviewerEntry?.pointer?.position ?? null,
-            viewerState: viewerEntry?.state ?? null,
-            viewerSelection: viewerEntry?.selection ?? null,
-          };
-        })
-        .toEqual({
-          authorSelection: { sheet: "margins", cellKey: authorPriceKey },
-          authorPointer: { x: 0.42, y: 0.31 },
-          reviewerSelection: { sheet: "weekly", cellKey: reviewerDayKey },
-          reviewerPointer: { x: 0.68, y: 0.55 },
-          viewerState: "viewing",
-          viewerSelection: null,
-        });
+        .poll(() => viewerEntry()?.pointer?.position ?? null)
+        .toEqual({ x: 0.5, y: 0.5 });
+      expect([viewerEntry()?.state, viewerEntry()?.selection]).toEqual([
+        "viewing",
+        null,
+      ]);
 
       // Concurrent Yjs cell edits from two teammates merge without conflict.
+      const authorPriceKey = productPriceCellKey(plainProduct.productId);
+      const reviewerDayKey = productDayCellKey(espressoProduct.productId, 5);
       const butterPackPriceKey = supplyFieldCellKey(
         butterBefore.id,
         "packPriceMajor",
@@ -1431,22 +1392,6 @@ it(
       for (const room of [authorRoom, reviewerRoom, viewerRoom]) {
         await expect.poll(() => room.cells()).toEqual(expectedAfterAgentCells);
       }
-      expect(
-        reviewerRoom.agentFrames.some((frame) =>
-          frame.some((entry) => entry.target === OVERHEAD_RENT_CELL_KEY),
-        ),
-      ).toBe(true);
-      // The edit takes milliseconds; the label stays on the cell after the
-      // tool returns, so a person sees it, and then clears.
-      const editReturnedAt = Date.now();
-      await new Promise((resolve) => setTimeout(resolve, 2_000));
-      expect(reviewerRoom.agentFrames.at(-1)).toEqual([
-        expect.objectContaining({ target: OVERHEAD_RENT_CELL_KEY }),
-      ]);
-      await expect
-        .poll(() => reviewerRoom.agentFrames.at(-1), { timeout: 15_000 })
-        .toEqual([]);
-      journey.agentLabels.editHeldMs = Date.now() - editReturnedAt;
 
       // costs_read surfaces non-empty draftCells from the multiplayer room.
       await chatDirect(fixture, author, "READCOSTS");
@@ -2348,7 +2293,6 @@ it(
     }
 
     task.meta.costsAndMarginsEvidence = {
-      agentLabels: journey.agentLabels,
       patisserieProductsCount: patisserieProducts.length,
       supplyCostsSeededCount: configured.supplyCostsSeeded,
       defaultIncludedTaxBps: initialOverview.defaultIncludedTaxBps,

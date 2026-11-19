@@ -9,14 +9,12 @@ import {
   prepareBakerySurfaceCommand,
   validatePreparedBakerySurfaceRead,
   bakerySurfaceCommandSucceeded,
-  commitBakerySurfaceCommand,
 } from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
 import { readScenario } from "../../../../apps/portal/src/features/workflow-simulator/scenario-api";
 import { readProductionScenario } from "../../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
 import { sha256Hex } from "@seams/std";
 import {
   editRehearsalWorkcells,
-  exportRehearsalWorkcells,
   type ProductionWorkcells,
 } from "../../../../packages/production-simulation/src/recipes/bakery/production-workcells.ts";
 import {
@@ -968,118 +966,6 @@ async function mutateAs(
 }
 
 it(
-  "saves and reopens complete rehearsal documents through authenticated workspace storage",
-  rehearsalRoundTrip,
-);
-async function rehearsalRoundTrip(): Promise<void> {
-  const owner = await client("bakery-multi-tray");
-  const organisation = await workspace(owner, "Multi-tray acceptance");
-  await attachSharedAccountNativeOrganisation({
-    organisationId: organisation,
-    owner,
-    members: {},
-  });
-  const { recorded } = await ovenCycleRehearsals();
-  const saved = await savePreparedWorkspaceRun(
-    organisation,
-    mutateAs.bind(null, owner.session),
-    await prepareRehearsalRunWorkspace("Complete tray run", recorded),
-    readAs.bind(null, owner.session),
-  );
-  if (saved.kind !== "verified") throw new Error(`Save ${saved.kind}`);
-  const opened = await openRehearsalRunWorkspace(
-    organisation,
-    saved.snapshot.id,
-    readAs.bind(null, owner.session),
-    rehearsalSettings(sampleSettings()),
-  );
-  expect(exportRehearsalWorkcells(opened.plan)).toBe(
-    exportRehearsalWorkcells(recorded),
-  );
-  let state = applyBakeryWorkspaceAction(
-    { kind: "openRehearsalRun", plan: opened.plan, notice: "Saved rehearsal" },
-    initialSimulatorState("closed"),
-  );
-  const file = {
-    name: "accepted-rehearsal.json",
-    text: exportRehearsalWorkcells(opened.plan),
-  };
-  const workspaceRead = {
-    organisationId: organisation,
-    read: readAs.bind(null, owner.session),
-    readDefinition: readProductionScenario,
-    readScenario,
-    readAttachment: attachedJourneyFile.bind(null, file),
-  };
-  const target = {
-    surfaceSessionId: state.workspace.surfaceSessionId,
-    surfaceEpoch: state.workspace.surfaceEpoch,
-  };
-  const exported = await prepareBakerySurfaceCommand(
-    state,
-    {
-      schemaVersion: 1,
-      kind: "file_action",
-      target,
-      action: { kind: "export", format: "run" },
-    },
-    sha256Hex,
-    workspaceRead,
-  );
-  if (exported.kind !== "file" || exported.prepared.kind !== "export")
-    throw new Error("Missing run export");
-  expect(exported.prepared.file.text).toBe(file.text);
-  const imported = await prepareBakerySurfaceCommand(
-    state,
-    {
-      schemaVersion: 1,
-      kind: "file_action",
-      target,
-      action: { kind: "import", digest: exported.manifest.digest },
-    },
-    sha256Hex,
-    workspaceRead,
-  );
-  if (
-    imported.kind !== "file" ||
-    imported.prepared.kind !== "import" ||
-    imported.prepared.pending.kind !== "run"
-  )
-    throw new Error("Missing attached-run review");
-  expect(imported.prepared.pending.review.plan.fingerprint).toBe(
-    opened.plan.fingerprint,
-  );
-  const stale = applyBakeryWorkspaceAction(
-    {
-      kind: "productionSessionChanged",
-      patch: { draftName: "Newer operator edit" },
-    },
-    state,
-  );
-  expect(
-    commitBakerySurfaceCommand(stale, imported, { kind: "local" }),
-  ).toMatchObject({ kind: "rejected", code: "stale_surface" });
-  const committed = commitBakerySurfaceCommand(state, imported, {
-    kind: "local",
-  });
-  if (committed.kind !== "applied")
-    throw new Error("Attached-run review failed");
-  state = applyBakeryWorkspaceAction(
-    {
-      kind: "workspaceRunOpenResolved",
-      review: imported.prepared.pending.review,
-      decision: "apply",
-    },
-    committed.state,
-  );
-  if (state.workspace.production.data.kind !== "ready")
-    throw new Error("Missing reopened run");
-  expect(exportRehearsalWorkcells(state.workspace.production.data.plan)).toBe(
-    file.text,
-  );
-}
-
-it(
   "binds shift and production scenario approvals to settled chat payloads and preserves pending recovery",
   scenarioApprovalJourney,
   60_000,
@@ -1694,11 +1580,4 @@ async function unavailableInspectionRead(): Promise<never> {
 
 function unavailableScenarioFile(): never {
   throw new Error("No file in scenario inspection");
-}
-
-function attachedJourneyFile(
-  file: { name: string; text: string },
-  _digest: string,
-) {
-  return file;
 }

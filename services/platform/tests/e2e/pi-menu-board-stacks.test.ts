@@ -1,12 +1,12 @@
 // Plan 40B phase 5, slice 8: auto-layout stacks on the free canvas. The
-// owner places two texts. Sous Chef reads the board, a stack of an element that is
-// not on the board is refused in words that it can act on, and it stacks
-// the two texts. At the same moment the owner widens the gap and staff
-// centre the stack; both keep their change, and a viewer's change is
-// refused. Staff make the first text taller, and the stack moves the second
-// one down with no edit of its own. Sous Chef puts the second text first. The TV
-// plays the stack as the editors place it, and a stack that staff remove
-// leaves its texts with no place, so the board cannot be published.
+// owner places two texts. Sous Chef reads the board, a stack of an element
+// that is not on the board is refused in words that it can act on, and it
+// stacks the two texts. The owner makes the first text taller, and the stack
+// moves the second one down with no edit of its own. Sous Chef puts the
+// second text first. The TV plays the stack as the editor places it, and a
+// stack that the owner removes leaves its texts with no place, so the board
+// cannot be published. `pi-menu-board-together` proves that people and Sous
+// Chef converge and that a viewer's change is refused.
 import { expect, it, type TestContext } from "vitest";
 import {
   MENU_BOARD_SCREEN_SIZES,
@@ -50,7 +50,7 @@ const SECOND = "element_breadbasket";
 type Script = { boardId: string; stackId: string; outputs: string[]; steps: number };
 
 it(
-  "lets Urk and two people build an auto-layout stack together, reflows it when an element grows, and plays it on the TV",
+  "lets Sous Chef and the owner build an auto-layout stack, reflows it when an element grows, and plays it on the TV",
   { timeout: 300_000 },
   async ({ task }: TestContext): Promise<void> => {
     const script: Script = { boardId: "", stackId: "", outputs: [], steps: 0 };
@@ -65,8 +65,6 @@ it(
     script.boardId = boardIdOf(created.body);
     const socket = `${BASE}/menu-boards/${script.boardId}/socket`;
     const ownerPeer = await BoardPeer.open(socket, journey.owner);
-    const staffPeer = await BoardPeer.open(socket, journey.staff);
-    const viewerPeer = await BoardPeer.open(socket, journey.viewer);
     try {
       for (const [id, text, rect] of [
         [FIRST, "Soup of the day", { x: 120, y: 240, width: 420, height: 80 }],
@@ -98,12 +96,12 @@ it(
         .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
         .toContain("ST_STACKED");
       await expect
-        .poll(() => stackOf(staffPeer.read()) !== null, { timeout: 15_000 })
+        .poll(() => stackOf(ownerPeer.read()) !== null, { timeout: 15_000 })
         .toBe(true);
-      const made = stackOf(staffPeer.read());
+      const made = stackOf(ownerPeer.read());
       if (made === null || made.kind !== "stack") throw new Error("No stack");
       script.stackId = made.id;
-      const first = rects(staffPeer.read());
+      const first = rects(ownerPeer.read());
       expect([made.direction, made.gap, made.padding, made.align]).toEqual([
         "vertical",
         "24",
@@ -120,34 +118,20 @@ it(
       });
       expect(first.get(SECOND)?.y).toBe(rectOf(made).y + 16 + 80 + 24);
 
-      // The owner widens the gap while staff centre the stack; a viewer's
-      // change is refused.
-      await Promise.all([
-        ownerPeer.submit("owner-gap", ownerPeer.doc.updateElement(made.id, { gap: "40" })),
-        staffPeer.submit("staff-align", staffPeer.doc.updateElement(made.id, { align: "center" })),
-      ]);
-      const refused = await viewerPeer.submitRefused((copy) =>
-        copy.updateElement(made.id, { direction: "horizontal" }),
-      );
-      expect(refused).toMatchObject({ kind: "failure", code: "access_revoked" });
-      await expect.poll(() => ownerPeer.read(), { timeout: 10_000 }).toEqual(staffPeer.read());
-      const settled = stackOf(ownerPeer.read());
-      expect(settled?.kind === "stack" ? [settled.gap, settled.align] : null).toEqual(["40", "center"]);
-
-      // Staff make the first text taller; the stack moves the second one.
+      // The owner makes the first text taller; the stack moves the second one.
       const soup = ownerPeer.read().elements.find((element) => element.id === FIRST);
       if (soup?.placement.frameId !== "stack") throw new Error("The soup is not stacked");
       const secondBefore = rects(ownerPeer.read()).get(SECOND);
-      await staffPeer.submit(
-        "staff-taller",
-        staffPeer.doc.moveElement(FIRST, {
+      await ownerPeer.submit(
+        "owner-taller",
+        ownerPeer.doc.moveElement(FIRST, {
           ...soup.placement,
           size: { width: soup.placement.size.width, height: 140 },
         }),
       );
       await expect
         .poll(() => rects(ownerPeer.read()).get(SECOND)?.y, { timeout: 10_000 })
-        .toBe((rects(ownerPeer.read()).get(FIRST)?.y ?? 0) + 140 + 40);
+        .toBe((rects(ownerPeer.read()).get(FIRST)?.y ?? 0) + 140 + 24);
       const second = ownerPeer.read().elements.find((element) => element.id === SECOND);
       // The second text changed no value of its own.
       expect(second?.placement).toMatchObject({ frameId: "stack", stackId: made.id });
@@ -164,14 +148,11 @@ it(
         .poll(delivered.bind(null, journey.slack), { timeout: 45_000 })
         .toContain("ST_ORDERED");
       await expect
-        .poll(() => order(staffPeer.read(), made.id), { timeout: 10_000 })
+        .poll(() => order(ownerPeer.read(), made.id), { timeout: 10_000 })
         .toEqual([SECOND, FIRST]);
       const merged = ownerPeer.read();
-      const stored = await BoardPeer.open(socket, journey.owner);
-      expect(stored.read()).toEqual(merged);
-      await closeSocket(stored.socket);
 
-      // The TV plays the stack as the editors place it.
+      // The TV plays the stack as the editor places it.
       const token = await pairScreen(journey.owner, script.boardId);
       const release = await publishBoard(journey.owner, script.boardId, null);
       const shown = await feed(token);
@@ -193,8 +174,8 @@ it(
       const soupOnPortrait = portrait.get(FIRST);
       expect(bread !== undefined && soupOnPortrait !== undefined && soupOnPortrait.y > bread.y).toBe(true);
 
-      // A stack that staff remove leaves its texts with no place.
-      await staffPeer.submit("staff-remove-stack", staffPeer.doc.removeElement(made.id));
+      // A stack that the owner removes leaves its texts with no place.
+      await ownerPeer.submit("owner-remove-stack", ownerPeer.doc.removeElement(made.id));
       await expect
         .poll(() => ownerPeer.read().unplaced.map((element) => element.id).sort(), { timeout: 10_000 })
         .toEqual([SECOND, FIRST].sort());
@@ -224,22 +205,22 @@ it(
         ],
         stack: {
           madeBy: "agent",
-          settings: settled?.kind === "stack"
-            ? { direction: settled.direction, gap: settled.gap, padding: settled.padding, align: settled.align }
-            : null,
+          settings: {
+            direction: made.direction,
+            gap: made.gap,
+            padding: made.padding,
+            align: made.align,
+          },
           order: order(merged, made.id),
         },
         reflow: { secondBefore, secondAfter: rects(merged).get(SECOND) },
-        viewerRefusal: refused,
         release,
         removedStackLeaves: "unplaced",
         publishWithLooseElements: blocked.status,
         toolOutputs: script.outputs.map(redactIds),
       };
     } finally {
-      await Promise.all(
-        [ownerPeer, staffPeer, viewerPeer].map((peer) => closeSocket(peer.socket)),
-      );
+      await closeSocket(ownerPeer.socket);
     }
   },
 );

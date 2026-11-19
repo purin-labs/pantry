@@ -25,6 +25,13 @@ const STOREFRONT = "storefront_cafe";
 
 type ProductLink = NonNullable<InventoryData["rows"][number]["product"]>;
 
+/** One product as a list shows it: its variant and its price. */
+type ProductPrice = Readonly<{
+  variantId: string;
+  amountMinor: number;
+  currency: string;
+}>;
+
 it(
   "lets an owner edit, archive, restore and delete a product, and keeps a sold product",
   { timeout: 180_000 },
@@ -129,7 +136,15 @@ async function productsPageActions(context: TestContext): Promise<void> {
   const madeToOrder = before.untrackedProducts.find(
     (row) => row.madeToOrder && !row.name.startsWith("Taro"),
   );
-  if (stocked?.kind !== "product" || madeToOrder === undefined)
+  const retired = before.rows.find(
+    (row) =>
+      row.kind === "product" && row !== stocked && !row.name.startsWith("Taro"),
+  );
+  if (
+    stocked?.kind !== "product" ||
+    retired?.kind !== "product" ||
+    madeToOrder === undefined
+  )
     throw new Error("Café fixture needs stocked and made-to-order products");
   const link = stocked.product;
   const newPrice = link.price.amountMinor + 100;
@@ -203,13 +218,18 @@ async function productsPageActions(context: TestContext): Promise<void> {
     "Spring ginger",
   );
 
-  // 3. An archived product leaves the shop and returns on restore.
-  const archived = await act(owner.session, "status", {
-    productId: madeToOrder.productId,
-    expectedProductRevision: madeToOrder.productRevision,
-    status: "archived",
-  });
-  expect(archived.status, await archived.clone().text()).toBe(200);
+  // 3. The page lists what a buyer sees. An archived product leaves the
+  //    page and the shop, and its stock leaves the page with no false alarm.
+  //    A restored product returns.
+  expect(portalProducts(await portal())).toEqual(shopProducts(await shop()));
+  for (const product of [madeToOrder, retired.product]) {
+    const archived = await act(owner.session, "status", {
+      productId: product.productId,
+      expectedProductRevision: product.productRevision,
+      status: "archived",
+    });
+    expect(archived.status, await archived.clone().text()).toBe(200);
+  }
   const afterArchive = await portal();
   expect(
     afterArchive.untrackedProducts.map((item) => item.productId),
@@ -220,6 +240,11 @@ async function productsPageActions(context: TestContext): Promise<void> {
       revision: madeToOrder.productRevision + 1,
     }),
   );
+  expect(
+    afterArchive.rows.filter(
+      (row) => row.inventoryItemId === retired.inventoryItemId,
+    ),
+  ).toEqual([]);
   await vi.waitFor(
     async () => {
       expect((await shop()).map((item) => item.variantId)).not.toContain(
@@ -228,6 +253,11 @@ async function productsPageActions(context: TestContext): Promise<void> {
     },
     { timeout: 15_000, interval: 1_000 },
   );
+  const offered = shopProducts(await shop());
+  expect(offered.map((item) => item.variantId)).not.toContain(
+    retired.product.variantId,
+  );
+  expect(portalProducts(afterArchive)).toEqual(offered);
   const restored = await act(owner.session, "status", {
     productId: madeToOrder.productId,
     expectedProductRevision: madeToOrder.productRevision + 1,
@@ -327,6 +357,39 @@ async function productsPageActions(context: TestContext): Promise<void> {
       shopCount: (await shop()).length,
     },
   });
+}
+
+function portalProducts(data: InventoryData): ProductPrice[] {
+  const products = new Map<string, ProductPrice>();
+  for (const row of data.rows)
+    if (row.kind === "product")
+      products.set(row.product.variantId, price(row.product));
+  for (const product of data.untrackedProducts)
+    products.set(product.variantId, price(product));
+  return [...products.values()].sort(byVariant);
+}
+
+function shopProducts(
+  listings: readonly Parameters<typeof price>[0][],
+): ProductPrice[] {
+  return listings.map(price).sort(byVariant);
+}
+
+function price(
+  product: Readonly<{
+    variantId: string;
+    price: Readonly<{ amountMinor: number; currency: string }>;
+  }>,
+): ProductPrice {
+  return {
+    variantId: product.variantId,
+    amountMinor: product.price.amountMinor,
+    currency: product.price.currency,
+  };
+}
+
+function byVariant(left: ProductPrice, right: ProductPrice): number {
+  return left.variantId.localeCompare(right.variantId);
 }
 
 async function required<T>(

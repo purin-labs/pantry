@@ -1,11 +1,11 @@
 // Plan 40B phase 5, slice 3: the item-row component and its variants. Every
-// item of a section repeats one item row. At the same moment, the owner sets
-// the board's default row and staff give the drinks section its own row; a
-// viewer's change is refused. Sous Chef then reads the board, an unknown row is
-// refused in words that it can act on, and it gives the pastries section the
-// price-first row. Every replica and the stored board converge, and the next
-// release carries the rows to the TV. A section that keeps the board's
-// default has no row key in the release.
+// item of a section repeats one item row. The owner sets the board's default
+// row and gives the drinks section its own row. Sous Chef then reads the
+// board, an unknown row is refused in words that it can act on, and it gives
+// the pastries section the price-first row. The next release carries the rows
+// to the TV. A section that keeps the board's default has no row key in the
+// release. `pi-menu-board-together` proves that people and Sous Chef converge
+// and that a viewer's change is refused.
 import { expect, it, type TestContext } from "vitest";
 import type {
   MenuBoardElement,
@@ -56,7 +56,7 @@ type Script = {
 };
 
 it(
-  "lets two people and Urk choose item rows on one board at once, converge, and carry the rows to the TV in the next release",
+  "lets the owner and Sous Chef choose item rows on one board, and carries the rows to the TV in the next release",
   { timeout: 300_000 },
   async ({ task }: TestContext): Promise<void> => {
     const script: Script = {
@@ -102,32 +102,21 @@ it(
 
     const socket = `${BASE}/menu-boards/${script.boardId}/socket`;
     const ownerPeer = await BoardPeer.open(socket, journey.owner);
-    const staffPeer = await BoardPeer.open(socket, journey.staff);
-    const viewerPeer = await BoardPeer.open(socket, journey.viewer);
     try {
       const drinks = sectionOf(ownerPeer.read(), DRINKS);
       script.pastriesElementId = sectionOf(ownerPeer.read(), PASTRIES).id;
       expect(drinks.kind === "section" && drinks.row).toBeUndefined();
 
-      // The owner sets the board's default row while staff give the drinks
-      // section its own; both start from the same state.
-      await Promise.all([
-        ownerPeer.submit(
-          "owner-default",
-          ownerPeer.doc.setStyle({ itemRow: "leader" }),
-        ),
-        staffPeer.submit(
-          "staff-drinks",
-          staffPeer.doc.updateElement(drinks.id, { row: "stacked" }),
-        ),
-      ]);
-      const refused = await viewerPeer.submitRefused((copy) =>
-        copy.updateElement(drinks.id, { row: "tiles" }),
+      // The owner sets the board's default row and gives the drinks section
+      // its own.
+      await ownerPeer.submit(
+        "owner-default",
+        ownerPeer.doc.setStyle({ itemRow: "leader" }),
       );
-      expect(refused).toMatchObject({
-        kind: "failure",
-        code: "access_revoked",
-      });
+      await ownerPeer.submit(
+        "owner-drinks",
+        ownerPeer.doc.updateElement(drinks.id, { row: "stacked" }),
+      );
 
       // Turn 2: Sous Chef gives the pastries their own row.
       await sendListingMessage(
@@ -143,15 +132,7 @@ it(
       await expect
         .poll(() => rowOf(ownerPeer.read(), PASTRIES), { timeout: 15_000 })
         .toBe("price_first");
-      await expect
-        .poll(() => rowOf(staffPeer.read(), PASTRIES), { timeout: 15_000 })
-        .toBe("price_first");
-
-      const stored = await BoardPeer.open(socket, journey.owner);
-      const merged = stored.read();
-      await closeSocket(stored.socket);
-      expect(ownerPeer.read()).toEqual(merged);
-      expect(staffPeer.read()).toEqual(merged);
+      const merged = ownerPeer.read();
       expect(merged.style.itemRow).toBe("leader");
       expect(rowOf(merged, DRINKS)).toBe("stacked");
       expect(rowOf(merged, PASTRIES)).toBe("price_first");
@@ -201,16 +182,11 @@ it(
               ? { sectionId: redactIds(element.sectionId), row: element.row ?? null }
               : null,
           ),
-        viewerRefusal: refused,
         toolOutputs: script.outputs.map(sortDraftItems).map(redactIds),
         releases: { first, second },
       };
     } finally {
-      await Promise.all(
-        [ownerPeer, staffPeer, viewerPeer].map((peer) =>
-          closeSocket(peer.socket),
-        ),
-      );
+      await closeSocket(ownerPeer.socket);
     }
   },
 );
@@ -285,7 +261,7 @@ function respond(script: Script, body: Record<string, unknown>): Response {
       const read: unknown = JSON.parse(last);
       const board =
         isRecord(read) && Array.isArray(read.boards) ? read.boards[0] : null;
-      // The read shows both people's rows.
+      // The read shows the owner's rows.
       expect(board).toMatchObject({ style: { itemRow: "leader" } });
       expect(JSON.stringify(board)).toContain('"row":"stacked"');
       return openRouterToolCall(
