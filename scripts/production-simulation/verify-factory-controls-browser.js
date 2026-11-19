@@ -4,10 +4,8 @@ async function verifyFactoryControlsBrowser(page) {
   await page.addScriptTag({ content: factoryNodeText.toString() });
   await page.evaluate(mountFactoryControls);
   await page.setViewportSize({ width: 1440, height: 1000 });
+  // The Combined Café Shift section holds the two-cell route.
   await page.getByRole("button", { name: "Recipes", exact: true }).click();
-  await page
-    .getByText("Individual recipes and logistics examples", { exact: true })
-    .click();
   await chooseOption(page, page.getByLabel("Logistics comparison"), {
     value: "stress-one-slot",
   });
@@ -27,6 +25,7 @@ async function verifyFactoryControlsBrowser(page) {
     throw new Error(
       "The journey must close arrivals before all 24 orders arrive.",
     );
+  await openFactoryHistory(page);
   await page.getByLabel("Observation seconds", { exact: true }).fill("50");
   await page
     .getByRole("button", { name: "Inspect factory history", exact: true })
@@ -34,20 +33,22 @@ async function verifyFactoryControlsBrowser(page) {
   await page
     .getByLabel("Observation time", { exact: true })
     .waitFor({ timeout: 120000 });
-  const factory = page.getByRole("region", { name: "Shared recorded factory", exact: true });
-  await factory.locator('canvas').waitFor();
-  await page.locator('[aria-label="Shared recorded factory"][data-scene="ready"]').waitFor();
-  if (await factory.locator("canvas").count() !== 1) throw new Error("The factory must use one renderer for both cells.");
-  await factory.locator('[data-factory-cell] button:enabled').first().click();
-  if (await page.locator('[data-graph-task][aria-pressed="true"]').count() !== 1) throw new Error("A shared cell did not select its workflow task.");
-  await factory.scrollIntoViewIfNeeded();
-  await page.screenshot({ path: "shared-recorded-factory.png", fullPage: true });
+  // factory-canvas-browser proves cell selection in both panes.
+  const factory = page.getByRole("region", {
+    name: "Shared recorded factory",
+    exact: true,
+  });
+  await factory.locator("canvas").waitFor();
+  if ((await factory.locator("canvas").count()) !== 1)
+    throw new Error("The factory must use one renderer for both cells.");
+  await page.screenshot({
+    path: "shared-recorded-factory.png",
+    fullPage: true,
+  });
   const historical = await page.evaluate(factoryControlState);
-  if (
-    historical.time !== paused.time ||
-    historical.observed !== "50.000" ||
-    historical.orders !== 1
-  )
+  // In history the clock shows the observed moment; the return to the live
+  // state below proves that the paused execution did not change.
+  if (historical.observed !== "50.000" || historical.orders !== 1)
     throw new Error(
       `History changed execution or included future orders: ${JSON.stringify(historical)}`,
     );
@@ -73,25 +74,24 @@ async function verifyFactoryControlsBrowser(page) {
   });
   if (await pauseHistory.isEnabled()) await pauseHistory.click();
   const played = await page.evaluate(factoryControlState);
-  if (
-    played.time !== paused.time ||
-    Number(played.observed) > Number(paused.time)
-  )
+  if (Number(played.observed) > Number(paused.time))
     throw new Error(
       "Playback advanced execution or crossed its accepted boundary.",
     );
-  const observedFrames = await page.evaluate(factoryObservedFrames);
-  if (observedFrames.length !== 2)
-    throw new Error("History must display both recorded cells.");
-  for (const frame of observedFrames)
-    if (frame.time > Number(played.observed) * 1e6)
-      throw new Error("A historical cell displayed a future sample.");
+  // The shared factory shows the cells at the observed time, never later.
+  const shownTime = Number(await factory.getAttribute("data-time"));
+  if (!(shownTime <= Number(played.observed) * 1e6))
+    throw new Error(
+      `History displayed a future sample: ${shownTime} µs after ${played.observed} s.`,
+    );
   await page
     .getByRole("button", { name: "Return to live state", exact: true })
     .click();
   const live = await page.evaluate(factoryControlState);
   if (JSON.stringify(live) !== JSON.stringify(paused))
     throw new Error("Inspection mutated the live factory.");
+  // The horizon, resource and arrival forms are in the Scenario panel.
+  await openFactoryPanel(page, "Scenario");
   await page.getByLabel("New horizon (seconds)", { exact: true }).fill("18000");
   await page
     .getByRole("button", { name: "Review horizon extension", exact: true })
@@ -99,7 +99,10 @@ async function verifyFactoryControlsBrowser(page) {
   await page
     .getByRole("button", { name: "Confirm scenario change", exact: true })
     .click();
+  // The timeline's scale states the horizon; it renders while it is open.
+  await showFactoryTimeline(page);
   await page.waitForFunction(factoryHorizonExtended);
+  await page.locator(".factory-playback .production-timeline-toggle").click();
   await page
     .getByText("Schedule resource unavailability", { exact: true })
     .click();
@@ -127,18 +130,12 @@ async function verifyFactoryControlsBrowser(page) {
   await page.waitForFunction(factoryClosing);
   await page.addScriptTag({ content: retainFactoryDownload.toString() });
   await page.evaluate(installFactoryDownloadCapture);
-  const download = page.waitForEvent("download");
-  await page
-    .getByRole("button", { name: "Save production run", exact: true })
-    .click();
   await (
-    await download
+    await downloadFactorySave(page)
   ).saveAs(`${globalThis.bakeryEvidence}/closed-arrivals.json`);
   await backToRecipes(page);
   await page
-    .getByLabel("Open recipe, oven route or saved production run", {
-      exact: true,
-    })
+    .getByLabel(/^Open recipe, oven route or saved production run/u)
     .evaluate(restoreFactoryFile);
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
@@ -153,6 +150,7 @@ async function verifyFactoryControlsBrowser(page) {
   for (const row of rows)
     if (!row.includes("completed"))
       throw new Error("The closed factory did not drain every order.");
+  await openFactoryPanel(page, "Scenario");
   const drain = await page
     .getByRole("region", { name: "Arrival and drain controls", exact: true })
     .textContent();
@@ -162,6 +160,7 @@ async function verifyFactoryControlsBrowser(page) {
   for (const tray of ["tray-a", "tray-b", "tray-c", "tray-d"])
     if (!trays.includes(tray))
       throw new Error(`Missing returned carrier ${tray}.`);
+  await openFactoryPanel(page, "Results");
   await page
     .getByRole("region", { name: "Production results", exact: true })
     .scrollIntoViewIfNeeded();
@@ -171,7 +170,7 @@ async function verifyFactoryControlsBrowser(page) {
     paused,
     historical,
     played,
-    observedFrames,
+    shownTime,
     completed,
     rows,
     drain,
@@ -232,17 +231,6 @@ function factoryHistoryAdvanced() {
       document.querySelector('[aria-label="Observation time"]')?.textContent,
     ) > 45
   );
-}
-function factoryObservedFrames() {
-  const frames = [];
-  for (const frame of document.querySelectorAll(
-    '[data-factory-cell]',
-  ))
-    frames.push({
-      time: Number(frame.getAttribute("data-time")),
-      step: Number(frame.getAttribute("data-step")),
-    });
-  return frames;
 }
 function factoryHorizonExtended() {
   return (
