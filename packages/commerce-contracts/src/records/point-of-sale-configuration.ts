@@ -24,6 +24,23 @@ export const pointOfSaleItemPolicySchema = StrictObject({
 });
 export type PointOfSaleItemPolicy = Static<typeof pointOfSaleItemPolicySchema>;
 
+/**
+ * What catalog surface a counter rings up from: either an explicit list of
+ * `supportedItems` variants, or the location's published café menu with
+ * modifiers, serving hours, and sold-out enforcement.
+ */
+export const pointOfSaleCatalogScopeSchema = Type.Union([
+  StrictObject({ kind: Type.Literal("supported_items") }),
+  StrictObject({
+    kind: Type.Literal("published_menu"),
+    menuId: normalizedTextSchema,
+    maxQuantityPerLine: PositiveInteger,
+  }),
+]);
+export type PointOfSaleCatalogScope = Static<
+  typeof pointOfSaleCatalogScopeSchema
+>;
+
 // The after-sale, presentation and lifecycle rules of a counter policy are
 // the checkout profile readers' rules (`parseCheckoutAfterSalePolicy`,
 // `parseCheckoutPresentationPolicy` and the client's
@@ -100,22 +117,28 @@ const lifecycleSchema = Type.Union([
  * item list is not a partial policy, it is an unsellable one.
  */
 export const pointOfSaleConfigurationSchema = Type.Refine(
-  StrictObject({
-    configurationId: normalizedTextSchema,
-    organisationId: normalizedTextSchema,
-    merchantId: Type.Unsafe<CommerceMerchantId>(normalizedTextSchema),
-    satyrLocationId: normalizedTextSchema,
-    salesChannelId: normalizedTextSchema,
-    currency: currencyCodeTextSchema,
-    supportedItems: Type.Array(pointOfSaleItemPolicySchema, { minItems: 1 }),
-    quoteTtlSeconds: PositiveInteger,
-    tax: storefrontTaxConfigurationSchema,
-    pickupReadyLeadTimeSeconds: NonNegativeInteger,
-    afterSalePolicy: afterSalePolicySchema,
-    presentationPolicy: presentationPolicySchema,
-    revision: PositiveInteger,
-    lifecycle: lifecycleSchema,
-  }),
+  Type.Refine(
+    StrictObject({
+      configurationId: normalizedTextSchema,
+      organisationId: normalizedTextSchema,
+      merchantId: Type.Unsafe<CommerceMerchantId>(normalizedTextSchema),
+      satyrLocationId: normalizedTextSchema,
+      salesChannelId: normalizedTextSchema,
+      currency: currencyCodeTextSchema,
+      supportedItems: Type.Array(pointOfSaleItemPolicySchema),
+      catalogScope: Type.Optional(pointOfSaleCatalogScopeSchema),
+      cashEnabled: Type.Optional(Type.Boolean()),
+      quoteTtlSeconds: PositiveInteger,
+      tax: storefrontTaxConfigurationSchema,
+      pickupReadyLeadTimeSeconds: NonNegativeInteger,
+      afterSalePolicy: afterSalePolicySchema,
+      presentationPolicy: presentationPolicySchema,
+      revision: PositiveInteger,
+      lifecycle: lifecycleSchema,
+    }),
+    hasSellableCatalogScope,
+    sellableCatalogScopeError,
+  ),
   refundThresholdInCurrency,
   refundThresholdCurrencyError,
 );
@@ -178,6 +201,22 @@ function refundThresholdInCurrency(
 
 function refundThresholdCurrencyError(): string {
   return "afterSalePolicy.refundGovernance.threshold must use the configuration currency";
+}
+
+function hasSellableCatalogScope(
+  configuration: Readonly<{
+    supportedItems: readonly PointOfSaleItemPolicy[];
+    catalogScope?: PointOfSaleCatalogScope;
+  }>,
+): boolean {
+  return (
+    configuration.catalogScope?.kind === "published_menu" ||
+    configuration.supportedItems.length > 0
+  );
+}
+
+function sellableCatalogScopeError(): string {
+  return "supportedItems must list at least one item when catalogScope is supported_items";
 }
 
 // Parsers of the records above (Plan 78 step 2).

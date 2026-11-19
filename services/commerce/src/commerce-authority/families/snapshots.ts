@@ -13,9 +13,11 @@ import {
   type CommercePaymentsV1,
   type CommerceOrderTimesV1,
   type CommercePickupQueueV1,
+  type CommerceCounterCashTenderV1,
 } from "@seams/commerce-client";
 import type { Checkout, CheckoutPaymentAttempt } from "@seams/commerce-contracts";
 import type { FailedPaymentsWindow } from "../../payments/failed-payments.ts";
+import { readManualTender } from "../../payments/manual-tender.ts";
 import {
   readCheckout,
   readCheckoutPaymentAttemptForCheckout,
@@ -173,11 +175,33 @@ export abstract class CommerceSnapshotFamily extends CommerceAuthorityBase {
     | Readonly<{
         checkout: Checkout;
         paymentAttempt: CheckoutPaymentAttempt | null;
+        manualTender?: CommerceCounterCashTenderV1;
       }>
     | undefined {
     const checkout = readCheckout(this.database, merchantId, checkoutId);
     if (checkout === undefined || checkout.source.kind !== "point_of_sale")
       return undefined;
+    const rawManual =
+      checkout.lifecycle.state === "accepted" &&
+      checkout.lifecycle.manualPaymentId !== undefined
+        ? readManualTender(
+            this.database,
+            merchantId,
+            checkout.lifecycle.manualPaymentId,
+          )
+        : undefined;
+    const manualTender: CommerceCounterCashTenderV1 | undefined =
+      rawManual !== undefined &&
+      rawManual.method === "cash" &&
+      rawManual.cashReceivedMinor !== undefined &&
+      rawManual.changeDueMinor !== undefined
+        ? {
+            method: "cash",
+            cashReceivedMinor: rawManual.cashReceivedMinor,
+            changeDueMinor: rawManual.changeDueMinor,
+            recordedAt: rawManual.recordedAt,
+          }
+        : undefined;
     return {
       checkout,
       paymentAttempt:
@@ -186,6 +210,7 @@ export abstract class CommerceSnapshotFamily extends CommerceAuthorityBase {
           merchantId,
           checkoutId,
         ) ?? null,
+      ...(manualTender === undefined ? {} : { manualTender }),
     };
   }
 

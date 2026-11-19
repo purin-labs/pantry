@@ -229,6 +229,7 @@ export async function handleServiceRoute(
     case "create_pickup_checkout":
     case "begin_checkout_payment":
     case "collect_in_person_checkout_payment":
+    case "record_counter_cash_payment":
     case "record_checkout_payment_capture":
     case "observe_payment_dispute":
     case "place_paid_checkout":

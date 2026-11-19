@@ -221,7 +221,7 @@ export const commerceOrderOriginV1Schema = Type.Union([
     salesChannelId: text,
     locationId: text,
     checkoutId: text,
-    terminalId: text,
+    terminalId: Type.Union([text, Type.Null()]),
     receiptNumber: text,
   }),
   ReadonlyOpenObject({

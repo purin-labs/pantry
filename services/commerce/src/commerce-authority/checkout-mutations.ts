@@ -372,11 +372,14 @@ export function paidCheckoutPlacementMutation(
     commandKind:
       command.schemaVersion === "underclerk.place-stored-value-checkout.v1"
         ? "place_stored_value_checkout"
-        : command.schemaVersion === "underclerk.mark-draft-order-paid.v1"
-          ? "mark_draft_order_paid"
-          : command.schemaVersion === "underclerk.place-draft-order-on-terms.v1"
-            ? "place_draft_order_on_terms"
-            : "place_paid_checkout",
+        : command.schemaVersion === "underclerk.record-counter-cash-payment.v1"
+          ? "record_counter_cash_payment"
+          : command.schemaVersion === "underclerk.mark-draft-order-paid.v1"
+            ? "mark_draft_order_paid"
+            : command.schemaVersion ===
+                "underclerk.place-draft-order-on-terms.v1"
+              ? "place_draft_order_on_terms"
+              : "place_paid_checkout",
     resource: {
       kind: "commerce_order",
       id: plan.order.id,

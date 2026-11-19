@@ -10,6 +10,7 @@ import {
   parseExpireCheckoutCommand,
   parsePlacePaidCheckoutCommand,
   parseRecordCheckoutPaymentCaptureCommand,
+  parseRecordCounterCashPaymentCommand,
   parseResolveCheckoutPaymentCommand,
   type BeginCommerceCheckoutPaymentV1,
   type CollectCommerceInPersonCheckoutPaymentV1,
@@ -20,6 +21,7 @@ import {
   type PlaceCommerceDraftOrderOnTermsV1,
   type PlaceCommercePaidCheckoutV1,
   type RecordCommerceCheckoutPaymentCaptureV1,
+  type RecordCommerceCounterCashPaymentV1,
   type ResolveCommerceCheckoutPaymentV1,
   type CommerceFoodServiceSnapshotV1,
   type CommerceMerchantSnapshotV1,
@@ -62,6 +64,7 @@ import {
   planCheckoutPaymentResolution,
   planCheckoutPaymentStart,
   planCheckoutExpiration,
+  planCounterCashPlacement,
   planManualCheckoutPlacement,
   planPaidCheckoutPlacement,
   type OfflinePlacementCommand,
@@ -86,6 +89,7 @@ export type CheckoutCommand =
   | RecordCommerceCheckoutPaymentCaptureV1
   | PlaceCommercePaidCheckoutV1
   | PlaceCommerceStoredValueCheckoutV1
+  | RecordCommerceCounterCashPaymentV1
   | MarkCommerceDraftOrderPaidV1
   | PlaceCommerceDraftOrderOnTermsV1
   | ResolveCommerceCheckoutPaymentV1
@@ -532,6 +536,45 @@ export class CheckoutCommandAuthority {
         command.paymentAttemptId,
       ),
       snapshot.resources,
+    );
+    if (plan.kind === "rejected") return this.#options.rejected(plan.error);
+    return this.#options.commit({
+      kind: "paid_checkout_placement",
+      command,
+      merchant,
+      plan: plan.value,
+    });
+  }
+
+  recordCounterCashPayment(rawCommand: unknown): CommerceMutationResultV1 {
+    const start = beginSnapshotCommand(
+      this.#options,
+      rawCommand,
+      parseRecordCounterCashPaymentCommand,
+      { merchantRevision: true },
+    );
+    if (start.kind !== "ready") return start.result;
+    const { command, merchant, snapshot } = start;
+    const existing = existingPlacementResource(
+      {
+        ...command,
+        buyer: { kind: "guest" },
+        placement: { kind: "pickup" },
+      },
+      snapshot.resources,
+      false,
+    );
+    if (existing !== undefined) return this.#options.rejected(existing);
+    const plan = planCounterCashPlacement(
+      this.#options.database,
+      command,
+      readCheckout(
+        this.#options.database,
+        command.merchantId,
+        command.checkoutId,
+      ),
+      (offerId) =>
+        readOfferRevision(this.#options.database, command.merchantId, offerId),
     );
     if (plan.kind === "rejected") return this.#options.rejected(plan.error);
     return this.#options.commit({

@@ -56,6 +56,7 @@ const COMMAND_EVENTS: Readonly<Partial<Record<CommandKind, string>>> = {
   create_pickup_checkout: "checkout.created",
   create_shipping_checkout: "checkout.created",
   create_in_person_checkout: "checkout.created",
+  record_counter_cash_payment: "order.created",
   begin_checkout_payment: "checkout.payment_started",
   record_checkout_payment_capture: "payment.captured",
   resolve_checkout_payment: "checkout.payment_resolved",

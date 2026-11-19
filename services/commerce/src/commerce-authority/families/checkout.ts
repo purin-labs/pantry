@@ -34,6 +34,10 @@ export abstract class CheckoutFamily extends CheckoutProfileFamily {
     return this.checkoutCommands.placePaidCheckout(rawCommand);
   }
 
+  recordCounterCashPayment(rawCommand: unknown): CommerceMutationResultV1 {
+    return this.checkoutCommands.recordCounterCashPayment(rawCommand);
+  }
+
   /** Releases the stock of lapsed checkouts; returns when the next lapses. */
   expireLapsedCheckouts(): string | null {
     return this.checkoutCommands.expireLapsedCheckouts();

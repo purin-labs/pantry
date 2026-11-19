@@ -408,6 +408,11 @@ export type CommerceRoute =
       checkoutId: string;
     }>
   | Readonly<{
+      kind: "record_counter_cash_payment";
+      merchantId: string;
+      checkoutId: string;
+    }>
+  | Readonly<{
       kind: "record_checkout_payment_capture";
       merchantId: string;
       checkoutId: string;
@@ -1181,6 +1186,12 @@ const CORE_ROUTES: readonly RouteDefinition<CommerceRoute>[] = [
     "/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/in-person-collections",
     "collect_in_person_checkout_payment",
     "underclerk.collect-in-person-checkout-payment.v1",
+  ),
+  route(
+    "POST",
+    "/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment",
+    "record_counter_cash_payment",
+    "underclerk.record-counter-cash-payment.v1",
   ),
   route(
     "POST",

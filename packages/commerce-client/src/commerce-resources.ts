@@ -10,6 +10,7 @@ import {
   type Menu,
   type ModifierGroupRevision,
   type PointOfSaleBuyer,
+  type PointOfSaleCatalogScope,
   type PointOfSaleConfiguration,
   type PreparationStation,
   type PreparationTicket,
@@ -470,6 +471,20 @@ export function pointOfSaleConfigurationIsSellable(
   configuration: PointOfSaleConfiguration,
 ): boolean {
   return configuration.lifecycle.state === "published";
+}
+
+/** The catalog surface a counter sells from (defaults to `supported_items`). */
+export function pointOfSaleCatalogScope(
+  configuration: PointOfSaleConfiguration,
+): PointOfSaleCatalogScope {
+  return configuration.catalogScope ?? { kind: "supported_items" };
+}
+
+/** Whether cash tender is enabled on a counter policy (defaults to `false`). */
+export function pointOfSaleCashEnabled(
+  configuration: PointOfSaleConfiguration,
+): boolean {
+  return configuration.cashEnabled === true;
 }
 
 /** The quantity ceiling for one variant, or `undefined` if it is not sold. */

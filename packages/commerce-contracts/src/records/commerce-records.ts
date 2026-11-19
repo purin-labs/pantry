@@ -449,7 +449,7 @@ export const orderOriginSchema = Type.Union([
     salesChannelId: resourceIdSchema,
     locationId: resourceIdSchema,
     checkoutId: resourceIdSchema,
-    terminalId: Type.String(),
+    terminalId: Type.Union([Type.String(), Type.Null()]),
     receiptNumber: Type.String(),
   }),
   OpenObject({
@@ -1800,7 +1800,7 @@ export const checkoutSourceSchema = Type.Union([
     satyrLocationId: recordTextSchema,
     posConfigurationRevision: PositiveInteger,
     operatorIdentity: recordTextSchema,
-    terminalAssignmentRevision: PositiveInteger,
+    terminalAssignmentRevision: Type.Union([PositiveInteger, Type.Null()]),
     buyer: pointOfSaleBuyerSchema,
   }),
 ]);

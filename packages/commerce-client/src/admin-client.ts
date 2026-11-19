@@ -307,6 +307,7 @@ import {
   parseReceiveInventoryCommandRecord,
   parseReconcileInventoryCommandRecord,
   parseRecordCheckoutPaymentCaptureCommandRecord,
+  parseRecordCounterCashPaymentCommandRecord,
   parseResolveCheckoutPaymentCommandRecord,
   parseCommerceSquarePaymentAccountV1Record,
   parseCommerceStripePaymentAccountV1Record,
@@ -481,6 +482,10 @@ export type PublishCommercePointOfSaleConfigurationV1 = WireAdmin.PublishCommerc
 export type BeginCommerceCheckoutPaymentV1 = WireAdmin.BeginCommerceCheckoutPaymentV1;
 
 export type CollectCommerceInPersonCheckoutPaymentV1 = WireAdmin.CollectCommerceInPersonCheckoutPaymentV1;
+
+export type RecordCommerceCounterCashPaymentV1 = WireAdmin.RecordCommerceCounterCashPaymentV1;
+
+export type CommerceCounterCashTenderV1 = WireAdmin.CommerceCounterCashTenderV1;
 
 export type CommerceInPersonCheckoutPaymentCollectionV1 =
   | Readonly<{
@@ -1848,6 +1853,17 @@ export class CommerceAdminClient {
     );
   }
 
+  async recordCounterCashPayment(
+    command: CommerceCommandInput<RecordCommerceCounterCashPaymentV1>,
+  ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
+    return this.#command(
+      `/v1/admin/merchants/${encodeURIComponent(command.merchantId)}/counter-sales/${encodeURIComponent(command.checkoutId)}/cash-payment`,
+      "POST",
+      command,
+      ["checkoutId"],
+    );
+  }
+
   async recordCheckoutPaymentCapture(
     command: CommerceCommandInput<RecordCommerceCheckoutPaymentCaptureV1>,
   ): Promise<CommerceClientResult<CommerceMutationResultV1>> {
@@ -2762,6 +2778,10 @@ export function parseBeginCheckoutPaymentCommand(value: unknown): BeginCommerceC
 
 export function parseCollectInPersonCheckoutPaymentCommand(value: unknown): CollectCommerceInPersonCheckoutPaymentV1 {
   return decodeRecord(parseCollectInPersonCheckoutPaymentCommandRecord, value);
+}
+
+export function parseRecordCounterCashPaymentCommand(value: unknown): RecordCommerceCounterCashPaymentV1 {
+  return decodeRecord(parseRecordCounterCashPaymentCommandRecord, value);
 }
 
 export function parseInPersonCheckoutPaymentCollection(

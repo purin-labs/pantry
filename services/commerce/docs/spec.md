@@ -705,11 +705,24 @@ Shopify: Shopify Payments, payment apps and disputes. Status: **Partial**.
   collect. The `payments:record` routes let an app that runs its own
   provider record captures, resolutions and disputes; an API key cannot
   hold that scope.
+- A counter policy (`point_of_sale_configuration`, section 4) names its
+  `catalogScope` (`supported_items` or `{ kind: "published_menu", menuId,
+  maxQuantityPerLine }`) and whether `cashEnabled` is active. When
+  `published_menu` is active, `create_in_person_checkout` accepts menu lines
+  and modifiers through the same menu, serving-hours, sold-out and recipe-lot
+  checks as online pickup. A cash-enabled counter may open an in-person
+  checkout with `terminalAssignmentRevision: null`.
+- `record_counter_cash_payment` (`POST
+  /v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment`,
+  `orders:write`) settles a quoted cash-enabled counter checkout: it verifies
+  `cashReceived >= amountDue`, records `manual_tender` (`method: "cash"`,
+  `cashReceivedMinor`, `changeDueMinor`), places the `point_of_sale` order
+  with `terminalId: null`, opens pickup fulfillment and emits `order.created`.
 - Manual tender: staff record cash, or a bank transfer with its reference,
-  when they mark a draft order as paid (section 13). The payment is captured
-  at once, and its `manual_tender` row names the method. A refund of a
-  manual payment asks no provider: Commerce resolves it in the same
-  request, and staff return the money in the same way.
+  when they mark a draft order as paid (section 13) or settle a counter cash
+  sale. The payment is captured at once, and its `manual_tender` row names
+  the method. A refund of a manual payment asks no provider: Commerce
+  resolves it in the same request, and staff return the money in the same way.
 - Every amount that a payment paid, settled, reserved or can still refund
   comes from one payment position (`src/payments/position.ts`), for each
   tender: card, stored value or manual.
@@ -726,7 +739,9 @@ is a staff item; fake Stripe),
 `square-connection-journey.test.ts` (connection, pairing, alarm-read
 Terminal sale, one refresh, revoke; fake Square),
 `square-journey.test.ts` (real Square sandbox, online and Terminal; it
-skips without a token).
+skips without a token), `counter-register-cash-journey.test.ts` (counter menu,
+modifiers, sold-out refusal, included tax, cash tender with change, stock
+deduction and idempotent cash refund).
 
 ## 13. Orders, draft orders and order edits
 
@@ -1497,6 +1512,7 @@ route table.
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts`                                                           | `create_pickup_checkout`                   | orders:write       | `underclerk.create-pickup-checkout.v1`             | §11     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts`                              | `begin_checkout_payment`                   | orders:write       | `underclerk.begin-checkout-payment.v1`             | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/in-person-collections`        | `collect_in_person_checkout_payment`       | orders:write       | `underclerk.collect-in-person-checkout-payment.v1` | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment`                                     | `record_counter_cash_payment`              | orders:write       | `underclerk.record-counter-cash-payment.v1`        | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/captures`   | `record_checkout_payment_capture`          | payments:record    | `underclerk.record-checkout-payment-capture.v1`    | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/payment-dispute-observations`                                               | `observe_payment_dispute`                  | payments:record    |                                                    | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/placements` | `place_paid_checkout`                      | orders:write       | `underclerk.place-paid-checkout.v1`                | §13     |
@@ -1678,6 +1694,7 @@ The kind of each event comes from the command that made it.
 | `order.created`                       | `place_draft_order_on_terms`      | §16     |
 | `order.created`                       | `place_paid_checkout`             | §13     |
 | `order.created`                       | `place_stored_value_checkout`     | §17     |
+| `order.created`                       | `record_counter_cash_payment`     | §12     |
 | `order.edited`                        | `edit_order`                      | §13     |
 | `order.exchanged`                     | `exchange_order_lines`            | §15     |
 | `order.paid`                          | `place_paid_checkout`             | §13     |

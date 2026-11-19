@@ -89,9 +89,17 @@ const domainPaymentAttemptSchema = Type.Unsafe<CheckoutPaymentAttempt>(
 );
 const domainStorefrontSchema = Type.Unsafe<Storefront>(storefrontSchema);
 
+export const counterCashTenderSchema = ReadonlyStrictObject({
+  method: Type.Literal("cash"),
+  cashReceivedMinor: NonNegativeInteger,
+  changeDueMinor: NonNegativeInteger,
+  recordedAt: timestamp,
+});
+
 export const counterSaleSchema = ReadonlyStrictObject({
   checkout: domainCheckoutSchema,
   paymentAttempt: Type.Union([domainPaymentAttemptSchema, Type.Null()]),
+  manualTender: Type.Optional(counterCashTenderSchema),
 });
 
 const paymentCaptureVersion = Type.Literal(
@@ -385,7 +393,7 @@ export const createInPersonCheckoutCommandSchema = ReadonlyStrictObject({
   satyrLocationId: text,
   posConfigurationRevision: PositiveInteger,
   operatorIdentity: text,
-  terminalAssignmentRevision: PositiveInteger,
+  terminalAssignmentRevision: Type.Union([PositiveInteger, Type.Null()]),
   buyer: wirePointOfSaleBuyerSchema,
   checkoutId: text,
   lines: checkoutLines,
@@ -419,6 +427,18 @@ export const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
     paymentBinding: wireInPersonPaymentBindingSchema,
   },
 );
+
+export const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
+  schemaVersion: Type.Literal("underclerk.record-counter-cash-payment.v1"),
+  ...commandContext,
+  checkoutId: text,
+  checkoutRevision: PositiveInteger,
+  quoteDigest: text,
+  orderId: text,
+  paymentId: text,
+  fulfillmentId: text,
+  cashReceived: wireMoneySchema,
+});
 
 const paymentAttemptFields = {
   ...commandContext,
@@ -945,6 +965,9 @@ export const parseBeginCheckoutPaymentCommandRecord = wireRecordParser(
 );
 export const parseCollectInPersonCheckoutPaymentCommandRecord =
   wireRecordParser(collectInPersonCheckoutPaymentCommandSchema);
+export const parseRecordCounterCashPaymentCommandRecord = wireRecordParser(
+  recordCounterCashPaymentCommandSchema,
+);
 export const parseRecordCheckoutPaymentCaptureCommandRecord = wireRecordParser(
   recordCheckoutPaymentCaptureCommandSchema,
 );
@@ -1056,6 +1079,12 @@ export type BeginCommerceCheckoutPaymentV1 = Static<
 >;
 export type CollectCommerceInPersonCheckoutPaymentV1 = Static<
   typeof collectInPersonCheckoutPaymentCommandSchema
+>;
+export type RecordCommerceCounterCashPaymentV1 = Static<
+  typeof recordCounterCashPaymentCommandSchema
+>;
+export type CommerceCounterCashTenderV1 = Static<
+  typeof counterCashTenderSchema
 >;
 export type RecordCommerceCheckoutPaymentCaptureV1 = Static<
   typeof recordCheckoutPaymentCaptureCommandSchema

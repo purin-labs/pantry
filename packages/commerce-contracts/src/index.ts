@@ -126,7 +126,10 @@ export type { PayoutRecoveryAction } from "./records/supplier-payout.ts";
 export type { SupplierPayoutState } from "./records/supplier-payout.ts";
 export type { WiseFundingMode } from "./records/supplier-payout.ts";
 export type { PointOfSaleBuyer } from "./records/commerce-records.ts";
-export type { PointOfSaleConfiguration } from "./records/point-of-sale-configuration.ts";
+export type {
+  PointOfSaleCatalogScope,
+  PointOfSaleConfiguration,
+} from "./records/point-of-sale-configuration.ts";
 export type { PointOfSaleItemPolicy } from "./records/point-of-sale-configuration.ts";
 export type { TerminalAssignment } from "./records/terminal.ts";
 export type { TerminalAssignmentState } from "./records/terminal.ts";

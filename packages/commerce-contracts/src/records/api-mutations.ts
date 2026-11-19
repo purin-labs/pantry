@@ -611,6 +611,7 @@ const CORE_COMMAND_KINDS = [
   "create_shipping_checkout",
   "begin_checkout_payment",
   "collect_in_person_checkout_payment",
+  "record_counter_cash_payment",
   "record_checkout_payment_capture",
   "observe_payment_dispute",
   "place_paid_checkout",
