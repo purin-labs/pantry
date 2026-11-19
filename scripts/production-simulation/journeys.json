@@ -1004,10 +1004,11 @@
         "tool": "python",
         "args": []
       },
-      "status": "fails",
-      "failure": {
-        "reason": "test_prepared_inertials_and_preserved_mass_axes_and_limits: a Dobot CR10 actuator has the force range -300 to 300, and its vendor URDF gives effort 0.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17); the test (2efc04330) and the Dobot model (bfe934b4f) did not change since 2026-10-09"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 3.2,
+        "date": "2026-11-19",
+        "commit": "2743ce0ab"
       }
     },
     {
@@ -1141,12 +1142,13 @@
         "tool": "node",
         "args": ["{out}"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "A step count is 14,750, and the pinned reference gives 14,250. The journey has failed for this old reason since at least 2026-10-07.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17); docs/evidence/refactor-8/README.md records the failure at 0b0aba06d"
-      },
-      "notes": "Needs MUJOCO_DIR, because it runs cargo build."
+      "status": "passes",
+      "notes": "Needs MUJOCO_DIR, because it runs cargo build.",
+      "lastRun": {
+        "seconds": 62.5,
+        "date": "2026-11-19",
+        "commit": "2743ce0ab"
+      }
     },
     {
       "id": "timeout-recovery",
@@ -1158,10 +1160,11 @@
         "tool": "node",
         "args": ["{out}"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "A native rack sequence is 'rejected', not 'accepted' ('Choose a native rack sequence'). The probable cause is the limit check of Refactor 16 step 7 (618c9ecb7); the commit before it was not run.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 4.7,
+        "date": "2026-11-19",
+        "commit": "2743ce0ab"
       }
     },
     {
@@ -1174,10 +1177,11 @@
         "tool": "node",
         "args": ["{out}"]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "A rejected placement fails with 'joint-speed', not 'unreachable'. Refactor 16 step 7 (618c9ecb7) added the 'joint-speed' failure; the commit before it was not run.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 5.5,
+        "date": "2026-11-19",
+        "commit": "2743ce0ab"
       }
     },
     {
