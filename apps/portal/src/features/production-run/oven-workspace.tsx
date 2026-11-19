@@ -108,6 +108,7 @@ import {
 } from "./recipe-workflow";
 import "./oven-workspace.css";
 import { ProductionOverview } from "./production-overview";
+import { watchFactoryToolbar } from "./factory-toolbar-offset";
 import { StationDetails, WaitExplanationView } from "./wait-explanation-view";
 import {
   factoryStationsForScenario,
@@ -343,6 +344,8 @@ export class OvenWorkspace extends React.Component<Props, State> {
   // This synchronous reference also guards requests before React paints a change.
   private session: Session = this.state.session;
   private mounted = false;
+  private readonly workspace = React.createRef<HTMLElement>();
+  private stopToolbarWatch: (() => void) | null = null;
   private agentSurface: PersistentProductionSurface | null = null;
   private readonly artifacts = new Map<string, ArtifactContent>();
   private livePhysics: LivePhysics = this.state.livePhysics;
@@ -431,6 +434,8 @@ export class OvenWorkspace extends React.Component<Props, State> {
   componentDidMount(): void {
     this.mounted = true;
     this.floorPlanSync.connect();
+    if (this.workspace.current !== null)
+      this.stopToolbarWatch = watchFactoryToolbar(this.workspace.current);
     if (this.props.source.kind === "snapshot")
       for (const artifact of this.props.source.save.artifacts)
         this.artifacts.set(artifact.digest, artifact);
@@ -457,6 +462,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+    this.stopToolbarWatch?.();
     this.floorPlanSync.dispose();
     this.agentSurface?.close();
     this.agentSurface = null;
@@ -1979,6 +1985,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
     const panel = this.state.panel;
     return (
       <section
+        ref={this.workspace}
         className="production-workspace persistent-production"
         aria-label="Persistent production"
         data-lifecycle={session.kind}
