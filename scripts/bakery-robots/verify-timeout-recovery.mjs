@@ -42,7 +42,17 @@ const loadingHandoffPath = join(output, "loading-handoff.json");
 const returnHandoffPath = join(output, "return-handoff.json");
 const resumedPath = join(output, "resumed.json");
 const failedPath = join(output, "failed-rack.json");
-run(requestPath, ["prepare", "--task", "table-to-oven", "--cell", "combined"]);
+// The FR10 cannot hold the tray in every pose of the combined cell, so its
+// rack cycle stops at step 0 (actuator-limit); the UR5e completes it.
+run(requestPath, [
+  "prepare",
+  "--robot",
+  "universal-robots-ur5e",
+  "--task",
+  "table-to-oven",
+  "--cell",
+  "combined",
+]);
 
 const timeout = spawnSync(
   binary,
@@ -63,6 +73,7 @@ assert.equal(parsed.kind, "accepted", parsed.message);
 const compiled = compileRackCycleInput(
   rackPlanFromSequence(parsed.sequence),
   "0",
+  "cold-cell-1",
 );
 assert.equal(compiled.kind, "ready", compiled.message);
 const reservation = reserveWorkcell({ kind: "empty" }, compiled.input);
@@ -106,6 +117,7 @@ assert.equal(failed.kind, "accepted", failed.message);
 const failedInput = compileRackCycleInput(
   rackPlanFromSequence(failed.sequence),
   "0",
+  "cold-cell-1",
 );
 assert.equal(failedInput.kind, "ready", failedInput.message);
 const failedReservation = reserveWorkcell({ kind: "empty" }, failedInput.input);
