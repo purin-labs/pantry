@@ -2214,10 +2214,10 @@
       "run": {
         "tool": "browser",
         "url": "/linea-rehearsal.html",
+        "portal": "built",
         "timeoutMs": 900000
       },
       "status": "passes",
-      "notes": "Runs on the built Portal: pnpm portal:build, then node scripts/production-simulation/serve-portal-assets.mjs apps/portal/dist <port>, and --base-url http://127.0.0.1:<port>.",
       "lastRun": {
         "seconds": 22,
         "date": "2026-11-17",

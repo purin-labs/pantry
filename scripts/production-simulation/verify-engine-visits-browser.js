@@ -1,7 +1,13 @@
 // Refactor 16 step 11: the bytes and the start times of a first and a
-// second visit. Run through scripts/bakery-robots/browser-acceptance.mjs on
-// the built Portal, served by scripts/production-simulation/serve-portal-assets.mjs:
+// second visit. It runs on the built Portal, served by
+// scripts/production-simulation/serve-portal-assets.mjs, and not on the Vite
+// dev server. The journey runner builds and serves it (run.portal "built"):
 //
+//   node scripts/production-simulation/run-journeys.mjs --id engine-visits-browser
+//
+// By hand, for a page address with the options below:
+//
+//   pnpm portal:build
 //   node scripts/production-simulation/serve-portal-assets.mjs apps/portal/dist 5296
 //   node scripts/bakery-robots/browser-acceptance.mjs \
 //     --url http://127.0.0.1:5296/linea-rehearsal.html \
@@ -25,7 +31,14 @@
 // /bakery-physics/ to the server. Without it, the journey only reports.
 async function served(page, reset) {
   return page.evaluate(
-    async (method) => (await fetch("/__served", { method })).json(),
+    async (method) => {
+      const response = await fetch("/__served", { method });
+      if (!response.ok)
+        throw new Error(
+          `/__served answered ${response.status}: serve the built Portal with serve-portal-assets.mjs.`,
+        );
+      return response.json();
+    },
     reset ? "POST" : "GET",
   );
 }

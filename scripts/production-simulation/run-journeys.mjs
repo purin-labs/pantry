@@ -29,6 +29,11 @@
 // directory of journey ID (which then runs first), {abs:ID} its absolute path
 // (for a /@fs/ evidence URL), {runtime} the pinned browser runtime directory.
 //
+// A browser journey with run.portal "built" runs on the built Portal, as the
+// Workers static assets serve it, and not on --base-url: the first such
+// journey of a run builds the Portal (pnpm portal:build) and serves
+// apps/portal/dist with serve-portal-assets.mjs on a free port.
+//
 // CI runs its journeys through this index: set ci in the headless step and
 // set ci-browser in the browser step of .github/workflows/pantry.yml, so the
 // commands and their time limits have one source. run.timeoutMs of a browser
@@ -38,9 +43,11 @@
 // 44091735277 stopped the presets journey at 600 s; it takes 194 s on a Mac).
 import { spawn, execFileSync } from "node:child_process";
 import {
+  closeSync,
   createWriteStream,
   existsSync,
   mkdirSync,
+  openSync,
   readFileSync,
   readdirSync,
   writeFileSync,
@@ -143,6 +150,8 @@ const commit = git(["rev-parse", "--short=9", "HEAD"]);
 const started = new Date();
 const results = [];
 const failed = new Set();
+// A promise of the built Portal's origin, from the first journey that needs it.
+let builtPortalOrigin;
 
 for (const journey of selected) {
   if (
@@ -260,7 +269,7 @@ function expand(text, journey) {
     .replace(/\{abs:([a-z0-9-]+)\}/gu, (_, id) => directoryOf(byId.get(id)));
 }
 
-function command(journey) {
+function command(journey, origin) {
   const run = journey.run;
   const args = (run.args ?? []).map((arg) => expand(arg, journey));
   if (run.tool === "browser")
@@ -269,7 +278,7 @@ function command(journey) {
       [
         "scripts/bakery-robots/browser-acceptance.mjs",
         "--url",
-        `${values["base-url"]}${expand(run.url, journey)}`,
+        `${origin}${expand(run.url, journey)}`,
         "--journey",
         journey.file,
         "--output",
@@ -305,8 +314,22 @@ async function runJourney(journey) {
       reason: "the output directory exists",
     };
   }
+  let origin = values["base-url"];
+  if (journey.run.portal === "built") {
+    try {
+      origin = await builtPortal();
+    } catch (error) {
+      console.error(`journeys: ${journey.id}: ${error.message}`);
+      return {
+        id: journey.id,
+        file: journey.file,
+        result: "failed",
+        reason: error.message,
+      };
+    }
+  }
   if (journey.run.mkdir === true) mkdirSync(directory, { recursive: true });
-  const [program, args] = command(journey);
+  const [program, args] = command(journey, origin);
   const env = { ...process.env };
   for (const [name, value] of Object.entries(journey.run.env ?? {}))
     env[name] = expand(value, journey);
@@ -388,6 +411,56 @@ async function runJourney(journey) {
   };
 }
 
+// The origin of the built Portal; see run.portal in the header. One build and
+// one server serve every such journey of the run, and the server stops when
+// the run exits.
+function builtPortal() {
+  builtPortalOrigin ??= serveBuiltPortal();
+  return builtPortalOrigin;
+}
+
+async function serveBuiltPortal() {
+  const buildLog = join(logs, "portal-build.log");
+  console.log(
+    `\njourneys: build the Portal: pnpm portal:build > ${relative(root, buildLog)}`,
+  );
+  const fd = openSync(buildLog, "w");
+  const built = await new Promise((done) => {
+    const build = spawn("pnpm", ["portal:build"], {
+      cwd: root,
+      stdio: ["ignore", fd, fd],
+    });
+    build.on("error", () => done(127));
+    build.on("close", (code) => done(code ?? 1));
+  });
+  closeSync(fd);
+  if (built !== 0)
+    throw new Error(
+      `pnpm portal:build failed (exit ${built}); read ${relative(root, buildLog)}`,
+    );
+  const server = spawn(
+    process.execPath,
+    [
+      "scripts/production-simulation/serve-portal-assets.mjs",
+      "apps/portal/dist",
+      "0",
+    ],
+    { cwd: root, stdio: ["ignore", "pipe", "inherit"] },
+  );
+  process.on("exit", () => server.kill());
+  return new Promise((ready, refuse) => {
+    let text = "";
+    server.stdout.on("data", (chunk) => {
+      text += chunk;
+      const origin = /on (http:\/\/\S+)/u.exec(text)?.[1];
+      if (origin !== undefined) ready(origin);
+    });
+    server.on("exit", (code) =>
+      refuse(new Error(`serve-portal-assets.mjs stopped (exit ${code})`)),
+    );
+  });
+}
+
 // Read the index again: another run can have recorded its times meanwhile.
 function record(results) {
   const date = started.toLocaleDateString("sv-SE"); // YYYY-MM-DD, local time
@@ -430,6 +503,11 @@ function checkIndex(strict) {
       found.push(`${where}: run.tool is one of ${TOOLS.join(", ")}`);
     if (journey.run?.tool === "browser" && typeof journey.run.url !== "string")
       found.push(`${where}: a browser journey gives run.url`);
+    if (
+      journey.run?.portal !== undefined &&
+      (journey.run.tool !== "browser" || journey.run.portal !== "built")
+    )
+      found.push(`${where}: run.portal is "built", for a browser journey`);
     if (!STATUSES.includes(journey.status))
       found.push(`${where}: status is one of ${STATUSES.join(", ")}`);
     if (!strict) continue;

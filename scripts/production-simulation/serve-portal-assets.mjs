@@ -4,6 +4,8 @@
 //
 //   node scripts/production-simulation/serve-portal-assets.mjs DIST PORT
 //
+// PORT 0 takes a free port; the first line names the origin.
+//
 // It applies the `_headers` file of DIST as the Workers static assets rules
 // say: every rule whose path pattern matches the request adds its headers,
 // and a header that a rule names replaces the default of the same name. The
@@ -14,7 +16,7 @@
 //
 // The server counts what it sends. `GET /__served` returns the requests,
 // the 304 answers and the body bytes, in all and under /bakery-physics/ (with
-// each file there), since the last `POST /__served/reset`.
+// each file there), since the last `POST /__served`, which sets them to zero.
 // This is a model of the asset server, not the asset server: it proves what
 // the browser fetches under the rules, not that Cloudflare applies them.
 import { createHash } from "node:crypto";
@@ -108,7 +110,7 @@ function etag(path) {
   return tag;
 }
 
-createServer((request, response) => {
+const server = createServer((request, response) => {
   const url = new URL(request.url ?? "/", "http://localhost");
   if (url.pathname === "/__served") {
     if (request.method === "POST") served = empty();
@@ -153,6 +155,7 @@ createServer((request, response) => {
   headers.set("content-length", String(body.length));
   response.writeHead(200, Object.fromEntries(headers));
   response.end(body);
-}).listen(port, "127.0.0.1", () =>
-  console.log(`Serving ${dist} on http://127.0.0.1:${port}`),
+});
+server.listen(port, "127.0.0.1", () =>
+  console.log(`Serving ${dist} on http://127.0.0.1:${server.address().port}`),
 );
