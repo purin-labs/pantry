@@ -64,7 +64,7 @@ async function runArtifactStorageStage(stage) {
   const { openExecutionWorker } =
     await import("/src/features/production-run/execution-client.ts");
   const { exportOvenSave, ovenCheckpointContents } =
-    await import("/src/features/production-run/oven-run-file.ts");
+    await import("/@id/@seams/production-simulation/runs/oven-run-file");
   const { canonicalJson } = await import("/@id/@seams/std");
   const base = new URL(location.href).searchParams.get("evidence");
   if (stage === 0) {

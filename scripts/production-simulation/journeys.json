@@ -2100,10 +2100,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html?evidence=/@fs/{abs:artifact-handoff}"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It imports src/features/production-run/oven-run-file.ts, which 319ba55b5 (Refactor 10 step 4) moved into @seams/production-simulation.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 82.8,
+        "date": "2026-11-19",
+        "commit": "67ee2330d"
       }
     },
     {
@@ -2118,8 +2119,8 @@
       },
       "status": "fails",
       "failure": {
-        "reason": "It reads the report of artifact-storage-browser, which fails.",
-        "proof": "artifact-storage-browser fails"
+        "reason": "Its fixture, the recurring-run.json of artifact-storage-browser, must exceed 512 MiB, the single string limit of the browser. On 2026-11-19 that export is 337,218,012 bytes (152 artifacts), so the journey refuses it.",
+        "proof": "fails at 67ee2330d (run on 2026-11-19)"
       }
     },
     {

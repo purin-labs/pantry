@@ -87,11 +87,11 @@ function addArchiveInput() {
 
 async function importStoredRun(snapshot) {
   const { readSavedRunFile } =
-    await import("/src/features/production-run/run-file-reader.ts");
+    await import("/@id/@seams/production-simulation/runs/run-file-reader");
   const { RunArtifactStore } =
     await import("/src/features/production-run/run-artifact-store.ts");
   const { OvenRecordings } =
-    await import("/src/features/production-run/oven-recordings.ts");
+    await import("/@id/@seams/production-simulation/runs/oven-recordings");
   const { openResumable } = await import("/@id/@seams/production-simulation");
   const input = document.querySelector("#archive-input");
   const file = input.files[0];
