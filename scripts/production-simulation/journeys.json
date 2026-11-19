@@ -1211,10 +1211,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "fails",
-      "failure": {
-        "reason": "Its page.waitForFunction check reads `receipts` of an undefined value: the page state that it reads has another shape now.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 149.7,
+        "date": "2026-11-19",
+        "commit": "dfd3e6bff"
       }
     },
     {

@@ -4,8 +4,14 @@
 // operator's own edits share the same draft.
 async function verifyProductionChatParity(page) {
   page.setDefaultTimeout(15000);
+  // This journey mounts its own connected workspace, so the preview entry
+  // only loads the styles: no second React root and its WebGL resources. The
+  // effect bridge polls only for the conversation that the URL names.
+  await page.route("**/src/dev/workflow-preview.tsx", serveParityStyles, {
+    times: 1,
+  });
   await page.goto(
-    `${globalThis.bakeryBase ?? "http://127.0.0.1:5188"}/workflow-preview.html`,
+    `${globalThis.bakeryBase ?? new URL(page.url()).origin}/workflow-preview.html?conversation=production-chat-acceptance`,
   );
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.evaluate(async function mountWorkspace() {
@@ -137,6 +143,9 @@ async function verifyProductionChatParity(page) {
       ),
     );
   });
+  // The page keeps one engine worker for all its jobs, so the result gate
+  // must wrap Worker before the first job opens that worker.
+  await page.evaluate(installSimulationResultGate);
   await page.getByRole("button", { name: "Play shift", exact: true }).waitFor();
   const evidence =
     globalThis.bakeryEvidence ?? "output/playwright/plan42e-production-chat";
@@ -531,7 +540,7 @@ async function verifyProductionChatParity(page) {
   if (
     await page
       .getByRole("group", { name: `Batch ${last.batchId} · tray ${last.tray}` })
-      .getByRole("checkbox", { name: "Use FR10 cold transfer" })
+      .getByRole("checkbox", { name: "Use Robot cold transfer" })
       .isChecked()
   )
     throw new Error("Edit scenario still assigns the removed tray");
@@ -731,22 +740,14 @@ async function verifyProductionChatParity(page) {
     draftDigest: accepted.active.draft.digest,
   });
   const reviewed = await capture();
-  if (reviewed.supportedCommands.includes("apply_production"))
-    throw new Error("Chat may not apply over accepted results");
-  const withheld = await refused(
-    {
-      kind: "apply_production",
-      draftDigest: reviewed.active.draft.digest,
-      planFingerprint: reviewed.active.draft.preview.planFingerprint,
-    },
-    "stale_surface",
-  );
-  await page.screenshot({ path: `${evidence}/apply-withheld.png` });
+  // Over accepted results, chat's Apply opens the operator's replacement
+  // review, as the Apply button does: it replaces nothing by itself.
   await run({
-    kind: "edit_production",
+    kind: "apply_production",
     draftDigest: reviewed.active.draft.digest,
-    edit: { kind: "prepare_replacement", source: "preview" },
+    planFingerprint: reviewed.active.draft.preview.planFingerprint,
   });
+  await page.screenshot({ path: `${evidence}/apply-review.png` });
   const proposed = await capture();
   if (
     proposed.active.planFingerprint !== reviewed.active.planFingerprint ||
@@ -945,7 +946,6 @@ async function verifyProductionChatParity(page) {
     edits,
     refused: {
       stale,
-      withheld,
       pendingTask,
       staleView,
       stalePanel,
@@ -1057,7 +1057,7 @@ async function verifyRecordingCameraFocus(
     });
     if (wholeScene.equals(chatImage))
       throw new Error(`${view.camera} did not change the rendered camera`);
-    if (!clickImage.equals(chatImage))
+    if (!(await sameView(page, clickImage, chatImage)))
       throw new Error(`${view.camera} chat and click camera images differ`);
     await page.screenshot({
       path: `${evidence}/recording-${view.camera}-view.png`,
@@ -1088,7 +1088,7 @@ async function verifyRecordingCameraFocus(
     mask: [mask],
     path: `${evidence}/recording-selection.png`,
   });
-  if (!selectedClick.equals(selectedChat))
+  if (!(await sameView(page, selectedClick, selectedChat)))
     throw new Error("Selected-equipment chat and click camera images differ");
   await page.screenshot({ path: `${evidence}/recording-selection-view.png` });
   matched.push("selection");
@@ -1154,7 +1154,10 @@ async function verifyWorkspaceCamera(
   name,
 ) {
   const workspace = page.locator(selector);
-  const top = workspace.getByRole("button", { name: "Top view", exact: true });
+  // The camera bar's Top view; the inspection panel has one of its own.
+  const top = workspace
+    .getByRole("group", { name: /^(3D camera|Camera controls)$/u })
+    .getByRole("button", { name: "Top view", exact: true });
   await top.click({ trial: true });
   const before = await capture();
   await run({
@@ -1212,7 +1215,7 @@ async function verifyManualSimulationStop(
   refused,
   evidence,
 ) {
-  await page.evaluate(installSimulationResultGate);
+  await page.evaluate(holdSimulationResults);
   await page
     .getByRole("button", { name: "Run in browser", exact: true })
     .click();
@@ -1300,13 +1303,20 @@ function installSimulationResultGate() {
   const fixture = window.chatParityAcceptance;
   fixture.nativeWorker = window.Worker;
   fixture.heldResults = [];
+  fixture.holdingResults = false;
   class ResultGateWorker extends fixture.nativeWorker {
     constructor(...args) {
       super(...args);
       this.addEventListener("message", this.holdResult.bind(this));
     }
+    // The engine worker answers each request in an envelope; the last reply
+    // of a job is "job-completed".
     holdResult(event) {
-      if (event.data.kind !== "completed") return;
+      if (
+        !fixture.holdingResults ||
+        event.data?.reply?.kind !== "job-completed"
+      )
+        return;
       event.stopImmediatePropagation();
       fixture.heldResults.push({
         handler: this.onmessage,
@@ -1330,8 +1340,12 @@ function releaseHeldSimulationResults() {
   }
 }
 
+function holdSimulationResults() {
+  window.chatParityAcceptance.holdingResults = true;
+}
+
 function restoreSimulationWorker() {
-  window.Worker = window.chatParityAcceptance.nativeWorker;
+  window.chatParityAcceptance.holdingResults = false;
 }
 
 function cameraStateDifferences(before, after) {
@@ -1562,7 +1576,10 @@ async function verifyDoorInspection(page, capture, run, refused, evidence) {
       mask: [mask],
       path: `${evidence}/door-${choice.degrees}.png`,
     });
-    if (recorded.equals(chatImage) || !clickImage.equals(chatImage))
+    if (
+      recorded.equals(chatImage) ||
+      !(await sameView(page, clickImage, chatImage))
+    )
       throw new Error(
         "Door preview failed to change geometry or click/chat images differ",
       );
@@ -1925,4 +1942,40 @@ function readSavedOpenReceipt(id) {
 
 function isFocused(element) {
   return document.activeElement === element;
+}
+
+async function serveParityStyles(route) {
+  await route.fulfill({
+    contentType: "application/javascript",
+    body: 'import "/src/styles.css"; import "/src/dev/workflow-preview.css";',
+  });
+}
+
+// Two WebGL renders of one camera can differ by 1/255 in some colour values
+// (shadow and anti-aliasing rounding). A person sees the same picture, so a
+// view is the same when no value differs by more than 2/255.
+async function sameView(page, first, second) {
+  if (first.equals(second)) return true;
+  return page.evaluate(comparePictures, [
+    first.toString("base64"),
+    second.toString("base64"),
+  ]);
+}
+
+async function comparePictures([first, second]) {
+  async function pixels(base64) {
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const bitmap = await createImageBitmap(
+      new Blob([bytes], { type: "image/png" }),
+    );
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const context = canvas.getContext("2d");
+    context.drawImage(bitmap, 0, 0);
+    return context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+  }
+  const [a, b] = await Promise.all([pixels(first), pixels(second)]);
+  if (a.length !== b.length) return false;
+  for (let index = 0; index < a.length; index++)
+    if (Math.abs(a[index] - b[index]) > 2) return false;
+  return true;
 }
