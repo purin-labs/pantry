@@ -1,6 +1,7 @@
 import {
   COSTS_SURFACE,
   KITCHEN_SURFACE,
+  REGISTER_SURFACE,
   isConversationId,
   pageViewCommandSurface,
   type PageViewCommand,
@@ -44,7 +45,11 @@ export async function executeCostsViewForHarness(
 ): Promise<unknown> {
   const surface = pageViewCommandSurface(command);
   const pageName =
-    surface === COSTS_SURFACE ? "Costs & margins" : "Kitchen Pastry Bench";
+    surface === COSTS_SURFACE
+      ? "Costs & margins"
+      : surface === REGISTER_SURFACE
+        ? "Café Register"
+        : "Kitchen Pastry Bench";
   const requester = authority.lease.requestAuthority;
   if (
     requester.kind !== "control" ||
@@ -75,6 +80,7 @@ export async function executeCostsViewForHarness(
     authority.organisationId,
     authority.lease,
     authority.accountAccess,
+    { allowOperator: surface === REGISTER_SURFACE },
   );
   const agentLabel = await authority.agentLabel();
   const target = {
@@ -93,15 +99,28 @@ export async function executeCostsViewForHarness(
           command,
           agentLabel,
         }
-      : {
-          kind: "page_command",
-          schemaVersion: 1,
-          surface: COSTS_SURFACE,
-          binding,
-          target,
-          command,
-          agentLabel,
-        };
+      : command.name === "register_add_item" ||
+          command.name === "register_update_line" ||
+          command.name === "register_remove_line" ||
+          command.name === "register_clear_basket"
+        ? {
+            kind: "page_command",
+            schemaVersion: 1,
+            surface: REGISTER_SURFACE,
+            binding,
+            target,
+            command,
+            agentLabel,
+          }
+        : {
+            kind: "page_command",
+            schemaVersion: 1,
+            surface: COSTS_SURFACE,
+            binding,
+            target,
+            command,
+            agentLabel,
+          };
   const dispatched = await dispatchBakerySurfaceEffect({
     db: authority.db,
     storage: authority.storage,
@@ -127,7 +146,7 @@ async function currentPageObservation(
   organisationId: OrganisationId,
   userId: string,
   conversationId: string,
-  surface: typeof COSTS_SURFACE | typeof KITCHEN_SURFACE,
+  surface: typeof COSTS_SURFACE | typeof KITCHEN_SURFACE | typeof REGISTER_SURFACE,
 ): Promise<SurfaceObservationV2 | null> {
   if (!isConversationId(conversationId)) return null;
   const user = parseUserId(userId);

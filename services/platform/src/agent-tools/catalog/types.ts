@@ -409,6 +409,34 @@ export type ProductDescriptionDraftEdit = (
 
 export type OrderQueueReadTool = () => Promise<OrderQueueToolRead>;
 
+export type CounterSaleReadRequest = Readonly<{ checkoutId: string }>;
+
+export type CounterSaleToolRead = Readonly<{
+  checkoutId: string;
+  satyrLocationId: string;
+  state: string;
+  collectable: boolean;
+  orderId: string | null;
+  pickupCode: string | null;
+  paymentMethod: string | null;
+  tenderBrand: string | null;
+  providerRefundable: boolean | null;
+  amountMinor: number | null;
+  currency: string | null;
+  cashReceivedMinor: number | null;
+  changeDueMinor: number | null;
+  afterSale: Readonly<{
+    orderState: string;
+    paymentState: string;
+    fulfillmentState: string;
+    refundState: string;
+  }> | null;
+}>;
+
+export type CounterSaleReadTool = (
+  request: CounterSaleReadRequest,
+) => Promise<CounterSaleToolRead>;
+
 /** The window of a payments read: two UTC instants, the start first. */
 export type PaymentsReadRequest = Readonly<{ start: string; end: string }>;
 

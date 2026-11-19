@@ -7,7 +7,7 @@ Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`d
 
 ## Current state
 
-- **Plan 90 is proposed and committed in `pantry` (`docs/plan-90-cafe-pos-checkout.md`).** No Plan 90 product code has been written yet.
+- **Phases 1, 2, 3A, and 4A are implemented on branch `plan-90-cafe-pos-checkout`.** Phases 3B (`square_pos_app`), 3C (live physical Square Terminal certification), 4B (GMO `stera` LAN CCT wire framing), and 5 (Star `MCP31LB` / `mJ-Drawer`) remain out of scope or hardware-gated.
 - **Display and code names changed in Plans 91 and 92 (`AGENTS.md`):**
   - Product display name: **Seams Pantry** (short form: **Pantry**).
   - Switcher area: **Café** (`Café › Register`, `Café › Order queue`, `Café › Counters & payments`).

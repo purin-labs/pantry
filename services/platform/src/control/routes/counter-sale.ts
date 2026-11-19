@@ -1,56 +1,50 @@
-import { terminalAssignmentPaymentBinding } from "@seams/contracts";
+import {
+  isCounterRegisterPaymentMethod,
+  type CounterRegisterPaymentMethod,
+} from "@seams/control-api";
 import type {
   CommerceClientError,
-  CommerceCounterSaleV1,
-  CommercePickupFulfillmentV1,
-  CommerceMerchantSnapshotV1,
-  CommerceOrderV1,
-  CommercePaymentV1,
   CommercePickupCheckoutLineV1,
 } from "@seams/commerce-client";
+import type { Variant } from "@seams/type-utils";
 
+import {
+  cancelCounterSaleCollection,
+  collectCounterSalePayment,
+  executeCounterSaleAfterSale,
+  loadCounterRegisterSnapshot,
+  openCounterSale,
+  readCounterSaleView,
+  reconcileCounterSale,
+  recordCounterSaleCash,
+  type CounterRegisterDeps,
+  type CounterRegisterFailure,
+  type CounterSaleAfterSaleAction,
+} from "../../commerce/counter-register";
+import type {
+  ControlMutationReceiptScope,
+  UnversionedControlMutationBoundary,
+} from "../../data/control-mutation";
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";
-import {
-  resolveMerchantControlContext,
-  type MerchantControlContext,
-} from "../commerce-merchant";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
+import {
+  resolveMerchantControlContext,
+  type MerchantControlContext,
+} from "../commerce-merchant";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
 } from "../http";
-import {
-  type UnversionedControlMutationBoundary,
-  type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
-import { readActiveTerminalAssignment } from "../../data/terminal-assignment-store";
-import { readCounterSale as readCounterSaleState } from "../../data/counter-sale-readback";
-import type { CounterSaleReadback } from "../../data/counter-sale-readback";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import type { Variant } from "@seams/type-utils";
-import { assertNever } from "@seams/std";
 
-/**
- * The walking sale: ring an order up at the counter and take the card.
- *
- * Two steps, because they fail differently. Opening the Checkout is ordinary
- * commerce and can simply be retried. Collecting is money movement against
- * hardware that is physically present, so it is idempotent on the operator's
- * key and never re-dispatched on a whim.
- *
- * Everything the sale is priced by — the counter policy revision and the
- * terminal assignment revision — is resolved here from what is actually in
- * force, never accepted from the caller. An operator's browser cannot name the
- * policy it wants to be charged under, and a counter sale pins no storefront
- * profile at all: it is priced by the counter's own published configuration.
- */
 export type CounterSaleControlRoute =
+  | Readonly<{ kind: "counterRegister"; organisationIdRaw: string }>
   | Readonly<{ kind: "counterSales"; organisationIdRaw: string }>
   | Readonly<{
       kind: "counterSale";
@@ -58,7 +52,17 @@ export type CounterSaleControlRoute =
       checkoutIdRaw: string;
     }>
   | Readonly<{
+      kind: "counterSaleCash";
+      organisationIdRaw: string;
+      checkoutIdRaw: string;
+    }>
+  | Readonly<{
       kind: "counterSaleCollection";
+      organisationIdRaw: string;
+      checkoutIdRaw: string;
+    }>
+  | Readonly<{
+      kind: "counterSaleCancel";
       organisationIdRaw: string;
       checkoutIdRaw: string;
     }>
@@ -69,45 +73,21 @@ export type CounterSaleControlRoute =
     }>
   | Readonly<{
       kind:
-        "counterSalePickupReady" | "counterSaleHandover" | "counterSaleRefund";
+        | "counterSalePickupReady"
+        | "counterSaleHandover"
+        | "counterSaleRefund"
+        | "counterSaleManualCashRefund";
       organisationIdRaw: string;
       checkoutIdRaw: string;
     }>;
 
-type CounterSaleAfterSale = Readonly<{
-  order: Readonly<{
-    id: string;
-    revision: number;
-    state: CommerceOrderV1["lifecycle"]["state"];
-  }>;
-  payment: Readonly<{
-    id: string;
-    revision: number;
-    state: CommercePaymentV1["lifecycle"]["state"];
-  }>;
-  fulfillment: Readonly<{
-    id: string;
-    revision: number;
-    state: CommercePickupFulfillmentV1["lifecycle"]["state"];
-  }>;
-  refundState: "none" | "pending" | "completed" | "failed";
-}>;
-
-type CounterSaleView = CounterSaleReadback &
-  Readonly<{
-    afterSale: CounterSaleAfterSale | null;
-  }>;
-
 type StartedMutation = Readonly<{
   authorized: AuthorizedOrganisationRequest;
-  identity: Readonly<{
-    issuer: string;
-    subject: string;
-    userId: string;
-  }>;
+  identity: Readonly<{ issuer: string; subject: string; userId: string }>;
   scope: ControlMutationReceiptScope;
   boundary: UnversionedControlMutationBoundary;
   context: MerchantControlContext;
+  deps: CounterRegisterDeps;
   body: JsonRecord;
   now: number;
 }>;
@@ -115,41 +95,42 @@ type StartedMutation = Readonly<{
 export function matchCounterSaleControlRoute(
   pathname: string,
 ): CounterSaleControlRoute | null {
+  const register = match(
+    pathname,
+    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-register$/u,
+  );
+  if (register !== null) {
+    return { kind: "counterRegister", organisationIdRaw: decode(register[0]) };
+  }
   const afterSale = match(
     pathname,
-    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-sales\/([^/]+)\/(ready|handover|refund)$/u,
+    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-sales\/([^/]+)\/(ready|handover|refund|manual-cash-refund)$/u,
   );
   if (afterSale !== null) {
-    const action = afterSale[2];
-    if (action === undefined) {
-      throw new Error("Counter-sale after-sale action is missing");
-    }
     return {
-      kind: afterSaleKind(action),
+      kind: afterSaleKind(afterSale[2] ?? ""),
       organisationIdRaw: decode(afterSale[0]),
       checkoutIdRaw: decode(afterSale[1]),
     };
   }
-  const reconciliation = match(
+  const subRoute = match(
     pathname,
-    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-sales\/([^/]+)\/reconciliation$/u,
+    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-sales\/([^/]+)\/(cash|collection|cancel|reconciliation)$/u,
   );
-  if (reconciliation !== null) {
+  if (subRoute !== null) {
+    const sub = subRoute[2];
+    const kind =
+      sub === "cash"
+        ? "counterSaleCash"
+        : sub === "collection"
+          ? "counterSaleCollection"
+          : sub === "cancel"
+            ? "counterSaleCancel"
+            : "counterSaleReconciliation";
     return {
-      kind: "counterSaleReconciliation",
-      organisationIdRaw: decode(reconciliation[0]),
-      checkoutIdRaw: decode(reconciliation[1]),
-    };
-  }
-  const collection = match(
-    pathname,
-    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-sales\/([^/]+)\/collection$/u,
-  );
-  if (collection !== null) {
-    return {
-      kind: "counterSaleCollection",
-      organisationIdRaw: decode(collection[0]),
-      checkoutIdRaw: decode(collection[1]),
+      kind,
+      organisationIdRaw: decode(subRoute[0]),
+      checkoutIdRaw: decode(subRoute[1]),
     };
   }
   const sale = match(
@@ -178,37 +159,61 @@ export function handleCounterSaleControlRoute(
   route: CounterSaleControlRoute,
 ): Promise<Response> {
   switch (route.kind) {
+    case "counterRegister":
+      return handleCounterRegisterRead(request, env, route.organisationIdRaw);
     case "counterSales":
       return handleCounterSaleOpen(request, env, route.organisationIdRaw);
     case "counterSale":
       return handleCounterSaleRead(request, env, route);
+    case "counterSaleCash":
+      return handleCounterSaleCash(request, env, route);
     case "counterSaleCollection":
       return handleCounterSaleCollection(request, env, route);
+    case "counterSaleCancel":
+      return handleCounterSaleCancel(request, env, route);
     case "counterSaleReconciliation":
       return handleCounterSaleReconciliation(request, env, route);
     case "counterSalePickupReady":
     case "counterSaleHandover":
     case "counterSaleRefund":
+    case "counterSaleManualCashRefund":
       return handleCounterSaleAfterSale(request, env, route);
   }
 }
 
-/**
- * Read one sale back: the receipt, and what the payment is actually doing.
- *
- * This is the surface an operator uses when a collection did not visibly
- * finish — a reload mid-sale, a terminal that went quiet, a customer asking
- * whether they were charged. It answers from recorded state only, and it is
- * the same answer whichever till asks.
- */
+async function handleCounterRegisterRead(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  if (request.method !== "GET") return controlError("method_not_allowed", 405);
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    "operator",
+    false,
+  );
+  if (!authorized.ok) return authorized.response;
+  const context = await resolveMerchantControlContext(env, authorized);
+  if (context instanceof Response) return context;
+  const url = new URL(request.url);
+  const locationId = url.searchParams.get("locationId");
+  const loaded = await loadCounterRegisterSnapshot(
+    makeDeps(env, authorized, context),
+    locationId,
+  );
+  return loaded.ok
+    ? controlJson({ ok: true, register: loaded.value })
+    : failureResponse(loaded.failure);
+}
+
 async function handleCounterSaleRead(
   request: Request,
   env: Env,
   route: Variant<CounterSaleControlRoute, "counterSale">,
 ): Promise<Response> {
-  if (request.method !== "GET") {
-    return controlError("method_not_allowed", 405);
-  }
+  if (request.method !== "GET") return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
@@ -216,26 +221,16 @@ async function handleCounterSaleRead(
     "viewer",
     false,
   );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
+  if (!authorized.ok) return authorized.response;
   const context = await resolveMerchantControlContext(env, authorized);
-  if (context instanceof Response) {
-    return context;
-  }
-  const sale = await context.client.readCounterSale(
-    context.merchantId,
+  if (context instanceof Response) return context;
+  const result = await readCounterSaleView(
+    makeDeps(env, authorized, context),
     route.checkoutIdRaw,
   );
-  if (!sale.ok) {
-    return sale.error.kind === "http" && sale.error.status === 404
-      ? controlError("counter_sale_not_found", 404)
-      : commerceErrorResponse(sale.error);
-  }
-  const view = await buildCounterSaleView(context, sale.value);
-  return view instanceof Response
-    ? view
-    : controlJson({ ok: true, counterSale: view });
+  return result.ok
+    ? controlJson({ ok: true, counterSale: result.value })
+    : failureResponse(result.failure);
 }
 
 async function handleCounterSaleOpen(
@@ -243,200 +238,96 @@ async function handleCounterSaleOpen(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const started = await beginCounterSaleMutation(
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const started = await beginMutation(
     request,
     env,
     organisationIdRaw,
     "counter_sale.open",
+    "operator",
   );
-  if (started instanceof Response) {
-    return started;
-  }
-  const sale = parseSaleRequest(started.body);
-  if (sale === null) {
-    return controlError("counter_sale_request_invalid", 422);
-  }
-
-  const resolved = await resolveCounterAuthority(started, sale.satyrLocationId);
-  if (resolved instanceof Response) {
-    return resolved;
-  }
-  const snapshot = await started.context.client.readSnapshot(
-    started.context.merchantId,
-  );
-  if (!snapshot.ok) {
-    return commerceErrorResponse(snapshot.error);
-  }
-
-  const created = await started.context.client.createInPersonCheckout({
-    merchantId: started.context.merchantId,
-    expectedMerchantRevision: snapshot.value.merchantRevision,
-    idempotencyKey: started.boundary.idempotencyKey,
-    satyrLocationId: sale.satyrLocationId,
-    posConfigurationRevision: resolved.posConfigurationRevision,
-    // The operator is recorded on the sale itself: a counter sale has no buyer
-    // identity to attribute it to, so who rang it up is the only attribution
-    // there is.
+  if (started instanceof Response) return started;
+  const parsed = parseSaleRequest(started.body);
+  if (parsed === null) return controlError("counter_sale_request_invalid", 422);
+  const opened = await openCounterSale(started.deps, {
+    ...parsed,
     operatorIdentity: started.identity.userId,
-    terminalAssignmentRevision: resolved.terminalAssignmentRevision,
-    buyer: { kind: "anonymous" },
-    checkoutId: sale.checkoutId,
-    lines: sale.lines,
+    idempotencyKey: started.boundary.idempotencyKey,
   });
-  if (!created.ok) {
-    return commerceErrorResponse(created.error);
-  }
-  if (created.value.outcome === "rejected") {
-    console.warn("counter_sale.open_rejected", {
-      code: created.value.error.code,
-      field:
-        "field" in created.value.error ? created.value.error.field : undefined,
-    });
-    return controlJson(
-      { ok: false, error: "counter_sale_rejected", detail: created.value },
-      409,
-    );
-  }
-  const responseBody = { ok: true, counterSale: created.value };
-  const recordedMutationReceipt = await completeCounterSaleMutation(
-    request,
-    started,
-    responseBody,
-  );
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  return controlJson(responseBody);
+  if (!opened.ok) return failureResponse(opened.failure);
+  return finishMutation(request, started, { ok: true, counterSale: opened.value });
 }
 
-/**
- * Present the amount on the terminal.
- *
- * The payment binding comes from the assignment currently active at the
- * counter, not from the request: an operator cannot choose which terminal
- * takes the money. A retired assignment has no binding at all, which is what
- * stops a withdrawn counter from collecting.
- */
+async function handleCounterSaleCash(
+  request: Request,
+  env: Env,
+  route: Variant<CounterSaleControlRoute, "counterSaleCash">,
+): Promise<Response> {
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const started = await beginMutation(
+    request,
+    env,
+    route.organisationIdRaw,
+    "counter_sale.cash",
+    "operator",
+  );
+  if (started instanceof Response) return started;
+  const parsed = parseCashRequest(started.body);
+  if (parsed === null) return controlError("counter_sale_request_invalid", 422);
+  const settled = await recordCounterSaleCash(started.deps, {
+    checkoutId: route.checkoutIdRaw,
+    ...parsed,
+    idempotencyKey: started.boundary.idempotencyKey,
+  });
+  if (!settled.ok) return failureResponse(settled.failure);
+  return finishMutation(request, started, { ok: true, counterSale: settled.value });
+}
+
 async function handleCounterSaleCollection(
   request: Request,
   env: Env,
   route: Variant<CounterSaleControlRoute, "counterSaleCollection">,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const started = await beginCounterSaleMutation(
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const started = await beginMutation(
     request,
     env,
     route.organisationIdRaw,
     "counter_sale.collect",
+    "operator",
   );
-  if (started instanceof Response) {
-    return started;
-  }
-  const collection = parseCollectionRequest(started.body);
-  if (collection === null) {
-    return controlError("counter_sale_request_invalid", 422);
-  }
-
-  const assignment = await readActiveTerminalAssignment(
-    started.authorized.executionScope.database,
-    started.authorized.organisationId,
-    collection.satyrLocationId,
-  );
-  if (!assignment.ok) {
-    return controlError("terminal_assignment_not_found", 409);
-  }
-  const binding = terminalAssignmentPaymentBinding(assignment.value);
-  if (!binding.ok) {
-    return controlError("terminal_assignment_retired", 409);
-  }
-  if (
-    binding.value.account.currency !== collection.amount.currency.toUpperCase()
-  ) {
-    // The terminal settles in its account's currency. Presenting an amount in
-    // another one would collect a number the buyer did not agree to.
-    return controlError("counter_sale_currency_mismatch", 409);
-  }
-
-  // Never present an amount for a sale whose payment is already unresolved or
-  // already settled. An indeterminate attempt has to be reconciled, and a
-  // captured one has already taken the customer's money — collecting again
-  // charges them twice for the same basket.
-  const existing = await started.context.client.readCounterSale(
-    started.context.merchantId,
-    route.checkoutIdRaw,
-  );
-  if (!existing.ok) {
-    return existing.error.kind === "http" && existing.error.status === 404
-      ? controlError("counter_sale_not_found", 404)
-      : commerceErrorResponse(existing.error);
-  }
-  const state = readCounterSaleState({
-    checkout: existing.value.checkout,
-    paymentAttempt: existing.value.paymentAttempt,
+  if (started instanceof Response) return started;
+  const parsed = parseCollectionRequest(started.body);
+  if (parsed === null) return controlError("counter_sale_request_invalid", 422);
+  const collected = await collectCounterSalePayment(started.deps, {
+    checkoutId: route.checkoutIdRaw,
+    ...parsed,
+    idempotencyKey: started.boundary.idempotencyKey,
   });
-  if (!state.collectable) {
-    return controlJson(
-      {
-        ok: false,
-        error: "counter_sale_not_collectable",
-        counterSale: state,
-      },
-      409,
-    );
-  }
+  if (!collected.ok) return failureResponse(collected.failure);
+  return finishMutation(request, started, { ok: true, collection: collected.value });
+}
 
-  const snapshot = await started.context.client.readSnapshot(
-    started.context.merchantId,
-  );
-  if (!snapshot.ok) {
-    return commerceErrorResponse(snapshot.error);
-  }
-  const collected = await started.context.client.collectInPersonCheckoutPayment(
-    {
-      merchantId: started.context.merchantId,
-      expectedMerchantRevision: snapshot.value.merchantRevision,
-      idempotencyKey: started.boundary.idempotencyKey,
-      checkoutId: route.checkoutIdRaw,
-      checkoutRevision: collection.checkoutRevision,
-      quoteDigest: collection.quoteDigest,
-      // Both identities are derived from the operator's idempotency key, so a
-      // retried collection is the same attempt rather than a second charge.
-      paymentAttemptId: `payment_attempt_${started.boundary.idempotencyKey}`,
-      providerRequestId: `provider_request_${started.boundary.idempotencyKey}`,
-      amount: collection.amount,
-      paymentBinding: binding.value,
-    },
-  );
-  if (!collected.ok) {
-    return commerceErrorResponse(collected.error);
-  }
-  if (collected.value.outcome === "rejected") {
-    return controlJson(
-      { ok: false, error: "counter_sale_rejected", detail: collected.value },
-      409,
-    );
-  }
-  if (collected.value.outcome === "unavailable") {
-    const responseBody = {
-      ok: false,
-      error: "counter_sale_collection_unavailable",
-      retryAfter: collected.value.retryAfter,
-    };
-    return controlJson(responseBody, 503);
-  }
-  const responseBody = { ok: true, collection: collected.value };
-  const recordedMutationReceipt = await completeCounterSaleMutation(
+async function handleCounterSaleCancel(
+  request: Request,
+  env: Env,
+  route: Variant<CounterSaleControlRoute, "counterSaleCancel">,
+): Promise<Response> {
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const started = await beginMutation(
     request,
-    started,
-    responseBody,
+    env,
+    route.organisationIdRaw,
+    "counter_sale.cancel",
+    "operator",
   );
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  return controlJson(responseBody);
+  if (started instanceof Response) return started;
+  const cancelled = await cancelCounterSaleCollection(started.deps, {
+    checkoutId: route.checkoutIdRaw,
+    idempotencyKey: started.boundary.idempotencyKey,
+  });
+  if (!cancelled.ok) return failureResponse(cancelled.failure);
+  return finishMutation(request, started, { ok: true, counterSale: cancelled.value });
 }
 
 async function handleCounterSaleReconciliation(
@@ -444,38 +335,21 @@ async function handleCounterSaleReconciliation(
   env: Env,
   route: Variant<CounterSaleControlRoute, "counterSaleReconciliation">,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const started = await beginCounterSaleMutation(
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const started = await beginMutation(
     request,
     env,
     route.organisationIdRaw,
     "counter_sale.reconcile",
+    "operator",
   );
-  if (started instanceof Response) {
-    return started;
-  }
-  const reconciled = await started.context.client.reconcileCounterSalePayment(
-    started.context.merchantId,
-    route.checkoutIdRaw,
-  );
-  if (!reconciled.ok) {
-    return commerceErrorResponse(reconciled.error);
-  }
-  const view = await buildCounterSaleView(started.context, reconciled.value);
-  if (view instanceof Response) {
-    return view;
-  }
-  const responseBody = { ok: true, counterSale: view };
-  const recordedMutationReceipt = await completeCounterSaleMutation(
-    request,
-    started,
-    responseBody,
-  );
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  return controlJson(responseBody);
+  if (started instanceof Response) return started;
+  const reconciled = await reconcileCounterSale(started.deps, {
+    checkoutId: route.checkoutIdRaw,
+    idempotencyKey: started.boundary.idempotencyKey,
+  });
+  if (!reconciled.ok) return failureResponse(reconciled.failure);
+  return finishMutation(request, started, { ok: true, counterSale: reconciled.value });
 }
 
 async function handleCounterSaleAfterSale(
@@ -483,427 +357,68 @@ async function handleCounterSaleAfterSale(
   env: Env,
   route: Variant<
     CounterSaleControlRoute,
-    "counterSalePickupReady" | "counterSaleHandover" | "counterSaleRefund"
+    | "counterSalePickupReady"
+    | "counterSaleHandover"
+    | "counterSaleRefund"
+    | "counterSaleManualCashRefund"
   >,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return controlError("method_not_allowed", 405);
-  }
-  const operation = afterSaleOperation(route.kind);
-  const started = await beginCounterSaleMutation(
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const action = afterSaleAction(route.kind);
+  const minRole = route.kind === "counterSaleManualCashRefund" ? "admin" : "operator";
+  const started = await beginMutation(
     request,
     env,
     route.organisationIdRaw,
-    operation,
+    `counter_sale.${action}`,
+    minRole,
   );
-  if (started instanceof Response) {
-    return started;
-  }
-  const placed = await resolvePlacedCounterSale(
-    started.context,
-    route.checkoutIdRaw,
-  );
-  if (placed instanceof Response) {
-    return placed;
-  }
-  if (
-    route.kind === "counterSaleRefund" &&
-    refundStateOf(placed.order) === "pending"
-  ) {
-    return reconcileCounterSaleRefund(
-      request,
-      env,
-      started,
-      route.checkoutIdRaw,
-    );
-  }
-  const commandBase = {
-    merchantId: started.context.merchantId,
-    expectedMerchantRevision: placed.snapshot.merchantRevision,
+  if (started instanceof Response) return started;
+  const reason =
+    typeof started.body.reason === "string" && started.body.reason.trim().length > 0
+      ? started.body.reason.trim()
+      : undefined;
+  const mutated = await executeCounterSaleAfterSale(started.deps, {
+    checkoutId: route.checkoutIdRaw,
+    action,
     idempotencyKey: started.boundary.idempotencyKey,
-  };
-  let mutated: Awaited<ReturnType<typeof refundCounterSale>>;
-  switch (route.kind) {
-    case "counterSalePickupReady":
-      mutated = await started.context.client.markPickupReady({
-        ...commandBase,
-        orderId: placed.order.id,
-        orderRevision: placed.order.revision,
-        fulfillmentId: placed.fulfillment.id,
-        fulfillmentRevision: placed.fulfillment.revision,
-      });
-      break;
-    case "counterSaleHandover":
-      mutated = await started.context.client.completePickup({
-        ...commandBase,
-        orderId: placed.order.id,
-        orderRevision: placed.order.revision,
-        paymentId: placed.payment.id,
-        paymentRevision: placed.payment.revision,
-        fulfillmentId: placed.fulfillment.id,
-        fulfillmentRevision: placed.fulfillment.revision,
-      });
-      break;
-    case "counterSaleRefund":
-      mutated = await refundCounterSale(started, placed);
-      break;
-    default:
-      return assertNever(route.kind);
-  }
-  if (!mutated.ok) {
-    return commerceErrorResponse(mutated.error);
-  }
-  if (mutated.value.outcome === "rejected") {
-    console.warn("counter_sale.after_sale_rejected", {
-      operation,
-      code: mutated.value.error.code,
-      field:
-        "field" in mutated.value.error ? mutated.value.error.field : undefined,
-    });
-    return controlJson(
-      { ok: false, error: "counter_sale_after_sale_rejected" },
-      409,
-    );
-  }
-  const sale = await started.context.client.readCounterSale(
-    started.context.merchantId,
-    route.checkoutIdRaw,
-  );
-  if (!sale.ok) {
-    return commerceErrorResponse(sale.error);
-  }
-  const view = await buildCounterSaleView(started.context, sale.value);
-  if (view instanceof Response) {
-    return view;
-  }
-  if (
-    route.kind === "counterSaleRefund" &&
-    view.afterSale?.refundState === "pending"
-  ) {
-    return controlJson(
-      {
-        ok: false,
-        error: "counter_sale_refund_processing",
-        counterSale: view,
-      },
-      503,
-    );
-  }
-  const responseBody = { ok: true, counterSale: view };
-  const recordedMutationReceipt = await completeCounterSaleMutation(
-    request,
-    started,
-    responseBody,
-  );
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  return controlJson(responseBody);
-}
-
-async function reconcileCounterSaleRefund(
-  request: Request,
-  env: Env,
-  started: StartedMutation,
-  checkoutId: string,
-): Promise<Response> {
-  const reconciled = await started.context.client.reconcileCounterSaleRefund(
-    started.context.merchantId,
-    checkoutId,
-  );
-  if (!reconciled.ok) {
-    return commerceErrorResponse(reconciled.error);
-  }
-  const view = await buildCounterSaleView(started.context, reconciled.value);
-  if (view instanceof Response) {
-    return view;
-  }
-  if (view.afterSale?.refundState === "pending") {
-    return controlJson(
-      {
-        ok: false,
-        error: "counter_sale_refund_processing",
-        counterSale: view,
-      },
-      503,
-    );
-  }
-  const responseBody = { ok: true, counterSale: view };
-  const recordedMutationReceipt = await completeCounterSaleMutation(
-    request,
-    started,
-    responseBody,
-  );
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
-  return controlJson(responseBody);
-}
-
-async function refundCounterSale(
-  started: StartedMutation,
-  placed: PlacedCounterSale,
-) {
-  const configuration =
-    await started.context.client.readPointOfSaleConfiguration(
-      started.context.merchantId,
-      placed.sale.checkout.source.kind === "point_of_sale"
-        ? placed.sale.checkout.source.satyrLocationId
-        : "",
-    );
-  if (!configuration.ok) {
-    return configuration;
-  }
-  return started.context.client.refundOrder({
-    merchantId: started.context.merchantId,
-    expectedMerchantRevision: placed.snapshot.merchantRevision,
-    idempotencyKey: started.boundary.idempotencyKey,
-    orderId: placed.order.id,
-    orderRevision: placed.order.revision,
-    paymentId: placed.payment.id,
-    paymentRevision: placed.payment.revision,
-    refundAttemptId: `refund_${started.boundary.idempotencyKey}`,
-    refundPolicyId: configuration.value.afterSalePolicy.refundPolicyId,
-    amount: placed.payment.amount,
-    allocation: fullRefundAllocation(placed.order),
-    reason: "Counter sale returned in full",
+    reason,
   });
+  if (!mutated.ok) return failureResponse(mutated.failure);
+  return finishMutation(request, started, { ok: true, counterSale: mutated.value });
 }
 
-function fullRefundAllocation(order: CommerceOrderV1) {
-  const lineAllocations = [];
-  const taxAllocations = [];
-  for (const line of order.lineItems) {
-    lineAllocations.push({ orderLineId: line.id, amount: line.lineTotal });
-    if (line.tax.amountMinor > 0) {
-      taxAllocations.push({ orderLineId: line.id, amount: line.tax });
-    }
-  }
-  return {
-    lineAllocations,
-    taxAllocations,
-    dutyAllocations: [],
-    shippingAllocation: order.totals.shipping,
-  };
-}
-
-type PlacedCounterSale = Readonly<{
-  sale: CommerceCounterSaleV1;
-  snapshot: CommerceMerchantSnapshotV1;
-  order: CommerceOrderV1;
-  payment: CommercePaymentV1;
-  fulfillment: CommercePickupFulfillmentV1;
-}>;
-
-async function resolvePlacedCounterSale(
+function makeDeps(
+  env: Env,
+  authorized: AuthorizedOrganisationRequest,
   context: MerchantControlContext,
-  checkoutId: string,
-): Promise<PlacedCounterSale | Response> {
-  const sale = await context.client.readCounterSale(
-    context.merchantId,
-    checkoutId,
-  );
-  if (!sale.ok) {
-    return commerceErrorResponse(sale.error);
-  }
-  const state = readCounterSaleState(sale.value);
-  if (state.orderId === null) {
-    return controlError("counter_sale_order_not_found", 409);
-  }
-  const snapshot = await context.client.readSnapshot(context.merchantId);
-  if (!snapshot.ok) {
-    return commerceErrorResponse(snapshot.error);
-  }
-  const order = findOrder(snapshot.value, state.orderId);
-  const payment = findPayment(snapshot.value, state.orderId);
-  const fulfillment = findPickupFulfillment(snapshot.value, state.orderId);
-  return order === undefined ||
-    payment === undefined ||
-    fulfillment === undefined
-    ? controlError("counter_sale_after_sale_not_found", 409)
-    : {
-        sale: sale.value,
-        snapshot: snapshot.value,
-        order,
-        payment,
-        fulfillment,
-      };
-}
-
-async function buildCounterSaleView(
-  context: MerchantControlContext,
-  sale: CommerceCounterSaleV1,
-): Promise<CounterSaleView | Response> {
-  const state = readCounterSaleState(sale);
-  if (state.orderId === null) {
-    return { ...state, afterSale: null };
-  }
-  const snapshot = await context.client.readSnapshot(context.merchantId);
-  if (!snapshot.ok) {
-    return commerceErrorResponse(snapshot.error);
-  }
-  const order = findOrder(snapshot.value, state.orderId);
-  const payment = findPayment(snapshot.value, state.orderId);
-  const fulfillment = findPickupFulfillment(snapshot.value, state.orderId);
-  if (
-    order === undefined ||
-    payment === undefined ||
-    fulfillment === undefined
-  ) {
-    return controlError("counter_sale_after_sale_not_found", 409);
-  }
+): CounterRegisterDeps {
   return {
-    ...state,
-    afterSale: {
-      order: {
-        id: order.id,
-        revision: order.revision,
-        state: order.lifecycle.state,
-      },
-      payment: {
-        id: payment.id,
-        revision: payment.revision,
-        state: payment.lifecycle.state,
-      },
-      fulfillment: {
-        id: fulfillment.id,
-        revision: fulfillment.revision,
-        state: fulfillment.lifecycle.state,
-      },
-      refundState: refundStateOf(order),
-    },
+    env,
+    scope: authorized.executionScope,
+    organisationId: authorized.organisationId,
+    merchantId: context.merchantId,
+    client: context.client,
   };
 }
 
-function refundStateOf(
-  order: CommerceOrderV1,
-): "none" | "pending" | "completed" | "failed" {
-  for (let index = order.adjustments.length - 1; index >= 0; index -= 1) {
-    const adjustment = order.adjustments[index];
-    if (adjustment?.kind === "refund") {
-      return adjustment.status;
-    }
-  }
-  return "none";
-}
-
-function findOrder(snapshot: CommerceMerchantSnapshotV1, orderId: string) {
-  for (const order of snapshot.resources.orders) {
-    if (order.id === orderId) {
-      return order;
-    }
-  }
-  return undefined;
-}
-
-function findPayment(snapshot: CommerceMerchantSnapshotV1, orderId: string) {
-  for (const payment of snapshot.resources.payments) {
-    if (payment.orderId === orderId) {
-      return payment;
-    }
-  }
-  return undefined;
-}
-
-function findPickupFulfillment(
-  snapshot: CommerceMerchantSnapshotV1,
-  orderId: string,
-) {
-  for (const fulfillment of snapshot.resources.fulfillments) {
-    if (fulfillment.orderId === orderId && fulfillment.kind === "pickup") {
-      return fulfillment;
-    }
-  }
-  return undefined;
-}
-
-function afterSaleKind(
-  value: string,
-): "counterSalePickupReady" | "counterSaleHandover" | "counterSaleRefund" {
-  switch (value) {
-    case "ready":
-      return "counterSalePickupReady";
-    case "handover":
-      return "counterSaleHandover";
-    case "refund":
-      return "counterSaleRefund";
-    default:
-      throw new Error("Invalid counter-sale after-sale route");
-  }
-}
-
-function afterSaleOperation(
-  kind: "counterSalePickupReady" | "counterSaleHandover" | "counterSaleRefund",
-): string {
-  switch (kind) {
-    case "counterSalePickupReady":
-      return "counter_sale.pickup_ready";
-    case "counterSaleHandover":
-      return "counter_sale.handover";
-    case "counterSaleRefund":
-      return "counter_sale.refund";
-  }
-}
-
-/**
- * What the counter is currently authorized to sell and collect under.
- *
- * Both revisions are read rather than accepted, so a sale is always priced by
- * the policy in force and dispatched to the terminal in force.
- */
-async function resolveCounterAuthority(
-  started: StartedMutation,
-  pantryLocationId: string,
-): Promise<
-  | Readonly<{
-      posConfigurationRevision: number;
-      terminalAssignmentRevision: number;
-    }>
-  | Response
-> {
-  const configuration =
-    await started.context.client.readPointOfSaleConfiguration(
-      started.context.merchantId,
-      pantryLocationId,
-    );
-  if (!configuration.ok) {
-    return configuration.error.kind === "http" &&
-      configuration.error.status === 404
-      ? controlError("counter_policy_not_found", 409)
-      : commerceErrorResponse(configuration.error);
-  }
-  const assignment = await readActiveTerminalAssignment(
-    started.authorized.executionScope.database,
-    started.authorized.organisationId,
-    pantryLocationId,
-  );
-  if (!assignment.ok) {
-    return controlError("terminal_assignment_not_found", 409);
-  }
-  return {
-    posConfigurationRevision: configuration.value.revision,
-    terminalAssignmentRevision: assignment.value.revision,
-  };
-}
-
-async function beginCounterSaleMutation(
+async function beginMutation(
   request: Request,
   env: Env,
   organisationIdRaw: string,
   operation: string,
+  role: "operator" | "admin",
 ): Promise<StartedMutation | Response> {
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
     organisationIdRaw,
-    "operator",
+    role,
     true,
   );
-  if (!authorized.ok) {
-    return authorized.response;
-  }
+  if (!authorized.ok) return authorized.response;
   const body = await readJsonRecord(request);
-  if (!body.ok) {
-    return controlError("counter_sale_request_invalid", 422);
-  }
+  if (!body.ok) return controlError("counter_sale_request_invalid", 422);
   const admitted = await admitUserMutation({
     request,
     env,
@@ -915,117 +430,48 @@ async function beginCounterSaleMutation(
     operation,
   });
   if (admitted instanceof Response) return admitted;
-  const { boundary, scope, user: identity } = admitted;
   const context = await resolveMerchantControlContext(env, authorized);
-  if (context instanceof Response) {
-    return context;
-  }
+  if (context instanceof Response) return context;
   return {
     authorized,
-    identity,
-    scope,
-    boundary,
+    identity: admitted.user,
+    scope: admitted.scope,
+    boundary: admitted.boundary,
     context,
+    deps: makeDeps(env, authorized, context),
     body: body.value,
     now: Date.now(),
   };
 }
 
-function completeCounterSaleMutation(
+async function finishMutation(
   request: Request,
   started: StartedMutation,
   responseBody: unknown,
-  responseStatus = 200,
-): ReturnType<typeof recordCommerceMutationReceipt> {
-  return recordCommerceMutationReceipt({
+): Promise<Response> {
+  const recorded = await recordCommerceMutationReceipt({
     authorized: started.authorized,
     identity: started.identity,
     scope: started.scope,
     boundary: started.boundary,
     request,
     responseBody,
-    responseStatus,
+    responseStatus: 200,
     now: started.now,
   });
+  return recorded.ok
+    ? controlJson(responseBody)
+    : controlError(recorded.error.code, 409);
 }
 
-function parseSaleRequest(body: JsonRecord): Readonly<{
-  satyrLocationId: string;
-  checkoutId: string;
-  lines: readonly CommercePickupCheckoutLineV1[];
-}> | null {
-  const { satyrLocationId: pantryLocationId, checkoutId, lines } = body;
-  if (typeof pantryLocationId !== "string" || pantryLocationId.length === 0) {
-    return null;
+function failureResponse(failure: CounterRegisterFailure): Response {
+  if (failure.kind === "commerce") {
+    return commerceErrorResponse(failure.error);
   }
-  if (typeof checkoutId !== "string" || checkoutId.length === 0) {
-    return null;
-  }
-  if (!Array.isArray(lines) || lines.length === 0) {
-    return null;
-  }
-  return {
-    satyrLocationId: pantryLocationId,
-    checkoutId,
-    // Line shape is Commerce's to enforce: it owns what may be rung up under
-    // the counter's published policy, and duplicating that judgement here would
-    // let the two disagree.
-    lines: lines as readonly CommercePickupCheckoutLineV1[],
-  };
-}
-
-function parseCollectionRequest(body: JsonRecord): Readonly<{
-  satyrLocationId: string;
-  checkoutRevision: number;
-  quoteDigest: string;
-  amount: Readonly<{ amountMinor: number; currency: string }>;
-}> | null {
-  const {
-    satyrLocationId: pantryLocationId,
-    checkoutRevision,
-    quoteDigest,
-    amount,
-  } = body;
-  if (typeof pantryLocationId !== "string" || pantryLocationId.length === 0) {
-    return null;
-  }
-  if (
-    !Number.isSafeInteger(checkoutRevision) ||
-    Number(checkoutRevision) <= 0
-  ) {
-    return null;
-  }
-  if (
-    typeof quoteDigest !== "string" ||
-    !/^quote_[a-f0-9]{64}$/u.test(quoteDigest)
-  ) {
-    return null;
-  }
-  if (typeof amount !== "object" || amount === null || Array.isArray(amount)) {
-    return null;
-  }
-  const money = amount as Record<string, unknown>;
-  if (
-    !Number.isSafeInteger(money.amountMinor) ||
-    Number(money.amountMinor) <= 0
-  ) {
-    return null;
-  }
-  if (
-    typeof money.currency !== "string" ||
-    !/^[A-Za-z]{3}$/u.test(money.currency)
-  ) {
-    return null;
-  }
-  return {
-    satyrLocationId: pantryLocationId,
-    checkoutRevision: Number(checkoutRevision),
-    quoteDigest,
-    amount: {
-      amountMinor: Number(money.amountMinor),
-      currency: money.currency,
-    },
-  };
+  return controlJson(
+    { ok: false, error: failure.code, ...(failure.extra ?? {}) },
+    failure.status,
+  );
 }
 
 function commerceErrorResponse(error: CommerceClientError): Response {
@@ -1043,14 +489,125 @@ function commerceErrorResponse(error: CommerceClientError): Response {
     : controlError("underclerk_unavailable", 503);
 }
 
+function parseSaleRequest(body: JsonRecord): Readonly<{
+  satyrLocationId: string;
+  checkoutId: string;
+  lines: readonly CommercePickupCheckoutLineV1[];
+  tenderMode?: "terminal" | "cash";
+}> | null {
+  const { satyrLocationId, checkoutId, lines, tenderMode } = body;
+  if (typeof satyrLocationId !== "string" || satyrLocationId.length === 0) return null;
+  if (typeof checkoutId !== "string" || checkoutId.length === 0) return null;
+  if (!Array.isArray(lines) || lines.length === 0) return null;
+  if (
+    tenderMode !== undefined &&
+    tenderMode !== "terminal" &&
+    tenderMode !== "cash"
+  ) {
+    return null;
+  }
+  return {
+    satyrLocationId,
+    checkoutId,
+    lines: lines as readonly CommercePickupCheckoutLineV1[],
+    ...(tenderMode === undefined ? {} : { tenderMode }),
+  };
+}
+
+function parseMoney(raw: unknown): Readonly<{ amountMinor: number; currency: string }> | null {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return null;
+  const money = raw as Record<string, unknown>;
+  if (!Number.isSafeInteger(money.amountMinor) || Number(money.amountMinor) <= 0) return null;
+  if (typeof money.currency !== "string" || !/^[A-Za-z]{3}$/u.test(money.currency)) return null;
+  return { amountMinor: Number(money.amountMinor), currency: money.currency };
+}
+
+function parseCashRequest(body: JsonRecord): Readonly<{
+  checkoutRevision: number;
+  quoteDigest: string;
+  cashReceived: Readonly<{ amountMinor: number; currency: string }>;
+}> | null {
+  const { checkoutRevision, quoteDigest, cashReceived } = body;
+  if (!Number.isSafeInteger(checkoutRevision) || Number(checkoutRevision) <= 0) return null;
+  if (typeof quoteDigest !== "string" || !/^quote_[a-f0-9]{64}$/u.test(quoteDigest)) return null;
+  const parsedCash = parseMoney(cashReceived);
+  if (parsedCash === null) return null;
+  return {
+    checkoutRevision: Number(checkoutRevision),
+    quoteDigest,
+    cashReceived: parsedCash,
+  };
+}
+
+function parseCollectionRequest(body: JsonRecord): Readonly<{
+  satyrLocationId: string;
+  checkoutRevision: number;
+  quoteDigest: string;
+  amount: Readonly<{ amountMinor: number; currency: string }>;
+  paymentMethod?: CounterRegisterPaymentMethod;
+}> | null {
+  const { satyrLocationId, checkoutRevision, quoteDigest, amount, paymentMethod } = body;
+  if (typeof satyrLocationId !== "string" || satyrLocationId.length === 0) return null;
+  if (!Number.isSafeInteger(checkoutRevision) || Number(checkoutRevision) <= 0) return null;
+  if (typeof quoteDigest !== "string" || !/^quote_[a-f0-9]{64}$/u.test(quoteDigest)) return null;
+  const parsedAmount = parseMoney(amount);
+  if (parsedAmount === null) return null;
+  if (paymentMethod !== undefined && !isCounterRegisterPaymentMethod(paymentMethod)) return null;
+  return {
+    satyrLocationId,
+    checkoutRevision: Number(checkoutRevision),
+    quoteDigest,
+    amount: parsedAmount,
+    ...(paymentMethod === undefined ? {} : { paymentMethod }),
+  };
+}
+
+function afterSaleKind(
+  value: string,
+):
+  | "counterSalePickupReady"
+  | "counterSaleHandover"
+  | "counterSaleRefund"
+  | "counterSaleManualCashRefund" {
+  switch (value) {
+    case "ready":
+      return "counterSalePickupReady";
+    case "handover":
+      return "counterSaleHandover";
+    case "refund":
+      return "counterSaleRefund";
+    case "manual-cash-refund":
+      return "counterSaleManualCashRefund";
+    default:
+      throw new Error("Invalid counter-sale after-sale route");
+  }
+}
+
+function afterSaleAction(
+  kind:
+    | "counterSalePickupReady"
+    | "counterSaleHandover"
+    | "counterSaleRefund"
+    | "counterSaleManualCashRefund",
+): CounterSaleAfterSaleAction {
+  switch (kind) {
+    case "counterSalePickupReady":
+      return "ready";
+    case "counterSaleHandover":
+      return "handover";
+    case "counterSaleRefund":
+      return "refund";
+    case "counterSaleManualCashRefund":
+      return "manual_cash_refund";
+  }
+}
+
 function match(pathname: string, pattern: RegExp): readonly string[] | null {
   const captures = pattern.exec(pathname);
   return captures === null ? null : captures.slice(1);
 }
 
 function decode(value: string | undefined): string {
-  if (value === undefined) {
-    throw new Error("Counter sale route capture is missing");
-  }
+  if (value === undefined) throw new Error("Counter sale route capture is missing");
   return decodeURIComponent(value);
 }

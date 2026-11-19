@@ -61,6 +61,7 @@ export * from "./failed-payments.ts";
 export * from "./payments.ts";
 export * from "./bank-payouts.ts";
 export * from "./order-queue.ts";
+export * from "./counter-register.ts";
 export * from "./brain.ts";
 export * from "./message-attachments.ts";
 

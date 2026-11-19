@@ -1,5 +1,12 @@
+import {
+  commercePickupCode,
+  type CommerceCounterCashTenderV1,
+} from "@seams/commerce-client";
 import type { Checkout, CheckoutPaymentAttempt } from "@seams/contracts";
-import type { CounterSaleState } from "@seams/control-api";
+import type {
+  CounterRegisterPaymentMethod,
+  CounterSaleState,
+} from "@seams/control-api";
 
 export type CounterSaleReadback = Readonly<{
   schemaVersion: "satyr.counter-sale.v1";
@@ -31,6 +38,15 @@ export type CounterSaleReadback = Readonly<{
   }> | null;
   orderId: string | null;
   capturedPaymentReference: string | null;
+  pickupCode?: string | null;
+  paymentMethod?: CounterRegisterPaymentMethod | null;
+  tenderBrand?: string | null;
+  providerRefundable?: boolean | null;
+  manualTender?: Readonly<{
+    cashReceivedMinor: number | null;
+    changeDueMinor: number | null;
+    currency: string;
+  }> | null;
 }>;
 
 /**
@@ -45,10 +61,49 @@ export function readCounterSale(
   input: Readonly<{
     checkout: Checkout;
     paymentAttempt: CheckoutPaymentAttempt | null;
+    manualTender?: CommerceCounterCashTenderV1 | null;
   }>,
 ): CounterSaleReadback {
-  const { checkout, paymentAttempt } = input;
+  const { checkout, paymentAttempt, manualTender } = input;
   const state = classify(checkout, paymentAttempt);
+  const orderId =
+    checkout.lifecycle.state === "accepted"
+      ? checkout.lifecycle.orderId
+      : null;
+  const captured =
+    paymentAttempt?.lifecycle.state === "captured"
+      ? paymentAttempt.lifecycle
+      : null;
+  const extra: {
+    pickupCode?: string | null;
+    paymentMethod?: CounterRegisterPaymentMethod | null;
+    tenderBrand?: string | null;
+    providerRefundable?: boolean | null;
+    manualTender?: Readonly<{
+      cashReceivedMinor: number | null;
+      changeDueMinor: number | null;
+      currency: string;
+    }> | null;
+  } = {};
+  if (orderId !== null) {
+    extra.pickupCode = commercePickupCode(orderId);
+  }
+  if (captured?.paymentMethod !== undefined) {
+    extra.paymentMethod = captured.paymentMethod;
+  }
+  if (captured?.tenderBrand !== undefined) {
+    extra.tenderBrand = captured.tenderBrand;
+  }
+  if (captured?.providerRefundable !== undefined) {
+    extra.providerRefundable = captured.providerRefundable;
+  }
+  if (manualTender !== undefined && manualTender !== null) {
+    extra.manualTender = {
+      cashReceivedMinor: manualTender.cashReceivedMinor,
+      changeDueMinor: manualTender.changeDueMinor,
+      currency: checkout.lifecycle.quote?.totals.total.currency ?? "JPY",
+    };
+  }
   return {
     schemaVersion: "satyr.counter-sale.v1",
     checkoutId: checkout.checkoutId,
@@ -63,14 +118,9 @@ export function readCounterSale(
     collectable: state === "awaiting_collection" || state === "declined",
     recoverable: recoverableAttempt(paymentAttempt, state),
     quote: quoteOf(checkout),
-    orderId:
-      checkout.lifecycle.state === "accepted"
-        ? checkout.lifecycle.orderId
-        : null,
-    capturedPaymentReference:
-      paymentAttempt?.lifecycle.state === "captured"
-        ? paymentAttempt.lifecycle.providerPaymentReference
-        : null,
+    orderId,
+    capturedPaymentReference: captured?.providerPaymentReference ?? null,
+    ...extra,
   };
 }
 

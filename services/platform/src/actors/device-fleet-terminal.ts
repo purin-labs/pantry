@@ -199,15 +199,15 @@ export function recordTerminalResult(
          updated_at = ?
      WHERE gateway_id = ? AND source_key = ? AND payment_attempt_id = ?`,
     nextState,
-    message.providerPaymentReference,
-    message.paymentMethod,
-    message.tenderBrand,
-    message.providerRefundable === null
+    message.providerPaymentReference ?? null,
+    message.paymentMethod ?? null,
+    message.tenderBrand ?? null,
+    message.providerRefundable === undefined || message.providerRefundable === null
       ? null
       : message.providerRefundable
         ? 1
         : 0,
-    message.reasonCode,
+    message.reasonCode ?? null,
     now,
     gatewayId,
     message.sourceKey,

@@ -28,6 +28,7 @@ import {
   OrderQueueRoute,
   PaymentsRoute,
   RecipesPage,
+  RegisterRoute,
   SupplierPayoutsPanel,
   TerminalOperationsPanel,
   VaultRoute,
@@ -99,6 +100,7 @@ export const PAGES: Record<WorkspaceDetailPage, PageEntry> = {
   },
   menus: { render: (page) => renderMenus(page) },
   "order-queue": { render: (page) => renderOrderQueue(page) },
+  register: { render: (page) => renderRegister(page) },
   terminals: { render: (page) => renderTerminals(page) },
   recipes: { render: (page) => renderRecipes(page) },
   costs: { render: (page) => renderCosts(page) },
@@ -365,6 +367,14 @@ function renderCheckout(page: PageContext): React.ReactNode {
         "integrations",
       )}
       mutate={checkoutProfileControlMutation}
+    />
+  );
+}
+
+function renderRegister(page: PageContext): React.ReactNode {
+  return (
+    <RegisterRoute
+      organisationId={page.state.organisation.organisation.organisationId}
     />
   );
 }

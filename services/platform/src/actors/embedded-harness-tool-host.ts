@@ -48,6 +48,7 @@ import type {
   HarnessConfigurationProposalRequest,
   OrderRefundProposal,
   StockActionProposal,
+  CounterSaleReadTool,
   OrderQueueReadTool,
   PaymentsReadTool,
   OrderQueueAdvanceTool,
@@ -227,6 +228,7 @@ export async function createCatalogHarnessToolHost(input: {
   readonly proposeOrderRefund: OrderRefundProposal;
   readonly proposeStockAction: StockActionProposal;
   readonly readOrderQueue: OrderQueueReadTool;
+  readonly readCounterSale?: CounterSaleReadTool;
   readonly readPayments: PaymentsReadTool;
   readonly advanceOrderQueue: OrderQueueAdvanceTool;
   readonly readSoldOut: SoldOutReadTool;
@@ -356,6 +358,7 @@ export async function createCatalogHarnessToolHost(input: {
     proposeOrderRefund: input.proposeOrderRefund,
     proposeStockAction: input.proposeStockAction,
     readOrderQueue: input.readOrderQueue,
+    readCounterSale: input.readCounterSale,
     readPayments: input.readPayments,
     advanceOrderQueue: input.advanceOrderQueue,
     readSoldOut: input.readSoldOut,

@@ -1752,6 +1752,8 @@ function workspaceNavigationIcon(page: WorkspaceDetailPage): LucideIcon {
       return Calculator;
     case "order-queue":
       return ConciergeBell;
+    case "register":
+      return CreditCard;
     case "inventory":
       return Warehouse;
     case "orders":

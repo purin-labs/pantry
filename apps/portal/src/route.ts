@@ -10,6 +10,7 @@ export type WorkspaceDetailPage =
   | "products"
   | "menus"
   | "order-queue"
+  | "register"
   | "terminals"
   | "recipes"
   | "costs"
@@ -147,6 +148,16 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Order queue",
     title: "Order queue",
     description: "Prepare open orders, mark them ready and hand them over.",
+    group: "CafeOS",
+    resource: { kind: "none" },
+  },
+  register: {
+    page: "register",
+    segment: "register",
+    navigationLabel: "Register",
+    title: "Register",
+    description:
+      "Ring up counter orders from the published menu and take cash or terminal payments.",
     group: "CafeOS",
     resource: { kind: "none" },
   },
@@ -411,7 +422,7 @@ export const WORKSPACE_NAVIGATION_GROUPS: readonly WorkspaceNavigationGroup[] =
       label: "AgentCommerce",
       pages: ["orders", "payments", "payouts", "products", "checkout"],
     },
-    { label: "CafeOS", pages: ["menus", "order-queue", "terminals"] },
+    { label: "CafeOS", pages: ["register", "menus", "order-queue", "terminals"] },
     {
       label: "BakeryOS",
       pages: [

@@ -101,6 +101,7 @@ import {
   type MerchantReportRead,
   type MessageAttachmentInspect,
   type MessageLinkRead,
+  type CounterSaleReadTool,
   type OrderQueueAdvanceTool,
   type OrderQueueReadTool,
   type OrderRefundProposal,
@@ -206,6 +207,7 @@ export async function executeCatalogTool(
     readonly proposeOrderRefund?: OrderRefundProposal;
     readonly proposeStockAction?: StockActionProposal;
     readonly readOrderQueue?: OrderQueueReadTool;
+    readonly readCounterSale?: CounterSaleReadTool;
     readonly readPayments?: PaymentsReadTool;
     readonly advanceOrderQueue?: OrderQueueAdvanceTool;
     readonly readSoldOut?: SoldOutReadTool;
@@ -441,6 +443,7 @@ export async function executeDirectCatalogTool(
     readonly proposeOrderRefund?: OrderRefundProposal;
     readonly proposeStockAction?: StockActionProposal;
     readonly readOrderQueue?: OrderQueueReadTool;
+    readonly readCounterSale?: CounterSaleReadTool;
     readonly readPayments?: PaymentsReadTool;
     readonly advanceOrderQueue?: OrderQueueAdvanceTool;
     readonly readSoldOut?: SoldOutReadTool;
