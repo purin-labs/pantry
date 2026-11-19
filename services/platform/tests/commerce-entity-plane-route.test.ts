@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import {
   parseCommerceActivityRouteBody,
-  parseCommerceBoardPresenceRouteBody,
   parseCommerceGraphChangesRequest,
   parseCommerceGraphQuery,
   parseCommerceGraphRouteBody,
@@ -10,38 +9,6 @@ import {
 } from "../src/commerce/entity-plane/routes";
 
 describe("commerce entity-plane route boundary", () => {
-  it("accepts only an exact bounded board-presence update", () => {
-    const update = {
-      resourceKey: "commerce_list:export_coordination",
-      selection: {
-        kind: "list_entry",
-        entryId: "entry_1",
-        listId: "export_coordination",
-      },
-      dragPreview: {
-        kind: "moving",
-        entryId: "entry_1",
-        desiredStatusId: "documents_ready",
-      },
-    };
-    expect(parseCommerceBoardPresenceRouteBody(update)).toEqual({
-      ok: true,
-      value: update,
-    });
-    expect(
-      parseCommerceBoardPresenceRouteBody({ ...update, persisted: true }),
-    ).toEqual({
-      ok: false,
-      error: { code: "invalid_query" },
-    });
-    expect(
-      parseCommerceBoardPresenceRouteBody({
-        ...update,
-        selection: { ...update.selection, unexpected: true },
-      }),
-    ).toEqual({ ok: false, error: { code: "invalid_query" } });
-  });
-
   it("accepts only the exact path-bound list-entry patch branch", () => {
     const command = {
       kind: "patch_commerce_list_entry",

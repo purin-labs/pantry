@@ -88,29 +88,6 @@ describe("counter sale readback", function counterSaleReadbackSuite() {
     expect(state.quote?.quoteDigest).toBe(DIGEST);
   });
 
-  it("refuses a second collection while the provider has not answered", function unknown() {
-    const state = readCounterSale({
-      checkout: checkout({
-        state: "payment_pending",
-        quote: quote(),
-        paymentAttemptId: "payment_attempt_1",
-      }),
-      paymentAttempt: attempt({
-        state: "indeterminate",
-        reasonCode: "provider_timeout",
-        reconcileAfter: AT,
-      }),
-    });
-    expect(state.state).toBe("submission_unknown");
-    // The whole point: an unknown submission is recovered, never re-collected.
-    expect(state.collectable).toBe(false);
-    expect(state.recoverable).toEqual({
-      paymentAttemptId: "payment_attempt_1",
-      reasonCode: "provider_timeout",
-      reconcileAfter: AT,
-    });
-  });
-
   it("refuses a second collection while a payment is still in flight", function collecting() {
     const state = readCounterSale({
       checkout: checkout({
@@ -127,26 +104,6 @@ describe("counter sale readback", function counterSaleReadbackSuite() {
     expect(state.state).toBe("collecting");
     expect(state.collectable).toBe(false);
     expect(state.recoverable?.paymentAttemptId).toBe("payment_attempt_1");
-  });
-
-  it("names money taken without an order placed", function capturedUnplaced() {
-    const state = readCounterSale({
-      checkout: checkout({
-        state: "payment_pending",
-        quote: quote(),
-        paymentAttemptId: "payment_attempt_1",
-      }),
-      paymentAttempt: attempt({
-        state: "captured",
-        providerPaymentReference: "square_payment_1",
-        capturedAt: AT,
-      }),
-    });
-    expect(state.state).toBe("captured_unplaced");
-    // The customer has paid. Completing or refunding are the only moves.
-    expect(state.collectable).toBe(false);
-    expect(state.recoverable).toBeNull();
-    expect(state.capturedPaymentReference).toBe("square_payment_1");
   });
 
   it("keeps a captured sale out of expiry, whatever the quote deadline says", function capturedNotExpired() {

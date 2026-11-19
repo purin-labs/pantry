@@ -7,36 +7,19 @@ import type {
   CommerceCursor,
   CommerceCursorPayload,
   CommerceEntity,
-  CommerceEntityRef,
-  SystemCommerceEntityRef,
   CommerceGraphQuery,
   CommerceGraphQueryResult,
-  CommerceListEntry,
-  CommerceOrderingValue,
-  CommerceProjection,
   CommerceQueryPlan,
   CommerceReadWatermark,
-  CommerceRelationship,
   SystemCommerceEntityKind,
   SourceProvenance,
 } from "@seams/contracts";
 import {
   CommerceEntityPlaneClient,
-  parseCustomCommerceRelationshipRef,
   parseCommerceGraphQuery,
-  parseCommerceGraphQueryPlanRequest,
-  parseCommerceGraphResponse,
-  parseEntityPlaneCapabilityMetadataRequest,
-  parseEntityPlaneCapabilityMetadataResponse,
-  parseCommerceQueryPlanOutcome,
-  parseRelationshipId,
   parseCommerceSnapshotRevision,
-  parseRelationshipDefinitionRevision,
-  parseRelationshipRevision,
-  type CommerceEntityPlaneFetch,
 } from "@seams/commerce-client";
 
-import type { CommerceProjectionRecord } from "../src/actors/commerce-projection";
 import { createCommerceProjectionSchema } from "../src/actors/commerce-projection";
 import { OrganisationDO } from "../src/actors/organisation";
 import { materializeCommerceRelationText } from "../src/actors/commerce-query-schema";
@@ -50,10 +33,6 @@ import {
   normalizedConformancePlanInput,
   type NormalizedConformanceRow,
 } from "@seams/commerce-query-sqlite/normalized-conformance";
-import type {
-  CommerceEntityRelationRow,
-  CommerceRelationshipRelationRow,
-} from "../src/actors/commerce-query-schema";
 import { buildSavedSelectorCommerceReadAuthority } from "../src/commerce/entity-plane/authority";
 import {
   BlotterSource,
@@ -78,8 +57,6 @@ import {
   parseCommerceEngineMerchantId,
 } from "../src/data/commerce-merchant-binding";
 import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
-import type { Variant } from "@seams/type-utils";
-import { isRecord } from "@seams/std";
 
 const ORGANISATION_ID = "organisation_entity_plane_parity";
 const MERCHANT_ID = "merchant_entity_plane_parity";
@@ -88,160 +65,8 @@ const NOW = "2026-08-26T00:00:00.000Z";
 const OBSERVED_AT = "2026-08-25T00:00:00.000Z";
 
 type SourceMode = "underclerk" | "blotter";
-type CorpusEntity = Readonly<{
-  entity: CommerceEntity;
-  updatedAt: number;
-  searchText: string;
-  projection: CommerceProjectionRecord | null;
-}>;
-type Corpus = Readonly<{
-  entities: readonly CorpusEntity[];
-  relationships: readonly CommerceRelationship[];
-  listEntries: readonly CommerceListEntry[];
-}>;
-type MutableFixture = {
-  corpus: Corpus;
-  merchantRevision: number;
-  blotterRevision: number;
-};
-type ReaderFixture = Readonly<{
-  mode: SourceMode;
-  state: MutableFixture;
-  reader: CommerceGraphReader;
-}>;
-
-const MODES: readonly SourceMode[] = ["underclerk", "blotter"];
 
 describe("commerce entity-plane reader parity evidence", () => {
-  it.each(MODES)(
-    "%s rejects a changed query and an opaque cursor after a mid-pagination mutation",
-    async (mode) => {
-      const fixture = createFixture(mode);
-      const first = await read(fixture, pageQuery(2, null));
-      expect(first.ok).toBe(true);
-      if (!first.ok) return;
-      const cursor = requiredCursor(first.value.nextCursor);
-      expect(await read(fixture, pageQuery(3, cursor))).toEqual({
-        ok: false,
-        error: {
-          code: "commerce_cursor_mismatch",
-          reason: "query_fingerprint",
-        },
-      });
-
-      mutateCorpus(fixture.state, mode);
-      expect(await read(fixture, pageQuery(2, cursor))).toEqual({
-        ok: false,
-        error: {
-          code: "commerce_results_changed",
-          expected: mutatedWatermark(mode),
-          received: currentWatermark(mode, 1),
-        },
-      });
-    },
-  );
-
-  it.each(MODES)(
-    "%s rejects cursor organisation, ordering, effective-ordering, and watermark-owner mismatches",
-    async (mode) => {
-      const fixture = createFixture(mode);
-      const first = await read(fixture, pageQuery(2, null));
-      expect(first.ok).toBe(true);
-      if (!first.ok) return;
-      const cursor = requiredCursor(first.value.nextCursor);
-      const payload = requiredDecodedCursor(cursor);
-
-      const organisationCursor = encodeCommerceCursor({
-        ...payload,
-        organisationId: "organisation_other",
-      });
-      expect(organisationCursor.ok).toBe(true);
-      if (organisationCursor.ok)
-        expect(await read(fixture, pageQuery(2, organisationCursor.value))).toEqual({
-          ok: false,
-          error: { code: "commerce_cursor_mismatch", reason: "organisation" },
-        });
-
-      const merchantCursor = encodeCommerceCursor({
-        ...payload,
-        merchantId: "merchant_other",
-      });
-      expect(merchantCursor.ok).toBe(true);
-      if (merchantCursor.ok)
-        expect(await read(fixture, pageQuery(2, merchantCursor.value))).toEqual(
-          {
-            ok: false,
-            error: { code: "commerce_cursor_mismatch", reason: "merchant" },
-          },
-        );
-
-      const effectiveOrdering = {
-        ...payload.effectiveOrdering,
-        leadingKeys: payload.effectiveOrdering.leadingKeys.map((key) => ({
-          ...key,
-          direction: key.direction === "ascending" ? "descending" : "ascending",
-        })),
-      };
-      const effectiveOrderingCursor = encodeCommerceCursor({
-        ...payload,
-        effectiveOrdering,
-      });
-      expect(effectiveOrderingCursor.ok).toBe(true);
-      if (effectiveOrderingCursor.ok)
-        expect(
-          await read(fixture, pageQuery(2, effectiveOrderingCursor.value)),
-        ).toEqual({
-          ok: false,
-          error: {
-            code: "commerce_cursor_mismatch",
-            reason: "effective_ordering",
-          },
-        });
-
-      const orderingVersionCursor = encodeCommerceCursor({
-        ...payload,
-        orderingVersion: "v2",
-      });
-      expect(orderingVersionCursor.ok).toBe(false);
-
-      const ownerCursor = encodeCommerceCursor({
-        ...payload,
-        watermark:
-          mode === "underclerk"
-            ? {
-                kind: "provider_backed",
-                blotterAcceptedProjectionSequence: 1,
-                underclerkExtensionMerchantRevision: 1,
-              }
-            : { kind: "underclerk_native", merchantRevision: 1 },
-      });
-      expect(ownerCursor.ok).toBe(true);
-      if (ownerCursor.ok)
-        expect(await read(fixture, pageQuery(2, ownerCursor.value))).toEqual({
-          ok: false,
-          error: { code: "commerce_cursor_mismatch", reason: "watermark_kind" },
-        });
-    },
-  );
-
-  it.each(MODES)(
-    "%s returns typed unsupported outcomes for every outside-matrix operator family",
-    async (mode) => {
-      const fixture = createFixture(mode);
-      for (const [index, query] of unsupportedMatrixQueries().entries()) {
-        const result = await read(fixture, query);
-        const expectedCode =
-          index < 5
-            ? "commerce_query_unsupported"
-            : "commerce_query_surface_unsupported";
-        expect(result, `outside-matrix case ${index}`).toMatchObject({
-          ok: false,
-          error: { code: expectedCode },
-        });
-      }
-    },
-  );
-
   // Commerce runs the same cases over its merchant relations in
   // services/commerce/tests/normalized-conformance.test.ts.
   it.each(NORMALIZED_CONFORMANCE_CASES)(
@@ -278,7 +103,7 @@ describe("commerce entity-plane reader parity evidence", () => {
     },
   );
 
-  it("executes actual Underclerk and OrganisationDO stores through the Reader, preserves ownership, and rejects a mutated continuation", async () => {
+  it("executes actual Underclerk and OrganisationDO stores through the Reader, preserves ownership, and rejects mismatched cursors, outside-matrix operators and a mutated continuation", async () => {
     const native = await createActualReaderFixture("underclerk");
     const provider = await createActualReaderFixture("blotter");
     try {
@@ -329,6 +154,8 @@ describe("commerce entity-plane reader parity evidence", () => {
           expect(decoded.value.merchantId).toBe(MERCHANT_ID);
           expect(decoded.value.boundary.entityRef.entityId).toBe("order_tie_b");
         }
+        await expectCursorMismatches(fixture, nextCursor);
+        await expectOutsideMatrixRefusals(fixture);
         const second = await read(fixture, pageQuery(2, nextCursor));
         expect(second.ok).toBe(true);
         if (second.ok) {
@@ -851,16 +678,8 @@ async function createActualBlotterDatabase(): Promise<ReturnType<
      VALUES (?, 'Actual parity', 'beta', 'active', 1)`,
     ORGANISATION_ID,
   );
-  const corpus = buildCorpus();
   for (const row of NORMALIZED_CONFORMANCE_ROWS) {
-    const stored = corpus.entities.find(
-      ({ entity }) =>
-        entity.reference.origin === "system" &&
-        entity.reference.entityId === row.entityId,
-    )?.projection;
-    if (stored === null || stored === undefined)
-      throw new Error(`missing actual projection ${row.entityId}`);
-    const projection = actualBlotterProjection(row, stored.projection);
+    const projection = actualBlotterProjection(row);
     const projectionKind =
       row.entityType === "order" ? "commerce_order" : row.entityType;
     const lifecycle =
@@ -1048,45 +867,27 @@ function projectionForNormalizedRow(
   };
 }
 
-function actualBlotterProjection(
-  row: NormalizedConformanceRow,
-  projection: CommerceProjection,
-): CommerceProjection {
+function actualBlotterProjection(row: NormalizedConformanceRow): unknown {
+  const provenance: SourceProvenance = {
+    ...provenanceFor(row.entityType, row.entityId),
+    source: "shopify",
+  };
   switch (row.entityType) {
     case "order":
-      if (projection.kind !== "commerce_order")
-        throw new Error(
-          `actual order projection changed kind: ${projection.kind}`,
-        );
       return {
-        ...projection,
-        projection: {
-          ...projection.projection,
-          buyer: { kind: "identified", customerReference: row.displayName },
-        },
+        kind: "commerce_order",
+        projection: orderProjection(provenance, row.displayName),
       };
     case "shipment":
-      if (
-        projection.kind !== "shipment" ||
-        projection.projection.kind !== "external"
-      ) {
-        throw new Error(
-          `actual shipment projection changed kind: ${projection.kind}`,
-        );
-      }
       return {
-        ...projection,
-        projection: {
-          ...projection.projection,
-          trackingNumber: row.displayName,
-        },
+        kind: "shipment",
+        projection: shipmentProjection(provenance, row.displayName),
       };
     case "production_batch":
-      if (projection.kind !== "production_batch")
-        throw new Error(
-          `actual production-batch projection changed kind: ${projection.kind}`,
-        );
-      return projection;
+      return {
+        kind: "production_batch",
+        projection: productionBatchProjection(provenance, row.entityId),
+      };
   }
 }
 
@@ -1173,103 +974,8 @@ function normalizedSqlBinding(
   return typeof value === "bigint" ? Number(value) : value;
 }
 
-function createFixture(mode: SourceMode): ReaderFixture {
-  const state: MutableFixture = {
-    corpus: buildCorpus(),
-    merchantRevision: 1,
-    blotterRevision: 1,
-  };
-  const organisationId = required(parseOrganisationId(ORGANISATION_ID));
-  const integrationAccountId = required(
-    parseIntegrationAccountId(INTEGRATION_ID),
-  );
-  const client = new CommerceEntityPlaneClient({
-    baseUrl: "https://underclerk.entity-plane.test",
-    serviceToken: "parity-test-token",
-    fetch: commerceFetch(state, mode),
-  });
-  const commerceEngine = new CommerceEngineSource({
-    organisationId: ORGANISATION_ID,
-    merchantId: MERCHANT_ID,
-    integrationAccountId: INTEGRATION_ID,
-    client,
-  });
-  const boundCommerce = {
-    source: commerceEngine.source,
-    query: async () => ({
-      ok: false as const,
-      error: {
-        code: "source_invalid" as const,
-        source: "underclerk" as const,
-        message: "Parity uses planned Underclerk reads",
-      },
-    }),
-    queryPlanned: commerceEngine.queryPlanned.bind(commerceEngine),
-    readCapabilityMetadata: commerceEngine.readCapabilityMetadata.bind(commerceEngine),
-    readSnapshotRevision: commerceEngine.readSnapshotRevision.bind(commerceEngine),
-    readRelationshipStep: commerceEngine.readRelationshipStep.bind(commerceEngine),
-    hydrateEntityExtensions:
-      commerceEngine.hydrateEntityExtensions.bind(commerceEngine),
-  };
-  if (mode === "underclerk") {
-    const commerceSystem = {
-      kind: "satyr_commerce" as const,
-      organisationId,
-      bindingId: required(
-        parseCommerceBindingId("underclerk_binding_entity_plane_parity"),
-      ),
-      merchantId: required(parseCommerceEngineMerchantId(MERCHANT_ID)),
-      revision: required(parseCommerceSystemRevision(1)),
-    };
-    return {
-      mode,
-      state,
-      reader: new CommerceGraphReader({
-        organisationId: ORGANISATION_ID,
-        merchantId: MERCHANT_ID,
-        commerceSystem,
-        underclerk: boundCommerce,
-      }),
-    };
-  }
-  const blotter = new BlotterSource({
-    organisationId,
-    merchantId: MERCHANT_ID,
-    integrationAccountId,
-    organisation: blotterOrganisation(state),
-    now: () => Date.parse(NOW),
-  });
-  const boundBlotter: CommerceGraphBlotterSource = {
-    source: blotter.source,
-    readSnapshotRevision: blotter.readSnapshotRevision.bind(blotter),
-    queryPlan: blotter.queryPlan.bind(blotter),
-    readRelationshipStep: blotter.readRelationshipStep.bind(blotter),
-    hydrateSystemEntities: blotter.hydrateSystemEntities.bind(blotter),
-  };
-  const commerceSystem = {
-    kind: "shopify" as const,
-    organisationId,
-    integrationAccountId,
-    shopDomain: required(
-      parseShopifyShopDomain("entity-plane-parity.myshopify.com"),
-    ),
-    revision: required(parseCommerceSystemRevision(1)),
-  };
-  return {
-    mode,
-    state,
-    reader: new CommerceGraphReader({
-      organisationId: ORGANISATION_ID,
-      merchantId: MERCHANT_ID,
-      commerceSystem,
-      underclerk: boundCommerce,
-      blotter: boundBlotter,
-    }),
-  };
-}
-
 async function read(
-  fixture: Pick<ReaderFixture, "mode" | "reader">,
+  fixture: Pick<ActualReaderFixture, "reader">,
   query: CommerceGraphQuery,
 ) {
   return readAtSensitivity(
@@ -1280,14 +986,14 @@ async function read(
 }
 
 async function readRestricted(
-  fixture: Pick<ReaderFixture, "mode" | "reader">,
+  fixture: Pick<ActualReaderFixture, "reader">,
   query: CommerceGraphQuery,
 ) {
   return readAtSensitivity(fixture, query, "restricted");
 }
 
 async function readAtSensitivity(
-  fixture: Pick<ReaderFixture, "mode" | "reader">,
+  fixture: Pick<ActualReaderFixture, "reader">,
   query: CommerceGraphQuery,
   sensitivityCeiling: "internal" | "restricted",
 ) {
@@ -1318,1095 +1024,6 @@ async function readAtSensitivity(
   return fixture.reader.query({ query, authority: authority.value, now: NOW });
 }
 
-function commerceFetch(
-  state: MutableFixture,
-  mode: SourceMode,
-): CommerceEntityPlaneFetch {
-  return async (input, init) => {
-    const path = new URL(String(input)).pathname;
-    const body =
-      init?.body === undefined
-        ? null
-        : (JSON.parse(String(init.body)) as unknown);
-    try {
-      if (path.endsWith("/system-extensions"))
-        return jsonResponse(extensionResponse(state, body));
-      if (path.endsWith("/capability-metadata")) {
-        const response = capabilityMetadataResponse(state, body);
-        return response instanceof Response ? response : jsonResponse(response);
-      }
-      if (path.endsWith("/query-plan"))
-        return jsonResponse(commercePlanResponse(state, body));
-      if (path.endsWith("/relationship-step"))
-        return jsonResponse(commerceRelationshipResponse(state, mode, body));
-    } catch (error) {
-      return new Response(
-        JSON.stringify({
-          message: error instanceof Error ? error.message : String(error),
-        }),
-        { status: 500 },
-      );
-    }
-    return new Response(
-      JSON.stringify({ message: `unexpected Underclerk path ${path}` }),
-      { status: 404 },
-    );
-  };
-}
-
-function capabilityMetadataResponse(
-  state: MutableFixture,
-  body: unknown,
-): unknown {
-  const request = parseEntityPlaneCapabilityMetadataRequest(body);
-  const capabilities =
-    request.query.kind === "commerce_list_page"
-      ? {
-          kind: "commerce_list" as const,
-          listId: request.query.listId,
-          listRevision: 1,
-          capability: {
-            filterableAttributeIds: [],
-            sortableAttributeIds: [],
-            aggregation: { kind: "count_only" as const },
-          },
-        }
-      : request.query.kind === "saved_commerce_view"
-        ? {
-            kind: "saved_commerce_view" as const,
-            viewId: request.query.viewId,
-            viewRevision: 1,
-            source: {
-              kind: "commerce_list" as const,
-              listId: "export_coordination",
-              listRevision: 1,
-              capability: {
-                filterableAttributeIds: [],
-                sortableAttributeIds: [],
-                aggregation: { kind: "count_only" as const },
-              },
-            },
-            filter: { kind: "all" as const },
-            sorts: [],
-          }
-        : request.query.kind === "aggregation" &&
-            request.query.source.kind === "commerce_list"
-          ? {
-              kind: "commerce_list" as const,
-              listId: request.query.source.listId,
-              listRevision: 1,
-              capability: {
-                filterableAttributeIds: [],
-                sortableAttributeIds: [],
-                aggregation: { kind: "count_only" as const },
-              },
-            }
-          : request.query.kind === "relationship_traversal" &&
-              request.query.seeds[0]?.origin === "custom"
-            ? {
-                kind: "underclerk_custom" as const,
-                entityTypeId: request.query.seeds[0].typeId,
-                publishedRevision: 1,
-                capability: {
-                  filterableAttributeIds: [],
-                  sortableAttributeIds: [],
-                  aggregation: { kind: "count_only" as const },
-                },
-              }
-            : {
-                kind: "system_mapped" as const,
-                systemEntityKind: "order" as const,
-                systemSchemaRevision: 1,
-                capability: {
-                  filterableAttributeIds: ["lifecycle"],
-                  sortableAttributeIds: ["lifecycle", "optional_all_null"],
-                  aggregation: { kind: "count_only" as const },
-                },
-              };
-  const response = parseCommerceGraphQueryPlanRequest({
-    query: request.query,
-    semantics: {
-      semanticsVersion: "v1",
-      orderingVersion: "v1",
-      textNormalization: "commerce_unicode_v1",
-      nullPlacement: "last",
-    },
-    projection: {
-      attributeIds: [],
-      relationshipDefinitions: [],
-      includeProvenance: true,
-      includeFreshness: true,
-    },
-    organisationId: request.organisationId,
-    merchantId: request.merchantId,
-    watermark: {
-      kind: "underclerk_native",
-      merchantRevision: state.merchantRevision,
-    },
-    capabilities,
-  });
-  return parseEntityPlaneCapabilityMetadataResponse({
-    kind: "capability_metadata",
-    organisationId: request.organisationId,
-    merchantId: request.merchantId,
-    merchantRevision: state.merchantRevision,
-    watermark: {
-      kind: "underclerk_native",
-      merchantRevision: state.merchantRevision,
-    },
-    capabilities: response.capabilities,
-    projection: response.projection,
-  });
-}
-
-function commercePlanResponse(state: MutableFixture, body: unknown): unknown {
-  const request = parseCommerceGraphQueryPlanRequest(body);
-  const planned = planCommerceGraphQuery(request);
-  if (!planned.ok) throw new Error(planned.error.code);
-  if (planned.value.kind !== "planned") return planned.value;
-  const plan = planned.value.plan;
-  if (plan.operation.kind === "aggregation") {
-    return {
-      kind: "planned",
-      organisationId: ORGANISATION_ID,
-      merchantId: MERCHANT_ID,
-      merchantRevision: state.merchantRevision,
-      plan,
-      result: resultForEntities(
-        state,
-        [],
-        null,
-        [],
-        [],
-        [
-          {
-            kind: "count",
-            value: BigInt(
-              referenceEntities(state.corpus, request.query).length,
-            ),
-          },
-        ],
-      ),
-      hasMore: false,
-    };
-  }
-  const listEntries = isListQuery(request.query)
-    ? pageListEntries(state.corpus, request.query, plan)
-    : [];
-  const entities = pageEntities(state.corpus, request.query, plan);
-  const limit = Number(plan.limit);
-  const retained = entities.slice(0, limit);
-  const retainedListEntries = listEntries.slice(0, limit);
-  const hasMore = entities.length > retained.length;
-  const nextCursor = hasMore ? cursorForEntity(plan, retained.at(-1)) : null;
-  return {
-    kind: "planned",
-    organisationId: ORGANISATION_ID,
-    merchantId: MERCHANT_ID,
-    merchantRevision: state.merchantRevision,
-    plan,
-    result: resultForEntities(
-      state,
-      retained,
-      nextCursor,
-      [],
-      retainedListEntries,
-    ),
-    hasMore,
-  };
-}
-
-function commerceRelationshipResponse(
-  state: MutableFixture,
-  mode: SourceMode,
-  body: unknown,
-): unknown {
-  if (!isRecord(body)) throw new Error("relationship request is not an object");
-  const plan = parsePlan(body.plan);
-  if (plan === null) throw new Error("relationship plan did not parse");
-  const frontier = parseRefs(body.frontier);
-  const accepted = state.corpus.relationships.filter((relationship) => {
-    if (mode === "blotter" && relationship.origin === "system") return false;
-    return frontier.some(
-      (reference) =>
-        sameRef(reference, relationship.source) ||
-        sameRef(reference, relationship.target),
-    );
-  });
-  const entities = state.corpus.entities.filter(
-    ({ entity }) =>
-      (mode === "underclerk" || entity.reference.origin === "custom") &&
-      (accepted.some(
-        (relationship) =>
-          sameRef(entity.reference, relationship.source) ||
-          sameRef(entity.reference, relationship.target),
-      ) ||
-        frontier.some((reference) => sameRef(reference, entity.reference))),
-  );
-  return {
-    kind: "planned",
-    organisationId: ORGANISATION_ID,
-    merchantId: MERCHANT_ID,
-    merchantRevision: state.merchantRevision,
-    plan,
-    result: resultForEntities(state, entities, null, accepted),
-    hasMore: false,
-  };
-}
-
-function extensionResponse(state: MutableFixture, body: unknown): unknown {
-  const requested =
-    isRecord(body) && Array.isArray(body.entityRefs) ? body.entityRefs : [];
-  const sidecars = state.corpus.entities
-    .filter(
-      ({ entity }) =>
-        entity.reference.origin === "system" &&
-        requested.some(
-          (reference) =>
-            isEntityRef(reference) && sameRef(reference, entity.reference),
-        ),
-    )
-    .map(({ entity }) => {
-      if (entity.reference.origin !== "system")
-        throw new Error("extension sidecar requires a system entity");
-      const hasPriority =
-        entity.reference.typeId === "order" &&
-        entity.reference.entityId === "order_export";
-      return {
-        entityRef: entity.reference,
-        extension: hasPriority
-          ? { state: "published", revision: 1 }
-          : { state: "absent" },
-        attributes: hasPriority
-          ? [
-              extensionAttribute(
-                "ext_priority",
-                "high",
-                entity.reference.typeId,
-              ),
-            ]
-          : [],
-      };
-    });
-  return {
-    merchantId: MERCHANT_ID,
-    merchantRevision: state.merchantRevision,
-    sidecars,
-  };
-}
-
-function blotterOrganisation(state: MutableFixture): BlotterOrganisationReader {
-  return {
-    readAcceptedCommerceProjectionSequence: async () => ({
-      ok: true,
-      value: state.blotterRevision,
-    }),
-    readCommerceQueryPlan: async (input) => {
-      const parsedPlan = parsePlan(input.plan);
-      if (parsedPlan === null)
-        throw new Error(
-          `blotter plan parser returned null: ${String(input.plan)}`,
-        );
-      const plan = parsedPlan;
-      const query = parseCommerceGraphQueryPlanRequest(input.planRequest).query;
-      if (plan.operation.kind === "aggregation") {
-        return {
-          ok: true,
-          value: {
-            kind: "count",
-            aggregation: {
-              kind: "count",
-              value: BigInt(referenceEntities(state.corpus, query).length),
-            },
-          },
-        };
-      }
-      const rows = pageEntities(state.corpus, query, plan)
-        .filter(({ entity }) => entity.reference.origin === "system")
-        .map((entry) => relationRow(entry, INTEGRATION_ID));
-      const retained = rows.slice(0, Number(plan.limit));
-      const records = retained.flatMap((row) =>
-        projectionFor(state.corpus, row.entity_type, row.entity_id),
-      );
-      return {
-        ok: true,
-        value: {
-          kind: "rows",
-          rows: retained,
-          records,
-          hasMore: rows.length > retained.length,
-        },
-      };
-    },
-    readCommerceRelationshipStep: async (input) => ({
-      ok: true,
-      value: state.corpus.relationships
-        .filter(
-          (relationship) =>
-            relationship.origin === "system" &&
-            input.frontier.some(
-              (reference) =>
-                sameRef(reference, relationship.source) ||
-                sameRef(reference, relationship.target),
-            ),
-        )
-        .map(relationshipRow),
-    }),
-    readExactCommerceProjectionReference: async (input) => ({
-      ok: true,
-      value:
-        state.corpus.entities.find(
-          ({ entity, projection }) =>
-            entity.reference.origin === "system" &&
-            String(entity.reference.entityId) === input.canonicalId &&
-            projection !== null,
-        )?.projection ?? null,
-    }),
-  };
-}
-
-function parsePlan(value: unknown): CommerceQueryPlan | null {
-  if (!isRecord(value)) return null;
-  let outcome;
-  try {
-    outcome = parseCommerceQueryPlanOutcome({ kind: "planned", plan: value });
-  } catch (error) {
-    throw new Error(
-      `plan parse failed: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-  return outcome.kind === "planned" ? outcome.plan : null;
-}
-
-function pageEntities(
-  corpus: Corpus,
-  query: CommerceGraphQuery,
-  plan: CommerceQueryPlan,
-): readonly CorpusEntity[] {
-  const candidates = referenceEntities(corpus, query);
-  const boundary = plan.boundary;
-  if (boundary === null) return candidates;
-  const index = candidates.findIndex(({ entity }) =>
-    sameRef(entity.reference, boundary.entityRef),
-  );
-  return index < 0 ? [] : candidates.slice(index + 1);
-}
-
-function pageListEntries(
-  corpus: Corpus,
-  query: CommerceGraphQuery,
-  plan: CommerceQueryPlan,
-): readonly CommerceListEntry[] {
-  const entries = corpus.listEntries
-    .filter((entry) => {
-      if (query.kind === "commerce_list_page")
-        return query.listId === entry.listId;
-      if (query.kind === "saved_commerce_view")
-        return entry.listId === "export_coordination";
-      return false;
-    })
-    .filter(
-      (entry) =>
-        query.kind !== "commerce_list_page" ||
-        entry.entityRef.origin !== "system" ||
-        applyRelationshipFilter(
-          [
-            corpus.entities.find(({ entity }) =>
-              sameRef(entity.reference, entry.entityRef),
-            ),
-          ].filter((entry): entry is CorpusEntity => entry !== undefined),
-          query.filter,
-          corpus.relationships,
-        ).length > 0,
-    );
-  const boundary = plan.boundary;
-  if (boundary === null) return entries;
-  const index = entries.findIndex((entry) =>
-    sameRef(entry.entityRef, boundary.entityRef),
-  );
-  return index < 0 ? [] : entries.slice(index + 1);
-}
-
-function referenceEntities(
-  corpus: Corpus,
-  query: CommerceGraphQuery,
-): readonly CorpusEntity[] {
-  let entities: readonly CorpusEntity[] = corpus.entities.filter(
-    ({ entity }) =>
-      entity.reference.origin === "system" &&
-      entity.reference.typeId === "order",
-  );
-  switch (query.kind) {
-    case "entity_by_ref":
-      entities = entities.filter(({ entity }) =>
-        sameRef(entity.reference, query.reference),
-      );
-      break;
-    case "search":
-      entities = entities.filter(({ searchText }) =>
-        fold(searchText).includes(fold(query.text)),
-      );
-      break;
-    case "entity_type_page":
-      if (
-        query.entityTypeId.origin !== "system" ||
-        query.entityTypeId.typeId !== "order"
-      )
-        return [];
-      entities = applyReferenceFilter(entities, query.filter);
-      break;
-    case "commerce_list_page":
-      entities = listEntities(corpus);
-      entities = applyRelationshipFilter(
-        entities,
-        query.filter,
-        corpus.relationships,
-      );
-      break;
-    case "saved_commerce_view":
-      entities = listEntities(corpus);
-      break;
-    case "aggregation":
-      if (query.source.kind === "commerce_list") {
-        entities = listEntities(corpus);
-        entities = applyRelationshipFilter(
-          entities,
-          query.filter,
-          corpus.relationships,
-        );
-      } else if (
-        query.source.entityTypeId.origin !== "system" ||
-        query.source.entityTypeId.typeId !== "order"
-      )
-        return [];
-      entities = applyReferenceFilter(entities, query.filter);
-      break;
-    case "underclerk_context": {
-      if (query.selection.kind !== "entity_seeds") return [];
-      const seeds = query.selection.seeds;
-      entities = entities.filter(({ entity }) =>
-        seeds.some((seed) => sameRef(seed, entity.reference)),
-      );
-      break;
-    }
-    default:
-      return [];
-  }
-  return [...entities].sort((left, right) =>
-    compareCorpusEntities(left, right, query),
-  );
-}
-
-function listEntities(corpus: Corpus): readonly CorpusEntity[] {
-  return corpus.listEntries.flatMap(
-    (entry) =>
-      corpus.entities.find(({ entity }) =>
-        sameRef(entity.reference, entry.entityRef),
-      ) ?? [],
-  );
-}
-
-function applyRelationshipFilter(
-  entities: readonly CorpusEntity[],
-  filter: Variant<CommerceGraphQuery, "commerce_list_page">["filter"],
-  relationships: readonly CommerceRelationship[],
-): readonly CorpusEntity[] {
-  if (filter.kind !== "relationship") return entities;
-  return entities.filter(({ entity }) => {
-    const exists = relationships.some(
-      (relationship) =>
-        relationship.definition.origin ===
-          filter.filter.relationshipDefinition.origin &&
-        relationship.definition.definitionId ===
-          filter.filter.relationshipDefinition.definitionId &&
-        Number(relationship.definition.revision) ===
-          filter.filter.relationshipDefinition.revision &&
-        (sameRef(entity.reference, relationship.source) ||
-          sameRef(entity.reference, relationship.target)),
-    );
-    return filter.filter.operator === "exists" ? exists : !exists;
-  });
-}
-
-function applyReferenceFilter(
-  entities: readonly CorpusEntity[],
-  filter: Variant<CommerceGraphQuery, "entity_type_page">["filter"],
-): readonly CorpusEntity[] {
-  if (filter.kind !== "attribute") return entities;
-  return entities.filter(({ entity }) => {
-    const attribute = entity.attributes.find(
-      (entry) => entry.attributeId === filter.filter.attributeId,
-    );
-    switch (filter.filter.operator) {
-      case "is_not_empty":
-        return attribute !== undefined;
-      case "equals":
-        return (
-          attribute !== undefined &&
-          JSON.stringify(attribute.value) ===
-            JSON.stringify(filter.filter.value)
-        );
-      case "not_equals":
-        return (
-          attribute === undefined ||
-          JSON.stringify(attribute.value) !==
-            JSON.stringify(filter.filter.value)
-        );
-      default:
-        return false;
-    }
-  });
-}
-
-function compareCorpusEntities(
-  left: CorpusEntity,
-  right: CorpusEntity,
-  query: CommerceGraphQuery,
-): number {
-  const sort =
-    query.kind === "entity_type_page" || query.kind === "commerce_list_page"
-      ? query.sorts[0]
-      : undefined;
-  if (sort !== undefined) {
-    const comparison = compareOrderingValue(
-      orderingValue(left, sort.field),
-      orderingValue(right, sort.field),
-    );
-    if (comparison !== 0)
-      return sort.direction === "descending" ? -comparison : comparison;
-  } else {
-    const updated = compareNumber(left.updatedAt, right.updatedAt);
-    if (updated !== 0) return -updated;
-  }
-  return compareUtf8(
-    String(left.entity.reference.entityId),
-    String(right.entity.reference.entityId),
-  );
-}
-
-function orderingValue(
-  entity: CorpusEntity,
-  field: Variant<
-    CommerceGraphQuery,
-    "entity_type_page"
-  >["sorts"][number]["field"],
-): CommerceOrderingValue {
-  switch (field.kind) {
-    case "updated_at":
-      return { kind: "integer", value: BigInt(entity.updatedAt) };
-    case "display_name":
-      return { kind: "text", value: fold(entity.entity.displayName) };
-    case "attribute":
-      return attributeValueForOrdering(
-        entity.entity.attributes.find(
-          (entry) => entry.attributeId === field.attributeId,
-        )?.value,
-      );
-    case "created_at":
-      return { kind: "null" };
-  }
-}
-
-function attributeValueForOrdering(
-  value: CommerceEntity["attributes"][number]["value"] | undefined,
-): CommerceOrderingValue {
-  if (value === undefined) return { kind: "null" };
-  switch (value.kind) {
-    case "short_text":
-    case "long_text":
-    case "date":
-    case "timestamp":
-    case "status":
-      return { kind: "text", value: value.value };
-    case "integer":
-      return { kind: "integer", value: value.value };
-    case "boolean":
-      return { kind: "boolean", value: value.value };
-    default:
-      return { kind: "null" };
-  }
-}
-
-function compareOrderingValue(
-  left: CommerceOrderingValue,
-  right: CommerceOrderingValue,
-): number {
-  if (left.kind === "null" || right.kind === "null")
-    return left.kind === right.kind ? 0 : left.kind === "null" ? 1 : -1;
-  if (left.kind !== right.kind) return compareUtf8(left.kind, right.kind);
-  switch (left.kind) {
-    case "text":
-      return compareUtf8(left.value, right.kind === "text" ? right.value : "");
-    case "integer":
-      return compareBigInt(
-        left.value,
-        right.kind === "integer" ? right.value : 0n,
-      );
-    case "boolean":
-      return compareNumber(
-        left.value ? 1 : 0,
-        right.kind === "boolean" && right.value ? 1 : 0,
-      );
-    default:
-      return 0;
-  }
-}
-
-function resultForEntities(
-  state: MutableFixture,
-  entries: readonly CorpusEntity[],
-  nextCursor: CommerceCursor | null,
-  relationships: readonly CommerceRelationship[] = [],
-  listEntries: readonly CommerceListEntry[] = [],
-  aggregations: CommerceGraphQueryResult["aggregations"] = [],
-): CommerceGraphQueryResult {
-  const entities = entries.map(({ entity }) => entity);
-  return {
-    merchantRevision: parseCommerceSnapshotRevision(
-      state.merchantRevision,
-      "merchantRevision",
-    ),
-    entities,
-    relationships: [...relationships],
-    listEntries: [...listEntries],
-    aggregations: [...aggregations],
-    nextCursor,
-    provenance: entities.flatMap(systemEntityProvenance),
-    freshness: entities.flatMap(systemEntityFreshness),
-  };
-}
-
-function systemEntityProvenance(entity: CommerceEntity): SourceProvenance[] {
-  const provenance =
-    entity.reference.origin === "system" && "provenance" in entity
-      ? entity.provenance
-      : undefined;
-  return provenance === undefined ? [] : [provenance];
-}
-
-function systemEntityFreshness(
-  entity: CommerceEntity,
-): CommerceGraphQueryResult["freshness"] {
-  const freshness =
-    entity.reference.origin === "system" && "freshness" in entity
-      ? entity.freshness
-      : undefined;
-  return freshness === undefined ? [] : [freshness];
-}
-
-function cursorForEntity(
-  plan: CommerceQueryPlan,
-  entry: CorpusEntity | undefined,
-): CommerceCursor {
-  if (entry === undefined)
-    throw new Error("cannot mint a cursor without a boundary");
-  const encoded = encodeCommerceCursor({
-    organisationId: ORGANISATION_ID,
-    merchantId: MERCHANT_ID,
-    queryFingerprint: plan.queryFingerprint,
-    semanticsVersion: plan.semanticsVersion,
-    orderingVersion: plan.orderingVersion,
-    effectiveOrdering: plan.effectiveOrdering,
-    boundary: {
-      entityRef: entry.entity.reference,
-      orderingValues: plan.effectiveOrdering.leadingKeys.map((key) =>
-        orderingValueForPlan(entry, key.field),
-      ),
-    },
-    watermark: plan.watermark,
-  });
-  if (!encoded.ok) throw new Error(encoded.error.code);
-  return encoded.value;
-}
-
-function orderingValueForPlan(
-  entry: CorpusEntity,
-  field: CommerceQueryPlan["effectiveOrdering"]["leadingKeys"][number]["field"],
-): CommerceOrderingValue {
-  switch (field.kind) {
-    case "updated_at":
-      return { kind: "integer", value: BigInt(entry.updatedAt) };
-    case "display_name":
-      return { kind: "text", value: fold(entry.entity.displayName) };
-    case "attribute":
-      return attributeValueForOrdering(
-        entry.entity.attributes.find(
-          (attribute) => attribute.attributeId === field.attributeId,
-        )?.value,
-      );
-    case "created_at":
-      return { kind: "null" };
-  }
-}
-
-function relationRow(
-  entry: CorpusEntity,
-  owner: string,
-): CommerceEntityRelationRow {
-  if (entry.entity.reference.origin !== "system")
-    throw new Error("Blotter relation rows are system-owned");
-  const displayName =
-    entry.entity.reference.typeId === "order"
-      ? String(entry.entity.reference.entityId)
-      : entry.entity.displayName;
-  return {
-    merchant_id: owner,
-    entity_origin: "system",
-    entity_type: entry.entity.reference.typeId,
-    entity_id: String(entry.entity.reference.entityId),
-    revision: Number(entry.entity.revision),
-    updated_at: entry.updatedAt,
-    display_name: displayName,
-    display_name_folded: fold(displayName),
-    search_text_folded: fold(displayName),
-    payload_json: JSON.stringify(entry.projection?.projection ?? {}),
-  };
-}
-
-function relationshipRow(
-  relationship: CommerceRelationship,
-): CommerceRelationshipRelationRow {
-  if (
-    relationship.origin !== "system" ||
-    relationship.source.origin !== "system" ||
-    relationship.target.origin !== "system"
-  )
-    throw new Error("Blotter relationship rows are system-owned");
-  return {
-    merchant_id: INTEGRATION_ID,
-    relationship_origin: "system",
-    relationship_id: String(relationship.relationshipId),
-    relationship_revision: Number(relationship.revision),
-    definition_origin: "system",
-    definition_id: relationship.definition.definitionId,
-    definition_revision: Number(relationship.definition.revision),
-    sensitivity: relationship.sensitivity,
-    source_origin: "system",
-    source_type_id: relationship.source.typeId,
-    source_entity_id: String(relationship.source.entityId),
-    target_origin: "system",
-    target_type_id: relationship.target.typeId,
-    target_entity_id: String(relationship.target.entityId),
-    payload_json: JSON.stringify({
-      relationshipId: relationship.relationshipId,
-      relationshipRevision: relationship.revision,
-    }),
-    provenance_json: JSON.stringify(relationship.provenance),
-  };
-}
-
-function projectionFor(
-  corpus: Corpus,
-  typeId: string,
-  entityId: string,
-): readonly CommerceProjectionRecord[] {
-  return corpus.entities.flatMap(({ entity, projection }) =>
-    entity.reference.origin === "system" &&
-    String(entity.reference.typeId) === typeId &&
-    String(entity.reference.entityId) === entityId &&
-    projection !== null
-      ? [projection]
-      : [],
-  );
-}
-
-function buildCorpus(): Corpus {
-  const orderExport = systemEntity(
-    "order",
-    "order_export",
-    "Straße",
-    50,
-    "Straße",
-    "open",
-  );
-  const orderTieA = systemEntity(
-    "order",
-    "order_tie_a",
-    "Café",
-    80,
-    "Café",
-    "open",
-  );
-  const orderTieB = systemEntity(
-    "order",
-    "order_tie_b",
-    "Café",
-    80,
-    "Café",
-    "open",
-  );
-  const orderMissing = systemEntity(
-    "order",
-    "order_missing_attribute",
-    "STRASSE",
-    60,
-    "STRASSE",
-    null,
-  );
-  const shipment = systemEntity(
-    "shipment",
-    "shipment_export",
-    "東京",
-    40,
-    "東京",
-    "in_transit",
-  );
-  const shipmentTwo = systemEntity(
-    "shipment",
-    "shipment_two",
-    "東京 shipment",
-    35,
-    "東京 shipment",
-    "in_transit",
-  );
-  const shipmentThree = systemEntity(
-    "shipment",
-    "shipment_three",
-    "Straße shipment",
-    34,
-    "Straße shipment",
-    "in_transit",
-  );
-  const batch = systemEntity(
-    "production_batch",
-    "production_batch_export",
-    "Export batch",
-    30,
-    "Export batch",
-    null,
-  );
-  const batchTwo = systemEntity(
-    "production_batch",
-    "production_batch_two",
-    "Second batch",
-    25,
-    "Second batch",
-    null,
-  );
-  const partner = customEntity(
-    "trade_partner",
-    "trade_partner_東京",
-    "東京 Trade Partner",
-    "partner",
-  );
-  const document = customEntity(
-    "export_document",
-    "export_document_é",
-    "Export document é",
-    "document",
-  );
-  const relationships = [
-    customRelationship(
-      "trade_partner_orders",
-      partner.entity.reference,
-      orderExport.entity.reference,
-      "trade_partner_orders",
-    ),
-    systemRelationship(
-      "order_shipment",
-      orderExport.entity.reference,
-      shipment.entity.reference,
-      "order_shipment",
-    ),
-    systemRelationship(
-      "order_shipment",
-      orderTieA.entity.reference,
-      shipmentTwo.entity.reference,
-      "order_shipment_tie_a",
-    ),
-    systemRelationship(
-      "order_shipment",
-      orderTieB.entity.reference,
-      shipmentThree.entity.reference,
-      "order_shipment_tie_b",
-    ),
-    customRelationship(
-      "shipment_export_documents",
-      shipment.entity.reference,
-      document.entity.reference,
-      "shipment_export_documents",
-    ),
-    systemRelationship(
-      "shipment_production_batch",
-      shipment.entity.reference,
-      batch.entity.reference,
-      "shipment_production_batch",
-    ),
-    systemRelationship(
-      "shipment_production_batch",
-      shipmentTwo.entity.reference,
-      batchTwo.entity.reference,
-      "shipment_production_batch_two",
-    ),
-  ];
-  const listEntries = [
-    listEntry("entry_order_tie_a", orderTieA.entity.reference),
-    listEntry("entry_order_export", orderExport.entity.reference),
-    listEntry("entry_order_missing", orderMissing.entity.reference),
-  ];
-  return {
-    entities: [
-      partner,
-      orderExport,
-      shipment,
-      shipmentTwo,
-      shipmentThree,
-      document,
-      batch,
-      batchTwo,
-      orderTieA,
-      orderTieB,
-      orderMissing,
-    ],
-    relationships,
-    listEntries,
-  };
-}
-
-function listEntry(
-  entryId: string,
-  entityRef: CommerceEntityRef,
-): CommerceListEntry {
-  const response = parseCommerceGraphResponse({
-    merchantRevision: 1,
-    entities: [],
-    relationships: [],
-    listEntries: [
-      {
-        entryId,
-        listId: "export_coordination",
-        listRevision: 1,
-        entityRef,
-        attributeValues: [],
-        revision: 1,
-      },
-    ],
-    aggregations: [],
-    nextCursor: null,
-    provenance: [],
-    freshness: [],
-  });
-  const entry = response.listEntries[0];
-  if (entry === undefined) throw new Error("list entry fixture did not parse");
-  return entry;
-}
-
-function systemEntity(
-  typeId: SystemCommerceEntityKind,
-  entityId: string,
-  displayName: string,
-  updatedAt: number,
-  searchText: string,
-  lifecycle: string | null,
-): CorpusEntity {
-  const provenance = provenanceFor(typeId, entityId);
-  const attributes =
-    lifecycle === null ? [] : [systemAttribute(typeId, "lifecycle", lifecycle)];
-  if (entityId === "order_missing_attribute")
-    attributes.push({
-      attributeId: "restricted_note",
-      scope: { kind: "system", entityTypeId: typeId, schemaRevision: 1 },
-      definitionRevision: 1,
-      sensitivity: "restricted",
-      value: { kind: "short_text", value: "private" },
-    });
-  const raw = {
-    reference: { origin: "system", typeId, entityId },
-    revision: 1,
-    displayName,
-    attributes,
-    provenance,
-    freshness: { state: "current", observedAt: OBSERVED_AT },
-  };
-  return {
-    entity: parseEntity(raw),
-    updatedAt,
-    searchText,
-    projection: projectionRecord(typeId, entityId, lifecycle, provenance),
-  };
-}
-
-function customEntity(
-  typeId: string,
-  entityId: string,
-  displayName: string,
-  attributeId: string,
-): CorpusEntity {
-  const raw = {
-    reference: { origin: "custom", typeId, entityId },
-    revision: 1,
-    displayName,
-    attributes: [customAttribute(typeId, attributeId)],
-    typeRevision: 1,
-    state: { state: "active" },
-    sensitivity: "internal",
-  };
-  return {
-    entity: parseEntity(raw),
-    updatedAt: 10,
-    searchText: displayName,
-    projection: null,
-  };
-}
-
-function parseEntity(raw: unknown): CommerceEntity {
-  const response = parseCommerceGraphResponse({
-    merchantRevision: 1,
-    entities: [raw],
-    relationships: [],
-    listEntries: [],
-    aggregations: [],
-    nextCursor: null,
-    provenance: [],
-    freshness: [],
-  });
-  const entity = response.entities[0];
-  if (entity === undefined) throw new Error("entity fixture did not parse");
-  return entity;
-}
-
-function systemAttribute(
-  typeId: SystemCommerceEntityKind,
-  attributeId: string,
-  value: string,
-) {
-  return {
-    attributeId,
-    scope: { kind: "system", entityTypeId: typeId, schemaRevision: 1 },
-    definitionRevision: 1,
-    sensitivity: "internal",
-    value: { kind: "status", value },
-  };
-}
-
-function customAttribute(typeId: string, attributeId: string) {
-  return {
-    attributeId,
-    scope: { kind: "custom", entityTypeId: typeId, typeRevision: 1 },
-    definitionRevision: 1,
-    sensitivity: "internal",
-    value: { kind: "short_text", value: "present" },
-  };
-}
-
-function extensionAttribute(
-  attributeId: string,
-  value: string,
-  typeId: SystemCommerceEntityKind,
-) {
-  return {
-    attributeId,
-    scope: {
-      kind: "merchant_extension",
-      entityTypeId: typeId,
-      schemaRevision: 1,
-    },
-    definitionRevision: 1,
-    sensitivity: "internal",
-    value: { kind: "short_text", value },
-  };
-}
-
 function provenanceFor(
   typeId: SystemCommerceEntityKind,
   entityId: string,
@@ -2424,64 +1041,10 @@ function provenanceFor(
   };
 }
 
-function projectionRecord(
-  typeId: SystemCommerceEntityKind,
-  entityId: string,
-  lifecycle: string | null,
+function orderProjection(
   provenance: SourceProvenance,
-): CommerceProjectionRecord {
-  const kind = typeId === "order" ? "commerce_order" : typeId;
-  const providerProvenance: SourceProvenance = {
-    ...provenance,
-    source: "shopify",
-  };
-  const projection =
-    typeId === "order"
-      ? {
-          kind: "commerce_order",
-          projection: orderProjection(providerProvenance),
-        }
-      : typeId === "shipment"
-        ? {
-            kind: "shipment",
-            projection: shipmentProjection(providerProvenance, entityId),
-          }
-        : {
-            kind: "production_batch",
-            projection: productionBatchProjection(providerProvenance, entityId),
-          };
-  return {
-    organisationId: ORGANISATION_ID,
-    kind,
-    canonicalId: entityId,
-    integrationAccountId: INTEGRATION_ID,
-    revision: 1,
-    lifecycle: lifecycle ?? "unknown",
-    projection,
-    updatedAt: 50,
-    validatedAt: Date.parse(OBSERVED_AT),
-    labRunId: null,
-  } as CommerceProjectionRecord;
-}
-
-function mutateCorpus(state: MutableFixture, mode: SourceMode): void {
-  const inserted = systemEntity(
-    "order",
-    "order_inserted_mid_page",
-    "Inserted mid-page",
-    100,
-    "Inserted mid-page",
-    "open",
-  );
-  state.corpus = {
-    ...state.corpus,
-    entities: [...state.corpus.entities, inserted],
-  };
-  state.merchantRevision = 2;
-  if (mode === "blotter") state.blotterRevision = 2;
-}
-
-function orderProjection(provenance: SourceProvenance): unknown {
+  customerReference: string,
+): unknown {
   return {
     provenance,
     origin: {
@@ -2490,7 +1053,7 @@ function orderProjection(provenance: SourceProvenance): unknown {
       caseId: "case",
       externalReference: "external",
     },
-    buyer: { kind: "guest" },
+    buyer: { kind: "identified", customerReference },
     lineItems: [],
     totals: moneyTotals(),
     adjustments: [],
@@ -2500,7 +1063,7 @@ function orderProjection(provenance: SourceProvenance): unknown {
 
 function shipmentProjection(
   provenance: SourceProvenance,
-  entityId: string,
+  trackingNumber: string,
 ): unknown {
   return {
     kind: "external",
@@ -2508,7 +1071,7 @@ function shipmentProjection(
     orderId: "order_export",
     fulfillmentId: "fulfillment_export",
     carrier: "Carrier",
-    trackingNumber: `TRACK-${entityId}`,
+    trackingNumber,
     estimatedDeliveryAt: OBSERVED_AT,
     lifecycle: { state: "in_transit", since: OBSERVED_AT },
     events: [],
@@ -2551,56 +1114,6 @@ function moneyTotals() {
     rounding: money,
     total: money,
   };
-}
-
-function customRelationship(
-  definitionId: string,
-  source: CommerceEntityRef,
-  target: CommerceEntityRef,
-  relationshipId: string,
-): CommerceRelationship {
-  const reference = parseCustomCommerceRelationshipRef({
-    origin: "custom",
-    relationshipId,
-    definition: { origin: "custom", definitionId, revision: 1 },
-    revision: 1,
-  });
-  return { ...reference, sensitivity: "internal", source, target };
-}
-
-function systemRelationship(
-  definitionId: string,
-  source: CommerceEntityRef,
-  target: CommerceEntityRef,
-  relationshipId: string,
-): CommerceRelationship {
-  const systemSource = requireSystemRef(source);
-  return {
-    origin: "system",
-    relationshipId: parseRelationshipId(`system:${relationshipId}`),
-    definition: {
-      origin: "system",
-      definitionId: definitionId as
-        "order_shipment" | "shipment_production_batch",
-      revision: parseRelationshipDefinitionRevision(1),
-    },
-    sensitivity: "internal",
-    source: systemSource,
-    target: requireSystemRef(target),
-    revision: parseRelationshipRevision(1),
-    provenance: provenanceFor(
-      systemSource.typeId,
-      String(systemSource.entityId),
-    ),
-  };
-}
-
-function requireSystemRef(
-  reference: CommerceEntityRef,
-): SystemCommerceEntityRef {
-  if (reference.origin !== "system")
-    throw new Error("expected a system reference");
-  return reference;
 }
 
 function pageQuery(
@@ -2857,55 +1370,6 @@ function unsupportedMatrixQueries(): readonly CommerceGraphQuery[] {
   ];
 }
 
-function isListQuery(query: CommerceGraphQuery): boolean {
-  return (
-    query.kind === "commerce_list_page" || query.kind === "saved_commerce_view"
-  );
-}
-
-function currentWatermark(
-  mode: SourceMode,
-  revision = 1,
-): CommerceReadWatermark {
-  return mode === "underclerk"
-    ? {
-        kind: "underclerk_native",
-        merchantRevision: parseCommerceSnapshotRevision(
-          revision,
-          "merchantRevision",
-        ),
-      }
-    : {
-        kind: "provider_backed",
-        blotterAcceptedProjectionSequence: parseCommerceSnapshotRevision(
-          revision,
-          "blotterAcceptedProjectionSequence",
-        ),
-        underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
-          1,
-          "underclerkExtensionMerchantRevision",
-        ),
-      };
-}
-
-function nextWatermark(mode: SourceMode): CommerceReadWatermark {
-  return currentWatermark(mode, 2);
-}
-function mutatedWatermark(mode: SourceMode): CommerceReadWatermark {
-  return mode === "underclerk"
-    ? nextWatermark(mode)
-    : {
-        kind: "provider_backed",
-        blotterAcceptedProjectionSequence: parseCommerceSnapshotRevision(
-          2,
-          "blotterAcceptedProjectionSequence",
-        ),
-        underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
-          2,
-          "underclerkExtensionMerchantRevision",
-        ),
-      };
-}
 function required<T>(
   value: { ok: true; value: T } | { ok: false; error: unknown },
 ): T {
@@ -2916,14 +1380,6 @@ function required<T>(
         : JSON.stringify(value.error),
     );
   return value.value;
-}
-function jsonResponse(value: unknown): Response {
-  return new Response(
-    JSON.stringify(value, (_key, entry: unknown) =>
-      typeof entry === "bigint" ? Number(entry) : entry,
-    ),
-    { headers: { "content-type": "application/json" } },
-  );
 }
 function entityId(entity: CommerceEntity): string {
   return String(entity.reference.entityId);
@@ -3038,95 +1494,6 @@ function expectListEntryTimestamps(
   }
   expect(timestamps).toEqual(expectedTimestamps);
 }
-
-function parseRefs(value: unknown): CommerceEntityRef[] {
-  if (!Array.isArray(value))
-    throw new Error("relationship frontier is invalid");
-  return value.map((reference) => {
-    const response = parseCommerceGraphResponse({
-      merchantRevision: 1,
-      entities: [
-        {
-          reference,
-          revision: 1,
-          displayName: "frontier",
-          attributes:
-            reference.origin === "system"
-              ? [
-                  {
-                    attributeId: "lifecycle",
-                    scope: {
-                      kind: "system",
-                      entityTypeId: reference.typeId,
-                      schemaRevision: 1,
-                    },
-                    definitionRevision: 1,
-                    sensitivity: "internal",
-                    value: { kind: "status", value: "open" },
-                  },
-                ]
-              : [],
-          ...(reference.origin === "system"
-            ? {
-                provenance: provenanceFor(
-                  reference.typeId,
-                  String(reference.entityId),
-                ),
-                freshness: { state: "current", observedAt: OBSERVED_AT },
-              }
-            : {
-                typeRevision: 1,
-                state: { state: "active" },
-                sensitivity: "internal",
-              }),
-        },
-      ],
-      relationships: [],
-      listEntries: [],
-      aggregations: [],
-      nextCursor: null,
-      provenance: [],
-      freshness: [],
-    });
-    const parsed = response.entities[0];
-    if (parsed === undefined)
-      throw new Error("frontier reference did not parse");
-    return parsed.reference;
-  });
-}
-
-function sameRef(left: CommerceEntityRef, right: CommerceEntityRef): boolean {
-  return (
-    left.origin === right.origin &&
-    left.typeId === right.typeId &&
-    left.entityId === right.entityId
-  );
-}
-function fold(value: string): string {
-  const normalized = materializeCommerceRelationText(value, value);
-  if (!normalized.ok) throw new Error(normalized.error.code);
-  return normalized.value.displayNameFolded;
-}
-function compareUtf8(left: string, right: string): number {
-  const leftBytes = new TextEncoder().encode(left);
-  const rightBytes = new TextEncoder().encode(right);
-  for (
-    let index = 0;
-    index < Math.min(leftBytes.length, rightBytes.length);
-    index += 1
-  ) {
-    const leftByte = leftBytes[index] ?? 0;
-    const rightByte = rightBytes[index] ?? 0;
-    if (leftByte !== rightByte) return leftByte < rightByte ? -1 : 1;
-  }
-  return compareNumber(leftBytes.length, rightBytes.length);
-}
-function compareNumber(left: number, right: number): number {
-  return left === right ? 0 : left < right ? -1 : 1;
-}
-function compareBigInt(left: bigint, right: bigint): number {
-  return left === right ? 0 : left < right ? -1 : 1;
-}
 function requiredCursor(cursor: CommerceCursor | null): CommerceCursor {
   if (cursor === null)
     throw new Error("expected an opaque continuation cursor");
@@ -3137,11 +1504,93 @@ function requiredDecodedCursor(cursor: CommerceCursor): CommerceCursorPayload {
   if (!decoded.ok) throw new Error(decoded.error.code);
   return decoded.value;
 }
-function isEntityRef(value: unknown): value is CommerceEntityRef {
-  return (
-    isRecord(value) &&
-    (value.origin === "system" || value.origin === "custom") &&
-    typeof value.typeId === "string" &&
-    typeof value.entityId === "string"
+
+async function expectCursorMismatches(
+  fixture: ActualReaderFixture,
+  cursor: CommerceCursor,
+): Promise<void> {
+  expect(await read(fixture, pageQuery(3, cursor))).toEqual({
+    ok: false,
+    error: { code: "commerce_cursor_mismatch", reason: "query_fingerprint" },
+  });
+  const payload = requiredDecodedCursor(cursor);
+  expect(encodeCommerceCursor({ ...payload, orderingVersion: "v2" }).ok).toBe(
+    false,
   );
+  const effectiveOrdering = {
+    ...payload.effectiveOrdering,
+    leadingKeys: payload.effectiveOrdering.leadingKeys.map((key) => ({
+      ...key,
+      direction: key.direction === "ascending" ? "descending" : "ascending",
+    })),
+  };
+  const otherWatermark: CommerceReadWatermark =
+    fixture.initialWatermark.kind === "underclerk_native"
+      ? {
+          kind: "provider_backed",
+          blotterAcceptedProjectionSequence: parseCommerceSnapshotRevision(
+            1,
+            "blotterAcceptedProjectionSequence",
+          ),
+          underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+            1,
+            "underclerkExtensionMerchantRevision",
+          ),
+        }
+      : {
+          kind: "underclerk_native",
+          merchantRevision: parseCommerceSnapshotRevision(
+            1,
+            "merchantRevision",
+          ),
+        };
+  const mismatches: readonly Readonly<{ payload: unknown; reason: string }>[] =
+    [
+      {
+        payload: { ...payload, organisationId: "organisation_other" },
+        reason: "organisation",
+      },
+      {
+        payload: { ...payload, merchantId: "merchant_other" },
+        reason: "merchant",
+      },
+      {
+        payload: { ...payload, effectiveOrdering },
+        reason: "effective_ordering",
+      },
+      {
+        payload: { ...payload, watermark: otherWatermark },
+        reason: "watermark_kind",
+      },
+    ];
+  for (const mismatch of mismatches) {
+    const changed = encodeCommerceCursor(mismatch.payload);
+    if (!changed.ok) throw new Error(changed.error.code);
+    expect(
+      await read(fixture, pageQuery(2, changed.value)),
+      `${fixture.mode}: ${mismatch.reason}`,
+    ).toEqual({
+      ok: false,
+      error: { code: "commerce_cursor_mismatch", reason: mismatch.reason },
+    });
+  }
+}
+
+async function expectOutsideMatrixRefusals(
+  fixture: ActualReaderFixture,
+): Promise<void> {
+  for (const [index, query] of unsupportedMatrixQueries().entries()) {
+    expect(
+      await read(fixture, query),
+      `${fixture.mode}: outside-matrix case ${index}`,
+    ).toMatchObject({
+      ok: false,
+      error: {
+        code:
+          index < 5
+            ? "commerce_query_unsupported"
+            : "commerce_query_surface_unsupported",
+      },
+    });
+  }
 }

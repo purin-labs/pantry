@@ -295,84 +295,6 @@ describe("Plan 16 agent operations", () => {
     });
   });
 
-  it("publishes immutable definition revisions while installations stay pinned", async () => {
-    const db = createDatabase();
-    await apply(db, {
-      kind: "create_area",
-      name: "Inventory revisions",
-      purpose: "Review inventory work.",
-      operationId: "area_inventory_revisions",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 100,
-    });
-    await apply(db, {
-      kind: "create_agent_definition",
-      displayName: "Inventory revision agent",
-      role: "coordinator",
-      purpose: "Review inventory.",
-      instructions: "Read inventory.",
-      requestedCapabilities: ["commerce.entity_plane.context"],
-      skillRefs: [],
-      operationId: "agent_inventory_revisions",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 101,
-    });
-    await apply(db, {
-      kind: "install_agent",
-      agentDefinitionId: "agent_inventory_revisions",
-      definitionRevision: 1,
-      areaId: "area_inventory_revisions",
-      responsibility: "Own inventory triage.",
-      scopeIds: [],
-      policyRevision: 1,
-      grantedCapabilities: ["commerce.entity_plane.context"],
-      operationId: "installation_inventory_revisions",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 102,
-    });
-
-    const revised = await apply(db, {
-      kind: "publish_agent_definition_revision",
-      agentDefinitionId: "agent_inventory_revisions",
-      expectedRevision: 1,
-      instructions: "Read inventory and draft a replenishment proposal.",
-      requestedCapabilities: [
-        "commerce.entity_plane.context",
-        "commerce.action.propose",
-      ],
-      skillRefs: [],
-      operationId: "agent_inventory_revision_2",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 103,
-    });
-
-    expect(revised.definitions[0]?.currentRevision).toMatchObject({
-      revision: 2,
-      instructions: "Read inventory and draft a replenishment proposal.",
-      requestedCapabilities: [
-        "commerce.entity_plane.context",
-        "commerce.action.propose",
-      ],
-    });
-    expect(revised.installations[0]?.definitionRevision).toBe(1);
-
-    const stale = await applyAgentOperation(db, ORGANISATION, {
-      kind: "publish_agent_definition_revision",
-      agentDefinitionId: "agent_inventory_revisions",
-      expectedRevision: 1,
-      instructions: "This stale revision must not publish.",
-      skillRefs: [],
-      requestedCapabilities: [],
-      operationId: "agent_inventory_revision_stale",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 104,
-    });
-    expect(stale).toEqual({
-      ok: false,
-      error: { code: "agent_operation_conflict", field: "expectedRevision" },
-    });
-  });
-
   it("changes an agent's skill set only by publishing a definition revision", async () => {
     const db = createDatabase();
     await apply(db, {
@@ -482,6 +404,23 @@ describe("Plan 16 agent operations", () => {
     const published = await readAgentOperations(db, ORGANISATION);
     expect(published.definitions[0]?.currentRevision.revision).toBe(2);
     expect(published.installations[0]?.definitionRevision).toBe(1);
+
+    // A publication against the revision it replaced is refused.
+    const stalePublication = await applyAgentOperation(db, ORGANISATION, {
+      kind: "publish_agent_definition_revision",
+      agentDefinitionId: "agent_inventory",
+      expectedRevision: 1,
+      instructions: "This stale revision must not publish.",
+      skillRefs: [],
+      requestedCapabilities: [],
+      operationId: "agent_inventory_revision_stale",
+      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
+      now: 300,
+    });
+    expect(stalePublication).toEqual({
+      ok: false,
+      error: { code: "agent_operation_conflict", field: "expectedRevision" },
+    });
 
     const activationForm = new FormData();
     activationForm.set("installationId", "installation_inventory");

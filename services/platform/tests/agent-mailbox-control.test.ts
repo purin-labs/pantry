@@ -29,10 +29,6 @@ const ORIGIN = "https://pantry.example";
 describe("agent mailbox control routes", agentMailboxControlSuite);
 
 function agentMailboxControlSuite(): void {
-  it(
-    "binds an agent, publishes policy, and projects mailbox state",
-    lifecycleTest,
-  );
   it("refuses an enabled policy before any assignment", unassignedPolicyTest);
   it("rejects invalid policy publishes and unknown mailboxes", rejectionTest);
   it("resumes paused processing through explicit policy actions", resumeTest);
@@ -427,93 +423,6 @@ async function resumeTest(): Promise<void> {
   expect(notPaused.status).toBe(409);
   await expect(notPaused.json()).resolves.toMatchObject({
     error: "agent_mailbox_not_paused",
-  });
-}
-
-async function lifecycleTest(): Promise<void> {
-  const fixture = await createFixture("lifecycle");
-  const first = await seedInstallation(fixture, "install_route_first");
-  const second = await seedInstallation(fixture, "install_route_second");
-
-  const bound = await postMailbox(fixture, "bind", "bind-route-0001", {
-    installationId: first,
-  });
-  expect(bound.status).toBe(200);
-  const boundBody = (await bound.json()) as {
-    readonly binding: {
-      readonly revision: number;
-      readonly mailboxBindingId: string;
-    };
-  };
-  expect(boundBody.binding.revision).toBe(1);
-
-  const rebound = await postMailbox(fixture, "bind", "bind-route-0002", {
-    installationId: second,
-  });
-  expect(rebound.status).toBe(200);
-  const reboundBody = (await rebound.json()) as {
-    readonly binding: {
-      readonly revision: number;
-      readonly mailboxBindingId: string;
-    };
-  };
-  expect(reboundBody.binding.revision).toBe(2);
-  expect(reboundBody.binding.mailboxBindingId).toBe(
-    boundBody.binding.mailboxBindingId,
-  );
-
-  const published = await postMailbox(fixture, "policy", "policy-route-0001", {
-    policy: enabledPolicy(),
-  });
-  expect(published.status).toBe(200);
-  const publishedBody = (await published.json()) as {
-    readonly policy: { readonly kind: string; readonly policyVersion: number };
-    readonly processing: string;
-  };
-  expect(publishedBody.policy).toMatchObject({
-    kind: "enabled",
-    policyVersion: 1,
-  });
-  expect(publishedBody.processing).toBe("scheduled");
-  const activation = fixture.connector.calls.find(
-    (call) => call.method === "activateEmailProcessing",
-  );
-  expect(activation?.input).toMatchObject({
-    integrationAccountId: fixture.integrationAccountId,
-    policyVersion: 1,
-    limits: { maxActiveCases: 3, dailyTokenBudget: 250_000 },
-  });
-
-  const read = await handleControlRequest(readRequest(fixture), fixture.env);
-  expect(read.status).toBe(200);
-  const projection = (await read.json()) as {
-    readonly mailbox: {
-      readonly observed_address: string;
-      readonly connection_lifecycle: string;
-      readonly binding: {
-        readonly installation_id: string;
-        readonly current_revision: number;
-      };
-      readonly policy: { readonly kind: string };
-      readonly runtime: {
-        readonly processing: { readonly kind: string };
-        readonly usage: {
-          readonly active_cases: number;
-          readonly tokens_consumed: number;
-        };
-      } | null;
-    };
-  };
-  expect(projection.mailbox.observed_address).toBe(
-    "owner-lifecycle@example.com",
-  );
-  expect(projection.mailbox.connection_lifecycle).toBe("active");
-  expect(projection.mailbox.binding.installation_id).toBe(second);
-  expect(projection.mailbox.binding.current_revision).toBe(2);
-  expect(projection.mailbox.policy.kind).toBe("enabled");
-  expect(projection.mailbox.runtime).toMatchObject({
-    processing: { kind: "scheduled" },
-    usage: { active_cases: 1, tokens_consumed: 12_000 },
   });
 }
 

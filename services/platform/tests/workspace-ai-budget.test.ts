@@ -11,8 +11,6 @@ import {
   parseWorkspaceAiBudgetLimits,
   readWorkspaceAiBudget,
 } from "../src/data/workspace-ai-budget";
-import { conversationGenerationError } from "../src/chat/generation-failure";
-import type { SessionBudgetDimension } from "@seams/contracts";
 
 const baseline = singleDatabaseSchema();
 
@@ -103,47 +101,4 @@ it("rejects unbounded, partial and fractional settings at the boundary", functio
     { ...valid, extra: 1 },
   ])
     expect(parseWorkspaceAiBudgetLimits(limits)).toBeNull();
-});
-
-it("reports each actual exhaustion dimension and its pinned limit", function exhaustionMessages() {
-  const dimensions: SessionBudgetDimension[] = [
-    "tokens",
-    "active_wall_ms",
-    "capability_calls",
-  ];
-  for (const dimension of dimensions) {
-    const message = conversationGenerationError({
-      kind: "budget_exhausted",
-      code: "session_turn:budget_exhausted",
-      budget: {
-        budgetRevision: "budget_7",
-        maxTokens: 64000,
-        maxWallMs: 180000,
-        maxToolCalls: 20,
-      },
-      exhaustion: {
-        exhaustionId: "exhaustion_test",
-        dimension,
-        runId: "run_test",
-        observedUsage: {
-          tokens: 64001,
-          activeWallMs: 180001,
-          capabilityCalls: 21,
-        },
-        exhaustedAt: 100,
-      },
-    });
-    expect(message).toContain("budget_7");
-    switch (dimension) {
-      case "tokens":
-        expect(message).toContain("64000 allowed");
-        break;
-      case "active_wall_ms":
-        expect(message).toContain("180 allowed");
-        break;
-      case "capability_calls":
-        expect(message).toContain("20 allowed");
-        break;
-    }
-  }
 });

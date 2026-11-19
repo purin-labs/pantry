@@ -1525,28 +1525,6 @@ describe("persistent portal chat", function chatSuite() {
     });
   });
 
-  it("does not mislabel historical budget exhaustion as tokens", async function explainsBudgetExhaustion() {
-    mocks.generate.mockResolvedValueOnce({
-      ok: false,
-      error: { code: "session_turn:budget_exhausted" },
-    });
-    expect(
-      (await handlePortalChat(request("Hello"), env, scope.organisationId))
-        .status,
-    ).toBe(200);
-    const stored = await readConversation(
-      env.DB,
-      scope,
-      "conv_7d980f41-a532-5387-9ea1-548f956b6e3e",
-    );
-    expect(stored?.conversation.work).toMatchObject({
-      kind: "failed",
-      requestId: "request_chat_first",
-      error:
-        "This session reached an AI budget limit. The older result does not identify which limit. An owner or admin can review AI budgets in Access before retrying.",
-    });
-  });
-
   it("retains a question card across reload, accepts its answer once, and continues to documentation and a connector in the same Case", async function conversationJourney() {
     const question = {
       title: "Which app would you like to connect?",

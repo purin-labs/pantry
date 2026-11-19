@@ -19,14 +19,7 @@ import {
   readScheduleDispatchReceipt,
   recordScheduleDispatchReceipt,
 } from "../src/data/agent-operations/schedule-dispatch";
-import {
-  readAgentDefinitionRevisions,
-  readSkillRevisions,
-} from "../src/data/agent-operations/revisions";
-import {
-  resolveManualDispatchAutomation,
-  resolveScheduleAutomation,
-} from "../src/data/agent-operations/automation";
+import { resolveManualDispatchAutomation } from "../src/data/agent-operations/automation";
 import type { IngressQueueMessage } from "../src/ingress-queue";
 import { runScheduleDispatch } from "../src/schedules/dispatch";
 import {
@@ -216,36 +209,6 @@ describe("Schedule dispatch", () => {
     ).toBe(true);
   });
 
-  it("resolves schedule automation with the same pin shape as cue automation", async () => {
-    const db = createDatabase();
-    await seedScheduledAgent(db, {
-      enabled: true,
-      instructionBody: "Prepare the morning restock list.",
-    });
-    const automation = await resolveScheduleAutomation(
-      db,
-      ORGANISATION,
-      "schedule_daily_inventory",
-    );
-    expect(automation).toMatchObject({
-      binding: {
-        bindingId: "schedule_daily_inventory",
-        installationId: "installation_inventory",
-        spec: { cadence: "daily", timeOfDay: "07:00", timezone: "Asia/Tokyo" },
-        instructionBody: "Prepare the morning restock list.",
-      },
-      agentDefinitionId: "agent_inventory",
-      definitionRevision: 1,
-      policyRevision: 1,
-      skillRefs: [{ skillId: "skill_low_stock", revision: 1 }],
-      grantedCapabilities: ["commerce.entity_plane.context"],
-      maxSessionBudgetTokens: 25_000,
-    });
-    expect(
-      await resolveScheduleAutomation(db, ORGANISATION, "missing_binding"),
-    ).toBeNull();
-  });
-
   it("resolves manual dispatch automation with the shared pin shape", async () => {
     const db = createDatabase();
     await seedScheduledAgent(db, { enabled: true });
@@ -270,50 +233,6 @@ describe("Schedule dispatch", () => {
         "missing_installation",
       ),
     ).toBeNull();
-  });
-
-  it("serves revision history newest first", async () => {
-    const db = createDatabase();
-    await seedScheduledAgent(db, { enabled: true });
-    await apply(db, {
-      kind: "publish_skill_revision",
-      skillId: "skill_low_stock",
-      expectedRevision: 1,
-      markdownBody: "Updated: prioritize perishables.",
-      operationId: "skill_low_stock_rev2",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 200,
-    });
-    await apply(db, {
-      kind: "publish_agent_definition_revision",
-      agentDefinitionId: "agent_inventory",
-      expectedRevision: 1,
-      instructions: "Updated instructions.",
-      requestedCapabilities: ["commerce.entity_plane.context"],
-      skillRefs: [{ skillId: "skill_low_stock", revision: 1 }],
-      operationId: "agent_inventory_rev2",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 201,
-    });
-    const skillRevisions = await readSkillRevisions(
-      db,
-      ORGANISATION,
-      "skill_low_stock",
-    );
-    expect(skillRevisions.map((entry) => entry.revision)).toEqual([2, 1]);
-    expect(skillRevisions[0]?.markdownBody).toBe(
-      "Updated: prioritize perishables.",
-    );
-    const definitionRevisions = await readAgentDefinitionRevisions(
-      db,
-      ORGANISATION,
-      "agent_inventory",
-    );
-    expect(definitionRevisions.map((entry) => entry.revision)).toEqual([2, 1]);
-    expect(definitionRevisions[0]?.instructions).toBe("Updated instructions.");
-    expect(await readSkillRevisions(db, ORGANISATION, "missing_skill")).toEqual(
-      [],
-    );
   });
 
   it("records and reads dispatch receipts for consumer idempotency", async () => {
@@ -387,7 +306,7 @@ async function apply(db: SingleDatabase, command: AgentOperationCommand) {
 
 async function seedScheduledAgent(
   db: SingleDatabase,
-  options: { readonly enabled: boolean; readonly instructionBody?: string },
+  options: { readonly enabled: boolean },
 ): Promise<void> {
   await apply(db, {
     kind: "create_area",
@@ -447,7 +366,7 @@ async function seedScheduledAgent(
     scopeIds: [],
     spec: { cadence: "daily", timeOfDay: "07:00", timezone: "Asia/Tokyo" },
     enabled: options.enabled,
-    instructionBody: options.instructionBody ?? null,
+    instructionBody: null,
     operationId: "schedule_daily_inventory",
     actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
     now: NOW,

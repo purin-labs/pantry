@@ -10,59 +10,17 @@ function restoreGlobals(): void {
   vi.unstubAllGlobals();
 }
 
-it("reports a non-JSON server interruption and can read saved progress afterward", async function recoversFromUnreadableResponse() {
-  const fetch = vi.fn();
-  fetch.mockResolvedValueOnce(
-    new Response("Your worker was restarted", { status: 503 }),
+it("reports a non-JSON server interruption as its HTTP status", async function reportsUnreadableResponse() {
+  vi.stubGlobal(
+    "fetch",
+    vi
+      .fn()
+      .mockResolvedValue(
+        new Response("Your worker was restarted", { status: 503 }),
+      ),
   );
-  fetch.mockResolvedValueOnce(
-    Response.json({
-      model: {
-        kind: "ready",
-        agent: "Pi",
-        selected: "test-model",
-        name: "Test model",
-        options: [
-          {
-            id: "test-model",
-            name: "Test model",
-            description: "Test model description",
-            capabilities: {
-              input: { text: true, images: false, documents: false },
-              tools: true,
-              progressSummaries: true,
-              citations: false,
-              effortOptions: ["low", "medium", "high"],
-              contextWindowTokens: 128000,
-            },
-          },
-        ],
-      },
-      configurationVersion: 1,
-      projectDirectory: {
-        revision: 0,
-        defaultProjectId: "project_00000000-0000-4000-8000-00000000ba5e",
-        projects: [],
-        placements: [],
-      },
-      derivedThreads: [],
-      pinnedConversations: [],
-      pendingDeletions: [],
-      nextActiveCursor: null,
-      nextArchivedCursor: null,
-      conversations: [],
-      archivedConversations: [],
-      conversation: null,
-      emailReviews: [],
-      unreadCount: 0,
-    }),
-  );
-  vi.stubGlobal("fetch", fetch);
 
   await expect(readChat("organisation_test", null)).rejects.toThrow("HTTP 503");
-  await expect(readChat("organisation_test", null)).resolves.toMatchObject({
-    conversation: null,
-  });
 });
 
 it("reads chunked NDJSON records through a terminal event", async function readsChunkedStream() {

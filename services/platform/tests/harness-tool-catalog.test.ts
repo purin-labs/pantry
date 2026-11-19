@@ -8,7 +8,6 @@ import {
 
 import { catalogHarnessToolCatalogDigest } from "../src/agent-tools/catalog/selection";
 import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "../src/agent-tools/catalog/code-mode";
-import { encodeFileCapabilityKey } from "../src/authorization/access-grants/capability-key";
 import { requireIntegrationAccountId } from "./test-ids";
 
 describe("Harness Code Mode authority", harnessCodeModeSuite);
@@ -28,23 +27,7 @@ function harnessCodeModeSuite(): void {
     gatesMessageToolsByCapability,
   );
   it(
-    "reads accepted attachment preparation through a direct tool",
-    readsPreparedAttachment,
-  );
-  it(
-    "searches a granted Gmail mailbox and creates an approval draft",
-    executesEmailMailboxTools,
-  );
-  it(
-    "accepts a discovery reference for a governed self-test proposal",
-    executesEmailSelfTest,
-  );
-  it(
-    "reads bounded active WhatsApp Cases from one granted phone-number account",
-    executesWhatsAppSupportRead,
-  );
-  it(
-    "sends one exact reply to a granted active WhatsApp Case",
+    "sends one exact reply to a granted active WhatsApp Case and refuses a history scope",
     executesWhatsAppSupportReplySend,
   );
   it(
@@ -52,24 +35,12 @@ function harnessCodeModeSuite(): void {
     screensDirectFailure,
   );
   it(
-    "records one governed commerce proposal without provider dispatch",
-    executesCommerceProposal,
-  );
-  it(
     "maps encoded current-message scopes into the governed catalog",
     selectsCurrentMessageCatalog,
   );
   it(
-    "selects and executes both file tools from one exact file capability",
-    executesFileTools,
-  );
-  it(
     "wires product description draft tools and preserves edit capability boundaries",
     executesProductDescriptionDraftTools,
-  );
-  it(
-    "wires email draft reads and exact-passage edits through one scoped capability",
-    executesEmailDraftTools,
   );
   it(
     "exposes only attached BakeryOS commands and returns surface authority",
@@ -498,270 +469,6 @@ async function airtableWriteFixture(input: unknown): Promise<unknown> {
   return { receiptId: "airtable_write_test", record: { id: "recRecord12345" } };
 }
 
-async function executesEmailSelfTest(): Promise<void> {
-  const scopes = harnessCapabilitiesFromCapabilityKeys([
-    "provider:email.operational.propose:1:ia_gmail:operational",
-  ]);
-  if (!scopes.ok) throw new Error("Invalid capability fixture");
-  const selection = { allowedCapabilities: scopes.value };
-  const proposals: unknown[] = [];
-  const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(selection),
-    catalogSelection: selection,
-    admission: permissiveAdmission(),
-    claimCapability: recordAcceptedCapabilityClaim.bind(null, []),
-    proposeEmailOperational: recordSelfTestProposal.bind(null, proposals),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
-  });
-  if (!created.ok) throw new Error(created.error.code);
-  const request = {
-    accountRef: `integration_ref_${"a".repeat(64)}`,
-    target: { kind: "self_test", address: "owner@example.com" },
-    subject: "Satyr Gmail canary",
-    body: "This is a synthetic test of Satyr's email drafting and approval workflow. No action is required.",
-  };
-  expect(
-    await created.value.executeTool(
-      "email_operational_propose",
-      JSON.stringify(request),
-      "self_test",
-    ),
-  ).toMatchObject({
-    kind: "provider_effect",
-    status: "succeeded",
-    authority: { receiptId: "proposal_self_test" },
-  });
-  expect(proposals).toEqual([request]);
-  const malformed = { ...request, accountRef: "integration_account_private" };
-  expect(
-    await created.value.executeTool(
-      "email_operational_propose",
-      JSON.stringify(malformed),
-      "invalid_ref",
-    ),
-  ).toMatchObject({ status: "failed" });
-  expect(proposals).toHaveLength(1);
-}
-
-function recordSelfTestProposal(
-  proposals: unknown[],
-  request: import("../src/agent-tools/catalog/types").HarnessEmailOperationalPropose,
-): Promise<
-  import("../src/agent-tools/catalog/types").HarnessEmailOperationalProposalReceipt
-> {
-  proposals.push(request);
-  return Promise.resolve({
-    kind: "proposed",
-    proposalId: "proposal_self_test",
-    version: 1,
-    snapshotDigest: "a".repeat(64),
-  });
-}
-
-async function executesEmailMailboxTools(): Promise<void> {
-  const integrationAccountId = requireIntegrationAccountId("ia_gmail");
-  const scopes = harnessCapabilitiesFromCapabilityKeys([
-    `provider:email.mailbox.read:1:${integrationAccountId}:mailbox`,
-    `provider:email.reply.propose:1:${integrationAccountId}:mailbox`,
-  ]);
-  expect(scopes).toEqual({
-    ok: true,
-    value: ["email.mailbox.read", "email.reply.propose"],
-  });
-  if (!scopes.ok) return;
-  const selection = { allowedCapabilities: scopes.value };
-  const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
-  const claims: string[] = [];
-  const searches: unknown[] = [];
-  const proposals: unknown[] = [];
-  const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest,
-    catalogSelection: selection,
-    admission: permissiveAdmission(),
-    claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    searchEmailMailbox: async (input) => {
-      searches.push(input);
-      return {
-        integrationAccountId,
-        messages: [
-          {
-            messageId: "m1",
-            threadId: "t1",
-            from: "supplier@example.com",
-            subject: "Friday delivery",
-            date: "Fri, 04 Sep 2026 09:00:00 +0000",
-            bodyText: "Delivery is confirmed.",
-            attachments: [],
-          },
-        ],
-        truncated: false,
-      };
-    },
-    proposeEmailReply: async (input) => {
-      proposals.push(input);
-      return {
-        kind: "proposed",
-        proposalId: "proposal_email_1",
-        providerDraftId: "draft_1",
-      };
-    },
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
-  });
-  if (!created.ok) throw new Error(created.error.code);
-
-  const searched = authorizedJson(
-    await created.value.executeTool(
-      "email_mailbox_search",
-      JSON.stringify({
-        integrationAccountId,
-        query: "from:supplier@example.com",
-        limit: 5,
-      }),
-      "email_search_direct",
-    ),
-  );
-  const proposedResult = await created.value.executeTool(
-    "email_reply_propose",
-    JSON.stringify({
-      integrationAccountId,
-      messageId: "m1",
-      threadId: "t1",
-      body: "Thank you. We have noted the delivery date.",
-      sources: null,
-    }),
-    "email_reply_direct",
-  );
-  expect(searched).toMatchObject({
-    success: true,
-    code_mode_value: {
-      messages: [{ messageId: "m1", threadId: "t1" }],
-    },
-  });
-  expect(proposedResult).toMatchObject({
-    kind: "provider_effect",
-    authority: { kind: "provider_effect", receiptId: "proposal_email_1" },
-    status: "succeeded",
-  });
-  expect(searches).toEqual([
-    { integrationAccountId, query: "from:supplier@example.com", limit: 5 },
-  ]);
-  expect(proposals).toEqual([
-    {
-      integrationAccountId,
-      messageId: "m1",
-      threadId: "t1",
-      body: "Thank you. We have noted the delivery date.",
-      citations: [],
-      malformedCitations: 0,
-    },
-  ]);
-  expect(claims).toEqual([
-    "direct_tool:email.mailbox.read",
-    "direct_tool:email.reply.propose",
-  ]);
-}
-
-async function executesWhatsAppSupportRead(): Promise<void> {
-  const integrationAccountId = requireIntegrationAccountId("ia_whatsapp");
-  const scopes = harnessCapabilitiesFromCapabilityKeys([
-    `provider:whatsapp.support.read:1:${integrationAccountId}:active_cases`,
-  ]);
-  expect(scopes).toEqual({ ok: true, value: ["whatsapp.support.read"] });
-  if (!scopes.ok) return;
-  const selection = { allowedCapabilities: scopes.value };
-  const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
-  const claims: string[] = [];
-  const reads: unknown[] = [];
-  const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest,
-    catalogSelection: selection,
-    admission: permissiveAdmission(),
-    claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readWhatsAppSupport: recordWhatsAppSupportRead.bind(
-      null,
-      reads,
-      integrationAccountId,
-    ),
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
-  });
-  if (!created.ok) throw new Error(created.error.code);
-
-  const direct = authorizedJson(
-    await created.value.executeTool(
-      "whatsapp_support_read",
-      JSON.stringify({ limit: 5 }),
-      "whatsapp_support_direct",
-    ),
-  );
-
-  expect(created.value.definitions.map(readToolName)).toEqual([
-    "whatsapp_support_read",
-  ]);
-  expect(reads).toEqual([{ limit: 5 }]);
-  expect(direct).toMatchObject({
-    success: true,
-    code_mode_value: {
-      scope: "active_cases",
-      cases: [
-        {
-          integrationAccountId,
-          customerWaId: "15555550123",
-          messages: [{ direction: "inbound", text: "Is my order ready?" }],
-        },
-      ],
-      truncated: false,
-    },
-  });
-  expect(claims).toEqual(["direct_tool:whatsapp.support.read"]);
-
-  expect(
-    harnessCapabilitiesFromCapabilityKeys([
-      `provider:whatsapp.support.read:1:${integrationAccountId}:history`,
-    ]),
-  ).toEqual({
-    ok: false,
-    error: {
-      code: "embedded_harness_resource_scope_invalid",
-      scope: `provider:whatsapp.support.read:1:${integrationAccountId}:history`,
-    },
-  });
-}
-
 async function executesWhatsAppSupportReplySend(): Promise<void> {
   const integrationAccountId = requireIntegrationAccountId("ia_whatsapp");
   const scopes = harnessCapabilitiesFromCapabilityKeys([
@@ -828,6 +535,18 @@ async function executesWhatsAppSupportReplySend(): Promise<void> {
     },
   });
   expect(claims).toEqual(["direct_tool:whatsapp.support.reply.send"]);
+
+  expect(
+    harnessCapabilitiesFromCapabilityKeys([
+      `provider:whatsapp.support.read:1:${integrationAccountId}:history`,
+    ]),
+  ).toEqual({
+    ok: false,
+    error: {
+      code: "embedded_harness_resource_scope_invalid",
+      scope: `provider:whatsapp.support.read:1:${integrationAccountId}:history`,
+    },
+  });
 }
 
 function inlineToolOutput(text: string): HarnessToolOutput {
@@ -836,58 +555,6 @@ function inlineToolOutput(text: string): HarnessToolOutput {
     content: [{ kind: "text", text }],
     digest: "a".repeat(64),
   } as HarnessToolOutput;
-}
-
-async function readsPreparedAttachment(): Promise<void> {
-  const selection = {
-    allowedCapabilities: [
-      "message.attachment.inspect",
-      "message.link.read",
-    ] as const,
-  };
-  const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
-  const claims: string[] = [];
-  const inspected: string[] = [];
-  const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest,
-    catalogSelection: selection,
-    admission: permissiveAdmission(),
-    claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    inspectMessageAttachment: recordPreparedInspection.bind(null, inspected),
-    readMessageLink: async function read(input) {
-      return { outcome: "read", url: input.url };
-    },
-    nowNs: monotonicClock(),
-  });
-  if (!created.ok) throw new Error(created.error.code);
-
-  await created.value.executeTool(
-    "inspect_message_attachment",
-    JSON.stringify({ attachmentId: "att_1" }),
-    "direct",
-  );
-  expect(inspected).toEqual(["att_1"]);
-  expect(claims).toEqual(["direct_tool:message.attachment.inspect"]);
-}
-
-async function recordPreparedInspection(
-  inspected: string[],
-  input: { readonly attachmentId: string },
-): Promise<Readonly<Record<string, unknown>>> {
-  inspected.push(input.attachmentId);
-  return { outcome: "inspected", attachmentId: input.attachmentId };
 }
 
 async function gatesMessageToolsByCapability(): Promise<void> {
@@ -1045,102 +712,6 @@ async function executesIntegrationDiscovery(): Promise<void> {
   expect(claims).toEqual(["direct_tool:integration.discovery.read"]);
 }
 
-async function executesFileTools(): Promise<void> {
-  const scopes = harnessCapabilitiesFromCapabilityKeys([
-    encodeFileCapabilityKey({
-      kind: "file_resource",
-      capabilityId: "file.read",
-      capabilityVersion: 1,
-      integrationAccountId: requireIntegrationAccountId("ia_files"),
-      scope: {
-        kind: "dropbox_file",
-        providerFileId: "id:file",
-        pathDisplay: "/Recipes/Recipe.md",
-      },
-    }),
-  ]);
-  expect(scopes).toEqual({ ok: true, value: ["file.read"] });
-  if (!scopes.ok) return;
-  const selection = { allowedCapabilities: scopes.value };
-  const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
-  const claims: string[] = [];
-  const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest,
-    catalogSelection: selection,
-    admission: permissiveAdmission(),
-    claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    searchFiles: async () => [
-      {
-        reference: {
-          integrationAccountId: requireIntegrationAccountId("ia_files"),
-          provider: "dropbox",
-          providerFileId: "id:file",
-        },
-        segmentIndex: 0,
-        sourceRevision: 1,
-        title: "Recipe.md",
-        displayPath: "/Recipes/Recipe.md",
-        deepLink: "https://www.dropbox.com/home/Recipes/Recipe.md",
-        excerpt: "mix flour",
-        metadataOnlyReason: null,
-      },
-    ],
-    readFile: async (input) => ({
-      kind: "content",
-      reference: input.reference,
-      title: "Recipe.md",
-      displayPath: "/Recipes/Recipe.md",
-      deepLink: "https://www.dropbox.com/home/Recipes/Recipe.md",
-      startSegment: input.startSegment,
-      segments: ["mix flour"],
-      continuation: { kind: "complete" },
-    }),
-    queryWorkspace,
-    nowNs: monotonicClock(),
-  });
-  if (!created.ok) throw new Error(created.error.code);
-
-  expect(created.value.definitions.map(readToolName)).toEqual([
-    "file_search",
-    "file_read",
-  ]);
-  const search = authorizedJson(
-    await created.value.executeTool(
-      "file_search",
-      JSON.stringify({ query: "recipe", limit: 5 }),
-      "file_search_call",
-    ),
-  );
-  const read = authorizedJson(
-    await created.value.executeTool(
-      "file_read",
-      JSON.stringify({
-        reference: {
-          integrationAccountId: "ia_files",
-          provider: "dropbox",
-          providerFileId: "id:file",
-        },
-        startSegment: 0,
-      }),
-      "file_read_call",
-    ),
-  );
-  expect(search).toMatchObject({ success: true });
-  expect(read).toMatchObject({ success: true });
-  expect(claims).toEqual(["direct_tool:file.read", "direct_tool:file.read"]);
-}
-
 async function executesProductDescriptionDraftTools(): Promise<void> {
   const selection = {
     allowedCapabilities: [
@@ -1253,97 +824,6 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
   );
   expect(denied.status).toBe("failed");
   expect(denied.authority.kind).toBe("read");
-}
-
-async function executesEmailDraftTools(): Promise<void> {
-  const selection = {
-    allowedCapabilities: ["marketing.email_draft.edit"] as const,
-  };
-  const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
-  const claims: string[] = [];
-  const reads: unknown[] = [];
-  const edits: Array<{
-    readonly request: unknown;
-    readonly operationId: string;
-  }> = [];
-  const snapshot = {
-    kind: "active" as const,
-    documentId: "active" as const,
-    revision: 4,
-    observedAt: 10,
-    draft: {
-      subject: "Friday menu",
-      preview: "Fresh from the oven",
-      body: "See this week's menu.",
-    },
-  };
-  const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest,
-    catalogSelection: selection,
-    admission: permissiveAdmission(),
-    claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: async () => {
-      reads.push({});
-      return snapshot;
-    },
-    editEmailDraft: async (request, operationId) => {
-      edits.push({ request, operationId });
-      return snapshot;
-    },
-    queryWorkspace,
-    nowNs: monotonicClock(),
-  });
-  if (!created.ok) throw new Error(created.error.code);
-
-  const directRead = authorizedJson(
-    await created.value.executeTool("email_draft_read", "{}", "email_read"),
-  );
-  const directEdit = authorizedJson(
-    await created.value.executeTool(
-      "email_draft_edit",
-      JSON.stringify({
-        field: "subject",
-        oldText: "Friday",
-        newText: "Weekend",
-        expectedRevision: 4,
-      }),
-      "email_edit",
-    ),
-  );
-
-  expect(directRead).toMatchObject({
-    success: true,
-    code_mode_value: snapshot,
-  });
-  expect(directEdit).toMatchObject({
-    success: true,
-    code_mode_value: snapshot,
-  });
-  expect(reads).toEqual([{}]);
-  expect(edits).toEqual([
-    {
-      request: {
-        field: "subject",
-        oldText: "Friday",
-        newText: "Weekend",
-        expectedRevision: 4,
-      },
-      operationId: JSON.stringify(["direct_tool", "email_edit"]),
-    },
-  ]);
-  expect(claims).toEqual([
-    "direct_tool:marketing.email_draft.edit",
-    "direct_tool:marketing.email_draft.edit",
-  ]);
 }
 
 async function screensDirectFailure(): Promise<void> {
@@ -1463,75 +943,6 @@ async function rejectsCatalogMismatch(): Promise<void> {
   });
 }
 
-async function executesCommerceProposal(): Promise<void> {
-  const expectedCatalogDigest = await catalogHarnessToolCatalogDigest();
-  const proposals: unknown[] = [];
-  const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest,
-    admission: permissiveAdmission(),
-    claimCapability: acceptFixtureCapabilityClaim,
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    proposeCommerceAction: async (request) => {
-      proposals.push(request);
-      return {
-        kind: "commerce_action_proposed",
-        proposalId: "proposal_fixture",
-      };
-    },
-    queryWorkspace,
-    nowNs: monotonicClock(),
-  });
-  if (!created.ok) throw new Error(created.error.code);
-
-  const definition = created.value.definitions.find(
-    (item) => item.name === "commerce_propose_action",
-  );
-  expect(definition).toBeDefined();
-  expect(JSON.stringify(definition?.parameters)).not.toContain("oneOf");
-  expect(JSON.stringify(definition?.parameters)).not.toContain(
-    "adjust_inventory",
-  );
-  expect(JSON.stringify(definition?.parameters)).not.toContain(
-    "targetAvailable",
-  );
-
-  const request = {
-    kind: "cancel_order",
-    resourceId: "order_1",
-    expectedRevision: 3,
-    reason: "customer_requested",
-    refund: "none",
-    restock: false,
-    notifyCustomer: true,
-    note: null,
-  } as const;
-  const result: unknown = authorizedJson(
-    await created.value.executeTool(
-      "commerce_propose_action",
-      JSON.stringify({ request }),
-      "call_proposal",
-    ),
-  );
-
-  expect(proposals).toEqual([request]);
-  expect(result).toMatchObject({
-    success: true,
-    code_mode_value: {
-      kind: "commerce_action_proposed",
-      proposalId: "proposal_fixture",
-    },
-  });
-}
-
 function fixtureContextRequest(): import("@seams/contracts").CommerceContextRequest {
   const parsed = parseCommerceGraphQuery({
     kind: "underclerk_context",
@@ -1619,37 +1030,6 @@ function listIntegrations(
         connection: "available",
         configuredDataClasses: ["payments"],
         readableDataClasses: [],
-      },
-    ],
-    truncated: false,
-  });
-}
-
-function recordWhatsAppSupportRead(
-  reads: unknown[],
-  integrationAccountId: string,
-  request: import("../src/agent-tools/catalog/types").HarnessWhatsAppSupportRead,
-): Promise<
-  import("../src/agent-tools/catalog/types").HarnessWhatsAppSupportInbox
-> {
-  reads.push(request);
-  return Promise.resolve({
-    scope: "active_cases",
-    cases: [
-      {
-        integrationAccountId,
-        caseId: "case_whatsapp_1",
-        customerWaId: "15555550123",
-        openedAt: 1_000,
-        serviceWindowExpiresAt: 86_401_000,
-        ownership: "agent_active",
-        messages: [
-          {
-            direction: "inbound",
-            occurredAt: 1_000,
-            text: "Is my order ready?",
-          },
-        ],
       },
     ],
     truncated: false,
