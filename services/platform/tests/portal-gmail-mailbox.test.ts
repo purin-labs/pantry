@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { emailReplyIsOpenable, emailReplyLifecycleLabel, emailReplyLifecycleStatus, gmailMailboxStatus, gmailMailboxSummary, gmailPauseCopy, gmailProcessingDescription, mailboxAuthorizationNotice, parseMailboxPolicyDraft } from "../../../apps/portal/src/pages/agent-mailbox";
+import { emailReplyIsOpenable, emailReplyLifecycleLabel, emailReplyLifecycleStatus, gmailMailboxStatus, gmailMailboxSummary, gmailPauseCopy, mailboxAuthorizationNotice, parseMailboxPolicyDraft } from "../../../apps/portal/src/pages/agent-mailbox";
 import type { AgentMailboxView, MailboxPauseReasonView } from "@seams/control-api/portal/agent-mailbox";
 
 const NOW = 1_784_016_325_277;
@@ -246,9 +246,6 @@ function activationStatusTest(): void {
     kind: "success",
     label: "On",
   });
-  expect(gmailProcessingDescription({ kind: "waiting" })).toEqual(
-    expect.any(String),
-  );
 }
 
 function pauseCopyTest(): void {

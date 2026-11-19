@@ -1747,13 +1747,6 @@ export class OrganisationDO extends OrganisationCommerce {
     );
   }
 
-  async readHarnessHistoryBudgetWarnings(request: OrganisationMetaRequest) {
-    return this.command(
-      request.requestingOrganisationId,
-      this.admittedReadHarnessHistoryBudgetWarnings.bind(this, request),
-    );
-  }
-
   async acceptShopifyLocationObservation(
     input: ShopifyLocationObservationInput,
   ) {

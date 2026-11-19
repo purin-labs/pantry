@@ -4,11 +4,7 @@ import type { UnitTestEnv } from "./worker-fakes";
 import { describe, expect, it, vi } from "vitest";
 
 import { OrganisationDO } from "../src/actors/organisation";
-import {
-  parseSessionId,
-  parseOrganisationId,
-  type OrganisationId,
-} from "../src/ids";
+import { parseOrganisationId, type OrganisationId } from "../src/ids";
 import {
   emptySqliteFixture,
   sqlStorage,
@@ -32,10 +28,6 @@ import {
 import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
 
 describe("OrganisationActor cutover quiescence", function organisationCutoverQuiescenceSuite() {
-  it(
-    "projects and replays NF9 history budget warnings in OrganisationDO",
-    projectHistoryBudgetWarning,
-  );
   it(
     "durably arms recovery before committing a provider execution lease",
     armProviderExecutionRecoveryFirst,
@@ -99,56 +91,6 @@ async function expireProviderExecutionLease(): Promise<void> {
     },
   ]);
   expect(fixture.storage.alarmAt).toBeNull();
-}
-
-async function projectHistoryBudgetWarning(): Promise<void> {
-  const fixture = await organisationFixture();
-  const sessionId = parseSessionId("session_history_warning");
-  if (!sessionId.ok) throw new Error(sessionId.error.code);
-  expect(
-    await fixture.organisation.recordHarnessHistoryBudgetWarning({
-      organisationId: fixture.organisationId,
-      sessionId: sessionId.value,
-      entryCount: 80_000,
-      inlineBytes: 100,
-      hardLimit: false,
-      warningAt: 20_000,
-    }),
-  ).toMatchObject({
-    ok: true,
-    value: {
-      organisationId: fixture.organisationId,
-      sessionId: sessionId.value,
-      entryCount: 80_000,
-      hardLimit: false,
-    },
-  });
-  expect(
-    await fixture.organisation.recordHarnessHistoryBudgetWarning({
-      organisationId: fixture.organisationId,
-      sessionId: sessionId.value,
-      entryCount: 100_000,
-      inlineBytes: 256 * 1024 * 1024,
-      hardLimit: true,
-      warningAt: 21_000,
-    }),
-  ).toMatchObject({ ok: true, value: { hardLimit: true } });
-  expect(
-    await fixture.organisation.readHarnessHistoryBudgetWarnings({
-      requestingOrganisationId: fixture.organisationId,
-    }),
-  ).toMatchObject({
-    ok: true,
-    value: [
-      {
-        sessionId: sessionId.value,
-        entryCount: 100_000,
-        inlineBytes: 256 * 1024 * 1024,
-        hardLimit: true,
-        warningAt: 20_000,
-      },
-    ],
-  });
 }
 
 async function organisationFixture(): Promise<{

@@ -1,4 +1,4 @@
-import { parseSessionId, type SessionId, type OrganisationId } from "../../ids";
+import type { SessionId, OrganisationId } from "../../ids";
 import type {
   OrganisationHarnessHistoryBudgetWarning,
   RecordOrganisationHarnessHistoryBudgetWarningInput,
@@ -62,38 +62,4 @@ export function readOrganisationHarnessHistoryBudgetWarning(
     warningAt: row.warning_at,
     updatedAt: row.updated_at,
   };
-}
-
-export function readOrganisationHarnessHistoryBudgetWarnings(
-  sql: SqlStorage,
-  organisationId: OrganisationId,
-): readonly OrganisationHarnessHistoryBudgetWarning[] {
-  const rows = sql
-    .exec<{
-      organisation_id: string;
-      session_id: string;
-      entry_count: number;
-      inline_bytes: number;
-      hard_limit: number;
-      warning_at: number;
-      updated_at: number;
-    }>(
-      `SELECT organisation_id, session_id, entry_count, inline_bytes, hard_limit,
-            warning_at, updated_at
-       FROM organisation_harness_history_budget_warning
-      WHERE organisation_id = ?
-      ORDER BY updated_at DESC, session_id`,
-      organisationId,
-    )
-    .toArray();
-  return rows.flatMap((row) => {
-    const sessionId = parseSessionId(row.session_id);
-    if (!sessionId.ok) return [];
-    const warning = readOrganisationHarnessHistoryBudgetWarning(
-      sql,
-      organisationId,
-      sessionId.value,
-    );
-    return warning === null ? [] : [warning];
-  });
 }

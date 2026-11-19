@@ -1,11 +1,7 @@
-import {
-  formatAbsoluteTime,
-  formatLifecycle,
-  formatRelativeTime,
-} from "../formatting";
+import { formatAbsoluteTime, formatLifecycle } from "../formatting";
 import type { StatusChipStatus } from "../status-chip";
 import { assertNever } from "@seams/std";
-import type { AgentMailboxView, MailboxPauseReasonView, MailboxProcessingView } from "@seams/control-api/portal/agent-mailbox";
+import type { AgentMailboxView, MailboxPauseReasonView } from "@seams/control-api/portal/agent-mailbox";
 import type { Variant } from "@seams/type-utils";
 
 /**
@@ -186,23 +182,6 @@ function gmailPauseReasonLabel(reason: MailboxPauseReasonView): string {
       return "Gmail sign-in expired";
     default:
       return "limit reached";
-  }
-}
-
-export function gmailProcessingDescription(
-  processing: MailboxProcessingView,
-): string {
-  switch (processing.kind) {
-    case "waiting":
-      return "Waiting for Gmail changes";
-    case "scheduled":
-      return `Evaluation scheduled for ${formatAbsoluteTime(processing.at)}`;
-    case "evaluating":
-      return `Evaluating since ${formatAbsoluteTime(processing.startedAt)}`;
-    case "paused":
-      return `Paused ${formatRelativeTime(processing.pausedAt)}`;
-    default:
-      return assertNever(processing, "Unhandled agent mailbox variant");
   }
 }
 

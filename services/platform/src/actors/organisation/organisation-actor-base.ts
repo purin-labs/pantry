@@ -77,7 +77,6 @@ import { rearmActorAlarm } from "../lifecycle/actor-alarm";
 import { organisationAlarmReconcilers } from "../organisation-alarm";
 import {
   readOrganisationHarnessHistoryBudgetWarning,
-  readOrganisationHarnessHistoryBudgetWarnings,
   validHistoryBudgetWarning,
 } from "./history-budget";
 import { schemaTransaction } from "./schema";
@@ -92,7 +91,6 @@ import type {
   OrganisationHarnessHistoryBudgetWarning,
   OrganisationMeta,
   OrganisationMetaInput,
-  OrganisationMetaRequest,
   OrganisationStateError,
   RecordOrganisationHarnessHistoryBudgetWarningInput,
 } from "./types";
@@ -683,30 +681,6 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
       throw new Error("organisation_history_budget_warning_missing");
     }
     return { ok: true, value: warning };
-  }
-
-  protected async admittedReadHarnessHistoryBudgetWarnings(
-    request: OrganisationMetaRequest,
-    _scope: OrganisationExecutionScope,
-  ): Promise<
-    Result<
-      readonly OrganisationHarnessHistoryBudgetWarning[],
-      | OrganisationStateError
-      | { readonly code: "organisation_placement_conflict" }
-    >
-  > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      request.requestingOrganisationId,
-    );
-    if (!organisation.ok) return organisation;
-    return {
-      ok: true,
-      value: readOrganisationHarnessHistoryBudgetWarnings(
-        this.ctx.storage.sql,
-        request.requestingOrganisationId,
-      ),
-    };
   }
 
   protected async admittedAcceptShopifyLocationObservation(
