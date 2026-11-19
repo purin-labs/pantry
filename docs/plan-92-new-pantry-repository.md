@@ -298,9 +298,21 @@ artifact (27 October) failed J4 and J7 (3 tests); the config now refuses it.
 mocks, so they proved nothing. A journey for each is open for the plan that
 owns it:
 1. An Organisation's erasure empties every WhatsApp Connector before its rows
-   go.
+   go. Done on 19 November 2026: `e2e/whatsapp-erasure` purges an
+   Organisation whose number holds a customer message, a reply draft and an
+   open Case, and finds the Connector empty and no erased row left. With the
+   Connector purge skipped, it fails.
 2. An attachment preparation settles or cancels its executor allocation (a
-   money path).
+   money path). Still open: the E2E pool has no fake workspace executor, so
+   only the cancel path can run there now.
+
+**Kitchen journeys (19 November 2026).** 22 rows of
+`scripts/production-simulation/journeys.json` said "repaired on branch
+ci-browser", but that branch is gone. A run on `dev` gave their real state:
+one passes, 21 fail with a recorded reason. The index now holds 102 passing,
+46 failing and 4 not-run journeys. Each failing row needs a repair or a
+deletion, by the rule in `AGENTS.md`: keep it only if its outcome still
+matters.
 
 **Product exports that only deleted tests used.** I did not change them,
 because the duplicate-code workstream owns product code; that workstream
