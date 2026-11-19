@@ -170,13 +170,15 @@ cargo fmt --manifest-path crates/bakery-native/Cargo.toml --check
 MUJOCO_DIR=/tmp/bakery-sdk cargo clippy --manifest-path crates/bakery-native/Cargo.toml --all-targets -- -D warnings
 ```
 
-The campaign compares against retained Python migration observations, checks
-nominal/fault/half-timestep outcomes and motion, resumes every nonterminal phase
+The campaign checks the outcome of each nominal, fault and half-timestep case
+(a failed case places nothing; a completed one settles inside the placement
+thresholds), resumes every nonterminal phase
 in fresh processes, compares continuous and handed-off retrieval exactly, and
 rejects mismatched requests, corrupt state and terminal-as-checkpoint inputs.
 Set `BAKERY_NATIVE_BINARY` to a packaged executable or container wrapper to run
-that same campaign without rebuilding. See the [reference provenance](../../scripts/bakery-robots/reference-recordings/README.md)
-and [acceptance evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-5-native-boundary.md).
+that same campaign without rebuilding. The frozen Python migration recordings
+that it once compared against are in the archived history; see the
+[acceptance evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-5-native-boundary.md).
 The timeout campaign produces request, checkpoint, handoff, recording and
 `report.json` artifacts for the combined workflow, including host signal
 interruption from each phase checkpoint. Use a new output directory
