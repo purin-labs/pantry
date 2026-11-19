@@ -4,6 +4,10 @@ import { fixtureDatabase } from "./organisation-database";
 import { newConversationId, type ConversationId } from "@seams/control-api";
 import type { CaseGoalCommand } from "@seams/contracts";
 import { isRecord } from "@seams/std";
+import {
+  parseBakerySurfaceEffect,
+  type BakerySurfaceEffectV1,
+} from "@seams/bakery-model/bakery-surface";
 import { readOrganisationCodexConnection } from "../../src/models/codex-connection";
 import {
   issueControlSession,
@@ -33,6 +37,7 @@ import {
 import {
   createConversation,
   emptyConversation,
+  post,
   postJson,
   workKind,
   type Member,
@@ -620,4 +625,55 @@ export function toolOutput(body: Record<string, unknown>): string {
   );
   const message = last.at(-1);
   return isRecord(message) ? JSON.stringify(message.content) : "";
+}
+
+/**
+ * The first page command that waits for the given browser of the person who
+ * started the chat. It waits up to 30 seconds for the agent's turn.
+ */
+export async function pendingPageCommand(
+  author: Member,
+  chatPath: string,
+  conversationId: string,
+  browserInstanceId: string,
+): Promise<BakerySurfaceEffectV1> {
+  let found: BakerySurfaceEffectV1 | null = null;
+  await expect
+    .poll(
+      async () => {
+        found = await readPageCommand(
+          author,
+          chatPath,
+          conversationId,
+          browserInstanceId,
+        );
+        return found !== null;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(true);
+  if (found === null) throw new Error("No page command reached the browser");
+  return found;
+}
+
+async function readPageCommand(
+  author: Member,
+  chatPath: string,
+  conversationId: string,
+  browserInstanceId: string,
+): Promise<BakerySurfaceEffectV1 | null> {
+  const response = await post(
+    author,
+    `${chatPath}/surface-effects?browserInstanceId=${browserInstanceId}&conversationId=${conversationId}`,
+    null,
+  );
+  const body: unknown = await response.json();
+  if (!isRecord(body) || !Array.isArray(body.effects)) return null;
+  for (const entry of body.effects) {
+    if (!isRecord(entry)) continue;
+    const parsed = parseBakerySurfaceEffect(entry.effect);
+    if (parsed.kind === "valid" && parsed.value.command.kind === "page_command")
+      return parsed.value;
+  }
+  return null;
 }

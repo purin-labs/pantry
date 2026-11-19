@@ -9,11 +9,7 @@ import {
   type ConversationId,
   type SurfaceObservationV2,
 } from "@seams/control-api";
-import {
-  createBakerySurfaceReceipt,
-  parseBakerySurfaceEffect,
-  type BakerySurfaceEffectV1,
-} from "@seams/bakery-model/bakery-surface";
+import { createBakerySurfaceReceipt } from "@seams/bakery-model/bakery-surface";
 import { isRecord } from "@seams/std";
 import { env } from "cloudflare:workers";
 
@@ -26,7 +22,11 @@ import {
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
-import { finished, lastToolCallName } from "./chat-journey-support";
+import {
+  finished,
+  lastToolCallName,
+  pendingPageCommand,
+} from "./chat-journey-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -111,7 +111,12 @@ it(
       surfaceObservation: costsObservation("None"),
     });
     expect(sent.status, await sent.clone().text()).toBe(200);
-    const effect = await pendingPageCommand(author, paths.chat, conversationId);
+    const effect = await pendingPageCommand(
+      author,
+      paths.chat,
+      conversationId,
+      BROWSER,
+    );
     if (effect.command.kind !== "page_command")
       throw new Error("Expected a page command");
     expect(effect.command).toMatchObject({
@@ -234,46 +239,6 @@ function send(
       ? {}
       : { surfaceObservation: message.surfaceObservation }),
   });
-}
-
-async function pendingPageCommand(
-  author: Member,
-  chatPath: string,
-  conversationId: ConversationId,
-): Promise<BakerySurfaceEffectV1> {
-  let found: BakerySurfaceEffectV1 | null = null;
-  await expect
-    .poll(
-      async () => {
-        found = await readPageCommand(author, chatPath, conversationId);
-        return found !== null;
-      },
-      { timeout: 30_000 },
-    )
-    .toBe(true);
-  if (found === null) throw new Error("No page command reached the browser");
-  return found;
-}
-
-async function readPageCommand(
-  author: Member,
-  chatPath: string,
-  conversationId: ConversationId,
-): Promise<BakerySurfaceEffectV1 | null> {
-  const response = await post(
-    author,
-    `${chatPath}/surface-effects?browserInstanceId=${BROWSER}&conversationId=${conversationId}`,
-    null,
-  );
-  const body: unknown = await response.json();
-  if (!isRecord(body) || !Array.isArray(body.effects)) return null;
-  for (const entry of body.effects) {
-    if (!isRecord(entry)) continue;
-    const parsed = parseBakerySurfaceEffect(entry.effect);
-    if (parsed.kind === "valid" && parsed.value.command.kind === "page_command")
-      return parsed.value;
-  }
-  return null;
 }
 
 async function pageCommandCount(author: Member): Promise<number> {

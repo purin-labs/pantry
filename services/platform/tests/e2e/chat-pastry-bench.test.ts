@@ -3,29 +3,28 @@
 // `configure_pastry_bench` page command. `chat-costs-commands` proves the
 // shared page command path: the receipt, and the refusal without the page.
 import { http, type HttpResponseResolver } from "msw";
-import { expect, it, vi } from "vitest";
+import { expect, it } from "vitest";
 import {
   KITCHEN_SURFACE,
   PASTRY_BENCH_VIEW_COMMANDS,
   newConversationId,
   type SurfaceObservationV2,
 } from "@seams/control-api";
-import {
-  createBakerySurfaceReceipt,
-  parseBakerySurfaceEffect,
-  type BakerySurfaceEffectV1,
-} from "@seams/bakery-model/bakery-surface";
+import { createBakerySurfaceReceipt } from "@seams/bakery-model/bakery-surface";
 import { isRecord } from "@seams/std";
 
 import {
   createConversation,
   installMemoryFixture,
   post,
-  type Member,
 } from "./memory-support";
 import { network } from "./network";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
-import { finished, lastToolCallName } from "./chat-journey-support";
+import {
+  finished,
+  lastToolCallName,
+  pendingPageCommand,
+} from "./chat-journey-support";
 
 const BROWSER = "browser-pastry-owner";
 const SESSION_ID = "pastry-bench-session-1";
@@ -87,9 +86,11 @@ it(
     });
     expect(sent.status, await sent.clone().text()).toBe(200);
 
-    const effect = await vi.waitFor(
-      () => pageCommand(author, paths.chat, conversationId),
-      { timeout: 30_000, interval: 500 },
+    const effect = await pendingPageCommand(
+      author,
+      paths.chat,
+      conversationId,
+      BROWSER,
     );
     expect(effect.command).toMatchObject({
       kind: "page_command",
@@ -165,27 +166,4 @@ async function configureBench({
         { query: "pastry_bench_configure", limit: 2 },
         `pastry_discover_${crypto.randomUUID()}`,
       );
-}
-
-/** The page command that waits for the owner's browser. */
-async function pageCommand(
-  author: Member,
-  chatPath: string,
-  conversationId: string,
-): Promise<BakerySurfaceEffectV1> {
-  const response = await post(
-    author,
-    `${chatPath}/surface-effects?browserInstanceId=${BROWSER}&conversationId=${conversationId}`,
-    null,
-  );
-  const body: unknown = await response.json();
-  const effects =
-    isRecord(body) && Array.isArray(body.effects) ? body.effects : [];
-  for (const entry of effects) {
-    if (!isRecord(entry)) continue;
-    const parsed = parseBakerySurfaceEffect(entry.effect);
-    if (parsed.kind === "valid" && parsed.value.command.kind === "page_command")
-      return parsed.value;
-  }
-  throw new Error("No page command reached the browser");
 }
