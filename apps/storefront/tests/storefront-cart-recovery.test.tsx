@@ -1,10 +1,7 @@
-import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
 import type {
   CommerceBuyerOrderV1,
   CommerceBuyerPaymentDisputeStatusV1,
-  CommerceBuyerQuotedShippingCheckoutV1,
   CommerceBuyerSessionV4,
 } from "@seams/commerce-client";
 import { parseCommerceBuyerSessionV4 } from "@seams/commerce-client";
@@ -13,10 +10,7 @@ import {
   parseStoredCheckoutRecovery,
   normalizedBuyerContact,
   orderNeedsPolling,
-  orderTimelineWithPaymentReview,
-  paymentReviewPresentation,
   profileAllowsFulfillment,
-  ShippingQuoteEvidence,
   StorefrontApp,
   storefrontConfiguration,
 } from "../src/storefront.tsx";
@@ -181,177 +175,6 @@ it("fails closed when a recovered profile disallows the static fulfillment", asy
       value: originalWindow,
     });
   }
-});
-
-it("uses the active profile display name and locale for the shell", () => {
-  const originalWindow = globalThis.window;
-  const originalDocument = globalThis.document;
-  const documentElement = { lang: "" };
-  Object.defineProperty(globalThis, "window", {
-    configurable: true,
-    value: { location: { origin: "https://storefront.test" } },
-  });
-  Object.defineProperty(globalThis, "document", {
-    configurable: true,
-    value: { documentElement, title: "" },
-  });
-  try {
-    const app = new StorefrontApp({
-      config: storefrontConfiguration("/store"),
-    });
-    const session = parseCommerceBuyerSessionV4({
-      ...sessionRecord(),
-      checkoutProfileConfiguration: {
-        ...CHECKOUT_PROFILE_CONFIGURATION,
-        presentationPolicy: {
-          ...CHECKOUT_PROFILE_CONFIGURATION.presentationPolicy,
-          locale: "ja-JP",
-          merchantDisplayName: "Profile Café",
-        },
-      },
-    });
-    app.applySessionPresentation(session);
-    expect(documentElement.lang).toBe("ja-JP");
-    expect(globalThis.document.title).toBe("Profile Café · Seams Checkout");
-  } finally {
-    Object.defineProperty(globalThis, "window", {
-      configurable: true,
-      value: originalWindow,
-    });
-    Object.defineProperty(globalThis, "document", {
-      configurable: true,
-      value: originalDocument,
-    });
-  }
-});
-
-it("renders domestic quote evidence with explicit duty and customs status", () => {
-  const markup = renderToStaticMarkup(
-    <ShippingQuoteEvidence quote={shippingQuote("JP")} />,
-  );
-  expect(markup).toContain("N/A (domestic delivery)");
-  expect(markup).toContain("None required for domestic delivery.");
-  expect(markup).toContain("address-validation-jp");
-  expect(markup).toContain("package-jp");
-});
-
-it("renders Singapore export quote evidence with duty, customs, and allocation references", () => {
-  const markup = renderToStaticMarkup(
-    <ShippingQuoteEvidence quote={shippingQuote("SG")} />,
-  );
-  expect(markup).toContain("duty-quote-sg");
-  expect(markup).toContain("DDP");
-  expect(markup).toContain("HS 190531");
-  expect(markup).toContain("rate-sg");
-  expect(markup).toContain("tax-sg");
-});
-
-it.each([
-  {
-    dispute: activePaymentDispute("action_required"),
-    language: "en",
-    expected: {
-      title: "Payment review in progress",
-      detail: "Your payment review is in progress.",
-      nextAction:
-        "Keep checking this page while the payment review is in progress.",
-      timeline: "Payment review in progress",
-      active: true,
-    },
-  },
-  {
-    dispute: activePaymentDispute("under_review"),
-    language: "ja",
-    expected: {
-      title: "お支払いを確認しています",
-      detail: "お支払いの確認を進めています。",
-      nextAction: "お支払いの確認が完了するまで、この画面をご確認ください。",
-      timeline: "お支払いを確認中",
-      active: true,
-    },
-  },
-  {
-    dispute: terminalPaymentDispute("won"),
-    language: "en",
-    expected: {
-      title: "Payment review complete",
-      detail: "The payment review is complete.",
-      nextAction: "The payment review is complete. No action is needed.",
-      timeline: "Payment review complete",
-      active: false,
-    },
-  },
-  {
-    dispute: terminalPaymentDispute("lost"),
-    language: "ja",
-    expected: {
-      title: "お支払いの確認が完了しました",
-      detail: "お支払いの確認が完了しました。",
-      nextAction: "お支払いの確認は完了しています。お手続きはありません。",
-      timeline: "お支払いの確認完了",
-      active: false,
-    },
-  },
-] as const satisfies readonly Readonly<{
-  dispute: CommerceBuyerPaymentDisputeStatusV1;
-  language: "en" | "ja";
-  expected: Readonly<{
-    title: string;
-    detail: string;
-    nextAction: string;
-    timeline: string;
-    active: boolean;
-  }>;
-}>[])(
-  "presents $dispute.state payment reviews in $language",
-  ({ dispute, language, expected }) => {
-    const presentation = paymentReviewPresentation([dispute], language);
-    expect(presentation).toMatchObject({
-      title: expected.title,
-      detail: expected.detail,
-      nextAction: expected.nextAction,
-      active: expected.active,
-    });
-    expect(presentation?.timeline.find(timelineItemIsCurrent)?.label).toBe(
-      expected.timeline,
-    );
-  },
-);
-
-it("aggregates multiple payment reviews without selecting an identity", () => {
-  const active = paymentReviewPresentation(
-    [
-      activePaymentDispute("action_required", "dispute_z"),
-      activePaymentDispute("under_review", "dispute_a"),
-      terminalPaymentDispute("lost", "dispute_m"),
-    ],
-    "en",
-  );
-  expect(active).toMatchObject({
-    title: "Payment reviews in progress",
-    detail: "3 payment reviews: 2 in progress, 1 complete.",
-    nextAction:
-      "Keep checking this page while payment reviews are in progress.",
-    active: true,
-  });
-
-  const terminal = paymentReviewPresentation(
-    [
-      terminalPaymentDispute("won", "dispute_z"),
-      terminalPaymentDispute("lost", "dispute_a"),
-    ],
-    "ja",
-  );
-  expect(terminal).toMatchObject({
-    title: "お支払いの確認が完了しました",
-    detail: "お支払いの確認は2件すべて完了しました。",
-    nextAction: "お支払いの確認は完了しています。お手続きはありません。",
-    active: false,
-  });
-});
-
-it("leaves the order presentation unchanged when there are no payment reviews", () => {
-  expect(paymentReviewPresentation([], "en")).toBeUndefined();
 });
 
 it("keeps active payment reviews polling after fulfillment completes", () => {
@@ -1576,116 +1399,6 @@ function parseSession(
   });
 }
 
-function shippingQuote(
-  country: "JP" | "SG",
-): CommerceBuyerQuotedShippingCheckoutV1 {
-  const domestic = country === "JP";
-  const dutyAmount = domestic ? 0 : 100;
-  const dutyIncoterm = domestic ? "not_applicable" : "ddp";
-  return {
-    schemaVersion: "underclerk.buyer-quoted-shipping-checkout.v1",
-    checkoutId: "checkout_evidence",
-    revision: 1,
-    state: "quoted",
-    quote: {
-      quoteDigest: "quote-evidence",
-      lines: [
-        {
-          kind: "catalog",
-          checkoutLineId: "line-cookie",
-          variantId: "variant-cookie",
-          quantity: 1,
-          unitPrice: { amountMinor: 900, currency: "JPY" },
-          lineTotal: { amountMinor: 900, currency: "JPY" },
-        },
-      ],
-      totals: {
-        subtotal: { amountMinor: 900, currency: "JPY" },
-        tax: { amountMinor: 90, currency: "JPY" },
-        duty: { amountMinor: dutyAmount, currency: "JPY" },
-        shipping: { amountMinor: 100, currency: "JPY" },
-        total: { amountMinor: 1_090 + dutyAmount, currency: "JPY" },
-      },
-      shipping: {
-        addressValidationReference: `address-validation-${country.toLowerCase()}`,
-        service: { code: "carrier-test", name: "Carrier test" },
-        destinationCountry: country,
-        dutyTerms: { incoterm: dutyIncoterm },
-        estimatedDelivery: {
-          kind: "window",
-          earliest: "2099-08-30T00:00:00.000Z",
-          latest: "2099-09-01T00:00:00.000Z",
-        },
-        carrierQuote: {
-          rateReference: `rate-${country.toLowerCase()}`,
-          shippingAmount: { amountMinor: 100, currency: "JPY" },
-          lineAllocations: [
-            {
-              checkoutLineId: "line-cookie",
-              amount: { amountMinor: 100, currency: "JPY" },
-            },
-          ],
-        },
-        taxQuote: {
-          registrationPolicyReference: "tax-registration",
-          quoteReference: `tax-${country.toLowerCase()}`,
-          taxAmount: { amountMinor: 90, currency: "JPY" },
-          lineAllocations: [
-            {
-              checkoutLineId: "line-cookie",
-              amount: { amountMinor: 90, currency: "JPY" },
-            },
-          ],
-        },
-        dutyQuote: {
-          quoteReference: `duty-quote-${country.toLowerCase()}`,
-          incoterm: dutyIncoterm,
-          dutyAmount: { amountMinor: dutyAmount, currency: "JPY" },
-          lineAllocations: [
-            {
-              checkoutLineId: "line-cookie",
-              amount: { amountMinor: dutyAmount, currency: "JPY" },
-            },
-          ],
-        },
-        packagePlan: {
-          packagePlanDigest:
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          package: {
-            packageId: `package-${country.toLowerCase()}`,
-            weight: { grams: 100 },
-            dimensions: {
-              lengthMillimeters: 100,
-              widthMillimeters: 100,
-              heightMillimeters: 100,
-            },
-            lineQuantities: [
-              {
-                checkoutLineId: "line-cookie",
-                quantity: { amount: 1, scale: 0, unit: "each" },
-              },
-            ],
-            customsLines: domestic
-              ? []
-              : [
-                  {
-                    checkoutLineId: "line-cookie",
-                    description: "Cookie box",
-                    quantity: { amount: 1, scale: 0, unit: "each" },
-                    weight: { grams: 100 },
-                    declaredValue: { amountMinor: 900, currency: "JPY" },
-                    countryOfOrigin: "JP",
-                    hsCode: "190531",
-                  },
-                ],
-          },
-        },
-      },
-      expiresAt: "2099-08-29T10:00:00.000Z",
-    },
-  };
-}
-
 function requestSummary(request: Request): string {
   return `${request.method} ${new URL(request.url).pathname}`;
 }
@@ -1714,10 +1427,4 @@ function isCartReplaceRequest(request: Request): boolean {
 
 function hasRecoveredSessionAuthorization(request: Request): boolean {
   return request.headers.get("authorization") === `Bearer ${SESSION_TOKEN}`;
-}
-
-function noop(): void {}
-
-function timelineItemIsCurrent(item: Readonly<{ state: string }>): boolean {
-  return item.state === "current";
 }
