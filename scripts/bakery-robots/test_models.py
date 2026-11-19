@@ -185,7 +185,15 @@ class RobotAssetTests(unittest.TestCase):
                     self.assertTrue(np.all(body.inertia > 0))
             for index, joint in enumerate(source.findall("joint[@type='revolute']")):
                 actual = model.joint(f"{spec.slug}__{joint.attrib['name']}")
-                limits = joint.find("limit").attrib
+                limits = prepared.find(
+                    f"joint[@name='{joint.attrib['name']}']/limit"
+                ).attrib
+                # prepare.py replaces the CR10's zero RViz placeholders and its
+                # joint 3 range; every other arm keeps its vendor limits.
+                if spec.source_name != "cr10":
+                    vendor = joint.find("limit").attrib
+                    for key in ("lower", "upper", "effort", "velocity"):
+                        self.assertAlmostEqual(float(limits[key]), float(vendor[key]))
                 np.testing.assert_allclose(
                     actual.range, (float(limits["lower"]), float(limits["upper"]))
                 )
