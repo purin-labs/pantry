@@ -551,13 +551,14 @@
   align-items: center;
   gap: 8px 12px;
 }
-/* Inside the Portal shell, keep the top-start toolbar clear of the top-end workspace actions. */
+/* Inside the Portal shell, keep the top-start toolbar clear of the top-end
+   workspace actions. The toolbar sits 12px in from the start edge. */
 .portal-shell-workspace:not(
     [data-sidebar-mode="drawer"][data-sidebar-state="open"]
   )
   .persistent-production
   > header.factory-toolbar {
-  max-width: calc(100% - var(--workflow-header-clearance, 224px));
+  max-width: calc(100% - 12px - var(--workflow-header-clearance, 224px));
 }
 @media (pointer: coarse) {
   .portal-shell-workspace:not(
@@ -565,7 +566,7 @@
     )
     .persistent-production
     > header.factory-toolbar {
-    max-width: calc(100% - var(--workflow-header-clearance, 260px));
+    max-width: calc(100% - 12px - var(--workflow-header-clearance, 260px));
   }
 }
 /* The way back is an icon at the start; a rule parts it from the recipe name. */
