@@ -6,6 +6,10 @@ const recordingEvidence =
 
 async function verifyRecordingRehearsalBrowser(page) {
   page.setDefaultTimeout(15000);
+  // The row opens the page with ?evidence=/@fs/<tray-layout-drag-browser>.
+  const dragEvidence = new URL(page.url()).searchParams
+    .get("evidence")
+    .replace(/^\/@fs/u, "");
   const base =
     globalThis.bakeryBase ?? (await page.evaluate("location.origin"));
   await page.goto(`${base}/workflow-preview.html`);
@@ -32,19 +36,20 @@ async function verifyRecordingRehearsalBrowser(page) {
   await setup.waitFor();
 
   // A saved run is redirected to Multi-tray rehearsal. The rehearsal file
-  // is the run saved by verify-tray-layout-drag-browser.js.
+  // is the run that tray-layout-drag-browser saved.
   await viewer
     .getByRole("tab", { name: "Compare & files", exact: true })
     .click();
   await viewer
     .getByLabel("Recording file (.json)")
-    .setInputFiles("output/playwright/plan42f-tray-layout-drag/applied.json");
+    .setInputFiles(`${dragEvidence}/applied.json`);
   await viewer
     .locator("#physics-import-error")
     .filter({ hasText: "Open it from Multi-tray rehearsal" })
     .waitFor();
 
   // The rack cycle recording becomes tray A with every result accepted.
+  await viewer.getByRole("tab", { name: "Examples", exact: true }).click();
   await viewer.getByRole("button", { name: /^Oven → table → rack/ }).click();
   const rehearse = viewer.getByRole("button", {
     name: "Rehearse this recording",

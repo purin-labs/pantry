@@ -1263,22 +1263,6 @@
       }
     },
     {
-      "id": "recording-rehearsal-browser",
-      "file": "scripts/bakery-robots/verify-recording-rehearsal-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "browser",
-        "url": "/workflow-preview.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads output/playwright/plan42f-tray-layout-drag/applied.json, which no journey in the index writes.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
-      }
-    },
-    {
       "id": "rehearsal-faults-browser",
       "file": "scripts/bakery-robots/verify-rehearsal-faults-browser.js",
       "tier": "browser",
@@ -1411,9 +1395,45 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 18.4,
+        "seconds": 28.6,
         "date": "2026-11-19",
-        "commit": "3371386"
+        "commit": "078b14d4d"
+      }
+    },
+    {
+      "id": "tray-layout-drag-fallback-browser",
+      "file": "scripts/bakery-robots/verify-tray-layout-drag-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "args": ["--mode", "fallback"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 14.8,
+        "date": "2026-11-19",
+        "commit": "078b14d4d"
+      }
+    },
+    {
+      "id": "recording-rehearsal-browser",
+      "file": "scripts/bakery-robots/verify-recording-rehearsal-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 42F",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html?evidence=/@fs/{abs:tray-layout-drag-browser}",
+        "prerequisites": ["{out:tray-layout-drag-browser}/applied.json"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 20.2,
+        "date": "2026-11-19",
+        "commit": "078b14d4d"
       }
     },
     {
@@ -1563,12 +1583,16 @@
       "owner": "Plan 42F",
       "run": {
         "tool": "tsx",
-        "args": ["{out:tray-layout-drag-browser}"]
+        "args": [
+          "{out:tray-layout-drag-browser}",
+          "{out:tray-layout-drag-fallback-browser}"
+        ]
       },
-      "status": "fails",
-      "failure": {
-        "reason": "It reads fallback/applied.json from the output of tray-layout-drag-browser, which that journey does not write now.",
-        "proof": "fails at 3371386 (run on 2026-11-19)"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 0.5,
+        "date": "2026-11-19",
+        "commit": "078b14d4d"
       }
     },
     {

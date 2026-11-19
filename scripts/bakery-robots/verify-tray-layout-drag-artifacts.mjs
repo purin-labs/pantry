@@ -1,18 +1,19 @@
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { rackLayoutHash } from "../../packages/bakery-model/src/bakery-physics.ts";
 import { parseRehearsalWorkcells } from "../../packages/production-simulation/src/recipes/bakery/production-workcells.ts";
 import { rackPlacementFit } from "../../apps/portal/src/features/workflow-simulator/rack-layout.ts";
 import { simulateProduction } from "../../packages/production-simulation/src/recipes/bakery/schedule.ts";
 
-// Verifies the runs saved by verify-tray-layout-drag-browser.js: the dragged
-// placement was applied to tray A's request and simulated in browser MuJoCo.
-const root = fileURLToPath(new URL("../../", import.meta.url));
-const evidence = resolve(
-  process.argv[2] ?? join(root, "output/playwright/plan42f-tray-layout-drag"),
-);
+// Verifies the runs saved by verify-tray-layout-drag-browser.js with WebGL
+// and without it (--mode fallback): the dragged placement was applied to
+// tray A's request and simulated in browser MuJoCo.
+//
+//   tsx verify-tray-layout-drag-artifacts.mjs WEBGL_DIRECTORY FALLBACK_DIRECTORY
+assert.equal(process.argv.length, 4, "Give the WebGL and fallback outputs.");
+const evidence = resolve(process.argv[2]);
+const fallbackEvidence = resolve(process.argv[3]);
 
 async function verify(directory) {
   const opened = await parseRehearsalWorkcells(
@@ -48,7 +49,7 @@ async function verify(directory) {
 const report = {
   status: "passed",
   webgl: await verify(evidence),
-  fallback: await verify(join(evidence, "fallback")),
+  fallback: await verify(fallbackEvidence),
 };
 writeFileSync(
   join(evidence, "artifact-report.json"),
