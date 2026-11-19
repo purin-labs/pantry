@@ -6,6 +6,11 @@ better Seams Pantry mark is drawn. The owner rejected a first replacement
 (an arch with a stitched score line) on 17 November 2026. The file names
 keep `satyr-` until the new mark replaces them.
 
+The new mark is the Purin cat mark (the owner chose it on 19 November 2026).
+Its SVG files and its icon pack are in `docs/brand/purin-logo`, and the Portal
+components are `PurinMark` and `PurinIcon` in `src/ui`. Nothing in this folder
+uses it yet: the goat files stay in use until the brand switch.
+
 `satyr-mark.png` is the canonical 1024 px transparent source asset.
 
 Keep the compact ram-head mark on navigation, favicons, application icons,
