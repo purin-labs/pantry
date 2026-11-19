@@ -258,23 +258,68 @@ async function s3Request(manifest, method, key, body = new Uint8Array()) {
   });
 }
 
-async function download(manifest, entry, absolute) {
+/** A download fault that a later try can pass: no connection, or an HTTP 429 or 5xx answer. */
+class TransientDownloadError extends Error {}
+
+/**
+ * The waits before the second, third and fourth try. A GitHub runner lost its
+ * connection to R2 for minutes on 19 November 2026, and the CI job failed at
+ * the first file.
+ */
+const DOWNLOAD_RETRY_DELAYS_MS = [2_000, 8_000, 30_000];
+
+async function downloadOnce(manifest, entry, absolute) {
   if (s3 === null) {
-    await wranglerAsync([
-      "r2",
-      "object",
-      "get",
-      `${manifest.bucket}/sha256/${entry.sha256}`,
-      "--file",
-      absolute,
-      "--remote",
-    ]);
+    try {
+      await wranglerAsync([
+        "r2",
+        "object",
+        "get",
+        `${manifest.bucket}/sha256/${entry.sha256}`,
+        "--file",
+        absolute,
+        "--remote",
+      ]);
+    } catch (error) {
+      // A missing object or a refused sign-in does not change on a later try.
+      if (/not found|does not exist|\b40[134]\b|authenticat|unauthori[sz]ed/i.test(error.message)) throw error;
+      throw new TransientDownloadError(error.message);
+    }
     return;
   }
-  const response = await s3Request(manifest, "GET", `sha256/${entry.sha256}`);
-  if (!response.ok)
-    throw new Error(`R2 GET sha256/${entry.sha256}: HTTP ${response.status}`);
-  writeFileSync(absolute, new Uint8Array(await response.arrayBuffer()));
+  let response;
+  let body;
+  try {
+    response = await s3Request(manifest, "GET", `sha256/${entry.sha256}`);
+    // The body can break in the middle too, so it is read inside the try.
+    if (response.ok) body = new Uint8Array(await response.arrayBuffer());
+  } catch (error) {
+    throw new TransientDownloadError(
+      `R2 GET sha256/${entry.sha256}: ${error.cause?.code ?? error.cause?.message ?? error.message}`,
+    );
+  }
+  if (!response.ok) {
+    const message = `R2 GET sha256/${entry.sha256}: HTTP ${response.status}`;
+    throw response.status === 429 || response.status >= 500
+      ? new TransientDownloadError(message)
+      : new Error(message);
+  }
+  writeFileSync(absolute, body);
+}
+
+/** Downloads one file. A transient fault gets three more tries; any other fault stops at once. */
+async function download(manifest, entry, absolute) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await downloadOnce(manifest, entry, absolute);
+      return;
+    } catch (error) {
+      const wait = DOWNLOAD_RETRY_DELAYS_MS[attempt];
+      if (!(error instanceof TransientDownloadError) || wait === undefined) throw error;
+      console.warn(`${error.message}; try ${attempt + 2} of ${DOWNLOAD_RETRY_DELAYS_MS.length + 1} in ${wait / 1000} s`);
+      await new Promise((settle) => setTimeout(settle, wait));
+    }
+  }
 }
 
 function state(path, entry) {
