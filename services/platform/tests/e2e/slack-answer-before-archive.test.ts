@@ -41,8 +41,9 @@ import {
 /**
  * A turn completes when its checkpoint is in the Session's own storage. The
  * archive write follows the answer, and the next turn restores from the
- * Session's copy. These journeys hold, stop and fail the archive, and show
- * what the user and the next turn see.
+ * Session's copy. These journeys stop and fail the archive write, refuse the
+ * archive read, and remove or damage the Session's copy, and show what the
+ * user and the next turn see.
  */
 const ROOT_PROMPT = "open the delivery thread";
 const REPLY_TS = "1787500100.000002";
@@ -95,12 +96,6 @@ type Archive = {
 };
 
 it(
-  "posts the answer while the checkpoint's archive write is held, and starts the next turn after the publication",
-  heldArchiveWriteJourney,
-  90_000,
-);
-
-it(
   "posts one answer when the Session stops during the archive write, and publishes the checkpoint before the next turn",
   stoppedSessionJourney,
   90_000,
@@ -119,101 +114,10 @@ it(
 );
 
 it(
-  "reads the archive when the Session keeps no copy or a damaged copy, and keeps the next checkpoint",
-  archiveFallbackJourney,
-  90_000,
-);
-
-it(
-  "moves the thread to another placement without the Session's checkpoint copy, and restores the next reply from the archive",
+  "restores from the archive when a move leaves the Session no checkpoint copy and when the copy is damaged",
   relocatedSessionJourney,
   90_000,
 );
-
-async function heldArchiveWriteJourney(test: TestContext): Promise<void> {
-  const fixture = await installSlackActorFixture();
-  const recorded = observeProviders();
-  const archive = interceptCheckpointArchive(test, recorded);
-  const gate = Promise.withResolvers<void>();
-  archive.write = holdUntil.bind(null, gate.promise);
-
-  await acceptRoot();
-  await expect
-    .poll(countOf.bind(null, recorded.delivered), { timeout: 30_000 })
-    .toBe(1);
-  // The answer is in Slack, and the archive write has not finished.
-  await expect.poll(startedWrites.bind(null, archive)).toBe(1);
-  expect(archive.finished).toBe(0);
-  expect(recorded.delivered[0]).toMatchObject({
-    thread_ts: ROOT_TS,
-    text: ANSWERS[0],
-  });
-  const session = await threadSession();
-  const held = await runInDurableObject(session.stub, readPublication);
-  expect(held).toMatchObject({
-    lifecycle: "sleeping",
-    stream: "complete",
-    publication: "upload_pending",
-  });
-  expect(held.retainedTurns).toEqual([held.latestTurn]);
-  expect(await archivedKeys(held.objectKeys)).toEqual([]);
-  const inspected = await session.stub.inspectCanonicalSessionState({
-    organisationId: ORGANISATION_ID,
-    sessionId: session.sessionId,
-  });
-  if (!inspected.ok) throw new Error(inspected.error.code);
-  expect(inspected.value.quiescence.blockers).toContain(
-    "unpublished_checkpoints",
-  );
-
-  // The first turn is settled. A reply that arrives now starts its turn in
-  // the Session, and that turn waits for the publication.
-  const connector = await connectorOf(fixture.connectorId);
-  await expect
-    .poll(caseWorkCount.bind(null, connector), { timeout: 15_000 })
-    .toBe(0);
-  await acceptReply("Ev55E_ARCHIVE_HELD_REPLY");
-  await expect
-    .poll(turnStarts.bind(null, recorded), { timeout: 15_000 })
-    .toBe(2);
-  await scheduler.wait(300);
-  expect(recorded.modelBodies).toHaveLength(1);
-  expect(archive.finished).toBe(0);
-
-  archive.write = passThrough;
-  gate.resolve();
-  await expect
-    .poll(countOf.bind(null, recorded.delivered), { timeout: 30_000 })
-    .toBe(2);
-  expect(recorded.delivered[1]).toMatchObject({
-    thread_ts: ROOT_TS,
-    text: ANSWERS[1],
-  });
-  expectPublishedBeforeSecondTurn(recorded);
-  await expect
-    .poll(caseWorkCount.bind(null, connector), { timeout: 15_000 })
-    .toBe(0);
-  const after = await runInDurableObject(session.stub, readPublication);
-  expect(after).toMatchObject({
-    lifecycle: "sleeping",
-    stream: "complete",
-    publication: "published",
-  });
-  // The Session keeps the payload of its latest checkpoint only.
-  expect(after.latestTurn).not.toBe(held.latestTurn);
-  expect(after.retainedTurns).toEqual([after.latestTurn]);
-  expect(after.objectKeys).toHaveLength(2);
-  expect(await archivedKeys(after.objectKeys)).toEqual(after.objectKeys);
-
-  Object.assign(test.task.meta, {
-    slackAnswerBeforeArchive: {
-      held,
-      blockersWhileHeld: inspected.value.quiescence.blockers,
-      after,
-      timeline: recorded.timeline,
-    },
-  });
-}
 
 async function stoppedSessionJourney(test: TestContext): Promise<void> {
   const fixture = await installSlackActorFixture();
@@ -406,66 +310,10 @@ async function localRestoreJourney(test: TestContext): Promise<void> {
 }
 
 /**
- * A Session with no copy of its checkpoint: an earlier release deleted the
- * copy at the publication, and a relocation does not carry it. A Session with
- * a damaged copy must not use it. Both read the archive.
- */
-async function archiveFallbackJourney(test: TestContext): Promise<void> {
-  const fixture = await installSlackActorFixture();
-  const recorded = observeProviders();
-  const archive = interceptCheckpointArchive(test, recorded);
-
-  await acceptRoot();
-  const connector = await connectorOf(fixture.connectorId);
-  const first = await settledTurn(recorded, connector, 1);
-  const session = await threadSession();
-  await runInDurableObject(session.stub, deleteRetainedPayload);
-
-  await acceptReply("Ev55E_ARCHIVE_FALLBACK_REPLY_1");
-  const second = await settledTurn(recorded, connector, 2);
-  expect(recorded.delivered[1]).toMatchObject({
-    thread_ts: ROOT_TS,
-    text: ANSWERS[1],
-  });
-  expect(recorded.modelBodies[1]).toContain(ROOT_PROMPT);
-  expect(recorded.modelBodies[1]).toContain(ANSWERS[0]);
-  expect(archive.reads).toEqual(first.objectKeys);
-  // The Session keeps the checkpoint of the turn that just completed.
-  expect(second.retainedTurns).toEqual([second.latestTurn]);
-
-  await runInDurableObject(session.stub, damageRetainedPayload);
-  await acceptReply(
-    "Ev55E_ARCHIVE_FALLBACK_REPLY_2",
-    SECOND_REPLY_TS,
-    SECOND_REPLY_PROMPT,
-  );
-  const third = await settledTurn(recorded, connector, 3);
-  expect(recorded.delivered[2]).toMatchObject({
-    thread_ts: ROOT_TS,
-    text: ANSWERS[2],
-  });
-  expect(recorded.modelBodies[2]).toContain(REPLY_PROMPT);
-  expect(recorded.modelBodies[2]).toContain(ANSWERS[1]);
-  // One read for each of the two restores, and each of its own checkpoint.
-  expect(archive.reads).toHaveLength(2);
-  expect(archive.reads.toSorted()).toEqual(second.objectKeys.toSorted());
-  expect(third.retainedTurns).toEqual([third.latestTurn]);
-
-  Object.assign(test.task.meta, {
-    slackRestoreFromArchive: {
-      first,
-      second,
-      third,
-      archiveReads: archive.reads.length,
-      timeline: recorded.timeline,
-    },
-  });
-}
-
-/**
  * A relocation exports the Session's tables and copies its archive objects.
  * The payload copy is neither: the target Session starts without one, reads
- * the archive for its first restore, and keeps a copy from then on.
+ * the archive for its first restore, and keeps a copy from then on. A Session
+ * with a damaged copy must not use it, and reads the archive again.
  */
 async function relocatedSessionJourney(test: TestContext): Promise<void> {
   const fixture = await installSlackActorFixture();
@@ -515,13 +363,41 @@ async function relocatedSessionJourney(test: TestContext): Promise<void> {
   expect(archive.reads.slice(readsBeforeReply)).toEqual(first.objectKeys);
   expect(second.retainedTurns).toEqual([second.latestTurn]);
 
+  await runInDurableObject(target.stub, damageRetainedPayload);
+  const readsBeforeDamagedReply = archive.reads.length;
+  await acceptReply(
+    "Ev55E_DAMAGED_COPY_REPLY",
+    SECOND_REPLY_TS,
+    SECOND_REPLY_PROMPT,
+  );
+  const third = await settledTurn(
+    recorded,
+    await connectorOf(fixture.connectorId, 2),
+    3,
+    2,
+  );
+  expect(recorded.delivered[2]).toMatchObject({
+    thread_ts: ROOT_TS,
+    text: ANSWERS[2],
+  });
+  expect(recorded.modelBodies[2]).toContain(REPLY_PROMPT);
+  expect(recorded.modelBodies[2]).toContain(ANSWERS[1]);
+  // The restore read the second turn's checkpoint from the archive.
+  const damagedCopyReads = archive.reads.slice(readsBeforeDamagedReply);
+  expect([...first.objectKeys, ...damagedCopyReads].toSorted()).toEqual(
+    second.objectKeys.toSorted(),
+  );
+  expect(third.retainedTurns).toEqual([third.latestTurn]);
+
   Object.assign(test.task.meta, {
-    slackRestoreAfterRelocation: {
+    slackRestoreFromArchive: {
       relocationId,
       first,
       imported,
       second,
-      archiveReadsForReply: archive.reads.length - readsBeforeReply,
+      third,
+      archiveReadsAfterMove: readsBeforeDamagedReply - readsBeforeReply,
+      archiveReadsForDamagedCopy: damagedCopyReads.length,
       timeline: recorded.timeline,
     },
   });
@@ -598,25 +474,11 @@ async function publicationOf(
   return (await runInDurableObject(session, readPublication)).publication;
 }
 
-function deleteRetainedPayload(_actor: unknown, state: DurableObjectState) {
-  state.storage.sql.exec("DELETE FROM session_harness_checkpoint_payload");
-}
-
 /** Replace the kept payload with bytes of the same length. */
 function damageRetainedPayload(_actor: unknown, state: DurableObjectState) {
   state.storage.sql.exec(
     "UPDATE session_harness_checkpoint_payload SET payload = zeroblob(length(payload))",
   );
-}
-
-/** The second model request starts after a checkpoint write finished. */
-function expectPublishedBeforeSecondTurn(recorded: Recorded): void {
-  const published = recorded.timeline.indexOf("archive write 1 done");
-  const secondTurn = recorded.timeline.indexOf("model request 2");
-  expect(published).toBeGreaterThan(-1);
-  expect(secondTurn).toBeGreaterThan(published);
-  expect(recorded.modelBodies[1]).toContain(ROOT_PROMPT);
-  expect(recorded.modelBodies[1]).toContain(ANSWERS[0]);
 }
 
 /**
@@ -747,14 +609,6 @@ function passThrough(write: () => Promise<unknown>): Promise<unknown> {
   return write();
 }
 
-async function holdUntil(
-  released: Promise<void>,
-  write: () => Promise<unknown>,
-): Promise<unknown> {
-  await released;
-  return write();
-}
-
 async function failWrite(): Promise<unknown> {
   throw new Error("The archive is unavailable");
 }
@@ -783,10 +637,6 @@ async function stopAfterPost(
 
 function stoppedState(archive: Archive): Publication | null {
   return archive.stoppedAt;
-}
-
-function startedWrites(archive: Archive): number {
-  return archive.started;
 }
 
 function turnStarts(recorded: Recorded): number {

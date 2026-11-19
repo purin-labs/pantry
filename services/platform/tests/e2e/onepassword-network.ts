@@ -24,12 +24,6 @@ export const E2E_ONEPASSWORD_VAULTS = [
 type StoredItem = { item: OnePasswordItem; archived: boolean };
 const items = new Map<string, StoredItem>();
 const tokens: string[] = [];
-/** A list call that waits until the journey releases it. */
-let listHold: {
-  started: boolean;
-  gate: Promise<void>;
-  release: () => void;
-} | null = null;
 
 export class OnePasswordNetwork extends WorkerEntrypoint {
   override async fetch(request: Request): Promise<Response> {
@@ -37,25 +31,10 @@ export class OnePasswordNetwork extends WorkerEntrypoint {
     if (path === "/__e2e/reset") {
       items.clear();
       tokens.length = 0;
-      listHold?.release();
-      listHold = null;
       return Response.json({ ok: true });
     }
     if (path === "/__e2e/state")
-      return Response.json({
-        items: [...items.values()],
-        tokens,
-        listHeld: listHold?.started ?? false,
-      });
-    if (path === "/__e2e/hold-list") {
-      const { promise, resolve } = Promise.withResolvers<void>();
-      listHold = { started: false, gate: promise, release: resolve };
-      return Response.json({ ok: true });
-    }
-    if (path === "/__e2e/release-list") {
-      listHold?.release();
-      return Response.json({ ok: true });
-    }
+      return Response.json({ items: [...items.values()], tokens });
     if (path === "/__e2e/add") {
       const created = createItem(
         (await request.json()) as OnePasswordItemCreate,
@@ -83,14 +62,8 @@ const CLIENT: OnePasswordClient = {
       })),
   },
   items: {
-    list: async (vaultId) => {
-      const hold = listHold;
-      if (hold !== null) {
-        hold.started = true;
-        await hold.gate;
-        listHold = null;
-      }
-      return [...items.values()]
+    list: async (vaultId) =>
+      [...items.values()]
         .filter((stored) => stored.item.vaultId === vaultId && !stored.archived)
         .map((stored) => ({
           id: stored.item.id,
@@ -98,8 +71,7 @@ const CLIENT: OnePasswordClient = {
           category: stored.item.category,
           vaultId: stored.item.vaultId,
           state: "active",
-        }));
-    },
+        })),
     get: async (vaultId, itemId) => {
       const stored = items.get(itemId);
       if (stored === undefined || stored.item.vaultId !== vaultId)

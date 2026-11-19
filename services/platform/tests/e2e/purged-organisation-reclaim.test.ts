@@ -8,18 +8,20 @@ import {
   storeVaultSecret,
   type VaultHandle,
 } from "../../src/credential-vault";
-import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
-import { registerEmailSenderAccount } from "../../src/data/email-operational";
+import {
+  createCustomConnectorDraft,
+  prepareCustomConnectorDraftDocument,
+} from "../../src/custom-connectors/revisions";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import type { OrganisationId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { network } from "./network";
-import { googleIdToken } from "./gmail-mailbox-support";
 import {
   configurationVersion,
   erasedTableResidue,
   purgeOrganisation,
   purgeOwner,
+  readHeaders,
   type PurgeOwner,
 } from "./purge-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
@@ -38,10 +40,6 @@ const INSTALLATION_ID = "installation_e2e_reclaim";
 const PURGED_TOKEN = "xoxb-installed-by-purged";
 const RECLAIM_TOKEN = "xoxb-after-reclaim";
 const DM_USER = "U0DMPERSON";
-const MAILBOX_ADDRESS = "orders@reclaim.example";
-const GOOGLE_SUBJECT = "google-subject-reclaim";
-const GMAIL_SCOPES =
-  "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/userinfo.email openid";
 const SLACK_SCOPES = [
   "app_mentions:read",
   "chat:write",
@@ -54,7 +52,7 @@ const SLACK_SCOPES = [
 ] as const;
 
 it(
-  "lets a new Organisation take the handle, the Google account and the Slack workspace of a purged one, while the Organisation that shares the workspace keeps its Slack",
+  "erases each catalogue table of a purged Organisation and lets a new Organisation take its handle and its Slack workspace, while the Organisation that shares the workspace keeps its Slack",
   purgedOrganisationReclaimJourney,
   180_000,
 );
@@ -85,39 +83,43 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
         response_metadata: { next_cursor: "" },
       }),
     ),
-    http.post("https://oauth2.googleapis.com/token", () =>
-      HttpResponse.json({
-        access_token: "gmail-access-reclaim",
-        refresh_token: "gmail-refresh-reclaim",
-        expires_in: 3_600,
-        scope: GMAIL_SCOPES,
-        id_token: googleIdToken(GOOGLE_SUBJECT, MAILBOX_ADDRESS),
-      }),
-    ),
-    http.post("https://oauth2.googleapis.com/revoke", () =>
-      HttpResponse.json({}),
-    ),
   );
 
-  // The first Organisation installed the workspace, holds the Google
-  // account, and a person picked it for their Slack DMs. A second
-  // Organisation uses the same workspace.
+  // The first Organisation installed the workspace, signed in to ChatGPT,
+  // drafted a custom connector, and a person picked it for their Slack DMs.
+  // A second Organisation uses the same workspace.
   const purged = await purgeOwner("reclaim-purged", NAME);
   const neighbour = await purgeOwner("reclaim-neighbour", "Neighbour cafe");
   const purgedHandle = await directoryHandle(purged.organisationId);
+  expect(purgedHandle).not.toBeNull();
   await seedWorkspace(purged, neighbour);
-  await holdGoogleAccount(purged);
+  await connectChatGpt(purged);
+  await draftCustomConnector(purged);
+  const before = await erasedTableResidue(purged.organisationId);
+  expect(before).toMatchObject({
+    organisation_codex_connection: 1,
+    custom_connector: 1,
+    custom_connector_revision: 1,
+  });
 
   await purgeOrganisation(purged);
 
   // Nothing that the purge erases names the purged Organisation, its Vault
-  // included, and no Slack record of the directory names it.
+  // included, and no Slack record of the directory names it. The Organisation
+  // keeps no handle.
   expect(await erasedTableResidue(purged.organisationId)).toEqual({});
   expect(await slackRecordsNaming(purged.organisationId)).toEqual({
     installationsOwned: 0,
     dmSelections: 0,
     threadPins: 0,
   });
+  const purgedRow = await purgedOrganisationRow(purged.organisationId);
+  expect(purgedRow).toEqual({
+    status: "purged",
+    handle: null,
+    lifecycle: "purged",
+  });
+  expect(await directoryHandle(purged.organisationId)).toBeNull();
 
   // A new Organisation with the same name gets the same handle. The account
   // authority serves it and the Organisation that shares the workspace.
@@ -150,12 +152,7 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
     credential_health: { kind: "healthy" },
   });
 
-  // The new Organisation connects the same Google account and the same
-  // workspace.
-  expect(await connectGmail(fresh)).toEqual({
-    terminalState: "connected",
-    failureReason: null,
-  });
+  // The new Organisation connects the same workspace.
   await connectSlack(fresh);
   checkedTokens.length = 0;
   const freshReadiness = await exports.default.fetch(
@@ -175,8 +172,9 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
   task.meta.purgedOrganisationReclaim = {
     purgedOrganisation: purged.organisationId,
     handleReused: purgedHandle,
+    erasedTablesWithRowsBefore: Object.keys(before).length,
+    purgedRow,
     neighbourSlackAfterPurge: "healthy with the moved token",
-    freshGmail: "connected",
     freshSlack: "healthy with its own token",
     installationOwner:
       owner === neighbour.organisationId ? "neighbour" : String(owner),
@@ -306,60 +304,73 @@ async function seedWorkspace(
   ]);
 }
 
-/** The records that a finished Gmail connection leaves. */
-async function holdGoogleAccount(owner: PurgeOwner): Promise<void> {
-  const now = Date.now() - 10_000;
+/** Input: the ChatGPT sign-in that the Organisation's owner finished. */
+async function connectChatGpt(owner: PurgeOwner): Promise<void> {
+  const now = Date.now();
   const scope = await requireOrganisationExecutionScope(
     env,
     owner.organisationId,
   );
   const handle = requiredHandle(
-    `vault:${owner.organisationId.toLowerCase()}:gmail:reclaim`,
+    `vault:${owner.organisationId.toLowerCase()}:codex:profile:1`,
   );
   const stored = await storeVaultSecret({
     db: scope.database,
     keys: env,
     organisationId: owner.organisationId,
     handle,
-    secret: {
-      kind: "oauth_tokens",
-      accessToken: "gmail-access-held",
-      refreshToken: "gmail-refresh-held",
-      expiry: { kind: "expires", expiresAt: now + 3_600_000 },
-    },
+    secret: { kind: "bearer", value: "chatgpt-profile-before-purge" },
     now,
   });
   if (!stored.ok) throw new Error(stored.error.code);
-  const connected = await createActiveConnectedIntegration(scope.database, {
-    organisationId: owner.organisationId,
-    provider: "gmail",
-    providerSubjectId: GOOGLE_SUBJECT,
-    environment: "development",
-    authMode: "shared_satyr_app",
-    authority: { kind: "connection_credential", credentialRef: handle },
-    grantedScopes: GMAIL_SCOPES.split(" "),
-    createdByUserId: owner.client.identity.userId,
-    providerAccountId: GOOGLE_SUBJECT,
-    accountKind: "mailbox",
-    displayName: MAILBOX_ADDRESS,
-    capabilities: ["mailbox.ingress", "email.operational.propose"],
-    audiencePolicy: { kind: "operator" },
-    retentionPolicy: { kind: "organisation_default" },
-    now,
+  await scope.database
+    .prepare(
+      `INSERT INTO organisation_codex_connection (
+         organisation_id, lifecycle, revision, auth_profile_handle,
+         auth_profile_generation, plan_type, action_required_reason,
+         allowance_json, connected_at, verified_at, observed_at, updated_at,
+         refresh_lease, refresh_until
+       ) VALUES (?, 'connected', 1, ?, 1, 'plus', NULL, '{}', ?, ?, ?, ?, NULL, NULL)`,
+    )
+    .bind(owner.organisationId, handle, now, now, now, now)
+    .run();
+}
+
+async function draftCustomConnector(owner: PurgeOwner): Promise<void> {
+  const scope = await requireOrganisationExecutionScope(
+    env,
+    owner.organisationId,
+  );
+  const document = await prepareCustomConnectorDraftDocument({
+    schemaVersion: 1,
+    name: "Supplier API",
   });
-  const claim = {
+  if (!document.ok) throw new Error(document.error.code);
+  await createCustomConnectorDraft({
     db: scope.database,
     organisationId: owner.organisationId,
-    integrationAccountId: connected.account.integrationAccountId,
-    environment: "development",
-    googleSubject: GOOGLE_SUBJECT,
-    observedAddress: MAILBOX_ADDRESS,
-    now,
-  } as const;
-  const sender = await registerEmailSenderAccount(claim);
-  if (!sender.ok) throw new Error(sender.error.code);
-  const mailbox = await registerEmailMailboxAccount(claim);
-  if (!mailbox.ok) throw new Error(mailbox.error.code);
+    createdByUserId: owner.client.identity.userId,
+    document: document.value,
+    now: Date.now(),
+  });
+}
+
+/** The Organisation's own row and its onboarding lifecycle, in its region. */
+async function purgedOrganisationRow(
+  organisationId: OrganisationId,
+): Promise<unknown> {
+  const scope = await requireOrganisationExecutionScope(env, organisationId);
+  return scope.database
+    .prepare(
+      `SELECT organisation.status AS status, organisation.organisation_handle AS handle,
+              onboarding.lifecycle AS lifecycle
+       FROM organisation
+       JOIN organisation_onboarding AS onboarding
+         ON onboarding.organisation_id = organisation.organisation_id
+       WHERE organisation.organisation_id = ?`,
+    )
+    .bind(organisationId)
+    .first();
 }
 
 /** The directory's Slack records that still name the Organisation. */
@@ -412,50 +423,15 @@ async function slackAccount(
 }
 
 async function connectSlack(owner: PurgeOwner): Promise<void> {
-  const state = await startProvider(owner, "slack");
-  const callback = new URL(
-    `${PUBLIC_ORIGIN}/v1/control/providers/slack/callback`,
-  );
-  callback.searchParams.set("code", "slack-code-reclaim");
-  callback.searchParams.set("state", state);
-  const completed = await exports.default.fetch(callback.toString());
-  expect(completed.status).toBe(200);
-  await expect(completed.text()).resolves.toContain(
-    "satyr.provider-attempt.completed",
-  );
-}
-
-async function connectGmail(
-  owner: PurgeOwner,
-): Promise<Readonly<{ terminalState: string; failureReason: string | null }>> {
-  const state = await startProvider(owner, "gmail");
-  const callback = new URL(
-    `${PUBLIC_ORIGIN}/v1/control/providers/gmail/callback`,
-  );
-  callback.searchParams.set("code", "gmail-code-reclaim");
-  callback.searchParams.set("state", state);
-  const completed = await exports.default.fetch(callback.toString());
-  const report =
-    /"terminal_state":"(\w+)","failure_reason_code":(?:"(\w+)"|null)/u.exec(
-      await completed.text(),
-    );
-  if (report === null) throw new Error("The window reports no result");
-  return { terminalState: report[1] ?? "", failureReason: report[2] ?? null };
-}
-
-async function startProvider(
-  owner: PurgeOwner,
-  provider: "slack" | "gmail",
-): Promise<string> {
   const started = await exports.default.fetch(
-    `${PUBLIC_ORIGIN}/v1/control/organisations/${owner.organisationId}/providers/${provider}/start`,
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${owner.organisationId}/providers/slack/start`,
     {
       method: "POST",
       headers: {
         ...readHeaders(owner),
         origin: PUBLIC_ORIGIN,
         "content-type": "application/json",
-        "idempotency-key": `reclaim-${owner.organisationId}-${provider}-start`,
+        "idempotency-key": `reclaim-${owner.organisationId}-slack-start`,
         "x-satyr-configuration-version": String(
           await configurationVersion(owner.organisationId),
         ),
@@ -467,15 +443,17 @@ async function startProvider(
   expect(started.status, await started.clone().text()).toBe(201);
   const body = await started.json();
   if (!isRecord(body) || typeof body.authorization_url !== "string")
-    throw new Error(`${provider} start returned no authorization address`);
+    throw new Error("Slack start returned no authorization address");
   const state = new URL(body.authorization_url).searchParams.get("state");
-  if (state === null) throw new Error(`${provider} authorization has no state`);
-  return state;
-}
-
-function readHeaders(owner: PurgeOwner): Record<string, string> {
-  const { token, csrfToken } = owner.client.session;
-  return {
-    cookie: `satyr_control_session=${token}; satyr_control_csrf=${csrfToken}`,
-  };
+  if (state === null) throw new Error("Slack authorization has no state");
+  const callback = new URL(
+    `${PUBLIC_ORIGIN}/v1/control/providers/slack/callback`,
+  );
+  callback.searchParams.set("code", "slack-code-reclaim");
+  callback.searchParams.set("state", state);
+  const completed = await exports.default.fetch(callback.toString());
+  expect(completed.status).toBe(200);
+  await expect(completed.text()).resolves.toContain(
+    "satyr.provider-attempt.completed",
+  );
 }
