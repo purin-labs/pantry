@@ -8,7 +8,7 @@ import {
   type ArchiveOrganisationMutation,
 } from "../../src/data/organisation-lifecycle";
 import { PURGE_CATALOGUE } from "../../src/data/purge-catalogue";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId, UserId } from "../../src/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
@@ -17,6 +17,12 @@ import type { SharedAccountNativeClient } from "./shared-account-platform-fixtur
 export type PurgeOwner = Readonly<{
   client: SharedAccountNativeClient;
   organisationId: OrganisationId;
+}>;
+
+/** An Organisation and the owner who archives and deletes it. */
+export type PurgeSubject = Readonly<{
+  organisationId: OrganisationId;
+  userId: UserId;
 }>;
 
 /** An owner and the Organisation that onboarding creates for it. */
@@ -33,35 +39,54 @@ export async function purgeOwner(
  * The owner archives the Organisation, the scheduled cleanup revokes its
  * credentials, the owner deletes it, and the scheduled run purges it.
  */
-export async function purgeOrganisation(owner: PurgeOwner): Promise<void> {
+export async function purgeOrganisation(
+  owner: PurgeOwner | PurgeSubject,
+): Promise<void> {
+  const subject =
+    "client" in owner
+      ? {
+          organisationId: owner.organisationId,
+          userId: owner.client.identity.userId,
+        }
+      : owner;
+  await archiveAsOwner(subject);
+  await runScheduledOnboardingReconciliation(env, Date.now());
+  await deleteAsOwner(subject);
+  await runScheduledOnboardingReconciliation(env, Date.now() + 1_000);
+  await runScheduledOnboardingReconciliation(env, Date.now() + 900_000);
+  expect(await cleanupStatus(subject.organisationId)).toBe("purged");
+}
+
+/** The owner archives the Organisation. */
+export async function archiveAsOwner(subject: PurgeSubject): Promise<void> {
   const archived = await archiveOrganisation({
     identityDatabase: env.DB,
     execution: await requireOrganisationExecutionScope(
       env,
-      owner.organisationId,
+      subject.organisationId,
     ),
-    actorUserId: owner.client.identity.userId,
+    actorUserId: subject.userId,
     authority: { kind: "organisation_owner" },
     reasonCode: "merchant_archived",
     now: Date.now(),
-    mutation: await lifecycleMutation(owner, "archive"),
+    mutation: await lifecycleMutation(subject, "archive"),
   });
   if (!archived.ok) throw new Error(archived.error.code);
-  await runScheduledOnboardingReconciliation(env, Date.now());
+}
+
+/** The owner deletes the archived Organisation. */
+export async function deleteAsOwner(subject: PurgeSubject): Promise<void> {
   const removed = await deleteArchivedOrganisation({
     directory: env.DB,
     execution: await requireOrganisationExecutionScope(
       env,
-      owner.organisationId,
+      subject.organisationId,
     ),
-    actorUserId: owner.client.identity.userId,
+    actorUserId: subject.userId,
     now: Date.now(),
-    mutation: await lifecycleMutation(owner, "delete"),
+    mutation: await lifecycleMutation(subject, "delete"),
   });
   if (!removed.ok) throw new Error(removed.error.code);
-  await runScheduledOnboardingReconciliation(env, Date.now() + 1_000);
-  await runScheduledOnboardingReconciliation(env, Date.now() + 900_000);
-  expect(await cleanupStatus(owner.organisationId)).toBe("purged");
 }
 
 /**
@@ -122,23 +147,23 @@ export async function configurationVersion(
 }
 
 async function lifecycleMutation(
-  owner: PurgeOwner,
+  subject: PurgeSubject,
   operation: "archive" | "delete",
 ): Promise<ArchiveOrganisationMutation> {
-  const key = `purge-support-${owner.organisationId}-${operation}`;
+  const key = `purge-support-${subject.organisationId}-${operation}`;
   return {
     boundary: {
       kind: "configuration_versioned",
       idempotencyKey: key,
       requestHash: `${key}-request`,
       expectedConfigurationVersion: await configurationVersion(
-        owner.organisationId,
+        subject.organisationId,
       ),
     },
     scope: {
-      userId: owner.client.identity.userId,
-      organisationScope: owner.organisationId,
-      route: `/v1/control/organisations/${owner.organisationId}${operation === "archive" ? "/archive" : ""}`,
+      userId: subject.userId,
+      organisationScope: subject.organisationId,
+      route: `/v1/control/organisations/${subject.organisationId}${operation === "archive" ? "/archive" : ""}`,
       operation: `organisation.${operation}`,
     },
     identity: newControlMutationIdentity({

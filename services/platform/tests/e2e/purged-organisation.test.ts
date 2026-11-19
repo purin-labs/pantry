@@ -9,14 +9,8 @@ import {
 import { listOrganisationActorRegistryEntries } from "../../src/actors/actor-registry";
 import type { ConnectorDO } from "../../src/actors/connector";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { listOnboardingReconciliationOrganisationIds } from "../../src/data/onboarding-reconciliation";
-import {
-  archiveOrganisation,
-  deleteArchivedOrganisation,
-  type ArchiveOrganisationMutation,
-} from "../../src/data/organisation-lifecycle";
 import { registerWhatsAppPhoneNumberAccount } from "../../src/data/whatsapp";
 import { parseConnectorId, parseUserId, type UserId } from "../../src/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
@@ -27,6 +21,7 @@ import {
   parseWhatsAppPhoneNumberId,
 } from "../../src/whatsapp/identifiers";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { archiveAsOwner, cleanupStatus, deleteAsOwner } from "./purge-support";
 import {
   ORGANISATION_ID,
   installSlackActorFixture,
@@ -74,38 +69,22 @@ async function purgedOrganisationJourney({ task }: TestContext) {
   });
   expect(await storedIngress(connector.stub)).toBe(1);
 
-  const scope = await requireOrganisationExecutionScope(env, ORGANISATION_ID);
-  const archived = await archiveOrganisation({
-    identityDatabase: env.DB,
-    execution: scope,
-    actorUserId: userId,
-    authority: { kind: "organisation_owner" },
-    reasonCode: "merchant_archived",
-    now: Date.now(),
-    mutation: await lifecycleMutation(userId, "archive"),
-  });
-  if (!archived.ok) throw new Error(archived.error.code);
+  const owner = { organisationId: ORGANISATION_ID, userId };
+  await archiveAsOwner(owner);
   await runScheduledOnboardingReconciliation(env, Date.now());
-  expect(await cleanupStatus()).toBe("pending_purge");
+  expect(await cleanupStatus(ORGANISATION_ID)).toBe("pending_purge");
 
   // Archived, with its purge still a month away, it keeps its Connector too.
   const refusedBeforePurge = await eraseConnector(connector);
   expect(refusedBeforePurge.status).toBe(409);
   expect(await storedIngress(connector.stub)).toBe(1);
 
-  const deleted = await deleteArchivedOrganisation({
-    directory: env.DB,
-    execution: await requireOrganisationExecutionScope(env, ORGANISATION_ID),
-    actorUserId: userId,
-    now: Date.now(),
-    mutation: await lifecycleMutation(userId, "delete"),
-  });
-  if (!deleted.ok) throw new Error(deleted.error.code);
+  await deleteAsOwner(owner);
 
   // The purge reaches the Connector, cannot read it, and stops.
   const blockedAt = Date.now() + 1_000;
   await runScheduledOnboardingReconciliation(env, blockedAt);
-  expect(await cleanupStatus()).toBe("pending_purge");
+  expect(await cleanupStatus(ORGANISATION_ID)).toBe("pending_purge");
   expect(await archiveRuns()).toMatchObject({
     lifecycle: "failed",
     reasonCode: "reconciliation_subject_failed",
@@ -125,7 +104,7 @@ async function purgedOrganisationJourney({ task }: TestContext) {
 
   const purgedAt = blockedAt + 15 * 60_000;
   await runScheduledOnboardingReconciliation(env, purgedAt);
-  expect(await cleanupStatus()).toBe("purged");
+  expect(await cleanupStatus(ORGANISATION_ID)).toBe("purged");
   expect(await archiveRuns()).toMatchObject({ lifecycle: "completed" });
   expect(
     await fixtureDatabase()
@@ -303,47 +282,6 @@ function connectorOwnerColumn(
       }) ?? null
     );
   });
-}
-
-async function lifecycleMutation(
-  userId: UserId,
-  operation: "archive" | "delete",
-): Promise<ArchiveOrganisationMutation> {
-  const version = await fixtureDatabase()
-    .prepare(
-      "SELECT configuration_version FROM organisation_onboarding WHERE organisation_id = ?",
-    )
-    .bind(ORGANISATION_ID)
-    .first<number>("configuration_version");
-  if (version === null) throw new Error("Missing configuration version");
-  return {
-    boundary: {
-      kind: "configuration_versioned",
-      idempotencyKey: `purged-journey-${operation}`,
-      requestHash: `purged-journey-${operation}-request`,
-      expectedConfigurationVersion: version,
-    },
-    scope: {
-      userId,
-      organisationScope: ORGANISATION_ID,
-      route: `/v1/control/organisations/${ORGANISATION_ID}${operation === "archive" ? "/archive" : ""}`,
-      operation: `organisation.${operation}`,
-    },
-    identity: newControlMutationIdentity({
-      portalSubjectHash: "purged-journey-owner",
-      causationId: `purged-journey-${operation}`,
-      now: Date.now(),
-    }),
-  };
-}
-
-function cleanupStatus(): Promise<unknown> {
-  return fixtureDatabase()
-    .prepare(
-      "SELECT status FROM organisation_archive_cleanup WHERE organisation_id = ?",
-    )
-    .bind(ORGANISATION_ID)
-    .first("status");
 }
 
 /** The latest run of the archive subject for the journey's Organisation. */
