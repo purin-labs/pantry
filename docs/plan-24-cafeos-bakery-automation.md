@@ -183,7 +183,7 @@ models directly into Isaac Lab. If we train camera-guided policies for physical
 robots under this plan later, we can reuse our existing MuJoCo assets in Isaac
 offline.
 
-An offline import spike ([`scripts/bakery-robots/verify_isaac_lab_import.py`](../scripts/bakery-robots/verify_isaac_lab_import.py),
+An offline import spike ([`scripts/bakery-robots/verify_isaac_lab_import.py`](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/scripts/bakery-robots/verify_isaac_lab_import.py),
 receipt in [`docs/evidence/plan-24-isaac-lab-import-spike.json`](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-24-isaac-lab-import-spike.json))
 verified all twelve nominal workcell `MJCF` models (`dobot-cr10`, `fairino-fr10`,
 `fairino-fr5`, `fanuc-crx10ial`, `ufactory-xarm6`, and `universal-robots-ur5e`

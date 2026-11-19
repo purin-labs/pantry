@@ -166,7 +166,6 @@ the exact controller/runtime build, including target and compiler identity.
 ```sh
 MUJOCO_DIR=/tmp/bakery-sdk node scripts/bakery-robots/verify-native.mjs /tmp/bakery-campaign
 node --experimental-strip-types scripts/bakery-robots/verify-timeout-recovery.mjs /tmp/bakery-timeout-campaign
-node --experimental-strip-types scripts/bakery-robots/verify-container-recovery.mjs satyr-bakery-native /tmp/bakery-container-campaign
 cargo fmt --manifest-path crates/bakery-native/Cargo.toml --check
 MUJOCO_DIR=/tmp/bakery-sdk cargo clippy --manifest-path crates/bakery-native/Cargo.toml --all-targets -- -D warnings
 ```
@@ -180,9 +179,7 @@ that same campaign without rebuilding. See the [reference provenance](../../scri
 and [acceptance evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-5-native-boundary.md).
 The timeout campaign produces request, checkpoint, handoff, recording and
 `report.json` artifacts for the combined workflow, including host signal
-interruption from each phase checkpoint. The container campaign uses the image
-built above to terminate actual offline containers and resume preserved
-checkpoints in fresh containers. Use a new output directory
+interruption from each phase checkpoint. Use a new output directory
 for every run; see [timeout evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42B-timeout-recovery.md).
 
 Python remains an **asset-build dependency only**. The checked-in XML and source

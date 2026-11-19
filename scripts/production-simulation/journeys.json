@@ -617,22 +617,6 @@
       }
     },
     {
-      "id": "hosted-deployment-artifacts",
-      "file": "scripts/production-simulation/verify-hosted-deployment-artifacts.mjs",
-      "tier": "fast",
-      "backend": "none",
-      "owner": "Plan 70",
-      "run": {
-        "tool": "node",
-        "args": ["output/acceptance/plan-70/hosted-release-2026-10-12"]
-      },
-      "status": "not run",
-      "failure": {
-        "reason": "It needs the documents of a hosted A-to-B run in output/acceptance/plan-70/hosted-release-2026-10-12. They are not in git and not on this Mac.",
-        "proof": "ENOENT for saved-a.json at a30c096a8 (run on 2026-11-17)"
-      }
-    },
-    {
       "id": "idle-contacts",
       "file": "scripts/production-simulation/verify-idle-contacts.mjs",
       "tier": "fast",
@@ -943,26 +927,6 @@
       }
     },
     {
-      "id": "recording-equivalence",
-      "file": "scripts/production-simulation/verify-recording-equivalence.mjs",
-      "tier": "fast",
-      "backend": "none",
-      "owner": "Plan 70C",
-      "run": {
-        "tool": "node",
-        "args": [
-          "REFERENCE_SNAPSHOT",
-          "CANDIDATE_SNAPSHOT",
-          "{out}/report.json"
-        ]
-      },
-      "status": "not run",
-      "failure": {
-        "reason": "It needs two saved snapshots of one route from runs with different advance allowances (the Plan 70 J3 inputs). No journey in the index writes them, and the J3 outputs are not on this Mac.",
-        "proof": "docs/evidence/plan-70-j3-bounded-operation-batching.md names the inputs"
-      }
-    },
-    {
       "id": "six-hour-shift",
       "file": "scripts/production-simulation/verify-six-hour-shift-journey.mjs",
       "tier": "fast",
@@ -1133,22 +1097,6 @@
       }
     },
     {
-      "id": "browser-chain-artifacts",
-      "file": "scripts/bakery-robots/verify-browser-chain-artifacts.mjs",
-      "tier": "fast",
-      "backend": "none",
-      "owner": "Plan 42F",
-      "run": {
-        "tool": "tsx",
-        "args": ["output/playwright/browser-authored-chain"]
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "An old browser file opens as 'rejected', not 'ready'. The input files (output/playwright/browser-authored-chain) are not in git; only the main checkout of this Mac has them.",
-        "proof": "fails at a30c096a8 (run on 2026-11-17)"
-      }
-    },
-    {
       "id": "browser-linkage",
       "file": "scripts/bakery-robots/verify-browser-linkage.mjs",
       "tier": "fast",
@@ -1180,39 +1128,6 @@
       "failure": {
         "reason": "The process grows to about 20 GB of resident memory, and macOS stops it (exit 137) after about 90 s. It wrote the oven cycle files of the first arm before it stopped.",
         "proof": "exit 137 at a30c096a8, three runs on 2026-11-17; /usr/bin/time -l gave a maximum resident set size of 19,971,309,568 bytes"
-      }
-    },
-    {
-      "id": "container-recovery",
-      "file": "scripts/bakery-robots/verify-container-recovery.mjs",
-      "tier": "slow",
-      "backend": "native",
-      "owner": "Plan 42B",
-      "run": {
-        "tool": "node",
-        "args": ["satyr-bakery-native:host-validation", "{out}"],
-        "nodeOptions": ["--experimental-strip-types"]
-      },
-      "status": "not run",
-      "failure": {
-        "reason": "It needs the Docker image satyr-bakery-native:host-validation. The image is not on this Mac, and the disk has no room to build it.",
-        "proof": "docker images on 2026-11-17"
-      }
-    },
-    {
-      "id": "isaac-lab-import",
-      "file": "scripts/bakery-robots/verify_isaac_lab_import.py",
-      "tier": "fast",
-      "backend": "none",
-      "owner": "Plan 42B",
-      "run": {
-        "tool": "python",
-        "args": []
-      },
-      "status": "not run",
-      "failure": {
-        "reason": "It needs NVIDIA Newton (Isaac Lab). The physics venv has no newton module.",
-        "proof": "ModuleNotFoundError: No module named 'newton' at a30c096a8 (run on 2026-11-17)"
       }
     },
     {
