@@ -1,7 +1,9 @@
 # Plan 94 — Pantry moves to the GitHub organisation `purin-labs`
 
-Status: draft, 19 November 2026. The folder move is done (see "Done"). The
-repository transfers wait for the owner.
+Status: 19 November 2026. The repository is `purin-labs/pantry`, the folder
+move is done and the old `satyr` repository is archived (see "Done"). Open:
+the old local clone, `pantry-history`, the first CI run and the legacy names
+(see "Steps").
 
 The owner decided on 19 November 2026:
 
@@ -19,8 +21,8 @@ undone. The organisation `purin-io` was never made on GitHub.
 
 | Organisation | Brand | Repositories | Local folder |
 |---|---|---|---|
-| `seams-tech` (stays) | Seams | `seams-wallet`, `seams-monorepo` (site, Console, wallet deploy), `speak-to-sign`, `seams-sdk` (archived) | `~/Dev/rust` |
-| `purin-labs` (new) | Purin | `pantry`, `pantry-history` (archived), `satyr` | `~/Dev/purin-labs` |
+| `seams-tech` (stays) | Seams | `seams-wallet`, `seams-monorepo` (site, Console, wallet deploy), `speak-to-sign`, `seams-sdk` (archived). Also the archived history of Pantry: `pantry-history` and `satyr` | `~/Dev/rust` |
+| `purin-labs` (new) | Purin | `pantry` | `~/Dev/purin-labs` |
 
 The npm organisations follow the same line. The wallet packages keep the
 `@seams` scope. `@purin-labs` is for Purin packages; Pantry publishes none
@@ -105,9 +107,9 @@ installed on `seams-tech`. The owner checks them.
 ## Done (19 November 2026)
 
 - The folder `~/Dev/purin-io` is now `~/Dev/purin-labs`. It holds `pantry`
-  and `say-so`. A symlink `~/Dev/purin-io` → `purin-labs` stays, because two
-  other Claude sessions, the `say-so` dev servers and a Python process ran
-  in the old path at the move. Remove the symlink when they stop.
+  and `say-so`. A symlink `~/Dev/purin-io` → `purin-labs` stayed for some
+  hours, for the sessions and dev servers that ran in the old path. It is
+  gone now.
 - `git worktree repair` fixed the worktree of the clone. The clone has no
   stash.
 - The memory folders of the old paths are copied to
@@ -116,39 +118,70 @@ installed on `seams-tech`. The owner checks them.
   sessions that still run in the old path.
 - The pantry docs that named `~/Dev/purin-io` name `~/Dev/purin-labs`.
 
+### The transfer (19 November 2026)
+
+The owner said: "let's focus just on migrating satyr to purin-labs/pantry,
+and cleaning up the legacy code from satyr". So only `pantry` moved.
+
+- `seams-tech/pantry` is now `purin-labs/pantry` (transfer through the
+  GitHub API). The old web, git and API addresses redirect. The three R2
+  secrets and pull request #1 moved with it. Actions is on.
+- The clone `~/Dev/purin-labs/pantry` has the new `origin`. The symlink
+  `~/Dev/purin-io` is gone, so the pnpm links were installed again.
+- `seams-tech/satyr` is archived again. It stays in `seams-tech`, with
+  `pantry-history` (decision 3).
+
+### The old `satyr` repository and clone (19 November 2026)
+
+Checked, so that nothing is lost:
+
+- Each commit of `seams-tech/satyr` after the last port base (`80b2bd9f0`),
+  and each commit of its local branch `refactor-16`, is in pantry by
+  content. The step 13 evidence is in `pantry-history` (branch `dev`).
+- The old clone `~/Dev/lowerarchy/satyr` held two edits that no commit had:
+  the drawer rule in AGENTS.md and the Side drawer section of the Portal
+  `ui/README.md`. Both are in pantry now.
+- The pantry clone had no local secret file, so local development still ran
+  from the old clone. Nine git-ignored files are copied to the pantry clone
+  (`.env`, `.env.local`, `.env.local.production`, `.env.local.slack`,
+  `.env.local.whatsapp`, two `services/platform/.dev.vars.local*` files and
+  two `services/commerce/.dev.vars.*` files). Their `SATYR_*` keys are now
+  `PANTRY_*`, as the code reads them. The local secret check of the
+  Platform passes in the pantry clone.
+- The session handoffs of `.artifacts/handoffs` are copied to the
+  git-ignored `.claude/handoffs` of the pantry clone.
+
+Still in the old clone, and lost when it goes:
+
+- 68 GB in all: `output/` (35 GB of acceptance and journey results, none
+  of it in pantry), `.artifacts/` (2.4 GB of journey logs), `node_modules`
+  and build output.
+- Two stashes: "plan55c candidate" (8 October) and "p32-whatsapp-message-read"
+  (2 September). Plan 55 is closed and WhatsApp is blocked.
+- Dev servers of old sessions still run from it (started on 9, 13 and 16
+  November).
+
 ## Steps
 
-### The owner
-
-1. Check the apps on `seams-tech` (Settings → GitHub Apps) and install the
-   ones that Pantry needs on `purin-labs`.
-2. In `purin-labs`: set the base permission and the Actions budget. Default:
-   $0, so only the free minutes run.
-3. Transfer `pantry`: https://github.com/seams-tech/pantry/settings →
-   Danger Zone → Transfer → `purin-labs`. Then `pantry-history` and `satyr`.
-
-### Me, after the owner says the transfers are done
-
-1. Check: `gh api repos/purin-labs/pantry`, `git ls-remote` on the old
-   address (redirect), the three secret names, and pull request #1.
-2. Run `git remote set-url origin https://github.com/purin-labs/<repo>.git`
-   in `~/Dev/purin-labs/pantry` and `~/Dev/lowerarchy/satyr`.
-3. Archive `purin-labs/satyr` (decision 3).
-4. One pantry commit: links `seams-tech/(pantry|pantry-history|satyr)` →
-   `purin-labs/...`, the footer link → `https://github.com/purin-labs`, and
-   the billing commands in the docs.
-5. Run Pantry CI once in the new organisation: add the label `run-ci` to
+1. **The owner: delete the old clone** `~/Dev/lowerarchy/satyr` (decision 5).
+   Stop the old dev servers first.
+2. **The owner: the GitHub Apps.** Check the apps on `seams-tech`
+   (Settings → GitHub Apps) and install the ones that Pantry needs on
+   `purin-labs`.
+3. **Run Pantry CI once** in the new organisation: add the label `run-ci` to
    pull request #1 (`gh api repos/purin-labs/pantry/issues/1/labels`). It
-   uses free minutes.
-6. Run `pnpm install --prefer-offline` in the clone when the symlink goes, so
-   that the pnpm shims name the new path.
+   uses the free minutes of `purin-labs`.
+4. **The legacy `satyr` names in the code:**
+   [Plan 93](plan-93-clean-cutover.md), "Legacy names on dev".
+5. **The Portal shop footer** links to `https://github.com/seams-tech`
+   (`apps/portal/src/features/ecommerce/footer.tsx`). Change it with the
+   brand rename.
 
-### The wallet side
+### The wallet side (done)
 
-This does not wait for the transfers. In seams-wallet: delete the
-organisation-rename checklist and its script, and change Refactor 251 (D11,
-D22, D23 and the package table) to keep `seams-wallet`, `seams-monorepo` and
-the `@seams` scope.
+seams-wallet dev `8c5c0e6ba`: the organisation-rename checklist and its
+script are deleted, and Refactor 251 (D11, D22, D23 and the package table)
+keeps `seams-wallet`, `seams-monorepo` and the `@seams` scope.
 
 ## Decisions for the owner
 
@@ -156,12 +189,17 @@ the `@seams` scope.
    Default: yes.
 2. **Pantry sign-in shows Seams for now.** People sign in through the Seams
    Console. Default: yes. A Purin sign-in page is a later plan.
-3. **Archive `satyr` after the move.** Default: yes. All its commits are in
-   pantry.
+3. **`pantry-history` and `satyr` stay in `seams-tech`, archived.** Default:
+   yes. About 85 pantry files link to `seams-tech/pantry-history`, and the
+   links stay valid. A later transfer keeps them valid too (redirect).
 4. **The npm organisation `purin-io`:** delete it, or keep it unused.
    Default: keep it until you decide.
+5. **Delete the old clone `~/Dev/lowerarchy/satyr` (68 GB).** Default: wait
+   for your yes. Its commits, secrets and handoffs are safe in pantry. Its
+   35 GB of old results and its two stashes go.
 
 ## Cost
 
-- The owner: about 15 minutes (the apps, the settings, three transfers).
-- Me: about one hour (checks, remotes, one link commit, one CI run).
+- Done: the transfer, the remotes, the secrets and the handoffs.
+- Open: the apps (the owner, about 5 minutes), one CI run, and the delete of
+  the old clone.

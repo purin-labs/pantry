@@ -116,6 +116,44 @@ The two D1 baselines stay one file each
 `migrations-regional/0001_current_schema.sql`). The new databases load them
 fresh, so a table or column with an old name can change too.
 
+### Legacy names on dev (`3371386`, 19 November 2026)
+
+The word `satyr` is on 2,704 lines in 853 files outside `docs/` and the
+Markdown files. Plan 92 already removed the unused and duplicate code, so
+these are names, not dead code. They fall into two groups.
+
+**Group A: no effect on production or on stored data (about 1,100 lines).**
+A codemod can change them at any time, in one commit:
+
+| Kind | Examples | Lines |
+|---|---|---|
+| Test and fixture values | `https://satyr.example`, `@U0SATYR`, `shared_satyr_app`, `satyr.test`, `satyr-test.myshopify.com` | about 500 |
+| Identifiers and comments | `SatyrX` and `satyrX` names (358 lines), the word "Satyr" in comments and test titles (239) | about 600 |
+| Brand files | 32 files named `satyr-mark-*` and `satyr-horn-mark-*`, with their references | — |
+
+**Group B: wire, stored and deployed names (about 1,600 lines).** A change
+breaks the data and the sessions of the stack that runs today. They change
+in step 2, for the new stack:
+
+| Kind | Examples | Lines |
+|---|---|---|
+| Cookie, CSRF and headers | `satyr_control_session`, `satyr_control_csrf`, `x-satyr-csrf`, `x-satyr-configuration-version` | about 430 |
+| Provider and platform ids | `satyr_commerce`, `satyr_platform` | about 300 |
+| Contract fields and event kinds | `satyrLocationId`, `satyr_location_id`, `satyr.checkout.*`, `satyr.counter-sale.v1`, `urn:satyr` | about 250 |
+| Deployed names | Workers, queues, D1 and R2 names | 148 |
+| Shop Mac | `sh.seams.satyr.*`, `~/.satyr-voice`, `hey_satyr` | 55 |
+| `SATYR_*` variables that are left | `SATYR_COMMERCE`, `SATYR_ECOMMERCE_FIXTURE_TIMESTAMP` | 63 |
+
+Not changed by any codemod: the pinned Kitchen physics bundles under
+`apps/portal/public/bakery-physics` hold the build path
+`/Users/pta/Dev/lowerarchy/satyr`. A saved run names its bundle by hash, so
+the files stay as they are.
+
+Found on the way: `scripts/production-simulation/verify-factory-overview-browser.js`
+(in the journey index) reads
+`/Users/pta/Dev/lowerarchy/satyr/output/acceptance/plan-70/j2-recurring-campaign-2026-10-11-r2`.
+That folder does not exist on this machine, so the journey cannot pass.
+
 ### Stale Pantry resources (delete them)
 
 | Resource | Why it is stale |
@@ -254,8 +292,9 @@ deletes them with the other old secrets.
 
 One branch, from a freeze of dev:
 
-- A codemod for the names in "Names in the code and on the wire", in pantry
-  and in seams-monorepo (Console). It also removes code that exists only for
+- A codemod for the names in "Names in the code and on the wire" and for
+  group B of "Legacy names on dev", in pantry and in seams-monorepo
+  (Console). Group A can land before this step, as its own commit. It also removes code that exists only for
   old names: fallbacks, aliases, the glossary rows and the old-name notes in
   AGENTS.md.
 - New Wrangler files: new Worker, storage, container and secret names,

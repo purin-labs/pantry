@@ -1,7 +1,7 @@
 # Voice handover — Plans 82, 82B and 82C
 
 Date: 18 November 2026. Written for the move to the new repository `seams-tech/pantry`
-([Plan 91](plan-91-seams-atelier-rename.md)), and for the next move: the GitHub organisation
+([Plan 91](plan-91-seams-atelier-rename.md); since 2026-11-19 it is `purin-labs/pantry`), and for the next move: the GitHub organisation
 `purin-labs`, the folder `~/Dev/purin-labs` and the Purin rename (see "The move to purin-labs").
 This file is the entry point for voice work. Each plan keeps its decisions, its phases and its
 evidence.

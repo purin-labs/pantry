@@ -130,6 +130,16 @@ The preview at `/gradients-preview.html` shows both on a hero panel.
 (`Switch.Root` + `Switch.Thumb`) for accessible boolean toggles with form input
 support. Import both from `../../ui`.
 
+### Side drawer
+
+`SideDrawer` (`side-drawer.tsx` + `side-drawer.css`) is the one Portal drawer.
+It is a modal `<dialog>` that opens from the inline end and fills the screen on
+a phone. Escape and a click on the backdrop call `close`, and focus goes back
+to the control that opened it. The children render only while the drawer is
+open; wrap plain content in `.side-drawer-body`. `footer` holds the main action
+and stays at the bottom edge. Do not add Vaul or a second drawer. If a drawer
+needs a swipe or drag gesture, add it to `SideDrawer`.
+
 ### Trace
 
 `Trace` builds its rows on Base UI `Collapsible`. Each part has a Portal class

@@ -415,6 +415,12 @@ rule for buttons excludes it with `button:not(:where(.pantry-select-trigger))`.
 `<datalist>`, a `<Select.Root>` without `items`, and page CSS for a `select`
 element or the caret.
 
+Every drawer and sheet uses the drawer that the app already has: `SideDrawer`
+in the Portal and `CartDrawer` (`apps/storefront/src/patisserie.tsx`) on the
+storefront. Do not add Vaul or another drawer library, even when a skill
+recommends it. If a drawer needs a swipe or drag gesture, add it to that
+drawer.
+
 Shared packages live in `packages/`. Browser applications live in `apps/`.
 Contracts are TypeBox 1.x schemas with `Value` checks (Plan 78); no contract
 remains in Rust. Add each new contract type or lifecycle to its owning
