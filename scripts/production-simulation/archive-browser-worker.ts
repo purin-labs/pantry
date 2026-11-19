@@ -1,95 +1,72 @@
-import {
-  handleBakeryRunRoute,
-  matchBakeryRunRoute,
-} from "../../services/platform/src/control/routes/bakery-runs.ts";
-import {
-  handleBakeryRunArtifactRoute,
-  matchBakeryRunArtifactRoute,
-} from "../../services/platform/src/control/routes/bakery-run-artifacts.ts";
-import {
-  issueControlSession,
-  upsertUser,
-} from "../../services/platform/src/data/control-plane.ts";
-import { ensureInitialOrganisationPlacement } from "../../services/platform/src/data/organisation-placement.ts";
-import { parseOrganisationId } from "../../services/platform/src/ids.ts";
-import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement.ts";
+// The Worker of the shared archive journeys (Plan 70 J3):
+// verify-shared-artifacts-browser.js and verify-large-shared-archive-browser.js.
+// serve-archive-acceptance.mjs starts it on port 8840 with local D1 and R2 and
+// the built account Worker as its account authority. Every /v1 request uses
+// production routing and authorization. GET /fixture/setup builds the
+// Organisation and signs in its two people, which a browser cannot do alone.
+import gateway from "../../services/platform/src/integration-gateway";
+import { issueControlSession } from "../../services/platform/src/data/control-plane";
+import type { Env } from "../../services/platform/src/env";
+import type { OrganisationId } from "../../services/platform/src/ids";
+import { fixturePeople } from "../plan-42J/account-authority";
 
-// This entry is used only by the isolated, loopback acceptance runtime.
-const organisationId = required(
-  parseOrganisationId("organisation_archive_browser"),
-);
-const placement = required(
-  parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId: "archive-browser",
-    locationHint: "wnam",
-  }),
-);
+export {
+  OrganisationDO,
+  SessionDO,
+  CaseDO,
+  ConnectorDO,
+  CodeModePlatformGovernorActor,
+} from "../../services/platform/src/integration-gateway";
 
-export default { fetch: handleRequest };
+const { admittedOrganisation } = fixturePeople("archive-", "archive-browser");
 
-async function handleRequest(request, env) {
-  const path = new URL(request.url).pathname;
-  if (path === "/fixture/setup") return setup(env);
-  const artifact = matchBakeryRunArtifactRoute(path);
-  if (artifact !== null)
-    return handleBakeryRunArtifactRoute(request, env, artifact);
-  const run = matchBakeryRunRoute(path);
-  if (run !== null) return handleBakeryRunRoute(request, env, run);
-  return new Response("Not found", { status: 404 });
-}
+type ArchiveFixture = Readonly<{
+  organisationId: OrganisationId;
+  sessions: readonly Readonly<{ token: string; csrfToken: string }>[];
+}>;
 
-async function setup(env) {
-  const now = Date.now();
-  await env.DB.prepare(
-    "INSERT INTO organisation (organisation_id, name, created_at) VALUES (?, 'Archive browser acceptance', ?) ON CONFLICT DO NOTHING",
-  )
-    .bind(organisationId, now)
-    .run();
-  required(
-    await ensureInitialOrganisationPlacement({
-      db: env.DB,
-      organisationId,
-      environment: "development",
-      placement,
-      now,
-    }),
+// One Organisation for each runtime: the journey calls the setup once, and a
+// second call returns the same people.
+let fixture: Promise<ArchiveFixture> | undefined;
+
+export default {
+  queue(batch: MessageBatch<unknown>, env: Env): Promise<void> {
+    return gateway.queue(batch, env);
+  },
+  async fetch(
+    request: Request,
+    env: Env,
+    context: ExecutionContext,
+  ): Promise<Response> {
+    const url = new URL(request.url);
+    if (url.pathname === "/test/health")
+      return new Response(null, { status: 204 });
+    if (url.pathname === "/fixture/setup") {
+      fixture ??= setup(env);
+      return Response.json(await fixture);
+    }
+    return gateway.fetch(request, env, context);
+  },
+};
+
+/**
+ * The owner publishes the archive. The administrator, a second person with
+ * a session of their own, reads it back.
+ */
+async function setup(env: Env): Promise<ArchiveFixture> {
+  const { organisationId, owner, other } = await admittedOrganisation(
+    env,
+    "Archive browser acceptance",
   );
   const sessions = [];
-  for (const subject of ["archive-owner", "archive-reviewer"]) {
-    const user = await upsertUser({
+  for (const user of [owner, other]) {
+    const issued = await issueControlSession({
       db: env.DB,
-      identity: {
-        issuer: "https://acceptance.invalid",
-        subject,
-        email: `${subject}@example.test`,
-        displayName: subject,
-        emailVerified: true,
-      },
-      now,
+      userId: user.userId,
+      now: Date.now(),
+      ttlMs: 3_600_000,
     });
-    await env.DB.batch([
-      env.DB.prepare(
-        "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, ?) ON CONFLICT DO NOTHING",
-      ).bind(organisationId, subject, subject),
-      env.DB.prepare(
-        "INSERT INTO organisation_membership (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, ?, 'owner', 'active', ?, NULL) ON CONFLICT DO NOTHING",
-      ).bind(organisationId, user.userId, subject, now),
-    ]);
-    sessions.push(
-      await issueControlSession({
-        db: env.DB,
-        userId: user.userId,
-        now,
-        ttlMs: 3_600_000,
-      }),
-    );
+    sessions.push({ token: issued.token, csrfToken: issued.csrfToken });
   }
-  return Response.json({ organisationId, sessions });
-}
-
-function required(result) {
-  if (!result.ok) throw new Error(JSON.stringify(result.error));
-  return result.value;
+  return { organisationId, sessions };
 }

@@ -2328,14 +2328,22 @@
       "owner": "Plan 70C",
       "run": {
         "tool": "browser",
-        "url": "/workflow-preview.html"
+        "url": "/workflow-preview.html",
+        "server": {
+          "args": [
+            "scripts/production-simulation/serve-archive-acceptance.mjs",
+            "{out}/archive-runtime",
+            "{base}"
+          ],
+          "ready": "http://127.0.0.1:8840/test/health"
+        }
       },
       "status": "fails",
       "failure": {
         "reason": "Its fixture server serve-archive-acceptance.mjs does not build: archive-browser-worker.mjs imports ensureInitialOrganisationPlacement, which 76bc930c7 (Refactor 12 part 2) removed.",
         "proof": "esbuild error at a30c096a8 (run on 2026-11-17)"
       },
-      "notes": "Needs node scripts/production-simulation/serve-archive-acceptance.mjs DIR <Portal origin> on port 8840."
+      "notes": "Needs PANTRY_ACCOUNT_WORKER_ARTIFACT, the built shared account Worker. The runner starts serve-archive-acceptance.mjs on port 8840."
     },
     {
       "id": "live-appliance-move-browser",
@@ -2563,14 +2571,22 @@
       "owner": "Plan 70C",
       "run": {
         "tool": "browser",
-        "url": "/workflow-preview.html"
+        "url": "/workflow-preview.html",
+        "server": {
+          "args": [
+            "scripts/production-simulation/serve-archive-acceptance.mjs",
+            "{out}/archive-runtime",
+            "{base}"
+          ],
+          "ready": "http://127.0.0.1:8840/test/health"
+        }
       },
       "status": "fails",
       "failure": {
         "reason": "Its fixture server serve-archive-acceptance.mjs does not build: archive-browser-worker.mjs imports ensureInitialOrganisationPlacement, which 76bc930c7 (Refactor 12 part 2) removed.",
         "proof": "esbuild error at a30c096a8 (run on 2026-11-17)"
       },
-      "notes": "Needs node scripts/production-simulation/serve-archive-acceptance.mjs DIR <Portal origin> on port 8840."
+      "notes": "Needs PANTRY_ACCOUNT_WORKER_ARTIFACT, the built shared account Worker. The runner starts serve-archive-acceptance.mjs on port 8840."
     },
     {
       "id": "siphon-browser",

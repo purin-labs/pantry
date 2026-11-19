@@ -6,12 +6,68 @@
 // as a second local Worker with its own database, and binds it to the fixture
 // Worker as `ACCOUNT_PLATFORM`. The account Worker has no public address.
 import { unstable_startWorker } from "../../services/platform/node_modules/wrangler/wrangler-dist/cli.js";
+import { execFileSync } from "node:child_process";
 import { createHash, generateKeyPairSync } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, openSync, closeSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+
+/**
+ * Prepares the empty local state `persistence` of the fixture Worker of
+ * `config`: the one-database schema in its D1 database, and the two fixture
+ * secrets of its secrets store. Wrangler writes its output to `log`. The
+ * Python runners of Plans 42J, 74 and 81 do the same before they start the
+ * provider process.
+ */
+export function prepareFixtureState({ config, persistence, log }) {
+  const schema = join(persistence, "schema.sql");
+  execFileSync("node", [
+    join(root, "services/platform/scripts/single-database-schema.mjs"),
+    schema,
+  ]);
+  const fd = openSync(log, "w");
+  const wrangler = (args) =>
+    execFileSync(
+      "pnpm",
+      ["--filter", "@seams/platform", "exec", "wrangler", ...args],
+      { cwd: root, stdio: ["ignore", fd, fd] },
+    );
+  try {
+    wrangler([
+      "d1",
+      "execute",
+      "DB",
+      "--config",
+      config,
+      "--local",
+      "--persist-to",
+      persistence,
+      "--file",
+      schema,
+    ]);
+    for (const name of ["checkpoint-root", "vault-root"])
+      wrangler([
+        "secrets-store",
+        "secret",
+        "create",
+        "browser-fixture",
+        "--config",
+        config,
+        "--persist-to",
+        persistence,
+        "--name",
+        name,
+        "--scopes",
+        "workers",
+        "--value",
+        "ERERERERERERERERERERERERERERERERERERERERERE=",
+      ]);
+  } finally {
+    closeSync(fd);
+  }
+}
 
 // The Platform source imports two workspace packages that a build makes. A
 // fresh clone or worktree has neither; Wrangler then writes its bundle error
