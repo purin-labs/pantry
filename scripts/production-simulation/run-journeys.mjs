@@ -80,12 +80,7 @@ const JOURNEY_FILE =
 const TIERS = ["fast", "slow", "browser"];
 const BACKENDS = ["native", "wasm", "both", "browser", "none"];
 const TOOLS = ["node", "tsx", "python", "browser"];
-const STATUSES = [
-  "passes",
-  "fails",
-  "repaired on branch ci-browser",
-  "not run",
-];
+const STATUSES = ["passes", "fails", "not run"];
 
 const { values } = parseArgs({
   options: {

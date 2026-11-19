@@ -1274,10 +1274,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "The 'Departing page draft' field does not become visible in 30 s. The journey's path to it is out of date.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1290,10 +1290,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "Its page.waitForFunction check reads `receipts` of an undefined value: the page state that it reads has another shape now.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1325,10 +1325,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "The 'Inputs' button is on the page but cannot take a click (tabindex -1) for 30 s. The journey's path to it is out of date.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1341,10 +1341,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "A page.waitForFunction check does not become true in 15 s.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1357,10 +1357,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads output/playwright/ur5e-ingredients-workflow-verified/completed.json, which no journey in the index writes.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1373,10 +1373,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads loading-request.json from its own output folder, which no step of the journey writes.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1389,10 +1389,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "The 'Inputs' button is on the page but cannot take a click (tabindex -1) for 8 s. The journey's path to it is out of date.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1405,10 +1405,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "The file has no 'async function verify…(page)' entry, so browser-acceptance.mjs cannot run it.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1421,10 +1421,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads output/playwright/plan42f-tray-layout-drag/applied.json, which no journey in the index writes.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1437,10 +1437,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "The 'Tray E' fieldset of the production panel shows no details element in 30 s. The journey's path to it is out of date.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1453,10 +1453,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "The open select shows no 'FR10 arm' option in 30 s. The journey's path to it is out of date.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1541,10 +1541,10 @@
         "url": "/workflow-preview.html",
         "prerequisites": ["output/playwright/plan42d-blocked-recording.json"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "Its prerequisite output/playwright/plan42d-blocked-recording.json is missing; no journey in the index writes it.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1557,10 +1557,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "The floor plan image 'Assumed room: 11 by 7 metres' does not become visible in 30 s. The journey's path to it is out of date.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1573,10 +1573,11 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
-      "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+      "status": "passes",
+      "lastRun": {
+        "seconds": 18.4,
+        "date": "2026-11-19",
+        "commit": "3371386"
       }
     },
     {
@@ -1589,10 +1590,10 @@
         "tool": "browser",
         "url": "/workflow-preview.html"
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads output/bakery-robots/ur5e-ingredients-scheduler-final/before-loading.json, which no journey in the index writes.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1677,10 +1678,10 @@
         "tool": "tsx",
         "args": ["{out:ingredient-editor-browser}"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads the output of ingredient-editor-browser, which fails.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1693,10 +1694,10 @@
         "tool": "tsx",
         "args": ["{out:native-import-browser}"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads the output of native-import-browser, which fails.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1709,10 +1710,10 @@
         "tool": "tsx",
         "args": ["{out:production-browser}"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads the output of production-browser, which fails.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1725,10 +1726,10 @@
         "tool": "tsx",
         "args": ["{out:rehearsal-browser}"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads the output of rehearsal-browser, which fails.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1741,10 +1742,10 @@
         "tool": "tsx",
         "args": ["{out:rehearsal-faults-browser}"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads the output of rehearsal-faults-browser, which fails.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1791,10 +1792,10 @@
         "tool": "tsx",
         "args": ["{out:tray-layout-drag-browser}"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads fallback/applied.json from the output of tray-layout-drag-browser, which that journey does not write now.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -1807,10 +1808,10 @@
         "tool": "tsx",
         "args": ["{out:ur5e-rack-browser}", "{out:ur5e-rack}"]
       },
-      "status": "repaired on branch ci-browser",
+      "status": "fails",
       "failure": {
-        "reason": "The journey clicks a control that the Portal no longer shows (since 7d66d5f84 and 4f14e14dd). Branch ci-browser repairs it; no time on this tree.",
-        "proof": "ci-browser commit 1ef22403a; CI failed at the first journey of the browser step"
+        "reason": "It reads the output of ur5e-rack-browser, which fails.",
+        "proof": "fails at 3371386 (run on 2026-11-19)"
       }
     },
     {
@@ -2254,7 +2255,7 @@
       },
       "status": "fails",
       "failure": {
-        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. The shared prelude simulator-navigation.js replaces such clicks, but this file does not use it.",
         "proof": "fails at a30c096a8 (run on 2026-11-17)"
       }
     },
@@ -2302,7 +2303,7 @@
       },
       "status": "fails",
       "failure": {
-        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. The shared prelude simulator-navigation.js replaces such clicks, but this file does not use it.",
         "proof": "fails at a30c096a8 (run on 2026-11-17)"
       }
     },
@@ -2318,7 +2319,7 @@
       },
       "status": "fails",
       "failure": {
-        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. The shared prelude simulator-navigation.js replaces such clicks, but this file does not use it.",
         "proof": "fails at a30c096a8 (run on 2026-11-17)"
       }
     },
@@ -2377,7 +2378,7 @@
       },
       "status": "fails",
       "failure": {
-        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. Branch ci-browser replaces such clicks with simulator-navigation.js, but it does not change this file.",
+        "reason": "It clicks the 'Individual recipes and logistics examples' card, which 4f14e14dd removed. The shared prelude simulator-navigation.js replaces such clicks, but this file does not use it.",
         "proof": "fails at a30c096a8 (run on 2026-11-17)"
       }
     },
