@@ -7,8 +7,22 @@
 // Worker as `ACCOUNT_PLATFORM`. The account Worker has no public address.
 import { unstable_startWorker } from "../../services/platform/node_modules/wrangler/wrangler-dist/cli.js";
 import { createHash, generateKeyPairSync } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+
+// The Platform source imports two workspace packages that a build makes. A
+// fresh clone or worktree has neither; Wrangler then writes its bundle error
+// to the provider log and waits, and the journey stops at its readiness wait.
+const BUILT_PACKAGES = [
+  ["packages/async-control/dist/deadline.js", "pnpm async-control:build"],
+  [
+    "packages/contracts/media-wasm-pkg/media_inspect.js",
+    "pnpm --filter @seams/contracts media:build",
+  ],
+];
 
 export function text(value) {
   return { type: "plain_text", value };
@@ -136,6 +150,13 @@ export async function startFixtureWorker({
   bindings = {},
   respond,
 }) {
+  const unbuilt = BUILT_PACKAGES.filter(
+    ([path]) => !existsSync(join(root, path)),
+  );
+  if (unbuilt.length > 0)
+    throw new Error(
+      `The fixture Worker needs the built workspace packages. Run ${unbuilt.map(([, command]) => command).join(", then ")}.`,
+    );
   const worker = await unstable_startWorker({
     config,
     build: { nodejsCompatMode: "v2" },
