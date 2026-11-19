@@ -64,7 +64,6 @@ import {
   supportsHumanCellTransfer,
 } from "@seams/production-simulation/recipes/bakery/human-cell-transfer";
 import { downloadBakeryFile } from "./file-download";
-import type { FinancierResult } from "@seams/production-simulation/runs/financier-results";
 import {
   FactoryComparison,
   type FactoryResult,
@@ -349,7 +348,6 @@ type MenuSnapshot = Readonly<{
 
 type RehearsalAuthoring = Readonly<{
   comparisons: readonly FactoryResult[];
-  financierResults: readonly FinancierResult[];
   rackCase: "nominal" | "slip";
   preset: RehearsalPreset;
   oven: OvenRunSource | null;
@@ -384,7 +382,6 @@ export class ProductionWorkspace extends React.Component<
 > {
   state: RehearsalAuthoring = {
     comparisons: [],
-    financierResults: [],
     rackCase: "nominal",
     preset: "two-trays",
     oven: null,
@@ -2735,19 +2732,6 @@ export class ProductionWorkspace extends React.Component<
   private clearComparisons(): void {
     this.setState({ comparisons: [] });
   }
-  private keepFinancierResult(result: FinancierResult): void {
-    const results: FinancierResult[] = [];
-    for (const previous of this.state.financierResults)
-      if (previous.identity !== result.identity) results.push(previous);
-    results.push(result);
-    this.setState({ financierResults: results });
-  }
-  private replaceFinancierResults(results: readonly FinancierResult[]): void {
-    this.setState({ financierResults: results });
-  }
-  private clearFinancierResults(): void {
-    this.setState({ financierResults: [] });
-  }
   private recipeWorkspaceFor = {
     connection: null as SimulatorConnection | null,
     value: null as RecipeWorkspace | null,
@@ -2857,10 +2841,6 @@ export class ProductionWorkspace extends React.Component<
           comparisons={this.state.comparisons}
           captureComparison={this.captureComparison.bind(this)}
           clearComparisons={this.clearComparisons.bind(this)}
-          financierResults={this.state.financierResults}
-          keepFinancierResult={this.keepFinancierResult.bind(this)}
-          replaceFinancierResults={this.replaceFinancierResults.bind(this)}
-          clearFinancierResults={this.clearFinancierResults.bind(this)}
           connection={this.props.connection}
           saveStatus={this.props.persistentSaveStatus}
           saveChanged={this.props.saveChanged}

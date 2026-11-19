@@ -108,17 +108,7 @@ import {
 } from "./recipe-workflow";
 import "./oven-workspace.css";
 import { ProductionOverview } from "./production-overview";
-import { FinancierComparison } from "./financier-comparison";
-import {
-  financierInput,
-  financierResult,
-  type FinancierResult,
-} from "@seams/production-simulation/runs/financier-results";
-import {
-  BatchList,
-  StationDetails,
-  WaitExplanationView,
-} from "./wait-explanation-view";
+import { StationDetails, WaitExplanationView } from "./wait-explanation-view";
 import {
   factoryStationsForScenario,
   financierStation,
@@ -158,10 +148,6 @@ type Props = Readonly<{
   comparisons: readonly FactoryResult[];
   captureComparison(result: FactoryResult): void;
   clearComparisons(): void;
-  financierResults: readonly FinancierResult[];
-  keepFinancierResult(result: FinancierResult): void;
-  replaceFinancierResults(results: readonly FinancierResult[]): void;
-  clearFinancierResults(): void;
   connection: SimulatorConnection;
   saveStatus: WorkspaceRunSaveStatus;
   saveChanged: WorkspaceRunSaveChanged;
@@ -1947,11 +1933,6 @@ export class OvenWorkspace extends React.Component<Props, State> {
       !live || view === undefined || worker === null
         ? null
         : factoryResult(scenario, worker.manifest.bundle.id, view);
-    const financier =
-      !live || view === undefined || worker === null
-        ? null
-        : financierResult(scenario, worker.manifest.bundle.id, view);
-    const financierRoute = financierInput(scenario) !== null;
     const stations = factoryStationsForScenario(scenario);
     const usesFactoryFloorSplit =
       stations !== null ||
@@ -2248,15 +2229,6 @@ export class OvenWorkspace extends React.Component<Props, State> {
             )}
           </div>
           <div hidden={panel !== "results"}>
-            {financierRoute && (
-              <FinancierComparison
-                results={this.props.financierResults}
-                current={financier}
-                keep={this.props.keepFinancierResult}
-                replace={this.props.replaceFinancierResults}
-                clear={this.props.clearFinancierResults}
-              />
-            )}
             {scenario.id === "plan-70-recurring-cold-cell" && (
               <FactoryComparison
                 results={this.props.comparisons}
@@ -2293,15 +2265,6 @@ export class OvenWorkspace extends React.Component<Props, State> {
           </div>
           {display !== undefined && (
             <div hidden={panel !== "logistics"}>
-              {financierRoute &&
-                display.logistics.kind === "available" &&
-                report !== null && (
-                  <BatchList
-                    view={display.logistics}
-                    orders={report.orders}
-                    select={this.selectTask.bind(this)}
-                  />
-                )}
               <FactoryOverview
                 scenario={scenario}
                 view={display}

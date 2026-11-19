@@ -33,7 +33,6 @@
     "./recipes/bakery/ginger-milk-tea": "./src/recipes/bakery/ginger-milk-tea.ts",
     "./recipes/bakery/shift-report": "./src/recipes/bakery/shift-report.ts",
     "./recipes/bakery/bakery-shift": "./src/recipes/bakery/bakery-shift.ts",
-    "./recipes/bakery/recurring-financier": "./src/recipes/bakery/recurring-financier.ts",
     "./recipes/bakery/mixed-tea": "./src/recipes/bakery/mixed-tea.ts",
     "./recipes/bakery/tea-process": "./src/recipes/bakery/tea-process.ts",
     "./recipes/bakery/ginger-black-tea": "./src/recipes/bakery/ginger-black-tea.ts",

@@ -734,10 +734,6 @@
 .factory-drawer .wait-chain li[data-wait-role="constraint"] {
   font-weight: 600;
 }
-.factory-drawer .financier-comparison td[data-changed="true"] {
-  background: var(--pantry-category-accent-surface);
-  color: var(--pantry-category-accent-text);
-}
 .factory-drawer .oven-physics-scene {
   height: 320px;
 }

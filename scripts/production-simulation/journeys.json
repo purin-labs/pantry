@@ -2100,22 +2100,6 @@
       }
     },
     {
-      "id": "financier-decision-browser",
-      "file": "scripts/production-simulation/verify-financier-decision-browser.js",
-      "tier": "browser",
-      "backend": "browser",
-      "owner": "Plan 70D",
-      "run": {
-        "tool": "browser",
-        "url": "/factory-acceptance.html"
-      },
-      "status": "fails",
-      "failure": {
-        "reason": "The 'Minutes between batches' field of the 'Recurring financier production' form does not become visible in 30 s. The control is still in the Portal source, so the journey's path to it is out of date.",
-        "proof": "fails at a30c096a8 (run twice on 2026-11-17, at load averages near 15 and near 6)"
-      }
-    },
-    {
       "id": "ginger-milk-tea-browser",
       "file": "scripts/production-simulation/verify-ginger-milk-tea-browser.js",
       "tier": "browser",

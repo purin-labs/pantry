@@ -74,23 +74,6 @@ function holderLabel(entry: Custody): string {
   return `${instanceLabel(entry.instance)} · ${entry.role.replace(/^tray-(\d+)\..*$/u, "tray $1")}`;
 }
 
-/** The first waiting task of an instance that waits on more than order. */
-export function frontierTask(view: Logistics, instance: string): string | null {
-  for (const task of view.tasks)
-    if (
-      task.subject.kind === "workflow" &&
-      task.subject.instance === instance &&
-      task.kind === "waiting" &&
-      task.blockers.some(notOrder)
-    )
-      return task.id;
-  return null;
-}
-
-function notOrder(blocker: Blocker): boolean {
-  return blocker.kind !== "prerequisite";
-}
-
 const PRIMARY: readonly Blocker["kind"][] = [
   "destination",
   "carrier",

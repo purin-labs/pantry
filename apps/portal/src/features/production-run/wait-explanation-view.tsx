@@ -2,23 +2,14 @@ import type React from "react";
 import type {
   CompiledScenario,
   LogisticsView,
-  OrderResult,
 } from "@seams/production-simulation";
-import { assertNever } from "@seams/std";
 import {
   carrierNoun,
-  clock,
   financierStation,
-  instanceLabel,
   placeLabel,
   taskLabel,
 } from "./factory-places";
-import {
-  explainWait,
-  frontierTask,
-  storeHolders,
-  type WaitLink,
-} from "./wait-explanation";
+import { explainWait, storeHolders, type WaitLink } from "./wait-explanation";
 import {
   computeFacilityUtilityTelemetry,
   summarizeAisleWalkCongestionTelemetry,
@@ -90,71 +81,6 @@ export function WaitExplanationView(
       <ol className="wait-chain">
         {links.map(linkItem.bind(null, props.select))}
       </ol>
-    </section>
-  );
-}
-
-function batchRow(
-  props: Readonly<{ view: Logistics; select(task: string): void }>,
-  order: OrderResult,
-): React.ReactNode {
-  const waiting =
-    order.kind === "open" ? frontierTask(props.view, order.instance) : null;
-  let state: string;
-  switch (order.kind) {
-    case "completed":
-      state = `Completed at ${clock(order.completedAt)}`;
-      break;
-    case "failed":
-      state = `Failed at ${clock(order.failedAt)}`;
-      break;
-    case "open":
-      state = waiting === null ? "In progress" : "Waiting";
-      break;
-    default:
-      return assertNever(order);
-  }
-  return (
-    <tr key={order.instance} data-batch={order.instance}>
-      <td>
-        {waiting === null ? (
-          instanceLabel(order.instance)
-        ) : (
-          <button onClick={props.select.bind(null, waiting)}>
-            {instanceLabel(order.instance)}
-          </button>
-        )}
-      </td>
-      <td>{clock(order.arrivedAt)}</td>
-      <td>{state}</td>
-      <td>{waiting === null ? "—" : taskLabel(waiting)}</td>
-    </tr>
-  );
-}
-
-/** Select a waiting batch to explain its wait in the Inspector. */
-export function BatchList(
-  props: Readonly<{
-    view: Logistics;
-    orders: readonly OrderResult[];
-    select(task: string): void;
-  }>,
-): React.ReactNode {
-  return (
-    <section aria-label="Batches">
-      <h3>Batches</h3>
-      <p>Select a waiting batch to see what it lacks and why.</p>
-      <table className="oven-workspace-cells">
-        <thead>
-          <tr>
-            <th>Batch</th>
-            <th>Arrived</th>
-            <th>State</th>
-            <th>Waiting step</th>
-          </tr>
-        </thead>
-        <tbody>{props.orders.map(batchRow.bind(null, props))}</tbody>
-      </table>
     </section>
   );
 }

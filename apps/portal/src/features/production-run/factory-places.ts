@@ -1,6 +1,5 @@
 import type { CompiledScenario } from "@seams/production-simulation";
 import type { FactoryStationSource } from "../workflow-simulator/spatial/factory-stations";
-import { financierInput } from "@seams/production-simulation/runs/financier-results";
 import { MORNING_SHIFT_STATIONS } from "./morning-shift-appliances";
 import {
   FINANCIER_FLAVOUR_PRODUCTS,
@@ -356,7 +355,6 @@ export function factoryStationsForScenario(
   scenario: CompiledScenario,
 ): readonly FactoryStationSource[] | null {
   if (scenario.id === "bakery-shift") return MORNING_SHIFT_STATIONS;
-  if (financierInput(scenario) !== null) return FINANCIER_STATIONS;
   if (isPieScenario(scenario)) return PIE_STATIONS;
   return null;
 }
