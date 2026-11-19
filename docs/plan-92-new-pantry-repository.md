@@ -234,13 +234,14 @@ Plan 88 journeys (J4, J7: an old account Worker artifact) and the placement
 move journey, whose fixture relied on the cutover gate; the next commit gives
 that fixture's second Organisation a policy, and the journey passes.
 
-**Apply after the next release** (each patch names its databases):
+**Applied with the release of 19 November 2026** (`satyr-edge` `fd4df928`,
+from `dev` `15c32c9`; each patch names its databases):
 1. `services/platform/scripts/plan-92-product-folder-capability-d1-data-patch.sql`
-   on each regional database, right after the release: the Access read refuses
-   the two old policy rows of the removed capability.
+   on the regional database, right after the release: the Access read refuses
+   the two old policy rows of the removed capability. The two rows are gone.
 2. `services/platform/scripts/plan-92-runtime-cutover-drop-d1-patch.sql` on the
-   global and each regional database. The patched schema equals the new
-   baseline (tested on the old baselines).
+   global and the regional database. The seven cutover columns and their
+   index are gone, and the remote schema check passes.
 
 **Kept, with the reason.**
 - Plan 33B supplier payouts: the owner decided on 18 November 2026 to keep
