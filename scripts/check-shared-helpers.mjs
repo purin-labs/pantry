@@ -26,9 +26,10 @@ const EXEMPT = [
   /^packages\/type-utils\//,
   /^packages\/async-control\//,
 ];
-// Generated and vendored code, built bundles and type declarations.
+// Vendored code, built bundles and type declarations. Generated sources are
+// checked: fix a finding there in its generator.
 const SKIP = [
-  /(^|\/)(bindings|generated|vendor|dist|node_modules)\//,
+  /(^|\/)(bindings|vendor|dist|node_modules)\//,
   /^apps\/portal\/public\//,
   /\.d\.ts$/,
   /\.min\.js$/,
