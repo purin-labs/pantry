@@ -132,7 +132,7 @@ Platform access
 A missing membership or a low role returns `404`, so a person cannot probe
 other Organisations.
 
-Every mutation needs an `Origin` equal to `SATYR_PUBLIC_ORIGIN` and an
+Every mutation needs an `Origin` equal to `PANTRY_PUBLIC_ORIGIN` and an
 `x-satyr-csrf` header that matches the `satyr_control_csrf` cookie. Rename,
 delete, member changes, setup, activate, archive and restore also need an
 `idempotency-key` (8 to 128 characters) and the expected

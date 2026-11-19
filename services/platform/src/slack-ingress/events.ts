@@ -274,7 +274,7 @@ async function resolveSlackCaseIngress(
   receivedAt: number,
 ): Promise<SlackCaseIngressFlow> {
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!installationIdentity.ok) {
@@ -745,7 +745,7 @@ async function showSlackRoutingSetupPrompt(
   requestId: RequestId,
 ): Promise<void> {
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!installationIdentity.ok) return;

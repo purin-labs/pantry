@@ -12,7 +12,7 @@ const artifactDir = join(root, "output/playwright/plan21-browser");
 const daemonDir = join(artifactDir, "daemon");
 const session = `plan21-${process.pid}`;
 const baseUrl = (
-  process.env.SATYR_PORTAL_URL ?? "http://localhost:7700"
+  process.env.PANTRY_PORTAL_URL ?? "http://localhost:7700"
 ).replace(/\/$/u, "");
 const fixturePath = join(root, "scripts/plan21/browser-acceptance-fixture.js");
 const checkPath = join(root, "scripts/plan21/browser-acceptance-check.js");
@@ -94,7 +94,7 @@ async function assertTargetAvailable() {
   } catch (error) {
     throw new Error(
       `target unavailable at ${baseUrl}; start it with ` +
-        "pnpm portal:build && pnpm --filter @seams/platform dev --ip localhost --port 7700 --var SATYR_PUBLIC_ORIGIN:http://localhost:7700",
+        "pnpm portal:build && pnpm --filter @seams/platform dev --ip localhost --port 7700 --var PANTRY_PUBLIC_ORIGIN:http://localhost:7700",
     );
   }
   if (response.status < 200 || response.status >= 400) {

@@ -187,7 +187,7 @@ async function configureCheckoutControlMocks(): Promise<void> {
 }
 
 function checkoutControlEnv(): UnitTestEnv {
-  return platformEnv({ SATYR_PUBLIC_ORIGIN: "https://satyr.example" });
+  return platformEnv({ PANTRY_PUBLIC_ORIGIN: "https://satyr.example" });
 }
 
 function activationRequest(): Request {

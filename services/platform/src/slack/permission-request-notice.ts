@@ -99,7 +99,7 @@ export function permissionRequestPortalUrl(
   const organisation = encodeURIComponent(address.organisationHandle);
   const workspace = encodeURIComponent(address.workspaceHandle);
   const request = encodeURIComponent(requestId);
-  return `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?permissionRequest=${request}`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?permissionRequest=${request}`;
 }
 
 export function permissionRequestNoticeText(

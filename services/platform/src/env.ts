@@ -58,7 +58,7 @@ export interface Env {
   DATA_ENCRYPTION_ROOT: SecretsStoreSecret;
   VAULT_ROOT_V1?: SecretsStoreSecret;
   VAULT_ROOT_V2?: SecretsStoreSecret;
-  SATYR_VAULT_ACTIVE_KEY_VERSION: string;
+  PANTRY_VAULT_ACTIVE_KEY_VERSION: string;
   EVENT_Q: Queue<IngressQueueMessage>;
   CUE_Q: Queue<CueQueueMessage>;
   CODE_MODE_PLATFORM_GOVERNOR_ACTOR: DurableObjectNamespace<CodeModePlatformGovernorActor>;
@@ -89,12 +89,12 @@ export interface Env {
   WORKSPACE_EXECUTOR: DurableObjectNamespace<WorkspaceExecutorContainer>;
   MESSAGE_LINK_FETCH: DurableObjectNamespace<MessageLinkFetchContainer>;
   CUSTOM_CONNECTOR_FETCH: DurableObjectNamespace<CustomConnectorFetchContainer>;
-  SATYR_OAUTH_CALLBACK_ORIGIN?: string;
-  SATYR_PROVIDER_INGRESS_ORIGIN?: string;
-  SATYR_PUBLIC_ORIGIN: string;
-  SATYR_ORGANISATION_PLACEMENT_PROFILE: string;
-  SATYR_DEPLOYMENT_PROFILE?: string;
-  SATYR_FAULT_INJECTION_TOKEN?: string;
+  PANTRY_OAUTH_CALLBACK_ORIGIN?: string;
+  PANTRY_PROVIDER_INGRESS_ORIGIN?: string;
+  PANTRY_PUBLIC_ORIGIN: string;
+  PANTRY_ORGANISATION_PLACEMENT_PROFILE: string;
+  PANTRY_DEPLOYMENT_PROFILE?: string;
+  PANTRY_FAULT_INJECTION_TOKEN?: string;
   /**
    * "on" lets Connectors start warm Case and Session slots (Plan 55F). Every
    * version reads a slot-backed Actor, so the setting turns on in a release
@@ -169,7 +169,7 @@ export interface Env {
    * Unset in production, which runs PACKAGED_PI_MODEL; tests that call
    * OpenRouter set a cheaper model.
    */
-  SATYR_PLATFORM_PI_MODEL?: string;
+  PANTRY_PLATFORM_PI_MODEL?: string;
   UNDERCLERK_BASE_URL?: string;
   UNDERCLERK_SERVICE_TOKEN?: string;
   /**

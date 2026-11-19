@@ -35,7 +35,7 @@ import { parseSupplierPayoutQuery } from "../slack/supplier-payout-command";
  */
 export type SlackIngressEnv = ConnectorSlackIngressBindings & {
   readonly SLACK_SIGNING_SECRET?: string;
-  readonly SATYR_DEPLOYMENT_PROFILE?: string;
+  readonly PANTRY_DEPLOYMENT_PROFILE?: string;
   readonly SLACK_APP_ID?: string;
   /** The platform Worker, which takes what this Worker does not complete. */
   readonly PLATFORM: Pick<Fetcher, "fetch">;
@@ -100,7 +100,7 @@ export async function handleSlackIngress(
 
   const event = fastPathEvent(rawBody);
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (event === null || !installationIdentity.ok)

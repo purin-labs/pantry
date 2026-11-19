@@ -78,7 +78,7 @@ local Worker. It needs the built account Worker and a speech bench with the mode
 results go to `output/shop-voice/journey-results.json`.
 
 ```bash
-SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker> python3 scripts/shop-voice/run-journey.py
+PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker> python3 scripts/shop-voice/run-journey.py
 ```
 
 The Portal journey also drives real Chrome from the microphone input to the chat. Run
@@ -86,5 +86,5 @@ The Portal journey also drives real Chrome from the microphone input to the chat
 `audioWorklet.addModule` forever. The results go to `output/shop-voice/portal-journey-results.json`.
 
 ```bash
-SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker> PLAYWRIGHT_MODULE=<Playwright package folder> python3 scripts/shop-voice/run-portal-journey.py
+PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker> PLAYWRIGHT_MODULE=<Playwright package folder> python3 scripts/shop-voice/run-portal-journey.py
 ```

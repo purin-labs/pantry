@@ -11,7 +11,7 @@ export function requirePublicOrigin(rawOrigin: string): string {
     url.password !== ""
   ) {
     throw new Error(
-      "SATYR_PUBLIC_ORIGIN must be an HTTPS or loopback HTTP origin",
+      "PANTRY_PUBLIC_ORIGIN must be an HTTPS or loopback HTTP origin",
     );
   }
   return url.origin;

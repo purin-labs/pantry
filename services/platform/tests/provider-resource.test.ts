@@ -43,7 +43,7 @@ describe("provider resource discovery", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -323,7 +323,7 @@ async function createResourceFixture(db: SingleDatabase): Promise<{
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Resource Refresh Merchant",

@@ -261,7 +261,7 @@ export async function handleRefreshAccountResources(
       if (!workspaceId.ok)
         return controlError("provider_account_ineligible", 409);
       const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-        deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+        deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
         appId: env.SLACK_APP_ID,
       });
       if (!installationIdentity.ok) {

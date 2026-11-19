@@ -12,10 +12,10 @@ const ACCOUNT_ORIGIN = "https://account.shared-account.invalid";
 const NATIVE_ORIGIN = "https://satyr.shared-account.invalid";
 
 export function accountWorkerArtifact() {
-  const artifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
+  const artifact = process.env.PANTRY_ACCOUNT_WORKER_ARTIFACT;
   if (!artifact)
     throw new Error(
-      "Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.",
+      "Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.",
     );
   return resolve(artifact);
 }

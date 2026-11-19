@@ -132,7 +132,7 @@ function createFixture(): {
     sqlite,
     organisationId,
     keys: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
       VAULT_ROOT_V1: testRoot(29),
     },
   };

@@ -12,6 +12,6 @@ export function googleConfig(env: Env): GoogleOidcConfig | null {
   return {
     clientId: env.GOOGLE_OIDC_CLIENT_ID,
     clientSecret: env.GOOGLE_OIDC_CLIENT_SECRET,
-    redirectUri: `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/v1/control/auth/google/callback`,
+    redirectUri: `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/v1/control/auth/google/callback`,
   };
 }

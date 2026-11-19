@@ -416,7 +416,7 @@ export class ConnectorCaseWorkDrain {
   ): Promise<void> {
     const { env } = this.input;
     const identity = resolveConfiguredSlackInstallationIdentity({
-      deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+      deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
       appId: env.SLACK_APP_ID,
     });
     if (!identity.ok) return;

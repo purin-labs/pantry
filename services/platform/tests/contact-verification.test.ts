@@ -104,7 +104,7 @@ async function fixture() {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Contact verification",
@@ -268,7 +268,7 @@ async function confirmsCaseContextCollectionRelationship(): Promise<void> {
   const sql = sqlStorage(actorFixture.storage);
   const env = platformEnv({
     DB: f.db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
   const actor = new OrganisationDO(
     {
@@ -517,8 +517,8 @@ async function controlsPublication(): Promise<void> {
   const account = await connectRealAccountPlatform(
     {
       DB: f.db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
     } as UnitTestEnv,
     {
       organisationId: f.organisationId,

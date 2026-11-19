@@ -13,12 +13,12 @@ export const STEER_ANSWER_LOST_FAULT_KEY = "fault:steer_answer_lost";
  * The key is used once.
  */
 export async function steerAnswerLost(
-  env: Pick<Env, "SATYR_FAULT_INJECTION_TOKEN">,
+  env: Pick<Env, "PANTRY_FAULT_INJECTION_TOKEN">,
   storage: Pick<DurableObjectStorage, "get" | "delete">,
 ): Promise<boolean> {
   if (
-    typeof env.SATYR_FAULT_INJECTION_TOKEN !== "string" ||
-    env.SATYR_FAULT_INJECTION_TOKEN.length === 0
+    typeof env.PANTRY_FAULT_INJECTION_TOKEN !== "string" ||
+    env.PANTRY_FAULT_INJECTION_TOKEN.length === 0
   )
     return false;
   if ((await storage.get(STEER_ANSWER_LOST_FAULT_KEY)) === undefined)

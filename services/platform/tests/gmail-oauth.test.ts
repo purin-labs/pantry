@@ -360,8 +360,8 @@ function encodeSegment(value: unknown): string {
 function vaultEnv(): UnitTestEnv {
   return platformEnv({
     DB: createMigratedDatabase(),
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: testRoot(7),
     GMAIL_OAUTH_CLIENT_ID: "gmail-client",
     GMAIL_OAUTH_CLIENT_SECRET: "gmail-secret",

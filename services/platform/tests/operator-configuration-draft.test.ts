@@ -681,7 +681,7 @@ function createDatabase(): SingleDatabase {
 function fixtureEnv(db: SingleDatabase) {
   return {
     DB: db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
       databaseBinding: "DB",
       kind: "affinity",
       placementCellId: "test",

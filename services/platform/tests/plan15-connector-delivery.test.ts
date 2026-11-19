@@ -55,7 +55,7 @@ function connectorDeliverySuite(): void {
     "delivers a channel address without a Slack thread timestamp",
     deliversChannelSnapshot,
   );
-  it.skipIf(process.env.SATYR_CAFE_LIVE_SLACK !== "1")(
+  it.skipIf(process.env.PANTRY_CAFE_LIVE_SLACK !== "1")(
     "delivers one live CafeOS receipt after an injected Vault outage",
     deliversLiveCafeReceiptAfterVaultOutage,
   );
@@ -487,8 +487,8 @@ async function connectorActor(
   const env = platformEnv({
     DB: db,
     SLACK_APP_ID: "A_PLAN15",
-    SATYR_DEPLOYMENT_PROFILE: "local",
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_DEPLOYMENT_PROFILE: "local",
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
   const actor = new ConnectorDO(state, env);
   await activateConnectorFixture(actor, env, organisationId, connectorId);
@@ -530,14 +530,14 @@ function liveSlackConfig(): LiveSlackConfig {
   return {
     botToken: requireLiveSlackEnvironment("SLACK_BOT_TOKEN", "xoxb-"),
     workspaceId: requireLiveSlackEnvironment("SLACK_TEAM_ID", "T"),
-    channelId: requireLiveSlackEnvironment("SATYR_SLACK_CHANNEL_ID", "C"),
+    channelId: requireLiveSlackEnvironment("PANTRY_SLACK_CHANNEL_ID", "C"),
   };
 }
 
 function requireLiveSlackEnvironment(name: string, prefix: string): string {
   const value = process.env[name]?.trim() ?? "";
   if (!value.startsWith(prefix) || value.length <= prefix.length) {
-    throw new Error(`SATYR_CAFE_LIVE_SLACK=1 requires ${name}`);
+    throw new Error(`PANTRY_CAFE_LIVE_SLACK=1 requires ${name}`);
   }
   return value;
 }

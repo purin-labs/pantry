@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { removeLocalEnvValues } from "../slack/local-env.mjs";
 import { readWorkerEnvironment } from "../worker-environment.mjs";
 
-const DELETABLE_SECRETS = new Set(["SATYR_FAULT_INJECTION_TOKEN"]);
+const DELETABLE_SECRETS = new Set(["PANTRY_FAULT_INJECTION_TOKEN"]);
 
 async function main() {
   const secretName = process.argv[2]?.trim() ?? "";

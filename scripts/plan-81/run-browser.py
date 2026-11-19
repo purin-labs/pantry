@@ -80,9 +80,9 @@ def main() -> None:
         help="Simulate and accept one robot step in browser MuJoCo first.",
     )
     args = parser.parse_args()
-    if not os.environ.get("SATYR_ACCOUNT_WORKER_ARTIFACT"):
+    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
         raise SystemExit(
-            "Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker."
+            "Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker."
         )
     artifacts = args.artifacts.resolve()
     artifacts.mkdir(parents=True, exist_ok=True)

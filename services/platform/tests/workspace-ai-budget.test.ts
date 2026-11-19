@@ -52,7 +52,7 @@ it("provisions finite defaults and fences changes, recovery and organisation iso
   const scope = await OrganisationExecutionScope.resolve(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
     },
     parsed.value,
   );

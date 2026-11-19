@@ -350,7 +350,7 @@ async function createFixture(
     answers,
     env: platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
         databaseBinding: "DB",
         kind: "affinity",
         placementCellId: "multi-region-preview",

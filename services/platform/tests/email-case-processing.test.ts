@@ -519,7 +519,7 @@ async function turnInput(sql: ReturnType<typeof sqlStorage>) {
   const account = await connectRealAccountPlatform(
     platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     }),
     {
       organisationId: organisationId.value,

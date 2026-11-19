@@ -246,7 +246,7 @@ async function installDraftReviewDestination(db) {
       handle,
       now,
       keys: {
-        SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+        PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
         VAULT_ROOT_V1: { get: trialVaultRoot },
       },
       secret: { kind: "bearer", value: "xoxb-local-draft-fixture" },

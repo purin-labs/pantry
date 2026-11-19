@@ -36,11 +36,11 @@ case "$WANT" in
   __*) echo "This Satyr release has no gateway build for $TARGET." >&2; exit 1 ;;
 esac
 
-SATYR_GATEWAY_HOME="${SATYR_GATEWAY_HOME:-$HOME/.satyr-gateway}"
-export SATYR_GATEWAY_HOME
-mkdir -p "$SATYR_GATEWAY_HOME/bin"
-chmod 700 "$SATYR_GATEWAY_HOME"
-BINARY="$SATYR_GATEWAY_HOME/bin/shop-gateway"
+PANTRY_GATEWAY_HOME="${PANTRY_GATEWAY_HOME:-$HOME/.satyr-gateway}"
+export PANTRY_GATEWAY_HOME
+mkdir -p "$PANTRY_GATEWAY_HOME/bin"
+chmod 700 "$PANTRY_GATEWAY_HOME"
+BINARY="$PANTRY_GATEWAY_HOME/bin/shop-gateway"
 DOWNLOAD="$(mktemp)"
 curl -fsSL -o "$DOWNLOAD" "$URL/shop-gateway/$TARGET/shop-gateway"
 if command -v sha256sum >/dev/null 2>&1; then
@@ -59,7 +59,7 @@ mv "$DOWNLOAD" "$BINARY"
 "$BINARY" enroll --url "$URL" --organisation "$ORGANISATION" --gateway "$GATEWAY" --code "$CODE"
 
 if [ "$SERVICE" = no ]; then
-  echo "Start it with: SATYR_GATEWAY_HOME=$SATYR_GATEWAY_HOME $BINARY run"
+  echo "Start it with: PANTRY_GATEWAY_HOME=$PANTRY_GATEWAY_HOME $BINARY run"
   exit 0
 fi
 
@@ -74,11 +74,11 @@ case "$(uname -s)" in
 <plist version="1.0"><dict>
   <key>Label</key><string>$LABEL</string>
   <key>ProgramArguments</key><array><string>$BINARY</string><string>run</string></array>
-  <key>EnvironmentVariables</key><dict><key>SATYR_GATEWAY_HOME</key><string>$SATYR_GATEWAY_HOME</string></dict>
+  <key>EnvironmentVariables</key><dict><key>PANTRY_GATEWAY_HOME</key><string>$PANTRY_GATEWAY_HOME</string></dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
-  <key>StandardErrorPath</key><string>$SATYR_GATEWAY_HOME/gateway.log</string>
-  <key>StandardOutPath</key><string>$SATYR_GATEWAY_HOME/gateway.log</string>
+  <key>StandardErrorPath</key><string>$PANTRY_GATEWAY_HOME/gateway.log</string>
+  <key>StandardOutPath</key><string>$PANTRY_GATEWAY_HOME/gateway.log</string>
 </dict></plist>
 PLIST
     launchctl bootout "gui/$(id -u)/$LABEL" >/dev/null 2>&1 || true
@@ -91,7 +91,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Environment=SATYR_GATEWAY_HOME=$SATYR_GATEWAY_HOME
+Environment=PANTRY_GATEWAY_HOME=$PANTRY_GATEWAY_HOME
 ExecStart=$BINARY run
 Restart=on-failure
 RestartSec=5

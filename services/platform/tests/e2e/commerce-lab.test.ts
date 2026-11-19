@@ -262,11 +262,11 @@ async function readInventoryCaseExecution() {
 
 async function runLab(args: readonly string[]): Promise<unknown> {
   const options = parseLabOptions(args, {
-    SATYR_WORKER_URL: "https://localhost",
-    SATYR_LAB_ORGANISATION_ID: ORGANISATION_ID,
-    SATYR_COMMERCE_LAB_NAMESPACE: NAMESPACE,
+    PANTRY_WORKER_URL: "https://localhost",
+    PANTRY_LAB_ORGANISATION_ID: ORGANISATION_ID,
+    PANTRY_COMMERCE_LAB_NAMESPACE: NAMESPACE,
     ORGANISATION_ADMIN_TOKEN: env.ORGANISATION_ADMIN_TOKEN,
-    SATYR_COMMERCE_LAB_SIGNING_SECRET: env.COMMERCE_LAB_SIGNING_SECRET,
+    PANTRY_COMMERCE_LAB_SIGNING_SECRET: env.COMMERCE_LAB_SIGNING_SECRET,
   });
   return runCommerceLabWorkflow(options, {
     fetchImplementation: fetchWorker,

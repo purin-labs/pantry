@@ -11,7 +11,7 @@ async (page) => {
   // product has a photo in the shop: the Products panel shows it, and a
   // paired TV shows it on the product's card.
   //
-  // Run: SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
+  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
   //   python3 scripts/plan-74/run-browser.py --journey scripts/plan-40b/browser-board-products.js \
   //   --entry /menus-preview.html --artifacts output/playwright/plan-40b-products
   //

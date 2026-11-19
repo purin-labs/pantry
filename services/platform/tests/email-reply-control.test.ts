@@ -575,7 +575,7 @@ async function createFixture(slug: string): Promise<Fixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: `Email Reply ${slug}`,
@@ -650,7 +650,7 @@ async function createFixture(slug: string): Promise<Fixture> {
     scope: await requireOrganisationExecutionScope(
       platformEnv({
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       }),
       organisation.organisationId,
@@ -689,9 +689,9 @@ async function createFixture(slug: string): Promise<Fixture> {
   const caseActor: FakeCaseActor = { calls: [] };
   const account = await connectRealAccountPlatform(
     platformEnv({
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
       DB: db,
-      SATYR_PUBLIC_ORIGIN: ORIGIN,
+      PANTRY_PUBLIC_ORIGIN: ORIGIN,
       SESSION_TOKEN_SECRET: "test-approval-hmac-secret",
       CONNECTOR: fakeConnectorNamespace(connector),
       CASE: fakeCaseNamespace(caseActor),

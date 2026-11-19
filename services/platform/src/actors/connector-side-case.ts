@@ -511,7 +511,7 @@ async function pinSideCaseThread(
   input: Readonly<{ threadTs: string; caseId: string; now: number }>,
 ): Promise<boolean> {
   const installation = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: context.env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: context.env.PANTRY_DEPLOYMENT_PROFILE,
     appId: context.env.SLACK_APP_ID,
   });
   if (!installation.ok) return false;
@@ -577,7 +577,7 @@ async function threadToken(
   source: SlackCaseCommand,
 ): Promise<string | null> {
   const installation = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: context.env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: context.env.PANTRY_DEPLOYMENT_PROFILE,
     appId: context.env.SLACK_APP_ID,
   });
   const organisationId = parseOrganisationId(source.organisationId);

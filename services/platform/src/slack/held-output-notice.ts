@@ -58,7 +58,7 @@ export function heldOutputPortalUrl(
   const organisation = encodeURIComponent(address.organisationHandle);
   const workspace = encodeURIComponent(address.workspaceHandle);
   const request = encodeURIComponent(requestId);
-  return `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?heldOutput=${request}`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?heldOutput=${request}`;
 }
 
 export function heldOutputNoticeText(reason: HeldOutputReason): string {

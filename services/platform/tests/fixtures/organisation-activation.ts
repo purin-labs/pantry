@@ -62,7 +62,7 @@ export async function createActiveOrganisationFixture(ctx: DurableObjectState, o
   const db = createMigratedDatabase();
   await db.prepare("INSERT INTO organisation (organisation_id, name, plan, created_at, status) VALUES (?, 'Commerce fixture', 'beta', 1, 'active')").bind(organisationId).run();
   await prepareInitialOrganisationPlacementInsert(db, organisationId, "development", TEST_INITIAL_ORGANISATION_PLACEMENT, 1).run();
-  const env = platformEnv({ DB: db, SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE });
+  const env = platformEnv({ DB: db, PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE });
   const actor = new OrganisationDO(ctx, env);
   await activateOrganisationFixture(actor, env, organisationId);
   return actor;

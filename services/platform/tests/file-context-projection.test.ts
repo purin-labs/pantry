@@ -375,7 +375,7 @@ async function createFixture(): Promise<
   const scope = await requireOrganisationExecutionScope(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
     },
     organisationId,
   );

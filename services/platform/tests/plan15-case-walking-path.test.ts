@@ -2087,7 +2087,7 @@ function actorFixture(
   } as unknown as DurableObjectState;
   const env = platformEnv({
     DB: createMigratedDatabase(),
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     EVENT_Q: { send: ignoreQueueMessage },
   });
   const instance = new Constructor(state, env);

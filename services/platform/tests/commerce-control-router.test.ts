@@ -889,14 +889,14 @@ function routeEnv(): UnitTestEnv {
   const database = { prepare: vi.fn().mockReturnValue({ bind }) };
   return platformEnv({
     DB: { ...database, withSession: vi.fn().mockReturnValue(database) },
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
  databaseBinding: "DB",
       kind: "affinity",
       placementCellId: "test",
       locationHint: "wnam",
     }),
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
-    SATYR_DEPLOYMENT_PROFILE: "local",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_DEPLOYMENT_PROFILE: "local",
     SLACK_APP_ID: "A_COMMERCE_CONSOLE",
   });
 }
@@ -929,14 +929,14 @@ function homeProjection() {
 function approvalRouteEnv(): UnitTestEnv {
   return platformEnv({
     ...routeEnv(),
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
   });
 }
 
 function googleCallbackEnv(): UnitTestEnv {
   return platformEnv({
     DB: {},
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
     GOOGLE_OIDC_CLIENT_ID: "google-client-id",
     GOOGLE_OIDC_CLIENT_SECRET: "google-client-secret",
   });

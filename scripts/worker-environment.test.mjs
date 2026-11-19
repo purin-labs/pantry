@@ -34,10 +34,10 @@ test("local startup requires its own secrets file; unavailable targets fail", fu
         ...production,
         vars: {
           ...production.vars,
-          SATYR_OAUTH_CALLBACK_ORIGIN: "http://localhost:8787",
+          PANTRY_OAUTH_CALLBACK_ORIGIN: "http://localhost:8787",
         },
       }),
-      /SATYR_OAUTH_CALLBACK_ORIGIN/u,
+      /PANTRY_OAUTH_CALLBACK_ORIGIN/u,
     );
   } finally {
     rmSync(directory, { recursive: true });

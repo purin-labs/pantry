@@ -73,11 +73,11 @@ export function createSplitTopology(): SplitTopology {
     env: platformEnv({
       DB: global.db,
       ORGANISATION_DB_WNAM: regional.db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
         ...SPLIT_CELL,
         databaseBinding: "ORGANISATION_DB_WNAM",
       }),
-      SATYR_PUBLIC_ORIGIN: SPLIT_PUBLIC_ORIGIN,
+      PANTRY_PUBLIC_ORIGIN: SPLIT_PUBLIC_ORIGIN,
     }),
   };
 }

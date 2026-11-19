@@ -27,7 +27,7 @@ export async function authorizeOrganisationSocket(
     return { ok: false, response: controlError("websocket_required", 426) };
   if (
     request.headers.get("Origin") !==
-    requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)
+    requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)
   )
     return { ok: false, response: controlError("origin_invalid", 403) };
   return authorizeOrganisationRequest(

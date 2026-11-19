@@ -51,7 +51,7 @@ describe("Schedule dispatch", () => {
     const beforeNextWindow = await runScheduleDispatch({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       queue,
@@ -64,7 +64,7 @@ describe("Schedule dispatch", () => {
     const first = await runScheduleDispatch({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       queue,
@@ -82,7 +82,7 @@ describe("Schedule dispatch", () => {
     const again = await runScheduleDispatch({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       queue,
@@ -101,7 +101,7 @@ describe("Schedule dispatch", () => {
       await runScheduleDispatch({
         env: {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         queue,
@@ -132,7 +132,7 @@ describe("Schedule dispatch", () => {
     await runScheduleDispatch({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       queue,
@@ -166,7 +166,7 @@ describe("Schedule dispatch", () => {
       await runScheduleDispatch({
         env: {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         queue,
@@ -181,7 +181,7 @@ describe("Schedule dispatch", () => {
       await runScheduleDispatch({
         env: {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         queue,

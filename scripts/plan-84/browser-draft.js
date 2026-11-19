@@ -5,7 +5,7 @@ async (page) => {
   // outcome here. The Worker journey `tests/e2e/bakery-workflow-draft.test.ts` also
   // covers lost access and a refused apply.
   //
-  // Run: SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
+  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
   //   python3 scripts/plan-74/run-browser.py --journey scripts/plan-84/browser-draft.js \
   //   --entry /workflow-draft-preview.html --artifacts output/acceptance/plan-84/j3-browser
   const WORKER = "http://127.0.0.1:8874";

@@ -90,7 +90,7 @@ describe("actor restore", function actorRestoreSuite() {
     const manifest = await prepareActorRestoreManifest({
       env: {
         DB: origin.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
           databaseBinding: "DB",
           kind: "affinity",
           placementCellId: "archive-target",
@@ -245,7 +245,7 @@ describe("actor restore", function actorRestoreSuite() {
 
 type RestoreBindings = Pick<
   UnitTestEnv,
-  | "SATYR_ORGANISATION_PLACEMENT_PROFILE"
+  | "PANTRY_ORGANISATION_PLACEMENT_PROFILE"
   | "DB"
   | "ARCHIVE"
   | "DATA_ENCRYPTION_ROOT"
@@ -369,7 +369,7 @@ function targetFixture(input: {
     namespace,
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
         databaseBinding: "DB",
         kind: "affinity",
         placementCellId: "multi-region-preview",

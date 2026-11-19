@@ -234,8 +234,8 @@ function routeEnv(): Readonly<{
     value: platformEnv({
       DB: db,
       POLICY_KV: {},
-      SATYR_PUBLIC_ORIGIN: "https://satyr.example",
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+      PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
         databaseBinding: "DB",
         kind: "affinity",
         placementCellId: "grant-route",

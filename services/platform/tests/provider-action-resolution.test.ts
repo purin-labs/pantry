@@ -280,7 +280,7 @@ type ProviderActionFixture = {
   readonly connection: ConnectedIntegration;
   readonly handle: VaultHandle;
   readonly keys: {
-    readonly SATYR_VAULT_ACTIVE_KEY_VERSION: "v1";
+    readonly PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1";
     readonly VAULT_ROOT_V1: SecretsStoreSecret;
   };
 };
@@ -309,7 +309,7 @@ async function createFixture(): Promise<ProviderActionFixture> {
     "vault:organisation:stripe:acct_action_resolution:oauth:g1",
   );
   const keys = {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" as const,
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1" as const,
     VAULT_ROOT_V1: testRoot(7),
   };
   const stored = await storeVaultSecret({
@@ -446,7 +446,7 @@ async function createOrganisation(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName,

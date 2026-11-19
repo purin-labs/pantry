@@ -54,7 +54,7 @@ let database: DatabaseSync;
 
 function env(): UnitTestEnv {
   return platformEnv({
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
     DB: db,
   });
 }

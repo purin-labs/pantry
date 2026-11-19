@@ -76,7 +76,7 @@ async function failsClosedWithoutStoringRoot(): Promise<void> {
   const resolved = await resolveVaultHandle({
     db: fixture.db,
     keys: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v2",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v2",
       VAULT_ROOT_V2: testRoot(22),
     },
     organisationId: fixture.organisationId,
@@ -98,7 +98,7 @@ async function neverFallsBackToAnotherRoot(): Promise<void> {
   const resolved = await resolveVaultHandle({
     db: fixture.db,
     keys: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v2",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v2",
       VAULT_ROOT_V2: testRoot(22),
     },
     organisationId: fixture.organisationId,
@@ -120,7 +120,7 @@ async function failsClosedWithoutActiveRoot(): Promise<void> {
 
   const resolved = await resolveVaultHandle({
     db: fixture.db,
-    keys: { SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" },
+    keys: { PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1" },
     organisationId: fixture.organisationId,
     handle: fixture.handle,
   });
@@ -139,7 +139,7 @@ async function failsClosedOnRootMaterialMismatch(): Promise<void> {
   const resolved = await resolveVaultHandle({
     db: fixture.db,
     keys: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
       VAULT_ROOT_V1: testRoot(99),
     },
     organisationId: fixture.organisationId,
@@ -168,7 +168,7 @@ async function seedSecretUnderV1(): Promise<RestoreFixture> {
   const organisationId = requireOrganisationId(ORGANISATION);
   const handle = requireVaultHandle(HANDLE);
   const storingKeys: CredentialVaultBindings = {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: testRoot(11),
   };
 

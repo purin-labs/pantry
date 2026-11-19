@@ -24,9 +24,9 @@ Every deployed environment needs these origins:
 
 | Binding                         | Purpose                                                                |
 | ------------------------------- | ---------------------------------------------------------------------- |
-| `SATYR_PUBLIC_ORIGIN`           | Browser-facing Portal and control-session origin                       |
-| `SATYR_OAUTH_CALLBACK_ORIGIN`   | Provider OAuth callbacks; set explicitly in every deployed environment |
-| `SATYR_PROVIDER_INGRESS_ORIGIN` | Optional webhook origin; defaults to `SATYR_OAUTH_CALLBACK_ORIGIN`     |
+| `PANTRY_PUBLIC_ORIGIN`           | Browser-facing Portal and control-session origin                       |
+| `PANTRY_OAUTH_CALLBACK_ORIGIN`   | Provider OAuth callbacks; set explicitly in every deployed environment |
+| `PANTRY_PROVIDER_INGRESS_ORIGIN` | Optional webhook origin; defaults to `PANTRY_OAUTH_CALLBACK_ORIGIN`     |
 
 The callback and ingress origins must use HTTPS and route `/v1/*`, `/hook/*`,
 and `/slack/*` to the same Platform Worker environment. A callback must match
@@ -53,7 +53,7 @@ Slack's standalone installation path also uses:
 https://example.com/slack/install
 ```
 
-Webhook endpoints use `SATYR_PROVIDER_INGRESS_ORIGIN`:
+Webhook endpoints use `PANTRY_PROVIDER_INGRESS_ORIGIN`:
 
 | Provider | Endpoint                        | Registration owner                     |
 | -------- | ------------------------------- | -------------------------------------- |
@@ -126,7 +126,7 @@ Provider configuration:
 1. Register the Dropbox callback URI.
 2. Enable `account_info.read`, `files.metadata.read`, and
    `files.content.read`.
-3. Register `${SATYR_PROVIDER_INGRESS_ORIGIN}/hook/dropbox` as the app webhook.
+3. Register `${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/dropbox` as the app webhook.
    Dropbox signs notifications with the app secret; the endpoint also answers
    Dropbox's verification challenge.
 4. Apply for production status before opening the integration to arbitrary
@@ -180,7 +180,7 @@ Pub/Sub configuration:
 2. Grant `roles/pubsub.publisher` on that topic to
    `gmail-api-push@system.gserviceaccount.com`.
 3. Create an authenticated push subscription to
-   `${SATYR_PROVIDER_INGRESS_ORIGIN}/hook/email/google`.
+   `${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/email/google`.
 4. Configure its OIDC service account and audience. Copy those exact values to
    `GMAIL_PUBSUB_SERVICE_ACCOUNT` and `GMAIL_PUBSUB_AUDIENCE`.
 
@@ -216,7 +216,7 @@ Google Cloud configuration:
 2. Configure an External OAuth consent screen with production branding,
    support links, and verified domains.
 3. Create a Web application OAuth client, register the Google Drive callback,
-   and add `SATYR_PUBLIC_ORIGIN` as an authorized JavaScript origin.
+   and add `PANTRY_PUBLIC_ORIGIN` as an authorized JavaScript origin.
 4. Declare only `https://www.googleapis.com/auth/drive.file`.
 5. Create a browser API key. Restrict it to the Portal origin and to the Drive
    and Picker APIs needed by the file picker.
@@ -275,7 +275,7 @@ Satyr bindings:
 
 App configuration:
 
-1. Set the app URL to `${SATYR_PUBLIC_ORIGIN}/portal` and register the Shopify
+1. Set the app URL to `${PANTRY_PUBLIC_ORIGIN}/portal` and register the Shopify
    callback URI.
 2. Enable the standalone authorization-code flow, named the legacy install
    flow in the Shopify dashboard.
@@ -320,7 +320,7 @@ Slack app configuration:
    `channels:read`, `files:read`, `groups:history`, `groups:read`, and
    `im:history`.
 3. Enable Event Subscriptions with request URL
-   `${SATYR_PROVIDER_INGRESS_ORIGIN}/slack/events`.
+   `${PANTRY_PROVIDER_INGRESS_ORIGIN}/slack/events`.
 4. Subscribe to bot events `app_mention`, `message.channels`,
    `message.groups`, and `message.im`.
 5. Keep Socket Mode disabled; Satyr receives signed HTTPS events.
@@ -361,7 +361,7 @@ Stripe configuration:
 2. Use a sandbox client ID with a test secret key, or a live client ID with a
    live secret key. Satyr rejects mixed modes.
 3. Create a webhook event destination for **Connected accounts** at
-   `${SATYR_PROVIDER_INGRESS_ORIGIN}/hook/stripe/connect`.
+   `${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/stripe/connect`.
 4. Subscribe it to `charge.failed`, `invoice.payment_failed`, `refund.failed`,
    and `customer.subscription.deleted`.
 5. Store the resulting endpoint ID and signing secret in the Worker bindings.
@@ -398,7 +398,7 @@ Meta configuration:
 4. Configure Embedded Signup to return customer business tokens with a finite
    lifetime and the requested WABA scopes.
 5. Configure the WhatsApp webhook callback as
-   `${SATYR_PROVIDER_INGRESS_ORIGIN}/hook/whatsapp`, use the exact
+   `${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/whatsapp`, use the exact
    `WHATSAPP_VERIFY_TOKEN`, and subscribe the `messages` field.
 6. Complete App Review and Advanced Access for the requested permissions.
 7. Confirm the production Tech Provider, customer funding, business
@@ -426,7 +426,7 @@ OAuth client, consent screen, or provider webhook.
 
 Google sign-in for Portal authentication is also separate from integrations.
 It uses `GOOGLE_OIDC_CLIENT_ID`, `GOOGLE_OIDC_CLIENT_SECRET`, and
-`${SATYR_PUBLIC_ORIGIN}/v1/control/auth/google/callback`. Never reuse that
+`${PANTRY_PUBLIC_ORIGIN}/v1/control/auth/google/callback`. Never reuse that
 Google project for Gmail or Drive scopes.
 
 ## Deployment and verification sequence

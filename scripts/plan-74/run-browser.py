@@ -75,9 +75,9 @@ def main() -> None:
     parser.add_argument("--entry", default="/chat-preview.html")
     parser.add_argument("--setup-path", default="/test/setup")
     args = parser.parse_args()
-    if not os.environ.get("SATYR_ACCOUNT_WORKER_ARTIFACT"):
+    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
         raise SystemExit(
-            "Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker."
+            "Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker."
         )
     artifacts = args.artifacts.resolve()
     artifacts.mkdir(parents=True, exist_ok=True)

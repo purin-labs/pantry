@@ -77,8 +77,8 @@ export function whatsappTestEnvBindings(
 ): Record<string, unknown> {
   return {
     DB: db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: testRootSecret(),
     WHATSAPP_APP_ID: "1000000000000001",
     WHATSAPP_APP_SECRET: "fixture-app-secret-not-a-real-credential",
@@ -118,7 +118,7 @@ export async function createWhatsAppWorld(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "WhatsApp Development Organisation",
@@ -146,7 +146,7 @@ export async function createWhatsAppWorld(
   const storedCredential = await storeVaultSecret({
     db,
     keys: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
       VAULT_ROOT_V1: testRootSecret(),
     },
     organisationId,
@@ -230,7 +230,7 @@ export async function createWhatsAppWorld(
     scope: await requireOrganisationExecutionScope(
       {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       organisationId,

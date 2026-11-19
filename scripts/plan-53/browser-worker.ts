@@ -54,7 +54,7 @@ export default {
     }
     response.headers.set(
       "access-control-allow-origin",
-      env.SATYR_PUBLIC_ORIGIN ?? "http://127.0.0.1:3115",
+      env.PANTRY_PUBLIC_ORIGIN ?? "http://127.0.0.1:3115",
     );
     response.headers.set("access-control-allow-credentials", "true");
     response.headers.set(

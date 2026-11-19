@@ -279,7 +279,7 @@ async function createFixture(slug: string): Promise<Fixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: `Gmail path ${slug}`,
@@ -380,8 +380,8 @@ async function createFixture(slug: string): Promise<Fixture> {
   ): UnitTestEnv {
     const base: Record<string, unknown> = {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
       GMAIL_PUBSUB_AUDIENCE: AUDIENCE,
       GMAIL_PUBSUB_SERVICE_ACCOUNT: SERVICE_ACCOUNT,
       EVENT_Q: {

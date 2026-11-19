@@ -36,7 +36,7 @@
   "env": {
     "local": {
       "name": "satyr-chatgpt-exit-local",
-      "vars": { "SATYR_DEPLOYMENT_PROFILE": "local" },
+      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "local" },
       "containers": [
         {
           "class_name": "ChatGptExitContainer",
@@ -59,7 +59,7 @@
     },
     "staging": {
       "name": "satyr-chatgpt-exit-staging",
-      "vars": { "SATYR_DEPLOYMENT_PROFILE": "staging" },
+      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "staging" },
       "containers": [
         {
           "class_name": "ChatGptExitContainer",
@@ -82,7 +82,7 @@
     },
     "production": {
       "name": "satyr-chatgpt-exit",
-      "vars": { "SATYR_DEPLOYMENT_PROFILE": "production" },
+      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "production" },
       "containers": [
         {
           "class_name": "ChatGptExitContainer",

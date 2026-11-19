@@ -3,7 +3,7 @@
   "main": "browser-worker.ts",
   "compatibility_date": "2026-07-07",
   "compatibility_flags": ["nodejs_compat"],
-  "vars": { "SATYR_PUBLIC_ORIGIN": "http://127.0.0.1:3115" },
+  "vars": { "PANTRY_PUBLIC_ORIGIN": "http://127.0.0.1:3115" },
   "d1_databases": [
     {
       "binding": "DB",

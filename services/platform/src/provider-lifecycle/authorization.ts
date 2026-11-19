@@ -259,27 +259,27 @@ export function providerCallbackUri(
 
 type ProviderPublicOriginEnv = Pick<
   Env,
-  "SATYR_OAUTH_CALLBACK_ORIGIN" | "SATYR_PUBLIC_ORIGIN"
+  "PANTRY_OAUTH_CALLBACK_ORIGIN" | "PANTRY_PUBLIC_ORIGIN"
 >;
 
 type ProviderIngressOriginEnv = Pick<
   Env,
-  | "SATYR_OAUTH_CALLBACK_ORIGIN"
-  | "SATYR_PROVIDER_INGRESS_ORIGIN"
-  | "SATYR_PUBLIC_ORIGIN"
+  | "PANTRY_OAUTH_CALLBACK_ORIGIN"
+  | "PANTRY_PROVIDER_INGRESS_ORIGIN"
+  | "PANTRY_PUBLIC_ORIGIN"
 >;
 
 function providerPublicOrigin(env: ProviderPublicOriginEnv): string {
   return requirePublicOrigin(
-    env.SATYR_OAUTH_CALLBACK_ORIGIN ?? env.SATYR_PUBLIC_ORIGIN,
+    env.PANTRY_OAUTH_CALLBACK_ORIGIN ?? env.PANTRY_PUBLIC_ORIGIN,
   );
 }
 
 export function providerIngressOrigin(env: ProviderIngressOriginEnv): string {
   return requirePublicOrigin(
-    env.SATYR_PROVIDER_INGRESS_ORIGIN ??
-      env.SATYR_OAUTH_CALLBACK_ORIGIN ??
-      env.SATYR_PUBLIC_ORIGIN,
+    env.PANTRY_PROVIDER_INGRESS_ORIGIN ??
+      env.PANTRY_OAUTH_CALLBACK_ORIGIN ??
+      env.PANTRY_PUBLIC_ORIGIN,
   );
 }
 

@@ -8,7 +8,7 @@ import { requireOrganisationExecutionScope } from "./organisation-execution-fixt
 // Existing Case state-machine tests isolate authorization. Native Case journeys
 // exercise real origin, membership, placement and Actor recovery boundaries.
 export async function admitCaseMutationFixture(
-  _env: Pick<UnitTestEnv, "DB" | "SATYR_ORGANISATION_PLACEMENT_PROFILE">,
+  _env: Pick<UnitTestEnv, "DB" | "PANTRY_ORGANISATION_PLACEMENT_PROFILE">,
   storage: Pick<DurableObjectStorage, "sql">,
 ): Promise<ActorRecoveryAdmission> {
   const meta = storage.sql
@@ -21,7 +21,7 @@ export async function admitCaseMutationFixture(
   const scope = await requireOrganisationExecutionScope(
     {
       DB: createAgentOperationsDatabase(organisationId),
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
  databaseBinding: "DB",
         kind: "affinity",
         placementCellId: "test",

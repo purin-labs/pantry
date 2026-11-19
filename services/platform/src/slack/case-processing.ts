@@ -258,11 +258,11 @@ function slackOperatorMayConfigure(role: string): boolean {
 
 /** Where the operator can see the same setup in the Portal. */
 function portalAgentsUrl(env: Env, organisationId: string): string {
-  return `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/portal/satyr/${encodeURIComponent(organisationId)}/agents`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/satyr/${encodeURIComponent(organisationId)}/agents`;
 }
 
 function portalCustomConnectorUrl(env: Env, organisationId: string): string {
-  return `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/portal/satyr/${encodeURIComponent(organisationId)}/chat`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/satyr/${encodeURIComponent(organisationId)}/chat`;
 }
 
 function portalEmailReviewUrl(
@@ -276,7 +276,7 @@ function portalEmailReviewUrl(
   const organisation = encodeURIComponent(address.organisationHandle);
   const workspace = encodeURIComponent(address.workspaceHandle);
   const proposal = encodeURIComponent(proposalId);
-  return `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/integrations#email-review-${proposal}`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/integrations#email-review-${proposal}`;
 }
 
 export function customConnectorSetupHandoff(input: {
@@ -1066,7 +1066,7 @@ async function ingestCaseAttachments(
     return { kind: "ready", value: [] };
   }
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!installationIdentity.ok) {

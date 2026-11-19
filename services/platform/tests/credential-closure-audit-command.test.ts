@@ -373,7 +373,7 @@ class FakeRuntime {
       execute: this.execute.bind(this),
       fetch: this.fetch.bind(this),
       environment: {
-        SATYR_WORKER_URL: this.options.origin ?? LOCAL_ORIGIN,
+        PANTRY_WORKER_URL: this.options.origin ?? LOCAL_ORIGIN,
         ORGANISATION_ADMIN_TOKEN: this.options.token ?? ADMIN_TOKEN,
       },
     };

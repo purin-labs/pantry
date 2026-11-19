@@ -46,7 +46,7 @@ export function organisationDatabase(
  */
 export function fixtureDatabase(placementCellId = "e2e"): OrganisationDatabase {
   const cells = parseOrganisationPlacementCells(
-    env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   if (!cells.ok) throw new Error(cells.error.path);
   const cell = cells.value.find(

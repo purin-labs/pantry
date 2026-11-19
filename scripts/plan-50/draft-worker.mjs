@@ -187,10 +187,10 @@ async function editAsPerson(env, personUserId) {
   });
   const path = `/v1/control/organisations/${organisationId}/commerce/products/${productId}/description-draft/socket`;
   const response = await handleProductDescriptionDraftRoute(
-    new Request(new URL(path, env.SATYR_PUBLIC_ORIGIN), {
+    new Request(new URL(path, env.PANTRY_PUBLIC_ORIGIN), {
       headers: {
         Upgrade: "websocket",
-        Origin: env.SATYR_PUBLIC_ORIGIN,
+        Origin: env.PANTRY_PUBLIC_ORIGIN,
         Cookie: `satyr_control_session=${encodeURIComponent(token)}`,
       },
     }),

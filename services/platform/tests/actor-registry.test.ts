@@ -249,7 +249,7 @@ describe("actor registry", function actorRegistrySuite() {
     const resolved = await resolveActiveSessionActor({
       env: {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       namespace: namespace as unknown as DurableObjectNamespace<SessionDO>,
@@ -307,7 +307,7 @@ describe("actor registry", function actorRegistrySuite() {
     const resolved = await resolveActiveCaseSessionActorsAtPlacement({
       env: {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       caseNamespace: namespace as unknown as DurableObjectNamespace<CaseDO>,
@@ -327,7 +327,7 @@ describe("actor registry", function actorRegistrySuite() {
       publishActorRegistryActivation({
         env: {
           DB: fixture.db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         publication: resolved.value.registryActivation,
@@ -358,7 +358,7 @@ describe("actor registry", function actorRegistrySuite() {
     const retry = await resolveActiveCaseSessionActorsAtPlacement({
       env: {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       caseNamespace: namespace as unknown as DurableObjectNamespace<CaseDO>,

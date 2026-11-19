@@ -31,8 +31,8 @@ process mail.
 Two URLs are registered with Google and must match byte for byte:
 
 ```text
-${SATYR_OAUTH_CALLBACK_ORIGIN}/v1/control/providers/gmail/callback
-${SATYR_OAUTH_CALLBACK_ORIGIN}/hook/email/google
+${PANTRY_OAUTH_CALLBACK_ORIGIN}/v1/control/providers/gmail/callback
+${PANTRY_OAUTH_CALLBACK_ORIGIN}/hook/email/google
 ```
 
 Gmail runs in its own Google Cloud project, `satyr-gmail-dev`, separate from

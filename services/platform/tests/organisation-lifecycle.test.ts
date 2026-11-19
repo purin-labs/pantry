@@ -82,7 +82,7 @@ describe("organisation onboarding lifecycle", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisationId.value,
@@ -146,7 +146,7 @@ describe("organisation onboarding lifecycle", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -166,7 +166,7 @@ describe("organisation onboarding lifecycle", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -237,7 +237,7 @@ describe("organisation onboarding lifecycle", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -308,7 +308,7 @@ describe("organisation onboarding lifecycle", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -323,7 +323,7 @@ describe("organisation onboarding lifecycle", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -352,7 +352,7 @@ describe("organisation onboarding lifecycle", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -379,7 +379,7 @@ describe("organisation onboarding lifecycle", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,

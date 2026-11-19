@@ -264,13 +264,13 @@ def stop(process: subprocess.Popen) -> None:
 
 
 def main() -> None:
-    if not os.environ.get("SATYR_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit("Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
+    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
+        raise SystemExit("Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="shop-voice-journey-")).resolve()
     voice_home = work / "home"
     label = f"sh.seams.satyr.shop-voice.journey-{uuid.uuid4().hex[:8]}"
-    env = {**os.environ, "SATYR_VOICE_HOME": str(voice_home), "SATYR_VOICE_LABEL": label}
+    env = {**os.environ, "PANTRY_VOICE_HOME": str(voice_home), "PANTRY_VOICE_LABEL": label}
     python = voice_home / "venv/bin/python"
     domain_job = f"gui/{os.getuid()}/{label}"
     plist = Path.home() / "Library/LaunchAgents" / f"{label}.plist"

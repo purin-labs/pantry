@@ -1610,7 +1610,7 @@ async function resolveSlackToken(
   input: ConnectorCaseTurnStreamInput,
 ): Promise<Result<string, ConnectorCaseTurnStreamError>> {
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!installationIdentity.ok) {

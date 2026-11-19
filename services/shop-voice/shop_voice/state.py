@@ -27,7 +27,7 @@ _UNUSED_SINCE = ".unused-since"
 
 def home() -> Path:
     # certbot splits its hook command at each space, so this path must have none.
-    return Path(os.environ.get("SATYR_VOICE_HOME", Path.home() / ".satyr-voice"))
+    return Path(os.environ.get("PANTRY_VOICE_HOME", Path.home() / ".satyr-voice"))
 
 
 @dataclass(frozen=True)

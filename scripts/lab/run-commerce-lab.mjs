@@ -42,11 +42,11 @@ export function parseLabOptions(args, environment) {
   const normalizedArgs = args.filter(isArgument);
   const command = normalizedArgs[0];
   let scenarioId = command === "scenario" ? normalizedArgs[1] : null;
-  let baseUrl = environment.SATYR_WORKER_URL ?? null;
-  let organisationId = environment.SATYR_LAB_ORGANISATION_ID ?? null;
-  let namespace = environment.SATYR_COMMERCE_LAB_NAMESPACE ?? null;
+  let baseUrl = environment.PANTRY_WORKER_URL ?? null;
+  let organisationId = environment.PANTRY_LAB_ORGANISATION_ID ?? null;
+  let namespace = environment.PANTRY_COMMERCE_LAB_NAMESPACE ?? null;
   let token = environment.ORGANISATION_ADMIN_TOKEN ?? null;
-  const signingSecret = environment.SATYR_COMMERCE_LAB_SIGNING_SECRET ?? null;
+  const signingSecret = environment.PANTRY_COMMERCE_LAB_SIGNING_SECRET ?? null;
   let outputPath = null;
   let idempotencyKey = null;
   let remoteAcknowledged = false;
@@ -101,7 +101,7 @@ export function parseLabOptions(args, environment) {
     !isLabNamespace(namespace)
   ) {
     throw new Error(
-      "SATYR_COMMERCE_LAB_NAMESPACE must start with lab_ and contain 8-128 characters",
+      "PANTRY_COMMERCE_LAB_NAMESPACE must start with lab_ and contain 8-128 characters",
     );
   }
 
@@ -131,7 +131,7 @@ export async function runCommerceLabWorkflow(options, dependencies) {
   if (options.command !== "scenario") return created;
   if (!nonEmptyString(options.signingSecret)) {
     throw new Error(
-      "SATYR_COMMERCE_LAB_SIGNING_SECRET is required for scenario delivery",
+      "PANTRY_COMMERCE_LAB_SIGNING_SECRET is required for scenario delivery",
     );
   }
   const run = parseCreatedScenario(created);
@@ -196,11 +196,11 @@ function validateCommand(command, scenarioId) {
 
 function validateConnection(baseUrl, organisationId, token) {
   if (!isHttpUrl(baseUrl)) {
-    throw new Error("SATYR_WORKER_URL must be an http(s) URL");
+    throw new Error("PANTRY_WORKER_URL must be an http(s) URL");
   }
 
   if (!nonEmptyString(organisationId)) {
-    throw new Error("SATYR_LAB_ORGANISATION_ID is required");
+    throw new Error("PANTRY_LAB_ORGANISATION_ID is required");
   }
 
   if (!nonEmptyString(token)) {

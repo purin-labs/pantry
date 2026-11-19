@@ -76,7 +76,7 @@ describe("provider connection attempts", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -134,7 +134,7 @@ describe("provider connection attempts", () => {
         scope: await requireOrganisationExecutionScope(
           {
             DB: db,
-            SATYR_ORGANISATION_PLACEMENT_PROFILE:
+            PANTRY_ORGANISATION_PLACEMENT_PROFILE:
               TEST_ORGANISATION_PLACEMENT_PROFILE,
           },
           organisation.organisationId,
@@ -153,7 +153,7 @@ describe("provider connection attempts", () => {
       scope: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -175,7 +175,7 @@ describe("provider connection attempts", () => {
       scope: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -194,7 +194,7 @@ describe("provider connection attempts", () => {
         scope: await requireOrganisationExecutionScope(
           {
             DB: db,
-            SATYR_ORGANISATION_PLACEMENT_PROFILE:
+            PANTRY_ORGANISATION_PLACEMENT_PROFILE:
               TEST_ORGANISATION_PLACEMENT_PROFILE,
           },
           organisation.organisationId,
@@ -250,7 +250,7 @@ describe("provider connection attempts", () => {
         scope: await requireOrganisationExecutionScope(
           {
             DB: db,
-            SATYR_ORGANISATION_PLACEMENT_PROFILE:
+            PANTRY_ORGANISATION_PLACEMENT_PROFILE:
               TEST_ORGANISATION_PLACEMENT_PROFILE,
           },
           organisation.organisationId,
@@ -315,7 +315,7 @@ async function resumeAuthorizationTest(): Promise<void> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Provider Resume Merchant",
@@ -405,9 +405,9 @@ async function resumeAuthorizationTest(): Promise<void> {
     NOW + 4,
   );
   const env: ProviderOAuthStartEnv = {
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: db,
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example.test",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example.test",
     SLACK_CLIENT_ID: "slack-client-id",
     SLACK_CLIENT_SECRET: "slack-client-secret",
   };
@@ -458,11 +458,11 @@ async function resumeAuthorizationTest(): Promise<void> {
   const airtableAuthorizationUrl = new URL(
     await providerAuthorizationUrlForMutation({
       env: {
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
         DB: db,
-        SATYR_OAUTH_CALLBACK_ORIGIN: "https://oauth.satyr.example.test",
-        SATYR_PUBLIC_ORIGIN: "https://satyr.example.test",
+        PANTRY_OAUTH_CALLBACK_ORIGIN: "https://oauth.satyr.example.test",
+        PANTRY_PUBLIC_ORIGIN: "https://satyr.example.test",
         AIRTABLE_OAUTH_CLIENT_ID: "airtable-client-id",
         AIRTABLE_OAUTH_CLIENT_SECRET: "airtable-client-secret",
       },
@@ -558,7 +558,7 @@ async function resumeAuthorizationTest(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       organisation.organisationId,
@@ -574,7 +574,7 @@ async function resumeAuthorizationTest(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       organisation.organisationId,

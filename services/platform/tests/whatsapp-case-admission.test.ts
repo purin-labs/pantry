@@ -59,13 +59,13 @@ async function filesCaseInDefaultProject(): Promise<void> {
   const environment = platformEnv({
     DB: db,
     ARCHIVE: {},
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
   const admission = {
     scope: await requireOrganisationExecutionScope(
       {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       identity.value,

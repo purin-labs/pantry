@@ -26,7 +26,7 @@ export default {
   fetch: handleRequest,
 } satisfies ExportedHandler<VaultOnePasswordEnv>;
 
-type VaultOnePasswordEnv = { readonly SATYR_DEPLOYMENT_PROFILE: string };
+type VaultOnePasswordEnv = { readonly PANTRY_DEPLOYMENT_PROFILE: string };
 
 Reflect.set(globalThis, "__opSdkWasm", sdkCore);
 

@@ -47,7 +47,7 @@ def _run_certbot(config: Config) -> bool:
                "--manual-auth-hook", _hook("put"), "--manual-cleanup-hook", _hook("delete"), "-d", config.hostname]
     if config.certificate_command is not None:
         command = [*config.certificate_command, sys.executable, config.hostname, str(certificate_dir())]
-    result = subprocess.run(command, capture_output=True, text=True, env={**os.environ, "SATYR_VOICE_HOME": str(home())})
+    result = subprocess.run(command, capture_output=True, text=True, env={**os.environ, "PANTRY_VOICE_HOME": str(home())})
     if result.returncode != 0:
         print(f"Certificate: certbot exited with {result.returncode}. See {home() / 'certbot-logs'}.", flush=True)
     return result.returncode == 0

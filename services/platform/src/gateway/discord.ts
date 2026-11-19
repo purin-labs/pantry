@@ -161,7 +161,7 @@ export async function handleConfigureDiscordInteraction(
     status: "active",
     installedAt,
   });
-  const endpointUrl = `${env.SATYR_PUBLIC_ORIGIN.replace(/\/$/u, "")}/hook/discord/${organisationId.value}`;
+  const endpointUrl = `${env.PANTRY_PUBLIC_ORIGIN.replace(/\/$/u, "")}/hook/discord/${organisationId.value}`;
 
   traceLog("discord.interaction_configured", {
     requestId,

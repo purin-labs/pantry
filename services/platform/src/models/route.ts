@@ -312,7 +312,7 @@ function chatModelOptionHasId(
 }
 
 export function resolvePantryPlatformModelRoute(
-  env: Pick<Env, "OPENROUTER_API_KEY" | "SATYR_PLATFORM_PI_MODEL">,
+  env: Pick<Env, "OPENROUTER_API_KEY" | "PANTRY_PLATFORM_PI_MODEL">,
 ): Result<PantryPlatformModelRoute, PantryPlatformModelRouteError> {
   const key = env.OPENROUTER_API_KEY?.trim() ?? "";
   if (key.length === 0) {
@@ -321,7 +321,7 @@ export function resolvePantryPlatformModelRoute(
       error: { code: "satyr_platform_credential_unavailable" },
     };
   }
-  const model = env.SATYR_PLATFORM_PI_MODEL?.trim() || PACKAGED_PI_MODEL;
+  const model = env.PANTRY_PLATFORM_PI_MODEL?.trim() || PACKAGED_PI_MODEL;
   if (!isPlatformPiModel(model)) {
     return { ok: false, error: { code: "satyr_platform_model_unsupported" } };
   }

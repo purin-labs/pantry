@@ -143,7 +143,7 @@ export async function accountFixtureRequest(
 ): Promise<Response> {
   if (!env.ACCOUNT_PLATFORM_FIXTURE || !env.TEST_ACCOUNT_PLATFORM_BASE_URL) {
     throw new Error(
-      "Build the real account Worker and set SATYR_ACCOUNT_WORKER_ARTIFACT before this journey.",
+      "Build the real account Worker and set PANTRY_ACCOUNT_WORKER_ARTIFACT before this journey.",
     );
   }
   return env.ACCOUNT_PLATFORM_FIXTURE.fetch(

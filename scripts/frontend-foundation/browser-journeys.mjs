@@ -9,10 +9,10 @@ import process from "node:process";
 
 const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
 const storefrontUrl = (
-  process.env.SATYR_STOREFRONT_URL ?? "http://cafe.localhost:3001"
+  process.env.PANTRY_STOREFRONT_URL ?? "http://cafe.localhost:3001"
 ).replace(/\/$/u, "");
 const portalUrl = (
-  process.env.SATYR_PORTAL_URL ?? "http://127.0.0.1:3103"
+  process.env.PANTRY_PORTAL_URL ?? "http://127.0.0.1:3103"
 ).replace(/\/$/u, "");
 const artifactDir = join(root, "output/playwright/frontend-foundation");
 const daemonDir = join(artifactDir, "daemon");

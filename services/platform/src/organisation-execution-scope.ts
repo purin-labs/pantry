@@ -28,7 +28,7 @@ import type { Result } from "./result";
 export type OrganisationPlacementBindings = Pick<
   Env,
   | "DB"
-  | "SATYR_ORGANISATION_PLACEMENT_PROFILE"
+  | "PANTRY_ORGANISATION_PLACEMENT_PROFILE"
   | "ORGANISATION_DB_WNAM"
   | "ORGANISATION_DB_APAC"
   | "ORGANISATION_DB_EU"
@@ -326,7 +326,7 @@ export function selectOrganisationPlacementDatabase(
   placement: OrganisationPlacement,
 ): Result<OrganisationDatabase, OrganisationExecutionScopeError> {
   const configured = parseOrganisationPlacementCells(
-    env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   if (!configured.ok) return configured;
   for (const cell of configured.value) {
@@ -353,7 +353,7 @@ export function configuredOrganisationDatabases(
   env: OrganisationPlacementBindings,
 ): readonly OrganisationDatabase[] {
   const configured = parseOrganisationPlacementCells(
-    env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   if (!configured.ok) throw new Error(configured.error.code);
   const databases = new Set<OrganisationDatabase>();

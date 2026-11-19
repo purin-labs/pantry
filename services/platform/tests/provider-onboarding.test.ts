@@ -31,8 +31,8 @@ import { platformEnv } from "./worker-fakes";
 const NOW = 1_784_390_000_000;
 const SCOPE_ORIGIN = "https://satyr.example.test";
 const SCOPE_ENV = {
-  SATYR_PUBLIC_ORIGIN: SCOPE_ORIGIN,
-  SATYR_DEPLOYMENT_PROFILE: "local",
+  PANTRY_PUBLIC_ORIGIN: SCOPE_ORIGIN,
+  PANTRY_DEPLOYMENT_PROFILE: "local",
   SHOPIFY_CLIENT_ID: "shopify-client-id",
   SHOPIFY_CLIENT_SECRET: "shopify-client-secret",
   SLACK_APP_ID: "A0SCOPE0001",
@@ -289,7 +289,7 @@ async function connectionFailure(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Scope Merchant",
@@ -347,7 +347,7 @@ async function connectionFailure(
   const env = platformEnv({
     ...SCOPE_ENV,
     DB: db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
   const completed = await completeProviderOAuth({
     env,

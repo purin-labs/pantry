@@ -411,7 +411,7 @@ export async function proposalFixtureAuthority(
   const scope = await requireOrganisationExecutionScope(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
         databaseBinding: "DB",
         kind: "affinity",
         placementCellId: "test",

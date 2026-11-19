@@ -481,9 +481,9 @@ function routeEnv(
     };
   });
   return platformEnv({
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: { prepare, withSession: vi.fn().mockReturnThis() },
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
   });
 }
 

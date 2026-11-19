@@ -76,7 +76,7 @@ async function dispatchParserTest(): Promise<void> {
   if (!placement.ok) throw new Error(placement.error.code);
   const env = platformEnv({
     DB: db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
   const { connector } = setup(env);
   await activateConnectorFixture(

@@ -62,7 +62,7 @@ function offeredCells(
   request: Request,
 ): Result<OfferedCells, OrganisationHomeRegionError> {
   const configured = parseOrganisationPlacementCells(
-    env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   const root = configured.ok ? configured.value[0] : undefined;
   if (!configured.ok || root === undefined) {

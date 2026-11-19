@@ -47,11 +47,11 @@ async function receiptRelocationJourney({ task }: TestContext) {
     ttlMs: 600_000,
   });
   const request = new Request(
-    `${env.SATYR_PUBLIC_ORIGIN}/control/organisations/${ORGANISATION_ID}/receipt`,
+    `${env.PANTRY_PUBLIC_ORIGIN}/control/organisations/${ORGANISATION_ID}/receipt`,
     {
       method: "POST",
       headers: {
-        origin: env.SATYR_PUBLIC_ORIGIN,
+        origin: env.PANTRY_PUBLIC_ORIGIN,
         cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
         "x-satyr-csrf": session.csrfToken,
       },

@@ -73,7 +73,7 @@ export async function deliverWhatsAppOperatorNotice(
   const workspaceId = parseWorkspaceId(destination.workspaceId);
   const channelId = parseChannelId(destination.channelId);
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: input.env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: input.env.PANTRY_DEPLOYMENT_PROFILE,
     appId: input.env.SLACK_APP_ID,
   });
   if (!workspaceId.ok || !channelId.ok || !installationIdentity.ok) {

@@ -13,7 +13,7 @@ import platform from "../../src/integration-gateway";
 export class CommerceNetwork extends WorkerEntrypoint<Env> {
   override fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    if (url.origin !== this.env.SATYR_PUBLIC_ORIGIN) return fetch(request);
+    if (url.origin !== this.env.PANTRY_PUBLIC_ORIGIN) return fetch(request);
     const eventId = request.headers.get("x-underclerk-event-id");
     if (eventId !== null) commerceWebhookPosts.push(eventId);
     return platform.fetch(request, this.env, this.ctx);

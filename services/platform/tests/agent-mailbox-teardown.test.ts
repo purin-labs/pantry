@@ -105,7 +105,7 @@ async function createFixture(slug: string): Promise<Fixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: `Teardown ${slug}`,
@@ -176,7 +176,7 @@ async function createFixture(slug: string): Promise<Fixture> {
   return {
     env: platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
       CONNECTOR: namespace,
     }),
     organisationId: organisation.organisationId,

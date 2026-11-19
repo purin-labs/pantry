@@ -24,11 +24,26 @@ const reportArg = args.indexOf("--report");
 const REPORT_PATH = reportArg >= 0 ? args[reportArg + 1] : null;
 const SELF = "scripts/rename/plan-91-pantry.mjs";
 
-/** Paths that keep their text and their names: plans, evidence and recorded data. */
+/** Paths that keep their "atelier" text and their names: plans, evidence and recorded data. */
 const EXCLUDED_PATHS = [
   /^docs\//,
   /^assets\//,
   /^output\//,
+  /^crates\/bakery-native\//,
+  /(^|\/)evidence\//,
+  /(^|\/)migrations[^/]*\//,
+  /\.sql$/,
+  /(^|\/)pnpm-lock\.yaml$/,
+  /(^|\/)Cargo\.lock$/,
+  new RegExp(`^${SELF.replace(/[.]/g, "\\.")}$`),
+];
+
+/** Paths excluded even from the SATYR_* -> PANTRY_* environment variable pass. */
+const ENV_EXCLUDED_PATHS = [
+  /^docs\/(?:plan-|refactor-|equipment\/)/,
+  /^assets\//,
+  /^output\//,
+  /^crates\/bakery-native\//,
   /(^|\/)evidence\//,
   /(^|\/)migrations[^/]*\//,
   /\.sql$/,
@@ -69,19 +84,68 @@ const WORDS = [
   ["atelier", "pantry"],
 ];
 
+/**
+ * Environment variables and Wrangler `vars` renamed from SATYR_* to PANTRY_*.
+ * The 10 SATYR_* Console pairing keys in scripts/init-local-commerce-env.mjs
+ * stay until seams-monorepo renames its Console Worker environment variables.
+ */
+const ENV_VAR_RENAMES = [
+  ["SATYR_ACCOUNT_WORKER_ARTIFACT", "PANTRY_ACCOUNT_WORKER_ARTIFACT"],
+  ["SATYR_CAFE_LIVE_SLACK", "PANTRY_CAFE_LIVE_SLACK"],
+  ["SATYR_CAFE_MERCHANT_ID", "PANTRY_CAFE_MERCHANT_ID"],
+  ["SATYR_CAFE_ORGANISATION_ID", "PANTRY_CAFE_ORGANISATION_ID"],
+  ["SATYR_CAFE_RECEIPT_EVIDENCE", "PANTRY_CAFE_RECEIPT_EVIDENCE"],
+  ["SATYR_CAFE_SLACK_CHANNEL_ID", "PANTRY_CAFE_SLACK_CHANNEL_ID"],
+  ["SATYR_CAFE_STOREFRONT_ID", "PANTRY_CAFE_STOREFRONT_ID"],
+  ["SATYR_CAFE_STRIPE_TEST_ACCESS_TOKEN", "PANTRY_CAFE_STRIPE_TEST_ACCESS_TOKEN"],
+  ["SATYR_CAFE_STRIPE_TEST_ACCOUNT_ID", "PANTRY_CAFE_STRIPE_TEST_ACCOUNT_ID"],
+  ["SATYR_CAFE_STRIPE_TEST_PUBLISHABLE_KEY", "PANTRY_CAFE_STRIPE_TEST_PUBLISHABLE_KEY"],
+  ["SATYR_COMMERCE_LAB_NAMESPACE", "PANTRY_COMMERCE_LAB_NAMESPACE"],
+  ["SATYR_COMMERCE_LAB_SIGNING_SECRET", "PANTRY_COMMERCE_LAB_SIGNING_SECRET"],
+  ["SATYR_DEPLOYMENT_PROFILE", "PANTRY_DEPLOYMENT_PROFILE"],
+  ["SATYR_FAULT_INJECTION_TOKEN", "PANTRY_FAULT_INJECTION_TOKEN"],
+  ["SATYR_GATEWAY_HOME", "PANTRY_GATEWAY_HOME"],
+  ["SATYR_LAB_ORGANISATION_ID", "PANTRY_LAB_ORGANISATION_ID"],
+  ["SATYR_OAUTH_CALLBACK_ORIGIN", "PANTRY_OAUTH_CALLBACK_ORIGIN"],
+  [
+    "SATYR_ORGANISATION_PLACEMENT_PROFILE",
+    "PANTRY_ORGANISATION_PLACEMENT_PROFILE",
+  ],
+  ["SATYR_PI_ACCEPTANCE_API_KEY", "PANTRY_PI_ACCEPTANCE_API_KEY"],
+  ["SATYR_PLATFORM_MODEL", "PANTRY_PLATFORM_MODEL"],
+  ["SATYR_PLATFORM_PI_MODEL", "PANTRY_PLATFORM_PI_MODEL"],
+  ["SATYR_PORTAL_URL", "PANTRY_PORTAL_URL"],
+  ["SATYR_PROVIDER_INGRESS_ORIGIN", "PANTRY_PROVIDER_INGRESS_ORIGIN"],
+  ["SATYR_PUBLIC_ORIGIN", "PANTRY_PUBLIC_ORIGIN"],
+  ["SATYR_SLACK_CHANNEL_ID", "PANTRY_SLACK_CHANNEL_ID"],
+  ["SATYR_STOREFRONT_URL", "PANTRY_STOREFRONT_URL"],
+  ["SATYR_THREAD_KEY", "PANTRY_THREAD_KEY"],
+  ["SATYR_VAULT_ACTIVE_KEY_VERSION", "PANTRY_VAULT_ACTIVE_KEY_VERSION"],
+  ["SATYR_VOICE_HOME", "PANTRY_VOICE_HOME"],
+  ["SATYR_VOICE_LABEL", "PANTRY_VOICE_LABEL"],
+  ["SATYR_WORKER_URL", "PANTRY_WORKER_URL"],
+];
+
 const isExcluded = (file) => EXCLUDED_PATHS.some((pattern) => pattern.test(file));
+const isEnvExcluded = (file) =>
+  ENV_EXCLUDED_PATHS.some((pattern) => pattern.test(file));
 const isBinary = (file) => /\.(png|jpe?g|gif|webp|ico|glb|gltf|bin|data|wasm|onnx|pdf|zip|gz|mp3|mp4|wav|woff2?|ttf|otf|mjb|stl|obj|npz|npy)$/i.test(file);
 
-function renameText(text) {
+function renameText(text, envOnly = false) {
   const masks = [];
   let masked = text;
-  for (const pattern of PROTECTED_TEXT) {
-    masked = masked.replace(pattern, (match) => {
-      masks.push(match);
-      return `\u0000${masks.length - 1}\u0000`;
-    });
+  if (!envOnly) {
+    for (const pattern of PROTECTED_TEXT) {
+      masked = masked.replace(pattern, (match) => {
+        masks.push(match);
+        return `\u0000${masks.length - 1}\u0000`;
+      });
+    }
+    for (const [from, to] of WORDS) masked = masked.replaceAll(from, to);
   }
-  for (const [from, to] of WORDS) masked = masked.replaceAll(from, to);
+  for (const [from, to] of ENV_VAR_RENAMES) {
+    masked = masked.replace(new RegExp(`\\b${from}\\b`, "g"), to);
+  }
   return masked.replace(/\u0000(\d+)\u0000/g, (_, index) => masks[Number(index)]);
 }
 
@@ -93,13 +157,20 @@ const tracked = execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" })
 const changes = [];
 const moves = [];
 for (const file of tracked) {
-  if (isExcluded(file)) continue;
-  const next = renameText(file);
-  if (next !== file) moves.push([file, next]);
+  if (isEnvExcluded(file)) continue;
+  const envOnly = isExcluded(file);
+  if (!envOnly) {
+    const next = renameText(file);
+    if (next !== file) moves.push([file, next]);
+  }
   if (isBinary(file)) continue;
   const text = fs.readFileSync(file, "utf8");
-  if (text.includes("\u0000") || !/atelier/i.test(text)) continue;
-  const rewritten = renameText(text);
+  if (
+    text.includes("\u0000") ||
+    ((envOnly || !/atelier/i.test(text)) && !text.includes("SATYR_"))
+  )
+    continue;
+  const rewritten = renameText(text, envOnly);
   if (rewritten === text) continue;
   const before = text.split("\n");
   const after = rewritten.split("\n");

@@ -143,8 +143,8 @@ function routeEnv(): UnitTestEnv {
   const all = vi.fn().mockResolvedValue({ results: [] });
   const bind = vi.fn().mockReturnValue({ first, all, run: vi.fn() });
   return platformEnv({
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: { prepare: vi.fn().mockReturnValue({ bind }), withSession: vi.fn().mockReturnThis() },
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
   });
 }

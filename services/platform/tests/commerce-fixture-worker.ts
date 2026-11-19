@@ -84,7 +84,7 @@ export async function startCommerceWorker(options: CommerceWorkerOptions = {}): 
       UNDERCLERK_MERCHANT: { className: "CommerceFixtureMerchantDO", useSQLite: true },
     },
     bindings: {
-      SATYR_DEPLOYMENT_PROFILE: "local",
+      PANTRY_DEPLOYMENT_PROFILE: "local",
       UNDERCLERK_SERVICE_TOKEN: serviceToken,
       UNDERCLERK_BUYER_SESSION_SECRET: "underclerk-fixture-buyer-session-secret-0001",
       UNDERCLERK_SIGNING_KEY_ID: signingKey.keyId,

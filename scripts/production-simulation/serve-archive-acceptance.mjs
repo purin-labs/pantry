@@ -37,8 +37,8 @@ const runtime = new Miniflare({
   r2Persist: join(output, "r2"),
   serviceBindings: { ASSETS: asset },
   bindings: {
-    SATYR_PUBLIC_ORIGIN: browserOrigin,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+    PANTRY_PUBLIC_ORIGIN: browserOrigin,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
       kind: "affinity",
       placementCellId: "archive-browser",
       locationHint: "wnam",

@@ -101,7 +101,7 @@ fn required(args: &[String], name: &str) -> Result<String, String> {
 }
 
 fn home() -> Result<PathBuf, String> {
-    if let Ok(path) = std::env::var("SATYR_GATEWAY_HOME") {
+    if let Ok(path) = std::env::var("PANTRY_GATEWAY_HOME") {
         return Ok(PathBuf::from(path));
     }
     std::env::var("HOME")

@@ -121,7 +121,7 @@ async function handleSetup(request: Request, env: Env): Promise<Response> {
     `/portal/${organisation.organisationHandle}/${organisation.workspace.workspaceHandle}/products/${PRODUCT_ID}`);
   return Response.json({
     ok: true,
-    origin: env.SATYR_PUBLIC_ORIGIN,
+    origin: env.PANTRY_PUBLIC_ORIGIN,
     organisationId: organisation.organisationId,
     organisationHandle: organisation.organisationHandle,
     workspaceHandle: organisation.workspace.workspaceHandle,

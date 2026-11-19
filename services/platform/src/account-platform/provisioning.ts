@@ -258,7 +258,7 @@ async function resolveProvisionNativeTenant(
       )
         return rejected("scope_forbidden");
       const cells = parseOrganisationPlacementCells(
-        env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+        env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
       );
       if (!cells.ok) return rejected("unavailable");
       let placement = null;

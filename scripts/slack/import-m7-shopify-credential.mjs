@@ -13,7 +13,7 @@ import {
 const ENV_PATH = ".env.local";
 
 async function main() {
-  const workerUrl = requiredLocalEnv("SATYR_WORKER_URL");
+  const workerUrl = requiredLocalEnv("PANTRY_WORKER_URL");
   const teamId = requiredLocalEnv("SLACK_TEAM_ID");
   const organisationId = `organisation_${teamId}`;
   const shopDomain = requiredLocalEnv("SHOPIFY_SHOP_DOMAIN");

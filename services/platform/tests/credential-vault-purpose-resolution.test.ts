@@ -541,7 +541,7 @@ async function createFixture(): Promise<PurposeResolutionFixture> {
     "organisation_purpose_resolution",
   );
   const keys: CredentialVaultBindings = {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: testRoot(11),
   };
   await insertOrganisationBoundary(db, organisationId);

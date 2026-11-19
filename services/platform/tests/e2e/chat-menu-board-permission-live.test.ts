@@ -4,10 +4,10 @@
 // (Pantry's OpenRouter route, the production model) finds no board tool, asks
 // for the access with the Allow prompt, and after Allow reads the board and
 // answers with its content. Only Slack-free control routes and the model
-// network are real; the run is skipped without SATYR_PI_ACCEPTANCE_API_KEY.
+// network are real; the run is skipped without PANTRY_PI_ACCEPTANCE_API_KEY.
 //
 // Run:
-//   SATYR_PI_ACCEPTANCE_API_KEY=<OpenRouter key> SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker> \
+//   PANTRY_PI_ACCEPTANCE_API_KEY=<OpenRouter key> PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker> \
 //   ./node_modules/.bin/vitest run --config vitest.e2e.config.ts tests/e2e/chat-menu-board-permission-live.test.ts
 import { env } from "cloudflare:workers";
 import { bypass, http, type HttpResponseResolver } from "msw";

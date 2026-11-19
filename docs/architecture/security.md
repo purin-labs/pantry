@@ -113,7 +113,7 @@ binds a connection to a generation, environment and lifecycle (`staged`,
 `active`, `superseded`, `revoked`, `failed`), with one active generation.
 
 The keyring (`credential-vault/keyring.ts`) writes with the root that
-`SATYR_VAULT_ACTIVE_KEY_VERSION` selects, and reads with the exact version on
+`PANTRY_VAULT_ACTIVE_KEY_VERSION` selects, and reads with the exact version on
 the row. It refuses an unknown version, a missing binding and key material
 that is not 32 bytes.
 

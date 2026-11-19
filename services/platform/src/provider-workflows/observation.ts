@@ -137,7 +137,7 @@ async function resolveObservationBearer(
   }
   if (provider === "slack") {
     const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-      deploymentProfile: input.env.SATYR_DEPLOYMENT_PROFILE,
+      deploymentProfile: input.env.PANTRY_DEPLOYMENT_PROFILE,
       appId: input.env.SLACK_APP_ID,
     });
     const workspaceId = parseWorkspaceId(input.providerAccountId);

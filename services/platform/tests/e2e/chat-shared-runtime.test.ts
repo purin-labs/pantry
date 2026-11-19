@@ -1334,7 +1334,7 @@ async function organisationArchiveCleanupRace(owner: Member) {
     expect(await env.ARCHIVE.head(attachmentKey)).toBeNull();
     expect(await env.ARCHIVE.head(foreignKey)).not.toBeNull();
     const identity = resolveConfiguredSlackInstallationIdentity({
-      deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+      deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
       appId: env.SLACK_APP_ID,
     });
     if (!identity.ok) throw new Error(identity.error.code);

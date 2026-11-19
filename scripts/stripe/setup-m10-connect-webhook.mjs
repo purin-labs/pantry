@@ -25,7 +25,7 @@ async function main() {
     process.env.STRIPE_CONNECT_CLIENT_SECRET,
   );
   const origin = normalizeOrigin(
-    process.env.SATYR_PUBLIC_ORIGIN ?? DEFAULT_PANTRY_ORIGIN,
+    process.env.PANTRY_PUBLIC_ORIGIN ?? DEFAULT_PANTRY_ORIGIN,
   );
   const endpointUrl = `${origin}/hook/stripe/connect`;
   const registered = await createStripeConnectWebhook({

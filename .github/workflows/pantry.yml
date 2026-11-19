@@ -72,7 +72,7 @@ jobs:
           pnpm -C output/shared-account-authority/source/tests exec node helpers/buildSharedAccountPlatformWorker.mjs
           account_worker="$GITHUB_WORKSPACE/output/shared-account-authority/source/.artifacts/shared-account-platform/account-worker/index.mjs"
           sha256sum "$account_worker"
-          printf 'SATYR_ACCOUNT_WORKER_ARTIFACT=%s\n' "$account_worker" >> "$GITHUB_ENV"
+          printf 'PANTRY_ACCOUNT_WORKER_ARTIFACT=%s\n' "$account_worker" >> "$GITHUB_ENV"
 
       - name: Check shared helpers are not copied
         run: pnpm check:shared-helpers

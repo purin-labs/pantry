@@ -246,8 +246,8 @@ beforeEach(async function setup() {
   env = platformEnv({
     DB: new SqliteD1Database(database) as unknown as SingleDatabase,
     MESSAGE_LINK_FETCH: {},
-    SATYR_PUBLIC_ORIGIN: "https://portal.example",
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+    PANTRY_PUBLIC_ORIGIN: "https://portal.example",
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
       databaseBinding: "DB",
       kind: "affinity",
       placementCellId: "chat-test",
@@ -255,7 +255,7 @@ beforeEach(async function setup() {
     }),
   });
   const placement = parseOrganisationPlacementProfile(
-    env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   if (!placement.ok) throw new Error(placement.error.code);
   await ensureInitialOrganisationPlacement({

@@ -140,7 +140,7 @@ describe("onboarding reconciliation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -277,7 +277,7 @@ describe("onboarding reconciliation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -293,7 +293,7 @@ describe("onboarding reconciliation", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -447,7 +447,7 @@ describe("onboarding reconciliation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -462,7 +462,7 @@ describe("onboarding reconciliation", () => {
       execution: await requireOrganisationExecutionScope(
         {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         organisation.organisationId,
@@ -1141,7 +1141,7 @@ async function createArchivedHarnessOrganisation(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: input.organisationName,
@@ -1155,7 +1155,7 @@ async function createArchivedHarnessOrganisation(
     execution: await requireOrganisationExecutionScope(
       {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       organisation.organisationId,
@@ -1444,7 +1444,7 @@ function reconcileOnboardingFixture(input: ReconciliationFixture) {
   const env = input.env ?? {
     // One combined database: the directory and the Organisation's database.
     DB: singleDatabase(input.db),
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   };
   return reconcileOrganisationOnboarding({
     env,

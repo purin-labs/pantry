@@ -209,7 +209,7 @@ async function reconcilerTest(): Promise<void> {
   const reconciled = await reconcileOrganisationOnboarding({
     env: {
       DB: world.db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     db: world.db,
     organisationNamespace: {} as DurableObjectNamespace<

@@ -36,7 +36,7 @@ async function loadsConfiguredRoots(): Promise<void> {
   const v1 = testRoot(1);
   const v2 = testRoot(2);
   const loaded = await loadCredentialVaultKeyRing({
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v2",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v2",
     VAULT_ROOT_V1: v1,
     VAULT_ROOT_V2: v2,
   });

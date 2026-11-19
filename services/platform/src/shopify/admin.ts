@@ -265,7 +265,7 @@ export async function handleConfigureShopifyConnector(
     return fieldErrorResponse(provisioning.error);
   }
 
-  const publicOrigin = parsePublicServiceUrl(env.SATYR_PUBLIC_ORIGIN);
+  const publicOrigin = parsePublicServiceUrl(env.PANTRY_PUBLIC_ORIGIN);
 
   if (publicOrigin === null) {
     return errorResponse(

@@ -19,8 +19,8 @@ async function main() {
   validateWorkerOrigins("platform", args.environment, config);
   const manifest = await loadManifest(args.manifestPath);
   const callbacks = [
-    `${config.vars.SATYR_OAUTH_CALLBACK_ORIGIN}/slack/install`,
-    `${config.vars.SATYR_OAUTH_CALLBACK_ORIGIN}/v1/control/providers/slack/callback`,
+    `${config.vars.PANTRY_OAUTH_CALLBACK_ORIGIN}/slack/install`,
+    `${config.vars.PANTRY_OAUTH_CALLBACK_ORIGIN}/v1/control/providers/slack/callback`,
   ];
   args.redirectUrls = callbacks;
   if (args.operation === "update") {

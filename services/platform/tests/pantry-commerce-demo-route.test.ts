@@ -288,7 +288,7 @@ function demoRouteEnv(
   const bind = vi.fn(() => ({ first, all }));
   const batch = vi.fn(async () => [{ meta: { changes: 1 } }]);
   return platformEnv({
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: {
       prepare: vi.fn(() => ({ bind })),
       withSession: vi.fn(() => ({ batch, prepare: vi.fn(() => ({ bind })) })),
@@ -300,7 +300,7 @@ function demoRouteEnv(
     DATA_ENCRYPTION_ROOT: {
       get: vi.fn(async () => Buffer.alloc(32, 17).toString("base64")),
     },
-    SATYR_PUBLIC_ORIGIN: "https://satyr.example",
+    PANTRY_PUBLIC_ORIGIN: "https://satyr.example",
   });
 }
 

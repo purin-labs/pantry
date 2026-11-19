@@ -12,7 +12,7 @@ BOOTSTRAP_ATTEMPTS = 10
 
 
 def label() -> str:
-    return os.environ.get("SATYR_VOICE_LABEL", DEFAULT_LABEL)
+    return os.environ.get("PANTRY_VOICE_LABEL", DEFAULT_LABEL)
 
 
 def plist_path() -> Path:
@@ -28,7 +28,7 @@ def write_and_start() -> None:
     job = {
         "Label": label(),
         "ProgramArguments": [sys.executable, "-m", "shop_voice", "run"],
-        "EnvironmentVariables": {"SATYR_VOICE_HOME": str(home()), "PYTHONPATH": str(home() / "app"),
+        "EnvironmentVariables": {"PANTRY_VOICE_HOME": str(home()), "PYTHONPATH": str(home() / "app"),
                                  "PYTHONUNBUFFERED": "1"},
         "WorkingDirectory": str(home()),
         "RunAtLoad": True,

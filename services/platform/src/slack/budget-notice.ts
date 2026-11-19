@@ -42,7 +42,7 @@ export function aiBudgetPortalUrl(
 ): string {
   const organisation = encodeURIComponent(address.organisationHandle);
   const workspace = encodeURIComponent(address.workspaceHandle);
-  return `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?aiBudget=raise`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?aiBudget=raise`;
 }
 
 /**

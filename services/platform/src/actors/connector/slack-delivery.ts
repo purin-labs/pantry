@@ -86,7 +86,7 @@ export function startSlackThreadCredentialRoute(
   const workspaceId = parseWorkspaceId(address.workspaceId);
   const channelId = parseChannelId(address.channelId);
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (
@@ -134,7 +134,7 @@ export async function deliverSlackOutput(
   if (!organisationId.ok || !workspaceId.ok || !channelId.ok)
     return { kind: "rejected", reason: "connector_address_invalid" };
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   // The post needs this digest of the delivery's key. It is computed before

@@ -98,8 +98,8 @@ def portal_up() -> bool:
 
 
 def main() -> None:
-    if not os.environ.get("SATYR_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit("Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
+    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
+        raise SystemExit("Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
     # Playwright 1.55 holds audioWorklet.addModule forever. 1.64.1 does not.
     if not os.environ.get("PLAYWRIGHT_MODULE"):
         raise SystemExit("Set PLAYWRIGHT_MODULE to a Playwright 1.64.1 or later package folder.")
@@ -157,7 +157,7 @@ def main() -> None:
         organisation_id = setup["organisationId"]
         owner = journey.Member("Owner", organisation_id)
         microphone = microphone_file(work)
-        env = {**os.environ, "SATYR_VOICE_HOME": str(voice_home), "SATYR_VOICE_LABEL": label}
+        env = {**os.environ, "PANTRY_VOICE_HOME": str(voice_home), "PANTRY_VOICE_LABEL": label}
         browser_input = {
             "platform": PORTAL, "worker": PLATFORM, "organisationId": organisation_id, "ownerId": setup["users"]["Owner"],
             "cookie": owner.cookie, "csrf": owner.csrf,

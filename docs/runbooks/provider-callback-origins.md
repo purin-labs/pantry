@@ -17,17 +17,17 @@ are unnecessary.
 
 ## Runtime variables
 
-`SATYR_PUBLIC_ORIGIN` is the browser-facing portal origin. It owns control
+`PANTRY_PUBLIC_ORIGIN` is the browser-facing portal origin. It owns control
 session origin checks, portal links, and the Google sign-in callback.
 
-`SATYR_OAUTH_CALLBACK_ORIGIN` is the HTTPS origin providers call after an
-integration authorization. It defaults to `SATYR_PUBLIC_ORIGIN`, although each
+`PANTRY_OAUTH_CALLBACK_ORIGIN` is the HTTPS origin providers call after an
+integration authorization. It defaults to `PANTRY_PUBLIC_ORIGIN`, although each
 deployed environment should set it explicitly. The origin must route `/v1/*`
 and `/slack/install` to that environment's Platform Worker. When a separate
 provider ingress origin is unset, it must also route `/hook/*` and `/slack/*`.
 
-`SATYR_PROVIDER_INGRESS_ORIGIN` is the optional HTTPS origin for provider
-webhooks. It defaults to `SATYR_OAUTH_CALLBACK_ORIGIN`. Local development sets
+`PANTRY_PROVIDER_INGRESS_ORIGIN` is the optional HTTPS origin for provider
+webhooks. It defaults to `PANTRY_OAUTH_CALLBACK_ORIGIN`. Local development sets
 it to the existing Square-only hostname. The Slack quick tunnel updates only
 the local Slack app's Events API request URL and leaves Worker bindings fixed.
 Shopify registration and reconciliation use the profile value for their organisation
@@ -35,7 +35,7 @@ hook, so local Shopify webhook delivery requires a separately verified ingress
 profile and routing configuration.
 Deployed environments normally use the same fixed origin for both values.
 
-| Environment        | `SATYR_PUBLIC_ORIGIN`                     | `SATYR_OAUTH_CALLBACK_ORIGIN`             | `SATYR_PROVIDER_INGRESS_ORIGIN`                               |
+| Environment        | `PANTRY_PUBLIC_ORIGIN`                     | `PANTRY_OAUTH_CALLBACK_ORIGIN`             | `PANTRY_PROVIDER_INGRESS_ORIGIN`                               |
 | ------------------ | ----------------------------------------- | ----------------------------------------- | ------------------------------------------------------------- |
 | Local              | `https://localhost:3003`                  | `https://localhost:3003`                  | `https://square-sandbox-webhook.seams.sh` (Square paths only) |
 | Current production | `https://satyr-edge.n6378056.workers.dev` | `https://satyr-edge.n6378056.workers.dev` | Unset; uses callback origin                                   |
@@ -49,7 +49,7 @@ isolated.
 
 ## Canonical URI set
 
-For `SATYR_OAUTH_CALLBACK_ORIGIN=https://example.com`, register these exact
+For `PANTRY_OAUTH_CALLBACK_ORIGIN=https://example.com`, register these exact
 integration callbacks:
 
 ```text
@@ -74,7 +74,7 @@ https://example.com/slack/install
 Google sign-in uses the browser-facing origin instead:
 
 ```text
-${SATYR_PUBLIC_ORIGIN}/v1/control/auth/google/callback
+${PANTRY_PUBLIC_ORIGIN}/v1/control/auth/google/callback
 ```
 
 ChatGPT uses OpenAI's device authorization flow and has no Satyr callback URI.
@@ -96,20 +96,20 @@ and verification status.
 | Slack           | Selected `services/platform/wrangler.jsonc` profile; `pnpm slack:app:update` for production or `pnpm slack:ingress` locally | Slack provider callback and standalone install callback                 |
 | Stripe          | Dashboard → Connect → Onboarding options → OAuth → Redirects                                                                | Stripe callback in the matching sandbox or live platform account        |
 | WhatsApp        | Meta App Dashboard → WhatsApp → Embedded signup configuration → OAuth redirect URIs                                         | WhatsApp callback for every enabled environment                         |
-| Google sign-in  | Google Cloud OAuth client → Authorized redirect URIs                                                                        | Google sign-in callback based on `SATYR_PUBLIC_ORIGIN`                  |
+| Google sign-in  | Google Cloud OAuth client → Authorized redirect URIs                                                                        | Google sign-in callback based on `PANTRY_PUBLIC_ORIGIN`                  |
 | Gmail mailboxes | Google Cloud OAuth client → Authorized redirect URIs                                                                        | Gmail callback for every enabled environment                            |
 
 Slack's Event Subscriptions request URL is adjacent ingress configuration. Set
-it to `${SATYR_PROVIDER_INGRESS_ORIGIN}/slack/events` in production. Locally,
+it to `${PANTRY_PROVIDER_INGRESS_ORIGIN}/slack/events` in production. Locally,
 `pnpm slack:ingress` uses its current quick tunnel URL; templates contain only
 app permissions and features, and the helper fills URLs from the selected
 profile and tunnel. Gmail's equivalent is the
 Cloud Pub/Sub push endpoint, which every environment sets to
-`${SATYR_PROVIDER_INGRESS_ORIGIN}/hook/email/google` on its own subscription. That
+`${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/email/google` on its own subscription. That
 endpoint authenticates by OIDC rather than by path secrecy, so an origin change
 also requires updating `GMAIL_PUBSUB_AUDIENCE` whenever the audience is derived
 from the endpoint URL. See [Gmail mailboxes](gmail-mailboxes.md). Dropbox uses
-the shared `${SATYR_PROVIDER_INGRESS_ORIGIN}/hook/dropbox` endpoint. Shopify
+the shared `${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/dropbox` endpoint. Shopify
 uses organisation-specific `/hook/shopify/:organisationId` endpoints, while the Stripe
 Connect platform uses `/hook/stripe/connect`; reconcile connected accounts
 after an origin change so Satyr registers the new provider endpoints.
@@ -120,8 +120,8 @@ after an origin change so Satyr registers the new provider endpoints.
    and `/slack/*` to the environment's Platform Worker.
 2. Create or select the environment-specific provider applications and
    credentials.
-3. Set `SATYR_PUBLIC_ORIGIN` and `SATYR_OAUTH_CALLBACK_ORIGIN` in that
-   environment's Worker configuration. Set `SATYR_PROVIDER_INGRESS_ORIGIN` only
+3. Set `PANTRY_PUBLIC_ORIGIN` and `PANTRY_OAUTH_CALLBACK_ORIGIN` in that
+   environment's Worker configuration. Set `PANTRY_PROVIDER_INGRESS_ORIGIN` only
    when webhook ingress uses a distinct public origin.
 4. Add the canonical URI set to each external configuration surface. Keep the
    previous URIs during a hostname migration.

@@ -199,7 +199,7 @@ describe("file context persistence", () => {
     const scope = await OrganisationExecutionScope.resolve(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
       },
       fixture.organisationId,
     );
@@ -444,7 +444,7 @@ async function requireFileFixtureScope(
   const scope = await OrganisationExecutionScope.resolve(
     {
       DB: fixture.db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: placement.value.kind, placementCellId: placement.value.placementCellId, locationHint: placement.value.locationHint }),
     },
     fixture.organisationId,
   );

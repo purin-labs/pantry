@@ -276,7 +276,7 @@ const worker = await startFixtureWorker({
   keys,
   account: (request) => account.fetch(request),
   bindings: {
-    SATYR_PUBLIC_ORIGIN: text(
+    PANTRY_PUBLIC_ORIGIN: text(
       process.env.SHOP_VOICE_PUBLIC_ORIGIN ?? `http://127.0.0.1:${port}`,
     ),
   },

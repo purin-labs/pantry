@@ -112,7 +112,7 @@ async function handleGoogleStart(
   // The state cookie must be set on the origin that receives the callback. A
   // start on another host, such as a dev server that proxies /v1, would set it
   // where the callback cannot read it.
-  const publicOrigin = new URL(requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN));
+  const publicOrigin = new URL(requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN));
   if (url.host !== publicOrigin.host) {
     const headers = controlHeaders();
     headers.set(
@@ -266,7 +266,7 @@ async function handleGoogleCallback(
   }
   const redirect = new URL(
     completed.value.redirectPath,
-    requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN),
+    requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN),
   );
   redirect.searchParams.delete("accountLink");
   redirect.searchParams.delete("accountInvitationLink");

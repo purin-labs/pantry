@@ -176,7 +176,7 @@ async function createCutoverFixture(): Promise<CutoverFixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Credential Cutover",
@@ -193,7 +193,7 @@ async function createCutoverFixture(): Promise<CutoverFixture> {
     "vault:organisation:stripe:acct_cutover:oauth:g2",
   );
   const keys = {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" as const,
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1" as const,
     VAULT_ROOT_V1: testRoot(9),
   };
   await storeCredential(
@@ -276,7 +276,7 @@ async function activateOrganisationOnboarding(
 async function storeCredential(
   db: SingleDatabase,
   keys: {
-    readonly SATYR_VAULT_ACTIVE_KEY_VERSION: "v1";
+    readonly PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1";
     readonly VAULT_ROOT_V1: SecretsStoreSecret;
   },
   organisationId: OrganisationId,

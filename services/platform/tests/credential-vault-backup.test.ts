@@ -556,14 +556,14 @@ function readRotationJobRow(sqlite: DatabaseSync): Record<string, unknown> {
 
 function v1OnlyBindings(): CredentialVaultBindings {
   return {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: testRoot(V1_FILL),
   };
 }
 
 function v2ActiveBindings(): CredentialVaultBindings {
   return {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v2",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v2",
     VAULT_ROOT_V1: testRoot(V1_FILL),
     VAULT_ROOT_V2: testRoot(V2_FILL),
   };

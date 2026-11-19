@@ -242,7 +242,7 @@ export async function handleCompleteIdentityLink(
       422,
     );
   }
-  const publicOrigin = env.SATYR_PUBLIC_ORIGIN.replace(/\/$/u, "");
+  const publicOrigin = env.PANTRY_PUBLIC_ORIGIN.replace(/\/$/u, "");
   if (request.headers.get("origin") !== publicOrigin) {
     return errorResponse(
       "origin_invalid",

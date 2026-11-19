@@ -378,7 +378,7 @@ export async function prepareSdkOrganisation() {
   const organisation = parseOrganisationId("organisation_compaction");
   if (!organisation.ok) throw new Error(organisation.error.code);
   const placement = parseOrganisationPlacementProfile(
-    env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   if (!placement.ok) throw new Error(placement.error.code);
   const database = organisationDatabase(

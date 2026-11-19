@@ -84,7 +84,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -129,7 +129,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -210,7 +210,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -257,7 +257,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -347,7 +347,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -403,7 +403,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -480,7 +480,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -603,7 +603,7 @@ describe("onboarding activation", () => {
     const organisation = await requireOrganisationBootstrap({
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
@@ -704,7 +704,7 @@ async function setupReplayPreservesSlackCredential(): Promise<void> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Setup Replay Commerce",
@@ -725,7 +725,7 @@ async function setupReplayPreservesSlackCredential(): Promise<void> {
   const scope = await requireOrganisationExecutionScope(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     organisation.organisationId,
   );
@@ -810,7 +810,7 @@ async function staleReadinessRejectionTest(): Promise<void> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Stale Readiness Commerce",
@@ -840,7 +840,7 @@ async function staleReadinessRejectionTest(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       organisation.organisationId,
@@ -935,7 +935,7 @@ async function diagnosticReadSafetyTest(): Promise<void> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Diagnostic Read Commerce",
@@ -1001,7 +1001,7 @@ async function interruptedActivationRecoveryAcceptanceTest(): Promise<void> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Interrupted Activation Commerce",

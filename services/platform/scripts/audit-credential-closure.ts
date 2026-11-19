@@ -117,7 +117,7 @@ export type CredentialClosureCommandRuntime = {
   readonly execute: WranglerExecutor;
   readonly fetch: CredentialClosureFetch;
   readonly environment: {
-    readonly SATYR_WORKER_URL?: string;
+    readonly PANTRY_WORKER_URL?: string;
     readonly ORGANISATION_ADMIN_TOKEN?: string;
   };
 };
@@ -670,7 +670,7 @@ function parseWorkerConfiguration(
   environment: CredentialClosureCommandRuntime["environment"],
 ): WorkerConfiguration | null {
   const token = environment.ORGANISATION_ADMIN_TOKEN;
-  const rawUrl = environment.SATYR_WORKER_URL;
+  const rawUrl = environment.PANTRY_WORKER_URL;
   if (
     typeof token !== "string" ||
     token.length === 0 ||
@@ -750,7 +750,7 @@ function defaultRuntime(): CredentialClosureCommandRuntime {
     execute: executeWrangler,
     fetch: globalThis.fetch,
     environment: {
-      SATYR_WORKER_URL: process.env.SATYR_WORKER_URL,
+      PANTRY_WORKER_URL: process.env.PANTRY_WORKER_URL,
       ORGANISATION_ADMIN_TOKEN: process.env.ORGANISATION_ADMIN_TOKEN,
     },
   };

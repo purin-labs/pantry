@@ -62,7 +62,7 @@ describe("Urk release boundaries", () => {
       throw new Error(`slack draft failed: ${JSON.stringify(draft.error)}`);
     const confirmed = await confirmOperatorConfigurationDraft({
       db: slackDb,
-      env: { DB: slackDb, SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("../src/env").Env,
+      env: { DB: slackDb, PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("../src/env").Env,
       organisationId: ORGANISATION,
       draftId: draft.value.draftId,
       actorUserId: OWNER,
@@ -106,7 +106,7 @@ describe("Urk release boundaries", () => {
         organisationId: ORGANISATION,
         draftId: draft.value.draftId,
         actorUserId: "user_f69e70b8-b1da-5135-80f3-5c87cbbf37b0",
-        env: { DB: db, SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("../src/env").Env,
+        env: { DB: db, PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("../src/env").Env,
         actorRole: "owner",
         previewCode: previewCode(draft.value.commandDigest),
         now: NOW,

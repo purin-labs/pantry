@@ -10,7 +10,11 @@ const require = createRequire(resolve(root, "services/platform/package.json"));
 const { unstable_readConfig } = require("wrangler");
 
 export function readWorkerEnvironment(service, environment) {
-  if (service !== "platform" && service !== "underclerk")
+  if (
+    service !== "platform" &&
+    service !== "commerce" &&
+    service !== "underclerk"
+  )
     throw new Error("Unknown Worker service");
   if (
     environment !== "local" &&
@@ -19,8 +23,9 @@ export function readWorkerEnvironment(service, environment) {
   ) {
     throw new Error("Select local, staging or production");
   }
+  const directory = service === "platform" ? "platform" : "commerce";
   const config = unstable_readConfig({
-    config: resolve(root, `services/${service}/wrangler.jsonc`),
+    config: resolve(root, `services/${directory}/wrangler.jsonc`),
     env: environment,
   });
   const serviceName = service === "platform" ? "satyr-edge" : "underclerk";
@@ -28,7 +33,7 @@ export function readWorkerEnvironment(service, environment) {
     environment === "staging" ? `${serviceName}-staging` : serviceName;
   if (
     config.name !== expectedName ||
-    config.vars.SATYR_DEPLOYMENT_PROFILE !== environment
+    config.vars.PANTRY_DEPLOYMENT_PROFILE !== environment
   ) {
     throw new Error(
       `${service}: resolved Worker name or profile does not match ${environment}`,
@@ -39,9 +44,9 @@ export function readWorkerEnvironment(service, environment) {
 
 const SLACK_INGRESS_CONFIG = "services/platform/wrangler.slack-ingress.jsonc";
 const SLACK_INGRESS_VARS = [
-  "SATYR_DEPLOYMENT_PROFILE",
-  "SATYR_ORGANISATION_PLACEMENT_PROFILE",
-  "SATYR_VAULT_ACTIVE_KEY_VERSION",
+  "PANTRY_DEPLOYMENT_PROFILE",
+  "PANTRY_ORGANISATION_PLACEMENT_PROFILE",
+  "PANTRY_VAULT_ACTIVE_KEY_VERSION",
   "SLACK_APP_ID",
 ];
 
@@ -261,8 +266,8 @@ function modelExitProfileDifferences(platform, exit, environment, name) {
     differences.push("platform binding of the exit Worker");
   if (!sameValue(definedFields(exit.placement), MODEL_EXIT_PLACEMENT))
     differences.push(`placement other than ${MODEL_EXIT_PLACEMENT.region}`);
-  if (!sameValue(exit.vars, { SATYR_DEPLOYMENT_PROFILE: environment }))
-    differences.push("variables other than SATYR_DEPLOYMENT_PROFILE");
+  if (!sameValue(exit.vars, { PANTRY_DEPLOYMENT_PROFILE: environment }))
+    differences.push("variables other than PANTRY_DEPLOYMENT_PROFILE");
   const held = [
     ...CODE_MODE_SANDBOX_FORBIDDEN_BINDINGS.filter(isNotVars),
     "durable_objects",
@@ -313,8 +318,8 @@ export function readVaultOnePasswordEnvironment(environment) {
     differences.push("platform binding of the 1Password store Worker");
   if (!sameValue(definedFields(store.placement), MODEL_EXIT_PLACEMENT))
     differences.push(`placement other than ${MODEL_EXIT_PLACEMENT.region}`);
-  if (!sameValue(store.vars, { SATYR_DEPLOYMENT_PROFILE: environment }))
-    differences.push("variables other than SATYR_DEPLOYMENT_PROFILE");
+  if (!sameValue(store.vars, { PANTRY_DEPLOYMENT_PROFILE: environment }))
+    differences.push("variables other than PANTRY_DEPLOYMENT_PROFILE");
   const held = [
     ...CODE_MODE_SANDBOX_FORBIDDEN_BINDINGS.filter(isNotVars),
     "durable_objects",
@@ -368,8 +373,8 @@ export function readChatGptExitEnvironment(environment) {
     differences.push("platform binding of the ChatGPT exit Worker");
   if (!sameValue(definedFields(exit.placement), MODEL_EXIT_PLACEMENT))
     differences.push(`placement other than ${MODEL_EXIT_PLACEMENT.region}`);
-  if (!sameValue(exit.vars, { SATYR_DEPLOYMENT_PROFILE: environment }))
-    differences.push("variables other than SATYR_DEPLOYMENT_PROFILE");
+  if (!sameValue(exit.vars, { PANTRY_DEPLOYMENT_PROFILE: environment }))
+    differences.push("variables other than PANTRY_DEPLOYMENT_PROFILE");
   const actors = (exit.durable_objects?.bindings ?? []).map(actorBinding);
   if (
     !sameValue(actors, [
@@ -531,9 +536,9 @@ export function requireLocalWorkerSecrets(service, config) {
 
 export function validateWorkerOrigins(service, environment, config) {
   for (const key of [
-    "SATYR_PUBLIC_ORIGIN",
-    "SATYR_OAUTH_CALLBACK_ORIGIN",
-    "SATYR_PROVIDER_INGRESS_ORIGIN",
+    "PANTRY_PUBLIC_ORIGIN",
+    "PANTRY_OAUTH_CALLBACK_ORIGIN",
+    "PANTRY_PROVIDER_INGRESS_ORIGIN",
     "UNDERCLERK_BASE_URL",
   ]) {
     const value = config.vars[key];

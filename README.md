@@ -205,7 +205,7 @@ Build it in a separate `seams-monorepo` checkout, then set its absolute path:
 
 ```bash
 pnpm -C /path/to/seams-monorepo/tests exec node helpers/buildSharedAccountPlatformWorker.mjs
-export SATYR_ACCOUNT_WORKER_ARTIFACT=/path/to/seams-monorepo/.artifacts/shared-account-platform/account-worker/index.mjs
+export PANTRY_ACCOUNT_WORKER_ARTIFACT=/path/to/seams-monorepo/.artifacts/shared-account-platform/account-worker/index.mjs
 ```
 
 The Worker contains fixture controls and test keys. Use it only for acceptance tests.
@@ -255,7 +255,7 @@ encryption roots live in Cloudflare Secrets Store. Runtime consumers authorize
 an exact purpose before resolving a credential for one trusted operation.
 `OPENROUTER_API_KEY` is a platform deployment secret used only by the explicit
 Seams-funded Pi route. That route runs `moonshotai/kimi-k3`; tests that call
-OpenRouter set the Worker variable `SATYR_PLATFORM_PI_MODEL` to the cheaper
+OpenRouter set the Worker variable `PANTRY_PLATFORM_PI_MODEL` to the cheaper
 `qwen/qwen3.7-flash`.
 
 See the [Vault operations guide](apps/docs/src/operate/vault.md), the

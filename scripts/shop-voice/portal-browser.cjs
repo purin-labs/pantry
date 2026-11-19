@@ -1745,7 +1745,7 @@ async function main() {
     await shopMac();
     if (ENGINE !== WHISPER) {
       // A change back needs no download: Whisper's file stays the same file.
-      const home = path.join(process.env.SATYR_VOICE_HOME, "model");
+      const home = path.join(process.env.PANTRY_VOICE_HOME, "model");
       const weights = path.join(home, WHISPER, "weights.safetensors");
       const before = fs.statSync(weights).ino;
       await chooseOption(

@@ -330,7 +330,7 @@ async function exposesProtectedRoute(): Promise<void> {
   );
   const adminToken = "retained-vault-root-closure-admin-token";
   const env = platformEnv({
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     DB: fixture.db,
     ...keys,
     ORGANISATION_ADMIN_TOKEN: adminToken,
@@ -460,12 +460,12 @@ function insertRawVaultRow(
 function credentialVaultKeys(includeV2: boolean): CredentialVaultBindings {
   return includeV2
     ? {
-        SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+        PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
         VAULT_ROOT_V1: testRoot(1),
         VAULT_ROOT_V2: testRoot(2),
       }
     : {
-        SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+        PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
         VAULT_ROOT_V1: testRoot(1),
       };
 }

@@ -630,7 +630,7 @@ async function chatReplySourcesJourney({ task }: TestContext): Promise<void> {
   // The JSON reporter writes this record, so a run leaves its evidence.
   task.meta.chatReplySources = {
     repeat:
-      "SATYR_ACCOUNT_WORKER_ARTIFACT=<seams>/.artifacts/shared-account-platform/account-worker/index.mjs pnpm --filter @seams/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-chat-reply-sources.test.ts --reporter=json --outputFile=<file>",
+      "PANTRY_ACCOUNT_WORKER_ARTIFACT=<seams>/.artifacts/shared-account-platform/account-worker/index.mjs pnpm --filter @seams/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-chat-reply-sources.test.ts --reporter=json --outputFile=<file>",
     route: route.model,
     proposalId,
     citationsMade: 2,

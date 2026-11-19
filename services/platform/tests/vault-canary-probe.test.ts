@@ -681,7 +681,7 @@ type CanaryProbeFixture = {
 async function createFixture(): Promise<CanaryProbeFixture> {
   const { sqlite, db } = createDatabase();
   const keys: CredentialVaultBindings = {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: testRoot(29),
   };
   const alphaOrganisationId = requireOk(parseOrganisationId("organisation_canary_alpha"));

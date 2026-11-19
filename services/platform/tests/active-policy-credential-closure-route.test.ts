@@ -185,7 +185,7 @@ async function routeFixture(): Promise<RouteFixture> {
     adminToken,
     env: platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
       ORGANISATION:
         namespace as unknown as DurableObjectNamespace<OrganisationDO>,
       ORGANISATION_ADMIN_TOKEN: adminToken,

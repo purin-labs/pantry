@@ -107,7 +107,7 @@ export async function handleSlackInstallStart(
   const requestId = newRequestId();
   const clientId = readRuntimeSecret(env.SLACK_CLIENT_ID);
   const stateSecret = readRuntimeSecret(env.SLACK_OAUTH_STATE_SECRET);
-  const publicOrigin = parsePublicServiceUrl(env.SATYR_PUBLIC_ORIGIN);
+  const publicOrigin = parsePublicServiceUrl(env.PANTRY_PUBLIC_ORIGIN);
 
   if (!clientId.ok || !stateSecret.ok) {
     traceWarn("integration_gateway.slack_install_start.missing_secret", {
@@ -167,7 +167,7 @@ export async function handleSlackInstall(
   const clientSecret = readRuntimeSecret(env.SLACK_CLIENT_SECRET);
   const configuredAppId = parseSlackAppId(env.SLACK_APP_ID ?? "");
   const stateSecret = readRuntimeSecret(env.SLACK_OAUTH_STATE_SECRET);
-  const publicOrigin = parsePublicServiceUrl(env.SATYR_PUBLIC_ORIGIN);
+  const publicOrigin = parsePublicServiceUrl(env.PANTRY_PUBLIC_ORIGIN);
 
   if (
     !clientId.ok ||
@@ -238,7 +238,7 @@ export async function handleSlackInstall(
   }
 
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!installationIdentity.ok) {

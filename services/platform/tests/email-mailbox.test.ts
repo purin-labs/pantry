@@ -400,7 +400,7 @@ async function threadCaseTest(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       fixture.organisationId,
@@ -418,7 +418,7 @@ async function threadCaseTest(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       fixture.organisationId,
@@ -440,7 +440,7 @@ async function threadCaseTest(): Promise<void> {
       scope: await requireOrganisationExecutionScope(
         {
           DB: fixture.db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         fixture.organisationId,
@@ -475,7 +475,7 @@ async function threadCaseTest(): Promise<void> {
       scope: await requireOrganisationExecutionScope(
         {
           DB: fixture.db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         fixture.organisationId,
@@ -550,7 +550,7 @@ async function createOrganisationWithGmailAccount(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: `Mailbox ${slug}`,

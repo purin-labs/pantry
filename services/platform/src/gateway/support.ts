@@ -187,7 +187,7 @@ export async function handleSlackInstallationRevoked(
   receivedAt: number,
 ): Promise<Response> {
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (
@@ -825,7 +825,7 @@ export function queueErrorField(error: IngressQueueMessageError): string {
 }
 
 export function identityLinkBrowserUrl(env: Env, token: string): string {
-  return `${env.SATYR_PUBLIC_ORIGIN.replace(/\/$/u, "")}/identity/link?token=${token}`;
+  return `${env.PANTRY_PUBLIC_ORIGIN.replace(/\/$/u, "")}/identity/link?token=${token}`;
 }
 
 export function actorResolutionErrorResponse(error: ActorResolutionError): Response {
@@ -1049,7 +1049,7 @@ export function isAuthorizedFaultInjectionRequest(
 ): boolean {
   return authorizeFaultInjectionBearer({
     authorization: request.headers.get("authorization"),
-    configuredToken: env.SATYR_FAULT_INJECTION_TOKEN,
+    configuredToken: env.PANTRY_FAULT_INJECTION_TOKEN,
   });
 }
 

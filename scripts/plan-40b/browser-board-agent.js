@@ -27,7 +27,7 @@ async (page) => {
   // change shows its text so far over its element. The viewer's own edit
   // is refused.
   //
-  // Run: SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
+  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
   //   python3 scripts/plan-81/run-browser.py --journey scripts/plan-40b/browser-board-agent.js \
   //   --entry /menu-chat-preview.html --setup-path /test/setup-menu \
   //   --artifacts output/playwright/plan-40b-agent

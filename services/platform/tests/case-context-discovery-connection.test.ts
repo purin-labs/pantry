@@ -78,8 +78,8 @@ async function fixture() {
   };
   const env = platformEnv({
     DB: new SqliteD1Database(database),
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: root,
   });
   const placement = await ensureInitialOrganisationPlacement({

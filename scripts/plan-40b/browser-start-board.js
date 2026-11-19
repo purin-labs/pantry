@@ -9,7 +9,7 @@ async (page) => {
   // board the owner then makes a blank canvas, which has no element, and a
   // Cancel leaves the boards as they were.
   //
-  // Run: SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
+  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
   //   python3 scripts/plan-74/run-browser.py --journey scripts/plan-40b/browser-start-board.js \
   //   --entry /menus-preview.html --artifacts output/playwright/plan-40b-start
   const WORKER = "http://127.0.0.1:8874";

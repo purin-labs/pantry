@@ -456,7 +456,7 @@ async function startGateway(
       now: Date.now(),
     },
   );
-  const origin = requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN);
+  const origin = requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN);
   return controlJson(
     {
       ok: true,

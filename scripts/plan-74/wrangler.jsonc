@@ -4,11 +4,11 @@
   "compatibility_date": "2026-07-07",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    "SATYR_PUBLIC_ORIGIN": "http://127.0.0.1:3174",
-    "SATYR_DEPLOYMENT_PROFILE": "local",
-    "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"plan74-browser\",\"locationHint\":\"wnam\",\"databaseBinding\":\"DB\"}",
+    "PANTRY_PUBLIC_ORIGIN": "http://127.0.0.1:3174",
+    "PANTRY_DEPLOYMENT_PROFILE": "local",
+    "PANTRY_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"plan74-browser\",\"locationHint\":\"wnam\",\"databaseBinding\":\"DB\"}",
     "OPENROUTER_API_KEY": "synthetic-side-case-fixture-simulated-provider",
-    "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+    "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
     "SESSION_TOKEN_SECRET": "synthetic-side-case-fixture-session-token-secret",
     // The built account Worker of the acceptance tests. The provider process
     // runs it, binds it as ACCOUNT_PLATFORM and adds the two keys of each run.

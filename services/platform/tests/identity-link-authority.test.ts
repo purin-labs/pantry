@@ -232,7 +232,7 @@ async function createFixture(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Identity Link Organisation",
@@ -293,9 +293,9 @@ async function createFixture(
     db,
     env: platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
       ORGANISATION_ADMIN_TOKEN: ADMIN_TOKEN,
-      SATYR_PUBLIC_ORIGIN: ORIGIN,
+      PANTRY_PUBLIC_ORIGIN: ORIGIN,
     }),
     now,
     organisationId: organisation.organisationId,

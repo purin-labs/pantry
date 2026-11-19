@@ -8,7 +8,7 @@ export type VaultKeyVersion = "v1" | "v2";
 export type CredentialVaultBindings = {
   readonly VAULT_ROOT_V1?: SecretsStoreSecret;
   readonly VAULT_ROOT_V2?: SecretsStoreSecret;
-  readonly SATYR_VAULT_ACTIVE_KEY_VERSION: string;
+  readonly PANTRY_VAULT_ACTIVE_KEY_VERSION: string;
 };
 
 export type VaultRootBinding = {
@@ -76,7 +76,7 @@ export async function loadCredentialVaultKeyRing(
   appendConfiguredRoot(candidates, "v2", bindings.VAULT_ROOT_V2);
 
   return loadVaultKeyRing({
-    activeVersion: bindings.SATYR_VAULT_ACTIVE_KEY_VERSION,
+    activeVersion: bindings.PANTRY_VAULT_ACTIVE_KEY_VERSION,
     bindings: candidates,
   });
 }

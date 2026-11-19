@@ -81,7 +81,7 @@ async function disconnectsInstallation(): Promise<void> {
     userMayDisconnectSlackInstallation(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       {
@@ -110,7 +110,7 @@ async function disconnectsInstallation(): Promise<void> {
     userMayDisconnectSlackInstallation(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       {
@@ -123,7 +123,7 @@ async function disconnectsInstallation(): Promise<void> {
     disconnectSlackInstallation({
       env: {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       installationId: INSTALLATION_ID,
@@ -165,7 +165,7 @@ async function routesDmSelection(): Promise<void> {
     selectSlackDmOrganisation(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       {
@@ -184,7 +184,7 @@ async function routesDmSelection(): Promise<void> {
     selectSlackDmOrganisation(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       {
@@ -211,7 +211,7 @@ async function routesDmSelection(): Promise<void> {
   await selectSlackDmOrganisation(
     {
       DB: fixture.db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       installationId: INSTALLATION_ID,
@@ -428,7 +428,7 @@ async function createFixture(): Promise<{
   await createSlackOrganisationConnection(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       connectionId: CONNECTION_A,
@@ -441,7 +441,7 @@ async function createFixture(): Promise<{
   await createSlackOrganisationConnection(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       connectionId: CONNECTION_B,

@@ -164,7 +164,7 @@ async function organisationFixture(): Promise<{
   const ctx = { storage } as unknown as DurableObjectState;
   const env = {} as UnitTestEnv;
   env.DB = createMigratedDatabase();
-  env.SATYR_ORGANISATION_PLACEMENT_PROFILE =
+  env.PANTRY_ORGANISATION_PLACEMENT_PROFILE =
     TEST_ORGANISATION_PLACEMENT_PROFILE;
   const organisation = new OrganisationDO(ctx, env);
   const organisationId = requiredOrganisationId();

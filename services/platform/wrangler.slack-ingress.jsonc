@@ -28,9 +28,9 @@
         "region": "aws:ap-northeast-1",
       },
       "vars": {
-        "SATYR_DEPLOYMENT_PROFILE": "production",
-        "SATYR_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"production-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
-        "SATYR_VAULT_ACTIVE_KEY_VERSION": "v1",
+        "PANTRY_DEPLOYMENT_PROFILE": "production",
+        "PANTRY_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"production-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
+        "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
         "SLACK_APP_ID": "A0BFVDZLFLM",
       },
       // SLACK_SIGNING_SECRET is a Worker secret: a copy of the secret of

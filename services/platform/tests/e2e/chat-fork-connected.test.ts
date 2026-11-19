@@ -1273,7 +1273,7 @@ async function restoreConnectedChats(
   const unavailable = await OrganisationExecutionScope.resolve(
     {
       DB: env.DB,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE:
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
         '{"kind":"affinity","placementCellId":"unconfigured","locationHint":"wnam","databaseBinding":"DB"}',
     },
     ORGANISATION_ID,

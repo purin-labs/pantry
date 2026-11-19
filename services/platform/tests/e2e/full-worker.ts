@@ -238,7 +238,7 @@ function fixtureEnvironment(env: Env): Env {
     ...env,
     DATA_ENCRYPTION_ROOT: { get: fixtureRoot },
     VAULT_ROOT_V1: { get: fixtureRoot },
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     OPENROUTER_API_KEY: "plan55-simulated-inference-no-provider-credential",
   };
 }
@@ -659,11 +659,11 @@ async function turn(
   const ingressAt = Date.now();
   const response = await gateway.fetch(
     new Request(
-      `${env.SATYR_PUBLIC_ORIGIN}/v1/control/organisations/${scope.organisationId}/chat`,
+      `${env.PANTRY_PUBLIC_ORIGIN}/v1/control/organisations/${scope.organisationId}/chat`,
       {
         method: "POST",
         headers: {
-          origin: env.SATYR_PUBLIC_ORIGIN,
+          origin: env.PANTRY_PUBLIC_ORIGIN,
           "content-type": "application/json",
           cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
           "x-satyr-csrf": session.csrfToken,
@@ -693,7 +693,7 @@ async function turn(
     after: "-1",
   });
   const streamRequest = new Request(
-    `${env.SATYR_PUBLIC_ORIGIN}/v1/control/organisations/${scope.organisationId}/chat/stream?${query}`,
+    `${env.PANTRY_PUBLIC_ORIGIN}/v1/control/organisations/${scope.organisationId}/chat/stream?${query}`,
     {
       headers: {
         accept: "application/x-ndjson",

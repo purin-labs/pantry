@@ -79,7 +79,7 @@ export function parseInitialOrganisationPlacement(
 
 export function parseOrganisationPlacementProfile(
   raw: string,
-  path = "SATYR_ORGANISATION_PLACEMENT_PROFILE",
+  path = "PANTRY_ORGANISATION_PLACEMENT_PROFILE",
 ): Result<InitialOrganisationPlacement, PlacementBoundaryError> {
   let value: unknown;
 
@@ -225,18 +225,18 @@ export function parseOrganisationPlacementCells(
   try {
     value = JSON.parse(raw);
   } catch {
-    return invalidPlacement("SATYR_ORGANISATION_PLACEMENT_PROFILE");
+    return invalidPlacement("PANTRY_ORGANISATION_PLACEMENT_PROFILE");
   }
   if (!isRecord(value))
-    return invalidPlacement("SATYR_ORGANISATION_PLACEMENT_PROFILE");
+    return invalidPlacement("PANTRY_ORGANISATION_PLACEMENT_PROFILE");
   const additional = value.cells;
   if (additional !== undefined && !Array.isArray(additional)) {
-    return invalidPlacement("SATYR_ORGANISATION_PLACEMENT_PROFILE.cells");
+    return invalidPlacement("PANTRY_ORGANISATION_PLACEMENT_PROFILE.cells");
   }
   const cells: OrganisationPlacementCell[] = [];
   const ids = new Set<string>();
   for (const [index, candidate] of [value, ...(additional ?? [])].entries()) {
-    const path = `SATYR_ORGANISATION_PLACEMENT_PROFILE.cells[${index}]`;
+    const path = `PANTRY_ORGANISATION_PLACEMENT_PROFILE.cells[${index}]`;
     if (!isRecord(candidate)) return invalidPlacement(path);
     const placement = parseInitialOrganisationPlacement(
       { ...candidate, placementEpoch: 1 },

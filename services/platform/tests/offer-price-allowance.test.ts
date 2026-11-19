@@ -39,7 +39,7 @@ describe("the price allowance boundary", () => {
   beforeEach(async () => {
     const db = createMigratedDatabase();
     await createOrganisationExecutionFixture(db, ORGANISATION);
-    ENV = platformEnv({ DB: db, SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE });
+    ENV = platformEnv({ DB: db, PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE });
     vi.clearAllMocks();
     organisationMocks.readOrganisationEnvironment.mockResolvedValue("development");
     bindingMocks.resolveOrganisationCommerceMerchantBinding.mockResolvedValue({

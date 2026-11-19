@@ -8,7 +8,7 @@ const OPERATIONS = new Set(["grant", "revoke"]);
 const ROLES = new Set(["command", "approve"]);
 
 async function main() {
-  const workerUrl = requiredLocalEnv("SATYR_WORKER_URL");
+  const workerUrl = requiredLocalEnv("PANTRY_WORKER_URL");
   const adminToken = requiredLocalEnv("ORGANISATION_ADMIN_TOKEN");
   const organisationId = `organisation_${requiredLocalEnv("SLACK_TEAM_ID")}`;
   const command = process.argv[2] ?? "";

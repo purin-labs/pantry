@@ -13,8 +13,8 @@ provider review status, and incident response isolated.
 
 ## Environment origins
 
-Provider callback URLs are derived from `SATYR_OAUTH_CALLBACK_ORIGIN`. Google
-Picker's browser origin is `SATYR_PUBLIC_ORIGIN`. Deployed environments normally
+Provider callback URLs are derived from `PANTRY_OAUTH_CALLBACK_ORIGIN`. Google
+Picker's browser origin is `PANTRY_PUBLIC_ORIGIN`. Deployed environments normally
 use the same HTTPS origin for both values.
 
 | Environment                     | Public and callback origin                |
@@ -179,12 +179,12 @@ Repeat this procedure in the staging project and production project.
 1. Open [OAuth clients](https://console.cloud.google.com/auth/clients), select
    **Create client**, and choose **Web application**.
 2. Give it an environment-specific name.
-3. Add the environment's `SATYR_PUBLIC_ORIGIN` under **Authorized JavaScript
+3. Add the environment's `PANTRY_PUBLIC_ORIGIN` under **Authorized JavaScript
    origins**. Enter only the origin, with no path.
 4. Add the exact Google Drive callback under **Authorized redirect URIs**:
 
    ```text
-   ${SATYR_OAUTH_CALLBACK_ORIGIN}/v1/control/providers/google_drive/callback
+   ${PANTRY_OAUTH_CALLBACK_ORIGIN}/v1/control/providers/google_drive/callback
    ```
 
 5. Copy the client ID to `GDRIVE_OAUTH_CLIENT_ID`.
@@ -329,7 +329,7 @@ pnpm --filter @seams/platform exec wrangler secret list --env staging
 1. Verify the webhook challenge:
 
    ```bash
-   curl -fsS "${SATYR_OAUTH_CALLBACK_ORIGIN}/hook/dropbox?challenge=satyr-dropbox-check"
+   curl -fsS "${PANTRY_OAUTH_CALLBACK_ORIGIN}/hook/dropbox?challenge=satyr-dropbox-check"
    ```
 
    The response must be `satyr-dropbox-check` with HTTP 200.

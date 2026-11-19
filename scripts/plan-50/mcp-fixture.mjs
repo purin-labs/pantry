@@ -71,7 +71,7 @@ async function vaultRoot() {
   return "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
 }
 export const vaultKeys = {
-  SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+  PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
   VAULT_ROOT_V1: { get: vaultRoot },
 };
 export const cursorKey = "native-mcp-trial-cursor-signing-key-00000000";

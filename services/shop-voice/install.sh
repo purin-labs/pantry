@@ -18,23 +18,23 @@ if [ "$(sw_vers -productVersion | cut -d. -f1)" -lt 14 ]; then
   echo "This service needs macOS 14 or later." >&2
   exit 1
 fi
-SATYR_VOICE_HOME="${SATYR_VOICE_HOME:-$HOME/.satyr-voice}"
-export SATYR_VOICE_HOME
-case "$SATYR_VOICE_HOME" in
+PANTRY_VOICE_HOME="${PANTRY_VOICE_HOME:-$HOME/.satyr-voice}"
+export PANTRY_VOICE_HOME
+case "$PANTRY_VOICE_HOME" in
   *" "*) echo "The service folder must have no space in its path." >&2; exit 1 ;;
 esac
-mkdir -p "$SATYR_VOICE_HOME/app" "$SATYR_VOICE_HOME/bin"
-chmod 700 "$SATYR_VOICE_HOME"
+mkdir -p "$PANTRY_VOICE_HOME/app" "$PANTRY_VOICE_HOME/bin"
+chmod 700 "$PANTRY_VOICE_HOME"
 
 PAYLOAD='__SHOP_VOICE_PAYLOAD__'
 # An update removes the old source first, so a module that the new version deleted cannot stay.
-rm -rf "$SATYR_VOICE_HOME/app/shop_voice"
+rm -rf "$PANTRY_VOICE_HOME/app/shop_voice"
 case "$PAYLOAD" in
-  __*) cp -R "$(dirname "$0")/shop_voice" "$(dirname "$0")/requirements.lock" "$SATYR_VOICE_HOME/app/" ;;
-  *) printf '%s' "$PAYLOAD" | base64 -d | tar -xz -C "$SATYR_VOICE_HOME/app" ;;
+  __*) cp -R "$(dirname "$0")/shop_voice" "$(dirname "$0")/requirements.lock" "$PANTRY_VOICE_HOME/app/" ;;
+  *) printf '%s' "$PAYLOAD" | base64 -d | tar -xz -C "$PANTRY_VOICE_HOME/app" ;;
 esac
 
-UV="$SATYR_VOICE_HOME/bin/uv"
+UV="$PANTRY_VOICE_HOME/bin/uv"
 if [ ! -x "$UV" ]; then
   ARCHIVE="$(mktemp)"
   curl -fsSL -o "$ARCHIVE" "https://github.com/astral-sh/uv/releases/download/$UV_VERSION/uv-aarch64-apple-darwin.tar.gz"
@@ -43,15 +43,15 @@ if [ ! -x "$UV" ]; then
     echo "The uv download failed its SHA-256 check." >&2
     exit 1
   fi
-  tar -xzf "$ARCHIVE" -C "$SATYR_VOICE_HOME/bin" --strip-components=1 uv-aarch64-apple-darwin/uv
+  tar -xzf "$ARCHIVE" -C "$PANTRY_VOICE_HOME/bin" --strip-components=1 uv-aarch64-apple-darwin/uv
   rm -f "$ARCHIVE"
 fi
 
-VENV="$SATYR_VOICE_HOME/venv"
+VENV="$PANTRY_VOICE_HOME/venv"
 "$UV" venv -q --allow-existing --python "$PYTHON_VERSION" --python-preference only-managed "$VENV"
-"$UV" pip install -q --python "$VENV/bin/python" --no-deps --require-hashes --compile-bytecode -r "$SATYR_VOICE_HOME/app/requirements.lock"
+"$UV" pip install -q --python "$VENV/bin/python" --no-deps --require-hashes --compile-bytecode -r "$PANTRY_VOICE_HOME/app/requirements.lock"
 
-export PYTHONPATH="$SATYR_VOICE_HOME/app"
+export PYTHONPATH="$PANTRY_VOICE_HOME/app"
 # An update keeps the Mac's name, certificate, credential and model.
 if [ "${1:-}" != --update ]; then
   "$VENV/bin/python" -m shop_voice enroll "$@"

@@ -295,7 +295,7 @@ export async function exerciseRegionalVaultRotation(): Promise<void> {
   const databases = [env.ORGANISATION_DB_WNAM, env.ORGANISATION_DB_APAC].map(
     organisationHandle,
   );
-  const keys = { ...env, SATYR_VAULT_ACTIVE_KEY_VERSION: "v2" as const };
+  const keys = { ...env, PANTRY_VAULT_ACTIVE_KEY_VERSION: "v2" as const };
   const rotationId = required(
     parseVaultRootRotationId(`vrot_${crypto.randomUUID()}`),
   );

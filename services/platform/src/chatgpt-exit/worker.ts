@@ -26,7 +26,7 @@ export class ChatGptExitContainer extends Container<ChatGptExitEnv> {
 
 type ChatGptExitEnv = {
   readonly CHATGPT_EXIT_CONTAINER: DurableObjectNamespace<ChatGptExitContainer>;
-  readonly SATYR_DEPLOYMENT_PROFILE: string;
+  readonly PANTRY_DEPLOYMENT_PROFILE: string;
 };
 
 /** All organisations share one container. */

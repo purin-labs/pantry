@@ -671,7 +671,7 @@ async function createFixture(slug: string): Promise<Fixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: `Mailbox Route ${slug}`,
@@ -716,8 +716,8 @@ async function createFixture(slug: string): Promise<Fixture> {
   const account = await connectRealAccountPlatform(
     platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      SATYR_PUBLIC_ORIGIN: ORIGIN,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_PUBLIC_ORIGIN: ORIGIN,
       CONNECTOR: fakeConnectorNamespace(connector),
     }),
     {

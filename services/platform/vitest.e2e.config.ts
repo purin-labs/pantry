@@ -33,7 +33,7 @@ const TEST_SECRET_BINDINGS = {
   STRIPE_CONNECT_WEBHOOK_SECRET: "whsec_e2e",
   ORGANISATION_ADMIN_TOKEN: "organisation-admin-e2e-token-000000000000",
   UNDERCLERK_SERVICE_TOKEN: "underclerk-e2e-token",
-  SATYR_FAULT_INJECTION_TOKEN: "fault-injection-e2e-token",
+  PANTRY_FAULT_INJECTION_TOKEN: "fault-injection-e2e-token",
   WHATSAPP_APP_SECRET: "whatsapp-e2e-app-secret",
 } as const;
 
@@ -43,11 +43,11 @@ const TEST_VALUE_BINDINGS = {
   GMAIL_PUBSUB_TOPIC: "projects/mail-e2e/topics/mail-e2e",
   GOOGLE_OIDC_CLIENT_ID: "google-oidc-e2e-client",
   NOTION_OAUTH_CLIENT_ID: "notion-e2e-client",
-  SATYR_DEPLOYMENT_PROFILE: "local",
-  SATYR_PUBLIC_ORIGIN: "https://localhost",
+  PANTRY_DEPLOYMENT_PROFILE: "local",
+  PANTRY_PUBLIC_ORIGIN: "https://localhost",
   SQUARE_OAUTH_CLIENT_ID: "sandbox-sq0idb-e2e",
   SQUARE_OAUTH_ENVIRONMENT: "development",
-  SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+  PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
     kind: "affinity",
     placementCellId: "e2e",
     locationHint: "wnam",
@@ -115,7 +115,7 @@ const TEST_VALUE_BINDINGS = {
       },
     ],
   }),
-  SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+  PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
   SLACK_APP_ID: "A12345678",
   UNDERCLERK_BASE_URL: "http://underclerk.test",
   SHOP_ORDER_PAGE_ORIGIN: "https://{name}.menu.test",
@@ -160,7 +160,7 @@ export default defineConfig({
 /** The cells of the fixture profile, each bound to a regional database. */
 function regionalFixtureCells(): readonly Record<string, unknown>[] {
   const profile = JSON.parse(
-    TEST_VALUE_BINDINGS.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    TEST_VALUE_BINDINGS.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   ) as Record<string, unknown> & { cells: Record<string, unknown>[] };
   const { cells, ...root } = profile;
   return [root, ...cells].map((cell) => ({
@@ -202,14 +202,14 @@ async function cloudflareOptions() {
       bindings: {
         ...TEST_SECRET_BINDINGS,
         OPENROUTER_API_KEY:
-          process.env.SATYR_PI_ACCEPTANCE_API_KEY ??
+          process.env.PANTRY_PI_ACCEPTANCE_API_KEY ??
           TEST_SECRET_BINDINGS.OPENROUTER_API_KEY,
         ...TEST_VALUE_BINDINGS,
         ...accountPlatform.bindings,
         TEST_MIGRATIONS: migrations,
         TEST_REGIONAL_MIGRATIONS: regionalMigrations,
         TEST_PRODUCTION_CRONS: productionCrons(),
-        SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
           kind: "affinity",
           placementCellId: "regional-wnam",
           locationHint: "wnam",
@@ -300,7 +300,7 @@ function commerceFixtureWorker() {
     // Product photos live in R2, as in production.
     r2Buckets: ["BUCKET"],
     bindings: {
-      SATYR_DEPLOYMENT_PROFILE: "local",
+      PANTRY_DEPLOYMENT_PROFILE: "local",
       UNDERCLERK_SERVICE_TOKEN: TEST_SECRET_BINDINGS.UNDERCLERK_SERVICE_TOKEN,
       UNDERCLERK_BUYER_SESSION_SECRET: "bakery-e2e-buyer-secret-00000001",
       UNDERCLERK_SIGNING_KEY_ID: "key_bakery_e2e",
@@ -334,7 +334,7 @@ const ACCOUNT_WORKER_PRICES = [
 
 /** Load the built account Worker. This test runtime never imports Seams source. */
 function sharedAccountPlatformTestRuntime() {
-  const artifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
+  const artifact = process.env.PANTRY_ACCOUNT_WORKER_ARTIFACT;
   const bindings: Record<string, string> = {};
   const serviceBindings: Record<string, { name: string }> = {};
   if (!artifact) return { workers: [] as const, bindings, serviceBindings };
@@ -460,7 +460,7 @@ function buildModelExitWorker() {
     name: MODEL_EXIT_WORKER,
     compatibilityDate: "2026-07-07",
     ...buildWorkerModules("wrangler.model-exit.jsonc", "model-exit"),
-    bindings: { SATYR_DEPLOYMENT_PROFILE: "local" },
+    bindings: { PANTRY_DEPLOYMENT_PROFILE: "local" },
     outboundService: { name: RUNNER_WORKER, entrypoint: "ModelExitNetwork" },
   };
 }

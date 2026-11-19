@@ -107,7 +107,7 @@ async function preservesCredentialOnFailedWrite(): Promise<void> {
 
   const failed = await storeVaultSecret({
     db: fixture.db,
-    keys: { SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" },
+    keys: { PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1" },
     organisationId: fixture.organisationId,
     handle,
     secret: { kind: "bearer", value: "replacement-secret" },
@@ -205,7 +205,7 @@ async function omitsSecretsFromStoreErrors(): Promise<void> {
 
   const failed = await storeVaultSecret({
     db: fixture.db,
-    keys: { SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" },
+    keys: { PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1" },
     organisationId: fixture.organisationId,
     handle,
     secret: { kind: "bearer", value: "never-surfaced-secret" },
@@ -286,7 +286,7 @@ async function rejectsRemovedRoot(): Promise<void> {
     resolveVaultHandle({
       db: fixture.db,
       keys: {
-        SATYR_VAULT_ACTIVE_KEY_VERSION: "v2",
+        PANTRY_VAULT_ACTIVE_KEY_VERSION: "v2",
         VAULT_ROOT_V2: fixture.v2Active.VAULT_ROOT_V2,
       },
       organisationId: fixture.organisationId,
@@ -389,12 +389,12 @@ function createFixture(): CredentialVaultFixture {
     db: d1Database(sqlite),
     organisationId,
     v1Active: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
       VAULT_ROOT_V1: v1,
       VAULT_ROOT_V2: v2,
     },
     v2Active: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v2",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v2",
       VAULT_ROOT_V1: v1,
       VAULT_ROOT_V2: v2,
     },

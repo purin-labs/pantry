@@ -1045,7 +1045,7 @@ async function insertOrganisation(
       .bind(organisationId, name, now)
       .run();
   const placement = parseOrganisationPlacementProfile(
-    env.SATYR_ORGANISATION_PLACEMENT_PROFILE,
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   if (!placement.ok) throw new Error(placement.error.code);
   const installed = await ensureInitialOrganisationPlacement({

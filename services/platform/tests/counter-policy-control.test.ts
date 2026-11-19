@@ -111,7 +111,7 @@ function publicationRequest(body: Record<string, unknown>): Request {
 }
 
 function env(): UnitTestEnv {
-  return platformEnv({ SATYR_PUBLIC_ORIGIN: "https://satyr.example" });
+  return platformEnv({ PANTRY_PUBLIC_ORIGIN: "https://satyr.example" });
 }
 
 describe("counter policy control routes", function counterPolicySuite() {

@@ -209,7 +209,7 @@ async function decideFromClick(
   requestId: RequestId,
 ): Promise<void> {
   const installation = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!installation.ok || installation.value.appId !== click.appId) return;
@@ -268,7 +268,7 @@ async function denyFromClick(
   requestId: RequestId,
 ): Promise<void> {
   const installation = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!installation.ok || installation.value.appId !== click.appId) return;
@@ -324,7 +324,7 @@ async function startSideCaseFromClick(
 ): Promise<void> {
   try {
     const installation = resolveConfiguredSlackInstallationIdentity({
-      deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+      deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
       appId: env.SLACK_APP_ID,
     });
     if (!installation.ok || installation.value.appId !== click.appId) return;

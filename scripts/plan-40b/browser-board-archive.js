@@ -8,7 +8,7 @@ async (page) => {
   // Archived list still restores. In the Images panel, a delete asks a second
   // time and names the board that shows the image.
   //
-  // Run: SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
+  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
   //   python3 scripts/plan-74/run-browser.py --journey scripts/plan-40b/browser-board-archive.js \
   //   --entry /menus-preview.html --artifacts output/playwright/plan-40b-archive
   //

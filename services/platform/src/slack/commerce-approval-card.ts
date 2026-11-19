@@ -64,7 +64,7 @@ export function commerceActionPortalUrl(
 ): string {
   const organisation = encodeURIComponent(address.organisationHandle);
   const workspace = encodeURIComponent(address.workspaceHandle);
-  return `${requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/operations?commerceAction=${encodeURIComponent(nonce)}`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/operations?commerceAction=${encodeURIComponent(nonce)}`;
 }
 
 /** What a proposal knows about the record that it changes. */

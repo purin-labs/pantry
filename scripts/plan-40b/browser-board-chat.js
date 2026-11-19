@@ -6,7 +6,7 @@ async (page) => {
   // stays while the chat opens and closes and while a sheet opens over it, and the canvas
   // fits the narrower pane instead of leaving the page.
   //
-  // Run: SATYR_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
+  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
   //   python3 scripts/plan-74/run-browser.py --journey scripts/plan-40b/browser-board-chat.js \
   //   --entry /menus-preview.html --artifacts output/playwright/plan-40b-chat
   const WORKER = "http://127.0.0.1:8874";

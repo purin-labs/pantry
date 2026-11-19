@@ -1066,7 +1066,7 @@ async function attachMerchantActionDestination(input: {
     };
   }
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: input.env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: input.env.PANTRY_DEPLOYMENT_PROFILE,
     appId: input.env.SLACK_APP_ID,
   });
   if (!installationIdentity.ok) {

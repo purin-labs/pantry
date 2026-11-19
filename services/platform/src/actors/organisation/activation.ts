@@ -412,8 +412,8 @@ export function hasOnboardingActivationAcceptanceFaultsEnabled(
   env: Env,
 ): boolean {
   return (
-    typeof env.SATYR_FAULT_INJECTION_TOKEN === "string" &&
-    env.SATYR_FAULT_INJECTION_TOKEN.length > 0
+    typeof env.PANTRY_FAULT_INJECTION_TOKEN === "string" &&
+    env.PANTRY_FAULT_INJECTION_TOKEN.length > 0
   );
 }
 

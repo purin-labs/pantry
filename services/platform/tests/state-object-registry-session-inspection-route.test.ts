@@ -621,7 +621,7 @@ async function routeFixture(
     connectorStub,
     env: platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
       SESSION: namespace as unknown as DurableObjectNamespace<SessionDO>,
       CASE: caseNamespace as unknown as DurableObjectNamespace<CaseDO>,
       CONNECTOR:

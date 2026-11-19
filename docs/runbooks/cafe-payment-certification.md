@@ -92,28 +92,28 @@ operations, and proves recovery after a simulated transport interruption.
 
 Configure and export these values outside the repository:
 
-- `SATYR_WORKER_URL` — the deployed Worker base URL. HTTPS is required except
+- `PANTRY_WORKER_URL` — the deployed Worker base URL. HTTPS is required except
   for a local loopback URL;
 - `UNDERCLERK_BASE_URL` — the deployed Underclerk public and service API base
   URL;
-- `SATYR_CAFE_ORGANISATION_ID` — the CafeOS organisation whose current account is being
+- `PANTRY_CAFE_ORGANISATION_ID` — the CafeOS organisation whose current account is being
   certified;
-- `SATYR_CAFE_MERCHANT_ID` — the merchant owned by that organisation;
-- `SATYR_CAFE_STOREFRONT_ID` — the activated storefront, or omit it to use
+- `PANTRY_CAFE_MERCHANT_ID` — the merchant owned by that organisation;
+- `PANTRY_CAFE_STOREFRONT_ID` — the activated storefront, or omit it to use
   `storefront_cafe`;
 - `ORGANISATION_ADMIN_TOKEN` — the organisation-admin bearer token for the Worker;
-- `SATYR_CAFE_STRIPE_TEST_ACCESS_TOKEN` — an account-scoped `sk_test_`
+- `PANTRY_CAFE_STRIPE_TEST_ACCESS_TOKEN` — an account-scoped `sk_test_`
   OAuth access token;
-- `SATYR_CAFE_STRIPE_TEST_PUBLISHABLE_KEY` — the matching `pk_test_` key; and
-- `SATYR_CAFE_STRIPE_TEST_ACCOUNT_ID` — the exact `acct_` identity represented
+- `PANTRY_CAFE_STRIPE_TEST_PUBLISHABLE_KEY` — the matching `pk_test_` key; and
+- `PANTRY_CAFE_STRIPE_TEST_ACCOUNT_ID` — the exact `acct_` identity represented
   by the development candidate returned by the Worker;
 - `UNDERCLERK_SERVICE_TOKEN` — the service token used only to read and, when
   necessary, replenish the disposable acceptance inventory;
-- `SATYR_FAULT_INJECTION_TOKEN` — the acceptance-only token for the deployed
+- `PANTRY_FAULT_INJECTION_TOKEN` — the acceptance-only token for the deployed
   queue interruption point;
 - `SLACK_BOT_TOKEN` — a bot token that can read the configured receipt channel;
   and
-- `SATYR_CAFE_SLACK_CHANNEL_ID` — the channel that receives the merchant-safe
+- `PANTRY_CAFE_SLACK_CHANNEL_ID` — the channel that receives the merchant-safe
   payment receipt.
 
 These acceptance-only values are separate from `STRIPE_CONNECT_CLIENT_SECRET`,
@@ -132,12 +132,12 @@ the exact placed Order, consume the configured queue interruption point, and
 poll Slack for the resulting receipt. The receipt must name the
 same Order and Payment while excluding provider references and credentials.
 The gate passes that validated receipt evidence directly into the live Stripe
-matrix; operators do not construct `SATYR_CAFE_RECEIPT_EVIDENCE` by hand.
+matrix; operators do not construct `PANTRY_CAFE_RECEIPT_EVIDENCE` by hand.
 
 The live matrix reads
 `/v1/admin/cafe-payment-certification?organisationId=...` and requires one development
 Stripe candidate whose `acct_` identity matches
-`SATYR_CAFE_STRIPE_TEST_ACCOUNT_ID`. It uses that exact binding for the closed
+`PANTRY_CAFE_STRIPE_TEST_ACCOUNT_ID`. It uses that exact binding for the closed
 eight-check matrix, includes the validated receipt in the evidence digest,
 and POSTs the packet to `/v1/admin/cafe-payment-certification`. A final GET must
 find the immutable record and certified payment authority. Retain the CI run
@@ -152,7 +152,7 @@ automatically. For a manual inspection, read the candidate binding with:
 ```bash
 curl --fail-with-body \
   -H "Authorization: Bearer ${ORGANISATION_ADMIN_TOKEN}" \
-  "${SATYR_WORKER_URL}/v1/admin/cafe-payment-certification?organisationId=${SATYR_CAFE_ORGANISATION_ID}"
+  "${PANTRY_WORKER_URL}/v1/admin/cafe-payment-certification?organisationId=${PANTRY_CAFE_ORGANISATION_ID}"
 ```
 
 The response must expose exactly one current development Stripe binding with

@@ -57,7 +57,7 @@ export async function ensureCommerceWebhookSubscription(
   const { env, db, client, binding, now } = input;
   const operatorToken = env.UNDERCLERK_SERVICE_TOKEN;
   if (operatorToken === undefined) return "unavailable";
-  const url = `${env.SATYR_PUBLIC_ORIGIN}/hook/underclerk/${binding.organisationId}`;
+  const url = `${env.PANTRY_PUBLIC_ORIGIN}/hook/underclerk/${binding.organisationId}`;
   const listed = await client.listWebhookSubscriptions(binding.merchantId);
   if (!listed.ok) return "unavailable";
   let subscription = listed.value.find((item) => item.id === SUBSCRIPTION_ID);
@@ -227,7 +227,7 @@ async function consumeAcceptanceFault(
   secret: KeptSecret,
   now: number,
 ): Promise<boolean> {
-  if (env.SATYR_FAULT_INJECTION_TOKEN === undefined) return false;
+  if (env.PANTRY_FAULT_INJECTION_TOKEN === undefined) return false;
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId,

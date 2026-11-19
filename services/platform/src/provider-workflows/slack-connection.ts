@@ -73,7 +73,7 @@ export async function connectSlack(
     return failProviderCompletion(input, attempt, current, installation.error);
   }
   const configuredIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: input.env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: input.env.PANTRY_DEPLOYMENT_PROFILE,
     appId: input.env.SLACK_APP_ID,
   });
   if (

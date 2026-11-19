@@ -26,7 +26,7 @@
     "local": {
       "name": "underclerk",
       "vars": {
-        "SATYR_DEPLOYMENT_PROFILE": "local",
+        "PANTRY_DEPLOYMENT_PROFILE": "local",
         "UNDERCLERK_SIGNING_KEY_ID": "key_underclerk_v1",
       },
       "secrets": {
@@ -55,7 +55,7 @@
     "staging": {
       "name": "underclerk-staging",
       "vars": {
-        "SATYR_DEPLOYMENT_PROFILE": "staging",
+        "PANTRY_DEPLOYMENT_PROFILE": "staging",
         "UNDERCLERK_SIGNING_KEY_ID": "key_underclerk_staging_v1",
       },
       "secrets": {
@@ -83,7 +83,7 @@
       "name": "underclerk",
       "vars": {
         "UNDERCLERK_SIGNING_KEY_ID": "key_underclerk_v1",
-        "SATYR_DEPLOYMENT_PROFILE": "production",
+        "PANTRY_DEPLOYMENT_PROFILE": "production",
         "SHOP_SITE_ORIGIN": "https://shop.seams.tokyo",
       },
       "secrets": {

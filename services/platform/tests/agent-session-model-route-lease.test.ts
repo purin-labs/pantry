@@ -144,7 +144,7 @@ async function leaseScope(): Promise<OrganisationExecutionScope> {
   ).run();
   const env = platformEnv({
     DB: db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
   const scope = await OrganisationExecutionScope.resolve(env, organisationId);
   if (!scope.ok) throw new Error(scope.error.code);

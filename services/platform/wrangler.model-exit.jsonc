@@ -33,15 +33,15 @@
   "env": {
     "local": {
       "name": "satyr-model-exit-local",
-      "vars": { "SATYR_DEPLOYMENT_PROFILE": "local" },
+      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "local" },
     },
     "staging": {
       "name": "satyr-model-exit-staging",
-      "vars": { "SATYR_DEPLOYMENT_PROFILE": "staging" },
+      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "staging" },
     },
     "production": {
       "name": "satyr-model-exit",
-      "vars": { "SATYR_DEPLOYMENT_PROFILE": "production" },
+      "vars": { "PANTRY_DEPLOYMENT_PROFILE": "production" },
     },
   },
 }

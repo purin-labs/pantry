@@ -56,8 +56,8 @@ both local and production flows.
 | Gmail  | `https://localhost:3003/v1/control/providers/gmail/callback`        | `https://satyr-edge.n6378056.workers.dev/v1/control/providers/gmail/callback`        |
 | Drive  | `https://localhost:3003/v1/control/providers/google_drive/callback` | `https://satyr-edge.n6378056.workers.dev/v1/control/providers/google_drive/callback` |
 
-SSO derives its callback from `SATYR_PUBLIC_ORIGIN`. Gmail and Drive derive
-theirs from `SATYR_OAUTH_CALLBACK_ORIGIN`. Both local origins are
+SSO derives its callback from `PANTRY_PUBLIC_ORIGIN`. Gmail and Drive derive
+theirs from `PANTRY_OAUTH_CALLBACK_ORIGIN`. Both local origins are
 `https://localhost:3003`. Exact scheme, port, path, and trailing slash matter.
 
 The SSO web client's local **Authorized JavaScript origin** is

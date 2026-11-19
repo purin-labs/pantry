@@ -145,7 +145,7 @@ export async function authenticateControlMutation(
 ): Promise<AuthenticatedControlResult> {
   if (
     request.headers.get("origin") !==
-    requirePublicOrigin(env.SATYR_PUBLIC_ORIGIN)
+    requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)
   ) {
     return { ok: false, response: controlError("origin_invalid", 403) };
   }

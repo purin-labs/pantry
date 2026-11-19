@@ -82,7 +82,7 @@ export type ProviderCleanupCredentials = {
 
 export type ProviderAdapterBindings = Pick<
   Env,
-  | "SATYR_DEPLOYMENT_PROFILE"
+  | "PANTRY_DEPLOYMENT_PROFILE"
   | "SLACK_APP_ID"
   | "AIRTABLE_OAUTH_CLIENT_ID"
   | "AIRTABLE_OAUTH_CLIENT_SECRET"

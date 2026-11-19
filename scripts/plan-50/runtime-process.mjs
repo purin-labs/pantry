@@ -100,11 +100,11 @@ const worker = {
     TRIAL_SCENARIO: basename(persistenceDirectory),
     // Platform's paid route, on the cheaper model that tests run.
     OPENROUTER_API_KEY: "native-model-fixture-key",
-    SATYR_PLATFORM_PI_MODEL: "qwen/qwen3.7-flash",
+    PANTRY_PLATFORM_PI_MODEL: "qwen/qwen3.7-flash",
     ...(usesDraftCollaboration
       ? {
           DRAFT_SCENARIO: basename(persistenceDirectory),
-          SATYR_DEPLOYMENT_PROFILE: "local",
+          PANTRY_DEPLOYMENT_PROFILE: "local",
           SLACK_APP_ID: "A12345678",
         }
       : {}),
@@ -122,7 +122,7 @@ const worker = {
       : {}),
     ...(usesProvider
       ? {
-          SATYR_PUBLIC_ORIGIN: draftBrowser
+          PANTRY_PUBLIC_ORIGIN: draftBrowser
             ? "http://127.0.0.1:8836"
             : "https://fixture.test",
           GOOGLE_OIDC_CLIENT_ID: "native-provider-fixture",
@@ -138,7 +138,7 @@ const worker = {
     ...(usesAuthority
       ? {
           FIXTURE_QUERIES: JSON.stringify(fixtureQueries),
-          SATYR_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
             databaseBinding: "DB",
             kind: "affinity",
             placementCellId: "cell-trial",

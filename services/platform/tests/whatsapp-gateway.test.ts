@@ -157,7 +157,7 @@ async function testEnv(): Promise<UnitTestEnv> {
   await createOrganisationExecutionFixture(db, requireOrganisationId("organisation_whatsapp_dev"));
   return platformEnv({
     DB: db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     CONNECTOR: {} as unknown as UnitTestEnv["CONNECTOR"],
     WHATSAPP_APP_SECRET: FIXTURE_APP_SECRET,
     WHATSAPP_VERIFY_TOKEN: FIXTURE_VERIFY_TOKEN,

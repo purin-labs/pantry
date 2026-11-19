@@ -106,7 +106,7 @@ async function createFixture(): Promise<RouteFixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Harness Erasure Route Organisation",
@@ -120,7 +120,7 @@ async function createFixture(): Promise<RouteFixture> {
     execution: await requireOrganisationExecutionScope(
       {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       organisation.organisationId,
@@ -186,8 +186,8 @@ async function createFixture(): Promise<RouteFixture> {
   return {
     env: platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      SATYR_PUBLIC_ORIGIN: ORIGIN,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_PUBLIC_ORIGIN: ORIGIN,
       SESSION: emptySessionNamespace(),
     }),
     organisationId: organisation.organisationId,

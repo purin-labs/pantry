@@ -114,7 +114,7 @@ Run this path in one new Slack root thread where the agent is installed:
 Record the root and reply permalinks, Case and session identifiers, policy
 versions, mutation receipts, and the observation window. Use the repository QA
 skill from the live Slack thread for tool, file, context, logs, and metrics
-coverage; a desktop shell without `SATYR_THREAD_KEY`, `SLACK_CHANNEL_ID`, and
+coverage; a desktop shell without `PANTRY_THREAD_KEY`, `SLACK_CHANNEL_ID`, and
 `SLACK_THREAD_TS` cannot substitute for that proof.
 
 ## Acceptance gate

@@ -8621,7 +8621,7 @@ it(
   supplierEvalRunJourney,
   240_000,
 );
-// The real model answers each Eval turn. It needs SATYR_PI_ACCEPTANCE_API_KEY.
+// The real model answers each Eval turn. It needs PANTRY_PI_ACCEPTANCE_API_KEY.
 it.skipIf(env.OPENROUTER_API_KEY === "openrouter-e2e-key")(
   "runs the reviewed Eval three times on the real pinned Pi route and records what the model did",
   supplierLiveEvalRunJourney,

@@ -172,13 +172,14 @@ async function pairAccountPlatform() {
 /** The account Worker's side of each value that the two Workers share. */
 function accountPlatformEnvironment(input) {
   const { vars } = input;
-  const placement = JSON.parse(vars.SATYR_ORGANISATION_PLACEMENT_PROFILE);
+  const placement = JSON.parse(vars.PANTRY_ORGANISATION_PLACEMENT_PROFILE);
   const userKey = createPrivateKey({
     key: Buffer.from(input.userAssertionPkcs8, "base64url"),
     format: "der",
     type: "pkcs8",
   });
   return {
+    // seams-monorepo's Console Worker (seams-sdk-d1-local) reads these exact SATYR_* keys from .env.local.
     SATYR_DEPLOYMENT_ID: vars.ACCOUNT_PLATFORM_DEPLOYMENT_ID,
     SATYR_ACCOUNT_ASSERTION_ISSUER: vars.ACCOUNT_PLATFORM_ASSERTION_ISSUER,
     SATYR_ACCOUNT_ASSERTION_AUDIENCE: vars.ACCOUNT_PLATFORM_ASSERTION_AUDIENCE,

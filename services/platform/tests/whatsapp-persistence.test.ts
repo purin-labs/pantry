@@ -281,7 +281,7 @@ async function seedSecondOrganisation(world: WhatsAppTestWorld): Promise<{
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: world.db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Second WhatsApp Organisation",
@@ -299,7 +299,7 @@ async function seedSecondOrganisation(world: WhatsAppTestWorld): Promise<{
   const storedCredential = await storeVaultSecret({
     db: world.db,
     keys: {
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
       VAULT_ROOT_V1: testRootSecret(),
     },
     organisationId: organisation.organisationId,

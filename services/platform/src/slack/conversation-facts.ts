@@ -224,7 +224,7 @@ async function slackBotToken(
   if (channel === null) return null;
   const workspaceId = parseWorkspaceId(channel.workspace_id);
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-    deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+    deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
     appId: env.SLACK_APP_ID,
   });
   if (!workspaceId.ok || !installationIdentity.ok) return null;

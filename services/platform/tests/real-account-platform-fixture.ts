@@ -59,10 +59,10 @@ export async function connectRealAccountPlatform(
     }>[];
   }>,
 ): Promise<Readonly<{ env: UnitTestEnv; artifactSha256: string }>> {
-  const artifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
+  const artifact = process.env.PANTRY_ACCOUNT_WORKER_ARTIFACT;
   if (!artifact)
     throw new Error(
-      "Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker",
+      "Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker",
     );
   const transport = await RealAccountTransport.create(artifact);
   const configured: UnitTestEnv = {
@@ -226,7 +226,7 @@ async function auxiliaryOwner(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner: user,
     organisationName: label,
@@ -246,7 +246,7 @@ async function auxiliaryOwner(
     member: await nativeMember(
       platformEnv({
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       }),
       organisation.organisationId,

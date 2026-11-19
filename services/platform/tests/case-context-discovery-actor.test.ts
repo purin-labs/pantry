@@ -371,6 +371,6 @@ async function caseContextCollectionEnvironment(
   if (!placement.ok) throw new Error(placement.error.code);
   return platformEnv({
     DB: db,
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
 }

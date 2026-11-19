@@ -2,7 +2,7 @@
 // shop Mac journeys), started by the journey's provider process.
 //
 // The account authority is not simulated. The provider process starts the
-// built account Worker of the acceptance tests (SATYR_ACCOUNT_WORKER_ARTIFACT)
+// built account Worker of the acceptance tests (PANTRY_ACCOUNT_WORKER_ARTIFACT)
 // as a second local Worker with its own database, and binds it to the fixture
 // Worker as `ACCOUNT_PLATFORM`. The account Worker has no public address.
 import { unstable_startWorker } from "../../services/platform/node_modules/wrangler/wrangler-dist/cli.js";
@@ -36,10 +36,10 @@ export function stream(chunks) {
 
 /** The path of the built account Worker. */
 export function accountArtifact() {
-  const artifact = process.env.SATYR_ACCOUNT_WORKER_ARTIFACT;
+  const artifact = process.env.PANTRY_ACCOUNT_WORKER_ARTIFACT;
   if (!artifact) {
     throw new Error(
-      "Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.",
+      "Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.",
     );
   }
   return artifact;

@@ -72,7 +72,7 @@ describe("Slack install organisation admission", function slackInstallOrganisati
       placement: requiredInitialPlacement(),
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       workspaceId,
@@ -115,7 +115,7 @@ describe("Slack install organisation admission", function slackInstallOrganisati
       placement: requiredInitialPlacement(),
       env: {
         DB: db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       workspaceId,
@@ -135,7 +135,7 @@ describe("Slack install organisation admission", function slackInstallOrganisati
         placement: requiredInitialPlacement(),
         env: {
           DB: db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         workspaceId,

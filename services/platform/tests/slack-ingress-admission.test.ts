@@ -176,7 +176,7 @@ async function rejectsUnselectedDestination(): Promise<void> {
 async function ingressFor(fixture: Awaited<ReturnType<typeof createFixture>>) {
   return authorizeResolvedSlackCaseIngress({
     env: fixture.env,
-    keys: { SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" },
+    keys: { PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1" },
     event: rootMention(),
     route: fixture.route,
   });
@@ -221,7 +221,7 @@ async function createFixture() {
   if (!handle.ok) throw new Error(handle.error.code);
   const stored = await storeVaultSecret({
     db,
-    keys: { SATYR_VAULT_ACTIVE_KEY_VERSION: "v1", VAULT_ROOT_V1: testRoot(24) },
+    keys: { PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1", VAULT_ROOT_V1: testRoot(24) },
     organisationId,
     handle: handle.value,
     secret: { kind: "bearer", value: "xoxb-latency-fixture" },
@@ -275,7 +275,7 @@ async function createFixture() {
   const account = await connectRealAccountPlatform(
     platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     }),
     { organisationId, owner, members: [{ slot: "operator", actor: operator }] },
   );

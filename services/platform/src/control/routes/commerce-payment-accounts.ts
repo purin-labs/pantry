@@ -112,7 +112,7 @@ export async function handleCommercePaymentAccountControlRoute(
     return controlError("stripe_onboarding_invalid", 422);
   // Stripe returns the owner to the Portal page that opened onboarding. A
   // repeated request reuses the merchant's account and opens a new link.
-  const origin = env.SATYR_PUBLIC_ORIGIN.replace(/\/$/u, "");
+  const origin = env.PANTRY_PUBLIC_ORIGIN.replace(/\/$/u, "");
   if (!origin.startsWith("https://"))
     return controlError("public_origin_missing", 503);
   const opened = await merchant.client.startStripeOnboarding(

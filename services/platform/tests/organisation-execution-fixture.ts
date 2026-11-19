@@ -36,7 +36,7 @@ import {
 } from "../src/chat/turn-access";
 
 export async function requireOrganisationExecutionScope(
-  env: Pick<Env, "DB" | "SATYR_ORGANISATION_PLACEMENT_PROFILE">,
+  env: Pick<Env, "DB" | "PANTRY_ORGANISATION_PLACEMENT_PROFILE">,
   organisationId: OrganisationId,
 ): Promise<OrganisationExecutionScope> {
   const resolved = await OrganisationExecutionScope.resolve(
@@ -48,7 +48,7 @@ export async function requireOrganisationExecutionScope(
 }
 
 export async function admitControlTurnFixture(
-  env: Pick<Env, "DB" | "SATYR_ORGANISATION_PLACEMENT_PROFILE">,
+  env: Pick<Env, "DB" | "PANTRY_ORGANISATION_PLACEMENT_PROFILE">,
   authority: Extract<RequestAuthority, { kind: "control" }>,
   controlSessionId: ControlSessionId,
 ): Promise<SessionTurnExecution> {
@@ -69,7 +69,7 @@ export async function admitControlTurnFixture(
 }
 
 export async function admitOperatorControlTurnFixture(
-  env: Pick<Env, "DB" | "SATYR_ORGANISATION_PLACEMENT_PROFILE">,
+  env: Pick<Env, "DB" | "PANTRY_ORGANISATION_PLACEMENT_PROFILE">,
   organisationId: OrganisationId,
   userId: UserId,
   controlSessionId: ControlSessionId,
@@ -129,14 +129,14 @@ export async function createOrganisationExecutionFixture(
   return requireOrganisationExecutionScope(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     organisationId,
   );
 }
 
 export async function activateActorFixture(
-  env: Pick<UnitTestEnv, "DB" | "SATYR_ORGANISATION_PLACEMENT_PROFILE">,
+  env: Pick<UnitTestEnv, "DB" | "PANTRY_ORGANISATION_PLACEMENT_PROFILE">,
   actor: {
     activate(request: ActorActivationRequest): Promise<ActorActivationResult>;
   },

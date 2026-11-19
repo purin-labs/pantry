@@ -43,8 +43,8 @@ def single_database_schema_file():
 
 
 def main() -> None:
-    if not os.environ.get("SATYR_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit("Set SATYR_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
+    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
+        raise SystemExit("Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
     stop_file = Path(os.environ["SHOP_VOICE_STOP_FILE"])
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="shop-voice-safari-")).resolve()
@@ -117,7 +117,7 @@ def main() -> None:
         command = (f"curl -fsSL {PORTAL}/shop-voice/install.sh | sh -s -- --origin {PORTAL} --organisation {organisation_id} "
                    f"--mac {start['macId']} --code={start['code']} --accept-letsencrypt-terms "
                    + " ".join(f"'{flag}'" for flag in flags))
-        env = {**os.environ, "SATYR_VOICE_HOME": str(voice_home), "SATYR_VOICE_LABEL": label}
+        env = {**os.environ, "PANTRY_VOICE_HOME": str(voice_home), "PANTRY_VOICE_LABEL": label}
         subprocess.run(command, shell=True, check=True, env=env, cwd=ROOT, timeout=400,
                        stdout=(ARTIFACTS / "safari-install.log").open("w"), stderr=subprocess.STDOUT)
         journey.wait_for("the model download", lambda: call("GET", "voice/macs")["macs"][0]["modelState"] == "unloaded", 300)

@@ -51,7 +51,7 @@ async function testCapabilityChangeAndRecovery(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       ORGANISATION_ID,
@@ -100,7 +100,7 @@ async function testCapabilityConflicts(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: staleAggregate.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       ORGANISATION_ID,
@@ -130,7 +130,7 @@ async function testCapabilityConflicts(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: staleRecord.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       ORGANISATION_ID,
@@ -164,7 +164,7 @@ async function testCapabilityConflicts(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: unsupportedMode.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       ORGANISATION_ID,
@@ -196,7 +196,7 @@ async function testApplyDefaults(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       ORGANISATION_ID,
@@ -237,7 +237,7 @@ async function testApplyDefaults(): Promise<void> {
     scope: await requireOrganisationExecutionScope(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       ORGANISATION_ID,
@@ -315,7 +315,7 @@ async function createFixture(withPolicies: boolean): Promise<
           scope: await requireOrganisationExecutionScope(
             {
               DB: db,
-              SATYR_ORGANISATION_PLACEMENT_PROFILE:
+              PANTRY_ORGANISATION_PLACEMENT_PROFILE:
                 TEST_ORGANISATION_PLACEMENT_PROFILE,
             },
             ORGANISATION_ID,

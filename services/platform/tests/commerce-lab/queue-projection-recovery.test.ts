@@ -86,7 +86,7 @@ describe("commerce queue projection recovery", function queueProjectionRecoveryS
     await createOrganisationExecutionFixture(db, ORGANISATION_ID);
     const env = platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
       CUE_Q: { send: cueSend },
     });
 
@@ -114,7 +114,7 @@ describe("commerce queue projection recovery", function queueProjectionRecoveryS
     await createOrganisationExecutionFixture(db, ORGANISATION_ID);
     const env = platformEnv({
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
       CUE_Q: { send: cueSend },
     });
 

@@ -38,7 +38,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
         scope: await requireOrganisationExecutionScope(
           {
             DB: fixture.db,
-            SATYR_ORGANISATION_PLACEMENT_PROFILE:
+            PANTRY_ORGANISATION_PLACEMENT_PROFILE:
               TEST_ORGANISATION_PLACEMENT_PROFILE,
           },
           fixture.organisationId,
@@ -65,7 +65,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
       scope: await requireOrganisationExecutionScope(
         {
           DB: fixture.db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         fixture.organisationId,
@@ -92,7 +92,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
         scope: await requireOrganisationExecutionScope(
           {
             DB: fixture.db,
-            SATYR_ORGANISATION_PLACEMENT_PROFILE:
+            PANTRY_ORGANISATION_PLACEMENT_PROFILE:
               TEST_ORGANISATION_PLACEMENT_PROFILE,
           },
           fixture.organisationId,
@@ -169,7 +169,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
           scope: await requireOrganisationExecutionScope(
             {
               DB: fixture.db,
-              SATYR_ORGANISATION_PLACEMENT_PROFILE:
+              PANTRY_ORGANISATION_PLACEMENT_PROFILE:
                 TEST_ORGANISATION_PLACEMENT_PROFILE,
             },
             fixture.organisationId,
@@ -202,7 +202,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
       scope: await requireOrganisationExecutionScope(
         {
           DB: fixture.db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         fixture.organisationId,
@@ -231,7 +231,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
           scope: await requireOrganisationExecutionScope(
             {
               DB: fixture.db,
-              SATYR_ORGANISATION_PLACEMENT_PROFILE:
+              PANTRY_ORGANISATION_PLACEMENT_PROFILE:
                 TEST_ORGANISATION_PLACEMENT_PROFILE,
             },
             fixture.organisationId,
@@ -257,7 +257,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
           scope: await requireOrganisationExecutionScope(
             {
               DB: fixture.db,
-              SATYR_ORGANISATION_PLACEMENT_PROFILE:
+              PANTRY_ORGANISATION_PLACEMENT_PROFILE:
                 TEST_ORGANISATION_PLACEMENT_PROFILE,
             },
             fixture.organisationId,
@@ -365,7 +365,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
           scope: await requireOrganisationExecutionScope(
             {
               DB: fixture.db,
-              SATYR_ORGANISATION_PLACEMENT_PROFILE:
+              PANTRY_ORGANISATION_PLACEMENT_PROFILE:
                 TEST_ORGANISATION_PLACEMENT_PROFILE,
             },
             fixture.organisationId,
@@ -379,7 +379,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
       scope: await requireOrganisationExecutionScope(
         {
           DB: fixture.db,
-          SATYR_ORGANISATION_PLACEMENT_PROFILE:
+          PANTRY_ORGANISATION_PLACEMENT_PROFILE:
             TEST_ORGANISATION_PLACEMENT_PROFILE,
         },
         fixture.organisationId,
@@ -438,7 +438,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
           scope: await requireOrganisationExecutionScope(
             {
               DB: fixture.db,
-              SATYR_ORGANISATION_PLACEMENT_PROFILE:
+              PANTRY_ORGANISATION_PLACEMENT_PROFILE:
                 TEST_ORGANISATION_PLACEMENT_PROFILE,
             },
             fixture.organisationId,
@@ -471,7 +471,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
     const scope = await requireOrganisationExecutionScope(
       {
         DB: fixture.db,
-        SATYR_ORGANISATION_PLACEMENT_PROFILE:
+        PANTRY_ORGANISATION_PLACEMENT_PROFILE:
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       fixture.organisationId,

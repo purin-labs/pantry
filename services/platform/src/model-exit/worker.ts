@@ -17,7 +17,7 @@ export default {
   fetch: forwardModelProviderRequest,
 } satisfies ExportedHandler<ModelExitEnv>;
 
-type ModelExitEnv = { readonly SATYR_DEPLOYMENT_PROFILE: string };
+type ModelExitEnv = { readonly PANTRY_DEPLOYMENT_PROFILE: string };
 
 /**
  * The provider hosts of the direct model routes, and nothing else.

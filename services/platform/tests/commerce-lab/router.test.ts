@@ -439,7 +439,7 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
 
 function testEnv(organisationId = "organisation_lab"): UnitTestEnv {
   return platformEnv({
-    SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     ORGANISATION_ADMIN_TOKEN: ADMIN_TOKEN,
     COMMERCE_LAB_SIGNING_SECRET: SIGNING_SECRET,
     POLICY_KV: {

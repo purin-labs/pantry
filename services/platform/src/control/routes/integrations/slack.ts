@@ -370,7 +370,7 @@ export async function handleDisconnectSlackInstallation(
       installationId.value,
     );
     const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-      deploymentProfile: env.SATYR_DEPLOYMENT_PROFILE,
+      deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
       appId: env.SLACK_APP_ID,
     });
     const workspaceId =

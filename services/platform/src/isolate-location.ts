@@ -31,14 +31,14 @@ export function isolateLocation(): string | null {
  * A local or test runtime runs at no Cloudflare location.
  */
 export function startIsolateLocationRead(
-  env: { readonly SATYR_DEPLOYMENT_PROFILE?: string },
+  env: { readonly PANTRY_DEPLOYMENT_PROFILE?: string },
   context: { waitUntil(work: Promise<unknown>): void },
 ): void {
   if (
     location !== null ||
     reading !== null ||
-    (env.SATYR_DEPLOYMENT_PROFILE !== "staging" &&
-      env.SATYR_DEPLOYMENT_PROFILE !== "production")
+    (env.PANTRY_DEPLOYMENT_PROFILE !== "staging" &&
+      env.PANTRY_DEPLOYMENT_PROFILE !== "production")
   ) {
     return;
   }
@@ -53,12 +53,12 @@ export function startIsolateLocationRead(
  * when Cloudflare gave no answer.
  */
 export async function readIsolateLocation(env: {
-  readonly SATYR_DEPLOYMENT_PROFILE?: string;
+  readonly PANTRY_DEPLOYMENT_PROFILE?: string;
 }): Promise<string | null> {
   if (
     location === null &&
-    (env.SATYR_DEPLOYMENT_PROFILE === "staging" ||
-      env.SATYR_DEPLOYMENT_PROFILE === "production")
+    (env.PANTRY_DEPLOYMENT_PROFILE === "staging" ||
+      env.PANTRY_DEPLOYMENT_PROFILE === "production")
   ) {
     const current = (reading ??= readLocation());
     if (!(await settlesWithin(current, WAIT_LIMIT_MS)) && reading === current) {

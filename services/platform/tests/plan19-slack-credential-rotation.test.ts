@@ -100,11 +100,11 @@ async function deliversSelectedDestinationAfterRotation(): Promise<void> {
   const actor = await connectorActor(
     platformEnv({
       DB: fixture.db,
-      SATYR_DEPLOYMENT_PROFILE: "local",
+      PANTRY_DEPLOYMENT_PROFILE: "local",
       SLACK_APP_ID: "A_PLAN19_ROTATE",
-      SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+      PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
       VAULT_ROOT_V1: fixture.root,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     }),
     fixture.organisationId,
   );
@@ -173,7 +173,7 @@ async function createRotationFixture(): Promise<RotationFixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Plan 19 Rotation",
@@ -185,7 +185,7 @@ async function createRotationFixture(): Promise<RotationFixture> {
   await activateOnboarding(db, organisation.organisationId);
   const root = testRoot(19);
   const keys = {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1" as const,
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1" as const,
     VAULT_ROOT_V1: root,
   };
   const oldHandle = requireVaultHandle(
@@ -243,7 +243,7 @@ async function createRotationFixture(): Promise<RotationFixture> {
   await createSlackOrganisationConnection(
     {
       DB: db,
-      SATYR_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       connectionId,
@@ -457,7 +457,7 @@ async function readCredentialGenerations(
 async function storeBearer(
   db: SingleDatabase,
   keys: {
-    readonly SATYR_VAULT_ACTIVE_KEY_VERSION: "v1";
+    readonly PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1";
     readonly VAULT_ROOT_V1: SecretsStoreSecret;
   },
   organisationId: OrganisationId,

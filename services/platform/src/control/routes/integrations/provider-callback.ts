@@ -149,5 +149,5 @@ async function readProviderCallbackContext(
 }
 
 function requirePublicOrigin(env: Env): string {
-  return requireConfiguredPublicOrigin(env.SATYR_PUBLIC_ORIGIN);
+  return requireConfiguredPublicOrigin(env.PANTRY_PUBLIC_ORIGIN);
 }

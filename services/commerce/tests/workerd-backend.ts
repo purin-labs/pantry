@@ -73,7 +73,7 @@ export async function startWorkerdBackend(
       ? {}
       : { durableObjectsPersist: options.persistDirectory }),
     bindings: {
-      SATYR_DEPLOYMENT_PROFILE: "local",
+      PANTRY_DEPLOYMENT_PROFILE: "local",
       UNDERCLERK_SERVICE_TOKEN: SERVICE_TOKEN,
       UNDERCLERK_BUYER_SESSION_SECRET:
         "underclerk-workerd-buyer-session-secret-01",

@@ -25,7 +25,7 @@ They are not routine Vault operations.
 | `DB`                             | D1                       | Vault ciphertext, credential generations, rotation jobs, and policy metadata |
 | `VAULT_ROOT_V1`                  | Cloudflare Secrets Store | Readable Vault root version `v1`                                             |
 | `VAULT_ROOT_V2`                  | Cloudflare Secrets Store | Readable Vault root version `v2`                                             |
-| `SATYR_VAULT_ACTIVE_KEY_VERSION` | Worker variable          | Selects `v1` or `v2` for new Vault writes                                    |
+| `PANTRY_VAULT_ACTIVE_KEY_VERSION` | Worker variable          | Selects `v1` or `v2` for new Vault writes                                    |
 | `DATA_ENCRYPTION_ROOT`           | Cloudflare Secrets Store | Protects Actor archives, checkpoints, and other encrypted platform state     |
 
 Every root is an independently generated 32-byte value stored as base64.
@@ -63,7 +63,7 @@ whose length is not 32 bytes.
 2. Confirm every configured Secrets Store binding resolves.
 3. Create a disposable provider credential and organisation generation through the
    normal control plane.
-4. Confirm its metadata records `SATYR_VAULT_ACTIVE_KEY_VERSION`.
+4. Confirm its metadata records `PANTRY_VAULT_ACTIVE_KEY_VERSION`.
 5. Perform one non-mutating provider read through its purpose-specific
    resolver.
 6. Revoke the disposable credential through the credential lifecycle.
@@ -173,10 +173,10 @@ change before an operator begins rotation.
 1. Generate 32 random bytes for `vault-root-v2` and store their base64 value in
    Cloudflare Secrets Store.
 2. Deploy with `VAULT_ROOT_V1` and `VAULT_ROOT_V2` readable while
-   `SATYR_VAULT_ACTIVE_KEY_VERSION` remains `v1`.
+   `PANTRY_VAULT_ACTIVE_KEY_VERSION` remains `v1`.
 3. Resolve existing credentials and confirm a newly stored canary generation
    records `key_version = 'v1'`.
-4. Change `SATYR_VAULT_ACTIVE_KEY_VERSION` to `v2` and deploy.
+4. Change `PANTRY_VAULT_ACTIVE_KEY_VERSION` to `v2` and deploy.
 5. Confirm a new canary records `v2` and both canaries resolve.
 
 The target must be active before the root-rotation job starts. Do not remove

@@ -1310,7 +1310,7 @@ function testVaultBindings(): CredentialVaultBindings {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return {
-    SATYR_VAULT_ACTIVE_KEY_VERSION: "v1",
+    PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
     VAULT_ROOT_V1: new TestSecretsStoreSecret(
       btoa(binary),
     ) as SecretsStoreSecret,
