@@ -914,12 +914,12 @@
         "args": [
           "{out:retained-case}",
           "8ecd88c13a602872adad17edbe0f3065713704e7f5008c23a12792f02f7f26f8",
-          "f7c345c8d8b34daf685b48fe147af4929fd335550ecc8ee288a1162c49113054",
+          "55d9c125a044b8e7a5996ca1d583e301f0595e8f7647967c128ad6e165a0268c",
           "{out}"
         ]
       },
       "status": "passes",
-      "notes": "Release A is the execution bundle of the step 11 runtime that steps 12 to 15A pin; release B adds the pinned execution bundle (step 9). The journey needs a different engine file in B. Change both at each engine release. The step 11 bundles are outside git after the move of step 9B: fetch them first (node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics).",
+      "notes": "Release A is the execution bundle of the step 11 runtime that steps 12 to 15A pin; release B adds the pinned execution bundle (step 9). The journey needs a different engine file and controller in B. Change B at each pin; change A only when its engine file equals B's. The step 11 bundles are outside git after the move of step 9B: fetch them first (node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics).",
       "lastRun": {
         "seconds": 139.2,
         "date": "2026-11-19",

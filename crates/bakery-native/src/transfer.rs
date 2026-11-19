@@ -537,11 +537,16 @@ fn capture(engine: &Engine, step: usize, samples: &mut Vec<Sample>) {
     samples.push(sample);
 }
 
-fn choose_branch(
+/// Follows the path from `seed` by inverse kinematics, 40 targets a phase.
+/// With `checks`, each pose must also be clear of collisions and hold the
+/// load. Without them, the walk asks only whether the arm reaches every
+/// target from this seed.
+fn walk(
     engine: &mut Engine,
     phases: &[Phase],
     seed: [f64; 6],
     limit: u64,
+    checks: bool,
 ) -> Result<Result<[f64; 6], Failure>> {
     let Some(start) = engine.solve_ik(phases[0].position, seed) else {
         return Ok(Err(Failure::Unreachable));
@@ -559,6 +564,9 @@ fn choose_branch(
                 return Ok(Err(Failure::Unreachable));
             };
             angles = next;
+            if !checks {
+                continue;
+            }
             if let Err(reason) =
                 check_contacts(&engine.probe_contacts(&angles, phase.closed), false)
             {
@@ -573,52 +581,69 @@ fn choose_branch(
     Ok(Ok(start))
 }
 
+fn choose_branch(
+    engine: &mut Engine,
+    phases: &[Phase],
+    seed: [f64; 6],
+    limit: u64,
+) -> Result<Result<[f64; 6], Failure>> {
+    walk(engine, phases, seed, limit, true)
+}
+
+/// The arm reaches every target of the path from `angles`. A start that
+/// holds the arm's joints (a tray in the gripper) has no start pose to
+/// choose, so only its reach is checked before the arm moves.
+fn reach_from(
+    engine: &mut Engine,
+    phases: &[Phase],
+    angles: [f64; 6],
+    limit: u64,
+) -> Result<Result<[f64; 6], Failure>> {
+    Ok(walk(engine, phases, angles, limit, false)?.map(|_| angles))
+}
+
 fn choose_start(
     engine: &mut Engine,
     phases: &[Phase],
     limit: u64,
 ) -> Result<Result<[f64; 6], Failure>> {
-    let mut last = Failure::Unreachable;
+    let mut seeds = Vec::with_capacity(40);
     for shoulder in [-1.5, 1.5, 0.] {
         for yaw in [0., 2.5, -2.5] {
             for elbow in [-2., 2.] {
                 for wrist in [-1.57, 1.57] {
-                    match choose_branch(
-                        engine,
-                        phases,
-                        [yaw, shoulder, elbow, -1.5, wrist, -1.57],
-                        limit,
-                    )? {
-                        Ok(start) => return Ok(Ok(start)),
-                        Err(reason @ (Failure::DestinationBlocked | Failure::DoorObstructed)) => {
-                            return Ok(Err(reason));
-                        }
-                        Err(reason) => {
-                            if last != Failure::ActuatorLimit {
-                                last = reason;
-                            }
-                        }
-                    }
+                    seeds.push([yaw, shoulder, elbow, -1.5, wrist, -1.57]);
                 }
             }
         }
     }
     // Include neutral wrist seeds so non-UR wrist layouts can enter either elbow branch.
-    for seed in [
+    seeds.extend([
         engine.joints(),
         [0.; 6],
         [0., 1.5, 2., 0., -1., 0.],
         [0., 1.5, 2., 0., 1., 0.],
-    ] {
+    ]);
+    let mut checked = Vec::new();
+    for seed in seeds {
         match choose_branch(engine, phases, seed, limit)? {
             Ok(start) => return Ok(Ok(start)),
             Err(reason @ (Failure::DestinationBlocked | Failure::DoorObstructed)) => {
                 return Ok(Err(reason));
             }
-            Err(reason) => {
-                if last != Failure::ActuatorLimit {
-                    last = reason;
-                }
+            Err(Failure::Unreachable) => {}
+            Err(reason) => checked.push((seed, reason)),
+        }
+    }
+    // A pose that fails a check names the cause only when the arm reaches the
+    // whole path from that seed. Out of reach on every branch is "unreachable",
+    // although a stretched arm also fails the load check on its way.
+    let mut last = Failure::Unreachable;
+    for (seed, reason) in checked {
+        if walk(engine, phases, seed, limit, false)?.is_ok() {
+            last = reason;
+            if reason == Failure::ActuatorLimit {
+                break;
             }
         }
     }
@@ -1044,7 +1069,9 @@ impl Operation {
                         ensure!(engine.time() == 0., "Prepared operation requires time zero");
                         choose_start(engine, &phases, opened + SOLVER_BUDGET)
                     }
-                    Start::Loaded { angles, .. } | Start::Returned { angles, .. } => Ok(Ok(angles)),
+                    Start::Loaded { angles, .. } | Start::Returned { angles, .. } => {
+                        reach_from(engine, &phases, angles, opened + SOLVER_BUDGET)
+                    }
                     Start::Recovery { angles, .. } => {
                         // A failed arm can deviate from the controller's ideal
                         // orientation. Validate the return, but begin by holding

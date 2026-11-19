@@ -273,6 +273,9 @@ MuJoCo recomputes the combined tray inertia before simulation.
 These input bounds do not establish manufacturer payload or gripper ratings.
 
 The planner checks static gravity torque against the arm's existing actuator limits.
-A rejected path reports `actuator-limit`. Runtime collision checks remain active.
+A path that the arm reaches but cannot hold reports `actuator-limit`. A
+destination out of reach reports `unreachable`, before the arm moves: a
+transfer that starts from a held pose (a loaded oven or a returned tray)
+checks its reach first. Runtime collision checks remain active.
 Use [the repeatable comparison and workcell acceptance](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/equipment/robot-selection-and-comparison.md)
 to inspect layout, load, recovery and browser parity evidence.

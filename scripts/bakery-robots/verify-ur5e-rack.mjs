@@ -46,9 +46,8 @@ for (const phase of ["lift", "transfer", "release"]) {
   assertSameResult(resumed.value, cycle.value, `rack resumed after ${phase}`);
   checkpoints.push(phase);
 }
-// Near the edge of its reach the arm swings a joint past its rated speed
-// before inverse kinematics fails, so the speed check (Refactor 16 step 7)
-// refuses the rack that is out of reach with "joint-speed".
+// The arm checks its reach before it moves, so the rack that is out of reach
+// is refused at step 0 and the tray stays on the table.
 const rejected = {};
 for (const cell of ["blocked-rack", "unreachable-rack"]) {
   const input = prepare(`${cell}-request`, cell);
@@ -58,8 +57,12 @@ for (const cell of ["blocked-rack", "unreachable-rack"]) {
   assert.equal(result.value.racking.outcome.kind, "failed");
   assert.equal(
     result.value.racking.outcome.reason,
-    cell === "blocked-rack" ? "destination-blocked" : "joint-speed",
+    cell === "blocked-rack" ? "destination-blocked" : "unreachable",
   );
+  if (cell === "unreachable-rack") {
+    assert.equal(result.value.racking.outcome.step, 0);
+    assert.equal(result.value.racking.outcome.trayDisposition, "source");
+  }
   rejected[cell] = result.value.racking.outcome;
 }
 const slip = run("slip", ["rack", returned.path, "--case", "slip"]);

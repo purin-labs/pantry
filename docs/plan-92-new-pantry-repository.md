@@ -390,10 +390,16 @@ The journeys found seven product faults, each fixed in its own commit:
    scenario. Its code is removed.
 
 Open, for the owner (not changed here):
-- A destination out of reach is refused with `actuator-limit` (FR10) or
-  `joint-speed` (UR5e rack), not `unreachable`, since the limit checks of
-  Refactor 16 step 7. A person sees a load or speed fault for a reach
-  problem. The journeys expect the current reasons.
+- Done on 20 November 2026: a destination out of reach is refused with
+  `unreachable`, before the arm moves. Since Refactor 16 step 7 the FR10
+  reported `actuator-limit`: the planner kept that reason from any start
+  pose, also from a stretched arm on a path that it could not finish. The
+  UR5e rack reported `joint-speed`: a transfer from a returned tray checked
+  nothing before it moved, and the arm swung toward the rack with the tray
+  until a joint passed its rated speed. Now the planner names a load or
+  collision fault only for a path that the arm reaches, and a transfer from
+  a held pose (a returned tray, a loaded oven) checks its reach first.
+  Every other outcome has the same motion, events and result.
 - The FR10 cannot hold the tray in every start pose of the combined cell,
   so its rack cycle stops at step 0; the UR5e, CR10 and CRX-10iA complete
   it. The combined-cell journeys use the UR5e.

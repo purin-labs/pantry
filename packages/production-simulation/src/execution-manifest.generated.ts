@@ -3,13 +3,13 @@
 export const PRODUCTION_EXECUTION_MANIFEST = {
   "schemaVersion": 1,
   "bundle": {
-    "id": "f7c345c8d8b34daf685b48fe147af4929fd335550ecc8ee288a1162c49113054",
+    "id": "55d9c125a044b8e7a5996ca1d583e301f0595e8f7647967c128ad6e165a0268c",
     "backend": "browser",
     "protocolVersion": 5,
     "checkpointSchemaVersion": 4,
-    "controllerSourceHash": "f4a7cfc227c4aa83660449bc07d70f7102f65447d429ead64b21963c27a58cd5",
-    "controllerHash": "98ef64f4ce73f43a684c88b2365e03ab6d82a4bbdd5aebf34a797603b54482a8",
-    "runtimeHash": "f0aef22352294ed400901a49d95d374aef44f3563b0fecebe28148bc04f5f74a",
+    "controllerSourceHash": "cd452297febae4d5282644632f0a89e1c982c973418c6c70aea17439e1fe08fa",
+    "controllerHash": "a8fcd3c32596f0f6c04c0fdedb0b655a48ae4ff57aea1bdfba31292c61dc2865",
+    "runtimeHash": "32a0fde2adb05d43cfc5c52b7e8203d37c99fe460fa7c5792c03355842e85975",
     "engineHash": "75a25491238e2600fab350fe796b4f29be517b177454c0c1d247c265d59e65db"
   },
   "engine": {
@@ -18,7 +18,7 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
     "byteLength": 809959
   },
   "runtime": {
-    "id": "31da6f43ef17b1989682e4f2c19745da7feffeac5dc1da9743b606ea059d8d57",
+    "id": "1b418dcc3b00f38437cf9171948aa73336c466b68f42946df96e2711dccd94ca",
     "files": [
       {
         "file": "bakery-native.js",
@@ -27,8 +27,8 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       },
       {
         "file": "bakery_native.wasm",
-        "sha256": "59e3d8f39c2381a32c98ab429b110628885cabcfe67cdd2684e3b81d780dede9",
-        "byteLength": 6256090
+        "sha256": "b148021142af0f9a43e48b89164fc652a9d9bbad1bd4468e1c0aaa827e473ed0",
+        "byteLength": 6240487
       },
       {
         "file": "models.json",

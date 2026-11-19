@@ -60,12 +60,9 @@ function phaseName(event) {
 // The outcome that each case must give. A failed case places nothing; a
 // completed one settles inside the physical placement thresholds. The Rust
 // runs are then checked against each other: repeat, checkpoint, handoff.
-// The planner keeps "actuator-limit" once any start pose cannot hold the tray,
-// so the FR10 reports it for a destination out of reach (since Refactor 16
-// step 7).
 const FAILURES = {
   blocked: "destination-blocked",
-  unreachable: "actuator-limit",
+  unreachable: "unreachable",
   slip: "lost-grasp",
   "closed-door": "door-obstructed",
 };
@@ -341,17 +338,24 @@ function verifyCombined(cell, scenario, timestep) {
         ? "lost-grasp"
         : cell === "blocked-rack"
           ? "destination-blocked"
-          : // Near the edge of its reach a joint passes its rated speed first.
-            "joint-speed";
+          : "unreachable";
     assert.equal(continuous.racking.outcome.kind, "failed");
     assert.equal(continuous.racking.outcome.reason, expected);
     assert.equal(continuous.racking.events.some(isPlacement), false);
-    run(directory, "paused", rackMode, "lift");
-    assertSameResult(
-      run(directory, "resumed", ["resume", join(directory, "paused.json")]),
-      continuous,
-      "failed rack resumed after lift",
-    );
+    const paused = run(directory, "paused", rackMode, "lift");
+    if (expected === "unreachable") {
+      // The arm checks its reach before it moves: the tray stays on the
+      // table, and no lift happens to pause after.
+      assert.equal(continuous.racking.outcome.step, 0);
+      assert.equal(continuous.racking.outcome.trayDisposition, "source");
+      assertSameResult(paused, continuous, "refused rack with a pause");
+    } else {
+      assertSameResult(
+        run(directory, "resumed", ["resume", join(directory, "paused.json")]),
+        continuous,
+        "failed rack resumed after lift",
+      );
+    }
     reject(directory, "failed-rack-as-handoff", continuous, "rack");
     report.failedResumeExact = true;
   }
