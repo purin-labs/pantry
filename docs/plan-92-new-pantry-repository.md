@@ -295,16 +295,25 @@ nine unpushed console-server commits that only fail closed), SHA-256
 artifact (27 October) failed J4 and J7 (3 tests); the config now refuses it.
 
 **Outcomes with no test now.** Their only cases asserted calls on product
-mocks, so they proved nothing. A journey for each is open for the plan that
-owns it:
+mocks, so they proved nothing. Each needed a journey or a decision:
 1. An Organisation's erasure empties every WhatsApp Connector before its rows
    go. Done on 19 November 2026: `e2e/whatsapp-erasure` purges an
    Organisation whose number holds a customer message, a reply draft and an
    open Case, and finds the Connector empty and no erased row left. With the
    Connector purge skipped, it fails.
-2. An attachment preparation settles or cancels its executor allocation (a
-   money path). Still open: the E2E pool has no fake workspace executor, so
-   only the cancel path can run there now.
+2. An attachment preparation settles or cancels its executor allocation.
+   Closed without a test on 19 November 2026, by the owner's decision. The
+   risk is too small for a new fake executor in the E2E pool:
+   - Each allocation reserves a fixed 250 micros ($0.00025), and the actual
+     cost is always the reserved amount. The daily cap of an Organisation is
+     25,000,000 micros.
+   - An allocation that no code closes expires at its deadline plus 5 s
+     (35 s at most), in the Organisation actor and in the platform governor.
+   - The ledger counts a `turn_cancelled` cancel and an expiry at the full
+     reserved amount. Only `admission_compensated` counts 0. So a missed
+     cancel changes the state, not the charged amount.
+   - A missed cancel holds one of the 4 platform executor slots until the
+     allocation expires.
 
 **Kitchen journeys (19 November 2026).** 22 rows of
 `scripts/production-simulation/journeys.json` said "repaired on branch
