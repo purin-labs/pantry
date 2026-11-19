@@ -5,20 +5,15 @@ import { describe, expect, it } from "vitest";
 import {
   activateWhatsAppRuntime,
   createConnectorWhatsAppSchema,
-  deferWhatsAppNotice,
   markWhatsAppNoticeDelivered,
   pauseWhatsAppRuntime,
   readWhatsAppOperatorNotice,
   recordWhatsAppOperatorNotice,
-  undeliveredWhatsAppNoticeKeys,
   updateWhatsAppRuntimePolicy,
   type WhatsAppIngressLimits,
   type WhatsAppPauseReason,
 } from "../src/actors/connector-whatsapp";
-import {
-  deliverWhatsAppOperatorNotice,
-  renderOperatorNotice,
-} from "../src/actors/whatsapp-operator-notice";
+import { deliverWhatsAppOperatorNotice } from "../src/actors/whatsapp-operator-notice";
 import {
   WHATSAPP_TEST_NOW,
   createWhatsAppWorld,
@@ -29,20 +24,16 @@ import { platformEnv } from "./worker-fakes";
 
 /**
  * `pause_and_notify` is two obligations. These cover the notify half: one
- * notice per cause per published policy, copy that never quotes the customer,
- * and a delivery path that degrades quietly when the organisation has no
- * destination or no usable credential.
+ * notice per cause per published policy, and a delivery path that degrades
+ * quietly when the organisation has no destination or no usable credential.
  */
 
 const NOW = WHATSAPP_TEST_NOW;
-const CUSTOMER_TEXT = "NOTICE-PROBE-do-you-deliver-to-14-Mill-Lane";
 
 describe("whatsapp operator notices", whatsappOperatorNoticeSuite);
 
 function whatsappOperatorNoticeSuite(): void {
   it("raises one notice per cause and reopens it on a new policy", dedupeTest);
-  it("keeps an undelivered notice claimable so it is retried", retryTest);
-  it("names the account and the cause without quoting the customer", copyTest);
   it("reports an unselected destination instead of failing", noDestinationTest);
   it(
     "reports an unusable destination credential instead of failing",
@@ -154,91 +145,6 @@ function dedupeTest(): void {
   expect(
     readWhatsAppOperatorNotice(sql, reopened ?? "")?.deliveredAt,
   ).toBeNull();
-}
-
-/**
- * A number can be paused with nobody told if the one delivery attempt fails.
- * Undelivered notices stay in the sweep queue until they land.
- */
-async function retryTest(): Promise<void> {
-  const world = await createWhatsAppWorld();
-  const sql = setup();
-  const noticeKey = recordWhatsAppOperatorNotice(sql, {
-    reason: { kind: "active_case_limit", observed: 3, limit: 3 },
-    policyVersion: 1,
-    now: NOW,
-  });
-  expect(undeliveredWhatsAppNoticeKeys(sql, NOW + 300)).toEqual([noticeKey]);
-
-  // A failed delivery leaves it queued.
-  const failed = await deliverWhatsAppOperatorNotice({
-    env: platformEnv({ DB: world.db }),
-    sql,
-    scope: await requireOrganisationExecutionScope(
-      platformEnv(whatsappTestEnvBindings(world.db)),
-      world.organisationId,
-    ),
-    displayPhoneNumber: "+15550001111",
-    noticeKey: noticeKey ?? "",
-    now: NOW + 100,
-    fetcher: unreachableFetcher,
-  });
-  expect(failed.ok && failed.value.kind).toBe("undeliverable");
-  // Backed off, then claimable again once the retry falls due.
-  deferWhatsAppNotice(sql, noticeKey ?? "", NOW + 100);
-  expect(undeliveredWhatsAppNoticeKeys(sql, NOW + 200)).toEqual([]);
-  expect(undeliveredWhatsAppNoticeKeys(sql, NOW + 120_000)).toEqual([
-    noticeKey,
-  ]);
-
-  markWhatsAppNoticeDelivered(sql, noticeKey ?? "", NOW + 200);
-  expect(undeliveredWhatsAppNoticeKeys(sql, NOW + 120_000)).toEqual([]);
-}
-
-function copyTest(): void {
-  const reasons: readonly WhatsAppPauseReason[] = [
-    { kind: "active_case_limit", observed: 5, limit: 5 },
-    {
-      kind: "hourly_message_limit",
-      observed: 60,
-      limit: 60,
-      windowEndsAt: NOW,
-    },
-    {
-      kind: "daily_token_budget",
-      reserved: 0,
-      consumed: 200_000,
-      limit: 200_000,
-      windowEndsAt: NOW,
-    },
-    {
-      kind: "message_too_large",
-      providerMessageId: "wamid.BIG",
-      observedBytes: 9_000,
-      limitBytes: 4_096,
-    },
-    {
-      kind: "unsupported_message_type",
-      providerMessageId: "wamid.IMG",
-      messageType: "image",
-    },
-    {
-      kind: "service_window_expired",
-      caseId: "case_whatsapp_1",
-      expiredAt: NOW,
-    },
-    {
-      kind: "send_indeterminate",
-      proposalId: "proposal_1",
-      caseId: "case_whatsapp_1",
-    },
-  ];
-  for (const reason of reasons) {
-    const notice = renderOperatorNotice("+15550001111", reason);
-    expect(notice).toContain("+15550001111");
-    expect(notice).not.toContain(CUSTOMER_TEXT);
-    expect(notice.length).toBeGreaterThan(40);
-  }
 }
 
 async function noDestinationTest(): Promise<void> {

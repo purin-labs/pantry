@@ -26,6 +26,10 @@ function credentialVaultServiceSuite(): void {
     "fails closed when a stored row depends on a removed root",
     rejectsRemovedRoot,
   );
+  it(
+    "fails closed when the root version is bound with different material",
+    rejectsRootMaterialMismatch,
+  );
   it("rejects corrupt ciphertext and unknown key versions", rejectsCorruptRows);
   it(
     "preserves the stored credential when a write fails",
@@ -295,6 +299,30 @@ async function rejectsRemovedRoot(): Promise<void> {
   ).resolves.toEqual({
     ok: false,
     error: { code: "vault_root_unavailable" },
+  });
+}
+
+async function rejectsRootMaterialMismatch(): Promise<void> {
+  const fixture = createFixture();
+  const handle = requireVaultHandle("vault:test:stripe:restored-root");
+
+  await requireStoredSecret(fixture, handle);
+
+  // The right version label bound to the wrong bytes: a restore that recreated
+  // v1 from the wrong source. AES-GCM authentication must reject it.
+  await expect(
+    resolveVaultHandle({
+      db: fixture.db,
+      keys: {
+        PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
+        VAULT_ROOT_V1: testRoot(99),
+      },
+      organisationId: fixture.organisationId,
+      handle,
+    }),
+  ).resolves.toEqual({
+    ok: false,
+    error: { code: "vault_ciphertext_invalid", handle },
   });
 }
 

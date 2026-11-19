@@ -1,9 +1,6 @@
 // The portal owns its browser-only React runtime; the platform test harness renders it through the app-local package.
 // @ts-expect-error React runtime declarations are scoped to apps/portal.
 import React from "../../../apps/portal/node_modules/react";
-// @ts-expect-error React DOM runtime declarations are scoped to apps/portal.
-import { renderToStaticMarkup as renderStaticMarkup } from "../../../apps/portal/node_modules/react-dom/server";
-import { StaticRouter } from "../../../apps/portal/node_modules/react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MutationLedger } from "../../../apps/portal/src/mutation-state";
 import { ControlApiError } from "../../../apps/portal/src/control-client";
@@ -14,84 +11,53 @@ import {
 } from "../../../apps/portal/src/portal";
 
 import {
-  IntegrationsPage,
+  IntegrationsRouteView,
+  WorkspaceSettingsRouteView,
   autoSyncCommerce,
-  connectionAttentionMessage,
   integrationsRouteRefreshFailure,
   readySettingsRouteContent,
   refreshingSettingsRouteContent,
   settingsRouteFailureContent,
   navigateProviderAuthorizationSurface,
   openProviderAuthorizationSurface,
-  type IntegrationsPageActions,
-  type WorkspaceSettingsPageActions,
   // @ts-expect-error The portal build type-checks this JSX module.
 } from "../../../apps/portal/src/features/integrations/settings-routes";
 import {
-  IntegrationsRouteView,
-  WorkspaceSettingsRouteView,
-  // @ts-expect-error The portal build type-checks this JSX module.,
-} from "../../../apps/portal/src/features/integrations/settings-routes";
+  INTEGRATIONS_PAGE_PROPS,
+  PORTAL_ACTIONS,
+  renderIntegrationsPage,
+  renderPortalMarkup,
+} from "./portal-integrations-page-fixture";
 
-const noOp = async (): Promise<void> => {};
-const noOpMouse = async (): Promise<void> => {};
-const noOpForm = async (): Promise<void> => {};
-const noOpSelect = async (): Promise<void> => {};
-const disconnectedCodex = {
-  kind: "disconnected" as const,
-  revision: 0 as const,
+const SLACK_ACCOUNT = {
+  integrationAccountId: "slack_account",
+  provider: "slack",
+  environment: "development",
+  providerAccountId: "workspace_1",
+  accountKind: "workspace",
+  displayName: "Cafe workspace",
+  lifecycle: { kind: "active" },
+  isDefaultForProvider: true,
+  capabilities: [],
+  scopes: [],
+  selectedResources: [],
+  credentialHealth: { kind: "healthy" },
+  webhookHealth: { kind: "healthy" },
+  eventRecency: { kind: "unavailable" },
 };
-const codexInference = { kind: "codex_subscription" as const };
-const organisationOpenAiInference = {
-  kind: "organisation_openai_api_key" as const,
+const SLACK_WORKSPACE_SETUP_DEFAULTS = {
+  ...INTEGRATIONS_PAGE_PROPS.setupDefaults,
+  key: "read_and_propose:commerce_operator:workspace_1:",
+  workspaceId: "workspace_1",
 };
-const EMPTY_WHATSAPP_SURFACE = {
-  applicationConfigured: false,
-  accounts: [],
-  replies: [],
+const SLACK_SAVE_FAILURE = {
+  kind: "error",
+  field: "form",
+  message: "Slack destination could not be saved.",
 };
-const EMPTY_WHATSAPP_ACTIONS = {};
-const EMPTY_WHATSAPP_PROPS = {
-  whatsapp: EMPTY_WHATSAPP_SURFACE,
-  whatsappActions: EMPTY_WHATSAPP_ACTIONS,
-};
-
-const integrationActions: IntegrationsPageActions = {
-  syncCommerceSystem: noOp,
-  syncCommerceSystemQuietly: noOp,
-  setupSatyrCommerce: noOp,
-  publishExportCoordination: noOp,
-  selectShopifyCommerce: noOpMouse,
-  connectShopify: noOpForm,
-  connectAirtable: noOpForm,
-  connectNotion: noOpForm,
-  connectStripe: noOp,
-  connectSquare: noOp,
-  connectSlack: noOp,
-  cancelProviderAuthorization: () => {},
-  refreshOverview: () => {},
-  connectCodex: noOp,
-  reconnectCodex: noOp,
-  cancelCodexAuthorization: noOp,
-  disconnectCodex: noOp,
-  saveInferenceSelection: noOpForm,
-  disableAccount: noOpMouse,
-  reconnectAccount: noOpMouse,
-  rotateAccount: noOpMouse,
-  setDefaultAccount: noOpMouse,
-  removeAccount: noOpMouse,
-  refreshAccountResources: noOpMouse,
-  selectSlackDmOrganisation: noOpMouse,
-  saveSetup: noOpForm,
-};
-
-const workspaceActions: WorkspaceSettingsPageActions = {
-  changeMemberRole: noOpSelect,
-  removeMember: noOpMouse,
-  revokeInvitation: noOpMouse,
-  inviteMember: noOpForm,
-  archiveOrganisation: noOp,
-  restoreOrganisation: noOp,
+const SLACK_CONNECT_FAILURE = {
+  mutation: { kind: "connect_provider", provider: "slack" },
+  message: "Slack could not be connected. Try again.",
 };
 
 afterEach(() => {
@@ -362,69 +328,41 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("narrates setup as one ordered checklist with done, actionable, and waiting steps", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: {
-          kind: "satyr_commerce",
-          bindingId: "binding_cafe",
-          merchantId: "merchant_cafe",
-          revision: 1,
-          sync: {
-            kind: "ready",
-            acceptedResourceCount: 2,
-            lastSyncedAt: Date.now(),
+    const markup = renderIntegrationsPage({
+      commerceSystem: {
+        kind: "satyr_commerce",
+        bindingId: "binding_cafe",
+        merchantId: "merchant_cafe",
+        revision: 1,
+        sync: {
+          kind: "ready",
+          acceptedResourceCount: 2,
+          lastSyncedAt: Date.now(),
+        },
+      },
+      readiness: {
+        kind: "blocked",
+        blockers: [
+          // Stale assessment: it still lists the commerce blocker even
+          // though the page can see a chosen commerce system above.
+          { code: "commerce_system_missing", integrationAccountId: null },
+          {
+            code: "communication_connection_missing",
+            integrationAccountId: null,
           },
-        },
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [],
-        destinations: [],
-        slackRouting: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator::",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "",
-          channelId: "",
-        },
-        setupFeedback: { kind: "idle" },
-        readiness: {
-          kind: "blocked",
-          blockers: [
-            // Stale assessment: it still lists the commerce blocker even
-            // though the page can see a chosen commerce system above.
-            { code: "commerce_system_missing", integrationAccountId: null },
-            {
-              code: "communication_connection_missing",
-              integrationAccountId: null,
-            },
-            {
-              code: "communication_destination_missing",
-              integrationAccountId: null,
-            },
-            { code: "policy_snapshot_missing", integrationAccountId: null },
-            { code: "owner_missing", integrationAccountId: null },
-          ],
-          approvalAuthentication: [],
-        },
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: false,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: null,
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-      }),
-    );
+          {
+            code: "communication_destination_missing",
+            integrationAccountId: null,
+          },
+          { code: "policy_snapshot_missing", integrationAccountId: null },
+          { code: "owner_missing", integrationAccountId: null },
+        ],
+        approvalAuthentication: [],
+      },
+      // A ChatGPT plan without a connection leaves the AI step open.
+      inferenceSelection: { kind: "codex_subscription" },
+      organisationIsActive: false,
+    });
 
     // The page can see the chosen commerce system, so live evidence outranks
     // the stale blocker code and the step stays visibly done, with its label.
@@ -441,51 +379,20 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("keeps the commerce card honest about sync state and syncs itself", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: {
-          kind: "satyr_commerce",
-          bindingId: "binding_cafe",
-          merchantId: "merchant_cafe",
-          revision: 4,
-          sync: {
-            kind: "delayed",
-            acceptedResourceCount: 3,
-            lastSyncedAt: Date.now() - 3 * 60 * 60 * 1000,
-          },
+    const markup = renderIntegrationsPage({
+      commerceSystem: {
+        kind: "satyr_commerce",
+        bindingId: "binding_cafe",
+        merchantId: "merchant_cafe",
+        revision: 4,
+        sync: {
+          kind: "delayed",
+          acceptedResourceCount: 3,
+          lastSyncedAt: Date.now() - 3 * 60 * 60 * 1000,
         },
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [],
-        destinations: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator::",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "",
-          channelId: "",
-        },
-        setupFeedback: { kind: "idle" },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: false,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: null,
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "commerce",
-      }),
-    );
+      },
+      initialIntegrationId: "commerce",
+    });
 
     // A genuinely stuck sync still says so, but no longer instructs a manual
     // click (the page syncs itself) and no longer exposes internals.
@@ -527,7 +434,7 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("keeps settings route transport and mutation state inside the route", () => {
-    const integrationsMarkup = renderToStaticMarkup(
+    const integrationsMarkup = renderPortalMarkup(
       React.createElement(IntegrationsRouteView, {
         requestedIntegration: {
           kind: "detail",
@@ -555,18 +462,12 @@ describe("CafeOS settings page ownership", () => {
         content: readySettingsRouteContent({
           commerceSystem: null,
           commerceSyncProblem: null,
-          codexConnection: disconnectedCodex,
-          inferenceSelection: organisationOpenAiInference,
+          codexConnection: { kind: "disconnected", revision: 0 },
+          inferenceSelection: { kind: "organisation_openai_api_key" },
           accounts: [],
           supportReference: null,
           whatsappApplicationConfigured: false,
-          setupDefaults: {
-            key: "read_and_propose:commerce_operator::",
-            capabilityProfile: "read_and_propose",
-            cuePresetId: "commerce_operator",
-            workspaceId: "",
-            channelId: "",
-          },
+          setupDefaults: INTEGRATIONS_PAGE_PROPS.setupDefaults,
           readiness: null,
           activation: {
             kind: "idle",
@@ -586,7 +487,11 @@ describe("CafeOS settings page ownership", () => {
             agentMailboxes: [],
             emailReplies: [],
             mailboxInstallations: [],
-            whatsapp: EMPTY_WHATSAPP_SURFACE,
+            whatsapp: {
+              applicationConfigured: false,
+              accounts: [],
+              replies: [],
+            },
           },
         },
         mutations: MutationLedger.empty(),
@@ -595,13 +500,13 @@ describe("CafeOS settings page ownership", () => {
         setupFeedback: { kind: "idle" },
         feedback: null,
         requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        whatsappActions: EMPTY_WHATSAPP_ACTIONS,
+        actions: PORTAL_ACTIONS,
+        whatsappActions: PORTAL_ACTIONS,
         retry: ignoreRetry,
         retryDetail: ignoreRetry,
       }),
     );
-    const workspaceMarkup = renderToStaticMarkup(
+    const workspaceMarkup = renderPortalMarkup(
       React.createElement(WorkspaceSettingsRouteView, {
         props: {
           organisationId: "organisation_settings",
@@ -625,7 +530,7 @@ describe("CafeOS settings page ownership", () => {
         pendingConfirm: null,
         feedback: null,
         requestConfirm: ignoreConfirm,
-        actions: workspaceActions,
+        actions: PORTAL_ACTIONS,
         retry: ignoreRetry,
       }),
     );
@@ -638,63 +543,16 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("associates Slack setup errors with the affected field", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: null,
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [
-          {
-            integrationAccountId: "slack_account",
-            provider: "slack",
-            environment: "development",
-            providerAccountId: "workspace_1",
-            accountKind: "workspace",
-            displayName: "Cafe workspace",
-            lifecycle: { kind: "active" },
-            isDefaultForProvider: true,
-            capabilities: [],
-            scopes: [],
-            selectedResources: [],
-            credentialHealth: { kind: "healthy" },
-            webhookHealth: { kind: "healthy" },
-            eventRecency: { kind: "unavailable" },
-          },
-        ],
-        destinations: [],
-        slackRouting: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator:workspace_1:",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "workspace_1",
-          channelId: "",
-        },
-        setupFeedback: {
-          kind: "error",
-          field: "channel",
-          message: "Select a destination channel.",
-        },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: true,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: null,
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "slack",
-      }),
-    );
+    const markup = renderIntegrationsPage({
+      accounts: [SLACK_ACCOUNT],
+      setupDefaults: SLACK_WORKSPACE_SETUP_DEFAULTS,
+      setupFeedback: {
+        kind: "error",
+        field: "channel",
+        message: "Select a destination channel.",
+      },
+      initialIntegrationId: "slack",
+    });
 
     expect(markup).toContain('name="channelId"');
     expect(markup).toContain('aria-invalid="true"');
@@ -704,41 +562,7 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("offers Slack installation when the workspace is not connected", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: null,
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [],
-        destinations: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator::",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "",
-          channelId: "",
-        },
-        setupFeedback: { kind: "idle" },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: true,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: null,
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "slack",
-      }),
-    );
+    const markup = renderIntegrationsPage({ initialIntegrationId: "slack" });
 
     expect(markup).toContain(">Connect Slack</button>");
     expect(markup).toContain(
@@ -753,54 +577,19 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("associates mutation failures with the action that produced them", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: {
-          kind: "satyr_commerce",
-          bindingId: "binding_1",
-          merchantId: "merchant_1",
-          revision: 1,
-          sync: { kind: "delayed", acceptedResourceCount: 0, lastSyncedAt: 1 },
-        },
-        commerceSyncProblem: "Commerce sync could not be completed. Try again.",
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [],
-        destinations: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator::",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "",
-          channelId: "",
-        },
-        setupFeedback: {
-          kind: "error",
-          field: "form",
-          message: "Slack destination could not be saved.",
-        },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: true,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: {
-          mutation: { kind: "connect_provider", provider: "slack" },
-          message: "Slack could not be connected. Try again.",
-        },
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "commerce",
-      }),
-    );
+    const markup = renderIntegrationsPage({
+      commerceSystem: {
+        kind: "satyr_commerce",
+        bindingId: "binding_1",
+        merchantId: "merchant_1",
+        revision: 1,
+        sync: { kind: "delayed", acceptedResourceCount: 0, lastSyncedAt: 1 },
+      },
+      commerceSyncProblem: "Commerce sync could not be completed. Try again.",
+      setupFeedback: SLACK_SAVE_FAILURE,
+      feedback: SLACK_CONNECT_FAILURE,
+      initialIntegrationId: "commerce",
+    });
 
     expect(markup).toContain('id="commerce-sync-error"');
     expect(markup).toContain('aria-describedby="commerce-sync-error"');
@@ -810,48 +599,11 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("reports Slack connection and save failures in the Slack detail", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: null,
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [],
-        destinations: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator::",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "",
-          channelId: "",
-        },
-        setupFeedback: {
-          kind: "error",
-          field: "form",
-          message: "Slack destination could not be saved.",
-        },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: true,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: {
-          mutation: { kind: "connect_provider", provider: "slack" },
-          message: "Slack could not be connected. Try again.",
-        },
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "slack",
-      }),
-    );
+    const markup = renderIntegrationsPage({
+      setupFeedback: SLACK_SAVE_FAILURE,
+      feedback: SLACK_CONNECT_FAILURE,
+      initialIntegrationId: "slack",
+    });
 
     expect(markup).toContain("Slack could not be connected. Try again.");
     // No workspace means no channel form to bind the save error to, so it
@@ -862,63 +614,12 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("associates a Slack save failure with the form that produced it", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: null,
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [
-          {
-            integrationAccountId: "slack_account",
-            provider: "slack",
-            environment: "development",
-            providerAccountId: "workspace_1",
-            accountKind: "workspace",
-            displayName: "Cafe workspace",
-            lifecycle: { kind: "active" },
-            isDefaultForProvider: true,
-            capabilities: [],
-            scopes: [],
-            selectedResources: [],
-            credentialHealth: { kind: "healthy" },
-            webhookHealth: { kind: "healthy" },
-            eventRecency: { kind: "unavailable" },
-          },
-        ],
-        destinations: [],
-        slackRouting: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator:workspace_1:",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "workspace_1",
-          channelId: "",
-        },
-        setupFeedback: {
-          kind: "error",
-          field: "form",
-          message: "Slack destination could not be saved.",
-        },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: true,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: null,
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "slack",
-      }),
-    );
+    const markup = renderIntegrationsPage({
+      accounts: [SLACK_ACCOUNT],
+      setupDefaults: SLACK_WORKSPACE_SETUP_DEFAULTS,
+      setupFeedback: SLACK_SAVE_FAILURE,
+      initialIntegrationId: "slack",
+    });
 
     expect(markup).toContain('id="setup-form-error"');
     expect(markup).toContain('aria-describedby="setup-form-error"');
@@ -928,135 +629,25 @@ describe("CafeOS settings page ownership", () => {
   });
 
   it("offers a fresh Slack connection after the sole workspace is disconnected", () => {
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: null,
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [
-          {
-            integrationAccountId: "slack_account",
-            provider: "slack",
-            environment: "development",
-            providerAccountId: "workspace_1",
-            accountKind: "workspace",
-            displayName: "Previous workspace",
-            lifecycle: { kind: "disabled" },
-            isDefaultForProvider: false,
-            capabilities: [],
-            scopes: [],
-            selectedResources: [],
-            credentialHealth: { kind: "missing" },
-            webhookHealth: { kind: "disabled" },
-            eventRecency: { kind: "unavailable" },
-          },
-        ],
-        destinations: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator::",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "",
-          channelId: "",
+    const markup = renderIntegrationsPage({
+      accounts: [
+        {
+          ...SLACK_ACCOUNT,
+          displayName: "Previous workspace",
+          lifecycle: { kind: "disabled" },
+          isDefaultForProvider: false,
+          credentialHealth: { kind: "missing" },
+          webhookHealth: { kind: "disabled" },
         },
-        setupFeedback: { kind: "idle" },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: true,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: null,
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "slack",
-      }),
-    );
+      ],
+      initialIntegrationId: "slack",
+    });
 
     expect(markup).toContain(
       'aria-label="Connect another Slack workspace in a popup"',
     );
     expect(markup).toContain("Previous workspace");
     expect(markup).toContain("Remove this Slack workspace");
-  });
-
-  it("explains a broken connection and leads with the repair", () => {
-    const brokenSlackAccount = {
-      integrationAccountId: "slack_account",
-      provider: "slack",
-      environment: "development",
-      providerAccountId: "workspace_1",
-      accountKind: "workspace",
-      displayName: "Cafe workspace",
-      lifecycle: { kind: "reauth_required", reasonCode: "oauth_scope_revoked" },
-      isDefaultForProvider: true,
-      capabilities: [],
-      scopes: [],
-      selectedResources: [],
-      credentialHealth: { kind: "degraded" },
-      webhookHealth: { kind: "degraded" },
-      eventRecency: { kind: "unavailable" },
-    };
-    const markup = renderToStaticMarkup(
-      React.createElement(IntegrationsPage, {
-        organisationHandle: "cafe",
-        workspaceHandle: "central",
-        commerceSystem: null,
-        commerceSyncProblem: null,
-        ...EMPTY_WHATSAPP_PROPS,
-        codexConnection: disconnectedCodex,
-        inferenceSelection: codexInference,
-        accounts: [brokenSlackAccount],
-        destinations: [],
-        supportDiagnostics: null,
-        setupDefaults: {
-          key: "read_and_propose:commerce_operator:workspace_1:",
-          capabilityProfile: "read_and_propose",
-          cuePresetId: "commerce_operator",
-          workspaceId: "workspace_1",
-          channelId: "",
-        },
-        setupFeedback: { kind: "idle" },
-        readiness: null,
-        activation: { kind: "idle", organisation_id: "organisation_settings" },
-        firstTask: null,
-        organisationIsActive: false,
-        canManage: true,
-        canConnectCodex: true,
-        mutations: MutationLedger.empty(),
-        pendingConfirm: null,
-        pendingAuthorization: null,
-        feedback: null,
-        requestConfirm: ignoreConfirm,
-        actions: integrationActions,
-        initialIntegrationId: "slack",
-      }),
-    );
-
-    // The reason code reaches the operator as a sentence, not as a code.
-    expect(markup).toContain(
-      "Slack removed a permission Seams Pantry was given.",
-    );
-    expect(markup).toContain("Seams Pantry cannot post inventory alerts");
-    expect(markup).not.toContain("oauth_scope_revoked");
-    // Health problems announce via console and toast, not page furniture —
-    // the wording is still owned and tested here.
-    expect(markup).not.toContain("Slack needs attention.");
-    expect(connectionAttentionMessage([brokenSlackAccount])).toBe(
-      "Slack needs attention.",
-    );
-    expect(connectionAttentionMessage([])).toBeNull();
-    // Repair and the other actions stay visible; nothing folds.
-    expect(markup).toContain("Reconnect Slack");
-    expect(markup).not.toContain("<details");
   });
 });
 
@@ -1113,13 +704,3 @@ function readSlackRemovalRequest(request: {
 
 function ignoreConfirm(_key: string): void {}
 function ignoreRetry(): void {}
-
-function renderToStaticMarkup(element: React.ReactNode): string {
-  return renderStaticMarkup(
-    React.createElement(
-      StaticRouter,
-      { location: "/portal/cafe/central/integrations" },
-      element,
-    ),
-  );
-}

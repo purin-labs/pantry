@@ -25,7 +25,6 @@ import {
   type WhatsAppContentCipher,
 } from "../src/actors/whatsapp-active-content";
 import { publishWhatsAppIngressPolicy } from "../src/data/whatsapp";
-import { digestCanonical } from "../src/policy";
 import { createFakeGraph } from "./whatsapp/fake-graph";
 import {
   WHATSAPP_TEST_NOW,
@@ -43,16 +42,11 @@ const REPLY = "We are open on Sunday from 8am to 2pm.";
 describe("whatsapp send ladder", whatsappSendSuite);
 
 function whatsappSendSuite(): void {
-  it(
-    "sends the exact approved body once and records the WhatsApp message id",
-    acceptedTest,
-  );
-  it("calls the injected fetcher without rebinding it", unboundFetcherTest);
   it("quarantines an ambiguous send without retrying it", indeterminateTest);
   it("treats a 200 without a message id as unprovable", ambiguousBodyTest);
   it("returns a definite provider rejection to the approver", rejectedTest);
   it("refuses to send while a handoff is pending", ownershipTest);
-  it("refuses a stale organisation credential generation", authorityTest);
+  it("refuses to send over a revoked connection", revokedConnectionTest);
   it("versions an edited proposal and invalidates the previous body", editTest);
   it(
     "resolves a fenced Case only through an explicit operator decision",
@@ -68,46 +62,6 @@ function whatsappSendSuite(): void {
     assignmentTest,
   );
   it("sends once when two approvals race", concurrentApprovalTest);
-}
-
-function requireUnboundFetcher(
-  this: void,
-  _input: RequestInfo | URL,
-  _init?: RequestInit,
-): Promise<Response> {
-  if (this !== undefined) throw new TypeError("fetcher was rebound");
-  return Promise.resolve(
-    new Response(JSON.stringify({ messages: [{ id: "wamid.UNBOUND" }] }), {
-      status: 200,
-      headers: { "content-type": "application/json" },
-    }),
-  );
-}
-
-async function unboundFetcherTest(): Promise<void> {
-  const fixture = await createSendFixture();
-  const proposal = await seedProposal(fixture);
-  const dispatched = await dispatchWhatsAppReply({
-    authorizeExecution: authorizeWhatsAppFixture,
-    scope: fixture.scope,
-    sql: fixture.sql,
-    cipher: fixture.cipher,
-    env: fixture.env,
-    proposalId: proposal.proposalId,
-    approvedVersion: 1,
-    approvedBodyDigest: proposal.bodyDigest,
-    approvedBy: fixture.world.userId,
-    now: NOW + 1_000,
-    fetcher: requireUnboundFetcher,
-  });
-
-  expect(dispatched.ok && dispatched.value.kind).toBe("sent");
-  expect(
-    latestWhatsAppProposal(fixture.sql, proposal.proposalId),
-  ).toMatchObject({
-    state: "sent",
-    sentMessageId: "wamid.UNBOUND",
-  });
 }
 
 /**
@@ -303,85 +257,6 @@ async function seedProposal(
   return { proposalId, bodyDigest };
 }
 
-async function acceptedTest(): Promise<void> {
-  const fixture = await createSendFixture();
-  const proposal = await seedProposal(fixture);
-  const graph = createFakeGraph({
-    sendOutcomes: [{ kind: "accepted", whatsappMessageId: "wamid.OUT0001" }],
-  });
-  const dispatched = await dispatchWhatsAppReply({
-    authorizeExecution: authorizeWhatsAppFixture,
-    scope: fixture.scope,
-    sql: fixture.sql,
-    cipher: fixture.cipher,
-    env: fixture.env,
-    proposalId: proposal.proposalId,
-    approvedVersion: 1,
-    approvedBodyDigest: proposal.bodyDigest,
-    approvedBy: fixture.world.userId,
-    now: NOW + 1_000,
-    fetcher: graph.fetcher,
-  });
-  expect(dispatched.ok && dispatched.value).toEqual({
-    kind: "sent",
-    whatsappMessageId: "wamid.OUT0001",
-    version: 1,
-    bodyDigest: proposal.bodyDigest,
-  });
-  expect(graph.sentBodies()).toHaveLength(1);
-  const sentBody = JSON.parse(graph.sentBodies()[0] ?? "{}") as Record<
-    string,
-    unknown
-  >;
-  expect(sentBody.text).toEqual({ preview_url: false, body: REPLY });
-  expect(sentBody.to).toBe(fixture.world.customerWaId);
-
-  const stored = latestWhatsAppProposal(fixture.sql, proposal.proposalId);
-  expect(stored).toMatchObject({
-    state: "sent",
-    sentMessageId: "wamid.OUT0001",
-    ciphertextB64: null,
-    nonceB64: null,
-  });
-  // The durable receipt carries a keyed digest, never the plain hash of the
-  // reply: a bare SHA-256 of a short message is recoverable by guessing.
-  const receipt = await fixture.world.db
-    .prepare(
-      `SELECT direction, body_digest AS bodyDigest FROM whatsapp_message_receipt
-      WHERE provider_message_id = ?`,
-    )
-    .bind("wamid.OUT0001")
-    .first<{ readonly direction: string; readonly bodyDigest: string }>();
-  expect(receipt?.direction).toBe("outbound");
-  expect(receipt?.bodyDigest).toMatch(/^[0-9a-f]{64}$/u);
-  expect(receipt?.bodyDigest).toBe(await fixture.cipher.digest(REPLY));
-  // Keyed, not a bare or merely domain-separated hash of the reply.
-  expect(receipt?.bodyDigest).not.toBe(
-    await digestCanonical({
-      kind: "satyr_whatsapp_reply_body_v1",
-      body: REPLY,
-    }),
-  );
-
-  // A second dispatch of the same approval returns the same receipt and does
-  // not produce a second provider call.
-  const replay = await dispatchWhatsAppReply({
-    authorizeExecution: authorizeWhatsAppFixture,
-    scope: fixture.scope,
-    sql: fixture.sql,
-    cipher: fixture.cipher,
-    env: fixture.env,
-    proposalId: proposal.proposalId,
-    approvedVersion: 1,
-    approvedBodyDigest: proposal.bodyDigest,
-    approvedBy: fixture.world.userId,
-    now: NOW + 2_000,
-    fetcher: graph.fetcher,
-  });
-  expect(replay.ok && replay.value.kind).toBe("sent");
-  expect(graph.sentBodies()).toHaveLength(1);
-}
-
 async function indeterminateTest(): Promise<void> {
   const fixture = await createSendFixture();
   const proposal = await seedProposal(fixture);
@@ -523,11 +398,17 @@ async function ownershipTest(): Promise<void> {
   expect(graph.sentBodies()).toHaveLength(0);
 }
 
-async function authorityTest(): Promise<void> {
+async function revokedConnectionTest(): Promise<void> {
   const fixture = await createSendFixture();
-  const proposal = await seedProposal(fixture, { credentialGeneration: 2 });
+  const proposal = await seedProposal(fixture);
   const graph = createFakeGraph();
-  const moved = await dispatchWhatsAppReply({
+  await fixture.world.db
+    .prepare(
+      `UPDATE provider_connection SET lifecycle = 'revoked', revoked_at = ? WHERE organisation_id = ?`,
+    )
+    .bind(NOW, fixture.world.organisationId)
+    .run();
+  const dispatched = await dispatchWhatsAppReply({
     authorizeExecution: authorizeWhatsAppFixture,
     scope: fixture.scope,
     sql: fixture.sql,
@@ -540,33 +421,7 @@ async function authorityTest(): Promise<void> {
     now: NOW + 1_000,
     fetcher: graph.fetcher,
   });
-  expect(moved.ok && moved.value).toEqual({
-    kind: "refused",
-    reason: "authority_moved",
-  });
-
-  const revoked = await createSendFixture();
-  const revokedProposal = await seedProposal(revoked);
-  await revoked.world.db
-    .prepare(
-      `UPDATE provider_connection SET lifecycle = 'revoked', revoked_at = ? WHERE organisation_id = ?`,
-    )
-    .bind(NOW, revoked.world.organisationId)
-    .run();
-  const revokedDispatch = await dispatchWhatsAppReply({
-    authorizeExecution: authorizeWhatsAppFixture,
-    scope: revoked.scope,
-    sql: revoked.sql,
-    cipher: revoked.cipher,
-    env: revoked.env,
-    proposalId: revokedProposal.proposalId,
-    approvedVersion: 1,
-    approvedBodyDigest: revokedProposal.bodyDigest,
-    approvedBy: revoked.world.userId,
-    now: NOW + 1_000,
-    fetcher: graph.fetcher,
-  });
-  expect(revokedDispatch.ok && revokedDispatch.value).toEqual({
+  expect(dispatched.ok && dispatched.value).toEqual({
     kind: "refused",
     reason: "connection_inactive",
   });

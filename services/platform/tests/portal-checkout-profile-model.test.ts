@@ -2,10 +2,14 @@ import type {
   CheckoutProfile,
   CheckoutProfileConfiguration,
 } from "@seams/contracts";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import type { CheckoutProfileCollection } from "../../../apps/portal/src/features/checkout-profiles/api";
+import type {
+  CheckoutProfileCollection,
+  DraftCheckoutProfileSummary,
+} from "../../../apps/portal/src/features/checkout-profiles/api";
 import type { CheckoutProfileSummary } from "@seams/control-api/portal/checkout-profiles";
+import { handleSaveSubmit } from "../../../apps/portal/src/features/checkout-profiles/controller";
 import {
   activeReview,
   busyAction,
@@ -17,9 +21,12 @@ import {
   profileReadiness,
   reduceCheckoutProfilesState,
   selectedProfile,
+  type CheckoutProfilesAction,
   type CheckoutProfilesState,
 } from "../../../apps/portal/src/features/checkout-profiles/model";
 import type { Variant } from "@seams/type-utils";
+
+vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
 
 const CONFIGURATION: CheckoutProfileConfiguration = {
   currencyPolicy: { kind: "fixed", currency: "JPY" },
@@ -226,32 +233,9 @@ describe("checkout profile screen model", () => {
     }
   });
 
-  it("offers storefronts that have never had a profile activation", () => {
-    const published = publishedSummary("checkout", 1);
-    const ready = loadCollection({
-      profiles: [published],
-      activations: [],
-      storefrontIds: ["storefront_new"],
-    });
-    const reviewing = reduceCheckoutProfilesState(ready, {
-      kind: "openReview",
-      review: {
-        kind: "activate",
-        profile: published,
-        storefrontId: "storefront_new",
-      },
-    });
-    expect(reviewing.kind === "ready" && activeReview(reviewing)).toMatchObject(
-      { kind: "activate", storefrontId: "storefront_new" },
-    );
-  });
-
   it("invalidates publication review when the draft changes", () => {
-    const draft = summary("replacement", 2, "draft");
+    const draft = draftSummary("replacement", 2);
     const ready = loadCollection(collection([draft], []));
-    if (!isDraftProfileSummary(draft)) {
-      throw new Error("Expected a draft checkout profile.");
-    }
     const reviewing = reduceCheckoutProfilesState(ready, {
       kind: "openReview",
       review: { kind: "publish", profile: draft },
@@ -311,6 +295,42 @@ describe("checkout profile screen model", () => {
     });
     expect(blocked.blockers[0]).toContain("Profile fields");
   });
+
+  it("rejects a save command detached from its source revision", async () => {
+    const source = draftSummary("checkout-draft", 2);
+    const actions: CheckoutProfilesAction[] = [];
+    const mutate = vi.fn();
+    const draft = {
+      ...createProfileDraft(source.profile),
+      sourceRevision: 1,
+    };
+
+    await handleSaveSubmit(
+      {
+        organisationId: "organisation-a",
+        mutate,
+        dispatch: actions.push.bind(actions),
+        scope: {
+          organisationId: "organisation-a",
+          currentOrganisation: { current: "organisation-a" },
+          active: true,
+        },
+      },
+      { source, draft },
+      { preventDefault: () => {} },
+    );
+
+    // A stale draft never reaches the server, so it cannot overwrite a newer
+    // revision that someone else saved.
+    expect(mutate).not.toHaveBeenCalled();
+    expect(actions).toEqual([
+      {
+        kind: "operationFailed",
+        organisationId: "organisation-a",
+        message: "The selected draft changed. Review it before saving.",
+      },
+    ]);
+  });
 });
 
 function loadCollection(
@@ -337,6 +357,17 @@ function publishedSummary(
   const value = summary(checkoutProfileId, revision, "published");
   if (!isPublishedProfileSummary(value)) {
     throw new Error("Expected a published checkout profile.");
+  }
+  return value;
+}
+
+function draftSummary(
+  checkoutProfileId: string,
+  revision: number,
+): DraftCheckoutProfileSummary {
+  const value = summary(checkoutProfileId, revision, "draft");
+  if (!isDraftProfileSummary(value)) {
+    throw new Error("Expected a draft checkout profile.");
   }
   return value;
 }

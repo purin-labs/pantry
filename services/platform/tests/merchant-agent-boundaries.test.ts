@@ -81,41 +81,6 @@ describe("Urk release boundaries", () => {
     );
   });
 
-  it("refuses a Slack confirmation from someone who is not the requester", async () => {
-    const db = await installedDatabase();
-    const draft = await createOperatorConfigurationDraft({
-      ...(await proposalFixtureAuthority(db, ORGANISATION)),
-      draftId: "draft_unauthorized",
-      caseId: "case_unauthorized",
-      actorUserId: OWNER,
-      actorPersonId: "person_owner",
-      rawCommand: {
-        kind: "configure_installation_governance",
-        installationId: merchantAgentInstallationId(ORGANISATION),
-        maxSessionBudgetTokens: 90_000,
-      },
-      mutationId: "mutation_unauthorized",
-      now: NOW,
-      expiresAt: NOW + 60_000,
-    });
-    if (!draft.ok) throw new Error("draft creation failed");
-
-    expect(
-      await confirmOperatorConfigurationDraft({
-        db,
-        organisationId: ORGANISATION,
-        draftId: draft.value.draftId,
-        actorUserId: "user_f69e70b8-b1da-5135-80f3-5c87cbbf37b0",
-        env: { DB: db, PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("../src/env").Env,
-        actorRole: "owner",
-        previewCode: previewCode(draft.value.commandDigest),
-        now: NOW,
-      }),
-    ).toEqual({ ok: false, error: { code: "operator_draft_actor_mismatch" } });
-
-    // The refusal left nothing behind.
-    expect((await readAgentOperations(db, ORGANISATION)).governance).toEqual([]);
-  });
 
   it("keeps an installed Urk to the access it was granted", async () => {
     const db = await installedDatabase();

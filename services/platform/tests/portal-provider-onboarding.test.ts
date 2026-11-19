@@ -1,13 +1,6 @@
-// The portal owns its browser-only React runtime; the platform test harness renders it through the app-local package.
-// @ts-expect-error React runtime declarations are scoped to apps/portal.
-import React from "../../../apps/portal/node_modules/react";
-// @ts-expect-error React DOM runtime declarations are scoped to apps/portal.
-import { renderToStaticMarkup as renderStaticMarkup } from "../../../apps/portal/node_modules/react-dom/server";
-import { StaticRouter } from "../../../apps/portal/node_modules/react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MutationLedger } from "../../../apps/portal/src/mutation-state";
 import {
-  IntegrationsPage,
   beginProviderAuthorizationWatch,
   beginProviderCompletionListener,
   providerAuthorizationInterruptedMessage,
@@ -19,57 +12,13 @@ import {
 import { providerAttemptFailureCopy } from "../../../apps/portal/src/provider-onboarding";
 // @ts-expect-error The portal's JSX module is type-checked by its app-local build.
 import { whatsappAttemptFailureCopy } from "../../../apps/portal/src/pages/whatsapp";
+import {
+  INTEGRATIONS_PAGE_PROPS,
+  renderIntegrationsPage,
+} from "./portal-integrations-page-fixture";
 
-const noOp = async (): Promise<void> => {};
 const nothing = (): void => {};
-const ACTIONS = new Proxy({}, { get: () => noOp });
 const PORTAL_ORIGIN = "https://portal.example";
-
-const BASE_PROPS = {
-  organisationId: "organisation_onboarding",
-  organisationHandle: "cafe",
-  workspaceHandle: "central",
-  commerceSystem: null,
-  commerceSyncProblem: null,
-  codexConnection: { kind: "disconnected", revision: 0 },
-  inferenceSelection: { kind: "satyr_platform" },
-  accounts: [],
-  credentialInventory: null,
-  destinations: [],
-  supportDiagnostics: null,
-  agentMailboxes: [],
-  emailReplies: [],
-  emailOperational: [],
-  mailboxInstallations: [],
-  whatsapp: { applicationConfigured: true, accounts: [], replies: [] },
-  whatsappActions: ACTIONS,
-  setupDefaults: {
-    key: "read_and_propose:commerce_operator::",
-    capabilityProfile: "read_and_propose",
-    cuePresetId: "commerce_operator",
-    workspaceId: "",
-    channelId: "",
-  },
-  setupFeedback: { kind: "idle" },
-  readiness: null,
-  activation: { kind: "idle", organisation_id: "organisation_onboarding" },
-  firstTask: null,
-  organisationIsActive: true,
-  canManage: true,
-  canConnectCodex: true,
-  mutations: MutationLedger.empty(),
-  pendingAuthorization: null,
-  pendingConfirm: null,
-  requestConfirm: () => {},
-  actions: ACTIONS,
-  feedback: null,
-};
-
-function render(overrides: Record<string, unknown>): string {
-  return renderToStaticMarkup(
-    React.createElement(IntegrationsPage, { ...BASE_PROPS, ...overrides }),
-  );
-}
 
 const DROPBOX_ACCOUNT = {
   integrationAccountId: "intacc_dropbox",
@@ -118,7 +67,7 @@ const FAILED_WHATSAPP_ATTEMPT = {
 
 describe("file storage onboarding", () => {
   it("keeps the account overview when one provider detail fails", () => {
-    const failedDetail = render({
+    const failedDetail = renderIntegrationsPage({
       initialIntegrationId: "gmail",
       accounts: [DROPBOX_ACCOUNT],
       detailContent: {
@@ -128,7 +77,7 @@ describe("file storage onboarding", () => {
       },
       retryDetail: nothing,
     });
-    const overview = render({ accounts: [DROPBOX_ACCOUNT] });
+    const overview = renderIntegrationsPage({ accounts: [DROPBOX_ACCOUNT] });
 
     expect(failedDetail).toContain(
       "Gmail details are temporarily unavailable.",
@@ -141,7 +90,7 @@ describe("file storage onboarding", () => {
   });
 
   it("shows every saved account once and keeps one provider tile", () => {
-    const markup = render({
+    const markup = renderIntegrationsPage({
       accounts: [
         DROPBOX_ACCOUNT,
         {
@@ -176,12 +125,12 @@ describe("file storage onboarding", () => {
   });
 
   it("opens separate provider tiles with their own connection actions", () => {
-    const dropbox = render({ initialIntegrationId: "dropbox" });
+    const dropbox = renderIntegrationsPage({ initialIntegrationId: "dropbox" });
     expect(dropbox).toContain("Close dropbox");
     expect(dropbox).toContain('id="integration-panel-dropbox"');
     expect(dropbox).toContain(">Continue with Dropbox</button>");
     expect(dropbox).not.toContain("Continue with Google Drive");
-    const drive = render({
+    const drive = renderIntegrationsPage({
       initialIntegrationId: "google_drive",
       accounts: [DROPBOX_ACCOUNT],
     });
@@ -194,7 +143,7 @@ describe("file storage onboarding", () => {
   });
 
   it("narrates a sign-in in progress and blocks a second one", () => {
-    const markup = render({
+    const markup = renderIntegrationsPage({
       initialIntegrationId: "google_drive",
       pendingAuthorization: { kind: "connect", provider: "google_drive" },
     });
@@ -246,7 +195,7 @@ describe("file storage onboarding", () => {
   });
 
   it("explains a failed sign-in beside the action", () => {
-    const markup = render({
+    const markup = renderIntegrationsPage({
       initialIntegrationId: "dropbox",
       feedback: {
         mutation: { kind: "connect_provider", provider: "dropbox" },
@@ -261,7 +210,7 @@ describe("file storage onboarding", () => {
   });
 
   it("leads a broken storage connection with its reconnect and hides raw scopes", () => {
-    const markup = render({
+    const markup = renderIntegrationsPage({
       initialIntegrationId: "dropbox",
       accounts: [DROPBOX_ACCOUNT],
     });
@@ -273,7 +222,7 @@ describe("file storage onboarding", () => {
     expect(markup).toContain("Connect another Dropbox account");
     // The rotation copy points every provider-authorized connection at Reconnect,
     // so the records providers get the same repair action.
-    const airtable = render({
+    const airtable = renderIntegrationsPage({
       initialIntegrationId: "airtable",
       accounts: [
         {
@@ -340,10 +289,12 @@ describe("file storage onboarding", () => {
 
 describe("Square onboarding", () => {
   it("offers the shared OAuth flow and existing-account lifecycle controls", () => {
-    const disconnected = render({ initialIntegrationId: "square" });
+    const disconnected = renderIntegrationsPage({
+      initialIntegrationId: "square",
+    });
     expect(disconnected).toContain('aria-label="Connect Square in a popup"');
 
-    const connected = render({
+    const connected = renderIntegrationsPage({
       initialIntegrationId: "square",
       accounts: [SQUARE_ACCOUNT],
     });
@@ -353,7 +304,7 @@ describe("Square onboarding", () => {
     expect(connected).toContain(">Refresh locations and devices</button>");
     expect(connected).toContain(">Disconnect</button>");
 
-    const waiting = render({
+    const waiting = renderIntegrationsPage({
       initialIntegrationId: "square",
       accounts: [SQUARE_ACCOUNT],
       pendingAuthorization: {
@@ -365,31 +316,11 @@ describe("Square onboarding", () => {
     expect(waiting).toContain("Waiting for Square…");
     expect(waiting).toContain(">Cancel</button>");
   });
-
-  it("keeps Square connection state in the shared mutation ledger", () => {
-    const opening = MutationLedger.empty().add({
-      kind: "connect_provider",
-      provider: "square",
-    });
-    expect(opening.kind).toBe("added");
-    if (opening.kind !== "added") return;
-    expect(
-      providerConnectionState(opening.ledger, null, null, "square"),
-    ).toEqual({ kind: "opening" });
-    expect(
-      providerConnectionState(
-        MutationLedger.empty(),
-        { kind: "connect", provider: "square" },
-        null,
-        "square",
-      ),
-    ).toEqual({ kind: "waiting" });
-  });
 });
 
 describe("WhatsApp onboarding", () => {
   it("keeps discovery honest while deployment availability is unknown", () => {
-    const markup = render({
+    const markup = renderIntegrationsPage({
       whatsappConfigurationKnown: false,
       whatsapp: {
         applicationConfigured: false,
@@ -403,7 +334,7 @@ describe("WhatsApp onboarding", () => {
   });
 
   it("holds the action while Meta is open and lets the operator cancel", () => {
-    const markup = render({
+    const markup = renderIntegrationsPage({
       initialIntegrationId: "whatsapp",
       pendingAuthorization: { kind: "connect", provider: "whatsapp" },
     });
@@ -414,7 +345,7 @@ describe("WhatsApp onboarding", () => {
   });
 
   it("records the last failed attempt with its reference and next step", () => {
-    const markup = render({
+    const markup = renderIntegrationsPage({
       initialIntegrationId: "whatsapp",
       supportDiagnostics: FAILED_WHATSAPP_ATTEMPT,
     });
@@ -444,7 +375,7 @@ const ROUTE_DATA = {
   accounts: [],
   supportReference: null,
   whatsappApplicationConfigured: true,
-  setupDefaults: BASE_PROPS.setupDefaults,
+  setupDefaults: INTEGRATIONS_PAGE_PROPS.setupDefaults,
   readiness: null,
   activation: { kind: "idle", organisation_id: "organisation_onboarding" },
   firstTask: null,
@@ -700,13 +631,3 @@ describe("completion handshake", () => {
     gmailCleanup();
   });
 });
-
-function renderToStaticMarkup(element: React.ReactNode): string {
-  return renderStaticMarkup(
-    React.createElement(
-      StaticRouter,
-      { location: "/portal/cafe/central/integrations" },
-      element,
-    ),
-  );
-}

@@ -2,6 +2,7 @@ import { expect, it } from "vitest";
 
 import {
   bindCommerceMerchant,
+  ensureEntityPlaneCommerceMerchantBinding,
   resolveCurrentOrganisationCommerceMerchantBinding,
   resolveCommerceMerchantBinding,
 } from "../src/data/commerce-merchant-binding";
@@ -32,7 +33,7 @@ it("binds one Satyr organisation and integration identity to one active Undercle
     )
     .bind(organisationId.value)
     .run();
-  const bound = await bindCommerceMerchant({
+  const binding = {
     db,
     bindingId: "underclerk_binding_demo",
     organisationId: organisationId.value,
@@ -41,8 +42,21 @@ it("binds one Satyr organisation and integration identity to one active Undercle
     environment: "development",
     deliverySigningKeyId: "key_underclerk_demo",
     deliverySigningPublicKey: new Uint8Array(32).fill(7),
+  } as const;
+  let provisions = 0;
+  const ensureInput = {
+    ...binding,
     now: 100,
-  });
+    provision: async () => {
+      provisions += 1;
+      return true;
+    },
+  };
+  const bound = await ensureEntityPlaneCommerceMerchantBinding(ensureInput);
+  expect(await ensureEntityPlaneCommerceMerchantBinding(ensureInput)).toEqual(
+    bound,
+  );
+  expect(provisions).toBe(1);
   expect(bound).toMatchObject({
     ok: true,
     value: {
@@ -65,19 +79,7 @@ it("binds one Satyr organisation and integration identity to one active Undercle
       organisationId: organisationId.value,
     }),
   ).toEqual(bound);
-  expect(
-    await bindCommerceMerchant({
-      db,
-      bindingId: "underclerk_binding_demo",
-      organisationId: organisationId.value,
-      integrationAccountId: integrationAccountId.value,
-      merchantId: "merchant_demo",
-      environment: "development",
-      deliverySigningKeyId: "key_underclerk_demo",
-      deliverySigningPublicKey: new Uint8Array(32).fill(7),
-      now: 101,
-    }),
-  ).toEqual(bound);
+  expect(await bindCommerceMerchant({ ...binding, now: 101 })).toEqual(bound);
   expect(
     await bindCommerceMerchant({
       db,

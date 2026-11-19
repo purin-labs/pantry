@@ -12,6 +12,11 @@ const WORKSPACE_HANDLE = "cafe-central";
 
 describe("CafeOS Plan 21 contracts", () => {
   it("round-trips every navigable page through one route descriptor", () => {
+    expect(readPortalRoute("/portal")).toEqual({ kind: "organisation_list" });
+    expect(readPortalRoute(`/portal/${ORGANISATION_HANDLE}`)).toEqual({
+      kind: "organisation",
+      organisationHandle: ORGANISATION_HANDLE,
+    });
     for (const group of WORKSPACE_NAVIGATION_GROUPS) {
       for (const page of group.pages) {
         const route = readPortalRoute(
@@ -40,16 +45,25 @@ describe("CafeOS Plan 21 contracts", () => {
       destination: { kind: "page", page: "chat" },
     });
 
-    expect(
-      workspaceResourcePath(
-        ORGANISATION_HANDLE,
-        WORKSPACE_HANDLE,
-        "product",
-        "gid://shopify/Product/42",
-      ),
-    ).toBe(
+    const productPath = workspaceResourcePath(
+      ORGANISATION_HANDLE,
+      WORKSPACE_HANDLE,
+      "product",
+      "gid://shopify/Product/42",
+    );
+    expect(productPath).toBe(
       "/portal/satyr-cafes/cafe-central/products/gid%253A%252F%252Fshopify%252FProduct%252F42",
     );
+    expect(readPortalRoute(productPath)).toEqual({
+      kind: "workspace",
+      organisationHandle: ORGANISATION_HANDLE,
+      workspaceHandle: WORKSPACE_HANDLE,
+      destination: {
+        kind: "resource",
+        page: "products",
+        resourceId: "gid://shopify/Product/42",
+      },
+    });
     expect(
       workspaceResourcePath(
         ORGANISATION_HANDLE,

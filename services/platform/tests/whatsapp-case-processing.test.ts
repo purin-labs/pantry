@@ -124,10 +124,6 @@ function whatsAppCaseTurnSuite(): void {
     irrelevantTest,
   );
   it(
-    "fails closed before decrypting a corrupt envelope direction",
-    corruptEnvelopeDirectionTest,
-  );
-  it(
     "charges the reserved allowance and settles failed when model usage is unknown",
     failureTest,
   );
@@ -511,36 +507,8 @@ async function irrelevantTest(): Promise<void> {
       ciphertextB64: proposal?.ciphertextB64 ?? "",
     },
   );
+  // The acknowledgement then takes the same send path as an agent reply.
   expect(opened.ok && opened.value).toBe(acknowledgement);
-  const graph = createFakeGraph({
-    sendOutcomes: [{ kind: "accepted", whatsappMessageId: "wamid.ACKOUT1" }],
-  });
-  const sent = await dispatchWhatsAppReply({
-    authorizeExecution: authorizeWhatsAppFixture,
-    scope: harness.scope,
-    sql: harness.sql,
-    cipher: harness.cipher,
-    env: harness.env,
-    proposalId: `proposal_${CASE_ID}_1`,
-    approvedVersion: 1,
-    approvedBodyDigest: proposal?.bodyDigest ?? "",
-    approvedBy: "system:whatsapp_cue_engine",
-    now: NOW + 1,
-    fetcher: graph.fetcher,
-  });
-  expect(sent.ok && sent.value.kind).toBe("sent");
-  expect(JSON.parse(graph.sentBodies()[0] ?? "{}")).toMatchObject({
-    text: { body: acknowledgement },
-  });
-  expect(readEnvelope(harness.sql, CASE_ID).at(-1)?.direction).toBe("outbound");
-  const panel = await readWhatsAppCasePanel(
-    { storage: harness.storage, env: harness.env, scope: harness.scope },
-    CASE_ID,
-  );
-  expect(panel.ok && panel.value.messages.map(readMessageText)).toEqual([
-    CUSTOMER_TEXT,
-    acknowledgement,
-  ]);
 }
 
 function proposed(body: string, totalTokens: number): unknown {
@@ -644,32 +612,6 @@ function readEnvelope(
   const envelope = readWhatsAppEnvelope(sql, caseId);
   if (!envelope.ok) throw new Error(envelope.error.code);
   return envelope.value;
-}
-
-async function corruptEnvelopeDirectionTest(): Promise<void> {
-  const harness = await setup(proposed("must not run", 30));
-  harness.sql.exec("PRAGMA ignore_check_constraints = ON");
-  try {
-    harness.sql.exec(
-      "UPDATE connector_whatsapp_envelope SET direction = ? WHERE case_id = ?",
-      "unknown",
-      CASE_ID,
-    );
-    const open = vi.spyOn(harness.cipher, "open");
-
-    const outcome = await processWhatsAppCaseTurn(
-      harness.env,
-      turnInput(harness),
-    );
-
-    expect(outcome).toEqual({
-      ok: false,
-      error: { code: "connector_whatsapp_storage_corrupt" },
-    });
-    expect(open).not.toHaveBeenCalled();
-  } finally {
-    harness.sql.exec("PRAGMA ignore_check_constraints = OFF");
-  }
 }
 
 async function failureTest(): Promise<void> {

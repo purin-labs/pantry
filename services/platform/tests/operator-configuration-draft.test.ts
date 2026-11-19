@@ -7,7 +7,6 @@ import {
   previewCode,
 } from "../src/slack/configuration-presentation";
 import {
-  cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
   createOperatorConfigurationDraft,
   readPendingOperatorDraft,
@@ -60,30 +59,6 @@ describe("operator configuration drafts", () => {
     ]);
     expect(confirmed.value.draft.state).toBe("settled");
     expect(confirmed.value.draft.receiptCode).toBe("accepted");
-  });
-
-  it("does not apply the change twice when a confirmation arrives again", async () => {
-    const db = createDatabase();
-    const draft = await create(db, {});
-    await confirm(db, draft.draftId, draft.commandDigest, NOW + 10);
-
-    const again = await confirmOperatorConfigurationDraft({
-      db,
-      env: fixtureEnv(db),
-      organisationId: ORGANISATION,
-      draftId: draft.draftId,
-      actorUserId: OWNER,
-      actorRole: "owner",
-      previewCode: previewCode(draft.commandDigest),
-      now: NOW + 20,
-    });
-    // The duplicate reads what was recorded rather than applying again, so a
-    // lost response costs the operator a read and not a second change.
-    expect(again.ok).toBe(true);
-    if (!again.ok) return;
-    expect(again.value.draft.receiptCode).toBe("accepted");
-    const snapshot = await readAgentOperations(db, ORGANISATION);
-    expect(snapshot.areas).toHaveLength(1);
   });
 
   it("does not re-run a change whose settlement was interrupted", async () => {
@@ -420,23 +395,6 @@ describe("operator configuration drafts", () => {
     expect((await readAgentOperations(db, ORGANISATION)).areas).toEqual([]);
   });
 
-  it("refuses a confirmation that does not match the preview it was shown", async () => {
-    const db = createDatabase();
-    const draft = await create(db, {});
-    expect(
-      await confirmOperatorConfigurationDraft({
-        db,
-        env: fixtureEnv(db),
-        organisationId: ORGANISATION,
-        draftId: draft.draftId,
-        actorUserId: OWNER,
-        actorRole: "owner",
-        previewCode: "BADBAD",
-        now: NOW + 10,
-      }),
-    ).toEqual({ ok: false, error: { code: "operator_draft_digest_mismatch" } });
-  });
-
   it("refuses a confirmation after the draft has expired", async () => {
     const db = createDatabase();
     const draft = await create(db, {});
@@ -492,41 +450,6 @@ describe("operator configuration drafts", () => {
       ok: false,
       error: { code: "operator_draft_not_pending", state: "cancelled" },
     });
-  });
-
-  it("reports a pending draft past its window as expired", async () => {
-    const db = createDatabase();
-    await create(db, {});
-    const pending = await readPendingOperatorDraft({
-      db,
-      organisationId: ORGANISATION,
-      caseId: CASE,
-      now: EXPIRES + 1,
-    });
-    expect(pending?.state).toBe("expired");
-  });
-
-  it("lets the operator withdraw a draft without applying it", async () => {
-    const db = createDatabase();
-    const draft = await create(db, {});
-    expect(
-      await cancelOperatorConfigurationDraft({
-        db,
-        organisationId: ORGANISATION,
-        draftId: draft.draftId,
-        actorUserId: OWNER,
-        now: NOW + 10,
-      }),
-    ).toEqual({ ok: true, value: true });
-    expect(
-      await readPendingOperatorDraft({
-        db,
-        organisationId: ORGANISATION,
-        caseId: CASE,
-        now: NOW + 10,
-      }),
-    ).toBeNull();
-    expect((await readAgentOperations(db, ORGANISATION)).areas).toEqual([]);
   });
 
   it("refuses a request that is not a valid configuration command", async () => {

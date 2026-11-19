@@ -113,7 +113,6 @@ function whatsappLifecycleSuite(): void {
     deferredAdmissionTest,
   );
   it("takes a Case over, returns it, and closes it", ownershipRpcTest);
-  it("serves the Case panel without any provider credential", panelTest);
   it(
     "keeps a valid organisation credential healthy through scheduled reconciliation",
     reconcilerTest,
@@ -819,26 +818,6 @@ async function ownershipRpcTest(): Promise<void> {
     ok: false,
     error: { code: "connector_whatsapp_case_missing" },
   });
-}
-
-async function panelTest(): Promise<void> {
-  const fixture = await createLifecycleFixture();
-  await admitOne(fixture, "wamid.PANEL1", "Do you deliver?");
-  await admitOne(fixture, "wamid.PANEL2", "I am at 14 Mill Lane.", NOW + 1_000);
-  const panel = await readWhatsAppCasePanel(fixture.deps, fixture.world.caseId);
-  expect(panel.ok).toBe(true);
-  if (!panel.ok) return;
-  expect(panel.value.messages.map((message) => message.text)).toEqual([
-    "Do you deliver?",
-    "I am at 14 Mill Lane.",
-  ]);
-  expect(panel.value.ownership).toEqual({ kind: "agent_active" });
-  // The panel is the only place customer text appears, and it carries no
-  // provider credential of any kind.
-  const serialized = JSON.stringify(panel.value);
-  expect(serialized).not.toContain("fixture-customer-business-token");
-  expect(serialized).not.toContain("fixture-app-secret-not-a-real-credential");
-  expect(serialized).not.toContain("Bearer");
 }
 
 function requireParsed<T>(

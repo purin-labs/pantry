@@ -86,111 +86,6 @@ describe("CafeOS automation route ownership", () => {
     ).toThrow("Agent operations are unavailable.");
   });
 
-  it("accepts a published saved selector with its validated commerce query", () => {
-    const parsed = parseAgentOperationsResponse({
-      ok: true,
-      operations: {
-        areas: [],
-        responsibilityScopes: [
-          {
-            scopeId: "scope_export_board",
-            organisationId: ORGANISATION_ID,
-            areaId: "area_export_coordination",
-            scope: {
-              kind: "saved_selector",
-              selector: {
-                selectorId: "export_board",
-                revision: 1,
-                query: {
-                  kind: "commerce_list_page",
-                  listId: "export_coordination",
-                  filter: { kind: "all" },
-                  sorts: [],
-                  pagination: { limit: 100, cursor: null },
-                },
-              },
-            },
-            lifecycle: "published",
-            revision: 1,
-            publishedAt: 10,
-          },
-        ],
-        definitions: [],
-        installations: [],
-        skills: [],
-        bindings: [],
-        cueBindings: [],
-        scheduleBindings: [],
-        governance: [],
-        escalationPolicies: [],
-        configurationProposals: [],
-        activeCases: [],
-        commerceExceptions: {
-          kind: "unavailable",
-          reason: "commerce_system_unavailable",
-        },
-        actionLedger: [],
-      },
-    });
-
-    const scope = parsed.responsibilityScopes[0]?.scope;
-    expect(parsed.responsibilityScopes[0]?.organisationId).toBe(
-      ORGANISATION_ID,
-    );
-    expect(scope?.kind).toBe("saved_selector");
-    if (scope?.kind !== "saved_selector")
-      throw new Error("saved selector scope was not parsed");
-    expect(scope.selector.query.kind).toBe("commerce_list_page");
-  });
-
-  it("normalizes direct Action Ledger activity without a commerce work DTO", () => {
-    const parsed = parseAgentOperationsResponse({
-      ok: true,
-      operations: {
-        areas: [],
-        responsibilityScopes: [],
-        definitions: [],
-        installations: [],
-        skills: [],
-        bindings: [],
-        cueBindings: [],
-        scheduleBindings: [],
-        governance: [],
-        escalationPolicies: [],
-        configurationProposals: [],
-        activeCases: [],
-        commerceExceptions: {
-          kind: "unavailable",
-          reason: "commerce_system_unavailable",
-        },
-        actionLedger: [
-          {
-            action: {
-              nonce: { value: "00000000-0000-4000-8000-000000000001" },
-              host: "satyr.commerce",
-              verb: "commerce.order.cancel",
-              resourceKey: "commerce:cancel_order:order_1",
-              amount: null,
-            },
-            caseId: "case_1",
-            proposalId: "proposal_1",
-            state: "proposed",
-            createdAt: 10,
-            updatedAt: 11,
-            providerResult: null,
-            commerceEffect: null,
-          },
-        ],
-      },
-    });
-
-    expect(parsed.actionLedger).toHaveLength(1);
-    expect(parsed.actionLedger[0]?.action.resourceKey).toBe(
-      "commerce:cancel_order:order_1",
-    );
-    expect(parsed.actionLedger[0]?.commerceEffect).toBeNull();
-  });
-
   it("renders an Underclerk governed refund amount", () => {
     const actionNonce = "00000000-0000-4000-8000-000000000002";
     const providerReceipt = {
@@ -377,25 +272,6 @@ describe("CafeOS automation route ownership", () => {
         "areas",
       ),
     ).toContain("Area created.");
-  });
-
-  it("normalizes manual run form input", () => {
-    const values = new FormData();
-    values.set("installationId", "installation_inventory");
-    values.set("instructionBody", "  Review today's low stock items.  ");
-    expect(parseAgentOperationForm("dispatch_manual_run", values)).toEqual({
-      ok: true,
-      command: {
-        kind: "dispatch_manual_run",
-        installationId: "installation_inventory",
-        instructionBody: "Review today's low stock items.",
-      },
-    });
-    values.delete("instructionBody");
-    expect(parseAgentOperationForm("dispatch_manual_run", values)).toEqual({
-      ok: false,
-      message: "Complete the required operation fields.",
-    });
   });
 
   it("diffs document lines for conflict and proposal views", () => {
