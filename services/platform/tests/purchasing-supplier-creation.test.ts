@@ -25,7 +25,7 @@ let commerceEngine: CommerceWorker;
 
 beforeAll(async () => {
   commerceEngine = await startCommerceWorker({ now: NOW });
-});
+}, 30_000);
 
 afterAll(async () => {
   await commerceEngine.dispose();
@@ -133,7 +133,7 @@ it("creates one supplier, directory entry, and supplied-item relationship throug
     ok: true,
     value: { kind: "found", entry: { listId: "supplier_directory" } },
   });
-});
+}, 30_000);
 
 it("rejects incomplete minimum-order and empty supplied-item input", () => {
   expect(

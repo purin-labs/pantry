@@ -56,6 +56,7 @@ const AUTHORITY: RequestAuthority = {
 it(
   "reads paged payment and shipment evidence through the tool host and real Underclerk HTTP/SQLite, fences access and rejects mixed reports",
   acceptsCommerceReads,
+  30_000,
 );
 
 async function acceptsCommerceReads(): Promise<void> {

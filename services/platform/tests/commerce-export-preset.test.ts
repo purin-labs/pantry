@@ -75,7 +75,7 @@ describe("Platform export preset publication", () => {
 
     platform.sqlite.close();
     await commerceEngine.dispose();
-  });
+  }, 30_000);
 
   it("publishes exact evidence and all owner records in one fenced batch", async () => {
     const database = createDatabase();

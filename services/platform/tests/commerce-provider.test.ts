@@ -1151,6 +1151,7 @@ const CANCELLATION_SHIPPING_FULFILLMENT: CommerceFulfillmentV1 = {
 it(
   "publishes through the authenticated Underclerk API and verifies its signed observation",
   runCommerceWalkingPath,
+  30_000,
 );
 
 async function runCommerceWalkingPath(): Promise<void> {

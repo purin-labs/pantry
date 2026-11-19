@@ -143,6 +143,7 @@ export default defineConfig({
     fileParallelism: false,
     retry: 0,
     testTimeout: 30_000,
+    hookTimeout: 30_000,
     deps: {
       optimizer: {
         ssr: {

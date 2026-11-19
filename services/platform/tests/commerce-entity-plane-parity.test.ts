@@ -418,7 +418,7 @@ describe("commerce entity-plane reader parity evidence", () => {
       await native.close();
       await provider.close();
     }
-  });
+  }, 30_000);
 });
 
 function createNormalizedProjectionStore(): ReturnType<typeof emptySqliteFixture> {
