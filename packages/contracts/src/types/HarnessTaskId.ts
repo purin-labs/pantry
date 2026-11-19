@@ -1,2 +1,0 @@
-
-export type HarnessTaskId = string;
