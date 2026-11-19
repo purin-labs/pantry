@@ -202,7 +202,9 @@ export class SpatialPane {
     this.separator.hidden = !this.open || this.compact;
     this.viewport.dataset.visible = String(!this.open || !this.compact);
     this.viewport.inert = this.open && this.compact;
-    this.inspection.hidden = planOnly && !floorPlanOnly;
+    // A compact plan has no room for the 340 px inspection card: it would
+    // cover the map, and the equipment under it could not take a drag.
+    this.inspection.hidden = planOnly;
     this.threeD.hidden = !this.compact;
     this.views.hidden = this.options.trigger === "external" && !planOnly;
     this.toggle.hidden = this.options.trigger === "external";
