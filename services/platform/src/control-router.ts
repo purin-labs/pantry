@@ -500,7 +500,6 @@ export async function handleControlRequest(
     case "commerceListEntryPatch":
     case "commerceSavedViewPresentationPatch":
     case "commerceBoardPresence":
-    case "cafeOperations":
     case "terminalOperations":
     case "terminalRetirement":
     case "counterPolicies":
@@ -538,7 +537,6 @@ export async function handleControlRequest(
     case "supplierPayoutAudit":
     case "supplierDestinations":
     case "supplierDestinationActivation":
-    case "shippingOperations":
     case "commerceTrackingBatchPreview":
     case "commerceOfferPricePolicy":
     case "commercePricedOffers":

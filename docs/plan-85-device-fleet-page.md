@@ -90,7 +90,8 @@ device enrollment table exists. Its lifecycle is defined only in the plan text: 
 
 ### Locations and stations are partial
 
-`satyr_location_id` exists on terminal assignments. `cafe-operations.ts` holds the fixed
+`satyr_location_id` exists on terminal assignments. The commerce engine's café scenario
+(`services/commerce/src/plugins/food-service/cafe-scenario.ts`) holds the fixed
 stations `station_bakery` and `station_bar`, and the order queue uses station ids. No general
 site or station table exists. This plan uses those existing ids first. It adds a station
 table only if a device needs a station that the existing ids do not hold.

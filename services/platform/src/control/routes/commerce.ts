@@ -119,10 +119,6 @@ import {
   handleCommerceSavedViewPresentationPatch,
 } from "./commerce/graph";
 import {
-  handleCafeOperations,
-  handleShippingOperations,
-} from "./commerce/operations";
-import {
   handleCommerceCapabilities,
   handleCommerceSystem,
   handleCommerceSystemSync,
@@ -180,12 +176,6 @@ export type CommerceControlRoute =
       viewIdRaw: string;
     }>
   | Readonly<{ kind: "commerceBoardPresence"; organisationIdRaw: string }>
-  | Readonly<{ kind: "cafeOperations"; organisationIdRaw: string }>
-  | Readonly<{
-      kind: "shippingOperations";
-      organisationIdRaw: string;
-      shipmentIdRaw: string;
-    }>
   | Readonly<{ kind: "commerceTrackingBatchPreview"; organisationIdRaw: string }>
   | Readonly<{
       kind: "commerceOfferPricePolicy";
@@ -421,19 +411,6 @@ export function matchCommerceControlRoute(
     return { kind: "commerceGraphActivity", organisationIdRaw: graphActivity };
   const graph = organisation(pathname, "commerce/graph");
   if (graph !== null) return { kind: "commerceGraph", organisationIdRaw: graph };
-  const cafe = organisation(pathname, "commerce/cafe-operations");
-  if (cafe !== null) return { kind: "cafeOperations", organisationIdRaw: cafe };
-  const shipping = match(
-    pathname,
-    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/shipping-operations\/([^/]+)$/u,
-  );
-  if (shipping !== null) {
-    return {
-      kind: "shippingOperations",
-      organisationIdRaw: decode(shipping[0]),
-      shipmentIdRaw: decode(shipping[1]),
-    };
-  }
   const trackingBatchPreview = organisation(
     pathname,
     "commerce/operations/tracking-batches/preview",
@@ -715,15 +692,6 @@ export function handleCommerceControlRoute(
       );
     case "commerceBoardPresence":
       return handleCommerceBoardPresence(request, env, route.organisationIdRaw);
-    case "cafeOperations":
-      return handleCafeOperations(request, env, route.organisationIdRaw);
-    case "shippingOperations":
-      return handleShippingOperations(
-        request,
-        env,
-        route.organisationIdRaw,
-        route.shipmentIdRaw,
-      );
     case "commerceTrackingBatchPreview":
       return handleCommerceTrackingBatchPreview(
         request,

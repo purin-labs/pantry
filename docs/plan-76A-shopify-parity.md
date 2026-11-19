@@ -447,8 +447,9 @@ fulfillment. A request after the window, or for a fresh food line, is
 refused.
 
 **Satyr.** Projection kinds `draft_order`, `order_edit` and `return`, and the
-order's payment list. Platform's `cafe-operations.ts` reads `lineItems` and
-`fulfilledQuantity`, so it must read the current order. Urk can prepare
+order's payment list. Platform's `cafe-operations.ts` read `lineItems` and
+`fulfilledQuantity`, so it had to read the current order (Plan 92 removed
+that module on 2026-11-19). Urk can prepare
 drafts and returns as governed actions; staff approval stays in Satyr.
 
 ## Step 3 — Customer accounts
