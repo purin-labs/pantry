@@ -7,7 +7,7 @@ import type {
 import {
   BAKERY_APPLIANCE_BUILDS,
   BAKERY_BROWSER_BUNDLE,
-} from "./browser-physics-asset";
+} from "./browser-physics-asset.ts";
 
 export type RuntimeFile = Readonly<{
   file: string;

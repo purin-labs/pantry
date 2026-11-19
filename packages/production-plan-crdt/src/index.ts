@@ -5,13 +5,13 @@ import {
   PLAN_STATE_LIMIT,
   PLAN_STATE_VECTOR_LIMIT,
   PLAN_UPDATE_LIMIT,
-} from "./limits";
+} from "./limits.ts";
 export {
   PLAN_LINE_LIMIT,
   PLAN_STATE_LIMIT,
   PLAN_STATE_VECTOR_LIMIT,
   PLAN_UPDATE_LIMIT,
-} from "./limits";
+} from "./limits.ts";
 
 /**
  * Plan 40D: the shared production plan of one location. Each line is a

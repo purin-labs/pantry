@@ -20,7 +20,7 @@ import {
   type EmailDraftSelection,
   type EmailDraftStateVector,
   type EmailDraftUpdate,
-} from "./index";
+} from "./index.ts";
 import { isRecord } from "@seams/std";
 
 export const EMAIL_DRAFT_PROTOCOL = "email_draft_sync.v2";

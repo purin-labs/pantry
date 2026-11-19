@@ -18,7 +18,7 @@ import {
   type CostsSheetSelection,
   type CostsSheetStateVector,
   type CostsSheetUpdate,
-} from "./index";
+} from "./index.ts";
 
 export const COSTS_SHEET_PROTOCOL = "costs_sheet_sync.v1";
 

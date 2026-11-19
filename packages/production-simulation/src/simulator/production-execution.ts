@@ -1,4 +1,4 @@
-import type { BrowserPhysicsTask } from "./browser-physics-task";
+import type { BrowserPhysicsTask } from "./browser-physics-task.ts";
 import type {
   ProductionWorkcell,
   ProductionWorkcells,

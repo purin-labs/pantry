@@ -4,7 +4,7 @@ import {
   RelativeTextSelection,
   captureTextPresenceSelection,
   resolveTextPresenceSelection,
-} from "../src/index";
+} from "../src/index.ts";
 
 describe("relative text selections", () => {
   it("keeps local and transmitted selections anchored across concurrent insertion", () => {

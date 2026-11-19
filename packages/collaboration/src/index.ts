@@ -6,7 +6,7 @@ export {
   type YjsEncodingKind,
   type YjsEncodingLimits,
   type YjsEncodingResult,
-} from "./yjs-encoding";
+} from "./yjs-encoding.ts";
 export {
   RelativeTextSelection,
   captureTextPresenceSelection,
@@ -14,7 +14,7 @@ export {
   type TextPresenceSelection,
   type TextSelectionDirection,
   type TextSelectionRange,
-} from "./text-selection";
+} from "./text-selection.ts";
 export {
   COLLABORATION_FRAME_LIMIT,
   COLLABORATION_PING,
@@ -39,13 +39,13 @@ export {
   type CollaborationPointer,
   type CollaborationPointerPosition,
   type CollaborationPresenceState,
-} from "./wire";
+} from "./wire.ts";
 export {
   hasValidPlainTextShape,
   normalizePlainText,
   splicePlainText,
   type TextInputRange,
-} from "./plain-text";
+} from "./plain-text.ts";
 export {
   COLLABORATION_AGENT_ACTION_BYTES,
   COLLABORATION_AGENT_DRAFT_TEXT_LIMIT,
@@ -59,7 +59,7 @@ export {
   type CollaborationAgentActivity,
   type CollaborationAgentColorKey,
   type CollaborationAgentRect,
-} from "./agent-presence";
+} from "./agent-presence.ts";
 export {
   createSyncProtocol,
   everyCode,
@@ -73,4 +73,4 @@ export {
   type SyncRoomMetadata,
   type SyncServerExtension,
   type SyncServerMessage,
-} from "./sync-protocol";
+} from "./sync-protocol.ts";

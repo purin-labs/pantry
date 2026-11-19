@@ -2,7 +2,7 @@ import {
   APPLIANCE_FOOTPRINTS,
   type ApplianceId,
   type AppliancePose,
-} from "./appliance-catalogue";
+} from "./appliance-catalogue.ts";
 
 const HALF_PI = Math.PI / 2;
 

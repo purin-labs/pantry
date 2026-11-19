@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { MenuDraftDoc } from "../src/index";
+import { MenuDraftDoc } from "../src/index.ts";
 import {
   encodeMenuDraftServerMessage,
   FRAME_LIMIT,
   parseMenuDraftServerMessage,
-} from "../src/protocol";
+} from "../src/protocol.ts";
 
 describe("MenuDraftDoc", () => {
   it("merges simultaneous edits to separate passages of one description", mergesDescriptionPassages);

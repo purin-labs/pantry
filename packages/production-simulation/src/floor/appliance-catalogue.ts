@@ -1,4 +1,4 @@
-import type { BakeryFloorPlanId } from "./bakery-room";
+import type { BakeryFloorPlanId } from "./bakery-room.ts";
 
 export type ApplianceFootprint = Readonly<{
   id: string;

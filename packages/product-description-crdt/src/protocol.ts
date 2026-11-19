@@ -20,7 +20,7 @@ import {
   type ProductDescriptionStateVector,
   type ProductDescriptionCrdtError,
   type ProductDescriptionPresenceSelection,
-} from "./index";
+} from "./index.ts";
 import { isPositiveInteger } from "@seams/std";
 
 export const DESCRIPTION_PROTOCOL = "product_description_sync.v2";

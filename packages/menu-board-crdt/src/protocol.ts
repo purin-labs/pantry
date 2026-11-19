@@ -23,7 +23,7 @@ import {
   type MenuBoardStateVector,
   type MenuBoardUpdate,
   type MenuBoardPresenceSelection,
-} from "./index";
+} from "./index.ts";
 import { isRecord } from "@seams/std";
 
 export const MENU_BOARD_PROTOCOL = "menu_board_sync.v1";

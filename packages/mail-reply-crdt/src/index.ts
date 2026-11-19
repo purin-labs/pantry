@@ -17,13 +17,13 @@ import {
   UPDATE_LIMIT,
   STATE_LIMIT,
   STATE_VECTOR_LIMIT,
-} from "./limits";
+} from "./limits.ts";
 export {
   BODY_LIMIT,
   UPDATE_LIMIT,
   STATE_LIMIT,
   STATE_VECTOR_LIMIT,
-} from "./limits";
+} from "./limits.ts";
 export { RelativeTextSelection as MailReplySelection } from "@seams/collaboration";
 
 export const MAIL_REPLY_SCHEMA = "mail_reply_crdt.v1";

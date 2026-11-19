@@ -6,7 +6,7 @@ import {
   encodeDraftServerMessage,
   parseDraftClientMessage,
   parseDraftServerMessage,
-} from "../src/protocol";
+} from "../src/protocol.ts";
 import {
   ProductDescriptionDoc,
   parseProductDescriptionState,
@@ -15,7 +15,7 @@ import {
   type ProductDescriptionCrdtResult,
   type ProductDescriptionStateVector,
   type ProductDescriptionUpdate,
-} from "../src/index";
+} from "../src/index.ts";
 
 function value<T>(result: ProductDescriptionCrdtResult<T>): T {
   if (!result.ok) throw new Error(result.error.code);

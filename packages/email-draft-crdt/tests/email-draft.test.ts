@@ -3,7 +3,7 @@ import * as Y from "yjs";
 import {
   EmailDraftDoc,
   parseEmailDraftUpdate,
-} from "../src/index";
+} from "../src/index.ts";
 
 describe("EmailDraftDoc", () => {
   it("converges concurrent edits in separate fields", () => {

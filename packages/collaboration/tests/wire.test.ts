@@ -7,7 +7,7 @@ import {
   isCollaborationPointerPosition,
   isTextPresenceSelection,
   parseProtocolFrame,
-} from "../src/index";
+} from "../src/index.ts";
 
 describe("collaboration wire boundary", () => {
   it("round-trips canonical binary and rejects malformed base64url", () => {

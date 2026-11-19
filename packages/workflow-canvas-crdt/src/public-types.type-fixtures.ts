@@ -3,14 +3,14 @@ import {
   CanvasLayout,
   CanvasMove,
   WorkflowCanvasDoc,
-} from "./index";
+} from "./index.ts";
 import {
   CanvasAgentRequest,
   CanvasMoveRequest,
   type CanvasMoveOrigin,
   type CanvasMoveOutcome,
-} from "./move";
-import type { CanvasServerMessage } from "./protocol";
+} from "./move.ts";
+import type { CanvasServerMessage } from "./protocol.ts";
 
 declare const move: CanvasMove;
 declare const update: CanvasEncoding<"update">;

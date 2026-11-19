@@ -14,7 +14,7 @@ import type {
   AnyCycleInput,
   WorkcellTaskId,
   RackCycleInput,
-} from "./workcell-input";
+} from "./workcell-input.ts";
 import { physicsDuration, physicsOutcome } from "./physics-playback.ts";
 import type { Variant, VariantBy } from "@seams/type-utils";
 import { assertNever } from "@seams/std";

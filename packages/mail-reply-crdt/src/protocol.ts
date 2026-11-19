@@ -20,7 +20,7 @@ import {
   type MailReplyStateVector,
   type MailReplyCrdtError,
   type MailReplyPresenceSelection,
-} from "./index";
+} from "./index.ts";
 import { isPositiveInteger } from "@seams/std";
 
 export const MAIL_REPLY_PROTOCOL = "mail_reply_sync.v1";

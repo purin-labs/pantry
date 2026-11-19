@@ -3,7 +3,7 @@ import {
   isShortProtocolText,
 } from "@seams/collaboration";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@seams/std";
-import { CanvasMove } from "./index";
+import { CanvasMove } from "./index.ts";
 
 /** A trusted Session turn, parsed once when it crosses the owning Actor boundary. */
 export class CanvasAgentRequest {

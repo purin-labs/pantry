@@ -17,7 +17,7 @@ import {
   type ProductionPlanSelection,
   type ProductionPlanStateVector,
   type ProductionPlanUpdate,
-} from "./index";
+} from "./index.ts";
 
 export const PRODUCTION_PLAN_PROTOCOL = "production_plan_sync.v1";
 // A full snapshot and its state vector travel together as base64 in one frame.

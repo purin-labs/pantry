@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as Y from "yjs";
-import { parseYjsEncoding, type YjsEncodingResult } from "../src/index";
+import { parseYjsEncoding, type YjsEncodingResult } from "../src/index.ts";
 
 const LIMITS = { state: 128, update: 64, stateVector: 32 } as const;
 

@@ -16,7 +16,7 @@ import {
   CANVAS_ENCODING_LIMITS,
   CanvasEncoding,
   type CanvasFailureCode,
-} from "./index";
+} from "./index.ts";
 
 type CanvasUpdate = CanvasEncoding<"update">;
 type CanvasStateVector = CanvasEncoding<"state_vector">;

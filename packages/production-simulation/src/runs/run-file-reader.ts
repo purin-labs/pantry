@@ -7,7 +7,7 @@ import { parseJsonOrNull } from "@seams/std";
 import {
   MAX_ENCODED_ARTIFACT_BYTES,
   RunArtifactFile,
-} from "./run-artifact-file";
+} from "./run-artifact-file.ts";
 
 const CHUNK_BYTES = 256 * 1024;
 

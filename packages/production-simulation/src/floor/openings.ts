@@ -3,8 +3,8 @@ import {
   type BakeryFloorPlanId,
   type FloorPlanDoor,
   type FloorPlanWindow,
-} from "./bakery-room";
-import type { Box2D } from "./collisions";
+} from "./bakery-room.ts";
+import type { Box2D } from "./collisions.ts";
 import type { Variant } from "@seams/type-utils";
 
 export type FloorPlanOpening =

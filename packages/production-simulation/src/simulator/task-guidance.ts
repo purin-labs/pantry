@@ -1,4 +1,4 @@
-import type { ActiveWorkcellView } from "./workcell-view";
+import type { ActiveWorkcellView } from "./workcell-view.ts";
 import type { WorkcellTask } from "../recipes/bakery/workcell-attempt.ts";
 import type { WorkcellResourceId } from "../recipes/bakery/workcell-input.ts";
 import { COLD_CELL } from "../recipes/bakery/workcell-instances.ts";

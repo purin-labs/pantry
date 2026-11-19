@@ -12,8 +12,8 @@ import {
   type TextSelectionDirection,
 } from "@seams/collaboration";
 import * as Y from "yjs";
-import { DESCRIPTION_LIMIT, UPDATE_LIMIT, STATE_LIMIT, STATE_VECTOR_LIMIT } from "./limits";
-export { DESCRIPTION_LIMIT, UPDATE_LIMIT, STATE_LIMIT, STATE_VECTOR_LIMIT } from "./limits";
+import { DESCRIPTION_LIMIT, UPDATE_LIMIT, STATE_LIMIT, STATE_VECTOR_LIMIT } from "./limits.ts";
+export { DESCRIPTION_LIMIT, UPDATE_LIMIT, STATE_LIMIT, STATE_VECTOR_LIMIT } from "./limits.ts";
 export { RelativeTextSelection as ProductDescriptionSelection } from "@seams/collaboration";
 
 export const PRODUCT_DESCRIPTION_SCHEMA = "product_description_crdt.v1";

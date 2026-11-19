@@ -5,13 +5,13 @@ import {
   COSTS_SHEET_STATE_LIMIT,
   COSTS_SHEET_STATE_VECTOR_LIMIT,
   COSTS_SHEET_UPDATE_LIMIT,
-} from "./limits";
+} from "./limits.ts";
 export {
   COSTS_SHEET_CELL_LIMIT,
   COSTS_SHEET_STATE_LIMIT,
   COSTS_SHEET_STATE_VECTOR_LIMIT,
   COSTS_SHEET_UPDATE_LIMIT,
-} from "./limits";
+} from "./limits.ts";
 
 /**
  * Plan 86 Phase 3: the shared multiplayer Costs & margins workbook of one

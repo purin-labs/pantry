@@ -1,4 +1,4 @@
-import { ProductDescriptionDoc, type ProductDescriptionState, type ProductDescriptionUpdate, type ProductDescriptionCrdtResult } from "../src/index";
+import { ProductDescriptionDoc, type ProductDescriptionState, type ProductDescriptionUpdate, type ProductDescriptionCrdtResult } from "../src/index.ts";
 
 export function rejectedInputs(doc: ProductDescriptionDoc, state: ProductDescriptionState): void {
   // @ts-expect-error Raw bytes must pass the update boundary.

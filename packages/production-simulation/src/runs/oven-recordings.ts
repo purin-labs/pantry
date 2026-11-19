@@ -17,9 +17,9 @@ import {
   ovenOperation,
   readOvenLiveFrame,
   type OvenLiveFrame,
-} from "./oven-live-physics";
-import { readOvenPlayback, type OvenPlayback } from "./oven-playback";
-import type { OvenSave } from "./oven-run-file";
+} from "./oven-live-physics.ts";
+import { readOvenPlayback, type OvenPlayback } from "./oven-playback.ts";
+import type { OvenSave } from "./oven-run-file.ts";
 import type { Variant } from "@seams/type-utils";
 
 /** Bounds resident record metadata, independently of the total archive size. */

@@ -1,5 +1,5 @@
 import { hasExactKeys, isRecord } from "@seams/std";
-import { isShortProtocolText, COLLABORATION_SOCKET_LIMIT } from "./wire";
+import { isShortProtocolText, COLLABORATION_SOCKET_LIMIT } from "./wire.ts";
 
 /**
  * The colours of agents on a canvas (Plan 40B phase 7). They are apart from

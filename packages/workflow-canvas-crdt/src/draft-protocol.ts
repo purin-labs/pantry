@@ -14,7 +14,7 @@ import {
   DRAFT_ENCODING_LIMITS,
   DraftEncoding,
   type DraftFailureCode,
-} from "./draft";
+} from "./draft.ts";
 
 type DraftUpdate = DraftEncoding<"update">;
 type DraftStateVector = DraftEncoding<"state_vector">;

@@ -37,9 +37,9 @@ import {
   type MenuBoardSnapshot,
   type MenuBoardStyle,
   type MenuBoardStyleChanges,
-} from "./board";
+} from "./board.ts";
 
-export * from "./board";
+export * from "./board.ts";
 
 export const MENU_BOARD_SCHEMA = "menu_board_crdt.v1";
 export const MENU_BOARD_STATE_LIMIT = 256 * 1024;

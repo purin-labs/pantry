@@ -15,9 +15,9 @@ import {
   type DraftNode,
   type DraftPosition,
   type DraftSnapshot,
-} from "./draft-shape";
+} from "./draft-shape.ts";
 
-export * from "./draft-shape";
+export * from "./draft-shape.ts";
 
 /**
  * Plan 84: the shared draft of one recipe's workflow. The document owns its

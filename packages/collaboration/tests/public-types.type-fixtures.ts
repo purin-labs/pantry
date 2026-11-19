@@ -2,7 +2,7 @@ import {
   RelativeTextSelection,
   type ParsedYjsEncoding,
   type YjsEncodingResult,
-} from "../src/index";
+} from "../src/index.ts";
 
 export function rejectRawAndMixedEncodings(
   state: ParsedYjsEncoding<"state">,

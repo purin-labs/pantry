@@ -1,4 +1,4 @@
-import type { TextPresenceSelection } from "./text-selection";
+import type { TextPresenceSelection } from "./text-selection.ts";
 import { decodeBase64Url, isRecord } from "@seams/std";
 export const COLLABORATION_FRAME_LIMIT = 384 * 1024;
 export const COLLABORATION_SOCKET_LIMIT = 20;

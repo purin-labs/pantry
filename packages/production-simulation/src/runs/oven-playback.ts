@@ -15,8 +15,8 @@ import {
   parsePersistentPhysicsMotion,
   type PersistentPhysicsScene,
 } from "@seams/bakery-model/bakery-physics";
-import type { OvenSave } from "./oven-run-file";
-import { ovenOperation, type OvenLiveFrame } from "./oven-live-physics";
+import type { OvenSave } from "./oven-run-file.ts";
+import { ovenOperation, type OvenLiveFrame } from "./oven-live-physics.ts";
 
 export type OvenPlayback = Extract<
   OvenLiveFrame,

@@ -19,7 +19,7 @@ import {
   type MenuDraftStateVector,
   type MenuDraftUpdate,
   type MenuPresenceSelection,
-} from "./index";
+} from "./index.ts";
 import { isRecord } from "@seams/std";
 
 export const MENU_DRAFT_PROTOCOL = "menu_draft_sync.v3";

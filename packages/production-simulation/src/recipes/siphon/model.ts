@@ -1,5 +1,5 @@
 import { ROBOTS } from "@seams/bakery-model/bakery-robots";
-import type { StationPose } from "../pour-over/sample";
+import type { StationPose } from "../pour-over/sample.ts";
 import {
   fr10Links,
   fr10ToolKinematics,

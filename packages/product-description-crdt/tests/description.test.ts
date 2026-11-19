@@ -4,7 +4,7 @@ import {
   DESCRIPTION_LIMIT, UPDATE_LIMIT, STATE_LIMIT, STATE_VECTOR_LIMIT,
   ProductDescriptionDoc, parseProductDescriptionState, parseProductDescriptionUpdate,
   parseProductDescriptionStateVector, type ProductDescriptionCrdtResult,
-} from "../src/index";
+} from "../src/index.ts";
 
 function value<T>(result: ProductDescriptionCrdtResult<T>): T {
   if (!result.ok) throw new Error(result.error.code);

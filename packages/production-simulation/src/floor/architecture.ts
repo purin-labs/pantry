@@ -1,4 +1,4 @@
-import type { BakeryFloorPlanSpec } from "./bakery-room";
+import type { BakeryFloorPlanSpec } from "./bakery-room.ts";
 
 type WallSubSegment = Readonly<{
   x0: number;

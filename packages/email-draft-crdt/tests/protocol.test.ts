@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { EmailDraftDoc } from "../src/index";
+import { EmailDraftDoc } from "../src/index.ts";
 import {
   encodeEmailDraftClientMessage,
   encodeEmailDraftServerMessage,
   parseEmailDraftClientMessage,
   parseEmailDraftServerMessage,
-} from "../src/protocol";
+} from "../src/protocol.ts";
 
 describe("email draft protocol", () => {
   it("round trips sync and field-aware presence", () => {

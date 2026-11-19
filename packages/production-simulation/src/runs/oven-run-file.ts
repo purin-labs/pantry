@@ -14,7 +14,7 @@ import {
   compileFinancierRecipe,
 } from "../recipes/bakery/financier.ts";
 import { isRecord, parseJsonOrNull } from "@seams/std";
-import { RunArtifactFile } from "./run-artifact-file";
+import { RunArtifactFile } from "./run-artifact-file.ts";
 import { compileBlackSesameRecipe } from "../recipes/bakery/black-sesame.ts";
 import { compileGingerBlackTeaRecipe } from "../recipes/bakery/ginger-black-tea.ts";
 import type { StrictUnion, Variant, VariantBy } from "@seams/type-utils";

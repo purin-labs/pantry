@@ -1,5 +1,5 @@
-import type { RecordingReplayView } from "./playback-state";
-import type { WorkcellSelection } from "./selection";
+import type { RecordingReplayView } from "./playback-state.ts";
+import type { WorkcellSelection } from "./selection.ts";
 import {
   attemptRecording,
   workcellEnd,

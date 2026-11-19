@@ -2,7 +2,7 @@ import { assertNever, isPositiveInteger, isRecord } from "@seams/std";
 import {
   isCollaborationAgentActivities,
   type CollaborationAgentActivity,
-} from "./agent-presence";
+} from "./agent-presence.ts";
 import {
   COLLABORATION_SOCKET_LIMIT,
   decodeProtocolBytes,
@@ -17,7 +17,7 @@ import {
   parseProtocolFrame,
   type CollaborationParticipant,
   type CollaborationPointerPosition,
-} from "./wire";
+} from "./wire.ts";
 
 /**
  * The sync protocol of one shared document room: the same nine message kinds
