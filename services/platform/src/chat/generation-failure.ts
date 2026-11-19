@@ -40,7 +40,7 @@ export function traceConversationFailure(
   });
 }
 
-export function conversationGenerationError(
+function conversationGenerationError(
   error: DirectCaseCommandError,
 ): string {
   if (error.kind === "budget_exhausted") {

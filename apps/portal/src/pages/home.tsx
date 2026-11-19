@@ -81,7 +81,7 @@ export function HomePage(props: {
   );
 }
 
-export function HomePageView(props: {
+function HomePageView(props: {
   readonly organisationHandle: string;
   readonly workspaceHandle: string;
   readonly content: HomePageContent;
@@ -149,7 +149,7 @@ export function HomePageView(props: {
   }
 }
 
-export type HomePageContent =
+type HomePageContent =
   | Variant<
       PageContent<HomeSnapshot>,
       "loading" | "ready" | "failed" | "unauthorized"

@@ -70,7 +70,6 @@ import {
 } from "./conversation-machine";
 import { nextTimelineSequence } from "./turn/timeline";
 
-export { conversationGenerationError } from "./generation-failure";
 
 export type ConversationExecutionFailure =
   | { readonly kind: "authority_invalid" }
