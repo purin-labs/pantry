@@ -416,6 +416,13 @@ removes the staging crons.
 5. **Stale resources of other projects.** Default: keep them until you say
    yes for each group.
 
+## Adapter code with no test (19 November 2026)
+
+Plan 92's test sweep removed the journeys that repaired stored states from
+releases before Refactor 15 or before a rename. Their adapter code stays
+until this cutover and has no test now. Remove it with the other adapters.
+The list is in Plan 92, "Phase 2 results: the low-impact test sweep".
+
 ## Open item
 
 The full Worker list. Wrangler has no command for it, and the API listing

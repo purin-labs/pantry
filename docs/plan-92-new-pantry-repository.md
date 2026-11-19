@@ -498,3 +498,76 @@ imports in `control-api`).
   so no view needs the re-send. `RecipeSampleStation` still sends its
   samples on each update, but the pour-over and espresso scenes ignore a
   batch that does not move forward.
+
+## Phase 2 results: the low-impact test sweep (19 November 2026)
+
+The owner asked for a sweep of tests whose value is low for their cost.
+Five reviewers read all 676 test files at `bee3ced` and sorted the
+candidates into batches A to E. The owner said "Remove those low impact
+tests, and dead product paths", then "Remove batches A to D". 16 commits on
+`dev` remove 23,260 lines and add 1,715 (net 21,545 fewer): tests 19,155
+(1,693 added), product code 4,087 (8 added). No deploy: the product
+removals ship with the next release.
+
+| Batch | Commits | Lines removed (added) | What went |
+|---|---|---|---|
+| B: dead product paths | `e19ff60`, `d9053b0`, `6fee58a`, `6324415` | 6,570 (18) | The one-time credential closure audit (script, admin route, Actor code, 4 test files); the café and shipping operations control routes; the bakery oven `assignment` mutation; the unread history budget warning list and `gmailProcessingDescription` |
+| A: tests only, high confidence | `03fc4ba`, `c95aadb`, parts of `561ca10` and `87865d8` | A and D together: 14,519 (1,480) | `control-route-budget` (asserted only HTTP 200), `linea-shared-run`, `machine-census-ages`, `slack-file-batch-archive`, `pi-menu-board-prompt`, the JP-to-Singapore case of `commerce-authority`, the storefront copy cases, and duplicate Portal and WhatsApp unit cases |
+| C: repairs of old stored states | `4187415` | 1,990 (113) | `case-assignment-wake`, `case-old-rows-wake`, `purged-organisation`, `chat-origin`, the old cases of `session-quarantine-end` and `chat-kitchen-observation`, Square step 5, the `public-links` erase, the Codex device sign-in cases |
+| D: medium confidence | `4d964a7`, `5ba5132`, `4713add`, `30af8bf`, parts of `561ca10` and `87865d8` | (with A) | Latency and counter journeys (`slack-new-thread-actors`, `slack-answer-before-projection`, `slack-conversation-residency`, `session-cutover-continuation`), the 1,500-line fake Underclerk of `commerce-entity-plane-parity`, the wiring cases of `harness-tool-catalog`, `vault-onepassword-reconnect`, `home-page-state`, `vault-alert-signals`, the Kitchen and menu board peers |
+| Merges | `9d9d244`, `0af011c`, `b39c5e7` | 199 (122) | Three exports made private; `gmail-after-deletion` uses the shared purge steps; one page command reader for the chat journeys |
+
+Before a delete, each check that only the deleted test had moved into the
+kept test: for example the five shipping checks into
+`plan33-core-acceptance`, the offer price limits into
+`offer-price-commands`, and the erased tables of `purge-catalogue-erasure`
+into `purged-organisation-reclaim`.
+
+**Proof.** On the final tree: the Platform, test and E2E type checks, the
+commerce engine type check, `pnpm lint` and `git diff --check` pass. The
+Platform unit suite passes 302 files and 1,732 tests (1 skipped; it was 314
+files and 1,816 tests), the commerce engine suite 84 files and 174 tests,
+the storefront 17 tests, the simulator 6 tests, and `cargo test` for
+`media-inspect` and `workspace-executor` 30 tests. Each changed E2E journey,
+and each journey that received a moved check, passed in batches of at most
+eight.
+
+**Kept against the sweep, with the reason.** Each removal checked its
+claim first. These parts were the only check of an authorization, money or
+data outcome, so they stay:
+- the GMO `stera` case of `counter-register-journey`: the busy-terminal
+  refusal, the `result_unknown` lock and the owner-only manual cash refund
+  that Square FeliCa sales use;
+- the bakery `operation` mutation (`bakery-runs` and the oven authoring
+  server call it);
+- the expiry and requester cases of `operator-configuration-draft` (the
+  Portal routes reach those checks only through `confirm`);
+- the lost-lease fences of `durable-codemode-recovery`, the newer-version
+  guard of `user-preferences`, the cross-merchant guard of
+  `product-sales-http`, the foreign-currency refund threshold, the demo
+  provisioning replay, the canonical shipment ids of `commerce-low-stock`
+  and the manual dispatch grants of `schedule-dispatch`.
+Batch E (large shrinks of money-path files) was not done, and the Plan 33B
+payouts stay by the owner's decision of 18 November.
+
+**Product code with no test now.**
+- Adapters for old stored states, for the Plan 93 cutover: the purged
+  Connector erase (`erase_purged_connector`, `canErasePurgedConnector`,
+  `erasePurgedOrganisationState`, the `tenant_id` read), whose
+  `organisation_purge_not_due` refusal lost its only test; the lapse of an
+  old approval wait (`case-alarm.ts`); the quarantine end with no Code Mode
+  settlement (`session-turn-recovery.ts`); the old Kitchen observation, v1
+  page view and `surfaceContext` paths; the Square token hand-over; the
+  `public-links` erase; the menu board `style` key for an old TV player;
+  the `codex_device` allowance, pause and refresh paths.
+- Current code, small harm accepted: `reserveDeviceWork` and its task alert
+  cards (no caller until Plan 24 dispatch), the 1Password item-list cache
+  key, the residency Actor stop on a freeze, the suggested home region, the
+  wording of `connectionAttentionMessage` and `renderOperatorNotice`.
+
+**Open items.**
+- The history budget warning rows are now written and never read
+  (`run-budget.ts`). Each write is a Durable Object row. Remove the table
+  and its writer, or give the rows a reader.
+- `DeviceFleetActor.clearTerminalResultUnknown` has no caller. Plan 90
+  decides if an operator action needs it.
