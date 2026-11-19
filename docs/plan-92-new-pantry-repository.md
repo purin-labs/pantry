@@ -647,8 +647,10 @@ payouts stay by the owner's decision of 18 November.
   wording of `connectionAttentionMessage` and `renderOperatorNotice`.
 
 **Open items.**
-- The history budget warning rows are now written and never read
-  (`run-budget.ts`). Each write is a Durable Object row. Remove the table
-  and its writer, or give the rows a reader.
+- Done on 19 November 2026, by the owner's decision: the history budget
+  warning rows are gone. A Session that passes its history warning level
+  now only writes the `session.harness_history_budget_warning` trace line,
+  with no call to the Organisation Actor and no Durable Object row. The
+  Organisation Actor drops the old table when it starts.
 - `DeviceFleetActor.clearTerminalResultUnknown` has no caller. Plan 90
   decides if an operator action needs it.

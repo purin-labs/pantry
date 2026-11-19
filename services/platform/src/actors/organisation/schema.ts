@@ -39,18 +39,10 @@ export function createOrganisationSchema(storage: DurableObjectStorage): void {
       activated_at INTEGER NOT NULL
     )`,
   );
-  sql.exec(
-    `CREATE TABLE IF NOT EXISTS organisation_harness_history_budget_warning (
-      organisation_id TEXT NOT NULL CHECK (length(organisation_id) > 0),
-      session_id TEXT NOT NULL CHECK (length(session_id) > 0),
-      entry_count INTEGER NOT NULL CHECK (entry_count >= 0),
-      inline_bytes INTEGER NOT NULL CHECK (inline_bytes >= 0),
-      hard_limit INTEGER NOT NULL CHECK (hard_limit IN (0, 1)),
-      warning_at INTEGER NOT NULL CHECK (warning_at >= 0),
-      updated_at INTEGER NOT NULL CHECK (updated_at >= warning_at),
-      PRIMARY KEY (organisation_id, session_id)
-    )`,
-  );
+  // Releases before 19 November 2026 kept a history budget warning row for
+  // each Session here, and nothing read it. The drop writes nothing once the
+  // table is gone.
+  sql.exec("DROP TABLE IF EXISTS organisation_harness_history_budget_warning");
   createActionLedgerSchema(sql);
   createCueDeliverySchema(sql, transaction);
   transaction(createCaseContextDiscoveryEvaluationSchema.bind(null, sql));

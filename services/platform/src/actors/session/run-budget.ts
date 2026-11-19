@@ -5,17 +5,9 @@ import type {
   SessionBudgetAccount,
   SessionBudgetUsage,
 } from "@seams/contracts";
-import type { Env } from "../../env";
-import {
-  parseRequestId,
-  parseSessionId,
-  parseOrganisationId,
-  type RequestId,
-} from "../../ids";
+import { parseRequestId, type RequestId } from "../../ids";
 import { traceWarn } from "../../observability";
 import type { Result } from "../../result";
-import { requireActiveOrganisationActorAtPlacement } from "../actor-router";
-import { SessionExecutionAdmission } from "../session-execution-admission";
 import { readHarnessHistoryUsage } from "../agent-session-harness-authority";
 import type { EmbeddedHarnessModelUsage } from "../embedded-harness";
 import {
@@ -343,16 +335,13 @@ function readHarnessHistoryWarningTraceContext(
     : null;
 }
 
-// Read committed history after runtime shutdown. History append can run inside
-// the native storage transaction and must not call another Actor there.
-export async function projectCurrentHarnessHistoryBudgetWarning(input: {
-  readonly env: Env;
-  readonly execution: SessionExecutionAdmission;
+// Read committed history after runtime shutdown, when every append of the
+// turn is in it. Operators read the warning in Workers Logs.
+export function traceHarnessHistoryBudgetWarning(input: {
   readonly sql: SqlStorage;
   readonly sessionId: string;
   readonly turnId: string;
-  readonly warningAt: number;
-}): Promise<void> {
+}): void {
   const traceContext = readHarnessHistoryWarningTraceContext(
     input.sql,
     input.turnId,
@@ -372,54 +361,6 @@ export async function projectCurrentHarnessHistoryBudgetWarning(input: {
     entry_count: usage.value.entryCount,
     inline_bytes: usage.value.inlineBytes,
   });
-  const organisationId = parseOrganisationId(traceContext.organisationId);
-  const sessionId = parseSessionId(input.sessionId);
-  if (
-    !organisationId.ok ||
-    !sessionId.ok ||
-    organisationId.value !== input.execution.scope.organisationId
-  ) {
-    traceWarn("session.harness_history_budget_projection_failed", {
-      requestId: traceContext.requestId,
-      organisation_id: traceContext.organisationId,
-      session_id: input.sessionId,
-      reason: "identity_invalid",
-    });
-    return;
-  }
-  try {
-    if (!(await input.execution.isActive())) return;
-    const organisation = await requireActiveOrganisationActorAtPlacement({
-      env: input.env,
-      organisationId: organisationId.value,
-      placement: input.execution.scope.placement,
-      now: input.warningAt,
-    });
-    if (!(await input.execution.isActive())) return;
-    const projected = await organisation.recordHarnessHistoryBudgetWarning({
-      organisationId: organisationId.value,
-      sessionId: sessionId.value,
-      entryCount: usage.value.entryCount,
-      inlineBytes: usage.value.inlineBytes,
-      hardLimit: usage.value.hardLimit,
-      warningAt: input.warningAt,
-    });
-    if (!projected.ok) {
-      traceWarn("session.harness_history_budget_projection_failed", {
-        requestId: traceContext.requestId,
-        organisation_id: traceContext.organisationId,
-        session_id: input.sessionId,
-        reason: projected.error.code,
-      });
-    }
-  } catch (error) {
-    traceWarn("session.harness_history_budget_projection_failed", {
-      requestId: traceContext.requestId,
-      organisation_id: traceContext.organisationId,
-      session_id: input.sessionId,
-      reason: error instanceof Error ? error.message : String(error),
-    });
-  }
 }
 
 export function combinedHarnessUsage(

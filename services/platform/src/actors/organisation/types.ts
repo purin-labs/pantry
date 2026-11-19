@@ -7,7 +7,6 @@ import type {
 import type {
   IntegrationAccountId,
   RequestId,
-  SessionId,
   OrganisationId,
 } from "../../ids";
 import type {
@@ -81,25 +80,6 @@ export type OrganisationMeta = OrganisationMetaInput;
 
 export type OrganisationMetaRequest = {
   requestingOrganisationId: OrganisationId;
-};
-
-export type OrganisationHarnessHistoryBudgetWarning = {
-  readonly organisationId: OrganisationId;
-  readonly sessionId: SessionId;
-  readonly entryCount: number;
-  readonly inlineBytes: number;
-  readonly hardLimit: boolean;
-  readonly warningAt: number;
-  readonly updatedAt: number;
-};
-
-export type RecordOrganisationHarnessHistoryBudgetWarningInput = {
-  readonly organisationId: OrganisationId;
-  readonly sessionId: SessionId;
-  readonly entryCount: number;
-  readonly inlineBytes: number;
-  readonly hardLimit: boolean;
-  readonly warningAt: number;
 };
 
 export type OrganisationApplyCommerceDeliveryInput =

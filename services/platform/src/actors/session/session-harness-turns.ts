@@ -261,7 +261,7 @@ import {
   acceptCanonicalRunModelUsage,
   combinedHarnessUsage,
   failCanonicalRunBudget,
-  projectCurrentHarnessHistoryBudgetWarning,
+  traceHarnessHistoryBudgetWarning,
   reconcileCanonicalRunBudgetDeadline,
   reconcileSleepingSessionRunBudget,
   settleCanonicalRunBudget,
@@ -1508,13 +1508,10 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         phaseStartedAt = Date.now();
         await runtime.value.close();
         await this.journalPlacedSteeringInputs(input, sessionId);
-        await projectCurrentHarnessHistoryBudgetWarning({
-          env: this.env,
-          execution: input.execution,
+        traceHarnessHistoryBudgetWarning({
           sql: this.ctx.storage.sql,
           sessionId,
           turnId: input.lease.turn.turnId,
-          warningAt: Date.now(),
         });
         traceSessionTurnCompletion(
           input,

@@ -75,10 +75,6 @@ import { errorMessage, isRecord } from "@seams/std";
 import { PlacedActor } from "../lifecycle/placed-actor";
 import { rearmActorAlarm } from "../lifecycle/actor-alarm";
 import { organisationAlarmReconcilers } from "../organisation-alarm";
-import {
-  readOrganisationHarnessHistoryBudgetWarning,
-  validHistoryBudgetWarning,
-} from "./history-budget";
 import { schemaTransaction } from "./schema";
 import {
   executeOrganisationCommand,
@@ -88,11 +84,9 @@ import {
   validateActionOrganisation,
 } from "./support";
 import type {
-  OrganisationHarnessHistoryBudgetWarning,
   OrganisationMeta,
   OrganisationMetaInput,
   OrganisationStateError,
-  RecordOrganisationHarnessHistoryBudgetWarningInput,
 } from "./types";
 
 /**
@@ -632,55 +626,6 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
         error: { code: "actor_cleanup_failed", detail: errorMessage(error) },
       };
     }
-  }
-
-  protected async admittedRecordHarnessHistoryBudgetWarning(
-    input: RecordOrganisationHarnessHistoryBudgetWarningInput,
-    _scope: OrganisationExecutionScope,
-  ): Promise<
-    Result<
-      OrganisationHarnessHistoryBudgetWarning,
-      | OrganisationStateError
-      | { readonly code: "organisation_placement_conflict" }
-      | { readonly code: "invalid_history_budget_warning" }
-    >
-  > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      input.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    if (!validHistoryBudgetWarning(input)) {
-      return { ok: false, error: { code: "invalid_history_budget_warning" } };
-    }
-    this.ctx.storage.sql.exec(
-      `INSERT INTO organisation_harness_history_budget_warning (
-         organisation_id, session_id, entry_count, inline_bytes, hard_limit,
-         warning_at, updated_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT (organisation_id, session_id) DO UPDATE SET
-         entry_count = MAX(entry_count, excluded.entry_count),
-         inline_bytes = MAX(inline_bytes, excluded.inline_bytes),
-         hard_limit = MAX(hard_limit, excluded.hard_limit),
-         warning_at = MIN(warning_at, excluded.warning_at),
-         updated_at = excluded.updated_at`,
-      input.organisationId,
-      input.sessionId,
-      input.entryCount,
-      input.inlineBytes,
-      input.hardLimit ? 1 : 0,
-      input.warningAt,
-      input.warningAt,
-    );
-    const warning = readOrganisationHarnessHistoryBudgetWarning(
-      this.ctx.storage.sql,
-      input.organisationId,
-      input.sessionId,
-    );
-    if (warning === null) {
-      throw new Error("organisation_history_budget_warning_missing");
-    }
-    return { ok: true, value: warning };
   }
 
   protected async admittedAcceptShopifyLocationObservation(

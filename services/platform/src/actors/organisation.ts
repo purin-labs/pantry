@@ -189,7 +189,6 @@ import type {
   OrganisationMetaRequest,
   OrganisationPing,
   OrganisationStateError,
-  RecordOrganisationHarnessHistoryBudgetWarningInput,
 } from "./organisation/types";
 import { OrganisationCommerce } from "./organisation/organisation-commerce";
 
@@ -1736,15 +1735,6 @@ export class OrganisationDO extends OrganisationCommerce {
         input.resourceKey,
       ),
     };
-  }
-
-  async recordHarnessHistoryBudgetWarning(
-    input: RecordOrganisationHarnessHistoryBudgetWarningInput,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedRecordHarnessHistoryBudgetWarning.bind(this, input),
-    );
   }
 
   async acceptShopifyLocationObservation(
