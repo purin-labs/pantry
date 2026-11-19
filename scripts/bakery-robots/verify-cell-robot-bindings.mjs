@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { assertSameResult } from "./native-results.mjs";
 import {
   sampleSettings,
   parseSettings,
@@ -128,16 +129,6 @@ function prepare(robot, cell, batchId) {
   };
 }
 
-// Native outputs are deterministic files, so equal results have equal bytes.
-// A failed deepEqual of two recordings of several MB builds a diff of many GB
-// (this journey once grew to 20 GB of memory before macOS stopped it).
-function assertSameFile(actual, expected, message) {
-  assert.ok(
-    readFileSync(actual.path).equals(readFileSync(expected.path)),
-    message,
-  );
-}
-
 function nativeResult(name, args) {
   const path = join(output, `${name}.json`);
   execFileSync(binary, ["--output", path, ...args], { timeout: 120000 });
@@ -173,10 +164,10 @@ function verifyOvenCycle(robot, cell) {
     "resume",
     paused.path,
   ]);
-  assertSameFile(
-    resumed,
-    loaded,
-    `${robot} ${cell}: the resumed loading differs from the uninterrupted one`,
+  assertSameResult(
+    resumed.value,
+    loaded.value,
+    `${robot} ${cell}: loading resumed after align_oven`,
   );
   const extracting = nativeResult(
     `${robot}-${cell}-oven-extracted-checkpoint`,
@@ -186,10 +177,10 @@ function verifyOvenCycle(robot, cell) {
     "resume",
     extracting.path,
   ]);
-  assertSameFile(
-    returned,
-    cycle,
-    `${robot} ${cell}: the resumed retrieval differs from the uninterrupted cycle`,
+  assertSameResult(
+    returned.value,
+    cycle.value,
+    `${robot} ${cell}: retrieval resumed after extract_oven`,
   );
   const closedRequest = nativeResult(`${robot}-${cell}-oven-closed-request`, [
     "prepare",

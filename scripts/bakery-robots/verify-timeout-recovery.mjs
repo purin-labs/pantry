@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertSameResult } from "./native-results.mjs";
 import { arch, cpus, platform, release, totalmem } from "node:os";
 import {
   parsePhysicsRackSequence,
@@ -109,7 +110,11 @@ run(returnHandoffPath, ["unload", "--for-rack", loadingHandoffPath]);
 run(resumedPath, ["rack", returnHandoffPath]);
 const resumed = parsePhysicsRackSequence(readFileSync(resumedPath, "utf8"));
 assert.equal(resumed.kind, "accepted", resumed.message);
-assert.deepEqual(resumed.sequence, parsed.sequence);
+assertSameResult(
+  resumed.sequence,
+  parsed.sequence,
+  "sequence resumed after the timed-out loading",
+);
 
 run(failedPath, ["rack", "--case", "slip", returnHandoffPath]);
 const failed = parsePhysicsRackSequence(readFileSync(failedPath, "utf8"));
@@ -165,9 +170,10 @@ for (const phase of ["loading", "unloading", "racking"]) {
     unloading: returnHandoffPath,
     racking: completedPath,
   }[phase];
-  assert.deepEqual(
+  assertSameResult(
     JSON.parse(readFileSync(recoveredPath, "utf8")),
     JSON.parse(readFileSync(reference, "utf8")),
+    `${phase} recovered after the host interruption`,
   );
 }
 
@@ -182,7 +188,11 @@ const recoveredSettlement = settleWorkcell(
   recoveredResult.sequence,
 );
 assert.equal(recoveredSettlement.kind, "accepted", recoveredSettlement.message);
-assert.deepEqual(recoveredSettlement.attempt, settled.attempt);
+assertSameResult(
+  recoveredSettlement.attempt,
+  settled.attempt,
+  "attempt settled after the host interruptions",
+);
 
 const report = {
   kind: "bakery-native-timeout-recovery-e2e",

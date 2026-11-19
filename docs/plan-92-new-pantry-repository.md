@@ -397,9 +397,11 @@ Open, for the owner (not changed here):
 - The FR10 cannot hold the tray in every start pose of the combined cell,
   so its rack cycle stops at step 0; the UR5e, CR10 and CRX-10iA complete
   it. The combined-cell journeys use the UR5e.
-- Other native journeys (`native-cli`, `ur5e-rack`) still compare whole
-  recordings with `deepEqual`; a future mismatch there can use many GB of
-  memory before it fails.
+- Done on 19 November 2026: `native-cli`, `ur5e-rack`, `timeout-recovery`
+  and `cell-robot-bindings` compare whole native results with one shared
+  check (`scripts/bakery-robots/native-results.mjs`), not `deepEqual`. For
+  one mismatch of a 1.4 MB and a 0.7 MB result, `deepEqual` took 9.6 GB and
+  128 s; the shared check takes 32 MB and names the first path that differs.
 - `rehearsal-conversion.ts` still converts files of the previous
   multi-tray engine. It is also the Portal's current file opener, so its
   old-format branch needs a separate look.

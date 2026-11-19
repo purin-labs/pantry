@@ -1127,9 +1127,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 12,
+        "seconds": 14.3,
         "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "commit": "b85200a9f"
       }
     },
     {
@@ -1145,9 +1145,9 @@
       "status": "passes",
       "notes": "Needs MUJOCO_DIR, because it runs cargo build.",
       "lastRun": {
-        "seconds": 63.1,
+        "seconds": 92.7,
         "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "commit": "b85200a9f"
       }
     },
     {
@@ -1162,9 +1162,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 4.7,
+        "seconds": 5.9,
         "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "commit": "b85200a9f"
       }
     },
     {
@@ -1179,9 +1179,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 5.5,
+        "seconds": 7.6,
         "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "commit": "b85200a9f"
       }
     },
     {

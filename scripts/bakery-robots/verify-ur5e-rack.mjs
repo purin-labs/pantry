@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
+import { assertSameResult } from "./native-results.mjs";
 
 assert.equal(process.argv.length, 3, "Provide a new evidence directory.");
 const directory = resolve(process.argv[2]);
@@ -42,7 +43,7 @@ for (const phase of ["lift", "transfer", "release"]) {
   ]);
   assert.equal(paused.value.kind, "bakery-native-rack-checkpoint");
   const resumed = run(`resumed-${phase}`, ["resume", paused.path]);
-  assert.deepEqual(resumed.value, cycle.value);
+  assertSameResult(resumed.value, cycle.value, `rack resumed after ${phase}`);
   checkpoints.push(phase);
 }
 // Near the edge of its reach the arm swings a joint past its rated speed

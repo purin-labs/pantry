@@ -3,6 +3,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, existsSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertSameResult } from "./native-results.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const binary =
@@ -104,7 +105,11 @@ function phaseCampaign(directory, expected, mode, prefix = "phase") {
     run(directory, `${prefix}-${index}`, current, phase);
     current = ["resume", join(directory, `${prefix}-${index}.json`)];
   }
-  assert.deepEqual(run(directory, `${prefix}-final`, current), expected);
+  assertSameResult(
+    run(directory, `${prefix}-final`, current),
+    expected,
+    `${prefix} resumed through every phase boundary`,
+  );
   return phases.length - 1;
 }
 
@@ -124,7 +129,11 @@ function verifyCase(task, scenario, timestep) {
   const requestPath = join(directory, "request.json");
   const native = run(directory, "native", ["run", requestPath]);
   const comparison = checkOutcome(scenario, native);
-  assert.deepEqual(run(directory, "repeat", ["run", requestPath]), native);
+  assertSameResult(
+    run(directory, "repeat", ["run", requestPath]),
+    native,
+    "repeat run",
+  );
   const alteredRequest = structuredClone(request);
   alteredRequest.execution.controllerHash = "0".repeat(64);
   reject(directory, "request-controller", alteredRequest, "run");
@@ -135,9 +144,10 @@ function verifyCase(task, scenario, timestep) {
       ["run", requestPath],
       "lift",
     );
-    assert.deepEqual(
+    assertSameResult(
       run(directory, "resumed", ["resume", join(directory, "checkpoint.json")]),
       native,
+      "run resumed after lift",
     );
     for (const field of ["runnerSha256", "runtimeSha256"]) {
       const changed = structuredClone(checkpoint);
@@ -164,20 +174,22 @@ function verifyCase(task, scenario, timestep) {
     if (task === "table-to-oven") {
       const handoff = run(directory, "handoff", ["load", requestPath]);
       run(directory, "load-paused", ["load", requestPath], "lift");
-      assert.deepEqual(
+      assertSameResult(
         run(directory, "load-resumed", [
           "resume",
           join(directory, "load-paused.json"),
         ]),
         handoff,
+        "load resumed after lift",
       );
       const handoffPath = join(directory, "handoff.json");
       const cycle = run(directory, "cycle", ["unload", handoffPath]);
-      assert.deepEqual(
+      assertSameResult(
         run(directory, "continuous", ["cycle", requestPath]),
         cycle,
+        "continuous cycle",
       );
-      assert.deepEqual(cycle.loading, native);
+      assertSameResult(cycle.loading, native, "loading of the cycle");
       for (const field of ["joints", "tray", "tool", "jaw"])
         assert.deepEqual(
           cycle.loading.samples.at(-1)[field],
@@ -256,8 +268,12 @@ function verifyCombined(cell, scenario, timestep) {
   ]);
   const returnedPath = join(directory, "returned.json");
   const rackMode = ["rack", "--case", scenario, returnedPath];
-  assert.deepEqual(run(directory, "handoff", rackMode), continuous);
-  assert.deepEqual(
+  assertSameResult(
+    run(directory, "handoff", rackMode),
+    continuous,
+    "rack from the handoff",
+  );
+  assertSameResult(
     run(directory, "repeat", [
       "cycle",
       "--to-rack",
@@ -266,6 +282,7 @@ function verifyCombined(cell, scenario, timestep) {
       requestPath,
     ]),
     continuous,
+    "repeat rack cycle",
   );
   for (const [first, second] of [
     [continuous.loading, continuous.unloading],
@@ -330,9 +347,10 @@ function verifyCombined(cell, scenario, timestep) {
     assert.equal(continuous.racking.outcome.reason, expected);
     assert.equal(continuous.racking.events.some(isPlacement), false);
     run(directory, "paused", rackMode, "lift");
-    assert.deepEqual(
+    assertSameResult(
       run(directory, "resumed", ["resume", join(directory, "paused.json")]),
       continuous,
+      "failed rack resumed after lift",
     );
     reject(directory, "failed-rack-as-handoff", continuous, "rack");
     report.failedResumeExact = true;
