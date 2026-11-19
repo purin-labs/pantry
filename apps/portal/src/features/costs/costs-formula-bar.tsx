@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, ChevronRight, RotateCcw, Sparkles, TableProperties } from "lucide-react";
+import { RotateCcw, Sparkles, TableProperties } from "lucide-react";
 import {
   COST_COLUMN_LETTERS,
   backSolveDailyUnitsForNetDay,
@@ -40,9 +40,7 @@ import {
 
 export type CostFormulaBarColumn = CostFormulaColumn | "taxFee";
 
-const COLUMN_LABELS: Readonly<
-  Record<CostFormulaBarColumn, string>
-> = {
+const COLUMN_LABELS: Readonly<Record<CostFormulaBarColumn, string>> = {
   units: "Units / d",
   spoil: "Spoil %",
   price: "Price",
@@ -275,24 +273,19 @@ type CellCommitOutcome =
       error: string;
     }>;
 
-export function commitEditableProductCell(input: Readonly<{
-  overview: CostsOverview;
-  projected: ProjectedCostsSheet;
-  row: CalculatedProductMargin;
-  rowNumber1Based: number;
-  allRows: readonly CalculatedProductMargin[];
-  column: CostFormulaColumn;
-  raw: string;
-}>): CellCommitOutcome {
-  const {
-    overview,
-    projected,
-    row,
-    rowNumber1Based,
-    allRows,
-    column,
-    raw,
-  } = input;
+export function commitEditableProductCell(
+  input: Readonly<{
+    overview: CostsOverview;
+    projected: ProjectedCostsSheet;
+    row: CalculatedProductMargin;
+    rowNumber1Based: number;
+    allRows: readonly CalculatedProductMargin[];
+    column: CostFormulaColumn;
+    raw: string;
+  }>,
+): CellCommitOutcome {
+  const { overview, projected, row, rowNumber1Based, allRows, column, raw } =
+    input;
   const trimmed = raw.trim();
   const digits = currencyDigits(row.currency);
   const scale = 10 ** digits;
@@ -303,15 +296,15 @@ export function commitEditableProductCell(input: Readonly<{
       ...changesForProductFormula(overview, row.productId, column, null),
     ];
     if (column === "cogs") {
-      changes.push(...changesForProductCogsMinor(overview, row.productId, null));
+      changes.push(
+        ...changesForProductCogsMinor(overview, row.productId, null),
+      );
     } else if (column === "waste") {
       changes.push(
         ...changesForProductWasteMinor(overview, row.productId, null),
       );
     } else if (column === "spoil") {
-      changes.push(
-        ...changesForProductSpoilBps(overview, row.productId, null),
-      );
+      changes.push(...changesForProductSpoilBps(overview, row.productId, null));
     }
     return { ok: true, changes };
   }
@@ -350,26 +343,22 @@ export function commitEditableProductCell(input: Readonly<{
         0,
         Math.min(9_500, Math.round(evaluated.value * 100)),
       );
-      changes.push(
-        {
-          cellKey: productSpoilCellKey(row.productId),
-          value: String(bps),
-        },
-      );
+      changes.push({
+        cellKey: productSpoilCellKey(row.productId),
+        value: String(bps),
+      });
     } else if (column === "price") {
       const priceMinor = Math.max(0, Math.round(evaluated.value * scale));
       const baseProduct = overview.products.find(
         (item) => item.productId === row.productId,
       );
-      changes.push(
-        {
-          cellKey: productPriceCellKey(row.productId),
-          value:
-            baseProduct !== undefined && priceMinor === baseProduct.priceMinor
-              ? null
-              : String(priceMinor),
-        },
-      );
+      changes.push({
+        cellKey: productPriceCellKey(row.productId),
+        value:
+          baseProduct !== undefined && priceMinor === baseProduct.priceMinor
+            ? null
+            : String(priceMinor),
+      });
     } else if (column === "cogs") {
       const cogsMinor = Math.max(0, Math.round(evaluated.value * scale));
       changes.push({
@@ -420,14 +409,13 @@ export function commitEditableProductCell(input: Readonly<{
           error: "Spoilage percent must be between 0% and 95%.",
         };
       }
-      const clampedBps = Math.max(0, Math.min(9_500, Math.round(numeric * 100)));
+      const clampedBps = Math.max(
+        0,
+        Math.min(9_500, Math.round(numeric * 100)),
+      );
       return {
         ok: true,
-        changes: changesForProductSpoilBps(
-          overview,
-          row.productId,
-          clampedBps,
-        ),
+        changes: changesForProductSpoilBps(overview, row.productId, clampedBps),
       };
     }
     case "price": {
@@ -593,8 +581,6 @@ export function CostsFormulaBar(props: {
   readonly onCommit: (raw: string) => void;
   readonly onResetColumn: () => void;
   readonly onOpenBom: () => void;
-  readonly isBomExpanded?: boolean;
-  readonly onToggleInlineBom?: () => void;
 }): React.ReactNode {
   const {
     row,
@@ -618,7 +604,7 @@ export function CostsFormulaBar(props: {
     column === "taxFee" ? undefined : row.activeFormulas[column];
   const displayedFormula = isEditing
     ? draftValue
-    : activeCustomFormula ?? defaultFormula;
+    : (activeCustomFormula ?? defaultFormula);
 
   const hasCustomState =
     activeCustomFormula !== undefined ||
@@ -648,11 +634,26 @@ export function CostsFormulaBar(props: {
     label: string;
   }>[] = [
     { token: "PRICE", label: `PRICE ${formatMoney(row.grossPriceMinor)}` },
-    { token: "BOM", label: `BOM ${formatMoney(Math.round(row.bomUnitCostMinor))}` },
-    { token: "INGR", label: `INGR ${formatMoney(Math.round(row.ingredientUnitCostMinor))}` },
-    { token: "PACK", label: `PACK ${formatMoney(Math.round(row.packagingUnitCostMinor))}` },
-    { token: "COGS", label: `COGS ${formatMoney(Math.round(row.effectiveCogsUnitMinor))}` },
-    { token: "WASTE", label: `WASTE ${formatMoney(Math.round(row.wasteAndSurplusUnitMinor))}` },
+    {
+      token: "BOM",
+      label: `BOM ${formatMoney(Math.round(row.bomUnitCostMinor))}`,
+    },
+    {
+      token: "INGR",
+      label: `INGR ${formatMoney(Math.round(row.ingredientUnitCostMinor))}`,
+    },
+    {
+      token: "PACK",
+      label: `PACK ${formatMoney(Math.round(row.packagingUnitCostMinor))}`,
+    },
+    {
+      token: "COGS",
+      label: `COGS ${formatMoney(Math.round(row.effectiveCogsUnitMinor))}`,
+    },
+    {
+      token: "WASTE",
+      label: `WASTE ${formatMoney(Math.round(row.wasteAndSurplusUnitMinor))}`,
+    },
     {
       token: "TAX_FEE",
       label: `TAX_FEE ${formatMoney(Math.round(row.includedTaxMinor + row.channelFeeMinor))}`,
@@ -668,8 +669,8 @@ export function CostsFormulaBar(props: {
     if (!canEdit || isReadOnlyBarColumn) return;
     const base = isEditing
       ? draftValue
-      : activeCustomFormula ?? defaultFormula;
-    const prefix = base.trimStart().startsWith("=") ? base : `= ${ token }`;
+      : (activeCustomFormula ?? defaultFormula);
+    const prefix = base.trimStart().startsWith("=") ? base : `= ${token}`;
     const next = base.trimStart().startsWith("=")
       ? `${base.trimEnd()} ${token}`
       : prefix;
@@ -683,7 +684,10 @@ export function CostsFormulaBar(props: {
       aria-label="Spreadsheet formula bar"
     >
       <div className="costs-fx-top">
-        <div className="costs-fx-coord" title={`${row.productTitle} · ${COLUMN_LABELS[column]}`}>
+        <div
+          className="costs-fx-coord"
+          title={`${row.productTitle} · ${COLUMN_LABELS[column]}`}
+        >
           <span className="costs-fx-coord-cell">{cellCoord}</span>
           <span className="costs-fx-coord-product">{row.productTitle}</span>
           <span className="costs-fx-coord-sep">·</span>
@@ -752,26 +756,6 @@ export function CostsFormulaBar(props: {
             </button>
           ) : null}
 
-          {column === "cogs" &&
-          props.onToggleInlineBom !== undefined &&
-          row.bomLines.length > 0 ? (
-            <button
-              type="button"
-              className="costs-fx-btn"
-              aria-expanded={props.isBomExpanded === true}
-              onClick={props.onToggleInlineBom}
-            >
-              {props.isBomExpanded ? (
-                <ChevronDown size={12} aria-hidden="true" />
-              ) : (
-                <ChevronRight size={12} aria-hidden="true" />
-              )}
-              {props.isBomExpanded
-                ? "Hide cost chain"
-                : `Cost chain (${row.bomLines.length})`}
-            </button>
-          ) : null}
-
           {column === "cogs" ? (
             <button
               type="button"
@@ -779,31 +763,33 @@ export function CostsFormulaBar(props: {
               onClick={props.onOpenBom}
             >
               <TableProperties size={12} aria-hidden="true" />
-              Unit stack ({formatMoney(Math.round(row.bomUnitCostMinor))})
+              Recipe BOM ({formatMoney(Math.round(row.bomUnitCostMinor))})
             </button>
           ) : null}
         </div>
       </div>
 
-      <div className="costs-fx-vars" aria-label="Row formula variables">
-        <span className="costs-fx-vars-label">Variables:</span>
-        {variableTokens.map((item) => (
-          <button
-            key={item.token}
-            type="button"
-            className="costs-fx-var-chip"
-            disabled={!canEdit || isReadOnlyBarColumn}
-            onMouseDown={(event) => {
-              // Prevent blurring the fx input when clicking a variable token
-              event.preventDefault();
-              handleInsertToken(item.token);
-            }}
-            title={`Insert ${item.token} into formula`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      {isEditing && isFormulaExpression(draftValue) ? (
+        <div className="costs-fx-vars" aria-label="Row formula variables">
+          <span className="costs-fx-vars-label">Variables:</span>
+          {variableTokens.map((item) => (
+            <button
+              key={item.token}
+              type="button"
+              className="costs-fx-var-chip"
+              disabled={!canEdit || isReadOnlyBarColumn}
+              onMouseDown={(event) => {
+                // Prevent blurring the fx input when clicking a variable token
+                event.preventDefault();
+                handleInsertToken(item.token);
+              }}
+              title={`Insert ${item.token} into formula`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -864,9 +850,7 @@ function getSolverHint(
           channelFeeBps: assumptions.channelFeeBps,
           targetUnitNetMinor: Math.round(num * scale),
         });
-        return solved !== null
-          ? `Solves Price → ${formatMoney(solved)}`
-          : null;
+        return solved !== null ? `Solves Price → ${formatMoney(solved)}` : null;
       }
       if (column === "netDay") {
         const solved = backSolveDailyUnitsForNetDay({

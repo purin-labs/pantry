@@ -2,8 +2,6 @@ import React from "react";
 import {
   Activity,
   ArrowUpRight,
-  Calendar,
-  ChevronDown,
   ChevronRight,
   LineChart,
   Package,
@@ -43,17 +41,8 @@ import {
 import { controlRead, forgetControlReads } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";
 import { PageSkeleton, RecoverableError } from "../../page-components";
-import {
-  CrmTable,
-  Select,
-  type CrmColumn,
-  type CrmRowAction,
-} from "../../ui";
-import {
-  costsError,
-  costsPath,
-  type CostsMutation,
-} from "./api";
+import { CrmTable, Select, type CrmColumn, type CrmRowAction } from "../../ui";
+import { costsError, costsPath, type CostsMutation } from "./api";
 import {
   CostsActualsKpiStrip,
   CostsActualsSheet,
@@ -66,11 +55,7 @@ import {
   CostsForecastTrajectoryChart,
 } from "./costs-forecast-sheet";
 import { CostsBomDrawer } from "./costs-bom-drawer";
-import { CostsInlineBomPanel } from "./costs-bom-inline";
-import {
-  CostsLotsDrawer,
-  applyPreviewLotEdits,
-} from "./costs-lots-drawer";
+import { CostsLotsDrawer, applyPreviewLotEdits } from "./costs-lots-drawer";
 import { CostsSuppliesSheet } from "./costs-supplies-sheet";
 import {
   CostsFormulaBar,
@@ -131,12 +116,7 @@ import {
   peerCellStyle,
   type PresenceIndex,
 } from "./costs-sheet-presence";
-import {
-  CostsAssumptionsPopover,
-  CostsKpiStrip,
-  ProductOrb,
-  categoryChipIcon,
-} from "./costs-ui";
+import { CostsAssumptionsPopover, CostsKpiStrip, ProductOrb } from "./costs-ui";
 import "./styles.css";
 import type { Variant } from "@seams/type-utils";
 
@@ -168,7 +148,6 @@ type State =
       search: string;
       selectedProductId: string | null;
       selectedSupplyItemId?: string | null;
-      expandedProductIds?: ReadonlySet<string>;
       actualsWindowDays?: ActualsWindowDays;
       activeFormulaColumn: CostFormulaBarColumn;
       bomOpen: boolean;
@@ -273,8 +252,7 @@ export class CostsPage extends React.Component<Props, State> {
       sheetView.savedAt !== this.lastObservedSavedAt
     ) {
       this.lastObservedSavedAt = sheetView.savedAt;
-      shouldReloadBaseline =
-        this.state.kind === "ready" && !this.state.saving;
+      shouldReloadBaseline = this.state.kind === "ready" && !this.state.saving;
     }
 
     if (this.state.kind === "ready") {
@@ -310,7 +288,6 @@ export class CostsPage extends React.Component<Props, State> {
         selectedProductId:
           prev?.selectedProductId ?? overview.products[0]?.productId ?? null,
         selectedSupplyItemId: prev?.selectedSupplyItemId ?? null,
-        expandedProductIds: prev?.expandedProductIds ?? new Set<string>(),
         activeFormulaColumn: prev?.activeFormulaColumn ?? "margin",
         bomOpen: prev?.bomOpen ?? false,
         assumptionsOpen: prev?.assumptionsOpen ?? false,
@@ -370,7 +347,8 @@ export class CostsPage extends React.Component<Props, State> {
       });
     const step = costsViewCommandState(this.state, command);
     if (step.kind === "rejected") return Promise.resolve(step);
-    if (command.name === "open_tab") this.sheetClient?.select(command.tab, null);
+    if (command.name === "open_tab")
+      this.sheetClient?.select(command.tab, null);
     return new Promise(this.settleViewCommand.bind(this, step.state));
   }
 
@@ -389,23 +367,6 @@ export class CostsPage extends React.Component<Props, State> {
       focusedCell: null,
     });
     this.sheetClient?.select(tab, null);
-  }
-
-  private toggleInlineBom(productId: string): void {
-    this.setState((prev) => {
-      if (prev.kind !== "ready") return prev;
-      const next = new Set(prev.expandedProductIds ?? []);
-      if (next.has(productId)) {
-        next.delete(productId);
-      } else {
-        next.add(productId);
-      }
-      return {
-        ...prev,
-        selectedProductId: productId,
-        expandedProductIds: next,
-      };
-    });
   }
 
   private inspectSupplyFromBom(inventoryItemId: string): void {
@@ -434,8 +395,6 @@ export class CostsPage extends React.Component<Props, State> {
         prev.sectionFilter !== prod.productType
           ? "all"
           : prev.sectionFilter;
-      const nextExpanded = new Set(prev.expandedProductIds ?? []);
-      nextExpanded.add(productId);
       return {
         ...prev,
         tab: "margins",
@@ -444,7 +403,7 @@ export class CostsPage extends React.Component<Props, State> {
         selectedProductId: productId,
         activeFormulaColumn: "cogs",
         lotsOpen: false,
-        expandedProductIds: nextExpanded,
+        bomOpen: true,
       };
     });
     this.sheetClient?.select(
@@ -731,9 +690,7 @@ export class CostsPage extends React.Component<Props, State> {
           planWrite: built.planWrite,
           priceWrites: built.priceWrites,
           supplyWrites: built.supplyWrites,
-          ...(built.lotWrites.length > 0
-            ? { lotWrites: built.lotWrites }
-            : {}),
+          ...(built.lotWrites.length > 0 ? { lotWrites: built.lotWrites } : {}),
         },
         { kind: "prepared", idempotencyKey },
       );
@@ -825,8 +782,7 @@ export class CostsPage extends React.Component<Props, State> {
       assumptions: projected.assumptions,
     });
 
-    const actualsWindowDays: ActualsWindowDays =
-      state.actualsWindowDays ?? 7;
+    const actualsWindowDays: ActualsWindowDays = state.actualsWindowDays ?? 7;
     const actualsCalculation = calculateBakeryPlanVsActuals({
       overview: effectiveOverview,
       windowDays: actualsWindowDays,
@@ -893,9 +849,6 @@ export class CostsPage extends React.Component<Props, State> {
         row.primaryNote.toLowerCase().includes(searchLower)
       );
     });
-    const marginRowsByProductId = new Map(
-      calculation.products.map((row) => [row.productId, row]),
-    );
     const leakCount = actualsCalculation.drivers.filter(
       (driver) => driver.profitImpactMinor < 0,
     ).length;
@@ -925,6 +878,12 @@ export class CostsPage extends React.Component<Props, State> {
       selectedProduct?.recipeId != null
         ? (calculation.recipes.find(
             (recipe) => recipe.recipeId === selectedProduct.recipeId,
+          ) ?? null)
+        : null;
+    const selectedActualsRow =
+      state.tab === "actuals" && selectedProduct !== null
+        ? (actualsCalculation.products.find(
+            (row) => row.productId === selectedProduct.productId,
           ) ?? null)
         : null;
 
@@ -976,7 +935,10 @@ export class CostsPage extends React.Component<Props, State> {
         ? `${state.overview.measuredWaste.measuredBatchRejectPct.toFixed(1)}% reject`
         : "no 30d rejects";
 
-    const laborFormatted = minorToMajorString(projected.dailyLaborMinor, digits);
+    const laborFormatted = minorToMajorString(
+      projected.dailyLaborMinor,
+      digits,
+    );
     const rentFormatted = minorToMajorString(projected.dailyRentMinor, digits);
 
     const headerActions = (
@@ -1055,30 +1017,48 @@ export class CostsPage extends React.Component<Props, State> {
                   type="button"
                   role="tab"
                   className="costs-underline-tab"
-                  aria-selected={state.tab === "margins"}
-                  data-surface-target="tab:margins"
-                  onClick={() => this.selectTab("margins")}
+                  aria-selected={
+                    state.tab === "margins" || state.tab === "weekly"
+                  }
+                  data-surface-target={
+                    state.tab === "weekly" ? "tab:weekly" : "tab:margins"
+                  }
+                  onClick={() =>
+                    this.selectTab(
+                      state.tab === "weekly" ? "weekly" : "margins",
+                    )
+                  }
                 >
                   <TrendingUp size={15} aria-hidden="true" />
-                  <span>Product margins</span>
+                  <span>Menu</span>
                   <span className="costs-tab-count">
                     {state.overview.products.length}
                   </span>
-                  <CostsTabPresenceDots peers={presence.peersByTab.margins} />
+                  <CostsTabPresenceDots
+                    peers={[
+                      ...presence.peersByTab.margins,
+                      ...presence.peersByTab.weekly.filter(
+                        (peer) =>
+                          !presence.peersByTab.margins.some(
+                            (m) => m.id === peer.id,
+                          ),
+                      ),
+                    ]}
+                  />
                 </button>
 
                 <button
                   type="button"
                   role="tab"
                   className="costs-underline-tab"
-                  aria-selected={state.tab === "weekly"}
-                  data-surface-target="tab:weekly"
-                  onClick={() => this.selectTab("weekly")}
+                  aria-selected={state.tab === "supplies"}
+                  data-surface-target="tab:supplies"
+                  onClick={() => this.selectTab("supplies")}
                 >
-                  <Calendar size={15} aria-hidden="true" />
-                  <span>Weekly plan</span>
-                  <span className="costs-tab-count">7d</span>
-                  <CostsTabPresenceDots peers={presence.peersByTab.weekly} />
+                  <Package size={15} aria-hidden="true" />
+                  <span>Supplies</span>
+                  <span className="costs-tab-count">{allSupplies.length}</span>
+                  <CostsTabPresenceDots peers={presence.peersByTab.supplies} />
                 </button>
 
                 <button
@@ -1090,7 +1070,7 @@ export class CostsPage extends React.Component<Props, State> {
                   onClick={() => this.selectTab("actuals")}
                 >
                   <Activity size={15} aria-hidden="true" />
-                  <span>Plan vs actuals</span>
+                  <span>Actuals</span>
                   <span
                     className={`costs-tab-count${leakCount > 0 ? " is-alert" : ""}`}
                   >
@@ -1110,7 +1090,7 @@ export class CostsPage extends React.Component<Props, State> {
                   onClick={() => this.selectTab("forecast")}
                 >
                   <LineChart size={15} aria-hidden="true" />
-                  <span>12-week P&amp;L &amp; cash</span>
+                  <span>12w Cash</span>
                   <span
                     className={`costs-tab-count${forecastCalculation.summary.hasCashShortfall ? " is-alert" : ""}`}
                   >
@@ -1119,20 +1099,6 @@ export class CostsPage extends React.Component<Props, State> {
                       : "12w"}
                   </span>
                   <CostsTabPresenceDots peers={presence.peersByTab.forecast} />
-                </button>
-
-                <button
-                  type="button"
-                  role="tab"
-                  className="costs-underline-tab"
-                  aria-selected={state.tab === "supplies"}
-                  data-surface-target="tab:supplies"
-                  onClick={() => this.selectTab("supplies")}
-                >
-                  <Package size={15} aria-hidden="true" />
-                  <span>Supplier packs</span>
-                  <span className="costs-tab-count">{allSupplies.length}</span>
-                  <CostsTabPresenceDots peers={presence.peersByTab.supplies} />
                 </button>
               </div>
 
@@ -1280,16 +1246,42 @@ export class CostsPage extends React.Component<Props, State> {
                 />
               </>
             ) : (
-            <div className="costs-toolbar-stack">
-              <div className="costs-search-controls-row">
+              <div className="costs-toolbar-row">
+                {(state.tab === "margins" || state.tab === "weekly") && (
+                  <div
+                    className="costs-view-segmented"
+                    role="group"
+                    aria-label="Menu sheet view"
+                  >
+                    <button
+                      type="button"
+                      className="costs-view-seg-btn"
+                      aria-pressed={state.tab === "margins"}
+                      data-surface-target="tab:margins"
+                      onClick={() => this.selectTab("margins")}
+                    >
+                      Margins
+                    </button>
+                    <button
+                      type="button"
+                      className="costs-view-seg-btn"
+                      aria-pressed={state.tab === "weekly"}
+                      data-surface-target="tab:weekly"
+                      onClick={() => this.selectTab("weekly")}
+                    >
+                      7d
+                    </button>
+                  </div>
+                )}
+
                 <label className="costs-search-box">
-                  <Search size={15} aria-hidden="true" />
+                  <Search size={14} aria-hidden="true" />
                   <input
                     type="search"
                     placeholder={
                       state.tab === "supplies"
-                        ? "Search supplier ingredients, codes, or packaging…"
-                        : "Search recipes, SKUs, or product categories…"
+                        ? "Search ingredients, codes, or packaging…"
+                        : "Search menu items or SKUs…"
                     }
                     value={state.search}
                     onChange={(event) =>
@@ -1301,80 +1293,117 @@ export class CostsPage extends React.Component<Props, State> {
                   />
                 </label>
 
-                <Select.Root
-                  name="scenario"
-                  items={SCENARIO_SELECT_ITEMS}
-                  disabled={!canEdit}
-                  value={projected.preset}
-                  onValueChange={(next) => {
-                    if (
-                      next === "saved" ||
-                      next === "weekend" ||
-                      next === "rainy"
-                    ) {
-                      this.applyMultiplierPreset(next);
-                    }
-                  }}
-                >
-                  <Select.Trigger
-                    size="sm"
-                    className="costs-scenario-select"
-                    aria-label="Demand scenario"
+                {state.tab !== "supplies" && (
+                  <Select.Root
+                    name="categoryFilter"
+                    items={[
+                      {
+                        value: "all",
+                        label: `All categories (${state.overview.products.length})`,
+                      },
+                      ...sections.map((section) => ({
+                        value: section,
+                        label: formatSectionName(section),
+                      })),
+                    ]}
+                    value={state.sectionFilter}
+                    onValueChange={(next) => {
+                      if (typeof next === "string" && next.length > 0) {
+                        this.setState({ ...state, sectionFilter: next });
+                      }
+                    }}
                   >
-                    <Zap
-                      size={14}
-                      className="costs-scenario-icon"
-                      aria-hidden="true"
-                    />
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Popup align="end" alignItemWithTrigger={false}>
-                    {(["saved", "weekend", "rainy"] as const).map((preset) => (
-                      <Select.Item key={preset} value={preset}>
-                        {PRESET_LABELS[preset]}
+                    <Select.Trigger
+                      size="sm"
+                      className="costs-scenario-select costs-category-select"
+                      aria-label="Menu category filter"
+                      data-surface-target={
+                        state.sectionFilter === "all"
+                          ? "category:all"
+                          : `category:${state.sectionFilter}`
+                      }
+                    >
+                      <Select.Value />
+                    </Select.Trigger>
+                    <Select.Popup align="start" alignItemWithTrigger={false}>
+                      <Select.Item value="all">
+                        All categories ({state.overview.products.length})
                       </Select.Item>
-                    ))}
-                    {projected.preset === "custom" && (
-                      <Select.Item value="custom" disabled>
-                        {PRESET_LABELS.custom}
-                      </Select.Item>
-                    )}
-                  </Select.Popup>
-                </Select.Root>
+                      {sections.map((section) => (
+                        <Select.Item key={section} value={section}>
+                          {formatSectionName(section)}
+                        </Select.Item>
+                      ))}
+                    </Select.Popup>
+                  </Select.Root>
+                )}
 
-                <CostsAssumptionsPopover
-                  open={state.assumptionsOpen}
-                  canEdit={canEdit}
-                  assumptions={projected.assumptions}
-                  focusedCell={state.focusedCell}
-                  presence={presence}
-                  actualShelfText={actualShelfText}
-                  actualRejectText={actualRejectText}
-                  onOpenChange={(assumptionsOpen) =>
-                    this.setState({ ...state, assumptionsOpen })
-                  }
-                  onFocusCell={(key, raw) => this.focusCell(key, raw)}
-                  onBlurCell={(key) => this.blurCell(key)}
-                  onUpdateRaw={(key, raw) => this.updateFocusedRaw(key, raw)}
-                  onCommitAssumptions={(next) =>
-                    this.applyCellChanges(
-                      changesForAssumptions(state.overview, next),
-                    )
-                  }
-                />
-
-                {state.tab !== "supplies" && selectedProduct !== null && (
-                  <button
-                    type="button"
-                    className="costs-control-btn"
-                    aria-expanded={state.bomOpen}
-                    onClick={() =>
-                      this.setState({ ...state, bomOpen: !state.bomOpen })
-                    }
+                {(state.tab === "margins" || state.tab === "weekly") && (
+                  <Select.Root
+                    name="scenario"
+                    items={SCENARIO_SELECT_ITEMS}
+                    disabled={!canEdit}
+                    value={projected.preset}
+                    onValueChange={(next) => {
+                      if (
+                        next === "saved" ||
+                        next === "weekend" ||
+                        next === "rainy"
+                      ) {
+                        this.applyMultiplierPreset(next);
+                      }
+                    }}
                   >
-                    <PanelRight size={14} aria-hidden="true" />
-                    <span>Recipe BOM</span>
-                  </button>
+                    <Select.Trigger
+                      size="sm"
+                      className="costs-scenario-select"
+                      aria-label="Demand scenario"
+                    >
+                      <Zap
+                        size={13.5}
+                        className="costs-scenario-icon"
+                        aria-hidden="true"
+                      />
+                      <Select.Value />
+                    </Select.Trigger>
+                    <Select.Popup align="end" alignItemWithTrigger={false}>
+                      {(["saved", "weekend", "rainy"] as const).map(
+                        (preset) => (
+                          <Select.Item key={preset} value={preset}>
+                            {PRESET_LABELS[preset]}
+                          </Select.Item>
+                        ),
+                      )}
+                      {projected.preset === "custom" && (
+                        <Select.Item value="custom" disabled>
+                          {PRESET_LABELS.custom}
+                        </Select.Item>
+                      )}
+                    </Select.Popup>
+                  </Select.Root>
+                )}
+
+                {state.tab !== "actuals" && (
+                  <CostsAssumptionsPopover
+                    open={state.assumptionsOpen}
+                    canEdit={canEdit}
+                    assumptions={projected.assumptions}
+                    focusedCell={state.focusedCell}
+                    presence={presence}
+                    actualShelfText={actualShelfText}
+                    actualRejectText={actualRejectText}
+                    onOpenChange={(assumptionsOpen) =>
+                      this.setState({ ...state, assumptionsOpen })
+                    }
+                    onFocusCell={(key, raw) => this.focusCell(key, raw)}
+                    onBlurCell={(key) => this.blurCell(key)}
+                    onUpdateRaw={(key, raw) => this.updateFocusedRaw(key, raw)}
+                    onCommitAssumptions={(next) =>
+                      this.applyCellChanges(
+                        changesForAssumptions(state.overview, next),
+                      )
+                    }
+                  />
                 )}
 
                 {state.tab === "supplies" && selectedSupplyItem !== null && (
@@ -1390,57 +1419,10 @@ export class CostsPage extends React.Component<Props, State> {
                     }
                   >
                     <PanelRight size={14} aria-hidden="true" />
-                    <span>Lots &amp; invoices</span>
+                    <span>Lots &amp; contracts</span>
                   </button>
                 )}
               </div>
-
-              <div className="costs-filter-chips-row">
-                {state.tab !== "supplies" ? (
-                  <>
-                    <button
-                      type="button"
-                      className="costs-filter-chip"
-                      aria-pressed={state.sectionFilter === "all"}
-                      data-surface-target="category:all"
-                      onClick={() =>
-                        this.setState({ ...state, sectionFilter: "all" })
-                      }
-                    >
-                      <span>All items · {state.overview.products.length}</span>
-                    </button>
-
-                    <span className="costs-chip-divider" aria-hidden="true" />
-
-                    {sections.map((section) => (
-                      <button
-                        key={section}
-                        type="button"
-                        className="costs-filter-chip"
-                        aria-pressed={state.sectionFilter === section}
-                        data-surface-target={`category:${section}`}
-                        onClick={() =>
-                          this.setState({ ...state, sectionFilter: section })
-                        }
-                      >
-                        {categoryChipIcon(section)}
-                        <span>{formatSectionName(section)}</span>
-                      </button>
-                    ))}
-                  </>
-                ) : (
-                  <span className="costs-supplies-meta-line">
-                    {allSupplies.length} supplier items ·{" "}
-                    {calculation.summary.unlockedBulkTierCount} bulk tiers
-                    unlocked
-                    {calculation.supplies.some((s) => s.reorderSuggested)
-                      ? ` · ${calculation.supplies.filter((s) => s.reorderSuggested).length} reorder alerts`
-                      : ""}{" "}
-                    · 30d actuals: {actualShelfText}, {actualRejectText}
-                  </span>
-                )}
-              </div>
-            </div>
             )}
 
             {state.tab === "actuals" && (
@@ -1488,25 +1470,19 @@ export class CostsPage extends React.Component<Props, State> {
                 <CostsActualsSheet
                   actuals={actualsCalculation}
                   rows={filteredActualsRows}
-                  marginRowsByProductId={marginRowsByProductId}
                   selectedProductId={state.selectedProductId}
-                  expandedProductIds={state.expandedProductIds}
+                  bomOpen={state.bomOpen}
                   presence={presence}
-                  recipesHref={this.props.recipesHref}
                   onSelectProduct={(productId) =>
                     this.setState({ ...state, selectedProductId: productId })
                   }
-                  onToggleInlineBom={(productId) =>
-                    this.toggleInlineBom(productId)
-                  }
-                  onOpenBomDrawer={(productId) =>
+                  onOpenBomDrawer={(productId, open) =>
                     this.setState({
                       ...state,
                       selectedProductId: productId,
-                      bomOpen: true,
+                      bomOpen: open,
                     })
                   }
-                  onInspectSupply={(itemId) => this.inspectSupplyFromBom(itemId)}
                   onEditOnMarginsTab={(productId) => {
                     this.setState({
                       ...state,
@@ -1578,14 +1554,10 @@ export class CostsPage extends React.Component<Props, State> {
             </div>
 
             <div className="costs-bottom-bar">
-              <span className="costs-kbd-hint">
-                <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd>{" "}
-                <kbd>Enter</kbd> <kbd>Tab</kbd> navigate cells · Type{" "}
-                <kbd>=</kbd> in any cell or the <kbd>fx</kbd> bar for formulas ·{" "}
-                <strong>Save changes</strong> commits prices, supplier packs,
-                and the shop cost plan
-              </span>
-              <nav className="costs-bottom-links" aria-label="Related kitchen pages">
+              <nav
+                className="costs-bottom-links"
+                aria-label="Related kitchen pages"
+              >
                 <Link to={this.props.recipesHref}>
                   <span>Recipes</span>
                   <ArrowUpRight size={12} aria-hidden="true" />
@@ -1606,8 +1578,10 @@ export class CostsPage extends React.Component<Props, State> {
             open={showDrawer}
             product={selectedProduct}
             recipe={selectedRecipe}
+            actualsRow={selectedActualsRow}
             recipesHref={this.props.recipesHref}
             onClose={() => this.setState({ ...state, bomOpen: false })}
+            onInspectSupply={(itemId) => this.inspectSupplyFromBom(itemId)}
           />
 
           <CostsLotsDrawer
@@ -1627,6 +1601,9 @@ export class CostsPage extends React.Component<Props, State> {
             onBlurCell={(key) => this.blurCell(key)}
             onUpdateLotField={(lot, cellKey, raw, patch) =>
               this.updateLotField(lot, currency, cellKey, raw, patch)
+            }
+            onUpdateSupplyField={(item, cur, cellKey, raw, patch) =>
+              this.updateSupplyField(item, cur, cellKey, raw, patch)
             }
             onSelectProduct={(productId) =>
               this.selectProductFromSupplyDrawer(productId)
@@ -1738,32 +1715,30 @@ export class CostsPage extends React.Component<Props, State> {
             bomOpen: true,
           })
         }
-        isBomExpanded={
-          state.expandedProductIds?.has(selectedProduct.productId) ?? false
-        }
-        onToggleInlineBom={() => this.toggleInlineBom(selectedProduct.productId)}
       />
     );
   }
 
-  private renderEditableMarginCell(opts: Readonly<{
-    row: CalculatedProductMargin;
-    rowIndex: number;
-    allRows: readonly CalculatedProductMargin[];
-    projected: ProjectedCostsSheet;
-    dirtyInfo: DirtyInspection;
-    presence: PresenceIndex;
-    canEdit: boolean;
-    column: CostFormulaColumn;
-    ariaLabel: string;
-    prefix?: string;
-    suffix?: string;
-    narrow?: boolean;
-    compact?: boolean;
-    toneClass?: string;
-    tooltip?: string;
-    leadAdornment?: React.ReactNode;
-  }>): React.ReactNode {
+  private renderEditableMarginCell(
+    opts: Readonly<{
+      row: CalculatedProductMargin;
+      rowIndex: number;
+      allRows: readonly CalculatedProductMargin[];
+      projected: ProjectedCostsSheet;
+      dirtyInfo: DirtyInspection;
+      presence: PresenceIndex;
+      canEdit: boolean;
+      column: CostFormulaColumn;
+      ariaLabel: string;
+      prefix?: string;
+      suffix?: string;
+      narrow?: boolean;
+      compact?: boolean;
+      toneClass?: string;
+      tooltip?: string;
+      leadAdornment?: React.ReactNode;
+    }>,
+  ): React.ReactNode {
     const state = this.state;
     if (state.kind !== "ready") return null;
     const {
@@ -1846,13 +1821,7 @@ export class CostsPage extends React.Component<Props, State> {
           }
           onBlur={() =>
             this.blurCell(cellKey, () =>
-              this.commitProductCell(
-                projected,
-                allRows,
-                row,
-                rowIndex,
-                column,
-              ),
+              this.commitProductCell(projected, allRows, row, rowIndex, column),
             )
           }
           onChange={(event) =>
@@ -1867,13 +1836,7 @@ export class CostsPage extends React.Component<Props, State> {
           }
           onKeyDown={(event) =>
             handleSheetKeyDown(event, rowIndex, column, () =>
-              this.commitProductCell(
-                projected,
-                allRows,
-                row,
-                rowIndex,
-                column,
-              ),
+              this.commitProductCell(projected, allRows, row, rowIndex, column),
             )
           }
         />
@@ -1903,13 +1866,8 @@ export class CostsPage extends React.Component<Props, State> {
 
     const actions: readonly CrmRowAction<CalculatedProductMargin>[] = [
       {
-        id: "inline_bom",
-        label: "Toggle inline cost chain",
-        onSelect: (row) => this.toggleInlineBom(row.productId),
-      },
-      {
         id: "bom",
-        label: "Inspect unit stack",
+        label: "Inspect recipe BOM",
         onSelect: (row) =>
           this.setState({
             ...state,
@@ -2081,8 +2039,8 @@ export class CostsPage extends React.Component<Props, State> {
           cellKey: selectionKeyForProductColumn(row.productId, "cogs"),
         }),
         render: (row, rowIndex) => {
-          const isExpanded =
-            state.expandedProductIds?.has(row.productId) ?? false;
+          const isBomOpenForRow =
+            state.bomOpen && state.selectedProductId === row.productId;
           return this.renderEditableMarginCell({
             row,
             rowIndex,
@@ -2100,26 +2058,22 @@ export class CostsPage extends React.Component<Props, State> {
                 <button
                   type="button"
                   className={`costs-cogs-expand-btn${
-                    isExpanded ? " is-expanded" : ""
+                    isBomOpenForRow ? " is-expanded" : ""
                   }`}
-                  aria-expanded={isExpanded}
-                  aria-label={`${
-                    isExpanded ? "Collapse" : "Expand"
-                  } recipe cost chain for ${row.productTitle}`}
-                  title={`${isExpanded ? "Hide" : "Expand"} ${
-                    row.bomLines.length
-                  } recipe inputs & wholesale rates`}
+                  aria-expanded={isBomOpenForRow}
+                  aria-label={`Inspect recipe BOM for ${row.productTitle}`}
+                  title={`Inspect ${row.bomLines.length} recipe inputs & wholesale rates`}
                   onMouseDown={(event) => event.stopPropagation()}
                   onClick={(event) => {
                     event.stopPropagation();
-                    this.toggleInlineBom(row.productId);
+                    this.setState({
+                      ...state,
+                      selectedProductId: row.productId,
+                      bomOpen: !isBomOpenForRow,
+                    });
                   }}
                 >
-                  {isExpanded ? (
-                    <ChevronDown size={12} aria-hidden="true" />
-                  ) : (
-                    <ChevronRight size={12} aria-hidden="true" />
-                  )}
+                  <ChevronRight size={12} aria-hidden="true" />
                 </button>
               ) : undefined,
             tooltip: `Recipe BOM ${formatMoneyMinor(Math.round(row.bomUnitCostMinor), row.currency)} (Ingredients ${formatMoneyMinor(Math.round(row.ingredientUnitCostMinor), row.currency)} · Packaging ${formatMoneyMinor(Math.round(row.packagingUnitCostMinor), row.currency)})`,
@@ -2158,8 +2112,7 @@ export class CostsPage extends React.Component<Props, State> {
         kind: "number",
         width: 84,
         minWidth: 72,
-        value: (row) =>
-          Math.round(row.includedTaxMinor + row.channelFeeMinor),
+        value: (row) => Math.round(row.includedTaxMinor + row.channelFeeMinor),
         format: fmtMoney,
         cellProps: (row) => ({
           cellKey: selectionKeyForProductColumn(row.productId, "taxFee"),
@@ -2218,7 +2171,8 @@ export class CostsPage extends React.Component<Props, State> {
             column: "unitNet",
             ariaLabel: `${row.productTitle} unit net contribution`,
             prefix: sym,
-            tooltip: "Type a target unit net to back-solve Price, or type = formula",
+            tooltip:
+              "Type a target unit net to back-solve Price, or type = formula",
           }),
       },
       {
@@ -2314,16 +2268,6 @@ export class CostsPage extends React.Component<Props, State> {
         onRowClick={(row) =>
           this.setState({ ...state, selectedProductId: row.productId })
         }
-        renderExpandedRow={(row) =>
-          state.expandedProductIds?.has(row.productId) ? (
-            <CostsInlineBomPanel
-              row={row}
-              recipesHref={this.props.recipesHref}
-              onInspectSupply={(itemId) => this.inspectSupplyFromBom(itemId)}
-              onCollapse={() => this.toggleInlineBom(row.productId)}
-            />
-          ) : null
-        }
         actions={actions}
         initialPinned={["product"]}
         initialCalculations={{
@@ -2388,7 +2332,9 @@ export class CostsPage extends React.Component<Props, State> {
                 data-sheet-col={`day_${dayIdx}`}
                 aria-label={`${row.productTitle} ${day} units`}
                 value={cellValue(state.focusedCell, dayKey, dayFormatted)}
-                onFocus={(e) => this.focusCell(dayKey, dayFormatted, e.currentTarget)}
+                onFocus={(e) =>
+                  this.focusCell(dayKey, dayFormatted, e.currentTarget)
+                }
                 onBlur={() => this.blurCell(dayKey)}
                 onChange={(event) =>
                   this.updateWeekDayUnits(
@@ -2621,7 +2567,9 @@ function cellValue(
   return focused?.cellKey === cellKey ? focused.raw : formatted;
 }
 
-function hasNonMetaDraftCells(cells: Readonly<Record<string, string>>): boolean {
+function hasNonMetaDraftCells(
+  cells: Readonly<Record<string, string>>,
+): boolean {
   for (const key of Object.keys(cells)) {
     if (key !== "meta:savedAt") return true;
   }

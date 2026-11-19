@@ -8,11 +8,6 @@ import { supplyFieldCellKey } from "@seams/costs-sheet-crdt";
 import { formatMoneyMinor } from "../../formatting";
 import { CrmTable, CrmTag, Select, type CrmColumn } from "../../ui";
 import { compatibleUnitsForBase, formatCostQuantity } from "./api";
-import {
-  renderSupplyCoverageCell,
-  renderSupplySkuReachCell,
-  supplyStockCoverageSortValue,
-} from "./costs-bom-inline";
 import { renderSupplyLotCostCell } from "./costs-lots-drawer";
 import {
   supplyDraftFromItem,
@@ -99,7 +94,6 @@ export function CostsSuppliesSheet(
       label: string;
       min: number;
       step: number | "any";
-      placeholder?: string;
       prefix?: React.ReactNode;
     }>,
   ): React.ReactNode => {
@@ -119,7 +113,6 @@ export function CostsSuppliesSheet(
           className="costs-cell-input"
           min={cell.min}
           step={cell.step}
-          placeholder={cell.placeholder}
           disabled={!canEdit}
           data-sheet-row={rowIndex}
           data-sheet-col={cell.column}
@@ -150,20 +143,26 @@ export function CostsSuppliesSheet(
       width: 244,
       minWidth: 184,
       value: (item) => item.name,
-      render: (item) => (
-        <div className="costs-product-cell">
-          <SupplyBadge category={item.category} />
-          <div className="costs-product-meta">
-            <span className="costs-product-title">{item.name}</span>
-            <span className="costs-product-sub">
-              {formatSupplyCategory(item.category)}
-              {item.merchantCode.length > 0
-                ? ` · ${item.merchantCode}`
-                : ` · ${item.baseUnit}`}
-            </span>
+      render: (item) => {
+        const skuCount = usageByItemId.get(item.id)?.usedInProductCount ?? 0;
+        return (
+          <div className="costs-product-cell">
+            <SupplyBadge category={item.category} />
+            <div className="costs-product-meta">
+              <span className="costs-product-title">{item.name}</span>
+              <span className="costs-product-sub">
+                {formatSupplyCategory(item.category)}
+                {item.merchantCode.length > 0
+                  ? ` · ${item.merchantCode}`
+                  : ` · ${item.baseUnit}`}
+                {skuCount > 0
+                  ? ` · ${skuCount} ${skuCount === 1 ? "SKU" : "SKUs"}`
+                  : ""}
+              </span>
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       id: "packQty",
@@ -219,9 +218,7 @@ export function CostsSuppliesSheet(
               disabled={!canEdit}
               value={draft.packUnit}
               onValueChange={(raw) => {
-                if (raw === null) {
-                  return;
-                }
+                if (raw === null) return;
                 props.onUpdateSupplyField(item, currency, key, raw, {
                   packUnit: raw as CostUnit,
                 });
@@ -237,9 +234,7 @@ export function CostsSuppliesSheet(
                 onBlur={() => props.onBlurCell(key)}
                 onKeyDown={(event) => {
                   handleSheetKeyDown(event, rowIndex, "pack_unit");
-                  if (event.defaultPrevented) {
-                    event.preventBaseUIHandler();
-                  }
+                  if (event.defaultPrevented) event.preventBaseUIHandler();
                 }}
               >
                 <Select.Value />
@@ -277,79 +272,6 @@ export function CostsSuppliesSheet(
           min: 0,
           step: priceStep,
           prefix: <span className="costs-cell-affix">{sym}</span>,
-        }),
-    },
-    {
-      id: "bulkMin",
-      label: "7d min",
-      kind: "number",
-      width: 86,
-      minWidth: 72,
-      value: (item) => {
-        const raw = draftFor(item).bulkMin7dQuantity;
-        const n = raw.length > 0 ? Number(raw) : NaN;
-        return Number.isFinite(n) ? n : null;
-      },
-      cellProps: (item) => ({
-        cellKey: supplyFieldCellKey(item.id, "bulkMin7dQuantity"),
-      }),
-      render: (item, rowIndex) =>
-        numberCell(item, rowIndex, "bulkMin7dQuantity", {
-          column: "bulk_min",
-          label: "7-day bulk minimum",
-          min: 0,
-          step: "any",
-          placeholder: "—",
-        }),
-    },
-    {
-      id: "bulkQty",
-      label: "Bulk qty",
-      kind: "number",
-      width: 86,
-      minWidth: 72,
-      value: (item) => {
-        const raw = draftFor(item).bulkPackQuantity;
-        const n = raw.length > 0 ? Number(raw) : NaN;
-        return Number.isFinite(n) ? n : null;
-      },
-      cellProps: (item) => ({
-        cellKey: supplyFieldCellKey(item.id, "bulkPackQuantity"),
-      }),
-      render: (item, rowIndex) =>
-        numberCell(item, rowIndex, "bulkPackQuantity", {
-          column: "bulk_qty",
-          label: "bulk pack quantity",
-          min: 0,
-          step: "any",
-          placeholder: "—",
-        }),
-    },
-    {
-      id: "bulkPrice",
-      label: "Bulk price",
-      kind: "number",
-      width: 96,
-      minWidth: 80,
-      value: (item) => {
-        const raw = draftFor(item).bulkPackPriceMajor;
-        const n = raw.length > 0 ? Number(raw) : NaN;
-        return Number.isFinite(n) ? Math.round(n * 10 ** digits) : null;
-      },
-      format: fmtMoney,
-      cellProps: (item) => ({
-        cellKey: supplyFieldCellKey(item.id, "bulkPackPriceMajor"),
-      }),
-      render: (item, rowIndex) =>
-        numberCell(item, rowIndex, "bulkPackPriceMajor", {
-          column: "bulk_price",
-          label: "bulk pack price",
-          min: 0,
-          step: priceStep,
-          placeholder: "—",
-          prefix: draftFor(item).bulkPackPriceMajor.length > 0 && (
-            <span className="costs-cell-affix">{sym}</span>
-          ),
         }),
     },
     {
@@ -407,27 +329,6 @@ export function CostsSuppliesSheet(
         }),
     },
     {
-      id: "usedInSkus",
-      label: "Used in SKUs",
-      kind: "number",
-      align: "start",
-      width: 96,
-      minWidth: 82,
-      value: (item) => usageByItemId.get(item.id)?.usedInProductCount ?? 0,
-      cellProps: (item) => ({
-        cellKey: `supply:${item.id}:usedInSkus`,
-      }),
-      render: (item, rowIndex) =>
-        renderSupplySkuReachCell({
-          item,
-          rowIndex,
-          usage: usageByItemId.get(item.id),
-          onInspectSupply: props.onInspectSupplyLots,
-          onKeyDown: (event) =>
-            handleSheetKeyDown(event, rowIndex, "used_in_skus"),
-        }),
-    },
-    {
       id: "lotCost",
       label: "Lot cost",
       kind: "number",
@@ -466,15 +367,9 @@ export function CostsSuppliesSheet(
       minWidth: 84,
       value: (item) => {
         const usage = usageByItemId.get(item.id);
-        if (usage?.effectiveCostPerBaseUnitMinor == null) {
-          return "Unpriced";
-        }
-        if (usage.costSource === "fifo_lot") {
-          return "FIFO lot";
-        }
-        if (usage.costSource === "weighted_lot") {
-          return "Weighted lot";
-        }
+        if (usage?.effectiveCostPerBaseUnitMinor == null) return "Unpriced";
+        if (usage.costSource === "fifo_lot") return "FIFO lot";
+        if (usage.costSource === "weighted_lot") return "Weighted lot";
         return usage.bulkUnlocked ? "Bulk tier" : "Standard";
       },
       cellProps: (item) => ({
@@ -495,16 +390,18 @@ export function CostsSuppliesSheet(
             <CrmTag>Standard</CrmTag>
           );
         return (
-          <div
-            className="costs-cell-box is-readonly is-align-start"
-            tabIndex={0}
+          <button
+            type="button"
+            className="costs-cell-box is-readonly is-align-start costs-tier-cell-btn"
             data-sheet-row={rowIndex}
             data-sheet-col="tier"
-            aria-label={`${item.name} active cost tier`}
+            aria-label={`${item.name} active cost tier — edit bulk contract`}
+            title="Inspect bulk contract tier & received lots"
+            onClick={() => props.onInspectSupplyLots(item.id)}
             onKeyDown={(event) => handleSheetKeyDown(event, rowIndex, "tier")}
           >
             {tag}
-          </div>
+          </button>
         );
       },
     },
@@ -571,9 +468,79 @@ function cellValue(
 }
 
 function formatSupplyCategory(section: string): string {
-  if (section.length === 0) {
-    return "General";
-  }
+  if (section.length === 0) return "General";
   const spaced = section.replace(/_/gu, " ");
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+function supplyStockCoverageSortValue(
+  usage: CalculatedSupplyUsage | undefined,
+): number | null {
+  if (usage === undefined || usage.onHandBaseQuantity === null) {
+    return null;
+  }
+  if (usage.daysOfSupply !== null) {
+    return Math.round(usage.daysOfSupply * 10) / 10;
+  }
+  return 999;
+}
+
+function renderSupplyCoverageCell(
+  input: Readonly<{
+    item: SupplyCostItem;
+    rowIndex: number;
+    usage: CalculatedSupplyUsage | undefined;
+    onInspectSupply: (itemId: string) => void;
+    onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  }>,
+): React.ReactNode {
+  const { item, rowIndex, usage, onInspectSupply, onKeyDown } = input;
+  let badge: React.ReactNode;
+  if (usage === undefined || usage.onHandBaseQuantity === null) {
+    badge = <span className="costs-cell-muted">Uncounted</span>;
+  } else if (usage.daysOfSupply !== null) {
+    if (usage.reorderSuggested) {
+      badge = (
+        <span className="costs-coverage-pill is-reorder">
+          {usage.daysOfSupply.toFixed(1)}d left · Reorder
+        </span>
+      );
+    } else {
+      const daysText =
+        usage.daysOfSupply >= 99 ? "99d+" : `${usage.daysOfSupply.toFixed(1)}d`;
+      badge = (
+        <span className="costs-coverage-pill is-healthy">
+          {daysText} on hand
+        </span>
+      );
+    }
+  } else {
+    badge = (
+      <span className="costs-cell-muted">
+        {formatCostQuantity(usage.onHandBaseQuantity, item.baseUnit)}
+      </span>
+    );
+  }
+
+  const onHandHint =
+    usage?.onHandBaseQuantity != null
+      ? `On hand: ${formatCostQuantity(usage.onHandBaseQuantity, item.baseUnit)}`
+      : "Stock not counted yet";
+
+  return (
+    <div className="costs-cell-box is-lot-cell">
+      <button
+        type="button"
+        className="costs-lot-cell-btn"
+        data-sheet-row={rowIndex}
+        data-sheet-col="stock_coverage"
+        title={onHandHint}
+        aria-label={`${item.name} stock coverage (${onHandHint})`}
+        onClick={() => onInspectSupply(item.id)}
+        onKeyDown={onKeyDown}
+      >
+        {badge}
+      </button>
+    </div>
+  );
 }

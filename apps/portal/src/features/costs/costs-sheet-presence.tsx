@@ -378,15 +378,15 @@ function syncStatusLabel(view: CostsSheetView): string {
 function shortTabLabel(sheet: CostsSheetTab): string {
   switch (sheet) {
     case "margins":
-      return "Product margins";
+      return "Menu (Margins)";
     case "weekly":
-      return "Weekly plan";
+      return "Menu (7d)";
     case "actuals":
-      return "Plan vs actuals";
+      return "Actuals";
     case "forecast":
-      return "12-week P&L & cash";
+      return "12w Cash";
     case "supplies":
-      return "Supplier packs";
+      return "Supplies";
   }
 }
 

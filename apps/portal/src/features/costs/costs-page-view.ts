@@ -29,7 +29,6 @@ type CostsPageSnapshot = Readonly<{
     sectionFilter: string;
     search: string;
     bomOpen: boolean;
-    expandedProductIds?: ReadonlySet<string>;
     overview: Readonly<{ measuredWaste: MeasuredWasteSummary }>;
   }>;
   projected: ProjectedCostsSheet;
@@ -188,17 +187,6 @@ function viewSection(snapshot: CostsPageSnapshot): PortalPageViewSection {
       label: state.bomOpen ? "BOM Inspector open for" : "Selected product",
       value: snapshot.selectedProduct.productTitle,
     });
-  if (state.expandedProductIds !== undefined && state.expandedProductIds.size > 0) {
-    const expandedTitles = snapshot.calculation.products
-      .filter((product) => state.expandedProductIds?.has(product.productId))
-      .map((product) => product.productTitle);
-    if (expandedTitles.length > 0) {
-      facts.push({
-        label: "Inline cost chain expanded for",
-        value: expandedTitles.join(", "),
-      });
-    }
-  }
   return { title: "Page state", facts, table: null };
 }
 
@@ -401,7 +389,9 @@ function forecastTable(snapshot: CostsPageSnapshot): PortalPageViewSection {
     money(wk.cogsMinor),
     money(wk.wasteTaxFeeMinor),
     money(wk.grossContributionMinor),
-    wk.extraShiftActive ? `${money(wk.laborMinor)} (+shift)` : money(wk.laborMinor),
+    wk.extraShiftActive
+      ? `${money(wk.laborMinor)} (+shift)`
+      : money(wk.laborMinor),
     money(wk.accrualRentMinor),
     money(wk.operatingProfitMinor),
     money(wk.endingCashMinor),

@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import type {
   CalculatedProductMargin,
   CalculatedRecipeCost,
+  ProductPlanVsActualRow,
 } from "@seams/control-api";
 import {
   formatMoneyMinor,
@@ -18,11 +19,13 @@ export function CostsBomDrawer(
     open: boolean;
     product: CalculatedProductMargin | null;
     recipe: CalculatedRecipeCost | null;
+    actualsRow?: ProductPlanVsActualRow | null;
     recipesHref: string;
     onClose: () => void;
+    onInspectSupply?: (inventoryItemId: string) => void;
   }>,
 ): React.ReactNode {
-  const { product, recipe } = props;
+  const { product, recipe, actualsRow = null } = props;
   if (product === null) {
     return (
       <SideDrawer
@@ -159,58 +162,110 @@ export function CostsBomDrawer(
           </div>
         </div>
 
-        {recipe !== null ? (
-          <div className="costs-bom-section">
-            <div className="costs-bom-list-header">
-              <span>Batch ingredients ({recipe.batchYield} pcs)</span>
-              <span>
-                Batch{" "}
-                {formatMoneyMinor(
-                  Math.round(recipe.totalBatchCostMinor),
-                  currency,
-                )}
-              </span>
-            </div>
+        {(() => {
+          const bomLines = actualsRow?.bomLines ?? product.bomLines;
+          if (bomLines.length === 0) {
+            return (
+              <div className="costs-bom-empty">
+                <p>No recipe or direct packaging is linked to this item yet.</p>
+              </div>
+            );
+          }
+          const isBatch =
+            product.fulfillmentKind === "stocked" && product.batchYield > 1;
+          const totalMinor =
+            actualsRow !== null
+              ? Math.round(
+                  isBatch
+                    ? actualsRow.actualUnitCogsMinor * product.batchYield
+                    : actualsRow.actualUnitCogsMinor,
+                )
+              : Math.round(
+                  isBatch
+                    ? product.bomUnitCostMinor * product.batchYield
+                    : product.bomUnitCostMinor,
+                );
+          return (
+            <div className="costs-bom-section">
+              <div className="costs-bom-list-header">
+                <span>
+                  {actualsRow !== null
+                    ? isBatch
+                      ? `Realized BOM (${product.batchYield} pcs)`
+                      : "Realized unit BOM"
+                    : isBatch
+                      ? `Batch BOM (${product.batchYield} pcs)`
+                      : "Unit BOM"}
+                </span>
+                <span>
+                  {isBatch ? "Batch " : "Unit "}
+                  {formatMoneyMinor(totalMinor, currency)}
+                </span>
+              </div>
 
-            <div className="costs-bom-rows">
-              {recipe.lines.map((line) => (
-                <div key={line.inventoryItemId} className="costs-bom-row">
-                  <div className="costs-bom-ing-meta">
-                    <span className="costs-bom-ing-name">{line.name}</span>
-                    <span className="costs-bom-ing-sub">
-                      {!line.hasCostTerms
-                        ? "Missing pack price"
-                        : line.costSource === "fifo_lot"
-                          ? "FIFO lot invoice"
-                          : line.costSource === "weighted_lot"
-                            ? "Weighted lot avg"
-                            : line.bulkUnlocked
-                              ? "Bulk tier applied"
-                              : "Standard pack tier"}
-                    </span>
-                  </div>
-                  <span className="costs-bom-qty-pill">
-                    {formatCostQuantity(line.quantityPerBatch, line.unit)}
-                  </span>
-                  <span
-                    className={`costs-bom-cost ${line.hasCostTerms ? "" : "is-missing"}`}
-                  >
-                    {line.hasCostTerms
-                      ? formatMoneyMinor(
-                          Math.round(line.costPerBatchMinor),
-                          currency,
-                        )
-                      : "Unpriced"}
-                  </span>
-                </div>
-              ))}
+              <div className="costs-bom-rows">
+                {bomLines.map((line) => {
+                  const sourceLabel = !line.hasCostTerms
+                    ? "Missing pack price"
+                    : line.costSource === "fifo_lot"
+                      ? "FIFO lot invoice"
+                      : line.costSource === "weighted_lot"
+                        ? "Weighted lot avg"
+                        : line.bulkUnlocked
+                          ? "Bulk tier applied"
+                          : "Standard pack tier";
+                  const varianceText =
+                    line.lotCostVariancePct !== null &&
+                    Math.abs(line.lotCostVariancePct) >= 0.5
+                      ? ` · ${line.lotCostVariancePct > 0 ? "+" : ""}${line.lotCostVariancePct.toFixed(1)}% vs pack`
+                      : "";
+                  return (
+                    <button
+                      key={`${line.source}:${line.inventoryItemId}`}
+                      type="button"
+                      className="costs-bom-row costs-bom-row-btn"
+                      onClick={() =>
+                        props.onInspectSupply?.(line.inventoryItemId)
+                      }
+                      title={`Inspect ${line.name} wholesale pack & lots`}
+                    >
+                      <div className="costs-bom-ing-meta">
+                        <span className="costs-bom-ing-name">{line.name}</span>
+                        <span className="costs-bom-ing-sub">
+                          {line.source === "direct_packaging"
+                            ? `Packaging · ${sourceLabel}${varianceText}`
+                            : `${sourceLabel}${varianceText}`}
+                        </span>
+                      </div>
+                      <span className="costs-bom-qty-pill">
+                        {formatCostQuantity(
+                          isBatch
+                            ? line.quantityPerBatch
+                            : line.quantityPerUnit,
+                          line.unit,
+                        )}
+                      </span>
+                      <span
+                        className={`costs-bom-cost ${line.hasCostTerms ? "" : "is-missing"}`}
+                      >
+                        {line.hasCostTerms
+                          ? formatMoneyMinor(
+                              Math.round(
+                                isBatch
+                                  ? line.costPerBatchMinor
+                                  : line.costPerUnitMinor,
+                              ),
+                              currency,
+                            )
+                          : "Unpriced"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="costs-bom-empty">
-            <p>No recipe is linked to this item yet.</p>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </SideDrawer>
   );

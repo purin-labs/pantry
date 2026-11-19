@@ -1,15 +1,5 @@
 import React from "react";
-import {
-  CakeSlice,
-  Coffee,
-  Croissant,
-  Flame,
-  Layers,
-  Package,
-  PieChart,
-  SlidersHorizontal,
-  Sparkles,
-} from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import type {
   BakeryCostCalculation,
   CostValuationBasis,
@@ -70,7 +60,11 @@ function pickProductGradient(title: string): string {
   ) {
     return "linear-gradient(135deg, #78350f, #b45309 60%, #fcd34d)";
   }
-  if (lower.includes("houjicha") || lower.includes("tea") || lower.includes("earl")) {
+  if (
+    lower.includes("houjicha") ||
+    lower.includes("tea") ||
+    lower.includes("earl")
+  ) {
     return "linear-gradient(135deg, #57534e, #a8a29e 64%, #e7e5e4)";
   }
   if (
@@ -89,7 +83,11 @@ function pickProductGradient(title: string): string {
   ) {
     return "linear-gradient(135deg, #be123c, #fb7185 62%, #fecdd3)";
   }
-  if (lower.includes("hazelnut") || lower.includes("almond") || lower.includes("pecan")) {
+  if (
+    lower.includes("hazelnut") ||
+    lower.includes("almond") ||
+    lower.includes("pecan")
+  ) {
     return "linear-gradient(135deg, #92400e, #d97706 60%, #fde68a)";
   }
   let hash = 0;
@@ -140,36 +138,6 @@ export function SupplyBadge(
   );
 }
 
-export function categoryChipIcon(section: string): React.ReactNode {
-  const lower = section.toLowerCase();
-  if (lower.includes("financier") || lower.includes("cake")) {
-    return <CakeSlice size={13.5} aria-hidden="true" />;
-  }
-  if (
-    lower.includes("pastr") ||
-    lower.includes("viennoiserie") ||
-    lower.includes("croissant")
-  ) {
-    return <Croissant size={13.5} aria-hidden="true" />;
-  }
-  if (lower.includes("drink") || lower.includes("coffee") || lower.includes("beverage")) {
-    return <Coffee size={13.5} aria-hidden="true" />;
-  }
-  if (lower.includes("hotcake") || lower.includes("pancake")) {
-    return <Layers size={13.5} aria-hidden="true" />;
-  }
-  if (lower.includes("pie") || lower.includes("tart")) {
-    return <PieChart size={13.5} aria-hidden="true" />;
-  }
-  if (lower.includes("warm") || lower.includes("savory")) {
-    return <Flame size={13.5} aria-hidden="true" />;
-  }
-  if (lower.includes("gift") || lower.includes("box")) {
-    return <Package size={13.5} aria-hidden="true" />;
-  }
-  return <Sparkles size={13.5} aria-hidden="true" />;
-}
-
 function buildSparklinePath(
   calculation: BakeryCostCalculation,
   dailyFixedMinor: number,
@@ -204,7 +172,6 @@ function formatCompactMonthly(amountMinor: number, currency: string): string {
   }
   return formatMoneyMinor(Math.round(amountMinor), currency);
 }
-
 
 export function CostsKpiStrip(
   props: Readonly<{
@@ -273,7 +240,9 @@ export function CostsKpiStrip(
           </span>
         </div>
         <div className="costs-kpi-sub">
-          {Math.round(calculation.summary.dailyUnitsSold).toLocaleString("en-US")}{" "}
+          {Math.round(calculation.summary.dailyUnitsSold).toLocaleString(
+            "en-US",
+          )}{" "}
           units/d · {props.productCount} SKUs
         </div>
       </div>
@@ -352,7 +321,9 @@ export function CostsKpiStrip(
                 )
               }
               onBlur={() => props.onBlurCell(OVERHEAD_LABOR_CELL_KEY)}
-              onChange={(event) => props.onChangeLaborRaw(event.currentTarget.value)}
+              onChange={(event) =>
+                props.onChangeLaborRaw(event.currentTarget.value)
+              }
             />
           </label>
 
@@ -378,7 +349,9 @@ export function CostsKpiStrip(
                 )
               }
               onBlur={() => props.onBlurCell(OVERHEAD_RENT_CELL_KEY)}
-              onChange={(event) => props.onChangeRentRaw(event.currentTarget.value)}
+              onChange={(event) =>
+                props.onChangeRentRaw(event.currentTarget.value)
+              }
             />
           </label>
         </div>
@@ -459,9 +432,15 @@ export function CostsAssumptionsPopover(
   const triggerTaxFormatted = (assumptions.includedTaxBps / 100).toFixed(0);
 
   const bakeWastePeers = presence.peersByCell.get(SCENARIO_BAKE_WASTE_CELL_KEY);
-  const prepRejectPeers = presence.peersByCell.get(SCENARIO_PREP_REJECT_CELL_KEY);
-  const channelFeePeers = presence.peersByCell.get(SCENARIO_CHANNEL_FEE_CELL_KEY);
-  const includedTaxPeers = presence.peersByCell.get(SCENARIO_INCLUDED_TAX_CELL_KEY);
+  const prepRejectPeers = presence.peersByCell.get(
+    SCENARIO_PREP_REJECT_CELL_KEY,
+  );
+  const channelFeePeers = presence.peersByCell.get(
+    SCENARIO_CHANNEL_FEE_CELL_KEY,
+  );
+  const includedTaxPeers = presence.peersByCell.get(
+    SCENARIO_INCLUDED_TAX_CELL_KEY,
+  );
 
   const val = (key: string, formatted: string) =>
     focusedCell?.cellKey === key ? focusedCell.raw : formatted;
@@ -674,10 +653,7 @@ export function CostsAssumptionsPopover(
               }
             }}
           >
-            <Select.Trigger
-              size="sm"
-              aria-label="Lot cost valuation basis"
-            >
+            <Select.Trigger size="sm" aria-label="Lot cost valuation basis">
               <Select.Value />
             </Select.Trigger>
             <Select.Popup>

@@ -10,19 +10,21 @@ import {
   type SupplyLotCost,
   type SupplyLotInvoiceCost,
 } from "@seams/control-api";
-import { lotInvoiceFieldCellKey } from "@seams/costs-sheet-crdt";
 import {
-  formatMoneyMinor,
-  formatSignedMoneyRounded,
-} from "../../formatting";
+  lotInvoiceFieldCellKey,
+  supplyFieldCellKey,
+} from "@seams/costs-sheet-crdt";
+import { formatMoneyMinor, formatSignedMoneyRounded } from "../../formatting";
 import { SideDrawer } from "../../ui";
 import { formatCostQuantity } from "./api";
 import {
   currencyDigits,
   lotDraftFromLot,
   sameLotDraft,
+  supplyDraftFromItem,
   type LotInvoiceRowDraft,
   type ProjectedCostsSheet,
+  type SupplyRowDraft,
 } from "./costs-sheet-draft";
 import {
   CellPeerOutline,
@@ -66,7 +68,9 @@ export function buildLotWritesForSheet(
     if (edit === undefined) continue;
     const item = itemsById.get(lot.inventoryItemId);
     const currency =
-      lot.invoiceCost?.currency ?? item?.costTerms?.currency ?? overview.currency;
+      lot.invoiceCost?.currency ??
+      item?.costTerms?.currency ??
+      overview.currency;
     const digits = currencyDigits(currency);
     const totalMajorRaw = edit.invoiceTotalMajor.trim();
     const totalMajor = totalMajorRaw.length > 0 ? Number(totalMajorRaw) : NaN;
@@ -122,7 +126,9 @@ export function applyPreviewLotEdits(
     if (edit === undefined) return lot;
     const item = itemsById.get(lot.inventoryItemId);
     const currency =
-      lot.invoiceCost?.currency ?? item?.costTerms?.currency ?? overview.currency;
+      lot.invoiceCost?.currency ??
+      item?.costTerms?.currency ??
+      overview.currency;
     const digits = currencyDigits(currency);
     const totalMajor = Number(edit.invoiceTotalMajor);
     if (
@@ -152,15 +158,17 @@ export function applyPreviewLotEdits(
   return { ...overview, lots };
 }
 
-export function renderSupplyLotCostCell(input: Readonly<{
-  item: SupplyCostItem;
-  rowIndex?: number;
-  usage: CalculatedSupplyUsage | undefined;
-  lotCostBasis: CostValuationBasis;
-  currency: string;
-  onOpenLots: (itemId: string) => void;
-  onKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
-}>): React.ReactNode {
+export function renderSupplyLotCostCell(
+  input: Readonly<{
+    item: SupplyCostItem;
+    rowIndex?: number;
+    usage: CalculatedSupplyUsage | undefined;
+    lotCostBasis: CostValuationBasis;
+    currency: string;
+    onOpenLots: (itemId: string) => void;
+    onKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  }>,
+): React.ReactNode {
   const {
     item,
     rowIndex,
@@ -249,6 +257,13 @@ export function CostsLotsDrawer(
       raw: string,
       patch: Partial<LotInvoiceRowDraft>,
     ) => void;
+    onUpdateSupplyField?: (
+      item: SupplyCostItem,
+      currency: string,
+      cellKey: string,
+      raw: string,
+      patch: Partial<SupplyRowDraft>,
+    ) => void;
     onSelectProduct?: (productId: string) => void;
   }>,
 ): React.ReactNode {
@@ -263,6 +278,27 @@ export function CostsLotsDrawer(
       />
     );
   }
+
+  const supplyDraft =
+    projected.supplyEdits[item.id] ?? supplyDraftFromItem(item, currency);
+  const bulkMinKey = supplyFieldCellKey(item.id, "bulkMin7dQuantity");
+  const bulkQtyKey = supplyFieldCellKey(item.id, "bulkPackQuantity");
+  const bulkPriceKey = supplyFieldCellKey(item.id, "bulkPackPriceMajor");
+  const bulkMinPeers = props.presence.peersByCell.get(bulkMinKey);
+  const bulkQtyPeers = props.presence.peersByCell.get(bulkQtyKey);
+  const bulkPricePeers = props.presence.peersByCell.get(bulkPriceKey);
+  const bulkMinVal =
+    props.focusedCell?.cellKey === bulkMinKey
+      ? props.focusedCell.raw
+      : supplyDraft.bulkMin7dQuantity;
+  const bulkQtyVal =
+    props.focusedCell?.cellKey === bulkQtyKey
+      ? props.focusedCell.raw
+      : supplyDraft.bulkPackQuantity;
+  const bulkPriceVal =
+    props.focusedCell?.cellKey === bulkPriceKey
+      ? props.focusedCell.raw
+      : supplyDraft.bulkPackPriceMajor;
 
   const basisLabel =
     projected.assumptions.lotCostBasis === "fifo_lot"
@@ -322,7 +358,10 @@ export function CostsLotsDrawer(
                 On hand:{" "}
                 <strong>
                   {usage.onHandBaseQuantity !== null
-                    ? formatCostQuantity(usage.onHandBaseQuantity, item.baseUnit)
+                    ? formatCostQuantity(
+                        usage.onHandBaseQuantity,
+                        item.baseUnit,
+                      )
                     : "Uncounted"}
                 </strong>
                 {" · "}7d need:{" "}
@@ -344,6 +383,143 @@ export function CostsLotsDrawer(
             </div>
           ) : null}
         </div>
+
+        {props.onUpdateSupplyField !== undefined ? (
+          <div className="costs-bom-section">
+            <div className="costs-bom-list-header">
+              <span>Bulk volume contract tier</span>
+              <span>
+                {usage?.bulkUnlocked
+                  ? "Bulk tier unlocked"
+                  : supplyDraft.bulkMin7dQuantity.length > 0
+                    ? "Below 7d threshold"
+                    : "No bulk tier set"}
+              </span>
+            </div>
+            <div className="costs-bulk-drawer-grid">
+              <label
+                data-cell-key={bulkMinKey}
+                className={`costs-pop-field${bulkMinPeers?.length ? " has-peer-focus" : ""}`}
+                style={peerCellStyle(bulkMinPeers)}
+              >
+                <CellPeerOutline peers={bulkMinPeers} />
+                <span className="costs-pop-field-label">
+                  7d min ({supplyDraft.packUnit})
+                </span>
+                <span className="costs-pop-input-wrap">
+                  <input
+                    type="number"
+                    min={0}
+                    step="any"
+                    placeholder="—"
+                    disabled={!props.canEdit}
+                    aria-label={`${item.name} 7-day bulk minimum`}
+                    value={bulkMinVal}
+                    onFocus={(event) =>
+                      props.onFocusCell(
+                        bulkMinKey,
+                        supplyDraft.bulkMin7dQuantity,
+                        event.currentTarget,
+                      )
+                    }
+                    onBlur={() => props.onBlurCell(bulkMinKey)}
+                    onChange={(event) => {
+                      const raw = event.currentTarget.value;
+                      props.onUpdateSupplyField?.(
+                        item,
+                        currency,
+                        bulkMinKey,
+                        raw,
+                        { bulkMin7dQuantity: raw },
+                      );
+                    }}
+                  />
+                </span>
+              </label>
+
+              <label
+                data-cell-key={bulkQtyKey}
+                className={`costs-pop-field${bulkQtyPeers?.length ? " has-peer-focus" : ""}`}
+                style={peerCellStyle(bulkQtyPeers)}
+              >
+                <CellPeerOutline peers={bulkQtyPeers} />
+                <span className="costs-pop-field-label">
+                  Bulk qty ({supplyDraft.packUnit})
+                </span>
+                <span className="costs-pop-input-wrap">
+                  <input
+                    type="number"
+                    min={0}
+                    step="any"
+                    placeholder="—"
+                    disabled={!props.canEdit}
+                    aria-label={`${item.name} bulk pack quantity`}
+                    value={bulkQtyVal}
+                    onFocus={(event) =>
+                      props.onFocusCell(
+                        bulkQtyKey,
+                        supplyDraft.bulkPackQuantity,
+                        event.currentTarget,
+                      )
+                    }
+                    onBlur={() => props.onBlurCell(bulkQtyKey)}
+                    onChange={(event) => {
+                      const raw = event.currentTarget.value;
+                      props.onUpdateSupplyField?.(
+                        item,
+                        currency,
+                        bulkQtyKey,
+                        raw,
+                        { bulkPackQuantity: raw },
+                      );
+                    }}
+                  />
+                </span>
+              </label>
+
+              <label
+                data-cell-key={bulkPriceKey}
+                className={`costs-pop-field${bulkPricePeers?.length ? " has-peer-focus" : ""}`}
+                style={peerCellStyle(bulkPricePeers)}
+              >
+                <CellPeerOutline peers={bulkPricePeers} />
+                <span className="costs-pop-field-label">
+                  Bulk price ({currencySymbol})
+                </span>
+                <span className="costs-pop-input-wrap">
+                  <span className="costs-pop-suffix">{currencySymbol}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={currencyDigits(currency) === 0 ? 10 : "any"}
+                    placeholder="—"
+                    disabled={!props.canEdit}
+                    aria-label={`${item.name} bulk pack price`}
+                    value={bulkPriceVal}
+                    onFocus={(event) =>
+                      props.onFocusCell(
+                        bulkPriceKey,
+                        supplyDraft.bulkPackPriceMajor,
+                        event.currentTarget,
+                      )
+                    }
+                    onBlur={() => props.onBlurCell(bulkPriceKey)}
+                    onChange={(event) => {
+                      const raw = event.currentTarget.value;
+                      props.onUpdateSupplyField?.(
+                        item,
+                        currency,
+                        bulkPriceKey,
+                        raw,
+                        { bulkPackPriceMajor: raw },
+                      );
+                    }}
+                  />
+                </span>
+              </label>
+            </div>
+          </div>
+        ) : null}
 
         {usage !== null && usage.skuImpacts.length > 0 ? (
           <div className="costs-bom-section">
@@ -456,7 +632,8 @@ export function CostsLotsDrawer(
             <div className="costs-bom-list-header">
               <span>Received lots &amp; purchase invoices</span>
               <span>
-                <Receipt size={12} aria-hidden="true" /> Invoice total ({currencySymbol})
+                <Receipt size={12} aria-hidden="true" /> Invoice total (
+                {currencySymbol})
               </span>
             </div>
 
@@ -589,7 +766,12 @@ export function CostsLotsDrawer(
                       >
                         <CellPeerOutline peers={totalPeers} />
                         <span className="costs-pop-field-label">
-                          Invoice total ({formatCostQuantity(lot.receivedQuantity, lot.baseUnit)})
+                          Invoice total (
+                          {formatCostQuantity(
+                            lot.receivedQuantity,
+                            lot.baseUnit,
+                          )}
+                          )
                         </span>
                         <span className="costs-pop-input-wrap">
                           <span className="costs-pop-suffix">

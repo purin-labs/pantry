@@ -2,7 +2,6 @@ import React from "react";
 import {
   AlertTriangle,
   ArrowUpRight,
-  ChevronDown,
   ChevronRight,
   Clock,
   TrendingUp,
@@ -10,13 +9,11 @@ import {
 import type {
   ActualsWindowDays,
   BakeryPlanVsActualsCalculation,
-  CalculatedProductMargin,
   PlanVsActualVarianceDriver,
   ProductPlanVsActualRow,
 } from "@seams/control-api";
 import { formatMoneyMinor } from "../../formatting";
 import { CrmTable, Select, type CrmColumn, type CrmRowAction } from "../../ui";
-import { CostsInlineBomPanel } from "./costs-bom-inline";
 import { handleSheetKeyDown } from "./costs-sheet-grid";
 import {
   CellPeerOutline,
@@ -305,15 +302,11 @@ export function CostsActualsSheet(
   props: Readonly<{
     actuals: BakeryPlanVsActualsCalculation;
     rows: readonly ProductPlanVsActualRow[];
-    marginRowsByProductId: ReadonlyMap<string, CalculatedProductMargin>;
     selectedProductId: string | null;
-    expandedProductIds: ReadonlySet<string> | undefined;
+    bomOpen: boolean;
     presence: PresenceIndex;
-    recipesHref: string;
     onSelectProduct: (productId: string) => void;
-    onToggleInlineBom: (productId: string) => void;
-    onOpenBomDrawer: (productId: string) => void;
-    onInspectSupply: (inventoryItemId: string) => void;
+    onOpenBomDrawer: (productId: string, open: boolean) => void;
     onEditOnMarginsTab: (productId: string) => void;
     onFocusCell: (cellKey: string, seed: string) => void;
     onBlurCell: (cellKey: string) => void;
@@ -500,8 +493,8 @@ export function CostsActualsSheet(
         cellKey: `actuals:${row.productId}:actual_cogs`,
       }),
       render: (row, rowIndex) => {
-        const isExpanded =
-          props.expandedProductIds?.has(row.productId) === true;
+        const isBomOpenForRow =
+          props.bomOpen && props.selectedProductId === row.productId;
         const hasBom = row.bomLines.length > 0;
         const cogsTone =
           row.unitCogsDeltaMinor >= 2
@@ -520,25 +513,17 @@ export function CostsActualsSheet(
               {hasBom && (
                 <button
                   type="button"
-                  className={`costs-bom-expand-btn${isExpanded ? " is-expanded" : ""}`}
-                  aria-expanded={isExpanded}
-                  aria-label={`${isExpanded ? "Collapse" : "Expand"} ${row.productTitle} realized ingredient cost chain`}
-                  title={
-                    isExpanded
-                      ? "Hide ingredient & packaging cost chain"
-                      : "Inspect realized invoice → recipe → SKU cost chain"
-                  }
+                  className={`costs-bom-expand-btn${isBomOpenForRow ? " is-expanded" : ""}`}
+                  aria-expanded={isBomOpenForRow}
+                  aria-label={`Inspect realized recipe BOM for ${row.productTitle}`}
+                  title={`Inspect ${row.bomLines.length} realized invoice & recipe inputs`}
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.stopPropagation();
-                    props.onToggleInlineBom(row.productId);
+                    props.onOpenBomDrawer(row.productId, !isBomOpenForRow);
                   }}
                 >
-                  {isExpanded ? (
-                    <ChevronDown size={13} aria-hidden="true" />
-                  ) : (
-                    <ChevronRight size={13} aria-hidden="true" />
-                  )}
+                  <ChevronRight size={13} aria-hidden="true" />
                 </button>
               )}
               <span className={cogsTone}>
@@ -676,18 +661,13 @@ export function CostsActualsSheet(
 
   const actions: readonly CrmRowAction<ProductPlanVsActualRow>[] = [
     {
-      id: "inline_bom",
-      label: "Toggle inline cost chain",
-      onSelect: (row) => props.onToggleInlineBom(row.productId),
-    },
-    {
       id: "bom_drawer",
-      label: "Open Recipe BOM drawer",
-      onSelect: (row) => props.onOpenBomDrawer(row.productId),
+      label: "Inspect recipe BOM",
+      onSelect: (row) => props.onOpenBomDrawer(row.productId, true),
     },
     {
       id: "edit_margins",
-      label: "Re-price on Product margins",
+      label: "Re-price on Menu",
       onSelect: (row) => props.onEditOnMarginsTab(row.productId),
     },
   ];
@@ -708,28 +688,6 @@ export function CostsActualsSheet(
           rows[0]?.productId === row.productId)
       }
       onRowClick={(row) => props.onSelectProduct(row.productId)}
-      renderExpandedRow={(row) => {
-        if (!props.expandedProductIds?.has(row.productId)) {
-          return null;
-        }
-        const baseMargin = props.marginRowsByProductId.get(row.productId);
-        if (baseMargin === undefined) {
-          return null;
-        }
-        const realizedMarginRow: CalculatedProductMargin = {
-          ...baseMargin,
-          bomUnitCostMinor: row.actualUnitCogsMinor,
-          bomLines: row.bomLines,
-        };
-        return (
-          <CostsInlineBomPanel
-            row={realizedMarginRow}
-            recipesHref={props.recipesHref}
-            onInspectSupply={props.onInspectSupply}
-            onCollapse={() => props.onToggleInlineBom(row.productId)}
-          />
-        );
-      }}
       actions={actions}
       initialPinned={["product"]}
       initialCalculations={{
@@ -741,7 +699,7 @@ export function CostsActualsSheet(
         profitDelta: "sum",
       }}
       emptyTitle="No matching menu items"
-      emptyDescription="Clear the search box or select another category chip."
+      emptyDescription="Clear the search box or select another category."
     />
   );
 }
@@ -783,12 +741,7 @@ function ActualsStatusOrb(
       </span>
     );
   }
-  return (
-    <ProductOrb
-      title={row.productTitle}
-      imageUrl={row.imageUrl}
-    />
-  );
+  return <ProductOrb title={row.productTitle} imageUrl={row.imageUrl} />;
 }
 
 function formatCategoryName(section: string): string {

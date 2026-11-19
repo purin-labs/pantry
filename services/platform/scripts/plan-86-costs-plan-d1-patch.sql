@@ -1,4 +1,5 @@
 -- Plan 86: Organisation bakery cost plan, formulas, 12-week forecast, and lot invoice costs in regional D1.
+-- Applied to production regional D1 (satyr-organisation-apac) on 2026-11-14 before satyr-edge 7e8454a3.
 CREATE TABLE IF NOT EXISTS bakery_cost_plan (
   organisation_id TEXT PRIMARY KEY REFERENCES organisation (organisation_id),
   revision INTEGER NOT NULL CHECK (revision > 0),
@@ -8,8 +9,6 @@ CREATE TABLE IF NOT EXISTS bakery_cost_plan (
   updated_by TEXT NOT NULL,
   updated_at INTEGER NOT NULL CHECK (updated_at >= 0)
 );
-
-ALTER TABLE bakery_cost_plan ADD COLUMN forecast_json TEXT;
 
 CREATE TABLE IF NOT EXISTS bakery_cost_product_plan (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
@@ -34,7 +33,7 @@ CREATE TABLE IF NOT EXISTS bakery_lot_invoice_cost (
   lot_id TEXT NOT NULL CHECK (length(lot_id) BETWEEN 1 AND 160),
   inventory_item_id TEXT NOT NULL CHECK (length(inventory_item_id) BETWEEN 1 AND 160),
   revision INTEGER NOT NULL CHECK (revision > 0),
-  invoice_reference TEXT,
+  invoice_reference TEXT NOT NULL CHECK (length(invoice_reference) BETWEEN 1 AND 120),
   supplier_id TEXT CHECK (supplier_id IS NULL OR length(supplier_id) <= 128),
   currency TEXT NOT NULL CHECK (length(currency) = 3),
   invoiced_quantity REAL NOT NULL CHECK (invoiced_quantity > 0),
