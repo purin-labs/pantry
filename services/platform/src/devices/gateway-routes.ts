@@ -3,7 +3,7 @@ import {
   type DeviceGatewayEnrollResponse,
 } from "@purin-labs/control-api";
 
-import { deviceFleetStub } from "../actors/device-fleet";
+import { deviceFleetStub } from "./contract/fleet-stub";
 import { controlError, controlJson } from "../control/http";
 import type { Env } from "../env";
 import { parseOrganisationId } from "../ids";

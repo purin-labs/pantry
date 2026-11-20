@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { deviceFleetStubAt } from "../actors/device-fleet";
+import { deviceFleetStubAt } from "./contract/fleet-stub";
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";

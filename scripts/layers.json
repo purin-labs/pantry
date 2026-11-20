@@ -89,7 +89,8 @@
     "services/platform/src/memory/contract/",
     "apps/portal/src/execution-client.ts",
     "apps/portal/src/features/brain/api.ts",
-    "apps/portal/src/features/brain/address.ts"
+    "apps/portal/src/features/brain/address.ts",
+    "services/platform/src/devices/contract/"
   ],
   "mixed": {
     "services/platform/src/agent-tools/registry.ts": "The one list of the agent tools. It imports each family, so it is a part of the Worker. The class SessionDO gives it to the Session (step A1.7).",

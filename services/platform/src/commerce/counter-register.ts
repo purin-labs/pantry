@@ -27,7 +27,7 @@ import type {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import { deviceFleetStub } from "../actors/device-fleet";
+import { deviceFleetStub } from "../devices/contract/fleet-stub";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   readCounterSale as readCounterSaleState,

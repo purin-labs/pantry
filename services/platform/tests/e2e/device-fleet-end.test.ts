@@ -4,7 +4,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { deviceFleetStub } from "../../src/actors/device-fleet";
+import { deviceFleetStub } from "../../src/devices/contract/fleet-stub";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import {
   archiveOrganisation,

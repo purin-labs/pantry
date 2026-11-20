@@ -1,7 +1,7 @@
 {
   "totals": {
     "upward": 144,
-    "areas": 59,
+    "areas": 58,
     "order": 103,
     "table": 117
   },
@@ -12,7 +12,6 @@
     "areas/brain -> surfaces/whatsapp": 2,
     "areas/brain -> workers/platform": 1,
     "areas/cafe -> areas/commerce": 1,
-    "areas/cafe -> areas/devices": 1,
     "areas/cafe -> areas/kitchen": 1,
     "areas/cafe -> surfaces/portal": 5,
     "areas/commerce -> areas/cafe": 1,
