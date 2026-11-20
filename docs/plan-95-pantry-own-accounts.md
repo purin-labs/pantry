@@ -1,8 +1,8 @@
 # Plan 95 — Pantry owns its accounts
 
-Status: in progress, 20 November 2026. The owner decided the five decisions
-on 20 November 2026 (see "Decisions"). Step 1 is done (see "Step 1
-results"). Steps 2 to 6 are open.
+Status: in progress, 21 November 2026. The owner decided the five decisions
+on 20 November 2026 (see "Decisions"). Steps 1 and 3 are done (see "Step 1
+results" and "Step 3 results"). Steps 2, 4, 5 and 6 are open.
 
 - The owner decided on 20 November 2026: the Seams Wallet and its Console are
   one product, apart from Purin. Pantry and the Wallet stop sharing
@@ -376,6 +376,12 @@ This table replaces the first rows of "Authority and ownership" in
 Each step lands on `dev` alone, with its checks. Steps 1 to 4 go to
 production in one release (step 5). Step 6 does not block the Console split.
 
+Step 3 landed before step 2. Each turn read the Console binding for its
+billing, so nearly every turn journey needed the Console attach of the test
+fixture until the billing went. After step 3, the attach serves only the
+sign-in link and the invitations, which step 2 replaces. The order has no
+effect on production, because steps 1 to 4 ship in one release.
+
 ### 0. Decisions (no code)
 
 Done on 20 November 2026. The owner took all five recommendations (see
@@ -503,6 +509,38 @@ list above:
   the billing account, not from the Console.
 - Checks: the Plan 88 journeys of free use pass. The journeys of Console paid
   use are deleted. Step 6 brings paid use back on Stripe.
+
+#### Step 3 results
+
+Done on 21 November 2026, before step 2 (see "Steps"). What changed, and
+where the work differs from the list above:
+
+- `execution-billing.ts` is deleted, with its calls in the Session: the
+  admission read of the binding and the fee policy, the dispatch mark, the
+  uncertainty mark, the three journal hooks and the four reconcile calls. A
+  turn no longer reads the Console before its model request.
+- The Session outbox schema has a version 3. It deletes the rows of the old
+  turn billing (`account_execution:*`) once, when a Session wakes. A turn of a
+  Console test account could leave such a row open, and an open row kept a
+  Session from its end and from a relocation. The relocation check and the
+  end of a quarantined Session no longer skip those rows.
+- Jev paid use is closed: `JEV_PAID_USE_OPEN` is false in
+  `jev-features/paid-use.ts`, and the view reports `priced: false`. There is
+  no plan catalog and no billing account yet; step 6 adds both. The server
+  refuses to turn paid use on (`jev_paid_use_closed`), and the Portal
+  disables the switch. A call above the free use stops as at the end of the
+  free use (`allowance_reached`). The feature-hour holds, the refusal codes
+  `spending_limit_reached` and `paid_use_unfunded`, and the Console price
+  versions are deleted. `priced` is now a boolean.
+- A sealed Jev hour is `not_billed`, with the outcome `unpriced` or
+  `no_measured_tokens`. A sealed hour no longer arms the Organisation alarm.
+  An hour that waited for the Console meter becomes `not_billed` at the next
+  seal.
+- The Console client lost its funds and usage calls.
+- Journeys: `plan-88-jev-features.test.ts` keeps J1, J2, J3 and J6 without
+  the Console attach. J4 now checks the local hour records. The two J7
+  journeys of Console paid use are one journey: above the free use a call
+  stops, and neither an admin nor the owner can turn paid use on.
 
 ### 4. Remove the Console connection
 

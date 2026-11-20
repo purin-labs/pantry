@@ -1,6 +1,5 @@
 import type { SessionShared } from "./session-shared";
 import { acceptedExecutionAuthority } from "../../organisation-access/access";
-import { reconcilePantryExecutionBilling } from "../../account-platform/execution-billing";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import type { Outcome } from "@purin-labs/contracts";
 import { validateLiveRequestAuthority } from "../../request-authority";
@@ -359,12 +358,6 @@ export class SessionCheckpoints {
       phaseStartedAt,
     );
     if (!slept.ok) return slept;
-    this.shared.ctx.waitUntil(
-      reconcilePantryExecutionBilling({
-        env: this.shared.env,
-        storage: this.shared.ctx.storage,
-      }),
-    );
     // The turn is complete, and the archive write starts now. The Case
     // posts the answer when the turn's call returns, so that call does not
     // wait for the write. The next turn waits for it before it restores the

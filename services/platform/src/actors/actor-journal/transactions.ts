@@ -1,9 +1,4 @@
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
-import {
-  recordPantryTurnCancellationInTransaction,
-  recordPantryTurnCompletionInTransaction,
-  recordPantrySessionCancellationInTransaction,
-} from "../../account-platform/execution-billing";
 import type {
   AcceptedInputRef,
   AgentSessionLifecycle,
@@ -52,7 +47,6 @@ import {
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
-  canonicalJson,
   hasExactKeys,
   isNonEmptyString,
   isRecord,
@@ -257,8 +251,7 @@ export function recoverInterruptedSessionInTransaction(
  * Ends a Session that an older release quarantined when a process loss
  * interrupted its turn: the reducer allows only termination from that
  * quarantine, and the Session ends as `failed`, as Refactor 15 ends the turn
- * itself. The caller checks first that the Session holds no other work. As
- * each Session termination does, it cancels the open billing of its turns.
+ * itself. The caller checks first that the Session holds no other work.
  */
 export function terminateQuarantinedSessionInTransaction(
   sql: SqlStorage,
@@ -327,16 +320,7 @@ export function terminateQuarantinedSessionInTransaction(
     "DELETE FROM session_harness_lease WHERE session_id = ?",
     state.state.identity.sessionId,
   );
-  const committed = writeCanonicalTransition(sql, input, envelope.value);
-  if (!committed.ok) return committed;
-  const billing = recordPantrySessionCancellationInTransaction(sql, {
-    sessionId: state.state.identity.sessionId,
-    sourceRecordId: input.event.eventId,
-    sequence: input.event.sequence,
-    occurredAt: now,
-  });
-  if (!billing.ok) throw new JournalTransitionAbort(billing.error);
-  return committed;
+  return writeCanonicalTransition(sql, input, envelope.value);
 }
 
 export function commitCheckpointingStartedSession(
@@ -831,11 +815,6 @@ export function commitCompletedSessionTurnTransaction(
     input.completedAt,
   );
   if (!stream.ok) throw new CompositeCommitAbort(stream.error);
-  const billing = recordPantryTurnCompletionInTransaction(
-    sql,
-    input.checkpoint.harnessCheckpoint,
-  );
-  if (!billing.ok) throw new CompositeCommitAbort(billing.error);
   return checkpoint;
 }
 
@@ -1635,44 +1614,7 @@ function commitCancellationResolvedSessionTransaction(
   }
   const envelope = encodeJournalEvent(input.event);
   if (!envelope.ok) return envelope;
-  const running = readRunningSessionTurn(sql);
-  if (!running.ok)
-    return { ok: false, error: { code: "invalid_persisted_state" } };
-  const committed = writeCanonicalTransition(sql, input, envelope.value);
-  if (!committed.ok) return committed;
-  const turnId =
-    current.state.plan.kind === "turn"
-      ? current.state.plan.turnId
-      : (running.value?.turnId ?? null);
-  if (input.state.kind !== "checkpointing" && turnId !== null) {
-    const billing = recordPantryTurnCancellationInTransaction(sql, {
-      turnId,
-      sourceRecordId: input.event.eventId,
-      canonicalReceipt: canonicalJson({
-        eventId: input.event.eventId,
-        streamId: input.event.streamId,
-        sequence: input.event.sequence,
-        turnId,
-        resolution: input.state.kind,
-        acceptedAt: input.event.acceptedAt,
-      }),
-      occurredAt: input.event.acceptedAt,
-    });
-    if (!billing.ok) throw new JournalTransitionAbort(billing.error);
-  }
-  if (
-    input.state.kind === "terminal" &&
-    current.state.plan.kind === "session"
-  ) {
-    const billing = recordPantrySessionCancellationInTransaction(sql, {
-      sessionId: current.state.identity.sessionId,
-      sourceRecordId: input.event.eventId,
-      sequence: input.event.sequence,
-      occurredAt: input.event.acceptedAt,
-    });
-    if (!billing.ok) throw new JournalTransitionAbort(billing.error);
-  }
-  return committed;
+  return writeCanonicalTransition(sql, input, envelope.value);
 }
 
 function writeCanonicalTransition(

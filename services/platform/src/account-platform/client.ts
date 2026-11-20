@@ -9,10 +9,8 @@ import {
   type SatyrInstanceReleaseV1 as PantryInstanceReleaseV1,
 } from "@seams-internal/console-shared/accountPlatform";
 import {
-  readReserveFundsResponseV1 as readReserveResponse,
   readSatyrServiceFeePolicyV1 as readFeePolicyResponse,
   readAccountServiceErrorV1 as readAccountError,
-  type ReserveFundsResponseV1 as ReserveResponse,
   type SatyrServiceFeePolicyV1 as FeePolicyResponse,
 } from "@seams-internal/console-shared/accountPlatform";
 import {
@@ -57,20 +55,12 @@ import {
   readLinkedUser,
   accountObject,
   accountUnavailable,
-  readAccountFundsReservation,
-  readAccountUsageReceipt,
   readAccountIdentityResolution,
   sameAccountScope,
-  type AccountFundsReservation,
   type AccountIdentityResolution,
-  type AccountIndeterminateRequest,
   type AccountPlatformError,
   type AccountPrincipal,
-  type AccountReserveRequest,
   type AccountScope,
-  type AccountTerminalDelivery,
-  type AccountUsageReceipt,
-  type AccountUsageRequest,
   type LinkedPantryAccountUser,
   type PantryAccountBinding,
 } from "./types";
@@ -193,45 +183,6 @@ export class AccountPlatformClient {
     return this.post(`onboarding/${operation}`, body, parser, assertion.value);
   }
 
-  reserveFunds(
-    input: AccountReserveRequest,
-  ): Promise<Result<ReserveResponse, AccountPlatformError>> {
-    return this.post("funds/reserve", input, readReserveResponse);
-  }
-  markIndeterminate(
-    input: AccountIndeterminateRequest,
-  ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
-    return this.post("funds/indeterminate", input, readAccountFundsReservation);
-  }
-  recordUsage(
-    input: AccountUsageRequest,
-  ): Promise<Result<AccountUsageReceipt, AccountPlatformError>> {
-    return this.post("usage", input, readAccountUsageReceipt);
-  }
-  settleFunds(
-    input: Variant<AccountTerminalDelivery, "settle">,
-  ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
-    return this.post("funds/settle", input, readAccountFundsReservation);
-  }
-  releaseFunds(
-    input: Variant<AccountTerminalDelivery, "release">,
-  ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
-    return this.post("funds/release", input, readAccountFundsReservation);
-  }
-  reconcileFunds(
-    input: Variant<AccountTerminalDelivery, "reconcile">,
-  ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
-    return this.post("funds/reconcile", input, readAccountFundsReservation);
-  }
-  getReservation(
-    reservationId: string,
-  ): Promise<Result<AccountFundsReservation, AccountPlatformError>> {
-    return this.post(
-      "funds/status",
-      { version: 1, reservationId },
-      readAccountFundsReservation,
-    );
-  }
   getFeePolicy(
     instanceId: string,
   ): Promise<Result<FeePolicyResponse, AccountPlatformError>> {

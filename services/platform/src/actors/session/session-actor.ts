@@ -38,7 +38,6 @@ import {
   type SteeringInputState,
 } from "../harness-steering";
 import { toHistoryContent } from "../pi-user-input";
-import { reconcilePantryExecutionBilling } from "../../account-platform/execution-billing";
 import { buildRecoveringSessionCancellation } from "../agent-session-recovery";
 import { beginPiDurableRecovery } from "../pi-durable-recovery";
 import { piDurableImportSchema } from "../pi-durable-checkpoint";
@@ -1516,16 +1515,6 @@ export abstract class SessionActor
    * for it after a backoff.
    */
   async alarm(): Promise<void> {
-    const billed = await runAlarmSteps("session", [
-      {
-        name: "execution_billing",
-        run: () =>
-          reconcilePantryExecutionBilling({
-            env: this.env,
-            storage: this.ctx.storage,
-          }),
-      },
-    ]);
     const admission = await admitActorRecovery(this.env, this.ctx.storage);
     if (admission.kind !== "admitted") return;
     const failed = await runAlarmSteps("session", [
@@ -1577,10 +1566,7 @@ export abstract class SessionActor
         run: () => schedulePersistedRunBudgetDeadline(this.ctx.storage),
       },
     ]);
-    await armAlarmAfterFailedSteps(this.ctx.storage, this.alarmRetries, [
-      ...billed,
-      ...failed,
-    ]);
+    await armAlarmAfterFailedSteps(this.ctx.storage, this.alarmRetries, failed);
   }
 
   /** Ends the turn whose run budget passed its deadline or ran out. */

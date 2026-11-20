@@ -1,5 +1,4 @@
 import type { SteeringRequester } from "../harness-steering";
-import type { PantryExecutionBillingError } from "../../account-platform/execution-billing";
 import type { Outcome } from "@purin-labs/contracts";
 import type { HarnessTurnContinuation } from "../agent-session-continuation";
 import type { LiveRequestAuthorityValidationError } from "../../request-authority";
@@ -363,7 +362,6 @@ export type CanonicalHarnessHistoryErasureError =
   CanonicalSessionAccessError | HarnessAuthorityError;
 
 export type CanonicalEmbeddedHarnessRunError =
-  | PantryExecutionBillingError
   | CanonicalEmbeddedHarnessInputError
   | MessagePreparationError
   | CanonicalHarnessCheckpointRestoreError

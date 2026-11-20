@@ -243,12 +243,7 @@ export async function runMailOrganization(
       if (!evaluated.ok) {
         if (evaluated.error.code === "budget_exhausted")
           pauseMailWorkBudget(input.storage.sql, work, Date.now());
-        else if (evaluated.error.code === "paid_use_unfunded")
-          pauseMailWorkBudget(input.storage.sql, work, Date.now());
-        else if (
-          evaluated.error.code === "allowance_reached" ||
-          evaluated.error.code === "spending_limit_reached"
-        )
+        else if (evaluated.error.code === "allowance_reached")
           pauseMailWorkUntil(
             input.storage.sql,
             work,

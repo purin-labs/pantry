@@ -15,8 +15,6 @@ import {
   type TypeSafePurpose,
 } from "./usage-store";
 
-import { admitJevPaidCall } from "../../jev-features/paid-use";
-
 /** Plan 88 D3: $1.00 of TypeSafe cost on Pantry's key each UTC month. */
 export const JEV_MONTHLY_ALLOWANCE_MICROUSD = 1_000_000;
 /** Plan 88 D8: at most 5 Pantry-funded Jev requests a second for each Organisation. */
@@ -102,8 +100,6 @@ export type TypeSafeUsageError = Readonly<{
     | "inactive"
     | "budget_exhausted"
     | "allowance_reached"
-    | "spending_limit_reached"
-    | "paid_use_unfunded"
     | "rate_limited"
     | "store_invalid";
 }>;
@@ -209,16 +205,10 @@ export function reserveTypeSafeEvaluation(
       readMonthlyPantryTypeSafeCost(sql, input.organisationId, input.now) +
         limits.reservationMicrousd >
       JEV_MONTHLY_ALLOWANCE_MICROUSD
-    ) {
-      // Above the free use only paid use admits the call (Plan 88 section 4).
-      const refused = admitJevPaidCall(sql, {
-        organisationId: input.organisationId,
-        purpose: input.purpose,
-        reservedInputTokens: input.reservedInputTokens,
-        now: input.now,
-      });
-      if (refused !== null) return failure(refused);
-    }
+    )
+      // Above the free use only paid use admits a call (Plan 88 section 4),
+      // and paid use is closed until Pantry's own billing (Plan 95 step 6).
+      return failure("allowance_reached");
   }
   const usage = readDailyTypeSafeUsage(
     sql,

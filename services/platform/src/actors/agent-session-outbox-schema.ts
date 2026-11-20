@@ -11,10 +11,15 @@ import {
  * (version 33) creates the table; this plan has its own key, so the change
  * moves no Session or registry schema version and needs no activation
  * advance. Version 1 is the table as the baseline creates it.
+ *
+ * Version 3 (Plan 95 step 3) deletes the rows of the turn billing that went
+ * to the Console (effect ids `account_execution:*`). Pantry no longer bills a
+ * turn, and an open row of a Console test account would keep a Session from
+ * its end and from a relocation.
  */
 const SESSION_OUTBOX_SCHEMA_PLAN: SchemaMigrationPlan = {
   key: "session_actor_outbox",
-  currentVersion: 2,
+  currentVersion: 3,
   preservedTables: ["actor_outbox"],
   baseline: {
     version: 1,
@@ -37,8 +42,19 @@ const SESSION_OUTBOX_SCHEMA_PLAN: SchemaMigrationPlan = {
           "recovery_attempts",
         ]),
     },
+    {
+      version: 3,
+      apply: deleteConsoleBillingRows,
+      validate: (sql) => assertTableExists(sql, "actor_outbox"),
+    },
   ],
 };
+
+function deleteConsoleBillingRows(sql: SqlStorage): void {
+  sql.exec(
+    "DELETE FROM actor_outbox WHERE effect_id GLOB 'account_execution:*'",
+  );
+}
 
 /** Runs after the Session plan, in the same transaction. */
 export function runSessionOutboxSchemaMigrations(sql: SqlStorage): void {

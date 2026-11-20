@@ -5,6 +5,12 @@ ingress `a8d1642c`, release tree `cbfe7b8ec`), with Plan 87 phase 1B. seams-mono
 `80a418ba` runs on the production-mainnet Console with the Jev meter, the $10 self-serve
 credit limit and the customer price. The owner approved the Jev price (D9) on 7 November 2026.
 
+Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step 3, on `dev`, not
+released): Pantry no longer bills through the Console. Free use and the hourly records stay
+local. Paid use is closed, so a call above the free use stops, until Plan 95 step 6 bills paid
+use through Pantry's own Stripe account. The sections below on the Account Platform meter,
+the holds and the credit limit describe the released state before that change.
+
 ## Outcome and scope
 
 An Organisation uses the Jev features with no TypeSafe account and no API key. Satyr

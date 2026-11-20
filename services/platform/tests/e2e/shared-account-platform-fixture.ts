@@ -666,21 +666,6 @@ export async function selectSharedAccountModelRoute(
   return route.value;
 }
 
-export function fixtureRows(
-  snapshot: Record<string, unknown>,
-  table: string,
-): readonly Record<string, unknown>[] {
-  const value = snapshot[table];
-  if (!Array.isArray(value))
-    throw new Error(`Fixture snapshot missing ${table}`);
-  const rows: Record<string, unknown>[] = [];
-  for (const row of value) {
-    if (!isRecord(row)) throw new Error(`Invalid snapshot row in ${table}`);
-    rows.push(row);
-  }
-  return rows;
-}
-
 function accountProducerRequest(
   path: "usage" | "funds/reserve" | "fee-policy" | "eligibility",
   body: unknown,

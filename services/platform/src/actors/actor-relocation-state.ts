@@ -154,8 +154,7 @@ export function inspectActorRelocationReadiness(
     case "session":
       queries.push(`SELECT effect_id AS operationId FROM actor_outbox
         CROSS JOIN (SELECT ? AS inspection_stage)
-        WHERE ((state_kind = 'indeterminate'
-            AND effect_id NOT GLOB 'account_execution:*')
+        WHERE (state_kind = 'indeterminate'
           OR json_extract(state_projection, '$.kind') = 'surface_indeterminate'
           OR (inspection_stage = 'quiescent' AND state_kind = 'dispatching'))
           AND NOT (inspection_stage = 'preflight'

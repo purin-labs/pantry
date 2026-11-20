@@ -74,8 +74,8 @@ export function JevUsePrompt(props: {
   return (
     <p className="jev-prompt" role="status">
       <span>
-        You have used {share} the free Jev use of this month. It starts again
-        on {resetDate(view.allowance)}.
+        You have used {share} the free Jev use of this month. It starts again on{" "}
+        {resetDate(view.allowance)}.
         {props.isOwner ? null : " Ask the owner to turn on paid use."}
       </span>
       {props.isOwner ? (
@@ -97,13 +97,11 @@ export function JevUsePrompt(props: {
   );
 }
 
-/** The state of the Seams account price for Jev, or null when it is open. */
-export function pricedNote(priced: boolean | null): string | null {
-  if (priced === false)
-    return "Paid Jev use is not open yet. Seams opens it when the Jev price is approved.";
-  if (priced === null)
-    return "Pantry could not read the Seams account. Reload the page to try again.";
-  return null;
+/** Why paid use cannot start yet, or null when it is open. */
+export function pricedNote(priced: boolean): string | null {
+  return priced
+    ? null
+    : "Paid Jev use is not open yet. It opens when Seams Pantry billing starts.";
 }
 
 /** "This month: $1.20 of $5.00", and the stop at the spending limit. */
@@ -181,7 +179,7 @@ export function PaidUseSection(props: {
 
   const note = pricedNote(paidUse.priced);
   // A person can always turn paid use off; turning it on needs the price.
-  const switchDisabled = !isOwner || (!paidUse.enabled && paidUse.priced === false);
+  const switchDisabled = !isOwner || (!paidUse.enabled && !paidUse.priced);
   const limitChanged = parseLimit(limit) !== paidUse.spendingLimitMinor;
 
   return (

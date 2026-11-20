@@ -5,13 +5,6 @@ import {
   acceptedExecutionAuthority,
   organisationAccessOfOneRead,
 } from "../../organisation-access/access";
-import {
-  admitPantryExecutionBilling,
-  markPantryExecutionDispatched,
-  readPantryExecutionAdmissionBinding,
-  reconcilePantryExecutionBilling,
-  retainPantryExecutionUncertainty,
-} from "../../account-platform/execution-billing";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import {
   createSessionGoalExecution,
@@ -267,13 +260,6 @@ export class SessionHarnessTurns {
       this.shared.ctx.storage,
       resolved.value,
     );
-    if (ended.ok)
-      this.shared.ctx.waitUntil(
-        reconcilePantryExecutionBilling({
-          env: this.shared.env,
-          storage: this.shared.ctx.storage,
-        }),
-      );
     if (ended.ok) await this.shared.releaseEndedExecutions();
     return ended;
   }
@@ -331,8 +317,8 @@ export class SessionHarnessTurns {
    * A caller that resolves the turn's connector catalog in the same call
    * gives it here. The context capability is then decided against the
    * authority of that catalog, with no second read of the grants.
-   * This input read can reuse the catalog's account answer. Execution checks
-   * around billing still use the scope's live account access.
+   * This input read can reuse the catalog's account answer. The execution
+   * checks around the dispatch still use the scope's live access.
    */
   async readCanonicalEmbeddedHarnessInput(input: {
     execution: SessionExecutionAdmission;
@@ -1076,17 +1062,7 @@ export class SessionHarnessTurns {
           Date.now(),
         );
         if (!authorized.ok) return authorized;
-        // The authority check runs beside the reads of the account binding
-        // and fee policy, which have no effect. Billing writes and reserves
-        // only after the check passes.
-        const [active, billingBinding] = await Promise.all([
-          input.execution.isTurnActive(input.lease),
-          readPantryExecutionAdmissionBinding(
-            { env: this.shared.env, storage: this.shared.ctx.storage },
-            input.lease,
-          ),
-        ]);
-        if (!active)
+        if (!(await input.execution.isTurnActive(input.lease)))
           return {
             ok: false,
             error: { code: "embedded_harness_model_authority_unavailable" },
@@ -1102,34 +1078,6 @@ export class SessionHarnessTurns {
         ) {
           return { ok: false, error: { code: "budget_reservation_conflict" } };
         }
-        if (!billingBinding.ok) return billingBinding;
-        const billing = await admitPantryExecutionBilling(
-          { env: this.shared.env, storage: this.shared.ctx.storage },
-          {
-            lease: input.lease,
-            binding: billingBinding.value,
-            modelRoute,
-            modelRouteDigest: binding.value.binding.modelRouteDigest,
-            continuation:
-              input.runtime.kind === "resume_turn" ? "resume_turn" : "fresh",
-          },
-        );
-        if (!billing.ok) return billing;
-        // Account admission can wait. Check current execution authority again at dispatch.
-        if (!(await input.execution.isTurnActive(input.lease)))
-          return {
-            ok: false,
-            error: { code: "embedded_harness_model_authority_unavailable" },
-          };
-        if (
-          Date.now() >= budgetAccount.value.reservation.reservation.deadlineAt
-        )
-          return { ok: false, error: { code: "budget_reservation_conflict" } };
-        const dispatched = markPantryExecutionDispatched(
-          this.shared.ctx.storage.sql,
-          input.lease.turn.turnId,
-        );
-        if (!dispatched.ok) return dispatched;
         const starting = runtime.value.startTurn(harnessInput.value);
         const started = await starting.completion;
         if (!started.ok) return started;
@@ -1212,10 +1160,6 @@ export class SessionHarnessTurns {
           },
         };
       } finally {
-        retainPantryExecutionUncertainty(
-          this.shared.ctx.storage.sql,
-          input.lease.turn.turnId,
-        );
         if (
           this.shared.activeEmbeddedHarnessTurn?.leaseId === input.lease.leaseId
         ) {

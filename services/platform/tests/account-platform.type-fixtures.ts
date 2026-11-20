@@ -1,12 +1,6 @@
 import type { OrganisationUserAuthority } from "../src/organisation-access/access";
 import { AccountServiceGrantAcceptance } from "../src/account-platform/service-membership";
-import type {
-  AccountFundsReservation,
-  AccountUsageRequest,
-} from "../src/account-platform/types";
 
-declare const reserved: Extract<AccountFundsReservation, { kind: "reserved" }>;
-declare const completedUsage: Extract<AccountUsageRequest, { quantity: 1 }>;
 declare const nativeSession: Extract<
   OrganisationUserAuthority,
   { kind: "authenticated_session" }
@@ -14,24 +8,6 @@ declare const nativeSession: Extract<
 
 // @ts-expect-error Only actual shared invitation acceptance can construct this receipt.
 export const constructedServiceAcceptance = new AccountServiceGrantAcceptance();
-
-// @ts-expect-error A reserved hold cannot carry a settled charge through a spread.
-export const reservedWithCharge: AccountFundsReservation = {
-  ...reserved,
-  chargeId: "charge_fixture",
-};
-
-// @ts-expect-error A completed outcome always has quantity one.
-export const completedWithoutQuantity: AccountUsageRequest = {
-  ...completedUsage,
-  quantity: 0,
-};
-
-// @ts-expect-error A cancellation cannot carry a completed-turn quantity.
-export const chargedCancellation: AccountUsageRequest = {
-  ...completedUsage,
-  evidence: { ...completedUsage.evidence, terminalOutcome: "cancelled" },
-};
 
 const mixedNativeOrigin = {
   ...nativeSession,
@@ -68,7 +44,6 @@ export const invalidMembershipAvailability: import("@purin-labs/control-api").Co
 import type {
   OrganizationMembership,
   OrganizationInvitation,
-  PlatformUsageReceiptV1,
 } from "@seams-internal/console-shared/accountPlatform";
 declare const sharedOwner: Extract<
   OrganizationMembership,
@@ -77,10 +52,6 @@ declare const sharedOwner: Extract<
 declare const sharedInvitation: Extract<
   OrganizationInvitation,
   { kind: "pending"; role: "ADMIN" }
->;
-declare const noCharge: Extract<
-  PlatformUsageReceiptV1,
-  { kind: "recorded_without_charge" }
 >;
 
 // @ts-expect-error An owner cannot enter the suspended membership branch through a spread.
@@ -94,10 +65,4 @@ export const pendingAndAccepted: OrganizationInvitation = {
   ...sharedInvitation,
   membershipId: "member",
   acceptedAt: "2026-10-16T00:00:00.000Z",
-};
-// @ts-expect-error A no-charge receipt cannot carry financial charge fields.
-export const noChargeWithAmount: PlatformUsageReceiptV1 = {
-  ...noCharge,
-  amountMinor: 1,
-  priceVersion: "unsupported-charge",
 };

@@ -13,11 +13,6 @@ import {
 import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { typeSafeMonth } from "../../src/integrations/typesafe/usage-store";
-import {
-  ensureJevPaidHold,
-  jevMonthChargeMinor,
-  JEV_PRICE,
-} from "../../src/jev-features/paid-use";
 import { createAccessGrant } from "../../src/data/access-grants";
 import {
   bootstrapOrganisation,
@@ -36,12 +31,7 @@ import { requireVaultHandle } from "../test-ids";
 import { commerceClient } from "./commerce-support";
 import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  accountFixtureJson,
-  addNativeServiceMember,
-  attachSharedAccountNativeOrganisation,
-  fixtureRows,
-} from "./shared-account-platform-fixture";
+import { addNativeServiceMember } from "./shared-account-platform-fixture";
 import { controlFetch } from "./chat-journey-support";
 
 const SATYR_KEY = "typesafe-satyr-e2e-key-0000000000";
@@ -81,11 +71,6 @@ async function allowanceJourney(): Promise<void> {
   });
   const calls = installFakes(held);
   const { organisationId, owner, accountId } = await shop("p88-allowance");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   await change(organisationId, owner.session, {
     feature: "mail_classification",
     enabled: true,
@@ -173,7 +158,7 @@ function seedPantryUse(
 }
 
 it(
-  "J4: a closed hour of Jev use on Satyr's key reaches the Account Platform meter once for each feature, with the exact token total, and a repeated delivery adds nothing",
+  "J4: a closed hour of Jev use on Pantry's key becomes one record for each feature, with the exact token total",
   recordsJourney,
   120_000,
 );
@@ -182,12 +167,7 @@ const HOUR_MS = 3_600_000;
 
 async function recordsJourney(): Promise<void> {
   installFakes();
-  const { organisationId, owner } = await shop("p88-records");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
+  const { organisationId } = await shop("p88-records");
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId,
@@ -201,46 +181,13 @@ async function recordsJourney(): Promise<void> {
   );
   expect(await runDurableObjectAlarm(organisation)).toBe(true);
 
-  const jevEvents = async () =>
-    fixtureRows(
-      await accountFixtureJson("snapshot", { version: 1 }),
-      "billing_usage_events",
-    ).filter((row) => row.meter_id === "satyr.jev_input_tokens");
-  const recorded = await jevEvents();
   // One record for each feature: mail 120 + 30, related Cases 70. The call on
-  // the Organisation's own key in the same hour is not Pantry's use.
-  expect(
-    recorded
-      .map((row) => ({
-        feature: featureOf(row),
-        quantity: row.quantity,
-        unit: row.unit,
-      }))
-      .sort((a, b) => a.feature.localeCompare(b.feature)),
-  ).toEqual([
-    { feature: "mail_classification", quantity: 150, unit: "input_token" },
-    { feature: "related_cases", quantity: 70, unit: "input_token" },
-  ]);
+  // the Organisation's own key in the same hour is not Pantry's use. Pantry
+  // sends no hour to a meter until its own billing (Plan 95 step 6).
   expect(await runInDurableObject(organisation, readHours)).toEqual([
-    { feature: "mail_classification", state: "recorded" },
-    { feature: "related_cases", state: "recorded" },
+    { feature: "mail_classification", inputTokens: 150, state: "not_billed" },
+    { feature: "related_cases", inputTokens: 70, state: "not_billed" },
   ]);
-
-  // A repeated delivery of the same hours adds nothing on the meter.
-  await runInDurableObject(organisation, redeliverHours);
-  expect(await runDurableObjectAlarm(organisation)).toBe(true);
-  expect(await jevEvents()).toHaveLength(2);
-  expect(await runInDurableObject(organisation, readHours)).toEqual([
-    { feature: "mail_classification", state: "recorded" },
-    { feature: "related_cases", state: "recorded" },
-  ]);
-}
-
-function featureOf(row: Record<string, unknown>): string {
-  const payload: unknown = JSON.parse(String(row.payload_json));
-  if (!isRecord(payload) || !isRecord(payload.evidence))
-    throw new Error("Invalid Jev usage event");
-  return String(payload.evidence.feature);
 }
 
 async function seedHourLedger(
@@ -252,7 +199,12 @@ async function seedHourLedger(
   const rows: readonly [string, string, string, number][] = [
     ["mail_classification", "hour-mail-1", "satyr_platform", 120],
     ["mail_classification", "hour-mail-2", "satyr_platform", 30],
-    ["case_context_discovery_relationship", "hour-related-1", "satyr_platform", 70],
+    [
+      "case_context_discovery_relationship",
+      "hour-related-1",
+      "satyr_platform",
+      70,
+    ],
     ["mail_classification", "hour-own-key", "organisation_byo", 500],
   ];
   for (const [purpose, evaluationId, funding, tokens] of rows) {
@@ -283,42 +235,30 @@ async function seedHourLedger(
 function readHours(
   _actor: unknown,
   state: DurableObjectState,
-): readonly { feature: string; state: string }[] {
+): readonly { feature: string; inputTokens: number; state: string }[] {
   return state.storage.sql
-    .exec<{ feature: string; state: string }>(
-      "SELECT feature, state FROM jev_usage_hour ORDER BY feature",
+    .exec<{ feature: string; input_tokens: number; state: string }>(
+      "SELECT feature, input_tokens, state FROM jev_usage_hour ORDER BY feature",
     )
     .toArray()
-    .map((row) => ({ feature: row.feature, state: row.state }));
-}
-
-/** Fault: the Actor lost the receipt of its delivery and sends the hours again. */
-async function redeliverHours(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  state.storage.sql.exec(
-    "UPDATE jev_usage_hour SET state = 'pending', outcome = NULL, due_at = 0",
-  );
-  await state.storage.setAlarm(Date.now() + HOUR_MS);
+    .map((row) => ({
+      feature: row.feature,
+      inputTokens: row.input_tokens,
+      state: row.state,
+    }));
 }
 
 it(
-  "J7: above the free use the owner turns on paid use; a call runs against a feature-hour hold, the spending limit stops the next one, an admin cannot turn it on, and the hourly record charges the exact price",
-  paidUseJourney,
+  "J7: paid use is closed until Pantry bills through Stripe: above the free use a call stops, and neither an admin nor the owner can turn paid use on",
+  paidUseClosedJourney,
   120_000,
 );
 
-async function paidUseJourney(): Promise<void> {
+async function paidUseClosedJourney(): Promise<void> {
   const calls = installFakes(Promise.resolve(), 10_000);
   const { organisationId, owner, accountId } = await shop("p88-paid-use");
   const admin = await commerceClient("p88-paid-use-admin");
   await addNativeServiceMember(organisationId, admin, "admin");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: admin },
-  });
   await change(organisationId, owner.session, {
     feature: "mail_classification",
     enabled: true,
@@ -328,28 +268,22 @@ async function paidUseJourney(): Promise<void> {
     organisationId,
     now: Date.now(),
   });
-  // Seed: earlier related Cases use of this month on Pantry's key. It used the
-  // free use and 50,000 tokens more (cost rounds up for each call).
-  const earlierTokens = JEV_PRICE.includedUnits + 50_000;
+  // Seed: earlier related Cases use of this month on Pantry's key, 50,000
+  // tokens above the free use.
   await runInDurableObject(
     organisation,
-    seedTokenUse.bind(null, organisationId, "earlier-paid", earlierTokens),
+    seedTokenUse.bind(null, organisationId, "earlier-paid", 23_859_523),
   );
 
-  // The free use is used and paid use is off: the call stops before TypeSafe.
+  // The free use is used: the call stops before TypeSafe.
   const stopped = await preview(organisationId, owner.session, accountId);
   expect(await stopped.text()).toContain("allowance_reached");
   expect(calls).toEqual([]);
   const before = await features(organisationId, owner.session);
   expect(before.allowance?.reached).toBe(true);
-  expect(before.paidUse).toEqual({
-    enabled: false,
-    spendingLimitMinor: 500,
-    spentMinor: jevMonthChargeMinor(earlierTokens),
-    priced: true,
-  });
+  expect(before.paidUse).toMatchObject({ enabled: false, priced: false });
 
-  // An admin who is not the owner cannot turn on paid use.
+  // Denied: an admin who is not the owner.
   const refused = await controlFetch(
     organisationId,
     admin.session,
@@ -357,108 +291,23 @@ async function paidUseJourney(): Promise<void> {
     { enabled: true, spendingLimitMinor: 500 },
   );
   expect(refused.status).toBe(404);
-  expect((await features(organisationId, owner.session)).paidUse.enabled).toBe(
-    false,
-  );
-
-  // The owner turns on paid use with a spending limit of 1 cent.
-  const turnedOn = await controlFetch(
-    organisationId,
-    owner.session,
-    "jev-features/paid-use",
-    { enabled: true, spendingLimitMinor: 1 },
-  );
-  const turnedOnBody: unknown = await turnedOn.json();
-  expect(turnedOn.status, JSON.stringify(turnedOnBody)).toBe(200);
-  if (!isRecord(turnedOnBody)) throw new Error("Invalid paid use answer");
-  expect(parseJevFeaturesView(turnedOnBody.value).paidUse).toMatchObject({
-    enabled: true,
-    spendingLimitMinor: 1,
-  });
-
-  // The next call runs against a 5-cent hold for its feature-hour.
-  const paid = await preview(organisationId, owner.session, accountId, ["m2"]);
-  expect(paid.status, await paid.clone().text()).toBe(200);
-  expect(calls).toEqual([{ key: SATYR_KEY, purpose: "mail" }]);
-  const holds = fixtureRows(
-    await accountFixtureJson("snapshot", { version: 1 }),
-    "billing_funds_reservations",
-  ).filter((row) => String(row.execution_id).includes("satyr_jev"));
-  expect(holds).toHaveLength(1);
-  expect(holds[0]).toMatchObject({ requested_minor: 5, status: "reserved" });
-
-  // 60,000 tokens above the free tokens with one more call's reservation pass
-  // 1 cent: the spending limit stops the next call before TypeSafe.
-  const limited = await preview(organisationId, owner.session, accountId, [
-    "m3",
-  ]);
-  expect(await limited.text()).toContain("spending_limit_reached");
-  expect(calls).toHaveLength(1);
-  expect((await features(organisationId, owner.session)).paidUse).toMatchObject(
-    {
-      enabled: true,
-      spendingLimitMinor: 1,
-      spentMinor: jevMonthChargeMinor(earlierTokens + 10_000),
-    },
-  );
-}
-
-it(
-  "J7: the hourly record of a paid feature-hour settles its hold for the exact price of the tokens above the free use",
-  paidHourJourney,
-  120_000,
-);
-
-async function paidHourJourney(): Promise<void> {
-  installFakes();
-  const { organisationId, owner } = await shop("p88-paid-hour");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
-  const turnedOn = await controlFetch(
+  // Denied: the owner too, while paid use is closed.
+  const closed = await controlFetch(
     organisationId,
     owner.session,
     "jev-features/paid-use",
     { enabled: true, spendingLimitMinor: 500 },
   );
-  expect(turnedOn.status, await turnedOn.clone().text()).toBe(200);
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
-  // A closed hour: product code holds its feature-hour as it would have then,
-  // and the seeded ledger of that hour holds 200,000 tokens above the free use.
-  const closedHour = Math.floor(Date.now() / HOUR_MS) * HOUR_MS - 2 * HOUR_MS;
-  const hourTokens = JEV_PRICE.includedUnits + 200_000;
-  await runInDurableObject(
-    organisation,
-    holdAndSeedPaidHour.bind(null, organisationId, closedHour, hourTokens),
+  expect(closed.status).toBe(409);
+  expect(await closed.text()).toContain("jev_paid_use_closed");
+
+  // The next call stops too, and paid use stays off.
+  const still = await preview(organisationId, owner.session, accountId, ["m2"]);
+  expect(await still.text()).toContain("allowance_reached");
+  expect(calls).toEqual([]);
+  expect((await features(organisationId, owner.session)).paidUse.enabled).toBe(
+    false,
   );
-  expect(await runDurableObjectAlarm(organisation)).toBe(true);
-  const snapshot = await accountFixtureJson("snapshot", { version: 1 });
-  const jevCharges = (
-    Array.isArray(snapshot.charges) ? snapshot.charges : []
-  ).filter(
-    (charge): charge is Record<string, unknown> =>
-      isRecord(charge) && charge.meterId === "satyr.jev_input_tokens",
-  );
-  expect(jevCharges).toEqual([
-    expect.objectContaining({
-      amountMinor: jevMonthChargeMinor(hourTokens),
-      quantity: hourTokens,
-      unit: "input_token",
-      priceVersion: JEV_PRICE.version,
-    }),
-  ]);
-  expect(jevMonthChargeMinor(hourTokens)).toBe(2);
-  const hold = fixtureRows(snapshot, "billing_funds_reservations").filter(
-    (row) => String(row.execution_id).includes("satyr_jev"),
-  );
-  expect(hold).toHaveLength(1);
-  expect(hold[0]).toMatchObject({ status: "settled" });
 }
 
 /** One settled Pantry-funded related Cases row with a token total, this month. */
@@ -490,51 +339,11 @@ function seedTokenUse(
   );
 }
 
-async function holdAndSeedPaidHour(
-  organisationId: OrganisationId,
-  hourStart: number,
-  tokens: number,
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  await ensureJevPaidHold({
-    sql: state.storage.sql,
-    env,
-    organisationId,
-    purpose: "mail_classification",
-    freeUseCovers: false,
-    now: hourStart + 60_000,
-  });
-  const at = hourStart + 120_000;
-  state.storage.sql.exec(
-    `INSERT INTO typesafe_evaluation (
-      organisation_id, purpose, evaluation_id, request_digest, policy_revision, funding,
-      connection_revision, disclosure_decision_digest, input_bytes, reserved_input_tokens,
-      reserved_wall_ms, reserved_cost_microusd, estimated_cost_microusd, input_tokens,
-      output_tokens, reserved_at, expires_at, state, settlement_state, failure_code
-    ) VALUES (?, 'mail_classification', 'paid-hour-mail', ?, 1, 'satyr_platform', NULL, ?,
-      100, 100, 1000, 3000, ?, ?, 0, ?, ?, 'evaluated', 'settled', NULL)`,
-    organisationId,
-    "a".repeat(64),
-    "b".repeat(64),
-    Math.ceil(tokens * 0.042),
-    tokens,
-    at,
-    at + 10_000,
-  );
-  await state.storage.setAlarm(Date.now() + HOUR_MS);
-}
-
 async function noKeyJourney(): Promise<void> {
   const calls = installFakes();
   const { organisationId, owner, accountId } = await shop("p88-no-key");
   const operator = await commerceClient("p88-no-key-operator");
   await addNativeServiceMember(organisationId, operator, "operator");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator },
-  });
 
   // J1: no key of its own; Pantry's key funds Jev, and every switch starts off.
   const initial = await features(organisationId, owner.session);
@@ -667,11 +476,6 @@ async function noKeyJourney(): Promise<void> {
 async function ownKeyJourney(): Promise<void> {
   const calls = installFakes();
   const { organisationId, owner, accountId } = await shop("p88-own-key");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   await change(organisationId, owner.session, {
     feature: "mail_classification",
     enabled: true,
@@ -874,7 +678,10 @@ async function shop(name: string): Promise<{
     `policy:${organisationId}:latest`,
     JSON.stringify(policy),
   );
-  await env.POLICY_KV.put(`policy:${organisationId}:v1`, JSON.stringify(policy));
+  await env.POLICY_KV.put(
+    `policy:${organisationId}:v1`,
+    JSON.stringify(policy),
+  );
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId,

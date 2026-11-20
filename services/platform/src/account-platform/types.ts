@@ -6,9 +6,8 @@ import {
 import {
   readPlatformScopeV1 as parseAccountScope,
   platformScopeFieldsEqual as sameAccountScope,
-  readFundsReservationV1 as readAccountFundsReservation,
+  readSatyrFeePolicyV1 as parsePantryFeePolicy,
   readServiceIdentityResolutionV1,
-  readPlatformUsageReceiptV1 as readAccountUsageReceipt,
   readLinkedServiceUserV1 as readLinkedUser,
   type PlatformScopeFieldsV1 as AccountScope,
   type SatyrFeePolicyV1 as PantryFeePolicy,
@@ -17,16 +16,7 @@ import {
   type PlatformIdentityLinkV1,
   type PlatformPrincipalV1,
   type ServiceIdentityResolutionV1,
-  type PlatformScopeV1,
-  type FundsReservationV1,
-  type ReserveFundsRequestV1,
-  type MarkFundsIndeterminateRequestV1,
-  type FundsTerminalDeliveryDataV1 as AccountTerminalDelivery,
-  type SatyrFundingSelectionV1 as AccountExecutionFunding,
-  type PlatformUsageEventDataV1,
-  type SatyrTurnUsageV1 as PantryTurnUsageV1,
-  type SatyrJevInputTokensUsageV1 as PantryJevInputTokensUsageV1,
-  type PlatformUsageReceiptV1 as AccountUsageReceipt,
+  type DurableSourceEvidenceV1 as AccountSourceEvidence,
 } from "@seams-internal/console-shared/accountPlatform";
 import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
@@ -36,17 +26,14 @@ export {
   accountText,
   parseAccountScope,
   sameAccountScope,
-  readAccountFundsReservation,
-  readAccountUsageReceipt,
+  parsePantryFeePolicy,
   readLinkedUser,
 };
 export type {
   AccountScope,
   AccountPlatformError,
   LinkedPantryAccountUser,
-  AccountTerminalDelivery,
-  AccountExecutionFunding,
-  AccountUsageReceipt,
+  AccountSourceEvidence,
 };
 
 export type PantryAccountBinding = Readonly<{
@@ -57,9 +44,6 @@ export type PantryAccountBinding = Readonly<{
   deploymentId: string;
   feePolicy: PantryFeePolicy;
 }>;
-type StoredAccountScope<T> = T extends { readonly scope: PlatformScopeV1 }
-  ? Omit<T, "scope"> & { readonly scope: AccountScope }
-  : never;
 export type AccountPrincipal =
   | Variant<PlatformPrincipalV1, "automation">
   | (Omit<Variant<PlatformPrincipalV1, "user">, "identity"> & {
@@ -72,24 +56,6 @@ export type AccountIdentityResolution = Omit<
   Pick<ServiceIdentityResolutionV1, keyof ServiceIdentityResolutionV1>,
   "principal"
 > & { readonly principal: AccountPrincipal };
-export type AccountFundsReservation = StoredAccountScope<FundsReservationV1>;
-export type AccountReserveRequest = Pick<
-  ReserveFundsRequestV1,
-  keyof ReserveFundsRequestV1
->;
-export type AccountIndeterminateRequest = Pick<
-  MarkFundsIndeterminateRequestV1,
-  keyof MarkFundsIndeterminateRequestV1
->;
-/** One Pantry turn on the test meter. */
-type AccountTurnUsageRequest = PlatformUsageEventDataV1 &
-  PantryTurnUsageV1;
-/** One UTC hour of Jev input tokens for one feature (Plan 88). */
-type AccountJevUsageRequest = PlatformUsageEventDataV1 &
-  PantryJevInputTokensUsageV1;
-export type AccountUsageRequest =
-  AccountTurnUsageRequest | AccountJevUsageRequest;
-
 export function accountInteger(input: unknown, minimum = 0): number {
   return integer(input, "account integer", minimum);
 }

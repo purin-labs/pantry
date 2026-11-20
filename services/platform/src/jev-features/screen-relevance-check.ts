@@ -1,7 +1,6 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { ScreenRelevanceBand } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
-import type { AccountPlatformBindings } from "../account-platform/config";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import { newRequestId, type OrganisationId } from "../ids";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
@@ -15,8 +14,6 @@ import { traceLog } from "../observability";
 import { FlowLabel } from "../policy/information-flow/labels";
 import type { SerializedFlowLabel } from "../policy/information-flow/types";
 import type { Result } from "../result";
-import { jevFreeUseCovers } from "./limits";
-import { ensureJevPaidHold } from "./paid-use";
 import {
   insertScreenRelevanceRecord,
   readJevScreenRelevanceSwitch,
@@ -103,7 +100,6 @@ function screenRelevanceBand(
 export async function runScreenRelevanceCheck(
   input: Readonly<{
     sql: SqlStorage;
-    env: AccountPlatformBindings;
     transaction: SchemaTransaction;
     credential: TypeSafeCredential | null;
     request: ScreenRelevanceCheckInput;
@@ -137,21 +133,6 @@ export async function runScreenRelevanceCheck(
         ? "disclosure_denied"
         : "jev_failed",
     );
-  const now = Date.now();
-  // Above the free use, paid use holds this feature-hour first (Plan 88).
-  await ensureJevPaidHold({
-    sql: input.sql,
-    env: input.env,
-    organisationId: request.organisationId,
-    purpose: "screen_relevance",
-    freeUseCovers: jevFreeUseCovers(
-      input.sql,
-      request.organisationId,
-      SCREEN_RELEVANCE_LIMITS.reservationMicrousd,
-      now,
-    ),
-    now,
-  });
   const key = {
     organisationId: request.organisationId,
     purpose: "screen_relevance" as const,
