@@ -11,11 +11,12 @@ The counts are from 2026-11-20. Run the commands again before a removal.
 Delete `services/platform/src/shopify/`: the connector, the webhooks, the action
 execution, the provider adapter (`provider-adapter.ts`), the connection workflow
 (`connection-workflow.ts`), the location observation (`location-observation.ts`) and
-the queue message (`queue-messages.ts`).
+the queue message (`queue-messages.ts`), the connection check
+(`connection-observation.ts`) and the credential check (`credential-replacement.ts`).
 
 ## 2. The files that import this folder
 
-Ten source files outside the folder import it. Remove the Shopify lines in each one.
+Nine source files outside the folder import it. Remove the Shopify lines in each one.
 
 | File                                                                                                        | What it uses                                                            |
 | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -25,12 +26,11 @@ Ten source files outside the folder import it. Remove the Shopify lines in each 
 | `gateway/support.ts`                                                                                        | The queue message for a webhook                                         |
 | `actors/organisation.ts`, `actors/organisation/schema.ts`, `actors/organisation/organisation-actor-base.ts` | The location observation that the Organisation actor holds              |
 | `commerce/provider-execution.ts`                                                                            | The execution of a commerce action on Shopify                           |
-| `provider-lifecycle/credential-replacement.ts`                                                              | The identity read of a replaced credential                              |
-| `provider-workflows/observation.ts`                                                                         | The admin domain check and the webhook registration                     |
+| `provider-lifecycle/credential-replacement.ts`                                                              | One `case` line for the check of a replaced credential                  |
 
-The last three are direct calls, not registrations. Step A2.5 puts them behind the
-`CommerceProvider` port and the provider adapter interface. After that, a removal
-changes only the registration files.
+`commerce/provider-execution.ts` is the one direct call that is not a registration.
+Step A2.5 puts it behind the `CommerceProvider` port. After that, a removal changes
+only registration lines.
 
 Find the importers again:
 

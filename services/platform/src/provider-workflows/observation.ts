@@ -14,10 +14,7 @@ import {
   stripeCredentialEnvironment,
   verifyStripeConnectWebhook,
 } from "../provider-adapters/stripe";
-import { isShopifyAdminDomain } from "../shopify/auth";
-import { registerShopifyWebhooks } from "../shopify/connector/webhook-registration";
 import type { ProviderObservationRequest } from "../provider-adapters/domain";
-import { providerIngressOrigin } from "../provider-lifecycle/authorization";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { linkStripePaymentAccount } from "../commerce/stripe-link";
 import { resolveCommerceMerchant } from "../commerce/square-link";
@@ -27,7 +24,7 @@ export type { ProviderObservationRequest } from "../provider-adapters/domain";
 export async function observeSlackConnection(
   input: ProviderObservationRequest,
 ): Promise<ProviderManifestEvidence> {
-  const bearer = await resolveObservationBearer(input, "slack");
+  const bearer = await resolveSlackObservationBearer(input);
   if (bearer === null || input.env.SLACK_SIGNING_SECRET === undefined) {
     return blockedEvidence("provider_credential_unavailable", [
       "reconnect_provider",
@@ -89,35 +86,6 @@ export async function observeStripeConnection(
   return { kind: "healthy", evidenceCode: "provider_webhook_verified" };
 }
 
-export async function observeShopifyConnection(
-  input: ProviderObservationRequest,
-): Promise<ProviderManifestEvidence> {
-  const bearer = await resolveObservationBearer(input, "shopify");
-  if (bearer === null || !isShopifyAdminDomain(input.providerAccountId)) {
-    return blockedEvidence("provider_credential_unavailable", [
-      "reconnect_provider",
-    ]);
-  }
-  const registration = await registerShopifyWebhooks({
-    shopDomain: input.providerAccountId,
-    accessToken: bearer,
-    endpointUrl: `${providerIngressOrigin(input.env)}/hook/shopify/${input.organisationId}`,
-    fetcher: input.fetcher,
-  });
-  if (!registration.ok) {
-    return blockedEvidence("provider_webhook_unhealthy", [
-      "repair_provider_webhook",
-    ]);
-  }
-  return registration.value.ordersCreate.kind === "unavailable"
-    ? {
-        kind: "degraded",
-        missingOptionalCapabilities: ["orders/create"],
-        repairActions: ["repair_provider_webhook"],
-      }
-    : { kind: "healthy", evidenceCode: "provider_webhook_verified" };
-}
-
 function observationUnsupported(): ProviderManifestEvidence {
   return { kind: "observation_unsupported" };
 }
@@ -128,33 +96,43 @@ export function observeUnsupportedConnection(
   return Promise.resolve(observationUnsupported());
 }
 
-async function resolveObservationBearer(
+async function resolveSlackObservationBearer(
   input: ProviderObservationRequest,
-  provider: "slack" | "shopify",
 ): Promise<string | null> {
   if (input.credentialRef === null) {
     return null;
   }
-  if (provider === "slack") {
-    const installationIdentity = resolveConfiguredSlackInstallationIdentity({
-      deploymentProfile: input.env.PANTRY_DEPLOYMENT_PROFILE,
-      appId: input.env.SLACK_APP_ID,
-    });
-    const workspaceId = parseWorkspaceId(input.providerAccountId);
-    if (!installationIdentity.ok || !workspaceId.ok) {
-      return null;
-    }
-    const credential = await resolveSlackHealthCheckCredential({
-      env: input.env,
-      keys: input.env,
-      installationIdentity: installationIdentity.value,
-      organisationId: input.organisationId,
-      integrationAccountId: input.integrationAccountId,
-      workspaceId: workspaceId.value,
-    });
-    return credential.ok && credential.value.kind === "bearer"
-      ? credential.value.value
-      : null;
+  const installationIdentity = resolveConfiguredSlackInstallationIdentity({
+    deploymentProfile: input.env.PANTRY_DEPLOYMENT_PROFILE,
+    appId: input.env.SLACK_APP_ID,
+  });
+  const workspaceId = parseWorkspaceId(input.providerAccountId);
+  if (!installationIdentity.ok || !workspaceId.ok) {
+    return null;
+  }
+  const credential = await resolveSlackHealthCheckCredential({
+    env: input.env,
+    keys: input.env,
+    installationIdentity: installationIdentity.value,
+    organisationId: input.organisationId,
+    integrationAccountId: input.integrationAccountId,
+    workspaceId: workspaceId.value,
+  });
+  return credential.ok && credential.value.kind === "bearer"
+    ? credential.value.value
+    : null;
+}
+
+/**
+ * The bearer token of a provider whose credential is in the Vault, for a
+ * provider module that checks its own connection. Null when there is none.
+ */
+export async function resolveStoredObservationBearer(
+  input: ProviderObservationRequest,
+  provider: "shopify",
+): Promise<string | null> {
+  if (input.credentialRef === null) {
+    return null;
   }
   const credential = await resolveProviderManifestCredential({
     db: input.scope.database,
@@ -216,7 +194,7 @@ function traceSlackFailure(
   }
 }
 
-function blockedEvidence(
+export function blockedEvidence(
   reasonCode: string,
   repairActions: readonly string[],
 ): ProviderManifestEvidence {

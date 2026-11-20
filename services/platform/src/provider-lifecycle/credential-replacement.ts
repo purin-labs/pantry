@@ -5,7 +5,7 @@ import type {
   CredentialRotationFailureCode,
 } from "../data/credential-lifecycle";
 import { validateExternalProviderToken } from "../external-records/records";
-import { discoverShopifyIdentity } from "../shopify/provider-adapter";
+import { validateShopifyReplacementCredential } from "../shopify/credential-replacement";
 import {
   discoverStripeAccount,
   stripeCredentialEnvironment,
@@ -42,23 +42,8 @@ export async function validateReplacementCredential(
         ? { ok: true }
         : { ok: false, failureCode: "replacement_validation_failed" };
     }
-    case "shopify": {
-      const discovered = await discoverShopifyIdentity({
-        fetcher: runtimeFetch,
-        shopDomain: rotation.connection.providerSubjectId,
-        accessToken: replacementSecret,
-      });
-      if (!discovered.ok)
-        return { ok: false, failureCode: "replacement_validation_failed" };
-      if (discovered.value.environment !== rotation.connection.environment) {
-        return { ok: false, failureCode: "replacement_environment_mismatch" };
-      }
-      return discovered.value.myshopifyDomain ===
-        rotation.connection.providerSubjectId ||
-        discovered.value.shopId === rotation.connection.providerSubjectId
-        ? { ok: true }
-        : { ok: false, failureCode: "replacement_identity_mismatch" };
-    }
+    case "shopify":
+      return validateShopifyReplacementCredential(rotation, replacementSecret);
     case "airtable":
     case "notion": {
       const discovered = await validateExternalProviderToken({

@@ -9,7 +9,10 @@ import {
   gmailOnboardingAdapter,
 } from "./gmail";
 import { notionCleanupAdapter, notionOnboardingAdapter } from "./notion";
-import { shopifyCleanupAdapter, shopifyOnboardingAdapter } from "../shopify/provider-adapter";
+import {
+  shopifyCleanupAdapter,
+  shopifyOnboardingAdapter,
+} from "../shopify/provider-adapter";
 import { slackCleanupAdapter, slackOnboardingAdapter } from "./slack";
 import {
   readSquareConfiguration,
@@ -20,11 +23,11 @@ import { stripeCleanupAdapter, stripeOnboardingAdapter } from "./stripe";
 import { whatsappCleanupAdapter, whatsappOnboardingAdapter } from "./whatsapp";
 import {
   observeUnsupportedConnection,
-  observeShopifyConnection,
   observeSlackConnection,
   observeStripeConnection,
   type ProviderObservationRequest,
 } from "../provider-workflows/observation";
+import { observeShopifyConnection } from "../shopify/connection-observation";
 import {
   parseProviderOnlyCleanup,
   parseWhatsAppCleanup,
