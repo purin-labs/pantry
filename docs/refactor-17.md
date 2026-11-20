@@ -413,6 +413,24 @@ A declaration merge gives each module the full type of an Actor without an impor
 The lint does not see that link. It ends in step A1.9, when each module declares
 the RPC interface of its part of an Actor.
 
+**20 November 2026. The module `connections` has its files** (the first part of step
+A1.8), on the branch `refactor-17-a1-8`. No code changed: the map changed.
+
+- `foundation/connections` holds the records of a connection: the integration
+  account, the provider attempt, the authorization state and the provider resource
+  (8 files, 6,200 lines). They import no area, apart from the 4 imports below.
+- It owns 13 tables, among them `integration_account`, `provider_connection` and
+  `provider_credential_generation`.
+- It sits below `authority` in the foundation order, because the access model and
+  the Vault read these records.
+- The map now shows 1,294 crossings, where it showed 1,315. An import of the account
+  record from an area or from `authority` goes down now. The table count went up
+  from 126 to 144: 5 modules write `integration_account`, and the map shows that
+  now.
+- What stays for step A1.8: `connections` imports the onboarding support of the
+  area `organisation` (1 import, and 12 writes of `organisation_onboarding`), the
+  handle type of the Vault (1), and `tenancy` imports the account record (1).
+
 The step is smaller than its first description. A count with the type checker gave
 the reason: callers use 245 methods of the four Actors at 440 places, in about 130
 files. An interface for each module is a larger piece of work, and it belongs with the
