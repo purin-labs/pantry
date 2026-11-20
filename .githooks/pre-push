@@ -1,0 +1,8 @@
+#!/bin/sh
+# Runs the lints that need only the git tree, before a push (Refactor 17,
+# step A0.1). It takes about 20 seconds.
+#
+# The hook is off until a person turns it on for a clone:
+#   git config core.hooksPath .githooks
+# The setting is shared by every worktree of that clone.
+exec pnpm -s lint:source

@@ -74,9 +74,6 @@ jobs:
           sha256sum "$account_worker"
           printf 'PANTRY_ACCOUNT_WORKER_ARTIFACT=%s\n' "$account_worker" >> "$GITHUB_ENV"
 
-      - name: Check shared helpers are not copied
-        run: pnpm check:shared-helpers
-
       - name: Check shared async-control package
         run: pnpm async-control:check
 
@@ -90,20 +87,10 @@ jobs:
         # Every shared package, Punter and the storefront, with the contracts.
         run: pnpm check:packages
 
-      - name: Runtime boundary between Pantry and Commerce
-        run: pnpm lint:runtime-boundary
-
-      - name: Information-flow boundary ownership
-        run: pnpm lint:ifc-boundaries
-
-      - name: Portal dropdowns use Select
-        run: pnpm lint:portal-select
-
-      - name: Engine source matches the pinned physics bundle
-        run: pnpm lint:physics-bundle
-
-      - name: Appliance lists match the appliance registry
-        run: pnpm lint:appliance-registry
+      - name: Every lint that needs no base revision
+        # The boundaries, the ratchets, the layers (Refactor 17) and the two
+        # checks of the physics files. The D1 patch check is the next step.
+        run: pnpm lint:static
 
       - name: D1 baseline changes have a patch script
         if: github.event_name == 'pull_request'
