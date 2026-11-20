@@ -726,6 +726,78 @@ The same landing has one change of step A1.8: the credential Vault defines the f
 fields that it reads of a Discord installation, so it imports no Discord file. The
 layer count is 820.
 
+**21 November 2026. Step A1.7 is done in part,** on the branch `refactor-17-a1-7`:
+the tool list, the handlers, and the ports of commerce, integrations and Kitchen.
+The Inbox ports and the Slack imports stay open.
+
+- **The Worker gives the tools.** `actors/agent-session.ts` holds only the class
+  `SessionDO`, a shell of the Worker. The Session actor is the abstract class
+  `SessionActor` in `actors/session/session-actor.ts`. `SessionDO` gives it one value,
+  `SessionToolWiring` (`actors/session/tool-wiring.ts`): the tool registry, the tools
+  that a turn adds, the services of each family that an area owns, the page effects
+  and the observer of tool arguments. It is a method, not a field, because the
+  constructor of the Session reads the registry for the Pi recovery.
+- **No Session file imports the registry.** `agent-tools/registry.ts` and the new
+  `agent-tools/session-wiring.ts` are `workers/platform` in the map. The replay rule
+  of a tool is an input of the harness runtime (`toolReplay`), and the Pi recovery
+  takes the registry as an argument.
+- **Each family gives its services.** Each area has a `turn-services.ts` file with one
+  function that builds the services of its families for a turn. The Session names no
+  handler of an area. It builds the turn context (`ToolTurnContext`) once and gives
+  the services of the three foundation families itself: files, messages and turn
+  (`actors/session/own-tool-services.ts`).
+- **Proposal staging left the class chain.** The class `SessionProposalStaging` is
+  deleted. Each area owns its staging function: campaign brief and configuration
+  (commerce), recipe workflow (Kitchen), device, Jev switch and custom connector
+  write (integrations). The shared identity check is
+  `actors/session/proposal-staging.ts`. The Organisation area writes a configuration
+  draft (`agent-tools/organisation/configuration-draft.ts`) and gets two parts as
+  ports: the price reference of an allowance from commerce, and the words of a
+  command from Slack.
+- **Commerce.** The Kitchen costs tools moved from `actors/agent-session-costs.ts` to
+  `agent-tools/kitchen/costs-handlers.ts`. They get the commerce reads and the
+  Underclerk clients as a port (`CostsCommerce`), so the move adds no import from
+  Kitchen to commerce.
+- **Integrations.** The Session no longer compiles the custom connector catalog. The
+  wiring gives `turnTools`, and the Session carries `TurnTool` values of the executor.
+- **Kitchen.** The wiring gives `pageEffects`: the page commands that an authority
+  may use, the check of the page state of a message, the settlement and the repair
+  of a page effect, and the rebind of the receipt collection after a recovery. The
+  RPC method `settleBakerySurfaceEffect` and the alarm step `bakery_surface_effects`
+  keep their names.
+- **Not changed:** no tool, check, order, stored value, journal entry, error text or
+  replay result. The catalog digests of "Baseline" are equal. The tool definitions
+  did not change, so the host digests of Appendix D did not change.
+- **Measures.** Layer crossings: 820 to 754. `foundation/agent` to commerce: 30 to 22.
+  To Inbox: 29 to 27. To Kitchen: 21 to 4. To integrations: 6 to 1. To Slack: 9 to 7.
+  To organisation: 5 to 4. To Café and to devices: 2 to 0 each. `foundation/agent-tools` to an area or a surface: 35 to 11.
+  Copies: 892 to 890. Unused exports: 809, no change.
+  Lines: 2,754 removed and 3,226 added. About 1,500 of each are the move of the
+  Session class to `session-actor.ts`.
+- **Checks.** The static lints, the D1 patch check, the three type checks,
+  `pnpm check:packages`, `pnpm portal:build` and the unit suite (302 files) pass. The
+  98 journey files of the brief ran in five groups: 96 pass and 2 are skipped. The
+  full E2E suite did not run on the branch.
+- **Still open, in Session files.** Each line is an import that stays.
+  - Inbox, 16 imports: `actors/session/session-transient-turns.ts` (7),
+    `transient-turns.ts` (2), `turn-completion.ts` (1) and `types.ts` (6). The mailbox,
+    mail assistant and WhatsApp turns are methods of the Session class, and their RPC
+    types name Inbox types that the Connector files use. They leave with the actor
+    modules of step A1.9.
+  - Kitchen, 4 imports: `actors/session/tool-wiring.ts` names the wire types of a
+    page (2), and `actors/agent-session-continuation.ts` parses the stored page
+    context (1). Both import the package `@purin-labs/bakery-model`: the wire types
+    must move to `contracts` first. `actors/pi-durable-tools.ts` asks if a tool is a
+    Kitchen surface tool (1).
+  - Commerce, 1 import: `actors/pi-durable-tools.ts` names the result type of
+    `commerce_entity_context`. Both imports of that file need a field of the harness
+    tool definition.
+  - Slack, 6 imports: `actors/harness-follow-up.ts` (3),
+    `actors/harness-side-case-proposal.ts` (1), `actors/session/harness-source.ts` (1)
+    and `session-harness-turns.ts` (1). They are the Slack side Case and the Slack
+    notices: the channel adapter of step A1.6 owns them.
+  - Brain, 1 import: `actors/harness-memory-proposal.ts`.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
