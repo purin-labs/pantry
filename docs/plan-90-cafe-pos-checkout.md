@@ -1,19 +1,26 @@
 # Plan 90 — Café Counter Register and POS Payment Adapters
 
-Status (20 November 2026): Phases 1, 2, 3A and 4A are built and on `dev`
-(merged on 19 November). Phases 3B, 3C, 4B and 5 are open.
+Status (20 November 2026): Phases 1, 2, 3A and 4A are built and released.
+Phases 3B, 3C, 4B and 5 are open.
 
-- The Platform releases of 19 and 20 November carry Phase 2: the Register is
-  live in the Portal. The commerce Worker is not deployed since 15 November, so
-  production has none of the Phase 1, 3A and 4A commerce code. The Register
-  takes no payment there: cash is off, and no terminal is assigned.
+- The Platform releases of 19 and 20 November carry Phase 2: the Register in
+  the Portal, the counter-register domain and the Sous Chef tools.
+- The commerce Worker carries Phases 1, 3A and 4A since 20 November 06:22 UTC:
+  `underclerk` version `f031c27b`, from `dev` `3fd041b`. The Platform was not
+  deployed again, because `dev` changed it only by the package rename.
+- Both production merchants upgraded to schema 91 on their first request.
+  They answer their snapshot with the same records as before the release.
+- The Register takes cash when an operator switches cash on in the point of
+  sale configuration, and card when a terminal is assigned. Production has
+  neither on 20 November.
 - The regional D1 patch `plan90-payment-terminal-d1-patch.sql` is applied in
   production (checked on 20 November).
-- The schema 91 step of the commerce Worker failed in a Durable Object for each
-  checkout with a payment attempt. It is fixed, and its rehearsal in workerd
-  (`services/commerce/scripts/schema-upgrade-rehearsal.ts`) passes from
-  `628f4a225` in `seams-tech/pantry-history`, the commit that production runs.
-- The next release deploys the commerce Worker with the Platform Worker.
+- The schema 91 step first failed in a Durable Object for each checkout with
+  a payment attempt. It was fixed before the release, and its rehearsal in
+  workerd (`services/commerce/scripts/schema-upgrade-rehearsal.ts`) passed from
+  `628f4a225` in `seams-tech/pantry-history`, the commit that production ran.
+- A rollback to `10ca5e52` is not a recovery path: that code refuses a
+  merchant at schema 91. Recover with a forward fix.
 
 Date: 16 November 2026
 Owners: Underclerk, Satyr platform, CafeOS Portal, and `shop-gateway`
