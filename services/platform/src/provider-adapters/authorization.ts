@@ -15,6 +15,23 @@ export function exactScopeIsGranted(
   return grantedScopes.has(requiredScope);
 }
 
+/** Whether the granted scopes hold each scope that the adapter requires. */
+export function scopesAreComplete(
+  adapter: Readonly<{
+    requiredScopes: readonly string[];
+    scopeIsGranted: (
+      requiredScope: string,
+      grantedScopes: ReadonlySet<string>,
+    ) => boolean;
+  }>,
+  grantedScopes: readonly string[],
+): boolean {
+  const granted = new Set(grantedScopes);
+  return adapter.requiredScopes.every((requiredScope) =>
+    adapter.scopeIsGranted(requiredScope, granted),
+  );
+}
+
 export function parseProviderOnlyStartContext<
   P extends
     | "airtable"

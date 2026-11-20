@@ -9,7 +9,6 @@ import {
 import type { VaultHandle } from "../credential-vault";
 import {
   createConnectedIntegration,
-  finalizeConnectedIntegrationAccount,
   requireConnectionCredentialAuthority,
   upsertProviderWebhook,
   type IntegrationAccount,
@@ -38,14 +37,13 @@ import type {
 } from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
-  completeProviderCredentialCutover,
   failProviderCompletion,
-  finishProviderCompletion,
   providerCredentialHandle,
   providerSigningHandle,
   storeBearerCredential,
   storeHeaderCredential,
   verifyExistingAccountIdentity,
+  finalizeProviderConnection,
 } from "../integrations/contract/provisioning";
 import type { Result } from "../result";
 import { fetchShopifyInitialCommerce } from "./connector/initial-sync";
@@ -307,35 +305,10 @@ export async function connectShopify(
     },
     "finalizing",
   );
-  const finalized = await finalizeConnectedIntegrationAccount({
-    db: input.scope.database,
-    organisationId: base.organisationId,
-    integrationAccountId: connected.account.integrationAccountId,
-    now: input.now,
+  return finalizeProviderConnection(input, attempt, current, connected, {
+    kind: "healthy",
+    evidenceCode: "provider_webhook_verified",
   });
-  if (!finalized.ok) {
-    return failProviderCompletion(input, attempt, current, {
-      code: "provider_oauth_response_invalid",
-    });
-  }
-  const cutover = await completeProviderCredentialCutover(
-    input,
-    base.organisationId,
-    connected.connection.providerConnectionId,
-    requireConnectionCredentialAuthority(connected.connection)
-      .credentialGeneration,
-  );
-  if (!cutover.ok) {
-    return failProviderCompletion(input, attempt, current, cutover.error);
-  }
-  return finishProviderCompletion(
-    input,
-    attempt,
-    current,
-    connected.connection.providerConnectionId,
-    [finalized.value.integrationAccountId],
-    { kind: "healthy", evidenceCode: "provider_webhook_verified" },
-  );
 }
 
 async function queueShopifyInitialCommerce(input: {

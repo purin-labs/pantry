@@ -4,11 +4,7 @@ import {
   type VaultOAuthTokens,
 } from "../credential-vault";
 import type { ProviderManifestEvidence } from "../data/provider-attempt";
-import {
-  createConnectedIntegration,
-  finalizeConnectedIntegrationAccount,
-  requireConnectionCredentialAuthority,
-} from "../data/integration-account";
+import { createConnectedIntegration } from "../data/integration-account";
 import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
 import {
   DROPBOX_REQUIRED_SCOPES,
@@ -42,13 +38,12 @@ import type {
 } from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
-  completeProviderCredentialCutover,
   failProviderCompletion,
-  finishProviderCompletion,
   providerCredentialHandle,
   storeOAuthCredential,
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
+import { finishProviderManagedConnection } from "./provider-managed-connection";
 import type { Result } from "../result";
 
 const DROPBOX_MANUAL_INSTRUCTION = "revoke_dropbox_access_in_dropbox" as const;
@@ -191,79 +186,11 @@ export async function connectDropbox(
     retentionPolicy: { kind: "organisation_default" },
     now: input.now,
   });
-  return finishFileProviderConnection(input, authorization, current, connected);
-}
-
-async function finishFileProviderConnection(
-  input: CompleteProviderInput,
-  authorization: ProviderOAuthAttempt,
-  provisioning: ProvisioningProviderConnectionAttempt,
-  connected: Awaited<ReturnType<typeof createConnectedIntegration>>,
-): Promise<Result<ProviderCompletion, ProviderOnboardingError>> {
-  let current = await advanceProviderPhase(
-    input,
-    provisioning,
-    "discovering_accounts",
-    {
-      integration_account_ids: [connected.account.integrationAccountId],
-    },
-    "reconciling_webhooks",
-  );
-  current = await advanceProviderPhase(
-    input,
-    current,
-    "reconciling_webhooks",
-    {
-      webhook_count: 0,
-    },
-    "discovering_resources",
-  );
-  current = await advanceProviderPhase(
-    input,
-    current,
-    "discovering_resources",
-    {
-      resource_selection_managed_by_provider: true,
-    },
-    "verifying_connection",
-  );
-  current = await advanceProviderPhase(
-    input,
-    current,
-    "verifying_connection",
-    {
-      provider_identity_verified: true,
-    },
-    "finalizing",
-  );
-  const finalized = await finalizeConnectedIntegrationAccount({
-    db: input.scope.database,
-    organisationId: authorization.state.attempt.organisationId,
-    integrationAccountId: connected.account.integrationAccountId,
-    now: input.now,
-  });
-  if (!finalized.ok) {
-    return failProviderCompletion(input, authorization, current, {
-      code: "provider_oauth_response_invalid",
-    });
-  }
-  const cutover = await completeProviderCredentialCutover(
-    input,
-    authorization.state.attempt.organisationId,
-    connected.connection.providerConnectionId,
-    requireConnectionCredentialAuthority(connected.connection)
-      .credentialGeneration,
-  );
-  if (!cutover.ok) {
-    return failProviderCompletion(input, authorization, current, cutover.error);
-  }
-  return finishProviderCompletion(
+  return finishProviderManagedConnection(
     input,
     authorization,
     current,
-    connected.connection.providerConnectionId,
-    [finalized.value.integrationAccountId],
-    { kind: "healthy", evidenceCode: "callback_identity_verified" },
+    connected,
   );
 }
 

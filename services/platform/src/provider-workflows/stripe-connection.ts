@@ -31,6 +31,7 @@ import {
   storeHeaderCredential,
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
+import { scopesAreComplete } from "../provider-adapters/authorization";
 import type { Result } from "../result";
 import { linkStripePaymentAccount } from "../commerce/contract/stripe-link";
 import { resolveCommerceMerchant } from "../commerce/contract/square-link";
@@ -305,21 +306,5 @@ export async function connectStripe(
     connected.connection.providerConnectionId,
     [finalized.value.integrationAccountId],
     { kind: "healthy", evidenceCode: "provider_webhook_verified" },
-  );
-}
-
-function scopesAreComplete(
-  adapter: Readonly<{
-    requiredScopes: readonly string[];
-    scopeIsGranted: (
-      requiredScope: string,
-      grantedScopes: ReadonlySet<string>,
-    ) => boolean;
-  }>,
-  grantedScopes: readonly string[],
-): boolean {
-  const granted = new Set(grantedScopes);
-  return adapter.requiredScopes.every((requiredScope) =>
-    adapter.scopeIsGranted(requiredScope, granted),
   );
 }
