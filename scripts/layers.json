@@ -85,7 +85,11 @@
     "services/platform/src/kitchen/contract/",
     "services/platform/src/agent-tools/kitchen/services.ts",
     "apps/portal/src/features/bakery-browser-context.ts",
-    "services/platform/src/cafe/contract/"
+    "services/platform/src/cafe/contract/",
+    "services/platform/src/memory/contract/",
+    "apps/portal/src/execution-client.ts",
+    "apps/portal/src/features/brain/api.ts",
+    "apps/portal/src/features/brain/address.ts"
   ],
   "mixed": {
     "services/platform/src/agent-tools/registry.ts": "The one list of the agent tools. It imports each family, so it is a part of the Worker. The class SessionDO gives it to the Session (step A1.7).",

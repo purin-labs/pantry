@@ -6,7 +6,7 @@ import { proposeMemoryFromCorrection } from "../memory/access";
 import {
   createMailboxTurnMemoryReader,
   readMailboxSupplierScope,
-} from "../memory/mailbox-turn";
+} from "../mail-inbox/mailbox-turn-memory";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
@@ -76,7 +76,7 @@ import type {
   EmailChatSource,
   EmailReplySources,
 } from "../mail-inbox/reply-sources";
-import type { ShownMemoryRevision } from "../memory/access";
+import type { ShownMemoryRevision } from "../memory/contract/turn-memory";
 import { caseContextCollectionEvidenceDependency } from "../case-context-discovery/evidence";
 import { bindMailboxCaseContextCollectionAuthority } from "../authorization/access-grants/turn-authority";
 import type { SerializedFlowBinding } from "../policy/information-flow";

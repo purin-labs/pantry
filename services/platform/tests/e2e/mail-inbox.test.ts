@@ -30,7 +30,7 @@ import {
   SUPPLIER_ENTITY_TYPE_ID,
 } from "@purin-labs/commerce-client";
 import { readSessionTurnMemoryRecords } from "../../src/actors/actor-journal/transactions";
-import { createMailboxTurnMemoryReader } from "../../src/memory/mailbox-turn";
+import { createMailboxTurnMemoryReader } from "../../src/mail-inbox/mailbox-turn-memory";
 import {
   canonicalFlowLabel,
   joinFlowLabels,

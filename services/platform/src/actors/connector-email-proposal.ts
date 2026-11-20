@@ -12,7 +12,7 @@ import {
   emailProposalMemoryStanding,
   readEmailProposalMemory,
 } from "./email-proposal-memory";
-import type { ShownMemoryRevision } from "../memory/access";
+import type { ShownMemoryRevision } from "../memory/contract/turn-memory";
 import {
   dropEmailProposalPurchaseRequestSources,
   readEmailProposalChatContext,

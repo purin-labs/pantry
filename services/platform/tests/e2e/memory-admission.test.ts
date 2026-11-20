@@ -44,8 +44,10 @@ import {
   createTurnMemoryReader,
   TURN_MEMORY_PAGE,
   type TurnMemoryDestination,
-  turnMemoryReaderWithoutSubjects,
 } from "../../src/memory/access";
+import {
+  turnMemoryReaderWithoutSubjects,
+} from "../../src/memory/contract/turn-memory";
 import {
   parseAssignmentId,
   parseSessionId,
