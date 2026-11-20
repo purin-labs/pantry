@@ -1,7 +1,7 @@
 {
   "totals": {
     "upward": 654,
-    "areas": 376,
+    "areas": 375,
     "order": 160,
     "table": 126
   },
@@ -28,7 +28,7 @@
     "areas/commerce -> surfaces/portal": 6,
     "areas/commerce -> surfaces/slack": 5,
     "areas/commerce -> workers/platform": 10,
-    "areas/devices -> areas/cafe": 5,
+    "areas/devices -> areas/cafe": 4,
     "areas/devices -> areas/inbox": 1,
     "areas/devices -> surfaces/slack": 1,
     "areas/devices -> surfaces/voice": 2,
