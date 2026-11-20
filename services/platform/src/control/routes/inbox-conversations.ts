@@ -24,6 +24,7 @@ import {
   type WhatsAppPhoneNumber,
   type WhatsAppReplyProposalProjection,
 } from "../../data/whatsapp";
+import { whatsappConnector } from "../../mail-inbox/agent-mailbox-connector";
 import type { Env } from "../../env";
 import { newRequestId, parseIntegrationAccountId } from "../../ids";
 import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
@@ -32,7 +33,6 @@ import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,
 } from "../../whatsapp/read-authorization";
-import { whatsappConnector } from "../../whatsapp/control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -40,9 +40,7 @@ import {
 import { readEmailReplyHeadlines } from "../email-review-headlines";
 import { emailReviewQueueItemWire } from "../email-review";
 import { controlError, noStoreJson } from "../http";
-import {
-  mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
+import { mailControlAuthority } from "../../mail-inbox/contract/control-authority";
 
 export type InboxConversationsRoute = Readonly<{
   kind: "inboxConversations";

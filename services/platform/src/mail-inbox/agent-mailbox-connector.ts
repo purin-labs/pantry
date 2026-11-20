@@ -3,6 +3,7 @@ import type { Result } from "../result";
 import { resolveActiveConnectorActor } from "../actors/actor-router";
 import { type MailboxIngressPolicy } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
+import { whatsappConnectorIdValue } from "../data/whatsapp";
 import {
   parseConnectorId,
   type IntegrationAccountId,
@@ -36,16 +37,15 @@ export type AgentMailboxConnectorHandle = {
   };
 };
 
-export async function agentMailboxConnector(
+/** Resolves the active Connector of one mailbox or one WhatsApp number. */
+async function activeConnector(
   env: Env,
   organisationId: OrganisationId,
-  integrationAccountId: IntegrationAccountId,
+  connectorIdValue: string,
+  invalidCode: string,
 ): Promise<Result<AgentMailboxConnectorHandle, { readonly code: string }>> {
-  const connectorId = parseConnectorId(
-    gmailConnectorIdValue(integrationAccountId),
-  );
-  if (!connectorId.ok)
-    return { ok: false, error: { code: "agent_mailbox_connector_invalid" } };
+  const connectorId = parseConnectorId(connectorIdValue);
+  if (!connectorId.ok) return { ok: false, error: { code: invalidCode } };
   const connector = await resolveActiveConnectorActor({
     env: env,
     namespace: env.CONNECTOR,
@@ -62,4 +62,30 @@ export async function agentMailboxConnector(
         },
       }
     : { ok: false, error: { code: connector.error.code } };
+}
+
+export function agentMailboxConnector(
+  env: Env,
+  organisationId: OrganisationId,
+  integrationAccountId: IntegrationAccountId,
+): Promise<Result<AgentMailboxConnectorHandle, { readonly code: string }>> {
+  return activeConnector(
+    env,
+    organisationId,
+    gmailConnectorIdValue(integrationAccountId),
+    "agent_mailbox_connector_invalid",
+  );
+}
+
+export function whatsappConnector(
+  env: Env,
+  organisationId: OrganisationId,
+  integrationAccountId: IntegrationAccountId,
+): Promise<Result<AgentMailboxConnectorHandle, { readonly code: string }>> {
+  return activeConnector(
+    env,
+    organisationId,
+    whatsappConnectorIdValue(integrationAccountId),
+    "whatsapp_connector_invalid",
+  );
 }

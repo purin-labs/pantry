@@ -372,7 +372,6 @@
     "services/platform/src/integrations/typesafe/connection.ts = services/platform/src/integrations/typesafe/connection.ts": 1,
     "services/platform/src/integrations/typesafe/connection.ts = services/platform/src/mail-inbox/evaluation.ts": 1,
     "services/platform/src/integrations/typesafe/usage-store.ts = services/platform/src/jev-features/paid-use.ts": 1,
-    "services/platform/src/mail-inbox/agent-mailbox-connector.ts = services/platform/src/whatsapp/control.ts": 1,
     "services/platform/src/mail-inbox/email-operational-lifecycle.ts = services/platform/src/mail-inbox/email-operational-lifecycle.ts": 1,
     "services/platform/src/mail-inbox/email-reply-lifecycle.ts = services/platform/src/mail-inbox/email-reply-lifecycle.ts": 1,
     "services/platform/src/mail/gmail-adapter.ts = services/platform/src/mail/gmail-adapter.ts": 2,

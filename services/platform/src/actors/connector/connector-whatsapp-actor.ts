@@ -82,7 +82,7 @@ import {
   parseWhatsAppResumeRequest,
   parseWhatsAppTakeoverRequest,
 } from "./whatsapp-parsers";
-import { ConnectorActorBase } from "./connector-actor-base";
+import { ConnectorEvals } from "./connector-evals";
 
 /** How long a Case waits before a turn that produced no outcome is retried. */
 const WHATSAPP_TURN_RETRY_MS = 60_000;
@@ -90,7 +90,7 @@ const WHATSAPP_TURN_RETRY_MS = 60_000;
 /**
  * WhatsApp runtime, turns, proposals and human replies for the Connector.
  */
-export abstract class ConnectorWhatsApp extends ConnectorActorBase {
+export abstract class ConnectorWhatsApp extends ConnectorEvals {
   /**
    * Durable admission for one parsed WhatsApp webhook event. The Worker only
    * acknowledges Meta after this returns, so a failure here becomes a Meta

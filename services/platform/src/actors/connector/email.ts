@@ -24,7 +24,7 @@ import {
 } from "../connector-email";
 import { nextOperationalEmailMaintenanceAt } from "../connector-email-operational";
 import type { EmailDisposalOutcome } from "../connector-email-proposal";
-import { nextEvalWorkAt } from "../connector-eval";
+import { createConnectorEvalSchema, nextEvalWorkAt } from "../connector-eval";
 import type { GmailMessageContent } from "../../mail/gmail-adapter";
 import { nextMailOrganizationAt } from "../../mail-inbox/store";
 import type { AlarmReconciler } from "../lifecycle/actor-alarm";
@@ -74,7 +74,7 @@ export type ConnectorEmailReplyProposal = Readonly<{
 
 /** Creates the tables of the mailbox. */
 export function createEmailChannelSchema(storage: DurableObjectStorage): void {
-  createConnectorEmailSchema(storage.sql);
+  createConnectorEmailSchema(storage.sql, createConnectorEvalSchema);
 }
 
 /**
