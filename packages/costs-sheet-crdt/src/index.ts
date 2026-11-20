@@ -1,4 +1,12 @@
-import { parseYjsEncoding, type ParsedYjsEncoding } from "@purin-labs/collaboration";
+import {
+  checkDocumentSize,
+  defineSharedDoc,
+  sharedDocFailure as failure,
+  sharedDocSuccess as success,
+  type SharedDocEncoding,
+  type SharedDocError,
+  type SharedDocResult,
+} from "@purin-labs/collaboration";
 import * as Y from "yjs";
 import {
   COSTS_SHEET_CELL_LIMIT,
@@ -78,74 +86,47 @@ export type CostsSheetSelection = Readonly<{
   cellKey: string | null;
 }>;
 
-export type CostsSheetCrdtError = Readonly<{
-  code:
-    | "invalid_state"
-    | "invalid_update"
-    | "invalid_state_vector"
-    | "invalid_document_shape"
-    | "collection_limit"
-    | "cell_invalid"
-    | "record_conflict"
-    | "update_too_large"
-    | "state_too_large"
-    | "state_vector_too_large";
-}>;
+/**
+ * The document's own failures, beside the failures of an encoding. No call
+ * gives `record_conflict` today: an edit that changes nothing gives null.
+ * The failure frame of the room keeps the code.
+ */
+const FAILURES = [
+  "invalid_document_shape",
+  "collection_limit",
+  "cell_invalid",
+  "record_conflict",
+] as const;
+export type CostsSheetCrdtError = SharedDocError<(typeof FAILURES)[number]>;
 
-export type CostsSheetCrdtResult<T> =
-  | Readonly<{ ok: true; value: T; error?: never }>
-  | Readonly<{ ok: false; error: CostsSheetCrdtError; value?: never }>;
+export type CostsSheetCrdtResult<T> = SharedDocResult<
+  T,
+  CostsSheetCrdtError["code"]
+>;
 
-type EncodingKind = "state" | "update" | "state_vector";
 const ENCODING_LIMITS = {
   state: COSTS_SHEET_STATE_LIMIT,
   update: COSTS_SHEET_UPDATE_LIMIT,
   stateVector: COSTS_SHEET_STATE_VECTOR_LIMIT,
 } as const;
 
-class SheetEncoding<K extends EncodingKind> {
-  readonly #encoding: ParsedYjsEncoding<K>;
-  readonly kind: K;
+export const costsSheetDocument = defineSharedDoc({
+  schema: COSTS_SHEET_SCHEMA,
+  limits: ENCODING_LIMITS,
+  failures: FAILURES,
+  roots: { cells: "map" },
+  shapeFailure: "invalid_document_shape",
+  validate: validateDocument,
+});
 
-  private constructor(encoding: ParsedYjsEncoding<K>) {
-    this.#encoding = encoding;
-    this.kind = encoding.kind;
-  }
+type Schema = typeof COSTS_SHEET_SCHEMA;
+export type CostsSheetState = SharedDocEncoding<"state", Schema>;
+export type CostsSheetUpdate = SharedDocEncoding<"update", Schema>;
+export type CostsSheetStateVector = SharedDocEncoding<"state_vector", Schema>;
 
-  encode(): Uint8Array {
-    return this.#encoding.encode();
-  }
-
-  static parse<K extends EncodingKind>(
-    kind: K,
-    bytes: Uint8Array,
-  ): CostsSheetCrdtResult<SheetEncoding<K>> {
-    const parsed = parseYjsEncoding(kind, bytes, ENCODING_LIMITS);
-    return parsed.ok ? success(new SheetEncoding(parsed.value)) : parsed;
-  }
-}
-
-export type CostsSheetState = SheetEncoding<"state">;
-export type CostsSheetUpdate = SheetEncoding<"update">;
-export type CostsSheetStateVector = SheetEncoding<"state_vector">;
-
-export function parseCostsSheetState(
-  bytes: Uint8Array,
-): CostsSheetCrdtResult<CostsSheetState> {
-  return SheetEncoding.parse("state", bytes);
-}
-
-export function parseCostsSheetUpdate(
-  bytes: Uint8Array,
-): CostsSheetCrdtResult<CostsSheetUpdate> {
-  return SheetEncoding.parse("update", bytes);
-}
-
-export function parseCostsSheetStateVector(
-  bytes: Uint8Array,
-): CostsSheetCrdtResult<CostsSheetStateVector> {
-  return SheetEncoding.parse("state_vector", bytes);
-}
+export const parseCostsSheetState = costsSheetDocument.parseState;
+export const parseCostsSheetUpdate = costsSheetDocument.parseUpdate;
+export const parseCostsSheetStateVector = costsSheetDocument.parseStateVector;
 
 export function productDailyCellKey(productId: string): string {
   return `product:${productId}:daily`;
@@ -215,22 +196,16 @@ export function forecastReadonlySelectionKey(
   return `forecast:row:${rowId}:${col}`;
 }
 
-export class CostsSheetDoc {
-  #doc: Y.Doc;
-
-  private constructor(doc: Y.Doc) {
-    this.#doc = doc;
-  }
-
+export class CostsSheetDoc extends costsSheetDocument.Doc {
   static create(): CostsSheetDoc {
-    return new CostsSheetDoc(createEmptyDocument());
+    return new CostsSheetDoc(costsSheetDocument.emptyDocument());
   }
 
   /** A new document with the same cells and none of their edit history. */
   static compact(
     snapshot: CostsSheetSnapshot,
   ): CostsSheetCrdtResult<CostsSheetDoc> {
-    const doc = createEmptyDocument();
+    const doc = costsSheetDocument.emptyDocument();
     const cells = doc.getMap("cells");
     doc.transact(writeSnapshotCells.bind(null, cells, snapshot.cells));
     const valid = validateDocument(doc);
@@ -244,24 +219,13 @@ export class CostsSheetDoc {
   static restore(
     state: CostsSheetState,
   ): CostsSheetCrdtResult<CostsSheetDoc> {
-    const doc = createEmptyDocument();
-    try {
-      Y.applyUpdate(doc, state.encode());
-      const valid = validateDocument(doc);
-      if (!valid.ok) {
-        doc.destroy();
-        return valid;
-      }
-      return success(new CostsSheetDoc(doc));
-    } catch {
-      doc.destroy();
-      return failure("invalid_state");
-    }
+    const doc = costsSheetDocument.restore(state);
+    return doc.ok ? success(new CostsSheetDoc(doc.value)) : doc;
   }
 
   read(): CostsSheetSnapshot {
     const cells: CostsSheetCell[] = [];
-    for (const [cellKey, value] of this.#doc.getMap("cells")) {
+    for (const [cellKey, value] of this.doc.getMap("cells")) {
       if (typeof value === "string") {
         cells.push({ cellKey, value });
       }
@@ -272,7 +236,7 @@ export class CostsSheetDoc {
 
   cellsRecord(): Readonly<Record<string, string>> {
     const record: Record<string, string> = {};
-    for (const [cellKey, value] of this.#doc.getMap("cells")) {
+    for (const [cellKey, value] of this.doc.getMap("cells")) {
       if (typeof value === "string") {
         record[cellKey] = value;
       }
@@ -281,45 +245,8 @@ export class CostsSheetDoc {
   }
 
   cell(cellKey: string): string | null {
-    const value = this.#doc.getMap("cells").get(cellKey);
+    const value = this.doc.getMap("cells").get(cellKey);
     return typeof value === "string" ? value : null;
-  }
-
-  state(): CostsSheetCrdtResult<CostsSheetState> {
-    return parseCostsSheetState(Y.encodeStateAsUpdate(this.#doc));
-  }
-
-  stateVector(): CostsSheetCrdtResult<CostsSheetStateVector> {
-    return parseCostsSheetStateVector(Y.encodeStateVector(this.#doc));
-  }
-
-  syncUpdate(
-    remoteStateVector: CostsSheetStateVector,
-  ): CostsSheetCrdtResult<CostsSheetUpdate> {
-    try {
-      return parseCostsSheetUpdate(
-        Y.encodeStateAsUpdate(this.#doc, remoteStateVector.encode()),
-      );
-    } catch {
-      return failure("invalid_state_vector");
-    }
-  }
-
-  apply(update: CostsSheetUpdate): CostsSheetCrdtResult<null> {
-    const candidate = cloneDocument(this.#doc);
-    try {
-      Y.applyUpdate(candidate, update.encode());
-      const valid = validateDocument(candidate);
-      if (!valid.ok) {
-        candidate.destroy();
-        return valid;
-      }
-    } catch {
-      candidate.destroy();
-      return failure("invalid_update");
-    }
-    this.#replace(candidate);
-    return success(null);
   }
 
   /** Sets or deletes one or more cell overrides in a single Yjs transaction. */
@@ -365,48 +292,13 @@ export class CostsSheetDoc {
     );
   }
 
-  destroy(): void {
-    this.#doc.destroy();
-  }
-
+  /** One Yjs transaction for the whole operation; null when nothing changed. */
   #mutate(
     operation: (doc: Y.Doc) => CostsSheetCrdtResult<boolean>,
   ): CostsSheetCrdtResult<CostsSheetUpdate | null> {
-    const candidate = cloneDocument(this.#doc);
-    const updates: Uint8Array[] = [];
-    const captureUpdate = captureYjsUpdate.bind(null, updates);
-    candidate.on("update", captureUpdate);
-    let changed: CostsSheetCrdtResult<boolean>;
-    try {
-      changed = candidate.transact(() => operation(candidate));
-    } finally {
-      candidate.off("update", captureUpdate);
-    }
-    if (!changed.ok) {
-      candidate.destroy();
-      return changed;
-    }
-    if (!changed.value || updates.length === 0) {
-      candidate.destroy();
-      return success(null);
-    }
-    const valid = validateDocument(candidate);
-    if (!valid.ok) {
-      candidate.destroy();
-      return valid;
-    }
-    const update = parseCostsSheetUpdate(Y.mergeUpdates(updates));
-    if (!update.ok) {
-      candidate.destroy();
-      return update;
-    }
-    this.#replace(candidate);
-    return update;
-  }
-
-  #replace(candidate: Y.Doc): void {
-    this.#doc.destroy();
-    this.#doc = candidate;
+    return this.mutateIfChanged((candidate) =>
+      candidate.transact(() => operation(candidate)),
+    );
   }
 }
 
@@ -688,19 +580,6 @@ export function isCostsSheetCellEntry(
   return false;
 }
 
-function createEmptyDocument(): Y.Doc {
-  const doc = new Y.Doc();
-  doc.getMap("cells");
-  return doc;
-}
-
-function cloneDocument(source: Y.Doc): Y.Doc {
-  const candidate = createEmptyDocument();
-  Y.applyUpdate(candidate, Y.encodeStateAsUpdate(source));
-  candidate.clientID = source.clientID;
-  return candidate;
-}
-
 function writeSnapshotCells(
   cells: Y.Map<unknown>,
   entries: readonly CostsSheetCell[],
@@ -776,14 +655,8 @@ function applySettleSavedCells(
   return success(true);
 }
 
-function captureYjsUpdate(updates: Uint8Array[], update: Uint8Array): void {
-  updates.push(update);
-}
-
+/** The check of the content. The shared document checks the root first. */
 function validateDocument(doc: Y.Doc): CostsSheetCrdtResult<null> {
-  if (doc.share.size !== 1 || !(doc.share.get("cells") instanceof Y.Map)) {
-    return failure("invalid_document_shape");
-  }
   const cells = doc.getMap("cells");
   if (cells.size > COSTS_SHEET_CELL_LIMIT) {
     return failure("collection_limit");
@@ -793,25 +666,9 @@ function validateDocument(doc: Y.Doc): CostsSheetCrdtResult<null> {
       return failure("invalid_document_shape");
     }
   }
-  if (Y.encodeStateAsUpdate(doc).byteLength > COSTS_SHEET_STATE_LIMIT) {
-    return failure("state_too_large");
-  }
-  if (Y.encodeStateVector(doc).byteLength > COSTS_SHEET_STATE_VECTOR_LIMIT) {
-    return failure("state_vector_too_large");
-  }
-  return success(null);
+  return checkDocumentSize(doc, ENCODING_LIMITS);
 }
 
 function compareCells(first: CostsSheetCell, second: CostsSheetCell): number {
   return first.cellKey.localeCompare(second.cellKey);
-}
-
-function success<T>(value: T): CostsSheetCrdtResult<T> {
-  return { ok: true, value };
-}
-
-function failure(
-  code: CostsSheetCrdtError["code"],
-): CostsSheetCrdtResult<never> {
-  return { ok: false, error: { code } };
 }

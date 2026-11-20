@@ -1,6 +1,5 @@
 import {
-  createSyncProtocol,
-  everyCode,
+  snapshotFrameLimit,
   type CollaborationParticipant,
   type SyncClientMessage,
   type SyncFailureCode,
@@ -9,10 +8,9 @@ import {
 import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   isPlanRequestId,
-  parseProductionPlanStateVector,
-  parseProductionPlanUpdate,
   PLAN_STATE_VECTOR_LIMIT,
   PLAN_UPDATE_LIMIT,
+  productionPlanDocument,
   type ProductionPlanCrdtError,
   type ProductionPlanSelection,
   type ProductionPlanStateVector,
@@ -20,12 +18,10 @@ import {
 } from "./index.ts";
 
 export const PRODUCTION_PLAN_PROTOCOL = "production_plan_sync.v1";
-// A full snapshot and its state vector travel together as base64 in one frame.
-export const FRAME_LIMIT =
-  4 *
-    (Math.ceil(PLAN_UPDATE_LIMIT / 3) +
-      Math.ceil(PLAN_STATE_VECTOR_LIMIT / 3)) +
-  1024;
+export const FRAME_LIMIT = snapshotFrameLimit(
+  PLAN_UPDATE_LIMIT,
+  PLAN_STATE_VECTOR_LIMIT,
+);
 
 export type PlanFailureCode = SyncFailureCode<ProductionPlanCrdtError["code"]>;
 export type PlanParticipant = CollaborationParticipant<ProductionPlanSelection>;
@@ -51,31 +47,14 @@ export type PlanServerMessage = SyncServerMessage<
   PlanRoomMetadata
 >;
 
-const protocol = createSyncProtocol<
+const protocol = productionPlanDocument.syncProtocol<
   ProductionPlanSelection,
-  ProductionPlanStateVector,
-  ProductionPlanUpdate,
-  ProductionPlanCrdtError["code"],
   PlanRoomMetadata
 >({
   protocol: PRODUCTION_PLAN_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "production plan",
   isSelection: isPlanSelection,
-  parseStateVector: parseProductionPlanStateVector,
-  parseUpdate: parseProductionPlanUpdate,
-  documentFailureCodes: everyCode<ProductionPlanCrdtError["code"]>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_document_shape",
-    "collection_limit",
-    "quantity_invalid",
-    "record_conflict",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-  ]),
   roomMetadata: {
     fields: ["documentRevision", "generation"],
     isValid: (raw) =>

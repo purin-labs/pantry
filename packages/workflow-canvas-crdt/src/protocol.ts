@@ -2,8 +2,7 @@ import {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
-  createSyncProtocol,
-  everyCode,
+  snapshotFrameLimit,
   type CollaborationAgentActivity,
   type CollaborationParticipant,
   type SyncClientMessage,
@@ -14,7 +13,8 @@ import {
 import { isRecord } from "@purin-labs/std";
 import {
   CANVAS_ENCODING_LIMITS,
-  CanvasEncoding,
+  workflowCanvasEncoding,
+  type CanvasEncoding,
   type CanvasFailureCode,
 } from "./index.ts";
 
@@ -23,12 +23,10 @@ type CanvasStateVector = CanvasEncoding<"state_vector">;
 export type CanvasSelection = Readonly<{ objectId: string }>;
 
 export const CANVAS_PROTOCOL = "workflow_canvas_sync.v2";
-// A full snapshot and its state vector travel together as base64 in one frame.
-export const FRAME_LIMIT =
-  4 *
-    (Math.ceil(CANVAS_ENCODING_LIMITS.state / 3) +
-      Math.ceil(CANVAS_ENCODING_LIMITS.stateVector / 3)) +
-  1024;
+export const FRAME_LIMIT = snapshotFrameLimit(
+  CANVAS_ENCODING_LIMITS.state,
+  CANVAS_ENCODING_LIMITS.stateVector,
+);
 export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
 export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
 export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
@@ -68,30 +66,16 @@ const LAST_CHANGE: SyncMessageFields = {
   isValid: (raw) => isCanvasLastChange(raw.lastChange),
 };
 
-const protocol = createSyncProtocol<
+const protocol = workflowCanvasEncoding.syncProtocol<
   CanvasSelection,
-  CanvasStateVector,
-  CanvasUpdate,
-  CanvasFailureCode,
   CanvasRoomMetadata,
+  never,
   CanvasExtension
 >({
   protocol: CANVAS_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "workflow canvas",
   isSelection: isCanvasSelection,
-  parseStateVector: (bytes) => CanvasEncoding.parse("state_vector", bytes),
-  parseUpdate: (bytes) => CanvasEncoding.parse("update", bytes),
-  documentFailureCodes: everyCode<CanvasFailureCode>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_layout",
-    "object_conflict",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-  ]),
   syncResponseFields: LAST_CHANGE,
   updateAcceptedFields: LAST_CHANGE,
   updateBroadcastFields: LAST_CHANGE,

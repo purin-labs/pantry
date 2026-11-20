@@ -2,9 +2,8 @@ import {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
-  createSyncProtocol,
-  everyCode,
   isShortProtocolText,
+  snapshotFrameLimit,
   type CollaborationParticipant,
   type SyncClientMessage,
   type SyncFailureCode,
@@ -13,8 +12,7 @@ import {
 import {
   MENU_STATE_VECTOR_LIMIT,
   MENU_UPDATE_LIMIT,
-  parseMenuDraftStateVector,
-  parseMenuDraftUpdate,
+  menuDraftDocument,
   type MenuDraftCrdtError,
   type MenuDraftStateVector,
   type MenuDraftUpdate,
@@ -23,8 +21,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 
 export const MENU_DRAFT_PROTOCOL = "menu_draft_sync.v3";
-// A full snapshot and its state vector travel together as base64 in one frame.
-export const FRAME_LIMIT = 4 * (Math.ceil(MENU_UPDATE_LIMIT / 3) + Math.ceil(MENU_STATE_VECTOR_LIMIT / 3)) + 1024;
+export const FRAME_LIMIT = snapshotFrameLimit(MENU_UPDATE_LIMIT, MENU_STATE_VECTOR_LIMIT);
 export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
 export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
 export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
@@ -40,30 +37,11 @@ export type MenuDraftServerMessage = SyncServerMessage<
   MenuDraftCrdtError["code"]
 >;
 
-const protocol = createSyncProtocol<
-  MenuPresenceSelection,
-  MenuDraftStateVector,
-  MenuDraftUpdate,
-  MenuDraftCrdtError["code"]
->({
+const protocol = menuDraftDocument.syncProtocol({
   protocol: MENU_DRAFT_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "menu draft",
   isSelection: isMenuSelection,
-  parseStateVector: parseMenuDraftStateVector,
-  parseUpdate: parseMenuDraftUpdate,
-  documentFailureCodes: everyCode<MenuDraftCrdtError["code"]>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_document_shape",
-    "collection_limit",
-    "text_too_long",
-    "record_conflict",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-  ]),
 });
 
 export const parseMenuDraftClientMessage = protocol.parseClientMessage;

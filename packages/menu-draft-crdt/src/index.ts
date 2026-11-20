@@ -1,9 +1,14 @@
 import {
+  checkDocumentSize,
+  defineSharedDoc,
   hasValidPlainTextShape,
   normalizePlainText,
-  parseYjsEncoding,
+  sharedDocFailure as failure,
+  sharedDocSuccess as success,
   splicePlainText,
-  type ParsedYjsEncoding,
+  type SharedDocEncoding,
+  type SharedDocError,
+  type SharedDocResult,
 } from "@purin-labs/collaboration";
 import * as Y from "yjs";
 
@@ -33,242 +38,111 @@ export type MenuPresenceSelection =
   | Readonly<{ kind: "section"; sectionId: string }>
   | Readonly<{ kind: "item"; itemId: string }>;
 
-export type MenuDraftCrdtError = Readonly<{
-  code:
-    | "invalid_state"
-    | "invalid_update"
-    | "invalid_state_vector"
-    | "invalid_document_shape"
-    | "collection_limit"
-    | "text_too_long"
-    | "record_conflict"
-    | "update_too_large"
-    | "state_too_large"
-    | "state_vector_too_large";
-}>;
-export type MenuDraftCrdtResult<T> =
-  | Readonly<{ ok: true; value: T; error?: never }>
-  | Readonly<{ ok: false; error: MenuDraftCrdtError; value?: never }>;
+/** The document's own failures, beside the failures of an encoding. */
+const FAILURES = [
+  "invalid_document_shape",
+  "collection_limit",
+  "text_too_long",
+  "record_conflict",
+] as const;
+export type MenuDraftCrdtError = SharedDocError<(typeof FAILURES)[number]>;
+export type MenuDraftCrdtResult<T> = SharedDocResult<T, MenuDraftCrdtError["code"]>;
 
-type EncodingKind = "state" | "update" | "state_vector";
 const ENCODING_LIMITS = {
   state: MENU_STATE_LIMIT,
   update: MENU_UPDATE_LIMIT,
   stateVector: MENU_STATE_VECTOR_LIMIT,
 } as const;
 
-class MenuEncoding<K extends EncodingKind> {
-  readonly #encoding: ParsedYjsEncoding<K>;
-  readonly kind: K;
+export const menuDraftDocument = defineSharedDoc({
+  schema: MENU_DRAFT_SCHEMA,
+  limits: ENCODING_LIMITS,
+  failures: FAILURES,
+  roots: { menu: "map", sections: "map", items: "map" },
+  shapeFailure: "invalid_document_shape",
+  validate: validateDocument,
+  unchangedFailure: "record_conflict",
+});
 
-  private constructor(encoding: ParsedYjsEncoding<K>) {
-    this.#encoding = encoding;
-    this.kind = encoding.kind;
-  }
+type Schema = typeof MENU_DRAFT_SCHEMA;
+export type MenuDraftState = SharedDocEncoding<"state", Schema>;
+export type MenuDraftUpdate = SharedDocEncoding<"update", Schema>;
+export type MenuDraftStateVector = SharedDocEncoding<"state_vector", Schema>;
 
-  encode(): Uint8Array {
-    return this.#encoding.encode();
-  }
+export const parseMenuDraftState = menuDraftDocument.parseState;
+export const parseMenuDraftUpdate = menuDraftDocument.parseUpdate;
+export const parseMenuDraftStateVector = menuDraftDocument.parseStateVector;
 
-  static parse<K extends EncodingKind>(kind: K, bytes: Uint8Array): MenuDraftCrdtResult<MenuEncoding<K>> {
-    const parsed = parseYjsEncoding(kind, bytes, ENCODING_LIMITS);
-    return parsed.ok ? success(new MenuEncoding(parsed.value)) : parsed;
-  }
-}
-
-export type MenuDraftState = MenuEncoding<"state">;
-export type MenuDraftUpdate = MenuEncoding<"update">;
-export type MenuDraftStateVector = MenuEncoding<"state_vector">;
-
-export function parseMenuDraftState(bytes: Uint8Array): MenuDraftCrdtResult<MenuDraftState> {
-  return MenuEncoding.parse("state", bytes);
-}
-
-export function parseMenuDraftUpdate(bytes: Uint8Array): MenuDraftCrdtResult<MenuDraftUpdate> {
-  return MenuEncoding.parse("update", bytes);
-}
-
-export function parseMenuDraftStateVector(bytes: Uint8Array): MenuDraftCrdtResult<MenuDraftStateVector> {
-  return MenuEncoding.parse("state_vector", bytes);
-}
-
-export class MenuDraftDoc {
-  #doc: Y.Doc;
-
-  private constructor(doc: Y.Doc) {
-    this.#doc = doc;
-  }
-
+export class MenuDraftDoc extends menuDraftDocument.Doc {
   static create(title = "Café menu"): MenuDraftCrdtResult<MenuDraftDoc> {
     const normalized = normalizePlainText(title);
     if (!validText(normalized)) return failure("text_too_long");
-    const doc = createEmptyDocument();
+    const doc = menuDraftDocument.emptyDocument();
     doc.getMap("menu").set("title", normalized);
     return success(new MenuDraftDoc(doc));
   }
 
   static createReplica(): MenuDraftDoc {
-    return new MenuDraftDoc(createEmptyDocument());
+    return new MenuDraftDoc(menuDraftDocument.emptyDocument());
   }
 
   static restore(state: MenuDraftState): MenuDraftCrdtResult<MenuDraftDoc> {
-    const doc = createEmptyDocument();
-    try {
-      Y.applyUpdate(doc, state.encode());
-      const valid = validateDocument(doc);
-      if (!valid.ok) {
-        doc.destroy();
-        return valid;
-      }
-      return success(new MenuDraftDoc(doc));
-    } catch {
-      doc.destroy();
-      return failure("invalid_state");
-    }
+    const doc = menuDraftDocument.restore(state);
+    return doc.ok ? success(new MenuDraftDoc(doc.value)) : doc;
   }
 
   read(): MenuDraftSnapshot {
     const sections: MenuSection[] = [];
-    for (const [id, raw] of this.#doc.getMap("sections")) {
+    for (const [id, raw] of this.doc.getMap("sections")) {
       if (raw instanceof Y.Map) sections.push(readSection(id, raw));
     }
     const items: MenuItem[] = [];
-    for (const [id, raw] of this.#doc.getMap("items")) {
+    for (const [id, raw] of this.doc.getMap("items")) {
       if (raw instanceof Y.Map) items.push(readItem(id, raw));
     }
     sections.sort(compareOrderedRecord);
     items.sort(compareMenuItems);
     return {
-      title: String(this.#doc.getMap("menu").get("title") ?? "Café menu"),
+      title: String(this.doc.getMap("menu").get("title") ?? "Café menu"),
       sections,
       items,
     };
   }
 
-  state(): MenuDraftCrdtResult<MenuDraftState> {
-    return parseMenuDraftState(Y.encodeStateAsUpdate(this.#doc));
-  }
-
-  stateVector(): MenuDraftCrdtResult<MenuDraftStateVector> {
-    return parseMenuDraftStateVector(Y.encodeStateVector(this.#doc));
-  }
-
-  syncUpdate(remoteStateVector: MenuDraftStateVector): MenuDraftCrdtResult<MenuDraftUpdate> {
-    try {
-      return parseMenuDraftUpdate(Y.encodeStateAsUpdate(this.#doc, remoteStateVector.encode()));
-    } catch {
-      return failure("invalid_state_vector");
-    }
-  }
-
-  apply(update: MenuDraftUpdate): MenuDraftCrdtResult<null> {
-    const candidate = cloneDocument(this.#doc);
-    try {
-      Y.applyUpdate(candidate, update.encode());
-      const valid = validateDocument(candidate);
-      if (!valid.ok) {
-        candidate.destroy();
-        return valid;
-      }
-    } catch {
-      candidate.destroy();
-      return failure("invalid_update");
-    }
-    this.#replace(candidate);
-    return success(null);
-  }
-
   rename(title: string): MenuDraftCrdtResult<MenuDraftUpdate> {
     const normalized = normalizePlainText(title);
     if (!validText(normalized)) return failure("text_too_long");
-    return this.#mutate(setMenuTitle.bind(null, normalized));
+    return this.mutate(setMenuTitle.bind(null, normalized));
   }
 
   addSection(section: MenuSection): MenuDraftCrdtResult<MenuDraftUpdate> {
-    return this.#mutate(addMenuSection.bind(null, section));
+    return this.mutate(addMenuSection.bind(null, section));
   }
 
   addItem(item: MenuItem): MenuDraftCrdtResult<MenuDraftUpdate> {
-    return this.#mutate(addMenuItem.bind(null, item));
+    return this.mutate(addMenuItem.bind(null, item));
   }
 
   renameItem(itemId: string, displayName: string): MenuDraftCrdtResult<MenuDraftUpdate> {
-    return this.#mutate(editMenuItemText.bind(null, itemId, "displayName", displayName));
+    return this.mutate(editMenuItemText.bind(null, itemId, "displayName", displayName));
   }
 
   describeItem(itemId: string, description: string): MenuDraftCrdtResult<MenuDraftUpdate> {
-    return this.#mutate(editMenuItemText.bind(null, itemId, "description", description));
+    return this.mutate(editMenuItemText.bind(null, itemId, "description", description));
   }
 
   moveItem(itemId: string, placement: MenuItemPlacement): MenuDraftCrdtResult<MenuDraftUpdate> {
-    return this.#mutate(moveMenuItem.bind(null, itemId, placement));
+    return this.mutate(moveMenuItem.bind(null, itemId, placement));
   }
 
   deleteItem(itemId: string): MenuDraftCrdtResult<MenuDraftUpdate> {
-    return this.#mutate(deleteMenuItem.bind(null, itemId));
+    return this.mutate(deleteMenuItem.bind(null, itemId));
   }
-
-  destroy(): void {
-    this.#doc.destroy();
-  }
-
-  #mutate(operation: (doc: Y.Doc) => MenuDraftCrdtResult<null>): MenuDraftCrdtResult<MenuDraftUpdate> {
-    const candidate = cloneDocument(this.#doc);
-    const updates: Uint8Array[] = [];
-    const captureUpdate = captureYjsUpdate.bind(null, updates);
-    candidate.on("update", captureUpdate);
-    const changed = operation(candidate);
-    candidate.off("update", captureUpdate);
-    if (!changed.ok) {
-      candidate.destroy();
-      return changed;
-    }
-    const valid = validateDocument(candidate);
-    if (!valid.ok) {
-      candidate.destroy();
-      return valid;
-    }
-    if (updates.length === 0) {
-      candidate.destroy();
-      return failure("record_conflict");
-    }
-    const update = parseMenuDraftUpdate(Y.mergeUpdates(updates));
-    if (!update.ok) {
-      candidate.destroy();
-      return update;
-    }
-    this.#replace(candidate);
-    return update;
-  }
-
-  #replace(candidate: Y.Doc): void {
-    this.#doc.destroy();
-    this.#doc = candidate;
-  }
-}
-
-function createEmptyDocument(): Y.Doc {
-  const doc = new Y.Doc();
-  doc.getMap("menu");
-  doc.getMap("sections");
-  doc.getMap("items");
-  return doc;
-}
-
-function cloneDocument(source: Y.Doc): Y.Doc {
-  const candidate = createEmptyDocument();
-  Y.applyUpdate(candidate, Y.encodeStateAsUpdate(source));
-  candidate.clientID = source.clientID;
-  return candidate;
 }
 
 function setMenuTitle(title: string, doc: Y.Doc): MenuDraftCrdtResult<null> {
   doc.getMap("menu").set("title", title);
   return success(null);
-}
-
-function captureYjsUpdate(updates: Uint8Array[], update: Uint8Array): void {
-  updates.push(update);
 }
 
 function addMenuSection(section: MenuSection, doc: Y.Doc): MenuDraftCrdtResult<null> {
@@ -335,11 +209,8 @@ function deleteMenuItem(itemId: string, doc: Y.Doc): MenuDraftCrdtResult<null> {
   return success(null);
 }
 
+/** The check of the content. The shared document checks the roots first. */
 function validateDocument(doc: Y.Doc): MenuDraftCrdtResult<null> {
-  if (doc.share.size !== 3 || !(doc.share.get("menu") instanceof Y.Map) ||
-    !(doc.share.get("sections") instanceof Y.Map) || !(doc.share.get("items") instanceof Y.Map)) {
-    return failure("invalid_document_shape");
-  }
   const menu = doc.getMap("menu");
   if (menu.size !== 1 || !validText(menu.get("title"))) return failure("invalid_document_shape");
   const sections = doc.getMap("sections");
@@ -351,9 +222,7 @@ function validateDocument(doc: Y.Doc): MenuDraftCrdtResult<null> {
   for (const [id, item] of items) {
     if (!(item instanceof Y.Map) || !validItemMap(id, item, sections)) return failure("invalid_document_shape");
   }
-  if (Y.encodeStateAsUpdate(doc).byteLength > MENU_STATE_LIMIT) return failure("state_too_large");
-  if (Y.encodeStateVector(doc).byteLength > MENU_STATE_VECTOR_LIMIT) return failure("state_vector_too_large");
-  return success(null);
+  return checkDocumentSize(doc, ENCODING_LIMITS);
 }
 
 function validSectionMap(id: string, section: Y.Map<unknown>): boolean {
@@ -428,12 +297,4 @@ function compareOrderedRecord(first: MenuSection, second: MenuSection): number {
 function compareMenuItems(first: MenuItem, second: MenuItem): number {
   return first.placement.sectionId.localeCompare(second.placement.sectionId) ||
     first.placement.order - second.placement.order || first.id.localeCompare(second.id);
-}
-
-function success<T>(value: T): MenuDraftCrdtResult<T> {
-  return { ok: true, value };
-}
-
-function failure(code: MenuDraftCrdtError["code"]): MenuDraftCrdtResult<never> {
-  return { ok: false, error: { code } };
 }

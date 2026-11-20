@@ -3,8 +3,6 @@ import {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
-  createSyncProtocol,
-  everyCode,
   isTextPresenceSelection,
   type CollaborationParticipant,
   type CollaborationPointer,
@@ -14,14 +12,13 @@ import {
   type SyncServerMessage,
 } from "@purin-labs/collaboration";
 import {
-  parseMailReplyUpdate,
-  parseMailReplyStateVector,
+  mailReplyDocument,
   type MailReplyUpdate,
   type MailReplyStateVector,
   type MailReplyCrdtError,
   type MailReplyPresenceSelection,
 } from "./index.ts";
-import { isPositiveInteger } from "@purin-labs/std";
+import { exhaustiveList, isPositiveInteger } from "@purin-labs/std";
 
 export const MAIL_REPLY_PROTOCOL = "mail_reply_sync.v1";
 export const FRAME_LIMIT = COLLABORATION_FRAME_LIMIT;
@@ -32,7 +29,8 @@ export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
 export type DraftPointerPosition = CollaborationPointerPosition;
 export type DraftPointer = CollaborationPointer;
 
-type DocumentCode = MailReplyCrdtError["code"] | "source_unavailable" | "draft_closed";
+type RoomCode = "source_unavailable" | "draft_closed";
+type DocumentCode = MailReplyCrdtError["code"] | RoomCode;
 export type DraftFailureCode = SyncFailureCode<DocumentCode>;
 
 export type DraftParticipant =
@@ -61,28 +59,16 @@ export type DraftServerMessage = SyncServerMessage<
   MailReplyRoomMetadata
 >;
 
-const protocol = createSyncProtocol<
+const protocol = mailReplyDocument.syncProtocol<
   MailReplyPresenceSelection,
-  MailReplyStateVector,
-  MailReplyUpdate,
-  DocumentCode,
-  MailReplyRoomMetadata
+  MailReplyRoomMetadata,
+  RoomCode
 >({
   protocol: MAIL_REPLY_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "mail reply",
   isSelection: isTextPresenceSelection,
-  parseStateVector: parseMailReplyStateVector,
-  parseUpdate: parseMailReplyUpdate,
-  documentFailureCodes: everyCode<DocumentCode>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_document_shape",
-    "body_too_long",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
+  roomFailureCodes: exhaustiveList<RoomCode>()([
     "source_unavailable",
     "draft_closed",
   ]),

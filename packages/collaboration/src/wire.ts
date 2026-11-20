@@ -11,6 +11,19 @@ export const COLLABORATION_PONG_TIMEOUT_MS = 75_000;
 export const COLLABORATION_PRESENCE_EXPIRY_MS = 90_000;
 export const COLLABORATION_POINTER_IDLE_MS = 5_000;
 
+/**
+ * The frame limit of a document whose full snapshot and state vector travel
+ * together as base64 in one frame.
+ */
+export function snapshotFrameLimit(
+  snapshotLimit: number,
+  stateVectorLimit: number,
+): number {
+  return (
+    4 * (Math.ceil(snapshotLimit / 3) + Math.ceil(stateVectorLimit / 3)) + 1024
+  );
+}
+
 export type CollaborationPresenceState = "viewing" | "editing";
 export type CollaborationPointerPosition = Readonly<{ x: number; y: number }>;
 export type CollaborationPointer = Readonly<{

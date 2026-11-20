@@ -2,8 +2,7 @@ import {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
-  createSyncProtocol,
-  everyCode,
+  snapshotFrameLimit,
   type CollaborationParticipant,
   type SyncClientMessage,
   type SyncFailureCode,
@@ -12,7 +11,8 @@ import {
 import { isRecord } from "@purin-labs/std";
 import {
   DRAFT_ENCODING_LIMITS,
-  DraftEncoding,
+  workflowDraftEncoding,
+  type DraftEncoding,
   type DraftFailureCode,
 } from "./draft.ts";
 
@@ -21,12 +21,10 @@ type DraftStateVector = DraftEncoding<"state_vector">;
 export type DraftSelection = Readonly<{ objectId: string }>;
 
 export const DRAFT_PROTOCOL = "workflow_draft_sync.v1";
-// A full snapshot and its state vector travel together as base64 in one frame.
-export const FRAME_LIMIT =
-  4 *
-    (Math.ceil(DRAFT_ENCODING_LIMITS.state / 3) +
-      Math.ceil(DRAFT_ENCODING_LIMITS.stateVector / 3)) +
-  1024;
+export const FRAME_LIMIT = snapshotFrameLimit(
+  DRAFT_ENCODING_LIMITS.state,
+  DRAFT_ENCODING_LIMITS.stateVector,
+);
 export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
 export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
 export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
@@ -59,30 +57,16 @@ export type DraftServerMessage = SyncServerMessage<
   DraftExtension
 >;
 
-const protocol = createSyncProtocol<
+const protocol = workflowDraftEncoding.syncProtocol<
   DraftSelection,
-  DraftStateVector,
-  DraftUpdate,
-  DraftFailureCode,
   DraftRoomMetadata,
+  never,
   DraftExtension
 >({
   protocol: DRAFT_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "workflow draft",
   isSelection: isDraftSelection,
-  parseStateVector: (bytes) => DraftEncoding.parse("state_vector", bytes),
-  parseUpdate: (bytes) => DraftEncoding.parse("update", bytes),
-  documentFailureCodes: everyCode<DraftFailureCode>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_draft",
-    "object_limit",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-  ]),
   presenceFields: { fields: [], isValid: () => true },
   signals: ["revision_changed"],
 });

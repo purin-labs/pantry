@@ -1,17 +1,22 @@
 import {
   captureTextPresenceSelection,
+  defineSharedDoc,
+  hasOnlyPlainTextStructs,
   hasValidPlainTextShape,
   normalizePlainText,
-  parseYjsEncoding,
   resolveTextPresenceSelection,
+  sharedDocFailure as failure,
+  sharedDocSuccess as success,
   splicePlainText,
-  type ParsedYjsEncoding,
+  type SharedDocEncoding,
+  type SharedDocError,
+  type SharedDocResult,
   type TextInputRange,
   type TextPresenceSelection,
   type TextSelectionDirection,
   type TextSelectionRange,
 } from "@purin-labs/collaboration";
-import * as Y from "yjs";
+import type * as Y from "yjs";
 import {
   EMAIL_AGGREGATE_LIMIT,
   EMAIL_BODY_LIMIT,
@@ -32,83 +37,49 @@ export type EmailDraftSelection = Readonly<{
   anchor: TextPresenceSelection;
 }>;
 
-export type EmailDraftCrdtError = Readonly<{
-  code:
-    | "invalid_state"
-    | "invalid_update"
-    | "invalid_state_vector"
-    | "invalid_document_shape"
-    | "field_too_long"
-    | "draft_too_long"
-    | "update_too_large"
-    | "state_too_large"
-    | "state_vector_too_large";
-}>;
+/** The document's own failures, beside the failures of an encoding. */
+const FAILURES = [
+  "invalid_document_shape",
+  "field_too_long",
+  "draft_too_long",
+] as const;
+export type EmailDraftCrdtError = SharedDocError<(typeof FAILURES)[number]>;
 
-export type EmailDraftCrdtResult<T> =
-  | Readonly<{ ok: true; value: T; error?: never }>
-  | Readonly<{ ok: false; error: EmailDraftCrdtError; value?: never }>;
-
-type EncodingKind = "state" | "update" | "state_vector";
+export type EmailDraftCrdtResult<T> = SharedDocResult<T, EmailDraftCrdtError["code"]>;
 
 const EMAIL_FIELDS: readonly EmailDraftField[] = ["subject", "preview", "body"];
-const ENCODING_LIMITS = {
-  state: EMAIL_STATE_LIMIT,
-  update: EMAIL_UPDATE_LIMIT,
-  stateVector: EMAIL_STATE_VECTOR_LIMIT,
-} as const;
 
-class EmailEncoding<K extends EncodingKind> {
-  readonly #encoding: ParsedYjsEncoding<K>;
-  readonly kind: K;
+/** Three plain texts, each in the root of its field. */
+export const emailDraftDocument = defineSharedDoc({
+  schema: EMAIL_DRAFT_SCHEMA,
+  limits: {
+    state: EMAIL_STATE_LIMIT,
+    update: EMAIL_UPDATE_LIMIT,
+    stateVector: EMAIL_STATE_VECTOR_LIMIT,
+  },
+  failures: FAILURES,
+  roots: { subject: "text", preview: "text", body: "text" },
+  shapeFailure: "invalid_document_shape",
+  validateEncoded: (bytes) =>
+    hasOnlyPlainTextStructs(bytes, EMAIL_FIELDS) ? null : "invalid_document_shape",
+  validate: validateDocument,
+});
 
-  private constructor(encoding: ParsedYjsEncoding<K>) {
-    this.#encoding = encoding;
-    this.kind = encoding.kind;
-  }
+type Schema = typeof EMAIL_DRAFT_SCHEMA;
+export type EmailDraftState = SharedDocEncoding<"state", Schema>;
+export type EmailDraftUpdate = SharedDocEncoding<"update", Schema>;
+export type EmailDraftStateVector = SharedDocEncoding<"state_vector", Schema>;
 
-  encode(): Uint8Array {
-    return this.#encoding.encode();
-  }
+export const parseEmailDraftState = emailDraftDocument.parseState;
+export const parseEmailDraftUpdate = emailDraftDocument.parseUpdate;
+export const parseEmailDraftStateVector = emailDraftDocument.parseStateVector;
 
-  static parse<K extends EncodingKind>(kind: K, bytes: Uint8Array): EmailDraftCrdtResult<EmailEncoding<K>> {
-    const parsed = parseYjsEncoding(kind, bytes, ENCODING_LIMITS);
-    if (!parsed.ok) return parsed;
-    if (kind !== "state_vector" && !hasValidUpdateShape(parsed.value.encode())) {
-      return failure("invalid_document_shape");
-    }
-    return success(new EmailEncoding(parsed.value));
-  }
-}
-
-export type EmailDraftState = EmailEncoding<"state">;
-export type EmailDraftUpdate = EmailEncoding<"update">;
-export type EmailDraftStateVector = EmailEncoding<"state_vector">;
-
-export function parseEmailDraftState(bytes: Uint8Array): EmailDraftCrdtResult<EmailDraftState> {
-  return EmailEncoding.parse("state", bytes);
-}
-
-export function parseEmailDraftUpdate(bytes: Uint8Array): EmailDraftCrdtResult<EmailDraftUpdate> {
-  return EmailEncoding.parse("update", bytes);
-}
-
-export function parseEmailDraftStateVector(bytes: Uint8Array): EmailDraftCrdtResult<EmailDraftStateVector> {
-  return EmailEncoding.parse("state_vector", bytes);
-}
-
-export class EmailDraftDoc {
-  #doc: Y.Doc;
-
-  private constructor(doc: Y.Doc) {
-    this.#doc = doc;
-  }
-
+export class EmailDraftDoc extends emailDraftDocument.Doc {
   static create(initial: EmailDraftSnapshot = { subject: "", preview: "", body: "" }): EmailDraftCrdtResult<EmailDraftDoc> {
     const normalized = normalizeSnapshot(initial);
     const valid = validateSnapshot(normalized);
     if (!valid.ok) return valid;
-    const doc = createEmptyDocument();
+    const doc = emailDraftDocument.emptyDocument();
     for (const field of EMAIL_FIELDS) {
       if (normalized[field].length > 0) doc.getText(field).insert(0, normalized[field]);
     }
@@ -116,64 +87,16 @@ export class EmailDraftDoc {
   }
 
   static restore(state: EmailDraftState): EmailDraftCrdtResult<EmailDraftDoc> {
-    const doc = createEmptyDocument();
-    try {
-      Y.applyUpdate(doc, state.encode());
-      const valid = validateDocument(doc);
-      if (!valid.ok) {
-        doc.destroy();
-        return valid;
-      }
-      return success(new EmailDraftDoc(doc));
-    } catch {
-      doc.destroy();
-      return failure("invalid_state");
-    }
+    const doc = emailDraftDocument.restore(state);
+    return doc.ok ? success(new EmailDraftDoc(doc.value)) : doc;
   }
 
   read(): EmailDraftSnapshot {
-    return {
-      subject: this.#doc.getText("subject").toString(),
-      preview: this.#doc.getText("preview").toString(),
-      body: this.#doc.getText("body").toString(),
-    };
+    return readSnapshot(this.doc);
   }
 
   readField(field: EmailDraftField): string {
-    return this.#doc.getText(field).toString();
-  }
-
-  state(): EmailDraftCrdtResult<EmailDraftState> {
-    return parseEmailDraftState(Y.encodeStateAsUpdate(this.#doc));
-  }
-
-  stateVector(): EmailDraftCrdtResult<EmailDraftStateVector> {
-    return parseEmailDraftStateVector(Y.encodeStateVector(this.#doc));
-  }
-
-  syncUpdate(remoteStateVector: EmailDraftStateVector): EmailDraftCrdtResult<EmailDraftUpdate> {
-    try {
-      return parseEmailDraftUpdate(Y.encodeStateAsUpdate(this.#doc, remoteStateVector.encode()));
-    } catch {
-      return failure("invalid_state_vector");
-    }
-  }
-
-  apply(update: EmailDraftUpdate): EmailDraftCrdtResult<null> {
-    const candidate = cloneDocument(this.#doc);
-    try {
-      Y.applyUpdate(candidate, update.encode());
-      const valid = validateDocument(candidate);
-      if (!valid.ok) {
-        candidate.destroy();
-        return valid;
-      }
-    } catch {
-      candidate.destroy();
-      return failure("invalid_update");
-    }
-    this.#replace(candidate);
-    return success(null);
+    return this.doc.getText(field).toString();
   }
 
   edit(field: EmailDraftField, nextValue: string, inputRange?: TextInputRange): EmailDraftCrdtResult<EmailDraftUpdate> {
@@ -184,25 +107,9 @@ export class EmailDraftDoc {
     const candidateSnapshot = { ...current, [field]: next };
     const validSnapshot = validateSnapshot(candidateSnapshot);
     if (!validSnapshot.ok) return validSnapshot;
-    const candidate = cloneDocument(this.#doc);
-    try {
-      candidate.transact(splicePlainText.bind(null, candidate.getText(field), current[field], next, inputRange));
-      const valid = validateDocument(candidate);
-      if (!valid.ok) {
-        candidate.destroy();
-        return valid;
-      }
-      const update = parseEmailDraftUpdate(Y.encodeStateAsUpdate(candidate, Y.encodeStateVector(this.#doc)));
-      if (!update.ok) {
-        candidate.destroy();
-        return update;
-      }
-      this.#replace(candidate);
-      return update;
-    } catch {
-      candidate.destroy();
-      return failure("invalid_update");
-    }
+    return this.stage((candidate) =>
+      candidate.transact(splicePlainText.bind(null, candidate.getText(field), current[field], next, inputRange)),
+    );
   }
 
   captureSelection(
@@ -213,25 +120,16 @@ export class EmailDraftDoc {
   ): EmailDraftSelection {
     return {
       field,
-      anchor: captureTextPresenceSelection(this.#doc.getText(field), start, end, direction),
+      anchor: captureTextPresenceSelection(this.doc.getText(field), start, end, direction),
     };
   }
 
   resolveSelection(selection: EmailDraftSelection): TextSelectionRange | null {
     return resolveTextPresenceSelection(
-      this.#doc,
-      this.#doc.getText(selection.field),
+      this.doc,
+      this.doc.getText(selection.field),
       selection.anchor,
     );
-  }
-
-  destroy(): void {
-    this.#doc.destroy();
-  }
-
-  #replace(candidate: Y.Doc): void {
-    this.#doc.destroy();
-    this.#doc = candidate;
   }
 }
 
@@ -239,17 +137,12 @@ export function isEmailDraftField(value: unknown): value is EmailDraftField {
   return value === "subject" || value === "preview" || value === "body";
 }
 
-function createEmptyDocument(): Y.Doc {
-  const doc = new Y.Doc();
-  for (const field of EMAIL_FIELDS) doc.getText(field);
-  return doc;
-}
-
-function cloneDocument(source: Y.Doc): Y.Doc {
-  const candidate = createEmptyDocument();
-  Y.applyUpdate(candidate, Y.encodeStateAsUpdate(source));
-  candidate.clientID = source.clientID;
-  return candidate;
+function readSnapshot(doc: Y.Doc): EmailDraftSnapshot {
+  return {
+    subject: doc.getText("subject").toString(),
+    preview: doc.getText("preview").toString(),
+    body: doc.getText("body").toString(),
+  };
 }
 
 function normalizeSnapshot(snapshot: EmailDraftSnapshot): EmailDraftSnapshot {
@@ -260,16 +153,9 @@ function normalizeSnapshot(snapshot: EmailDraftSnapshot): EmailDraftSnapshot {
   };
 }
 
+/** The check of the content. The shared document checks the roots first. */
 function validateDocument(doc: Y.Doc): EmailDraftCrdtResult<null> {
-  if (doc.share.size !== EMAIL_FIELDS.length) return failure("invalid_document_shape");
-  for (const field of EMAIL_FIELDS) {
-    if (!(doc.share.get(field) instanceof Y.Text)) return failure("invalid_document_shape");
-  }
-  return validateSnapshot({
-    subject: doc.getText("subject").toString(),
-    preview: doc.getText("preview").toString(),
-    body: doc.getText("body").toString(),
-  });
+  return validateSnapshot(readSnapshot(doc));
 }
 
 function validateSnapshot(snapshot: EmailDraftSnapshot): EmailDraftCrdtResult<null> {
@@ -291,31 +177,4 @@ function validateField(field: EmailDraftField, value: string): EmailDraftCrdtRes
       : EMAIL_BODY_LIMIT;
   if (value.length > limit) return failure("field_too_long");
   return hasValidPlainTextShape(value) ? success(null) : failure("invalid_document_shape");
-}
-
-function hasValidUpdateShape(bytes: Uint8Array): boolean {
-  try {
-    const decoded = Y.decodeUpdate(bytes);
-    for (const struct of decoded.structs) {
-      if (!(struct instanceof Y.Item)) continue;
-      if (
-        typeof struct.parent === "string" && !isEmailDraftField(struct.parent) ||
-        struct.parentSub !== null ||
-        !(struct.content instanceof Y.ContentString || struct.content instanceof Y.ContentDeleted)
-      ) {
-        return false;
-      }
-    }
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function success<T>(value: T): EmailDraftCrdtResult<T> {
-  return { ok: true, value };
-}
-
-function failure(code: EmailDraftCrdtError["code"]): EmailDraftCrdtResult<never> {
-  return { ok: false, error: { code } };
 }

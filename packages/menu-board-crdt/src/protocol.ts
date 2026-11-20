@@ -2,9 +2,8 @@ import {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
-  createSyncProtocol,
-  everyCode,
   isShortProtocolText,
+  snapshotFrameLimit,
   type CollaborationParticipant,
   type SyncClientMessage,
   type SyncFailureCode,
@@ -17,8 +16,7 @@ import {
   isMenuBoardId,
   isMenuBoardRect,
   MENU_BOARD_UPDATE_LIMIT,
-  parseMenuBoardStateVector,
-  parseMenuBoardUpdate,
+  menuBoardDocument,
   type MenuBoardCrdtError,
   type MenuBoardStateVector,
   type MenuBoardUpdate,
@@ -27,8 +25,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 
 export const MENU_BOARD_PROTOCOL = "menu_board_sync.v1";
-// A full snapshot and its state vector travel together as base64 in one frame.
-export const FRAME_LIMIT = 4 * (Math.ceil(MENU_BOARD_UPDATE_LIMIT / 3) + Math.ceil(MENU_BOARD_STATE_VECTOR_LIMIT / 3)) + 1024;
+export const FRAME_LIMIT = snapshotFrameLimit(MENU_BOARD_UPDATE_LIMIT, MENU_BOARD_STATE_VECTOR_LIMIT);
 export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
 export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
 export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
@@ -44,30 +41,11 @@ export type MenuBoardServerMessage = SyncServerMessage<
   MenuBoardCrdtError["code"]
 >;
 
-const protocol = createSyncProtocol<
-  MenuBoardPresenceSelection,
-  MenuBoardStateVector,
-  MenuBoardUpdate,
-  MenuBoardCrdtError["code"]
->({
+const protocol = menuBoardDocument.syncProtocol({
   protocol: MENU_BOARD_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "menu board",
   isSelection: isBoardSelection,
-  parseStateVector: parseMenuBoardStateVector,
-  parseUpdate: parseMenuBoardUpdate,
-  documentFailureCodes: everyCode<MenuBoardCrdtError["code"]>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_document_shape",
-    "collection_limit",
-    "text_too_long",
-    "record_conflict",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-  ]),
 });
 
 export const parseMenuBoardClientMessage = protocol.parseClientMessage;
