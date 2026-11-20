@@ -45,6 +45,8 @@ import type {
 
 /** The adapter version that a Square Terminal assignment records. */
 const SQUARE_TERMINAL_ADAPTER_VERSION = "square_terminal@2026-08-19";
+/** The Point of Sale API version that the Register's handoff link names. */
+const SQUARE_POS_APP_ADAPTER_VERSION = "square_pos_app@1.3";
 
 /**
  * The operator's view of card-present counters. Development organisations can bind a
@@ -72,7 +74,8 @@ export type TerminalOperationsControlRoute =
       kind: "terminalRetirement";
       organisationIdRaw: string;
       satyrLocationIdRaw: string;
-    }>;
+    }>
+  | Readonly<{ kind: "terminalSquarePosApp"; organisationIdRaw: string }>;
 
 export function matchTerminalOperationsControlRoute(
   pathname: string,
@@ -99,6 +102,16 @@ export function matchTerminalOperationsControlRoute(
           : "terminalPairingActivation",
       organisationIdRaw: decode(pairing[0]),
       deviceCodeIdRaw: decode(pairing[1]),
+    };
+  }
+  const squarePosApp = match(
+    pathname,
+    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/terminal-operations\/square-pos-app$/u,
+  );
+  if (squarePosApp !== null) {
+    return {
+      kind: "terminalSquarePosApp",
+      organisationIdRaw: decode(squarePosApp[0]),
     };
   }
   const retirement = match(
@@ -141,6 +154,12 @@ export function handleTerminalOperationsControlRoute(
       return handleTerminalPairingRead(request, env, route);
     case "terminalPairingActivation":
       return handleTerminalPairingActivation(request, env, route);
+    case "terminalSquarePosApp":
+      return handleSquarePosAppAssignment(
+        request,
+        env,
+        route.organisationIdRaw,
+      );
   }
 }
 
@@ -728,47 +747,25 @@ async function handleTerminalPairingStart(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const change = await beginSquareCounterChange(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
+    {
+      parse: parseTerminalPairingRequest,
+      invalid: "terminal_pairing_invalid",
+      operation: "terminal.pairing.start",
+      suffix: "/pairings",
+    },
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("terminal_pairing_invalid", 422);
-  const selection = parseTerminalPairingRequest(body.value);
-  if (selection === null) return controlError("terminal_pairing_invalid", 422);
-  const mutation = await beginCounterMutation(
-    request,
-    env,
-    authorized,
-    body.value,
-    "terminal.pairing.start",
-    "/pairings",
-  );
-  if (mutation instanceof Response) return mutation;
-  const context = await pairingContext(
-    env,
-    authorized,
-    selection.integrationAccountId,
-  );
-  if (context instanceof Response) return context;
-  const location = findSquareLocation(
-    context.account.locations,
+  if (change instanceof Response) return change;
+  const { authorized, mutation, context, selection } = change;
+  const location = counterLocation(
+    context,
+    selection.satyrLocationId,
     selection.providerLocationId,
   );
-  if (
-    location === null ||
-    !hasPantryLocation(
-      context.configuration,
-      selection.satyrLocationId,
-      location.currency,
-    )
-  )
-    return controlError("terminal_pairing_invalid", 422);
+  if (location === null) return controlError("terminal_pairing_invalid", 422);
   const created = await context.square.client.createSquareDeviceCode(
     context.square.merchantId,
     {
@@ -825,26 +822,147 @@ async function handleTerminalPairingActivation(
   env: Env,
   route: Variant<TerminalOperationsControlRoute, "terminalPairingActivation">,
 ): Promise<Response> {
+  const change = await beginSquareCounterChange(
+    request,
+    env,
+    route.organisationIdRaw,
+    {
+      parse: parseTerminalPairingActivation,
+      invalid: "terminal_pairing_invalid",
+      operation: "terminal.pairing.activate",
+      suffix: `/pairings/${route.deviceCodeIdRaw}/activation`,
+    },
+  );
+  if (change instanceof Response) return change;
+  const read = await readPairingCode(change.context, route.deviceCodeIdRaw);
+  if (read instanceof Response) return read;
+  const state = pairingReadback(read.code, Date.now()).status;
+  if (state !== "paired" || read.code.deviceId === null)
+    return controlError(`terminal_pairing_${state}`, 409);
+  if (
+    !hasPantryLocation(
+      change.context.configuration,
+      change.selection.satyrLocationId,
+      read.location.currency,
+    )
+  )
+    return controlError("terminal_pairing_invalid", 422);
+  return assignCounterTarget(request, change, {
+    location: read.location,
+    target: { kind: "paired_physical", providerDeviceId: read.code.deviceId },
+    transport: "server_terminal",
+    adapterVersion: SQUARE_TERMINAL_ADAPTER_VERSION,
+    invalid: "terminal_pairing_invalid",
+  });
+}
+
+/**
+ * Lets the Square Point of Sale app on the counter iPad take a counter's
+ * card, e-money and PayPay payments on a Square Reader (Plan 90 Phase 3B).
+ * Square's Sandbox has no Point of Sale API, so only a production
+ * organisation can choose it.
+ */
+async function handleSquarePosAppAssignment(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  const change = await beginSquareCounterChange(
+    request,
+    env,
+    organisationIdRaw,
+    {
+      parse: parseSquarePosAppSelection,
+      invalid: "terminal_configuration_invalid",
+      operation: "terminal.assignment.square_pos_app",
+      suffix: "/square-pos-app",
+    },
+  );
+  if (change instanceof Response) return change;
+  const location = counterLocation(
+    change.context,
+    change.selection.satyrLocationId,
+    change.selection.providerLocationId,
+  );
+  if (location === null)
+    return controlError("terminal_configuration_invalid", 422);
+  return assignCounterTarget(request, change, {
+    location,
+    target: { kind: "square_pos_app" },
+    transport: "client_app_handoff",
+    adapterVersion: SQUARE_POS_APP_ADAPTER_VERSION,
+    invalid: "terminal_configuration_invalid",
+  });
+}
+
+function parseSquarePosAppSelection(
+  body: Readonly<Record<string, unknown>>,
+): Readonly<{
+  satyrLocationId: string;
+  integrationAccountId: string;
+  providerLocationId: string;
+}> | null {
+  const keys = Object.keys(body).sort().join(",");
+  return keys === "integrationAccountId,providerLocationId,satyrLocationId" &&
+    nonEmpty(body.satyrLocationId) &&
+    nonEmpty(body.integrationAccountId) &&
+    nonEmpty(body.providerLocationId)
+    ? {
+        satyrLocationId: body.satyrLocationId,
+        integrationAccountId: body.integrationAccountId,
+        providerLocationId: body.providerLocationId,
+      }
+    : null;
+}
+
+type SquareCounterChange<Selection> = Readonly<{
+  env: Env;
+  authorized: AuthorizedRequest;
+  mutation: CounterMutation;
+  context: PairingContext;
+  selection: Selection;
+}>;
+
+/**
+ * The start of a change to a production counter's Square payments: an
+ * admin, the idempotent start of the mutation and the Square account.
+ */
+async function beginSquareCounterChange<
+  Selection extends Readonly<{
+    satyrLocationId: string;
+    integrationAccountId: string;
+  }>,
+>(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  change: Readonly<{
+    parse: (body: Readonly<Record<string, unknown>>) => Selection | null;
+    invalid: string;
+    operation: string;
+    suffix: string;
+  }>,
+): Promise<SquareCounterChange<Selection> | Response> {
   if (request.method !== "POST") return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
-    route.organisationIdRaw,
+    organisationIdRaw,
     "admin",
     true,
   );
   if (!authorized.ok) return authorized.response;
   const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("terminal_pairing_invalid", 422);
-  const selection = parseTerminalPairingActivation(body.value);
-  if (selection === null) return controlError("terminal_pairing_invalid", 422);
+  if (!body.ok) return controlError(change.invalid, 422);
+  const selection = change.parse(body.value);
+  if (selection === null) return controlError(change.invalid, 422);
   const mutation = await beginCounterMutation(
     request,
     env,
     authorized,
     body.value,
-    "terminal.pairing.activate",
-    `/pairings/${route.deviceCodeIdRaw}/activation`,
+    change.operation,
+    change.suffix,
   );
   if (mutation instanceof Response) return mutation;
   const context = await pairingContext(
@@ -853,20 +971,45 @@ async function handleTerminalPairingActivation(
     selection.integrationAccountId,
   );
   if (context instanceof Response) return context;
-  const read = await readPairingCode(context, route.deviceCodeIdRaw);
-  if (read instanceof Response) return read;
-  const state = pairingReadback(read.code, Date.now()).status;
-  if (state !== "paired" || read.code.deviceId === null)
-    return controlError(`terminal_pairing_${state}`, 409);
-  const location = read.location;
-  if (
-    !hasPantryLocation(
+  return { env, authorized, mutation, context, selection };
+}
+
+/** The account's location for a counter, or null when the counter cannot use it. */
+function counterLocation(
+  context: PairingContext,
+  pantryLocationId: string,
+  providerLocationId: string,
+): SquareLocationChoice | null {
+  const location = findSquareLocation(
+    context.account.locations,
+    providerLocationId,
+  );
+  return location !== null &&
+    hasPantryLocation(
       context.configuration,
-      selection.satyrLocationId,
+      pantryLocationId,
       location.currency,
     )
-  )
-    return controlError("terminal_pairing_invalid", 422);
+    ? location
+    : null;
+}
+
+/**
+ * Points the counter at a target, or keeps the active assignment that
+ * already does, then answers with the counters.
+ */
+async function assignCounterTarget(
+  request: Request,
+  change: SquareCounterChange<Readonly<{ satyrLocationId: string }>>,
+  next: Readonly<{
+    location: SquareLocationChoice;
+    target: TerminalAssignment["target"];
+    transport: TerminalAssignment["transport"];
+    adapterVersion: string;
+    invalid: string;
+  }>,
+): Promise<Response> {
+  const { authorized, context, mutation, selection } = change;
   const database = authorized.executionScope.database;
   const current = await readActiveTerminalAssignment(
     database,
@@ -875,31 +1018,33 @@ async function handleTerminalPairingActivation(
   );
   if (!current.ok && current.error.code === "terminal_assignment_corrupt")
     return controlError("terminal_assignment_corrupt", 409);
-  const now = Date.now();
+  const account = providerAccountBinding(context.sourceAccount, next.location);
   const unchanged =
     current.ok &&
-    physicalSelectionMatches(
-      current.value,
-      context,
-      selection.satyrLocationId,
-      location,
-      read.code.deviceId,
-    );
+    current.value.state.kind === "active" &&
+    current.value.merchantId === context.configuration.merchantId &&
+    current.value.satyrLocationId === selection.satyrLocationId &&
+    current.value.providerLocationId === next.location.providerLocationId &&
+    current.value.transport === next.transport &&
+    current.value.adapterVersion === next.adapterVersion &&
+    JSON.stringify(current.value.target) === JSON.stringify(next.target) &&
+    JSON.stringify(current.value.account) === JSON.stringify(account);
+  const now = Date.now();
   if (!unchanged) {
     const assignment = parseTerminalAssignment({
       assignmentId: `terminal_assignment_${crypto.randomUUID()}`,
       organisationId: authorized.organisationId,
       merchantId: context.configuration.merchantId,
       satyrLocationId: selection.satyrLocationId,
-      account: providerAccountBinding(context.sourceAccount, location),
-      providerLocationId: location.providerLocationId,
-      target: { kind: "paired_physical", providerDeviceId: read.code.deviceId },
-      transport: "server_terminal",
-      adapterVersion: SQUARE_TERMINAL_ADAPTER_VERSION,
+      account,
+      providerLocationId: next.location.providerLocationId,
+      target: next.target,
+      transport: next.transport,
+      adapterVersion: next.adapterVersion,
       revision: current.ok ? current.value.revision + 1 : 1,
       state: { kind: "active" },
     });
-    if (!assignment.ok) return controlError("terminal_pairing_invalid", 422);
+    if (!assignment.ok) return controlError(next.invalid, 422);
     const activated = await activateTerminalAssignment({
       db: database,
       organisationId: authorized.organisationId,
@@ -910,7 +1055,11 @@ async function handleTerminalPairingActivation(
   }
   const responseBody = {
     ok: true,
-    terminalOperations: await readTerminalOperationsOf(env, authorized, now),
+    terminalOperations: await readTerminalOperationsOf(
+      change.env,
+      authorized,
+      now,
+    ),
     configuration: context.configuration,
   };
   return finishCounterMutation(request, authorized, mutation, responseBody);
@@ -1092,31 +1241,6 @@ function pairingProviderError(error: CommerceClientError): Response {
   return controlError(
     unavailable ? "square_unavailable" : "square_request_refused",
     unavailable ? 503 : 502,
-  );
-}
-
-function physicalSelectionMatches(
-  assignment: TerminalAssignment,
-  context: PairingContext,
-  pantryLocationId: string,
-  location: SquareLocationChoice,
-  deviceId: string,
-): boolean {
-  return (
-    assignment.state.kind === "active" &&
-    assignment.merchantId === context.configuration.merchantId &&
-    assignment.satyrLocationId === pantryLocationId &&
-    assignment.account.integrationAccountId ===
-      context.sourceAccount.integrationAccountId &&
-    assignment.account.providerAccountId ===
-      context.sourceAccount.providerAccountId &&
-    assignment.account.environment === context.sourceAccount.environment &&
-    assignment.account.capabilityRevision ===
-      Math.max(1, context.sourceAccount.updatedAt) &&
-    assignment.providerLocationId === location.providerLocationId &&
-    assignment.target.kind === "paired_physical" &&
-    assignment.target.providerDeviceId === deviceId &&
-    assignment.adapterVersion === SQUARE_TERMINAL_ADAPTER_VERSION
   );
 }
 

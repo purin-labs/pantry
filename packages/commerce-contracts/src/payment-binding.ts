@@ -142,6 +142,31 @@ export function parseInPersonPaymentBinding(
   if (!locationId.ok) return locationId;
   switch (provider.value) {
     case "square_terminal": {
+      const transport = readEnum(raw.transport, "binding.transport", [
+        "server_terminal",
+        "client_app_handoff",
+      ] satisfies readonly SquareTerminalTransport[]);
+      if (!transport.ok) return transport;
+      // The Square Point of Sale app takes the payment on whichever iPad is
+      // signed in to the location, so the binding names no device.
+      if (transport.value === "client_app_handoff") {
+        return hasExactKeys(raw, [
+          "provider",
+          "account",
+          "locationId",
+          "transport",
+        ])
+          ? {
+              ok: true,
+              value: {
+                provider: provider.value,
+                account: account.value,
+                locationId: locationId.value,
+                transport: transport.value,
+              },
+            }
+          : invalidBinding("binding");
+      }
       if (
         !hasExactKeys(raw, [
           "provider",
@@ -154,11 +179,7 @@ export function parseInPersonPaymentBinding(
         return invalidBinding("binding");
       }
       const deviceId = readText(raw.deviceId, "binding.deviceId");
-      if (!deviceId.ok) return deviceId;
-      const transport = readEnum(raw.transport, "binding.transport", [
-        "server_terminal",
-      ] satisfies readonly SquareTerminalTransport[]);
-      return transport.ok
+      return deviceId.ok
         ? {
             ok: true,
             value: {
@@ -169,7 +190,7 @@ export function parseInPersonPaymentBinding(
               transport: transport.value,
             },
           }
-        : transport;
+        : deviceId;
     }
     case "gmo_stera": {
       if (

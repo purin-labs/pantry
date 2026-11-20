@@ -44,7 +44,7 @@ const COUNTER = "location_cafe";
 const TOKENS = ["sq-access-1", "sq-refresh-1"];
 
 it(
-  "connects Square in Underclerk, pairs a Terminal, sells and refunds at the counter, and keeps no Square token in Satyr",
+  "connects Square in Underclerk, pairs a Terminal, sells and refunds at the counter, sells through the Square app on the iPad, and keeps no Square token in Satyr",
   { timeout: 180_000 },
   squareInCommerceJourney,
 );
@@ -205,6 +205,93 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
         .refundState,
     ).toBe("completed");
 
+    // 4b. The owner moves the counter to the Square Point of Sale app on the
+    //     iPad (Plan 90 Phase 3B). A barista sells a cookie: the Register
+    //     gets what it needs to open the app, the buyer pays on the Reader,
+    //     and the app's answer comes back through the callback page. Pantry
+    //     places the order only after Commerce reads it from Square.
+    const onIpad = await terminalControl(
+      organisationId,
+      owner.session,
+      "/square-pos-app",
+      {
+        satyrLocationId: COUNTER,
+        integrationAccountId: account,
+        providerLocationId: CAFE,
+      },
+    );
+    expect(onIpad.status, JSON.stringify(onIpad.body)).toBe(200);
+    const ipadOpened = await counterControl(organisationId, owner.session, "", {
+      satyrLocationId: COUNTER,
+      checkoutId: "checkout_counter_ipad",
+      lines: [
+        {
+          cartLineId: "cart_line_ipad",
+          checkoutLineId: "checkout_line_ipad",
+          source: { kind: "catalog", variantId: "variant_sesame_cookie" },
+          quantity: { amount: 1, scale: 0, unit: "each" },
+        },
+      ],
+    });
+    expect(ipadOpened.status, JSON.stringify(ipadOpened.body)).toBe(200);
+    const ipadRung = await counterSale(
+      organisationId,
+      owner.session,
+      "checkout_counter_ipad",
+    );
+    const ipadQuote = record(ipadRung.quote);
+    const handedOff = await counterControl(
+      organisationId,
+      owner.session,
+      "/checkout_counter_ipad/collection",
+      {
+        satyrLocationId: COUNTER,
+        checkoutRevision: ipadQuote.checkoutRevision,
+        quoteDigest: ipadQuote.quoteDigest,
+        amount: ipadQuote.amount,
+        paymentMethod: "card",
+      },
+    );
+    expect(handedOff.status, JSON.stringify(handedOff.body)).toBe(200);
+    const collection = record(record(handedOff.body).collection);
+    const handoff = record(collection.session);
+    expect(handoff).toMatchObject({
+      kind: "client_app_handoff",
+      app: "square_point_of_sale",
+      locationId: CAFE,
+      amountMinor: record(ipadQuote.amount).amountMinor,
+      currency: "JPY",
+      tenderTypes: ["CREDIT_CARD"],
+    });
+    expect(square.terminalCheckouts).toHaveLength(1);
+    const paidOnIpad = square.takePosPayment(Number(handoff.amountMinor));
+    const answer = (handoffReference: unknown) => ({
+      paymentAttemptId: collection.paymentAttemptId,
+      handoffReference,
+      status: "ok",
+      transactionId: paidOnIpad.transactionId,
+      clientTransactionId: paidOnIpad.clientTransactionId,
+      errorCode: null,
+    });
+    const forged = await counterControl(
+      organisationId,
+      owner.session,
+      "/checkout_counter_ipad/handoff-result",
+      answer("f".repeat(40)),
+    );
+    expect(forged.status, JSON.stringify(forged.body)).toBe(409);
+    expect(square.orderReads).toEqual([]);
+    const settled = await counterControl(
+      organisationId,
+      owner.session,
+      "/checkout_counter_ipad/handoff-result",
+      answer(handoff.handoffReference),
+    );
+    expect(settled.status, JSON.stringify(settled.body)).toBe(200);
+    const ipadSale = record(record(settled.body).counterSale);
+    expect(ipadSale.state).toBe("complete");
+    expect(square.orderReads).toEqual([paidOnIpad.transactionId]);
+
     // 5. No Square token is anywhere in Pantry's database.
     const tokenRows = await rowsHolding(TOKENS);
     expect(tokenRows).toEqual([]);
@@ -278,6 +365,11 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       pairing: "paired_physical",
       counterSale: sale.state,
       terminalCheckouts: square.terminalCheckouts.length,
+      squarePosApp: {
+        forgedAnswer: forged.status,
+        sale: ipadSale.state,
+        squareOrderReads: square.orderReads.length,
+      },
       refund: "completed",
       squareTokenRowsInSatyr: tokenRows.length,
       removal: { revocations: square.revocations.length, connection: 404 },
@@ -292,6 +384,31 @@ class FakeSquare {
   readonly exchanges: Record<string, unknown>[] = [];
   readonly revocations: Record<string, unknown>[] = [];
   readonly terminalCheckouts: Record<string, unknown>[] = [];
+  readonly orderReads: string[] = [];
+  #posPayment: Record<string, unknown> | undefined;
+
+  /**
+   * What the Square Point of Sale app does when the buyer pays on the
+   * Reader: Square keeps an order with one tender and its payment.
+   */
+  takePosPayment(
+    amountMinor: number,
+  ): Readonly<{ transactionId: string; clientTransactionId: string }> {
+    this.#posPayment = {
+      id: "payment_ipad_cookie",
+      status: "COMPLETED",
+      source_type: "CARD",
+      card_details: { card: { card_brand: "JCB" }, entry_method: "EMV" },
+      location_id: CAFE,
+      order_id: "order_ipad_cookie",
+      created_at: new Date().toISOString(),
+      amount_money: { amount: amountMinor, currency: "JPY" },
+    };
+    return {
+      transactionId: "order_ipad_cookie",
+      clientTransactionId: "client_ipad_cookie",
+    };
+  }
   #tokens = new Set<string>();
   #paired = false;
   #checkout: Record<string, unknown> | undefined;
@@ -400,6 +517,19 @@ class FakeSquare {
           refund_ids: [],
         },
       });
+    if (path === "/v2/orders/order_ipad_cookie" && this.#posPayment !== undefined) {
+      this.orderReads.push("order_ipad_cookie");
+      return HttpResponse.json({
+        order: {
+          id: "order_ipad_cookie",
+          location_id: CAFE,
+          state: "COMPLETED",
+          tenders: [{ id: "payment_ipad_cookie", payment_id: "payment_ipad_cookie" }],
+        },
+      });
+    }
+    if (path === "/v2/payments/payment_ipad_cookie" && this.#posPayment !== undefined)
+      return HttpResponse.json({ payment: this.#posPayment });
     if (path === "/v2/refunds" && isRecord(body))
       return HttpResponse.json({
         refund: {
@@ -664,9 +794,10 @@ async function refreshResources(
 async function counterSale(
   organisationId: string,
   session: IssuedControlSession,
+  checkoutId = "checkout_counter_cookie",
 ): Promise<Record<string, unknown>> {
   const response = await exports.default.fetch(
-    `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/commerce/counter-sales/checkout_counter_cookie`,
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/commerce/counter-sales/${checkoutId}`,
     {
       headers: {
         cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,

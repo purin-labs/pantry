@@ -153,6 +153,24 @@ export const commerceInPersonCollectionSessionV1Schema = Type.Union([
     deviceSourceKey: text,
     expiresAt: timestampSchema,
   }),
+  // The Register hands the payment to the Square Point of Sale app on the
+  // same iPad (Plan 90 Phase 3B). The app's answer is a hint; Commerce
+  // settles the attempt only after it reads the payment from Square.
+  ReadonlyStrictObject({
+    kind: Type.Literal("client_app_handoff"),
+    app: Type.Literal("square_point_of_sale"),
+    clientId: text,
+    locationId: text,
+    amountMinor: PositiveInteger,
+    currency: text,
+    tenderTypes: Type.Array(
+      Type.Union([Type.Literal("CREDIT_CARD"), Type.Literal("PAYPAY")]),
+      { minItems: 1, maxItems: 2 },
+    ),
+    handoffReference: text,
+    note: text,
+    expiresAt: timestampSchema,
+  }),
 ]);
 export type CommerceInPersonCollectionSessionV1 = Static<
   typeof commerceInPersonCollectionSessionV1Schema

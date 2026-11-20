@@ -6,6 +6,8 @@ import {
 } from "../../http-routes.ts";
 import { errorMessage } from "@purin-labs/std";
 import type { HttpRouteContext } from "../context.ts";
+import { parseCommerceCounterSaleHandoffResultV1Record } from "@purin-labs/commerce-contracts/records/api-admin";
+import { readJsonBody } from "../request-body.ts";
 import { jsonResponse } from "../responses.ts";
 import {
   adjustOfferPriceRoute,
@@ -154,6 +156,24 @@ export async function handleServiceRoute(
     } catch (error) {
       return jsonResponse(409, { message: errorMessage(error) });
     }
+  }
+  if (route.kind === "record_counter_sale_handoff_result") {
+    const body = await readJsonBody(request);
+    if (!body.ok) return body.response;
+    const parsed = parseCommerceCounterSaleHandoffResultV1Record(body.value);
+    if (!parsed.ok)
+      return jsonResponse(400, { message: "Handoff result is invalid" });
+    const recorded = await ctx.authority.recordCounterSaleHandoffResult(
+      route.merchantId,
+      route.checkoutId,
+      parsed.value,
+    );
+    return recorded.ok
+      ? jsonResponse(200, recorded.value)
+      : jsonResponse(recorded.code === "not_found" ? 404 : 409, {
+          message: "Handoff result was refused",
+          code: recorded.code,
+        });
   }
   if (route.kind === "reconcile_counter_sale_refund") {
     try {

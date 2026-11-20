@@ -96,6 +96,29 @@ export async function activateTerminalPairing(
 }
 
 /**
+ * Let the Square Point of Sale app on the counter iPad take the counter's
+ * payments on a Square Reader (Plan 90 Phase 3B).
+ */
+export async function assignSquarePosApp(
+  organisationId: string,
+  selection: Readonly<{
+    satyrLocationId: string;
+    integrationAccountId: string;
+    providerLocationId: string;
+  }>,
+  mutate: TerminalMutationTransport,
+): Promise<TerminalOperationsView> {
+  return parseOperationsEnvelope(
+    await mutate(
+      `${terminalOperationsPath(organisationId)}/square-pos-app`,
+      "POST",
+      selection,
+      `terminal-square-pos-app:${selection.satyrLocationId}:${selection.providerLocationId}`,
+    ),
+  );
+}
+
+/**
  * Stop a counter taking further payments.
  *
  * The platform refuses while a collection is still unresolved, and that refusal

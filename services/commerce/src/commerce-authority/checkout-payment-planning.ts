@@ -2063,7 +2063,9 @@ function placementTerminalId(
   }
   const binding = paymentAttempt.binding.paymentBinding;
   if (binding.provider === "square_terminal") {
-    return binding.deviceId;
+    // The Square Point of Sale app takes the money on whichever iPad is
+    // signed in to the location; Commerce names no device for it.
+    return binding.transport === "server_terminal" ? binding.deviceId : null;
   }
   if (binding.provider === "gmo_stera") {
     return `${binding.gatewayId}:${binding.deviceSourceKey}`;

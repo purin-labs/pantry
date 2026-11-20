@@ -9,6 +9,7 @@ import {
   requireExactKeys,
   requireObject,
 } from "@purin-labs/control-api/portal/counter-sale";
+import type { SquarePosHandoffAnswer } from "../register/square-pos-handoff";
 
 export type CounterSaleMutationTransport = (
   path: string,
@@ -43,7 +44,7 @@ export async function collectCounterSale(
   amount: Readonly<{ amountMinor: number; currency: string }>,
   mutate: CounterSaleMutationTransport,
   paymentMethod?: CounterRegisterPaymentMethod,
-): Promise<void> {
+): Promise<Readonly<{ paymentAttemptId: string; session: unknown }>> {
   if (sale.quote === null)
     throw new Error("This sale has no quote to collect.");
   const raw = await mutate(
@@ -68,9 +69,34 @@ export async function collectCounterSale(
     envelope.collection,
     "counter sale collection",
   );
-  if (collection.outcome !== "ready") {
+  if (
+    collection.outcome !== "ready" ||
+    typeof collection.paymentAttemptId !== "string"
+  ) {
     throw new Error("The payment terminal could not present this payment.");
   }
+  return {
+    paymentAttemptId: collection.paymentAttemptId,
+    session: collection.session,
+  };
+}
+
+/**
+ * Send the Square Point of Sale app's answer for the sale. Seams Pantry reads
+ * the payment from Square before it places the order.
+ */
+export async function recordCounterSaleHandoffResult(
+  organisationId: string,
+  answer: SquarePosHandoffAnswer,
+  mutate: CounterSaleMutationTransport = defaultCounterSaleMutate,
+): Promise<CounterSale> {
+  const raw = await mutate(
+    `${counterSalesPath(organisationId)}/${encodeURIComponent(answer.checkoutId)}/handoff-result`,
+    "POST",
+    answer.result,
+    `counter-handoff:${answer.checkoutId}:${answer.result.handoffReference}:${answer.result.transactionId ?? answer.result.errorCode ?? "offline"}`,
+  );
+  return parseEnvelope(raw);
 }
 
 export async function readCounterRegister(

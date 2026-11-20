@@ -1760,6 +1760,22 @@ export class CommerceAdminClient {
     );
   }
 
+  /**
+   * Hand the Square Point of Sale app's answer for a counter payment to
+   * Commerce, which reads the payment from Square (Plan 90 Phase 3B).
+   */
+  async recordCounterSaleHandoffResult(
+    merchantId: string,
+    checkoutId: string,
+    result: WireAdmin.CommerceCounterSaleHandoffResultV1,
+  ): Promise<CommerceClientResult<CommerceCounterSaleV1>> {
+    return this.#request(
+      `/v1/admin/merchants/${encodeURIComponent(merchantId)}/counter-sales/${encodeURIComponent(checkoutId)}/handoff-result`,
+      { method: "POST", body: JSON.stringify(result) },
+      parseCounterSale,
+    );
+  }
+
   async reconcileCounterSaleRefund(
     merchantId: string,
     checkoutId: string,

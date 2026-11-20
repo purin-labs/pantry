@@ -418,6 +418,40 @@ export async function reconcileCounterSale(
   return buildCounterSaleView(deps, reconciled.value);
 }
 
+/** The Square Point of Sale app's answer, as the Register's callback page read it. */
+export type CounterSaleHandoffResult = Readonly<{
+  paymentAttemptId: string;
+  handoffReference: string;
+  status: "ok" | "error";
+  transactionId: string | null;
+  clientTransactionId: string | null;
+  errorCode: string | null;
+}>;
+
+/**
+ * Hands the Square Point of Sale app's answer to Commerce, which reads the
+ * order and the payment from Square before it places the order (Plan 90
+ * Phase 3B). A refused answer changes nothing.
+ */
+export async function recordCounterSaleHandoffResult(
+  deps: CounterRegisterDeps,
+  input: Readonly<{ checkoutId: string; result: CounterSaleHandoffResult }>,
+): Promise<CounterRegisterResult<CounterSaleView>> {
+  const recorded = await deps.client.recordCounterSaleHandoffResult(
+    deps.merchantId,
+    input.checkoutId,
+    { schemaVersion: "underclerk.counter-sale-handoff-result.v1", ...input.result },
+  );
+  if (!recorded.ok) {
+    if (recorded.error.kind === "http" && recorded.error.status === 404)
+      return fail("counter_sale_not_found", 404);
+    if (recorded.error.kind === "http" && recorded.error.status === 409)
+      return fail("counter_sale_handoff_refused", 409);
+    return commerceFail(recorded.error);
+  }
+  return buildCounterSaleView(deps, recorded.value);
+}
+
 export async function cancelCounterSaleCollection(
   deps: CounterRegisterDeps,
   input: Readonly<{ checkoutId: string; idempotencyKey: string }>,

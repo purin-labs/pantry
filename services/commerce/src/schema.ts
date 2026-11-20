@@ -14,7 +14,7 @@ import { MEDIA_SCHEMA } from "./plugins/media/index.ts";
 import { STORED_VALUE_SCHEMA } from "./plugins/stored-value/index.ts";
 import { FOOD_SERVICE_SCHEMA } from "./plugins/food-service/index.ts";
 
-const SCHEMA_VERSION = 91;
+const SCHEMA_VERSION = 92;
 
 // Schema 86: a delivery whose event was archived is `gone` (Refactor 15).
 // SQLite cannot change a CHECK, so the delivery table is rebuilt with its
@@ -916,6 +916,36 @@ CREATE TABLE IF NOT EXISTS square_terminal_checkout (
   PRIMARY KEY (merchant_id, payment_attempt_id)
 ) STRICT;`;
 
+// Square Point of Sale app handoffs (Plan 90 Phase 3B): the first answer of
+// the app for a counter payment attempt, and the Square payment that the
+// readback verified. A transaction or payment settles one attempt only.
+// Migration 92 creates this text as it is; a later change needs a new step.
+const SQUARE_POS_HANDOFF_SCHEMA_V92 = `
+CREATE TABLE IF NOT EXISTS square_pos_handoff (
+  merchant_id TEXT NOT NULL REFERENCES merchant (merchant_id),
+  payment_attempt_id TEXT NOT NULL,
+  payment_provider_binding_id TEXT NOT NULL,
+  handoff_reference TEXT NOT NULL,
+  tender_family TEXT NOT NULL CHECK (tender_family IN ('card', 'qr_code')),
+  created_at TEXT NOT NULL,
+  result_status TEXT CHECK (result_status IN ('ok', 'error')),
+  transaction_id TEXT,
+  client_transaction_id TEXT,
+  error_code TEXT,
+  reported_at TEXT,
+  payment_id TEXT,
+  PRIMARY KEY (merchant_id, payment_attempt_id),
+  UNIQUE (merchant_id, handoff_reference),
+  CHECK ((result_status IS NULL) = (reported_at IS NULL)),
+  CHECK (payment_id IS NULL OR transaction_id IS NOT NULL)
+) STRICT;
+CREATE UNIQUE INDEX IF NOT EXISTS square_pos_handoff_transaction
+  ON square_pos_handoff (merchant_id, transaction_id)
+  WHERE transaction_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS square_pos_handoff_payment
+  ON square_pos_handoff (merchant_id, payment_id)
+  WHERE payment_id IS NOT NULL;`;
+
 // Event feed readers and their cursors (Plan 76 phase 4).
 const FEED_CONSUMER_SCHEMA = `
 CREATE TABLE IF NOT EXISTS feed_consumer (
@@ -1784,7 +1814,8 @@ export function initializeCommerceSchema(
       if (from < 88) applySchemaV88(database, appliedAt);
       if (from < 89) applySchemaV89(database, appliedAt);
       if (from < 90) applySchemaV90(database, appliedAt);
-      applySchemaV91(database, appliedAt);
+      if (from < 91) applySchemaV91(database, appliedAt);
+      applySchemaV92(database, appliedAt);
     });
   } else if (row.version !== SCHEMA_VERSION) {
     throw new Error(`Unsupported Underclerk schema version: ${row.version}`);
@@ -1817,7 +1848,7 @@ function applySchemaBaseline(
   appliedAt: string,
 ): void {
   database.exec(
-    `${SCHEMA_V1}${FOOD_SERVICE_SCHEMA}\n${SHIPPING_OPERATIONS_SCHEMA}\n${ADDRESS_VALIDATION_SCHEMA}\n${SHIPPING_QUOTE_ATTEMPT_SCHEMA}\n${CHECKOUT_CHARGE_QUOTE_ATTEMPT_SCHEMA}\n${OFFER_PRICE_POLICY_SCHEMA}\n${DRAFT_ORDER_SCHEMA}\n${ORDER_RETURN_SCHEMA}\n${ORDER_CHANGE_SCHEMA}\n${CUSTOMER_SCHEMA}${NOTIFICATION_OUTBOX_SCHEMA}\n${WEBHOOK_SCHEMA}\n${ARCHIVE_SCHEMA}\n${COLLECTION_SCHEMA}\n${DISCOUNT_SCHEMA}\n${MARKET_SCHEMA}\n${MEDIA_SCHEMA}\n${API_CREDENTIAL_SCHEMA}\n${PAYMENT_PROVIDER_SCHEMA}\n${FEED_CONSUMER_SCHEMA}\n${REFUND_COMMAND_SCHEMA}\n${STORED_VALUE_SCHEMA}\n${MANUAL_TENDER_SCHEMA}\n${PLUGIN_STATE_SCHEMA}\n${MERCHANT_PLUGIN_SCHEMA}\n${PLUGIN_FAILURE_SCHEMA}\n${CHECKOUT_PICKUP_CHOICE_SCHEMA}\n${PLUGIN_FIELD_SCHEMA}\n${PLUGIN_HANDLER_SCHEMA}\n${PLUGIN_ENTITY_TYPE_SCHEMA}\n${SQUARE_PAYMENT_SCHEMA}\n${COMPANY_SCHEMA}\n${STOCK_LOT_USABLE_INDEX_V82}\n${FAILED_PAYMENT_INDEXES_V84}\n${BANK_PAYOUT_SCHEMA_V85}\n${CAPTURE_UNPLACED_SCHEMA}\n${STOCK_LOT_EXPIRY_INDEX}`,
+    `${SCHEMA_V1}${FOOD_SERVICE_SCHEMA}\n${SHIPPING_OPERATIONS_SCHEMA}\n${ADDRESS_VALIDATION_SCHEMA}\n${SHIPPING_QUOTE_ATTEMPT_SCHEMA}\n${CHECKOUT_CHARGE_QUOTE_ATTEMPT_SCHEMA}\n${OFFER_PRICE_POLICY_SCHEMA}\n${DRAFT_ORDER_SCHEMA}\n${ORDER_RETURN_SCHEMA}\n${ORDER_CHANGE_SCHEMA}\n${CUSTOMER_SCHEMA}${NOTIFICATION_OUTBOX_SCHEMA}\n${WEBHOOK_SCHEMA}\n${ARCHIVE_SCHEMA}\n${COLLECTION_SCHEMA}\n${DISCOUNT_SCHEMA}\n${MARKET_SCHEMA}\n${MEDIA_SCHEMA}\n${API_CREDENTIAL_SCHEMA}\n${PAYMENT_PROVIDER_SCHEMA}\n${FEED_CONSUMER_SCHEMA}\n${REFUND_COMMAND_SCHEMA}\n${STORED_VALUE_SCHEMA}\n${MANUAL_TENDER_SCHEMA}\n${PLUGIN_STATE_SCHEMA}\n${MERCHANT_PLUGIN_SCHEMA}\n${PLUGIN_FAILURE_SCHEMA}\n${CHECKOUT_PICKUP_CHOICE_SCHEMA}\n${PLUGIN_FIELD_SCHEMA}\n${PLUGIN_HANDLER_SCHEMA}\n${PLUGIN_ENTITY_TYPE_SCHEMA}\n${SQUARE_PAYMENT_SCHEMA}\n${COMPANY_SCHEMA}\n${STOCK_LOT_USABLE_INDEX_V82}\n${FAILED_PAYMENT_INDEXES_V84}\n${BANK_PAYOUT_SCHEMA_V85}\n${CAPTURE_UNPLACED_SCHEMA}\n${STOCK_LOT_EXPIRY_INDEX}\n${SQUARE_POS_HANDOFF_SCHEMA_V92}`,
   );
   database
     .prepare("INSERT INTO schema_migration (version, applied_at) VALUES (?, ?)")
@@ -2074,6 +2105,15 @@ DROP TABLE checkout_payment_attempt_v90;
 CREATE INDEX checkout_payment_attempt_state
   ON checkout_payment_attempt (merchant_id, lifecycle_state);
 `;
+
+// Schema 92 (Plan 90 Phase 3B) only adds a table and its indexes, so no
+// existing row moves.
+function applySchemaV92(database: CommerceDatabase, appliedAt: string): void {
+  database.exec(SQUARE_POS_HANDOFF_SCHEMA_V92);
+  database
+    .prepare("INSERT INTO schema_migration (version, applied_at) VALUES (?, ?)")
+    .run(92, appliedAt);
+}
 
 function applySchemaV91(database: CommerceDatabase, appliedAt: string): void {
   database.exec(SCHEMA_V91_MIGRATION);

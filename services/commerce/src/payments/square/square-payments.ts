@@ -5,7 +5,8 @@
 // turns a card into a one-time source token with Square's Web Payments SDK,
 // and Commerce makes the payment from that token. At the counter,
 // Commerce sends a Terminal checkout to the location's Square Terminal and
-// reads the payment it took. A payment of another provider, and a merchant
+// reads the payment it took, or hands the payment to the Square Point of
+// Sale app on the Register's iPad (square-pos-handoff.ts). A payment of another provider, and a merchant
 // with no Square location, go to the fallback gateway: Stripe, or a refusal
 // as unavailable.
 import { createHash } from "node:crypto";
@@ -26,6 +27,8 @@ import type { VariantBy } from "@purin-labs/type-utils";
 
 import type { CommerceDatabase } from "../../database.ts";
 import type {
+  InPersonClientHandoffOutcome,
+  InPersonClientHandoffResult,
   InPersonCollectionGateway,
   MerchantInPersonCollectionCommand,
   MerchantPaymentReconciliationCommand,
@@ -39,6 +42,12 @@ import {
   type SquareConnections,
   type SquareResult,
 } from "./square-connection.ts";
+import {
+  reconcileSquarePosHandoff,
+  recordSquarePosHandoffResult,
+  startSquarePosHandoff,
+} from "./square-pos-handoff.ts";
+import { squareTenderEvidence } from "./square-tender-evidence.ts";
 
 const RETRY_SECONDS = 60;
 /** A Terminal checkout that waits for the card is read again this soon. */
@@ -240,6 +249,14 @@ export class SquarePaymentAccounts {
       )?.bindingId;
   }
 
+  /** The Square application that a linked location's connection uses. */
+  applicationId(
+    merchantId: string,
+    paymentProviderBindingId: string,
+  ): string | undefined {
+    return this.#row(merchantId, paymentProviderBindingId)?.applicationId;
+  }
+
   /**
    * The environment and a token that is valid now for a linked location: the
    * connection refreshes a token close to its expiry first.
@@ -353,7 +370,9 @@ export class SquarePaymentGateway implements PaymentProvider {
   ): Promise<CommercePaymentCaptureResultV1> {
     const binding = request.paymentBinding;
     if (binding.provider === "square_terminal")
-      return this.#reconcileTerminal(request, binding);
+      return binding.transport === "client_app_handoff"
+        ? this.#reconcilePosHandoff(request, binding)
+        : this.#reconcileTerminal(request, binding);
     if (binding.provider !== "square_online")
       return this.#fallback.reconcile(request);
     const bindingId = this.#accounts.bindingIdFor(request.merchantId, binding);
@@ -497,6 +516,23 @@ export class SquarePaymentGateway implements PaymentProvider {
    * the payment itself is read and checked: card, location, the exact
    * amount and no tip.
    */
+  async #reconcilePosHandoff(
+    request: MerchantPaymentReconciliationCommand,
+    binding: SquareTerminalBinding,
+  ): Promise<CommercePaymentCaptureResultV1> {
+    if (!payable(request.money, binding))
+      return this.#indeterminate("payment_request_invalid");
+    return (
+      (await reconcileSquarePosHandoff(
+        this.#database,
+        this.#accounts,
+        request,
+        binding.locationId,
+        this.#now(),
+      )) ?? this.#fallback.reconcile(request)
+    );
+  }
+
   async #reconcileTerminal(
     request: MerchantPaymentReconciliationCommand,
     binding: SquareTerminalBinding,
@@ -566,12 +602,14 @@ export class SquarePaymentGateway implements PaymentProvider {
     const raw = paid.body.payment;
     const tip =
       isRecord(raw) && isRecord(raw.tip_money) ? raw.tip_money.amount : 0;
-    const tenderEvidence =
-      isRecord(raw) ? verifySquareTerminalTender(row.paymentMethod, raw) : undefined;
+    const tenderEvidence = isRecord(raw) ? squareTenderEvidence(raw) : undefined;
+    // A Terminal checkout offers one payment type, so the tender must be the
+    // one that the counter asked for.
     if (
       payment === undefined ||
       !isRecord(raw) ||
       tenderEvidence === undefined ||
+      tenderEvidence.paymentMethod !== row.paymentMethod ||
       payment.id !== paymentId ||
       payment.status !== "COMPLETED" ||
       raw.location_id !== binding.locationId ||
@@ -838,11 +876,22 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
     const bindingId = this.#accounts.bindingIdFor(request.merchantId, binding);
     if (bindingId === undefined)
       return this.#unavailable("payment_authority_unavailable");
-    if (
-      binding.transport !== "server_terminal" ||
-      !payable(request.money, binding)
-    )
+    if (!payable(request.money, binding))
       return this.#unavailable("payment_request_invalid");
+    if (binding.transport === "client_app_handoff") {
+      const applicationId = this.#accounts.applicationId(
+        request.merchantId,
+        bindingId,
+      );
+      return applicationId === undefined
+        ? this.#unavailable("payment_authority_unavailable")
+        : startSquarePosHandoff(this.#database, request, {
+            paymentProviderBindingId: bindingId,
+            applicationId,
+            locationId: binding.locationId,
+            now: this.#now(),
+          });
+    }
     const credential = await this.#accounts.credential(
       request.merchantId,
       bindingId,
@@ -928,6 +977,21 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
     };
   }
 
+  /** Keeps the Square Point of Sale app's answer for a counter payment. */
+  recordClientHandoffResult(
+    merchantId: string,
+    paymentAttemptId: string,
+    result: InPersonClientHandoffResult,
+  ): InPersonClientHandoffOutcome {
+    return recordSquarePosHandoffResult(
+      this.#database,
+      merchantId,
+      paymentAttemptId,
+      result,
+      this.#now(),
+    );
+  }
+
   #unavailable(reason: string): CommerceInPersonCollectionResultV1 {
     return {
       schemaVersion: "underclerk.in-person-collection-result.v1",
@@ -971,53 +1035,6 @@ function squareTerminalPaymentType(
       return "FELICA_ALL";
     case "qr_code":
       return "QR_CODE";
-  }
-}
-
-function verifySquareTerminalTender(
-  method: InPersonPaymentMethod,
-  raw: Readonly<Record<string, unknown>>,
-): Readonly<{ tenderBrand: string; providerRefundable: boolean }> | undefined {
-  switch (method) {
-    case "card": {
-      if (raw.source_type !== "CARD") return undefined;
-      const cardDetails = isRecord(raw.card_details)
-        ? raw.card_details
-        : undefined;
-      const card =
-        cardDetails !== undefined && isRecord(cardDetails.card)
-          ? cardDetails.card
-          : undefined;
-      const brand =
-        card !== undefined &&
-        typeof card.card_brand === "string" &&
-        card.card_brand.trim().length > 0
-          ? card.card_brand.trim()
-          : "CARD";
-      return { tenderBrand: brand, providerRefundable: true };
-    }
-    case "felica": {
-      if (raw.source_type !== "FELICA" || !isRecord(raw.felica_details)) {
-        return undefined;
-      }
-      const brand =
-        typeof raw.felica_details.brand === "string" &&
-        raw.felica_details.brand.trim().length > 0
-          ? raw.felica_details.brand.trim()
-          : "FELICA";
-      return { tenderBrand: brand, providerRefundable: false };
-    }
-    case "qr_code": {
-      if (raw.source_type !== "WALLET" || !isRecord(raw.wallet_details)) {
-        return undefined;
-      }
-      const brand =
-        typeof raw.wallet_details.brand === "string" &&
-        raw.wallet_details.brand.trim().length > 0
-          ? raw.wallet_details.brand.trim()
-          : "WALLET";
-      return { tenderBrand: brand, providerRefundable: true };
-    }
   }
 }
 

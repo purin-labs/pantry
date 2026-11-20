@@ -33,6 +33,10 @@ export const terminalTargetSchema = Type.Union([
     gatewayId: resourceIdSchema,
     deviceSourceKey: resourceIdSchema,
   }),
+  // The Square Point of Sale app on the counter iPad (Plan 90 Phase 3B).
+  OpenObject({
+    kind: Type.Literal("square_pos_app"),
+  }),
 ]);
 export type TerminalTarget = Static<typeof terminalTargetSchema>;
 

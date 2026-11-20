@@ -129,6 +129,11 @@ type CounterSaleRoute =
       checkoutId: string;
     }>
   | Readonly<{
+      kind: "record_counter_sale_handoff_result";
+      merchantId: string;
+      checkoutId: string;
+    }>
+  | Readonly<{
       kind: "reconcile_counter_sale_refund";
       merchantId: string;
       checkoutId: string;
@@ -661,6 +666,11 @@ const CORE_ROUTES: readonly RouteDefinition<CommerceRoute>[] = [
     "POST",
     "/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/reconciliation",
     "reconcile_counter_sale_payment",
+  ),
+  route(
+    "POST",
+    "/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/handoff-result",
+    "record_counter_sale_handoff_result",
   ),
   route(
     "POST",

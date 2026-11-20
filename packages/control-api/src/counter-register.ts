@@ -70,6 +70,7 @@ export type CounterRegisterTerminal = Readonly<{
     | "sandbox_simulated"
     | "paired_physical"
     | "lan_gateway_device"
+    | "square_pos_app"
     | null;
   deviceId: string | null;
   gatewayId: string | null;

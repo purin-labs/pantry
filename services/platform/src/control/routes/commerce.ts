@@ -600,6 +600,7 @@ export function handleCommerceControlRoute(
     case "counterSaleCollection":
     case "counterSaleCancel":
     case "counterSaleReconciliation":
+    case "counterSaleHandoffResult":
     case "counterSalePickupReady":
     case "counterSaleHandover":
     case "counterSaleRefund":
@@ -623,6 +624,7 @@ export function handleCommerceControlRoute(
     case "terminalPairings":
     case "terminalPairing":
     case "terminalPairingActivation":
+    case "terminalSquarePosApp":
       return handleTerminalOperationsControlRoute(request, env, route);
     case "supplierPayouts":
     case "supplierPayout":

@@ -3170,17 +3170,19 @@ CREATE TABLE cafe_terminal_assignment (
   satyr_location_id TEXT NOT NULL CHECK (length(satyr_location_id) BETWEEN 1 AND 255),
   provider_location_id TEXT NOT NULL CHECK (length(provider_location_id) BETWEEN 1 AND 255),
   device_id TEXT NOT NULL CHECK (length(device_id) BETWEEN 1 AND 255),
-  target_kind TEXT NOT NULL CHECK (target_kind IN ('sandbox_simulated', 'paired_physical', 'lan_gateway_device')),
+  target_kind TEXT NOT NULL CHECK (target_kind IN ('sandbox_simulated', 'paired_physical', 'lan_gateway_device', 'square_pos_app')),
   environment TEXT NOT NULL CHECK (environment IN ('development', 'production')),
   revision INTEGER NOT NULL CHECK (revision > 0),
   state TEXT NOT NULL CHECK (state IN ('active', 'retired')),
   assignment_json TEXT NOT NULL CHECK (json_valid(assignment_json)),
   recorded_at INTEGER NOT NULL CHECK (recorded_at >= 0),
   PRIMARY KEY (organisation_id, assignment_id, revision),
-  -- A simulated target belongs to development, a paired device to production, and a LAN gateway device to either.
+  -- A simulated target belongs to development; a paired device and the Square
+  -- Point of Sale app (Square's Sandbox has no Point of Sale API) to
+  -- production; a LAN gateway device to either.
   CHECK (
     (target_kind = 'sandbox_simulated' AND environment = 'development') OR
-    (target_kind = 'paired_physical' AND environment = 'production') OR
+    (target_kind IN ('paired_physical', 'square_pos_app') AND environment = 'production') OR
     (target_kind = 'lan_gateway_device')
   )
 );

@@ -123,6 +123,7 @@ const ADMIN_ROUTE_ACCESS: Readonly<
   collect_in_person_checkout_payment: "orders:write",
   record_counter_cash_payment: "orders:write",
   reconcile_counter_sale_payment: "orders:write",
+  record_counter_sale_handoff_result: "orders:write",
   reconcile_counter_sale_refund: "orders:write",
   read_counter_sale: "orders:read",
   place_paid_checkout: "orders:write",

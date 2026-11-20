@@ -97,13 +97,11 @@ export function parseTerminalAssignment(
   }
   const transport = readEnum(raw.transport, "terminalAssignment.transport", [
     "server_terminal",
+    "client_app_handoff",
     "lan_gateway",
   ] satisfies readonly InPersonTerminalTransport[]);
   if (!transport.ok) return transport;
-  if (
-    (target.value.kind === "lan_gateway_device") !==
-    (transport.value === "lan_gateway")
-  ) {
+  if (transport.value !== targetTransport(target.value)) {
     return invalid("terminalAssignment.transport");
   }
   const adapterVersion = readText(
@@ -144,8 +142,14 @@ export function parseTerminalTarget(raw: unknown): ParseResult<TerminalTarget> {
     "sandbox_simulated",
     "paired_physical",
     "lan_gateway_device",
+    "square_pos_app",
   ] as const);
   if (!kind.ok) return kind;
+  if (kind.value === "square_pos_app") {
+    return hasExactKeys(raw, ["kind"])
+      ? { ok: true, value: { kind: "square_pos_app" } }
+      : invalid("terminalAssignment.target");
+  }
   if (kind.value === "sandbox_simulated") {
     if (!hasExactKeys(raw, ["kind", "testDeviceId"])) {
       return invalid("terminalAssignment.target");
@@ -548,6 +552,20 @@ export function terminalAssignmentPaymentBinding(
       },
     };
   }
+  if (
+    assignment.target.kind === "square_pos_app" &&
+    assignment.transport === "client_app_handoff"
+  ) {
+    return {
+      ok: true,
+      value: {
+        provider: "square_terminal",
+        account: assignment.account,
+        locationId: assignment.providerLocationId,
+        transport: "client_app_handoff",
+      },
+    };
+  }
   return {
     ok: true,
     value: {
@@ -593,6 +611,21 @@ export function terminalTargetDeviceId(target: TerminalTarget): string {
       return target.providerDeviceId;
     case "lan_gateway_device":
       return `${target.gatewayId}:${target.deviceSourceKey}`;
+    case "square_pos_app":
+      return "square_pos_app";
+  }
+}
+
+/** The one transport that can reach a target. */
+function targetTransport(target: TerminalTarget): InPersonTerminalTransport {
+  switch (target.kind) {
+    case "lan_gateway_device":
+      return "lan_gateway";
+    case "square_pos_app":
+      return "client_app_handoff";
+    case "sandbox_simulated":
+    case "paired_physical":
+      return "server_terminal";
   }
 }
 
@@ -647,6 +680,8 @@ function targetPermitsEnvironment(
   environment: PaymentEnvironment,
 ): boolean {
   if (target.kind === "lan_gateway_device") return true;
+  // Square's Sandbox has no Point of Sale API, so a POS app target is a
+  // production target like a paired device.
   return target.kind === "sandbox_simulated"
     ? environment === "development"
     : environment === "production";

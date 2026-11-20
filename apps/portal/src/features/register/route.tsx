@@ -20,10 +20,16 @@ import {
   readCounterSale,
   reconcileCounterSale,
   recordCounterSaleCash,
+  recordCounterSaleHandoffResult,
 } from "../terminals/counter-sale-api";
 import { RegisterModifierDrawer, formatMoney } from "./modifier-drawer";
 import { ReceiptPrintControl } from "./receipt-print";
 import { RegisterPageViewSource } from "./register-surface";
+import {
+  isSquarePosHandoffSession,
+  readSquarePosAnswer,
+  squarePosHandoffLink,
+} from "./square-pos-handoff";
 import "./register.css";
 
 const REFRESH_MS = 10_000;
@@ -56,7 +62,28 @@ export function RegisterRoute(
   activeSaleRef.current = activeSale;
 
   // Recover an open or pending sale pinned in the URL query across reloads.
+  // After the Square Point of Sale app, the query also carries the app's
+  // answer: send it once, then drop it from the address.
   React.useEffect(() => {
+    const answer = readSquarePosAnswer(window.location.search);
+    if (answer !== null) {
+      dropSquarePosAnswer();
+      setBusyAction("reconcile");
+      void recordCounterSaleHandoffResult(props.organisationId, answer)
+        .then((sale) => {
+          setActiveSale(sale);
+          if (sale.state === "complete") setBasket([]);
+        })
+        .catch((error: unknown) => {
+          setErrorMessage(errorText(error));
+          return readCounterSale(props.organisationId, answer.checkoutId).then(
+            setActiveSale,
+          );
+        })
+        .catch(() => setPinnedSaleId(null))
+        .finally(() => setBusyAction(null));
+      return;
+    }
     const pinned = new URLSearchParams(window.location.search).get("sale");
     if (!pinned) return;
     void readCounterSale(props.organisationId, pinned)
@@ -237,6 +264,7 @@ export function RegisterRoute(
       : null;
   const canCash = snapshot.policy?.cashEnabled === true;
   const canTerminal = snapshot.terminal.assigned && snapshot.terminal.ready;
+  const onIpad = snapshot.terminal.targetKind === "square_pos_app";
 
   function onTileClick(entry: CounterRegisterMenuEntry): void {
     if (!entry.available || activeSale !== null) return;
@@ -289,7 +317,7 @@ export function RegisterRoute(
       });
       setPinnedSaleId(opened.checkoutId);
       setActiveSale(opened);
-      await collectCounterSale(
+      const collected = await collectCounterSale(
         props.organisationId,
         opened,
         opened.quote?.amount ?? {
@@ -299,6 +327,24 @@ export function RegisterRoute(
         defaultCounterSaleMutate,
         paymentMethod,
       );
+      // The Square Point of Sale app takes the payment and returns to the
+      // callback page, which brings the browser back to this sale.
+      if (isSquarePosHandoffSession(collected.session)) {
+        window.location.assign(
+          squarePosHandoffLink(
+            collected.session,
+            {
+              checkoutId: opened.checkoutId,
+              paymentAttemptId: collected.paymentAttemptId,
+            },
+            {
+              origin: window.location.origin,
+              registerPath: window.location.pathname,
+            },
+          ),
+        );
+        return;
+      }
       const updated = await readCounterSale(props.organisationId, opened.checkoutId);
       setActiveSale(updated);
       reload();
@@ -687,20 +733,17 @@ export function RegisterRoute(
 
             {canTerminal ? (
               <div className="register-tender-section">
-                <h3>Terminal</h3>
+                <h3>{onIpad ? "Square app on this iPad" : "Terminal"}</h3>
                 <div className="register-method-row">
-                  {(
-                    [
-                      ["card", "Card"],
-                      ["felica", "FeliCa"],
-                      ["qr_code", "QR"],
-                    ] as const
-                  ).map(([method, label]) => (
+                  {(onIpad ? IPAD_METHODS : TERMINAL_METHODS).map(([method, label]) => (
                     <button
                       key={method}
                       type="button"
                       className="register-method-btn"
-                      aria-pressed={paymentMethod === method}
+                      aria-pressed={
+                        paymentMethod === method ||
+                        (onIpad && method === "card" && paymentMethod === "felica")
+                      }
                       onClick={() => setPaymentMethod(method)}
                     >
                       {label}
@@ -714,8 +757,12 @@ export function RegisterRoute(
                   onClick={() => void handleTerminalSale()}
                 >
                   {busyAction === "terminal"
-                    ? "Sending to terminal…"
-                    : `Charge terminal · ${paymentMethodLabel(paymentMethod)}`}
+                    ? onIpad
+                      ? "Opening Square…"
+                      : "Sending to terminal…"
+                    : onIpad
+                      ? `Open Square app · ${paymentMethodLabel(paymentMethod, true)}`
+                      : `Charge terminal · ${paymentMethodLabel(paymentMethod)}`}
                 </button>
               </div>
             ) : null}
@@ -888,15 +935,34 @@ function parseCashMinor(raw: string, defaultTotal: number): number | null {
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
-function paymentMethodLabel(method: CounterRegisterPaymentMethod): string {
-  switch (method) {
-    case "card":
-      return "Card";
-    case "felica":
-      return "FeliCa";
-    case "qr_code":
-      return "QR";
-  }
+function paymentMethodLabel(
+  method: CounterRegisterPaymentMethod,
+  onIpad = false,
+): string {
+  // On the iPad, FeliCa is part of the card choice.
+  const choice = onIpad && method === "felica" ? "card" : method;
+  return (
+    (onIpad ? IPAD_METHODS : TERMINAL_METHODS).find(([m]) => m === choice)?.[1] ??
+    "Card"
+  );
+}
+
+const TERMINAL_METHODS: readonly (readonly [CounterRegisterPaymentMethod, string])[] = [
+  ["card", "Card"],
+  ["felica", "FeliCa"],
+  ["qr_code", "QR"],
+];
+// The Square app offers e-money as a card tender in Japan, so the iPad has
+// one choice for both, and PayPay for QR.
+const IPAD_METHODS: readonly (readonly [CounterRegisterPaymentMethod, string])[] = [
+  ["card", "Card or e-money"],
+  ["qr_code", "PayPay"],
+];
+
+function dropSquarePosAnswer(): void {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("squarePos");
+  window.history.replaceState(null, "", url.toString());
 }
 
 function setPinnedSaleId(checkoutId: string | null): void {

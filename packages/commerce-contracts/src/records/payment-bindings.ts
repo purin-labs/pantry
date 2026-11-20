@@ -70,11 +70,19 @@ export const onlinePaymentBindingSchema = Type.Union([
 export type OnlinePaymentBinding = Static<typeof onlinePaymentBindingSchema>;
 
 /**
- * Square Terminal connected mode. Plan 33C ships server-controlled
- * collection only; a POS-app handoff is a different ceremony and would need
- * its own measured slice.
+ * How a Square counter payment is collected. `server_terminal` sends the
+ * payment to a paired Square Terminal (Plan 33C). `client_app_handoff` hands
+ * the payment to the Square Point of Sale app on the same iPad, which takes it
+ * on a Square Reader (Plan 90 Phase 3B). Both stay the `square_terminal`
+ * provider, so a stored payment attempt keeps its provider value.
  */
-export const squareTerminalTransportSchema = Type.Literal("server_terminal");
+export const squareServerTerminalTransportSchema =
+  Type.Literal("server_terminal");
+export const squarePosAppTransportSchema = Type.Literal("client_app_handoff");
+export const squareTerminalTransportSchema = Type.Union([
+  squareServerTerminalTransportSchema,
+  squarePosAppTransportSchema,
+]);
 export type SquareTerminalTransport = Static<
   typeof squareTerminalTransportSchema
 >;
@@ -96,7 +104,13 @@ export const inPersonPaymentBindingSchema = Type.Union([
     account: paymentAccountRecordSchema,
     locationId: identityTextSchema,
     deviceId: identityTextSchema,
-    transport: squareTerminalTransportSchema,
+    transport: squareServerTerminalTransportSchema,
+  }),
+  StrictObject({
+    provider: Type.Literal("square_terminal"),
+    account: paymentAccountRecordSchema,
+    locationId: identityTextSchema,
+    transport: squarePosAppTransportSchema,
   }),
   StrictObject({
     provider: Type.Literal("gmo_stera"),

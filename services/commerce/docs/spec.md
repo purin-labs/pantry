@@ -622,10 +622,32 @@ Shopify: Shopify Payments, payment apps and disputes. Status: **Partial**.
   with no tip and no partial authorization; a repeated request under the
   same idempotency key reads the same checkout. The counter sale reads the
   checkout, then the payment behind it, and records the capture only for a
-  completed card payment at that location for the exact amount with no tip. The merchant's
+  completed payment at that location for the exact amount with no tip, whose
+  tender is the payment type that the counter asked for. Square records
+  Japanese e-money as a `CARD` payment with the card brand `FELICA` and the
+  sub-brand in `electronic_money_details.felica_details.felica_brand`, and a
+  QR payment as a `WALLET` payment with `wallet_details.brand`. The merchant's
   alarm reads a waiting Terminal checkout every five seconds for ten
   minutes, then once a minute for an hour, and places the order when the
   card is paid; reads that find the checkout still waiting write nothing.
+- A `square_terminal` binding with `transport: "client_app_handoff"` hands a
+  counter payment to the Square Point of Sale app on the Register's iPad,
+  which takes it on a Square Reader. The collection answers with a
+  `client_app_handoff` session: the application id, the location, the amount,
+  the tender types (`CREDIT_CARD`, which includes e-money in Japan, or
+  `PAYPAY`) and a 40-character `handoffReference` that the app returns as its
+  `state`. `record_counter_sale_handoff_result` (`POST
+  /v1/admin/merchants/:merchantId/counter-sales/:checkoutId/handoff-result`,
+  `orders:write`) keeps the app's first answer for the open attempt: the same
+  answer again is a retry, and another reference, another answer or a
+  transaction id that another handoff used is refused with 409. The answer is
+  a hint. Commerce reads the order (`GET /v2/orders/:transactionId`) and its
+  one tender's payment, and records the capture only for a completed payment
+  of that order at the binding's location, for the exact amount, with no tip,
+  with no `reference_id`, made after the handoff started, and taken by no
+  other handoff. A `payment_canceled` answer declines the attempt. An answer
+  with no transaction id (the app's Offline Mode), and a payment that fails a
+  check, leave the attempt indeterminate for staff. No alarm reads a handoff.
 - Stripe's Connect webhook (`POST /v1/providers/stripe/webhooks`, outside
   the route table) is only a prompt. The Worker checks the signature and
   finds the merchant and the payment attempt in the PaymentIntent's
@@ -1429,6 +1451,7 @@ route table.
 | `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/order`                     | `read_buyer_order`                         | buyer              |                                                    | §13     |
 | `GET`    | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId`                                                  | `read_counter_sale`                        | orders:read        |                                                    | §11     |
 | `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/reconciliation`                                   | `reconcile_counter_sale_payment`           | orders:write       |                                                    | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/handoff-result`                                   | `record_counter_sale_handoff_result`       | orders:write       |                                                    | §12     |
 | `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/refund-reconciliation`                            | `reconcile_counter_sale_refund`            | orders:write       |                                                    | §12     |
 | `GET`    | `/v1/admin/merchants/:merchantId/point-of-sale-configurations`                                               | `list_point_of_sale_configurations`        | settings:read      |                                                    | §4      |
 | `POST`   | `/v1/admin/merchants/:merchantId/point-of-sale-configurations`                                               | `publish_point_of_sale_configuration`      | settings:write     |                                                    | §4      |

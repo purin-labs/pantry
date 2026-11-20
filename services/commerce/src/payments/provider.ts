@@ -101,10 +101,38 @@ export interface PaymentRefundGateway {
  */
 export type PaymentProvider = PaymentGateway & PaymentRefundGateway;
 
+/**
+ * The answer that a payment app on the counter device returns through the
+ * browser (the Square Point of Sale app, Plan 90 Phase 3B). It is a hint: the
+ * gateway reads the payment from the provider before it records a capture.
+ */
+export type InPersonClientHandoffResult = Readonly<{
+  handoffReference: string;
+  status: "ok" | "error";
+  transactionId: string | null;
+  clientTransactionId: string | null;
+  errorCode: string | null;
+}>;
+
+export type InPersonClientHandoffOutcome =
+  | "recorded"
+  | "already_recorded"
+  | "not_found"
+  | "reference_mismatch"
+  | "result_invalid"
+  | "result_conflict"
+  | "transaction_already_used";
+
 export interface InPersonCollectionGateway {
   createInPersonCollection(
     request: MerchantInPersonCollectionCommand,
   ): Promise<CommerceInPersonCollectionResultV1>;
+  /** Keeps the first answer of a client app handoff for its attempt. */
+  recordClientHandoffResult?(
+    merchantId: string,
+    paymentAttemptId: string,
+    result: InPersonClientHandoffResult,
+  ): InPersonClientHandoffOutcome;
 }
 
 /**

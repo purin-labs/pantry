@@ -4,8 +4,10 @@ import { toast } from "sonner";
 import { PageSkeleton, RecoverableError } from "../../page-components";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 
+import { SQUARE_POS_CALLBACK_PATH } from "../register/square-pos-handoff";
 import {
   activateTerminalPairing,
+  assignSquarePosApp,
   configureSandboxTerminal,
   readTerminalOperations,
   readTerminalPairing,
@@ -242,7 +244,9 @@ function renderTerminalCounter(
         <span className="terminal-row-device">
           {counter.assignment.targetKind === "sandbox_simulated"
             ? "Source: Square Sandbox test scenario · physical health unknown"
-            : "Source: Square Devices API"}
+            : counter.assignment.targetKind === "square_pos_app"
+              ? "Square Point of Sale app on the counter iPad · Square checks each payment"
+              : "Source: Square Devices API"}
         </span>
       </div>
       <div className="terminal-row-state">
@@ -420,13 +424,21 @@ function TerminalSetup(
   }
   if (props.configuration.environment === "production") {
     return (
-      <TerminalPairingSetup
-        organisationId={props.organisationId}
-        configuration={props.configuration}
-        mutate={props.mutate}
-        replace={props.replace}
-        setView={props.setView}
-      />
+      <>
+        <TerminalPairingSetup
+          organisationId={props.organisationId}
+          configuration={props.configuration}
+          mutate={props.mutate}
+          replace={props.replace}
+          setView={props.setView}
+        />
+        <SquarePosAppSetup
+          organisationId={props.organisationId}
+          configuration={props.configuration}
+          mutate={props.mutate}
+          setView={props.setView}
+        />
+      </>
     );
   }
   const locations = squareLocationOptions(props.configuration);
@@ -614,6 +626,106 @@ function TerminalPairingSetup(
       )}
     </form>
   );
+}
+
+/**
+ * Lets the Square Point of Sale app on the counter iPad take the counter's
+ * payments on a Square Reader (Plan 90 Phase 3B). The Square app must list
+ * the Portal's callback page, so the form shows that address.
+ */
+function SquarePosAppSetup(
+  props: Readonly<{
+    organisationId: string;
+    configuration: ReadyTerminalConfiguration;
+    mutate: TerminalMutationTransport;
+    setView: (view: TerminalOperationsView) => void;
+  }>,
+): React.ReactNode {
+  const [busy, setBusy] = React.useState(false);
+  const locations = squareLocationOptions(props.configuration);
+  const canAssign =
+    props.configuration.satyrLocations.length > 0 && locations.length > 0;
+  if (!canAssign) return null;
+  return (
+    <form
+      className="terminal-setup"
+      onSubmit={submitSquarePosApp.bind(null, props, setBusy)}
+    >
+      <div className="terminal-setup-heading">
+        <h3>Use the Square app on an iPad</h3>
+        <p>
+          For a counter with a Square Reader and no Square Terminal. The
+          Register opens the Square Point of Sale app on the same iPad, and
+          Seams Pantry checks each payment with Square. In the Square Developer
+          Console, add this web callback URL to the Point of Sale API:{" "}
+          <code>{`${window.location.origin}${SQUARE_POS_CALLBACK_PATH}`}</code>
+        </p>
+      </div>
+      <div className="terminal-setup-fields">
+        <label>
+          <span>Seams Checkout location</span>
+          <TerminalSelect
+            name="satyrLocationId"
+            items={props.configuration.satyrLocations.map(pantryLocationItem)}
+            disabled={busy}
+            required
+          />
+        </label>
+        <label>
+          <span>Square account and location</span>
+          <TerminalSelect
+            name="squareLocation"
+            items={locations}
+            disabled={busy}
+            required
+          />
+        </label>
+      </div>
+      <button type="submit" className="terminal-row-action" disabled={busy}>
+        {busy ? "Saving…" : "Use the Square app"}
+      </button>
+    </form>
+  );
+}
+
+async function submitSquarePosApp(
+  props: Readonly<{
+    organisationId: string;
+    mutate: TerminalMutationTransport;
+    setView: (view: TerminalOperationsView) => void;
+  }>,
+  setBusy: (busy: boolean) => void,
+  event: React.FormEvent<HTMLFormElement>,
+): Promise<void> {
+  event.preventDefault();
+  const selection = parseTerminalSelection(
+    withSandboxPlaceholder(new FormData(event.currentTarget)),
+  );
+  if (selection === null) {
+    toast.error("Choose a Seams Checkout location and a Square location.");
+    return;
+  }
+  setBusy(true);
+  try {
+    props.setView(
+      await assignSquarePosApp(
+        props.organisationId,
+        {
+          satyrLocationId: selection.satyrLocationId,
+          integrationAccountId: selection.integrationAccountId,
+          providerLocationId: selection.providerLocationId,
+        },
+        props.mutate,
+      ),
+    );
+    toast.success("The counter now uses the Square app on the iPad.");
+  } catch (cause) {
+    toast.error(
+      cause instanceof Error ? cause.message : "The counter was not changed.",
+    );
+  } finally {
+    setBusy(false);
+  }
 }
 
 async function submitTerminalPairing(

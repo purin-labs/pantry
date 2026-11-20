@@ -71,7 +71,11 @@ export type TerminalCounterReadback = Readonly<{
     capabilityRevision: number;
     capabilityCurrent: boolean;
     providerLocationId: string;
-    targetKind: "sandbox_simulated" | "paired_physical" | "lan_gateway_device";
+    targetKind:
+      | "sandbox_simulated"
+      | "paired_physical"
+      | "lan_gateway_device"
+      | "square_pos_app";
     deviceId: string;
     adapterVersion: string;
     environment: "development" | "production";

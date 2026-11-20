@@ -445,6 +445,25 @@ export const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
   cashReceived: wireMoneySchema,
 });
 
+/**
+ * The Square Point of Sale app's answer for a counter payment, as the
+ * Register's callback page read it (Plan 90 Phase 3B). Commerce keeps the
+ * first answer as a hint and settles only after it reads the payment from
+ * Square.
+ */
+export const commerceCounterSaleHandoffResultV1Schema = ReadonlyStrictObject({
+  schemaVersion: Type.Literal("underclerk.counter-sale-handoff-result.v1"),
+  paymentAttemptId: text,
+  handoffReference: text,
+  status: Type.Union([Type.Literal("ok"), Type.Literal("error")]),
+  transactionId: Type.Union([text, Type.Null()]),
+  clientTransactionId: Type.Union([text, Type.Null()]),
+  errorCode: Type.Union([text, Type.Null()]),
+});
+export type CommerceCounterSaleHandoffResultV1 = Static<
+  typeof commerceCounterSaleHandoffResultV1Schema
+>;
+
 const paymentAttemptFields = {
   ...commandContext,
   checkoutId: text,
@@ -901,6 +920,9 @@ export type CommercePaymentAccountsV1 = Static<
 >;
 
 // Parsers of the records above.
+export const parseCommerceCounterSaleHandoffResultV1Record = wireRecordParser(
+  commerceCounterSaleHandoffResultV1Schema,
+);
 export const parseCommerceStripePaymentAccountV1Record = wireRecordParser(
   commerceStripePaymentAccountV1Schema,
 );

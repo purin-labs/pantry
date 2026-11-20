@@ -310,9 +310,9 @@ class TestInPersonCollectionGateway implements InPersonCollectionGateway {
         kind: "server_terminal_checkout",
         providerCheckoutReference: `terminal_checkout_${request.paymentAttemptId}`,
         deviceId:
-          request.paymentBinding.provider === "square_terminal"
-            ? request.paymentBinding.deviceId
-            : request.paymentBinding.deviceSourceKey,
+          request.paymentBinding.provider === "gmo_stera"
+            ? request.paymentBinding.deviceSourceKey
+            : (request.paymentBinding.deviceId ?? "square_pos_app"),
         expiresAt: request.expiresAt,
       },
     };

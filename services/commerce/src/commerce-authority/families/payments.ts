@@ -9,6 +9,7 @@ import {
   type CommerceMutationResultV1,
   type ObserveCommercePaymentDisputeV1,
 } from "@purin-labs/commerce-client";
+import type { CommerceCounterSaleHandoffResultV1 } from "@purin-labs/commerce-contracts/records/api-admin";
 import { readPointOfSaleConfigurationForCheckout } from "../../point-of-sale-configuration-persistence.ts";
 import { rejected, sha256, validateMerchant } from "../ledger.ts";
 import { parseStripeDisputeEvent } from "../../payments/stripe/stripe-disputes.ts";
@@ -175,6 +176,58 @@ export abstract class PaymentFamily extends CheckoutFamily {
       paymentAttemptId: command.paymentAttemptId,
       session: provider.session,
     };
+  }
+
+  /**
+   * Keeps the Square Point of Sale app's answer for the sale's open payment
+   * attempt, then reads the payment from Square (Plan 90 Phase 3B). The
+   * answer arrives through the browser, so it settles nothing by itself.
+   */
+  async recordCounterSaleHandoffResult(
+    merchantId: string,
+    checkoutId: string,
+    result: CommerceCounterSaleHandoffResultV1,
+  ): Promise<
+    | Readonly<{ ok: true; value: CommerceCounterSaleV1 }>
+    | Readonly<{ ok: false; code: string }>
+  > {
+    const sale = this.readCounterSale(merchantId, checkoutId);
+    if (sale === undefined) return { ok: false, code: "not_found" };
+    const attempt = sale.paymentAttempt;
+    const binding = attempt?.binding.paymentBinding;
+    if (
+      attempt === null ||
+      attempt.paymentAttemptId !== result.paymentAttemptId ||
+      binding?.provider !== "square_terminal" ||
+      binding.transport !== "client_app_handoff"
+    )
+      return { ok: false, code: "handoff_attempt_mismatch" };
+    const gateway = this.inPersonCollectionGateway;
+    if (gateway?.recordClientHandoffResult === undefined)
+      return { ok: false, code: "handoff_unavailable" };
+    const outcome = gateway.recordClientHandoffResult(
+      merchantId,
+      result.paymentAttemptId,
+      {
+        handoffReference: result.handoffReference,
+        status: result.status,
+        transactionId: result.transactionId,
+        clientTransactionId: result.clientTransactionId,
+        errorCode: result.errorCode,
+      },
+    );
+    if (outcome === "not_found")
+      return { ok: false, code: "handoff_not_found" };
+    if (outcome !== "recorded" && outcome !== "already_recorded")
+      return { ok: false, code: outcome };
+    try {
+      return {
+        ok: true,
+        value: await this.reconcileCounterSalePayment(merchantId, checkoutId),
+      };
+    } catch {
+      return { ok: false, code: "reconciliation_failed" };
+    }
   }
 
   async reconcileCounterSalePayment(

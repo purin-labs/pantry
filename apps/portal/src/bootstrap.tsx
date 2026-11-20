@@ -19,6 +19,16 @@ function reloadAfterRelease(error: unknown): void {
 }
 
 async function renderApplication(pathname: string): Promise<void> {
+  // The Square Point of Sale app returns here; the page goes straight back
+  // to the Register that opened the app, with the app's answer.
+  if (pathname === "/portal/square-pos-return") {
+    const { squarePosReturnAddress } =
+      await import("./features/register/square-pos-handoff");
+    window.location.replace(
+      squarePosReturnAddress(window.location.search) ?? "/portal",
+    );
+    return;
+  }
   if (pathname === "/ecommerce" || pathname === "/ecommerce/") {
     const { EcommercePage } = await import("./features/ecommerce/page");
     document.title = "Ecommerce Agents · Seams";

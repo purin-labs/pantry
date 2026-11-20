@@ -376,7 +376,8 @@ function parseAssignment(raw: unknown): TerminalCounterReadback["assignment"] {
     typeof object.healthIsObservable !== "boolean" ||
     (targetKind !== "sandbox_simulated" &&
       targetKind !== "paired_physical" &&
-      targetKind !== "lan_gateway_device") ||
+      targetKind !== "lan_gateway_device" &&
+      targetKind !== "square_pos_app") ||
     (environment !== "development" && environment !== "production")
   ) {
     throw new Error("Terminal assignment is invalid.");

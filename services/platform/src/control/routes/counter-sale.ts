@@ -11,6 +11,8 @@ import {
   openCounterSale,
   readCounterSaleView,
   reconcileCounterSale,
+  recordCounterSaleHandoffResult,
+  type CounterSaleHandoffResult,
   type CounterSaleAfterSaleAction,
 } from "../../commerce/counter-register";
 import {
@@ -62,6 +64,11 @@ export type CounterSaleControlRoute =
       checkoutIdRaw: string;
     }>
   | Readonly<{
+      kind: "counterSaleHandoffResult";
+      organisationIdRaw: string;
+      checkoutIdRaw: string;
+    }>
+  | Readonly<{
       kind:
         | "counterSalePickupReady"
         | "counterSaleHandover"
@@ -97,7 +104,7 @@ export function matchCounterSaleControlRoute(
   }
   const subRoute = match(
     pathname,
-    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-sales\/([^/]+)\/(cash|collection|cancel|reconciliation)$/u,
+    /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-sales\/([^/]+)\/(cash|collection|cancel|reconciliation|handoff-result)$/u,
   );
   if (subRoute !== null) {
     const sub = subRoute[2];
@@ -108,7 +115,9 @@ export function matchCounterSaleControlRoute(
           ? "counterSaleCollection"
           : sub === "cancel"
             ? "counterSaleCancel"
-            : "counterSaleReconciliation";
+            : sub === "handoff-result"
+              ? "counterSaleHandoffResult"
+              : "counterSaleReconciliation";
     return {
       kind,
       organisationIdRaw: decode(subRoute[0]),
@@ -155,6 +164,8 @@ export function handleCounterSaleControlRoute(
       return handleCounterSaleCancel(request, env, route);
     case "counterSaleReconciliation":
       return handleCounterSaleReconciliation(request, env, route);
+    case "counterSaleHandoffResult":
+      return handleCounterSaleHandoffResult(request, env, route);
     case "counterSalePickupReady":
     case "counterSaleHandover":
     case "counterSaleRefund":
@@ -314,6 +325,35 @@ async function handleCounterSaleReconciliation(
   return finishMutation(request, started, { ok: true, counterSale: reconciled.value });
 }
 
+/**
+ * The Register's callback page sends the Square Point of Sale app's answer
+ * here (Plan 90 Phase 3B). Commerce reads the payment from Square before it
+ * places the order, so the answer is only a hint.
+ */
+async function handleCounterSaleHandoffResult(
+  request: Request,
+  env: Env,
+  route: Variant<CounterSaleControlRoute, "counterSaleHandoffResult">,
+): Promise<Response> {
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const started = await beginMutation(
+    request,
+    env,
+    route.organisationIdRaw,
+    "counter_sale.handoff_result",
+    "operator",
+  );
+  if (started instanceof Response) return started;
+  const result = parseHandoffResultRequest(started.body);
+  if (result === null) return controlError("counter_sale_request_invalid", 422);
+  const recorded = await recordCounterSaleHandoffResult(started.deps, {
+    checkoutId: route.checkoutIdRaw,
+    result,
+  });
+  if (!recorded.ok) return failureResponse(recorded.failure);
+  return finishMutation(request, started, { ok: true, counterSale: recorded.value });
+}
+
 async function handleCounterSaleAfterSale(
   request: Request,
   env: Env,
@@ -423,6 +463,32 @@ function parseCollectionRequest(body: JsonRecord): Readonly<{
     amount: parsedAmount,
     ...(paymentMethod === undefined ? {} : { paymentMethod }),
   };
+}
+
+function parseHandoffResultRequest(
+  body: JsonRecord,
+): CounterSaleHandoffResult | null {
+  const keys = Object.keys(body).sort().join(",");
+  if (
+    keys !==
+    "clientTransactionId,errorCode,handoffReference,paymentAttemptId,status,transactionId"
+  )
+    return null;
+  const text = (value: unknown): value is string =>
+    typeof value === "string" && value.length > 0 && value.length <= 255;
+  const nullableText = (value: unknown): value is string | null =>
+    value === null || text(value);
+  const { paymentAttemptId, handoffReference, status, transactionId, clientTransactionId, errorCode } = body;
+  if (
+    !text(paymentAttemptId) ||
+    !text(handoffReference) ||
+    (status !== "ok" && status !== "error") ||
+    !nullableText(transactionId) ||
+    !nullableText(clientTransactionId) ||
+    !nullableText(errorCode)
+  )
+    return null;
+  return { paymentAttemptId, handoffReference, status, transactionId, clientTransactionId, errorCode };
 }
 
 function afterSaleKind(

@@ -73,6 +73,18 @@ export type CommerceInPersonCollectionSessionV1 =
       gatewayId: string;
       deviceSourceKey: string;
       expiresAt: string;
+    }>
+  | Readonly<{
+      kind: "client_app_handoff";
+      app: "square_point_of_sale";
+      clientId: string;
+      locationId: string;
+      amountMinor: number;
+      currency: string;
+      tenderTypes: ("CREDIT_CARD" | "PAYPAY")[];
+      handoffReference: string;
+      note: string;
+      expiresAt: string;
     }>;
 
 export type CommerceInPersonCollectionResultV1 =

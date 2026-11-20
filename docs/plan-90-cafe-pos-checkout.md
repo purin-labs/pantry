@@ -1,9 +1,29 @@
 # Plan 90 — Café Counter Register and POS Payment Adapters
 
 Status (20 November 2026): Phases 1, 2, 3A and 4A are built and released.
-Phase 5 is built in simulation on branch `plan-90-printer` and is not
-released; its physical certification waits for the owner's `MCP31LB`.
-Phases 3B, 3C and 4B are open.
+Phases 3B and 5 are built and not released. Phases 3C and 4B wait for
+hardware and a provider document. The owner steps for every hardware check
+are in [the hardware runbook](runbooks/plan-90-hardware-acceptance.md).
+
+- Phase 3B (Square Point of Sale app on the iPad) is proven with a fake
+  Square in the commerce journey `tests/square-japan-tenders-journey.test.ts`
+  and the Platform journey `tests/e2e/square-in-commerce.test.ts`. Its
+  release needs commerce schema 92 (one new table; the rehearsal from
+  production `3fd041b` passed) and the regional D1 patch
+  `services/platform/scripts/plan90-square-pos-app-d1-patch.sql` before the
+  Platform deploy. A rollback of the commerce Worker to `f031c27b` refuses
+  schema 92, as the earlier rollback refused schema 91.
+- Phase 5 (receipt printer and cash drawer) is built in simulation. Its
+  release needs the regional D1 patch
+  `services/platform/scripts/plan-90-receipt-printer-d1-patch.sql` and a new
+  `shop-gateway` build. Its physical certification waits for the owner's
+  `MCP31LB`.
+- The FeliCa readback of Phase 3A was wrong and is fixed with Phase 3B:
+  Square records e-money as a `CARD` payment with the card brand `FELICA`
+  and the sub-brand in `electronic_money_details.felica_details.felica_brand`,
+  not as `source_type: "FELICA"`. The released code would refuse every real
+  FeliCa Terminal payment. No terminal is assigned in production, so no sale
+  was affected.
 
 - The Platform releases of 19 and 20 November carry Phase 2: the Register in
   the Portal, the counter-register domain and the Sous Chef tools.
@@ -151,12 +171,16 @@ handoff is optional.**
   `felica_details` for `felica`, `WALLET` / `wallet_details` for `qr_code`),
   persisting the sub-brand (such as `FELICA_TRANSPORTATION` or `PAYPAY`) on the
   payment record.
-- **`square_pos_app` (`client_app_handoff`, optional Phase 3B):** for an iPad
+- **`square_pos_app` (`client_app_handoff`, Phase 3B):** for an iPad
   paired to a Bluetooth Square Reader with no Square Terminal, `/register`
   launches `square-commerce-v1://payment/create` with a deterministic client
   reference. Return-URL parameters are untrusted hints; Underclerk settles the
   attempt only after `GET /v2/payments/:id` confirms the exact merchant,
   location, amount, currency, and zero tip.
+  Built as the transport `client_app_handoff` of the provider
+  `square_terminal`, with the terminal target `square_pos_app`. A new
+  provider value would need a rebuild of `checkout_payment_attempt` for its
+  provider CHECK, the kind of step that failed in schema 91.
 
 D6. **Non-refundable Japan e-money refunds in cash without skewing payouts.**
 Square's Refunds API refuses FeliCa refunds (`REFUND_DECLINED`), and `stera`
@@ -405,14 +429,41 @@ refund through Square; FeliCa refuses provider refund and settles via
 `record_counter_manual_cash_refund` with exact payout and cash positions; a
 cancelled terminal prompt allows switching the same counter basket to cash.
 
-Optional Phase 3B (`square_pos_app`): implement only if a target café uses an
-iPad + Bluetooth Square Reader instead of a Square Terminal.
+Phase 3B (`square_pos_app`) — built on 20 November 2026, not deployed:
+
+- Café › Counters & payments: "Use the Square app on an iPad" assigns the
+  counter to the Square Point of Sale app (`POST
+  …/commerce/terminal-operations/square-pos-app`, `admin`+, production only:
+  Square's Sandbox has no Point of Sale API). The form shows the one web
+  callback URL, `<Portal origin>/portal/square-pos-return`, that the Square
+  Developer Console must list.
+- The Register's charge opens the app with the amount, the location, the
+  tender types (`CREDIT_CARD`, which covers e-money in Japan, or `PAYPAY`) and
+  a `state` that names the handoff reference and the Register. The callback
+  page sends the browser back to that Register only, and the Register posts
+  the app's answer (`POST …/counter-sales/:checkoutId/handoff-result`,
+  `operator`+).
+- Commerce keeps the first answer for the attempt (schema 92,
+  `square_pos_handoff`), refuses another reference, another answer and a
+  transaction id that another handoff used, reads the order
+  (`GET /v2/orders/:transactionId`) and its one tender's payment, and records
+  the capture only for a completed payment at the location, for the exact
+  amount, with no tip, with no `reference_id`, made after the handoff started.
+  A FeliCa capture is refunded in cash (D6). No alarm reads a handoff, so an
+  idle counter costs nothing.
+- Limits: if the app does not return to the Register, or in the app's Offline
+  Mode, Pantry has no transaction id and the sale stays open; staff find the
+  payment in the Square Dashboard. Live acceptance needs an iPad, a Square
+  Reader and a live Japan location (runbook step A).
+- Agent access: none. The handoff and its answer move money, so they stay
+  with the person at the counter (D9); `counter_sale_read` shows the result.
 
 Phase 3C (restarts [Plan 33D](./plan-33D-square-release-acceptance.md) on
 Underclerk): once the shop's Japan Square location is activated for live
 payments and one physical Square Terminal is purchased, run the Plan 33D
 distinct-seller check and physical pairing, card, FeliCa, QR, cancellation,
-offline, and refund certification packet.
+offline, and refund certification packet. The steps are in step B of
+[the hardware runbook](runbooks/plan-90-hardware-acceptance.md).
 
 ### Phase 4 — GMO `stera` adapter via `shop-gateway`
 
@@ -433,7 +484,9 @@ Work (Phase 4A — provider-neutral `lan_gateway` + simulation, no GMO blocker):
 Work (Phase 4B — physical `stera terminal` driver, **gated on GMO-FG spec**):
 
 - Obtain the official LAN POS-link (CCT) specification from SMBC
-  (`stera developers`) and GMO Financial Gate (`pos_stera@gmo-fg.com`).
+  (`stera developers`) and GMO Financial Gate (`pos_stera@gmo-fg.com`). The
+  request is step C of
+  [the hardware runbook](runbooks/plan-90-hardware-acceptance.md).
 - Implement the versioned `stera` LAN client in `crates/shop-gateway` with local
   disk journal persistence before LAN dispatch so a power or Wi-Fi blip never
   double-charges or strands a terminal.
@@ -443,9 +496,10 @@ Work (Phase 4B — physical `stera terminal` driver, **gated on GMO-FG spec**):
 
 ### Phase 5 — Star `MCP31LB` receipt printer and `mJ-Drawer` (optional)
 
-State (20 November 2026): built and proven in simulation on branch
-`plan-90-printer`. It is not released. The physical certification waits for
-the owner's `MCP31LB` and `mJ-Drawer`.
+State (20 November 2026): built and proven in simulation. It is not
+released. The physical certification waits for the owner's `MCP31LB` and
+`mJ-Drawer` (step D of
+[the hardware runbook](runbooks/plan-90-hardware-acceptance.md)).
 
 What is built:
 

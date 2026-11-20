@@ -517,6 +517,7 @@ export async function handleControlRequest(
     case "counterSaleCollection":
     case "counterSaleCancel":
     case "counterSaleReconciliation":
+    case "counterSaleHandoffResult":
     case "counterSalePickupReady":
     case "counterSaleHandover":
     case "counterSaleRefund":
@@ -533,6 +534,7 @@ export async function handleControlRequest(
     case "terminalPairings":
     case "terminalPairing":
     case "terminalPairingActivation":
+    case "terminalSquarePosApp":
     case "supplierPayouts":
     case "supplierPayout":
     case "supplierPayoutAudit":
