@@ -70,6 +70,12 @@ commit that production runs:
 node --experimental-strip-types scripts/schema-upgrade-rehearsal.ts --from <production commit> --out <report.json>
 ```
 
+The message of the current deploy in `wrangler deployments list --name
+underclerk` usually names that commit. If the commit is only in the archived
+`seams-tech/pantry-history` repository, fetch it with `git fetch --depth=1
+<repository URL> <full commit>` into a separate clone, because a shallow fetch
+makes the clone shallow.
+
 The old code seeds paid orders and an unpaid checkout, and this tree opens the
 same storage. The rehearsal passes when the object opens, every table keeps its
 rows, the foreign key check is clean, and the schema equals a new database.

@@ -26,7 +26,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
 
@@ -139,7 +139,18 @@ try {
     merchantId: string;
     orders: number;
   };
-  const databaseFile = merchantDatabase(persist);
+  const seededFiles = merchantDatabases(persist);
+  if (seededFiles.length !== 1)
+    throw new Error(
+      `expected one merchant database in ${persist}, found ${seededFiles.length}`,
+    );
+  const databaseFile = seededFiles[0]!;
+  // Miniflare keeps an object at <persist>/<namespace key>/<id>.sqlite. The
+  // key names the old fixture class, so this tree opens it under that key.
+  const storagePath = relative(persist, databaseFile).split(sep);
+  if (storagePath.length !== 2)
+    throw new Error(`unexpected merchant storage path ${databaseFile}`);
+  const merchantStorageKey = storagePath[0]!;
   const before = inspect(databaseFile);
   if ((before.rows.checkout_payment_attempt ?? 0) === 0)
     failures.push(
@@ -155,6 +166,7 @@ try {
     artifact,
     signingKey: fixtureSigningKey(),
     persistDirectory: persist,
+    merchantStorageKey,
   });
   let snapshotStatus = 0;
   let snapshotOrders = -1;
@@ -185,6 +197,13 @@ try {
     );
 
   step("compare the upgraded database with a new one");
+  const reopenedFiles = merchantDatabases(persist);
+  if (reopenedFiles.length !== 1 || reopenedFiles[0] !== databaseFile)
+    failures.push(
+      `this tree opened another merchant object: ${reopenedFiles
+        .map((file) => relative(persist, file))
+        .join(", ")}`,
+    );
   const after = inspect(databaseFile);
   const baseline = freshBaseline();
   if (after.version !== baseline.version)
@@ -221,7 +240,12 @@ try {
   const report = {
     rehearsedAt: new Date().toISOString(),
     fixtureNow: FIXTURE_NOW,
-    from: { ref: from, commit: fromCommit, version: before.version },
+    from: {
+      ref: from,
+      commit: fromCommit,
+      version: before.version,
+      merchantStorageKey,
+    },
     to: { commit: toCommit, uncommittedChanges: dirty, version: after.version },
     seeded,
     snapshot: { status: snapshotStatus, orders: snapshotOrders },
@@ -285,9 +309,9 @@ function run(
   return result.stdout;
 }
 
-/** The merchant object's SQLite file in the Miniflare storage folder. */
-function merchantDatabase(directory: string): string {
-  const files = readdirSync(directory, { recursive: true, encoding: "utf8" })
+/** The merchant objects' SQLite files in the Miniflare storage folder. */
+function merchantDatabases(directory: string): string[] {
+  return readdirSync(directory, { recursive: true, encoding: "utf8" })
     .filter((path) => path.endsWith(".sqlite"))
     .map((path) => join(directory, path))
     .filter((path) => {
@@ -303,12 +327,8 @@ function merchantDatabase(directory: string): string {
       } finally {
         database.close();
       }
-    });
-  if (files.length !== 1)
-    throw new Error(
-      `expected one merchant database in ${directory}, found ${files.length}`,
-    );
-  return files[0]!;
+    })
+    .sort();
 }
 
 function inspect(path: string): Inspection {

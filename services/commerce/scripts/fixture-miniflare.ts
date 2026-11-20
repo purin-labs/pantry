@@ -41,12 +41,18 @@ export function fixtureSigningKey(): KeyObject {
  * Starts a built fixture Worker. `persistDirectory` keeps the merchant
  * objects' storage in a folder, so a second start on the same folder opens the
  * same merchant, as after an eviction or a deploy.
+ *
+ * Miniflare derives the storage folder and every object id from the merchant
+ * namespace key, which contains the fixture class name. `merchantStorageKey`
+ * opens storage that an older fixture wrote under another class name, as the
+ * production namespace stays the same across a deploy.
  */
 export async function startFixtureMiniflare(
   options: Readonly<{
     artifact: string;
     signingKey: KeyObject;
     persistDirectory?: string;
+    merchantStorageKey?: string;
   }>,
 ): Promise<FixtureMiniflare> {
   const settings = JSON.parse(
@@ -73,6 +79,9 @@ export async function startFixtureMiniflare(
       UNDERCLERK_MERCHANT: {
         className: "CommerceFixtureMerchantDO",
         useSQLite: true,
+        ...(options.merchantStorageKey === undefined
+          ? {}
+          : { unsafeUniqueKey: options.merchantStorageKey }),
       },
     },
     ...(options.persistDirectory === undefined

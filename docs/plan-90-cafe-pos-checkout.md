@@ -10,8 +10,9 @@ Status (20 November 2026): Phases 1, 2, 3A and 4A are built and on `dev`
 - The regional D1 patch `plan90-payment-terminal-d1-patch.sql` is applied in
   production (checked on 20 November).
 - The schema 91 step of the commerce Worker failed in a Durable Object for each
-  checkout with a payment attempt. It is fixed, and its rehearsal from schema
-  90 passes in workerd (`services/commerce/scripts/schema-upgrade-rehearsal.ts`).
+  checkout with a payment attempt. It is fixed, and its rehearsal in workerd
+  (`services/commerce/scripts/schema-upgrade-rehearsal.ts`) passes from
+  `628f4a225` in `seams-tech/pantry-history`, the commit that production runs.
 - The next release deploys the commerce Worker with the Platform Worker.
 
 Date: 16 November 2026
