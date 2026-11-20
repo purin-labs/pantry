@@ -66,7 +66,7 @@ export type MailboxIngressDebounce = {
   readonly coalesceSeconds: 30;
 };
 
-export type MailboxIngressOverflow = "pause_and_notify";
+type MailboxIngressOverflow = "pause_and_notify";
 
 export type MailboxIngressPolicy =
   | {
@@ -155,7 +155,7 @@ export type MailboxProcessingPauseReason =
       readonly observedAt: number;
     };
 
-export type EmailProposalDisposal =
+type EmailProposalDisposal =
   | { readonly kind: "cleanup_pending" }
   | { readonly kind: "cleaned"; readonly deletedAt: number }
   | { readonly kind: "cleanup_unreachable"; readonly reason: string };

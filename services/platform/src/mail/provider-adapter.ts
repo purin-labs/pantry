@@ -46,7 +46,7 @@ type GmailMailProducts = {
   };
 };
 
-export type MailProviderAdapterByProvider = {
+type MailProviderAdapterByProvider = {
   readonly gmail: {
     readonly provider: "gmail";
     readonly products: {

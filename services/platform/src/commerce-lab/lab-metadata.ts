@@ -32,7 +32,7 @@ type CommerceLabOrganisationMarker = {
   readonly markedAt: number;
 };
 
-export type CommerceLabRunResult = "running" | "completed" | "failed";
+type CommerceLabRunResult = "running" | "completed" | "failed";
 
 export type CommerceLabRunEvidence = {
   readonly runId: string;

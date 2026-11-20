@@ -8,7 +8,7 @@ type OrganisationCutoverBacklog = {
   readonly enqueuedCommerceCues: number;
 };
 
-export type OrganisationCutoverBlocker =
+type OrganisationCutoverBlocker =
   | {
       readonly kind: "provider_actions";
       readonly signed: number;

@@ -53,7 +53,7 @@ export type GmailHistoryMessage = {
  */
 export type GmailInboxEntry = "delivered" | "rescued_from_spam";
 
-export type GmailInboxAddition = GmailHistoryMessage & {
+type GmailInboxAddition = GmailHistoryMessage & {
   readonly entry: GmailInboxEntry;
 };
 

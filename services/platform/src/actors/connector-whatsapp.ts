@@ -76,7 +76,7 @@ export type WhatsAppPauseReason =
       readonly caseId: string;
     };
 
-export type WhatsAppProcessingState =
+type WhatsAppProcessingState =
   | { readonly kind: "waiting" }
   | { readonly kind: "scheduled"; readonly at: number }
   | {

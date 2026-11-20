@@ -223,7 +223,7 @@ function fixtureCodeMode(
 }
 
 /** The sandbox Worker of the test runtime, one object for each execution. */
-export function fixtureSandbox(executionId: string): CodemodeRemote {
+function fixtureSandbox(executionId: string): CodemodeRemote {
   const sandbox = env.CODE_MODE_SANDBOX?.getByName(executionId);
   if (sandbox === undefined) throw new Error("Missing sandbox binding");
   return {

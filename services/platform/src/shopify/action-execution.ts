@@ -58,7 +58,7 @@ export type ShopifyExecutionReceipt =
       reason: "transport_failure" | "response_invalid";
     };
 
-export type ShopifyExecutionFailure = {
+type ShopifyExecutionFailure = {
   field: string | null;
   code: string | null;
   message: string;

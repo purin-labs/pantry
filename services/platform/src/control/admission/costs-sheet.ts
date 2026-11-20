@@ -7,7 +7,7 @@ import {
 import { controlError } from "../http";
 import { authorizeOrganisationSocket } from "./organisation-socket";
 
-export type CostsSheetTransport = "snapshot" | "socket" | "reset";
+type CostsSheetTransport = "snapshot" | "socket" | "reset";
 
 export type CostsSheetRoute = Readonly<{
   kind: "costsSheet";

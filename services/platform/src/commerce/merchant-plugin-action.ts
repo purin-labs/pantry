@@ -22,7 +22,7 @@ export const MERCHANT_PLUGIN_INSTALL_VERB = "commerce.plugin.install";
 type MerchantPluginSettingKind =
   "integer" | "text" | "boolean" | "text_list";
 
-export type MerchantPluginSettingProposal = Readonly<{
+type MerchantPluginSettingProposal = Readonly<{
   key: string;
   valueKind: MerchantPluginSettingKind;
   description: string;
@@ -35,7 +35,7 @@ const MERCHANT_PLUGIN_COMMANDS = [
   "set_plugin_field_values",
   "credit_store_credit",
 ] as const;
-export type MerchantPluginCommand = (typeof MERCHANT_PLUGIN_COMMANDS)[number];
+type MerchantPluginCommand = (typeof MERCHANT_PLUGIN_COMMANDS)[number];
 
 export type InstallMerchantPluginAction = Readonly<{
   kind: "install_merchant_plugin";

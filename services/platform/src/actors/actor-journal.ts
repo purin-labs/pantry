@@ -60,47 +60,44 @@ import {
   commitStartedSessionTransaction,
 } from "./actor-journal/transactions";
 
-export type InputAcceptedTransition = Variant<
-  SessionTransition,
-  "input_accepted"
->;
+type InputAcceptedTransition = Variant<SessionTransition, "input_accepted">;
 
-export type SessionInitializedTransition = Variant<
+type SessionInitializedTransition = Variant<
   SessionTransition,
   "session_initialized"
 >;
 
-export type RuntimeActivatedTransition = Variant<
+type RuntimeActivatedTransition = Variant<
   SessionTransition,
   "runtime_activated"
 >;
 
-export type ExecutionRequestedTransition = Variant<
+type ExecutionRequestedTransition = Variant<
   SessionTransition,
   "execution_requested"
 >;
 
-export type ExecutionSettledTransition = Variant<
+type ExecutionSettledTransition = Variant<
   SessionTransition,
   "execution_settled"
 >;
 
-export type SessionQuarantinedTransition = Variant<
+type SessionQuarantinedTransition = Variant<
   SessionTransition,
   "session_quarantined"
 >;
 
-export type SessionTerminatedTransition = Variant<
+type SessionTerminatedTransition = Variant<
   SessionTransition,
   "session_terminated"
 >;
 
-export type CheckpointingStartedTransition = Variant<
+type CheckpointingStartedTransition = Variant<
   SessionTransition,
   "checkpointing_started"
 >;
 
-export type CheckpointCommittedTransition = Variant<
+type CheckpointCommittedTransition = Variant<
   SessionTransition,
   "checkpoint_committed"
 >;
@@ -115,7 +112,7 @@ export type CancellationResolvedTransition = Variant<
   "cancellation_resolved"
 >;
 
-export type ActorInboxSource =
+type ActorInboxSource =
   | "capacity_governor"
   | "integration_gateway"
   | "surface_actor"
@@ -348,7 +345,7 @@ export type CheckpointCommittedSessionCommit = {
   harnessCheckpoint: HarnessCheckpointRecord;
 };
 
-export type CancellationStartedSessionCommitFields = {
+type CancellationStartedSessionCommitFields = {
   source: Extract<ActorInboxSource, "operator" | "surface_actor">;
   commandId: string;
   event: EventEnvelope<CancellationStartedTransition>;

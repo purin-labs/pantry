@@ -7,8 +7,7 @@ import {
 import { controlError } from "../http";
 import { authorizeOrganisationSocket } from "./organisation-socket";
 
-export type EmailDraftTransport =
-  "snapshot" | "socket" | "review" | "shared-thread";
+type EmailDraftTransport = "snapshot" | "socket" | "review" | "shared-thread";
 
 export type EmailDraftRoute = Readonly<{
   kind: "emailDraft";

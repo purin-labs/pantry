@@ -1,7 +1,7 @@
 import type { CountRow } from "./sql-rows";
 import { errorMessage } from "@purin-labs/std";
 
-export type SchemaMigrationStep = {
+type SchemaMigrationStep = {
   version: number;
   apply: (sql: SqlStorage) => void;
   validate: (sql: SqlStorage) => void;

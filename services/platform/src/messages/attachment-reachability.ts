@@ -26,8 +26,7 @@ import type { OrganisationId } from "../ids";
  * whose result is uncertain.
  */
 
-export const ATTACHMENT_COLLECTION_RECEIPT_SCHEMA =
-  "plan37.attachment-collection.v1";
+const ATTACHMENT_COLLECTION_RECEIPT_SCHEMA = "plan37.attachment-collection.v1";
 
 export type AttachmentCollectionReceipt = {
   readonly schemaVersion: typeof ATTACHMENT_COLLECTION_RECEIPT_SCHEMA;

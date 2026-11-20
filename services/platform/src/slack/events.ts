@@ -104,7 +104,7 @@ export type SlackEnvelope =
     }
   | { kind: "ignored"; reason: SlackIgnoredReason };
 
-export type SlackIgnoredReason =
+type SlackIgnoredReason =
   | "unsupported_envelope"
   | "unsupported_event"
   | "message_subtype"

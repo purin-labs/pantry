@@ -864,7 +864,7 @@ async function pkceChallenge(verifier: string): Promise<string> {
  * "Sign in with ChatGPT" as an owner does it in Portal: start, approve at
  * OpenAI, paste the callback address. Returns the address that was pasted.
  */
-export async function signInWithChatGpt(
+async function signInWithChatGpt(
   openai: FakeOpenAiSignIn,
   input: Readonly<{
     organisationId: OrganisationId;

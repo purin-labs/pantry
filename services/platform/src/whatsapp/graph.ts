@@ -51,7 +51,7 @@ type WhatsAppDiscoveredPhoneNumber = {
   readonly verifiedName: string;
 };
 
-export type WhatsAppGrantedAssets = {
+type WhatsAppGrantedAssets = {
   readonly businessPortfolioId: MetaBusinessPortfolioId;
   readonly wabaId: WhatsAppBusinessAccountId;
   readonly grantedScopes: readonly string[];

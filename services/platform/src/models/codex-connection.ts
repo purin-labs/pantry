@@ -77,7 +77,7 @@ const WEEKLY_REFRESH_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 /** One cron run refreshes at most this many sign-ins in each database. */
 const WEEKLY_REFRESH_BATCH = 50;
 
-export type CodexActionRequiredReason =
+type CodexActionRequiredReason =
   | "authorization_expired"
   | "workspace_access_revoked"
   | "device_authorization_unavailable"

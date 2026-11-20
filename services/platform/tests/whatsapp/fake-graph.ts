@@ -11,7 +11,7 @@ import {
  * in `src/`. Every outcome the send ladder must handle is expressible here.
  */
 
-export type FakeSendOutcome =
+type FakeSendOutcome =
   | { readonly kind: "accepted"; readonly whatsappMessageId?: string }
   | {
       readonly kind: "rejected";
@@ -41,7 +41,7 @@ export type FakeGraphOptions = {
   readonly tokenExpiresAt?: number;
 };
 
-export type FakeGraphCall = {
+type FakeGraphCall = {
   readonly method: string;
   readonly path: string;
   readonly body: string | null;

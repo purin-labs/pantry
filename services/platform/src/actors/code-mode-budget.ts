@@ -186,7 +186,7 @@ export type CodeModeOrganisationReconcileInput = {
   readonly now: number;
 };
 
-export type WorkspaceExecutorAllocationProfile =
+type WorkspaceExecutorAllocationProfile =
   typeof WORKSPACE_EXECUTOR_ALLOCATION_PROFILE;
 
 export type WorkspaceExecutorAllocationParent =

@@ -71,7 +71,7 @@ export type OnboardingActivationInput = {
   readonly now: number;
 };
 
-export type CueActivationSelection = {
+type CueActivationSelection = {
   readonly presetId:
     "observe_commerce" | "commerce_operator" | "proactive_triage";
   readonly workspaceId: WorkspaceId;

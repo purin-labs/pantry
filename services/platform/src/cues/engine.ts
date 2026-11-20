@@ -60,7 +60,7 @@ export type StripeChargeFailedCueEvent = StripeCueEventBase & {
   payload: StripeChargeFailedCuePayload;
 };
 
-export type StripeChargeFailedCuePayload = {
+type StripeChargeFailedCuePayload = {
   chargeId: string;
   amountMinor: number;
   currency: string;
@@ -157,7 +157,7 @@ type CommerceCueEventBase = Omit<
   source: "commerce";
 };
 
-export type CommercePaymentFailedCueEvent = CommerceCueEventBase & {
+type CommercePaymentFailedCueEvent = CommerceCueEventBase & {
   eventType: "payment_failed";
   payload: {
     orderId: string;
@@ -168,7 +168,7 @@ export type CommercePaymentFailedCueEvent = CommerceCueEventBase & {
   };
 };
 
-export type CommerceInventoryShortageCueEvent = CommerceCueEventBase & {
+type CommerceInventoryShortageCueEvent = CommerceCueEventBase & {
   eventType: "inventory_shortage";
   payload: {
     orderId: string;
@@ -179,7 +179,7 @@ export type CommerceInventoryShortageCueEvent = CommerceCueEventBase & {
   };
 };
 
-export type CommerceInventoryLowStockCueEvent = CommerceCueEventBase & {
+type CommerceInventoryLowStockCueEvent = CommerceCueEventBase & {
   eventType: "inventory_low_stock";
   payload: {
     stockPolicyId: string;
@@ -195,7 +195,7 @@ export type CommerceInventoryLowStockCueEvent = CommerceCueEventBase & {
   };
 };
 
-export type CommerceOrderUnshippedCueEvent = CommerceCueEventBase & {
+type CommerceOrderUnshippedCueEvent = CommerceCueEventBase & {
   eventType: "order_unshipped";
   payload: {
     orderId: string;
@@ -204,7 +204,7 @@ export type CommerceOrderUnshippedCueEvent = CommerceCueEventBase & {
   };
 };
 
-export type CommerceTrackingStalledCueEvent = CommerceCueEventBase & {
+type CommerceTrackingStalledCueEvent = CommerceCueEventBase & {
   eventType: "tracking_stalled";
   payload: {
     orderId: string;

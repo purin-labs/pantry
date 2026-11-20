@@ -21,7 +21,7 @@ export function isPaymentWindow(from: number, to: number): boolean {
 type PaymentRunOutcome =
   "paid_first_try" | "recovered_after_decline" | "not_recovered";
 
-export type PaymentsSummary = Readonly<{
+type PaymentsSummary = Readonly<{
   /** Each run counts once, however many tries it holds. */
   runs: number;
   runsByOutcome: Readonly<Record<PaymentRunOutcome, number>>;

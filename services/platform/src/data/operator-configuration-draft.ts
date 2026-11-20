@@ -66,7 +66,7 @@ export function previewCode(commandDigest: string): string {
   return commandDigest.slice(0, 6).toUpperCase();
 }
 
-export type OperatorConfigurationDraftState =
+type OperatorConfigurationDraftState =
   "pending" | "confirmed" | "settled" | "cancelled" | "expired";
 
 export type OperatorConfigurationDraft = Readonly<{

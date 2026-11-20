@@ -72,7 +72,7 @@ export type BlotterOrganisationReader = Pick<
   | "readExactCommerceProjectionReference"
 >;
 
-export type BlotterQueryPlanError =
+type BlotterQueryPlanError =
   | Readonly<{
       readonly code: "query_unsupported";
       readonly source: "blotter";

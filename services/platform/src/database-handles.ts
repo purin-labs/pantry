@@ -33,7 +33,7 @@ interface OrganisationRole {
   readonly [organisationRole]: true;
 }
 
-export type GlobalStatement = D1PreparedStatement & GlobalRole;
+type GlobalStatement = D1PreparedStatement & GlobalRole;
 export type OrganisationStatement = D1PreparedStatement & OrganisationRole;
 
 /** `env.DB`: global identity, the ingress directory and placement. */
@@ -86,7 +86,7 @@ export interface SingleDatabase
     constraintOrBookmark?: D1SessionBookmark | D1SessionConstraint,
   ): SingleDatabaseSession;
 }
-export interface SingleDatabaseSession
+interface SingleDatabaseSession
   extends GlobalDatabaseSession,
     OrganisationDatabaseSession {
   prepare(query: string): GlobalStatement & OrganisationStatement;

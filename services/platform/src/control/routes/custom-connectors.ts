@@ -19,12 +19,12 @@ import {
 } from "./custom-connectors/setup";
 import { handleCustomConnectorWriteAction } from "./custom-connectors/write-actions";
 
-export type CollectionRoute = Readonly<{
+type CollectionRoute = Readonly<{
   kind: "customConnectors";
   organisationIdRaw: string;
 }>;
 
-export type ConnectorRouteBase = Readonly<{
+type ConnectorRouteBase = Readonly<{
   organisationIdRaw: string;
   connectorIdRaw: string;
 }>;

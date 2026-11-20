@@ -64,7 +64,7 @@ import {
 /** How long one participant's mailbox check stays valid in memory. */
 const PARTICIPANT_CHECK_TTL_MS = 30_000;
 
-export type MailReplyDraftAgentEditRequest = Readonly<{
+type MailReplyDraftAgentEditRequest = Readonly<{
   proposalId: string;
   oldText: string;
   newText: string;

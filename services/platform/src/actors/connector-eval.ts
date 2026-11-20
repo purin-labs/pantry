@@ -52,7 +52,7 @@ export type ConnectorEvalRun = Readonly<{
   cancelledAt: number | null;
 }>;
 
-export type ConnectorEvalTask = EvalTaskKey & Readonly<{ position: number }>;
+type ConnectorEvalTask = EvalTaskKey & Readonly<{ position: number }>;
 
 export type ClaimedEvalTask = Readonly<{
   run: ConnectorEvalRun;

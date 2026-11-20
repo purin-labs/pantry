@@ -250,7 +250,7 @@ function base64Url(text: string): string {
  * Session names that Session's records as they were: a cursor that names
  * other records, or none, is refused as changed too.
  */
-export async function verifyExecutionPaging(
+async function verifyExecutionPaging(
   organisationId: string,
   session: IssuedControlSession,
   caseId: string,

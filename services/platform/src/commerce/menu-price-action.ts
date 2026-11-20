@@ -10,7 +10,7 @@ import type { Result } from "../result";
 
 export const MENU_PRICE_CHANGE_VERB = "commerce.menu.change_price";
 
-export type MenuPriceMoney = Readonly<{
+type MenuPriceMoney = Readonly<{
   amountMinor: number;
   currency: string;
 }>;

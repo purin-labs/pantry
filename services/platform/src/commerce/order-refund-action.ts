@@ -16,7 +16,7 @@ export const ORDER_REFUND_VERB = "commerce.order.refund";
 /** A refusal that the agent can act on, returned as the tool's words. */
 export class OrderRefundRequestError extends ToolRequestError {}
 
-export type OrderRefundLine = Readonly<{
+type OrderRefundLine = Readonly<{
   orderLineId: string;
   title: string;
   amountMinor: number;

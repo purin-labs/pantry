@@ -85,7 +85,7 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 
-export type CaseWalkingConnector = CaseConnectorRpc;
+type CaseWalkingConnector = CaseConnectorRpc;
 export type OngoingCaseWalkingConnector = CaseWalkingConnector & {
   /** Streams a Case turn; the release check lets its answer reach the thread. */
   streamCaseTurn(
@@ -109,7 +109,7 @@ export type CaseWalkingCase = Pick<
   | "rejectOutput"
   | "inspect"
 >;
-export type OngoingCaseWalkingCase = CaseWalkingCase &
+type OngoingCaseWalkingCase = CaseWalkingCase &
   Pick<CaseActor, "prepareOngoingTurn">;
 export type CaseWalkingSession = {
   initializeCaseSession(
@@ -145,7 +145,7 @@ export type CaseWalkingSession = {
 export type OngoingCaseWalkingSession = CaseWalkingSession &
   Pick<SessionActor, "inspectTurnStream">;
 
-export type RevalidateTurnAuthority = () => Promise<
+type RevalidateTurnAuthority = () => Promise<
   Result<CompiledTurnAuthority, { readonly code: string }>
 >;
 

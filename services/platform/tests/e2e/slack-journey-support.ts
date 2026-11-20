@@ -1192,7 +1192,7 @@ export function slackSimulator(
   };
 }
 
-export function countMessages(messages: readonly unknown[]): number {
+function countMessages(messages: readonly unknown[]): number {
   return messages.length;
 }
 

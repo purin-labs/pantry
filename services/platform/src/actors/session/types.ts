@@ -126,7 +126,7 @@ export type CanonicalEmbeddedHarnessRuntimeSource =
       readonly checkpoint: HarnessCheckpointRecord;
     };
 
-export type HarnessCheckpointRestartReason =
+type HarnessCheckpointRestartReason =
   | "backend_mismatch"
   | "build_mismatch"
   | "format_mismatch"
@@ -428,7 +428,7 @@ export type CanonicalEmbeddedHarnessInputError =
  * code stays one code for its callers; the reason names the check, so a
  * trace or a retry reason says which one refused.
  */
-export type TurnStateInvalidReason =
+type TurnStateInvalidReason =
   | "assignment_missing"
   | "attachments_invalid"
   | "context_unavailable"

@@ -71,7 +71,7 @@ export type CaseContributionSource =
       readonly turnId?: never;
     });
 
-export type ProducedCaseOutput = Omit<ContractCaseOutput, "source"> & {
+type ProducedCaseOutput = Omit<ContractCaseOutput, "source"> & {
   readonly source: CaseContributionSource;
 };
 
@@ -80,7 +80,7 @@ export type CaseOutput = ProducedCaseOutput & {
 };
 
 /** An output that waited for a person and never left (Plan 27C). */
-export type CaseOutputDropped<Output> = Readonly<{
+type CaseOutputDropped<Output> = Readonly<{
   readonly kind: "dropped";
   readonly output: Output;
   readonly reason: CaseOutputDropReason | "undelivered";
@@ -98,7 +98,7 @@ export type CaseOutputDropReason = "denied" | "expired";
  * An output that the exit check stopped while a person decides (Plan 27C,
  * Refactor 15). Only that decision moves it: no resume path sends it.
  */
-export type CaseOutputHeld<Output> = Readonly<{
+type CaseOutputHeld<Output> = Readonly<{
   readonly kind: "held";
   readonly output: Output;
   readonly requestId: string;
@@ -106,7 +106,7 @@ export type CaseOutputHeld<Output> = Readonly<{
 }>;
 
 /** An output whose delivery the provider refused for good. */
-export type CaseOutputRejected<Output> = Readonly<{
+type CaseOutputRejected<Output> = Readonly<{
   readonly kind: "rejected";
   readonly output: Output;
   readonly reason: string;

@@ -1,4 +1,4 @@
-export type GatewayStaticRoute =
+type GatewayStaticRoute =
   | Readonly<{ kind: "health" }>
   | Readonly<{ kind: "control" }>
   | Readonly<{ kind: "menuScreen" }>

@@ -37,7 +37,7 @@ export type OnePasswordVault = Readonly<{
   itemCount: number;
 }>;
 
-export type OnePasswordSecret = Readonly<{
+type OnePasswordSecret = Readonly<{
   kind: "website_login";
   username: string;
   password: string;

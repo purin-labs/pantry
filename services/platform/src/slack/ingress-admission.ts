@@ -98,7 +98,7 @@ export type AuthorizedSlackCaseIngress = {
 
 export type SlackCommandRole = "owner" | "admin" | "operator";
 
-export type SlackIdentityLinkRequired = {
+type SlackIdentityLinkRequired = {
   readonly organisationId: OrganisationId;
   readonly workspaceId: SlackMessageEvent["workspaceId"];
   readonly externalUserId: SlackMessageEvent["author"];

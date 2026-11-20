@@ -138,7 +138,7 @@ const MAX_MEMORY_CANDIDATE_CHARS = 600;
  * later and that the learned fact changes the right answer to. It becomes
  * the first scenario of a candidate Eval.
  */
-export type EmailLearningCheck = Readonly<{ subject: string; body: string }>;
+type EmailLearningCheck = Readonly<{ subject: string; body: string }>;
 
 const MAX_CHECK_SUBJECT_CHARS = 200;
 const MAX_CHECK_BODY_CHARS = 2_000;

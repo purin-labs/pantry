@@ -25,7 +25,7 @@ export type ApprovalProofDigest = string & {
   readonly [approvalProofDigestBrand]: "ApprovalProofDigest";
 };
 
-export type ApprovalPolicyBinding = {
+type ApprovalPolicyBinding = {
   readonly kind: "unversioned_default";
 };
 
@@ -39,14 +39,14 @@ export type ApprovalActionBinding = {
   readonly expiresAt: number;
 };
 
-export type ControlApprovalPrincipal = {
+type ControlApprovalPrincipal = {
   readonly kind: "app_user";
   readonly userId: UserId;
   readonly personId: PersonId;
   readonly role: "owner" | "admin";
 };
 
-export type SeamsApprovalPrincipal = {
+type SeamsApprovalPrincipal = {
   readonly kind: "seams_identity";
   readonly seamsIdentityId: SeamsIdentityId;
   readonly personId: PersonId;

@@ -32,7 +32,7 @@ export type WorkspaceAllocationAuthorityError =
       readonly reason: string;
     };
 
-export type ReservedWorkspaceExecutorAllocation = Variant<
+type ReservedWorkspaceExecutorAllocation = Variant<
   WorkspaceExecutorAllocationReservation,
   "reserved"
 >;

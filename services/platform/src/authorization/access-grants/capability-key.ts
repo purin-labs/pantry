@@ -21,7 +21,7 @@ export type ProviderCapabilityDefinition = Readonly<{
 
 export type FileCapabilityDefinition = Readonly<FileResourceGrantTarget>;
 
-export type CustomConnectorCapabilityDefinition = Readonly<{
+type CustomConnectorCapabilityDefinition = Readonly<{
   readonly kind: "custom_connector_operation";
   readonly capabilityId: string;
   readonly capabilityVersion: number;

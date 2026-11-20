@@ -31,7 +31,7 @@ export type ActorExportId = string & {
   readonly [actorExportIdBrand]: "ActorExportId";
 };
 
-export type PortableStateValue =
+type PortableStateValue =
   | { readonly kind: "null" }
   | { readonly kind: "boolean"; readonly value: boolean }
   | { readonly kind: "number"; readonly value: number }

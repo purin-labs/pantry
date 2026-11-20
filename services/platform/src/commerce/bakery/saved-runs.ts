@@ -15,7 +15,7 @@ export type SavedBakeryRunQuery = StrictUnion<
   | Readonly<{ kind: "latest" }>
 >;
 
-export type SavedBakeryRunContext = Readonly<{
+type SavedBakeryRunContext = Readonly<{
   kind: "saved_bakery_run";
   source: RunSnapshotSummary;
   revision: string;

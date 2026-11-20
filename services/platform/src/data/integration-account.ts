@@ -76,7 +76,7 @@ export type ProviderConnectionAuthority = {
   readonly credentialRef: VaultHandle;
 };
 
-export type ProviderConnectionAuthoritySeed = {
+type ProviderConnectionAuthoritySeed = {
   readonly kind: "connection_credential";
   readonly credentialRef: VaultHandle;
 };
@@ -153,11 +153,11 @@ export type ActiveIntegrationAccount = Omit<IntegrationAccount, "lifecycle"> & {
   readonly lifecycle: { readonly kind: "active" };
 };
 
-export type AudiencePolicy =
+type AudiencePolicy =
   | { readonly kind: "operator" }
   | { readonly kind: "customer"; readonly consentRequired: true };
 
-export type RetentionPolicy =
+type RetentionPolicy =
   | { readonly kind: "organisation_default" }
   | { readonly kind: "days"; readonly days: number };
 

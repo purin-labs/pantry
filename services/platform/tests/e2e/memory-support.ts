@@ -41,7 +41,7 @@ import {
 import { openRouterText } from "./slack-journey-support";
 import type { OrganisationActorStub } from "../../src/env";
 
-export const CUTOFF_INSTRUCTION =
+const CUTOFF_INSTRUCTION =
   "Remember that our primary supplier closes next-day orders at noon Sydney time.";
 
 /** One person of the fixture Organisation, with their control session. */

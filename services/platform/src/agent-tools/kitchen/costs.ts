@@ -53,7 +53,7 @@ type CostsReadTarget = Readonly<{
   unitsPerDay: number;
 }>;
 
-export type CostsReadForecastScenario = Readonly<{
+type CostsReadForecastScenario = Readonly<{
   openingCashMinor?: number | null;
   demandCurve?: ForecastDemandCurve | null;
   supplierTerms?: ForecastSupplierTerms | null;

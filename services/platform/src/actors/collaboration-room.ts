@@ -49,7 +49,7 @@ import {
   socketSessionMembership,
 } from "./socket-session-access";
 
-export type CollaborationRoomClientMessage<Update, StateVector, Selection> =
+type CollaborationRoomClientMessage<Update, StateVector, Selection> =
   | Readonly<{
       kind: "pointer_update";
       position: CollaborationPointerPosition | null;

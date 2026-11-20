@@ -142,7 +142,7 @@ type AccessControlCapabilityActions =
 type AccessControlGrantActions =
   Readonly<{ kind: "read_only" }> | Readonly<{ kind: "revoke_grant" }>;
 
-export type AccessControlViewActions =
+type AccessControlViewActions =
   | Readonly<{ kind: "read_only" }>
   | Readonly<{ kind: "manage"; createGrant: true; applyDefaults: true }>;
 
@@ -157,7 +157,7 @@ export type AccessControlCapabilityView = Readonly<{
   actions: AccessControlCapabilityActions;
 }>;
 
-export type AccessControlIntegrationView = Readonly<{
+type AccessControlIntegrationView = Readonly<{
   integrationAccountId: IntegrationAccountId;
   provider: string;
   displayName: string;

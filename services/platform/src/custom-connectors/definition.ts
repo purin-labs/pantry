@@ -18,7 +18,7 @@ import {
 } from "@purin-labs/std";
 import { isCommerceSensitivity } from "../commerce/contract/sensitivity";
 
-export type JsonPrimitive = string | number | boolean | null;
+type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | readonly JsonValue[] | JsonObject;
 export type JsonObject = { readonly [key: string]: JsonValue };
 
@@ -42,7 +42,7 @@ export type CustomConnectorObjectSchema = {
   readonly required: readonly string[];
 };
 
-export type CustomConnectorArraySchema = {
+type CustomConnectorArraySchema = {
   readonly kind: "array";
   readonly nullable: boolean;
   readonly items: CustomConnectorSchema;
@@ -50,7 +50,7 @@ export type CustomConnectorArraySchema = {
   readonly maxItems: number;
 };
 
-export type CustomConnectorStringSchema = {
+type CustomConnectorStringSchema = {
   readonly kind: "string";
   readonly nullable: boolean;
   readonly minLength: number;
@@ -58,7 +58,7 @@ export type CustomConnectorStringSchema = {
   readonly constraint: CustomConnectorScalarConstraint;
 };
 
-export type CustomConnectorNumberSchema = {
+type CustomConnectorNumberSchema = {
   readonly kind: "integer" | "number";
   readonly nullable: boolean;
   readonly minimum: number | null;
@@ -66,7 +66,7 @@ export type CustomConnectorNumberSchema = {
   readonly constraint: CustomConnectorScalarConstraint;
 };
 
-export type CustomConnectorBooleanSchema = {
+type CustomConnectorBooleanSchema = {
   readonly kind: "boolean";
   readonly nullable: boolean;
   readonly constraint: CustomConnectorScalarConstraint;
@@ -85,7 +85,7 @@ export type CustomConnectorScalarConstraint =
       readonly values?: never;
     };
 
-export type CustomConnectorNullSchema = {
+type CustomConnectorNullSchema = {
   readonly kind: "null";
 };
 
@@ -133,10 +133,10 @@ export type CustomConnectorMcpTransport = {
   readonly bodyBindings?: never;
 };
 
-export type CustomConnectorOperationTransport =
+type CustomConnectorOperationTransport =
   CustomConnectorRestTransport | CustomConnectorMcpTransport;
 
-export type CustomConnectorPagination =
+type CustomConnectorPagination =
   | {
       readonly kind: "none";
       readonly cursorInput?: never;
@@ -157,7 +157,7 @@ type CustomConnectorWriteRetryPolicy =
   | Readonly<{ readonly kind: "single_attempt"; readonly header?: never }>
   | Readonly<{ readonly kind: "provider_idempotent"; readonly header: string }>;
 
-export type CustomConnectorOperationEffect =
+type CustomConnectorOperationEffect =
   | Readonly<{
       readonly kind: "read";
       readonly retryPolicy?: never;
@@ -174,7 +174,7 @@ export type CustomConnectorOperationEffect =
       readonly resourceIdentityInput: string;
     }>;
 
-export type CustomConnectorResponse = {
+type CustomConnectorResponse = {
   readonly successStatuses: readonly number[];
   readonly resultPointer: string;
   readonly outputSchema: CustomConnectorSchema;

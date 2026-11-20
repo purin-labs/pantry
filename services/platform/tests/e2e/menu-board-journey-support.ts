@@ -513,7 +513,7 @@ export async function actionState(nonce: string): Promise<unknown> {
 }
 
 /** Slack's answer to a click on a card, at its response URL. */
-export type ClickAnswer = Readonly<{
+type ClickAnswer = Readonly<{
   ephemeral: boolean;
   replaceOriginal: boolean;
   text: string;

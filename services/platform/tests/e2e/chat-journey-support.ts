@@ -132,13 +132,6 @@ export function readConnection(reconcile: boolean) {
   });
 }
 
-export async function readFailureReason(): Promise<string> {
-  const connection = await readConnection(false);
-  return connection.ok && connection.value.kind === "action_required"
-    ? connection.value.reason
-    : "none";
-}
-
 export async function readWork(session: IssuedControlSession): Promise<string> {
   const raw: unknown = await (await chat(session, null)).json();
   if (
@@ -160,13 +153,6 @@ export function chat(
     session,
     turn === null ? { kind: "read" } : { kind: "message", turn },
   );
-}
-
-export function retryChat(
-  session: IssuedControlSession,
-  turn: number,
-): Promise<Response> {
-  return requestChat(session, { kind: "retry", turn });
 }
 
 export function goalCommand(

@@ -79,7 +79,7 @@ export type CustomConnectorIdentityTestExecutor = (
   >
 >;
 
-export type CustomConnectorVerification = {
+type CustomConnectorVerification = {
   readonly providerAccountId: string;
   readonly displayName: string;
   readonly resultSchemaDigest: string;

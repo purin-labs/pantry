@@ -41,13 +41,13 @@ export type OnePasswordClient = Readonly<{
   }>;
 }>;
 
-export type OnePasswordVaultRecord = Readonly<{
+type OnePasswordVaultRecord = Readonly<{
   id: string;
   title: string;
   activeItemCount: number;
 }>;
 
-export type OnePasswordItemOverview = Readonly<{
+type OnePasswordItemOverview = Readonly<{
   id: string;
   title: string;
   category: string;
@@ -63,7 +63,7 @@ export type OnePasswordField = Readonly<{
   value: string;
 }>;
 
-export type OnePasswordWebsite = Readonly<{
+type OnePasswordWebsite = Readonly<{
   url: string;
   label: string;
   autofillBehavior: string;

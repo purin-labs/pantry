@@ -46,7 +46,7 @@ type ShopifyLocationObservationProjectionAuthority =
       commerceSystem: Readonly<{ kind: "shopify"; revision: number }>;
     }>;
 
-export type ShopifyLocationObservationClassification =
+type ShopifyLocationObservationClassification =
   | {
       readonly state: "pending";
       readonly reason: "provider_location_kind_unmapped";
@@ -103,7 +103,7 @@ export type ShopifyLocationClassificationAssignmentResult = {
   readonly projection: AppliedCommerceDeliveryResult;
 };
 
-export type ShopifyLocationObservationDisposition =
+type ShopifyLocationObservationDisposition =
   "applied" | "duplicate" | "out_of_order";
 
 export type ShopifyLocationObservationResult = {

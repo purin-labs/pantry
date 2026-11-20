@@ -70,7 +70,7 @@ type OrganisationPlacementMoveTargetBoundaryError = {
   readonly path: string;
 };
 
-export type PlacementRecordBase = {
+type PlacementRecordBase = {
   readonly placement: OrganisationPlacement;
   readonly fenceToken: OrganisationPlacementFenceToken;
   readonly createdAt: number;

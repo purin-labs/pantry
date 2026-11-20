@@ -22,7 +22,7 @@ import {
  * request continues in a new turn of the same thread; an allowed Portal chat
  * request lets the paused chat run its step again.
  */
-export type AgentPermissionRequestStatus = "pending" | "allowed" | "denied";
+type AgentPermissionRequestStatus = "pending" | "allowed" | "denied";
 
 export type AgentPermissionRequesterRole =
   | "owner"
@@ -54,7 +54,7 @@ export type AgentPermissionRequest = Readonly<{
 }>;
 
 /** Where an agent turn asked. */
-export type AgentPermissionOrigin =
+type AgentPermissionOrigin =
   | Readonly<{
       kind: "slack_thread";
       connectorId: string;

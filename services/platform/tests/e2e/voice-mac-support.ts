@@ -55,7 +55,7 @@ export function voiceMacRequest(
   });
 }
 
-export function readVoiceMacCredential(body: unknown): string {
+function readVoiceMacCredential(body: unknown): string {
   if (!isRecord(body) || typeof body.credential !== "string")
     throw new Error("No credential");
   return body.credential;

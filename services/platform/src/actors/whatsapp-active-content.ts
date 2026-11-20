@@ -12,7 +12,7 @@ import { decodeBase64, encodeBase64 } from "@purin-labs/std";
  * Deleting the row deletes the content; there is no second copy.
  */
 
-export type WhatsAppContentSlot =
+type WhatsAppContentSlot =
   | { readonly kind: "message"; readonly providerMessageId: string }
   | {
       readonly kind: "proposal";
@@ -20,7 +20,7 @@ export type WhatsAppContentSlot =
       readonly version: number;
     };
 
-export type WhatsAppSealedContent = {
+type WhatsAppSealedContent = {
   readonly nonceB64: string;
   readonly ciphertextB64: string;
   readonly bytes: number;

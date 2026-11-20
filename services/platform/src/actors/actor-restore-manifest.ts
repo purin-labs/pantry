@@ -29,7 +29,7 @@ import {
   isRecord,
 } from "@purin-labs/std";
 
-export type ActorRestoreCounts = {
+type ActorRestoreCounts = {
   readonly tableCount: number;
   readonly rowCount: number;
   readonly kvEntryCount: number;

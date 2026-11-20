@@ -16,7 +16,7 @@ import {
 } from "./fixtures/organisation-placement";
 import { fixtureProviderActionAuthority } from "./fixtures/plan25-turn";
 
-export const PROVIDER_SLACK_ACCOUNT = "integration_provider_slack";
+const PROVIDER_SLACK_ACCOUNT = "integration_provider_slack";
 
 /** The authenticated Slack origin is independent from the provider action target. */
 export function realProviderActionAuthority(

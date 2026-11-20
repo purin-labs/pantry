@@ -47,7 +47,7 @@ import {
 
 type WhatsAppProposalError = { readonly code: string };
 
-export type WhatsAppProposalPreview = {
+type WhatsAppProposalPreview = {
   readonly proposalId: string;
   readonly version: number;
   readonly caseId: string;

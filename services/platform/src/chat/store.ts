@@ -114,7 +114,7 @@ type ConversationDirectory = Readonly<{
     ArchivedConversationMetadata)[];
 }>;
 
-export type ConversationSharing = Readonly<{
+type ConversationSharing = Readonly<{
   visibility: "private" | "shared";
   role: ProjectRole;
 }>;

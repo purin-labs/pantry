@@ -47,11 +47,11 @@ export type PinnedSessionPolicy = {
   modelRoute: ModelRoute;
 };
 
-export type ConversationRiskPolicy = {
+type ConversationRiskPolicy = {
   outputScreeningMode: ConversationRiskOutputScreeningMode;
 };
 
-export type ConversationRiskOutputScreeningMode = "hold" | "stream";
+type ConversationRiskOutputScreeningMode = "hold" | "stream";
 
 export type OrganisationPolicyLoad = {
   snapshot: OrganisationPolicySnapshot;
@@ -855,7 +855,7 @@ export function parseOrganisationPolicySnapshot(
   };
 }
 
-export function parseEgressPolicy(
+function parseEgressPolicy(
   raw: unknown,
 ): Result<EgressPolicy, { code: "policy_snapshot_invalid"; detail: string }> {
   if (!isRecord(raw)) {
@@ -889,64 +889,6 @@ export function parseEgressPolicy(
     value: {
       allowedHosts: allowedHosts.value,
       injections: injections.value,
-      modelRoute: modelRoute.value,
-    },
-  };
-}
-
-export function parsePinnedSessionPolicy(
-  raw: unknown,
-): Result<
-  PinnedSessionPolicy,
-  { code: "policy_snapshot_invalid"; detail: string }
-> {
-  if (!isRecord(raw)) {
-    return {
-      ok: false,
-      error: { code: "policy_snapshot_invalid", detail: "pin object required" },
-    };
-  }
-
-  const version = raw.version;
-  const egress = parseEgressPolicy(raw.egress);
-  const authz = parseAuthzRules(raw.authz);
-  const conversationRisk = parseConversationRiskPolicy(raw.conversationRisk);
-  const modelRoute = parseSessionModelRoute(raw.modelRoute);
-
-  if (
-    !Number.isSafeInteger(version) ||
-    typeof version !== "number" ||
-    version < 0
-  ) {
-    return {
-      ok: false,
-      error: { code: "policy_snapshot_invalid", detail: "invalid version" },
-    };
-  }
-
-  if (!egress.ok) {
-    return egress;
-  }
-
-  if (!authz.ok) {
-    return authz;
-  }
-
-  if (!conversationRisk.ok) {
-    return conversationRisk;
-  }
-
-  if (!modelRoute.ok) {
-    return modelRoute;
-  }
-
-  return {
-    ok: true,
-    value: {
-      version,
-      egress: egress.value,
-      authz: authz.value,
-      conversationRisk: conversationRisk.value,
       modelRoute: modelRoute.value,
     },
   };

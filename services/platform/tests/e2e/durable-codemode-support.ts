@@ -84,7 +84,7 @@ type GateState = {
   journalAtDenial: Promise<JournalSize | null> | null;
 };
 
-export type JournalSize = { entries: number; bytes: number };
+type JournalSize = { entries: number; bytes: number };
 
 class FencedDatabase extends ActorSqliteDatabase {
   dead = false;

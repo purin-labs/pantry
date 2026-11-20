@@ -84,11 +84,11 @@ type WhatsAppSupportBinding = {
 };
 
 /** V1 sends operator notices to the organisation's already-selected destination. */
-export type OperatorDestination = {
+type OperatorDestination = {
   readonly kind: "organisation_communication_destination";
 };
 
-export type WhatsAppIngressOverflow = "pause_and_notify";
+type WhatsAppIngressOverflow = "pause_and_notify";
 const WHATSAPP_RELEVANT_MESSAGE_TOPICS_MAX_CHARS = 2_000;
 const WHATSAPP_AUTOMATIC_ACKNOWLEDGEMENT_MAX_CHARS = 1_000;
 
@@ -166,7 +166,7 @@ export type WhatsAppCaseConversationWindow = {
   readonly closedAt: number | null;
 };
 
-export type WhatsAppProposalDisposal =
+type WhatsAppProposalDisposal =
   | { readonly kind: "cleanup_pending" }
   | { readonly kind: "cleaned"; readonly deletedAt: number };
 
