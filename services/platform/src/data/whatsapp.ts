@@ -1762,7 +1762,11 @@ export async function purgeOrganisationWhatsAppConnectors(input: {
               `${input.organisationId}:${connectorId.value}`,
             ),
           )
-        : actorStub(input.namespace, entry.physicalObjectName, entry.placement);
+        : actorStub(
+            input.namespace,
+            entry.physicalObjectName,
+            entry.placement,
+          );
     const disabled = await stub.disableWhatsAppProcessing({
       identity: {
         organisationId: input.organisationId,

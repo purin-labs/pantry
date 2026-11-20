@@ -74,7 +74,15 @@ import {
 } from "./console-sidebar";
 import { runLayoutMotion } from "./layout-motion";
 import { DashboardNavigation } from "./dashboard-navigation";
-import { WorkspaceSwitcher } from "./workspace-switcher";
+import {
+  WorkspaceSwitcher,
+  type OrganisationChoice,
+  type OrganisationShellContext,
+  type WorkspaceChoice,
+  type WorkspaceShellContext,
+} from "./workspace-switcher";
+
+export type { OrganisationChoice, WorkspaceChoice };
 import { useConsoleSidebarPreference } from "./use-console-sidebar-preference";
 import { assertNever } from "@purin-labs/std";
 import { ConsoleToolsProvider } from "./console-tools";
@@ -85,18 +93,6 @@ import type { Variant } from "@purin-labs/type-utils";
 const DOCS_ORIGIN = (
   import.meta.env.VITE_DOCS_ORIGIN || "http://docs.localhost:3005"
 ).replace(/\/$/, "");
-
-export type OrganisationChoice = {
-  readonly organisationHandle: string;
-  readonly name: string;
-  readonly workspaces: readonly WorkspaceChoice[];
-};
-
-export type WorkspaceChoice = {
-  readonly organisationHandle: string;
-  readonly workspaceHandle: string;
-  readonly name: string;
-};
 
 type PortalFrameIdentity =
   | {
@@ -114,19 +110,6 @@ type PortalFrameIdentity =
       };
     }
   | { readonly kind: "loading" };
-
-export type OrganisationShellContext = {
-  readonly organisationHandle: string;
-  readonly name: string;
-  readonly choices: readonly OrganisationChoice[];
-};
-
-export type WorkspaceShellContext = {
-  readonly organisationHandle: string;
-  readonly workspaceHandle: string;
-  readonly name: string;
-  readonly choices: readonly WorkspaceChoice[];
-};
 
 type PortalFrameProps =
   | {

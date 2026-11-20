@@ -6,7 +6,7 @@ import { AgentCursors } from "../collaboration/agent-cursors";
 import {
   DraftParticipants,
   DraftPresenceOverlay,
-} from "../commerce/description-draft/presence";
+} from "../collaboration/draft-presence";
 import { ReplyDraftClient, type ReplyDraftView } from "./reply-draft-client";
 
 type Props = Readonly<{

@@ -268,11 +268,7 @@ export async function handleWhatsAppAccount(
     route: `/v1/control/organisations/${authorized.organisationId}/whatsapp-accounts/${accountId.value}/${action}`,
     operation: `whatsapp_account.${action.replaceAll("-", "_")}`,
   };
-  const replayed = await replayGuard(
-    authorized.executionScope,
-    scope,
-    boundary.value,
-  );
+  const replayed = await replayGuard(authorized.executionScope, scope, boundary.value);
   if (replayed !== null) return replayed;
   const identity = await resolveUser({
     db: env.DB,
@@ -297,6 +293,7 @@ export async function handleWhatsAppAccount(
   });
   if (!outcome.ok) return outcome.error;
   const recordedMutationReceipt = await recordCommerceMutationReceipt({
+
     authorized,
     identity,
     scope,
@@ -305,8 +302,7 @@ export async function handleWhatsAppAccount(
     responseBody: outcome.value,
     now,
   });
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
+  if (!recordedMutationReceipt.ok) return controlError(recordedMutationReceipt.error.code, 409);
   return controlJson(outcome.value);
 }
 
@@ -490,9 +486,7 @@ async function runAccountAction(
       });
       if (!contextGrant.ok) {
         const status =
-          contextGrant.error.code === "organisation_placement_conflict"
-            ? 409
-            : 500;
+          contextGrant.error.code === "organisation_placement_conflict" ? 409 : 500;
         return {
           ok: false,
           error: controlError(contextGrant.error.code, status),
@@ -857,7 +851,10 @@ export async function handleWhatsAppReply(
   if (action === null) {
     if (request.method !== "GET")
       return controlError("method_not_allowed", 405);
-    const readable = await whatsappTextReadable(authorized, accountId.value);
+    const readable = await whatsappTextReadable(
+      authorized,
+      accountId.value,
+    );
     if (readable !== null) return readable;
     const preview = await connector.value.stub.previewWhatsAppProposal({
       identity: connector.value.identity,
@@ -921,11 +918,7 @@ export async function handleWhatsAppReply(
     route: `/v1/control/organisations/${authorized.organisationId}/whatsapp-replies/${projection.proposalId}/${action}`,
     operation: `whatsapp_reply.${action}`,
   };
-  const replayed = await replayGuard(
-    authorized.executionScope,
-    scope,
-    boundary.value,
-  );
+  const replayed = await replayGuard(authorized.executionScope, scope, boundary.value);
   if (replayed !== null) return replayed;
   const identity = await resolveUser({
     db: env.DB,
@@ -1012,6 +1005,7 @@ export async function handleWhatsAppReply(
     responseBody = { ok: true, result: resolved.value };
   }
   const recordedMutationReceipt = await recordCommerceMutationReceipt({
+
     authorized,
     identity,
     scope,
@@ -1020,8 +1014,7 @@ export async function handleWhatsAppReply(
     responseBody,
     now,
   });
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
+  if (!recordedMutationReceipt.ok) return controlError(recordedMutationReceipt.error.code, 409);
   return controlJson(responseBody);
 }
 
@@ -1045,8 +1038,7 @@ export async function handleWhatsAppCase(
     organisationId: authorized.organisationId,
     caseId: caseIdRaw,
   });
-  if (conversationWindow === null)
-    return controlError("whatsapp_case_not_found", 404);
+  if (conversationWindow === null) return controlError("whatsapp_case_not_found", 404);
   const connector = await whatsappConnector(
     env,
     authorized.organisationId,
@@ -1091,11 +1083,7 @@ export async function handleWhatsAppCase(
     route: `/v1/control/organisations/${authorized.organisationId}/whatsapp-cases/${caseIdRaw}/${action}`,
     operation: `whatsapp_case.${action.replaceAll("-", "_")}`,
   };
-  const replayed = await replayGuard(
-    authorized.executionScope,
-    scope,
-    boundary.value,
-  );
+  const replayed = await replayGuard(authorized.executionScope, scope, boundary.value);
   if (replayed !== null) return replayed;
   const identity = await resolveUser({
     db: env.DB,
@@ -1184,6 +1172,7 @@ export async function handleWhatsAppCase(
     responseBody = { ok: true, result: sent.value };
   }
   const recordedMutationReceipt = await recordCommerceMutationReceipt({
+
     authorized,
     identity,
     scope,
@@ -1192,8 +1181,7 @@ export async function handleWhatsAppCase(
     responseBody,
     now,
   });
-  if (!recordedMutationReceipt.ok)
-    return controlError(recordedMutationReceipt.error.code, 409);
+  if (!recordedMutationReceipt.ok) return controlError(recordedMutationReceipt.error.code, 409);
   return controlJson(responseBody);
 }
 

@@ -13,7 +13,7 @@ import type {
 } from "@purin-labs/collaboration";
 import { assertNever } from "@purin-labs/std";
 import { TextCollaborationClient, type TextCollaborationClientMessage, type TextCollaborationView, type TextDocumentAdapter, type TextProtocolAdapter } from "../collaboration/text-client";
-import type { DraftPresenceView } from "../commerce/description-draft/presence";
+import type { DraftPresenceView } from "../collaboration/draft-presence";
 import {
   parseReplyServerMessage,
 } from "@purin-labs/inbox-control-api/portal/reply-draft";

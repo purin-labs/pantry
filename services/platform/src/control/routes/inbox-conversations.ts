@@ -40,7 +40,9 @@ import {
 import { readEmailReplyHeadlines } from "../email-review-headlines";
 import { emailReviewQueueItemWire } from "../email-review";
 import { controlError, noStoreJson } from "../http";
-import { mailControlAuthority } from "../../mail-inbox/contract/control-authority";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
 
 export type InboxConversationsRoute = Readonly<{
   kind: "inboxConversations";
