@@ -96,7 +96,7 @@ export type CanonicalTextTurnInput = {
   readonly attachments: readonly StoredMessageAttachment[];
   readonly links: readonly string[];
   readonly browserContext: TurnPageContext;
-  readonly surfaceContext: TurnPageState | null;
+  readonly surfaceContext: TurnPageState;
   readonly context: unknown;
   readonly completion: CanonicalTextTurnCompletionIdentity;
 };

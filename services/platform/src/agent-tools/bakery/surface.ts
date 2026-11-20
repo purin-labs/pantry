@@ -71,6 +71,7 @@ type BakerySurfaceHarnessToolName =
   | "bakery_surface_apply_production";
 
 const surfaceInspect = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_inspect",
   description:
     "Read the attached Kitchen workspace, including selected task timing, resource constraints and source identity. saveVerification reports the latest verified rehearsal run; scenarioSaveResult reports the latest canonical scenario save result for this operator and surface.",
@@ -104,6 +105,7 @@ const surfaceInspect = defineKitchenTool({
 });
 
 const surfaceReadDraft = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_read_draft",
   description:
     "Read the exact current Kitchen shift draft values with their revision and digest. Use this before calculating a relative edit.",
@@ -137,6 +139,7 @@ const surfaceReadDraft = defineKitchenTool({
 });
 
 const surfaceQueryTasks = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_query_tasks",
   description:
     "Find up to eight Kitchen shift tasks matching a bounded text filter without loading the full schedule.",
@@ -173,6 +176,7 @@ const surfaceQueryTasks = defineKitchenTool({
 });
 
 const surfacePrepareWorkcell = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_prepare_workcell",
   description:
     "Prepare a one-tray robot rehearsal on the production scheduler from an installed example or the recording already open in the canvas. The tray's steps start without results; dispatch time becomes its earliest staging time, a whole number of seconds from 0 to 43200. Replaces an open rehearsal run but keeps unresolved saves. Examples are prerecorded reference data; preparation does not simulate, accept evidence or save. Call simulate_workcell separately for each new MuJoCo result.",
@@ -246,6 +250,7 @@ const surfacePrepareWorkcell = defineKitchenTool({
 });
 
 const surfaceStopSimulation = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_stop_simulation",
   description:
     "Stop the exact browser simulation attached to this chat, including one started by the operator. Completed tasks and accepted evidence are preserved. An old stop request cannot cancel a restarted or different operation.",
@@ -279,6 +284,7 @@ const surfaceStopSimulation = defineKitchenTool({
 });
 
 const surfaceControlWorkspaceView = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_control_workspace_view",
   description:
     "Control the attached workspace view: open a dock (inspector is Details, inputs is its Inputs tab, floorPlan is Floor plan, comparison is Compare shifts), set overhead/perspective camera, recenter, set labels, show/hide the corner map or interface, or reset the view. Uses the same controls as clicks. Camera and recenter are available in Shift, production, rehearsal and the recording viewer. The recording viewer also supports cell, current recorded task, currently selected equipment, operator-height camera views, and inspectionOverhead (selected equipment or the robot cell). setDoorPreview previews an oven door at an integer angle from 0 to 110 degrees and pauses recording playback; degrees: null restores its recorded pose. This visual pose never changes simulation evidence. Docks, labels, minimap, interface visibility and full view reset are available in Shift.",
@@ -446,6 +452,7 @@ const surfaceControlWorkspaceView = defineKitchenTool({
 });
 
 const surfaceShowProductionPanel = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_show_production_panel",
   description:
     "Open a panel in the attached financier production run or scheduled rehearsal: workflow, timeline, files, details, or author (Edit scenario / Edit trays). Opening author or files only shows controls; it never edits, accepts evidence or confirms a proposal. Playback and pending work are preserved.",
@@ -487,6 +494,7 @@ const surfaceShowProductionPanel = defineKitchenTool({
 });
 
 const surfaceControlBaseline = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_control_baseline",
   description:
     "Pin the displayed rehearsal or financier run (including a displayed draft preview) as the comparison baseline, or clear it. Uses the exact comparison attached to this turn. Inspect comparison.current and comparison.baseline for measures. Baselines are session-local; this neither changes the plan nor saves a run.",
@@ -520,6 +528,7 @@ const surfaceControlBaseline = defineKitchenTool({
 });
 
 const surfaceControlPlayback = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_control_playback",
   description:
     "Control playback in the attached shift, rehearsal or production run, as the Play shift, Next event, Restart and Speed controls do: explicit play/pause, seek (run seconds), restart, next event, or speed. In a shift, play runs the calculated shift forward from the cursor; to recalculate it with new inputs, call bakery_surface_run_shift first. Playback never saves a run or runs a robot workcell. Shift speeds: 30/120. Workcell: 0.25/0.5/1/2/30/120. Standalone recording: 0.25/0.5/1/2. Multi-tray: 1/4/16. Production: fixed at 120.",
@@ -587,6 +596,7 @@ const surfaceControlPlayback = defineKitchenTool({
 });
 
 const surfaceSetView = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_set_view",
   description:
     "Pause and navigate the attached Kitchen workspace to one exact task, resource, station, batch, or operation at an exact simulation time. Scheduled rehearsal and financier navigation uses the applied run. The recording viewer accepts only transfers and resources listed in its attached context, within the recording's time range. A native operation ID opens its Files selector even before it has a scheduled task; a scheduled task ID must already exist in the run.",
@@ -630,6 +640,7 @@ const surfaceSetView = defineKitchenTool({
 });
 
 const surfaceSimulateWorkcell = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_simulate_workcell",
   description:
     "Run the native step the attached financier production run or rehearsal awaits (its pendingOperation) in the browser worker. Pass that step's mode: transfer, oven-cycle or rack-cycle. The result waits as an unaccepted candidate for review; accept it with accept_candidate before simulating the tray's next step.",
@@ -668,6 +679,7 @@ const surfaceSimulateWorkcell = defineKitchenTool({
 });
 
 const surfaceDiscardCandidate = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_discard_candidate",
   description:
     "Discard the exact unaccepted production or rehearsal recording attached to this turn. Accepted results remain unchanged. A changed candidate is rejected.",
@@ -701,6 +713,7 @@ const surfaceDiscardCandidate = defineKitchenTool({
 });
 
 const surfaceAcceptCandidate = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_accept_candidate",
   description:
     "Accept the exact recording candidate shown in the attached Kitchen workspace. Use its full candidate reference from the surface context. This changes the current simulation and requires an explicit operator request.",
@@ -797,6 +810,7 @@ const surfaceAcceptCandidate = defineKitchenTool({
 });
 
 const surfacePrepareLayout = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_prepare_layout",
   description:
     "Prepare a bounded rack translation for operator Apply or Discard on the attached rehearsal tray named in rackLayout. Use the attached modelHash and absolute offsets from the original fixture in whole millimetres. Applying it clears that tray's results. Does not apply, simulate or save.",
@@ -834,6 +848,7 @@ const surfacePrepareLayout = defineKitchenTool({
 });
 
 const surfaceEditRehearsal = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_edit_rehearsal",
   description:
     "Edit the trays of the attached scheduled rehearsal. Timing, baker and prerequisite edits preserve accepted results. Add a browser tray chain (loading, retrieval and racking), give a tray another baker from 1 to bakerCount, set one step's earliest start in whole seconds, or replace a tray's prerequisites with steps of other trays. Use batch and operation IDs from the attached trays and tasks. Set simulation-only fault assumptions with set_faults: supply all three fields, using null to clear an assumption. Outages postpone new dispatch on a named resource within the shift; injected failures target staging/clearance; assumed recovery releases held resources but does not complete a failed tray. Read current faults, resource IDs and task IDs from the attached context. Use add_human_transfer for a single nominal table-to-rack tray in cell 1 to add an assumed human transfer through a one-slot buffer to cell 2, with another native table-to-rack task. Use set_ingredients with batchId and ingredients (massKg: total ingredients excluding tray/tool, 0–4; forwardMm: whole millimetres from -100 to 100; lateralMm: whole millimetres from -60 to 60) to review a load change. Applying it clears that tray’s results and continuation states. Use set_cell (cold-cell-1 or cold-cell-2), clear_results, remove_tray or replace_preset to prepare a review; cell reassignment clears that tray’s results; these do not change the run until the operator applies it. Presets open recorded examples. Does not simulate or save.",
@@ -1043,6 +1058,7 @@ const surfaceEditRehearsal = defineKitchenTool({
 });
 
 const surfaceEditProduction = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_edit_production",
   description:
     "Edit the draft of the attached financier production run. The applied run and its native requests are unchanged until a preview is applied. Give a batch's tray the FR10 cold transfer or remove it, set a tray's staging baker (1 to bakerCount), earliest staging second or prerequisites, set a manual task's baker (null for any available baker), prerequisites and earliest start, choose the normal or assumed-outage oven, or discard the draft back to the applied run. Task IDs: batch:<B>:process:<stage|portion|bake|cool|demould|finishCooling|pack>, batch:<B>:transfer:<stage:portion|portion:bake|bake:cool|cool:pack>, and for assigned trays batch:<B>:native:<tray> and batch:<B>:handoff:<tray>-<stage|clear>. Manual tasks are the stage, portion, demould and pack processes and the transfers. Does not preview, apply or save. Use prepare_replacement with source preview, procedure, or one-batch to propose replacing the run. The operator must confirm; this command keeps the current run and its accepted results.",
@@ -1186,6 +1202,7 @@ const surfaceEditProduction = defineKitchenTool({
 });
 
 const surfacePreviewProduction = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_preview_production",
   description:
     "Compile the attached financier production draft into a preview for review: its FR10 transfers, run end and unfinished batches. Does not change the applied run.",
@@ -1219,6 +1236,7 @@ const surfacePreviewProduction = defineKitchenTool({
 });
 
 const surfaceApplyProduction = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_apply_production",
   description:
     "Apply the attached draft's reviewed preview as a fresh financier production run with new native requests, as the operator's Apply preview button does. While the run holds no result it applies at once. When the run holds accepted results, it prepares the production replacement review in Edit scenario instead: the run stays unchanged until the operator applies or discards that review in the workspace, so tell the operator. Refused while a result waits for review, a browser job runs or a save is unresolved. Does not save.",
@@ -1252,6 +1270,7 @@ const surfaceApplyProduction = defineKitchenTool({
 });
 
 const surfacePrepareProductionControl = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_prepare_production_control",
   description:
     "Prepare a control for the attached persistent production execution. The operator must confirm it in the workspace. Times are integer microseconds on the 2000-microsecond grid. Resource unavailability and floor-plan equipment moves or rotations affect new work and future worker walk routes while preserving accepted history. This tool returns the proposal immediately and does not run the factory.",
@@ -1367,6 +1386,7 @@ const surfacePrepareProductionControl = defineKitchenTool({
 });
 
 const surfacePrepareEdit = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_prepare_edit",
   description:
     "Prepare a reviewed Kitchen shift-assumption edit against the exact attached draft. This creates an operator-visible proposal and does not apply it.",
@@ -1450,6 +1470,7 @@ const surfacePrepareEdit = defineKitchenTool({
 });
 
 const surfaceRunShift = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_run_shift",
   description:
     "Run the attached Kitchen shift, as the operator's Apply changes does: set up to eight inputs against the exact attached draft (read it first), then recalculate the normal and outage runs from 06:00 with playback reset and paused. Pass no edits to re-run the applied inputs. Refused while the operator has unapplied input changes or an unsaved operation draft. The run stays local to the page until a scenario copy is saved. Then use bakery_surface_control_playback to play or step it.",
@@ -1533,6 +1554,7 @@ const surfaceRunShift = defineKitchenTool({
 });
 
 const surfaceSelect = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_select",
   description:
     "Select a batch, worker (resource), station (equipment) or task in the attached Kitchen shift, as a click on a Details chip or in the 3D view does. Details opens on that item's tab: Batches, Workers or Equipment. Playback time and state stay as they are; use bakery_surface_set_view to also move to a time. For the Inputs tab, open the inputs dock with bakery_surface_control_workspace_view.",
@@ -1579,6 +1601,7 @@ const surfaceSelect = defineKitchenTool({
 });
 
 const surfaceRotateEquipment = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_rotate_equipment",
   description:
     "Rotate one appliance of the attached Kitchen floor plan by 90 degrees, as Rotate 90° (R) does: it snaps to a quarter turn, turns once and moves the appliance clear of walls and other equipment. applianceId is an id from layout.equipment in the attached shift. Walk times and the shift schedule then recalculate from the new layout, so the run can change. The layout stays in this browser; nothing is saved.",
@@ -1614,6 +1637,7 @@ const surfaceRotateEquipment = defineKitchenTool({
 });
 
 const surfaceMoveEquipment = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_move_equipment",
   description:
     "Move one appliance of the attached Kitchen floor plan to (xMm, zMm) in millimetres relative to the room centre, keeping it clear of walls, columns, fixtures and other equipment. applianceId is an id from layout.equipment in the attached shift. Walk times, door-sweep limits and the shift schedule recalculate from the new layout.",
@@ -1651,6 +1675,7 @@ const surfaceMoveEquipment = defineKitchenTool({
 });
 
 const surfaceToggleOpening = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_toggle_opening",
   description:
     "Open or close a door or window on the attached Kitchen floor plan. openingId is an id from layout.openings in the attached shift (for example 'door:door-corridor-access'). Walk routes and the shift schedule recalculate from the updated door state.",
@@ -1687,6 +1712,7 @@ const surfaceToggleOpening = defineKitchenTool({
 });
 
 const surfaceSelectFloorPlan = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_select_floor_plan",
   description:
     "Switch the active room floor plan in the attached Kitchen shift ('asakusabashi-t101940', 'kinshicho-61146', 'machiya-sun-reve', 'hongo-8257562' or 'reference'). Walk times and the shift schedule recalculate for the selected room.",
@@ -1731,6 +1757,7 @@ const surfaceSelectFloorPlan = defineKitchenTool({
 });
 
 const surfaceSetEquipmentAngle = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_set_equipment_angle",
   description:
     "Set one appliance on the attached Kitchen floor plan to an exact yaw angle in whole degrees (-180..180), keeping it clear of walls, columns, fixtures and other equipment. applianceId is an id from layout.equipment in the attached shift. Walk times and the shift schedule recalculate from the updated layout.",
@@ -1767,6 +1794,7 @@ const surfaceSetEquipmentAngle = defineKitchenTool({
 });
 
 const surfaceConfigureInterior = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_configure_interior",
   description:
     "Configure the Store Interior Design palette on the attached Kitchen shift: apply a curated architectural preset ('kuramae-artisan', 'noix-parisien', 'kiyosumi-minimal' or 'kyoto-machiya') or set an individual floor material, wall cladding, fixture finish, ceiling lighting style, wall height mode or café furnishings toggle.",
@@ -1902,6 +1930,7 @@ const surfaceConfigureInterior = defineKitchenTool({
 });
 
 const surfaceResetFloorPlan = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_reset_floor_plan",
   description:
     "Undo or redo a floor-plan edit ('undo', 'redo'), reset equipment placements on the active floor plan ('reset_appliances'), or restore the initial shift layout ('reset_initial') in the attached Kitchen shift. Walk times and the shift schedule recalculate from the resulting layout.",
@@ -1940,6 +1969,7 @@ const surfaceResetFloorPlan = defineKitchenTool({
 });
 
 const surfaceStartProduction = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_start_production",
   description:
     "Open the financier production run from the attached Kitchen shift, as the recipe catalog does: procedure uses the procedure inputs; one-batch is Financier + robot with one batch and one tray. A new run prepares its native requests from these inputs. If a financier run is already open in this workspace, it reopens that run unchanged; to start it fresh, use bakery_surface_edit_production with prepare_replacement, which the operator confirms. Nothing is saved.",
@@ -1975,6 +2005,7 @@ const surfaceStartProduction = defineKitchenTool({
 });
 
 const surfaceCompareShift = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_compare_shift",
   description:
     "Use Compare shifts in the attached Kitchen shift: outage shows the oven-outage run against the normal run as its baseline; normal replays the normal shift. Opens the comparison panel and resets playback to 06:00, paused. The outage window comes from the shift inputs outageStart and outageEnd.",
@@ -2010,6 +2041,7 @@ const surfaceCompareShift = defineKitchenTool({
 });
 
 const surfaceFile = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_file",
   description:
     "Import an explicitly attached Kitchen file by its SHA-256 digest into operator review, or download an immutable run/request/accepted recording/handoff from the selected operation. File bytes stay in the browser. Imports never apply themselves; ask the operator to review. Exports download in the current browser and return their filename, digest and size.",
@@ -2069,6 +2101,7 @@ const surfaceFile = defineKitchenTool({
 });
 
 const surfaceInspectScenarioSave = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_inspect_scenario_save",
   description:
     "Inspect the scenario save proposal and its current phase. Uncertain outcomes read back the exact submitted copy without writing or repairing approval. Ask the operator to Resume exact save for receipt recovery. Idle means no proposal is tracked in this browser.",
@@ -2105,6 +2138,7 @@ const surfaceInspectScenarioSave = defineKitchenTool({
 });
 
 const surfaceInspectRunSave = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_inspect_run_save",
   description:
     "Inspect this browser workspace's latest save attempt for the given run kind. Uncertain attempts are checked by exact content readback. Inspection never writes, approves, retries or clears a recovery fence. A verified readback with an uncertain agent save still needs the operator's Check saved run action to repair its approval receipt. Idle means no attempt is tracked in this browser; use list_saved_runs for the catalogue.",
@@ -2140,6 +2174,7 @@ const surfaceInspectRunSave = defineKitchenTool({
 });
 
 const surfaceListSavedRuns = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_list_saved_runs",
   description:
     "List one page of saved runs in the current workspace. Pass null cursor for the first page, then the returned nextCursor. Pages are filtered by runKind and can be empty while nextCursor is non-null. Use an observed ID with prepare_run_open. Listing preserves the current run and grants no save or replacement approval.",
@@ -2176,6 +2211,7 @@ const surfaceListSavedRuns = defineKitchenTool({
 });
 
 const surfacePrepareRunOpen = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_prepare_run_open",
   description:
     "Read an exact saved workspace run by its content ID and prepare replacement review in Files. Use the ID from an observed saved-run receipt or the operator. The open workspace must match runKind. The current run is kept until the operator confirms Use saved production run; chat cannot confirm replacement.",
@@ -2212,6 +2248,7 @@ const surfacePrepareRunOpen = defineKitchenTool({
 });
 
 const surfacePrepareRunSave = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_prepare_run_save",
   description:
     "Prepare an exact frozen rehearsal copy for operator review. Returns its name, content ID and byte count; the operator must confirm the save in Kitchen.",
@@ -2247,6 +2284,7 @@ const surfacePrepareRunSave = defineKitchenTool({
 });
 
 const surfacePrepareScenarioSave = defineKitchenTool({
+  modelOnly: true,
   name: "bakery_surface_prepare_scenario_save",
   description:
     "Prepare an immutable shift or production scenario from the current Kitchen draft for operator review. The operator must confirm the exact copy.",
@@ -2326,16 +2364,6 @@ export const SURFACE_TOOL_LIST = [
   surfacePrepareRunSave,
   surfacePrepareScenarioSave,
 ] as const;
-
-const SURFACE_TOOL_NAMES: ReadonlySet<string> = new Set(
-  SURFACE_TOOL_LIST.map((tool) => tool.name),
-);
-
-export function isBakerySurfaceHarnessToolName(
-  name: string,
-): name is BakerySurfaceHarnessToolName {
-  return SURFACE_TOOL_NAMES.has(name);
-}
 
 function parseBakerySurfaceToolRequest(
   name: BakerySurfaceHarnessToolName,

@@ -47,12 +47,9 @@ import type { Variant } from "@purin-labs/type-utils";
 import { CodeModeAdmissionFrozenError } from "../agent-tools/catalog/types";
 import { PERMISSION_REQUEST_TOOL_NAME } from "../agent-tools/catalog/permission";
 import { MAX_CODE_MODE_SOURCE_BYTES } from "../agent-tools/catalog/code-mode";
-import { isBakerySurfaceHarnessToolName } from "../agent-tools/bakery/surface";
+import { StructuredToolResult } from "../agent-tools/structured-result";
+import type { PiToolRules } from "./pi-tool-replay";
 import { renderHarnessHistoryContent } from "./harness-history";
-import {
-  CommerceContextToolResult,
-  commerceContextOutputSchema,
-} from "./commerce-context-tool-result";
 import {
   governCodeModeRemote,
   type CodeModeExchangeDenial,
@@ -90,7 +87,7 @@ type ToolState = {
   readonly host: HarnessToolHost;
   readonly preflight: () => void | Promise<void>;
   readonly turnId: string;
-  readonly replay: (name: string) => "safe" | "unsafe";
+  readonly rules: (name: string) => PiToolRules;
   /**
    * The executions of this process, by the call ID of their Code Mode call.
    * A nested call waits here for its execution: after a restart, Pi can run an
@@ -128,7 +125,6 @@ const WHOLE_CATALOG_TOOLS = 16;
 const WHOLE_CATALOG_BYTES = 8 * 1024;
 /** The bytes of script output that one execution may return to the model. */
 const MAX_CODE_MODE_RESULT_BYTES = CODE_MODE_PILOT_BUDGET.maxOutputBytes;
-const COMMERCE_CONTEXT_TOOL = "commerce_entity_context";
 
 /**
  * A small catalog is enabled as a whole when Code Mode is enabled. A deferred
@@ -169,13 +165,13 @@ export function createDurableHostTools(
   host: HarnessToolHost,
   preflight: ToolState["preflight"],
   turnId: string,
-  replay: ToolState["replay"],
+  rules: ToolState["rules"],
 ): ToolRegistration[] {
   const state: ToolState = {
     host,
     preflight,
     turnId,
-    replay,
+    rules,
     executions: new Map(),
   };
   return [
@@ -218,6 +214,7 @@ function hostTool(
   state: ToolState,
   definition: HarnessToolDefinition,
 ): ToolRegistration {
+  const rules = state.rules(definition.name);
   const common = {
     name: definition.name,
     description: definition.description,
@@ -226,18 +223,17 @@ function hostTool(
       null,
       definition.parameters,
     ),
-    replay: state.replay(definition.name),
+    replay: rules.replay,
     execute: executeHostTool.bind(null, state, definition.name),
   };
   // A capability that changes what the operator sees runs only as a direct
   // call. Leaving it out of a script's tools enforces that.
-  if (isBakerySurfaceHarnessToolName(definition.name))
-    return defineTool({ ...common, callers: ["model"] });
+  if (rules.modelOnly) return defineTool({ ...common, callers: ["model"] });
   // This tool declares its value. A script receives that value, validated.
-  if (definition.name === COMMERCE_CONTEXT_TOOL)
+  if (rules.structuredOutput !== undefined)
     return defineTool({
       ...common,
-      structuredOutputSchema: commerceContextOutputSchema,
+      structuredOutputSchema: rules.structuredOutput,
     });
   return defineTool(common);
 }
@@ -290,9 +286,9 @@ async function executeDirect(
   await state.preflight();
   context.abortSignal?.throwIfAborted();
   const authorized = authorizedResult(result);
-  if (name !== COMMERCE_CONTEXT_TOOL) return authorized;
+  if (state.rules(name).structuredOutput === undefined) return authorized;
   // A tool that declares a value returns it on every result that succeeded.
-  return result instanceof CommerceContextToolResult
+  return result instanceof StructuredToolResult
     ? { ...authorized, structuredOutput: jsonValue(result.structuredContent) }
     : { ...authorized, isError: true };
 }
@@ -446,7 +442,7 @@ function nestedResult(
     satyrSources: sources,
   });
   const text = toolText(result);
-  if (result instanceof CommerceContextToolResult)
+  if (result instanceof StructuredToolResult)
     return {
       output: [{ type: "text", text }],
       structuredOutput: jsonValue(result.structuredContent),

@@ -43,7 +43,7 @@ export function authorizedBakerySurfaceCommands(
 }
 
 async function normalizeBakerySurfaceContext(
-  raw: BakerySurfaceAttachmentV1 | null,
+  raw: unknown,
 ): Promise<
   Result<BakerySurfaceAttachmentV1 | null, { readonly code: string }>
 > {

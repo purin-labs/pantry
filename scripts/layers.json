@@ -740,6 +740,7 @@
     "services/platform/src/agent-tools/registry.ts": "workers/platform",
     "services/platform/src/agent-tools/session-wiring.ts": "workers/platform",
     "services/platform/src/agent-tools/session-support.ts": "foundation/agent-tools",
+    "services/platform/src/agent-tools/structured-result.ts": "foundation/agent-tools",
     "services/platform/src/agent-tools/tool-effect.ts": "foundation/agent-tools",
     "services/platform/src/approval-authentication.ts": "foundation/authority",
     "services/platform/src/boundary.ts": "foundation/kernel",

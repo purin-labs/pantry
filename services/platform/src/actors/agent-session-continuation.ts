@@ -5,9 +5,9 @@ import {
   type SchemaMigrationPlan,
 } from "./schema-migrations";
 import {
-  parseBakeryBrowserContext,
-  type BakeryBrowserContext,
-} from "@purin-labs/bakery-model/bakery-context";
+  parsePageBrowserContext,
+  type PageBrowserContext,
+} from "@purin-labs/contracts";
 import {
   parseRequestId,
   parseOrganisationId,
@@ -24,7 +24,7 @@ export type HarnessTurnContinuation = Readonly<{
   harnessInstructions: string;
   turnPrompt: string;
   thinkingLevel: "low" | "medium" | "high" | null;
-  browserContext: BakeryBrowserContext;
+  browserContext: PageBrowserContext;
   completion: Readonly<{ completionId: string; acceptedAt: number }>;
   binding: Readonly<{
     instructionDigest: string;
@@ -174,7 +174,7 @@ export function parseContinuation(
     return null;
   const organisationId = parseOrganisationId(raw.organisationId);
   const requestId = parseRequestId(raw.requestId);
-  const browserContext = parseBakeryBrowserContext(raw.browserContext);
+  const browserContext = parsePageBrowserContext(raw.browserContext);
   if (
     !organisationId.ok ||
     !requestId.ok ||

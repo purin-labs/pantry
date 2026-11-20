@@ -91,7 +91,7 @@ import {
   createCatalogHarnessToolHost,
   withSettledToolArguments,
 } from "../embedded-harness-tool-host";
-import { piToolReplay } from "../pi-tool-replay";
+import { piToolRules } from "../pi-tool-replay";
 import type {
   EmbeddedHarnessAdapter,
   EmbeddedHarnessUserInput,
@@ -538,7 +538,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     thinkingLevel?: import("../embedded-harness").EmbeddedHarnessThinkingLevel;
     turnPrompt: string;
     browserContext: TurnPageContext;
-    surfaceContext: TurnPageState | null;
+    surfaceContext: TurnPageState;
   }): Promise<
     Result<CanonicalEmbeddedHarnessTurnResult, CanonicalEmbeddedHarnessRunError>
   > {
@@ -1073,7 +1073,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           { kind: "canonical", admission: input.execution, lease: input.lease },
           withSettledToolArguments(toolHost.value, toolArguments),
         ),
-        toolReplay: piToolReplay.bind(null, tools.registry),
+        toolRules: piToolRules.bind(null, tools.registry),
         toolArguments,
         eventSink: this,
         historySink: this,
@@ -1306,7 +1306,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     thinkingLevel?: import("../embedded-harness").EmbeddedHarnessThinkingLevel;
     turnPrompt: string;
     browserContext: TurnPageContext;
-    surfaceContext: TurnPageState | null;
+    surfaceContext: TurnPageState;
     completion: CanonicalTextTurnCompletionIdentity;
   }): Promise<
     Result<

@@ -322,7 +322,7 @@ class PiDurableRuntime implements EmbeddedHarnessRuntime {
       this.input.toolHost,
       this.preflight.bind(this),
       this.input.turnLease.turn.turnId,
-      this.input.toolReplay,
+      this.input.toolRules,
     );
     const extension = defineExtension({ name: "satyr.tools", tools });
     const codeMode = this.input.toolHost.codeMode.kind === "enabled";

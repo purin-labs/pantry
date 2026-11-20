@@ -1,3 +1,9 @@
+export {
+  parsePageBrowserBinding,
+  parsePageBrowserContext,
+  type PageBrowserBinding,
+  type PageBrowserContext,
+} from "./page-browser-context.ts";
 export type { PortalChatStreamRecord } from "./record-schemas.ts";
 export type { AcceptedInputRef } from "./types/AcceptedInputRef";
 export type { AgentRole } from "./types/AgentRole";

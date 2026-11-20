@@ -3,7 +3,10 @@ import {
   createTransientGoalExecution,
   type GoalUsageContext,
 } from "../session-goal-usage";
-import type { HarnessToolHost } from "../embedded-harness";
+import type {
+  EmbeddedHarnessConstructionInput,
+  HarnessToolHost,
+} from "../embedded-harness";
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import type {
   AcceptedInputRef,
@@ -52,7 +55,7 @@ export async function runTransientMailHarness(
     "manifest" | "responsePolicy" | "evidenceDependency" | "context"
   >,
   toolHost: HarnessToolHost,
-  toolReplay: (name: string) => "safe" | "unsafe",
+  toolRules: EmbeddedHarnessConstructionInput["toolRules"],
   reauthorize: () => Promise<Result<null, Readonly<{ code: string }>>>,
 ): Promise<
   Result<
@@ -162,7 +165,7 @@ export async function runTransientMailHarness(
           workspaceRevision: input.workspaceRevision,
           policyRevision: String(contract.policyVersion),
         },
-        toolReplay,
+        toolRules,
         toolHost: admittedSessionToolHost(
           {
             kind: "transient",

@@ -1,9 +1,7 @@
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
-  BakerySurfaceAttachmentV1,
-  BakerySurfaceReceiptV1,
-} from "@purin-labs/bakery-model/bakery-surface";
-import type { HarnessTurnLease } from "@purin-labs/contracts";
+  HarnessTurnLease,
+  PageBrowserContext,
+} from "@purin-labs/contracts";
 import type { EffectiveGrantSet } from "../../authorization/access-grants";
 import type {
   ToolRegistry,
@@ -16,15 +14,16 @@ import type { OrganisationId, RequestId } from "../../ids";
 import type { Result } from "../../result";
 import type { HarnessToolArgumentObserver } from "../embedded-harness";
 
+/** What a person's browser gave with a message. The contracts own the form. */
+export type TurnPageContext = PageBrowserContext;
+
 /**
- * The wire forms of a person's page: what the page gave with a message, the
- * state of the page, and the receipt of an effect that the page showed.
- * Kitchen owns the forms. This file is the one place where the Session names
- * them: it carries the values and does not read them.
+ * The state of a person's page, and the receipt of an effect that the page
+ * showed. The area of the page owns the forms and parses them. The Session
+ * carries the values and does not read them.
  */
-export type TurnPageContext = BakeryBrowserContext;
-export type TurnPageState = BakerySurfaceAttachmentV1;
-export type PageEffectReceipt = BakerySurfaceReceiptV1;
+export type TurnPageState = unknown;
+export type PageEffectReceipt = unknown;
 
 /** What the Session answers for the receipt of a page effect. */
 export type PageEffectSettlement =
@@ -49,11 +48,14 @@ export interface SessionPageEffects {
   authorizedCommands(
     authority: HarnessTurnLease["requestAuthority"],
   ): readonly string[];
-  /** Checks the page state that came with a message. */
+  /**
+   * Parses and checks the page state that came with a message. Null stays
+   * null: the message came with no page state.
+   */
   normalizeState(
-    raw: TurnPageState | null,
-  ): Promise<Result<TurnPageState | null, { readonly code: string }>>;
-  /** Accepts the receipt that a page sent for one effect. */
+    raw: TurnPageState,
+  ): Promise<Result<TurnPageState, { readonly code: string }>>;
+  /** Parses and accepts the receipt that a page sent for one effect. */
   settle(
     input: Readonly<{
       db: OrganisationDatabase;

@@ -401,7 +401,8 @@ export async function settleBakerySurfaceEffect(input: {
   readonly db: OrganisationDatabase;
   readonly storage: DurableObjectStorage;
   readonly organisationId: OrganisationId;
-  readonly receipt: BakerySurfaceReceiptV1;
+  /** The receipt as the page sent it. This function parses it first. */
+  readonly receipt: unknown;
   readonly now?: () => number;
 }): Promise<BakerySurfaceEffectSettlement> {
   const receipt = parseBakerySurfaceReceipt(input.receipt);

@@ -1,4 +1,5 @@
 import { assertNever } from "@purin-labs/std";
+import type { TSchema } from "typebox";
 import type { ToolRegistry } from "../agent-tools/catalog/tool-registry";
 
 /**
@@ -26,11 +27,27 @@ function toolRerun(registry: ToolRegistry, name: string): ToolRerun {
  * name, so a tool that only a script may repeat is `safe` here.
  * `mayRerunToolCall` keeps a direct call of such a tool stopped.
  */
-export function piToolReplay(
-  registry: ToolRegistry,
-  name: string,
-): "safe" | "unsafe" {
+function piToolReplay(registry: ToolRegistry, name: string): "safe" | "unsafe" {
   return toolRerun(registry, name) === "none" ? "unsafe" : "safe";
+}
+
+/** What the Pi harness needs to know of one tool, by its name. */
+export type PiToolRules = Readonly<{
+  replay: "safe" | "unsafe";
+  /** A script does not get the tool. */
+  modelOnly: boolean;
+  /** The schema of the value that a script receives, when the tool has one. */
+  structuredOutput: TSchema | undefined;
+}>;
+
+/** The rules of a tool, from the one list of the agent tools. */
+export function piToolRules(registry: ToolRegistry, name: string): PiToolRules {
+  const registered = registry.find(name);
+  return {
+    replay: piToolReplay(registry, name),
+    modelOnly: registered?.modelOnly === true,
+    structuredOutput: registered?.structuredOutput,
+  };
 }
 
 export function mayRerunToolCall(
