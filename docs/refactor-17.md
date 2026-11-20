@@ -1262,6 +1262,66 @@ points of the entry above where it names them.
 - **Still open: 1 Inbox import.** `case-context-discovery/metadata.ts` reads the
   verification of a selection for a conversation.
 
+**21 November 2026. Only the owner of a table writes it: 92 of 117 writes moved,** on
+the branch `refactor-17-table-owners`.
+
+- **The method.** A writer in a higher module calls a statement builder of the owner
+  and puts the statement into its own batch, at the same place. 19 owner files hold
+  the builders. 6 of them are new: `integration-account-writes.ts`,
+  `provider-connection-writes.ts`, `surface-installation-writes.ts`,
+  `onboarding-reconciliation-run.ts`, `agent-operations/export-coordinator-rows.ts`
+  and `cues/cue-log.ts`.
+- **The proof of the SQL.** A script compared each SQL write text of the Platform and
+  the Portal before and after the change: 1,334 texts, each one the same. Each bind
+  list keeps its order.
+- **A lower writer with an import that exists.** Four lower files already imported a
+  file of the owner: the Slack install of `data/organisation.ts` (tenancy) imports
+  `data/integration-account.ts`, the grant code of `authority` imports
+  `context/files/persistence.ts`, the membership revocation imports
+  `projects/case-project.ts`, and the archive reconciliation imports
+  `voice/store.ts`. Their statements moved into that file, so no import was added.
+  The import crossing stays in the ratchet, and the port of that crossing removes it.
+- **One wrong owner in the map.** Only the Slack revocation webhook writes
+  `slack_installation_lifecycle_event`, and no code reads it. Its owner is
+  `surfaces/slack`, beside `slack_installation`.
+- **Cleanup.** Seven local helpers that held one statement are gone, and a re-export of
+  `ACTIVE_PLACEMENT` with no other user.
+- **What stays (25), and why.**
+  - The purge (8): `data/organisation-purge.ts` pseudonymizes the account, the
+    connection and the credential generation rows, and erases two Slack rows. The
+    purge catalogue is the hook: tenancy erases or rewrites each regional table by
+    design, and `pnpm lint:purge-catalogue` checks each entry.
+  - The archive (4): `data/organisation-lifecycle.ts` disables the accounts, the
+    connections and the webhooks, and removes the Project members, in its fenced
+    batch. Tenancy imports no file of `connections` or `conversation` there. The
+    hook is an archive part that the Worker gives, and 3 source files and 12 test
+    files call the archive directly. It belongs with the port of the Organisation
+    lifecycle.
+  - Other lower writers with no import of the owner (11): `control-plane.ts` writes
+    the workspace rows of `agent` (2) and the readiness of `organisation` (2);
+    `service-membership.ts` writes an invitation role of `organisation`; the Slack
+    credential of the Vault writes `slack_installation` (2); and
+    `integration-account.ts` and `provider-attempt.ts` (`connections`) write
+    `credential_ref`, the communication destination and the support reference.
+    Each needs a hook, or the file is in the wrong module.
+  - Between two areas (2): the account removal of `organisation` writes the cleanup
+    row of `integrations` and the contact verification of `inbox`. A call needs a
+    public file of that area, and this step changed no contract.
+  - A false match (1): the lint reads the Portal error text "Could not update
+    project access." as a write of `project`. The text stays.
+- **Measures.** Layer crossings: 520 to 428. Table writes: 117 to 25. Upward, between
+  areas and against the order: no change (147, 153, 103). Copies: 880, no change.
+  Unused exports: 807, no change. Lines: 1,531 removed and 2,966 added; a builder
+  names each of its values.
+- **Not changed:** no SQL text, no bind order, no batch order, no D1 baseline, no
+  wire value.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files) pass. The 28 journey files of
+  the brief pass in four groups, with the idle tenant journey: 76 tests. 7 more
+  journey files for the side Cases, the member removal, the custom connector, the
+  voice Macs and the cue claim pass: 11 tests. The full E2E suite did not run on the
+  branch.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
