@@ -62,7 +62,7 @@ export const productionPlanEdit = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceProductionPlanEdit,
   },
   unavailable: "production plan edit is unavailable",
-  handler: ({ editProductionPlan }) =>
+  prepare: ({ editProductionPlan }) =>
     editProductionPlan === undefined
       ? undefined
       : (request, call) =>

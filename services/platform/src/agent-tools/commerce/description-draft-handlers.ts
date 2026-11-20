@@ -7,32 +7,26 @@ import type {
 } from "../../actors/product-description-draft";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
-import {
-  requireActiveOrganisationActorAtPlacement,
-} from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
-import {
-  preflightHarnessTurnLease,
-} from "../../actors/agent-session-harness-authority";
+import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import { DescriptionDraftRequestError } from "./services";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import type { AccessGrant } from "../../authorization/access-grants/types";
-import { type OrganisationMember } from "../../data/control-plane";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { CommerceReadRequestError } from "../../context/assembly/commerce";
 import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
 import {
   type DraftThreadLink,
-  type PreparedCommerceRead,
   admitCommerceReadObservation,
-  authorizeSharedDraftEdit,
   collaborationEditDeadline,
   collaborationMember,
   prepareSharedCommerceObservation,
+  type ToolEffect,
 } from "../session-support";
 import { prepareCommerceReadForEmbeddedHarness } from "./handlers";
 import type { SessionToolContext } from "../context";
@@ -180,7 +174,7 @@ export async function editProductDescriptionDraftForEmbeddedHarness(
   request: DraftAgentEditRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<DraftAgentSnapshot> {
+): Promise<ToolEffect<DraftAgentSnapshot>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -226,84 +220,69 @@ export async function editProductDescriptionDraftForEmbeddedHarness(
     lease,
     "edit",
   );
-  await authorizeDescriptionDraftDisclosure(
-    env,
-    storage,
-    lease,
+  const caseId = assignment.caseId;
+  const productId = request.productId;
+  return {
+    kind: "shared_draft",
     member,
-    prepared,
-    assignment.caseId,
-    request.productId,
-  );
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(
-      `Description draft edit authority expired: ${active.error.code}`,
-    );
-  }
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.editProductDescriptionDraft({
-    agent: await resolveCollaborationAgent(execution.scope, assignment),
-    execution: sessionTurnExecution(lease),
-    organisationId,
-    request,
-    operationId: JSON.stringify([
-      lease.session.sessionId,
-      lease.turn.turnId,
-      operationId,
-    ]),
-    userId: member.userId,
-    deadlineAt,
-  });
-  if (!result.ok) {
-    throw new Error(
-      `Description draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
-    );
-  }
-  await admitCommerceReadObservation(
-    storage,
-    lease,
-    prepared,
-    result.value,
-    result.value.product.revision,
-    "description draft edit",
-  );
-  return result.value;
-}
-
-function authorizeDescriptionDraftDisclosure(
-  env: Env,
-  storage: DurableObjectStorage,
-  lease: HarnessTurnLease,
-  member: OrganisationMember,
-  prepared: PreparedCommerceRead,
-  caseId: string,
-  productId: string,
-): Promise<void> {
-  return authorizeSharedDraftEdit(
-    env,
-    storage,
-    prepared.execution,
-    lease,
-    member,
-    {
-      draft: "Description draft",
-      caseId,
-      capabilityId: CAPABILITY_KEYS.commerceProductDescriptionDraftEdit,
-      integrationAccountId: prepared.integrationAccountId,
-      resourceScope: prepared.resourceScope,
-      readSharedThread: readProductDescriptionDraftThread.bind(
-        null,
-        env,
-        prepared.execution,
-        lease,
-        productId,
+    unavailable: "Description draft information-flow authority unavailable",
+    draft: {
+      shared: "lookup",
+      edit: {
+        draft: "Description draft",
         caseId,
-      ),
-      notConnected:
-        "Connect this Slack thread from the product draft before editing with its context",
+        capabilityId: CAPABILITY_KEYS.commerceProductDescriptionDraftEdit,
+        integrationAccountId: prepared.integrationAccountId,
+        resourceScope: prepared.resourceScope,
+        readSharedThread: readProductDescriptionDraftThread.bind(
+          null,
+          env,
+          execution,
+          lease,
+          productId,
+          caseId,
+        ),
+        notConnected:
+          "Connect this Slack thread from the product draft before editing with its context",
+      },
     },
-  );
+    run: async () => {
+      const active = preflightHarnessTurnLease(storage, lease, Date.now());
+      if (!active.ok) {
+        throw new Error(
+          `Description draft edit authority expired: ${active.error.code}`,
+        );
+      }
+      await requireSessionExecution(execution, lease);
+      const result = await organisation.editProductDescriptionDraft({
+        agent: await resolveCollaborationAgent(execution.scope, assignment),
+        execution: sessionTurnExecution(lease),
+        organisationId,
+        request,
+        operationId: JSON.stringify([
+          lease.session.sessionId,
+          lease.turn.turnId,
+          operationId,
+        ]),
+        userId: member.userId,
+        deadlineAt,
+      });
+      if (!result.ok) {
+        throw new Error(
+          `Description draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
+        );
+      }
+      await admitCommerceReadObservation(
+        storage,
+        lease,
+        prepared,
+        result.value,
+        result.value.product.revision,
+        "description draft edit",
+      );
+      return result.value;
+    },
+  };
 }
 
 async function readProductDescriptionDraftThread(

@@ -227,6 +227,10 @@ import {
 } from "../../agent-tools/kitchen/handlers";
 import { withToolContext } from "../../agent-tools/context";
 import {
+  settleToolEffect,
+  type ToolEffect,
+} from "../../agent-tools/session-support";
+import {
   createMenuBoardDraftPreview,
   withSettledToolArguments,
 } from "../../agent-tools/drafts/board-draft-preview";
@@ -1218,6 +1222,18 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           proposeSideCase: tool(proposeSideCaseForHarness),
         },
       },
+      // The one place of the exit check: `prepare` of an effect tool returns
+      // the effect, and this turn's authority settles it.
+      settleEffect: (effect) =>
+        settleToolEffect(
+          {
+            env: this.env,
+            storage: this.ctx.storage,
+            execution: input.execution,
+            lease: input.lease,
+          },
+          effect as ToolEffect,
+        ),
       requestPermission: requestPermissionForHarness.bind(null, {
         env: this.env,
         execution: input.execution,

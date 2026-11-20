@@ -1,6 +1,6 @@
-import type { StaffPageToolReceipt } from "../catalog/types";
 import { defineToolFamily } from "../define-tool";
 import { ToolRequestError } from "../errors";
+import type { PreparedEffect } from "../tool-effect";
 
 type DeviceReadTool = () => Promise<DeviceToolRead>;
 
@@ -22,7 +22,7 @@ export type DevicePauseRequest = Readonly<{ deviceId: string }>;
 type DevicePauseTool = (
   request: DevicePauseRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 export type DeviceProposeRequest = Readonly<{
   deviceId: string;

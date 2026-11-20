@@ -6,17 +6,13 @@ import type {
 } from "../../actors/email-draft";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
-import {
-  requireActiveOrganisationActorAtPlacement,
-} from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
 import type { CatalogExecutionContext } from "../catalog/execute";
-import {
-  readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
-} from "../../actors/agent-session-information-flow";
+import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import {
   listOrganisationMembers,
   type OrganisationMember,
@@ -24,8 +20,8 @@ import {
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import {
   type DraftThreadLink,
-  authorizeSharedDraftEdit,
   collaborationEditDeadline,
+  type ToolEffect,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
@@ -63,7 +59,7 @@ export async function editEmailDraftForEmbeddedHarness(
   request: EmailDraftEditRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<EmailDraftRead> {
+): Promise<ToolEffect<EmailDraftRead>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -81,50 +77,53 @@ export async function editEmailDraftForEmbeddedHarness(
     assignment,
     "edit",
   );
-  await authorizeSharedDraftEdit(
-    env,
-    storage,
-    execution,
-    lease,
-    access.member,
-    {
-      draft: "Email draft",
-      caseId: assignment.caseId,
-      capabilityId: CAPABILITY_KEYS.marketingEmailDraftEdit,
-      integrationAccountId: "platform",
-      resourceScope: "email-draft",
-      readSharedThread: checkedDraftThread.bind(null, access.sharing),
-      notConnected:
-        "Connect this Slack thread from the email draft before reading or editing it",
+  return {
+    kind: "shared_draft",
+    member: access.member,
+    unavailable: "Email draft information-flow authority unavailable",
+    draft: {
+      shared: "lookup",
+      edit: {
+        draft: "Email draft",
+        caseId: assignment.caseId,
+        capabilityId: CAPABILITY_KEYS.marketingEmailDraftEdit,
+        integrationAccountId: "platform",
+        resourceScope: "email-draft",
+        readSharedThread: checkedDraftThread.bind(null, access.sharing),
+        notConnected:
+          "Connect this Slack thread from the email draft before reading or editing it",
+      },
     },
-  );
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.editEmailDraft({
-    agent: await resolveCollaborationAgent(execution.scope, assignment),
-    organisationId,
-    execution: sessionTurnExecution(lease),
-    request,
-    operationId: JSON.stringify([
-      lease.session.sessionId,
-      lease.turn.turnId,
-      operationId,
-    ]),
-    userId: access.member.userId,
-    deadlineAt,
-  });
-  await requireSessionExecution(execution, lease);
-  if (!result.ok) {
-    throw new Error(
-      `Email draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
-    );
-  }
-  return result.value;
+    run: async () => {
+      const organisation = await requireActiveOrganisationActorAtPlacement({
+        env,
+        organisationId,
+        placement: execution.scope.placement,
+        now: Date.now(),
+      });
+      await requireSessionExecution(execution, lease);
+      const result = await organisation.editEmailDraft({
+        agent: await resolveCollaborationAgent(execution.scope, assignment),
+        organisationId,
+        execution: sessionTurnExecution(lease),
+        request,
+        operationId: JSON.stringify([
+          lease.session.sessionId,
+          lease.turn.turnId,
+          operationId,
+        ]),
+        userId: access.member.userId,
+        deadlineAt,
+      });
+      await requireSessionExecution(execution, lease);
+      if (!result.ok) {
+        throw new Error(
+          `Email draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
+        );
+      }
+      return result.value;
+    },
+  };
 }
 
 /** A thread link that the caller has already read and checked. */

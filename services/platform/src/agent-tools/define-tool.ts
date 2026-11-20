@@ -7,6 +7,7 @@ import type {
   HarnessToolDefinition,
 } from "./catalog/types";
 import { isRecord } from "@purin-labs/std";
+import type { PreparedEffect } from "./tool-effect";
 
 /**
  * What a successful call proves.
@@ -77,6 +78,15 @@ type ToolHandler<Request> = (
 ) => Promise<unknown>;
 
 /**
+ * The first part of an effect tool: the live checks and the reads. It
+ * returns the effect with its exit checks. The executor's host runs them.
+ */
+type ToolPrepare<Request> = (
+  request: Request,
+  call: ToolCall,
+) => Promise<PreparedEffect>;
+
+/**
  * The result of a tool that keeps its own envelope in the accepted history.
  * The executor uses it for each result of the tool, also for a call that the
  * catalog refuses before the handler runs.
@@ -118,9 +128,17 @@ type ToolSpec<Name extends string, Input extends TSchema, Request, Services> = {
    * The handler of one turn, from the services that the turn gives to the
    * tool's family. A host may give only a part of them.
    */
-  readonly handler: (
+  readonly handler?: (
     services: Partial<Services>,
   ) => ToolHandler<Request> | undefined;
+  /**
+   * For a `draft`, `receipt` or `scheduled` tool, in place of `handler`: the
+   * live checks and the reads of one call. The host of the executor reads the
+   * label, runs the exit checks that `prepare` returns and calls `run`.
+   */
+  readonly prepare?: (
+    services: Partial<Services>,
+  ) => ToolPrepare<Request> | undefined;
   /**
    * For a receipt tool or a surface tool: the receipt id in the handler's
    * value. Default: the value's `receiptId`.
@@ -178,6 +196,7 @@ export type RegisteredTool<
   /** Checks the schema, then decodes. Throws before any capability claim. */
   readonly parse: (input: unknown) => unknown;
   readonly handler: (services: Services) => ToolHandler<unknown> | undefined;
+  readonly prepare?: (services: Services) => ToolPrepare<unknown> | undefined;
   readonly readReceipt: (value: unknown) => string;
   readonly succeeded?: (value: unknown) => boolean;
   readonly result?: ToolResultEnvelope;
@@ -201,6 +220,19 @@ export function defineToolFamily<Services>() {
     <const Name extends string, Input extends TSchema, Request>(
       spec: ToolSpec<Name, Input, Request, Services>,
     ): RegisteredTool<Name, Family, Services> => {
+      if ((spec.handler === undefined) === (spec.prepare === undefined)) {
+        throw new Error(
+          `${spec.name} needs a handler or prepare, and not both`,
+        );
+      }
+      if (
+        (spec.effect === "draft" ||
+          spec.effect === "receipt" ||
+          spec.effect === "scheduled") &&
+        spec.prepare === undefined
+      ) {
+        throw new Error(`${spec.name} has an effect, so it needs prepare`);
+      }
       if (spec.effect === "surface" && spec.succeeded === undefined) {
         throw new Error(
           `${spec.name} is a surface tool with no outcome reader`,
@@ -229,11 +261,18 @@ export function defineToolFamily<Services>() {
         parse,
         // The executor calls a handler only with the request that this tool's
         // own parse returned, so the erased request type is safe here.
-        handler: spec.handler as RegisteredTool<
+        handler: (spec.handler ?? noHandler) as RegisteredTool<
           Name,
           Family,
           Services
         >["handler"],
+        ...(spec.prepare === undefined
+          ? {}
+          : {
+              prepare: spec.prepare as NonNullable<
+                RegisteredTool<Name, Family, Services>["prepare"]
+              >,
+            }),
         readReceipt: spec.readReceipt ?? readReceiptId,
         ...(spec.succeeded === undefined ? {} : { succeeded: spec.succeeded }),
         ...(spec.result === undefined ? {} : { result: spec.result }),
@@ -255,6 +294,10 @@ export function defineToolFamily<Services>() {
  */
 export function jsonSchema(schema: Readonly<Record<string, unknown>>) {
   return Type.Unsafe<unknown>(schema);
+}
+
+function noHandler(): undefined {
+  return undefined;
 }
 
 function readReceiptId(value: unknown): string {

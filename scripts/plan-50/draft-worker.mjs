@@ -11,6 +11,8 @@ export { CodeModePlatformGovernorActor } from "./codemode-worker.mjs";
 import { organisationId, userId } from "./proposal-worker.mjs";
 import { humanUser } from "./draft-seed.mjs";
 import { editProductDescriptionDraftForEmbeddedHarness } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
+import { settleToolEffect } from "../../services/platform/src/agent-tools/session-support.ts";
+import { uncheckedEffect } from "../../services/platform/src/agent-tools/tool-effect.ts";
 import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { issueControlSession } from "../../services/platform/src/data/control-plane.ts";
 import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";
@@ -75,7 +77,15 @@ export class CandidateActor extends CollaborationActor {
     return super.admitRecovery();
   }
 
+  // The tool gives its effect. This trial holds the receipt owner around the
+  // whole edit, so the edit and its exit check run inside the effect.
   async editProductDescriptionDraft(lease, request, operationId) {
+    return uncheckedEffect(() =>
+      this.editProductDescriptionDraftNow(lease, request, operationId),
+    );
+  }
+
+  async editProductDescriptionDraftNow(lease, request, operationId) {
     const available = await this.provider("/draft-owner-availability", {
       operationId,
     });
@@ -95,11 +105,15 @@ export class CandidateActor extends CollaborationActor {
       organisationId,
     );
     if (admission === null) throw new Error("Draft execution admission denied");
-    const value = await editProductDescriptionDraftForEmbeddedHarness(
-      this.toolContext(admission, lease),
-      request,
-      operationId,
-      { kind: "direct" },
+    const context = this.toolContext(admission, lease);
+    const value = await settleToolEffect(
+      context,
+      await editProductDescriptionDraftForEmbeddedHarness(
+        context,
+        request,
+        operationId,
+        { kind: "direct" },
+      ),
     );
     await this.provider("/draft-committed", { operationId, value });
     return value;

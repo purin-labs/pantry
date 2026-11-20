@@ -53,15 +53,13 @@ import {
 import { assertNever } from "@purin-labs/std";
 import {
   admitCommerceReadObservation,
-  currentTurnFlowLabel,
   liveDeviceMember,
-  passSharedDraftExit,
   prepareStaffPageWork,
   refreshRecipeProjection,
   requestableReportRead,
-  settleStaffPageEffect,
   supplierDirectoryQuery,
   untrustedDeviceText,
+  type ToolEffect,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
@@ -264,20 +262,14 @@ export async function saveRecipeForEmbeddedHarness(
   context: SessionToolContext,
   request: RecipeSaveRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
-  const { env, storage, execution, lease, assignment } = context;
+): Promise<ToolEffect<StaffPageToolReceipt>> {
+  const { env, execution, lease, assignment } = context;
   const work = await prepareStaffPageWork(
     env,
     execution,
     lease,
     assignment,
     "recipe_revision",
-    "recipe",
-  );
-  const flowLabel = await currentTurnFlowLabel(
-    storage,
-    execution,
-    lease,
     "recipe",
   );
   const sink = {
@@ -288,41 +280,39 @@ export async function saveRecipeForEmbeddedHarness(
     resourceScope: RECIPE_LIBRARY_SCOPE,
     approvalSatisfied: false,
   };
-  return settleStaffPageEffect(env, execution, lease, work, {
-    flowLabel,
-    sink,
-    route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/recipes`,
-    operation: request.recipeId === null ? "recipe.create" : "recipe.edit",
-    body: request,
-    operationId,
-    result:
-      "The recipe is saved as a new revision. Earlier production keeps its revision. Call recipe_read to see it.",
-    exit: passSharedDraftExit.bind(
-      null,
-      env,
-      execution,
-      lease,
-      work.member,
-      {
+  return {
+    kind: "staff_page",
+    work,
+    unavailable: "recipe information-flow authority unavailable",
+    effect: {
+      sink,
+      route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/recipes`,
+      operation: request.recipeId === null ? "recipe.create" : "recipe.edit",
+      body: request,
+      operationId,
+      result:
+        "The recipe is saved as a new revision. Earlier production keeps its revision. Call recipe_read to see it.",
+      run: async (key) =>
+        recipeSaveRefusal(
+          await saveRecipeDraft(
+            work.context,
+            // A new recipe's id comes from the call, so a repeat finds it.
+            { ...request, recipeId: request.recipeId ?? `recipe_${key}` },
+            key,
+          ),
+        ),
+      settled: refreshRecipeProjection.bind(null, env, execution, work),
+    },
+    content: {
+      member: work.member,
+      edit: {
         draft: "Recipe",
         capabilityId: CAPABILITY_KEYS.commerceRecipeSave,
         integrationAccountId: "platform",
         resourceScope: RECIPE_LIBRARY_SCOPE,
       },
-      flowLabel,
-      [],
-    ),
-    run: async (key) =>
-      recipeSaveRefusal(
-        await saveRecipeDraft(
-          work.context,
-          // A new recipe's id comes from the call, so a repeat finds it.
-          { ...request, recipeId: request.recipeId ?? `recipe_${key}` },
-          key,
-        ),
-      ),
-    settled: refreshRecipeProjection.bind(null, env, execution, work),
-  });
+    },
+  };
 }
 
 export async function readSuppliersForEmbeddedHarness(
@@ -432,8 +422,8 @@ export async function createSupplierForEmbeddedHarness(
   context: SessionToolContext,
   request: SupplierCreateRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
-  const { env, storage, execution, lease, assignment } = context;
+): Promise<ToolEffect<StaffPageToolReceipt>> {
+  const { env, execution, lease, assignment } = context;
   const supplierId =
     typeof request.displayName === "string"
       ? supplierIdFromName(request.displayName)
@@ -455,12 +445,6 @@ export async function createSupplierForEmbeddedHarness(
     lease,
     assignment,
     "supplier_directory",
-    "supplier",
-  );
-  const flowLabel = await currentTurnFlowLabel(
-    storage,
-    execution,
-    lease,
     "supplier",
   );
   const sink = {
@@ -493,47 +477,45 @@ export async function createSupplierForEmbeddedHarness(
   if (!integrationAccountId.ok) {
     throw new Error("supplier integration account invalid");
   }
-  return settleStaffPageEffect(env, execution, lease, work, {
-    flowLabel,
-    sink,
-    route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/suppliers`,
-    operation: "commerce.supplier.create",
-    body: parsed.value,
-    operationId,
-    result: `The supplier ${parsed.value.displayName} is in the directory, with id ${supplierId}. Purchasing work opens for the items that it provides.`,
-    exit: passSharedDraftExit.bind(
-      null,
-      env,
-      execution,
-      lease,
-      work.member,
-      {
+  return {
+    kind: "staff_page",
+    work,
+    unavailable: "supplier information-flow authority unavailable",
+    effect: {
+      sink,
+      route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/suppliers`,
+      operation: "commerce.supplier.create",
+      body: parsed.value,
+      operationId,
+      result: `The supplier ${parsed.value.displayName} is in the directory, with id ${supplierId}. Purchasing work opens for the items that it provides.`,
+      run: async (key) => {
+        const registered = await registerSupplier({
+          client,
+          db: execution.scope.database,
+          queue: env.EVENT_Q,
+          organisationId: execution.scope.organisationId,
+          merchantId: work.context.merchantId,
+          integrationAccountId: integrationAccountId.value,
+          principalId: work.member.userId,
+          idempotencyKey: key,
+          supplier: parsed.value,
+          now: Date.now(),
+        });
+        return registered.ok ? null : supplierRefusal(registered.error);
+      },
+      // Registration already refreshed the projection.
+      settled: () => Promise.resolve(),
+    },
+    content: {
+      member: work.member,
+      edit: {
         draft: "Supplier",
         capabilityId: CAPABILITY_KEYS.commerceSupplierCreate,
         integrationAccountId: "platform",
         resourceScope: SUPPLIER_DIRECTORY_SCOPE,
       },
-      flowLabel,
-      [],
-    ),
-    run: async (key) => {
-      const registered = await registerSupplier({
-        client,
-        db: execution.scope.database,
-        queue: env.EVENT_Q,
-        organisationId: execution.scope.organisationId,
-        merchantId: work.context.merchantId,
-        integrationAccountId: integrationAccountId.value,
-        principalId: work.member.userId,
-        idempotencyKey: key,
-        supplier: parsed.value,
-        now: Date.now(),
-      });
-      return registered.ok ? null : supplierRefusal(registered.error);
     },
-    // Registration already refreshed the projection.
-    settled: () => Promise.resolve(),
-  });
+  };
 }
 
 function recipeSaveRefusal(saved: RecipeSaveResult): string | null {

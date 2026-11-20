@@ -12,6 +12,7 @@ import type {
 } from "../agent-tools/catalog/types";
 import { type HarnessPermissionRequest, type HarnessPermissionRequestResult, type HarnessPermissionRequestTool, missingRequestableCapabilities } from "../agent-tools/catalog/permission";
 import { TOOL_REGISTRY, type ToolServices } from "../agent-tools/registry";
+import type { EffectSettle } from "../agent-tools/tool-effect";
 import { createHarnessCodeModeAdmission } from "./code-mode-admission";
 import type { HarnessToolHost } from "./embedded-harness";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
@@ -78,6 +79,8 @@ export async function createCatalogHarnessToolHost(input: {
    * service that a family needs, so a tool that the model sees has a handler.
    */
   readonly services: ToolServices;
+  /** Runs the exit checks of an effect tool, with this turn's authority. */
+  readonly settleEffect: EffectSettle;
   /**
    * Records a permission request of a Slack thread turn. The host passes only
    * capabilities that this turn lacks.
@@ -120,6 +123,7 @@ export async function createCatalogHarnessToolHost(input: {
       catalogDigest: input.expectedCatalogDigest,
     }),
     services: input.services,
+    settleEffect: input.settleEffect,
     requestPermission: requestOnlyMissingCapabilities.bind(
       null,
       input.requestPermission,

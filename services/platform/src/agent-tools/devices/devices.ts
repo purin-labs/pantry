@@ -73,7 +73,7 @@ export const devicePause = defineDeviceTool({
   },
   selection: { kind: "capability", capability: CAPABILITY_KEYS.devicePause },
   unavailable: "device pause is unavailable",
-  handler: ({ pauseDevice }) =>
+  prepare: ({ pauseDevice }) =>
     pauseDevice === undefined
       ? undefined
       : (request, call) => pauseDevice(request, call.operationId),

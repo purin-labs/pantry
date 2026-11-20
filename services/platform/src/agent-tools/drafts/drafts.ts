@@ -33,7 +33,6 @@ import {
 } from "@purin-labs/menu-board-crdt";
 import type {
   MenuBoardEdit,
-  MenuBoardEditResult,
   MenuBoardLayoutEdit,
   MenuBoardStackEdit,
   MenuBoardStackSettings,
@@ -46,6 +45,8 @@ import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import type { CommerceActionProposalOrigin } from "../catalog/types";
 import { defineToolFamily, jsonSchema } from "../define-tool";
+import { uncheckedEffect } from "../tool-effect";
+import type { PreparedEffect } from "../../agent-tools/tool-effect";
 
 type MenuDraftReadTool = () => Promise<MenuDraftRead>;
 
@@ -53,7 +54,7 @@ type MenuDraftEditTool = (
   edit: MenuDraftEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<MenuDraftRead>;
+) => Promise<PreparedEffect>;
 
 /** Plan 40B phase 4: the shop's boards and the live prices of their items. */
 type MenuBoardReadTool = (
@@ -64,7 +65,7 @@ type MenuBoardEditTool = (
   request: Readonly<{ boardId: string; edit: MenuBoardEdit }>,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<MenuBoardEditResult>;
+) => Promise<PreparedEffect>;
 
 /** Plan 40B, the start screen: a new board from a layout or a design. */
 export type MenuBoardCreateRequest = Readonly<{
@@ -77,7 +78,7 @@ type MenuBoardCreateTool = (
   request: MenuBoardCreateRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<unknown>;
+) => Promise<PreparedEffect>;
 
 /** Plan 40B, board removal: archive a board or restore an archived one. */
 export type MenuBoardArchiveRequest = Readonly<{
@@ -192,7 +193,7 @@ export const menuDraftEdit = defineMenuTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftEdit,
   },
   unavailable: "menu draft edit is unavailable",
-  handler: ({ editMenuDraft }) =>
+  prepare: ({ editMenuDraft }) =>
     editMenuDraft === undefined
       ? undefined
       : (request, call) =>
@@ -334,7 +335,7 @@ export const menuBoardEdit = defineMenuTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftEdit,
   },
   unavailable: "menu board edit is unavailable",
-  handler: ({ editMenuBoard }) =>
+  prepare: ({ editMenuBoard }) =>
     editMenuBoard === undefined
       ? undefined
       : (request, call) =>
@@ -382,7 +383,7 @@ export const menuBoardComment = defineMenuTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftEdit,
   },
   unavailable: "menu board comment is unavailable",
-  handler: ({ editMenuBoard }) =>
+  prepare: ({ editMenuBoard }) =>
     editMenuBoard === undefined
       ? undefined
       : (request, call) =>
@@ -423,7 +424,7 @@ export const menuBoardHistory = defineMenuTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftEdit,
   },
   unavailable: "menu board history is unavailable",
-  handler: ({ editMenuBoard }) =>
+  prepare: ({ editMenuBoard }) =>
     editMenuBoard === undefined
       ? undefined
       : (request, call) =>
@@ -459,11 +460,14 @@ export const menuBoardArchive = defineMenuTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftEdit,
   },
   unavailable: "menu board archive is unavailable",
-  handler: ({ archiveMenuBoard }) =>
+  // No exit check today (Refactor 17, Appendix C): the effect has other rules.
+  prepare: ({ archiveMenuBoard }) =>
     archiveMenuBoard === undefined
       ? undefined
-      : (request, call) =>
-          archiveMenuBoard(request, call.operationId, call.execution),
+      : async (request, call) =>
+          uncheckedEffect(() =>
+            archiveMenuBoard(request, call.operationId, call.execution),
+          ),
 });
 
 function parseMenuBoardArchiveArgs(raw: unknown): MenuBoardArchiveRequest {
@@ -509,7 +513,7 @@ export const menuBoardCreate = defineMenuTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftEdit,
   },
   unavailable: "menu board create is unavailable",
-  handler: ({ createMenuBoard }) =>
+  prepare: ({ createMenuBoard }) =>
     createMenuBoard === undefined
       ? undefined
       : (request, call) =>
@@ -592,7 +596,7 @@ export const menuBoardStack = defineMenuTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftEdit,
   },
   unavailable: "menu board stack is unavailable",
-  handler: ({ editMenuBoard }) =>
+  prepare: ({ editMenuBoard }) =>
     editMenuBoard === undefined
       ? undefined
       : (request, call) =>

@@ -55,14 +55,12 @@ import {
   admitCommerceReadObservation,
   collaborationEditDeadline,
   collaborationMember,
-  currentTurnFlowLabel,
   liveDeviceMember,
-  passSharedDraftExit,
   prepareStaffPageWork,
   refreshRecipeProjection,
   selectMerchantReportSourceGrant,
-  settleStaffPageEffect,
   type PreparedCommerceRead,
+  type ToolEffect,
 } from "../agent-tools/session-support";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { sessionTurnExecution } from "../chat/turn-access";
@@ -115,7 +113,7 @@ type SessionCostsHost = Readonly<{
     request: CostsSheetEditRequest,
     operationId: string,
     boundary: CatalogExecutionContext,
-  ) => Promise<CostsSheetEditResult>;
+  ) => Promise<ToolEffect<CostsSheetEditResult>>;
   settleSavedCells: (cellKeys: readonly string[], nowMs: number) => Promise<void>;
   prepareCostsReads: (includeActuals?: boolean) => Promise<
     Readonly<{
@@ -142,7 +140,7 @@ type SessionCostsHost = Readonly<{
         idempotencyKey: string,
       ) => Promise<string | null>;
     }>,
-  ) => Promise<StaffPageToolReceipt>;
+  ) => Promise<ToolEffect<StaffPageToolReceipt>>;
 }>;
 
 export function embeddedHarnessCostsTools(
@@ -202,65 +200,61 @@ export function embeddedHarnessCostsTools(
         lease,
         "edit",
       );
-      const flowLabel = await currentTurnFlowLabel(
-        storage,
-        execution,
-        lease,
-        "costs sheet",
-      );
-      await passSharedDraftExit(
-        env,
-        execution,
-        lease,
-        member,
-        {
-          draft: "Costs sheet",
-          capabilityId: CAPABILITY_KEYS.commerceSupplyCostSave,
-          integrationAccountId: "platform",
-          resourceScope: COSTS_SHEET_DRAFT_SCOPE,
-        },
-        flowLabel,
-        [],
-      );
-      const active = preflightHarnessTurnLease(storage, lease, Date.now());
-      if (!active.ok) {
-        throw new Error(
-          `Costs sheet edit authority expired: ${active.error.code}`,
-        );
-      }
-      const organisation = await requireActiveOrganisationActorAtPlacement({
-        env,
-        organisationId,
-        placement: execution.scope.placement,
-        now: Date.now(),
-      });
-      await requireSessionExecution(execution, lease);
-      const firstCellKey = request.changes[0]?.cellKey ?? OVERHEAD_LABOR_CELL_KEY;
-      const result = await organisation.editCostsSheetDraft({
-        agent: await resolveCollaborationAgent(execution.scope, assignment),
-        execution: sessionTurnExecution(lease),
-        organisationId,
-        changes: request.changes,
-        targetCellKey: firstCellKey,
-        operationId: JSON.stringify([
-          lease.session.sessionId,
-          lease.turn.turnId,
-          operationId,
-        ]),
-        userId: member.userId,
-        deadlineAt,
-      });
-      if (!result.ok) {
-        throw new Error(`Costs sheet edit failed: ${result.error.code}`);
-      }
-      await requireSessionExecution(execution, lease);
       return {
-        documentId: "costs-sheet",
-        revision: result.value.revision,
-        generation: result.value.generation,
-        cells: result.value.cells.filter(
-          (cell) => cell.cellKey !== META_SAVED_AT_CELL_KEY,
-        ),
+        kind: "shared_draft",
+        member,
+        unavailable: "costs sheet information-flow authority unavailable",
+        draft: {
+          shared: "every_member",
+          edit: {
+            draft: "Costs sheet",
+            capabilityId: CAPABILITY_KEYS.commerceSupplyCostSave,
+            integrationAccountId: "platform",
+            resourceScope: COSTS_SHEET_DRAFT_SCOPE,
+          },
+        },
+        run: async () => {
+          const active = preflightHarnessTurnLease(storage, lease, Date.now());
+          if (!active.ok) {
+            throw new Error(
+              `Costs sheet edit authority expired: ${active.error.code}`,
+            );
+          }
+          const organisation = await requireActiveOrganisationActorAtPlacement({
+            env,
+            organisationId,
+            placement: execution.scope.placement,
+            now: Date.now(),
+          });
+          await requireSessionExecution(execution, lease);
+          const firstCellKey = request.changes[0]?.cellKey ?? OVERHEAD_LABOR_CELL_KEY;
+          const result = await organisation.editCostsSheetDraft({
+            agent: await resolveCollaborationAgent(execution.scope, assignment),
+            execution: sessionTurnExecution(lease),
+            organisationId,
+            changes: request.changes,
+            targetCellKey: firstCellKey,
+            operationId: JSON.stringify([
+              lease.session.sessionId,
+              lease.turn.turnId,
+              operationId,
+            ]),
+            userId: member.userId,
+            deadlineAt,
+          });
+          if (!result.ok) {
+            throw new Error(`Costs sheet edit failed: ${result.error.code}`);
+          }
+          await requireSessionExecution(execution, lease);
+          return {
+            documentId: "costs-sheet",
+            revision: result.value.revision,
+            generation: result.value.generation,
+            cells: result.value.cells.filter(
+              (cell) => cell.cellKey !== META_SAVED_AT_CELL_KEY,
+            ),
+          };
+        },
       };
     },
     settleSavedCells: async (cellKeys, nowMs) => {
@@ -389,57 +383,48 @@ export function embeddedHarnessCostsTools(
         "recipe_revision",
         effect.label,
       );
-      const flowLabel = await currentTurnFlowLabel(
-        storage,
-        execution,
-        lease,
-        effect.label,
-      );
-      const sink = {
-        kind: "tool_effect" as const,
-        destinationAuthority: lease.requestAuthority,
-        capabilityId: CAPABILITY_KEYS.commerceSupplyCostSave,
-        integrationAccountId: "platform",
-        resourceScope: effect.scope,
-        approvalSatisfied: false,
-      };
-      return settleStaffPageEffect(env, execution, lease, work, {
-        flowLabel,
-        sink,
-        route: `/v1/control/organisations/${organisationId}/commerce/costs`,
-        operation: effect.operation,
-        body: effect.body,
-        operationId: effect.operationId,
-        result: effect.result,
-        exit: passSharedDraftExit.bind(
-          null,
-          env,
-          execution,
-          lease,
-          work.member,
-          {
+      return {
+        kind: "staff_page",
+        work,
+        unavailable: `${effect.label} information-flow authority unavailable`,
+        effect: {
+          sink: {
+            kind: "tool_effect" as const,
+            destinationAuthority: lease.requestAuthority,
+            capabilityId: CAPABILITY_KEYS.commerceSupplyCostSave,
+            integrationAccountId: "platform",
+            resourceScope: effect.scope,
+            approvalSatisfied: false,
+          },
+          route: `/v1/control/organisations/${organisationId}/commerce/costs`,
+          operation: effect.operation,
+          body: effect.body,
+          operationId: effect.operationId,
+          result: effect.result,
+          run: (key) =>
+            effect.run(
+              {
+                merchantId: work.context.merchantId,
+                userId: work.member.userId,
+                personId: String(work.member.personId),
+                client: work.context.client,
+              },
+              key,
+            ),
+          settled: effect.refreshProjection
+            ? refreshRecipeProjection.bind(null, env, execution, work)
+            : () => Promise.resolve(),
+        },
+        content: {
+          member: work.member,
+          edit: {
             draft: effect.draftName,
             capabilityId: CAPABILITY_KEYS.commerceSupplyCostSave,
             integrationAccountId: "platform",
             resourceScope: effect.scope,
           },
-          flowLabel,
-          [],
-        ),
-        run: (key) =>
-          effect.run(
-            {
-              merchantId: work.context.merchantId,
-              userId: work.member.userId,
-              personId: String(work.member.personId),
-              client: work.context.client,
-            },
-            key,
-          ),
-        settled: effect.refreshProjection
-          ? refreshRecipeProjection.bind(null, env, execution, work)
-          : () => Promise.resolve(),
-      });
+        },
+      };
     },
   });
 }
@@ -875,7 +860,7 @@ async function saveSupplyCostForSession(
   host: SessionCostsHost,
   request: SupplyCostSaveRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
+): Promise<ToolEffect<StaffPageToolReceipt>> {
   return host.runStaffEffect({
     label: "supply cost",
     scope: SUPPLY_COST_TERMS_SCOPE,
@@ -945,7 +930,7 @@ async function saveCostsPlanForSession(
   host: SessionCostsHost,
   request: CostsPlanSaveRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
+): Promise<ToolEffect<StaffPageToolReceipt>> {
   return host.runStaffEffect({
     label: "cost plan",
     scope: BAKERY_COST_PLAN_SCOPE,
@@ -1064,7 +1049,7 @@ async function saveLotCostForSession(
   host: SessionCostsHost,
   request: LotCostSaveRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
+): Promise<ToolEffect<StaffPageToolReceipt>> {
   return host.runStaffEffect({
     label: "lot invoice cost",
     scope: LOT_INVOICE_COST_SCOPE,

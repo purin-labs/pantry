@@ -53,7 +53,7 @@ export const emailDraftEdit = defineChannelTool({
     capability: CAPABILITY_KEYS.marketingEmailDraftEdit,
   },
   unavailable: "email draft edit is unavailable",
-  handler: ({ editEmailDraft }) =>
+  prepare: ({ editEmailDraft }) =>
     editEmailDraft === undefined
       ? undefined
       : (request, call) =>

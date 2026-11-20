@@ -82,7 +82,7 @@ export const supplierCreate = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceSupplierCreate,
   },
   unavailable: "supplier creation is unavailable",
-  handler: ({ createSupplier }) =>
+  prepare: ({ createSupplier }) =>
     createSupplier === undefined
       ? undefined
       : (request, call) => createSupplier(request, call.operationId),

@@ -95,7 +95,8 @@ import type { Variant } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import {
   type EmailMailboxReadScope,
-  authorizeToolEffectInformationFlow,
+  proposalFlowEffect,
+  type ToolEffect,
   collaborationEditDeadline,
   collaborationMember,
   readAccessGrantId,
@@ -411,7 +412,7 @@ export async function editEmailReplyDraftForEmbeddedHarness(
   request: HarnessEmailReplyDraftEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<HarnessEmailReplyDraft> {
+): Promise<ToolEffect<HarnessEmailReplyDraft>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -457,100 +458,98 @@ export async function editEmailReplyDraftForEmbeddedHarness(
   if (!authorized.ok) {
     throw new Error(`Email reply authority rejected: ${authorized.error.code}`);
   }
-  await authorizeToolEffectInformationFlow(
-    env,
-    execution,
-    storage,
-    organisationId,
+  return proposalFlowEffect(
     lease,
     {
       capabilityId: CAPABILITY_KEYS.emailReplyPropose,
-      integrationAccountId,
+      integrationAccountId: integrationAccountId,
       resourceScope: EMAIL_MAILBOX_RESOURCE_SCOPE,
     },
-  );
-  const member = await collaborationMember(
-    execution.scope.database,
-    organisationId,
-    lease,
-    "edit",
-  );
-  if (member.role !== "owner" && member.role !== "admin") {
-    throw new EmailReplyDraftRequestError(
-      "Only an owner or admin may edit a reply draft.",
-    );
-  }
-  const chat = await authorizeEmailReplyDraftChat(
-    env,
-    storage,
-    execution,
-    lease,
-    integrationAccountId,
-    request.proposalId,
-  );
-  // The reply's review covers what this chat read before its words reach
-  // the shared draft, so a person who may not read them is refused first.
-  await requireSessionExecution(execution, lease);
-  const recorded = await chat.connector.recordEmailReplyEditProvenance({
-    identity: chat.identity,
-    proposalId: request.proposalId,
-    chatSources: chat.provenance.chatSources,
-    chatContext: chat.provenance.chatContext,
-    now: Date.now(),
-  });
-  if (!recorded.ok) {
-    throw new Error(`Email reply draft edit refused: ${recorded.error.code}`);
-  }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(
-      `Email reply draft authority expired: ${active.error.code}`,
-    );
-  }
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.editMailReplyDraft({
-    agent: await resolveCollaborationAgent(execution.scope, assignment),
-    execution: sessionTurnExecution(lease),
-    organisationId,
-    request: {
-      proposalId: request.proposalId,
-      oldText: request.oldText,
-      newText: request.newText,
+    async () => {
+      const member = await collaborationMember(
+        execution.scope.database,
+        organisationId,
+        lease,
+        "edit",
+      );
+      if (member.role !== "owner" && member.role !== "admin") {
+        throw new EmailReplyDraftRequestError(
+          "Only an owner or admin may edit a reply draft.",
+        );
+      }
+      const chat = await authorizeEmailReplyDraftChat(
+        env,
+        storage,
+        execution,
+        lease,
+        integrationAccountId,
+        request.proposalId,
+      );
+      // The reply's review covers what this chat read before its words reach
+      // the shared draft, so a person who may not read them is refused first.
+      await requireSessionExecution(execution, lease);
+      const recorded = await chat.connector.recordEmailReplyEditProvenance({
+        identity: chat.identity,
+        proposalId: request.proposalId,
+        chatSources: chat.provenance.chatSources,
+        chatContext: chat.provenance.chatContext,
+        now: Date.now(),
+      });
+      if (!recorded.ok) {
+        throw new Error(`Email reply draft edit refused: ${recorded.error.code}`);
+      }
+      const organisation = await requireActiveOrganisationActorAtPlacement({
+        env,
+        organisationId,
+        placement: execution.scope.placement,
+        now: Date.now(),
+      });
+      const active = preflightHarnessTurnLease(storage, lease, Date.now());
+      if (!active.ok) {
+        throw new Error(
+          `Email reply draft authority expired: ${active.error.code}`,
+        );
+      }
+      await requireSessionExecution(execution, lease);
+      const result = await organisation.editMailReplyDraft({
+        agent: await resolveCollaborationAgent(execution.scope, assignment),
+        execution: sessionTurnExecution(lease),
+        organisationId,
+        request: {
+          proposalId: request.proposalId,
+          oldText: request.oldText,
+          newText: request.newText,
+        },
+        operationId: JSON.stringify([
+          lease.session.sessionId,
+          lease.turn.turnId,
+          operationId,
+        ]),
+        userId: member.userId,
+        deadlineAt,
+      });
+      if (!result.ok) {
+        throw new EmailReplyDraftRequestError(
+          `Email reply draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
+        );
+      }
+      const draft: HarnessEmailReplyDraft = {
+        proposalId: result.value.proposalId,
+        body: result.value.body,
+        savedVersion: result.value.savedVersion,
+        unsaved: result.value.unsaved,
+      };
+      await commitEmailReplyDraftObservation(
+        storage,
+        execution,
+        lease,
+        scope,
+        draft,
+      );
+      requireCurrentEmailToolLease(storage, lease, assignment);
+      return draft;
     },
-    operationId: JSON.stringify([
-      lease.session.sessionId,
-      lease.turn.turnId,
-      operationId,
-    ]),
-    userId: member.userId,
-    deadlineAt,
-  });
-  if (!result.ok) {
-    throw new EmailReplyDraftRequestError(
-      `Email reply draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
-    );
-  }
-  const draft: HarnessEmailReplyDraft = {
-    proposalId: result.value.proposalId,
-    body: result.value.body,
-    savedVersion: result.value.savedVersion,
-    unsaved: result.value.unsaved,
-  };
-  await commitEmailReplyDraftObservation(
-    storage,
-    execution,
-    lease,
-    scope,
-    draft,
   );
-  requireCurrentEmailToolLease(storage, lease, assignment);
-  return draft;
 }
 
 /**
@@ -716,7 +715,7 @@ async function commitEmailReplyDraftObservation(
 export async function proposeEmailReplyForEmbeddedHarness(
   context: SessionToolContext,
   request: HarnessEmailReplyPropose,
-): Promise<HarnessEmailReplyProposalReceipt> {
+): Promise<ToolEffect<HarnessEmailReplyProposalReceipt>> {
   const { env, storage, execution, lease, assignment } = context;
   await requireSessionExecution(execution, lease);
   const organisationId = execution.scope.organisationId;
@@ -751,127 +750,125 @@ export async function proposeEmailReplyForEmbeddedHarness(
   if (!authorized.ok) {
     throw new Error(`Email reply authority rejected: ${authorized.error.code}`);
   }
-  await authorizeToolEffectInformationFlow(
-    env,
-    execution,
-    storage,
-    organisationId,
+  return proposalFlowEffect(
     lease,
     {
       capabilityId: CAPABILITY_KEYS.emailReplyPropose,
       integrationAccountId: integrationAccountId.value,
       resourceScope: EMAIL_MAILBOX_RESOURCE_SCOPE,
     },
+    async () => {
+      // The model's citations prove nothing alone: this Session's accepted reads
+      // decide which ones the reply keeps.
+      const provenance = await readChatReplyProvenance(storage.sql, {
+        organisationId,
+        sessionId: lease.session.sessionId,
+        body: request.body,
+        citations: request.citations,
+        malformed: request.malformedCitations,
+      });
+      const connectorId = gmailConnectorId(integrationAccountId.value);
+      if (!connectorId.ok) {
+        throw new Error("Email mailbox Connector identity is invalid");
+      }
+      const now = Date.now();
+      const connector = await resolveActiveConnectorActorAtPlacement({
+        env: env,
+        namespace: env.CONNECTOR,
+        organisationId,
+        placement: execution.scope.placement,
+        connectorId: connectorId.value,
+        now,
+      });
+      if (!connector.ok) {
+        throw new Error(
+          `Email mailbox Connector is unavailable: ${connector.error.code}`,
+        );
+      }
+      await requireSessionExecution(execution, lease);
+      const proposalId = `proposal_email_${lease.turn.turnId}_${request.messageId}`;
+      const created = await connector.value.createEmailReplyProposal({
+        identity: { organisationId, connectorId: connectorId.value },
+        execution: sessionTurnExecution(lease),
+        caseId,
+        proposalId,
+        messageId: request.messageId,
+        threadId: request.threadId,
+        body: request.body,
+        sources: provenance.sources,
+        chatSources: provenance.chatSources,
+        chatContext: provenance.chatContext,
+        now,
+      });
+      if (!created.ok) {
+        throw new Error(`Email reply proposal failed: ${created.error.code}`);
+      }
+      // The count of refused citations is part of the turn's trace.
+      traceLog("email_reply.sources", {
+        requestId: newRequestId(),
+        proposalId,
+        accepted: provenance.sources.sources.length,
+        dropped: provenance.sources.dropped,
+      });
+      await requireSessionExecution(execution, lease);
+      const caseActor = await resolveActiveCaseActorAtPlacement({
+        env: env,
+        namespace: env.CASE,
+        organisationId,
+        placement: execution.scope.placement,
+        caseId,
+        now,
+      });
+      if (!caseActor.ok) {
+        throw new Error(`Email reply Case is unavailable: ${caseActor.error.code}`);
+      }
+      await requireSessionExecution(execution, lease);
+      const accepted = await caseActor.value.acceptEmailProposal(
+        created.value.record,
+      );
+      await requireSessionExecution(execution, lease);
+      if (!accepted.ok) {
+        await connector.value.disposeEmailProposal({
+          identity: { organisationId, connectorId: connectorId.value },
+          proposalId,
+          now,
+        });
+        throw new Error(
+          `Email reply proposal record failed: ${accepted.error.code}`,
+        );
+      }
+      const projected = await projectEmailReplyProposal({
+        scope: execution.scope,
+        integrationAccountId: integrationAccountId.value,
+        proposalId,
+        caseId,
+        gmailThreadId: request.threadId,
+        currentVersion: 1,
+        lifecycleKind: "awaiting_approval",
+        now,
+      });
+      if (!projected.ok) {
+        traceWarn("email_slack.proposal_projection_deferred", {
+          requestId: newRequestId(),
+          proposalId,
+          code: projected.error.code,
+        });
+      }
+      await requireSessionExecution(execution, lease);
+      requireCurrentEmailToolLease(storage, lease, assignment);
+      return {
+        kind: "proposed",
+        proposalId,
+        providerDraftId: created.value.record.providerDraftId,
+      };
+    },
   );
-  // The model's citations prove nothing alone: this Session's accepted reads
-  // decide which ones the reply keeps.
-  const provenance = await readChatReplyProvenance(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-    body: request.body,
-    citations: request.citations,
-    malformed: request.malformedCitations,
-  });
-  const connectorId = gmailConnectorId(integrationAccountId.value);
-  if (!connectorId.ok) {
-    throw new Error("Email mailbox Connector identity is invalid");
-  }
-  const now = Date.now();
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    placement: execution.scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
-  if (!connector.ok) {
-    throw new Error(
-      `Email mailbox Connector is unavailable: ${connector.error.code}`,
-    );
-  }
-  await requireSessionExecution(execution, lease);
-  const proposalId = `proposal_email_${lease.turn.turnId}_${request.messageId}`;
-  const created = await connector.value.createEmailReplyProposal({
-    identity: { organisationId, connectorId: connectorId.value },
-    execution: sessionTurnExecution(lease),
-    caseId,
-    proposalId,
-    messageId: request.messageId,
-    threadId: request.threadId,
-    body: request.body,
-    sources: provenance.sources,
-    chatSources: provenance.chatSources,
-    chatContext: provenance.chatContext,
-    now,
-  });
-  if (!created.ok) {
-    throw new Error(`Email reply proposal failed: ${created.error.code}`);
-  }
-  // The count of refused citations is part of the turn's trace.
-  traceLog("email_reply.sources", {
-    requestId: newRequestId(),
-    proposalId,
-    accepted: provenance.sources.sources.length,
-    dropped: provenance.sources.dropped,
-  });
-  await requireSessionExecution(execution, lease);
-  const caseActor = await resolveActiveCaseActorAtPlacement({
-    env: env,
-    namespace: env.CASE,
-    organisationId,
-    placement: execution.scope.placement,
-    caseId,
-    now,
-  });
-  if (!caseActor.ok) {
-    throw new Error(`Email reply Case is unavailable: ${caseActor.error.code}`);
-  }
-  await requireSessionExecution(execution, lease);
-  const accepted = await caseActor.value.acceptEmailProposal(
-    created.value.record,
-  );
-  await requireSessionExecution(execution, lease);
-  if (!accepted.ok) {
-    await connector.value.disposeEmailProposal({
-      identity: { organisationId, connectorId: connectorId.value },
-      proposalId,
-      now,
-    });
-    throw new Error(
-      `Email reply proposal record failed: ${accepted.error.code}`,
-    );
-  }
-  const projected = await projectEmailReplyProposal({
-    scope: execution.scope,
-    integrationAccountId: integrationAccountId.value,
-    proposalId,
-    caseId,
-    gmailThreadId: request.threadId,
-    currentVersion: 1,
-    lifecycleKind: "awaiting_approval",
-    now,
-  });
-  if (!projected.ok) {
-    traceWarn("email_slack.proposal_projection_deferred", {
-      requestId: newRequestId(),
-      proposalId,
-      code: projected.error.code,
-    });
-  }
-  await requireSessionExecution(execution, lease);
-  requireCurrentEmailToolLease(storage, lease, assignment);
-  return {
-    kind: "proposed",
-    proposalId,
-    providerDraftId: created.value.record.providerDraftId,
-  };
 }
 
 export async function proposeEmailOperationalForEmbeddedHarness(
   context: SessionToolContext,
   request: HarnessEmailOperationalPropose,
-): Promise<HarnessEmailOperationalProposalReceipt> {
+): Promise<ToolEffect<HarnessEmailOperationalProposalReceipt>> {
   const { env, storage, execution, lease, assignment } = context;
   await requireSessionExecution(execution, lease);
   const organisationId = execution.scope.organisationId;
@@ -903,166 +900,146 @@ export async function proposeEmailOperationalForEmbeddedHarness(
       `Operational email authority rejected: ${authorized.error.code}`,
     );
   }
-  await authorizeOperationalEmailInformationFlow(
-    env,
-    execution,
-    storage,
-    organisationId,
-    lease,
-    integrationAccountId,
-  );
-  const connectorId = gmailConnectorId(integrationAccountId);
-  if (!connectorId.ok) {
-    throw new Error("Operational email Connector identity is invalid");
-  }
-  const now = Date.now();
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    placement: execution.scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
-  if (!connector.ok) {
-    throw new Error(
-      `Operational email Connector is unavailable: ${connector.error.code}`,
-    );
-  }
-  const proposalKey =
-    request.target.kind === "self_test"
-      ? "self_test"
-      : request.target.contactId;
-  const proposalId = `proposal_operational_email_${lease.turn.turnId}_${proposalKey}`;
-  let target: EmailProposalTarget;
-  if (request.target.kind === "self_test") {
-    await requireSessionExecution(execution, lease);
-    const registered = await registerEmailSelfTest({
-      scope: execution.scope,
-      globalDatabase: env.DB,
-      execution: sessionTurnExecution(lease),
-      integrationAccountId: integrationAccountId,
-      proposalId,
-      caseId,
-      now,
-      expiresAt: now + 15 * 60_000,
-      request: request.target,
-    });
-    if (!registered.ok) {
-      throw new Error(`Self-test recipient rejected: ${registered.error.code}`);
-    }
-    target = registered.value;
-  } else {
-    target = request.target;
-  }
-  await requireSessionExecution(execution, lease);
-  const created = await connector.value.createEmailOperationalProposal({
-    identity: { organisationId, connectorId: connectorId.value },
-    execution: sessionTurnExecution(lease),
-    integrationAccountId: integrationAccountId,
-    caseId,
-    proposalId,
-    target,
-    subject: request.subject,
-    body: request.body,
-    policyVersion: capability.capabilityVersion,
-    expiresAt: now + 15 * 60_000,
-    now,
-  });
-  if (!created.ok) {
-    if (target.kind === "self_test") {
-      await execution.scope.database
-        .prepare(
-          `DELETE FROM email_self_test WHERE organisation_id = ? AND self_test_id = ?
-           AND EXISTS (SELECT 1 FROM organisation_placement WHERE organisation_id = ?
-             AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')`,
-        )
-        .bind(
-          organisationId,
-          target.selfTestId,
-          organisationId,
-          execution.scope.placement.placementEpoch,
-          execution.scope.placement.placementCellId,
-          execution.scope.fenceToken,
-        )
-        .run();
-    }
-    throw new Error(`Operational email proposal failed: ${created.error.code}`);
-  }
-  await requireSessionExecution(execution, lease);
-  const caseActor = await resolveActiveCaseActorAtPlacement({
-    env: env,
-    namespace: env.CASE,
-    organisationId,
-    placement: execution.scope.placement,
-    caseId,
-    now,
-  });
-  if (!caseActor.ok) {
-    throw new Error(
-      `Operational email Case is unavailable: ${caseActor.error.code}`,
-    );
-  }
-  await requireSessionExecution(execution, lease);
-  const accepted = await caseActor.value.acceptEmailProposal({
-    kind: "operational_new_message",
-    proposalId: created.value.proposalId,
-    version: created.value.version,
-    caseId: created.value.caseId,
-    integrationAccountId: String(created.value.integrationAccountId),
-    target: created.value.target,
-    targetDigest: created.value.targetDigest,
-    subjectDigest: created.value.subjectDigest,
-    bodyDigest: created.value.bodyDigest,
-    snapshotDigest: created.value.snapshotDigest,
-    policyVersion: created.value.policyVersion,
-    credentialGeneration: created.value.credentialGeneration,
-    createdAt: created.value.createdAt,
-    expiresAt: created.value.expiresAt,
-    lifecycle: { kind: "awaiting_approval" },
-  });
-  await requireSessionExecution(execution, lease);
-  if (!accepted.ok) {
-    await connector.value.rejectEmailOperational({
-      identity: { organisationId, connectorId: connectorId.value },
-      integrationAccountId: integrationAccountId,
-      proposalId,
-      approvedVersion: created.value.version,
-      approvedSnapshotDigest: created.value.snapshotDigest,
-      now,
-    });
-    throw new Error(
-      `Operational email proposal record failed: ${accepted.error.code}`,
-    );
-  }
-  await requireSessionExecution(execution, lease);
-  requireCurrentEmailToolLease(storage, lease, assignment);
-  return {
-    kind: "proposed",
-    proposalId: created.value.proposalId,
-    version: created.value.version,
-    snapshotDigest: created.value.snapshotDigest,
-  };
-}
-
-async function authorizeOperationalEmailInformationFlow(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  storage: DurableObjectStorage,
-  organisationId: OrganisationId,
-  lease: HarnessTurnLease,
-  integrationAccountId: IntegrationAccountId,
-): Promise<void> {
-  await authorizeToolEffectInformationFlow(
-    env,
-    execution,
-    storage,
-    organisationId,
+  return proposalFlowEffect(
     lease,
     {
       capabilityId: CAPABILITY_KEYS.emailOperationalPropose,
-      integrationAccountId,
+      integrationAccountId: integrationAccountId,
       resourceScope: EMAIL_OPERATIONAL_RESOURCE_SCOPE,
+    },
+    async () => {
+      const connectorId = gmailConnectorId(integrationAccountId);
+      if (!connectorId.ok) {
+        throw new Error("Operational email Connector identity is invalid");
+      }
+      const now = Date.now();
+      const connector = await resolveActiveConnectorActorAtPlacement({
+        env: env,
+        namespace: env.CONNECTOR,
+        organisationId,
+        placement: execution.scope.placement,
+        connectorId: connectorId.value,
+        now,
+      });
+      if (!connector.ok) {
+        throw new Error(
+          `Operational email Connector is unavailable: ${connector.error.code}`,
+        );
+      }
+      const proposalKey =
+        request.target.kind === "self_test"
+          ? "self_test"
+          : request.target.contactId;
+      const proposalId = `proposal_operational_email_${lease.turn.turnId}_${proposalKey}`;
+      let target: EmailProposalTarget;
+      if (request.target.kind === "self_test") {
+        await requireSessionExecution(execution, lease);
+        const registered = await registerEmailSelfTest({
+          scope: execution.scope,
+          globalDatabase: env.DB,
+          execution: sessionTurnExecution(lease),
+          integrationAccountId: integrationAccountId,
+          proposalId,
+          caseId,
+          now,
+          expiresAt: now + 15 * 60_000,
+          request: request.target,
+        });
+        if (!registered.ok) {
+          throw new Error(`Self-test recipient rejected: ${registered.error.code}`);
+        }
+        target = registered.value;
+      } else {
+        target = request.target;
+      }
+      await requireSessionExecution(execution, lease);
+      const created = await connector.value.createEmailOperationalProposal({
+        identity: { organisationId, connectorId: connectorId.value },
+        execution: sessionTurnExecution(lease),
+        integrationAccountId: integrationAccountId,
+        caseId,
+        proposalId,
+        target,
+        subject: request.subject,
+        body: request.body,
+        policyVersion: capability.capabilityVersion,
+        expiresAt: now + 15 * 60_000,
+        now,
+      });
+      if (!created.ok) {
+        if (target.kind === "self_test") {
+          await execution.scope.database
+            .prepare(
+              `DELETE FROM email_self_test WHERE organisation_id = ? AND self_test_id = ?
+               AND EXISTS (SELECT 1 FROM organisation_placement WHERE organisation_id = ?
+                 AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')`,
+            )
+            .bind(
+              organisationId,
+              target.selfTestId,
+              organisationId,
+              execution.scope.placement.placementEpoch,
+              execution.scope.placement.placementCellId,
+              execution.scope.fenceToken,
+            )
+            .run();
+        }
+        throw new Error(`Operational email proposal failed: ${created.error.code}`);
+      }
+      await requireSessionExecution(execution, lease);
+      const caseActor = await resolveActiveCaseActorAtPlacement({
+        env: env,
+        namespace: env.CASE,
+        organisationId,
+        placement: execution.scope.placement,
+        caseId,
+        now,
+      });
+      if (!caseActor.ok) {
+        throw new Error(
+          `Operational email Case is unavailable: ${caseActor.error.code}`,
+        );
+      }
+      await requireSessionExecution(execution, lease);
+      const accepted = await caseActor.value.acceptEmailProposal({
+        kind: "operational_new_message",
+        proposalId: created.value.proposalId,
+        version: created.value.version,
+        caseId: created.value.caseId,
+        integrationAccountId: String(created.value.integrationAccountId),
+        target: created.value.target,
+        targetDigest: created.value.targetDigest,
+        subjectDigest: created.value.subjectDigest,
+        bodyDigest: created.value.bodyDigest,
+        snapshotDigest: created.value.snapshotDigest,
+        policyVersion: created.value.policyVersion,
+        credentialGeneration: created.value.credentialGeneration,
+        createdAt: created.value.createdAt,
+        expiresAt: created.value.expiresAt,
+        lifecycle: { kind: "awaiting_approval" },
+      });
+      await requireSessionExecution(execution, lease);
+      if (!accepted.ok) {
+        await connector.value.rejectEmailOperational({
+          identity: { organisationId, connectorId: connectorId.value },
+          integrationAccountId: integrationAccountId,
+          proposalId,
+          approvedVersion: created.value.version,
+          approvedSnapshotDigest: created.value.snapshotDigest,
+          now,
+        });
+        throw new Error(
+          `Operational email proposal record failed: ${accepted.error.code}`,
+        );
+      }
+      await requireSessionExecution(execution, lease);
+      requireCurrentEmailToolLease(storage, lease, assignment);
+      return {
+        kind: "proposed",
+        proposalId: created.value.proposalId,
+        version: created.value.version,
+        snapshotDigest: created.value.snapshotDigest,
+      };
     },
   );
 }

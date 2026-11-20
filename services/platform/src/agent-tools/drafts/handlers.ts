@@ -16,21 +16,15 @@ import {
 import { readCafeImages } from "../../commerce/cafe-media";
 import { readPublishedCafeMenu } from "../../control/routes/menu-screens";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import {
-  requireActiveOrganisationActorAtPlacement,
-} from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
-import {
-  preflightHarnessTurnLease,
-} from "../../actors/agent-session-harness-authority";
+import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import type { MenuBoardArchiveRequest, MenuBoardCreateRequest } from "./drafts";
-import {
-  readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
-} from "../../actors/agent-session-information-flow";
+import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { assertNever } from "@purin-labs/std";
 import {
@@ -41,7 +35,7 @@ import {
 import {
   collaborationEditDeadline,
   collaborationMember,
-  passSharedDraftExit,
+  type ToolEffect,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
@@ -77,7 +71,7 @@ export async function editMenuDraftForEmbeddedHarness(
   edit: MenuDraftEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<MenuDraftRead> {
+): Promise<ToolEffect<MenuDraftRead>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -93,66 +87,58 @@ export async function editMenuDraftForEmbeddedHarness(
     lease,
     "edit",
   );
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error("Menu draft information-flow authority unavailable");
-  }
-  await passSharedDraftExit(
-    env,
-    execution,
-    lease,
+  return {
+    kind: "shared_draft",
     member,
-    {
-      draft: "Menu draft",
-      capabilityId: CAPABILITY_KEYS.commerceMenuDraftEdit,
-      integrationAccountId: "platform",
-      resourceScope: "menu-draft:cafe-menu",
+    unavailable: "Menu draft information-flow authority unavailable",
+    draft: {
+      shared: "every_member",
+      edit: {
+        draft: "Menu draft",
+        capabilityId: CAPABILITY_KEYS.commerceMenuDraftEdit,
+        integrationAccountId: "platform",
+        resourceScope: "menu-draft:cafe-menu",
+      },
     },
-    current.value.binding.flowLabel,
-    [],
-  );
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(`Menu draft edit authority expired: ${active.error.code}`);
-  }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.editMenuDraft({
-    agent: await resolveCollaborationAgent(execution.scope, assignment),
-    execution: sessionTurnExecution(lease),
-    organisationId,
-    edit,
-    operationId: JSON.stringify([
-      lease.session.sessionId,
-      lease.turn.turnId,
-      operationId,
-    ]),
-    userId: member.userId,
-    deadlineAt,
-  });
-  if (!result.ok) {
-    if (result.error.code === "record_conflict") {
-      throw new MenuDraftRequestError(
-        "That section or item is not in the menu now. Read the menu again before you choose a new edit.",
-      );
-    }
-    throw new Error(`Menu draft edit failed: ${result.error.code}`);
-  }
-  await requireSessionExecution(execution, lease);
-  return result.value;
+    run: async () => {
+      const active = preflightHarnessTurnLease(storage, lease, Date.now());
+      if (!active.ok) {
+        throw new Error(
+          `Menu draft edit authority expired: ${active.error.code}`,
+        );
+      }
+      const organisation = await requireActiveOrganisationActorAtPlacement({
+        env,
+        organisationId,
+        placement: execution.scope.placement,
+        now: Date.now(),
+      });
+      await requireSessionExecution(execution, lease);
+      const result = await organisation.editMenuDraft({
+        agent: await resolveCollaborationAgent(execution.scope, assignment),
+        execution: sessionTurnExecution(lease),
+        organisationId,
+        edit,
+        operationId: JSON.stringify([
+          lease.session.sessionId,
+          lease.turn.turnId,
+          operationId,
+        ]),
+        userId: member.userId,
+        deadlineAt,
+      });
+      if (!result.ok) {
+        if (result.error.code === "record_conflict") {
+          throw new MenuDraftRequestError(
+            "That section or item is not in the menu now. Read the menu again before you choose a new edit.",
+          );
+        }
+        throw new Error(`Menu draft edit failed: ${result.error.code}`);
+      }
+      await requireSessionExecution(execution, lease);
+      return result.value;
+    },
+  };
 }
 
 /**
@@ -285,7 +271,7 @@ export async function editMenuBoardForEmbeddedHarness(
   request: Readonly<{ boardId: string; edit: MenuBoardEdit }>,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<MenuBoardEditResult> {
+): Promise<ToolEffect<MenuBoardEditResult>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -313,101 +299,96 @@ export async function editMenuBoardForEmbeddedHarness(
         "That image is not in the shop's library. Call menu_board_read and use a mediaId from its images.",
       );
   }
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error("Menu board information-flow authority unavailable");
-  }
-  await passSharedDraftExit(
-    env,
-    execution,
-    lease,
+  return {
+    kind: "shared_draft",
     member,
-    {
-      draft: "Menu board",
-      capabilityId: CAPABILITY_KEYS.commerceMenuDraftEdit,
-      integrationAccountId: "platform",
-      resourceScope: `menu-board:${request.boardId}`,
+    unavailable: "Menu board information-flow authority unavailable",
+    draft: {
+      shared: "every_member",
+      edit: {
+        draft: "Menu board",
+        capabilityId: CAPABILITY_KEYS.commerceMenuDraftEdit,
+        integrationAccountId: "platform",
+        resourceScope: `menu-board:${request.boardId}`,
+      },
     },
-    current.value.binding.flowLabel,
-    [],
-  );
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(`Menu board edit authority expired: ${active.error.code}`);
-  }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.editMenuBoard({
-    agent: await resolveCanvasCollaborationAgent(execution.scope, assignment),
-    execution: sessionTurnExecution(lease),
-    organisationId,
-    boardId: request.boardId,
-    edit: request.edit,
-    operationId: JSON.stringify([
-      lease.session.sessionId,
-      lease.turn.turnId,
-      operationId,
-    ]),
-    userId: member.userId,
-    deadlineAt,
-  });
-  if (!result.ok) {
-    switch (result.error.code) {
-      case "menu_board_missing":
-        throw new MenuBoardRequestError(
-          "That board does not exist. Call menu_board_read with boardId null to list the boards.",
+    run: async () => {
+      const active = preflightHarnessTurnLease(storage, lease, Date.now());
+      if (!active.ok) {
+        throw new Error(
+          `Menu board edit authority expired: ${active.error.code}`,
         );
-      case "menu_board_element_missing":
-        throw new MenuBoardRequestError(
-          "That element is not on the board now. Read the board again before you choose a new edit.",
-        );
-      case "menu_board_text_changed":
-        throw new MenuBoardRequestError(
-          `Someone changed that text since your read. It is now ${JSON.stringify(result.error.current ?? "")}. Read the board again and check with the person before you change it.`,
-        );
-      case "menu_board_edit_invalid":
-        throw new MenuBoardRequestError(
-          "The board cannot take that edit: check the element kind, the prop, the frame of the layout, the item and the text length (280 characters).",
-        );
-      case "menu_board_comment_missing":
-        throw new MenuBoardRequestError(
-          "That comment is not on the board now. Call menu_board_read for the board's comment threads.",
-        );
-      case "menu_board_comment_limit":
-        throw new MenuBoardRequestError(
-          "This board has 300 comments. Ask a person to delete old ones before you add another.",
-        );
-      case "menu_board_comment_invalid":
-        throw new MenuBoardRequestError(
-          "A comment needs 1 to 1000 characters of text.",
-        );
-      case "menu_board_version_missing":
-        throw new MenuBoardRequestError(
-          "That version is not in the board's history. Call menu_board_read for the board's versions.",
-        );
-      case "menu_board_version_invalid":
-        throw new MenuBoardRequestError(
-          "A version name needs 1 to 80 characters.",
-        );
-      default:
-        throw new Error(`Menu board edit failed: ${result.error.code}`);
-    }
-  }
-  await requireSessionExecution(execution, lease);
-  return result.value;
+      }
+      const organisation = await requireActiveOrganisationActorAtPlacement({
+        env,
+        organisationId,
+        placement: execution.scope.placement,
+        now: Date.now(),
+      });
+      await requireSessionExecution(execution, lease);
+      const result = await organisation.editMenuBoard({
+        agent: await resolveCanvasCollaborationAgent(
+          execution.scope,
+          assignment,
+        ),
+        execution: sessionTurnExecution(lease),
+        organisationId,
+        boardId: request.boardId,
+        edit: request.edit,
+        operationId: JSON.stringify([
+          lease.session.sessionId,
+          lease.turn.turnId,
+          operationId,
+        ]),
+        userId: member.userId,
+        deadlineAt,
+      });
+      if (!result.ok) {
+        switch (result.error.code) {
+          case "menu_board_missing":
+            throw new MenuBoardRequestError(
+              "That board does not exist. Call menu_board_read with boardId null to list the boards.",
+            );
+          case "menu_board_element_missing":
+            throw new MenuBoardRequestError(
+              "That element is not on the board now. Read the board again before you choose a new edit.",
+            );
+          case "menu_board_text_changed":
+            throw new MenuBoardRequestError(
+              `Someone changed that text since your read. It is now ${JSON.stringify(result.error.current ?? "")}. Read the board again and check with the person before you change it.`,
+            );
+          case "menu_board_edit_invalid":
+            throw new MenuBoardRequestError(
+              "The board cannot take that edit: check the element kind, the prop, the frame of the layout, the item and the text length (280 characters).",
+            );
+          case "menu_board_comment_missing":
+            throw new MenuBoardRequestError(
+              "That comment is not on the board now. Call menu_board_read for the board's comment threads.",
+            );
+          case "menu_board_comment_limit":
+            throw new MenuBoardRequestError(
+              "This board has 300 comments. Ask a person to delete old ones before you add another.",
+            );
+          case "menu_board_comment_invalid":
+            throw new MenuBoardRequestError(
+              "A comment needs 1 to 1000 characters of text.",
+            );
+          case "menu_board_version_missing":
+            throw new MenuBoardRequestError(
+              "That version is not in the board's history. Call menu_board_read for the board's versions.",
+            );
+          case "menu_board_version_invalid":
+            throw new MenuBoardRequestError(
+              "A version name needs 1 to 80 characters.",
+            );
+          default:
+            throw new Error(`Menu board edit failed: ${result.error.code}`);
+        }
+      }
+      await requireSessionExecution(execution, lease);
+      return result.value;
+    },
+  };
 }
 
 /**
@@ -422,7 +403,7 @@ export async function createMenuBoardForEmbeddedHarness(
   request: MenuBoardCreateRequest,
   _operationId: string,
   _boundary: CatalogExecutionContext,
-): Promise<unknown> {
+): Promise<ToolEffect<unknown>> {
   const { env, storage, execution, lease } = context;
   const organisationId = execution.scope.organisationId;
   await requireLiveMenuDraftAuthority(execution, storage, lease);
@@ -432,62 +413,54 @@ export async function createMenuBoardForEmbeddedHarness(
     lease,
     "edit",
   );
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error("Menu board information-flow authority unavailable");
-  }
-  await passSharedDraftExit(
-    env,
-    execution,
-    lease,
+  return {
+    kind: "shared_draft",
     member,
-    {
-      draft: "Menu board",
-      capabilityId: CAPABILITY_KEYS.commerceMenuDraftEdit,
-      integrationAccountId: "platform",
-      resourceScope: "menu-board:new",
+    unavailable: "Menu board information-flow authority unavailable",
+    draft: {
+      shared: "every_member",
+      edit: {
+        draft: "Menu board",
+        capabilityId: CAPABILITY_KEYS.commerceMenuDraftEdit,
+        integrationAccountId: "platform",
+        resourceScope: "menu-board:new",
+      },
     },
-    current.value.binding.flowLabel,
-    [],
-  );
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(`Menu board edit authority expired: ${active.error.code}`);
-  }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const created = await organisation.menuBoardCommand({
-    organisationId,
-    command: {
-      kind: "create_board",
-      title: request.title,
-      layout: request.layout,
-      start: request.start,
-      userId: member.userId,
+    run: async () => {
+      const active = preflightHarnessTurnLease(storage, lease, Date.now());
+      if (!active.ok) {
+        throw new Error(
+          `Menu board edit authority expired: ${active.error.code}`,
+        );
+      }
+      const organisation = await requireActiveOrganisationActorAtPlacement({
+        env,
+        organisationId,
+        placement: execution.scope.placement,
+        now: Date.now(),
+      });
+      await requireSessionExecution(execution, lease);
+      const created = await organisation.menuBoardCommand({
+        organisationId,
+        command: {
+          kind: "create_board",
+          title: request.title,
+          layout: request.layout,
+          start: request.start,
+          userId: member.userId,
+        },
+      });
+      if (!created.ok) {
+        if (created.error.code === "menu_board_limit")
+          throw new MenuBoardRequestError(
+            "This shop has 12 boards. Ask a person to remove one before you make another.",
+          );
+        throw new Error(`Menu board create failed: ${created.error.code}`);
+      }
+      await requireSessionExecution(execution, lease);
+      return { board: created.value };
     },
-  });
-  if (!created.ok) {
-    if (created.error.code === "menu_board_limit")
-      throw new MenuBoardRequestError(
-        "This shop has 12 boards. Ask a person to remove one before you make another.",
-      );
-    throw new Error(`Menu board create failed: ${created.error.code}`);
-  }
-  await requireSessionExecution(execution, lease);
-  return { board: created.value };
+  };
 }
 
 /**

@@ -15,6 +15,7 @@ import type {
   StaffPageToolReceipt,
 } from "./catalog/types";
 import { StaffPageRequestError } from "./errors";
+import type { UncheckedEffect } from "./tool-effect";
 import type { DraftSharedThread } from "../actors/product-description-draft";
 import {
   currentFlowSinkCheck,
@@ -398,27 +399,6 @@ export function untrustedDeviceText(value: string): string {
   return normalizeUntrustedCommerceText(value, "display_name").text;
 }
 
-export async function currentTurnFlowLabel(
-  storage: DurableObjectStorage,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  label: string,
-): Promise<StoredFlowLabel> {
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId: execution.scope.organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error(`${label} information-flow authority unavailable`);
-  }
-  return current.value.binding.flowLabel;
-}
-
 /** The commerce projection reads the saved recipe now, as after the page's save. */
 export async function refreshRecipeProjection(
   env: Env,
@@ -443,6 +423,25 @@ export async function refreshRecipeProjection(
   ).catch(() => undefined);
 }
 
+/** One step of a staff page: its sink, its receipt scope and its command. */
+type StaffPageEffect = Readonly<{
+  flowLabel: StoredFlowLabel;
+  sink: import("../policy/information-flow").ToolEffectSink;
+  route: string;
+  operation: string;
+  body: unknown;
+  operationId: string;
+  result: string;
+  /**
+   * The check of content that the page's readers will see, if it has one.
+   * The effect's own check asks the writer question, with the action.
+   */
+  exit?: (mode: "pass_or_ask", writerRule: "asked") => Promise<void>;
+  run: (key: string) => Promise<string | null>;
+  /** What must see the step at once, after its receipt. */
+  settled: () => Promise<void>;
+}>;
+
 /**
  * Runs one step that staff also take on the page, with the page's receipt: the
  * same route and operation, a key from this tool call. A repeated call gets the
@@ -450,28 +449,12 @@ export async function refreshRecipeProjection(
  * queue's stage, which refuses a step that already happened. A refusal runs no
  * command and stores no receipt, so the agent can read and try again.
  */
-export async function settleStaffPageEffect(
+async function settleStaffPageEffect(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   work: StaffPageWork,
-  effect: Readonly<{
-    flowLabel: StoredFlowLabel;
-    sink: import("../policy/information-flow").ToolEffectSink;
-    route: string;
-    operation: string;
-    body: unknown;
-    operationId: string;
-    result: string;
-    /**
-     * The check of content that the page's readers will see, if it has one.
-     * The effect's own check asks the writer question, with the action.
-     */
-    exit?: (mode: "pass_or_ask", writerRule: "asked") => Promise<void>;
-    run: (key: string) => Promise<string | null>;
-    /** What must see the step at once, after its receipt. */
-    settled: () => Promise<void>;
-  }>,
+  effect: StaffPageEffect,
 ): Promise<StaffPageToolReceipt> {
   const decision = await evaluateHarnessFlowSink(
     execution.scope.database,
@@ -612,6 +595,7 @@ type SharedDraftEdit = Readonly<{
     | typeof CAPABILITY_KEYS.marketingEmailDraftEdit
     | typeof CAPABILITY_KEYS.commerceProductionPlanEdit
     | typeof CAPABILITY_KEYS.commerceMenuDraftEdit
+    | typeof CAPABILITY_KEYS.commerceWorkflowCanvasMove
     | typeof CAPABILITY_KEYS.commerceRecipeSave
     | typeof CAPABILITY_KEYS.commerceSupplyCostSave
     | typeof CAPABILITY_KEYS.commerceSupplierCreate;
@@ -684,57 +668,6 @@ export type SharedDraftChat = Readonly<{
 }>;
 
 /**
- * Whether the turn's work may enter a draft that every organisation role
- * reads. Work that some role may not read comes from a conversation, and an
- * owner or admin must have shared that conversation with the draft. The share
- * adds that conversation to the draft's audience, and the turn's label stays as
- * it is. Internal content enters. Other private content asks a person (Plan 27C).
- */
-export async function authorizeSharedDraftEdit(
-  env: Env,
-  storage: DurableObjectStorage,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  member: OrganisationMember,
-  edit: SharedDraftEdit,
-): Promise<void> {
-  const organisationId = execution.scope.organisationId;
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error(`${edit.draft} information-flow authority unavailable`);
-  }
-  const flowLabel = current.value.binding.flowLabel;
-  const everyRoleReads = (
-    ["owner", "admin", "operator", "viewer"] as const
-  ).every((role) =>
-    labelAllowsAudiences(flowLabel, [{ kind: "organisation_role", role }]),
-  );
-  const sharedWith = everyRoleReads
-    ? []
-    : await draftSharedReaders(organisationId, lease, edit);
-  if (sharedWith === null) {
-    throw new Error(edit.notConnected);
-  }
-  await passSharedDraftExit(
-    env,
-    execution,
-    lease,
-    member,
-    edit,
-    flowLabel,
-    sharedWith,
-  );
-}
-
-/**
  * The exit check of content that goes into a draft that every member reads.
  * Content that a member may not read raises the approval prompt.
  */
@@ -759,6 +692,8 @@ export async function passSharedDraftExit(
    * own check asks the writer question with its action (Plan 89).
    */
   writerRule: "ask" | "asked" = "ask",
+  /** Sees the decision of a check that does not pass, for a trace. */
+  refused?: (decision: FlowSinkDecision) => void,
 ): Promise<void> {
   const organisationId = execution.scope.organisationId;
   const revision = await readActiveOrganisationMembershipRevision({
@@ -810,6 +745,7 @@ export async function passSharedDraftExit(
       mode,
     ))
   ) {
+    refused?.(decision);
     throw new Error(`${edit.draft} disclosure is not authorized`);
   }
 }
@@ -911,7 +847,7 @@ export async function requireLiveBakeryReadAuthority(
  * through, and the Organisation's capability rules still apply to it. A
  * first block raises `ExitApprovalRequestedError`, which the agent reads.
  */
-export async function toolEffectPassesExit(
+async function toolEffectPassesExit(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -998,7 +934,7 @@ export async function toolEffectPassesExit(
   return true;
 }
 
-export async function evaluateHarnessFlowSink(
+async function evaluateHarnessFlowSink(
   db: OrganisationDatabase,
   accountAccess: import("../account-platform/access").AccountPlatformAccess,
   userAuthority: import("../account-platform/access").AccountUserAuthority,
@@ -1039,23 +975,145 @@ export async function evaluateHarnessFlowSink(
 }
 
 /**
- * The turn's cumulative label may flow into this proposal tool's effect. The
- * effect still waits for a person, so approval is not yet satisfied.
+ * The effect of a tool that stages content for a person, such as a reply
+ * draft. The work label of the Session may flow into it. The effect still
+ * waits for a person, so approval is not yet satisfied.
  */
-export async function authorizeToolEffectInformationFlow(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  storage: DurableObjectStorage,
-  organisationId: OrganisationId,
+export function proposalFlowEffect<Result>(
   lease: HarnessTurnLease,
   effect: Readonly<{
     capabilityId: HarnessCapabilityName;
     integrationAccountId: IntegrationAccountId;
     resourceScope: string;
   }>,
-): Promise<void> {
+  run: () => Promise<Result>,
+): ToolEffect<Result> {
+  return {
+    kind: "effect",
+    label: {
+      source: "work",
+      unavailable: "Proposal information-flow context unavailable",
+    },
+    sink: {
+      kind: "tool_effect",
+      destinationAuthority: lease.requestAuthority,
+      capabilityId: effect.capabilityId,
+      integrationAccountId: effect.integrationAccountId,
+      resourceScope: effect.resourceScope,
+      approvalSatisfied: false,
+    },
+    refusal: (decision) =>
+      `The proposal requires policy resolution: ${decision}`,
+    run,
+  };
+}
+
+/** The decision of an exit check, before a pass or an ask. */
+export type FlowSinkDecision = Awaited<
+  ReturnType<typeof evaluateHarnessFlowSink>
+>;
+
+/** The draft that a content check names: what `passSharedDraftExit` reads. */
+type SharedDraftSink = Pick<
+  SharedDraftEdit,
+  "draft" | "capabilityId" | "integrationAccountId" | "resourceScope"
+>;
+
+/**
+ * An effect that `prepare` of a tool returns, with the exit checks that the
+ * tool has (Refactor 17, step A1.4). `settleToolEffect` reads the label, runs
+ * the checks and calls `run`. A step that a tool does after its check and
+ * before its effect is the first step of `run`.
+ *
+ * - `none`: no exit check, as before this step: the tool has other rules.
+ * - `effect`: one check of the turn's authority as the sink.
+ * - `shared_draft`: the content check of a draft that every member reads.
+ * - `staff_page`: a step of a staff page, with its receipt and its checks.
+ */
+export type ToolEffect<Result = unknown> =
+  | UncheckedEffect<Result>
+  | Readonly<{
+      kind: "effect";
+      /**
+       * The label that the check reads: the label of the turn, or the work
+       * label of the Session. `unavailable` is the error with no label.
+       */
+      label: Readonly<{ source: "turn" | "work"; unavailable: string }>;
+      sink: import("../policy/information-flow").ToolEffectSink;
+      /** The operation and its arguments, when the person's Allow shows them. */
+      action?: EffectAction;
+      /** The error of a check that does not pass, from the decision kind. */
+      refusal: (decision: string) => string;
+      run: () => Promise<Result>;
+    }>
+  | Readonly<{
+      kind: "shared_draft";
+      member: OrganisationMember;
+      /** The error with no label of the turn. */
+      unavailable: string;
+      /**
+       * `lookup`: when a role cannot read the label, the turn's conversation
+       * must be shared with the draft, and its readers join the audience.
+       */
+      draft:
+        | Readonly<{
+            shared: "every_member";
+            edit: SharedDraftSink;
+            /** Sees the decision of a check that does not pass, for a trace. */
+            refused?: (decision: FlowSinkDecision) => void;
+          }>
+        | Readonly<{
+            shared: "lookup";
+            edit: SharedDraftEdit;
+            /** The error of a conversation that is not shared, if not a plain one. */
+            notShared?: (message: string) => Error;
+          }>;
+      run: () => Promise<Result>;
+    }>
+  | Readonly<{
+      kind: "staff_page";
+      work: StaffPageWork;
+      /** The error with no label of the turn. */
+      unavailable: string;
+      effect: Omit<StaffPageEffect, "flowLabel" | "exit">;
+      /** The check of content that the page's readers will see, if any. */
+      content?: Readonly<{ member: OrganisationMember; edit: SharedDraftSink }>;
+    }>;
+
+type EffectContext = Readonly<{
+  env: Env;
+  storage: DurableObjectStorage;
+  execution: SessionExecutionAdmission;
+  lease: HarnessTurnLease;
+}>;
+
+async function turnFlowLabel(
+  context: EffectContext,
+  unavailable: string,
+): Promise<StoredFlowLabel> {
+  const { storage, execution, lease } = context;
+  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
+    organisationId: execution.scope.organisationId,
+    sessionId: lease.session.sessionId,
+    turnId: lease.turn.turnId,
+  });
+  if (
+    !current.ok ||
+    current.value === null ||
+    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
+  ) {
+    throw new Error(unavailable);
+  }
+  return current.value.binding.flowLabel;
+}
+
+async function sessionWorkLabel(
+  context: EffectContext,
+  unavailable: string,
+): Promise<StoredFlowLabel> {
+  const { storage, execution, lease } = context;
   const flow = await readSessionInformationFlow(storage.sql, {
-    organisationId,
+    organisationId: execution.scope.organisationId,
     sessionId: lease.session.sessionId,
   });
   if (
@@ -1064,34 +1122,115 @@ export async function authorizeToolEffectInformationFlow(
     flow.value.context.authorityPartitionDigest !==
       lease.authorityPartitionDigest
   ) {
-    throw new Error("Proposal information-flow context unavailable");
+    throw new Error(unavailable);
   }
-  const sink = {
-    kind: "tool_effect",
-    destinationAuthority: lease.requestAuthority,
-    capabilityId: effect.capabilityId,
-    integrationAccountId: effect.integrationAccountId,
-    resourceScope: effect.resourceScope,
-    approvalSatisfied: false,
-  } as const;
-  const decision = await evaluateHarnessFlowSink(
-    execution.scope.database,
-    execution.scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
-    { flowLabel: flow.value.context.workLabel, sink },
-  );
-  if (
-    !(await toolEffectPassesExit(env, execution, lease, {
-      decision,
-      flowLabel: flow.value.context.workLabel,
-      sink,
-    }))
-  ) {
-    throw new Error(
-      `The proposal requires policy resolution: ${decision.kind}`,
-    );
+  return flow.value.context.workLabel;
+}
+
+/**
+ * The one place that runs the exit check of an effect tool. The executor
+ * calls it with what `prepare` returned: it reads the label, runs each check
+ * of the effect in the tool's order, and then runs the effect.
+ */
+export async function settleToolEffect(
+  context: EffectContext,
+  effect: ToolEffect,
+): Promise<unknown> {
+  const { env, execution, lease } = context;
+  switch (effect.kind) {
+    case "none":
+      return effect.run();
+    case "effect": {
+      const flowLabel =
+        effect.label.source === "turn"
+          ? await turnFlowLabel(context, effect.label.unavailable)
+          : await sessionWorkLabel(context, effect.label.unavailable);
+      const decision = await evaluateHarnessFlowSink(
+        execution.scope.database,
+        execution.scope.accountAccess,
+        acceptedExecutionAccountAuthority(
+          lease.session.sessionId,
+          lease.turn.turnId,
+        ),
+        { flowLabel, sink: effect.sink },
+      );
+      if (
+        !(await toolEffectPassesExit(env, execution, lease, {
+          decision,
+          flowLabel,
+          sink: effect.sink,
+          ...(effect.action === undefined ? {} : { action: effect.action }),
+        }))
+      ) {
+        throw new Error(effect.refusal(decision.kind));
+      }
+      return effect.run();
+    }
+    case "shared_draft": {
+      const flowLabel = await turnFlowLabel(context, effect.unavailable);
+      const { draft } = effect;
+      let sharedWith: readonly import("../policy/information-flow").FlowAudience[] =
+        [];
+      if (draft.shared === "lookup") {
+        const everyRoleReads = (
+          ["owner", "admin", "operator", "viewer"] as const
+        ).every((role) =>
+          labelAllowsAudiences(flowLabel, [
+            { kind: "organisation_role", role },
+          ]),
+        );
+        const readers = everyRoleReads
+          ? []
+          : await draftSharedReaders(
+              execution.scope.organisationId,
+              lease,
+              draft.edit,
+            );
+        if (readers === null) {
+          throw (
+            draft.notShared?.(draft.edit.notConnected) ??
+            new Error(draft.edit.notConnected)
+          );
+        }
+        sharedWith = readers;
+      }
+      await passSharedDraftExit(
+        env,
+        execution,
+        lease,
+        effect.member,
+        draft.edit,
+        flowLabel,
+        sharedWith,
+        "pass_or_ask",
+        "ask",
+        draft.shared === "every_member" ? draft.refused : undefined,
+      );
+      return effect.run();
+    }
+    case "staff_page": {
+      const flowLabel = await turnFlowLabel(context, effect.unavailable);
+      const { content } = effect;
+      return settleStaffPageEffect(env, execution, lease, effect.work, {
+        ...effect.effect,
+        flowLabel,
+        ...(content === undefined
+          ? {}
+          : {
+              exit: passSharedDraftExit.bind(
+                null,
+                env,
+                execution,
+                lease,
+                content.member,
+                content.edit,
+                flowLabel,
+                [],
+              ),
+            }),
+      });
+    }
+    default:
+      return assertNever(effect);
   }
 }

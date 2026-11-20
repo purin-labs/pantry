@@ -29,7 +29,6 @@ import type {
   WorkflowCanvasReadTool,
 } from "../../actors/workflow-canvas-tools";
 import type { CatalogExecutionContext } from "../catalog/execute";
-import type { StaffPageToolReceipt } from "../catalog/types";
 import { defineToolFamily } from "../define-tool";
 import { ToolRequestError } from "../errors";
 import type {
@@ -40,6 +39,7 @@ import type {
   SupplyCostSaveTool,
 } from "./costs";
 import type { SUPPLIER_CREATE_FIELDS } from "./suppliers";
+import type { PreparedEffect } from "../../agent-tools/tool-effect";
 
 export type HarnessBakerySurfaceToolRequest =
   | Readonly<{ kind: "file_action"; action: BakeryFileAction }>
@@ -180,7 +180,7 @@ export type RecipeSaveRequest = Omit<RecipeDraft, "recipeId"> &
 type RecipeSaveTool = (
   request: RecipeSaveRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 export type SupplierToolRead = Readonly<{
   suppliers: readonly Readonly<{
@@ -208,7 +208,7 @@ export type SupplierCreateRequest = Readonly<
 type SupplierCreateTool = (
   request: SupplierCreateRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 export type RecipeWorkflowReadRequest = Readonly<{ workflowId: string | null }>;
 
@@ -271,7 +271,7 @@ type ProductionPlanEditTool = (
   request: HarnessProductionPlanEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<HarnessProductionPlan>;
+) => Promise<PreparedEffect>;
 
 /**
  * Plan 40D: a plan request that the model can correct, such as a request that

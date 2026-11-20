@@ -8,6 +8,7 @@ import type {
   CustomConnectorWriteCatalogEntry,
 } from "../../custom-connectors";
 import { defineToolFamily } from "../define-tool";
+import type { PreparedEffect } from "../tool-effect";
 
 type HarnessCustomConnectorRead = (
   entry: CustomConnectorReadCatalogEntry,
@@ -31,7 +32,9 @@ type IntegrationList = (
 export type IntegrationToolServices = {
   readonly listIntegrations: IntegrationList;
   readonly readAirtable?: (input: AirtableReadInput) => Promise<unknown>;
-  readonly writeAirtable?: (input: AirtableWriteInput) => Promise<unknown>;
+  readonly writeAirtable?: (
+    input: AirtableWriteInput,
+  ) => Promise<PreparedEffect>;
   readonly readCustomConnector: HarnessCustomConnectorRead;
   readonly proposeCustomConnectorWrite: HarnessCustomConnectorWriteProposal;
 };

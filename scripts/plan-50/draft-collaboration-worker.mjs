@@ -9,6 +9,8 @@ import {
   readProductDescriptionDraftForEmbeddedHarness,
   editProductDescriptionDraftForEmbeddedHarness,
 } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
+import { settleToolEffect } from "../../services/platform/src/agent-tools/session-support.ts";
+import { uncheckedEffect } from "../../services/platform/src/agent-tools/tool-effect.ts";
 import { createCommerceClient } from "../../services/platform/src/commerce/outbox-worker.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/provider.ts";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants.ts";
@@ -165,15 +167,27 @@ export class CandidateActor extends CodeModeActor {
     );
   }
 
+  // The tool gives its effect. This trial records a denial of the edit, so
+  // the edit and its exit check run inside the effect.
   async editProductDescriptionDraft(lease, request, operationId) {
+    return uncheckedEffect(() =>
+      this.editProductDescriptionDraftNow(lease, request, operationId),
+    );
+  }
+
+  async editProductDescriptionDraftNow(lease, request, operationId) {
     let result;
     try {
       const execution = await draftExecutionAdmission(this);
-      result = await editProductDescriptionDraftForEmbeddedHarness(
-        this.toolContext(execution, lease),
-        request,
-        operationId,
-        { kind: "direct" },
+      const context = this.toolContext(execution, lease);
+      result = await settleToolEffect(
+        context,
+        await editProductDescriptionDraftForEmbeddedHarness(
+          context,
+          request,
+          operationId,
+          { kind: "direct" },
+        ),
       );
     } catch (error) {
       await this.provider("/draft-collaboration-denied", {

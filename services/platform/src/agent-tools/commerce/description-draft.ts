@@ -66,7 +66,7 @@ export const productDescriptionDraftEdit = defineCommerceTool({
     capability: CAPABILITY_KEYS.commerceProductDescriptionDraftEdit,
   },
   unavailable: "product description draft edit is unavailable",
-  handler: ({ editProductDescriptionDraft }) =>
+  prepare: ({ editProductDescriptionDraft }) =>
     editProductDescriptionDraft === undefined
       ? undefined
       : (request, call) =>

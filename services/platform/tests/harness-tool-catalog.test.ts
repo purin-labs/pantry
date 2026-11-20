@@ -12,6 +12,7 @@ import {
   TOOL_REGISTRY,
   type PartialToolServices,
 } from "../src/agent-tools/registry";
+import { uncheckedEffect } from "../src/agent-tools/tool-effect";
 import { requireIntegrationAccountId } from "./test-ids";
 
 /**
@@ -415,7 +416,9 @@ async function executesAirtableTools(): Promise<void> {
     services: fixtureServices({
       integrations: {
         readAirtable: airtableReadFixture,
-        writeAirtable: airtableWriteFixture,
+        // An effect tool gives its effect; the fake has no exit check.
+        writeAirtable: async (input) =>
+          uncheckedEffect(() => airtableWriteFixture(input)),
       },
     }),
   });
@@ -726,10 +729,11 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
           reads.push(request);
           return snapshot;
         },
-        editProductDescriptionDraft: async (request, operationId) => {
-          edits.push({ request, operationId });
-          return snapshot;
-        },
+        editProductDescriptionDraft: async (request, operationId) =>
+          uncheckedEffect(async () => {
+            edits.push({ request, operationId });
+            return snapshot;
+          }),
       },
     }),
   });
@@ -772,7 +776,8 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     services: fixtureServices({
       commerce: {
         readProductDescriptionDraft: async () => snapshot,
-        editProductDescriptionDraft: async () => snapshot,
+        editProductDescriptionDraft: async () =>
+          uncheckedEffect(async () => snapshot),
       },
     }),
   });

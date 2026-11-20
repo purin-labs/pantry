@@ -20,6 +20,7 @@ import type {
 } from "./services";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";
+import { uncheckedEffect } from "../tool-effect";
 import { defineChannelTool } from "./services";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
@@ -99,7 +100,7 @@ export const emailReplyProposal = defineChannelTool({
     capability: CAPABILITY_KEYS.emailReplyPropose,
   },
   unavailable: "email reply propose is unavailable",
-  handler: ({ proposeEmailReply }) =>
+  prepare: ({ proposeEmailReply }) =>
     proposeEmailReply === undefined ? undefined : (request) => proposeEmailReply(request),
   readReceipt: readEmailProposalReceiptId,
 });
@@ -163,7 +164,7 @@ export const emailReplyDraftEdit = defineChannelTool({
     capability: CAPABILITY_KEYS.emailReplyPropose,
   },
   unavailable: "email reply draft edit is unavailable",
-  handler: ({ editEmailReplyDraft }) =>
+  prepare: ({ editEmailReplyDraft }) =>
     editEmailReplyDraft === undefined
       ? undefined
       : (request, call) =>
@@ -232,7 +233,7 @@ export const emailOperationalProposal = defineChannelTool({
     capability: CAPABILITY_KEYS.emailOperationalPropose,
   },
   unavailable: "email operational propose is unavailable",
-  handler: ({ proposeEmailOperational }) =>
+  prepare: ({ proposeEmailOperational }) =>
     proposeEmailOperational === undefined ? undefined : (request) => proposeEmailOperational(request),
   readReceipt: readEmailOperationalProposalReceiptId,
 });
@@ -287,8 +288,12 @@ export const whatsAppSupportReplySend = defineChannelTool({
     capability: CAPABILITY_KEYS.whatsappSupportReplySend,
   },
   unavailable: "whatsapp support reply send is unavailable",
-  handler: ({ sendWhatsAppSupportReply }) =>
-    sendWhatsAppSupportReply === undefined ? undefined : (request) => sendWhatsAppSupportReply(request),
+  // No exit check today (Refactor 17, Appendix C): the effect has other rules.
+  prepare: ({ sendWhatsAppSupportReply }) =>
+    sendWhatsAppSupportReply === undefined
+      ? undefined
+      : async (request) =>
+          uncheckedEffect(() => sendWhatsAppSupportReply(request)),
   readReceipt: readWhatsAppReceiptId,
 });
 

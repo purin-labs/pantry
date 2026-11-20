@@ -3,10 +3,10 @@ import {
   type WorkflowCanvasSource,
 } from "@purin-labs/bakery-model/bakery-canvas-source";
 import { CanvasMove } from "@purin-labs/workflow-canvas-crdt";
-import type { CanvasMoveOutcome } from "@purin-labs/workflow-canvas-crdt/move";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 import type { WorkflowCanvasRead } from "./workflow-canvas";
 import type { CatalogExecutionContext } from "../agent-tools/catalog/execute";
+import type { PreparedEffect } from "../agent-tools/tool-effect";
 
 export type WorkflowCanvasReadRequest = Readonly<{
   reference: WorkflowCanvasSource;
@@ -23,7 +23,7 @@ export type WorkflowCanvasMoveTool = (
   request: WorkflowCanvasMoveRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<CanvasMoveOutcome>;
+) => Promise<PreparedEffect>;
 
 export function parseWorkflowCanvasReadArgs(
   args: readonly unknown[],

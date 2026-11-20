@@ -82,11 +82,10 @@ import { assertNever } from "@purin-labs/std";
 import {
   type PreparedCommerceRead,
   admitCommerceReadObservation,
-  currentTurnFlowLabel,
   prepareStaffPageWork,
   requestableReportRead,
   selectMerchantReportSourceGrant,
-  settleStaffPageEffect,
+  type ToolEffect,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
@@ -557,20 +556,14 @@ export async function advanceOrderQueueForEmbeddedHarness(
   context: SessionToolContext,
   request: OrderQueueAdvanceRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
-  const { env, storage, execution, lease, assignment } = context;
+): Promise<ToolEffect<StaffPageToolReceipt>> {
+  const { env, execution, lease, assignment } = context;
   const work = await prepareStaffPageWork(
     env,
     execution,
     lease,
     assignment,
     "order",
-    "order queue",
-  );
-  const flowLabel = await currentTurnFlowLabel(
-    storage,
-    execution,
-    lease,
     "order queue",
   );
   const sink = {
@@ -581,45 +574,43 @@ export async function advanceOrderQueueForEmbeddedHarness(
     resourceScope: "order-queue:cafe",
     approvalSatisfied: false,
   };
-  return settleStaffPageEffect(env, execution, lease, work, {
-    flowLabel,
-    sink,
-    route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/order-queue/${request.fulfillmentId}/advance`,
-    operation: `order_queue.${request.action}`,
-    body: { action: request.action },
-    operationId,
-    result: `The order moved: ${request.action}. Call order_queue_read to see the queue now.`,
-    run: async (key) =>
-      orderQueueAdvanceRefusal(
-        await advanceOrderQueueEntry(
-          work.context,
-          request.fulfillmentId,
-          request.action,
-          key,
+  return {
+    kind: "staff_page",
+    work,
+    unavailable: "order queue information-flow authority unavailable",
+    effect: {
+      sink,
+      route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/order-queue/${request.fulfillmentId}/advance`,
+      operation: `order_queue.${request.action}`,
+      body: { action: request.action },
+      operationId,
+      result: `The order moved: ${request.action}. Call order_queue_read to see the queue now.`,
+      run: async (key) =>
+        orderQueueAdvanceRefusal(
+          await advanceOrderQueueEntry(
+            work.context,
+            request.fulfillmentId,
+            request.action,
+            key,
+          ),
         ),
-      ),
-    settled: signalShopScreens.bind(null, env, execution),
-  });
+      settled: signalShopScreens.bind(null, env, execution),
+    },
+  };
 }
 
 export async function markSoldOutForEmbeddedHarness(
   context: SessionToolContext,
   request: SoldOutMarkRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
-  const { env, storage, execution, lease, assignment } = context;
+): Promise<ToolEffect<StaffPageToolReceipt>> {
+  const { env, execution, lease, assignment } = context;
   const work = await prepareStaffPageWork(
     env,
     execution,
     lease,
     assignment,
     "product",
-    "sold out",
-  );
-  const flowLabel = await currentTurnFlowLabel(
-    storage,
-    execution,
-    lease,
     "sold out",
   );
   const sink = {
@@ -631,27 +622,31 @@ export async function markSoldOutForEmbeddedHarness(
     approvalSatisfied: false,
   };
   const soldOut = request.mark.kind === "today";
-  return settleStaffPageEffect(env, execution, lease, work, {
-    flowLabel,
-    sink,
-    route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/sold-out/${request.variantId}`,
-    operation: soldOut ? "sold_out.mark" : "sold_out.clear",
-    body: { soldOut, mark: request.mark },
-    operationId,
-    result: soldOut
-      ? "The item is sold out until the shop's next midnight. Screens show it, and checkout refuses it."
-      : "The sold out mark is gone. The item is on sale again.",
-    run: async (key) =>
-      soldOutMarkRefusal(
-        await setSoldOutMark(
-          work.context,
-          request.variantId,
-          request.mark,
-          key,
+  return {
+    kind: "staff_page",
+    work,
+    unavailable: "sold out information-flow authority unavailable",
+    effect: {
+      sink,
+      route: `/v1/control/organisations/${execution.scope.organisationId}/commerce/sold-out/${request.variantId}`,
+      operation: soldOut ? "sold_out.mark" : "sold_out.clear",
+      body: { soldOut, mark: request.mark },
+      operationId,
+      result: soldOut
+        ? "The item is sold out until the shop's next midnight. Screens show it, and checkout refuses it."
+        : "The sold out mark is gone. The item is on sale again.",
+      run: async (key) =>
+        soldOutMarkRefusal(
+          await setSoldOutMark(
+            work.context,
+            request.variantId,
+            request.mark,
+            key,
+          ),
         ),
-      ),
-    settled: signalShopScreens.bind(null, env, execution),
-  });
+      settled: signalShopScreens.bind(null, env, execution),
+    },
+  };
 }
 
 /** The pickup board and the menu screens show the step now. */
