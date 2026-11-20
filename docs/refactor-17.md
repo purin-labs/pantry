@@ -1934,6 +1934,57 @@ value, and it reads no field of the Actor class.
   policy, Jev, Memory and Evals parts of the Organisation were modules before this
   step.
 
+### The end of Stage A — Dead code after the ports (2026-11-21)
+
+No export is public without a user in another module, apart from the 15 that a
+reason keeps. A hand check came before each deletion.
+
+- **Unused exports: 797 to 15.** A name that only its own file uses lost `export`.
+  A declaration with no user is deleted, with what only it used. A re-export that
+  no file imports is gone from its barrel: the Vault, the access grants, the
+  context files and assembly, information flow, the Portal commerce barrel and the
+  commerce engine. A name that a doc or a plan names only in prose keeps its
+  declaration; it lost `export` or the barrel line.
+- **Two rules for knip.** `knip.json` ignores `services/platform/src/generated/`:
+  `scripts/generate-actions.ts` writes it and decides its exports (44 names). An
+  export that a reader outside the import graph needs has a `@public` tag with the
+  reader: `PIE_STATIONS` and `buildLiveRoomRoute` (two browser check scripts),
+  `INSIDE_CAPABILITIES` (`scripts/check-ifc-destinations.mjs` reads the source
+  text) and `outsideWrittenFlowLabel` (the IFC integration guide). The header of
+  `scripts/check-unused.mjs` gives both rules.
+- **What stays, with the reason.** `devices/work.ts` and `readKitchenDeviceView`:
+  Plan 24 calls them. Seven Vault names of `credential-vault/index.ts`: the Vault
+  API page of `apps/docs` gives them as the public API. `caseContributionSourceSchema`
+  of `packages/contracts/src/case-output.ts`: Plan 77 names it in that file; the
+  live parser is the one of `case-rpc.ts`. The six exports of
+  `tests/e2e/full-worker.ts`: a Worker harness of Plan 55 that no config starts, in
+  the test folder that another worker decides.
+- **`packages/contracts`.** 25 type re-exports had no user outside the package;
+  only its own type fixtures read them through the barrel. The fixtures now import
+  the source files, and the barrel drops the 25. The other 203 names of the barrel
+  have a user in another package.
+- **Copies: 842 to 825.** Merged: the admin cue route head of Shopify and Stripe
+  (`readCueChannelRequest` in `gateway/request-helpers.ts`), the rotation gizmo of
+  the two Kitchen floor scenes (`spatial/rotation-gizmo.ts`), the commerce action
+  path (derived from the request; a type check proved the two unions equal), the
+  chat list and search read, the end of the provider connection workflows
+  (`provider-managed-connection.ts`, `finalizeProviderConnection` and one
+  `scopesAreComplete`), the head of the two acceptance fault routes, and the entity
+  type parser of the commerce engine (it imports the client parser).
+- **Copies that stay.** The pour-over and siphon scenes: the gripper jaws have a
+  different geometry. `browser-physics-asset.ts`: `build-browser.mjs` writes its pin
+  data. The two Rust fetch crates: no shared crate exists, and one changes two
+  container builds. The refund and cancellation resolution of
+  `after-sale-cancellation.ts`, the recipe models, the Code Mode budget and governor
+  row parsers: each copy has its own types, errors or replay. The two CRDT draft
+  actors wait for step A2.6.
+- **Measures.** Layer crossings: 50, no change. Copies: 842 to 825. Unused
+  exports: 797 to 15, unused files: 1.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build`, `pnpm underclerk:check` and the unit suite (301 files, 1,730
+  tests) pass on the last code commit. No test file is deleted, and no old-row
+  adapter is deleted.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
