@@ -1,5 +1,4 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { DiscordInteractionInstall } from "../data/discord-install";
 import type {
   IntegrationProvider,
   LiveProviderWebhookContext,
@@ -7,7 +6,7 @@ import type {
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
 import { recordCredentialAccessDenial } from "./alerts";
-import type { VaultResolveError, VaultSecret } from "./domain";
+import type { VaultHandle, VaultResolveError, VaultSecret } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";
 import { resolveVaultHandle } from "./service";
 
@@ -106,10 +105,22 @@ async function resolveProviderWebhookCredentialInner(input: {
   });
 }
 
+/**
+ * What the Vault needs of a Discord installation to give its public key: the
+ * identity of the installation and the handle that it must hold. The Discord
+ * code gives its installation record, which has these fields.
+ */
+type DiscordVerificationBinding = Readonly<{
+  organisationId: OrganisationId;
+  applicationId: string;
+  guildId: string;
+  publicKeyRef: VaultHandle;
+}>;
+
 export async function resolveDiscordInteractionVerificationCredential(input: {
   readonly db: OrganisationDatabase;
   readonly keys: CredentialVaultBindings;
-  readonly install: DiscordInteractionInstall;
+  readonly install: DiscordVerificationBinding;
 }): Promise<Result<VaultSecret, ProviderWebhookResolutionError>> {
   const active = await input.db
     .prepare(

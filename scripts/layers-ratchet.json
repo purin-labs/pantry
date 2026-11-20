@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 352,
+    "upward": 351,
     "areas": 217,
     "order": 134,
     "table": 118
@@ -97,7 +97,7 @@
     "foundation/agent-tools -> foundation/conversation": 1,
     "foundation/agent-tools -> surfaces/slack": 1,
     "foundation/authority -> areas/commerce": 7,
-    "foundation/authority -> areas/integrations": 6,
+    "foundation/authority -> areas/integrations": 5,
     "foundation/authority -> foundation/agent": 14,
     "foundation/authority -> foundation/control": 12,
     "foundation/authority -> foundation/conversation": 4,
