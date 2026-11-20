@@ -1,4 +1,3 @@
-import { handleAccountPlatformRequest } from "./account-platform/routes";
 import { runScheduledPayoutReconciliation } from "./payouts/recovery";
 import type { Track } from "@purin-labs/contracts";
 import { handleControlRequest } from "./control-router";
@@ -27,7 +26,6 @@ import { runScheduledPaidReceiptDelivery } from "./commerce/paid-receipt";
 import { runFileContextReconciliation } from "./context/files";
 import { runAttachmentCollection } from "./messages/attachment-collection";
 import { runWeeklyChatGptLoginRefresh } from "./models/codex-connection";
-import { runAccountInstanceRelease } from "./account-platform/instance-release";
 import { runScheduledActorRegistryReconciliation } from "./actors/actor-registry-sweep";
 import { handleCommerceWebhook } from "./commerce/webhooks";
 import { handleMenuScreenRequest } from "./control/routes/menu-screens";
@@ -181,7 +179,6 @@ export default {
       runScheduledPayoutReconciliation(env, controller.scheduledTime),
     );
     ctx.waitUntil(runWeeklyChatGptLoginRefresh(env, controller.scheduledTime));
-    ctx.waitUntil(runAccountInstanceRelease(env, controller.scheduledTime));
     ctx.waitUntil(
       runScheduledActorRegistryReconciliation(env, controller.scheduledTime),
     );
@@ -198,8 +195,6 @@ async function handleRequest(
   env: Env,
   ctx: ExecutionContext,
 ): Promise<Response> {
-  const accountPlatform = await handleAccountPlatformRequest(request, env);
-  if (accountPlatform !== null) return accountPlatform;
   const url = new URL(request.url);
   const commerceLabRoute = matchCommerceLabRoute(url);
 

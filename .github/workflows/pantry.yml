@@ -58,22 +58,6 @@ jobs:
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
         run: node scripts/repo-binaries.mjs fetch --jobs 16
 
-      - name: Checkout pinned account acceptance authority
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          repository: purin-labs/monorepo
-          ref: 3a05ce4864dbbcec87d43122e9263bfecf922264
-          path: output/shared-account-authority/source
-          persist-credentials: false
-
-      - name: Build account acceptance authority
-        run: |
-          pnpm -C output/shared-account-authority/source install --frozen-lockfile
-          pnpm -C output/shared-account-authority/source/tests exec node helpers/buildSharedAccountPlatformWorker.mjs
-          account_worker="$GITHUB_WORKSPACE/output/shared-account-authority/source/.artifacts/shared-account-platform/account-worker/index.mjs"
-          sha256sum "$account_worker"
-          printf 'PANTRY_ACCOUNT_WORKER_ARTIFACT=%s\n' "$account_worker" >> "$GITHUB_ENV"
-
       - name: Check shared async-control package
         run: pnpm async-control:check
 
@@ -112,8 +96,8 @@ jobs:
       - name: Unit suites
         # The Platform unit suite, the Portal, storefront and package suites and
         # the Worker environment test (about one minute). It needs the R2 files,
-        # the async-control build, the media build of the Edge TypeScript check
-        # and the account Worker of the steps above.
+        # the async-control build and the media build of the Edge TypeScript
+        # check of the steps above.
         run: pnpm test:units
 
       - name: Edge end-to-end journeys

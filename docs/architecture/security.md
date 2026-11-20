@@ -201,14 +201,14 @@ The policy sets `outputScreeningMode` to `hold` or `stream`.
 
 ## Identity, approval and authorization
 
-| Identity class         | Record                                                                                     |
-| ---------------------- | ------------------------------------------------------------------------------------------ |
-| Portal user            | `app_user` with a `control_session`, signed in through Google OIDC (`control-oidc.ts`)     |
-| Support operator       | `control_support_role`: `support_agent` or `support_admin`                                 |
-| Organisation member    | `service_role_grant`: `owner`, `admin`, `operator` or `viewer`; the shared Console owns it |
-| Provider person        | a person bound to a provider account, such as a Slack user                                 |
-| Automation principal   | a workflow, agent mailbox or WhatsApp support binding                                      |
-| Cryptographic approver | a Seams identity with the `person_authz_role` `approve`                                    |
+| Identity class         | Record                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| Portal user            | `app_user` with a `control_session`, signed in through Google OIDC (`control-oidc.ts`)   |
+| Support operator       | `control_support_role`: `support_agent` or `support_admin`                               |
+| Organisation member    | `service_role_grant`: `owner`, `admin`, `operator` or `viewer`; Pantry owns it (Plan 95) |
+| Provider person        | a person bound to a provider account, such as a Slack user                               |
+| Automation principal   | a workflow, agent mailbox or WhatsApp support binding                                    |
+| Cryptographic approver | a Seams identity with the `person_authz_role` `approve`                                  |
 
 Display names and provider aliases never replace a canonical identity.
 Authorization needs three legs. If one leg fails, the operation is denied:

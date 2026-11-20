@@ -2,17 +2,8 @@
 // Gmail and the model provider are simulated here, in this process, so their
 // state is one state whichever Actor asks. The journey reads that state, and
 // delivers mail, through the control address below.
-//
-// The account authority is not simulated. This process starts the built
-// account Worker of the acceptance tests as a second local Worker with its
-// own database, and binds it to the fixture Worker as `ACCOUNT_PLATFORM`.
-// The account Worker has no public address in this journey.
 import {
-  accountArtifact,
-  artifactSha256,
   json,
-  runKeys,
-  startAccountWorker,
   startFixtureWorker,
   stopOnSignal,
   stream,
@@ -20,10 +11,6 @@ import {
 import { writeFileSync } from "node:fs";
 
 const [config, persistence, evidencePath] = process.argv.slice(2);
-
-const artifact = accountArtifact();
-const accountSha256 = artifactSha256(artifact);
-const keys = runKeys();
 
 const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
 const MODEL = "https://openrouter.ai/api/v1/chat/completions";
@@ -53,8 +40,6 @@ const state = {
   draftCreates: 0,
   sent: [],
   modelRequests: [],
-  /** Requests that the fixture Worker sent to the account authority. */
-  accountRequests: 0,
 };
 
 function record() {
@@ -67,10 +52,6 @@ function record() {
           turn: request.turn,
           toolResults: request.toolResults,
         })),
-        accountAuthority: {
-          workerSha256: accountSha256,
-          requests: state.accountRequests,
-        },
       },
       null,
       2,
@@ -363,24 +344,6 @@ async function control(request, url) {
   throw new Error(`Unexpected control request: ${request.url}`);
 }
 
-const account = await startAccountWorker({
-  artifact,
-  name: "satyr-plan42j-account-authority",
-  database: {
-    name: "plan42j-account-authority",
-    id: "00000000-0000-0000-0000-000000000427",
-  },
-  persistence,
-  port: 8843,
-  keys,
-});
-
-/** The binding of the fixture Worker to the account Worker. */
-function accountCall(request) {
-  state.accountRequests += 1;
-  return account.fetch(request);
-}
-
 async function respond(request) {
   const url = new URL(request.url);
   if (request.url === MODEL) return model(request);
@@ -393,8 +356,6 @@ const worker = await startFixtureWorker({
   config,
   persistence,
   port: 8842,
-  keys,
-  account: accountCall,
   respond,
 });
-stopOnSignal(worker, account);
+stopOnSignal(worker);

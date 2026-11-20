@@ -241,9 +241,8 @@ async function connectorOf(env: Env, fixture: Fixture) {
 /**
  * One organisation with an owner and a second administrator, a Gmail mailbox
  * that only the owner's role may read, an agent assigned to that mailbox, and
- * one supplier contact whose address is verified for it. The account
- * authority knows the Organisation, both people and the agent, so each control
- * request and each mailbox turn of the journey passes the real account check.
+ * one supplier contact whose address is verified for it. Each control request
+ * and each mailbox turn of the journey passes Pantry's real access check.
  */
 async function seed(env: Env) {
   const now = Date.now();

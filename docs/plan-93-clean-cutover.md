@@ -3,6 +3,12 @@
 Status: draft, 19 November 2026. Step 1 is done (see "Step 1 results").
 Steps 0 and 2 to 7 are open.
 
+Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step
+4): Pantry no longer binds the Console. The new stack has no
+`ACCOUNT_PLATFORM` binding and no `ACCOUNT_PLATFORM_*` value, a sign-up makes
+the organisation in Pantry, and the Console records of the old organisations
+are Refactor 260 work. The Console items below are history.
+
 - The owner asked for a Worker rename ("Plan a Worker rename").
 - Then the owner chose a clean cutover with the brand rename: "don't worry
   about legacy support or backwards compatibility, this will be a clean
@@ -218,8 +224,7 @@ The cutover replaces each of these. Nothing keeps the old value.
 
 - `satyr-edge.n6378056.workers.dev`: the Platform variables
   `PANTRY_PUBLIC_ORIGIN`, `PANTRY_OAUTH_CALLBACK_ORIGIN`,
-  `GMAIL_PUBSUB_AUDIENCE`, `ACCOUNT_PLATFORM_ASSERTION_ISSUER` and
-  `ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE`; the OAuth apps of Slack,
+  and `GMAIL_PUBSUB_AUDIENCE`; the OAuth apps of Slack,
   Google sign-in, Gmail, Google Drive, Square, Stripe Connect and its
   webhook, Shopify (`integrations/shopify/shopify.app.toml`), Airtable,
   Notion, Dropbox and the Meta webhook; the Gmail Pub/Sub push subscription;
@@ -339,7 +344,7 @@ One branch, from a freeze of dev:
 4. Set the secrets that step 4 does not need.
 5. Attach the custom domains.
 6. Check: the Portal loads on `pantry.purin.io`, a sign-up makes a new
-   organisation through the Console, the chat answers, and the idle-tenant
+   organisation in Pantry, the chat answers, and the idle-tenant
    check writes close to nothing in one hour.
 
 ### 4. Switch the outside parties
@@ -369,7 +374,6 @@ possible after this step.
 - Their container applications, the D1 databases, the buckets (empty them
   first), `POLICY_KV`, the queues, the old Secrets Store secrets, the old R2
   token for CI, and `shop.seams.tokyo`.
-- The Console records of the old organisations (seams-monorepo).
 - The old Kitchen physics bundles. A saved run resumes only on the bundle
   that made it, so each release of the old stack must hold every old bundle
   (Refactor 16: "Never remove a bundle that a saved run can name"). This

@@ -46,7 +46,7 @@ test and any fixture that exists only for the obsolete behavior.
   check asks Slack in the idle hour, and a result that stays the same writes
   nothing. `e2e/write-meter.ts` counts the writes and names the D1 statement
   that wrote. Run the journey after a change to a cron, an alarm, a poll or a
-  Durable Object constructor. It needs the account Worker.
+  Durable Object constructor.
 - `e2e/unregistered-actors.test.ts` covers the operator's erase of an Actor by
   its object identifier: what is erased, and the two refusals that protect a
   registered Actor and one whose Organisation exists.
@@ -57,16 +57,15 @@ test and any fixture that exists only for the obsolete behavior.
   Slack still checks out with that token, and a second run changes nothing.
   `e2e/slack-workspace-support.ts` holds the Slack workspace that it shares
   with `e2e/purged-organisation-reclaim.test.ts` and
-  `e2e/idle-tenant-cost.test.ts`. It needs the account Worker.
+  `e2e/idle-tenant-cost.test.ts`.
 - `e2e/message-link-fetch-placement.test.ts` follows a documentation read of
   a Portal chat and a link read of a Session to the link-fetch Actor of the
   Organisation's region, and checks that the operator's erase refuses that
-  Actor. It needs the account Worker (`PANTRY_ACCOUNT_WORKER_ARTIFACT`).
+  Actor.
 - `e2e/custom-connector-fetch-placement.test.ts` follows the Portal setup of a
   custom connector, from the draft to the test of its key, to the fetch
   container of the Organisation, asked for in the Organisation's region, and
-  checks that the operator's erase refuses that container. It needs the
-  account Worker as well.
+  checks that the operator's erase refuses that container.
 - `e2e/outside-written-effect.test.ts` is the allowed/denied journey of the
   writer rule (Plan 89): a Portal request that read text of an outside person
   asks before an Airtable write, shows the exact record to the person who
@@ -76,21 +75,18 @@ test and any fixture that exists only for the obsolete behavior.
   the text. The supplier Memory journey of `e2e/mail-inbox.test.ts` covers
   the direct reply rule: a stranger's direct reply becomes a draft, and a
   verified supplier's goes. `e2e/airtable-exit-support.ts` holds the Airtable
-  account that it shares with `e2e/airtable-exit-approval.test.ts`. Both need
-  the account Worker.
+  account that it shares with `e2e/airtable-exit-approval.test.ts`.
 - `e2e/case-context-discovery-access.test.ts` is the allowed/denied journey of
   the case context policy route: an administrator publishes the policy, and a
-  viewer's read, change and relationship review are refused. It needs the
-  account Worker.
+  viewer's read, change and relationship review are refused.
 - `e2e/chat-side-case.test.ts` follows a side Case (Plan 74) from the agent's
   proposal to the person's start, the limit of open proposals, a dismissal
   and the deletion of the source chat. `e2e/chat-side-case-ifc.test.ts` is
   its allowed/denied journey: a side Case closes for a person who loses the
-  source chat. Both need the account Worker.
+  source chat.
 - `e2e/chat-paused-read.test.ts` is the allowed/denied journey of a chat that
   waits for a permission: the chat and its goal open for a person who may read
   the paused turn, and close when that person loses a read that the turn used.
-  It needs the account Worker.
 - `e2e/chat-queued-steer.test.ts` and `e2e/chat-queued-steer-join.test.ts` follow
   Steer on a queued Portal message: the cancel path with a second queued message
   behind it and a double click, and the join path with no second turn. Each
@@ -99,8 +95,7 @@ test and any fixture that exists only for the obsolete behavior.
   proposal with its Start button, a double click that starts one new thread,
   the first turn for the member who clicked, a reply in the new thread and a
   late click. `e2e/slack-side-case-dm.test.ts` does the same in a DM, where a
-  click by another member is refused. Both need the account Worker, and each
-  runs in its own process. A second journey in `slack-side-case.test.ts`
+  click by another member is refused. Each runs in its own process. A second journey in `slack-side-case.test.ts`
   follows a start that stops after its claim: when the start's lease ends,
   another member starts the side Case (Refactor 15).
 - `e2e/bakery-surface-quarantine.test.ts` gives a Session 33 damaged Satyr
@@ -119,8 +114,7 @@ test and any fixture that exists only for the obsolete behavior.
 - `e2e/device-commands.test.ts` follows the pauses that Satyr sends to a shop
   gateway: a refused snapshot of a paused camera leaves the pause unconfirmed
   until the gateway answers the pause, and a pause sent while the gateway is
-  offline reaches it at its next hello, one time (Refactor 15). It needs the
-  account Worker.
+  offline reaches it at its next hello, one time (Refactor 15).
 - `e2e/whatsapp-send-attempt.test.ts` follows an approved WhatsApp reply
   while a fake Meta holds the message: a Connector that stops during the
   call ends the reply as `send_indeterminate` and fences the number, so the
@@ -129,7 +123,7 @@ test and any fixture that exists only for the obsolete behavior.
   (Refactor 15). `e2e/whatsapp-connector-support.ts` installs the WhatsApp
   number, Case and proposal that it shares with `whatsapp-placement.test.ts`
   and `inbox-whatsapp.test.ts` (with `inbox: true`, the number is selected and
-  the draft is in the Inbox). It needs the account Worker.
+  the draft is in the Inbox).
 - `e2e/slack-held-output.test.ts` follows an answer that the exit check
   holds (Plan 27C): it waits as `held` until a person decides, and an allowed
   answer that Slack refuses for good ends as `rejected`, so the
@@ -137,8 +131,7 @@ test and any fixture that exists only for the obsolete behavior.
 - `e2e/slack-steering-recovery.test.ts` follows a steering reply through the
   loss of the Session Actor: a turn that resumes places it once, and a turn
   that cannot resume reports it as withdrawn, so the reply returns to the
-  Connector queue and does not stay parked (Refactor 15). It needs the
-  account Worker.
+  Connector queue and does not stay parked (Refactor 15).
 - `e2e/provider-removed-access.test.ts` follows Shopify's `app/uninstalled`
   and Stripe's `account.application.deauthorized` to the credential
   revocation: the account, its connection, its webhooks and its Vault secret
@@ -157,24 +150,23 @@ test and any fixture that exists only for the obsolete behavior.
   installing Organisation is archived, cleaned up and deleted: a new
   Organisation connects the workspace in the Portal and adds the channel that
   the deleted one left behind, but not a channel that an Organisation in use
-  holds. It needs the account Worker.
+  holds.
 - `e2e/schedule-runs.test.ts` follows one hourly schedule from the agent
   operations and the owner's grants to its dispatched Case, whose agent
   lists the integrations under the schedule's grant. It reads the runs of
   the window: a member of the schedule's Project gets the finished run, with
   the first line of its instruction as its title and no record withheld, as
   their Activity timeline shows it. An administrator without a seat in that
-  Project gets the same run (Plan 27C). It needs the account Worker.
+  Project gets the same run (Plan 27C).
 - `e2e/order-queue.test.ts` follows QR orders through the staff queue and the
   pickup board (Plan 40B phase 3): a made-to-order drink and a cookie from
   stock, a sale in the middle of a staff action, an early hand-over, a second
   tablet and a viewer. It also follows a declined QR payment and its paid
-  retry to the failed payments list. It needs the account Worker.
+  retry to the failed payments list.
 - `e2e/paid-receipt-outbox.test.ts` takes two paid QR orders while the
   café's Slack connection is disabled: the feed reads every event of the
   shop, the receipts wait as `failed` with their reason, and the retry pass
-  posts each one once when Slack works again (Refactor 15). It needs the
-  account Worker.
+  posts each one once when Slack works again (Refactor 15).
 - `e2e/placement-move.test.ts` follows the operator's placement moves
   through the admin routes (Refactor 15): a restore that stops after the
   freeze is abandoned, a recovery relocation makes the Organisation active
@@ -185,7 +177,7 @@ test and any fixture that exists only for the obsolete behavior.
   a product's photos on the product page: a retry and a second click add
   nothing, Undo puts a removed photo back, an older view, an operator, a
   drawing and a file whose bytes are not its named type change nothing, and
-  the shop's catalog shows each order. It needs the account Worker.
+  the shop's catalog shows each order.
 - `e2e/portal-order-cancel.test.ts` follows a paid order that an owner cancels
   from the Orders page, with the id that the page reads from Underclerk: no
   money moves before the approval, and the approval cancels and refunds it.
@@ -195,21 +187,20 @@ test and any fixture that exists only for the obsolete behavior.
   and a mark that checkout refuses and a clear that it accepts.
   `e2e/chat-agent-order-queue-recovery.test.ts` loses the Session Actor after a
   hand-over: the receipt answers the repeated call. A person who loses the staff
-  role during a turn moves nothing. Both need the account Worker.
+  role during a turn moves nothing.
 - `e2e/chat-agent-order-lifecycle.test.ts` follows an owner who asks the
   Portal chat agent if the orders are fulfilled, with one order handed over
   and one in the queue: the agent's order read names no `lifecycle` field and
   still gets each order's state as the Orders page shows it. An administrator
-  without the order read gets no order. It needs the account Worker.
+  without the order read gets no order.
 - `e2e/chat-agent-recipes-suppliers.test.ts` follows the Portal chat agent through
   recipes and suppliers (Plan 81): a prompt for each missing read and capability,
   the exit check of a private chat, a save that the person's page shows, a stale
-  edit and a wrong unit refused, and a supplier added, repeated and refused. It
-  needs the account Worker.
+  edit and a wrong unit refused, and a supplier added, repeated and refused.
 - `e2e/mail-inbox-reconnect.test.ts` follows a Gmail mailbox whose sign-in
   Google refuses: the Inbox asks each reader to reconnect it, asks Google one
   time, refuses a viewer's reconnect, and reads mail after the owner's
-  reconnect. It needs the account Worker. `e2e/gmail-mailbox-support.ts`
+  reconnect. `e2e/gmail-mailbox-support.ts`
   holds the connected mailbox, its setup and Google's ID token that the mail
   journeys share.
 - `e2e/counter-receipt-printer.test.ts` follows the receipt printer and the
@@ -218,8 +209,7 @@ test and any fixture that exists only for the obsolete behavior.
   nothing more, a printer with no paper shows the error while the sale stays
   complete, and a viewer is refused. Its socket only carries messages:
   `shop-gateway-adapters.ts` runs the real `shop-gateway answer`, whose
-  simulated printer writes the artifact in `output/e2e/shop-gateway/`. It
-  needs the account Worker and `cargo`.
+  simulated printer writes the artifact in `output/e2e/shop-gateway/`. It needs `cargo`.
 - `e2e/bake-proposal.test.ts` follows the bake proposals of Plan 24 S1. The
   café sells financiers through its QR order path, from the declared morning
   in `scripts/plan-24/counter-day.json`, and Commerce restocks the counter.
@@ -231,7 +221,7 @@ test and any fixture that exists only for the obsolete behavior.
   decides; a second click changes nothing. A second journey has the Portal
   chat agent propose a bake and a stock level for a person, with no tool that
   approves, and a viewer stays refused. The artifacts are in
-  `output/plan-24/`. It needs the account Worker.
+  `output/plan-24/`.
 - `e2e/cobot-gateway.test.ts` is the exit journey of Plan 24 S3: the Plan 85
   gateway journey with two simulated FR10 cobots and the oven behind the real
   `cobot` adapter. The three found devices wait for a person, a pause and a
@@ -243,7 +233,7 @@ test and any fixture that exists only for the obsolete behavior.
   `shop-gateway-adapters.ts` runs `cobot-controller` and `shop-gateway relay`
   for a home; `e2e/cobot-gateway-support.ts` pumps messages between the socket
   and the relay. The artifact is `output/plan-24/cobot-gateway-journey.json`.
-  It needs the account Worker, `cargo`, and `PANTRY_COBOT_CONTROLLER_BINARY`
+  It needs `cargo` and `PANTRY_COBOT_CONTROLLER_BINARY`
   or `MUJOCO_DIR`.
 - `e2e/bake-run.test.ts` is the exit journey of Plan 24 S4: one approved bake
   on the server, through the real gateway relay and the controller simulator
@@ -259,8 +249,7 @@ test and any fixture that exists only for the obsolete behavior.
   `e2e/bake-slack-support.ts` their Slack cards and signed clicks. `e2e/bake-run-support.ts` holds the cobot kitchen of
   the bake run journeys: the counter, the controller simulator, the real
   gateway relay, the three confirmed devices, the kitchen's authority and the
-  level. The artifact is `output/plan-24/bake-run-journey.json`. It needs the
-  account Worker, `cargo` and `MUJOCO_DIR`.
+  level. The artifact is `output/plan-24/bake-run-journey.json`. It needs `cargo` and `MUJOCO_DIR`.
 - `e2e/bake-shadow.test.ts` is the exit journey of Plan 24 S5: a kitchen is
   in shadow mode until an admin changes it, and an operator and a viewer
   cannot. An approved proposal starts a shadow run. The controller simulator
@@ -297,7 +286,7 @@ test and any fixture that exists only for the obsolete behavior.
   on a Slack card. The Portal read and the Slack record hold every proposal,
   approval, dispatch, receipt and check, and the two days give the same
   outcomes. Artifact: `output/plan-24/cafe-day.json`. Each S6 journey needs
-  the account Worker, `cargo` and `MUJOCO_DIR` (or
+  `cargo` and `MUJOCO_DIR` (or
   `PANTRY_COBOT_CONTROLLER_BINARY`).
 - `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an

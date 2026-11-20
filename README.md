@@ -173,17 +173,10 @@ links. `pnpm portal` remains available when only the portal is needed. Run
 `pnpm local:init` once when local service secrets are missing. Backend startup
 preserves data and never seeds or migrates it automatically.
 
-The Platform asks the shared account Worker on each Portal request, through
-the `ACCOUNT_PLATFORM` service binding. In local development that Worker is
-`seams-sdk-d1-local` of the Seams checkout, and it runs in its own process
-(`pnpm router` there). The two Workers share a provision token and two
-signing keys. `pnpm local:init` creates them and writes the account Worker's
-side to `services/platform/.dev.vars.local.account-platform`. With
-`SEAMS_MONOREPO_ROOT` set to the Seams checkout, it also installs those lines
-in the `.env.local` of that checkout and keeps the other lines of that file.
-An Organisation is created in the local Console, which then provisions it on
-the local Platform. While the account Worker does not run, the Portal's
-control requests answer `503`.
+Pantry keeps its own organisations, members and invitations
+([Plan 95](docs/plan-95-pantry-own-accounts.md)). A person signs in with
+Google and makes an organisation in the Portal; local development needs no
+other checkout or account Worker.
 
 The local HTTP addresses are:
 
@@ -200,20 +193,7 @@ remain available as aliases. Google sign-in uses the HTTPS loopback origin at
 
 ## Checks
 
-Protected-access checks use the real account authority through a built acceptance Worker.
-Build it in a separate `purin-labs/monorepo` checkout, then set its absolute path:
-
-```bash
-pnpm -C /path/to/monorepo/tests exec node helpers/buildSharedAccountPlatformWorker.mjs
-export PANTRY_ACCOUNT_WORKER_ARTIFACT=/path/to/monorepo/.artifacts/shared-account-platform/account-worker/index.mjs
-```
-
-The Worker contains fixture controls and test keys. Use it only for acceptance tests.
-Pantry production imports no `purin-labs/monorepo` source.
-CI checks out an exact commit from the public `purin-labs/monorepo` repository.
-It installs the locked dependencies and builds the same acceptance Worker in that separate checkout.
-Native journeys receive only the built Worker path and record its SHA-256 digest.
-The workflow needs no additional access token or repository variables.
+The checks need no other repository and no outside account service.
 
 ```bash
 pnpm --filter @purin-labs/platform check:types

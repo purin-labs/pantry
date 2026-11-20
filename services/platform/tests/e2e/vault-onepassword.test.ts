@@ -376,7 +376,6 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
 
   Object.assign(task.meta, {
     vaultOnePassword: {
-      accountWorkerSha256: env.TEST_ACCOUNT_PLATFORM_WORKER_SHA256,
       responses: seen.length,
       onePasswordCalls: (await onePasswordState()).tokens.length,
       checks: [

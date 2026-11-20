@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The shop Mac journey (Plan 82 Phase 1B). It runs real parts from end to end:
 
-- the Platform's real routes on a local Worker with its own D1, and the real account Worker,
+- the Platform's real routes on a local Worker with its own D1,
 - the real install script, launchd job, Python packages, Whisper and Qwen3-ASR with MLX on this Mac,
 - real speech from macOS, sent over real TLS with the grants that the Platform signs.
 
@@ -264,8 +264,6 @@ def stop(process: subprocess.Popen) -> None:
 
 
 def main() -> None:
-    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit("Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="shop-voice-journey-")).resolve()
     voice_home = work / "home"

@@ -72,11 +72,6 @@ The same batch writes `organisation_onboarding` (`configuring`,
 row and the `organisation_created` event. A failed batch creates no
 Organisation.
 
-Until Plan 95 step 4, `runAccountInstanceRelease` in
-[`instance-release.ts`](../../services/platform/src/account-platform/instance-release.ts)
-still reports an Organisation that can no longer be restored to the old
-Console.
-
 ### Organisation lifecycle
 
 `organisation_onboarding.lifecycle` is `configuring`, `activating`, `active`

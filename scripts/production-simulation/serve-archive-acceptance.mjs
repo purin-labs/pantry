@@ -1,9 +1,8 @@
 // The isolated runtime of the shared archive journeys (Plan 70 J3):
-// archive-browser-worker.ts on http://127.0.0.1:8840 with production routing,
-// local D1 and R2, and the built account Worker as its account authority.
+// archive-browser-worker.ts on http://127.0.0.1:8840 with production routing
+// and local D1 and R2.
 //
-//   PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker> \
-//     node scripts/production-simulation/serve-archive-acceptance.mjs DIR PORTAL_ORIGIN
+//   node scripts/production-simulation/serve-archive-acceptance.mjs DIR PORTAL_ORIGIN
 //
 // DIR is a fresh directory for the state of one run, so that no file of an
 // earlier run shortens an upload. PORTAL_ORIGIN is the origin of the Portal
@@ -15,10 +14,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  accountArtifact,
   prepareFixtureState,
-  runKeys,
-  startAccountWorker,
   startFixtureWorker,
   stopOnSignal,
   text,
@@ -36,30 +32,15 @@ const config = join(
   root,
   "scripts/production-simulation/archive-wrangler.jsonc",
 );
-const artifact = accountArtifact();
 prepareFixtureState({
   config,
   persistence,
   log: join(output, "state.log"),
 });
-const keys = runKeys();
-const account = await startAccountWorker({
-  artifact,
-  name: "satyr-archive-account-authority",
-  database: {
-    name: "archive-account-authority",
-    id: "00000000-0000-0000-0000-000000000841",
-  },
-  persistence,
-  port: 8841,
-  keys,
-});
 const worker = await startFixtureWorker({
   config,
   persistence,
   port: 8840,
-  keys,
-  account: (request) => account.fetch(request),
   bindings: {
     PANTRY_PUBLIC_ORIGIN: text(browserOrigin),
     ASSETS: { type: "fetcher", fetcher: asset },
@@ -68,7 +49,7 @@ const worker = await startFixtureWorker({
     throw new Error(`Unexpected external request: ${request.url}`);
   },
 });
-stopOnSignal(worker, account);
+stopOnSignal(worker);
 writeFileSync(
   join(output, "runtime.json"),
   `${JSON.stringify(
@@ -78,7 +59,6 @@ writeFileSync(
       storage: output,
       kind: "local-workerd-d1-r2",
       routes: "production handlers and authorization",
-      account: "built account Worker",
     },
     null,
     2,

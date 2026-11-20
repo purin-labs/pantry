@@ -98,10 +98,9 @@ async function seedMenu(env: Env) {
 }
 
 /**
- * One active organisation with an owner and a second administrator, whom
- * the account authority admits, and Pantry's model route. Owners may read
- * the Case context that a Portal chat reads. Kitchen needs no other
- * grant: its browser controls follow the owner's role.
+ * One active organisation with an owner, a second administrator and Pantry's
+ * model route. Owners may read the Case context that a Portal chat reads.
+ * Kitchen needs no other grant: its browser controls follow the owner's role.
  */
 async function seed(env: Env) {
   const now = Date.now();

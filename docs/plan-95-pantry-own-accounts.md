@@ -1,8 +1,8 @@
 # Plan 95 — Pantry owns its accounts
 
 Status: in progress, 21 November 2026. The owner decided the five decisions
-on 20 November 2026 (see "Decisions"). Steps 1, 2 and 3 are done (see their
-"results" sections). Steps 4, 5 and 6 are open.
+on 20 November 2026 (see "Decisions"). Steps 1 to 4 are done (see their
+"results" sections). Step 5 needs the owner for its gate. Step 6 is open.
 
 - The owner decided on 20 November 2026: the Seams Wallet and its Console are
   one product, apart from Purin. Pantry and the Wallet stop sharing
@@ -632,6 +632,33 @@ where the work differs from the list above:
   `pnpm lint:unused`, `pnpm lint:layers` and `pnpm lint:d1-patch`; and
   `git grep -n -e ACCOUNT_PLATFORM -e console-shared -e SatyrAccountPlatform`
   finds nothing outside plans and evidence.
+
+#### Step 4 results
+
+Done on 21 November 2026. What changed, and where the work differs from the
+list above:
+
+- `services/platform/src/account-platform/` is deleted, with the
+  `/account-platform/v1/*` route, its `run_worker_first` entry and the
+  instance release pass of the cron.
+- The binding, the ten values and the three secrets are gone from
+  `wrangler.jsonc` (local and production) and `env.ts`. `vendor/seams/` and
+  the last pin are gone, and the lockfile names no Console package.
+- The D1 patch is two scripts, because the two databases differ:
+  `plan-95-console-removal-global-d1-patch.sql` and
+  `plan-95-console-removal-regional-d1-patch.sql`. The three old patch scripts
+  that made the Console tables are deleted, so nobody can make them again.
+- The E2E suite no longer loads the account Worker. The script harnesses of
+  Plans 40B, 42J, 50, 74, 81 and 84, the production simulation, the shop
+  gateway, the shop voice journeys and `pnpm local:init` no longer start it
+  or write its values. CI no longer checks out `purin-labs/monorepo`.
+- The grep of the check finds nothing outside plans and evidence, except the
+  past rename codemods in `scripts/rename/`, whose maps name old packages as
+  data.
+- The Plan 50 trial `recovery_schema_upgrade` fails with
+  `schema_version_retired:session_hot_schema:32:33`. It stages Session schema
+  32, which Plan 92 retired, so the failure is older than this step.
+- Idle cost: lower. The instance release pass no longer runs in the cron.
 
 ### 5. Release and production proof
 

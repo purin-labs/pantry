@@ -4,8 +4,7 @@ async (page) => {
   // /test/propose runs the tool's own preparation, so no model turn is needed here.
   // `tests/e2e/bakery-workflow-agent.test.ts` covers the turn itself.
   //
-  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
-  //   python3 scripts/plan-74/run-browser.py --journey scripts/plan-84/browser-proposal.js \
+  // Run: python3 scripts/plan-74/run-browser.py --journey scripts/plan-84/browser-proposal.js \
   //   --entry /workflow-draft-preview.html --artifacts output/acceptance/plan-84/j7-browser
   const WORKER = "http://127.0.0.1:8874";
   const PORTAL = "http://127.0.0.1:3174";

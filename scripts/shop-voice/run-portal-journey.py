@@ -98,8 +98,6 @@ def portal_up() -> bool:
 
 
 def main() -> None:
-    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit("Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
     # Playwright 1.55 holds audioWorklet.addModule forever. 1.64.1 does not.
     if not os.environ.get("PLAYWRIGHT_MODULE"):
         raise SystemExit("Set PLAYWRIGHT_MODULE to a Playwright 1.64.1 or later package folder.")

@@ -297,9 +297,6 @@ CREATE UNIQUE INDEX idx_organisation_placement_active
   ON organisation_placement (organisation_id)
   WHERE status = 'active';
 CREATE TABLE service_role_grant (
-  platform_membership_id TEXT,
-  account_access_revision INTEGER NOT NULL DEFAULT 1 CHECK (account_access_revision >= 1),
-  account_acceptance_receipt_id TEXT,
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   user_id TEXT NOT NULL,
   person_id TEXT NOT NULL,
@@ -4487,22 +4484,6 @@ CREATE TABLE side_case_proposal (
 CREATE INDEX side_case_proposal_source ON side_case_proposal (organisation_id, source_conversation_id, created_at);
 CREATE INDEX side_case_proposal_source_case ON side_case_proposal (organisation_id, source_case_id, status);
 
-CREATE TABLE account_service_invitation_role (
-  native_organisation_id TEXT NOT NULL REFERENCES organisation(organisation_id),
-  platform_invitation_id TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'operator', 'viewer')),
-  invited_by_native_user_id TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  accepted_at INTEGER,
-  accepted_native_user_id TEXT,
-  PRIMARY KEY (native_organisation_id, platform_invitation_id),
-  CHECK ((accepted_at IS NULL) = (accepted_native_user_id IS NULL))
-);
-CREATE TRIGGER account_service_invitation_role_immutable BEFORE UPDATE ON account_service_invitation_role
-WHEN NEW.native_organisation_id <> OLD.native_organisation_id OR NEW.platform_invitation_id <> OLD.platform_invitation_id
- OR NEW.role <> OLD.role OR NEW.invited_by_native_user_id <> OLD.invited_by_native_user_id OR NEW.created_at <> OLD.created_at
- OR (OLD.accepted_at IS NOT NULL AND (NEW.accepted_at IS NOT OLD.accepted_at OR NEW.accepted_native_user_id IS NOT OLD.accepted_native_user_id))
-BEGIN SELECT RAISE(ABORT, 'account_service_invitation_role_conflict'); END;
 
 CREATE TABLE organisation_invitation (
   organisation_id TEXT NOT NULL REFERENCES organisation(organisation_id),
@@ -4530,18 +4511,6 @@ WHEN OLD.state <> 'pending' OR NEW.organisation_id <> OLD.organisation_id
   OR NEW.expires_at <> OLD.expires_at
 BEGIN SELECT RAISE(ABORT, 'organisation_invitation_closed'); END;
 
-CREATE TABLE account_service_access_revision (
-  native_organisation_id TEXT NOT NULL REFERENCES organisation(organisation_id),
-  native_user_id TEXT NOT NULL,
-  access_revision INTEGER NOT NULL CHECK (access_revision >= 1),
-  cleanup_pending INTEGER NOT NULL CHECK (cleanup_pending IN (0, 1)),
-  updated_at INTEGER NOT NULL,
-  PRIMARY KEY (native_organisation_id, native_user_id)
-);
-CREATE TRIGGER account_service_access_revision_monotonic BEFORE UPDATE ON account_service_access_revision
-WHEN NEW.native_organisation_id <> OLD.native_organisation_id OR NEW.native_user_id <> OLD.native_user_id
- OR NEW.access_revision < OLD.access_revision OR NEW.updated_at < OLD.updated_at
-BEGIN SELECT RAISE(ABORT, 'account_service_access_revision_conflict'); END;
 CREATE TABLE device_gateway (
   gateway_id TEXT PRIMARY KEY,
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),

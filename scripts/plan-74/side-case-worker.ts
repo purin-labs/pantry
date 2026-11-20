@@ -125,9 +125,8 @@ async function propose(env: Env, raw: unknown): Promise<Response> {
 }
 
 /**
- * One active organisation with an owner and a second administrator, whom
- * the account authority admits, and Pantry's model route. Owners may read
- * the Case context that a Portal chat reads.
+ * One active organisation with an owner, a second administrator and Pantry's
+ * model route. Owners may read the Case context that a Portal chat reads.
  */
 async function seed(env: Env) {
   const now = Date.now();

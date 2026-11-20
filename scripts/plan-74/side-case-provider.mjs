@@ -2,16 +2,8 @@
 // sends out. The model provider is simulated here, in this process, so its
 // record is one record whichever Actor asks. The journey reads that record
 // through the control address below.
-//
-// The account authority is not simulated. This process starts the built
-// account Worker of the acceptance tests as a second local Worker with its
-// own database, and binds it to the fixture Worker as `ACCOUNT_PLATFORM`.
 import {
-  accountArtifact,
-  artifactSha256,
   json,
-  runKeys,
-  startAccountWorker,
   startFixtureWorker,
   stopOnSignal,
   stream,
@@ -19,10 +11,6 @@ import {
 import { writeFileSync } from "node:fs";
 
 const [config, persistence, evidencePath] = process.argv.slice(2);
-
-const artifact = accountArtifact();
-const accountSha256 = artifactSha256(artifact);
-const keys = runKeys();
 
 const MODEL = "https://openrouter.ai/api/v1/chat/completions";
 const CONTROL = "https://side-case-fixture.internal";
@@ -37,7 +25,6 @@ const SIDE_ANSWER = "I will check the almond croissant price record.";
 
 const state = {
   modelRequests: [],
-  accountRequests: 0,
 };
 
 function record() {
@@ -51,10 +38,6 @@ function record() {
           answer: request.answer,
           historyRoles: request.historyRoles,
         })),
-        accountAuthority: {
-          workerSha256: accountSha256,
-          requests: state.accountRequests,
-        },
       },
       null,
       2,
@@ -205,24 +188,6 @@ function control(request, url) {
   throw new Error(`Unexpected control request: ${request.url}`);
 }
 
-const account = await startAccountWorker({
-  artifact,
-  name: "satyr-plan74-account-authority",
-  database: {
-    name: "plan74-account-authority",
-    id: "00000000-0000-0000-0000-000000000475",
-  },
-  persistence,
-  port: 8875,
-  keys,
-});
-
-/** The binding of the fixture Worker to the account Worker. */
-function accountCall(request) {
-  state.accountRequests += 1;
-  return account.fetch(request);
-}
-
 async function respond(request) {
   const url = new URL(request.url);
   if (request.url === MODEL) return model(request);
@@ -234,8 +199,6 @@ const worker = await startFixtureWorker({
   config,
   persistence,
   port: 8874,
-  keys,
-  account: accountCall,
   respond,
 });
-stopOnSignal(worker, account);
+stopOnSignal(worker);

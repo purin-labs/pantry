@@ -43,8 +43,6 @@ def single_database_schema_file():
 
 
 def main() -> None:
-    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit("Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
     stop_file = Path(os.environ["SHOP_VOICE_STOP_FILE"])
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="shop-voice-safari-")).resolve()

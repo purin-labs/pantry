@@ -10,17 +10,6 @@
     "OPENROUTER_API_KEY": "synthetic-brain-fixture-simulated-provider",
     "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
     "SESSION_TOKEN_SECRET": "synthetic-brain-fixture-session-token-secret",
-    // The built account Worker of the acceptance tests. The provider process
-    // runs it, binds it as ACCOUNT_PLATFORM and adds the two keys of each run.
-    "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "shared-account-satyr-e2e",
-    "ACCOUNT_PLATFORM_PROVISION_TOKEN": "shared-account-e2e-pantry-provision",
-    "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-shared-account-e2e",
-    "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "https://account.shared-account.invalid",
-    "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://satyr.shared-account.invalid",
-    "ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID": "satyr-shared-account-e2e",
-    "ACCOUNT_PLATFORM_ASSERTION_ISSUER": "https://satyr.shared-account.invalid",
-    "ACCOUNT_PLATFORM_ASSERTION_AUDIENCE": "https://account.shared-account.invalid",
-    "GOOGLE_OIDC_CLIENT_ID": "shared-account-satyr-e2e",
   },
   "exports": {
     "OrganisationDO": { "type": "durable-object", "storage": "sqlite" },

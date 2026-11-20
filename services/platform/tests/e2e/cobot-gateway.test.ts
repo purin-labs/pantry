@@ -29,8 +29,8 @@ import {
  * the node side (tests/shop-gateway-adapters.ts); the socket only carries the
  * relay's messages. The relay and the controller decide every answer.
  *
- * The artifact is output/plan-24/cobot-gateway-journey.json. It needs the
- * account Worker, `cargo`, and PANTRY_COBOT_CONTROLLER_BINARY or MUJOCO_DIR.
+ * The artifact is output/plan-24/cobot-gateway-journey.json. It needs
+ * `cargo`, and PANTRY_COBOT_CONTROLLER_BINARY or MUJOCO_DIR.
  */
 
 const HOME = "cobot-gateway";

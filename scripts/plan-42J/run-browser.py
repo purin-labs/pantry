@@ -2,9 +2,7 @@
 """Run the Brain journey: two Portal sessions against an isolated local Worker and D1.
 
 Gmail and the model provider are simulated by brain-provider.mjs, which also
-starts the Worker. The account authority is the built account Worker of the
-acceptance tests, which brain-provider.mjs starts beside it. The Portal is
-served from source.
+starts the Worker. The Portal is served from source.
 """
 import tempfile
 import argparse
@@ -75,10 +73,6 @@ def main() -> None:
     parser.add_argument("--entry", default="/brain-preview.html")
     parser.add_argument("--setup-path", default="/test/setup")
     args = parser.parse_args()
-    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit(
-            "Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker."
-        )
     artifacts = args.artifacts.resolve()
     artifacts.mkdir(parents=True, exist_ok=True)
     run_id = uuid.uuid4().hex[:8]
@@ -162,7 +156,6 @@ def main() -> None:
         evidence = {
             "backend": "isolated local production Worker routing and D1",
             "identity": "independent browser contexts with real control sessions",
-            "account": "built account Worker; each control request passes its check",
             "model": "simulated provider",
             "mail": "simulated Gmail",
             "journey": runner.result_json(output),

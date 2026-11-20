@@ -64,11 +64,6 @@ await runLocalProcesses(root, commands, "commerce").ready;
 console.log(
   "Commerce Workers ready. Run pnpm site for https://localhost:3003 (Square Sandbox).",
 );
-// The Platform asks the account Worker on each Portal request. That Worker
-// belongs to the Seams checkout and runs in its own process.
-console.log(
-  "The Portal also needs the local account Worker (seams-sdk-d1-local): run pnpm router in the Seams checkout.",
-);
 
 function runScript(script, ...args) {
   const result = spawnSync(

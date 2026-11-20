@@ -8,8 +8,7 @@ async (page) => {
   // admin's browser shows the same image. The owner publishes, and a paired
   // TV loads the image from the address that the release names.
   //
-  // Run: PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker>
-  //   python3 scripts/plan-74/run-browser.py --journey scripts/plan-40b/browser-board-images.js \
+  // Run: python3 scripts/plan-74/run-browser.py --journey scripts/plan-40b/browser-board-images.js \
   //   --entry /menus-preview.html --artifacts output/playwright/plan-40b-images
   //
   // The harness Worker has no shop, so this browser answers the shop's
