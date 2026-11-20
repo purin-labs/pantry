@@ -43,6 +43,7 @@ import {
 } from "../../case-context-discovery/evidence";
 import { readGmailInferenceEligibility } from "../../data/gmail-inference-eligibility";
 import { runTransientTurn } from "../transient-turn";
+import { piToolReplay } from "../pi-tool-replay";
 import { createWhatsAppHarnessToolHost } from "../whatsapp-harness-tools";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";
 import { authorityPartitionKeyMatchesRequest } from "../../authorization/access-grants/turn-authority";
@@ -310,6 +311,7 @@ export abstract class SessionTransientTurns extends SessionTurnRecovery {
       contract,
       { ...input, turnPrompt: rendered.text },
       toolHost,
+      piToolReplay.bind(null, this.sessionTools().registry),
       reauthorizeTransientEmail.bind(
         null,
         execution.scope,
@@ -557,6 +559,7 @@ export abstract class SessionTransientTurns extends SessionTurnRecovery {
       contract,
       { ...input, turnPrompt: rendered.text },
       toolHost,
+      piToolReplay.bind(null, this.sessionTools().registry),
       reauthorizeTransientEmail.bind(
         null,
         execution.scope,
@@ -665,6 +668,7 @@ export abstract class SessionTransientTurns extends SessionTurnRecovery {
       lifecycle.state.contract,
       input,
       toolHost,
+      piToolReplay.bind(null, this.sessionTools().registry),
       reauthorizeTransientMailAssistant.bind(null, this.env, input),
     );
     if (!(await execution.isActive()))
@@ -888,6 +892,7 @@ export abstract class SessionTransientTurns extends SessionTurnRecovery {
             workspaceRevision: input.workspaceRevision,
             policyRevision: String(contract.policyVersion),
           },
+          toolReplay: piToolReplay.bind(null, this.sessionTools().registry),
           toolHost: admittedSessionToolHost(
             {
               kind: "transient",

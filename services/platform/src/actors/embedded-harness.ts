@@ -318,6 +318,11 @@ export type EmbeddedHarnessConstructionInput = {
   readonly modelRouteLease: EmbeddedHarnessModelRouteLease;
   readonly checkpointBinding: EmbeddedHarnessCheckpointBinding;
   readonly toolHost: HarnessToolHost;
+  /**
+   * The replay rule of a tool after a lost process, by tool name. The caller
+   * takes it from the one list of the agent tools.
+   */
+  readonly toolReplay: (name: string) => "safe" | "unsafe";
   /** Sees tool arguments while they stream (Plan 40B phase 7). */
   readonly toolArguments?: HarnessToolArgumentObserver;
   readonly eventSink: CanonicalHarnessEventSink;

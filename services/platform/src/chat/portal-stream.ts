@@ -5,7 +5,7 @@ import { authorizeConversation } from "./conversation-access";
 import type { ConversationId } from "@purin-labs/control-api";
 import { applyAgentMessageAssemblyEvent } from "../actors/agent-message-assembly";
 import { resolveActiveSessionActorAtPlacement } from "../actors/actor-router";
-import type { SessionDO } from "../actors/agent-session";
+import type { SessionActor } from "../actors/session/session-actor";
 import {
   parseSessionTurnStreamRecord,
   type SessionTurnStreamRecord,
@@ -278,7 +278,7 @@ export async function projectAcceptedTurnReplay(
   stream: ConversationStream,
   replay: {
     readonly response: Response;
-    readonly session: Pick<SessionDO, "readSessionTurnFlowBinding">;
+    readonly session: Pick<SessionActor, "readSessionTurnFlowBinding">;
   },
 ): Promise<boolean> {
   const reader = replay.response.body?.getReader();
@@ -346,7 +346,7 @@ async function openTurnReplay(
   stream: ConversationStream,
 ): Promise<{
   readonly response: Response;
-  readonly session: Pick<SessionDO, "readSessionTurnFlowBinding">;
+  readonly session: Pick<SessionActor, "readSessionTurnFlowBinding">;
 } | null> {
   for (let attempt = 0; attempt < TURN_START_ATTEMPTS; attempt += 1) {
     if (
@@ -397,7 +397,7 @@ type ConsumeTurnInput = {
     readonly currentMessageText: string;
   };
   readonly projectedText: string;
-  readonly session: Pick<SessionDO, "readSessionTurnFlowBinding">;
+  readonly session: Pick<SessionActor, "readSessionTurnFlowBinding">;
 };
 
 type ConsumeTurnResult = {
@@ -552,7 +552,7 @@ export async function canProjectAgentEvent(
     | "controlSessionId"
   >,
   stream: Pick<ConversationStream, "sessionId" | "turnId">,
-  session: Pick<SessionDO, "readSessionTurnFlowBinding">,
+  session: Pick<SessionActor, "readSessionTurnFlowBinding">,
 ): Promise<boolean> {
   const account = await input.placement.accountAccess.checkUser({
     userId: input.scope.userId,

@@ -1,6 +1,4 @@
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
-import { executeCostsViewForHarness } from "../../agent-tools/costs/view-handler";
-import { collaborationAgentLabel } from "../collaboration-agent";
 import {
   acceptedExecutionAccountAuthority,
   accountAccessOfOneRead,
@@ -13,14 +11,6 @@ import {
   retainPantryExecutionUncertainty,
 } from "../../account-platform/execution-billing";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
-import {
-  proposeCommerceActionForHarness,
-  proposeCafeMenuPublicationForHarness,
-  proposeMenuPriceForHarness,
-  proposeOrderRefundForHarness,
-  proposeStockActionForHarness,
-  proposeMerchantPluginForHarness,
-} from "../harness-commerce-proposal";
 import {
   createSessionGoalExecution,
   findServedGoalCase,
@@ -44,23 +34,17 @@ import {
   writeHarnessTurnContinuation,
   finishHarnessTurnContinuation,
 } from "../agent-session-continuation";
-import { embeddedHarnessCostsTools } from "../agent-session-costs";
 import {
-  proposeMemoryForHarness,
   turnMayProposeMemory,
 } from "../harness-memory-proposal";
 import {
-  proposeSideCaseForHarness,
   turnMayProposeSideCase,
 } from "../harness-side-case-proposal";
 import {
   requestPermissionForHarness,
-  scheduleFollowUpForHarness,
   turnMayRequestPermission,
   turnMayScheduleFollowUp,
 } from "../harness-follow-up";
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { parseSessionId, type RequestId, type OrganisationId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
@@ -73,7 +57,6 @@ import {
   type FencedWorkspaceReceiptCheck,
   admittedSessionModelRoute,
   admittedSessionToolHost,
-  admittedSessionOperation,
 } from "../session-execution-admission";
 import { readCanonicalSessionForPersistence } from "../agent-session-canonical";
 import {
@@ -105,10 +88,10 @@ import {
 } from "../agent-session-harness-checkpoint";
 import { ActiveAttachmentPreparationControl } from "../message-attachment-preparation";
 import {
-  createAttachmentInspectionTool,
-  createMessageLinkTool,
-} from "../message-tools";
-import { createCatalogHarnessToolHost } from "../embedded-harness-tool-host";
+  createCatalogHarnessToolHost,
+  withSettledToolArguments,
+} from "../embedded-harness-tool-host";
+import { piToolReplay } from "../pi-tool-replay";
 import type {
   EmbeddedHarnessAdapter,
   EmbeddedHarnessUserInput,
@@ -153,91 +136,12 @@ import {
 } from "../agent-session-information-flow";
 import { sha256Hex } from "@purin-labs/std";
 import {
-  announceSurfaceEffect,
-  executeBakerySurfaceForHarness,
-  readSavedBakeryRunForHarness,
-} from "../../agent-tools/bakery/handlers";
-import {
-  editEmailReplyDraftForEmbeddedHarness,
-  proposeEmailOperationalForEmbeddedHarness,
-  proposeEmailReplyForEmbeddedHarness,
-  readEmailReplyDraftForEmbeddedHarness,
-  readWhatsAppSupportForEmbeddedHarness,
-  searchEmailMailboxForEmbeddedHarness,
-  sendWhatsAppSupportReplyForEmbeddedHarness,
-} from "../../agent-tools/channels/handlers";
-import {
-  editEmailDraftForEmbeddedHarness,
-  readEmailDraftForEmbeddedHarness,
-} from "../../agent-tools/channels/email-draft-handlers";
-import {
-  editProductDescriptionDraftForEmbeddedHarness,
-  readProductDescriptionDraftForEmbeddedHarness,
-} from "../../agent-tools/commerce/description-draft-handlers";
-import {
-  editProductionPlanForEmbeddedHarness,
-  readProductionPlanForEmbeddedHarness,
-} from "../../agent-tools/kitchen/production-plan-handlers";
-import {
-  moveWorkflowCanvasForEmbeddedHarness,
-  readWorkflowCanvasForEmbeddedHarness,
-} from "../../agent-tools/kitchen/workflow-canvas-handlers";
-import { proposeSlackMessageForEmbeddedHarness } from "../../agent-tools/slack/handlers";
-import {
-  advanceOrderQueueForEmbeddedHarness,
-  markSoldOutForEmbeddedHarness,
-  readEntityContextForEmbeddedHarness,
-  readMerchantReportForEmbeddedHarness,
-  readCounterSaleForEmbeddedHarness,
-  readOrderQueueForEmbeddedHarness,
-  readPaymentsForEmbeddedHarness,
-  readSoldOutForEmbeddedHarness,
-} from "../../agent-tools/commerce/handlers";
-import {
-  pauseDeviceForEmbeddedHarness,
-  readDeviceSnapshotsForEmbeddedHarness,
-  readDevicesForEmbeddedHarness,
-} from "../../agent-tools/devices/handlers";
-import { readJevFeaturesForEmbeddedHarness } from "../../agent-tools/jev/handlers";
-import {
-  editMenuBoardForEmbeddedHarness,
-  createMenuBoardForEmbeddedHarness,
-  archiveMenuBoardForEmbeddedHarness,
-  editMenuDraftForEmbeddedHarness,
-  readMenuBoardsForEmbeddedHarness,
-  readMenuDraftForEmbeddedHarness,
-} from "../../agent-tools/drafts/handlers";
-import {
-  queryWorkspaceForEmbeddedHarness,
-  readFileForEmbeddedHarness,
-  searchFilesForEmbeddedHarness,
-} from "../../agent-tools/files/handlers";
-import {
-  listIntegrationsForEmbeddedHarness,
-  readAirtableForHarness,
-  readCustomConnectorForEmbeddedHarness,
-  writeAirtableForHarness,
-} from "../../agent-tools/integrations/handlers";
-import {
-  createSupplierForEmbeddedHarness,
-  readRecipeWorkflowForEmbeddedHarness,
-  readRecipesForEmbeddedHarness,
-  readSuppliersForEmbeddedHarness,
-  saveRecipeForEmbeddedHarness,
-} from "../../agent-tools/kitchen/handlers";
-import { withToolContext } from "../../agent-tools/context";
-import {
   settleToolEffect,
   type ToolEffect,
 } from "../../agent-tools/session-support";
 import {
-  createMenuBoardDraftPreview,
-  withSettledToolArguments,
-} from "../../agent-tools/drafts/board-draft-preview";
-import {
   materializeAcceptedAttachment,
   materializeEmbeddedHarnessUserInput,
-  readPreparedInspection,
   readSessionTurnAttachments,
   validateAcceptedTurnContext,
 } from "./attachments";
@@ -246,7 +150,7 @@ import {
   claimCanonicalRunCapability,
 } from "./capability-claims";
 import {
-  type AcceptedCustomConnectorCatalog,
+  type AcceptedTurnTools,
   canonicalEmbeddedHarnessRuntimeSource,
   canonicalTextTurnWorkspaceReceipt,
   fenceWithoutReceiptCheck,
@@ -255,8 +159,7 @@ import {
   ignoreUnusedSideCaseOrigin,
   ignoreUnusedStartFence,
   materializeEmbeddedHarnessSource,
-  normalizeBakerySurfaceContext,
-  resolveAcceptedCustomConnectorCatalog,
+  resolveAcceptedTurnTools,
   resolveCanonicalEmbeddedHarnessCheckpointBinding,
   sideCaseHarnessInstructions,
   textTurnHarnessCheckpointInput,
@@ -264,9 +167,7 @@ import {
 } from "./harness-source";
 import { projectWorkingHistory, requirePiHarnessLease } from "./model-context";
 import {
-  admittedMessageLinkEgress,
   createEmbeddedHarnessModelRouteLease,
-  recordMessageAttachmentObservation,
 } from "./model-route";
 import {
   acceptCanonicalRunModelUsage,
@@ -288,7 +189,6 @@ import {
   traceSessionTurnCompletion,
   traceTurnCompletionRefused,
 } from "./traces";
-import { authorizedBakerySurfaceCommands } from "./transient-turns";
 import {
   commitCheckpointAndAlarm,
   completeEmbeddedHarnessTurnWithinBudget,
@@ -305,6 +205,12 @@ import type {
   CanonicalHarnessCheckpointCommitError,
 } from "./types";
 import { SessionCheckpoints } from "./session-checkpoints";
+import { sessionOwnToolServices } from "./own-tool-services";
+import type {
+  ToolTurnContext,
+  TurnPageContext,
+  TurnPageState,
+} from "./tool-wiring";
 
 /**
  * Canonical embedded harness turns: input, preparation, the run with its tools, and the checkpoint commit.
@@ -450,7 +356,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     lease: HarnessTurnLease;
     turnPrompt: string;
     resolvedCatalog: Promise<
-      Result<AcceptedCustomConnectorCatalog, unknown>
+      Result<AcceptedTurnTools, unknown>
     > | null;
   }): Promise<
     Result<CanonicalEmbeddedHarnessInput, CanonicalEmbeddedHarnessInputError>
@@ -616,7 +522,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
    */
   protected async runCanonicalEmbeddedHarnessTurn(input: {
     execution: SessionExecutionAdmission;
-    customConnectorCatalog: AcceptedCustomConnectorCatalog | null;
+    acceptedTurnTools: AcceptedTurnTools | null;
     inheritedHistory: ReturnType<typeof readChatForkHistoryForCase> | null;
     /**
      * The goal execution that the caller started to bind, and that the caller
@@ -631,8 +537,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     harnessInstructions: string;
     thinkingLevel?: import("../embedded-harness").EmbeddedHarnessThinkingLevel;
     turnPrompt: string;
-    browserContext: BakeryBrowserContext;
-    surfaceContext: BakerySurfaceAttachmentV1 | null;
+    browserContext: TurnPageContext;
+    surfaceContext: TurnPageState | null;
   }): Promise<
     Result<CanonicalEmbeddedHarnessTurnResult, CanonicalEmbeddedHarnessRunError>
   > {
@@ -768,8 +674,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // These four read the organisation's records and decide nothing alone.
     // The turn starts only after the fence is read again below.
     const catalogRead =
-      input.customConnectorCatalog === null
-        ? resolveAcceptedCustomConnectorCatalog({
+      input.acceptedTurnTools === null
+        ? resolveAcceptedTurnTools({
+            turnTools: this.sessionTools().turnTools,
             scope: input.execution.scope,
             organisationId: input.requestingOrganisationId,
             authority: input.lease.requestAuthority,
@@ -781,11 +688,11 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           })
         : Promise.resolve({
             ok: true as const,
-            value: input.customConnectorCatalog,
+            value: input.acceptedTurnTools,
           });
     const [
       canonicalInput,
-      customConnectorCatalog,
+      acceptedTurnTools,
       resolvedModelRouteLease,
       servedCase,
     ] = await Promise.all([
@@ -820,7 +727,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         : null,
     ]);
     if (!canonicalInput.ok) return canonicalInput;
-    if (!customConnectorCatalog.ok) return customConnectorCatalog;
+    if (!acceptedTurnTools.ok) return acceptedTurnTools;
     if (
       this.activeMessagePreparation !== null ||
       this.activeEmbeddedHarnessTurn !== null
@@ -898,12 +805,13 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       turnId: String(input.lease.turn.turnId),
     });
     const binding = await resolveCanonicalEmbeddedHarnessCheckpointBinding({
+      registry: this.sessionTools().registry,
       state: session.value.lifecycle,
       runtime: input.runtime,
       harnessInstructions,
       assignment,
-      customConnectorOperations: customConnectorCatalog.value.entries,
-      bakerySurfaceCommands: authorizedBakerySurfaceCommands(
+      turnTools: acceptedTurnTools.value.turnTools,
+      bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
         input.lease.requestAuthority,
       ),
       memoryProposal: turnMayProposeMemory(input.lease.requestAuthority),
@@ -946,44 +854,21 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         : { ok: false, error: { code: "budget_reservation_conflict" } };
     }
     phaseStartedAt = Date.now();
-    const tool = withToolContext({
+    const toolTurn: ToolTurnContext = {
       env: this.env,
       storage: this.ctx.storage,
       execution: input.execution,
       lease: input.lease,
       assignment,
-    });
-    // Plan 40B phase 7: a board edit shows on the board while the model
-    // writes it.
-    const boardDraftPreview = createMenuBoardDraftPreview({
-      env: this.env,
-      storage: this.ctx.storage,
-      execution: input.execution,
-      lease: input.lease,
-      assignment,
-    });
-    // One executor runs the view commands of each page (Plan 87): Costs &
-    // margins, the Pastry Bench and Café › Register.
-    const executePageViewCommand = executeCostsViewForHarness.bind(null, {
-      db: input.execution.scope.database,
-      accountAccess: input.execution.scope.accountAccess,
-      storage: this.ctx.storage,
+      requestId: input.requestId,
       organisationId: input.requestingOrganisationId,
       sessionId: session.value.lifecycle.state.identity.sessionId,
-      requestId: input.requestId,
-      lease: input.lease,
+      turnPrompt: input.turnPrompt,
       browserContext: input.browserContext,
-      agentLabel: collaborationAgentLabel.bind(
-        null,
-        input.execution.scope,
-        assignment,
-      ),
-      announceEffect: announceSurfaceEffect.bind(
-        null,
-        input.execution.scope,
-        input.lease.requestAuthority,
-      ),
-    });
+      effectiveGrantSet: acceptedTurnTools.value.authority.effectiveGrantSet,
+    };
+    const tools = this.sessionTools();
+    const toolArguments = tools.argumentObserver(toolTurn);
     const toolHostPreparation = createCatalogHarnessToolHost({
       env: this.env,
       storage: this.ctx.storage,
@@ -991,8 +876,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       lease: input.lease,
       expectedCatalogDigest: binding.value.binding.toolCatalogDigest,
       capabilityKeys: assignment.authorityPartition.capabilityKeys,
-      customConnectorOperations: customConnectorCatalog.value.entries,
-      bakerySurfaceCommands: authorizedBakerySurfaceCommands(
+      turnTools: acceptedTurnTools.value.turnTools,
+      bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
         input.lease.requestAuthority,
       ),
       memoryProposal: turnMayProposeMemory(input.lease.requestAuthority),
@@ -1006,221 +891,16 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         String(input.lease.turn.turnId),
         permissionRequest,
       ),
+      registry: tools.registry,
+      // Each area gives the services of its tool families. The Session gives
+      // the services of the families that the foundation owns.
       services: {
-        integrations: {
-          listIntegrations: tool(listIntegrationsForEmbeddedHarness),
-          readAirtable: tool(readAirtableForHarness),
-          writeAirtable: tool(writeAirtableForHarness),
-          readCustomConnector: readCustomConnectorForEmbeddedHarness.bind(
-            null,
-            this.env,
-            this.ctx.storage,
-            input.execution,
-            input.lease,
-            assignment,
-            customConnectorCatalog.value.authority.effectiveGrantSet,
-          ),
-          proposeCustomConnectorWrite:
-            this.proposeCustomConnectorWriteForEmbeddedHarness.bind(this, {
-              execution: input.execution,
-              lease: input.lease,
-              assignment,
-            }),
-        },
-        channels: {
-          readEmailDraft: tool(readEmailDraftForEmbeddedHarness),
-          editEmailDraft: tool(editEmailDraftForEmbeddedHarness),
-          searchEmailMailbox: tool(searchEmailMailboxForEmbeddedHarness),
-          proposeEmailReply: tool(proposeEmailReplyForEmbeddedHarness),
-          readEmailReplyDraft: tool(readEmailReplyDraftForEmbeddedHarness),
-          editEmailReplyDraft: tool(editEmailReplyDraftForEmbeddedHarness),
-          proposeEmailOperational: tool(proposeEmailOperationalForEmbeddedHarness),
-          readWhatsAppSupport: tool(readWhatsAppSupportForEmbeddedHarness),
-          sendWhatsAppSupportReply: sendWhatsAppSupportReplyForEmbeddedHarness.bind(
-            null,
-            this.env,
-            input.execution,
-            input.lease,
-            assignment,
-            input.turnPrompt,
-          ),
-        },
-        commerce: {
-          readProductDescriptionDraft: tool(
-            readProductDescriptionDraftForEmbeddedHarness,
-          ),
-          editProductDescriptionDraft: tool(
-            editProductDescriptionDraftForEmbeddedHarness,
-          ),
-          readEntityContext: tool(readEntityContextForEmbeddedHarness),
-          readMerchantReport: tool(readMerchantReportForEmbeddedHarness),
-          readPayments: tool(readPaymentsForEmbeddedHarness),
-          proposeCommerceAction: tool(proposeCommerceActionForHarness),
-          proposeMerchantPlugin: tool(proposeMerchantPluginForHarness),
-          proposeOrderRefund: tool(proposeOrderRefundForHarness),
-          proposeStockAction: tool(proposeStockActionForHarness),
-          proposeCafeMenuPublication: tool(proposeCafeMenuPublicationForHarness),
-          proposeCampaignBrief: this.proposeCampaignBriefForEmbeddedHarness.bind(
-            this,
-            {
-              execution: input.execution,
-              lease: input.lease,
-              assignment,
-            },
-          ),
-          proposeConfiguration: this.proposeConfigurationForEmbeddedHarness.bind(
-            this,
-            {
-              execution: input.execution,
-              lease: input.lease,
-              assignment,
-            },
-          ),
-        },
-        cafe: {
-          readOrderQueue: tool(readOrderQueueForEmbeddedHarness),
-          readCounterSale: tool(readCounterSaleForEmbeddedHarness),
-          advanceOrderQueue: tool(advanceOrderQueueForEmbeddedHarness),
-          readSoldOut: tool(readSoldOutForEmbeddedHarness),
-          markSoldOut: tool(markSoldOutForEmbeddedHarness),
-          executeRegisterViewCommand: executePageViewCommand,
-        },
-        slack: {
-          proposeSlackMessage: tool(proposeSlackMessageForEmbeddedHarness),
-        },
-        kitchen: {
-          readProductionPlan: tool(readProductionPlanForEmbeddedHarness),
-          editProductionPlan: tool(editProductionPlanForEmbeddedHarness),
-          readWorkflowCanvas: tool(readWorkflowCanvasForEmbeddedHarness),
-          moveWorkflowCanvasObject: tool(moveWorkflowCanvasForEmbeddedHarness),
-          readSavedBakeryRun: readSavedBakeryRunForHarness.bind(
-            null,
-            input.requestId,
-            this.env,
-            this.ctx.storage,
-            input.execution,
-            input.lease,
-            input.browserContext,
-          ),
-          executeBakerySurface: executeBakerySurfaceForHarness.bind(null, {
-            db: input.execution.scope.database,
-            accountAccess: input.execution.scope.accountAccess,
-            archive: this.env.ARCHIVE,
-            storage: this.ctx.storage,
-            organisationId: input.requestingOrganisationId,
-            sessionId: session.value.lifecycle.state.identity.sessionId,
-            requestId: input.requestId,
-            lease: input.lease,
-            browserContext: input.browserContext,
-            announceEffect: announceSurfaceEffect.bind(
-              null,
-              input.execution.scope,
-              input.lease.requestAuthority,
-            ),
-            surfaceReadiness: { kind: "unprepared" },
-          }),
-          executeCostsViewCommand: executePageViewCommand,
-          readRecipes: tool(readRecipesForEmbeddedHarness),
-          saveRecipe: tool(saveRecipeForEmbeddedHarness),
-          ...embeddedHarnessCostsTools(
-            this.env,
-            this.ctx.storage,
-            input.execution,
-            input.lease,
-            assignment,
-          ),
-          readSuppliers: tool(readSuppliersForEmbeddedHarness),
-          createSupplier: tool(createSupplierForEmbeddedHarness),
-          readRecipeWorkflow: tool(readRecipeWorkflowForEmbeddedHarness),
-          proposeRecipeWorkflow: this.proposeRecipeWorkflowForEmbeddedHarness.bind(
-            this,
-            {
-              execution: input.execution,
-              lease: input.lease,
-              assignment,
-            },
-          ),
-        },
-        devices: {
-          readDevices: tool(readDevicesForEmbeddedHarness),
-          pauseDevice: tool(pauseDeviceForEmbeddedHarness),
-          proposeDevice: this.proposeDeviceForEmbeddedHarness.bind(this, {
-            execution: input.execution,
-            lease: input.lease,
-            assignment,
-          }),
-          readDeviceSnapshots: tool(readDeviceSnapshotsForEmbeddedHarness),
-        },
-        jev: {
-          readJevFeatures: tool(readJevFeaturesForEmbeddedHarness),
-          proposeJevFeature: this.proposeJevFeatureForEmbeddedHarness.bind(this, {
-            execution: input.execution,
-            lease: input.lease,
-            assignment,
-          }),
-        },
-        menu: {
-          readMenuDraft: tool(readMenuDraftForEmbeddedHarness),
-          editMenuDraft: tool(editMenuDraftForEmbeddedHarness),
-          readMenuBoards: tool(readMenuBoardsForEmbeddedHarness),
-          editMenuBoard: tool(editMenuBoardForEmbeddedHarness),
-          createMenuBoard: tool(createMenuBoardForEmbeddedHarness),
-          archiveMenuBoard: tool(archiveMenuBoardForEmbeddedHarness),
-          proposeMenuPrice: tool(proposeMenuPriceForHarness),
-        },
-        files: {
-          searchFiles: tool(searchFilesForEmbeddedHarness),
-          readFile: tool(readFileForEmbeddedHarness),
-          queryWorkspace: queryWorkspaceForEmbeddedHarness.bind(
-            null,
-            this.env,
-            this.persistence,
-            this.ctx.storage,
-            input.execution,
-            input.lease,
-          ),
-        },
-        messages: {
-          // Both message tools are scoped to this turn's own message, so neither
-          // can reach a file or a link from another conversation.
-          inspectMessageAttachment: createAttachmentInspectionTool({
-            attachments: canonicalInput.value.attachments,
-            readPreparation: readPreparedInspection.bind(
-              null,
-              input.execution,
-              this.ctx.storage,
-              this.env.ARCHIVE,
-              input.lease,
-            ),
-            recordObservation: recordMessageAttachmentObservation.bind(null, {
-              execution: input.execution,
-              storage: this.ctx.storage,
-              lease: input.lease,
-              caseId: assignment.caseId,
-            }),
-          }),
-          readMessageLink: admittedSessionOperation(
-            input.execution,
-            input.lease,
-            createMessageLinkTool({
-              links: canonicalInput.value.links,
-              egress: admittedMessageLinkEgress(
-                input.execution,
-                input.lease,
-                this.env,
-              ),
-            }),
-          ),
-        },
-        turn: {
-          proposeMemory: tool(proposeMemoryForHarness),
-          scheduleFollowUp: scheduleFollowUpForHarness.bind(null, {
-            env: this.env,
-            execution: input.execution,
-            lease: input.lease,
-          }),
-          proposeSideCase: tool(proposeSideCaseForHarness),
-        },
+        ...tools.areaServices(toolTurn),
+        ...sessionOwnToolServices(toolTurn, {
+          persistence: this.persistence,
+          attachments: canonicalInput.value.attachments,
+          links: canonicalInput.value.links,
+        }),
       },
       // The one place of the exit check: `prepare` of an effect tool returns
       // the effect, and this turn's authority settles it.
@@ -1391,9 +1071,10 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         },
         toolHost: admittedSessionToolHost(
           { kind: "canonical", admission: input.execution, lease: input.lease },
-          withSettledToolArguments(toolHost.value, boardDraftPreview),
+          withSettledToolArguments(toolHost.value, toolArguments),
         ),
-        toolArguments: boardDraftPreview,
+        toolReplay: piToolReplay.bind(null, tools.registry),
+        toolArguments,
         eventSink: this,
         historySink: this,
         turnLease: input.lease,
@@ -1597,7 +1278,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
      * The connector catalog the same call resolved to start this turn. Null
      * when the turn resumes in a later call, which resolves it again.
      */
-    customConnectorCatalog: AcceptedCustomConnectorCatalog | null;
+    acceptedTurnTools: AcceptedTurnTools | null;
     /**
      * The receipt check that read the fence of this turn's start commit in
      * the same call. Null when the turn resumes in a later call, which checks
@@ -1624,8 +1305,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     harnessInstructions: string;
     thinkingLevel?: import("../embedded-harness").EmbeddedHarnessThinkingLevel;
     turnPrompt: string;
-    browserContext: BakeryBrowserContext;
-    surfaceContext: BakerySurfaceAttachmentV1 | null;
+    browserContext: TurnPageContext;
+    surfaceContext: TurnPageState | null;
     completion: CanonicalTextTurnCompletionIdentity;
   }): Promise<
     Result<
@@ -1742,7 +1423,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     try {
       completed = await this.runCanonicalEmbeddedHarnessTurn({
         execution: input.execution,
-        customConnectorCatalog: input.customConnectorCatalog,
+        acceptedTurnTools: input.acceptedTurnTools,
         inheritedHistory,
         goalExecution,
         requestingOrganisationId: input.requestingOrganisationId,
@@ -1996,7 +1677,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           reason: "context_unavailable",
         },
       };
-    const surfaceContext = await normalizeBakerySurfaceContext(
+    const surfaceContext = await this.sessionTools().pageEffects.normalizeState(
       input.surfaceContext,
     );
     if (!surfaceContext.ok)
@@ -2122,7 +1803,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       execution.scope,
       assignment,
     );
-    const customConnectorCatalog = await resolveAcceptedCustomConnectorCatalog({
+    const acceptedTurnTools = await resolveAcceptedTurnTools({
+      turnTools: this.sessionTools().turnTools,
       scope: execution.scope,
       organisationId: input.requestingOrganisationId,
       authority: input.start.requestAuthority,
@@ -2138,10 +1820,11 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       "start_custom_catalog",
       phaseStartedAt,
     );
-    if (!customConnectorCatalog.ok) return customConnectorCatalog;
+    if (!acceptedTurnTools.ok) return acceptedTurnTools;
     phaseStartedAt = Date.now();
     const runtimePreflight =
       await resolveCanonicalEmbeddedHarnessCheckpointBinding({
+      registry: this.sessionTools().registry,
         state: current.value.lifecycle,
         runtime: runtime.value,
         harnessInstructions: sideCaseHarnessInstructions(
@@ -2149,8 +1832,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           await sideCaseOrigin,
         ),
         assignment,
-        customConnectorOperations: customConnectorCatalog.value.entries,
-        bakerySurfaceCommands: authorizedBakerySurfaceCommands(
+        turnTools: acceptedTurnTools.value.turnTools,
+        bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
           input.start.requestAuthority,
         ),
         memoryProposal: turnMayProposeMemory(input.start.requestAuthority),
@@ -2211,7 +1894,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       // connector catalog. A refused sink leaves no turn and no stream.
       phaseStartedAt = Date.now();
       const sink = await decideCaseConversationSink(
-        customConnectorCatalog.value.authority,
+        acceptedTurnTools.value.authority,
         informationFlow.value.binding,
         input.streamSink.channelId,
         this.env,
@@ -2284,7 +1967,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       const completed =
         await this.runAndCheckpointCanonicalEmbeddedHarnessTextTurn({
           execution,
-          customConnectorCatalog: customConnectorCatalog.value,
+          acceptedTurnTools: acceptedTurnTools.value,
           startReceiptCheck: startFence.check,
           startedInheritedHistory: inheritedHistory,
           startedGoalCase: servedGoalCase,

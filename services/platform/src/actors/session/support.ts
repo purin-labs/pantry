@@ -1,5 +1,4 @@
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { TurnPageContext, TurnPageState } from "./tool-wiring";
 import type {
   HarnessTurnLease,
   StoredMessageAttachment,
@@ -28,14 +27,6 @@ import type {
   CanonicalTextTurnStartRequest,
 } from "../agent-session-turn-start";
 import type { CanonicalEmbeddedHarnessTextTurnError } from "./types";
-
-/**
- * How long a staged change stays confirmable.
- *
- * Long enough for someone to read it and reply, short enough that a preview
- * nobody answered cannot be confirmed days later against state that moved.
- */
-export const OPERATOR_DRAFT_TTL_MS = 60 * 60 * 1000;
 
 /** The wait before a recovery repeats a lease rebind that an owner deferred. */
 export const CODE_MODE_LEASE_REBIND_RETRY_MS = 1_000;
@@ -104,8 +95,8 @@ export type CanonicalTextTurnInput = {
   readonly turnPrompt: string;
   readonly attachments: readonly StoredMessageAttachment[];
   readonly links: readonly string[];
-  readonly browserContext: BakeryBrowserContext;
-  readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+  readonly browserContext: TurnPageContext;
+  readonly surfaceContext: TurnPageState | null;
   readonly context: unknown;
   readonly completion: CanonicalTextTurnCompletionIdentity;
 };

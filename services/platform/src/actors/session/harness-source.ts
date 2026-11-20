@@ -4,11 +4,6 @@ import type { SideCaseOrigin } from "../../chat/side-case-origin";
 import { SLACK_SIDE_CASE_HARNESS_INSTRUCTION } from "../../slack/side-cases";
 import { turnMayProposeSideCase } from "../harness-side-case-proposal";
 import { turnMayRequestPermission } from "../harness-follow-up";
-import {
-  parseBakerySurfaceAttachment,
-  verifyBakerySurfaceAttachment,
-  type BakerySurfaceAttachmentV1,
-} from "@purin-labs/bakery-model/bakery-surface";
 import type {
   AcceptedHarnessEventCursor,
   AcceptedInputRef,
@@ -35,6 +30,11 @@ import type { CanonicalHarnessCheckpointInput } from "../agent-session-harness-c
 import { digestModelRoute } from "../../models/route";
 import { harnessToolCatalogDigest } from "../embedded-harness-tool-host";
 import type {
+  ToolRegistry,
+  TurnTool,
+} from "../../agent-tools/catalog/tool-registry";
+import type { SessionToolWiring } from "./tool-wiring";
+import type {
   EmbeddedHarnessAdapter,
   EmbeddedHarnessSource,
 } from "../embedded-harness";
@@ -44,10 +44,6 @@ import {
   type CurrentEffectiveGrantAuthority,
   resolveEffectiveGrantSetForAuthorityPartition,
 } from "../../authorization/access-grants/turn-authority";
-import {
-  compileCustomConnectorCatalog,
-  type CustomConnectorCatalogEntry,
-} from "../../custom-connectors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, errorMessage, sha256Hex } from "@purin-labs/std";
 import {
@@ -68,24 +64,24 @@ import type {
 } from "./types";
 
 /**
- * The custom connector operations of a turn, with the live authority that
+ * The tools that a turn adds to the tool list, with the live authority that
  * selected them. The same Actor call decides its other capability questions
  * against this authority and does not read the grants again.
  */
-export type AcceptedCustomConnectorCatalog = Readonly<{
+export type AcceptedTurnTools = Readonly<{
   readonly authority: CurrentEffectiveGrantAuthority;
-  readonly entries: readonly CustomConnectorCatalogEntry[];
+  readonly turnTools: readonly TurnTool[];
 }>;
 
-export async function resolveAcceptedCustomConnectorCatalog(input: {
+export async function resolveAcceptedTurnTools(input: {
+  /** Gives the tools that the grants of the turn select. */
+  readonly turnTools: SessionToolWiring["turnTools"];
   readonly scope: OrganisationExecutionScope;
   readonly organisationId: OrganisationId;
   readonly authority: RequestAuthority;
   readonly userAuthority: import("../../account-platform/access").AccountUserAuthority;
   readonly assignment: CaseAssignment;
-}): Promise<
-  Result<AcceptedCustomConnectorCatalog, CanonicalEmbeddedHarnessRunError>
-> {
+}): Promise<Result<AcceptedTurnTools, CanonicalEmbeddedHarnessRunError>> {
   const authority = await resolveEffectiveGrantSetForAuthorityPartition({
     db: input.scope.database,
     accountAccess: input.scope.accountAccess,
@@ -101,14 +97,14 @@ export async function resolveAcceptedCustomConnectorCatalog(input: {
       error: { code: "embedded_harness_authority_partition_unavailable" },
     };
   }
-  const catalog = await compileCustomConnectorCatalog({
-    db: input.scope.database,
+  const catalog = await input.turnTools({
+    database: input.scope.database,
     effectiveGrants: authority.value.effectiveGrantSet,
   });
   return catalog.ok
     ? {
         ok: true,
-        value: { authority: authority.value, entries: catalog.value },
+        value: { authority: authority.value, turnTools: catalog.value },
       }
     : {
         ok: false,
@@ -119,11 +115,14 @@ export async function resolveAcceptedCustomConnectorCatalog(input: {
 }
 
 export async function resolveCanonicalEmbeddedHarnessCheckpointBinding(input: {
+  /** The one list of the agent tools. */
+  registry: ToolRegistry;
   state: Variant<AgentSessionLifecycle, "sleeping" | "processing">;
   runtime: CanonicalEmbeddedHarnessRuntimeSource;
   harnessInstructions: string;
   assignment: CaseAssignment;
-  customConnectorOperations: readonly CustomConnectorCatalogEntry[];
+  /** The tools that this turn adds to the tool list. */
+  turnTools: readonly TurnTool[];
   bakerySurfaceCommands: readonly string[];
   memoryProposal: boolean;
   followUp: boolean;
@@ -160,8 +159,9 @@ export async function resolveCanonicalEmbeddedHarnessCheckpointBinding(input: {
     };
   }
   const currentCatalogDigest = await harnessToolCatalogDigest(
+    input.registry,
     capabilities.value,
-    input.customConnectorOperations,
+    input.turnTools,
     input.bakerySurfaceCommands,
     input.memoryProposal,
     input.followUp,
@@ -233,21 +233,6 @@ export async function resolveCanonicalEmbeddedHarnessCheckpointBinding(input: {
       },
     },
   };
-}
-
-export async function normalizeBakerySurfaceContext(
-  raw: BakerySurfaceAttachmentV1 | null,
-): Promise<
-  Result<BakerySurfaceAttachmentV1 | null, { readonly code: string }>
-> {
-  if (raw === null) return { ok: true, value: null };
-  const parsed = parseBakerySurfaceAttachment(raw);
-  if (
-    parsed.kind === "invalid" ||
-    !(await verifyBakerySurfaceAttachment(parsed.value))
-  )
-    return { ok: false, error: { code: "bakery_surface_context_invalid" } };
-  return { ok: true, value: parsed.value };
 }
 
 function embeddedHarnessAdapterSupportsModel(

@@ -1,5 +1,5 @@
 import { assertNever } from "@purin-labs/std";
-import { TOOL_REGISTRY } from "../agent-tools/registry";
+import type { ToolRegistry } from "../agent-tools/catalog/tool-registry";
 
 /**
  * Who may run a tool call again after a lost process left it in flight.
@@ -15,8 +15,8 @@ type ToolRerun = "any_caller" | "script" | "none";
 /** Who issued a tool call: the model, or a Code Mode script. */
 export type ToolCaller = "model" | "script";
 
-function toolRerun(name: string): ToolRerun {
-  const registered = TOOL_REGISTRY.find(name);
+function toolRerun(registry: ToolRegistry, name: string): ToolRerun {
+  const registered = registry.find(name);
   if (registered !== undefined) return registered.rerun.kind;
   return RERUN_BY_ANY_CALLER.has(name) ? "any_caller" : "none";
 }
@@ -26,12 +26,19 @@ function toolRerun(name: string): ToolRerun {
  * name, so a tool that only a script may repeat is `safe` here.
  * `mayRerunToolCall` keeps a direct call of such a tool stopped.
  */
-export function piToolReplay(name: string): "safe" | "unsafe" {
-  return toolRerun(name) === "none" ? "unsafe" : "safe";
+export function piToolReplay(
+  registry: ToolRegistry,
+  name: string,
+): "safe" | "unsafe" {
+  return toolRerun(registry, name) === "none" ? "unsafe" : "safe";
 }
 
-export function mayRerunToolCall(name: string, caller: ToolCaller): boolean {
-  const rerun = toolRerun(name);
+export function mayRerunToolCall(
+  registry: ToolRegistry,
+  name: string,
+  caller: ToolCaller,
+): boolean {
+  const rerun = toolRerun(registry, name);
   switch (rerun) {
     case "any_caller":
       return true;

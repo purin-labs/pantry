@@ -33,7 +33,6 @@ import {
   createCurrentSourceFlowLabel,
   ObservationEvidence,
 } from "../../policy";
-import { readOfferPriceAllowanceView } from "../../data/offer-price-allowance";
 import { assertNever, errorMessage } from "@purin-labs/std";
 
 /**
@@ -394,51 +393,6 @@ export async function recordMessageAttachmentObservation(
       `Message attachment information-flow commit failed: ${admitted.error.code}`,
     );
   }
-}
-
-/**
- * Fills in the Offer revision and price an allowance is measured from, when
- * the command names an Offer and carries neither.
- */
-export async function bindAllowanceReference(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  rawCommand: unknown,
-): Promise<unknown> {
-  if (
-    typeof rawCommand !== "object" ||
-    rawCommand === null ||
-    Array.isArray(rawCommand)
-  ) {
-    return rawCommand;
-  }
-  const body = rawCommand as Readonly<Record<string, unknown>>;
-  if (
-    body.kind !== "set_offer_price_allowance" ||
-    typeof body.offerId !== "string" ||
-    body.expectedOfferRevision !== undefined
-  ) {
-    return rawCommand;
-  }
-  const view = await readOfferPriceAllowanceView(
-    env,
-    execution.scope,
-    requireSessionExecution.bind(null, execution, lease),
-    admittedSessionOperation(
-      execution,
-      lease,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
-    ),
-    body.offerId,
-  );
-  if (view === null) return rawCommand;
-  return {
-    ...body,
-    expectedOfferRevision: view.currentOfferRevision,
-    referencePriceMinor: view.currentPriceMinor,
-    currency: view.currency,
-  };
 }
 
 export function admittedMessageLinkEgress(
