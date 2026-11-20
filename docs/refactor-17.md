@@ -694,8 +694,7 @@ the Session first.
 - **Still open:** a handler takes the turn context from the Session
   (`withToolContext`), not from the executor. Step A1.7 owns it.
 
-**20 November 2026. Step A1.5 is done on the branch `refactor-17-a1-5`.** The branch
-starts at `origin/dev` `ce959eb`. It is not on `dev`.
+**20 November 2026. Step A1.5 is done and on `dev`.**
 
 - **One executor.** The mailbox agent host and the WhatsApp agent host call
   `executeCatalogTool`. Their two chains of name tests are deleted. Their 14 tools
@@ -717,10 +716,15 @@ starts at `origin/dev` `ce959eb`. It is not on `dev`.
   longer as `defineTool` values.
 - **Checks.** The static lints, the three type checks, `pnpm check:packages`,
   `pnpm portal:build` and the unit suite (302 files) pass. The 32 journey files of
-  the brief pass, in three groups. Not run: the full E2E suite.
+  the brief pass, in three groups. The full E2E suite passed on the merge with
+  `dev`: 236 files, 457 tests.
 - **Still open:** each host keeps its services, its state and its result format in
   its own file. `actors/embedded-harness-tool-host.ts` did not change: the three
   hosts share the executor, not one host object.
+
+The same landing has one change of step A1.8: the credential Vault defines the four
+fields that it reads of a Discord installation, so it imports no Discord file. The
+layer count is 820.
 
 ## Baseline
 
