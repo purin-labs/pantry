@@ -9,7 +9,9 @@ import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
 import { commerceActionTitle } from "../../../../apps/portal/src/features/governed-actions/commerce";
-import { parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
+import {
+  parseCommerceActionRecordResponse,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "../../src/data/control-plane";

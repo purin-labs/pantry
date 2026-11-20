@@ -5,7 +5,7 @@ import {
   parseMenuScreenSummaries,
   type MenuBoardSummary,
   type MenuScreenSummary,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
 import { isRecord } from "@purin-labs/std";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import { Select } from "../../ui/select";

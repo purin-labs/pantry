@@ -23,7 +23,7 @@ import type {
   CommerceActivityResource,
   CommerceActivitySourceName,
   CommerceProviderReceipt,
-} from "@purin-labs/control-api";
+} from "@purin-labs/commerce-control-api";
 
 export type CommerceActivityEvent =
   | Readonly<{

@@ -4,8 +4,8 @@ import {
   type MenuScreenFeed,
   type MenuScreenPairing,
   type MenuScreenPairingState,
-  type MenuScreenPickup,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
+import { type MenuScreenPickup } from "@purin-labs/control-api";
 import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 

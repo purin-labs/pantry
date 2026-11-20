@@ -1,6 +1,8 @@
 import React from "react";
 
-import type { CommerceActionDetails } from "@purin-labs/control-api/portal/commerce-actions";
+import type {
+  CommerceActionDetails,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { Variant } from "@purin-labs/type-utils";
 
 /** The exact menu that goes live, by section, with what changes. */

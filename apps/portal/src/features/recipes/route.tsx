@@ -8,7 +8,7 @@ import {
   parseRecipeCollection,
   type CalculatedRecipeCost,
   type RecipeCollection,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";
 import { costsPath } from "../costs/api";

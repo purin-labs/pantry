@@ -4,7 +4,7 @@ import {
   PRODUCTION_PLAN_ACCEPT_LIMIT,
   type InventoryProductionPlanOutcome,
   type InventoryProductionRequest,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { isPlanQuantity } from "@purin-labs/production-plan-crdt";
 import type { Quantity } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";

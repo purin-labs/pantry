@@ -1,10 +1,12 @@
 import type {
   MenuBoardCommentThread,
   MenuBoardVersionSummary,
+} from "@purin-labs/control-api";
+import type {
   MenuBoardRelease,
   MenuBoardSummary,
   MenuScreenSummary,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
 import type { MenuBoardLayout, MenuBoardStart } from "@purin-labs/menu-board-crdt";
 import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 

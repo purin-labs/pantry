@@ -1,0 +1,35 @@
+{
+  "name": "@purin-labs/commerce-control-api",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "description": "Commerce shapes of the Pantry control API: the Portal entity plane, commerce actions, agent operations and checkout profiles.",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./portal/*": {
+      "types": "./src/portal/*.ts",
+      "default": "./src/portal/*.ts"
+    }
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@purin-labs/collaboration": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/product-description-crdt": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

@@ -167,7 +167,7 @@ import { readCaseEffectRecords } from "./organisation-execution-records";
 import { type AcceptedMemoryCursor } from "../memory/store";
 import { cleanupTypeSafeCredentials } from "../integrations/typesafe/connection";
 import { assertNever, errorMessage } from "@purin-labs/std";
-import type { CommerceBoardPresenceEntry } from "@purin-labs/control-api";
+import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import { expireOrganisationLeases } from "./organisation/activation";
 import { deliverCaseContextCollectionInvalidations } from "./organisation/case-context-collection";
 import { createOrganisationSchema } from "./organisation/schema";

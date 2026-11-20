@@ -11,7 +11,8 @@
 //   upward   a lower layer imports a higher one
 //   areas    one area imports a file of another area. An import of a workspace
 //            package of another area is allowed: the package is the contract
-//            of that area (step A1.10)
+//            of that area (step A1.10). A package of an area may depend on a
+//            package of another area that `contracts` lists
 //   order    a foundation module imports a foundation module that is later
 //            in foundationOrder
 //   table    a module writes a D1 table that another module owns
@@ -71,6 +72,11 @@ if (
 const layerRank = new Map(targets.layers.map((layer, index) => [layer, index]));
 const orderRank = new Map(
   targets.foundationOrder.map((name, index) => [`foundation/${name}`, index]),
+);
+// The workspace packages that are the contract of their area. A package of
+// another area may depend on them.
+const contractPackages = new Set(
+  (targets.contracts ?? []).map((folder) => posix.basename(folder)),
 );
 const packageByName = new Map(
   Object.entries(targets.packages).map(([folder, module]) => [
@@ -191,6 +197,12 @@ for (const [folder, from] of Object.entries(targets.packages)) {
     const workspace = WORKSPACE.exec(dependency);
     const to = workspace === null ? undefined : packageByName.get(workspace[1]);
     if (to === undefined) continue;
+    if (
+      layerOf(from) === "areas" &&
+      layerOf(to) === "areas" &&
+      contractPackages.has(workspace[1])
+    )
+      continue;
     const kind = crossing(from, to);
     if (kind === null) continue;
     const pair = `package ${folder} -> ${dependency}`;

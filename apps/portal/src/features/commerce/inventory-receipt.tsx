@@ -4,7 +4,7 @@ import {
   parseInventoryReceiptContext,
   parseInventoryQuantityText,
   type InventoryReceiptContext,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   parseMutationResult,
   type CommerceInventoryLotInputV1,

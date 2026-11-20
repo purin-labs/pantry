@@ -4,7 +4,7 @@ import { controlRead } from "../../control-client";
 import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{

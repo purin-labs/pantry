@@ -1,11 +1,16 @@
-import type { CommerceProviderReceipt } from "@purin-labs/control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/commerce-control-api";
 import React from "react";
 import { CommerceActionTrace } from "./commerce-trace";
 import { CafeMenuPublicationDetails } from "./cafe-menu-details";
 import { MenuPriceChangeDetails } from "./menu-price-card";
 import { OrderRefundDetails } from "./order-refund-details";
 import { StockOperationCard } from "./stock-operation-details";
-import type { CommerceActionDetails, MerchantPluginSettingDetails, CommerceActionRecord, MerchantPluginPreview } from "@purin-labs/control-api/portal/commerce-actions";
+import type {
+  CommerceActionDetails,
+  MerchantPluginSettingDetails,
+  CommerceActionRecord,
+  MerchantPluginPreview,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { formatCommerceActionAmount, formatOfferPrice, commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { runAsync } from "../../pages/agent-console-shared";
 import {

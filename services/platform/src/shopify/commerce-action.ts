@@ -23,7 +23,7 @@ import {
 import type { ShopifyExecutionReceipt } from "./action-execution";
 import type { Result } from "../result";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
-import type { CommerceShopifyProviderReceipt } from "@purin-labs/control-api";
+import type { CommerceShopifyProviderReceipt } from "@purin-labs/commerce-control-api";
 import {
   type CommerceEffectGatePermit,
   type CommerceProviderExecutionError,

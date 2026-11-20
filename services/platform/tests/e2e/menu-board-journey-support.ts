@@ -11,7 +11,7 @@ import {
   parseMenuScreenPairingState,
   parseMenuScreenSignal,
   type MenuScreenFeed,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
 import {
   MenuBoardDoc,
   type MenuBoardCrdtResult,

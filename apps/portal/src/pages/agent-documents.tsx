@@ -1,6 +1,10 @@
 import React from "react";
 
-import type { AgentDocumentRevision, AgentOperationKind, AgentRevisionTarget } from "@purin-labs/control-api/portal/agent-operations";
+import type {
+  AgentDocumentRevision,
+  AgentOperationKind,
+  AgentRevisionTarget,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { Notice, RecoverableError } from "../page-components";
 import {
   MutationFeedback,

@@ -16,7 +16,10 @@ import type {
   WhatsAppRouteTransport,
   WorkspaceSettingsRouteTransport,
 } from "./features/integrations/settings-types";
-import { type CommerceActionRecord, parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
+import {
+  type CommerceActionRecord,
+  parseCommerceActionRecordResponse,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceOperationsTransport } from "./features/commerce/operations";
 import type { AgentOperationsTransport } from "./pages/automation";
 import { createAccessRouteTransport } from "./features/access/api";

@@ -14,7 +14,7 @@ import {
   type ActorExportSource,
 } from "./actor-export";
 import { eraseActorContentSql } from "./placement-execution-quiescence";
-import type { CommerceProviderReceipt } from "@purin-labs/control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/commerce-control-api";
 import { readActionResult } from "./action-ledger";
 import { reconcileCommerceProviderReceipt } from "../commerce/action-model";
 import { FlowBinding, digestFlowBinding } from "../policy/information-flow";

@@ -78,3 +78,4 @@ export {
   type SyncMessageFields,
   type SyncServerMessage,
 } from "./sync-protocol.ts";
+export type { TextCollaborationServerMessage } from "./text-collaboration.ts";

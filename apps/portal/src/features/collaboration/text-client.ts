@@ -7,7 +7,7 @@ import type {
   TextSelectionDirection,
   TextSelectionRange,
 } from "@purin-labs/collaboration";
-import type { TextCollaborationServerMessage } from "@purin-labs/control-api/portal/text-collaboration";
+import type { TextCollaborationServerMessage } from "@purin-labs/collaboration";
 import {
   DocumentClient,
   type DocumentConnection,

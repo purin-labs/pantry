@@ -7,7 +7,9 @@ import {
   type OrganisationMutation,
 } from "./mutation-state";
 import type { IntegrationAccount, ReadinessAssessment, SetupSelection } from "@purin-labs/control-api/portal/settings";
-import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import type {
+  CommerceActionRecord,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceSystemView, Membership, OperatorOrganisationCase, OrganisationSummary, OrganisationWorkspace, SupportRole, User } from "@purin-labs/control-api/portal/portal-types";
 
 export type Provider = Extract<

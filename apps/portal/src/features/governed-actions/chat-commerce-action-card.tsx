@@ -4,7 +4,7 @@ import {
   parseCommerceActionExecutionResponse,
   parseCommerceActionRecordResponse,
   type CommerceActionRecord,
-} from "@purin-labs/control-api/portal/commerce-actions";
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { parseCommerceApprovalResponse } from "@purin-labs/control-api/portal/portal-reads";
 import { ControlApiError, controlMutation, controlRead } from "../../control-client";
 import {

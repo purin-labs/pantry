@@ -5,7 +5,7 @@ import { expect, it, type TestContext } from "vitest";
 import {
   parseInventoryProductionPlanResult,
   type InventoryProductionRequest,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import {

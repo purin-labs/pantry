@@ -8,7 +8,7 @@ import {
   type InventoryProductionPlanAcceptance,
   type InventoryProductionPlanLine,
   type InventoryProductionPlanOutcome,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   parseEntityPlaneCommand,
   parseListEntryReadRequest,

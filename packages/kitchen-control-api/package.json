@@ -1,0 +1,27 @@
+{
+  "name": "@purin-labs/kitchen-control-api",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "description": "Kitchen shapes of the Pantry control API: recipes, costs and margins, inventory receipts and production.",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

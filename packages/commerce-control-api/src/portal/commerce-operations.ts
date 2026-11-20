@@ -4,7 +4,7 @@ import type {
   TrackingActionTarget,
   TrackingBatchPreview,
   TrackingBatchPreviewItem,
-} from "../index.ts";
+} from "../commerce.ts";
 
 export function parseCommerceExceptionInbox(
   value: unknown,

@@ -9,7 +9,7 @@
 // TV's feed, the editor's facts and the Products panel's list show it.
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import type { MenuScreenPhoto } from "@purin-labs/control-api";
+import type { MenuScreenPhoto } from "@purin-labs/cafe-control-api";
 import type { MenuBoardElement } from "@purin-labs/menu-board-crdt";
 import { isRecord } from "@purin-labs/std";
 import { closeSocket } from "./hibernatable-socket-support";

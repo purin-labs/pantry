@@ -1,0 +1,25 @@
+{
+  "name": "@purin-labs/inbox-control-api",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "description": "Inbox shapes of the Pantry control API: the shared reply draft.",
+  "exports": {
+    "./portal/*": {
+      "types": "./src/portal/*.ts",
+      "default": "./src/portal/*.ts"
+    }
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@purin-labs/collaboration": "workspace:*",
+    "@purin-labs/mail-reply-crdt": "workspace:*",
+    "@purin-labs/std": "workspace:*"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

@@ -1,4 +1,4 @@
-import type { InventoryProductionRequest } from "@purin-labs/control-api";
+import type { InventoryProductionRequest } from "@purin-labs/kitchen-control-api";
 
 const request: InventoryProductionRequest = {
   id: "request",

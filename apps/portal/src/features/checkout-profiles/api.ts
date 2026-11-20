@@ -5,7 +5,13 @@ import type {
 import { parseCheckoutProfileActivations, parseStorefrontIds, type CommerceCheckoutProfileActivationV1 } from "@purin-labs/commerce-client";
 import { controlRead } from "../../control-client";
 import type { VariantBy } from "@purin-labs/type-utils";
-import { type CheckoutProfileSummary, parseProfileMutation, parseProfileSummary, requireExactKeys, requireObject } from "@purin-labs/control-api/portal/checkout-profiles";
+import {
+  type CheckoutProfileSummary,
+  parseProfileMutation,
+  parseProfileSummary,
+  requireExactKeys,
+  requireObject,
+} from "@purin-labs/commerce-control-api/portal/checkout-profiles";
 
 type CheckoutProfileWithLifecycle<
   TState extends CheckoutProfile["lifecycle"]["state"],

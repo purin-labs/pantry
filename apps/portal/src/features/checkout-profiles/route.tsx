@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import { PageSkeleton, RecoverableError } from "../../page-components";
 
 import type { CheckoutProfileMutationTransport } from "./api";
-import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
 import {
   confirmReview,
   handleCreateSubmit,

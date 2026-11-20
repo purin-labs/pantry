@@ -17,7 +17,10 @@ import { commerceActionCardText, commerceActionSummary, commerceCardSummary } fr
 import { traceWarn } from "../observability";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import type { CommerceActionFollowUp, CommerceProviderReceipt } from "@purin-labs/control-api";
+import type {
+  CommerceActionFollowUp,
+  CommerceProviderReceipt,
+} from "@purin-labs/commerce-control-api";
 
 export function commerceActionProjectionTarget(
   action: CommerceActionRequest | CommerceActionPath,

@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { formatOfferPrice } from "../../../apps/portal/src/features/governed-actions/commerce";
-import { parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
+import { parseCommerceActionRecordResponse } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { parseCommerceActionPath } from "../src/commerce/action-model";
 
 const ACTION_NONCE = "nonce_offer_price_portal";

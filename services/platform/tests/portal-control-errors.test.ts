@@ -4,7 +4,7 @@ import {
   controlApiProblemMessage,
   parseControlApiProblem,
 } from "@purin-labs/control-api/portal/errors";
-import { parseAgentOperationsResponse } from "@purin-labs/control-api/portal/agent-operations";
+import { parseAgentOperationsResponse } from "@purin-labs/commerce-control-api/portal/agent-operations";
 
 describe("portal control error boundary", () => {
   it("recognizes the exact saved-run missing response", () => {

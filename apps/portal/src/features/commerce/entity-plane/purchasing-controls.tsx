@@ -27,8 +27,8 @@ import type {
 import {
   supplierIdFromName,
   type PermissionRequired,
-  type SupplierCreation,
 } from "@purin-labs/control-api";
+import { type SupplierCreation } from "@purin-labs/commerce-control-api";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,

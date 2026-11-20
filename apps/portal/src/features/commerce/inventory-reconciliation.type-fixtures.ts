@@ -1,4 +1,4 @@
-import type { InventoryReceiptContext } from "@purin-labs/control-api";
+import type { InventoryReceiptContext } from "@purin-labs/kitchen-control-api";
 import type { ReconciliationState } from "./inventory-reconciliation";
 import type { ReconciliationSubmission } from "./inventory-reconciliation-submission";
 import type { Variant } from "@purin-labs/type-utils";

@@ -1,7 +1,7 @@
 // What an agent's stock proposal becomes: the current records, read now, and
 // the exact change for the approval card. Each refusal is in words that the
 // agent can act on. No stock moves here.
-import { parseInventoryQuantityText } from "@purin-labs/control-api";
+import { parseInventoryQuantityText } from "@purin-labs/kitchen-control-api";
 import type { Quantity } from "@purin-labs/commerce-contracts";
 import {
   parseListEntryReadRequest,

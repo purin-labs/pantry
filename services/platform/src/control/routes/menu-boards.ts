@@ -1,4 +1,7 @@
-import { isMenuScreenCode, type MenuScreenSummary } from "@purin-labs/control-api";
+import {
+  isMenuScreenCode,
+  type MenuScreenSummary,
+} from "@purin-labs/cafe-control-api";
 import {
   isMenuBoardLayout,
   isMenuBoardStart,

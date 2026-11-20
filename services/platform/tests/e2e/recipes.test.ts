@@ -5,7 +5,7 @@ import {
   parseRecipeCollection,
   type RecipeCollection,
   type RecipeWrite,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   CommerceAdminClient,
   type CommerceStockSnapshot,

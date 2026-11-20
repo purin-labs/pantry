@@ -22,7 +22,7 @@ import {
   type OrganisationId,
 } from "../../ids";
 import type { Result } from "../../result";
-import type { SupplierCreation } from "@purin-labs/control-api";
+import type { SupplierCreation } from "@purin-labs/commerce-control-api";
 
 export type SupplierCreationError = Readonly<{
   code: "invalid" | "purchasing_inactive" | "command_rejected" | "unavailable";

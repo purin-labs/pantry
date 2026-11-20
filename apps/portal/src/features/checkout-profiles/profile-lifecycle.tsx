@@ -2,7 +2,7 @@ import { Select } from "../../ui/select";
 import React from "react";
 
 import type { CheckoutProfileCollection } from "./api";
-import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
 import {
   activeStorefrontIds,
   isDraftProfileSummary,

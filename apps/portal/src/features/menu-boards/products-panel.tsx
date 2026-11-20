@@ -1,6 +1,6 @@
 import React from "react";
 import { Plus, Search } from "lucide-react";
-import type { MenuScreenFacts } from "@purin-labs/control-api";
+import type { MenuScreenFacts } from "@purin-labs/cafe-control-api";
 import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 import { MenuDraftClient } from "../content-studio/menu-client";
 import { readCafeMenuOptions, type CafeMenuProduct } from "../content-studio/route";

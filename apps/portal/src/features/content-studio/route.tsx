@@ -34,7 +34,11 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
-import { type MenuDraftReview, parseMenuReview, parseMenuSnapshot } from "@purin-labs/control-api/portal/content-studio-menu";
+import {
+  type MenuDraftReview,
+  parseMenuReview,
+  parseMenuSnapshot,
+} from "@purin-labs/cafe-control-api/portal/content-studio-menu";
 
 type MenuReviewState =
   | Readonly<{ kind: "idle" }>

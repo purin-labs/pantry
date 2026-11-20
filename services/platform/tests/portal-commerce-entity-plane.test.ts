@@ -22,7 +22,7 @@ import {
   readPublishedCommerceResources,
 } from "../../../apps/portal/src/features/commerce";
 import { updateCommerceBoardPresence } from "../../../apps/portal/src/features/commerce/entity-plane/api";
-import { parseCommerceListEntryPatchResponse } from "@purin-labs/control-api/portal/entity-plane";
+import { parseCommerceListEntryPatchResponse } from "@purin-labs/commerce-control-api/portal/entity-plane";
 import {
   OrderCancellationControl,
   proposeOrderCancellation,

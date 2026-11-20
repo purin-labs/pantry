@@ -23,7 +23,7 @@ import type {
   MissingTrackingException,
   TrackingBatchPreview,
   TrackingBatchPreviewItem,
-} from "@purin-labs/control-api";
+} from "@purin-labs/commerce-control-api";
 
 const INBOX_PAGE_LIMIT = 100;
 const INBOX_RESULT_LIMIT = 500;

@@ -6,7 +6,7 @@ import {
   parseMenuScreenFacts,
   type MenuBoardSummary,
   type MenuScreenFacts,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
 import {
   MENU_BOARD_DEFAULT_CONSTRAINTS,
   MENU_BOARD_ITEM_ROWS,

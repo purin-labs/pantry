@@ -3,7 +3,7 @@ import type {
   InventoryDeliveries,
   InventoryDelivery,
   InventoryReceiptContext,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   parseReceiveInventoryCommand,
   parseReconcileInventoryCommand,

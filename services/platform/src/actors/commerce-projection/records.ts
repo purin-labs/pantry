@@ -18,7 +18,7 @@ import {
   isRecord,
   parseJsonOrNull,
 } from "@purin-labs/std";
-import type { CommerceObservationDisposition } from "@purin-labs/control-api";
+import type { CommerceObservationDisposition } from "@purin-labs/commerce-control-api";
 import {
   type CommerceLabCueReceipt,
   type CommerceLabProjectionReceipt,

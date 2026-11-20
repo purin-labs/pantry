@@ -13,7 +13,6 @@ import {
 } from "../price-allowance";
 import { Link } from "react-router";
 import { toast } from "sonner";
-
 import type {
   AttributeDefinitionId,
   CommerceEntity,
@@ -74,7 +73,7 @@ import {
   type CommerceEntityDossierModel,
 } from "./models";
 import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "./api";
-import type { CommerceListEntryPatchApprovalAction, CommerceActivityResult } from "@purin-labs/control-api/portal/entity-plane";
+import type { CommerceListEntryPatchApprovalAction, CommerceActivityResult } from "@purin-labs/commerce-control-api/portal/entity-plane";
 import {
   PurchaseRequestCardEditor,
   PurchasingControls,
@@ -83,12 +82,13 @@ import type {
   CommerceOperationsTransport,
   OrderCancellationAction,
 } from "../operations";
-import { parseCommerceActionRecordResponse, type CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import { parseCommerceActionRecordResponse, type CommerceActionRecord } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { useDossierSurface } from "./dossier-surface";
 import { CrmIdentity, CrmTable, type CrmColumn } from "../../../ui";
-import type { CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, PermissionRequired } from "@purin-labs/control-api";
+import type { CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection } from "@purin-labs/commerce-control-api";
+import type { PermissionRequired } from "@purin-labs/control-api";
 
 type CommerceGraphPage = "products" | "orders" | "suppliers";
 

@@ -4,7 +4,7 @@ import {
   parseInventoryDeliveries,
   type InventoryDeliveries,
   type InventoryDelivery,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 
 import { controlRead } from "../../control-client";
 import { PageSkeleton, RecoverableError } from "../../page-components";

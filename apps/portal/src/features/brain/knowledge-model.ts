@@ -1,7 +1,10 @@
 import type { EvalView, MemoryView } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import type { AgentDefinition, Skill } from "@purin-labs/control-api/portal/agent-operations";
+import type {
+  AgentDefinition,
+  Skill,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { StatusChipStatus } from "../../status-chip";
 import type { KnowledgeState } from "./address";
 import {

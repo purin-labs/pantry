@@ -2,7 +2,7 @@ import React from "react";
 
 import { formatMoneyMinorEnglish as money } from "../../formatting";
 
-import type { CommerceActionDetails } from "@purin-labs/control-api/portal/commerce-actions";
+import type { CommerceActionDetails } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { Variant } from "@purin-labs/type-utils";
 
 /** The exact money that goes back, and where it comes from on the order. */

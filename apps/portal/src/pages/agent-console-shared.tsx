@@ -1,6 +1,18 @@
 import React from "react";
 
-import type { AgentConfigurationProposal, AgentDefinition, AgentInstallation, AgentOperationCommand, AgentOperationFormContext, AgentOperationKind, AgentOperationsSnapshot, CueBinding, OperationalArea, Skill, ScheduleBinding } from "@purin-labs/control-api/portal/agent-operations";
+import type {
+  AgentConfigurationProposal,
+  AgentDefinition,
+  AgentInstallation,
+  AgentOperationCommand,
+  AgentOperationFormContext,
+  AgentOperationKind,
+  AgentOperationsSnapshot,
+  CueBinding,
+  OperationalArea,
+  Skill,
+  ScheduleBinding,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import {
   Notice,
   RecoverableError,

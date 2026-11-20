@@ -11,10 +11,10 @@
 import { fixtureDatabase } from "./organisation-database";
 import { exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import type { MenuScreenFeed } from "@purin-labs/control-api";
+import type { MenuScreenFeed } from "@purin-labs/cafe-control-api";
 import { isRecord } from "@purin-labs/std";
 import { commerceActionTitle } from "../../../../apps/portal/src/features/governed-actions/commerce";
-import { parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
+import { parseCommerceActionRecordResponse } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import {
   BASE,
   actionState,

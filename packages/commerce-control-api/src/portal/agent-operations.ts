@@ -23,10 +23,10 @@ import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord, isString } from "@purin-labs/std";
 import type {
   AgentSkillRef,
-  CommerceExceptionInbox,
   ScheduleSpec,
   ScheduleWeekday,
-} from "../index.ts";
+} from "@purin-labs/control-api";
+import type { CommerceExceptionInbox } from "../commerce.ts";
 
 export type AgentOperationsSnapshot = {
   readonly areas: readonly OperationalArea[];

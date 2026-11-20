@@ -30,7 +30,7 @@ import {
 } from "../actor-export";
 import { readNextCodeModeOrganisationAlarmAt } from "../code-mode-budget";
 import { errorMessage } from "@purin-labs/std";
-import type { CommerceBoardPresenceEntry } from "@purin-labs/control-api";
+import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import type { CodeModeOrganisationActorError } from "./code-mode-types";
 import type {
