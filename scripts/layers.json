@@ -821,6 +821,7 @@
     "services/platform/src/control/mutation-receipt.ts": "foundation/control",
     "services/platform/src/control/mutation.ts": "foundation/control",
     "services/platform/src/control/oidc.ts": "foundation/control",
+    "services/platform/src/control/path-match.ts": "foundation/control",
     "services/platform/src/control/onboarding-runtime.ts": "areas/organisation",
     "services/platform/src/control/organisation-runtime.ts": "foundation/control",
     "services/platform/src/control/permission-required.ts": "foundation/control",

@@ -211,6 +211,11 @@ import {
   type CustomConnectorControlRoute,
 } from "./control/routes/custom-connectors";
 import {
+  handlePortalChatControlRoute,
+  matchPortalChatControlRoute,
+  type PortalChatControlRoute,
+} from "./control/routes/chat/router";
+import {
   handleOnboardingControlRoute,
   matchOnboardingControlRoute,
   type OnboardingControlRoute,
@@ -275,6 +280,7 @@ type ControlRoute =
   | CommerceControlRoute
   | IntegrationControlRoute
   | CustomConnectorControlRoute
+  | PortalChatControlRoute
   | OnboardingControlRoute
   | OperatorControlRoute
   | SessionControlRoute
@@ -411,7 +417,6 @@ export async function handleControlRequest(
     case "refreshAccountResources":
     case "removeAccount":
       return handleIntegrationControlRoute(request, env, route, url);
-    case "customConnectors":
     case "portalChat":
     case "portalChatCancel":
     case "portalChatConversation":
@@ -425,6 +430,8 @@ export async function handleControlRequest(
     case "portalChatStream":
     case "portalChatSurfaceEffects":
     case "portalChatSurfaceReceipt":
+      return handlePortalChatControlRoute(request, env, route, execution);
+    case "customConnectors":
     case "customConnector":
     case "customConnectorAction":
     case "customConnectorRevisions":
@@ -433,7 +440,7 @@ export async function handleControlRequest(
     case "customConnectorSetupAttempt":
     case "customConnectorSetupAction":
     case "customConnectorWriteAction":
-      return handleCustomConnectorControlRoute(request, env, route, execution);
+      return handleCustomConnectorControlRoute(request, env, route);
     case "setup":
     case "stageViewed":
     case "readiness":
@@ -662,6 +669,8 @@ function matchControlRoute(pathname: string): ControlRoute {
   if (agentRoute !== null) return agentRoute;
   const integrationRoute = matchIntegrationControlRoute(pathname);
   if (integrationRoute !== null) return integrationRoute;
+  const portalChatRoute = matchPortalChatControlRoute(pathname);
+  if (portalChatRoute !== null) return portalChatRoute;
   const customConnectorRoute = matchCustomConnectorControlRoute(pathname);
   if (customConnectorRoute !== null) return customConnectorRoute;
   const commerceRoute = matchCommerceControlRoute(pathname);

@@ -950,7 +950,6 @@ function dispatchControlWrite(
     request,
     new Proxy(env, { get: controlWriteBinding }),
     route,
-    null,
   );
 }
 
