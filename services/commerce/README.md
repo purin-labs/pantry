@@ -54,3 +54,22 @@ states. See [docs/plan.md](docs/plan.md).
   Worker with a deterministic payment gateway, an optional fixed clock and
   named seed scenarios
 - `docs/` — plan
+
+## Schema upgrades
+
+`src/schema.ts` upgrades a merchant object in its constructor, so a deploy
+upgrades each merchant on its next request. A failed step rolls back, and the
+object then refuses every request. A SQLite Durable Object keeps foreign keys
+on even after `PRAGMA foreign_keys = OFF`, so a table rebuild with dependent
+rows can fail there while the Node suite passes.
+
+Before a deploy that adds an upgrade step, rehearse it in workerd from the
+commit that production runs:
+
+```bash
+node --experimental-strip-types scripts/schema-upgrade-rehearsal.ts --from <production commit> --out <report.json>
+```
+
+The old code seeds paid orders and an unpaid checkout, and this tree opens the
+same storage. The rehearsal passes when the object opens, every table keeps its
+rows, the foreign key check is clean, and the schema equals a new database.

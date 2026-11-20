@@ -71,8 +71,9 @@ import {
 } from "../scripts/seed-local-commerce.ts";
 import { QuickJsFunctionRuntime } from "../src/plugins/function-runtime.ts";
 import quickjsWasm from "./quickjs-wasm-module.ts";
+import { FIXTURE_NOW } from "../scripts/fixture-miniflare.ts";
 
-export const NOW = "2026-08-14T10:00:00.000Z";
+export const NOW = FIXTURE_NOW;
 export const SERVICE_TOKEN = "catalog_editing_service_token";
 export const BASE_URL = "https://underclerk.test";
 export const STOREFRONT = "storefront_cafe";

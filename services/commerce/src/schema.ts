@@ -1754,39 +1754,38 @@ export function initializeCommerceSchema(
       applySchemaBaseline.bind(undefined, database, appliedAt),
     );
   } else if (row.version >= 66 && row.version < SCHEMA_VERSION) {
+    // Foreign keys stay on. A SQLite Durable Object ignores
+    // `PRAGMA foreign_keys = OFF`, so each step must hold with them on, and
+    // the Node suite runs the steps as a merchant object does. Rehearse a new
+    // step with scripts/schema-upgrade-rehearsal.ts.
     const from = row.version;
-    if (from < 91) database.exec("PRAGMA foreign_keys = OFF");
-    try {
-      database.transaction(() => {
-        if (from < 67) applySchemaV67(database, appliedAt);
-        if (from < 68) applySchemaV68(database, appliedAt);
-        if (from < 69) applySchemaV69(database, appliedAt);
-        if (from < 70) applySchemaV70(database, appliedAt);
-        if (from < 71) applySchemaV71(database, appliedAt);
-        if (from < 72) applySchemaV72(database, appliedAt);
-        if (from < 73) applySchemaV73(database, appliedAt);
-        if (from < 74) applySchemaV74(database, appliedAt);
-        if (from < 75) applySchemaV75(database, appliedAt);
-        if (from < 76) applySchemaV76(database, appliedAt);
-        if (from < 77) applySchemaV77(database, appliedAt);
-        if (from < 78) applySchemaV78(database, appliedAt);
-        if (from < 79) applySchemaV79(database, appliedAt);
-        if (from < 80) applySchemaV80(database, appliedAt);
-        if (from < 81) applySchemaV81(database, appliedAt);
-        if (from < 82) applySchemaV82(database, appliedAt);
-        if (from < 83) applySchemaV83(database, appliedAt);
-        if (from < 84) applySchemaV84(database, appliedAt);
-        if (from < 85) applySchemaV85(database, appliedAt);
-        if (from < 86) applySchemaV86(database, appliedAt);
-        if (from < 87) applySchemaV87(database, appliedAt);
-        if (from < 88) applySchemaV88(database, appliedAt);
-        if (from < 89) applySchemaV89(database, appliedAt);
-        if (from < 90) applySchemaV90(database, appliedAt);
-        applySchemaV91(database, appliedAt);
-      });
-    } finally {
-      if (from < 91) database.exec("PRAGMA foreign_keys = ON");
-    }
+    database.transaction(() => {
+      if (from < 67) applySchemaV67(database, appliedAt);
+      if (from < 68) applySchemaV68(database, appliedAt);
+      if (from < 69) applySchemaV69(database, appliedAt);
+      if (from < 70) applySchemaV70(database, appliedAt);
+      if (from < 71) applySchemaV71(database, appliedAt);
+      if (from < 72) applySchemaV72(database, appliedAt);
+      if (from < 73) applySchemaV73(database, appliedAt);
+      if (from < 74) applySchemaV74(database, appliedAt);
+      if (from < 75) applySchemaV75(database, appliedAt);
+      if (from < 76) applySchemaV76(database, appliedAt);
+      if (from < 77) applySchemaV77(database, appliedAt);
+      if (from < 78) applySchemaV78(database, appliedAt);
+      if (from < 79) applySchemaV79(database, appliedAt);
+      if (from < 80) applySchemaV80(database, appliedAt);
+      if (from < 81) applySchemaV81(database, appliedAt);
+      if (from < 82) applySchemaV82(database, appliedAt);
+      if (from < 83) applySchemaV83(database, appliedAt);
+      if (from < 84) applySchemaV84(database, appliedAt);
+      if (from < 85) applySchemaV85(database, appliedAt);
+      if (from < 86) applySchemaV86(database, appliedAt);
+      if (from < 87) applySchemaV87(database, appliedAt);
+      if (from < 88) applySchemaV88(database, appliedAt);
+      if (from < 89) applySchemaV89(database, appliedAt);
+      if (from < 90) applySchemaV90(database, appliedAt);
+      applySchemaV91(database, appliedAt);
+    });
   } else if (row.version !== SCHEMA_VERSION) {
     throw new Error(`Unsupported Underclerk schema version: ${row.version}`);
   }
@@ -1849,7 +1848,17 @@ function applySchemaV87(database: CommerceDatabase, appliedAt: string): void {
 // Schema 91 (Plan 90 Phase 1): cash-enabled counters can open a point_of_sale
 // checkout with terminal_assignment_revision IS NULL, and manual_tender records
 // cash_received_minor / change_due_minor for counter cash sales. Frozen DDL.
+//
+// checkout_payment_attempt references buyer_checkout ON DELETE RESTRICT. The
+// RENAME below would move that reference to buyer_checkout_v90, and its DROP
+// would then fail for every checkout with a payment attempt, because foreign
+// keys stay on in a Durable Object. So the payment attempts move first to a
+// copy without constraints, and their own rebuild below reads that copy.
 const SCHEMA_V91_MIGRATION = `
+CREATE TABLE checkout_payment_attempt_v90 AS
+  SELECT * FROM checkout_payment_attempt ORDER BY rowid;
+DROP TABLE checkout_payment_attempt;
+
 ALTER TABLE buyer_checkout RENAME TO buyer_checkout_v90;
 DROP INDEX IF EXISTS buyer_checkout_session;
 DROP INDEX IF EXISTS buyer_checkout_payment_pending;
@@ -2024,8 +2033,6 @@ ALTER TABLE square_terminal_checkout ADD COLUMN payment_method TEXT NOT NULL DEF
   payment_method IN ('card', 'felica', 'qr_code')
 );
 
-ALTER TABLE checkout_payment_attempt RENAME TO checkout_payment_attempt_v90;
-DROP INDEX IF EXISTS checkout_payment_attempt_state;
 CREATE TABLE checkout_payment_attempt (
   merchant_id TEXT NOT NULL,
   payment_attempt_id TEXT NOT NULL,

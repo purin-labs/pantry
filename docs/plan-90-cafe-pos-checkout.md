@@ -1,6 +1,19 @@
 # Plan 90 — Café Counter Register and POS Payment Adapters
 
-Status: **proposed · no code yet**
+Status (20 November 2026): Phases 1, 2, 3A and 4A are built and on `dev`
+(merged on 19 November). Phases 3B, 3C, 4B and 5 are open.
+
+- The Platform releases of 19 and 20 November carry Phase 2: the Register is
+  live in the Portal. The commerce Worker is not deployed since 15 November, so
+  production has none of the Phase 1, 3A and 4A commerce code. The Register
+  takes no payment there: cash is off, and no terminal is assigned.
+- The regional D1 patch `plan90-payment-terminal-d1-patch.sql` is applied in
+  production (checked on 20 November).
+- The schema 91 step of the commerce Worker failed in a Durable Object for each
+  checkout with a payment attempt. It is fixed, and its rehearsal from schema
+  90 passes in workerd (`services/commerce/scripts/schema-upgrade-rehearsal.ts`).
+- The next release deploys the commerce Worker with the Platform Worker.
+
 Date: 16 November 2026
 Owners: Underclerk, Satyr platform, CafeOS Portal, and `shop-gateway`
 
