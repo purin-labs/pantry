@@ -48,6 +48,9 @@ const SOURCES = tracked.filter(
 // Paths that are absent on purpose. Give each one its reason.
 const ABSENT = new Map([
   ["docs/spec.md", "check-commerce-spec.mjs joins it to services/commerce"],
+  // CI checks the merge of dev with main, so the map must know a folder that
+  // only main has. Remove the line when dev has the folder.
+  ["scripts/brand/", "on main since 2026-11-20, not on dev yet"],
 ]);
 
 const ROOTS = "(?:apps|crates|docs|packages|scripts|services)";

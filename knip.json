@@ -47,6 +47,7 @@
         "src/bootstrap.tsx",
         "src/tv/main.tsx",
         "src/dev/*.{ts,tsx}",
+        "src/ui/index.ts",
         "src/features/production-run/linea/espresso-rehearsal.ts",
         "src/features/production-run/execution-worker.ts",
         "src/features/voice/wake-worker.ts",

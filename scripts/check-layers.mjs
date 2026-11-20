@@ -214,11 +214,7 @@ for (const path of trackedFiles()) {
 for (const folder of homeless) {
   faults.push(`${folder}: no place. Add a prefix to placement in ${TARGETS}.`);
 }
-for (const home of Object.keys(targets.placement)) {
-  if (!home.endsWith("*") && !existsSync(join(root, home))) {
-    faults.push(`${TARGETS}: placement names ${home}, which is gone`);
-  }
-}
+// `pnpm lint:lint-paths` checks that each placement key matches a file.
 
 // The writers of each D1 table. A write is INSERT INTO, REPLACE INTO, UPDATE
 // or DELETE FROM with the table name, in a file under `covers`.

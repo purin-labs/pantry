@@ -434,10 +434,17 @@ The prune baseline of step A0.8:
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | Copies of product code      | 937 copies with 17,423 lines (1.59 %) in 2,715 files. The Platform has 555, the Portal 159, `production-simulation` 73, the engine 64 | `node scripts/check-clones.mjs --report` |
 | Unused files                | 1: `services/platform/src/devices/work.ts`, which Plan 24 will call                                                                   | `node scripts/check-unused.mjs --report` |
-| Unused exports              | 908: the Platform 473, the Portal 262, the engine 82, `contracts` 44, `commerce-client` 24                                            | the same                                 |
+| Unused exports              | 819: the Platform 473, the Portal 173, the engine 82, `contracts` 44, `commerce-client` 24                                            | the same                                 |
 | Journeys                    | 308 files with 161,000 lines: 237 of the Platform and 71 of the engine. 196 import the source                                         | `node scripts/list-tests.mjs`            |
 | Other tests                 | 329 files with 148,000 lines. 43 use `vi.mock`                                                                                        | the same                                 |
 | Test support and type files | 105 support files (26,000 lines) and 198 type files (15,000 lines)                                                                    | the same                                 |
+
+CI checks the merge of `dev` with `main`. On 2026-11-20 `main` had 4 commits that
+`dev` lacked (the Purin mark and its tools), and the first run of the new lints
+failed on that merge. Two changes made both trees pass: `apps/portal/src/ui/index.ts`
+is an entry file in `knip.json`, as the public file of the component kit, and
+`scripts/brand/` has a place in the map before `dev` has the folder. A commit that
+goes to `main` and not to `dev` can fail these lints on the next push to `dev`.
 
 jscpd 5 finds more copies than the jscpd 4 scan of Plan 92 (491), with the same
 `--min-tokens 70`: it is a different program, and this scan also reads the crates.

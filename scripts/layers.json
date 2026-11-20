@@ -77,6 +77,7 @@
     "scripts/*": "scripts",
     "scripts/bakery-mujoco/": "areas/kitchen",
     "scripts/bakery-robots/": "areas/kitchen",
+    "scripts/brand/": "scripts",
     "scripts/cloudflare/": "scripts",
     "scripts/frontend-foundation/": "foundation/ui",
     "scripts/frontend-themes/": "foundation/ui",
