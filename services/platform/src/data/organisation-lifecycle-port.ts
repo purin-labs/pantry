@@ -15,8 +15,14 @@
  * serves a request or starts an Actor. A read before that is a programmer
  * error.
  */
-import type { SurfaceKind } from "@purin-labs/contracts";
-import type { OrganisationDatabaseSession } from "../database-handles";
+import type {
+  OnboardingControlRole,
+  SurfaceKind,
+} from "@purin-labs/contracts";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
 import type { ProjectId } from "@purin-labs/control-api";
 import type { OrganisationId, UserId } from "../ids";
 import type { InitialOrganisationPlacement } from "../placement";
@@ -27,6 +33,7 @@ type Session = OrganisationDatabaseSession;
 
 export type OrganisationLifecycleParts = Readonly<{
   creation: OrganisationCreationParts;
+  membership: OrganisationMembershipParts;
 }>;
 
 /** The parts of the creation batch and of the install batch of a surface. */
@@ -108,6 +115,60 @@ export type OrganisationCreationParts = Readonly<{
       integrationAccountId: string;
       botTokenRef: string;
       guard: RowGuard;
+    }>,
+  ): D1PreparedStatement;
+}>;
+
+/** The parts of the batches that change a member of an Organisation. */
+type OrganisationMembershipParts = Readonly<{
+  /** The member's role in the base Project follows a role change (conversation). */
+  baseProjectRoleChange(
+    session: Session,
+    input: Readonly<{
+      organisationId: OrganisationId;
+      userId: UserId;
+      role: OnboardingControlRole;
+      now: number;
+    }>,
+  ): readonly D1PreparedStatement[];
+  /**
+   * A removed member's private chats go back to the default Project, the
+   * member leaves each Project, and the chat directory moves on
+   * (conversation).
+   */
+  memberRemoval(
+    session: Session,
+    input: Readonly<{
+      organisationId: OrganisationId;
+      userId: UserId;
+      now: number;
+    }>,
+  ): readonly D1PreparedStatement[];
+  /** A membership change ends the readiness assessment (organisation). */
+  readinessInvalidation(
+    session: Session,
+    organisationId: OrganisationId,
+  ): D1PreparedStatement;
+  /** The member of an accepted invitation joins the base Project (conversation). */
+  baseProjectMembership(
+    db: OrganisationDatabase,
+    input: Readonly<{
+      organisationId: OrganisationId;
+      userId: UserId;
+      role: OnboardingControlRole;
+      now: number;
+    }>,
+  ): readonly D1PreparedStatement[];
+  /** The invitation of an accepted membership is accepted (organisation). */
+  invitationAcceptance(
+    db: OrganisationDatabase,
+    input: Readonly<{
+      organisationId: OrganisationId;
+      invitationId: string;
+      userId: UserId;
+      membershipId: string;
+      acceptanceReceiptId: string;
+      now: number;
     }>,
   ): D1PreparedStatement;
 }>;

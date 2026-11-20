@@ -6,7 +6,19 @@ import {
 } from "./data/integration-account";
 import type { OrganisationLifecycleParts } from "./data/organisation-lifecycle-port";
 import { prepareInitialOrganisationWorkspace } from "./data/organisation-workspace";
-import { baseProjectId, prepareBaseProject } from "./projects/default-project";
+import { prepareReadinessAssessmentDeletion } from "./data/onboarding";
+import { prepareServiceInvitationAcceptance } from "./data/service-invitation-role";
+import {
+  prepareChatDirectoryRevisionBump,
+  prepareReturnPrivateChatsToDefault,
+} from "./projects/case-project";
+import {
+  baseProjectId,
+  prepareBaseProject,
+  prepareBaseProjectMembership,
+  prepareBaseProjectRoleChange,
+  prepareProjectMembershipRevocation,
+} from "./projects/default-project";
 
 /**
  * The Worker gives the lifecycle batches of tenancy the statements of the
@@ -38,5 +50,31 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
       prepareSurfaceReinstallConnectionRows(session, input),
     replacedSurfaceTokenRevocation: (session, input) =>
       prepareReplacedSurfaceTokenRevocation(session, input),
+  },
+  membership: {
+    baseProjectRoleChange: (session, input) =>
+      prepareBaseProjectRoleChange(session, input),
+    memberRemoval: (session, input) => [
+      ...prepareReturnPrivateChatsToDefault(session, {
+        organisationId: input.organisationId,
+        sourceProjectId: null,
+        ownerUserId: input.userId,
+        now: input.now,
+        guard: null,
+      }),
+      ...prepareProjectMembershipRevocation(session, {
+        organisationId: input.organisationId,
+        userId: input.userId,
+        now: input.now,
+        guard: null,
+      }),
+      prepareChatDirectoryRevisionBump(session, input.organisationId),
+    ],
+    readinessInvalidation: (session, organisationId) =>
+      prepareReadinessAssessmentDeletion(session, organisationId),
+    baseProjectMembership: (db, input) =>
+      prepareBaseProjectMembership(db, input),
+    invitationAcceptance: (db, input) =>
+      prepareServiceInvitationAcceptance(db, input),
   },
 };

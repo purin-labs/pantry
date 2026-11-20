@@ -62,14 +62,6 @@ import type {
   OrganisationQuerySource,
   GlobalQuerySource,
 } from "./query-source";
-import {
-  prepareBaseProjectRoleChange,
-  prepareProjectMembershipRevocation,
-} from "../projects/default-project";
-import {
-  prepareChatDirectoryRevisionBump,
-  prepareReturnPrivateChatsToDefault,
-} from "../projects/case-project";
 import type { OnboardingControlRole } from "@purin-labs/contracts";
 import { encodeBase64Url, isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
@@ -1448,6 +1440,7 @@ export async function changeOrganisationServiceRole(input: {
     user_id: input.targetUserId,
     role: input.nextRole,
   };
+  const parts = organisationLifecycleParts().membership;
   const statements: D1PreparedStatement[] = [];
   if (member.role !== input.nextRole) {
     statements.push(
@@ -1458,18 +1451,14 @@ export async function changeOrganisationServiceRole(input: {
          WHERE organisation_id = ? AND user_id = ? AND status = 'active'`,
         )
         .bind(input.nextRole, input.organisationId, input.targetUserId),
-      ...prepareBaseProjectRoleChange(session, {
+      ...parts.baseProjectRoleChange(session, {
         organisationId: input.organisationId,
         userId: input.targetUserId,
         role: input.nextRole,
         now: input.now,
       }),
       prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
-      session
-        .prepare(
-          `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
-        )
-        .bind(input.organisationId),
+      parts.readinessInvalidation(session, input.organisationId),
       prepareOnboardingEvent(session, input.mutation.identity, {
         eventId: `event_${crypto.randomUUID()}`,
         eventType: "readiness_invalidated",
@@ -1597,6 +1586,7 @@ export async function revokeOrganisationMembership(input: {
     organisation_id: input.organisationId,
     user_id: input.targetUserId,
   };
+  const parts = organisationLifecycleParts().membership;
   await session.batch([
     input.execution.prepareMutationFence(),
     session
@@ -1606,26 +1596,13 @@ export async function revokeOrganisationMembership(input: {
        WHERE organisation_id = ? AND user_id = ? AND status = 'active'`,
       )
       .bind(input.now, input.organisationId, input.targetUserId),
-    ...prepareReturnPrivateChatsToDefault(session, {
-      organisationId: input.organisationId,
-      sourceProjectId: null,
-      ownerUserId: input.targetUserId,
-      now: input.now,
-      guard: null,
-    }),
-    ...prepareProjectMembershipRevocation(session, {
+    ...parts.memberRemoval(session, {
       organisationId: input.organisationId,
       userId: input.targetUserId,
       now: input.now,
-      guard: null,
     }),
-    prepareChatDirectoryRevisionBump(session, input.organisationId),
     prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
-    session
-      .prepare(
-        `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
-      )
-      .bind(input.organisationId),
+    parts.readinessInvalidation(session, input.organisationId),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

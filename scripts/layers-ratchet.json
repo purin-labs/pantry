@@ -2,8 +2,8 @@
   "totals": {
     "upward": 68,
     "areas": 44,
-    "order": 15,
-    "table": 21
+    "order": 12,
+    "table": 18
   },
   "crossings": {
     "areas/brain -> areas/inbox": 1,
@@ -53,16 +53,13 @@
     "foundation/conversation -> surfaces/portal": 2,
     "foundation/conversation -> surfaces/slack": 4,
     "foundation/kernel -> foundation/contracts": 1,
-    "foundation/tenancy -> foundation/conversation": 3,
     "foundation/tool-handlers -> surfaces/slack": 2,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
-    "table account_service_invitation_role (areas/organisation) <- foundation/tenancy": 1,
     "table credential_ref (foundation/authority) <- foundation/connections": 1,
     "table integration_account (foundation/connections) <- foundation/tenancy": 3,
     "table onboarding_support_reference (areas/organisation) <- foundation/connections": 1,
     "table organisation_communication_destination (areas/organisation) <- foundation/connections": 1,
-    "table organisation_readiness_assessment (areas/organisation) <- foundation/tenancy": 2,
     "table project (foundation/conversation) <- surfaces/portal": 1,
     "table project_member (foundation/conversation) <- foundation/tenancy": 1,
     "table provider_connection (foundation/connections) <- foundation/tenancy": 3,

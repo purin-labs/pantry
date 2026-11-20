@@ -49,7 +49,10 @@ import {
   prepareOnboardingEvent,
   type ControlMutationIdentity,
 } from "./control-mutation";
-import { ensureCurrentReadiness } from "./onboarding";
+import {
+  ensureCurrentReadiness,
+  prepareReadinessAssessmentDeletion,
+} from "./onboarding";
 import { expireProviderAttemptIfDue } from "./provider-attempt";
 import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 import {
@@ -958,12 +961,10 @@ async function reconcileSetupSnapshots(
   if (incomplete?.found !== 1) {
     return 0;
   }
-  const result = await db
-    .prepare(
-      `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
-    )
-    .bind(organisation.organisationId)
-    .run();
+  const result = await prepareReadinessAssessmentDeletion(
+    db,
+    organisation.organisationId,
+  ).run();
   await prepareProjectionRevisionBump(db, organisation.organisationId, { updatedAt: now })
     .run();
   return Math.max(result.meta.changes ?? 0, 1);
