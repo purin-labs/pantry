@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 370,
+    "upward": 354,
     "areas": 222,
     "order": 134,
     "table": 118
@@ -102,10 +102,7 @@
     "foundation/authority -> foundation/control": 12,
     "foundation/authority -> foundation/conversation": 4,
     "foundation/authority -> workers/platform": 3,
-    "foundation/collaboration -> areas/cafe": 3,
-    "foundation/collaboration -> areas/commerce": 3,
-    "foundation/collaboration -> areas/inbox": 4,
-    "foundation/collaboration -> areas/kitchen": 7,
+    "foundation/collaboration -> areas/commerce": 1,
     "foundation/connections -> areas/organisation": 1,
     "foundation/connections -> foundation/authority": 1,
     "foundation/connections -> foundation/control": 1,

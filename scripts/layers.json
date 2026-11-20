@@ -54,7 +54,8 @@
     "services/platform/src/actors/organisation.ts": "The class OrganisationDO with logic of tenancy, authority, commerce and collaboration. The class becomes a shell of the Worker in steps A1.1 and A1.5.",
     "services/platform/src/actors/organisation/support.ts": "Helpers of the Organisation actor for the code of commerce, policy and Code Mode. They go with their module when the class becomes a shell (step A1.9).",
     "services/platform/src/actors/connector.ts": "The class ConnectorDO. It joins the Slack, email, WhatsApp and Eval parts of the Connector actor. The class becomes a shell of the Worker in step A1.9.",
-    "apps/portal/src/route.ts": "The page list of the Portal: the path, the title and the navigation group of each page. Each area reads it to make a link, and it imports no area. It names the pages of every area in one union; an area registers its own pages when the Portal gets a page registry (step A1.10)."
+    "apps/portal/src/route.ts": "The page list of the Portal: the path, the title and the navigation group of each page. Each area reads it to make a link, and it imports no area. It names the pages of every area in one union; an area registers its own pages when the Portal gets a page registry (step A1.10).",
+    "services/platform/src/actors/organisation-collaboration-rooms.ts": "The list of the shared document rooms of OrganisationDO: one route match, one admission check and one room class for each document of Kitchen, Café, commerce and the inbox. Only the class OrganisationDO imports it, so it is a part of the Worker. Each area registers its room when the class becomes a shell (step A1.9)."
   },
   "placement": {
     "*": "root",
@@ -653,7 +654,7 @@
     "services/platform/src/actors/onboarding-activation-acceptance-fault.ts": "areas/organisation",
     "services/platform/src/actors/organisation-alarm.ts": "workers/platform",
     "services/platform/src/actors/organisation-archive-cleanup.ts": "foundation/tenancy",
-    "services/platform/src/actors/organisation-collaboration-rooms.ts": "foundation/collaboration",
+    "services/platform/src/actors/organisation-collaboration-rooms.ts": "workers/platform",
     "services/platform/src/actors/organisation-cutover-quiescence.ts": "foundation/tenancy",
     "services/platform/src/actors/organisation-execution-records.ts": "areas/brain",
     "services/platform/src/actors/organisation.ts": "workers/platform",
