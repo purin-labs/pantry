@@ -7,8 +7,8 @@ import type {
   MenuScreenEntry,
   MenuScreenFacts,
   MenuScreenPhoto,
-  MenuScreenPickup,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
+import type { MenuScreenPickup } from "@purin-labs/control-api";
 import {
   MENU_BOARD_LAYOUTS,
   MENU_BOARD_SCREEN_SIZES,

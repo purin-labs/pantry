@@ -7,7 +7,7 @@ import {
   type ContractDecodeResult,
   SafeInteger as safeInteger,
   PositiveInteger as positiveInteger,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type StaticDecode } from "typebox";
 import { assertNever } from "@purin-labs/std";
 import { type StrictUnion } from "@purin-labs/type-utils";

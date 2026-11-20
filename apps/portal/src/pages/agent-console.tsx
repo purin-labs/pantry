@@ -13,7 +13,16 @@ import {
   Zap,
 } from "lucide-react";
 
-import type { AgentPublishedResourceMetadata, AgentDefinition, AgentInstallation, AgentOperationsSnapshot, CueBinding, ScheduleBinding, OperationalArea, Skill } from "@purin-labs/control-api/portal/agent-operations";
+import type {
+  AgentPublishedResourceMetadata,
+  AgentDefinition,
+  AgentInstallation,
+  AgentOperationsSnapshot,
+  CueBinding,
+  ScheduleBinding,
+  OperationalArea,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
+import type { Skill } from "@purin-labs/control-api";
 import { readPublishedCommerceResources } from "../features/commerce/entity-plane/api";
 import {
   EmptyState,

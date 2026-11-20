@@ -16,7 +16,7 @@ import {
   parseContract,
   type ContractDecodeResult,
   NonNegativeInteger as rawRevision,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 import { isRecord } from "@purin-labs/std";

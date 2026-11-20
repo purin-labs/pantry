@@ -3,14 +3,14 @@ import { fixtureDatabase } from "./organisation-database";
 import { expect, it, type TestContext } from "vitest";
 import {
   MENU_SCREEN_SOCKET_PROTOCOL,
-  parseInventoryReceiptContext,
   parseMenuBoardSummaries,
   parseMenuScreenFeed,
   parseMenuScreenPairing,
   parseMenuScreenPairingState,
   parseMenuScreenSummaries,
   type MenuScreenFeed,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
+import { parseInventoryReceiptContext } from "@purin-labs/kitchen-control-api";
 import { MenuBoardDoc, type MenuBoardUpdate } from "@purin-labs/menu-board-crdt";
 import {
   encodeMenuBoardClientMessage,

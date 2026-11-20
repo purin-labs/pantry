@@ -3,7 +3,7 @@ import {
   parseContract,
   type ContractDecodeResult,
   type ContractRejection,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";

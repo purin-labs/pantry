@@ -5,7 +5,6 @@ import {
   isRecord,
   sameJson,
 } from "@purin-labs/std";
-import type { CommerceEntityRef } from "@purin-labs/commerce-contracts";
 
 /** One exact Memory revision. Turns, evals and receipts cite this pair. */
 export type MemoryRevisionRef = Readonly<{
@@ -14,6 +13,16 @@ export type MemoryRevisionRef = Readonly<{
 }>;
 
 export type MemoryKind = "fact" | "preference" | "lesson";
+
+/**
+ * The commerce entity that an entity scope names. Memory holds the reference
+ * as it is; the parser that the commerce area gives checks its exact shape.
+ */
+type MemoryEntityRef = Readonly<{
+  origin: "system" | "custom";
+  typeId: string;
+  entityId: string;
+}>;
 
 /**
  * Where a Memory applies.
@@ -49,7 +58,7 @@ export type MemoryApplicability =
   | Readonly<{
       kind: "commerce_entity";
       merchantId: string;
-      entity: CommerceEntityRef;
+      entity: MemoryEntityRef;
       skillId?: never;
       entityType?: never;
     }>;
@@ -284,7 +293,7 @@ export type MemoryCommandErrorCode =
   | "memory_capacity_exceeded";
 
 /** Parses a commerce entity reference, or returns null when it is not one. */
-export type MemoryEntityRefParser = (raw: unknown) => CommerceEntityRef | null;
+export type MemoryEntityRefParser = (raw: unknown) => MemoryEntityRef | null;
 
 const MAX_STATEMENT_LENGTH = 2_000;
 const MAX_EVIDENCE = 20;

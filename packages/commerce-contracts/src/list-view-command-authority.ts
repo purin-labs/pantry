@@ -3,7 +3,7 @@ import { parseCommandAuthorizationInput } from "./command-authorization-input.ts
 import { parseCommerceEntityAuthority } from "./command-authority.ts";
 import { parseListViewCommand } from "./list-view-commands.ts";
 import { cursorRefusal } from "./cursor-values.ts";
-import type { ContractDecodeResult } from "./schema.ts";
+import type { ContractDecodeResult } from "@purin-labs/contract-schema";
 
 export function validateListViewCommandAuthority(
   input: unknown,

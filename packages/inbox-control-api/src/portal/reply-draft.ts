@@ -10,7 +10,7 @@ import {
   type MailReplyRoomMetadata,
 } from "@purin-labs/mail-reply-crdt/protocol";
 import { assertNever } from "@purin-labs/std";
-import type { TextCollaborationServerMessage } from "./text-collaboration.ts";
+import type { TextCollaborationServerMessage } from "@purin-labs/collaboration";
 
 export function parseReplyServerMessage(frame: unknown) {
   const parsed = parseDraftServerMessage(frame);

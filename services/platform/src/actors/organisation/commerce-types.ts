@@ -19,7 +19,7 @@ import type { CommerceEntityRelationRow } from "../commerce-query-schema";
 import type {
   CommerceBoardDragPreview,
   CommerceBoardPresenceSelection,
-} from "@purin-labs/control-api";
+} from "@purin-labs/commerce-control-api";
 
 export type CafeCommerceAcceptanceFaultRecord = Readonly<{
   schemaVersion: 1;

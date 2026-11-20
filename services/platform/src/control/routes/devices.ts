@@ -13,8 +13,8 @@ import {
   type DeviceSnapshotList,
   type DeviceStationId,
   type DeviceView,
-  type MenuScreenSummary,
 } from "@purin-labs/control-api";
+import { type MenuScreenSummary } from "@purin-labs/cafe-control-api";
 
 import { deviceFleetStub, type DeviceSample } from "../../actors/device-fleet";
 import { roleMayConfigure, roleMayOperate } from "../../data/control-plane";

@@ -3,7 +3,7 @@
 // keys, the currencies that Commerce sells in, unique countries and ids,
 // and a positive decimal rate.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

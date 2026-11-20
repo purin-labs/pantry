@@ -2,7 +2,10 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Package, RotateCcw, Workflow } from "lucide-react";
 import { CommerceActionTrace } from "../features/governed-actions/commerce-trace";
-import { parseCommerceActionExecutionResponse, type CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import {
+  parseCommerceActionExecutionResponse,
+  type CommerceActionRecord,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import { usePortalTheme } from "../use-portal-theme";
 import "../styles.css";

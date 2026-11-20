@@ -3,7 +3,11 @@
 // step 2). Each rule is the rule of one hand-written reader; the record
 // schemas apply it where that reader runs.
 import { Type, type TSchema } from "typebox";
-import { NonNegativeInteger, OpenObject, StrictObject } from "../schema.ts";
+import {
+  NonNegativeInteger,
+  OpenObject,
+  StrictObject,
+} from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   currencyCodeTextSchema,

@@ -2,7 +2,7 @@ import {
   MENU_SCREEN_SIGNAL,
   MENU_SCREEN_SOCKET_PROTOCOL,
   type MenuScreenSummary,
-} from "@purin-labs/control-api";
+} from "@purin-labs/cafe-control-api";
 import { isNonNegativeInteger, isRecord, sha256Hex } from "@purin-labs/std";
 
 import { controlError } from "../control/http";

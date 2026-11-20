@@ -1,7 +1,9 @@
 import type { CheckoutProfile } from "@purin-labs/commerce-contracts";
 
 import type { CheckoutProfileCollection, DraftCheckoutProfileSummary, PublishedCheckoutProfileSummary } from "./api";
-import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
+import type {
+  CheckoutProfileSummary,
+} from "@purin-labs/commerce-control-api/portal/checkout-profiles";
 import { formatMoneyMinor } from "../../formatting";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

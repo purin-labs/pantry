@@ -7,7 +7,7 @@ import {
   StrictObject,
   parseContract,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import {
   commerceAuthorityContextSchema,

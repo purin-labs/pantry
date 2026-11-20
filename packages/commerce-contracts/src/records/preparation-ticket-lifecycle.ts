@@ -2,7 +2,7 @@
 // (commerce-machines.ts). Kept beside commerce-records.ts, which re-exports it.
 import { Type, type Static } from "typebox";
 
-import { OpenObject } from "../schema.ts";
+import { OpenObject } from "@purin-labs/contract-schema";
 import { resourceIdSchema } from "./identifiers.ts";
 import { commerceTimestampSchema } from "./provenance.ts";
 

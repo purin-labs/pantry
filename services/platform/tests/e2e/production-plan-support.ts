@@ -8,7 +8,7 @@ import {
   parseInventoryProductionContext,
   parseProductionDemand,
   type InventoryProductionRequest,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   ProductionPlanDoc,
   type ProductionPlanUpdate,

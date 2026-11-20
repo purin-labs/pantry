@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 351,
-    "areas": 217,
-    "order": 134,
+    "upward": 346,
+    "areas": 215,
+    "order": 133,
     "table": 118
   },
   "crossings": {
@@ -135,16 +135,8 @@
     "foundation/tenancy -> foundation/conversation": 7,
     "foundation/tenancy -> surfaces/slack": 1,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
-    "package packages/bakery-model -> @purin-labs/commerce-contracts": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
-    "package packages/control-api -> @purin-labs/collaboration": 1,
-    "package packages/control-api -> @purin-labs/commerce-client": 1,
     "package packages/control-api -> @purin-labs/commerce-contracts": 1,
-    "package packages/control-api -> @purin-labs/mail-reply-crdt": 1,
-    "package packages/control-api -> @purin-labs/menu-board-crdt": 1,
-    "package packages/control-api -> @purin-labs/menu-draft-crdt": 1,
-    "package packages/control-api -> @purin-labs/product-description-crdt": 1,
-    "package packages/production-simulation -> @purin-labs/commerce-contracts": 1,
     "surfaces/email -> workers/platform": 1,
     "table access_grant (foundation/authority) <- areas/commerce": 1,
     "table access_grant (foundation/authority) <- areas/inbox": 1,

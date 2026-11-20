@@ -6,6 +6,8 @@ import {
   parseMenuScreenFeed,
   parseMenuScreenPairing,
   parseMenuScreenPairingState,
+} from "@purin-labs/cafe-control-api";
+import {
   parseMenuScreenPickup,
   parseBankPayouts,
   parseFailedPaymentsDay,

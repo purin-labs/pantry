@@ -10,7 +10,7 @@ import {
 import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import {
   commerceClient,

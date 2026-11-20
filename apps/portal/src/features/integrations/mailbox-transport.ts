@@ -1,5 +1,7 @@
 import { controlRead } from "../../control-client";
-import { parseAgentOperationsResponse } from "@purin-labs/control-api/portal/agent-operations";
+import {
+  parseAgentOperationsResponse,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import type { MailboxInstallationOption } from "../../pages/agent-mailbox";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";

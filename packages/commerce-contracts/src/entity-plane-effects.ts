@@ -17,7 +17,7 @@ import {
   parseContract,
   type ContractDecodeResult,
   NonNegativeInteger as revisionWire,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever } from "@purin-labs/std";

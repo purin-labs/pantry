@@ -23,17 +23,12 @@
     "check:types": "tsrs --noEmit"
   },
   "dependencies": {
-    "@purin-labs/collaboration": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
-    "@purin-labs/mail-reply-crdt": "workspace:*",
-    "@purin-labs/menu-board-crdt": "workspace:*",
-    "@purin-labs/menu-draft-crdt": "workspace:*",
-    "@purin-labs/product-description-crdt": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@seams-internal/console-shared": "file:../../vendor/seams/seams-internal-console-shared-0.1.3-ebed186cf39a.tgz",
-    "@purin-labs/commerce-client": "workspace:*",
-    "@purin-labs/commerce-contracts": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

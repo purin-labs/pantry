@@ -16,7 +16,8 @@ import type {
   BakeryWorkcellPreparation,
   BakeryWorkspaceViewAction,
 } from "@purin-labs/bakery-model/bakery-surface";
-import type { PageViewCommand, RecipeItem } from "@purin-labs/control-api";
+import type { PageViewCommand } from "@purin-labs/control-api";
+import type { RecipeItem } from "@purin-labs/kitchen-control-api";
 import type { AgentRunSaveVerification } from "../../commerce/bakery/agent-run-save";
 import type { AgentScenarioSaveResult } from "../../commerce/bakery/agent-scenario-save";
 import type {

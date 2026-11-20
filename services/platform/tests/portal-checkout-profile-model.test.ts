@@ -8,7 +8,7 @@ import type {
   CheckoutProfileCollection,
   DraftCheckoutProfileSummary,
 } from "../../../apps/portal/src/features/checkout-profiles/api";
-import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
+import type { CheckoutProfileSummary } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
 import { handleSaveSubmit } from "../../../apps/portal/src/features/checkout-profiles/controller";
 import {
   activeReview,

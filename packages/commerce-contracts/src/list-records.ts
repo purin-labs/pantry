@@ -4,7 +4,7 @@ import {
   parseContract,
   type ContractDecodeResult,
   NonNegativeInteger as revisionWire,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { compareCodePoints } from "@purin-labs/std";

@@ -1,6 +1,11 @@
-import type { ActionLedgerActivity } from "@purin-labs/control-api/portal/agent-operations";
+import type {
+  ActionLedgerActivity,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { assertNever } from "@purin-labs/std";
-import type { CommerceActionAmount, CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import type {
+  CommerceActionAmount,
+  CommerceActionRecord,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 
 /**
  * Renders a minor-unit price for a reader deciding whether to approve it.

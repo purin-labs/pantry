@@ -31,10 +31,10 @@ import {
   parseContract,
   type ContractDecodeResult,
   NonNegativeInteger as revision,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
-import { cleanValue } from "./sorted-unions.ts";
+import { cleanValue } from "@purin-labs/contract-schema/sorted-unions";
 import {
   assertNever,
   canonicalJsonByCodePoint,

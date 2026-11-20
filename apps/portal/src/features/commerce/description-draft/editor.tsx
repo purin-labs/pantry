@@ -5,7 +5,9 @@ import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt";
 import { DescriptionDraftClient, type DescriptionDraftView } from "./client";
 import { DraftParticipants, DraftPresenceOverlay, DraftMousePointers } from "./presence";
 import { cancelDialog, syncDialog } from "../../../dialog";
-import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
+import type {
+  CommerceActionRecord,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { VariantBy } from "@purin-labs/type-utils";
 import type { PermissionRequired } from "@purin-labs/control-api";
 import { PermissionRequiredPrompt, permissionRequiredOf } from "../../access/permission-required-prompt";

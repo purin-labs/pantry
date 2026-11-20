@@ -61,7 +61,13 @@ import {
   startShellReads,
   startWorkspacePageReads,
 } from "./early-reads";
-import { type CommerceActionRecord, parseCommerceActionRecordResponse, parseMerchantPluginPreviewResponse, type MerchantPluginPreview, parseCommerceActionExecutionResponse } from "@purin-labs/control-api/portal/commerce-actions";
+import {
+  type CommerceActionRecord,
+  parseCommerceActionRecordResponse,
+  parseMerchantPluginPreviewResponse,
+  type MerchantPluginPreview,
+  parseCommerceActionExecutionResponse,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { BakerySurfaceEffectBridge } from "./features/bakery-surface-effect-bridge";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

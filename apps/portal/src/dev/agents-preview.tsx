@@ -4,7 +4,12 @@ import { BrowserRouter } from "react-router";
 
 import "../styles.css";
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "../agent-operations";
-import type { AgentDefinition, AgentDocumentRevision, AgentOperationsSnapshot, AgentRevisionTarget } from "@purin-labs/control-api/portal/agent-operations";
+import type {
+  AgentDefinition,
+  AgentDocumentRevision,
+  AgentOperationsSnapshot,
+  AgentRevisionTarget,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import {
   AgentsPage,
   AgentsTabs,

@@ -8,7 +8,7 @@ import {
   OpenObject,
   PositiveInteger,
   SafeInteger,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

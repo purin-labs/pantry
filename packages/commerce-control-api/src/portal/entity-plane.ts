@@ -21,7 +21,7 @@ import type {
   CommerceBoardPresenceEntry,
   CommerceBoardPresenceSelection,
   CommerceObservationDisposition,
-} from "../index.ts";
+} from "../commerce.ts";
 
 export type CommerceListEntryPatchApprovalAction = Readonly<{
   nonce: string;

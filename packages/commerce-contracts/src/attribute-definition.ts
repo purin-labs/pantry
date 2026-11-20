@@ -4,11 +4,11 @@ import {
   parseContract,
   type ContractDecodeResult,
   SafeInteger as integer,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { attributeDefinitionWireSchema } from "./entity-wire.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
-import { cleanValue } from "./sorted-unions.ts";
+import { cleanValue } from "@purin-labs/contract-schema/sorted-unions";
 import { assertNever, codePointCount, isRecord } from "@purin-labs/std";
 import {
   attributeDefinitionScopeSchema,

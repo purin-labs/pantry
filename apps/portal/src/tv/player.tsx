@@ -8,10 +8,12 @@ import {
   parseMenuScreenFeed,
   parseMenuScreenPairing,
   parseMenuScreenPairingState,
-  parseMenuScreenPickup,
   parseMenuScreenSignal,
   type MenuScreenFeed,
   type MenuScreenPairing,
+} from "@purin-labs/cafe-control-api";
+import {
+  parseMenuScreenPickup,
   type MenuScreenPickup,
 } from "@purin-labs/control-api";
 import { backoffDelay } from "@purin-labs/std";

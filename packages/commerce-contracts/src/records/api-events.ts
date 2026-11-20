@@ -3,7 +3,7 @@
 // follows its hand-written reader: exact keys, unique topics such as
 // `order.created` or `order.*`, and a delivery as the delivery reader keeps it.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import { normalizedTextSchema, utcTimestampSchema } from "./fields.ts";
 import { Nullable } from "./client-wire-fields.ts";
 import {

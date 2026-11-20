@@ -1,4 +1,4 @@
-import { parseRecipeWrite } from "@purin-labs/control-api";
+import { parseRecipeWrite } from "@purin-labs/kitchen-control-api";
 import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import { recipeCollectionOf } from "../../commerce/recipe-commands";
 import type { Env } from "../../env";

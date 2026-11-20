@@ -10,12 +10,12 @@ import {
   parseContract,
   type ContractDecodeResult,
   NonNegativeInteger as revision,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 
 import { commerceAuthorityScopeWireSchema } from "./authority-scope.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
-import { cleanValue } from "./sorted-unions.ts";
+import { cleanValue } from "@purin-labs/contract-schema/sorted-unions";
 import { assertNever, canonicalJsonByCodePoint } from "@purin-labs/std";
 import { type StrictUnion } from "@purin-labs/type-utils";
 import { commerceSensitivitySchema } from "./entity-record.ts";

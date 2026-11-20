@@ -14,7 +14,9 @@ import type {
 import { assertNever } from "@purin-labs/std";
 import { TextCollaborationClient, type TextCollaborationClientMessage, type TextCollaborationView, type TextDocumentAdapter, type TextProtocolAdapter } from "../collaboration/text-client";
 import type { DraftPresenceView } from "../commerce/description-draft/presence";
-import { parseReplyServerMessage } from "@purin-labs/control-api/portal/reply-draft";
+import {
+  parseReplyServerMessage,
+} from "@purin-labs/inbox-control-api/portal/reply-draft";
 
 /**
  * Plan 40D: the shared draft of one Inbox reply. People and agents edit the

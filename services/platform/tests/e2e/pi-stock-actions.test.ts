@@ -11,14 +11,16 @@ import {
   parseInventoryReceiptContext,
   type InventoryDeliveries,
   type InventoryReceiptContext,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   parseCommerceGraphQuery,
   parseListEntryReadRequest,
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 import { commerceActionTitle } from "../../../../apps/portal/src/features/governed-actions/commerce";
-import { parseCommerceActionRecordResponse } from "@purin-labs/control-api/portal/commerce-actions";
+import {
+  parseCommerceActionRecordResponse,
+} from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "../../src/data/control-plane";

@@ -6,7 +6,7 @@ import {
   PositiveInteger,
   StrictObject,
   recordParser,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import { storefrontTaxConfigurationSchema } from "./commerce-records.ts";
 import { identityTextSchema } from "./commerce-fields.ts";
 import { currencyCodeTextSchema, normalizedTextSchema } from "./fields.ts";

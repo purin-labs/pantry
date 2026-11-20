@@ -1,10 +1,12 @@
 import type {
+  TrackingBatchPreview,
+  TrackingBatchPreviewItem,
+} from "../commerce.ts";
+import type {
   CommerceExceptionInbox,
   MissingTrackingException,
   TrackingActionTarget,
-  TrackingBatchPreview,
-  TrackingBatchPreviewItem,
-} from "../index.ts";
+} from "@purin-labs/control-api";
 
 export function parseCommerceExceptionInbox(
   value: unknown,

@@ -1,0 +1,30 @@
+{
+  "name": "@purin-labs/cafe-control-api",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "description": "Café shapes of the Pantry control API: menu boards and the Content Studio menu.",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./portal/*": {
+      "types": "./src/portal/*.ts",
+      "default": "./src/portal/*.ts"
+    }
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@purin-labs/menu-board-crdt": "workspace:*",
+    "@purin-labs/menu-draft-crdt": "workspace:*",
+    "@purin-labs/std": "workspace:*"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

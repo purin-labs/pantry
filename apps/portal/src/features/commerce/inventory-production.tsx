@@ -10,7 +10,7 @@ import {
   type InventoryProductionContext,
   type InventoryProductionRecipe,
   type InventoryProductionRequest,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { assertNever, isRecord } from "@purin-labs/std";
 import { StatusChip, type StatusChipStatus } from "../../page-components";
 import type { Quantity } from "@purin-labs/commerce-contracts";

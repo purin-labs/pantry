@@ -22,7 +22,7 @@ import { parseCommerceGraphQuery } from "@purin-labs/commerce-contracts/graph-qu
 import { encodeCommerceCursor as encodeCommerceCursorTypescript } from "@purin-labs/commerce-contracts/query-encoders";
 import { parseCommerceQueryPlan } from "@purin-labs/commerce-contracts/query-plan";
 import { planCommerceGraphQuery as planCommerceGraphQueryTypescript } from "@purin-labs/commerce-contracts/query-planner";
-import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
+import type { ContractDecodeResult } from "@purin-labs/contract-schema";
 import type { CommerceBoundaryResponse } from "@purin-labs/commerce-contracts/commerce-boundary";
 import {
   deriveLabEventCueFacts as deriveLabEventCueFactsTypescript,

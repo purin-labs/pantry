@@ -3,7 +3,7 @@
 // keys for commands, lines and returns, and a lifecycle that keeps the fields
 // of its state.
 import { Type, type Static } from "typebox";
-import { PositiveInteger } from "../schema.ts";
+import { PositiveInteger } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

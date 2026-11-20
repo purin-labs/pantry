@@ -1,7 +1,5 @@
-import type {
-  CollaborationAgentActivity,
-  CollaborationParticipant,
-} from "@purin-labs/collaboration";
+import type { CollaborationAgentActivity } from "./agent-presence.ts";
+import type { CollaborationParticipant } from "./wire.ts";
 
 export type TextCollaborationServerMessage<
   Update,

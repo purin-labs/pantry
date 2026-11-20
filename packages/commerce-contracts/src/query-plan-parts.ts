@@ -2,7 +2,7 @@ import {
   OpenObject,
   parseContract,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { relationshipDefinitionWireSchema } from "./query-wire.ts";
 import { Type, type Static, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";

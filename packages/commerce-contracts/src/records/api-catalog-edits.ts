@@ -3,7 +3,7 @@
 // schema follows its hand-written reader: exact keys, and changes that name
 // at least one field that the record lets staff change.
 import { Type, type Static, type TSchema } from "typebox";
-import { PositiveInteger } from "../schema.ts";
+import { PositiveInteger } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   currencyCodeTextSchema,

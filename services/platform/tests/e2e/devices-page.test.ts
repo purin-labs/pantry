@@ -3,11 +3,13 @@ import { fixtureDatabase } from "./organisation-database";
 import { afterEach, beforeEach, expect, it } from "vitest";
 import {
   parseDeviceList,
-  parseMenuBoardSummaries,
-  parseMenuScreenPairing,
   type DeviceList,
   type DeviceView,
 } from "@purin-labs/control-api";
+import {
+  parseMenuBoardSummaries,
+  parseMenuScreenPairing,
+} from "@purin-labs/cafe-control-api";
 import {
   parseTerminalAssignment,
   type TerminalAssignment,

@@ -8,7 +8,7 @@ import {
   NonNegativeInteger,
   PositiveInteger,
   ReadonlyRecord,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import type {
   ShipmentLabelAttempt,
   ShipmentLabelRateSnapshot,

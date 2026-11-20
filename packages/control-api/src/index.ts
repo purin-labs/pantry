@@ -5,6 +5,7 @@
  */
 export type * from "./access.ts";
 export type * from "./agents.ts";
+export type * from "./agent-operation-commands.ts";
 export * from "./chat.ts";
 export * from "./portal-page-view.ts";
 export * from "./surface-observation.ts";
@@ -16,7 +17,8 @@ export * from "./agent-permission-requests.ts";
 export * from "./permission-required.ts";
 export * from "./projects.ts";
 export * from "./project-context.ts";
-export type * from "./commerce.ts";
+export type * from "./commerce-exceptions.ts";
+export type * from "./commerce-receipts.ts";
 export * from "./supplier-id.ts";
 export type * from "./home.ts";
 export type * from "./payouts.ts";
@@ -32,10 +34,6 @@ export * from "./mail-work.ts";
 export * from "./mail-reply.ts";
 export * from "./mail-sender-link.ts";
 export * from "./email-review.ts";
-export * from "./inventory-receipt.ts";
-
-export * from "./inventory-production.ts";
-
 export * from "./chat-forks.ts";
 export * from "./chat-side-cases.ts";
 export * from "./chat-signals.ts";
@@ -55,7 +53,6 @@ export * from "./memory.ts";
 export * from "./evals.ts";
 export * from "./case-execution.ts";
 export * from "./case-timeline.ts";
-export * from "./menu-boards.ts";
 export * from "./menu-board-reviews.ts";
 export * from "./failed-payments.ts";
 export * from "./payments.ts";
@@ -82,5 +79,4 @@ export * from "./voice.ts";
 export * from "./voice-engines.ts";
 export * from "./voice-text-check.ts";
 export * from "./devices.ts";
-export * from "./recipes.ts";
 export * from "./costs.ts";

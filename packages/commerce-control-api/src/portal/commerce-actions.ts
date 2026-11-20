@@ -1,7 +1,7 @@
 import {
   parseStockOperationDetails,
   type StockOperationDetails,
-} from "./stock-operation.ts";
+} from "@purin-labs/control-api/portal/stock-operation";
 import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt/limits";
 import type { Variant } from "@purin-labs/type-utils";
 import {
@@ -11,17 +11,17 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
+import type { CommerceActionFollowUp } from "../commerce.ts";
 import type {
-  CommerceActionFollowUp,
   CommerceProviderReceipt,
   CommerceShopifyProviderReceipt,
   CommerceEngineProviderReceipt,
-} from "../index.ts";
+} from "@purin-labs/control-api";
 import type { ActionState } from "@purin-labs/contracts";
 import {
   parseMenuPriceDetails,
   type MenuPriceDetails,
-} from "./menu-price-details.ts";
+} from "@purin-labs/control-api/portal/menu-price-details";
 
 type CommerceActionAuthority =
   | {

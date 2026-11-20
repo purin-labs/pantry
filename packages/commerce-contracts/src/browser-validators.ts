@@ -26,9 +26,12 @@ import {
   parseCommerceRelationshipShape,
   parseRelationshipDefinition,
 } from "./relationships.ts";
-import type { ContractDecodeResult } from "./schema.ts";
+import type { ContractDecodeResult } from "@purin-labs/contract-schema";
 
-export type { ContractDecodeError, ContractDecodeResult } from "./schema.ts";
+export type {
+  ContractDecodeError,
+  ContractDecodeResult,
+} from "@purin-labs/contract-schema";
 import { parseSavedCommerceView } from "./view-records.ts";
 import { isRecord } from "@purin-labs/std";
 

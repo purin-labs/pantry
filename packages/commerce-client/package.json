@@ -17,7 +17,8 @@
   "dependencies": {
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
-    "@purin-labs/commerce-contracts": "workspace:*"
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*"
   },
   "devDependencies": {
     "tsrs": "0.18.0-ts7.1.0-dev.20260929"

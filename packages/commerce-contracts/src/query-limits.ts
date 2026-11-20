@@ -1,4 +1,4 @@
-import { OpenObject, StrictObject } from "./schema.ts";
+import { OpenObject, StrictObject } from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import type { StrictUnion } from "@purin-labs/type-utils";
 

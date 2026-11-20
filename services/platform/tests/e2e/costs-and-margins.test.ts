@@ -31,7 +31,6 @@ import {
   calculateBakeryCostsAndMargins,
   calculateBakeryPlanVsActuals,
   defaultCostAssumptions,
-  newConversationId,
   parseCostsOverview,
   parseCostsSheetWriteResult,
   presetDemandCurveValues,
@@ -40,6 +39,7 @@ import {
   type CostsSheetWrite,
   type ProductCostPlanEntry,
 } from "@purin-labs/control-api";
+import { newConversationId } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import {
   PATISSERIE_ITEMS,

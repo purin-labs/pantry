@@ -8,7 +8,7 @@ import type {
   CheckoutPaymentAttempt,
   Storefront,
 } from "../commerce-domain.ts";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   currencyCodeTextSchema,
   normalizedTextSchema,

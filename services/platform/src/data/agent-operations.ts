@@ -10,7 +10,7 @@ import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 import type { AgentSkillRef, ScheduleSpec } from "@purin-labs/control-api";
-import type { AgentOperationCommand as ApiAgentOperationCommand } from "@purin-labs/control-api/portal/agent-operations";
+import type { AgentOperationCommandOf as ApiAgentOperationCommand } from "@purin-labs/control-api";
 import {
   createArea,
   publishResponsibilityScope,

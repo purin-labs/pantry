@@ -41,8 +41,9 @@ const COMMERCE_DIRECTORIES = [
 ];
 // Commerce's runtime source. Other code reaches it only as a built Worker.
 const COMMERCE_RUNTIME_DIRECTORIES = ["services/commerce", "apps/storefront"];
-// Shared helpers that both runtimes may use. They depend on no workspace package.
-const NEUTRAL_DIRECTORIES = ["packages/std", "packages/type-utils"];
+// Shared helpers that both runtimes may use. They depend on no workspace package
+// outside this list.
+const NEUTRAL_DIRECTORIES = ["packages/std", "packages/type-utils", "packages/contract-schema"];
 
 // Crossings that may stay for now, as file -> { count, reason }: each file
 // keeps its exact count and cannot gain one. A count that is too high or a

@@ -25,7 +25,7 @@ import {
 import { webSocketUrl } from "../../collaboration/document-client";
 import type { DraftPresenceView } from "./presence";
 import { assertNever } from "@purin-labs/std";
-import { parseDescriptionServerMessage } from "@purin-labs/control-api/portal/description-collaboration";
+import { parseDescriptionServerMessage } from "@purin-labs/commerce-control-api/portal/description-collaboration";
 
 type DescriptionField = "description";
 

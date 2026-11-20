@@ -8,7 +8,7 @@ import {
   PositiveInteger,
   contractRefusal,
   type ContractDecodeResult,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

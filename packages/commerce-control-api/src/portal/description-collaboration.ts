@@ -9,7 +9,7 @@ import {
   type DraftServerMessage,
   type ProductDescriptionRoomMetadata,
 } from "@purin-labs/product-description-crdt/protocol";
-import type { TextCollaborationServerMessage } from "./text-collaboration.ts";
+import type { TextCollaborationServerMessage } from "@purin-labs/collaboration";
 import { assertNever } from "@purin-labs/std";
 
 export function parseDescriptionServerMessage(frame: unknown) {

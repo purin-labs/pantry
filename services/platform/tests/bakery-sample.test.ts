@@ -22,7 +22,9 @@ import {
   saveOperationDuration,
 } from "../src/commerce/bakery/operation";
 import { commerceGraphResponseBody } from "../src/commerce/entity-plane/routes";
-import { parseCommerceGraphQueryResult } from "@purin-labs/control-api/portal/entity-plane-boundary";
+import {
+  parseCommerceGraphQueryResult,
+} from "@purin-labs/commerce-control-api/portal/entity-plane-boundary";
 import {
   bakeryFingerprint,
   fields,

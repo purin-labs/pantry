@@ -49,6 +49,9 @@
     "@purin-labs/collaboration": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
     "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/cafe-control-api": "workspace:*",
+    "@purin-labs/commerce-control-api": "workspace:*",
+    "@purin-labs/kitchen-control-api": "workspace:*",
     "@purin-labs/costs-sheet-crdt": "workspace:*",
     "@purin-labs/email-draft-crdt": "workspace:*",
     "@purin-labs/mail-reply-crdt": "workspace:*",
@@ -64,6 +67,7 @@
     "@purin-labs/commerce-client": "workspace:*",
     "@purin-labs/commerce-query-sqlite": "workspace:*",
     "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

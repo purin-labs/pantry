@@ -726,6 +726,37 @@ The same landing has one change of step A1.8: the credential Vault defines the f
 fields that it reads of a Discord installation, so it imports no Discord file. The
 layer count is 820.
 
+**20 November 2026. Step A1.11, the rest: `control-api` names one area package.**
+
+| Part                      | What exists                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Schema kit                | `@purin-labs/contract-schema` (`foundation/std`) holds `schema.ts`, `record-values.ts` and `sorted-unions.ts` of Plan 78. They were in `commerce-contracts`. Each importer names the new package. The package is neutral for `lint:runtime-boundary`, so the commerce engine may import it                                                                                                           |
+| Area slices               | Four packages hold the shapes of one area each: `commerce-control-api` (entity plane, commerce actions and operations, agent operations, checkout profiles, the description room), `kitchen-control-api` (recipes, inventory receipts and production), `cafe-control-api` (menu boards, the Content Studio menu) and `inbox-control-api` (the reply draft)                                           |
+| Foundation shapes         | `memory.ts` holds the entity of a `commerce_entity` scope as a plain reference; the parser that the caller gives checks its shape. `access-models.ts` takes the entity type of a grant selection from `CommerceReadGrantScope` of `contracts`                                                                                                                                                        |
+| What the foundation reads | The foundation reads some commerce shapes, so they stay in `control-api` and name no commerce package: `commerce-receipts.ts` (the provider receipt), `commerce-exceptions.ts` (the exception inbox) and `agent-operation-commands.ts` (`AgentOperationCommandOf<Scope>`; the commerce package gives the scope type)                                                                                 |
+| Costs                     | `costs.ts`, `costs-actuals.ts`, `costs-forecast.ts` and `costs-formulas.ts` stay in `control-api`, so `control-api` still depends on `commerce-contracts` (the recipe records of `CostsOverview`). The Session file `actors/agent-session-costs.ts` calls the cost calculations. In the Kitchen package, that import is a new crossing, and the ratchet refuses it. The port of step A1.7 moves them |
+| `text-collaboration`      | The type is in `@purin-labs/collaboration`. `control-api` no longer depends on it                                                                                                                                                                                                                                                                                                                    |
+| Layer lint                | `contracts` in `scripts/layers.json` lists the contract packages of the areas (now `commerce-contracts`). A package of another area may depend on one, as a file of an area may import it                                                                                                                                                                                                            |
+
+`control-api` now depends on `contracts`, `commerce-contracts`, `contract-schema`,
+`std`, `type-utils` and `console-shared`. Codemods moved each import of a moved name.
+No shape, parser or error text changed.
+
+- **Measures.** Layer crossings: 821 to 813, and no pair went up. The package pairs of
+  `control-api` to `collaboration`, `commerce-client` and the four CRDT packages are
+  gone, and so are the pairs of `bakery-model` and `production-simulation` to
+  `commerce-contracts`. Copies of product code: 892, no change. Unused exports: 809, no
+  change.
+- **Checks.** The static lints, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build`, `pnpm underclerk:check` and the unit suite (302 files) pass.
+  The full E2E suite passes: 236 files and 457 tests, 3 files skipped (live model
+  journeys).
+- **Still open:** the costs files (above). `OrganisationId` is still in
+  `commerce-contracts`, and `contracts` still depends on `commerce-contracts`.
+  `control-api` keeps area files that name no area package, for example
+  `menu-board-reviews.ts`, `order-queue.ts`, `mail-*.ts`, `evals.ts` and
+  `case-execution.ts`.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

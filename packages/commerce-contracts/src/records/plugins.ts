@@ -1,7 +1,11 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import { SafeInteger, StrictObject, recordParser } from "../schema.ts";
+import {
+  SafeInteger,
+  StrictObject,
+  recordParser,
+} from "@purin-labs/contract-schema";
 
 /**
  * A stage of the checkout pipeline (step 2) that a built-in plugin adds a

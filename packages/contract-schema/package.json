@@ -1,0 +1,29 @@
+{
+  "name": "@purin-labs/contract-schema",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "description": "The contract schema kit of Plan 78: strict objects, record parsers and contract decoders over TypeBox.",
+  "types": "./src/schema.ts",
+  "exports": {
+    ".": {
+      "types": "./src/schema.ts",
+      "default": "./src/schema.ts"
+    },
+    "./sorted-unions": {
+      "types": "./src/sorted-unions.ts",
+      "default": "./src/sorted-unions.ts"
+    }
+  },
+  "scripts": {
+    "check:types": "tsrs --noEmit"
+  },
+  "dependencies": {
+    "@purin-labs/std": "workspace:*",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

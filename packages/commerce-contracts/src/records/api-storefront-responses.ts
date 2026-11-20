@@ -5,7 +5,7 @@
 // exact keys where the reader requires them, and each cross-field rule of the
 // reader as a refinement.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   countryCodeTextSchema,
   normalizedTextSchema,

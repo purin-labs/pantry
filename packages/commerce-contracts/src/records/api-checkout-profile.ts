@@ -4,7 +4,7 @@
 // characters, timestamps written as `Date.toISOString` writes them, and the
 // configuration as `parseCheckoutProfileConfiguration` reads it.
 import { Type, type Static } from "typebox";
-import { PositiveInteger } from "../schema.ts";
+import { PositiveInteger } from "@purin-labs/contract-schema";
 import type {
   CheckoutProfile,
   CheckoutProfileLifecycle,

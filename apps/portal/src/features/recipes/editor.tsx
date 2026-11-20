@@ -9,7 +9,7 @@ import {
   type RecipeCollection,
   type RecipeItem,
   type RecipeWrite,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { controlRead, ControlApiError } from "../../control-client";
 import { Select } from "../../ui/select";
 import {

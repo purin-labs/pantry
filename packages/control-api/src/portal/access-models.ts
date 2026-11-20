@@ -8,12 +8,12 @@ import type {
   CapabilityMode,
   CapabilityPolicyProvenance,
   CapabilityRef,
+  CommerceReadGrantScope,
   FileContextProvider,
   FileResourceScope,
   OnboardingControlRole,
 } from "@purin-labs/contracts";
-import type { CommerceEntityTypeId } from "@purin-labs/commerce-contracts";
-import type { StrictUnion } from "@purin-labs/type-utils";
+import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import type { ControlErrorKind } from "./errors.ts";
 import type {
   AccessControlAvailability,
@@ -246,7 +246,11 @@ export type AccessGrantTargetSelection = StrictUnion<
   | Readonly<{
       kind: "commerce_entity_type";
       capabilityRef: CapabilityRef;
-      entityTypeId: CommerceEntityTypeId;
+      /** The entity type of the commerce read grant that the selection makes. */
+      entityTypeId: Variant<
+        CommerceReadGrantScope,
+        "entity_type"
+      >["entityTypeId"];
     }>
   /** A list read that an agent permission request names. */
   | Readonly<{

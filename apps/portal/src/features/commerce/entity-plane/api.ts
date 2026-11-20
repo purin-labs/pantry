@@ -28,11 +28,25 @@ import type {
 import { parseInventory } from "@purin-labs/commerce-contracts";
 import { responseJson } from "../../../control-client";
 import { needsReorder } from "../stock-status";
-import { parseCommerceGraphQueryResult } from "@purin-labs/control-api/portal/entity-plane-boundary";
+import {
+  parseCommerceGraphQueryResult,
+} from "@purin-labs/commerce-control-api/portal/entity-plane-boundary";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";
-import type { CommerceActivityResource, CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection, SupplierCreation } from "@purin-labs/control-api";
-import { type CommerceActivityResult, type CommerceListEntryPatchOutcome, parseCommerceActivityResponse, parseCommerceBoardPresenceEntry, parseCommerceListEntryPatchResponse } from "@purin-labs/control-api/portal/entity-plane";
+import type {
+  CommerceActivityResource,
+  CommerceBoardDragPreview,
+  CommerceBoardPresenceEntry,
+  CommerceBoardPresenceSelection,
+  SupplierCreation,
+} from "@purin-labs/commerce-control-api";
+import {
+  type CommerceActivityResult,
+  type CommerceListEntryPatchOutcome,
+  parseCommerceActivityResponse,
+  parseCommerceBoardPresenceEntry,
+  parseCommerceListEntryPatchResponse,
+} from "@purin-labs/commerce-control-api/portal/entity-plane";
 
 const TABLE_TRAVERSAL: CommerceTraversalLimits = {
   maxDepth: 0,

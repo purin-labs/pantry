@@ -3,7 +3,7 @@ import {
   NonNegativeInteger,
   parseContract,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever, canonicalJsonByCodePoint } from "@purin-labs/std";

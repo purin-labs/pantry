@@ -6,7 +6,7 @@ import {
 } from "@purin-labs/commerce-contracts/list-records";
 import { parseSavedCommerceView } from "@purin-labs/commerce-contracts/view-records";
 import { parseCommerceMutationReceipt } from "@purin-labs/commerce-contracts/entity-plane-receipts";
-import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
+import type { ContractDecodeResult } from "@purin-labs/contract-schema";
 import { parseCommerceEntityAuthority } from "@purin-labs/commerce-contracts/command-authority";
 import {
   parseRelationshipDefinition,

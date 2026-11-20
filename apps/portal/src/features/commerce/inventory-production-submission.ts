@@ -3,7 +3,7 @@ import {
   parseInventoryProductionTransition,
   type InventoryProductionCreation,
   type InventoryProductionTransition,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { isNormalizedText, isRecord } from "@purin-labs/std";
 import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
 import { ControlApiError } from "../../control-client";

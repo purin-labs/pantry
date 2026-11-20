@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/commerce-contracts/schema";
+import { recordParser } from "@purin-labs/contract-schema";
 import { KITCHEN_SURFACE } from "./surface-observation.ts";
 
 /**

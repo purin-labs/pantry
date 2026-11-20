@@ -1,4 +1,4 @@
-import { OpenObject, PositiveInteger } from "./schema.ts";
+import { OpenObject, PositiveInteger } from "@purin-labs/contract-schema";
 import { Type, type StaticDecode } from "typebox";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import { commerceEntityRefSchema } from "./entity-reference.ts";

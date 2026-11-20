@@ -11,7 +11,10 @@ import {
   type MemoryView,
 } from "@purin-labs/control-api";
 
-import type { AgentDefinition, Skill } from "@purin-labs/control-api/portal/agent-operations";
+import type {
+  AgentDefinition,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
+import type { Skill } from "@purin-labs/control-api";
 import { refreshBrainSummary, useBrainSummary } from "../../brain-summary";
 import { isPrimaryNavigationClick } from "../../console-sidebar";
 import { Notice, PageSkeleton, RecoverableError } from "../../page-components";

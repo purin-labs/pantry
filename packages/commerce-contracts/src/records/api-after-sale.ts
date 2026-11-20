@@ -5,7 +5,7 @@
 // one currency whose parts add up to the refund.
 import { Type, type Static } from "typebox";
 import { boundedTextSchema } from "./fields.ts";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import type { RefundAllocation, RefundAttempt } from "../commerce-domain.ts";
 import type { Money } from "./money.ts";
 import {

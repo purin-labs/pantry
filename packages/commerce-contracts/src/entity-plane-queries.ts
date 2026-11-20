@@ -3,7 +3,7 @@ import {
   parseContract,
   parseContractArray,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type StaticDecode } from "typebox";
 import {
   commerceGraphQuerySchema,

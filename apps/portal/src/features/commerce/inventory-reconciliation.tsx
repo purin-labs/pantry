@@ -3,7 +3,7 @@ import React from "react";
 import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   parseMutationResult,
   type ReconcileCommerceInventoryV1,
@@ -11,7 +11,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 import { controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
-import { parseInventoryQuantityText as inventoryQuantityInput } from "@purin-labs/control-api";
+import { parseInventoryQuantityText as inventoryQuantityInput } from "@purin-labs/kitchen-control-api";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 import {
   StockDialogCancel,

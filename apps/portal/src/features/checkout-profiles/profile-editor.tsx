@@ -5,7 +5,9 @@ import type {
 import React from "react";
 
 import { formatMoneyMinor } from "../../formatting";
-import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";
+import type {
+  CheckoutProfileSummary,
+} from "@purin-labs/commerce-control-api/portal/checkout-profiles";
 import {
   automaticRefundThresholdReady,
   refundGovernanceDescription,

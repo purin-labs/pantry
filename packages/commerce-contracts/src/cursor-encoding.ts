@@ -1,4 +1,7 @@
-import { contractRefusal, type ContractDecodeResult } from "./schema.ts";
+import {
+  contractRefusal,
+  type ContractDecodeResult,
+} from "@purin-labs/contract-schema";
 import { utf8ByteLength } from "@purin-labs/std";
 
 import type { CommerceCursor } from "./query-pagination.ts";

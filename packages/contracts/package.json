@@ -34,6 +34,7 @@
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@
 // is a hand-written reader of packages/commerce-client, written as
 // a schema: the same values pass and the same values are refused.
 import { Type, type TSchema } from "typebox";
-import { PositiveInteger } from "../schema.ts";
+import { PositiveInteger } from "@purin-labs/contract-schema";
 import { currencyCodeTextSchema } from "./fields.ts";
 import { ReadonlyOpenObject } from "./wire-objects.ts";
 

@@ -6,7 +6,7 @@ import { parseCommerceEntityPlaneCommand } from "./entity-plane-commands.ts";
 import { validateListViewCommandAuthority } from "./list-view-command-authority.ts";
 import { validateRelationshipCommandAuthority } from "./relationship-authority.ts";
 import { cursorRefusal } from "./cursor-values.ts";
-import type { ContractDecodeResult } from "./schema.ts";
+import type { ContractDecodeResult } from "@purin-labs/contract-schema";
 
 const RELATIONSHIP_COMMANDS: ReadonlySet<unknown> = new Set([
   "create_custom_relationship_definition",

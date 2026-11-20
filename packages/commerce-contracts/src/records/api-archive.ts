@@ -4,7 +4,7 @@
 // an order record belong to the resource readers of commerce-resources.ts,
 // which are not ported yet; until then their schemas check only the shape.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   commerceFulfillmentV1Schema,
   commerceOrderV1Schema,

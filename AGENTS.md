@@ -456,8 +456,11 @@ TypeScript package. See `docs/plan-78-contracts-in-typescript.md`.
 See [`docs/commerce-monorepo.md`](docs/commerce-monorepo.md). Reach for the
 shared helpers before writing a local copy: `@purin-labs/std` for value guards,
 `assertNever`, encoding, SHA-256 and canonical JSON; `@purin-labs/type-utils`
-for `Variant`, `VariantBy` and `StrictUnion`; `@purin-labs/control-api` for shapes
-the portal and the platform exchange.
+for `Variant`, `VariantBy` and `StrictUnion`; `@purin-labs/contract-schema` for
+`StrictObject`, `recordParser` and the other contract schema helpers;
+`@purin-labs/control-api` for shapes the portal and the platform exchange. The
+shapes of one area are in the control API package of that area, for example
+`@purin-labs/kitchen-control-api`; `control-api` names no area package.
 
 Source-derived model and user-visible content must use the established live
 authorization and IFC boundaries, including titles, previews, errors and replay.

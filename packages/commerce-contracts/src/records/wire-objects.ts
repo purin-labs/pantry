@@ -15,7 +15,7 @@ import {
   StrictObject,
   recordParser,
   type ContractDecodeResult,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 
 type ReadonlyProperties<Properties extends TProperties> = {
   [Key in keyof Properties]: ReturnType<typeof Type.Readonly<Properties[Key]>>;

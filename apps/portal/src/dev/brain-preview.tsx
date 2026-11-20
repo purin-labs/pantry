@@ -27,7 +27,7 @@ import {
   controlRead,
 } from "../control-client";
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "../agent-operations";
-import type { AgentOperationsSnapshot } from "@purin-labs/control-api/portal/agent-operations";
+import type { AgentOperationsSnapshot } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { useBrainSummary } from "../brain-summary";
 import type { BrainTransport } from "../features/brain/api";
 import {

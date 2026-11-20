@@ -9,7 +9,7 @@ import { expect, it, type TestContext } from "vitest";
 import {
   parseRecipeCollection,
   type RecipeCollection,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { isRecord } from "@purin-labs/std";
 import {
   parseListEntryReadRequest,

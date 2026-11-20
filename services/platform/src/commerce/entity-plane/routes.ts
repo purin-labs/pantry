@@ -34,7 +34,7 @@ import type {
   CommerceActivityResource,
   CommerceBoardDragPreview,
   CommerceBoardPresenceSelection,
-} from "@purin-labs/control-api";
+} from "@purin-labs/commerce-control-api";
 
 type CommerceGraphRouteError =
   CommerceEntityPlaneError | CommerceGraphReaderError;

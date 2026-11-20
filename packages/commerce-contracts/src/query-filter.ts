@@ -5,7 +5,7 @@ import {
   parseContract,
   type ContractDecodeResult,
   type ContractRejection,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever, codePointCount, isRecord } from "@purin-labs/std";

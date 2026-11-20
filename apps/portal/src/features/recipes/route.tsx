@@ -3,11 +3,13 @@ import { Link, useBlocker } from "react-router";
 import { DraftLeaveDialog } from "../collaboration/draft-leave-dialog";
 import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import {
+  parseRecipeCollection,
+  type RecipeCollection,
+} from "@purin-labs/kitchen-control-api";
+import {
   calculateBakeryCostsAndMargins,
   parseCostsOverview,
-  parseRecipeCollection,
   type CalculatedRecipeCost,
-  type RecipeCollection,
 } from "@purin-labs/control-api";
 import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";

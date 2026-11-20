@@ -7,7 +7,7 @@ import {
   type InventoryProductionTransition,
   type InventoryProductionContext,
   type InventoryProductionRequest,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { isNormalizedText, isPositiveInteger } from "@purin-labs/std";
 import {
   parseCommerceGraphQuery,

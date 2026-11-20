@@ -29,7 +29,7 @@ import {
   type ContractDecodeResult,
   PositiveInteger,
   SafeInteger,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import { type CommerceEntityPlaneObservationV1 } from "../commerce-entity-plane.ts";
 import { parseCommerceEntityPlaneObservation } from "../entity-plane-observations.ts";
 import {

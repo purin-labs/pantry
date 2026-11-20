@@ -1,9 +1,7 @@
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import {
-  newConversationId,
-  parseInventoryProductionPlanResult,
-} from "@purin-labs/control-api";
+import { newConversationId } from "@purin-labs/control-api";
+import { parseInventoryProductionPlanResult } from "@purin-labs/kitchen-control-api";
 import { isRecord } from "@purin-labs/std";
 
 import {

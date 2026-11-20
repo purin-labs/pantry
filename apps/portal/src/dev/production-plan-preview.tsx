@@ -5,7 +5,7 @@ import {
   COLLABORATION_PONG,
   type CollaborationParticipant,
 } from "@purin-labs/collaboration";
-import type { InventoryProductionRequest } from "@purin-labs/control-api";
+import type { InventoryProductionRequest } from "@purin-labs/kitchen-control-api";
 import {
   ProductionPlanDoc,
   type ProductionPlanSelection,

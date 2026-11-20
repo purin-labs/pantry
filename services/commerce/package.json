@@ -23,6 +23,7 @@
     "@purin-labs/commerce-client": "workspace:*",
     "@purin-labs/commerce-query-sqlite": "workspace:*",
     "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "quickjs-wasi": "3.6.2"
   },
   "devDependencies": {

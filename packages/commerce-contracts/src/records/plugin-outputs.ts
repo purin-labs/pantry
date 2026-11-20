@@ -5,8 +5,11 @@
 // parser gives the value that the host applies.
 import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
-import { decodeValue } from "../sorted-unions.ts";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
+import { decodeValue } from "@purin-labs/contract-schema/sorted-unions";
 
 /** A message for a buyer or staff: not blank, at most 300 characters. */
 const messageSchema = Type.Refine(Type.String(), isMessage, messageError);

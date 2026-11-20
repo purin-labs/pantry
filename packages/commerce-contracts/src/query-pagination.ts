@@ -4,7 +4,7 @@ import {
   parseContract,
   type ContractDecodeResult,
   type ContractRejection,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { trimmedIdentityTextSchema } from "./identity-text.ts";
 import { Type, type Static } from "typebox";
 import type { TLocalizedValidationError } from "typebox/error";

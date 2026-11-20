@@ -4,7 +4,10 @@
 // knows, and a reported population names each order line once, inside the
 // window, at one revision of each order.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { normalizedTextSchema } from "./fields.ts";
 import {
   ImmutableArray,
