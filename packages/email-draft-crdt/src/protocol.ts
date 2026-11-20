@@ -3,8 +3,6 @@ import {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
-  createSyncProtocol,
-  everyCode,
   isTextPresenceSelection,
   type CollaborationParticipant,
   type CollaborationPointerPosition,
@@ -13,9 +11,8 @@ import {
   type SyncServerMessage,
 } from "@purin-labs/collaboration";
 import {
+  emailDraftDocument,
   isEmailDraftField,
-  parseEmailDraftStateVector,
-  parseEmailDraftUpdate,
   type EmailDraftCrdtError,
   type EmailDraftSelection,
   type EmailDraftStateVector,
@@ -43,29 +40,11 @@ export type EmailDraftServerMessage = SyncServerMessage<
   EmailDraftCrdtError["code"]
 >;
 
-const protocol = createSyncProtocol<
-  EmailDraftSelection,
-  EmailDraftStateVector,
-  EmailDraftUpdate,
-  EmailDraftCrdtError["code"]
->({
+const protocol = emailDraftDocument.syncProtocol({
   protocol: EMAIL_DRAFT_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "email draft",
   isSelection: isEmailDraftSelection,
-  parseStateVector: parseEmailDraftStateVector,
-  parseUpdate: parseEmailDraftUpdate,
-  documentFailureCodes: everyCode<EmailDraftCrdtError["code"]>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_document_shape",
-    "field_too_long",
-    "draft_too_long",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-  ]),
 });
 
 export const parseEmailDraftClientMessage = protocol.parseClientMessage;

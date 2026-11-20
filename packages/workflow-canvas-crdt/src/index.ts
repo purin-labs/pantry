@@ -1,8 +1,12 @@
 import * as Y from "yjs";
 import {
-  parseYjsEncoding,
-  type ParsedYjsEncoding,
-  type YjsEncodingFailure,
+  checkDocumentSize,
+  defineSharedEncoding,
+  sharedDocFailure as failure,
+  sharedDocSuccess as success,
+  type SharedDocEncoding,
+  type SharedDocError,
+  type SharedDocResult,
   type YjsEncodingKind,
 } from "@purin-labs/collaboration";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
@@ -21,15 +25,12 @@ export const CANVAS_ENCODING_LIMITS = Object.freeze({
   stateVector: 16 * 1024,
 });
 
-export type CanvasFailureCode =
-  YjsEncodingFailure["code"] | "invalid_layout" | "object_conflict";
-export type CanvasResult<T> =
-  | { readonly ok: true; readonly value: T; readonly error?: never }
-  | {
-      readonly ok: false;
-      readonly error: { readonly code: CanvasFailureCode };
-      readonly value?: never;
-    };
+/** The document's own failures, beside the failures of an encoding. */
+const FAILURES = ["invalid_layout", "object_conflict"] as const;
+export type CanvasFailureCode = SharedDocError<
+  (typeof FAILURES)[number]
+>["code"];
+export type CanvasResult<T> = SharedDocResult<T, CanvasFailureCode>;
 
 /** A validated existing-object destination in canvas coordinates. */
 export class CanvasMove {
@@ -99,50 +100,49 @@ export class CanvasLayout {
   }
 }
 
-export class CanvasEncoding<K extends YjsEncodingKind> {
-  readonly #encoding: ParsedYjsEncoding<K>;
-  readonly kind: K;
+/**
+ * The checked encodings of the canvas. The document class below is its own:
+ * the membership comes from the workflow owner, so a restore and a check take
+ * the expected layout.
+ */
+export const workflowCanvasEncoding = defineSharedEncoding({
+  schema: WORKFLOW_CANVAS_SCHEMA,
+  limits: CANVAS_ENCODING_LIMITS,
+  failures: FAILURES,
+  validateEncoded: (bytes) =>
+    hasOnlyPositionStructs(bytes) ? null : "invalid_layout",
+});
 
-  private constructor(encoding: ParsedYjsEncoding<K>) {
-    this.#encoding = encoding;
-    this.kind = encoding.kind;
-  }
+/** `CanvasEncoding.parse(kind, bytes)` gives a checked encoding. */
+export const CanvasEncoding = workflowCanvasEncoding.encoding;
+export type CanvasEncoding<K extends YjsEncodingKind> = SharedDocEncoding<
+  K,
+  typeof WORKFLOW_CANVAS_SCHEMA
+>;
 
-  encode(): Uint8Array {
-    return this.#encoding.encode();
+/** True when each struct of a state or an update is a point in `positions`. */
+function hasOnlyPositionStructs(bytes: Uint8Array): boolean {
+  for (const struct of Y.decodeUpdate(bytes).structs) {
+    if (!(struct instanceof Y.Item)) continue;
+    if (
+      (typeof struct.parent === "string" && struct.parent !== "positions") ||
+      // Replacement items inherit the map key from their origin item.
+      (struct.parentSub === null &&
+        struct.origin === null &&
+        struct.rightOrigin === null) ||
+      !(
+        struct.content instanceof Y.ContentAny ||
+        struct.content instanceof Y.ContentDeleted
+      )
+    )
+      return false;
+    if (
+      struct.content instanceof Y.ContentAny &&
+      !struct.content.arr.every(validPoint)
+    )
+      return false;
   }
-
-  static parse<K extends YjsEncodingKind>(
-    kind: K,
-    bytes: Uint8Array,
-  ): CanvasResult<CanvasEncoding<K>> {
-    const parsed = parseYjsEncoding(kind, bytes, CANVAS_ENCODING_LIMITS);
-    if (!parsed.ok) return parsed;
-    if (kind !== "state_vector") {
-      for (const struct of Y.decodeUpdate(parsed.value.encode()).structs) {
-        if (!(struct instanceof Y.Item)) continue;
-        if (
-          (typeof struct.parent === "string" &&
-            struct.parent !== "positions") ||
-          // Replacement items inherit the map key from their origin item.
-          (struct.parentSub === null &&
-            struct.origin === null &&
-            struct.rightOrigin === null) ||
-          !(
-            struct.content instanceof Y.ContentAny ||
-            struct.content instanceof Y.ContentDeleted
-          )
-        )
-          return failure("invalid_layout");
-        if (
-          struct.content instanceof Y.ContentAny &&
-          !struct.content.arr.every(validPoint)
-        )
-          return failure("invalid_layout");
-      }
-    }
-    return success(new CanvasEncoding(parsed.value));
-  }
+  return true;
 }
 
 export class WorkflowCanvasDoc {
@@ -281,11 +281,8 @@ function validateDocument(
       return failure("invalid_layout");
     values.push({ objectId: object.objectId, x: point.x, y: point.y });
   }
-  if (Y.encodeStateAsUpdate(doc).byteLength > CANVAS_ENCODING_LIMITS.state)
-    return failure("state_too_large");
-  if (Y.encodeStateVector(doc).byteLength > CANVAS_ENCODING_LIMITS.stateVector)
-    return failure("state_vector_too_large");
-  return CanvasLayout.parse(values);
+  const size = checkDocumentSize(doc, CANVAS_ENCODING_LIMITS);
+  return size.ok ? CanvasLayout.parse(values) : size;
 }
 
 function validCoordinate(
@@ -312,11 +309,4 @@ function validPoint(raw: unknown): boolean {
 
 function compareObjectId(left: CanvasMove, right: CanvasMove): number {
   return left.objectId.localeCompare(right.objectId);
-}
-
-function success<T>(value: T): CanvasResult<T> {
-  return { ok: true, value };
-}
-function failure(code: CanvasFailureCode): CanvasResult<never> {
-  return { ok: false, error: { code } };
 }

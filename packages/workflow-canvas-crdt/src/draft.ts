@@ -1,8 +1,11 @@
 import * as Y from "yjs";
 import {
-  parseYjsEncoding,
-  type ParsedYjsEncoding,
-  type YjsEncodingFailure,
+  defineSharedEncoding,
+  sharedDocFailure as failure,
+  sharedDocSuccess as success,
+  type SharedDocEncoding,
+  type SharedDocError,
+  type SharedDocResult,
   type YjsEncodingKind,
 } from "@purin-labs/collaboration";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
@@ -39,37 +42,30 @@ export const DRAFT_ENCODING_LIMITS = Object.freeze({
 const ROOTS = ["nodes", "edges", "positions"] as const;
 const IDENTITY = /^[A-Za-z0-9][A-Za-z0-9._:#-]{0,127}$/u;
 
-export type DraftFailureCode =
-  YjsEncodingFailure["code"] | "invalid_draft" | "object_limit";
-export type DraftResult<T> =
-  | { readonly ok: true; readonly value: T; readonly error?: never }
-  | {
-      readonly ok: false;
-      readonly error: { readonly code: DraftFailureCode };
-      readonly value?: never;
-    };
+/** The document's own failures, beside the failures of an encoding. */
+const FAILURES = ["invalid_draft", "object_limit"] as const;
+export type DraftFailureCode = SharedDocError<
+  (typeof FAILURES)[number]
+>["code"];
+export type DraftResult<T> = SharedDocResult<T, DraftFailureCode>;
 
-export class DraftEncoding<K extends YjsEncodingKind> {
-  readonly #encoding: ParsedYjsEncoding<K>;
-  readonly kind: K;
+/**
+ * The checked encodings of the draft. The document class below is its own:
+ * its undo history needs one Yjs document for its whole life, so an edit and
+ * an accepted update change that document in place.
+ */
+export const workflowDraftEncoding = defineSharedEncoding({
+  schema: WORKFLOW_DRAFT_SCHEMA,
+  limits: DRAFT_ENCODING_LIMITS,
+  failures: FAILURES,
+});
 
-  private constructor(encoding: ParsedYjsEncoding<K>) {
-    this.#encoding = encoding;
-    this.kind = encoding.kind;
-  }
-
-  encode(): Uint8Array {
-    return this.#encoding.encode();
-  }
-
-  static parse<K extends YjsEncodingKind>(
-    kind: K,
-    bytes: Uint8Array,
-  ): DraftResult<DraftEncoding<K>> {
-    const parsed = parseYjsEncoding(kind, bytes, DRAFT_ENCODING_LIMITS);
-    return parsed.ok ? success(new DraftEncoding(parsed.value)) : parsed;
-  }
-}
+/** `DraftEncoding.parse(kind, bytes)` gives a checked encoding. */
+export const DraftEncoding = workflowDraftEncoding.encoding;
+export type DraftEncoding<K extends YjsEncodingKind> = SharedDocEncoding<
+  K,
+  typeof WORKFLOW_DRAFT_SCHEMA
+>;
 
 const LOCAL_EDIT = "local-edit";
 
@@ -394,12 +390,4 @@ function byOrder(
   right: Readonly<{ order: number }>,
 ): number {
   return left.order - right.order;
-}
-
-function success<T>(value: T): DraftResult<T> {
-  return { ok: true, value };
-}
-
-function failure(code: DraftFailureCode): DraftResult<never> {
-  return { ok: false, error: { code } };
 }

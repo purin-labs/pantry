@@ -1,6 +1,5 @@
 import {
-  createSyncProtocol,
-  everyCode,
+  snapshotFrameLimit,
   type CollaborationParticipant,
   type SyncClientMessage,
   type SyncFailureCode,
@@ -10,10 +9,9 @@ import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   COSTS_SHEET_STATE_VECTOR_LIMIT,
   COSTS_SHEET_UPDATE_LIMIT,
+  costsSheetDocument,
   isCostsSheetSelectionKey,
   isCostsSheetTab,
-  parseCostsSheetStateVector,
-  parseCostsSheetUpdate,
   type CostsSheetCrdtError,
   type CostsSheetSelection,
   type CostsSheetStateVector,
@@ -22,11 +20,10 @@ import {
 
 export const COSTS_SHEET_PROTOCOL = "costs_sheet_sync.v1";
 
-export const FRAME_LIMIT =
-  4 *
-    (Math.ceil(COSTS_SHEET_UPDATE_LIMIT / 3) +
-      Math.ceil(COSTS_SHEET_STATE_VECTOR_LIMIT / 3)) +
-  1024;
+export const FRAME_LIMIT = snapshotFrameLimit(
+  COSTS_SHEET_UPDATE_LIMIT,
+  COSTS_SHEET_STATE_VECTOR_LIMIT,
+);
 
 export type CostsSheetFailureCode = SyncFailureCode<
   CostsSheetCrdtError["code"]
@@ -50,31 +47,14 @@ export type CostsSheetServerMessage = SyncServerMessage<
   CostsSheetRoomMetadata
 >;
 
-const protocol = createSyncProtocol<
+const protocol = costsSheetDocument.syncProtocol<
   CostsSheetSelection,
-  CostsSheetStateVector,
-  CostsSheetUpdate,
-  CostsSheetCrdtError["code"],
   CostsSheetRoomMetadata
 >({
   protocol: COSTS_SHEET_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "costs sheet",
   isSelection: isCostsSheetSelection,
-  parseStateVector: parseCostsSheetStateVector,
-  parseUpdate: parseCostsSheetUpdate,
-  documentFailureCodes: everyCode<CostsSheetCrdtError["code"]>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_document_shape",
-    "collection_limit",
-    "cell_invalid",
-    "record_conflict",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-  ]),
   roomMetadata: {
     fields: ["documentRevision", "generation"],
     isValid: (raw) =>

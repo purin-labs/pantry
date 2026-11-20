@@ -3,8 +3,6 @@ import {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
-  createSyncProtocol,
-  everyCode,
   isTextPresenceSelection,
   type CollaborationParticipant,
   type CollaborationPointer,
@@ -14,14 +12,13 @@ import {
   type SyncServerMessage,
 } from "@purin-labs/collaboration";
 import {
-  parseProductDescriptionUpdate,
-  parseProductDescriptionStateVector,
+  productDescriptionDocument,
   type ProductDescriptionUpdate,
   type ProductDescriptionStateVector,
   type ProductDescriptionCrdtError,
   type ProductDescriptionPresenceSelection,
 } from "./index.ts";
-import { isPositiveInteger } from "@purin-labs/std";
+import { exhaustiveList, isPositiveInteger } from "@purin-labs/std";
 
 export const DESCRIPTION_PROTOCOL = "product_description_sync.v2";
 export const FRAME_LIMIT = COLLABORATION_FRAME_LIMIT;
@@ -32,7 +29,8 @@ export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
 export type DraftPointerPosition = CollaborationPointerPosition;
 export type DraftPointer = CollaborationPointer;
 
-type DocumentCode = ProductDescriptionCrdtError["code"] | "source_unavailable";
+type RoomCode = "source_unavailable";
+type DocumentCode = ProductDescriptionCrdtError["code"] | RoomCode;
 export type DraftFailureCode = SyncFailureCode<DocumentCode>;
 
 export type DraftParticipant =
@@ -57,30 +55,16 @@ export type DraftServerMessage = SyncServerMessage<
   ProductDescriptionRoomMetadata
 >;
 
-const protocol = createSyncProtocol<
+const protocol = productDescriptionDocument.syncProtocol<
   ProductDescriptionPresenceSelection,
-  ProductDescriptionStateVector,
-  ProductDescriptionUpdate,
-  DocumentCode,
-  ProductDescriptionRoomMetadata
+  ProductDescriptionRoomMetadata,
+  RoomCode
 >({
   protocol: DESCRIPTION_PROTOCOL,
   frameLimit: FRAME_LIMIT,
   label: "description",
   isSelection: isTextPresenceSelection,
-  parseStateVector: parseProductDescriptionStateVector,
-  parseUpdate: parseProductDescriptionUpdate,
-  documentFailureCodes: everyCode<DocumentCode>()([
-    "invalid_state",
-    "invalid_update",
-    "invalid_state_vector",
-    "invalid_document_shape",
-    "description_too_long",
-    "update_too_large",
-    "state_too_large",
-    "state_vector_too_large",
-    "source_unavailable",
-  ]),
+  roomFailureCodes: exhaustiveList<RoomCode>()(["source_unavailable"]),
   roomMetadata: {
     fields: ["initializedFromProductRevision", "currentProductRevision"],
     isValid: (raw) =>

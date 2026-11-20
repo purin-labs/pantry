@@ -1,7 +1,12 @@
 import {
+  checkDocumentSize,
+  defineSharedDoc,
   normalizePlainText,
-  parseYjsEncoding,
-  type ParsedYjsEncoding,
+  sharedDocFailure as failure,
+  sharedDocSuccess as success,
+  type SharedDocEncoding,
+  type SharedDocError,
+  type SharedDocResult,
 } from "@purin-labs/collaboration";
 import * as Y from "yjs";
 
@@ -74,22 +79,18 @@ export type MenuBoardMovingSelection = Readonly<{
 /** A drag shows at most this many elements in motion to other people. */
 export const MENU_BOARD_MOVING_LIMIT = 12;
 
-export type MenuBoardCrdtError = Readonly<{
-  code:
-    | "invalid_state"
-    | "invalid_update"
-    | "invalid_state_vector"
-    | "invalid_document_shape"
-    | "collection_limit"
-    | "text_too_long"
-    | "record_conflict"
-    | "update_too_large"
-    | "state_too_large"
-    | "state_vector_too_large";
-}>;
-export type MenuBoardCrdtResult<T> =
-  | Readonly<{ ok: true; value: T; error?: never }>
-  | Readonly<{ ok: false; error: MenuBoardCrdtError; value?: never }>;
+/** The document's own failures, beside the failures of an encoding. */
+const FAILURES = [
+  "invalid_document_shape",
+  "collection_limit",
+  "text_too_long",
+  "record_conflict",
+] as const;
+export type MenuBoardCrdtError = SharedDocError<(typeof FAILURES)[number]>;
+export type MenuBoardCrdtResult<T> = SharedDocResult<
+  T,
+  MenuBoardCrdtError["code"]
+>;
 
 /** One element's new placement in a batch. */
 export type MenuBoardElementPlacement = Readonly<{
@@ -100,56 +101,31 @@ export type MenuBoardElementPlacement = Readonly<{
 /** The props that one edit changes: any subset of one kind's props. */
 export type MenuBoardPropChanges = Readonly<Record<string, string>>;
 
-type EncodingKind = "state" | "update" | "state_vector";
 const ENCODING_LIMITS = {
   state: MENU_BOARD_STATE_LIMIT,
   update: MENU_BOARD_UPDATE_LIMIT,
   stateVector: MENU_BOARD_STATE_VECTOR_LIMIT,
 } as const;
 
-class MenuBoardEncoding<K extends EncodingKind> {
-  readonly #encoding: ParsedYjsEncoding<K>;
-  readonly kind: K;
+export const menuBoardDocument = defineSharedDoc({
+  schema: MENU_BOARD_SCHEMA,
+  limits: ENCODING_LIMITS,
+  failures: FAILURES,
+  // `style` is of Plan 40B phase 5.
+  roots: { board: "map", elements: "map", style: "map" },
+  shapeFailure: "invalid_document_shape",
+  validate: validateDocument,
+  unchangedFailure: "record_conflict",
+});
 
-  private constructor(encoding: ParsedYjsEncoding<K>) {
-    this.#encoding = encoding;
-    this.kind = encoding.kind;
-  }
+type Schema = typeof MENU_BOARD_SCHEMA;
+export type MenuBoardState = SharedDocEncoding<"state", Schema>;
+export type MenuBoardUpdate = SharedDocEncoding<"update", Schema>;
+export type MenuBoardStateVector = SharedDocEncoding<"state_vector", Schema>;
 
-  encode(): Uint8Array {
-    return this.#encoding.encode();
-  }
-
-  static parse<K extends EncodingKind>(
-    kind: K,
-    bytes: Uint8Array,
-  ): MenuBoardCrdtResult<MenuBoardEncoding<K>> {
-    const parsed = parseYjsEncoding(kind, bytes, ENCODING_LIMITS);
-    return parsed.ok ? success(new MenuBoardEncoding(parsed.value)) : parsed;
-  }
-}
-
-export type MenuBoardState = MenuBoardEncoding<"state">;
-export type MenuBoardUpdate = MenuBoardEncoding<"update">;
-export type MenuBoardStateVector = MenuBoardEncoding<"state_vector">;
-
-export function parseMenuBoardState(
-  bytes: Uint8Array,
-): MenuBoardCrdtResult<MenuBoardState> {
-  return MenuBoardEncoding.parse("state", bytes);
-}
-
-export function parseMenuBoardUpdate(
-  bytes: Uint8Array,
-): MenuBoardCrdtResult<MenuBoardUpdate> {
-  return MenuBoardEncoding.parse("update", bytes);
-}
-
-export function parseMenuBoardStateVector(
-  bytes: Uint8Array,
-): MenuBoardCrdtResult<MenuBoardStateVector> {
-  return MenuBoardEncoding.parse("state_vector", bytes);
-}
+export const parseMenuBoardState = menuBoardDocument.parseState;
+export const parseMenuBoardUpdate = menuBoardDocument.parseUpdate;
+export const parseMenuBoardStateVector = menuBoardDocument.parseStateVector;
 
 /**
  * One board as a Yjs document. The `board` map holds the title and the
@@ -159,20 +135,14 @@ export function parseMenuBoardStateVector(
  * element converge to one of them. Every edit and every received update is
  * applied to a copy first, and the copy must pass the shape check.
  */
-export class MenuBoardDoc {
-  #doc: Y.Doc;
-
-  private constructor(doc: Y.Doc) {
-    this.#doc = doc;
-  }
-
+export class MenuBoardDoc extends menuBoardDocument.Doc {
   static create(
     title: string,
     layout: MenuBoardLayout,
   ): MenuBoardCrdtResult<MenuBoardDoc> {
     const normalized = normalizePlainText(title);
     if (!isMenuBoardText(normalized)) return failure("text_too_long");
-    const doc = createEmptyDocument();
+    const doc = menuBoardDocument.emptyDocument();
     const board = doc.getMap("board");
     board.set("title", normalized);
     board.set("layout", layout);
@@ -180,34 +150,23 @@ export class MenuBoardDoc {
   }
 
   static createReplica(): MenuBoardDoc {
-    return new MenuBoardDoc(createEmptyDocument());
+    return new MenuBoardDoc(menuBoardDocument.emptyDocument());
   }
 
   static restore(state: MenuBoardState): MenuBoardCrdtResult<MenuBoardDoc> {
-    const doc = createEmptyDocument();
-    try {
-      Y.applyUpdate(doc, state.encode());
-      const valid = validateDocument(doc);
-      if (!valid.ok) {
-        doc.destroy();
-        return valid;
-      }
-      return success(new MenuBoardDoc(doc));
-    } catch {
-      doc.destroy();
-      return failure("invalid_state");
-    }
+    const doc = menuBoardDocument.restore(state);
+    return doc.ok ? success(new MenuBoardDoc(doc.value)) : doc;
   }
 
   read(): MenuBoardSnapshot {
-    const board = this.#doc.getMap("board");
+    const board = this.doc.getMap("board");
     const layoutValue = board.get("layout");
     const layout: MenuBoardLayout = isMenuBoardLayout(layoutValue)
       ? layoutValue
       : "three_columns";
     const placed: MenuBoardElement[] = [];
     const unplaced: MenuBoardElement[] = [];
-    for (const [id, raw] of this.#doc.getMap("elements")) {
+    for (const [id, raw] of this.doc.getMap("elements")) {
       if (!(raw instanceof Y.Map)) continue;
       const element = readElement(id, raw);
       if (element === null) continue;
@@ -240,58 +199,21 @@ export class MenuBoardDoc {
     return {
       title: String(board.get("title") ?? ""),
       layout,
-      style: readStyle(this.#doc),
+      style: readStyle(this.doc),
       elements: placed,
       unplaced,
     };
   }
 
-  state(): MenuBoardCrdtResult<MenuBoardState> {
-    return parseMenuBoardState(Y.encodeStateAsUpdate(this.#doc));
-  }
-
-  stateVector(): MenuBoardCrdtResult<MenuBoardStateVector> {
-    return parseMenuBoardStateVector(Y.encodeStateVector(this.#doc));
-  }
-
-  syncUpdate(
-    remoteStateVector: MenuBoardStateVector,
-  ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    try {
-      return parseMenuBoardUpdate(
-        Y.encodeStateAsUpdate(this.#doc, remoteStateVector.encode()),
-      );
-    } catch {
-      return failure("invalid_state_vector");
-    }
-  }
-
-  apply(update: MenuBoardUpdate): MenuBoardCrdtResult<null> {
-    const candidate = cloneDocument(this.#doc);
-    try {
-      Y.applyUpdate(candidate, update.encode());
-      const valid = validateDocument(candidate);
-      if (!valid.ok) {
-        candidate.destroy();
-        return valid;
-      }
-    } catch {
-      candidate.destroy();
-      return failure("invalid_update");
-    }
-    this.#replace(candidate);
-    return success(null);
-  }
-
   rename(title: string): MenuBoardCrdtResult<MenuBoardUpdate> {
     const normalized = normalizePlainText(title);
     if (!isMenuBoardText(normalized)) return failure("text_too_long");
-    return this.#mutate(setBoardValue.bind(null, "title", normalized));
+    return this.mutate(setBoardValue.bind(null, "title", normalized));
   }
 
   setLayout(layout: MenuBoardLayout): MenuBoardCrdtResult<MenuBoardUpdate> {
     if (!isMenuBoardLayout(layout)) return failure("invalid_document_shape");
-    return this.#mutate(setBoardValue.bind(null, "layout", layout));
+    return this.mutate(setBoardValue.bind(null, "layout", layout));
   }
 
   /**
@@ -301,11 +223,11 @@ export class MenuBoardDoc {
   setStyle(
     changes: MenuBoardStyleChanges,
   ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate(setBoardStyle.bind(null, changes));
+    return this.mutate(setBoardStyle.bind(null, changes));
   }
 
   addElement(element: MenuBoardElement): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate(addBoardElement.bind(null, element));
+    return this.mutate(addBoardElement.bind(null, element));
   }
 
   /** Sets some props of one element; the others keep their value. */
@@ -313,18 +235,18 @@ export class MenuBoardDoc {
     elementId: string,
     changes: MenuBoardPropChanges,
   ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate(updateBoardElement.bind(null, elementId, changes));
+    return this.mutate(updateBoardElement.bind(null, elementId, changes));
   }
 
   moveElement(
     elementId: string,
     placement: MenuBoardPlacement,
   ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate(moveBoardElement.bind(null, elementId, placement));
+    return this.mutate(moveBoardElement.bind(null, elementId, placement));
   }
 
   removeElement(elementId: string): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate(removeBoardElement.bind(null, elementId));
+    return this.mutate(removeBoardElement.bind(null, elementId));
   }
 
   /**
@@ -335,7 +257,7 @@ export class MenuBoardDoc {
   placeElements(
     placements: readonly MenuBoardElementPlacement[],
   ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate(placeBoardElements.bind(null, placements));
+    return this.mutate(placeBoardElements.bind(null, placements));
   }
 
   /**
@@ -349,7 +271,7 @@ export class MenuBoardDoc {
     placements: readonly MenuBoardElementPlacement[],
   ): MenuBoardCrdtResult<MenuBoardUpdate> {
     if (!isMenuBoardLayout(layout)) return failure("invalid_document_shape");
-    return this.#mutate((doc) => {
+    return this.mutate((doc) => {
       setBoardValue("layout", layout, doc);
       return placeBoardElements(placements, doc);
     });
@@ -363,7 +285,7 @@ export class MenuBoardDoc {
     stack: MenuBoardElement,
     placements: readonly MenuBoardElementPlacement[],
   ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate((doc) => {
+    return this.mutate((doc) => {
       const added = addBoardElement(stack, doc);
       return added.ok ? placeBoardElements(placements, doc) : added;
     });
@@ -374,7 +296,7 @@ export class MenuBoardDoc {
     stackId: string,
     placements: readonly MenuBoardElementPlacement[],
   ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate((doc) => {
+    return this.mutate((doc) => {
       const placed = placeBoardElements(placements, doc);
       return placed.ok ? removeBoardElement(stackId, doc) : placed;
     });
@@ -388,69 +310,8 @@ export class MenuBoardDoc {
    * are not written, so a concurrent edit of another value survives.
    */
   restoreTo(target: MenuBoardSnapshot): MenuBoardCrdtResult<MenuBoardUpdate> {
-    return this.#mutate(replaceBoard.bind(null, target));
+    return this.mutate(replaceBoard.bind(null, target));
   }
-
-  destroy(): void {
-    this.#doc.destroy();
-  }
-
-  #mutate(
-    operation: (doc: Y.Doc) => MenuBoardCrdtResult<null>,
-  ): MenuBoardCrdtResult<MenuBoardUpdate> {
-    const candidate = cloneDocument(this.#doc);
-    const updates: Uint8Array[] = [];
-    const captureUpdate = captureYjsUpdate.bind(null, updates);
-    candidate.on("update", captureUpdate);
-    const changed = operation(candidate);
-    candidate.off("update", captureUpdate);
-    if (!changed.ok) {
-      candidate.destroy();
-      return changed;
-    }
-    const valid = validateDocument(candidate);
-    if (!valid.ok) {
-      candidate.destroy();
-      return valid;
-    }
-    if (updates.length === 0) {
-      candidate.destroy();
-      return failure("record_conflict");
-    }
-    const update = parseMenuBoardUpdate(Y.mergeUpdates(updates));
-    if (!update.ok) {
-      candidate.destroy();
-      return update;
-    }
-    this.#replace(candidate);
-    return update;
-  }
-
-  #replace(candidate: Y.Doc): void {
-    this.#doc.destroy();
-    this.#doc = candidate;
-  }
-}
-
-function createEmptyDocument(): Y.Doc {
-  const doc = new Y.Doc();
-  doc.getMap("board");
-  doc.getMap("elements");
-  // Plan 40B phase 5. Every document defines the map before an update
-  // arrives, so that Yjs reads its entries as a map.
-  doc.getMap("style");
-  return doc;
-}
-
-function cloneDocument(source: Y.Doc): Y.Doc {
-  const candidate = createEmptyDocument();
-  Y.applyUpdate(candidate, Y.encodeStateAsUpdate(source));
-  candidate.clientID = source.clientID;
-  return candidate;
-}
-
-function captureYjsUpdate(updates: Uint8Array[], update: Uint8Array): void {
-  updates.push(update);
 }
 
 function setBoardValue(
@@ -636,16 +497,9 @@ function removeBoardElement(
   return success(null);
 }
 
+/** The check of the content. The shared document checks the roots first. */
 function validateDocument(doc: Y.Doc): MenuBoardCrdtResult<null> {
-  const style = doc.share.get("style");
-  if (
-    doc.share.size !== 3 ||
-    !(doc.share.get("board") instanceof Y.Map) ||
-    !(doc.share.get("elements") instanceof Y.Map) ||
-    !(style instanceof Y.Map)
-  )
-    return failure("invalid_document_shape");
-  for (const [token, value] of style)
+  for (const [token, value] of doc.getMap("style"))
     if (!isMenuBoardStyleToken(token) || !isMenuBoardStyleValue(token, value))
       return failure("invalid_document_shape");
   const board = doc.getMap("board");
@@ -662,11 +516,7 @@ function validateDocument(doc: Y.Doc): MenuBoardCrdtResult<null> {
     if (!(element instanceof Y.Map) || readElement(id, element) === null)
       return failure("invalid_document_shape");
   }
-  if (Y.encodeStateAsUpdate(doc).byteLength > MENU_BOARD_STATE_LIMIT)
-    return failure("state_too_large");
-  if (Y.encodeStateVector(doc).byteLength > MENU_BOARD_STATE_VECTOR_LIMIT)
-    return failure("state_vector_too_large");
-  return success(null);
+  return checkDocumentSize(doc, ENCODING_LIMITS);
 }
 
 function readElement(
@@ -779,12 +629,4 @@ function encodePlacement(placement: MenuBoardPlacement): string {
     return `${placement.frameId}@${placement.order}`;
   const { rect, constraints } = placement;
   return `canvas@${placement.order}@${rect.x},${rect.y},${rect.width},${rect.height}@${constraints.horizontal}:${constraints.vertical}`;
-}
-
-function success<T>(value: T): MenuBoardCrdtResult<T> {
-  return { ok: true, value };
-}
-
-function failure(code: MenuBoardCrdtError["code"]): MenuBoardCrdtResult<never> {
-  return { ok: false, error: { code } };
 }

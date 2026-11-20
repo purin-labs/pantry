@@ -1,3 +1,4 @@
+import { exhaustiveList } from "@purin-labs/std";
 import * as Y from "yjs";
 
 export type YjsEncodingKind = "state" | "update" | "state_vector";
@@ -17,6 +18,18 @@ export type YjsEncodingFailure = Readonly<{
     | "state_too_large"
     | "state_vector_too_large";
 }>;
+
+/** Each code of an encoding failure, for the failure frame of a room. */
+export const YJS_ENCODING_FAILURE_CODES = exhaustiveList<
+  YjsEncodingFailure["code"]
+>()([
+  "invalid_state",
+  "invalid_update",
+  "invalid_state_vector",
+  "update_too_large",
+  "state_too_large",
+  "state_vector_too_large",
+]);
 
 export type YjsEncodingResult<T> =
   | Readonly<{ ok: true; value: T; error?: never }>

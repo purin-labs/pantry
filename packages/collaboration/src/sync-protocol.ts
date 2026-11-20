@@ -26,6 +26,9 @@ import {
  * codecs and the metadata of its sync response; the frames stay byte for byte
  * as each package wrote them. A package can add fields to some server
  * messages, and server kinds without fields.
+ *
+ * A package reaches this file through `syncProtocol` of its shared document
+ * (`shared-doc.ts`), which gives the document codecs and each failure code.
  */
 
 /** The room metadata of a sync response when a package names none. */
@@ -76,7 +79,7 @@ export type SyncServerExtension = Readonly<{
 }>;
 
 /** The server messages of a package that adds nothing. */
-type SyncBaseExtension = Readonly<{
+export type SyncBaseExtension = Readonly<{
   syncResponse: unknown;
   updateAccepted: unknown;
   updateBroadcast: unknown;
@@ -178,17 +181,6 @@ export type SyncProtocolSpec<
   /** The server kinds without fields. Default: none. */
   signals?: readonly Extension["signal"][];
 }>;
-
-/**
- * A list of every code of a union: the type check refuses a list that misses
- * one, so a new document failure cannot be dropped from the failure frame.
- */
-export function everyCode<Code extends string>() {
-  return <const List extends readonly Code[]>(
-    list: List &
-      ([Code] extends [List[number]] ? unknown : "a code is missing"),
-  ): readonly Code[] => list;
-}
 
 const ROOM_FAILURE_CODES: readonly SyncRoomFailureCode[] = [
   "invalid_message",

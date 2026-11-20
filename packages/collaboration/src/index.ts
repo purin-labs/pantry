@@ -7,6 +7,22 @@ export {
   type YjsEncodingResult,
 } from "./yjs-encoding.ts";
 export {
+  checkDocumentSize,
+  defineSharedDoc,
+  defineSharedEncoding,
+  sharedDocFailure,
+  sharedDocSuccess,
+  type SharedDocEncoding,
+  type SharedDocError,
+  type SharedDocResult,
+} from "./shared-doc.ts";
+export {
+  definePlainTextDoc,
+  hasOnlyPlainTextStructs,
+  type PlainTextChange,
+  type PlainTextDocError,
+} from "./plain-text-doc.ts";
+export {
   RelativeTextSelection,
   captureTextPresenceSelection,
   resolveTextPresenceSelection,
@@ -34,6 +50,7 @@ export {
   isShortProtocolText,
   isTextPresenceSelection,
   parseProtocolFrame,
+  snapshotFrameLimit,
   type CollaborationParticipant,
   type CollaborationPointer,
   type CollaborationPointerPosition,
@@ -56,8 +73,6 @@ export {
   type CollaborationAgentColorKey,
 } from "./agent-presence.ts";
 export {
-  createSyncProtocol,
-  everyCode,
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncMessageFields,
