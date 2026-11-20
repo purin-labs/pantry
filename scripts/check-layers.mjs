@@ -34,6 +34,10 @@
 // a port: the lower module defines an interface, and the higher one gives the
 // implementation. Then lower the baseline with --update.
 //
+// Each pair that stays has a written reason: `reasons` in the same file gives
+// the reason and the fix of each pair, and the check refuses a pair with no
+// reason or no fix. --update drops the reason of a pair that is gone.
+//
 // A file under `covers` with no module is refused: add a rule or a line to
 // scripts/layers.json. A tracked file outside `covers` needs a folder in
 // `packages` or a prefix in `placement`, so that each file has a place in the
@@ -435,6 +439,12 @@ if (faults.length > 0) {
   process.exit(1);
 }
 
+const stored = existsSync(join(root, BASELINE))
+  ? JSON.parse(readFileSync(join(root, BASELINE), "utf8"))
+  : { crossings: {}, reasons: {} };
+/** pair -> { reason, fix }: why a crossing stays, and what removes it. */
+const reasons = stored.reasons ?? {};
+
 function writeBaseline(crossings) {
   const sum = totals(
     Object.entries(crossings).map(([pair, count]) => ({
@@ -442,10 +452,31 @@ function writeBaseline(crossings) {
       count,
     })),
   );
+  const kept = Object.fromEntries(
+    Object.keys(crossings)
+      .filter((pair) => reasons[pair] !== undefined)
+      .map((pair) => [pair, reasons[pair]]),
+  );
   writeFileSync(
     join(root, BASELINE),
-    `${JSON.stringify({ totals: sum, crossings }, null, 2)}\n`,
+    `${JSON.stringify({ totals: sum, crossings, reasons: kept }, null, 2)}\n`,
   );
+}
+
+/** The pairs of `crossings` with no reason or no fix. */
+function unexplained(crossings) {
+  return Object.keys(crossings)
+    .filter(
+      (pair) =>
+        typeof reasons[pair]?.reason !== "string" ||
+        reasons[pair].reason.trim() === "" ||
+        typeof reasons[pair]?.fix !== "string" ||
+        reasons[pair].fix.trim() === "",
+    )
+    .map(
+      (pair) =>
+        `${pair}: no written reason. Add { "reason": "...", "fix": "..." } for it under reasons in ${BASELINE}.`,
+    );
 }
 
 if (mode === "--init") {
@@ -454,9 +485,7 @@ if (mode === "--init") {
   process.exit(0);
 }
 
-const baseline = JSON.parse(
-  readFileSync(join(root, BASELINE), "utf8"),
-).crossings;
+const baseline = stored.crossings;
 const grown = [];
 for (const [pair, count] of Object.entries(current)) {
   const allowed = baseline[pair];
@@ -479,6 +508,11 @@ if (mode === "--update") {
   }
   writeBaseline(current);
   console.log(`wrote ${BASELINE}: ${Object.keys(current).length} pairs`);
+  const missing = unexplained(current);
+  if (missing.length > 0) {
+    console.error(missing.join("\n"));
+    process.exit(1);
+  }
   process.exit(0);
 }
 
@@ -487,6 +521,20 @@ if (grown.length > 0) {
   console.error(
     "An import may only go down the layers. Use a port: the lower module defines an interface, and the higher one gives the implementation. Only the owner of a table writes it: call a function of the owner. See docs/refactor-17.md.",
   );
+  process.exit(1);
+}
+const stale = Object.keys(reasons).filter(
+  (pair) => current[pair] === undefined,
+);
+const missing = [
+  ...unexplained(current),
+  ...stale.map(
+    (pair) =>
+      `${pair}: a reason for a crossing that is gone. Run node scripts/check-layers.mjs --update.`,
+  ),
+];
+if (missing.length > 0) {
+  console.error(missing.join("\n"));
   process.exit(1);
 }
 const lower = Object.entries(baseline).filter(
