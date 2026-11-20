@@ -1263,6 +1263,59 @@ points of the entry above where it names them.
 - **Still open: 1 Inbox import.** `case-context-discovery/metadata.ts` reads the
   verification of a selection for a conversation.
 
+**21 November 2026. The tool handlers are a module, and the handler support names
+no commerce file,** on the branch `refactor-17-foundation-2`.
+
+- **A new foundation module, `tool-handlers`.** The module `agent-tools` held two
+  concerns. The executor is below the Session. The handlers and their support read
+  the Session and the conversation, so `tool-handlers` is after `conversation` in
+  `foundationOrder`. Its files: `agent-tools/session-support.ts`,
+  `agent-tools/files/handlers.ts`, `actors/session/own-tool-services.ts` and the
+  three `actors/harness-*` files of a follow-up, a Memory proposal and a side Case.
+  `--init` ran one time for the pairs that the new name renames. No pair without
+  the new name grew.
+- **The Session imports no handler file.** `actors/session/turn-tool-offers.ts`
+  holds the rules that say if a turn offers a tool by its origin. The wiring gives
+  `ownServices`, `settleEffect`, `mayRequestPermission` and `requestPermission`.
+- **A service interface of the commerce contract.**
+  `commerce/contract/tool-reads.ts` declares `CommerceToolReads` with `import type`
+  only. The commerce helpers left `session-support.ts` for
+  `agent-tools/commerce/read-support.ts`. Commerce implements the interface, the
+  Worker wiring gives it to Kitchen, and a Kitchen handler reads commerce through
+  `context.commerce`. The `staff_page` effect of the foundation knows only the
+  member of the page.
+- **Two files at the module that they serve.** `organisation-policy.ts` and
+  `actors/message-tools.ts` are `foundation/agent` in the map.
+- **Measures.** Layer crossings: 520 to 477. Order crossings: 103 to 72.
+  `foundation/agent-tools -> foundation/agent`: 21 to 3. `foundation/agent ->
+foundation/conversation`: 28 to 22. `foundation/authority -> foundation/agent`: 11
+  to 5. The handler support to commerce: 9 to 0. Kitchen to commerce: 3 to 1.
+  Copies: 880 to 878. Unused exports: 807, no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite pass. The catalog was not changed. 36
+  journey files of the changed paths pass, in two groups. The full E2E suite did
+  not run on the branch.
+- **Still open: 32 imports of commerce from the foundation.**
+  - `context/assembly/commerce.ts` (5) builds the commerce context of a turn from
+    the graph. Commerce, Kitchen and the handler support import it. It is commerce
+    code. It can go behind `CommerceToolReads`, with its error class in the
+    foundation.
+  - `data/agent-operations*` with its runner and routes (10) and `cues/engine.ts`
+    (2) are the operations and the cues of the merchant agent. They write eight
+    agent tables that the foundation owns. As commerce files they give more crossings: 16 more for the
+    operations and 8 more for the cues, measured.
+  - `actors/action-ledger.ts` (3), the access grant files (4) and the two access
+    control routes (5): the access grant model names the entity types and the graph
+    query of the commerce contract. Those types must go to `contracts`, or the
+    grant target must hold an opaque commerce part.
+  - `control/routes/sessions.ts` (1), `control/agent-operation-activity.ts` (1) and
+    `control/routes/agents/operations.ts` (1).
+- **Still open: the order pairs.** `foundation/agent -> foundation/conversation`
+  (22): `chat/turn-access.ts` (the access of a Session turn) is read by 4 agent
+  files, and the Case context discovery reads the chat store. `foundation/tool-handlers
+-> surfaces/slack` (3): the Slack notices of a permission request and of a held
+  effect.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
