@@ -409,7 +409,11 @@ interface that the Worker wires. Only the owner module of a D1 table writes it. 
 new crossing, and it refuses a source file, a top-level folder or a D1 table
 with no line in the map. Remove a crossing with a port: the lower module
 defines an interface, and the higher one gives the implementation. Then run
-`node scripts/check-layers.mjs --update`. `pnpm lint:clones` refuses a new copy
+`node scripts/check-layers.mjs --update`. A crossing that stays needs a reason
+and a fix under `reasons` in `scripts/layers-ratchet.json`. `docs/layers.md`
+lists the files, tables and public files of each module; after a new file or a
+map change, run `node scripts/check-layers.mjs --areas --write`, or
+`pnpm lint:layers-page` fails. `pnpm lint:clones` refuses a new copy
 of product code, and `pnpm lint:unused` refuses a new unused file or export. A
 file that only a tool starts, such as a new Worker entry or a page with its own
 HTML file, goes into the entry list of its workspace in `knip.json`. When a

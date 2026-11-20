@@ -49,6 +49,9 @@
 //   node scripts/check-layers.mjs --report              print the totals and each pair
 //   node scripts/check-layers.mjs --list "<a> -> <b>"   print the imports of one pair
 //   node scripts/check-layers.mjs --tables [--shared]   print the writer modules of each D1 table
+//   node scripts/check-layers.mjs --areas [module]      print the files, tables and public files of each module
+//   node scripts/check-layers.mjs --areas --write       write that list to docs/layers.md
+//   node scripts/check-layers.mjs --areas --check       fail when docs/layers.md is older than the map
 //   node scripts/check-layers.mjs --misfits [share] [links]
 //       print each file whose imports and importers are mostly in another
 //       module (default: a share of 0.6 and 4 links). Such a file has a wrong
@@ -77,6 +80,7 @@ if (
     "--list",
     "--tables",
     "--misfits",
+    "--areas",
   ].includes(mode)
 ) {
   console.error(`unknown argument ${mode}`);
@@ -349,6 +353,95 @@ for (const name of Object.keys(targets.tables)) {
   }
 }
 
+const LAYERS_PAGE = "docs/layers.md";
+const LAYERS_PAGE_HEAD = `# The modules of the three layers
+
+This page is made by \`node scripts/check-layers.mjs --areas --write\` from
+\`scripts/layers.json\` and the tracked files. Do not edit it. \`pnpm lint\`
+fails when the page is older than the map or the files: after a new file, a
+new table or a changed line of the map, write the page again. Each section is
+one module, bottom-up: the foundation in its order, the areas, the surfaces
+and the Workers ([Refactor 17](refactor-17.md)). "Files" gives the count of
+the source files of the module and the folders that hold them, with the count
+in each folder. "Packages" gives its workspace packages. "Tables" gives the D1
+tables that the module owns; only the owner writes a table. "Public files"
+gives the contract of an area: the files and folders that another area may
+import. A module with no line for one of these has none.
+
+`;
+
+/** The files, packages, tables and public files of each module. */
+function moduleList(only) {
+  const modules = new Set([
+    ...Object.values(targets.rules),
+    ...Object.values(targets.files),
+    ...Object.values(targets.packages),
+    ...Object.values(targets.tables),
+  ]);
+  // The layers bottom-up, the foundation in its order, then by name.
+  const order = (a, b) =>
+    layerRank.get(layerOf(a)) - layerRank.get(layerOf(b)) ||
+    (orderRank.get(a) ?? 0) - (orderRank.get(b) ?? 0) ||
+    (a < b ? -1 : 1);
+  const selected = [...modules]
+    .filter((module) => layerRank.has(layerOf(module)))
+    .filter(
+      (module) =>
+        only === null || module === only || module === `areas/${only}`,
+    )
+    .sort(order);
+  const sections = [];
+  for (const module of selected) {
+    const lines = [`## ${module}`, ""];
+    const files = tracked.filter((path) => moduleOf(path) === module);
+    if (files.length > 0) {
+      const folders = new Map();
+      for (const path of files) {
+        const folder = `${posix.dirname(path)}/`;
+        folders.set(folder, (folders.get(folder) ?? 0) + 1);
+      }
+      lines.push(`- Files: ${files.length} in ${folders.size} folders`);
+      for (const [folder, count] of [...folders].sort(([a], [b]) =>
+        a < b ? -1 : 1,
+      ))
+        lines.push(`  - \`${folder}\` ${count}`);
+    }
+    const packages = Object.entries(targets.packages)
+      .filter(([, owner]) => owner === module)
+      .map(([folder]) => folder)
+      .sort();
+    if (packages.length > 0)
+      lines.push(
+        `- Packages: ${packages.map((folder) => `\`${folder}\``).join(", ")}`,
+      );
+    const owned = Object.entries(targets.tables)
+      .filter(([, owner]) => owner === module)
+      .map(([name]) => name)
+      .sort();
+    if (owned.length > 0)
+      lines.push(
+        `- Tables (${owned.length}): ${owned.map((name) => `\`${name}\``).join(", ")}`,
+      );
+    const contract = (targets.contracts ?? [])
+      .filter((entry) =>
+        targets.packages[entry] !== undefined
+          ? targets.packages[entry] === module
+          : entry.endsWith("/")
+            ? tracked.some(
+                (path) => path.startsWith(entry) && moduleOf(path) === module,
+              )
+            : moduleOf(entry) === module,
+      )
+      .sort();
+    if (contract.length > 0)
+      lines.push(
+        `- Public files: ${contract.map((entry) => `\`${entry}\``).join(", ")}`,
+      );
+    sections.push(lines.join("\n"));
+  }
+  return sections.length === 0 ? "" : `${sections.join("\n\n")}\n`;
+}
+
 function totals(entries) {
   const sum = { upward: 0, areas: 0, order: 0, table: 0 };
   for (const { kind, count } of entries) sum[kind] += count;
@@ -376,6 +469,32 @@ if (mode === "--report") {
   }
   if (faults.length > 0) console.error(faults.join("\n"));
   process.exit(faults.length === 0 ? 0 : 1);
+}
+
+if (mode === "--areas") {
+  const option = process.argv[3];
+  const text = moduleList(
+    option === undefined || option.startsWith("--") ? null : option,
+  );
+  if (option === "--write" || option === "--check") {
+    const page = `${LAYERS_PAGE_HEAD}${text}`;
+    const path = join(root, LAYERS_PAGE);
+    if (option === "--write") {
+      writeFileSync(path, page);
+      console.log(`wrote ${LAYERS_PAGE}`);
+      process.exit(0);
+    }
+    if (!existsSync(path) || readFileSync(path, "utf8") !== page) {
+      console.error(
+        `${LAYERS_PAGE} is older than the map. Run node scripts/check-layers.mjs --areas --write.`,
+      );
+      process.exit(1);
+    }
+    console.log(`${LAYERS_PAGE} lists the map of today`);
+    process.exit(0);
+  }
+  process.stdout.write(text);
+  process.exit(text === "" ? 2 : 0);
 }
 
 if (mode === "--tables") {
