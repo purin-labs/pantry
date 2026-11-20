@@ -1,5 +1,4 @@
 import type {
-  CommerceSystemKind,
   AuthorityPartition,
   CaseAssignmentLifecycle,
   CaseAssignmentStart,
@@ -19,13 +18,8 @@ import type {
   SessionProposal,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import type { CommerceEntityPlaneProposal } from "@purin-labs/commerce-contracts";
-import type { SourceProvenance } from "@purin-labs/commerce-contracts";
-import type { IntegrationAccountId } from "../../ids";
 import type { EmailReplyProposalLifecycle } from "../../data/email-mailbox";
 import type { EmailProposalTarget } from "../../data/email-operational";
-import type { CommerceSystemRevision } from "../../data/organisation-commerce-system";
-import type { CommerceActionRequest } from "../../commerce/action-model";
 import type {
   MerchantActionDecision,
   MerchantActionRejectionEvidence,
@@ -35,6 +29,7 @@ import { FlowBinding } from "../../policy";
 import type { SerializedFlowBinding } from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
+import type { CaseSourceProvenance } from "./source-provenance";
 
 export type CaseGmailReplyProposal = {
   readonly evidence: import("../../case-context-discovery/evidence").CaseContextCollectionProposalEvidence;
@@ -300,7 +295,7 @@ export type AcceptProposalRequest = {
 };
 
 export type AcceptCommerceProposalRequest = {
-  readonly proposal: CommerceCaseProposal;
+  readonly proposal: CaseCommerceProposal;
   readonly acceptedAt: number;
   readonly flowBinding: FlowBinding;
   /** The tool call that made the proposal, when the caller names one. */
@@ -318,20 +313,15 @@ export type CommerceEntityPlaneCaseProposal = {
   readonly caseId: string;
   readonly basedOnRevision: number;
   readonly requestAuthority: RequestAuthority;
-  readonly proposal: CommerceEntityPlaneProposal;
-  readonly origin:
-    | {
-        readonly kind: "merchant_control";
-        readonly userId: string;
-        readonly controlSessionId: string;
-      }
-    | {
-        readonly kind: "agent_session";
-        readonly sessionId: string;
-        readonly assignmentId: string;
-        readonly threadId: string;
-      };
+  readonly proposal: CaseEntityPlaneCommand;
+  readonly origin: CaseCommerceProposalOrigin;
 };
+
+/** The command of an entity plane proposal, as a Case entry holds it. */
+export type CaseEntityPlaneCommand = Variant<
+  CaseContent,
+  "entity_plane_proposal"
+>["proposal"];
 
 export type AcceptCommerceEntityPlaneProposalRequest = {
   readonly proposal: CommerceEntityPlaneCaseProposal;
@@ -342,9 +332,9 @@ export type AcceptCommerceEntityPlaneProposalRequest = {
 export type ParsedAcceptCommerceProposalRequest =
   | Readonly<{
       readonly kind: "agent_bound";
-      readonly proposal: CommerceCaseProposal & {
+      readonly proposal: CaseCommerceProposal & {
         readonly origin: Variant<
-          CommerceCaseProposal["origin"],
+          CaseCommerceProposalOrigin,
           "agent_session"
         >;
       };
@@ -355,9 +345,9 @@ export type ParsedAcceptCommerceProposalRequest =
     }>
   | Readonly<{
       readonly kind: "merchant_input";
-      readonly proposal: CommerceCaseProposal & {
+      readonly proposal: CaseCommerceProposal & {
         readonly origin: Variant<
-          CommerceCaseProposal["origin"],
+          CaseCommerceProposalOrigin,
           "merchant_control"
         >;
       };
@@ -397,79 +387,41 @@ export type CaseCommerceApprovalRecord =
       readonly lapsedAt: number;
     };
 
-export type CommerceCaseProposal = {
+export type CaseCommerceProposalOrigin =
+  | {
+      readonly kind: "merchant_control";
+      readonly userId: string;
+      readonly controlSessionId: string;
+    }
+  | {
+      readonly kind: "agent_session";
+      readonly sessionId: string;
+      readonly assignmentId: string;
+      readonly threadId: string;
+    };
+
+/**
+ * A commerce proposal, as the Case stores it. The Case reads its envelope.
+ * Commerce checks its body through `CaseCommercePart`, and
+ * `commerce/case-proposals.ts` names the precise types of the body.
+ */
+export type CaseCommerceProposal = {
   readonly proposalId: string;
   readonly caseId: string;
   readonly basedOnRevision: number;
   readonly requestAuthority: RequestAuthority;
-  readonly origin:
-    | {
-        readonly kind: "merchant_control";
-        readonly userId: string;
-        readonly controlSessionId: string;
-      }
-    | {
-        readonly kind: "agent_session";
-        readonly sessionId: string;
-        readonly assignmentId: string;
-        readonly threadId: string;
-      };
-} & (
-  | Readonly<{
-      action: Exclude<
-        CommerceActionRequest,
-        {
-          kind:
-            | "install_merchant_plugin"
-            | "publish_cafe_menu"
-            | "change_menu_price"
-            | "refund_order"
-            | "stock_operation"
-            | "submit_supplier_payout"
-            | "resume_supplier_payout_funding";
-        }
-      >;
-      authority: CommerceCaseAuthority;
-      provenance: SourceProvenance;
-    }>
-  | Readonly<{
-      // A merchant plugin is configuration, not a projection: the commerce
-      // system is the authority, and no source record is its provenance.
-      action: Variant<
-        CommerceActionRequest,
-        | "install_merchant_plugin"
-        | "publish_cafe_menu"
-        | "change_menu_price"
-        | "refund_order"
-        | "stock_operation"
-      >;
-      authority: CommerceCaseAuthority;
-      provenance: null;
-    }>
-  | Readonly<{
-      action: Variant<
-        CommerceActionRequest,
-        "submit_supplier_payout" | "resume_supplier_payout_funding"
-      >;
-      authority: Readonly<{
-        kind: "integration_account";
-        integrationAccountId: IntegrationAccountId;
-      }>;
-      provenance: null;
-    }>
-);
+  readonly origin: CaseCommerceProposalOrigin;
+} & CaseCommerceProposalBody;
+
+/** The action, the authority and the source record of a commerce proposal. */
+export type CaseCommerceProposalBody = Readonly<{
+  action: Readonly<{ kind: string }>;
+  authority: Readonly<{ kind: string }>;
+  provenance: CaseSourceProvenance | null;
+}>;
 
 export type PersistedCommerceProposal =
-  CommerceCaseProposal | CommerceEntityPlaneCaseProposal;
-
-export type CommerceCaseAuthority =
-  | Readonly<{ kind: "lab" }>
-  | Readonly<{
-      kind: "commerce_system";
-      system: CommerceSystemKind;
-      revision: CommerceSystemRevision;
-      integrationAccountId: IntegrationAccountId;
-    }>;
+  CaseCommerceProposal | CommerceEntityPlaneCaseProposal;
 
 export type ParsedDeliveryReceiptRequest = {
   readonly outputId: string;

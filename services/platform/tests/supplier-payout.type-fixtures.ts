@@ -14,13 +14,13 @@ import type { VariantBy } from "@purin-labs/type-utils";
 const money = { amountMinor: 10_000, currency: "JPY" };
 
 type PayoutCase = VariantBy<
-  import("../src/actors/case/types").CommerceCaseProposal,
+  import("../src/commerce/case-proposals").CommerceCaseProposal,
   "provenance",
   null
 >;
 declare const payoutCase: PayoutCase;
 // @ts-expect-error Payout proposals cannot borrow commerce-system authority through a spread.
-const payoutWithCommerceAuthority: import("../src/actors/case/types").CommerceCaseProposal =
+const payoutWithCommerceAuthority: import("../src/commerce/case-proposals").CommerceCaseProposal =
   { ...payoutCase, authority: { kind: "lab" } };
 void payoutWithCommerceAuthority;
 

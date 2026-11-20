@@ -239,6 +239,7 @@ import type {
   QuarantinedCaseDiscardResult,
 } from "./types";
 import type { Variant } from "@purin-labs/type-utils";
+import { provideCaseParts, type CaseParts } from "./parts";
 
 /** What a Case did with the ledger entry of the action that it waits on. */
 type CommerceApprovalSync = Readonly<{
@@ -267,8 +268,12 @@ export abstract class CaseActor
   private conversationWork: Promise<Result<null, ActorExportError>> | null =
     null;
 
+  /** The parts of the product areas (`./parts.ts`). The Worker class gives them. */
+  protected abstract areaParts(): CaseParts;
+
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env, { executionBarrier: true });
+    provideCaseParts(this.areaParts());
     const startedAt = Date.now();
     this.ctx.storage.transactionSync(
       createCaseSchema.bind(null, this.ctx.storage.sql),

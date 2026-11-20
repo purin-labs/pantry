@@ -3,7 +3,7 @@
 // for approval. Each delivery checks the action's request authority again,
 // as it stands now, before the connector posts.
 import { acceptedExecutionAuthority } from "../organisation-access/access";
-import type { CaseDO } from "../actors/case";
+import type { CaseActor } from "../actors/case/case-actor";
 import type { CaseOutput } from "../actors/case/types";
 import { sinkRefusalAsksPerson } from "../actors/case-conversation-sink";
 import { holdCaseOutput } from "../actors/case-output-hold";
@@ -45,7 +45,7 @@ export async function deliverCommerceCaseOutput(
     env: Env;
     scope: OrganisationExecutionScope;
     caseActor: Pick<
-      CaseDO,
+      CaseActor,
       "acceptDeliveryReceipt" | "holdOutput" | "rejectOutput"
     >;
     output: CaseOutput;

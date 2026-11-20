@@ -1138,7 +1138,7 @@ async function runEmailTurn(
 type EmailReplyTurnSettlement = Readonly<{
   caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"] &
     Pick<
-      import("./case").CaseDO,
+      import("./case/case-actor").CaseActor,
       "acceptEmailProposal" | "transitionEmailProposal"
     >;
   prepared: Readonly<{

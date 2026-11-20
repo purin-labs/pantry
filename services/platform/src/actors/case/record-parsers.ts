@@ -1,7 +1,7 @@
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { readAdmittedChatInput } from "../../chat/turn-access";
 import { parseGoalIdentity } from "../case-goals";
-import { parseSourceProvenance } from "../../commerce/source-provenance";
+import { parseSourceProvenance } from "./source-provenance";
 import { parseCaseEvidenceDependency } from "../../case-context-discovery/evidence";
 import { parseMessageCaseContent } from "../case-content";
 import type {
@@ -23,15 +23,11 @@ import type {
   SessionProposalDisposition,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import {
-  parseCommerceActionRequest,
-  type CommerceActionRequest,
-} from "../../commerce/action-model";
 import { parseStoredAttachmentList } from "../../messages/stored-attachment";
 import { parseStoredAuthorityPartition } from "../../authorization/access-grants/turn-authority";
 import { parseStoredRequestAuthority } from "../../request-authority";
 import { FlowLabel } from "../../policy";
-import { parseCommerceEntityPlaneProposal } from "../../commerce/entity-plane/proposals";
+import { caseParts } from "./parts";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   checked,
@@ -605,15 +601,10 @@ export function parseCaseContent(value: unknown): CaseContent | null {
       : { kind: "commerce_reference", provenance };
   }
   if (value.kind !== "entity_plane_proposal") return null;
-  const proposal = parseCommerceEntityPlaneProposal(value.proposal);
+  const proposal = caseParts().commerce.parseEntityPlaneCommand(
+    value.proposal,
+  );
   return proposal === null ? null : { kind: "entity_plane_proposal", proposal };
-}
-
-export function parseCommerceAction(
-  value: unknown,
-): CommerceActionRequest | null {
-  const parsed = parseCommerceActionRequest(value);
-  return parsed.ok ? parsed.value : null;
 }
 
 function parseCursor(
