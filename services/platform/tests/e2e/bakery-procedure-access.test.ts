@@ -107,7 +107,6 @@ async function procedureAccessJourney({ task }: TestContext): Promise<void> {
   const reader = new CommerceGraphReader({
     organisationId,
     merchantId,
-    commerceSystem: commerce.value.commerceSystem,
     underclerk: new CommerceEngineSource({
       organisationId,
       merchantId,

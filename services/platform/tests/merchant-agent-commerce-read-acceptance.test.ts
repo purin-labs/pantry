@@ -27,11 +27,6 @@ import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
 } from "../src/context/assembly/commerce";
-import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
-import {
-  parseCommerceBindingId,
-  parseCommerceEngineMerchantId,
-} from "../src/data/commerce-merchant-binding";
 import { parseOrganisationId } from "../src/ids";
 import { isRecord } from "@purin-labs/std";
 import {
@@ -650,15 +645,6 @@ async function createFixture(): Promise<Fixture> {
     reader: new CommerceGraphReader({
       organisationId: ORGANISATION_ID,
       merchantId: MERCHANT_ID,
-      commerceSystem: {
-        kind: "satyr_commerce",
-        organisationId: ORGANISATION_ID,
-        bindingId: required(
-          parseCommerceBindingId("underclerk_binding_urk_reads"),
-        ),
-        merchantId: required(parseCommerceEngineMerchantId(MERCHANT_ID)),
-        revision: required(parseCommerceSystemRevision(1)),
-      },
       underclerk: new CommerceEngineSource({
         organisationId: ORGANISATION_ID,
         merchantId: MERCHANT_ID,

@@ -22,7 +22,6 @@ import type {
   CommerceGraphPlannedSourceResult,
   CommerceGraphSourceResult,
 } from "../src/commerce/entity-plane/commerce-source";
-import type { CommerceSystem } from "../src/data/organisation-commerce-system";
 import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
 import { commerceGraphQueryProjection } from "../src/commerce/entity-plane/planner";
 import type {
@@ -69,7 +68,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(organisationId),
       underclerk: source,
     });
     expect(
@@ -121,7 +119,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(organisationId),
       underclerk: source,
     });
     const result = await reader.query({
@@ -164,7 +161,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(organisationId),
       underclerk: source,
     });
     const result = await reader.query({
@@ -448,7 +444,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(organisationId),
       underclerk: source,
     });
 
@@ -521,7 +516,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: commerceEngine,
       blotter,
     });
@@ -573,7 +567,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: commerceEngine,
       blotter,
     });
@@ -706,7 +699,6 @@ describe("commerce entity-plane authority", () => {
     const systemReader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: systemCommerce,
       blotter,
     });
@@ -729,7 +721,6 @@ describe("commerce entity-plane authority", () => {
     const listReader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: listCommerce,
       blotter,
     });
@@ -798,7 +789,6 @@ describe("commerce entity-plane authority", () => {
     const providerReader = new CommerceGraphReader({
       organisationId: providerOrganisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(providerOrganisationId),
       underclerk: providerCommerce,
       blotter: sourceStub("blotter", async () => emptyResult()),
     });
@@ -864,7 +854,6 @@ describe("commerce entity-plane authority", () => {
     const nativeReader = new CommerceGraphReader({
       organisationId: nativeOrganisationId,
       merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(nativeOrganisationId),
       underclerk: nativeCommerce,
     });
     const nativeResult = await nativeReader.query({
@@ -917,7 +906,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(organisationId),
       underclerk: source,
     });
     const presentation = await reader.query({
@@ -985,7 +973,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: commerceWithHydration,
       blotter,
     });
@@ -1046,7 +1033,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: commerceWithHydration,
       blotter,
     });
@@ -1157,7 +1143,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: commerceEngine,
       blotter,
     });
@@ -1236,7 +1221,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: pantrySystem(organisationId),
       underclerk: commerceEngine,
     });
 
@@ -1334,7 +1318,6 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      commerceSystem: shopifySystem(organisationId),
       underclerk: commerceEngine,
       blotter,
     });
@@ -1642,29 +1625,7 @@ function merchantRevision(value: number): CommerceSnapshotRevision {
   return parseCommerceSnapshotRevision(value, "merchantRevision");
 }
 
-function pantrySystem(
-  organisationId: ReturnType<typeof requireOrganisationId>,
-): Variant<CommerceSystem, "satyr_commerce"> {
-  return {
-    kind: "satyr_commerce",
-    organisationId,
-    bindingId: "underclerk_binding_graph",
-    merchantId: "merchant_graph",
-    revision: 1,
-  } as Variant<CommerceSystem, "satyr_commerce">;
-}
 
-function shopifySystem(
-  organisationId: ReturnType<typeof requireOrganisationId>,
-): Variant<CommerceSystem, "shopify"> {
-  return {
-    kind: "shopify",
-    organisationId,
-    integrationAccountId: "integration_shopify_graph",
-    shopDomain: "graph.myshopify.com",
-    revision: 1,
-  } as Variant<CommerceSystem, "shopify">;
-}
 
 function systemEntityReference(
   reference: CommerceEntityRef,

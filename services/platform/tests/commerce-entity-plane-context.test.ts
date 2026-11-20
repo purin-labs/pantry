@@ -24,11 +24,6 @@ import {
 } from "../src/commerce/entity-plane/routes";
 import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
-import { parseCommerceSystemRevision as parseSystemRevision } from "../src/data/organisation-commerce-system";
-import {
-  parseCommerceBindingId,
-  parseCommerceEngineMerchantId,
-} from "../src/data/commerce-merchant-binding";
 import { parseOrganisationId as parsePlatformOrganisationId } from "../src/ids";
 import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
 import { isRecord } from "@purin-labs/std";
@@ -136,22 +131,9 @@ describe("commerce entity-plane context parity", () => {
       integrationAccountId: INTEGRATION_ID,
       client,
     });
-    const platformOrganisation = required(
-      parsePlatformOrganisationId(ORGANISATION_ID),
-    );
-    const commerceSystem = {
-      kind: "satyr_commerce" as const,
-      organisationId: platformOrganisation,
-      bindingId: required(
-        parseCommerceBindingId("underclerk_binding_phase4_context"),
-      ),
-      merchantId: required(parseCommerceEngineMerchantId(MERCHANT_ID)),
-      revision: required(parseSystemRevision(1)),
-    };
     const reader = new CommerceGraphReader({
       organisationId: ORGANISATION_ID,
       merchantId: MERCHANT_ID,
-      commerceSystem,
       underclerk: commerceEngine,
     });
 

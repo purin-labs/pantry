@@ -14,11 +14,6 @@ import {
 import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
 import {
-  parseCommerceBindingId,
-  parseCommerceEngineMerchantId,
-} from "../src/data/commerce-merchant-binding";
-import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
-import {
   startCommerceWorker,
   type CommerceWorker,
 } from "./commerce-fixture-worker";
@@ -62,23 +57,9 @@ async function readAuthorityJourney(): Promise<void> {
       expiresAt: EXPIRES,
     });
     expect(sample.ok).toBe(true);
-    const binding = parseCommerceBindingId(
-      "underclerk_binding_read_authority",
-    );
-    const merchant = parseCommerceEngineMerchantId(MERCHANT);
-    const revision = parseCommerceSystemRevision(1);
-    if (!binding.ok || !merchant.ok || !revision.ok)
-      throw new Error("Invalid commerce fixture identity");
     const reader = new CommerceGraphReader({
       organisationId: ORGANISATION,
       merchantId: MERCHANT,
-      commerceSystem: {
-        kind: "satyr_commerce",
-        organisationId: ORGANISATION,
-        bindingId: binding.value,
-        merchantId: merchant.value,
-        revision: revision.value,
-      },
       underclerk: new CommerceEngineSource({
         organisationId: ORGANISATION,
         merchantId: MERCHANT,

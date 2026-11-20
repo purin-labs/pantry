@@ -114,7 +114,6 @@ export async function readCommerceExceptionInbox(
   const reader = new CommerceGraphReader({
     organisationId,
     merchantId: binding.value.merchantId,
-    commerceSystem: authority.value.commerceSystem,
     underclerk: commerceEngine,
   });
   try {
