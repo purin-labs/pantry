@@ -110,12 +110,3 @@ export type {
   CommerceEntityPlaneObservationV1,
   CommerceEntityPlanePlannedQueryResponse,
 } from "./parsers.ts";
-
-export {
-  parseListEntryReadRequest,
-  parseListEntryReadResult,
-} from "./resources.ts";
-export type {
-  CommerceListEntryReadRequest,
-  CommerceListEntryReadResult,
-} from "./resources.ts";
