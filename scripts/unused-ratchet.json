@@ -382,7 +382,6 @@
     "services/platform/src/actors/case-walking-path.ts#CaseWalkingConnector",
     "services/platform/src/actors/case-walking-path.ts#OngoingCaseWalkingCase",
     "services/platform/src/actors/case-walking-path.ts#RevalidateTurnAuthority",
-    "services/platform/src/actors/case/types.ts#CaseOperationalEmailProposal",
     "services/platform/src/actors/case/types.ts#CaseOutputDropped",
     "services/platform/src/actors/case/types.ts#CaseOutputHeld",
     "services/platform/src/actors/case/types.ts#CaseOutputRejected",

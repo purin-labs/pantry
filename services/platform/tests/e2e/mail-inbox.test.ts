@@ -272,7 +272,7 @@ import {
   digestEmailSnapshot,
 } from "../../src/mail/reply-target";
 import type { CaseAssignment } from "@purin-labs/contracts";
-import type { CaseGmailReplyProposal } from "../../src/actors/case/types";
+import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-proposals";
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
 import type { OrganisationActorStub } from "../../src/env";

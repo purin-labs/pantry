@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 198,
+    "upward": 158,
     "areas": 153,
     "order": 106,
     "table": 117
@@ -97,15 +97,11 @@
     "foundation/control -> foundation/agent": 3,
     "foundation/control -> foundation/conversation": 3,
     "foundation/control -> surfaces/slack": 2,
-    "foundation/conversation -> areas/brain": 2,
-    "foundation/conversation -> areas/commerce": 12,
-    "foundation/conversation -> areas/inbox": 11,
-    "foundation/conversation -> areas/integrations": 1,
-    "foundation/conversation -> areas/kitchen": 10,
-    "foundation/conversation -> areas/organisation": 1,
-    "foundation/conversation -> surfaces/portal": 7,
-    "foundation/conversation -> surfaces/slack": 7,
-    "foundation/conversation -> workers/platform": 2,
+    "foundation/conversation -> areas/brain": 1,
+    "foundation/conversation -> areas/commerce": 1,
+    "foundation/conversation -> areas/kitchen": 4,
+    "foundation/conversation -> surfaces/portal": 2,
+    "foundation/conversation -> surfaces/slack": 5,
     "foundation/kernel -> foundation/contracts": 2,
     "foundation/kernel -> foundation/tenancy": 1,
     "foundation/tenancy -> foundation/actor-runtime": 7,

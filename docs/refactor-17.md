@@ -1143,6 +1143,78 @@ branch `refactor-17-commerce-contract`.
   stock and menu actions of the action model, the inventory check of the product
   routes and the provider list.
 
+**21 November 2026. Steps A1.6 and A1.9 for the Case,** on the branch
+`refactor-17-case-ports`. The Case actor, the chat records and the Projects name
+fewer areas and surfaces.
+
+- **The Worker shell.** `actors/case.ts` holds only the class `CaseDO`, and the map
+  gives it to `workers/platform`. The Case actor is the abstract class `CaseActor`
+  in `actors/case/case-actor.ts`. The Case modules and the area files name
+  `CaseActor`, not `CaseDO`.
+- **The parts.** `actors/case/parts.ts` defines `CaseParts`: the checks of the
+  commerce values (`CaseCommercePart`), the Connector of a mailbox or a WhatsApp
+  trigger (`CaseInboxPart`) and the resume of a Portal chat turn. `CaseDO` gives
+  the parts. `CaseActor` gives them to the Case modules in its constructor, before
+  it reads a stored value. Only the Case actor runs the parsers that read them.
+- **Commerce.** The Case stores a commerce proposal and reads its envelope.
+  `commerce/case-proposals.ts` checks the action, the authority and the source
+  record, and it names the precise types of the body. The parser of a source
+  record moved to `actors/case/source-provenance.ts`: only the Case imports it,
+  and it parses a field of the Case content contract.
+- **Inbox.** The email reply proposals and the mail work of a thread are functions
+  of `actors/case-inbox/` (area `inbox`). `CaseInboxRpc` declares the RPC methods,
+  and `CaseDO` implements them. `readConversationEmailReviews` moved to
+  `mail-inbox/conversation-email-reviews.ts`.
+- **Kitchen.** The Case forwards the page state as `TurnPageState`, as the Session
+  holds it. The browser context is `PageBrowserContext` of `@purin-labs/contracts`.
+- **Slack and the Worker.** The Case walk names `CaseConnectorRpc`, not the class
+  `ConnectorDO`. The map gives `control/routes/chat-configuration-drafts.ts` to
+  `surfaces/portal`: it is a Portal chat route, and only the Portal chat routes
+  import it.
+- **Portal.** `chat/input-admission.ts` is `foundation/conversation` in the map: it
+  imports no Portal file, and only the Case imports it. The read of a canvas chat
+  panel moved to `chat/workspace-canvas-read.ts` (`surfaces/portal`): it returns
+  the Portal shape of the chat. `surfaceObservationField` moved to
+  `chat/timeline.ts`.
+- **Brain and integrations.** `readExecutionRecords` and `readExecutionContent`
+  moved to `CaseDO`. The chat record names the shape of its documents
+  (`ConversationDocument`).
+- **Not changed:** the stored JSON, the key order of a proposal, the schema steps,
+  the table names, the delivery ids, the RPC method names, the argument shapes and
+  the error codes.
+- **Measures.** Layer crossings: 674 to 634. `foundation/conversation` to commerce:
+  12 to 1. To Inbox: 11 to 0. To Kitchen: 10 to 4. To Slack: 7 to 5. To Portal: 7
+  to 2. To Brain: 2 to 1. To `workers/platform`: 2 to 0. To integrations and to
+  organisation: 1 to 0 each. Copies: 887 to 886 (one copy in the Case actor is
+  now one method). Unused exports: 808 to 807.
+- **Still open.** Each line is an import that stays.
+  - `actors/case-walking-path.ts` (Slack, 2): the Slack thread turn builds the
+    stream input and its release. The port goes through
+    `OngoingCaseWalkingConnector`, and its caller is
+    `actors/connector/slack-channel.ts`.
+  - `actors/case-conversation-sink.ts` (Slack, 1): the exit check asks if a Slack
+    channel reaches people outside. The Session, the Connector and the Slack side
+    Cases call it, so the port changes their calls.
+  - `actors/case-output-hold.ts` (Slack, 1): it holds a Slack output and posts the
+    Slack notice text. The Connector side of the walk and the commerce delivery
+    call it.
+  - `chat/side-case-origin.ts` (Slack, 1): it parses the Slack row of
+    `side_case_proposal`. Its callers are Session files.
+  - `chat/conversation.ts` and `chat/timeline.ts` (Kitchen 2, Portal 2): the chat
+    record parser checks the Kitchen view of a message (an old tab attachment and
+    the screen observation). The chat record has no actor that gives a part, and
+    the parser runs in the routes, the store, the Case and 4 unit test files. A
+    surface registry for the state check of each surface is the host.
+  - `projects/references.ts` (Kitchen 1, commerce 1): the observation of a saved
+    Kitchen run and of a commerce record. Six callers in the routes, the Project
+    commands, the membership, the context and the chat directory need a registry
+    of reference kinds that the Worker gives.
+  - `actors/chat-signal-sockets.ts` (Kitchen 1): a chat signal reaches the
+    workflow canvas pages. The port changes the call in `OrganisationDO`.
+  - `actors/case-direct-processing.ts` (Brain 1): the empty Memory reader
+    (`turnMemoryReaderWithoutSubjects`). It is a value of the port
+    `TurnMemoryReader` in `context/assembly`, so it can move there.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

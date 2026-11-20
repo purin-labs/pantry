@@ -2,14 +2,11 @@ import type { OrganisationExecutionScope } from "../../organisation-execution-sc
 import { chatUserMessage } from "../attachments";
 import {
   attachmentParts,
+  surfaceObservationField,
   surfaceObservationFromParts,
   type PendingChatInput,
 } from "../timeline";
-import {
-  chatInputParts,
-  surfaceObservationField,
-  pendingInputSurfaceContext,
-} from "../input-parts";
+import { chatInputParts, pendingInputSurfaceContext } from "../input-parts";
 import {
   browserContextFromParts,
   inputModeFromParts,

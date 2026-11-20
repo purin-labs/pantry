@@ -11,7 +11,7 @@ import { traceWarn } from "../../observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { Result } from "../../result";
 import { resolveActiveSessionActorAtPlacement } from "../actor-router";
-import type { CaseDO } from "../case";
+import type { CaseActor } from "./case-actor";
 import { logAbandonSkipped } from "./assignment-census";
 
 type ActiveAssignment = Variant<
@@ -146,7 +146,7 @@ async function askSession(
  */
 export async function recoverAbandonedAssignments(
   input: Readonly<{
-    caseActor: Pick<CaseDO, "assignmentLifecycles" | "abandonAssignment">;
+    caseActor: Pick<CaseActor, "assignmentLifecycles" | "abandonAssignment">;
     proveQuiescence: SessionQuiescenceProof;
     minimumAgeMs: number;
     now: number;

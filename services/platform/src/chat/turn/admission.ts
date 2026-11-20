@@ -1,13 +1,10 @@
 import {
   attachmentParts,
   type ChatTimelineEvent,
+  surfaceObservationField,
   type PendingChatInput,
 } from "../timeline";
-import {
-  chatInputParts,
-  surfaceObservationField,
-  pendingInputSurfaceContext,
-} from "../input-parts";
+import { chatInputParts, pendingInputSurfaceContext } from "../input-parts";
 import { initialConversationCaseIdentity } from "../conversation-actor-identity";
 import { canonicalJson } from "@purin-labs/std";
 import {

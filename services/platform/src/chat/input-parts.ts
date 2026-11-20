@@ -44,10 +44,3 @@ export function pendingInputSurfaceContext(
       return kitchenAttachment(part.observation);
   return null;
 }
-
-/** The screen observation of a message, as a field to spread into it. */
-export function surfaceObservationField(
-  surfaceObservation: SurfaceObservationV2 | undefined,
-): Readonly<{ surfaceObservation?: SurfaceObservationV2 }> {
-  return surfaceObservation === undefined ? {} : { surfaceObservation };
-}

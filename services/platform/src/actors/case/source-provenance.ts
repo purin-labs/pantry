@@ -1,6 +1,17 @@
-import type { SourceProvenance } from "@purin-labs/commerce-contracts";
-import { parseOrganisationId, parseIntegrationAccountId } from "../ids";
+import type { CaseContent } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
+import { parseOrganisationId, parseIntegrationAccountId } from "../../ids";
 import { isRecord } from "@purin-labs/std";
+
+/**
+ * The source record of a commerce reference or a record message in a Case
+ * entry. The Case content contract names it, so the Case parses it.
+ */
+export type CaseSourceProvenance = Variant<
+  CaseContent,
+  "commerce_reference"
+>["provenance"];
+type SourceProvenance = CaseSourceProvenance;
 
 export function parseSourceProvenance(value: unknown): SourceProvenance | null {
   if (

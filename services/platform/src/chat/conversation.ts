@@ -30,13 +30,12 @@ import {
   type ChatHistoryBinding,
 } from "./fork-history";
 import {
-  parseBakeryBrowserContext,
-  type BakeryBrowserContext,
-} from "@purin-labs/bakery-model/bakery-context";
-import type { ModelRoute } from "@purin-labs/contracts";
+  parsePageBrowserContext,
+  type ModelRoute,
+  type PageBrowserContext,
+} from "@purin-labs/contracts";
 import { parseSessionModelRoute } from "../policy-snapshot";
 import type { JsonRecord } from "../control/http";
-import type { ConnectorDocumentation } from "../custom-connectors/authoring";
 import {
   parseCustomConnectorId,
   type CustomConnectorId,
@@ -78,7 +77,7 @@ export type ChatMessage =
       readonly kind: "user";
       readonly id: string;
       readonly text: string;
-      readonly browserContext: BakeryBrowserContext;
+      readonly browserContext: PageBrowserContext;
       readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
       readonly attachments: readonly ChatAttachmentPart[];
       readonly inputMode?: ChatInputMode;
@@ -184,13 +183,21 @@ export type ConversationStream = {
   readonly turnId: string;
 };
 
+/** A documentation page that a chat read, as the chat record stores it. */
+export type ConversationDocument = {
+  readonly url: string;
+  readonly sha256: string;
+  readonly text: string;
+  readonly truncated: boolean;
+};
+
 export type Conversation = {
   readonly lineage: ChatThreadLineage;
   readonly historyBindings: readonly ChatHistoryBinding[];
   readonly id: ConversationId;
   readonly title: string;
   readonly modelRoute: ModelRoute;
-  readonly documents: readonly ConnectorDocumentation[];
+  readonly documents: readonly ConversationDocument[];
   readonly work: ConversationWork;
   readonly completedRequests: readonly string[];
   readonly timeline: readonly ChatTimelineEvent[];
@@ -217,7 +224,7 @@ export type ChatCommand =
       readonly effort?: ChatEffort;
       /** Sets the message as the chat's goal with this budget, before the turn starts. */
       readonly goalTokenBudget?: number;
-      readonly browserContext: BakeryBrowserContext;
+      readonly browserContext: PageBrowserContext;
       readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
       readonly attachments: readonly ChatAttachmentPart[];
       /** Present on a spoken command (Plan 82). */
@@ -234,7 +241,7 @@ export type ChatCommand =
       readonly model: string;
       readonly text: string;
       readonly effort?: ChatEffort;
-      readonly browserContext: BakeryBrowserContext;
+      readonly browserContext: PageBrowserContext;
       readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
       readonly attachments: readonly ChatAttachmentPart[];
       /** Present on a spoken command (Plan 82). */
@@ -250,7 +257,7 @@ export type ChatCommand =
       readonly text: string;
       readonly inputId: string;
       readonly effort?: ChatEffort;
-      readonly browserContext: BakeryBrowserContext;
+      readonly browserContext: PageBrowserContext;
       readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
       readonly attachments: readonly ChatAttachmentPart[];
       /** Present on a spoken command (Plan 82). */
@@ -339,7 +346,7 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
   const browserContext =
     raw.browserContext === undefined
       ? ({ kind: "unavailable" } as const)
-      : parseBakeryBrowserContext(raw.browserContext);
+      : parsePageBrowserContext(raw.browserContext);
   if (
     browserContext === null ||
     (browserContext.kind !== "unavailable" &&
@@ -522,7 +529,7 @@ function parseSurfaceObservationKey(
 function commandScreen(
   observation: SurfaceObservationV2 | undefined,
   oldTab: BakerySurfaceAttachmentV1 | null,
-  browser: BakeryBrowserContext,
+  browser: PageBrowserContext,
 ): Readonly<{
   observation: SurfaceObservationV2 | undefined;
   kitchen: BakerySurfaceAttachmentV1 | null;
@@ -573,7 +580,7 @@ export function parseConversation(raw: unknown): Conversation {
     !Array.isArray(raw.completedRequests)
   )
     throw new Error("conversation_storage_invalid");
-  const documents: ConnectorDocumentation[] = [];
+  const documents: ConversationDocument[] = [];
   for (const document of raw.documents) {
     if (
       !isRecord(document) ||
@@ -1197,7 +1204,7 @@ export function personDocumentationLinks(
 
 export function browserContextFromParts(
   parts: readonly ChatInputPart[],
-): BakeryBrowserContext {
+): PageBrowserContext {
   for (const part of parts) if (part.kind === "browser") return part.context;
   return { kind: "unavailable" };
 }

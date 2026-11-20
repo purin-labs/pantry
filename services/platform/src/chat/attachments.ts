@@ -18,8 +18,11 @@ import {
   type ChatCommand,
 } from "./conversation";
 import type { ConversationScope } from "./store";
-import { attachmentParts, type ChatAttachmentPart } from "./timeline";
-import { surfaceObservationField } from "./input-parts";
+import {
+  attachmentParts,
+  surfaceObservationField,
+  type ChatAttachmentPart,
+} from "./timeline";
 
 type ChatSubmission = {
   readonly command: ChatCommand;

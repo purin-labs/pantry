@@ -14,8 +14,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "../../ids";
-import { gmailConnectorIdValue } from "../../data/email-mailbox";
-import { whatsappConnectorIdValue } from "../../data/whatsapp";
+import { caseParts } from "./parts";
 import type {
   CaseContextReplayAuthority,
   ContextVisibility,
@@ -645,14 +644,10 @@ export function triggerAuthorityMatchesSource(
         trigger.requestAuthority.connectorId === trigger.source.connectorId
       );
     case "agent_mailbox":
-      return (
-        trigger.source.connectorId ===
-        gmailConnectorIdValue(trigger.requestAuthority.integrationAccountId)
-      );
     case "whatsapp_support":
       return (
         trigger.source.connectorId ===
-        whatsappConnectorIdValue(trigger.requestAuthority.integrationAccountId)
+        caseParts().inbox.triggerConnectorId(trigger.requestAuthority)
       );
     case "workflow":
     case "control":
