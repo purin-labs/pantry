@@ -869,7 +869,7 @@
     "services/platform/src/control/routes/case-context-discovery.ts": "foundation/agent",
     "services/platform/src/control/routes/case-execution.ts": "areas/brain",
     "services/platform/src/control/routes/case-screen-observations.ts": "surfaces/portal",
-    "services/platform/src/control/routes/chat-configuration-drafts.ts": "foundation/conversation",
+    "services/platform/src/control/routes/chat-configuration-drafts.ts": "surfaces/portal",
     "services/platform/src/control/routes/chat-directory.ts": "foundation/conversation",
     "services/platform/src/control/routes/chat-goal.ts": "foundation/conversation",
     "services/platform/src/control/routes/chat-screen-relevance.ts": "surfaces/portal",

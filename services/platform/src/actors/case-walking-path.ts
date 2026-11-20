@@ -62,7 +62,7 @@ import type { CanonicalEmbeddedHarnessTextTurnError } from "./session/types";
 import type { SessionActor } from "./session/session-actor";
 import type { CaseActor } from "./case/case-actor";
 import type { CaseOutput, CaseSnapshot } from "./case/types";
-import type { ConnectorDO } from "./connector";
+import type { CaseConnectorRpc } from "./case/connector-rpc";
 import type { SessionActorRoute } from "./actor-router";
 import type { ConnectorWarmActorSlots } from "./warm-actor-slots";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "./embedded-harness-adapter";
@@ -86,10 +86,7 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 
-export type CaseWalkingConnector = Pick<
-  ConnectorDO,
-  "acceptIngress" | "deliver"
->;
+export type CaseWalkingConnector = CaseConnectorRpc;
 export type OngoingCaseWalkingConnector = CaseWalkingConnector & {
   /** Streams a Case turn; the release check lets its answer reach the thread. */
   streamCaseTurn(
@@ -1204,7 +1201,7 @@ export async function runOngoingCaseTurn(
 
 export async function admitOngoingCaseTurn(
   input: Readonly<{
-    connector: Pick<ConnectorDO, "acceptIngress">;
+    connector: Pick<CaseConnectorRpc, "acceptIngress">;
     connectorIdentity: ConnectorIdentity;
     caseActor: Pick<CaseActor, "prepareOngoingTurn">;
     organisationId: OrganisationId;
@@ -1876,7 +1873,7 @@ function hasActiveCaseAssignment(snapshot: CaseSnapshot): boolean {
 async function holdRefusedOutput(
   input: Pick<CaseWalkingPathInput, "env" | "turnAuthority"> &
     Readonly<{
-      connector: Pick<ConnectorDO, "deliver">;
+      connector: Pick<CaseConnectorRpc, "deliver">;
       connectorIdentity: ConnectorIdentity;
       caseActor: Pick<CaseActor, "holdOutput">;
     }>,
