@@ -986,6 +986,55 @@ the "Costs" row and the open points of the two entries above where it names them
   calls `memory/access.ts`. Each needs a port through the tool effect and the turn
   tools.
 
+**21 November 2026. Step A1.10 for the commerce area: one area contract,** on the
+branch `refactor-17-commerce-contract`.
+
+- **The lint knows the public files.** `contracts` in `scripts/layers.json` lists
+  the contract packages and now also public source files and folders. An import of
+  a public file from another area is not a crossing. A public file must be honest:
+  `lint:layers` refuses a value import of a file of its own area that is not
+  public. `import type` is allowed. `--report` prints the imports between areas
+  that go through a contract (181: 59 to public files, 122 to area packages).
+- **The commerce contract.** `services/platform/src/commerce/contract/` holds the
+  client factory of the commerce engine (`createCommerceClient`,
+  `createCommerceEntityPlaneClient`, `pantryCommerceAccess`), the queue messages,
+  the provider port with `commerceProjectionRevision`, the merchant control check,
+  the Square and Stripe links, the merchant closure, the system readiness, the
+  offer price allowance, the resource ids, the list entry commands, the sensitivity
+  guard and `types.ts`. Each file needs only the foundation, the commerce packages
+  and other public files, so its code is the entry point. Four Portal modules are
+  public in place: the commerce graph requests (`entity-plane/api.ts`), the stock
+  rule, the operations types and the action labels. Importers changed import lines
+  only. Test mocks of the client factory follow it to `contract/client.ts`.
+- **A wrong line in the map.** `apps/portal/src/features/content-studio/` is the
+  Café Menus page: it uses the menu draft document and the Café control API. It is
+  now in the area `cafe`.
+- **Measures.** Layer crossings: 674 to 613. Between areas: 214 to 153. The six
+  pairs into commerce: Kitchen 25 to 3, Café 13 to 1, integrations 12 to 1,
+  organisation 8 to 0, Shopify 8 to 4, Inbox 7 to 5. Copies: 887, no change.
+  Unused exports: 808, no change.
+- **What stays, and why.** Each import needs the inside of commerce, so each needs
+  a service interface that the Worker wires. No caller changed its function body.
+  - Shopify (4): the delivery normalizers of `commerce-wasm.ts` and
+    `applyCommerceDelivery` of the projection. Shopify is the second provider; the
+    provider port needs a delivery entry that the commerce server gives.
+  - Inbox (2 Platform): `mailbox-sender-links.ts` opens the commerce graph through
+    `control/commerce-graph.ts`, and `supplier-context.ts` builds a graph reader.
+    Both need a graph read service.
+  - Kitchen (3): `production-plan-handlers.ts` parses a graph query and prepares a
+    commerce read (a Kitchen tool service, A1.7), and
+    `stock-shortage-report.ts` uses the report definitions of commerce.
+  - Portal (4): the draft presence component of commerce is shared by the Café
+    menu editor and the Inbox reply draft. It belongs in
+    `features/collaboration/` with its styles. The integrations page shows the
+    Stripe setup part of commerce.
+- **Commerce imports back.** Commerce imports organisation (12), Kitchen (10),
+  Café (7), Shopify (1), Inbox (1) and integrations (1). The contract imports no
+  area, so the contracts have no cycle. The imports back are in the inside: the
+  access prompts of the Portal, the activation steps of the Organisation actor, the
+  stock and menu actions of the action model, the inventory check of the product
+  routes and the provider list.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
