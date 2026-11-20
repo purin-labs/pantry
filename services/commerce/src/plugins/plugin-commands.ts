@@ -11,7 +11,6 @@ import type {
 
 import {
   parsePluginRunOutput,
-  type PluginRunOutput,
   type PluginRunOutputCommand,
 } from "@purin-labs/commerce-contracts/records/plugin-outputs";
 
@@ -30,7 +29,6 @@ export type PluginOperation = PluginRunOutputCommand;
 
 /** The output of a handler or an action, or undefined when it has no shape. */
 export { parsePluginRunOutput as parseRunOutput };
-export type { PluginRunOutput };
 
 /**
  * The command that an operation names, for the core's own parser, or

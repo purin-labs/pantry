@@ -26,7 +26,7 @@ export type OfferPricePolicy =
       maxMovementBps: number;
     }>;
 
-export const MAX_MOVEMENT_BPS = 10_000;
+const MAX_MOVEMENT_BPS = 10_000;
 const BPS_SCALE = 10_000;
 
 type OfferPriceChangeRequest = Readonly<{
