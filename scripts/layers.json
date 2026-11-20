@@ -519,6 +519,7 @@
     "apps/portal/src/features/bakery-surface-registry.ts": "areas/kitchen",
     "apps/portal/src/features/bakery-workspace-reveal.tsx": "areas/kitchen",
     "apps/portal/src/features/chat/effort-labels.ts": "foundation/ui",
+    "apps/portal/src/features/integrations/settings-transport.ts": "surfaces/portal",
     "apps/portal/src/features/surface-effect-signals.ts": "foundation/ui",
     "apps/portal/src/features/surface-observation.ts": "foundation/ui",
     "apps/portal/src/formatting.ts": "foundation/ui",

@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 88,
+    "upward": 84,
     "areas": 44,
     "order": 71,
     "table": 23
@@ -9,7 +9,7 @@
     "areas/brain -> areas/inbox": 1,
     "areas/brain -> surfaces/slack": 1,
     "areas/cafe -> areas/kitchen": 1,
-    "areas/cafe -> surfaces/portal": 3,
+    "areas/cafe -> surfaces/portal": 2,
     "areas/commerce -> areas/cafe": 1,
     "areas/commerce -> areas/organisation": 3,
     "areas/commerce -> areas/shopify": 1,
@@ -24,7 +24,6 @@
     "areas/integrations -> areas/inbox": 5,
     "areas/integrations -> areas/organisation": 1,
     "areas/integrations -> areas/shopify": 4,
-    "areas/integrations -> surfaces/portal": 3,
     "areas/integrations -> surfaces/slack": 4,
     "areas/kitchen -> areas/inbox": 1,
     "areas/kitchen -> areas/organisation": 1,
