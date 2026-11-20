@@ -2,6 +2,7 @@ import type { CobotObserved, CobotTask } from "@purin-labs/control-api";
 import type {
   BakeAuthorityMode,
   BakeRunHold,
+  BakeRunSettlement,
 } from "@purin-labs/kitchen-control-api";
 import type {
   BakeRunInput,
@@ -55,10 +56,36 @@ export type StoredBakeRun = Readonly<{
   hold: BakeRunHold | null;
   /** The devices that this run paused, which its resume resumes. */
   pausedDevices: readonly string[];
-  /** The last time a signal of the run's devices arrived. */
+  /**
+   * When the run last started to wait for evidence: its start, a dispatch, a
+   * resume or a settle. The watch counts silence from here or from the last
+   * new line of the device, whichever is later.
+   */
   lastEvidenceAt: number;
+  /**
+   * S6: the last sequence of each device that the run took in, and when it
+   * rose. A repeated or stale line does not move it, so a frozen device
+   * holds the run even while the gateway still sends its last clock.
+   */
+  progress: Readonly<
+    Record<string, Readonly<{ sequence: number; at: number }>>
+  >;
   /** A shadow run's observed moves, in the order of their arrival. */
   observed: readonly CobotObserved[];
+  /**
+   * S6: an unload that does not start this long after the bake ends shows
+   * the over-bake risk. The recipe's step between the bake and the unload
+   * gives it.
+   */
+  unloadGraceSeconds: number;
+  /** The over-bake risk that the run found, once, and when it told Slack. */
+  overBake: Readonly<{
+    step: string;
+    lateSeconds: number;
+    detectedAt: number;
+  }> | null;
+  /** Each hold that a person settled, oldest first. */
+  settlements: readonly BakeRunSettlement[];
   startedAt: number;
   endedAt: number | null;
 }>;
@@ -78,10 +105,16 @@ export type BakeRunAction = Readonly<{
   sentAt: number | null;
 }>;
 
+/** S6: the revision of the run's Slack card, one up for each update. */
+const CARD_TABLE = `CREATE TABLE IF NOT EXISTS bake_run_card (
+  singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
+  revision INTEGER NOT NULL
+)`;
+
 const SCHEMA: SchemaMigrationPlan = {
   key: "bake_run",
   currentVersion: 1,
-  preservedTables: ["bake_run_state", "bake_run_action"],
+  preservedTables: ["bake_run_state", "bake_run_action", "bake_run_card"],
   baseline: {
     version: 1,
     apply: (sql) => {
@@ -90,6 +123,7 @@ const SCHEMA: SchemaMigrationPlan = {
         run_json TEXT NOT NULL,
         updated_at INTEGER NOT NULL
       )`);
+      sql.exec(CARD_TABLE);
       sql.exec(`CREATE TABLE IF NOT EXISTS bake_run_action (
         request_id TEXT PRIMARY KEY,
         step TEXT NOT NULL,
@@ -108,6 +142,7 @@ const SCHEMA: SchemaMigrationPlan = {
         "run_json",
         "updated_at",
       ]);
+      assertRequiredColumns(sql, "bake_run_card", ["singleton", "revision"]);
       assertRequiredColumns(sql, "bake_run_action", [
         "request_id",
         "step",
@@ -121,6 +156,7 @@ const SCHEMA: SchemaMigrationPlan = {
       ]);
     },
   },
+  // No bake run has been released, so the baseline holds every table.
   steps: [],
 };
 
@@ -130,6 +166,18 @@ export function runBakeRunSchemaMigrations(
   runSchemaMigrations(storage.sql, SCHEMA, (operation) =>
     storage.transactionSync(operation),
   );
+}
+
+/** The next revision of the run's Slack card. */
+export function nextBakeRunCardRevision(sql: SqlStorage): number {
+  const row = sql
+    .exec<{ revision: number }>(
+      `INSERT INTO bake_run_card (singleton, revision) VALUES (1, 1)
+       ON CONFLICT (singleton) DO UPDATE SET revision = revision + 1
+       RETURNING revision`,
+    )
+    .toArray()[0];
+  return row?.revision ?? 1;
 }
 
 export function loadBakeRun(sql: SqlStorage): StoredBakeRun | null {

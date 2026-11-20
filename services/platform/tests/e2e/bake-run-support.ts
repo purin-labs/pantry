@@ -10,7 +10,13 @@ import {
   type BakeRunTaskView,
 } from "@purin-labs/kitchen-control-api";
 
+import { env } from "cloudflare:workers";
+
+import { deviceFleetStub } from "../../src/actors/device-fleet";
 import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { OrganisationId } from "../../src/ids";
+import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { organisationDatabase } from "./organisation-database";
 import {
   applyFinancierWorkflow,
   levelOf,
@@ -74,6 +80,10 @@ export async function equipCobotKitchen(
     timeScale: number;
     mode: BakeAuthorityMode;
     bakeSeconds: number;
+    /** The level's pieces and the pieces in one mould group, if not the day's. */
+    level?: Readonly<{ levelPieces: number; piecesPerGroup: number }>;
+    /** The café day's events, if not the declared morning. */
+    day?: Parameters<typeof openCounterShop>[3];
   }>,
 ): Promise<CobotKitchen> {
   const { organisationId, owner, home } = input;
@@ -82,6 +92,7 @@ export async function equipCobotKitchen(
     organisationId,
     input.ownerUserId,
     input.merchantId,
+    input.day,
   );
   await applyFinancierWorkflow(organisationId, owner, input.bakeSeconds);
   await cobotSession("start", home, { timeScale: input.timeScale });
@@ -129,18 +140,72 @@ export async function equipCobotKitchen(
     const set = await setAuthority(organisationId, owner, "approval", null);
     expect(set.status, JSON.stringify(set.body)).toBe(200);
   }
-  const level = levelOf(
-    productOf(await readBoard(organisationId, owner)).inventoryItemId,
-  );
+  const level = {
+    ...levelOf(
+      productOf(await readBoard(organisationId, owner)).inventoryItemId,
+    ),
+    ...input.level,
+  };
   const levelSet = await putLevel(organisationId, owner, level);
   expect(levelSet.status, JSON.stringify(levelSet.body)).toBe(200);
   return kitchen;
+}
+
+/**
+ * The gateway's socket drops: the relay hears that the Platform side went
+ * away, and its controllers go on. `reconnect` opens a new socket with the
+ * same credential, and the relay says hello again.
+ */
+export async function dropGateway(kitchen: CobotKitchen): Promise<void> {
+  await kitchen.pump.stop();
+  await kitchen.pump.toRelay({ relay: "disconnected" });
+  await kitchen.gateway.close();
+}
+
+export async function reconnectGateway(kitchen: CobotKitchen): Promise<void> {
+  const gateway = await connectGateway(kitchen.credential);
+  gateway.socket.addEventListener("message", (event: MessageEvent) => {
+    kitchen.sentToGateway.push(
+      JSON.parse(String(event.data)) as PlatformGatewayMessage,
+    );
+  });
+  kitchen.gateway = gateway;
+  kitchen.pump = new CobotGatewayPump(gateway, kitchen.home);
+  await kitchen.pump.toRelay({ relay: "connected" });
 }
 
 export async function closeCobotKitchen(kitchen: CobotKitchen): Promise<void> {
   await kitchen.pump.stop();
   await kitchen.gateway.close();
   await cobotSession("stop", kitchen.home);
+}
+
+/** The id string of the run's Durable Object, from its summary row. */
+export async function runActorIdOf(
+  organisationId: string,
+  proposalId: string,
+): Promise<string> {
+  const row = await organisationDatabase(organisationId)
+    .prepare(
+      "SELECT actor_id AS actorId FROM bake_run WHERE organisation_id = ? AND run_id = ?",
+    )
+    .bind(organisationId, proposalId)
+    .first<{ actorId: string | null }>();
+  const actorId = row?.actorId ?? null;
+  if (actorId === null) throw new Error("The run has no Durable Object");
+  return actorId;
+}
+
+/** The device fleet Actor of the kitchen, as the Platform calls it. */
+export async function kitchenFleet(organisationId: string) {
+  const scope = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId as OrganisationId,
+  );
+  if (!scope.ok) throw new Error("No scope");
+  const fleet = deviceFleetStub(env, scope.value, KITCHEN);
+  if (fleet === null) throw new Error("No device fleet");
+  return fleet;
 }
 
 /** The first fall below the level opens one proposal. */
@@ -198,18 +263,35 @@ export async function runUntil(
   done: (read: BakeRunRead) => boolean,
   timeout = 120_000,
 ): Promise<BakeRunRead> {
+  const until = Date.now() + timeout;
   let last: BakeRunRead | null = null;
-  await expect
-    .poll(
-      async () => {
-        last = await readRun(kitchen.organisationId, kitchen.owner, proposalId);
-        return done(last);
-      },
-      { timeout, interval: 500 },
-    )
-    .toBe(true);
-  if (last === null) throw new Error("No run read");
-  return last;
+  while (Date.now() < until) {
+    // An approval from Slack starts the run after Pantry answers Slack.
+    const response = await send(
+      `${controlBase(kitchen.organisationId)}/bakes/proposals/${proposalId}/run`,
+      kitchen.owner,
+      "GET",
+    );
+    if (response.status === 200) {
+      last = parseBakeRunRead(response.body);
+      if (done(last)) return last;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  // The run as it was, so that a failure names where it stood.
+  const run = last?.run;
+  throw new Error(
+    `The run did not get there: ${JSON.stringify({
+      state: run?.state,
+      hold: run?.hold,
+      tasks: run?.view?.tasks.map((task) => [
+        task.key,
+        task.state,
+        task.reason,
+      ]),
+      dispatches: run?.dispatches.map((item) => [item.step, item.state]),
+    })}`,
+  );
 }
 
 export type ControllerDevice = Readonly<{

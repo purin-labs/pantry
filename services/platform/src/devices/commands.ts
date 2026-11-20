@@ -294,6 +294,7 @@ async function runKitchenDeviceCommand(
         event(run, device.deviceId, "revoked", receiptId, {}),
       ]);
       if (inFlight) await openResultUnknownAlert(run.env, scope, device, now);
+      await tellFleetOfRevoke(run, device);
       return done(receiptId);
     }
   }
@@ -344,6 +345,29 @@ async function closeGatewaySocket(
   await stub?.closeGateway(gateway.gatewayId).catch(() => undefined);
 }
 
+/** The device fleet Actor of the device's gateway, or null. */
+async function fleetOfDevice(run: Run, device: DeviceRecord) {
+  const gateway = await readGateway(
+    run.scope.database,
+    run.scope.organisationId,
+    device.gatewayId,
+  );
+  if (gateway === null) return null;
+  const stub = deviceFleetStub(run.env, run.scope, gateway.locationId);
+  return stub === null ? null : { stub, gatewayId: gateway.gatewayId };
+}
+
+/** A bake run that uses the device holds at once (Plan 24 S6). */
+async function tellFleetOfRevoke(
+  run: Run,
+  device: DeviceRecord,
+): Promise<void> {
+  const fleet = await fleetOfDevice(run, device);
+  await fleet?.stub
+    .deviceRevoked(fleet.gatewayId, device.sourceKey)
+    .catch(() => undefined);
+}
+
 async function tellGateway(
   run: Run,
   device: DeviceRecord,
@@ -353,18 +377,12 @@ async function tellGateway(
     sourceKey: string;
   }>,
 ): Promise<void> {
-  const gateway = await readGateway(
-    run.scope.database,
-    run.scope.organisationId,
-    device.gatewayId,
-  );
-  if (gateway === null) return;
-  const stub = deviceFleetStub(run.env, run.scope, gateway.locationId);
+  const fleet = await fleetOfDevice(run, device);
   // Pantry already stopped its own dispatch. The Actor keeps the command until
   // the gateway answers it, so a gateway with no socket gets it at its hello.
-  await stub
-    ?.sendDeviceCommand({
-      gatewayId: gateway.gatewayId,
+  await fleet?.stub
+    .sendDeviceCommand({
+      gatewayId: fleet.gatewayId,
       deviceId: device.deviceId,
       message,
     })

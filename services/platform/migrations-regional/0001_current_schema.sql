@@ -4830,6 +4830,7 @@ CREATE TABLE bake_proposal (
   proposed_at INTEGER NOT NULL CHECK (proposed_at >= 0),
   opened_at INTEGER,
   announced_at INTEGER,
+  card_ts TEXT CHECK (card_ts IS NULL OR length(card_ts) BETWEEN 1 AND 32),
   decided_by TEXT,
   decided_role TEXT CHECK (decided_role IS NULL OR decided_role IN ('owner', 'admin', 'operator')),
   decided_via TEXT CHECK (decided_via IS NULL OR decided_via IN ('portal', 'slack')),

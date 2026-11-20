@@ -2,6 +2,7 @@ import React from "react";
 import type {
   BakeRunActionInput,
   BakeRunRecord,
+  BakeRunSeen,
   BakeRunTaskView,
   BakeRunView,
   BakeShadowMatch,
@@ -18,6 +19,7 @@ import {
   type TimeLanesTone,
   type TimeRange,
 } from "../../ui";
+import { Select } from "../../ui/select";
 import { actOnBakeRun, readBakeRun, refusalText } from "./requests";
 import "./run-panel.css";
 
@@ -27,6 +29,10 @@ import "./run-panel.css";
  * one read of the run, so they agree on each task. A position that no
  * receipt proves shows as unknown. An operator or a higher role pauses,
  * resumes, settles, stops and checks the run here.
+ *
+ * A hold (S6) is the one disposition of an uncertain outcome. A person
+ * settles it with what they saw; a failed task asks where the mould group is,
+ * and the run then stops. Settling never sends a move again.
  *
  * A shadow run (S5) sends nothing: the drawer shows each move that the
  * controller made, the planned task that it matches and the difference of
@@ -56,6 +62,13 @@ const TASK_STATE: Readonly<Record<BakeRunTaskView["state"], string>> = {
   failed: "Failed",
 };
 
+const SEEN: readonly Readonly<{ value: BakeRunSeen; label: string }>[] = [
+  { value: "source", label: "On its source shelf" },
+  { value: "tool", label: "On the cobot's tool" },
+  { value: "destination", label: "On its destination shelf" },
+  { value: "lost", label: "Lost" },
+];
+
 const STATION: Readonly<Record<string, string>> = {
   cold_rack: "Cold rack",
   oven: "Oven",
@@ -80,6 +93,7 @@ export function BakeRunPanel(
     () => void reload(),
   );
   const [pieces, setPieces] = React.useState("");
+  const [seen, setSeen] = React.useState<BakeRunSeen | null>(null);
   if (loaded.kind === "loading")
     return <p className="bake-run-note">Reading the bake run.</p>;
   if (loaded.kind === "failed")
@@ -89,6 +103,8 @@ export function BakeRunPanel(
   const busy = state.kind === "running";
   const send = (input: BakeRunActionInput) => void act.run("run", input);
   const shadow = run.mode === "shadow";
+  // A failed task: the person says where the group is, and the run stops.
+  const failed = run.view !== null && run.view.disposition !== null;
   return (
     <section className="bake-run" aria-label="Bake run">
       <div className="bake-run-head">
@@ -117,9 +133,25 @@ export function BakeRunPanel(
       )}
       {run.unloadRisk === null ? null : (
         <p className="bake-run-alert" role="status">
-          Over-bake risk: {run.unloadRisk.step} is{" "}
+          Over-bake risk: {run.unloadRisk.step} did not start within{" "}
+          {run.unloadRisk.graceSeconds} s after the bake ended. It was{" "}
           {Math.round(run.unloadRisk.lateSeconds)} s late.
         </p>
+      )}
+      {run.settlements.length === 0 ? null : (
+        <ul className="bake-run-groups" aria-label="Settled holds">
+          {run.settlements.map((settled) => (
+            <li key={settled.at}>
+              <span>{settled.holdCode.replaceAll("_", " ")}</span>
+              <span>
+                {settled.decision === "stop" ? "Stopped" : "Continued"}
+                {settled.seen === null
+                  ? ""
+                  : `; the mould group was ${SEEN.find((item) => item.value === settled.seen)?.label.toLowerCase() ?? settled.seen}`}
+              </span>
+            </li>
+          ))}
+        </ul>
       )}
       {access.mayOperate && shadow && run.state === "running" ? (
         <div className="bakes-actions">
@@ -149,7 +181,7 @@ export function BakeRunPanel(
               Resume
             </Button>
           ) : null}
-          {run.state === "held" ? (
+          {run.state === "held" && !failed ? (
             <Button
               disabled={busy}
               onClick={() => send({ action: "settle", decision: "continue" })}
@@ -157,9 +189,45 @@ export function BakeRunPanel(
               Checked, continue
             </Button>
           ) : null}
+          {run.state === "held" && failed ? (
+            <>
+              <Select.Root
+                items={SEEN}
+                value={seen}
+                onValueChange={(value) => {
+                  const item = SEEN.find((entry) => entry.value === value);
+                  setSeen(item?.value ?? null);
+                }}
+              >
+                <Select.Trigger
+                  size="sm"
+                  aria-label="Where is the mould group?"
+                >
+                  <Select.Value placeholder="Where is the mould group?" />
+                </Select.Trigger>
+                <Select.Popup>
+                  {SEEN.map((item) => (
+                    <Select.Item key={item.value} value={item.value}>
+                      {item.label}
+                    </Select.Item>
+                  ))}
+                </Select.Popup>
+              </Select.Root>
+              <Button
+                variant="danger"
+                disabled={busy || seen === null}
+                onClick={() => {
+                  if (seen !== null)
+                    send({ action: "settle", decision: "stop", seen });
+                }}
+              >
+                Record and stop the run
+              </Button>
+            </>
+          ) : null}
           {run.state === "running" ||
           run.state === "paused" ||
-          run.state === "held" ? (
+          (run.state === "held" && !failed) ? (
             <Button
               variant="danger"
               disabled={busy}

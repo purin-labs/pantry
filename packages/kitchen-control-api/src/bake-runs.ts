@@ -8,6 +8,10 @@ import { recordParser } from "@purin-labs/contract-schema";
  * each task. Every observed value comes from a device receipt; a position
  * that no receipt proves is `unknown`.
  *
+ * S6: a hold is the one visible disposition of an uncertain outcome. A person
+ * settles it with what they saw (`seen`), and settling never sends a move
+ * again. `unloadRisk` is the over-bake risk of a late unload.
+ *
  * S5: a run in `shadow` mode sends nothing. The controller runs the bake from
  * its own script, and the run matches each observed move to its planned task
  * (`shadow`). The same `view` shows the observed times of those moves.
@@ -170,6 +174,8 @@ const holdSchema = Type.Object({
     Type.Literal("device_fault"),
     Type.Literal("device_not_ready"),
     Type.Literal("dispatch_unsent"),
+    Type.Literal("dispatch_refused"),
+    Type.Literal("device_revoked"),
     Type.Literal("engine_stop"),
   ]),
   message: text,
@@ -179,6 +185,25 @@ const holdSchema = Type.Object({
   at: time,
 });
 export type BakeRunHold = Static<typeof holdSchema>;
+
+/** Where a person saw the mould group of a held task. */
+const seenSchema = Type.Union([
+  Type.Literal("source"),
+  Type.Literal("tool"),
+  Type.Literal("destination"),
+  Type.Literal("lost"),
+]);
+export type BakeRunSeen = Static<typeof seenSchema>;
+
+const settlementSchema = Type.Object({
+  holdCode: holdSchema.properties.code,
+  step: nullable(text),
+  decision: Type.Union([Type.Literal("continue"), Type.Literal("stop")]),
+  seen: nullable(seenSchema),
+  by: text,
+  at: time,
+});
+export type BakeRunSettlement = Static<typeof settlementSchema>;
 
 const role = Type.Union([
   Type.Literal("owner"),
@@ -258,10 +283,21 @@ const runSchema = Type.Object({
       sentAt: nullable(time),
     }),
   ),
-  /** An unload that is later than its plan after the bake ended. */
+  /**
+   * An unload that did not start within the recipe's grace time after the
+   * bake ended: the pieces can over-bake in the hot oven.
+   */
   unloadRisk: nullable(
-    Type.Object({ step: text, lateSeconds: Type.Number({ minimum: 0 }) }),
+    Type.Object({
+      step: text,
+      lateSeconds: Type.Number({ minimum: 0 }),
+      graceSeconds: Type.Number({ minimum: 0 }),
+      /** When the person on shift was told in Slack, or null. */
+      notifiedAt: nullable(time),
+    }),
   ),
+  /** Each hold that a person settled, oldest first. */
+  settlements: Type.Array(settlementSchema),
   view: nullable(viewSchema),
   /** A shadow run's observed moves, each matched to its planned task. */
   shadow: nullable(
@@ -297,6 +333,8 @@ const actionInputSchema = Type.Union([
     {
       action: Type.Literal("settle"),
       decision: Type.Union([Type.Literal("continue"), Type.Literal("stop")]),
+      /** Where the person saw the mould group; a failed task needs it. */
+      seen: Type.Optional(seenSchema),
     },
     { additionalProperties: false },
   ),

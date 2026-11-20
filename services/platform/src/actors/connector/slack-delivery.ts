@@ -59,6 +59,11 @@ import {
   bakeProposalOfNotice,
   bakesPortalUrl,
 } from "../../slack/bake-proposal-card";
+import {
+  BAKE_RUN_CARD,
+  bakeRunCardBlocks,
+  bakeRunPauseTarget,
+} from "../../slack/bake-run-card";
 import { slackMayApproveAction } from "../../commerce/action-model";
 import { resolveActiveSlackDestinationConnection } from "../../slack/organisation-routing";
 import { requireActiveOrganisationActor } from "../actor-router";
@@ -544,7 +549,10 @@ async function deviceAlertDeliveryBlocks(
   }
 }
 
-/** A bake proposal's card: buttons on its notice, none on its updates. */
+/**
+ * A bake proposal's card: buttons on its notice, none on its updates. A bake
+ * run's card in the proposal's thread (Plan 24 S6): Pause while it runs.
+ */
 async function bakeProposalDeliveryBlocks(
   env: Env,
   scope: OrganisationExecutionScope,
@@ -552,7 +560,8 @@ async function bakeProposalDeliveryBlocks(
   deliveryId: string,
   text: string,
 ): Promise<readonly Record<string, unknown>[] | null> {
-  if (!BAKE_PROPOSAL_CARD.isCard(deliveryId)) return null;
+  const run = BAKE_RUN_CARD.isCard(deliveryId);
+  if (!run && !BAKE_PROPOSAL_CARD.isCard(deliveryId)) return null;
   let portalUrl: string | null = null;
   try {
     const read = await readOrganisationDefaultWorkspacePortalAddress({
@@ -563,11 +572,9 @@ async function bakeProposalDeliveryBlocks(
   } catch {
     // The card keeps its text, which says who decides.
   }
-  return bakeProposalCardBlocks(
-    text,
-    bakeProposalOfNotice(deliveryId),
-    portalUrl,
-  );
+  return run
+    ? bakeRunCardBlocks(text, bakeRunPauseTarget(deliveryId), portalUrl)
+    : bakeProposalCardBlocks(text, bakeProposalOfNotice(deliveryId), portalUrl);
 }
 
 /** The message of the notice that this delivery updates, if any. */
@@ -581,7 +588,8 @@ function cardMessageTs(sql: SqlStorage, deliveryId: string): string | null {
         ? permissionNoticeDeliveryId(requestId)
         : (heldNoticeOfDecision(deliveryId) ??
           deviceAlertNoticeOfUpdate(deliveryId) ??
-          BAKE_PROPOSAL_CARD.noticeOfUpdate(deliveryId));
+          BAKE_PROPOSAL_CARD.noticeOfUpdate(deliveryId) ??
+          BAKE_RUN_CARD.noticeOfUpdate(deliveryId));
   if (noticeDeliveryId === null) return null;
   const row = sql
     .exec<{ state_json: string }>(

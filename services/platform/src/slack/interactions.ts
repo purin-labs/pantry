@@ -36,6 +36,7 @@ import {
   SLACK_BAKE_REASON_BLOCK,
   SLACK_BAKE_REJECT_ACTION,
 } from "./bake-proposal-card";
+import { SLACK_BAKE_RUN_PAUSE_ACTION } from "./bake-run-card";
 import { SLACK_PERMISSION_DENY_ACTION } from "./permission-request-notice";
 import { denyPermissionRequestFromSlack } from "./permission-request-deny";
 import { tellClicker } from "./interaction-reply";
@@ -260,13 +261,22 @@ function parseBakeDecisionClick(rawBody: string): BakeDecisionClick | null {
   const { actions: _actions, ...fields } = envelope;
   return {
     ...fields,
-    decision:
-      action.action_id === SLACK_BAKE_REJECT_ACTION ? "reject" : "approve",
     proposalId: action.value,
-    reason: bakeReasonOf(rawBody),
+    action:
+      action.action_id === SLACK_BAKE_RUN_PAUSE_ACTION
+        ? { kind: "pause" }
+        : {
+            kind: "decide",
+            decision:
+              action.action_id === SLACK_BAKE_REJECT_ACTION
+                ? "reject"
+                : "approve",
+            reason: bakeReasonOf(rawBody),
+          },
   };
 }
 
+/** Approve or Reject of a proposal's card, or Pause of its run's card. */
 function isBakeDecisionAction(
   action: unknown,
 ): action is Readonly<{ action_id: string; value: string }> {
@@ -274,7 +284,8 @@ function isBakeDecisionAction(
     isRecord(action) &&
     action.type === "button" &&
     (action.action_id === SLACK_BAKE_APPROVE_ACTION ||
-      action.action_id === SLACK_BAKE_REJECT_ACTION) &&
+      action.action_id === SLACK_BAKE_REJECT_ACTION ||
+      action.action_id === SLACK_BAKE_RUN_PAUSE_ACTION) &&
     typeof action.value === "string" &&
     BAKE_PROPOSAL_ID.test(action.value)
   );

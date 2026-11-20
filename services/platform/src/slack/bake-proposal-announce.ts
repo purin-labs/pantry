@@ -48,6 +48,7 @@ export async function announceBakeProposal(
           scope.organisationId,
           proposal.proposalId,
           now,
+          null,
         );
         return;
       }
@@ -73,6 +74,7 @@ export async function announceBakeProposal(
         scope.organisationId,
         proposal.proposalId,
         now,
+        ts,
       );
       return;
     }

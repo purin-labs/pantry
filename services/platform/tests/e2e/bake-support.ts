@@ -44,7 +44,7 @@ import {
 
 export const day = counterDay;
 
-type DayEvent = Readonly<{
+export type DayEvent = Readonly<{
   at: string;
   kind: "sale" | "restock" | "checkpoint";
   quantity?: number;
@@ -61,6 +61,11 @@ export async function openCounterShop(
   ownerUserId: string,
   /** The merchant that the shop's fixture already connected, if any. */
   connected: string | null = null,
+  /** The day's events and its opening count, if not the declared morning. */
+  dayOf: Readonly<{
+    openingStock: number;
+    events: readonly DayEvent[];
+  }> = { openingStock: day.openingStock, events: EVENTS },
 ) {
   const merchantId =
     connected ?? `merchant_bakes_${crypto.randomUUID().replaceAll("-", "")}`;
@@ -224,15 +229,15 @@ export async function openCounterShop(
       }),
     );
   };
-  await change("opening", { kind: "count", pieces: day.openingStock });
+  await change("opening", { kind: "count", pieces: dayOf.openingStock });
   await reconcileFeed();
   let next = 0;
   return {
     merchantId,
     /** Runs the declared day's events up to the named checkpoint. */
     async runUntil(checkpoint: string): Promise<void> {
-      for (; next < EVENTS.length; next += 1) {
-        const event = EVENTS[next];
+      for (; next < dayOf.events.length; next += 1) {
+        const event = dayOf.events[next];
         if (event === undefined) break;
         if (event.kind === "checkpoint") {
           if (event.name === checkpoint) {

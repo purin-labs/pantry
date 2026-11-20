@@ -250,8 +250,18 @@ function acceptReport(ledger: EvidenceLedger, report: CobotReport): Check {
   const ordered = deviceCheck(ledger, report);
   if (ordered !== null)
     return refuse(ledger, evidence, ordered.outcome, ordered.reason);
-  if (!isOpen(record))
-    return refuse(ledger, evidence, "refused", "after_terminal");
+  if (!isOpen(record)) {
+    // After a reconnect the controller states a task's end again, for the
+    // gateway's own status ask and for the Platform's inquiry. The same end
+    // says nothing new; a different one is refused.
+    const end = terminalReport(record);
+    return end !== null &&
+      end.state === report.state &&
+      end.carrierAt === report.carrierAt &&
+      end.reason === report.reason
+      ? refuse(ledger, evidence, "duplicate", null)
+      : refuse(ledger, evidence, "refused", "after_terminal");
+  }
   return {
     ledger: withDispatch(withDevice(ledger, report, null), {
       ...record,

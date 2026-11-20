@@ -7,17 +7,19 @@
 // on the card through the same decision; the Portal chat agent proposes and
 // cannot approve. Slack, the gateway and the model are fakes that only record
 // or answer; every asserted outcome comes from product code.
-import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
-import type { BakeProposalView } from "@purin-labs/kitchen-control-api";
 import { isRecord } from "@purin-labs/std";
 
+import type { IssuedControlSession } from "../../src/data/control-plane";
 import {
-  issueControlSession,
-  type IssuedControlSession,
-} from "../../src/data/control-plane";
-import { parseUserId } from "../../src/ids";
+  buttonsOf,
+  cardOf,
+  clickCard,
+  sessionOf,
+  setActorRole,
+  threadCase,
+} from "./bake-slack-support";
 import {
   applyFinancierWorkflow,
   chatDirect,
@@ -55,13 +57,9 @@ import {
 } from "./device-fleet-support";
 import { installMemoryFixture } from "./memory-support";
 import { network } from "./network";
-import { fixtureDatabase } from "./organisation-database";
-import { signedButtonClick } from "./slack-side-case-support";
 import {
-  CHANNEL_ID,
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,
-  USER_ID,
   installSlackActorFixture,
   slackSimulator,
 } from "./slack-journey-support";
@@ -439,87 +437,6 @@ async function enrollOven(
   );
   expect(confirmed.status, JSON.stringify(confirmed.body)).toBe(200);
   return gateway;
-}
-
-async function sessionOf(userId: string): Promise<IssuedControlSession> {
-  const parsed = parseUserId(userId);
-  if (!parsed.ok) throw new Error(parsed.error.code);
-  return issueControlSession({
-    db: env.DB,
-    userId: parsed.value,
-    now: Date.now(),
-    ttlMs: 1_800_000,
-  });
-}
-
-/** The Slack actor's role: the same linked Slack user as a viewer or operator. */
-async function setActorRole(role: "operator" | "viewer"): Promise<void> {
-  await fixtureDatabase()
-    .prepare(
-      "UPDATE service_role_grant SET role = ? WHERE organisation_id = ? AND user_id = ?",
-    )
-    .bind(role, ORGANISATION_ID, SLACK_ACTOR_USER_ID)
-    .run();
-}
-
-function buttonsOf(message: Record<string, string>): string[] {
-  const blocks: unknown = JSON.parse(message.blocks ?? "[]");
-  if (!Array.isArray(blocks)) return [];
-  return blocks.flatMap((block: unknown) =>
-    isRecord(block) && block.type === "actions" && Array.isArray(block.elements)
-      ? block.elements.flatMap((element: unknown) =>
-          isRecord(element) ? [String(element.action_id)] : [],
-        )
-      : [],
-  );
-}
-
-/** The card whose thread resolves to the proposal's Case. */
-async function cardOf(
-  cards: readonly Record<string, string>[],
-  proposal: Pick<BakeProposalView, "caseId">,
-): Promise<Record<string, string>> {
-  for (const card of cards)
-    if ((await threadCase(String(card.ts))) === proposal.caseId) return card;
-  throw new Error("No card for the proposal");
-}
-
-/** The Case that the thread of a card's message resolves to. */
-async function threadCase(ts: string): Promise<string | null> {
-  const pin = await env.DB.prepare(
-    "SELECT case_id AS caseId FROM slack_thread_case_pin WHERE channel_id = ? AND root_message_ts = ?",
-  )
-    .bind(CHANNEL_ID, ts)
-    .first<{ caseId: string }>();
-  return pin?.caseId ?? null;
-}
-
-/** A click on the card, as Slack signs it, with the text of its reason field. */
-async function clickCard(
-  card: Record<string, string>,
-  actionId: string,
-  proposal: Pick<BakeProposalView, "proposalId">,
-  reason: string | null,
-): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedButtonClick({
-      actionId,
-      value: proposal.proposalId,
-      user: USER_ID,
-      channel: CHANNEL_ID,
-      threadTs: null,
-      proposalTs: String(card.ts),
-      state: {
-        bake_proposal_reason: {
-          bake_proposal_reason_text: {
-            type: "plain_text_input",
-            value: reason,
-          },
-        },
-      },
-    }),
-  );
-  expect(response.status).toBe(200);
 }
 
 function scripts(journey: Journey): Readonly<Record<string, Script>> {

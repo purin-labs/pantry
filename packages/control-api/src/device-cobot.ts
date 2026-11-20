@@ -202,7 +202,9 @@ export type CobotObserved = Static<typeof cobotObservedMessageSchema>;
  * What the device fleet Actor gives a run's Durable Object about the run's
  * devices (Plan 24 S4), in the order that the gateway sent it. A fault is the
  * `health` report of a watched device; `connection_lost` names the open
- * dispatches that a lost gateway socket left with an unknown result.
+ * dispatches that a lost gateway socket left with an unknown result;
+ * `device_revoked` says that a person revoked the device on the Devices page
+ * (Plan 24 S6).
  */
 export type CobotRunSignal =
   | Readonly<{ kind: "report"; report: CobotReport }>
@@ -218,4 +220,5 @@ export type CobotRunSignal =
       kind: "connection_lost";
       requestIds: readonly string[];
       at: number;
-    }>;
+    }>
+  | Readonly<{ kind: "device_revoked"; sourceKey: string; at: number }>;

@@ -41,8 +41,14 @@ type BakeKitchenDevice = Readonly<{
 
 export type BakeRunLaunchPorts = Readonly<{
   kitchenDevices(location: string): Promise<readonly BakeKitchenDevice[]>;
-  /** The bake time of the proposal's recipe revision, or null. */
-  ovenProgram(proposal: BakeProposal): Promise<number | null>;
+  /**
+   * The bake time of the proposal's recipe revision, and the time of its
+   * step between the bake and the unload, in seconds; null without a bake.
+   */
+  recipeTimes(proposal: BakeProposal): Promise<Readonly<{
+    bakeSeconds: number;
+    unloadGraceSeconds: number | null;
+  }> | null>;
   /** Starts the run's Durable Object, which sends the first task. */
   launch(start: BakeRunStart): Promise<Result<null, BakeRunError>>;
 }>;
@@ -61,6 +67,11 @@ const OVEN_SHELVES = 4;
 const MOVE_SECONDS = { load: 38.5, unload: 40 } as const;
 /** The recipe revision holds no oven temperature yet; Kitchen's default. */
 const OVEN_TEMPERATURE_C = 180;
+/**
+ * S6: the over-bake grace of a recipe with no step between its bake and its
+ * unload. The financier recipe's `examine-bake` step gives 30 s.
+ */
+const UNLOAD_GRACE_SECONDS = 60;
 
 function problem(
   code: string,
@@ -86,7 +97,11 @@ async function planRun(
   ports: BakeRunLaunchPorts,
 ): Promise<
   Result<
-    Readonly<{ input: BakeRunInput; devices: readonly BakeRunDevice[] }>,
+    Readonly<{
+      input: BakeRunInput;
+      devices: readonly BakeRunDevice[];
+      unloadGraceSeconds: number;
+    }>,
     BakeRunStartError
   >
 > {
@@ -128,8 +143,8 @@ async function planRun(
         "bake_run_device_not_ready",
         `${device.name} is not ready: ${describe(device.readiness)}. Check it on the Devices page, then start the run.`,
       );
-  const programSeconds = await ports.ovenProgram(proposal);
-  if (programSeconds === null)
+  const times = await ports.recipeTimes(proposal);
+  if (times === null)
     return problem(
       "bake_run_program_missing",
       `Recipe revision ${proposal.workflowRevision} has no bake step with a time.`,
@@ -150,12 +165,22 @@ async function planRun(
       ovenShelf: index + 1,
       coolingRackShelf: index + 1,
     })),
-    oven: { programSeconds, temperatureC: OVEN_TEMPERATURE_C },
+    oven: {
+      programSeconds: times.bakeSeconds,
+      temperatureC: OVEN_TEMPERATURE_C,
+    },
     cobots: [first.sourceKey, second.sourceKey],
     ovenSource: oven.sourceKey,
     moveSeconds: MOVE_SECONDS,
   };
-  return { ok: true, value: { input, devices } };
+  return {
+    ok: true,
+    value: {
+      input,
+      devices,
+      unloadGraceSeconds: times.unloadGraceSeconds ?? UNLOAD_GRACE_SECONDS,
+    },
+  };
 }
 
 function plain(device: BakeKitchenDevice): Omit<BakeRunDevice, "role"> {
@@ -203,6 +228,7 @@ export async function startProposalRun(
         mode,
         input: planned.value.input,
         devices: planned.value.devices,
+        unloadGraceSeconds: planned.value.unloadGraceSeconds,
         approval: {
           by: decision.by,
           role: decision.role,

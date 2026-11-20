@@ -1,0 +1,22 @@
+{
+  "about": "Plan 24 exit gate: one declared café day of counter sales of fresh financiers. The café day journey (services/platform/tests/e2e/bake-cafe-day.test.ts) runs it two times, each with a fresh Organisation, gateway and identities, in approval mode. Each fall below the level opens one proposal; at each checkpoint a person approves it (in the Portal or on its Slack card), two cobots bake it through the real gateway and the controller simulator, and a person checks the pieces.",
+  "openingStock": 16,
+  "level": { "levelPieces": 12, "piecesPerGroup": 8 },
+  "bakes": [
+    { "checkpoint": "morning_bake", "approveIn": "portal", "goodPieces": 8 },
+    { "checkpoint": "midday_bake", "approveIn": "slack", "goodPieces": 7 }
+  ],
+  "events": [
+    { "at": "07:30", "kind": "sale", "quantity": 2 },
+    { "at": "07:45", "kind": "sale", "quantity": 3 },
+    { "at": "08:05", "kind": "sale", "quantity": 1 },
+    { "at": "08:10", "kind": "checkpoint", "name": "morning_bake" },
+    { "at": "09:30", "kind": "sale", "quantity": 4 },
+    { "at": "10:15", "kind": "sale", "quantity": 3 },
+    { "at": "11:40", "kind": "sale", "quantity": 2 },
+    { "at": "11:45", "kind": "checkpoint", "name": "midday_bake" },
+    { "at": "14:00", "kind": "sale", "quantity": 2 },
+    { "at": "16:30", "kind": "sale", "quantity": 1 },
+    { "at": "17:00", "kind": "checkpoint", "name": "close" }
+  ]
+}

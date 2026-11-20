@@ -21,6 +21,8 @@ export type OperationsCard = Readonly<{
   idempotencyKey: string;
   /** The trace name of a card that did not go out, for example `devices.alert`. */
   trace: string;
+  /** A reply in this message's thread, in place of a channel message. */
+  threadTs?: string;
 }>;
 
 /** The Slack message ts of the card, or null when it did not go out. */
@@ -34,11 +36,19 @@ export async function deliverOperationsCard(
   const delivery = {
     deliveryId: card.deliveryId,
     bindingId: card.bindingId,
-    address: {
-      kind: "slack_channel",
-      workspaceId: destination.workspaceId,
-      channelId: destination.channelId,
-    },
+    address:
+      card.threadTs === undefined
+        ? {
+            kind: "slack_channel",
+            workspaceId: destination.workspaceId,
+            channelId: destination.channelId,
+          }
+        : {
+            kind: "slack",
+            workspaceId: destination.workspaceId,
+            channelId: destination.channelId,
+            threadTs: card.threadTs,
+          },
     caseId: card.caseId,
     caseRevision: card.caseRevision,
     content: { kind: "text", text: card.text },

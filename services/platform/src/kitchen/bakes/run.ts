@@ -8,6 +8,7 @@ import type {
   BakeAuthorityMode,
   BakeRunHold,
   BakeRunRecord,
+  BakeRunSeen,
 } from "@purin-labs/kitchen-control-api";
 import { timeFromSeconds } from "@purin-labs/production-simulation";
 import {
@@ -31,6 +32,7 @@ import { writeBakeRunStarted, writeBakeRunState } from "./run-records";
 import {
   listBakeRunActions,
   loadBakeRun,
+  nextBakeRunCardRevision,
   saveBakeRun,
   setBakeRunActionState,
   writeBakeRunAction,
@@ -61,6 +63,13 @@ import {
  * own script, as a person at the teach pendant would; the device fleet Actor
  * gives the run each observed move, and the run matches it to its planned
  * task with the difference of the times. A shadow run changes no stock.
+ *
+ * S6, faults: each uncertain outcome holds the run, and the hold is the one
+ * visible disposition on the Bakes page and on the run's Slack card. A person
+ * settles it with what they saw; settling never sends a move again. A revoke
+ * of a device holds the run at once. When the bake ends and no unload starts
+ * within the recipe's grace time, the run shows the over-bake risk and tells
+ * the person on shift once in the proposal's Slack thread.
  */
 
 export type RunActor = Readonly<{ kind: "person" | "agent"; id: string }>;
@@ -78,7 +87,7 @@ export type BakeRunDevicePorts = Readonly<{
       runActorId: string;
       approval: BakeRunApproval;
     }>,
-  ): Promise<"sent" | "unsent" | "known">;
+  ): Promise<"sent" | "unsent" | "known" | "refused">;
   /** The clock of each device behind this device's gateway, now. */
   readClocks(device: BakeRunDevice): Promise<readonly CobotClockEntry[] | null>;
   watch(runActorId: string, devices: readonly BakeRunDevice[]): Promise<void>;
@@ -92,6 +101,20 @@ export type BakeRunDevicePorts = Readonly<{
   settle(device: BakeRunDevice, actor: RunActor): Promise<boolean>;
 }>;
 
+/** The run's part of the one read, as the Bakes page and Slack show it. */
+export type BakeRunRunRecord = Omit<BakeRunRecord, "check" | "problem">;
+
+/** What the run tells the people of the shop, in the proposal's Slack thread. */
+export type BakeRunNotices = Readonly<{
+  /** Posts the run's card, or updates it to this revision. */
+  card(record: BakeRunRunRecord, revision: number): Promise<void>;
+  /** Tells the person on shift of the over-bake risk, once. */
+  overBake(
+    record: BakeRunRunRecord,
+    risk: NonNullable<BakeRunRecord["unloadRisk"]>,
+  ): Promise<void>;
+}>;
+
 export type BakeRunContext = Readonly<{
   sql: SqlStorage;
   db: OrganisationDatabase;
@@ -101,6 +124,7 @@ export type BakeRunContext = Readonly<{
   devices: BakeRunDevicePorts;
   /** Ends the run's proposal through the Organisation Actor (S1's end). */
   endProposal(reason: string): Promise<void>;
+  notices: BakeRunNotices;
   alarm: Readonly<{
     at(time: number): Promise<void>;
     clear(): Promise<void>;
@@ -115,6 +139,8 @@ export type BakeRunStart = Readonly<{
   input: BakeRunInput;
   devices: readonly BakeRunDevice[];
   approval: BakeRunApproval;
+  /** The recipe's time between the bake and the unload, in seconds. */
+  unloadGraceSeconds: number;
 }>;
 
 export type BakeRunError = Readonly<{
@@ -128,16 +154,18 @@ export type BakeRunError = Readonly<{
     | "bake_run_ended"
     | "bake_run_attempt_failed"
     | "bake_run_result_open"
+    | "bake_run_seen_required"
     | "bake_run_shadow";
   message: string;
 }>;
 
-/** The alarm watches a running run this often, and only while it runs. */
+/**
+ * The alarm watches a running run this often, and a paused or held run only
+ * while its bake has ended and its unload has not started.
+ */
 const WATCH_MS = 10_000;
 /** An open dispatch with no signal of its devices for this long is lost. */
 const EVIDENCE_LOST_MS = 30_000;
-/** An unload this much later than its plan after the bake shows a risk. */
-const UNLOAD_MARGIN_SECONDS = 60;
 const HORIZON = (() => {
   const parsed = timeFromSeconds(12 * 3_600);
   if (!parsed.ok) throw new Error("The run horizon is invalid.");
@@ -167,7 +195,11 @@ function held(
   return { ...run, state: "held", hold: { ...hold, at: now } };
 }
 
-/** Saves the run, and writes its summary and its alarm only on a change. */
+/**
+ * Saves the run. Its summary row, its alarm and its Slack card change only
+ * when its state or its hold changes, and Slack hears of an over-bake risk
+ * once.
+ */
 async function persist(
   ctx: BakeRunContext,
   before: StoredBakeRun | null,
@@ -175,21 +207,41 @@ async function persist(
   now: number,
 ): Promise<void> {
   saveBakeRun(ctx.sql, after, now);
-  if (before?.state === after.state && before.hold?.code === after.hold?.code)
-    return;
-  await writeBakeRunState(ctx.db, ctx.organisationId, {
-    runId: after.runId,
-    state: after.state,
-    holdCode: after.hold?.code ?? null,
-    endedAt: after.endedAt,
-    now,
-  });
-  // A shadow run sends nothing, so it has no dispatch to watch.
-  if (after.state === "running" && after.mode === "approval")
-    await ctx.alarm.at(now + WATCH_MS);
-  else await ctx.alarm.clear();
-  if (after.state === "completed" || after.state === "stopped")
+  const changed =
+    before?.state !== after.state || before.hold?.code !== after.hold?.code;
+  if (changed)
+    await writeBakeRunState(ctx.db, ctx.organisationId, {
+      runId: after.runId,
+      state: after.state,
+      holdCode: after.hold?.code ?? null,
+      endedAt: after.endedAt,
+      now,
+    });
+  if (changed || (before !== null && wantsAlarm(before) !== wantsAlarm(after)))
+    if (wantsAlarm(after)) await ctx.alarm.at(now + WATCH_MS);
+    else await ctx.alarm.clear();
+  if (changed && (after.state === "completed" || after.state === "stopped"))
     await ctx.devices.unwatch(ctx.actorId, after.devices);
+  const risk = before?.overBake === null && after.overBake !== null;
+  if (!changed && !risk) return;
+  const record = recordOf(ctx, after);
+  await ctx.notices.card(record, nextBakeRunCardRevision(ctx.sql));
+  if (risk && record.unloadRisk !== null)
+    await ctx.notices.overBake(record, record.unloadRisk);
+}
+
+/**
+ * A shadow run sends nothing, so it has no dispatch to watch. A paused or
+ * held run is watched only for the over-bake risk of its unload.
+ */
+function wantsAlarm(run: StoredBakeRun): boolean {
+  if (run.mode === "shadow") return false;
+  if (run.state === "running") return true;
+  return (
+    (run.state === "paused" || run.state === "held") &&
+    run.overBake === null &&
+    unloadWindow(observeBakeRun(run.physical)) !== null
+  );
 }
 
 /**
@@ -256,6 +308,10 @@ export async function startBakeRun(
     pausedDevices: [],
     lastEvidenceAt: now,
     observed: [],
+    unloadGraceSeconds: start.unloadGraceSeconds,
+    progress: {},
+    overBake: null,
+    settlements: [],
     startedAt: now,
     endedAt: null,
   };
@@ -268,6 +324,7 @@ export async function startBakeRun(
     mode: run.mode,
     now,
   });
+  await ctx.notices.card(recordOf(ctx, run), nextBakeRunCardRevision(ctx.sql));
   if (run.mode === "shadow") return { ok: true, value: run };
   await ctx.alarm.at(now + WATCH_MS);
   return { ok: true, value: await advance(ctx, run, [], now) };
@@ -343,8 +400,25 @@ async function advance(
     run = sent.run;
     driven = sent.driven;
   }
+  run = withOverBake(
+    withProgress(run, now),
+    latestSeconds(run.physical, null),
+    now,
+  );
   await persist(ctx, start, run, now);
   return run;
+}
+
+/** The run with the time when each device's sequence last rose. */
+function withProgress(run: StoredBakeRun, now: number): StoredBakeRun {
+  let progress = run.progress;
+  for (const [sourceKey, device] of Object.entries(run.physical.ledger.devices))
+    if (device.sequence > (progress[sourceKey]?.sequence ?? -1))
+      progress = {
+        ...progress,
+        [sourceKey]: { sequence: device.sequence, at: now },
+      };
+  return progress === run.progress ? run : { ...run, progress };
 }
 
 /**
@@ -392,7 +466,11 @@ async function dispatchStep(
     };
   }
   const driven = drivePhysicalRun(start.physical, [message], HORIZON);
-  let run: StoredBakeRun = { ...start, physical: driven.run };
+  let run: StoredBakeRun = {
+    ...start,
+    physical: driven.run,
+    lastEvidenceAt: now,
+  };
   saveBakeRun(ctx.sql, run, now);
   const sent = await ctx.devices.dispatch(device, {
     message,
@@ -402,9 +480,21 @@ async function dispatchStep(
   setBakeRunActionState(
     ctx.sql,
     message.requestId,
-    sent === "unsent" ? "unsent" : "sent",
+    sent === "known" ? "sent" : sent,
     now,
   );
+  if (sent === "refused")
+    run = held(
+      run,
+      {
+        code: "dispatch_refused",
+        message: `The device fleet refused ${step} for ${device.name}: the run did not watch the device. Nothing was sent. Settle the run to send it again, or stop it.`,
+        step,
+        requestId: message.requestId,
+        sourceKey: device.sourceKey,
+      },
+      now,
+    );
   if (sent === "unsent")
     run = held(
       run,
@@ -451,7 +541,7 @@ async function resendWritten(
     setBakeRunActionState(
       ctx.sql,
       action.requestId,
-      sent === "unsent" ? "unsent" : "sent",
+      sent === "known" ? "sent" : sent,
       now,
     );
   }
@@ -472,7 +562,7 @@ export async function receiveBakeRunSignal(
     return;
   }
   const keys = new Set(stored.devices.map((device) => device.sourceKey));
-  let run: StoredBakeRun = { ...stored, lastEvidenceAt: now };
+  let run: StoredBakeRun = stored;
   const evidence: PhysicalEvidence[] = [];
   switch (signal.kind) {
     case "report":
@@ -504,6 +594,20 @@ export async function receiveBakeRunSignal(
         signal.at,
       );
       break;
+    case "device_revoked":
+      if (!keys.has(signal.sourceKey)) return;
+      run = held(
+        run,
+        {
+          code: "device_revoked",
+          message: `${deviceOf(run, signal.sourceKey).name} was revoked on the Devices page. Pantry sends it no task. A person checks the machine, then continues with the other devices or stops the run.`,
+          step: null,
+          requestId: null,
+          sourceKey: signal.sourceKey,
+        },
+        signal.at,
+      );
+      break;
     case "connection_lost":
       run = held(
         run,
@@ -519,11 +623,8 @@ export async function receiveBakeRunSignal(
       );
       break;
   }
-  if (run.state === "completed") {
-    // A late report after the end only updates the record.
-    saveBakeRun(ctx.sql, run, now);
-    return;
-  }
+  // A late report after the end changes nothing.
+  if (run.state === "completed") return;
   await advanceSaved(ctx, stored, run, evidence, now);
 }
 
@@ -600,13 +701,18 @@ async function advanceSaved(
   return advance(ctx, run, evidence, now);
 }
 
-/** The alarm of a running run: a dispatch whose evidence stopped is held. */
+/**
+ * The alarm of an active run: a dispatch whose evidence stopped is held, and
+ * an unload that does not start within the recipe's grace time after the
+ * bake shows the over-bake risk. Device time comes from the gateway, because
+ * a paused run gets no clock while no task is open.
+ */
 export async function watchBakeRun(
   ctx: BakeRunContext,
   now: number,
 ): Promise<void> {
   const run = loadBakeRun(ctx.sql);
-  if (run?.state !== "running" || run.mode === "shadow") {
+  if (run === null || !wantsAlarm(run)) {
     await ctx.alarm.clear();
     return;
   }
@@ -620,12 +726,22 @@ export async function watchBakeRun(
           report.state === "indeterminate",
       ),
   );
-  if (open !== undefined && now - run.lastEvidenceAt > EVIDENCE_LOST_MS) {
+  // A device is silent when no new line of it came: a repeated or stale
+  // clock of a frozen device is no sign of life.
+  const heard =
+    open === undefined
+      ? now
+      : Math.max(run.lastEvidenceAt, run.progress[open.sourceKey]?.at ?? 0);
+  if (
+    run.state === "running" &&
+    open !== undefined &&
+    now - heard > EVIDENCE_LOST_MS
+  ) {
     const after = held(
       run,
       {
         code: "evidence_lost",
-        message: `${deviceOf(run, open.sourceKey).name} sent no report or clock for ${Math.round(EVIDENCE_LOST_MS / 1000)} s while its task was open. A person checks the machine.`,
+        message: `${deviceOf(run, open.sourceKey).name} sent no new report or clock for ${Math.round(EVIDENCE_LOST_MS / 1000)} s while its task was open: its data is stale. A person checks the machine.`,
         step: null,
         requestId: open.requestId,
         sourceKey: open.sourceKey,
@@ -635,7 +751,16 @@ export async function watchBakeRun(
     await persist(ctx, run, after, now);
     return;
   }
-  await ctx.alarm.at(now + WATCH_MS);
+  let after = run;
+  if (unloadWindow(observeBakeRun(run.physical)) !== null) {
+    const oven =
+      run.devices.find((device) => device.role === "oven") ?? run.devices[0];
+    const clocks =
+      oven === undefined ? null : await ctx.devices.readClocks(oven);
+    after = withOverBake(run, latestSeconds(run.physical, clocks), now);
+    if (after !== run) await persist(ctx, run, after, now);
+  }
+  if (wantsAlarm(after)) await ctx.alarm.at(now + WATCH_MS);
 }
 
 function loaded(ctx: BakeRunContext): Result<StoredBakeRun, BakeRunError> {
@@ -696,7 +821,12 @@ export async function resumeBakeRun(
   for (const device of run.devices)
     if (run.pausedDevices.includes(device.deviceId))
       await ctx.devices.resume(device, actor);
-  const after: StoredBakeRun = { ...run, state: "running", pausedDevices: [] };
+  const after: StoredBakeRun = {
+    ...run,
+    state: "running",
+    pausedDevices: [],
+    lastEvidenceAt: now,
+  };
   return { ok: true, value: await advanceSaved(ctx, run, after, [], now) };
 }
 
@@ -743,15 +873,17 @@ export async function stopBakeRun(
 }
 
 /**
- * A person settles the run's hold. `stop` stops the run. `continue` lifts
- * the hold after the person checked the machine: an unknown result needs the
- * task's end from the controller first, and an unsent task goes once more
- * with the same identity. A failed attempt cannot continue yet (S6 adds its
- * recovery); stop the run.
+ * A person settles the run's hold with what they saw at the machine, and the
+ * settlement stays on the run. Settling never sends a move again. `stop`
+ * stops the run. `continue` lifts the hold: an unknown result needs the
+ * task's end from the controller first, and a task that did not reach the
+ * gateway goes once more with the same identity, so the gateway's journal
+ * makes it one move. A failed task does not go again: the person says where
+ * the mould group is, and the run stops.
  */
 export async function settleBakeRun(
   ctx: BakeRunContext,
-  decision: "continue" | "stop",
+  input: Readonly<{ decision: "continue" | "stop"; seen: BakeRunSeen | null }>,
   actor: RunActor,
   now: number,
 ): Promise<Result<StoredBakeRun, BakeRunError>> {
@@ -759,16 +891,40 @@ export async function settleBakeRun(
   if (!found.ok) return found;
   const run = found.value;
   if (run.mode === "shadow") return refuseShadow();
-  if (run.hold === null)
+  const hold = run.hold;
+  if (hold === null)
     return refuse("bake_run_not_held", "The run has nothing to settle.");
-  if (decision === "stop") return stopBakeRun(ctx, actor, now);
-  if (openDisposition(run.physical) !== null)
+  const failed = openDisposition(run.physical) !== null;
+  if (failed && input.decision === "continue")
     return refuse(
       "bake_run_attempt_failed",
-      "A task failed, and the run cannot continue it yet. Check the machine, then stop the run.",
+      "A task failed, and Pantry does not send a move again. Say where the mould group is, then stop the run.",
     );
+  if (failed && input.seen === null)
+    return refuse(
+      "bake_run_seen_required",
+      "Say where you saw the mould group: on its source shelf, on the cobot's tool, on its destination shelf, or lost.",
+    );
+  const settled: StoredBakeRun = {
+    ...run,
+    settlements: [
+      ...run.settlements,
+      {
+        holdCode: hold.code,
+        step: hold.step,
+        decision: input.decision,
+        seen: input.seen,
+        by: actor.id,
+        at: now,
+      },
+    ],
+  };
+  if (input.decision === "stop") {
+    saveBakeRun(ctx.sql, settled, now);
+    return stopBakeRun(ctx, actor, now);
+  }
   const actions = listBakeRunActions(ctx.sql);
-  if (run.hold.code === "result_unknown" || run.hold.code === "evidence_lost") {
+  if (hold.code === "result_unknown" || hold.code === "evidence_lost") {
     for (const action of actions) {
       const record = run.physical.ledger.dispatches[action.requestId];
       if (action.state !== "sent" || record === undefined) continue;
@@ -786,9 +942,12 @@ export async function settleBakeRun(
       await ctx.devices.settle(deviceOf(run, action.sourceKey), actor);
     }
   }
-  if (run.hold.code === "dispatch_unsent")
+  if (hold.code === "dispatch_unsent" || hold.code === "dispatch_refused") {
+    if (hold.code === "dispatch_refused")
+      await ctx.devices.watch(ctx.actorId, run.devices);
+    const left = hold.code === "dispatch_refused" ? "refused" : "unsent";
     for (const action of actions) {
-      if (action.state !== "unsent") continue;
+      if (action.state !== left) continue;
       const record = run.physical.ledger.dispatches[action.requestId];
       if (record === undefined) continue;
       const sent = await ctx.devices.dispatch(deviceOf(run, action.sourceKey), {
@@ -803,15 +962,16 @@ export async function settleBakeRun(
         runActorId: ctx.actorId,
         approval: run.approval,
       });
-      if (sent === "unsent")
+      if (sent === "unsent" || sent === "refused")
         return refuse(
           "bake_run_result_open",
-          "The gateway is still not connected. Settle the run again when it is back.",
+          "The gateway did not take the task. Settle the run again when it is back.",
         );
       setBakeRunActionState(ctx.sql, action.requestId, "sent", now);
     }
+  }
   const after: StoredBakeRun = {
-    ...run,
+    ...settled,
     hold: null,
     state: run.pausedDevices.length > 0 ? "paused" : "running",
     lastEvidenceAt: now,
@@ -819,38 +979,91 @@ export async function settleBakeRun(
   return { ok: true, value: await advanceSaved(ctx, run, after, [], now) };
 }
 
-/** The late unload whose delay can burn the bake, once the bake ended. */
-function unloadRisk(
-  view: BakeRunView,
-  physical: PhysicalRun,
-): BakeRunRecord["unloadRisk"] {
+type EngineTask = BakeRunView["tasks"][number];
+
+/** The bake that ended and the unloads that have not started, if any. */
+function unloadWindow(view: BakeRunView): Readonly<{
+  bake: EngineTask;
+  endedSeconds: number;
+  waiting: readonly EngineTask[];
+}> | null {
   const bake = view.tasks.find((task) => task.kind === "bake");
-  const ended = bake?.observed.endSeconds ?? null;
-  if (bake === undefined || bake.state !== "completed" || ended === null)
+  const endedSeconds = bake?.observed.endSeconds ?? null;
+  if (bake === undefined || bake.state !== "completed" || endedSeconds === null)
     return null;
+  const waiting = view.tasks.filter(
+    (task) => task.kind === "unload" && task.observed.startSeconds === null,
+  );
+  return waiting.length === 0 ? null : { bake, endedSeconds, waiting };
+}
+
+/** The latest device time of the run, in its logical seconds. */
+function latestSeconds(
+  physical: PhysicalRun,
+  clocks: readonly CobotClockEntry[] | null,
+): number {
+  const { origin, devices } = physical.ledger;
   let latest = 0;
-  for (const [sourceKey, device] of Object.entries(physical.ledger.devices))
+  for (const [sourceKey, device] of Object.entries(devices))
     latest = Math.max(
       latest,
-      (device.clockMs - (physical.ledger.origin[sourceKey] ?? 0)) / 1_000,
+      (device.clockMs - (origin[sourceKey] ?? 0)) / 1_000,
     );
-  for (const task of view.tasks) {
-    if (task.kind !== "unload" || task.state === "completed") continue;
+  for (const entry of clocks ?? [])
+    if (origin[entry.sourceKey] !== undefined)
+      latest = Math.max(
+        latest,
+        (entry.deviceClockMs - (origin[entry.sourceKey] ?? 0)) / 1_000,
+      );
+  return latest;
+}
+
+/**
+ * The first unload that did not start within the grace time after the bake
+ * ended, measured from its planned gap to the bake, and how late it is.
+ */
+function lateUnload(
+  run: StoredBakeRun,
+  nowSeconds: number,
+): Readonly<{ step: string; lateSeconds: number }> | null {
+  const window = unloadWindow(observeBakeRun(run.physical));
+  if (window === null) return null;
+  for (const task of window.waiting) {
     const due =
-      ended +
-      (task.planned.endSeconds - bake.planned.endSeconds) +
-      UNLOAD_MARGIN_SECONDS;
-    if (latest > due) return { step: task.key, lateSeconds: latest - due };
+      window.endedSeconds +
+      (task.planned.startSeconds - window.bake.planned.endSeconds) +
+      run.unloadGraceSeconds;
+    if (nowSeconds > due)
+      return {
+        step: task.key,
+        lateSeconds: Math.round((nowSeconds - due) * 10) / 10,
+      };
   }
   return null;
+}
+
+/** The run with the over-bake risk that it found now, once. */
+function withOverBake(
+  run: StoredBakeRun,
+  nowSeconds: number,
+  now: number,
+): StoredBakeRun {
+  if (run.mode === "shadow" || run.overBake !== null) return run;
+  const late = lateUnload(run, nowSeconds);
+  return late === null
+    ? run
+    : { ...run, overBake: { ...late, detectedAt: now } };
 }
 
 /** The run's part of the one read; the Worker adds the D1 summary. */
 export function readBakeRunRecord(
   ctx: BakeRunContext,
-): Omit<BakeRunRecord, "check" | "problem"> | null {
+): BakeRunRunRecord | null {
   const run = loadBakeRun(ctx.sql);
-  if (run === null) return null;
+  return run === null ? null : recordOf(ctx, run);
+}
+
+function recordOf(ctx: BakeRunContext, run: StoredBakeRun): BakeRunRunRecord {
   const shadow = run.mode === "shadow" ? shadowOf(run) : null;
   const engineView = observeBakeRun(run.physical);
   const view: RecordView =
@@ -861,6 +1074,11 @@ export function readBakeRunRecord(
           groups: [...engineView.groups],
         }
       : shadowView(engineView, shadow);
+  const late =
+    run.overBake ??
+    (shadow === null
+      ? lateUnload(run, latestSeconds(run.physical, null))
+      : null);
   return {
     runId: run.runId,
     proposalId: run.proposalId,
@@ -888,7 +1106,16 @@ export function readBakeRunRecord(
       writtenAt: action.writtenAt,
       sentAt: action.sentAt,
     })),
-    unloadRisk: shadow === null ? unloadRisk(engineView, run.physical) : null,
+    unloadRisk:
+      late === null
+        ? null
+        : {
+            step: late.step,
+            lateSeconds: late.lateSeconds,
+            graceSeconds: run.unloadGraceSeconds,
+            notifiedAt: run.overBake?.detectedAt ?? null,
+          },
+    settlements: [...run.settlements],
     view,
     shadow:
       shadow === null

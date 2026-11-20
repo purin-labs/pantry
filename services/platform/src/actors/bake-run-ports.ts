@@ -15,10 +15,14 @@ import type { Env } from "../env";
 import { newRequestId, type OrganisationId } from "../ids";
 import type { BakeKitchenPorts } from "../kitchen/bakes/commands";
 import type { BakeProposal } from "../kitchen/bakes/records";
-import type { BakeRunDevicePorts } from "../kitchen/bakes/run";
+import type { BakeRunDevicePorts, BakeRunNotices } from "../kitchen/bakes/run";
 import type { BakeRunLaunchPorts } from "../kitchen/bakes/run-start";
 import type { BakeRunDevice } from "../kitchen/bakes/run-store";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import {
+  announceBakeRun,
+  tellBakeRunOverBake,
+} from "../slack/bake-run-announce";
 import type { BakeRunActor } from "./bake-run";
 import { deviceFleetStub } from "./device-fleet";
 
@@ -93,7 +97,8 @@ export function bakeRunDevicePorts(
         message: input.message,
         approval: input.approval,
       });
-      if (result.state === "unsent") return "unsent";
+      if (result.state === "unsent" || result.state === "refused")
+        return result.state;
       return result.replayed ? "known" : "sent";
     },
     readClocks: (device) =>
@@ -123,6 +128,19 @@ export function bakeRunDevicePorts(
         now: Date.now(),
       });
     },
+  };
+}
+
+/** The run's card and its over-bake message in the proposal's thread. */
+export function bakeRunNotices(
+  env: Env,
+  scope: OrganisationExecutionScope,
+): BakeRunNotices {
+  return {
+    card: (record, revision) =>
+      announceBakeRun(env, scope, record, revision, Date.now()),
+    overBake: (record, risk) =>
+      tellBakeRunOverBake(env, scope, record, risk, Date.now()),
   };
 }
 
@@ -199,8 +217,8 @@ function bakeRunLaunchPorts(
         ];
       });
     },
-    ovenProgram: (proposal) =>
-      ovenProgramOf(env, scope.organisationId, proposal),
+    recipeTimes: (proposal) =>
+      recipeTimesOf(env, scope.organisationId, proposal),
     launch: async (start) => {
       const stub = bakeRunStub(env, scope, start.runId);
       if (stub === null)
@@ -216,32 +234,45 @@ function bakeRunLaunchPorts(
   };
 }
 
-/** The bake time of the recipe revision's `bake` step, in whole seconds. */
-async function ovenProgramOf(
+/**
+ * The recipe revision's times: its `bake` step gives the oven program, and
+ * its `examine-bake` step, the person's look into the oven before the unload,
+ * gives the over-bake grace (S6). Each in whole seconds.
+ */
+async function recipeTimesOf(
   env: Env,
   organisationId: OrganisationId,
   proposal: BakeProposal,
-): Promise<number | null> {
+): Promise<Readonly<{
+  bakeSeconds: number;
+  unloadGraceSeconds: number | null;
+}> | null> {
   const document = await readWorkflowDocument(
     env,
     organisationId,
     proposal.workflowDigest,
   );
-  for (const workflow of document?.workflows ?? [])
-    for (const node of workflow.nodes) {
-      if (node.kind !== "step" || node.id !== "bake") continue;
-      const executor = (node.body as { executor?: unknown }).executor;
-      if (
-        typeof executor === "object" &&
-        executor !== null &&
-        "kind" in executor &&
-        executor.kind === "declared" &&
-        "duration" in executor &&
-        typeof executor.duration === "number"
-      )
-        return Math.max(1, Math.round(executor.duration / 1_000_000));
-    }
-  return null;
+  const seconds = (id: string): number | null => {
+    for (const workflow of document?.workflows ?? [])
+      for (const node of workflow.nodes) {
+        if (node.kind !== "step" || node.id !== id) continue;
+        const executor = (node.body as { executor?: unknown }).executor;
+        if (
+          typeof executor === "object" &&
+          executor !== null &&
+          "kind" in executor &&
+          (executor.kind === "declared" || executor.kind === "attended") &&
+          "duration" in executor &&
+          typeof executor.duration === "number"
+        )
+          return Math.max(1, Math.round(executor.duration / 1_000_000));
+      }
+    return null;
+  };
+  const bakeSeconds = seconds("bake");
+  return bakeSeconds === null
+    ? null
+    : { bakeSeconds, unloadGraceSeconds: seconds("examine-bake") };
 }
 
 /**

@@ -126,6 +126,7 @@ export async function readBakeRunOf(
       endedAt: summary.endedAt,
       dispatches: [],
       unloadRisk: null,
+      settlements: [],
       view: null,
       shadow: null,
     };

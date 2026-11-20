@@ -65,7 +65,11 @@ export function bakeProposalCardText(proposal: BakeProposal): string {
       lines.push(decisionLine(proposal));
       break;
     case "ended":
-      lines.push(decisionLine(proposal), "The bake run ended.");
+      // The end names what happened: the check, the stop or the shadow run.
+      lines.push(
+        decisionLine(proposal),
+        proposal.endReason ?? "The bake run ended.",
+      );
       break;
   }
   return lines.join("\n");

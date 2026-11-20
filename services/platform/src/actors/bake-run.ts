@@ -26,7 +26,7 @@ import {
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 import { requireActiveOrganisationActorAtScope } from "./actor-router";
-import { bakeRunDevicePorts } from "./bake-run-ports";
+import { bakeRunDevicePorts, bakeRunNotices } from "./bake-run-ports";
 
 /**
  * The Durable Object of one approved bake run (Plan 24 S4). A physical run
@@ -71,6 +71,7 @@ export class BakeRunActor extends DurableObject<Env> {
       organisationId,
       actorId: this.ctx.id.toString(),
       devices: bakeRunDevicePorts(this.env, scope),
+      notices: bakeRunNotices(this.env, scope),
       endProposal: async (reason) => {
         const run = loadBakeRun(storage.sql);
         if (run === null) return;
@@ -143,7 +144,7 @@ export class BakeRunActor extends DurableObject<Env> {
           : action.kind === "resume"
             ? await resumeBakeRun(ctx, actor, now)
             : action.kind === "settle"
-              ? await settleBakeRun(ctx, action.decision, actor, now)
+              ? await settleBakeRun(ctx, action, actor, now)
               : await stopBakeRun(ctx, actor, now);
       return done.ok ? { ok: true, value: null } : done;
     });

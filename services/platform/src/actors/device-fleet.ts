@@ -545,6 +545,10 @@ export class DeviceFleetActor extends DurableObject<Env> {
    * state and sends nothing. A task that no socket carried stays `unsent`;
    * only a person's settle of its run asks for it again, with the same
    * identity, so the gateway's journal still makes it one move.
+   *
+   * S6: a new task goes only for a run that watches the device: an approved
+   * run that is active. A call for a run that ended, or a forged one, is
+   * refused, and nothing is written or sent.
    */
   async dispatchCobotTask(
     input: Readonly<{
@@ -554,12 +558,20 @@ export class DeviceFleetActor extends DurableObject<Env> {
       message: CobotTaskMessage;
       approval: CobotDispatchApproval;
     }>,
-  ): Promise<Readonly<{ state: CobotDispatchState; replayed: boolean }>> {
+  ): Promise<
+    Readonly<{ state: CobotDispatchState | "refused"; replayed: boolean }>
+  > {
     const { message } = input;
     const now = Date.now();
     const known = readCobotDispatch(this.#sql, message.requestId);
     if (known !== null && known.state !== "unsent")
       return { state: known.state, replayed: true };
+    if (
+      !watchingRuns(this.#sql, input.gatewayId, [message.sourceKey]).includes(
+        input.runActorId,
+      )
+    )
+      return { state: "refused", replayed: false };
     if (known === null) {
       const scope = await this.#scope();
       if (scope === null) return { state: "unsent", replayed: false };
@@ -629,6 +641,13 @@ export class DeviceFleetActor extends DurableObject<Env> {
 
   unwatchCobotRun(runActorId: string): void {
     unwatchCobotRun(this.#sql, runActorId);
+  }
+
+  /** S6: a person revoked a device; each run that watches it holds. */
+  deviceRevoked(gatewayId: string, sourceKey: string): void {
+    const at = Date.now();
+    for (const runActorId of watchingRuns(this.#sql, gatewayId, [sourceKey]))
+      this.#forward(runActorId, { kind: "device_revoked", sourceKey, at });
   }
 
   /** A task began or changed on one of this gateway's devices. */

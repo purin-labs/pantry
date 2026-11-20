@@ -10,12 +10,13 @@ import { tellClicker } from "./interaction-reply";
 import { resolveOrClaimSlackThreadRoute } from "./organisation-routing";
 
 /**
- * A Slack click on Approve or Reject of a bake proposal's card (Plan 24 S1).
- * The card's thread names the Organisation and the proposal's Case. The
- * clicker needs a verified Slack link to a member; the Organisation Actor runs
- * the same decision as the Bakes page, so a viewer stays refused and a
- * rejection keeps its reason. The decision updates the card; a refusal or a
- * repeated click gets a message that only the clicker sees.
+ * A Slack click on Approve or Reject of a bake proposal's card (Plan 24 S1),
+ * or on Pause of its bake run's card in the same thread (S6). The thread
+ * names the Organisation and the proposal's Case. The clicker needs a
+ * verified Slack link to a member; the Organisation Actor runs the same
+ * command as the Bakes page, so a viewer stays refused and a rejection keeps
+ * its reason. The command updates the cards; a refusal or a repeated click
+ * gets a message that only the clicker sees. No click moves a cobot.
  */
 export type BakeDecisionClick = Readonly<{
   appId: SlackAppId;
@@ -24,25 +25,31 @@ export type BakeDecisionClick = Readonly<{
   threadTs: string;
   starter: SlackUserId;
   responseUrl: string;
-  decision: "approve" | "reject";
   proposalId: string;
-  reason: string | null;
+  action:
+    | Readonly<{
+        kind: "decide";
+        decision: "approve" | "reject";
+        reason: string | null;
+      }>
+    | Readonly<{ kind: "pause" }>;
 }>;
 
 const UNLINKED =
-  "Only an operator, an admin or the owner whose Slack account is linked to Seams Pantry can decide this bake.";
+  "Only an operator, an admin or the owner whose Slack account is linked to Seams Pantry can decide or pause this bake.";
 const FAILED =
-  "Seams Pantry could not decide this bake now. Try again, or decide it on the Bakes page.";
+  "Seams Pantry could not do this now. Try again, or use the Bakes page.";
 
 export async function decideBakeProposalFromSlack(
   env: Env,
   click: BakeDecisionClick,
   requestId: RequestId,
 ): Promise<void> {
-  const answer = await decide(env, click).catch((): string => {
+  const answer = await decide(env, click).catch((error: unknown): string => {
     traceWarn("kitchen.bake_proposal_slack_decision_failed", {
       requestId,
       proposalId: click.proposalId,
+      error: error instanceof Error ? error.message : String(error),
     });
     return FAILED;
   });
@@ -90,22 +97,38 @@ async function decide(
     organisationId: route.value.organisationId,
     now: Date.now(),
   });
+  const { action } = click;
   const decided = await organisation.runBakeCommand({
     organisationId: route.value.organisationId,
-    command: {
-      kind: "decide",
-      proposalId: click.proposalId,
-      caseId: route.value.caseId,
-      decision: click.decision,
-      reason: click.reason,
-      decider: { userId: member.userId, role: member.role, via: "slack" },
-    },
+    command:
+      action.kind === "pause"
+        ? {
+            kind: "run_action",
+            proposalId: click.proposalId,
+            caseId: route.value.caseId,
+            action: { kind: "pause" },
+            requester: {
+              userId: member.userId,
+              role: member.role,
+              via: "person",
+            },
+          }
+        : {
+            kind: "decide",
+            proposalId: click.proposalId,
+            caseId: route.value.caseId,
+            decision: action.decision,
+            reason: action.reason,
+            decider: { userId: member.userId, role: member.role, via: "slack" },
+          },
   });
   if (!decided.ok)
     return "message" in decided.error &&
       typeof decided.error.message === "string"
       ? decided.error.message
       : FAILED;
+  // The run's card shows the pause.
+  if (action.kind === "pause") return null;
   if (decided.value.kind !== "unchanged") return null;
   const proposal = decided.value.proposal;
   return proposal.state === "approved" || proposal.state === "ended"

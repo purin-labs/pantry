@@ -540,17 +540,38 @@ export async function openWaitingBakeProposal(
 }
 
 /** Records that the proposal's Case and Slack card exist. */
+/**
+ * The proposal's card went out. `cardTs` is the Slack message of the card,
+ * the root of the thread where its bake run posts (Plan 24 S6).
+ */
 export async function markBakeProposalAnnounced(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   proposalId: string,
   at: number,
+  cardTs: string | null,
 ): Promise<void> {
   await db
     .prepare(
-      `UPDATE bake_proposal SET announced_at = ?
+      `UPDATE bake_proposal SET announced_at = ?, card_ts = ?
         WHERE organisation_id = ? AND proposal_id = ? AND announced_at IS NULL`,
     )
-    .bind(at, organisationId, proposalId)
+    .bind(at, cardTs, organisationId, proposalId)
     .run();
+}
+
+/** The Slack message of the proposal's card, or null with no card. */
+export async function readBakeProposalCardTs(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  proposalId: string,
+): Promise<string | null> {
+  const row = await db
+    .prepare(
+      `SELECT card_ts FROM bake_proposal
+        WHERE organisation_id = ? AND proposal_id = ?`,
+    )
+    .bind(organisationId, proposalId)
+    .first<{ card_ts: string | null }>();
+  return row?.card_ts ?? null;
 }

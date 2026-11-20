@@ -254,16 +254,13 @@ test and any fixture that exists only for the obsolete behavior.
   not move during the run; a viewer cannot record the check, and an
   operator's check raises the counter stock through Commerce and ends the
   proposal. A second dispatch with the same identity sends nothing, and a
-  second delivery on the wire makes no second move. A second journey has the
-  Portal chat agent read a run and pause it for the owner with an answering
-  gateway; a viewer has no chat and the Bakes page refuses the viewer's
-  pause. `e2e/bake-support.ts` holds the counter shop and the chat helpers of
-  the Plan 24 journeys. `e2e/bake-run-support.ts` holds the cobot kitchen of
+  second delivery on the wire makes no second move. `e2e/bake-support.ts`
+  holds the counter shop and the chat helpers of the Plan 24 journeys, and
+  `e2e/bake-slack-support.ts` their Slack cards and signed clicks. `e2e/bake-run-support.ts` holds the cobot kitchen of
   the bake run journeys: the counter, the controller simulator, the real
   gateway relay, the three confirmed devices, the kitchen's authority and the
-  level. The artifacts are `output/plan-24/bake-run-journey.json` and
-  `output/plan-24/bake-run-agent.json`. It needs the account Worker, `cargo`
-  and `MUJOCO_DIR`.
+  level. The artifact is `output/plan-24/bake-run-journey.json`. It needs the
+  account Worker, `cargo` and `MUJOCO_DIR`.
 - `e2e/bake-shadow.test.ts` is the exit journey of Plan 24 S5: a kitchen is
   in shadow mode until an admin changes it, and an operator and a viewer
   cannot. An approved proposal starts a shadow run. The controller simulator
@@ -273,6 +270,35 @@ test and any fixture that exists only for the obsolete behavior.
   pause, resume, stop or inquiry, the simulator starts no Platform task, and
   the counter stock does not change: a pause and a check are refused. The
   artifact is `output/plan-24/bake-shadow-journey.json`.
+- `e2e/bake-faults.test.ts` holds the fault cases of Plan 24 S6, one `it`
+  for each outcome, through the real relay and the controller simulator,
+  whose `state` counts every move: a duplicate delivery during a move, a
+  dropped gateway socket (the run holds, the next hello asks, a person
+  settles), stale data (a frozen cobot holds the run while the gateway still
+  sends its last clock), a revoke of a cobot (the run holds at once, the
+  cobot gets no task), a local emergency stop (a failed task cannot go on; a
+  person records where the mould group is and stops), two mould groups and
+  one oven door, and a move outside the plan that meets the run's move in the
+  door. Artifacts: `output/plan-24/bake-fault-*.json`.
+- `e2e/bake-pause.test.ts` follows a run's pause from the Portal, from the
+  Pause button of the run's Slack card (a viewer is refused) and from the
+  Portal chat agent, and the late unload: the over-bake risk on the Bakes page
+  and one message in the proposal's Slack thread. Only a person resumes.
+  Artifacts: `output/plan-24/bake-pause-slack.json`,
+  `output/plan-24/bake-pause-agent.json` and
+  `output/plan-24/bake-late-unload.json`.
+- `e2e/bake-approval-gate.test.ts` is the S6 exit check "no move without an
+  approval": an open, a rejected and an ended proposal dispatch nothing, from
+  the Portal, a replayed request, a viewer or a forged call to the device
+  fleet Actor. Artifact: `output/plan-24/bake-approval-gate.json`.
+- `e2e/bake-cafe-day.test.ts` is the exit gate of the Plan 24 simulation
+  phase: the declared café day `scripts/plan-24/cafe-day.json` runs two times
+  from empty stores, in approval mode, with one approval in the Portal and one
+  on a Slack card. The Portal read and the Slack record hold every proposal,
+  approval, dispatch, receipt and check, and the two days give the same
+  outcomes. Artifact: `output/plan-24/cafe-day.json`. Each S6 journey needs
+  the account Worker, `cargo` and `MUJOCO_DIR` (or
+  `PANTRY_COBOT_CONTROLLER_BINARY`).
 - `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an
   optional fixed clock and named seed scenarios at `/test-fixture`. The E2E

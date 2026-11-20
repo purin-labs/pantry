@@ -412,7 +412,11 @@ function runCommand(
       return {
         kind: "run_action",
         proposalId,
-        action: { kind: "settle", decision: input.decision },
+        action: {
+          kind: "settle",
+          decision: input.decision,
+          seen: input.seen ?? null,
+        },
         requester: { ...requester, via: "person" },
       };
     default:

@@ -1,7 +1,11 @@
 # Plan 24 — Cobot bakes in the first café kitchen
 
-Status: Rewritten on 3 November 2026 after a review with the owner. S1 to S3 are built on the
-branch `plan-24-simulation` (see "Steps done"); S4 to S6 follow.
+Status: Rewritten on 3 November 2026 after a review with the owner. S1 to S6 are built on the
+branch `plan-24-simulation` (see "Steps done"), not pushed and not released. The checks of the exit
+gate passed on 21 November 2026 in the simulation: `bake-cafe-day` (the café day two times, the same
+outcomes), the S6 fault journeys `bake-faults`, `bake-pause` and `bake-approval-gate`, and
+`bake-shadow`, `bake-run`, `bake-proposal` and `cobot-gateway`. The full E2E suite passed the same day
+(244 files, 475 tests). The owner decides which cobot to buy.
 The simulation phase comes first. The owner buys cobots only after its exit gate passes.
 Owner: CafeOS operations. Replaces the August version, which used a Japan-to-Singapore export
 order as its first path.
@@ -217,12 +221,54 @@ Each case is one E2E journey with its own outcome:
 Exit: no move without an approval, no duplicate move, and each uncertain outcome stops the next
 dispatch with one visible disposition.
 
+State (21 November 2026, branch `plan-24-s56`, not released): built.
+
+- Disposition: the run's hold is the one visible disposition, on the Bakes page and on the run's
+  Slack card. A person settles it with what they saw (`seen`: on the source shelf, on the tool, on
+  the destination shelf, or lost), and the run keeps each settlement. Settling never sends a move
+  again: a failed task cannot continue; the person says where the mould group is, and the run
+  stops. An unknown result continues only after the gateway gave the task's end.
+- Duplicate delivery: the device fleet Actor answers a known identity from its ledger, and the
+  gateway's journal answers a second `cobot_task` with `replayed`. One move for each task.
+- Gateway disconnect: a lost socket holds the run with `result_unknown`; the next hello asks
+  `cobot_inquire`; a person settles.
+- Stale data: the run counts silence from the last new line of each device, not from any signal,
+  so a frozen cobot holds the run with `evidence_lost` (30 s) while the gateway still sends its
+  last clock. An old line sent again is a duplicate and changes nothing.
+- Revoke: a revoke of a device on the Devices page tells the fleet Actor, and each run that
+  watches the device holds at once (`device_revoked`). The revoked device gets no task.
+- Pause: from the Portal, from the Pause button of the run's Slack card (same check, a viewer is
+  refused) and from the agent's `bake_run_pause`. Only a person resumes.
+- Emergency stop and door conflict: the controller's fault holds the run with the failed task.
+  The engine reserves the oven door, so Pantry sends a door move only after the receipt of the one
+  before; a move from outside the plan that meets the run's move in the door stops both cobots.
+- Late unload: the grace time is the recipe's `examine-bake` step, the person's look into the
+  oven between the bake and the unload (30 s for the financier; 60 s when a recipe has no such
+  step). When the bake ends and an unload does not start within the grace time, the run records
+  the over-bake risk once, shows it on the Bakes page and on the run's card, and posts one message
+  in the proposal's Slack thread. A paused or held run reads the device clocks from the gateway
+  each 10 s while its bake has ended and its unload has not started; then the alarm ends.
+- No move without an approval: the fleet Actor sends a new task only for a run that watches the
+  device, so a forged call or a call for a run that ended is refused, and nothing is written or
+  sent. An open or rejected proposal has no run to start.
+- Slack: the run posts its own card in the proposal's thread (`bake_proposal.card_ts`), and each
+  change of its state or hold updates it: each task with its dispatch and the controller's receipt,
+  the hold and each settlement. The proposal's card shows the end, with the check and its receipt.
+- Idle cost: an Organisation with no active run writes nothing more. The over-bake watch exists only
+  while a paused or held run waits for its unload, and it ends when the risk is recorded.
+- Patch: `services/platform/scripts/plan-24-run-card-d1-patch.sql`, after the S5 patch.
+
 ## Steps done
 
 | Step | What exists | Proof |
 | --- | --- | --- |
-| S4 | The bake run Durable Object on the server: start at approval, the dispatch ledger in the device fleet Actor, holds that a person settles, pause, stop, the check that raises the stock, one read for the drawer's canvas, timeline and positions, and two agent tools | `services/platform/tests/e2e/bake-run.test.ts` (artifacts `output/plan-24/bake-run-journey.json`, `output/plan-24/bake-run-agent.json`) |
+| S1 | Stock levels for each fresh product, set by an admin; one bake proposal on a Case when a café sale takes the counter stock below the level, and one that waits while another is open; approval or rejection with a reason in the Portal and on one Slack card; the Bakes page; agent tools that read and propose | `services/platform/tests/e2e/bake-proposal.test.ts` (artifacts `output/plan-24/bake-proposal-slack.json`, `bake-proposal-agent.json`) |
+| S2 | `cobot-controller`, the controller simulator of `bakery-native` (`crates/bakery-native/controller/`): two FR10 arms and the oven on localhost, task times from the FR10 physics cases, and the four faults | `scripts/plan-24/controller-journey.mjs` (artifact `output/plan-24/controller-journey.json`) |
+| S3 | The typed `cobot` adapter of `crates/shop-gateway` with its journal, `status` after a reconnect, receipts for pause, resume and stop, the `relay` session, and the cobot messages in `packages/control-api` | `services/platform/tests/e2e/cobot-gateway.test.ts` (artifact `output/plan-24/cobot-gateway-journey.json`) |
+| S4 (engine) | The physical execution adapter of the engine (`@purin-labs/production-simulation/physical`): the bake run scenario, the cobot assignment by the engine, the host loop that advances only on receipts and device clocks, the observed read and the shadow correlation | `scripts/plan-24/physical-run-journey.mjs` (artifact `output/plan-24/physical-run-journey.json`) |
+| S4 | The bake run Durable Object on the server: start at approval, the dispatch ledger in the device fleet Actor, holds that a person settles, pause, stop, the check that raises the stock, one read for the drawer's canvas, timeline and positions, and two agent tools | `services/platform/tests/e2e/bake-run.test.ts` (artifact `output/plan-24/bake-run-journey.json`; the agent's read and pause moved to `bake-pause.test.ts` in S6, with the real gateway) |
 | S5 | Shadow mode: the authority of each kitchen location, a shadow run that matches each observed move to its planned task, zero commands and zero stock changes | `services/platform/tests/e2e/bake-shadow.test.ts` (artifact `output/plan-24/bake-shadow-journey.json`) |
+| S6 | Approval mode and faults: one hold for each uncertain outcome, settled with what a person saw; the revoke signal; stale data from a frozen cobot; the Slack run card with Pause; the over-bake risk from the recipe's grace time; no new dispatch for a run that does not watch the device. Exit gate: the declared café day two times | `services/platform/tests/e2e/bake-faults.test.ts`, `bake-pause.test.ts`, `bake-approval-gate.test.ts`, `bake-cafe-day.test.ts` (artifacts `output/plan-24/bake-fault-*.json`, `bake-pause-*.json`, `bake-late-unload.json`, `bake-approval-gate.json`, `cafe-day.json`) |
 
 ## Exit gate of the simulation phase
 

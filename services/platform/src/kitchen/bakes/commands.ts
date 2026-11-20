@@ -1,3 +1,4 @@
+import type { BakeRunSeen } from "@purin-labs/kitchen-control-api";
 import { machineTransition } from "@purin-labs/std/state-machine";
 import type { Variant } from "@purin-labs/type-utils";
 import { deriveStableCaseId } from "../../case-identity";
@@ -75,7 +76,12 @@ export type BakeKitchenPorts = Readonly<{
 
 export type BakeRunAction =
   | Readonly<{ kind: "pause" | "resume" | "stop" }>
-  | Readonly<{ kind: "settle"; decision: "continue" | "stop" }>;
+  | Readonly<{
+      kind: "settle";
+      decision: "continue" | "stop";
+      /** Where the person saw the mould group of the held task. */
+      seen: BakeRunSeen | null;
+    }>;
 
 export type BakeMemberRole = BakeDeciderRole | "viewer";
 
@@ -122,6 +128,8 @@ export type BakeCommand =
       /** A pause from a person or from the agent for the person who asked. */
       kind: "run_action";
       proposalId: string;
+      /** The Case of the run card's thread, for a pause from Slack. */
+      caseId?: string;
       action: BakeRunAction;
       requester: Readonly<{
         userId: string;
@@ -683,6 +691,11 @@ async function controlBakeRun(
     command.proposalId,
   );
   if (!proposal.ok) return proposal;
+  if (command.caseId !== undefined && command.caseId !== proposal.value.caseId)
+    return refuse(
+      "bake_proposal_missing",
+      "This bake proposal does not exist.",
+    );
   const run = await readBakeRun(
     db,
     organisationId,
@@ -778,7 +791,7 @@ async function checkBakeRun(
     db,
     organisationId,
     proposal.value.proposalId,
-    `Checked: ${command.goodPieces} good pieces reached the counter.`,
+    `Checked: ${command.goodPieces} good pieces reached the counter (receipt ${raised.value.receiptId}).`,
     ports,
     now,
   );

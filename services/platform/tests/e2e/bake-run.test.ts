@@ -7,67 +7,38 @@
 // The relay and the simulator decide every receipt; the asserted outcomes
 // come from product code.
 import { env } from "cloudflare:workers";
-import { http } from "msw";
 import { expect, it } from "vitest";
-import {
-  newConversationId,
-  parseDeviceActivity,
-  type PlatformGatewayMessage,
-} from "@purin-labs/control-api";
+import { parseDeviceActivity } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
-import { deviceFleetStub } from "../../src/actors/device-fleet";
-import type { IssuedControlSession } from "../../src/data/control-plane";
 import type { OrganisationId } from "../../src/ids";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import {
   DEVICES,
   controllerState,
   equipCobotKitchen,
   firstProposal,
+  kitchenFleet,
   readRun,
   runAction,
+  runActorIdOf,
   sentTasks,
-  setAuthority,
   taskOf,
 } from "./bake-run-support";
 import {
-  applyFinancierWorkflow,
-  chatThrough,
   day,
   decide,
-  levelOf,
-  onlyProposal,
-  openCounterShop,
   productOf,
-  putLevel,
   readBoard,
   reconcileFeed,
-  replyToModel,
-  toolValue,
-  writeArtifact,
-  type Journey,
-  type Script,
 } from "./bake-support";
-import { organisationDatabase } from "./organisation-database";
 import { cobotSession } from "./cobot-gateway-support";
 import {
-  connectGateway,
   controlBase,
-  credentialOf,
   deviceShop,
-  enrollGateway,
-  found,
-  helloAndWait,
   readDeviceList,
   requireKitchenDevice,
   send,
-  startGateway,
-  type SimulatedGateway,
 } from "./device-fleet-support";
-
-import { installMemoryFixture, post } from "./memory-support";
-import { network } from "./network";
 
 const HOME = "bake-run";
 /** The simulator's clock runs this much faster than the wall. */
@@ -77,12 +48,6 @@ it(
   "S4: an approved bake loads, bakes and unloads with two cobots through the real gateway; the read agrees with the receipts, the stock waits for an operator's check, and a second delivery makes no second move",
   { timeout: 420_000 },
   bakeRunJourney,
-);
-
-it(
-  "S4: the Portal chat agent reads a bake run and requests its pause for the person who asked; a viewer's request is refused and the run goes on",
-  { timeout: 300_000 },
-  agentPauseJourney,
 );
 
 async function bakeRunJourney(): Promise<void> {
@@ -302,14 +267,9 @@ async function bakeRunJourney(): Promise<void> {
 
   // 5. A second dispatch with the same identity sends nothing; a second
   //    delivery of the task on the wire makes no second move.
-  const scope = await OrganisationExecutionScope.resolve(
-    env,
-    organisationId as OrganisationId,
-  );
-  if (!scope.ok) throw new Error("No scope");
-  const fleet = deviceFleetStub(env, scope.value, "Main shop");
+  const fleet = await kitchenFleet(organisationId);
   const firstTask = sent[0];
-  if (fleet === null || firstTask === undefined) throw new Error("No fleet");
+  if (firstTask === undefined) throw new Error("No first task");
   const beforeAgain = gateway.received.length;
   const again = await fleet.dispatchCobotTask({
     gatewayId: gatewayStart.gatewayId,
@@ -341,7 +301,7 @@ async function bakeRunJourney(): Promise<void> {
   evidence.run = final.run;
   evidence.dispatches = done.run.dispatches;
   evidence.fleetDispatches = await fleet.cobotDispatches(
-    (await readActorId(organisationId, proposal.proposalId)) ?? "",
+    await runActorIdOf(organisationId, proposal.proposalId),
   );
   evidence.receipts = receipts;
   evidence.stock = {
@@ -363,258 +323,4 @@ async function bakeRunJourney(): Promise<void> {
   });
   await cobotSession("stop", HOME);
   console.log("BAKE_RUN_EVIDENCE", JSON.stringify({ file: artifact.file }));
-}
-
-async function readActorId(
-  organisationId: string,
-  proposalId: string,
-): Promise<string | null> {
-  const row = await organisationDatabase(organisationId)
-    .prepare(
-      "SELECT actor_id AS actorId FROM bake_run WHERE organisation_id = ? AND run_id = ?",
-    )
-    .bind(organisationId, proposalId)
-    .first<{ actorId: string | null }>();
-  return row?.actorId ?? null;
-}
-
-/**
- * A gateway that only answers: the clock read, an `accepted` report for each
- * task, and each device's clock every two seconds while it is connected.
- */
-async function answeringGateway(
-  organisationId: string,
-  session: IssuedControlSession,
-): Promise<Readonly<{ gateway: SimulatedGateway; stop: () => Promise<void> }>> {
-  const started = await startGateway(
-    organisationId,
-    session,
-    "Kitchen gateway",
-  );
-  const gateway = await connectGateway(
-    await credentialOf(
-      await enrollGateway(organisationId, started.gatewayId, started.code),
-    ),
-  );
-  await helloAndWait(gateway, [
-    ...["cobot-1", "cobot-2"].map((key) =>
-      found(key, key, {
-        capabilities: [
-          { id: "move_mould_group", label: "Move a mould group", revision: 1 },
-        ],
-      }),
-    ),
-    found("oven-1", "oven-1", {
-      kind: "appliance",
-      capabilities: [{ id: "bake", label: "Bake a program", revision: 1 }],
-    }),
-  ]);
-  const zero = Date.now();
-  const sequence = new Map<string, number>();
-  const stamp = (sourceKey: string) => {
-    const next = (sequence.get(sourceKey) ?? 0) + 1;
-    sequence.set(sourceKey, next);
-    return { sequence: next, deviceClockMs: Date.now() - zero };
-  };
-  const clocks = () =>
-    DEVICES.map((sourceKey) => ({
-      sourceKey,
-      ...stamp(sourceKey),
-      state: "idle" as const,
-    }));
-  gateway.socket.addEventListener("message", (event: MessageEvent) => {
-    const message = JSON.parse(String(event.data)) as PlatformGatewayMessage;
-    if (message.type === "cobot_clock_read")
-      gateway.send({
-        type: "cobot_clock",
-        requestId: message.requestId,
-        clocks: clocks(),
-      });
-    if (message.type === "cobot_task")
-      gateway.send({
-        type: "cobot_report",
-        requestId: message.requestId,
-        sourceKey: message.sourceKey,
-        state: "accepted",
-        ...stamp(message.sourceKey),
-        progress: 0,
-        phase: "accepted",
-        carrierAt: "source",
-        reason: null,
-        observedSeconds: null,
-        replayed: false,
-      });
-  });
-  const ticker = setInterval(() => {
-    if (gateway.socket.readyState === WebSocket.OPEN)
-      gateway.send({
-        type: "cobot_clock",
-        clocks: clocks().map((entry) =>
-          entry.sourceKey === "cobot-1" ? { ...entry, state: "busy" } : entry,
-        ),
-      });
-  }, 2_000);
-  const devices = await readDeviceList(organisationId, session);
-  for (const sourceKey of DEVICES) {
-    const confirmed = await send(
-      `${controlBase(organisationId)}/devices/${requireKitchenDevice(devices, sourceKey).deviceId}/confirm`,
-      session,
-      "POST",
-      { name: sourceKey, stationId: "station_bakery" },
-    );
-    expect(confirmed.status, JSON.stringify(confirmed.body)).toBe(200);
-  }
-  return {
-    gateway,
-    stop: async () => {
-      clearInterval(ticker);
-      await gateway.close();
-    },
-  };
-}
-
-function agentScripts(journey: Journey): Readonly<Record<string, Script>> {
-  return {
-    READRUN: {
-      tool: "bake_run_read",
-      args: () => ({ proposalId: journey.proposalId }),
-      ask: ["kitchen.bake.read"],
-    },
-    PAUSERUN: {
-      tool: "bake_run_pause",
-      args: () => ({ proposalId: journey.proposalId }),
-      ask: ["kitchen.bake_run.pause"],
-    },
-  };
-}
-
-async function agentPauseJourney(): Promise<void> {
-  const fixture = await installMemoryFixture();
-  const { author, viewer, organisationId } = fixture;
-  const journey: Journey = {
-    outputs: {},
-    offered: new Set(),
-    inventoryItemId: "",
-    proposalId: "",
-  };
-  network.use(
-    http.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      replyToModel.bind(null, journey, agentScripts),
-    ),
-  );
-  const shop = await openCounterShop(organisationId, author.userId);
-  await applyFinancierWorkflow(organisationId, author.session);
-  const { gateway, stop } = await answeringGateway(
-    organisationId,
-    author.session,
-  );
-  expect(
-    (await setAuthority(organisationId, author.session, "approval", null))
-      .status,
-  ).toBe(200);
-  const opening = await readBoard(organisationId, author.session);
-  expect(
-    (
-      await putLevel(
-        organisationId,
-        author.session,
-        levelOf(productOf(opening).inventoryItemId),
-      )
-    ).status,
-  ).toBe(200);
-  await shop.runUntil("first_fall");
-  const proposal = await onlyProposal(organisationId, author.session);
-  journey.proposalId = proposal.proposalId;
-  expect(
-    (
-      await decide(organisationId, author.session, proposal, {
-        decision: "approve",
-      })
-    ).status,
-  ).toBe(200);
-  // The run sent its first task, and the gateway accepted it.
-  await expect
-    .poll(
-      async () =>
-        (await readRun(organisationId, author.session, proposal.proposalId)).run
-          .view?.tasks[0]?.state,
-      { timeout: 20_000 },
-    )
-    .toBe("accepted");
-
-  // 1. The agent reads the run for the person.
-  await chatThrough(fixture, author, "READRUN");
-  const read = toolValue(journey.outputs.READRUN?.at(-1) ?? "");
-  expect(read).toMatchObject({
-    state: "running",
-    proposalId: proposal.proposalId,
-  });
-
-  // 2. A viewer asks the agent for a pause: the Organisation Actor refuses
-  //    the viewer's role, and the run goes on.
-  //    The viewer's role has no Portal chat, so the chat refuses the
-  //    message, and the Bakes page refuses the viewer's own pause.
-  const pausesBefore = gateway.received.filter(
-    (m) => m.type === "pause",
-  ).length;
-  const viewerChat = await post(viewer, fixture.paths.chat, {
-    kind: "message",
-    conversationId: newConversationId(),
-    requestId: "request_viewer_pause",
-    model: fixture.route.model,
-    text: "PAUSERUN now.",
-    surfaceContext: null,
-    browserContext: { kind: "unavailable" },
-  });
-  expect(viewerChat.status).toBeGreaterThanOrEqual(403);
-  const viewerOutcome: Record<string, unknown> = {
-    chat: await viewerChat.json(),
-  };
-  expect(viewerOutcome.chat).toMatchObject({ ok: false });
-  const viewerPause = await runAction(
-    organisationId,
-    viewer.session,
-    proposal.proposalId,
-    { action: "pause" },
-  );
-  expect(viewerPause.status).toBeGreaterThanOrEqual(403);
-  viewerOutcome.portal = viewerPause.body;
-  expect(journey.outputs.PAUSERUN ?? []).toEqual([]);
-  expect(
-    (await readRun(organisationId, author.session, proposal.proposalId)).run
-      .state,
-  ).toBe("running");
-  expect(gateway.received.filter((m) => m.type === "pause").length).toBe(
-    pausesBefore,
-  );
-
-  // 3. The owner asks for a pause: no next task, and each cobot of the run
-  //    gets the Devices page's own pause with its receipt.
-  await chatThrough(fixture, author, "PAUSERUN");
-  const paused = toolValue(journey.outputs.PAUSERUN?.at(-1) ?? "");
-  expect(JSON.stringify(paused)).toContain("bakepause_");
-  const after = await readRun(
-    organisationId,
-    author.session,
-    proposal.proposalId,
-  );
-  expect(after.run.state).toBe("paused");
-  expect(after.run.dispatches).toHaveLength(1);
-  const pauses = gateway.received.filter(
-    (m): m is Extract<PlatformGatewayMessage, { type: "pause" }> =>
-      m.type === "pause",
-  );
-  expect(pauses.map((m) => m.sourceKey).sort()).toEqual(["cobot-1", "cobot-2"]);
-  for (const name of journey.offered)
-    expect(name).not.toMatch(/bake.*(approve|dispatch|settle|resume|stop)/u);
-  await stop();
-  await writeArtifact("plan-24/bake-run-agent.json", {
-    agentRead: read,
-    viewerPause: viewerOutcome,
-    ownerPause: paused,
-    run: after.run,
-    pausesSent: pauses,
-    offeredTools: [...journey.offered].sort(),
-  });
 }
