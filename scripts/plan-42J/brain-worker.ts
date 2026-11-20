@@ -33,10 +33,12 @@ import {
 import { publishContactVerification } from "../../services/platform/src/data/contact-verification";
 import {
   assignAgentMailbox,
-  gmailConnectorId,
   publishMailboxIngressPolicy,
   registerEmailMailboxAccount,
 } from "../../services/platform/src/data/email-mailbox";
+import {
+  gmailConnectorId,
+} from "../../services/platform/src/mail-inbox/contract/connector-ids";
 import { registerOperationalEmailContact } from "../../services/platform/src/data/email-operational";
 import { createActiveConnectedIntegration } from "../../services/platform/src/data/integration-account";
 import type { Env } from "../../services/platform/src/env";

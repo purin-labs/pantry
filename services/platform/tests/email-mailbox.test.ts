@@ -9,7 +9,6 @@ import {
   assignAgentMailbox,
   bindEmailMessageReceiptContact,
   emailMessageReceiptMatches,
-  gmailConnectorIdValue,
   parseMailboxIngressPolicyPublishRequest,
   publishMailboxIngressPolicy,
   readAgentMailboxBinding,
@@ -20,6 +19,9 @@ import {
   recordEmailThreadCase,
   registerEmailMailboxAccount,
 } from "../src/data/email-mailbox";
+import {
+  gmailConnectorIdValue,
+} from "../src/mail-inbox/contract/connector-ids";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

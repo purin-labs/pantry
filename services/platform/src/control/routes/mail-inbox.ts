@@ -1,10 +1,9 @@
 import { runtimeFetch } from "../../runtime-fetch";
 import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
-import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   authorizeMailSource,
   mailboxAwaitsReconnect,
-} from "../../mail-inbox/authorization";
+} from "../../mail-inbox/contract/mail-source-authorization";
 import { readMailThreadWork, readMailThreadReply } from "../../mail-inbox/work";
 import {
   parseMailInboxCommand,
@@ -15,25 +14,23 @@ import {
   type MailOrganizationView,
   parseMailOrganizationView,
 } from "@purin-labs/control-api";
-import { readActiveOrganisationMembershipRevision } from "../../data/control-plane";
 import { listIntegrationAccounts } from "../../data/integration-account";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
 import { resolveActiveConnectorActor } from "../../actors/actor-router";
-import { gmailConnectorId } from "../../data/email-mailbox";
+import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import type { Env } from "../../env";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type OrganisationId,
 } from "../../ids";
-import { buildControlAuthority } from "../../request-authority";
+import { mailControlAuthority } from "../../mail-inbox/contract/control-authority";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import { openMailInboxCursor, sealMailInboxCursor } from "../mail-inbox-cursor";
-import type { Variant } from "@purin-labs/type-utils";
 
 export type MailInboxRoute = Readonly<{
   kind: "mailInbox";
@@ -346,19 +343,3 @@ async function listMailboxes(
   return controlJson({ kind: "accounts", accounts } satisfies MailInboxResult);
 }
 
-export async function mailControlAuthority(
-  authorized: AuthorizedOrganisationRequest,
-): Promise<Variant<RequestAuthority, "control"> | null> {
-  const membershipRevision = await readActiveOrganisationMembershipRevision({
-    db: authorized.executionScope.database,
-    organisationId: authorized.organisationId,
-  });
-  if (membershipRevision === null) return null;
-  return buildControlAuthority({
-    organisationId: authorized.organisationId,
-    requesterPersonId: authorized.membership.personId,
-    userId: authorized.authenticated.session.userId,
-    membershipRevision,
-    role: authorized.membership.role,
-  }).requestAuthority;
-}

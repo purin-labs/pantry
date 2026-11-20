@@ -68,7 +68,13 @@
     "apps/portal/src/features/integrations/connection-dialog.tsx",
     "apps/portal/src/features/integrations/custom-connector-api.ts",
     "apps/portal/src/features/jev-features/api.ts",
-    "apps/portal/src/features/jev-features/paid-use.tsx"
+    "apps/portal/src/features/jev-features/paid-use.tsx",
+    "services/platform/src/mail-inbox/contract/",
+    "apps/portal/src/pages/agent-mailbox.ts",
+    "apps/portal/src/whatsapp.ts",
+    "apps/portal/src/features/email-review/api.ts",
+    "apps/portal/src/features/email-review/review.tsx",
+    "apps/portal/src/features/mail-setup/"
   ],
   "mixed": {
     "services/platform/src/agent-tools/registry.ts": "The one list of the agent tools. It imports each family, so it is a part of the Worker. The class SessionDO gives it to the Session (step A1.7).",
@@ -508,7 +514,7 @@
     "apps/portal/src/pages/agent-templates.ts": "areas/organisation",
     "apps/portal/src/pages/automation.tsx": "areas/organisation",
     "apps/portal/src/pages/integration-support-toast.ts": "areas/integrations",
-    "apps/portal/src/pages/whatsapp.tsx": "areas/inbox",
+    "apps/portal/src/pages/whatsapp.tsx": "areas/integrations",
     "apps/portal/src/pages/workspaces.tsx": "areas/organisation",
     "apps/portal/src/portal-commerce-approval.ts": "areas/commerce",
     "apps/portal/src/provider-onboarding.tsx": "areas/integrations",
@@ -991,7 +997,6 @@
     "services/platform/src/data/email-self-test.ts": "areas/inbox",
     "services/platform/src/data/export-preset.ts": "areas/commerce",
     "services/platform/src/data/first-operational-task.ts": "areas/organisation",
-    "services/platform/src/data/gmail-inference-eligibility.ts": "areas/inbox",
     "services/platform/src/data/held-output-context.ts": "foundation/authority",
     "services/platform/src/data/held-output-request.ts": "foundation/authority",
     "services/platform/src/data/identity-link.ts": "foundation/tenancy",

@@ -30,7 +30,7 @@ import {
   readAgentMailboxBinding,
   readEmailMailboxAccount,
 } from "../data/email-mailbox";
-import { readGmailInferenceEligibility } from "../data/gmail-inference-eligibility";
+import { readGmailInferenceEligibility } from "./contract/gmail-inference-eligibility";
 import type { Env } from "../env";
 import type { IntegrationAccountId } from "../ids";
 import { resolveOrganisationModelRoute } from "../models/route";

@@ -42,7 +42,7 @@ import {
 } from "../data/whatsapp";
 import type { Env, ConnectorActorStub } from "../env";
 import { permissionRequiredResponse } from "../control/permission-required";
-import { mailControlAuthority } from "../control/routes/mail-inbox";
+import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
 import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,

@@ -10,9 +10,9 @@ import {
 } from "../actors/actor-router";
 import {
   readEmailThreadCase,
-  gmailConnectorId,
   readEmailReplyProposalProjection,
 } from "../data/email-mailbox";
+import { gmailConnectorId } from "./contract/connector-ids";
 import type { Env } from "../env";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";

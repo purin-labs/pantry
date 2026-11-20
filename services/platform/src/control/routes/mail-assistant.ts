@@ -9,9 +9,11 @@ import {
 } from "../../ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
-import { mailControlAuthority } from "./mail-inbox";
-import { authorizeMailSource } from "../../mail-inbox/authorization";
-import { gmailConnectorId } from "../../data/email-mailbox";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
+import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
+import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import { resolveActiveConnectorActor } from "../../actors/actor-router";
 
 export type MailAssistantRoute = Readonly<{

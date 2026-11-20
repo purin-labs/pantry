@@ -2,25 +2,25 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
-import { parseOrganisationId, type IntegrationAccountId } from "../ids";
-import type { FlowLabel } from "../policy/information-flow/labels";
-import { digestCanonical } from "../policy/information-flow/digest";
-import { selectActiveGrants } from "../authorization/access-grants/compiler";
+} from "../../organisation-execution-scope";
+import { parseOrganisationId, type IntegrationAccountId } from "../../ids";
+import type { FlowLabel } from "../../policy/information-flow/labels";
+import { digestCanonical } from "../../policy/information-flow/digest";
+import { selectActiveGrants } from "../../authorization/access-grants/compiler";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
-} from "../authorization/capability-catalogue";
-import { listAccessGrants } from "../data/access-grants";
+} from "../../authorization/capability-catalogue";
+import { listAccessGrants } from "../../data/access-grants";
 import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,
   resolveProviderConnection,
-} from "../data/integration-account";
-import type { OrganisationDatabase } from "../database-handles";
-import { validateNativeRequestAuthority } from "../request-authority";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
-import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";
+} from "../../data/integration-account";
+import type { OrganisationDatabase } from "../../database-handles";
+import { validateNativeRequestAuthority } from "../../request-authority";
+import { readCurrentOrganisationPolicySnapshot } from "../../policy-snapshot";
+import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
 export async function authorizeMailSource(
   env: OrganisationPlacementBindings,

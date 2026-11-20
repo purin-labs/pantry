@@ -1,12 +1,12 @@
 {
   "totals": {
     "upward": 144,
-    "areas": 124,
+    "areas": 99,
     "order": 103,
     "table": 117
   },
   "crossings": {
-    "areas/brain -> areas/inbox": 10,
+    "areas/brain -> areas/inbox": 7,
     "areas/brain -> surfaces/email": 2,
     "areas/brain -> surfaces/slack": 1,
     "areas/brain -> surfaces/whatsapp": 2,
@@ -16,7 +16,6 @@
     "areas/cafe -> areas/kitchen": 4,
     "areas/cafe -> surfaces/portal": 5,
     "areas/commerce -> areas/cafe": 7,
-    "areas/commerce -> areas/inbox": 1,
     "areas/commerce -> areas/kitchen": 10,
     "areas/commerce -> areas/organisation": 12,
     "areas/commerce -> areas/shopify": 1,
@@ -25,7 +24,6 @@
     "areas/commerce -> surfaces/webhooks": 1,
     "areas/commerce -> workers/platform": 1,
     "areas/devices -> areas/cafe": 4,
-    "areas/devices -> areas/inbox": 1,
     "areas/devices -> surfaces/slack": 1,
     "areas/devices -> surfaces/voice": 2,
     "areas/inbox -> areas/brain": 10,
@@ -36,7 +34,7 @@
     "areas/inbox -> surfaces/slack": 2,
     "areas/inbox -> surfaces/whatsapp": 6,
     "areas/integrations -> areas/commerce": 1,
-    "areas/integrations -> areas/inbox": 25,
+    "areas/integrations -> areas/inbox": 5,
     "areas/integrations -> areas/organisation": 3,
     "areas/integrations -> areas/shopify": 4,
     "areas/integrations -> surfaces/email": 1,

@@ -10,7 +10,7 @@ import {
 } from "../../data/contact-verification";
 import type { Result } from "../../result";
 import { readCaseContextDiscoveryPolicy } from "../../case-context-discovery/evaluation-store";
-import { gmailConnectorId } from "../../data/email-mailbox";
+import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import { resolveActiveConnectorActor } from "../actor-router";
 import {
   decideCaseContextCollectionRelationship,

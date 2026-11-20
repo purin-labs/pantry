@@ -49,7 +49,7 @@ import {
 import type { EmailChangeQueueMessage } from "../mail/queue-messages";
 import type { IngressQueueMessageError } from "../queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
-import { gmailConnectorIdValue } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import {
   parseConnectorId,
   type RequestId,

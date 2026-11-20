@@ -39,8 +39,8 @@ import {
   publishMailboxIngressPolicy,
   recordEmailMessageReceipt,
   bindEmailMessageReceiptContact,
-  gmailConnectorId,
 } from "../../src/data/email-mailbox";
+import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import {
   applyAgentOperation,
   type AgentOperationCommand,

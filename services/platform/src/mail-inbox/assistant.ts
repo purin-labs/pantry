@@ -24,10 +24,8 @@ import {
   type PinnedSessionPolicy,
 } from "../policy-snapshot";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import {
-  readMailboxIngressPolicy,
-  gmailConnectorIdValue,
-} from "../data/email-mailbox";
+import { readMailboxIngressPolicy } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "./contract/connector-ids";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,

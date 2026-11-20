@@ -144,7 +144,7 @@ import {
   type EmailThreadTurnInput,
 } from "../../src/actors/email-case-processing";
 import { resolveCaseTurnAgentProfile } from "../../src/data/pinned-agent-profile";
-import { authorizeMailSource } from "../../src/mail-inbox/authorization";
+import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
 import { buildControlAuthority } from "../../src/request-authority";
 import { readActiveOrganisationMembershipRevision } from "../../src/data/control-plane";
 import {
@@ -212,10 +212,8 @@ import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
 } from "../../src/actors/actor-router";
-import {
-  gmailConnectorId,
-  registerEmailMailboxAccount,
-} from "../../src/data/email-mailbox";
+import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
+import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import { resolveActiveProviderAccountContext } from "../../src/data/integration-account";
 import { digestCanonical } from "../../src/policy/information-flow/digest";
 import {

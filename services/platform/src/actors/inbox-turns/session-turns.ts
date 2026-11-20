@@ -40,7 +40,7 @@ import {
   parseCaseContextCollectionEvidenceDependency,
   caseContextCollectionEvidenceDependency,
 } from "../../case-context-discovery/evidence";
-import { readGmailInferenceEligibility } from "../../data/gmail-inference-eligibility";
+import { readGmailInferenceEligibility } from "../../mail-inbox/contract/gmail-inference-eligibility";
 import { runTransientTurn } from "../transient-turn";
 import { createWhatsAppHarnessToolHost } from "../whatsapp-harness-tools";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";

@@ -37,8 +37,10 @@ import {
   readBoundedJsonRecord,
   readJsonRecord,
 } from "../http";
-import { authorizeMailSource } from "../../mail-inbox/authorization";
-import { mailControlAuthority } from "./mail-inbox";
+import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
 
 /**

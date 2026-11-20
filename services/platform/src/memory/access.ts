@@ -36,7 +36,7 @@ import type {
   TurnMemoryReader,
   TurnMemoryReadRequest,
 } from "../context/assembly";
-import { gmailConnectorId } from "../data/email-mailbox";
+import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env, CaseActorStub, OrganisationActorStub } from "../env";
 import {
   parseCaseId,

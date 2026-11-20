@@ -1,6 +1,6 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Env } from "../env";
-import { gmailConnectorIdValue } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import {
   newRequestId,

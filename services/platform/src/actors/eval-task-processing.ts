@@ -20,7 +20,7 @@ import {
 } from "../context/turn-context";
 import { readContactVerificationStanding } from "../data/contact-verification";
 import { readAgentMailboxBinding } from "../data/email-mailbox";
-import { readGmailInferenceEligibility } from "../data/gmail-inference-eligibility";
+import { readGmailInferenceEligibility } from "../mail-inbox/contract/gmail-inference-eligibility";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import {
   composeAgentInstructions,

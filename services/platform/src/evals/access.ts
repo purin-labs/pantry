@@ -21,7 +21,7 @@ import {
 } from "../actors/actor-router";
 import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
 import { listVerifiedContactEndpoints } from "../data/contact-verification";
-import { gmailConnectorId } from "../data/email-mailbox";
+import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env, OrganisationActorStub } from "../env";
 import { parseIntegrationAccountId, type OrganisationId } from "../ids";
 import {

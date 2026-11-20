@@ -1,9 +1,9 @@
-import type { OrganisationDatabase } from "../database-handles";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
+import type { OrganisationDatabase } from "../../database-handles";
+import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import {
   typeSafeAuthorityRevision,
   type TypeSafeAuthority,
-} from "../integrations/typesafe/authority";
+} from "../../integrations/typesafe/authority";
 
 export async function mailInferenceEligible(
   input: Readonly<{

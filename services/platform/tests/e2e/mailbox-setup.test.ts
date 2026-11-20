@@ -18,7 +18,7 @@ import {
   readActiveOrganisationMembershipRevision,
 } from "../../src/data/control-plane";
 import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
-import { authorizeMailSource } from "../../src/mail-inbox/authorization";
+import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
 import { resolveOrganisationModelRoute } from "../../src/models/route";
 import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
 import {

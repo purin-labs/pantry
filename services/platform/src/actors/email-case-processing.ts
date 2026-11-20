@@ -98,7 +98,7 @@ import {
   type PinnedSessionPolicy,
 } from "../policy-snapshot";
 import { resolveOrganisationModelRoute } from "../models/route";
-import { readGmailInferenceEligibility } from "../data/gmail-inference-eligibility";
+import { readGmailInferenceEligibility } from "../mail-inbox/contract/gmail-inference-eligibility";
 import {
   BACKGROUND_MEMORY_DEADLINE_MS,
   prepareTurnAuthority,

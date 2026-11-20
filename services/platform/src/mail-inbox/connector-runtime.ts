@@ -19,8 +19,8 @@ import {
 import type { GmailHistoryMessage } from "../mail/gmail-adapter";
 import type { Env } from "../env";
 import { digestCanonical } from "../policy/information-flow/digest";
-import { authorizeMailSource } from "./authorization";
-import { mailInferenceEligible } from "./eligibility";
+import { authorizeMailSource } from "./contract/mail-source-authorization";
+import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import type { MailOrganizationHead, MailWork } from "./types";
 import {
   claimMailWork,

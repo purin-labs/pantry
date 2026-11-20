@@ -1,6 +1,8 @@
 import { currentGrantedCapabilityIds } from "../../authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { mailControlAuthority } from "./mail-inbox";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
 import {
   parseDeviceAlertSetting,
   parseDeviceStationId,
