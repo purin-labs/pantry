@@ -5,7 +5,7 @@ import {
   isRecord,
   sameJson,
 } from "@purin-labs/std";
-import type { CommerceEntityRef } from "@purin-labs/contracts";
+import type { CommerceEntityRef } from "@purin-labs/commerce-contracts";
 
 /** One exact Memory revision. Turns, evals and receipts cite this pair. */
 export type MemoryRevisionRef = Readonly<{

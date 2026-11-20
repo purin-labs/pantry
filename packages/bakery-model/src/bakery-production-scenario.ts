@@ -20,7 +20,7 @@ import {
   parsePersistentCell,
   type PersistentOvenCell,
 } from "./bakery-physics.ts";
-import { isCustomCommerceEntity } from "@purin-labs/contracts";
+import { isCustomCommerceEntity } from "@purin-labs/commerce-contracts";
 
 const validated: unique symbol = Symbol("validated bakery production scenario");
 
@@ -401,7 +401,7 @@ function text(value: unknown, length: number): value is string {
 import type {
   CommerceGraphQueryResult,
   CustomCommerceEntity,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   canonicalJson,
   hasExactKeys,

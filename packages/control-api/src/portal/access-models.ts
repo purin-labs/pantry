@@ -8,11 +8,11 @@ import type {
   CapabilityMode,
   CapabilityPolicyProvenance,
   CapabilityRef,
-  CommerceEntityTypeId,
   FileContextProvider,
   FileResourceScope,
   OnboardingControlRole,
 } from "@purin-labs/contracts";
+import type { CommerceEntityTypeId } from "@purin-labs/commerce-contracts";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import type { ControlErrorKind } from "./errors.ts";
 import type {

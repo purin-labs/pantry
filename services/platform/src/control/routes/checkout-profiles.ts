@@ -2,7 +2,7 @@ import {
   parseCheckoutProfileConfiguration,
   type CheckoutProfile,
   type CheckoutProfileConfiguration,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   type CommerceActiveCheckoutProfileV1,
   type CommerceAdminClient,

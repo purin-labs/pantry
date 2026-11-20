@@ -1,7 +1,7 @@
 import { isRecord } from "@purin-labs/std";
 import { parseMutationResult } from "@purin-labs/commerce-client";
 import React from "react";
-import type { RecipeRevision } from "@purin-labs/contracts";
+import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import {
   parseInventoryQuantityText,
   parseRecipeCollection,

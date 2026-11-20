@@ -4,7 +4,7 @@ import type {
   CommerceListEntryRef,
   CommerceRelationshipRef,
   PublishedCommerceSelector,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceEntityPlaneCommand,
   parseCommerceGraphQuery,

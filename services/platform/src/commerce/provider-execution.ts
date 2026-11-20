@@ -7,7 +7,7 @@ import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
 import type {
   CanonicalCommerceDelivery,
   CommerceProjection,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   buildCommerceLabDelivery,

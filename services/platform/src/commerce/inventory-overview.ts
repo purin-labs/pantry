@@ -1,4 +1,4 @@
-import { selectInventoryConsumptionPlan } from "@purin-labs/contracts";
+import { selectInventoryConsumptionPlan } from "@purin-labs/commerce-contracts";
 import type {
   InventoryData,
   ProductDeleteBlock,
@@ -7,7 +7,7 @@ import type {
   StockStatus,
   StockPolicy,
   Quantity,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { productDeleteBlock } from "@purin-labs/commerce-client";
 import type {
   CommerceResourcesV1,

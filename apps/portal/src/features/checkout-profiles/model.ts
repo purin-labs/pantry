@@ -1,4 +1,4 @@
-import type { CheckoutProfile } from "@purin-labs/contracts";
+import type { CheckoutProfile } from "@purin-labs/commerce-contracts";
 
 import type { CheckoutProfileCollection, DraftCheckoutProfileSummary, PublishedCheckoutProfileSummary } from "./api";
 import type { CheckoutProfileSummary } from "@purin-labs/control-api/portal/checkout-profiles";

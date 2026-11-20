@@ -1,4 +1,4 @@
-import type { CheckoutProfile } from "@purin-labs/contracts";
+import type { CheckoutProfile } from "@purin-labs/commerce-contracts";
 import { parseCheckoutProfile } from "@purin-labs/commerce-client";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 

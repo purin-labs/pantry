@@ -1,5 +1,5 @@
 import { parseCommerceGraphResponse } from "@purin-labs/commerce-client";
-import type { CommerceGraphQueryResult } from "@purin-labs/contracts";
+import type { CommerceGraphQueryResult } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
 export type CommercePresentationParseError = Readonly<{

@@ -22,7 +22,7 @@ import { Toaster } from "sonner";
 import type {
   CheckoutProfileConfiguration,
   CommerceResourceType,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import "../styles.css";
 import { CheckoutProfilesRoute } from "../features/checkout-profiles/route";

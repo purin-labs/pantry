@@ -12,7 +12,7 @@ import {
 import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { ScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
 import { entityType, type CommandStep } from "./sample";
 

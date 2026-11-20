@@ -37,7 +37,7 @@ import type {
   CommerceSensitivity,
   MerchantExtensionSchemaRevision,
   CommerceSnapshotRevision,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { requireOrganisationId } from "./test-ids";

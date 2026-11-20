@@ -1,4 +1,4 @@
-import type { CheckoutProfile } from "@purin-labs/contracts";
+import type { CheckoutProfile } from "@purin-labs/commerce-contracts";
 import React from "react";
 import { Link } from "react-router";
 import { PageSkeleton, RecoverableError } from "../../page-components";

@@ -1,8 +1,5 @@
-import type {
-  CaseContent,
-  SourceProvenance,
-  UserMessage,
-} from "@purin-labs/contracts";
+import type { CaseContent, UserMessage } from "@purin-labs/contracts";
+import type { SourceProvenance } from "@purin-labs/commerce-contracts";
 
 export function recordMessageTypeChecks(
   message: UserMessage,

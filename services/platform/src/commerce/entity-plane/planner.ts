@@ -7,7 +7,7 @@ import type {
   CommerceQueryPlanOutcome,
   CommerceReadWatermark,
   SystemCommerceEntityKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { parseCommerceMerchantId } from "@purin-labs/commerce-client";
 
 import {

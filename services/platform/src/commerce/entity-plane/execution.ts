@@ -4,6 +4,7 @@ import { pantryCommerceAccess } from "../app-access";
 import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { decideCurrentAuthorityFlowSink } from "../../chat/information-flow";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceAuthorityScope,
   CommerceCommandResult,
@@ -12,9 +13,8 @@ import type {
   CommerceEntityRef,
   CommerceEntityTypeId,
   CommerceMutationTarget,
-  RequestAuthority,
   CommerceMutationReceiptV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   CommerceEntityPlaneClient,
   parseCommerceCommandId,

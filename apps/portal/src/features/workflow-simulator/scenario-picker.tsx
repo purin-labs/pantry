@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronRight, FileText } from "lucide-react";
-import type { CommerceCursor } from "@purin-labs/contracts";
+import type { CommerceCursor } from "@purin-labs/commerce-contracts";
 import {
   readSavedEntityPage,
   SAVED_PROCEDURES,

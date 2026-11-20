@@ -1,4 +1,4 @@
-import type { SourceProvenance } from "@purin-labs/contracts";
+import type { SourceProvenance } from "@purin-labs/commerce-contracts";
 import { parseOrganisationId, parseIntegrationAccountId } from "../ids";
 import { isRecord } from "@purin-labs/std";
 

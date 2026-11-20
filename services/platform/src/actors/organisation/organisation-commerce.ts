@@ -4,7 +4,7 @@ import {
 } from "../action-mutation-execution";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
-import type { CommerceProjection } from "@purin-labs/contracts";
+import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 import {
   compileCommerceRelationshipTraversalStepSql,
   compileCommerceQuerySql,

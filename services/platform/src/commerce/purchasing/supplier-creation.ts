@@ -3,7 +3,7 @@ import type {
   CommerceCommandResult,
   CommerceSnapshotRevision,
   CommerceMutationReceiptV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseEntityPlaneCommand,
   parseCommerceSnapshotRevision,

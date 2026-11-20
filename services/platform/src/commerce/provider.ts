@@ -26,7 +26,7 @@ import type {
   FirstPartyShipmentLifecycle,
   ShipmentPackage,
   SourceProvenance,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceCancellationAuthority } from "./action-model";
 import type { Result } from "../result";
 import {

@@ -3,7 +3,7 @@ import type {
   CommerceEntityRevision,
   CommerceSnapshotRevision,
   CustomCommerceEntityRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceEntityRevision,
   parseCommerceGraphQuery,

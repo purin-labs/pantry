@@ -5,7 +5,7 @@ import {
   type PlatformGatewayMessage,
 } from "@purin-labs/control-api";
 import { parseEnvelope as parseCounterSaleEnvelope } from "@purin-labs/control-api/portal/counter-sale";
-import { parseTerminalAssignment } from "@purin-labs/contracts";
+import { parseTerminalAssignment } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
 import { activateTerminalAssignment } from "../../src/data/terminal-assignment-store";

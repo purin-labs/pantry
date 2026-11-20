@@ -1,12 +1,12 @@
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceAuthorityContext,
   CommerceGraphQuery,
   CommerceGraphQueryResult,
   CommerceSensitivity,
-  RequestAuthority,
   PantryCommerceReadAuthority,
   CommerceContextRequest,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceCommandId,
   parseCommerceMerchantId,

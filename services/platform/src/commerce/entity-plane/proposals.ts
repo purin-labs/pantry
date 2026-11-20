@@ -3,7 +3,7 @@ import type {
   CommerceEntityPlaneProposal,
   CommerceEntityPlaneCommand,
   CommerceMutationReceiptV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import { assertCommerceEntityPlaneCommandWithLexicon } from "../commerce-wasm";
 import type { Variant } from "@purin-labs/type-utils";

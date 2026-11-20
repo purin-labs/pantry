@@ -1,5 +1,7 @@
 import { Select } from "../../ui/select";
-import type { CheckoutProfileConfiguration } from "@purin-labs/contracts";
+import type {
+  CheckoutProfileConfiguration,
+} from "@purin-labs/commerce-contracts";
 import React from "react";
 
 import { formatMoneyMinor } from "../../formatting";

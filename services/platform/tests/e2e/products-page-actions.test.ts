@@ -4,7 +4,10 @@
 import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, vi, type TestContext } from "vitest";
-import { parseInventory, type InventoryData } from "@purin-labs/contracts";
+import {
+  parseInventory,
+  type InventoryData,
+} from "@purin-labs/commerce-contracts";
 import {
   CommerceAdminClient,
   CommerceStorefrontClient,

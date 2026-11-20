@@ -1,7 +1,7 @@
 import type {
   PayoutIndeterminateOperation,
   SupplierPayoutExecutionPlan,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
 /** Funding acknowledgement is not evidence of delivery to the supplier. */

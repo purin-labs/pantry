@@ -17,9 +17,9 @@ import type {
   CustomCommerceEntityRef,
   CustomCommerceRelationship,
   CustomCommerceRelationshipRef,
-} from "@purin-labs/contracts";
-import type { CommerceGraphQuery } from "@purin-labs/contracts";
-import { isCustomCommerceEntity } from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
+import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
+import { isCustomCommerceEntity } from "@purin-labs/commerce-contracts";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
 

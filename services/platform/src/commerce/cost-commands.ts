@@ -21,7 +21,7 @@ import {
 import {
   selectInventoryConsumptionPlan,
   type ProductPhotos,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceGraphQuery,
   parseCommerceSnapshotRevision,
@@ -564,7 +564,7 @@ async function loadSupplyCostRawEntries(
   | Readonly<{ ok: false }>
 > {
   const entries: RawListEntry[] = [];
-  let cursor: import("@purin-labs/contracts").CommerceCursor | null = null;
+  let cursor: import("@purin-labs/commerce-contracts").CommerceCursor | null = null;
   for (let page = 0; page < 20; page += 1) {
     const query = parseCommerceGraphQuery({
       kind: "commerce_list_page",

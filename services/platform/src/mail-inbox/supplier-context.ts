@@ -1,12 +1,12 @@
 import type { OrganisationDatabase } from "../database-handles";
 import { pantryCommerceAccess } from "../commerce/app-access";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
   AttributeValue,
-  RequestAuthority,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   CommerceEntityPlaneClient,
   SUPPLIER_DIRECTORY_LIST_ID,

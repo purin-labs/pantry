@@ -1,4 +1,7 @@
-import type { CommerceCueFact, CommerceProjection } from "@purin-labs/contracts";
+import type {
+  CommerceCueFact,
+  CommerceProjection,
+} from "@purin-labs/commerce-contracts";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { assertRequiredColumns } from "../schema-migrations";

@@ -1,6 +1,6 @@
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { Env } from "../../env";
-import type { CanonicalCommerceDelivery } from "@purin-labs/contracts";
+import type { CanonicalCommerceDelivery } from "@purin-labs/commerce-contracts";
 import { listLiveProviderWebhookContexts } from "../../data/integration-account";
 import type { JsonObject } from "../../http";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";

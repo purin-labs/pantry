@@ -10,7 +10,7 @@ import {
 import type {
   CommerceEntity,
   CommerceEntityPlaneEffect,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   createFinancierSample,
   FINANCIER_SAMPLE_ID,

@@ -4,7 +4,7 @@ import type {
   LabCatalogOptionV1,
   LabEventEnvelopeV1,
   LabEventV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   COMMERCE_LAB_CATALOG_VERSION,

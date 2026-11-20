@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { isSystemCommerceEntity } from "@purin-labs/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 
 import {
   CommerceEntityPlaneClient,
@@ -8,13 +8,13 @@ import {
   parseCommerceGraphResponse,
   type CommerceEntityPlaneFetch,
 } from "@purin-labs/commerce-client";
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceEntity,
   CommerceEntityRef,
   CommerceGraphQueryResult,
   CommerceRelationship,
-  RequestAuthority,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { assembleCommerceContext } from "../src/context/assembly/commerce";
 import { buildSavedSelectorCommerceReadAuthority } from "../src/commerce/entity-plane/authority";

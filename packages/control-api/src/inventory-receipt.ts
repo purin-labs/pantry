@@ -2,7 +2,7 @@ import type {
   InventoryTrackingPolicy,
   QuantityUnit,
   Quantity,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { isPositiveInteger, isRecord } from "@purin-labs/std";
 
 export type InventoryReceiptContext = Readonly<{

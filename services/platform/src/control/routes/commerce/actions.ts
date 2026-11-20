@@ -4,7 +4,8 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env, CaseActorStub, OrganisationActorStub } from "../../../env";
 import type { Result } from "../../../result";
-import type { CaseBinding, CommerceSource } from "@purin-labs/contracts";
+import type { CaseBinding } from "@purin-labs/contracts";
+import type { CommerceSource } from "@purin-labs/commerce-contracts";
 import {
   resolveActiveCaseActor,
   requireActiveOrganisationActor,

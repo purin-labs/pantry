@@ -5,7 +5,7 @@ import type {
   CommerceEntityRef,
   CommerceGraphQueryResult,
   CommerceListEntryRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import type { CommerceEntityPlaneCapabilityMetadataResponse } from "@purin-labs/commerce-client";
 import {

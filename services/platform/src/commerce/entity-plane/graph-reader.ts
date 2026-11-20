@@ -11,7 +11,7 @@ import type {
   CommerceRelationship,
   SourceProvenance,
   SystemCommerceEntityRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { Result } from "../../result";
 import type { CommerceSystem } from "../../data/organisation-commerce-system";
 import type { CommerceWasmError } from "../commerce-wasm";
@@ -102,7 +102,7 @@ export type CommerceGraphCommerceSource = CommerceGraphQuerySource &
       Result<CommerceGraphCapabilityMetadata, CommerceGraphSourceError>
     >;
     queryPlanned: (
-      request: import("@purin-labs/contracts").CommerceGraphQueryPlanRequest,
+      request: import("@purin-labs/commerce-contracts").CommerceGraphQueryPlanRequest,
     ) => Promise<CommerceGraphPlannedSourceResult>;
     readRelationshipStep?: (
       input: CommerceGraphRelationshipStepInput,

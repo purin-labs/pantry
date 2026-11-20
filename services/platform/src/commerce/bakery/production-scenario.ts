@@ -16,7 +16,7 @@ import { readBakeryProcedure } from "@purin-labs/bakery-model/bakery-procedure";
 import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { entityType, type CommandStep } from "./sample";
 
 const scenarioType = "bakery_production_scenario";

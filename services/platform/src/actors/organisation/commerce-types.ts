@@ -4,7 +4,7 @@ import type {
   CommerceQueryPlanErrorCapability,
   CommerceReadWatermark,
   SystemCommerceEntityRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   IntegrationAccountId,
   RequestId,

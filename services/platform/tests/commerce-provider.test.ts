@@ -11,7 +11,10 @@ import {
   type CommerceMerchantSnapshotV1,
 } from "@purin-labs/commerce-client";
 import { commerceCommandInput } from "@purin-labs/commerce-client";
-import type { CheckoutProfile, FoodServicePreparation } from "@purin-labs/contracts";
+import type {
+  CheckoutProfile,
+  FoodServicePreparation,
+} from "@purin-labs/commerce-contracts";
 import { expect, it } from "vitest";
 
 import { startCommerceWorker } from "./commerce-fixture-worker.ts";

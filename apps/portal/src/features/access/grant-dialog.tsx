@@ -3,7 +3,7 @@ import React from "react";
 import type {
   CommerceEntityTypeId,
   SystemCommerceEntityKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import { parseEntityTypeId, SYSTEM_KINDS } from "@purin-labs/commerce-client";
 import {

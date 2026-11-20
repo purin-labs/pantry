@@ -4,7 +4,7 @@ import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
 } from "../organisation-execution-scope";
-import type { CanonicalCommerceDelivery } from "@purin-labs/contracts";
+import type { CanonicalCommerceDelivery } from "@purin-labs/commerce-contracts";
 import {
   CommerceAdminClient,
   CommerceEntityPlaneClient,

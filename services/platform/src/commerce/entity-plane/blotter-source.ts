@@ -27,7 +27,7 @@ import type {
   SystemCommerceRelationship,
   SystemSchemaRevision,
   SystemRelationshipDefinitionKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseAttributeDefinitionRevision,
   parseAttributeDefinitionId,
@@ -80,8 +80,8 @@ export type BlotterQueryPlanError =
     }>
   | Readonly<{
       readonly code: "query_stale";
-      readonly expected: import("@purin-labs/contracts").CommerceReadWatermark;
-      readonly received: import("@purin-labs/contracts").CommerceReadWatermark;
+      readonly expected: import("@purin-labs/commerce-contracts").CommerceReadWatermark;
+      readonly received: import("@purin-labs/commerce-contracts").CommerceReadWatermark;
     }>;
 
 export type BlotterQueryPlanResult = Result<
@@ -182,7 +182,7 @@ export class BlotterSource {
 
   async readSnapshotRevision(): Promise<
     Result<
-      import("@purin-labs/contracts").CommerceSnapshotRevision,
+      import("@purin-labs/commerce-contracts").CommerceSnapshotRevision,
       CommerceGraphSourceError
     >
   > {

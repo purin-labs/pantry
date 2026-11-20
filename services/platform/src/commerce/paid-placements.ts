@@ -1,8 +1,8 @@
+import type { ConnectorDelivery } from "@purin-labs/contracts";
 import type {
   CanonicalCommerceDelivery,
   CommerceProjection,
-  ConnectorDelivery,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
 import type { ChannelId, WorkspaceId } from "../ids";

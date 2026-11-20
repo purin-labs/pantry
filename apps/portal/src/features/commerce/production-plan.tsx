@@ -6,7 +6,7 @@ import {
   type InventoryProductionRequest,
 } from "@purin-labs/control-api";
 import { isPlanQuantity } from "@purin-labs/production-plan-crdt";
-import type { Quantity } from "@purin-labs/contracts";
+import type { Quantity } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";
 import {
   ControlApiError,

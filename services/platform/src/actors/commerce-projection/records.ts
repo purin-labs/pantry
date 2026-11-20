@@ -2,7 +2,7 @@ import type {
   CommerceProjection,
   CommerceResourceType,
   CommerceSource,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

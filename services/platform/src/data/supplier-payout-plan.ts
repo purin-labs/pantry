@@ -1,4 +1,4 @@
-import type { SupplierPayoutExecutionPlan } from "@purin-labs/contracts";
+import type { SupplierPayoutExecutionPlan } from "@purin-labs/commerce-contracts";
 import {
   assertSupplierPayoutPlanWithLexicon,
   validateSupplierPayoutPlanWithLexicon,

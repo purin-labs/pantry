@@ -1,7 +1,10 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
-import type { CommerceEntity, CommerceListEntry } from "@purin-labs/contracts";
+import type {
+  CommerceEntity,
+  CommerceListEntry,
+} from "@purin-labs/commerce-contracts";
 
 import { Notice } from "../../../page-components";
 import { SideDrawer } from "../../../ui";

@@ -4,7 +4,7 @@ import type {
   MerchantRevision,
   CommerceEntityPlaneDeliveryId,
   CommerceMutationReceiptOutcome,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import { parseCommerceProviderReceipt } from "../action-model";
 import { assertCommerceGraphQueryWithLexicon } from "../commerce-wasm";

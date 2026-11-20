@@ -1,8 +1,8 @@
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
-  RequestAuthority,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import { isRecord, sameJson } from "@purin-labs/std";
 import type { Env } from "../env";

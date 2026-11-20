@@ -1,9 +1,7 @@
 import { Type, type Static } from "typebox";
-import { isSystemCommerceEntity } from "@purin-labs/contracts";
-import type {
-  HarnessToolOutput,
-  CommerceGraphQueryResult,
-} from "@purin-labs/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
+import type { HarnessToolOutput } from "@purin-labs/contracts";
+import type { CommerceGraphQueryResult } from "@purin-labs/commerce-contracts";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import { assertNever, sha256Hex } from "@purin-labs/std";
 
@@ -329,7 +327,7 @@ function entityJson(
 }
 
 function attributeJson(
-  value: import("@purin-labs/contracts").AttributeValueAssignment,
+  value: import("@purin-labs/commerce-contracts").AttributeValueAssignment,
 ): Static<typeof attribute> {
   return {
     attributeId: value.attributeId,
@@ -341,7 +339,7 @@ function attributeJson(
 }
 
 function attributeValueJson(
-  value: import("@purin-labs/contracts").AttributeValue,
+  value: import("@purin-labs/commerce-contracts").AttributeValue,
 ): Static<typeof attributeValue> {
   switch (value.kind) {
     case "integer":
@@ -394,14 +392,14 @@ function aggregationJson(
   }
 }
 
-function groupJson(group: import("@purin-labs/contracts").CommerceAggregationGroup) {
+function groupJson(group: import("@purin-labs/commerce-contracts").CommerceAggregationGroup) {
   return {
     value: attributeValueJson(group.value),
     count: group.count.toString(),
   };
 }
 
-function bucketJson(bucket: import("@purin-labs/contracts").CommerceAgeBucket) {
+function bucketJson(bucket: import("@purin-labs/commerce-contracts").CommerceAgeBucket) {
   return {
     minimumAgeDays: bucket.minimumAgeDays,
     maximumAgeDays: bucket.maximumAgeDays,

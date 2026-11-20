@@ -12,12 +12,12 @@ import {
 } from "../commerce/entity-plane/api";
 import { readProcedure } from "./procedure-api";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
-import { isCustomCommerceEntity } from "@purin-labs/contracts";
+import { isCustomCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
   CommerceCursor,
   CommerceEntityType,
   CustomCommerceEntityRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 export type ScenarioChoice = Readonly<{
   reference: CustomCommerceEntityRef;

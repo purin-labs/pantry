@@ -15,7 +15,7 @@ import type {
   CommerceViewPresentation,
   SavedCommerceViewId,
   SavedCommerceViewRevision,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { Result } from "../../result";
 import {
   assertCommerceEntityPlaneCommandWithLexicon,

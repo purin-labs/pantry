@@ -1,5 +1,5 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
-import { isSystemCommerceEntity } from "@purin-labs/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
   PaymentsReadRequest,
 } from "./services";
@@ -251,7 +251,7 @@ export async function prepareCommerceReadForEmbeddedHarness(
 
 /** The commerce records one graph read returned, at the revisions it saw. */
 function observedCommerceEntities(
-  result: import("@purin-labs/contracts").CommerceGraphQueryResult,
+  result: import("@purin-labs/commerce-contracts").CommerceGraphQueryResult,
   merchantId: string,
 ): readonly CommerceObservationEntity[] {
   const observed: CommerceObservationEntity[] = [];
@@ -281,8 +281,8 @@ function observedCommerceEntities(
 
 export async function readEntityContextForEmbeddedHarness(
   context: SessionToolContext,
-  request: import("@purin-labs/contracts").CommerceContextRequest,
-): Promise<import("@purin-labs/contracts").CommerceGraphQueryResult> {
+  request: import("@purin-labs/commerce-contracts").CommerceContextRequest,
+): Promise<import("@purin-labs/commerce-contracts").CommerceGraphQueryResult> {
   const { env, storage, execution, lease, assignment } = context;
   const prepared = await prepareCommerceReadForEmbeddedHarness(
     env,
@@ -320,7 +320,7 @@ export async function readEntityContextForEmbeddedHarness(
 
 function selectEntityContextSourceGrant(
   lease: HarnessTurnLease,
-  request: import("@purin-labs/contracts").CommerceContextRequest,
+  request: import("@purin-labs/commerce-contracts").CommerceContextRequest,
   input: Readonly<{
     organisationId: string;
     merchantId: string;
@@ -345,7 +345,7 @@ function selectEntityContextSourceGrant(
  * request may ask for that grant.
  */
 function requestableRecordRead(
-  request: import("@purin-labs/contracts").CommerceContextRequest,
+  request: import("@purin-labs/commerce-contracts").CommerceContextRequest,
   error: unknown,
 ): never {
   const read = recordReadOfRequest(request);
@@ -360,7 +360,7 @@ function requestableRecordRead(
 }
 
 function recordReadOfRequest(
-  request: import("@purin-labs/contracts").CommerceContextRequest,
+  request: import("@purin-labs/commerce-contracts").CommerceContextRequest,
 ): RequestableEntityTypeRead | null {
   if (request.selection.kind === "entity_seeds") {
     const typeId = request.selection.seeds[0]?.typeId;

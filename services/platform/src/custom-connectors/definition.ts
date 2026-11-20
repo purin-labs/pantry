@@ -1,4 +1,4 @@
-import type { CommerceSensitivity } from "@purin-labs/contracts";
+import type { CommerceSensitivity } from "@purin-labs/commerce-contracts";
 import type { JsonRecord } from "../control/http";
 import {
   digestCanonical,

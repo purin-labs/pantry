@@ -4,7 +4,7 @@ import type {
   CommerceSensitivity,
   SystemCommerceEntityKind,
   SystemRelationshipDefinitionKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   runSchemaMigrations,
   type SchemaTransaction,

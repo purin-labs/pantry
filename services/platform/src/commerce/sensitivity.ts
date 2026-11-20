@@ -1,4 +1,4 @@
-import type { CommerceSensitivity } from "@purin-labs/contracts";
+import type { CommerceSensitivity } from "@purin-labs/commerce-contracts";
 import { exhaustiveList } from "@purin-labs/std";
 
 /** Every commerce sensitivity, from least to most restricted. */

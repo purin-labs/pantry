@@ -5,7 +5,7 @@ import type {
   ShopifyShipmentLifecycleV202607,
   ShopifyTrackingEventKindV202607,
   ShopifyTrackingEventV202607,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { JsonObject } from "../../http";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";

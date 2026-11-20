@@ -1,5 +1,8 @@
 import { pantryCommerceAccess } from "../commerce/app-access";
-import type { CommerceGraphQuery, CommerceSensitivity } from "@purin-labs/contracts";
+import type {
+  CommerceGraphQuery,
+  CommerceSensitivity,
+} from "@purin-labs/commerce-contracts";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "../actors/actor-router";

@@ -82,7 +82,7 @@ import {
   parseCommerceGraphQuery,
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
-import type { CommerceGraphQuery } from "@purin-labs/contracts";
+import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
 import { FINANCIER_SAMPLE_ID } from "../../src/commerce/bakery/sample";
 import { customEntityRef } from "../../../../apps/portal/src/features/commerce/entity-plane/api";
 import { parseScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";

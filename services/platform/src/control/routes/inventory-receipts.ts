@@ -400,7 +400,7 @@ async function readPurchases(
   return { kind: "ready", entries };
 }
 function purchaseAttribute(
-  attribute: import("@purin-labs/contracts").ListEntryAttributeValue,
+  attribute: import("@purin-labs/commerce-contracts").ListEntryAttributeValue,
 ): [string, string] {
   const value = attribute.value;
   switch (value.kind) {

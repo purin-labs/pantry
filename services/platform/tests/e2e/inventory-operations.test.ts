@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { commerceCommandInput } from "@purin-labs/commerce-client";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { parseInventory, type Quantity } from "@purin-labs/contracts";
+import { parseInventory, type Quantity } from "@purin-labs/commerce-contracts";
 import {
   parseInventoryReceiptContext,
   parseInventoryProductionContext,
@@ -1547,7 +1547,7 @@ async function verifyPurchasePagination(
   }
 }
 function closedPurchaseAttribute(
-  attribute: import("@purin-labs/contracts").ListEntryAttributeValue,
+  attribute: import("@purin-labs/commerce-contracts").ListEntryAttributeValue,
 ): unknown {
   switch (String(attribute.attributeId)) {
     case "status":

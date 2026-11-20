@@ -26,12 +26,13 @@
     "check:types": "tsrs --noEmit"
   },
   "dependencies": {
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
     "@purin-labs/control-api": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/workflow-canvas-crdt": "workspace:*",
-    "@purin-labs/commerce-client": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

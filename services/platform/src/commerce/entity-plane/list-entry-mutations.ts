@@ -3,7 +3,7 @@ import type {
   CommerceEntityAuthority,
   CommerceEntityPlaneError,
   CommerceMutationReceiptV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import type { Result } from "../../result";

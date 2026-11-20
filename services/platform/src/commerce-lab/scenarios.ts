@@ -5,7 +5,7 @@ import type {
   LabShipmentV1,
   LabTrackingEventKindV1,
   LabTrackingEventV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { Result } from "../result";
 import { COMMERCE_LAB_CATALOG_VERSION, COMMERCE_LAB_PRODUCTS } from "./catalog";

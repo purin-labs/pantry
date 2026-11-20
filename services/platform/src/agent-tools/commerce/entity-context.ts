@@ -1,7 +1,7 @@
 import type {
   CommerceContextRequest,
   CommerceGraphQueryResult,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 import { CommerceContextToolResult } from "../../actors/commerce-context-tool-result";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";

@@ -3,7 +3,7 @@ import type {
   CommerceCueFact,
   CommerceProjection,
   CommerceSource,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceCueEvent } from "../cues/engine";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
 import type { Result } from "../result";

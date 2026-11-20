@@ -8,7 +8,7 @@ import type {
   CommerceQueryPlan,
   SystemCommerceEntityKind,
   SystemCommerceEntityRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceGraphQueryPlanRequest,
   parseCommerceSnapshotRevision,
@@ -522,7 +522,7 @@ function requiredRelationshipFrontier(
 function requiredPlannedPage(
   organisationId: ReturnType<typeof requireOrganisationId>,
   merchantId: string,
-  typeId: import("@purin-labs/contracts").SystemCommerceEntityKind,
+  typeId: import("@purin-labs/commerce-contracts").SystemCommerceEntityKind,
 ): { plan: CommerceQueryPlan; planRequest: CommerceGraphQueryPlanRequest } {
   const query = parseCommerceGraphQuery({
     kind: "entity_type_page",

@@ -1,5 +1,5 @@
 import { timestampNanoseconds } from "@purin-labs/commerce-contracts/commerce-timestamp";
-import { isSystemCommerceEntity } from "@purin-labs/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
   CommerceCommandAuthorityContext,
   CommerceAuthorityScope,
@@ -18,7 +18,7 @@ import type {
   SavedCommerceViewId,
   SavedCommerceViewRevision,
   SystemCommerceEntityKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { commerceBlotterSystemAttributeIds } from "../../actors/commerce-query-schema";
 import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import {
@@ -297,10 +297,10 @@ function filterUsesDeclaredSystemAttributesOnly(
 }
 
 export function filterCommerceGraphSensitivity(
-  result: import("@purin-labs/contracts").CommerceGraphQueryResult,
+  result: import("@purin-labs/commerce-contracts").CommerceGraphQueryResult,
   authority: CommerceGraphReadAuthority,
   allowedAttributeIds?: readonly string[],
-): import("@purin-labs/contracts").CommerceGraphQueryResult {
+): import("@purin-labs/commerce-contracts").CommerceGraphQueryResult {
   const ceiling = authority.context.sensitivityCeiling;
   const allowed =
     allowedAttributeIds === undefined ? null : new Set(allowedAttributeIds);
@@ -371,7 +371,7 @@ function entityKey(reference: CommerceEntityRef): string {
 }
 
 function relationshipSensitivity(
-  relationship: import("@purin-labs/contracts").CommerceRelationship,
+  relationship: import("@purin-labs/commerce-contracts").CommerceRelationship,
 ): CommerceSensitivity | null {
   if (relationship.origin === "custom") {
     return relationship.definition.origin === "custom"
@@ -444,7 +444,7 @@ function entityFreshnessKeys(entity: CommerceEntity): string[] {
   return [freshnessKey(entity.freshness)];
 }
 function provenanceKey(
-  value: import("@purin-labs/contracts").SourceProvenance,
+  value: import("@purin-labs/commerce-contracts").SourceProvenance,
 ): string {
   return `${value.organisationId}:${value.source}:${value.resourceType}:${value.resourceId}:${value.revision}`;
 }

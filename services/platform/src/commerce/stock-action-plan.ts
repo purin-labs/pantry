@@ -2,7 +2,7 @@
 // the exact change for the approval card. Each refusal is in words that the
 // agent can act on. No stock moves here.
 import { parseInventoryQuantityText } from "@purin-labs/control-api";
-import type { Quantity } from "@purin-labs/contracts";
+import type { Quantity } from "@purin-labs/commerce-contracts";
 import {
   parseListEntryReadRequest,
   parseProductionRequestFields,

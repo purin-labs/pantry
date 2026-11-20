@@ -1,5 +1,5 @@
 import { expect, it, type TestContext } from "vitest";
-import { isCustomCommerceEntity } from "@purin-labs/contracts";
+import { isCustomCommerceEntity } from "@purin-labs/commerce-contracts";
 import {
   parseCommerceGraphQuery,
   parseCommerceSnapshotRevision,
@@ -11,7 +11,7 @@ import type {
   CommerceGraphQuery,
   CommerceGraphQueryResult,
   CustomCommerceEntityRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   createFinancierSample,
   entityType,
@@ -1131,7 +1131,7 @@ async function readChangedProcedureGraph(
   return graph;
 }
 function isScenario(
-  entity: import("@purin-labs/contracts").CommerceEntity,
+  entity: import("@purin-labs/commerce-contracts").CommerceEntity,
 ): boolean {
   return (
     entity.reference.origin === "custom" &&

@@ -216,6 +216,9 @@ importers:
       '@purin-labs/commerce-client':
         specifier: workspace:*
         version: link:../commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../commerce-contracts
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../contracts
@@ -519,6 +522,9 @@ importers:
       '@purin-labs/bakery-model':
         specifier: workspace:*
         version: link:../bakery-model
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../commerce-contracts
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../contracts

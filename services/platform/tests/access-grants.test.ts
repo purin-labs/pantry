@@ -2,12 +2,12 @@ import type { SingleDatabase } from "../src/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceCommandAuthorityContext,
   CommerceAuthorityScope,
   CommerceEntityAuthority,
-  RequestAuthority,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceEntityPlaneCommand,
   parseCommerceGraphQuery,

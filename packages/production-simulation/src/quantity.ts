@@ -1,4 +1,4 @@
-import type { Quantity, QuantityUnit } from "@purin-labs/contracts";
+import type { Quantity, QuantityUnit } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";
 import { err, ok, type Result } from "./result.ts";
 

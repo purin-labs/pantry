@@ -1,4 +1,7 @@
-import type { CommerceCommandResult, Quantity } from "@purin-labs/contracts";
+import type {
+  CommerceCommandResult,
+  Quantity,
+} from "@purin-labs/commerce-contracts";
 import {
   parseInventoryProductionPlanAcceptance,
   parseInventoryQuantityText,

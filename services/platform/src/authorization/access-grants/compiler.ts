@@ -1,10 +1,10 @@
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceAuthorityContext,
   CommerceAuthorityScope,
   CommerceEntityAuthority,
   CommerceMutationTarget,
-  RequestAuthority,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";

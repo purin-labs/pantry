@@ -1,4 +1,7 @@
-import type { CommerceEntity, CommerceRelationship } from "@purin-labs/contracts";
+import type {
+  CommerceEntity,
+  CommerceRelationship,
+} from "@purin-labs/commerce-contracts";
 import { sha256Hex } from "@purin-labs/std";
 
 export type StationId = "stage" | "portion" | "bake" | "cool" | "pack";

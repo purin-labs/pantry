@@ -8,7 +8,7 @@ import type {
   SupplierPayoutExecutionPlan,
   SupplierPayoutProviderBinding,
   SupplierPayoutState,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 const money = { amountMinor: 10_000, currency: "JPY" };

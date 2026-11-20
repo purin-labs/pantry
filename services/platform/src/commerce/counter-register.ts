@@ -2,7 +2,7 @@ import {
   terminalAssignmentPaymentBinding,
   terminalTargetDeviceId,
   type TerminalAssignment,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   CommerceAdminClient,
   CommerceClientError,

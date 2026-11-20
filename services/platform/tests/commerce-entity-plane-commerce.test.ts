@@ -10,7 +10,7 @@ import {
 import type {
   CommerceEntityRef,
   CommerceReadWatermark,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
 import {
   buildCommerceGraphQueryPlanRequest,

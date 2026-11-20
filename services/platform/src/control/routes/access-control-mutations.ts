@@ -12,8 +12,8 @@ import type {
   CapabilityDefinition,
   CapabilityMode,
   CapabilityRef,
-  CommerceEntityTypeId,
 } from "@purin-labs/contracts";
+import type { CommerceEntityTypeId } from "@purin-labs/commerce-contracts";
 import { parseEntityTypeId } from "@purin-labs/commerce-client";
 
 import {

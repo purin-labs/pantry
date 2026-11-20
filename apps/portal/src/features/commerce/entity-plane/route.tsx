@@ -30,7 +30,7 @@ import type {
   CommerceViewPresentation,
   ListEntryAttributeDefinition,
   SourceProvenance,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   REPLENISHMENT_QUEUE_LIST_ID,
   REPLENISHMENT_QUEUE_VIEW_ID,

@@ -11,7 +11,7 @@ import {
   type StockStatus,
   type StockRow,
   type StockLot,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import React from "react";
 import { Link } from "react-router";
 import { controlRead } from "../../control-client";

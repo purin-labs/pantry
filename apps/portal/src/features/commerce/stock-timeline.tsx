@@ -1,5 +1,5 @@
 import React from "react";
-import type { StockRow } from "@purin-labs/contracts";
+import type { StockRow } from "@purin-labs/commerce-contracts";
 import {
   parseInventoryDeliveries,
   type InventoryDeliveries,

@@ -10,7 +10,6 @@ import type {
   CaseJournalCursor,
   CaseLifecycle,
   CaseTrigger,
-  CommerceEntityPlaneProposal,
   CaseContributionSource as ContractCaseContributionSource,
   CaseOutput as ContractCaseOutput,
   CaseProposalAcceptance as ContractCaseProposalAcceptance,
@@ -19,7 +18,8 @@ import type {
   SessionProposal,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import type { SourceProvenance } from "@purin-labs/contracts";
+import type { CommerceEntityPlaneProposal } from "@purin-labs/commerce-contracts";
+import type { SourceProvenance } from "@purin-labs/commerce-contracts";
 import type { IntegrationAccountId } from "../../ids";
 import type { EmailReplyProposalLifecycle } from "../../data/email-mailbox";
 import type { EmailProposalTarget } from "../../data/email-operational";

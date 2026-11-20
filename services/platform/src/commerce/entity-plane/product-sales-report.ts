@@ -1,7 +1,7 @@
 import type {
   CommerceGraphQuery,
   SystemCommerceEntityKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type {
   ProductSalesReport,
   CommerceAdminClient,

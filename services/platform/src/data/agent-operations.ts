@@ -3,7 +3,7 @@ import type { CommerceEntityPlaneCueEvent } from "../cues/engine";
 import type {
   CommerceListEntryRef,
   CommerceRelationshipRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceEntityPlanePublishedResourceMetadataResponse } from "@purin-labs/commerce-client";
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
@@ -125,7 +125,7 @@ export type AgentResponsibilityScope =
       readonly selector: {
         readonly selectorId: string;
         readonly revision: number;
-        readonly query: import("@purin-labs/contracts").CommerceGraphQuery;
+        readonly query: import("@purin-labs/commerce-contracts").CommerceGraphQuery;
       };
     };
 

@@ -1,7 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { describe, expect, it } from "vitest";
-import type { CommerceProjection } from "@purin-labs/contracts";
+import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 
 import {
   buildCommerceActionDraft,

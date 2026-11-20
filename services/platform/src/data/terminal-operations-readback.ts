@@ -4,7 +4,7 @@ import {
   terminalTargetDeviceId,
   terminalTargetHealthIsObservable,
   type TerminalAssignment,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { OrganisationId } from "../ids";
 import { listActiveTerminalAssignments } from "./terminal-assignment-store";

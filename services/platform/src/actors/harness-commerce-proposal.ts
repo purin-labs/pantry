@@ -9,7 +9,7 @@ import type {
   CommerceProjection,
   CommerceSource,
   SourceProvenance,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   assertNever,
   sha256Hex,

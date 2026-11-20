@@ -4,7 +4,7 @@ import type {
   SupplierPayable,
   SupplierPayoutExecutionPlan,
   SupplierPayoutState,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   advanceSupplierPayout,

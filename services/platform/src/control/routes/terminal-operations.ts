@@ -4,7 +4,7 @@ import {
   parseTerminalAssignment,
   type PointOfSaleConfiguration,
   type TerminalAssignment,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";

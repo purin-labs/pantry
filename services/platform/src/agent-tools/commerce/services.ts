@@ -1,7 +1,7 @@
 import type {
   CommerceContextRequest,
   CommerceGraphQueryResult,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { CommerceActionRequest } from "../../commerce/action-model";
 import type {
   MerchantReportName,

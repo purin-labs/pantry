@@ -23,9 +23,10 @@ export type { CaseBinding } from "./types/CaseBinding";
 export type { CaseContent } from "./types/CaseContent";
 export { type CaseContributionSource } from "./case-output.ts";
 export type { CaseContextEntryRef } from "./types/CaseContextEntryRef";
-export type CaseEvidenceDependency = import("@purin-labs/type-utils").StrictUnion<
-  import("./types/CaseEvidenceDependency").CaseEvidenceDependency
->;
+export type CaseEvidenceDependency =
+  import("@purin-labs/type-utils").StrictUnion<
+    import("./types/CaseEvidenceDependency").CaseEvidenceDependency
+  >;
 export type { CaseContextCollectionEvidenceRef } from "./types/CaseContextCollectionEvidenceRef";
 export type MailboxReplyScope = import("@purin-labs/type-utils").StrictUnion<
   import("./types/MailboxReplyScope").MailboxReplyScope
@@ -240,7 +241,5 @@ export type {
 } from "./goal.ts";
 
 export { parseCaseGoal, parseCaseGoalSnapshot } from "./goal.ts";
-
-export * from "@purin-labs/commerce-contracts";
 
 export type { MediaMetadata, FrameSamplingOutcome } from "./media-inspect.ts";

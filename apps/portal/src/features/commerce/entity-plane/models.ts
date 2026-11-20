@@ -16,7 +16,7 @@ import type {
   CommerceViewPresentation,
   SavedCommerceView,
   ListEntryAttributeValue,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type {
   CommerceCollectionSelection,

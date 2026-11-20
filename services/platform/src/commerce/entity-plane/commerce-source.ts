@@ -4,7 +4,7 @@ import type {
   CommerceEntityPlaneSystemExtensionSidecar,
 } from "@purin-labs/commerce-client";
 import { parseCommerceSnapshotRevision } from "@purin-labs/commerce-client";
-import { isSystemCommerceEntity } from "@purin-labs/contracts";
+import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
   AttributeValueAssignment,
   CommerceEntity,
@@ -21,7 +21,7 @@ import type {
   CommerceQueryCapabilityProfile,
   CommerceQueryProjection,
   SourceProvenance,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import type { Result } from "../../result";
 import { errorMessage, isNormalizedText } from "@purin-labs/std";
 
@@ -59,7 +59,7 @@ export type CommerceGraphSourceResult = Result<
 
 export type CommerceGraphRelationshipStepInput = Readonly<{
   planRequest: CommerceGraphQueryPlanRequest;
-  plan: import("@purin-labs/contracts").CommerceQueryPlan;
+  plan: import("@purin-labs/commerce-contracts").CommerceQueryPlan;
   frontier: readonly CommerceEntityRef[];
   remaining: number;
 }>;
@@ -68,7 +68,7 @@ export type CommerceGraphRelationshipStepError =
   | CommerceGraphSourceError
   | Readonly<{
       code: "commerce_cursor_mismatch";
-      reason: import("@purin-labs/contracts").CommerceCursorMismatchReason;
+      reason: import("@purin-labs/commerce-contracts").CommerceCursorMismatchReason;
     }>
   | Readonly<{
       code: "commerce_cursor_stale";
@@ -77,7 +77,7 @@ export type CommerceGraphRelationshipStepError =
     }>
   | Readonly<{
       code: "commerce_query_unsupported";
-      capability: import("@purin-labs/contracts").CommerceQueryPlanErrorCapability;
+      capability: import("@purin-labs/commerce-contracts").CommerceQueryPlanErrorCapability;
     }>
   | Readonly<{ code: "invalid_query" }>;
 

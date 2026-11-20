@@ -2,7 +2,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
-import type { CommerceMutationReceiptV1 } from "@purin-labs/contracts";
+import type { CommerceMutationReceiptV1 } from "@purin-labs/commerce-contracts";
 import type { CommerceEntityPlaneCaseProposal } from "../src/actors/case/types";
 import type { ActionLedgerEntry } from "../src/actors/action-ledger";
 import { parseApprovalEvidence } from "../src/approval-authentication";

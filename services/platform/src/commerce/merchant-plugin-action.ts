@@ -5,7 +5,7 @@
 // and fields on products, variants and customers. The action path carries the whole definition, so the approval signs
 // exactly the code and the settings that Commerce will run, and the version
 // and installation revision that the proposal read.
-import type { PluginDefinition } from "@purin-labs/contracts";
+import type { PluginDefinition } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 import type {
   CommercePluginActionV1,

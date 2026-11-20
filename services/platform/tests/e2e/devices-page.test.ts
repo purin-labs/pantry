@@ -11,7 +11,7 @@ import {
 import {
   parseTerminalAssignment,
   type TerminalAssignment,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";

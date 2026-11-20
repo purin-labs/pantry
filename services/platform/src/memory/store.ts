@@ -15,7 +15,7 @@ import type {
   MemoryRevisionState,
   MemoryRevisionView,
 } from "@purin-labs/control-api";
-import type { CommerceEntityRef } from "@purin-labs/contracts";
+import type { CommerceEntityRef } from "@purin-labs/commerce-contracts";
 import {
   assertNever,
   canonicalJson,

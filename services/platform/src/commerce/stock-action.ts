@@ -3,7 +3,7 @@
 // action path, so an approval signs that exact change. Commerce checks the
 // revisions at commit.
 import { isRecord } from "@purin-labs/std";
-import type { Quantity } from "@purin-labs/contracts";
+import type { Quantity } from "@purin-labs/commerce-contracts";
 import type { ListEntryAttributeValue } from "@purin-labs/commerce-contracts";
 
 import { ToolRequestError } from "../agent-tools/errors";

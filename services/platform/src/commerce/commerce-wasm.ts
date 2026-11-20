@@ -10,7 +10,7 @@ import type {
   CommerceGraphQuery,
   CommerceQueryPlan,
   CommerceQueryPlanOutcome,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { parseCommerceCursorValue } from "@purin-labs/commerce-client";
 import {
   decodeCommerceCursor as decodeCommerceCursorTypescript,

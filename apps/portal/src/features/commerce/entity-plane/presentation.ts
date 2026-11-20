@@ -13,7 +13,7 @@ import type {
   AttributeOption,
   AttributeValue,
   ListEntryAttributeDefinition,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { formatAbsoluteTime, humanizeIdentifier } from "../../../formatting";
 import type { StatusChipStatus } from "../../../status-chip";

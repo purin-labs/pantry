@@ -878,7 +878,7 @@ async function rejectsCatalogMismatch(): Promise<void> {
   });
 }
 
-function fixtureContextRequest(): import("@purin-labs/contracts").CommerceContextRequest {
+function fixtureContextRequest(): import("@purin-labs/commerce-contracts").CommerceContextRequest {
   const parsed = parseCommerceGraphQuery({
     kind: "underclerk_context",
     selection: {
@@ -935,7 +935,7 @@ function rejectInternalEntityContext(): Promise<never> {
 
 function readEntityContext(
   _request: unknown,
-): Promise<import("@purin-labs/contracts").CommerceGraphQueryResult> {
+): Promise<import("@purin-labs/commerce-contracts").CommerceGraphQueryResult> {
   return Promise.resolve(
     parseCommerceGraphResponse({
       merchantRevision: 1,

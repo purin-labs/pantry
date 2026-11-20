@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type {
   CanonicalCommerceObservation,
   CommerceProjection,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   createCueQueueMessage,

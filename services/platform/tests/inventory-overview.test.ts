@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
-import { parseInventory } from "@purin-labs/contracts";
-import type { InventoryConsumptionPlan } from "@purin-labs/contracts";
+import { parseInventory } from "@purin-labs/commerce-contracts";
+import type { InventoryConsumptionPlan } from "@purin-labs/commerce-contracts";
 import type {
   CommerceInventoryItemV1,
   CommerceVariantV1,

@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "../../database-handles";
 import type { ActionMutationExecution } from "../action-mutation-execution";
 import { parseSourceProvenance } from "../../commerce/source-provenance";
 import type { RequestAuthority } from "@purin-labs/contracts";
-import type { SourceProvenance } from "@purin-labs/contracts";
+import type { SourceProvenance } from "@purin-labs/commerce-contracts";
 import { parseIntegrationAccountId } from "../../ids";
 import { parseEmailReplyProposalLifecycle } from "../../data/email-mailbox";
 import { parseEmailProposalTarget } from "../../data/email-operational";

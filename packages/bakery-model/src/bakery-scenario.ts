@@ -1,4 +1,4 @@
-import type { CustomCommerceEntity } from "@purin-labs/contracts";
+import type { CustomCommerceEntity } from "@purin-labs/commerce-contracts";
 import { fields, parseSettings, type Settings } from "./bakery.ts";
 import { isRecord } from "@purin-labs/std";
 

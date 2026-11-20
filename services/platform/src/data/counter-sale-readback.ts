@@ -2,7 +2,10 @@ import {
   commercePickupCode,
   type CommerceCounterCashTenderV1,
 } from "@purin-labs/commerce-client";
-import type { Checkout, CheckoutPaymentAttempt } from "@purin-labs/contracts";
+import type {
+  Checkout,
+  CheckoutPaymentAttempt,
+} from "@purin-labs/commerce-contracts";
 import type {
   CounterRegisterPaymentMethod,
   CounterSaleState,

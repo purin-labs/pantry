@@ -13,7 +13,7 @@ import type {
   CommerceReadWatermark,
   SystemCommerceEntityKind,
   SourceProvenance,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   CommerceEntityPlaneClient,
   parseCommerceGraphQuery,

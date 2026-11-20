@@ -1,7 +1,8 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type { AccountPlatformAccess } from "../account-platform/access";
 import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
-import type { CommerceSensitivity, RequestAuthority } from "@purin-labs/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { CommerceSensitivity } from "@purin-labs/commerce-contracts";
 
 import type { EffectiveGrantSet } from "../authorization/access-grants";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";

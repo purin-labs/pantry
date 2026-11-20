@@ -9,7 +9,7 @@ import type {
   PublishedCommerceSelectorId,
   PublishedCommerceSelectorRevision,
   SavedCommerceView,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   EXPORT_COORDINATION_PRESET_ID,
   EXPORT_COORDINATION_PRESET_VERSION,

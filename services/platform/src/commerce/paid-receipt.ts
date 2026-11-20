@@ -16,10 +16,8 @@ import {
   type MachineEvent,
   type MachineState,
 } from "@purin-labs/std/state-machine";
-import type {
-  CanonicalCommerceDelivery,
-  ConnectorDelivery,
-} from "@purin-labs/contracts";
+import type { ConnectorDelivery } from "@purin-labs/contracts";
+import type { CanonicalCommerceDelivery } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";

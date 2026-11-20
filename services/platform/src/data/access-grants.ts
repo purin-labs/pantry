@@ -12,7 +12,7 @@ import type {
   CommerceAuthorityScope,
   CommerceMutationTarget,
   CommerceRelationshipRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { parseFileResourceScope } from "../authorization/access-grants/capability-key";
 import {
   parseCommerceEntityPlaneCommand,

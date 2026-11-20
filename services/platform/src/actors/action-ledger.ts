@@ -1,9 +1,9 @@
 import type {
   AuthorityPartition,
   CanonicalAction,
-  CommerceEntityPlaneEffect,
   RequestAuthority,
 } from "@purin-labs/contracts";
+import type { CommerceEntityPlaneEffect } from "@purin-labs/commerce-contracts";
 
 import {
   parseCaseId,

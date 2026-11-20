@@ -2,7 +2,7 @@ import type { SingleDatabase } from "../src/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, afterEach, describe, expect, it } from "vitest";
-import type { SupplierPayable } from "@purin-labs/contracts";
+import type { SupplierPayable } from "@purin-labs/commerce-contracts";
 import { d1Database } from "./sqlite-d1";
 import { payoutPlan } from "./supplier-payout-fixtures";
 import { parseOrganisationId } from "../src/ids";

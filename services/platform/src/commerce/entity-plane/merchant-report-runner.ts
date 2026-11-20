@@ -1,8 +1,8 @@
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceGraphQueryResult,
   CommerceSensitivity,
-  RequestAuthority,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import {

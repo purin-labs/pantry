@@ -1,5 +1,5 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
-import type { CommerceListEntry } from "@purin-labs/contracts";
+import type { CommerceListEntry } from "@purin-labs/commerce-contracts";
 import {
   parseInventoryProductionCreation,
   parseInventoryProductionTransition,

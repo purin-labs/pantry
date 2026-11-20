@@ -13,7 +13,7 @@ import {
 } from "@purin-labs/control-api";
 import { assertNever, isRecord } from "@purin-labs/std";
 import { StatusChip, type StatusChipStatus } from "../../page-components";
-import type { Quantity } from "@purin-labs/contracts";
+import type { Quantity } from "@purin-labs/commerce-contracts";
 import { ControlApiError, controlRead } from "../../control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import {

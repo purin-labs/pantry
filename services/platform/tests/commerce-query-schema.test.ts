@@ -11,7 +11,7 @@ import type {
   CommerceReadWatermark,
   CustomCommerceEntityTypeId,
   SystemCommerceEntityKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceGraphQueryPlanRequest,
   parseEntityPlaneCapabilityMetadataResponse,
@@ -597,11 +597,11 @@ function requiredPlannedRelationship(
   organisationId: ReturnType<typeof requireOrganisationId>,
   merchantId: string,
   query: Variant<
-    import("@purin-labs/contracts").CommerceGraphQuery,
+    import("@purin-labs/commerce-contracts").CommerceGraphQuery,
     "relationship_traversal"
   >,
 ): {
-  plan: import("@purin-labs/contracts").CommerceQueryPlan;
+  plan: import("@purin-labs/commerce-contracts").CommerceQueryPlan;
   planRequest: ReturnType<typeof parseCommerceGraphQueryPlanRequest>;
 } {
   const request = parseCommerceGraphQueryPlanRequest({

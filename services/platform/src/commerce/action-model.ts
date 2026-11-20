@@ -4,7 +4,7 @@ import type {
   CommerceOrder,
   Fulfillment,
   Offer,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt/limits";
 
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../commerce-lab/lab-metadata";

@@ -1,13 +1,12 @@
 import type { OrganisationDatabase } from "../database-handles";
+import type { CueEvent, SurfaceRef } from "@purin-labs/contracts";
 import type {
   CommerceEntityTypeId,
   CommerceListEntryRef,
   CommerceListId,
   CommerceRelationshipRef,
-  CueEvent,
   PublishedCommerceSelector,
-  SurfaceRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseEntityPlaneObservation,
   type CommerceEntityPlaneObservationV1,

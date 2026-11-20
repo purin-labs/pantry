@@ -7,7 +7,7 @@ import type {
   PayoutIndeterminateOperation,
   SupplierPayoutExecutionPlan,
   SupplierPayoutState,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { readOrganisationEnvironment } from "../control/organisation-runtime";
 import {
   createSupplierPayoutAttemptStore,

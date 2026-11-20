@@ -1,4 +1,4 @@
-import type { Quantity } from "@purin-labs/contracts";
+import type { Quantity } from "@purin-labs/commerce-contracts";
 import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import { parseInventoryQuantity } from "./inventory-receipt.ts";
 

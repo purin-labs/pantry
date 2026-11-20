@@ -1,5 +1,8 @@
 import { parseCommerceGraphResponse } from "@purin-labs/commerce-client";
-import type { CommerceEntity, CommerceFreshness } from "@purin-labs/contracts";
+import type {
+  CommerceEntity,
+  CommerceFreshness,
+} from "@purin-labs/commerce-contracts";
 import { describe, expect, it } from "vitest";
 
 import {

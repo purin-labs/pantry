@@ -1,5 +1,5 @@
 import React from "react";
-import type { CommerceEntity } from "@purin-labs/contracts";
+import type { CommerceEntity } from "@purin-labs/commerce-contracts";
 import { ControlApiError, controlRead } from "../../../control-client";
 import type { CommerceActionRecord } from "@purin-labs/control-api/portal/commerce-actions";
 import { SlackThreadControl } from "../../collaboration/slack-thread-control";

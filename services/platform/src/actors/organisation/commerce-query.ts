@@ -1,7 +1,7 @@
 import type {
   CommerceQueryPlan,
   CommerceGraphQueryPlanRequest,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceGraphQueryPlanRequest,
   parseCommerceSnapshotRevision,

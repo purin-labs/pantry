@@ -1,7 +1,7 @@
 // The execution and the reconciliation of a commerce action on Shopify. The
 // commerce area calls these two functions for a shop whose commerce system is
 // Shopify. Today the one action is the cancellation of an order.
-import type { CommerceProjection } from "@purin-labs/contracts";
+import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 import { type CommerceActionPath } from "../commerce/action-model";
 import type {
   ActionLedgerEntry,

@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@purin-labs/bakery-model": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",

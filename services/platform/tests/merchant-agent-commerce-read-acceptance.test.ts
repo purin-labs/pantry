@@ -1,12 +1,11 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
+import type { GrantSubject, RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceGraphQueryResult,
-  GrantSubject,
-  RequestAuthority,
   CommerceContextRequest,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceGraphQuery,
   parseCommerceGraphResponse,

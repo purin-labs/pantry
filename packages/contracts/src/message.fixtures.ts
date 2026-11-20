@@ -9,6 +9,7 @@
 // `mint*` helpers below stand in for those parsers with one narrow cast each,
 // so a fixture never launders a raw string into a domain value implicitly.
 
+import type { IntegrationAccountId } from "@purin-labs/commerce-contracts";
 import type {
   AttachmentDescriptor,
   AttachmentId,
@@ -18,7 +19,6 @@ import type {
   FileExtensionHint,
   HttpUrl,
   ImageMediaType,
-  IntegrationAccountId,
   MessageAttachmentSource,
   MessageLink,
   NonEmptyText,

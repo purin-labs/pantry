@@ -2,7 +2,8 @@ import { requireOrganisationId, requireIntegrationAccountId } from "./test-ids";
 /// <reference types="@cloudflare/workers-types" />
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { CommerceProjection, RequestAuthority } from "@purin-labs/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 
 const accountMocks = vi.hoisted(() => ({
   resolveActiveProviderAccountContext: vi.fn(),

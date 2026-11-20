@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useBlocker } from "react-router";
 import { DraftLeaveDialog } from "../collaboration/draft-leave-dialog";
-import type { RecipeRevision } from "@purin-labs/contracts";
+import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import {
   calculateBakeryCostsAndMargins,
   parseCostsOverview,

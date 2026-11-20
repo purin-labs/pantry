@@ -5,7 +5,8 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env, OrganisationActorStub } from "../../../env";
 import type { Result } from "../../../result";
-import type { CommerceGraphQuery, RequestAuthority } from "@purin-labs/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
 import {
   parseCommerceCommandId,
   CommerceEntityPlaneClient,

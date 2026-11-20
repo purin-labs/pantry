@@ -3,7 +3,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import type { CommerceProjection } from "@purin-labs/contracts";
+import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";

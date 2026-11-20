@@ -9,15 +9,15 @@ import {
   type CommerceEntityPlaneFetch,
   type CommerceEntityPlanePublishedResourceMetadataResponse,
 } from "@purin-labs/commerce-client";
+import type { AccessTargetRef } from "@purin-labs/contracts";
 import type {
-  AccessTargetRef,
   CommerceCursor,
   CommerceEntity,
   CommerceGraphQueryResult,
   CommerceList,
   CommerceListEntry,
   CommerceRelationshipRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { sameCommerceRelationshipRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 
 import type { AccessGrantTarget } from "../../authorization/access-grants/types";

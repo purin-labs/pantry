@@ -2,7 +2,7 @@ import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import type {
   CommerceListEntryRef,
   CommerceRelationshipRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseCommerceListEntryRef,
   parseCommerceRelationshipRef,

@@ -811,7 +811,7 @@ export async function passSharedDraftExit(
 
 export function selectMerchantReportSourceGrant(
   lease: HarnessTurnLease,
-  typeId: import("@purin-labs/contracts").SystemCommerceEntityKind,
+  typeId: import("@purin-labs/commerce-contracts").SystemCommerceEntityKind,
   allowedSensitivity: "internal" | "restricted",
   input: Readonly<{
     organisationId: string;

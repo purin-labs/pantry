@@ -5,12 +5,12 @@ import {
   parseCommerceEntityPlaneCommand,
   parseEntityPlaneCommandResult,
 } from "@purin-labs/commerce-client";
+import type { ActionState } from "@purin-labs/contracts";
 import type {
-  ActionState,
   CommerceEntityPlaneEffect,
   CommerceEntityRef,
   CommerceMutationReceiptV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";

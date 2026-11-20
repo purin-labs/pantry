@@ -2,7 +2,7 @@ import type {
   CommerceEntityRef,
   CustomCommerceRelationshipRef,
   CommerceListEntryRef,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 export type CommerceBoardPresenceSelection =
   | Readonly<{ kind: "none" }>

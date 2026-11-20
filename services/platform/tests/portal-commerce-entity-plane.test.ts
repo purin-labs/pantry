@@ -9,7 +9,7 @@ import { parseCommerceEntityPlaneCommand } from "@purin-labs/commerce-client";
 import type {
   CommerceBoardViewConfiguration,
   CommerceList,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   buildCommerceBoardModel,

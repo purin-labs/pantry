@@ -4,7 +4,7 @@ import type {
   CommerceCursor,
   CommerceEntity,
   CommerceGraphQuery,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { assertCommerceGraphQueryWithLexicon } from "./commerce-wasm";

@@ -2,7 +2,7 @@ import type {
   CommerceFilter,
   CommerceGraphQuery,
   SystemCommerceEntityKind,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import { assertCommerceGraphQueryWithLexicon } from "../commerce-wasm";
 import { assertNever } from "@purin-labs/std";

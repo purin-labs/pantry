@@ -1,7 +1,7 @@
 import type {
   CheckoutProfile,
   CheckoutProfileConfiguration,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import type {

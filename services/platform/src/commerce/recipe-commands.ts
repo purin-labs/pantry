@@ -7,7 +7,7 @@ import type {
   CommerceAdminClient,
   CommerceStockSnapshot,
 } from "@purin-labs/commerce-client";
-import type { RecipeRevision } from "@purin-labs/contracts";
+import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import { canonicalJson } from "@purin-labs/std";
 
 /**

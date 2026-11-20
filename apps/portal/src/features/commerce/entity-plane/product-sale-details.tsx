@@ -1,4 +1,7 @@
-import { parseInventory, type InventoryData } from "@purin-labs/contracts";
+import {
+  parseInventory,
+  type InventoryData,
+} from "@purin-labs/commerce-contracts";
 import { MEDIA_CONTENT_TYPES, MEDIA_MAX_BYTES } from "@purin-labs/commerce-client";
 import { ArrowLeft, ArrowRight, ImagePlus, Trash2 } from "lucide-react";
 import React from "react";

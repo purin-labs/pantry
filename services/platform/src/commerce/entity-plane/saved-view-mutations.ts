@@ -6,7 +6,7 @@ import type {
   SavedCommerceView,
   SavedCommerceViewRevision,
   CommerceMutationReceiptV1,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 import {
   parseSavedCommerceViewRevision,
   type CommerceEntityPlaneClient,

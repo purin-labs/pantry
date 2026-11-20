@@ -1,7 +1,7 @@
 import type {
   LocationKind,
   ShopifyResourceEnvelopeV202607,
-} from "@purin-labs/contracts";
+} from "@purin-labs/commerce-contracts";
 
 import {
   normalizeShopifyCommerceResourceDelivery,

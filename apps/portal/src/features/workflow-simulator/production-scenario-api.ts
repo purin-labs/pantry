@@ -8,7 +8,7 @@ import {
   type ProductionScenario,
 } from "@purin-labs/bakery-model/bakery-production-scenario";
 import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";
-import type { CustomCommerceEntity } from "@purin-labs/contracts";
+import type { CustomCommerceEntity } from "@purin-labs/commerce-contracts";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import {
   customEntityRef,
