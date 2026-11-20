@@ -89,15 +89,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.menu-presence-words[data-agent-color] {
-  --agent: #6d3fe0;
-}
-
-.menu-presence-words[data-agent-color="teal"] {
-  --agent: #00796b;
-}
-
-.menu-presence-words[data-agent-color="gold"] {
-  --agent: #8f6300;
-}

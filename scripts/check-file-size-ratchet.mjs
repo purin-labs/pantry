@@ -21,9 +21,10 @@ const LIMIT = 3000;
 
 // Source code only: tests, generated files and data tables are not checked.
 // Since Refactor 16 step 14 the ratchet also covers the Rust crates and the
-// scripts (journeys, builders and tools).
+// scripts (journeys, builders and tools). Since Refactor 17 step A2.3 it
+// covers the style sheets.
 const SOURCE = [
-  /^(apps|packages|services)\/.+\.(ts|tsx|mjs|js)$/,
+  /^(apps|packages|services)\/.+\.(ts|tsx|mjs|js|css)$/,
   /^crates\/.+\.rs$/,
   /^scripts\/.+\.(mjs|js|py)$/,
 ];

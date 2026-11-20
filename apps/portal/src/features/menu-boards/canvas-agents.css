@@ -1,6 +1,7 @@
 /* Plan 40B phase 7, slice 2: agents on the free canvas. The overlay uses
    board units; a cursor and its tag scale back to screen size. Agents have
-   their own colours, apart from the six colours of people. */
+   their own colours, apart from the six colours of people. This file has the
+   one definition of each agent colour, also for the presence bar. */
 
 .menu-canvas-agent,
 .menu-canvas-agent-mark,
@@ -9,7 +10,8 @@
 .menu-canvas-agent-draft,
 .menu-canvas-layer-agent,
 .menu-canvas-ruler-range,
-.menu-presence-agent {
+.menu-presence-agent,
+.menu-presence-words {
   --agent: #6d3fe0;
 }
 

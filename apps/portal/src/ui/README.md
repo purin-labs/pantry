@@ -89,6 +89,47 @@ buttons excludes it with `button:not(:where(.pantry-select-trigger))`.
 `.pantry-select-icon`. Use `Combobox` for searchable resource lists and
 `ActionMenu` for commands rather than form values.
 
+### Button
+
+`Button` (`button.tsx`) is the Portal button on
+[Base UI Button](https://base-ui.com/react/components/button). It renders
+`<button type="button">`; pass `type="submit"` in a form. Use it for each new
+button with a label.
+
+- `variant="primary"` is the main action of a page or a dialog.
+- `variant="secondary"` (the default) is each other action.
+- `variant="danger"` is an action that removes or stops something.
+- `variant="link"` is an action that reads as text, such as Cancel beside a
+  main action.
+- `size="lg"` is the main action at the foot of a page or a dialog. It is
+  44px high and takes the text size of its place. The default `md` is 40px
+  high with 14px text.
+
+```tsx
+<Button variant="link" onClick={close}>Cancel</Button>
+<Button variant="primary" size="lg" type="submit" disabled={saving}>
+  Save
+</Button>
+```
+
+A disabled button shows a wait pointer, because a button is disabled while its
+write runs. `button.css` owns the look. Each of its rules has more specificity
+than a page rule for every raw button of a container, such as
+`.home-recovery button`, so that rule does not change a `Button`. A page that
+sets the size, the width or the font of a `Button` in its own container
+targets `button.pantry-button` there:
+
+```css
+.order-queue-actions button.pantry-button {
+  min-block-size: 48px;
+}
+```
+
+The classes `primary-button`, `secondary` and `danger` in `styles.css` give a
+raw `<button>` the same look. They stay for the pages that do not use `Button`
+yet. Do not use them in new code. A toggle in a segmented control, an icon
+button and a row that opens a record are not a `Button`.
+
 ### Grain fields
 
 `GrainField` (`grain-field.tsx` + `grain-field.css`) is a moving, grainy
