@@ -1,3 +1,4 @@
+import { sessionModule } from "./session-module-support";
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject, runDurableObjectAlarm } from "cloudflare:test";
@@ -326,12 +327,14 @@ function injectCrash(
   actor: object,
   state: DurableObjectState,
 ): void {
-  const original = Reflect.get(actor, "commitCanonicalHarnessCheckpoint");
+  // The harness turns module of the Session accepts the checkpoint.
+  const turns = sessionModule(actor, "harnessTurns");
+  const original = Reflect.get(turns, "commitCanonicalHarnessCheckpoint");
   if (typeof original !== "function")
     throw new Error("Missing checkpoint acceptance");
-  Object.defineProperty(actor, "commitCanonicalHarnessCheckpoint", {
+  Object.defineProperty(turns, "commitCanonicalHarnessCheckpoint", {
     configurable: true,
-    value: crashAfterCommit.bind(null, fault, name, actor, state, original),
+    value: crashAfterCommit.bind(null, fault, name, turns, state, original),
   });
   if (fault.boundary === "after_upload") {
     const actorEnv = Object.create(Reflect.get(actor, "env"));
@@ -493,9 +496,7 @@ function closeAdmissionDuringFinalization(
   state: DurableObjectState,
 ): void {
   // The checkpoints module of the Session finalizes; the hook is on it.
-  const checkpoints: unknown = Reflect.get(actor, "checkpoints");
-  if (typeof checkpoints !== "object" || checkpoints === null)
-    throw new Error("Missing checkpoints module");
+  const checkpoints = sessionModule(actor, "checkpoints");
   const original = Reflect.get(
     checkpoints,
     "completeCanonicalCheckpointAndStream",

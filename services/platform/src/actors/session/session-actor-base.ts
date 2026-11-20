@@ -1,18 +1,8 @@
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { Env } from "../../env";
-import { newRequestId, type SessionId, type OrganisationId } from "../../ids";
-import { traceLog } from "../../observability";
+import { type SessionId, type OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { readCanonicalSessionForPersistence } from "../agent-session-canonical";
-import {
-  acceptHarnessEvent,
-  appendHarnessHistory,
-  type AcceptHarnessEventInput,
-  type AppendHarnessHistoryInput,
-  type HarnessAuthorityError,
-  type HarnessEventAcceptance,
-  type HarnessHistoryAcceptanceWithUsage,
-} from "../agent-session-harness-authority";
 import {
   canAdmitSessionWork,
   isPortalChatCleanupPlacementActive,
@@ -37,7 +27,6 @@ import type { SessionToolWiring } from "./tool-wiring";
 import type { SessionTransientHost } from "./transient-host";
 import { piToolRules } from "../pi-tool-replay";
 import { settleActorExecution } from "../actor-execution-quiescence";
-import type { CanonicalHarnessEventError } from "./types";
 
 /**
  * The Session actor's state and its Portal chat cleanup (Refactor 10, step 2.5). The layers above it add checkpoints, harness turns, recovery and transient turns; `SessionDO` adds the RPC methods.
@@ -229,35 +218,16 @@ export abstract class SessionActorBase extends PlacedActor<null> {
     }
   }
 
-  async acceptCanonicalHarnessEvent(
-    input: AcceptHarnessEventInput,
-  ): Promise<Result<HarnessEventAcceptance, CanonicalHarnessEventError>> {
-    return acceptHarnessEvent(this.ctx.storage, input);
+  acceptCanonicalHarnessEvent(
+    ...input: Parameters<SessionShared["acceptCanonicalHarnessEvent"]>
+  ) {
+    return this.shared.acceptCanonicalHarnessEvent(...input);
   }
 
-  async appendHarnessHistory(
-    input: AppendHarnessHistoryInput,
-  ): Promise<
-    Result<
-      HarnessHistoryAcceptanceWithUsage,
-      | HarnessAuthorityError
-      | { readonly code: "canonical_session_schema_mismatch" }
-    >
-  > {
-    const appendStartedAt = Date.now();
-    const result = await appendHarnessHistory(this.ctx.storage, input);
-    if (result.ok) {
-      traceLog("session.harness_history_append_metrics", {
-        requestId: newRequestId(),
-        session_id: input.sessionId,
-        turn_id: input.turn.turnId,
-        outcome: result.value.kind,
-        entry_count: result.value.usage.entryCount,
-        durable_bytes: result.value.usage.inlineBytes,
-        append_duration_ms: Date.now() - appendStartedAt,
-      });
-    }
-    return result;
+  appendHarnessHistory(
+    ...input: Parameters<SessionShared["appendHarnessHistory"]>
+  ) {
+    return this.shared.appendHarnessHistory(...input);
   }
 
   get sql(): SqlStorage {

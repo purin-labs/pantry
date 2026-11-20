@@ -1,3 +1,4 @@
+import { sessionModule } from "./session-module-support";
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject } from "cloudflare:test";
@@ -77,10 +78,12 @@ function injectTransitionFailure(
   actor: object,
   state: DurableObjectState,
 ): void {
-  const original = Reflect.get(actor, "commitCanonicalHarnessCheckpoint");
+  // The harness turns module of the Session accepts the checkpoint.
+  const turns = sessionModule(actor, "harnessTurns");
+  const original = Reflect.get(turns, "commitCanonicalHarnessCheckpoint");
   if (typeof original !== "function")
     throw new Error("Missing checkpoint acceptance");
-  Object.defineProperty(actor, "commitCanonicalHarnessCheckpoint", {
+  Object.defineProperty(turns, "commitCanonicalHarnessCheckpoint", {
     configurable: true,
     value: acceptAfterRejection.bind(null, evidence, actor, state, original),
   });
@@ -94,10 +97,11 @@ async function acceptAfterRejection(
   checkpoint: unknown,
   transition: unknown,
 ): Promise<unknown> {
+  const turns = sessionModule(actor, "harnessTurns");
   const before = checkpointRows(state);
   const invalid = JSON.parse(JSON.stringify(transition));
   invalid.event.sequence += 1;
-  const rejected = await Reflect.apply(original, actor, [checkpoint, invalid]);
+  const rejected = await Reflect.apply(original, turns, [checkpoint, invalid]);
   expect(rejected).toMatchObject({
     ok: false,
     error: { code: "journal_sequence_gap" },
@@ -105,11 +109,11 @@ async function acceptAfterRejection(
   evidence.rejected = true;
   expect(checkpointRows(state)).toEqual(before);
   evidence.rollbackVerified = true;
-  Object.defineProperty(actor, "commitCanonicalHarnessCheckpoint", {
+  Object.defineProperty(turns, "commitCanonicalHarnessCheckpoint", {
     configurable: true,
     value: original,
   });
-  const accepted = await Reflect.apply(original, actor, [
+  const accepted = await Reflect.apply(original, turns, [
     checkpoint,
     transition,
   ]);

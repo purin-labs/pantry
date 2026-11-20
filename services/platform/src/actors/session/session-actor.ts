@@ -305,7 +305,9 @@ export abstract class SessionActor extends SessionTurnRecovery {
     );
     if (!closed.ok) return closed;
     if (this.shared.portalChatQuiescence === null)
-      this.shared.portalChatQuiescence = this.drainPortalChatCleanup(closed.value);
+      this.shared.portalChatQuiescence = this.drainPortalChatCleanup(
+        closed.value,
+      );
     const result = await this.shared.portalChatQuiescence;
     if (!result.ok) this.shared.portalChatQuiescence = null;
     return result;
@@ -438,7 +440,9 @@ export abstract class SessionActor extends SessionTurnRecovery {
     }
     return {
       ok: true,
-      value: { kind: this.shared.transientExecutions.size > 0 ? "running" : "idle" },
+      value: {
+        kind: this.shared.transientExecutions.size > 0 ? "running" : "idle",
+      },
     };
   }
 
@@ -486,7 +490,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       input.organisationId,
       input.sessionId,
       sessionProjection.state.contract.modelRoute,
-      this.selectEmbeddedHarnessAdapter(
+      this.harnessTurns.selectEmbeddedHarnessAdapter(
         sessionProjection.state.contract.modelRoute,
       ),
     );
@@ -974,9 +978,10 @@ export abstract class SessionActor extends SessionTurnRecovery {
             reason: "recovery_cancellation_invalid",
           },
         };
-      const cancelled = await this.cancelCanonicalEmbeddedHarnessTurn(
-        cancellation.value,
-      );
+      const cancelled =
+        await this.harnessTurns.cancelCanonicalEmbeddedHarnessTurn(
+          cancellation.value,
+        );
       if (!cancelled.ok) return cancelled;
       discardHarnessTurnContinuation(this.ctx.storage.sql);
       const failed = failOrphanedSessionTurnStreams(
@@ -1038,9 +1043,10 @@ export abstract class SessionActor extends SessionTurnRecovery {
       },
     });
     if (!cancellation.ok) return cancellation;
-    const interrupted = await this.cancelCanonicalEmbeddedHarnessTurn(
-      cancellation.value,
-    );
+    const interrupted =
+      await this.harnessTurns.cancelCanonicalEmbeddedHarnessTurn(
+        cancellation.value,
+      );
     if (!interrupted.ok) return interrupted;
     traceLog("session.canonical_turn_interrupted", {
       requestId: requestId.value,
@@ -1113,7 +1119,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     );
     if (execution === null || !(await execution.isActive()))
       return { ok: false, error: { code: "invalid_persisted_state" } };
-    return this.readCanonicalEmbeddedHarnessInput({
+    return this.harnessTurns.readCanonicalEmbeddedHarnessInput({
       execution,
       requestingOrganisationId: input.requestingOrganisationId,
       lease: input.lease,
@@ -1165,7 +1171,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
           reason: "turn_running",
         },
       };
-    const work = this.prepareCanonicalTextTurn(input);
+    const work = this.harnessTurns.prepareCanonicalTextTurn(input);
     this.shared.canonicalTurn = settleActorExecution(work);
     try {
       return await work;
@@ -1379,7 +1385,10 @@ export abstract class SessionActor extends SessionTurnRecovery {
         name: "quarantine_end",
         run: () => this.endInterruptedTurnQuarantine(),
       },
-      { name: "ended_executions", run: () => this.shared.releaseEndedExecutions() },
+      {
+        name: "ended_executions",
+        run: () => this.shared.releaseEndedExecutions(),
+      },
       {
         name: "bakery_surface_effects",
         run: () =>
@@ -1427,7 +1436,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     const organisationId =
       lease === null ? null : parseOrganisationId(lease.session.organisationId);
     if (lease === null || organisationId?.ok !== true) return;
-    await this.resolveFailedTurn({
+    await this.harnessTurns.resolveFailedTurn({
       organisationId: organisationId.value,
       lease,
       cancellationId: `cancel_${exhaustion.exhaustionId}`,

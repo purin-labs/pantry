@@ -1,4 +1,8 @@
 import {
+  SessionCheckpoints,
+  type SessionCheckpointsRpc,
+} from "./session-checkpoints";
+import {
   countOpenEffectsBesidesBilling,
   reconcilePantryExecutionBilling,
 } from "../../account-platform/execution-billing";
@@ -35,7 +39,10 @@ import {
   readHarnessHistory,
   readUnpublishedHarnessCheckpoint,
 } from "../agent-session-harness-authority";
-import type { HarnessHistoryEntry, HarnessTurnLease } from "@purin-labs/contracts";
+import type {
+  HarnessHistoryEntry,
+  HarnessTurnLease,
+} from "@purin-labs/contracts";
 import { isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import {
   canonicalRunBudgetIdentity,
@@ -52,7 +59,11 @@ import { materializedHarnessHistory } from "./harness-source";
 import { failOrphanedSessionTurnStreams } from "./replay";
 import { CODE_MODE_LEASE_REBIND_RETRY_MS } from "./support";
 import { KNOWN_ZERO_MODEL_USAGE } from "./transient-turns";
-import { SessionHarnessTurns } from "./session-harness-turns";
+import {
+  SessionHarnessTurns,
+  type SessionHarnessTurnsRpc,
+} from "./session-harness-turns";
+import { SessionActorBase } from "./session-actor-base";
 
 /**
  * What a Session termination ends by itself: the quarantine, and the open
@@ -69,7 +80,55 @@ const INTERRUPTED_TURN_NOTE =
 /**
  * Recovery of interrupted harness turns and of checkpoint publication and finalization.
  */
-export abstract class SessionTurnRecovery extends SessionHarnessTurns {
+export abstract class SessionTurnRecovery
+  extends SessionActorBase
+  implements SessionCheckpointsRpc, SessionHarnessTurnsRpc
+{
+  /** The checkpoints of the Session: restore, finalization and publication. */
+  protected readonly checkpoints = new SessionCheckpoints(this.shared);
+
+  /** The turns of the embedded harness: input, run, checkpoint and failure. */
+  protected readonly harnessTurns = new SessionHarnessTurns(
+    this.shared,
+    this.checkpoints,
+  );
+
+  cancelCanonicalEmbeddedHarnessTurn(
+    ...input: Parameters<
+      SessionHarnessTurns["cancelCanonicalEmbeddedHarnessTurn"]
+    >
+  ) {
+    return this.harnessTurns.cancelCanonicalEmbeddedHarnessTurn(...input);
+  }
+
+  commitCanonicalHarnessCheckpoint(
+    ...input: Parameters<
+      SessionHarnessTurns["commitCanonicalHarnessCheckpoint"]
+    >
+  ) {
+    return this.harnessTurns.commitCanonicalHarnessCheckpoint(...input);
+  }
+
+  completeCanonicalCheckpointAndStream(
+    ...input: Parameters<
+      SessionCheckpoints["completeCanonicalCheckpointAndStream"]
+    >
+  ) {
+    return this.checkpoints.completeCanonicalCheckpointAndStream(...input);
+  }
+
+  readSessionTurnFlowBinding(
+    ...input: Parameters<SessionCheckpoints["readSessionTurnFlowBinding"]>
+  ) {
+    return this.checkpoints.readSessionTurnFlowBinding(...input);
+  }
+
+  readCompletedTurn(
+    ...input: Parameters<SessionCheckpoints["readCompletedTurn"]>
+  ) {
+    return this.checkpoints.readCompletedTurn(...input);
+  }
+
   protected recoverUnrecoverableTurn(now: number): void {
     recoverInterruptedSessionInTransaction(this.ctx.storage.sql, now);
     discardHarnessTurnContinuation(this.ctx.storage.sql);
@@ -229,7 +288,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       if (!accepted.ok && accepted.error.code !== "budget_exhausted")
         return false;
     }
-    const resolved = await this.resolveFailedTurn({
+    const resolved = await this.harnessTurns.resolveFailedTurn({
       organisationId: organisationId.value,
       lease,
       cancellationId: `interrupted_${lease.turn.turnId}`,
@@ -369,7 +428,9 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
     if (resumed === null) return;
     const work = this.resumeHarnessTurn(resumed);
     this.shared.canonicalTurn = settleActorExecution(work);
-    this.ctx.waitUntil(work.finally(this.checkpoints.clearCanonicalTurn.bind(this)));
+    this.ctx.waitUntil(
+      work.finally(this.checkpoints.clearCanonicalTurn.bind(this)),
+    );
   }
 
   /**
@@ -400,9 +461,10 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       },
     });
     if (!cancellation.ok) return;
-    const cancelled = await this.cancelCanonicalEmbeddedHarnessTurn(
-      cancellation.value,
-    );
+    const cancelled =
+      await this.harnessTurns.cancelCanonicalEmbeddedHarnessTurn(
+        cancellation.value,
+      );
     if (!cancelled.ok) {
       await armAlarmBy(this.ctx.storage, now + CODE_MODE_LEASE_REBIND_RETRY_MS);
       return;
@@ -434,31 +496,33 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       // Pi restores its own usage; this attempt starts from none.
       const priorUsage = { ...KNOWN_ZERO_MODEL_USAGE };
       const result =
-        await this.runAndCheckpointCanonicalEmbeddedHarnessTextTurn({
-          execution,
-          acceptedTurnTools: null,
-          startReceiptCheck: null,
-          startedInheritedHistory: null,
-          startedGoalCase: null,
-          requestingOrganisationId: pending.continuation.organisationId,
-          requestId: pending.continuation.requestId,
-          runtime: {
-            kind: "resume_turn",
-            binding: pending.continuation.binding,
-            cursor: pending.cursor,
-            priorUsage,
+        await this.harnessTurns.runAndCheckpointCanonicalEmbeddedHarnessTextTurn(
+          {
+            execution,
+            acceptedTurnTools: null,
+            startReceiptCheck: null,
+            startedInheritedHistory: null,
+            startedGoalCase: null,
+            requestingOrganisationId: pending.continuation.organisationId,
+            requestId: pending.continuation.requestId,
+            runtime: {
+              kind: "resume_turn",
+              binding: pending.continuation.binding,
+              cursor: pending.cursor,
+              priorUsage,
+            },
+            lease: pending.lease,
+            harnessInstructions: pending.continuation.harnessInstructions,
+            thinkingLevel: pending.continuation.thinkingLevel ?? undefined,
+            turnPrompt: pending.continuation.turnPrompt,
+            browserContext: pending.continuation.browserContext,
+            surfaceContext: null,
+            completion: pending.continuation.completion,
           },
-          lease: pending.lease,
-          harnessInstructions: pending.continuation.harnessInstructions,
-          thinkingLevel: pending.continuation.thinkingLevel ?? undefined,
-          turnPrompt: pending.continuation.turnPrompt,
-          browserContext: pending.continuation.browserContext,
-          surfaceContext: null,
-          completion: pending.continuation.completion,
-        });
+        );
       if (!result.ok) throw new Error(result.error.code);
     } catch (error) {
-      await this.resolveFailedTurn({
+      await this.harnessTurns.resolveFailedTurn({
         organisationId: pending.continuation.organisationId,
         lease: pending.lease,
         cancellationId: `cancel_${pending.continuation.requestId}`,

@@ -12,7 +12,7 @@ import {
   newRequestId,
   type SessionId,
 } from "../../ids";
-import { traceWarn } from "../../observability";
+import { traceLog, traceWarn } from "../../observability";
 import type { Result } from "../../result";
 import { resolveActiveCaseActorAtPlacement } from "../actor-router";
 import { type AgentSessionPersistence } from "../agent-session-schema";
@@ -30,7 +30,19 @@ import {
   type TrackedTransientSessionExecution,
 } from "./support";
 import type { SessionToolWiring } from "./tool-wiring";
-import type { CheckpointPublicationError } from "./types";
+import type {
+  CanonicalHarnessEventError,
+  CheckpointPublicationError,
+} from "./types";
+import {
+  acceptHarnessEvent,
+  appendHarnessHistory,
+  type AcceptHarnessEventInput,
+  type AppendHarnessHistoryInput,
+  type HarnessAuthorityError,
+  type HarnessEventAcceptance,
+  type HarnessHistoryAcceptanceWithUsage,
+} from "../agent-session-harness-authority";
 
 /**
  * The state that the modules of the Session actor share (Refactor 17, step
@@ -184,5 +196,37 @@ export class SessionShared {
         error: errorMessage(error).slice(0, 300),
       });
     }
+  }
+
+  /** Accepts one event of the harness. The harness calls it as its sink. */
+  async acceptCanonicalHarnessEvent(
+    input: AcceptHarnessEventInput,
+  ): Promise<Result<HarnessEventAcceptance, CanonicalHarnessEventError>> {
+    return acceptHarnessEvent(this.ctx.storage, input);
+  }
+
+  async appendHarnessHistory(
+    input: AppendHarnessHistoryInput,
+  ): Promise<
+    Result<
+      HarnessHistoryAcceptanceWithUsage,
+      | HarnessAuthorityError
+      | { readonly code: "canonical_session_schema_mismatch" }
+    >
+  > {
+    const appendStartedAt = Date.now();
+    const result = await appendHarnessHistory(this.ctx.storage, input);
+    if (result.ok) {
+      traceLog("session.harness_history_append_metrics", {
+        requestId: newRequestId(),
+        session_id: input.sessionId,
+        turn_id: input.turn.turnId,
+        outcome: result.value.kind,
+        entry_count: result.value.usage.entryCount,
+        durable_bytes: result.value.usage.inlineBytes,
+        append_duration_ms: Date.now() - appendStartedAt,
+      });
+    }
+    return result;
   }
 }
