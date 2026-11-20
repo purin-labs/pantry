@@ -13,7 +13,7 @@ import {
 } from "../../src/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
-import { createCommerceClient } from "../../src/commerce/outbox-worker";
+import { createCommerceClient } from "../../src/commerce/contract/client";
 import {
   commerceClient,
   commerceWorkspace,

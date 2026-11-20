@@ -10,13 +10,13 @@ import type {
 } from "@purin-labs/commerce-client";
 import { isRecord } from "@purin-labs/std";
 
-import type { VaultSecret } from "../credential-vault/domain";
-import { resolveOrganisationCommerceSystem } from "../data/organisation-commerce-system";
-import type { Env } from "../env";
-import { newRequestId, type OrganisationId } from "../ids";
-import { traceWarn } from "../observability";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { createCommerceClient } from "./outbox-worker";
+import type { VaultSecret } from "../../credential-vault/domain";
+import { resolveOrganisationCommerceSystem } from "../../data/organisation-commerce-system";
+import type { Env } from "../../env";
+import { newRequestId, type OrganisationId } from "../../ids";
+import { traceWarn } from "../../observability";
+import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { createCommerceClient } from "./client";
 
 /** The organisation's Commerce merchant, reached with Pantry's app token. */
 export type CommerceMerchant = Readonly<{

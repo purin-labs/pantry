@@ -9,7 +9,7 @@ import { listDevices } from "../devices/store";
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { createCommerceClient } from "../commerce/outbox-worker";
+import { createCommerceClient } from "../commerce/contract/client";
 
 const CACHE_MS = 5 * 60_000;
 /** A prompt of this length stays well inside Whisper's 224 tokens. */

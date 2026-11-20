@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../commerce/app-access";
+import { pantryCommerceAccess } from "../commerce/contract/client";
 import type {
   CommerceGraphQuery,
   CommerceSensitivity,

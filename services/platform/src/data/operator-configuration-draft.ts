@@ -32,8 +32,8 @@ import {
   offerPriceAllowanceAlreadyApplied,
   parseOfferPriceAllowanceCommand,
   type OfferPriceAllowanceCommand,
-} from "./offer-price-allowance";
-import type { PublishedResourceBoundaryError } from "../commerce/entity-plane/published-resources";
+} from "../commerce/contract/offer-price-allowance";
+import type { PublishedResourceBoundaryError } from "../commerce/contract/types";
 import type { Result } from "../result";
 import { digestCanonical } from "../policy";
 import {

@@ -10,7 +10,7 @@ import { advanceOrderQueueEntry } from "../../src/commerce/order-queue-commands"
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { parseIntegrationAccountId, parseRequestId } from "../../src/ids";
-import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/contract/queue-messages";
 import { reconcileCommerceOutbox } from "../../src/commerce/outbox-worker";
 import {
   placeCafeOrder,

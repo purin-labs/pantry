@@ -399,8 +399,13 @@ beside the large file. When a listed file gets smaller, run
 [Refactor 17](docs/refactor-17.md) gives each source file a module in one of
 three layers: foundation, product areas and surfaces. `scripts/layers.json` is
 the map. An import goes only down the layers. One area imports no file of
-another area; it may import the workspace package of that area, which is its
-contract. Only the owner module of a D1 table writes it. `pnpm lint:layers` refuses a
+another area; it may import the contract of that area: its workspace package,
+or a public file that `contracts` in the map lists, such as
+`services/platform/src/commerce/contract/`. A public file holds types,
+schemas and entry points. It imports no file of its own area that is not
+public, except with `import type`; `pnpm lint:layers` refuses a public file
+that does. A service that needs the inside of its area stays behind an
+interface that the Worker wires. Only the owner module of a D1 table writes it. `pnpm lint:layers` refuses a
 new crossing, and it refuses a source file, a top-level folder or a D1 table
 with no line in the map. Remove a crossing with a port: the lower module
 defines an interface, and the higher one gives the implementation. Then run

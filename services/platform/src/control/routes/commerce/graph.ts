@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../../commerce/app-access";
+import { pantryCommerceAccess } from "../../../commerce/contract/client";
 import { ensureCaseProject } from "../../../projects/case-project";
 import type { OrganisationPlacementBindings } from "../../../organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
@@ -60,7 +60,7 @@ import {
   type CommerceExportPresetError,
 } from "../../../data/export-preset";
 import { prepareTurnAuthority } from "../../../context/turn-context";
-import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/contract/queue-messages";
 import {
   newRequestId,
   parseCaseId,
@@ -91,7 +91,7 @@ import {
   controlMutationIdentity,
   resolveMutationUser,
 } from "../../admission/control-mutation";
-import { resolveMerchantBinding } from "../../commerce-merchant";
+import { resolveMerchantBinding } from "../../../commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";

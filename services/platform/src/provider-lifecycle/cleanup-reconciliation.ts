@@ -2,7 +2,7 @@ import type { OrganisationDatabaseSession } from "../database-handles";
 import {
   readSquareDelegation,
   type SquareDelegation,
-} from "../commerce/square-link";
+} from "../commerce/contract/square-link";
 import {
   OrganisationExecutionScope,
   dispatchWithOrganisationPlacement,

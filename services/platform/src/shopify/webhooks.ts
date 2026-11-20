@@ -9,7 +9,7 @@ import {
   methodNotAllowed,
   notFound,
 } from "../http";
-import { createCommerceDeliveryQueueMessage } from "../commerce/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
 import { createShopifyCommerceRefreshQueueMessage } from "./queue-messages";
 import {
   newRequestId,

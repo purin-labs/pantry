@@ -24,7 +24,6 @@ import {
   buildCommerceCancellationActionDraft,
   commerceActionExpectedRevision,
   commerceActionMutationDigest,
-  commerceProjectionRevision,
   commerceTrackingAttachmentTargetMatches,
   isCommerceActionNonce as isActionNonce,
   parseCommerceActionPath,
@@ -32,6 +31,7 @@ import {
   type CommerceActionError,
   type CommerceActionRequest,
 } from "../../../commerce/action-model";
+import { commerceProjectionRevision } from "../../../commerce/contract/commerce-provider";
 import { listPublishedCommerceTargets } from "../../../commerce/entity-plane/published-resources";
 import type { PermissionRequired } from "@purin-labs/control-api";
 import { CAPABILITY_KEYS } from "../../../authorization/capability-catalogue";
@@ -64,7 +64,7 @@ import {
 } from "../../../slack/organisation-routing";
 import { resolveOrganisationCommerceSystemAuthority } from "../../../data/organisation-commerce-system";
 import { previewMerchantPluginAction } from "../../../commerce/provider-execution";
-import type { CommerceProviderExecutionError } from "../../../commerce/commerce-provider";
+import type { CommerceProviderExecutionError } from "../../../commerce/contract/commerce-provider";
 import { prepareTurnAuthority } from "../../../context/turn-context";
 import {
   parseCaseId,
@@ -80,12 +80,12 @@ import {
 import { loadOrganisationPolicyOrDefaultDeny } from "../../../policy-snapshot";
 import { buildControlAuthority } from "../../../request-authority";
 import { resolveOrganisationModelRoute } from "../../../models/route";
+import { resolveCommerceCancellationAuthority } from "../../../commerce/provider";
 import {
-  resolveCommerceCancellationAuthority,
   commerceCanonicalResourceId,
   commerceProviderResourceId,
-} from "../../../commerce/provider";
-import { createCommerceClient } from "../../../commerce/outbox-worker";
+} from "../../../commerce/contract/resource-ids";
+import { createCommerceClient } from "../../../commerce/contract/client";
 import {
   admitUserMutation,
   controlMutationIdentity,

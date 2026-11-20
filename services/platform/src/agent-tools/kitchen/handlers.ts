@@ -27,7 +27,7 @@ import {
   requireSessionExecution,
   admittedSessionOperation,
 } from "../../actors/session-execution-admission";
-import { createCommerceEntityPlaneClient } from "../../commerce/outbox-worker";
+import { createCommerceEntityPlaneClient } from "../../commerce/contract/client";
 import {
   recipeCollectionOf,
   saveRecipeDraft,

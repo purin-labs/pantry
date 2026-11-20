@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "./app-access";
+import { pantryCommerceAccess } from "./contract/client";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
   CommerceCursor,
@@ -13,7 +13,7 @@ import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation
 import type { Env } from "../env";
 import { newRequestId, type OrganisationId } from "../ids";
 import type { Result } from "../result";
-import { commerceCanonicalResourceId } from "./provider";
+import { commerceCanonicalResourceId } from "./contract/resource-ids";
 import { buildSavedSelectorCommerceReadAuthority } from "./entity-plane/authority";
 import { CommerceGraphReader } from "./entity-plane/graph-reader";
 import { CommerceEngineSource } from "./entity-plane/commerce-source";

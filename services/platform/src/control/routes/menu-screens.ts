@@ -27,7 +27,7 @@ import { readCafeImageContent } from "../../commerce/cafe-media";
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { createCommerceClient } from "../../commerce/outbox-worker";
+import { createCommerceClient } from "../../commerce/contract/client";
 import {
   countOpenScreenPairings,
   deleteExpiredScreenPairings,

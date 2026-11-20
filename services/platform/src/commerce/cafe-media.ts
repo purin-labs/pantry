@@ -8,7 +8,7 @@ import { readOrganisationEnvironment } from "../control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import type { OrganisationId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { createCommerceClient } from "./outbox-worker";
+import { createCommerceClient } from "./contract/client";
 import { commerceCommandInput, type CommerceAdminClient } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { Result } from "../result";

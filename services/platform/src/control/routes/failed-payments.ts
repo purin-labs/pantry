@@ -1,7 +1,7 @@
 import type { FailedPaymentsDay } from "@purin-labs/control-api";
 
 import type { Env } from "../../env";
-import { resolveMerchantControlContext } from "../commerce-merchant";
+import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
 import { isPaymentWindow } from "../../commerce/payments-read";

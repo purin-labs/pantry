@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { pantryCommerceAccess } from "../commerce/app-access";
+import { pantryCommerceAccess } from "../commerce/contract/client";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {

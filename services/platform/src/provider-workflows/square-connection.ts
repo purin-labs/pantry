@@ -5,7 +5,7 @@ import {
   resolveCommerceMerchant,
   squareDelegationSecret,
   type SquareDelegation,
-} from "../commerce/square-link";
+} from "../commerce/contract/square-link";
 import { storeOrganisationPlacementVaultSecret } from "../credential-vault/service";
 import {
   createConnectedIntegration,

@@ -47,11 +47,23 @@ export function trackedFiles(...paths) {
 }
 
 const IMPORT =
-  /(?:import|export)\s[^'"]*?from\s*["']([^"']+)["']|import\s*\(\s*["']([^"']+)["']\s*\)/g;
+  /(?:import|export)(\s+type)?\s[^'";]*?from\s*["']([^"']+)["']|import\s*\(\s*["']([^"']+)["']\s*\)/g;
+
+/**
+ * The imports of a source text, static and dynamic. `typeOnly` is true for
+ * `import type … from` and `export type … from`, which leave no import in
+ * the built code.
+ */
+export function importStatementsOf(text) {
+  return [...text.matchAll(IMPORT)].map((match) => ({
+    specifier: match[2] ?? match[3],
+    typeOnly: match[1] !== undefined,
+  }));
+}
 
 /** The import specifiers of a source text, static and dynamic. */
 export function importsOf(text) {
-  return [...text.matchAll(IMPORT)].map((match) => match[1] ?? match[2]);
+  return importStatementsOf(text).map(({ specifier }) => specifier);
 }
 
 /** A resolver of relative imports against a set of known files. */

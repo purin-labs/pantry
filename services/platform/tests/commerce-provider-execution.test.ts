@@ -43,7 +43,8 @@ vi.mock("../src/data/commerce-merchant-binding", () => ({
   resolveCommerceMerchantBinding:
     commerceEngineMocks.resolveCommerceMerchantBinding,
 }));
-vi.mock("../src/commerce/outbox-worker", () => ({
+vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/commerce/contract/client")>()),
   createCommerceClient: commerceEngineMocks.createCommerceClient,
 }));
 vi.mock("../src/commerce/provider", async (importOriginal) => ({

@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../../commerce/app-access";
+import { pantryCommerceAccess } from "../../../commerce/contract/client";
 import type { Env } from "../../../env";
 import {
   connectedStockOverview,
@@ -8,19 +8,19 @@ import type { Result } from "../../../result";
 import {
   createPublishedResourceClient,
   enumeratePublishedResources,
-  type PublishedResourceBoundaryError,
 } from "../../../commerce/entity-plane/published-resources";
+import type { PublishedResourceBoundaryError } from "../../../commerce/contract/types";
 import { ensureCommerceLowStockCueSnapshot } from "../../../cues/engine";
 import {
   commerceCanonicalResourceId,
   commerceProviderResourceId,
-} from "../../../commerce/provider";
+} from "../../../commerce/contract/resource-ids";
 import {
   applyOfferPriceAllowance,
   parseOfferPriceAllowanceCommand,
   type OfferPriceAllowanceCommand,
   type OfferPriceAllowanceError,
-} from "../../../data/offer-price-allowance";
+} from "../../../commerce/contract/offer-price-allowance";
 import type {
   CommerceClientResult,
   CommerceOfferPriceResultV1,
@@ -37,7 +37,7 @@ import {
 import {
   resolveMerchantBinding,
   resolveMerchantControlContext,
-} from "../../commerce-merchant";
+} from "../../../commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 

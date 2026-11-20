@@ -1,4 +1,4 @@
-import type { SquareDelegation } from "../commerce/square-link";
+import type { SquareDelegation } from "../commerce/contract/square-link";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
   VaultHandle,

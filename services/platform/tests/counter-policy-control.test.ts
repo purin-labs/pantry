@@ -43,8 +43,8 @@ vi.mock("../src/control/mutation-receipt", () => ({
   recordCommerceMutationReceipt:
     counterPolicyMocks.recordCommerceMutationReceipt,
 }));
-vi.mock("../src/commerce/outbox-worker", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/commerce/outbox-worker")>()),
+vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/commerce/contract/client")>()),
   createCommerceClient: vi.fn(() => ({
     publishPointOfSaleConfiguration:
       counterPolicyMocks.publishPointOfSaleConfiguration,

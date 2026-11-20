@@ -32,7 +32,7 @@ import type { Env, SessionActorStub } from "../env";
 import { removeVoiceMacNames } from "../voice/dns";
 import { listVoiceMacNameIds } from "../voice/store";
 import { purgeOrganisationDeviceFleets } from "../devices/purge";
-import { closeOrganisationCommerceMerchants } from "../commerce/merchant-closure";
+import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
 import { revokeOrganisationDevicesStatements } from "../devices/store";
 import { parseOrganisationPlacement } from "../placement";
 import type { Result } from "../result";

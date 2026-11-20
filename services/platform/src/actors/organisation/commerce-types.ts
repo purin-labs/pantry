@@ -5,11 +5,8 @@ import type {
   CommerceReadWatermark,
   SystemCommerceEntityRef,
 } from "@purin-labs/commerce-contracts";
-import type {
-  IntegrationAccountId,
-  RequestId,
-  OrganisationId,
-} from "../../ids";
+import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type { CafeCommerceAcceptanceFaultRecord } from "../../commerce/contract/types";
 import type {
   ApplyCommerceDeliveryInput,
   CommerceProjectionRecord,
@@ -20,14 +17,6 @@ import type {
   CommerceBoardDragPreview,
   CommerceBoardPresenceSelection,
 } from "@purin-labs/commerce-control-api";
-
-export type CafeCommerceAcceptanceFaultRecord = Readonly<{
-  schemaVersion: 1;
-  requestId: RequestId;
-  merchantId: string;
-  armedAt: number;
-  queueConsumedAt: number | null;
-}>;
 
 export type CafeCommerceAcceptanceFaultConsumption =
   | Readonly<{ kind: "inactive" }>

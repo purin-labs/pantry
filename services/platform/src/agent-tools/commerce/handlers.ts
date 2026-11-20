@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../commerce/app-access";
+import { pantryCommerceAccess } from "../../commerce/contract/client";
 import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
   PaymentsReadRequest,
@@ -22,7 +22,7 @@ import type { CommerceObservationEntity } from "../../actors/agent-session-infor
 import { runMerchantReport } from "../../commerce/entity-plane/merchant-report-runner";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
-import { createCommerceClient } from "../../commerce/outbox-worker";
+import { createCommerceClient } from "../../commerce/contract/client";
 import {
   advanceOrderQueueEntry,
   presentOrderQueueEntry,
@@ -55,7 +55,7 @@ import {
   readNeedsPrivateChat,
   type RequestableEntityTypeRead,
 } from "../../authorization/requestable-capabilities";
-import { commerceCanonicalResourceId } from "../../commerce/provider";
+import { commerceCanonicalResourceId } from "../../commerce/contract/resource-ids";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,

@@ -13,10 +13,8 @@ import {
 } from "@purin-labs/commerce-client";
 
 import type { Result } from "../../result";
-import {
-  enumeratePublishedResources,
-  type PublishedResourceBoundaryError,
-} from "./published-resources";
+import { enumeratePublishedResources } from "./published-resources";
+import { type PublishedResourceBoundaryError } from "../contract/types";
 import type { SavedCommerceViewPresentationPatch } from "./routes";
 import type { Variant } from "@purin-labs/type-utils";
 

@@ -9,7 +9,7 @@ import { builtInCommerceProvider } from "./built-in-commerce-provider";
 import type {
   CommerceProvider,
   CommerceProviderPermit,
-} from "./commerce-provider";
+} from "./contract/commerce-provider";
 
 type CommerceProviders = { [K in CommerceSystemKind]: CommerceProvider<K> };
 

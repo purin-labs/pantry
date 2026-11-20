@@ -5,10 +5,10 @@
 // D1 batch; the merchant bindings stay after the purge, so a purge that
 // stopped here finds the same merchants again, and a repeated close changes
 // nothing.
-import type { OrganisationDatabase } from "../database-handles";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
-import { createCommerceClient } from "./outbox-worker";
+import type { OrganisationDatabase } from "../../database-handles";
+import type { Env } from "../../env";
+import type { OrganisationId } from "../../ids";
+import { createCommerceClient } from "./client";
 
 export async function closeOrganisationCommerceMerchants(
   env: Env,
