@@ -400,6 +400,33 @@ the reason: callers use 245 methods of the four Actors at 440 places, in about 1
 files. An interface for each module is a larger piece of work, and it needs the
 environment parts to have an effect. It is now a part of step A1.2.
 
+**20 November 2026. Steps A2.2 and A2.3 are done in the Portal,** on the branch
+`refactor-17-a2-2-portal-hooks`. They are not on `dev` yet. The surface registry
+of step A2.3 is open: it changes the Platform too.
+
+| Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A2.2 | `useLatestRead` gives its read an `AbortSignal`, and it has `retry`, `pauseWhenHidden` and `reloadOn`. `useMutation` has `busy`. `usePeriodRead` is built on `useLatestRead`. The Devices page, the order queue, Payments, Payouts and the order timeline use the hooks, and each has a request module (`requests.ts`). `pnpm lint:portal-requests` (`scripts/check-portal-requests-ratchet.mjs`) counts the direct calls of the control client in component files: 99 in 46 files, from 106 in 50. It shares `scripts/lib/count-ratchet.mjs` with `lint:portal-fetch` |
+| A2.3 | `Button` in `ui/` on Base UI Button, with the variants `primary`, `secondary`, `danger` and `link`. The moved pages use it for 38 buttons; 1,291 raw `<button>` elements remain. `pnpm lint:file-size` reads style sheets: `apps/portal/src/styles.css` (11,106 lines) and `apps/storefront/src/styles.css` (3,907 lines) are in the ratchet. The agent colours of the menu canvas have one definition                                                                                                                                                                 |
+
+What the steps show:
+
+- The Organisation settings keep the `MutationLedger` of `mutation-state.ts`. It is
+  the state of the `Portal` class, and a Platform test reads it. `useMutation` has
+  no scope rule for two different writes of one record.
+- 30 custom properties have a definition in two or more style sheets. One group
+  was a copy: the three agent colours of the menu canvas, now merged. The others
+  differ by intent: 4 radii and 1 shadow of the Kitchen and menu workspaces, the width of
+  the sidebar by state, 13 `--navbar-*` values of the site page, 8 Portal aliases
+  in two preview pages, and 2 values that a host gives to a component. The design
+  tokens are in `packages/frontend-theme.css` and its theme files, and the Portal
+  aliases are in the first rule of `styles.css`.
+- A page rule for every raw button of a container, such as `.home-recovery button`,
+  also matches a `Button`. The rules of `button.css` have more specificity, and a
+  page sets a size with `button.pantry-button`.
+- The devices preview page had no CSRF cookie, so each write on it failed. It sets
+  one now.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
