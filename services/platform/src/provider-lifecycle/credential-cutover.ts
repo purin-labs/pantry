@@ -12,6 +12,7 @@ import {
 import { compilePublishAndActivateOrganisationPolicy } from "../policy-snapshot";
 import type { Result } from "../result";
 import { prepareSupersededGenerationsRevocation } from "../data/provider-credential-generation";
+import { prepareSupersededGenerationSecretsRevocation } from "../credential-vault/secret-revocation";
 
 export type ProviderCredentialCutoverError = {
   readonly code: "provider_policy_activation_failed";
@@ -117,24 +118,11 @@ async function revokeSupersededCredentialGenerations(input: {
 }): Promise<void> {
   const session = input.db.withSession("first-primary");
   await session.batch([
-    session
-      .prepare(
-        `UPDATE vault_secret
-       SET revoked_at = COALESCE(revoked_at, ?)
-       WHERE organisation_id = ?
-         AND vault_handle IN (
-           SELECT credential_ref
-           FROM provider_credential_generation
-           WHERE organisation_id = ? AND provider_connection_id = ?
-             AND lifecycle = 'superseded'
-         )`,
-      )
-      .bind(
-        input.now,
-        input.organisationId,
-        input.organisationId,
-        input.providerConnectionId,
-      ),
+    prepareSupersededGenerationSecretsRevocation(session, {
+      now: input.now,
+      organisationId: input.organisationId,
+      providerConnectionId: input.providerConnectionId,
+    }),
     prepareSupersededGenerationsRevocation(session, {
       now: input.now,
       organisationId: input.organisationId,

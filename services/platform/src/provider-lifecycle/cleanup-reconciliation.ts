@@ -34,7 +34,10 @@ import type {
 } from "../provider-adapters/domain";
 import type { Variant } from "@purin-labs/type-utils";
 import { backoffDelay, isString } from "@purin-labs/std";
-import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
+import {
+  prepareCredentialRefRevocation,
+  prepareVaultSecretRevocation,
+} from "../credential-vault/secret-revocation";
 import { prepareCleanedConnectionGenerationsRevocation } from "../data/provider-credential-generation";
 import { prepareCleanedConnectionRevocation } from "../data/provider-connection-writes";
 
@@ -431,12 +434,11 @@ function providerCredentialRevocationStatements(
   const statements: D1PreparedStatement[] = [];
   for (const handle of cleanup.credentialHandles) {
     statements.push(
-      session
-        .prepare(
-          `UPDATE credential_ref SET revoked_at = ?
-         WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-        )
-        .bind(now, cleanup.organisationId, handle),
+      prepareCredentialRefRevocation(session, {
+        now,
+        organisationId: cleanup.organisationId,
+        handle,
+      }),
       prepareVaultSecretRevocation(session, {
         organisationId: cleanup.organisationId,
         handle: handle,

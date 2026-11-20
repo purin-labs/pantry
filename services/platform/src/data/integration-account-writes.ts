@@ -401,3 +401,16 @@ export function prepareCredentialHandleWebhooksRevocation(
       input.handle,
     );
 }
+
+/** Deletes the webhooks of a removed account. */
+export function prepareRemovedAccountWebhooksDelete(
+  db: Database,
+  integrationAccountId: string,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `DELETE FROM provider_webhook
+       WHERE integration_account_id = ?`,
+    )
+    .bind(integrationAccountId);
+}

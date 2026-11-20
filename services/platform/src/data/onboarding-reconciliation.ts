@@ -1,5 +1,6 @@
 import { purgeArchivedOrganisation } from "./organisation-purge";
 import {
+  prepareArchiveCleanupAwaitsPurge,
   prepareOrganisationLifecycleMove,
   ARCHIVE_CLEANUP_PLACEMENT_STATUSES,
   type LifecycleFence,
@@ -55,6 +56,10 @@ import {
 } from "./integration-account-writes";
 import { prepareArchivedOrganisationConnectionsRevocation } from "./provider-connection-writes";
 import { prepareArchivedOrganisationGenerationsRevocation } from "./provider-credential-generation";
+import {
+  prepareArchivedOrganisationCredentialRefsRevocation,
+  prepareArchivedOrganisationSecretsRevocation,
+} from "../credential-vault/secret-revocation";
 import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,
@@ -1118,24 +1123,17 @@ async function reconcileArchivedOrganisation(
         organisationId: organisation.organisationId,
         guard: stillArchived,
       }),
-      session
-        .prepare(
-          `UPDATE vault_secret SET revoked_at = ?
-         WHERE organisation_id = ? AND revoked_at IS NULL
-           AND vault_handle NOT IN (SELECT value FROM json_each(?)) AND ${archived}`,
-        )
-        .bind(
-          now,
-          organisation.organisationId,
-          sharedCredentials,
-          organisation.organisationId,
-        ),
-      session
-        .prepare(
-          `UPDATE credential_ref SET revoked_at = ?
-         WHERE organisation_id = ? AND revoked_at IS NULL AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
+      prepareArchivedOrganisationSecretsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        sharedHandles: sharedCredentials,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationCredentialRefsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
       session
         .prepare(
           `UPDATE voice_mac
@@ -1149,13 +1147,11 @@ async function reconcileArchivedOrganisation(
         organisation.organisationId,
         now,
       ),
-      session
-        .prepare(
-          `UPDATE organisation_archive_cleanup
-         SET status = 'pending_purge', updated_at = ?
-         WHERE organisation_id = ? AND status = 'pending_provider_cleanup' AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
+      prepareArchiveCleanupAwaitsPurge(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
     ]);
     for (const result of results) repaired += result.meta.changes;
     return repaired;

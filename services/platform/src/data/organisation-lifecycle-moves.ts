@@ -9,6 +9,10 @@
  * error, so it throws.
  */
 import type { MachineEvent, MachineState } from "@purin-labs/std/state-machine";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
 import type { OrganisationId } from "../ids";
 import type { OrganisationQuerySource } from "./query-source";
 import type { RowGuard } from "./shared-rows/organisation-row";
@@ -228,4 +232,22 @@ export function prepareInstalledOnboardingRow(
       input.installedAt,
       input.installedAt,
     );
+}
+
+/**
+ * Moves the archive cleanup of an Organisation from the provider cleanup to
+ * the wait for the purge, while the guard holds. The table
+ * `organisation_archive_cleanup` belongs to the lifecycle.
+ */
+export function prepareArchiveCleanupAwaitsPurge(
+  db: OrganisationDatabase | OrganisationDatabaseSession,
+  input: Readonly<{ now: number; organisationId: string; guard: RowGuard }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE organisation_archive_cleanup
+         SET status = 'pending_purge', updated_at = ?
+         WHERE organisation_id = ? AND status = 'pending_provider_cleanup' AND ${input.guard.sql}`,
+    )
+    .bind(input.now, input.organisationId, ...input.guard.bindings);
 }

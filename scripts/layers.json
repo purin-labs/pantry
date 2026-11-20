@@ -1031,6 +1031,7 @@
     "services/platform/src/data/supplier-payout-event-inbox.ts": "areas/commerce",
     "services/platform/src/data/supplier-payout-plan.ts": "areas/commerce",
     "services/platform/src/data/supplier-payout-store.ts": "areas/commerce",
+    "services/platform/src/data/surface-installation-writes.ts": "foundation/tenancy",
     "services/platform/src/data/terminal-assignment-store.ts": "areas/cafe",
     "services/platform/src/data/terminal-operations-readback.ts": "areas/cafe",
     "services/platform/src/data/user-preferences.ts": "areas/organisation",

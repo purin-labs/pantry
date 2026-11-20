@@ -21,7 +21,12 @@ import { readProviderCleanupContext } from "../provider-adapters/catalogue";
 import { parseActiveIntegrationProvider } from "./integration-provider-directory";
 import { fileAccountErasureStatements } from "../context/files";
 import { sha256Hex } from "@purin-labs/std";
-import { prepareRemovedAccountPseudonymization } from "./integration-account-writes";
+import {
+  prepareRemovedAccountPseudonymization,
+  prepareRemovedAccountWebhooksDelete,
+} from "./integration-account-writes";
+import { prepareRemovedAccountResourcesErasure } from "./provider-resource";
+import { prepareRemovedAccountInstallationDelete } from "./surface-installation-writes";
 import { prepareRemovedConnectionRevocation } from "./provider-connection-writes";
 import { prepareRemovedConnectionGenerationsRevocation } from "./provider-credential-generation";
 import {
@@ -187,39 +192,15 @@ export async function removeIntegrationAccount(input: {
         "DELETE FROM contact_endpoint_verification WHERE organisation_id = ? AND integration_account_id = ?",
       )
       .bind(input.organisationId, input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_resource_cursor
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_discovered_resource
-       WHERE snapshot_revision IN (
-         SELECT snapshot_revision FROM provider_resource_snapshot
-         WHERE integration_account_id = ?
-       )`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_resource_snapshot
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_webhook
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM surface_installation
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
+    ...prepareRemovedAccountResourcesErasure(
+      session,
+      input.integrationAccountId,
+    ),
+    prepareRemovedAccountWebhooksDelete(session, input.integrationAccountId),
+    prepareRemovedAccountInstallationDelete(
+      session,
+      input.integrationAccountId,
+    ),
     session
       .prepare(
         `DELETE FROM organisation_communication_destination

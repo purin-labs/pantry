@@ -38,6 +38,7 @@ import {
 } from "./provider-credential-generation";
 import { prepareDefaultAccountReplacement } from "./integration-account-writes";
 import { prepareConnectionCredentialRotation } from "./provider-connection-writes";
+import { prepareCredentialRefRotation } from "../credential-vault/secret-revocation";
 
 const CREDENTIAL_ROTATION_FAILURE_CODES = [
   "replacement_environment_mismatch",
@@ -1049,19 +1050,12 @@ export async function commitCredentialRotation(input: {
       providerConnectionId: input.rotation.connection.providerConnectionId,
       credentialGeneration: input.rotation.authority.credentialGeneration,
     }),
-    session
-      .prepare(
-        `UPDATE credential_ref
-         SET vault_handle = ?
-         WHERE organisation_id = ? AND provider = ? AND vault_handle = ?
-           AND revoked_at IS NULL`,
-      )
-      .bind(
-        input.rotation.replacementHandle,
-        input.organisationId,
-        input.rotation.connection.provider,
-        input.rotation.authority.credentialRef,
-      ),
+    prepareCredentialRefRotation(session, {
+      replacementHandle: input.rotation.replacementHandle,
+      organisationId: input.organisationId,
+      provider: input.rotation.connection.provider,
+      handle: input.rotation.authority.credentialRef,
+    }),
     session
       .prepare(
         `UPDATE credential_rotation

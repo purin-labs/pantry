@@ -3,7 +3,7 @@
     "upward": 147,
     "areas": 153,
     "order": 103,
-    "table": 76
+    "table": 62
   },
   "crossings": {
     "areas/brain -> areas/inbox": 10,
@@ -121,8 +121,6 @@
     "table agent_installation_governance (foundation/agent) <- areas/commerce": 1,
     "table agent_responsibility_scope (foundation/agent) <- areas/commerce": 1,
     "table contact_endpoint_verification (areas/inbox) <- areas/organisation": 1,
-    "table credential_ref (foundation/authority) <- areas/integrations": 2,
-    "table credential_ref (foundation/authority) <- areas/organisation": 1,
     "table credential_ref (foundation/authority) <- foundation/connections": 1,
     "table cue_binding (foundation/agent) <- areas/commerce": 1,
     "table cue_log (foundation/agent) <- areas/commerce": 1,
@@ -134,7 +132,6 @@
     "table onboarding_reconciliation_run (areas/organisation) <- surfaces/email": 1,
     "table onboarding_support_reference (areas/organisation) <- foundation/connections": 1,
     "table operational_area (foundation/agent) <- areas/commerce": 1,
-    "table organisation_archive_cleanup (foundation/tenancy) <- areas/organisation": 1,
     "table organisation_communication_destination (areas/organisation) <- foundation/connections": 1,
     "table organisation_default_workspace (foundation/agent) <- foundation/tenancy": 1,
     "table organisation_readiness_assessment (areas/organisation) <- foundation/tenancy": 2,
@@ -145,10 +142,6 @@
     "table provider_account_cleanup (areas/integrations) <- areas/organisation": 1,
     "table provider_connection (foundation/connections) <- foundation/tenancy": 5,
     "table provider_credential_generation (foundation/connections) <- foundation/tenancy": 5,
-    "table provider_discovered_resource (foundation/connections) <- areas/organisation": 1,
-    "table provider_resource_cursor (foundation/connections) <- areas/organisation": 1,
-    "table provider_resource_snapshot (foundation/connections) <- areas/organisation": 1,
-    "table provider_webhook (foundation/connections) <- areas/organisation": 1,
     "table provider_webhook (foundation/connections) <- foundation/tenancy": 1,
     "table side_case_proposal (foundation/conversation) <- surfaces/slack": 2,
     "table skill (foundation/agent) <- areas/commerce": 1,
@@ -159,11 +152,6 @@
     "table slack_installation_lifecycle_event (areas/organisation) <- surfaces/webhooks": 1,
     "table slack_thread_case_pin (surfaces/slack) <- foundation/tenancy": 1,
     "table state_object_relocation (foundation/tenancy) <- foundation/actor-runtime": 3,
-    "table surface_installation (foundation/tenancy) <- areas/organisation": 1,
-    "table surface_installation (foundation/tenancy) <- foundation/connections": 2,
-    "table vault_secret (foundation/authority) <- areas/integrations": 1,
-    "table vault_secret (foundation/authority) <- areas/organisation": 1,
-    "table vault_secret (foundation/authority) <- foundation/agent": 1,
     "table vault_secret (foundation/authority) <- foundation/tenancy": 1,
     "table voice_mac (surfaces/voice) <- areas/organisation": 1
   }

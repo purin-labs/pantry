@@ -578,3 +578,36 @@ function randomCursor(): string {
     .replace(/\//gu, "_")
     .replace(/=+$/gu, "");
 }
+
+/**
+ * Deletes the resource records of a removed account: its cursor, the
+ * resources of its snapshots and the snapshots, in that order.
+ */
+export function prepareRemovedAccountResourcesErasure(
+  db: Pick<OrganisationDatabase, "prepare">,
+  integrationAccountId: string,
+): D1PreparedStatement[] {
+  return [
+    db
+      .prepare(
+        `DELETE FROM provider_resource_cursor
+       WHERE integration_account_id = ?`,
+      )
+      .bind(integrationAccountId),
+    db
+      .prepare(
+        `DELETE FROM provider_discovered_resource
+       WHERE snapshot_revision IN (
+         SELECT snapshot_revision FROM provider_resource_snapshot
+         WHERE integration_account_id = ?
+       )`,
+      )
+      .bind(integrationAccountId),
+    db
+      .prepare(
+        `DELETE FROM provider_resource_snapshot
+       WHERE integration_account_id = ?`,
+      )
+      .bind(integrationAccountId),
+  ];
+}

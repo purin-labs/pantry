@@ -53,6 +53,10 @@ import {
   isString,
 } from "@purin-labs/std";
 import {
+  prepareDisabledAccountInstallationDelete,
+  prepareSurfaceInstallationUpsert,
+} from "./surface-installation-writes";
+import {
   prepareProjectionRevisionBump,
   prepareReauthProjectionBump,
   prepareUnfencedConfigurationBump,
@@ -1057,12 +1061,10 @@ export async function disableIntegrationAccount(input: {
        WHERE organisation_id = ? AND integration_account_id = ? AND lifecycle != 'revoked'`,
       )
       .bind(input.now, input.organisationId, input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM surface_installation
-       WHERE organisation_id = ? AND integration_account_id = ?`,
-      )
-      .bind(input.organisationId, input.integrationAccountId),
+    prepareDisabledAccountInstallationDelete(session, {
+      organisationId: input.organisationId,
+      integrationAccountId: input.integrationAccountId,
+    }),
     session
       .prepare(
         `UPDATE provider_connection
@@ -1928,27 +1930,16 @@ export async function upsertSurfaceInstallation(input: {
 }): Promise<void> {
   const session = input.db.withSession("first-primary");
   await session.batch([
-    session
-      .prepare(
-        `INSERT INTO surface_installation (
-         integration_account_id, organisation_id, surface_kind, workspace_id, install_model,
-         bot_token_ref, scopes, installed_at, last_event_received_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)
-       ON CONFLICT (integration_account_id) DO UPDATE SET
-         surface_kind = excluded.surface_kind, workspace_id = excluded.workspace_id,
-         install_model = excluded.install_model, bot_token_ref = excluded.bot_token_ref,
-         scopes = excluded.scopes, installed_at = excluded.installed_at`,
-      )
-      .bind(
-        input.account.integrationAccountId,
-        input.account.organisationId,
-        input.surfaceKind,
-        input.workspaceId,
-        input.installModel,
-        input.botTokenRef,
-        JSON.stringify(input.scopes),
-        input.installedAt,
-      ),
+    prepareSurfaceInstallationUpsert(session, {
+      integrationAccountId: input.account.integrationAccountId,
+      organisationId: input.account.organisationId,
+      surfaceKind: input.surfaceKind,
+      workspaceId: input.workspaceId,
+      installModel: input.installModel,
+      botTokenRef: input.botTokenRef,
+      scopes: JSON.stringify(input.scopes),
+      installedAt: input.installedAt,
+    }),
     prepareProjectionRevisionBump(session, input.account.organisationId),
   ]);
 }
