@@ -13,6 +13,7 @@ import type { SlackInstallationIdentity } from "../src/slack/installation-identi
 import { createSlackInstallation } from "../src/slack/organisation-routing";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireOrganisationId, requireWorkspaceId } from "./test-ids";
+import "./provide-organisation-lifecycle-parts";
 
 describe("Slack install organisation admission", function slackInstallOrganisationAdmissionSuite() {
   it(

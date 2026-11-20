@@ -65,6 +65,7 @@ import {
   createSplitTopology,
   onboardSplitOrganisation,
 } from "./split-topology";
+import "./provide-organisation-lifecycle-parts";
 
 const NOW = 1_784_390_000_000;
 

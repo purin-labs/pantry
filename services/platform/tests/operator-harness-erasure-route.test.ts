@@ -17,6 +17,7 @@ import {
 } from "./fixtures/organisation-placement";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
+import "./provide-organisation-lifecycle-parts";
 
 const ORIGIN = "https://pantry.example";
 

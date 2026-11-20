@@ -1,4 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
 import type { WorkspaceRevisionReceipt } from "@purin-labs/contracts";
 
 import {
@@ -314,4 +317,41 @@ function parseOrganisationWorkspaceBinding(
         value: { workspaceId: workspaceId.value, createdAt: row.created_at },
       }
     : { ok: false, error: { code: "organisation_workspace_binding_corrupt" } };
+}
+
+/**
+ * The first workspace of a new Organisation and its default pointer. The
+ * creation batch of tenancy runs them through the lifecycle port.
+ */
+export function prepareInitialOrganisationWorkspace(
+  session: OrganisationDatabase | OrganisationDatabaseSession,
+  input: Readonly<{
+    organisationId: OrganisationId;
+    workspaceId: string;
+    workspaceHandle: string;
+    name: string;
+    createdAt: number;
+  }>,
+): D1PreparedStatement[] {
+  return [
+    session
+      .prepare(
+        `INSERT INTO organisation_workspace (
+           workspace_id, organisation_id, workspace_handle, name, status, created_at, archived_at
+         ) VALUES (?, ?, ?, ?, 'active', ?, NULL)`,
+      )
+      .bind(
+        input.workspaceId,
+        input.organisationId,
+        input.workspaceHandle,
+        input.name,
+        input.createdAt,
+      ),
+    session
+      .prepare(
+        `INSERT INTO organisation_default_workspace (organisation_id, workspace_id, created_at)
+         VALUES (?, ?, ?)`,
+      )
+      .bind(input.organisationId, input.workspaceId, input.createdAt),
+  ];
 }

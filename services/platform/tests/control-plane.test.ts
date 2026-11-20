@@ -17,6 +17,7 @@ import { type UserId, type OrganisationId } from "../src/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { createMigratedDatabase } from "./sqlite-d1";
+import "./provide-organisation-lifecycle-parts";
 
 const NOW = 1_783_987_896_426;
 const SESSION_TTL_MS = 30 * 60 * 1000;

@@ -23,6 +23,8 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
   type WorkspaceId,
+  parseVaultHandle,
+  type VaultHandle,
 } from "../ids";
 import {
   parseOrganisationPlacement,
@@ -31,23 +33,14 @@ import {
 } from "../placement";
 import type { Result } from "../result";
 import {
-  parseVaultHandle,
-  prepareReplacedSurfaceTokenRevocation,
-  type VaultHandle,
-} from "../credential-vault";
-import {
-  prepareSurfaceInstallConnectionRows,
-  prepareSurfaceReinstallConnectionRows,
-  type IntegrationProvider,
-  type ProviderAuthMode,
-} from "./integration-account";
-import { prepareReadAndProposeAccessDefaults } from "./capability-policy";
+  organisationLifecycleParts,
+  type OrganisationCreationParts,
+} from "./organisation-lifecycle-port";
 import {
   ensureInitialOrganisationPlacement,
   prepareInitialOrganisationPlacementInsert,
 } from "./shared-rows/placement-row";
 import type { OrganisationQuerySource } from "./query-source";
-import { baseProjectId, prepareBaseProject } from "../projects/default-project";
 import { assertNever, isString } from "@purin-labs/std";
 import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
 import {
@@ -185,6 +178,7 @@ async function createOrganisationInstallWithInstallModelPolicy(
   seed: OrganisationInstallSeed,
   existingInstallModel: ExistingInstallModelPolicy,
 ): Promise<OrganisationInstallRecord> {
+  const parts = organisationLifecycleParts().creation;
   const botTokenRef = requireVaultHandle(seed.botTokenRef);
   const existing = await resolveInstallOrganisation(db, {
     surfaceKind: seed.surfaceKind,
@@ -205,6 +199,7 @@ async function createOrganisationInstallWithInstallModelPolicy(
     }
 
     return updateOrganisationInstall(
+      parts,
       db,
       existing.value,
       { ...seed, botTokenRef },
@@ -215,8 +210,7 @@ async function createOrganisationInstallWithInstallModelPolicy(
   const userId = await ensureSystemUserId(identityDatabase, seed);
   const providerConnectionId = newProviderConnectionId();
   const integrationAccountId = newIntegrationAccountId();
-  const provider = surfaceProvider(seed.surfaceKind);
-  const defaultProjectId = await baseProjectId(seed.organisationId);
+  const defaultProjectId = await parts.baseProjectId(seed.organisationId);
   const session = db.withSession("first-primary");
 
   await session.batch([
@@ -225,17 +219,15 @@ async function createOrganisationInstallWithInstallModelPolicy(
       name: seed.name,
       createdAt: seed.createdAt,
     }),
-    ...prepareSurfaceInstallConnectionRows(session, {
+    ...parts.surfaceInstall(session, {
+      surfaceKind: seed.surfaceKind,
       providerConnectionId,
       integrationAccountId,
       organisationId: seed.organisationId,
-      provider,
-      authMode: surfaceAuthMode(provider),
       botTokenRef,
       scopesJson: JSON.stringify(seed.scopes),
       userId,
       workspaceId: seed.workspaceId,
-      accountKind: surfaceAccountKind(provider),
       name: seed.name,
       capabilitySetJson: JSON.stringify(surfaceCapabilities(seed.surfaceKind)),
       audiencePolicyJson: JSON.stringify({ kind: "operator" }),
@@ -260,19 +252,14 @@ async function createOrganisationInstallWithInstallModelPolicy(
       seed.placement,
       seed.createdAt,
     ),
-    ...prepareReadAndProposeAccessDefaults({
-      source: session,
-      admission: {
-        kind: "organisation_creation",
-        organisationId: seed.organisationId,
-        placement: seed.placement,
-      },
+    ...parts.accessDefaults(session, {
+      organisationId: seed.organisationId,
+      placement: seed.placement,
       materializationReceiptId: `system-install:${seed.organisationId}`,
       now: seed.installedAt,
-      destination: { kind: "organisation" },
     }),
     // An install has no member yet, so its Base starts without an owner.
-    ...prepareBaseProject(session, {
+    ...parts.baseProject(session, {
       organisationId: seed.organisationId,
       projectId: defaultProjectId,
       ownerUserId: null,
@@ -295,12 +282,13 @@ async function createOrganisationInstallWithInstallModelPolicy(
 }
 
 async function updateOrganisationInstall(
+  parts: OrganisationCreationParts,
   db: OrganisationDatabase,
   existing: OrganisationInstallRecord,
   seed: OrganisationInstallSeed & { readonly botTokenRef: VaultHandle },
   existingInstallModel: ExistingInstallModelPolicy,
 ): Promise<OrganisationInstallRecord> {
-  const defaultProjectId = await baseProjectId(existing.organisationId);
+  const defaultProjectId = await parts.baseProjectId(existing.organisationId);
   const session = db.withSession("first-primary");
   // A repeat install reactivates the provider connection and the account. It
   // may do so only for an Organisation in use, under its placement fence
@@ -323,7 +311,7 @@ async function updateOrganisationInstall(
       name: seed.name,
       guard: live,
     }),
-    ...prepareSurfaceReinstallConnectionRows(session, {
+    ...parts.surfaceReinstall(session, {
       organisationId: existing.organisationId,
       integrationAccountId: existing.integrationAccountId,
       botTokenRef: seed.botTokenRef,
@@ -334,7 +322,7 @@ async function updateOrganisationInstall(
       installedAt: seed.installedAt,
       live,
     }),
-    prepareReplacedSurfaceTokenRevocation(session, {
+    parts.replacedSurfaceTokenRevocation(session, {
       installedAt: seed.installedAt,
       organisationId: existing.organisationId,
       integrationAccountId: existing.integrationAccountId,
@@ -352,7 +340,7 @@ async function updateOrganisationInstall(
   if (renamed?.meta.changes !== 1)
     throw new Error("organisation_lifecycle_conflict");
   await session.batch([
-    ...prepareBaseProject(session, {
+    ...parts.baseProject(session, {
       organisationId: existing.organisationId,
       projectId: defaultProjectId,
       ownerUserId: null,
@@ -530,78 +518,6 @@ function prepareSurfaceInstallationInsert(
       JSON.stringify(seed.scopes),
       seed.installedAt,
     );
-}
-
-function surfaceProvider(surfaceKind: SurfaceKind): IntegrationProvider {
-  switch (surfaceKind) {
-    case "slack":
-    case "discord":
-    case "dropbox":
-      return surfaceKind;
-    case "gdrive":
-      return "google_drive";
-    case "telegram":
-    case "whatsapp":
-    case "teams":
-    case "line-works":
-      throw new Error(`surface_provider_not_implemented:${surfaceKind}`);
-    default:
-      return assertNever(surfaceKind);
-  }
-}
-
-function surfaceAuthMode(provider: IntegrationProvider): ProviderAuthMode {
-  switch (provider) {
-    case "slack":
-    case "discord":
-      return "shared_satyr_app";
-    case "gmail":
-    case "whatsapp":
-    case "google_drive":
-    case "dropbox":
-      return "shared_satyr_app";
-    case "stripe":
-    case "square":
-    case "shopify":
-    case "airtable":
-    case "notion":
-    // Both payout rails authenticate with a purpose-bound secret rather than
-    // an OAuth grant: there is no end user to send to a consent screen.
-    case "gmo_aozora":
-    case "wise":
-      return "api_key";
-    default:
-      return assertNever(provider);
-  }
-}
-
-function surfaceAccountKind(provider: IntegrationProvider): string {
-  switch (provider) {
-    case "slack":
-      return "workspace";
-    case "discord":
-      return "guild";
-    case "google_drive":
-    case "dropbox":
-    case "airtable":
-    case "notion":
-      return "resource";
-    case "stripe":
-    case "square":
-    // A payout rail is bound to one funding account — a GMO source account or
-    // a Wise profile — not to a workspace or a resource.
-    case "gmo_aozora":
-    case "wise":
-      return "account";
-    case "shopify":
-      return "shop";
-    case "gmail":
-      return "mailbox";
-    case "whatsapp":
-      return "phone_number";
-    default:
-      return assertNever(provider);
-  }
 }
 
 function surfaceCapabilities(surfaceKind: SurfaceKind): readonly string[] {

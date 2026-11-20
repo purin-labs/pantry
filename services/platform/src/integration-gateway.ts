@@ -106,6 +106,12 @@ import {
   handleStripeWebhook,
 } from "./stripe/webhooks";
 import { handleWhatsAppWebhook } from "./whatsapp/webhook-route";
+import { provideOrganisationLifecycleParts } from "./data/organisation-lifecycle-port";
+import { ORGANISATION_LIFECYCLE_PARTS } from "./organisation-lifecycle-parts";
+
+// The lifecycle batches of tenancy get the parts of the table owners before
+// the Worker serves a request or starts an Actor.
+provideOrganisationLifecycleParts(ORGANISATION_LIFECYCLE_PARTS);
 
 export { CodeModePlatformGovernorActor } from "./actors/code-mode-platform-governor";
 

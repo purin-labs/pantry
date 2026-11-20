@@ -67,7 +67,7 @@ import {
 
 export type IntegrationProvider = OnboardingProvider;
 
-export type ProviderAuthMode =
+type ProviderAuthMode =
   "shared_satyr_app" | "api_key" | "webhook_secret";
 
 export type ProviderConnectionAuthority = {
@@ -2507,13 +2507,11 @@ export function prepareSurfaceInstallConnectionRows(
     providerConnectionId: string;
     integrationAccountId: string;
     organisationId: string;
-    provider: string;
-    authMode: string;
+    surfaceKind: SurfaceKind;
     botTokenRef: string;
     scopesJson: string;
     userId: string;
     workspaceId: string;
-    accountKind: string;
     name: string;
     capabilitySetJson: string;
     audiencePolicyJson: string;
@@ -2522,6 +2520,7 @@ export function prepareSurfaceInstallConnectionRows(
     installedAt: number;
   }>,
 ): D1PreparedStatement[] {
+  const provider = surfaceProvider(input.surfaceKind);
   return [
     session
       .prepare(
@@ -2538,8 +2537,8 @@ export function prepareSurfaceInstallConnectionRows(
       .bind(
         input.providerConnectionId,
         input.organisationId,
-        input.provider,
-        input.authMode,
+        provider,
+        surfaceAuthMode(provider),
         input.botTokenRef,
         input.scopesJson,
         input.userId,
@@ -2558,7 +2557,7 @@ export function prepareSurfaceInstallConnectionRows(
       .bind(
         input.providerConnectionId,
         input.organisationId,
-        input.provider,
+        provider,
         input.botTokenRef,
         input.createdAt,
         input.installedAt,
@@ -2579,9 +2578,9 @@ export function prepareSurfaceInstallConnectionRows(
         input.integrationAccountId,
         input.organisationId,
         input.providerConnectionId,
-        input.provider,
+        provider,
         input.workspaceId,
-        input.accountKind,
+        surfaceAccountKind(provider),
         input.name,
         input.capabilitySetJson,
         input.audiencePolicyJson,
@@ -2590,6 +2589,79 @@ export function prepareSurfaceInstallConnectionRows(
         input.installedAt,
       ),
   ];
+}
+
+/** The provider of the connection that a surface install makes. */
+function surfaceProvider(surfaceKind: SurfaceKind): IntegrationProvider {
+  switch (surfaceKind) {
+    case "slack":
+    case "discord":
+    case "dropbox":
+      return surfaceKind;
+    case "gdrive":
+      return "google_drive";
+    case "telegram":
+    case "whatsapp":
+    case "teams":
+    case "line-works":
+      throw new Error(`surface_provider_not_implemented:${surfaceKind}`);
+    default:
+      return assertNever(surfaceKind);
+  }
+}
+
+function surfaceAuthMode(provider: IntegrationProvider): ProviderAuthMode {
+  switch (provider) {
+    case "slack":
+    case "discord":
+      return "shared_satyr_app";
+    case "gmail":
+    case "whatsapp":
+    case "google_drive":
+    case "dropbox":
+      return "shared_satyr_app";
+    case "stripe":
+    case "square":
+    case "shopify":
+    case "airtable":
+    case "notion":
+    // Both payout rails authenticate with a purpose-bound secret rather than
+    // an OAuth grant: there is no end user to send to a consent screen.
+    case "gmo_aozora":
+    case "wise":
+      return "api_key";
+    default:
+      return assertNever(provider);
+  }
+}
+
+function surfaceAccountKind(provider: IntegrationProvider): string {
+  switch (provider) {
+    case "slack":
+      return "workspace";
+    case "discord":
+      return "guild";
+    case "google_drive":
+    case "dropbox":
+    case "airtable":
+    case "notion":
+      return "resource";
+    case "stripe":
+    case "square":
+    // A payout rail is bound to one funding account — a GMO source account or
+    // a Wise profile — not to a workspace or a resource.
+    case "gmo_aozora":
+    case "wise":
+      return "account";
+    case "shopify":
+      return "shop";
+    case "gmail":
+      return "mailbox";
+    case "whatsapp":
+      return "phone_number";
+    default:
+      return assertNever(provider);
+  }
 }
 
 /**

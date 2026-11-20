@@ -34,6 +34,7 @@ import {
   bindOperatorTurnAccess,
   type SessionTurnExecution,
 } from "../src/chat/turn-access";
+import "./provide-organisation-lifecycle-parts";
 
 export async function requireOrganisationExecutionScope(
   env: Pick<Env, "DB" | "PANTRY_ORGANISATION_PLACEMENT_PROFILE">,

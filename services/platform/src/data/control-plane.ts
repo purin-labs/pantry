@@ -56,15 +56,13 @@ import {
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
 } from "./control-mutation";
-import { prepareReadAndProposeAccessDefaults } from "./capability-policy";
+import { organisationLifecycleParts } from "./organisation-lifecycle-port";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type {
   OrganisationQuerySource,
   GlobalQuerySource,
 } from "./query-source";
 import {
-  baseProjectId,
-  prepareBaseProject,
   prepareBaseProjectRoleChange,
   prepareProjectMembershipRevocation,
 } from "../projects/default-project";
@@ -784,6 +782,7 @@ export async function bootstrapOrganisation(input: {
   readonly mutation: OrganisationBootstrapMutation;
   readonly now: number;
 }): Promise<Result<OrganisationBootstrap, OrganisationBootstrapError>> {
+  const parts = organisationLifecycleParts().creation;
   const reserved = await reserveOrganisationBootstrap(input);
   if (!reserved.ok) return reserved;
   const reservation = reserved.value;
@@ -791,7 +790,7 @@ export async function bootstrapOrganisation(input: {
   const personId = reservation.personId;
   const organisationHandle = reservation.organisationHandle;
   const workspace = reservation.workspace;
-  const defaultProjectId = await baseProjectId(organisationId);
+  const defaultProjectId = await parts.baseProjectId(organisationId);
   const organisationName = normalizeOrganisationName(input.organisationName);
   const selected = selectOrganisationPlacementDatabase(
     input.env,
@@ -815,25 +814,13 @@ export async function bootstrapOrganisation(input: {
     try {
       await session.batch([
         prepareBootstrapOrganisationRow(session, reservation, organisationName),
-        session
-          .prepare(
-            `INSERT INTO organisation_workspace (
-           workspace_id, organisation_id, workspace_handle, name, status, created_at, archived_at
-         ) VALUES (?, ?, ?, ?, 'active', ?, NULL)`,
-          )
-          .bind(
-            workspace.workspaceId,
-            organisationId,
-            workspace.workspaceHandle,
-            workspace.name,
-            workspace.createdAt,
-          ),
-        session
-          .prepare(
-            `INSERT INTO organisation_default_workspace (organisation_id, workspace_id, created_at)
-         VALUES (?, ?, ?)`,
-          )
-          .bind(organisationId, workspace.workspaceId, workspace.createdAt),
+        ...parts.workspace(session, {
+          organisationId,
+          workspaceId: workspace.workspaceId,
+          workspaceHandle: workspace.workspaceHandle,
+          name: workspace.name,
+          createdAt: workspace.createdAt,
+        }),
         prepareBootstrapPlacement(session, reservation, input.environment),
         prepareInitialPlacementActivation(session, {
           organisationId,
@@ -858,7 +845,7 @@ export async function bootstrapOrganisation(input: {
             personId,
             reservation.createdAt,
           ),
-        ...prepareBaseProject(session, {
+        ...parts.baseProject(session, {
           organisationId,
           projectId: defaultProjectId,
           ownerUserId: input.owner.userId,
@@ -870,16 +857,11 @@ export async function bootstrapOrganisation(input: {
           capabilityProfile: "read_and_propose",
           now: reservation.createdAt,
         }),
-        ...prepareReadAndProposeAccessDefaults({
-          source: session,
-          admission: {
-            kind: "organisation_creation",
-            organisationId,
-            placement: reservation.placement,
-          },
+        ...parts.accessDefaults(session, {
+          organisationId,
+          placement: reservation.placement,
           materializationReceiptId: reservation.receiptId,
           now: reservation.createdAt,
-          destination: { kind: "organisation" },
         }),
         prepareOnboardingAuditEvent(session, input.mutation.identity, {
           organisationId,

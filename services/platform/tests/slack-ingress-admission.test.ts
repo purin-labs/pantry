@@ -27,6 +27,7 @@ import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireOrganisationId, requireWorkspaceId } from "./test-ids";
 import { platformEnv } from "./worker-fakes";
+import "./provide-organisation-lifecycle-parts";
 
 const NOW = 1_785_810_000_100;
 

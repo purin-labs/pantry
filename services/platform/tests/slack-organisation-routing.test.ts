@@ -37,6 +37,7 @@ import {
   selectSlackDmOrganisation,
 } from "../src/slack/organisation-routing";
 import { createMigratedDatabase } from "./sqlite-d1";
+import "./provide-organisation-lifecycle-parts";
 
 const APP_ID = requiredSlackAppId("A_PLAN25B");
 const INSTALLATION_ID = requiredInstallationId("slack_installation_plan25b");

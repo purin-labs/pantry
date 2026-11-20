@@ -9,6 +9,7 @@ import {
 import { afterAll, afterEach, beforeAll, beforeEach } from "vitest";
 
 import { network } from "./network";
+import "../provide-organisation-lifecycle-parts";
 // Pi loads each model API module on its first request. In the test runner the
 // first load takes about a second, and a second Session that asks for the same
 // module during that load never gets it. A Worker bundle has no such load, so
