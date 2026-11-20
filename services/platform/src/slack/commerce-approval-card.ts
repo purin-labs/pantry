@@ -26,8 +26,6 @@ import type { Env } from "../env";
 import { requirePublicOrigin } from "../public-origin";
 import { assertNever } from "@purin-labs/std";
 
-const NOTICE_DELIVERY_PREFIX = "delivery_commerce_notice_";
-const OUTCOME_DELIVERY_PREFIX = "delivery_commerce_";
 const CARD_PARTS = "\n\n";
 /** Slack refuses a section with more text than this. */
 const SECTION_TEXT_LIMIT = 3_000;
@@ -35,26 +33,6 @@ const SECTION_TEXT_LIMIT = 3_000;
 /** The click's action identity; its value is the action nonce. */
 export const SLACK_COMMERCE_APPROVE_ACTION = "commerce_action_approve";
 export const SLACK_COMMERCE_DECLINE_ACTION = "commerce_action_decline";
-
-/** The delivery identity of the approval notice of one action. */
-export function commerceApprovalNoticeDeliveryId(actionNonce: string): string {
-  return `${NOTICE_DELIVERY_PREFIX}${actionNonce}`;
-}
-
-/** The action nonce of an approval notice, or null for any other delivery. */
-export function commerceApprovalNoticeNonce(deliveryId: string): string | null {
-  return deliveryId.startsWith(NOTICE_DELIVERY_PREFIX)
-    ? deliveryId.slice(NOTICE_DELIVERY_PREFIX.length)
-    : null;
-}
-
-/** The action nonce of an outcome, or null for any other delivery. */
-export function commerceOutcomeNonce(deliveryId: string): string | null {
-  return deliveryId.startsWith(OUTCOME_DELIVERY_PREFIX) &&
-    !deliveryId.startsWith(NOTICE_DELIVERY_PREFIX)
-    ? deliveryId.slice(OUTCOME_DELIVERY_PREFIX.length)
-    : null;
-}
 
 /** Where an owner or admin opens one action's approval card. */
 export function commerceActionPortalUrl(

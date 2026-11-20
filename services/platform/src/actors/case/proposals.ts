@@ -9,7 +9,10 @@ import { authorityPartitionKeyMatchesRequest } from "../../authorization/access-
 import { FlowBinding } from "../../policy";
 import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
 import type { Variant } from "@purin-labs/type-utils";
-import { commerceApprovalNoticeDeliveryId } from "../../slack/commerce-approval-card";
+import {
+  commerceApprovalNoticeDeliveryId,
+  commerceOutcomeDeliveryId,
+} from "./commerce-delivery-ids";
 import {
   bindingMatchesAssignmentTurn,
   journalEntryExists,
@@ -838,7 +841,7 @@ export function acceptCommerceOutcome(
     content: input.content,
     revision: next,
     addressedAt: input.acceptedAt,
-    deliveryId: `delivery_commerce_${input.actionNonce}`,
+    deliveryId: commerceOutcomeDeliveryId(input.actionNonce),
     idempotencyKey: `case_commerce_outcome_${input.actionNonce}`,
     flowBinding: input.flowBinding.toJSON(),
   });

@@ -19,11 +19,13 @@ import type { OrganisationExecutionScope } from "../../organisation-execution-sc
 import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";
 import {
   commerceActionPortalUrl,
+  commerceCardBlocks,
+} from "../../slack/commerce-approval-card";
+import {
   commerceApprovalNoticeDeliveryId,
   commerceApprovalNoticeNonce,
-  commerceCardBlocks,
   commerceOutcomeNonce,
-} from "../../slack/commerce-approval-card";
+} from "../case/commerce-delivery-ids";
 import { readOrganisationDefaultWorkspacePortalAddress } from "../../data/organisation-workspace";
 import {
   permissionCardBlocks,
