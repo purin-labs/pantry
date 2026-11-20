@@ -14,7 +14,7 @@ import {
   isAuthorizedOrganisationAdminRequest,
   isLocalDebugRequest,
   jsonBodyErrorResponse,
-} from "./support";
+} from "./request-helpers";
 
 export async function handleListIntegrationAccounts(
   request: Request,

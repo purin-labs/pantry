@@ -55,12 +55,8 @@ import {
   assertNever,
   isRecord,
 } from "@purin-labs/std";
-import {
-  handleSlackInstallationRevoked,
-  identityLinkBrowserUrl,
-  readRuntimeSecret,
-  slackPayloadErrorResponse,
-} from "../gateway/support";
+import { handleSlackInstallationRevoked, identityLinkBrowserUrl, slackPayloadErrorResponse } from "../gateway/support";
+import { readRuntimeSecret } from "../gateway/request-helpers";
 
 type SlackDurableAccept =
   | { mode: "case_accepted" }

@@ -51,12 +51,8 @@ import {
   errorMessage,
   isRecord,
 } from "@purin-labs/std";
-import {
-  ensureOrganisationObject,
-  isLocalDebugRequest,
-  parsePublicServiceUrl,
-  readRuntimeSecret,
-} from "../gateway/support";
+import { ensureOrganisationObject } from "../gateway/support";
+import { isLocalDebugRequest, parsePublicServiceUrl, readRuntimeSecret } from "../gateway/request-helpers";
 
 export const SLACK_INSTALL_SCOPES = [
   "app_mentions:read",

@@ -18,11 +18,8 @@ import {
   readJsonObject,
 } from "../../http";
 import { newRequestId } from "../../ids";
-import {
-  actorResolutionErrorResponse,
-  isAuthorizedOrganisationAdminRequest,
-  jsonBodyErrorResponse,
-} from "../support";
+import { actorResolutionErrorResponse } from "../support";
+import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "../request-helpers";
 
 export async function handleAdministerCodeModePlatformCutover(
   request: Request,

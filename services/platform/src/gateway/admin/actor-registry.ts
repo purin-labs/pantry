@@ -80,13 +80,8 @@ import { customConnectorFetchObjectName } from "../../custom-connectors/egress";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { conversationResidencyStub } from "../../actors/conversation-residency";
-import {
-  type QuarantinedCaseActorRegistryEntry,
-  actorResolutionErrorResponse,
-  isAuthorizedOrganisationAdminRequest,
-  jsonBodyErrorResponse,
-  readPositiveSafeIntegerField,
-} from "../support";
+import { type QuarantinedCaseActorRegistryEntry, actorResolutionErrorResponse } from "../support";
+import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readPositiveSafeIntegerField } from "../request-helpers";
 
 type ActorRegistryAdminRequest =
   | {

@@ -38,12 +38,7 @@ import {
   parseVaultHandle,
   storeVaultSecret,
 } from "../credential-vault";
-import {
-  fieldErrorResponse,
-  isAuthorizedOrganisationAdminRequest,
-  jsonBodyErrorResponse,
-  parsePublicServiceUrl,
-} from "../gateway/support";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, parsePublicServiceUrl } from "../gateway/request-helpers";
 
 export async function handleConfigureStripeConnector(
   request: Request,

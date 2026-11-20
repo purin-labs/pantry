@@ -29,13 +29,8 @@ import {
   assertNever,
   isRecord,
 } from "@purin-labs/std";
-import {
-  createActiveAdminIntegration,
-  fieldErrorResponse,
-  isAuthorizedOrganisationAdminRequest,
-  jsonBodyErrorResponse,
-  readJsonFailure,
-} from "../gateway/support";
+import { createActiveAdminIntegration } from "../gateway/support";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readJsonFailure } from "../gateway/request-helpers";
 
 export async function handleConfigureStripeTestCredential(
   request: Request,

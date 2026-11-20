@@ -1015,6 +1015,7 @@
     "services/platform/src/gateway/identity-link.ts": "surfaces/webhooks",
     "services/platform/src/gateway/integration-accounts.ts": "areas/integrations",
     "services/platform/src/gateway/mail-webhooks.ts": "surfaces/email",
+    "services/platform/src/gateway/request-helpers.ts": "foundation/control",
     "services/platform/src/gateway/support.ts": "surfaces/webhooks",
     "services/platform/src/harness-checkpoint.ts": "foundation/agent",
     "services/platform/src/http.ts": "foundation/kernel",

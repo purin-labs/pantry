@@ -40,16 +40,7 @@ import {
 import { parseInitialOrganisationPlacement } from "../../placement";
 import type { Result } from "../../result";
 import { assertNever } from "@purin-labs/std";
-import {
-  fieldErrorResponse,
-  isAuthorizedFaultInjectionRequest,
-  isLocalDebugRequest,
-  jsonBodyErrorResponse,
-  parseOrganisationPath,
-  parseSurfaceKindPath,
-  parseWorkspacePath,
-  routeParamErrorResponse,
-} from "../support";
+import { fieldErrorResponse, isAuthorizedFaultInjectionRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath, parseSurfaceKindPath, parseWorkspacePath, routeParamErrorResponse } from "../request-helpers";
 
 export async function handleCreateOrganisationInstall(
   request: Request,

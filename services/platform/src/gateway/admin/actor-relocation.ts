@@ -50,10 +50,7 @@ import {
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { assertNever } from "@purin-labs/std";
-import {
-  isAuthorizedOrganisationAdminRequest,
-  jsonBodyErrorResponse,
-} from "../support";
+import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "../request-helpers";
 
 type ActorRelocationAdminRequest =
   | {

@@ -57,13 +57,8 @@ import {
   storeVaultSecret,
 } from "../credential-vault";
 import { assertNever } from "@purin-labs/std";
-import {
-  createActiveAdminIntegration,
-  fieldErrorResponse,
-  isAuthorizedOrganisationAdminRequest,
-  jsonBodyErrorResponse,
-  parsePublicServiceUrl,
-} from "../gateway/support";
+import { createActiveAdminIntegration } from "../gateway/support";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, parsePublicServiceUrl } from "../gateway/request-helpers";
 
 export async function handleConfigureShopifyCredential(
   request: Request,

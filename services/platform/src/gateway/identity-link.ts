@@ -29,15 +29,15 @@ import { newRequestId } from "../ids";
 import { traceLog } from "../observability";
 import { parseSlackUserId } from "../slack/events";
 import { assertNever } from "@purin-labs/std";
+import { identityLinkBrowserUrl } from "./support";
 import {
   decodePathSegment,
   fieldErrorResponse,
-  identityLinkBrowserUrl,
   isAuthorizedOrganisationAdminRequest,
   isLocalDebugRequest,
   jsonBodyErrorResponse,
   parsePublicServiceUrl,
-} from "./support";
+} from "./request-helpers";
 
 export async function handleIssueIdentityLink(
   request: Request,

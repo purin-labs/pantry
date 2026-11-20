@@ -28,12 +28,12 @@ import {
 import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
 import { connectExternalRecordsIntegration } from "../external-records/connection";
 import { resolveExternalRecordsAccessToken } from "../external-records/oauth";
+import { readOrganisationEnvironment } from "./support";
 import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,
   jsonBodyErrorResponse,
-  readOrganisationEnvironment,
-} from "./support";
+} from "./request-helpers";
 
 export async function handleConfigureExternalRecordsCredential(
   request: Request,

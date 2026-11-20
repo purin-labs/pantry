@@ -34,13 +34,7 @@ import {
   storeVaultSecret,
 } from "../credential-vault";
 import { assertNever } from "@purin-labs/std";
-import {
-  fieldErrorResponse,
-  isAuthorizedOrganisationAdminRequest,
-  isLocalDebugRequest,
-  jsonBodyErrorResponse,
-  parseOrganisationPath,
-} from "./support";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath } from "./request-helpers";
 
 export async function handleConfigureDiscordInteraction(
   request: Request,

@@ -5,7 +5,7 @@ import type {
   MachineCensus,
   MachineStateAge,
 } from "../../actors/lifecycle/machine-census";
-import { isAuthorizedOrganisationAdminRequest } from "../support";
+import { isAuthorizedOrganisationAdminRequest } from "../request-helpers";
 
 /** The most Actors that one census request reads. */
 const CENSUS_ACTOR_LIMIT = 2_000;
