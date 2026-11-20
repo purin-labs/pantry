@@ -463,6 +463,21 @@ table-owner step), on the branch `refactor-17-a1-8`.
   four, and the baseline is written again.
 - No behavior changed: each moved line is the same.
 
+**20 November 2026. Shopify is one folder and one module of the map** (the first part
+of step A2.5), on the branch `refactor-17-a1-8`.
+
+- The three Shopify files outside `shopify/` moved into it: the provider adapter, the
+  connection workflow and the location observation. The folder holds 17 files.
+- The map has the module `areas/shopify`. The ratchet lists the 7 imports of the
+  folder from another area, and it refuses a new one. An import from a foundation
+  module is refused too.
+- `shopify/REMOVE.md` lists what a removal deletes: the folder, the 10 files that
+  import it, the union values, the tests, the scripts and the deployment values.
+- What stays for step A2.5: three files call Shopify code directly
+  (`commerce/provider-execution.ts`, `provider-lifecycle/credential-replacement.ts`,
+  `provider-workflows/observation.ts`). The `CommerceProvider` port and the provider
+  adapter interface replace those calls.
+
 The step is smaller than its first description. A count with the type checker gave
 the reason: callers use 245 methods of the four Actors at 440 places, in about 130
 files. An interface for each module is a larger piece of work, and it belongs with the

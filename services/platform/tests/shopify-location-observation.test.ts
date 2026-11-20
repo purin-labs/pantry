@@ -8,7 +8,7 @@ import {
   createShopifyLocationObservationSchema,
   parseShopifyLocationObservationEnvelope,
   readShopifyLocationObservation,
-} from "../src/actors/shopify-location-observation";
+} from "../src/shopify/location-observation";
 import {
   createCommerceProjectionSchema,
   readCurrentCommerceProjection,

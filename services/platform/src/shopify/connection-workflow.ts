@@ -1,5 +1,5 @@
 import { requireActiveOrganisationActor } from "../actors/actor-router";
-import { parseShopifyLocationObservationEnvelope } from "../actors/shopify-location-observation";
+import { parseShopifyLocationObservationEnvelope } from "./location-observation";
 import {
   normalizeShopifyCommerceCatalogDelivery,
   normalizeShopifyCommerceInventoryDelivery,
@@ -28,7 +28,7 @@ import {
   exchangeShopifyAuthorizationCode,
   shopifyOnboardingAdapter,
   verifyShopifyCallback,
-} from "../provider-adapters/shopify";
+} from "./provider-adapter";
 import { providerIngressOrigin } from "../provider-lifecycle/authorization";
 import type {
   CompleteProviderInput,
@@ -48,15 +48,15 @@ import {
   verifyExistingAccountIdentity,
 } from "../provider-lifecycle/provisioning";
 import type { Result } from "../result";
-import { fetchShopifyInitialCommerce } from "../shopify/connector/initial-sync";
-import { registerShopifyWebhooks } from "../shopify/connector/webhook-registration";
+import { fetchShopifyInitialCommerce } from "./connector/initial-sync";
+import { registerShopifyWebhooks } from "./connector/webhook-registration";
 import type {
   ShopifyLocationSnapshotAccess,
   ShopifyPublicationSnapshotAccess,
   ShopifyWebhookRegistration,
   ShopifyWebhookSubscriptionResult,
   ShopifyWebhookTopic,
-} from "../shopify/connector";
+} from "./connector";
 
 export async function connectShopify(
   input: CompleteProviderInput,

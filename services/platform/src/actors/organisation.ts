@@ -161,7 +161,7 @@ import { createCodeModeBudgetSchema } from "./code-mode-budget";
 import {
   type AssignShopifyLocationClassificationInput,
   type ShopifyLocationObservationInput,
-} from "./shopify-location-observation";
+} from "../shopify/location-observation";
 import type { CaseExecutionEffectRecords } from "../case-execution/records";
 import { readCaseEffectRecords } from "./organisation-execution-records";
 import { type AcceptedMemoryCursor } from "../memory/store";

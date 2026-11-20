@@ -1,12 +1,12 @@
-import { isShopifyAdminDomain } from "../shopify/auth";
+import { isShopifyAdminDomain } from "./auth";
 import type { Result } from "../result";
-import { configuredValue, SHORT_PROVIDER_STATE_TTL_MS } from "./authorization";
+import { configuredValue, SHORT_PROVIDER_STATE_TTL_MS } from "../provider-adapters/authorization";
 import {
   providerHttpFailure,
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "./domain";
+} from "../provider-adapters/domain";
 import { bytesToHex, isRecord } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "remove_shopify_app_in_shopify" as const;

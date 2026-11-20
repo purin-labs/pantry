@@ -21,7 +21,7 @@ import {
   type AppliedCommerceDeliveryResult,
   type CommerceProjectionError,
   type CommerceSystemStorageAuthority,
-} from "./commerce-projection";
+} from "../actors/commerce-projection";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { exhaustiveList, isRecord } from "@purin-labs/std";
 

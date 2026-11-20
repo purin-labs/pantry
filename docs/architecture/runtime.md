@@ -225,7 +225,7 @@ each child as accepted, duplicate or out of order. An invalid child rejects
 the whole delivery. A delete writes a tombstone, which a later complete
 upsert clears in the same transaction. A Shopify location stays `pending`
 until a `LocationKind` is assigned
-([`shopify-location-observation.ts`](../../services/platform/src/actors/shopify-location-observation.ts));
+([`location-observation.ts`](../../services/platform/src/shopify/location-observation.ts));
 code never infers it from a name or address. Merchant reads use the
 Commerce Read Layer
 ([`entity-plane/`](../../services/platform/src/commerce/entity-plane/)).

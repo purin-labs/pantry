@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { airtableCleanupAdapter } from "../src/provider-adapters/airtable";
 import { gmailCleanupAdapter } from "../src/provider-adapters/gmail";
 import { notionCleanupAdapter } from "../src/provider-adapters/notion";
-import { shopifyCleanupAdapter } from "../src/provider-adapters/shopify";
+import { shopifyCleanupAdapter } from "../src/shopify/provider-adapter";
 import { slackCleanupAdapter } from "../src/provider-adapters/slack";
 import { stripeCleanupAdapter } from "../src/provider-adapters/stripe";
 import { whatsappCleanupAdapter } from "../src/provider-adapters/whatsapp";

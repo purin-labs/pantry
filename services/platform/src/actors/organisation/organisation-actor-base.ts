@@ -43,7 +43,7 @@ import {
   type ShopifyLocationObservationAcceptanceError,
   type ShopifyLocationObservationInput,
   type ShopifyLocationObservationResult,
-} from "../shopify-location-observation";
+} from "../../shopify/location-observation";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import {
   applyEvalCommand,

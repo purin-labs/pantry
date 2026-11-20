@@ -15,7 +15,7 @@ import {
   parseSlackInstallation,
   observeSlackProviderIdentity,
 } from "../src/provider-adapters/slack";
-import { parseShopifyIdentityResponse } from "../src/provider-adapters/shopify";
+import { parseShopifyIdentityResponse } from "../src/shopify/provider-adapter";
 import {
   parseStripeAccountSummary,
   stripeCredentialEnvironment,

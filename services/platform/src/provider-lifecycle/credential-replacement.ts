@@ -5,7 +5,7 @@ import type {
   CredentialRotationFailureCode,
 } from "../data/credential-lifecycle";
 import { validateExternalProviderToken } from "../external-records/records";
-import { discoverShopifyIdentity } from "../provider-adapters/shopify";
+import { discoverShopifyIdentity } from "../shopify/provider-adapter";
 import {
   discoverStripeAccount,
   stripeCredentialEnvironment,

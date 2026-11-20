@@ -2,7 +2,7 @@ import { createMailEvaluationSchema } from "../../mail-inbox/evaluation";
 import { createActionLedgerSchema } from "../action-ledger";
 import { createCueDeliverySchema } from "../cue-delivery";
 import { createCommerceProjectionSchema } from "../commerce-projection";
-import { createShopifyLocationObservationSchema } from "../shopify-location-observation";
+import { createShopifyLocationObservationSchema } from "../../shopify/location-observation";
 import type { SchemaTransaction } from "../schema-migrations";
 import { createCaseContextDiscoveryEvaluationSchema } from "../../case-context-discovery/evaluation-store";
 import { createEvalSchema } from "../../evals/store";
