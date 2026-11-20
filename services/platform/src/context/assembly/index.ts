@@ -16,12 +16,10 @@ export type {
   ContextAssemblyStrategyVersion,
   ContextBundle,
   ContextItem,
-  ContextVisibility,
   ModelContextBundle,
   ModelContextItem,
 } from "./types";
 export type { CaseContextReplayAuthority } from "../projection";
-export type { FlowLabel, ObservationEvidence } from "../../policy";
 
 import type {
   AssignmentId,

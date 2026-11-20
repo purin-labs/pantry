@@ -10,11 +10,7 @@ import {
   type MessageContractRejection,
 } from "../messages/message-wasm";
 import type { Result } from "../result";
-import type {
-  SlackAuthoredPart,
-  SlackFileCandidate,
-  SlackMessageEvent,
-} from "./events";
+import type { SlackAuthoredPart, SlackMessageEvent } from "./events";
 import { assertNever } from "@purin-labs/std";
 
 /**
@@ -94,5 +90,3 @@ function authoredPart(authored: SlackAuthoredPart): UserMessagePart {
       return assertNever(authored, "Unhandled Slack authored part");
   }
 }
-
-export type { SlackFileCandidate };

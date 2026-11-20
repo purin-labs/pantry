@@ -8,9 +8,10 @@ export {
   labelAllowsAudiences,
   policyAllowsAudiences,
   policyLevel,
-  outsideWrittenFlowLabel,
   acceptedByPersonFlowLabel,
 } from "./labels";
+/** @public The IFC integration guide names this entry point. */
+export { outsideWrittenFlowLabel } from "./labels";
 export { decideAutomaticContextAdmission, decideContextAdmission } from "./pac";
 export { digestCanonical, serializeCanonical } from "./digest";
 export {
@@ -42,8 +43,6 @@ export {
 } from "./source-labels";
 export type {
   CanonicalFlowPolicy,
-  ContextAdmissionDecision,
-  ContextAdmissionSubject,
   CurrentSourceFlowLabelError,
   ConversationDeliverySink,
   FlowAudience,
@@ -52,7 +51,6 @@ export type {
   FlowLabelDecision,
   FlowWriter,
   FlowPolicyInput,
-  FlowPolicyOwner,
   FlowSink,
   FlowSource,
   SerializedFlowBinding,
@@ -60,5 +58,4 @@ export type {
   SerializedInformationFlowContext,
   SerializedObservationEvidence,
   ToolEffectSink,
-  TypeSafeInferenceSink,
 } from "./types";

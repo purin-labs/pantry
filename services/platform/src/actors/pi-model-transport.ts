@@ -37,10 +37,7 @@ export const PACKAGED_PI_MODEL = "moonshotai/kimi-k3";
  * PACKAGED_PI_MODEL; `PANTRY_PLATFORM_PI_MODEL` selects a cheaper one for tests
  * that call OpenRouter.
  */
-export const PLATFORM_PI_MODELS = [
-  PACKAGED_PI_MODEL,
-  "qwen/qwen3.7-flash",
-] as const;
+const PLATFORM_PI_MODELS = [PACKAGED_PI_MODEL, "qwen/qwen3.7-flash"] as const;
 export type PlatformPiModel = (typeof PLATFORM_PI_MODELS)[number];
 
 export function isPlatformPiModel(model: string): model is PlatformPiModel {

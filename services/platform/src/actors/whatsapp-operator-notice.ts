@@ -141,7 +141,7 @@ export async function deliverWhatsAppOperatorNotice(
  * Operator-facing copy. It states what stopped, why, and what to do — and
  * never quotes the customer.
  */
-export function renderOperatorNotice(
+function renderOperatorNotice(
   displayPhoneNumber: string,
   reason: WhatsAppPauseReason,
 ): string {

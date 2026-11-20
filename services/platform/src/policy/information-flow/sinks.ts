@@ -328,6 +328,9 @@ function decideExit(
  * The capabilities whose effect stays inside the Organisation or its connected
  * tools. `pnpm lint:ifc-boundaries` refuses a tool effect whose capability is in
  * no class set here.
+ *
+ * @public `scripts/check-ifc-destinations.mjs` reads this declaration from the
+ * source text.
  */
 export const INSIDE_CAPABILITIES: ReadonlySet<string> = new Set([
   CAPABILITY_KEYS.commerceProductDescriptionDraftEdit,

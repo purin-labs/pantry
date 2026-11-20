@@ -11,12 +11,7 @@ export {
   type EffectiveGrantSet,
   type ImmutableCapabilityDefinition,
 } from "./compiler";
-export type {
-  AccessGrant,
-  AccessGrantTarget,
-  CommerceReadGrantScope,
-  ContextVisibility,
-} from "./types";
+export type { AccessGrant } from "./types";
 export { encodeContextVisibility } from "./visibility";
 export {
   authorityPartitionKey,

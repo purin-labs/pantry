@@ -197,7 +197,7 @@ type ActiveAgentOperation = {
 // After an accepted edit, the room keeps the agent's label on its target for
 // this long, or until the same agent starts its next edit. The label grants
 // nothing and is not checked again: the turn often ends inside the hold.
-export const AGENT_ACTIVITY_HOLD_MS = 5_000;
+const AGENT_ACTIVITY_HOLD_MS = 5_000;
 type HeldAgentActivity = Readonly<{
   activity: CollaborationAgentActivity;
   timer: ReturnType<typeof setTimeout>;

@@ -134,6 +134,9 @@ export async function joinFlowLabels(
  * The same label for content that holds free text of a person outside the
  * Organisation (Plan 89). A read adapter calls it for such a result, before it
  * records the observation.
+ *
+ * @public The IFC integration guide (`README.md` beside this file) tells a
+ * new read adapter to call it.
  */
 export async function outsideWrittenFlowLabel(
   label: FlowLabel,

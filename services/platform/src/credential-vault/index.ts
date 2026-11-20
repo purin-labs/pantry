@@ -81,11 +81,7 @@ export {
   verifyRestoredVaultBackup,
   type VaultBackupEnvelope,
 } from "./backup";
-export {
-  RESTRICTION_LATENCY_ALERT_MS,
-  RESTRICTION_LATENCY_TARGET_MS,
-  sweepVaultAlertSignals,
-} from "./alerts";
+export { sweepVaultAlertSignals } from "./alerts";
 export { commandVaultItem, createVaultItem, listVaultItems } from "./items";
 export {
   commandVaultStoreItem,

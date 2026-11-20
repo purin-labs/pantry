@@ -7,8 +7,8 @@ import type { VaultKeyVersion } from "./keyring";
 // the explicit delivery-path constants. Restrictions target 3 seconds p95
 // from revocation commit to policy activation; anything beyond 5 seconds
 // is an operational alert.
-export const RESTRICTION_LATENCY_TARGET_MS = 3_000;
-export const RESTRICTION_LATENCY_ALERT_MS = 5_000;
+const RESTRICTION_LATENCY_TARGET_MS = 3_000;
+const RESTRICTION_LATENCY_ALERT_MS = 5_000;
 
 const STUCK_ROTATION_ALERT_MS = 15 * 60 * 1_000;
 const STALE_GENERATION_ALERT_MS = 60 * 60 * 1_000;

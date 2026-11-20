@@ -60,7 +60,7 @@ export type SlackHostedFileMetadata = {
  * rejecting the whole raw event. `remote_link` is a file Slack does not host;
  * it becomes a link part, never admitted bytes.
  */
-export type SlackFileCandidate =
+type SlackFileCandidate =
   | { readonly kind: "hosted"; readonly file: SlackHostedFileMetadata }
   | { readonly kind: "needs_info"; readonly fileId: string }
   | {
