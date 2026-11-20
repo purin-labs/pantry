@@ -653,6 +653,37 @@ places, and each name is commerce-specific (`CommerceGraphQuery`,
 among them. So part 2 is not a move of names below both packages. It is the work of
 steps A1.7 and A1.8: the Session and the authority code read commerce through a port.
 
+**20 November 2026. Step A1.4 is done on the branch `refactor-17-a1-4b`.** The
+branch starts at the local branch `refactor-17-b`. It is not on `dev`.
+
+- **Two parts.** Each of the 27 `draft`, `receipt` and `scheduled` tools defines
+  `prepare` in place of `handler`. `prepare` does the live checks and the reads, and
+  it returns the effect with its exit checks.
+- **One place.** `settleToolEffect` in `agent-tools/session-support.ts` reads the
+  label, runs the checks and calls `run`. The executor gives it each effect. No
+  handler calls the exit check: `toolEffectPassesExit` is private to that file.
+- **The record.** [Appendix C](#appendix-c--what-each-effect-tool-did-before-step-a14)
+  gives the checks of each tool before the port, the eight patterns, what the
+  `proposal` and `surface` tools do, and the two differences that the comparison
+  found. Both are in a log only.
+- **The lint.** `pnpm lint:tool-effects`, in `lint:source`, refuses an effect tool
+  with no `prepare`. `defineToolFamily` refuses one when the Worker loads.
+- **Not changed:** the 13 `proposal` tools, the 47 `surface` tools, the tool order
+  and the model definitions. The catalog digests are equal to the baseline.
+- **Three effect tools have no exit check, as before:** `menu_board_archive`,
+  `whatsapp_support_reply_send` and `schedule_follow_up`. Their `prepare` returns an
+  effect with no check, and `run` is the old handler. A check there is a behavior
+  change and needs its own decision.
+- **Measures.** Layer crossings: 821, no change. Copies of product code: 895 to 892.
+  Unused exports: 809, no change. Lines: 1,616 removed and 1,794 added.
+- **Checks.** The static lints, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (302 files) pass. 92 journey files ran: 90
+  pass and 1 is skipped. `counter-receipt-printer.test.ts` failed one time in the
+  group run and passed alone; it tests the receipt printer and reads no agent tool.
+  Not run: the full E2E suite.
+- **Still open:** a handler takes the turn context from the Session
+  (`withToolContext`), not from the executor. Step A1.7 owns it.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
@@ -1363,3 +1394,145 @@ export class OrganisationDO
   extends OrganisationCommerce
   implements MemoryActorRpc {}
 ```
+
+## Appendix C — What each effect tool did before step A1.4
+
+Step A1.4 started with this list. It was read from the code on 2026-11-20, after
+the split of the channel and draft tools by area and before the port. "Exit check"
+means `toolEffectPassesExit` in `agent-tools/session-support.ts`. Before the port
+the executor in `agent-tools/catalog/execute.ts` ran no exit check: it checked
+`directOnly`, the handler, the arguments and the capability claim, and then it
+called the handler, which ran the check itself.
+
+### Eight patterns
+
+| #   | Pattern                                                                                                                                                                                                                                                           | Tools                                                                                                                                               |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Content check of a shared draft (`passSharedDraftExit`): the turn label, a sink of the member with `readByEveryMember`, no action. A menu board scope sets `repeatInRequest`                                                                                      | `menu_draft_edit`, `menu_board_edit`, `menu_board_comment`, `menu_board_history`, `menu_board_stack`, `menu_board_create`, `costs_sheet_edit`       |
+| 2   | Pattern 1 behind `authorizeSharedDraftEdit`: if a role cannot read the label, a read of the shared thread or chat comes first, and it can refuse with its own text                                                                                                | `product_description_draft_edit`, `production_plan_edit`, `email_draft_edit`                                                                        |
+| 3   | A copy of pattern 1 in the handler, with a warning trace on refusal                                                                                                                                                                                               | `move_object`                                                                                                                                       |
+| 4   | Staff page (`settleStaffPageEffect`): the effect check in mode `check`, then the ask, then the receipt replay, then the content check with `writerRule: "asked"` (5 of the 7 tools), then the effect check again. The turn label, the lease sink, with the action | `order_queue_advance`, `sold_out_mark` (no content check); `recipe_save`, `supplier_create`, `supply_cost_save`, `lot_cost_save`, `costs_plan_save` |
+| 5   | One check: the turn label, the lease sink, with the action                                                                                                                                                                                                        | `device_pause`                                                                                                                                      |
+| 6   | One check: the work label of the Session, the lease sink, with the action                                                                                                                                                                                         | `airtable_api_write`                                                                                                                                |
+| 7   | One check (`authorizeToolEffectInformationFlow`): the work label of the Session, the lease sink, no action                                                                                                                                                        | `slack_message_propose`, `email_reply_propose`, `email_operational_propose`, `email_reply_draft_edit`                                               |
+| 8   | No exit check                                                                                                                                                                                                                                                     | `menu_board_archive`, `whatsapp_support_reply_send`, `schedule_follow_up`, the 13 `proposal` tools, the 47 `surface` tools                          |
+
+Only pattern 5 is the shape of the example in Appendix B.
+
+### What does not fit one check before `run`
+
+- **Two labels.** Patterns 1 to 5 read the label of the turn (`currentTurnFlowLabel`).
+  Patterns 6 and 7 read the work label of the Session (`readSessionInformationFlow`).
+  The executor must take the label source from `prepare`, not choose one.
+- **Three checks and a replay between them** (pattern 4). A repeated call returns its
+  first receipt after the first check and before the content check. `prepare` must
+  give the executor the replay read, the optional content check and the effect check,
+  in this order.
+- **Work after the check and before the effect.** `email_reply_draft_edit` checks the
+  member, the role and the chat, and it writes the edit provenance in the Connector.
+  `email_operational_propose` writes a self-test row. `slack_message_propose` and
+  `email_reply_propose` do reads that can refuse with a text for the agent.
+  `airtable_api_write` checks its authority again and claims the write in Session
+  storage: a second write in the turn is refused there. All of this goes into `run`,
+  in the same order.
+- **Commits before the check.** `product_description_draft_edit`, `production_plan_edit`
+  and `move_object` admit the observation of their read before the check. This stays
+  in `prepare`.
+- **A check with no ask.** The preview of `menu_board_edit`
+  (`drafts/board-draft-preview.ts`) runs the content check in mode `check` while the
+  model writes the arguments. It is not a tool call, so it stays outside the executor
+  and uses the same sink builder.
+- **A refusal with its own class or text.** `production_plan_edit` turns a refusal of
+  the shared chat into `ProductionPlanRequestError`. Each tool has its own text for
+  "not authorized". `prepare` gives the text.
+- **Effect tools with no check today:** `menu_board_archive` (owner or admin only),
+  `whatsapp_support_reply_send` (the body must be in the person's own words) and
+  `schedule_follow_up`. The step keeps this. A new check here is a behavior change
+  and needs its own decision.
+
+### The `proposal` tools (13)
+
+No `proposal` tool runs an exit check. Each one checks the lease, the person and the
+role, reads what the card shows, and stores a proposal that a person confirms.
+
+| Tools                                                                                                                                                                             | What a call does                                                                                                                                                                                                                                                                          |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commerce_propose_action`, `commerce_propose_plugin`, `commerce_propose_menu_publication`, `commerce_propose_refund`, `commerce_propose_stock_action`, `menu_board_propose_price` | Checks that the targets were read in this Session and that their revisions are current. `recordCommerceProposal` then claims `commerce.action.propose`, stores the turn label with the proposal in the Case and the Organisation, and shows the approval card. An owner or admin approves |
+| `configuration_propose`, `recipe_workflow_propose`, `device_propose`, `jev_features_manage`                                                                                       | Staging in `actors/session/session-proposal-staging.ts`: the lease, a live member with the role for the change, then an operator draft with a time limit. The person confirms on the card, or in Slack with a reply code                                                                  |
+| `commerce_propose_campaign_brief`                                                                                                                                                 | The same staging. Each target must be read in the Session. It stores a brief for review                                                                                                                                                                                                   |
+| `propose_memory`                                                                                                                                                                  | A Portal chat turn with a live authority. It gives the turn label to the Memory proposal. A person accepts it in Brain                                                                                                                                                                    |
+| `propose_side_case`                                                                                                                                                               | Portal: stores the proposal with the turn label and signals the chat. Slack: checks the thread as a sink (`decideCaseConversationSink`); a refusal answers "not proposed" and asks nobody. A person presses Start                                                                         |
+
+### The `surface` tools (47)
+
+No `surface` tool reads a label or runs an exit check. The page runs the command as
+the person's own click does.
+
+- **The 38 `bakery_surface_*` tools** (`executeBakerySurfaceForHarness`): a control
+  authority and an attached browser; a live owner or admin; a repeated call sends the
+  stored command of its outbox row again; else the surface is prepared (a cached
+  surface, or a `prepare_context` effect) and must support the command; the live
+  check again; the dispatch; the live check a third time. `inspect_surface` also reads
+  the last run save and scenario save.
+- **The 9 view tools** (`costs_view_*`, `pastry_bench_*`, `register_*`, through
+  `executeCostsViewForHarness`): the last message of the person must carry the page
+  and list the command; a live owner or admin, and an operator for Register only; the
+  dispatch. There is no repeat step and no prepare step.
+- **The receipt** of both: `dispatchBakerySurfaceEffect` writes an outbox row in
+  Session storage, with an id from the Session, the turn and the call, and it waits
+  for the receipt of the browser. A repeat with the same id returns the stored
+  receipt.
+
+### The record of each effect tool
+
+The record is from before the port. "Refused" is the case where the exit check does
+not pass. In each refused case the effect does not run. Where the turn has a person,
+the first refusal asks that person and the model reads `ExitApprovalRequestedError`
+("Seams Pantry stopped this step, because…"). Where it has none, the model reads the
+generic failure text, and the error below goes to the log.
+
+| Tool                                                                                     | Checks, in order                                                                                                                                                                              | Allowed                                                                                                           | Refused (the log)                                                                                               |
+| ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `device_pause`                                                                           | lease; a live member with the staff role; the turn label; one check with the action `device.pause`                                                                                            | The device command runs with a key from the call. A receipt                                                       | `Device pause is not authorized: <decision>`                                                                    |
+| `airtable_api_write`                                                                     | Airtable authority and grants; the credential; the work label; one check with the action `airtable.write`                                                                                     | Authority again, the claim of the write, the request, the observation                                             | `Airtable write requires policy resolution: <decision>`                                                         |
+| `email_reply_propose`, `email_operational_propose`                                       | lease; the mail capability and its grant; the work label; one check, no action                                                                                                                | The provenance read (reply) or the self-test row (operational); a draft proposal in the Case                      | `The proposal requires policy resolution: <decision>`                                                           |
+| `slack_message_propose`                                                                  | lease; the Slack capability and its grant; the work label; one check, no action                                                                                                               | The channel read, which can refuse an unknown channel; a draft on a card                                          | `The proposal requires policy resolution: <decision>`                                                           |
+| `email_reply_draft_edit`                                                                 | lease; the reply is in the mailbox; the mailbox read; the reply capability; the work label; one check, no action                                                                              | Member, owner or admin, the chat covers the reply, the provenance write, the edit, the observation                | `The proposal requires policy resolution: <decision>`                                                           |
+| `menu_draft_edit`                                                                        | deadline; a live person authority; a member who may edit; the turn label; the content check                                                                                                   | Lease checks, then the edit in the Organisation                                                                   | `Menu draft disclosure is not authorized`                                                                       |
+| `menu_board_edit`, `menu_board_comment`, `menu_board_history`, `menu_board_stack`        | the same; for `add_image` the image must be in the library first; the scope `menu-board:<id>` lets one Allow cover the later edits of the request                                             | Lease checks, then the board edit                                                                                 | `Menu board disclosure is not authorized`                                                                       |
+| `menu_board_create`                                                                      | the same, with the scope `menu-board:new`                                                                                                                                                     | Lease checks, then the new board                                                                                  | `Menu board disclosure is not authorized`                                                                       |
+| `costs_sheet_edit`                                                                       | deadline; lease; a member who may edit; the turn label; the content check                                                                                                                     | Lease checks, then the sheet edit                                                                                 | `Costs sheet disclosure is not authorized`                                                                      |
+| `product_description_draft_edit`                                                         | deadline; the commerce read of the product, with its observation; the draft read; a member who may edit; the turn label; the shared thread if a role cannot read the label; the content check | Lease checks, the edit, the observation                                                                           | `Description draft disclosure is not authorized`; not shared: the text "Connect this Slack thread…"             |
+| `production_plan_edit`                                                                   | deadline; the plan reads, with their observation; the request is in the plan; a member who may edit; the turn label; the shared thread or chat if needed; the content check                   | Lease checks, then the plan edit                                                                                  | `Production plan disclosure is not authorized`; not shared: `ProductionPlanRequestError`, which the model reads |
+| `email_draft_edit`                                                                       | deadline; lease; the Slack thread is shared with the draft; the turn label; the shared thread; the content check                                                                              | The edit in the Organisation                                                                                      | `Email draft disclosure is not authorized`                                                                      |
+| `move_object`                                                                            | deadline; the canvas read with its observation; a member who may edit; the turn label; the content check                                                                                      | Lease checks, the move, the observation                                                                           | `Workflow canvas disclosure is not authorized`, with a warning trace                                            |
+| `order_queue_advance`, `sold_out_mark`                                                   | lease; a live member with the staff role; the read of the page; the turn label; the effect check with no ask; the ask; the receipt replay; the effect check                                   | The command with the receipt key; the receipt; the shop screens signal. A repeated call returns its first receipt | `Staff page effect is not authorized: <decision>`                                                               |
+| `recipe_save`, `supplier_create`, `supply_cost_save`, `lot_cost_save`, `costs_plan_save` | the same; between the replay and the last effect check, the content check with the writer question asked by the effect check. `supplier_create` checks the name first                         | The same. A refusal of the command stores no receipt                                                              | `Staff page effect is not authorized: <decision>`, or `<draft> disclosure is not authorized`                    |
+| `menu_board_archive`                                                                     | a live person authority; a member who may edit; owner or admin. No exit check                                                                                                                 | The board is archived or restored                                                                                 | No exit refusal. Another role reads `MenuBoardRequestError`                                                     |
+| `whatsapp_support_reply_send`                                                            | lease; the body is in the person's own words; a live owner, admin or operator; an active conversation window; the capability. No exit check                                                   | The Connector sends the reply                                                                                     | No exit refusal                                                                                                 |
+| `schedule_follow_up`                                                                     | lease; a Slack thread turn; a live authority. No exit check                                                                                                                                   | The Connector schedules the turn. A repeat returns the same result                                                | No exit refusal                                                                                                 |
+
+### What the port did
+
+`prepare` returns one of four kinds of effect (`ToolEffect` in
+`agent-tools/session-support.ts`), and `settleToolEffect` runs them:
+
+- `effect`: one check with the turn's authority as the sink. The effect names its
+  label source, the turn or the work label of the Session (patterns 5, 6 and 7).
+- `shared_draft`: the content check, with the lookup of the shared conversation
+  where the tool had it (patterns 1, 2 and 3).
+- `staff_page`: the staff page step with its replay and its checks (pattern 4).
+- `none`: no check (the three effect tools of pattern 8).
+
+Each step that a tool did after its check is the first step of `run`.
+
+The comparison with the record shows two differences. No person and no model sees
+them:
+
+- `supplier_create` read the turn label before it built its commerce client. It now
+  reads it after. If both fail, the log names the other error.
+- `move_object` had its own copy of the content check. It now uses the shared check
+  and keeps its warning trace. The decisions, the texts and the membership read are
+  the same.
+
+The proposal and surface tools did not change.
