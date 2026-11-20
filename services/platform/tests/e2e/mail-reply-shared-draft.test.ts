@@ -47,6 +47,7 @@ import { CollaborationRoom } from "../../src/actors/collaboration-room";
 import { ConnectorEmail } from "../../src/actors/connector/connector-email-actor";
 import { issueControlSession } from "../../src/data/control-plane";
 import { network } from "./network";
+import { pendingDecisionsOf } from "./access-route-support";
 import {
   connectGmailMailbox,
   sendAs,
@@ -64,6 +65,7 @@ import {
 declare module "vitest" {
   interface TaskMeta {
     mailReplySharedDraft?: Record<string, unknown>;
+    mailReplyRejected?: Record<string, unknown>;
   }
 }
 
@@ -92,6 +94,100 @@ it(
   { timeout: 240_000 },
   staleParticipantCheckJourney,
 );
+
+it(
+  "refuses a viewer's rejection of a Gmail reply and a rejection with a reason, then an administrator's rejection deletes the Gmail draft, ends the shared draft of the owner, sends nothing on a late approval with the review that the owner read before, and takes the reply out of the decisions that wait",
+  { timeout: 240_000 },
+  rejectedReplyJourney,
+);
+
+/**
+ * Refactor 17, step A2.1: a refused Gmail reply through the real routes. The
+ * owner's chat drafts the reply and the owner reads its review, so the owner
+ * holds a send challenge. A viewer may not reject. An administrator rejects:
+ * Gmail loses the draft and nothing is sent, also when the owner then
+ * approves with the challenge from before the rejection.
+ */
+async function rejectedReplyJourney({ task }: TestContext): Promise<void> {
+  const { organisationId, owner, admin, viewer, gmail, proposalId } =
+    await draftReply();
+  const waiting = { kind: "email_review", id: proposalId };
+  const rejectPath = `${replyPath(organisationId, proposalId)}/reject`;
+  expect(await pendingDecisionsOf(organisationId, owner.session)).toContainEqual(
+    waiting,
+  );
+  const ownerRoom = new ReplyRoomClient(
+    await openSocket(
+      `https://localhost/v1/control/organisations/${organisationId}/email-replies/${proposalId}/draft/socket`,
+      owner.session,
+    ),
+  );
+  await ownerRoom.sync();
+  const reviewed = await reviewBody(owner, proposalId);
+
+  // 1. A viewer may not reject, and a rejection carries no reason. The reply
+  //    still waits, and Gmail keeps the draft.
+  const byViewer = await sendAs(viewer, rejectPath, {});
+  expect(byViewer).toEqual({
+    status: 404,
+    body: { ok: false, error: "organisation_role_insufficient" },
+  });
+  const withReason = await sendAs(admin, rejectPath, { reason: "wrong tone" });
+  expect(withReason).toEqual({
+    status: 422,
+    body: { ok: false, error: "email_reply_request_invalid" },
+  });
+  expect(gmail.deleted).toEqual([]);
+  expect(await pendingDecisionsOf(organisationId, admin.session)).toContainEqual(
+    waiting,
+  );
+
+  // 2. The administrator rejects. Gmail loses the draft, and the shared
+  //    draft of the owner ends.
+  const ownerClosed = ownerRoom.closed();
+  const rejected = await sendAs(admin, rejectPath, {});
+  expect(rejected).toEqual({
+    status: 200,
+    body: { ok: true, kind: "rejected", cleanup: "deleted" },
+  });
+  expect(gmail.deleted).toHaveLength(1);
+  await ownerClosed;
+  expect(ownerRoom.failures).toEqual(["draft_closed"]);
+
+  // 3. The owner approves with the review from before the rejection. Nothing
+  //    is sent.
+  const late = await sendAs(
+    owner,
+    `${replyPath(organisationId, proposalId)}/approve`,
+    {
+      version: reviewed.version,
+      snapshotDigest: reviewed.snapshotDigest,
+      challenge: reviewed.challenge,
+    },
+  );
+  expect(late.status).toBeGreaterThanOrEqual(400);
+  expect(late.body).toMatchObject({ ok: false });
+  expect(gmail.sent).toEqual([]);
+
+  // 4. The reply waits for nobody.
+  for (const person of [owner, admin])
+    expect(
+      await pendingDecisionsOf(organisationId, person.session),
+    ).not.toContainEqual(waiting);
+  await ownerRoom.close();
+  expect(gmail.unexpected).toEqual([]);
+
+  task.meta.mailReplyRejected = {
+    proposalId,
+    viewer: byViewer,
+    rejectionWithReason: withReason,
+    rejection: rejected,
+    gmailDraftsDeleted: gmail.deleted,
+    ownerSocket: ownerRoom.failures,
+    lateApproval: late,
+    gmailSent: gmail.sent,
+  };
+}
 
 /**
  * Refactor 11 part 2 (F3). An agent edit can add sources to a reply, so the
@@ -985,6 +1081,8 @@ class ReplyMailbox {
   updates: string[] = [];
   /** The body of each sent message, in order. */
   sent: string[] = [];
+  /** The Gmail drafts that a rejection deleted. */
+  deleted: string[] = [];
   unexpected: string[] = [];
 
   serve(): void {
@@ -1092,6 +1190,7 @@ class ReplyMailbox {
         });
       }),
       http.delete(`${GMAIL}/drafts/:draftId`, ({ params }) => {
+        this.deleted.push(String(params.draftId));
         this.drafts.delete(String(params.draftId));
         return new HttpResponse(null, { status: 204 });
       }),
