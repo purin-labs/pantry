@@ -628,6 +628,26 @@ document codes.
 `exhaustiveList` of `std` does the same. The result type of each package is now
 `SharedDocResult` with the codes of the package.
 
+**20 November 2026. Step A1.11, part 1, and four structure changes.**
+
+| Step                  | What exists                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1.11, part 1         | `@purin-labs/contracts` no longer re-exports `@purin-labs/commerce-contracts`. A file imports a commerce name from the commerce package. A codemod moved 604 names in 176 files and 32 inline type references. `bakery-model` and `production-simulation` declare the dependency that the re-export hid                                                           |
+| Tool files by area    | `agent-tools/channels/` and `agent-tools/drafts/` held tools of several areas. Each tool, its handler and its types are now in a file of its own area: Kitchen (production plan, workflow canvas), commerce (product description draft), inbox (marketing email draft), Slack (`agent-tools/slack/`, new family) and Café (menu draft, menu boards). Same digests |
+| Portal chat router    | `control/routes/chat/router.ts` matches and dispatches the 13 routes of the Portal chat. They were in the route file of the custom connectors. `control/path-match.ts` holds the two path helpers                                                                                                                                                                 |
+| Access feature        | `permission-requests-summary.ts` is in `features/access/` of the Portal, so the feature no longer imports the shell                                                                                                                                                                                                                                               |
+| Map: Portal page list | `apps/portal/src/route.ts` is foundation UI code. It imports no area. Its union names the pages of every area until the Portal has a page registry (step A1.10)                                                                                                                                                                                                   |
+
+The layer count is 882 (upward 386, between areas 242, order 136, tables 118). The
+re-export hid 15 imports of the commerce package from foundation files; the count
+shows them now.
+
+What part 1 found for part 2: foundation source files import 18 commerce names at 29
+places, and each name is commerce-specific (`CommerceGraphQuery`,
+`CommerceAuthorityScope`, `CommerceEntityTypeId` and others). No shared primitive is
+among them. So part 2 is not a move of names below both packages. It is the work of
+steps A1.7 and A1.8: the Session and the authority code read commerce through a port.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
