@@ -31,7 +31,10 @@ import { resolveActiveOrganisationPlacementRecord } from "./organisation-placeme
 import { purgeOrganisationWhatsAppConnectors } from "./whatsapp";
 import type { Env, SessionActorStub } from "../env";
 import { removeVoiceMacNames } from "../voice/dns";
-import { listVoiceMacNameIds } from "../voice/store";
+import {
+  listVoiceMacNameIds,
+  prepareArchivedOrganisationVoiceMacsRevocation,
+} from "../voice/store";
 import { purgeOrganisationDeviceFleets } from "../devices/purge";
 import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
 import { revokeOrganisationDevicesStatements } from "../devices/store";
@@ -1134,14 +1137,11 @@ async function reconcileArchivedOrganisation(
         organisationId: organisation.organisationId,
         guard: stillArchived,
       }),
-      session
-        .prepare(
-          `UPDATE voice_mac
-         SET state = 'revoked', credential_sha256 = NULL, code_sha256 = NULL,
-             code_expires_at = NULL, private_address = NULL, revoked_at = ?
-         WHERE organisation_id = ? AND state != 'revoked' AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
+      prepareArchivedOrganisationVoiceMacsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
       ...revokeOrganisationDevicesStatements(
         session,
         organisation.organisationId,

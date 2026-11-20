@@ -2492,3 +2492,198 @@ function isProviderAuthMode(raw: unknown): raw is ProviderAuthMode {
     raw === "shared_satyr_app" || raw === "api_key" || raw === "webhook_secret"
   );
 }
+
+/**
+ * The connection, its first credential generation and the default account of
+ * a new surface install, in the order of the install batch (Refactor 17: the
+ * install of tenancy puts these connection rows into its batch).
+ */
+export function prepareSurfaceInstallConnectionRows(
+  session: OrganisationDatabaseSession,
+  input: Readonly<{
+    providerConnectionId: string;
+    integrationAccountId: string;
+    organisationId: string;
+    provider: string;
+    authMode: string;
+    botTokenRef: string;
+    scopesJson: string;
+    userId: string;
+    workspaceId: string;
+    accountKind: string;
+    name: string;
+    capabilitySetJson: string;
+    audiencePolicyJson: string;
+    retentionPolicyJson: string;
+    createdAt: number;
+    installedAt: number;
+  }>,
+): D1PreparedStatement[] {
+  return [
+    session
+      .prepare(
+        `INSERT INTO provider_connection (
+       provider_connection_id, organisation_id, provider, auth_mode, authority_kind,
+       credential_generation, credential_ref, lifecycle, granted_scopes,
+       created_by_user_id, created_at, updated_at, disabled_at,
+       revoked_at, environment, provider_subject_id
+     ) VALUES (
+       ?, ?, ?, ?, 'connection_credential', 1, ?, 'active', ?, ?, ?, ?, NULL, NULL,
+       'development', ?
+     )`,
+      )
+      .bind(
+        input.providerConnectionId,
+        input.organisationId,
+        input.provider,
+        input.authMode,
+        input.botTokenRef,
+        input.scopesJson,
+        input.userId,
+        input.createdAt,
+        input.installedAt,
+        input.workspaceId,
+      ),
+    session
+      .prepare(
+        `INSERT INTO provider_credential_generation (
+       provider_connection_id, credential_generation, organisation_id, provider,
+       environment, credential_ref, lifecycle, created_at, activated_at,
+       superseded_at, revoked_at, failed_at, failure_code
+     ) VALUES (?, 1, ?, ?, 'development', ?, 'active', ?, ?, NULL, NULL, NULL, NULL)`,
+      )
+      .bind(
+        input.providerConnectionId,
+        input.organisationId,
+        input.provider,
+        input.botTokenRef,
+        input.createdAt,
+        input.installedAt,
+      ),
+    session
+      .prepare(
+        `INSERT INTO integration_account (
+       integration_account_id, organisation_id, provider_connection_id, provider,
+       provider_account_id, account_kind, display_name, lifecycle, lifecycle_reason_code,
+       capability_set, audience_policy, retention_policy, created_at, updated_at,
+       disabled_by_user_id, disabled_at, revoked_at, environment, is_default_for_provider
+     ) VALUES (
+       ?, ?, ?, ?, ?, ?, ?, 'active', NULL, ?, ?, ?, ?, ?,
+       NULL, NULL, NULL, 'development', 1
+     )`,
+      )
+      .bind(
+        input.integrationAccountId,
+        input.organisationId,
+        input.providerConnectionId,
+        input.provider,
+        input.workspaceId,
+        input.accountKind,
+        input.name,
+        input.capabilitySetJson,
+        input.audiencePolicyJson,
+        input.retentionPolicyJson,
+        input.createdAt,
+        input.installedAt,
+      ),
+  ];
+}
+
+/**
+ * A repeat install of a surface: it supersedes the active generation, adds
+ * the next one with the new token, and makes the connection and the account
+ * active again, in that order. Each statement changes a row only while the
+ * `live` guard holds.
+ */
+export function prepareSurfaceReinstallConnectionRows(
+  session: OrganisationDatabaseSession,
+  input: Readonly<{
+    organisationId: string;
+    integrationAccountId: string;
+    botTokenRef: string;
+    name: string;
+    capabilitySetJson: string;
+    audiencePolicyJson: string;
+    retentionPolicyJson: string;
+    installedAt: number;
+    live: Readonly<{ sql: string; bindings: readonly unknown[] }>;
+  }>,
+): D1PreparedStatement[] {
+  return [
+    session
+      .prepare(
+        `UPDATE provider_credential_generation
+       SET lifecycle = 'superseded', superseded_at = ?
+       WHERE provider_connection_id = (
+         SELECT provider_connection_id FROM integration_account
+         WHERE organisation_id = ? AND integration_account_id = ?
+       ) AND lifecycle = 'active' AND ${input.live.sql}`,
+      )
+      .bind(
+        input.installedAt,
+        input.organisationId,
+        input.integrationAccountId,
+        ...input.live.bindings,
+      ),
+    session
+      .prepare(
+        `INSERT INTO provider_credential_generation (
+         provider_connection_id, credential_generation, organisation_id, provider,
+         environment, credential_ref, lifecycle, created_at, activated_at,
+         superseded_at, revoked_at, failed_at, failure_code
+       )
+       SELECT
+         connection.provider_connection_id, connection.credential_generation + 1,
+         connection.organisation_id, connection.provider, connection.environment,
+         ?, 'active', ?, ?, NULL, NULL, NULL, NULL
+       FROM provider_connection AS connection
+       JOIN integration_account AS account
+         ON account.provider_connection_id = connection.provider_connection_id
+       WHERE account.organisation_id = ? AND account.integration_account_id = ?
+         AND ${input.live.sql}`,
+      )
+      .bind(
+        input.botTokenRef,
+        input.installedAt,
+        input.installedAt,
+        input.organisationId,
+        input.integrationAccountId,
+        ...input.live.bindings,
+      ),
+    session
+      .prepare(
+        `UPDATE provider_connection
+       SET credential_ref = ?, credential_generation = credential_generation + 1,
+           lifecycle = 'active', updated_at = ?, disabled_at = NULL, revoked_at = NULL
+       WHERE provider_connection_id = (
+         SELECT provider_connection_id FROM integration_account
+         WHERE organisation_id = ? AND integration_account_id = ?
+       ) AND ${input.live.sql}`,
+      )
+      .bind(
+        input.botTokenRef,
+        input.installedAt,
+        input.organisationId,
+        input.integrationAccountId,
+        ...input.live.bindings,
+      ),
+    session
+      .prepare(
+        `UPDATE integration_account
+       SET display_name = ?, lifecycle = 'active', lifecycle_reason_code = NULL,
+           capability_set = ?, audience_policy = ?, retention_policy = ?, updated_at = ?,
+           disabled_by_user_id = NULL, disabled_at = NULL, revoked_at = NULL
+       WHERE organisation_id = ? AND integration_account_id = ? AND ${input.live.sql}`,
+      )
+      .bind(
+        input.name,
+        input.capabilitySetJson,
+        input.audiencePolicyJson,
+        input.retentionPolicyJson,
+        input.installedAt,
+        input.organisationId,
+        input.integrationAccountId,
+        ...input.live.bindings,
+      ),
+  ];
+}

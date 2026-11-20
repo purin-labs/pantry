@@ -3,7 +3,7 @@
     "upward": 147,
     "areas": 153,
     "order": 103,
-    "table": 39
+    "table": 26
   },
   "crossings": {
     "areas/brain -> areas/inbox": 10,
@@ -114,9 +114,7 @@
     "table account_service_invitation_role (areas/organisation) <- foundation/tenancy": 1,
     "table contact_endpoint_verification (areas/inbox) <- areas/organisation": 1,
     "table credential_ref (foundation/authority) <- foundation/connections": 1,
-    "table file_grant_admission (foundation/agent) <- foundation/authority": 1,
-    "table file_grant_sync (foundation/agent) <- foundation/authority": 3,
-    "table integration_account (foundation/connections) <- foundation/tenancy": 5,
+    "table integration_account (foundation/connections) <- foundation/tenancy": 3,
     "table onboarding_support_reference (areas/organisation) <- foundation/connections": 1,
     "table organisation_communication_destination (areas/organisation) <- foundation/connections": 1,
     "table organisation_default_workspace (foundation/agent) <- foundation/tenancy": 1,
@@ -126,13 +124,11 @@
     "table project (foundation/conversation) <- surfaces/portal": 1,
     "table project_member (foundation/conversation) <- foundation/tenancy": 1,
     "table provider_account_cleanup (areas/integrations) <- areas/organisation": 1,
-    "table provider_connection (foundation/connections) <- foundation/tenancy": 5,
-    "table provider_credential_generation (foundation/connections) <- foundation/tenancy": 5,
+    "table provider_connection (foundation/connections) <- foundation/tenancy": 3,
+    "table provider_credential_generation (foundation/connections) <- foundation/tenancy": 2,
     "table provider_webhook (foundation/connections) <- foundation/tenancy": 1,
     "table slack_dm_organisation_selection (surfaces/slack) <- foundation/tenancy": 1,
     "table slack_installation (surfaces/slack) <- foundation/authority": 2,
-    "table slack_thread_case_pin (surfaces/slack) <- foundation/tenancy": 1,
-    "table vault_secret (foundation/authority) <- foundation/tenancy": 1,
-    "table voice_mac (surfaces/voice) <- areas/organisation": 1
+    "table slack_thread_case_pin (surfaces/slack) <- foundation/tenancy": 1
   }
 }

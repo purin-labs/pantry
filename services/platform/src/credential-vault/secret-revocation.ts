@@ -154,3 +154,39 @@ export function prepareArchivedOrganisationCredentialRefsRevocation(
     )
     .bind(input.now, input.organisationId, ...input.guard.bindings);
 }
+
+/**
+ * Revokes the token of the surface installation of an account when a repeat
+ * install replaces it with another token, while the guard holds.
+ */
+export function prepareReplacedSurfaceTokenRevocation(
+  db: Database,
+  input: Readonly<{
+    installedAt: number;
+    organisationId: string;
+    integrationAccountId: string;
+    botTokenRef: string;
+    guard: Guard;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE vault_secret
+       SET revoked_at = ?
+       WHERE organisation_id = ?
+         AND vault_handle = (
+           SELECT bot_token_ref
+           FROM surface_installation
+           WHERE integration_account_id = ?
+         )
+         AND vault_handle <> ?
+         AND revoked_at IS NULL AND ${input.guard.sql}`,
+    )
+    .bind(
+      input.installedAt,
+      input.organisationId,
+      input.integrationAccountId,
+      input.botTokenRef,
+      ...input.guard.bindings,
+    );
+}

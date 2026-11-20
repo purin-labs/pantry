@@ -20,7 +20,11 @@ import {
   parseCommerceRelationshipRef,
 } from "@purin-labs/commerce-client";
 
-import { supersedeUnadmittedFileProjectionsStatement } from "../context/files/persistence";
+import {
+  prepareNewFileGrantSync,
+  prepareRevokedFileGrantRows,
+  supersedeUnadmittedFileProjectionsStatement,
+} from "../context/files/persistence";
 import {
   parseIntegrationAccountId,
   parsePersonId,
@@ -201,20 +205,12 @@ export async function createAccessGrant(
       }
       await input.db.batch([
         create,
-        input.db
-          .prepare(
-            `INSERT INTO file_grant_sync (
-             organisation_id, grant_id, grant_revision, integration_account_id,
-             state, next_run_at, updated_at
-           ) VALUES (?, ?, 1, ?, 'pending', ?, ?)`,
-          )
-          .bind(
-            input.organisationId,
-            input.grantId,
-            input.target.integrationAccountId,
-            input.now,
-            input.now,
-          ),
+        prepareNewFileGrantSync(input.db, {
+          organisationId: input.organisationId,
+          grantId: input.grantId,
+          integrationAccountId: input.target.integrationAccountId,
+          now: input.now,
+        }),
       ]);
     } else {
       await create.run();
@@ -351,16 +347,10 @@ export async function revokeAccessGrant(
         };
       }
       await input.db.batch([
-        input.db
-          .prepare(
-            "DELETE FROM file_grant_admission WHERE organisation_id = ? AND grant_id = ?",
-          )
-          .bind(input.organisationId, input.grantId),
-        input.db
-          .prepare(
-            "DELETE FROM file_grant_sync WHERE organisation_id = ? AND grant_id = ?",
-          )
-          .bind(input.organisationId, input.grantId),
+        ...prepareRevokedFileGrantRows(input.db, {
+          organisationId: input.organisationId,
+          grantId: input.grantId,
+        }),
         supersedeUnadmittedFileProjectionsStatement({
           db: input.db,
           organisationId: input.organisationId,
