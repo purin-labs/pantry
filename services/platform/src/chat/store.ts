@@ -740,20 +740,15 @@ function personalizeConversation(
   };
 }
 
+/**
+ * One page of the chat list. A search gives the normalized `title`; the
+ * page then holds only the chats whose title holds it.
+ */
 export async function listConversationDirectory(
   db: D1Database,
   scope: ConversationScope,
   cursors: ChatDirectoryCursors = { active: null, archived: null },
-): Promise<ConversationDirectory> {
-  return readConversationDirectory(db, scope, "", cursors);
-}
-
-/** One page of the chat list, with the chats whose title holds `title`. */
-async function readConversationDirectory(
-  db: D1Database,
-  scope: ConversationScope,
-  title: string,
-  cursors: ChatDirectoryCursors,
+  title = "",
 ): Promise<ConversationDirectory> {
   const [activeRows, archivedRows] = await Promise.all([
     listConversationRows(db, scope, "active", title, cursors),
@@ -838,7 +833,7 @@ export async function searchConversationDirectory(
   const normalized = normalizeConversationTitle(query);
   if (normalized.length === 0)
     return listConversationDirectory(db, scope, cursors);
-  return readConversationDirectory(db, scope, normalized, cursors);
+  return listConversationDirectory(db, scope, cursors, normalized);
 }
 
 export async function updateConversationMetadata(
