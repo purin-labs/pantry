@@ -1509,8 +1509,8 @@ is a foundation module.
 - **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
   `pnpm portal:build` and the unit suite (301 files) pass. The 79 journey files of
   the brief ran in four groups: 78 pass and 1 is skipped (144 tests pass, 2 are
-  skipped). `wrangler deploy --dry-run` did not run. The full E2E suite did not run
-  on the branch.
+  skipped). `wrangler deploy --dry-run` passes for the six Workers. The full E2E
+  suite did not run on the branch.
 - **Still open, with what removes it.**
   - Commerce (31). The agent operations (`data/agent-operations*`, the runner, the
     operations route and activity, 12) and the cue engine (2) name commerce kinds
