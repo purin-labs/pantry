@@ -1319,8 +1319,8 @@ the branch `refactor-17-table-owners`.
   `pnpm portal:build` and the unit suite (301 files) pass. The 28 journey files of
   the brief pass in four groups, with the idle tenant journey: 76 tests. 7 more
   journey files for the side Cases, the member removal, the custom connector, the
-  voice Macs and the cue claim pass: 11 tests. The full E2E suite did not run on the
-  branch.
+  voice Macs and the cue claim pass: 11 tests. `wrangler deploy --dry-run` passes
+  for the six Workers. The full E2E suite did not run on the branch.
 
 ## Baseline
 
