@@ -53,7 +53,8 @@
     "services/platform/src/agent-tools/session-support.ts": "Holds the exit check of the foundation and helpers of four areas. Split in step A1.4.",
     "services/platform/src/actors/organisation.ts": "The class OrganisationDO with logic of tenancy, authority, commerce and collaboration. The class becomes a shell of the Worker in steps A1.1 and A1.5.",
     "services/platform/src/actors/organisation/support.ts": "Helpers of the Organisation actor for the code of commerce, policy and Code Mode. They go with their module when the class becomes a shell (step A1.9).",
-    "services/platform/src/actors/connector.ts": "The class ConnectorDO. It joins the Slack, email, WhatsApp and Eval parts of the Connector actor. The class becomes a shell of the Worker in step A1.9."
+    "services/platform/src/actors/connector.ts": "The class ConnectorDO. It joins the Slack, email, WhatsApp and Eval parts of the Connector actor. The class becomes a shell of the Worker in step A1.9.",
+    "apps/portal/src/route.ts": "The page list of the Portal: the path, the title and the navigation group of each page. Each area reads it to make a link, and it imports no area. It names the pages of every area in one union; an area registers its own pages when the Portal gets a page registry (step A1.10)."
   },
   "placement": {
     "*": "root",
@@ -484,6 +485,7 @@
     "apps/portal/src/pages/workspaces.tsx": "areas/organisation",
     "apps/portal/src/portal-commerce-approval.ts": "areas/commerce",
     "apps/portal/src/provider-onboarding.tsx": "areas/integrations",
+    "apps/portal/src/route.ts": "foundation/ui",
     "apps/portal/src/status-chip.ts": "foundation/ui",
     "apps/portal/src/use-portal-theme.ts": "foundation/ui",
     "apps/portal/src/whatsapp.ts": "areas/inbox",
@@ -821,9 +823,9 @@
     "services/platform/src/control/mutation-receipt.ts": "foundation/control",
     "services/platform/src/control/mutation.ts": "foundation/control",
     "services/platform/src/control/oidc.ts": "foundation/control",
-    "services/platform/src/control/path-match.ts": "foundation/control",
     "services/platform/src/control/onboarding-runtime.ts": "areas/organisation",
     "services/platform/src/control/organisation-runtime.ts": "foundation/control",
+    "services/platform/src/control/path-match.ts": "foundation/control",
     "services/platform/src/control/permission-required.ts": "foundation/control",
     "services/platform/src/control/routes/access-control-explain.ts": "foundation/control",
     "services/platform/src/control/routes/access-control-mutations.ts": "foundation/control",
