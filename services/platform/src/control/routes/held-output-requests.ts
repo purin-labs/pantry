@@ -27,7 +27,7 @@ import { parseCaseId } from "../../ids";
 import { memberMaySee, type MemberViewer } from "../../memory/member-view";
 import { FlowLabel } from "../../policy/information-flow";
 import { policyLevel } from "../../policy/information-flow/labels";
-import { releaseHeldOutputDecision } from "../../slack/held-output-release";
+import { slackSurfaceParts } from "../../slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -148,11 +148,9 @@ export async function decideHeldOutput(
     return controlError("held_output_decided", 409);
   // The decision is stored. When the delivery cannot finish now, the scheduled
   // reconciliation tries again; a repeated decision tries at once.
-  const released = await releaseHeldOutputDecision(
-    env,
-    authorized.executionScope,
-    decided,
-  );
+  const released = await slackSurfaceParts
+    .use()
+    .releaseHeldOutputDecision(env, authorized.executionScope, decided);
   return controlJson({ ok: true, status: decided.status, released });
 }
 

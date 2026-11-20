@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 36,
+    "upward": 30,
     "areas": 19,
     "order": 16,
     "table": 21
@@ -36,15 +36,13 @@
     "foundation/control -> areas/organisation": 1,
     "foundation/control -> foundation/agent": 1,
     "foundation/control -> foundation/conversation": 1,
-    "foundation/control -> surfaces/slack": 2,
     "foundation/conversation -> areas/kitchen": 4,
     "foundation/conversation -> surfaces/portal": 2,
-    "foundation/conversation -> surfaces/slack": 4,
+    "foundation/conversation -> surfaces/slack": 2,
     "foundation/kernel -> foundation/contracts": 1,
     "foundation/tenancy -> foundation/authority": 3,
     "foundation/tenancy -> foundation/connections": 1,
     "foundation/tenancy -> foundation/conversation": 4,
-    "foundation/tool-handlers -> surfaces/slack": 2,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
     "table account_service_invitation_role (areas/organisation) <- foundation/tenancy": 1,

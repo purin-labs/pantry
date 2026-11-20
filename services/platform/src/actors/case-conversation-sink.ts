@@ -9,7 +9,7 @@ import {
 } from "../policy";
 import type { FlowDecision } from "../policy";
 import type { Result } from "../result";
-import { slackConversationReachesOutside } from "../slack/conversation-facts";
+import { slackSurfaceParts } from "../slack/surface-parts";
 
 export type AllowFlowDecision = Variant<FlowDecision, "allow">;
 
@@ -82,12 +82,14 @@ export async function decideStoredFlowConversationSink(
       kind: "conversation_delivery",
       destinationAuthority,
       ...(destinationAuthority.kind !== "direct_conversation" &&
-      (await slackConversationReachesOutside(
-        env,
-        destinationAuthority,
-        binding.flowLabel,
-        channelId,
-      ))
+      (await slackSurfaceParts
+        .use()
+        .conversationReachesOutside(
+          env,
+          destinationAuthority,
+          binding.flowLabel,
+          channelId,
+        ))
         ? { reachesOutside: true as const }
         : {}),
     },

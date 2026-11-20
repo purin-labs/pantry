@@ -57,7 +57,17 @@ import {
   readShownMemoryStanding,
 } from "./memory/access";
 import { memoryService } from "./memory/contract/memory-service";
+import { CARD_ONLY_REPLY_INSTRUCTION } from "./slack/card-only-reply";
+import { slackConversationReachesOutside } from "./slack/conversation-facts";
+import {
+  heldEffectNoticeText,
+  heldOutputNoticeText,
+} from "./slack/held-output-notice";
+import { releaseHeldOutputDecision } from "./slack/held-output-release";
 import { slackDmSelection } from "./slack/installation-store";
+import { permissionRequestNoticeText } from "./slack/permission-request-notice";
+import { releaseAgentPermissionDecision } from "./slack/permission-request-release";
+import { slackSurfaceParts } from "./slack/surface-parts";
 import {
   prepareRevokedDmSelectionRelease,
   selectSlackDmOrganisation,
@@ -140,4 +150,17 @@ commerceExceptionInbox.register((...input) =>
 actionLedgerCommerce.register({
   parseEffect: (raw) => parseCommerceEntityPlaneEffect(raw),
   slackMayApprove: (action) => slackMayApproveAction(action),
+});
+
+slackSurfaceParts.register({
+  heldOutputNoticeText: (reason) => heldOutputNoticeText(reason),
+  heldEffectNoticeText: (reason) => heldEffectNoticeText(reason),
+  permissionRequestNoticeText: (...input) =>
+    permissionRequestNoticeText(...input),
+  cardOnlyReplyInstruction: CARD_ONLY_REPLY_INSTRUCTION,
+  conversationReachesOutside: (...input) =>
+    slackConversationReachesOutside(...input),
+  releaseAgentPermissionDecision: (...input) =>
+    releaseAgentPermissionDecision(...input),
+  releaseHeldOutputDecision: (...input) => releaseHeldOutputDecision(...input),
 });
