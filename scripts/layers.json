@@ -655,6 +655,7 @@
     "services/platform/src/actors/connector/slack-channel.ts": "surfaces/slack",
     "services/platform/src/actors/connector/slack-delivery.ts": "surfaces/slack",
     "services/platform/src/actors/connector/steer-fault.ts": "foundation/conversation",
+    "services/platform/src/actors/connector/module-admission.ts": "foundation/conversation",
     "services/platform/src/actors/connector/support.ts": "foundation/conversation",
     "services/platform/src/actors/connector/types.ts": "foundation/conversation",
     "services/platform/src/actors/connector/whatsapp-parsers.ts": "surfaces/whatsapp",

@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 134,
+    "upward": 133,
     "areas": 56,
     "order": 72,
     "table": 25
@@ -9,7 +9,7 @@
     "areas/brain -> areas/inbox": 6,
     "areas/brain -> surfaces/email": 2,
     "areas/brain -> surfaces/slack": 1,
-    "areas/brain -> surfaces/whatsapp": 2,
+    "areas/brain -> surfaces/whatsapp": 1,
     "areas/brain -> workers/platform": 1,
     "areas/cafe -> areas/commerce": 1,
     "areas/cafe -> areas/kitchen": 1,

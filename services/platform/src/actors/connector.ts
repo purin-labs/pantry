@@ -85,15 +85,121 @@ import {
 } from "./connector/types";
 import { ConnectorEmail } from "./connector/connector-email-actor";
 import {
+  ConnectorWhatsApp,
+  type ConnectorWhatsAppRpc,
+} from "./connector/connector-whatsapp-actor";
+import {
   ConnectorEvals,
   type ConnectorEvalsRpc,
 } from "./connector/connector-evals";
 
-export class ConnectorDO extends ConnectorEmail implements ConnectorEvalsRpc {
+export class ConnectorDO
+  extends ConnectorEmail
+  implements ConnectorEvalsRpc, ConnectorWhatsAppRpc
+{
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 
   /** The eval runs of this Connector. */
   protected readonly evals = new ConnectorEvals(this.moduleHost);
+
+  /** The WhatsApp channel of this Connector. */
+  protected readonly whatsApp = new ConnectorWhatsApp(this.moduleHost);
+
+  acceptWhatsAppEvent(
+    ...input: Parameters<ConnectorWhatsApp["acceptWhatsAppEvent"]>
+  ) {
+    return this.whatsApp.acceptWhatsAppEvent(...input);
+  }
+
+  activateWhatsAppProcessing(
+    ...input: Parameters<ConnectorWhatsApp["activateWhatsAppProcessing"]>
+  ) {
+    return this.whatsApp.activateWhatsAppProcessing(...input);
+  }
+
+  disableWhatsAppProcessing(
+    ...input: Parameters<ConnectorWhatsApp["disableWhatsAppProcessing"]>
+  ) {
+    return this.whatsApp.disableWhatsAppProcessing(...input);
+  }
+
+  resumeWhatsAppProcessing(
+    ...input: Parameters<ConnectorWhatsApp["resumeWhatsAppProcessing"]>
+  ) {
+    return this.whatsApp.resumeWhatsAppProcessing(...input);
+  }
+
+  inspectWhatsAppRuntime(
+    ...input: Parameters<ConnectorWhatsApp["inspectWhatsAppRuntime"]>
+  ) {
+    return this.whatsApp.inspectWhatsAppRuntime(...input);
+  }
+
+  readWhatsAppConversationHeads(
+    ...input: Parameters<ConnectorWhatsApp["readWhatsAppConversationHeads"]>
+  ) {
+    return this.whatsApp.readWhatsAppConversationHeads(...input);
+  }
+
+  readWhatsAppCasePanel(
+    ...input: Parameters<ConnectorWhatsApp["readWhatsAppCasePanel"]>
+  ) {
+    return this.whatsApp.readWhatsAppCasePanel(...input);
+  }
+
+  previewWhatsAppProposal(
+    ...input: Parameters<ConnectorWhatsApp["previewWhatsAppProposal"]>
+  ) {
+    return this.whatsApp.previewWhatsAppProposal(...input);
+  }
+
+  editWhatsAppProposal(
+    ...input: Parameters<ConnectorWhatsApp["editWhatsAppProposal"]>
+  ) {
+    return this.whatsApp.editWhatsAppProposal(...input);
+  }
+
+  dispatchWhatsAppReply(
+    ...input: Parameters<ConnectorWhatsApp["dispatchWhatsAppReply"]>
+  ) {
+    return this.whatsApp.dispatchWhatsAppReply(...input);
+  }
+
+  disposeWhatsAppProposal(
+    ...input: Parameters<ConnectorWhatsApp["disposeWhatsAppProposal"]>
+  ) {
+    return this.whatsApp.disposeWhatsAppProposal(...input);
+  }
+
+  resolveWhatsAppIndeterminateSend(
+    ...input: Parameters<ConnectorWhatsApp["resolveWhatsAppIndeterminateSend"]>
+  ) {
+    return this.whatsApp.resolveWhatsAppIndeterminateSend(...input);
+  }
+
+  takeOverWhatsAppCase(
+    ...input: Parameters<ConnectorWhatsApp["takeOverWhatsAppCase"]>
+  ) {
+    return this.whatsApp.takeOverWhatsAppCase(...input);
+  }
+
+  returnWhatsAppCaseToAgent(
+    ...input: Parameters<ConnectorWhatsApp["returnWhatsAppCaseToAgent"]>
+  ) {
+    return this.whatsApp.returnWhatsAppCaseToAgent(...input);
+  }
+
+  composeWhatsAppHumanReply(
+    ...input: Parameters<ConnectorWhatsApp["composeWhatsAppHumanReply"]>
+  ) {
+    return this.whatsApp.composeWhatsAppHumanReply(...input);
+  }
+
+  closeWhatsAppCase(
+    ...input: Parameters<ConnectorWhatsApp["closeWhatsAppCase"]>
+  ) {
+    return this.whatsApp.closeWhatsAppCase(...input);
+  }
 
   startEvalRun(...input: Parameters<ConnectorEvals["startEvalRun"]>) {
     return this.evals.startEvalRun(...input);
@@ -116,7 +222,11 @@ export class ConnectorDO extends ConnectorEmail implements ConnectorEvalsRpc {
   }
 
   protected readonly channels: ConnectorChannels = {
-    adapters: [this.slack, this.emailChannel(), this.whatsAppChannel()],
+    adapters: [
+      this.slack,
+      this.emailChannel(),
+      this.whatsApp.whatsAppChannel(),
+    ],
     caseWork: this.slack,
     delivery: this.slack,
   };

@@ -179,13 +179,13 @@ import {
 } from "./whatsapp-parsers";
 import type { ConnectorDO } from "../connector";
 import type { ConnectorEvals } from "./connector-evals";
-import { ConnectorWhatsApp } from "./connector-whatsapp-actor";
+import { ConnectorActorBase } from "./connector-actor-base";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Email processing for the Connector: the mailbox, reply turns, operational proposals, correction learning and Case context discovery.
  */
-export abstract class ConnectorEmail extends ConnectorWhatsApp {
+export abstract class ConnectorEmail extends ConnectorActorBase {
   /** The evals module. `ConnectorDO` gives it. */
   protected abstract readonly evals: ConnectorEvals;
 
