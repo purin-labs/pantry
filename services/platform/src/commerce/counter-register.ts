@@ -101,6 +101,14 @@ function commerceFail(error: CommerceClientError): CounterRegisterResult<never> 
   return { ok: false, failure: { kind: "commerce", error } };
 }
 
+/** The DeviceFleetActor of one counter location: its terminal and printer. */
+export function counterLocationFleet(
+  deps: CounterRegisterDeps,
+  locationId: string,
+) {
+  return deviceFleetStub(deps.env, deps.scope, locationId);
+}
+
 /**
  * Load everything the Café › Register screen needs in one round trip:
  * published menu sections/items/modifiers, active counter POS policy,

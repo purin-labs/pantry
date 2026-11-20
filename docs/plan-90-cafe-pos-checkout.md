@@ -1,7 +1,9 @@
 # Plan 90 — Café Counter Register and POS Payment Adapters
 
 Status (20 November 2026): Phases 1, 2, 3A and 4A are built and released.
-Phases 3B, 3C, 4B and 5 are open.
+Phase 5 is built in simulation on branch `plan-90-printer` and is not
+released; its physical certification waits for the owner's `MCP31LB`.
+Phases 3B, 3C and 4B are open.
 
 - The Platform releases of 19 and 20 November carry Phase 2: the Register in
   the Portal, the counter-register domain and the Sous Chef tools.
@@ -211,7 +213,8 @@ Plans 81, 82, 87, and 89:
   `register.clear_basket`) when the member has `/register` open, so a barista
   can say *"Two plain financiers and an iced ginger milk tea"*.
 - The agent gets **no tool** to trigger terminal collection, record cash
-  received, kick the cash drawer, or run a direct counter refund. A person at
+  received, kick the cash drawer, print or reprint a receipt, or run a direct
+  counter refund. A person at
   the counter taps **Charge** or **Record cash** after seeing the total, and
   chat-proposed refunds continue through `commerce_propose_refund` (`owner` or
   `admin` approval card).
@@ -259,6 +262,10 @@ nothing:
   is still `PENDING` or `IN_PROGRESS`, and terminates at `60 min`.
   `DeviceFleetActor` writes `0` rows on unchanged `30 s` `shop-gateway`
   heartbeats (Plan 85).
+- **Phase 5 printer and drawer:** `0`. A shop with no receipt printer reads
+  one D1 row set at a print or a cash sale and starts no Durable Object. A
+  `printer_job` row exists only after a print or a drawer task, and the daily
+  upkeep that `DeviceFleetActor` already runs deletes it after 7 days.
 - **30-day idle Organisation cost added by Plan 90:** `0` D1 rows written, `0`
   DO SQLite rows written, `0` queue messages, `0` KV writes, and `0` R2 writes.
   Guard with `pnpm --filter satyr-edge test:e2e tests/e2e/idle-tenant-cost.test.ts`
@@ -436,18 +443,112 @@ Work (Phase 4B — physical `stera terminal` driver, **gated on GMO-FG spec**):
 
 ### Phase 5 — Star `MCP31LB` receipt printer and `mJ-Drawer` (optional)
 
-Work:
+State (20 November 2026): built and proven in simulation on branch
+`plan-90-printer`. It is not released. The physical certification waits for
+the owner's `MCP31LB` and `mJ-Drawer`.
 
-- Add `receipt_printer` capability (`StarPRNT` over LAN TCP) and optional
-  `cash_drawer_kick` (`DK-Port`) to `crates/shop-gateway` and
-  `packages/control-api/src/device-gateway.ts`.
-- Render an `80 mm` (`72 mm` printable width) thermal receipt layout in
-  Platform from Underclerk's commercial receipt record (shop name, timestamp,
-  tax-included lines, 8%/10% consumption tax breakdown and Qualified Invoice
-  registration number when configured, tender, change due, and `F-xxx` code).
-- Trigger drawer kick on counter cash capture and manual cash refund when a
-  printer/drawer is bound to the counter location; fall back cleanly to browser
-  print when absent or offline.
+What is built:
+
+- **Protocol** (`packages/control-api/src/device-gateway.ts`): the hardware
+  kind `receipt_printer` (capability `print_receipt`, and `cash_drawer` when a
+  drawer hangs on the DK port), the Platform messages `receipt_print` (a typed
+  48-column layout: text with alignment, emphasis and double size, two-column
+  rows, rules and feeds) and `cash_drawer_kick`, and the gateway answer
+  `printer_result` (`done`, `offline`, `paper_out`, `cover_open`, `no_drawer`,
+  `unknown_device` or `result_unknown`, with `replayed`).
+- **Gateway** (`crates/shop-gateway/src/printer.rs`): it encodes StarPRNT and
+  sends it to TCP port 9100. The printer's LAN address stays in
+  `printers.json` in the gateway's folder; the gateway reports each printer in
+  its hello. A JSON journal records each `requestId` before the first byte and
+  after the answer, so a repeated request never prints or opens the drawer a
+  second time. A request that stopped between the two records answers
+  `result_unknown`. Before a print, the gateway reads the printer's status
+  (`ESC ACK SOH`), so a printer with no paper or an open cover prints nothing.
+  The gateway also sends a health report, so the Devices page shows the fault.
+  `--simulate` takes `printers` (`sourceKey`, `drawer`, `status`,
+  `outputDir`); a simulated printer writes the bytes and a plain-text
+  rendering to two files. `shop-gateway answer` answers one task message from
+  standard input with the same journal.
+- **DeviceFleetActor** (`services/platform/src/actors/device-fleet-printer.ts`,
+  schema version 4): one `printer_job` row for each task. The Actor finds the
+  location's bound printer: the first active `receipt_printer` on an active
+  gateway of the location, which a person confirmed on the Devices page. It
+  waits up to 8 s for the answer. A task with no answer goes again at the
+  gateway's next hello while it is younger than 60 s; an older one ends as
+  `result_unknown`, so nothing prints or opens late. No cron, alarm or poll.
+- **Platform** (`services/platform/src/commerce/counter-receipt.ts` and
+  `counter-printing.ts`): the receipt comes from Commerce's order record: shop
+  name, time, the lines with their modifiers, the tax-included total, the
+  taxable amount and tax for each rate (a line's rate comes from its own tax
+  and price; reduced-rate lines carry `※`), the Qualified Invoice registration
+  number when it is set, the tender and change, the pickup code and the order.
+  Commerce keeps one tax rate for each counter today, so a receipt shows one
+  rate until Commerce has a rate for each line. A cash sale and a completed
+  manual cash refund open the drawer one time each (request ids
+  `drawer_sale_<checkout>` and `drawer_refund_<checkout>`). A print or drawer
+  error never changes the sale: the cash and refund answers carry `drawer`
+  beside `counterSale`.
+- **Routes:** `GET …/counter-sales/:checkoutId/receipt` (operator+: the
+  printer and the tasks of the sale), `POST …/counter-sales/:checkoutId/receipt-print`
+  (operator+), and `GET` / `PUT …/commerce/counter-receipt-settings` (the
+  registration number; `PUT` is admin+). The table
+  `cafe_counter_receipt_setting` holds it.
+- **Register:** "Print receipt" prints on the bound printer. With no printer,
+  or with a printer whose gateway is offline, the browser prints. Each error
+  shows in plain words, with "Print in the browser" where it helps.
+- **Agent access (D9):** the agent gets no tool to print or reprint a receipt,
+  and none to open the drawer. A receipt is paper for the customer at the
+  counter, and only the person there can hand it over. A reprint from the
+  agent prints a second copy of a Qualified Invoice that nobody asked for at
+  the counter. The agent reads the sale with `counter_sale_read`.
+
+StarPRNT commands. The source is Star's "StarPRNT Command Specifications"
+Rev. 4.20, <https://www.starasia.com/Download/Manual/starprnt_cm_en.pdf>, whose
+model list names `MCP31LB` as mC-Print3 (1st Gen.). Rev. 2.25,
+<https://www.starmicronics.com/support/Mannualfolder/StarPRNT_cm_en.pdf>, shows
+the same commands. The command list for each model (section 5) marks each one
+as supported on mC-Print3 (1st Gen.).
+
+| Use | Command | Bytes | Rev. 4.20 |
+| --- | --- | --- | --- |
+| Initialize | ESC @ | `1B 40` | p. 103 |
+| UTF-8 on | ESC GS ) U fn=48 | `1B 1D 29 55 02 00 30 01` | p. 127 |
+| Japanese Kanji font first | ESC GS ) U fn=65 | `1B 1D 29 55 05 00 41 01 00 00 00` | p. 129 |
+| Alignment | ESC GS a n | `1B 1D 61 n` | p. 45 |
+| Emphasis on / off | ESC E / ESC F | `1B 45` / `1B 46` | p. 39 |
+| Double size on / off | ESC i n1 n2 | `1B 69 01 01` / `1B 69 00 00` | p. 36 |
+| Line feed | LF | `0A` | p. 46 |
+| Feed and partial cut | ESC d 3 | `1B 64 03` | p. 52 |
+| Drawer (DK port) | BEL | `07` | p. 137 |
+| Status | ESC ACK SOH | `1B 06 01` | p. 106, Appendix 2 |
+| LAN port | TCP 9100 | — | §2.1 (NSB), and the mC-Print3 manual |
+
+Not used: Shift JIS Kanji mode (`ESC $`, `ESC p`), because UTF-8 mode covers
+Japanese text, and `ESC BEL` (drawer pulse width), because the default of
+200 ms stays. `ESC GS BEL` is not supported on mC-Print3.
+
+Proof: `services/platform/tests/e2e/counter-receipt-printer.test.ts`. The
+socket of the journey only carries messages: each task goes to the real
+`shop-gateway answer` through `tests/shop-gateway-adapters.ts`. A cash sale
+opens the drawer once and prints one receipt; a socket drop after the print
+and before the answer ends with the same task `done` and `replayed`, with no
+second print; a printer with no paper prints nothing, the Register message
+and the Devices fault show it, and the sale stays complete; a viewer is
+refused. The artifact is the simulated printer's text and bytes in
+`output/e2e/shop-gateway/receipt-printer/printer/`.
+
+Before the release:
+
+- Apply `services/platform/scripts/plan-90-receipt-printer-d1-patch.sql` to
+  each regional D1 database.
+- Release a new `shop-gateway` build with the Portal.
+
+Not verified on hardware: the bytes on a real `MCP31LB`, the Japanese font on
+the unit, the status block over Ethernet (if the printer sends no status, the
+print goes ahead), the DK-port pulse with `mJ-Drawer`, and the newest edition
+of the specification (Rev. 4.50 needs a sign-in). The certification prints a
+Japanese receipt, opens the drawer, and checks paper out, cover open, a power
+cut during a print and a LAN unplug.
 
 ## Out of scope
 

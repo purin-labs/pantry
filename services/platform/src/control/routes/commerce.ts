@@ -604,6 +604,7 @@ export function handleCommerceControlRoute(
     case "counterSaleHandover":
     case "counterSaleRefund":
     case "counterSaleManualCashRefund":
+    case "counterReceipt":
       return handleCounterSaleControlRoute(request, env, route);
     case "failedPayments":
       return handleFailedPaymentsControlRoute(request, env, route);

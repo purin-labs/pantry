@@ -3188,6 +3188,22 @@ CREATE TABLE cafe_terminal_assignment (
 CREATE UNIQUE INDEX idx_cafe_terminal_assignment_active_location
   ON cafe_terminal_assignment (organisation_id, satyr_location_id)
   WHERE state = 'active';
+-- What a café counter's printed receipt shows besides the sale (Plan 90
+-- Phase 5): the Qualified Invoice registration number (T and 13 digits).
+CREATE TABLE cafe_counter_receipt_setting (
+  organisation_id TEXT NOT NULL,
+  satyr_location_id TEXT NOT NULL CHECK (length(satyr_location_id) BETWEEN 1 AND 255),
+  invoice_registration_number TEXT CHECK (
+    invoice_registration_number IS NULL OR (
+      length(invoice_registration_number) = 14 AND
+      substr(invoice_registration_number, 1, 1) = 'T' AND
+      substr(invoice_registration_number, 2) NOT GLOB '*[^0-9]*'
+    )
+  ),
+  updated_by_user_id TEXT NOT NULL,
+  updated_at INTEGER NOT NULL CHECK (updated_at >= 0),
+  PRIMARY KEY (organisation_id, satyr_location_id)
+);
 
 -- What Satyr sent to a payout provider, written before the request leaves.
 --
@@ -4525,7 +4541,7 @@ CREATE TABLE device_enrollment (
   gateway_id TEXT NOT NULL REFERENCES device_gateway (gateway_id),
   source_key TEXT NOT NULL CHECK (length(source_key) BETWEEN 1 AND 120),
   name TEXT NOT NULL CHECK (length(name) BETWEEN 1 AND 120),
-  device_kind TEXT NOT NULL CHECK (device_kind IN ('cobot', 'appliance', 'servo', 'relay', 'camera', 'payment_terminal', 'other')),
+  device_kind TEXT NOT NULL CHECK (device_kind IN ('cobot', 'appliance', 'servo', 'relay', 'camera', 'payment_terminal', 'receipt_printer', 'other')),
   model TEXT NOT NULL,
   serial TEXT,
   firmware_version TEXT,

@@ -4,11 +4,15 @@ import {
   DEVICE_CONNECTION_QUIET_MS,
   DEVICE_GATEWAY_MESSAGE_BYTES,
   parseGatewayMessage,
+  type CounterPrinterJob,
+  type CounterReceiptPrinter,
   type DeviceAlertSetting,
   type DeviceConnection,
   type DeviceSampleReport,
   type GatewayMessage,
   type PlatformGatewayMessage,
+  type PrinterTask,
+  type ReceiptLayout,
 } from "@purin-labs/control-api";
 
 import {
@@ -27,6 +31,7 @@ import {
   applyGatewayHello,
   applyHealthReports,
   listGatewayDevices,
+  listGateways,
   pruneDeviceEvents,
   readDeviceAlertSetting,
   readGateway,
@@ -45,6 +50,18 @@ import {
   queueDeviceCommand,
   type DeviceCommandKind,
 } from "./device-command";
+import {
+  deleteGatewayPrinterJobs,
+  insertPrinterJob,
+  listCheckoutPrinterJobs,
+  PRINTER_JOB_RESEND_MS,
+  printerJobView,
+  prunePrinterJobs,
+  readPrinterJob,
+  recordPrinterResult,
+  reopenPrinterJobs,
+  unsentPrinterJob,
+} from "./device-fleet-printer";
 import { runDeviceFleetSchemaMigrations } from "./device-fleet-schema";
 import {
   clearTerminalResultUnknown,
@@ -80,6 +97,15 @@ const SAMPLE_BUCKET_MS = 60_000;
 const DELIVERY_RETRY_MS = 60_000;
 const OUTSIDE_HOURS_CHECK_MS = 5 * 60_000;
 const DAILY_MS = 24 * 60 * 60_000;
+/** A print waits this long for the gateway's answer, then shows `sent`. */
+const PRINTER_ANSWER_MS = 8_000;
+
+/** The receipt printer that this location's counter uses. */
+type BoundPrinter = Readonly<{
+  view: CounterReceiptPrinter;
+  gatewayId: string;
+  sourceKey: string;
+}>;
 
 type GatewaySocketAttachment = Readonly<{
   gatewayId: string;
@@ -100,6 +126,8 @@ export class DeviceFleetActor extends DurableObject<Env> {
   readonly #sql: SqlStorage;
   /** An erased Actor has no tables, so a late socket event does nothing. */
   #erased = false;
+  /** The calls that wait for a printer's answer, by request. */
+  readonly #printerWaiters = new Map<string, (() => void)[]>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -289,6 +317,88 @@ export class DeviceFleetActor extends DurableObject<Env> {
     this.#sql.exec("DELETE FROM device_sample WHERE gateway_id = ?", gatewayId);
     deleteGatewayCommands(this.#sql, gatewayId);
     deleteGatewayTerminalCollections(this.#sql, gatewayId);
+    deleteGatewayPrinterJobs(this.#sql, gatewayId);
+  }
+
+  /**
+   * Prints one receipt or opens the cash drawer on this location's bound
+   * printer, then waits a short time for the gateway's answer. The same
+   * `requestId` is one task: a second call reads it, and sends it again only
+   * while it has no answer. A printer error ends the task and changes no sale.
+   */
+  async runPrinterTask(
+    input: Readonly<{
+      task: PrinterTask;
+      requestId: string;
+      checkoutId: string;
+      receipt: ReceiptLayout | null;
+    }>,
+  ): Promise<CounterPrinterJob> {
+    const existing = readPrinterJob(this.#sql, input.requestId);
+    if (existing !== null) {
+      // Only a young task goes again, as at a hello: nothing prints late.
+      if (
+        existing.state === "sent" &&
+        Date.now() - existing.createdAt <= PRINTER_JOB_RESEND_MS &&
+        this.#sendRaw(existing.gatewayId, existing.messageJson)
+      )
+        await this.#waitForPrinter(existing.requestId);
+      const settled = readPrinterJob(this.#sql, input.requestId) ?? existing;
+      return printerJobView(settled);
+    }
+    const printer = await this.#boundPrinter();
+    if (printer === null)
+      return unsentPrinterJob(input.requestId, input.task, "no_printer");
+    if (input.task === "cash_drawer_kick" && !printer.view.drawer)
+      return unsentPrinterJob(input.requestId, input.task, "no_drawer");
+    if (!printer.view.connected)
+      return unsentPrinterJob(input.requestId, input.task, "gateway_offline");
+    let message: PlatformGatewayMessage;
+    if (input.task === "receipt_print") {
+      if (input.receipt === null)
+        throw new Error("A receipt print needs a receipt layout");
+      message = {
+        type: "receipt_print",
+        requestId: input.requestId,
+        sourceKey: printer.sourceKey,
+        receipt: input.receipt,
+      };
+    } else {
+      message = {
+        type: "cash_drawer_kick",
+        requestId: input.requestId,
+        sourceKey: printer.sourceKey,
+      };
+    }
+    const messageJson = JSON.stringify(message);
+    insertPrinterJob(
+      this.#sql,
+      {
+        requestId: input.requestId,
+        gatewayId: printer.gatewayId,
+        sourceKey: printer.sourceKey,
+        task: input.task,
+        checkoutId: input.checkoutId,
+        messageJson,
+      },
+      Date.now(),
+    );
+    // A send that fails leaves the task open; the next hello sends it again.
+    if (this.#sendRaw(printer.gatewayId, messageJson))
+      await this.#waitForPrinter(input.requestId);
+    const job = readPrinterJob(this.#sql, input.requestId);
+    if (job === null) throw new Error("A printer task did not persist");
+    return printerJobView(job);
+  }
+
+  /** The bound printer of this location's counter, or null. */
+  async counterPrinter(): Promise<CounterReceiptPrinter | null> {
+    return (await this.#boundPrinter())?.view ?? null;
+  }
+
+  /** The print and drawer tasks of one sale, oldest first. */
+  printerJobs(checkoutId: string): readonly CounterPrinterJob[] {
+    return listCheckoutPrinterJobs(this.#sql, checkoutId).map(printerJobView);
   }
 
   /** Reserves exclusive collection ownership on one LAN payment terminal and dispatches `terminal_collect`. */
@@ -451,6 +561,8 @@ export class DeviceFleetActor extends DurableObject<Env> {
         });
         this.#send(socket, { type: "welcome", gatewayId });
         this.#sendOpenCommands(socket, gatewayId, now);
+        for (const job of reopenPrinterJobs(this.#sql, gatewayId, now))
+          this.#sendRawTo(socket, job.messageJson);
         for (const unknown of openUnknownTerminalCollections(
           this.#sql,
           gatewayId,
@@ -490,7 +602,84 @@ export class DeviceFleetActor extends DurableObject<Env> {
       case "terminal_result":
         recordTerminalResult(this.#sql, gatewayId, message, now);
         return;
+      case "printer_result":
+        recordPrinterResult(this.#sql, gatewayId, message, now);
+        this.#releasePrinterWaiters(message.requestId);
+        return;
     }
+  }
+
+  /**
+   * The first active receipt printer on an active gateway of this location.
+   * A person confirms a printer on the Devices page before it prints.
+   */
+  async #boundPrinter(): Promise<BoundPrinter | null> {
+    const scope = await this.#scope();
+    if (scope === null) return null;
+    const locationId = this.#locationId();
+    const gateways = (
+      await listGateways(scope.database, scope.organisationId)
+    ).filter(
+      (gateway) =>
+        gateway.state === "active" && gateway.locationId === locationId,
+    );
+    for (const gateway of gateways) {
+      const printer = (
+        await listGatewayDevices(
+          scope.database,
+          scope.organisationId,
+          gateway.gatewayId,
+        )
+      ).find(
+        (device) =>
+          device.hardware === "receipt_printer" &&
+          device.enrollment === "active",
+      );
+      if (printer === undefined) continue;
+      return {
+        gatewayId: gateway.gatewayId,
+        sourceKey: printer.sourceKey,
+        view: {
+          deviceId: printer.deviceId,
+          name: printer.name,
+          drawer: printer.capabilities.some(
+            (capability) => capability.id === "cash_drawer",
+          ),
+          connected: this.#gatewaySockets(gateway.gatewayId).length > 0,
+        },
+      };
+    }
+    return null;
+  }
+
+  #sendRaw(gatewayId: string, messageJson: string): boolean {
+    const [socket] = this.#gatewaySockets(gatewayId);
+    if (socket === undefined) return false;
+    try {
+      socket.send(messageJson);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  #waitForPrinter(requestId: string): Promise<void> {
+    return new Promise((resolve) => {
+      const waiters = this.#printerWaiters.get(requestId) ?? [];
+      const timer = setTimeout(done, PRINTER_ANSWER_MS);
+      function done(): void {
+        clearTimeout(timer);
+        resolve();
+      }
+      waiters.push(done);
+      this.#printerWaiters.set(requestId, waiters);
+    });
+  }
+
+  #releasePrinterWaiters(requestId: string): void {
+    const waiters = this.#printerWaiters.get(requestId) ?? [];
+    this.#printerWaiters.delete(requestId);
+    for (const done of waiters) done();
   }
 
   async #applyHealth(
@@ -640,6 +829,10 @@ export class DeviceFleetActor extends DurableObject<Env> {
     const scope = await this.#scope();
     if (scope === null) return;
     const replaced = this.#gatewaySockets(attachment.gatewayId).length > 0;
+    // A print that waits for this socket's answer stops waiting: it stays
+    // `sent`, and the gateway's next hello settles it from its journal.
+    for (const requestId of [...this.#printerWaiters.keys()])
+      this.#releasePrinterWaiters(requestId);
     if (!replaced) {
       markGatewayCollectionsUnknown(this.#sql, attachment.gatewayId, now);
       await this.#announce(
@@ -725,6 +918,7 @@ export class DeviceFleetActor extends DurableObject<Env> {
       Math.floor((now - SAMPLE_RETENTION_MS) / SAMPLE_BUCKET_MS),
     );
     pruneSettledDeviceCommands(this.#sql, now);
+    prunePrinterJobs(this.#sql, now);
     this.#sql.exec(
       `INSERT INTO fleet_upkeep (singleton, pruned_at) VALUES (1, ?)
        ON CONFLICT (singleton) DO UPDATE SET pruned_at = excluded.pruned_at`,
@@ -765,6 +959,14 @@ export class DeviceFleetActor extends DurableObject<Env> {
       due = now + DAILY_MS;
     if (due === null) await this.ctx.storage.deleteAlarm();
     else await this.ctx.storage.setAlarm(Math.max(due, now + 1_000));
+  }
+
+  #sendRawTo(socket: WebSocket, messageJson: string): void {
+    try {
+      socket.send(messageJson);
+    } catch {
+      // The gateway left. Its next hello sends the task again.
+    }
   }
 
   #send(socket: WebSocket, message: PlatformGatewayMessage): boolean {

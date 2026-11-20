@@ -10,6 +10,7 @@ import { defineConfig } from "vitest/config";
 import { unstable_readConfig } from "wrangler";
 
 import { commerceFixtureWorkerArtifact } from "./tests/commerce-fixture-worker";
+import { shopGatewayAdapters } from "./tests/shop-gateway-adapters";
 
 const TEST_SECRET_BINDINGS = {
   AIRTABLE_OAUTH_CLIENT_SECRET: "airtable-e2e-secret",
@@ -238,6 +239,8 @@ async function cloudflareOptions() {
           name: RUNNER_WORKER,
           entrypoint: "OnePasswordNetwork",
         },
+        // The real shop gateway's printer and terminal adapters (Plan 90).
+        SHOP_GATEWAY_ADAPTERS: shopGatewayAdapters,
         ...accountPlatform.serviceBindings,
       },
     },

@@ -2,46 +2,36 @@ import {
   isCounterRegisterPaymentMethod,
   type CounterRegisterPaymentMethod,
 } from "@purin-labs/control-api";
-import type {
-  CommerceClientError,
-  CommercePickupCheckoutLineV1,
-} from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
 
 import {
   cancelCounterSaleCollection,
   collectCounterSalePayment,
-  executeCounterSaleAfterSale,
   loadCounterRegisterSnapshot,
   openCounterSale,
   readCounterSaleView,
   reconcileCounterSale,
-  recordCounterSaleCash,
-  type CounterRegisterDeps,
-  type CounterRegisterFailure,
   type CounterSaleAfterSaleAction,
 } from "../../commerce/counter-register";
-import type {
-  ControlMutationReceiptScope,
-  UnversionedControlMutationBoundary,
-} from "../../data/control-mutation";
+import {
+  recordCounterCashAndOpenDrawer,
+  runCounterAfterSaleWithDrawer,
+} from "../../commerce/counter-printing";
 import type { Env } from "../../env";
-import { admitUserMutation } from "../admission/control-mutation";
+import { controlError, controlJson, type JsonRecord } from "../http";
 import {
-  authorizeOrganisationRequest,
-  type AuthorizedOrganisationRequest,
-} from "../authorization";
+  beginMutation,
+  beginRead,
+  decode,
+  failureResponse,
+  finishMutation,
+  match,
+} from "./counter-sale-support";
 import {
-  resolveMerchantControlContext,
-  type MerchantControlContext,
-} from "../commerce-merchant";
-import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-  type JsonRecord,
-} from "../http";
-import { recordCommerceMutationReceipt } from "../mutation-receipt";
+  handleCounterReceiptControlRoute,
+  matchCounterReceiptControlRoute,
+  type CounterReceiptControlRoute,
+} from "./counter-receipt";
 
 export type CounterSaleControlRoute =
   | Readonly<{ kind: "counterRegister"; organisationIdRaw: string }>
@@ -79,22 +69,14 @@ export type CounterSaleControlRoute =
         | "counterSaleManualCashRefund";
       organisationIdRaw: string;
       checkoutIdRaw: string;
-    }>;
-
-type StartedMutation = Readonly<{
-  authorized: AuthorizedOrganisationRequest;
-  identity: Readonly<{ issuer: string; subject: string; userId: string }>;
-  scope: ControlMutationReceiptScope;
-  boundary: UnversionedControlMutationBoundary;
-  context: MerchantControlContext;
-  deps: CounterRegisterDeps;
-  body: JsonRecord;
-  now: number;
-}>;
+    }>
+  | Readonly<{ kind: "counterReceipt"; receipt: CounterReceiptControlRoute }>;
 
 export function matchCounterSaleControlRoute(
   pathname: string,
 ): CounterSaleControlRoute | null {
+  const receipt = matchCounterReceiptControlRoute(pathname);
+  if (receipt !== null) return { kind: "counterReceipt", receipt };
   const register = match(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/commerce\/counter-register$/u,
@@ -178,6 +160,8 @@ export function handleCounterSaleControlRoute(
     case "counterSaleRefund":
     case "counterSaleManualCashRefund":
       return handleCounterSaleAfterSale(request, env, route);
+    case "counterReceipt":
+      return handleCounterReceiptControlRoute(request, env, route.receipt);
   }
 }
 
@@ -187,22 +171,11 @@ async function handleCounterRegisterRead(
   organisationIdRaw: string,
 ): Promise<Response> {
   if (request.method !== "GET") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
-    request,
-    env,
-    organisationIdRaw,
-    "operator",
-    false,
-  );
-  if (!authorized.ok) return authorized.response;
-  const context = await resolveMerchantControlContext(env, authorized);
-  if (context instanceof Response) return context;
+  const deps = await beginRead(request, env, organisationIdRaw, "operator");
+  if (deps instanceof Response) return deps;
   const url = new URL(request.url);
   const locationId = url.searchParams.get("locationId");
-  const loaded = await loadCounterRegisterSnapshot(
-    makeDeps(env, authorized, context),
-    locationId,
-  );
+  const loaded = await loadCounterRegisterSnapshot(deps, locationId);
   return loaded.ok
     ? controlJson({ ok: true, register: loaded.value })
     : failureResponse(loaded.failure);
@@ -214,20 +187,9 @@ async function handleCounterSaleRead(
   route: Variant<CounterSaleControlRoute, "counterSale">,
 ): Promise<Response> {
   if (request.method !== "GET") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
-    request,
-    env,
-    route.organisationIdRaw,
-    "viewer",
-    false,
-  );
-  if (!authorized.ok) return authorized.response;
-  const context = await resolveMerchantControlContext(env, authorized);
-  if (context instanceof Response) return context;
-  const result = await readCounterSaleView(
-    makeDeps(env, authorized, context),
-    route.checkoutIdRaw,
-  );
+  const deps = await beginRead(request, env, route.organisationIdRaw, "viewer");
+  if (deps instanceof Response) return deps;
+  const result = await readCounterSaleView(deps, route.checkoutIdRaw);
   return result.ok
     ? controlJson({ ok: true, counterSale: result.value })
     : failureResponse(result.failure);
@@ -274,13 +236,13 @@ async function handleCounterSaleCash(
   if (started instanceof Response) return started;
   const parsed = parseCashRequest(started.body);
   if (parsed === null) return controlError("counter_sale_request_invalid", 422);
-  const settled = await recordCounterSaleCash(started.deps, {
+  const settled = await recordCounterCashAndOpenDrawer(started.deps, {
     checkoutId: route.checkoutIdRaw,
     ...parsed,
     idempotencyKey: started.boundary.idempotencyKey,
   });
   if (!settled.ok) return failureResponse(settled.failure);
-  return finishMutation(request, started, { ok: true, counterSale: settled.value });
+  return finishMutation(request, started, { ok: true, ...settled.value });
 }
 
 async function handleCounterSaleCollection(
@@ -378,121 +340,22 @@ async function handleCounterSaleAfterSale(
     typeof started.body.reason === "string" && started.body.reason.trim().length > 0
       ? started.body.reason.trim()
       : undefined;
-  const mutated = await executeCounterSaleAfterSale(started.deps, {
+  const mutated = await runCounterAfterSaleWithDrawer(started.deps, {
     checkoutId: route.checkoutIdRaw,
     action,
     idempotencyKey: started.boundary.idempotencyKey,
     reason,
   });
   if (!mutated.ok) return failureResponse(mutated.failure);
-  return finishMutation(request, started, { ok: true, counterSale: mutated.value });
+  return finishMutation(request, started, { ok: true, ...mutated.value });
 }
 
-function makeDeps(
-  env: Env,
-  authorized: AuthorizedOrganisationRequest,
-  context: MerchantControlContext,
-): CounterRegisterDeps {
-  return {
-    env,
-    scope: authorized.executionScope,
-    organisationId: authorized.organisationId,
-    merchantId: context.merchantId,
-    client: context.client,
-  };
-}
-
-async function beginMutation(
-  request: Request,
-  env: Env,
-  organisationIdRaw: string,
-  operation: string,
-  role: "operator" | "admin",
-): Promise<StartedMutation | Response> {
-  const authorized = await authorizeOrganisationRequest(
-    request,
-    env,
-    organisationIdRaw,
-    role,
-    true,
-  );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("counter_sale_request_invalid", 422);
-  const admitted = await admitUserMutation({
-    request,
-    env,
-    authorized,
-    body: body.value,
-    boundary: "unversioned",
-    user: "before_replay",
-    route: `/v1/control/organisations/${authorized.organisationId}/commerce/counter-sales`,
-    operation,
-  });
-  if (admitted instanceof Response) return admitted;
-  const context = await resolveMerchantControlContext(env, authorized);
-  if (context instanceof Response) return context;
-  return {
-    authorized,
-    identity: admitted.user,
-    scope: admitted.scope,
-    boundary: admitted.boundary,
-    context,
-    deps: makeDeps(env, authorized, context),
-    body: body.value,
-    now: Date.now(),
-  };
-}
-
-async function finishMutation(
-  request: Request,
-  started: StartedMutation,
-  responseBody: unknown,
-): Promise<Response> {
-  const recorded = await recordCommerceMutationReceipt({
-    authorized: started.authorized,
-    identity: started.identity,
-    scope: started.scope,
-    boundary: started.boundary,
-    request,
-    responseBody,
-    responseStatus: 200,
-    now: started.now,
-  });
-  return recorded.ok
-    ? controlJson(responseBody)
-    : controlError(recorded.error.code, 409);
-}
-
-function failureResponse(failure: CounterRegisterFailure): Response {
-  if (failure.kind === "commerce") {
-    return commerceErrorResponse(failure.error);
-  }
-  return controlJson(
-    { ok: false, error: failure.code, ...(failure.extra ?? {}) },
-    failure.status,
-  );
-}
-
-function commerceErrorResponse(error: CommerceClientError): Response {
-  if (error.kind === "rejected") {
-    return controlJson(
-      { ok: false, error: "counter_sale_rejected", detail: error.error },
-      409,
-    );
-  }
-  return error.kind === "http" && error.status >= 400 && error.status < 500
-    ? controlJson(
-        { ok: false, error: "counter_sale_rejected", detail: error.message },
-        409,
-      )
-    : controlError("underclerk_unavailable", 503);
-}
+type OpenSaleLines = Parameters<typeof openCounterSale>[1]["lines"];
 
 function parseSaleRequest(body: JsonRecord): Readonly<{
   satyrLocationId: string;
   checkoutId: string;
-  lines: readonly CommercePickupCheckoutLineV1[];
+  lines: OpenSaleLines;
   tenderMode?: "terminal" | "cash";
 }> | null {
   const { satyrLocationId, checkoutId, lines, tenderMode } = body;
@@ -509,7 +372,7 @@ function parseSaleRequest(body: JsonRecord): Readonly<{
   return {
     satyrLocationId,
     checkoutId,
-    lines: lines as readonly CommercePickupCheckoutLineV1[],
+    lines: lines as OpenSaleLines,
     ...(tenderMode === undefined ? {} : { tenderMode }),
   };
 }
@@ -600,14 +463,4 @@ function afterSaleAction(
     case "counterSaleManualCashRefund":
       return "manual_cash_refund";
   }
-}
-
-function match(pathname: string, pattern: RegExp): readonly string[] | null {
-  const captures = pattern.exec(pathname);
-  return captures === null ? null : captures.slice(1);
-}
-
-function decode(value: string | undefined): string {
-  if (value === undefined) throw new Error("Counter sale route capture is missing");
-  return decodeURIComponent(value);
 }

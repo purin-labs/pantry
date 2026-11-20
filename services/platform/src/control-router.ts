@@ -521,6 +521,7 @@ export async function handleControlRequest(
     case "counterSaleHandover":
     case "counterSaleRefund":
     case "counterSaleManualCashRefund":
+    case "counterReceipt":
     case "failedPayments":
     case "commercePayments":
     case "bankPayouts":

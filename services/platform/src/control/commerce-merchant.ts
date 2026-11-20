@@ -6,7 +6,10 @@ import {
 } from "../data/commerce-merchant-binding";
 import type { Env } from "../env";
 import type { IntegrationAccountId } from "../ids";
-import type { AuthorizedOrganisationRequest } from "./authorization";
+import {
+  authorizeOrganisationRequest,
+  type AuthorizedOrganisationRequest,
+} from "./authorization";
 import { controlError } from "./http";
 import { readOrganisationEnvironment } from "./organisation-runtime";
 
@@ -56,4 +59,30 @@ export async function resolveMerchantControlContext(
     integrationAccountId: binding.integrationAccountId,
     client,
   };
+}
+
+/** A read of the merchant: the member's role check, then the merchant. */
+export async function authorizeMerchantRead(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  role: Parameters<typeof authorizeOrganisationRequest>[3],
+): Promise<
+  | Readonly<{
+      authorized: AuthorizedOrganisationRequest;
+      context: MerchantControlContext;
+    }>
+  | Response
+> {
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    role,
+    false,
+  );
+  if (!authorized.ok) return authorized.response;
+  const context = await resolveMerchantControlContext(env, authorized);
+  if (context instanceof Response) return context;
+  return { authorized, context };
 }

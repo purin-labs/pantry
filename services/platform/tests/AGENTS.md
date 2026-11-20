@@ -202,6 +202,14 @@ test and any fixture that exists only for the obsolete behavior.
   reconnect. It needs the account Worker. `e2e/gmail-mailbox-support.ts`
   holds the connected mailbox, its setup and Google's ID token that the mail
   journeys share.
+- `e2e/counter-receipt-printer.test.ts` follows the receipt printer and the
+  cash drawer of a café counter (Plan 90 Phase 5): a cash sale opens the
+  drawer once and prints one receipt, a socket drop during a print prints
+  nothing more, a printer with no paper shows the error while the sale stays
+  complete, and a viewer is refused. Its socket only carries messages:
+  `shop-gateway-adapters.ts` runs the real `shop-gateway answer`, whose
+  simulated printer writes the artifact in `output/e2e/shop-gateway/`. It
+  needs the account Worker and `cargo`.
 - `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an
   optional fixed clock and named seed scenarios at `/test-fixture`. The E2E

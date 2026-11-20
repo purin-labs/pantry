@@ -15,6 +15,8 @@ declare global {
       TEST_PRODUCTION_CRONS: string[];
       VAULT_ROOT_V1: SecretsStoreSecret;
       VAULT_ROOT_V2: SecretsStoreSecret;
+      /** `tests/shop-gateway-adapters.ts`: the real gateway's device adapters. */
+      SHOP_GATEWAY_ADAPTERS: Fetcher;
     }
 
     interface GlobalProps {

@@ -39,6 +39,7 @@ export const deviceKindSchema = Type.Union([
   Type.Literal("relay"),
   Type.Literal("camera"),
   Type.Literal("payment_terminal"),
+  Type.Literal("receipt_printer"),
   Type.Literal("other"),
 ]);
 export type DeviceHardwareKind = Static<typeof deviceKindSchema>;
@@ -59,6 +60,79 @@ export const terminalCollectionOutcomeSchema = Type.Union([
 export type TerminalCollectionOutcome = Static<
   typeof terminalCollectionOutcomeSchema
 >;
+
+/** Characters on one line of 72 mm print (80 mm paper), Plan 90 Phase 5. */
+export const RECEIPT_COLUMNS = 48;
+
+/**
+ * A receipt as lines. Pantry lays it out; the gateway encodes it for its
+ * printer (StarPRNT for a Star mC-Print3) and keeps the printer's address.
+ */
+export const receiptLineSchema = Type.Union([
+  Type.Object(
+    {
+      kind: Type.Literal("text"),
+      text: Type.String({ maxLength: 200 }),
+      align: Type.Union([
+        Type.Literal("left"),
+        Type.Literal("center"),
+        Type.Literal("right"),
+      ]),
+      emphasis: Type.Boolean(),
+      size: Type.Union([Type.Literal("normal"), Type.Literal("double")]),
+    },
+    strict,
+  ),
+  /** A left text and a right text on one line, for an item and its price. */
+  Type.Object(
+    {
+      kind: Type.Literal("columns"),
+      left: Type.String({ maxLength: 200 }),
+      right: Type.String({ maxLength: 60 }),
+      emphasis: Type.Boolean(),
+    },
+    strict,
+  ),
+  Type.Object({ kind: Type.Literal("rule") }, strict),
+  Type.Object(
+    {
+      kind: Type.Literal("feed"),
+      lines: Type.Integer({ minimum: 1, maximum: 5 }),
+    },
+    strict,
+  ),
+]);
+export type ReceiptLine = Static<typeof receiptLineSchema>;
+
+export const receiptLayoutSchema = Type.Object(
+  {
+    columns: Type.Literal(RECEIPT_COLUMNS),
+    lines: Type.Array(receiptLineSchema, { minItems: 1, maxItems: 160 }),
+  },
+  strict,
+);
+export type ReceiptLayout = Static<typeof receiptLayoutSchema>;
+
+export const printerTaskSchema = Type.Union([
+  Type.Literal("receipt_print"),
+  Type.Literal("cash_drawer_kick"),
+]);
+export type PrinterTask = Static<typeof printerTaskSchema>;
+
+/**
+ * What a printer task did. Only `done` printed or opened the drawer. A
+ * `result_unknown` task stopped after its first byte, so the paper may exist.
+ */
+export const printerOutcomeSchema = Type.Union([
+  Type.Literal("done"),
+  Type.Literal("offline"),
+  Type.Literal("paper_out"),
+  Type.Literal("cover_open"),
+  Type.Literal("no_drawer"),
+  Type.Literal("unknown_device"),
+  Type.Literal("result_unknown"),
+]);
+export type PrinterOutcome = Static<typeof printerOutcomeSchema>;
 
 export const deviceHealthSchema = Type.Union([
   Type.Literal("ok"),
@@ -176,6 +250,19 @@ export const gatewayMessageSchema = Type.Union([
     },
     strict,
   ),
+  /** The answer to `receipt_print` or `cash_drawer_kick`, from the journal. */
+  Type.Object(
+    {
+      type: Type.Literal("printer_result"),
+      requestId: shortText,
+      sourceKey,
+      task: printerTaskSchema,
+      outcome: printerOutcomeSchema,
+      /** The gateway had answered this request before and did nothing now. */
+      replayed: Type.Boolean(),
+    },
+    strict,
+  ),
 ]);
 export type GatewayMessage = Static<typeof gatewayMessageSchema>;
 
@@ -243,6 +330,25 @@ export const platformGatewayMessageSchema = Type.Union([
       requestId: shortText,
       sourceKey,
       paymentAttemptId: shortText,
+    },
+    strict,
+  ),
+  /** One receipt. The same `requestId` never prints twice (Plan 90 D8). */
+  Type.Object(
+    {
+      type: Type.Literal("receipt_print"),
+      requestId: shortText,
+      sourceKey,
+      receipt: receiptLayoutSchema,
+    },
+    strict,
+  ),
+  /** Opens the cash drawer on the printer's DK port, one time per request. */
+  Type.Object(
+    {
+      type: Type.Literal("cash_drawer_kick"),
+      requestId: shortText,
+      sourceKey,
     },
     strict,
   ),

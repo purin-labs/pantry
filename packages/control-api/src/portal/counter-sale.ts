@@ -78,7 +78,15 @@ const SALE_STATES = exhaustiveList<CounterSaleState>()([
 
 export function parseEnvelope(raw: unknown): CounterSale {
   const object = requireObject(raw, "counter sale response");
-  requireExactKeys(object, ["ok", "counterSale"], "counter sale response");
+  // A cash sale and a cash refund also answer the cash drawer's task (Plan 90
+  // Phase 5). The sale stands apart from it.
+  requireExactKeys(
+    object,
+    "drawer" in object
+      ? ["ok", "counterSale", "drawer"]
+      : ["ok", "counterSale"],
+    "counter sale response",
+  );
   if (object.ok !== true) throw new Error("The counter sale is unavailable.");
   return parseSale(object.counterSale);
 }

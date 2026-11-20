@@ -22,6 +22,7 @@ import {
   recordCounterSaleCash,
 } from "../terminals/counter-sale-api";
 import { RegisterModifierDrawer, formatMoney } from "./modifier-drawer";
+import { ReceiptPrintControl } from "./receipt-print";
 import { RegisterPageViewSource } from "./register-surface";
 import "./register.css";
 
@@ -514,6 +515,7 @@ export function RegisterRoute(
 
         {activeSale !== null ? (
           <ActiveSalePanel
+            organisationId={props.organisationId}
             sale={activeSale}
             busyAction={busyAction}
             canSwitchToCash={canSwitchToCash}
@@ -734,6 +736,7 @@ export function RegisterRoute(
 
 function ActiveSalePanel(
   props: Readonly<{
+    organisationId: string;
     sale: CounterSale;
     busyAction: string | null;
     canSwitchToCash: boolean;
@@ -817,13 +820,10 @@ function ActiveSalePanel(
           ) : (
             <p>Handed over to customer.</p>
           )}
-          <button
-            type="button"
-            className="register-secondary-btn"
-            onClick={() => window.print()}
-          >
-            Print receipt
-          </button>
+          <ReceiptPrintControl
+            organisationId={props.organisationId}
+            checkoutId={sale.checkoutId}
+          />
           <button
             type="button"
             className="register-secondary-btn"

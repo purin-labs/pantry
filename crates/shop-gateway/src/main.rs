@@ -8,11 +8,14 @@
 //!
 //! Plan 24 adds a typed adapter for each physical device. Today `--simulate`
 //! reads devices from a file, so that the whole path runs before any hardware.
+//! Plan 90 adds a LAN payment terminal (`terminal`) and a receipt printer with
+//! its cash drawer (`printer`).
 
+mod printer;
 mod terminal;
 
 use std::fs;
-use std::io::ErrorKind;
+use std::io::{ErrorKind, Read};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -56,6 +59,31 @@ struct Simulation {
     /// Simulated LAN payment terminal outcomes (Plan 90 Phase 4A).
     #[serde(default)]
     terminal_outcomes: Vec<terminal::SimulatedTerminalRule>,
+    /// Simulated receipt printers (Plan 90 Phase 5).
+    #[serde(default)]
+    printers: Vec<printer::SimulatedPrinter>,
+}
+
+/// The adapters whose tasks keep a local journal across socket drops.
+struct Adapters {
+    terminals: terminal::TerminalJournal,
+    printers: printer::Printers,
+}
+
+impl Adapters {
+    fn load(folder: &Path, simulation: &Simulation) -> Result<Self, String> {
+        Ok(Self {
+            terminals: terminal::TerminalJournal::load(folder)?,
+            printers: printer::Printers::load(folder, simulation.printers.clone())?,
+        })
+    }
+}
+
+/// What a gateway does after a task message.
+enum TaskReply {
+    Send(Vec<Value>),
+    /// The simulation drops the socket after the journal holds the outcome.
+    Drop,
 }
 
 #[derive(Deserialize)]
@@ -76,12 +104,13 @@ fn main() -> ExitCode {
     let result = match args.first().map(String::as_str) {
         Some("enroll") => enroll(&args[1..]),
         Some("run") => run(&args[1..]),
+        Some("answer") => answer_once(&args[1..]),
         Some("version") => {
             println!("{VERSION}");
             Ok(())
         }
         _ => Err(
-            "usage: shop-gateway enroll --url U --organisation O --gateway G --code C | run [--simulate FILE] | version"
+            "usage: shop-gateway enroll --url U --organisation O --gateway G --code C | run [--simulate FILE] | answer [--simulate FILE] | version"
                 .to_string(),
         ),
     };
@@ -162,23 +191,83 @@ fn enroll(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
+fn read_simulation(args: &[String]) -> Result<Simulation, String> {
+    match option(args, "--simulate") {
+        Some(path) => {
+            let text = fs::read_to_string(&path).map_err(|error| format!("{path}: {error}"))?;
+            serde_json::from_str(&text).map_err(|error| format!("{path}: {error}"))
+        }
+        None => Ok(Simulation::default()),
+    }
+}
+
+/// Answers one task message from standard input, with the same journals as
+/// `run`, and writes each answer on one line. A journey drives the real
+/// adapters with it, and a person can check a printer without a socket.
+fn answer_once(args: &[String]) -> Result<(), String> {
+    let folder = home()?;
+    let simulation = read_simulation(args)?;
+    let mut adapters = Adapters::load(&folder, &simulation)?;
+    let mut text = String::new();
+    std::io::stdin()
+        .read_to_string(&mut text)
+        .map_err(|error| error.to_string())?;
+    let message: Value = serde_json::from_str(&text).map_err(|error| error.to_string())?;
+    match answer_task(&message, &simulation, &mut adapters) {
+        Some(Ok(TaskReply::Send(answers))) => {
+            for answer in answers {
+                println!("{answer}");
+            }
+            Ok(())
+        }
+        Some(Ok(TaskReply::Drop)) => Ok(()),
+        Some(Err(error)) => Err(error),
+        None => Err("This message is not a device task.".to_string()),
+    }
+}
+
+/// The answer to a task for a payment terminal or a receipt printer. None for
+/// a message of another kind.
+fn answer_task(
+    message: &Value,
+    simulation: &Simulation,
+    adapters: &mut Adapters,
+) -> Option<Result<TaskReply, String>> {
+    let reply = match message.get("type").and_then(Value::as_str)? {
+        "terminal_collect" => adapters
+            .terminals
+            .handle_collect(message, &simulation.terminal_outcomes)
+            .map(|action| match action {
+                terminal::TerminalAction::SendResult(result) => TaskReply::Send(vec![result]),
+                terminal::TerminalAction::SimulateSocketDrop => TaskReply::Drop,
+            }),
+        "terminal_cancel" => adapters
+            .terminals
+            .handle_cancel(message)
+            .map(|result| TaskReply::Send(vec![result])),
+        "terminal_inquire" => adapters
+            .terminals
+            .handle_inquire(message)
+            .map(|result| TaskReply::Send(vec![result])),
+        "receipt_print" | "cash_drawer_kick" => {
+            adapters.printers.handle(message).map(TaskReply::Send)
+        }
+        _ => return None,
+    };
+    Some(reply)
+}
+
 fn run(args: &[String]) -> Result<(), String> {
     let folder = home()?;
     let credential = fs::read_to_string(folder.join("credential"))
         .map_err(|_| "This gateway is not enrolled. Run the install command.".to_string())?;
     let url = fs::read_to_string(folder.join("url")).map_err(|error| error.to_string())?;
-    let simulation = match option(args, "--simulate") {
-        Some(path) => {
-            let text = fs::read_to_string(&path).map_err(|error| format!("{path}: {error}"))?;
-            serde_json::from_str(&text).map_err(|error| format!("{path}: {error}"))?
-        }
-        None => Simulation::default(),
-    };
-    let mut journal = terminal::TerminalJournal::load(&folder)?;
+    let simulation = read_simulation(args)?;
+    let mut adapters = Adapters::load(&folder, &simulation)?;
     let mut wait = Duration::from_secs(1);
     loop {
         let started = Instant::now();
-        match connect_and_serve(url.trim(), credential.trim(), &simulation, &mut journal) {
+        match connect_and_serve(url.trim(), credential.trim(), &simulation, &mut adapters) {
             RunEnd::Revoked => {
                 println!("Seams Pantry ended this gateway's access. It will not connect again.");
                 return Ok(());
@@ -205,7 +294,7 @@ fn connect_and_serve(
     url: &str,
     credential: &str,
     simulation: &Simulation,
-    journal: &mut terminal::TerminalJournal,
+    adapters: &mut Adapters,
 ) -> RunEnd {
     let mut request = match socket_url(url).into_client_request() {
         Ok(request) => request,
@@ -227,7 +316,7 @@ fn connect_and_serve(
         return RunEnd::Dropped(error);
     }
     println!("Connected to Seams Pantry.");
-    serve(&mut socket, simulation, journal, url, credential)
+    serve(&mut socket, simulation, adapters, url, credential)
 }
 
 fn set_read_tick(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>) -> Result<(), String> {
@@ -250,7 +339,7 @@ fn send(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>, message: &Value) -> R
 fn serve(
     socket: &mut WebSocket<MaybeTlsStream<TcpStream>>,
     simulation: &Simulation,
-    journal: &mut terminal::TerminalJournal,
+    adapters: &mut Adapters,
     url: &str,
     credential: &str,
 ) -> RunEnd {
@@ -260,10 +349,19 @@ fn serve(
     let sample_every = simulation
         .sample_seconds
         .map_or(SAMPLE_EVERY, Duration::from_secs);
+    let mut devices = simulation.devices.clone();
+    for found in adapters.printers.found_devices() {
+        if !devices
+            .iter()
+            .any(|device| device["sourceKey"] == found["sourceKey"])
+        {
+            devices.push(found);
+        }
+    }
     let hello = json!({
         "type": "hello",
         "serviceVersion": VERSION,
-        "devices": simulation.devices,
+        "devices": devices,
         "health": simulation.health,
     });
     if let Err(error) = send(socket, &hello) {
@@ -306,7 +404,7 @@ fn serve(
         }
         match socket.read() {
             Ok(Message::Text(text)) => {
-                match answer(socket, text.as_str(), simulation, journal, url, credential) {
+                match answer(socket, text.as_str(), simulation, adapters, url, credential) {
                     Ok(welcome) => welcomed = welcomed || welcome,
                     Err(error) => return RunEnd::Dropped(error),
                 }
@@ -332,11 +430,23 @@ fn answer(
     socket: &mut WebSocket<MaybeTlsStream<TcpStream>>,
     text: &str,
     simulation: &Simulation,
-    journal: &mut terminal::TerminalJournal,
+    adapters: &mut Adapters,
     url: &str,
     credential: &str,
 ) -> Result<bool, String> {
     let message: Value = serde_json::from_str(text).map_err(|error| error.to_string())?;
+    match answer_task(&message, simulation, adapters) {
+        Some(Ok(TaskReply::Send(answers))) => {
+            for answer in &answers {
+                send(socket, answer)?;
+            }
+            return Ok(false);
+        }
+        Some(Ok(TaskReply::Drop)) => return Err("simulated mid-flight socket drop".to_string()),
+        // The connection ends, so the Platform marks the task's result unknown.
+        Some(Err(error)) => return Err(format!("A device task failed: {error}")),
+        None => {}
+    }
     match message.get("type").and_then(Value::as_str) {
         Some("welcome") => Ok(true),
         Some("pause" | "resume") => {
@@ -349,7 +459,10 @@ fn answer(
             Ok(false)
         }
         Some("snapshot") => {
-            let request = message.get("requestId").and_then(Value::as_str).unwrap_or("");
+            let request = message
+                .get("requestId")
+                .and_then(Value::as_str)
+                .unwrap_or("");
             let outcome = match send_snapshot(request, simulation, url, credential) {
                 Ok(()) => "done",
                 Err(error) => {
@@ -361,27 +474,6 @@ fn answer(
                 socket,
                 &json!({ "type": "ack", "requestId": request, "outcome": outcome }),
             )?;
-            Ok(false)
-        }
-        Some("terminal_collect") => {
-            match journal.handle_collect(&message, &simulation.terminal_outcomes)? {
-                terminal::TerminalAction::SendResult(result) => {
-                    send(socket, &result)?;
-                    Ok(false)
-                }
-                terminal::TerminalAction::SimulateSocketDrop => {
-                    Err("simulated mid-flight socket drop".to_string())
-                }
-            }
-        }
-        Some("terminal_cancel") => {
-            let result = journal.handle_cancel(&message)?;
-            send(socket, &result)?;
-            Ok(false)
-        }
-        Some("terminal_inquire") => {
-            let result = journal.handle_inquire(&message)?;
-            send(socket, &result)?;
             Ok(false)
         }
         Some("refused") => {

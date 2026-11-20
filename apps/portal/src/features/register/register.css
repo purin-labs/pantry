@@ -317,6 +317,16 @@
   font-size: 0.88rem;
 }
 
+.register-receipt-note {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
 .register-modifier-group {
   display: flex;
   flex-direction: column;

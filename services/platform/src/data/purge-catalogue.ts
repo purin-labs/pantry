@@ -71,6 +71,7 @@ export const PURGE_CATALOGUE = [
   { table: "bakery_surface_effect_delivery", action: "erase" },
   { table: "bakery_workflow", action: "erase" },
   { table: "bakery_workflow_revision", action: "erase" },
+  { table: "cafe_counter_receipt_setting", action: "erase" },
   { table: "cafe_terminal_assignment", action: "erase" },
   { table: "campaign_brief", action: "erase" },
   { table: "portal_conversation_user", action: "erase" },

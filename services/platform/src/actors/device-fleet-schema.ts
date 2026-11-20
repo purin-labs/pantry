@@ -1,4 +1,5 @@
 import { deviceCommandSchemaStatements } from "./device-command";
+import { printerJobSchemaStatements } from "./device-fleet-printer";
 import { terminalCollectionSchemaStatements } from "./device-fleet-terminal";
 import {
   assertRequiredColumns,
@@ -11,7 +12,8 @@ import {
  * The DeviceFleetActor's tables (Plan 85). Version 1 is the shape that the
  * Actor created before it had a plan, so an Actor with those tables applies
  * the baseline as no change. Version 2 adds `device_command` (Refactor 15,
- * refactor 6).
+ * refactor 6), version 3 `terminal_collection` and version 4 `printer_job`
+ * (Plan 90).
  */
 const DEVICE_FLEET_SCHEMA_V1: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS device_fleet_scope (
@@ -48,7 +50,7 @@ const DEVICE_FLEET_V1_TABLES = [
 
 const DEVICE_FLEET_SCHEMA_PLAN: SchemaMigrationPlan = {
   key: "device_fleet",
-  currentVersion: 3,
+  currentVersion: 4,
   preservedTables: DEVICE_FLEET_V1_TABLES,
   baseline: {
     version: 1,
@@ -98,6 +100,29 @@ const DEVICE_FLEET_SCHEMA_PLAN: SchemaMigrationPlan = {
           "payment_method",
           "state",
           "expires_at",
+          "updated_at",
+        ]);
+      },
+    },
+    {
+      // Plan 90 Phase 5: receipt printer and cash drawer tasks.
+      version: 4,
+      apply: (sql) => {
+        for (const statement of printerJobSchemaStatements())
+          sql.exec(statement);
+      },
+      validate: (sql) => {
+        validateV1(sql);
+        assertRequiredColumns(sql, "printer_job", [
+          "request_id",
+          "gateway_id",
+          "source_key",
+          "task",
+          "checkout_id",
+          "message_json",
+          "state",
+          "replayed",
+          "created_at",
           "updated_at",
         ]);
       },

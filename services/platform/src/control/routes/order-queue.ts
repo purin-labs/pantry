@@ -7,7 +7,10 @@ import {
 } from "../../commerce/order-queue-commands";
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";
-import { resolveMerchantControlContext } from "../commerce-merchant";
+import {
+  authorizeMerchantRead,
+  resolveMerchantControlContext,
+} from "../commerce-merchant";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
@@ -60,16 +63,14 @@ async function readOrderQueue(
   organisationIdRaw: string,
 ): Promise<Response> {
   if (request.method !== "GET") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const read = await authorizeMerchantRead(
     request,
     env,
     organisationIdRaw,
     "operator",
-    false,
   );
-  if (!authorized.ok) return authorized.response;
-  const context = await resolveMerchantControlContext(env, authorized);
-  if (context instanceof Response) return context;
+  if (read instanceof Response) return read;
+  const { context } = read;
   const queue = await context.client.readPickupQueue(context.merchantId);
   if (!queue.ok) return controlError("underclerk_unavailable", 503);
   return controlJson({
