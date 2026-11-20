@@ -664,13 +664,13 @@ dry run, no upload):
 The tool catalog. Steps A1.3 and A1.4 change the tool registry, and the digest must
 stay the same:
 
-| Value                                                     | Result                                                             |
-| --------------------------------------------------------- | ------------------------------------------------------------------ |
-| Registered tools                                          | 116, with 33 capabilities and 47 surface commands                  |
-| Tools in the widest selection                             | 117                                                                |
-| SHA-256 of the tool names in order, one name on each line | `0ad0603b2740725442d8782ab6c05013d7bd39d892fa279f11e3d07229799e47` |
-| `catalogHarnessToolCatalogDigest` of the widest selection | `146bbd674420018eb69b2605daf59f6f3bb76eba10a96052fdb6120f6e4971b1` |
-| `catalogHarnessToolCatalogDigest` with no argument        | `5d3e3158f521246350507cdb4971427149840e2ddbfa97a03eccbee8436db632` |
+| Value                                                             | Result                                                                                                                               |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Registered tools                                                  | 116 before step A1.3 and 117 after it (the permission request tool is in the list now), with 33 capabilities and 47 surface commands |
+| Tools in the widest selection                                     | 117                                                                                                                                  |
+| SHA-256 of the tool names in order, one name on each line         | `0ad0603b2740725442d8782ab6c05013d7bd39d892fa279f11e3d07229799e47`                                                                   |
+| `catalogHarnessToolCatalogDigest` of the widest selection         | `146bbd674420018eb69b2605daf59f6f3bb76eba10a96052fdb6120f6e4971b1`                                                                   |
+| `catalogHarnessToolCatalogDigest` with the base capabilities only | `5d3e3158f521246350507cdb4971427149840e2ddbfa97a03eccbee8436db632`                                                                   |
 
 The widest selection has each capability and each surface command of `TOOLS` in
 `agent-tools/registry.ts`, in registry order, and each turn flag on (`memoryProposal`,
