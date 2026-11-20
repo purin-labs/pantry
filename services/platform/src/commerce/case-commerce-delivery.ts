@@ -5,7 +5,7 @@
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import type { CaseActor } from "../actors/case/case-actor";
 import type { CaseOutput } from "../actors/case/types";
-import { sinkRefusalAsksPerson } from "../actors/case-conversation-sink";
+import { sinkRefusalAsksPerson } from "../policy";
 import { holdCaseOutput } from "../actors/case-output-hold";
 import { authorizeCaseConversationOutput } from "../actors/case-walking-path";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";

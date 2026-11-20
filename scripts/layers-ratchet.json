@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 134,
+    "upward": 131,
     "areas": 56,
-    "order": 72,
+    "order": 53,
     "table": 25
   },
   "crossings": {
@@ -61,11 +61,9 @@
     "foundation/actor-runtime -> foundation/conversation": 3,
     "foundation/actor-runtime -> surfaces/email": 2,
     "foundation/agent -> areas/commerce": 19,
-    "foundation/agent -> areas/inbox": 1,
     "foundation/agent -> areas/integrations": 1,
     "foundation/agent -> areas/organisation": 4,
-    "foundation/agent -> foundation/conversation": 22,
-    "foundation/agent -> surfaces/portal": 1,
+    "foundation/agent -> foundation/conversation": 3,
     "foundation/agent-tools -> foundation/agent": 3,
     "foundation/authority -> areas/commerce": 7,
     "foundation/authority -> foundation/agent": 5,
@@ -83,7 +81,7 @@
     "foundation/conversation -> areas/commerce": 1,
     "foundation/conversation -> areas/kitchen": 4,
     "foundation/conversation -> surfaces/portal": 2,
-    "foundation/conversation -> surfaces/slack": 5,
+    "foundation/conversation -> surfaces/slack": 4,
     "foundation/kernel -> foundation/contracts": 2,
     "foundation/kernel -> foundation/tenancy": 1,
     "foundation/tenancy -> foundation/actor-runtime": 7,

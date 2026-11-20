@@ -1,4 +1,5 @@
 import { SESSION_TOOL_WIRING } from "../agent-tools/session-wiring";
+import { authorizeChatHarnessLease } from "../chat/turn-access";
 import type {
   SessionInboxTurnsRpc,
   TransientEmailTurnRequest,
@@ -14,6 +15,10 @@ import {
 } from "./inbox-turns/session-turns";
 import { SessionActor } from "./session/session-actor";
 import type { SessionToolWiring } from "./session/tool-wiring";
+import { registerSessionTurnAccess } from "./session-turn-access";
+
+// The conversation module owns the access rule of a Session turn.
+registerSessionTurnAccess(authorizeChatHarnessLease);
 
 /**
  * The Session Durable Object class of the Worker. It keeps the deployed class

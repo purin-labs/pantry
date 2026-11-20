@@ -17,18 +17,7 @@ import {
   StartedGoalExecution,
   type GoalExecution,
 } from "../session-goal-usage";
-import { authorizeChatHarnessLease } from "../../chat/turn-access";
-import { decideChatFlowDelivery } from "../../chat/information-flow";
-import {
-  readChatForkHistoryForCase,
-  admitChatForkInformationFlow,
-  authorizeForkHistoryAccess,
-} from "../../chat/forks";
-import {
-  admitSideCaseInformationFlow,
-  authorizeSideCaseAccess,
-} from "../../chat/side-cases";
-import { readSideCaseOrigin } from "../../chat/side-case-origin";
+import { authorizeSessionTurnLease } from "../session-turn-access";
 import {
   writeHarnessTurnContinuation,
   finishHarnessTurnContinuation,
@@ -118,10 +107,7 @@ import {
   buildCanonicalTextTurnStart,
   withNextRuntimeGeneration,
 } from "../agent-session-turn-start";
-import {
-  decideCaseConversationSink,
-  sinkRefusalAsksPerson,
-} from "../case-conversation-sink";
+import { sinkRefusalAsksPerson } from "../../policy";
 import {
   prepareSessionInformationFlow,
   readSessionInformationFlow,
@@ -193,6 +179,7 @@ import type {
 } from "./types";
 import { SessionCheckpoints } from "./session-checkpoints";
 import type {
+  SessionToolWiring,
   ToolTurnContext,
   TurnPageContext,
   TurnPageState,
@@ -349,7 +336,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (execution.scope.organisationId !== input.requestingOrganisationId)
       return { ok: false, error: { code: "invalid_persisted_state" } };
     if (
-      !(await authorizeChatHarnessLease(
+      !(await authorizeSessionTurnLease(
         this.env.DB,
         execution.scope.database,
         input.requestingOrganisationId,
@@ -507,7 +494,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
   protected async runCanonicalEmbeddedHarnessTurn(input: {
     execution: SessionExecutionAdmission;
     acceptedTurnTools: AcceptedTurnTools | null;
-    inheritedHistory: ReturnType<typeof readChatForkHistoryForCase> | null;
+    inheritedHistory: ReturnType<
+      SessionToolWiring["conversation"]["readForkHistory"]
+    > | null;
     /**
      * The goal execution that the caller started to bind, and that the caller
      * closes. Null when the turn resumes in a later call: this call then
@@ -555,7 +544,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       };
     }
     // A side Case's proposal is read beside its fork history (Plan 74).
-    const sideCaseRead = readSideCaseOrigin(
+    const conversation = this.sessionTools().conversation;
+    const sideCaseRead = conversation.readSideCase(
       input.execution.scope,
       String(assignment.caseId),
     );
@@ -564,13 +554,13 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (inheritedHistory.entries.length > 0) {
       if (input.lease.requestAuthority.kind !== "control")
         throw new Error("chat_fork_history_forbidden");
-      await authorizeForkHistoryAccess(
+      await conversation.authorizeForkHistoryAccess(
         input.execution.scope,
         inheritedHistory,
         input.lease.requestAuthority,
       );
     }
-    await admitChatForkInformationFlow(
+    await conversation.admitForkInformationFlow(
       input.execution.scope.database,
       input.execution.scope.accountAccess,
       this.ctx.storage,
@@ -578,32 +568,19 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       inheritedHistory,
       requireSessionExecution.bind(null, input.execution, input.lease),
     );
-    const sideCaseOrigin = await sideCaseRead;
-    if (sideCaseOrigin?.kind === "slack_thread")
-      await this.sessionTools().slackThreadSideCase.admit(
-        this.ctx.storage,
-        input.lease,
-        sideCaseOrigin.proposal,
-        requireSessionExecution.bind(null, input.execution, input.lease),
-        this.env,
-      );
-    if (sideCaseOrigin?.kind === "portal_chat") {
-      if (input.lease.requestAuthority.kind !== "control")
-        throw new Error("side_case_forbidden");
-      await authorizeSideCaseAccess(
-        input.execution.scope,
-        sideCaseOrigin.proposal,
-        input.lease.requestAuthority,
-      );
-      await admitSideCaseInformationFlow(
-        input.execution.scope.database,
-        input.execution.scope.accountAccess,
-        this.ctx.storage,
-        input.lease,
-        sideCaseOrigin.proposal,
-        requireSessionExecution.bind(null, input.execution, input.lease),
-      );
-    }
+    const sideCase = await sideCaseRead;
+    if (sideCase !== null)
+      await sideCase.admit({
+        scope: input.execution.scope,
+        storage: this.ctx.storage,
+        lease: input.lease,
+        authorizeCommit: requireSessionExecution.bind(
+          null,
+          input.execution,
+          input.lease,
+        ),
+        env: this.env,
+      });
     const currentFlow = await readPersistedSessionTurnFlowBinding(
       this.ctx.storage.sql,
       {
@@ -624,7 +601,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       };
     }
     if (input.lease.requestAuthority.kind === "control") {
-      const admission = await decideChatFlowDelivery(
+      const admission = await conversation.decideFlowDelivery(
         input.execution.scope.database,
         input.execution.scope.accountAccess,
         currentFlow.value.binding,
@@ -643,8 +620,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         : `${input.harnessInstructions}\n\nThis chat is a fork. Earlier messages and settled tool results are inherited history. Execute only the newly accepted request. Prior approvals and effects cannot authorize new actions. Shared workspaces have their current state; inspect their current revision before editing.`;
     const harnessInstructions = sideCaseHarnessInstructions(
       forkInstructions,
-      sideCaseOrigin,
-      this.sessionTools().slackThreadSideCase,
+      sideCase,
     );
     const parsedSessionId = parseSessionId(
       session.value.lifecycle.state.identity.sessionId,
@@ -1272,7 +1248,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
      * when the turn resumes in a later call, which starts the read itself.
      */
     startedInheritedHistory: ReturnType<
-      typeof readChatForkHistoryForCase
+      SessionToolWiring["conversation"]["readForkHistory"]
     > | null;
     /**
      * The read of the registry row of the Case that this Session serves,
@@ -1333,7 +1309,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       input.startedInheritedHistory ??
       (assignment === null
         ? null
-        : readChatForkHistoryForCase(
+        : this.sessionTools().conversation.readForkHistory(
             this.env,
             input.execution.scope,
             String(assignment.caseId),
@@ -1756,7 +1732,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // fence of the start commit, and the turn does not read the receipt
     // again. Between this wait and the commit the turn uses only this
     // Session's storage.
-    const inheritedHistory = readChatForkHistoryForCase(
+    const conversation = this.sessionTools().conversation;
+    const inheritedHistory = conversation.readForkHistory(
       this.env,
       execution.scope,
       String(assignment.caseId),
@@ -1764,11 +1741,11 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     void inheritedHistory.catch(ignoreUnusedForkHistory);
     // A side Case adds its instruction to every turn, also to the binding
     // that this start pins, so the run and its checkpoint agree.
-    const sideCaseOrigin = readSideCaseOrigin(
+    const sideCaseRead = conversation.readSideCase(
       execution.scope,
       String(assignment.caseId),
     );
-    void sideCaseOrigin.catch(ignoreUnusedSideCaseOrigin);
+    void sideCaseRead.catch(ignoreUnusedSideCaseOrigin);
     const startReceipt = canonicalTextTurnWorkspaceReceipt(
       current.value.lifecycle,
       runtime.value,
@@ -1811,8 +1788,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         runtime: runtime.value,
         harnessInstructions: sideCaseHarnessInstructions(
           input.harnessInstructions,
-          await sideCaseOrigin,
-          this.sessionTools().slackThreadSideCase,
+          await sideCaseRead,
         ),
         assignment,
         turnTools: acceptedTurnTools.value.turnTools,
@@ -1877,7 +1853,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       // The authority is the live one that this call resolved for the
       // connector catalog. A refused sink leaves no turn and no stream.
       phaseStartedAt = Date.now();
-      const sink = await decideCaseConversationSink(
+      const sink = await conversation.decideStreamSink(
         acceptedTurnTools.value.authority,
         informationFlow.value.binding,
         input.streamSink.channelId,
