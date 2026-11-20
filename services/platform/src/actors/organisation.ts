@@ -12,7 +12,7 @@ import {
   runAlarmSteps,
 } from "./lifecycle/actor-alarm";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
-import { screenMediaBase } from "../commerce/cafe-media";
+import { screenMediaBase } from "../cafe/contract/media";
 import {
   CHAT_SIGNAL_SOCKET_HANDLER,
   isChatSignalSocket,

@@ -4,7 +4,7 @@ import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import {
   advanceOrderQueueEntry,
   presentOrderQueueEntry,
-} from "../../commerce/order-queue-commands";
+} from "../../cafe/contract/order-queue-commands";
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";
 import {

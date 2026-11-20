@@ -36,7 +36,7 @@ import {
 import { readActiveTerminalAssignment } from "../data/terminal-assignment-store";
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
-import { presentOrderQueueEntry } from "./order-queue-commands";
+import { presentOrderQueueEntry } from "../cafe/contract/order-queue-commands";
 
 const DEFAULT_CAFE_MENU_ID = "menu_cafe_main";
 const ALL_JAPAN_METHODS: readonly CounterRegisterPaymentMethod[] = [

@@ -3,17 +3,17 @@
 // only while a listed product shows it, so the Platform serves a board's
 // image itself: to the board editor under the person's session, and to a
 // TV only while a published board names it.
-import type { Env } from "../env";
-import { readOrganisationEnvironment } from "../control/organisation-runtime";
-import { resolveOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import type { OrganisationId } from "../ids";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { createCommerceClient } from "./contract/client";
+import type { Env } from "../../env";
+import { readOrganisationEnvironment } from "../../control/organisation-runtime";
+import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import type { OrganisationId } from "../../ids";
+import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { createCommerceClient } from "../../commerce/contract/client";
 import { commerceCommandInput, type CommerceAdminClient } from "@purin-labs/commerce-client";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
-import type { Result } from "../result";
-import type { MenuBoardCommand, MenuBoardCommandReply } from "../actors/menu-board-commands";
-import { CAFE_STOREFRONT_ID } from "./cafe-menu-publication";
+import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import type { Result } from "../../result";
+import type { MenuBoardCommand, MenuBoardCommandReply } from "../../actors/menu-board-commands";
+import { CAFE_STOREFRONT_ID } from "./menu-publication";
 import type { Variant } from "@purin-labs/type-utils";
 
 /** The café storefront's media address for a merchant, ending in "/". */

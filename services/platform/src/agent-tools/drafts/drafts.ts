@@ -1,8 +1,8 @@
 import {
-  MenuDraftRequestError,
   type MenuDraftEdit,
   type MenuDraftRead,
 } from "../../actors/menu-draft";
+import { MenuDraftRequestError } from "../../cafe/contract/request-errors";
 import {
   isMenuBoardFrameId,
   isMenuBoardItemRow,

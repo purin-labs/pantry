@@ -6,7 +6,7 @@ import { isRecord } from "@purin-labs/std";
 import { parsePublishMenuCommand } from "@purin-labs/commerce-client";
 
 import type { Result } from "../result";
-import { CAFE_MENU_ID, type CafeMenuDefinition } from "./cafe-menu-publication";
+import { CAFE_MENU_ID, type CafeMenuDefinition } from "../cafe/contract/menu-publication";
 
 export const CAFE_MENU_PUBLISH_VERB = "commerce.menu.publish";
 
