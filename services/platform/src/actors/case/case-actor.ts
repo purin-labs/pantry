@@ -25,15 +25,6 @@ import {
   parseGoalUsageRequest,
 } from "../case-goals";
 import {
-  readCaseExecutionContent,
-  readCaseExecutionRecords,
-} from "../case-execution-records";
-import type {
-  CaseExecutionCaseRecords,
-  CaseExecutionContentTarget,
-  CaseExecutionStoredContent,
-} from "../../case-execution/records";
-import {
   createConversationExecutionSchema,
   persistConversationExecution,
   readConversationExecution,
@@ -241,7 +232,8 @@ export abstract class CaseActor
     return stale === null ? census : [...census, stale];
   }
 
-  private discarded = false;
+  /** True after the quarantined Case discarded its state; the Case then reads nothing. */
+  protected discarded = false;
   private projectionWork: Promise<void> | null = null;
   private readonly executions = new Set<
     Promise<Result<null, ActorExportError>>
@@ -1842,25 +1834,6 @@ export abstract class CaseActor
     return lifecycles === null
       ? invalid("case_storage_corrupt")
       : { ok: true, value: lifecycles };
-  }
-
-  /**
-   * The execution records of this Case with their stored labels, for the
-   * execution projection. The caller decides what its reader may see.
-   */
-  async readExecutionRecords(): Promise<CaseExecutionCaseRecords | null> {
-    return this.discarded
-      ? null
-      : readCaseExecutionRecords(this.ctx.storage.sql);
-  }
-
-  /** The stored content of one record. The caller has authorized the read. */
-  async readExecutionContent(
-    target: CaseExecutionContentTarget,
-  ): Promise<readonly CaseExecutionStoredContent[] | null> {
-    return this.discarded
-      ? null
-      : readCaseExecutionContent(this.ctx.storage.sql, target);
   }
 
   /** Every attachment object a trigger of this case still names. */

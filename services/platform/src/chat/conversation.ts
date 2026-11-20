@@ -36,7 +36,6 @@ import {
 } from "@purin-labs/contracts";
 import { parseSessionModelRoute } from "../policy-snapshot";
 import type { JsonRecord } from "../control/http";
-import type { ConnectorDocumentation } from "../custom-connectors/authoring";
 import {
   parseCustomConnectorId,
   type CustomConnectorId,
@@ -184,13 +183,21 @@ export type ConversationStream = {
   readonly turnId: string;
 };
 
+/** A documentation page that a chat read, as the chat record stores it. */
+export type ConversationDocument = {
+  readonly url: string;
+  readonly sha256: string;
+  readonly text: string;
+  readonly truncated: boolean;
+};
+
 export type Conversation = {
   readonly lineage: ChatThreadLineage;
   readonly historyBindings: readonly ChatHistoryBinding[];
   readonly id: ConversationId;
   readonly title: string;
   readonly modelRoute: ModelRoute;
-  readonly documents: readonly ConnectorDocumentation[];
+  readonly documents: readonly ConversationDocument[];
   readonly work: ConversationWork;
   readonly completedRequests: readonly string[];
   readonly timeline: readonly ChatTimelineEvent[];
@@ -573,7 +580,7 @@ export function parseConversation(raw: unknown): Conversation {
     !Array.isArray(raw.completedRequests)
   )
     throw new Error("conversation_storage_invalid");
-  const documents: ConnectorDocumentation[] = [];
+  const documents: ConversationDocument[] = [];
   for (const document of raw.documents) {
     if (
       !isRecord(document) ||

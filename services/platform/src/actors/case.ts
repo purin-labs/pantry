@@ -1,4 +1,13 @@
 import { caseCommercePart } from "../commerce/case-proposals";
+import type {
+  CaseExecutionCaseRecords,
+  CaseExecutionContentTarget,
+  CaseExecutionStoredContent,
+} from "../case-execution/records";
+import {
+  readCaseExecutionContent,
+  readCaseExecutionRecords,
+} from "./case-execution-records";
 import {
   acceptCaseEmailProposal,
   readCaseEmailProposals,
@@ -53,6 +62,27 @@ export class CaseDO extends CaseActor implements CaseInboxRpc {
 
   async readMailWork(input: Parameters<CaseInboxRpc["readMailWork"]>[0]) {
     return readCaseMailWork(this.ctx.storage, input);
+  }
+
+  // The execution records of Brain (`actors/case-execution-records.ts`).
+
+  /**
+   * The execution records of this Case with their stored labels, for the
+   * execution projection. The caller decides what its reader may see.
+   */
+  async readExecutionRecords(): Promise<CaseExecutionCaseRecords | null> {
+    return this.discarded
+      ? null
+      : readCaseExecutionRecords(this.ctx.storage.sql);
+  }
+
+  /** The stored content of one record. The caller has authorized the read. */
+  async readExecutionContent(
+    target: CaseExecutionContentTarget,
+  ): Promise<readonly CaseExecutionStoredContent[] | null> {
+    return this.discarded
+      ? null
+      : readCaseExecutionContent(this.ctx.storage.sql, target);
   }
 }
 
