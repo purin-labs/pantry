@@ -5,7 +5,11 @@ import type {
 } from "../database-handles";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import type { UserId, IntegrationAccountId, OrganisationId } from "../ids";
-import { whatsappErasureStatements } from "./whatsapp";
+import {
+  prepareAccountContactVerificationsDelete,
+  whatsappErasureStatements,
+} from "../mail-inbox/contract/account-erasure";
+import { prepareProviderAccountCleanup } from "../integrations/contract/provider-account-cleanup";
 import type { Result } from "../result";
 import {
   resolveIntegrationAccount,
@@ -187,11 +191,11 @@ export async function removeIntegrationAccount(input: {
   const cleanupId = `provider_cleanup_${crypto.randomUUID()}`;
   const statements: D1PreparedStatement[] = [];
   statements.push(
-    session
-      .prepare(
-        "DELETE FROM contact_endpoint_verification WHERE organisation_id = ? AND integration_account_id = ?",
-      )
-      .bind(input.organisationId, input.integrationAccountId),
+    prepareAccountContactVerificationsDelete(
+      session,
+      input.organisationId,
+      input.integrationAccountId,
+    ),
     ...prepareRemovedAccountResourcesErasure(
       session,
       input.integrationAccountId,
@@ -262,32 +266,19 @@ export async function removeIntegrationAccount(input: {
     );
   } else {
     statements.push(
-      session
-        .prepare(
-          `INSERT INTO provider_account_cleanup (
-           cleanup_id, organisation_id, integration_account_id, provider, environment,
-           lifecycle, reason_code, instruction_code, attempt, next_attempt_at,
-           created_at, updated_at, completed_at,
-           provider_account_id, provider_connection_id, credential_handles,
-           provider_webhook_ids, provider_context
-         ) VALUES (?, ?, ?, ?, ?, 'pending_provider_cleanup', NULL, NULL, 0, ?,
-           ?, ?, NULL, ?, ?, ?, ?, ?)`,
-        )
-        .bind(
-          cleanupId,
-          input.organisationId,
-          input.integrationAccountId,
-          account.value.provider,
-          account.value.environment,
-          input.now,
-          input.now,
-          input.now,
-          account.value.providerAccountId,
-          account.value.providerConnectionId,
-          JSON.stringify(cleanupMetadata.credentialHandles),
-          JSON.stringify(cleanupMetadata.providerWebhookIds),
-          providerContext,
-        ),
+      prepareProviderAccountCleanup(session, {
+        cleanupId,
+        organisationId: input.organisationId,
+        integrationAccountId: input.integrationAccountId,
+        provider: account.value.provider,
+        environment: account.value.environment,
+        now: input.now,
+        providerAccountId: account.value.providerAccountId,
+        providerConnectionId: account.value.providerConnectionId,
+        credentialHandles: JSON.stringify(cleanupMetadata.credentialHandles),
+        providerWebhookIds: JSON.stringify(cleanupMetadata.providerWebhookIds),
+        providerContext,
+      }),
     );
   }
   statements.push(

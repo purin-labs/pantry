@@ -1,9 +1,9 @@
 {
   "totals": {
-    "upward": 91,
-    "areas": 48,
+    "upward": 88,
+    "areas": 44,
     "order": 71,
-    "table": 25
+    "table": 23
   },
   "crossings": {
     "areas/brain -> areas/inbox": 1,
@@ -28,13 +28,12 @@
     "areas/integrations -> surfaces/slack": 4,
     "areas/kitchen -> areas/inbox": 1,
     "areas/kitchen -> areas/organisation": 1,
-    "areas/organisation -> areas/devices": 3,
-    "areas/organisation -> areas/inbox": 3,
+    "areas/organisation -> areas/devices": 1,
+    "areas/organisation -> areas/inbox": 1,
     "areas/organisation -> areas/integrations": 2,
     "areas/organisation -> areas/kitchen": 1,
     "areas/organisation -> surfaces/portal": 2,
-    "areas/organisation -> surfaces/slack": 2,
-    "areas/organisation -> surfaces/voice": 2,
+    "areas/organisation -> surfaces/slack": 1,
     "areas/shopify -> areas/commerce": 4,
     "foundation/actor-runtime -> areas/commerce": 1,
     "foundation/actor-runtime -> areas/devices": 1,
@@ -81,7 +80,6 @@
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
     "table account_service_invitation_role (areas/organisation) <- foundation/tenancy": 1,
-    "table contact_endpoint_verification (areas/inbox) <- areas/organisation": 1,
     "table credential_ref (foundation/authority) <- foundation/connections": 1,
     "table integration_account (foundation/connections) <- foundation/tenancy": 3,
     "table onboarding_support_reference (areas/organisation) <- foundation/connections": 1,
@@ -91,7 +89,6 @@
     "table organisation_workspace (foundation/agent) <- foundation/tenancy": 1,
     "table project (foundation/conversation) <- surfaces/portal": 1,
     "table project_member (foundation/conversation) <- foundation/tenancy": 1,
-    "table provider_account_cleanup (areas/integrations) <- areas/organisation": 1,
     "table provider_connection (foundation/connections) <- foundation/tenancy": 3,
     "table provider_credential_generation (foundation/connections) <- foundation/tenancy": 2,
     "table provider_webhook (foundation/connections) <- foundation/tenancy": 1,

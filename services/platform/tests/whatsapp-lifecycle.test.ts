@@ -63,8 +63,8 @@ import {
   requestWhatsAppCaseHandoff,
   revokeWhatsAppConnection,
   routeWhatsAppWebhookAccount,
-  whatsappErasureStatements,
 } from "../src/data/whatsapp";
+import { whatsappErasureStatements } from "../src/mail-inbox/contract/account-erasure";
 import { reconcileOrganisationOnboarding } from "../src/data/onboarding-reconciliation";
 import type { SessionDO } from "../src/actors/agent-session";
 import {

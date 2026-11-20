@@ -20,6 +20,7 @@ import {
   reconcileOrganisationOnboarding,
   reconcileAdmittedOrganisationArchiveCleanup,
 } from "../src/data/onboarding-reconciliation";
+import { ARCHIVE_CLEANUP_PARTS } from "../src/archive-cleanup-parts";
 import type { SessionDO } from "../src/actors/agent-session";
 import type { OrganisationDO } from "../src/actors/organisation";
 import type {
@@ -1489,6 +1490,7 @@ class ArchiveOrganisationFixture {
     const value = await reconcileAdmittedOrganisationArchiveCleanup({
       // No voice zone in this fixture.
       env: {} as never,
+      parts: ARCHIVE_CLEANUP_PARTS,
       db: this.input.db,
       directory: this.directory,
       archive: this.input.archive,

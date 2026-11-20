@@ -799,6 +799,7 @@
     "services/platform/src/agent-tools/structured-result.ts": "foundation/agent-tools",
     "services/platform/src/agent-tools/tool-effect.ts": "foundation/agent-tools",
     "services/platform/src/approval-authentication.ts": "foundation/authority",
+    "services/platform/src/archive-cleanup-parts.ts": "workers/platform",
     "services/platform/src/boundary.ts": "foundation/kernel",
     "services/platform/src/case-execution/records.ts": "foundation/agent",
     "services/platform/src/case-identity.ts": "foundation/kernel",
