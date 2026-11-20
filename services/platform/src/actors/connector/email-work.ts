@@ -35,9 +35,13 @@ import {
 } from "../connector-email-operational";
 import type { Result } from "../../result";
 import { assertNever } from "@purin-labs/std";
-import { armConnectorAlarm } from "./alarm";
-import { type EmailCaseContextCollectionAccess, invalid } from "./support";
+import { invalid } from "./support";
 import type { ConnectorResult } from "./types";
+
+type EmailCaseContextCollectionAccess =
+  | Readonly<{ kind: "ready"; accessToken: string }>
+  | Readonly<{ kind: "inactive"; reason: string }>
+  | Readonly<{ kind: "retry"; reason: string }>;
 
 export function finalizeEmailCaseContextDiscovery(
   sql: SqlStorage,
@@ -232,6 +236,7 @@ export async function maintainOperationalEmail(
 
 export async function executeOperationalEmailCommand<Value>(
   storage: DurableObjectStorage,
+  armAlarm: () => Promise<unknown>,
   scope: OrganisationExecutionScope,
   proposalId: string,
   now: number,
@@ -240,7 +245,7 @@ export async function executeOperationalEmailCommand<Value>(
   if (!(await isActorExecutionActive(storage.sql, scope)))
     return invalid("connector_placement_conflict");
   const result = await start();
-  await armConnectorAlarm(storage);
+  await armAlarm();
   if (!(await isActorExecutionActive(storage.sql, scope)))
     return invalid("connector_placement_conflict");
   const current = latestOperationalEmailProposal(storage.sql, proposalId);

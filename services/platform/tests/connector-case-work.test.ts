@@ -10,8 +10,11 @@ import {
   inspectConnectorCaseWorkEfficiency,
   nextConnectorCaseWorkAlarm,
   renewRunningConnectorCaseWorkLeases,
-  type ConnectorCaseWorkRequest,
 } from "../src/actors/connector-case-work";
+import {
+  SLACK_CASE_WORK,
+  type SlackCaseWorkRequest,
+} from "../src/actors/connector-slack-case-work";
 import {
   createSlackCaseCommand,
   parseSlackCaseCommand,
@@ -88,7 +91,7 @@ function deduplicatesSlackRetry(): void {
   const request = caseWorkRequest();
   const retryRequestId = parseRequestId("request_case_work_retry");
   if (!retryRequestId.ok) throw new Error("retry request ID fixture invalid");
-  const retry: ConnectorCaseWorkRequest = {
+  const retry: SlackCaseWorkRequest = {
     identity: request.identity,
     command: {
       ...request.command,
@@ -97,11 +100,11 @@ function deduplicatesSlackRetry(): void {
     },
   };
 
-  expect(acceptConnectorCaseWork(sql, request)).toMatchObject({
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, request)).toMatchObject({
     ok: true,
     value: { kind: "accepted" },
   });
-  expect(acceptConnectorCaseWork(sql, retry)).toMatchObject({
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, retry)).toMatchObject({
     ok: true,
     value: { kind: "duplicate", eventId: request.command.event.eventId },
   });
@@ -124,11 +127,11 @@ function deduplicatesSlackThreadSubscriptions(): void {
     1_000,
   );
 
-  expect(acceptConnectorCaseWork(sql, message)).toMatchObject({
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, message)).toMatchObject({
     ok: true,
     value: { kind: "accepted", eventId: message.command.event.eventId },
   });
-  expect(acceptConnectorCaseWork(sql, mention)).toMatchObject({
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, mention)).toMatchObject({
     ok: true,
     value: { kind: "duplicate", eventId: mention.command.event.eventId },
   });
@@ -143,27 +146,27 @@ function recoversExpiredLease(): void {
   const sql = sqlStorage(fixture.storage);
   createConnectorCaseWorkSchema(sql);
   const request = caseWorkRequest();
-  expect(acceptConnectorCaseWork(sql, request)).toMatchObject({
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, request)).toMatchObject({
     ok: true,
     value: { kind: "accepted" },
   });
-  expect(acceptConnectorCaseWork(sql, request)).toMatchObject({
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, request)).toMatchObject({
     ok: true,
     value: { kind: "duplicate" },
   });
-  const first = claimConnectorCaseWork(sql, 1_000);
+  const first = claimConnectorCaseWork(SLACK_CASE_WORK, sql, 1_000);
   expect(first).toMatchObject({
     ok: true,
     value: { result: { attempt: 1 }, rowsRead: 1 },
   });
   if (!first.ok || first.value.result === null)
     throw new Error("first work claim missing");
-  expect(claimConnectorCaseWork(sql, 120_999)).toEqual({
+  expect(claimConnectorCaseWork(SLACK_CASE_WORK, sql, 120_999)).toEqual({
     ok: true,
     value: { result: null, rowsRead: 0 },
   });
   expect(nextConnectorCaseWorkAlarm(sql)).toMatchObject({ result: 121_000 });
-  const recovered = claimConnectorCaseWork(sql, 121_000);
+  const recovered = claimConnectorCaseWork(SLACK_CASE_WORK, sql, 121_000);
   expect(recovered).toMatchObject({
     ok: true,
     value: { result: { attempt: 2 }, rowsRead: 1 },
@@ -171,19 +174,19 @@ function recoversExpiredLease(): void {
   if (!recovered.ok || recovered.value.result === null)
     throw new Error("recovered work claim missing");
   expect(
-    finalizeConnectorCaseWork(sql, recovered.value.result, {
+    finalizeConnectorCaseWork(SLACK_CASE_WORK, sql, recovered.value.result, {
       kind: "retry",
       reason: "provider_busy",
       retryAt: 125_000,
     }),
   ).toEqual({ ok: true, value: null });
   expect(nextConnectorCaseWorkAlarm(sql)).toMatchObject({ result: 125_000 });
-  const final = claimConnectorCaseWork(sql, 125_000);
+  const final = claimConnectorCaseWork(SLACK_CASE_WORK, sql, 125_000);
   if (!final.ok || final.value.result === null)
     throw new Error("final work claim missing");
   expect(final.value.result.attempt).toBe(3);
   expect(
-    finalizeConnectorCaseWork(sql, final.value.result, {
+    finalizeConnectorCaseWork(SLACK_CASE_WORK, sql, final.value.result, {
       kind: "completed",
       completedAt: 125_500,
     }),
@@ -200,8 +203,14 @@ function renewsInFlightLease(): void {
   const sql = sqlStorage(fixture.storage);
   createConnectorCaseWorkSchema(sql);
   const request = caseWorkRequest();
-  expect(acceptConnectorCaseWork(sql, request)).toMatchObject({ ok: true });
-  const claimed = claimConnectorCaseWork(sql, request.command.receivedAt);
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, request)).toMatchObject({
+    ok: true,
+  });
+  const claimed = claimConnectorCaseWork(
+    SLACK_CASE_WORK,
+    sql,
+    request.command.receivedAt,
+  );
   if (!claimed.ok || claimed.value.result === null)
     throw new Error("case work was not claimed");
 
@@ -209,7 +218,7 @@ function renewsInFlightLease(): void {
   renewRunningConnectorCaseWorkLeases(sql, leaseExpiredAt);
   expect(nextConnectorCaseWorkAlarm(sql).result).toBe(leaseExpiredAt + 120_000);
   expect(
-    finalizeConnectorCaseWork(sql, claimed.value.result, {
+    finalizeConnectorCaseWork(SLACK_CASE_WORK, sql, claimed.value.result, {
       kind: "completed",
       completedAt: leaseExpiredAt + 1,
     }),
@@ -231,10 +240,14 @@ function keepsRunningLeaseAsAlarmOwner(): void {
     "request_case_work_queued",
     1_001,
   );
-  expect(acceptConnectorCaseWork(sql, first).ok).toBe(true);
-  expect(acceptConnectorCaseWork(sql, second).ok).toBe(true);
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, first).ok).toBe(true);
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, second).ok).toBe(true);
 
-  const claimed = claimConnectorCaseWork(sql, first.command.receivedAt);
+  const claimed = claimConnectorCaseWork(
+    SLACK_CASE_WORK,
+    sql,
+    first.command.receivedAt,
+  );
   if (!claimed.ok || claimed.value.result === null)
     throw new Error("case work was not claimed");
 
@@ -242,7 +255,7 @@ function keepsRunningLeaseAsAlarmOwner(): void {
     first.command.receivedAt + 120_000,
   );
   expect(
-    finalizeConnectorCaseWork(sql, claimed.value.result, {
+    finalizeConnectorCaseWork(SLACK_CASE_WORK, sql, claimed.value.result, {
       kind: "completed",
       completedAt: first.command.receivedAt + 1,
     }),
@@ -257,12 +270,12 @@ function compactsTerminalWork(): void {
   const sql = sqlStorage(fixture.storage);
   createConnectorCaseWorkSchema(sql);
   const request = caseWorkRequest();
-  expect(acceptConnectorCaseWork(sql, request).ok).toBe(true);
-  const claim = claimConnectorCaseWork(sql, 1_000);
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, request).ok).toBe(true);
+  const claim = claimConnectorCaseWork(SLACK_CASE_WORK, sql, 1_000);
   if (!claim.ok || claim.value.result === null)
     throw new Error("work claim missing");
   expect(
-    finalizeConnectorCaseWork(sql, claim.value.result, {
+    finalizeConnectorCaseWork(SLACK_CASE_WORK, sql, claim.value.result, {
       kind: "completed",
       completedAt: 2_000,
     }),
@@ -271,21 +284,25 @@ function compactsTerminalWork(): void {
     activeRows: 0,
     receiptRows: 1,
   });
-  expect(acceptConnectorCaseWork(sql, request)).toMatchObject({
+  expect(acceptConnectorCaseWork(SLACK_CASE_WORK, sql, request)).toMatchObject({
     ok: true,
     value: { kind: "duplicate" },
   });
-  expect(acceptConnectorCaseWork(sql, changedCaseWorkRequest(request))).toEqual(
-    {
-      ok: false,
-      error: { code: "connector_case_work_conflict" },
-    },
-  );
+  expect(
+    acceptConnectorCaseWork(
+      SLACK_CASE_WORK,
+      sql,
+      changedCaseWorkRequest(request),
+    ),
+  ).toEqual({
+    ok: false,
+    error: { code: "connector_case_work_conflict" },
+  });
 }
 
 function changedCaseWorkRequest(
-  request: ConnectorCaseWorkRequest,
-): ConnectorCaseWorkRequest {
+  request: SlackCaseWorkRequest,
+): SlackCaseWorkRequest {
   return {
     identity: request.identity,
     command: {
@@ -303,7 +320,7 @@ function threadedCaseWorkRequest(
   eventId: string,
   requestIdValue: string,
   receivedAt: number,
-): ConnectorCaseWorkRequest {
+): SlackCaseWorkRequest {
   const base = caseWorkRequest();
   const requestId = parseRequestId(requestIdValue);
   const envelope = parseSlackEnvelope(
@@ -345,7 +362,7 @@ function threadedCaseWorkRequest(
   };
 }
 
-function caseWorkRequest(): ConnectorCaseWorkRequest {
+function caseWorkRequest(): SlackCaseWorkRequest {
   const organisationId = parseOrganisationId("organisation_case_work");
   const caseId = parseCaseId("case_case_work");
   const connectorId = parseConnectorId("connector_case_work");

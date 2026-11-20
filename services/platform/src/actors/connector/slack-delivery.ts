@@ -70,8 +70,12 @@ import {
   type ConnectorDeliveryRequest,
   type ConnectorDeliveryResult,
   DELIVERY_RETRY_MS,
-  type SlackDeliveryResponse,
 } from "./types";
+
+type SlackDeliveryResponse =
+  | { readonly kind: "delivered"; readonly timestamp: string }
+  | { readonly kind: "rejected"; readonly reason: string }
+  | { readonly kind: "invalid" };
 
 /**
  * Start the read of the route of a Slack thread delivery's bot credential.

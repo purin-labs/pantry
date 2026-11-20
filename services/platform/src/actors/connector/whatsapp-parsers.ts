@@ -1,8 +1,4 @@
-import type {
-  ConnectorDelivery,
-  ConnectorDeliveryReceipt,
-  ConnectorIdentity,
-} from "@purin-labs/contracts";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { IntegrationAccountId } from "../../ids";
 import type { WhatsAppIngressLimits } from "../connector-whatsapp";
 import {
@@ -27,24 +23,6 @@ import {
   whatsappResumeFieldsSchema,
 } from "@purin-labs/contracts/connector-rpc";
 import { isRecord } from "@purin-labs/std";
-import { parseDelivery, parseDeliveryState } from "./ingress-parsers";
-import type { DeliveryRow } from "./types";
-
-export function parseDeliveryRows(rows: readonly DeliveryRow[]): {
-  readonly deliveries: ConnectorDelivery[];
-  readonly receipts: ConnectorDeliveryReceipt[];
-} | null {
-  const deliveries: ConnectorDelivery[] = [];
-  const receipts: ConnectorDeliveryReceipt[] = [];
-  for (const row of rows) {
-    const delivery = parseDelivery(JSON.parse(row.payload));
-    const state = parseDeliveryState(row.state_json);
-    if (delivery === null || state === null) return null;
-    deliveries.push(delivery);
-    if (state.kind === "delivered") receipts.push(state.receipt);
-  }
-  return { deliveries, receipts };
-}
 
 type ConnectorWhatsAppIdentityRequest = {
   readonly identity: ConnectorIdentity;
@@ -74,9 +52,7 @@ export function parseWhatsAppIdentityRequest(
       };
 }
 
-function parseWhatsAppLimits(
-  value: unknown,
-): WhatsAppIngressLimits | null {
+function parseWhatsAppLimits(value: unknown): WhatsAppIngressLimits | null {
   const limits = checked(whatsappLimitsSchema, value);
   return limits === null
     ? null
@@ -188,7 +164,12 @@ export function parseWhatsAppEditRequest(value: unknown):
   const fields = checked(whatsappEditFieldsSchema, value);
   return origin === null || base === null || fields === null
     ? null
-    : { ...base, origin, body: fields.body, maxReplyChars: fields.maxReplyChars };
+    : {
+        ...base,
+        origin,
+        body: fields.body,
+        maxReplyChars: fields.maxReplyChars,
+      };
 }
 
 export function parseWhatsAppDispatchRequest(value: unknown):
@@ -296,7 +277,9 @@ export function parseWhatsAppEventRequest(value: unknown):
     })
   | null {
   const base = parseWhatsAppIdentityRequest(value);
-  const event = isRecord(value) ? checked(whatsappEventSchema, value.event) : null;
+  const event = isRecord(value)
+    ? checked(whatsappEventSchema, value.event)
+    : null;
   if (base === null || event === null) return null;
   switch (event.kind) {
     case "text_message":

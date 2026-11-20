@@ -1,3 +1,4 @@
+import type { AlarmReconciler } from "./lifecycle/actor-alarm";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import type { Result } from "../result";
@@ -1240,6 +1241,21 @@ const WHATSAPP_PROCESSING_LEASE_MS = 4 * 60_000;
  * 24-hour bound is only enforced by the next customer message, which may never
  * come.
  */
+/** Creates the tables of WhatsApp, each change in its own transaction. */
+export function createWhatsAppChannelSchema(
+  storage: DurableObjectStorage,
+): void {
+  createConnectorWhatsAppSchema(
+    storage.sql,
+    storage.transactionSync.bind(storage),
+  );
+}
+
+/** The due time of the WhatsApp sweep: debounces, windows and notices. */
+export function whatsAppAlarmDue(sql: SqlStorage): readonly AlarmReconciler[] {
+  return [{ name: "whatsapp_sweep", nextDue: () => nextWhatsAppSweepAt(sql) }];
+}
+
 export function nextWhatsAppSweepAt(sql: SqlStorage): number | null {
   const runtime = readWhatsAppRuntime(sql);
   if (runtime === null || runtime.disabledAt !== null) return null;

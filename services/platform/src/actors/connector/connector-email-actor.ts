@@ -1,5 +1,12 @@
 import { runtimeFetch } from "../../runtime-fetch";
 import {
+  createContinueSerialQueue,
+  createKeyedContinueSerialQueue,
+} from "@purin-labs/async-control/serial-queue";
+import { runMailOrganization } from "../../mail-inbox/connector-runtime";
+import { newRequestId } from "../../ids";
+import { traceLog, traceWarn } from "../../observability";
+import {
   reconcileFrozenMailReceipt,
   type RelocationMailReceiptRequest,
 } from "../actor-relocation-mail";
@@ -48,6 +55,15 @@ import {
 import { admitActorRecovery } from "../actor-activation";
 import {
   activateEmailRuntime,
+  claimDueEmailCorrectionLearning,
+  claimDueEmailReplyTurn,
+  completeEmailCorrectionLearning,
+  completeEmailReplyTurn,
+  dueEmailCaseContextDiscovery,
+  retryEmailCorrectionLearning,
+  retryEmailReplyTurn,
+  type EmailCorrectionLearningWork,
+  type EmailReplyTurnWork,
   countEmailAdmissionsSince,
   countOpenEmailCases,
   disableEmailRuntime,
@@ -71,9 +87,14 @@ import {
   establishConnectorEmailWatch,
   readConnectorEmailHistoryId,
   renewConnectorEmailWatch,
+  runConnectorEmailEvaluation,
   stopConnectorEmailWatch,
   resolveConnectorGmailAccess,
 } from "../connector-email-evaluation";
+import {
+  processEmailCorrectionLearning,
+  processEmailThreadTurn,
+} from "../email-case-processing";
 import {
   readEmailProposalChatContext,
   readEmailProposalChatSources,
@@ -89,7 +110,9 @@ import {
   dispatchEmailReply,
   disposeEmailProposal,
   previewEmailProposal,
+  readCorrectedEmailReply,
   resolveEmailProposalState,
+  runEmailProposalMaintenance,
   type EmailDispatchOutcome,
   type EmailDisposalOutcome,
   type EmailProposalPreviewOutcome,
@@ -106,7 +129,6 @@ import {
   type OperationalEmailProposalRecord,
 } from "../connector-email-operational";
 import { isRecord } from "@purin-labs/std";
-import { armConnectorAlarm } from "./alarm";
 import {
   emailMessageExceedsLimit,
   parseEmailActivationRequest,
@@ -129,24 +151,28 @@ import {
 } from "./email-parsers";
 import {
   executeOperationalEmailCommand,
+  finalizeEmailCaseContextDiscovery,
+  maintainOperationalEmail,
   projectOperationalEmailRecord,
   rejectAdmittedOperationalEmail,
+  runEmailCaseContextDiscoveryWork,
 } from "./email-work";
 import {
   acceptConnectorEmailChange,
   createConnectorEmailReplyProposal,
+  createEmailChannelSchema,
+  emailAlarmDue,
   fenceConnectorEmailMailbox,
-} from "./email";
-import { ensureConnectorIdentity } from "./ingress-parsers";
-import { invalid } from "./support";
-import {
   type ConnectorEmailMailboxSearch,
   type ConnectorEmailReplyProposal,
-  type ConnectorResult,
   type EmailMailboxDisposal,
   type EmailMailboxRevocation,
   type EmailRuntimeStatus,
-} from "./types";
+} from "./email";
+import type { ChannelAdapter, ChannelAlarmSteps } from "./channel-adapter";
+import { ensureConnectorIdentity } from "./ingress-parsers";
+import { invalid } from "./support";
+import type { ConnectorResult } from "./types";
 import {
   type ConnectorEmailIdentityRequest,
   type EmailReplyProvenance,
@@ -159,6 +185,30 @@ import type { Variant } from "@purin-labs/type-utils";
  * Email processing for the Connector: the mailbox, reply turns, operational proposals, correction learning and Case context discovery.
  */
 export abstract class ConnectorEmail extends ConnectorEvals {
+  protected activeMailOrganization: Promise<void> | null = null;
+
+  /**
+   * One in-flight mutation per proposal. Dispatch, resolve, dispose, and the
+   * maintenance sweep all await Gmail mid-flight, and the Workers runtime
+   * interleaves requests at those awaits — so two operators approving the
+   * same proposal together would otherwise both pass the sent check and both
+   * send. Serialising per proposal makes the second caller re-read state the
+   * first already wrote and return idempotently.
+   */
+  protected readonly emailProposalWork =
+    createKeyedContinueSerialQueue<string>();
+
+  /**
+   * Names this instance of the Actor on the reply turns it claims. One
+   * instance runs at a time, so a claim under another name is from an
+   * instance that stopped.
+   */
+  protected readonly emailReplyTurnOwner = crypto.randomUUID();
+
+  protected readonly runningEmailReplyTurns = new Set<string>();
+
+  protected readonly emailMailboxWork = createContinueSerialQueue();
+
   async reconcileRelocationMailReceipt(request: RelocationMailReceiptRequest) {
     return reconcileFrozenMailReceipt(this.env, this.ctx.storage, request);
   }
@@ -276,7 +326,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       { env: this.env, storage: this.ctx.storage, scope },
       input,
     );
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
       return invalid<never>("connector_placement_conflict");
     return result;
@@ -299,7 +349,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       acceptConnectorEmailChange.bind(null, this.ctx.storage.sql, input),
     );
     if (!accepted.ok) return accepted;
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return accepted;
@@ -398,7 +448,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
           limits: input.limits,
         }),
       );
-      await armConnectorAlarm(this.ctx.storage);
+      await this.armAlarm();
       if (!(await isActorExecutionActive(sql, scope)))
         return invalid("connector_placement_conflict");
       return updated;
@@ -428,7 +478,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
         now: input.now,
       }),
     );
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     if (!(await isActorExecutionActive(sql, scope)))
       return invalid("connector_placement_conflict");
     return activated;
@@ -454,7 +504,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     const disabled = this.ctx.storage.transactionSync(
       disableEmailRuntime.bind(null, this.ctx.storage.sql, { now: input.now }),
     );
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return disabled;
@@ -490,7 +540,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
         now: input.now,
       }),
     );
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     if (!(await isActorExecutionActive(sql, scope)))
       return invalid("connector_placement_conflict");
     return resumed;
@@ -552,7 +602,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
         now: input.now,
       }),
     );
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     if (!(await isActorExecutionActive(sql, scope)))
       return invalid("connector_placement_conflict");
     return reconnected;
@@ -807,6 +857,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     );
     return executeOperationalEmailCommand<OperationalEmailProposalRecord>(
       this.ctx.storage,
+      this.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
@@ -858,6 +909,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     }
     return executeOperationalEmailCommand<OperationalEmailProposalRecord>(
       this.ctx.storage,
+      this.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
@@ -904,6 +956,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     }
     return executeOperationalEmailCommand<OperationalEmailProposalOutcome>(
       this.ctx.storage,
+      this.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
@@ -947,6 +1000,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     }
     return executeOperationalEmailCommand<OperationalEmailDispatchOutcome>(
       this.ctx.storage,
+      this.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
@@ -989,6 +1043,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       return invalid("connector_email_operational_identity_invalid");
     return executeOperationalEmailCommand<null>(
       this.ctx.storage,
+      this.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
@@ -1041,7 +1096,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
         input.now,
       ),
     );
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     for (const proposal of revoked) {
       const projected = await projectOperationalEmailRecord(
         this.ctx.storage.sql,
@@ -1299,7 +1354,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       edited.ok &&
       nextEmailCorrectionLearningAt(this.ctx.storage.sql) !== null
     )
-      await armConnectorAlarm(this.ctx.storage);
+      await this.armAlarm();
     return edited.ok ? edited : invalid(edited.error.code);
   }
 
@@ -1613,7 +1668,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     if (input.kind === "erase") {
       await eraseMailClassificationRecords(scope, input.integrationAccountId);
     }
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     const pending = pendingEmailDraftProposals(this.ctx.storage.sql);
     const disposals: EmailMailboxDisposal[] = [];
     for (const operation of pending) {
@@ -1640,10 +1695,439 @@ export abstract class ConnectorEmail extends ConnectorEvals {
       now: input.now,
       fetcher: runtimeFetch,
     });
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     const watchStopped = stopped.ok;
     return { ok: true, value: { watchStopped, disposals } };
+  }
+
+  /** Email as a channel of the Connector: its tables and its alarm part. */
+  protected emailChannel(): ChannelAdapter {
+    return {
+      name: "email",
+      createSchema: createEmailChannelSchema,
+      alarmDue: emailAlarmDue,
+      beforeCaseWork: this.stopDueEmailWatch.bind(this),
+      alarmSteps: this.emailAlarmSteps.bind(this),
+    };
+  }
+
+  /** Stops the Gmail watch of a mailbox whose cleanup is due. */
+  protected async stopDueEmailWatch(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    const watchCleanupAt = nextEmailWatchCleanupAt(this.ctx.storage.sql);
+    if (watchCleanupAt !== null && watchCleanupAt <= Date.now()) {
+      await this.emailMailboxWork.enqueue(
+        stopConnectorEmailWatch.bind(null, {
+          env: this.env,
+          storage: this.ctx.storage,
+          scope,
+          now: Date.now(),
+          fetcher: runtimeFetch,
+        }),
+      );
+    }
+  }
+
+  /**
+   * The mailbox work of one alarm. The mailbox's evals run here too: an eval
+   * task runs the mailbox's agent.
+   */
+  protected emailAlarmSteps(
+    scope: OrganisationExecutionScope,
+  ): ChannelAlarmSteps {
+    return {
+      together: [
+        {
+          name: "email_evaluation",
+          run: () => this.runDueEmailEvaluation(scope),
+        },
+      ],
+      inOrder: [
+        {
+          name: "email_case_context_discovery",
+          run: () => this.runDueEmailCaseContextDiscoveries(scope),
+        },
+        {
+          name: "email_correction_learning",
+          run: () => this.runDueEmailCorrectionLearning(scope),
+        },
+        { name: "eval_work", run: () => this.runDueEvalWork(scope) },
+        {
+          name: "mail_organization",
+          run: () => this.runDueMailOrganization(scope),
+        },
+        {
+          name: "email_proposal_maintenance",
+          run: () =>
+            runEmailProposalMaintenance({
+              scope,
+              sql: this.ctx.storage.sql,
+              env: this.env,
+              now: Date.now(),
+              fetcher: runtimeFetch,
+              withProposalLock: this.withEmailProposalLock.bind(this),
+            }),
+        },
+        {
+          name: "operational_email",
+          run: () =>
+            this.emailMailboxWork.enqueue(
+              maintainOperationalEmail.bind(null, this.ctx.storage, scope),
+            ),
+        },
+      ],
+    };
+  }
+
+  protected async runDueMailOrganization(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    if (this.activeMailOrganization !== null)
+      return this.activeMailOrganization;
+    this.activeMailOrganization = runMailOrganization({
+      scope,
+      env: this.env,
+      storage: this.ctx.storage,
+    });
+    try {
+      await this.activeMailOrganization;
+    } finally {
+      this.activeMailOrganization = null;
+    }
+  }
+
+  protected async runDueEmailEvaluation(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    try {
+      // Admission queues the reply turn each admitted burst is owed.
+      await runConnectorEmailEvaluation({
+        scope,
+        storage: this.ctx.storage,
+        env: this.env,
+        now: Date.now(),
+        fetcher: runtimeFetch,
+      });
+    } catch (error) {
+      traceWarn("connector.email_evaluation_failed", {
+        requestId: newRequestId(),
+        reason: error instanceof Error ? error.message : "unknown",
+      });
+    }
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+    await this.runDueEmailReplyTurns(scope);
+  }
+
+  /**
+   * Runs each reply turn that is due. The work was written with the mail's
+   * admission, so a turn this instance did not finish is run again: by its
+   * retry time, or at once by the instance that replaces this one. A turn is
+   * claimed before it runs and is never run twice at the same time.
+   */
+  protected async runDueEmailReplyTurns(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    const sql = this.ctx.storage.sql;
+    for (let processed = 0; processed < 5; processed += 1) {
+      if (!(await isActorExecutionActive(sql, scope))) return;
+      const runtime = readEmailRuntime(sql);
+      if (
+        runtime === null ||
+        runtime.disabledAt !== null ||
+        runtime.processing.kind === "paused"
+      )
+        return;
+      const now = Date.now();
+      const work = this.ctx.storage.transactionSync(
+        claimDueEmailReplyTurn.bind(null, sql, {
+          now,
+          owner: this.emailReplyTurnOwner,
+          running: this.runningEmailReplyTurns,
+        }),
+      );
+      if (work === null) return;
+      this.runningEmailReplyTurns.add(work.providerMessageId);
+      // A turn that throws is one failed attempt. It must not stop the
+      // alarm's other work or repeat without bound.
+      const outcome = await this.runEmailReplyTurn(scope, runtime, work, now)
+        .catch(() => ({ kind: "retry", reason: "email_turn_failed" }) as const)
+        .finally(() => {
+          this.runningEmailReplyTurns.delete(work.providerMessageId);
+        });
+      // A frozen placement keeps the claim. The instance that takes over
+      // finds it held by another and runs the turn.
+      if (!(await isActorExecutionActive(sql, scope))) return;
+      if (outcome.kind === "settled") {
+        this.ctx.storage.transactionSync(
+          completeEmailReplyTurn.bind(null, sql, work.providerMessageId),
+        );
+        if (outcome.reason !== null)
+          traceWarn("connector.email_turn_failed", {
+            requestId: newRequestId(),
+            thread_id: work.threadId,
+            reason: outcome.reason,
+          });
+        continue;
+      }
+      const retried = this.ctx.storage.transactionSync(
+        retryEmailReplyTurn.bind(null, sql, { work, now: Date.now() }),
+      );
+      traceWarn("connector.email_turn_failed", {
+        requestId: newRequestId(),
+        thread_id: work.threadId,
+        reason:
+          retried === "exhausted"
+            ? "email_turn_retries_exhausted"
+            : outcome.reason,
+      });
+    }
+  }
+
+  protected async runEmailReplyTurn(
+    scope: OrganisationExecutionScope,
+    runtime: EmailRuntimeSnapshot,
+    work: EmailReplyTurnWork,
+    now: number,
+  ): Promise<
+    | Readonly<{ kind: "settled"; reason: string | null }>
+    | Readonly<{ kind: "retry"; reason: string }>
+  > {
+    const binding = await scope.database
+      .prepare(
+        `SELECT mailbox_binding_id AS mailboxBindingId, current_revision AS currentRevision
+         FROM agent_mailbox_binding WHERE organisation_id = ? AND integration_account_id = ?`,
+      )
+      .bind(runtime.organisationId, runtime.integrationAccountId)
+      .first<{
+        readonly mailboxBindingId: string;
+        readonly currentRevision: number;
+      }>();
+    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+      return { kind: "retry", reason: "connector_placement_conflict" };
+    if (binding === null)
+      return { kind: "retry", reason: "mailbox_binding_missing" };
+    const turn = await processEmailThreadTurn(this.env, {
+      scope,
+      connectorSql: this.ctx.storage.sql,
+      responsePolicy: "cue_routed",
+      organisationId: runtime.organisationId,
+      integrationAccountId: runtime.integrationAccountId,
+      threadId: work.threadId,
+      caseId: work.caseId,
+      messageIds: work.messageIds,
+      mailboxBindingId: binding.mailboxBindingId,
+      bindingRevision: binding.currentRevision,
+      policyVersion: runtime.policyVersion,
+      limits: runtime.limits,
+      claim: { attempt: work.attempt, disposition: work.disposition },
+      now,
+    });
+    if (turn.ok) {
+      const outcome = turn.value;
+      if (outcome.kind === "deferred")
+        return { kind: "retry", reason: outcome.reason };
+      // No budget today and another assignment in progress both pass.
+      return outcome.kind === "skipped" &&
+        (outcome.reason === "daily_token_budget_exhausted" ||
+          outcome.reason === "case_assignment_in_progress")
+        ? { kind: "retry", reason: outcome.reason }
+        : { kind: "settled", reason: null };
+    }
+    // The message is no longer this path's to answer, or its draft was
+    // claimed and can never be made a second time.
+    return turn.error.code === "email_turn_identity_invalid" ||
+      turn.error.code === "email_response_owner_conflict" ||
+      turn.error.code === "email_draft_creation_indeterminate"
+      ? { kind: "settled", reason: turn.error.code }
+      : { kind: "retry", reason: turn.error.code };
+  }
+
+  /**
+   * Runs the learning turn for each recorded correction that is due. The
+   * turn runs only while that correction is still the draft, so a correction
+   * that was edited again, sent or removed is dropped. A turn that could not
+   * run is tried again later. Each attempt is claimed before it runs and has
+   * its own assignment and Session, so an attempt that stopped with its
+   * instance is settled and the turn is run again.
+   */
+  protected async runDueEmailCorrectionLearning(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    for (let processed = 0; processed < 3; processed += 1) {
+      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      const now = Date.now();
+      const work = this.ctx.storage.transactionSync(
+        claimDueEmailCorrectionLearning.bind(null, this.ctx.storage.sql, now),
+      );
+      if (work === null) return;
+      // A turn that throws is one failed attempt. It must not stop the
+      // alarm's other work or repeat without bound.
+      const outcome = await this.learnFromEmailCorrection(
+        scope,
+        work,
+        now,
+      ).catch(
+        () =>
+          ({ kind: "retry", reason: "correction_learning_failed" }) as const,
+      );
+      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      if (outcome.kind === "settled") {
+        this.ctx.storage.transactionSync(
+          completeEmailCorrectionLearning.bind(
+            null,
+            this.ctx.storage.sql,
+            work,
+          ),
+        );
+        continue;
+      }
+      const retried = this.ctx.storage.transactionSync(
+        retryEmailCorrectionLearning.bind(null, this.ctx.storage.sql, {
+          work,
+          now,
+        }),
+      );
+      traceWarn("connector.email_correction_learning_failed", {
+        requestId: newRequestId(),
+        reason:
+          retried === "exhausted"
+            ? "correction_learning_retries_exhausted"
+            : outcome.reason,
+      });
+    }
+  }
+
+  protected async learnFromEmailCorrection(
+    scope: OrganisationExecutionScope,
+    work: EmailCorrectionLearningWork,
+    now: number,
+  ): Promise<
+    | Readonly<{ kind: "settled"; reason?: never }>
+    | Readonly<{ kind: "retry"; reason: string }>
+  > {
+    const sql = this.ctx.storage.sql;
+    const corrected = await readCorrectedEmailReply({
+      sql,
+      env: this.env,
+      scope,
+      proposalId: work.proposalId,
+      version: work.version,
+      now,
+      fetcher: runtimeFetch,
+    });
+    if (corrected.kind !== "current")
+      return corrected.kind === "gone"
+        ? { kind: "settled" }
+        : { kind: "retry", reason: "corrected_reply_unavailable" };
+    const runtime = readEmailRuntime(sql);
+    if (runtime === null || runtime.disabledAt !== null)
+      return { kind: "settled" };
+    if (runtime.processing.kind === "paused")
+      return { kind: "retry", reason: "mailbox_processing_paused" };
+    const binding = await scope.database
+      .prepare(
+        `SELECT mailbox_binding_id AS mailboxBindingId, current_revision AS currentRevision
+         FROM agent_mailbox_binding WHERE organisation_id = ? AND integration_account_id = ?`,
+      )
+      .bind(runtime.organisationId, runtime.integrationAccountId)
+      .first<{
+        readonly mailboxBindingId: string;
+        readonly currentRevision: number;
+      }>();
+    if (!(await isActorExecutionActive(sql, scope)))
+      return { kind: "retry", reason: "connector_placement_conflict" };
+    if (binding === null) return { kind: "settled" };
+    const learned = await processEmailCorrectionLearning(this.env, {
+      scope,
+      connectorSql: sql,
+      organisationId: runtime.organisationId,
+      integrationAccountId: runtime.integrationAccountId,
+      threadId: corrected.operation.threadId,
+      caseId: corrected.operation.caseId,
+      messageIds: [corrected.operation.triggeringMessageId],
+      mailboxBindingId: binding.mailboxBindingId,
+      bindingRevision: binding.currentRevision,
+      policyVersion: runtime.policyVersion,
+      limits: runtime.limits,
+      correction: {
+        proposalId: work.proposalId,
+        version: work.version,
+        bodyDigest: corrected.bodyDigest,
+        correctedReply: corrected.body,
+      },
+      claim: { attempt: work.attempt },
+      now,
+    });
+    if (learned.ok) {
+      const outcome = learned.value;
+      if (outcome.kind === "deferred")
+        return { kind: "retry", reason: outcome.reason };
+      // No budget today and another assignment in progress both pass.
+      return outcome.kind === "skipped" &&
+        (outcome.reason === "daily_token_budget_exhausted" ||
+          outcome.reason === "case_assignment_in_progress")
+        ? { kind: "retry", reason: outcome.reason }
+        : { kind: "settled" };
+    }
+    // A settled assignment under this attempt's name means the correction
+    // was queued again after a run that learned from it.
+    return learned.error.code === "case_assignment_settled"
+      ? { kind: "settled" }
+      : { kind: "retry", reason: learned.error.code };
+  }
+
+  protected async runDueEmailCaseContextDiscoveries(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    for (let processed = 0; processed < 5; processed += 1) {
+      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      const now = Date.now();
+      const work = this.ctx.storage.transactionSync(
+        dueEmailCaseContextDiscovery.bind(null, this.ctx.storage.sql, now),
+      );
+      if (work === null) return;
+      const outcome = await runEmailCaseContextDiscoveryWork({
+        scope,
+        env: this.env,
+        sql: this.ctx.storage.sql,
+        work,
+        now,
+      });
+      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      if (outcome.kind === "evaluated") {
+        traceLog("connector.email_case_context_discovery_evaluated", {
+          requestId: newRequestId(),
+          recorded: outcome.recorded,
+        });
+      }
+      const finalized = this.ctx.storage.transactionSync(
+        finalizeEmailCaseContextDiscovery.bind(
+          null,
+          this.ctx.storage.sql,
+          work,
+          outcome,
+          now,
+        ),
+      );
+      if (outcome.kind === "retry") {
+        traceWarn("connector.email_case_context_collection_failed", {
+          requestId: newRequestId(),
+          reason:
+            finalized === "exhausted"
+              ? "case_context_discovery_retries_exhausted"
+              : outcome.reason,
+        });
+      }
+    }
+  }
+
+  protected async withEmailProposalLock<T>(
+    proposalId: string,
+    task: () => Promise<T>,
+  ): Promise<T> {
+    return this.emailProposalWork.enqueue(proposalId, task);
   }
 }

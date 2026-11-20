@@ -1,21 +1,19 @@
-import type { ConnectorDelivery, ConnectorIdentity } from "@purin-labs/contracts";
-import {
-  createSlackCaseCommand,
-  type SlackCaseCommand,
-} from "../../slack/case-command-message";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type {
+  ConnectorDelivery,
+  ConnectorIdentity,
+} from "@purin-labs/contracts";
 import {
   inspectConnectorCaseWorkEfficiency,
-  type ConnectorCaseWorkClaim,
+  type CaseWorkOutcome,
   type ConnectorCaseWorkResult,
 } from "../connector-case-work";
-import { completeConnectorSlackDelivery } from "../connector-slack-stream";
-import { processScheduledSlackCaseMessage } from "../../slack/case-processing";
 import { parseJsonOrNull } from "@purin-labs/std";
+import type { DeliveryChannel } from "./channel-adapter";
 import {
   ensureConnectorIdentity,
   parseDelivery,
   parseDeliveryState,
+  parseDeliveryRows,
   parseIngress,
 } from "./ingress-parsers";
 import { count, invalid } from "./support";
@@ -33,35 +31,9 @@ import {
   type JsonRow,
   type MetaRow,
 } from "./types";
-import { parseDeliveryRows } from "./whatsapp-parsers";
 
-export function caseWorkCommandAtPlacement(
-  command: SlackCaseCommand,
-  scope: OrganisationExecutionScope,
-): SlackCaseCommand {
-  return createSlackCaseCommand({
-    requestId: command.requestId,
-    receivedAt: command.receivedAt,
-    organisationId: command.organisationId,
-    integrationAccountId: command.integrationAccountId,
-    principalId: command.principalId,
-    userId: command.userId,
-    requestAuthority: command.requestAuthority,
-    event: command.event,
-    target: {
-      caseId: command.target.caseId,
-      connectorId: command.target.connectorId,
-      sessionId: command.target.sessionId,
-      assignmentId: command.target.assignmentId,
-      placement: scope.placement,
-    },
-  });
-}
-
-export function connectorIdentityForClaim(
-  sql: SqlStorage,
-  _claim: ConnectorCaseWorkClaim,
-): ConnectorIdentity {
+/** The identity of this Connector. It throws when the Connector has none. */
+export function readConnectorIdentity(sql: SqlStorage): ConnectorIdentity {
   const row = sql
     .exec<MetaRow>(
       "SELECT organisation_id, connector_id FROM connector_meta WHERE singleton = 1",
@@ -72,7 +44,7 @@ export function connectorIdentityForClaim(
 }
 
 export function caseWorkResult(
-  result: Awaited<ReturnType<typeof processScheduledSlackCaseMessage>>,
+  result: CaseWorkOutcome,
 ): ConnectorCaseWorkResult {
   switch (result.kind) {
     case "completed":
@@ -247,6 +219,7 @@ export function finalizeDelivery(
   input: ConnectorDeliveryRequest,
   attempt: number,
   result: ConnectorDeliveryResult,
+  channel: DeliveryChannel<unknown>,
 ): ConnectorResult<ConnectorDeliveryResult> {
   const row =
     sql
@@ -266,7 +239,7 @@ export function finalizeDelivery(
   }
   switch (result.kind) {
     case "delivered": {
-      completeConnectorSlackDelivery(sql, input.delivery, result.receipt);
+      channel.delivered(sql, input.delivery, result.receipt);
       const delivered: ConnectorDeliveryState = {
         kind: "delivered",
         receipt: result.receipt,

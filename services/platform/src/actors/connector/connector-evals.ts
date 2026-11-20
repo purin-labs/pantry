@@ -2,11 +2,23 @@ import { readEmailRuntime } from "../connector-email";
 import {
   admitEvalRun,
   cancelEvalRun,
+  claimDueEvalTask,
+  deferEvalRunPublication,
+  deferEvalTask,
+  EVAL_TASK_MAX_CLAIMS,
   findEvalRunCommand,
+  markEvalRunPublished,
   readEvalRunProgress,
+  readSettledEvalRun,
+  settleEvalTask,
   type ClaimedEvalTask,
 } from "../connector-eval";
-import { armConnectorAlarm } from "./alarm";
+import { processEvalTask, type EvalTaskEnd } from "../eval-task-processing";
+import { publishEvalRunResult } from "../../evals/access";
+import { newRequestId } from "../../ids";
+import { traceWarn } from "../../observability";
+import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { isActorExecutionActive } from "../actor-execution-quiescence";
 import { invalid } from "./support";
 import { type ConnectorResult } from "./types";
 import { type ConnectorEmailIdentityRequest } from "./whatsapp-parsers";
@@ -65,7 +77,7 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
       return invalid("eval_command_conflict");
     if (admitted.kind === "capacity_exceeded")
       return invalid("eval_capacity_exceeded");
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     return {
       ok: true,
       value: { runId: admitted.run.runId, caseId: admitted.run.caseId },
@@ -133,7 +145,7 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
       }),
     );
     if (run === null) return { ok: true, value: null };
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
     return { ok: true, value: { runId: run.runId, caseId: run.caseId } };
   }
 
@@ -158,5 +170,147 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
       ok: true,
       value: readEvalRunProgress(this.ctx.storage.sql, input.evalId),
     };
+  }
+
+  protected async runDueEvalWork(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    const sql = this.ctx.storage.sql;
+    for (let processed = 0; processed < 4; processed += 1) {
+      if (!(await isActorExecutionActive(sql, scope))) return;
+      const now = Date.now();
+      const claim = this.ctx.storage.transactionSync(
+        claimDueEvalTask.bind(null, sql, now),
+      );
+      if (claim === null) break;
+      // A task that throws leaves its turn's end unknown. The next claim
+      // reads what it left on the Case.
+      const end = await this.runEvalTask(scope, claim, now).catch(
+        (): EvalTaskEnd => ({
+          kind: "deferred",
+          retryAt: now + 30_000,
+          exhausted: { kind: "indeterminate", code: "eval_task_failed" },
+        }),
+      );
+      if (end.kind === "inactive") return;
+      if (end.kind !== "deferred") continue;
+      const key = { runId: claim.run.runId, taskId: claim.task.taskId };
+      if (claim.attempt >= EVAL_TASK_MAX_CLAIMS) {
+        this.ctx.storage.transactionSync(
+          settleEvalTask.bind(null, sql, {
+            ...key,
+            result: {
+              outcome: end.exhausted,
+              execution: null,
+              pins: null,
+              totalTokens: null,
+            },
+            flowLabel: null,
+          }),
+        );
+        traceWarn("connector.eval_task_claims_exhausted", {
+          requestId: newRequestId(),
+          reason: end.exhausted.kind,
+        });
+        continue;
+      }
+      this.ctx.storage.transactionSync(
+        deferEvalTask.bind(null, sql, { ...key, availableAt: end.retryAt }),
+      );
+    }
+    await this.publishSettledEvalRuns(scope);
+  }
+
+  protected async runEvalTask(
+    scope: OrganisationExecutionScope,
+    claim: ClaimedEvalTask,
+    now: number,
+  ): Promise<EvalTaskEnd> {
+    const sql = this.ctx.storage.sql;
+    const agentUnavailable = (): EvalTaskEnd => {
+      const outcome = {
+        kind: "unavailable",
+        reason: "agent_unavailable",
+      } as const;
+      settleEvalTask(sql, {
+        runId: claim.run.runId,
+        taskId: claim.task.taskId,
+        result: { outcome, execution: null, pins: null, totalTokens: null },
+        flowLabel: null,
+      });
+      return { kind: "settled", outcome };
+    };
+    const runtime = readEmailRuntime(sql);
+    if (runtime === null || runtime.disabledAt !== null)
+      return agentUnavailable();
+    const binding = await scope.database
+      .prepare(
+        `SELECT mailbox_binding_id AS mailboxBindingId, current_revision AS currentRevision
+         FROM agent_mailbox_binding WHERE organisation_id = ? AND integration_account_id = ?`,
+      )
+      .bind(runtime.organisationId, runtime.integrationAccountId)
+      .first<{
+        readonly mailboxBindingId: string;
+        readonly currentRevision: number;
+      }>();
+    if (!(await isActorExecutionActive(sql, scope)))
+      return { kind: "inactive" };
+    if (binding === null) return agentUnavailable();
+    return processEvalTask(this.env, {
+      scope,
+      connectorSql: sql,
+      organisationId: runtime.organisationId,
+      integrationAccountId: runtime.integrationAccountId,
+      mailboxBindingId: binding.mailboxBindingId,
+      bindingRevision: binding.currentRevision,
+      mailboxPolicyVersion: runtime.policyVersion,
+      dailyTokenBudget: runtime.limits.dailyTokenBudget,
+      claim,
+      now,
+    });
+  }
+
+  /**
+   * Publishes each run whose tasks have all settled. The OrganisationActor
+   * receives the settled result alone. A run it cannot take now is tried
+   * again later, with the same result.
+   */
+  protected async publishSettledEvalRuns(
+    scope: OrganisationExecutionScope,
+  ): Promise<void> {
+    const sql = this.ctx.storage.sql;
+    for (let published = 0; published < 4; published += 1) {
+      const now = Date.now();
+      const settled = this.ctx.storage.transactionSync(
+        readSettledEvalRun.bind(null, sql, now),
+      );
+      if (settled === null) return;
+      const runId = settled.result.runId;
+      const outcome = await publishEvalRunResult({
+        env: this.env,
+        execution: scope,
+        organisationId: scope.organisationId,
+        result: settled.result,
+        flowLabels: settled.flowLabels,
+      }).catch(() => "unavailable" as const);
+      if (!(await isActorExecutionActive(sql, scope))) return;
+      if (outcome === "unavailable") {
+        this.ctx.storage.transactionSync(
+          deferEvalRunPublication.bind(null, sql, {
+            runId,
+            publishAfter: now + 60_000,
+          }),
+        );
+        continue;
+      }
+      if (outcome === "refused")
+        traceWarn("connector.eval_run_result_refused", {
+          requestId: newRequestId(),
+          reason: "eval_run_result_refused",
+        });
+      this.ctx.storage.transactionSync(
+        markEvalRunPublished.bind(null, sql, { runId, now }),
+      );
+    }
   }
 }

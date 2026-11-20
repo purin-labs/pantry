@@ -26,14 +26,24 @@ import { readEmailRuntime } from "./connector-email";
 import {
   parseConnectorCaseWorkRecoveryRequest,
   parseConnectorCaseWorkRequest,
+} from "./connector-case-work";
+import {
+  acceptCaseWorkTransaction,
+  acceptSlackFollowUpTransaction,
+  parkSlackPermissionTransaction,
+  parkSlackSideCaseTransaction,
   parseSlackFollowUpRequest,
   parseSlackPermissionParkRequest,
   parseSlackPermissionNotice,
   parseSlackPermissionRelease,
-  readParkedSlackPermission,
   parseSlackSideCaseParkRequest,
+  readParkedSlackPermission,
+  releaseSlackPermissionTransaction,
+  SLACK_CASE_WORK,
   type SlackFollowUpAcceptance,
-} from "./connector-case-work";
+  type SlackPermissionParked,
+  type SlackSideCaseParked,
+} from "./connector-slack-case-work";
 import {
   parseConnectorSlackIngressRequest,
   type ConnectorSlackIngressOutcome,
@@ -59,17 +69,9 @@ import {
 } from "./organisation-archive-cleanup";
 import { type PlacedActorExportSource } from "./lifecycle/placed-actor";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
-import { armConnectorAlarm } from "./connector/alarm";
 import { inspectConnector } from "./connector/delivery";
-import {
-  type SlackPermissionParked,
-  type SlackSideCaseParked,
-  acceptCaseWorkTransaction,
-  acceptSlackFollowUpTransaction,
-  parkSlackPermissionTransaction,
-  parkSlackSideCaseTransaction,
-  releaseSlackPermissionTransaction,
-} from "./connector/email";
+import type { ConnectorChannels } from "./connector/channel-adapter";
+import { SlackConnectorChannel } from "./connector/slack-channel";
 import {
   ensureConnectorIdentity,
   holdsConnectorIdentity,
@@ -84,6 +86,14 @@ import {
 import { ConnectorEmail } from "./connector/connector-email-actor";
 
 export class ConnectorDO extends ConnectorEmail {
+  private readonly slack = new SlackConnectorChannel(this.channelHost());
+
+  protected readonly channels: ConnectorChannels = {
+    adapters: [this.slack, this.emailChannel(), this.whatsAppChannel()],
+    caseWork: this.slack,
+    delivery: this.slack,
+  };
+
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   machineCensus(): Promise<readonly MachineCensus[]> {
     return actorMachineCensus(this.ctx.storage);
@@ -148,7 +158,7 @@ export class ConnectorDO extends ConnectorEmail {
     Result<PlacedActorExportSource, ActorExportError>
   > {
     // A drained alarm may have consumed its wakeup while durable work remains.
-    const armed = await armConnectorAlarm(this.ctx.storage);
+    const armed = await this.armAlarm();
     if (!armed.ok)
       return {
         ok: false,
@@ -187,7 +197,7 @@ export class ConnectorDO extends ConnectorEmail {
       readonly eventId: string;
     }>
   > {
-    const input = parseConnectorCaseWorkRequest(raw);
+    const input = parseConnectorCaseWorkRequest(SLACK_CASE_WORK, raw);
     if (input === null) return invalid("connector_case_work_invalid");
     const scope = await this.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
@@ -196,7 +206,11 @@ export class ConnectorDO extends ConnectorEmail {
     );
     if (!accepted.ok) return accepted;
     this.ctx.waitUntil(
-      scheduleAcceptedCaseWorkAlarm(this.ctx.storage, input.command.requestId),
+      scheduleAcceptedCaseWorkAlarm(
+        this.ctx.storage,
+        this.alarmDue(),
+        input.command.requestId,
+      ),
     );
     this.startCaseWorkDrain(scope);
     return accepted;
@@ -260,7 +274,7 @@ export class ConnectorDO extends ConnectorEmail {
     }
     // Work is persisted in the boundary parser's form, whichever side admitted
     // it. Claims and receipts compare that form.
-    const work = parseConnectorCaseWorkRequest({
+    const work = parseConnectorCaseWorkRequest(SLACK_CASE_WORK, {
       identity: input.identity,
       command,
     });
@@ -274,7 +288,11 @@ export class ConnectorDO extends ConnectorEmail {
     );
     if (!accepted.ok) return accepted;
     this.ctx.waitUntil(
-      scheduleAcceptedCaseWorkAlarm(this.ctx.storage, work.command.requestId),
+      scheduleAcceptedCaseWorkAlarm(
+        this.ctx.storage,
+        this.alarmDue(),
+        work.command.requestId,
+      ),
     );
     this.startCaseWorkDrain(scope);
     return accepted;
@@ -292,7 +310,11 @@ export class ConnectorDO extends ConnectorEmail {
     );
     if (!identity.ok) return identity;
     this.ctx.waitUntil(
-      scheduleAcceptedCaseWorkAlarm(this.ctx.storage, input.requestId),
+      scheduleAcceptedCaseWorkAlarm(
+        this.ctx.storage,
+        this.alarmDue(),
+        input.requestId,
+      ),
     );
     this.startCaseWorkDrain();
     return { ok: true, value: { kind: "scheduled" } };
@@ -313,7 +335,7 @@ export class ConnectorDO extends ConnectorEmail {
       acceptSlackFollowUpTransaction.bind(null, this.ctx.storage.sql, input),
     );
     if (!accepted.ok || accepted.value.kind !== "scheduled") return accepted;
-    const armed = await armConnectorAlarm(this.ctx.storage);
+    const armed = await this.armAlarm();
     return armed.ok ? accepted : armed;
   }
 
@@ -409,7 +431,7 @@ export class ConnectorDO extends ConnectorEmail {
       input.noticeText,
     );
     if (released.value.kind === "allowed") {
-      const armed = await armConnectorAlarm(this.ctx.storage);
+      const armed = await this.armAlarm();
       if (!armed.ok) return armed;
       this.startCaseWorkDrain();
     }
@@ -484,9 +506,7 @@ export class ConnectorDO extends ConnectorEmail {
     if (input === null) return invalid("connector_side_case_invalid");
     const scope = await this.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const earlier = this.sideCaseStarts.get(input.proposalId) ?? null;
-    const start = this.startSideCaseAfter(
-      earlier,
+    const outcome = await this.slack.startSideCase(
       {
         env: this.env,
         storage: this.ctx.storage,
@@ -495,16 +515,8 @@ export class ConnectorDO extends ConnectorEmail {
       },
       input,
     );
-    this.sideCaseStarts.set(input.proposalId, start);
-    let outcome: SlackSideCaseStartOutcome;
-    try {
-      outcome = await start;
-    } finally {
-      if (this.sideCaseStarts.get(input.proposalId) === start)
-        this.sideCaseStarts.delete(input.proposalId);
-    }
     if (outcome.kind === "started") {
-      const armed = await armConnectorAlarm(this.ctx.storage);
+      const armed = await this.armAlarm();
       if (!armed.ok) return armed;
       this.startCaseWorkDrain();
     }

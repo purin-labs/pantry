@@ -8,36 +8,107 @@ import type { Env } from "../../env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   acceptEmailHint,
+  createConnectorEmailSchema,
   disableEmailRuntime,
   latestEmailDraftOperation,
+  nextEmailCaseContextDiscoveryAt,
+  nextEmailCorrectionLearningAt,
+  nextEmailEvaluationAt,
+  nextEmailMaintenanceAt,
+  nextEmailReplyTurnAt,
+  nextEmailWatchCleanupAt,
   requestEmailWatchCleanup,
   readEmailRuntime,
   type EmailHintAcceptance,
   type EmailRuntimeSnapshot,
 } from "../connector-email";
+import { nextOperationalEmailMaintenanceAt } from "../connector-email-operational";
+import type { EmailDisposalOutcome } from "../connector-email-proposal";
+import { nextEvalWorkAt } from "../connector-eval";
+import type { GmailMessageContent } from "../../mail/gmail-adapter";
+import { nextMailOrganizationAt } from "../../mail-inbox/store";
+import type { AlarmReconciler } from "../lifecycle/actor-alarm";
 import { digestEmailBody } from "../../mail/reply-target";
-import { createEmailProposalDraft } from "../email-case-processing";
 import {
-  acceptConnectorCaseWork,
-  acceptSlackFollowUp,
-  parkSlackPermissionRequest,
-  releaseParkedSlackPermission,
-  parkSlackSideCaseCommand,
-  type SlackSideCaseParkRequest,
-  type SlackPermissionParkRequest,
-  type SlackPermissionRelease,
-  type ConnectorCaseWorkRequest,
-  type SlackFollowUpAcceptance,
-  type SlackFollowUpRequest,
-} from "../connector-case-work";
+  createEmailProposalDraft,
+  type EmailProposalDraftRecord,
+} from "../email-case-processing";
 import {
   type EmailReplyProposalCreateRequest,
   parseEmailChangeRequest,
 } from "./email-parsers";
 import { ensureConnectorIdentity } from "./ingress-parsers";
 import { invalid } from "./support";
-import type { ConnectorEmailReplyProposal, ConnectorResult } from "./types";
+import type { ConnectorResult } from "./types";
 import type { EmailMailboxRevocationRequest } from "./whatsapp-parsers";
+
+export type EmailMailboxDisposal = {
+  readonly proposalId: string;
+  readonly version: number;
+  readonly kind: EmailDisposalOutcome["kind"];
+};
+
+export type EmailMailboxRevocation = {
+  readonly watchStopped: boolean;
+  readonly disposals: readonly EmailMailboxDisposal[];
+};
+
+export type EmailRuntimeStatus = EmailRuntimeSnapshot & {
+  readonly usage: {
+    readonly activeCases: number;
+    readonly admittedLastHour: number;
+    readonly tokens: { readonly reserved: number; readonly consumed: number };
+    readonly nextEvaluationAt: number | null;
+  };
+};
+
+export type ConnectorEmailMailboxSearch = Readonly<{
+  integrationAccountId: string;
+  messages: readonly GmailMessageContent[];
+  truncated: boolean;
+}>;
+
+export type ConnectorEmailReplyProposal = Readonly<{
+  record: EmailProposalDraftRecord;
+}>;
+
+/** Creates the tables of the mailbox. */
+export function createEmailChannelSchema(storage: DurableObjectStorage): void {
+  createConnectorEmailSchema(storage.sql);
+}
+
+/**
+ * The due times of the mailbox's alarm work, its evals among them. Each
+ * reads its own rows.
+ */
+export function emailAlarmDue(sql: SqlStorage): readonly AlarmReconciler[] {
+  return [
+    { name: "email_evaluation", nextDue: () => nextEmailEvaluationAt(sql) },
+    { name: "mail_organization", nextDue: () => nextMailOrganizationAt(sql) },
+    {
+      name: "email_case_context_discovery",
+      nextDue: () => nextEmailCaseContextDiscoveryAt(sql),
+    },
+    {
+      name: "email_correction_learning",
+      nextDue: () => nextEmailCorrectionLearningAt(sql),
+    },
+    { name: "eval_work", nextDue: () => nextEvalWorkAt(sql) },
+    { name: "email_reply_turn", nextDue: () => nextEmailReplyTurnAt(sql) },
+    {
+      name: "email_maintenance",
+      nextDue: (now) => nextEmailMaintenanceAt(sql, now),
+    },
+    {
+      name: "email_watch_cleanup",
+      nextDue: () => nextEmailWatchCleanupAt(sql),
+    },
+    {
+      name: "operational_email_maintenance",
+      nextDue: () => nextOperationalEmailMaintenanceAt(sql),
+    },
+  ];
+}
 
 export async function createConnectorEmailReplyProposal(
   input: Readonly<{
@@ -149,76 +220,6 @@ export async function createConnectorEmailReplyProposal(
   return created.ok ? created : invalid(created.error.code);
 }
 
-export function acceptCaseWorkTransaction(
-  sql: SqlStorage,
-  input: ConnectorCaseWorkRequest,
-): ConnectorResult<{
-  readonly kind: "accepted" | "duplicate";
-  readonly eventId: string;
-}> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return acceptConnectorCaseWork(sql, input);
-}
-
-export type SlackPermissionParked = Readonly<{
-  caseId: string;
-  workspaceId: string;
-  channelId: string;
-  threadTs: string;
-  requesterUserId: string | null;
-}>;
-
-export function parkSlackPermissionTransaction(
-  sql: SqlStorage,
-  input: SlackPermissionParkRequest,
-  now: number,
-): ReturnType<typeof parkSlackPermissionRequest> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return parkSlackPermissionRequest(sql, input, now);
-}
-
-/** The later start repeats the work of an earlier one that failed. */
-export function ignoreEarlierSideCaseStart(): void {}
-
-export type SlackSideCaseParked = Readonly<{
-  caseId: string;
-  workspaceId: string;
-  channelId: string;
-  threadTs: string;
-  requesterPersonId: string;
-}>;
-
-export function parkSlackSideCaseTransaction(
-  sql: SqlStorage,
-  input: SlackSideCaseParkRequest,
-  now: number,
-): ReturnType<typeof parkSlackSideCaseCommand> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return parkSlackSideCaseCommand(sql, input, now);
-}
-
-export function releaseSlackPermissionTransaction(
-  sql: SqlStorage,
-  input: SlackPermissionRelease,
-  now: number,
-): ReturnType<typeof releaseParkedSlackPermission> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return releaseParkedSlackPermission(sql, input, now);
-}
-
-export function acceptSlackFollowUpTransaction(
-  sql: SqlStorage,
-  input: SlackFollowUpRequest,
-): ConnectorResult<SlackFollowUpAcceptance> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return acceptSlackFollowUp(sql, input);
-}
-
 export function acceptConnectorEmailChange(
   sql: SqlStorage,
   input: NonNullable<ReturnType<typeof parseEmailChangeRequest>>,
@@ -248,8 +249,4 @@ export function fenceConnectorEmailMailbox(
   if (disabled.ok && runtime !== null && runtime.watchExpiresAt !== null)
     requestEmailWatchCleanup(sql, input.now);
   return disabled;
-}
-
-export function isPresentNoticeKey(value: string | null): value is string {
-  return value !== null;
 }

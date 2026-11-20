@@ -757,6 +757,46 @@ No shape, parser or error text changed.
   `menu-board-reviews.ts`, `order-queue.ts`, `mail-*.ts`, `evals.ts` and
   `case-execution.ts`.
 
+**20 November 2026. Step A1.6 is done for the Connector**, on the branch
+`refactor-17-a1-6`. It is not on `dev`.
+
+- **The port.** `actors/connector/channel-adapter.ts` defines `ChannelAdapter`:
+  the tables of a channel, the due times of its alarm work, its work before
+  the Case work drain starts and its alarm steps. `CaseWorkChannel` runs,
+  tells and steers the Case work. `DeliveryChannel` sends a Case output.
+  `ConnectorChannelHost` is what the kernel gives to a channel. `ConnectorDO`
+  gives the three channels to the kernel, in the order Slack, email,
+  WhatsApp.
+- **Slack.** The Case work queue holds an opaque command. A `CaseWorkCodec`
+  reads its event, its provider message and its stable form.
+  `connector-slack-case-work.ts` holds the codec, the follow-ups and the
+  parked permissions and side Cases. `connector/slack-channel.ts` holds the
+  Slack turn, the exhausted notice, the steer rule, the live turns, the side
+  Case starts, the stream and the delivery.
+- **Email.** The mailbox work of the alarm is in `ConnectorEmail`, and the eval
+  work is in `ConnectorEvals`. The eval step runs as a step of the email
+  channel, in its old place, so the order of the steps did not change.
+- **WhatsApp.** The turns, the notices and the automatic send are in
+  `ConnectorWhatsApp`. The delivery row parser is a kernel parser.
+- **The alarm.** `armConnectorAlarm` takes the due times of the channels. A
+  class layer calls `this.armAlarm()`. A WhatsApp send and an operational
+  email command get the call from their caller.
+- **Measures.** The kernel files (`connector-actor-base.ts`, `case-work-drain.ts`,
+  `delivery.ts`, `support.ts`, `types.ts`, `alarm.ts`, `connector-case-work.ts`,
+  `connector-alarm.ts`) import no file of `surfaces/slack`, `surfaces/email`,
+  `surfaces/whatsapp`, `areas/inbox`, `areas/brain` or `workers/platform`.
+  Layer crossings: 821 to 778. The pairs `foundation/conversation ->
+surfaces/email` and `-> surfaces/whatsapp` are gone. Copies of product code:
+  892, no change. Unused exports: 809, no change. `connector-actor-base.ts`
+  went from 1,466 lines to 396.
+- **Not changed:** the stored values, the schema steps, the delivery ids, the
+  alarm times and each Slack, Gmail and WhatsApp request. The class chain
+  stays (step A1.9).
+- **Still open:** 7 imports of Slack files from `actors/case*.ts` and `chat/`,
+  and the Inbox and email imports of `actors/case*.ts`. They are the Case
+  kernel, not the Connector. The Portal chat stream is not a channel adapter
+  yet.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

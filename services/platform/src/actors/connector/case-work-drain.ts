@@ -1,18 +1,11 @@
 import type { Env, SessionActorStub } from "../../env";
-import { resolveActiveSlackThreadCredential } from "../../credential-vault";
 import { newRequestId, parseSessionId } from "../../ids";
-import { slackAuthoredText } from "../../slack/events";
-import { traceLog, traceWarn } from "../../observability";
-import type { SlackCaseCommand } from "../../slack/case-command-message";
+import { traceLog } from "../../observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { actorExecutionAdmissionOpen } from "../actor-execution-quiescence";
-import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";
 import { admitActorRecovery } from "../actor-activation";
 import { actorStub } from "../actor-stubs";
-import { buildSlackUserMessage } from "../../slack/user-message";
 import {
-  CASE_WORK_ATTEMPTS_EXHAUSTED,
-  CASE_WORK_EXHAUSTED_NOTICE_UNDELIVERED,
   claimConnectorCaseWork,
   parkSteeredCaseWork,
   pendingCaseWorkForCases,
@@ -20,42 +13,30 @@ import {
   steeredCaseWorkToSettle,
   unparkRefusedSteer,
   finalizeConnectorCaseWork,
+  type CaseWorkCommand,
   type ConnectorCaseWorkClaim,
 } from "../connector-case-work";
-import {
-  connectorSlackStreamPostedFailure,
-  stopOpenConnectorSlackStream,
-  slackCaseStreamId,
-  slackCaseTurnId,
-} from "../connector-slack-stream";
-import {
-  deliverSlackAttemptsExhaustedNotice,
-  processScheduledSlackCaseMessage,
-  slackCaseIngressId,
-  type SlackCaseProcessingResult,
-} from "../../slack/case-processing";
-import type { OngoingCaseWalkingConnector } from "../case-walking-path";
-import { setSlackThreadStatus } from "../../slack/messages";
-import { errorMessage } from "@purin-labs/std";
 import { scheduleCaseWorkAlarm } from "./alarm";
 import { steerAnswerLost } from "./steer-fault";
-import {
-  caseWorkCommandAtPlacement,
-  caseWorkResult,
-  connectorIdentityForClaim,
-} from "./delivery";
-import {
-  CASE_WORK_CONCURRENCY,
-  type LiveSlackTurn,
-  replyMaySteer,
-} from "./support";
-import type { Variant } from "@purin-labs/type-utils";
+import { caseWorkResult, readConnectorIdentity } from "./delivery";
+import { CASE_WORK_CONCURRENCY } from "./support";
+import type {
+  CaseWorkChannel,
+  ChannelAlarmDue,
+  LiveCaseTurn,
+} from "./channel-adapter";
 
+type Claim = ConnectorCaseWorkClaim<CaseWorkCommand>;
+
+/**
+ * Runs the Case work that a Connector accepted. The channel of the work
+ * runs each turn; the drain claims, settles and steers.
+ */
 export class ConnectorCaseWorkDrain {
   /** The Cases that have a message in flight. */
   private readonly busyCases = new Set<string>();
   /** The claim in flight for each busy Case. */
-  private readonly runningClaims = new Map<string, ConnectorCaseWorkClaim>();
+  private readonly runningClaims = new Map<string, Claim>();
   /** Replies that already had their chance to steer a running turn. */
   private readonly steeringTried = new Set<string>();
   /**
@@ -72,12 +53,10 @@ export class ConnectorCaseWorkDrain {
     private readonly input: {
       readonly storage: DurableObjectStorage;
       readonly env: Env;
-      /** The Connector as one item uses it, under the scope admitted for it. */
-      readonly connectorFor: (
-        scope: OrganisationExecutionScope,
-      ) => OngoingCaseWalkingConnector;
-      /** The Session of a Slack turn that streams now. */
-      readonly liveSlackTurn: (turnId: string) => LiveSlackTurn | null;
+      /** The channel whose messages are the Case work. */
+      readonly channel: CaseWorkChannel<CaseWorkCommand>;
+      /** The due times of the work of each channel, for the alarm. */
+      readonly alarmDue: readonly ChannelAlarmDue[];
     },
   ) {}
 
@@ -130,7 +109,11 @@ export class ConnectorCaseWorkDrain {
       // is settled once nothing runs.
       await this.settleSteeredReplies();
       // Nothing runs. Leave the alarm at the next due item.
-      await scheduleCaseWorkAlarm(this.input.storage, newRequestId());
+      await scheduleCaseWorkAlarm(
+        this.input.storage,
+        this.input.alarmDue,
+        newRequestId(),
+      );
       if (
         this.state === "open" &&
         (this.busyCases.size > 0 || this.acceptedSinceLaunch)
@@ -147,19 +130,23 @@ export class ConnectorCaseWorkDrain {
    * wait, so the fence its caller read is still the latest observation.
    */
   private launch(scope: OrganisationExecutionScope): void {
-    const { storage } = this.input;
+    const { storage, channel } = this.input;
     this.acceptedSinceLaunch = false;
     while (
       this.state === "open" &&
       this.busyCases.size < CASE_WORK_CONCURRENCY &&
       actorExecutionAdmissionOpen(storage.sql)
     ) {
-      let claim: ReturnType<typeof claimConnectorCaseWork>;
+      let claim: ReturnType<typeof claimConnectorCaseWork<CaseWorkCommand>>;
       try {
         claim = storage.transactionSync(
-          claimConnectorCaseWork.bind(null, storage.sql, Date.now(), [
-            ...this.busyCases,
-          ]),
+          claimConnectorCaseWork.bind(
+            null,
+            channel.codec,
+            storage.sql,
+            Date.now(),
+            [...this.busyCases],
+          ),
         );
       } catch (error) {
         // An accepting call may be the caller. Its work is already accepted,
@@ -183,14 +170,15 @@ export class ConnectorCaseWorkDrain {
         this.steerWaitingReplies();
         return;
       }
+      const eventId = channel.codec.eventId(claimed.command);
       traceLog("connector.case_work_claimed", {
         requestId: claimed.command.requestId,
-        event_id: claimed.command.event.eventId,
+        event_id: eventId,
         attempt: claimed.attempt,
         elapsed_ms: Date.now() - claimed.command.receivedAt,
         cases_in_flight: this.busyCases.size + 1,
       });
-      this.steeringTried.delete(claimed.command.event.eventId);
+      this.steeringTried.delete(eventId);
       this.busyCases.add(claimed.command.target.caseId);
       this.runningClaims.set(claimed.command.target.caseId, claimed);
       void this.runClaimed(claimed, scope);
@@ -199,23 +187,25 @@ export class ConnectorCaseWorkDrain {
 
   /** Run one claimed item to its receipt. It never rejects. */
   private async runClaimed(
-    claimed: ConnectorCaseWorkClaim,
+    claimed: Claim,
     scope: OrganisationExecutionScope,
   ): Promise<void> {
-    const { storage } = this.input;
+    const { storage, channel } = this.input;
     try {
       const [scheduled, result] = await Promise.all([
-        scheduleCaseWorkAlarm(storage, claimed.command.requestId),
+        scheduleCaseWorkAlarm(
+          storage,
+          this.input.alarmDue,
+          claimed.command.requestId,
+        ),
         claimed.work.kind === "turn"
-          ? processScheduledSlackCaseMessage(
-              this.input.env,
-              caseWorkCommandAtPlacement(claimed.command, scope),
-              claimed.attempt,
-              connectorIdentityForClaim(storage.sql, claimed),
-              this.input.connectorFor(scope),
+          ? channel.runTurn(claimed, scope, readConnectorIdentity(storage.sql))
+          : channel.tellAttemptsExhausted(
+              claimed,
+              claimed.work,
               scope,
-            )
-          : this.tellAttemptsExhausted(claimed, claimed.work, scope),
+              readConnectorIdentity(storage.sql),
+            ),
       ]);
       if (!scheduled.ok) {
         this.halt("fault");
@@ -223,7 +213,7 @@ export class ConnectorCaseWorkDrain {
       }
       traceLog("connector.case_work_finished", {
         requestId: claimed.command.requestId,
-        event_id: claimed.command.event.eventId,
+        event_id: channel.codec.eventId(claimed.command),
         outcome: result.kind,
         reason: result.kind === "completed" ? null : result.reason,
         elapsed_ms: Date.now() - claimed.command.receivedAt,
@@ -231,6 +221,7 @@ export class ConnectorCaseWorkDrain {
       const finalized = storage.transactionSync(
         finalizeConnectorCaseWork.bind(
           null,
+          channel.codec,
           storage.sql,
           claimed,
           caseWorkResult(result),
@@ -260,8 +251,9 @@ export class ConnectorCaseWorkDrain {
    * not join the turn waits for the next turn, as before.
    */
   private steerWaitingReplies(): void {
-    const { storage } = this.input;
+    const { storage, channel } = this.input;
     for (const reply of pendingCaseWorkForCases(
+      channel.codec,
       storage.sql,
       [...this.runningClaims.keys()],
       Date.now(),
@@ -269,12 +261,10 @@ export class ConnectorCaseWorkDrain {
       if (this.steeringTried.has(reply.eventId)) continue;
       const running = this.runningClaims.get(reply.command.target.caseId);
       if (running === undefined || running.work.kind !== "turn") continue;
-      const live = this.input.liveSlackTurn(
-        slackCaseTurnId(slackCaseIngressId(running.command)),
-      );
+      const live = channel.liveTurn(running.command);
       if (live === null) continue;
       this.steeringTried.add(reply.eventId);
-      if (!replyMaySteer(reply.command, running.command)) continue;
+      if (!channel.replyMaySteer(reply.command, running.command)) continue;
       const caseId = reply.command.target.caseId;
       const calls = this.steeringCalls.get(caseId) ?? new Set();
       this.steeringCalls.set(caseId, calls);
@@ -295,17 +285,18 @@ export class ConnectorCaseWorkDrain {
    * to its place in the queue; a call with no answer keeps the record.
    */
   private async steerReply(
-    reply: Readonly<{ eventId: string; command: SlackCaseCommand }>,
-    running: ConnectorCaseWorkClaim,
-    live: LiveSlackTurn,
+    reply: Readonly<{ eventId: string; command: CaseWorkCommand }>,
+    running: Claim,
+    live: LiveCaseTurn,
   ): Promise<void> {
-    const { storage, env } = this.input;
-    const message = buildSlackUserMessage(reply.command.event, []);
-    if (!message.ok) return;
+    const { storage, env, channel } = this.input;
+    const input = channel.steerInput(reply.command);
+    if (input === null) return;
+    const runningEventId = channel.codec.eventId(running.command);
     const parked = storage.transactionSync(
       parkSteeredCaseWork.bind(null, storage.sql, {
         eventId: reply.eventId,
-        runningEventId: running.command.event.eventId,
+        runningEventId,
         sessionId: String(live.sessionId),
         sessionRoute: live.sessionRoute,
         steeredAt: Date.now(),
@@ -324,12 +315,9 @@ export class ConnectorCaseWorkDrain {
         organisationId: reply.command.organisationId,
         sessionId: live.sessionId,
         requestId: reply.command.requestId,
-        requester: {
-          kind: "person",
-          personId: String(reply.command.principalId),
-        },
-        text: slackAuthoredText(reply.command.event.authored).trim(),
-        message: message.value.message,
+        requester: { kind: "person", personId: input.requesterPersonId },
+        text: input.text,
+        message: input.message,
       });
     } catch {
       // The Session may have taken the reply: the turn's end settles it.
@@ -337,7 +325,12 @@ export class ConnectorCaseWorkDrain {
     }
     if (!steered.ok || steered.value.kind !== "accepted") {
       storage.transactionSync(
-        unparkRefusedSteer.bind(null, storage.sql, reply.eventId),
+        unparkRefusedSteer.bind(
+          null,
+          channel.codec,
+          storage.sql,
+          reply.eventId,
+        ),
       );
       return;
     }
@@ -345,7 +338,7 @@ export class ConnectorCaseWorkDrain {
     traceLog("connector.slack_reply_steered", {
       requestId: reply.command.requestId,
       event_id: reply.eventId,
-      running_event_id: running.command.event.eventId,
+      running_event_id: runningEventId,
       parked,
     });
   }
@@ -356,8 +349,8 @@ export class ConnectorCaseWorkDrain {
    * whose Session does not answer waits for a later pass. Never rejects.
    */
   private async settleSteeredReplies(): Promise<void> {
-    const { storage, env } = this.input;
-    for (const steered of steeredCaseWorkToSettle(storage.sql)) {
+    const { storage, env, channel } = this.input;
+    for (const steered of steeredCaseWorkToSettle(channel.codec, storage.sql)) {
       let outcome: "placed" | "withdrawn" | null = null;
       const sessionId = parseSessionId(steered.sessionId);
       if (
@@ -394,6 +387,7 @@ export class ConnectorCaseWorkDrain {
       const settled = outcome;
       storage.transactionSync(() =>
         settleSteeredCaseWork(
+          channel.codec,
           storage.sql,
           steered.eventId,
           settled,
@@ -401,102 +395,8 @@ export class ConnectorCaseWorkDrain {
         ),
       );
       if (settled === "placed" && steered.command !== null)
-        await this.clearSteeredReplyStatus(steered.command);
+        await channel.steerPlaced(steered.command);
     }
-  }
-
-  /**
-   * Ingress shows "is thinking…" for each message that it accepts. A reply
-   * that steered a turn gets no answer of its own, so nothing clears that
-   * status: clear it once the turn has read the reply. Never rejects.
-   */
-  private async clearSteeredReplyStatus(
-    command: SlackCaseCommand,
-  ): Promise<void> {
-    const { env } = this.input;
-    const identity = resolveConfiguredSlackInstallationIdentity({
-      deploymentProfile: env.PANTRY_DEPLOYMENT_PROFILE,
-      appId: env.SLACK_APP_ID,
-    });
-    if (!identity.ok) return;
-    try {
-      const credential = await resolveActiveSlackThreadCredential({
-        env,
-        keys: env,
-        installationIdentity: identity.value,
-        organisationId: command.organisationId,
-        workspaceId: command.event.workspaceId,
-        channelId: command.event.channelId,
-        rootMessageTs: command.event.threadTs,
-      });
-      if (!credential.ok || credential.value.kind !== "bearer") return;
-      const cleared = await setSlackThreadStatus({
-        token: credential.value.value,
-        channelId: command.event.channelId,
-        threadTs: command.event.threadTs,
-        status: "",
-      });
-      if (!cleared.ok)
-        traceWarn("connector.slack_steered_status_kept", {
-          requestId: command.requestId,
-          detail: cleared.error.detail,
-        });
-    } catch (error) {
-      traceWarn("connector.slack_steered_status_kept", {
-        requestId: command.requestId,
-        detail: errorMessage(error).slice(0, 300),
-      });
-    }
-  }
-
-  /**
-   * The message used every attempt. Its thread is told one time, and the
-   * message is then settled as rejected. A thread that already holds the
-   * failure text of the turn's own stream gets no second post.
-   */
-  private async tellAttemptsExhausted(
-    claimed: ConnectorCaseWorkClaim,
-    work: Variant<ConnectorCaseWorkClaim["work"], "exhausted_notice">,
-    scope: OrganisationExecutionScope,
-  ): Promise<SlackCaseProcessingResult> {
-    const { storage } = this.input;
-    const command = caseWorkCommandAtPlacement(claimed.command, scope);
-    const streamId = slackCaseStreamId(slackCaseIngressId(command));
-    const streamFailurePosted = connectorSlackStreamPostedFailure(
-      storage.sql,
-      streamId,
-    );
-    traceWarn("connector.case_work_attempts_exhausted", {
-      requestId: command.requestId,
-      event_id: command.event.eventId,
-      attempt: claimed.attempt,
-      last_reason: work.lastReason,
-      stream_failure_posted: streamFailurePosted,
-    });
-    if (streamFailurePosted)
-      return { kind: "rejected", reason: CASE_WORK_ATTEMPTS_EXHAUSTED };
-    // A partial answer stops streaming before the notice follows it.
-    await stopOpenConnectorSlackStream({
-      sql: storage.sql,
-      env: this.input.env,
-      scope,
-      streamId,
-    });
-    const notice = await deliverSlackAttemptsExhaustedNotice(
-      command,
-      connectorIdentityForClaim(storage.sql, claimed),
-      this.input.connectorFor(scope),
-    );
-    if (notice.kind === "completed")
-      return { kind: "rejected", reason: CASE_WORK_ATTEMPTS_EXHAUSTED };
-    // A later claim posts the notice, unless this one was the last.
-    if (notice.kind === "retry" && !work.final) return notice;
-    traceWarn("connector.case_work_exhausted_notice_undelivered", {
-      requestId: command.requestId,
-      event_id: command.event.eventId,
-      reason: notice.reason,
-    });
-    return { kind: "rejected", reason: CASE_WORK_EXHAUSTED_NOTICE_UNDELIVERED };
   }
 
   /** Stop starting work. The items in flight still run to their receipts. */
