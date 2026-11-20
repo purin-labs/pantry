@@ -2115,3 +2115,9 @@ function nullableSafeInteger(value: unknown): value is number | null {
 function invalidCueField(field: string): Result<never, CueBoundaryError> {
   return { ok: false, error: { code: "invalid_field", field } };
 }
+
+declare module "../env" {
+  interface Env {
+    CUE_Q: Queue<CueQueueMessage>;
+  }
+}

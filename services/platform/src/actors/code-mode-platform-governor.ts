@@ -2067,3 +2067,9 @@ function isPlatformOutcome(
     value === "organisation_failed"
   );
 }
+
+declare module "../env" {
+  interface Env {
+    CODE_MODE_PLATFORM_GOVERNOR_ACTOR: DurableObjectNamespace<CodeModePlatformGovernorActor>;
+  }
+}

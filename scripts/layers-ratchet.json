@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 658,
+    "upward": 654,
     "areas": 376,
-    "order": 169,
+    "order": 160,
     "table": 126
   },
   "crossings": {
@@ -133,15 +133,9 @@
     "foundation/conversation -> surfaces/voice": 1,
     "foundation/conversation -> surfaces/whatsapp": 6,
     "foundation/conversation -> workers/platform": 4,
-    "foundation/kernel -> areas/devices": 1,
-    "foundation/kernel -> areas/integrations": 1,
-    "foundation/kernel -> foundation/actor-runtime": 1,
-    "foundation/kernel -> foundation/agent": 6,
     "foundation/kernel -> foundation/contracts": 1,
     "foundation/kernel -> foundation/control": 1,
-    "foundation/kernel -> foundation/conversation": 2,
     "foundation/kernel -> foundation/tenancy": 1,
-    "foundation/kernel -> workers/platform": 2,
     "foundation/tenancy -> areas/integrations": 1,
     "foundation/tenancy -> foundation/actor-runtime": 7,
     "foundation/tenancy -> foundation/agent": 2,

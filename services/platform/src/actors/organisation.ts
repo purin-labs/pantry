@@ -1904,3 +1904,9 @@ export class OrganisationDO extends OrganisationCommerce {
   /** Runs in a row with a failed alarm step; the backoff grows with it. */
   private readonly alarmRetries = { failures: 0 };
 }
+
+declare module "../env" {
+  interface Env {
+    ORGANISATION: DurableObjectNamespace<OrganisationDO>;
+  }
+}

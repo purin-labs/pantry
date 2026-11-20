@@ -1,7 +1,7 @@
 import { Container } from "@cloudflare/containers";
 
+import { eraseIdleContainerState } from "../actors/unregistered-actor-erasure";
 import type { Env } from "../env";
-import type { Result } from "../result";
 
 const MESSAGE_LINK_FETCH_PORT = 8080;
 
@@ -25,13 +25,13 @@ export class MessageLinkFetchContainer extends Container<Env> {
    * the placement of no organisation addresses; a container that runs is in
    * use.
    */
-  async eraseUnregisteredState(): Promise<
-    Result<null, { readonly code: "actor_in_use" }>
-  > {
-    if (this.ctx.container?.running === true)
-      return { ok: false, error: { code: "actor_in_use" } };
-    await this.ctx.storage.deleteAlarm();
-    await this.ctx.storage.deleteAll();
-    return { ok: true, value: null };
+  eraseUnregisteredState() {
+    return eraseIdleContainerState(this.ctx);
+  }
+}
+
+declare module "../env" {
+  interface Env {
+    MESSAGE_LINK_FETCH: DurableObjectNamespace<MessageLinkFetchContainer>;
   }
 }

@@ -65,6 +65,20 @@ export async function eraseUnregisteredActorState(
   return { ok: true, value: null };
 }
 
+/**
+ * Empties the Actor of a fetch container that no Organisation addresses. A
+ * container that runs is in use, and it keeps its state.
+ */
+export async function eraseIdleContainerState(
+  ctx: DurableObjectState,
+): Promise<Result<null, { readonly code: "actor_in_use" }>> {
+  if (ctx.container?.running === true)
+    return { ok: false, error: { code: "actor_in_use" } };
+  await ctx.storage.deleteAlarm();
+  await ctx.storage.deleteAll();
+  return { ok: true, value: null };
+}
+
 function storedActorOwners(sql: SqlStorage): readonly string[] {
   const owners = new Set<string>();
   for (const table of OWNER_TABLES) {

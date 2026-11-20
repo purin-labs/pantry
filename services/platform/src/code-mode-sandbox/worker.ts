@@ -51,3 +51,13 @@ export default {
     return new Response(null, { status: 404 });
   },
 } satisfies ExportedHandler;
+
+declare module "../env" {
+  interface Env {
+    /**
+     * The sandbox Worker that runs the VM of a Pi Code Mode script. Absent in a
+     * deployment without that Worker: Pi Code Mode admission then fails.
+     */
+    CODE_MODE_SANDBOX?: DurableObjectNamespace<CodeModeSandbox>;
+  }
+}

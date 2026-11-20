@@ -1499,3 +1499,9 @@ export class SessionDO extends SessionTransientTurns {
     );
   }
 }
+
+declare module "../env" {
+  interface Env {
+    SESSION: DurableObjectNamespace<SessionDO>;
+  }
+}

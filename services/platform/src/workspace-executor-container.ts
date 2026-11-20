@@ -589,3 +589,9 @@ const ATTACHMENT_NOT_INSPECTABLE_KEYS = [
   "reason",
   "sourceSha256",
 ] as const;
+
+declare module "./env" {
+  interface Env {
+    WORKSPACE_EXECUTOR: DurableObjectNamespace<WorkspaceExecutorContainer>;
+  }
+}

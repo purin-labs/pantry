@@ -1081,3 +1081,9 @@ export function deviceFleetStubAt(
     { locationHint: placement.locationHint },
   );
 }
+
+declare module "../env" {
+  interface Env {
+    DEVICE_FLEET?: DurableObjectNamespace<DeviceFleetActor>;
+  }
+}

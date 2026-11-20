@@ -1,18 +1,15 @@
 import type { GlobalDatabase } from "./database-handles";
-import type { CodeModePlatformGovernorActor } from "./actors/code-mode-platform-governor";
-import type { ConversationResidencyActor } from "./actors/conversation-residency";
-import type { DeviceFleetActor } from "./actors/device-fleet";
-import type { SessionDO } from "./actors/agent-session";
-import type { OrganisationDO } from "./actors/organisation";
-import type { IngressQueueMessage } from "./ingress-queue";
-import type { CueQueueMessage } from "./cues/engine";
-import type { WorkspaceExecutorContainer } from "./workspace-executor-container";
-import type { CaseDO } from "./actors/case";
-import type { ConnectorDO } from "./actors/connector";
-import type { CodeModeSandbox } from "./code-mode-sandbox/worker";
-import type { MessageLinkFetchContainer } from "./messages/link-fetch-container";
-import type { CustomConnectorFetchContainer } from "./custom-connectors/fetch-container";
 
+/**
+ * The bindings of the Platform Worker.
+ *
+ * This file declares the bindings whose types come from the platform or from
+ * this module. A binding whose type belongs to a higher module is declared by
+ * that module, with a declaration merge of this interface: each Actor
+ * namespace beside its class, each queue beside its message type and each
+ * container beside its class (Refactor 17, step A1.2). So this file imports
+ * no Actor and no area.
+ */
 export interface Env {
   /** Workers AI: the fallback of Portal voice control, through `voice/engines/` (Plan 82C). */
   AI?: Readonly<{
@@ -42,11 +39,6 @@ export interface Env {
   ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER?: string;
   ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE?: string;
   ASSETS: Fetcher;
-  /**
-   * The sandbox Worker that runs the VM of a Pi Code Mode script. Absent in a
-   * deployment without that Worker: Pi Code Mode admission then fails.
-   */
-  CODE_MODE_SANDBOX?: DurableObjectNamespace<CodeModeSandbox>;
   /** Global identity, placement directory and relocation journal. */
   DB: GlobalDatabase;
   /** Only cells with a deployed binding can accept organisation work. */
@@ -59,16 +51,6 @@ export interface Env {
   VAULT_ROOT_V1?: SecretsStoreSecret;
   VAULT_ROOT_V2?: SecretsStoreSecret;
   PANTRY_VAULT_ACTIVE_KEY_VERSION: string;
-  EVENT_Q: Queue<IngressQueueMessage>;
-  CUE_Q: Queue<CueQueueMessage>;
-  CODE_MODE_PLATFORM_GOVERNOR_ACTOR: DurableObjectNamespace<CodeModePlatformGovernorActor>;
-  /** Absent in a harness Worker, which then keeps no conversation resident. */
-  CONVERSATION_RESIDENCY?: DurableObjectNamespace<ConversationResidencyActor>;
-  DEVICE_FLEET?: DurableObjectNamespace<DeviceFleetActor>;
-  ORGANISATION: DurableObjectNamespace<OrganisationDO>;
-  SESSION: DurableObjectNamespace<SessionDO>;
-  CASE: DurableObjectNamespace<CaseDO>;
-  CONNECTOR: DurableObjectNamespace<ConnectorDO>;
   UNDERCLERK: Fetcher;
   /**
    * The model exit Worker, near AWS Tokyo (Plan 73). Each direct request to
@@ -86,9 +68,6 @@ export interface Env {
    * Organisation that keeps its Vault items in 1Password.
    */
   VAULT_ONEPASSWORD: Fetcher;
-  WORKSPACE_EXECUTOR: DurableObjectNamespace<WorkspaceExecutorContainer>;
-  MESSAGE_LINK_FETCH: DurableObjectNamespace<MessageLinkFetchContainer>;
-  CUSTOM_CONNECTOR_FETCH: DurableObjectNamespace<CustomConnectorFetchContainer>;
   PANTRY_OAUTH_CALLBACK_ORIGIN?: string;
   PANTRY_PROVIDER_INGRESS_ORIGIN?: string;
   PANTRY_PUBLIC_ORIGIN: string;

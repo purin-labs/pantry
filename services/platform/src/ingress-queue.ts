@@ -1301,3 +1301,9 @@ function readRequiredString(
 
   return { ok: true, value: value.trim() };
 }
+
+declare module "./env" {
+  interface Env {
+    EVENT_Q: Queue<IngressQueueMessage>;
+  }
+}

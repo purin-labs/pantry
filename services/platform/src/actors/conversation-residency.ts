@@ -577,3 +577,10 @@ function callResident(
       return assertNever(resident.kind);
   }
 }
+
+declare module "../env" {
+  interface Env {
+    /** Absent in a harness Worker, which then keeps no conversation resident. */
+    CONVERSATION_RESIDENCY?: DurableObjectNamespace<ConversationResidencyActor>;
+  }
+}

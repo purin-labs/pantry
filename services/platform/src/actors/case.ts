@@ -2107,3 +2107,9 @@ function journalAuthorPersonId(requestAuthorityJson: string): string | null {
     ? accepted.requesterPersonId
     : null;
 }
+
+declare module "../env" {
+  interface Env {
+    CASE: DurableObjectNamespace<CaseDO>;
+  }
+}

@@ -580,3 +580,9 @@ export class ConnectorDO extends ConnectorEmail {
     return { ok: true as const, value: null };
   }
 }
+
+declare module "../env" {
+  interface Env {
+    CONNECTOR: DurableObjectNamespace<ConnectorDO>;
+  }
+}
