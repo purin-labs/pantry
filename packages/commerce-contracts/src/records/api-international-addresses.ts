@@ -5,7 +5,10 @@
 // the United States, both in upper case, and the field order that an address
 // digest hashes.
 import { Type, type Static } from "typebox";
-import { OpenObject, type ContractDecodeResult } from "../schema.ts";
+import {
+  OpenObject,
+  type ContractDecodeResult,
+} from "@purin-labs/contract-schema";
 import { normalizedTextSchema } from "./fields.ts";
 import { wireRecordParser } from "./wire-objects.ts";
 

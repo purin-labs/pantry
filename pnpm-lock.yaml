@@ -285,6 +285,9 @@ importers:
       '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../contract-schema
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
@@ -298,6 +301,9 @@ importers:
 
   packages/commerce-contracts:
     dependencies:
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../contract-schema
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
@@ -317,6 +323,9 @@ importers:
       '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../contract-schema
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
@@ -334,11 +343,27 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
+  packages/contract-schema:
+    dependencies:
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../std
+      typebox:
+        specifier: 1.3.27
+        version: 1.3.27
+    devDependencies:
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   packages/contracts:
     dependencies:
       '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../contract-schema
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
@@ -364,6 +389,9 @@ importers:
       '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../contract-schema
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../contracts
@@ -609,6 +637,9 @@ importers:
       '@purin-labs/commerce-query-sqlite':
         specifier: workspace:*
         version: link:../../packages/commerce-query-sqlite
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../packages/contract-schema
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
@@ -682,6 +713,9 @@ importers:
       '@purin-labs/commerce-query-sqlite':
         specifier: workspace:*
         version: link:../../packages/commerce-query-sqlite
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../packages/contract-schema
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts

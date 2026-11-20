@@ -16,7 +16,7 @@ import {
   parseContractArray,
   type ContractDecodeResult,
   type ContractRejection,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import { canonicalJson } from "@purin-labs/std";
 

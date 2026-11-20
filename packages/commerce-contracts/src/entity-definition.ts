@@ -19,7 +19,7 @@ import {
   parseContract,
   contractRefusal,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 
 const definitionsWire = Type.Array(attributeDefinitionWireSchema);
 function invalidRequest() {

@@ -7,7 +7,7 @@ import { compileCommerceQuerySql } from "@purin-labs/commerce-query-sqlite";
 import { planCommerceGraphQuery } from "@purin-labs/commerce-contracts/query-planner";
 import { encodeCommerceCursor } from "@purin-labs/commerce-contracts/query-encoders";
 import { parseCommerceCursorPayload } from "@purin-labs/commerce-contracts/cursor-payload";
-import type { ContractDecodeResult } from "@purin-labs/commerce-contracts/schema";
+import type { ContractDecodeResult } from "@purin-labs/contract-schema";
 import { parseCommerceQueryPlanOutcome } from "@purin-labs/commerce-client";
 
 import { NodeCommerceDatabase } from "../src/node-database.ts";

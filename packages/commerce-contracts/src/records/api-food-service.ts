@@ -4,7 +4,7 @@
 // timestamp as `Date.toISOString` writes it, and check that a resource's
 // provenance names the resource itself.
 import { Type, type Static, type TSchema } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import type {
   InventoryRequirementAdjustment,
   MenuScope,

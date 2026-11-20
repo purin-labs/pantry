@@ -1,7 +1,7 @@
 // Plan 78 step 2: the order edit records that packages/commerce-client
 // reads in src/order-edits.ts. Each schema follows its hand-written reader.
 import { Type, type Static, type TProperties } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

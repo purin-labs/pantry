@@ -5,7 +5,7 @@
 // the dispute was observed, compared to the nanosecond.
 import { Type, type Static } from "typebox";
 import { boundedTextSchema } from "./fields.ts";
-import { PositiveInteger } from "../schema.ts";
+import { PositiveInteger } from "@purin-labs/contract-schema";
 import type {
   PaymentDispute,
   PaymentDisputeLifecycle,

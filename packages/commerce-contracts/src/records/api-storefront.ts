@@ -6,7 +6,7 @@
 import { Type, type Static } from "typebox";
 import type { CheckoutProfileConfiguration } from "../commerce-domain.ts";
 import { parseCheckoutProfileConfiguration } from "../checkout-profile.ts";
-import { PositiveInteger } from "../schema.ts";
+import { PositiveInteger } from "@purin-labs/contract-schema";
 import { normalizedTextSchema, utcTimestampSchema } from "./fields.ts";
 import {
   discountCodeSchema,

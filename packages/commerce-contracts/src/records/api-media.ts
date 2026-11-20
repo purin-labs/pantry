@@ -3,7 +3,7 @@
 // keys, SHA-256 digests, image types without SVG, and alt text of at most 512
 // characters, which may be empty.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

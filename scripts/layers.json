@@ -23,6 +23,7 @@
   "packages": {
     "packages/std": "foundation/std",
     "packages/type-utils": "foundation/std",
+    "packages/contract-schema": "foundation/std",
     "packages/contracts": "foundation/contracts",
     "packages/control-api": "foundation/control",
     "packages/collaboration": "foundation/collaboration",

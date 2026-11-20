@@ -3,7 +3,7 @@
 // types; the type fixtures in the client prove them equal.
 import { Type, type Static } from "typebox";
 import { wireRecordParser } from "./wire-objects.ts";
-import { OpenObject, SafeInteger } from "../schema.ts";
+import { OpenObject, SafeInteger } from "@purin-labs/contract-schema";
 import { quantitySchema } from "./commerce-records.ts";
 
 export const productionRequestFieldsSchema = OpenObject({

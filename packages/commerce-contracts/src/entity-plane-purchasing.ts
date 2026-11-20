@@ -4,7 +4,7 @@ import {
   type ContractDecodeResult,
   type ContractRejection,
   NonNegativeInteger as count,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import { javascriptTrimmedTextSchema } from "./identity-text.ts";

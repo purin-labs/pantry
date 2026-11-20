@@ -11,6 +11,7 @@ on:
       - "packages/commerce-query-sqlite/**"
       - "packages/std/**"
       - "packages/type-utils/**"
+      - "packages/contract-schema/**"
       - "services/commerce/**"
       - "apps/storefront/**"
       - "scripts/check-runtime-boundary.mjs"

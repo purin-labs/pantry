@@ -8,7 +8,7 @@ import {
   PositiveInteger,
   ReadonlyRecord,
   SafeInteger,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import type { PluginDefinition } from "./plugins.ts";
 import {
   boundedTextSchema,

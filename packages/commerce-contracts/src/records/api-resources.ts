@@ -15,7 +15,7 @@ import {
   SafeInteger,
   recordParser,
   type ContractDecodeResult,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import {
   wireBuyerSchema,
   wireInventoryLotExpirySchema,

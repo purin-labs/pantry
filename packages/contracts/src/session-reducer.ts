@@ -1,6 +1,6 @@
 import { Type, type TSchema } from "typebox";
 import { isRecord, sameJson, sha256HexSync, utf8ByteLength } from "@purin-labs/std";
-import { StrictObject } from "@purin-labs/commerce-contracts/schema";
+import { StrictObject } from "@purin-labs/contract-schema";
 import { encodeHarnessCheckpointRecord } from "./digest-encoders.ts";
 import { encodeModelRoute } from "./model-route.ts";
 import {

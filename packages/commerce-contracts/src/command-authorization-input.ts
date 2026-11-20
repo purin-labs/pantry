@@ -4,7 +4,7 @@ import {
   StrictObject,
   normalizeContractInput,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { cursorRefusal } from "./cursor-values.ts";
 
 // The request admits an unknown authority; the selected authority parser checks it next.

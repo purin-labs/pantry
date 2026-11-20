@@ -4,7 +4,7 @@
 // schemas are the only source of the company records (Plan 78: a new type
 // goes into TypeScript); `src/companies.ts` in the client reads them.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

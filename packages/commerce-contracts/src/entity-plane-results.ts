@@ -3,7 +3,7 @@ import {
   StrictObject,
   parseContract,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type StaticDecode } from "typebox";
 import { assertNever } from "@purin-labs/std";
 import { type StrictUnion } from "@purin-labs/type-utils";

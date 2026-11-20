@@ -15,7 +15,6 @@
       "types": "./src/commerce-relationship-references.ts",
       "default": "./src/commerce-relationship-references.ts"
     },
-    "./schema": "./src/schema.ts",
     "./unicode": "./src/unicode.ts",
     "./commerce-boundary": "./src/commerce-boundary.ts",
     "./cue-facts": "./src/cue-facts.ts",
@@ -60,6 +59,7 @@
     "unicode:check": "node scripts/generate-unicode.mjs --check"
   },
   "dependencies": {
+    "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "typebox": "1.3.27"

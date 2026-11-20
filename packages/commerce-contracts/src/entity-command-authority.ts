@@ -4,7 +4,7 @@ import { parseCommerceEntityAuthority } from "./command-authority.ts";
 import { parseEntityLifecycleCommand } from "./entity-commands.ts";
 import { commerceSensitivitySchema } from "./entity-record.ts";
 import { cursorRefusal } from "./cursor-values.ts";
-import type { ContractDecodeResult } from "./schema.ts";
+import type { ContractDecodeResult } from "@purin-labs/contract-schema";
 
 export function validateEntityCommandAuthority(
   input: unknown,

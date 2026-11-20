@@ -25,6 +25,7 @@
   "dependencies": {
     "@purin-labs/collaboration": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/mail-reply-crdt": "workspace:*",
     "@purin-labs/menu-board-crdt": "workspace:*",
     "@purin-labs/menu-draft-crdt": "workspace:*",

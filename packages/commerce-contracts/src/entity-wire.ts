@@ -4,7 +4,7 @@ import {
   StrictObject,
   NonNegativeInteger as revision,
   SafeInteger as integer,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 
 import {

@@ -7,7 +7,10 @@ import type {
   ProtectedBuyerContact,
 } from "../commerce-domain.ts";
 import type { PointOfSaleBuyer } from "./commerce-records.ts";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import {
   parseInPersonPaymentBinding,
   parseOnlinePaymentBinding,

@@ -5,10 +5,10 @@ import {
   type ContractDecodeResult,
   type ContractRejection,
   SafeInteger as signed,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
-import { decodeChecked } from "./sorted-unions.ts";
+import { decodeChecked } from "@purin-labs/contract-schema/sorted-unions";
 import { assertNever, isRecord, isString } from "@purin-labs/std";
 import type { StrictUnion } from "@purin-labs/type-utils";
 

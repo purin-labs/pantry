@@ -1,5 +1,5 @@
 import { Type, type Static, type TSchema } from "typebox";
-import { NonNegativeInteger, StrictObject } from "@purin-labs/commerce-contracts/schema";
+import { NonNegativeInteger, StrictObject } from "@purin-labs/contract-schema";
 import { modelRouteSchema } from "./model-route.ts";
 
 // Session lifecycle contracts (Plan 78 Step 5). Each object lists its fields

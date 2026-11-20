@@ -2,7 +2,7 @@
 // reads in src/discounts.ts. Each schema follows its hand-written reader:
 // exact keys, and codes trimmed and in upper case, each code once.
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger, PositiveInteger } from "../schema.ts";
+import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   normalizedTextSchema,

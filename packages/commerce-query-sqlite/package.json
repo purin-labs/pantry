@@ -22,7 +22,8 @@
   "dependencies": {
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
-    "@purin-labs/commerce-contracts": "workspace:*"
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*"
   },
   "devDependencies": {
     "@purin-labs/commerce-client": "workspace:*",

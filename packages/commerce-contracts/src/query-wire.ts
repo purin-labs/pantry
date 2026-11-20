@@ -5,7 +5,10 @@ import {
   sortWire,
   freshnessWire,
 } from "./query-parts.ts";
-import { OpenObject, NonNegativeInteger as revision } from "./schema.ts";
+import {
+  OpenObject,
+  NonNegativeInteger as revision,
+} from "@purin-labs/contract-schema";
 import { Type } from "typebox";
 
 import { attributeValueWireSchema } from "./entity-wire.ts";

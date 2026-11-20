@@ -4,7 +4,7 @@ import {
   contractRefusal,
   parseContract,
   type ContractDecodeResult,
-} from "./schema.ts";
+} from "@purin-labs/contract-schema";
 import { commerceGraphQueryWireSchema } from "./query-wire.ts";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";

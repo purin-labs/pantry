@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import { StrictObject } from "@purin-labs/commerce-contracts/schema";
+import { StrictObject } from "@purin-labs/contract-schema";
 import type { AssignmentId } from "./types/AssignmentId";
 import type { SessionId } from "./types/SessionId";
 import type { SessionProposalId } from "./types/SessionProposalId";

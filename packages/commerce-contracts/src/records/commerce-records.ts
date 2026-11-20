@@ -8,7 +8,7 @@ import {
   SafeInteger,
   StrictObject,
   recordParser,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import { checkoutProfileReferenceSchema } from "./checkout-profile.ts";
 import {
   hasUniqueValues,

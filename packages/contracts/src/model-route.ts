@@ -1,7 +1,7 @@
 import {
   StrictObject,
   NonNegativeInteger as generation,
-} from "@purin-labs/commerce-contracts/schema";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import { assertNever } from "@purin-labs/std";
 import type { StrictUnion } from "@purin-labs/type-utils";

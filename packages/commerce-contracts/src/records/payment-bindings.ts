@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { OpenObject, PositiveInteger, SafeInteger, StrictObject } from "../schema.ts";
+import { OpenObject, PositiveInteger, SafeInteger, StrictObject } from "@purin-labs/contract-schema";
 import { identityTextSchema } from "./commerce-fields.ts";
 import { countryCodeTextSchema, currencyCodeTextSchema } from "./fields.ts";
 import { integrationAccountIdSchema } from "./identifiers.ts";

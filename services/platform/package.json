@@ -64,6 +64,7 @@
     "@purin-labs/commerce-client": "workspace:*",
     "@purin-labs/commerce-query-sqlite": "workspace:*",
     "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

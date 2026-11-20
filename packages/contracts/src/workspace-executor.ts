@@ -6,7 +6,7 @@ import {
   type ContractDecodeResult,
   type ContractRejection,
   NonNegativeInteger as unsignedInteger,
-} from "@purin-labs/commerce-contracts/schema";
+} from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import type { TLocalizedValidationError } from "typebox/error";
 import type { StrictUnion } from "@purin-labs/type-utils";

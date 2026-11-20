@@ -28,7 +28,7 @@ import {
   SafeInteger,
   StrictObject,
   recordParser,
-} from "../schema.ts";
+} from "@purin-labs/contract-schema";
 import { normalizedTextSchema } from "./fields.ts";
 import { commerceListEntryRefSchema } from "../authority-scope.ts";
 import {

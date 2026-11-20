@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/commerce-contracts/schema";
+import { recordParser } from "@purin-labs/contract-schema";
 import { recipeRevisionResourceSchema } from "@purin-labs/commerce-contracts/records/api-food-service";
 import {
   evaluateCostFormula,
