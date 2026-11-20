@@ -1316,6 +1316,54 @@ foundation/conversation`: 28 to 22. `foundation/authority -> foundation/agent`: 
 -> surfaces/slack` (3): the Slack notices of a permission request and of a held
   effect.
 
+### A2.1 — One decision API, parts 1 to 3 (2026-11-21)
+
+Parts 1 to 3 of the step are done: the record, the one read and the one decide call.
+Parts 4 to 6 are open: the one Portal card, the one Slack card builder and the journey
+for a refused Gmail reply.
+
+- **The record.** [Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)
+  gives each kind: its store, who reads it, who decides, what happens, and what a
+  person sees in the Portal and in Slack.
+- **The one read.** `GET /v1/control/organisations/{id}/decisions` gives the
+  decisions that wait for the reader. `PendingDecision` in
+  `@purin-labs/control-api` is the union: `governed_action`, `held_output`,
+  `permission_request` and `email_review`. `listPendingDecisions`
+  (`control/pending-decisions.ts`) reads each store one time with the read of its
+  page, copies no record and writes nothing. A Case approval wait is the Case's view
+  of a ledger action, so that action is one entry. No route changed its answer.
+- **The one decide call.** `decidePendingDecision`
+  (`control/decide-pending-decision.ts`) takes a `PendingDecisionCall`: the kind,
+  the id of the entry in the one read, and the answer `allow` or `refuse`. It gives
+  the call to the store that owns the decision. The nine decide routes call it: the
+  held output, the permission request, the approval and the rejection of a commerce
+  action, the approval of a custom connector write, and the approve and reject
+  actions of a Gmail reply and of an operational email.
+- **Each store keeps its checks.** The code of each store did not change: the role,
+  the step-up grant, the mutation boundary, the challenge of an email proposal, the
+  receipt and the effect. Each route answers with the same status and body, and it
+  makes its checks in the same order.
+- **The proof is the request.** The call carries the request as the proof of the
+  person, because the step-up grant, the mutation boundary and the challenge are in
+  it. The stores still answer with a `Response`. A decide function with a `Result`
+  for each store is a larger change of four route files; it is not done.
+- **A custom connector write has no refusal.** The type of the call permits only
+  `allow` for it.
+- **Slack does not use the call.** The Deny of a permission request
+  (`slack/permission-request-deny.ts`) and the buttons of a commerce action
+  (`slack/commerce-approval.ts`) prove the person through a verified Slack link, not
+  through a Portal session. They call the stores directly, as before.
+- **Layers.** `control/pending-decisions.ts` and `control/decide-pending-decision.ts`
+  are `foundation/control` and name no area. The Worker file
+  `control/pending-decision-parts.ts` gives the readers and the stores. Layer
+  crossings: 477, no change.
+- **Still open: part 4.** One Portal card in `apps/portal/src/ui/` for the six
+  places that show a decision. The owner must decide the items in "Two looks of one
+  kind, as found" of Appendix E.
+- **Still open: part 5.** One Slack card builder, with a temporary check that the
+  block JSON is equal byte for byte.
+- **Still open: part 6.** No journey rejects a Gmail reply.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

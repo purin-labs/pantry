@@ -5,12 +5,28 @@ import type {
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { listEmailReviewProjections } from "../data/email-review";
 import type { Env } from "../env";
+import {
+  decidePendingDecision,
+  type DecidePendingDecision,
+  type PendingDecisionDeciders,
+} from "./decide-pending-decision";
 import type { PendingDecisionSources } from "./pending-decisions";
+import { handleEmailOperational } from "./routes/agents/email-operational";
+import { handleEmailReply } from "./routes/agents/email-reply";
+import {
+  handleCommerceActionApproval,
+  handleCommerceActionRejection,
+} from "./routes/commerce/actions";
+import { approveCustomConnectorWriteAction } from "./routes/custom-connectors/write-actions";
 import {
   agentPermissionRequestSummaries,
+  decideAgentPermission,
   mayDecideAgentPermissionRequests,
 } from "./routes/agent-permission-requests";
-import { heldOutputSummaries } from "./routes/held-output-requests";
+import {
+  decideHeldOutput,
+  heldOutputSummaries,
+} from "./routes/held-output-requests";
 
 /** The most ledger entries and email proposals that one read looks at. */
 const ACTION_READ_LIMIT = 50;
@@ -99,4 +115,50 @@ export function pendingDecisionSources(env: Env): PendingDecisionSources {
       return waiting;
     },
   };
+}
+
+/**
+ * The stores that record an answer, as the routes of each store did before
+ * the one decide call. Each store keeps its checks, its receipt and its
+ * effect.
+ */
+function pendingDecisionDeciders(env: Env): PendingDecisionDeciders {
+  return {
+    heldOutput: (proof, call) => decideHeldOutput(env, proof, call),
+    permissionRequest: (proof, call) => decideAgentPermission(env, proof, call),
+    governedAction({ request, organisationIdRaw }, call) {
+      if (call.surface === "custom_connector")
+        return approveCustomConnectorWriteAction(request, env, {
+          organisationIdRaw,
+          connectorIdRaw: call.connectorIdRaw,
+          actionNonceRaw: call.id,
+        });
+      return call.answer === "allow"
+        ? handleCommerceActionApproval(request, env, organisationIdRaw, call.id)
+        : handleCommerceActionRejection(
+            request,
+            env,
+            organisationIdRaw,
+            call.id,
+          );
+    },
+    emailReview({ request, organisationIdRaw }, call) {
+      const action = call.answer === "allow" ? "approve" : "reject";
+      return call.message === "gmail_reply"
+        ? handleEmailReply(request, env, organisationIdRaw, call.id, action)
+        : handleEmailOperational(
+            request,
+            env,
+            organisationIdRaw,
+            call.id,
+            action,
+          );
+    },
+  };
+}
+
+/** The one decide call, with the stores of this Worker. */
+export function decidePendingDecisionWith(env: Env): DecidePendingDecision {
+  return (proof, call) =>
+    decidePendingDecision(pendingDecisionDeciders(env), proof, call);
 }

@@ -1,3 +1,8 @@
+import type {
+  DecidePendingDecision,
+  PendingDecisionAnswer,
+  PendingDecisionProof,
+} from "../decide-pending-decision";
 import {
   parseAgentPermissionDecision,
   type AgentPermissionGrantTarget,
@@ -105,6 +110,7 @@ export async function handleAgentPermissionRequestRoute(
   request: Request,
   env: Env,
   route: AgentPermissionRequestRoute,
+  decide: DecidePendingDecision,
 ): Promise<Response> {
   if (route.transport === "list") {
     if (request.method !== "GET")
@@ -159,10 +165,30 @@ export async function handleAgentPermissionRequestRoute(
   const decision = body.ok ? parseAgentPermissionDecision(body.value) : null;
   if (decision === null)
     return controlError("agent_permission_decision_invalid", 422);
+  return decide(
+    { request, organisationIdRaw: route.organisationIdRaw },
+    {
+      kind: "permission_request",
+      id: route.requestId,
+      answer: decision === "allow" ? "allow" : "refuse",
+    },
+  );
+}
+
+/**
+ * Records the answer of an owner or admin to one permission request, and
+ * gives it to the thread or the chat that waits.
+ */
+export async function decideAgentPermission(
+  env: Env,
+  proof: PendingDecisionProof,
+  call: Readonly<{ id: string; answer: PendingDecisionAnswer }>,
+): Promise<Response> {
+  const decision = call.answer === "allow" ? "allow" : "deny";
   const authorized = await authorizeOrganisationRequest(
-    request,
+    proof.request,
     env,
-    route.organisationIdRaw,
+    proof.organisationIdRaw,
     "admin",
     true,
   );
@@ -172,7 +198,7 @@ export async function handleAgentPermissionRequestRoute(
   const stored = await readAgentPermissionRequest(
     scope.database,
     authorized.organisationId,
-    route.requestId,
+    call.id,
   );
   if (stored === null)
     return controlError("agent_permission_request_not_found", 404);

@@ -1,3 +1,4 @@
+import type { DecidePendingDecision } from "../decide-pending-decision";
 import type { Env } from "../../env";
 import { parseCustomConnectorRevision } from "../../custom-connectors";
 import { controlError } from "../http";
@@ -169,6 +170,7 @@ export function handleCustomConnectorControlRoute(
   request: Request,
   env: Env,
   route: CustomConnectorControlRoute,
+  decide: DecidePendingDecision,
 ): Promise<Response> {
   switch (route.kind) {
     case "customConnectors":
@@ -194,7 +196,7 @@ export function handleCustomConnectorControlRoute(
     case "customConnectorSetupAction":
       return handleSetupAction(request, env, route);
     case "customConnectorWriteAction":
-      return handleCustomConnectorWriteAction(request, env, route);
+      return handleCustomConnectorWriteAction(request, env, route, decide);
     default:
       return assertNever(route);
   }

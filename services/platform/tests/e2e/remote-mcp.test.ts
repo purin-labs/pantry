@@ -1,3 +1,4 @@
+import { decidePendingDecisionWith } from "../../src/control/pending-decision-parts";
 import {
   handleCustomConnectorControlRoute,
   matchCustomConnectorControlRoute,
@@ -950,6 +951,7 @@ function dispatchControlWrite(
     request,
     new Proxy(env, { get: controlWriteBinding }),
     route,
+    decidePendingDecisionWith(new Proxy(env, { get: controlWriteBinding })),
   );
 }
 
