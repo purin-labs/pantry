@@ -244,7 +244,6 @@
     "services/platform/src/agent-tools/drafts/handlers.ts = services/platform/src/agent-tools/drafts/handlers.ts": 3,
     "services/platform/src/agent-tools/integrations/handlers.ts = services/platform/src/agent-tools/integrations/handlers.ts": 1,
     "services/platform/src/agent-tools/kitchen/costs-handlers.ts = services/platform/src/control/routes/costs.ts": 1,
-    "services/platform/src/authorization/access-grants/compiler.ts = services/platform/src/authorization/access-grants/compiler.ts": 1,
     "services/platform/src/authorization/access-grants/turn-authority.ts = services/platform/src/authorization/access-grants/turn-authority.ts": 2,
     "services/platform/src/authorization/access-grants/turn-authority.ts = services/platform/src/case-context-discovery/evidence.ts": 1,
     "services/platform/src/boundary.ts = services/platform/src/queue-fields.ts": 1,

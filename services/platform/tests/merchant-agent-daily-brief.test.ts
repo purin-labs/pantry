@@ -7,11 +7,6 @@ import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";
 import type { MerchantReportName } from "../src/commerce/entity-plane/merchant-reports";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
-import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
-import {
-  parseCommerceBindingId,
-  parseCommerceEngineMerchantId,
-} from "../src/data/commerce-merchant-binding";
 import { parseOrganisationId } from "../src/ids";
 
 const ORGANISATION_ID = "organisation_urk_brief";
@@ -90,15 +85,6 @@ function fixtureReader(): CommerceGraphReader {
   return new CommerceGraphReader({
     organisationId: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
-    commerceSystem: {
-      kind: "satyr_commerce" as const,
-      organisationId: required(parseOrganisationId(ORGANISATION_ID)),
-      bindingId: required(
-        parseCommerceBindingId("underclerk_binding_urk_brief"),
-      ),
-      merchantId: required(parseCommerceEngineMerchantId(MERCHANT_ID)),
-      revision: required(parseCommerceSystemRevision(1)),
-    },
     underclerk: new CommerceEngineSource({
       organisationId: ORGANISATION_ID,
       merchantId: MERCHANT_ID,

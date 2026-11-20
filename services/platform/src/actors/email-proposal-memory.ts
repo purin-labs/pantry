@@ -1,6 +1,6 @@
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
-import { readShownMemoryStanding } from "../memory/access";
+import { memoryService } from "../memory/contract/memory-service";
 import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 
@@ -78,7 +78,7 @@ export async function emailProposalMemoryStanding(
 ): Promise<"in_force" | "changed" | "unavailable"> {
   const shown = readEmailProposalMemory(input.sql, input.proposalId);
   if (shown.length === 0) return "in_force";
-  return readShownMemoryStanding({
+  return memoryService.use().readShownMemoryStanding({
     env: input.env,
     execution: input.scope,
     organisationId: input.organisationId,

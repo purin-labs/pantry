@@ -25,7 +25,7 @@ import {
   readActiveOrganisationMembership,
 } from "../../src/data/control-plane";
 import { buildControlAuthority } from "../../src/request-authority";
-import { readNamedCommerceQuery } from "../../src/context/assembly/commerce";
+import { readNamedCommerceQuery } from "../../src/commerce/entity-plane/context-read";
 import { CommerceGraphReader } from "../../src/commerce/entity-plane/graph-reader";
 import { CommerceEngineSource } from "../../src/commerce/entity-plane/commerce-source";
 import { createCommerceEntityPlaneClient } from "../../src/commerce/contract/client";
@@ -107,7 +107,6 @@ async function procedureAccessJourney({ task }: TestContext): Promise<void> {
   const reader = new CommerceGraphReader({
     organisationId,
     merchantId,
-    commerceSystem: commerce.value.commerceSystem,
     underclerk: new CommerceEngineSource({
       organisationId,
       merchantId,

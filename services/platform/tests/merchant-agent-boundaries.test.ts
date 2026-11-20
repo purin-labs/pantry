@@ -12,10 +12,10 @@ import {
 import { previewCode } from "../src/slack/configuration-presentation";
 import {
   installMerchantAgent,
-  merchantAgentAgentId,
   merchantAgentDefaultSkills,
   merchantAgentInstallationId,
 } from "../src/data/merchant-agent-preset";
+import { merchantAgentAgentId } from "../src/data/merchant-agent-ids";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

@@ -42,7 +42,7 @@ import { readOrganisationCapabilityPolicies } from "../../data/capability-policy
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import type { Env } from "../../env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { releaseAgentPermissionDecision } from "../../slack/permission-request-release";
+import { slackSurfaceParts } from "../../slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -231,7 +231,9 @@ export async function decideAgentPermission(
   // The decision is stored. When Slack cannot take it now, the scheduled
   // reconciliation hands it to the thread once Slack works; a repeated
   // decision tries again at once.
-  const released = await releaseAgentPermissionDecision(env, scope, decided);
+  const released = await slackSurfaceParts
+    .use()
+    .releaseAgentPermissionDecision(env, scope, decided);
   return controlJson({
     ok: true,
     status: decided.status,

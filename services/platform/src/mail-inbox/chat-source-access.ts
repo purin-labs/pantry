@@ -4,7 +4,7 @@ import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import { listAccessGrants } from "../data/access-grants";
 import type { Env } from "../env";
 import { parseOrganisationId } from "../ids";
-import { readMemoryViews } from "../memory/access";
+import { memoryService } from "../memory/contract/memory-service";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   createCurrentObservedSourceFlowLabel,
@@ -129,7 +129,7 @@ export async function authorizeEmailChatSourceDelivery(
   if (context.memory.length === 0) return { ok: true, value: null };
   // A Memory with anything hidden from this person is absent from their
   // views, as one that no longer exists is.
-  const views = await readMemoryViews(
+  const views = await memoryService.use().readMemoryViews(
     env,
     {
       ...person,

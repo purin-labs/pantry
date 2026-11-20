@@ -18,7 +18,7 @@ import {
 } from "../../ids";
 import { digestCanonical } from "../../policy";
 import type { Result } from "../../result";
-import { listPublishedCommerceTargets } from "../../commerce/entity-plane/published-resources";
+import { commerceAccessTargets } from "../../access-control/commerce-access-targets";
 import {
   readAccessControlOrganisationProjection,
   readAccessControlView,
@@ -757,7 +757,7 @@ async function readCommerceTargetOptions(
     query.query,
   );
   if (!cursor.ok) return cursor;
-  const targets = await listPublishedCommerceTargets({
+  const targets = await commerceAccessTargets.use().listPublishedTargets({
     env,
     organisationId,
   });

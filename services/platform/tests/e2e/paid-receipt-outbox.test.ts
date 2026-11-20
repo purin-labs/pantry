@@ -15,7 +15,7 @@ import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/co
 import {
   createSlackOrganisationConnection,
   disableSlackOrganisationConnection,
-} from "../../src/slack/organisation-routing";
+} from "../../src/slack/installation-store";
 import { reconcileCommerceOutbox } from "../../src/commerce/outbox-worker";
 import { runScheduledPaidReceiptDelivery } from "../../src/commerce/paid-receipt";
 import { placeCafeOrder, publishCafeMenu } from "./cafe-order-support";

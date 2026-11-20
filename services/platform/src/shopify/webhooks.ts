@@ -34,7 +34,7 @@ import type { ShopifyWebhookError } from "./connector";
 import {
   normalizeShopifyCommerceCatalogDelivery,
   normalizeShopifyCommerceInventoryDelivery,
-} from "../commerce/commerce-wasm";
+} from "./delivery-normalizers";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { commerceObservationIdentity } from "../commerce/contract/observation-identity";

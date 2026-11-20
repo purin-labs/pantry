@@ -61,7 +61,7 @@ import {
   bindUnboundSetupChannel,
   prepareSlackRoutingAuditEvent,
   resolveActiveSlackDestinationConnection,
-} from "../../../slack/organisation-routing";
+} from "../../../slack/installation-store";
 import { resolveOrganisationCommerceSystemAuthority } from "../../../data/organisation-commerce-system";
 import { previewMerchantPluginAction } from "../../../commerce/provider-execution";
 import type { CommerceProviderExecutionError } from "../../../commerce/contract/commerce-provider";

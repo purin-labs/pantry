@@ -45,7 +45,7 @@ import {
   createSlackOrganisationConnection,
   disableSlackOrganisationConnection,
   resolveSlackInstallation,
-} from "../slack/organisation-routing";
+} from "../slack/installation-store";
 
 export async function connectSlack(
   input: CompleteProviderInput,

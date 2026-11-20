@@ -23,7 +23,6 @@ import {
   type HeldEffectPassUse,
   type HeldOutputReason,
 } from "../data/held-output-request";
-import { heldEffectNoticeText } from "../slack/held-output-notice";
 import {
   heldEffectActionRecord,
   type EffectAction,
@@ -45,8 +44,7 @@ import {
   readNeedsPrivateChat,
   type RequestableEntityTypeRead,
 } from "../authorization/requestable-capabilities";
-import { CARD_ONLY_REPLY_INSTRUCTION } from "../slack/card-only-reply";
-import { permissionRequestNoticeText } from "../slack/permission-request-notice";
+import { slackSurfaceParts } from "../slack/surface-parts";
 import {
   requireSessionExecution,
   type SessionExecutionAdmission,
@@ -359,14 +357,16 @@ export async function requestPermissionForHarness(
   const notice = await connector.value.noticeSlackPermission({
     identity,
     requestId,
-    noticeText: permissionRequestNoticeText(capabilityIds, entityTypeReads),
+    noticeText: slackSurfaceParts
+      .use()
+      .permissionRequestNoticeText(capabilityIds, entityTypeReads),
     card: true,
   });
   return {
     kind: "permission_requested",
     detail:
       notice.ok && notice.value.notice === "posted"
-        ? `Seams Pantry posted a card with this request and its buttons in this thread. Do not give a link. Do not do the work now. ${CARD_ONLY_REPLY_INSTRUCTION}`
+        ? `Seams Pantry posted a card with this request and its buttons in this thread. Do not give a link. Do not do the work now. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`
         : "Seams Pantry stored the request, but the thread does not hold its link. Tell the person that you asked an owner or admin, who can allow it under Access in the Portal. Do not do the work now.",
   };
 }
@@ -604,12 +604,12 @@ export async function passOrAskForExitApproval(
   await connector.value.noticeSlackPermission({
     identity,
     requestId,
-    noticeText: heldEffectNoticeText(input.reason),
+    noticeText: slackSurfaceParts.use().heldEffectNoticeText(input.reason),
   });
   throw new ExitApprovalRequestedError(
     input.reason === "outside_written"
-      ? `Seams Pantry stopped this step, because this conversation read text that a person outside the Organisation wrote, and this step changes something. It posted a card with this request in this thread, and the request continues here after it is allowed. The step must then be the same. Do not give a link. Do not try this step again in this turn. ${CARD_ONLY_REPLY_INSTRUCTION}`
-      : `Seams Pantry stopped this step, because it uses content that this destination may not receive. It posted a card with this request in this thread, and the step continues here after it is allowed. Do not give a link. Do not try this step again in this turn. ${CARD_ONLY_REPLY_INSTRUCTION}`,
+      ? `Seams Pantry stopped this step, because this conversation read text that a person outside the Organisation wrote, and this step changes something. It posted a card with this request in this thread, and the request continues here after it is allowed. The step must then be the same. Do not give a link. Do not try this step again in this turn. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`
+      : `Seams Pantry stopped this step, because it uses content that this destination may not receive. It posted a card with this request in this thread, and the step continues here after it is allowed. Do not give a link. Do not try this step again in this turn. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`,
   );
 }
 

@@ -15,6 +15,9 @@ import "../provide-organisation-lifecycle-parts";
 // module during that load never gets it. A Worker bundle has no such load, so
 // the suite loads the module that the OpenRouter route uses here, once.
 import "@earendil-works/pi-ai/api/openai-completions";
+// A test that calls a Platform module before the Worker loads still finds
+// the ports that the Worker registers.
+import "../../src/worker-ports";
 
 const DATA_ROOT = "ERERERERERERERERERERERERERERERERERERERERERE=";
 const VAULT_ROOT_V1 = "IiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiI=";

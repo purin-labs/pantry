@@ -9,7 +9,11 @@ import {
   type MerchantAgentSkillName,
 } from "./merchant-agent-skills";
 
-import { organisationIdUniquePart, type OrganisationId } from "../ids";
+import type { OrganisationId } from "../ids";
+import {
+  merchantAgentAgentId,
+  merchantAgentSuffix,
+} from "./merchant-agent-ids";
 import type { Result } from "../result";
 import {
   applyAgentOperation,
@@ -23,26 +27,10 @@ import type { AgentSkillRef } from "@purin-labs/control-api";
  */
 export const MERCHANT_AGENT_READ_CAPABILITY = "commerce.entity_plane.context";
 
-/**
- * Sous Chef's record identifiers, one set per organisation.
- *
- * The area, agent, installation and skill tables all key on a bare id rather
- * than on (organisation_id, id), so a fixed constant would let the first organisation's
- * install take the id and every later organisation's fail with a bare conflict.
- * Deriving from the organisation is preferred over a digest: a repeat install for
- * the same organisation then fails closed rather than quietly standing up a second
- * Sous Chef beside the first.
- */
-function merchantAgentSuffix(organisationId: OrganisationId): string {
-  return organisationIdUniquePart(organisationId).replaceAll("-", "_");
-}
-
+// Sous Chef's record identifiers derive from the organisation
+// (`merchant-agent-ids.ts`).
 export function merchantAgentAreaId(organisationId: OrganisationId): string {
   return `area_urk_merchant_operations_${merchantAgentSuffix(organisationId)}`;
-}
-
-export function merchantAgentAgentId(organisationId: OrganisationId): string {
-  return `agent_urk_${merchantAgentSuffix(organisationId)}`;
 }
 
 export function merchantAgentInstallationId(organisationId: OrganisationId): string {

@@ -4,8 +4,17 @@ import type { ActionLedgerActivity } from "../actors/action-ledger";
 import type { AgentOperationsSnapshot } from "../data/agent-operations";
 import type { Env, OrganisationActorStub } from "../env";
 import type { OrganisationId } from "../ids";
-import { readCommerceExceptionInbox } from "../commerce/operations-workbench";
+import { definePort } from "../port";
 import type { CommerceExceptionInbox } from "@purin-labs/control-api";
+
+/**
+ * The commerce exceptions of an Organisation, which the agent operations
+ * page shows beside its agents. Commerce reads them, and the Worker registers
+ * the reader (`worker-ports.ts`).
+ */
+export const commerceExceptionInbox = definePort<
+  (env: Env, organisationId: OrganisationId) => Promise<CommerceExceptionInbox>
+>("commerce_exception_inbox");
 
 type AgentOperationsWithActivity = AgentOperationsSnapshot & {
   readonly actionLedger: readonly ActionLedgerActivity[];
@@ -49,7 +58,7 @@ async function readAgentOperationsWithActivityFromOrganisation(
     organisationId,
     now,
   });
-  const commerceExceptions = await readCommerceExceptionInbox(
+  const commerceExceptions = await commerceExceptionInbox.use()(
     env,
     organisationId,
   );

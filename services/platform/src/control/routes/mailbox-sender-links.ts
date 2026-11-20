@@ -26,11 +26,7 @@ import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
-import {
-  commerceGraphControlAuthority,
-  controlCommerceSensitivityCeiling,
-  openControlCommerceGraph,
-} from "../commerce-graph";
+import { commerceGraphReads } from "../../commerce/contract/graph-reads";
 import {
   controlError,
   controlJson,
@@ -277,14 +273,15 @@ async function readSupplier(
   } catch {
     return { kind: "missing" };
   }
-  const graph = await openControlCommerceGraph(env, authorized);
+  const reads = commerceGraphReads.use();
+  const graph = await reads.openControlCommerceGraph(env, authorized);
   if (!graph.ok) return { kind: "unavailable" };
   const now = Date.now();
-  const authority = commerceGraphControlAuthority({
+  const authority = reads.commerceGraphControlAuthority({
     organisationId: authorized.organisationId,
     merchantId: graph.value.merchantId,
     principalId: authorized.authenticated.session.userId,
-    sensitivityCeiling: controlCommerceSensitivityCeiling(authorized),
+    sensitivityCeiling: reads.controlCommerceSensitivityCeiling(authorized),
     query,
     now,
   });

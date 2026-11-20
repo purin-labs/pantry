@@ -106,12 +106,9 @@ import {
   handleStripeWebhook,
 } from "./stripe/webhooks";
 import { handleWhatsAppWebhook } from "./whatsapp/webhook-route";
-import { provideOrganisationLifecycleParts } from "./data/organisation-lifecycle-port";
-import { ORGANISATION_LIFECYCLE_PARTS } from "./organisation-lifecycle-parts";
-
-// The lifecycle batches of tenancy get the parts of the table owners before
-// the Worker serves a request or starts an Actor.
-provideOrganisationLifecycleParts(ORGANISATION_LIFECYCLE_PARTS);
+// The Worker registers the ports of the lower modules (`worker-ports.ts`)
+// before it serves a request or starts an Actor.
+import "./worker-ports";
 
 export { CodeModePlatformGovernorActor } from "./actors/code-mode-platform-governor";
 
@@ -163,10 +160,7 @@ export default {
     // Durable Object.
     if (controller.cron === "*/5 * * * *") {
       ctx.waitUntil(
-        runScheduledCommerceOutboxReconciliation(
-          env,
-          controller.scheduledTime,
-        ),
+        runScheduledCommerceOutboxReconciliation(env, controller.scheduledTime),
       );
       return;
     }

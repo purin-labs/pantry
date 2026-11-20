@@ -34,7 +34,7 @@ import {
   configureSlackChannelDefault,
   createSlackInstallation,
   createSlackOrganisationConnection,
-} from "../src/slack/organisation-routing";
+} from "../src/slack/installation-store";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
@@ -104,7 +104,8 @@ async function deliversSelectedDestinationAfterRotation(): Promise<void> {
       SLACK_APP_ID: "A_PLAN19_ROTATE",
       PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
       VAULT_ROOT_V1: fixture.root,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     }),
     fixture.organisationId,
   );
@@ -173,7 +174,8 @@ async function createRotationFixture(): Promise<RotationFixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Plan 19 Rotation",
@@ -243,7 +245,8 @@ async function createRotationFixture(): Promise<RotationFixture> {
   await createSlackOrganisationConnection(
     {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       connectionId,

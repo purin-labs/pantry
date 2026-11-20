@@ -46,6 +46,7 @@ import type {
   HarnessConfigurationProposalRequest,
 } from "./services";
 import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
+import { readNamedCommerceQuery } from "../../commerce/entity-plane/context-read";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import {
   admitCommerceReadObservation,
@@ -276,5 +277,6 @@ const COMMERCE_TOOL_READS: CommerceToolReads = {
   selectInternalQuerySourceGrant,
   selectMerchantReportSourceGrant,
   supplierDirectoryQuery,
+  readNamedCommerceQuery,
   parseCommerceGraphQuery,
 };

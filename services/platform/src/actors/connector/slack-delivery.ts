@@ -56,7 +56,7 @@ import {
   isDeviceAlertDelivery,
 } from "../../devices/contract/alert-delivery";
 import { slackMayApproveAction } from "../../commerce/action-model";
-import { resolveActiveSlackDestinationConnection } from "../../slack/organisation-routing";
+import { resolveActiveSlackDestinationConnection } from "../../slack/installation-store";
 import { requireActiveOrganisationActor } from "../actor-router";
 import { checkPreparedConnectorDelivery } from "../connector-slack-stream";
 import {

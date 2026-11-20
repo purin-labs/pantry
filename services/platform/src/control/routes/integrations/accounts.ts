@@ -13,7 +13,7 @@ import {
 } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import { tearDownAgentMailboxForRemoval } from "../../../mail-inbox/agent-mailbox-teardown";
+import { connectionParts } from "../../../integrations/contract/connection-parts";
 import {
   authorizeAccountRequest,
   parseReplacementAccountId,
@@ -79,12 +79,14 @@ export async function handleRemoveAccount(
   const now = Date.now();
   // Stand a Gmail mailbox down before the connection goes: removal revokes the
   // Google grant, and a revoked grant cannot delete the drafts Pantry created.
-  const mailboxTeardown = await tearDownAgentMailboxForRemoval(
-    env,
-    authorized.executionScope,
-    integrationAccountId,
-    "erase",
-  );
+  const mailboxTeardown = await connectionParts
+    .use()
+    .mailbox.tearDownAgentMailboxForRemoval(
+      env,
+      authorized.executionScope,
+      integrationAccountId,
+      "erase",
+    );
   if (mailboxTeardown.kind === "connector_unavailable") {
     return controlError("email_teardown_unavailable", 503);
   }
@@ -173,12 +175,14 @@ export async function handleDisableAccount(
   });
   if (admitted instanceof Response) return admitted;
   const now = Date.now();
-  const teardown = await tearDownAgentMailboxForRemoval(
-    env,
-    authorized.executionScope,
-    integrationAccountId,
-    "stand_down",
-  );
+  const teardown = await connectionParts
+    .use()
+    .mailbox.tearDownAgentMailboxForRemoval(
+      env,
+      authorized.executionScope,
+      integrationAccountId,
+      "stand_down",
+    );
   if (teardown.kind === "connector_unavailable") {
     return controlError("email_teardown_unavailable", 503);
   }

@@ -5,7 +5,7 @@ import {
   normalizeShopifyCommerceInventoryDelivery,
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../commerce/commerce-wasm";
+} from "./delivery-normalizers";
 import type { VaultHandle } from "../credential-vault";
 import {
   createConnectedIntegration,

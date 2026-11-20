@@ -36,8 +36,8 @@ import {
   type OrganisationMember,
 } from "../../data/control-plane";
 import { CommerceGraphReader } from "../../commerce/entity-plane/graph-reader";
-import { CommerceReadRequestError } from "../../context/assembly/commerce";
-import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
+import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
+import { selectNamedCommerceQuerySourceGrant } from "../../commerce/entity-plane/context-read";
 import { prepareCommerceReadForEmbeddedHarness } from "./handlers";
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 

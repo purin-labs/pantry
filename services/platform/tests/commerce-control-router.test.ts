@@ -1,5 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { describe, expect, it, vi } from "vitest";
 
 const controlMocks = vi.hoisted(() => ({
@@ -140,9 +142,9 @@ vi.mock("../src/policy-snapshot", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/policy-snapshot")>()),
   loadOrganisationPolicyOrDefaultDeny: policyMocks.loadOrganisationPolicyOrDefaultDeny,
 }));
-vi.mock("../src/slack/organisation-routing", async (importOriginal) => ({
+vi.mock("../src/slack/installation-store", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/slack/organisation-routing")
+    typeof import("../src/slack/installation-store")
   >()),
   resolveActiveSlackDestinationConnection:
     slackRoutingMocks.resolveActiveSlackDestinationConnection,

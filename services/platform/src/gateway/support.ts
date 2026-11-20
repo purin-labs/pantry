@@ -60,11 +60,11 @@ import { resolveConfiguredSlackInstallationIdentity } from "../slack/installatio
 import {
   disconnectSlackInstallation,
   resolveSlackInstallation,
-} from "../slack/organisation-routing";
+} from "../slack/installation-store";
 import {
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../commerce/commerce-wasm";
+} from "../shopify/delivery-normalizers";
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,

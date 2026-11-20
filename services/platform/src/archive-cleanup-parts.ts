@@ -5,7 +5,7 @@ import { revokeOrganisationDevicesStatements } from "./devices/store";
 import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,
-} from "./slack/organisation-routing";
+} from "./slack/installation-store";
 import { removeVoiceMacNames } from "./voice/dns";
 import {
   listVoiceMacNameIds,

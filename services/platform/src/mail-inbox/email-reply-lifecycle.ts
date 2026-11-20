@@ -1,6 +1,9 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Env } from "../env";
-import { readMemoryViews } from "../memory/access";
+import {
+  memoryService,
+  type MemoryReadScope,
+} from "../memory/contract/memory-service";
 import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
 import { resolveActiveCaseActor } from "../actors/actor-router";
 import {
@@ -79,7 +82,7 @@ function caseRefusedMove(code: string): boolean {
  */
 export async function replyMemoryViews(
   env: Env,
-  viewer: Parameters<typeof readMemoryViews>[1],
+  viewer: MemoryReadScope,
   shown: readonly ShownMemoryRevision[],
 ): Promise<
   readonly Readonly<{
@@ -89,7 +92,7 @@ export async function replyMemoryViews(
   }>[]
 > {
   if (shown.length === 0) return [];
-  const views = await readMemoryViews(env, viewer);
+  const views = await memoryService.use().readMemoryViews(env, viewer);
   if (!views.ok) return [];
   const used = [];
   for (const one of shown) {

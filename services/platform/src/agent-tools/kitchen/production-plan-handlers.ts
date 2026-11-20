@@ -18,10 +18,7 @@ import {
 } from "./services";
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import {
-  CommerceReadRequestError,
-  readNamedCommerceQuery,
-} from "../../context/assembly/commerce";
+import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import { parseProductionRequestFields } from "@purin-labs/commerce-client";
 import {
   type DraftThreadLink,
@@ -131,7 +128,7 @@ async function readProductionPlanSources(
   if (!query.ok) {
     throw new Error(`${label} query invalid`);
   }
-  const read = await readNamedCommerceQuery({
+  const read = await commerce.readNamedCommerceQuery({
     organisationId: String(organisationId),
     merchantId: prepared.merchantId,
     grants: prepared.grants,

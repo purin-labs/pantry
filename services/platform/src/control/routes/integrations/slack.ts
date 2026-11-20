@@ -38,9 +38,9 @@ import {
   disconnectSlackInstallation,
   listSlackOrganisationRouting,
   prepareSlackRoutingAuditEvent,
-  selectSlackDmOrganisation,
+  slackDmSelection,
   type SlackChannelDefaultChange,
-} from "../../../slack/organisation-routing";
+} from "../../../slack/installation-store";
 import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
 import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
@@ -228,7 +228,7 @@ export async function handleSlackDmSelection(
     return controlError("slack_installation_not_found", 404);
   }
   const selectedAt = Date.now();
-  const selected = await selectSlackDmOrganisation(env, {
+  const selected = await slackDmSelection.use().selectOrganisation(env, {
     installationId: installationId.value,
     destinationConnectionId: connection.connectionId,
     destinationOrganisationId: authorized.organisationId,

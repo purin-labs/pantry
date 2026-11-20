@@ -5,7 +5,7 @@ import type {
   CredentialRotationFailureCode,
 } from "../integrations/contract/credential-lifecycle";
 import { validateExternalProviderToken } from "../external-records/records";
-import { validateShopifyReplacementCredential } from "../shopify/credential-replacement";
+import { providerModules } from "../integrations/contract/provider-modules";
 import {
   discoverStripeAccount,
   stripeCredentialEnvironment,
@@ -43,7 +43,9 @@ export async function validateReplacementCredential(
         : { ok: false, failureCode: "replacement_validation_failed" };
     }
     case "shopify":
-      return validateShopifyReplacementCredential(rotation, replacementSecret);
+      return providerModules
+        .use()
+        .shopify.validateReplacementCredential(rotation, replacementSecret);
     case "airtable":
     case "notion": {
       const discovered = await validateExternalProviderToken({

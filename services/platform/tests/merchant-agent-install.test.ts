@@ -6,13 +6,13 @@ import {
   readAgentOperations,
 } from "../src/data/agent-operations";
 import {
-  merchantAgentAgentId,
   merchantAgentInstallationId,
   MERCHANT_AGENT_READ_CAPABILITY,
   installMerchantAgent,
   merchantAgentDefaultSkills,
   merchantAgentSkillId,
 } from "../src/data/merchant-agent-preset";
+import { merchantAgentAgentId } from "../src/data/merchant-agent-ids";
 import { merchantAgentSkill } from "../src/data/merchant-agent-skills";
 import { merchantAgentAreaId } from "../src/data/merchant-agent-preset";
 import { createAgentOperationsDatabase } from "./agent-operations-database";

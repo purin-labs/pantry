@@ -13,7 +13,6 @@ import type {
   SystemCommerceEntityRef,
 } from "@purin-labs/commerce-contracts";
 import type { Result } from "../../result";
-import type { CommerceSystem } from "../../data/organisation-commerce-system";
 import type { CommerceWasmError } from "../commerce-wasm";
 import { commerceBlotterSystemAttributeIds } from "../../actors/commerce-query-schema";
 import type { BlotterQueryPlanResult } from "./blotter-source";
@@ -79,21 +78,17 @@ export type CommerceGraphReaderError =
  * A reader of the built-in engine has one source. A reader of a provider-backed
  * system (Shopify) also has the blotter source of the provider's records; the
  * `CommerceProvider` of the system says which (`createCommerceGraphReader`).
- * `commerceSystem` is not read: callers that build a reader by hand still
- * name it, until they use `createCommerceGraphReader`.
  */
 type CommerceGraphReaderOptions =
   | Readonly<{
       organisationId: string;
       merchantId: string;
-      commerceSystem?: CommerceSystem;
       underclerk: CommerceGraphCommerceSource;
       blotter?: undefined;
     }>
   | Readonly<{
       organisationId: string;
       merchantId: string;
-      commerceSystem?: CommerceSystem;
       underclerk: CommerceGraphHydratingSource;
       blotter: CommerceGraphBlotterSource;
     }>;

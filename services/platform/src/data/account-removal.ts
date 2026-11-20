@@ -21,7 +21,7 @@ import {
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
 } from "./control-mutation";
-import { readProviderCleanupContext } from "../provider-adapters/catalogue";
+import { providerServices } from "../integrations/contract/provider-services";
 import { parseActiveIntegrationProvider } from "./integration-provider-directory";
 import { fileAccountErasureStatements } from "../context/files";
 import { sha256Hex } from "@purin-labs/std";
@@ -36,10 +36,8 @@ import { prepareRemovedConnectionGenerationsRevocation } from "./provider-creden
 import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
-} from "../slack/organisation-routing";
-import {
-  prepareConfigurationVersionBump,
-} from "./organisation-onboarding-row";
+} from "../slack/installation-store";
+import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
 
 type RemoveIntegrationAccountError =
   | { readonly code: "integration_account_not_found" }
@@ -171,7 +169,7 @@ export async function removeIntegrationAccount(input: {
       );
   const providerContext = sharedSlackInstallation
     ? null
-    : await readProviderCleanupContext({
+    : await providerServices.use().readProviderCleanupContext({
         db: session,
         integrationAccountId: input.integrationAccountId,
         provider,
@@ -282,7 +280,9 @@ export async function removeIntegrationAccount(input: {
     );
   }
   statements.push(
-    prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
+    prepareConfigurationVersionBump(session, input.organisationId, input.now, {
+      atConfigurationVersion: state.configurationVersion,
+    }),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

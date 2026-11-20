@@ -9,7 +9,7 @@ import type { Env } from "../env";
 import { parseChannelId, parseWorkspaceId } from "../ids";
 import type { Result } from "../result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
-import { resolveActiveSlackDestinationConnection } from "../slack/organisation-routing";
+import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import {
   markWhatsAppNoticeDelivered,
   readWhatsAppOperatorNotice,

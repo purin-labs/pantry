@@ -2,7 +2,6 @@ import {
   isAgentPermissionListRead,
   type AgentPermissionListRead,
 } from "@purin-labs/control-api";
-import { parseCommerceGraphQuery as parseCommerceGraphQueryResult } from "../../commerce/entity-plane/routes";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type {
   AccessSubjectRef,
@@ -11,8 +10,10 @@ import type {
   CapabilityMode,
   CapabilityRef,
 } from "@purin-labs/contracts";
-import type { CommerceEntityTypeId } from "@purin-labs/commerce-contracts";
-import { parseEntityTypeId } from "@purin-labs/commerce-client";
+import {
+  commerceAccessTargets,
+  type CommerceGrantEntityTypeId,
+} from "../../access-control/commerce-access-targets";
 
 import {
   applyVersionedAccessDefaults,
@@ -29,7 +30,6 @@ import {
   resolveGrantSubjectReference,
   resolveGrantTargetReference,
 } from "../../access-control/decision-explanation";
-import { resolvePublishedCommerceTarget } from "../../commerce/entity-plane/published-resources";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import type {
   AccessGrantTarget,
@@ -123,7 +123,7 @@ type CreateGrantTargetSelection = StrictUnion<
   | Readonly<{
       kind: "commerce_entity_type";
       capabilityRef: CapabilityRef;
-      entityTypeId: CommerceEntityTypeId;
+      entityTypeId: CommerceGrantEntityTypeId;
     }>
   | Readonly<{
       kind: "commerce_list";
@@ -672,14 +672,10 @@ async function resolveGrantTargetSelection(
       });
       if (!authority.ok || authority.value.provider !== "underclerk")
         return { ok: false, error: "access_grant_target_unavailable" };
-      const query = parseCommerceGraphQueryResult({
-        kind: "commerce_list_page",
-        listId: selection.listId,
-        filter: { kind: "all" },
-        sorts: [],
-        pagination: { limit: 1, cursor: null },
-      });
-      if (!query.ok || query.value.kind !== "commerce_list_page")
+      const listId = commerceAccessTargets
+        .use()
+        .parseListReadId(selection.listId);
+      if (listId === null)
         return { ok: false, error: "access_grant_target_invalid" };
       return {
         ok: true,
@@ -687,7 +683,7 @@ async function resolveGrantTargetSelection(
           kind: "commerce_read",
           capabilityId: definition.capabilityId,
           capabilityVersion: definition.capabilityVersion,
-          scope: { kind: "commerce_list", listId: query.value.listId },
+          scope: { kind: "commerce_list", listId },
         },
       };
     }
@@ -724,7 +720,7 @@ async function resolveGrantTargetSelection(
       ) {
         return { ok: false, error: "access_grant_target_invalid" };
       }
-      const target = await resolvePublishedCommerceTarget({
+      const target = await commerceAccessTargets.use().resolvePublishedTarget({
         env,
         organisationId: scope.organisationId,
         targetRef: selection.targetRef,
@@ -1020,12 +1016,12 @@ function parseCreateGrantTargetSelection(
     case "commerce_entity_type": {
       if (!hasExactKeys(value, ["kind", "capabilityRef", "entityTypeId"]))
         return null;
-      try {
-        const entityTypeId = parseEntityTypeId(value.entityTypeId);
-        return { kind: "commerce_entity_type", capabilityRef, entityTypeId };
-      } catch {
-        return null;
-      }
+      const entityTypeId = commerceAccessTargets
+        .use()
+        .parseEntityTypeId(value.entityTypeId);
+      return entityTypeId === null
+        ? null
+        : { kind: "commerce_entity_type", capabilityRef, entityTypeId };
     }
     case "platform":
       return hasExactKeys(value, ["kind", "capabilityRef"])

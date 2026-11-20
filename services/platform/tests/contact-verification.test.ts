@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";

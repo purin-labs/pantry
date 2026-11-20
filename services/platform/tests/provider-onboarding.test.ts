@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
