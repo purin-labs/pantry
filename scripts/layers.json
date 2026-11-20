@@ -904,7 +904,7 @@
     "services/platform/src/control/routes/commerce-api-keys.ts": "areas/commerce",
     "services/platform/src/control/routes/commerce-menu-publication.ts": "areas/cafe",
     "services/platform/src/control/routes/commerce-payment-accounts.ts": "areas/commerce",
-    "services/platform/src/control/routes/commerce.ts": "areas/commerce",
+    "services/platform/src/control/routes/commerce.ts": "workers/platform",
     "services/platform/src/control/routes/contact-verification.ts": "areas/inbox",
     "services/platform/src/control/routes/costs-sheet.ts": "areas/kitchen",
     "services/platform/src/control/routes/costs.ts": "areas/kitchen",

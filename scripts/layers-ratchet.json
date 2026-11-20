@@ -1,7 +1,7 @@
 {
   "totals": {
     "upward": 502,
-    "areas": 337,
+    "areas": 324,
     "order": 139,
     "table": 119
   },
@@ -19,10 +19,10 @@
     "areas/cafe -> areas/kitchen": 8,
     "areas/cafe -> areas/organisation": 3,
     "areas/cafe -> surfaces/portal": 10,
-    "areas/commerce -> areas/cafe": 25,
+    "areas/commerce -> areas/cafe": 18,
     "areas/commerce -> areas/inbox": 1,
     "areas/commerce -> areas/integrations": 1,
-    "areas/commerce -> areas/kitchen": 19,
+    "areas/commerce -> areas/kitchen": 13,
     "areas/commerce -> areas/organisation": 14,
     "areas/commerce -> areas/shopify": 1,
     "areas/commerce -> surfaces/portal": 6,
