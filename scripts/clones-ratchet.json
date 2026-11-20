@@ -250,7 +250,7 @@
     "services/platform/src/chat/store.ts = services/platform/src/chat/store.ts": 2,
     "services/platform/src/commerce-lab/router.ts = services/platform/src/commerce-lab/router.ts": 4,
     "services/platform/src/commerce-lab/scenarios.ts = services/platform/src/commerce-lab/scenarios.ts": 1,
-    "services/platform/src/commerce/action-model.ts = services/platform/src/commerce/action-model.ts": 3,
+    "services/platform/src/commerce/action-model.ts = services/platform/src/commerce/action-model.ts": 1,
     "services/platform/src/commerce/actions.ts = services/platform/src/commerce/actions.ts": 3,
     "services/platform/src/commerce/bakery/production-scenario.ts = services/platform/src/commerce/bakery/sample.ts": 1,
     "services/platform/src/commerce/bakery/production-scenario.ts = services/platform/src/commerce/bakery/scenario.ts": 1,
