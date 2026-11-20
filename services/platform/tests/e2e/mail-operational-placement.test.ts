@@ -21,10 +21,8 @@ import {
   latestOperationalEmailProposal,
   readOperationalEmailDispatchId,
 } from "../../src/actors/connector-email-operational";
-import {
-  resumeActorRelocation,
-  reconcileActorRelocationMailReceipt,
-} from "../../src/actors/actor-relocation";
+import { resumeActorRelocation } from "../../src/actors/actor-relocation";
+import { reconcileActorRelocationMailReceipt } from "../../src/actors/actor-relocation-mail";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {

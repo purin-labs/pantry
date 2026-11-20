@@ -32,7 +32,6 @@ import {
   type ActorRelocationExclusion,
 } from "./actor-relocation-exclusion";
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { RelocationMailReceipt } from "./actor-relocation-mail";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { RelocationReceiptError } from "./actor-relocation-state";
 import {
@@ -380,7 +379,7 @@ type RelocationItemRow = {
   updatedAt: unknown;
 };
 
-type RelocationBindings = OrganisationPlacementBindings &
+export type RelocationBindings = OrganisationPlacementBindings &
   Pick<
     Env,
     | "DB"
@@ -651,39 +650,8 @@ export async function reconcileActorRelocationReceipt(input: {
   return { ok: false, error: { code: "relocation_receipt_rejected" } };
 }
 
-export async function reconcileActorRelocationMailReceipt(input: {
-  readonly env: RelocationBindings;
-  readonly relocationId: ActorRelocationId;
-  readonly receipt: RelocationMailReceipt;
-  readonly now: number;
-}): Promise<Result<null, ActorRelocationError>> {
-  const source = await resolveFrozenReceiptActors(
-    input.env,
-    input.relocationId,
-  );
-  if (!source.ok) return source;
-  for (const entry of source.value.entries) {
-    if (
-      entry.identity.objectKind !== "connector" ||
-      entry.identity.logicalObjectId !== input.receipt.connectorId
-    )
-      continue;
-    const connector = actorStub(
-      input.env.CONNECTOR,
-      entry.physicalObjectName,
-      entry.placement,
-    );
-    return connector.reconcileRelocationMailReceipt({
-      relocationId: source.value.relocationId,
-      expectedFenceToken: entry.fenceToken,
-      receipt: input.receipt,
-      now: input.now,
-    });
-  }
-  return { ok: false, error: { code: "relocation_receipt_rejected" } };
-}
-
-async function resolveFrozenReceiptActors(
+/** The Actors of a frozen relocation that may settle a receipt. */
+export async function resolveFrozenReceiptActors(
   env: RelocationBindings,
   relocationId: ActorRelocationId,
 ): Promise<

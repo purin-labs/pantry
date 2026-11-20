@@ -24,6 +24,7 @@ import { resolveControlSessionById } from "../data/control-plane";
 import type { ConversationScope } from "./store";
 import {
   authorizeConversation,
+  NATIVE_CHAT_SOURCE_ACCESS,
   VISIBLE_CONVERSATIONS_SQL,
 } from "./conversation-access";
 import { authorizeProject } from "../projects/access";
@@ -647,6 +648,7 @@ export async function readAdmittedChatInput(
           db,
           authority,
           source,
+          access: NATIVE_CHAT_SOURCE_ACCESS,
         })
       : createCurrentSourceFlowLabel({ kind: "ingress", db, authority }),
   ]);

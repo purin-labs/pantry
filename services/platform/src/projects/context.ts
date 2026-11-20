@@ -30,6 +30,7 @@ import {
 } from "@purin-labs/control-api";
 import type { Env } from "../env";
 import type { ProjectAccessScope } from "./access";
+import { NATIVE_CHAT_SOURCE_ACCESS } from "../chat/conversation-access";
 import { readProject } from "./records";
 import { observeProjectReference } from "./references";
 import type { Variant } from "@purin-labs/type-utils";
@@ -74,6 +75,7 @@ export async function prepareProjectSnapshot(
       organisationId: scope.organisationId,
       projectId: project.id,
     },
+    access: NATIVE_CHAT_SOURCE_ACCESS,
   });
   if (!label.ok) throw new Error("project_context_unavailable");
   const evidence = await ObservationEvidence.create({

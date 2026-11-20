@@ -43,7 +43,7 @@ import { savedBakeryRunArchiveKeys } from "../commerce/bakery/saved-runs";
 import {
   reconcileFrozenOrganisationReceipt,
   type RelocationReceiptRequest,
-} from "./actor-relocation-state";
+} from "./organisation-relocation-receipt";
 import { workspaceRevisionArchiveKeys } from "../workspace-revision-store";
 import { readPortalChatAttachmentKeys } from "../chat/attachments";
 import { readChatForkAttachmentKeys } from "../chat/fork-history";

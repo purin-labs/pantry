@@ -6,7 +6,6 @@ import {
   type OrganisationExecutionScope,
 } from "../organisation-execution-scope";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import type { SessionExecutionAdmission } from "../actors/session-execution-admission";
 import type { Result } from "../result";
 import {
   activeVaultRoot,
@@ -38,6 +37,15 @@ import {
 import { prepareCredentialHandleConnectionsRevocation } from "../data/provider-connection-writes";
 import { prepareCredentialHandleGenerationsRevocation } from "../data/provider-credential-generation";
 import { assertNever, isNonNegativeInteger, isRecord } from "@purin-labs/std";
+
+/**
+ * The admission of the Session turn that asks for a credential. The Session
+ * gives it: the scope of the turn and the check that the turn is still live.
+ */
+type VaultTurnAdmission = Readonly<{
+  scope: OrganisationExecutionScope;
+  requireTurn(lease: HarnessTurnLease): Promise<void>;
+}>;
 
 type VaultAlgorithm = "AES-GCM-256";
 
@@ -229,7 +237,7 @@ export async function storeOrganisationPlacementVaultSecret(
 
 export async function storeSessionExecutionVaultSecret(
   input: Readonly<{
-    admission: SessionExecutionAdmission;
+    admission: VaultTurnAdmission;
     lease: HarnessTurnLease;
     keys: CredentialVaultBindings;
     handle: VaultHandle;
