@@ -2,9 +2,14 @@
 // table `vault_secret`. Another module puts this statement into its own
 // batch, so that its change and the revocation happen together.
 
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
+
 /** Marks the secret of a handle as revoked. A revoked secret keeps its time. */
 export function prepareVaultSecretRevocation(
-  db: Pick<D1Database, "prepare">,
+  db: OrganisationDatabase | OrganisationDatabaseSession,
   input: Readonly<{ organisationId: string; handle: string; now: number }>,
 ): D1PreparedStatement {
   return db
