@@ -17,7 +17,7 @@ import {
   type SupplyCostWrite,
   type SupplyLotCost,
   type SupplyLotInvoiceCost,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   selectInventoryConsumptionPlan,
   type ProductPhotos,

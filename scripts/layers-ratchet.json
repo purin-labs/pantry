@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 240,
+    "upward": 239,
     "areas": 215,
     "order": 130,
     "table": 118
@@ -127,7 +127,6 @@
     "foundation/tenancy -> surfaces/slack": 1,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
-    "package packages/control-api -> @purin-labs/commerce-contracts": 1,
     "surfaces/email -> workers/platform": 1,
     "table access_grant (foundation/authority) <- areas/commerce": 1,
     "table access_grant (foundation/authority) <- areas/inbox": 1,

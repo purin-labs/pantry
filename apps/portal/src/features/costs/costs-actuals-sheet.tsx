@@ -11,7 +11,7 @@ import type {
   BakeryPlanVsActualsCalculation,
   PlanVsActualVarianceDriver,
   ProductPlanVsActualRow,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { formatMoneyMinor } from "../../formatting";
 import { CrmTable, Select, type CrmColumn, type CrmRowAction } from "../../ui";
 import { handleSheetKeyDown } from "./costs-sheet-grid";

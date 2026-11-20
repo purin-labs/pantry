@@ -6,7 +6,7 @@ import type {
   ForecastDemandCurve,
   ForecastSupplierTerms,
   ForecastWeekColumn,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   FORECAST_CAPEX_MINOR_CELL_KEY,
   FORECAST_EXTRA_SHIFT_THRESHOLD_PCT_CELL_KEY,

@@ -14,7 +14,7 @@ import {
   type CostFormulaRowContext,
   type CostScenarioAssumptions,
   type CostsOverview,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   productCogsCellKey,
   productDailyCellKey,
