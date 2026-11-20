@@ -15,10 +15,8 @@ import {
 } from "@purin-labs/commerce-client";
 import type { Result } from "../../result";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
-import {
-  compileCommerceReadAuthorities,
-  selectActiveGrants,
-} from "../../authorization/access-grants/compiler";
+import { selectActiveGrants } from "../../authorization/access-grants/compiler";
+import { compileCommerceReadAuthorities } from "./grant-authorities";
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import { enforceCommerceGraphReadAuthority } from "./authority";
 import type { CommerceGraphReader } from "./graph-reader";

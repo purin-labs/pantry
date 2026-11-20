@@ -14,17 +14,10 @@ export {
 } from "./capability-key";
 export {
   compileEffectiveGrantSet,
-  compileCommerceReadAuthorities,
   compileSelectedGrantSet,
-  commerceCommandGrantMatches,
-  commerceCommandGrantMatchesTarget,
-  grantAppliesToAuthority,
   selectActiveGrants,
   type CompileEffectiveGrantsInput,
-  type CompileCommerceReadAuthoritiesInput,
   type CompileSelectedGrantSetInput,
-  type CompiledCommerceReadAuthority,
-  type CommerceCommandGrantMatchInput,
   type EffectiveCapability,
   type EffectiveGrantCompileError,
   type EffectiveGrantSet,

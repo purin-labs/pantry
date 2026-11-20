@@ -16,6 +16,8 @@ import {
 } from "./data/whatsapp";
 import { proposeEvalFromCorrection } from "./evals/access";
 import { commerceGrantSelection } from "./authorization/access-grants/commerce-grant-selection";
+import { commerceGrantTargets } from "./authorization/access-grants/commerce-grant-targets";
+import { COMMERCE_GRANT_TARGETS } from "./commerce/entity-plane/grant-targets";
 import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
 import { COMMERCE_GRANT_SELECTION } from "./commerce/entity-plane/grant-selection";
 import { commerceGraphReads } from "./commerce/contract/graph-reads";
@@ -105,6 +107,7 @@ commerceDeliveryIntake.register({
 });
 
 commerceGrantSelection.register(COMMERCE_GRANT_SELECTION);
+commerceGrantTargets.register(COMMERCE_GRANT_TARGETS);
 
 commerceGraphReads.register({
   selectNamedCommerceQuerySourceGrant: (...input) =>

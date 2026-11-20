@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { SingleDatabase } from "../src/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
@@ -16,9 +18,11 @@ import {
 import { describe, expect, it } from "vitest";
 
 import {
-  compileEffectiveGrantSet,
   compileCommerceReadAuthorities,
   commerceCommandGrantMatches,
+} from "../src/commerce/entity-plane/grant-authorities";
+import {
+  compileEffectiveGrantSet,
   encodeProviderCapabilityKey,
   parseCapabilityKey,
   type AccessGrant,
