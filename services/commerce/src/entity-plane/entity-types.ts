@@ -9,13 +9,6 @@ import type {
   CommerceEntityPlaneSystemExtensionResponse,
 } from "@purin-labs/commerce-client";
 
-export type {
-  CommerceEntityTypeId,
-  CommerceGraphQuery,
-  CommerceList,
-  CommerceSensitivity,
-} from "@purin-labs/commerce-contracts";
-
 /** The route owns merchant binding; request wire shapes remain client-owned. */
 export type EntityPlaneQueryRequest = CommerceEntityPlaneQueryRequest;
 /** Idempotency and organisation fencing live at the Commerce request boundary. */

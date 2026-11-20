@@ -2,11 +2,6 @@
   "files": ["services/platform/src/devices/work.ts"],
   "exports": [
     "packages/contracts/src/case-output.ts#caseContributionSourceSchema",
-    "services/commerce/src/entity-plane/entity-types.ts#CommerceEntityTypeId",
-    "services/commerce/src/entity-plane/entity-types.ts#CommerceGraphQuery",
-    "services/commerce/src/entity-plane/entity-types.ts#CommerceList",
-    "services/commerce/src/entity-plane/entity-types.ts#CommerceSensitivity",
-    "services/commerce/src/plugins/purchasing/purchasing-preset.ts#SUPPLY_COST_TERMS_LIST_ID",
     "services/platform/src/actors/collaboration-room.ts#AGENT_ACTIVITY_HOLD_MS",
     "services/platform/src/actors/organisation/types.ts#OrganisationPlan",
     "services/platform/src/actors/pi-model-transport.ts#PLATFORM_PI_MODELS",
