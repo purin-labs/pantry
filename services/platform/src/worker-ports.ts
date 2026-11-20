@@ -15,7 +15,14 @@ import {
   setWhatsAppProviderHealth,
 } from "./data/whatsapp";
 import { proposeEvalFromCorrection } from "./evals/access";
+import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
+import { commerceDeliveryIntake } from "./commerce/contract/delivery-intake";
+import { applyCommerceDelivery } from "./actors/commerce-projection";
+import { normalizeCommerceDelivery } from "./commerce/commerce-wasm";
 import { connectionParts } from "./integrations/contract/connection-parts";
+import { providerModules } from "./integrations/contract/provider-modules";
+import { shopifyCommerceProvider } from "./shopify/commerce-provider";
+import { SHOPIFY_PROVIDER_MODULE } from "./shopify/provider-module";
 import { tearDownAgentMailboxForRemoval } from "./mail-inbox/agent-mailbox-teardown";
 import { verifiedContacts } from "./mail-inbox/contract/verified-contacts";
 import {
@@ -70,4 +77,15 @@ slackDmSelection.register({
   prepareRevokedSelectionRelease: (...input) =>
     prepareRevokedDmSelectionRelease(...input),
   selectOrganisation: (...input) => selectSlackDmOrganisation(...input),
+});
+
+// The Shopify module: its commerce provider and its provider catalogue
+// entry. A removal of Shopify deletes these two lines and the folder
+// `shopify/`.
+connectedCommerceProviders.register({ shopify: shopifyCommerceProvider });
+providerModules.register({ shopify: SHOPIFY_PROVIDER_MODULE });
+
+commerceDeliveryIntake.register({
+  normalizeCommerceDelivery: (...input) => normalizeCommerceDelivery(...input),
+  applyCommerceDelivery: (...input) => applyCommerceDelivery(...input),
 });

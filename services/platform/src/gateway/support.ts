@@ -64,7 +64,7 @@ import {
 import {
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../commerce/commerce-wasm";
+} from "../shopify/delivery-normalizers";
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,

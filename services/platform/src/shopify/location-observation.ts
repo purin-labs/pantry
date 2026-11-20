@@ -5,8 +5,7 @@ import type {
 
 import {
   normalizeShopifyCommerceResourceDelivery,
-  type CommerceWasmError,
-} from "../commerce/commerce-wasm";
+} from "./delivery-normalizers";
 import {
   parseUserId,
   parseIntegrationAccountId,
@@ -21,11 +20,12 @@ import type {
   CommerceSystemProviderAuthority,
 } from "../data/organisation-commerce-system";
 import {
-  applyCommerceDelivery,
+  commerceDeliveryIntake,
   type AppliedCommerceDeliveryResult,
   type CommerceProjectionError,
   type CommerceSystemStorageAuthority,
-} from "../actors/commerce-projection";
+  type CommerceWasmError,
+} from "../commerce/contract/delivery-intake";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { exhaustiveList, isRecord } from "@purin-labs/std";
 
@@ -487,7 +487,7 @@ function projectAssignedShopifyLocationObservation(
     createAssignedLocationEnvelope(observation),
   );
   if (!normalized.ok) return normalized;
-  return applyCommerceDelivery(
+  return commerceDeliveryIntake.use().applyCommerceDelivery(
     sql,
     {
       organisationId: observation.organisationId,

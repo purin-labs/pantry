@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { requireOrganisationId, requireIntegrationAccountId } from "./test-ids";
 /// <reference types="@cloudflare/workers-types" />
 

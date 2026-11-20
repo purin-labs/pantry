@@ -1,5 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { describe, expect, it } from "vitest";
 import type {
   CanonicalCommerceObservation,
@@ -34,7 +36,7 @@ import {
   normalizeShopifyCommerceInventoryDelivery,
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../src/commerce/commerce-wasm";
+} from "../src/shopify/delivery-normalizers";
 import { isRecord } from "@purin-labs/std";
 
 type CapturedShopifyRequest = {

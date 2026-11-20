@@ -14,6 +14,7 @@ import type {
   CommerceShopifyProviderReceipt,
 } from "@purin-labs/control-api";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import { definePort } from "../../port";
 import type {
   ActionExecutionRetryEvidence,
   ActionLedgerEntry,
@@ -168,3 +169,17 @@ export function commerceProjectionRevision(
 ): number {
   return projection.projection.provenance.revision;
 }
+
+/**
+ * The commerce providers that a connection gives, such as Shopify. The
+ * built-in engine is the provider of commerce itself. The Worker registers
+ * the others (`worker-ports.ts`), so commerce imports no provider module.
+ */
+export type ConnectedCommerceProviders = {
+  readonly [
+    K in Exclude<CommerceSystemKind, "satyr_commerce">
+  ]: CommerceProvider<K>;
+};
+
+export const connectedCommerceProviders =
+  definePort<ConnectedCommerceProviders>("connected_commerce_providers");
