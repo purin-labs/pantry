@@ -25,13 +25,13 @@ import {
   hasEcommerceDemoFixture,
 } from "../demo-fixtures.ts";
 
-export type ProvisioningMerchantRow = Readonly<{
+type ProvisioningMerchantRow = Readonly<{
   merchantId: string;
   organisationId: string;
   revision: number;
 }>;
 
-export type ProvisioningMutation = (
+type ProvisioningMutation = (
   rawCommand: unknown,
 ) => CommerceMutationResultV1;
 

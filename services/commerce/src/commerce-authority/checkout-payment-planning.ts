@@ -136,7 +136,7 @@ type CheckoutPaymentCapturePlanResult =
   | Readonly<{ kind: "planned"; value: CheckoutPaymentCapturePlan }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type CheckoutPlacementCommon = Readonly<{
+type CheckoutPlacementCommon = Readonly<{
   checkout: Checkout;
   /** None when stored value or a manual tender paid the whole total. */
   paymentAttempt: CheckoutPaymentAttempt | undefined;

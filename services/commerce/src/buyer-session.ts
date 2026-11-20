@@ -18,7 +18,7 @@ import {
   isRecord,
 } from "@purin-labs/std";
 
-export type BuyerSessionIdentity =
+type BuyerSessionIdentity =
   | Readonly<{
       kind: "guest";
       protectedCustomerReference?: never;

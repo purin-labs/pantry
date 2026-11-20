@@ -22,7 +22,7 @@ import { findResource, orderLineIdFor, sameMoney } from "./checkout-shared.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;
 
-export type AcceptedOrderLine = Readonly<{
+type AcceptedOrderLine = Readonly<{
   orderLineId: string;
   quantity: number;
   lineTotal: Money;

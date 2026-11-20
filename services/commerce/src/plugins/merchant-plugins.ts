@@ -81,7 +81,7 @@ export type CheckoutValidationInput = Readonly<{
 }>;
 
 /** `refused`: the core refused the command that a handler or action returned. */
-export type PluginFailureReason = FunctionFailureReason | "refused";
+type PluginFailureReason = FunctionFailureReason | "refused";
 
 /** A function that failed and was skipped, with why. */
 export type PluginFunctionFailure = Readonly<{

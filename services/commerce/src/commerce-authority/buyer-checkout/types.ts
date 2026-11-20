@@ -61,7 +61,7 @@ export type BuyerCartMutation =
   | Readonly<{ kind: "resolved"; cart: CommerceBuyerCartV1 }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type BuyerPaymentAuthorityResult =
+type BuyerPaymentAuthorityResult =
   | Exclude<CommerceBuyerPaymentResultV1, { state: "placed" }>
   | WithoutOrderRecovery<
       VariantBy<CommerceBuyerPaymentResultV1, "state", "placed">
@@ -111,7 +111,7 @@ export type BuyerPaymentSessionResult =
   | Readonly<{ kind: "resolved"; result: CommerceBuyerPaymentSessionV1 }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }>;
 
-export type BuyerCheckoutCommands = Pick<
+type BuyerCheckoutCommands = Pick<
   CheckoutCommandAuthority,
   | "submitBuyerPickupCheckout"
   | "submitBuyerShippingCheckout"

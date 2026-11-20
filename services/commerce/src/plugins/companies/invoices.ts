@@ -25,7 +25,7 @@ import { writeManualTender } from "../../payments/manual-tender.ts";
 const DAY_MS = 86_400_000;
 
 /** The system command that marks an invoice overdue; no route takes it. */
-export type MarkInvoiceOverdueCommand = Readonly<{
+type MarkInvoiceOverdueCommand = Readonly<{
   schemaVersion: "underclerk.mark-invoice-overdue.internal.v1";
   merchantId: string;
   idempotencyKey: string;

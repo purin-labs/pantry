@@ -22,7 +22,7 @@ import {
   teaVariant,
 } from "./journey-support.ts";
 
-export const AUD_TIN = "variant_tea_counter_au";
+const AUD_TIN = "variant_tea_counter_au";
 
 export class SquareCounterDesk extends StaffDesk {
   readonly run: number;

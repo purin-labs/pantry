@@ -47,7 +47,7 @@ export type PurchasingReconciliationResult =
       received: number;
     }>;
 
-export type PurchasingReplenishmentContext = Readonly<{
+type PurchasingReplenishmentContext = Readonly<{
   database: CommerceDatabase;
   now: () => string;
   commerceLists: CommerceLists;
@@ -117,7 +117,7 @@ export type FoodServiceMutationCommand =
   | CompleteProductionBatchCommand;
 
 /** What the core lends the food service commands. */
-export type FoodServiceCommandContext =
+type FoodServiceCommandContext =
   MerchantCommandPorts<FoodServiceMutationCommand> &
     Readonly<{
       database: CommerceDatabase;
