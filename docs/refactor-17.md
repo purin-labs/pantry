@@ -447,6 +447,22 @@ table-owner step), on the branch `refactor-17-a1-8`.
   `bumpProjectionRevision`. The clone baseline holds 908 copies.
 - No behavior changed: each statement has the same text and the same values.
 
+**20 November 2026. Three files of the Worker shell go to their owners**, on the branch
+`refactor-17-a1-8`.
+
+- `ingress-queue.ts` held the queue message types of five modules, and 27 files of
+  lower modules imported it. Each module now has its own file (`queue-messages.ts`
+  in `commerce/`, `shopify/`, `schedules/` and `mail/`, and
+  `slack/case-command-message.ts`). The queue file keeps the union and the choice of
+  the parser: 127 lines, where it had 1,309.
+- `actors/organisation/types.ts` held the types of four modules. The commerce, policy,
+  activation and Code Mode types are in a file of their module.
+- Three files named `support.ts` were in the wrong module of the map.
+- The map shows 1,203 crossings, where it showed 1,241. An import that pointed at the
+  shell now points at the real owner, so some pairs between areas went up by one to
+  four, and the baseline is written again.
+- No behavior changed: each moved line is the same.
+
 The step is smaller than its first description. A count with the type checker gave
 the reason: callers use 245 methods of the four Actors at 440 places, in about 130
 files. An interface for each module is a larger piece of work, and it belongs with the
