@@ -694,6 +694,34 @@ the Session first.
 - **Still open:** a handler takes the turn context from the Session
   (`withToolContext`), not from the executor. Step A1.7 owns it.
 
+**20 November 2026. Step A1.5 is done on the branch `refactor-17-a1-5`.** The branch
+starts at `origin/dev` `ce959eb`. It is not on `dev`.
+
+- **One executor.** The mailbox agent host and the WhatsApp agent host call
+  `executeCatalogTool`. Their two chains of name tests are deleted. Their 14 tools
+  are `defineTool` values in `agent-tools/channels/mailbox-agent.ts` and
+  `whatsapp-agent.ts`, with the selection rule `{ kind: "host", host }`.
+- **Two registries beside `TOOLS`.** A host has its own registry, and no tool of it
+  is in `TOOLS`. So a Portal chat or Slack turn never sees one, and the mailbox
+  `propose_memory` does not meet the Portal tool of the same name.
+- **A host profile.** A host with its own result format gives the executor its
+  result envelope and its refusal of an unknown name.
+- **The record.** [Appendix D](#appendix-d--the-two-agent-hosts-before-step-a15)
+  gives the tool lists, the hashes and the checks of each tool before the port. The
+  comparison shows no difference: the definitions, the host digests and the results
+  are the same bytes for one WhatsApp turn and five kinds of mailbox turn.
+- **Not changed:** no capability, no policy row and no check was added (decision D6).
+  The catalog digests of the Portal chat host are equal to the baseline.
+- **Measures.** Layer crossings: 821, no change. Copies: 892, no change. Unused
+  exports: 809, no change. Lines: 557 removed and 868 added; the 14 definitions are
+  longer as `defineTool` values.
+- **Checks.** The static lints, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (302 files) pass. The 32 journey files of
+  the brief pass, in three groups. Not run: the full E2E suite.
+- **Still open:** each host keeps its services, its state and its result format in
+  its own file. `actors/embedded-harness-tool-host.ts` did not change: the three
+  hosts share the executor, not one host object.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
@@ -1546,3 +1574,84 @@ them:
   the same.
 
 The proposal and surface tools did not change.
+
+## Appendix D — The two agent hosts before step A1.5
+
+The record is from `origin/dev` `ce959eb`, before the port. The full name,
+description and schema of each tool are in `agent-tools/channels/mailbox-agent.ts`
+and `agent-tools/channels/whatsapp-agent.ts`; the hashes below cover each byte of
+them. "Definitions" is the SHA-256 of `JSON.stringify` of the list that the model
+gets. "Digest" is the host's catalog digest for the fixed input of the check: one
+message `m1`, the account `ia_1`, the Case `case_1`.
+
+### The WhatsApp agent host
+
+| Value       | Result                                                                     |
+| ----------- | -------------------------------------------------------------------------- |
+| Tools       | `whatsapp_case_read`, `whatsapp_reply_propose`, `whatsapp_handoff_request` |
+| Definitions | `830a2fe7e084315d13dc9f7d4267748b20d38f9510f967d681650beb4cee1145`         |
+| Digest      | `d9b2c7f16dd583306fcbc5d4b65c8ac367695ab2bcb84873aa492ce1bb0fb660`         |
+
+Each call checks first that the turn has not expired ("This Case turn has
+expired."). Then:
+
+| Tool                       | Checks, in order                                                                                                  | Result                                                                  |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `whatsapp_case_read`       | None. It does not read its input                                                                                  | The admitted messages, oldest first                                     |
+| `whatsapp_reply_propose`   | The turn has no outcome; the input has a text `body`; the body has 1 to `maxReplyChars` characters after the trim | The host records the proposal. A person approves it before a send       |
+| `whatsapp_handoff_request` | The turn has no outcome; the input has a text `reason`                                                            | The host records the handoff, with at most 200 characters of the reason |
+| Another name               | —                                                                                                                 | "Unknown tool: <name>"                                                  |
+
+### The mailbox agent host
+
+The response policy of the turn gives the tool list, and the evidence of the turn
+adds to it:
+
+| Turn                                      | Tools, in order                                                                                                                       | Definitions | Digest      |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ----------- |
+| `cue_routed`                              | `read_email_case`, `read_email_attachment`, `email_reply_now`, `email_reply_for_approval`, `email_no_reply`, `read_order`             | `2300a57d…` | `78bcdb88…` |
+| `cue_routed`, with selected evidence      | the first five, then `read_case_context_collection_evidence`                                                                          | `ca2c5b70…` | `935e0d61…` |
+| `draft_only`                              | `read_email_case`, `read_email_attachment`, `email_reply_for_approval`, `email_no_reply`, `read_supplier_delay_context`, `read_order` | `073ded73…` | `62c6ab85…` |
+| `draft_only`, an eval turn with a fixture | the same with no `read_order`                                                                                                         | `87efebc0…` | `d5d5cfff…` |
+| `correction_learning`                     | `read_email_case`, `propose_memory`, `no_memory`                                                                                      | `a72b25c8…` | `c260dcc3…` |
+
+`email_reply_for_approval` has a second description in a `draft_only` turn.
+`propose_memory` has the name of a Portal chat tool and is another tool.
+
+A name that the turn's list does not hold gives "Unknown tool: <name>". Then:
+
+| Tool                                    | Checks, in order                                                                                                                                   | Result                                                           |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `read_email_case`                       | For each message: it is in the manifest, the turn has not expired, the body and the attachments are within the size policy                         | The messages. The host notes if the whole Case was read          |
+| `read_case_context_collection_evidence` | The same, for the messages that a person selected. A message that Gmail lost is erased from the selection                                          | The selected messages                                            |
+| `read_email_attachment`                 | Not an eval turn; the input names a message and an attachment; the message is admitted; the attachment is in it, within the size limit and textual | The attachment as text                                           |
+| `read_supplier_delay_context`           | The whole Case was read with no size breach; a triggering message exists and is readable                                                           | The purchasing facts, or the error code of the read              |
+| `read_order`                            | The whole Case was read with no size breach                                                                                                        | The order, or the error code of the read                         |
+| `email_reply_now`                       | The turn read no order; then as `email_reply_for_approval`                                                                                         | The outcome `reply_now`                                          |
+| `email_reply_for_approval`              | The whole Case was read; the turn has no outcome; the input has a body; the commerce evidence did not change                                       | The outcome `approval_required`, with the citations of the model |
+| `propose_memory`, `no_memory`           | The whole Case was read; the turn has no outcome; for `propose_memory` the statement is valid                                                      | The outcome `memory_candidate` or `ignore`                       |
+| `email_no_reply`                        | The whole Case was read; the turn has no outcome                                                                                                   | The outcome `ignore`                                             |
+
+After a result that did not fail, a turn with selected evidence observes the result
+digest. If the evidence is no longer authorized, the model reads "The selected
+evidence is no longer authorized. Stop this turn."
+
+No tool of the two hosts claims a capability, reads a label or runs an exit check.
+A tool records an outcome in the host; the completion of the turn, not a tool,
+drafts or sends. Each result is plain text with the host's own digest.
+
+### What the port did
+
+- Each tool is a `defineTool` value with the selection rule
+  `{ kind: "host", host }`. The WhatsApp host has one registry. The mailbox host
+  builds the registry of the turn from the list of its response policy.
+- Each host calls `executeCatalogTool` with a profile: its result format and its
+  refusal of an unknown name. With a profile the executor gives a tool the input text
+  as it is, asks for no call id, writes no log and lets an unexpected error through,
+  as the hosts did.
+- A service of the host holds the body of each old branch. The comparison with the
+  record shows no difference: the definitions, the digests and the results are the
+  same bytes.
+- One branch was not reachable and is still not: `email_reply_now` in a `draft_only`
+  turn ("This turn permits review drafts only."). The list of that turn does not
+  hold the tool, so the model reads "Unknown tool".
