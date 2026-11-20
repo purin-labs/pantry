@@ -1717,6 +1717,60 @@ is a foundation module.
     default agent id of the room presence, the collaboration ping of the socket
     host and `UserId` of `control-api` in `ids.ts`.
 
+**21 November 2026. The lifecycle port of an Organisation: table writes 23 to 4,**
+on the branch `refactor-17-lifecycle-port`.
+
+- **The port.** `data/organisation-lifecycle-port.ts` (tenancy) has one part type
+  for each lifecycle step: creation, membership, archive and purge. A part gives
+  the prepared statements of the owner's tables for one place in one batch.
+  Tenancy puts them at that place, so each batch keeps the same statements in
+  the same order, with the same bind values. One D1 batch stays one D1 batch.
+- **The Worker gives the parts.** `organisation-lifecycle-parts.ts` (Worker) maps
+  each part to a builder in the owner module. `integration-gateway.ts` gives them
+  when the Worker loads, before a request or an Actor runs. A read before that
+  throws. Each part names its function when it runs, as the archive cleanup parts
+  do, so a test that mocks an owner module still loads. The E2E setup and the unit
+  files that call a lifecycle function import
+  `tests/provide-organisation-lifecycle-parts.ts`. A global unit setup file broke
+  four mocked test files, so the import is in each file.
+- **Creation.** The bootstrap and the surface install get the workspace rows
+  (agent), the base Project (conversation), the access defaults and the replaced
+  token revocation (authority) and the connection rows (connections). The surface
+  provider helpers moved to `data/integration-account.ts`.
+- **Membership.** The role change, the member removal and the invitation
+  acceptance get the Project rows (conversation), the readiness deletion and the
+  invitation acceptance (organisation). One builder in `data/onboarding.ts`
+  replaces three equal readiness deletions.
+- **Archive.** The archive gets the disable of the accounts, the connections and
+  the webhooks (connections). The delete of an archived Organisation gets the
+  removal of the Project members (conversation). The restore writes only tenancy
+  tables.
+- **Purge.** The purge gets the rewrites of the three pseudonymized connection
+  tables (connections) and the directory's Slack records (Slack). The release of
+  the shared Slack bot token gets the revoke and the move of the installation
+  (Slack). The purge context and its guarded statement are in the port. The
+  catalogue order still sets the batch order, and `pnpm lint:purge-catalogue`
+  passes.
+- **Not changed:** no SQL text at run time, bind order, batch order, table, D1
+  baseline, route, status code or error text. A scan of each write literal found
+  two changes in source text only: the three equal readiness deletions are one,
+  and four archive statements read the guard as `${input.guard.sql}`, which is the
+  accepted mutation check of before.
+- **Measures.** Layer crossings: 155 to 128. Table writes 23 to 4, against the
+  order 20 to 12, upward 68 and between areas 44 (no change). Ratchet pairs: 69
+  to 54. Copies: 876, no change. Unused exports: 805, no change.
+- **What stays (4).** Three writes are in connection flows, not in a lifecycle
+  batch: `data/integration-account.ts` writes `credential_ref` (authority) in a
+  reconnect and `organisation_communication_destination` (organisation) in a
+  default account change, and `data/provider-attempt.ts` writes
+  `onboarding_support_reference` (organisation). `connections` is below both
+  owners, so each needs a port of the connection flows. The fourth is the false
+  match of an error text in `apps/portal/src/features/chat/project-sharing.tsx`.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files) pass. The journey files of
+  the brief ran in groups after each step and on the final tree. The full E2E
+  suite did not run on the branch.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
