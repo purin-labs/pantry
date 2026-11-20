@@ -1052,6 +1052,48 @@ are above it.
   - The route files of `control/` that call Slack, Brain, commerce and integrations
     (13). A route file with rules is not a part of the Worker, so no map change.
 
+**21 November 2026. Step A1.9 for the Organisation actor, three parts, and the
+custom connector read of step A1.8,** on the branch `refactor-17-a1-9-organisation`.
+The Case context collection and the class chain stay open.
+
+- **Rooms.** `actors/organisation-collaboration-rooms.ts` is deleted, and its `mixed`
+  note is gone. `actors/collaboration-room-dispatch.ts` is the kernel of the room
+  dispatch: the admission of the room, the placement check, the Organisation record,
+  then the room. Each area gives its routes and its socket rooms from its own file:
+  `actors/kitchen-`, `cafe-`, `commerce-` and `inbox-collaboration-rooms.ts`. The
+  class `OrganisationDO` joins them and keeps the old order of the routes.
+- **Jev settings.** `jev-features/organisation-settings.ts` holds the three Jev
+  commands as functions that take an `OrganisationJevHost`, and it declares
+  `OrganisationJevRpc`. `OrganisationDO` implements the interface. The policy file
+  defines `PolicyJevPort` for the two Jev calls that stay inside policy commands:
+  the repin of mail classification and the paid hold. The paid hold reads the clock
+  one time and not two times.
+- **A1.8.** `access-control/decision-explanation.ts` defines
+  `CustomConnectorAccountRead`. The Worker router gives the read to the access
+  control route (`AccessControlParts`), and the route gives it to the explanation.
+- **Not changed:** no path, check, status code, error text, RPC method name,
+  argument shape or stored value. No constructor changed.
+- **Measures.** Layer crossings: 640 to 635. `foundation/authority` to integrations:
+  5 to 0. Copies: 887 to 881. Unused exports: 808, no change. `organisation-policy.ts`:
+  1,483 lines to 1,226.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite pass. 56 journey files ran in four groups,
+  with the idle tenant journey: 55 pass and 1 is skipped. The full E2E suite did not
+  run on the branch.
+- **Still open: the Case context collection (5 imports of the Inbox).**
+  `actors/organisation/case-context-collection.ts` and
+  `case-context-discovery/source.ts` are the Gmail source of a collection: the
+  mailbox binding, the contact verification and the message receipt. As Inbox files
+  they give 635 to 631, but the policy class then imports them (2 new imports from
+  `foundation/authority` to the Inbox), and one imports a helper of the Worker. The
+  eight collection commands of `OrganisationPolicy` read the verified contact and its
+  supplier target, so they are Inbox rules. They must leave the policy class as an
+  Inbox module, as the Jev commands did: about 570 lines and 8 RPC methods.
+- **Still open: the class chain.** `OrganisationActorBase`, `OrganisationPolicy`,
+  `OrganisationCommerce` and `OrganisationDO` are still one chain. `OrganisationPolicy`
+  still holds rules, so no level only composes yet. The schema steps are in
+  `actors/organisation/schema.ts`: this step did not change them.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
