@@ -380,15 +380,23 @@ Step A0.4, measured on the branch `refactor-17` on 2026-11-20, on the owner's Ma
 with other sessions at work on the same machine. A step of Stage A compares its
 result with these lines.
 
-| Check                      | Result                                                         | Command                                                 |
-| -------------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
-| Every lint                 | passes, 26 s                                                   | `pnpm lint`                                             |
-| Type check, Platform       | passes, 4 s                                                    | `pnpm --filter @purin-labs/platform check:types`        |
-| Type check, Platform tests | passes, 1 s                                                    | `pnpm --filter @purin-labs/platform check:test-types`   |
-| Type check, packages       | passes, 4 s                                                    | `pnpm check:packages`                                   |
-| Type check, engine         | passes, 1 s                                                    | `pnpm --filter @purin-labs/commerce-worker check:types` |
-| Portal build               | passes, 3 s. 280 script files with 7.12 MB, and 0.88 MB of CSS | `pnpm portal:build`                                     |
-| E2E suite of the Platform  | not measured yet                                               | `pnpm --filter @purin-labs/platform test:e2e`           |
+| Check                      | Result                                                                                                                                                                                                                       | Command                                                 |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Every lint                 | passes, 26 s                                                                                                                                                                                                                 | `pnpm lint`                                             |
+| Type check, Platform       | passes, 4 s                                                                                                                                                                                                                  | `pnpm --filter @purin-labs/platform check:types`        |
+| Type check, Platform tests | passes, 1 s                                                                                                                                                                                                                  | `pnpm --filter @purin-labs/platform check:test-types`   |
+| Type check, packages       | passes, 4 s                                                                                                                                                                                                                  | `pnpm check:packages`                                   |
+| Type check, engine         | passes, 1 s                                                                                                                                                                                                                  | `pnpm --filter @purin-labs/commerce-worker check:types` |
+| Portal build               | passes, 3 s. 280 script files with 7.12 MB, and 0.88 MB of CSS                                                                                                                                                               | `pnpm portal:build`                                     |
+| E2E suite of the Platform  | 234 files pass and 3 are skipped; 455 tests pass and 6 are skipped. 54 min 19 s, one file at a time: 29 min of setup and 23 min of tests. The command ends with code 1, because one file logs after its teardown (see below) | `pnpm --filter @purin-labs/platform test:e2e`           |
+
+The E2E suite needs the account Worker of the pinned commit of `purin-labs/monorepo`
+(`3a05ce4`, as CI builds it) in `PANTRY_ACCOUNT_WORKER_ARTIFACT`. Without it, almost
+each journey fails at its first request. No test failed in the baseline run, but
+Vitest reports 11 errors of one kind: `EnvironmentTeardownError: Closing rpc while
+"onUserConsoleLog" was pending`, all from `tests/e2e/slack-attachment-restore.test.ts`.
+That file writes a log line after its teardown. A step of Stage A compares its count
+of passed files and tests, not the exit code, until that file is corrected.
 
 The bundle of each Worker, from `node scripts/worker-bundle-sizes.mjs` (a Wrangler
 dry run, no upload):
@@ -745,8 +753,10 @@ The count of work for Stage A:
 | Journeys that import the inside of the Worker |                                                                     178 |
 | Specs to write                                |                                                                      33 |
 
-[Baseline](#baseline) gives the run time of the E2E suite. Steps A1.1 to A1.3 give
-the time for one port. The estimate for the rest uses those two numbers.
+A full run of the E2E suite takes 54 minutes on the owner's Mac
+([Baseline](#baseline)), so 25 landings need about 23 hours of suite time. CI runs
+the suite in 4 shards. Steps A1.1 to A1.3 give the time for one port. The estimate
+for the rest uses those two numbers.
 
 Runtime cost: none. The same Workers run the same code.
 
