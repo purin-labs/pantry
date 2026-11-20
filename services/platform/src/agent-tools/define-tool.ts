@@ -20,12 +20,6 @@ import type {
 import { isRecord } from "@purin-labs/std";
 
 /**
- * A tool argument that the agent can correct: the message names the field and
- * reaches the model as the tool's failure text.
- */
-export class ProposalArgumentError extends Error {}
-
-/**
  * What a successful call proves.
  *
  * - `read`: the call changed nothing.

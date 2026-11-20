@@ -1,11 +1,10 @@
-import { OrderRefundRequestError } from "../../commerce/order-refund-action";
-import { StockActionRequestError } from "../../commerce/stock-action";
 import { CommerceContextToolResult } from "../../actors/commerce-context-tool-result";
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,
 } from "../bakery/surface";
-import { ProposalArgumentError, type RegisteredTool } from "../define-tool";
+import type { RegisteredTool } from "../define-tool";
+import { ToolRequestError } from "../errors";
 import { registeredTool } from "../registry";
 import type {
   WorkflowCanvasReadTool,
@@ -27,12 +26,10 @@ import type {
   AirtableWriteInput,
 } from "../../actors/airtable-tool-input";
 import type { CommerceContextRequest } from "@purin-labs/contracts";
-import { CommerceReadRequestError } from "../../context/assembly/commerce";
 import type {
   AuthorizedHarnessToolResult,
   HarnessToolOutput,
 } from "@purin-labs/contracts";
-import { MenuDraftRequestError } from "../../actors/menu-draft";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { CustomConnectorCatalogEntry } from "../../custom-connectors";
@@ -52,81 +49,71 @@ import {
   isSelectedCatalogToolName,
   isStaticHarnessToolName,
 } from "./selection";
-import {
-  BakeryContextRequestError,
-  type CafeMenuPublicationProposal,
-  type CampaignBriefPropose,
-  type CommerceActionProposal,
-  type ConfigurationPropose,
-  DescriptionDraftRequestError,
-  type DevicePauseTool,
-  type DeviceProposeTool,
-  type DeviceReadTool,
-  DeviceRequestError,
-  type DeviceSnapshotReadTool,
-  type EmailDraftEditTool,
-  type EmailDraftReadTool,
-  type EmailMailboxSearch,
-  type EmailOperationalPropose,
-  type EmailReplyDraftEdit,
-  type EmailReplyDraftRead,
-  EmailReplyDraftRequestError,
-  type EmailReplyPropose,
-  type EntityContextRead,
-  ExitApprovalRequestedError,
-  type FileRead,
-  type FileSearch,
-  type HarnessBakerySurfaceExecute,
-  type HarnessCapabilityClaim,
-  type HarnessCapabilityName,
-  type HarnessCodeModeExecutionLease,
-  type HarnessCustomConnectorRead,
-  type HarnessCustomConnectorWriteProposal,
-  type HarnessFollowUpSchedule,
-  type HarnessMemoryProposal,
-  type HarnessSideCaseProposal,
-  type HarnessToolDefinition,
-  type IntegrationList,
-  type JevFeatureProposeTool,
-  JevFeatureRequestError,
-  type JevFeaturesReadTool,
-  type MenuBoardEditTool,
-  type MenuBoardCreateTool,
-  type MenuBoardArchiveTool,
-  type MenuBoardReadTool,
-  type MenuDraftEditTool,
-  type MenuDraftReadTool,
-  type MenuPriceProposal,
-  type MerchantPluginProposal,
-  type MerchantReportRead,
-  type MessageAttachmentInspect,
-  type MessageLinkRead,
-  type CounterSaleReadTool,
-  type OrderQueueAdvanceTool,
-  type OrderQueueReadTool,
-  type OrderRefundProposal,
-  type PaymentsReadTool,
-  type ProductDescriptionDraftEdit,
-  type ProductDescriptionDraftRead,
-  type ProductionPlanEditTool,
-  type ProductionPlanReadTool,
-  ProductionPlanRequestError,
-  type RecipeReadTool,
-  type RecipeSaveTool,
-  type RecipeWorkflowProposeTool,
-  type RecipeWorkflowReadTool,
-  RecipeWorkflowRequestError,
-  SlackDraftRequestError,
-  type SlackMessagePropose,
-  type SoldOutMarkTool,
-  type SoldOutReadTool,
-  StaffPageRequestError,
-  type StockActionProposal,
-  type SupplierCreateTool,
-  type SupplierReadTool,
-  type WhatsAppSupportRead,
-  type WhatsAppSupportReplySend,
-  type WorkspaceQuery,
+import type {
+  CafeMenuPublicationProposal,
+  CampaignBriefPropose,
+  CommerceActionProposal,
+  ConfigurationPropose,
+  DevicePauseTool,
+  DeviceProposeTool,
+  DeviceReadTool,
+  DeviceSnapshotReadTool,
+  EmailDraftEditTool,
+  EmailDraftReadTool,
+  EmailMailboxSearch,
+  EmailOperationalPropose,
+  EmailReplyDraftEdit,
+  EmailReplyDraftRead,
+  EmailReplyPropose,
+  EntityContextRead,
+  FileRead,
+  FileSearch,
+  HarnessBakerySurfaceExecute,
+  HarnessCapabilityClaim,
+  HarnessCapabilityName,
+  HarnessCodeModeExecutionLease,
+  HarnessCustomConnectorRead,
+  HarnessCustomConnectorWriteProposal,
+  HarnessFollowUpSchedule,
+  HarnessMemoryProposal,
+  HarnessSideCaseProposal,
+  HarnessToolDefinition,
+  IntegrationList,
+  JevFeatureProposeTool,
+  JevFeaturesReadTool,
+  MenuBoardEditTool,
+  MenuBoardCreateTool,
+  MenuBoardArchiveTool,
+  MenuBoardReadTool,
+  MenuDraftEditTool,
+  MenuDraftReadTool,
+  MenuPriceProposal,
+  MerchantPluginProposal,
+  MerchantReportRead,
+  MessageAttachmentInspect,
+  MessageLinkRead,
+  CounterSaleReadTool,
+  OrderQueueAdvanceTool,
+  OrderQueueReadTool,
+  OrderRefundProposal,
+  PaymentsReadTool,
+  ProductDescriptionDraftEdit,
+  ProductDescriptionDraftRead,
+  ProductionPlanEditTool,
+  ProductionPlanReadTool,
+  RecipeReadTool,
+  RecipeSaveTool,
+  RecipeWorkflowProposeTool,
+  RecipeWorkflowReadTool,
+  SlackMessagePropose,
+  SoldOutMarkTool,
+  SoldOutReadTool,
+  StockActionProposal,
+  SupplierCreateTool,
+  SupplierReadTool,
+  WhatsAppSupportRead,
+  WhatsAppSupportReplySend,
+  WorkspaceQuery,
 } from "./types";
 
 const MAX_CODE_MODE_OUTPUT_BYTES = 24 * 1024;
@@ -137,10 +124,10 @@ const ENCODER = new TextEncoder();
 const CAPABILITY_FAILURE_TEXT =
   "The capability could not complete this request. Authoritative data is unavailable; retry once without inferring a broader outage.";
 
-class CommerceContextRequestError extends Error {}
+class CommerceContextRequestError extends ToolRequestError {}
 
 /** A call that the run's tool-call budget refused: retrying cannot help. */
-class CapabilityBudgetError extends Error {}
+class CapabilityBudgetError extends ToolRequestError {}
 
 const CAPABILITY_BUDGET_TEXT =
   "This conversation used its budget of tool calls, so this call did not run. Do not retry it or guess its result. Tell the person that the conversation reached its tool-call budget, and that an owner or admin can raise the budget under Access in the Portal.";
@@ -308,33 +295,12 @@ export async function executeCatalogTool(
   } catch (error) {
     logCapabilityFailure(name, callId, error);
     let failure = CAPABILITY_FAILURE_TEXT;
-    if (
-      error instanceof CapabilityBudgetError ||
-      error instanceof CommerceContextRequestError ||
-      error instanceof CommerceReadRequestError ||
-      error instanceof BakeryContextRequestError ||
-      error instanceof SlackDraftRequestError ||
-      error instanceof EmailReplyDraftRequestError ||
-      error instanceof ExitApprovalRequestedError ||
-      error instanceof ProductionPlanRequestError ||
-      error instanceof MenuDraftRequestError ||
-      error instanceof OrderRefundRequestError ||
-      error instanceof StockActionRequestError ||
-      error instanceof StaffPageRequestError ||
-      error instanceof RecipeWorkflowRequestError ||
-      error instanceof DeviceRequestError ||
-      error instanceof JevFeatureRequestError ||
-      error instanceof DescriptionDraftRequestError ||
-      error instanceof ProposalArgumentError
-    ) {
+    if (error instanceof ToolRequestError) {
       failure = error.message;
     } else {
       failure = registeredTool(name)?.unconfirmedFailure ?? failure;
     }
-    if (
-      error instanceof CommerceReadRequestError &&
-      error.requestableRead !== null
-    ) {
+    if (error instanceof ToolRequestError && error.requestableRead !== null) {
       failure = await requestDeniedRead(
         authority.requestPermission,
         execution,

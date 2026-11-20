@@ -34,10 +34,8 @@ import {
 import { assertNever } from "@purin-labs/std";
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import type { CatalogExecutionContext } from "../agent-tools/catalog/execute";
-import {
-  StaffPageRequestError,
-  type StaffPageToolReceipt,
-} from "../agent-tools/catalog/types";
+import type { StaffPageToolReceipt } from "../agent-tools/catalog/types";
+import { StaffPageRequestError } from "../agent-tools/errors";
 import { prepareCommerceReadForEmbeddedHarness } from "../agent-tools/commerce/handlers";
 import type {
   CostsPlanSaveRequest,

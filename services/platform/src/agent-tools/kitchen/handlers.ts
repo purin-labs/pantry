@@ -12,8 +12,8 @@ import {
   readWorkflowFindings,
 } from "../../commerce/bakery/workflow-revisions";
 import { supplierIdFromName } from "@purin-labs/control-api";
+import { StaffPageRequestError } from "../errors";
 import {
-  StaffPageRequestError,
   RecipeWorkflowRequestError,
   type RecipeWorkflowReadRequest,
   type RecipeSaveRequest,

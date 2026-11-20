@@ -2,7 +2,8 @@ import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { RecipeSaveRequest } from "../catalog/types";
 import type { RecipeDraft } from "../../commerce/recipe-commands";
-import { ProposalArgumentError, defineTool, jsonSchema } from "../define-tool";
+import { defineTool, jsonSchema } from "../define-tool";
+import { ProposalArgumentError } from "../errors";
 
 type RecipeQuantity = RecipeDraft["inputs"][number]["quantity"];
 

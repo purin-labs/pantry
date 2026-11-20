@@ -13,6 +13,7 @@ import {
   parseCommercePrincipalId,
   parseCommerceTimestamp,
 } from "@purin-labs/commerce-client";
+import { ToolRequestError } from "../../agent-tools/errors";
 import type { Result } from "../../result";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import {
@@ -42,19 +43,19 @@ export type CommerceContextAssemblyError =
    */
   | Readonly<{ code: "commerce_context_ceiling_denied" }>;
 
-export class CommerceReadRequestError extends Error {
+export class CommerceReadRequestError extends ToolRequestError {
   constructor(
     readonly failure: CommerceContextAssemblyError,
     /**
      * The record type or types whose read grants would admit this read, when a
      * permission request may ask for them.
      */
-    readonly requestableRead:
+    requestableRead:
       | RequestableEntityTypeRead
       | readonly RequestableEntityTypeRead[]
       | null = null,
   ) {
-    super(describeCommerceReadFailure(failure));
+    super(describeCommerceReadFailure(failure), requestableRead);
   }
 }
 

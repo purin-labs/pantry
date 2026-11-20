@@ -2,7 +2,8 @@ import { Type } from "typebox";
 import { KITCHEN_SURFACE, type PastryBenchViewCommand } from "@purin-labs/control-api";
 import { readBakerySurfaceReceiptId } from "../bakery/surface";
 import type { HarnessCostsViewExecute } from "../costs/view";
-import { defineTool, ProposalArgumentError } from "../define-tool";
+import { defineTool } from "../define-tool";
+import { ProposalArgumentError } from "../errors";
 
 const RERUN = {
   kind: "any_caller",

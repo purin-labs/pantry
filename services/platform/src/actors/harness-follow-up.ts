@@ -7,11 +7,11 @@ import type { Env } from "../env";
 import { parseConnectorId } from "../ids";
 import { validateLiveRequestAuthority } from "../request-authority";
 import { resolveActiveConnectorActorAtPlacement } from "./actor-router";
-import {
-  ExitApprovalRequestedError,
-  type HarnessFollowUpRequest,
-  type HarnessFollowUpResult,
+import type {
+  HarnessFollowUpRequest,
+  HarnessFollowUpResult,
 } from "../agent-tools/catalog/types";
+import { ExitApprovalRequestedError } from "../agent-tools/errors";
 import type {
   HarnessPermissionRequest,
   HarnessPermissionRequestResult,

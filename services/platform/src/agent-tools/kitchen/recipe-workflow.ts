@@ -1,5 +1,5 @@
 import { parseWorkflowChanges } from "@purin-labs/bakery-workflow/changes";
-import { ProposalArgumentError } from "../../agent-tools/define-tool";
+import { ProposalArgumentError } from "../errors";
 import { hasExactKeys, isRecord, isString } from "@purin-labs/std";
 import type {
   RecipeWorkflowProposeRequest,

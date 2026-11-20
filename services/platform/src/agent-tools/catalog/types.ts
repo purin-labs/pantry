@@ -96,6 +96,7 @@ import type {
   CustomConnectorWriteCatalogEntry,
 } from "../../custom-connectors";
 import type { MerchantPluginDraft } from "../../commerce/merchant-plugin-action";
+import { ToolRequestError } from "../errors";
 import type { CatalogExecutionContext } from "./execute";
 import type { JsonSchema } from "./selection";
 
@@ -324,23 +325,20 @@ export type HarnessBakerySurfaceToolResult = Readonly<{
   scenarioSaveResult: AgentScenarioSaveResult;
 }>;
 
-export class BakeryContextRequestError extends Error {}
+export class BakeryContextRequestError extends ToolRequestError {}
 
 /**
  * A Slack draft the model can correct, such as one for a channel that is not
  * connected. Its message reaches the model, so it names no channel or account.
  */
-export class SlackDraftRequestError extends Error {}
+export class SlackDraftRequestError extends ToolRequestError {}
 
 /**
  * Plan 40D: a reply draft request the model can correct, such as a read from
  * a chat that did not read the reply's sources. Its message reaches the
  * model, so it names no source, Project, person or reply text.
  */
-export class EmailReplyDraftRequestError extends Error {}
-
-/** The exit check stopped a tool effect, and Pantry asked a person (Plan 27C). */
-export class ExitApprovalRequestedError extends Error {}
+export class EmailReplyDraftRequestError extends ToolRequestError {}
 
 export type HarnessBakerySurfaceExecute = (
   request: HarnessBakerySurfaceToolRequest,
@@ -564,7 +562,7 @@ export type RecipeWorkflowProposeTool = (
 ) => Promise<unknown>;
 
 /** A recipe workflow request that was refused, in words that the agent can act on. */
-export class RecipeWorkflowRequestError extends Error {}
+export class RecipeWorkflowRequestError extends ToolRequestError {}
 
 export type DeviceReadTool = () => Promise<DeviceToolRead>;
 
@@ -599,7 +597,7 @@ export type DeviceProposeTool = (
 ) => Promise<unknown>;
 
 /** A device request that was refused, in words that the agent can act on. */
-export class DeviceRequestError extends Error {}
+export class DeviceRequestError extends ToolRequestError {}
 
 /** The Jev settings, as Settings › Jev shows them (Plan 88). */
 export type JevFeaturesReadTool = () => Promise<JevFeaturesView>;
@@ -610,13 +608,7 @@ export type JevFeatureProposeTool = (
 ) => Promise<unknown>;
 
 /** A Jev request that was refused, in words that the agent can act on. */
-export class JevFeatureRequestError extends Error {}
-
-/**
- * A step of a staff page that was refused, in words that the agent can act on.
- * It names no buyer.
- */
-export class StaffPageRequestError extends Error {}
+export class JevFeatureRequestError extends ToolRequestError {}
 
 export type MenuDraftReadTool = () => Promise<MenuDraftRead>;
 
@@ -1043,13 +1035,13 @@ export type ProductionPlanEditTool = (
  * Plan 40D: a plan request that the model can correct, such as a request that
  * no longer waits for acceptance. Its message reaches the model.
  */
-export class ProductionPlanRequestError extends Error {}
+export class ProductionPlanRequestError extends ToolRequestError {}
 
 /**
  * A description draft request that the model can correct, such as a product
  * id that names no product. Its message reaches the model.
  */
-export class DescriptionDraftRequestError extends Error {}
+export class DescriptionDraftRequestError extends ToolRequestError {}
 
 export type EmailOperationalPropose = (
   request: HarnessEmailOperationalPropose,

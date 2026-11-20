@@ -8,12 +8,13 @@ import type {
   CommercePaymentV1,
 } from "@purin-labs/commerce-client";
 
+import { ToolRequestError } from "../agent-tools/errors";
 import type { Result } from "../result";
 
 export const ORDER_REFUND_VERB = "commerce.order.refund";
 
 /** A refusal that the agent can act on, returned as the tool's words. */
-export class OrderRefundRequestError extends Error {}
+export class OrderRefundRequestError extends ToolRequestError {}
 
 export type OrderRefundLine = Readonly<{
   orderLineId: string;

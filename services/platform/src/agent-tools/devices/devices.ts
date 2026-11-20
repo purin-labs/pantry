@@ -4,7 +4,8 @@ import type {
   DeviceProposeRequest,
 } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { ProposalArgumentError, defineTool, jsonSchema } from "../define-tool";
+import { defineTool, jsonSchema } from "../define-tool";
+import { ProposalArgumentError } from "../errors";
 
 export const deviceRead = defineTool({
   name: "device_read",

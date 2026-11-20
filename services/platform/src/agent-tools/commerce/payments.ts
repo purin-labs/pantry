@@ -1,7 +1,8 @@
 import { Type } from "typebox";
 import { isPaymentWindow } from "../../commerce/payments-read";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { ProposalArgumentError, defineTool } from "../define-tool";
+import { defineTool } from "../define-tool";
+import { ProposalArgumentError } from "../errors";
 
 export const paymentsRead = defineTool({
   name: "payments_read",

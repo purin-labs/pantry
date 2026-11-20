@@ -33,6 +33,7 @@ import {
   type CollaborationSocketRoom,
 } from "./collaboration-room";
 import { assertNever, sha256Hex } from "@purin-labs/std";
+import { ToolRequestError } from "../agent-tools/errors";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 
@@ -55,7 +56,7 @@ export type MenuDraftRead = Readonly<{
 }>;
 
 /** A menu request that the model can correct. Its message reaches the model. */
-export class MenuDraftRequestError extends Error {}
+export class MenuDraftRequestError extends ToolRequestError {}
 
 /** One change that an agent makes to the shared menu. */
 export type MenuDraftEdit =

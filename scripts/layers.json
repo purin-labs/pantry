@@ -721,6 +721,7 @@
     "services/platform/src/agent-tools/drafts/drafts.ts": "areas/cafe",
     "services/platform/src/agent-tools/drafts/handlers.ts": "areas/cafe",
     "services/platform/src/agent-tools/effect-action.ts": "foundation/agent-tools",
+    "services/platform/src/agent-tools/errors.ts": "foundation/agent-tools",
     "services/platform/src/agent-tools/registry.ts": "foundation/agent-tools",
     "services/platform/src/agent-tools/session-support.ts": "foundation/agent-tools",
     "services/platform/src/approval-authentication.ts": "foundation/authority",

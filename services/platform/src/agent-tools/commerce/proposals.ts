@@ -14,7 +14,8 @@ import type {
   HarnessCampaignBriefRequest,
   HarnessConfigurationProposalRequest,
 } from "../catalog/types";
-import { defineTool, jsonSchema, ProposalArgumentError } from "../define-tool";
+import { defineTool, jsonSchema } from "../define-tool";
+import { ProposalArgumentError } from "../errors";
 
 export const campaignBriefProposal = defineTool({
   name: "commerce_propose_campaign_brief",

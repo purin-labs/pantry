@@ -2,12 +2,8 @@ import { Type } from "typebox";
 import { isIanaTimezone } from "@purin-labs/control-api";
 import type { SoldOutMarkRequest } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import {
-  ProposalArgumentError,
-  defineTool,
-  noArguments,
-  stringEnum,
-} from "../define-tool";
+import { defineTool, noArguments, stringEnum } from "../define-tool";
+import { ProposalArgumentError } from "../errors";
 
 const ID_PATTERN = "^[A-Za-z0-9_:-]{1,128}$";
 

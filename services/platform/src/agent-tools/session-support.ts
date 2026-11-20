@@ -10,10 +10,8 @@ import {
 } from "../actors/harness-follow-up";
 import type { HeldOutputReason } from "../data/held-output-request";
 import type { EffectAction } from "./effect-action";
-import {
-  StaffPageRequestError,
-  type StaffPageToolReceipt,
-} from "./catalog/types";
+import type { StaffPageToolReceipt } from "./catalog/types";
+import { StaffPageRequestError } from "./errors";
 import type { DraftSharedThread } from "../actors/product-description-draft";
 import {
   currentFlowSinkCheck,
