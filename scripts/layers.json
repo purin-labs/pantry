@@ -1044,6 +1044,7 @@
     "services/platform/src/request-deadline.ts": "foundation/kernel",
     "services/platform/src/result.ts": "foundation/kernel",
     "services/platform/src/runtime-fetch.ts": "foundation/kernel",
+    "services/platform/src/slack/goal-command.ts": "foundation/conversation",
     "services/platform/src/slack/installation-identity.ts": "foundation/connections",
     "services/platform/src/workspace-executor-container.ts": "foundation/agent",
     "services/platform/src/workspace-revision-store.ts": "foundation/agent"
