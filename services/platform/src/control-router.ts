@@ -236,6 +236,7 @@ import {
   type WorkspaceControlRoute,
 } from "./control/routes/workspace";
 import { assertNever } from "@purin-labs/std";
+import { resolveActiveCustomConnectorAccount } from "./custom-connectors/accounts";
 
 type ControlRoute =
   | ChatGoalRoute
@@ -381,7 +382,9 @@ export async function handleControlRequest(
     case "accessControlCapabilityChange":
     case "accessControlDefaultsApply":
     case "accessControlBudget":
-      return handleAccessControlRoute(request, env, route, url);
+      return handleAccessControlRoute(request, env, route, url, {
+        customConnectorAccount: resolveActiveCustomConnectorAccount,
+      });
     case "googleStart":
     case "googleCallback":
     case "session":

@@ -7,6 +7,7 @@ import {
   handleAccessControlExplainRoute,
   parseAccessDecisionQuestion,
 } from "../src/control/routes/access-control-explain";
+import { resolveActiveCustomConnectorAccount } from "../src/custom-connectors/accounts";
 
 const SUBJECT_REF = "subject_0123456789abcdef0123456789abcdef";
 const SOURCE_REF = "source_0123456789abcdef0123456789abcdef";
@@ -142,6 +143,7 @@ async function testUnauthorized(): Promise<void> {
       kind: "accessControlExplain",
       organisationIdRaw: "organisation_1",
     },
+    { customConnectorAccount: resolveActiveCustomConnectorAccount },
   );
   expect(response.status).toBe(401);
   await expect(response.json()).resolves.toEqual({

@@ -117,6 +117,7 @@ import {
 } from "../src/policy/information-flow";
 import { buildSharedSlackAuthority } from "../src/request-authority";
 import { requireConnectorId, requireIntegrationAccountId } from "./test-ids";
+import { resolveActiveCustomConnectorAccount } from "../src/custom-connectors/accounts";
 
 const ORGANISATION_ID = requiredOrganisationId();
 const GRANT = activeGrant();
@@ -249,6 +250,7 @@ async function testFlowSinkParity(): Promise<void> {
     });
     const env = decisionEnv();
     const explanation = await explainAccessDecision({
+      customConnectorAccount: resolveActiveCustomConnectorAccount,
       env,
       scope: await requireOrganisationExecutionScope(env, ORGANISATION_ID),
       organisationId: ORGANISATION_ID,
@@ -299,6 +301,7 @@ async function testContextRead(): Promise<void> {
   });
   const env = decisionEnv();
   const explanation = await explainAccessDecision({
+    customConnectorAccount: resolveActiveCustomConnectorAccount,
     env,
     scope: await requireOrganisationExecutionScope(env, ORGANISATION_ID),
     organisationId: ORGANISATION_ID,
@@ -336,6 +339,7 @@ async function testToolEffect(): Promise<void> {
   const refs = await conversationQuestionRefs(sourceGrant);
   const env = decisionEnv();
   const explanation = await explainAccessDecision({
+    customConnectorAccount: resolveActiveCustomConnectorAccount,
     env,
     scope: await requireOrganisationExecutionScope(env, ORGANISATION_ID),
     organisationId: ORGANISATION_ID,
@@ -387,6 +391,7 @@ async function explanationInput(
   );
   const env = decisionEnv();
   return {
+    customConnectorAccount: resolveActiveCustomConnectorAccount,
     env,
     scope: await requireOrganisationExecutionScope(env, ORGANISATION_ID),
     organisationId: ORGANISATION_ID,

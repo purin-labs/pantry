@@ -37,6 +37,7 @@ import {
 import {
   handleAccessControlExplainRoute,
   type AccessControlExplainRoute,
+  type AccessControlParts,
 } from "./access-control-explain";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isPositiveInteger } from "@purin-labs/std";
@@ -196,10 +197,11 @@ export async function handleAccessControlRoute(
   env: Env,
   route: AccessControlRoute,
   url: URL,
+  parts: AccessControlParts,
 ): Promise<Response> {
   switch (route.kind) {
     case "accessControlExplain":
-      return handleAccessControlExplainRoute(request, env, route);
+      return handleAccessControlExplainRoute(request, env, route, parts);
     case "accessControlGrantCreate":
     case "accessControlBudget":
     case "accessControlGrantRevoke":

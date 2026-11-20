@@ -28,7 +28,6 @@ import {
 } from "../data/integration-account";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import { resolveActiveCustomConnectorAccount } from "../custom-connectors/accounts";
 import type { Env } from "../env";
 import {
   parseConnectorId,
@@ -71,7 +70,30 @@ import { assertNever, isPositiveInteger } from "@purin-labs/std";
 
 const SUBJECT_RESOLUTION_LIMIT = 1_000;
 
+/**
+ * Reads the active custom connector account of an integration account: its
+ * connector and the binding that the Organisation accepted. The integrations
+ * area gives the read through the Worker.
+ */
+export type CustomConnectorAccountRead = (
+  input: Readonly<{
+    db: OrganisationDatabase;
+    organisationId: OrganisationId;
+    integrationAccountId: IntegrationAccountId;
+  }>,
+) => Promise<
+  Result<
+    Readonly<{
+      source: Readonly<{ connectorId: string }>;
+      binding: Readonly<{ acceptedRevision: number; definitionDigest: string }>;
+    }>,
+    unknown
+  >
+>;
+
 type ExplanationInput = Readonly<{
+  /** The read of a custom connector account, from the integrations area. */
+  customConnectorAccount: CustomConnectorAccountRead;
   scope: OrganisationExecutionScope;
   env: Env;
   organisationId: OrganisationId;
@@ -395,6 +417,7 @@ async function explainToolEffect(
     }
   }
   const credential = await credentialIsAdmissible(
+    input.customConnectorAccount,
     input.scope.database,
     input.organisationId,
     gate.value.target,
@@ -483,6 +506,7 @@ async function capabilityGate(
     };
   }
   const available = await targetIsAvailable(
+    input.customConnectorAccount,
     input.scope.database,
     input.organisationId,
     target.value,
@@ -1124,6 +1148,7 @@ async function currentPolicyMode(
 }
 
 async function targetIsAvailable(
+  resolveActiveCustomConnectorAccount: CustomConnectorAccountRead,
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   target: AccessGrantTarget,
@@ -1179,6 +1204,7 @@ async function targetIsAvailable(
 }
 
 async function credentialIsAdmissible(
+  resolveActiveCustomConnectorAccount: CustomConnectorAccountRead,
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   target: AccessGrantTarget,
