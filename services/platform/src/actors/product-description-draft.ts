@@ -23,7 +23,8 @@ import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
 import type { Env } from "../env";
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   readExactCommerceProjectionReference,
@@ -33,11 +34,11 @@ import { createCommerceClient } from "../commerce/contract/client";
 import { commerceCanonicalResourceId } from "../commerce/contract/resource-ids";
 import {
   parseCaseId,
-  parseUserId,
   parseIntegrationAccountId,
   type CaseId,
   type IntegrationAccountId,
 } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { readJsonRecord } from "../control/http";
 import {
   CollaborationRoom,

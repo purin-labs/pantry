@@ -36,8 +36,8 @@ import {
   type ControlSessionId,
   type IntegrationAccountId,
   type OrganisationId,
-  type UserId,
 } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { buildControlAuthority } from "../request-authority";

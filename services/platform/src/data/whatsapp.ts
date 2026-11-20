@@ -16,14 +16,13 @@ import type {
 import {
   parseCaseId,
   parseConnectorId,
-  parseUserId,
   type CaseId,
   type ConnectorId,
-  type UserId,
   type IntegrationAccountId,
   type ProviderConnectionId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   parseE164PhoneNumber,

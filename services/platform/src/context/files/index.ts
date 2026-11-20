@@ -53,10 +53,7 @@ export {
 } from "./projection";
 export { runFileContextReconciliation } from "./reconciliation";
 export { ProviderFileProjectionSourceReader } from "./provider-source";
-export {
-  validateFileGrantTarget,
-  type FileGrantValidationError,
-} from "./grant-validation";
+export type { FileGrantValidationError } from "./grant-validation";
 export {
   discoverFileResources,
   type FileResourceDiscoveryError,

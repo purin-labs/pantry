@@ -1,13 +1,12 @@
 import type { CommerceSystemKind } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "../database-handles";
 import {
-  parseUserId,
   parseIntegrationAccountId,
   parseOrganisationId,
-  type UserId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   resolveOrganisationCommerceSystemAuthority,

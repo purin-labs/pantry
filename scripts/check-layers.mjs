@@ -295,7 +295,9 @@ for (const folder of homeless) {
 // `pnpm lint:lint-paths` checks that each placement key matches a file.
 
 // The writers of each D1 table. A write is INSERT INTO, REPLACE INTO, UPDATE
-// or DELETE FROM with the table name, in a file under `covers`.
+// or DELETE FROM with the table name, in a file under `covers`. The keywords
+// are in upper case, as in each SQL text of the repository, so a sentence
+// such as "Could not update project access" is not a write.
 const tables = new Map();
 for (const database of ["global", "regional"]) {
   const sql = readFileSync(
@@ -312,7 +314,7 @@ for (const database of ["global", "regional"]) {
   }
 }
 const WRITE =
-  /\b(?:insert\s+(?:or\s+\w+\s+)?into|replace\s+into|update|delete\s+from)\s+"?([a-z0-9_]+)"?/gi;
+  /\b(?:INSERT\s+(?:OR\s+\w+\s+)?INTO|REPLACE\s+INTO|UPDATE|DELETE\s+FROM)\s+"?([a-z0-9_]+)"?/g;
 for (const path of tracked) {
   const from = moduleOf(path);
   if (from === null) continue;

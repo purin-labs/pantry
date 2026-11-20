@@ -109,55 +109,6 @@ export function prepareSlackInstallationLifecycleEvent(
     );
 }
 
-/**
- * The directory's Slack records that name the Organisation's connections: a
- * person's DM choice and the thread pins. A DM choice that named a revoked
- * connection asks the person to choose again; a pin has no Case to reach.
- */
-export function directorySlackRecordDeletions(
-  directory: GlobalDatabase,
-  organisationId: OrganisationId,
-): readonly (readonly [table: string, statement: D1PreparedStatement])[] {
-  return [
-    [
-      "slack_dm_organisation_selection",
-      directory
-        .prepare(
-          `DELETE FROM slack_dm_organisation_selection
-           WHERE EXISTS (SELECT 1 FROM slack_organisation_connection AS connection
-             WHERE connection.installation_id = slack_dm_organisation_selection.installation_id
-               AND connection.connection_id = slack_dm_organisation_selection.connection_id
-               AND connection.organisation_id = ? AND connection.lifecycle = 'revoked')`,
-        )
-        .bind(organisationId),
-    ],
-    [
-      "slack_thread_case_pin",
-      directory
-        .prepare("DELETE FROM slack_thread_case_pin WHERE organisation_id = ?")
-        .bind(organisationId),
-    ],
-  ];
-}
-
-/** How many of the records that `directorySlackRecordDeletions` deletes exist. */
-export function directorySlackRecordCount(
-  directory: GlobalDatabase,
-  organisationId: OrganisationId,
-): D1PreparedStatement {
-  return directory
-    .prepare(
-      `SELECT
-         (SELECT COUNT(*) FROM slack_dm_organisation_selection AS selection
-          JOIN slack_organisation_connection AS connection
-            ON connection.installation_id = selection.installation_id
-           AND connection.connection_id = selection.connection_id
-          WHERE connection.organisation_id = ?1 AND connection.lifecycle = 'revoked')
-       + (SELECT COUNT(*) FROM slack_thread_case_pin WHERE organisation_id = ?1) AS count`,
-    )
-    .bind(organisationId);
-}
-
 /** Revokes an installation whose bot token the Organisation holds. */
 export function prepareSlackInstallationRevocation(
   directory: GlobalDatabase,

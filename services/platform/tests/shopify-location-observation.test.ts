@@ -15,7 +15,7 @@ import {
   createCommerceProjectionSchema,
   readCurrentCommerceProjection,
 } from "../src/actors/commerce-projection";
-import { parseUserId } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const ORGANISATION_ID = "organisation_shopify_locations";

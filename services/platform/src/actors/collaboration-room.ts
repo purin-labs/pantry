@@ -24,11 +24,10 @@ import {
 import type { Env } from "../env";
 import {
   parseControlSessionId,
-  parseUserId,
   type ControlSessionId,
-  type UserId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import type { Result } from "../result";

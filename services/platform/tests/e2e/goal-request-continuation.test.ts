@@ -4,7 +4,7 @@ import { evictDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,

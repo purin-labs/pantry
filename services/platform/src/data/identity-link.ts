@@ -7,11 +7,11 @@ import {
   parseProviderConnectionId,
   parseOrganisationId,
   parseWorkspaceId,
-  type UserId,
   type ProviderConnectionId,
   type OrganisationId,
   type WorkspaceId,
 } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   parseSlackUserId,

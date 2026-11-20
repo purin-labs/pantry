@@ -16,10 +16,8 @@ import {
 import type { Result } from "../../result";
 import type { FileContextProvider } from "@purin-labs/contracts";
 
-export type FileGrantValidationError = Readonly<{
-  readonly code:
-    "provider_resource_not_accessible" | "provider_resource_identity_mismatch";
-}>;
+import type { FileGrantValidationError } from "../../authorization/access-grants/file-grant-parts";
+export type { FileGrantValidationError } from "../../authorization/access-grants/file-grant-parts";
 
 export async function validateFileGrantTarget(
   input: Readonly<{

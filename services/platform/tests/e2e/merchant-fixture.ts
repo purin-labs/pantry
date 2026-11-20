@@ -1,6 +1,7 @@
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import type { Env } from "../../src/env";
-import type { OrganisationId, UserId } from "../../src/ids";
+import type { OrganisationId } from "../../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   createAccessGrant,
   readAccessGrant,

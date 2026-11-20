@@ -26,6 +26,7 @@ import {
   readWhatsAppCase,
   readWhatsAppRuntime,
   recordWhatsAppProposal,
+  WHATSAPP_DISPOSAL_EVENTS,
   type WhatsAppProposalRow,
 } from "./connector-whatsapp";
 import type { WhatsAppContentCipher } from "./whatsapp-active-content";
@@ -737,14 +738,6 @@ type WhatsAppDisposalOutcome =
   | { readonly kind: "disposed"; readonly state: WhatsAppProposalRow["state"] }
   | { readonly kind: "proposal_missing" };
 
-const DISPOSAL_EVENTS = {
-  rejected: "reject",
-  taken_over: "take_over",
-  revoked: "revoke",
-  expired: "expire",
-  superseded: "supersede",
-} as const;
-
 /**
  * Terminal disposal for reject, takeover, and revoke. The stored body is
  * deleted in the same statement, so no path can leave a readable draft. A
@@ -767,7 +760,7 @@ export function disposeWhatsAppProposal(
   const moved = advanceWhatsAppProposal(
     input.sql,
     proposal,
-    { event: DISPOSAL_EVENTS[input.state] },
+    { event: WHATSAPP_DISPOSAL_EVENTS[input.state] },
     input.now,
   );
   return moved.ok
@@ -832,32 +825,6 @@ export function resolveWhatsAppIndeterminateSend(
  * operator can compose their own reply. A close revokes a version that is
  * being sent as well; a takeover and a new draft leave it to its attempt.
  */
-export function invalidateOpenWhatsAppProposal(
-  sql: SqlStorage,
-  caseId: string,
-  state: Extract<
-    WhatsAppProposalRow["state"],
-    "taken_over" | "revoked" | "superseded"
-  >,
-  now: number,
-):
-  | { readonly kind: "invalidated"; readonly proposalId: string }
-  | { readonly kind: "none" } {
-  let invalidated: string | null = null;
-  for (const open of openWhatsAppProposals(sql, caseId)) {
-    const moved = advanceWhatsAppProposal(
-      sql,
-      open,
-      { event: DISPOSAL_EVENTS[state] },
-      now,
-    );
-    if (moved.ok) invalidated ??= open.proposalId;
-  }
-  return invalidated === null
-    ? { kind: "none" }
-    : { kind: "invalidated", proposalId: invalidated };
-}
-
 /**
  * A human-authored reply. It still goes through the same send ladder, so the
  * service window, organisation credential, account state, and ownership gates apply;

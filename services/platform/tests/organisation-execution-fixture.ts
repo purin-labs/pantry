@@ -19,7 +19,7 @@ import {
 } from "../src/data/control-plane";
 import { readActiveOrganisationMembershipRevision } from "../src/data/control-plane";
 import { buildControlAuthority } from "../src/request-authority";
-import type { UserId } from "../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Env } from "../src/env";
 import type { UnitTestEnv } from "./worker-fakes";
 import {

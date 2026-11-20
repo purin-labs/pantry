@@ -23,15 +23,14 @@ import {
 } from "../src/approval-authentication";
 import {
   parseCaseId,
-  parseUserId,
   parseControlSessionId,
   parsePersonId,
   parseSessionId,
   parseOrganisationId,
-  type UserId,
   type SessionId,
   type OrganisationId,
 } from "../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { credentialPolicyRuleId } from "../src/policy-rule-id";
 import {
   compilePublishAndActivateOrganisationPolicy,

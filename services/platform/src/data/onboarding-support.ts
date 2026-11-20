@@ -3,7 +3,8 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
 } from "../organisation-execution-scope";
-import { parseOrganisationId, type UserId, type OrganisationId } from "../ids";
+import { parseOrganisationId, type OrganisationId } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type {
   QuerySource,

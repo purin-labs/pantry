@@ -17,7 +17,8 @@ import {
   readOrganisationCapabilityPolicies,
 } from "../data/capability-policy";
 import type { OrganisationEnvironment } from "../data/control-plane";
-import type { UserId, OrganisationId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { OrganisationQuerySource } from "../data/query-source";

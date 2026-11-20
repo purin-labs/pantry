@@ -14,7 +14,7 @@ import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-mess
 import { newRequestId } from "../ids";
 import { parseStoredRequestAuthority } from "../request-authority";
 import { deliverCommerceCaseOutput } from "./case-commerce-delivery";
-import { commerceActionCardText, commerceActionSummary, commerceCardSummary } from "../slack/commerce-approval-card";
+import { commerceApprovalCardTexts } from "./contract/approval-card-texts";
 import { traceWarn } from "../observability";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
@@ -607,12 +607,14 @@ export async function acceptAndDeliverCommerceOutcome(
     outcome: commerceCaseOutcome(input),
     content: {
       kind: "text",
-      text: commerceActionCardText(
-        notice === null
-          ? commerceActionSummary(input.entry.action)
-          : commerceCardSummary(notice),
-        input.entry,
-      ),
+      text: commerceApprovalCardTexts
+        .use()
+        .actionCardText(
+          notice === null
+            ? commerceApprovalCardTexts.use().actionSummary(input.entry.action)
+            : commerceApprovalCardTexts.use().cardSummary(notice),
+          input.entry,
+        ),
     },
     acceptedAt: input.now,
   });

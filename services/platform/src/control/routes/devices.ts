@@ -21,7 +21,7 @@ import { type MenuScreenSummary } from "@purin-labs/cafe-control-api";
 import { type DeviceSample } from "../../actors/device-fleet";
 import { deviceFleetStub } from "../../devices/contract/fleet-stub";
 import { roleMayConfigure, roleMayOperate } from "../../data/control-plane";
-import { readTerminalOperations } from "../../data/terminal-operations-readback";
+import { cafeServices } from "../../cafe/contract/cafe-services";
 import {
   DEVICE_COMMAND_ROLE,
   runDeviceCommand,
@@ -50,13 +50,12 @@ import type { Env } from "../../env";
 import { newRequestId } from "../../ids";
 import { traceWarn } from "../../observability";
 import { requirePublicOrigin } from "../../public-origin";
-import { readShopMacDevices } from "../../voice/mac-devices";
+import { shopMacDevices } from "../../devices/contract/shop-mac-devices";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
-import { readMenuScreenList } from "./menu-boards";
 
 /**
  * The Devices page's routes (Plan 85):
@@ -612,7 +611,9 @@ async function readScreens(
   env: Env,
   authorized: AuthorizedOrganisationRequest,
 ): Promise<DeviceRead> {
-  const screens = await readMenuScreenList(env, authorized);
+  const screens = await cafeServices
+    .use()
+    .readMenuScreenList(env, authorized);
   return screens === null
     ? { devices: [], complete: false }
     : { devices: screens.map(screenView), complete: true };
@@ -640,7 +641,7 @@ async function readMacs(
   authorized: AuthorizedOrganisationRequest,
   now: number,
 ): Promise<DeviceRead> {
-  const macs = await readShopMacDevices(
+  const macs = await shopMacDevices.use().readShopMacDevices(
     env,
     authorized.executionScope.database,
     authorized.organisationId,
@@ -654,7 +655,7 @@ async function readTerminals(
   now: number,
 ): Promise<DeviceRead> {
   // This page does not use `paymentsLinked`, so it makes no Commerce call.
-  const operations = await readTerminalOperations({
+  const operations = await cafeServices.use().readTerminalOperations({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     now,

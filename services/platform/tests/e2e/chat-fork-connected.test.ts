@@ -41,7 +41,8 @@ import {
   parseMenuDraftServerMessage,
   type MenuDraftServerMessage,
 } from "@purin-labs/menu-draft-crdt/protocol";
-import { parseSessionId, parseUserId, type UserId } from "../../src/ids";
+import { parseSessionId } from "../../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,
   type IssuedControlSession,

@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { Outcome, RequestAuthority } from "@purin-labs/contracts";
-import type { UserId } from "../../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { chatInputParts } from "../input-parts";
 import type {

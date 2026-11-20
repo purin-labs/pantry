@@ -5,12 +5,8 @@ import { isNonBlankString, isRecord } from "@purin-labs/std";
 import { resolveActiveSlackThreadCredential } from "../credential-vault";
 import { parsePersonId } from "../data/person-authz";
 import type { Env } from "../env";
-import {
-  parseChannelId,
-  parseOrganisationId,
-  parseUserId,
-  parseWorkspaceId,
-} from "../ids";
+import { parseChannelId, parseOrganisationId, parseWorkspaceId } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import type { SlackCaseCommand } from "../slack/case-command-message";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "../request-authority";

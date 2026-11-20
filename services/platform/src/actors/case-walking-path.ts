@@ -41,7 +41,6 @@ import {
 import { traceLog } from "../observability";
 import { FlowBinding, sinkRefusalAsksPerson } from "../policy";
 import type { SerializedFlowBinding } from "../policy";
-import type { SlackUserId } from "../slack/events";
 import {
   slackCaseOutputIdempotencyKey,
   slackCaseStreamId,
@@ -50,7 +49,7 @@ import {
   type ConnectorCaseTurnStreamInput,
   type ConnectorCaseTurnStreamError,
   type ConnectorCaseTurnStreamResult,
-} from "./connector-slack-stream";
+} from "./case-turn-stream";
 import { parseSessionTurnInputDigest } from "./agent-session-turn-input-digest";
 import { serializeContextBundle } from "./actor-journal/parsers";
 import type {
@@ -225,7 +224,11 @@ export type OngoingCaseTurnInput = Omit<
   readonly attempt: number;
   readonly output:
     | { readonly kind: "terminal" }
-    | { readonly kind: "slack_stream"; readonly recipientUserId: SlackUserId };
+    | {
+        readonly kind: "slack_stream";
+        /** The Slack user that the answer replies to. */
+        readonly recipientUserId: string;
+      };
 };
 
 type CaseParticipantInput = {

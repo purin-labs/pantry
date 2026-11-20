@@ -20,11 +20,11 @@ import {
 } from "../../src/data/whatsapp";
 import {
   parseIntegrationAccountId,
-  type UserId,
   type IntegrationAccountId,
   type ProviderConnectionId,
   type OrganisationId,
 } from "../../src/ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { providerCredentialHandle } from "../../src/integrations/contract/provisioning";
 import {
   parseE164PhoneNumber,

@@ -1,6 +1,11 @@
 import { assertNever } from "@purin-labs/std";
 
-import { authorizeConversation } from "../chat/conversation-access";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import { authorizeConversation } from "./conversation-access";
+import type { Env } from "../env";
+import type { OrganisationId } from "../ids";
+import type { AuthorizedConversationScope } from "../organisation-access/access";
+import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { FlowLabel } from "../policy/information-flow";
 import { slackChannelIsPublic } from "../policy/information-flow/source-labels";
 import { slackSurfaceParts } from "../slack/surface-parts";
@@ -8,14 +13,16 @@ import type {
   FlowAudience,
   FlowPolicyOwner,
 } from "../policy/information-flow/types";
-import type { MemoryViewer } from "./access";
 import type { Variant } from "@purin-labs/type-utils";
 
 /** The member that a view is for, with what is needed to judge a reader. */
-export type MemberViewer = Pick<
-  MemoryViewer,
-  "env" | "organisationId" | "execution" | "scope" | "authority"
->;
+export type MemberViewer = Readonly<{
+  env: Env;
+  organisationId: OrganisationId;
+  execution: OrganisationExecutionScope;
+  scope: AuthorizedConversationScope;
+  authority: Variant<RequestAuthority, "control">;
+}>;
 
 /**
  * Whether a member sees content under `label` in the Portal (Plan 27C). The

@@ -16,7 +16,8 @@ import {
   createActiveConnectedIntegration,
   type ConnectedIntegrationSeed,
 } from "../src/data/integration-account";
-import type { UserId, IntegrationAccountId, OrganisationId } from "../src/ids";
+import type { IntegrationAccountId, OrganisationId } from "../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   cancelProviderAttempt,
   beginProviderProvisioning,

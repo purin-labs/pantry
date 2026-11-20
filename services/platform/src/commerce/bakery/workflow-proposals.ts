@@ -11,7 +11,8 @@ import {
 import type { RunFinding } from "@purin-labs/bakery-workflow/findings";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { Env } from "../../env";
-import type { ControlSessionId, OrganisationId, UserId } from "../../ids";
+import type { ControlSessionId, OrganisationId } from "../../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   applyWorkflowRevision,

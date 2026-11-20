@@ -1,9 +1,9 @@
 import {
-  COLLABORATION_PING,
-  COLLABORATION_PONG,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
-} from "@purin-labs/collaboration";
-import { sha256Hex } from "@purin-labs/std";
+  sha256Hex,
+  SOCKET_PING,
+  SOCKET_PONG,
+  SOCKET_PRESENCE_EXPIRY_MS,
+} from "@purin-labs/std";
 
 /**
  * Sockets that an Actor accepts through the hibernation API.
@@ -25,7 +25,7 @@ export const SOCKET_SWEEP_INTERVAL_MS = 300_000;
  * client, and a sweep closes it. While two people share a room, sweeps run
  * this often, so a dropped client leaves the room's presence in time.
  */
-export const SOCKET_SILENCE_LIMIT_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
+export const SOCKET_SILENCE_LIMIT_MS = SOCKET_PRESENCE_EXPIRY_MS;
 
 /**
  * The Actor no longer serves its sockets: the Organisation moved, or its
@@ -40,7 +40,7 @@ export function installSocketAutoResponse(ctx: DurableObjectState): void {
   // serves no sockets, so it needs no answer.
   if (typeof WebSocketRequestResponsePair !== "function") return;
   ctx.setWebSocketAutoResponse(
-    new WebSocketRequestResponsePair(COLLABORATION_PING, COLLABORATION_PONG),
+    new WebSocketRequestResponsePair(SOCKET_PING, SOCKET_PONG),
   );
 }
 

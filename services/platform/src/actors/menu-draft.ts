@@ -23,7 +23,8 @@ import type { SessionTurnExecution } from "../chat/turn-access";
 import { controlError } from "../control/http";
 import { resolveUser } from "../data/control-plane";
 import type { Env } from "../env";
-import type { UserId, OrganisationId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   CollaborationRoom,

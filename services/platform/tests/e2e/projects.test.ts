@@ -59,7 +59,7 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveOrganisationModelRoute } from "../../src/models/route";
 import {
   readConversation,

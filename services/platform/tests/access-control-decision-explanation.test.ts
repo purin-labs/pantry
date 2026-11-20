@@ -106,11 +106,11 @@ import {
 } from "../src/access-control/references";
 import {
   parseCaseId,
-  parseUserId,
   parsePersonId,
   parseOrganisationId,
   type OrganisationId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   FlowLabel,
   evaluateFlowLabelSink,

@@ -14,7 +14,7 @@ import {
   type CommercePurchasingReconcileResponse,
 } from "@purin-labs/commerce-client";
 
-import { registerSupplierOperationalEmailContact } from "../../data/email-operational";
+import { inboxServices } from "../../mail-inbox/contract/inbox-services";
 import { createCommerceOutboxReconcileQueueMessage } from "../contract/queue-messages";
 import {
   newRequestId,
@@ -160,15 +160,17 @@ export async function registerSupplier(
   });
   if (!created.ok) return created;
   if (input.supplier.email !== null) {
-    const contact = await registerSupplierOperationalEmailContact({
-      db: input.db,
-      organisationId: input.organisationId,
-      supplierId: input.supplier.supplierId,
-      contactRevision: Number(created.value.merchantRevision),
-      address: input.supplier.email,
-      displayName: input.supplier.contactName ?? input.supplier.displayName,
-      now: input.now,
-    });
+    const contact = await inboxServices
+      .use()
+      .registerSupplierOperationalEmailContact({
+        db: input.db,
+        organisationId: input.organisationId,
+        supplierId: input.supplier.supplierId,
+        contactRevision: Number(created.value.merchantRevision),
+        address: input.supplier.email,
+        displayName: input.supplier.contactName ?? input.supplier.displayName,
+        now: input.now,
+      });
     if (!contact.ok)
       return {
         ok: false,

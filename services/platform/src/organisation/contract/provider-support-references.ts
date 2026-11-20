@@ -2,8 +2,10 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../../database-handles";
-import type { UserId, OrganisationId } from "../../ids";
+import type { OrganisationId } from "../../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationEnvironment } from "../../data/control-plane";
+import type { ProviderAttemptSupportReference } from "../../data/connection-flow-parts";
 import { prepareProjectionRevisionBump } from "../../data/organisation-onboarding-row";
 
 /**
@@ -103,4 +105,45 @@ export async function resolveOpenProviderSupportReferences(
   if (resolved.meta.changes === 0) return false;
   await prepareProjectionRevisionBump(db, input.organisationId).run();
   return true;
+}
+
+/** The support reference of a provider attempt that failed. */
+export function prepareProviderAttemptSupportReference(
+  session: Pick<OrganisationDatabaseSession, "prepare">,
+  input: ProviderAttemptSupportReference,
+): D1PreparedStatement {
+  return session
+    .prepare(
+      `INSERT INTO onboarding_support_reference (
+         support_reference, organisation_id, environment, actor_user_id,
+         correlation_id, route, operation, reason_code, retry_classification,
+         first_occurred_at, latest_occurred_at, occurrence_count, resolved_at,
+         provider, adapter_operation, lifecycle_before, lifecycle_after,
+         redacted_provider_status, redacted_provider_request_id,
+         durable_receipts, last_successful_phase
+       ) VALUES (
+         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NULL,
+         ?, ?, ?, 'failed', ?, ?, ?, ?
+       )`,
+    )
+    .bind(
+      input.supportReference,
+      input.organisationId,
+      input.environment,
+      input.actorUserId,
+      input.correlationId,
+      input.route,
+      input.operation,
+      input.reasonCode,
+      input.retryClassification,
+      input.now,
+      input.now,
+      input.provider,
+      input.adapterOperation,
+      input.lifecycleBefore,
+      input.redactedProviderStatus,
+      input.redactedProviderRequestId,
+      input.durableReceipts,
+      input.lastSuccessfulPhase,
+    );
 }

@@ -2,8 +2,8 @@ import type { ConnectorDeliveryReceipt } from "@purin-labs/contracts";
 import {
   checkPreparedConnectorDelivery,
   streamConnectorCaseTurn,
-  type ConnectorCaseTurnStreamInput,
 } from "../src/actors/connector-slack-stream";
+import type { ConnectorCaseTurnStreamInput } from "../src/actors/case-turn-stream";
 
 declare const streamInput: Parameters<typeof streamConnectorCaseTurn>[0];
 declare const deliveryInput: Parameters<

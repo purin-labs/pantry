@@ -8,7 +8,7 @@ import {
 import { readAccessGrant } from "../../src/data/access-grants";
 import { readControlMutationReplay } from "../../src/data/control-mutation";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
-import { parseUserId, type UserId } from "../../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import {
   startActorRelocation,

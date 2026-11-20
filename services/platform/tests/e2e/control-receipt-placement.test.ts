@@ -7,7 +7,7 @@ import {
   ORGANISATION_ID,
 } from "./slack-journey-support";
 import { issueControlSession } from "../../src/data/control-plane";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { authorizeOrganisationRequest } from "../../src/control/authorization";
 import { recordCommerceMutationReceipt } from "../../src/control/mutation-receipt";
 import { readControlMutationReplay } from "../../src/data/control-mutation";

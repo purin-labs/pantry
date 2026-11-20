@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";

@@ -28,10 +28,10 @@ import {
 } from "../../src/data/whatsapp";
 import {
   parseConnectorId,
-  parseUserId,
   type ConnectorId,
   type IntegrationAccountId,
 } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,

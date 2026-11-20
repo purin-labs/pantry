@@ -55,7 +55,6 @@ import {
   resolveOrganisationCommerceMerchantBinding,
   resolveCommerceMerchantBinding,
 } from "../../../data/commerce-merchant-binding";
-import { buildOnboardingProjection } from "../../../data/onboarding-projection";
 import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
 import {
   bindUnboundSetupChannel,
@@ -87,6 +86,7 @@ import {
 } from "../../../commerce/contract/resource-ids";
 import { createCommerceClient } from "../../../commerce/contract/client";
 import {
+  onboardingProjection,
   admitUserMutation,
   controlMutationIdentity,
   controlMutationScope,
@@ -1034,7 +1034,7 @@ async function attachMerchantActionDestination(input: {
     { readonly code: string }
   >
 > {
-  const projection = await buildOnboardingProjection({
+  const projection = await onboardingProjection.use()({
     db: input.execution.database,
     organisationId: input.execution.organisationId,
     membership: input.membership,

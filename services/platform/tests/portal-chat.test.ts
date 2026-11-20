@@ -176,11 +176,8 @@ import {
   parseChatCommand,
   parseChatModelAction,
 } from "../src/chat/conversation";
-import {
-  parseUserId,
-  parseIntegrationAccountId,
-  parseOrganisationId,
-} from "../src/ids";
+import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   advanceConversationRead,
   listConversationDirectory,

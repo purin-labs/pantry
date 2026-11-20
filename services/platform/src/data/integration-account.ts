@@ -23,12 +23,10 @@ import {
   newIntegrationAccountId,
   newProviderConnectionId,
   newProviderWebhookId,
-  parseUserId,
   parseIntegrationAccountId,
   parseProviderConnectionId,
   parseProviderWebhookId,
   parseOrganisationId,
-  type UserId,
   type IntegrationAccountId,
   type ProviderConnectionId,
   type ProviderWebhookId,
@@ -36,9 +34,8 @@ import {
   parseVaultHandle,
   type VaultHandle,
 } from "../ids";
-import {
-  prepareResolveOpenSupportReferences,
-} from "../organisation/contract/provider-support-references";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
+import { connectionFlowParts } from "./connection-flow-parts";
 import type { Result } from "../result";
 import {
   gmailProductFromScopes,
@@ -789,19 +786,12 @@ function reconnectAuthorityStatements(
         connection.providerConnectionId,
         previous.credentialGeneration,
       ),
-    session
-      .prepare(
-        `UPDATE credential_ref
-       SET vault_handle = ?, revoked_at = NULL
-       WHERE organisation_id = ? AND provider = ? AND vault_handle = ?
-         AND revoked_at IS NULL`,
-      )
-      .bind(
-        replacement,
-        seed.organisationId,
-        seed.provider,
-        previous.credentialRef,
-      ),
+    connectionFlowParts.use().prepareCredentialRefReplacement(session, {
+      organisationId: seed.organisationId,
+      provider: seed.provider,
+      previousCredentialRef: previous.credentialRef,
+      replacementCredentialRef: replacement,
+    }),
   ];
 }
 
@@ -952,7 +942,7 @@ export async function finalizeConnectedIntegrationAccount(input: {
          )`,
       )
       .bind(input.now, input.organisationId, input.integrationAccountId),
-    prepareResolveOpenSupportReferences(session, {
+    connectionFlowParts.use().prepareResolveOpenSupportReferences(session, {
       organisationId: input.organisationId,
       provider: account.value.provider,
       now: input.now,
@@ -1337,13 +1327,11 @@ async function prepareDefaultAccountBindingTransition(
     return {
       ok: true,
       value: [
-        db
-          .prepare(
-            `UPDATE organisation_communication_destination
-           SET integration_account_id = ?, selected_at = ?
-           WHERE organisation_id = ?`,
-          )
-          .bind(next.integrationAccountId, now, next.organisationId),
+        connectionFlowParts.use().prepareCommunicationDestinationAccount(db, {
+          organisationId: next.organisationId,
+          integrationAccountId: next.integrationAccountId,
+          now,
+        }),
       ],
     };
   }

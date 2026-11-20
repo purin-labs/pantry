@@ -4,7 +4,8 @@ import type {
   OrganisationDatabaseSession,
 } from "../database-handles";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
-import type { UserId, IntegrationAccountId, OrganisationId } from "../ids";
+import type { IntegrationAccountId, OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   prepareAccountContactVerificationsDelete,
   whatsappErasureStatements,

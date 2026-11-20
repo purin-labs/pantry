@@ -6,11 +6,11 @@ import { parseVaultHandle, type VaultHandle } from "../../credential-vault";
 import {
   parseIntegrationAccountId,
   parseProviderConnectionId,
-  type UserId,
   type IntegrationAccountId,
   type ProviderConnectionId,
   type OrganisationId,
 } from "../../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../../result";
 import {
   prepareControlMutationReceipt,

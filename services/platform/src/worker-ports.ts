@@ -85,6 +85,54 @@ import { slackDmSelection } from "./slack/installation-store";
 import { permissionRequestNoticeText } from "./slack/permission-request-notice";
 import { releaseAgentPermissionDecision } from "./slack/permission-request-release";
 import { slackSurfaceParts } from "./slack/surface-parts";
+import { shopMacDevices } from "./devices/contract/shop-mac-devices";
+import { readShopMacDevices } from "./voice/mac-devices";
+import { commerceApprovalCardTexts } from "./commerce/contract/approval-card-texts";
+import {
+  commerceActionCardText,
+  commerceActionPortalUrl,
+  commerceActionSummary,
+  commerceCardSummary,
+  commerceChangeSummary,
+  commerceWaitingCardText,
+} from "./slack/commerce-approval-card";
+import { cafeServices } from "./cafe/contract/cafe-services";
+import { readCounterSaleView } from "./commerce/counter-register";
+import { readMenuScreenList } from "./control/routes/menu-boards";
+import { readTerminalOperations } from "./data/terminal-operations-readback";
+import { inboxServices } from "./mail-inbox/contract/inbox-services";
+import { readGmailPilotBudget } from "./data/email-mailbox";
+import { registerSupplierOperationalEmailContact } from "./data/email-operational";
+import { organisationServices } from "./organisation/contract/organisation-services";
+import { removeIntegrationAccount } from "./data/account-removal";
+import {
+  cancelOperatorConfigurationDraft,
+  confirmOperatorConfigurationDraft,
+  previewCode,
+  readOperatorDraft,
+} from "./data/operator-configuration-draft";
+import { workflowChanges } from "./kitchen/contract/workflow-changes";
+import { applyApprovedWorkflowChange } from "./commerce/bakery/workflow-proposals";
+import { deviceCommands } from "./devices/contract/device-commands";
+import { runDeviceCommand } from "./devices/commands";
+import { connectionFlowParts } from "./data/connection-flow-parts";
+import { prepareCredentialRefReplacement } from "./credential-vault/service";
+import { prepareCommunicationDestinationAccount } from "./data/onboarding";
+import {
+  prepareProviderAttemptSupportReference,
+  prepareResolveOpenSupportReferences,
+} from "./organisation/contract/provider-support-references";
+import { fileGrantParts } from "./authorization/access-grants/file-grant-parts";
+import {
+  prepareChangedFileGrantSync,
+  prepareNewFileGrantSync,
+  prepareRevokedFileGrantCleanup,
+  prepareRevokedFileGrantRows,
+  supersedeUnadmittedFileProjectionsStatement,
+} from "./context/files/persistence";
+import { validateFileGrantTarget } from "./context/files/grant-validation";
+import { nativeChatAudience } from "./context/assembly/native-chat-audience";
+import { resolveNativeChatAudience } from "./chat/information-flow";
 import {
   prepareRevokedDmSelectionRelease,
   selectSlackDmOrganisation,
@@ -200,6 +248,80 @@ providerServices.register({
 entityPlaneObservationParser.register((raw) =>
   parseEntityPlaneObservation(raw),
 );
+
+nativeChatAudience.register((db, accountAccess, authority, label) =>
+  resolveNativeChatAudience(db, accountAccess, authority, label, {
+    kind: "current",
+  }),
+);
+
+fileGrantParts.register({
+  prepareNewFileGrantSync: (...input) => prepareNewFileGrantSync(...input),
+  prepareChangedFileGrantSync: (...input) =>
+    prepareChangedFileGrantSync(...input),
+  prepareRevokedFileGrantRows: (...input) =>
+    prepareRevokedFileGrantRows(...input),
+  prepareRevokedFileGrantCleanup: (...input) =>
+    prepareRevokedFileGrantCleanup(...input),
+  supersedeUnadmittedFileProjectionsStatement: (...input) =>
+    supersedeUnadmittedFileProjectionsStatement(...input),
+  validateFileGrantTarget: (...input) => validateFileGrantTarget(...input),
+});
+
+connectionFlowParts.register({
+  prepareResolveOpenSupportReferences: (...input) =>
+    prepareResolveOpenSupportReferences(...input),
+  prepareProviderAttemptSupportReference: (...input) =>
+    prepareProviderAttemptSupportReference(...input),
+  prepareCommunicationDestinationAccount: (...input) =>
+    prepareCommunicationDestinationAccount(...input),
+  prepareCredentialRefReplacement: (...input) =>
+    prepareCredentialRefReplacement(...input),
+});
+
+cafeServices.register({
+  readMenuScreenList: (...input) => readMenuScreenList(...input),
+  readTerminalOperations: (...input) => readTerminalOperations(...input),
+  readCounterSaleView: (...input) => readCounterSaleView(...input),
+});
+
+inboxServices.register({
+  readGmailPilotBudget: (...input) => readGmailPilotBudget(...input),
+  registerSupplierOperationalEmailContact: (...input) =>
+    registerSupplierOperationalEmailContact(...input),
+});
+
+organisationServices.register({
+  removeIntegrationAccount: (...input) => removeIntegrationAccount(...input),
+  readOperatorDraft: (...input) => readOperatorDraft(...input),
+  cancelOperatorConfigurationDraft: (...input) =>
+    cancelOperatorConfigurationDraft(...input),
+  confirmOperatorConfigurationDraft: (...input) =>
+    confirmOperatorConfigurationDraft(...input),
+  previewCode: (...input) => previewCode(...input),
+});
+
+workflowChanges.register({
+  applyApprovedWorkflowChange: (...input) =>
+    applyApprovedWorkflowChange(...input),
+});
+
+deviceCommands.register({
+  runDeviceCommand: (...input) => runDeviceCommand(...input),
+});
+
+commerceApprovalCardTexts.register({
+  portalUrl: (...input) => commerceActionPortalUrl(...input),
+  changeSummary: (...input) => commerceChangeSummary(...input),
+  actionSummary: (...input) => commerceActionSummary(...input),
+  cardSummary: (...input) => commerceCardSummary(...input),
+  waitingCardText: (...input) => commerceWaitingCardText(...input),
+  actionCardText: (...input) => commerceActionCardText(...input),
+});
+
+shopMacDevices.register({
+  readShopMacDevices: (...input) => readShopMacDevices(...input),
+});
 
 // The lifecycle batches of tenancy get the parts of the table owners.
 provideOrganisationLifecycleParts(ORGANISATION_LIFECYCLE_PARTS);

@@ -7,7 +7,8 @@ import {
   finalizeConnectedIntegrationAccount,
 } from "../src/data/integration-account";
 import { parseVaultHandle } from "../src/credential-vault";
-import { parseOrganisationId, parseUserId } from "../src/ids";
+import { parseOrganisationId } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   disableSlackOrganisationConnection,
   hasSlackOrganisationConnection,

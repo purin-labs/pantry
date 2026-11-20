@@ -11,9 +11,9 @@ import {
   parseCodexAuthorizationAttemptId,
   parseOrganisationId,
   type CodexAuthorizationAttemptId,
-  type UserId,
   type OrganisationId,
 } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { traceWarn } from "../observability";
 import type { Env } from "../env";
 import type { Result } from "../result";

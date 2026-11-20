@@ -16,7 +16,8 @@ import {
   readConversationStatus,
   reconcileRevokedConversationRun,
 } from "../chat/store";
-import type { CaseId, UserId } from "../ids";
+import type { CaseId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { authorizeProject, type ProjectAccessScope } from "./access";
 import { readDefaultProjectId } from "./case-project";

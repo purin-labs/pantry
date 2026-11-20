@@ -13,7 +13,8 @@ import {
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
-import { parseRequestId, parseSessionId, parseUserId } from "../../src/ids";
+import { parseRequestId, parseSessionId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,
   readActiveOrganisationMembershipRevision,

@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { SingleDatabase } from "../src/database-handles";
 import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";

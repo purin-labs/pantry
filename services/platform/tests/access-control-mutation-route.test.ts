@@ -47,13 +47,12 @@ vi.mock("../src/context/files", async (importOriginal) => ({
 
 import { handleControlRequest } from "../src/control-router";
 import {
-  parseUserId,
   parsePersonId,
   parseOrganisationId,
-  type UserId,
   type PersonId,
   type OrganisationId,
 } from "../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID_RAW = "organisation_access_control_mutation_route";

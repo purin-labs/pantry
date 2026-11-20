@@ -1,4 +1,4 @@
-import type { UserId } from "../../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { sha256Hex, assertNever } from "@purin-labs/std";
 import type { ChatContextDetails } from "@purin-labs/control-api";
@@ -301,7 +301,7 @@ function isReadyContextEvent(
 }
 
 export function sharedMemberUserId(member: {
-  userId: import("../../ids").UserId;
-}): import("../../ids").UserId {
+  userId: import("@purin-labs/control-api/ids").UserId;
+}): import("@purin-labs/control-api/ids").UserId {
   return member.userId;
 }

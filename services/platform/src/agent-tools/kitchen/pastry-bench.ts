@@ -3,7 +3,7 @@ import { KITCHEN_SURFACE, type PastryBenchViewCommand } from "@purin-labs/contro
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,
-} from "../bakery/surface";
+} from "../bakery/surface-result";
 import { defineKitchenTool, type KitchenToolServices } from "./services";
 import { ProposalArgumentError } from "../errors";
 

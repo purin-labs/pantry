@@ -5,7 +5,7 @@ import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
 } from "../organisation-execution-scope";
-import type { UserId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import {

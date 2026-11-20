@@ -11,7 +11,7 @@ import { createAccessGrant } from "../../src/data/access-grants";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import type { AgentOperationInput } from "../../src/data/agent-operations";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import type { IngressQueueMessage } from "../../src/ingress-queue";
 import gateway from "../../src/integration-gateway";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";

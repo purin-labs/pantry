@@ -9,7 +9,7 @@ import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { accessControlPath, enableCapability } from "./access-route-support";
 import { commerceHeaders } from "./commerce-support";

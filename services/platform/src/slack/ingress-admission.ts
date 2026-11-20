@@ -12,13 +12,11 @@ import {
   type VaultSecretRow,
 } from "../credential-vault/service";
 import {
-  parseUserId,
   parseIntegrationAccountId,
   parseOrganisationId,
   type AssignmentId,
   type CaseId,
   type ConnectorId,
-  type UserId,
   type IntegrationAccountId,
   type SlackAppId,
   type SlackInstallationId,
@@ -26,6 +24,7 @@ import {
   type SessionId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,

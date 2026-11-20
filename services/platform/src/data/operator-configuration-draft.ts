@@ -11,15 +11,16 @@ import {
 
 import type { Env } from "../env";
 import { roleMayConfigure, type ControlRole } from "./control-plane";
-import type { ControlSessionId, OrganisationId, UserId } from "../ids";
+import type { ControlSessionId, OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { runAgentOperation } from "./agent-operation-runner";
 import { parseProposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
 import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import {
-  applyApprovedWorkflowChange,
+  workflowChanges,
   type WorkflowChangeCommand,
-} from "../commerce/bakery/workflow-proposals";
-import { runDeviceCommand } from "../devices/commands";
+} from "../kitchen/contract/workflow-changes";
+import { deviceCommands } from "../devices/contract/device-commands";
 import {
   applyJevDraftCommand,
   jevDraftOperation,
@@ -819,7 +820,7 @@ async function applyClaimedWorkflowChange(
   const db = execution.database;
   if (approver === null)
     return { ok: false, error: { code: "workflow_approver_required" } };
-  const applied = await applyApprovedWorkflowChange(
+  const applied = await workflowChanges.use().applyApprovedWorkflowChange(
     env,
     execution,
     organisationId,
@@ -904,7 +905,7 @@ async function applyClaimedDeviceCommand(
   Result<OperatorDraftReceipt, OperatorDraftError | AgentOperationsError>
 > {
   const db = execution.database;
-  const applied = await runDeviceCommand({
+  const applied = await deviceCommands.use().runDeviceCommand({
     env,
     scope: execution,
     subjectId: command.deviceId,

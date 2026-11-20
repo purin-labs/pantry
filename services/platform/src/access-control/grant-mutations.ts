@@ -6,13 +6,11 @@ import type {
 } from "../authorization/access-grants/types";
 import { readAccessGrant } from "../data/access-grants";
 import type { OrganisationEnvironment } from "../data/control-plane";
-import type { UserId, IntegrationAccountId, OrganisationId } from "../ids";
+import type { IntegrationAccountId, OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { parseIntegrationAccountId } from "../ids";
 import type { Result } from "../result";
-import {
-  prepareChangedFileGrantSync,
-  prepareRevokedFileGrantCleanup,
-} from "../context/files/persistence";
+import { fileGrantParts } from "../authorization/access-grants/file-grant-parts";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   prepareControlMutationReceiptAfterWrite,
@@ -162,7 +160,7 @@ export async function createVersionedAccessGrant(
   );
   if (input.target.kind === "file_resource") {
     statements.push(
-      prepareChangedFileGrantSync(input.scope.database, {
+      fileGrantParts.use().prepareChangedFileGrantSync(input.scope.database, {
         organisationId: input.scope.organisationId,
         grantId: input.grantId,
         integrationAccountId: requireIntegrationAccountId(
@@ -325,7 +323,7 @@ export async function revokeVersionedAccessGrant(
     ];
     if (existing.value.target.kind === "file_resource") {
       statements.push(
-        ...prepareRevokedFileGrantCleanup({
+        ...fileGrantParts.use().prepareRevokedFileGrantCleanup({
           scope: input.scope,
           receiptId: input.identity.receiptId,
           grantId: input.grantId,
