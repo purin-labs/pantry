@@ -2,7 +2,7 @@
 # Plan 82 G0.6: start the Mac test server with the D8 certificate, and keep the Mac awake.
 # Needs setup-name.py first, and the speech bench venv and model from voiceId/stt-bench.
 set -eu
-BENCH="${BENCH:-$HOME/Dev/rust/seams-monorepo/.claude/worktrees/voiceid-stt-bench/voiceId/stt-bench}"
+BENCH="${BENCH:-$HOME/Dev/purin-labs/monorepo/.claude/worktrees/voiceid-stt-bench/voiceId/stt-bench}"
 MODEL="$BENCH/.cache/hf/models--mlx-community--whisper-large-v3-turbo/snapshots/a4aaeec0636e6fef84abdcbe3544cb2bf7e9f6fb"
 TEST_HOME="$HOME/.satyr-voice-test"
 NAME="$(cat "$TEST_HOME/name")"

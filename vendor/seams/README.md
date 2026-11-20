@@ -1,6 +1,6 @@
 # Shared account contracts
 
-`@seams-internal/console-shared@0.1.3` comes from `seams-monorepo/packages/console-shared-ts`.
+`@seams-internal/console-shared@0.1.3` comes from `purin-labs/monorepo/packages/console-shared-ts`.
 Console and Satyr share one set of wire types and parsers.
 Source commit: `aee87e9a` on `dev` (Plan 88).
 Version 0.1.3 adds the Jev customer price `satyr-jev-input-tokens-customer-v1` (D9).

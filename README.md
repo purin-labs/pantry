@@ -201,16 +201,16 @@ remain available as aliases. Google sign-in uses the HTTPS loopback origin at
 ## Checks
 
 Protected-access checks use the real account authority through a built acceptance Worker.
-Build it in a separate `seams-monorepo` checkout, then set its absolute path:
+Build it in a separate `purin-labs/monorepo` checkout, then set its absolute path:
 
 ```bash
-pnpm -C /path/to/seams-monorepo/tests exec node helpers/buildSharedAccountPlatformWorker.mjs
-export PANTRY_ACCOUNT_WORKER_ARTIFACT=/path/to/seams-monorepo/.artifacts/shared-account-platform/account-worker/index.mjs
+pnpm -C /path/to/monorepo/tests exec node helpers/buildSharedAccountPlatformWorker.mjs
+export PANTRY_ACCOUNT_WORKER_ARTIFACT=/path/to/monorepo/.artifacts/shared-account-platform/account-worker/index.mjs
 ```
 
 The Worker contains fixture controls and test keys. Use it only for acceptance tests.
-Pantry production imports no seams-monorepo source.
-CI checks out an exact commit from the public `seams-tech/seams-monorepo` repository.
+Pantry production imports no `purin-labs/monorepo` source.
+CI checks out an exact commit from the public `purin-labs/monorepo` repository.
 It installs the locked dependencies and builds the same acceptance Worker in that separate checkout.
 Native journeys receive only the built Worker path and record its SHA-256 digest.
 The workflow needs no additional access token or repository variables.

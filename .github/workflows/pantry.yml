@@ -61,7 +61,7 @@ jobs:
       - name: Checkout pinned account acceptance authority
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          repository: seams-tech/seams-monorepo
+          repository: purin-labs/monorepo
           ref: 3a05ce4864dbbcec87d43122e9263bfecf922264
           path: output/shared-account-authority/source
           persist-credentials: false
