@@ -247,7 +247,7 @@
     "services/platform/src/case-context-discovery/metadata.ts = services/platform/src/case-context-discovery/metadata.ts": 1,
     "services/platform/src/chat/attachments.ts = services/platform/src/chat/attachments.ts": 2,
     "services/platform/src/chat/portal-stream.ts = services/platform/src/chat/portal-stream.ts": 1,
-    "services/platform/src/chat/store.ts = services/platform/src/chat/store.ts": 2,
+    "services/platform/src/chat/store.ts = services/platform/src/chat/store.ts": 1,
     "services/platform/src/commerce-lab/router.ts = services/platform/src/commerce-lab/router.ts": 4,
     "services/platform/src/commerce-lab/scenarios.ts = services/platform/src/commerce-lab/scenarios.ts": 1,
     "services/platform/src/commerce/action-model.ts = services/platform/src/commerce/action-model.ts": 1,

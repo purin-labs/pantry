@@ -745,9 +745,19 @@ export async function listConversationDirectory(
   scope: ConversationScope,
   cursors: ChatDirectoryCursors = { active: null, archived: null },
 ): Promise<ConversationDirectory> {
+  return readConversationDirectory(db, scope, "", cursors);
+}
+
+/** One page of the chat list, with the chats whose title holds `title`. */
+async function readConversationDirectory(
+  db: D1Database,
+  scope: ConversationScope,
+  title: string,
+  cursors: ChatDirectoryCursors,
+): Promise<ConversationDirectory> {
   const [activeRows, archivedRows] = await Promise.all([
-    listConversationRows(db, scope, "active", "", cursors),
-    listConversationRows(db, scope, "archived", "", cursors),
+    listConversationRows(db, scope, "active", title, cursors),
+    listConversationRows(db, scope, "archived", title, cursors),
   ]);
   const active: (Readonly<
     Pick<
@@ -828,49 +838,7 @@ export async function searchConversationDirectory(
   const normalized = normalizeConversationTitle(query);
   if (normalized.length === 0)
     return listConversationDirectory(db, scope, cursors);
-  const [activeRows, archivedRows] = await Promise.all([
-    listConversationRows(db, scope, "active", normalized, cursors),
-    listConversationRows(db, scope, "archived", normalized, cursors),
-  ]);
-  const active: (Readonly<
-    Pick<
-      ConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ActiveConversationMetadata)[] = [];
-  for (const row of activeRows)
-    active.push(parseConversationSummary(row, "active"));
-  const archived: (Readonly<
-    Pick<
-      ConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ArchivedConversationMetadata)[] = [];
-  for (const row of archivedRows)
-    archived.push(parseConversationSummary(row, "archived"));
-  return directoryPage(active, archived);
+  return readConversationDirectory(db, scope, normalized, cursors);
 }
 
 export async function updateConversationMetadata(
