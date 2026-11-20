@@ -23,7 +23,10 @@ import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { readWorkerEnvironment } from "./worker-environment.mjs";
+import {
+  readWorkerEnvironment,
+  workerDirectory,
+} from "./worker-environment.mjs";
 import {
   MISSING_POLICY_QUERY,
   POLICY_TABLE,
@@ -60,12 +63,7 @@ for (const database of config.d1_databases ?? []) {
   const directory = database.migrations_dir ?? "migrations";
   const expected = snapshotOfBaseline(
     readFileSync(
-      resolve(
-        root,
-        `services/${service}`,
-        directory,
-        "0001_current_schema.sql",
-      ),
+      resolve(workerDirectory(service), directory, "0001_current_schema.sql"),
       "utf8",
     ),
   );

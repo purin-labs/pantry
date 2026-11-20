@@ -2,9 +2,8 @@
 // file through Wrangler, against the local, staging or production database of
 // a Worker profile.
 import { spawnSync } from "node:child_process";
-import { resolve } from "node:path";
 
-const root = resolve(import.meta.dirname, "..");
+import { workerDirectory } from "./worker-environment.mjs";
 
 /** The rows of one statement. */
 export function d1Rows(target, binding, query) {
@@ -53,7 +52,7 @@ function wrangler({ service, environment, persistTo }, binding, args) {
       ...args,
     ],
     {
-      cwd: resolve(root, `services/${service}`),
+      cwd: workerDirectory(service),
       encoding: "utf8",
       maxBuffer: 64 * 1024 * 1024,
       env: { ...process.env, CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false" },

@@ -9,19 +9,24 @@ const root = resolve(import.meta.dirname, "..");
 const require = createRequire(resolve(root, "services/platform/package.json"));
 const { unstable_readConfig } = require("wrangler");
 
+/**
+ * The source folder of a Worker service. `underclerk` is the deployed name of
+ * the commerce Worker, not a folder.
+ */
+export function workerDirectory(service) {
+  if (service === "platform") return resolve(root, "services/platform");
+  if (service === "commerce" || service === "underclerk")
+    return resolve(root, "services/commerce");
+  throw new Error("Unknown Worker service");
+}
+
 export function readWorkerEnvironment(service, environment) {
-  if (
-    service !== "platform" &&
-    service !== "commerce" &&
-    service !== "underclerk"
-  )
-    throw new Error("Unknown Worker service");
+  const directory = workerDirectory(service);
   if (environment !== "local" && environment !== "production") {
     throw new Error("Select local or production");
   }
-  const directory = service === "platform" ? "platform" : "commerce";
   const config = unstable_readConfig({
-    config: resolve(root, `services/${directory}/wrangler.jsonc`),
+    config: resolve(directory, "wrangler.jsonc"),
     env: environment,
   });
   const serviceName = service === "platform" ? "satyr-edge" : "underclerk";

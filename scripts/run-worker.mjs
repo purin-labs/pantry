@@ -9,6 +9,7 @@ import {
   requireLocalWorkerSecrets,
   validateWorkerOrigins,
   workerDeployArguments,
+  workerDirectory,
 } from "./worker-environment.mjs";
 import { requireGatewayBuilds } from "../services/shop-gateway/check-pack.mjs";
 import { requirePhysicsBundles } from "./check-physics-dist.mjs";
@@ -100,7 +101,7 @@ if (operation === "schema") {
 }
 for (const args of commands) {
   const result = spawnSync("pnpm", ["exec", "wrangler", ...args, ...extra], {
-    cwd: resolve(root, `services/${service}`),
+    cwd: workerDirectory(service),
     stdio: "inherit",
     env: { ...process.env, CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false" },
   });

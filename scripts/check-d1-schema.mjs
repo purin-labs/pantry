@@ -18,7 +18,10 @@
 // rebuilds the table and the column checks above still see the new shape.
 import { readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { readWorkerEnvironment } from "./worker-environment.mjs";
+import {
+  readWorkerEnvironment,
+  workerDirectory,
+} from "./worker-environment.mjs";
 import {
   MISSING_POLICY_QUERY,
   POLICY_TABLE,
@@ -31,7 +34,6 @@ import {
 } from "./d1-schema-snapshot.mjs";
 import { d1Rows } from "./d1-wrangler.mjs";
 
-const root = resolve(import.meta.dirname, "..");
 const LOCAL_STATE = ".wrangler/square-acceptance";
 const [service, environment, ...options] = process.argv.slice(2);
 const persistIndex = options.indexOf("--persist-to");
@@ -49,7 +51,7 @@ let failed = false;
 for (const database of databases) {
   const directory = database.migrations_dir ?? "migrations";
   const baseline = readFileSync(
-    resolve(root, `services/${service}`, directory, "0001_current_schema.sql"),
+    resolve(workerDirectory(service), directory, "0001_current_schema.sql"),
     "utf8",
   );
   const expected = snapshotOfBaseline(baseline);
