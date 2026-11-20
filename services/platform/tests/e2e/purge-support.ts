@@ -1,13 +1,21 @@
 import { env } from "cloudflare:workers";
 import { expect } from "vitest";
 
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+  type VaultHandle,
+} from "../../src/credential-vault";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   type ArchiveOrganisationMutation,
 } from "../../src/data/organisation-lifecycle";
-import { PURGE_CATALOGUE } from "../../src/data/purge-catalogue";
+import {
+  eraseEntryWhere,
+  PURGE_CATALOGUE,
+} from "../../src/data/purge-catalogue";
 import type { OrganisationId, UserId } from "../../src/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
@@ -116,9 +124,10 @@ export async function erasedTableResidue(
   const residue: Record<string, number> = {};
   for (const entry of PURGE_CATALOGUE) {
     if (entry.action !== "erase") continue;
-    const where = "where" in entry ? entry.where : "organisation_id = ?";
     const count = await scope.database
-      .prepare(`SELECT COUNT(*) AS count FROM ${entry.table} WHERE ${where}`)
+      .prepare(
+        `SELECT COUNT(*) AS count FROM ${entry.table} WHERE ${eraseEntryWhere(entry)}`,
+      )
       .bind(organisationId)
       .first<number>("count");
     if (count !== null && count > 0) residue[entry.table] = count;
@@ -136,6 +145,44 @@ export async function cleanupStatus(
     )
     .bind(organisationId)
     .first("status");
+}
+
+export function requiredVaultHandle(raw: string): VaultHandle {
+  const handle = parseVaultHandle(raw);
+  if (!handle.ok) throw new Error("The Vault handle is invalid");
+  return handle.value;
+}
+
+/** Input: the ChatGPT sign-in that the Organisation's owner finished. */
+export async function signInToChatGpt(owner: PurgeOwner): Promise<void> {
+  const now = Date.now();
+  const scope = await requireOrganisationExecutionScope(
+    env,
+    owner.organisationId,
+  );
+  const handle = requiredVaultHandle(
+    `vault:${owner.organisationId.toLowerCase()}:codex:profile:1`,
+  );
+  const stored = await storeVaultSecret({
+    db: scope.database,
+    keys: env,
+    organisationId: owner.organisationId,
+    handle,
+    secret: { kind: "bearer", value: "chatgpt-profile-before-purge" },
+    now,
+  });
+  if (!stored.ok) throw new Error(stored.error.code);
+  await scope.database
+    .prepare(
+      `INSERT INTO organisation_codex_connection (
+         organisation_id, lifecycle, revision, auth_profile_handle,
+         auth_profile_generation, plan_type, action_required_reason,
+         allowance_json, connected_at, verified_at, observed_at, updated_at,
+         refresh_lease, refresh_until
+       ) VALUES (?, 'connected', 1, ?, 1, 'plus', NULL, '{}', ?, ?, ?, ?, NULL, NULL)`,
+    )
+    .bind(owner.organisationId, handle, now, now, now, now)
+    .run();
 }
 
 /** The owner's Portal session cookies, for a read. */

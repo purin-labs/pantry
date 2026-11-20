@@ -8,6 +8,9 @@
  * The Actors, the attachments, the device fleets, the WhatsApp Connectors,
  * the Commerce merchant and the Slack installation credentials end before
  * this batch (see `reconcileArchivedOrganisation`).
+ *
+ * `erasePurgedOrganisationRows` is the operator's repair for an Organisation
+ * that a purge before the catalogue left: it erases what that purge kept.
  */
 import type {
   GlobalDatabase,
@@ -15,13 +18,14 @@ import type {
   OrganisationDatabaseSession,
 } from "../database-handles";
 import type { OrganisationId } from "../ids";
+import type { Result } from "../result";
 import { assertNever } from "@purin-labs/std";
 import { hashOpaqueSecret } from "./control-plane";
 import {
   prepareOrganisationLifecycleMove,
   type LifecycleFence,
 } from "./organisation-lifecycle-moves";
-import { PURGE_CATALOGUE } from "./purge-catalogue";
+import { eraseEntryWhere, PURGE_CATALOGUE } from "./purge-catalogue";
 import { prepareExpiredOrganisationReceiptsDeletion } from "./shared-rows/mutation-receipt";
 import {
   prepareOrganisationPurge,
@@ -144,10 +148,105 @@ const PSEUDONYMIZE: Readonly<
   ],
 };
 
+type EraseEntry = Extract<
+  (typeof PURGE_CATALOGUE)[number],
+  Readonly<{ action: "erase" }>
+>;
+
+const ERASE_ENTRIES: readonly EraseEntry[] = PURGE_CATALOGUE.filter(
+  (entry): entry is EraseEntry => entry.action === "erase",
+);
+
+/** Holds once the Organisation's lifecycle says purged. */
+function purgedGuard(organisationId: OrganisationId): RowGuard {
+  return {
+    sql: `EXISTS (SELECT 1 FROM organisation_onboarding
+      WHERE organisation_id = ? AND lifecycle = 'purged')`,
+    bindings: [organisationId],
+  };
+}
+
+function guardedStatement(
+  session: Session,
+  guard: RowGuard,
+  organisationId: OrganisationId,
+  sql: string,
+): D1PreparedStatement {
+  return session
+    .prepare(`${sql} AND ${guard.sql}`)
+    .bind(organisationId, ...guard.bindings);
+}
+
 function guarded(context: PurgeContext, sql: string): D1PreparedStatement {
-  return context.session
-    .prepare(`${sql} AND ${context.purged.sql}`)
-    .bind(context.organisationId, ...context.purged.bindings);
+  return guardedStatement(
+    context.session,
+    context.purged,
+    context.organisationId,
+    sql,
+  );
+}
+
+function eraseStatement(
+  session: Session,
+  guard: RowGuard,
+  organisationId: OrganisationId,
+  entry: EraseEntry,
+): D1PreparedStatement {
+  return guardedStatement(
+    session,
+    guard,
+    organisationId,
+    `DELETE FROM ${entry.table} WHERE (${eraseEntryWhere(entry)})`,
+  );
+}
+
+/**
+ * The directory's Slack records that name the Organisation's connections: a
+ * person's DM choice and the thread pins. A DM choice that named a revoked
+ * connection asks the person to choose again; a pin has no Case to reach.
+ */
+function directorySlackRecordDeletions(
+  directory: GlobalDatabase,
+  organisationId: OrganisationId,
+): readonly (readonly [table: string, statement: D1PreparedStatement])[] {
+  return [
+    [
+      "slack_dm_organisation_selection",
+      directory
+        .prepare(
+          `DELETE FROM slack_dm_organisation_selection
+           WHERE EXISTS (SELECT 1 FROM slack_organisation_connection AS connection
+             WHERE connection.installation_id = slack_dm_organisation_selection.installation_id
+               AND connection.connection_id = slack_dm_organisation_selection.connection_id
+               AND connection.organisation_id = ? AND connection.lifecycle = 'revoked')`,
+        )
+        .bind(organisationId),
+    ],
+    [
+      "slack_thread_case_pin",
+      directory
+        .prepare("DELETE FROM slack_thread_case_pin WHERE organisation_id = ?")
+        .bind(organisationId),
+    ],
+  ];
+}
+
+/** How many of the records that `directorySlackRecordDeletions` deletes exist. */
+function directorySlackRecordCount(
+  directory: GlobalDatabase,
+  organisationId: OrganisationId,
+): D1PreparedStatement {
+  return directory
+    .prepare(
+      `SELECT
+         (SELECT COUNT(*) FROM slack_dm_organisation_selection AS selection
+          JOIN slack_organisation_connection AS connection
+            ON connection.installation_id = selection.installation_id
+           AND connection.connection_id = selection.connection_id
+          WHERE connection.organisation_id = ?1 AND connection.lifecycle = 'revoked')
+       + (SELECT COUNT(*) FROM slack_thread_case_pin WHERE organisation_id = ?1) AS count`,
+    )
+    .bind(organisationId);
 }
 
 function googleAccountRelease(
@@ -172,9 +271,11 @@ function catalogueStatements(
   switch (entry.action) {
     case "erase":
       return [
-        guarded(
-          context,
-          `DELETE FROM ${entry.table} WHERE (${"where" in entry ? entry.where : "organisation_id = ?"})`,
+        eraseStatement(
+          context.session,
+          context.purged,
+          context.organisationId,
+          entry,
         ),
       ];
     case "pseudonymize":
@@ -222,11 +323,7 @@ export async function purgeArchivedOrganisation(input: {
   const context: PurgeContext = {
     session,
     organisationId: input.organisationId,
-    purged: {
-      sql: `EXISTS (SELECT 1 FROM organisation_onboarding
-        WHERE organisation_id = ? AND lifecycle = 'purged')`,
-      bindings: [input.organisationId],
-    },
+    purged: purgedGuard(input.organisationId),
     accounts: await Promise.all(
       accounts.results.map(async (row) => ({
         id: requireString(row.id, "purged account id"),
@@ -278,25 +375,110 @@ export async function purgeArchivedOrganisation(input: {
     db: input.db,
     organisationId: input.organisationId,
   });
-  // The directory's Slack records that name the Organisation's connections:
-  // a person's DM choice and the thread pins. A DM choice that named a
-  // revoked connection asks the person to choose again; a pin has no Case
-  // to reach.
-  await input.directory.batch([
-    input.directory
-      .prepare(
-        `DELETE FROM slack_dm_organisation_selection
-         WHERE EXISTS (SELECT 1 FROM slack_organisation_connection AS connection
-           WHERE connection.installation_id = slack_dm_organisation_selection.installation_id
-             AND connection.connection_id = slack_dm_organisation_selection.connection_id
-             AND connection.organisation_id = ? AND connection.lifecycle = 'revoked')`,
-      )
-      .bind(input.organisationId),
-    input.directory
-      .prepare("DELETE FROM slack_thread_case_pin WHERE organisation_id = ?")
-      .bind(input.organisationId),
-  ]);
+  await input.directory.batch(
+    directorySlackRecordDeletions(input.directory, input.organisationId).map(
+      ([, statement]) => statement,
+    ),
+  );
   return statements.length;
+}
+
+export type PurgedOrganisationRowsReport = Readonly<{
+  /** What `releaseSharedCredentials` moved before the erase. */
+  sharedCredentialsReleased: number;
+  /** The rows erased from each table that still held some. */
+  erasedRows: Readonly<Record<string, number>>;
+}>;
+
+export type PurgedOrganisationRowsError =
+  | Readonly<{ code: "organisation_not_purged" }>
+  | Readonly<{ code: "shared_credentials_not_released"; reason: string }>;
+
+/**
+ * Erases what an earlier purge left of an Organisation that is purged: the
+ * rows of each table that the catalogue marks erase, and the directory's
+ * Slack records that name it. A purge before the catalogue (Refactor 15) left
+ * such rows, and the purge runs the catalogue only on the move to purged, so
+ * it never comes back for them.
+ *
+ * Its Vault can still hold a credential that a live Organisation uses: the
+ * bot token of a shared Slack workspace. As the purge does, it first calls
+ * `releaseSharedCredentials`, which moves each such credential and returns
+ * the count; when that throws, it erases nothing. It counts before it
+ * writes, so with nothing left it writes nothing, and it is safe to repeat.
+ */
+export async function erasePurgedOrganisationRows(input: {
+  readonly db: OrganisationDatabase;
+  readonly directory: GlobalDatabase;
+  readonly organisationId: OrganisationId;
+  readonly releaseSharedCredentials: () => Promise<number>;
+}): Promise<Result<PurgedOrganisationRowsReport, PurgedOrganisationRowsError>> {
+  const lifecycle = await input.db
+    .prepare(
+      "SELECT lifecycle FROM organisation_onboarding WHERE organisation_id = ?",
+    )
+    .bind(input.organisationId)
+    .first<unknown>("lifecycle");
+  if (lifecycle !== "purged")
+    return { ok: false, error: { code: "organisation_not_purged" } };
+  let sharedCredentialsReleased: number;
+  try {
+    sharedCredentialsReleased = await input.releaseSharedCredentials();
+  } catch (error) {
+    return {
+      ok: false,
+      error: {
+        code: "shared_credentials_not_released",
+        reason: error instanceof Error ? error.message : "unknown",
+      },
+    };
+  }
+  const regionalLeft = await input.db.batch<{ readonly count: unknown }>(
+    ERASE_ENTRIES.map((entry) =>
+      input.db
+        .prepare(
+          `SELECT COUNT(*) AS count FROM ${entry.table} WHERE (${eraseEntryWhere(entry)})`,
+        )
+        .bind(input.organisationId),
+    ),
+  );
+  const directoryLeft = await directorySlackRecordCount(
+    input.directory,
+    input.organisationId,
+  ).first<unknown>("count");
+  const nothingLeft =
+    directoryLeft === 0 &&
+    regionalLeft.every((result) => result.results[0]?.count === 0);
+  if (nothingLeft)
+    return { ok: true, value: { sharedCredentialsReleased, erasedRows: {} } };
+  const session = input.db.withSession("first-primary");
+  const guard = purgedGuard(input.organisationId);
+  const regionalErased = await session.batch(
+    ERASE_ENTRIES.map((entry) =>
+      eraseStatement(session, guard, input.organisationId, entry),
+    ),
+  );
+  const directoryDeletions = directorySlackRecordDeletions(
+    input.directory,
+    input.organisationId,
+  );
+  const directoryErased = await input.directory.batch(
+    directoryDeletions.map(([, statement]) => statement),
+  );
+  const tables = [
+    ...ERASE_ENTRIES.map((entry) => entry.table),
+    ...directoryDeletions.map(([table]) => table),
+  ];
+  const erasedRows: Record<string, number> = {};
+  for (const [index, result] of [
+    ...regionalErased,
+    ...directoryErased,
+  ].entries()) {
+    const table = tables[index];
+    if (table !== undefined && result.meta.changes > 0)
+      erasedRows[table] = result.meta.changes;
+  }
+  return { ok: true, value: { sharedCredentialsReleased, erasedRows } };
 }
 
 function requireString(raw: unknown, field: string): string {

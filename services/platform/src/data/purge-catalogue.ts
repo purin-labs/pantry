@@ -346,3 +346,10 @@ export const PURGE_CATALOGUE = [
   { table: "workspace_revision", action: "erase" },
   { table: "workspace_revision_head", action: "erase" },
 ] as const satisfies readonly PurgeCatalogueEntry[];
+
+/** The rows of the Organisation that an erase entry selects. */
+export function eraseEntryWhere(
+  entry: Readonly<{ action: "erase"; where?: string }>,
+): string {
+  return entry.where ?? "organisation_id = ?";
+}
