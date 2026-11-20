@@ -2,24 +2,28 @@
 // The clone ratchet (Refactor 17, step A0.8).
 //
 // jscpd finds blocks of product code that are copies of each other. The
-// baseline scripts/jscpd-baseline.json holds one fingerprint for each known
-// copy. A fingerprint comes from the tokens of the block, not from its path,
-// so a moved file keeps its entry.
+// baseline scripts/clones-ratchet.json holds, for each pair of files, the
+// count of the copies between them (a file can be a pair with itself).
 //
-//   A new copy is refused. Put the shared code in one module and import it.
-//   A copy that is gone must leave the baseline, so that it cannot come back.
+//   A pair may not get one more copy, and a new pair is refused. Put the
+//   shared code in one module and import it.
+//   When a pair loses a copy, lower its entry with --update, so that the copy
+//   cannot come back.
+//
+// The count of a pair does not change when code near a copy changes or when a
+// formatter runs. It changes with the path of a file: after a move, write the
+// new path into the baseline.
 //
 // The scan settings are in .jscpd.json: product code of apps, packages,
 // services and crates, without tests, scripts, bundles and generated code.
 //
 //   node scripts/check-clones.mjs            check
-//   node scripts/check-clones.mjs --update   drop the fingerprints that are gone
+//   node scripts/check-clones.mjs --update   lower entries, drop pairs that are gone
 //   node scripts/check-clones.mjs --init     write the baseline from the tree
 //   node scripts/check-clones.mjs --report   print the totals for each folder
 
 import { spawnSync } from "node:child_process";
 import {
-  copyFileSync,
   existsSync,
   mkdtempSync,
   readFileSync,
@@ -31,7 +35,8 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const baselinePath = join(root, "scripts/jscpd-baseline.json");
+const BASELINE = "scripts/clones-ratchet.json";
+const baselinePath = join(root, BASELINE);
 const mode = process.argv[2] ?? "check";
 
 if (!["check", "--update", "--init", "--report"].includes(mode)) {
@@ -47,66 +52,53 @@ if (mode === "--report") {
 }
 
 if (mode === "--init") {
-  writeBaseline(scan.fingerprints);
+  writeBaseline(scan.pairs);
   console.log(
-    `Wrote ${count(scan.fingerprints)} copies (${scan.total.duplicatedLines} lines) to scripts/jscpd-baseline.json.`,
+    `Wrote ${scan.total.clones} copies in ${Object.keys(scan.pairs).length} file pairs to ${BASELINE}.`,
   );
   process.exit(0);
 }
 
 if (!existsSync(baselinePath)) {
   console.error(
-    "scripts/jscpd-baseline.json is missing. Run node scripts/check-clones.mjs --init.",
+    `${BASELINE} is missing. Run node scripts/check-clones.mjs --init.`,
   );
   process.exit(1);
 }
 
-const baseline = JSON.parse(readFileSync(baselinePath, "utf8")).fingerprints;
-const added = [];
-const gone = [];
-for (const [fingerprint, current] of Object.entries(scan.fingerprints)) {
-  if (current > (baseline[fingerprint] ?? 0)) added.push(fingerprint);
-}
-for (const [fingerprint, known] of Object.entries(baseline)) {
-  if ((scan.fingerprints[fingerprint] ?? 0) < known) gone.push(fingerprint);
-}
+const baseline = JSON.parse(readFileSync(baselinePath, "utf8")).pairs;
+const grown = Object.entries(scan.pairs).filter(
+  ([pair, count]) => count > (baseline[pair] ?? 0),
+);
+const lower = Object.entries(baseline).filter(
+  ([pair, count]) => (scan.pairs[pair] ?? 0) < count,
+);
 
 if (mode === "--update") {
-  const next = {};
-  for (const [fingerprint, known] of Object.entries(baseline)) {
-    const current = Math.min(known, scan.fingerprints[fingerprint] ?? 0);
-    if (current > 0) next[fingerprint] = current;
-  }
-  writeBaseline(next);
-  console.log(
-    `Dropped ${count(baseline) - count(next)} copies. The baseline holds ${count(next)}.`,
-  );
-  if (added.length > 0) {
-    console.error(
-      `${added.length} new copies are not in the baseline. --update does not add a copy.`,
-    );
+  if (grown.length > 0) {
+    reportGrown();
+    console.error("A pair grew, so the baseline is not changed.");
     process.exit(1);
   }
+  writeBaseline(scan.pairs);
+  console.log(
+    `Lowered ${lower.length} pairs. The baseline holds ${scan.total.clones} copies.`,
+  );
   process.exit(0);
 }
 
 let failed = false;
-if (added.length > 0) {
+if (grown.length > 0) {
   failed = true;
-  console.error(`${scan.newClones.length} new copies of product code:`);
-  for (const clone of scan.newClones) {
-    console.error(
-      `  ${clone.firstFile.name}:${clone.firstFile.start}-${clone.firstFile.end}\n    = ${clone.secondFile.name}:${clone.secondFile.start}-${clone.secondFile.end} (${clone.lines} lines)`,
-    );
-  }
+  reportGrown();
   console.error(
     "Put the shared code in one module and import it from both places. See docs/refactor-17.md, Prune with each step.",
   );
 }
-if (gone.length > 0) {
+if (lower.length > 0) {
   failed = true;
   console.error(
-    `${gone.length} copies of the baseline are gone. Run node scripts/check-clones.mjs --update.`,
+    `${lower.length} file pairs have fewer copies than the baseline. Run node scripts/check-clones.mjs --update.`,
   );
 }
 if (failed) process.exit(1);
@@ -114,27 +106,32 @@ console.log(
   `${scan.total.clones} known copies (${scan.total.duplicatedLines} lines, ${scan.total.percentage.toFixed(2)} %) in ${scan.total.sources} files. No new copy.`,
 );
 
-// One jscpd run. A copy of the baseline receives the fingerprints of the tree,
-// and the JSON report marks each copy that the baseline does not hold.
+function reportGrown() {
+  for (const [pair, count] of grown) {
+    console.error(
+      `${pair}: ${count} copies, the baseline allows ${baseline[pair] ?? 0}.`,
+    );
+    for (const clone of scan.duplicates.filter(
+      (candidate) => pairOf(candidate) === pair,
+    )) {
+      console.error(
+        `  ${clone.firstFile.name}:${clone.firstFile.start}-${clone.firstFile.end} = ${clone.secondFile.name}:${clone.secondFile.start}-${clone.secondFile.end} (${clone.lines} lines)`,
+      );
+    }
+  }
+}
+
+function pairOf(clone) {
+  return [clone.firstFile.name, clone.secondFile.name].sort().join(" = ");
+}
+
+// One jscpd run with the JSON report.
 function scanTree() {
   const work = mkdtempSync(join(tmpdir(), "pantry-clones-"));
   try {
-    const current = join(work, "current.json");
-    const marks = existsSync(baselinePath) && mode !== "--init";
-    if (marks) copyFileSync(baselinePath, current);
     const run = spawnSync(
       join(root, "node_modules/.bin/jscpd"),
-      [
-        "--reporters",
-        "json",
-        "--output",
-        work,
-        "--baseline",
-        current,
-        "--update-baseline",
-        "--absolute",
-        "--no-tips",
-      ],
+      ["--reporters", "json", "--output", work, "--absolute", "--no-tips"],
       { cwd: root, encoding: "utf8" },
     );
     if (run.status !== 0) {
@@ -145,33 +142,31 @@ function scanTree() {
     const report = JSON.parse(
       readFileSync(join(work, "jscpd-report.json"), "utf8"),
     );
+    const pairs = {};
     for (const clone of report.duplicates) {
       clone.firstFile.name = relative(root, clone.firstFile.name);
       clone.secondFile.name = relative(root, clone.secondFile.name);
+      const pair = pairOf(clone);
+      pairs[pair] = (pairs[pair] ?? 0) + 1;
     }
     return {
-      fingerprints: JSON.parse(readFileSync(current, "utf8")).fingerprints,
+      pairs,
       total: report.statistics.total,
       duplicates: report.duplicates,
-      newClones: report.duplicates.filter((clone) => clone.isNew),
     };
   } finally {
     rmSync(work, { recursive: true, force: true });
   }
 }
 
-function writeBaseline(fingerprints) {
+function writeBaseline(pairs) {
   const sorted = Object.fromEntries(
-    Object.entries(fingerprints).sort(([a], [b]) => (a < b ? -1 : 1)),
+    Object.entries(pairs).sort(([a], [b]) => (a < b ? -1 : 1)),
   );
   writeFileSync(
     baselinePath,
-    `${JSON.stringify({ version: 1, fingerprints: sorted }, null, 2)}\n`,
+    `${JSON.stringify({ pairs: sorted }, null, 2)}\n`,
   );
-}
-
-function count(fingerprints) {
-  return Object.values(fingerprints).reduce((sum, n) => sum + n, 0);
 }
 
 function printReport({ total, duplicates }) {
