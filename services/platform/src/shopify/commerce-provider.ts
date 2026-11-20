@@ -1,8 +1,12 @@
-// The execution and the reconciliation of a commerce action on Shopify. The
-// commerce area calls these two functions for a shop whose commerce system is
-// Shopify. Today the one action is the cancellation of an order.
+// The `CommerceProvider` of Shopify (Refactor 17, step A2.5): the credential,
+// the execution and the reconciliation of a commerce action, the graph read
+// source and the control API shape of the selected shop. Today the one action
+// is the cancellation of an order.
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
-import { type CommerceActionPath } from "../commerce/action-model";
+import {
+  commerceProjectionRevision,
+  type CommerceActionPath,
+} from "../commerce/action-model";
 import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
@@ -25,14 +29,17 @@ import type { Result } from "../result";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type { CommerceShopifyProviderReceipt } from "@purin-labs/control-api";
 import {
+  commerceProviderUnsupported,
   type CommerceEffectGatePermit,
+  type CommerceProvider,
   type CommerceProviderExecutionError,
   type CommerceProviderOperation,
   type CommerceProviderReconciliation,
-  commerceProjectionRevision,
-} from "../commerce/provider-execution";
+} from "../commerce/commerce-provider";
+import { resolveActiveProviderAccountContext } from "../data/integration-account";
+import { runtimeFetch } from "../runtime-fetch";
 
-export async function reconcileShopifyCommerceAction(
+async function reconcileShopifyCommerceAction(
   input: Readonly<{
     env: Env;
     action: VariantBy<ActionLedgerEntry, "state", "indeterminate">;
@@ -92,7 +99,7 @@ export async function reconcileShopifyCommerceAction(
   };
 }
 
-export async function executeShopifyCommerceAction(input: {
+async function executeShopifyCommerceAction(input: {
   readonly env: Env;
   readonly action: ExecutingActionLedgerEntry;
   readonly current: Variant<CommerceProjection, "commerce_order">;
@@ -262,3 +269,68 @@ function shopifyReceipt(input: {
       };
   }
 }
+
+export const shopifyCommerceProvider: CommerceProvider<"shopify"> = {
+  kind: "shopify",
+  wire: (system) => ({
+    kind: "shopify",
+    organisationId: system.organisationId,
+    integrationAccountId: system.integrationAccountId,
+    shopDomain: system.shopDomain,
+    revision: system.revision,
+  }),
+  graphSource: (system) => ({
+    kind: "provider_backed",
+    integrationAccountId: system.integrationAccountId,
+  }),
+  async resolveActionCredential(input) {
+    const accountContext = await resolveActiveProviderAccountContext(input);
+    return accountContext.ok &&
+      accountContext.value.account.provider === "shopify"
+      ? {
+          ok: true,
+          value: { kind: "shopify", accountContext: accountContext.value },
+        }
+      : {
+          ok: false,
+          error: { code: "commerce_action_provider_execution_failed" },
+        };
+  },
+  executeAction(input) {
+    const { path, permit } = input;
+    if (
+      permit.kind !== "shopify" ||
+      path.kind !== "cancel_order" ||
+      permit.current.kind !== "commerce_order"
+    )
+      return Promise.resolve(commerceProviderUnsupported());
+    return executeShopifyCommerceAction({
+      env: input.env,
+      action: input.action,
+      current: permit.current,
+      path,
+      permit,
+      currentRevision: input.currentRevision,
+      now: input.now,
+      fetcher: input.fetcher ?? runtimeFetch,
+    });
+  },
+  reconcileAction(input) {
+    const { path, permit } = input;
+    if (
+      permit.kind !== "shopify" ||
+      path.kind !== "cancel_order" ||
+      permit.current.kind !== "commerce_order"
+    )
+      return Promise.resolve(commerceProviderUnsupported());
+    return reconcileShopifyCommerceAction({
+      env: input.env,
+      action: input.action,
+      current: permit.current,
+      path,
+      permit,
+      now: input.now,
+      fetcher: input.fetcher ?? runtimeFetch,
+    });
+  },
+};

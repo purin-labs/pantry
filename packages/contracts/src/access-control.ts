@@ -2,6 +2,7 @@ import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
 import { commerceAuthorityScopeWireSchema } from "@purin-labs/commerce-contracts/authority-scope";
 import { commerceMutationTargetWireSchema } from "@purin-labs/commerce-contracts/entity-plane-receipts";
+import { commerceSystemKindSchema } from "./commerce-system.ts";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-contracts/graph-query";
 import { systemEntityTypeIdSchema } from "@purin-labs/commerce-contracts/query-parts";
 import { hasLoneSurrogate, isRecord } from "@purin-labs/std";
@@ -218,10 +219,6 @@ const capabilityProviderSchema = Type.Union([
   Type.Literal("whatsapp"),
   Type.Literal("wise"),
 ]);
-const capabilityCommerceSystemSchema = Type.Union([
-  Type.Literal("satyr_commerce"),
-  Type.Literal("shopify"),
-]);
 const capabilityPolicyModesSchema = Type.Union([
   Type.Literal("enabled_disabled"),
   Type.Literal("approval_required_disabled"),
@@ -240,7 +237,7 @@ export const capabilityProviderDependencySchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("commerce_system"),
-      systems: Type.Array(capabilityCommerceSystemSchema),
+      systems: Type.Array(commerceSystemKindSchema),
     },
     strict,
   ),

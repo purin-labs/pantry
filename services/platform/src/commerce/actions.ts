@@ -8,7 +8,8 @@ import type { MerchantActionRejectionEvidence } from "../approval-authentication
 import { parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceActionError, type CommerceEntityPlaneActionPath, type CommerceActionPath, type CommerceActionRequest } from "./action-model";
 import { executeCommerceEntityPlaneAction, type CommerceEntityPlaneExecutionOutcome } from "./entity-plane/execution";
 import { admitCommerceCapability } from "../data/commerce-capability-activation";
-import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution, type CommerceProviderExecutionError } from "./provider-execution";
+import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution } from "./provider-execution";
+import type { CommerceProviderExecutionError } from "./commerce-provider";
 import { createCommerceOutboxReconcileQueueMessage } from "./queue-messages";
 import { newRequestId } from "../ids";
 import { parseStoredRequestAuthority } from "../request-authority";

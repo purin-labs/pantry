@@ -1,45 +1,43 @@
+import { commerceSystemKindOfSource } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "../database-handles";
 import type { AccountPlatformAccess } from "../account-platform/access";
 import { acceptedExecutionAccountAuthority } from "../account-platform/access";
-import { runtimeFetch } from "../runtime-fetch";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
-import type {
-  CanonicalCommerceDelivery,
-  CommerceProjection,
-} from "@purin-labs/commerce-contracts";
+import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 
 import {
   buildCommerceLabDelivery,
   commerceActionExpectedRevision,
+  commerceProjectionRevision,
   parseCommerceActionPath,
-  type CommerceActionError,
   type CommerceActionPath,
 } from "./action-model";
 import {
   admitCommerceCapability,
   type CommerceCapability,
 } from "../data/commerce-capability-activation";
-import {
-  resolveActiveProviderAccountContext,
-  type ActiveProviderAccountContext,
-} from "../data/integration-account";
-import {
-  resolveCommerceMerchantBinding,
-  type CommerceMerchantBinding,
-} from "../data/commerce-merchant-binding";
+import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import type {
-  ActionExecutionRetryEvidence,
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
   LedgerCanonicalAction,
 } from "../actors/action-ledger";
 import type { Env } from "../env";
 import {
-  executeShopifyCommerceAction,
-  reconcileShopifyCommerceAction,
-} from "../shopify/commerce-action";
+  commerceProviderUnsupported,
+  type CommerceEffectGatePermit,
+  type CommerceProviderExecuteInput,
+  type CommerceProviderExecutionError,
+  type CommerceProviderOperation,
+  type CommerceProviderReconcileInput,
+  type CommerceProviderReconciliation,
+} from "./commerce-provider";
+import {
+  commerceProvider,
+  commerceProviderOfPermit,
+} from "./commerce-providers";
 import type { Result } from "../result";
 import { assertNever } from "@purin-labs/std";
 import {
@@ -70,11 +68,7 @@ import {
 } from "../policy";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type { CommerceMutationErrorV1 } from "@purin-labs/commerce-client";
-import type {
-  CommerceLabProviderReceipt,
-  CommerceShopifyProviderReceipt,
-  CommerceEngineProviderReceipt,
-} from "@purin-labs/control-api";
+import type { CommerceEngineProviderReceipt } from "@purin-labs/control-api";
 import {
   MERCHANT_PLUGIN_INSTALL_VERB,
   merchantPluginInstallation,
@@ -97,66 +91,11 @@ import { createCommerceOutboxReconcileQueueMessage } from "./queue-messages";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 
-export type CommerceProviderExecutionError =
-  | CommerceActionError
-  | { readonly code: "commerce_action_authority_superseded" }
-  | { readonly code: "commerce_action_capability_inactive" }
-  | { readonly code: "commerce_action_flow_binding_invalid" }
-  | { readonly code: "commerce_action_flow_denied" }
-  | { readonly code: "commerce_action_provider_indeterminate" }
-  | { readonly code: "commerce_action_provider_execution_failed" }
-  | { readonly code: "commerce_action_order_has_prepared_lines" };
-
 type ApprovedCommerceActionEntry = VariantBy<
   ActionLedgerEntry,
   "state",
   "executing" | "indeterminate"
 >;
-
-export type CommerceEffectGatePermit =
-  | Readonly<{
-      kind: "lab";
-      current: CommerceProjection;
-      flowDecision: Variant<FlowDecision, "allow">;
-      approval: ApprovedCommerceActionEntry["approval"];
-    }>
-  | Readonly<{
-      kind: "shopify";
-      current: CommerceProjection;
-      accountContext: ActiveProviderAccountContext;
-      flowDecision: Variant<FlowDecision, "allow">;
-      approval: ApprovedCommerceActionEntry["approval"];
-    }>
-  | Readonly<{
-      kind: "underclerk";
-      current: CommerceProjection;
-      merchantBinding: CommerceMerchantBinding;
-      flowDecision: Variant<FlowDecision, "allow">;
-      approval: ApprovedCommerceActionEntry["approval"];
-    }>;
-
-export type CommerceProviderReconciliation =
-  | Readonly<{
-      kind: "settled";
-      receipt: CommerceShopifyProviderReceipt | CommerceEngineProviderReceipt;
-    }>
-  | Readonly<{
-      kind: "retryable";
-      evidence: ActionExecutionRetryEvidence;
-    }>
-  | Readonly<{ kind: "unresolved" }>;
-
-export type CommerceProviderOperation =
-  | {
-      readonly kind: "projection_delivery";
-      readonly delivery: CanonicalCommerceDelivery;
-      readonly receipt: CommerceLabProviderReceipt;
-    }
-  | {
-      readonly kind: "provider_receipt";
-      readonly receipt:
-        CommerceShopifyProviderReceipt | CommerceEngineProviderReceipt;
-    };
 
 export async function validateCommerceActionAuthorityBeforeExecution(
   input: Readonly<{
@@ -396,21 +335,18 @@ async function authorizeCommerceEffectGatePlan(
       : flowDecision;
   }
 
-  if (input.current.projection.provenance.source === "shopify") {
-    const accountContext = await resolveActiveProviderAccountContext({
+  const systemKind = commerceSystemKindOfSource(
+    input.current.projection.provenance.source,
+  );
+  if (systemKind !== null) {
+    const credential = await commerceProvider(
+      systemKind,
+    ).resolveActionCredential({
       db: input.scope.database,
       organisationId: input.action.action.organisationId,
       integrationAccountId: input.action.action.integrationAccountId,
     });
-    if (
-      !accountContext.ok ||
-      accountContext.value.account.provider !== "shopify"
-    ) {
-      return {
-        ok: false,
-        error: { code: "commerce_action_provider_execution_failed" },
-      };
-    }
+    if (!credential.ok) return credential;
     const flowDecision = await authorizeCommerceEffectSink(
       input.scope.database,
       input.scope.accountAccess,
@@ -420,40 +356,8 @@ async function authorizeCommerceEffectGatePlan(
       ? {
           ok: true,
           value: {
-            kind: "shopify",
+            ...credential.value,
             current: input.current,
-            accountContext: accountContext.value,
-            flowDecision: flowDecision.value,
-            approval: input.action.approval,
-          },
-        }
-      : flowDecision;
-  }
-
-  if (input.current.projection.provenance.source === "underclerk") {
-    const merchantBinding = await resolveCommerceMerchantBinding({
-      db: input.scope.database,
-      organisationId: input.action.action.organisationId,
-      integrationAccountId: input.action.action.integrationAccountId,
-    });
-    if (!merchantBinding.ok) {
-      return {
-        ok: false,
-        error: { code: "commerce_action_provider_execution_failed" },
-      };
-    }
-    const flowDecision = await authorizeCommerceEffectSink(
-      input.scope.database,
-      input.scope.accountAccess,
-      input.action.action,
-    );
-    return flowDecision.ok
-      ? {
-          ok: true,
-          value: {
-            kind: "underclerk",
-            current: input.current,
-            merchantBinding: merchantBinding.value,
             flowDecision: flowDecision.value,
             approval: input.action.approval,
           },
@@ -591,16 +495,36 @@ export async function reconcileCommerceProviderAction(
         }
       : { ok: true, value: { kind: "unresolved" } };
   }
+  const provider = commerceProviderOfPermit(gate.value);
+  return provider === null
+    ? commerceProviderUnsupported()
+    : provider.reconcileAction({
+        env: input.env,
+        action: input.action,
+        path: path.value,
+        permit: gate.value,
+        now: input.now,
+        fetcher: input.fetcher,
+      });
+}
+
+/** The reconciliation of an action on a record of the built-in engine. */
+export async function reconcileBuiltInCommerceAction(
+  input: CommerceProviderReconcileInput,
+): Promise<
+  Result<CommerceProviderReconciliation, CommerceProviderExecutionError>
+> {
+  const { path, permit } = input;
+  if (permit.kind !== "underclerk") return commerceProviderUnsupported();
   if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "attach_tracking" &&
-    gate.value.current.kind === "fulfillment"
+    path.kind === "attach_tracking" &&
+    permit.current.kind === "fulfillment"
   ) {
     const attachment = await attachTrackingThroughCommerce({
       env: input.env,
       action: input.action,
-      path: path.value,
-      permit: gate.value,
+      path: path,
+      permit: permit,
       fetcher: input.fetcher,
     });
     if (attachment.kind === "settled") {
@@ -624,18 +548,14 @@ export async function reconcileCommerceProviderAction(
         }
       : { ok: true, value: { kind: "unresolved" } };
   }
-  if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "adjust_offer_price" &&
-    gate.value.current.kind === "offer"
-  ) {
+  if (path.kind === "adjust_offer_price" && permit.current.kind === "offer") {
     // Re-sending is safe: the idempotency key is the action's, so Commerce
     // replays the receipt rather than moving the price a second time.
     const adjustment = await applyApprovedOfferPrice({
       env: input.env,
       action: input.action,
-      path: path.value,
-      permit: gate.value,
+      path: path,
+      permit: permit,
       fetcher: input.fetcher,
     });
     if (adjustment.kind === "settled") {
@@ -660,66 +580,48 @@ export async function reconcileCommerceProviderAction(
       : { ok: true, value: { kind: "unresolved" } };
   }
   if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "publish_catalog_listing" &&
-    gate.value.current.kind === "offer"
+    path.kind === "publish_catalog_listing" &&
+    permit.current.kind === "offer"
   ) {
     return reconcileCommerceAction({
       env: input.env,
       action: input.action,
-      path: path.value,
-      permit: gate.value,
+      path: path,
+      permit: permit,
       now: input.now,
       fetcher: input.fetcher,
     });
   }
 
   if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "update_product_description" &&
-    gate.value.current.kind === "product"
+    path.kind === "update_product_description" &&
+    permit.current.kind === "product"
   ) {
     return reconcileCommerceProductDescriptionAction({
       env: input.env,
       action: input.action,
-      current: gate.value.current,
-      path: path.value,
-      permit: gate.value,
+      current: permit.current,
+      path: path,
+      permit: permit,
       now: input.now,
       fetcher: input.fetcher,
     });
   }
   if (
-    gate.value.kind === "underclerk" &&
-    isCommerceCancellationPath(path.value) &&
-    gate.value.current.kind === "commerce_order"
+    isCommerceCancellationPath(path) &&
+    permit.current.kind === "commerce_order"
   ) {
     return reconcileCommerceCancellation({
       env: input.env,
       action: input.action,
-      current: gate.value.current,
-      path: path.value,
-      permit: gate.value,
+      current: permit.current,
+      path: path,
+      permit: permit,
       now: input.now,
       fetcher: input.fetcher,
     });
   }
-  if (
-    gate.value.kind === "shopify" &&
-    path.value.kind === "cancel_order" &&
-    gate.value.current.kind === "commerce_order"
-  ) {
-    return reconcileShopifyCommerceAction({
-      env: input.env,
-      action: input.action,
-      current: gate.value.current,
-      path: path.value,
-      permit: gate.value,
-      now: input.now,
-      fetcher: input.fetcher ?? runtimeFetch,
-    });
-  }
-  return { ok: false, error: { code: "commerce_action_provider_unsupported" } };
+  return commerceProviderUnsupported();
 }
 
 async function reconcileCommerceAction(
@@ -1084,32 +986,50 @@ export async function executeCommerceProviderAction(input: {
       : delivery;
   }
 
+  const provider = commerceProviderOfPermit(gate.value);
+  return provider === null
+    ? commerceProviderUnsupported()
+    : provider.executeAction({
+        env: input.env,
+        action: input.action,
+        path: path.value,
+        permit: gate.value,
+        currentRevision,
+        now: input.now,
+        fetcher: input.fetcher,
+      });
+}
+
+/** The execution of an action on a record of the built-in engine. */
+export async function executeBuiltInCommerceAction(
+  input: CommerceProviderExecuteInput,
+): Promise<Result<CommerceProviderOperation, CommerceProviderExecutionError>> {
+  const { path, permit } = input;
+  if (permit.kind !== "underclerk") return commerceProviderUnsupported();
   if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "publish_catalog_listing" &&
-    gate.value.current.kind === "offer"
+    path.kind === "publish_catalog_listing" &&
+    permit.current.kind === "offer"
   ) {
     return executeCommerceEngineAction({
       env: input.env,
       action: input.action,
-      path: path.value,
-      permit: gate.value,
+      path: path,
+      permit: permit,
       now: input.now,
       fetcher: input.fetcher,
     });
   }
 
   if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "update_product_description" &&
-    gate.value.current.kind === "product"
+    path.kind === "update_product_description" &&
+    permit.current.kind === "product"
   ) {
     const update = await applyApprovedProductDescription({
       env: input.env,
       action: input.action,
-      current: gate.value.current,
-      path: path.value,
-      permit: gate.value,
+      current: permit.current,
+      path: path,
+      permit: permit,
       now: input.now,
       fetcher: input.fetcher,
     });
@@ -1128,30 +1048,28 @@ export async function executeCommerceProviderAction(input: {
   }
 
   if (
-    gate.value.kind === "underclerk" &&
-    isCommerceCancellationPath(path.value) &&
-    gate.value.current.kind === "commerce_order"
+    isCommerceCancellationPath(path) &&
+    permit.current.kind === "commerce_order"
   ) {
     return executeCommerceCancellation({
       env: input.env,
       action: input.action,
-      current: gate.value.current,
-      path: path.value,
-      permit: gate.value,
+      current: permit.current,
+      path: path,
+      permit: permit,
       fetcher: input.fetcher,
     });
   }
 
   if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "attach_tracking" &&
-    gate.value.current.kind === "fulfillment"
+    path.kind === "attach_tracking" &&
+    permit.current.kind === "fulfillment"
   ) {
     const attachment = await attachTrackingThroughCommerce({
       env: input.env,
       action: input.action,
-      path: path.value,
-      permit: gate.value,
+      path: path,
+      permit: permit,
       fetcher: input.fetcher,
     });
     if (attachment.kind === "settled") {
@@ -1168,16 +1086,12 @@ export async function executeCommerceProviderAction(input: {
         };
   }
 
-  if (
-    gate.value.kind === "underclerk" &&
-    path.value.kind === "adjust_offer_price" &&
-    gate.value.current.kind === "offer"
-  ) {
+  if (path.kind === "adjust_offer_price" && permit.current.kind === "offer") {
     const adjustment = await applyApprovedOfferPrice({
       env: input.env,
       action: input.action,
-      path: path.value,
-      permit: gate.value,
+      path: path,
+      permit: permit,
       fetcher: input.fetcher,
     });
     if (adjustment.kind === "settled") {
@@ -1194,27 +1108,7 @@ export async function executeCommerceProviderAction(input: {
         };
   }
 
-  if (
-    gate.value.kind !== "shopify" ||
-    path.value.kind !== "cancel_order" ||
-    gate.value.current.kind !== "commerce_order"
-  ) {
-    return {
-      ok: false,
-      error: { code: "commerce_action_provider_unsupported" },
-    };
-  }
-
-  return executeShopifyCommerceAction({
-    env: input.env,
-    action: input.action,
-    current: gate.value.current,
-    path: path.value,
-    permit: gate.value,
-    currentRevision,
-    now: input.now,
-    fetcher: input.fetcher ?? runtimeFetch,
-  });
+  return commerceProviderUnsupported();
 }
 
 function authorityRebaseRequired(
@@ -2550,10 +2444,4 @@ async function authorizeCommerceEffectSink(
   return decision.kind === "allow"
     ? { ok: true, value: decision }
     : { ok: false, error: { code: "commerce_action_flow_denied" } };
-}
-
-export function commerceProjectionRevision(
-  projection: CommerceProjection,
-): number {
-  return projection.projection.provenance.revision;
 }

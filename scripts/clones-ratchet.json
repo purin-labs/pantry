@@ -277,7 +277,7 @@
     "services/platform/src/commerce/entity-plane/proposals.ts = services/platform/src/commerce/entity-plane/proposals.ts": 1,
     "services/platform/src/commerce/entity-plane/published-resources.ts = services/platform/src/commerce/entity-plane/published-resources.ts": 1,
     "services/platform/src/commerce/order-refund-action.ts = services/platform/src/commerce/stock-action.ts": 1,
-    "services/platform/src/commerce/provider-execution.ts = services/platform/src/commerce/provider-execution.ts": 27,
+    "services/platform/src/commerce/provider-execution.ts = services/platform/src/commerce/provider-execution.ts": 25,
     "services/platform/src/commerce/provider.ts = services/platform/src/commerce/provider.ts": 8,
     "services/platform/src/commerce/queue-messages.ts = services/platform/src/mail/queue-messages.ts": 1,
     "services/platform/src/commerce/queue-messages.ts = services/platform/src/schedules/queue-messages.ts": 1,

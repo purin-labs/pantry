@@ -43,8 +43,7 @@ import { resolveConfiguredSlackInstallationIdentity } from "../slack/installatio
 import { resolveActiveSlackDestinationConnection } from "../slack/organisation-routing";
 import { buildWorkflowAuthority } from "../request-authority";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";
-import { BlotterSource } from "../commerce/entity-plane/blotter-source";
-import { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
+import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";
 import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
@@ -474,32 +473,19 @@ async function resolveSavedSelectorCueMembership(
       integrationAccountId: String(binding.value.integrationAccountId),
       client,
     });
-    const reader =
-      commerceAuthority.value.commerceSystem.kind === "shopify"
-        ? new CommerceGraphReader({
-            organisationId: String(input.organisationId),
-            merchantId: String(binding.value.merchantId),
-            commerceSystem: commerceAuthority.value.commerceSystem,
-            underclerk: commerceEngine,
-            blotter: new BlotterSource({
-              organisation: await requireActiveOrganisationActorAtPlacement({
-                placement: scope.placement,
-                env,
-                organisationId: input.organisationId,
-                now: Date.now(),
-              }),
-              organisationId: input.organisationId,
-              merchantId: String(binding.value.merchantId),
-              integrationAccountId:
-                commerceAuthority.value.integrationAccountId,
-            }),
-          })
-        : new CommerceGraphReader({
-            organisationId: String(input.organisationId),
-            merchantId: String(binding.value.merchantId),
-            commerceSystem: commerceAuthority.value.commerceSystem,
-            underclerk: commerceEngine,
-          });
+    const reader = await createCommerceGraphReader({
+      commerceSystem: commerceAuthority.value.commerceSystem,
+      organisationId: input.organisationId,
+      merchantId: String(binding.value.merchantId),
+      underclerk: commerceEngine,
+      organisation: () =>
+        requireActiveOrganisationActorAtPlacement({
+          placement: scope.placement,
+          env,
+          organisationId: input.organisationId,
+          now: Date.now(),
+        }),
+    });
     const authority = buildSavedSelectorCommerceReadAuthority({
       organisationId: String(input.organisationId),
       merchantId: String(binding.value.merchantId),

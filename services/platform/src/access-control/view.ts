@@ -1,5 +1,5 @@
 import type {
-  CapabilityCommerceSystem,
+  CommerceSystemKind,
   CapabilityDefinition,
   CapabilityMode,
   CapabilityPolicyProvenance,
@@ -126,7 +126,7 @@ export type AccessControlViewInput = Readonly<{
   capabilityDefinitions: readonly CapabilityDefinition[];
   capabilityPolicies: readonly OrganisationCapabilityPolicy[];
   integrations: readonly AccessControlIntegrationProjection[];
-  availableCommerceSystems: readonly CapabilityCommerceSystem[];
+  availableCommerceSystems: readonly CommerceSystemKind[];
   subjectReferenceIds: ReadonlyMap<string, string>;
   grants: readonly AccessGrant[];
   resources: readonly AccessControlResourceProjection[];
@@ -522,7 +522,7 @@ function buildCapabilityViews(
 function capabilityAvailability(
   definition: CapabilityDefinition,
   integrations: ReadonlyMap<string, AccessControlIntegrationProjection>,
-  availableCommerceSystems: readonly CapabilityCommerceSystem[],
+  availableCommerceSystems: readonly CommerceSystemKind[],
 ): AccessControlAvailability {
   if (definition.providerDependency.kind === "none") return "available";
   if (definition.providerDependency.kind === "commerce_system") {

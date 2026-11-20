@@ -93,21 +93,23 @@ export type CommerceSystemSyncView =
       readonly lastSyncedAt: number;
     };
 
-export type CommerceSystemView =
-  | {
-      readonly kind: "satyr_commerce";
-      readonly bindingId: string;
-      readonly merchantId: string;
-      readonly revision: number;
-      readonly sync: CommerceSystemSyncView;
-    }
-  | {
-      readonly kind: "shopify";
-      readonly integrationAccountId: string;
-      readonly shopDomain: string;
-      readonly revision: number;
-      readonly sync: CommerceSystemSyncView;
-    };
+/** The selected commerce system, as the control API gives it. */
+export type CommerceSystemIdentityView =
+  | Readonly<{
+      kind: "satyr_commerce";
+      bindingId: string;
+      merchantId: string;
+      revision: number;
+    }>
+  | Readonly<{
+      kind: "shopify";
+      integrationAccountId: string;
+      shopDomain: string;
+      revision: number;
+    }>;
+
+export type CommerceSystemView = CommerceSystemIdentityView &
+  Readonly<{ sync: CommerceSystemSyncView }>;
 
 export type ReadinessBlocker = {
   readonly code: string;

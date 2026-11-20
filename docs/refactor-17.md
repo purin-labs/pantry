@@ -887,6 +887,46 @@ them. `appliances-preview.tsx` (1,545 lines) is an appliance viewer with its own
 Three.js loader, and `kitchen-chat-preview.tsx` builds the same frame as the workflow
 demo for a real Organisation. They are separate work.
 
+**21 November 2026. Step A2.5 is done in part,** on the branch `refactor-17-a2-5`: the
+`CommerceProvider` port and its two implementations.
+
+- **The port.** `commerce/commerce-provider.ts` defines `CommerceProvider`. It has five
+  methods, each from a branch on the system kind: `resolveActionCredential` (the
+  effect gate), `executeAction`, `reconcileAction`, `graphSource` (the sources of a
+  graph read) and `wire` (the control API shape). The permit and the result types of
+  an action moved there from `provider-execution.ts`.
+- **Two implementations and one list.** `builtInCommerceProvider` is in
+  `commerce/built-in-commerce-provider.ts`, and the engine paths of
+  `provider-execution.ts` are its execution and its reconciliation.
+  `shopifyCommerceProvider` is in `shopify/commerce-provider.ts`, the old
+  `commerce-action.ts`. `commerce/commerce-providers.ts` holds the one list, and
+  `commerceProvider(kind)` gives the provider of a system.
+- **The callers.** The effect gate, the execution and the reconciliation ask the
+  provider. `createCommerceGraphReader` replaces three copies of the reader set-up
+  (the control graph read, the cue delivery and the supplier context). The graph
+  reader reads the blotter source when the provider gave one; it does not read the
+  system kind. The Shopify location checks of the Organisation actor are functions
+  of `shopify/location-observation.ts`.
+- **One union.** `CommerceSystemKind` and the record source of each kind are in
+  `packages/contracts/src/commerce-system.ts`, as a closed union of wire values. Six
+  copies of the kind union, two schema copies and `CapabilityCommerceSystem` are
+  gone. The Portal and `control-api` have one view type of the selected system.
+  `BankPayout` already had one hand-written type; it stays.
+- **Not changed:** no route, scope, event kind, stored value or error text. The
+  provider list is a function, so the import cycle between the execution module and
+  the list reads nothing at module load.
+- **Measures.** The grep of the brief: 75 lines to 60; 55 to 36 outside `shopify/`
+  and the Portal. Layer crossings: 703 to 702; the Shopify pairs are equal (24).
+  Copies: 890 to 888 (`commerceProjectionRevision` had two). Unused exports: 809.
+- **What stays.** `agent-tools/commerce/handlers.ts` builds its reader by hand (another
+  worker owns the file); after it calls `createCommerceGraphReader`, the reader option
+  `commerceSystem` goes. The access model (`decision-explanation.ts`,
+  `integration-discovery.ts`) is a foundation module, so it needs the port of step
+  A1.8. `data/organisation-commerce-system.ts` parses and writes the stored row of
+  each kind. The onboarding readiness rule (`data/onboarding.ts`) has its own SQL.
+  The Portal shows each kind. The other matches of the grep are provider ids or cue
+  sources, not the system kind.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

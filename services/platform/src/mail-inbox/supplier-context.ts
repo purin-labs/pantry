@@ -25,9 +25,8 @@ import {
   readNamedCommerceQuery,
   selectNamedCommerceQuerySourceGrant,
 } from "../context/assembly/commerce";
-import { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
+import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";
 import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
-import { BlotterSource } from "../commerce/entity-plane/blotter-source";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import {
   validateLiveRequestAuthority,
@@ -629,30 +628,14 @@ async function readGrantedCommerceQuery(
     integrationAccountId: binding.value.integrationAccountId,
     client,
   });
-  const reader =
-    system.value.commerceSystem.kind === "shopify"
-      ? new CommerceGraphReader({
-          organisationId: authority.organisationId,
-          merchantId: String(binding.value.merchantId),
-          commerceSystem: system.value.commerceSystem,
-          underclerk: commerceEngine,
-          blotter: new BlotterSource({
-            organisation: await requireActiveOrganisationActor({
-              env,
-              organisationId,
-              now: Date.now(),
-            }),
-            organisationId,
-            merchantId: String(binding.value.merchantId),
-            integrationAccountId: system.value.integrationAccountId,
-          }),
-        })
-      : new CommerceGraphReader({
-          organisationId: authority.organisationId,
-          merchantId: String(binding.value.merchantId),
-          commerceSystem: system.value.commerceSystem,
-          underclerk: commerceEngine,
-        });
+  const reader = await createCommerceGraphReader({
+    commerceSystem: system.value.commerceSystem,
+    organisationId,
+    merchantId: String(binding.value.merchantId),
+    underclerk: commerceEngine,
+    organisation: () =>
+      requireActiveOrganisationActor({ env, organisationId, now: Date.now() }),
+  });
   const result = await readNamedCommerceQuery({ ...scope, reader });
   if (!result.ok) return unavailable();
   return {
