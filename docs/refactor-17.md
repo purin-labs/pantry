@@ -1506,8 +1506,9 @@ surface or a package.
   RPC method name, schema step or schedule.
 - **Measures.** In scope: 124 to 62. Layer crossings: 287 to 222 (upward 134 to
   84, between areas 56 to 44, order 72 to 71, table writes 25 to 23). Three
-  foundation pairs went down as a result: `foundation/tool-handlers ->
-  surfaces/slack` 3 to 2, `foundation/actor-runtime -> surfaces/email` 2 to 1 and
+  foundation pairs went down as a result:
+  `foundation/tool-handlers -> surfaces/slack` 3 to 2,
+  `foundation/actor-runtime -> surfaces/email` 2 to 1 and
   `foundation/actor-runtime -> foundation/connections` 1 to 0. Copies: 878 to 877.
   Unused exports: 805, no change. Plain D1 handles: 66 to 62.
 - **What stays (62), and what removes it.**
