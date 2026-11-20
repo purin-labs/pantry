@@ -48,6 +48,13 @@ test and any fixture that exists only for the obsolete behavior.
 - `e2e/unregistered-actors.test.ts` covers the operator's erase of an Actor by
   its object identifier: what is erased, and the two refusals that protect a
   registered Actor and one whose Organisation exists.
+- `e2e/purged-organisation-rows.test.ts` covers the operator's erase of the
+  rows that a purge before the catalogue left (`erase_purged_organisation_rows`):
+  a live Organisation is refused, the bot token of the shared Slack workspace
+  moves to the Organisation that still uses it before the Vault goes, its
+  Slack still checks out with that token, and a second run changes nothing.
+  `e2e/purge-slack-support.ts` holds the shared workspace that it uses with
+  `e2e/purged-organisation-reclaim.test.ts`. It needs the account Worker.
 - `e2e/message-link-fetch-placement.test.ts` follows a documentation read of
   a Portal chat and a link read of a Session to the link-fetch Actor of the
   Organisation's region, and checks that the operator's erase refuses that

@@ -19,6 +19,10 @@ import {
   ORGANISATION_ID,
   installSlackActorFixture,
 } from "./slack-journey-support";
+import {
+  STATE_OBJECT_REGISTRY_ROUTE,
+  stateObjectRegistryCommand,
+} from "./state-object-registry-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -26,7 +30,6 @@ declare module "vitest" {
   }
 }
 
-const REGISTRY_ROUTE = "https://localhost/v1/admin/state-object-registry";
 const GONE_ORGANISATION = "tenant_11111111-2222-4333-8444-555555555555";
 
 it(
@@ -87,7 +90,7 @@ async function unregisteredActorJourney({ task }: TestContext) {
   });
 
   const unauthorised = await exports.default.fetch(
-    new Request(REGISTRY_ROUTE, {
+    new Request(STATE_OBJECT_REGISTRY_ROUTE, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -325,20 +328,11 @@ function residents(
 }
 
 function erase(objectKind: string, objectId: string): Promise<Response> {
-  return exports.default.fetch(
-    new Request(REGISTRY_ROUTE, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${env.ORGANISATION_ADMIN_TOKEN}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        command: "erase_unregistered_actor",
-        objectKind,
-        objectId,
-      }),
-    }),
-  );
+  return stateObjectRegistryCommand({
+    command: "erase_unregistered_actor",
+    objectKind,
+    objectId,
+  });
 }
 
 async function storeConnector(
