@@ -69,6 +69,8 @@ import {
   type SessionId,
   type OrganisationId,
 } from "../../ids";
+import { releaseSlackInstallationCredentials } from "../../credential-vault/slack-installation-credential";
+import { erasePurgedOrganisationRows } from "../../data/organisation-purge";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
 import type { Result } from "../../result";
 import {
@@ -128,6 +130,11 @@ type ActorRegistryAdminRequest =
       readonly organisationId: OrganisationId;
       readonly connectorId: ConnectorId;
       readonly registryId: ActorRegistryId;
+      readonly staleReservationAgeMs?: never;
+    }
+  | {
+      readonly command: "erase_purged_organisation_rows";
+      readonly organisationId: OrganisationId;
       readonly staleReservationAgeMs?: never;
     }
   | {
@@ -218,6 +225,11 @@ export async function handleAdministerActorRegistry(
       return discardQuarantinedCaseResponse(env, input.value);
     case "erase_purged_connector":
       return erasePurgedConnectorResponse(env, input.value);
+    case "erase_purged_organisation_rows":
+      return erasePurgedOrganisationRowsResponse(
+        env,
+        input.value.organisationId,
+      );
     case "erase_unregistered_actor":
       return eraseUnregisteredActorResponse(env, input.value);
     default:
@@ -476,6 +488,68 @@ async function erasePurgedConnectorResponse(
       registryId: entry.registryId,
       instances: names.size,
       erasedAt: Date.now(),
+    },
+  });
+}
+
+/**
+ * Erases the rows that a purge before the catalogue left of a purged
+ * Organisation, after its Slack installations' bot tokens move to an
+ * Organisation that still uses them.
+ */
+async function erasePurgedOrganisationRowsResponse(
+  env: Env,
+  organisationId: OrganisationId,
+): Promise<Response> {
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId,
+  );
+  if (!execution.ok) {
+    return errorResponse(
+      execution.error.code,
+      "The organisation region is unavailable.",
+      503,
+    );
+  }
+  const erased = await erasePurgedOrganisationRows({
+    db: execution.value.database,
+    directory: env.DB,
+    organisationId,
+    releaseSharedCredentials: () =>
+      releaseSlackInstallationCredentials({
+        env,
+        directory: env.DB,
+        db: execution.value.database,
+        organisationId,
+        now: Date.now(),
+      }),
+  });
+  if (!erased.ok) {
+    switch (erased.error.code) {
+      case "organisation_not_purged":
+        return errorResponse(
+          erased.error.code,
+          "The organisation is not purged.",
+          409,
+        );
+      case "shared_credentials_not_released":
+        return errorResponse(
+          erased.error.code,
+          `The Slack bot tokens did not move (${erased.error.reason}). Nothing was erased.`,
+          409,
+        );
+      default:
+        return assertNever(erased.error);
+    }
+  }
+  return jsonResponse({
+    ok: true,
+    report: {
+      kind: "purged_organisation_rows_erased",
+      organisationId,
+      slackInstallationsReleased: erased.value.sharedCredentialsReleased,
+      erasedRows: erased.value.erasedRows,
     },
   });
 }
@@ -957,7 +1031,10 @@ function parseActorRegistryAdminRequest(
     return invalidActorRegistryAdminRequest("organisationId");
   }
 
-  if (command.value === "bootstrap_organisation") {
+  if (
+    command.value === "bootstrap_organisation" ||
+    command.value === "erase_purged_organisation_rows"
+  ) {
     return Object.keys(body).length === 2
       ? {
           ok: true,

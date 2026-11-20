@@ -4,24 +4,30 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import {
-  parseVaultHandle,
-  storeVaultSecret,
-  type VaultHandle,
-} from "../../src/credential-vault";
-import {
   createCustomConnectorDraft,
   prepareCustomConnectorDraftDocument,
 } from "../../src/custom-connectors/revisions";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import type { OrganisationId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { network } from "./network";
+import {
+  PUBLIC_ORIGIN,
+  SLACK_SCOPES,
+  seedSharedSlackWorkspace,
+  slackAccount,
+  slackAuthTestHandler,
+  slackInstallationCredential,
+  slackRecordsNaming,
+  slackTokensCheckedByReadiness,
+  type SharedSlackWorkspace,
+} from "./purge-slack-support";
 import {
   configurationVersion,
   erasedTableResidue,
   purgeOrganisation,
   purgeOwner,
   readHeaders,
+  signInToChatGpt,
   type PurgeOwner,
 } from "./purge-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
@@ -32,24 +38,20 @@ declare module "vitest" {
   }
 }
 
-const PUBLIC_ORIGIN = "https://localhost";
 const NAME = "Reclaim bakery";
 const APP_ID = "A12345678";
 const TEAM_ID = "T0RECLAIM1";
 const INSTALLATION_ID = "installation_e2e_reclaim";
 const PURGED_TOKEN = "xoxb-installed-by-purged";
 const RECLAIM_TOKEN = "xoxb-after-reclaim";
-const DM_USER = "U0DMPERSON";
-const SLACK_SCOPES = [
-  "app_mentions:read",
-  "chat:write",
-  "channels:history",
-  "channels:read",
-  "files:read",
-  "groups:history",
-  "groups:read",
-  "im:history",
-] as const;
+const WORKSPACE: SharedSlackWorkspace = {
+  key: "reclaim",
+  appId: APP_ID,
+  teamId: TEAM_ID,
+  installationId: INSTALLATION_ID,
+  botToken: PURGED_TOKEN,
+  dmUser: "U0DMPERSON",
+};
 
 it(
   "erases each catalogue table of a purged Organisation and lets a new Organisation take its handle and its Slack workspace, while the Organisation that shares the workspace keeps its Slack",
@@ -60,12 +62,7 @@ it(
 async function purgedOrganisationReclaimJourney({ task }: TestContext) {
   const checkedTokens: string[] = [];
   network.use(
-    http.post("https://slack.com/api/auth.test", ({ request }) => {
-      checkedTokens.push(
-        (request.headers.get("authorization") ?? "").replace(/^Bearer /u, ""),
-      );
-      return HttpResponse.json({ ok: true, team_id: TEAM_ID });
-    }),
+    slackAuthTestHandler(TEAM_ID, checkedTokens),
     http.post("https://slack.com/api/oauth.v2.access", () =>
       HttpResponse.json({
         ok: true,
@@ -92,8 +89,8 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
   const neighbour = await purgeOwner("reclaim-neighbour", "Neighbour cafe");
   const purgedHandle = await directoryHandle(purged.organisationId);
   expect(purgedHandle).not.toBeNull();
-  await seedWorkspace(purged, neighbour);
-  await connectChatGpt(purged);
+  await seedSharedSlackWorkspace(WORKSPACE, purged, neighbour);
+  await signInToChatGpt(purged);
   await draftCustomConnector(purged);
   const before = await erasedTableResidue(purged.organisationId);
   expect(before).toMatchObject({
@@ -137,16 +134,9 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
 
   // The Organisation that shares the workspace keeps its Slack: its token is
   // the one that the purged Organisation's Vault held.
-  checkedTokens.length = 0;
-  const neighbourReadiness = await exports.default.fetch(
-    `${PUBLIC_ORIGIN}/v1/control/organisations/${neighbour.organisationId}/readiness`,
-    { headers: readHeaders(neighbour) },
+  expect(await slackTokensCheckedByReadiness(neighbour, checkedTokens)).toEqual(
+    [PURGED_TOKEN],
   );
-  expect(
-    neighbourReadiness.status,
-    await neighbourReadiness.clone().text(),
-  ).toBe(200);
-  expect(checkedTokens).toEqual([PURGED_TOKEN]);
   expect(await slackAccount(neighbour)).toMatchObject({
     lifecycle: { kind: "active" },
     credential_health: { kind: "healthy" },
@@ -154,20 +144,16 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
 
   // The new Organisation connects the same workspace.
   await connectSlack(fresh);
-  checkedTokens.length = 0;
-  const freshReadiness = await exports.default.fetch(
-    `${PUBLIC_ORIGIN}/v1/control/organisations/${fresh.organisationId}/readiness`,
-    { headers: readHeaders(fresh) },
-  );
-  expect(freshReadiness.status, await freshReadiness.clone().text()).toBe(200);
-  expect(checkedTokens).toEqual([RECLAIM_TOKEN]);
+  expect(await slackTokensCheckedByReadiness(fresh, checkedTokens)).toEqual([
+    RECLAIM_TOKEN,
+  ]);
   expect(await slackAccount(fresh)).toMatchObject({
     lifecycle: { kind: "active" },
     credential_health: { kind: "healthy" },
   });
   // The reclaim leaves nothing in the purged Organisation's tables either.
   expect(await erasedTableResidue(purged.organisationId)).toEqual({});
-  const owner = await installationOwner();
+  const owner = (await slackInstallationCredential(INSTALLATION_ID))?.owner;
 
   task.meta.purgedOrganisationReclaim = {
     purgedOrganisation: purged.organisationId,
@@ -189,151 +175,6 @@ async function directoryHandle(
   )
     .bind(organisationId)
     .first("organisation_handle");
-}
-
-function requiredHandle(raw: string): VaultHandle {
-  const handle = parseVaultHandle(raw);
-  if (!handle.ok) throw new Error("The token handle is invalid");
-  return handle.value;
-}
-
-/**
- * The workspace as two Organisations left it: one installation whose token
- * the first holds, a connection for each, a person's DM choice of the first
- * and a thread pinned to it.
- */
-async function seedWorkspace(
-  installer: PurgeOwner,
-  other: PurgeOwner,
-): Promise<void> {
-  const now = Date.now() - 10_000;
-  const tokenRef = `vault:${installer.organisationId.toLowerCase()}:slack:reclaim`;
-  const installerScope = await requireOrganisationExecutionScope(
-    env,
-    installer.organisationId,
-  );
-  const stored = await storeVaultSecret({
-    db: installerScope.database,
-    keys: env,
-    organisationId: installer.organisationId,
-    handle: requiredHandle(tokenRef),
-    secret: { kind: "bearer", value: PURGED_TOKEN },
-    now,
-  });
-  if (!stored.ok) throw new Error(stored.error.code);
-  await env.DB.prepare(
-    `INSERT INTO slack_installation (
-       installation_id, environment, app_id, workspace_id,
-       credential_organisation_id, bot_token_ref, install_model, scopes_json,
-       lifecycle, installed_at, updated_at, disabled_at, revoked_at
-     ) VALUES (?, 'development', ?, ?, ?, ?, 'unlisted', ?, 'active', ?, ?, NULL, NULL)`,
-  )
-    .bind(
-      INSTALLATION_ID,
-      APP_ID,
-      TEAM_ID,
-      installer.organisationId,
-      tokenRef,
-      JSON.stringify(SLACK_SCOPES),
-      now,
-      now,
-    )
-    .run();
-  for (const [owner, label] of [
-    [installer, "installer"],
-    [other, "other"],
-  ] as const) {
-    const scope = await requireOrganisationExecutionScope(
-      env,
-      owner.organisationId,
-    );
-    const connected = await createActiveConnectedIntegration(scope.database, {
-      organisationId: owner.organisationId,
-      provider: "slack",
-      providerSubjectId: TEAM_ID,
-      environment: "development",
-      authMode: "shared_satyr_app",
-      authority: {
-        kind: "connection_credential",
-        credentialRef: requiredHandle(tokenRef),
-      },
-      grantedScopes: [...SLACK_SCOPES],
-      createdByUserId: owner.client.identity.userId,
-      providerAccountId: TEAM_ID,
-      accountKind: "workspace",
-      displayName: "Reclaim Workspace",
-      capabilities: ["conversation.ingress", "conversation.egress"],
-      audiencePolicy: { kind: "operator" },
-      retentionPolicy: { kind: "organisation_default" },
-      now,
-    });
-    await env.DB.prepare(
-      `INSERT INTO slack_organisation_connection (
-         connection_id, installation_id, organisation_id, integration_account_id,
-         lifecycle, revision, connected_at, updated_at, disabled_at, revoked_at
-       ) VALUES (?, ?, ?, ?, 'active', 1, ?, ?, NULL, NULL)`,
-    )
-      .bind(
-        `connection_e2e_reclaim_${label}`,
-        INSTALLATION_ID,
-        owner.organisationId,
-        connected.account.integrationAccountId,
-        now,
-        now,
-      )
-      .run();
-  }
-  const installerAccount = await env.DB.prepare(
-    `SELECT integration_account_id AS id FROM slack_organisation_connection
-     WHERE connection_id = 'connection_e2e_reclaim_installer'`,
-  ).first<string>("id");
-  await env.DB.batch([
-    env.DB.prepare(
-      `INSERT INTO slack_dm_organisation_selection (
-         installation_id, external_user_id, connection_id, revision, selected_at
-       ) VALUES (?, ?, 'connection_e2e_reclaim_installer', 1, ?)`,
-    ).bind(INSTALLATION_ID, DM_USER, now),
-    env.DB.prepare(
-      `INSERT INTO slack_thread_case_pin (
-         installation_id, channel_id, root_message_ts, connection_id,
-         organisation_id, integration_account_id, case_id,
-         routing_source_kind, routing_source_revision, pinned_at
-       ) VALUES (?, 'D0DMPERSON', '1700000000.000100', 'connection_e2e_reclaim_installer',
-         ?, ?, 'case_e2e_reclaim', 'dm_selection', 1, ?)`,
-    ).bind(INSTALLATION_ID, installer.organisationId, installerAccount, now),
-  ]);
-}
-
-/** Input: the ChatGPT sign-in that the Organisation's owner finished. */
-async function connectChatGpt(owner: PurgeOwner): Promise<void> {
-  const now = Date.now();
-  const scope = await requireOrganisationExecutionScope(
-    env,
-    owner.organisationId,
-  );
-  const handle = requiredHandle(
-    `vault:${owner.organisationId.toLowerCase()}:codex:profile:1`,
-  );
-  const stored = await storeVaultSecret({
-    db: scope.database,
-    keys: env,
-    organisationId: owner.organisationId,
-    handle,
-    secret: { kind: "bearer", value: "chatgpt-profile-before-purge" },
-    now,
-  });
-  if (!stored.ok) throw new Error(stored.error.code);
-  await scope.database
-    .prepare(
-      `INSERT INTO organisation_codex_connection (
-         organisation_id, lifecycle, revision, auth_profile_handle,
-         auth_profile_generation, plan_type, action_required_reason,
-         allowance_json, connected_at, verified_at, observed_at, updated_at,
-         refresh_lease, refresh_until
-       ) VALUES (?, 'connected', 1, ?, 1, 'plus', NULL, '{}', ?, ?, ?, ?, NULL, NULL)`,
-    )
-    .bind(owner.organisationId, handle, now, now, now, now)
-    .run();
 }
 
 async function draftCustomConnector(owner: PurgeOwner): Promise<void> {
@@ -371,55 +212,6 @@ async function purgedOrganisationRow(
     )
     .bind(organisationId)
     .first();
-}
-
-/** The directory's Slack records that still name the Organisation. */
-async function slackRecordsNaming(
-  organisationId: OrganisationId,
-): Promise<Readonly<Record<string, unknown>>> {
-  const row = await env.DB.prepare(
-    `SELECT
-       (SELECT COUNT(*) FROM slack_installation
-        WHERE credential_organisation_id = ?1) AS installationsOwned,
-       (SELECT COUNT(*) FROM slack_dm_organisation_selection AS selection
-        JOIN slack_organisation_connection AS connection
-          ON connection.installation_id = selection.installation_id
-         AND connection.connection_id = selection.connection_id
-        WHERE connection.organisation_id = ?1) AS dmSelections,
-       (SELECT COUNT(*) FROM slack_thread_case_pin WHERE organisation_id = ?1) AS threadPins`,
-  )
-    .bind(organisationId)
-    .first();
-  return row ?? {};
-}
-
-function installationOwner(): Promise<unknown> {
-  return env.DB.prepare(
-    "SELECT credential_organisation_id FROM slack_installation WHERE installation_id = ?",
-  )
-    .bind(INSTALLATION_ID)
-    .first("credential_organisation_id");
-}
-
-/** The Slack account as the Portal's Integrations page reads it. */
-async function slackAccount(
-  owner: PurgeOwner,
-): Promise<Record<string, unknown>> {
-  const response = await exports.default.fetch(
-    `${PUBLIC_ORIGIN}/v1/control/organisations/${owner.organisationId}`,
-    { headers: readHeaders(owner) },
-  );
-  expect(response.status, await response.clone().text()).toBe(200);
-  const body: unknown = await response.json();
-  const projection =
-    isRecord(body) && isRecord(body.projection) ? body.projection : body;
-  const accounts =
-    isRecord(projection) && Array.isArray(projection.provider_accounts)
-      ? projection.provider_accounts
-      : [];
-  for (const account of accounts)
-    if (isRecord(account) && account.provider === "slack") return account;
-  throw new Error("The Organisation has no Slack account");
 }
 
 async function connectSlack(owner: PurgeOwner): Promise<void> {

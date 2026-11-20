@@ -1,11 +1,9 @@
 // Fetches that leave through the Organisation's fetch Actors (link reads and
 // custom connectors): the public address that the fake resolver gives, the
 // link-fetch binding of an Actor, and the operator's erase of a fetch Actor.
-import { env, exports } from "cloudflare:workers";
 import { HttpResponse, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
-
-const REGISTRY_ROUTE = "https://localhost/v1/admin/state-object-registry";
+import { stateObjectRegistryCommand } from "./state-object-registry-support";
 
 /** The resolver's answer: one public address for an A query, none for others. */
 export function resolvePublicAddress({
@@ -35,20 +33,11 @@ export async function erase(
   objectKind: string,
   objectId: string,
 ): Promise<{ status: number; code: unknown }> {
-  const answered = await exports.default.fetch(
-    new Request(REGISTRY_ROUTE, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${env.ORGANISATION_ADMIN_TOKEN}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        command: "erase_unregistered_actor",
-        objectKind,
-        objectId,
-      }),
-    }),
-  );
+  const answered = await stateObjectRegistryCommand({
+    command: "erase_unregistered_actor",
+    objectKind,
+    objectId,
+  });
   const body: unknown = await answered.json().catch(() => null);
   const error = isRecord(body) && isRecord(body.error) ? body.error : null;
   return { status: answered.status, code: error?.code ?? null };
