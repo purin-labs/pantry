@@ -38,9 +38,13 @@ import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisat
 import type { Env } from "../../env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { releaseAgentPermissionDecision } from "../../slack/permission-request-release";
-import { authorizeOrganisationRequest } from "../authorization";
+import {
+  authorizeOrganisationRequest,
+  type AuthorizedOrganisationRequest,
+} from "../authorization";
 import { heldOutputSummaries } from "./held-output-requests";
 import { controlError, controlJson, readJsonRecord } from "../http";
+import type { AgentPermissionRequestSummary } from "@purin-labs/control-api";
 
 export type AgentPermissionRequestRoute =
   | Readonly<{
@@ -113,34 +117,11 @@ export async function handleAgentPermissionRequestRoute(
       false,
     );
     if (!authorized.ok) return authorized.response;
-    const mayDecide =
-      authorized.membership.role === "owner" ||
-      authorized.membership.role === "admin";
-    const pending = await listPendingAgentPermissionRequests(
-      authorized.executionScope.database,
-      {
-        organisationId: authorized.organisationId,
-        requesterPersonId: mayDecide
-          ? null
-          : String(authorized.membership.personId),
-        now: Date.now(),
-      },
-    );
+    const mayDecide = mayDecideAgentPermissionRequests(authorized);
     const list: AgentPermissionRequestList = {
       mayDecide,
       heldOutputs: await heldOutputSummaries(env, authorized),
-      requests: pending.map(({ request: stored, requesterName }) => ({
-        requestId: stored.requestId,
-        origin: stored.origin.kind,
-        requesterName,
-        requesterRole: stored.requesterRole,
-        itemLabels: [
-          ...stored.entityTypeReads.map(entityTypeReadLabel),
-          ...stored.capabilityIds.map(capabilityLabel),
-        ],
-        createdAt: stored.createdAt,
-        expiresAt: stored.createdAt + AGENT_PERMISSION_REQUEST_LIFETIME_MS,
-      })),
+      requests: await agentPermissionRequestSummaries(authorized),
     };
     return controlJson(list);
   }
@@ -544,4 +525,46 @@ function readGrantTarget(
     case "commerce_list":
       return { kind: "commerce_list", capabilityRef, listId: scope.listId };
   }
+}
+
+/** An owner or admin decides a permission request. */
+export function mayDecideAgentPermissionRequests(
+  authorized: AuthorizedOrganisationRequest,
+): boolean {
+  return (
+    authorized.membership.role === "owner" ||
+    authorized.membership.role === "admin"
+  );
+}
+
+/**
+ * The permission requests that wait, as this member may read them: an owner
+ * or admin reads every request of the Organisation, and another member reads
+ * their own.
+ */
+export async function agentPermissionRequestSummaries(
+  authorized: AuthorizedOrganisationRequest,
+): Promise<readonly AgentPermissionRequestSummary[]> {
+  const pending = await listPendingAgentPermissionRequests(
+    authorized.executionScope.database,
+    {
+      organisationId: authorized.organisationId,
+      requesterPersonId: mayDecideAgentPermissionRequests(authorized)
+        ? null
+        : String(authorized.membership.personId),
+      now: Date.now(),
+    },
+  );
+  return pending.map(({ request: stored, requesterName }) => ({
+    requestId: stored.requestId,
+    origin: stored.origin.kind,
+    requesterName,
+    requesterRole: stored.requesterRole,
+    itemLabels: [
+      ...stored.entityTypeReads.map(entityTypeReadLabel),
+      ...stored.capabilityIds.map(capabilityLabel),
+    ],
+    createdAt: stored.createdAt,
+    expiresAt: stored.createdAt + AGENT_PERMISSION_REQUEST_LIFETIME_MS,
+  }));
 }

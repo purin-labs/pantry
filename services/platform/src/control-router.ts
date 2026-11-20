@@ -237,10 +237,17 @@ import {
 } from "./control/routes/workspace";
 import { assertNever } from "@purin-labs/std";
 import { ACCESS_CONTROL_PARTS } from "./control/access-control-parts";
+import { pendingDecisionSources } from "./control/pending-decision-parts";
+import {
+  handlePendingDecisionsRoute,
+  matchPendingDecisionsRoute,
+  type PendingDecisionsRoute,
+} from "./control/routes/pending-decisions";
 
 type ControlRoute =
   | ChatGoalRoute
   | AgentPermissionRequestRoute
+  | PendingDecisionsRoute
   | HeldOutputRequestRoute
   | ChatSharingRoute
   | UserPreferencesRoute
@@ -372,6 +379,13 @@ export async function handleControlRequest(
       return handleCostsSheetRoute(request, env, route);
     case "agentPermissionRequest":
       return handleAgentPermissionRequestRoute(request, env, route);
+    case "pendingDecisions":
+      return handlePendingDecisionsRoute(
+        request,
+        env,
+        route,
+        pendingDecisionSources(env),
+      );
     case "heldOutputRequest":
       return handleHeldOutputRequestRoute(request, env, route);
     case "accessControl":
@@ -660,6 +674,8 @@ function matchControlRoute(pathname: string): ControlRoute {
   if (heldOutputRoute !== null) return heldOutputRoute;
   const agentPermissionRoute = matchAgentPermissionRequestRoute(pathname);
   if (agentPermissionRoute !== null) return agentPermissionRoute;
+  const pendingDecisionsRoute = matchPendingDecisionsRoute(pathname);
+  if (pendingDecisionsRoute !== null) return pendingDecisionsRoute;
   const accessControlRoute = matchAccessControlRoute(pathname);
   if (accessControlRoute !== null) return accessControlRoute;
   const mailAssistantRoute = matchMailAssistantRoute(pathname);

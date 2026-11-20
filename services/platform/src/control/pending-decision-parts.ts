@@ -1,0 +1,102 @@
+import type {
+  PendingEmailReview,
+  PendingGovernedAction,
+} from "@purin-labs/control-api";
+import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { listEmailReviewProjections } from "../data/email-review";
+import type { Env } from "../env";
+import type { PendingDecisionSources } from "./pending-decisions";
+import {
+  agentPermissionRequestSummaries,
+  mayDecideAgentPermissionRequests,
+} from "./routes/agent-permission-requests";
+import { heldOutputSummaries } from "./routes/held-output-requests";
+
+/** The most ledger entries and email proposals that one read looks at. */
+const ACTION_READ_LIMIT = 50;
+const EMAIL_REVIEW_READ_LIMIT = 100;
+
+/**
+ * The readers of the stores of the decisions that wait for a person. The
+ * Worker router gives this value to the route. Each reader uses the read
+ * that the page of its store uses today.
+ */
+export function pendingDecisionSources(env: Env): PendingDecisionSources {
+  return {
+    // The Operations page reads the same 50 newest entries of the ledger. An
+    // Organisation actor that does not answer gives no entry, as there.
+    async governedActions(authorized) {
+      const waiting: PendingGovernedAction[] = [];
+      try {
+        const organisation = await requireActiveOrganisationActor({
+          env,
+          organisationId: authorized.organisationId,
+          now: Date.now(),
+        });
+        const activity = await organisation.readActionActivity({
+          organisationId: authorized.organisationId,
+          resourceKey: null,
+          limit: ACTION_READ_LIMIT,
+        });
+        if (!activity.ok) return waiting;
+        for (const item of activity.value) {
+          if (item.state !== "proposed" && item.state !== "approval_requested")
+            continue;
+          waiting.push({
+            kind: "governed_action",
+            id: item.action.nonce.value,
+            host: item.action.host,
+            verb: item.action.verb,
+            resourceKey: item.action.resourceKey,
+            caseId: String(item.caseId),
+            state: item.state,
+            createdAt: item.createdAt,
+          });
+        }
+      } catch {
+        return waiting;
+      }
+      return waiting;
+    },
+    async heldOutputs(authorized) {
+      const summaries = await heldOutputSummaries(env, authorized);
+      return summaries.map((summary) => ({
+        kind: "held_output",
+        id: summary.requestId,
+        summary,
+      }));
+    },
+    async permissionRequests(authorized) {
+      const mayDecide = mayDecideAgentPermissionRequests(authorized);
+      const summaries = await agentPermissionRequestSummaries(authorized);
+      return summaries.map((summary) => ({
+        kind: "permission_request",
+        id: summary.requestId,
+        summary,
+        mayDecide,
+      }));
+    },
+    // The mailbox page reads the same projection rows.
+    async emailReviews(authorized) {
+      const reviews = await listEmailReviewProjections({
+        db: authorized.executionScope.database,
+        organisationId: authorized.organisationId,
+        limit: EMAIL_REVIEW_READ_LIMIT,
+      });
+      const waiting: PendingEmailReview[] = [];
+      for (const review of reviews) {
+        if (review.lifecycleKind !== "awaiting_approval") continue;
+        waiting.push({
+          kind: "email_review",
+          id: review.proposalId,
+          message: review.kind,
+          integrationAccountId: review.integrationAccountId,
+          caseId: review.caseId,
+          version: review.version,
+          createdAt: review.createdAt,
+        });
+      }
+      return waiting;
+    },
+  };
+}

@@ -50,15 +50,18 @@ export async function createGrant(
   grant: Record<string, unknown>,
 ): Promise<void> {
   const view = await readAccess(organisationId, session);
-  const response = await exports.default.fetch(`${accessControlPath(organisationId)}/grants`, {
-    method: "POST",
-    headers: mutationHeaders(session),
-    body: JSON.stringify({
-      expectedRevision: view.revision,
-      subjectRef: grant.subjectRef,
-      target: grant.target,
-    }),
-  });
+  const response = await exports.default.fetch(
+    `${accessControlPath(organisationId)}/grants`,
+    {
+      method: "POST",
+      headers: mutationHeaders(session),
+      body: JSON.stringify({
+        expectedRevision: view.revision,
+        subjectRef: grant.subjectRef,
+        target: grant.target,
+      }),
+    },
+  );
   expect(response.status).toBe(200);
 }
 
@@ -125,9 +128,12 @@ export async function readAccess(
   organisationId: string,
   session: IssuedControlSession,
 ): Promise<Record<string, unknown>> {
-  const response = await exports.default.fetch(accessControlPath(organisationId), {
-    headers: commerceHeaders(session),
-  });
+  const response = await exports.default.fetch(
+    accessControlPath(organisationId),
+    {
+      headers: commerceHeaders(session),
+    },
+  );
   expect(response.status).toBe(200);
   const body: unknown = await response.json();
   if (!isRecord(body)) throw new Error("Access view invalid");
@@ -141,3 +147,24 @@ export function mutationHeaders(session: IssuedControlSession): Headers {
   return headers;
 }
 
+/**
+ * The decisions that wait for this person, from the one read over every
+ * store: the kind and the id of each one.
+ */
+export async function pendingDecisionsOf(
+  organisationId: string,
+  session: IssuedControlSession,
+): Promise<readonly Readonly<{ kind: string; id: string }>[]> {
+  const response = await exports.default.fetch(
+    `https://localhost/v1/control/organisations/${organisationId}/decisions`,
+    { headers: commerceHeaders(session) },
+  );
+  expect(response.status).toBe(200);
+  const body: unknown = await response.json();
+  if (!isRecord(body) || !Array.isArray(body.decisions))
+    throw new Error("Pending decisions invalid");
+  return body.decisions.filter(isRecord).map((decision) => ({
+    kind: String(decision.kind),
+    id: String(decision.id),
+  }));
+}
