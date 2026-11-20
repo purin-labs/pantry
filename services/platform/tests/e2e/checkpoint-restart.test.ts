@@ -492,11 +492,18 @@ function closeAdmissionDuringFinalization(
   actor: object,
   state: DurableObjectState,
 ): void {
-  const original = Reflect.get(actor, "completeCanonicalCheckpointAndStream");
+  // The checkpoints module of the Session finalizes; the hook is on it.
+  const checkpoints: unknown = Reflect.get(actor, "checkpoints");
+  if (typeof checkpoints !== "object" || checkpoints === null)
+    throw new Error("Missing checkpoints module");
+  const original = Reflect.get(
+    checkpoints,
+    "completeCanonicalCheckpointAndStream",
+  );
   if (typeof original !== "function") throw new Error("Missing finalizer");
-  Object.defineProperty(actor, "completeCanonicalCheckpointAndStream", {
+  Object.defineProperty(checkpoints, "completeCanonicalCheckpointAndStream", {
     configurable: true,
-    value: closeAdmissionBeforeCommit.bind(null, actor, state, original),
+    value: closeAdmissionBeforeCommit.bind(null, checkpoints, state, original),
   });
 }
 

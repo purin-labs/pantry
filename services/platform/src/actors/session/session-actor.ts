@@ -205,7 +205,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env, { executionBarrier: true });
-    this.persistence = this.ctx.storage.transactionSync(
+    this.shared.persistence = this.ctx.storage.transactionSync(
       initializeAgentSessionPersistence.bind(null, this.ctx.storage.sql),
     );
     const nativeRecovery = this.ctx.storage.transactionSync(
@@ -237,7 +237,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       hasUnpublishedHarnessCheckpoint(this.ctx.storage.sql)
     )
       this.ctx.blockConcurrencyWhile(
-        this.scheduleCheckpointFinalization.bind(this),
+        this.checkpoints.scheduleCheckpointFinalization.bind(this),
       );
   }
 
@@ -285,14 +285,14 @@ export abstract class SessionActor extends SessionTurnRecovery {
   ): Promise<Result<void, PortalChatCleanupError>> {
     if (
       !canAdmitSessionWork(this.ctx.storage.sql, input) ||
-      this.portalChatCleanup !== null
+      this.shared.portalChatCleanup !== null
     )
       return { ok: false, error: { code: "chat_cleanup_conflict" } };
-    this.portalChatCleanup = this.admitPortalChatCleanup(input);
+    this.shared.portalChatCleanup = this.admitPortalChatCleanup(input);
     try {
-      return await this.portalChatCleanup;
+      return await this.shared.portalChatCleanup;
     } finally {
-      this.portalChatCleanup = null;
+      this.shared.portalChatCleanup = null;
     }
   }
 
@@ -304,10 +304,10 @@ export abstract class SessionActor extends SessionTurnRecovery {
       input.expectedFenceToken,
     );
     if (!closed.ok) return closed;
-    if (this.portalChatQuiescence === null)
-      this.portalChatQuiescence = this.drainPortalChatCleanup(closed.value);
-    const result = await this.portalChatQuiescence;
-    if (!result.ok) this.portalChatQuiescence = null;
+    if (this.shared.portalChatQuiescence === null)
+      this.shared.portalChatQuiescence = this.drainPortalChatCleanup(closed.value);
+    const result = await this.shared.portalChatQuiescence;
+    if (!result.ok) this.shared.portalChatQuiescence = null;
     return result;
   }
 
@@ -330,8 +330,8 @@ export abstract class SessionActor extends SessionTurnRecovery {
         ok: false,
         error: { code: "organisation_archive_cleanup_conflict" },
       };
-    await this.activeMessagePreparation?.cancel();
-    await this.activeEmbeddedHarnessTurn?.turn.cancel();
+    await this.shared.activeMessagePreparation?.cancel();
+    await this.shared.activeEmbeddedHarnessTurn?.turn.cancel();
     if (
       !(await canEraseArchivedHarnessHistory(
         this.env,
@@ -365,7 +365,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       };
     }
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.requestingOrganisationId,
     );
@@ -400,7 +400,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     Result<ImportedCanonicalSessionRecord, CanonicalSessionAccessError>
   > {
     return readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.requestingOrganisationId,
     );
@@ -422,7 +422,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
   > {
     const header = readSessionInspectionHeader(this.ctx.storage.sql, input);
     if (!header.ok) return header;
-    if (this.transientExecutions.size > 0)
+    if (this.shared.transientExecutions.size > 0)
       return { ok: true, value: { kind: "running" } };
     const now = Date.now();
     const alarmAt = await this.ctx.storage.getAlarm();
@@ -433,12 +433,12 @@ export abstract class SessionActor extends SessionTurnRecovery {
         input.organisationId,
       );
       // A turn that began during those reads keeps the alarm it set.
-      if (execution !== null && this.transientExecutions.size === 0)
+      if (execution !== null && this.shared.transientExecutions.size === 0)
         await this.ctx.storage.setAlarm(now);
     }
     return {
       ok: true,
-      value: { kind: this.transientExecutions.size > 0 ? "running" : "idle" },
+      value: { kind: this.shared.transientExecutions.size > 0 ? "running" : "idle" },
     };
   }
 
@@ -504,7 +504,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
         checkpoint: checkpoint.value,
         budget: budget.value.budget,
         reservation: budget.value.reservation,
-        preparation: this.activeMessagePreparation?.inspect() ?? {
+        preparation: this.shared.activeMessagePreparation?.inspect() ?? {
           kind: "none",
         },
         latestMessageLinkReceipt: inspectLatestMessageLinkReceipt(
@@ -524,7 +524,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     if (contextBundle === null)
       return { ok: false, error: { code: "invalid_persisted_state" } };
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.requestingOrganisationId,
     );
@@ -799,7 +799,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       !steeringMessageHasNoFiles(input.message)
     )
       return { ok: false, error: { code: "invalid_config" } };
-    const active = this.activeEmbeddedHarnessTurn;
+    const active = this.shared.activeEmbeddedHarnessTurn;
     if (
       active === null ||
       active.lease.session.organisationId !== organisationId.value ||
@@ -908,7 +908,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       requestId.value,
     );
     if (steering === null) return { ok: true, value: { state: "missing" } };
-    const live = this.activeEmbeddedHarnessTurn?.lease.turn.turnId;
+    const live = this.shared.activeEmbeddedHarnessTurn?.lease.turn.turnId;
     const settled = this.ctx.storage.transactionSync(() =>
       settledSteeringInput(
         sql,
@@ -948,7 +948,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       return { ok: false, error: { code: "invalid_config" } };
     }
     const current = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       organisationId.value,
     );
@@ -1057,7 +1057,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     checkpoint: HarnessCheckpointRecord;
   }): Promise<Result<ArrayBuffer, CanonicalHarnessCheckpointRestoreError>> {
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.requestingOrganisationId,
     );
@@ -1127,7 +1127,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     readonly sessionId: SessionId;
   }): Promise<readonly ChatContextDetails[]> {
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.requestingOrganisationId,
     );
@@ -1157,7 +1157,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       CanonicalEmbeddedHarnessTextTurnError
     >
   > {
-    if (this.canonicalTurn !== null)
+    if (this.shared.canonicalTurn !== null)
       return {
         ok: false,
         error: {
@@ -1166,12 +1166,12 @@ export abstract class SessionActor extends SessionTurnRecovery {
         },
       };
     const work = this.prepareCanonicalTextTurn(input);
-    this.canonicalTurn = settleActorExecution(work);
+    this.shared.canonicalTurn = settleActorExecution(work);
     try {
       return await work;
     } finally {
-      this.canonicalTurn = null;
-      this.startedCheckpointPayload = null;
+      this.shared.canonicalTurn = null;
+      this.shared.startedCheckpointPayload = null;
     }
   }
 
@@ -1198,7 +1198,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     input: SessionReplayInput,
   ): Promise<Result<Response, SessionStateError>> {
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.organisationId,
     );
@@ -1220,7 +1220,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     readonly sessionId: SessionId;
   }): Promise<CaseExecutionSessionRecords | null> {
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.organisationId,
     );
@@ -1236,7 +1236,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     readonly target: SessionExecutionContentTarget;
   }): Promise<readonly CaseExecutionStoredContent[] | null> {
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.organisationId,
     );
@@ -1285,7 +1285,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     readonly turnId: string;
     readonly throughSequence: number | null;
   }): Promise<string> {
-    const completed = await this.readCompletedTurn(input);
+    const completed = await this.checkpoints.readCompletedTurn(input);
     if (!completed.ok) throw new Error("chat_fork_boundary_unavailable");
     const materialized = await readHarnessHistory(
       this.ctx.storage.sql,
@@ -1317,7 +1317,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     >
   > {
     const record = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       input.organisationId,
     );
@@ -1379,7 +1379,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
         name: "quarantine_end",
         run: () => this.endInterruptedTurnQuarantine(),
       },
-      { name: "ended_executions", run: () => this.releaseEndedExecutions() },
+      { name: "ended_executions", run: () => this.shared.releaseEndedExecutions() },
       {
         name: "bakery_surface_effects",
         run: () =>
@@ -1394,7 +1394,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
           reconcileSessionGoalUsage({
             env: this.env,
             storage: this.ctx.storage,
-            liveRuns: this.liveGoalRuns,
+            liveRuns: this.shared.liveGoalRuns,
           }),
       },
       { name: "pending_pi_turn", run: () => this.resumePendingPiTurn() },

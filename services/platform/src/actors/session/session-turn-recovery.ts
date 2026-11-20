@@ -113,7 +113,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
     const sessionId = parseSessionId(row.session_id);
     if (!organisationId.ok || !sessionId.ok) return;
     const current = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       sql,
       organisationId.value,
     );
@@ -200,7 +200,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
     const organisationId = parseOrganisationId(lease.session.organisationId);
     if (!organisationId.ok) return false;
     const current = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       sql,
       organisationId.value,
     );
@@ -327,7 +327,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       env: this.env,
       storage: this.ctx.storage,
     });
-    if (this.canonicalTurn !== null) return;
+    if (this.shared.canonicalTurn !== null) return;
     const pending = readPiDurableRecovery(this.ctx.storage.sql);
     if (pending === null) return;
     const execution = await SessionExecutionAdmission.resolve(
@@ -368,8 +368,8 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
     if (rebind.kind === "refused") await this.endUnresumableTurn();
     if (resumed === null) return;
     const work = this.resumeHarnessTurn(resumed);
-    this.canonicalTurn = settleActorExecution(work);
-    this.ctx.waitUntil(work.finally(this.clearCanonicalTurn.bind(this)));
+    this.shared.canonicalTurn = settleActorExecution(work);
+    this.ctx.waitUntil(work.finally(this.checkpoints.clearCanonicalTurn.bind(this)));
   }
 
   /**
@@ -386,7 +386,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       row === undefined ? null : parseOrganisationId(row.organisation_id);
     if (organisationId === null || !organisationId.ok) return;
     const current = await readCanonicalSessionForPersistence(
-      this.persistence,
+      this.shared.persistence,
       this.ctx.storage.sql,
       organisationId.value,
     );
@@ -495,8 +495,8 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       return;
     }
     // The foreground turn owns completion until its execution settles.
-    if (this.canonicalTurn !== null) {
-      await this.scheduleCheckpointFinalization();
+    if (this.shared.canonicalTurn !== null) {
+      await this.checkpoints.scheduleCheckpointFinalization();
       return;
     }
     const { current } = pending.value.finalization;
@@ -510,13 +510,13 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       organisationId.value,
     );
     if (execution === null) return;
-    const result = await this.finalizeAcceptedSessionCheckpoint({
+    const result = await this.checkpoints.finalizeAcceptedSessionCheckpoint({
       execution,
       requestingOrganisationId: organisationId.value,
       caller: { kind: "recovery" },
       turnId: current.state.turnId,
     });
-    if (!result.ok) await this.scheduleCheckpointFinalization();
+    if (!result.ok) await this.checkpoints.scheduleCheckpointFinalization();
   }
 
   protected async resumeCheckpointPublication(): Promise<void> {
@@ -532,7 +532,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       organisationId.value,
     );
     if (execution === null) return;
-    await this.publishAcceptedCheckpoint({
+    await this.checkpoints.publishAcceptedCheckpoint({
       execution,
       attempt: "resumed",
       trace: {

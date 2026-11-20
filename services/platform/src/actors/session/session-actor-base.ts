@@ -1,24 +1,8 @@
-import {
-  markSteeringInputJournaled,
-  steeringInputsToJournal,
-  turnTriggerEntryId,
-} from "../harness-steering";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { armAlarmBy } from "../lifecycle/actor-alarm";
-import type { AcceptedInputRef, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
-import {
-  parseCaseId,
-  parseOrganisationId,
-  newRequestId,
-  type SessionId,
-  type OrganisationId,
-} from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+import { newRequestId, type SessionId, type OrganisationId } from "../../ids";
+import { traceLog } from "../../observability";
 import type { Result } from "../../result";
-import { resolveActiveCaseActorAtPlacement } from "../actor-router";
-import { type AgentSessionPersistence } from "../agent-session-schema";
-import { SessionExecutionAdmission } from "../session-execution-admission";
 import { readCanonicalSessionForPersistence } from "../agent-session-canonical";
 import {
   acceptHarnessEvent,
@@ -29,10 +13,6 @@ import {
   type HarnessEventAcceptance,
   type HarnessHistoryAcceptanceWithUsage,
 } from "../agent-session-harness-authority";
-import { type CanonicalHarnessCheckpointPayload } from "../agent-session-harness-checkpoint";
-import { ActiveAttachmentPreparationControl } from "../message-attachment-preparation";
-import { releaseEndedCodeModeExecutions } from "../agent-session-code-mode-settlement";
-import type { EmbeddedHarnessActiveTurn } from "../embedded-harness";
 import {
   canAdmitSessionWork,
   isPortalChatCleanupPlacementActive,
@@ -47,9 +27,8 @@ import type { ActorExportError } from "../actor-export";
 import type { Variant } from "@purin-labs/type-utils";
 import { errorMessage } from "@purin-labs/std";
 import { PlacedActor } from "../lifecycle/placed-actor";
-import { deferredExecutionRelease } from "./replay";
+import { SessionShared } from "./session-shared";
 import {
-  CODE_MODE_RELEASE_RETRY_MS,
   type TrackedTransientSessionExecution,
   type TransientSessionExecution,
   sessionPlacementR2Keys,
@@ -58,17 +37,12 @@ import type { SessionToolWiring } from "./tool-wiring";
 import type { SessionTransientHost } from "./transient-host";
 import { piToolRules } from "../pi-tool-replay";
 import { settleActorExecution } from "../actor-execution-quiescence";
-import type {
-  CanonicalHarnessEventError,
-  CheckpointPublicationError,
-} from "./types";
+import type { CanonicalHarnessEventError } from "./types";
 
 /**
  * The Session actor's state and its Portal chat cleanup (Refactor 10, step 2.5). The layers above it add checkpoints, harness turns, recovery and transient turns; `SessionDO` adds the RPC methods.
  */
 export abstract class SessionActorBase extends PlacedActor<null> {
-  protected persistence!: AgentSessionPersistence;
-
   /**
    * The agent tools and the parts of the product areas. The Worker's class
    * gives them, so the Session names no area. It is a method, not a field:
@@ -76,36 +50,14 @@ export abstract class SessionActorBase extends PlacedActor<null> {
    */
   protected abstract sessionTools(): SessionToolWiring;
 
-  protected portalChatCleanup: Promise<
-    Result<void, PortalChatCleanupError>
-  > | null = null;
-
-  protected portalChatQuiescence: Promise<
-    Result<null, ActorExportError>
-  > | null = null;
-
-  protected canonicalTurn: Promise<Result<null, ActorExportError>> | null =
-    null;
-
   /**
-   * The payload of the checkpoint the turn being started restores, when its
-   * read began beside the turn's admission. Only the restore of that same
-   * checkpoint record takes it.
+   * The state that the modules of the Session share. Each module gets this
+   * one value; no module reads a field of the Actor class.
    */
-  protected startedCheckpointPayload: {
-    readonly checkpoint: string;
-    readonly payload: CanonicalHarnessCheckpointPayload;
-  } | null = null;
-
-  /** The archive write of the last accepted checkpoint, while it runs. */
-  protected checkpointPublication: Promise<
-    Result<null, CheckpointPublicationError>
-  > | null = null;
-
-  protected readonly transientExecutions =
-    new Set<TrackedTransientSessionExecution>();
-
-  protected readonly liveGoalRuns = new Set<string>();
+  protected readonly shared = new SessionShared(
+    { ctx: () => this.ctx, env: () => this.env },
+    () => this.sessionTools(),
+  );
 
   /**
    * Runs one transient turn and holds it in the set that the cleanup, the
@@ -122,11 +74,11 @@ export abstract class SessionActorBase extends PlacedActor<null> {
       execution,
       settlement: settleActorExecution(work),
     };
-    this.transientExecutions.add(tracked);
+    this.shared.transientExecutions.add(tracked);
     try {
       return await work;
     } finally {
-      this.transientExecutions.delete(tracked);
+      this.shared.transientExecutions.delete(tracked);
     }
   }
 
@@ -135,22 +87,11 @@ export abstract class SessionActorBase extends PlacedActor<null> {
     return {
       env: this.env,
       ctx: this.ctx,
-      persistence: this.persistence,
-      liveGoalRuns: this.liveGoalRuns,
+      persistence: this.shared.persistence,
+      liveGoalRuns: this.shared.liveGoalRuns,
       toolRules: piToolRules.bind(null, this.sessionTools().registry),
     };
   }
-
-  protected activeMessagePreparation: ActiveAttachmentPreparationControl | null =
-    null;
-
-  protected activeEmbeddedHarnessTurn: {
-    readonly leaseId: HarnessTurnLease["leaseId"];
-    readonly lease: HarnessTurnLease;
-    readonly acceptedInput: AcceptedInputRef;
-    readonly execution: SessionExecutionAdmission;
-    readonly turn: EmbeddedHarnessActiveTurn;
-  } | null = null;
 
   protected async admitPortalChatCleanup(
     input: PortalChatCleanupRequest,
@@ -178,7 +119,7 @@ export abstract class SessionActorBase extends PlacedActor<null> {
         throw new Error("session_organisation_mismatch");
       if (erasure === null) {
         const session = await readCanonicalSessionForPersistence(
-          this.persistence,
+          this.shared.persistence,
           this.ctx.storage.sql,
           input.requestingOrganisationId,
         );
@@ -215,11 +156,11 @@ export abstract class SessionActorBase extends PlacedActor<null> {
   protected async finishPortalChatCleanup(
     erasure: Variant<PortalChatErasure, "pending">,
   ): Promise<void> {
-    await this.activeMessagePreparation?.cancel();
-    await this.activeEmbeddedHarnessTurn?.turn.cancel();
+    await this.shared.activeMessagePreparation?.cancel();
+    await this.shared.activeEmbeddedHarnessTurn?.turn.cancel();
     // An archive write that is in flight would put the checkpoint back after
     // the delete below.
-    await this.checkpointPublication;
+    await this.shared.checkpointPublication;
     await this.ctx.storage.deleteAlarm();
     this.ctx.storage.transactionSync(
       eraseActorContentSql.bind(null, this.ctx.storage.sql),
@@ -243,7 +184,7 @@ export abstract class SessionActorBase extends PlacedActor<null> {
     readonly sessionId: SessionId;
   }): Promise<Result<null, ActorExportError>> {
     try {
-      const cleanup = await this.portalChatCleanup;
+      const cleanup = await this.shared.portalChatCleanup;
       if (
         cleanup !== null &&
         !cleanup.ok &&
@@ -262,19 +203,19 @@ export abstract class SessionActorBase extends PlacedActor<null> {
         throw new Error("session_organisation_mismatch");
       if (erasure?.kind === "pending")
         await this.finishPortalChatCleanup(erasure);
-      await this.activeMessagePreparation?.cancel();
-      await this.activeEmbeddedHarnessTurn?.turn.cancel();
-      const transientExecutions = [...this.transientExecutions];
+      await this.shared.activeMessagePreparation?.cancel();
+      await this.shared.activeEmbeddedHarnessTurn?.turn.cancel();
+      const transientExecutions = [...this.shared.transientExecutions];
       for (const transient of transientExecutions) {
         if (transient.execution.state.kind === "running") {
           const cancelled = await transient.execution.state.turn.cancel();
           if (!cancelled.ok) throw new Error(cancelled.error.detail);
         }
       }
-      const execution = await this.canonicalTurn;
+      const execution = await this.shared.canonicalTurn;
       if (execution !== null && !execution.ok) return execution;
       // A checkpoint's archive write continues after its turn's call.
-      await this.checkpointPublication;
+      await this.shared.checkpointPublication;
       for (const transient of transientExecutions) {
         const settled = await transient.settlement;
         if (!settled.ok) return settled;
@@ -285,92 +226,6 @@ export abstract class SessionActorBase extends PlacedActor<null> {
         ok: false,
         error: { code: "actor_cleanup_failed", detail: errorMessage(error) },
       };
-    }
-  }
-
-  /**
-   * Releases the Code Mode executions that an ended turn left open. A turn
-   * that is cancelled, that fails, or that cannot resume settles no script,
-   * so its reservation is released at its owners. The alarm repeats a
-   * release that an owner deferred.
-   */
-  protected async releaseEndedExecutions(): Promise<void> {
-    const released = await releaseEndedCodeModeExecutions({
-      env: this.env,
-      storage: this.ctx.storage,
-      now: Date.now(),
-    }).catch(deferredExecutionRelease);
-    if (released.deferred)
-      await armAlarmBy(
-        this.ctx.storage,
-        Date.now() + CODE_MODE_RELEASE_RETRY_MS,
-      );
-  }
-
-  /**
-   * Journal in the Case the steering inputs that a turn placed (Plan 71).
-   * The run calls this when the turn ends. An input that the turn did not
-   * place stays out of the Case, so a surface can run it as a new turn. A
-   * failed call leaves the input unjournaled, and a resumed run of the turn
-   * tries again.
-   */
-  protected async journalPlacedSteeringInputs(
-    input: {
-      readonly execution: SessionExecutionAdmission;
-      readonly lease: HarnessTurnLease;
-    },
-    sessionId: SessionId,
-  ): Promise<void> {
-    const turnId = String(input.lease.turn.turnId);
-    const placed = steeringInputsToJournal(
-      this.ctx.storage.sql,
-      sessionId,
-      turnId,
-    );
-    const triggerEntryId = turnTriggerEntryId(turnId);
-    if (placed.length === 0 || triggerEntryId === null) return;
-    try {
-      const organisationId = parseOrganisationId(
-        input.lease.session.organisationId,
-      );
-      if (!organisationId.ok) throw new Error("steering_organisation_invalid");
-      for (const steering of placed) {
-        if (steering.inputRef.kind !== "case")
-          throw new Error("steering_input_not_case");
-        const caseId = parseCaseId(steering.inputRef.caseId);
-        if (!caseId.ok) throw new Error("steering_case_invalid");
-        const caseActor = await resolveActiveCaseActorAtPlacement({
-          env: this.env,
-          namespace: this.env.CASE,
-          organisationId: organisationId.value,
-          caseId: caseId.value,
-          placement: input.execution.scope.placement,
-          now: Date.now(),
-        });
-        if (!caseActor.ok) throw new Error(caseActor.error.code);
-        const journaled = await caseActor.value.acceptSteeringInput({
-          caseId: steering.inputRef.caseId,
-          assignmentId: steering.inputRef.assignmentId,
-          inputId: steering.inputId,
-          triggerEntryId,
-          content: { kind: "user_message", message: steering.message },
-          requestAuthority: input.lease.requestAuthority,
-          acceptedAt: steering.admittedAt,
-        });
-        if (!journaled.ok) throw new Error(journaled.error.code);
-        markSteeringInputJournaled(
-          this.ctx.storage.sql,
-          sessionId,
-          steering.inputId,
-          Date.now(),
-        );
-      }
-    } catch (error) {
-      traceWarn("agent_session.steering_journal_failed", {
-        requestId: newRequestId(),
-        turn_id: turnId,
-        error: errorMessage(error).slice(0, 300),
-      });
     }
   }
 

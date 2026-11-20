@@ -230,7 +230,6 @@
     "services/platform/src/actors/organisation/organisation-policy.ts = services/platform/src/actors/organisation/organisation-policy.ts": 1,
     "services/platform/src/actors/session/capability-claims.ts = services/platform/src/actors/session/capability-claims.ts": 4,
     "services/platform/src/actors/session/run-budget.ts = services/platform/src/actors/session/run-budget.ts": 1,
-    "services/platform/src/actors/session/session-actor.ts = services/platform/src/actors/session/session-checkpoints.ts": 1,
     "services/platform/src/actors/session/session-actor.ts = services/platform/src/actors/session/session-harness-turns.ts": 1,
     "services/platform/src/actors/session/session-harness-turns.ts = services/platform/src/actors/session/session-harness-turns.ts": 1,
     "services/platform/src/agent-tools/bakery/surface.ts = services/platform/src/agent-tools/bakery/surface.ts": 2,
