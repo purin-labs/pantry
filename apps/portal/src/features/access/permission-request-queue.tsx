@@ -11,7 +11,7 @@ import type {
   AgentPermissionRequestSummary,
   HeldOutputSummary,
 } from "@purin-labs/control-api";
-import { usePermissionRequests } from "../../permission-requests-summary";
+import { usePermissionRequests } from "./permission-requests-summary";
 
 type Props = Readonly<{
   organisationId: string;

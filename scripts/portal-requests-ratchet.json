@@ -44,7 +44,7 @@
     "apps/portal/src/pages/account-invitation.tsx": 1,
     "apps/portal/src/pages/account-onboarding.tsx": 2,
     "apps/portal/src/pages/home.tsx": 1,
-    "apps/portal/src/permission-requests-summary.ts": 1,
+    "apps/portal/src/features/access/permission-requests-summary.ts": 1,
     "apps/portal/src/portal.tsx": 8
   }
 }

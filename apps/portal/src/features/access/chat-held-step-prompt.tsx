@@ -8,7 +8,7 @@ import React from "react";
 import {
   refreshPermissionRequests,
   usePermissionRequests,
-} from "../../permission-requests-summary";
+} from "./permission-requests-summary";
 import { HeldOutputPrompt } from "./held-output-prompt";
 
 type Props = Readonly<{

@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 390,
+    "upward": 386,
     "areas": 242,
     "order": 136,
     "table": 118
@@ -59,7 +59,7 @@
     "areas/organisation -> areas/integrations": 14,
     "areas/organisation -> areas/kitchen": 1,
     "areas/organisation -> surfaces/email": 1,
-    "areas/organisation -> surfaces/portal": 8,
+    "areas/organisation -> surfaces/portal": 4,
     "areas/organisation -> surfaces/slack": 4,
     "areas/organisation -> surfaces/voice": 2,
     "areas/shopify -> areas/commerce": 8,

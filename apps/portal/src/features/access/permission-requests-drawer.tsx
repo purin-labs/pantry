@@ -9,7 +9,7 @@ import { X } from "lucide-react";
 import {
   refreshPermissionRequests,
   usePermissionRequests,
-} from "../../permission-requests-summary";
+} from "./permission-requests-summary";
 import { AgentPermissionRequestPrompt } from "./agent-permission-request";
 import { HeldOutputPrompt } from "./held-output-prompt";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";

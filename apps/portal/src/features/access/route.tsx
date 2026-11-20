@@ -53,7 +53,7 @@ import { assertNever } from "@purin-labs/std";
 import { AgentPermissionRequestPrompt } from "./agent-permission-request";
 import { HeldOutputPrompt } from "./held-output-prompt";
 import { PermissionRequestQueue } from "./permission-request-queue";
-import { refreshPermissionRequests } from "../../permission-requests-summary";
+import { refreshPermissionRequests } from "./permission-requests-summary";
 import { AiBudgetRaisePrompt } from "./ai-budget-raise";
 
 type AccessRouteProps = Readonly<{

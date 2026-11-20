@@ -38,12 +38,7 @@ import {
   Warehouse,
   type LucideIcon,
 } from "lucide-react";
-import {
-  Link,
-  Outlet,
-  useLocation,
-  useNavigate,
-} from "react-router";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import { Toaster } from "sonner";
 
 import {
@@ -56,7 +51,7 @@ import {
   type WorkspaceSystem,
 } from "./route";
 import { useBrainItemsToReview } from "./brain-summary";
-import { useRequestsToDecide } from "./permission-requests-summary";
+import { useRequestsToDecide } from "./features/access/permission-requests-summary";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import "./features/access/permission-requests-drawer.css";
 import "./portal-brand.css";
@@ -205,7 +200,10 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
       props.sidebar?.chatOpen ?? false,
       href,
     );
-    navigate(target.to, target.state === undefined ? {} : { state: target.state });
+    navigate(
+      target.to,
+      target.state === undefined ? {} : { state: target.state },
+    );
   };
   const [chatFullscreen, setChatFullscreen] = React.useState(false);
   // Full-screen chat starts with the rail collapsed. Expanding it there does
