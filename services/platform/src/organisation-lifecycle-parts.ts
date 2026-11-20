@@ -4,9 +4,14 @@ import {
   prepareSurfaceInstallConnectionRows,
   prepareSurfaceReinstallConnectionRows,
 } from "./data/integration-account";
+import {
+  prepareArchivedOrganisationAccountsDisable,
+  prepareArchivedOrganisationWebhooksDisable,
+} from "./data/integration-account-writes";
 import type { OrganisationLifecycleParts } from "./data/organisation-lifecycle-port";
 import { prepareInitialOrganisationWorkspace } from "./data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "./data/onboarding";
+import { prepareArchivedOrganisationConnectionsDisable } from "./data/provider-connection-writes";
 import { prepareServiceInvitationAcceptance } from "./data/service-invitation-role";
 import {
   prepareChatDirectoryRevisionBump,
@@ -17,6 +22,7 @@ import {
   prepareBaseProject,
   prepareBaseProjectMembership,
   prepareBaseProjectRoleChange,
+  prepareOrganisationProjectMembersDeletion,
   prepareProjectMembershipRevocation,
 } from "./projects/default-project";
 
@@ -76,5 +82,14 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
       prepareBaseProjectMembership(db, input),
     invitationAcceptance: (db, input) =>
       prepareServiceInvitationAcceptance(db, input),
+  },
+  archive: {
+    connectionsDisable: (session, input) => [
+      prepareArchivedOrganisationAccountsDisable(session, input),
+      prepareArchivedOrganisationConnectionsDisable(session, input),
+      prepareArchivedOrganisationWebhooksDisable(session, input),
+    ],
+    projectMembersDeletion: (session, input) =>
+      prepareOrganisationProjectMembersDeletion(session, input),
   },
 };

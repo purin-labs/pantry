@@ -3,7 +3,7 @@
     "upward": 68,
     "areas": 44,
     "order": 12,
-    "table": 18
+    "table": 14
   },
   "crossings": {
     "areas/brain -> areas/inbox": 1,
@@ -57,14 +57,12 @@
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
     "table credential_ref (foundation/authority) <- foundation/connections": 1,
-    "table integration_account (foundation/connections) <- foundation/tenancy": 3,
+    "table integration_account (foundation/connections) <- foundation/tenancy": 2,
     "table onboarding_support_reference (areas/organisation) <- foundation/connections": 1,
     "table organisation_communication_destination (areas/organisation) <- foundation/connections": 1,
     "table project (foundation/conversation) <- surfaces/portal": 1,
-    "table project_member (foundation/conversation) <- foundation/tenancy": 1,
-    "table provider_connection (foundation/connections) <- foundation/tenancy": 3,
+    "table provider_connection (foundation/connections) <- foundation/tenancy": 2,
     "table provider_credential_generation (foundation/connections) <- foundation/tenancy": 2,
-    "table provider_webhook (foundation/connections) <- foundation/tenancy": 1,
     "table slack_dm_organisation_selection (surfaces/slack) <- foundation/tenancy": 1,
     "table slack_installation (surfaces/slack) <- foundation/authority": 2,
     "table slack_thread_case_pin (surfaces/slack) <- foundation/tenancy": 1

@@ -414,3 +414,52 @@ export function prepareRemovedAccountWebhooksDelete(
     )
     .bind(integrationAccountId);
 }
+
+/**
+ * The archive of an Organisation disables each account that is not disabled
+ * or revoked, while the guard holds.
+ */
+export function prepareArchivedOrganisationAccountsDisable(
+  db: Database,
+  input: Readonly<{
+    organisationId: string;
+    actorUserId: string;
+    now: number;
+    guard: Readonly<{ sql: string; bindings: readonly unknown[] }>;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE integration_account
+       SET lifecycle = 'disabled', lifecycle_reason_code = NULL,
+           disabled_by_user_id = ?, disabled_at = ?,
+           revoked_at = NULL, is_default_for_provider = 0, updated_at = ?
+       WHERE organisation_id = ? AND lifecycle NOT IN ('disabled', 'revoked') AND ${input.guard.sql}`,
+    )
+    .bind(
+      input.actorUserId,
+      input.now,
+      input.now,
+      input.organisationId,
+      ...input.guard.bindings,
+    );
+}
+
+/** The archive of an Organisation disables each webhook that is not revoked. */
+export function prepareArchivedOrganisationWebhooksDisable(
+  db: Database,
+  input: Readonly<{
+    organisationId: string;
+    now: number;
+    guard: Readonly<{ sql: string; bindings: readonly unknown[] }>;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE provider_webhook
+       SET lifecycle = 'disabled', lifecycle_reason_code = NULL,
+           last_verified_at = NULL, updated_at = ?
+       WHERE organisation_id = ? AND lifecycle != 'revoked' AND ${input.guard.sql}`,
+    )
+    .bind(input.now, input.organisationId, ...input.guard.bindings);
+}

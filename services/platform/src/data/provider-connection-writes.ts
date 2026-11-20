@@ -246,3 +246,29 @@ export function prepareDisconnectedAccountConnectionRevocation(
       input.integrationAccountId,
     );
 }
+
+/**
+ * The archive of an Organisation disables each connection that is not
+ * disabled or revoked, while the guard holds.
+ */
+export function prepareArchivedOrganisationConnectionsDisable(
+  db: Database,
+  input: Readonly<{
+    organisationId: string;
+    now: number;
+    guard: RowGuard;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE provider_connection
+       SET lifecycle = 'disabled', disabled_at = ?, revoked_at = NULL, updated_at = ?
+       WHERE organisation_id = ? AND lifecycle NOT IN ('disabled', 'revoked') AND ${input.guard.sql}`,
+    )
+    .bind(
+      input.now,
+      input.now,
+      input.organisationId,
+      ...input.guard.bindings,
+    );
+}

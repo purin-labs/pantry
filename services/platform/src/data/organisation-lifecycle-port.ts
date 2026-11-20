@@ -34,6 +34,7 @@ type Session = OrganisationDatabaseSession;
 export type OrganisationLifecycleParts = Readonly<{
   creation: OrganisationCreationParts;
   membership: OrganisationMembershipParts;
+  archive: OrganisationArchiveParts;
 }>;
 
 /** The parts of the creation batch and of the install batch of a surface. */
@@ -170,6 +171,25 @@ type OrganisationMembershipParts = Readonly<{
       acceptanceReceiptId: string;
       now: number;
     }>,
+  ): D1PreparedStatement;
+}>;
+
+/** The parts of the archive batch and of the delete of an archived Organisation. */
+type OrganisationArchiveParts = Readonly<{
+  /** The archive disables the accounts, the connections and the webhooks (connections). */
+  connectionsDisable(
+    session: Session,
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorUserId: UserId;
+      now: number;
+      guard: RowGuard;
+    }>,
+  ): readonly D1PreparedStatement[];
+  /** The delete removes the members of each Project (conversation). */
+  projectMembersDeletion(
+    session: Session,
+    input: Readonly<{ organisationId: OrganisationId; guard: RowGuard }>,
   ): D1PreparedStatement;
 }>;
 

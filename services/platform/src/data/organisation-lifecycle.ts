@@ -23,6 +23,7 @@ import type { OrganisationEnvironment } from "./control-plane";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { assertNever } from "@purin-labs/std";
+import { organisationLifecycleParts } from "./organisation-lifecycle-port";
 import {
   prepareOrganisationLifecycleMove,
   type OrganisationLifecycleState as LifecycleMachineState,
@@ -265,6 +266,7 @@ export async function deleteArchivedOrganisation(input: {
   readonly mutation: DeleteOrganisationMutation;
   readonly now: number;
 }): Promise<Result<RestoredOrganisation, DeleteOrganisationError>> {
+  const parts = organisationLifecycleParts().archive;
   if (!(await input.execution.isActive()))
     return { ok: false, error: { code: "organisation_placement_conflict" } };
   const session = input.execution.database.withSession("first-primary");
@@ -354,11 +356,10 @@ export async function deleteArchivedOrganisation(input: {
         `UPDATE organisation_archive_tombstone SET purge_after = ? WHERE organisation_id = ? AND ${ACCEPTED_MUTATION}`,
       )
       .bind(input.now, input.execution.organisationId, ...acceptedMutation),
-    session
-      .prepare(
-        `DELETE FROM project_member WHERE organisation_id = ? AND ${ACCEPTED_MUTATION}`,
-      )
-      .bind(input.execution.organisationId, ...acceptedMutation),
+    parts.projectMembersDeletion(session, {
+      organisationId: input.execution.organisationId,
+      guard: { sql: ACCEPTED_MUTATION, bindings: acceptedMutation },
+    }),
     session
       .prepare(
         `DELETE FROM service_role_grant WHERE organisation_id = ? AND ${ACCEPTED_MUTATION}`,
@@ -439,6 +440,7 @@ type ArchiveOrganisationInput = {
 export async function archiveOrganisation(
   input: ArchiveOrganisationInput,
 ): Promise<Result<ArchivedOrganisation, ArchiveOrganisationError>> {
+  const parts = organisationLifecycleParts().archive;
   if (!(await input.execution.isActive()))
     return { ok: false, error: { code: "organisation_placement_conflict" } };
   const session = input.execution.database.withSession("first-primary");
@@ -550,41 +552,12 @@ export async function archiveOrganisation(
       status: "deleted",
       guard: { sql: ACCEPTED_MUTATION, bindings: acceptedMutation },
     }),
-    session
-      .prepare(
-        `UPDATE integration_account
-       SET lifecycle = 'disabled', lifecycle_reason_code = NULL,
-           disabled_by_user_id = ?, disabled_at = ?,
-           revoked_at = NULL, is_default_for_provider = 0, updated_at = ?
-       WHERE organisation_id = ? AND lifecycle NOT IN ('disabled', 'revoked') AND ${ACCEPTED_MUTATION}`,
-      )
-      .bind(
-        input.actorUserId,
-        input.now,
-        input.now,
-        input.execution.organisationId,
-        ...acceptedMutation,
-      ),
-    session
-      .prepare(
-        `UPDATE provider_connection
-       SET lifecycle = 'disabled', disabled_at = ?, revoked_at = NULL, updated_at = ?
-       WHERE organisation_id = ? AND lifecycle NOT IN ('disabled', 'revoked') AND ${ACCEPTED_MUTATION}`,
-      )
-      .bind(
-        input.now,
-        input.now,
-        input.execution.organisationId,
-        ...acceptedMutation,
-      ),
-    session
-      .prepare(
-        `UPDATE provider_webhook
-       SET lifecycle = 'disabled', lifecycle_reason_code = NULL,
-           last_verified_at = NULL, updated_at = ?
-       WHERE organisation_id = ? AND lifecycle != 'revoked' AND ${ACCEPTED_MUTATION}`,
-      )
-      .bind(input.now, input.execution.organisationId, ...acceptedMutation),
+    ...parts.connectionsDisable(session, {
+      organisationId: input.execution.organisationId,
+      actorUserId: input.actorUserId,
+      now: input.now,
+      guard: { sql: ACCEPTED_MUTATION, bindings: acceptedMutation },
+    }),
     session
       .prepare(
         `INSERT INTO organisation_archive_cleanup (
