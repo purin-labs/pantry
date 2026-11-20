@@ -11,7 +11,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 
 export type ProductCatalogAction = "edit" | "status" | "delete";
 

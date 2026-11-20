@@ -7,7 +7,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   finishInventoryOperation,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 
 export async function handleRecipes(
   request: Request,

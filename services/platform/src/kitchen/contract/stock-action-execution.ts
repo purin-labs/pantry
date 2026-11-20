@@ -16,7 +16,7 @@ import type { CommerceCommandResult } from "@purin-labs/commerce-contracts";
 import {
   commerceListEntryPatchCommand,
   productionRequestCreateCommand,
-} from "./contract/list-entry-commands";
+} from "../../commerce/contract/list-entry-commands";
 import type {
   StockOperationAction,
   StockProductionAdvanceOperation,
@@ -26,7 +26,7 @@ import type {
   StockCountOperation,
 } from "./stock-action";
 
-export type StockReceiptFields = Readonly<{
+type StockReceiptFields = Readonly<{
   receiptId: string;
   effectId: string;
   deliveryId: string;

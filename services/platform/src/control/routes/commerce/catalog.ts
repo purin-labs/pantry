@@ -3,7 +3,7 @@ import type { Env } from "../../../env";
 import {
   connectedStockOverview,
   productPhotos,
-} from "../../../commerce/inventory-overview";
+} from "../../../kitchen/contract/inventory-overview";
 import type { Result } from "../../../result";
 import {
   createPublishedResourceClient,

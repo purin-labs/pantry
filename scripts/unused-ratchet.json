@@ -499,7 +499,6 @@
     "services/platform/src/commerce/merchant-plugin-action.ts#MerchantPluginSettingProposal",
     "services/platform/src/commerce/order-refund-action.ts#OrderRefundLine",
     "services/platform/src/commerce/payments-read.ts#PaymentsSummary",
-    "services/platform/src/commerce/stock-action-execution.ts#StockReceiptFields",
     "services/platform/src/context/assembly/commerce.ts#prepareNamedCommerceQuery",
     "services/platform/src/context/assembly/index.ts#CanonicalContextSourceRef",
     "services/platform/src/context/assembly/index.ts#CommerceContextAssemblyError",

@@ -36,7 +36,7 @@ import {
   stockOperationResourceId,
   stockOperationVerb,
   type StockOperationAction,
-} from "./stock-action";
+} from "../kitchen/contract/stock-action";
 import {
   CAFE_MENU_PUBLISH_VERB,
   cafeMenuActionPath,

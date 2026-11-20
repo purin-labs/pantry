@@ -17,7 +17,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlAccess,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 
 /**
  * `add` and `arrange` change one product's photos; `library` lists the

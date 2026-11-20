@@ -7,14 +7,14 @@ import type { Env } from "../../env";
 import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/contract/queue-messages";
 import { newRequestId, type IntegrationAccountId } from "../../ids";
 import { traceWarn } from "../../observability";
-import { admitUserMutation } from "../admission/control-mutation";
+import { admitUserMutation } from "../../control/admission/control-mutation";
 import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson } from "../http";
-import { recordCommerceMutationReceipt } from "../mutation-receipt";
+} from "../../control/authorization";
+import { controlError, controlJson } from "../../control/http";
+import { recordCommerceMutationReceipt } from "../../control/mutation-receipt";
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 export type InventoryControlAccess = Readonly<{

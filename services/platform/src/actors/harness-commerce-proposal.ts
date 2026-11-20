@@ -86,8 +86,8 @@ import {
 import {
   planStockOperation,
   type StockProposalRequest,
-} from "../commerce/stock-action-plan";
-import { stockOperationResourceId } from "../commerce/stock-action";
+} from "../kitchen/contract/stock-action-plan";
+import { stockOperationResourceId } from "../kitchen/contract/stock-action";
 import { traceWarn } from "../observability";
 import { resolveCommerceCancellationAuthority } from "../commerce/provider";
 import { commerceProviderResourceId } from "../commerce/contract/resource-ids";

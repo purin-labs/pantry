@@ -14,14 +14,14 @@ import {
   type ReceiveCommerceInventoryV3,
   type CommerceStockSnapshot,
 } from "@purin-labs/commerce-client";
-import { inventoryQuantity } from "../../commerce/inventory-overview";
+import { inventoryQuantity } from "../../kitchen/contract/inventory-overview";
 import type { Env } from "../../env";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   finishInventoryOperation,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 
 export async function handleInventoryReceipt(
   request: Request,
