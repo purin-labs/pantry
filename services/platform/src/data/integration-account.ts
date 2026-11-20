@@ -52,7 +52,11 @@ import {
   isRecord,
   isString,
 } from "@purin-labs/std";
-import { prepareProjectionRevisionBump } from "./organisation-onboarding-row";
+import {
+  prepareProjectionRevisionBump,
+  prepareReauthProjectionBump,
+  prepareUnfencedConfigurationBump,
+} from "./organisation-onboarding-row";
 
 export type IntegrationProvider = OnboardingProvider;
 
@@ -346,20 +350,6 @@ type IntegrationAccountRow = {
   isDefaultForProvider: unknown;
 };
 
-function bumpConfigurationRevision(
-  session: OrganisationDatabaseSession,
-  organisationId: OrganisationId,
-): D1PreparedStatement {
-  return session
-    .prepare(
-      `UPDATE organisation_onboarding
-     SET configuration_version = configuration_version + 1,
-         projection_revision = projection_revision + 1
-     WHERE organisation_id = ?`,
-    )
-    .bind(organisationId);
-}
-
 export async function createConnectedIntegration(
   db: OrganisationDatabase,
   seed: ConnectedIntegrationSeed,
@@ -401,7 +391,7 @@ export async function createConnectedIntegration(
 
   await session.batch([
     ...statements,
-    bumpConfigurationRevision(session, seed.organisationId),
+    prepareUnfencedConfigurationBump(session, seed.organisationId),
   ]);
 
   const account = await resolveIntegrationAccountByProviderIdentity({
@@ -512,7 +502,7 @@ export async function attachIntegrationAccount(
       : attachIntegrationAccountStatement(session, seed);
   await session.batch([
     accountStatement,
-    bumpConfigurationRevision(session, seed.organisationId),
+    prepareUnfencedConfigurationBump(session, seed.organisationId),
   ]);
   return resolveIntegrationAccountByProviderIdentity({
     db: session,
@@ -1092,7 +1082,7 @@ export async function disableIntegrationAccount(input: {
         account.value.providerConnectionId,
         input.integrationAccountId,
       ),
-    bumpConfigurationRevision(session, input.organisationId),
+    prepareUnfencedConfigurationBump(session, input.organisationId),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,
@@ -1218,7 +1208,7 @@ export async function switchDefaultIntegrationAccount(input: {
       )
       .bind(input.now, input.organisationId, next.value.integrationAccountId),
     ...bindingTransition.value,
-    bumpConfigurationRevision(session, input.organisationId),
+    prepareUnfencedConfigurationBump(session, input.organisationId),
     session
       .prepare(
         `INSERT INTO provider_default_account_history (
@@ -1917,22 +1907,11 @@ export async function markIntegrationAccountReauthRequired(input: {
         input.integrationAccountId,
         input.readUpdatedAt,
       ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-         SET projection_revision = projection_revision + 1
-         WHERE organisation_id = ? AND EXISTS (
-           SELECT 1 FROM integration_account
-           WHERE organisation_id = ? AND integration_account_id = ?
-             AND lifecycle = 'reauth_required' AND updated_at = ?
-         )`,
-      )
-      .bind(
-        input.organisationId,
-        input.organisationId,
-        input.integrationAccountId,
-        input.now,
-      ),
+    prepareReauthProjectionBump(session, {
+      organisationId: input.organisationId,
+      integrationAccountId: input.integrationAccountId,
+      now: input.now,
+    }),
   ]);
   return marked !== undefined && marked.meta.changes === 1;
 }

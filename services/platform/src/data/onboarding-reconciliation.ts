@@ -61,6 +61,7 @@ import {
 } from "../slack/organisation-routing";
 import {
   prepareProjectionRevisionBump,
+  prepareRepairConfigurationBump,
 } from "./organisation-onboarding-row";
 
 type OnboardingReconciliationSubject =
@@ -2412,16 +2413,7 @@ async function bumpConfigurationForRepair(
   organisationId: OrganisationId,
   now: number,
 ): Promise<void> {
-  await db
-    .prepare(
-      `UPDATE organisation_onboarding
-     SET configuration_version = configuration_version + 1,
-         projection_revision = projection_revision + 1,
-         updated_at = ?
-     WHERE organisation_id = ? AND lifecycle NOT IN ('archived', 'purging', 'purged')`,
-    )
-    .bind(now, organisationId)
-    .run();
+  await prepareRepairConfigurationBump(db, organisationId, now).run();
 }
 
 async function startReconciliationRun(

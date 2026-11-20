@@ -3,7 +3,7 @@
     "upward": 147,
     "areas": 153,
     "order": 103,
-    "table": 86
+    "table": 76
   },
   "crossings": {
     "areas/brain -> areas/inbox": 10,
@@ -137,10 +137,6 @@
     "table organisation_archive_cleanup (foundation/tenancy) <- areas/organisation": 1,
     "table organisation_communication_destination (areas/organisation) <- foundation/connections": 1,
     "table organisation_default_workspace (foundation/agent) <- foundation/tenancy": 1,
-    "table organisation_onboarding (foundation/tenancy) <- areas/commerce": 2,
-    "table organisation_onboarding (foundation/tenancy) <- areas/organisation": 3,
-    "table organisation_onboarding (foundation/tenancy) <- foundation/authority": 3,
-    "table organisation_onboarding (foundation/tenancy) <- foundation/connections": 2,
     "table organisation_readiness_assessment (areas/organisation) <- foundation/tenancy": 2,
     "table organisation_workspace (foundation/agent) <- foundation/tenancy": 1,
     "table portal_chat_directory (foundation/conversation) <- foundation/tenancy": 1,

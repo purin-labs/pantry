@@ -18,6 +18,7 @@ import {
   type UnversionedControlMutationBoundary,
 } from "../data/control-mutation";
 import { errorMessage, isPositiveInteger } from "@purin-labs/std";
+import { prepareAccessChangeRevision } from "../data/organisation-onboarding-row";
 
 type AccessControlMutationStateRow = Readonly<{
   environment: unknown;
@@ -150,11 +151,10 @@ export async function createVersionedAccessGrant(
     },
   };
   statements.push(
-    prepareRevisionBump(
-      input.scope.database,
-      input.scope.organisationId,
-      input.expectedProjectionRevision,
-    ),
+    prepareAccessChangeRevision(input.scope.database, {
+      organisationId: input.scope.organisationId,
+      expectedProjectionRevision: input.expectedProjectionRevision,
+    }),
     ...prepareGrantSettlement(input, state.value, grant),
   );
   if (input.target.kind === "file_resource") {
@@ -314,11 +314,10 @@ export async function revokeVersionedAccessGrant(
           input.scope.placement.placementCellId,
           input.scope.fenceToken,
         ),
-      prepareRevisionBump(
-        input.scope.database,
-        input.scope.organisationId,
-        input.expectedProjectionRevision,
-      ),
+      prepareAccessChangeRevision(input.scope.database, {
+        organisationId: input.scope.organisationId,
+        expectedProjectionRevision: input.expectedProjectionRevision,
+      }),
       ...prepareGrantSettlement(input, state.value, grant),
     ];
     if (existing.value.target.kind === "file_resource") {
@@ -399,21 +398,6 @@ async function readMutationState(
   } catch (error) {
     return mutationFailure(errorMessage(error));
   }
-}
-
-function prepareRevisionBump(
-  db: Pick<OrganisationDatabase, "prepare">,
-  organisationId: OrganisationId,
-  expectedProjectionRevision: number,
-): D1PreparedStatement {
-  return db
-    .prepare(
-      `UPDATE organisation_onboarding
-        SET configuration_version = configuration_version + 1,
-            projection_revision = projection_revision + 1
-      WHERE organisation_id = ? AND projection_revision = ? AND changes() = 1`,
-    )
-    .bind(organisationId, expectedProjectionRevision);
 }
 
 function prepareFileGrantSync(

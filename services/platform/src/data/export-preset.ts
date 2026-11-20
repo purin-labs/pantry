@@ -42,6 +42,10 @@ import {
 } from "./capability-policy";
 import type { Variant } from "@purin-labs/type-utils";
 import {
+  prepareGuardedConfigurationVersionFence,
+  preparePublicationRevision,
+} from "./organisation-onboarding-row";
+import {
   assertNever,
   isRecord,
   nonNegativeIntegerOrNull,
@@ -329,26 +333,19 @@ export async function publishCommerceExportPreset(
     evidence: authoritative.value.evidence,
   };
   const statements = [
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-          SET configuration_version = ?, projection_revision = ?, updated_at = ?
-        WHERE organisation_id = ? AND configuration_version = ? AND projection_revision = ?
-          AND lifecycle IN ('configuring', 'active') AND EXISTS (SELECT 1 FROM organisation_placement
-            WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')`,
-      )
-      .bind(
-        publication.configurationVersion,
-        publication.projectionRevision,
-        input.controlMutation.identity.createdAt,
-        input.scope.organisationId,
-        configurationVersion,
-        projectionRevision,
-        input.scope.organisationId,
-        input.scope.placement.placementEpoch,
-        input.scope.placement.placementCellId,
-        input.scope.fenceToken,
-      ),
+    preparePublicationRevision(session, {
+      nextConfigurationVersion: publication.configurationVersion,
+      nextProjectionRevision: publication.projectionRevision,
+      now: input.controlMutation.identity.createdAt,
+      organisationId: input.scope.organisationId,
+      configurationVersion,
+      projectionRevision,
+      placement: {
+        placementEpoch: input.scope.placement.placementEpoch,
+        placementCellId: input.scope.placement.placementCellId,
+        fenceToken: input.scope.fenceToken,
+      },
+    }),
     prepareControlMutationReceiptAfterWrite(session, {
       scope: input.controlMutation.scope,
       boundary: input.controlMutation.boundary,
@@ -440,16 +437,11 @@ async function settleExportReplay(
   });
   try {
     const [admission] = await session.batch([
-      session
-        .prepare(
-          `UPDATE organisation_onboarding SET updated_at = updated_at
-        WHERE organisation_id = ? AND configuration_version = ? AND ${guard.condition}`,
-        )
-        .bind(
-          input.scope.organisationId,
-          input.expectedConfigurationVersion,
-          ...guard.bindings,
-        ),
+      prepareGuardedConfigurationVersionFence(session, {
+        organisationId: input.scope.organisationId,
+        version: input.expectedConfigurationVersion,
+        guard,
+      }),
       prepareControlMutationReceiptAfterWrite(session, {
         scope: input.controlMutation.scope,
         boundary: input.controlMutation.boundary,
