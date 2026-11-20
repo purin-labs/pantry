@@ -13,7 +13,7 @@ import {
   assertCommerceQueryPlanWithLexicon,
   planCommerceGraphQuery,
 } from "../../commerce/commerce-wasm";
-import type { CommerceQueryPlanReadError } from "./types";
+import type { CommerceQueryPlanReadError } from "./commerce-types";
 
 export function commerceRelationshipTraversalPlan(
   plan: CommerceQueryPlan,

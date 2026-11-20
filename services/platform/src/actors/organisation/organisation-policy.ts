@@ -83,7 +83,12 @@ import {
 } from "../../jev-features/paid-use";
 import { resolvePantryAccountBinding } from "../../account-platform/binding";
 import { listIntegrationAccounts } from "../../data/integration-account";
-import { assertNever, errorMessage, isRecord, sha256Hex } from "@purin-labs/std";
+import {
+  assertNever,
+  errorMessage,
+  isRecord,
+  sha256Hex,
+} from "@purin-labs/std";
 import {
   caseContextCollectionReviewDecision,
   caseContextCollectionSourceAccess,
@@ -104,7 +109,7 @@ import type {
   OrganisationPolicyActivation,
   OrganisationPolicyActivationError,
   OrganisationPolicyHead,
-} from "./types";
+} from "./policy-types";
 import { OrganisationActorBase } from "./organisation-actor-base";
 
 /**
@@ -356,7 +361,11 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
             : null,
         paidUse: {
           ...readJevPaidUse(sql, scope.organisationId),
-          spentMinor: readJevPaidSpendMinor(sql, scope.organisationId, Date.now()),
+          spentMinor: readJevPaidSpendMinor(
+            sql,
+            scope.organisationId,
+            Date.now(),
+          ),
           priced,
         },
       },
@@ -463,7 +472,10 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
             now,
           })) === 0
         )
-          return { ok: false, error: { code: "jev_feature_source_unavailable" } };
+          return {
+            ok: false,
+            error: { code: "jev_feature_source_unavailable" },
+          };
         break;
       case "related_cases": {
         const head = readCaseContextDiscoveryPolicy(sql, scope.organisationId);

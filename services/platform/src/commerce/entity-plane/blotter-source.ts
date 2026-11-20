@@ -41,7 +41,8 @@ import {
   parseSystemEntityRef,
   parseSystemSchemaRevision,
 } from "@purin-labs/commerce-client";
-import type { CommerceQueryPlanReadError, OrganisationStateError } from "../../actors/organisation/types";
+import type { CommerceQueryPlanReadError } from "../../actors/organisation/commerce-types";
+import type { OrganisationStateError } from "../../actors/organisation/types";
 import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
 import {
   COMMERCE_PROJECTION_STALE_AFTER_MS,
@@ -185,10 +186,11 @@ export class BlotterSource {
       CommerceGraphSourceError
     >
   > {
-    const read = await this.#organisation.readAcceptedCommerceProjectionSequence({
-      organisationId: this.#organisationId,
-      integrationAccountId: this.#integrationAccountId,
-    });
+    const read =
+      await this.#organisation.readAcceptedCommerceProjectionSequence({
+        organisationId: this.#organisationId,
+        integrationAccountId: this.#integrationAccountId,
+      });
     if (!read.ok) return sourceFailure(read.error);
     try {
       return {
@@ -1011,7 +1013,10 @@ function entityKey(reference: CommerceEntityRef): string {
 }
 
 function planReadFailure(
-  error: OrganisationStateError | CommerceQueryPlanReadError | { readonly code: "organisation_placement_conflict" },
+  error:
+    | OrganisationStateError
+    | CommerceQueryPlanReadError
+    | { readonly code: "organisation_placement_conflict" },
 ): BlotterQueryPlanResult {
   switch (error.code) {
     case "commerce_query_plan_unsupported":
@@ -1048,7 +1053,10 @@ function planReadFailure(
 }
 
 function relationshipPlanReadFailure(
-  error: OrganisationStateError | CommerceQueryPlanReadError | { readonly code: "organisation_placement_conflict" },
+  error:
+    | OrganisationStateError
+    | CommerceQueryPlanReadError
+    | { readonly code: "organisation_placement_conflict" },
 ): BlotterRelationshipStepResult {
   switch (error.code) {
     case "commerce_query_plan_unsupported":

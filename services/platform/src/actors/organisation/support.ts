@@ -32,15 +32,17 @@ import { readNextCodeModeOrganisationAlarmAt } from "../code-mode-budget";
 import { errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/control-api";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
+import type { CodeModeOrganisationActorError } from "./code-mode-types";
 import type {
-  CodeModeOrganisationActorError,
   OrganisationMeta,
   OrganisationMetaRow,
+  OrganisationStateError,
+} from "./types";
+import type {
   OrganisationPolicyActivation,
   OrganisationPolicyHead,
   OrganisationPolicyHeadRow,
-  OrganisationStateError,
-} from "./types";
+} from "./policy-types";
 
 const COMMERCE_BOARD_PRESENCE_TTL_MS = 30_000;
 

@@ -3,7 +3,7 @@ import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
   OrganisationPolicyActivationError,
-} from "../actors/organisation/types";
+} from "../actors/organisation/policy-types";
 import {
   parseProviderConnectionId,
   type ProviderConnectionId,

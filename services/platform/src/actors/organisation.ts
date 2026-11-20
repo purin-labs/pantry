@@ -185,6 +185,8 @@ import {
 import type {
   CommerceBoardPresenceRead,
   CommerceBoardPresenceUpdate,
+} from "./organisation/commerce-types";
+import type {
   OrganisationMeta,
   OrganisationMetaRequest,
   OrganisationPing,
@@ -1262,8 +1264,7 @@ export class OrganisationDO extends OrganisationCommerce {
         drafts: this.#menuDrafts,
         // A release names the Platform's screen media route: it serves an
         // image only while a published board names it.
-        mediaBase: () =>
-          Promise.resolve(screenMediaBase(scope.organisationId)),
+        mediaBase: () => Promise.resolve(screenMediaBase(scope.organisationId)),
       },
       command,
       Date.now(),

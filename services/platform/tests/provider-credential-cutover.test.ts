@@ -12,7 +12,7 @@ import {
 import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
-} from "../src/actors/organisation/types";
+} from "../src/actors/organisation/policy-types";
 import type { UserId, ProviderConnectionId, OrganisationId } from "../src/ids";
 import {
   writeStripeReadCredentialRef,
@@ -176,7 +176,8 @@ async function createCutoverFixture(): Promise<CutoverFixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "Credential Cutover",

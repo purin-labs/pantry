@@ -187,18 +187,22 @@ import {
 } from "./support";
 import type {
   ActivationExecutionFailure,
+  OnboardingActivationError,
+} from "./activation-types";
+import type {
   CafeCommerceAcceptanceFaultConsumption,
   CafeCommerceAcceptanceFaultRecord,
-  CodeModeOrganisationActorError,
   CommerceQueryPlanReadError,
-  OnboardingActivationError,
   OrganisationApplyCommerceDeliveryInput,
-  OrganisationCutoverCueSettlementError,
-  OrganisationCutoverCueSettlementInput,
-  OrganisationStateError,
   ReadCommerceQueryPlanInput,
   ReadCommerceQueryPlanValue,
   ReadCommerceRelationshipStepInput,
+} from "./commerce-types";
+import type { CodeModeOrganisationActorError } from "./code-mode-types";
+import type {
+  OrganisationCutoverCueSettlementError,
+  OrganisationCutoverCueSettlementInput,
+  OrganisationStateError,
 } from "./types";
 import { OrganisationPolicy } from "./organisation-policy";
 

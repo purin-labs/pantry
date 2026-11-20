@@ -415,7 +415,6 @@
     "services/platform/src/actors/menu-boards.ts#MenuBoardCommentEdit",
     "services/platform/src/actors/organisation-cutover-quiescence.ts#OrganisationCutoverBlocker",
     "services/platform/src/actors/organisation/types.ts#OrganisationPlan",
-    "services/platform/src/actors/organisation/types.ts#OrganisationStatus",
     "services/platform/src/actors/pi-model-transport.ts#PLATFORM_PI_MODELS",
     "services/platform/src/actors/schema-migrations.ts#SchemaMigrationStep",
     "services/platform/src/actors/session/types.ts#HarnessCheckpointRestartReason",
