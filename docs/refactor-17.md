@@ -1455,6 +1455,108 @@ the branch `refactor-17-table-owners`.
   voice Macs and the cue claim pass: 11 tests. `wrangler deploy --dry-run` passes
   for the six Workers. The full E2E suite did not run on the branch.
 
+**21 November 2026. The crossings that start in an area: 124 to 62,** on the branch
+`refactor-17-areas-rest`. The work list was each pair whose source is an area, a
+surface or a package.
+
+- **Placements with evidence.** A file moved in the map only when its imports and
+  its importers showed its module:
+  - `actors/connector-email.ts`, `actors/connector-email-proposal.ts` and
+    `actors/connector-whatsapp.ts` hold the agent state of a mailbox and a WhatsApp
+    number: drafts, reply turns, budgets and handoff. They import no surface
+    file, so they are `areas/inbox`. `actors/eval-task-processing.ts` is a mailbox
+    reply turn by its own comment, and it is `areas/inbox` too.
+  - `actors/actor-relocation-mail.ts` reads mail receipts, and only the email level
+    of the Connector and the relocation admin route import it: `surfaces/email`.
+    `actors/whatsapp-operator-notice.ts` posts to a Slack channel, and only the
+    WhatsApp RPC file imports it: `surfaces/slack`.
+  - The WhatsApp identifiers, the application configuration and the Graph client
+    import nothing above the kernel: `foundation/connections`.
+  - `slack/card-only-reply.ts` imports nothing: `foundation/tool-handlers`.
+  - In the Portal, the console tools context and the reasoning effort labels are
+    `foundation/ui`, and the approval sign-in window is `foundation/control`.
+    `features/integrations/settings-transport.ts` holds the route transports that
+    the Portal wiring gives two pages: `surfaces/portal`.
+- **Public files.** `mail/gmail-oauth.ts` (integrations) and `evals/scorer.ts`
+  (Brain) import only the foundation and packages. New public files:
+  `evals/contract/eval-task.ts`, `commerce/contract/observation-identity.ts`,
+  `integrations/contract/admin-integration.ts`,
+  `integrations/contract/provider-account-cleanup.ts`,
+  `mail-inbox/contract/account-erasure.ts` and `devices/contract/alert-delivery.ts`.
+  Each function moved with its body. The SQL texts and the bind order are the same.
+- **Ports.**
+  - The Connector class chain is `ConnectorDO`, `ConnectorEmail`,
+    `ConnectorWhatsApp`, `ConnectorEvals`, `ConnectorActorBase`. The Eval level asks
+    the mailbox level two abstract methods: if the agent is active, and to run one
+    task. It passes the Brain services of the task (`EvalTaskServices`). The email
+    schema gets the Eval schema step as an argument, in the same place.
+  - `ArchiveCleanupParts` gives the archive cleanup and the purge of an
+    Organisation the steps of the voice Macs, Slack, the devices and the WhatsApp
+    Connectors. The Worker file `archive-cleanup-parts.ts` gives them, and each
+    part names its function when it runs.
+  - The store of the running chat request is in `features/collaboration`: the
+    chat sets it, and the Café board reads it.
+- **Moves and merges.** The draft presence component and its styles are in
+  `features/collaboration/`, with the pointer names of
+  `@purin-labs/collaboration`. The WhatsApp and the mailbox Connector handles are
+  one helper. The strict read of the Organisation environment uses the read of
+  `control/organisation-runtime.ts`, so the gateway copy of that query is gone.
+  The workspace switcher owns the types of its choices.
+- **Not changed:** no stored value, SQL text, route, message text, delivery id,
+  RPC method name, schema step or schedule.
+- **Measures.** In scope: 124 to 62. Layer crossings: 287 to 222 (upward 134 to
+  84, between areas 56 to 44, order 72 to 71, table writes 25 to 23). Three
+  foundation pairs went down as a result: `foundation/tool-handlers ->
+  surfaces/slack` 3 to 2, `foundation/actor-runtime -> surfaces/email` 2 to 1 and
+  `foundation/actor-runtime -> foundation/connections` 1 to 0. Copies: 878 to 877.
+  Unused exports: 805, no change. Plain D1 handles: 66 to 62.
+- **What stays (62), and what removes it.**
+  - Inbox to Brain (7): the Inbox reads and proposes Memory and Evals through
+    `memory/access.ts` and `evals/access.ts`, which restore branded revisions. A
+    Memory service interface in `memory/contract/` that the Worker gives the
+    Connector and the Inbox routes removes them.
+  - Integrations to Inbox (5): the Gmail and WhatsApp connection workflows register
+    the mailbox, the sender and the phone number, and two routes tear down the
+    mailbox agent. A registration port of the integrations contract, given to the
+    integrations router and the provider workflows, removes them.
+  - Shopify (9): step A2.5 owns them.
+  - Devices to Café (4): the device fleet actor composes the Café terminal module
+    (step A1.9), and the devices route reads the terminal operations and the menu
+    screens (a Café read interface).
+  - Integrations to Slack (4) and Organisation to Slack (1): the Slack routes, the
+    Slack connection workflow and the account removal use the Slack installation
+    store. The store needs one owner below them, with a port for its Vault calls.
+  - Commerce to Slack (3): the commerce action builds the text of its Slack card,
+    and the commerce actions route binds a Slack setup channel. The action can give
+    typed facts, and the Slack surface can build the text.
+  - Commerce to organisation (3) and to the Worker (1): the commerce level of the
+    Organisation actor runs the activation steps and extends
+    `OrganisationActorBase` (step A1.9). The commerce actions route builds the
+    onboarding projection.
+  - Inbox to commerce (3): the sender links and the supplier context read the
+    commerce graph. A graph read service of the commerce contract removes them.
+  - Portal (5): the Café prompt edit reads and sends the Portal chat (a chat port
+    that the shell gives), two Organisation pages render in `PortalFrame`, and the
+    integrations page shows the Stripe setup part.
+  - Devices to voice (2): the shop Mac devices read the voice Mac store.
+  - Organisation to integrations (2): the onboarding route reconciles provider
+    observations, and the account removal reads the provider cleanup context. The
+    route can give that reader as an input; six unit test calls change with it.
+  - One each: Brain to Inbox (the verified contacts of an Eval), Brain to Slack (the
+    members of a Slack channel for a Memory reader), Inbox to WhatsApp (the send
+    ladder store), commerce to Café (the counter sale view), Café to Kitchen (the
+    bakery surface receipt), Kitchen to Inbox (the supplier email contact), Kitchen
+    to organisation (the configuration draft), integrations to organisation (the
+    account removal), organisation to Inbox (the Gmail pilot budget), organisation
+    to devices and to Kitchen (the configuration draft runs a device command and a
+    workflow change).
+  - Packages (2): step A1.11 owns them.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,730 tests) pass. The 106
+  journey files whose names hold a word of the brief ran in nine groups: 105 pass
+  and 1 is skipped (208 tests pass, 3 are skipped). `wrangler deploy --dry-run` and
+  the full E2E suite did not run on the branch.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
