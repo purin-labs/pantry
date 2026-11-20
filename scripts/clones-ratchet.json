@@ -202,7 +202,7 @@
     "services/platform/src/actors/commerce-projection/cues.ts = services/platform/src/cues/engine.ts": 1,
     "services/platform/src/actors/connector-email-evaluation.ts = services/platform/src/actors/connector-email-evaluation.ts": 1,
     "services/platform/src/actors/connector-email-operational.ts = services/platform/src/actors/connector-email-operational.ts": 7,
-    "services/platform/src/actors/connector-email-proposal.ts = services/platform/src/actors/connector-email-proposal.ts": 17,
+    "services/platform/src/actors/connector-email-proposal.ts = services/platform/src/actors/connector-email-proposal.ts": 12,
     "services/platform/src/actors/connector-whatsapp-proposal.ts = services/platform/src/actors/connector-whatsapp-proposal.ts": 1,
     "services/platform/src/actors/connector-whatsapp-rpc.ts = services/platform/src/actors/connector-whatsapp-rpc.ts": 2,
     "services/platform/src/actors/connector-whatsapp.ts = services/platform/src/data/email-mailbox.ts": 1,

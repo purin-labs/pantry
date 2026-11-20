@@ -1,7 +1,7 @@
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import { fetchConnectorMail } from "../mail-inbox/execution";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import {
   authorizeEmailProposalFlow,
   fenceEmailCaseContextCollectionEffect,
@@ -126,8 +126,7 @@ export async function previewEmailRelationship(
         code: "email_case_context_collection_relationship_edit_unavailable",
       },
     };
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const operation = latestEmailDraftOperation(input.sql, input.proposalId);
   const runtime = readEmailRuntime(input.sql);
   if (
@@ -262,8 +261,7 @@ export async function correctEmailRelationship(
     input.scope,
     input.fetcher,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const selected = await previewEmailRelationship({
     sql: input.sql,
     env: input.env,
@@ -523,8 +521,7 @@ export async function editEmailReplyBody(
     input.scope,
     input.fetcher,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const operation = latestEmailDraftOperation(input.sql, input.proposalId);
   const runtime = readEmailRuntime(input.sql);
   if (
@@ -992,8 +989,7 @@ export async function dispatchEmailReply(
     input.scope,
     input.fetcher,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const runtime = readEmailRuntime(input.sql);
   if (
     runtime === null ||
@@ -1319,8 +1315,7 @@ export async function resolveEmailProposalState(
     input.scope,
     input.fetcher,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const runtime = readEmailRuntime(input.sql);
   if (runtime === null || runtime.organisationId !== input.scope.organisationId)
     return { ok: false, error: { code: "connector_email_runtime_missing" } };
@@ -1425,8 +1420,7 @@ export async function disposeEmailProposal(
     input.scope,
     input.fetcher,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const runtime = readEmailRuntime(input.sql);
   const operation = latestEmailDraftOperation(input.sql, input.proposalId);
   if (operation === null)
@@ -1587,8 +1581,7 @@ async function inspectCurrentDraft(
     input.scope,
     input.fetcher,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const runtime = readEmailRuntime(input.sql);
   if (runtime === null || runtime.organisationId !== input.scope.organisationId)
     return { ok: false, error: { code: "connector_email_runtime_missing" } };
@@ -1665,8 +1658,7 @@ async function reconstructTarget(
     input.scope,
     input.fetcher,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const runtime = readEmailRuntime(input.sql);
   if (runtime === null || runtime.organisationId !== input.scope.organisationId)
     return { ok: false, error: { code: "connector_email_runtime_missing" } };
@@ -1744,8 +1736,7 @@ async function reconcileIndeterminateSend(
   accessToken: string,
   dispatchVersion: number,
 ): Promise<Result<string | null, EmailProposalError>> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const runtime = readEmailRuntime(input.sql);
   if (runtime === null || runtime.organisationId !== input.scope.organisationId)
     return { ok: false, error: { code: "connector_email_runtime_missing" } };
@@ -1918,8 +1909,7 @@ async function cleanUnknownCaseContextCollectionDrafts(
     fetcher,
   });
   if (!access.ok) return { cleaned: 0, unresolved: candidates.length };
-  const operations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.drafts;
+  const operations = GMAIL_MAILBOX.drafts;
   let cleaned = 0;
   for (const candidate of candidates) {
     const found = await operations.findCreationEvidence({

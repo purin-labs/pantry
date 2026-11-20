@@ -1,7 +1,7 @@
 import { runtimeFetch } from "../runtime-fetch";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { assertNever } from "@purin-labs/std";
 import type { MailDecision } from "@purin-labs/control-api";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
@@ -108,8 +108,7 @@ export async function readDecision(
     context.scope,
     context.fetcher ?? runtimeFetch,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const authorized = await authorizedHead(context, input);
   if (!authorized.ok) return authorized;
   const head = authorized.value;

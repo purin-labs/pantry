@@ -4,7 +4,7 @@ import {
   type MailConnectorContext,
 } from "../mail-inbox/execution";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 
 import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
@@ -219,8 +219,7 @@ export async function establishConnectorEmailWatch(
       fetcher: typeof fetch;
     }>,
 ): Promise<Result<ConnectorEmailActivation, ConnectorEmailAccessError>> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   if (!(await isActorExecutionActive(input.storage.sql, input.scope)))
     return { ok: false, error: { code: "connector_placement_conflict" } };
   const fetcher = fetchConnectorMail.bind(
@@ -289,10 +288,10 @@ export async function readConnectorEmailHistoryId(
     fetcher,
   });
   if (!access.ok) return access;
-  const profile =
-    await PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.reads.readProfile(
-      { accessToken: access.value, fetcher },
-    );
+  const profile = await GMAIL_MAILBOX.reads.readProfile({
+    accessToken: access.value,
+    fetcher,
+  });
   return profile.ok
     ? { ok: true, value: profile.value.historyId }
     : { ok: false, error: { code: profile.error.code } };
@@ -306,8 +305,7 @@ export async function renewConnectorEmailWatch(
       fetcher: typeof fetch;
     }>,
 ): Promise<Result<number, ConnectorEmailAccessError>> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   if (!(await isActorExecutionActive(input.storage.sql, input.scope)))
     return { ok: false, error: { code: "connector_placement_conflict" } };
   const fetcher = fetchConnectorMail.bind(
@@ -367,13 +365,10 @@ export async function stopConnectorEmailWatch(
     fetcher,
   });
   if (!access.ok) return access;
-  const stopped =
-    await PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.observation.stopWatch(
-      {
-        accessToken: access.value,
-        fetcher,
-      },
-    );
+  const stopped = await GMAIL_MAILBOX.observation.stopWatch({
+    accessToken: access.value,
+    fetcher,
+  });
   if (!stopped.ok) return { ok: false, error: { code: stopped.error.code } };
   // Keep an acknowledged stop in the export even when placement froze in flight.
   input.storage.transactionSync(settleEmailWatchCleanup.bind(null, sql));
@@ -411,8 +406,7 @@ export async function runConnectorEmailEvaluation(
   input: MailConnectorContext &
     Readonly<{ now: number; fetcher: typeof fetch }>,
 ): Promise<EmailEvaluationOutcome> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const sql = input.storage.sql;
   if (!(await isActorExecutionActive(sql, input.scope)))
     return { kind: "deferred", reason: "connector_placement_conflict" };

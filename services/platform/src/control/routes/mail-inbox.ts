@@ -1,5 +1,5 @@
 import { runtimeFetch } from "../../runtime-fetch";
-import { PROVIDER_ADAPTERS } from "../../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   authorizeMailSource,
@@ -56,8 +56,7 @@ export async function handleMailInboxRoute(
   env: Env,
   route: MailInboxRoute,
 ): Promise<Response> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   if (request.method !== "GET" && request.method !== "POST")
     return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(

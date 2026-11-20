@@ -10,7 +10,7 @@ import type { EmailReviewProjection } from "../data/email-review";
 import type { Env } from "../env";
 import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
 import { authorizeMailSource } from "../mail-inbox/authorization";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { runtimeFetch } from "../runtime-fetch";
 import {
   authorizeOrganisationRequest,
@@ -159,10 +159,11 @@ async function readThreadHeadline(
   accessToken: string,
   [threadId]: readonly [string, readonly string[]],
 ): Promise<EmailReplyHeadline | null> {
-  const read =
-    await PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.reads.readThreadHeadline(
-      { accessToken, threadId, fetcher: runtimeFetch },
-    );
+  const read = await GMAIL_MAILBOX.reads.readThreadHeadline({
+    accessToken,
+    threadId,
+    fetcher: runtimeFetch,
+  });
   return read.ok && read.value !== null ? replyHeadline(read.value) : null;
 }
 

@@ -23,7 +23,10 @@ import type { ActiveCapabilityId } from "../authorization/capability-catalogue";
 import type { IntegrationDiscoveryDataClass } from "@purin-labs/contracts";
 import type { GmailAuthorizationProduct } from "../mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
-import type { MailIntegrationProvider, MailProviderAdapter } from "./mail";
+import type {
+  MailIntegrationProvider,
+  MailProviderAdapter,
+} from "../mail/provider-adapter";
 
 export type ActiveIntegrationProvider = Extract<
   IntegrationProvider,

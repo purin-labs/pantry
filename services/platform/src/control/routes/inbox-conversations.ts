@@ -13,7 +13,7 @@ import {
 import { listEmailReviewProjections } from "../../data/email-review";
 import { listIntegrationAccounts } from "../../data/integration-account";
 import { extractMailbox } from "../../mail/gmail-adapter";
-import { PROVIDER_ADAPTERS } from "../../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import { runtimeFetch } from "../../runtime-fetch";
 import {
   listWhatsAppCaseConversationWindows,
@@ -177,7 +177,7 @@ async function readUnansweredThreads(
     organisationId: authorized.organisationId,
   });
   const unanswered: InboxUnansweredThread[] = [];
-  const mail = PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mail = GMAIL_MAILBOX;
   for (const account of accounts) {
     if (account.provider !== "gmail") continue;
     const policy = await readMailboxIngressPolicy({

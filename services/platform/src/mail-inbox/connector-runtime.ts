@@ -3,7 +3,7 @@ import { runtimeFetch } from "../runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type {
   MailOrganizationView,
   MailClassification,
@@ -118,8 +118,7 @@ export async function queueSelectedMail(
     input.scope,
     input.fetcher ?? runtimeFetch,
   );
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   if (mailPendingCount(input.storage.sql) + input.messageIds.length > 250)
     return false;
   const access = await resolveConnectorGmailAccess({
@@ -339,8 +338,7 @@ async function observeMail(
   input: MailConnectorContext,
   head: MailOrganizationHead,
 ): Promise<void> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   if (head.observation.kind !== "watching") return;
   const fetcher = fetchConnectorMail.bind(
     null,

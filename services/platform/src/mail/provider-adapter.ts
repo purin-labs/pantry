@@ -1,5 +1,5 @@
-import type * as Gmail from "../mail/gmail-adapter";
-import type { GmailAuthorizationProduct } from "../mail/gmail-authorization";
+import type * as Gmail from "./gmail-adapter";
+import type { GmailAuthorizationProduct } from "./gmail-authorization";
 
 type GmailMailProducts = {
   readonly full_mailbox_pilot: {

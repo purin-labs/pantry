@@ -1,7 +1,7 @@
 {
   "totals": {
     "upward": 383,
-    "areas": 242,
+    "areas": 229,
     "order": 136,
     "table": 118
   },
@@ -33,7 +33,7 @@
     "areas/devices -> surfaces/voice": 2,
     "areas/inbox -> areas/brain": 10,
     "areas/inbox -> areas/commerce": 8,
-    "areas/inbox -> areas/integrations": 20,
+    "areas/inbox -> areas/integrations": 7,
     "areas/inbox -> areas/organisation": 7,
     "areas/inbox -> surfaces/email": 7,
     "areas/inbox -> surfaces/portal": 1,

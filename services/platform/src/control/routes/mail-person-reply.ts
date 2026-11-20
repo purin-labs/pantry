@@ -21,7 +21,7 @@ import { extractMailbox } from "../../mail/gmail-adapter";
 import type { Env } from "../../env";
 import { parseIntegrationAccountId } from "../../ids";
 import { authorizeMailSource } from "../../mail-inbox/authorization";
-import { PROVIDER_ADAPTERS } from "../../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import { runtimeFetch } from "../../runtime-fetch";
 import {
   controlMutationScope,
@@ -164,7 +164,7 @@ export async function handleMailPersonReplyRoute(
     fetcher: runtimeFetch,
   });
   if (!access.ok) return controlError("mail_access_unavailable", 502);
-  const mail = PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mail = GMAIL_MAILBOX;
   const thread = await mail.reads.readConversation({
     accessToken: access.value,
     threadId,

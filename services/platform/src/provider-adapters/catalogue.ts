@@ -5,9 +5,9 @@ import {
   gmailAuthorizationSecretForProduct,
   gmailCleanupAdapter,
   gmailConfigurationIsValidForProduct,
-  gmailMailAdapter,
   gmailOnboardingAdapter,
 } from "./gmail";
+import { gmailMailAdapter } from "../mail/gmail-mail-adapter";
 import { notionCleanupAdapter, notionOnboardingAdapter } from "./notion";
 import {
   shopifyCleanupAdapter,

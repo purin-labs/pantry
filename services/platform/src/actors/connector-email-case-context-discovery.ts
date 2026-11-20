@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { Env } from "../env";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
@@ -46,8 +46,7 @@ export async function discoverAdmittedEmailCaseContext(
     fetcher: typeof fetch;
   }>,
 ): Promise<EmailCaseContextDiscoveryOutcome> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   if (!(await isActorExecutionActive(input.sql, input.scope)))
     return placementRetry();
   const fetcher = fetchConnectorMail.bind(

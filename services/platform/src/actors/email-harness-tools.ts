@@ -1,4 +1,4 @@
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type {
   AuthorizedHarnessToolResult,
   HarnessToolOutput,
@@ -414,8 +414,7 @@ export async function createEmailHarnessToolHost(
   const admittedContent = async (
     messageId: string,
   ): Promise<Result<GmailMessageContent, { readonly code: string }>> => {
-    const mailOperations =
-      PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+    const mailOperations = GMAIL_MAILBOX;
     if (
       !input.manifest.messageIds.includes(messageId) &&
       !(
@@ -910,8 +909,7 @@ async function readEmailAttachment(
   fetcher: typeof fetch,
   inputJson: string,
 ): Promise<AuthorizedHarnessToolResult> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   let parsed: unknown;
   try {
     parsed = JSON.parse(inputJson);

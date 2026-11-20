@@ -6,7 +6,7 @@ import {
 } from "../mail-inbox/execution";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { gmailMailAdapter } from "../mail/gmail-mail-adapter";
 import type { SqlStorage, SqlStorageValue } from "@cloudflare/workers-types";
 
 import {
@@ -840,7 +840,7 @@ export async function dispatchOperationalEmail(
     body: content.body,
     rfcMessageId,
   });
-  const sent = await PROVIDER_ADAPTERS.gmail.mail.products[
+  const sent = await gmailMailAdapter.products[
     authority.value.authorizationProduct
   ].submission.sendMessage({
     accessToken: authority.value.accessToken,

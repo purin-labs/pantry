@@ -38,7 +38,7 @@ import {
 } from "../policy/information-flow";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import {
   extractMailbox,
   type GmailMessageContent,
@@ -389,14 +389,11 @@ async function validateCaseContextCollectionProviderSources(
   });
   if (!access.ok) return access;
   for (const selected of dependency.selections) {
-    const content =
-      await PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.reads.readMessage(
-        {
-          accessToken: access.value,
-          messageId: selected.source.reference,
-          fetcher: runtimeFetch,
-        },
-      );
+    const content = await GMAIL_MAILBOX.reads.readMessage({
+      accessToken: access.value,
+      messageId: selected.source.reference,
+      fetcher: runtimeFetch,
+    });
     if (!content.ok) {
       if (content.error.code === "gmail_not_found") {
         const organisationId = parseOrganisationId(

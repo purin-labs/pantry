@@ -1,5 +1,5 @@
 import { runtimeFetch } from "../runtime-fetch";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import type { MailRule } from "@purin-labs/control-api";
@@ -306,8 +306,7 @@ async function currentActionMessage(
   | Readonly<{ kind: "stale"; message?: never }>
   | Readonly<{ kind: "unavailable"; message?: never }>
 > {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const classifications = await listMailClassifications(
     input.scope.database,
     head,

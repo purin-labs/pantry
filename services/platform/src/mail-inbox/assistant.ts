@@ -2,7 +2,7 @@ import { runtimeFetch } from "../runtime-fetch";
 import { turnMemoryReaderWithoutSubjects } from "../memory/access";
 import { ensureCaseProject } from "../projects/case-project";
 import type { MailConnectorContext } from "./execution";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type {
   MailAssistantCommand,
   MailAssistantResult,
@@ -268,7 +268,10 @@ async function executeAssistant(
   const preparedContext = await prepareTurnContext({
     db: context.scope.database,
     accountAccess: context.scope.accountAccess,
-    userAuthority: { kind: "authenticated_session", nativeSessionId: input.controlSessionId },
+    userAuthority: {
+      kind: "authenticated_session",
+      nativeSessionId: input.controlSessionId,
+    },
     action: "execute",
     organisationId: input.identity.organisationId,
     caseId: caseId.value,
@@ -312,7 +315,10 @@ async function executeAssistant(
     revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
       db: context.scope.database,
       accountAccess: context.scope.accountAccess,
-      userAuthority: { kind: "authenticated_session", nativeSessionId: input.controlSessionId },
+      userAuthority: {
+        kind: "authenticated_session",
+        nativeSessionId: input.controlSessionId,
+      },
       action: "execute",
       organisationId: input.identity.organisationId,
       requestAuthority: input.authority,
@@ -524,8 +530,7 @@ async function readAssistantEvidence(
   input: MailOrganizationActorInput,
   messageId: string,
 ): Promise<Result<string, AssistantError>> {
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const allowed = await authorizeMailAssistant(env, input);
   if (!allowed.ok) return allowed;
   const access = await resolveConnectorGmailAccess({

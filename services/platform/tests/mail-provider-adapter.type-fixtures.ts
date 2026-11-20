@@ -3,7 +3,7 @@ import type {
   ActiveIntegrationProvider,
   ProviderAdapter,
 } from "../src/provider-adapters/domain";
-import type { MailProviderAdapter } from "../src/provider-adapters/mail";
+import type { MailProviderAdapter } from "../src/mail/provider-adapter";
 import type { GmailAuthorizationProduct } from "../src/mail/gmail-authorization";
 
 type GmailProducts = MailProviderAdapter<"gmail">["products"];

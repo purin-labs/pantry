@@ -7,7 +7,7 @@ import {
   createMailboxTurnMemoryReader,
   readMailboxSupplierScope,
 } from "../memory/mailbox-turn";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import {
@@ -1558,8 +1558,7 @@ async function removeUnreceiptedEmailDraft(
     proposalId: string;
   }>,
 ): Promise<Result<null, EmailThreadTurnError>> {
-  const drafts =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.drafts;
+  const drafts = GMAIL_MAILBOX.drafts;
   const fetcher = fetchConnectorMail.bind(
     null,
     input.connectorSql,
@@ -2365,8 +2364,7 @@ export async function createEmailProposalDraft(
     origin.kind === "mailbox"
       ? "connector_placement_conflict"
       : "connector_execution_authority_inactive";
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const organisationId = parseOrganisationId(input.organisationId);
   const integrationAccountId = parseIntegrationAccountId(
     input.integrationAccountId,

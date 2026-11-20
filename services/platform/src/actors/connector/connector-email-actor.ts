@@ -3,7 +3,7 @@ import {
   reconcileFrozenMailReceipt,
   type RelocationMailReceiptRequest,
 } from "../actor-relocation-mail";
-import { PROVIDER_ADAPTERS } from "../../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import {
   fetchSessionConnectorMail,
   isSessionMailExecutionActive,
@@ -676,15 +676,12 @@ export abstract class ConnectorEmail extends ConnectorEvals {
     )
       return invalid("connector_execution_authority_inactive");
     if (!access.ok) return invalid(access.error.code);
-    const searched =
-      await PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot.reads.searchMessages(
-        {
-          accessToken: access.value,
-          query: input.query,
-          limit: input.limit,
-          fetcher,
-        },
-      );
+    const searched = await GMAIL_MAILBOX.reads.searchMessages({
+      accessToken: access.value,
+      query: input.query,
+      limit: input.limit,
+      fetcher,
+    });
     if (
       !(await isSessionMailExecutionActive(
         sql,

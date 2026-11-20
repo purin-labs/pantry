@@ -1,6 +1,6 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
-import { PROVIDER_ADAPTERS } from "../provider-adapters/catalogue";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   parseMailClassifications,
@@ -74,8 +74,7 @@ export async function evaluateMail(
   )
     return failure("organisation_placement_conflict");
   const fetcher = fetchMailEvaluation.bind(null, input);
-  const mailOperations =
-    PROVIDER_ADAPTERS.gmail.mail.products.full_mailbox_pilot;
+  const mailOperations = GMAIL_MAILBOX;
   const request = input.request;
   if (
     request.authority.kind !== "control" ||
