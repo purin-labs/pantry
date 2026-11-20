@@ -54,7 +54,8 @@
     "services/platform/src/agent-tools/drafts/drafts.ts": "Holds tool definitions of cafe, commerce, inbox and kitchen. Split by area in step A1.3.",
     "services/platform/src/agent-tools/session-support.ts": "Holds the exit check of the foundation and helpers of four areas. Split in step A1.4.",
     "services/platform/src/actors/organisation.ts": "The class OrganisationDO with logic of tenancy, authority, commerce and collaboration. The class becomes a shell of the Worker in steps A1.1 and A1.5.",
-    "services/platform/src/ingress-queue.ts": "The queue consumer of the Worker with message types of slack, commerce, kitchen and agent. Each module gets its message types in step A1."
+    "services/platform/src/ingress-queue.ts": "The queue consumer of the Worker with message types of slack, commerce, kitchen and agent. Each module gets its message types in step A1.",
+    "services/platform/src/actors/organisation/support.ts": "Helpers of the Organisation actor for the code of commerce, policy and Code Mode. They go with their module when the class becomes a shell (step A1.9)."
   },
   "placement": {
     "*": "root",
@@ -635,7 +636,7 @@
     "services/platform/src/actors/connector/ingress-parsers.ts": "foundation/conversation",
     "services/platform/src/actors/connector/slack-delivery.ts": "surfaces/slack",
     "services/platform/src/actors/connector/steer-fault.ts": "foundation/conversation",
-    "services/platform/src/actors/connector/support.ts": "areas/organisation",
+    "services/platform/src/actors/connector/support.ts": "foundation/conversation",
     "services/platform/src/actors/connector/types.ts": "foundation/conversation",
     "services/platform/src/actors/connector/whatsapp-parsers.ts": "surfaces/whatsapp",
     "services/platform/src/actors/conversation-residency.ts": "foundation/actor-runtime",
@@ -708,7 +709,7 @@
     "services/platform/src/actors/organisation/organisation-policy.ts": "foundation/authority",
     "services/platform/src/actors/organisation/policy-types.ts": "foundation/authority",
     "services/platform/src/actors/organisation/schema.ts": "workers/platform",
-    "services/platform/src/actors/organisation/support.ts": "areas/organisation",
+    "services/platform/src/actors/organisation/support.ts": "workers/platform",
     "services/platform/src/actors/organisation/types.ts": "foundation/tenancy",
     "services/platform/src/actors/pi-durable-checkpoint.ts": "foundation/agent",
     "services/platform/src/actors/pi-durable-code-receipt.ts": "foundation/agent",
@@ -1050,7 +1051,7 @@
     "services/platform/src/gateway/identity-link.ts": "surfaces/webhooks",
     "services/platform/src/gateway/integration-accounts.ts": "areas/integrations",
     "services/platform/src/gateway/mail-webhooks.ts": "surfaces/email",
-    "services/platform/src/gateway/support.ts": "areas/organisation",
+    "services/platform/src/gateway/support.ts": "surfaces/webhooks",
     "services/platform/src/harness-checkpoint.ts": "foundation/agent",
     "services/platform/src/http.ts": "foundation/kernel",
     "services/platform/src/ids.ts": "foundation/kernel",
