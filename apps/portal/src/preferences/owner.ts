@@ -20,7 +20,7 @@ type PendingEdit = Readonly<{
   sequence: number;
 }>;
 
-export type SaveState =
+type SaveState =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "saving" }>
   | Readonly<{ kind: "failed"; message: string }>;
@@ -254,7 +254,7 @@ function preferencePath(area: PreferenceArea): string {
   return `/v1/control/user/preferences/${area}`;
 }
 
-export function cacheKey(userId: UserId, area: PreferenceArea): string {
+function cacheKey(userId: UserId, area: PreferenceArea): string {
   return `satyr:preferences:${userId}:${area}`;
 }
 

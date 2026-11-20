@@ -25,7 +25,7 @@ import type {
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
-export type CommerceEntityTableRow = Readonly<{
+type CommerceEntityTableRow = Readonly<{
   entity: CommerceEntity;
   relationships: readonly CommerceRelationship[];
 }>;
@@ -38,7 +38,7 @@ export type CommerceEntityTableModel = Readonly<{
   nextCursor: CommerceCursor | null;
 }>;
 
-export type CommerceRelationshipTraversalModel = Readonly<{
+type CommerceRelationshipTraversalModel = Readonly<{
   kind: "relationship_traversal";
   seed: CommerceEntityRef;
   entities: readonly CommerceEntity[];
@@ -54,7 +54,7 @@ export type CommerceEntityDossierModel = Readonly<{
   freshness: readonly CommerceFreshness[];
 }>;
 
-export type CommerceListTableRow = Readonly<{
+type CommerceListTableRow = Readonly<{
   entity: CommerceEntity;
   entry: CommerceListEntry;
   contextualAttributes: readonly ListEntryAttributeValue[];
@@ -67,7 +67,7 @@ export type CommerceListTableModel = Readonly<{
   rows: readonly CommerceListTableRow[];
 }>;
 
-export type CommerceBoardLane = Readonly<{
+type CommerceBoardLane = Readonly<{
   key: string;
   rows: readonly CommerceListTableRow[];
 }>;
@@ -80,7 +80,7 @@ export type CommerceBoardModel = Readonly<{
   lanes: readonly CommerceBoardLane[];
 }>;
 
-export type CommerceModelError =
+type CommerceModelError =
   | Readonly<{ kind: "entity_not_found"; reference: CommerceEntityRef }>
   | Readonly<{
       kind: "list_entry_entity_not_found";
@@ -187,7 +187,7 @@ export function buildEntityTypeTableModel(
   };
 }
 
-export function buildCommerceRelationshipTraversalModel(
+function buildCommerceRelationshipTraversalModel(
   result: CommerceGraphQueryResult,
   seed: CommerceEntityRef,
 ): CommerceModelResult<CommerceRelationshipTraversalModel> {

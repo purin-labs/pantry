@@ -29,14 +29,12 @@ import {
   type SimulatorHistoryActionFeedback,
   type SimulatorHistoryEntry,
   type SimulatorHistorySnapshot,
-  type SimulatorHistoryTimelineEntry,
 } from "./simulator-history-store";
 
 export type {
   SimulatorHistoryActionFeedback,
   SimulatorHistoryEntry,
   SimulatorHistorySnapshot,
-  SimulatorHistoryTimelineEntry,
 };
 
 const FLOOR_PLAN_WORKSPACE_STORAGE_KEY = "satyr:floor-plan-workspace:v1";
@@ -573,11 +571,6 @@ export const floorPlanWorkspace = new FloorPlanWorkspace(
   initialUrlPlan ?? "asakusabashi-t101940",
   initialUrlPlan !== null,
 );
-
-export const canUndo = floorPlanWorkspace.canUndo;
-export const canRedo = floorPlanWorkspace.canRedo;
-export const undo = floorPlanWorkspace.undo;
-export const redo = floorPlanWorkspace.redo;
 
 export function useSimulatorHistory(): SimulatorHistorySnapshot &
   Readonly<{

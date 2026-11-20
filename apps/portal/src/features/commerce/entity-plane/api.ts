@@ -79,7 +79,7 @@ type CommerceHomeGraphCountName =
   | "home_payment_failures"
   | "home_delayed_shipments";
 
-export type CommerceHomeAggregationName =
+type CommerceHomeAggregationName =
   | CommerceHomeGraphCountName
   | "home_product_shortages"
   | "home_supply_shortages";
@@ -670,20 +670,6 @@ export function commerceCollectionQuery(
   }
 }
 
-export function normalizeCommerceCollectionSelection(
-  selection: CommerceCollectionSelectionInput,
-): CommerceCollectionSelection {
-  const query = commerceCollectionQuery(selection);
-  switch (query.kind) {
-    case "commerce_list_page":
-      return { kind: "commerce_list", listId: query.listId };
-    case "saved_commerce_view":
-      return { kind: "saved_commerce_view", viewId: query.viewId };
-    default:
-      throw new Error("Commerce collection query changed shape.");
-  }
-}
-
 export function systemEntityRef(
   typeId: SystemCommerceEntityKind,
   entityId: string,
@@ -715,7 +701,7 @@ export function customEntityRef(
   return query.reference;
 }
 
-export function relationshipTraversalQuery(
+function relationshipTraversalQuery(
   seed: CommerceEntityRef,
 ): CommerceGraphQuery {
   return parseCommerceGraphQuery({
@@ -727,7 +713,7 @@ export function relationshipTraversalQuery(
   });
 }
 
-export function commerceAggregationQuery(
+function commerceAggregationQuery(
   typeId: SystemCommerceEntityKind,
   filter: CommerceFilter = allFilter(),
 ): CommerceGraphQuery {
@@ -739,7 +725,7 @@ export function commerceAggregationQuery(
   });
 }
 
-export function homeCommerceAggregationQuery(
+function homeCommerceAggregationQuery(
   name: CommerceHomeGraphCountName,
 ): CommerceGraphQuery {
   switch (name) {
@@ -773,7 +759,7 @@ function systemEntityTypeId(
   return { origin: "system", typeId };
 }
 
-export function allFilter(): CommerceFilter {
+function allFilter(): CommerceFilter {
   return { kind: "all" };
 }
 

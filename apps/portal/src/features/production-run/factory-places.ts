@@ -149,7 +149,7 @@ export function instanceLabel(instance: string): string {
   return instance;
 }
 
-export function stepLabel(key: string): string {
+function stepLabel(key: string): string {
   const tray = /^tray-(\d+)\.(.+)$/u.exec(key);
   if (tray === null) return key.replaceAll("-", " ");
   return `tray ${tray[1] ?? ""} · ${(tray[2] ?? "").replaceAll("-", " ")}`;
