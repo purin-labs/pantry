@@ -1309,3 +1309,89 @@ function storeFailure(error: unknown): Result<never, AccessGrantDataError> {
     },
   };
 }
+
+/** A condition that a grant insert checks, and its values. */
+type GrantGuard = Readonly<{ condition: string; bindings: readonly unknown[] }>;
+
+/** The values of an active grant at its first revision, as stored JSON. */
+type FirstGrantRevision = Readonly<{
+  organisationId: string;
+  grantId: string;
+  subjectJson: string;
+  targetJson: string;
+  provenanceJson: string;
+  changedAt: number;
+}>;
+
+/** Adds an active grant at its first revision while the guard holds. */
+export function prepareGuardedFirstGrant(
+  db: Pick<OrganisationDatabase, "prepare">,
+  input: FirstGrantRevision & Readonly<{ guard: GrantGuard }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `INSERT INTO access_grant (
+       organisation_id, grant_id, subject_json, target_json, lifecycle,
+       revision, reason, provenance_json, changed_at
+     ) SELECT ?, ?, ?, ?, 'active', 1, NULL, ?, ? WHERE ${input.guard.condition}`,
+    )
+    .bind(
+      input.organisationId,
+      input.grantId,
+      input.subjectJson,
+      input.targetJson,
+      input.provenanceJson,
+      input.changedAt,
+      ...input.guard.bindings,
+    );
+}
+
+/**
+ * Adds the context grant of a WhatsApp support binding while the placement
+ * is active and the binding is at `bindingRevision`. A grant that exists
+ * stays. With `precedingWrite`, it also needs a change by the statement
+ * before it.
+ */
+export function prepareSupportBindingContextGrant(
+  db: Pick<OrganisationDatabase, "prepare">,
+  input: FirstGrantRevision &
+    Readonly<{
+      placement: Readonly<{
+        placementEpoch: number;
+        placementCellId: string;
+        fenceToken: string;
+      }>;
+      integrationAccountId: string;
+      supportBindingId: string;
+      bindingRevision: number;
+      precedingWrite: "" | " AND changes() = 1";
+    }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `INSERT INTO access_grant (
+       organisation_id, grant_id, subject_json, target_json, lifecycle,
+       revision, reason, provenance_json, changed_at
+     ) SELECT ?, ?, ?, ?, 'active', 1, NULL, ?, ? WHERE EXISTS (SELECT 1 FROM organisation_placement
+       WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')
+       AND EXISTS (SELECT 1 FROM whatsapp_support_binding WHERE organisation_id = ? AND integration_account_id = ?
+         AND support_binding_id = ? AND current_revision = ?)${input.precedingWrite}
+     ON CONFLICT (organisation_id, grant_id) DO NOTHING`,
+    )
+    .bind(
+      input.organisationId,
+      input.grantId,
+      input.subjectJson,
+      input.targetJson,
+      input.provenanceJson,
+      input.changedAt,
+      input.organisationId,
+      input.placement.placementEpoch,
+      input.placement.placementCellId,
+      input.placement.fenceToken,
+      input.organisationId,
+      input.integrationAccountId,
+      input.supportBindingId,
+      input.bindingRevision,
+    );
+}
